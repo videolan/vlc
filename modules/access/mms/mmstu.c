@@ -1196,22 +1196,20 @@ static int  mms_ParseCommand( stream_t *p_access,
         return -1;
     }
 
-    if( (p_sys->p_cmd = malloc( i_data )) )
-    {
-        p_sys->i_cmd = i_data;
-        memcpy( p_sys->p_cmd, p_data, i_data );
-        *pi_used = i_data; /* by default */
-    }
-    else
-    {
-        return -1;
-    }
-
-    if( i_length > p_sys->i_cmd )
+    if( i_length > i_data )
     {
         msg_Warn( p_access,
                   "truncated command (missing %zu bytes)",
                    (size_t)i_length - i_data  );
+        return -1;
+    }
+
+    if( (p_sys->p_cmd = malloc( i_length )) )
+    {
+        memcpy( p_sys->p_cmd, p_data, i_length );
+    }
+    else
+    {
         return -1;
     }
     p_sys->i_cmd = i_length;
