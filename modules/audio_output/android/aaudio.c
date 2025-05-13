@@ -668,13 +668,9 @@ Play(aout_stream_t *stream, vlc_frame_t *frame, vlc_tick_t date)
         if (RequestStart(stream) != VLC_SUCCESS)
             goto bailout;
     }
-    else if (state == AAUDIO_STREAM_STATE_UNINITIALIZED)
+    else if (state != AAUDIO_STREAM_STATE_STARTING
+          && state != AAUDIO_STREAM_STATE_STARTED)
         goto bailout;
-    else
-    {
-        assert(state == AAUDIO_STREAM_STATE_STARTING
-            || state == AAUDIO_STREAM_STATE_STARTED);
-    }
 
     assert(sys->as);
 
