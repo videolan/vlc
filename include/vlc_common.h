@@ -221,7 +221,9 @@
 #if defined (__GNUC__) || defined (__clang__)
 # define likely(p)     __builtin_expect(!!(p), 1)
 # define unlikely(p)   __builtin_expect(!!(p), 0)
-# define unreachable() __builtin_unreachable()
+# if !defined(unreachable)
+#  define unreachable() __builtin_unreachable()
+# endif
 #elif defined(_MSC_VER)
 # define likely(p)     (!!(p))
 # define unlikely(p)   (!!(p))
