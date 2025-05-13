@@ -1128,14 +1128,14 @@ static int NetFillBuffer( stream_t *p_access )
         i_tcp_read =
             recv( p_sys->i_handle_tcp,
                   p_sys->buffer_tcp + p_sys->i_buffer_tcp,
-                  i_tcp + MMS_BUFFER_SIZE/2, 0 );
+                  MMS_BUFFER_SIZE - p_sys->i_buffer_tcp, 0 );
     }
 
     if( i_udp > 0 && ufd[i_tcp > 0].revents )
     {
         i_udp_read = recv( p_sys->i_handle_udp,
                            p_sys->buffer_udp + p_sys->i_buffer_udp,
-                           i_udp + MMS_BUFFER_SIZE/2, 0 );
+                           MMS_BUFFER_SIZE - p_sys->i_buffer_udp, 0 );
     }
 
 #ifdef MMS_DEBUG
