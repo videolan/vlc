@@ -162,6 +162,7 @@ typedef struct
     es_out_id_t *es;
     bool        b_slave;
     bool        b_first_time;
+    bool        b_sorted;
 
     double      f_rate;
     vlc_tick_t  i_next_demux_date;
@@ -318,6 +319,7 @@ static int Open ( vlc_object_t *p_this )
 
     p_sys->b_slave = false;
     p_sys->b_first_time = true;
+    p_sys->b_sorted = false;
     p_sys->i_next_demux_date = 0;
     p_sys->f_rate = 1.0;
 
@@ -858,6 +860,9 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    if ( !p_sys->b_slave )
+        Fix( p_demux );
+
     vlc_tick_t i_barrier = p_sys->i_next_demux_date;
 
     while( p_sys->subtitles.i_current < p_sys->subtitles.i_count &&
@@ -915,9 +920,12 @@ static int subtitle_cmp( const void *first, const void *second )
 static void Fix( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    if (p_sys->b_sorted)
+        return;
 
     /* *** fix order (to be sure...) *** */
     qsort( p_sys->subtitles.p_array, p_sys->subtitles.i_count, sizeof( p_sys->subtitles.p_array[0] ), subtitle_cmp);
+    p_sys->b_sorted = true;
 }
 
 static int TextLoad( text_t *txt, stream_t *s )
