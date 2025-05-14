@@ -2178,14 +2178,17 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( psz_temp != NULL )
         {
             char psz_end[12], psz_begin[12];
+            vlc_tick_t end = VLC_TICK_MIN;
             /* Line has begin and end */
-            if( ( sscanf( psz_temp,
+            if( sscanf( psz_temp,
                   "<%*[t|T]ime %*[b|B]egin=\"%11[^\"]\" %*[e|E]nd=\"%11[^\"]%*[^>]%[^\n\r]",
-                            psz_begin, psz_end, psz_text) != 3 ) &&
-                    /* Line has begin and no end */
-                    ( sscanf( psz_temp,
-                              "<%*[t|T]ime %*[b|B]egin=\"%11[^\"]\"%*[^>]%[^\n\r]",
-                              psz_begin, psz_text ) != 2) )
+                            psz_begin, psz_end, psz_text) == 3 )
+            {
+                end = ParseRealTime( psz_end );
+            }
+            else if ( sscanf( psz_temp,
+                                "<%*[t|T]ime %*[b|B]egin=\"%11[^\"]\"%*[^>]%[^\n\r]",
+                                psz_begin, psz_text ) != 2)
                 /* Line is not recognized */
             {
                 continue;
@@ -2198,9 +2201,8 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
             else
                 p_subtitle->i_start = -1;
 
-            i_time = ParseRealTime( psz_end );
-            if (i_time != VLC_TICK_MIN)
-                p_subtitle->i_stop = i_time;
+            if (end != VLC_TICK_MIN)
+                p_subtitle->i_stop = end;
             else
                 p_subtitle->i_stop = -1;
             break;
