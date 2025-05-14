@@ -3385,15 +3385,18 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
     /* try sync points without recovery roll */
     if( ( p_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
     {
+        /* XXX in libmp4 sample begin at 0 */
+        const uint32_t stts_sample = i_sample + 1;
         const MP4_Box_data_stss_t *p_stss_data = BOXDATA(p_stss);
         msg_Dbg( p_demux, "track[Id 0x%x] using Sync Sample Box (stss)",
                  p_track->i_track_ID );
         for( unsigned i_index = 0; i_index < p_stss_data->i_entry_count; i_index++ )
         {
-            if( i_index == p_stss_data->i_entry_count - 1 ||
-                i_sample < p_stss_data->i_sample_number[i_index+1] )
+            if(( i_index == p_stss_data->i_entry_count - 1 ||
+                stts_sample < p_stss_data->i_sample_number[i_index+1] ) &&
+                p_stss_data->i_sample_number[i_index] != 0 )
             {
-                *pi_sync_sample = p_stss_data->i_sample_number[i_index];
+                *pi_sync_sample = p_stss_data->i_sample_number[i_index] - 1;
                 msg_Dbg( p_demux, "stss gives %d --> %" PRIu32 " (sample number)",
                          i_sample, *pi_sync_sample );
                 i_ret = VLC_SUCCESS;
