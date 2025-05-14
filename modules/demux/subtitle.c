@@ -2083,14 +2083,30 @@ static int ParsePSB( vlc_object_t *p_obj, subs_properties_t *p_props,
 static vlc_tick_t ParseRealTime( char *psz, int *h, int *m, int *s, int *f )
 {
     if( *psz == '\0' ) return VLC_TICK_0;
-    if( sscanf( psz, "%d:%d:%d.%d", h, m, s, f ) == 4 ||
-            sscanf( psz, "%d:%d.%d", m, s, f ) == 3 ||
-            sscanf( psz, "%d.%d", s, f ) == 2 ||
-            sscanf( psz, "%d:%d", m, s ) == 2 ||
-            sscanf( psz, "%d", s ) == 1 )
+    if( sscanf( psz, "%d:%d:%d.%d", h, m, s, f ) == 4 )
     {
         return vlc_tick_from_sec((( *h * 60 + *m ) * 60 ) + *s )
                + VLC_TICK_FROM_MS(*f * 10) + VLC_TICK_0;
+    }
+    if( sscanf( psz, "%d:%d.%d", m, s, f ) == 3 )
+    {
+        return vlc_tick_from_sec(( *m * 60 ) + *s )
+               + VLC_TICK_FROM_MS(*f * 10) + VLC_TICK_0;
+    }
+    if( sscanf( psz, "%d.%d", s, f ) == 2 )
+    {
+        return vlc_tick_from_sec( *s )
+               + VLC_TICK_FROM_MS(*f * 10) + VLC_TICK_0;
+    }
+    if( sscanf( psz, "%d:%d", m, s ) == 2 )
+    {
+        return vlc_tick_from_sec(( *m * 60 ) + *s )
+               + VLC_TICK_0;
+    }
+    if( sscanf( psz, "%d", s ) == 1 )
+    {
+        return vlc_tick_from_sec( *s )
+               + VLC_TICK_0;
     }
     return -1;
 }
