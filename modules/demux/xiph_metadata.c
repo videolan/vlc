@@ -397,11 +397,19 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         hasMetaFlags |= XIPHMETA_##var; \
     }
 
-#define IF_EXTRACT_ONCE(txt,var) \
+#define IF_EXTRACT_ONCE_NUMBER(txt,var) \
     if( !strncasecmp(psz_comment, txt, strlen(txt)) && !(hasMetaFlags & XIPHMETA_##var) ) \
     { \
-        vlc_meta_Set( p_meta, vlc_meta_ ## var, &psz_comment[strlen(txt)] ); \
-        hasMetaFlags |= XIPHMETA_##var; \
+        bool isnum = true; \
+        const char *num_str = &psz_comment[strlen(txt)], *c; \
+        for (c = num_str; isnum && *c != '\0'; c++) { \
+            isnum = *c >= '0' && *c <= '9'; \
+        } \
+        if (isnum) \
+        { \
+            vlc_meta_Set( p_meta, vlc_meta_ ## var, num_str ); \
+            hasMetaFlags |= XIPHMETA_##var; \
+        } \
     }
 
         IF_EXTRACT("TITLE=", Title )
@@ -429,8 +437,8 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
                 }
             }
         }
-        else IF_EXTRACT_ONCE("TRACKTOTAL=", TrackTotal )
-        else IF_EXTRACT_ONCE("TOTALTRACKS=", TrackTotal )
+        else IF_EXTRACT_ONCE_NUMBER("TRACKTOTAL=", TrackTotal )
+        else IF_EXTRACT_ONCE_NUMBER("TOTALTRACKS=", TrackTotal )
         else IF_EXTRACT("DESCRIPTION=", Description )
         else IF_EXTRACT("COMMENT=", Description )
         else IF_EXTRACT("COMMENTS=", Description )
@@ -539,4 +547,3 @@ const char *FindKateCategoryName( const char *psz_tag )
     }
     return N_("Unknown category");
 }
-
