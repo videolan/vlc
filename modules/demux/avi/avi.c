@@ -1051,7 +1051,21 @@ static void AVI_SendFrame( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
                 if( *psz_osd != 0 )
                 {
                     psz_osd[23] = 0;
-                    if( !psz_title || strncmp( psz_osd, psz_title, 24 ) )
+                    {
+                        char *str = psz_osd;
+                        ssize_t n;
+                        uint32_t cp;
+
+                        while ((n = vlc_towc(str, &cp)) != 0)
+                            if (likely(n != -1))
+                                str += n;
+                            else
+                            {
+                                *str = '\0';
+                                break;
+                            }
+                    }
+                    if( psz_osd[0] && ( !psz_title || strncmp( psz_osd, psz_title, 24 ) ) )
                     {
                         vlc_meta_Set( p_sys->meta, vlc_meta_Title, psz_osd );
                         p_sys->updates |= INPUT_UPDATE_META;
