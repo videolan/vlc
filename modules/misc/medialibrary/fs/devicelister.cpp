@@ -26,6 +26,8 @@
 
 #include <vlc_services_discovery.h>
 
+#include <memory>
+
 namespace vlc
 {
 namespace medialibrary

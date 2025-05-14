@@ -27,7 +27,7 @@
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include <memory>
+#include <vector>
 
 namespace vlc
 {
