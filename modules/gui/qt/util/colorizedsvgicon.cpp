@@ -25,6 +25,8 @@
 #include <QWidget>
 #include <QFileInfo>
 
+#include "util/color_svg_image_provider.hpp"
+
 ColorizedSvgIcon::ColorizedSvgIcon(const QString& filename, const QColor color1, const QColor color2, const QColor accentColor, const QList<QPair<QString, QString> > &otherReplacements)
 {
     QIcon& qIconRef = *this;

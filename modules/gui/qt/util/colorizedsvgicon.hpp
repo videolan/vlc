@@ -20,8 +20,6 @@
 
 #include <QIcon>
 
-#include "util/color_svg_image_provider.hpp"
-
 class ColorizedSvgIcon : public QIcon
 {
     static int hashKey(QIcon::Mode mode, QIcon::State state)
