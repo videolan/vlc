@@ -25,7 +25,7 @@
 #include <QWidget>
 #include <QFileInfo>
 
-ColorizedSvgIcon::ColorizedSvgIcon(QString filename, std::optional<QColor> color1, std::optional<QColor> color2, std::optional<QColor> accentColor, const QList<QPair<QString, QString> > &otherReplacements)
+ColorizedSvgIcon::ColorizedSvgIcon(QString filename, const QColor color1, const QColor color2, const QColor accentColor, const QList<QPair<QString, QString> > &otherReplacements)
 {
     QIcon& qIconRef = *this;
 
@@ -41,14 +41,14 @@ ColorizedSvgIcon::ColorizedSvgIcon(QString filename, std::optional<QColor> color
 
     QList<QPair<QString, QString>> replacements;
     {
-        if (color1.has_value())
-            replacements.push_back({QStringLiteral(COLOR1_KEY), color1->name(QColor::HexRgb)});
+        if (color1.isValid())
+            replacements.push_back({QStringLiteral(COLOR1_KEY), color1.name(QColor::HexRgb)});
 
-        if (color2.has_value())
-            replacements.push_back({QStringLiteral(COLOR2_KEY), color2->name(QColor::HexRgb)});
+        if (color2.isValid())
+            replacements.push_back({QStringLiteral(COLOR2_KEY), color2.name(QColor::HexRgb)});
 
-        if (accentColor.has_value())
-            replacements.push_back({QStringLiteral(COLOR_ACCENT_KEY), accentColor->name(QColor::HexRgb)});
+        if (accentColor.isValid())
+            replacements.push_back({QStringLiteral(COLOR_ACCENT_KEY), accentColor.name(QColor::HexRgb)});
 
         replacements.append(otherReplacements.begin(), otherReplacements.end());
     }

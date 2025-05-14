@@ -30,7 +30,7 @@
 #define COLOR2_KEY "_res_C2"
 #define COLOR_ACCENT_KEY "_res_ACCENT"
 
-QPair<QByteArray, std::optional<QColor>> colorizeSvg(const QString& filename, const QList<QPair<QString, QString>>& replacements);
+QPair<QByteArray, QColor> colorizeSvg(const QString& filename, const QList<QPair<QString, QString>>& replacements);
 
 class SVGColorImageImageProvider: public QQuickAsyncImageProvider
 {

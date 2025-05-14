@@ -22,8 +22,6 @@
 
 #include "util/color_svg_image_provider.hpp"
 
-#include <optional>
-
 class ColorizedSvgIcon : public QIcon
 {
     static int hashKey(QIcon::Mode mode, QIcon::State state)
@@ -34,9 +32,9 @@ class ColorizedSvgIcon : public QIcon
 
 public:
     explicit ColorizedSvgIcon(QString filename,
-                              std::optional<QColor> color1 = std::nullopt,
-                              std::optional<QColor> color2 = std::nullopt,
-                              std::optional<QColor> accentColor = std::nullopt,
+                              const QColor color1 = {},
+                              const QColor color2 = {},
+                              const QColor accentColor = {},
                               const QList<QPair<QString, QString>>& otherReplacements = {});
 
     [[nodiscard]] static ColorizedSvgIcon colorizedIconForWidget(const QString& fileName, const QWidget *widget);
