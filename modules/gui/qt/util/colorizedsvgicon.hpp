@@ -31,7 +31,7 @@ class ColorizedSvgIcon : public QIcon
     }
 
 public:
-    explicit ColorizedSvgIcon(QString filename,
+    explicit ColorizedSvgIcon(const QString& filename,
                               const QColor color1 = {},
                               const QColor color2 = {},
                               const QColor accentColor = {},
