@@ -28,13 +28,18 @@
 typedef int64_t ts_90khz_t;
 #define TS_90KHZ_INVALID -1
 
+
 #define TS_33BITS_ROLL_NZ      FROM_SCALE_NZ(0x1FFFFFFFF)
 #define TS_33BITS_HALF_ROLL_NZ FROM_SCALE_NZ(0x0FFFFFFFF)
+#define TS_33BITS_ROLL         FROM_SCALE(0x1FFFFFFFF)
+#define TS_33BITS_HALF_ROLL    FROM_SCALE(0x0FFFFFFFF)
 
 static inline vlc_tick_t TimeStampWrapAround( vlc_tick_t i_past_pcr, vlc_tick_t i_time )
 {
     vlc_tick_t i_adjust = 0;
-    if( i_past_pcr > TS_33BITS_HALF_ROLL_NZ && i_time < TS_33BITS_HALF_ROLL_NZ )
+    if(i_past_pcr == VLC_TICK_INVALID || i_past_pcr == i_time)
+        return i_time;
+    if( i_past_pcr >= TS_33BITS_HALF_ROLL && i_time <= TS_33BITS_HALF_ROLL )
         i_adjust = TS_33BITS_ROLL_NZ;
 
     return i_time + i_adjust;
