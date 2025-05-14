@@ -1735,6 +1735,22 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
         }
 #endif
     }
+    else
+    {
+        HRESULT hr = S_OK;
+        IDXGIAdapter *adap = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
+        if (adap == NULL)
+            hr = E_FAIL;
+        else
+        {
+            hr = IDXGIAdapter_GetDesc(adap, &sys->d3d_dev.adapterDesc);
+            IDXGIAdapter_Release(adap);
+        }
+        if (hr)
+            msg_Warn(vd, "can't get adapter description");
+
+        D3D11_GetDriverVersion(vd, &sys->d3d_dev);
+    }
 
     IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
 
