@@ -2120,32 +2120,33 @@ static int ParsePSB( vlc_object_t *p_obj, subs_properties_t *p_props,
     return VLC_SUCCESS;
 }
 
-static vlc_tick_t ParseRealTime( char *psz, int *h, int *m, int *s, int *f )
+static vlc_tick_t ParseRealTime( const char *psz )
 {
     if( *psz == '\0' ) return VLC_TICK_0;
-    if( sscanf( psz, "%d:%d:%d.%d", h, m, s, f ) == 4 )
+    int h, m, s, f;
+    if( sscanf( psz, "%d:%d:%d.%d", &h, &m, &s, &f ) == 4 )
     {
-        return vlc_tick_from_sec((( *h * 60 + *m ) * 60 ) + *s )
-               + VLC_TICK_FROM_MS(*f * 10) + VLC_TICK_0;
+        return vlc_tick_from_sec((( h * 60 + m ) * 60 ) + s )
+               + VLC_TICK_FROM_MS(f * 10) + VLC_TICK_0;
     }
-    if( sscanf( psz, "%d:%d.%d", m, s, f ) == 3 )
+    if( sscanf( psz, "%d:%d.%d", &m, &s, &f ) == 3 )
     {
-        return vlc_tick_from_sec(( *m * 60 ) + *s )
-               + VLC_TICK_FROM_MS(*f * 10) + VLC_TICK_0;
+        return vlc_tick_from_sec(( m * 60 ) + s )
+               + VLC_TICK_FROM_MS(f * 10) + VLC_TICK_0;
     }
-    if( sscanf( psz, "%d.%d", s, f ) == 2 )
+    if( sscanf( psz, "%d.%d", &s, &f ) == 2 )
     {
-        return vlc_tick_from_sec( *s )
-               + VLC_TICK_FROM_MS(*f * 10) + VLC_TICK_0;
+        return vlc_tick_from_sec( s )
+               + VLC_TICK_FROM_MS(f * 10) + VLC_TICK_0;
     }
-    if( sscanf( psz, "%d:%d", m, s ) == 2 )
+    if( sscanf( psz, "%d:%d", &m, &s ) == 2 )
     {
-        return vlc_tick_from_sec(( *m * 60 ) + *s )
+        return vlc_tick_from_sec(( m * 60 ) + s )
                + VLC_TICK_0;
     }
-    if( sscanf( psz, "%d", s ) == 1 )
+    if( sscanf( psz, "%d", &s ) == 1 )
     {
-        return vlc_tick_from_sec( *s )
+        return vlc_tick_from_sec( s )
                + VLC_TICK_0;
     }
     return VLC_TICK_MIN;
@@ -2161,8 +2162,6 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
 
     for( ;; )
     {
-        int h1 = 0, m1 = 0, s1 = 0, f1 = 0;
-        int h2 = 0, m2 = 0, s2 = 0, f2 = 0;
         const char *s = TextGetLine( txt );
         free( psz_text );
 
@@ -2193,13 +2192,13 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
             }
 
             /* Get the times */
-            vlc_tick_t i_time = ParseRealTime( psz_begin, &h1, &m1, &s1, &f1 );
+            vlc_tick_t i_time = ParseRealTime( psz_begin );
             if (i_time != VLC_TICK_MIN)
                 p_subtitle->i_start = i_time;
             else
                 p_subtitle->i_start = -1;
 
-            i_time = ParseRealTime( psz_end, &h2, &m2, &s2, &f2 );
+            i_time = ParseRealTime( psz_end );
             if (i_time != VLC_TICK_MIN)
                 p_subtitle->i_stop = i_time;
             else
