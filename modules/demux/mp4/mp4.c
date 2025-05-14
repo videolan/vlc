@@ -5284,8 +5284,10 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
             {
                 if( i_moof_time != INVALID_SEGMENT_TIME )
                     i_traf_start_time = MP4_rescale( i_moof_time, p_sys->i_timescale, p_track->i_timescale );
-                else /* That should not happen */
+                else if ( p_sys->i_nztime != VLC_TICK_MAX ) /* That should not happen */
                     i_traf_start_time = MP4_rescale_qtime( p_sys->i_nztime, p_track->i_timescale );
+                else /* That should not happen */
+                    i_traf_start_time = p_track->i_time;
             }
         }
 
