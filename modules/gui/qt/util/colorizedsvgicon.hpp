@@ -22,34 +22,10 @@
 
 #include "util/color_svg_image_provider.hpp"
 
-#include <QMutex>
-
 #include <optional>
 
 class ColorizedSvgIcon : public QIcon
 {
-    QIconEngine *m_engine = nullptr;
-
-    inline static QMutex engineLock;
-    inline static QIconEngine *lastEngine; // static variables are initialized by default
-
-    static QIconEngine *newEngine()
-    {
-        engineLock.lock();
-        assert(!lastEngine);
-        lastEngine = svgIconEngine();
-        return lastEngine;
-    }
-
-    void captureEngine()
-    {
-        assert(!m_engine);
-        assert(lastEngine);
-        m_engine = lastEngine;
-        lastEngine = nullptr;
-        engineLock.unlock();
-    }
-
     static int hashKey(QIcon::Mode mode, QIcon::State state)
     {
         // From QSvgIconEnginePrivate:

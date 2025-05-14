@@ -26,16 +26,18 @@
 #include <QFileInfo>
 
 ColorizedSvgIcon::ColorizedSvgIcon(QString filename, std::optional<QColor> color1, std::optional<QColor> color2, std::optional<QColor> accentColor, const QList<QPair<QString, QString> > &otherReplacements)
-    : QIcon(newEngine()) // QIcon takes the ownership of the icon engine
 {
-    captureEngine();
+    QIcon& qIconRef = *this;
 
-    if (!m_engine)
+    const auto engine = svgIconEngine();
+    if (!engine)
     {
         qWarning() << "ColorizedSvgIcon: could not create svg icon engine, icon " << filename << " will not be colorized.";
-        addFile(filename);
+        qIconRef = QIcon(filename);
         return;
     }
+
+    qIconRef = QIcon(engine); // QIcon takes the ownership of the engine
 
     QList<QPair<QString, QString>> replacements;
     {
@@ -78,7 +80,7 @@ ColorizedSvgIcon::ColorizedSvgIcon(QString filename, std::optional<QColor> color
     {
         // Feed the engine with the colorized svg content:
         QDataStream in(std::as_const(data)); // read-only
-        if (!m_engine->read(in))
+        if (!engine->read(in))
         {
             qWarning() << "ColorizedSvgIcon: svg icon engine can not read contents, icon " << filename << " will not be colorized.";
             addFile(filename);
