@@ -3224,8 +3224,6 @@ static int MP4_ReadBox_stss( stream_t *p_stream, MP4_Box_t *p_box )
     for( uint32_t i = 0; i < count; i++ )
     {
         MP4_GET4BYTES( p_box->data.p_stss->i_sample_number[i] );
-        /* XXX in libmp4 sample begin at 0 */
-        p_box->data.p_stss->i_sample_number[i]--;
     }
 
 #ifdef MP4_VERBOSE
