@@ -2232,6 +2232,9 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         ProbeStart( p_demux, p_pmt->i_number );
         ProbeEnd( p_demux, p_pmt->i_number );
         p_pmt->b_last_dts_probed = true;
+        if( p_pmt->i_last_dts != VLC_TICK_INVALID &&
+            p_pmt->i_last_dts < p_pmt->pcr.i_first_dts )
+            p_pmt->i_last_dts = TimeStampWrapAround( p_pmt->pcr.i_first_dts, p_pmt->i_last_dts );
     }
 
     dvbpsi_pmt_delete( p_dvbpsipmt );
