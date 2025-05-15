@@ -588,14 +588,6 @@ Item {
         source: "qrc:///qt/qml/VLC/Dialogs/ToolbarEditorDialog.qml"
 
         Connections {
-            target: toolbarEditorDialogLoader.item
-
-            function onUnload() {
-                toolbarEditorDialogLoader.active = false
-            }
-        }
-
-        Connections {
             target: DialogsProvider
 
             function onShowToolbarEditorDialog() {
