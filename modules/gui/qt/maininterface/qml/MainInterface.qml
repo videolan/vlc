@@ -98,7 +98,7 @@ Item {
         Binding {
             target: MainCtx
             property: "windowExtendedMargin"
-            value: _extendedFrameVisible ? 20 : 0
+            value: _extendedFrameVisible ? (Qt.platform.pluginName.startsWith("wayland") ? 40 : 20) : 0
         }
 
         Window.onWindowChanged: {
