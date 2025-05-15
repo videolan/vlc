@@ -17,5 +17,6 @@
         <file alias="FastBlend_multiply.frag.qsb">FastBlend_multiply.frag.qsb</file>
         <file alias="FastBlend_screen.frag.qsb">FastBlend_screen.frag.qsb</file>
         <file alias="RoundedRectangleShadow.frag.qsb">RoundedRectangleShadow.frag.qsb</file>
+        <file alias="RoundedRectangleShadow_hollow.frag.qsb">RoundedRectangleShadow_hollow.frag.qsb</file>
     </qresource>
 </RCC>

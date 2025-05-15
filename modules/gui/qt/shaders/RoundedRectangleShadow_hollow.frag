@@ -1,5 +1,9 @@
 #version 440
 
+// WARNING: This file must be in sync with RoundedRectangleShadow.frag
+// TODO: Generate this shader at build time.
+#define HOLLOW
+
 // TODO: Dithering is not necessary with light colors. It is pretty much
 //       necessary with dark colors due to premultiplied alpha to prevent
 //       color banding. So, this should ideally be used only when the

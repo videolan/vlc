@@ -23,6 +23,7 @@ shader_sources = [
     'FastBlend_multiply.frag',
     'FastBlend_screen.frag',
     'RoundedRectangleShadow.frag',
+    'RoundedRectangleShadow_hollow.frag',
 ]
 
 shader_files = files(shader_sources)
