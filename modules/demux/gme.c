@@ -128,6 +128,12 @@ static int Open (vlc_object_t *obj)
     fmt.i_bitrate = RATE * 4;
 
     sys->es = es_out_Add (demux->out, &fmt);
+    if (unlikely(sys->es == NULL))
+    {
+        gme_delete (sys->emu);
+        free (sys);
+        return VLC_ENOMEM;
+    }
     date_Init (&sys->pts, RATE, 1);
     date_Set(&sys->pts, VLC_TICK_0);
 
