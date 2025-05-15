@@ -1577,8 +1577,8 @@ typedef struct
     uint8_t i_length_size_of_trun_num;
     uint8_t i_length_size_of_sample_num;
 
-    uint32_t *p_time;
-    uint32_t *p_moof_offset;
+    uint64_t *p_time;
+    uint64_t *p_moof_offset;
     uint8_t *p_traf_number;
     uint8_t *p_trun_number;
     uint8_t *p_sample_number;
