@@ -4773,10 +4773,10 @@ static bool GetMoofTrackDuration( MP4_Box_t *p_moov, MP4_Box_t *p_moof,
         }
 
         *p_duration = i_traf_duration;
-        break;
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 static int ProbeFragments( demux_t *p_demux, bool b_force, bool *pb_fragmented )
