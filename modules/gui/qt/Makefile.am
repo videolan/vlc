@@ -1303,7 +1303,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/PartialEffect.qml \
 	widgets/qml/ViewHeader.qml \
 	widgets/qml/ProgressIndicator.qml \
-	widgets/qml/RectangularGlow.qml \
 	widgets/qml/ImageExt.qml \
 	widgets/qml/ScrollBarExt.qml \
 	widgets/qml/FastBlend.qml \
