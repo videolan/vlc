@@ -51,11 +51,15 @@ ShaderEffect {
     // to prevent overlapping shadows (breaks batching) and to decrease the shader coverage:
     property real compensationFactor: 2.0
 
+    // Do not paint in the non-compensated inner area - only makes sense if there is compensation:
+    property bool hollow: false
+
     blending: true
 
     supportsAtlasTextures: true // irrelevant, but nevertheless...
 
     // cullMode: ShaderEffect.BackFaceCulling // problematic with item layers
 
-    fragmentShader: "qrc:///shaders/RoundedRectangleShadow.frag.qsb"
+    fragmentShader: hollow ? "qrc:///shaders/RoundedRectangleShadow_hollow.frag.qsb"
+                           : "qrc:///shaders/RoundedRectangleShadow.frag.qsb"
 }
