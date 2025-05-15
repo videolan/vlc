@@ -72,6 +72,7 @@ Widgets.PageLoader {
 
                 sortCriteria: MainCtx.sort.criteria
                 sortOrder: MainCtx.sort.order
+                searchPattern: MainCtx.search.pattern
             }
 
             header: Widgets.ViewHeader {
@@ -79,8 +80,6 @@ Widgets.PageLoader {
 
                 text: qsTr("Continue Watching")
             }
-
-            isSearchable: false // TODO: make history searchable
 
             sectionProperty: model.sortCriteria === "title" ? "title_first_symbol" : ""
 
