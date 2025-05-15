@@ -40,7 +40,7 @@ T.Page {
 
     readonly property bool hasGridListMode: true
 
-    readonly property bool isSearchable: false // TODO: make history searchable
+    readonly property bool isSearchable: true
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -249,6 +249,7 @@ T.Page {
 
                     sortCriteria: MainCtx.sort.criteria
                     sortOrder: MainCtx.sort.order
+                    searchPattern: MainCtx.search.pattern
 
                     // FIXME: Make limit 0 load no items, instead of loading all items.
                     limit: MainCtx.gridView ? Math.max(continueWatchingRow.currentItem?.nbItemPerRow ?? null, 1) : 5
@@ -271,8 +272,6 @@ T.Page {
                         seeAllButtonClicked.connect(continueWatchingRow.seeAllButtonClicked)
                     }
                 }
-
-                isSearchable: false // TODO: make history searchable
 
                 contextMenu: MLContextMenu {
                     model: continueWatchingRow.model
