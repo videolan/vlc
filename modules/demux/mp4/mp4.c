@@ -5441,18 +5441,8 @@ static int FragGetMoofByTfraIndex( demux_t *p_demux, const vlc_tick_t i_target_t
                 stime_t i_track_target_time = MP4_rescale_qtime( i_target_time, p_track->i_timescale );
                 for ( uint32_t i = 0; i<p_data->i_number_of_entries; i += ( p_data->i_version == 1 ) ? 2 : 1 )
                 {
-                    stime_t i_time;
-                    uint64_t i_offset;
-                    if ( p_data->i_version == 1 )
-                    {
-                        i_time = *((uint64_t *)(p_data->p_time + i));
-                        i_offset = *((uint64_t *)(p_data->p_moof_offset + i));
-                    }
-                    else
-                    {
-                        i_time = p_data->p_time[i];
-                        i_offset = p_data->p_moof_offset[i];
-                    }
+                    stime_t i_time = p_data->p_time[i];
+                    uint64_t i_offset = p_data->p_moof_offset[i];
 
                     if ( i_time >= i_track_target_time )
                     {

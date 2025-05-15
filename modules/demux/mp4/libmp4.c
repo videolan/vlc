@@ -4428,9 +4428,9 @@ static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
     p_tfra->i_length_size_of_trun_num = ( i_lengths & 0x0c ) >> 2;
     p_tfra->i_length_size_of_sample_num = i_lengths & 0x03;
 
-    size_t size = 4 + 4*p_tfra->i_version; /* size in {4, 8} */
-    p_tfra->p_time = calloc( i_number_of_entries, size );
-    p_tfra->p_moof_offset = calloc( i_number_of_entries, size );
+    size_t size;
+    p_tfra->p_time = calloc( i_number_of_entries, sizeof(*p_tfra->p_time) );
+    p_tfra->p_moof_offset = calloc( i_number_of_entries, sizeof(*p_tfra->p_moof_offset) );
 
     size = 1 + p_tfra->i_length_size_of_traf_num; /* size in [|1, 4|] */
     if ( size == 3 ) size++;
@@ -4458,8 +4458,8 @@ static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
         {
             if ( i_read < i_fields_length + 16 )
                 break;
-            MP4_GET8BYTES( *((uint64_t *)&p_tfra->p_time[i*2]) );
-            MP4_GET8BYTES( *((uint64_t *)&p_tfra->p_moof_offset[i*2]) );
+            MP4_GET8BYTES( p_tfra->p_time[i] );
+            MP4_GET8BYTES( p_tfra->p_moof_offset[i] );
         }
         else
         {
@@ -4483,22 +4483,11 @@ static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
 #ifdef MP4_ULTRA_VERBOSE
     for( i = 0; i < i_number_of_entries; i++ )
     {
-        if( p_tfra->i_version == 0 )
-        {
-            msg_Dbg( p_stream, "tfra[%"PRIu32"] time[%"PRIu32"]: %"PRIu32", "
-                               "moof_offset[%"PRIu32"]: %"PRIu32"",
-                     p_tfra->i_track_ID,
-                     i, p_tfra->p_time[i],
-                     i, p_tfra->p_moof_offset[i] );
-        }
-        else
-        {
-            msg_Dbg( p_stream, "tfra[%"PRIu32"] time[%"PRIu32"]: %"PRIu64", "
-                               "moof_offset[%"PRIu32"]: %"PRIu64"",
-                     p_tfra->i_track_ID,
-                     i, ((uint64_t *)(p_tfra->p_time))[i],
-                     i, ((uint64_t *)(p_tfra->p_moof_offset))[i] );
-        }
+        msg_Dbg( p_stream, "tfra[%"PRIu32"] time[%"PRIu32"]: %"PRIu64", "
+                            "moof_offset[%"PRIu32"]: %"PRIu64"",
+                    p_tfra->i_track_ID,
+                    i, p_tfra->p_time[i],
+                    i, p_tfra->p_moof_offset[i] );
     }
 #endif
 #ifdef MP4_VERBOSE
