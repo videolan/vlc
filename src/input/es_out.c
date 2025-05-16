@@ -340,8 +340,7 @@ static void MouseEventCb(const vlc_mouse_t *newmouse, void *userdata)
     if(!p_sys->p_input)
         return;
 
-    /* player event is disabled when a filter is listening to mouse events */
-    if(!newmouse || vlc_mouse_HasMouseFilter(newmouse))
+    if(!newmouse)
     {
         vlc_mouse_Init(&id->oldmouse);
         id->mouse_being_dragged = false;

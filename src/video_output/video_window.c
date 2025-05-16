@@ -193,7 +193,12 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
                                           &state->format, &state->display);
     vlc_mutex_unlock(&state->lock);
 
-    vout_FilterMouse(vout, &video_mouse);
+    if (video_mouse.b_double_click && vlc_mouse_IsLeftPressed(&video_mouse))
+        var_ToggleBool(vout, "fullscreen");
+
+    /* Stop propagation if the event was consumed by a video filter */
+    if (vout_FilterMouse(vout, &video_mouse))
+        return;
 
     /* Check if the mouse state actually changed and emit events. */
     /* NOTE: sys->mouse is only used here, so no need to lock. */
@@ -201,8 +206,6 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
         var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
     if (vlc_mouse_HasButton(&state->mouse.video, &video_mouse))
         var_SetInteger(vout, "mouse-button-down", video_mouse.i_pressed);
-    if (video_mouse.b_double_click && vlc_mouse_IsLeftPressed(&video_mouse))
-        var_ToggleBool(vout, "fullscreen");
 
     state->mouse.video = video_mouse;
 
