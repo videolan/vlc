@@ -296,6 +296,7 @@
 		1CFE8D561EA0D3D300E94451 /* ErrorPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorPanel.xib; sourceTree = "<group>"; };
 		1CFE8D571EA0D42A00E94451 /* VLCErrorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCErrorWindowController.h; sourceTree = "<group>"; };
 		1CFE8D581EA0D42A00E94451 /* VLCErrorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCErrorWindowController.m; sourceTree = "<group>"; };
+		530429942DD1ED66004BB598 /* VLCPlaybackEndView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCPlaybackEndView.xib; sourceTree = "<group>"; };
 		530771F22AEBB80C00656D3D /* VLCLibraryRepresentedItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryRepresentedItem.h; sourceTree = "<group>"; };
 		530771F32AEBBD5B00656D3D /* VLCLibraryRepresentedItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryRepresentedItem.m; sourceTree = "<group>"; };
 		5307A6F32967859F001E0C6A /* NSImage+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSImage+VLCAdditions.h"; sourceTree = "<group>"; };
@@ -2126,6 +2127,7 @@
 				534E8E3729A04F95009503F8 /* VLCMainVideoView.xib */,
 				7D67318322C8F3F60000AD40 /* VLCMediaSourceCollectionViewItem.xib */,
 				7DF14FBC2270CB1C0008ABE4 /* VLCMediaSourceDeviceCollectionViewItem.xib */,
+				530429942DD1ED66004BB598 /* VLCPlaybackEndView.xib */,
 				7D0F64002201F66D00FDB91F /* VLCPlayQueueTableCellView.xib */,
 				6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */,
 				7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */,
