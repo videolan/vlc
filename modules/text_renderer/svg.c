@@ -253,6 +253,10 @@ static picture_t * svg_RenderPicture( filter_t *p_filter,
     fmt.i_chroma = VLC_CODEC_BGRA;
     fmt.i_width = fmt.i_visible_width = dim.width;
     fmt.i_height = fmt.i_visible_height = dim.height;
+    fmt.transfer = TRANSFER_FUNC_SRGB;
+    fmt.primaries = COLOR_PRIMARIES_SRGB;
+    fmt.space = COLOR_SPACE_SRGB;
+    fmt.b_color_range_full = true;
 
     picture_t *p_picture = picture_NewFromFormat( &fmt );
     if( !p_picture )
