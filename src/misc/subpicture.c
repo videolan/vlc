@@ -151,7 +151,7 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     p_subpic->i_original_picture_width  = fmt_out.i_visible_width;
     p_subpic->i_original_picture_height = fmt_out.i_visible_height;
 
-    subpicture_region_t *p_region = subpicture_region_ForPicture( NULL, p_pip );
+    subpicture_region_t *p_region = subpicture_region_ForPicture( p_pip );
     picture_Release( p_pip );
 
     if (likely(p_region == NULL))
@@ -313,20 +313,13 @@ subpicture_region_t *subpicture_region_NewText( void )
     return p_region;
 }
 
-subpicture_region_t *subpicture_region_ForPicture( const video_format_t *p_fmt, picture_t *pic )
+subpicture_region_t *subpicture_region_ForPicture( picture_t *pic )
 {
-    assert( !p_fmt || video_format_IsSameChroma( p_fmt, &pic->format ) );
-    if ( p_fmt && !video_format_IsSameChroma( p_fmt, &pic->format ) )
-        return NULL;
-
     subpicture_region_t *p_region = subpicture_region_NewInternal( );
     if( !p_region )
         return NULL;
 
-    if (p_fmt == NULL)
-        p_fmt = &pic->format;
-
-    video_format_Copy( &p_region->fmt, p_fmt );
+    video_format_Copy( &p_region->fmt, &pic->format );
     if ( pic->format.i_chroma == VLC_CODEC_YUVP || pic->format.i_chroma == VLC_CODEC_RGBP )
     {
         /* YUVP/RGBP should have a palette */

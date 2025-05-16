@@ -644,7 +644,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             }
         }
 
-        p_region = subpicture_region_ForPicture( NULL, p_converted );
+        p_region = subpicture_region_ForPicture( p_converted );
         if( !p_sys->b_keep )
             picture_Release( p_converted );
 

@@ -500,7 +500,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         /* Display the feed's image */
         picture_t *p_pic = p_feed->p_pic;
 
-        subpicture_region_t *p_region = subpicture_region_ForPicture( NULL, p_pic );
+        subpicture_region_t *p_region = subpicture_region_ForPicture( p_pic );
         if( likely(p_region) )
         {
             p_region->i_x = region->i_x;

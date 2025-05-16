@@ -361,7 +361,7 @@ static subpicture_t *FilterSub( filter_t *p_filter, vlc_tick_t date )
         goto exit;
 
     /* Create new SPU region */
-    p_region = subpicture_region_ForPicture( NULL, p_pic );
+    p_region = subpicture_region_ForPicture( p_pic );
     if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate SPU region" );
