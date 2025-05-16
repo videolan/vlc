@@ -80,9 +80,6 @@ vlc_module_begin ()
     set_callbacks( Create, Destroy )
 vlc_module_end ()
 
-static void svg_RescaletoFit  ( filter_t *, int *width, int *height, float * );
-static picture_t * svg_RenderPicture ( filter_t *p_filter, const char * );
-
 static void svg_LoadTemplate( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
