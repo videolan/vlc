@@ -467,19 +467,6 @@ bool filter_chain_IsEmpty(const filter_chain_t *chain)
     return vlc_list_is_empty( &chain->filter_list );
 }
 
-bool filter_chain_HasMouseFilter( const filter_chain_t *chain )
-{
-    const chained_filter_t *f;
-    vlc_list_foreach_const( f, &chain->filter_list, node )
-    {
-        const filter_t *p_filter = &f->filter;
-
-        if( p_filter->ops->video_mouse )
-            return true;
-    }
-    return false;
-}
-
 const es_format_t *filter_chain_GetFmtOut( const filter_chain_t *p_chain )
 {
     chained_filter_t *last =

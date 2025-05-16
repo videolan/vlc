@@ -586,15 +586,6 @@ VLC_API void filter_chain_DeleteFilter(filter_chain_t *chain,
 VLC_API bool filter_chain_IsEmpty(const filter_chain_t *chain);
 
 /**
- * Checks whether the filter chain contains any video filters listening to
- * mouse events.
- *
- * \param chain pointer to filter chain
- * \return true if at least one filter listens to mouse events
- */
-VLC_API bool filter_chain_HasMouseFilter( const filter_chain_t *chain );
-
-/**
  * Get last output format of the last element in the filter chain.
  *
  * \param chain filter chain

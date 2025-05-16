@@ -50,8 +50,6 @@ typedef struct vlc_mouse_t
     int i_pressed;
     /* Is double clicked */
     bool b_double_click;
-    /* Has filter listening to mouse events */
-    bool b_mouse_filter;
 } vlc_mouse_t;
 
 /**
@@ -68,7 +66,6 @@ static inline void vlc_mouse_Init( vlc_mouse_t *p_mouse )
     p_mouse->i_y = 0;
     p_mouse->i_pressed = 0;
     p_mouse->b_double_click = false;
-    p_mouse->b_mouse_filter = false;
 }
 
 /* */
@@ -87,12 +84,6 @@ static inline void vlc_mouse_SetPosition( vlc_mouse_t *p_mouse,
 {
     p_mouse->i_x = i_x;
     p_mouse->i_y = i_y;
-}
-
-static inline void vlc_mouse_SetMouseFilter( vlc_mouse_t *p_mouse,
-                                             bool mouse_filter )
-{
-    p_mouse->b_mouse_filter = mouse_filter;
 }
 
 /* */
@@ -165,10 +156,6 @@ static inline bool vlc_mouse_HasReleased( const vlc_mouse_t *p_old,
 {
     const int i_mask = 1 << i_button;
     return (p_old->i_pressed & i_mask) && (p_new->i_pressed & i_mask) == 0;
-}
-static inline bool vlc_mouse_HasMouseFilter( const vlc_mouse_t *p_mouse )
-{
-    return p_mouse->b_mouse_filter;
 }
 #endif /* _VLC_MOUSE_H */
 
