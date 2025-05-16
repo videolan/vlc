@@ -309,6 +309,10 @@ subpicture_region_t *subpicture_region_NewText( void )
     p_region->text_flags |= VLC_SUBPIC_TEXT_FLAG_IS_TEXT;
 
     video_format_Init( &p_region->fmt, 0 );
+    p_region->fmt.transfer = TRANSFER_FUNC_SRGB;
+    p_region->fmt.primaries = COLOR_PRIMARIES_SRGB;
+    p_region->fmt.space = COLOR_SPACE_SRGB;
+    p_region->fmt.color_range = COLOR_RANGE_FULL;
 
     return p_region;
 }
