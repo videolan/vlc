@@ -166,7 +166,12 @@ void vout_ChangeProjection(vout_thread_t *, video_projection_mode_t projection);
 void vout_ToggleProjection(vout_thread_t *, bool enabled);
 void vout_ResetProjection(vout_thread_t *);
 
-void vout_FilterMouse(vout_thread_t *vout, vlc_mouse_t *mouse);
+/**
+ * Passes mouse events through the video filter chains and updates the mouse state.
+ *
+ * \return true if any filter in the chain consumed the mouse event, false otherwise.
+ */
+bool vout_FilterMouse(vout_thread_t *vout, vlc_mouse_t *mouse);
 
 /* */
 void vout_CreateVars( vout_thread_t * );
