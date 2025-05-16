@@ -243,6 +243,22 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
         return NULL;
     }
 
+    if (p_region->fmt.transfer == TRANSFER_FUNC_UNDEF)
+        p_region->fmt.transfer = TRANSFER_FUNC_SRGB;
+    if (p_region->fmt.primaries == COLOR_PRIMARIES_UNDEF)
+        p_region->fmt.primaries = COLOR_PRIMARIES_SRGB;
+    if (p_region->fmt.space == COLOR_SPACE_UNDEF)
+        p_region->fmt.space = COLOR_SPACE_SRGB;
+    p_region->fmt.b_color_range_full = true;
+
+    if (p_region->p_picture->format.transfer == TRANSFER_FUNC_UNDEF)
+        p_region->p_picture->format.transfer = TRANSFER_FUNC_SRGB;
+    if (p_region->p_picture->format.primaries == COLOR_PRIMARIES_UNDEF)
+        p_region->p_picture->format.primaries = COLOR_PRIMARIES_SRGB;
+    if (p_region->p_picture->format.space == COLOR_SPACE_UNDEF)
+        p_region->p_picture->format.space = COLOR_SPACE_SRGB;
+    p_region->p_picture->format.b_color_range_full = true;
+
     return p_region;
 }
 
