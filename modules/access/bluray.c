@@ -1611,7 +1611,7 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
     const subpicture_region_t *p_src;
     subpicture_region_t *p_dst;
     vlc_spu_regions_foreach_const(p_src, &p_overlay->regions) {
-        p_dst = subpicture_region_ForPicture(&p_src->fmt, p_src->p_picture);
+        p_dst = subpicture_region_ForPicture(NULL, p_src->p_picture);
         if (p_dst == NULL)
             break;
 
