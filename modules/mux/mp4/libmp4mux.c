@@ -148,13 +148,12 @@ mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *h, unsigned id,
     if(unlikely(id == 0))
         return NULL;
     mp4mux_trackinfo_t *t = malloc(sizeof(*t));
-    if(!t || !mp4mux_trackinfo_Init(t, 0, 0))
+    if(!t || !mp4mux_trackinfo_Init(t, 0, timescale))
     {
         free(t);
         return NULL;
     }
     t->i_track_id = id;
-    t->i_timescale = timescale;
     es_format_Init(&t->fmt, fmt->i_cat, fmt->i_codec);
     es_format_Copy(&t->fmt, fmt);
     vlc_array_append(&h->tracks, t);
