@@ -234,7 +234,7 @@ static int64_t MP4_rescale( int64_t i_value, uint32_t i_timescale, uint32_t i_ne
     if( i_timescale == i_newscale )
         return i_value;
 
-    if( i_value <= VLC_TICK_MAX / i_newscale )
+    if( i_value <= INT64_MAX / i_newscale )
         return i_value * i_newscale / i_timescale;
 
     /* overflow */
