@@ -227,6 +227,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
 
 static int stream_cmp(const void *a, const void *b, void *priv)
 {
+    VLC_UNUSED(priv);
     const mp4_stream_t *p_a = *((const mp4_stream_t **)a);
     const mp4_stream_t *p_b = *((const mp4_stream_t **)b);
     static const uint8_t order[ES_CATEGORY_COUNT] = {
