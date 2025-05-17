@@ -36,6 +36,11 @@ static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
 
 @implementation VLCPlaybackEndViewController
 
+- (instancetype)init
+{
+    return [super initWithNibName:@"VLCPlaybackEndView" bundle:nil];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
