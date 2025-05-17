@@ -590,6 +590,10 @@
                           selector:@selector(playbackEndViewReturnToLibrary:)
                               name:VLCPlaybackEndViewReturnToLibraryNotificationName
                             object:self.playbackEndViewController];
+        [defaultCenter addObserver:self
+                          selector:@selector(playbackEndViewRestartPlayQueue:)
+                              name:VLCPlaybackEndViewRestartPlayQueueNotificationName
+                            object:self.playbackEndViewController];
     }
 
     self.playbackEndViewController.hideLibraryControls = !self.displayLibraryControls;
@@ -603,6 +607,12 @@
 {
     [self.playbackEndViewController.view removeFromSuperview];
     [self returnToLibrary:self];
+}
+
+- (void)playbackEndViewRestartPlayQueue:(NSNotification *)notification
+{
+    [self.playbackEndViewController.view removeFromSuperview];
+    [VLCMain.sharedInstance.playQueueController playItemAtIndex:0];
 }
 
 #pragma mark - PIPViewControllerDelegate
