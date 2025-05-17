@@ -22,6 +22,8 @@
 
 #import "VLCPlaybackEndViewController.h"
 
+#import "extensions/NSString+Helpers.h"
+
 @interface VLCPlaybackEndViewController ()
 
 @end
@@ -31,7 +33,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do view setup here.
+    self.largeTitleLabel.stringValue = _NS("Reached the end of the play queue");
+    self.returnToLibraryButton.stringValue = _NS("Return to library");
+    self.restartPlayQueueButton.stringValue = _NS("Restart play queue");
 }
 
 @end
