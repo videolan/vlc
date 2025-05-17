@@ -22,7 +22,9 @@
 
 #import "VLCPlaybackEndViewController.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "library/VLCLibraryUIUnits.h"
 
 static const NSTimeInterval kVLCPlaybackEndTimeout = 10;
 static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
@@ -48,6 +50,10 @@ NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName = @"VLCPlayb
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.view.wantsLayer = YES;
+    self.view.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
+    self.view.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
+    self.view.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
     self.largeTitleLabel.stringValue = _NS("Reached the end of the play queue");
     self.returnToLibraryButton.stringValue = _NS("Return to library");
     self.returnToLibraryButton.target = self;
