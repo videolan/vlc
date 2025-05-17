@@ -24,7 +24,13 @@
 
 #import "extensions/NSString+Helpers.h"
 
+static const NSTimeInterval kVLCPlaybackEndTimeout = 10;
+static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
+
 @interface VLCPlaybackEndViewController ()
+
+@property NSTimer *countdownTimer;
+@property NSDate *timeoutDate;
 
 @end
 
@@ -36,6 +42,42 @@
     self.largeTitleLabel.stringValue = _NS("Reached the end of the play queue");
     self.returnToLibraryButton.stringValue = _NS("Return to library");
     self.restartPlayQueueButton.stringValue = _NS("Restart play queue");
+}
+
+- (void)startCountdown
+{
+    [self.countdownTimer invalidate];
+    self.timeoutDate = [NSDate dateWithTimeIntervalSinceNow:kVLCPlaybackEndTimeout];
+    self.countdownTimer = [NSTimer scheduledTimerWithTimeInterval:kVLCPlaybackEndUpdateInterval
+                                                           target:self
+                                                         selector:@selector(handleUpdateInterval:)
+                                                         userInfo:nil
+                                                          repeats:YES];
+    [self handleUpdateInterval:nil];
+}
+
+- (void)handleUpdateInterval:(nullable NSTimer *)timer
+{
+    NSDate * const now = NSDate.date;
+    NSDate * const timeout = self.timeoutDate;
+    const NSTimeInterval timeRemaining = [timeout timeIntervalSinceDate:now];
+    if (timeRemaining <= 0) {
+        if (timer)
+            [timer invalidate];
+        return;
+    }
+
+    NSString *remainingTimeString = @"";
+    if (@available(macOS 10.15, *)) {
+        NSRelativeDateTimeFormatter * const formatter = [[NSRelativeDateTimeFormatter alloc] init];
+        remainingTimeString = [formatter localizedStringForDate:timeout relativeToDate:now];
+    } else {
+        NSDateComponentsFormatter * const formatter = [[NSDateComponentsFormatter alloc] init];
+        NSString * const timeString = [formatter stringFromTimeInterval:timeRemaining];
+        remainingTimeString = [NSString stringWithFormat:_NS("in %@"), timeString];
+    }
+    self.countdownLabel.stringValue =
+        [NSString stringWithFormat:_NS("Returning to library %@"), remainingTimeString];
 }
 
 @end

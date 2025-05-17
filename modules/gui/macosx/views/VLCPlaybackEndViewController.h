@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *returnToLibraryButton;
 @property (readwrite, weak) IBOutlet NSButton *restartPlayQueueButton;
 
+- (void)startCountdown;
+
 @end
 
 NS_ASSUME_NONNULL_END
