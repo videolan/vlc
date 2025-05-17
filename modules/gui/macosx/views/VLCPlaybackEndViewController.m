@@ -28,6 +28,8 @@ static const NSTimeInterval kVLCPlaybackEndTimeout = 10;
 static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
 
 NSString * const VLCPlaybackEndViewTimeoutNotificationName = @"VLCPlaybackEndViewTimeout";
+NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlaybackEndViewReturnToLibrary";
+NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName = @"VLCPlaybackEndViewRestartPlayQueue";
 
 @interface VLCPlaybackEndViewController ()
 
@@ -48,7 +50,11 @@ NSString * const VLCPlaybackEndViewTimeoutNotificationName = @"VLCPlaybackEndVie
     [super viewDidLoad];
     self.largeTitleLabel.stringValue = _NS("Reached the end of the play queue");
     self.returnToLibraryButton.stringValue = _NS("Return to library");
+    self.returnToLibraryButton.target = self;
+    self.returnToLibraryButton.action = @selector(returnToLibrary:);
     self.restartPlayQueueButton.stringValue = _NS("Restart play queue");
+    self.restartPlayQueueButton.target = self;
+    self.restartPlayQueueButton.action = @selector(restartPlayQueue:);
 }
 
 - (void)startCountdown
@@ -96,6 +102,18 @@ NSString * const VLCPlaybackEndViewTimeoutNotificationName = @"VLCPlaybackEndVie
     _hideLibraryControls = hideLibraryControls;
     self.countdownLabel.hidden = hideLibraryControls;
     self.returnToLibraryButton.hidden = hideLibraryControls;
+}
+
+- (void)returnToLibrary:(id)sender
+{
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewReturnToLibraryNotificationName
+                                                      object:self];
+}
+
+- (void)restartPlayQueue:(id)sender
+{
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewRestartPlayQueueNotificationName
+                                                      object:self];
 }
 
 @end
