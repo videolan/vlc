@@ -201,6 +201,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                name:VLCPlayerTrackSelectionChanged
                              object:nil];
 
+    [notificationCenter addObserver:self
+                           selector:@selector(videoViewEndPlaybackViewTimeout:)
+                               name:VLCMainVideoViewControllerPlaybackEndViewTimeoutNotificationName
+                             object:self.videoViewController];
+
     [self setViewForSelectedSegment];
     [self setupLoadingOverlayView];
 }
@@ -413,11 +418,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         const BOOL decorativeViewVisible = mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
 
         if (!decorativeViewVisible) {
-            [self disableVideoPlaybackAppearance];
+            [self.videoViewController displayPlaybackEndView];
         }
     } else {
         [self disableVideoPlaybackAppearance];
     }
+}
+
+- (void)videoViewEndPlaybackViewTimeout:(NSNotification *)notification
+{
+    [self disableVideoPlaybackAppearance];
 }
 
 - (void)playerStateChanged:(NSNotification *)notification
