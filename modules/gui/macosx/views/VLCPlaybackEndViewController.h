@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCPlaybackEndViewTimeoutNotificationName;
+
 @interface VLCPlaybackEndViewController : NSViewController
 
 @property (readwrite, weak) IBOutlet NSTextField *largeTitleLabel;

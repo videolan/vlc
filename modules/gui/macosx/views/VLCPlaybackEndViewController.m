@@ -27,6 +27,8 @@
 static const NSTimeInterval kVLCPlaybackEndTimeout = 10;
 static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
 
+NSString * const VLCPlaybackEndViewTimeoutNotificationName = @"VLCPlaybackEndViewTimeout";
+
 @interface VLCPlaybackEndViewController ()
 
 @property NSTimer *countdownTimer;
@@ -69,6 +71,8 @@ static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
     if (timeRemaining <= 0) {
         if (timer)
             [timer invalidate];
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewTimeoutNotificationName
+                                                          object:self];
         return;
     }
 
