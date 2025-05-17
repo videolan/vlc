@@ -395,6 +395,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCLoadingOverlayView.m \
 	gui/macosx/views/VLCNoResultsLabel.h \
 	gui/macosx/views/VLCNoResultsLabel.m \
+	gui/macosx/views/VLCPlaybackEndViewController.h \
+	gui/macosx/views/VLCPlaybackEndViewController.m \
 	gui/macosx/views/VLCPlaybackProgressSlider.h \
 	gui/macosx/views/VLCPlaybackProgressSlider.m \
 	gui/macosx/views/VLCPlaybackProgressSliderCell.h \
