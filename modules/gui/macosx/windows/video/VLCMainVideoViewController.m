@@ -586,6 +586,10 @@
                           selector:@selector(playbackEndViewReturnToLibrary:)
                               name:VLCPlaybackEndViewTimeoutNotificationName
                             object:self.playbackEndViewController];
+        [defaultCenter addObserver:self
+                          selector:@selector(playbackEndViewReturnToLibrary:)
+                              name:VLCPlaybackEndViewReturnToLibraryNotificationName
+                            object:self.playbackEndViewController];
     }
 
     self.playbackEndViewController.hideLibraryControls = !self.displayLibraryControls;
