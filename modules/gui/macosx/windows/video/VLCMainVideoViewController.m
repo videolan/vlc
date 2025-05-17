@@ -604,6 +604,8 @@
     [self.view addSubview:self.playbackEndViewController.view];
     [self.playbackEndViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [self.playbackEndViewController.view.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
+    [self.playbackEndViewController.view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [self.playbackEndViewController.view.trailingAnchor constraintLessThanOrEqualToAnchor:self.view.trailingAnchor].active = YES;
     [self.playbackEndViewController startCountdown];
 }
 
