@@ -52,6 +52,9 @@
 
 #import "private/PIPSPI.h"
 
+NSString * const VLCMainVideoViewControllerPlaybackEndViewTimeoutNotificationName =
+    @"VLCMainVideoViewControllerPlaybackEndViewTimeout";
+
 @interface PIPVoutViewController : NSViewController
 @end
 
@@ -583,7 +586,18 @@
     [self.view addSubview:self.playbackEndViewController.view];
     [self.playbackEndViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [self.playbackEndViewController.view.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(playbackEndViewTimeout:)
+                                               name:VLCPlaybackEndViewTimeoutNotificationName
+                                             object:self.playbackEndViewController];
     [self.playbackEndViewController startCountdown];
+}
+
+- (void)playbackEndViewTimeout:(NSNotification *)notification
+{
+    [self.playbackEndViewController.view removeFromSuperview];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCMainVideoViewControllerPlaybackEndViewTimeoutNotificationName
+                                                      object:self];
 }
 
 #pragma mark - PIPViewControllerDelegate
