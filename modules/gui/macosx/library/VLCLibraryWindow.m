@@ -201,11 +201,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                name:VLCPlayerTrackSelectionChanged
                              object:nil];
 
-    [notificationCenter addObserver:self
-                           selector:@selector(videoViewEndPlaybackViewTimeout:)
-                               name:VLCMainVideoViewControllerPlaybackEndViewTimeoutNotificationName
-                             object:self.videoViewController];
-
     [self setViewForSelectedSegment];
     [self setupLoadingOverlayView];
 }
@@ -423,11 +418,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     } else {
         [self disableVideoPlaybackAppearance];
     }
-}
-
-- (void)videoViewEndPlaybackViewTimeout:(NSNotification *)notification
-{
-    [self disableVideoPlaybackAppearance];
 }
 
 - (void)playerStateChanged:(NSNotification *)notification

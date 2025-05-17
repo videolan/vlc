@@ -52,9 +52,6 @@
 
 #import "private/PIPSPI.h"
 
-NSString * const VLCMainVideoViewControllerPlaybackEndViewTimeoutNotificationName =
-    @"VLCMainVideoViewControllerPlaybackEndViewTimeout";
-
 @interface PIPVoutViewController : NSViewController
 @end
 
@@ -581,25 +578,27 @@ NSString * const VLCMainVideoViewControllerPlaybackEndViewTimeoutNotificationNam
 
 - (void)displayPlaybackEndView
 {
-    if (_playbackEndViewController == nil)
+    if (_playbackEndViewController == nil) {
         _playbackEndViewController = [[VLCPlaybackEndViewController alloc] init];
+
+        NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+        [defaultCenter addObserver:self
+                          selector:@selector(playbackEndViewReturnToLibrary:)
+                              name:VLCPlaybackEndViewTimeoutNotificationName
+                            object:self.playbackEndViewController];
+    }
 
     self.playbackEndViewController.hideLibraryControls = !self.displayLibraryControls;
     [self.view addSubview:self.playbackEndViewController.view];
     [self.playbackEndViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [self.playbackEndViewController.view.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(playbackEndViewTimeout:)
-                                               name:VLCPlaybackEndViewTimeoutNotificationName
-                                             object:self.playbackEndViewController];
     [self.playbackEndViewController startCountdown];
 }
 
-- (void)playbackEndViewTimeout:(NSNotification *)notification
+- (void)playbackEndViewReturnToLibrary:(NSNotification *)notification
 {
     [self.playbackEndViewController.view removeFromSuperview];
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCMainVideoViewControllerPlaybackEndViewTimeoutNotificationName
-                                                      object:self];
+    [self returnToLibrary:self];
 }
 
 #pragma mark - PIPViewControllerDelegate
