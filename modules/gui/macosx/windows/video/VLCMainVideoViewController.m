@@ -39,6 +39,7 @@
 #import "playqueue/VLCPlayerController.h"
 
 #import "views/VLCBottomBarView.h"
+#import "views/VLCPlaybackEndViewController.h"
 
 #import "windows/controlsbar/VLCMainVideoViewControlsBar.h"
 
@@ -573,6 +574,16 @@
                relativeTo:self.mainControlsView];
     [videoView applyConstraintsToFillSuperview];
     [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
+}
+
+- (void)displayPlaybackEndView
+{
+    if (_playbackEndViewController == nil)
+        _playbackEndViewController = [[VLCPlaybackEndViewController alloc] init];
+    [self.view addSubview:self.playbackEndViewController.view];
+    [self.playbackEndViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    [self.playbackEndViewController.view.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
+    [self.playbackEndViewController startCountdown];
 }
 
 #pragma mark - PIPViewControllerDelegate

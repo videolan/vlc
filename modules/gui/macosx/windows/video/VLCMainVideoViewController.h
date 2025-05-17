@@ -27,6 +27,7 @@
 @class VLCMainVideoViewOverlayView;
 @class VLCMainVideoViewAudioMediaDecorativeView;
 @class VLCMainVideoViewControlsBar;
+@class VLCPlaybackEndViewController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -64,10 +65,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL mouseOnControls;
 @property (readonly) BOOL pipIsActive;
 
+@property (readonly) VLCPlaybackEndViewController *playbackEndViewController;
+
 - (void)showControls;
 - (void)hideControls;
 - (nullable NSView *)acquireVideoView;
 - (void)returnVideoView:(NSView *)videoView;
+- (void)displayPlaybackEndView;
 
 - (IBAction)togglePlayQueue:(id)sender;
 - (IBAction)returnToLibrary:(id)sender;
