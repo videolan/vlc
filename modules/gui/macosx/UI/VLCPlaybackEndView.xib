@@ -5,10 +5,18 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCPlaybackEndViewController">
+            <connections>
+                <outlet property="countdownLabel" destination="C5J-Xc-NJc" id="tNP-DB-pOU"/>
+                <outlet property="largeTitleLabel" destination="jN5-TU-5uH" id="0qd-aL-HsE"/>
+                <outlet property="restartPlayQueueButton" destination="CII-HN-I8g" id="uLY-jC-xYO"/>
+                <outlet property="returnToLibraryButton" destination="vpB-Yh-v5U" id="e37-g6-GGT"/>
+                <outlet property="view" destination="NcL-Nn-hUb" id="do2-eJ-8gU"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <visualEffectView wantsLayer="YES" blendingMode="behindWindow" material="appearanceBased" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="NcL-Nn-hUb">
+        <visualEffectView wantsLayer="YES" blendingMode="withinWindow" material="sheet" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="NcL-Nn-hUb">
             <rect key="frame" x="0.0" y="0.0" width="500" height="149"/>
             <subviews>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jN5-TU-5uH">
@@ -64,9 +72,11 @@
                 <constraint firstItem="huG-UY-8W9" firstAttribute="top" secondItem="C5J-Xc-NJc" secondAttribute="bottom" constant="20" id="Wk4-Fh-M3Z"/>
                 <constraint firstItem="huG-UY-8W9" firstAttribute="leading" secondItem="NcL-Nn-hUb" secondAttribute="leading" constant="20" id="X0f-L9-A1Y"/>
                 <constraint firstItem="huG-UY-8W9" firstAttribute="centerX" secondItem="NcL-Nn-hUb" secondAttribute="centerX" id="mVr-Ig-tg3"/>
+                <constraint firstAttribute="width" constant="500" id="mwp-2D-UCT"/>
+                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="149" id="owb-PL-E4y"/>
                 <constraint firstAttribute="bottom" secondItem="huG-UY-8W9" secondAttribute="bottom" constant="20" id="paw-6c-QHp"/>
             </constraints>
-            <point key="canvasLocation" x="286" y="185"/>
+            <point key="canvasLocation" x="286" y="184.5"/>
         </visualEffectView>
     </objects>
     <resources>

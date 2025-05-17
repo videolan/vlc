@@ -26,6 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlaybackEndViewController : NSViewController
 
+@property (readwrite, weak) IBOutlet NSTextField *largeTitleLabel;
+@property (readwrite, weak) IBOutlet NSTextField *countdownLabel;
+@property (readwrite, weak) IBOutlet NSButton *returnToLibraryButton;
+@property (readwrite, weak) IBOutlet NSButton *restartPlayQueueButton;
+
 @end
 
 NS_ASSUME_NONNULL_END
