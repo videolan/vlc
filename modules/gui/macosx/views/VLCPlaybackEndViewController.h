@@ -35,6 +35,7 @@ extern NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName;
 @property (readwrite, weak) IBOutlet NSButton *returnToLibraryButton;
 @property (readwrite, weak) IBOutlet NSButton *restartPlayQueueButton;
 @property (readwrite, nonatomic) BOOL hideLibraryControls;
+@property (readonly) NSTimer *countdownTimer;
 
 - (void)startCountdown;
 

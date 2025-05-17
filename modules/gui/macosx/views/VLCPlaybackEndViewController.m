@@ -35,7 +35,6 @@ NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName = @"VLCPlayb
 
 @interface VLCPlaybackEndViewController ()
 
-@property NSTimer *countdownTimer;
 @property NSDate *timeoutDate;
 
 @end
@@ -67,11 +66,11 @@ NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName = @"VLCPlayb
 {
     [self.countdownTimer invalidate];
     self.timeoutDate = [NSDate dateWithTimeIntervalSinceNow:kVLCPlaybackEndTimeout];
-    self.countdownTimer = [NSTimer scheduledTimerWithTimeInterval:kVLCPlaybackEndUpdateInterval
-                                                           target:self
-                                                         selector:@selector(handleUpdateInterval:)
-                                                         userInfo:nil
-                                                          repeats:YES];
+    _countdownTimer = [NSTimer scheduledTimerWithTimeInterval:kVLCPlaybackEndUpdateInterval
+                                                       target:self
+                                                     selector:@selector(handleUpdateInterval:)
+                                                     userInfo:nil
+                                                      repeats:YES];
     [self handleUpdateInterval:nil];
 }
 

@@ -553,6 +553,10 @@
 
 - (IBAction)returnToLibrary:(id)sender
 {
+    if (self.playbackEndViewController) { // Stop any pending automatic return to library
+        [self.playbackEndViewController.countdownTimer invalidate];
+        [self.playbackEndViewController.view removeFromSuperview];
+    }
     VLCLibraryWindow *libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil) {
         [libraryWindow disableVideoPlaybackAppearance];
@@ -605,7 +609,6 @@
 
 - (void)playbackEndViewReturnToLibrary:(NSNotification *)notification
 {
-    [self.playbackEndViewController.view removeFromSuperview];
     [self returnToLibrary:self];
 }
 
