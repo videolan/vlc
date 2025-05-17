@@ -106,12 +106,14 @@ NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName = @"VLCPlayb
 
 - (void)returnToLibrary:(id)sender
 {
+    [self.countdownTimer invalidate];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewReturnToLibraryNotificationName
                                                       object:self];
 }
 
 - (void)restartPlayQueue:(id)sender
 {
+    [self.countdownTimer invalidate];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewRestartPlayQueueNotificationName
                                                       object:self];
 }
