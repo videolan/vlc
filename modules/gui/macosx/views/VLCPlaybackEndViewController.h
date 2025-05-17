@@ -32,6 +32,7 @@ extern NSString * const VLCPlaybackEndViewTimeoutNotificationName;
 @property (readwrite, weak) IBOutlet NSTextField *countdownLabel;
 @property (readwrite, weak) IBOutlet NSButton *returnToLibraryButton;
 @property (readwrite, weak) IBOutlet NSButton *restartPlayQueueButton;
+@property (readwrite, nonatomic) BOOL hideLibraryControls;
 
 - (void)startCountdown;
 

@@ -583,6 +583,8 @@ NSString * const VLCMainVideoViewControllerPlaybackEndViewTimeoutNotificationNam
 {
     if (_playbackEndViewController == nil)
         _playbackEndViewController = [[VLCPlaybackEndViewController alloc] init];
+
+    self.playbackEndViewController.hideLibraryControls = !self.displayLibraryControls;
     [self.view addSubview:self.playbackEndViewController.view];
     [self.playbackEndViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [self.playbackEndViewController.view.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;

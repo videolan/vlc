@@ -89,4 +89,13 @@ NSString * const VLCPlaybackEndViewTimeoutNotificationName = @"VLCPlaybackEndVie
         [NSString stringWithFormat:_NS("Returning to library %@"), remainingTimeString];
 }
 
+- (void)setHideLibraryControls:(BOOL)hideLibraryControls
+{
+    if (self.hideLibraryControls == hideLibraryControls)
+        return;
+    _hideLibraryControls = hideLibraryControls;
+    self.countdownLabel.hidden = hideLibraryControls;
+    self.returnToLibraryButton.hidden = hideLibraryControls;
+}
+
 @end
