@@ -77,7 +77,15 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
 
     VLCInputItem * const currentInputItem =
         VLCMain.sharedInstance.playQueueController.currentlyPlayingInputItem;
-    self.nextItem = [self nextItemForInputItem:currentInputItem];
+    NSURL * const inputItemUrl = [NSURL URLWithString:currentInputItem.MRL];
+    VLCMediaLibraryMediaItem * const mediaLibraryItem =
+        [VLCMediaLibraryMediaItem mediaItemForURL:inputItemUrl];
+
+    if (mediaLibraryItem) {
+        self.nextItem = [self nextItemForMediaLibraryItem:mediaLibraryItem];
+    } else {
+        self.nextItem = [self nextItemForInputItem:currentInputItem];
+    }
     self.playNextItemButton.hidden = self.nextItem == nil;
     self.timeoutDate = [NSDate dateWithTimeIntervalSinceNow:kVLCPlaybackEndTimeout];
     _countdownTimer = [NSTimer scheduledTimerWithTimeInterval:kVLCPlaybackEndUpdateInterval
@@ -86,6 +94,35 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
                                                      userInfo:nil
                                                       repeats:YES];
     [self handleUpdateInterval:nil];
+}
+
+- (nullable VLCInputItem *)nextItemForMediaLibraryItem:(VLCMediaLibraryMediaItem *)item
+{
+    NSArray<VLCMediaLibraryMediaItem *> *parentMediaItemCollection = nil;
+    __block NSInteger itemIndex = NSNotFound;
+
+    if (item.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK) {
+        parentMediaItemCollection = [VLCMediaLibraryAlbum albumWithID:item.albumID].mediaItems;
+        itemIndex = [parentMediaItemCollection indexOfMediaLibraryItem:item];
+    } else if (item.mediaSubType == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
+        NSArray<VLCMediaLibraryShow *> * const shows =
+            VLCMain.sharedInstance.libraryController.libraryModel.listOfShows;
+        const NSInteger showContainingEpisodeIdx = [shows indexOfObjectPassingTest:^BOOL(VLCMediaLibraryShow * const show, const NSUInteger idx, BOOL * const stop) {
+            itemIndex = [show.mediaItems indexOfMediaLibraryItem:item];
+            return itemIndex != NSNotFound;
+        }];
+        if (showContainingEpisodeIdx != NSNotFound) {
+            parentMediaItemCollection = shows[showContainingEpisodeIdx].mediaItems;
+        }
+    }
+
+    if (parentMediaItemCollection == nil ||
+        itemIndex == NSNotFound ||
+        itemIndex + 1 >= parentMediaItemCollection.count
+    ) {
+        return [self nextItemForInputItem:item.inputItem];
+    }
+    return parentMediaItemCollection[itemIndex + 1].inputItem;
 }
 
 - (nullable VLCInputItem *)nextItemForInputItem:(VLCInputItem *)item
