@@ -9,6 +9,7 @@
             <connections>
                 <outlet property="countdownLabel" destination="C5J-Xc-NJc" id="tNP-DB-pOU"/>
                 <outlet property="largeTitleLabel" destination="jN5-TU-5uH" id="0qd-aL-HsE"/>
+                <outlet property="playNextItemButton" destination="YFo-7r-UzM" id="ZrY-Ot-LjJ"/>
                 <outlet property="restartPlayQueueButton" destination="CII-HN-I8g" id="uLY-jC-xYO"/>
                 <outlet property="returnToLibraryButton" destination="vpB-Yh-v5U" id="e37-g6-GGT"/>
                 <outlet property="view" destination="NcL-Nn-hUb" id="do2-eJ-8gU"/>
@@ -52,6 +53,13 @@
                                 <font key="font" metaFont="smallSystemBold"/>
                             </buttonCell>
                         </button>
+                        <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YFo-7r-UzM">
+                            <rect key="frame" x="267" y="0.0" width="125" height="32"/>
+                            <buttonCell key="cell" type="inline" title="Play next item" bezelStyle="inline" image="arrow.right" catalog="system" imagePosition="above" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="O5u-Ck-U6T">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" size="11" name=".SFNS-Semibold"/>
+                            </buttonCell>
+                        </button>
                     </subviews>
                     <visibilityPriorities>
                         <integer value="1000"/>
@@ -80,6 +88,7 @@
         </visualEffectView>
     </objects>
     <resources>
+        <image name="arrow.right" catalog="system" width="15" height="12"/>
         <image name="books.vertical.fill" catalog="system" width="20" height="17"/>
         <image name="repeat" catalog="system" width="18" height="14"/>
     </resources>

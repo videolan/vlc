@@ -23,8 +23,12 @@
 #import "VLCPlaybackEndViewController.h"
 
 #import "main/VLCMain.h"
+#import "extensions/NSArray+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "library/VLCInputItem.h"
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "playqueue/VLCPlayQueueController.h"
 
@@ -37,6 +41,7 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
 @interface VLCPlaybackEndViewController ()
 
 @property NSDate *timeoutDate;
+@property VLCInputItem *nextItem;
 
 @end
 
@@ -61,11 +66,19 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
     self.restartPlayQueueButton.stringValue = _NS("Restart play queue");
     self.restartPlayQueueButton.target = self;
     self.restartPlayQueueButton.action = @selector(restartPlayQueue:);
+    self.playNextItemButton.stringValue = _NS("Play next item");
+    self.playNextItemButton.target = self;
+    self.playNextItemButton.action = @selector(playNextItem:);
 }
 
 - (void)startCountdown
 {
     [self.countdownTimer invalidate];
+
+    VLCInputItem * const currentInputItem =
+        VLCMain.sharedInstance.playQueueController.currentlyPlayingInputItem;
+    self.nextItem = [self nextItemForInputItem:currentInputItem];
+    self.playNextItemButton.hidden = self.nextItem == nil;
     self.timeoutDate = [NSDate dateWithTimeIntervalSinceNow:kVLCPlaybackEndTimeout];
     _countdownTimer = [NSTimer scheduledTimerWithTimeInterval:kVLCPlaybackEndUpdateInterval
                                                        target:self
@@ -75,13 +88,48 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
     [self handleUpdateInterval:nil];
 }
 
+- (nullable VLCInputItem *)nextItemForInputItem:(VLCInputItem *)item
+{
+    if (item.isStream) {
+        return nil;
+    }
+
+    NSURL * const itemUrl = [NSURL URLWithString:item.MRL];
+    NSParameterAssert(itemUrl != nil);
+    NSString * const parentFolderPath = itemUrl.URLByDeletingLastPathComponent.path;
+    NSFileManager * const fm = NSFileManager.defaultManager;
+    NSError *error = nil;
+    NSArray<NSString *> * const itemSiblingItemPaths =
+        [fm contentsOfDirectoryAtPath:parentFolderPath error:&error];
+
+    if (error != nil) {
+        NSLog(@"Could not find siblings for item: %@\n\tReceived error:%@", item.decodedMRL, error.localizedDescription);
+        return nil;
+    }
+
+    const NSInteger itemIdx = [itemSiblingItemPaths indexOfObject:itemUrl.lastPathComponent];
+    NSParameterAssert(itemIdx != NSNotFound);
+    if (itemIdx + 1 >= itemSiblingItemPaths.count) {
+        NSLog(@"Played item was last in parent folder.");
+        return nil;
+    }
+    NSString * const nextItemFileName = itemSiblingItemPaths[itemIdx + 1];
+    NSURL * const nextItemURL =
+        [[NSURL fileURLWithPath:parentFolderPath] URLByAppendingPathComponent:nextItemFileName];
+    return [VLCInputItem inputItemFromURL:nextItemURL];
+}
+
 - (void)handleUpdateInterval:(nullable NSTimer *)timer
 {
     NSDate * const now = NSDate.date;
     NSDate * const timeout = self.timeoutDate;
     const NSTimeInterval timeRemaining = [timeout timeIntervalSinceDate:now];
     if (timeRemaining <= 0) {
-        [self returnToLibrary:self];
+        if (self.nextItem) {
+            [self playNextItem:self];
+        } else {
+            [self returnToLibrary:self];
+        }
         return;
     }
 
@@ -94,8 +142,17 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
         NSString * const timeString = [formatter stringFromTimeInterval:timeRemaining];
         remainingTimeString = [NSString stringWithFormat:_NS("in %@"), timeString];
     }
-    self.countdownLabel.stringValue =
-        [NSString stringWithFormat:_NS("Returning to library %@"), remainingTimeString];
+
+    NSString *countdownLabelString = nil;
+    if (self.nextItem) {
+        countdownLabelString =
+            [NSString stringWithFormat:_NS("Playing %@ %@"), self.nextItem.title, remainingTimeString];
+    } else {
+        countdownLabelString =
+            [NSString stringWithFormat:_NS("Returning to library %@"), remainingTimeString];
+    }
+    NSParameterAssert(countdownLabelString != nil);
+    self.countdownLabel.stringValue = countdownLabelString;
 }
 
 - (void)setHideLibraryControls:(BOOL)hideLibraryControls
@@ -120,6 +177,18 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
 {
     [self.countdownTimer invalidate];
     [VLCMain.sharedInstance.playQueueController playItemAtIndex:0];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewHideNotificationName
+                                                      object:self];
+}
+
+- (void)playNextItem:(id)sender
+{
+    [self.countdownTimer invalidate];
+    if (self.nextItem == nil)
+        return;
+    [VLCMain.sharedInstance.playQueueController addInputItem:self.nextItem.vlcInputItem
+                                                  atPosition:-1
+                                               startPlayback:YES];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewHideNotificationName
                                                       object:self];
 }
