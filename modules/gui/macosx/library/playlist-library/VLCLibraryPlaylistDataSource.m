@@ -68,7 +68,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
                                name:VLCLibraryModelPlaylistAdded
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(playQueueUpdated:)
+                           selector:@selector(playlistUpdated:)
                                name:VLCLibraryModelPlaylistUpdated
                              object:nil];
     [notificationCenter addObserver:self
