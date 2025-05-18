@@ -588,15 +588,11 @@
         NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
         [defaultCenter addObserver:self
                           selector:@selector(playbackEndViewReturnToLibrary:)
-                              name:VLCPlaybackEndViewTimeoutNotificationName
-                            object:self.playbackEndViewController];
-        [defaultCenter addObserver:self
-                          selector:@selector(playbackEndViewReturnToLibrary:)
                               name:VLCPlaybackEndViewReturnToLibraryNotificationName
                             object:self.playbackEndViewController];
         [defaultCenter addObserver:self
-                          selector:@selector(playbackEndViewRestartPlayQueue:)
-                              name:VLCPlaybackEndViewRestartPlayQueueNotificationName
+                          selector:@selector(playbackEndViewHide:)
+                              name:VLCPlaybackEndViewHideNotificationName
                             object:self.playbackEndViewController];
     }
 
@@ -614,10 +610,9 @@
     [self returnToLibrary:self];
 }
 
-- (void)playbackEndViewRestartPlayQueue:(NSNotification *)notification
+- (void)playbackEndViewHide:(NSNotification *)notification
 {
     [self.playbackEndViewController.view removeFromSuperview];
-    [VLCMain.sharedInstance.playQueueController playItemAtIndex:0];
 }
 
 #pragma mark - PIPViewControllerDelegate

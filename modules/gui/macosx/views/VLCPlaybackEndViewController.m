@@ -22,16 +22,17 @@
 
 #import "VLCPlaybackEndViewController.h"
 
+#import "main/VLCMain.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 static const NSTimeInterval kVLCPlaybackEndTimeout = 10;
 static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
 
-NSString * const VLCPlaybackEndViewTimeoutNotificationName = @"VLCPlaybackEndViewTimeout";
+NSString * const VLCPlaybackEndViewHideNotificationName = @"VLCPlaybackEndViewRequestHide";
 NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlaybackEndViewReturnToLibrary";
-NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName = @"VLCPlaybackEndViewRestartPlayQueue";
 
 @interface VLCPlaybackEndViewController ()
 
@@ -80,10 +81,7 @@ NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName = @"VLCPlayb
     NSDate * const timeout = self.timeoutDate;
     const NSTimeInterval timeRemaining = [timeout timeIntervalSinceDate:now];
     if (timeRemaining <= 0) {
-        if (timer)
-            [timer invalidate];
-        [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewTimeoutNotificationName
-                                                          object:self];
+        [self returnToLibrary:self];
         return;
     }
 
@@ -114,12 +112,15 @@ NSString * const VLCPlaybackEndViewRestartPlayQueueNotificationName = @"VLCPlayb
     [self.countdownTimer invalidate];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewReturnToLibraryNotificationName
                                                       object:self];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewHideNotificationName
+                                                      object:self];
 }
 
 - (void)restartPlayQueue:(id)sender
 {
     [self.countdownTimer invalidate];
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewRestartPlayQueueNotificationName
+    [VLCMain.sharedInstance.playQueueController playItemAtIndex:0];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCPlaybackEndViewHideNotificationName
                                                       object:self];
 }
 
