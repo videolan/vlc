@@ -74,6 +74,18 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 @implementation VLCInputItem
 
++ (nullable instancetype)inputItemFromURL:(NSURL *)url
+{
+    const char * const psz_uri = url.absoluteString.UTF8String;
+    const char * const psz_name = url.lastPathComponent.stringByDeletingPathExtension.UTF8String;
+    input_item_t * const p_input_item = input_item_New(psz_uri, psz_name);
+    if (p_input_item == NULL)
+        return nil;
+    VLCInputItem * const inputItem = [[VLCInputItem alloc] initWithInputItem:p_input_item];
+    input_item_Release(p_input_item);
+    return inputItem;
+}
+
 - (instancetype)initWithInputItem:(struct input_item_t *)p_inputItem
 {
     self = [super init];
