@@ -42,6 +42,7 @@ intf_thread_t *getIntf(void);
 vlc_preparser_t *getNetworkPreparser();
 
 extern NSString *VLCConfigurationChangedNotification;
+extern NSString * const kVLCPreferencesVersion;
 
 /*****************************************************************************
  * VLCMain interface

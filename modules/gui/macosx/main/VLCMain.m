@@ -73,6 +73,8 @@
 #import "preferences/prefs.h"
 #import "preferences/VLCSimplePrefsController.h"
 
+#import "views/VLCPlaybackEndViewController.h"
+
 #import "windows/VLCDetachedAudioWindow.h"
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCOpenInputMetadata.h"
@@ -89,6 +91,8 @@ NSString *const kARM64UpdateURLString = @"https://update.videolan.org/vlc/sparkl
 #endif
 
 NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotification";
+
+NSString * const kVLCPreferencesVersion = @"VLCPreferencesVersion";
 
 #pragma mark -
 #pragma mark Private extension
@@ -308,7 +312,11 @@ static VLCMain *sharedInstance = nil;
     if (!_p_intf)
         return;
 
-    [self migrateOldPreferences];
+    NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
+    if ([defaults integerForKey:kVLCPreferencesVersion] != 4) {
+        [defaults setBool:YES forKey:VLCPlaybackEndViewEnabledKey];
+        [self migrateOldPreferences];
+    }
 
     _statusBarIcon = [[VLCStatusBarIcon alloc] init];
 

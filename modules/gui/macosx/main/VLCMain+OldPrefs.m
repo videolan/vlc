@@ -34,7 +34,6 @@
 
 @implementation VLCMain(OldPrefs)
 
-static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";
 static const int kCurrentPreferencesVersion = 4;
 
 + (void)initialize
