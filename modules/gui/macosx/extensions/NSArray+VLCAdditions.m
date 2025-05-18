@@ -40,4 +40,12 @@
     return mutableArray.copy;
 }
 
+- (NSInteger)indexOfMediaLibraryItem:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem
+{
+    return [self indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> item, const NSUInteger idx, BOOL * const stop) {
+        NSParameterAssert([item conformsToProtocol:@protocol(VLCMediaLibraryItemProtocol)]);
+        return item.libraryID == mediaLibraryItem.libraryID;
+    }];
+}
+
 @end

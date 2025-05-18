@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSArray (VLCAdditions)
 
 + (NSArray<VLCMediaLibraryMediaItem *> *)arrayFromVlcMediaList:(vlc_ml_media_list_t *)p_media_list;
+- (NSInteger)indexOfMediaLibraryItem:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem;
 
 @end
 
