@@ -76,6 +76,7 @@
 #import "views/VLCImageView.h"
 #import "views/VLCLoadingOverlayView.h"
 #import "views/VLCNoResultsLabel.h"
+#import "views/VLCPlaybackEndViewController.h"
 #import "views/VLCRoundedCornerTextField.h"
 #import "views/VLCTrackingView.h"
 
@@ -412,8 +413,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:currentMediaUrl];
         const BOOL decorativeViewVisible = mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
 
-        if (!decorativeViewVisible) {
+        if (!decorativeViewVisible && [NSUserDefaults.standardUserDefaults boolForKey:VLCPlaybackEndViewEnabledKey]) {
             [self.videoViewController displayPlaybackEndView];
+        } else if (!decorativeViewVisible) {
+            [self disableVideoPlaybackAppearance];
         }
     } else {
         [self disableVideoPlaybackAppearance];

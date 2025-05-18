@@ -118,6 +118,7 @@
 @property (readwrite, weak) IBOutlet NSBox *intf_playbackControlBox;
 @property (readwrite, weak) IBOutlet NSTextField *intf_continueplaybackLabel;
 @property (readwrite, weak) IBOutlet NSPopUpButton *intf_continueplaybackPopup;
+@property (readwrite, weak) IBOutlet NSButton *intf_displayEndOfPlaybackViewCheckBox;
 
 // intf pane - behaviour box
 @property (readwrite, weak) IBOutlet NSBox *intf_playbackBehaviourBox;

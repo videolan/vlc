@@ -35,6 +35,7 @@
 static const NSTimeInterval kVLCPlaybackEndTimeout = 10;
 static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
 
+NSString * const VLCPlaybackEndViewEnabledKey = @"VLCPlaybackEndViewEnabledKey";
 NSString * const VLCPlaybackEndViewHideNotificationName = @"VLCPlaybackEndViewRequestHide";
 NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlaybackEndViewReturnToLibrary";
 

@@ -50,6 +50,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "views/VLCPlaybackEndViewController.h"
 
 static struct {
     const char iso[6];
@@ -400,6 +401,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 
     [_intf_playbackControlBox setTitle:_NS("Playback control")];
     [_intf_continueplaybackLabel setStringValue:_NS("Continue playback")];
+    [_intf_displayEndOfPlaybackViewCheckBox setTitle:_NS("Display end of playback view")];
     [_intf_statusIconCheckbox setTitle: _NS("Display VLC status menu icon")];
     [_intf_largeFontInListsCheckbox setTitle: _NS("Use large text for list views")];
 
@@ -608,7 +610,8 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
      **********************/
     NSUInteger sel = 0;
     const char *pref = NULL;
-    pref = [[[NSUserDefaults standardUserDefaults] objectForKey:@"language"] UTF8String];
+    NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
+    pref = [[defaults objectForKey:@"language"] UTF8String];
     for (int x = 0; x < ARRAY_SIZE(language_map); x++) {
         [_intf_languagePopup addItemWithTitle:toNSStr(language_map[x].name)];
         if (pref) {
@@ -625,6 +628,8 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     } else {
         [_intf_continueplaybackPopup setEnabled: YES];
     }
+
+    self.intf_displayEndOfPlaybackViewCheckBox.state = [defaults boolForKey:VLCPlaybackEndViewEnabledKey] ? NSControlStateValueOn : NSControlStateValueOff;
 
     [self setupButton:_intf_statusIconCheckbox forBoolValue: "macosx-statusicon"];
 
@@ -951,6 +956,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:toNSStr(language_map[index].iso) forKey:@"language"];
         [VLCSimplePrefsController updateRightToLeftSettings];
+
+        [defaults setBool:self.intf_displayEndOfPlaybackViewCheckBox.state == NSControlStateValueOn
+                   forKey:VLCPlaybackEndViewEnabledKey];
 
         config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 

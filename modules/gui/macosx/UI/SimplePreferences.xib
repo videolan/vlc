@@ -61,6 +61,7 @@
                 <outlet property="intf_artCheckbox" destination="3928" id="HND-nW-BHK"/>
                 <outlet property="intf_continueplaybackLabel" destination="3919" id="ZJO-qY-UCq"/>
                 <outlet property="intf_continueplaybackPopup" destination="3920" id="dZ3-SI-SCp"/>
+                <outlet property="intf_displayEndOfPlaybackViewCheckBox" destination="SYi-7I-cKE" id="sTC-Oc-1zX"/>
                 <outlet property="intf_enableNotificationsCheckbox" destination="3564" id="IIA-ce-g61"/>
                 <outlet property="intf_enableluahttpCheckbox" destination="lpZ-9y-Vfn" id="ieR-ZH-mcd"/>
                 <outlet property="intf_generalSettingsBox" destination="kup-aY-Wqq" id="RsL-yE-DVe"/>
@@ -375,13 +376,26 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="SxN-sI-55J"/>
                                 </connections>
                             </popUpButton>
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SYi-7I-cKE">
+                                <rect key="frame" x="15" y="14" width="201" height="18"/>
+                                <buttonCell key="cell" type="check" title="Display end of playback view" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Vsg-0v-H35">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="interfaceSettingChanged:" target="-2" id="SR0-g4-Kx9"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="3920" secondAttribute="bottom" constant="15" id="11b-WT-SyB"/>
+                            <constraint firstItem="SYi-7I-cKE" firstAttribute="leading" secondItem="gj4-zO-E26" secondAttribute="leading" constant="17" id="5SR-Aq-aAG"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="SYi-7I-cKE" secondAttribute="trailing" constant="17" id="5a5-Eq-PCg"/>
                             <constraint firstAttribute="trailing" secondItem="3920" secondAttribute="trailing" constant="17" id="M7f-H3-4Mk"/>
                             <constraint firstItem="3919" firstAttribute="top" secondItem="gj4-zO-E26" secondAttribute="top" constant="12" id="R4h-Ob-XbD"/>
                             <constraint firstItem="3919" firstAttribute="centerY" secondItem="3920" secondAttribute="centerY" id="Txp-Vc-Bet"/>
                             <constraint firstItem="3919" firstAttribute="leading" secondItem="gj4-zO-E26" secondAttribute="leading" constant="17" id="cnI-H9-J0k"/>
+                            <constraint firstItem="SYi-7I-cKE" firstAttribute="top" secondItem="3919" secondAttribute="bottom" constant="10" id="czT-2q-qcN"/>
+                            <constraint firstAttribute="bottom" secondItem="SYi-7I-cKE" secondAttribute="bottom" constant="15" id="d1m-O6-Uxb"/>
                             <constraint firstItem="3920" firstAttribute="leading" secondItem="3919" secondAttribute="trailing" constant="17" id="gLu-nZ-tla"/>
                         </constraints>
                     </view>
