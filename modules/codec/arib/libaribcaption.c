@@ -162,6 +162,10 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
     fmt_region.i_chroma       = VLC_CODEC_RGBA;
     fmt_region.i_x_offset     = 0;
     fmt_region.i_y_offset     = 0;
+    fmt_region.transfer       = TRANSFER_FUNC_SRGB;
+    fmt_region.primaries      = COLOR_PRIMARIES_SRGB;
+    fmt_region.space          = COLOR_SPACE_SRGB;
+    fmt_region.color_range    = COLOR_RANGE_FULL;
 
     /* Allocate the regions and draw them */
     for (uint32_t i = 0; i < i_image_count; i++) {
