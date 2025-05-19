@@ -863,6 +863,7 @@ static int Render( decoder_t *p_dec, subpicture_t *p_spu,
         fmt.p_palette->palette[i_x][2] = p_spu_data->pi_yuv[i_x][2];
         fmt.p_palette->palette[i_x][3] = p_spu_data->pi_alpha[i_x] * 0x11;
     }
+    fmt.b_color_range_full = false;
 
     p_spu->p_region = subpicture_region_New( &fmt );
     if( !p_spu->p_region )
