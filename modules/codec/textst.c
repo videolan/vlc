@@ -179,7 +179,7 @@ static size_t textst_Decode_palette(decoder_t *p_dec, const uint8_t *p_data, siz
     i_size = i_data = __MIN(i_data, i_size);
     while (i_data > 4)
     {
-        p_dec->p_sys->palette[p_data[0]] = /* YCrCbT to ARGB */
+        p_dec->p_sys->palette[p_data[0]] = /* YCrCbT limited range to ARGB full range */
                 ( (uint32_t)((float)p_data[1] +1.402f * (p_data[2]-128)) << 16 ) |
                 ( (uint32_t)((float)p_data[1] -0.34414 * (p_data[3]-128) -0.71414 * (p_data[2]-128)) << 8 ) |
                 ( (uint32_t)((float)p_data[1] +1.722 * (p_data[3]-128)) ) |
