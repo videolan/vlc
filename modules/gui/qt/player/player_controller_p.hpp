@@ -95,10 +95,10 @@ public:
     float           m_buffering = 0.f;
     float           m_rate = 1.f;
 
-    VLCTick      m_time = 0;
-    VLCTick      m_remainingTime = 0;
+    VLCTime      m_time;
+    VLCDuration  m_remainingTime;
     double       m_position = 0.f;
-    VLCTick      m_length= 0;
+    VLCDuration  m_length;
 
 #ifdef QT_HAS_LIBATOMIC
     std::atomic<vlc_player_timer_smpte_timecode> m_highResolutionTime;
@@ -122,9 +122,9 @@ public:
 
     vlc_shared_data_ptr_type(vlc_es_id_t, vlc_es_id_Hold, vlc_es_id_Release) m_secondarySpuEsId;
 
-    VLCTick      m_audioDelay = 0;
-    VLCTick      m_subtitleDelay = 0;
-    VLCTick      m_secondarySubtitleDelay = 0;
+    VLCDuration  m_audioDelay;
+    VLCDuration  m_subtitleDelay;
+    VLCDuration  m_secondarySubtitleDelay;
     float        m_subtitleFPS = 1.0;
 
     //timer
@@ -180,8 +180,8 @@ public:
     //misc
     bool            m_recording = false;
     PlayerController::ABLoopState m_ABLoopState = PlayerController::ABLOOP_STATE_NONE;
-    VLCTick m_ABLoopA = VLC_TICK_INVALID;
-    VLCTick m_ABLoopB = VLC_TICK_INVALID;
+    VLCTime m_ABLoopA;
+    VLCTime m_ABLoopB;
 
     //others
     QString         m_artUrl;

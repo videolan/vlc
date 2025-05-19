@@ -66,7 +66,7 @@ QVariant MLBookmarkModel::data( const QModelIndex &index, int role ) const
         case BookmarkRoles::NameRole:
             return QVariant::fromValue( qfu( bookmark.psz_name ) );
         case BookmarkRoles::TimeRole:
-            return QVariant::fromValue( VLCTick::fromMS( bookmark.i_time ).formatHMS() );
+            return QVariant::fromValue( VLCDuration::fromMS( bookmark.i_time ).formatHMS() );
         case BookmarkRoles::PositionRole:
         {
             vlc_player_locker lock{ m_player };
@@ -263,7 +263,7 @@ void MLBookmarkModel::add()
 
         if (media)
         {
-            QString name = qtr("Bookmark at %1").arg(VLCTick::fromMS( time ).formatHMS());
+            QString name = qtr("Bookmark at %1").arg(VLCDuration::fromMS( time ).formatHMS());
 
             vlc_ml_media_update_bookmark(ml, mediaId, time, qtu(name), nullptr);
         }

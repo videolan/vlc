@@ -1449,19 +1449,19 @@ SyncControls::SyncControls( qt_intf_t *_p_intf, QWidget *_parent )
     connect( subSpeedSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsSpeed);
     connect( subDurationSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsDuration);
 
-    connect( THEMIM, &PlayerController::subtitleDelayChanged, [this](vlc_tick_t value) {
+    connect( THEMIM, &PlayerController::subtitleDelayChanged, [this](VLCDuration value) {
         b_userAction = false;
-        subsSpin->setValue(secf_from_vlc_tick(value));
+        subsSpin->setValue(value.toSecf());
         b_userAction = true;
     });
-    connect( THEMIM, &PlayerController::secondarySubtitleDelayChanged, [this](vlc_tick_t value) {
+    connect( THEMIM, &PlayerController::secondarySubtitleDelayChanged, [this](VLCDuration value) {
         b_userAction = false;
-        secondarySubsSpin->setValue(secf_from_vlc_tick(value));
+        secondarySubsSpin->setValue(value.toSecf());
         b_userAction = true;
     });
-    connect( THEMIM, &PlayerController::audioDelayChanged, [this](vlc_tick_t value) {
+    connect( THEMIM, &PlayerController::audioDelayChanged, [this](VLCDuration value) {
         b_userAction = false;
-        AVSpin->setValue(secf_from_vlc_tick(value));
+        AVSpin->setValue(value.toSecf());
         b_userAction = true;
     });
     connect( THEMIM, &PlayerController::subtitleFPSChanged, subSpeedSpin, &QDoubleSpinBox::setValue );
@@ -1494,9 +1494,9 @@ void SyncControls::update()
     b_userAction = false;
     if( THEMIM->getInput() )
     {
-        subsSpin->setValue(secf_from_vlc_tick(THEMIM->getSubtitleDelay()));
-        secondarySubsSpin->setValue(secf_from_vlc_tick(THEMIM->getSecondarySubtitleDelay()));
-        AVSpin->setValue(secf_from_vlc_tick(THEMIM->getAudioDelay()));
+        subsSpin->setValue(THEMIM->getSubtitleDelay().toSecf());
+        secondarySubsSpin->setValue(THEMIM->getSecondarySubtitleDelay().toSecf());
+        AVSpin->setValue(THEMIM->getAudioDelay().toSecf());
         subSpeedSpin->setValue(THEMIM->getSubtitleFPS());
         subDurationSpin->setValue(m_SubsDelayCfgFactor.getValue());
     }

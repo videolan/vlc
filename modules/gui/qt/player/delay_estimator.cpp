@@ -29,14 +29,14 @@ DelayEstimator::~DelayEstimator()
 }
 
 bool DelayEstimator::isHeardTimeMarked() {
-    return (m_heardTime != VLC_TICK_INVALID);
+    return m_heardTime.valid();
 }
 
 bool DelayEstimator::isSpottedTimeMarked() {
-    return (m_spottedTime != VLC_TICK_INVALID);
+    return m_spottedTime.valid();
 }
 
-/*Q_INVOKABLE*/ VLCTick DelayEstimator::getDelay()
+/*Q_INVOKABLE*/ VLCDuration DelayEstimator::getDelay()
 {
     return m_delay;
 }
@@ -44,7 +44,7 @@ bool DelayEstimator::isSpottedTimeMarked() {
 /*Q_INVOKABLE*/ void DelayEstimator::markHeardTime()
 {
     if (isHeardTimeMarked())
-        m_heardTime = VLC_TICK_INVALID;
+        m_heardTime = VLCTime();
     else
         m_heardTime = vlc_tick_now();
 
@@ -57,7 +57,7 @@ bool DelayEstimator::isSpottedTimeMarked() {
 /*Q_INVOKABLE*/ void DelayEstimator::markSpottedTime()
 {
     if (isSpottedTimeMarked())
-        m_spottedTime = VLC_TICK_INVALID;
+        m_spottedTime = VLCTime();
     else
         m_spottedTime = vlc_tick_now();
 
@@ -69,13 +69,13 @@ bool DelayEstimator::isSpottedTimeMarked() {
 
 void DelayEstimator::calculateDelay()
 {
-    if (m_heardTime != VLC_TICK_INVALID &&
-        m_spottedTime != VLC_TICK_INVALID)
+    if (m_heardTime.valid() &&
+        m_spottedTime.valid())
     {
         m_delay = m_heardTime - m_spottedTime;
         emit delayChanged();
-        m_heardTime = VLC_TICK_INVALID;
-        m_spottedTime = VLC_TICK_INVALID;
+        m_heardTime = VLCTime();
+        m_spottedTime = VLCTime();
         emit spottedTimeChanged();
         emit heardTimeChanged();
     }
@@ -83,9 +83,9 @@ void DelayEstimator::calculateDelay()
 
 /*Q_INVOKABLE*/ void DelayEstimator::reset()
 {
-    m_heardTime = VLC_TICK_INVALID;
-    m_spottedTime = VLC_TICK_INVALID;
-    m_delay = VLC_TICK_INVALID;
+    m_heardTime = VLCTime();
+    m_spottedTime = VLCTime();
+    m_delay = VLCDuration();
     emit delayChanged();
     emit spottedTimeChanged();
     emit heardTimeChanged();

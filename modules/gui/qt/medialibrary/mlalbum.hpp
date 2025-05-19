@@ -24,7 +24,7 @@
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
 
-class VLCTick;
+class VLCDuration;
 
 class MLAlbum : public MLItem
 {
@@ -37,7 +37,7 @@ public:
     QString getCover() const;
     QString getArtist() const;
     unsigned int getNbTracks() const;
-    VLCTick getDuration() const;
+    VLCDuration getDuration() const;
 
 private:
     QString m_title;

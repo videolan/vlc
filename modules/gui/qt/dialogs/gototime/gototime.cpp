@@ -88,8 +88,8 @@ void GotoTimeDialog::toggleVisible()
     reset();
     if ( !isVisible() && THEMIM->hasInput() )
     {
-        vlc_tick_t i_time = THEMIM->getTime();
-        timeEdit->setTime( timeEdit->time().addSecs( SEC_FROM_VLC_TICK(i_time) ) );
+        VLCTime time = THEMIM->getTime();
+        timeEdit->setTime( timeEdit->time().addSecs( time.toSeconds() ) );
     }
     QVLCDialog::toggleVisible();
     if(isVisible())

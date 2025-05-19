@@ -750,7 +750,8 @@ static inline void registerMetaTypes()
     qRegisterMetaType<ssize_t>();
     qRegisterMetaType<vlc_tick_t>();
 
-    qRegisterMetaType<VLCTick>();
+    qRegisterMetaType<VLCTime>();
+    qRegisterMetaType<VLCDuration>();
     qRegisterMetaType<SharedInputItem>();
     qRegisterMetaType<NetworkTreeItem>();
     qRegisterMetaType<Playlist>();

@@ -33,8 +33,6 @@
 
 #include <functional>
 
-class VLCTick;
-
 class VideoDescription
 {
     Q_GADGET

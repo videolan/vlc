@@ -50,9 +50,9 @@ QString MLGroup::getTitle() const
 
 //-------------------------------------------------------------------------------------------------
 
-VLCTick MLGroup::getDuration() const
+VLCDuration MLGroup::getDuration() const
 {
-    return VLCTick::fromMS(m_duration);
+    return VLCDuration::fromMS(m_duration);
 }
 
 unsigned int MLGroup::getDate() const

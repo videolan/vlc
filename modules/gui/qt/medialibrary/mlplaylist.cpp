@@ -51,9 +51,9 @@ void MLPlaylist::setName(const QString & name)
 
 //-------------------------------------------------------------------------------------------------
 
-VLCTick MLPlaylist::getDuration() const
+VLCDuration MLPlaylist::getDuration() const
 {
-    return VLCTick::fromMS(m_duration);
+    return VLCDuration::fromMS(m_duration);
 }
 
 unsigned int MLPlaylist::getCount() const

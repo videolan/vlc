@@ -62,7 +62,7 @@ public:
         m_fileName = qfu(media->psz_filename);
         m_smallThumbnail = getThumbnail(media->thumbnails[VLC_ML_THUMBNAIL_SMALL]);
         m_bannerThumbnail = getThumbnail(media->thumbnails[VLC_ML_THUMBNAIL_BANNER]);
-        m_duration = VLCTick::fromMS(media->i_duration);
+        m_duration = VLCDuration::fromMS(media->i_duration);
         m_progress = media->f_progress;
         m_playCount = media->i_playcount;
         m_mrl = getMRL();
@@ -73,7 +73,7 @@ public:
 
     QString title() const { return m_title; }
     QString fileName() const { return m_fileName; }
-    VLCTick duration() const { return m_duration; }
+    VLCDuration duration() const { return m_duration; }
     qreal progress() const { return m_progress; }
     int playCount() const { return m_playCount; }
     QString mrl() const { return m_mrl.toEncoded(); }
@@ -94,7 +94,7 @@ public:
         return m_bannerThumbnail.mrl;
     }
 
-    VLCTick progressTime() const { return VLCTick::fromMS(m_duration * m_progress); }
+    VLCTime progressTime() const { return m_duration * m_progress; }
 
     Q_INVOKABLE bool valid() const { return getId().id != INVALID_MLITEMID_ID; }
 
@@ -109,7 +109,7 @@ protected:
     QString m_fileName;
     MLThumbnail m_smallThumbnail;
     MLThumbnail m_bannerThumbnail;
-    VLCTick m_duration;
+    VLCDuration m_duration;
     qreal m_progress;
     int m_playCount;
     QUrl m_mrl;

@@ -299,11 +299,11 @@ PlaylistListModel::rowCount(const QModelIndex &parent) const
     return d->m_items.size();
 }
 
-VLCTick
+VLCDuration
 PlaylistListModel::getDuration() const
 {
     Q_D(const PlaylistListModel);
-    return VLCTick(d->m_duration);
+    return VLCDuration(d->m_duration);
 }
 
 PlaylistItem
@@ -483,7 +483,7 @@ PlaylistListModel::data(const QModelIndex &index, int role) const
     case DurationRole:
     {
         QVariant var;
-        var.setValue(VLCTick(d->m_items[row].getDuration()));
+        var.setValue(d->m_items[row].getDuration());
         return var;
     }
     case ArtistRole:

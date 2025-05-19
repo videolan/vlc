@@ -113,10 +113,10 @@ public:
     Q_PROPERTY(float rate READ getRate WRITE setRate NOTIFY rateChanged FINAL)
     Q_PROPERTY(QUrl url READ getUrl NOTIFY inputChanged FINAL)
 
-    Q_PROPERTY(VLCTick time READ getTime WRITE setTime NOTIFY timeChanged FINAL)
-    Q_PROPERTY(VLCTick remainingTime READ getRemainingTime NOTIFY remainingTimeChanged FINAL)
+    Q_PROPERTY(VLCTime time READ getTime WRITE setTime NOTIFY timeChanged FINAL)
+    Q_PROPERTY(VLCTime remainingTime READ getRemainingTime NOTIFY remainingTimeChanged FINAL)
     Q_PROPERTY(double position READ getPosition WRITE setPosition NOTIFY positionChanged FINAL)
-    Q_PROPERTY(VLCTick length READ getLength NOTIFY lengthChanged FINAL)
+    Q_PROPERTY(VLCDuration length READ getLength NOTIFY lengthChanged FINAL)
 
     Q_PROPERTY(bool seekable READ isSeekable NOTIFY seekableChanged FINAL)
     Q_PROPERTY(bool rewindable READ isRewindable NOTIFY rewindableChanged FINAL)
@@ -136,9 +136,9 @@ public:
     Q_PROPERTY(TrackListModel* audioTracks READ getAudioTracks CONSTANT FINAL)
     Q_PROPERTY(TrackListModel* subtitleTracks READ getSubtitleTracks CONSTANT FINAL)
 
-    Q_PROPERTY(VLCTick audioDelay READ getAudioDelay WRITE setAudioDelay NOTIFY audioDelayChanged FINAL)
-    Q_PROPERTY(VLCTick subtitleDelay READ getSubtitleDelay WRITE setSubtitleDelay NOTIFY subtitleDelayChanged FINAL)
-    Q_PROPERTY(VLCTick secondarySubtitleDelay READ getSecondarySubtitleDelay WRITE setSecondarySubtitleDelay NOTIFY secondarySubtitleDelayChanged FINAL)
+    Q_PROPERTY(VLCDuration audioDelay READ getAudioDelay WRITE setAudioDelay NOTIFY audioDelayChanged FINAL)
+    Q_PROPERTY(VLCDuration subtitleDelay READ getSubtitleDelay WRITE setSubtitleDelay NOTIFY subtitleDelayChanged FINAL)
+    Q_PROPERTY(VLCDuration secondarySubtitleDelay READ getSecondarySubtitleDelay WRITE setSecondarySubtitleDelay NOTIFY secondarySubtitleDelayChanged FINAL)
     Q_PROPERTY(int audioDelayMS READ getAudioDelayMS WRITE setAudioDelayMS NOTIFY audioDelayChanged FINAL)
     Q_PROPERTY(int subtitleDelayMS READ getSubtitleDelayMS WRITE setSubtitleDelayMS NOTIFY subtitleDelayChanged FINAL)
     Q_PROPERTY(int secondarySubtitleDelayMS READ getSecondarySubtitleDelayMS WRITE setSecondarySubtitleDelayMS NOTIFY secondarySubtitleDelayChanged FINAL)
@@ -190,8 +190,8 @@ public:
 
     //misc
     Q_PROPERTY(ABLoopState ABloopState READ getABloopState WRITE setABloopState NOTIFY ABLoopStateChanged FINAL)
-    Q_PROPERTY(VLCTick ABLoopA READ getABLoopA NOTIFY ABLoopAChanged FINAL)
-    Q_PROPERTY(VLCTick ABLoopB READ getABLoopB NOTIFY ABLoopBChanged FINAL)
+    Q_PROPERTY(VLCTime ABLoopA READ getABLoopA NOTIFY ABLoopAChanged FINAL)
+    Q_PROPERTY(VLCTime ABLoopB READ getABLoopB NOTIFY ABLoopBChanged FINAL)
     Q_PROPERTY(bool recording READ isRecording WRITE setRecording NOTIFY recordingChanged FINAL)
     Q_PROPERTY(RendererManager* rendererManager READ getRendererManager CONSTANT FINAL)
 
@@ -209,7 +209,7 @@ public slots:
 
     void jumpFwd();
     void jumpBwd();
-    void jumpToTime( VLCTick i_time );
+    void jumpToTime( VLCTime i_time );
     void jumpToPos( double );
     void frameNext();
 
@@ -285,12 +285,12 @@ public slots:
     float getBuffering() const;
     float getRate() const;
     void setRate( float );
-    VLCTick getTime() const;
-    void setTime(VLCTick);
-    VLCTick getRemainingTime() const;
+    VLCTime getTime() const;
+    void setTime(VLCTime);
+    VLCDuration getRemainingTime() const;
     double getPosition() const;
     void setPosition(double);
-    VLCTick getLength() const;
+    VLCDuration getLength() const;
     bool isSeekable() const;
     bool isRewindable() const;
     bool isPausable() const;
@@ -308,15 +308,15 @@ public slots:
     TrackListModel* getAudioTracks();
     TrackListModel* getSubtitleTracks();
 
-    VLCTick getAudioDelay() const;
-    void setAudioDelay( VLCTick );
-    Q_INVOKABLE void addAudioDelay( VLCTick );
-    VLCTick getSubtitleDelay() const;
-    VLCTick getSecondarySubtitleDelay() const;
-    void setSubtitleDelay( VLCTick );
-    Q_INVOKABLE void addSubtitleDelay( VLCTick );
-    void setSecondarySubtitleDelay( VLCTick );
-    Q_INVOKABLE void addSecondarySubtitleDelay( VLCTick );
+    VLCDuration getAudioDelay() const;
+    void setAudioDelay( VLCDuration );
+    Q_INVOKABLE void addAudioDelay( VLCDuration );
+    VLCDuration getSubtitleDelay() const;
+    VLCDuration getSecondarySubtitleDelay() const;
+    void setSubtitleDelay( VLCDuration );
+    Q_INVOKABLE void addSubtitleDelay( VLCDuration );
+    void setSecondarySubtitleDelay( VLCDuration );
+    Q_INVOKABLE void addSecondarySubtitleDelay( VLCDuration );
     int getAudioDelayMS() const;
     void setAudioDelayMS( int );
     int getSubtitleDelayMS() const;
@@ -382,8 +382,8 @@ public slots:
     void setRecording(bool record);
     void setABloopState(ABLoopState);
     ABLoopState getABloopState() const;
-    VLCTick getABLoopA() const;
-    VLCTick getABLoopB() const;
+    VLCTime getABLoopA() const;
+    VLCTime getABLoopB() const;
 
     // High resolution time fed by SMPTE timer
     QString highResolutionTime() const;
@@ -409,11 +409,11 @@ signals:
     void bufferingChanged( float );
     void rateChanged( float );
 
-    void timeChanged( VLCTick );
-    void remainingTimeChanged( VLCTick );
+    void timeChanged( VLCTime );
+    void remainingTimeChanged( VLCTime );
     void positionChanged( double );
-    void lengthChanged( VLCTick );
-    void positionUpdated( double , VLCTick, int );
+    void lengthChanged( VLCDuration );
+    void positionUpdated( double , VLCTime, VLCDuration );
     void seekRequested( double pos ); //not exposed through Q_PROPERTY
 
     void seekableChanged( bool );
@@ -425,9 +425,9 @@ signals:
     void playbackRestoreQueried();
 
     //tracks
-    void audioDelayChanged(VLCTick);
-    void subtitleDelayChanged(VLCTick);
-    void secondarySubtitleDelayChanged(VLCTick);
+    void audioDelayChanged(VLCDuration);
+    void subtitleDelayChanged(VLCDuration);
+    void secondarySubtitleDelayChanged(VLCDuration);
     void subtitleFPSChanged(float);
 
     //title/chapters/menu
@@ -462,8 +462,8 @@ signals:
     //misc
     void recordingChanged( bool );
     void ABLoopStateChanged(ABLoopState);
-    void ABLoopAChanged(VLCTick);
-    void ABLoopBChanged(VLCTick);
+    void ABLoopAChanged(VLCTime);
+    void ABLoopBChanged(VLCTime);
 
     // High resolution time fed by SMPTE timer
     void highResolutionTimeChanged(const QString&);
@@ -471,7 +471,7 @@ signals:
     // Other signals
 
     // You can resume playback
-    void resumePlayback( VLCTick );
+    void resumePlayback( VLCTime );
     // Statistics are updated
     void statisticsUpdated( const input_stats_t& stats );
     void infoChanged( input_item_t* );

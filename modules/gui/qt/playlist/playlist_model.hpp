@@ -39,7 +39,7 @@ class PlaylistListModel : public QAbstractListModel
     Q_PROPERTY(Playlist playlist READ getPlaylist WRITE setPlaylist NOTIFY playlistChanged FINAL)
     Q_PROPERTY(int currentIndex READ getCurrentIndex NOTIFY currentIndexChanged FINAL)
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged FINAL)
-    Q_PROPERTY(VLCTick duration READ getDuration NOTIFY countChanged FINAL)
+    Q_PROPERTY(VLCDuration duration READ getDuration NOTIFY countChanged FINAL)
 
 public:
     enum Roles
@@ -60,7 +60,7 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex &parent = {}) const override;
-    VLCTick getDuration() const;
+    VLCDuration getDuration() const;
     QVariant data(const QModelIndex &index,
                   int role = Qt::DisplayRole) const override;
 

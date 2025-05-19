@@ -64,7 +64,7 @@ unsigned int MLAlbum::getNbTracks() const
     return m_nbTracks;
 }
 
-VLCTick MLAlbum::getDuration() const
+VLCDuration MLAlbum::getDuration() const
 {
-    return VLCTick::fromMS(m_duration);
+    return VLCDuration::fromMS(m_duration);
 }

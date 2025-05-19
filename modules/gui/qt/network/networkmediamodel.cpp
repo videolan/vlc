@@ -575,8 +575,8 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
         {
             if (item->media.valid())
             {
-                const VLCTick duration = item->media.duration();
-                return duration <= 0 ? QVariant {} : QVariant::fromValue(duration);
+                const VLCDuration duration = item->media.duration();
+                return !duration.valid() ? QVariant {} : QVariant::fromValue(duration);
             }
 
             return {};

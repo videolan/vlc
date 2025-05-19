@@ -25,14 +25,14 @@
 #include "qt.hpp"
 #include "util/vlctick.hpp"
 
-class VLCTick;
+class VLCDuration;
 
 class DelayEstimator : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isHeardTimeMarked READ isHeardTimeMarked NOTIFY heardTimeChanged FINAL)
     Q_PROPERTY(bool isSpottedTimeMarked READ isSpottedTimeMarked NOTIFY spottedTimeChanged FINAL)
-    Q_PROPERTY(VLCTick delay READ getDelay NOTIFY delayChanged FINAL)
+    Q_PROPERTY(VLCDuration delay READ getDelay NOTIFY delayChanged FINAL)
 
 public:
     explicit DelayEstimator(QObject* parent = nullptr);
@@ -41,7 +41,7 @@ public:
     bool isHeardTimeMarked();
     bool isSpottedTimeMarked();
     void calculateDelay();
-    VLCTick getDelay();
+    VLCDuration getDelay();
 
     Q_INVOKABLE void markHeardTime();
     Q_INVOKABLE void markSpottedTime();
@@ -53,9 +53,9 @@ signals:
     void delayChanged();
 
 private:
-    VLCTick m_heardTime = VLC_TICK_INVALID;
-    VLCTick m_spottedTime = VLC_TICK_INVALID;
-    VLCTick m_delay = VLC_TICK_INVALID;
+    VLCTime m_heardTime;
+    VLCTime m_spottedTime;
+    VLCDuration m_delay;
 };
 
 #endif

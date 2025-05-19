@@ -28,7 +28,7 @@
 // MediaLibrary includes
 #include "mlqmltypes.hpp"
 
-class VLCTick;
+class VLCDuration;
 
 class MLGroup : public MLItem
 {
@@ -38,7 +38,7 @@ public:
 public: // Interface
     QString getTitle() const;
 
-    VLCTick getDuration() const;
+    VLCDuration getDuration() const;
 
     unsigned int getDate() const;
 

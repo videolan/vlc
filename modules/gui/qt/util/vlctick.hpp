@@ -35,11 +35,6 @@ public:
     };
     Q_ENUM(FormatFlag)
 
-    VLCTick();
-    VLCTick(vlc_tick_t ticks);
-
-    operator vlc_tick_t() const;
-
     Q_INVOKABLE bool valid() const;
 
     Q_INVOKABLE bool isSubSecond() const;
@@ -79,17 +74,51 @@ public:
      */
     Q_INVOKABLE QString formatShort(int formatFlags = SubSecondFormattedAsMS) const;
 
-
-    Q_INVOKABLE VLCTick scale(float) const;
-
+    vlc_tick_t toVLCTick() const;
     Q_INVOKABLE int toMinutes() const;
     Q_INVOKABLE int toSeconds() const;
     Q_INVOKABLE int toHours()   const;
+    int toMilliseconds() const;
 
+protected:
+    VLCTick() = delete;
+    VLCTick(vlc_tick_t, vlc_tick_t);
 
-    static VLCTick fromMS(int64_t ms);
-private:
+    vlc_tick_t asMilliseconds() const;
+    vlc_tick_t asSeconds() const;
+
+    vlc_tick_t m_base_offset;
+    vlc_tick_t m_invalid_value;
     vlc_tick_t m_ticks;
+};
+
+class VLCDuration : public VLCTick
+{
+public:
+    VLCDuration();
+    VLCDuration(vlc_tick_t);
+
+    VLCDuration operator*(double) const;
+    bool operator==(const VLCDuration &) const;
+    bool operator>(const VLCDuration &) const;
+
+    double toSecf() const;
+
+    Q_INVOKABLE VLCDuration scale(float) const;
+
+    static VLCDuration fromMS(int64_t ms);
+};
+
+class VLCTime : public VLCTick
+{
+public:
+    VLCTime();
+    VLCTime(vlc_tick_t);
+    VLCTime(VLCDuration);
+    VLCDuration operator-(const VLCTime &rhs) const;
+    bool operator<=(const VLCTime &) const;
+
+    Q_INVOKABLE VLCTime scale(float) const;
 };
 
 #endif // VLCTICK_HPP
