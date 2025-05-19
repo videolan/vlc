@@ -452,7 +452,7 @@ static int AddStream( sout_mux_t *, sout_input_t * );
 static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
-static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo );
+static block_t *FixPES( block_fifo_t *p_fifo );
 static block_t *Add_ADTS( block_t *, const es_format_t * );
 static int TSSchedule   ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                           vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts );
@@ -1245,7 +1245,7 @@ static int MuxStreams( sout_mux_t *p_mux )
                 p_data = Pack_Opus( p_data );
         }
         else
-            p_data = FixPES( p_mux, p_input->p_fifo );
+            p_data = FixPES( p_input->p_fifo );
 
         SetBlockDuration( p_input, p_data );
 
@@ -1556,9 +1556,8 @@ static int Mux( sout_mux_t *p_mux )
 }
 
 #define STD_PES_PAYLOAD 170
-static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
+static block_t *FixPES( block_fifo_t *p_fifo )
 {
-    VLC_UNUSED(p_mux);
     block_t *p_data;
     size_t i_size;
 
