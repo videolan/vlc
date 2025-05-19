@@ -741,6 +741,7 @@ vlc_fifo_DequeueUnlocked
 vlc_fifo_DequeueAllUnlocked
 vlc_fifo_GetCount
 vlc_fifo_GetBytes
+vlc_fifo_Held
 vlc_queue_Init
 vlc_queue_EnqueueUnlocked
 vlc_queue_DequeueUnlocked
