@@ -210,7 +210,9 @@ typedef struct dvbsub_clut_s
     dvbsub_color_t          c_2b[4];
     dvbsub_color_t          c_4b[16];
     dvbsub_color_t          c_8b[256];
+    int                     c_8b_entries;
     video_color_range_t     color_range;
+    int                     dynamic_range_and_colour_gamut;
 
     struct dvbsub_clut_s    *p_next;
 
@@ -291,6 +293,7 @@ typedef struct
 #define DVBSUB_ST_CLUT_DEFINITION       0x12
 #define DVBSUB_ST_OBJECT_DATA           0x13
 #define DVBSUB_ST_DISPLAY_DEFINITION    0x14
+#define DVBSUB_ST_ALTERNATE_CLUT        0x16
 #define DVBSUB_ST_ENDOFDISPLAY          0x80
 #define DVBSUB_ST_STUFFING              0xff
 /* List of different OBJECT TYPES */
@@ -311,6 +314,15 @@ typedef struct
 /* According to EN 300-743, 7.2.1 table 3 */
 #define DVBSUB_PCS_STATE_ACQUISITION    0x01
 #define DVBSUB_PCS_STATE_CHANGE         0x02
+/* According to EN 300-743, 7.2.8 table 33 */
+#define DVBSUB_ST_BITDEPTH_8BIT         0x00
+#define DVBSUB_ST_BITDEPTH_10BIT        0x01
+/* According to EN 300-743, 7.2.8 table 34 */
+#define DVBSUB_ST_COLORIMETRY_CDS       -1
+#define DVBSUB_ST_COLORIMETRY_SDR_709   0x00
+#define DVBSUB_ST_COLORIMETRY_SDR_2020  0x01
+#define DVBSUB_ST_COLORIMETRY_HDR_PQ    0x02
+#define DVBSUB_ST_COLORIMETRY_HDR_HLG   0x03
 
 /*****************************************************************************
  * Local prototypes
@@ -320,6 +332,7 @@ static void decode_page_composition( decoder_t *, bs_t *, uint16_t );
 static void decode_region_composition( decoder_t *, bs_t *, uint16_t );
 static void decode_object( decoder_t *, bs_t *, uint16_t );
 static void decode_display_definition( decoder_t *, bs_t *, uint16_t );
+static void alternative_CLUT( decoder_t *, bs_t *, uint16_t );
 static void decode_clut( decoder_t *, bs_t *, uint16_t );
 static void free_all( decoder_t * );
 
@@ -551,7 +564,9 @@ static void default_clut_init( decoder_t *p_dec )
 
     /* 256 entries CLUT */
     memset( p_sys->default_clut.c_8b, 0xFF, 256 * sizeof(dvbsub_color_t) );
+    p_sys->default_clut.c_8b_entries = 256;
     p_sys->default_clut.color_range = COLOR_RANGE_LIMITED;
+    p_sys->default_clut.dynamic_range_and_colour_gamut = DVBSUB_ST_COLORIMETRY_CDS;
 }
 
 static void decode_segment( decoder_t *p_dec, bs_t *s )
@@ -637,6 +652,13 @@ static void decode_segment( decoder_t *p_dec, bs_t *s )
         msg_Dbg( p_dec, "decode_display_definition" );
 #endif
         decode_display_definition( p_dec, s, i_size );
+        break;
+
+    case DVBSUB_ST_ALTERNATE_CLUT:
+#ifdef DEBUG_DVBSUB
+        msg_Dbg( p_dec, "alternative_CLUT" );
+#endif
+        alternative_CLUT( p_dec, s, i_size );
         break;
 
     case DVBSUB_ST_ENDOFDISPLAY:
@@ -995,6 +1017,130 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
             i_processed_length += 2;
         }
     }
+}
+
+/* ETSI 300 743 [7.2.8] */
+static void alternative_CLUT( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    uint16_t      i_processed_length;
+    int           i_id, i_version;
+    dvbsub_clut_t *p_clut, *p_next;
+
+    i_id = bs_read( s, 8 );
+    i_version = bs_read( s, 4 );
+
+    /* Check if we already have this clut */
+    for( p_clut = p_sys->p_cluts; p_clut != NULL; p_clut = p_clut->p_next )
+    {
+        if( p_clut->i_id == i_id )
+        {
+            /* Check version number */
+            if( p_clut->i_version == i_version )
+            {
+                /* Nothing to do */
+                bs_skip( s, 8 * i_segment_length - 12 );
+                return;
+            }
+
+            break;
+        }
+    }
+
+    if( !p_clut )
+    {
+#ifdef DEBUG_DVBSUB
+        msg_Dbg( p_dec, "new alternative clut: %i", i_id );
+#endif
+        p_clut = malloc( sizeof( dvbsub_clut_t ) );
+        if( !p_clut )
+            return;
+        p_clut->p_next = p_sys->p_cluts;
+        p_sys->p_cluts = p_clut;
+    }
+
+    /* We don't have this version of the CLUT: Parse it */
+    p_clut->i_version = i_version;
+    p_clut->i_id = i_id;
+
+    bs_skip( s, 4 ); // reserved_zero_future_use
+
+    // CLUT_parameters
+    int CLUT_entry_max_number = bs_read( s, 2 );
+    int colour_component_type = bs_read( s, 2 );
+    int output_bit_depth = bs_read( s, 3 );
+    bs_skip( s, 1 ); // reserved_zero_future_use
+    int dynamic_range_and_colour_gamut = bs_read( s, 8 );
+
+    bool error = false;
+    i_processed_length = 4;
+    if (output_bit_depth != DVBSUB_ST_BITDEPTH_8BIT &&
+        output_bit_depth == DVBSUB_ST_BITDEPTH_10BIT)
+    {
+        msg_Err( p_dec, "unsupported alternative clut bitdepth: %i", output_bit_depth );
+        error = true;
+    }
+    if (CLUT_entry_max_number != 0) // 0: 256 entries
+    {
+        msg_Err( p_dec, "unsupported alternative clut max entries: %i", CLUT_entry_max_number );
+        error = true;
+    }
+    if (colour_component_type != 0) // 0: YCbCr
+    {
+        msg_Err( p_dec, "unsupported alternative clut component type: %i", colour_component_type );
+        error = true;
+    }
+    if (dynamic_range_and_colour_gamut > DVBSUB_ST_COLORIMETRY_HDR_HLG)
+    {
+        msg_Err( p_dec, "unsupported alternative clut color range: %i", dynamic_range_and_colour_gamut );
+        error = true;
+    }
+    if (error)
+        goto done;
+
+    p_clut->c_8b_entries = 0;
+    while( i_processed_length < i_segment_length )
+    {
+        uint8_t y, cb, cr, t;
+        if (output_bit_depth == DVBSUB_ST_BITDEPTH_10BIT)
+        {
+            // TODO: apply the palette locally to keep 10-bit values
+            y  = bs_read( s, 10 ) >> 2;
+            cr = bs_read( s, 10 ) >> 2;
+            cb = bs_read( s, 10 ) >> 2;
+            t  = bs_read( s, 10 ) >> 2;
+            i_processed_length += 5;
+        }
+        else
+        {
+            y  = bs_read( s, 8 );
+            cr = bs_read( s, 8 );
+            cb = bs_read( s, 8 );
+            t  = bs_read( s, 8 );
+            i_processed_length += 4;
+        }
+
+        /* We are not entirely compliant here as full transparency is indicated
+         * with a luma value of zero, not a transparency value of 0xff
+         * (full transparency would actually be 0xff + 1). */
+        if( y == 0 )
+        {
+            cr = cb = 0;
+            t  = 0xff;
+        }
+
+        p_clut->c_8b[p_clut->c_8b_entries].Y = y;
+        p_clut->c_8b[p_clut->c_8b_entries].Cr = cr;
+        p_clut->c_8b[p_clut->c_8b_entries].Cb = cb;
+        p_clut->c_8b[p_clut->c_8b_entries].T = t;
+        p_clut->c_8b_entries++;
+        if (p_clut->c_8b_entries >= (int)ARRAY_SIZE(p_clut->c_8b))
+            break;
+    }
+    p_clut->dynamic_range_and_colour_gamut = dynamic_range_and_colour_gamut;
+    p_clut->color_range = COLOR_RANGE_FULL;
+done:
+    bs_skip( s, 8 * (i_segment_length - i_processed_length) );
 }
 
 /* ETSI 300 743 [7.2.1] */
@@ -1595,7 +1741,7 @@ static subpicture_t *render( decoder_t *p_dec )
         fmt.i_x_offset = fmt.i_y_offset = 0;
         fmt.p_palette = &palette;
         fmt.p_palette->i_entries = ( p_region->i_depth == 1 ) ? 4 :
-            ( ( p_region->i_depth == 2 ) ? 16 : 256 );
+            ( ( p_region->i_depth == 2 ) ? 16 : p_clut->c_8b_entries );
         p_color = ( p_region->i_depth == 1 ) ? p_clut->c_2b :
             ( ( p_region->i_depth == 2 ) ? p_clut->c_4b : p_clut->c_8b );
         for( j = 0; j < fmt.p_palette->i_entries; j++ )
@@ -1604,6 +1750,34 @@ static subpicture_t *render( decoder_t *p_dec )
             fmt.p_palette->palette[j][1] = p_color[j].Cb; /* U == Cb */
             fmt.p_palette->palette[j][2] = p_color[j].Cr; /* V == Cr */
             fmt.p_palette->palette[j][3] = 0xff - p_color[j].T;
+        }
+        switch (p_clut->dynamic_range_and_colour_gamut)
+        {
+            case DVBSUB_ST_COLORIMETRY_CDS:
+                fmt.space = COLOR_SPACE_BT601;
+                fmt.primaries = COLOR_PRIMARIES_BT601_525;
+                fmt.transfer = TRANSFER_FUNC_BT709;
+                break;
+            case DVBSUB_ST_COLORIMETRY_SDR_709:
+                fmt.space = COLOR_SPACE_BT709;
+                fmt.primaries = COLOR_PRIMARIES_BT709;
+                fmt.transfer = TRANSFER_FUNC_BT709;
+                break;
+            case DVBSUB_ST_COLORIMETRY_SDR_2020:
+                fmt.space = COLOR_SPACE_BT2020;
+                fmt.primaries = COLOR_PRIMARIES_BT2020;
+                fmt.transfer = TRANSFER_FUNC_BT709;
+                break;
+            case DVBSUB_ST_COLORIMETRY_HDR_PQ:
+                fmt.space = COLOR_SPACE_BT2020;
+                fmt.primaries = COLOR_PRIMARIES_BT2020;
+                fmt.transfer = TRANSFER_FUNC_SMPTE_ST2084;
+                break;
+            case DVBSUB_ST_COLORIMETRY_HDR_HLG:
+                fmt.space = COLOR_SPACE_BT2020;
+                fmt.primaries = COLOR_PRIMARIES_BT2020;
+                fmt.transfer = TRANSFER_FUNC_HLG;
+                break;
         }
         fmt.color_range = p_clut->color_range;
 
