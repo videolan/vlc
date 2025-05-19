@@ -507,7 +507,7 @@ void sout_MuxFlush( sout_mux_t *p_mux, sout_input_t *p_input )
  *****************************************************************************/
 int sout_MuxGetStream( sout_mux_t *p_mux, unsigned i_blocks, vlc_tick_t *pi_dts )
 {
-    vlc_tick_t i_dts = 0;
+    vlc_tick_t i_dts = VLC_TICK_MAX;
     int     i_stream = -1;
 
     assert( i_blocks > 0 );
@@ -529,7 +529,7 @@ int sout_MuxGetStream( sout_mux_t *p_mux, unsigned i_blocks, vlc_tick_t *pi_dts 
         }
 
         p_data = block_FifoShow( p_input->p_fifo );
-        if( i_stream < 0 || p_data->i_dts < i_dts )
+        if( p_data->i_dts < i_dts )
         {
             i_stream = i;
             i_dts    = p_data->i_dts;
