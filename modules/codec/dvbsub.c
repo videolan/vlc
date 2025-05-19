@@ -199,6 +199,7 @@ typedef struct dvbsub_clut_s
     dvbsub_color_t          c_2b[4];
     dvbsub_color_t          c_4b[16];
     dvbsub_color_t          c_8b[256];
+    bool                    b_color_range_full;
 
     struct dvbsub_clut_s    *p_next;
 
@@ -546,6 +547,7 @@ static void default_clut_init( decoder_t *p_dec )
 
     /* 256 entries CLUT */
     memset( p_sys->default_clut.c_8b, 0xFF, 256 * sizeof(dvbsub_color_t) );
+    p_sys->default_clut.b_color_range_full = false;
 }
 
 static void decode_segment( decoder_t *p_dec, bs_t *s )
@@ -710,7 +712,8 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
 
         bs_skip( s, 4 );
 
-        if( bs_read( s, 1 ) )
+        p_clut->b_color_range_full = bs_read( s, 1 ) != 0;
+        if( p_clut->b_color_range_full )
         {
             y  = bs_read( s, 8 );
             cr = bs_read( s, 8 );
@@ -1614,6 +1617,7 @@ static subpicture_t *render( decoder_t *p_dec )
             fmt.p_palette->palette[j][2] = p_color[j].Cr; /* V == Cr */
             fmt.p_palette->palette[j][3] = 0xff - p_color[j].T;
         }
+        fmt.b_color_range_full = p_clut->b_color_range_full;
 
         p_spu_region = subpicture_region_New( &fmt );
         fmt.p_palette = NULL; /* was stack var */
