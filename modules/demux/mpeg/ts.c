@@ -2527,7 +2527,7 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
     /* Record the first data packet timestamp in case there won't be any PCR */
     else if( p_pmt->pcr.i_first_dts == VLC_TICK_INVALID )
     {
-        p_pmt->pcr.i_first_dts = TO_SCALE(p_block->i_dts);
+        p_pmt->pcr.i_first_dts = p_block->i_dts;
     }
     else if( p_block->i_dts - FROM_SCALE(p_pmt->pcr.i_first_dts) > VLC_TICK_FROM_MS(500) ) /* "PCR repeat rate shall not exceed 100ms" */
     {
