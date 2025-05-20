@@ -149,7 +149,7 @@ static bool ts_pes_Push( ts_pes_parse_callback *cb,
 
 bool ts_pes_Drain( ts_pes_parse_callback *cb, ts_stream_t *p_pes )
 {
-    return ts_pes_Push( cb, p_pes, NULL, true, VLC_TICK_INVALID );
+    return ts_pes_Push( cb, p_pes, NULL, true, TS_90KHZ_INVALID );
 }
 
 bool ts_pes_Gather( ts_pes_parse_callback *cb,
