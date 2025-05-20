@@ -1860,6 +1860,10 @@ static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurat
         p_sys->i_nztime = FragGetDemuxTimeFromTracksTime( p_sys );
         p_sys->i_pcr = VLC_TICK_INVALID;
     }
+    else
+    {
+        p_sys->i_nztime = i_sync_time;
+    }
 
     p_sys->i_pcr  = VLC_TICK_INVALID;
 
@@ -1868,7 +1872,6 @@ static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurat
         if( i_segment_type == ATOM_moov )
         {
             MP4_TrackSeek( p_demux, &p_sys->track[i], i_sync_time );
-            p_sys->i_nztime = i_sync_time;
             p_sys->i_pcr  = VLC_TICK_INVALID;
         }
         else
