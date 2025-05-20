@@ -110,7 +110,7 @@ void SCTE27_Section_Callback( demux_t *p_demux,
 
     }
 
-    p_content->i_dts = p_content->i_pts = FROM_SCALE(i_date);
+    p_content->i_dts = p_content->i_pts = i_date;
     //PCRFixHandle( p_demux, p_pmt, p_content );
 
     if( p_pes->p_es->id )
