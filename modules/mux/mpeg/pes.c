@@ -52,7 +52,7 @@
  * \param i_header_size length of padding data to insert into PES packet
  *                      header in bytes.
  */
-static inline int PESHeader( uint8_t *p_hdr, int64_t i_pts, int64_t i_dts,
+static inline int PESHeader( uint8_t *p_hdr, ts_90khz_t i_pts, ts_90khz_t i_dts,
                              int i_es_size, const es_format_t *p_fmt,
                              int i_stream_id, bool b_mpeg2,
                              bool b_data_alignment, int i_header_size )
@@ -356,8 +356,8 @@ void EStoPES ( block_t **pp_pes,
     if( !p_es )
         return;
 
-    int64_t i_dts = 0;
-    int64_t i_pts = 0;
+    ts_90khz_t i_dts = 0;
+    ts_90khz_t i_pts = 0;
     if (p_es->i_pts != VLC_TICK_INVALID)
         i_pts = TO_SCALE_NZ(p_es->i_pts - ts_offset);
     if (p_es->i_dts != VLC_TICK_INVALID)
