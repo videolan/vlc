@@ -594,7 +594,7 @@ static void MuxWritePackHeader( sout_mux_t *p_mux, block_t **p_buf,
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     bits_buffer_t bits;
     block_t *p_hdr;
-    int64_t i_scr;
+    ts_90khz_t i_scr;
     int i_mux_rate;
 
     i_scr = TO_SCALE_NZ(i_dts - p_sys->i_dts_delay);
