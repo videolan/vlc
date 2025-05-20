@@ -1975,7 +1975,7 @@ static uint32_t FragGetMoofSequenceNumber( MP4_Box_t *p_moof )
     return 0;
 }
 
-static int FragSeekLoadFragment( demux_t *p_demux, uint32_t i_moox, stime_t i_moox_time )
+static int FragSeekLoadFragment( demux_t *p_demux, uint32_t i_moox )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     MP4_Box_t *p_moox;
@@ -2008,15 +2008,6 @@ static int FragSeekLoadFragment( demux_t *p_demux, uint32_t i_moox, stime_t i_mo
     /* map context */
     p_sys->context.p_fragment_atom = p_moox;
     p_sys->context.i_current_box_type = i_moox;
-
-    if( i_moox == ATOM_moof )
-    {
-        FragPrepareChunk( p_demux, p_moox, NULL, i_moox_time, true );
-        p_sys->context.i_lastseqnumber = FragGetMoofSequenceNumber( p_moox );
-
-        p_sys->i_nztime = FragGetDemuxTimeFromTracksTime( p_sys );
-        p_sys->i_pcr = VLC_TICK_INVALID;
-    }
 
     msg_Dbg( p_demux, "seeked to %4.4s at pos %" PRIu64, (char *) &i_moox, p_moox->i_pos );
     return VLC_SUCCESS;
@@ -2165,10 +2156,19 @@ static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurat
     }
 
     /* Context is killed on success */
-    if( FragSeekLoadFragment( p_demux, i_segment_type, i_segment_time ) != VLC_SUCCESS )
+    if( FragSeekLoadFragment( p_demux, i_segment_type ) != VLC_SUCCESS )
     {
         p_sys->b_error = (vlc_stream_Seek( p_demux->s, i_backup_pos ) != VLC_SUCCESS);
         return VLC_EGENERIC;
+    }
+    if( i_segment_type == ATOM_moof )
+    {
+        MP4_Box_t *p_moox = p_sys->context.p_fragment_atom;
+        FragPrepareChunk( p_demux, p_moox, NULL, i_segment_time, true );
+        p_sys->context.i_lastseqnumber = FragGetMoofSequenceNumber( p_moox );
+
+        p_sys->i_nztime = FragGetDemuxTimeFromTracksTime( p_sys );
+        p_sys->i_pcr = VLC_TICK_INVALID;
     }
 
     p_sys->i_pcr  = VLC_TICK_INVALID;
