@@ -1594,7 +1594,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
     if( i_pts != VLC_TICK_INVALID && i_dts == VLC_TICK_INVALID )
         i_dts = i_pts;
 
-    if( i_dts != TS_90KHZ_INVALID )
+    if( i_dts != VLC_TICK_INVALID )
         pid->u.p_stream->i_last_dts = i_dts;
 
     if( p_pes )
