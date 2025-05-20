@@ -2168,7 +2168,6 @@ static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurat
         p_sys->context.i_lastseqnumber = FragGetMoofSequenceNumber( p_moox );
 
         p_sys->i_nztime = FragGetDemuxTimeFromTracksTime( p_sys );
-        p_sys->i_pcr = VLC_TICK_INVALID;
     }
     else
     {
