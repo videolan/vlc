@@ -1875,7 +1875,7 @@ static block_t *TSNew( sout_mux_t *p_mux, sout_input_sys_t *p_stream,
 
 static void TSSetPCR( block_t *p_ts, vlc_tick_t i_dts )
 {
-    int64_t i_pcr = TO_SCALE_NZ(i_dts);
+    ts_90khz_t i_pcr = TO_SCALE_NZ(i_dts);
 
     p_ts->p_buffer[6]  = ( i_pcr >> 25 )&0xff;
     p_ts->p_buffer[7]  = ( i_pcr >> 17 )&0xff;
