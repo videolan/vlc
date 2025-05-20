@@ -2288,7 +2288,7 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, vlc_tick_t i_pcr)
 
         if( i_pktdts != TS_90KHZ_INVALID )
             i_dts = TimeStampWrapAround( i_pcr, FROM_SCALE(i_pktdts) );
-        if( i_pktpts > TS_90KHZ_INVALID )
+        if( i_pktpts != TS_90KHZ_INVALID )
             i_pts = TimeStampWrapAround( i_pcr, FROM_SCALE(i_pktpts) );
 
         if (p_pmt->pcr.i_pcroffset > 0) {
