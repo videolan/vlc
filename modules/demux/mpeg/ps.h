@@ -510,17 +510,16 @@ static inline int ps_pkt_parse_system( const uint8_t *p_pkt, size_t i_pkt,
 /* Parse a PES (and skip i_skip_extra in the payload) */
 static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int i_skip_extra )
 {
-    unsigned int i_skip  = 0;
-    ts_90khz_t i_pts = TS_90KHZ_INVALID;
-    ts_90khz_t i_dts = TS_90KHZ_INVALID;
-    uint8_t i_stream_id = 0;
-    bool b_pes_scrambling = false;
+    unsigned int i_skip;
+    ts_pes_header_t pesh;
+    ts_pes_header_init( &pesh );
 
-    if( ParsePESHeader( p_object, p_pes->p_buffer, p_pes->i_buffer,
-                        &i_skip, &i_dts, &i_pts, &i_stream_id, &b_pes_scrambling ) != VLC_SUCCESS )
+    if( ParsePESHeader( p_object->logger, p_pes->p_buffer, p_pes->i_buffer, &pesh ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
-    if( b_pes_scrambling )
+    i_skip = pesh.i_size;
+
+    if( pesh.b_scrambling )
         p_pes->i_flags |= BLOCK_FLAG_SCRAMBLED;
 
     if( i_skip_extra >= 0 )
@@ -538,11 +537,11 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     p_pes->p_buffer += i_skip;
     p_pes->i_buffer -= i_skip;
 
-    if( i_pts != TS_90KHZ_INVALID )
+    if( pesh.i_pts != TS_90KHZ_INVALID )
     {
-        p_pes->i_pts = FROM_SCALE( i_pts );
-        if( i_dts != TS_90KHZ_INVALID )
-            p_pes->i_dts = FROM_SCALE( i_dts );
+        p_pes->i_pts = FROM_SCALE( pesh.i_pts );
+        if( pesh.i_dts != TS_90KHZ_INVALID )
+            p_pes->i_dts = FROM_SCALE( pesh.i_dts );
         else /* ISO/IEC 13818-1 2.7.5: if pts and no dts, then dts == pts */
             p_pes->i_dts = p_pes->i_pts;
     }
