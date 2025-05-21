@@ -1696,6 +1696,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     if (sys->regionQuad.generic.textureFormat == NULL)
         return VLC_EGENERIC;
 
+    const auto render_orientation = video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation);
+
     size_t count = subpicture->regions.size;
     const struct subpicture_region_rendered *r;
 
@@ -1833,10 +1835,32 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             continue;
         }
 
-        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad,
-            video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation));
+        vout_display_place_t render_place = r->place;
+        switch (render_orientation)
+        {
+        case TRANSFORM_R180: /* 180° */
+            render_place.y = vd->cfg->display.height - render_place.y - render_place.height;
+            render_place.x = vd->cfg->display.width - render_place.x - render_place.width;
+            break;
+        case TRANSFORM_VFLIP:
+            render_place.y = vd->cfg->display.height - render_place.y - render_place.height;
+            break;
+        case TRANSFORM_HFLIP:
+            render_place.x = vd->cfg->display.width - render_place.x - render_place.width;
+            break;
+        case TRANSFORM_ANTI_TRANSPOSE:
+        case TRANSFORM_TRANSPOSE:
+        case TRANSFORM_R90: /* 90° anti clockwise */
+        case TRANSFORM_R270: /* 90° clockwise */
+        case TRANSFORM_IDENTITY:
+        default:
+            break;
+        }
 
-        quad->UpdateViewport( &r->place, sys->display.pixelFormat );
+        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad,
+            render_orientation);
+
+        quad->UpdateViewport( &render_place, sys->display.pixelFormat );
 
         D3D11_UpdateQuadOpacity(vd, sys->d3d_dev, quad, r->i_alpha / 255.0f );
         i++;
