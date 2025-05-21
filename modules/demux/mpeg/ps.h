@@ -538,14 +538,14 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     p_pes->p_buffer += i_skip;
     p_pes->i_buffer -= i_skip;
 
-    /* ISO/IEC 13818-1 2.7.5: if no pts and no dts, then dts == pts */
-    if( i_pts != TS_90KHZ_INVALID && i_dts == TS_90KHZ_INVALID )
-        i_dts = i_pts;
-
-    if( i_dts != TS_90KHZ_INVALID )
-        p_pes->i_dts = FROM_SCALE( i_dts );
     if( i_pts != TS_90KHZ_INVALID )
+    {
         p_pes->i_pts = FROM_SCALE( i_pts );
+        if( i_dts != TS_90KHZ_INVALID )
+            p_pes->i_dts = FROM_SCALE( i_dts );
+        else /* ISO/IEC 13818-1 2.7.5: if pts and no dts, then dts == pts */
+            p_pes->i_dts = p_pes->i_pts;
+    }
 
     return VLC_SUCCESS;
 }
