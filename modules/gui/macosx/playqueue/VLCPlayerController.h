@@ -441,7 +441,7 @@ extern const CGFloat VLCVolumeDefault;
  * @note A started and playing media doesn't have necessarily a valid time.
  * @note listen to VLCPlayerTimeAndPositionChanged to be notified about changes to this property
  */
-@property (readonly) float position;
+@property (readonly) double position;
 
 /**
  * set the playback position as a percentage (range 0.0 to 1.0) for the currently playing media
