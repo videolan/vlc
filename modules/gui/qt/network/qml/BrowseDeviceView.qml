@@ -144,7 +144,7 @@ FocusScope {
     function onClicked(model, index, modifier) {
         modelSelect.updateSelection(modifier, model.currentIndex, index)
 
-        model.currentIndex = index
+        _currentView.currentIndex = index
 
         forceActiveFocus()
     }
