@@ -74,28 +74,6 @@ T.Page {
             forceActiveFocus(reason) // this should not be necessary normally, but when there is `setCurrentItemFocus()`, it seems the root item does not get focus
     }
 
-    function _centerFlickableOnRow(row) {
-        if (!row.activeFocus) return
-
-        let minY = mediaRows.y + row.y,
-            maxY = minY + row.rowHeight
-
-        // NOTE: Include the header in case of list view,
-        //       when it's the first item of the list view.
-        if (row.currentIndex === 0 || MainCtx.gridView)
-            maxY += row.getItemY(row.currentIndex)
-        else
-            minY += row.getItemY(row.currentIndex),
-            maxY += row.getItemY(row.currentIndex)
-
-        // TODO: Implement scrolling animation as in `ExpandGridView`.
-        if (maxY > flickable.contentY + flickable.height)
-            flickable.contentY = maxY - flickable.height
-        else if (minY < flickable.contentY)
-            flickable.contentY = minY
-    }
-
-
     contentItem: Flickable {
         id: flickable
 
@@ -182,15 +160,7 @@ T.Page {
             }
 
             onActiveFocusChanged: {
-                if (!activeFocus) return
-
-                let minY = coneNButtons.y,
-                    maxY = minY + coneNButtons.implicitHeight
-
-                if (maxY > flickable.contentY + flickable.height)
-                    flickable.contentY = maxY - flickable.height
-                else if (minY < flickable.contentY)
-                    flickable.contentY = minY
+                Helpers.positionFlickableToContainItem(flickable, this)
             }
         }
 
@@ -283,8 +253,20 @@ T.Page {
                     root.seeAllButtonClicked("continueWatching", reason)
                 }
 
-                onActiveFocusChanged: _centerFlickableOnRow(this)
-                onCurrentIndexChanged: _centerFlickableOnRow(this)
+                onActiveFocusChanged: {
+                    if (activeFocus) {
+                        const item = currentItem?.currentItem ?? currentItem?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                        Helpers.positionFlickableToContainItem(flickable, item ?? this)
+                    }
+                }
+
+                onCurrentIndexChanged: {
+                    if (activeFocus) {
+                        const item = currentItem?.currentItem ?? currentItem?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                        if (item)
+                            Helpers.positionFlickableToContainItem(flickable, item)
+                    }
+                }
             }
 
             MediaView {
@@ -350,8 +332,20 @@ T.Page {
                     root.seeAllButtonClicked("favorites", reason)
                 }
 
-                onActiveFocusChanged: _centerFlickableOnRow(this)
-                onCurrentIndexChanged: _centerFlickableOnRow(this)
+                onActiveFocusChanged: {
+                    if (activeFocus) {
+                        const item = currentItem?.currentItem ?? currentItem?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                        Helpers.positionFlickableToContainItem(flickable, item ?? this)
+                    }
+                }
+
+                onCurrentIndexChanged: {
+                    if (activeFocus) {
+                        const item = currentItem?.currentItem ?? currentItem?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                        if (item)
+                            Helpers.positionFlickableToContainItem(flickable, item)
+                    }
+                }
             }
 
             MediaView {
@@ -409,8 +403,20 @@ T.Page {
                     root.seeAllButtonClicked("newMedia", reason)
                 }
 
-                onActiveFocusChanged: _centerFlickableOnRow(this)
-                onCurrentIndexChanged: _centerFlickableOnRow(this)
+                onActiveFocusChanged: {
+                    if (activeFocus) {
+                        const item = currentItem?.currentItem ?? currentItem?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                        Helpers.positionFlickableToContainItem(flickable, item ?? this)
+                    }
+                }
+
+                onCurrentIndexChanged: {
+                    if (activeFocus) {
+                        const item = currentItem?.currentItem ?? currentItem?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                        if (item)
+                            Helpers.positionFlickableToContainItem(flickable, item)
+                    }
+                }
             }
         }
     }
