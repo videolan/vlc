@@ -23,6 +23,16 @@ import QtQuick
 // Qt 5's `RectangularGlow` that this uses proper approximation of gaussian blur instead of relying on
 // `smoothstep()`, which I assume is good for glow effect but not for shadows.
 ShaderEffect {
+
+    // Normally an "hypothetical clip test" should be done when adding a child to an item (parent) that exceeds the
+    // boundaries of that item, which is simply asking the question: "if clipping was enabled in the parent, would it
+    // change anything?". If the answer is yes, the parent item's size should be adjusted to cover the size of the
+    // newly added child. However, there are exceptions to this, the first exception is when clipping is used as a
+    // visual effect to actually have clipping. Another exception is with effects that are by definition supposed to
+    // exceed the boundaries of the parent item, such as shadow and glow effects. In this case, the bounding box of
+    // the effect is a derivative of the parent's size, and two things can not be based on each other. Since effects
+    // are purely for visual aesthetics, it is acceptable if they get clipped (for any reason, which can be using
+    // `grabToImage()`, for example).
     implicitWidth: parent ? Math.min((parent.paintedWidth ?? Number.MAX_VALUE) - Math.ceil(parent.padding ?? 0) * 2, parent.width) + (blurRadius * compensationFactor * 2)
                           : 0
     implicitHeight: parent ? Math.min((parent.paintedHeight ?? Number.MAX_VALUE) - Math.ceil(parent.padding ?? 0) * 2, parent.height) + (blurRadius * compensationFactor * 2)
