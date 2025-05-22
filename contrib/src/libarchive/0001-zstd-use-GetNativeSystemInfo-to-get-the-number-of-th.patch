@@ -1,7 +1,8 @@
-From 51214b8cbd6008105fd94807dfc9c0699459e9e2 Mon Sep 17 00:00:00 2001
+From 30308ee3c0b1eccc6747aac0cbabb6bfb171dd18 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 23 Sep 2024 13:37:22 +0200
-Subject: [PATCH] zstd: use GetNativeSystemInfo() to get the number of threads
+Subject: [PATCH] set_format: use GetNativeSystemInfo() to get the number of
+ threads
 
 GetActiveProcessorCount() is not available in UWP [1] and
 it's not available before Windows 7.
@@ -12,10 +13,12 @@ SYSTEM_INFO::dwNumberOfProcessors gives the same information [2]
 [2] https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-system_info
 ---
  libarchive/archive_write_add_filter_zstd.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ libarchive/archive_write_set_format_7zip.c | 6 +++---
+ libarchive/archive_write_set_format_zip.c  | 5 +++--
+ 3 files changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/libarchive/archive_write_add_filter_zstd.c b/libarchive/archive_write_add_filter_zstd.c
-index 7ea3d18c..89b90387 100644
+index c0a6e5a3..0e2bdf44 100644
 --- a/libarchive/archive_write_add_filter_zstd.c
 +++ b/libarchive/archive_write_add_filter_zstd.c
 @@ -280,9 +280,9 @@ archive_compressor_zstd_options(struct archive_write_filter *f, const char *key,
@@ -31,6 +34,39 @@ index 7ea3d18c..89b90387 100644
  		}
  #endif
  		if (threads < 0 || threads > INT_MAX) {
+diff --git a/libarchive/archive_write_set_format_7zip.c b/libarchive/archive_write_set_format_7zip.c
+index 902d03f6..793a2e8c 100644
+--- a/libarchive/archive_write_set_format_7zip.c
++++ b/libarchive/archive_write_set_format_7zip.c
+@@ -533,9 +533,9 @@ _7z_options(struct archive_write *a, const char *key, const char *value)
+ 			threads = sysconf(_SC_NPROCESSORS_ONLN);
+ #elif !defined(__CYGWIN__) && defined(_WIN32_WINNT) && \
+ 	_WIN32_WINNT >= 0x0601 /* _WIN32_WINNT_WIN7 */
+-			DWORD winCores = GetActiveProcessorCount(
+-				ALL_PROCESSOR_GROUPS);
+-			threads = (intmax_t)winCores;
++			SYSTEM_INFO systemInfo;
++			GetNativeSystemInfo(&systemInfo);
++			threads = (intmax_t)systemInfo.dwNumberOfProcessors;
+ #else
+ 			threads = 1;
+ #endif
+diff --git a/libarchive/archive_write_set_format_zip.c b/libarchive/archive_write_set_format_zip.c
+index 3630b9f2..76356d40 100644
+--- a/libarchive/archive_write_set_format_zip.c
++++ b/libarchive/archive_write_set_format_zip.c
+@@ -453,8 +453,9 @@ archive_write_zip_options(struct archive_write *a, const char *key,
+ 			zip->threads = sysconf(_SC_NPROCESSORS_ONLN);
+ #elif !defined(__CYGWIN__) && defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0601
+ 			/* Windows 7 and up */
+-			DWORD activeProcs = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
+-			zip->threads = activeProcs <= SHRT_MAX ? (short)activeProcs : SHRT_MAX;
++			SYSTEM_INFO systemInfo;
++			GetNativeSystemInfo(&systemInfo);
++			zip->threads = systemInfo.dwNumberOfProcessors <= SHRT_MAX ? (short)systemInfo.dwNumberOfProcessors : SHRT_MAX;
+ #else
+ 			zip->threads = 1;
+ #endif
 -- 
-2.45.0.windows.1
+2.47.2
 
