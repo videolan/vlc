@@ -54,15 +54,7 @@ CompositorWayland::CompositorWayland(qt_intf_t *p_intf, QObject* parent)
 
 CompositorWayland::~CompositorWayland()
 {
-    if (m_waylandImpl)
-    {
-        if (m_waylandImpl->p_module)
-        {
-            m_waylandImpl->close(m_waylandImpl);
-            module_unneed(m_waylandImpl, m_waylandImpl->p_module);
-        }
-        vlc_object_delete(m_waylandImpl);
-    }
+    unloadWaylandModule();
 }
 
 bool CompositorWayland::init()
@@ -79,6 +71,7 @@ bool CompositorWayland::init()
      * a separate wayland module is used to perform direct wayland calls
      * without requiring Qt module to be directly linked to wayland
      */
+    assert(!m_waylandImpl);
     m_waylandImpl = static_cast<qtwayland_t*>(vlc_object_create(m_intf, sizeof(qtwayland_t)));
     if (!m_waylandImpl)
         return false;
@@ -105,6 +98,8 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx, std::function<void(Q
     m_qmlView = std::make_unique<QQuickView>();
     m_qmlView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_qmlView->setColor(QColor(Qt::transparent));
+
+    m_qmlView->installEventFilter(this);
 
     m_qmlView->create();
 
@@ -153,7 +148,12 @@ QWindow* CompositorWayland::interfaceMainWindow() const
 void CompositorWayland::destroyMainInterface()
 {
     unloadGUI();
+    // We still need to call this explicitly, as it seems Qt does not send
+    // the `QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed` event if we
+    // delete the window ourselves:
+    unloadWaylandModule();
     m_qmlView.reset();
+    assert(!m_waylandImpl);
 }
 
 void CompositorWayland::unloadGUI()
@@ -168,6 +168,24 @@ void CompositorWayland::unloadGUI()
     m_qmlView->setSource(QUrl());
 
     commonGUIDestroy();
+}
+
+bool CompositorWayland::eventFilter(QObject *watched, QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::PlatformSurface:
+        if (watched == m_qmlView.get() &&
+            static_cast<QPlatformSurfaceEvent *>(event)->surfaceEventType() == QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed)
+        {
+            unloadWaylandModule();
+        }
+        break;
+    default:
+        break;
+    }
+
+    return QObject::eventFilter(watched, event);
 }
 
 Compositor::Type CompositorWayland::type() const
@@ -255,6 +273,22 @@ void CompositorWayland::onSurfaceScaleChanged(qreal dpr)
     assert(m_waylandImpl);
 
     m_waylandImpl->rescale(m_waylandImpl, dpr);
+}
+
+bool CompositorWayland::unloadWaylandModule()
+{
+    if (m_waylandImpl)
+    {
+        if (m_waylandImpl->p_module)
+        {
+            m_waylandImpl->close(m_waylandImpl);
+            module_unneed(m_waylandImpl, m_waylandImpl->p_module);
+        }
+        vlc_object_delete(m_waylandImpl);
+        m_waylandImpl = nullptr;
+        return true;
+    }
+    return false;
 }
 
 #ifdef QT_WAYLAND_HAS_CUSTOM_MARGIN_SUPPORT
