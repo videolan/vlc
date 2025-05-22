@@ -2007,17 +2007,10 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, vlc_tick_t i_see
             ts_pid_t *p_pid = GetPID(p_sys, i_pid);
             if( i_pid != 0x1FFF )
             {
-                unsigned i_skip = 4;
-                if ( p_pkt->p_buffer[3] & 0x20 ) // adaptation field
-                {
-                    if( p_pkt->i_buffer >= 4 + 2 + 5 )
-                    {
-                        if( p_pmt->i_pid_pcr == i_pid )
-                            i_pktpcr = GetPCR( p_pkt );
-                        i_skip += 1 + __MIN(p_pkt->p_buffer[4], 182);
-                    }
-                }
+                if( p_pmt->i_pid_pcr == i_pid )
+                    i_pktpcr = GetPCR( p_pkt );
 
+                unsigned i_skip = PKTHeaderAndAFSize( p_pkt );
                 if( i_pktpcr == TS_90KHZ_INVALID && p_pid->type == TYPE_STREAM &&
                     ts_stream_Find_es( p_pid->u.p_stream, p_pmt ) &&
                    (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
@@ -2093,10 +2086,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, bool *pb_fou
         if( i_pid != 0x1FFF && (p_pkt->p_buffer[1] & 0x80) == 0 ) /* not corrupt */
         {
             bool b_pcrresult = true;
-            bool b_adaptfield = p_pkt->p_buffer[3] & 0x20;
-
-            if( b_adaptfield && p_pkt->i_buffer >= 4 + 2 + 5 )
-                i_pcr = GetPCR( p_pkt );
+            i_pcr = GetPCR( p_pkt );
 
             /* Designated PCR pid will be valid, don't repick (on the fly probing) */
             if( i_pcr != TS_90KHZ_INVALID && !p_pid->probed.i_pcr_count )
@@ -2110,10 +2100,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, bool *pb_fou
               )
             {
                 b_pcrresult = false;
-                unsigned i_skip = 4;
-                if ( b_adaptfield ) // adaptation field
-                    i_skip += 1 + __MIN(p_pkt->p_buffer[4], 182);
-
+                unsigned i_skip = PKTHeaderAndAFSize( p_pkt );
                 ts_pes_header_t pesh;
                 ts_pes_header_init( &pesh );
                 if ( VLC_SUCCESS == ParsePESHeader( NULL, &p_pkt->p_buffer[i_skip],

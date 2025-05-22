@@ -29,6 +29,15 @@
 
 #define AS_BUF(pkt) pkt->p_buffer,pkt->i_buffer
 
+static inline unsigned PKTHeaderAndAFSize( const block_t *p_pkt )
+{
+    const uint8_t *p = p_pkt->p_buffer;
+    unsigned i_size = 4;
+    if ( p[3] & 0x30 ) // adaptation field
+        i_size += 1 + __MIN(p[4], 182);
+    return i_size;
+}
+
 static inline int PIDGet( const block_t *p )
 {
     return ( (p->p_buffer[1]&0x1f)<<8 )|p->p_buffer[2];
