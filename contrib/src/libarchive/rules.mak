@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.7.8
+LIBARCHIVE_VERSION := 3.8.0
 LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
