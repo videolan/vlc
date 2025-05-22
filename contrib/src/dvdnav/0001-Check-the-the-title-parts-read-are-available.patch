@@ -1,0 +1,29 @@
+From e10f8570219748f67c7809cbdb57e8b790415083 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 22 May 2025 13:57:31 +0200
+Subject: [PATCH 1/2] Check the the title parts read are available
+
+The nr_of_ptts of the VTS and VMGI may differ.
+We can't read past the number count of items in title[].
+---
+ src/searching.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/searching.c b/src/searching.c
+index 7c8e6e6..ba27306 100644
+--- a/src/searching.c
++++ b/src/searching.c
+@@ -668,6 +668,10 @@ uint32_t dvdnav_describe_title_chapters(dvdnav_t *this, int32_t title, uint64_t
+   if(ptitle->vts_ttn == 0)
+       goto fail;
+   ptt = ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].ptt;
++  if (parts >= ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].nr_of_ptts) {
++      printerr("Too many parts, using the ones available.");
++      parts = ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].nr_of_ptts;
++  }
+ 
+   tmp = calloc(1, sizeof(uint64_t)*parts);
+   if(!tmp)
+-- 
+2.45.1.windows.1
+

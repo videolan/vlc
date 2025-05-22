@@ -1,0 +1,27 @@
+From 48ba3c481225dbe3b3a03ed621bed8df25bed941 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 22 May 2025 14:09:53 +0200
+Subject: [PATCH 2/2] Fix access to title not found in array
+
+---
+ src/searching.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/searching.c b/src/searching.c
+index ba27306..968deef 100644
+--- a/src/searching.c
++++ b/src/searching.c
+@@ -667,6 +667,10 @@ uint32_t dvdnav_describe_title_chapters(dvdnav_t *this, int32_t title, uint64_t
+   parts = ptitle->nr_of_ptts;
+   if(ptitle->vts_ttn == 0)
+       goto fail;
++  if (ptitle->vts_ttn > ifo->vts_ptt_srpt->nr_of_srpts) {
++      printerr("Requested title not found.");
++      goto fail;
++  }
+   ptt = ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].ptt;
+   if (parts >= ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].nr_of_ptts) {
+       printerr("Too many parts, using the ones available.");
+-- 
+2.45.1.windows.1
+
