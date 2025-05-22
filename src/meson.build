@@ -36,11 +36,19 @@ libvlccore_deps = [
 ]
 
 vlccore_cargs = [ '-DMODULE_STRING="core"', '-DHAVE_DYNAMIC_PLUGINS' ]
+libvlccore_link_args = []
 
 if host_system == 'darwin'
     libvlccore_deps += foundation_dep
     libvlccore_deps += corefoundation_dep
     libvlccore_deps += dependency('CFNetwork', required: true)
+    libvlccore_link_args += [
+        '-Wl,-U,_vlc_static_modules',
+        '-Wl,-undefined,dynamic_lookup',
+    ]
+    vlccore_cargs += [
+        '-DHAVE_DYLIB_DYNAMIC_LOOKUP=1',
+    ]
 elif host_system == 'windows'
 min_windows_version_test = '''
 #include <sdkddkver.h>
@@ -303,8 +311,6 @@ if get_option('videolan_manager')
     libvlccore_sources += libvlccore_vlm_sources
 endif
 
-libvlccore_link_args = []
-
 if host_system == 'darwin'
     libvlccore_sources += [
         'darwin/dirs.m',
@@ -325,7 +331,6 @@ if host_system == 'darwin'
             'posix/spawn.c',
         ]
     endif
-    libvlccore_link_args += '-Wl,-U,_vlc_static_modules'
 elif host_system == 'windows'
     libvlccore_sources += [
         'win32/error.c',
