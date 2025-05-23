@@ -127,3 +127,10 @@ executable('vlc-demux-dec-run', 'vlc-demux-run.c',
     link_with: [libvlc_demux_dec_run, libvlc, libvlccore, vlc_libcompat],
     install: false,
     win_subsystem: 'console')
+
+executable('vlc-window', 'vlc-window.c',
+    include_directories: [vlc_include_dirs],
+    link_with: [libvlc, libvlccore, vlc_libcompat],
+    c_args: common_args,
+    install: false,
+    win_subsystem: 'console')
