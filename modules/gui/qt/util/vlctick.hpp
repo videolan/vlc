@@ -25,6 +25,7 @@
 #include <QObject>
 #include <vlc_common.h>
 #include <vlc_tick.h>
+#include <QtQml/qqmlregistration.h>
 
 class VLCTick
 {
@@ -94,6 +95,9 @@ protected:
 
 class VLCDuration : public VLCTick
 {
+    Q_GADGET
+    QML_VALUE_TYPE(vlcDuration)
+
 public:
     VLCDuration();
     VLCDuration(vlc_tick_t);
@@ -111,6 +115,8 @@ public:
 
 class VLCTime : public VLCTick
 {
+    Q_GADGET
+    QML_VALUE_TYPE(vlcTime)
 public:
     VLCTime();
     VLCTime(vlc_tick_t);

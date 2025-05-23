@@ -180,6 +180,8 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
         qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "vlcTick", "");
+        qmlRegisterTypesAndRevisions<VLCDuration>(uri, versionMajor);
+        qmlRegisterTypesAndRevisions<VLCTime>(uri, versionMajor);
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
         qmlRegisterUncreatableType<BaseModel>( uri, versionMajor, versionMinor, "BaseModel", "Base Model is uncreatable." );
         qmlRegisterUncreatableType<VLCVarChoiceModel>(uri, versionMajor, versionMinor, "VLCVarChoiceModel", "generic variable with choice model" );
