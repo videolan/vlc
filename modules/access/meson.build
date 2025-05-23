@@ -106,6 +106,15 @@ vlc_modules += {
     'enabled' : jack_dep.found(),
 }
 
+# PipeWire module
+vlc_modules += {
+    'name' : 'pipewiresrc',
+    'sources' : files('pipewire.c'),
+    'dependencies' : [pipewire_dep],
+    'link_with' : [libvlc_pipewire],
+    'enabled' : pipewire_dep.found(),
+}
+
 # Pulseaudio module
 vlc_modules += {
     'name' : 'pulsesrc',

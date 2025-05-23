@@ -209,6 +209,11 @@ option('alsa',
     value : 'auto',
     description : 'Enable/disable ALSA support')
 
+option('pipewire',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable PipeWire support')
+
 option('pulse',
     type : 'feature',
     value : 'auto',

@@ -59,6 +59,9 @@ else
     have_wayland = false
 endif
 
+# PipeWire
+pipewire_dep = dependency('libpipewire-0.3', version: '>= 0.3.64', required: get_option('pipewire'))
+
 # Pulse audio
 pulse_dep = dependency('libpulse', version: '>= 6.0', required: get_option('pulse'))
 
@@ -157,6 +160,20 @@ ksuser_lib = cc.find_library('ksuser',
 
 # Helper libraries for modules
 # These are helper libraries used by some modules
+
+# PipeWire helper library
+if pipewire_dep.found()
+    libvlc_pipewire = library('vlc_pipewire',
+        files('audio_output/vlc_pipewire.c'),
+        include_directories: [include_directories('audio_output'), vlc_include_dirs],
+        dependencies: [libvlccore_dep, pipewire_dep],
+        link_with: [vlc_libcompat],
+    )
+else
+    libvlc_pipewire = disabler()
+endif
+
+# Pulse audio helper library
 if pulse_dep.found()
     libvlc_pulse = library('vlc_pulse',
         files('audio_output/vlcpulse.c'),

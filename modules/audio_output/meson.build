@@ -18,6 +18,15 @@ vlc_modules += {
     'sources' : files('amem.c')
 }
 
+# PipeWire output
+vlc_modules += {
+    'name' : 'aout_pipewire',
+    'sources' : files('pipewire.c'),
+    'dependencies' : [m_lib, pipewire_dep],
+    'link_with' : [libvlc_pipewire],
+    'enabled' : pipewire_dep.found(),
+}
+
 # Pulseaudio output
 if pulse_dep.found()
     vlc_modules += {

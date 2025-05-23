@@ -54,6 +54,15 @@ if upnp_dep.found()
     }
 endif
 
+# PipeWire device list
+vlc_modules += {
+    'name' : 'pipewirelist',
+    'sources' : files('pipewire.c'),
+    'link_with' : [libvlc_pipewire],
+    'dependencies' : [pipewire_dep],
+    'enabled' : pipewire_dep.found(),
+}
+
 # Pulse device list
 if pulse_dep.found()
     vlc_modules += {
