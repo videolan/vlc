@@ -481,11 +481,7 @@ PlaylistListModel::data(const QModelIndex &index, int role) const
     case IsCurrentRole:
         return row == d->m_current;
     case DurationRole:
-    {
-        QVariant var;
-        var.setValue(d->m_items[row].getDuration());
-        return var;
-    }
+        return QVariant::fromValue<VLCDuration>(d->m_items[row].getDuration());
     case ArtistRole:
         return d->m_items[row].getArtist();
     case AlbumRole:

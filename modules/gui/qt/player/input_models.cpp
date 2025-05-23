@@ -326,7 +326,7 @@ QVariant ChapterListModel::data(const QModelIndex &index, int role) const
     else if (role == Qt::CheckStateRole)
         return QVariant::fromValue<bool>(row == m_current);
     else if (role == ChapterListRoles::TimeRole )
-        return QVariant::fromValue<vlc_tick_t>(chapter.time);
+        return QVariant::fromValue<VLCTime>(chapter.time);
     else if (role == ChapterListRoles::StartPositionRole && (m_title->length != 0))
         return QVariant::fromValue<float>(chapter.time / (float) m_title->length);
     else if (role == ChapterListRoles::EndPositionRole && (m_title->length != 0))
