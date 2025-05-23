@@ -24,6 +24,7 @@ import VLC.Player
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util
+import VLC.MainInterface
 
 T.ProgressBar {
     id: control
@@ -87,7 +88,7 @@ T.ProgressBar {
             else
                 _text = Player.time
 
-            _text = _text.formatHMS(length.isSubSecond() ? length.SubSecondFormattedAsMS : 0)
+            _text = _text.formatHMS(length.isSubSecond() ? VLCTick.SubSecondFormattedAsMS : 0)
 
             if (Player.hasChapters)
                 _text += " - " + Player.chapters.getNameAtPosition(control._tooltipPosition)

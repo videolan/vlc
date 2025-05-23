@@ -140,7 +140,7 @@ T.Pane {
 
                 text: {
                     const length = Player.length
-                    return Player.time.formatHMS(length.isSubSecond() ? length.SubSecondFormattedAsMS : 0)
+                    return Player.time.formatHMS(length.isSubSecond() ? VLCTick.SubSecondFormattedAsMS : 0)
                 }
                 color: theme.fg.primary
                 font: timeTextMetrics.font

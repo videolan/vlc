@@ -136,4 +136,15 @@ public:
     bool valid() const override;
 };
 
+//following boilerplate allow registering FormatFlag enum in the VLCTick namespace in QML
+//VLCTick is not a QML_VALUE_TYPE so we don't need to define a distinct type to
+//register it in the namespace
+
+namespace VLCTickForeign
+{
+    Q_NAMESPACE
+    QML_NAMED_ELEMENT(VLCTick)
+    QML_FOREIGN_NAMESPACE(VLCTick)
+}
+
 #endif // VLCTICK_HPP
