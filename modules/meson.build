@@ -60,7 +60,7 @@ else
 endif
 
 # Pulse audio
-pulse_dep = dependency('libpulse', version: '>= 1.0', required: get_option('pulse'))
+pulse_dep = dependency('libpulse', version: '>= 6.0', required: get_option('pulse'))
 
 # ALSA
 alsa_dep = dependency('alsa', version: '>= 1.0.24', required: get_option('alsa'))
