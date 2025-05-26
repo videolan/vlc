@@ -22,6 +22,20 @@
 
 #include "timestamps.h"
 
+#define STREAM_ID_PROGRAM_STREAM_MAP         0xBC
+#define STREAM_ID_PRIVATE_STREAM_1           0xBD
+#define STREAM_ID_PADDING                    0xBE
+#define STREAM_ID_PRIVATE_STREAM_2           0xBF
+#define STREAM_ID_AUDIO_STREAM_0             0xC0
+#define STREAM_ID_VIDEO_STREAM_0             0xE0
+#define STREAM_ID_ECM                        0xF0
+#define STREAM_ID_EMM                        0xF1
+#define STREAM_ID_DSM_CC                     0xF2
+#define STREAM_ID_H222_1_TYPE_E              0xF8
+#define STREAM_ID_METADATA_STREAM            0xFC
+#define STREAM_ID_EXTENDED_STREAM_ID         0xFD
+#define STREAM_ID_PROGRAM_STREAM_DIRECTORY   0xFF
+
 static inline ts_90khz_t GetPESTimestamp( const uint8_t *p_data )
 {
     return  ((ts_90khz_t)(p_data[ 0]&0x0e ) << 29)|
@@ -90,14 +104,14 @@ static int ParsePESHeader( struct vlc_logger *p_logger, const uint8_t *p_header,
 
     switch( p_header[3] )
     {
-    case 0xBC:  /* Program stream map */
-    case 0xBE:  /* Padding */
-    case 0xBF:  /* Private stream 2 */
-    case 0xF0:  /* ECM */
-    case 0xF1:  /* EMM */
-    case 0xFF:  /* Program stream directory */
-    case 0xF2:  /* DSMCC stream */
-    case 0xF8:  /* ITU-T H.222.1 type E stream */
+    case STREAM_ID_PROGRAM_STREAM_MAP:
+    case STREAM_ID_PADDING:
+    case STREAM_ID_PRIVATE_STREAM_2:
+    case STREAM_ID_ECM:
+    case STREAM_ID_EMM:
+    case STREAM_ID_PROGRAM_STREAM_DIRECTORY:
+    case STREAM_ID_DSM_CC:
+    case STREAM_ID_H222_1_TYPE_E:
         i_skip = 6;
         h->b_scrambling = false;
         break;
