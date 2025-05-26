@@ -1,0 +1,39 @@
+From ac96967e36808cf4fb7a523e37bec66a4888b106 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 26 May 2025 10:44:49 +0200
+Subject: [PATCH] [cmake] add uuid library when using xmllite
+
+Consecutive to 16fd043f51d911b106f2a7834ad8f08f65051977
+IID_ISequentialStream is required by the code.
+This GUID is defined in uuid.lib or libuuid.a in mingw-w64. It is required
+to link with that library to get the definition of the GUID. Some toolchains
+add it by default but not all.
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7096b7c0..e938df72 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1257,7 +1257,7 @@ ELSE(LIBXML2_FOUND)
+       # Check linkage as well; versions of mingw-w64 before v11.0.0
+       # do not contain an import library for xmllite.
+       cmake_push_check_state()
+-      SET(CMAKE_REQUIRED_LIBRARIES "xmllite")
++      SET(CMAKE_REQUIRED_LIBRARIES "xmllite" "uuid")
+       check_c_source_compiles("
+       #include <initguid.h>
+       #include <xmllite.h>
+@@ -1268,7 +1268,7 @@ ELSE(LIBXML2_FOUND)
+       cmake_pop_check_state()
+       IF(HAVE_XMLLITE_H)
+         SET(XMLLITE_FOUND TRUE)
+-        LIST(APPEND ADDITIONAL_LIBS "xmllite")
++        LIST(APPEND ADDITIONAL_LIBS "xmllite" "uuid")
+       ENDIF()
+     ENDIF()
+   ENDIF(EXPAT_FOUND)
+-- 
+2.45.1.windows.1
+
