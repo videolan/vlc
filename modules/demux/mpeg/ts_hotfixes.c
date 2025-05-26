@@ -81,76 +81,21 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
     if( p_pes[0] != 0 || p_pes[1] != 0 || p_pes[2] != 1 )
         return;
 
-    size_t i_pesextoffset = 8;
-    ts_90khz_t i_dts = TS_90KHZ_INVALID;
-    if( p_pes[7] & 0x80 ) // PTS
-    {
-        i_pesextoffset += 5;
-        if ( i_data < i_pesextoffset ||
-            !ExtractPESTimestamp( &p_pes[9], p_pes[7] >> 6, &i_dts ) )
-            return;
+    ts_pes_header_t pesh;
+    ts_pes_header_init( &pesh );
+    if( ParsePESHeader( NULL, p_pes, i_data, &pesh ) != VLC_SUCCESS )
+        return;
+
+    if( pesh.i_dts != TS_90KHZ_INVALID )
         pid->probed.i_dts_count++;
-    }
-    if( p_pes[7] & 0x40 ) // DTS
-    {
-        i_pesextoffset += 5;
-        if ( i_data < i_pesextoffset ||
-            !ExtractPESTimestamp( &p_pes[14], 0x01, &i_dts ) )
-            return;
-    }
-    if( p_pes[7] & 0x20 ) // ESCR
-        i_pesextoffset += 6;
-    if( p_pes[7] & 0x10 ) // ESrate
-        i_pesextoffset += 3;
-    if( p_pes[7] & 0x08 ) // DSM
-        i_pesextoffset += 1;
-    if( p_pes[7] & 0x04 ) // CopyInfo
-        i_pesextoffset += 1;
-    if( p_pes[7] & 0x02 ) // PESCRC
-        i_pesextoffset += 2;
 
     if( pid->probed.i_fourcc != 0 )
         goto codecprobingend;
 
-    if ( i_data < i_pesextoffset )
+    if( i_data < pesh.i_size + 4 )
         return;
 
-     /* HeaderdataLength */
-    const size_t i_payloadoffset = 8 + 1 + p_pes[8];
-    i_pesextoffset += 1;
-
-    if ( i_data < i_pesextoffset || i_data < i_payloadoffset )
-        return;
-
-    i_data -= 8 + 1 + p_pes[8];
-
-    if( p_pes[7] & 0x01 ) // PESExt
-    {
-        size_t i_extension2_offset = 1;
-        if ( p_pes[i_pesextoffset] & 0x80 ) // private data
-            i_extension2_offset += 16;
-        if ( p_pes[i_pesextoffset] & 0x40 ) // pack
-            i_extension2_offset += 1;
-        if ( p_pes[i_pesextoffset] & 0x20 ) // seq
-            i_extension2_offset += 2;
-        if ( p_pes[i_pesextoffset] & 0x10 ) // P-STD
-            i_extension2_offset += 2;
-        if ( p_pes[i_pesextoffset] & 0x01 ) // Extension 2
-        {
-            uint8_t i_len = p_pes[i_pesextoffset + i_extension2_offset] & 0x7F;
-            i_extension2_offset += i_len;
-        }
-        if( i_data < i_extension2_offset )
-            return;
-
-        i_data -= i_extension2_offset;
-    }
-    /* (i_payloadoffset - i_pesextoffset) 0xFF stuffing */
-
-    if ( i_data < 4 )
-        return;
-
-    const uint8_t *p_data = &p_pes[i_payloadoffset];
+    const uint8_t *p_data = &p_pes[pesh.i_size];
     const uint8_t i_stream_id = pid->probed.i_stream_id = p_pes[3];
     /* NON MPEG audio & subpictures STREAM */
     if(i_stream_id == 0xBD)
@@ -197,15 +142,15 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
 
 codecprobingend:
     /* Track timestamps and flag missing PAT */
-    if( !p_sys->patfix.i_timesourcepid && i_dts != TS_90KHZ_INVALID )
+    if( !p_sys->patfix.i_timesourcepid && pesh.i_dts != TS_90KHZ_INVALID )
     {
-        p_sys->patfix.i_first_dts = FROM_SCALE(i_dts);
+        p_sys->patfix.i_first_dts = FROM_SCALE(pesh.i_dts);
         p_sys->patfix.i_timesourcepid = pid->i_pid;
     }
-    else if( p_sys->patfix.i_timesourcepid == pid->i_pid && i_dts != TS_90KHZ_INVALID &&
+    else if( p_sys->patfix.i_timesourcepid == pid->i_pid && pesh.i_dts != TS_90KHZ_INVALID &&
              p_sys->patfix.status == PAT_WAITING )
     {
-        if( FROM_SCALE(i_dts) - p_sys->patfix.i_first_dts > MIN_PAT_INTERVAL )
+        if( FROM_SCALE(pesh.i_dts) - p_sys->patfix.i_first_dts > MIN_PAT_INTERVAL )
             p_sys->patfix.status = PAT_MISSING;
     }
 
