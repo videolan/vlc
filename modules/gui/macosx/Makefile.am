@@ -22,7 +22,7 @@ endif
 
 EXTRA_DIST += $(ASSET_CATALOG_DEPS)
 
-SUFFIXES += .xib .nib .air .metal
+SUFFIXES += .xib .nib
 
 xib_verbose = $(xib_verbose_$(V))
 xib_verbose_ = $(xib_verbose__$(AM_DEFAULT_VERBOSITY))
@@ -36,15 +36,37 @@ xib_verbose__0 = $(xib_verbose_0)
 	  --minimum-deployment-target 10.11 --output-format human-readable-text \
 	  --compile $@ $<
 
+if ENABLE_MACOSX_UI_SHADERS
+SUFFIXES += .air .metal
+
 metal_verbose = $(metal_verbose_$(V))
 metal_verbose_ = $(metal_verbose__$(AM_DEFAULT_VERBOSITY))
 metal_verbose_0 = @echo "  METAL     " $@;
 metal_verbose__0 = $(metal_verbose_0)
 
 # Rule to compile .metal to .air
-.air: .metal
-	@mkdir -p $(builddir)/$(@D)
-	$(metal_verbose)$(METAL) -c $< -o $(builddir)/$@
+.metal.air:
+	$(AM_V_at)$(MKDIR_P) "gui/macosx/shaders"
+	$(metal_verbose)$(METAL) -c $< -o $@
+
+metallib_verbose = $(metallib_verbose_$(V))
+metallib_verbose_ = $(metallib_verbose__$(AM_DEFAULT_VERBOSITY))
+metallib_verbose_0 = @echo "  METALLIB " $@;
+metallib_verbose__0 = $(metallib_verbose_0)
+
+libmacosx_plugin_la_METAL_SOURCES = gui/macosx/shaders/VLCSnowShader.metal
+libmacosx_plugin_la_METAL_AIR_FILES = $(libmacosx_plugin_la_METAL_SOURCES:.metal=.air)
+libmacosx_plugin_la_METAL_LIBRARY = gui/macosx/resources/Shaders.metallib
+
+$(libmacosx_plugin_la_METAL_LIBRARY): $(libmacosx_plugin_la_METAL_AIR_FILES)
+	$(AM_V_at)$(MKDIR_P) "gui/macosx/shaders"
+	$(metallib_verbose)$(METALLIB) $(libmacosx_plugin_la_METAL_AIR_FILES) -o $@
+
+EXTRA_DIST += $(libmacosx_plugin_la_METAL_SOURCES)
+BUILT_SOURCES += $(libmacosx_plugin_la_METAL_LIBRARY)
+CLEANFILES += $(libmacosx_plugin_la_METAL_AIR_FILES) $(libmacosx_plugin_la_METAL_LIBRARY)
+
+endif
 
 libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc -I$(srcdir)/gui/macosx
 libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
@@ -60,9 +82,12 @@ libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,WebKit \
 	-Wl,-framework,QuickLook \
 	-Wl,-framework,QuickLookThumbnailing \
-	-Wl,-framework,Metal \
-	-Wl,-framework,MetalKit \
 	-Wl,-weak_framework,MediaPlayer
+
+if ENABLE_MACOSX_UI_SHADERS
+libmacosx_plugin_la_LDFLAGS += -Wl,-framework,Metal \
+	-Wl,-framework,MetalKit
+endif
 
 if HAVE_SPARKLE
 libmacosx_plugin_la_LDFLAGS += -Wl,-framework,Sparkle
@@ -549,20 +574,6 @@ libmacosx_plugin_la_SOURCES += $(libmacosx_plugin_la_XIB_SOURCES)
 if ENABLE_MACOSX_UI
 gui_LTLIBRARIES += libmacosx_plugin.la
 BUILT_SOURCES += $(libmacosx_plugin_la_XIB_SOURCES:.xib=.nib)
-
-metallib_verbose = $(metallib_verbose_$(V))
-metallib_verbose_ = $(metallib_verbose__$(AM_DEFAULT_VERBOSITY))
-metallib_verbose_0 = @echo "  METALLIB     " $@;
-metallib_verbose__0 = $(metallib_verbose_0)
-
-libmacosx_plugin_la_METAL_SOURCES = gui/macosx/shaders/VLCSnowShader.metal
-libmacosx_plugin_la_METAL_AIR_FILES = $(libmacosx_plugin_la_METAL_SOURCES:.metal=.air)
-libmacosx_plugin_la_METAL_LIBRARY = Shaders.metallib
-
-$(libmacosx_plugin_la_METAL_LIBRARY): $(libmacosx_plugin_la_METAL_AIR_FILES)
-	@mkdir -p $(builddir)/$(@D)
-	$(metallib_verbose)$(METALLIB) $(addprefix $(builddir)/,$(libmacosx_plugin_la_METAL_AIR_FILES)) -o $(builddir)/$@
-
 endif
 
 libmacosx_plugin_la_RES = \

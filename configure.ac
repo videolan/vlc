@@ -4472,7 +4472,25 @@ then
       AC_MSG_ERROR([actool was not found, but is required for --enable-macosx])
     ])
   ])
+
+  dnl
+  dnl  MacOS X gui module metal shaders
+  dnl
+  _enable_macosx_ui_shaders_default="yes"
+
+  AC_ARG_ENABLE([macosx-ui-shaders],
+    AS_HELP_STRING([--disable-macosx-ui-shaders], [Disable macOS UI Metal shaders (default: enabled if macOS UI is active)]),
+    [], [enable_macosx_ui_shaders="${_enable_macosx_ui_shaders_default}"]
+  )
+
+  if test "${enable_macosx_ui_shaders}" != "no"
+  then
+    dnl Tool checks for metal and metallib are already performed above if enable_macosx is true.
+    dnl We assume they are found if we reach this point and shaders are enabled.
+    AC_DEFINE([ENABLE_MACOSX_UI_SHADERS], [1], [Define to 1 if macOS UI Metal shaders are enabled.])
+  fi
 fi
+AM_CONDITIONAL([ENABLE_MACOSX_UI_SHADERS], [test "${enable_macosx_ui_shaders}" != "no" -a "${enable_macosx}" != "no" -a "${SYS}" = "darwin"])
 AM_CONDITIONAL([ENABLE_MACOSX_UI], [test "$enable_macosx" != "no" -a "${SYS}" = "darwin"])
 
 dnl
