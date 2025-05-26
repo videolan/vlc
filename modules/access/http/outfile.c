@@ -39,6 +39,7 @@ struct vlc_http_outfile *vlc_http_outfile_create(struct vlc_http_mgr *mgr,
     struct vlc_http_msg *resp = NULL;
     vlc_url_t url;
     bool secure;
+    char* url_path_with_options = NULL;
 
     if (vlc_UrlParse(&url, uri))
         goto error;
@@ -62,9 +63,19 @@ struct vlc_http_outfile *vlc_http_outfile_create(struct vlc_http_mgr *mgr,
     if (unlikely(authority == NULL))
         goto error;
 
+    if (url.psz_option)
+    {
+        if (asprintf(&url_path_with_options, "%s?%s", url.psz_path, url.psz_option) < 0)
+        {
+            free(authority);
+            goto error;
+        }
+    }
+
     struct vlc_http_msg *req = vlc_http_req_create("PUT", url.psz_protocol,
-                                                   authority, url.psz_path);
+                                                   authority, url_path_with_options ? url_path_with_options : url.psz_path);
     free(authority);
+    free(url_path_with_options);
     if (unlikely(req == NULL))
         goto error;
 
