@@ -7,6 +7,7 @@ members = [
     "modules/logger/telegraf-rs/"
 ]
 resolver = "2"
+exclude = ["contrib"]
 
 [workspace.package]
 version = "4.0.0"
