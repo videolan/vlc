@@ -24,7 +24,7 @@ variables:
     VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20241118101328
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20241118101328
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20241112155431
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20250403202200
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20231013031754
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20240806085528
     VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20250207201514
@@ -617,7 +617,7 @@ xros-arm64:
         name: $VLC_ANDROID_IMAGE
     script: |
         git clone https://code.videolan.org/videolan/libvlcjni.git
-        (cd libvlcjni && git checkout fa2b8f681930f2a1957b0222ddf817f7c1c8da2f)
+        (cd libvlcjni && git checkout e90807431330d949b855b37695b9004af6b00bd9)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
           CONTRIB_FLAGS="--with-prebuilt-contribs"
         elif [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
