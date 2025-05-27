@@ -237,7 +237,7 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         else
             i_kc_offset = 0;
 
-        if ( i_kc_offset == (sizeof( kc ) / sizeof( Qt::Key )) )
+        if ( i_kc_offset == ARRAY_SIZE( kc ) )
         {
             i_kc_offset = 0;
             emit kc_pressed();
