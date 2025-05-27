@@ -529,7 +529,7 @@ block_t * HTTPChunkBufferedSource::read(size_t readsize)
         copied += toconsume;
         readsize -= toconsume;
         inblockreadoffset += toconsume;
-        if(inblockreadoffset >= p_head->i_buffer)
+        if(inblockreadoffset >= p_read->i_buffer)
         {
             p_read = p_read->p_next;
             inblockreadoffset = 0;
