@@ -212,6 +212,7 @@ void DXGI_GetBlackColor( const d3d_format_t *pixelFormat,
     case DXGI_FORMAT_B8G8R8X8_UNORM:
     case DXGI_FORMAT_R10G10B10A2_UNORM:
     case DXGI_FORMAT_B5G6R5_UNORM:
+    case DXGI_FORMAT_R16G16B16A16_UNORM:
         colors[0] = 4; black[0] = blackRGBA;
         colors[1] = 0;
         break;
