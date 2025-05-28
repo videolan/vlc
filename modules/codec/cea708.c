@@ -164,6 +164,10 @@ void CEA708_DTVCC_Demuxer_Push( cea708_demux_t *h, vlc_tick_t i_start, const uin
                                         CEA708_WINDOW_MAX_ROWS)
 #define CEA708_FONT_TO_LINE_HEIGHT_RATIO 1.06
 
+#define CEA708_REL_POS_MAX              99.0f
+#define CEA708_CENTER_ANCHOR_START      0.25f
+#define CEA708_CENTER_ANCHOR_RANGE      0.5f
+
 #define CEA708_FONTRELSIZE_STANDARD    (100.0 * CEA708_ROW_HEIGHT_STANDARD / \
                                         CEA708_FONT_TO_LINE_HEIGHT_RATIO)
 #define CEA708_FONTRELSIZE_SMALL       (CEA708_FONTRELSIZE_STANDARD * 0.7)
@@ -623,7 +627,7 @@ static void CEA708_Window_Truncate( cea708_window_t *p_w, int i_direction )
                         /* Drop rightmost column */
                         row->lastcol--;
                     }
-                   
+
                 }
             }
         }
@@ -652,7 +656,7 @@ static void CEA708_Window_Truncate( cea708_window_t *p_w, int i_direction )
                         /* Drop leftmost column */
                         row->firstcol++;
                     }
-                   
+
                 }
             }
         }
@@ -1011,7 +1015,8 @@ static text_segment_t * CEA708RowToSegments( const cea708_text_row_t *p_row,
 }
 
 static void CEA708SpuConvert( const cea708_window_t *p_w,
-                              substext_updater_region_t *p_region )
+                              substext_updater_region_t *p_region,
+                              decoder_t *p_dec )
 {
     if( !p_w->b_visible || CEA708_Window_RowCount( p_w ) == 0 )
         return;
@@ -1051,41 +1056,64 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
 
     if( p_w->b_relative )
     {
-        /* FIXME: take into account left/right anchors */
-        p_region->origin.x = p_w->i_anchor_offset_h / 100.0;
+        /* CEA-708 relative positioning uses 0-99% range */
+        p_region->origin.x = p_w->i_anchor_offset_h / CEA708_REL_POS_MAX;
 
         switch (p_w->anchor_point) {
         case CEA708_ANCHOR_TOP_LEFT:
         case CEA708_ANCHOR_TOP_CENTER:
         case CEA708_ANCHOR_TOP_RIGHT:
-            p_region->origin.y = p_w->i_anchor_offset_v / 100.0;
+            p_region->origin.y = p_w->i_anchor_offset_v / CEA708_REL_POS_MAX;
             break;
         case CEA708_ANCHOR_BOTTOM_LEFT:
         case CEA708_ANCHOR_BOTTOM_CENTER:
         case CEA708_ANCHOR_BOTTOM_RIGHT:
-            p_region->origin.y = 1.0 - (p_w->i_anchor_offset_v / 100.0);
+            p_region->origin.y = 1.0f - ( p_w->i_anchor_offset_v / CEA708_REL_POS_MAX );
             break;
+        case CEA708_ANCHOR_CENTER_LEFT:
+        case CEA708_ANCHOR_CENTER_CENTER:
+        case CEA708_ANCHOR_CENTER_RIGHT:
         default:
-            /* FIXME: for CENTER vertical justified, just position as top */
-            p_region->origin.y = p_w->i_anchor_offset_v / 100.0;
+        {
+            /* Center anchors use middle 50% of screen */
+            float f_center_offset = p_w->i_anchor_offset_v / CEA708_REL_POS_MAX;
+            p_region->origin.y = CEA708_CENTER_ANCHOR_START + ( f_center_offset * CEA708_CENTER_ANCHOR_RANGE );
             break;
+        }
         }
     }
     else
     {
-        p_region->origin.x = (float)p_w->i_anchor_offset_h / CEA708_SCREEN_COLS_169;
-        p_region->origin.y = (float)p_w->i_anchor_offset_v /
-                             (CEA708_SCREEN_ROWS * CEA708_FONT_TO_LINE_HEIGHT_RATIO);
+        int i_grid_cols;
+        if( p_dec->fmt_out.video.i_visible_width > 0 && p_dec->fmt_out.video.i_visible_height > 0 )
+        {
+            unsigned dar_num = p_dec->fmt_out.video.i_visible_width * p_dec->fmt_out.video.i_sar_num;
+            unsigned dar_den = p_dec->fmt_out.video.i_visible_height * p_dec->fmt_out.video.i_sar_den;
+            if( dar_num * 3 < dar_den * 5 )
+            {
+                i_grid_cols = CEA708_SCREEN_COLS_43;
+            }
+            else
+            {
+                i_grid_cols = CEA708_SCREEN_COLS_169;
+                p_region->flags |= UPDT_REGION_USES_16_9_GRID;
+            }
+        }
+        else
+        {
+            i_grid_cols = CEA708_SCREEN_COLS_169;
+            p_region->flags |= UPDT_REGION_USES_16_9_GRID;
+        }
+        p_region->origin.x = (float)p_w->i_anchor_offset_h / i_grid_cols;
+        p_region->origin.y = (float)p_w->i_anchor_offset_v / CEA708_SCREEN_ROWS;
     }
-    p_region->flags |= UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO;
+
+    p_region->flags |= UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO|UPDT_REGION_USES_GRID_COORDINATES;
     p_region->b_absolute = false; p_region->b_in_window = false;
 
     if( p_w->i_firstrow <= p_w->i_lastrow )
     {
         p_region->origin.y += p_w->i_firstrow * CEA708_ROW_HEIGHT_STANDARD;
-        /*const uint8_t i_min = CEA708_Window_MinCol( p_w );
-        if( i_min < CEA708_WINDOW_MAX_COLS )
-            p_region->origin.x += (float) i_min / CEA708_WINDOW_MAX_COLS;*/
     }
 
     if( p_w->anchor_point <= CEA708_ANCHOR_BOTTOM_RIGHT )
@@ -1137,7 +1165,7 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
             first = false;
 
             /* Fill region */
-            CEA708SpuConvert( p_w, p_region );
+            CEA708SpuConvert( p_w, p_region, p_cea708->p_dec );
         }
     }
 
