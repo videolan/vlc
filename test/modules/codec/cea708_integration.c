@@ -152,15 +152,22 @@ static void test_cea708_subtitle_text_output(void)
     destroy_cea708_decoder_test(dec);
 }
 
-/* Test that substext header definitions are available */
-static void test_substext_header_inclusion(void)
+/* Test substext infrastructure with new flag */
+static void test_substext_infrastructure_with_new_flag(void)
 {
-    test_log("Testing substext header definitions are available\n");
+    test_log("Testing substext infrastructure with new flag\n");
 
-    /* Test that existing flags are properly defined */
+    /* Test that both grid flags are now properly defined */
     assert(UPDT_REGION_USES_GRID_COORDINATES == (1 << 5));
+    assert(UPDT_REGION_USES_16_9_GRID == (1 << 6));
 
-    test_log("Substext flags are properly defined\n");
+    test_log("✓ UPDT_REGION_USES_GRID_COORDINATES exists (0x%02x)\n",
+             UPDT_REGION_USES_GRID_COORDINATES);
+    test_log("✓ UPDT_REGION_USES_16_9_GRID is available (0x%02x)\n",
+             UPDT_REGION_USES_16_9_GRID);
+
+    test_log("✓ Available: UPDT_REGION_USES_16_9_GRID flag infrastructure\n");
+    test_log("  This flag enables dynamic SAR selection for aspect ratio awareness\n");
 }
 
 /* Test CEA-708 with positioning data (will expose positioning issues) */
@@ -205,7 +212,7 @@ int main(void)
     libvlc = libvlc_new(test_defaults_nargs, test_defaults_args);
     assert(libvlc != NULL);
 
-    test_substext_header_inclusion();
+    test_substext_infrastructure_with_new_flag();
     test_cea708_decoder_loading();
     test_cea708_decoder_with_different_formats();
     test_cea708_subtitle_text_output();

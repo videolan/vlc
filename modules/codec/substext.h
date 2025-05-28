@@ -35,6 +35,7 @@ enum substext_updater_region_flags_e
     UPDT_REGION_EXTENT_Y_IS_RATIO      = 1 << 3,
     UPDT_REGION_IGNORE_BACKGROUND      = 1 << 4,
     UPDT_REGION_USES_GRID_COORDINATES  = 1 << 5,
+    UPDT_REGION_USES_16_9_GRID         = 1 << 6,
     UPDT_REGION_FIXED_DONE             = 1 << 31,
 };
 
@@ -144,8 +145,16 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
     if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
     {
-        sar.num = 4;
-        sar.den = 3;
+        if( sys->region.flags & UPDT_REGION_USES_16_9_GRID )
+        {
+            sar.num = 16;
+            sar.den = 9;
+        }
+        else
+        {
+            sar.num = 4;
+            sar.den = 3;
+        }
     }
     else
     {
