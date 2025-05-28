@@ -119,6 +119,22 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_modules_codec_cea708_aspect_ratio',
+    'sources' : files('codec/cea708_aspect_ratio.c'),
+    'suite' : ['modules', 'test_modules'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_modules_codec_cea708_integration',
+    'sources' : files('codec/cea708_integration.c'),
+    'suite' : ['modules', 'test_modules'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
     'name' : 'test_modules_video_output_opengl_filters',
     'sources' : files(
         'video_output/opengl/filters.c',

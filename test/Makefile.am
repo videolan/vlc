@@ -76,6 +76,8 @@ check_PROGRAMS = \
 	test_modules_packetizer_hevc \
 	test_modules_packetizer_mpegvideo \
 	test_modules_codec_hxxx_helper \
+	test_modules_codec_cea708_aspect_ratio \
+	test_modules_codec_cea708_integration \
 	test_modules_keystore \
 	test_modules_demux_libmp4 \
 	test_modules_demux_timestamps \
@@ -364,6 +366,12 @@ test_modules_codec_hxxx_helper_SOURCES = modules/codec/hxxx_helper.c \
                                       ../modules/packetizer/h264_nal.c \
                                       ../modules/packetizer/hevc_nal.c
 test_modules_codec_hxxx_helper_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_modules_codec_cea708_aspect_ratio_SOURCES = modules/codec/cea708_aspect_ratio.c
+test_modules_codec_cea708_aspect_ratio_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_modules_codec_cea708_integration_SOURCES = modules/codec/cea708_integration.c
+test_modules_codec_cea708_integration_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_video_output_opengl_filters_SOURCES = \
 	modules/video_output/opengl/filters.c \
 	../modules/video_output/opengl/filters.c \
