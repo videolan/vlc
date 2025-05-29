@@ -4900,7 +4900,7 @@ AS_IF([test -z "$VLC_COMPILE_HOST"],[
    VLC_COMPILE_HOST=`hostname -f 2>/dev/null || hostname`
 ])
 AC_DEFINE_UNQUOTED([VLC_COMPILE_HOST], "$VLC_COMPILE_HOST", [host which ran configure])
-AC_DEFINE_UNQUOTED([VLC_COMPILER], "`$CC -v 2>&1 | tail -n 1 | sed -e 's/ *$//'`", [compiler])
+AC_DEFINE_UNQUOTED([VLC_COMPILER], "`$CC -v 2>&1 | grep -i 'version ' | tail -n 1 | sed -e 's/ *$//'`", [compiler])
 dnl
 dnl  Handle substvars that use $(top_srcdir)
 dnl
