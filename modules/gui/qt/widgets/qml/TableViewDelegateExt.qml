@@ -249,6 +249,7 @@ T.Control {
                             selected: Qt.binding(() => delegate.selected),
                             containsMouse: Qt.binding(() => delegate.hovered),
                             colorContext: Qt.binding(() => theme),
+                            delegate: delegate
                         }
                     )
                 }

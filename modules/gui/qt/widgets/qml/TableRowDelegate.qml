@@ -29,4 +29,6 @@ Item {
     // so don't mark 'ColorContext' type here
     // see https://bugreports.qt.io/browse/QTBUG-125095
     required property var colorContext
+
+    required property Item delegate
 }
