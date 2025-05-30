@@ -62,6 +62,7 @@
     NSTimeInterval last_bwd_event;
     BOOL just_triggered_next;
     BOOL just_triggered_previous;
+    BOOL _isTimeSliderBeingDragged;
 
     VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
@@ -108,6 +109,7 @@
                              object:nil];
 
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
+    _isTimeSliderBeingDragged = NO;
 
     self.dropView.drawBorder = NO;
 
@@ -356,16 +358,9 @@
     }
 
     switch (NSApp.currentEvent.type) {
-        case NSEventTypeLeftMouseUp:
-            /* Ignore mouse up, as this is a continuous slider and
-             * when the user does a single click to a position on the slider,
-             * the action is called twice, once for the mouse down and once
-             * for the mouse up event. This results in two short seeks one
-             * after another to the same position, which results in weird
-             * audio quirks.
-             */
-            return;
         case NSEventTypeLeftMouseDown:
+            _isTimeSliderBeingDragged = YES;
+            break;
         case NSEventTypeLeftMouseDragged:
         case NSEventTypeScrollWheel:
         {
@@ -374,6 +369,9 @@
             self.timeSlider.floatValue = newPosition;
             break;
         }
+        case NSEventTypeLeftMouseUp:
+            _isTimeSliderBeingDragged = NO;
+            break;
         default:
             return;
     }
@@ -412,6 +410,10 @@
 
 - (void)updateTimeSlider:(NSNotification *)aNotification;
 {
+    if (_isTimeSliderBeingDragged) {
+        return;
+    }
+
     VLCInputItem * const inputItem = _playerController.currentMedia;
 
     const BOOL validInputItem = inputItem != nil;
