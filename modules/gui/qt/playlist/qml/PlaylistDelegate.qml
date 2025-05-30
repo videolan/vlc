@@ -172,19 +172,37 @@ T.Control {
 
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source: delegate.preparsed ? targetSource : ""
+                source: defaultSource
                 visible: !statusIcon.visible
                 asynchronous: true
 
                 readonly property url targetSource: (delegate?.artwork.toString()) ? VLCAccessImage.uri(delegate.artwork) : VLCStyle.noArtAlbumCover
+                readonly property url defaultSource: delegate.preparsed ? targetSource : ""
 
                 onStatusChanged: {
                     if (source !== VLCStyle.noArtAlbumCover && status === Image.Error)
                         source = VLCStyle.noArtAlbumCover
                 }
 
+                function resetSource() {
+                    artwork.source = Qt.binding(() => { return artwork.defaultSource })
+                    artworkTimer.running = Qt.binding(() => { return artworkTimer.defaultRunning })
+                }
+
+                function removeSource() {
+                    artworkTimer.running = false
+                    artwork.source = ""
+                }
+
+                Component.onCompleted: {
+                    delegate.ListView.reused.connect(artwork.resetSource)
+                    delegate.ListView.pooled.connect(artwork.removeSource)
+                }
+
                 Timer {
-                    running: (artwork.status === Image.Null)
+                    id: artworkTimer
+                    running: defaultRunning
+                    readonly property bool defaultRunning: (artwork.status === Image.Null)
                     interval: VLCStyle.duration_long
                     onTriggered: {
                         // Remove the preparse guard, enough time has passed:
