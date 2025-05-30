@@ -653,6 +653,8 @@ FocusScope {
         item.z = _indexToZ(id)
         item.visible = true
 
+        item.GridView.reused()
+
         _setItem(id, item)
 
         return item
@@ -972,6 +974,7 @@ FocusScope {
                     if (_shouldDelayRemove(item)) {
                         _delayRemove(i, item)
                     } else if (root.reuseItems) {
+                        item.GridView.pooled()
                         item.visible = false
                         root._unusedItemList.push(item)
                     } else {
