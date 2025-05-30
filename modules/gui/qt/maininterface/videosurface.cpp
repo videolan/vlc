@@ -234,14 +234,17 @@ void VideoSurface::synchronize()
     QSizeF size;
     QPointF position;
 
-    if (QThread::currentThread() == thread())
+    static const bool isObjectThread = QThread::currentThread() == thread();
+    if (isObjectThread)
     {
+        assert(QThread::currentThread() == thread());
         // Item's thread (GUI thread):
         size = this->size();
         position = this->mapToScene(QPointF(0,0));
     }
     else
     {
+        assert(QThread::currentThread() != thread());
         // Render thread:
         size = renderSize();
         position = renderPosition();
