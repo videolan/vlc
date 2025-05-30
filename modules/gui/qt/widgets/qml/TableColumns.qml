@@ -117,6 +117,12 @@ Item {
                 radius: root.titleCover_radius
                 color: titleDel.colorContext.bg.secondary
 
+                Component.onCompleted: {
+                    console.assert(titleDel.delegate)
+                    titleDel.delegate.ListView.reused.connect(cover.reinitialize)
+                    titleDel.delegate.ListView.pooled.connect(cover.releaseResources)
+                }
+
                 imageOverlay: Item {
                     width: cover.width
                     height: cover.height
