@@ -45,10 +45,10 @@ extern NSString *VLCMediaSourcePreparsingEnded;
 - (instancetype)initWithLocalFolderMrl:(NSString *)mrl
                      andPreparser:(vlc_preparser_t *)p_preparser;
 
-- (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
+- (nullable NSError *)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
 - (void)clearChildNodesForNode:(input_item_node_t*)inputNode;
-- (void)generateChildNodesForDirectoryNode:(input_item_node_t*)directoryNode
-                                   withUrl:(NSURL*)directoryUrl;
+- (nullable NSError *)generateChildNodesForDirectoryNode:(input_item_node_t *)directoryNode
+                                                 withUrl:(NSURL *)directoryUrl;
 
 @property (nonatomic, readonly) NSString *mediaSourceDescription;
 @property (nonatomic, readonly) VLCInputNode *rootNode;

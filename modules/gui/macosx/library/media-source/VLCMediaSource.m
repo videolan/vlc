@@ -290,19 +290,16 @@ static const char *const myFoldersDescription = "My Folders";
     }
 }
 
-- (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode
+- (NSError *)preparseInputNodeWithinTree:(VLCInputNode *)inputNode
 {
-    if(!inputNode) {
-        NSLog(@"Could not preparse input node, is null.");
-        return;
-    }
+    NSParameterAssert(inputNode != nil);
 
     if (_p_mediaSource->description == localDevicesDescription) {
         [self generateLocalDevicesTree];
     }
 
-    if (inputNode == nil || inputNode.inputItem == nil) {
-        return;
+    if (inputNode.inputItem == nil) {
+        return nil;
     }
 
     if (inputNode.inputItem.inputType == ITEM_TYPE_DIRECTORY &&
@@ -310,12 +307,12 @@ static const char *const myFoldersDescription = "My Folders";
         input_item_node_t *vlcInputNode = inputNode.vlcInputItemNode;
         NSURL *dirUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
 
-        [self generateChildNodesForDirectoryNode:vlcInputNode withUrl:dirUrl];
-        return;
+        return [self generateChildNodesForDirectoryNode:vlcInputNode withUrl:dirUrl];
     }
 
     vlc_media_tree_Preparse(_p_mediaSource->tree, _p_preparser,
                             inputNode.inputItem.vlcInputItem);
+    return nil;
 }
 
 - (void)clearChildNodesForNode:(nonnull input_item_node_t*)inputNode
@@ -409,13 +406,10 @@ static const char *const myFoldersDescription = "My Folders";
     });
 }
 
-- (void)generateChildNodesForDirectoryNode:(input_item_node_t *)directoryNode
-                                   withUrl:(NSURL *)directoryUrl
+- (NSError *)generateChildNodesForDirectoryNode:(input_item_node_t *)directoryNode
+                                        withUrl:(NSURL *)directoryUrl
 {
-    if (directoryNode == NULL || directoryUrl == nil) {
-        return;
-    }
-
+    NSParameterAssert(directoryNode != NULL && directoryUrl != nil);
     if (self.willStartGeneratingChildNodesForNodeHandler) {
         self.willStartGeneratingChildNodesForNodeHandler(directoryNode);
     }
@@ -437,9 +431,9 @@ static const char *const myFoldersDescription = "My Folders";
                                                        options:options
                                                          error:&error];
 
-    if (children == nil || children.count == 0 || error) {
+    if (error) {
         NSLog(@"Failed to get directories: %@.", error);
-        return;
+        return error;
     }
 
     children = [children sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
@@ -491,6 +485,8 @@ static const char *const myFoldersDescription = "My Folders";
     if (self.didFinishGeneratingChildNodesForNodeHandler) {
         self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
     }
+
+    return nil;
 }
 
 - (NSString *)mediaSourceDescription
