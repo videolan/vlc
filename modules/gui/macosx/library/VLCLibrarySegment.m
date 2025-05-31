@@ -69,7 +69,10 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
     for (VLCMediaSource * const mediaSource in localMediaSources) {
         VLCInputNode * const rootNode = mediaSource.rootNode;
-        [mediaSource preparseInputNodeWithinTree:rootNode];
+        NSError * const error = [mediaSource preparseInputNodeWithinTree:rootNode];
+        if (error)
+            continue;
+        
 
         if (rootNode.children != nil) {
             for (VLCInputNode * const node in rootNode.children) {

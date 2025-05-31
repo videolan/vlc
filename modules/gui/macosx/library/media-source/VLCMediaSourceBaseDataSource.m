@@ -167,8 +167,11 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 
     for (VLCMediaSource * const mediaSource in mediaSources) {
         VLCInputNode * const rootNode = [mediaSource rootNode];
-        [mediaSource preparseInputNodeWithinTree:rootNode];
-        [self.navigationStack installHandlersOnMediaSource:mediaSource];
+        if (rootNode == nil)
+            continue;
+        NSError * const error = [mediaSource preparseInputNodeWithinTree:rootNode];
+        if (error == nil)
+            [self.navigationStack installHandlersOnMediaSource:mediaSource];
     }
 
     _mediaSources = mediaSources;
@@ -476,7 +479,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
         return;
     }
 
-    [mediaSource preparseInputNodeWithinTree:node];
+    NSError * const error = [mediaSource preparseInputNodeWithinTree:node];
+    if (error) {
+        return;
+    }
     
     VLCMediaSourceDataSource * const newChildDataSource = [[VLCMediaSourceDataSource alloc] init];
     

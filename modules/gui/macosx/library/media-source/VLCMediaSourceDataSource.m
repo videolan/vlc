@@ -94,7 +94,12 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
     if (self.parentBaseDataSource.mediaSourceMode == VLCMediaSourceModeLAN) {
         NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
-        [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode withUrl:nodeUrl];
+        NSError * const error =
+            [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
+                                                                  withUrl:nodeUrl];
+        if (error) {
+            return;
+        }
 
         const __weak typeof(self) weakSelf = self;
         self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
@@ -266,8 +271,12 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
                 NSURL * const inputNodeUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
                 input_item_node_t * const p_inputNode = inputNode.vlcInputItemNode;
-                [self.displayedMediaSource generateChildNodesForDirectoryNode:p_inputNode
-                                                                      withUrl:inputNodeUrl];
+                NSError * const error =
+                    [self.displayedMediaSource generateChildNodesForDirectoryNode:p_inputNode
+                                                                          withUrl:inputNodeUrl];
+                if (error)
+                    return;
+
                 dispatch_async(dispatch_get_main_queue(), ^{
                     cellView.textField.stringValue =
                         [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
@@ -398,7 +407,10 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
         [self.pathControl appendInputNodePathControlItem:nodePathItem];
 
-        [self.displayedMediaSource preparseInputNodeWithinTree:node];
+        NSError * const error = [self.displayedMediaSource preparseInputNodeWithinTree:node];
+        if (error) {
+            return;
+        }
         self.nodeToDisplay = node;
 
         [self.navigationStack appendCurrentLibraryState];
