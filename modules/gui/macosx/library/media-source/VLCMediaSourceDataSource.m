@@ -98,6 +98,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
             [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
                                                                   withUrl:nodeUrl];
         if (error) {
+            NSAlert * const alert = [NSAlert alertWithError:error];
+            alert.alertStyle = NSAlertStyleCritical;
+            [alert runModal];
             return;
         }
 
@@ -409,6 +412,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
         NSError * const error = [self.displayedMediaSource preparseInputNodeWithinTree:node];
         if (error) {
+            NSAlert * const alert = [NSAlert alertWithError:error];
+            alert.alertStyle = NSAlertStyleCritical;
+            [alert runModal];
             return;
         }
         self.nodeToDisplay = node;

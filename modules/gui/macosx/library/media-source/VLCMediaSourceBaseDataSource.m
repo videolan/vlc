@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCMediaSourceBaseDataSource.h"
+#include <AppKit/AppKit.h>
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSourceProvider.h"
@@ -481,6 +482,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     NSError * const error = [mediaSource preparseInputNodeWithinTree:node];
     if (error) {
+        NSAlert * const alert = [NSAlert alertWithError:error];
+        alert.alertStyle = NSAlertStyleCritical;
+        [alert runModal];
         return;
     }
     
