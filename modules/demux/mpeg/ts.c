@@ -38,6 +38,7 @@
 #include "ts_pid.h"
 #include "ts_streams.h"
 #include "ts_streams_private.h"
+#include "ts_packet.h"
 #include "ts_pes.h"
 #include "ts_psi.h"
 #include "ts_si.h"
@@ -182,11 +183,6 @@ static bool PIDReferencedByProgram( const ts_pmt_t *, uint16_t );
 void UpdatePESFilters( demux_t *p_demux, bool b_all );
 static inline void FlushESBuffer( ts_stream_t *p_pes );
 static void UpdatePIDScrambledState( demux_t *p_demux, ts_pid_t *p_pid, bool );
-static inline int PIDGet( block_t *p )
-{
-    return ( (p->p_buffer[1]&0x1f)<<8 )|p->p_buffer[2];
-}
-static ts_90khz_t GetPCR( const block_t * );
 
 static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, int * );
 static bool GatherSectionsData( demux_t *p_demux, ts_pid_t *, block_t *, size_t );
@@ -198,12 +194,6 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *, vlc_tick_t time );
 static void ReadyQueuesPostSeek( demux_t *p_demux );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, ts_90khz_t );
 static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
-
-#define TS_PACKET_SIZE_188 188
-#define TS_PACKET_SIZE_192 192
-#define TS_PACKET_SIZE_204 204
-#define TS_PACKET_SIZE_MAX 204
-#define TS_HEADER_SIZE 4
 
 #define PROBE_CHUNK_COUNT 500
 #define PROBE_MAX         (PROBE_CHUNK_COUNT * 10)
@@ -1871,32 +1861,6 @@ static block_t* ReadTSPacket( demux_t *p_demux )
         }
     }
     return p_pkt;
-}
-
-static ts_90khz_t GetPCR( const block_t *p_pkt )
-{
-    const uint8_t *p = p_pkt->p_buffer;
-
-    ts_90khz_t i_pcr = TS_90KHZ_INVALID;
-
-    if(unlikely(p_pkt->i_buffer < 12))
-        return i_pcr;
-
-    const uint8_t i_adaption = p[3] & 0x30;
-
-    if( ( ( i_adaption == 0x30 && p[4] <= 182 ) ||   /* adaptation 0b11 */
-          ( i_adaption == 0x20 && p[4] == 183 ) ) && /* adaptation 0b10 */
-        ( p[4] >= 7 )  &&
-        ( p[5] & 0x10 ) ) /* PCR carry flag */
-    {
-        /* PCR is 33 bits */
-        i_pcr = ( (ts_90khz_t)p[6] << 25 ) |
-                ( (ts_90khz_t)p[7] << 17 ) |
-                ( (ts_90khz_t)p[8] << 9 ) |
-                ( (ts_90khz_t)p[9] << 1 ) |
-                ( (ts_90khz_t)p[10] >> 7 );
-    }
-    return i_pcr;
 }
 
 static inline void UpdateESScrambledState( es_out_t *out, const ts_es_t *p_es, bool b_scrambled )
