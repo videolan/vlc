@@ -303,6 +303,8 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
         const uint8_t *cc = &p_src[5];
         int i;
 
+#define CC_ALIGNMENT_TEST   (0x7f)
+
         if( i_src < 4+1+6*i_count_cc2 - ( b_truncate ? 3 : 0) )
             return;
         for( i = 0; i < i_count_cc2; i++ )
@@ -314,7 +316,7 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
 
                 if( b_truncate && i == i_count_cc2 - 1 && j == 1 )
                     break;
-                if( (cc[0] & 0xfe) != 0xfe )
+                if( (cc[0] >> 1) != CC_ALIGNMENT_TEST )
                     continue;
                 if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                     continue;
