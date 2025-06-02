@@ -210,8 +210,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
         if( memcmp( p_header, startcode, 3 ) ||
            ( (p_header[3] & 0xB0) != 0xB0 &&
             !(p_header[3] >= 0xC0 && p_header[3] <= 0xEF) &&
-              p_header[3] != PS_STREAM_ID_EXTENDED &&
-              p_header[3] != PS_STREAM_ID_DIRECTORY ) )
+              p_header[3] != STREAM_ID_EXTENDED_STREAM_ID &&
+              p_header[3] != STREAM_ID_PROGRAM_STREAM_DIRECTORY ) )
             return VLC_EGENERIC;
 
         ssize_t i_pessize = ps_pkt_size( p_header, 16 );
@@ -480,7 +480,7 @@ static int Demux( demux_t *p_demux )
     switch( i_stream_id )
     {
     case PS_STREAM_ID_END_STREAM:
-    case PS_STREAM_ID_PADDING:
+    case STREAM_ID_PADDING:
         block_Release( p_pkt );
         break;
 
@@ -507,7 +507,7 @@ static int Demux( demux_t *p_demux )
         block_Release( p_pkt );
         break;
 
-    case PS_STREAM_ID_MAP:
+    case STREAM_ID_PROGRAM_STREAM_MAP:
         if( p_sys->psm.i_version == 0xFF )
             msg_Dbg( p_demux, "contains a PSM");
 
@@ -525,8 +525,8 @@ static int Demux( demux_t *p_demux )
             break;
         }
         /* fallthrough */
-    case PS_STREAM_ID_PRIVATE_STREAM1:
-    case PS_STREAM_ID_EXTENDED:
+    case STREAM_ID_PRIVATE_STREAM_1:
+    case STREAM_ID_EXTENDED_STREAM_ID:
         {
             int i_id = ps_pkt_id( p_pkt->p_buffer, p_pkt->i_buffer );
             /* Small heuristic to improve MLP detection from AOB */

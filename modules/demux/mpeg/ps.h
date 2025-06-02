@@ -27,11 +27,6 @@
 #define PS_STREAM_ID_END_STREAM       0xB9
 #define PS_STREAM_ID_PACK_HEADER      0xBA
 #define PS_STREAM_ID_SYSTEM_HEADER    0xBB
-#define PS_STREAM_ID_MAP              0xBC
-#define PS_STREAM_ID_PRIVATE_STREAM1  0xBD
-#define PS_STREAM_ID_PADDING          0xBE
-#define PS_STREAM_ID_EXTENDED         0xFD
-#define PS_STREAM_ID_DIRECTORY        0xFF
 
 /* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)
@@ -435,8 +430,8 @@ static inline int ps_pkt_size( const uint8_t *p, int i_peek )
             break;
 
         case PS_STREAM_ID_SYSTEM_HEADER:
-        case PS_STREAM_ID_MAP:
-        case PS_STREAM_ID_DIRECTORY:
+        case STREAM_ID_PROGRAM_STREAM_MAP:
+        case STREAM_ID_PROGRAM_STREAM_DIRECTORY:
         default:
             if( i_peek >= 6 )
                 return 6 + ((p[4]<<8) | p[5] );
@@ -487,7 +482,7 @@ static inline int ps_pkt_parse_system( const uint8_t *p_pkt, size_t i_pkt,
             case 0xB7:
                 if( p_pktend - p < 6 )
                     return VLC_EGENERIC;
-                i_id = ((int)PS_STREAM_ID_EXTENDED << 8) | (p[2] & 0x7F);
+                i_id = ((int)STREAM_ID_EXTENDED_STREAM_ID << 8) | (p[2] & 0x7F);
                 p += 6;
                 break;
             default:
@@ -643,7 +638,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm,
     // Demux() checks that we have at least 4 bytes, but we need
     // at least 10 to read up to the info_length field
     assert(i_pkt >= 4);
-    if( !p_psm || i_pkt < 10 || p_buffer[3] != PS_STREAM_ID_MAP)
+    if( !p_psm || i_pkt < 10 || p_buffer[3] != STREAM_ID_PROGRAM_STREAM_MAP)
         return VLC_EGENERIC;
 
     i_length = GetWBE(&p_buffer[4]) + 6;
@@ -689,7 +684,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm,
          *      descriptor 0x5 with format_identifier == 0x56432D31 (VC-1)
          *      (I need a sample that use PSM with VC-1) */
 
-        if( p_es->i_id == PS_STREAM_ID_EXTENDED && b_single_extension == 0 )
+        if( p_es->i_id == STREAM_ID_EXTENDED_STREAM_ID && b_single_extension == 0 )
         {
             if( i_info_length < 3 )
                 break;
