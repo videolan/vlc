@@ -309,12 +309,12 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
             return;
         for( i = 0; i < 2*i_count_cc2 + b_truncate; i++, cc+=3 )
         {
-            if( (cc[0] >> 1) != CC_ALIGNMENT_TEST )
-                continue;
-
-            const bool even_field = (cc[0] & 0x01) ? 0 : 1;
-            if (!cc_AppendData( c, CC_PKT_BYTE0(even_field), &cc[1] ))
-                continue;
+            if( (cc[0] >> 1) == CC_ALIGNMENT_TEST )
+            {
+                const bool even_field = (cc[0] & 0x01) ? 0 : 1;
+                if (!cc_AppendData( c, CC_PKT_BYTE0(even_field), &cc[1] ))
+                    break;
+            }
         }
         c->b_reorder = false;
     }
