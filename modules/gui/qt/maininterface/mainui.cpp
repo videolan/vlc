@@ -93,6 +93,26 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(m_interfaceWindow);
 
     registerQMLTypes();
+
+    // FIXME: Since Qt 6.6, Qt follows a different approach for scrolling. This new approach has
+    //        caused a lot of frustration (QTBUG-116388, QTBUG-129948, QTBUG-120038). However,
+    //        the previous scrolling behavior was not perfect either, so we have not been opting
+    //        in to use the previous behavior. That being said, the new approach broke scrolling
+    //        with views that has sections completely, so we don't have any option besides using
+    //        the previous scrolling implementation. The new approach (b1766d9), `Flickable:
+    //        Proportional wheel scrolling if deceleration is large` tells that the previous
+    //        deceleration value was 5000. In this case, we use 10000 instead to not make scrolling
+    //        as loose as it was before (which was apparently the main reason of coming up with the
+    //        new approach). Setting this environment variable to any value lower than 15000
+    //        reportedly (and evidently) brings back the old behavior, and does not continue
+    //        using the new approach with the deceleration set (which is what we want to fix
+    //        scrolling when there are sections).
+    if constexpr (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+    {
+        const auto envFlickableWheelDeceleration = "QT_QUICK_FLICKABLE_WHEEL_DECELERATION";
+        if (qEnvironmentVariableIsEmpty(envFlickableWheelDeceleration))
+            qputenv(envFlickableWheelDeceleration, QByteArrayLiteral("10000"));
+    }
 }
 
 MainUI::~MainUI()
