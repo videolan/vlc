@@ -299,14 +299,14 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
          */
         const int b_truncate = p_src[4] & 0x01;
         const int i_field_first = (p_src[4] & 0x80) ? 0 : 1;
-        const int i_count_cc2 = ((p_src[4] >> 1) & 0x1f) + b_truncate;
+        const int i_count_cc2 = ((p_src[4] >> 1) & 0x1f);
         const uint8_t *cc = &p_src[5];
         i_src -= 5;
         int i;
 
 #define CC_ALIGNMENT_TEST   (0x7f)
 
-        if( i_src < 3*(2*i_count_cc2 - b_truncate)) )
+        if( i_src < 3*(2*i_count_cc2 + b_truncate) )
             return;
         for( i = 0; i < i_count_cc2; i++ )
         {
@@ -315,13 +315,19 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
             {
                 const int i_field = j == i_field_first ? 0 : 1;
 
-                if( b_truncate && i == i_count_cc2 - 1 && j == 1 )
-                    break;
                 if( (cc[0] >> 1) != CC_ALIGNMENT_TEST )
                     continue;
                 if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                     continue;
 
+                cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[1] );
+            }
+        }
+        if( b_truncate )
+        {
+            if( (cc[0] >> 1) == CC_ALIGNMENT_TEST && c->i_data + 3 <= CC_MAX_DATA_SIZE )
+            {
+                const int i_field = 0 == odd_field_first ? 0 : 1;
                 cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[1] );
             }
         }
