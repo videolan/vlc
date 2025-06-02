@@ -313,22 +313,21 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
             int j;
             for( j = 0; j < 2; j++, cc += 3 )
             {
-                const int i_field = j == i_field_first ? 0 : 1;
-
                 if( (cc[0] >> 1) != CC_ALIGNMENT_TEST )
                     continue;
                 if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                     continue;
 
-                cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[1] );
+                const bool even_field = (cc[0] & 0x01) ? 0 : 1;
+                cc_AppendData( c, CC_PKT_BYTE0(even_field), &cc[1] );
             }
         }
         if( b_truncate )
         {
             if( (cc[0] >> 1) == CC_ALIGNMENT_TEST && c->i_data + 3 <= CC_MAX_DATA_SIZE )
             {
-                const int i_field = 0 == odd_field_first ? 0 : 1;
-                cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[1] );
+                const bool even_field = (cc[0] & 0x01) ? 0 : 1;
+                cc_AppendData( c, CC_PKT_BYTE0(even_field), &cc[1] );
             }
         }
         c->b_reorder = false;
