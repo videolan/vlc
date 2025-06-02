@@ -298,7 +298,6 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
          *              u8 cc_data_2
          */
         const int b_truncate = p_src[4] & 0x01;
-        const int i_field_first = (p_src[4] & 0x80) ? 0 : 1;
         const int i_count_cc2 = ((p_src[4] >> 1) & 0x1f);
         const uint8_t *cc = &p_src[5];
         i_src -= 5;
