@@ -78,8 +78,6 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
     if( i_data < 9 )
         return;
 
-    if( p_pes[0] != 0 || p_pes[1] != 0 || p_pes[2] != 1 )
-        return;
 
     ts_pes_header_t pesh;
     ts_pes_header_init( &pesh );

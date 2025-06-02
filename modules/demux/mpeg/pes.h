@@ -100,6 +100,9 @@ static int ParsePESHeader( struct vlc_logger *p_logger, const uint8_t *p_header,
     if ( i_header < 9 )
         return VLC_EGENERIC;
 
+    if( p_header[0] != 0 || p_header[1] != 0 || p_header[2] != 1 )
+        return VLC_EGENERIC;
+
     h->i_stream_id = p_header[3];
 
     switch( p_header[3] )

@@ -2329,9 +2329,6 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, vlc_tick_t i_pcr)
         uint8_t header[34];
         const int i_max = block_ChainExtract( p_pes->gather.p_data, header, 34 );
 
-        if( i_max < 6 || header[0] != 0 || header[1] != 0 || header[2] != 1 )
-            continue;
-
         ts_pes_header_t pesh;
         ts_pes_header_init( &pesh );
 
