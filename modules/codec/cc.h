@@ -194,8 +194,11 @@ static inline void cc_ProbeCEA708( cc_data_t *c, uint8_t i_field, const uint8_t 
     cc_ProbeCEA708OneByte( c, false, cc[1] );
 }
 
-static inline void cc_AppendData( cc_data_t *c, uint8_t cc_preamble, const uint8_t cc[2] )
+static inline bool cc_AppendData( cc_data_t *c, uint8_t cc_preamble, const uint8_t cc[2] )
 {
+    if (c->i_data + 3 > ARRAY_SIZE(c->p_data))
+        return false;
+
     const uint8_t i_field = cc_preamble & 0x03;
     if( i_field == 0 || i_field == 1 ) /* NTSC_CC_FIELD_1 NTSC_CC_FIELD_2 */
     {
@@ -211,6 +214,7 @@ static inline void cc_AppendData( cc_data_t *c, uint8_t cc_preamble, const uint8
     c->p_data[c->i_data++] = cc_preamble;
     c->p_data[c->i_data++] = cc[0];
     c->p_data[c->i_data++] = cc[1];
+    return true;
 }
 
 static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_type,
