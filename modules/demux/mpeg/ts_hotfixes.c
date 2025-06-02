@@ -44,40 +44,22 @@
 #include "ts_streams_private.h"
 #include "ts.h"
 #include "ts_hotfixes.h"
+#include "ts_packet.h"
 
 #include <assert.h>
 
-void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_t i_data, bool b_adaptfield )
+void ProbePES( demux_t *p_demux, ts_pid_t *pid, const block_t *p_pkt )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    const uint8_t *p_pes = p_pesstart;
 
-    if( b_adaptfield )
-    {
-        if ( i_data < 2 )
-            return;
+    unsigned i_skip = PKTHeaderAndAFSize( p_pkt );
+    ts_90khz_t pktpcr = GetPCR( p_pkt );
 
-        uint8_t len = *p_pes;
-        p_pes++; i_data--;
+    if( pktpcr != TS_90KHZ_INVALID )
+        pid->probed.i_pcr_count++;
 
-        if(len == 0)
-        {
-            p_pes++; i_data--;/* stuffing */
-        }
-        else
-        {
-            if( i_data < len )
-                return;
-            if( len >= 7 && (p_pes[0] & 0x10) )
-                pid->probed.i_pcr_count++;
-            p_pes += len;
-            i_data -= len;
-        }
-    }
-
-    if( i_data < 9 )
-        return;
-
+    size_t i_data = p_pkt->i_buffer - i_skip;
+    const uint8_t *p_pes = &p_pkt->p_buffer[i_skip];
 
     ts_pes_header_t pesh;
     ts_pes_header_init( &pesh );

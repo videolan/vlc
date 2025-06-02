@@ -21,7 +21,7 @@
 
 #define MIN_PAT_INTERVAL VLC_TICK_FROM_SEC(1) // DVB is 500ms
 
-void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_t i_data, bool b_adaptfield );
+void ProbePES(demux_t *p_demux, ts_pid_t *pid, const block_t * );
 void MissingPATPMTFixup( demux_t *p_demux );
 
 #endif

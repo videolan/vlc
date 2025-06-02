@@ -697,8 +697,7 @@ static int Demux( demux_t *p_demux )
             (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
             (p_pkt->p_buffer[3] & 0xD0) == 0x10 )  /* Has payload but is not encrypted */
         {
-            ProbePES( p_demux, p_pid, p_pkt->p_buffer + TS_HEADER_SIZE,
-                      p_pkt->i_buffer - TS_HEADER_SIZE, p_pkt->p_buffer[3] & 0x20 /* Adaptation field */);
+            ProbePES( p_demux, p_pid, p_pkt );
         }
 
         switch( p_pid->type )
