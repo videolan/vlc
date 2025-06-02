@@ -224,4 +224,13 @@ Loader {
 
         sourceComponent: emptyLabel
     }
+
+    // The encapsulating Loader is a focus scope. If it has active focus,
+    // is there any reason why its loaded item would not have focus?
+    Binding {
+        target: root.currentItem
+        when: root.activeFocus
+        property: "focus"
+        value: true
+    }
 }
