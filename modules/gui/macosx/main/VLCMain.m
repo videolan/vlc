@@ -288,17 +288,21 @@ static VLCMain *sharedInstance = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-    _metalDevice = MTLCreateSystemDefaultDevice();
-    NSString * const libraryPath =
-        [NSBundle.mainBundle pathForResource:@"Shaders" ofType:@"metallib"];
-    if (libraryPath) {
-        NSError *error = nil;
-        _metalLibrary = [_metalDevice newLibraryWithFile:libraryPath error:&error];
-        if (!_metalLibrary) {
-            NSLog(@"Error creating Metal library: %@", error);
+    // Only Metal shader in use at the moment is for holiday theming, so only load during this time.
+    // Change this if you are going to add new shaders!
+    if (((VLCApplication *)NSApplication.sharedApplication).winterHolidaysTheming) {
+        _metalDevice = MTLCreateSystemDefaultDevice();
+        NSString * const libraryPath =
+            [NSBundle.mainBundle pathForResource:@"Shaders" ofType:@"metallib"];
+        if (libraryPath) {
+            NSError *error = nil;
+            _metalLibrary = [_metalDevice newLibraryWithFile:libraryPath error:&error];
+            if (!_metalLibrary) {
+                NSLog(@"Error creating Metal library: %@", error);
+            }
+        } else {
+            NSLog(@"Error: Could not find Shaders.metallib in the bundle.");
         }
-    } else {
-        NSLog(@"Error: Could not find Shaders.metallib in the bundle.");
     }
 
     _clickerManager = [[VLCClickerManager alloc] init];
