@@ -57,7 +57,7 @@ T.Pane {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-
+    Navigation.parentItem: view
     Navigation.navigable: button.visible
 
     Component.onCompleted: {
