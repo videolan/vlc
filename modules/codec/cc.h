@@ -233,11 +233,9 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
     {
         for( int i = 0; i + 2 < i_src; i += 3 )
         {
-            if( c->i_data + 3 > CC_MAX_DATA_SIZE )
-                break;
-
             const uint8_t *cc = &p_src[i];
-            cc_AppendData( c, cc[0], &cc[1] );
+            if (!cc_AppendData( c, cc[0], &cc[1] ))
+                break;
         }
         c->b_reorder = true;
     }
@@ -279,10 +277,8 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
 
         for( i = 0; i < i_count_cc; i++, cc += 3 )
         {
-            if( c->i_data + 3 > CC_MAX_DATA_SIZE )
+            if (!cc_AppendData( c, cc[0], &cc[1] ))
                 break;
-
-            cc_AppendData( c, cc[0], &cc[1] );
         }
         c->b_reorder = true;
     }
@@ -318,16 +314,15 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
             {
                 if( (cc[0] >> 1) != CC_ALIGNMENT_TEST )
                     continue;
-                if( c->i_data + 3 > CC_MAX_DATA_SIZE )
-                    continue;
 
                 const bool even_field = (cc[0] & 0x01) ? 0 : 1;
-                cc_AppendData( c, CC_PKT_BYTE0(even_field), &cc[1] );
+                if (!cc_AppendData( c, CC_PKT_BYTE0(even_field), &cc[1] ))
+                    continue;
             }
         }
         if( b_truncate )
         {
-            if( (cc[0] >> 1) == CC_ALIGNMENT_TEST && c->i_data + 3 <= CC_MAX_DATA_SIZE )
+            if( (cc[0] >> 1) == CC_ALIGNMENT_TEST )
             {
                 const bool even_field = (cc[0] & 0x01) ? 0 : 1;
                 cc_AppendData( c, CC_PKT_BYTE0(even_field), &cc[1] );
@@ -341,10 +336,9 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
         for( int i_cc_count = i_src >> 2; i_cc_count > 0;
              i_cc_count--, cc += 4 )
         {
-            if( c->i_data + 3 > CC_MAX_DATA_SIZE )
-                return;
             uint8_t i_field = (cc[0] & 0x02) >> 1;
-            cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[2] );
+            if (!cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[2] ))
+                return;
         }
         c->b_reorder = false;
     }
@@ -383,15 +377,14 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
 
             if( i_field_idx == 0 )
                 continue;
-            if( c->i_data + 2*3 > CC_MAX_DATA_SIZE )
-                continue;
 
             /* 1,2,3 -> 0,1,0. I.E. repeated field 3 is merged with field 1 */
             int i_field = ((i_field_idx - 1) & 1);
             if (!b_top_field_first)
                 i_field ^= 1;
 
-            cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[0] );
+            if (!cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[0] ))
+                continue;
         }
         c->b_reorder = true;
     }
@@ -449,9 +442,8 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
             cc += 1;
             for( int i = 0; i < i_count_cc; i++, cc += 3 )
             {
-                if( c->i_data + 3 > CC_MAX_DATA_SIZE )
+                if (!cc_AppendData( c, cc[0], &cc[1] ))
                     break;
-                cc_AppendData( c, cc[0], &cc[1] );
             }
         }
         /* remaining data */
