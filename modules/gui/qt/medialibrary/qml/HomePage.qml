@@ -92,8 +92,16 @@ T.Page {
         topMargin: VLCStyle.layoutTitle_top_padding
         bottomMargin: topMargin
 
-        property bool _hasMedias: continueWatchingRow.visible || favoritesRow.visible || newMediaRow.visible
+        property bool _hasMedias: true
 
+        Timer {
+            interval: 50
+            running: true
+
+            onTriggered: {
+                flickable._hasMedias = Qt.binding(() => { return continueWatchingRow.visible || favoritesRow.visible || newMediaRow.visible } )
+            }
+        }
 
         ScrollBar.vertical: Widgets.ScrollBarExt {}
 
