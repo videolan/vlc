@@ -1499,8 +1499,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 region->b_absolute = false;
                 region->b_in_window = cached_is_in_window;
                 region->i_align = cached_alignment;
-                assert(output_last_ptr->place.x == cache_pos->x);
-                assert(output_last_ptr->place.y == cache_pos->y);
+                assert(area.x == cache_pos->x);
+                assert(area.y == cache_pos->y);
             }
 
             vlc_vector_push(&output->regions, output_last_ptr);
