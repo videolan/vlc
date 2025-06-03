@@ -660,7 +660,8 @@ static struct subtitle_position_cache *subtitles_positions_FindRegion(
 static void subtitles_positions_AddRegion(subtitles_positions_vector *subs,
                                           const subpicture_t *subpic,
                                           const subpicture_region_t *region,
-                                          const spu_area_t *area)
+                                          const spu_area_t *area,
+                                          struct subtitle_position_cache *write)
 {
     assert(subpic->b_subtitle);
     if (region->b_absolute)
@@ -668,9 +669,6 @@ static void subtitles_positions_AddRegion(subtitles_positions_vector *subs,
     if (area->width <= 0 && area->height <= 0)
         return;
 
-    // find existing
-    struct subtitle_position_cache *write =
-        subtitles_positions_FindRegion(subs, subpic, region);
     if (write == NULL)
     {
         if (unlikely(!vlc_vector_insert_hole(subs, subs->size, 1)))
@@ -1519,7 +1517,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                     area = spu_area_unscaled(area, scale);
                 if (subtitle_area)
                     subtitle_area[subtitle_area_count++] = area;
-                subtitles_positions_AddRegion(&sys->subs_pos, subpic, region, &area);
+                subtitles_positions_AddRegion(&sys->subs_pos, subpic, region, &area, cache_pos);
             }
         }
     }
