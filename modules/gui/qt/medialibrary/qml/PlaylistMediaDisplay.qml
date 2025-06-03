@@ -129,8 +129,8 @@ FocusScope {
             resetFocus();
         }
 
-        onTransactionPendingChanged: {
-            if (transactionPending) {
+        function onBusynessChanged() {
+            if (transactionPending || loading) {
                 MainCtx.setCursor(root, Qt.BusyCursor)
                 visibilityTimer.start()
             } else {
@@ -138,6 +138,12 @@ FocusScope {
                 progressIndicator.visible = false
                 MainCtx.unsetCursor(root)
             }
+        }
+
+        Component.onCompleted: {
+            model.transactionPendingChanged.connect(model.onBusynessChanged)
+            model.loadingChanged.connect(model.onBusynessChanged)
+            model.onBusynessChanged()
         }
     }
 
@@ -151,7 +157,7 @@ FocusScope {
 
         z: 99
 
-        text: qsTr("Processing...")
+        text: root.model?.transactionPending ? qsTr("Processing...") : ""
 
         Timer {
             id: visibilityTimer
