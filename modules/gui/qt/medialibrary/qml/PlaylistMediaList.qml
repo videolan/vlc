@@ -106,8 +106,8 @@ MainViewLoader {
 
         coverPrefix: (isMusic) ? "playlist-music" : "playlist-video"
 
-        onTransactionPendingChanged: {
-            if (transactionPending) {
+        function onBusynessChanged() {
+            if (transactionPending || loading) {
                 MainCtx.setCursor(root, Qt.BusyCursor)
                 visibilityTimer.start()
             } else {
@@ -115,6 +115,12 @@ MainViewLoader {
                 progressIndicator.visible = false
                 MainCtx.unsetCursor(root)
             }
+        }
+
+        Component.onCompleted: {
+            playlistModel.transactionPendingChanged.connect(playlistModel.onBusynessChanged)
+            playlistModel.loadingChanged.connect(playlistModel.onBusynessChanged)
+            playlistModel.onBusynessChanged()
         }
     }
 
@@ -203,7 +209,7 @@ MainViewLoader {
 
         z: 99
 
-        text: qsTr("Processing...")
+        text: root.model?.transactionPending ? qsTr("Processing...") : ""
 
         Timer {
             id: visibilityTimer
