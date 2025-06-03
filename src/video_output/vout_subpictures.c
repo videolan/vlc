@@ -643,8 +643,6 @@ static struct subtitle_position_cache *subtitles_positions_FindRelativeRegion(
 {
     if (!subpic->b_subtitle)
         return NULL;
-    if (region->b_absolute)
-        return NULL;
 
     struct subtitle_position_cache *pos;
     vlc_vector_foreach_ref(pos, subs)
@@ -1466,22 +1464,24 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             /* Check scale validity */
             assert(scale.w != 0 && scale.h != 0);
 
-            bool cached_is_absolute;
             bool cached_is_in_window;
             int cached_alignment;
             subpicture_t forced_subpic = *subpic;
-            struct subtitle_position_cache *cache_pos =
-                subtitles_positions_FindRelativeRegion(&sys->subs_pos, subpic, region);
-            if (cache_pos != NULL)
+            struct subtitle_position_cache *cache_pos = NULL;
+            if (!region->b_absolute)
             {
-                region->i_x = cache_pos->x;
-                region->i_y = cache_pos->y;
-                cached_is_absolute = region->b_absolute;
-                cached_is_in_window = region->b_in_window;
-                cached_alignment = region->i_align;
-                region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
-                region->b_absolute = true;
-                region->b_in_window = true;
+                cache_pos =
+                    subtitles_positions_FindRelativeRegion(&sys->subs_pos, subpic, region);
+                if (cache_pos != NULL)
+                {
+                    region->i_x = cache_pos->x;
+                    region->i_y = cache_pos->y;
+                    cached_is_in_window = region->b_in_window;
+                    cached_alignment = region->i_align;
+                    region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+                    region->b_absolute = true;
+                    region->b_in_window = true;
+                }
             }
 
             /* */
@@ -1503,7 +1503,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             if (cache_pos != NULL)
             {
-                region->b_absolute = cached_is_absolute;
+                region->b_absolute = false;
                 region->b_in_window = cached_is_in_window;
                 region->i_align = cached_alignment;
                 assert(output_last_ptr->place.x == cache_pos->x);
