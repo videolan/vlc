@@ -21,7 +21,7 @@ import QtQuick.Templates as T
 import QtQuick.Layouts
 import QtQml.Models
 
-
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Style
@@ -91,6 +91,12 @@ T.ItemDelegate {
     Accessible.onPressAction: root.playClicked()
 
     Keys.onMenuPressed: root.contextMenuButtonClicked(picture, root.mapToGlobal(0,0))
+
+    Component.onCompleted: {
+        // Qt Quick AbstractButton sets a cursor for itself, unset it so that if the view has
+        // busy cursor, it is visible over the delegate:
+        MainCtx.unsetCursor(this)
+    }
 
     // States
 

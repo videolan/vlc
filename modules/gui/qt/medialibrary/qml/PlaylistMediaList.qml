@@ -332,12 +332,6 @@ MainViewLoader {
                         })
                     }
                 }
-
-                Component.onCompleted: {
-                    // Qt Quick Button sets a cursor for itself, unset it so that if the view has
-                    // busy cursor, it is visible over the delegate:
-                    MainCtx.unsetCursor(this)
-                }
             }
 
             //-------------------------------------------------------------------------------------
