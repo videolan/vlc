@@ -21,7 +21,7 @@ import QtQml.Models
 import QtQuick.Layouts
 
 import VLC.MediaLibrary
-
+import VLC.MainInterface
 import VLC.Util
 import VLC.Widgets as Widgets
 import VLC.Style
@@ -218,6 +218,18 @@ Widgets.TableViewExt {
             default:
                 section.property = ""
             }
+        }
+
+        onLoadingChanged: {
+            if (loading) {
+                MainCtx.setCursor(root, Qt.BusyCursor)
+            } else {
+                MainCtx.unsetCursor(root)
+            }
+        }
+
+        Component.onCompleted: {
+            loadingChanged() // in case boolean default value is `true`, currently it is not
         }
     }
 
