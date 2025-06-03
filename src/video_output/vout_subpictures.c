@@ -652,14 +652,10 @@ static struct subtitle_position_cache *subtitles_positions_FindRelativeRegion(
 }
 
 static void subtitles_positions_AddRelativeRegion(subtitles_positions_vector *subs,
-                                          const subpicture_t *subpic,
                                           const subpicture_region_t *region,
                                           const spu_area_t *area,
                                           struct subtitle_position_cache *write)
 {
-    assert(subpic->b_subtitle);
-    if (region->b_absolute)
-        return;
     if (area->width <= 0 && area->height <= 0)
         return;
 
@@ -1513,7 +1509,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                     area = spu_area_unscaled(area, scale);
                 if (subtitle_area)
                     subtitle_area[subtitle_area_count++] = area;
-                subtitles_positions_AddRelativeRegion(&sys->subs_pos, subpic, region, &area, cache_pos);
+                subtitles_positions_AddRelativeRegion(&sys->subs_pos, region, &area, cache_pos);
             }
         }
     }
