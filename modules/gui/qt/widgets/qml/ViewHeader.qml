@@ -60,6 +60,12 @@ T.Pane {
 
     Navigation.navigable: button.visible
 
+    Component.onCompleted: {
+        // Qt Quick Pane sets a cursor for itself, unset it so that if the view has
+        // busy cursor, it is visible over the header:
+        MainCtx.unsetCursor(this)
+    }
+
     // Children
 
     readonly property ColorContext colorContext: ColorContext {
