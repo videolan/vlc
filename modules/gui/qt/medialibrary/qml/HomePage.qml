@@ -199,13 +199,6 @@ T.Page {
                 //        is true and items provided by the model change (#29084).
                 reuseItems: !MainCtx.gridView
 
-                onCurrentItemChanged: {
-                    if (currentItem instanceof Widgets.ExpandGridView) {
-                        // FIXME: ExpandGridView applies spacing at the end:
-                        currentItem.verticalSpacing = 0
-                    }
-                }
-
                 Navigation.parentItem: mediaRows
                 Navigation.downAction: function() {
                     if (favoritesRow.visible)
@@ -292,13 +285,6 @@ T.Page {
                 //        is true and items provided by the model change (#29084).
                 reuseItems: !MainCtx.gridView
 
-                onCurrentItemChanged: {
-                    if (currentItem instanceof Widgets.ExpandGridView) {
-                        // FIXME: ExpandGridView applies spacing at the end:
-                        currentItem.verticalSpacing = 0
-                    }
-                }
-
                 Navigation.parentItem: mediaRows
                 Navigation.upAction: function() {
                     if (continueWatchingRow.visible)
@@ -370,13 +356,6 @@ T.Page {
                 // FIXME: `ExpandGridView` causes extreme performance degradation when `reuseItems`
                 //        is true and items provided by the model change (#29084).
                 reuseItems: !MainCtx.gridView
-
-                onCurrentItemChanged: {
-                    if (currentItem instanceof Widgets.ExpandGridView) {
-                        // FIXME: ExpandGridView applies spacing at the end:
-                        currentItem.verticalSpacing = 0
-                    }
-                }
 
                 Navigation.parentItem: mediaRows
                 Navigation.upAction: function() {
