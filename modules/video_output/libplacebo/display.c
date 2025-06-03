@@ -523,30 +523,28 @@ static int SetDisplaySize(vout_display_t *vd, unsigned width_, unsigned height_)
 {
     vout_display_sys_t *sys = vd->sys;
 
-        /* The following resize should be automatic on most platforms but can
-         * trigger bugs on some platform with some drivers, that have been seen
-         * on Windows in particular. Doing it right now enforces the correct
-         * behavior and prevents these bugs.
-         * In addition, platforms like Wayland need the call as the size of the
-         * window is defined by the size of the content, and not the opposite.
-         * The swapchain creation won't be done twice with this call. */
-        {
-            int width = (int) width_;
-            int height = (int) height_;
-            if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
-                return VLC_SUCCESS; // ignore errors
+    /* The following resize should be automatic on most platforms but can
+     * trigger bugs on some platform with some drivers, that have been seen
+     * on Windows in particular. Doing it right now enforces the correct
+     * behavior and prevents these bugs.
+     * In addition, platforms like Wayland need the call as the size of the
+     * window is defined by the size of the content, and not the opposite.
+     * The swapchain creation won't be done twice with this call. */
+    int width = (int) width_;
+    int height = (int) height_;
+    if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
+        return VLC_SUCCESS; // ignore errors
 
-            pl_swapchain_resize(sys->pl->swapchain, &width, &height);
-            vlc_placebo_ReleaseCurrent(sys->pl);
+    pl_swapchain_resize(sys->pl->swapchain, &width, &height);
+    vlc_placebo_ReleaseCurrent(sys->pl);
 
-            /* NOTE: We currently ignore resizing failures that are transient
-             * on X11. Maybe improving resizing might fix that, but we don't
-             * implement reset_pictures anyway.
-            if (width != (int) width_ || height != (int) height_)
-                return VLC_EGENERIC;
-            */
-        }
-        return VLC_SUCCESS;
+    /* NOTE: We currently ignore resizing failures that are transient
+     * on X11. Maybe improving resizing might fix that, but we don't
+     * implement reset_pictures anyway.
+    if (width != (int) width_ || height != (int) height_)
+        return VLC_EGENERIC;
+    */
+    return VLC_SUCCESS;
 }
 
 static int Control(vout_display_t *vd, int query)
