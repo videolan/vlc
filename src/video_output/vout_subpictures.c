@@ -638,12 +638,8 @@ static void subtitles_positions_FinishUpdate(subtitles_positions_vector *subs)
 
 static struct subtitle_position_cache *subtitles_positions_FindRelativeRegion(
     const subtitles_positions_vector *subs,
-    const subpicture_t *subpic,
     const subpicture_region_t *region)
 {
-    if (!subpic->b_subtitle)
-        return NULL;
-
     struct subtitle_position_cache *pos;
     vlc_vector_foreach_ref(pos, subs)
     {
@@ -1468,10 +1464,10 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             int cached_alignment;
             subpicture_t forced_subpic = *subpic;
             struct subtitle_position_cache *cache_pos = NULL;
-            if (!region->b_absolute)
+            if (subpic->b_subtitle && !region->b_absolute)
             {
                 cache_pos =
-                    subtitles_positions_FindRelativeRegion(&sys->subs_pos, subpic, region);
+                    subtitles_positions_FindRelativeRegion(&sys->subs_pos, region);
                 if (cache_pos != NULL)
                 {
                     region->i_x = cache_pos->x;
