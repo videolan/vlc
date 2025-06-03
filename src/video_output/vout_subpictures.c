@@ -636,7 +636,7 @@ static void subtitles_positions_FinishUpdate(subtitles_positions_vector *subs)
     }
 }
 
-static struct subtitle_position_cache *subtitles_positions_FindRegion(
+static struct subtitle_position_cache *subtitles_positions_FindRelativeRegion(
     const subtitles_positions_vector *subs,
     const subpicture_t *subpic,
     const subpicture_region_t *region)
@@ -657,7 +657,7 @@ static struct subtitle_position_cache *subtitles_positions_FindRegion(
     return NULL;
 }
 
-static void subtitles_positions_AddRegion(subtitles_positions_vector *subs,
+static void subtitles_positions_AddRelativeRegion(subtitles_positions_vector *subs,
                                           const subpicture_t *subpic,
                                           const subpicture_region_t *region,
                                           const spu_area_t *area,
@@ -1471,7 +1471,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             int cached_alignment;
             subpicture_t forced_subpic = *subpic;
             struct subtitle_position_cache *cache_pos =
-                subtitles_positions_FindRegion(&sys->subs_pos, subpic, region);
+                subtitles_positions_FindRelativeRegion(&sys->subs_pos, subpic, region);
             if (cache_pos != NULL)
             {
                 region->i_x = cache_pos->x;
@@ -1517,7 +1517,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                     area = spu_area_unscaled(area, scale);
                 if (subtitle_area)
                     subtitle_area[subtitle_area_count++] = area;
-                subtitles_positions_AddRegion(&sys->subs_pos, subpic, region, &area, cache_pos);
+                subtitles_positions_AddRelativeRegion(&sys->subs_pos, subpic, region, &area, cache_pos);
             }
         }
     }
