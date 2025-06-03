@@ -1367,9 +1367,10 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
     subtitles_positions_StartUpdate(&sys->subs_pos);
 
-    subtitle_area = subtitle_area_buffer;
-    if (subtitle_region_count > ARRAY_SIZE(subtitle_area_buffer))
+    if (unlikely(subtitle_region_count > ARRAY_SIZE(subtitle_area_buffer)))
         subtitle_area = calloc(subtitle_region_count, sizeof(*subtitle_area));
+    else
+        subtitle_area = subtitle_area_buffer;
 
     /* Process all subpictures and regions (in the right order) */
     for (size_t index = 0; index < i_subpicture; index++) {
@@ -1507,7 +1508,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (subpic->b_subtitle && !region->b_absolute) {
                 if (!external_scale)
                     area = spu_area_unscaled(area, scale);
-                if (subtitle_area)
+                if (likely(subtitle_area))
                     subtitle_area[subtitle_area_count++] = area;
                 subtitles_positions_AddRelativeRegion(&sys->subs_pos, region, &area, cache_pos);
             }
