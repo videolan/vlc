@@ -1505,12 +1505,13 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             vlc_vector_push(&output->regions, output_last_ptr);
 
-            if (subpic->b_subtitle && !region->b_absolute) {
+            if (subpic->b_subtitle) {
                 if (!external_scale)
                     area = spu_area_unscaled(area, scale);
                 if (likely(subtitle_area))
                     subtitle_area[subtitle_area_count++] = area;
-                subtitles_positions_AddRelativeRegion(&sys->subs_pos, region, &area, cache_pos);
+                if (!region->b_absolute)
+                    subtitles_positions_AddRelativeRegion(&sys->subs_pos, region, &area, cache_pos);
             }
         }
     }
