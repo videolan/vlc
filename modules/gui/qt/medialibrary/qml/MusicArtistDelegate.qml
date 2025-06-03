@@ -69,6 +69,12 @@ T.ItemDelegate {
 
     Accessible.onPressAction: root.itemClicked()
 
+    Component.onCompleted: {
+        // Qt Quick AbstractButton sets a cursor for itself, unset it so that if the view has
+        // busy cursor, it is visible over the delegate:
+        MainCtx.unsetCursor(this)
+    }
+
     // Childs
 
     readonly property ColorContext colorContext: ColorContext {
