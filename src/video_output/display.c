@@ -357,7 +357,7 @@ static struct pooled_filter_chain *VoutSetupConverter(vlc_object_t *o,
     return conv;
 }
 
-static int VoutDisplayCreateRender(vout_display_t *vd)
+static int VoutConverterCreate(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     filter_owner_t owner = {
@@ -455,7 +455,7 @@ static void vout_display_Reset(vout_display_t *vd)
 
     assert(vd->ops->reset_pictures);
     if (vd->ops->reset_pictures(vd, &osys->display_fmt) != VLC_SUCCESS
-     || VoutDisplayCreateRender(vd))
+     || VoutConverterCreate(vd) != VLC_SUCCESS)
         msg_Err(vd, "Failed to adjust render format");
 }
 
@@ -875,7 +875,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         int ret = cb(vd, &osys->display_fmt, vctx);
         if (ret == VLC_SUCCESS) {
             assert(vd->ops->prepare != NULL || vd->ops->display != NULL);
-            if (VoutDisplayCreateRender(vd) == 0) {
+            if (VoutConverterCreate(vd) == VLC_SUCCESS) {
                 msg_Dbg(vd, "using %s module \"%s\"", "vout display",
                         module_get_object(mods[i]));
                 free(mods);
