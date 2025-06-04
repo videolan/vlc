@@ -214,9 +214,6 @@ T.Control {
     contentItem: Row {
         id: contentItemRow
 
-        leftPadding: VLCStyle.margin_xxxsmall
-        rightPadding: VLCStyle.margin_xxxsmall
-
         spacing: VLCStyle.column_spacing
 
         Repeater {
