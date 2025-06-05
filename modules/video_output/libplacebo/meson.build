@@ -1,5 +1,17 @@
 # Libplacebo-based video outputs
 
+libplacebo_dep = dependency('libplacebo',
+                            version: '>= 2.72',
+                            required: get_option('libplacebo'))
+
+if not libplacebo_dep.found()
+    subdir_done()
+endif
+libplacebo_utils = static_library('vlc_libplacebo_utils',
+                                files('utils.c'),
+                                dependencies: [libplacebo_dep],
+                                include_directories: [vlc_include_dirs])
+
 vlc_modules += {
     'name' : 'placebo',
     'sources' : files('instance.c', 'display.c'),

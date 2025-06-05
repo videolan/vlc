@@ -13,9 +13,6 @@ else
     missing_win_glew = false
 endif
 
-libplacebo_dep = dependency('libplacebo',
-                            version: '>= 2.72',
-                            required: get_option('libplacebo'))
 if missing_win_glew
     # Our OpenGL code requires glew.h to be present
     opengl_dep = disabler()
@@ -28,16 +25,7 @@ if host_system == 'darwin'
     subdir('apple')
 endif
 
-if libplacebo_dep.found()
-    libplacebo_utils = static_library('vlc_libplacebo_utils',
-                                  files('./libplacebo/utils.c'),
-                                  dependencies: [libplacebo_dep],
-                                  include_directories: [vlc_include_dirs])
-
-    subdir('libplacebo')
-else
-    libplacebo_utils = []
-endif
+subdir('libplacebo')
 subdir('opengl')
 
 if host_system == 'windows'

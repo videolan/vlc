@@ -4,7 +4,6 @@ if host_system == 'android'
 endif
 
 gl_common_dep = declare_dependency(
-    link_with: [libplacebo_utils],
     sources: files(
         'filter.c',
         'filters.c',
