@@ -55,6 +55,13 @@ vlc_modules += {
     'enabled' : opengl_filter_dep.found()
 }
 
+vlc_modules += {
+    'name' : 'opengl_win_offscreen',
+    'sources' : files('opengl_win_offscreen.c'),
+    'dependencies' : [ gl_common_dep, opengl_dep ],
+    'enabled' : opengl_dep.found() and host_system == 'windows'
+}
+
 if host_system == 'windows'
     vlc_modules += {
         'name' : 'amf_frc',

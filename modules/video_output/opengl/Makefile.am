@@ -244,3 +244,11 @@ if HAVE_EGL
 vout_LTLIBRARIES += libegl_surfacetexture_plugin.la
 endif
 endif
+
+libopengl_win_offscreen_plugin_la_SOURCES = video_filter/opengl_win_offscreen.c
+if HAVE_WIN32
+if HAVE_GL
+libopengl_win_offscreen_plugin_la_LIBADD = libvlc_opengl.la $(GL_LIBS) -lgdi32
+vout_LTLIBRARIES += libopengl_win_offscreen_plugin.la
+endif
+endif
