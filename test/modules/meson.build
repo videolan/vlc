@@ -127,7 +127,9 @@ vlc_tests += {
     'c_args' : ['-DVLC_TEST_OPENGL_API=VLC_OPENGL'],
     'module_depends' : vlc_plugins_targets.keys()
 }
+endif
 
+if opengles2_dep.found()
 vlc_tests += {
     'name' : 'test_modules_video_output_opengl_es2_filters',
     'sources' : files(
