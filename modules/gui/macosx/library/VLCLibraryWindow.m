@@ -415,9 +415,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)setHasActiveVideo:(BOOL)hasActiveVideo
 {
     [super setHasActiveVideo:hasActiveVideo];
-    if (hasActiveVideo) {
-        [self enableVideoPlaybackAppearance];
-    } else if (!self.videoViewController.view.hidden) {
+    if (!hasActiveVideo && !self.videoViewController.view.hidden) {
         // If we are switching to audio media then keep the active main video view open
         NSURL * const currentMediaUrl = _playQueueController.playerController.URLOfCurrentMediaItem;
         VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:currentMediaUrl];
@@ -435,8 +433,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         } else if (!decorativeViewVisible) {
             [self disableVideoPlaybackAppearance];
         }
-    } else {
-        [self disableVideoPlaybackAppearance];
     }
 }
 

@@ -423,6 +423,8 @@ static int WindowFloatOnTop(vlc_object_t *obj,
     voutView.voutThread = p_vout;
     voutView.voutWindow = p_wnd;
     videoWindow.hasActiveVideo = YES;
+    if (videoWindow.class == VLCLibraryWindow.class)
+        [(VLCLibraryWindow *)videoWindow enableVideoPlaybackAppearance];
     _playerController.activeVideoPlayback = YES;
     VLCMain.sharedInstance.libraryWindow.nonembedded = !b_mainWindowHasVideo;
 }
@@ -515,7 +517,9 @@ static int WindowFloatOnTop(vlc_object_t *obj,
         [videoWindow toggleFullScreen:self];
     }
 
-    if ([videoWindow class] != [VLCLibraryWindow class]) {
+    if (videoWindow.class == VLCLibraryWindow.class) {
+        [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
+    } else {
         [videoWindow close];
     }
     [NSAnimationContext endGrouping];
