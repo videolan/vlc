@@ -345,11 +345,11 @@ subdir('spu')
 # text renderer modules
 subdir('text_renderer')
 
-# video filter modules
-subdir('video_filter')
-
 # video output modules
 subdir('video_output')
+
+# video filter modules
+subdir('video_filter')
 
 # hardware modules
 subdir('hw')

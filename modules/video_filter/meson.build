@@ -36,6 +36,25 @@ vlc_modules += {
     'sources' : files('antiflicker.c')
 }
 
+opengl_filter_dep = disabler()
+opengl_filter_cargs = []
+if opengl_dep.found() or opengles2_dep.found()
+    if host_system in ['darwin', 'android'] and opengles2_dep.found()
+        opengl_filter_dep = opengles2_dep
+        opengl_filter_cargs += '-DUSE_OPENGL_ES2'
+    elif opengl_dep.found()
+        opengl_filter_dep = opengl_dep
+    endif
+endif
+
+vlc_modules += {
+    'name' : 'opengl_filter',
+    'sources' : files('opengl.c'),
+    'dependencies' : [gl_common_dep, opengl_filter_dep],
+    'c_args' : opengl_filter_cargs,
+    'enabled' : opengl_filter_dep.found()
+}
+
 if host_system == 'windows'
     vlc_modules += {
         'name' : 'amf_frc',
