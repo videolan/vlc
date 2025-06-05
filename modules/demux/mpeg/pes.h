@@ -36,8 +36,10 @@
 #define STREAM_ID_EXTENDED_STREAM_ID         0xFD
 #define STREAM_ID_PROGRAM_STREAM_DIRECTORY   0xFF
 
+/* MPEG-2 PTS/DTS */
 static inline ts_90khz_t GetPESTimestamp( const uint8_t *p_data )
 {
+    /* prefixed by 4 bits 0010 or 0011 */
     return  ((ts_90khz_t)(p_data[ 0]&0x0e ) << 29)|
              (ts_90khz_t)(p_data[1] << 22)|
             ((ts_90khz_t)(p_data[2]&0xfe) << 14)|
@@ -64,6 +66,7 @@ static inline bool ExtractPESTimestamp( const uint8_t *p_data, uint8_t i_flags, 
 /* PS SCR timestamp as defined in H222 2.5.3.2 */
 static inline ts_90khz_t ExtractPackHeaderTimestamp( const uint8_t *p_data )
 {
+    /* prefixed by 2 bits 01 */
     return  ((ts_90khz_t)(p_data[0]&0x38 ) << 27)|
             ((ts_90khz_t)(p_data[0]&0x03 ) << 28)|
              (ts_90khz_t)(p_data[1] << 20)|
