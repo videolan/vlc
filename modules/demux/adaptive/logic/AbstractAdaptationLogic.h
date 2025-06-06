@@ -44,8 +44,9 @@ namespace adaptive
                                         public SegmentTrackerListenerInterface
         {
             public:
+                AbstractAdaptationLogic             () = delete;
                 AbstractAdaptationLogic             (vlc_object_t *);
-                virtual ~AbstractAdaptationLogic    ();
+                virtual ~AbstractAdaptationLogic    () = default;
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) = 0;
                 virtual void                updateDownloadRate     (const ID &, size_t,

@@ -14,6 +14,7 @@ namespace adaptive
         {
             public:
                 RoundRobinLogic(vlc_object_t *);
+                virtual ~RoundRobinLogic() = default;
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *,
                                                                   BaseRepresentation *) override;
