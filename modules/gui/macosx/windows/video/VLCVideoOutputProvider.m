@@ -531,16 +531,22 @@ static int WindowFloatOnTop(vlc_object_t *obj,
     const BOOL endOfPlaybackScreenEnabled =
         [NSUserDefaults.standardUserDefaults boolForKey:VLCPlaybackEndViewEnabledKey];
     
-    // we need to check that the player itself is in a stopped state. Removal of the active video
-    // can be triggered by more than just end of playback (e.g. disabling the video track).
-    if (!decorativeViewVisible && endOfPlaybackScreenEnabled && playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
-        [videoWindow.videoViewController displayPlaybackEndView];
-    } else if (!decorativeViewVisible) {
+    
+    void (^windowVideoDismissProcedure)(void) = ^{
         if (videoWindow.class == VLCLibraryWindow.class && !videoWindow.videoViewController.view.hidden) {
             [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
         } else {
             [videoWindow close];
         }
+    };
+
+    // we need to check that the player itself is in a stopped state. Removal of the active video
+    // can be triggered by more than just end of playback (e.g. disabling the video track).
+    if (!decorativeViewVisible && endOfPlaybackScreenEnabled && playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
+        [videoWindow.videoViewController displayPlaybackEndView];
+        videoWindow.videoViewController.endViewDismissHandler = windowVideoDismissProcedure;
+    } else if (!decorativeViewVisible) {
+        windowVideoDismissProcedure();
     }
     [NSAnimationContext endGrouping];
 

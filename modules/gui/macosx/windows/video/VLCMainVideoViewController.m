@@ -608,12 +608,17 @@
 
 - (void)playbackEndViewReturnToLibrary:(NSNotification *)notification
 {
-    [self returnToLibrary:self];
+    if (self.endViewDismissHandler)
+        self.endViewDismissHandler();
+    else
+        [self returnToLibrary:self];
 }
 
 - (void)playbackEndViewHide:(NSNotification *)notification
 {
     [self.playbackEndViewController.view removeFromSuperview];
+    if (self.endViewDismissHandler)
+        self.endViewDismissHandler();
 }
 
 #pragma mark - PIPViewControllerDelegate

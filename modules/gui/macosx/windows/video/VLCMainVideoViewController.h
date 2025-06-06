@@ -66,6 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL pipIsActive;
 
 @property (readonly) VLCPlaybackEndViewController *playbackEndViewController;
+@property (readwrite) void (^endViewDismissHandler)(void);
 
 - (void)showControls;
 - (void)hideControls;
