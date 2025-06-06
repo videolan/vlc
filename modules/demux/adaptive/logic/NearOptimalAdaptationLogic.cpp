@@ -59,6 +59,7 @@ NearOptimalAdaptationLogic::NearOptimalAdaptationLogic(vlc_object_t *obj)
 
 NearOptimalAdaptationLogic::~NearOptimalAdaptationLogic()
 {
+
 }
 
 BaseRepresentation *

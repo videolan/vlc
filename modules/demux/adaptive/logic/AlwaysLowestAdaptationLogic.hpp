@@ -30,6 +30,7 @@ namespace adaptive
         {
             public:
                 AlwaysLowestAdaptationLogic(vlc_object_t *);
+                virtual ~AlwaysLowestAdaptationLogic() = default;
 
                 BaseRepresentation* getNextRepresentation(BaseAdaptationSet *,
                                                           BaseRepresentation *) override;

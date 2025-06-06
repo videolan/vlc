@@ -38,7 +38,7 @@ namespace adaptive
         {
             public:
                 RateBasedAdaptationLogic            (vlc_object_t *);
-                virtual ~RateBasedAdaptationLogic   ();
+                virtual ~RateBasedAdaptationLogic   () = default;
 
                 BaseRepresentation *getNextRepresentation(BaseAdaptationSet *,
                                                           BaseRepresentation *) override;

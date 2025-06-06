@@ -48,6 +48,11 @@ PredictiveStats::PredictiveStats()
     last_duration = 1;
 }
 
+PredictiveAdaptationLogic::~PredictiveAdaptationLogic()
+{
+
+}
+
 bool PredictiveStats::starting() const
 {
     return (segments_count < 3) || !last_download_rate;
@@ -58,10 +63,6 @@ PredictiveAdaptationLogic::PredictiveAdaptationLogic(vlc_object_t *obj)
 {
     usedBps = 0;
     vlc_mutex_init(&lock);
-}
-
-PredictiveAdaptationLogic::~PredictiveAdaptationLogic()
-{
 }
 
 BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *prevRep)
