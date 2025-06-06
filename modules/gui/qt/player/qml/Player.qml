@@ -201,12 +201,19 @@ FocusScope {
 
                     cursorShape: playerSpecializationLoader.cursorShape
 
-                    onMouseMoved: {
+                    function onMouseEvent() {
                         //short interval for mouse events
                         if (Player.isInteractive)
                             interactiveAutoHideTimer.restart()
                         else
                             playerToolbarVisibilityFSM.mouseMove();
+                    }
+
+                    Component.onCompleted: {
+                        mouseMoved.connect(videoSurface.onMouseEvent)
+                        mousePressed.connect(videoSurface.onMouseEvent)
+                        mouseReleased.connect(videoSurface.onMouseEvent)
+                        mouseDblClicked.connect(videoSurface.onMouseEvent)
                     }
 
                     Binding on cursorShape {
