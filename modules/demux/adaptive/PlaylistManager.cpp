@@ -90,8 +90,8 @@ PlaylistManager::~PlaylistManager   ()
     delete streamFactory;
     unsetPeriod();
     delete playlist;
-    delete logic;
     delete resources;
+    delete logic;
     delete bufferingLogic;
     vlc_cond_destroy(&waitcond);
     vlc_mutex_destroy(&lock);
