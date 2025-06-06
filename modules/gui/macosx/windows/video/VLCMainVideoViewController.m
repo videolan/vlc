@@ -557,9 +557,10 @@
         [self.playbackEndViewController.countdownTimer invalidate];
         [self.playbackEndViewController.view removeFromSuperview];
     }
-    VLCLibraryWindow *libraryWindow = (VLCLibraryWindow*)self.view.window;
-    if (libraryWindow != nil) {
-        [libraryWindow disableVideoPlaybackAppearance];
+    if (self.view.window.class == VLCLibraryWindow.class) {
+        [(VLCLibraryWindow *)self.view.window disableVideoPlaybackAppearance];
+    } else {
+        [self.view.window close];
     }
 }
 
