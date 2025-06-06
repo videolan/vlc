@@ -509,6 +509,12 @@ FocusScope {
     //use the same signature as Gridview.positionViewAtIndex(index, PositionMode mode)
     //mode is ignored at the moment
     function positionViewAtIndex(index, mode) {
+        // FIXME: Ideally this check should not be necessary, but without it the view
+        //        goes out of bounds. If the content height is smaller than the view-
+        //        port, then positioning is meaningless.
+        if (flickable.contentHeight <= flickable.height)
+            return
+
         if (flickable.width === 0 || flickable.height === 0
             ||
             index < 0 || index >= _count)
