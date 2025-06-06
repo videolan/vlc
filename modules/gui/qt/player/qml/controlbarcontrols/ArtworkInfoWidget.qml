@@ -223,6 +223,7 @@ AbstractButton {
                 Layout.fillHeight: true
 
                 Binding on visible {
+                    delayed: true
                     value: (infoColumn.height > infoColumn.implicitHeight) && (artistLabel.text.length > 0)
                 }
 
