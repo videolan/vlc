@@ -412,30 +412,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 #pragma mark - video output controlling
 
-- (void)setHasActiveVideo:(BOOL)hasActiveVideo
-{
-    [super setHasActiveVideo:hasActiveVideo];
-    if (!hasActiveVideo && !self.videoViewController.view.hidden) {
-        // If we are switching to audio media then keep the active main video view open
-        NSURL * const currentMediaUrl = _playQueueController.playerController.URLOfCurrentMediaItem;
-        VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:currentMediaUrl];
-        const BOOL decorativeViewVisible = mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
-
-        // If the playback end view is enabled and the player is stopped, display playback end view.
-        // We want to still display the decorative view for audio items.
-        // In other cases, we need to check that the player itself is in a stopped state. Removal of
-        // the active video can be triggered by more than just end of playback (e.g. disabling the
-        // video track).
-        if (!decorativeViewVisible &&
-            [NSUserDefaults.standardUserDefaults boolForKey:VLCPlaybackEndViewEnabledKey] &&
-            self.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
-            [self.videoViewController displayPlaybackEndView];
-        } else if (!decorativeViewVisible) {
-            [self disableVideoPlaybackAppearance];
-        }
-    }
-}
-
 - (void)playerStateChanged:(NSNotification *)notification
 {
     if (_playQueueController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {

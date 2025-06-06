@@ -25,6 +25,7 @@
 
 #import "extensions/NSScreen+VLCAdditions.h"
 
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/CompatibilityFixes.h"
@@ -39,6 +40,8 @@
 
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayerController.h"
+
+#import "views/VLCPlaybackEndViewController.h"
 
 #import "windows/video/VLCAspectRatioRetainingVideoWindow.h"
 #import "windows/video/VLCMainVideoViewController.h"
@@ -476,7 +479,7 @@ static int WindowFloatOnTop(vlc_object_t *obj,
 
 - (void)removeVoutForDisplay:(NSValue *)key
 {
-    VLCMain *mainInstance = VLCMain.sharedInstance;
+    VLCMain * const mainInstance = VLCMain.sharedInstance;
     VLCVideoWindowCommon *videoWindow = [_voutWindows objectForKey:key];
     if (!videoWindow) {
         msg_Err(getIntf(), "Cannot close nonexisting window");
@@ -517,10 +520,27 @@ static int WindowFloatOnTop(vlc_object_t *obj,
         [videoWindow toggleFullScreen:self];
     }
 
-    if (videoWindow.class == VLCLibraryWindow.class) {
-        [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
-    } else {
-        [videoWindow close];
+    // do not close the window if we have the decorative view for audio visible
+    // or if we have enabled end-of-playback screens.
+    VLCPlayerController * const playerController = mainInstance.playQueueController.playerController;
+    NSURL * const currentMediaUrl = playerController.URLOfCurrentMediaItem;
+    VLCMediaLibraryMediaItem * const mediaItem =
+        [VLCMediaLibraryMediaItem mediaItemForURL:currentMediaUrl];
+    const BOOL decorativeViewVisible =
+        mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
+    const BOOL endOfPlaybackScreenEnabled =
+        [NSUserDefaults.standardUserDefaults boolForKey:VLCPlaybackEndViewEnabledKey];
+    
+    // we need to check that the player itself is in a stopped state. Removal of the active video
+    // can be triggered by more than just end of playback (e.g. disabling the video track).
+    if (!decorativeViewVisible && endOfPlaybackScreenEnabled && playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
+        [videoWindow.videoViewController displayPlaybackEndView];
+    } else if (!decorativeViewVisible) {
+        if (videoWindow.class == VLCLibraryWindow.class && !videoWindow.videoViewController.view.hidden) {
+            [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
+        } else {
+            [videoWindow close];
+        }
     }
     [NSAnimationContext endGrouping];
 
