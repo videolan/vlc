@@ -479,8 +479,7 @@ static int WindowFloatOnTop(vlc_object_t *obj,
 
 - (void)removeVoutForDisplay:(NSValue *)key
 {
-    VLCMain * const mainInstance = VLCMain.sharedInstance;
-    VLCVideoWindowCommon *videoWindow = [_voutWindows objectForKey:key];
+    VLCVideoWindowCommon * const videoWindow = [_voutWindows objectForKey:key];
     if (!videoWindow) {
         msg_Err(getIntf(), "Cannot close nonexisting window");
         return;
@@ -504,55 +503,68 @@ static int WindowFloatOnTop(vlc_object_t *obj,
 
     // set active video to no BEFORE closing the window and exiting fullscreen
     // (avoid stopping playback due to NSWindowWillCloseNotification, preserving fullscreen state)
-    [videoWindow setHasActiveVideo: NO];
-
-    // prevent visible extra window if in fullscreen
-    [NSAnimationContext beginGrouping];
-    BOOL b_native = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
-
-    // close fullscreen, without changing fullscreen vars
-    if (!b_native && ([videoWindow fullscreen] || [videoWindow inFullscreenTransition]))
-        [videoWindow leaveFullscreenWithAnimation:NO];
-
-    // native fullscreen window will not be closed if
-    // fullscreen was triggered without video
-    if ((b_native && [videoWindow class] == [VLCLibraryWindow class] && [videoWindow fullscreen] && [videoWindow windowShouldExitFullscreenWhenFinished])) {
-        [videoWindow toggleFullScreen:self];
-    }
+    videoWindow.hasActiveVideo = NO;
 
     // do not close the window if we have the decorative view for audio visible
     // or if we have enabled end-of-playback screens.
-    VLCPlayerController * const playerController = mainInstance.playQueueController.playerController;
-    NSURL * const currentMediaUrl = playerController.URLOfCurrentMediaItem;
+    NSURL * const currentMediaUrl = _playerController.URLOfCurrentMediaItem;
     VLCMediaLibraryMediaItem * const mediaItem =
         [VLCMediaLibraryMediaItem mediaItemForURL:currentMediaUrl];
     const BOOL decorativeViewVisible =
         mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
     const BOOL endOfPlaybackScreenEnabled =
         [NSUserDefaults.standardUserDefaults boolForKey:VLCPlaybackEndViewEnabledKey];
-    
-    
-    void (^windowVideoDismissProcedure)(void) = ^{
-        if (videoWindow.class == VLCLibraryWindow.class && !videoWindow.videoViewController.view.hidden) {
-            [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
-        } else {
-            [videoWindow close];
-        }
-    };
 
     // we need to check that the player itself is in a stopped state. Removal of the active video
     // can be triggered by more than just end of playback (e.g. disabling the video track).
-    if (!decorativeViewVisible && endOfPlaybackScreenEnabled && playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
+    if (!decorativeViewVisible
+        && endOfPlaybackScreenEnabled
+        && _playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [videoWindow.videoViewController displayPlaybackEndView];
-        videoWindow.videoViewController.endViewDismissHandler = windowVideoDismissProcedure;
+        videoWindow.videoViewController.endViewDismissHandler = ^{
+            [self handleVideoCloseForDisplay:key];
+        };
     } else if (!decorativeViewVisible) {
-        windowVideoDismissProcedure();
+        [self handleVideoCloseForDisplay:key];
+    }
+}
+
+- (void)handleVideoCloseForDisplay:(NSValue *)key
+{
+    VLCVideoWindowCommon * const videoWindow = [_voutWindows objectForKey:key];
+    if (!videoWindow) {
+        msg_Err(getIntf(), "Cannot handle close for nonexistent window");
+        return;
+    }
+
+    // prevent visible extra window if in fullscreen
+    [NSAnimationContext beginGrouping];
+    const BOOL b_native = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
+
+    // close fullscreen, without changing fullscreen vars
+    if (!b_native && (videoWindow.fullscreen || videoWindow.inFullscreenTransition))
+        [videoWindow leaveFullscreenWithAnimation:NO];
+
+    // native fullscreen window will not be closed if
+    // fullscreen was triggered without video
+    if (b_native
+        && videoWindow.class == VLCLibraryWindow.class
+        && videoWindow.fullscreen
+        && videoWindow.windowShouldExitFullscreenWhenFinished) {
+        [videoWindow toggleFullScreen:self];
+    }
+
+    if (videoWindow.class == VLCLibraryWindow.class
+        && !videoWindow.videoViewController.view.hidden) {
+        [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
+    } else {
+        [videoWindow close];
     }
     [NSAnimationContext endGrouping];
 
     [_voutWindows removeObjectForKey:key];
-    if ([_voutWindows count] == 0) {
-        [_playerController setActiveVideoPlayback:NO];
+    if (_voutWindows.count == 0) {
+        _playerController.activeVideoPlayback = NO;
         _statusLevelWindowCounter = 0;
     }
 
@@ -560,11 +572,10 @@ static int WindowFloatOnTop(vlc_object_t *obj,
         b_mainWindowHasVideo = NO;
 
         // video in main window might get stopped while another vout is open
-        if ([_voutWindows count] > 0)
-            [[mainInstance libraryWindow] setNonembedded:YES];
+        if (_voutWindows.count > 0)
+            VLCMain.sharedInstance.libraryWindow.nonembedded = YES;
     }
 }
-
 
 - (void)setNativeVideoSize:(NSSize)size forWindow:(vlc_window_t *)p_wnd
 {
