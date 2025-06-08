@@ -481,6 +481,20 @@ static int WindowFloatOnTop(vlc_object_t *obj,
         return;
     }
 
+    vlc_window_t * const p_wnd = (vlc_window_t *)key.pointerValue;
+    if (p_wnd) {
+        vout_thread_t * const p_vout = (vout_thread_t *)vlc_object_parent(p_wnd);
+        if (p_vout) {
+            var_DelCallback(p_vout, "video-on-top", WindowFloatOnTop, (__bridge void *)videoWindow);
+        } else {
+            msg_Warn(getIntf(),
+                     "Could not get p_vout to unregister WindowFloatOnTop callback for window %p",
+                     p_wnd);
+        }
+    } else {
+        msg_Warn(getIntf(), "Could not get p_wnd from key to unregister WindowFloatOnTop callback");
+    }
+
     [videoWindow.videoViewController.voutView releaseVoutThread];
 
     // set active video to no BEFORE closing the window and exiting fullscreen
