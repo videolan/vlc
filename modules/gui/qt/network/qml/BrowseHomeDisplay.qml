@@ -166,6 +166,7 @@ FocusScope {
             height: implicitHeight
 
             spacing: 0 // relied on the generous padding of ViewHeader instead
+            bottomPadding: VLCStyle.margin_normal // topPadding taken care by ViewHeader
 
             Navigation.parentItem: root
 
