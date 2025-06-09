@@ -402,10 +402,12 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
     }
 }
 
-bool DialogsProvider::getMessageDialog(const QString& message) const
+bool DialogsProvider::getMessageDialog(const QString& text, const QString &title) const
 {
     QMessageBox messageBox;
-    messageBox.setText(message);
+    messageBox.setText(text);
+    if (!title.isEmpty())
+        messageBox.setWindowTitle(title);
     messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 
     QVLCDialog::setWindowTransientParent(&messageBox, nullptr, p_intf);
