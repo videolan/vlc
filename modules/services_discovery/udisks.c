@@ -523,6 +523,7 @@ error:
     {
         sd_bus_flush(p_sys->bus);
         sd_bus_close(p_sys->bus);
+        sd_bus_unref(p_sys->bus);
     }
     sd_bus_error_free(&err);
     return VLC_EGENERIC;
