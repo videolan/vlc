@@ -409,12 +409,12 @@ bool DialogsProvider::getMessageDialog(const QString& text, const QString &title
     if (!title.isEmpty())
         messageBox.setWindowTitle(title);
     messageBox.setIcon(QMessageBox::Question);
-    messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    messageBox.setStandardButtons(QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No));
 
     QVLCDialog::setWindowTransientParent(&messageBox, nullptr, p_intf);
 
     int result = messageBox.exec();
-    return result == QMessageBox::Ok;
+    return result == QMessageBox::Yes;
 }
 
 void DialogsProvider::mediaCodecDialog()
