@@ -543,5 +543,42 @@ int M3U8Playlist_test()
         return 1;
     }
 
+
+    /* Manifest 6 */
+    const char manifest6[] =
+        "#EXTM3U\n"
+        "#EXT-X-MEDIA-SEQUENCE:10\n"
+        "#EXTINF:1\n"
+        "#EXT-X-BYTERANGE:1000@0\n"
+        "foobar.ts\n"
+        "#EXT-X-BYTERANGE:4000@2000\n"
+        "foobar.ts\n"
+        "#EXT-X-BYTERANGE:500\n"
+        "foobar.ts\n";
+
+    m3u = ParseM3U8(obj, manifest6, sizeof(manifest6));
+    try
+    {
+        Expect(m3u);
+        BaseRepresentation *rep = m3u->getFirstPeriod()->getAdaptationSets().front()->
+                                  getRepresentations().front();
+        Segment *seg = rep->getMediaSegment(10);
+        Expect(seg);
+        Expect(seg->getOffset() == 0);
+        seg = rep->getMediaSegment(11);
+        Expect(seg);
+        Expect(seg->getOffset() == 2000);
+        seg = rep->getMediaSegment(12);
+        Expect(seg);
+        Expect(seg->getOffset() == 6000);
+        delete m3u;
+    }
+    catch (...)
+    {
+        delete m3u;
+        return 1;
+    }
+
+
     return 0;
 }
