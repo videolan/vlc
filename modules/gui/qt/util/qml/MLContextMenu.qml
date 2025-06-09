@@ -165,7 +165,7 @@ NativeMenu {
     }
 
     function deleteFileFromSource(dataList, options, indexes) {
-        let confirm = DialogsProvider.questionDialog("Are you sure you want to delete this file?");
+        let confirm = DialogsProvider.questionDialog(qsTr("Are you sure you want to delete this file?"));
         
         if (confirm) {
             model.deleteFileFromSource(indexes[0]);
