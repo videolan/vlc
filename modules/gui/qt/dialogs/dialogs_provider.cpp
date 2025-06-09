@@ -408,6 +408,7 @@ bool DialogsProvider::getMessageDialog(const QString& text, const QString &title
     messageBox.setText(text);
     if (!title.isEmpty())
         messageBox.setWindowTitle(title);
+    messageBox.setIcon(QMessageBox::Question);
     messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 
     QVLCDialog::setWindowTransientParent(&messageBox, nullptr, p_intf);
