@@ -408,6 +408,8 @@ bool DialogsProvider::getMessageDialog(const QString& message) const
     messageBox.setText(message);
     messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 
+    QVLCDialog::setWindowTransientParent(&messageBox, nullptr, p_intf);
+
     int result = messageBox.exec();
     return result == QMessageBox::Ok;
 }
