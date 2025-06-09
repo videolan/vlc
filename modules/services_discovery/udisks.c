@@ -431,6 +431,7 @@ static void *Run(void *p_obj)
     if(r < 0)
     {
         sd_bus_slot_unref(p_sys->interface_added_slot);
+        p_sys->interface_added_slot = NULL;
         return NULL;
     }
 
@@ -455,8 +456,7 @@ static void *Run(void *p_obj)
         }
         sd_bus_message_unref(msg);
     }
-    sd_bus_slot_unref(p_sys->interface_added_slot);
-    sd_bus_slot_unref(p_sys->interface_removed_slot);
+
     return NULL;
 }
 
@@ -532,12 +532,12 @@ static void Close(vlc_object_t *p_obj)
 {
     services_discovery_t *sd = (services_discovery_t *)p_obj;
     struct discovery_sys *p_sys = sd->p_sys;
-    if(p_sys->interface_added_slot)
-        sd_bus_slot_unref(p_sys->interface_added_slot);
     sd_bus_flush(p_sys->bus);
-    sd_bus_close(p_sys->bus);
     vlc_cancel(p_sys->thread);
     vlc_join(p_sys->thread, NULL);
+    sd_bus_close(p_sys->bus);
+    sd_bus_slot_unref(p_sys->interface_removed_slot);
+    sd_bus_slot_unref(p_sys->interface_added_slot);
     vlc_dictionary_clear(&p_sys->entries, FreeEntries, sd);
 }
 
