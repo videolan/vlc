@@ -402,7 +402,7 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
     }
 }
 
-bool DialogsProvider::getMessageDialog(const QString& text, const QString &title) const
+bool DialogsProvider::questionDialog(const QString& text, const QString &title) const
 {
     QMessageBox messageBox;
     messageBox.setText(text);
