@@ -539,6 +539,7 @@ static void Close(vlc_object_t *p_obj)
     sd_bus_close(p_sys->bus);
     sd_bus_slot_unref(p_sys->interface_removed_slot);
     sd_bus_slot_unref(p_sys->interface_added_slot);
+    sd_bus_unref(p_sys->bus);
     vlc_dictionary_clear(&p_sys->entries, FreeEntries, sd);
 }
 
