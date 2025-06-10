@@ -134,9 +134,7 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
 
     /* Copy the initial source, sine we might rotate it to fake a rotated
      * display also. */
-    video_format_t source;
-    video_format_Init(&source, 0);
-    video_format_Copy(&source, vd->source);
+    video_format_t source = *vd->source;
 
     video_transform_t transform = (video_transform_t)sys->gl->orientation;
     video_format_TransformBy(&source, transform_Inverse(transform));
@@ -160,8 +158,6 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
         };
     }
     sys->place_changed = true;
-
-    video_format_Clean(&source);
 }
 
 static void UpdateConfig(vout_display_t *vd)
