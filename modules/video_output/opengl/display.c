@@ -160,16 +160,10 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
     sys->place_changed = true;
 }
 
-static void UpdateConfig(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    PlacePicture(vd, &sys->place, vd->cfg->display);
-}
-
 static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t projection)
 {
     vout_display_sys_t *sys = vd->sys;
-    UpdateConfig(vd);
+    PlacePicture(vd, &sys->place, vd->cfg->display);
     sys->restart_renderer = true;
     return VLC_SUCCESS;
 }
@@ -177,7 +171,7 @@ static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t pr
 static int SetStereoMode(vout_display_t *vd, vlc_stereoscopic_mode_t mode)
 {
     vout_display_sys_t *sys = vd->sys;
-    UpdateConfig(vd);
+    PlacePicture(vd, &sys->place, vd->cfg->display);
     sys->stereo.mode = mode;
     sys->stereo.changed = true;
     return VLC_SUCCESS;
@@ -361,19 +355,14 @@ static int Control (vout_display_t *vd, int query)
     {
 
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-            UpdateConfig(vd);
+            PlacePicture(vd, &sys->place, vd->cfg->display);
             vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
             // fallthrough
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        {
-            struct vout_display_placement dp = vd->cfg->display;
-
-            PlacePicture(vd, &sys->place, dp);
-            UpdateConfig(vd);
+            PlacePicture(vd, &sys->place, vd->cfg->display);
             return VLC_SUCCESS;
-        }
 
         default:
             msg_Err (vd, "Unknown request %d", query);
