@@ -114,7 +114,7 @@ static void vlc_css_expression_Debug( const vlc_css_expr_t *p_expr, int depth )
 vlc_css_expr_t * vlc_css_expression_New( vlc_css_term_t term )
 {
     vlc_css_expr_t *p_expr = calloc(1, sizeof(*p_expr));
-    if(!vlc_css_expression_AddTerm( p_expr, 0, term ))
+    if(p_expr && !vlc_css_expression_AddTerm( p_expr, 0, term ))
     {
         free(p_expr);
         p_expr = NULL;
@@ -150,7 +150,15 @@ static void vlc_css_declarations_Debug( const vlc_css_declaration_t *p_decl, int
 vlc_css_declaration_t * vlc_css_declaration_New( const char *psz )
 {
     vlc_css_declaration_t *p_decl = calloc(1, sizeof(*p_decl));
-    p_decl->psz_property = strdup(psz);
+    if (likely(p_decl != NULL))
+    {
+        p_decl->psz_property = strdup(psz);
+        if (unlikely( p_decl->psz_property == NULL ))
+        {
+            free(p_decl);
+            p_decl = NULL;
+        }
+    }
     return p_decl;
 }
 
@@ -194,6 +202,8 @@ static void vlc_css_selectors_Debug( const vlc_css_selector_t *p_sel, int depth 
 vlc_css_selector_t * vlc_css_selector_New( int type, const char *psz )
 {
     vlc_css_selector_t *p_sel = calloc(1, sizeof(*p_sel));
+    if (unlikely(p_sel == NULL))
+        return NULL;
     p_sel->psz_name = strdup(psz);
     p_sel->type = type;
     p_sel->combinator = RELATION_SELF;
