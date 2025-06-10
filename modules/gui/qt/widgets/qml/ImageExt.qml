@@ -97,9 +97,7 @@ Item {
     // need that. This makes it feasible to use `PreserveAspectCrop`
     // in delegate, where we want to have effective batching. Note
     // that such option is still not free, because the fragment
-    // shader has to do additional calculations that way. Also note
-    // that a clip node is still necessary if radius is 0, as in
-    // that case the default image is used directly.
+    // shader has to do additional calculations that way.
     fillMode: Image.PreserveAspectFit
 
     property real radius
