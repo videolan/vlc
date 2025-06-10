@@ -206,6 +206,8 @@ FocusScope {
                             image: model.cover || ""
                             fallbackImage: VLCStyle.noArtAlbumCover
 
+                            fillMode: Image.PreserveAspectCrop
+
                             title: model.title || qsTr("Unknown title")
                             subtitle: model.release_year || ""
                             subtitleVisible: true
