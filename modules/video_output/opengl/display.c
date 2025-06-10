@@ -158,6 +158,9 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
         };
     }
     sys->place_changed = true;
+
+    assert(sys->gl->orientation != ORIENT_NORMAL || place->x == vd->place->x);
+    assert(sys->gl->orientation != ORIENT_NORMAL || place->y == (int)(vd->cfg->display.height - (vd->place->y + vd->place->height)));
 }
 
 static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t projection)
