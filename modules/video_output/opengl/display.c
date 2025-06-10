@@ -164,7 +164,6 @@ static void UpdateConfig(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     PlacePicture(vd, &sys->place, vd->cfg->display);
-    sys->place_changed = true;
 }
 
 static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t projection)
@@ -252,7 +251,6 @@ static int Open(vout_display_t *vd,
 
     struct vout_display_placement dp = vd->cfg->display;
     PlacePicture(vd, &sys->place, dp);
-    sys->place_changed = true;
     sys->stereo.changed = false;
     vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
 
@@ -373,7 +371,6 @@ static int Control (vout_display_t *vd, int query)
             struct vout_display_placement dp = vd->cfg->display;
 
             PlacePicture(vd, &sys->place, dp);
-            sys->place_changed = true;
             UpdateConfig(vd);
             return VLC_SUCCESS;
         }
