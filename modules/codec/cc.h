@@ -301,11 +301,12 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
         const int i_field_first = (p_src[4] & 0x80) ? 0 : 1;
         const int i_count_cc2 = ((p_src[4] >> 1) & 0x1f) + b_truncate;
         const uint8_t *cc = &p_src[5];
+        i_src -= 5;
         int i;
 
 #define CC_ALIGNMENT_TEST   (0x7f)
 
-        if( i_src < 4+1+6*i_count_cc2 - ( b_truncate ? 3 : 0) )
+        if( i_src < 6*i_count_cc2 - ( b_truncate ? 3 : 0) )
             return;
         for( i = 0; i < i_count_cc2; i++ )
         {
