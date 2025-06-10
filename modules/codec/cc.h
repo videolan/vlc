@@ -306,7 +306,7 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
 
 #define CC_ALIGNMENT_TEST   (0x7f)
 
-        if( i_src < 6*i_count_cc2 - ( b_truncate ? 3 : 0) )
+        if( i_src < 3*(2*i_count_cc2 - b_truncate)) )
             return;
         for( i = 0; i < i_count_cc2; i++ )
         {
