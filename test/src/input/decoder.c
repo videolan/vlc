@@ -34,7 +34,7 @@
 #include <vlc_url.h>
 
 #include <vlc/libvlc.h>
-#include "../../lib/libvlc_internal.h"
+#include "../../../lib/libvlc_internal.h"
 
 #include "common.h"
 #include "decoder.h"
