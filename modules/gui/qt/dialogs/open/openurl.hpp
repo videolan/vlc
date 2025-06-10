@@ -55,7 +55,7 @@ public:
     void showEvent( QShowEvent *ev ) override;
 
 public slots:
-    void accept() override { play(); QVLCDialog::accept(); }
+    void accept() override;
 
 };
 

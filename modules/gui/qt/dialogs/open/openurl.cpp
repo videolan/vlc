@@ -82,13 +82,11 @@ OpenUrlDialog::OpenUrlDialog( qt_intf_t *_p_intf,
 void OpenUrlDialog::enqueue()
 {
     bShouldEnqueue = true;
-    lastUrl = edit->text().trimmed();
     accept();
 }
 
 void OpenUrlDialog::play()
 {
-    lastUrl = edit->text().trimmed();
     accept();
 }
 
@@ -133,4 +131,10 @@ void OpenUrlDialog::showEvent( QShowEvent* )
         if( txt.contains( "://" ) || QFile::exists( txt ) )
             edit->setText( txt );
     }
+}
+
+void OpenUrlDialog::accept()
+{
+    lastUrl = edit->text().trimmed();
+    QVLCDialog::accept();
 }
