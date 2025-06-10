@@ -187,6 +187,8 @@ T.ItemDelegate {
 
             borderWidth: VLCStyle.dp(1, VLCStyle.scale)
 
+            fillMode: Image.PreserveAspectCrop
+
             // FIXME: Qt bug (observed 6.2 and 6.8): Without an alpha node beneath the image, the image does not get rendered.
             Rectangle {
                 z: -1
