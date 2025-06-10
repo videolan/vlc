@@ -347,9 +347,9 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
     unsigned int i_extended;
 
     i_size += 2;
-    if( i_size < sizeof( WAVEFORMATEX ) )
+    if( i_size < sizeof( WAVEFORMATEX ) || i_size > (sizeof( WAVEFORMATEX ) + UINT16_MAX ) )
     {
-        msg_Err( p_demux, "invalid 'fmt ' chunk" );
+        msg_Err( p_demux, "invalid 'fmt ' chunk of size %" PRIu32, i_size );
         goto error;
     }
 
