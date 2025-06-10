@@ -167,9 +167,9 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
     i_size += 2;
-    if( i_size < sizeof( WAVEFORMATEX ) )
+    if( i_size < sizeof( WAVEFORMATEX ) || i_size > (sizeof( WAVEFORMATEX ) + UINT16_MAX ) )
     {
-        msg_Err( p_demux, "invalid 'fmt ' chunk" );
+        msg_Err( p_demux, "invalid 'fmt ' chunk of size %" PRIu32, i_size );
         goto error;
     }
     if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
