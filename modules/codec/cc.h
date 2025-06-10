@@ -305,9 +305,7 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
 
 #define CC_ALIGNMENT_TEST   (0x7f)
 
-        if( i_src < 3*(2*i_count_cc2 + b_truncate) )
-            return;
-        for( i = 0; i < 2*i_count_cc2 + b_truncate; i++, cc+=3 )
+        for( i = 0; i < 2*i_count_cc2 + b_truncate && i_src >= 3; i++, cc+=3 )
         {
             if( (cc[0] >> 1) == CC_ALIGNMENT_TEST )
             {
@@ -315,6 +313,7 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
                 if (!cc_AppendData( c, CC_PKT_BYTE0(even_field), &cc[1] ))
                     break;
             }
+            i_src -= 3;
         }
         c->b_reorder = false;
     }
