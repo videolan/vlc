@@ -162,6 +162,9 @@ FocusScope {
                         topMargin: VLCStyle.gridItemSelectedBorder
                         bottomMargin: VLCStyle.gridItemSelectedBorder
 
+                        displayMarginBeginning: root._contentLeftMargin
+                        displayMarginEnd: root._contentRightMargin
+
                         focus: true
 
                         model: albumModel
