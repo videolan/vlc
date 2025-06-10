@@ -152,6 +152,7 @@ FocusScope {
                 radius: VLCStyle.cover_normal
                 borderColor: theme.border
                 borderWidth: VLCStyle.dp(1, VLCStyle.scale)
+                fillMode: Image.PreserveAspectCrop
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
             }
         }
