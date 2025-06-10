@@ -122,9 +122,7 @@ skins2_sources += files(
     'win32/win32_tooltip.cpp',
     'win32/win32_window.cpp',
 )
-endif
-
-if x11_dep.found()
+elif x11_dep.found()
 skins2_flags += [ '-DX11_SKINS' ]
 skins2_sources += files(
     'x11/x11_display.cpp',
