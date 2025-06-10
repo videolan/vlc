@@ -96,8 +96,8 @@ FadingEdge {
             top: parent.top
             left: parent.left
 
-            topMargin: (orientation === Qt.Vertical) ? beginningMargin : undefined
-            leftMargin: (orientation === Qt.Horizontal) ? beginningMargin : undefined
+            topMargin: (orientation === Qt.Vertical) ? -beginningMargin : undefined
+            leftMargin: (orientation === Qt.Horizontal) ? -beginningMargin : undefined
 
             bottom: (orientation === Qt.Horizontal) ? parent.bottom : undefined
             right: (orientation === Qt.Vertical) ? parent.right : undefined
@@ -125,8 +125,8 @@ FadingEdge {
             bottom: parent.bottom
             right: parent.right
 
-            bottomMargin: (orientation === Qt.Vertical) ? beginningMargin : undefined
-            rightMargin: (orientation === Qt.Horizontal) ? beginningMargin : undefined
+            bottomMargin: (orientation === Qt.Vertical) ? -endMargin : undefined
+            rightMargin: (orientation === Qt.Horizontal) ? -endMargin : undefined
 
             top: (orientation === Qt.Horizontal) ? parent.top : undefined
             left: (orientation === Qt.Vertical) ? parent.left : undefined
