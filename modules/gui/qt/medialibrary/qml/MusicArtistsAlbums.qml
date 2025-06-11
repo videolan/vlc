@@ -316,8 +316,10 @@ FocusScope {
                 sourceWidth: root.width
                 targetWidth: artistList.width
 
+                visible: !VLCStyle.isScreenSmall
+
                 onWidthFactorChanged: {
-                    if (!_inhibitMainCtxUpdate)
+                    if (!_inhibitMainCtxUpdate && visible)
                         MainCtx.artistAlbumsWidthFactor = widthFactor
                 }
 
