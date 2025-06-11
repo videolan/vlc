@@ -85,24 +85,16 @@ Item {
         grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
     }
 
-    ScaledImage {
-        anchors.centerIn: parent
-
-        // NOTE: We round this to avoid blurry textures with the QML renderer.
-        width: Math.round(parent.width * 3.2)
-        height: width
-
-        z: -1
-
-        source: VLCStyle.playShadow
-    }
-
     Rectangle {
         anchors.fill: parent
 
         radius: width
 
         color: "white"
+
+        Widgets.DefaultShadow {
+
+        }
     }
 
     Widgets.IconLabel {
