@@ -446,8 +446,10 @@ FocusScope {
                         targetWidth: parent.width
                         sourceWidth: g_mainDisplay.width
 
+                        visible: !VLCStyle.isScreenSmall
+
                         onWidthFactorChanged: {
-                            if (!_inhibitMainInterfaceUpdate)
+                            if (!_inhibitMainInterfaceUpdate && visible)
                                 MainCtx.setPlaylistWidthFactor(widthFactor)
                         }
 
