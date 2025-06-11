@@ -304,9 +304,6 @@ QtObject {
     readonly property url noArtArtistCover: "qrc:///placeholder/noart_artistCover.svg";
     readonly property url noArtVideoCover: "qrc:///placeholder/noart_videoCover.svg";
 
-    // Play shadow
-    readonly property url playShadow: "qrc:///misc/play_shadow.png";
-
     // New indicator
     readonly property url newIndicator: "qrc:///misc/new_indicator.svg";
 

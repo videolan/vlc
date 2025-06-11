@@ -58,7 +58,6 @@
     </qresource>
     <qresource prefix="/misc">
         <file alias="cone.svg">pixmaps/misc/cone.svg</file>
-        <file alias="play_shadow.png">pixmaps/misc/play_shadow.png</file>
         <file alias="new_indicator.svg">pixmaps/misc/new_indicator.svg</file>
         <file alias="theme_dark.svg">pixmaps/misc/theme_dark.svg</file>
         <file alias="theme_daynight.svg">pixmaps/misc/theme_daynight.svg</file>
