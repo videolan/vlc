@@ -1309,7 +1309,10 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
     if ( !p_esds ) p_esds = MP4_BoxGet( p_sample, "wave/esds" );
     if ( p_esds && BOXDATA(p_esds) && BOXDATA(p_esds)->es_descriptor.p_decConfigDescr )
     {
-        assert(i_sample_type == ATOM_mp4a);
+        if( i_sample_type != ATOM_mp4a )
+        {
+            msg_Warn( p_demux, "Unexpected ESDS for %4.4s", (char *)&i_sample_type );
+        }
         SetupESDS( p_demux, p_track, BOXDATA(p_esds)->es_descriptor.p_decConfigDescr, p_fmt );
     }
     else switch( i_sample_type )
