@@ -1805,6 +1805,11 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             vars.p_fmt->i_codec = VLC_CODEC_A52;
             vars.p_fmt->b_packetized = false;
         }
+        S_CASE("A_ATRAC/AT1") {
+            ONLY_FMT(AUDIO);
+            vars.p_fmt->i_codec = VLC_CODEC_ATRAC1;
+            vars.p_tk->fmt.audio.i_blockalign = vars.p_tk->fmt.audio.i_channels * 212;
+        }
         S_CASE("A_EAC3") {
             vars.p_fmt->i_codec = VLC_CODEC_EAC3;
             vars.p_fmt->b_packetized = false;
