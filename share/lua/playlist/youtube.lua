@@ -1112,4 +1112,4 @@ function parse()
         end
         return { { path = vlc.access.."://www.youtube.com/watch?v="..video_id..copy_url_param( vlc.path, "fmt" ) } }
     end
-echo end
+end
