@@ -793,6 +793,12 @@ int vout_SetDisplayFormat(vout_display_t *vd, const video_format_t *fmt,
     return VLC_SUCCESS;
 }
 
+int vout_display_SetFormat(vout_display_t *vd, const video_format_t *fmt,
+                            vlc_video_context *vctx)
+{
+    return vout_SetDisplayFormat(vd, fmt, vctx);
+}
+
 void vout_SetDisplayProjection(vout_display_t *vd,
                                video_projection_mode_t projection)
 {

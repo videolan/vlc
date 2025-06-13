@@ -489,6 +489,26 @@ static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
 VLC_API
 void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height);
 
+/**
+ * Updates the video format for an existing display.
+ *
+ * This function changes the input video format of a vout display by calling
+ * the display module's update_format callback. It handles internal format
+ * updates, video context management, and display converter cleanup when the
+ * format change is accepted by the display module.
+ *
+ * \note The format size is not expected to change.
+ *
+ * \param vd the vout display to update
+ * \param fmt the new video format to set
+ * \param vctx the video context associated with the format (may be NULL)
+ * \return VLC_SUCCESS on success, VLC_EGENERIC if the display module doesn't
+ *         support format updates, or another error code on failure
+ */
+VLC_API
+int vout_display_SetFormat(vout_display_t *, const video_format_t *fmt,
+                            vlc_video_context *vctx);
+
 static inline void vout_display_SendEventMousePressed(vout_display_t *vd, int button)
 {
     vlc_window_ReportMousePressed(vd->cfg->window, button);
