@@ -19,6 +19,7 @@
 
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 import QtQuick.Templates as T
 
 
@@ -86,11 +87,13 @@ T.Pane {
 
             focus: true
 
-            iconTxt: root.providerModel.indexed ? VLCIcons.remove : VLCIcons.add
+            iconTxt: root.providerModel.indexed ? VLCIcons.collections_remove : VLCIcons.collections_add
 
             text: root.providerModel.indexed
                   ? qsTr("Remove from medialibrary")
                   : qsTr("Add to medialibrary")
+
+            display: VLCStyle.isScreenSmall ?  AbstractButton.IconOnly  : AbstractButton.TextBesideIcon
 
             visible: root.providerModel.canBeIndexed ?? false
 
