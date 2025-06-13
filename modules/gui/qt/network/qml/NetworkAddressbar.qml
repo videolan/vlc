@@ -96,6 +96,8 @@ T.Control {
             text: VLCIcons.home
             font.pixelSize: VLCStyle.icon_addressBar
 
+            display: AddressbarButton.IconOnly
+
             Layout.fillHeight: true
 
             Navigation.parentItem: control
@@ -117,6 +119,8 @@ T.Control {
             visible: !!control._menuModel && control._menuModel.length > 0
             text: VLCIcons.breadcrumb_prev
             font.pixelSize: VLCStyle.icon_addressBar
+
+            display: AddressbarButton.IconOnly
 
             Layout.fillHeight: true
 
@@ -170,7 +174,6 @@ T.Control {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 0
                     text: modelData.display
-                    onlyIcon: false
                     highlighted: index === contentRepeater.count - 1
 
                     onClicked: browse(modelData.tree, focusReason)
