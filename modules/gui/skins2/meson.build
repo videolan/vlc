@@ -1,15 +1,21 @@
+skins2_enabled = get_option('skins2') \
+    .disable_auto_if(host_system != 'windows' and not x11_dep.found()).allowed() and \
+    freetype_dep.found() and host_system != 'darwin'
+
 skins2_flags = []
 skins2_deps = [ freetype_dep ]
 
-fribidi_dep = dependency('fribidi', required: get_option('fribidi'))
-if fribidi_dep.found()
-    skins2_deps += [ fribidi_dep ]
-    skins2_flags += [ '-DHAVE_FRIBIDI' ]
+if skins2_enabled
+    fribidi_dep = dependency('fribidi', required: get_option('fribidi'))
+    if fribidi_dep.found()
+        skins2_deps += [ fribidi_dep ]
+        skins2_flags += [ '-DHAVE_FRIBIDI' ]
 
-    harfbuzz_dep = dependency('harfbuzz', required: get_option('harfbuzz'))
-    if harfbuzz_dep.found()
-        skins2_deps += [ harfbuzz_dep ]
-        skins2_flags += [ '-DHAVE_HARFBUZZ' ]
+        harfbuzz_dep = dependency('harfbuzz', required: get_option('harfbuzz'))
+        if harfbuzz_dep.found()
+            skins2_deps += [ harfbuzz_dep ]
+            skins2_flags += [ '-DHAVE_HARFBUZZ' ]
+        endif
     endif
 endif
 
@@ -122,7 +128,7 @@ skins2_sources += files(
     'win32/win32_tooltip.cpp',
     'win32/win32_window.cpp',
 )
-elif x11_dep.found()
+elif x11_dep.found() and skins2_enabled
 skins2_flags += [ '-DX11_SKINS' ]
 skins2_sources += files(
     'x11/x11_display.cpp',
@@ -150,7 +156,5 @@ vlc_modules += {
     'dependencies' : [ skins2_deps ],
     'c_args' : skins2_flags,
     'cpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
-    'enabled' : get_option('skins2')
-      .disable_auto_if(host_system != 'windows' and not x11_dep.found()).allowed() and
-      freetype_dep.found() and host_system != 'darwin'
+    'enabled': skins2_enabled,
 }
