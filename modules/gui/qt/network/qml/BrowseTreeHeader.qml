@@ -87,7 +87,7 @@ T.Pane {
 
             focus: true
 
-            iconTxt: root.providerModel.indexed ? VLCIcons.collections_remove : VLCIcons.collections_add
+            iconTxt: root.providerModel.indexed ? VLCIcons.medialibrary_remove : VLCIcons.medialibrary_add
 
             text: root.providerModel.indexed
                   ? qsTr("Remove from medialibrary")
