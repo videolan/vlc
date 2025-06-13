@@ -67,6 +67,9 @@ NativeMenu {
             "action": removeFavorite,
             "visible": _showRemoveFavorite
         }, {
+            "text": (root.showPlayAsAudioAction ? qsTr("Add to a video-only playlist") : qsTr("Add to an audio-only playlist")),
+            "action": (root.showPlayAsAudioAction ? root.addToVideoOnlyPlaylist : root.addToAudioOnlyPlaylist)
+        }, {
             "text": qsTr("Add to a playlist"),
             "action": addToAPlaylist
         }, {
@@ -127,13 +130,17 @@ NativeMenu {
         model.ml.addToPlaylist(_mlIDList(dataList), _playerOptions(options))
     }
 
-    function addToAPlaylist(dataList, options, indexes) {
-        let type
-        // if (dataList.length === 1)
-            type = root.showPlayAsAudioAction ? MLPlaylistListModel.PLAYLIST_TYPE_VIDEO
-                                              : MLPlaylistListModel.PLAYLIST_TYPE_AUDIO
-        // else
-        //    type = MLPlaylistListModel.PLAYLIST_TYPE_ALL // iterate through items?
+    function addToAudioOnlyPlaylist(dataList, options, indexes) {
+        addToAPlaylist(dataList, options, indexes, MLPlaylistListModel.PLAYLIST_TYPE_AUDIO_ONLY)
+    }
+
+    function addToVideoOnlyPlaylist(dataList, options, indexes) {
+        addToAPlaylist(dataList, options, indexes, MLPlaylistListModel.PLAYLIST_TYPE_VIDEO_ONLY)
+    }
+
+    function addToAPlaylist(dataList, options, indexes, type) {
+        if (type === undefined)
+            type = MLPlaylistListModel.PLAYLIST_TYPE_ALL
 
         DialogsProvider.playlistsDialog(_mlIDList(dataList), type)
     }
