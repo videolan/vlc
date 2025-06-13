@@ -176,7 +176,10 @@ T.Control {
                     text: modelData.display
                     highlighted: index === contentRepeater.count - 1
 
-                    onClicked: browse(modelData.tree, focusReason)
+                    onClicked: {
+                        if (index !== contentRepeater.count - 1)
+                            browse(modelData.tree, focusReason)
+                    }
                 }
 
                 Widgets.IconLabel {

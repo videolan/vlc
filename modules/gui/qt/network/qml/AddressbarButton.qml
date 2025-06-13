@@ -56,7 +56,7 @@ T.Button {
 
         enabled: button.enabled
         focused: button.visualFocus
-        hovered: button.hovered
+        hovered: button.hovered || button.highlighted
         pressed: button.down
     }
 
