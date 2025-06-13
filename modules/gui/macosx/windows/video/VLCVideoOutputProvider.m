@@ -448,7 +448,6 @@ static int WindowFloatOnTop(vlc_object_t *obj,
     if (!videoWallpaper && !b_have_splitter && (var_InheritBool(getIntf(), "fullscreen") || _playerController.fullscreen)) {
         // this is not set when we start in fullscreen because of
         // fullscreen settings in video prefs the second time
-        var_SetBool(vlc_object_parent(p_wnd), "fullscreen", 1);
         [self setFullscreen:1 forWindow:p_wnd withAnimation:NO];
     }
 }
