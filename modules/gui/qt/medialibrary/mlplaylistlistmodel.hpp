@@ -46,6 +46,7 @@ public:
         PLAYLIST_TYPE_AUDIO,
         PLAYLIST_TYPE_VIDEO,
         PLAYLIST_TYPE_AUDIO_ONLY,
+        PLAYLIST_TYPE_VIDEO_ONLY,
     };
     Q_ENUM(PlaylistType)
 
