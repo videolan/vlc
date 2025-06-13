@@ -657,7 +657,9 @@ static int WindowFloatOnTop(vlc_object_t *obj,
         if((b_fullscreen && !([o_current_window fullscreen] || [o_current_window inFullscreenTransition])) ||
            (!b_fullscreen && [o_current_window fullscreen])) {
 
-            [o_current_window toggleFullScreen:self];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [o_current_window toggleFullScreen:self];
+            });
         }
     } else {
         assert(o_current_window);
@@ -666,11 +668,15 @@ static int WindowFloatOnTop(vlc_object_t *obj,
             if (_playerController.playerState != VLC_PLAYER_STATE_STOPPED && [_playerController activeVideoPlayback]) {
                 // activate app, as method can also be triggered from outside the app (prevents nasty window layout)
                 [NSApp activateIgnoringOtherApps:YES];
-                [o_current_window enterFullscreenWithAnimation:b_animation];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [o_current_window enterFullscreenWithAnimation:b_animation];
+                });
             }
         } else {
             // leaving fullscreen is always allowed
-            [o_current_window leaveFullscreenWithAnimation:YES];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [o_current_window leaveFullscreenWithAnimation:YES];
+            });
         }
     }
 }
