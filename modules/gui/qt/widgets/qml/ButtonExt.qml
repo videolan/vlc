@@ -134,7 +134,7 @@ T.Button {
         Widgets.IconLabel {
             id: iconLabel
 
-            visible: text.length > 0
+            visible: text.length > 0 && control.display !== AbstractButton.TextOnly
 
             rotation: control.iconRotation
 
@@ -166,7 +166,7 @@ T.Button {
         T.Label {
             id: label
 
-            visible: control.showText
+            visible: control.showText && control.display !== AbstractButton.IconOnly
 
             text: control.text
 
