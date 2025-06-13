@@ -525,6 +525,34 @@ static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t pr
     return Direct3D11CreateFormatResources(vd, vd->source);
 }
 
+static int UpdateFormat(vout_display_t *vd, const video_format_t *fmtp, vlc_video_context *vctx)
+{
+    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+
+    video_format_t fmt;
+    video_format_Copy(&fmt, fmtp);
+    video_format_Copy(&sys->picQuad.quad_fmt, &fmt);
+
+    int err = SetupOutputFormat(vd, &fmt, vctx, &sys->picQuad.quad_fmt);
+    if (err != VLC_SUCCESS)
+        goto error;
+
+    err = UpdateDisplayFormat(vd, &sys->picQuad.quad_fmt);
+    if (err != VLC_SUCCESS)
+        goto error;
+
+    err = Direct3D11CreateFormatResources(vd, &fmt);
+    if (err != VLC_SUCCESS)
+        goto error;
+
+    video_format_Clean(&fmt);
+    return VLC_SUCCESS;
+
+error:
+    video_format_Clean(&fmt);
+    return err;
+}
+
 static constexpr const auto ops = []{
     struct vlc_display_operations ops {};
     ops.close = Close;
@@ -532,6 +560,7 @@ static constexpr const auto ops = []{
     ops.display = Display;
     ops.set_display_size = SetDisplaySize;
     ops.control = Control;
+    ops.update_format = UpdateFormat;
     ops.set_viewpoint = SetViewpoint;
     ops.change_source_projection = ChangeSourceProjection;
     return ops;
