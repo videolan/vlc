@@ -492,6 +492,15 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         [self orderOut: self];
 
     _inFullscreenTransition = NO;
+    
+    if ([self hasActiveVideo]) {
+        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
+        if (p_vout) {
+            var_SetBool(p_vout, "fullscreen", true);
+            vout_Release(p_vout);
+        }
+    }
+
     [self setFullscreen:YES];
 }
 
@@ -618,6 +627,14 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     [self setLevel:i_originalLevel];
 
     [self setAlphaValue: config_GetFloat("macosx-opaqueness")];
+
+    if ([self hasActiveVideo]) {
+        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
+        if (p_vout) {
+            var_SetBool(p_vout, "fullscreen", false);
+            vout_Release(p_vout);
+        }
+    }
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation
