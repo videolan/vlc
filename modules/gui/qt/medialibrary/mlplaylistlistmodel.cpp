@@ -483,7 +483,7 @@ static inline vlc_ml_playlist_type_t qmlToMLPlaylistType(MLPlaylistListModel::Pl
     case MLPlaylistListModel::PlaylistType::PLAYLIST_TYPE_ALL:
         return VLC_ML_PLAYLIST_TYPE_ALL;
     case MLPlaylistListModel::PlaylistType::PLAYLIST_TYPE_AUDIO:
-        return VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY;
+        return VLC_ML_PLAYLIST_TYPE_AUDIO;
     case MLPlaylistListModel::PlaylistType::PLAYLIST_TYPE_VIDEO:
         return VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY;
     default:
