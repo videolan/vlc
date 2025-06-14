@@ -499,6 +499,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)configureArtworkButtonLiveVideoView
 {
+    if (!var_InheritBool(getIntf(), "embedded-video"))
+        return;
+
     _acquiredVideoView = [self.videoViewController acquireVideoView];
     if (_acquiredVideoView) {
         [self.controlsBar.artworkImageView addSubview:_acquiredVideoView
