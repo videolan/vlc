@@ -103,17 +103,28 @@ Compositor* CompositorFactory::createCompositor()
     return nullptr;
 }
 
+namespace {
+
+struct CompositorWindow {
+    /* The CompositorVideo instance that created the window */
+    vlc::CompositorVideo *compositor;
+
+    /* Callback setup from commonSetupVoutWindow. It usually comes from the main qt.cpp
+     * file so as to handle the reference counting of Qt's resources. */
+    void (*destroy_cb)(struct vlc_window *wnd);
+};
+
+}
 
 extern "C"
 {
-
 static int windowEnableCb(vlc_window_t* p_wnd, const vlc_window_cfg_t * cfg)
 {
     assert(p_wnd->sys);
-    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
+    auto that = static_cast<CompositorWindow*>(p_wnd->sys);
     int ret = VLC_EGENERIC;
-    QMetaObject::invokeMethod(that, [&](){
-        ret = that->windowEnable(cfg);
+    QMetaObject::invokeMethod(that->compositor, [&](){
+        ret = that->compositor->windowEnable(cfg);
     }, Qt::BlockingQueuedConnection);
     return ret;
 }
@@ -121,45 +132,53 @@ static int windowEnableCb(vlc_window_t* p_wnd, const vlc_window_cfg_t * cfg)
 static void windowDisableCb(vlc_window_t* p_wnd)
 {
     assert(p_wnd->sys);
-    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
-    QMetaObject::invokeMethod(that, [that](){
-        that->windowDisable();
+    auto that = static_cast<CompositorWindow*>(p_wnd->sys);
+    QMetaObject::invokeMethod(that->compositor, [that](){
+        that->compositor->windowDisable();
     }, Qt::BlockingQueuedConnection);
 }
 
 static void windowResizeCb(vlc_window_t* p_wnd, unsigned width, unsigned height)
 {
     assert(p_wnd->sys);
-    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
-    that->windowResize(width, height);
+    auto that = static_cast<CompositorWindow*>(p_wnd->sys);
+    that->compositor->windowResize(width, height);
 }
 
 static void windowDestroyCb(struct vlc_window * p_wnd)
 {
     assert(p_wnd->sys);
-    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
-    that->windowDestroy();
+    auto that = static_cast<CompositorWindow*>(p_wnd->sys);
+    that->compositor->windowDestroy();
+    that->compositor = nullptr;
+
+    if (that->destroy_cb != nullptr)
+        that->destroy_cb(p_wnd);
+
+    /* Destroy p_wnd->sys */
+    delete that;
+    p_wnd->sys = nullptr;
 }
 
 static void windowSetStateCb(vlc_window_t* p_wnd, unsigned state)
 {
     assert(p_wnd->sys);
-    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
-    that->windowSetState(state);
+    auto that = static_cast<CompositorWindow*>(p_wnd->sys);
+    that->compositor->windowSetState(state);
 }
 
 static void windowUnsetFullscreenCb(vlc_window_t* p_wnd)
 {
     assert(p_wnd->sys);
-    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
-    that->windowUnsetFullscreen();
+    auto that = static_cast<CompositorWindow*>(p_wnd->sys);
+    that->compositor->windowUnsetFullscreen();
 }
 
 static void windowSetFullscreenCb(vlc_window_t* p_wnd, const char *id)
 {
     assert(p_wnd->sys);
-    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
-    that->windowSetFullscreen(id);
+    auto that = static_cast<CompositorWindow*>(p_wnd->sys);
+    that->compositor->windowSetFullscreen(id);
 }
 
 }
@@ -193,9 +212,17 @@ void CompositorVideo::commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb d
         nullptr, //window_set_title
     };
 
+    /* Allocate state that will be tracked by the window through vlc_window::sys */
+    // NOTE: no std::nothrow here since no error code, forward the exception
+    auto *compositor_window = new CompositorWindow;
+    compositor_window->compositor = this;
+    compositor_window->destroy_cb = destroyCb;
+
+    /* We currently support only a single window in the compositor. */
+    assert(m_wnd == nullptr);
     m_wnd = p_wnd;
-    m_destroyCb = destroyCb;
-    p_wnd->sys = this;
+
+    p_wnd->sys = compositor_window;
     p_wnd->ops = &ops;
     p_wnd->info.has_double_click = true;
 
@@ -223,11 +250,7 @@ void CompositorVideo::windowDestroy()
     disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceScaleChanged,
                this, &CompositorVideo::onSurfaceScaleChanged);
 
-    if (m_destroyCb)
-        m_destroyCb(m_wnd);
-
     m_wnd = nullptr;
-    m_destroyCb = nullptr;
 }
 
 void CompositorVideo::windowResize(unsigned width, unsigned height)

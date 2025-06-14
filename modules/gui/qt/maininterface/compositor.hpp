@@ -188,7 +188,6 @@ protected:
 
     MainCtx* m_mainCtx = nullptr;
 
-    VoutDestroyCb m_destroyCb = nullptr;
     std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
 
     std::unique_ptr<InterfaceWindowHandler> m_interfaceWindowHandler;
