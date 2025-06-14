@@ -499,7 +499,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)configureArtworkButtonLiveVideoView
 {
-    if (!var_InheritBool(getIntf(), "embedded-video"))
+    VLCPlayerController * const playerController = self.playerController;
+    const BOOL videoTrackDisabled =
+        !playerController.videoTracksEnabled || !playerController.selectedVideoTrack.selected;
+        
+    if (videoTrackDisabled || !var_InheritBool(getIntf(), "embedded-video"))
         return;
 
     _acquiredVideoView = [self.videoViewController acquireVideoView];
