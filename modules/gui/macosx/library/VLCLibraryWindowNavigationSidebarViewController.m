@@ -403,4 +403,20 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     return segment.segmentType == VLCLibraryHeaderSegmentType;
 }
 
+- (BOOL)outlineView:(nonnull NSOutlineView *)outlineView shouldCollapseItem:(nonnull id)item
+{
+    NSAssert(outlineView == _outlineView, @"VLCLibraryWindowNavigationSidebarController should only be a delegate for the libraryWindow nav sidebar outline view!");
+
+    // Don't allow collapsing the parent segment of the selected segment, if selection is a child
+    NSTreeNode * const treeNode = (NSTreeNode *)item;
+    VLCLibrarySegment * const segment = (VLCLibrarySegment *)treeNode.representedObject;
+    NSTreeNode * const selectedSegmentItem = (NSTreeNode *)[self.outlineView itemAtRow:self.outlineView.selectedRow];
+    VLCLibrarySegment * const selectedSegment = (VLCLibrarySegment *)selectedSegmentItem.representedObject;
+    const NSInteger childNodeIndex = [segment.childNodes indexOfObjectPassingTest:^BOOL(NSTreeNode * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        VLCLibrarySegment * const childSegment = (VLCLibrarySegment *)obj;
+        return childSegment.segmentType == selectedSegment.segmentType;
+    }];
+    return childNodeIndex == NSNotFound;
+}
+
 @end
