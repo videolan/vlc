@@ -141,6 +141,7 @@ NSString * const kVLCPreferencesVersion = @"VLCPreferencesVersion";
 
 static intf_thread_t *p_interface_thread;
 static vlc_preparser_t *p_network_preparser;
+vlc_sem_t g_wait_quit;
 
 intf_thread_t *getIntf()
 {
@@ -178,6 +179,7 @@ int OpenIntf (vlc_object_t *p_this)
             @try {
                 VLCApplication * const application = VLCApplication.sharedApplication;
                 NSCAssert(application != nil, @"VLCApplication must not be nil");
+                [application setIntf:p_intf];
 
                 VLCMain * const main = VLCMain.sharedInstance;
                 NSCAssert(main != nil, @"VLCMain must not be nil");
@@ -192,6 +194,7 @@ int OpenIntf (vlc_object_t *p_this)
             dispatch_semaphore_signal(sem);
             [NSApp run];
         }
+        vlc_sem_post(&g_wait_quit);
     });
     CFRunLoopWakeUp(CFRunLoopGetMain());
 
@@ -208,15 +211,24 @@ void CloseIntf (vlc_object_t *p_this)
             [VLCMain.sharedInstance applicationWillTerminate:nil];
             [VLCMain killInstance];
         }
-        p_interface_thread = nil;
-
         vlc_preparser_Delete(p_network_preparser);
-        p_network_preparser = nil;
+        [NSApp stop:nil];
+        NSEvent* event = [NSEvent otherEventWithType:NSApplicationDefined
+            location:NSMakePoint(0,0)
+            modifierFlags:0
+            timestamp:0.0
+            windowNumber:0
+            context:nil
+            subtype:0
+            data1:0
+            data2:0];
+        [NSApp postEvent:event atStart:YES];
     };
     if (CFRunLoopGetCurrent() == CFRunLoopGetMain())
         release_intf();
     else
         dispatch_sync(dispatch_get_main_queue(), release_intf);
+    vlc_sem_wait(&g_wait_quit);
 }
 
 /*****************************************************************************
@@ -337,7 +349,7 @@ static VLCMain *sharedInstance = nil;
         [self migrateOldPreferences];
     }
 
-    _statusBarIcon = [[VLCStatusBarIcon alloc] init];
+    _statusBarIcon = [[VLCStatusBarIcon alloc] init:_p_intf];
 
     /* on macOS 11 and later, check whether the user attempts to deploy
      * the x86_64 binary on ARM-64 - if yes, log it */

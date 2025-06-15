@@ -31,6 +31,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import <vlc_configuration.h>
+#import <vlc_interface.h>
 
 /*****************************************************************************
  * VLCApplication implementation
@@ -40,6 +41,7 @@
 {
     NSURL *_appLocationURL;
     NSImage *_vlcAppIconImage;
+    intf_thread_t *_intf;
 }
 
 @end
@@ -72,6 +74,11 @@
 
     }
     return self;
+}
+
+- (void)setIntf:(intf_thread_t*)intf
+{
+    _intf = intf;
 }
 
 - (void)dealloc
@@ -140,19 +147,7 @@
 - (void)terminate:(id)sender
 {
     [self activateIgnoringOtherApps:YES];
-    [self stop:sender];
-
-    // Trigger event in loop to force evaluating the stop flag
-    NSEvent* event = [NSEvent otherEventWithType:NSApplicationDefined
-                                        location:NSMakePoint(0,0)
-                                   modifierFlags:0
-                                       timestamp:0.0
-                                    windowNumber:0
-                                         context:nil
-                                         subtype:0
-                                           data1:0
-                                           data2:0];
-    [NSApp postEvent:event atStart:YES];
+    libvlc_Quit(vlc_object_instance(_intf));
 }
 
 @end

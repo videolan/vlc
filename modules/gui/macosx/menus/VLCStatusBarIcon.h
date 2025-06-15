@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#include <vlc_interface.h>
 
 @interface VLCStatusBarIcon : NSObject <NSMenuDelegate>
 
@@ -30,6 +31,7 @@
 @property (strong) IBOutlet NSView *playbackInfoView;
 @property (strong) IBOutlet NSView *controlsView;
 
+- (instancetype)init:(intf_thread_t *)intf;
 - (IBAction)statusBarIconShowMainWindow:(id)sender;
 - (IBAction)statusBarIconTogglePlayPause:(id)sender;
 - (IBAction)statusBarIconNext:(id)sender;

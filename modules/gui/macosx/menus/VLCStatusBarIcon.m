@@ -34,6 +34,8 @@
 
 @interface VLCStatusBarIcon ()
 {
+    intf_thread_t *_intf;
+
     NSMenuItem *_vlcStatusBarMenuItem;
 
     /* Outlets for Now Playing labels */
@@ -71,10 +73,11 @@
 #pragma mark -
 #pragma mark Init
 
-- (instancetype)init
+- (instancetype)init:(intf_thread_t *)intf;
 {
     self = [super init];
     if (self) {
+        _intf = intf;
         [[NSBundle mainBundle] loadNibNamed:@"VLCStatusBarIconMainMenu" owner:self topLevelObjects:nil];
     }
     return self;
@@ -489,7 +492,7 @@
 // Action: Quit VLC
 - (IBAction)quitAction:(id)sender
 {
-    [NSApplication.sharedApplication terminate:nil];
+    libvlc_Quit(vlc_object_instance(_intf));
 }
 
 - (IBAction)statusBarIconShowMiniAudioPlayer:(id)sender
