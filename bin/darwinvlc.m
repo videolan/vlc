@@ -43,42 +43,46 @@
 
 #include "../lib/libvlc_internal.h"
 
+struct vlc_context {
+    libvlc_instance_t *vlc;
+    dispatch_queue_t intf_queue;
+    vlc_sem_t wait_quit;
+
+    bool quitting;
+};
+
 /**
  * Handler called when VLC asks to terminate the program.
  */
 static void vlc_terminate(void *data)
 {
-    (void)data;
+    struct vlc_context *context = data;
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        /*
-         * Stop the main loop. When using the CoreFoundation mainloop, simply
-         * CFRunLoopStop can be used.
-         *
-         * But this does not work when having an interface.
-         * In this case, [NSApp stop:nil] needs to be used, but the used flag is only
-         * evaluated at the end of main loop event processing. This is always true
-         * in the case of code inside a action method. But here, this is
-         * not true and thus we need to send an dummy event to make sure the stop
-         * flag is actually processed by the main loop.
-         */
-        if (NSApp == nil) {
+    /* vlc_terminate can be called multiple times, for instance:
+     * - once when an interface like Qt (DialogProvider::quit) is exiting
+     * - once when libvlc_release() is called.
+     * `context` can only be guaranteed to be valid for the first call to
+     * vlc_terminate, but others will have no more effects than the first
+     * one, so we can ignore them. */
+    __block bool quitting = false;
+    static dispatch_once_t quitToken = 0;
+    dispatch_once(&quitToken, ^{
+        quitting = true;
+    });
+
+    if (!quitting)
+        return;
+
+    /* Release the libvlc instance to clean up the interfaces. */
+    dispatch_async(context->intf_queue, ^{
+        libvlc_release(context->vlc);
+        context->vlc = NULL;
+        vlc_sem_post(&context->wait_quit);
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            /* Stop the main loop started in main(). */
             CFRunLoopStop(CFRunLoopGetCurrent());
-        } else {
-
-            [NSApp stop:nil];
-            NSEvent* event = [NSEvent otherEventWithType:NSApplicationDefined
-                                                location:NSMakePoint(0,0)
-                                           modifierFlags:0
-                                               timestamp:0.0
-                                            windowNumber:0
-                                                 context:nil
-                                                 subtype:0
-                                                   data1:0
-                                                   data2:0];
-            [NSApp postEvent:event atStart:YES];
-        }
-
+        });
     });
 }
 
@@ -208,13 +212,6 @@ int main(int i_argc, const char *ppsz_argv[])
     if (!sigIntSource || !sigTermSource)
         abort();
 
-    dispatch_source_set_event_handler(sigIntSource, ^{
-        vlc_terminate(nil);
-    });
-    dispatch_source_set_event_handler(sigTermSource, ^{
-        vlc_terminate(nil);
-    });
-
     dispatch_resume(sigIntSource);
     dispatch_resume(sigTermSource);
 
@@ -259,12 +256,27 @@ int main(int i_argc, const char *ppsz_argv[])
     argv[argc] = NULL;
 
     dispatch_queue_t intf_queue = dispatch_queue_create("org.videolan.vlc", NULL);
+
+    __block struct vlc_context context = {
+        .vlc = NULL,
+        .intf_queue = intf_queue,
+    };
+    vlc_sem_init(&context.wait_quit, 0);
+
+    dispatch_source_set_event_handler(sigIntSource, ^{
+        vlc_terminate(&context);
+    });
+    dispatch_source_set_event_handler(sigTermSource, ^{
+        vlc_terminate(&context);
+    });
+
     __block bool intf_started = true;
     __block libvlc_instance_t *vlc = NULL;
     int ret = 1;
     dispatch_async(intf_queue, ^{
         /* Initialize libvlc */
-        vlc = libvlc_new(argc, argv);
+        vlc = context.vlc
+            = libvlc_new(argc, argv);
         if (vlc == NULL)
         {
             dispatch_sync(dispatch_get_main_queue(), ^{
@@ -274,13 +286,14 @@ int main(int i_argc, const char *ppsz_argv[])
             return;
         }
 
-        libvlc_SetExitHandler(vlc->p_libvlc_int, vlc_terminate, NULL);
+        libvlc_SetExitHandler(vlc->p_libvlc_int, vlc_terminate, &context);
         libvlc_set_app_id(vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
         libvlc_set_user_agent(vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
 
         if (libvlc_InternalAddIntf(vlc->p_libvlc_int, NULL)) {
             fprintf(stderr, "VLC cannot start any interface. Exiting.\n");
+            libvlc_SetExitHandler(vlc->p_libvlc_int, NULL, NULL);
             dispatch_sync(dispatch_get_main_queue(), ^{
                 intf_started = false;
                 CFRunLoopStop(CFRunLoopGetMain());
@@ -305,15 +318,19 @@ int main(int i_argc, const char *ppsz_argv[])
 
     ret = 0;
     /* Cleanup */
+    vlc_sem_wait(&context.wait_quit);
+
 out:
-    dispatch_release(intf_queue);
-    free(argv);
 
     dispatch_release(sigIntSource);
     dispatch_release(sigTermSource);
 
-    if (vlc)
-        libvlc_release(vlc);
+    dispatch_release(intf_queue);
+    free(argv);
+
+    /* If no interface were created, we release libvlc here instead. */
+    if (context.vlc)
+        libvlc_release(context.vlc);
 
 #ifdef HAVE_BREAKPAD
     if (breakpad)
