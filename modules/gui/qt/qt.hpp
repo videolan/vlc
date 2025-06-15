@@ -82,6 +82,7 @@ struct qt_intf_t
                                intf_dialog_args_t * );
 
     vlc_thread_t thread;
+    vlc_sem_t wait_quit;
 
     class MainCtx *p_mi;     /* Main Interface, NULL if DialogProvider Mode */
     class QSettings *mainSettings; /* Qt State settings not messing main VLC ones */

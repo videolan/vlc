@@ -546,13 +546,7 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason );
 
 #ifdef Q_OS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
-#include "../../../lib/libvlc_internal.h" /* libvlc_SetExitHandler */
 #include <CoreFoundation/CFRunLoop.h>
-static void Abort( void *obj )
-{
-    (void)obj;
-    triggerQuit();
-}
 #endif
 
 /* Open Interface */
@@ -607,9 +601,9 @@ static int OpenInternal( qt_intf_t *p_intf )
     /* */
 #ifdef Q_OS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
-    libvlc_SetExitHandler( vlc_object_instance(p_intf), Abort, p_intf );
     CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopDefaultMode, ^{
         Thread(static_cast<void*>(p_intf));
+        vlc_sem_post(&p_intf->wait_quit);
     });
     CFRunLoopWakeUp(CFRunLoopGetMain());
 #else
@@ -648,7 +642,10 @@ static void CloseInternal( qt_intf_t *p_intf )
     msg_Dbg( p_intf, "waiting for UI thread..." );
 #ifndef Q_OS_MAC
     vlc_join (p_intf->thread, NULL);
+#else
+    vlc_sem_wait(&p_intf->wait_quit);
 #endif
+
 
     //mutex scope
     {
@@ -678,6 +675,7 @@ static int OpenIntfCommon( vlc_object_t *p_this, bool dialogProvider )
         vlc_object_delete(p_intf);
         return VLC_EGENERIC;
     }
+    vlc_sem_init(&p_intf->wait_quit, 0);
     p_intf->intf = intfThread;
     p_intf->b_isDialogProvider = dialogProvider;
     p_intf->isShuttingDown = false;
