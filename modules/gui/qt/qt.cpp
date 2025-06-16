@@ -917,6 +917,34 @@ static void *Thread( void *obj )
         assert(ret);
     }
 
+    /* Ctrl+Q, or more specifically Command+Q on MacOS is going
+     * through the NSApplication/NSApplicationDelegate selector
+     * applicationShouldTerminate:, which is catched by Qt and
+     * trigger termination of the app.exec() runloop.
+     * We don't want to quit right now and instead trigger
+     * libvlc_Quit() to unload the interface from Close and avoid
+     * racing the window by removing the eventloop before it's
+     * destroyed. */
+    class QuitSpy : public QObject
+    {
+    public:
+        QuitSpy(QObject *parent) : QObject(parent)
+        {
+            qGuiApp->installEventFilter(this);
+        }
+        bool eventFilter(QObject *o, QEvent *e) override
+        {
+            (void)o;
+            if (e->type() == QEvent::Quit)
+            {
+                THEDP->quit();
+                return true;
+            }
+            return false;
+        }
+    };
+    QuitSpy quitSpy(&app);
+
     registerMetaTypes();
 
     //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
