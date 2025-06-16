@@ -1,9 +1,8 @@
 # libogg
 
-OGG_VERSION := 1.3.5
+OGG_VERSION := 1.3.6
 
 OGG_URL := $(XIPH)/ogg/libogg-$(OGG_VERSION).tar.xz
-#OGG_CVSROOT := :pserver:anoncvs@xiph.org:/usr/local/cvsroot
 
 PKGS += ogg
 ifeq ($(call need_pkg,"ogg >= 1.0"),)
