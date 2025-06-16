@@ -32,6 +32,8 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "playqueue/VLCPlayQueueController.h"
 
+#include <vlc_interface.h>
+
 static const NSTimeInterval kVLCPlaybackEndTimeout = 10;
 static const NSTimeInterval kVLCPlaybackEndUpdateInterval = 0.1;
 
@@ -145,13 +147,22 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
         return nil;
     }
 
-    const NSInteger itemIdx = [itemSiblingItemPaths indexOfObject:itemUrl.lastPathComponent];
+    NSArray<NSString *> * const playableExtensions = [[[NSString
+        stringWithCString:EXTENSIONS_MEDIA encoding:NSUTF8StringEncoding] 
+        stringByReplacingOccurrencesOfString:@"*." withString:@""]
+        componentsSeparatedByString:@";"];
+    NSArray<NSString *> * const itemPlayableSiblingItemPaths = [[itemSiblingItemPaths
+        sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]
+        filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString * const _Nonnull siblingItemPath, NSDictionary<NSString *, id> * const _Nullable bindings) {
+            return [playableExtensions containsObject:siblingItemPath.pathExtension.lowercaseString];
+        }]];
+    const NSInteger itemIdx = [itemPlayableSiblingItemPaths indexOfObject:itemUrl.lastPathComponent];
     NSParameterAssert(itemIdx != NSNotFound);
-    if (itemIdx + 1 >= itemSiblingItemPaths.count) {
+    if (itemIdx + 1 >= itemPlayableSiblingItemPaths.count) {
         NSLog(@"Played item was last in parent folder.");
         return nil;
     }
-    NSString * const nextItemFileName = itemSiblingItemPaths[itemIdx + 1];
+    NSString * const nextItemFileName = itemPlayableSiblingItemPaths[itemIdx + 1];
     NSURL * const nextItemURL =
         [[NSURL fileURLWithPath:parentFolderPath] URLByAppendingPathComponent:nextItemFileName];
     return [VLCInputItem inputItemFromURL:nextItemURL];
