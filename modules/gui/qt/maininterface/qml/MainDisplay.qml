@@ -64,13 +64,6 @@ FocusScope {
         if (!found)
             return
 
-        const item = stackView.currentItem
-
-        MainCtx.hasGridListMode = Qt.binding(() => item &&  item.hasGridListMode !== undefined && item.hasGridListMode)
-        MainCtx.search.available = Qt.binding(() => item && item.isSearchable !== undefined && item.isSearchable)
-        MainCtx.sort.model = Qt.binding(function () { return  item?.sortModel ?? null })
-        MainCtx.sort.available = Qt.binding(function () { return item && Helpers.isArray(item.sortModel) && item.sortModel.length > 0 })
-
         if (Player.hasVideoOutput && MainCtx.hasEmbededVideo)
             _showMiniPlayer = true
     }
