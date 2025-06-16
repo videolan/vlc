@@ -1,6 +1,6 @@
 # libogg
 
-OGG_VERSION := 1.3.5
+OGG_VERSION := 1.3.6
 
 OGG_URL := http://downloads.xiph.org/releases/ogg/libogg-$(OGG_VERSION).tar.xz
 
