@@ -90,5 +90,10 @@
     VLCPlayQueueItem * const item = _playQueueArray[index];
     [item updateRepresentation];
 }
-
+- (void)replaceItemAtIndex:(size_t)index withItem:(VLCPlayQueueItem *)newItem
+{
+    NSParameterAssert(index >= 0 && index < _playQueueArray.count);
+    NSParameterAssert(newItem != nil);
+    [_playQueueArray replaceObjectAtIndex:index withObject:newItem];
+}
 @end

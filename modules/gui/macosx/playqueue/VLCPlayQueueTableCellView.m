@@ -28,6 +28,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCInputItem.h"
 
 #import "main/VLCMain.h"
 
@@ -35,6 +36,7 @@
 
 #import "views/VLCImageView.h"
 
+#import <vlc_common.h>
 #import <vlc_configuration.h>
 
 @implementation VLCPlayQueueTableCellView
@@ -91,6 +93,16 @@
 
     const BOOL validArtistString = item.artistName && item.artistName.length > 0;
     const BOOL validAlbumString = item.albumName && item.albumName.length > 0;
+    const BOOL validTitleString = item.inputItem && item.inputItem.title && (item.inputItem.title.length > 0);
+
+    NSString *playTitle = item.title;
+    if (validTitleString) {
+        if (item.inputItem.trackNumber && item.inputItem.trackNumber.length > 0) {
+            playTitle = [NSString stringWithFormat:@"%@ · %@", item.inputItem.trackNumber, item.inputItem.title];
+        } else {
+            playTitle = item.inputItem.title;
+        }
+    }
 
     NSString *songDetailString = @"";
 
@@ -104,7 +116,7 @@
         self.mediaTitleTextField.hidden = YES;
         self.secondaryMediaTitleTextField.hidden = NO;
         self.artistTextField.hidden = NO;
-        self.secondaryMediaTitleTextField.stringValue = item.title;
+        self.secondaryMediaTitleTextField.stringValue = playTitle;
         self.artistTextField.stringValue = songDetailString;
         self.audioMediaTypeIndicator.hidden = NO;
 
@@ -114,7 +126,7 @@
         self.mediaTitleTextField.hidden = NO;
         self.secondaryMediaTitleTextField.hidden = YES;
         self.artistTextField.hidden = YES;
-        self.mediaTitleTextField.stringValue = item.title;
+        self.mediaTitleTextField.stringValue = playTitle;
         self.audioMediaTypeIndicator.hidden = YES;
 
         self.audioArtworkImageView.hidden = YES;

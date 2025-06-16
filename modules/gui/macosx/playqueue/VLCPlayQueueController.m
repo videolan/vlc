@@ -337,11 +337,19 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)playQueueUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems
 {
-    VLC_UNUSED(items);
-    for (size_t i = firstUpdatedIndex; i < firstUpdatedIndex + numberOfItems; i++) {
-        [_playQueueModel updateItemAtIndex:i];
+    vlc_playlist_Lock(_p_playlist);
+    for (size_t i = 0; i < numberOfItems; i++) {
+        size_t replaceIndex = firstUpdatedIndex + i;
+        if (replaceIndex < vlc_playlist_Count(_p_playlist)) {
+            vlc_playlist_item_t *currentItem = vlc_playlist_Get(_p_playlist, replaceIndex);
+            VLCPlayQueueItem *newItem = [[VLCPlayQueueItem alloc] initWithPlaylistItem:currentItem];
+            [_playQueueModel replaceItemAtIndex:replaceIndex withItem:newItem];
+        }
     }
+    vlc_playlist_Unlock(_p_playlist);
+
     [_playQueueDataSource playQueueUpdated];
+
 }
 
 - (void)playQueuePlaybackRepeatUpdated:(enum vlc_playlist_playback_repeat)currentRepeatMode

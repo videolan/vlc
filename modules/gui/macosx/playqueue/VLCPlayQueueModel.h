@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)moveItemAtIndex:(size_t)index toTarget:(size_t)target;
 - (void)removeItemsInRange:(NSRange)range;
 - (void)updateItemAtIndex:(size_t)index;
-
+- (void)replaceItemAtIndex:(size_t)index withItem:(VLCPlayQueueItem *)newItem;
 @end
 
 NS_ASSUME_NONNULL_END
