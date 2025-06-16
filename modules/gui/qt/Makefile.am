@@ -180,7 +180,7 @@ libqt_plugin_la_SOURCES = \
 	maininterface/interface_window_handler.hpp \
 	maininterface/mainctx.cpp \
 	maininterface/mainctx.hpp \
-	maininterface/mainctx_submodels.hpp \
+	maininterface/mainctx_submodels.cpp maininterface/mainctx_submodels.hpp \
 	maininterface/mainui.cpp \
 	maininterface/mainui.hpp \
 	maininterface/navigationmodel.cpp maininterface/navigationmodel.hpp \

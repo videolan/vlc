@@ -104,51 +104,37 @@ private:
     bool m_available = false;
 };
 
-class PlayqueuePanelCtx: public QObject
+class MainCtx;
+
+class SidePanelCtx: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged FINAL)
     Q_PROPERTY(bool docked READ isDocked WRITE setDocked NOTIFY dockedChanged FINAL)
-    Q_PROPERTY(double widthFactor READ widthFactor WRITE setWidthFactor NOTIFY widthFactorChanged FINAL)
+    Q_PROPERTY(double width READ width WRITE setWidth NOTIFY widthChanged FINAL)
 
 public:
-    inline PlayqueuePanelCtx(QObject* parent = nullptr): QObject(parent) {}
+    SidePanelCtx(MainCtx* ctx, QObject* parent = nullptr);
 
     inline bool isDocked() const { return m_docked; }
     inline bool isVisible() const { return m_visible; }
-    inline double widthFactor() const { return m_widthFactor; }
+    double width() const;
 
-    inline void setDocked(bool value) {
-        if (value == m_docked)
-            return;
-        m_docked = value;
-        emit dockedChanged(value);
-    }
-
-    inline void setVisible(bool value) {
-        if (value == m_visible)
-            return;
-        m_visible = value;
-        emit visibleChanged(value);
-    }
-
-    inline void setWidthFactor(double value) {
-        if (value == m_widthFactor)
-            return;
-        m_widthFactor = value;
-        emit widthFactorChanged(value);
-    }
+    void setDocked(bool value);
+    void setVisible(bool value);
+    void setWidth(double value);
 
 signals:
     void visibleChanged(bool visible);
     void dockedChanged(bool);
-    void widthFactorChanged(double);
+    void widthChanged(double);
 
 private:
+    MainCtx* m_ctx = nullptr;
     bool m_visible = true;
     bool m_docked = false;
-    ///< playlist size: root.width / playlistScaleFactor
-    double  m_widthFactor = 4.;
+    // size in dp
+    double  m_width = 120;
 
     friend class MainCtx;
 };

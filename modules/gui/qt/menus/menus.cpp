@@ -306,13 +306,13 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu)
             qtr( "Play&list" ));
     action->setShortcut(QString( "Ctrl+L" ));
     action->setCheckable( true );
-    connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &PlayqueuePanelCtx::setVisible );
+    connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &SidePanelCtx::setVisible );
     action->setChecked( mi->getPlayqueuePanel()->isVisible() );
 
     /* Docked Playlist */
     action = menu->addAction( qtr( "Docked Playlist" ) );
     action->setCheckable( true );
-    connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &PlayqueuePanelCtx::setDocked );
+    connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &SidePanelCtx::setDocked );
     action->setChecked( mi->getPlayqueuePanel()->isDocked() );
 
     menu->addSeparator();

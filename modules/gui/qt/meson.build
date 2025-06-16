@@ -299,6 +299,7 @@ qt_plugin_sources = files(
     'maininterface/interface_window_handler.hpp',
     'maininterface/mainctx.cpp',
     'maininterface/mainctx.hpp',
+    'maininterface/mainctx_submodels.cpp',
     'maininterface/mainctx_submodels.hpp',
     'maininterface/mainui.cpp',
     'maininterface/mainui.hpp',

@@ -181,7 +181,7 @@ Widgets.PageExt {
             Layout.fillHeight: true
             Layout.preferredWidth: VLCStyle.isScreenSmall
                                    ? 0
-                                   : Math.round(Helpers.clamp(root.width / resizeHandle.widthFactor,
+                                   : Math.round(Helpers.clamp(resizeHandle.requestedWidth,
                                                               VLCStyle.colWidth(1) + VLCStyle.column_spacing,
                                                               root.width * .5))
 
@@ -324,31 +324,30 @@ Widgets.PageExt {
 
                 z: 1
 
-                sourceWidth: root.width
-                targetWidth: artistList.width
+                currentWidth: artistList.width
 
                 visible: !VLCStyle.isScreenSmall
 
-                onWidthFactorChanged: {
-                    if (!_inhibitMainCtxUpdate && visible)
-                        MainCtx.artistAlbumsWidthFactor = widthFactor
+                onRequestedWidthChanged: {
+                    if (!_inhibitMainCtxUpdate)
+                        MainCtx.artistAlbumsWidth = requestedWidth
                 }
 
                 Component.onCompleted:  _updateFromMainCtx()
 
                 function _updateFromMainCtx() {
-                    if (widthFactor == MainCtx.artistAlbumsWidthFactor)
+                    if (requestedWidth === MainCtx.artistAlbumsWidth)
                         return
 
                     _inhibitMainCtxUpdate = true
-                    widthFactor = MainCtx.artistAlbumsWidthFactor
+                    requestedWidth = MainCtx.artistAlbumsWidth
                     _inhibitMainCtxUpdate = false
                 }
 
                 Connections {
                     target: MainCtx
 
-                    function onArtistAlbumsWidthFactorChanged() {
+                    function onArtistAlbumsWidthChanged() {
                         resizeHandle._updateFromMainCtx()
                     }
                 }

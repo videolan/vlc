@@ -67,7 +67,7 @@ class VLCSystray;
 class MediaLib;
 class ColorSchemeModel;
 class VLCVarChoiceModel;
-class PlayqueuePanelCtx;
+class SidePanelCtx;
 #ifdef UPDATE_CHECK
 class UpdateModel;
 #endif
@@ -98,10 +98,10 @@ class MainCtx : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(double playerPlaylistWidthFactor READ getPlayerPlaylistWidthFactor WRITE setPlayerPlaylistWidthFactor NOTIFY playerPlaylistFactorChanged FINAL)
-    Q_PROPERTY(PlayqueuePanelCtx* playqueuePanel READ getPlayqueuePanel CONSTANT FINAL)
-    Q_PROPERTY(PlayqueuePanelCtx* navigationPanel READ getNavigationPanel CONSTANT FINAL)
-    Q_PROPERTY(double artistAlbumsWidthFactor READ artistAlbumsWidthFactor WRITE setArtistAlbumsWidthFactor NOTIFY artistAlbumsWidthFactorChanged FINAL)
+    Q_PROPERTY(double playerPlaylistWidth READ getPlayerPlaylistWidth WRITE setPlayerPlaylistWidth NOTIFY playerPlaylistWidthChanged FINAL)
+    Q_PROPERTY(SidePanelCtx* playqueuePanel READ getPlayqueuePanel CONSTANT FINAL)
+    Q_PROPERTY(SidePanelCtx* navigationPanel READ getNavigationPanel CONSTANT FINAL)
+    Q_PROPERTY(double artistAlbumsWidth READ artistAlbumsWidth WRITE setArtistAlbumsWidth NOTIFY artistAlbumsWidthChanged FINAL)
     Q_PROPERTY(bool interfaceAlwaysOnTop READ isInterfaceAlwaysOnTop WRITE setInterfaceAlwaysOnTop NOTIFY interfaceAlwaysOnTopChanged FINAL)
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged FINAL)
     Q_PROPERTY(bool showRemainingTime READ isShowRemainingTime WRITE setShowRemainingTime NOTIFY showRemainingTimeChanged FINAL)
@@ -222,9 +222,9 @@ public:
     Q_DECLARE_FLAGS(MainInterfaceModes, MainInterfaceMode)
 
     inline QWindow::Visibility interfaceVisibility() const { return m_windowVisibility; }
-    inline PlayqueuePanelCtx* getPlayqueuePanel() const { return m_playqueuePanel; }
-    inline PlayqueuePanelCtx* getNavigationPanel() const { return m_navigationPanel; }
-    inline double getPlayerPlaylistWidthFactor() const { return m_playerPlaylistWidthFactor; }
+    inline SidePanelCtx* getPlayqueuePanel() const { return m_playqueuePanel; }
+    inline SidePanelCtx* getNavigationPanel() const { return m_navigationPanel; }
+    inline double getPlayerPlaylistWidth() const { return m_playerPlaylistWidth; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
@@ -412,8 +412,8 @@ public:
 
     Q_INVOKABLE QString displayMRL(const QUrl &mrl) const;
 
-    double artistAlbumsWidthFactor() const;
-    void setArtistAlbumsWidthFactor(double newArtistAlbumsWidthFactor);
+    double artistAlbumsWidth() const;
+    void setArtistAlbumsWidth(double newArtistAlbumsWidth);
 
 #ifdef UPDATE_CHECK
     UpdateModel* getUpdateModel() const;
@@ -440,8 +440,8 @@ protected:
     double               m_intfScaleFactor = 1.;
     int                  i_notificationSetting = 0; /// Systray Notifications
     bool                 b_hideAfterCreation = false; /// --qt-start-minimized
-    PlayqueuePanelCtx*   m_playqueuePanel = nullptr;
-    PlayqueuePanelCtx*   m_navigationPanel = nullptr;
+    SidePanelCtx*   m_playqueuePanel = nullptr;
+    SidePanelCtx*   m_navigationPanel = nullptr;
     QWindow::Visibility  m_windowVisibility = QWindow::Windowed;
     bool                 b_interfaceOnTop = false;      ///keep UI on top
     bool                 b_hasWayland = false;
@@ -464,11 +464,11 @@ protected:
     QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
     /* States */
-    double               m_playerPlaylistWidthFactor = 4.;
+    double               m_playerPlaylistWidth = 120;
     MainInterfaceModes   m_mainInterfaceModes = { MAININTERFACE_MODE_MAINDISPLAY };
     MainInterfaceMode    m_initialEffectiveMainInterfaceMode = MAININTERFACE_MODE_MAINDISPLAY;
 
-    double               m_artistAlbumsWidthFactor = 4.;
+    double               m_artistAlbumsWidth = 120;
 
     VLCVarChoiceModel* m_extraInterfaces = nullptr;
 
@@ -515,7 +515,7 @@ protected:
 public slots:
     void toggleToolbarMenu();
     void toggleInterfaceFullScreen();
-    void setPlayerPlaylistWidthFactor( double factor );
+    void setPlayerPlaylistWidth( double factor );
     void setInterfaceAlwaysOnTop( bool );
     void setShowRemainingTime( bool );
     void setGridView( bool );
@@ -563,7 +563,7 @@ signals:
     void askRaise();
     void kc_pressed(); /* easter eggs */
 
-    void playerPlaylistFactorChanged(double);
+    void playerPlaylistWidthChanged(double);
     void interfaceAlwaysOnTopChanged(bool);
     void hasEmbededVideoChanged(bool);
     void showRemainingTimeChanged(bool);
@@ -611,7 +611,7 @@ signals:
     void windowSuportExtendedFrameChanged();
     void windowExtendedMarginChanged(unsigned margin);
 
-    void artistAlbumsWidthFactorChanged( double );
+    void artistAlbumsWidthChanged( double );
 
     void mainInterfaceModesChanged(MainInterfaceModes);
 
