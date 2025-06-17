@@ -303,10 +303,16 @@ T.ItemDelegate {
                 root.playClicked()
             }
 
-            Component.onCompleted: {
-                root.GridView.reused.connect(picture.reinitialize)
-                root.GridView.pooled.connect(picture.releaseResources)
-            }
+            Connections {
+                target: root.GridView
+
+                function onReused() {
+                    picture.reinitialize()
+                }
+                function onPooled() {
+                    picture.releaseResources()
+                }
+             }
 
             DefaultShadow {
                 id: unselectedShadow
