@@ -119,10 +119,16 @@ Item {
                 radius: root.titleCover_radius
                 color: titleDel.colorContext.bg.secondary
 
-                Component.onCompleted: {
-                    console.assert(titleDel.delegate)
-                    titleDel.delegate.ListView.reused.connect(cover.reinitialize)
-                    titleDel.delegate.ListView.pooled.connect(cover.releaseResources)
+
+                Connections {
+                    target: titleDel.delegate.ListView
+
+                    function onReused() {
+                        cover.reinitialize()
+                    }
+                    function onPooled() {
+                        cover.releaseResources()
+                    }
                 }
 
                 imageOverlay: Item {
