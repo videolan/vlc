@@ -1,6 +1,6 @@
 # libogg
 
-OGG_VERSION := 1.3.4
+OGG_VERSION := 1.3.5
 
 OGG_URL := http://downloads.xiph.org/releases/ogg/libogg-$(OGG_VERSION).tar.xz
 
@@ -16,7 +16,6 @@ $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
 
 libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK)
-	$(APPLY) $(SRC)/ogg/libogg-uint-macos.patch
 	$(MOVE)
 
 .ogg: libogg toolchain.cmake
