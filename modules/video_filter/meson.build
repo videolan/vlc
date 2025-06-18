@@ -355,3 +355,9 @@ vlc_modules += {
     'name' : 'blend',
     'sources' : files('blend.cpp')
 }
+
+vlc_modules += {
+    'name' : 'dither',
+    'sources' : files('dither.c'),
+    'dependencies' : [m_lib]
+}

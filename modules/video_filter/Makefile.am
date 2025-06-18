@@ -71,7 +71,8 @@ libtransform_plugin_la_SOURCES = video_filter/transform.c
 libvhs_plugin_la_SOURCES = video_filter/vhs.c
 libwave_plugin_la_SOURCES = video_filter/wave.c
 libwave_plugin_la_LIBADD = $(LIBM)
-
+libdither_plugin_la_SOURCES = video_filter/dither.c
+libdither_plugin_la_LIBADD = $(LIBM)
 video_filter_LTLIBRARIES = \
 	libadjust_plugin.la \
 	libalphamask_plugin.la \
@@ -111,7 +112,8 @@ video_filter_LTLIBRARIES = \
 	libfps_plugin.la \
 	libfreeze_plugin.la \
 	libpuzzle_plugin.la \
-	librotate_plugin.la
+	librotate_plugin.la \
+	libdither_plugin.la
 
 # macOS / iOS hardware video filters
 libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c codec/vt_utils.h
