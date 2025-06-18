@@ -1245,7 +1245,7 @@ static void WindowCloseCb( vlc_window_t * )
 /**
  * Video output window provider
  */
-static int WindowOpen( vlc_window_t *p_wnd )
+static int WindowOpen( vlc_window_t *p_wnd ) try
 {
     if( !var_InheritBool( p_wnd, "embedded-video" ) )
         return VLC_EGENERIC;
@@ -1282,4 +1282,8 @@ static int WindowOpen( vlc_window_t *p_wnd )
             p_intf->refCount += 1;
         return ret ? VLC_SUCCESS : VLC_EGENERIC;
     }
+}
+catch (std::bad_alloc&)
+{
+    return VLC_ENOMEM;
 }
