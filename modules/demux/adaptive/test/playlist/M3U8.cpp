@@ -554,6 +554,8 @@ int M3U8Playlist_test()
         "#EXT-X-BYTERANGE:4000@2000\n"
         "foobar.ts\n"
         "#EXT-X-BYTERANGE:500\n"
+        "foobar.ts\n"
+        "#EXT-X-BYTERANGE:1000@0\n"
         "foobar.ts\n";
 
     m3u = ParseM3U8(obj, manifest6, sizeof(manifest6));
@@ -571,6 +573,9 @@ int M3U8Playlist_test()
         seg = rep->getMediaSegment(12);
         Expect(seg);
         Expect(seg->getOffset() == 6000);
+        seg = rep->getMediaSegment(13);
+        Expect(seg);
+        Expect(seg->getOffset() == 0);
         delete m3u;
     }
     catch (...)
