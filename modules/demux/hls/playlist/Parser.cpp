@@ -362,11 +362,11 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
 
                 if(ctx_byterange)
                 {
-                    std::pair<std::size_t,std::size_t> range = ctx_byterange->getValue().getByteRange();
-                    if(range.first == 0) /* first == offset, second = length */
+                    ByteRange range = ctx_byterange->getValue().getByteRange();
+                    if(!range.first.has_value()) /* first == offset, second = length */
                         range.first = prevbyterangeoffset;
-                    prevbyterangeoffset = range.first + range.second;
-                    segment->setByteRange(range.first, prevbyterangeoffset - 1);
+                    prevbyterangeoffset = range.first.value() + range.second;
+                    segment->setByteRange(range.first.value(), prevbyterangeoffset - 1);
                     ctx_byterange = nullptr;
                 }
                 segment->setDiscontinuitySequenceNumber(discontinuitySequence);
@@ -428,8 +428,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                         const Attribute *byterangeAttr = keytag->getAttributeByName("BYTERANGE");
                         if(byterangeAttr)
                         {
-                            const std::pair<std::size_t,std::size_t> range = byterangeAttr->unescapeQuotes().getByteRange();
-                            initSegment->setByteRange(range.first, range.first + range.second - 1);
+                            const ByteRange range = byterangeAttr->unescapeQuotes().getByteRange();
+                            initSegment->setByteRange(range.first.value_or(0), range.first.value_or(0) + range.second - 1);
                         }
                         segmentList->initialisationSegment.Set(initSegment);
                     }

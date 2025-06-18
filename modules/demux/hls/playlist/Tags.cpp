@@ -72,10 +72,18 @@ std::vector<uint8_t> Attribute::hexSequence() const
     return ret;
 }
 
-std::pair<std::size_t,std::size_t> Attribute::getByteRange() const
+static inline std::istream& operator>>(std::istream& is, adaptive::optional<std::size_t>& data)
 {
-    std::size_t length = 0;
-    std::size_t offset = 0;
+    size_t val;
+    is >> val;
+    data = val;
+    return is;
+}
+
+ByteRange Attribute::getByteRange() const
+{
+    std::size_t length;
+    adaptive::optional<std::size_t> offset;
     std::istringstream is(value);
     is.imbue(std::locale("C"));
 
@@ -90,7 +98,7 @@ std::pair<std::size_t,std::size_t> Attribute::getByteRange() const
         }
     }
 
-    return std::make_pair(offset, length);
+    return ByteRange(std::move(offset), length);
 }
 
 std::pair<int, int> Attribute::getResolution() const

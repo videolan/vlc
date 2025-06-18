@@ -112,12 +112,12 @@ void BaseAdaptationSet::setBitswitchAble(bool b)
 
 bool BaseAdaptationSet::isSegmentAligned() const
 {
-    return !segmentAligned.has_value() || segmentAligned.value();
+    return segmentAligned.value_or(true);
 }
 
 bool BaseAdaptationSet::isBitSwitchable() const
 {
-    return bitswitchAble.has_value() && segmentAligned.value();
+    return bitswitchAble.has_value() && isSegmentAligned();
 }
 
 void BaseAdaptationSet::setRole(const Role &r)

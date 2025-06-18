@@ -192,6 +192,15 @@ public:
     T& operator*() { return *ptr(); }
     const T& operator*() const { return *ptr(); }
 
+    template <typename U>
+    T value_or(U&& default_value) const& {
+        return has_value_ ? *ptr() : static_cast<T>(std::forward<U>(default_value));
+    }
+    template <typename U>
+    T value_or(U&& default_value) && {
+        return has_value_ ? std::move(*ptr()) : static_cast<T>(std::forward<U>(default_value));
+    }
+
     void reset() noexcept
     {
         destroy();

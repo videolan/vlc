@@ -20,6 +20,8 @@
 #ifndef TAGS_HPP
 #define TAGS_HPP
 
+#include "../../adaptive/tools/Compatibility.hpp"
+
 #include <stdint.h>
 
 #include <string>
@@ -32,6 +34,7 @@ namespace hls
 
     namespace playlist
     {
+        using ByteRange = std::pair<adaptive::optional<std::size_t>,std::size_t>;
 
         class Attribute
         {
@@ -43,7 +46,7 @@ namespace hls
                 std::string quotedString() const;
                 double floatingPoint() const;
                 std::vector<uint8_t> hexSequence() const;
-                std::pair<std::size_t,std::size_t> getByteRange() const;
+                ByteRange getByteRange() const;
                 std::pair<int, int> getResolution() const;
 
                 std::string name;
