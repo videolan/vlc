@@ -130,8 +130,13 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     self.secondaryDetailTextButton.title = item.secondaryDetailString;
 
     if ([item isKindOfClass:VLCMediaLibraryAlbum.class]) {
-        self.yearAndDurationTextField.stringValue =
-            [NSString stringWithFormat:@"%u · %@", [(VLCMediaLibraryAlbum *)item year], item.durationString];
+        const int year = [(VLCMediaLibraryAlbum *)item year];
+        if (year != 0) {
+            self.yearAndDurationTextField.stringValue =
+                [NSString stringWithFormat:@"%u · %@", year, item.durationString];
+        } else {
+            self.yearAndDurationTextField.stringValue = item.durationString;
+        }
     } else {
         self.yearAndDurationTextField.stringValue = item.durationString;
     }
