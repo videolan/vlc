@@ -107,23 +107,15 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)name
 {
-    if (_vlcInputItem) {
-        return toNSStr(_vlcInputItem->psz_name);
-    }
-    return @"";
+    return toNSStr(_vlcInputItem->psz_name);
 }
 - (void)setName:(NSString *)name
 {
-    if (_vlcInputItem) {
-        input_item_SetName(_vlcInputItem, [name UTF8String]);
-    }
+    input_item_SetName(_vlcInputItem, [name UTF8String]);
 }
 
 - (NSString *)title
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_title = input_item_GetTitle(_vlcInputItem);
     if (!psz_title) {
         return self.name;
@@ -136,16 +128,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 -(void)setTitle:(NSString *)title
 {
-    if (_vlcInputItem) {
-        input_item_SetTitle(_vlcInputItem, [title UTF8String]);
-    }
+    input_item_SetTitle(_vlcInputItem, [title UTF8String]);
 }
 
 - (NSString *)artist
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_artist = input_item_GetArtist(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_artist);
     FREENULL(psz_artist);
@@ -153,16 +140,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setArtist:(NSString *)artist
 {
-    if (_vlcInputItem) {
-        input_item_SetArtist(_vlcInputItem, [artist UTF8String]);
-    }
+    input_item_SetArtist(_vlcInputItem, [artist UTF8String]);
 }
 
 - (NSString *)album
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_album = input_item_GetAlbum(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_album);
     FREENULL(psz_album);
@@ -170,16 +152,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setAlbum:(NSString *)albumName
 {
-    if (_vlcInputItem) {
-        input_item_SetAlbum(_vlcInputItem, [albumName UTF8String]);
-    }
+    input_item_SetAlbum(_vlcInputItem, [albumName UTF8String]);
 }
 
 - (NSString *)trackNumber
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_trackNumber = input_item_GetTrackNumber(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_trackNumber);
     FREENULL(psz_trackNumber);
@@ -187,16 +164,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setTrackNumber:(NSString *)trackNumber
 {
-    if (_vlcInputItem) {
-        input_item_SetTrackNumber(_vlcInputItem, [trackNumber UTF8String]);
-    }
+    input_item_SetTrackNumber(_vlcInputItem, [trackNumber UTF8String]);
 }
 
 - (NSString *)genre
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_genre = input_item_GetGenre(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_genre);
     FREENULL(psz_genre);
@@ -204,16 +176,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setGenre:(NSString *)genre
 {
-    if (_vlcInputItem) {
-        input_item_SetGenre(_vlcInputItem, [genre UTF8String]);
-    }
+    input_item_SetGenre(_vlcInputItem, [genre UTF8String]);
 }
 
 - (NSString *)copyright
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_copyright = input_item_GetCopyright(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_copyright);
     FREENULL(psz_copyright);
@@ -221,16 +188,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setCopyright:(NSString *)copyright
 {
-    if (_vlcInputItem) {
-        input_item_SetCopyright(_vlcInputItem, [copyright UTF8String]);
-    }
+    input_item_SetCopyright(_vlcInputItem, [copyright UTF8String]);
 }
 
 - (NSString *)publisher
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_publisher = input_item_GetPublisher(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_publisher);
     FREENULL(psz_publisher);
@@ -238,16 +200,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setPublisher:(NSString *)publisher
 {
-    if (_vlcInputItem) {
-        input_item_SetPublisher(_vlcInputItem, [publisher UTF8String]);
-    }
+    input_item_SetPublisher(_vlcInputItem, [publisher UTF8String]);
 }
 
 - (NSString *)nowPlaying
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_nowPlaying = input_item_GetNowPlaying(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_nowPlaying);
     FREENULL(psz_nowPlaying);
@@ -256,9 +213,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)language
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_language = input_item_GetLanguage(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_language);
     FREENULL(psz_language);
@@ -266,16 +220,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setLanguage:(NSString *)language
 {
-    if (_vlcInputItem) {
-        input_item_SetLanguage(_vlcInputItem, [language UTF8String]);
-    }
+    input_item_SetLanguage(_vlcInputItem, [language UTF8String]);
 }
 
 - (NSString *)date
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_date = input_item_GetDate(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_date);
     FREENULL(psz_date);
@@ -283,16 +232,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setDate:(NSString *)date
 {
-    if (_vlcInputItem) {
-        input_item_SetDate(_vlcInputItem, [date UTF8String]);
-    }
+    input_item_SetDate(_vlcInputItem, [date UTF8String]);
 }
 
 - (NSString *)contentDescription
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_description = input_item_GetDescription(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_description);
     FREENULL(psz_description);
@@ -300,16 +244,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setContentDescription:(NSString *)contentDescription
 {
-    if (_vlcInputItem) {
-        input_item_SetDescription(_vlcInputItem, [contentDescription UTF8String]);
-    }
+    input_item_SetDescription(_vlcInputItem, [contentDescription UTF8String]);
 }
 
 - (NSString *)encodedBy
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_encodedBy = input_item_GetEncodedBy(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_encodedBy);
     FREENULL(psz_encodedBy);
@@ -318,9 +257,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)trackID
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_trackID = input_item_GetTrackID(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_trackID);
     FREENULL(psz_trackID);
@@ -329,9 +265,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)trackTotal
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_trackTotal = input_item_GetTrackTotal(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_trackTotal);
     FREENULL(psz_trackTotal);
@@ -340,9 +273,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)director
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_director = input_item_GetDirector(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_director);
     FREENULL(psz_director);
@@ -350,16 +280,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setDirector:(NSString *)director
 {
-    if (_vlcInputItem) {
-        input_item_SetDirector(_vlcInputItem, [director UTF8String]);
-    }
+    input_item_SetDirector(_vlcInputItem, [director UTF8String]);
 }
 
 - (NSString *)season
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_season = input_item_GetSeason(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_season);
     FREENULL(psz_season);
@@ -368,9 +293,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)episode
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_episode = input_item_GetEpisode(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_episode);
     FREENULL(psz_episode);
@@ -379,9 +301,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)showName
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_showName = input_item_GetShowName(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_showName);
     FREENULL(psz_showName);
@@ -389,16 +308,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setShowName:(NSString *)showName
 {
-    if (_vlcInputItem) {
-        input_item_SetShowName(_vlcInputItem, [showName UTF8String]);
-    }
+    input_item_SetShowName(_vlcInputItem, [showName UTF8String]);
 }
 
 - (NSString *)actors
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_actors = input_item_GetActors(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_actors);
     FREENULL(psz_actors);
@@ -406,16 +320,11 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 }
 - (void)setActors:(NSString *)actors
 {
-    if (_vlcInputItem) {
-        input_item_SetActors(_vlcInputItem, [actors UTF8String]);
-    }
+    input_item_SetActors(_vlcInputItem, [actors UTF8String]);
 }
 
 - (NSString *)discNumber
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_discNumber = input_item_GetDiscNumber(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_discNumber);
     FREENULL(psz_discNumber);
@@ -424,9 +333,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)totalNumberOfDiscs
 {
-    if (!_vlcInputItem) {
-        return nil;
-    }
     char *psz_totalDiscNumber = input_item_GetDiscTotal(_vlcInputItem);
     NSString *returnValue = toNSStr(psz_totalDiscNumber);
     FREENULL(psz_totalDiscNumber);
@@ -435,26 +341,20 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)MRL
 {
-    if (_vlcInputItem) {
-        return toNSStr(_vlcInputItem->psz_uri);
-    }
-    return @"";
+    return toNSStr(_vlcInputItem->psz_uri);
 }
 
 - (NSString *)decodedMRL
 {
-    if (_vlcInputItem) {
-        char *psz_url = vlc_uri_decode(input_item_GetURI(_vlcInputItem));
-        NSString *returnValue = toNSStr(psz_url);
-        FREENULL(psz_url);
-        return returnValue;
-    }
-    return nil;
+    char *psz_url = vlc_uri_decode(input_item_GetURI(_vlcInputItem));
+    NSString *returnValue = toNSStr(psz_url);
+    FREENULL(psz_url);
+    return returnValue;
 }
 
 - (NSString*)path
 {
-    if (_vlcInputItem || (_vlcInputItem && _vlcInputItem->b_net)) {
+    if (!_vlcInputItem->b_net) {
         char *psz_url = input_item_GetURI(_vlcInputItem);
         if (!psz_url) {
             return @"";
@@ -473,38 +373,27 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (vlc_tick_t)duration
 {
-    if (_vlcInputItem) {
-        return _vlcInputItem->i_duration;
-    }
-    return -1;
+    return _vlcInputItem->i_duration;
 }
 
 - (enum input_item_type_e)inputType
 {
-    if (_vlcInputItem) {
-        return _vlcInputItem->i_type;
-    }
-    return ITEM_TYPE_UNKNOWN;
+    return _vlcInputItem->i_type;
 }
 
 - (NSURL *)artworkURL
 {
-    if (_vlcInputItem) {
-        char *p_artworkURL = input_item_GetArtworkURL(_vlcInputItem);
-        if (p_artworkURL) {
-            NSString *artworkURLString = toNSStr(p_artworkURL);
-            FREENULL(p_artworkURL);
-            return [NSURL URLWithString:artworkURLString];
-        }
+    char *p_artworkURL = input_item_GetArtworkURL(_vlcInputItem);
+    if (p_artworkURL) {
+        NSString *artworkURLString = toNSStr(p_artworkURL);
+        FREENULL(p_artworkURL);
+        return [NSURL URLWithString:artworkURLString];
     }
     return nil;
 }
 
 - (void)setArtworkURL:(NSURL *)artworkURL
 {
-    if (!_vlcInputItem) {
-        return;
-    }
 
     if (artworkURL != nil) {
         input_item_SetArtworkURL(_vlcInputItem, artworkURL.absoluteString.UTF8String);
@@ -546,18 +435,12 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (BOOL)preparsed
 {
-    if (_vlcInputItem) {
-        return input_item_IsPreparsed(_vlcInputItem);
-    }
-    return NO;
+    return input_item_IsPreparsed(_vlcInputItem);
 }
 
 - (BOOL)isStream
 {
-    if (_vlcInputItem) {
-        return (BOOL)_vlcInputItem->b_net;
-    }
-    return YES;
+    return (BOOL)_vlcInputItem->b_net;
 }
 
 - (void)subTreeAdded:(input_item_node_t *)p_node
@@ -568,15 +451,12 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (int)writeMetadataToFile
 {
-    if (!_vlcInputItem) {
-        return VLC_ENOENT;
-    }
     return input_item_WriteMeta(VLC_OBJECT(getIntf()), _vlcInputItem);
 }
 
 - (void)thumbnailWithSize:(NSSize)size completionHandler:(void(^)(NSImage * image))completionHandler
 {
-    if (self.isStream || _vlcInputItem == NULL) {
+    if (self.isStream) {
         completionHandler(nil);
         return;
     }
@@ -651,10 +531,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (nullable NSArray<NSString *> *)options
 {
-    if (_vlcInputItem == NULL) {
-        return nil;
-    }
-
     const int i_options = _vlcInputItem->i_options;
     NSMutableArray * const options = [NSMutableArray arrayWithCapacity:i_options];
     for (NSUInteger i = 0; i < i_options; ++i) {
