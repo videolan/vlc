@@ -388,7 +388,7 @@ vlc_tick_t DefaultBufferingLogic::getBufferingOffset(const BasePlaylist *p) cons
 
 bool DefaultBufferingLogic::isLowLatency(const BasePlaylist *p) const
 {
-    if(userLowLatency.isSet())
+    if(userLowLatency.has_value())
         return userLowLatency.value();
     return p->isLowLatency();
 }

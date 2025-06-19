@@ -22,7 +22,9 @@
 
 #include <vector>
 #include <vlc_common.h>
-#include "../tools/Properties.hpp"
+#include <vlc_mtime.h>
+
+#include "../tools/Compatibility.hpp"
 
 namespace adaptive
 {
@@ -60,7 +62,7 @@ namespace adaptive
                 vlc_tick_t userMinBuffering;
                 vlc_tick_t userMaxBuffering;
                 vlc_tick_t userLiveDelay;
-                Undef<bool> userLowLatency;
+                optional<bool> userLowLatency;
         };
 
         class DefaultBufferingLogic : public AbstractBufferingLogic

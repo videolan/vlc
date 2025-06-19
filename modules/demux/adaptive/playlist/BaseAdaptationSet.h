@@ -68,8 +68,8 @@ namespace adaptive
                 Role                            role;
                 std::vector<BaseRepresentation *>   representations;
                 std::string                     lang;
-                Undef<bool>                     segmentAligned;
-                Undef<bool>                     bitswitchAble;
+                optional<bool>                  segmentAligned;
+                optional<bool>                  bitswitchAble;
         };
     }
 }

@@ -39,24 +39,6 @@ template <typename T> class Property
         T value;
 };
 
-template <typename T> class Undef
-{
-    public:
-        Undef() { undef = true; }
-
-        bool isSet() const
-        {
-            return !undef;
-        }
-
-        void operator =(const T &v) { val = v; undef = false; }
-        const T& value() const { return val; }
-
-    private:
-        bool undef;
-        T val;
-};
-
 template <typename T> class Ratio
 {
     public:
