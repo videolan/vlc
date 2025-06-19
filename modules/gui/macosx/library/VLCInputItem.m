@@ -86,11 +86,13 @@ static const struct input_item_parser_cbs_t parserCallbacks =
     return inputItem;
 }
 
-- (instancetype)initWithInputItem:(struct input_item_t *)p_inputItem
+- (nullable instancetype)initWithInputItem:(struct input_item_t *)p_inputItem
 {
     self = [super init];
     if (self && p_inputItem != NULL) {
         _vlcInputItem = input_item_Hold(p_inputItem);
+    } else {
+        return nil;
     }
     return self;
 }
