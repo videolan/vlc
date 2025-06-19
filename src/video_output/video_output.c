@@ -850,8 +850,19 @@ typedef struct {
     config_chain_t *cfg;
 } vout_filter_t;
 
+static int strcmp_void(const void *a, const void *b)
+{
+    const char *const *entry = b;
+    return strcmp(a, *entry);
+}
+
 static void ChangeFilters(vout_thread_sys_t *vout)
 {
+    /* bsearch: must be sorted alphabetically */
+    static const char *const static_filters[] = {
+        "amf_frc",
+        "postproc",
+    };
     vout_thread_sys_t *sys = vout;
     FilterFlush(vout, true);
     DelAllFilterCallbacks(vout);
@@ -887,7 +898,10 @@ static void ChangeFilters(vout_thread_sys_t *vout)
             if (likely(e)) {
                 e->name = name;
                 e->cfg  = cfg;
-                if (!strcmp(e->name, "postproc") || !strcmp(e->name, "amf_frc"))
+                bool is_static_filter =
+                    bsearch(e->name, static_filters, ARRAY_SIZE(static_filters),
+                            sizeof(const char *), strcmp_void) != NULL;
+                if (is_static_filter)
                     vlc_array_append_or_abort(&array_static, e);
                 else
                     vlc_array_append_or_abort(&array_interactive, e);
