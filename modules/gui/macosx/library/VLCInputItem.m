@@ -98,10 +98,10 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (void)dealloc
 {
-    if (_p_parserID) {
+    if (_p_parserID)
         input_item_parser_id_Release(_p_parserID);
-    }
-    input_item_Release(_vlcInputItem);
+    if (_vlcInputItem)
+        input_item_Release(_vlcInputItem);
 }
 
 - (NSString *)name
