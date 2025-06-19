@@ -9,6 +9,8 @@ libcompressor_plugin_la_LIBADD = $(LIBM)
 libequalizer_plugin_la_SOURCES = audio_filter/equalizer.c \
 	audio_filter/equalizer_presets.h
 libequalizer_plugin_la_LIBADD = $(LIBM)
+libgate_plugin_la_SOURCES = audio_filter/gate.c
+libgate_plugin_la_LIBADD  = $(LIBM)
 libkaraoke_plugin_la_SOURCES = audio_filter/karaoke.c
 libnormvol_plugin_la_SOURCES = audio_filter/normvol.c
 libnormvol_plugin_la_LIBADD = $(LIBM)
@@ -43,6 +45,7 @@ audio_filter_LTLIBRARIES = \
 	libchorus_flanger_plugin.la \
 	libcompressor_plugin.la \
 	libequalizer_plugin.la \
+	libgate_plugin.la \ 
 	libkaraoke_plugin.la \
 	libnormvol_plugin.la \
 	libgain_plugin.la \
