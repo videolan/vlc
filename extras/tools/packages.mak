@@ -6,7 +6,7 @@ VIDEOLAN=https://downloads.videolan.org/pub/contrib
 YASM_VERSION=1.3.0
 YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
 
-NASM_VERSION=2.14
+NASM_VERSION=2.16.03
 NASM_URL=https://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)/nasm-$(NASM_VERSION).tar.gz
 
 CMAKE_VERSION_MAJ=4.1
