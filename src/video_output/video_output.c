@@ -861,6 +861,7 @@ static void ChangeFilters(vout_thread_sys_t *vout)
     /* bsearch: must be sorted alphabetically */
     static const char *const static_filters[] = {
         "amf_frc",
+        "fps",
         "postproc",
     };
     vout_thread_sys_t *sys = vout;
