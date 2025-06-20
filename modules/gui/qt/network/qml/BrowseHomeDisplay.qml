@@ -136,6 +136,20 @@ FocusScope {
         contentWidth: column.width
         contentHeight: column.height
 
+        // This behavior allows to have similar "smooth" animation
+        // that Qt views have with `highlightFollowsCurrentItem`.
+        Behavior on contentY {
+            id: contentYBehavior
+
+            enabled: false
+
+            // NOTE: Usage of `SmoothedAnimation` is intentional here.
+            SmoothedAnimation {
+                duration: VLCStyle.duration_veryLong
+                easing.type: Easing.InOutSine
+            }
+        }
+
         DefaultFlickableScrollHandler { }
 
         Navigation.parentItem: root
@@ -287,15 +301,20 @@ FocusScope {
         onActiveFocusChanged: {
             if (activeFocus) {
                 const item = _currentView?.currentItem ?? _currentView?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                contentYBehavior.enabled = true
                 Helpers.positionFlickableToContainItem(flickable, item ?? this)
+                contentYBehavior.enabled = false
             }
         }
 
         onCurrentIndexChanged: {
             if (activeFocus) {
                 const item = _currentView?.currentItem ?? _currentView?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
-                if (item)
+                if (item) {
+                    contentYBehavior.enabled = true
                     Helpers.positionFlickableToContainItem(flickable, item)
+                    contentYBehavior.enabled = false
+                }
             }
         }
     }
