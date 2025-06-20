@@ -438,6 +438,34 @@ ListView {
         Helpers.enforceFocus(currentItem, reason);
     }
 
+    // Qt does not allow having multiple behavior on a single
+    // property. Having this behavior for a single purpose can
+    // be problematic for the cases where a different behavior
+    // wanted to be used. However, I have not found a nice
+    // solution for that, so we have this behavior here for now.
+    Behavior on contentX {
+        id: horizontalPageAnimationBehavior
+
+        enabled: false
+
+        // NOTE: Usage of `SmoothedAnimation` is intentional here.
+        SmoothedAnimation {
+            duration: VLCStyle.duration_veryLong
+            easing.type: Easing.InOutSine
+        }
+    }
+
+    function animatePage(func) {
+        // One might think, what is the purpose of this if `highlightFollowsCurrentItem` (default
+        // true) causes the view to smoothly follow the current item. The thing is that, not in
+        // all cases the current index is changed. With the horizontal page buttons, for example,
+        // it is not conventional to change the current index.
+        console.assert(func === root.nextPage || func === root.prevPage)
+        horizontalPageAnimationBehavior.enabled = true
+        func()
+        horizontalPageAnimationBehavior.enabled = false
+    }
+
     function nextPage() {
         root.contentX += (Math.min(root.width, (root.contentWidth - root.width - root.contentX)))
     }
@@ -705,7 +733,9 @@ ListView {
 
         visible: (root.orientation === ListView.Horizontal && !(root.atXBeginning))
 
-        onClicked: root.prevPage()
+        onClicked: {
+            root.animatePage(root.prevPage)
+        }
 
         activeFocusOnTab: false
     }
@@ -720,7 +750,9 @@ ListView {
 
         visible: (root.orientation === ListView.Horizontal && !(root.atXEnd))
 
-        onClicked: root.nextPage()
+        onClicked: {
+            root.animatePage(root.nextPage)
+        }
 
         activeFocusOnTab: false
     }
