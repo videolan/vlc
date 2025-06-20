@@ -201,7 +201,7 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
         ForgedInitSegment *initSegment = new (std::nothrow)
                 ForgedInitSegment(rep, type,
                                   timescale,
-                                  adaptSet->getPlaylist()->duration.Get());
+                                  adaptSet->getPlaylist()->duration);
         if(initSegment)
         {
             initSegment->setTrackID(trackid);
@@ -214,7 +214,7 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
 
             initSegment->setSourceUrl("forged://");
 
-            rep->initialisationSegment.Set(initSegment);
+            rep->initialisationSegment = initSegment;
         }
     }
 }
@@ -229,7 +229,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
             adaptSet->setLang(streamIndexNode->getAttributeValue("Language"));
 
         if(streamIndexNode->hasAttribute("Name"))
-            adaptSet->description.Set(streamIndexNode->getAttributeValue("Name"));
+            adaptSet->description = streamIndexNode->getAttributeValue("Name");
 
         Timescale timescale(10000000);
         if(streamIndexNode->hasAttribute("TimeScale"))
@@ -284,13 +284,13 @@ Manifest * ManifestParser::parse()
     if(root->hasAttribute("Duration"))
     {
         stime_t time = Integer<stime_t>(root->getAttributeValue("Duration"));
-        manifest->duration.Set(timescale.ToTime(time));
+        manifest->duration = timescale.ToTime(time);
     }
 
     if(root->hasAttribute("DVRWindowLength"))
     {
         stime_t time = Integer<stime_t>(root->getAttributeValue("DVRWindowLength"));
-        manifest->timeShiftBufferDepth.Set(timescale.ToTime(time));
+        manifest->timeShiftBufferDepth = timescale.ToTime(time);
     }
 
     if(root->hasAttribute("IsLive") && root->getAttributeValue("IsLive") == "TRUE")
@@ -300,7 +300,7 @@ Manifest * ManifestParser::parse()
     BasePeriod *period = new (std::nothrow) BasePeriod(manifest);
     if(period)
     {
-        period->duration.Set(manifest->duration.Get());
+        period->duration = manifest->duration;
         unsigned nextid = 1;
         std::vector<Node *> streamIndexes = DOMHelper::getElementByTagName(root, "StreamIndex", NS_SMOOTH, true);
         std::vector<Node *>::const_iterator it;

@@ -89,16 +89,16 @@ int SegmentTemplate_test()
 
         /* start/end, duration known */
         vlc_tick_t now = timescale.ToTime(1000000);
-        pl->availabilityStartTime.Set(now);
-        pl->availabilityEndTime.Set(now + timescale.ToTime(100 * 20));
+        pl->availabilityStartTime = now;
+        pl->availabilityEndTime = now + timescale.ToTime(100 * 20);
         Expect(templ->getLiveTemplateNumber(now, true) == templ->getStartSegmentNumber());
         //Expect(templ->getLiveTemplateNumber(now / 2, true) == std::numeric_limits<uint64_t>::max());
         Expect(templ->getLiveTemplateNumber(now + timescale.ToTime(100) * 2 + 1, true) ==
                templ->getStartSegmentNumber() + 1);
 
         /* reset */
-        pl->availabilityStartTime.Set(0);
-        pl->availabilityEndTime.Set(0);
+        pl->availabilityStartTime = 0;
+        pl->availabilityEndTime = 0;
 
         /* timeline */
         const stime_t START = 1337;

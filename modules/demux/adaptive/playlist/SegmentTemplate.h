@@ -24,7 +24,6 @@
 #define SEGMENTTEMPLATE_H
 
 #include "Segment.h"
-#include "../tools/Properties.hpp"
 #include "SegmentBaseType.hpp"
 
 namespace adaptive

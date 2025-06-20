@@ -57,8 +57,8 @@ int SegmentList_test() try
     const stime_t START = 1337;
     std::unique_ptr<Segment> seg = std::make_unique<Segment>(nullptr);
     seg->setSequenceNumber(123);
-    seg->startTime.Set(START);
-    seg->duration.Set(100);
+    seg->startTime = START;
+    seg->duration = 100;
     segmentList->addSegment(seg.release());
 
     Expect(segmentList->getTotalLength() == 100);
@@ -71,7 +71,7 @@ int SegmentList_test() try
     Segment *segptr = segmentList->getMediaSegment(123);
     Expect(segptr);
     Expect(segptr->getSequenceNumber() == 123);
-    Expect(segptr->startTime.Get() == START);
+    Expect(segptr->startTime == START);
     segptr = segmentList->getNextMediaSegment(123, &number, &discont);
     Expect(segptr);
     Expect(number == 123);
@@ -87,8 +87,8 @@ int SegmentList_test() try
     {
         std::unique_ptr<Segment> seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(123 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList->addSegment(seg.release());
     }
 
@@ -107,8 +107,8 @@ int SegmentList_test() try
     {
         std::unique_ptr<Segment> seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(123 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList2->addSegment(seg.release());
     }
     segmentList->updateWith(segmentList2.get());
@@ -120,8 +120,8 @@ int SegmentList_test() try
         segptr = segmentList->getMediaSegment(123 + i);
         Expect(segptr);
         Expect(segptr->getSequenceNumber() == (uint64_t) 123 + i);
-        Expect(segptr->startTime.Get() == START + 100 * i);
-        Expect(segptr->duration.Get() == 100);
+        Expect(segptr->startTime == START + 100 * i);
+        Expect(segptr->duration == 100);
     }
 
     /* prune */
@@ -145,8 +145,8 @@ int SegmentList_test() try
     {
         seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(123 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList->addSegment(seg.release());
     }
     segmentList2 = std::make_unique<SegmentList>(nullptr, true);
@@ -154,8 +154,8 @@ int SegmentList_test() try
     {
         seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(123 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList2->addSegment(seg.release());
     }
     segmentList->updateWith(segmentList2.get());
@@ -176,8 +176,8 @@ int SegmentList_test() try
     {
         seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(123 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList->addSegment(seg.release());
     }
     segmentList2 = std::make_unique<SegmentList>(nullptr, true);
@@ -185,8 +185,8 @@ int SegmentList_test() try
     {
         seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(128 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList2->addSegment(seg.release());
     }
     segmentList->updateWith(segmentList2.get());
@@ -194,8 +194,8 @@ int SegmentList_test() try
     Expect(segmentList->getSegments().size() == 2);
     Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 128);
     Expect(segmentList->getSegments().at(1)->getSequenceNumber() == 129);
-    Expect(segmentList->getSegments().at(0)->startTime.Get() == START + 100 * (128 - 123));
-    Expect(segmentList->getSegments().at(1)->startTime.Get() == START + 100 * (129 - 123));
+    Expect(segmentList->getSegments().at(0)->startTime == START + 100 * (128 - 123));
+    Expect(segmentList->getSegments().at(1)->startTime == START + 100 * (129 - 123));
 
     segmentList.reset();
     segmentList2.reset();
@@ -209,8 +209,8 @@ int SegmentList_test() try
     {
         seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(123 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList->addSegment(seg.release());
     }
     segmentList2 = std::make_unique<SegmentList>(nullptr, false);
@@ -218,8 +218,8 @@ int SegmentList_test() try
     {
         seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(123 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList2->addSegment(seg.release());
     }
     segmentList->updateWith(segmentList2.get());
@@ -227,8 +227,8 @@ int SegmentList_test() try
     Expect(segmentList->getSegments().size() == 2);
     Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 128);
     Expect(segmentList->getSegments().at(1)->getSequenceNumber() == 129);
-    Expect(segmentList->getSegments().at(0)->startTime.Get() == START + 100 * (128 - 123));
-    Expect(segmentList->getSegments().at(1)->startTime.Get() == START + 100 * (129 - 123));
+    Expect(segmentList->getSegments().at(0)->startTime == START + 100 * (128 - 123));
+    Expect(segmentList->getSegments().at(1)->startTime == START + 100 * (129 - 123));
 
     segmentList.reset();
     segmentList2.reset();
@@ -240,8 +240,8 @@ int SegmentList_test() try
     {
         seg = std::make_unique<Segment>(nullptr);
         seg->setSequenceNumber(123 + i);
-        seg->startTime.Set(START + 100 * i);
-        seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
         segmentList->addSegment(seg.release());
     }
     const std::vector<Segment*>&allsegments = segmentList->getSegments();

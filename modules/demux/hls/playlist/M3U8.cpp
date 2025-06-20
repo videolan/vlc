@@ -31,7 +31,7 @@ using namespace hls::playlist;
 M3U8::M3U8 (vlc_object_t *p_object) :
     BasePlaylist(p_object)
 {
-    minUpdatePeriod.Set( VLC_TICK_FROM_SEC(5) );
+    minUpdatePeriod = VLC_TICK_FROM_SEC(5);
 }
 
 M3U8::~M3U8()

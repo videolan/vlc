@@ -57,7 +57,7 @@ void SegmentTemplateSegment::setParentTemplate( SegmentTemplate *templ_ )
 SegmentTemplate::SegmentTemplate( SegmentTemplateSegment *seg, SegmentInformation *parent ) :
     AbstractMultipleSegmentBaseType( parent, AbstractAttr::Type::SegmentTemplate )
 {
-    initialisationSegment.Set( nullptr );
+    initialisationSegment = nullptr;
     parentSegmentInformation = parent;
     virtualsegment = seg;
     virtualsegment->setParent( parentSegmentInformation );
@@ -102,7 +102,7 @@ uint64_t SegmentTemplate::getLiveTemplateNumber(vlc_tick_t playbacktime, bool ab
         if(abs)
         {
             vlc_tick_t streamstart =
-                    parentSegmentInformation->getPlaylist()->availabilityStartTime.Get();
+                    parentSegmentInformation->getPlaylist()->availabilityStartTime;
             streamstart += parentSegmentInformation->getPeriodStart();
             playbacktime -= streamstart;
         }
@@ -149,8 +149,8 @@ void SegmentTemplate::setVirtualSegmentTime(uint64_t pos,
     if(getScaledPlaybackTimeDurationBySegmentNumber(pos, &startTime,
                                                     &duration, &timescale))
     {
-        virtualsegment->startTime.Set(startTime);
-        virtualsegment->duration.Set(duration);
+        virtualsegment->startTime = startTime;
+        virtualsegment->duration = duration;
     }
 }
 
@@ -188,7 +188,7 @@ Segment *  SegmentTemplate::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newp
             const stime_t segmentduration = inheritDuration();
             vlc_tick_t totalduration = parentSegmentInformation->getPeriodDuration();
             if(totalduration == 0)
-                totalduration = playlist->duration.Get();
+                totalduration = playlist->duration;
             if(totalduration && segmentduration)
             {
                 uint64_t endnum = inheritStartNumber() +
@@ -232,9 +232,9 @@ bool SegmentTemplate::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) con
         if( playlist->isLive() )
         {
             vlc_tick_t now = vlc_tick_from_sec(::time(nullptr));
-            if(time >= playlist->availabilityStartTime.Get() && time < now)
+            if(time >= playlist->availabilityStartTime && time < now)
                 *ret = getLiveTemplateNumber(time, true);
-            else if(now - playlist->availabilityStartTime.Get() > time)
+            else if(now - playlist->availabilityStartTime > time)
                 *ret = getLiveTemplateNumber(time, false);
             else return false;
         }

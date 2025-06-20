@@ -60,8 +60,8 @@ CodecDescription * QualityLevel::makeCodecDescription(const std::string &) const
 
 InitSegment * QualityLevel::getInitSegment() const
 {
-    if(initialisationSegment.Get())
-        return initialisationSegment.Get();
+    if(initialisationSegment)
+        return initialisationSegment;
     else
         return BaseRepresentation::getInitSegment();
 }

@@ -27,7 +27,6 @@
 
 #include "ICanonicalUrl.hpp"
 #include "Inheritables.hpp"
-#include "../tools/Properties.hpp"
 
 namespace adaptive
 {
@@ -66,15 +65,15 @@ namespace adaptive
                 bool                needsUpdates() const;
                 void                updateWith(BasePlaylist *);
 
-                Property<vlc_tick_t>                   duration;
-                Property<time_t>                    playbackStart;
-                Property<vlc_tick_t>                   availabilityEndTime;
-                Property<vlc_tick_t>                   availabilityStartTime;
-                Property<vlc_tick_t>                   minUpdatePeriod;
-                Property<vlc_tick_t>                   maxSegmentDuration;
-                Property<vlc_tick_t>                   timeShiftBufferDepth;
-                Property<vlc_tick_t>                   suggestedPresentationDelay;
-                Property<vlc_tick_t>                   presentationStartOffset;
+                vlc_tick_t                   duration;
+                time_t                       playbackStart;
+                vlc_tick_t                   availabilityEndTime;
+                vlc_tick_t                   availabilityStartTime;
+                vlc_tick_t                   minUpdatePeriod;
+                vlc_tick_t                   maxSegmentDuration;
+                vlc_tick_t                   timeShiftBufferDepth;
+                vlc_tick_t                   suggestedPresentationDelay;
+                vlc_tick_t                   presentationStartOffset;
 
             protected:
                 vlc_object_t                       *p_object;

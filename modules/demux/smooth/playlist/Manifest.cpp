@@ -31,7 +31,7 @@ using namespace smooth::playlist;
 Manifest::Manifest (vlc_object_t *p_object) :
     BasePlaylist(p_object)
 {
-    minUpdatePeriod.Set( VLC_TICK_FROM_SEC(5) );
+    minUpdatePeriod = VLC_TICK_FROM_SEC(5);
     addAttribute(new TimescaleAttr(Timescale(10000000))); // 100ns
     b_live = false;
 }

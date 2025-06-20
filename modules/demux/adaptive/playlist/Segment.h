@@ -31,7 +31,6 @@
 #include "ICanonicalUrl.hpp"
 #include "../http/Chunk.h"
 #include "../encryption/CommonEncryption.hpp"
-#include "../tools/Properties.hpp"
 #include "../Time.hpp"
 
 namespace adaptive
@@ -72,8 +71,8 @@ namespace adaptive
                 void                                    setEncryption   (CommonEncryption &);
                 void                                    setDisplayTime  (vlc_tick_t);
                 vlc_tick_t                              getDisplayTime  () const;
-                Property<stime_t>       startTime;
-                Property<stime_t>       duration;
+                stime_t                 startTime;
+                stime_t                 duration;
                 bool                    discontinuity;
 
             protected:

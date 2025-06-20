@@ -52,7 +52,7 @@ namespace dash
                 void                            setLowLatency(bool);
                 void                            debug() const override;
 
-                Property<ProgramInformation *>      programInfo;
+                ProgramInformation *            programInfo;
 
             private:
                 Profile                             profile;

@@ -109,7 +109,7 @@ void BaseRepresentation::getCodecsDesc(CodecDescriptionList *desc) const
     for(auto it = codecs.cbegin(); it != codecs.cend(); ++it)
     {
         CodecDescription *dsc = makeCodecDescription(*it);
-        dsc->setDescription(adaptationSet->description.Get());
+        dsc->setDescription(adaptationSet->description);
         dsc->setLanguage(adaptationSet->getLang());
         if(getWidth() > 0 && getHeight() > 0)
             dsc->setDimensions(getWidth(), getHeight());
@@ -250,8 +250,8 @@ bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
         else if( mediaSegmentTemplate->inheritDuration() )
         {
             *rangeEnd = 0;
-            *rangeBegin = -1 * getPlaylist()->timeShiftBufferDepth.Get();
-            *rangeLength = getPlaylist()->timeShiftBufferDepth.Get();
+            *rangeBegin = -1 * getPlaylist()->timeShiftBufferDepth;
+            *rangeLength = getPlaylist()->timeShiftBufferDepth;
             return true;
         }
     }
@@ -262,8 +262,8 @@ bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
         const Timescale timescale = segmentList->inheritTimescale();
         const std::vector<Segment *> &list = segmentList->getSegments();
         const ISegment *back = list.back();
-        const stime_t startTime = list.front()->startTime.Get();
-        const stime_t endTime = back->startTime.Get() + back->duration.Get();
+        const stime_t startTime = list.front()->startTime;
+        const stime_t endTime = back->startTime + back->duration;
         *rangeBegin = timescale.ToTime(startTime);
         *rangeEnd = timescale.ToTime(endTime);
         *rangeLength = timescale.ToTime(segmentList->getTotalLength());
@@ -279,8 +279,8 @@ bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
 
         const Timescale timescale = inheritTimescale();
         const Segment *back = list.back();
-        const stime_t startTime = list.front()->startTime.Get();
-        const stime_t endTime = back->startTime.Get() + back->duration.Get();
+        const stime_t startTime = list.front()->startTime;
+        const stime_t endTime = back->startTime + back->duration;
         *rangeBegin = timescale.ToTime(startTime);
         *rangeEnd = timescale.ToTime(endTime);
         *rangeLength = 0;

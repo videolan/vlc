@@ -101,7 +101,7 @@ int BufferingLogic_test()
         uint64_t number = 22;
         Segment *seg = new Segment(rep);
         seg->setSequenceNumber(number);
-        seg->duration.Set(segmentduration);
+        seg->duration = segmentduration;
         segmentList->addSegment(seg);
 
         Expect(bufferinglogic.getStartSegmentNumber(rep) == number);
@@ -152,7 +152,7 @@ int BufferingLogic_test()
         {
             seg = new Segment(rep);
             seg->setSequenceNumber(++number);
-            seg->duration.Set(segmentduration);
+            seg->duration = segmentduration;
             segmentList->addSegment(seg);
         }
 

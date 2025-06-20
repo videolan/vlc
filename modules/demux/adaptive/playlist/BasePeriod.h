@@ -28,7 +28,6 @@
 
 #include "BaseAdaptationSet.h"
 #include "SegmentInformation.hpp"
-#include "../tools/Properties.hpp"
 
 namespace adaptive
 {
@@ -49,8 +48,8 @@ namespace adaptive
                 vlc_tick_t getPeriodDuration() const override;
                 BasePlaylist *getPlaylist() const override;
 
-                Property<vlc_tick_t> duration;
-                Property<vlc_tick_t> startTime;
+                vlc_tick_t duration;
+                vlc_tick_t startTime;
 
             private:
                 std::vector<BaseAdaptationSet *>    adaptationSets;

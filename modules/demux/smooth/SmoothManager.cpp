@@ -120,8 +120,8 @@ void SmoothManager::scheduleNextUpdate()
 
     vlc_tick_t minbuffer = getMinAheadTime() / 2;
 
-    if(playlist->minUpdatePeriod.Get() > minbuffer)
-        minbuffer = playlist->minUpdatePeriod.Get();
+    if(playlist->minUpdatePeriod > minbuffer)
+        minbuffer = playlist->minUpdatePeriod;
 
     minbuffer = std::max(minbuffer, VLC_TICK_FROM_SEC(5));
 

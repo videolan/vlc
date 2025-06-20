@@ -205,8 +205,8 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
 
     if(!segmentList->hasRelativeMediaTimes())
     {
-        const stime_t wantedTimeIn = fromSeg->startTime.Get();
-        const stime_t wantedTimeOut = wantedTimeIn + fromSeg->duration.Get();
+        const stime_t wantedTimeIn = fromSeg->startTime;
+        const stime_t wantedTimeOut = wantedTimeIn + fromSeg->duration;
 
         const std::vector<Segment *> &list = segmentList->getSegments();
         std::vector<Segment *>::const_iterator it;
@@ -216,8 +216,8 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
             /* Must be in the same sequence */
             if(seg->getDiscontinuitySequenceNumber() < discontinuitySequence)
                 continue;
-            const stime_t segTimeIn = seg->startTime.Get();
-            const stime_t segTimeOut = segTimeIn + seg->duration.Get();
+            const stime_t segTimeIn = seg->startTime;
+            const stime_t segTimeOut = segTimeIn + seg->duration;
             if(wantedTimeIn >= segTimeIn && wantedTimeIn < segTimeOut)
                 return seg->getSequenceNumber();
             /* approx / gap */
@@ -231,12 +231,12 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
         if(fromList)
         {
             stime_t length = fromList->getTotalLength();
-            stime_t first = fromList->getSegments().front()->startTime.Get();
-            stime_t now = fromSeg->startTime.Get();
+            stime_t first = fromList->getSegments().front()->startTime;
+            stime_t now = fromSeg->startTime;
             double relpos = ((double)(now - first)) / length;
 
             const std::vector<Segment *> &list = segmentList->getSegments();
-            stime_t lookup = list.front()->startTime.Get() +
+            stime_t lookup = list.front()->startTime +
                              segmentList->getTotalLength() * relpos;
             std::vector<Segment *>::const_iterator it;
             for(it=list.begin(); it != list.end(); ++it)
@@ -245,8 +245,8 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
                 /* Must be in the same sequence */
                 if(seg->getDiscontinuitySequenceNumber() < discontinuitySequence)
                     continue;
-                const stime_t segTimeIn = seg->startTime.Get();
-                const stime_t segTimeOut = segTimeIn + seg->duration.Get();
+                const stime_t segTimeIn = seg->startTime;
+                const stime_t segTimeOut = segTimeIn + seg->duration;
                 if(lookup >= segTimeIn && lookup < segTimeOut)
                     return seg->getSequenceNumber();
             }

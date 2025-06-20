@@ -298,8 +298,8 @@ static int SegmentTracker_check_formats(BaseAdaptationSet *adaptSet,
                 Segment *seg = new Segment(rep0);
                 seg->setSequenceNumber(123 + i);
                 seg->setDiscontinuitySequenceNumber(456);
-                seg->startTime.Set(START + 100 * i);
-                seg->duration.Set(100);
+                seg->startTime = START + 100 * i;
+                seg->duration = 100;
                 seg->setSourceUrl(i < 2 ? "sample/aac" : "sample/ac3");
                 segmentList->addSegment(seg);
             }
@@ -391,8 +391,8 @@ static int SegmentTracker_check_seeks(BaseAdaptationSet *adaptSet,
                 Segment *seg = new Segment(rep0);
                 seg->setSequenceNumber(123 + i);
                 seg->setDiscontinuitySequenceNumber(456);
-                seg->startTime.Set(START + 100 * i);
-                seg->duration.Set(100);
+                seg->startTime = START + 100 * i;
+                seg->duration = 100;
                 seg->setSourceUrl("sample/aac");
                 segmentList->addSegment(seg);
             }
@@ -488,8 +488,8 @@ static int SegmentTracker_check_switches(BaseAdaptationSet *adaptSet,
                 Segment *seg = new Segment(rep0);
                 seg->setSequenceNumber(123 + i);
                 seg->setDiscontinuitySequenceNumber(456);
-                seg->startTime.Set(START + 100 * i);
-                seg->duration.Set(100);
+                seg->startTime = START + 100 * i;
+                seg->duration = 100;
                 seg->setSourceUrl("sample/aac");
                 segmentList->addSegment(seg);
             }
@@ -514,8 +514,8 @@ static int SegmentTracker_check_switches(BaseAdaptationSet *adaptSet,
                 Segment *seg = new Segment(rep1);
                 seg->setSequenceNumber(123 + i);
                 seg->setDiscontinuitySequenceNumber(456);
-                seg->startTime.Set(START + 100 * i);
-                seg->duration.Set(100);
+                seg->startTime = START + 100 * i;
+                seg->duration = 100;
                 seg->setSourceUrl("sample/aac");
                 segmentList->addSegment(seg);
             }
@@ -528,7 +528,7 @@ static int SegmentTracker_check_switches(BaseAdaptationSet *adaptSet,
         /* have some init segment on rep1 */
         InitSegment *initSegment = new InitSegment(rep1);
         initSegment->setSourceUrl("sample/aacinit");
-        segmentList->initialisationSegment.Set(initSegment);
+        segmentList->initialisationSegment = initSegment;
 
         Expect(adaptSet->isSegmentAligned());
         Expect(adaptSet->getRepresentations().size() == 2);
@@ -668,8 +668,8 @@ static int SegmentTracker_check_HLSseeks(BaseAdaptationSet *adaptSet,
             {
                 Segment *seg = new Segment(rep0);
                 seg->setSequenceNumber(123 + i);
-                seg->startTime.Set(START + 100 * i);
-                seg->duration.Set(100);
+                seg->startTime = START + 100 * i;
+                seg->duration = 100;
                 seg->setSourceUrl("sample/aac");
                 segmentList->addSegment(seg);
             }
@@ -692,8 +692,8 @@ static int SegmentTracker_check_HLSseeks(BaseAdaptationSet *adaptSet,
             {
                 Segment *seg = new Segment(rep1);
                 seg->setSequenceNumber(123 + i);
-                seg->startTime.Set(START + 250 * i);
-                seg->duration.Set(250);
+                seg->startTime = START + 250 * i;
+                seg->duration = 250;
                 seg->setSourceUrl("sample/aac");
                 segmentList->addSegment(seg);
             }

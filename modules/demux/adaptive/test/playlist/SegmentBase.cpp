@@ -71,7 +71,7 @@ int SegmentBase_test()
 
         segmentBase->setByteRange(111, 2000);
 
-        segmentBase->duration.Set(100 * 10);
+        segmentBase->duration = 100 * 10;
         rep->SplitUsingIndex(splitlist);
         Expect(segmentBase->subSegments().size());
         Expect(segmentBase->getMediaSegment(0) != nullptr);

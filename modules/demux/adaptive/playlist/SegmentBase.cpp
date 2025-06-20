@@ -55,7 +55,7 @@ vlc_tick_t SegmentBase::getMinAheadTime(uint64_t curnum) const
     stime_t minTime = 0;
     std::for_each(subsegments.cbegin() + curnum + 1, subsegments.cend(),
         [&minTime](const Segment * seg){
-            minTime += seg->duration.Get();
+            minTime += seg->duration;
         });
 
     return timescale.ToTime(minTime);
@@ -97,8 +97,8 @@ bool SegmentBase::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     const ISegment *segment = getMediaSegment(number);
     if( segment )
     {
-        *time = timescale.ToTime(segment->startTime.Get());
-        *dur = timescale.ToTime(segment->duration.Get());
+        *time = timescale.ToTime(segment->startTime);
+        *dur = timescale.ToTime(segment->duration);
         return true;
     }
     return false;

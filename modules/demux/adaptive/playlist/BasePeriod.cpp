@@ -41,8 +41,8 @@ using namespace adaptive::playlist;
 BasePeriod::BasePeriod(BasePlaylist *playlist_) :
     SegmentInformation( playlist_ )
 {
-    duration.Set(0);
-    startTime.Set(0);
+    duration = 0;
+    startTime = 0;
     playlist = playlist_;
 }
 
@@ -96,10 +96,10 @@ void BasePeriod::debug(vlc_object_t *obj, int indent) const
 
 vlc_tick_t BasePeriod::getPeriodStart() const
 {
-    return startTime.Get();
+    return startTime;
 }
 
 vlc_tick_t BasePeriod::getPeriodDuration() const
 {
-    return duration.Get();
+    return duration;
 }

@@ -28,29 +28,23 @@ namespace adaptive
         template<class T> class Initializable
         {
         public:
-            Initializable()
-            {
-                initialisationSegment.Set(nullptr);
-            }
+            Initializable() = default;
             ~Initializable()
             {
-                delete initialisationSegment.Get();
+                delete initialisationSegment;
             }
-            Property<T *> initialisationSegment;
+            T * initialisationSegment = nullptr;
         };
 
         template<class T> class Indexable
         {
         public:
-            Indexable()
-            {
-                indexSegment.Set(nullptr);
-            }
+            Indexable() = default;
             ~Indexable()
             {
-                delete indexSegment.Get();
+                delete indexSegment;
             }
-            Property<T *> indexSegment;
+            T *indexSegment = nullptr;
         };
 
     }

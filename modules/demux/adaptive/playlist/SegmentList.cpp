@@ -85,7 +85,7 @@ void SegmentList::addSegment(Segment *seg)
 {
     seg->setParent(AbstractSegmentBaseType::parent);
     segments.push_back(seg);
-    totalLength += seg->duration.Get();
+    totalLength += seg->duration;
 }
 
 void SegmentList::updateWith(AbstractMultipleSegmentBaseType *updated_,
@@ -125,14 +125,14 @@ void SegmentList::updateWith(AbstractMultipleSegmentBaseType *updated_,
         for(auto it = updated->segments.begin(); it != updated->segments.end(); ++it)
         {
             Segment *cur = *it;
-            cur->startTime.Set(prevSegment->startTime.Get() + prevSegment->duration.Get());
+            cur->startTime = prevSegment->startTime + prevSegment->duration;
             /* not continuous */
             if(cur->getSequenceNumber() != prevSegment->getSequenceNumber() + 1)
             {
                 assert(prevSegment->getSequenceNumber() < cur->getSequenceNumber());
                 assert(duration);
                 uint64_t gap = cur->getSequenceNumber() - prevSegment->getSequenceNumber() - 1;
-                cur->startTime.Set(cur->startTime.Get() + duration * gap);
+                cur->startTime = cur->startTime + duration * gap;
             }
             prevSegment = cur;
             addSegment(cur);
@@ -162,7 +162,7 @@ void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
         if(seg->getSequenceNumber() >= tobelownum)
             break;
 
-        totalLength -= (*it)->duration.Get();
+        totalLength -= (*it)->duration;
         delete *it;
         it = segments.erase(it);
     }
@@ -198,15 +198,15 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
             return false;
 
         bool found = false;
-        stime = first->startTime.Get();
+        stime = first->startTime;
         sduration = 0;
         std::vector<Segment *>::const_iterator it = segments.begin();
         for(it = segments.begin(); it != segments.end(); ++it)
         {
             const Segment *seg = *it;
 
-            if(seg->duration.Get())
-                sduration = seg->duration.Get();
+            if(seg->duration)
+                sduration = seg->duration;
             else
                 sduration = inheritDuration();
 
@@ -258,7 +258,7 @@ vlc_tick_t SegmentList::getMinAheadTime(uint64_t curnum) const
     {
         const Segment *seg = *it;
         if(seg->getSequenceNumber() > curnum)
-            minTime += timescale.ToTime(seg->duration.Get());
+            minTime += timescale.ToTime(seg->duration);
     }
     return minTime;
 }
