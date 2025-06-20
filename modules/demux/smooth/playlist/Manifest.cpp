@@ -32,7 +32,7 @@ using namespace smooth::playlist;
 Manifest::Manifest (vlc_object_t *p_object) :
     BasePlaylist(p_object)
 {
-    minUpdatePeriod.Set( 5 * CLOCK_FREQ );
+    minUpdatePeriod = 5 * CLOCK_FREQ;
     addAttribute(new TimescaleAttr(Timescale(10000000))); // 100ns
     b_live = false;
 }

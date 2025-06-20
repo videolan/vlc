@@ -53,12 +53,12 @@ void SmoothSegmentChunk::onDownload(block_t **pp_block)
 
     /* If timeshift depth is present, we use it for expiring segments
        as we never update playlist itself */
-    if(rep->getPlaylist()->timeShiftBufferDepth.Get())
+    if(rep->getPlaylist()->timeShiftBufferDepth)
     {
         vlc_tick_t start, end, length;
         if(rep->getMediaPlaybackRange(&start, &end, &length))
         {
-            start = std::max(start, end - rep->getPlaylist()->timeShiftBufferDepth.Get());
+            start = std::max(start, end - rep->getPlaylist()->timeShiftBufferDepth);
             rep->pruneByPlaybackTime(start);
         }
     }

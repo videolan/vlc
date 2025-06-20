@@ -33,7 +33,7 @@ using namespace adaptive::playlist;
 Segment * AbstractSegmentBaseType::findSegmentByScaledTime(const std::vector<Segment *> &segments,
                                                                  stime_t time)
 {
-    if(segments.empty() || (segments.size() > 1 && segments[1]->startTime.Get() == 0) )
+    if(segments.empty() || (segments.size() > 1 && segments[1]->startTime == 0) )
         return nullptr;
 
     Segment *ret = nullptr;
@@ -41,7 +41,7 @@ Segment * AbstractSegmentBaseType::findSegmentByScaledTime(const std::vector<Seg
     while(it != segments.end())
     {
         Segment *seg = *it;
-        if(seg->startTime.Get() > time)
+        if(seg->startTime > time)
         {
             if(it == segments.begin())
                 return nullptr;
@@ -77,20 +77,20 @@ AbstractSegmentBaseType::~AbstractSegmentBaseType()
 
 InitSegment *AbstractSegmentBaseType::getInitSegment() const
 {
-    return initialisationSegment.Get();
+    return initialisationSegment;
 }
 
 IndexSegment *AbstractSegmentBaseType::getIndexSegment() const
 {
-    return indexSegment.Get();
+    return indexSegment;
 }
 
 void AbstractSegmentBaseType::debug(vlc_object_t *obj, int indent) const
 {
-    if(initialisationSegment.Get())
-        initialisationSegment.Get()->debug(obj, indent);
-    if(indexSegment.Get())
-        indexSegment.Get()->debug(obj, indent);
+    if(initialisationSegment)
+        initialisationSegment->debug(obj, indent);
+    if(indexSegment)
+        indexSegment->debug(obj, indent);
 }
 
 AbstractMultipleSegmentBaseType::AbstractMultipleSegmentBaseType(SegmentInformation *parent,

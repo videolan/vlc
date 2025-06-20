@@ -306,7 +306,7 @@ int M3U8Playlist_test()
         Segment *seg = rep->getMediaSegment(number);
         Expect(seg);
         Expect(seg->getSequenceNumber() == 10);
-        Expect(seg->startTime.Get() == (stime_t) 0);
+        Expect(seg->startTime == (stime_t) 0);
 
         vlc_tick_t begin, end;
         Expect(rep->getMediaPlaybackRange(&begin, &end, &duration));
@@ -340,7 +340,7 @@ int M3U8Playlist_test()
         BaseRepresentation *rep = m3u->getFirstPeriod()->getAdaptationSets().front()->
                                   getRepresentations().front();
         Expect(rep->getProfile()->getStartSegmentNumber() == 10);
-        Expect(m3u->duration.Get());
+        Expect(m3u->duration);
 
         Timescale timescale = rep->inheritTimescale();
         Expect(timescale.isValid());
@@ -352,7 +352,7 @@ int M3U8Playlist_test()
         Expect(number == 12);
         Expect(!discont);
         Expect(seg->getSequenceNumber() == 12);
-        Expect(seg->startTime.Get() == timescale.ToScaled(vlc_tick_from_sec(20)));
+        Expect(seg->startTime == timescale.ToScaled(vlc_tick_from_sec(20)));
 
         vlc_tick_t begin, end, duration;
         Expect(rep->getMediaPlaybackRange(&begin, &end, &duration));
@@ -493,11 +493,11 @@ int M3U8Playlist_test()
     {
         Expect(m3u);
         Expect(m3u->isLive() == false);
-        Expect(m3u->presentationStartOffset.Get() == ((50 - 11.5) * CLOCK_FREQ));
+        Expect(m3u->presentationStartOffset == ((50 - 11.5) * CLOCK_FREQ));
         BaseRepresentation *rep = m3u->getFirstPeriod()->getAdaptationSets().front()->
                                   getRepresentations().front();
         Expect(bufferingLogic.getStartSegmentNumber(rep) == 13);
-        m3u->presentationStartOffset.Set(11.5 * CLOCK_FREQ);
+        m3u->presentationStartOffset = 11.5 * CLOCK_FREQ;
         Expect(bufferingLogic.getStartSegmentNumber(rep) == 11);
 
         delete m3u;

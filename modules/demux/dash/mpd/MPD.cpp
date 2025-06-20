@@ -41,13 +41,13 @@ MPD::MPD (vlc_object_t *p_object, Profile profile_) :
     BasePlaylist(p_object),
     profile( profile_ )
 {
-    programInfo.Set( nullptr );
+    programInfo = nullptr;
     lowLatency = false;
 }
 
 MPD::~MPD()
 {
-    delete(programInfo.Get());
+    delete programInfo;
 }
 
 bool MPD::isLive() const
@@ -81,7 +81,7 @@ void MPD::debug() const
     msg_Dbg(p_object, "MPD profile=%s mediaPresentationDuration=%" PRId64
             " minBufferTime=%" PRId64,
             static_cast<std::string>(getProfile()).c_str(),
-            duration.Get() / CLOCK_FREQ,
+            duration / CLOCK_FREQ,
             minBufferTime / CLOCK_FREQ);
     msg_Dbg(p_object, "BaseUrl=%s", getUrlSegment().toString().c_str());
 

@@ -59,8 +59,8 @@ int SegmentList_test()
         const stime_t START = 1337;
         Segment *seg = new Segment(nullptr);
         seg->setSequenceNumber(123);
-        seg->startTime.Set(START);
-        seg->duration.Set(100);
+        seg->startTime = START;
+        seg->duration = 100;
         segmentList->addSegment(seg);
 
         Expect(segmentList->getTotalLength() == 100);
@@ -73,7 +73,7 @@ int SegmentList_test()
         seg = segmentList->getMediaSegment(123);
         Expect(seg);
         Expect(seg->getSequenceNumber() == 123);
-        Expect(seg->startTime.Get() == START);
+        Expect(seg->startTime == START);
         seg = segmentList->getNextMediaSegment(123, &number, &discont);
         Expect(seg);
         Expect(number == 123);
@@ -89,8 +89,8 @@ int SegmentList_test()
         {
             seg = new Segment(nullptr);
             seg->setSequenceNumber(123 + i);
-            seg->startTime.Set(START + 100 * i);
-            seg->duration.Set(100);
+            seg->startTime = START + 100 * i;
+            seg->duration = 100;
             segmentList->addSegment(seg);
         }
 
@@ -109,8 +109,8 @@ int SegmentList_test()
         {
             seg = new Segment(nullptr);
             seg->setSequenceNumber(123 + i);
-            seg->startTime.Set(START + 100 * i);
-            seg->duration.Set(100);
+            seg->startTime = START + 100 * i;
+            seg->duration = 100;
             segmentList2->addSegment(seg);
         }
         segmentList->updateWith(segmentList2);
@@ -122,8 +122,8 @@ int SegmentList_test()
             seg = segmentList->getMediaSegment(123 + i);
             Expect(seg);
             Expect(seg->getSequenceNumber() == (uint64_t) 123 + i);
-            Expect(seg->startTime.Get() == START + 100 * i);
-            Expect(seg->duration.Get() == 100);
+            Expect(seg->startTime == START + 100 * i);
+            Expect(seg->duration == 100);
         }
 
         /* prune */
@@ -148,8 +148,8 @@ int SegmentList_test()
         {
             seg = new Segment(nullptr);
             seg->setSequenceNumber(123 + i);
-            seg->startTime.Set(START + 100 * i);
-            seg->duration.Set(100);
+            seg->startTime = START + 100 * i;
+            seg->duration = 100;
             segmentList->addSegment(seg);
         }
         segmentList2 = new SegmentList(nullptr, true);
@@ -157,8 +157,8 @@ int SegmentList_test()
         {
             seg = new Segment(nullptr);
             seg->setSequenceNumber(128 + i);
-            seg->startTime.Set(START + 100 * i);
-            seg->duration.Set(100);
+            seg->startTime = START + 100 * i;
+            seg->duration = 100;
             segmentList2->addSegment(seg);
         }
         segmentList->updateWith(segmentList2);
@@ -166,8 +166,8 @@ int SegmentList_test()
         Expect(segmentList->getSegments().size() == 2);
         Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 128);
         Expect(segmentList->getSegments().at(1)->getSequenceNumber() == 129);
-        Expect(segmentList->getSegments().at(0)->startTime.Get() == START + 100 * (128 - 123));
-        Expect(segmentList->getSegments().at(1)->startTime.Get() == START + 100 * (129 - 123));
+        Expect(segmentList->getSegments().at(0)->startTime == START + 100 * (128 - 123));
+        Expect(segmentList->getSegments().at(1)->startTime == START + 100 * (129 - 123));
 
         delete segmentList;
         delete segmentList2;
@@ -182,8 +182,8 @@ int SegmentList_test()
 	{
 		seg = new Segment(nullptr);
 		seg->setSequenceNumber(123 + i);
-		seg->startTime.Set(START + 100 * i);
-		seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
 		segmentList->addSegment(seg);
 	}
 	segmentList2 = new SegmentList(nullptr, true);
@@ -191,8 +191,8 @@ int SegmentList_test()
 	{
 		seg = new Segment(nullptr);
 		seg->setSequenceNumber(123 + i);
-		seg->startTime.Set(START + 100 * i);
-		seg->duration.Set(100);
+        seg->startTime = START + 100 * i;
+        seg->duration = 100;
 		segmentList2->addSegment(seg);
 	}
 	segmentList->updateWith(segmentList2);
@@ -214,8 +214,8 @@ int SegmentList_test()
         {
             seg = new Segment(nullptr);
             seg->setSequenceNumber(123 + i);
-            seg->startTime.Set(START + 100 * i);
-            seg->duration.Set(100);
+            seg->startTime = START + 100 * i;
+            seg->duration = 100;
             segmentList->addSegment(seg);
         }
         segmentList2 = new SegmentList(nullptr, false);
@@ -223,8 +223,8 @@ int SegmentList_test()
         {
             seg = new Segment(nullptr);
             seg->setSequenceNumber(123 + i);
-            seg->startTime.Set(START + 100 * i);
-            seg->duration.Set(100);
+            seg->startTime = START + 100 * i;
+            seg->duration = 100;
             segmentList2->addSegment(seg);
         }
         segmentList->updateWith(segmentList2);
@@ -232,8 +232,8 @@ int SegmentList_test()
         Expect(segmentList->getSegments().size() == 2);
         Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 128);
         Expect(segmentList->getSegments().at(1)->getSequenceNumber() == 129);
-        Expect(segmentList->getSegments().at(0)->startTime.Get() == START + 100 * (128 - 123));
-        Expect(segmentList->getSegments().at(1)->startTime.Get() == START + 100 * (129 - 123));
+        Expect(segmentList->getSegments().at(0)->startTime == START + 100 * (128 - 123));
+        Expect(segmentList->getSegments().at(1)->startTime == START + 100 * (129 - 123));
 
         delete segmentList;
         delete segmentList2;
@@ -246,8 +246,8 @@ int SegmentList_test()
         {
             seg = new Segment(nullptr);
             seg->setSequenceNumber(123 + i);
-            seg->startTime.Set(START + 100 * i);
-            seg->duration.Set(100);
+            seg->startTime = START + 100 * i;
+            seg->duration = 100;
             segmentList->addSegment(seg);
         }
         const std::vector<Segment*>&allsegments = segmentList->getSegments();

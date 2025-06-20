@@ -57,12 +57,12 @@ SegmentInformation::SegmentInformation(BasePlaylist * parent_) :
 
 void SegmentInformation::init()
 {
-    baseUrl.Set(nullptr);
+    baseUrl = nullptr;
 }
 
 SegmentInformation::~SegmentInformation()
 {
-    delete baseUrl.Get();
+    delete baseUrl;
 }
 
 BasePlaylist * SegmentInformation::getPlaylist() const
@@ -258,8 +258,8 @@ static void insertIntoSegment(Segment *container, size_t start,
     if(end == 0 || container->contains(end))
     {
         SubSegment *subsegment = new SubSegment(container, start, (end != 0) ? end : 0);
-        subsegment->startTime.Set(time);
-        subsegment->duration.Set(duration);
+        subsegment->startTime = time;
+        subsegment->duration = duration;
         container->addSubSegment(subsegment);
     }
 }
@@ -299,15 +299,15 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
 
 Url SegmentInformation::getUrlSegment() const
 {
-    if(baseUrl.Get() && baseUrl.Get()->hasScheme())
+    if(baseUrl && baseUrl->hasScheme())
     {
-        return *(baseUrl.Get());
+        return *(baseUrl);
     }
     else
     {
         Url ret = getParentUrlSegment();
-        if (baseUrl.Get())
-            ret.append(*(baseUrl.Get()));
+        if (baseUrl)
+            ret.append(*baseUrl);
         return ret;
     }
 }

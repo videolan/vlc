@@ -37,17 +37,17 @@ BasePlaylist::BasePlaylist (vlc_object_t *p_object_) :
     ICanonicalUrl(), AttrsNode(Type::Playlist),
     p_object(p_object_)
 {
-    playbackStart.Set(0);
-    availabilityStartTime.Set( 0 );
-    availabilityEndTime.Set( 0 );
-    duration.Set( 0 );
-    minUpdatePeriod.Set( 2 * CLOCK_FREQ );
-    maxSegmentDuration.Set( 0 );
+    playbackStart = 0;
+    availabilityStartTime = 0;
+    availabilityEndTime = 0;
+    duration = 0;
+    minUpdatePeriod = 2 * CLOCK_FREQ;
+    maxSegmentDuration = 0;
     minBufferTime = 0;
     maxBufferTime = 0;
-    timeShiftBufferDepth.Set( 0 );
-    suggestedPresentationDelay.Set( 0 );
-    presentationStartOffset.Set( 0 );
+    timeShiftBufferDepth = 0;
+    suggestedPresentationDelay = 0;
+    presentationStartOffset = 0;
     b_needsUpdates = true;
 }
 
@@ -161,7 +161,7 @@ bool BasePlaylist::needsUpdates() const
 
 void BasePlaylist::updateWith(BasePlaylist *updatedPlaylist)
 {
-    availabilityEndTime.Set(updatedPlaylist->availabilityEndTime.Get());
+    availabilityEndTime = updatedPlaylist->availabilityEndTime;
 
     for(size_t i = 0; i < periods.size() && i < updatedPlaylist->periods.size(); i++)
         periods.at(i)->updateWith(updatedPlaylist->periods.at(i));

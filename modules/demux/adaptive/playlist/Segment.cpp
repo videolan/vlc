@@ -46,8 +46,8 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     endByte    (0)
 {
     debugName = "Segment";
-    startTime.Set(0);
-    duration.Set(0);
+    startTime = 0;
+    duration = 0;
     sequence = 0;
     discontinuitySequenceNumber = std::numeric_limits<uint64_t>::max();
     templated = false;
@@ -162,9 +162,9 @@ void ISegment::debug(vlc_object_t *obj, int indent) const
     ss << " url=" << getUrlSegment().toString();
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
-    if(startTime.Get() > 0)
-    	 ss << " stime " << startTime.Get();
-    ss << " duration " << duration.Get();
+    if(startTime > 0)
+        ss << " stime " << startTime;
+    ss << " duration " << duration;
     if(discontinuity)
     {
         ss << " dty";

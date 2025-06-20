@@ -69,8 +69,8 @@ void DASHManager::scheduleNextUpdate()
 
     vlc_tick_t minbuffer = getMinAheadTime() / 2;
 
-    if(playlist->minUpdatePeriod.Get() > minbuffer)
-        minbuffer = playlist->minUpdatePeriod.Get();
+    if(playlist->minUpdatePeriod > minbuffer)
+        minbuffer = playlist->minUpdatePeriod;
 
     if(minbuffer < 5 * CLOCK_FREQ)
         minbuffer = 5 * CLOCK_FREQ;
@@ -141,7 +141,7 @@ int DASHManager::doControl(int i_query, va_list args)
             if(!mpd)
                 return VLC_EGENERIC;
 
-            if(!mpd->programInfo.Get())
+            if(!mpd->programInfo)
                 break;
 
             vlc_meta_t *p_meta = va_arg (args, vlc_meta_t *);
@@ -149,17 +149,17 @@ int DASHManager::doControl(int i_query, va_list args)
             if (meta == nullptr)
                 return VLC_EGENERIC;
 
-            if(!mpd->programInfo.Get()->getTitle().empty())
-                vlc_meta_SetTitle(meta, mpd->programInfo.Get()->getTitle().c_str());
+            if(!mpd->programInfo->getTitle().empty())
+                vlc_meta_SetTitle(meta, mpd->programInfo->getTitle().c_str());
 
-            if(!mpd->programInfo.Get()->getSource().empty())
-                vlc_meta_SetPublisher(meta, mpd->programInfo.Get()->getSource().c_str());
+            if(!mpd->programInfo->getSource().empty())
+                vlc_meta_SetPublisher(meta, mpd->programInfo->getSource().c_str());
 
-            if(!mpd->programInfo.Get()->getCopyright().empty())
-                vlc_meta_SetCopyright(meta, mpd->programInfo.Get()->getCopyright().c_str());
+            if(!mpd->programInfo->getCopyright().empty())
+                vlc_meta_SetCopyright(meta, mpd->programInfo->getCopyright().c_str());
 
-            if(!mpd->programInfo.Get()->getMoreInformationUrl().empty())
-                vlc_meta_SetURL(meta, mpd->programInfo.Get()->getMoreInformationUrl().c_str());
+            if(!mpd->programInfo->getMoreInformationUrl().empty())
+                vlc_meta_SetURL(meta, mpd->programInfo->getMoreInformationUrl().c_str());
 
             vlc_meta_Merge(p_meta, meta);
             vlc_meta_Delete(meta);

@@ -47,7 +47,7 @@ ForgedInitSegment::ForgedInitSegment(ICanonicalUrl *parent,
     InitSegment(parent)
 {
     type = type_;
-    duration.Set(duration_);
+    duration = duration_;
     extradata = nullptr;
     i_extradata = 0;
     timescale = timescale_;
@@ -211,7 +211,7 @@ block_t * ForgedInitSegment::buildMoovBox()
     mp4mux_trackinfo_Init(&trackinfo,
                           0x01, /* Will always be 1st and unique track; tfhd patched on block read */
                           (uint32_t) timescale);
-    trackinfo.i_read_duration = duration.Get();
+    trackinfo.i_read_duration = duration;
     trackinfo.i_trex_default_length = 1;
     trackinfo.i_trex_default_size = 1;
 
@@ -276,7 +276,7 @@ block_t * ForgedInitSegment::buildMoovBox()
 
     if(mp4mux_CanMux( nullptr, &trackinfo.fmt ))
        box = mp4mux_GetMoovBox(nullptr, &p_tracks, 1,
-                               timescale.ToTime(duration.Get()),
+                               timescale.ToTime(duration),
                                true, false, false, false);
 
     mp4mux_trackinfo_Clear(&trackinfo);

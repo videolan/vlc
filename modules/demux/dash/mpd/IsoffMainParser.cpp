@@ -114,7 +114,7 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     it = attr.find("mediaPresentationDuration");
     if(it != attr.end())
-        mpd->duration.Set(IsoTime(it->second));
+        mpd->duration = IsoTime(it->second);
 
     it = attr.find("minBufferTime");
     if(it != attr.end())
@@ -125,12 +125,12 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
     {
         vlc_tick_t minupdate = IsoTime(it->second);
         if(minupdate > 0)
-            mpd->minUpdatePeriod.Set(minupdate);
+            mpd->minUpdatePeriod = minupdate;
     }
 
     it = attr.find("maxSegmentDuration");
     if(it != attr.end())
-        mpd->maxSegmentDuration.Set(IsoTime(it->second));
+        mpd->maxSegmentDuration = IsoTime(it->second);
 
     it = attr.find("type");
     if(it != attr.end())
@@ -138,19 +138,19 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     it = attr.find("availabilityStartTime");
     if(it != attr.end())
-        mpd->availabilityStartTime.Set(UTCTime(it->second).mtime());
+        mpd->availabilityStartTime = UTCTime(it->second).mtime();
 
     it = attr.find("availabilityEndTime");
     if(it != attr.end())
-        mpd->availabilityEndTime.Set(UTCTime(it->second).mtime());
+        mpd->availabilityEndTime = UTCTime(it->second).mtime();
 
     it = attr.find("timeShiftBufferDepth");
         if(it != attr.end())
-            mpd->timeShiftBufferDepth.Set(IsoTime(it->second));
+            mpd->timeShiftBufferDepth = IsoTime(it->second);
 
     it = attr.find("suggestedPresentationDelay");
     if(it != attr.end())
-        mpd->suggestedPresentationDelay.Set(IsoTime(it->second));
+        mpd->suggestedPresentationDelay = IsoTime(it->second);
 }
 
 void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
@@ -166,13 +166,13 @@ void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
             continue;
         parseSegmentInformation(mpd, *it, period, &nextid);
         if((*it)->hasAttribute("start"))
-            period->startTime.Set(IsoTime((*it)->getAttributeValue("start")));
+            period->startTime = IsoTime((*it)->getAttributeValue("start"));
         if((*it)->hasAttribute("duration"))
-            period->duration.Set(IsoTime((*it)->getAttributeValue("duration")));
+            period->duration = IsoTime((*it)->getAttributeValue("duration"));
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(*it, "BaseURL");
         if(!baseUrls.empty())
         {
-            period->baseUrl.Set( new Url( baseUrls.front()->getText() ) );
+            period->baseUrl = new Url( baseUrls.front()->getText() );
             parseAvailability<BasePeriod>(mpd, baseUrls.front(), period);
         }
 
@@ -196,7 +196,7 @@ void IsoffMainParser::parseSegmentBaseType(MPD *, Node *node,
             if(index)
             {
                 index->setByteRange(start, end);
-                base->indexSegment.Set(index);
+                base->indexSegment = index;
                 /* index must be before data, so data starts at index end */
                 if(dynamic_cast<SegmentBase *>(base))
                     dynamic_cast<SegmentBase *>(base)->setByteRange(end + 1, 0);
@@ -252,8 +252,8 @@ size_t IsoffMainParser::parseSegmentTemplate(MPD *mpd, Node *templateNode, Segme
         if(!initurl.empty() && (initTemplate = new (std::nothrow) SegmentTemplateInit(mediaTemplate, info)))
         {
             initTemplate->setSourceUrl(initurl);
-            delete mediaTemplate->initialisationSegment.Get();
-            mediaTemplate->initialisationSegment.Set(initTemplate);
+            delete mediaTemplate->initialisationSegment;
+            mediaTemplate->initialisationSegment = initTemplate;
         }
     }
 
@@ -309,7 +309,7 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
         if(baseUrl)
         {
             parseAvailability<AdaptationSet>(mpd, baseUrl, adaptationSet);
-            adaptationSet->baseUrl.Set(new Url(baseUrl->getText()));
+            adaptationSet->baseUrl = new Url(baseUrl->getText());
         }
 
         Node *role = DOMHelper::getFirstChildElementByName((*it), "Role");
@@ -319,7 +319,7 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
             if(uri == "urn:mpeg:dash:role:2011")
             {
                 const std::string &rolevalue = role->getAttributeValue("value");
-                adaptationSet->description.Set(rolevalue);
+                adaptationSet->description = rolevalue;
                 if(rolevalue == "main")
                     adaptationSet->setRole(Role::Value::Main);
                 else if(rolevalue == "alternate")
@@ -337,13 +337,18 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
             }
         }
 #ifdef ADAPTATIVE_ADVANCED_DEBUG
-        if(adaptationSet->description.Get().empty())
-            adaptationSet->description.Set(adaptationSet->getMimeType());
+        if(adaptationSet->description.empty())
+            adaptationSet->description = adaptationSet->getMimeType();
 #endif
 
         parseSegmentInformation(mpd, *it, adaptationSet, &nextid);
 
         parseRepresentations(mpd, (*it), adaptationSet);
+
+#ifdef ADAPTATIVE_ADVANCED_DEBUG
+        if(adaptationSet->description.empty())
+            adaptationSet->description = adaptationSet->getID().str();
+#endif
 
         if(!adaptationSet->getRepresentations().empty())
             period->addAdaptationSet(adaptationSet);
@@ -364,7 +369,7 @@ void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");
         if(!baseUrls.empty())
         {
-            currentRepresentation->baseUrl.Set(new Url(baseUrls.front()->getText()));
+            currentRepresentation->baseUrl = new Url(baseUrls.front()->getText());
             parseAvailability<Representation>(mpd, baseUrls.front(), currentRepresentation);
         }
 
@@ -389,7 +394,7 @@ void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode
         size_t i_total = parseSegmentInformation(mpd, repNode, currentRepresentation, &nextid);
         /* Empty Representation with just baseurl (ex: subtitles) */
         if(i_total == 0 &&
-           (currentRepresentation->baseUrl.Get() && !currentRepresentation->baseUrl.Get()->empty()) &&
+           (currentRepresentation->baseUrl && !currentRepresentation->baseUrl->empty()) &&
             adaptationSet->getMediaSegment(0) == nullptr)
         {
             SegmentBase *base = new (std::nothrow) SegmentBase(currentRepresentation);
@@ -411,12 +416,12 @@ size_t IsoffMainParser::parseSegmentBase(MPD *mpd, Node * segmentBaseNode, Segme
 
     parseAvailability<SegmentInformation>(mpd, segmentBaseNode, info);
 
-    if(!base->initialisationSegment.Get() && base->indexSegment.Get() && base->indexSegment.Get()->getOffset())
+    if(!base->initialisationSegment && base->indexSegment && base->indexSegment->getOffset())
     {
         InitSegment *initSeg = new InitSegment( info );
         initSeg->setSourceUrl(base->getUrlSegment().toString());
-        initSeg->setByteRange(0, base->indexSegment.Get()->getOffset() - 1);
-        base->initialisationSegment.Set(initSeg);
+        initSeg->setByteRange(0, base->indexSegment->getOffset() - 1);
+        base->initialisationSegment = initSeg;
     }
 
     info->addAttribute(base);
@@ -463,8 +468,8 @@ size_t IsoffMainParser::parseSegmentList(MPD *mpd, Node * segListNode, SegmentIn
                     seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
                 }
 
-                seg->startTime.Set(nzStartTime);
-                seg->duration.Set(duration);
+                seg->startTime = nzStartTime;
+                seg->duration = duration;
                 nzStartTime += duration;
 
                 seg->setSequenceNumber(sequenceNumber++);
@@ -494,7 +499,7 @@ void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<InitSegment
         seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
     }
 
-    init->initialisationSegment.Set(seg);
+    init->initialisationSegment = seg;
 }
 
 void IsoffMainParser::parseTimeline(Node *node, AbstractMultipleSegmentBaseType *base)
@@ -566,7 +571,7 @@ void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
         if(node->hasAttribute("moreInformationURL"))
             info->setMoreInformationUrl(node->getAttributeValue("moreInformationURL"));
 
-        mpd->programInfo.Set(info);
+        mpd->programInfo = info;
     }
 }
 

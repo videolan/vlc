@@ -45,8 +45,8 @@ StreamFormat QualityLevel::getStreamFormat() const
 
 InitSegment * QualityLevel::getInitSegment() const
 {
-    if(initialisationSegment.Get())
-        return initialisationSegment.Get();
+    if(initialisationSegment)
+        return initialisationSegment;
     else
         return BaseRepresentation::getInitSegment();
 }

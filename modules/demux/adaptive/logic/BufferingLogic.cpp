@@ -90,7 +90,7 @@ uint64_t DefaultBufferingLogic::getStartSegmentNumber(BaseRepresentation *rep) c
     if(!profile)
         return 0;
     uint64_t num = profile->getStartSegmentNumber();
-    vlc_tick_t offset = rep->getPlaylist()->presentationStartOffset.Get();
+    vlc_tick_t offset = rep->getPlaylist()->presentationStartOffset;
     if(offset > 0)
     {
         vlc_tick_t startTime, duration;
@@ -132,12 +132,12 @@ vlc_tick_t DefaultBufferingLogic::getLiveDelay(const BasePlaylist *p) const
         return getMinBuffering(p);
     vlc_tick_t delay = userLiveDelay ? userLiveDelay
                                   : DEFAULT_LIVE_BUFFERING;
-    if(p->suggestedPresentationDelay.Get())
-        delay = p->suggestedPresentationDelay.Get();
-    else if(p->presentationStartOffset.Get())
-        delay = p->presentationStartOffset.Get();
-    if(p->timeShiftBufferDepth.Get())
-        delay = std::min(delay, p->timeShiftBufferDepth.Get());
+    if(p->suggestedPresentationDelay)
+        delay = p->suggestedPresentationDelay;
+    else if(p->presentationStartOffset)
+        delay = p->presentationStartOffset;
+    if(p->timeShiftBufferDepth)
+        delay = std::min(delay, p->timeShiftBufferDepth);
     return std::max(delay, getMinBuffering(p));
 }
 
@@ -202,7 +202,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         if(unlikely(!b_ret))
             return 0;
 
-        if(playlist->timeShiftBufferDepth.Get())
+        if(playlist->timeShiftBufferDepth)
         {
             stime_t edgetime;
             b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->maxElementNumber(),
@@ -210,7 +210,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
             if(unlikely(!b_ret))
                 return 0;
             edgetime += duration - 1;
-            stime_t timeshiftdepth = timescale.ToScaled(playlist->timeShiftBufferDepth.Get());
+            stime_t timeshiftdepth = timescale.ToScaled(playlist->timeShiftBufferDepth);
             if(safestarttime + timeshiftdepth < edgetime)
             {
                 safestarttime = edgetime - timeshiftdepth;
@@ -243,7 +243,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
             /* Compute playback offset and effective finished segment from wall time */
             vlc_tick_t now = CLOCK_FREQ * time(nullptr);
             vlc_tick_t playbacktime = now - i_buffering;
-            vlc_tick_t minavailtime = playlist->availabilityStartTime.Get() + rep->getPeriodStart();
+            vlc_tick_t minavailtime = playlist->availabilityStartTime + rep->getPeriodStart();
             const uint64_t startnumber = mediaSegmentTemplate->inheritStartNumber();
             const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
             if(!timescale)
@@ -253,13 +253,13 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
                 return startnumber;
 
             /* restrict to DVR window */
-            if(playlist->timeShiftBufferDepth.Get())
+            if(playlist->timeShiftBufferDepth)
             {
                 vlc_tick_t elapsed = now - minavailtime;
                 elapsed = elapsed - (elapsed % duration); /* align to last segment */
                 vlc_tick_t alignednow = minavailtime + elapsed;
-                if(playlist->timeShiftBufferDepth.Get() < elapsed)
-                    minavailtime = alignednow - playlist->timeShiftBufferDepth.Get();
+                if(playlist->timeShiftBufferDepth < elapsed)
+                    minavailtime = alignednow - playlist->timeShiftBufferDepth;
 
                 if(playbacktime < minavailtime)
                     playbacktime = minavailtime;
@@ -292,14 +292,14 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         /* working around HLS discontinuities by using durations */
         stime_t totallistduration = 0;
         for(auto it = list.begin(); it != list.end(); ++it)
-            totallistduration += (*it)->duration.Get();
+            totallistduration += (*it)->duration;
 
         /* Apply timeshift restrictions */
         stime_t availableduration;
-        if(playlist->timeShiftBufferDepth.Get())
+        if(playlist->timeShiftBufferDepth)
         {
             availableduration = std::min(totallistduration,
-                    timescale.ToScaled(playlist->timeShiftBufferDepth.Get()));
+                    timescale.ToScaled(playlist->timeShiftBufferDepth));
         }
         else availableduration = totallistduration;
 
@@ -310,9 +310,9 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
             for(auto it = list.begin(); it != list.end(); ++it)
             {
                 availableliststartnumber = (*it)->getSequenceNumber();
-                if(offset < (*it)->duration.Get())
+                if(offset < (*it)->duration)
                     break;
-                offset -= (*it)->duration.Get();
+                offset -= (*it)->duration;
             }
         }
 
@@ -335,9 +335,9 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
             if((*it)->getSequenceNumber() < safestartnumber)
                 continue;
             if((*it)->getSequenceNumber() <= safeedgenumber)
-                maxbufferizable += (*it)->duration.Get();
+                maxbufferizable += (*it)->duration;
             else
-                safeedgeduration += (*it)->duration.Get();
+                safeedgeduration += (*it)->duration;
         }
 
         stime_t tobuffer = std::min(maxbufferizable, timescale.ToScaled(i_buffering));
@@ -346,9 +346,9 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         for(auto it = list.begin(); it != list.end(); ++it)
         {
             start = (*it)->getSequenceNumber();
-            if((*it)->duration.Get() > skipduration)
+            if((*it)->duration > skipduration)
                 break;
-            skipduration -= (*it)->duration.Get();
+            skipduration -= (*it)->duration;
         }
 
         return start;
@@ -363,7 +363,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         if(!timescale.isValid())
             return std::numeric_limits<uint64_t>::max();
         const Segment *back = list.back();
-        const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() -
+        const stime_t bufferingstart = back->startTime + back->duration -
                                        timescale.ToScaled(i_buffering);
 
         uint64_t start = AbstractSegmentBaseType::findSegmentNumberByScaledTime(list, bufferingstart);

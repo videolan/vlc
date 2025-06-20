@@ -123,8 +123,8 @@ void SmoothManager::scheduleNextUpdate()
 
     vlc_tick_t minbuffer = getMinAheadTime() / 2;
 
-    if(playlist->minUpdatePeriod.Get() > minbuffer)
-        minbuffer = playlist->minUpdatePeriod.Get();
+    if(playlist->minUpdatePeriod > minbuffer)
+        minbuffer = playlist->minUpdatePeriod;
 
     if(minbuffer < 5 * CLOCK_FREQ)
         minbuffer = 5 * CLOCK_FREQ;

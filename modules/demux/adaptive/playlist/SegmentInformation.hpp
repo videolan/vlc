@@ -23,7 +23,6 @@
 #include "ICanonicalUrl.hpp"
 #include "Inheritables.hpp"
 #include "Segment.h"
-#include "../tools/Properties.hpp"
 #include "../encryption/CommonEncryption.hpp"
 #include <vlc_common.h>
 #include <vector>
@@ -88,7 +87,7 @@ namespace adaptive
                 void updateSegmentList(SegmentList *, bool = false);
                 void setSegmentTemplate(SegmentTemplate *);
                 virtual Url getUrlSegment() const override;
-                Property<Url *> baseUrl;
+                Url * baseUrl;
                 const AbstractSegmentBaseType * inheritSegmentProfile() const;
 
             private:

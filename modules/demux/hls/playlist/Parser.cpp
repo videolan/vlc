@@ -120,7 +120,7 @@ HLSRepresentation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet
             {
                 uri = Helper::getDirectoryPath(uri);
                 if(!uri.empty())
-                    rep->baseUrl.Set(new Url(uri.append("/")));
+                    rep->baseUrl = new Url(uri.append("/"));
             }
         }
 
@@ -218,7 +218,7 @@ void M3U8Parser::fillAdaptsetFromMediainfo(const AttributesTag *mediatag,
 
     if(!desc.empty())
     {
-        altAdaptSet->description.Set(desc);
+        altAdaptSet->description = desc;
         altAdaptSet->setID(ID(desc));
     }
 }
@@ -348,8 +348,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                         nzDuration = CLOCK_FREQ * durAttribute->floatingPoint();
                     ctx_extinf = nullptr;
                 }
-                segment->duration.Set(timescale.ToScaled(nzDuration));
-                segment->startTime.Set(timescale.ToScaled(nzStartTime));
+                segment->duration = timescale.ToScaled(nzDuration);
+                segment->startTime = timescale.ToScaled(nzStartTime);
                 nzStartTime += nzDuration;
                 totalduration += nzDuration;
                 if(absReferenceTime > VLC_TICK_INVALID)
@@ -399,7 +399,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                     vlc_tick_t tempTime = absReferenceTime;
                     for(auto it = segmentstoappend.crbegin(); it != segmentstoappend.crend(); ++it)
                     {
-                        vlc_tick_t duration = timescale.ToTime((*it)->duration.Get());
+                        vlc_tick_t duration = timescale.ToTime((*it)->duration);
                         if( duration < tempTime - VLC_TICK_0 )
                             tempTime -= duration;
                         else
@@ -419,7 +419,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 const AttributesTag *keytag = static_cast<const AttributesTag *>(tag);
                 const Attribute *uriAttr;
                 if(keytag && (uriAttr = keytag->getAttributeByName("URI")) &&
-                   !segmentList->initialisationSegment.Get()) /* FIXME: handle discontinuities */
+                   !segmentList->initialisationSegment) /* FIXME: handle discontinuities */
                 {
                     InitSegment *initSegment = new (std::nothrow) InitSegment(rep);
                     if(initSegment)
@@ -431,7 +431,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                             const ByteRange range = byterangeAttr->unescapeQuotes().getByteRange();
                             initSegment->setByteRange(range.first.value_or(0), range.first.value_or(0) + range.second - 1);
                         }
-                        segmentList->initialisationSegment.Set(initSegment);
+                        segmentList->initialisationSegment = initSegment;
                     }
                 }
             }
@@ -457,11 +457,11 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
 
     if(rep->isLive())
     {
-        rep->getPlaylist()->duration.Set(0);
+        rep->getPlaylist()->duration = 0;
     }
-    else if(totalduration > rep->getPlaylist()->duration.Get())
+    else if(totalduration > rep->getPlaylist()->duration)
     {
-        rep->getPlaylist()->duration.Set(totalduration);
+        rep->getPlaylist()->duration = totalduration;
     }
 
     rep->updateSegmentList(segmentList, true);
@@ -656,10 +656,10 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                 for(auto codec: info.codecs)
                     rep->addCodecs(codec.codec);
 
-                if(adaptSet->description.Get().empty() &&
+                if(adaptSet->description.empty() &&
                    info.tag->getAttributeByName("NAME"))
                 {
-                    adaptSet->description.Set(info.tag->getAttributeByName("NAME")->quotedString());
+                    adaptSet->description = info.tag->getAttributeByName("NAME")->quotedString();
                 }
 
                 adaptSet->addRepresentation(rep);
@@ -791,11 +791,11 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
         if(xstartTag->getAttributeByName("TIME-OFFSET"))
         {
             float offset = xstartTag->getAttributeByName("TIME-OFFSET")->floatingPoint();
-            if(offset > 0 && (offset * CLOCK_FREQ) <= playlist->duration.Get())
-                playlist->presentationStartOffset.Set(CLOCK_FREQ * offset);
-            else if(offset < 0 && (-offset * CLOCK_FREQ) <= playlist->duration.Get())
-                playlist->presentationStartOffset.Set(playlist->duration.Get() +
-                                                      CLOCK_FREQ * offset);
+            if(offset > 0 && (offset * CLOCK_FREQ) <= playlist->duration)
+                playlist->presentationStartOffset = CLOCK_FREQ * offset;
+            else if(offset < 0 && (-offset * CLOCK_FREQ) <= playlist->duration)
+                playlist->presentationStartOffset = playlist->duration +
+                                                    CLOCK_FREQ * offset;
         }
     }
 
