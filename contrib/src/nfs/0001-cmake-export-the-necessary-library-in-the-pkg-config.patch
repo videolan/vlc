@@ -1,19 +1,30 @@
-From c6b70a429e7022fb5da88d3344ae8da55a761b41 Mon Sep 17 00:00:00 2001
+From 8615adc07b66c78a12211324ff0992afe4be79cf Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 16 Dec 2024 11:46:16 +0100
 Subject: [PATCH] cmake: export the necessary library in the pkg-config file
 
 That includes gnutls on Linux if it's used.
+
+Co-authored-by: Khalid Masum <khalid.masum.92@gmail.com>
 ---
- CMakeLists.txt        | 8 ++++++++
- cmake/libnfs.pc.cmake | 2 +-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ CMakeLists.txt        | 11 ++++++++++-
+ cmake/libnfs.pc.cmake |  4 ++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 1b94d2e..86e0845 100644
+index 1b94d2e..aa64acb 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -155,6 +155,14 @@ install(FILES cmake/FindNFS.cmake
+@@ -86,7 +86,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+     else()
+       message(STATUS "Using ${GNUTLS_LIBRARIES}")
+       add_definitions(-DHAVE_TLS)
+-      list(APPEND SYSTEM_LIBRARIES ${GNUTLS_LIBRARIES})
++      list(APPEND REQUIRED_LIBRARIES "gnutls")
+       add_subdirectory(tls)
+     endif()
+   endif()
+@@ -155,6 +155,15 @@ install(FILES cmake/FindNFS.cmake
          DESTINATION ${INSTALL_CMAKE_DIR})
  
  # handle pc-config files
@@ -25,20 +36,24 @@ index 1b94d2e..86e0845 100644
 +    list(APPEND PKG_LIBLIST "-l${LIB}")
 +  endif()
 +endforeach()
++string(REPLACE ";" " " PKG_REQUIRED_LIBRARIES "${REQUIRED_LIBRARIES}")
  configure_file(cmake/libnfs.pc.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/libnfs.pc @ONLY)
  
 diff --git a/cmake/libnfs.pc.cmake b/cmake/libnfs.pc.cmake
-index 8a4e11e..783c2e3 100644
+index 8a4e11e..1699df7 100644
 --- a/cmake/libnfs.pc.cmake
 +++ b/cmake/libnfs.pc.cmake
-@@ -10,5 +10,5 @@ Description: libnfs is a client library for accessing NFS shares over a network.
+@@ -8,7 +8,7 @@ includedir=@INSTALL_INC_DIR@
+ Name: libnfs
+ Description: libnfs is a client library for accessing NFS shares over a network.
  Version: @PROJECT_VERSION@
- Requires:
+-Requires:
++Requires: @PKG_REQUIRED_LIBRARIES@
  Conflicts:
 -Libs: -L${libdir} -lnfs
 +Libs: -L${libdir} -lnfs @PKG_LIBLIST@
  Cflags: -I${includedir}
 -- 
-2.45.0.windows.1
+2.45.1.windows.1
 
