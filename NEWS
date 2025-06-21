@@ -1,3 +1,56 @@
+Changes between 3.0.21 and 3.0.22:
+----------------------------------
+
+Windows:
+ * Fix support for Windows XP SP3
+
+Decoders:
+ * Improve CEA-608 support
+ * Improve subtitles color handling
+ * Improve FLAC and OPUS data handing
+ * Fix hardware decoding with VideoToolbox of XVID MPEG-4 video
+ * Fix multi-channel OPUS
+ * Fix ProRes 4:4:4:4
+ * Disable decoding using libdca, libmpeg2 and liba52 by default in favor of libavcodec
+
+Demux:
+ * Improve reliability for TS, MKV and MP4
+ * Fix display of certain JPEG files
+ * Fix playback of very short ASF files (duration less than 1s)
+
+Input:
+ * sftp: fix seek for large files on 32-bit OS
+
+Qt interface:
+ * add a dark display mode
+ * add compilation support for Qt6 and newer versions of Qt5
+
+Services Discovery
+ * UPnP: remove SAT>IP channel list fallback
+
+Video Filters:
+ * add AMD Frame Rate Conversion filter
+
+Contrib:
+ * Update amf to 1.4.34
+ * Update libarchive to 3.8.0 including support for RAR 5.0
+ * Update libass to 0.17.3
+ * Update libbluray to 1.3.4
+ * Update dav1d to 1.5.1
+ * Update freetype to 2.13.1
+ * Update gcrypt to 1.10.1
+ * Update glew to 2.1.0
+ * Update gnutls to 3.8.3
+ * Update matroska to 1.7.0
+ * Update ogg to 1.3.6
+ * Update openjpeg to 2.5.0
+ * Update orc to 0.4.33
+ * Update libsrt to 1.5.3
+ * Update taglib to 1.13.1
+ * Update libvpx to 1.15.2
+ * libmpeg2, libdca and liba52 are no longer build by default
+
+
 Changes between 3.0.20 and 3.0.21:
 ----------------------------------
 
