@@ -488,7 +488,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
         return;
     }
     
-    VLCMediaSourceDataSource * const newChildDataSource = [[VLCMediaSourceDataSource alloc] init];
+    VLCMediaSourceDataSource * const newChildDataSource =
+        [[VLCMediaSourceDataSource alloc] initWithParentBaseDataSource:self];
     
     newChildDataSource.displayedMediaSource = mediaSource;
     newChildDataSource.nodeToDisplay = node;
@@ -496,7 +497,6 @@ referenceSizeForHeaderInSection:(NSInteger)section
     newChildDataSource.pathControl = self.pathControl;
     newChildDataSource.tableView = self.tableView;
     newChildDataSource.navigationStack = self.navigationStack;
-    newChildDataSource.parentBaseDataSource = self;
 
     [self setChildDataSource:newChildDataSource];
     [self.navigationStack appendCurrentLibraryState];

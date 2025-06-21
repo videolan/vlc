@@ -47,6 +47,7 @@ extern NSString * const VLCMediaSourceDataSourceNodeChanged;
 @property (readwrite, weak) VLCLibraryMediaSourceViewNavigationStack *navigationStack;
 @property (readwrite, weak) VLCMediaSourceBaseDataSource *parentBaseDataSource;
 
+- (instancetype)initWithParentBaseDataSource:(VLCMediaSourceBaseDataSource *)parentBaseDataSource;
 - (void)setupViews;
 - (VLCInputItem *)mediaSourceInputItemAtRow:(NSInteger)tableViewRow;
 - (NSArray<VLCInputItem *> *)mediaSourceInputItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths;

@@ -62,6 +62,14 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
 @implementation VLCMediaSourceDataSource
 
+- (instancetype)initWithParentBaseDataSource:(VLCMediaSourceBaseDataSource *)parentBaseDataSource
+{
+    self = [super init];
+    if (self)
+        self.parentBaseDataSource = parentBaseDataSource;
+    return self;
+}
+
 - (dispatch_source_t)observeLocalUrl:(NSURL *)url
                       forVnodeEvents:(dispatch_source_vnode_flags_t)eventsFlags
                     withEventHandler:(dispatch_block_t)eventHandlerBlock
@@ -92,6 +100,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
     input_item_node_t * const inputNode = nodeToDisplay.vlcInputItemNode;
 
+    NSParameterAssert(self.parentBaseDataSource);
     if (self.parentBaseDataSource.mediaSourceMode == VLCMediaSourceModeLAN) {
         NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
         NSError * const error =
