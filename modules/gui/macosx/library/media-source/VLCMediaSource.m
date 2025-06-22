@@ -31,6 +31,7 @@
     vlc_preparser_t *_p_preparser;
     vlc_media_source_t *_p_mediaSource;
     vlc_media_tree_listener_id *_p_treeListenerID;
+    NSLock *_generateChildNodesLock;
 }
 @end
 
@@ -105,6 +106,7 @@ static const char *const myFoldersDescription = "My Folders";
 {
     self = [super init];
     if (self) {
+        _generateChildNodesLock = [[NSLock alloc] init];
         _respondsToDiskChanges = NO;
         _p_preparser = p_preparser;
         
@@ -133,6 +135,7 @@ static const char *const myFoldersDescription = "My Folders";
 {
     self = [super init];
     if (self && p_mediaSource != NULL) {
+        _generateChildNodesLock = [[NSLock alloc] init];
         _respondsToDiskChanges = NO;
         _p_preparser = p_preparser;
         _p_mediaSource = p_mediaSource;
@@ -150,6 +153,7 @@ static const char *const myFoldersDescription = "My Folders";
 {
     self = [super init];
     if (self) {
+        _generateChildNodesLock = [[NSLock alloc] init];
         _p_preparser = p_preparser;
 
          _p_mediaSource = malloc(sizeof(vlc_media_source_t));
@@ -219,6 +223,7 @@ static const char *const myFoldersDescription = "My Folders";
 {
     self = [super init];
     if (self) {
+        _generateChildNodesLock = [[NSLock alloc] init];
         _p_preparser = p_preparser;
 
          _p_mediaSource = malloc(sizeof(vlc_media_source_t));
@@ -410,6 +415,8 @@ static const char *const myFoldersDescription = "My Folders";
                                         withUrl:(NSURL *)directoryUrl
 {
     NSParameterAssert(directoryNode != NULL && directoryUrl != nil);
+    [_generateChildNodesLock lock];
+
     if (self.willStartGeneratingChildNodesForNodeHandler) {
         self.willStartGeneratingChildNodesForNodeHandler(directoryNode);
     }
@@ -485,6 +492,7 @@ static const char *const myFoldersDescription = "My Folders";
     if (self.didFinishGeneratingChildNodesForNodeHandler) {
         self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
     }
+    [_generateChildNodesLock unlock];
 
     return nil;
 }
