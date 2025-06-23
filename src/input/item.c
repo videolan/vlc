@@ -1214,6 +1214,7 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
         { "live",   ITEM_TYPE_STREAM, true }, /* livedotcom */
         { "mms",    ITEM_TYPE_STREAM, true },
         { "mtp",    ITEM_TYPE_DISC, false },
+        { "ndi",    ITEM_TYPE_STREAM, true},
         { "nfs",    ITEM_TYPE_FILE, true },
         { "ofdm",   ITEM_TYPE_CARD, false },
         { "oss",    ITEM_TYPE_CARD, false },

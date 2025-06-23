@@ -416,6 +416,15 @@ endif
 access_PLUGINS += $(LTLIBsmb2)
 EXTRA_LTLIBRARIES += libsmb2_plugin.la
 
+libnoidea_plugin_la_SOURCES = access/ndi.c
+libnoidea_plugin_la_CFLAGS = $(AM_CFLAGS) $(NDI_CFLAGS)
+libnoidea_plugin_la_LIBADD = $(NDI_LIBS) $(SOCKET_LIBS)
+libnoidea_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
+if HAVE_NDI
+access_LTLIBRARIES += $(LTLIBnoidea)
+EXTRA_LTLIBRARIES += libnoidea_plugin.la
+endif
+
 libtcp_plugin_la_SOURCES = access/tcp.c
 libtcp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_PLUGINS += libtcp_plugin.la
