@@ -105,15 +105,9 @@ T.Pane {
         text: {
             // This text metrics is used for both the time and length, as we want them to have the same width.
             // Length might not be reported in some cases, for that reason we should check both and use the bigger one.
-            let t
-            const time = Player.time
-            const length = Player.length
-            if (time > length)
-                t = time
-            else
-                t = length
+
             // Some extra space to compensate non-monospaced fonts ("-" takes more space than ":", double "-" for guarantee)
-            return t.isSubHour() ? "00--00" : "00--00--00"
+            return (Player.time.isSubHour() && Player.length.isSubHour()) ? "00--00" : "00--00--00"
         }
     }
 
