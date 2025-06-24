@@ -1122,6 +1122,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
         ID3D11DeviceContext* copyContext = sys->d3d_dev.d3dcontext;
         ID3D11Resource* copyResource = p_sys->resource[KNOWN_DXGI_INDEX];
+        ID3D11Resource* newResource = NULL;
 
         if (is_d3d11_opaque(picture->format.i_chroma) && sys->d3d_dev.d3dcontext != p_sys->context)
         {
@@ -1145,7 +1146,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             hr = ID3D11Device_QueryInterface(psysDev, &IID_ID3D11Device1, (void**)&d3d11VLC1);
             if (SUCCEEDED(hr))
             {
-                hr = ID3D11Device1_OpenSharedResource1(d3d11VLC1, sys->sharedHandle, &IID_ID3D11Resource, (void**)&copyResource);
+                hr = ID3D11Device1_OpenSharedResource1(d3d11VLC1, sys->sharedHandle, &IID_ID3D11Resource, (void**)&newResource);
                 ID3D11Device1_Release(d3d11VLC1);
             }
             ID3D11Device_Release(psysDev);
@@ -1156,6 +1157,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                 return;
             }
 
+            copyResource = newResource;
             copyContext = p_sys->context;
         }
 
@@ -1200,9 +1202,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             }
         }
 
-        if (copyResource != p_sys->resource[KNOWN_DXGI_INDEX])
+        if (newResource != NULL)
             // shared resource
-            ID3D11Resource_Release(copyResource);
+            ID3D11Resource_Release(newResource);
     }
 
     if (subpicture) {
