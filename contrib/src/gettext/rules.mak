@@ -15,6 +15,7 @@ $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
+	$(APPLY) $(SRC)/gettext/gettext-0.22.5-gnulib-rename-real-openat.patch
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	# disable libtextstyle
 	sed -i.orig -e 's,gettext-runtime libtextstyle gettext-tools,gettext-runtime gettext-tools,g' $(UNPACK_DIR)/configure
@@ -52,6 +53,20 @@ GETTEXT_CONF += --disable-libasprintf
 endif
 ifdef HAVE_MINGW_W64
 GETTEXT_CONF += --disable-libasprintf
+endif
+ifdef HAVE_MACOSX
+# Mark functions as missing. Gettext/gnulib checks for functions without
+# using headers (which would make them unavailable with
+# -Werror=partial-availability), so we need to manually mark them unavailable.
+# These are unavailable in macOS 10.7.
+GETTEXT_CONF += \
+    ac_cv_func_clock_gettime=no \
+    ac_cv_func_faccessat=no \
+    ac_cv_func_fdopendir=no \
+    ac_cv_func_futimens=no \
+    ac_cv_func_memset_s=no \
+    ac_cv_func_openat=no \
+    ac_cv_func_utimensat=no
 endif
 
 .gettext: gettext
