@@ -28,7 +28,6 @@ Image {
     id: root
 
     required property color color
-    property alias csdMenuVisible: csdMenu.menuVisible
 
     sourceSize: Qt.size(VLCStyle.icon_normal, VLCStyle.icon_normal)
 
@@ -37,40 +36,4 @@ Image {
                                   : "qrc:///misc/cone.svg"
 
     focus: false
-
-    TapHandler {
-        enabled:  MainCtx.clientSideDecoration
-
-        gesturePolicy: TapHandler.WithinBounds
-
-        onSingleTapped: (eventPoint, button) => {
-            if (button === Qt.LeftButton){
-                doubleTapFilter.start()
-            }
-        }
-
-        onDoubleTapped: (eventPoint, button) => {
-            if (button === Qt.LeftButton) {
-                doubleTapFilter.stop()
-                MainCtx.intfMainWindow.close()
-            }
-        }
-    }
-
-    CSDMenu {
-        id: csdMenu
-        ctx: MainCtx
-    }
-
-    //SingleTapped is always notified, perform the action only if the double tap doesn't occur
-    Timer {
-        id: doubleTapFilter
-
-        interval: VLCStyle.duration_short
-
-        onTriggered: {
-            //popup below the widget
-            csdMenu.popup(root.mapToGlobal(0, root.height + VLCStyle.margin_xxsmall))
-        }
-    }
 }

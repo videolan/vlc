@@ -293,8 +293,6 @@ FocusScope{
                 anchors.leftMargin: VLCStyle.margin_xxsmall
 
                 color: theme.accent
-
-                onCsdMenuVisibleChanged: root.requestLockUnlockAutoHide(csdMenuVisible)
             }
         }
 
