@@ -795,7 +795,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/album_cover.svg \
 	pixmaps/icons/ic_aspect_ratio.svg \
 	pixmaps/icons/atob.svg \
-	pixmaps/icons/audiosub.svg \
+	pixmaps/icons/ic_audiosub.svg \
 	pixmaps/icons/back.svg \
 	pixmaps/icons/ic_fluent_bookmark.svg \
 	pixmaps/icons/breadcrumb_prev.svg \

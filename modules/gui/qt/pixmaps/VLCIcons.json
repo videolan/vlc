@@ -9,7 +9,7 @@
         {"key":"album_cover", "path": "./icons/album_cover.svg"},
         {"key":"aspect_ratio", "path": "./icons/ic_aspect_ratio.svg"},
         {"key":"atob", "path": "./icons/atob.svg"},
-        {"key":"audiosub", "path": "./icons/audiosub.svg"},
+        {"key":"audiosub", "path": "./icons/ic_audiosub.svg"},
         {"key":"back", "path": "./icons/back.svg"},
         {"key":"breadcrumb_sep", "path": "./icons/breadcrumb_sep.svg"},
         {"key":"breadcrumb_prev", "path": "./icons/breadcrumb_prev.svg"},
