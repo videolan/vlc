@@ -359,8 +359,12 @@
 
     switch (NSApp.currentEvent.type) {
         case NSEventTypeLeftMouseDown:
+        {
             _isTimeSliderBeingDragged = YES;
+            const float newPosition = [sender floatValue];
+            [_playerController setPositionFast:newPosition];
             break;
+        }
         case NSEventTypeLeftMouseDragged:
         case NSEventTypeScrollWheel:
         {
