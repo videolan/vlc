@@ -793,7 +793,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/active_indicator.svg \
 	pixmaps/icons/add.svg \
 	pixmaps/icons/album_cover.svg \
-	pixmaps/icons/aspect_ratio.svg \
+	pixmaps/icons/ic_aspect_ratio.svg \
 	pixmaps/icons/atob.svg \
 	pixmaps/icons/audiosub.svg \
 	pixmaps/icons/back.svg \
