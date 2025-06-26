@@ -997,7 +997,7 @@ FocusScope {
         }
     }
 
-    Widgets.DrawerExt {
+    Loader {
         id: playlistpopup
 
         anchors {
@@ -1012,18 +1012,59 @@ FocusScope {
         }
 
         focus: false
-        edge: Widgets.DrawerExt.Edges.Right
+
+        active: MainCtx.playqueuePanel.docked
 
         //initial state value is "", using a binding avoid animation on startup
         Binding on state {
             when: playlistVisibility.started
-            value: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
+            value: (status === Loader.Ready && playlistVisibility.isPlaylistVisible) ? "expanded" : "retracted"
         }
 
-        component: PlaylistPane {
+        Component.onCompleted: {
+            Qt.callLater(() => { playlistTransition.enabled = true; })
+        }
+
+        states: [
+            State {
+                name: "expanded"
+                PropertyChanges {
+                    target: playlistpopup
+                    width: playlistpopup.implicitWidth
+                    visible: true
+                }
+           }, State {
+                name: "retracted"
+                PropertyChanges {
+                    target: playlistpopup
+                    width: 0
+                    visible: false
+                }
+           }
+        ]
+
+        transitions: Transition {
+            id: playlistTransition
+            enabled: false
+
+            from: "retracted"; to: "expanded";
+            reversible: true
+
+            SequentialAnimation {
+                PropertyAction { property: "visible" }
+
+                NumberAnimation {
+                    property: "width"
+                    duration: VLCStyle.duration_short
+                    easing.type: Easing.InOutSine
+                }
+            }
+        }
+
+        sourceComponent: PlaylistPane {
             id: playlistView
 
-            width: Helpers.clamp(resizeHandle.requestedWith
+            implicitWidth: Helpers.clamp(MainCtx.playqueuePanel.width
                                  , playlistView.minimumWidth
                                  , (rootPlayer.width + playlistView.rightPadding) / 2)
             height: playlistpopup.height
