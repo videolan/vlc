@@ -31,7 +31,6 @@
     vlc_preparser_t *_p_preparser;
     vlc_media_source_t *_p_mediaSource;
     vlc_media_tree_listener_id *_p_treeListenerID;
-    NSLock *_generateChildNodesLock;
 }
 @end
 
@@ -106,7 +105,6 @@ static const char *const myFoldersDescription = "My Folders";
 {
     self = [super init];
     if (self) {
-        _generateChildNodesLock = [[NSLock alloc] init];
         _respondsToDiskChanges = NO;
         _p_preparser = p_preparser;
         
@@ -135,7 +133,6 @@ static const char *const myFoldersDescription = "My Folders";
 {
     self = [super init];
     if (self && p_mediaSource != NULL) {
-        _generateChildNodesLock = [[NSLock alloc] init];
         _respondsToDiskChanges = NO;
         _p_preparser = p_preparser;
         _p_mediaSource = p_mediaSource;
@@ -153,7 +150,6 @@ static const char *const myFoldersDescription = "My Folders";
 {
     self = [super init];
     if (self) {
-        _generateChildNodesLock = [[NSLock alloc] init];
         _p_preparser = p_preparser;
 
          _p_mediaSource = malloc(sizeof(vlc_media_source_t));
@@ -223,7 +219,6 @@ static const char *const myFoldersDescription = "My Folders";
 {
     self = [super init];
     if (self) {
-        _generateChildNodesLock = [[NSLock alloc] init];
         _p_preparser = p_preparser;
 
          _p_mediaSource = malloc(sizeof(vlc_media_source_t));
@@ -415,84 +410,83 @@ static const char *const myFoldersDescription = "My Folders";
                                         withUrl:(NSURL *)directoryUrl
 {
     NSParameterAssert(directoryNode != NULL && directoryUrl != nil);
-    [_generateChildNodesLock lock];
-
-    if (self.willStartGeneratingChildNodesForNodeHandler) {
-        self.willStartGeneratingChildNodesForNodeHandler(directoryNode);
-    }
-
-    // Clear pre-existing child nodes
-    while (directoryNode->i_children > 0) {
-        input_item_node_t * const childNode = directoryNode->pp_children[0];
-        input_item_node_RemoveNode(directoryNode, childNode);
-        input_item_node_Delete(childNode);
-    }
-
-    NSError *error;
-    const NSDirectoryEnumerationOptions options =
-        NSDirectoryEnumerationSkipsHiddenFiles | NSDirectoryEnumerationSkipsSubdirectoryDescendants;
-    NSArray<NSURLResourceKey> * const keys = @[NSURLIsDirectoryKey];
-    NSArray<NSURL *> *children =
-        [NSFileManager.defaultManager contentsOfDirectoryAtURL:directoryUrl
-                                    includingPropertiesForKeys:keys
-                                                       options:options
-                                                         error:&error];
-
-    if (error) {
-        NSLog(@"Failed to get directories: %@.", error);
-        return error;
-    }
-
-    children = [children sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
-        NSNumber *isDirectory1 = nil;
-        NSNumber *isDirectory2 = nil;
-        [url1 getResourceValue:&isDirectory1 forKey:NSURLIsDirectoryKey error:NULL];
-        [url2 getResourceValue:&isDirectory2 forKey:NSURLIsDirectoryKey error:NULL];
-
-        if (isDirectory1.boolValue && !isDirectory2.boolValue) {
-            return NSOrderedAscending;
-        } else if (!isDirectory1.boolValue && isDirectory2.boolValue) {
-            return NSOrderedDescending;
+    @synchronized (self) {
+        if (self.willStartGeneratingChildNodesForNodeHandler) {
+            self.willStartGeneratingChildNodesForNodeHandler(directoryNode);
         }
 
-        return [url1.lastPathComponent compare:url2.lastPathComponent
-                                       options:NSCaseInsensitiveSearch];
-    }];
+        // Clear pre-existing child nodes
+        while (directoryNode->i_children > 0) {
+            input_item_node_t * const childNode = directoryNode->pp_children[0];
+            input_item_node_RemoveNode(directoryNode, childNode);
+            input_item_node_Delete(childNode);
+        }
 
-    for (NSURL * const url in children) {
-        NSNumber *isDirectory;
-        NSNumber *isVolume;
-        NSNumber *isEjectable;
-        NSNumber *isInternal;
-        NSNumber *isLocal;
+        NSError *error;
+        const NSDirectoryEnumerationOptions options =
+            NSDirectoryEnumerationSkipsHiddenFiles | NSDirectoryEnumerationSkipsSubdirectoryDescendants;
+        NSArray<NSURLResourceKey> * const keys = @[NSURLIsDirectoryKey];
+        NSArray<NSURL *> *children =
+            [NSFileManager.defaultManager contentsOfDirectoryAtURL:directoryUrl
+                                        includingPropertiesForKeys:keys
+                                                        options:options
+                                                            error:&error];
 
-	    [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-        [url getResourceValue:&isVolume forKey:NSURLIsVolumeKey error:nil];
-        [url getResourceValue:&isEjectable forKey:NSURLVolumeIsEjectableKey error:nil];
-        [url getResourceValue:&isInternal forKey:NSURLVolumeIsInternalKey error:nil];
-        [url getResourceValue:&isLocal forKey:NSURLVolumeIsLocalKey error:nil];
-        
-        const enum input_item_type_e inputType = isDirectory.boolValue ? isEjectable.boolValue ? ITEM_TYPE_DISC : ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
-        const enum input_item_net_type netType = isLocal.boolValue ? ITEM_LOCAL : ITEM_NET;
+        if (error) {
+            NSLog(@"Failed to get directories: %@.", error);
+            return error;
+        }
 
-        const char * const psz_filename = url.absoluteString.UTF8String;
-        const char * const psz_name = url.lastPathComponent.UTF8String;
-        
-        input_item_t *urlInputItem = input_item_NewExt(psz_filename, psz_name, 0, inputType, netType);
-        if (urlInputItem != NULL && (inputType != ITEM_TYPE_FILE || input_item_Playable(psz_filename))) {
-            input_item_node_t * const urlNode = input_item_node_Create(urlInputItem);
-            if (urlNode) {
-                input_item_node_AppendNode(directoryNode, urlNode);
+        children = [children sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
+            NSNumber *isDirectory1 = nil;
+            NSNumber *isDirectory2 = nil;
+            [url1 getResourceValue:&isDirectory1 forKey:NSURLIsDirectoryKey error:NULL];
+            [url2 getResourceValue:&isDirectory2 forKey:NSURLIsDirectoryKey error:NULL];
+
+            if (isDirectory1.boolValue && !isDirectory2.boolValue) {
+                return NSOrderedAscending;
+            } else if (!isDirectory1.boolValue && isDirectory2.boolValue) {
+                return NSOrderedDescending;
             }
-            input_item_Release(urlInputItem);
-            urlInputItem = NULL;
+
+            return [url1.lastPathComponent compare:url2.lastPathComponent
+                                        options:NSCaseInsensitiveSearch];
+        }];
+
+        for (NSURL * const url in children) {
+            NSNumber *isDirectory;
+            NSNumber *isVolume;
+            NSNumber *isEjectable;
+            NSNumber *isInternal;
+            NSNumber *isLocal;
+
+            [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+            [url getResourceValue:&isVolume forKey:NSURLIsVolumeKey error:nil];
+            [url getResourceValue:&isEjectable forKey:NSURLVolumeIsEjectableKey error:nil];
+            [url getResourceValue:&isInternal forKey:NSURLVolumeIsInternalKey error:nil];
+            [url getResourceValue:&isLocal forKey:NSURLVolumeIsLocalKey error:nil];
+            
+            const enum input_item_type_e inputType = isDirectory.boolValue ? isEjectable.boolValue ? ITEM_TYPE_DISC : ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
+            const enum input_item_net_type netType = isLocal.boolValue ? ITEM_LOCAL : ITEM_NET;
+
+            const char * const psz_filename = url.absoluteString.UTF8String;
+            const char * const psz_name = url.lastPathComponent.UTF8String;
+            
+            input_item_t *urlInputItem = input_item_NewExt(psz_filename, psz_name, 0, inputType, netType);
+            if (urlInputItem != NULL && (inputType != ITEM_TYPE_FILE || input_item_Playable(psz_filename))) {
+                input_item_node_t * const urlNode = input_item_node_Create(urlInputItem);
+                if (urlNode) {
+                    input_item_node_AppendNode(directoryNode, urlNode);
+                }
+                input_item_Release(urlInputItem);
+                urlInputItem = NULL;
+            }
+        }
+
+        if (self.didFinishGeneratingChildNodesForNodeHandler) {
+            self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
         }
     }
-
-    if (self.didFinishGeneratingChildNodesForNodeHandler) {
-        self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
-    }
-    [_generateChildNodesLock unlock];
 
     return nil;
 }
