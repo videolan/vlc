@@ -523,6 +523,9 @@ static int WindowFloatOnTop(vlc_object_t *obj,
         videoWindow.videoViewController.endViewDismissHandler = ^{
             [self handleVideoCloseForDisplay:key];
         };
+        if (videoWindow.class == VLCLibraryWindow.class) {
+            b_mainWindowHasVideo = NO;
+        }
     } else if (!decorativeViewVisible) {
         [self handleVideoCloseForDisplay:key];
     }
