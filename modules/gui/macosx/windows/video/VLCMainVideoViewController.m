@@ -235,6 +235,10 @@
     NSAssert(controller != nil, 
              @"Player current media item changed notification should have valid player controller");
     [self updateDecorativeViewVisibilityOnControllerChange:controller];
+
+    // New item playing, dismiss playback end view
+    [self.playbackEndViewController.countdownTimer invalidate];
+    [self.playbackEndViewController.view removeFromSuperview];
 }
 
 - (void)playerCurrentItemTrackListChanged:(NSNotification *)notification
