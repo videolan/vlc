@@ -343,7 +343,7 @@ static int RefineSeek( demux_t *p_demux, vlc_tick_t i_time, double i_bytemicrora
 
         if( !b_found )
         {
-            if( i_highpos < i_lowpos || i_highpos - i_lowpos < i_frame_size )
+            if( i_highpos < i_lowpos || i_highpos - i_lowpos <= i_frame_size )
                 break;
 
             if( VLC_SUCCESS != vlc_stream_Seek( p_demux->s, i_start_pos ) )
