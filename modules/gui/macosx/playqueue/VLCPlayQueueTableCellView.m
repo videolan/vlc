@@ -97,8 +97,9 @@
 
     NSString *playTitle = item.title;
     if (validTitleString) {
-        if (item.inputItem.trackNumber && item.inputItem.trackNumber.length > 0) {
-            playTitle = [NSString stringWithFormat:@"%@ · %@", item.inputItem.trackNumber, item.inputItem.title];
+        NSString * const trackNumberString = item.inputItem.trackNumber;
+        if (trackNumberString && trackNumberString.length > 0 && ![trackNumberString isEqualToString:@"0"]) {
+            playTitle = [NSString stringWithFormat:@"%@ · %@", trackNumberString, item.inputItem.title];
         } else {
             playTitle = item.inputItem.title;
         }
