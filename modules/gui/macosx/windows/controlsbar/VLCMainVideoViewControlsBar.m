@@ -83,6 +83,10 @@
                            selector:@selector(playbackRateChanged:)
                                name:VLCPlayerCapabilitiesChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateAvailableButtons:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
 
     [self update];
 }
@@ -217,6 +221,13 @@
     }
     var_ToggleBool(p_vout, "video-on-top");
     vout_Release(p_vout);
+}
+
+- (void)updateAvailableButtons:(id)sender
+{
+    const BOOL currentItemIsAudio = _playerController.currentMediaIsAudioOnly;
+    self.videoButton.hidden = currentItemIsAudio;
+    self.subtitlesButton.hidden = currentItemIsAudio;
 }
 
 @end
