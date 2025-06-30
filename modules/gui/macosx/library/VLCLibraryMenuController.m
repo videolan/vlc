@@ -27,6 +27,7 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibrarySegment.h"
 
@@ -44,6 +45,7 @@
     VLCInformationWindowController *_informationWindowController;
 
     NSHashTable<NSMenuItem*> *_mediaItemRequiringMenuItems;
+    NSHashTable<NSMenuItem*> *_recentsMediaItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_inputItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_localInputItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_folderInputItemRequiringMenuItems;
@@ -78,6 +80,9 @@
     NSMenuItem *deleteItem = [[NSMenuItem alloc] initWithTitle:_NS("Delete from Library") action:@selector(moveToTrash:) keyEquivalent:@""];
     deleteItem.target = self;
 
+    NSMenuItem *markUnseenItem = [[NSMenuItem alloc] initWithTitle:_NS("Mark as Unseen") action:@selector(markUnseen:) keyEquivalent:@""];
+    markUnseenItem.target = self;
+
     NSMenuItem *informationItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformation:) keyEquivalent:@""];
     informationItem.target = self;
 
@@ -93,6 +98,7 @@
         bookmarkItem,
         revealItem,
         deleteItem,
+        markUnseenItem,
         informationItem,
         [NSMenuItem separatorItem], 
         addItem
@@ -104,6 +110,9 @@
     [_mediaItemRequiringMenuItems addObject:revealItem];
     [_mediaItemRequiringMenuItems addObject:deleteItem];
     [_mediaItemRequiringMenuItems addObject:informationItem];
+
+    _recentsMediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
+    [_recentsMediaItemRequiringMenuItems addObject:markUnseenItem];
 
     _inputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_inputItemRequiringMenuItems addObject:playItem];
@@ -127,11 +136,26 @@
 
 - (void)updateMenuItems
 {
+    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    NSArray<VLCMediaLibraryMediaItem *> * const recents = libraryModel.listOfRecentMedia;
+
     if (self.representedItems != nil && self.representedItems.count > 0) {
         [self menuItems:_inputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_localInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_folderInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
+
+        BOOL anyNonRecent = NO;
+        for (VLCLibraryRepresentedItem * const item in self.representedItems) {
+            if ([recents indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                return obj.libraryID == item.item.libraryID;
+            }] == NSNotFound) {
+                anyNonRecent = YES;
+                break;
+            }
+        }
+        [self menuItems:_recentsMediaItemRequiringMenuItems setHidden:anyNonRecent];
+
     } else if (_representedInputItems != nil && self.representedInputItems.count > 0) {
         [self menuItems:_mediaItemRequiringMenuItems setHidden:YES];
         [self menuItems:_inputItemRequiringMenuItems setHidden:NO];
@@ -282,6 +306,14 @@
     }
     [defaults setObject:bookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
     [defaultCenter postNotificationName:VLCLibraryBookmarkedLocationsChanged object:inputItemMRL];
+}
+
+- (void)markUnseen:(id)sender
+{
+    vlc_medialibrary_t * const p_ml = vlc_ml_instance_get(getIntf());
+    for (VLCLibraryRepresentedItem * const item in self.representedItems) {
+        vlc_ml_media_set_played(p_ml, item.item.libraryID, false);
+    }
 }
 
 - (void)setRepresentedItems:(NSArray<VLCLibraryRepresentedItem *> *)items
