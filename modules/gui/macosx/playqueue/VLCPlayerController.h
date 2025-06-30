@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlayerTitle;
 @class VLCProgramMetaData;
 @class VLCInputItem;
+@class VLCMediaLibraryMediaItem;
 
 extern NSString *VLCPlayerElementaryStreamID;
 extern NSString *VLCTick;
@@ -317,6 +318,12 @@ extern const CGFloat VLCVolumeDefault;
  * @note it is the receiver's obligation to release the input item
  */
 @property (readonly, nullable) VLCInputItem *currentMedia;
+
+/**
+ * get the relevant media library item for the current media item
+ * @return the current media library media, NULL if no current input item OR is not an ML item
+ */
+@property (readonly, nullable) VLCMediaLibraryMediaItem *currentMediaLibraryItem;
 
 /**
  * returns the duration of the current media in vlc ticks

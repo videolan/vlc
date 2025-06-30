@@ -753,6 +753,12 @@ static int BossCallback(vlc_object_t *p_this,
     return _currentMedia;
 }
 
+- (nullable VLCMediaLibraryMediaItem *)currentMediaLibraryItem
+{
+    NSURL * const url = [NSURL URLWithString:self.currentMedia.MRL];
+    return [VLCMediaLibraryMediaItem mediaItemForURL:url];
+}
+
 - (int)interpolateTime:(vlc_tick_t)system_now
 {
     vlc_tick_t new_time;
