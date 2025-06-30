@@ -71,6 +71,9 @@
     NSMenuItem *appendItem = [[NSMenuItem alloc] initWithTitle:_NS("Append to Play Queue") action:@selector(appendToPlayQueue:) keyEquivalent:@""];
     appendItem.target = self;
 
+    NSMenuItem *favoriteItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Favorite") action:@selector(toggleFavorite:) keyEquivalent:@""];
+    favoriteItem.target = self;
+
     NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
     addItem.target = self;
 
@@ -95,6 +98,7 @@
     [_libraryMenu addMenuItemsFromArray:@[
         playItem,
         appendItem,
+        favoriteItem,
         bookmarkItem,
         revealItem,
         deleteItem,
@@ -107,6 +111,7 @@
     _mediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_mediaItemRequiringMenuItems addObject:playItem];
     [_mediaItemRequiringMenuItems addObject:appendItem];
+    [_mediaItemRequiringMenuItems addObject:favoriteItem];
     [_mediaItemRequiringMenuItems addObject:revealItem];
     [_mediaItemRequiringMenuItems addObject:deleteItem];
     [_mediaItemRequiringMenuItems addObject:informationItem];
@@ -282,6 +287,15 @@
     }
 
     [_informationWindowController toggleWindow:sender];
+}
+
+- (void)toggleFavorite:(id)sender
+{
+    for (VLCLibraryRepresentedItem * const item in self.representedItems) {
+        [item.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * _Nonnull const mediaItem) {
+            [mediaItem toggleFavorite];
+        }];
+    }
 }
 
 - (void)toggleBookmark:(id)sender
