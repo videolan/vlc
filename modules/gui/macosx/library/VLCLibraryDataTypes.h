@@ -335,6 +335,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) int trackNumber;
 @property (readonly) int discNumber;
 
+- (int)setFavorite:(BOOL)favorite;
 - (int)toggleFavorite;
 
 @end

@@ -1576,17 +1576,21 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.internalLabels;
 }
 
-- (int)toggleFavorite
+- (int)setFavorite:(BOOL)favorite
 {
     const int64_t mediaItemId = self.libraryID;
-    const bool b_favorite = self.favorited;
     vlc_medialibrary_t * const p_ml = vlc_ml_instance_get(getIntf());
-    const int result = vlc_ml_media_set_favorite(p_ml, mediaItemId, !b_favorite);
+    const int result = vlc_ml_media_set_favorite(p_ml, mediaItemId, favorite);
     if (result == VLC_SUCCESS)
-        _favorited = !_favorited;
+        _favorited = favorite;
     else
         NSLog(@"Unable to set favorite status of media item: %lli", mediaItemId);
     return result;
+}
+
+- (int)toggleFavorite
+{
+    return [self setFavorite:!self.favorited];
 }
 
 @end
