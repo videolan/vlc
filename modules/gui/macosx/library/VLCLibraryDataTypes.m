@@ -1576,6 +1576,19 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.internalLabels;
 }
 
+- (int)toggleFavorite
+{
+    const int64_t mediaItemId = self.libraryID;
+    const bool b_favorite = self.favorited;
+    vlc_medialibrary_t * const p_ml = vlc_ml_instance_get(getIntf());
+    const int result = vlc_ml_media_set_favorite(p_ml, mediaItemId, !b_favorite);
+    if (result == VLC_SUCCESS)
+        _favorited = !_favorited;
+    else
+        NSLog(@"Unable to set favorite status of media item: %lli", mediaItemId);
+    return result;
+}
+
 @end
 
 @implementation VLCMediaLibraryShow

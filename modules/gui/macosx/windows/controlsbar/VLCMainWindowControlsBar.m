@@ -201,6 +201,18 @@
     self.prevButton.enabled = b_seekable || _playQueueController.hasPreviousPlayQueueItem;
     self.nextButton.enabled = b_seekable || _playQueueController.hasNextPlayQueueItem;
     [self updateCurrentItemDisplayControls:notification];
+
+    VLCMediaLibraryMediaItem * const currentMlItem = _playerController.currentMediaLibraryItem;
+    self.favoriteButton.hidden = currentMlItem == nil;
+    self.favoriteButton.state = currentMlItem.favorited ? NSControlStateValueOn : NSControlStateValueOff;
+}
+
+- (void)toggleFavorite:(id)sender
+{
+    const NSControlStateValue buttonStartState = self.favoriteButton.state;
+    VLCMediaLibraryMediaItem * const mediaItem = [_playerController currentMediaLibraryItem];
+    if (mediaItem == nil || [mediaItem toggleFavorite] != VLC_SUCCESS)
+        self.favoriteButton.state = buttonStartState;
 }
 
 @end

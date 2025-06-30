@@ -258,16 +258,29 @@
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="SM6-nx-NKD" secondAttribute="trailing" constant="4" id="wML-fX-wuF"/>
                                         </constraints>
                                     </customView>
-                                    <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
+                                    <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
                                         <rect key="frame" x="692" y="4" width="188" height="40"/>
                                         <subviews>
+                                            <button horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Bt8-jQ-hUr">
+                                                <rect key="frame" x="0.0" y="13.5" width="16" height="14"/>
+                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="heart" catalog="system" imagePosition="only" alignment="center" alternateImage="heart.fill" imageScaling="proportionallyUpOrDown" inset="2" id="Y7l-9o-1h7">
+                                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="16" id="cLo-3L-cvG"/>
+                                                </constraints>
+                                                <connections>
+                                                    <action selector="toggleFavorite:" target="Uzf-Tf-H8x" id="5n0-gl-qS6"/>
+                                                </connections>
+                                            </button>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="i42-vp-ih7">
-                                                <rect key="frame" x="0.0" y="0.0" width="164" height="40"/>
+                                                <rect key="frame" x="21" y="0.0" width="146" height="40"/>
                                                 <subviews>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="noz-yJ-oH4" customClass="VLCVolumeSlider">
-                                                        <rect key="frame" x="56" y="12" width="52" height="17"/>
+                                                        <rect key="frame" x="6" y="12" width="126" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" constant="48" id="EM2-Hh-lqK"/>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="48" id="EM2-Hh-lqK"/>
                                                         </constraints>
                                                         <sliderCell key="cell" controlSize="mini" continuous="YES" alignment="left" maxValue="512" doubleValue="251.95348837209303" tickMarkPosition="above" sliderType="linear" id="IIu-VN-bEm" customClass="VLCVolumeSliderCell"/>
                                                         <connections>
@@ -306,10 +319,11 @@
                                                 <constraints>
                                                     <constraint firstItem="75c-FF-mgb" firstAttribute="leading" secondItem="noz-yJ-oH4" secondAttribute="trailing" constant="4" id="2Ot-bs-v7Q"/>
                                                     <constraint firstItem="75c-FF-mgb" firstAttribute="centerY" secondItem="noz-yJ-oH4" secondAttribute="centerY" id="9Oz-v1-KwH"/>
-                                                    <constraint firstItem="noz-yJ-oH4" firstAttribute="centerX" secondItem="i42-vp-ih7" secondAttribute="centerX" id="KPm-J8-zuC"/>
                                                     <constraint firstItem="IAy-58-UPp" firstAttribute="centerY" secondItem="noz-yJ-oH4" secondAttribute="centerY" id="PGM-ud-0Wk"/>
+                                                    <constraint firstAttribute="trailing" secondItem="75c-FF-mgb" secondAttribute="trailing" id="TKa-Ng-Pti"/>
+                                                    <constraint firstItem="IAy-58-UPp" firstAttribute="leading" secondItem="i42-vp-ih7" secondAttribute="leading" id="g8p-sN-yd5"/>
                                                     <constraint firstItem="noz-yJ-oH4" firstAttribute="centerY" secondItem="i42-vp-ih7" secondAttribute="centerY" id="jfV-of-CoU"/>
-                                                    <constraint firstItem="IAy-58-UPp" firstAttribute="trailing" secondItem="noz-yJ-oH4" secondAttribute="leading" constant="-4" id="nMU-2d-pO9"/>
+                                                    <constraint firstItem="IAy-58-UPp" firstAttribute="trailing" secondItem="noz-yJ-oH4" secondAttribute="leading" constant="4" id="nMU-2d-pO9"/>
                                                 </constraints>
                                             </customView>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="dwM-Uz-pAw" userLabel="Full Screen Button">
@@ -330,8 +344,10 @@
                                         <visibilityPriorities>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
+                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
@@ -593,6 +609,7 @@
                 <outlet property="backwardButton" destination="jGc-Xw-GYI" id="0AG-44-SN3"/>
                 <outlet property="bottomBarView" destination="vUy-jt-gjY" id="WqX-SW-mpv"/>
                 <outlet property="dropView" destination="MQH-bI-Zdh" id="Wz9-NB-wtE"/>
+                <outlet property="favoriteButton" destination="Bt8-jQ-hUr" id="Ouv-od-xpR"/>
                 <outlet property="forwardButton" destination="dPD-MZ-5oT" id="btH-v5-s7F"/>
                 <outlet property="fullscreenButton" destination="dwM-Uz-pAw" id="gXA-WS-Gig"/>
                 <outlet property="jumpBackwardButton" destination="72A-6S-lpR" id="YRk-DB-K28"/>
@@ -1670,6 +1687,8 @@
         <image name="arrow.up.arrow.down" catalog="system" width="18" height="15"/>
         <image name="fullscreen-one-button" width="29" height="23"/>
         <image name="fullscreen-one-button-pressed" width="29" height="23"/>
+        <image name="heart" catalog="system" width="16" height="14"/>
+        <image name="heart.fill" catalog="system" width="16" height="14"/>
         <image name="libraryPlay" width="64" height="64"/>
         <image name="list.triangle" catalog="system" width="16" height="12"/>
         <image name="sidebar.left" catalog="system" width="18" height="14"/>

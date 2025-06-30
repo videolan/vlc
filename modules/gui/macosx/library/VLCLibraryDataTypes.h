@@ -335,6 +335,8 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) int trackNumber;
 @property (readonly) int discNumber;
 
+- (int)toggleFavorite;
+
 @end
 
 @interface VLCMediaLibraryEntryPoint : NSObject

@@ -37,16 +37,16 @@
 @interface VLCMainWindowControlsBar : VLCControlsBarCommon
 
 @property (readwrite, strong) IBOutlet NSButton *stopButton;
-
 @property (readwrite, strong) IBOutlet NSButton *prevButton;
 @property (readwrite, strong) IBOutlet NSButton *nextButton;
-
 @property (readwrite, strong) IBOutlet NSButton *volumeUpButton;
+@property (readwrite, strong) IBOutlet NSButton *favoriteButton;
 
 @property (readwrite, strong) IBOutlet VLCTrackingView *thumbnailTrackingView;
 @property (readwrite, strong) IBOutlet NSView *openMainVideoViewButtonOverlay;
 
 - (IBAction)stop:(id)sender;
+- (IBAction)toggleFavorite:(id)sender;
 
 @end
 
