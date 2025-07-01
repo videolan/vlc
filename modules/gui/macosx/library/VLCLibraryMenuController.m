@@ -50,6 +50,9 @@
     NSHashTable<NSMenuItem*> *_localInputItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_folderInputItemRequiringMenuItems;
 }
+
+@property (readwrite, weak) NSMenuItem *favoriteItem;
+
 @end
 
 @implementation VLCLibraryMenuController
@@ -129,6 +132,8 @@
 
     _folderInputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_folderInputItemRequiringMenuItems addObject:bookmarkItem];
+
+    self.favoriteItem = favoriteItem;
 }
 
 - (void)menuItems:(NSHashTable<NSMenuItem*>*)menuItems
@@ -160,6 +165,20 @@
             }
         }
         [self menuItems:_recentsMediaItemRequiringMenuItems setHidden:anyNonRecent];
+        
+        __block BOOL anyUnfavorited = NO;
+        for (VLCLibraryRepresentedItem * const item in self.representedItems) {
+            [item.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * _Nonnull const mediaItem) {
+                if (!mediaItem.favorited) {
+                    anyUnfavorited = YES;
+                    return;
+                }
+            }];
+            if (anyUnfavorited)
+                break;
+        }
+        self.favoriteItem.title = anyUnfavorited ? _NS("Add to Favorites") : _NS("Remove from Favorites");
+        self.favoriteItem.action = anyUnfavorited ? @selector(addFavorite:) : @selector(removeFavorite:);
 
     } else if (_representedInputItems != nil && self.representedInputItems.count > 0) {
         [self menuItems:_mediaItemRequiringMenuItems setHidden:YES];
@@ -289,11 +308,21 @@
     [_informationWindowController toggleWindow:sender];
 }
 
-- (void)toggleFavorite:(id)sender
+- (void)addFavorite:(id)sender
+{
+    [self setItemsFavorite:YES];
+}
+
+- (void)removeFavorite:(id)sender
+{
+    [self setItemsFavorite:NO];
+}
+
+- (void)setItemsFavorite:(BOOL)favorite
 {
     for (VLCLibraryRepresentedItem * const item in self.representedItems) {
         [item.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * _Nonnull const mediaItem) {
-            [mediaItem toggleFavorite];
+            [mediaItem setFavorite:favorite];
         }];
     }
 }
