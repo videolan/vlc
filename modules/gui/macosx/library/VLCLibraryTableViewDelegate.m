@@ -22,11 +22,20 @@
 
 #import "VLCLibraryTableViewDelegate.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
+
+#import "library/VLCInputItem.h"
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableCellViewProtocol.h"
 #import "library/VLCLibraryTableViewDataSource.h"
-#import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryRepresentedItem.h"
+
+#include "main/VLCMain.h"
+
+#import "playqueue/VLCPlayQueueController.h"
 
 @implementation VLCLibraryTableViewDelegate
 
@@ -64,6 +73,37 @@
         [cellView setRepresentedItem:representedItem];
     }
     return cellView;
+}
+
+- (NSArray<NSTableViewRowAction *> *)tableView:(NSTableView *)tableView
+                              rowActionsForRow:(NSInteger)row
+                                          edge:(NSTableRowActionEdge)edge
+{
+    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+        return @[];
+    }
+
+    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource =
+        (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
+    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
+
+    NSObject<VLCMediaLibraryItemProtocol> * const libraryItem =
+        [vlcDataSource libraryItemAtRow:row forTableView:tableView];
+
+    if (edge == NSTableRowActionEdgeLeading) {
+        NSTableViewRowAction * const appendToPlayQueueAction =
+            [NSTableViewRowAction rowActionWithStyle:NSTableViewRowActionStyleRegular
+                                               title:_NS("Append to Play Queue")
+                                             handler:^(NSTableViewRowAction *action, NSInteger r) {
+                VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+                for (VLCMediaLibraryMediaItem *mediaItem in libraryItem.mediaItems) {
+                    [libraryController appendItemToPlayQueue:mediaItem playImmediately:NO];
+                }
+        }];
+        appendToPlayQueueAction.backgroundColor = NSColor.VLCAccentColor;
+        return @[appendToPlayQueueAction];
+    }
+    return @[];
 }
 
 @end
