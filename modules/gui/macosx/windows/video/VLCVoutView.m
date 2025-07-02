@@ -104,7 +104,7 @@
     f_cumulated_magnification = 0.0;
 
     _playerController = VLCMain.sharedInstance.playQueueController.playerController;
-    _hotkeysController = [[VLCHotkeysController alloc] init];
+    _hotkeysController = VLCMain.sharedInstance.hotkeysController;
     _eventQueue = dispatch_queue_create("org.videolan.vlc.vout.events", DISPATCH_QUEUE_SERIAL);
     vlc_mutex_init(&_mutex);
 }
