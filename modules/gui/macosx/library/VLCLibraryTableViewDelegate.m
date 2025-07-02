@@ -102,6 +102,29 @@
         }];
         appendToPlayQueueAction.backgroundColor = NSColor.VLCAccentColor;
         return @[appendToPlayQueueAction];
+    } else if (edge == NSTableRowActionEdgeTrailing) {
+        __block BOOL anyUnfavorited = NO;
+        for (VLCMediaLibraryMediaItem * const item in libraryItem.mediaItems) {
+            if (!item.favorited) {
+                anyUnfavorited = YES;
+                break;
+            }
+        }
+        NSString * const displayString =
+            anyUnfavorited ? _NS("Add to Favorites") : _NS("Remove from Favorites");
+
+        NSTableViewRowAction * const favoriteAction =
+            [NSTableViewRowAction rowActionWithStyle:NSTableViewRowActionStyleRegular
+                                               title:displayString
+                                             handler:^(NSTableViewRowAction *action, NSInteger r) {
+            [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *const mediaItem) {
+                const BOOL setFavorited = !mediaItem.favorited;
+                [mediaItem setFavorite:setFavorited];
+            }];
+        }];
+        favoriteAction.backgroundColor =
+            anyUnfavorited ? NSColor.systemRedColor : NSColor.systemBlueColor;
+        return @[favoriteAction];
     }
     return @[];
 }
