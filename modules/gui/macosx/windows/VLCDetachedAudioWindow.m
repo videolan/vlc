@@ -22,6 +22,8 @@
 
 #import "VLCDetachedAudioWindow.h"
 
+#import "coreinteraction/VLCHotkeysController.h"
+
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
@@ -108,6 +110,10 @@
         [self closeAndAnimate:YES];
         return YES;
     }
+
+    if ([VLCMain.sharedInstance.hotkeysController performKeyEquivalent:event])
+        return YES;
+
     return [super performKeyEquivalent:event];
 }
 
