@@ -127,7 +127,10 @@
                            selector:@selector(hasNextChanged:)
                                name:VLCPlaybackHasNextChanged
                              object:nil];
-
+    [notificationCenter addObserver:self
+                           selector:@selector(playerStateChanged:)
+                               name:VLCPlayerStateChanged
+                             object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(configurationChanged:)
                                name:VLCConfigurationChangedNotification
@@ -258,12 +261,10 @@
 
             [totalField setStringValue:[NSString stringWithTimeFromTicks:duration]];
         }
-        [self setStoppedStatus:NO];
     } else {
         /* Nothing playing */
         [progressField setStringValue:@"--:--"];
         [totalField setStringValue:@"--:--"];
-        [self setStoppedStatus:YES];
     }
 }
 
@@ -290,6 +291,36 @@
     forwardButton.enabled = VLCMain.sharedInstance.playQueueController.hasNextPlayQueueItem;
 }
 
+- (void)playerStateChanged:(NSNotification *)aNotification
+{
+    VLCPlayerController *playerController = aNotification.object;
+    enum vlc_player_state playerState = playerController.playerState;
+    VLCInputItem *inputItem = playerController.currentMedia;
+
+    switch (playerState) {
+        case VLC_PLAYER_STATE_PLAYING:
+            [playPauseButton setState:NSControlStateValueOn];
+            [self setProgressTimeEnabled:YES];
+            [pathActionItem setEnabled:YES];
+            [self updateCachedURLOfCurrentMedia:inputItem];
+            break;
+        case VLC_PLAYER_STATE_PAUSED:
+            [playPauseButton setState:NSControlStateValueOff];
+            [self setProgressTimeEnabled:YES];
+            [pathActionItem setEnabled:YES];
+            [self updateCachedURLOfCurrentMedia:inputItem];
+            break;
+        case VLC_PLAYER_STATE_STOPPED:
+            [playPauseButton setState:NSControlStateValueOff];
+            [self setProgressTimeEnabled:NO];
+            [pathActionItem setEnabled:NO];
+            _currentPlaybackUrl = nil;
+            break;
+        default:
+            break;
+    }
+}
+
 /* Updates the Metadata for the currently
  * playing item or resets it if nothing is playing
  */
@@ -302,31 +333,9 @@
     NSString        *album;
 
     VLCPlayerController *playerController = aNotification.object;
-    enum vlc_player_state playerState = playerController.playerState;
     VLCInputItem *inputItem = playerController.currentMedia;
 
-    switch (playerState) {
-        case VLC_PLAYER_STATE_PLAYING:
-            [self setStoppedStatus:NO];
-            [self setProgressTimeEnabled:YES];
-            [pathActionItem setEnabled:YES];
-            [self updateCachedURLOfCurrentMedia:inputItem];
-            break;
-        case VLC_PLAYER_STATE_STOPPED:
-            [self setStoppedStatus:YES];
-            [self setProgressTimeEnabled:NO];
-            [pathActionItem setEnabled:NO];
-            _currentPlaybackUrl = nil;
-            break;
-        case VLC_PLAYER_STATE_PAUSED:
-            [self setStoppedStatus:NO];
-            [self setProgressTimeEnabled:YES];
-            [pathActionItem setEnabled:YES];
-            [self updateCachedURLOfCurrentMedia:inputItem];
-            [playPauseButton setState:NSOffState];
-        default:
-            break;
-    }
+    [self updateCachedURLOfCurrentMedia:inputItem];
 
     if (inputItem) {
         coverArtImage = [[NSImage alloc] initWithContentsOfURL:inputItem.artworkURL];
