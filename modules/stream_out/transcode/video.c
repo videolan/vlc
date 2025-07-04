@@ -307,8 +307,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     id->p_decoder->pf_decode = NULL;
     id->p_decoder->pf_get_cc = NULL;
 
-    id->p_decoder->p_module =
-        module_need_var( id->p_decoder, "video decoder", "codec" );
+    decoder_LoadModule( id->p_decoder, false, true );
 
     if( !id->p_decoder->p_module )
     {
