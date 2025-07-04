@@ -625,8 +625,7 @@ int OpenDecoder(vlc_object_t *o)
     };
 
     p_sys->opaque->dec.cbs = &dec_cbs;
-    p_sys->opaque->dec.p_module =
-        module_need_var( &p_sys->opaque->dec, "video decoder", "codec" );
+    decoder_LoadModule(&p_sys->opaque->dec, false, true);
     if (p_sys->opaque->dec.p_module == NULL)
     {
         decoder_Destroy(&p_sys->alpha->dec);
@@ -634,8 +633,7 @@ int OpenDecoder(vlc_object_t *o)
         return VLC_EGENERIC;
     }
     p_sys->alpha->dec.cbs = &dec_cbs;
-    p_sys->alpha->dec.p_module =
-        module_need_var( &p_sys->alpha->dec, "video decoder", "codec" );
+    decoder_LoadModule(&p_sys->alpha->dec, false, true);
     if (p_sys->alpha->dec.p_module == NULL)
     {
         decoder_Destroy(&p_sys->alpha->dec);
