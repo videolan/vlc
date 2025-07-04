@@ -252,11 +252,7 @@ void AbstractDecodedStream::deinit()
 bool AbstractDecodedStream::init(const es_format_t *p_fmt)
 {
     const char *category;
-    if(p_fmt->i_cat == VIDEO_ES)
-        category = "video decoder";
-    else if(p_fmt->i_cat == AUDIO_ES)
-        category = "audio decoder";
-    else
+    if(p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES)
         return false;
 
     /* Create decoder object */
@@ -274,7 +270,8 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
 
     setCallbacks();
 
-    p_decoder->p_module = module_need_var(p_decoder, category, "codec");
+    decoder_LoadModule(p_decoder, false, true);
+
     if(!p_decoder->p_module)
     {
         msg_Err(p_stream, "cannot find %s for %4.4s", category, (char *)&p_fmt->i_codec);
