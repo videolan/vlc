@@ -965,7 +965,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [cachedMediaArray replaceObjectAtIndex:cachedMediaIndex withObject:mediaItem];
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
-            [cachedMediaArray replaceObjectAtIndex:recentMediaIndex withObject:mediaItem];
+            [recentMediaArray replaceObjectAtIndex:recentMediaIndex withObject:mediaItem];
             switch (mediaItem.mediaType) {
                 case VLC_ML_MEDIA_TYPE_VIDEO:
                     [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemUpdated 
