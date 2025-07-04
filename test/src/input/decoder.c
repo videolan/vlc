@@ -104,19 +104,7 @@ static int decoder_load(decoder_t *decoder, bool is_packetizer,
 
     decoder->b_frame_drop_allowed = true;
 
-    if (!is_packetizer)
-    {
-        static const char caps[ES_CATEGORY_COUNT][16] = {
-            [VIDEO_ES] = "video decoder",
-            [AUDIO_ES] = "audio decoder",
-            [SPU_ES] = "spu decoder",
-        };
-        decoder->p_module =
-            module_need(decoder, caps[decoder->fmt_in->i_cat], NULL, false);
-    }
-    else
-        decoder->p_module = module_need(decoder, "packetizer", NULL, false);
-
+    decoder_LoadModule(decoder, is_packetizer, false);
     if (!decoder->p_module)
     {
         es_format_Clean( &owner->fmt_in );

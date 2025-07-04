@@ -86,7 +86,7 @@ static decoder_t *create_packetizer(libvlc_instance_t *vlc,
     owner->fmt_in.b_packetized = false;
     p_pack->fmt_in = &owner->fmt_in;
 
-    p_pack->p_module = module_need( p_pack, "packetizer", NULL, false );
+    decoder_LoadModule( p_pack, true, false );
     if(!p_pack->p_module)
         delete_packetizer(p_pack);
     return p_pack;
