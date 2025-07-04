@@ -44,8 +44,14 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
     set_description( N_("Copy packetizer") )
-    set_capability( "packetizer", 1 )
+    set_capability( "video packetizer", 1 )
     set_callbacks( Open, Close )
+    add_submodule()
+        set_capability( "audio packetizer", 1 )
+        set_callbacks( Open, Close )
+    add_submodule()
+        set_capability( "spu packetizer", 1 )
+        set_callbacks( Open, Close )
 vlc_module_end ()
 
 /*****************************************************************************

@@ -83,7 +83,7 @@ static void Close(  vlc_object_t * );
 vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_description( N_("MPEG audio layer I/II/III packetizer") )
-    set_capability( "packetizer", 10 )
+    set_capability( "audio packetizer", 10 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

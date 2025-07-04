@@ -47,7 +47,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_subcategory(SUBCAT_SOUT_PACKETIZER)
     set_description( N_("A/52 audio packetizer") )
-    set_capability( "packetizer", 10 )
+    set_capability( "audio packetizer", 10 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

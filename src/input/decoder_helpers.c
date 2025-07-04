@@ -62,11 +62,16 @@ int decoder_LoadModule(decoder_t *dec, bool packetizer,
         [AUDIO_ES] = "audio decoder",
         [SPU_ES] = "spu decoder",
     };
+    static const char pkt_caps[ES_CATEGORY_COUNT][19] = {
+        [VIDEO_ES] = "video packetizer",
+        [AUDIO_ES] = "audio packetizer",
+        [SPU_ES] = "spu packetizer",
+    };
 
     const char *type, *option;
     if (packetizer)
     {
-        type = "packetizer";
+        type = pkt_caps[dec->fmt_in->i_cat];
         option = use_varoption ? "packetizer" : NULL;
     }
     else

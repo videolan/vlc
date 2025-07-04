@@ -60,7 +60,7 @@ vlc_module_begin ()
 
     add_submodule ()
     set_description( N_("Linear PCM audio packetizer") )
-    set_capability( "packetizer", 100 )
+    set_capability( "audio packetizer", 100 )
     set_callback( OpenPacketizer )
 
 #ifdef ENABLE_SOUT

@@ -123,7 +123,7 @@ vlc_module_begin ()
     add_shortcut( "daala" )
     add_submodule ()
     set_description( N_("Daala video packetizer") )
-    set_capability( "packetizer", 100 )
+    set_capability( "video packetizer", 100 )
     set_callbacks( OpenPacketizer, CloseDecoder )
     add_shortcut( "daala" )
 

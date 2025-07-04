@@ -101,7 +101,7 @@ vlc_module_begin ()
 
     add_submodule ()
     set_description( N_("Speex audio packetizer") )
-    set_capability( "packetizer", 100 )
+    set_capability( "audio packetizer", 100 )
     set_callbacks( OpenPacketizer, CloseDecoder )
 
 #ifdef ENABLE_SOUT

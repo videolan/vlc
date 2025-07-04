@@ -161,7 +161,7 @@ static void     Flush( decoder_t * );
 vlc_module_begin ()
     set_subcategory(SUBCAT_SOUT_PACKETIZER)
     set_description(N_("MPEG4 audio packetizer"))
-    set_capability("packetizer", 50)
+    set_capability("audio packetizer", 50)
     set_callbacks(OpenPacketizer, ClosePacketizer)
 vlc_module_end ()
 

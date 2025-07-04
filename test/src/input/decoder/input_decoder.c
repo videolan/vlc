@@ -441,7 +441,15 @@ vlc_module_begin()
 
     add_submodule()
         set_callback(OpenPacketizer)
-        set_capability("packetizer", INT_MAX)
+        set_capability("video packetizer", INT_MAX)
+
+    add_submodule()
+        set_callback(OpenPacketizer)
+        set_capability("audio packetizer", INT_MAX)
+
+    add_submodule()
+        set_callback(OpenPacketizer)
+        set_capability("spu packetizer", INT_MAX)
 
     add_submodule()
         set_callback(OpenWindow)

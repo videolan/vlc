@@ -309,7 +309,7 @@ vlc_module_begin ()
 #ifdef ENABLE_PACKETIZER
     add_submodule ()
     set_description( N_("Kate text subtitles packetizer") )
-    set_capability( "packetizer", 100 )
+    set_capability( "spu packetizer", 100 )
     set_callbacks( OpenPacketizer, CloseDecoder )
     add_shortcut( "kate" )
 #endif

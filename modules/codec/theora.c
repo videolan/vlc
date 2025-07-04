@@ -121,7 +121,7 @@ vlc_module_begin ()
 
     add_submodule ()
     set_description( N_("Theora video packetizer") )
-    set_capability( "packetizer", 100 )
+    set_capability( "video packetizer", 100 )
     set_callbacks( OpenPacketizer, CloseDecoder )
     add_shortcut( "theora" )
 

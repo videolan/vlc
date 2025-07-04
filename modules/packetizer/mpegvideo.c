@@ -73,7 +73,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
     set_description( N_("MPEG-I/II video packetizer") )
     set_shortname( N_("MPEG Video") )
-    set_capability( "packetizer", 50 )
+    set_capability( "video packetizer", 50 )
     set_callbacks( Open, Close )
 
     add_bool( "packetizer-mpegvideo-sync-iframe", false, SYNC_INTRAFRAME_TEXT,

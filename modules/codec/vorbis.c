@@ -198,7 +198,7 @@ vlc_module_begin ()
 
     add_submodule ()
     set_description( N_("Vorbis audio packetizer") )
-    set_capability( "packetizer", 100 )
+    set_capability( "audio packetizer", 100 )
     set_callbacks( OpenPacketizer, CloseDecoder )
 
 #ifdef HAVE_VORBIS_ENCODER
