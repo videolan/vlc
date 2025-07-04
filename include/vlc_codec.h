@@ -402,6 +402,18 @@ VLC_API picture_t *decoder_NewPicture( decoder_t *dec );
 VLC_API void decoder_Init( decoder_t *dec, es_format_t *fmt_in, const es_format_t *fmt );
 
 /**
+ * Load a decoder or packetizer module
+ *
+ * To be used by decoder owners.
+ * @param dec a valid and initialized decoder
+ * @packetizer true if the decoder_t is a packetizer
+ * @use_varoption if true, will try to load the decoder from the corresponding
+ * option (if set by the user)
+ */
+VLC_API int decoder_LoadModule(decoder_t *dec, bool packetizer,
+                                bool use_varoption);
+
+/**
  * Destroy a decoder and reset the structure.
  *
  * To be used by decoder owners.

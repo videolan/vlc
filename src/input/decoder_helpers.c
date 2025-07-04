@@ -51,6 +51,38 @@ void decoder_Init( decoder_t *p_dec, es_format_t *restrict fmt_in, const es_form
     es_format_Init( &p_dec->fmt_out, p_fmt->i_cat, 0 );
 }
 
+int decoder_LoadModule(decoder_t *dec, bool packetizer,
+                       bool use_varoption)
+{
+    assert(dec->fmt_in->i_cat != UNKNOWN_ES);
+    assert(dec->p_module == NULL);
+
+    static const char dec_caps[ES_CATEGORY_COUNT][16] = {
+        [VIDEO_ES] = "video decoder",
+        [AUDIO_ES] = "audio decoder",
+        [SPU_ES] = "spu decoder",
+    };
+
+    const char *type, *option;
+    if (packetizer)
+    {
+        type = "packetizer";
+        option = use_varoption ? "packetizer" : NULL;
+    }
+    else
+    {
+        type = dec_caps[dec->fmt_in->i_cat];
+        option = use_varoption ? "codec" : NULL;
+    }
+
+    if (option != NULL)
+        dec->p_module = module_need_var(dec, type, option);
+    else
+        dec->p_module = module_need(dec, type, NULL, false);
+
+    return dec->p_module == NULL ? VLC_ENOENT : VLC_SUCCESS;
+}
+
 void decoder_Clean( decoder_t *p_dec )
 {
     if ( p_dec->p_module != NULL )

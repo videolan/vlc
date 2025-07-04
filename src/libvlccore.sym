@@ -93,6 +93,7 @@ date_Increment
 date_Init
 decoder_NewPicture
 decoder_Init
+decoder_LoadModule
 decoder_Clean
 decoder_Destroy
 decoder_NewAudioBuffer
