@@ -925,8 +925,10 @@ static void *Thread( void *obj )
      * destroyed. */
     class QuitSpy : public QObject
     {
+        qt_intf_t *m_intf;
     public:
-        QuitSpy(QObject *parent) : QObject(parent)
+        QuitSpy(QObject *parent, qt_intf_t *intf)
+             : QObject(parent), m_intf(intf)
         {
             qGuiApp->installEventFilter(this);
         }
@@ -935,13 +937,13 @@ static void *Thread( void *obj )
             (void)o;
             if (e->type() == QEvent::Quit)
             {
-                THEDP->quit();
+             DialogsProvider::getInstance(m_intf)->quit();
                 return true;
             }
             return false;
         }
     };
-    QuitSpy quitSpy(&app);
+    QuitSpy quitSpy(&app, p_intf);
 
     registerMetaTypes();
 
