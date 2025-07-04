@@ -58,7 +58,7 @@
                                                 <subviews>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="gAM-N6-20z" userLabel="Jump Back Button">
                                                         <rect key="frame" x="0.0" y="3" width="20.5" height="28"/>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="arrow.trianglehead.counterclockwise" catalog="system" imagePosition="only" alignment="center" alternateImage="backward.fill" controlSize="large" continuous="YES" imageScaling="proportionallyUpOrDown" id="ZMf-Wu-LAx">
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="arrow.trianglehead.counterclockwise" catalog="system" imagePosition="only" alignment="center" alternateImage="arrow.trianglehead.counterclockwise" controlSize="large" continuous="YES" imageScaling="proportionallyUpOrDown" id="ZMf-Wu-LAx">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
