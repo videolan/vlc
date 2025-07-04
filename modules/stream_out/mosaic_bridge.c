@@ -214,8 +214,7 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     p_owner->p_stream = p_stream;
     p_owner->vctx = NULL;
 
-    p_owner->dec.p_module =
-        module_need_var( &p_owner->dec, "video decoder", "codec" );
+    decoder_LoadModule( &p_owner->dec, false, true );
 
     if( p_owner->dec.p_module == NULL )
     {
