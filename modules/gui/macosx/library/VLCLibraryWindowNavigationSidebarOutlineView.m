@@ -29,6 +29,67 @@
 
 @implementation VLCLibraryWindowNavigationSidebarOutlineView
 
+- (NSRect)frameOfOutlineCellAtRow:(NSInteger)row
+{
+    if ([self shouldHideDisclosureCaretAtRow:row]) {
+        return NSZeroRect;
+    }
+    return [super frameOfOutlineCellAtRow:row];
+}
+
+- (BOOL)shouldHideDisclosureCaretAtRow:(NSInteger)row
+{
+    const id item = [self itemAtRow:row];
+    if (![self isExpandable:item]) {
+        return NO;
+    }
+    
+    NSTreeNode * const treeNode = (NSTreeNode *)item;
+    VLCLibrarySegment * const segment = (VLCLibrarySegment *)treeNode.representedObject;
+    
+    if (self.selectedRow < 0 || self.selectedRow >= self.numberOfRows) {
+        return NO; // No valid selection
+    }
+    
+    NSTreeNode * const selectedSegmentItem = (NSTreeNode *)[self itemAtRow:self.selectedRow];
+    if (selectedSegmentItem == nil) {
+        return NO;
+    }
+    
+    VLCLibrarySegment * const selectedSegment = (VLCLibrarySegment *)selectedSegmentItem.representedObject;
+    if (selectedSegment == nil) {
+        return NO;
+    }
+    
+    const NSInteger childNodeIndex = [segment.childNodes indexOfObjectPassingTest:^BOOL(NSTreeNode * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        VLCLibrarySegment * const childSegment = (VLCLibrarySegment *)obj;
+        return childSegment.segmentType == selectedSegment.segmentType;
+    }];
+    
+    // Hide triangle when collapsing would be disabled
+    return childNodeIndex != NSNotFound;
+}
+
+- (void)selectRowIndexes:(NSIndexSet *)indexes byExtendingSelection:(BOOL)extend
+{
+    [super selectRowIndexes:indexes byExtendingSelection:extend];
+    [self refreshDisclosureCaret];
+}
+
+- (void)refreshDisclosureCaret
+{
+    const NSInteger rowCount = self.numberOfRows;
+    for (NSInteger row = 0; row < rowCount; row++) {
+        const id item = [self itemAtRow:row];
+        if ([self isExpandable:item]) {
+            [self reloadItem:item reloadChildren:NO];
+        }
+    }
+    
+    [self setNeedsDisplay:YES];
+    [self displayIfNeeded];
+}
+
 - (NSMenu *)menuForEvent:(NSEvent *)event
 {
     const NSPoint location = [self convertPoint:event.locationInWindow fromView:nil];

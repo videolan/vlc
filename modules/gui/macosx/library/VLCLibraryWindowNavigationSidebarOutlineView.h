@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryWindowNavigationSidebarOutlineView : NSOutlineView
 
+- (void)refreshDisclosureCaret;
+
 @end
 
 NS_ASSUME_NONNULL_END
