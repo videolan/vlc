@@ -51,7 +51,7 @@
     NSHashTable<NSMenuItem*> *_folderInputItemRequiringMenuItems;
 }
 
-@property (readwrite, weak) NSMenuItem *favoriteItem;
+@property (readwrite) NSMenuItem *favoriteItem;
 
 @end
 
@@ -74,9 +74,6 @@
     NSMenuItem *appendItem = [[NSMenuItem alloc] initWithTitle:_NS("Append to Play Queue") action:@selector(appendToPlayQueue:) keyEquivalent:@""];
     appendItem.target = self;
 
-    NSMenuItem *favoriteItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Favorite") action:@selector(toggleFavorite:) keyEquivalent:@""];
-    favoriteItem.target = self;
-
     NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
     addItem.target = self;
 
@@ -97,11 +94,14 @@
                                                           keyEquivalent:@""];
     bookmarkItem.target = self;
 
+    _favoriteItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Favorite") action:@selector(toggleFavorite:) keyEquivalent:@""];
+    self.favoriteItem.target = self;
+
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
     [_libraryMenu addMenuItemsFromArray:@[
         playItem,
         appendItem,
-        favoriteItem,
+        self.favoriteItem,
         bookmarkItem,
         revealItem,
         deleteItem,
@@ -114,7 +114,7 @@
     _mediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_mediaItemRequiringMenuItems addObject:playItem];
     [_mediaItemRequiringMenuItems addObject:appendItem];
-    [_mediaItemRequiringMenuItems addObject:favoriteItem];
+    [_mediaItemRequiringMenuItems addObject:self.favoriteItem];
     [_mediaItemRequiringMenuItems addObject:revealItem];
     [_mediaItemRequiringMenuItems addObject:deleteItem];
     [_mediaItemRequiringMenuItems addObject:informationItem];
@@ -132,8 +132,6 @@
 
     _folderInputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_folderInputItemRequiringMenuItems addObject:bookmarkItem];
-
-    self.favoriteItem = favoriteItem;
 }
 
 - (void)menuItems:(NSHashTable<NSMenuItem*>*)menuItems
