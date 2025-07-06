@@ -22,6 +22,7 @@
 
 #import "VLCPlayQueueDataSource.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayQueueTableCellView.h"
@@ -188,6 +189,29 @@ static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
     }
 
     return YES;
+}
+
+- (NSArray<NSTableViewRowAction *> *)tableView:(NSTableView *)tableView
+                              rowActionsForRow:(NSInteger)row
+                                          edge:(NSTableRowActionEdge)edge
+{
+    if (edge == NSTableRowActionEdgeTrailing) {
+        VLCPlayQueueModel * const model = _playQueueController.playQueueModel;
+        VLCPlayQueueItem * const item = [_playQueueController.playQueueModel playQueueItemAtIndex:row];
+        if (item == nil) {
+            return @[];
+        }
+
+        NSTableViewRowAction * const removeAction =
+            [NSTableViewRowAction rowActionWithStyle:NSTableViewRowActionStyleDestructive
+                                                title:_NS("Remove from Play Queue")
+                                               handler:^(NSTableViewRowAction *action, NSInteger row) {
+                NSIndexSet * const indices = [NSIndexSet indexSetWithIndex:row];
+                [_playQueueController removeItemsAtIndexes:indices];
+            }];
+        return @[removeAction];
+    }
+    return @[];
 }
 
 - (void)scrollToCurrentPlayQueueItem
