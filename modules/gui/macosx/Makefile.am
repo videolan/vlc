@@ -289,6 +289,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.m \
 	gui/macosx/library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h \
 	gui/macosx/library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.m \
+	gui/macosx/library/favorites-library/VLCLibraryFavoritesViewController.h \
+	gui/macosx/library/favorites-library/VLCLibraryFavoritesViewController.m \
 	gui/macosx/library/media-source/VLCLibraryMediaSourceViewController.h \
 	gui/macosx/library/media-source/VLCLibraryMediaSourceViewController.m \
 	gui/macosx/library/media-source/VLCMediaSource.h \
