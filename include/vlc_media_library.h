@@ -551,6 +551,24 @@ enum vlc_ml_list_queries
     VLC_ML_LIST_FOLDER_MEDIA,     /**< arg1: folder id; arg2 (out): vlc_ml_media_list_t**                               */
     VLC_ML_COUNT_FOLDER_MEDIA,    /**< arg1: folder id; arg2 (out): size_t*                                             */
 
+    /* Favorites listings */
+    VLC_ML_LIST_FAVORITE_MEDIA,   /**< arg1 (out): vlc_ml_media_list_t**                                                */
+    VLC_ML_COUNT_FAVORITE_MEDIA,  /**< arg1 (out): size_t*                                                              */
+    VLC_ML_LIST_FAVORITE_VIDEOS,  /**< arg1 (out): vlc_ml_media_list_t**                                                */
+    VLC_ML_COUNT_FAVORITE_VIDEOS, /**< arg1 (out): size_t*                                                              */
+    VLC_ML_LIST_FAVORITE_AUDIOS,  /**< arg1 (out): vlc_ml_media_list_t**                                                */
+    VLC_ML_COUNT_FAVORITE_AUDIOS, /**< arg1 (out): size_t*                                                              */
+    VLC_ML_LIST_FAVORITE_ALBUMS,  /**< arg1 (out): vlc_ml_album_list_t**                                                */
+    VLC_ML_COUNT_FAVORITE_ALBUMS, /**< arg1 (out): size_t*                                                              */
+    VLC_ML_LIST_FAVORITE_ARTISTS, /**< arg1 (out): vlc_ml_artist_list_t**                                               */
+    VLC_ML_COUNT_FAVORITE_ARTISTS,/**< arg1 (out): size_t*                                                              */
+    VLC_ML_LIST_FAVORITE_GENRES,  /**< arg1 (out): vlc_ml_genre_list_t**                                                */
+    VLC_ML_COUNT_FAVORITE_GENRES, /**< arg1 (out): size_t*                                                              */
+    VLC_ML_LIST_FAVORITE_PLAYLISTS,/**< arg1 (out): vlc_ml_playlist_list_t**                                            */
+    VLC_ML_COUNT_FAVORITE_PLAYLISTS,/**< arg1 (out): size_t*                                                            */
+    VLC_ML_LIST_FAVORITE_FOLDERS, /**< arg1 (out): vlc_ml_folder_list_t**                                               */
+    VLC_ML_COUNT_FAVORITE_FOLDERS,/**< arg1 (out): size_t*                                                              */
+
     /* Children entities listing */
     VLC_ML_LIST_MEDIA_OF,         /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_media_list_t**   */
     VLC_ML_COUNT_MEDIA_OF,        /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t*             */
@@ -2009,6 +2027,153 @@ static inline int vlc_ml_genre_set_favorite( vlc_medialibrary_t* p_ml, int64_t i
 static inline int vlc_ml_playlist_set_favorite( vlc_medialibrary_t *p_ml, int64_t i_playlist_id, bool b_favorite )
 {
     return vlc_ml_control( p_ml, VLC_ML_PLAYLIST_SET_FAVORITE, i_playlist_id, (int)b_favorite );
+}
+
+//-------------------------------------------------------------------------------------------------
+// Favorites
+
+static inline vlc_ml_media_list_t* vlc_ml_list_favorite_media( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_media_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_FAVORITE_MEDIA, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_favorite_media( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_FAVORITE_MEDIA, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_media_list_t* vlc_ml_list_favorite_videos( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_media_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_FAVORITE_VIDEOS, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_favorite_videos( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_FAVORITE_VIDEOS, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_media_list_t* vlc_ml_list_favorite_audios( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_media_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_FAVORITE_AUDIOS, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_favorite_audios( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_FAVORITE_AUDIOS, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_album_list_t* vlc_ml_list_favorite_albums( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_album_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_FAVORITE_ALBUMS, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_favorite_albums( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_FAVORITE_ALBUMS, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_artist_list_t* vlc_ml_list_favorite_artists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_artist_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_FAVORITE_ARTISTS, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_favorite_artists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_FAVORITE_ARTISTS, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_genre_list_t* vlc_ml_list_favorite_genres( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_genre_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_FAVORITE_GENRES, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_favorite_genres( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_FAVORITE_GENRES, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_playlist_list_t* vlc_ml_list_favorite_playlists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_playlist_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_FAVORITE_PLAYLISTS, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_favorite_playlists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_FAVORITE_PLAYLISTS, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_folder_list_t* vlc_ml_list_favorite_folders( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_folder_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_FAVORITE_FOLDERS, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_favorite_folders( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_FAVORITE_FOLDERS, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
 }
 
 #ifdef __cplusplus

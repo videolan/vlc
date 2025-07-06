@@ -1247,6 +1247,246 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             *( va_arg( args, size_t* ) ) = query ? query->count() : 0;
             break;
         }
+        case VLC_ML_LIST_FAVORITE_MEDIA:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IMedia> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchMedia( psz_pattern, &favParams );
+            else
+                query = m_ml->mediaFiles( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto res = ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
+                        query->items( nbItems, offset ) );
+            *va_arg( args, vlc_ml_media_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FAVORITE_MEDIA:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IMedia> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchMedia( psz_pattern, &favParams );
+            else
+                query = m_ml->mediaFiles( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            *va_arg( args, size_t* ) = query->count();
+            break;
+        }
+        case VLC_ML_LIST_FAVORITE_VIDEOS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IMedia> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchVideo( psz_pattern, &favParams );
+            else
+                query = m_ml->videoFiles( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto res = ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
+                        query->items( nbItems, offset ) );
+            *va_arg( args, vlc_ml_media_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FAVORITE_VIDEOS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IMedia> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchVideo( psz_pattern, &favParams );
+            else
+                query = m_ml->videoFiles( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            *va_arg( args, size_t* ) = query->count();
+            break;
+        }
+        case VLC_ML_LIST_FAVORITE_AUDIOS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IMedia> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchAudio( psz_pattern, &favParams );
+            else
+                query = m_ml->audioFiles( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto res = ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
+                        query->items( nbItems, offset ) );
+            *va_arg( args, vlc_ml_media_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FAVORITE_AUDIOS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IMedia> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchAudio( psz_pattern, &favParams );
+            else
+                query = m_ml->audioFiles( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            *va_arg( args, size_t* ) = query->count();
+            break;
+        }
+        case VLC_ML_LIST_FAVORITE_ALBUMS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IAlbum> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchAlbums( psz_pattern, &favParams );
+            else
+                query = m_ml->albums( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto res = ml_convert_list<vlc_ml_album_list_t, vlc_ml_album_t>(
+                        query->items( nbItems, offset ) );
+            *va_arg( args, vlc_ml_album_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FAVORITE_ALBUMS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IAlbum> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchAlbums( psz_pattern, &favParams );
+            else
+                query = m_ml->albums( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            *va_arg( args, size_t* ) = query->count();
+            break;
+        }
+        case VLC_ML_LIST_FAVORITE_ARTISTS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IArtist> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchArtists( psz_pattern, medialibrary::ArtistIncluded::All, &favParams );
+            else
+                query = m_ml->artists( medialibrary::ArtistIncluded::All, &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto res = ml_convert_list<vlc_ml_artist_list_t, vlc_ml_artist_t>(
+                        query->items( nbItems, offset ) );
+            *va_arg( args, vlc_ml_artist_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FAVORITE_ARTISTS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IArtist> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchArtists( psz_pattern, medialibrary::ArtistIncluded::All, &favParams );
+            else
+                query = m_ml->artists( medialibrary::ArtistIncluded::All, &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            *va_arg( args, size_t* ) = query->count();
+            break;
+        }
+        case VLC_ML_LIST_FAVORITE_GENRES:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IGenre> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchGenre( psz_pattern, &favParams );
+            else
+                query = m_ml->genres( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto res = ml_convert_list<vlc_ml_genre_list_t,vlc_ml_genre_t>(
+                        query->items( nbItems, offset ) );
+            *va_arg( args, vlc_ml_genre_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FAVORITE_GENRES:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IGenre> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchGenre( psz_pattern, &favParams );
+            else
+                query = m_ml->genres( &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            *va_arg( args, size_t* ) = query->count();
+            break;
+        }
+        case VLC_ML_LIST_FAVORITE_PLAYLISTS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IPlaylist> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchPlaylists( psz_pattern, medialibrary::PlaylistType::All, &favParams );
+            else
+                query = m_ml->playlists( medialibrary::PlaylistType::All, &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto res = ml_convert_list<vlc_ml_playlist_list_t, vlc_ml_playlist_t>(
+                        query->items( nbItems, offset ) );
+            *va_arg( args, vlc_ml_playlist_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FAVORITE_PLAYLISTS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IPlaylist> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchPlaylists( psz_pattern, medialibrary::PlaylistType::All, &favParams );
+            else
+                query = m_ml->playlists( medialibrary::PlaylistType::All, &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            *va_arg( args, size_t* ) = query->count();
+            break;
+        }
+        case VLC_ML_LIST_FAVORITE_FOLDERS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IFolder> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchFolders( psz_pattern, medialibrary::IMedia::Type::Unknown, &favParams );
+            else
+                query = m_ml->folders( medialibrary::IMedia::Type::Unknown, &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto res = ml_convert_list<vlc_ml_folder_list_t, vlc_ml_folder_t>(
+                        query->items( nbItems, offset ) );
+            *va_arg( args, vlc_ml_folder_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FAVORITE_FOLDERS:
+        {
+            medialibrary::QueryParameters favParams = paramsPtr ? *paramsPtr : medialibrary::QueryParameters{};
+            favParams.favoriteOnly = true;
+            medialibrary::Query<medialibrary::IFolder> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchFolders( psz_pattern, medialibrary::IMedia::Type::Unknown, &favParams );
+            else
+                query = m_ml->folders( medialibrary::IMedia::Type::Unknown, &favParams );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            *va_arg( args, size_t* ) = query->count();
+            break;
+        }
         case VLC_ML_LIST_SUBFOLDERS:
         {
             const auto parent = m_ml->folder( va_arg( args, int64_t ) );
