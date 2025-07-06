@@ -36,6 +36,11 @@ extern NSString * const VLCLibraryModelMediaItemThumbnailGenerated;
 
 extern NSString * const VLCLibraryModelAudioMediaListReset;
 extern NSString * const VLCLibraryModelVideoMediaListReset;
+extern NSString * const VLCLibraryModelFavoriteAudioMediaListReset;
+extern NSString * const VLCLibraryModelFavoriteVideoMediaListReset;
+extern NSString * const VLCLibraryModelFavoriteAlbumsListReset;
+extern NSString * const VLCLibraryModelFavoriteArtistsListReset;
+extern NSString * const VLCLibraryModelFavoriteGenresListReset;
 extern NSString * const VLCLibraryModelRecentsMediaListReset;
 extern NSString * const VLCLibraryModelRecentAudioMediaListReset;
 extern NSString * const VLCLibraryModelListOfShowsReset;
@@ -119,6 +124,22 @@ extern NSString * const VLCLibraryModelDiscoveryFailed;
 
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria
          andDescending:(bool)descending;
+
+// Favorites support
+@property (readonly) size_t numberOfFavoriteAudioMedia;
+@property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfFavoriteAudioMedia;
+
+@property (readonly) size_t numberOfFavoriteVideoMedia;
+@property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfFavoriteVideoMedia;
+
+@property (readonly) size_t numberOfFavoriteAlbums;
+@property (readonly) NSArray <VLCMediaLibraryAlbum *> *listOfFavoriteAlbums;
+
+@property (readonly) size_t numberOfFavoriteArtists;
+@property (readonly) NSArray <VLCMediaLibraryArtist *> *listOfFavoriteArtists;
+
+@property (readonly) size_t numberOfFavoriteGenres;
+@property (readonly) NSArray <VLCMediaLibraryGenre *> *listOfFavoriteGenres;
 
 @end
 

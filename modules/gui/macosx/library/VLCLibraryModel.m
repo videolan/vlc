@@ -37,6 +37,11 @@ NSString * const VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelM
 
 NSString * const VLCLibraryModelAudioMediaListReset = @"VLCLibraryModelAudioMediaListReset";
 NSString * const VLCLibraryModelVideoMediaListReset = @"VLCLibraryModelVideoMediaListReset";
+NSString * const VLCLibraryModelFavoriteAudioMediaListReset = @"VLCLibraryModelFavoriteAudioMediaListReset";
+NSString * const VLCLibraryModelFavoriteVideoMediaListReset = @"VLCLibraryModelFavoriteVideoMediaListReset";
+NSString * const VLCLibraryModelFavoriteAlbumsListReset = @"VLCLibraryModelFavoriteAlbumsListReset";
+NSString * const VLCLibraryModelFavoriteArtistsListReset = @"VLCLibraryModelFavoriteArtistsListReset";
+NSString * const VLCLibraryModelFavoriteGenresListReset = @"VLCLibraryModelFavoriteGenresListReset";
 NSString * const VLCLibraryModelRecentsMediaListReset = @"VLCLibraryModelRecentsMediaListReset";
 NSString * const VLCLibraryModelRecentAudioMediaListReset = @"VLCLibraryModelRecentAudioMediaListReset";
 NSString * const VLCLibraryModelListOfShowsReset = @"VLCLibraryModelListOfShowsReset";
@@ -1332,6 +1337,119 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistDeleted 
                                                         object:@(itemId)];
     });
+}
+
+#pragma mark - Favorites Support
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfFavoriteAudioMedia
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    vlc_ml_media_list_t * const p_media_list = vlc_ml_list_favorite_audios(_p_mediaLibrary, &queryParams);
+    NSArray * const mediaArray = [NSArray arrayFromVlcMediaList:p_media_list];
+    if (mediaArray == nil) {
+        return @[];
+    }
+    vlc_ml_media_list_release(p_media_list);
+    return mediaArray;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfFavoriteVideoMedia
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    vlc_ml_media_list_t * const p_media_list = vlc_ml_list_favorite_videos(_p_mediaLibrary, &queryParams);
+    NSArray * const mediaArray = [NSArray arrayFromVlcMediaList:p_media_list];
+    if (mediaArray == nil) {
+        return @[];
+    }
+    vlc_ml_media_list_release(p_media_list);
+    return mediaArray;
+}
+
+- (NSArray<VLCMediaLibraryAlbum *> *)listOfFavoriteAlbums
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    vlc_ml_album_list_t * const p_album_list = vlc_ml_list_favorite_albums(_p_mediaLibrary, &queryParams);
+    if (p_album_list == NULL) {
+        return @[];
+    }
+    
+    NSMutableArray * const mutableArray = [[NSMutableArray alloc] initWithCapacity:p_album_list->i_nb_items];
+    for (size_t x = 0; x < p_album_list->i_nb_items; x++) {
+        VLCMediaLibraryAlbum * const album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_album_list->p_items[x]];
+        if (album != nil) {
+            [mutableArray addObject:album];
+        }
+    }
+    vlc_ml_album_list_release(p_album_list);
+    return mutableArray.copy;
+}
+
+- (NSArray<VLCMediaLibraryArtist *> *)listOfFavoriteArtists
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    vlc_ml_artist_list_t * const p_artist_list = vlc_ml_list_favorite_artists(_p_mediaLibrary, &queryParams);
+    if (p_artist_list == NULL) {
+        return @[];
+    }
+    
+    NSMutableArray * const mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artist_list->i_nb_items];
+    for (size_t x = 0; x < p_artist_list->i_nb_items; x++) {
+        VLCMediaLibraryArtist * const artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artist_list->p_items[x]];
+        if (artist != nil) {
+            [mutableArray addObject:artist];
+        }
+    }
+    vlc_ml_artist_list_release(p_artist_list);
+    return mutableArray.copy;
+}
+
+- (NSArray<VLCMediaLibraryGenre *> *)listOfFavoriteGenres
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    vlc_ml_genre_list_t * const p_genre_list = vlc_ml_list_favorite_genres(_p_mediaLibrary, &queryParams);
+    if (p_genre_list == NULL) {
+        return @[];
+    }
+    
+    NSMutableArray * const mutableArray = [[NSMutableArray alloc] initWithCapacity:p_genre_list->i_nb_items];
+    for (size_t x = 0; x < p_genre_list->i_nb_items; x++) {
+        VLCMediaLibraryGenre * const genre = [[VLCMediaLibraryGenre alloc] initWithGenre:&p_genre_list->p_items[x]];
+        if (genre != nil) {
+            [mutableArray addObject:genre];
+        }
+    }
+    vlc_ml_genre_list_release(p_genre_list);
+    return mutableArray.copy;
+}
+
+- (size_t)numberOfFavoriteAudioMedia
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    return vlc_ml_count_favorite_audios(_p_mediaLibrary, &queryParams);
+}
+
+- (size_t)numberOfFavoriteVideoMedia
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    return vlc_ml_count_favorite_videos(_p_mediaLibrary, &queryParams);
+}
+
+- (size_t)numberOfFavoriteAlbums
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    return vlc_ml_count_favorite_albums(_p_mediaLibrary, &queryParams);
+}
+
+- (size_t)numberOfFavoriteArtists
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    return vlc_ml_count_favorite_artists(_p_mediaLibrary, &queryParams);
+}
+
+- (size_t)numberOfFavoriteGenres
+{
+    const vlc_ml_query_params_t queryParams = [self queryParams];
+    return vlc_ml_count_favorite_genres(_p_mediaLibrary, &queryParams);
 }
 
 @end
