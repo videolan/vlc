@@ -831,6 +831,12 @@ enum vlc_ml_event_type
      * Sent when an application requested rescan starts being processed.
      */
     VLC_ML_EVENT_RESCAN_STARTED,
+    /**
+     * Sent when favorites list changes. This includes when entities are
+     * marked/unmarked as favorites.
+     * The entity type and id are stored in vlc_ml_event_t::favorites_changed
+     */
+    VLC_ML_EVENT_FAVORITES_CHANGED,
 };
 
 typedef struct vlc_ml_event_t
@@ -903,6 +909,12 @@ typedef struct vlc_ml_event_t
         {
             vlc_ml_history_type_t history_type;
         } history_changed;
+        struct
+        {
+            int64_t i_entity_id;
+            int i_entity_type; /**< One of VLC_ML_PARENT_* values */
+            bool b_favorite; /**< true if marked as favorite, false if unmarked */
+        } favorites_changed;
     };
 } vlc_ml_event_t;
 

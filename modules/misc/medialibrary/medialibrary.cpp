@@ -793,6 +793,14 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             if ( folder->setFavorite( favorite ) == false )
                 return VLC_EGENERIC;
+            
+            vlc_ml_event_t ev;
+            ev.i_type = VLC_ML_EVENT_FAVORITES_CHANGED;
+            ev.favorites_changed.i_entity_id = folder->id();
+            ev.favorites_changed.i_entity_type = VLC_ML_PARENT_FOLDER;
+            ev.favorites_changed.b_favorite = favorite;
+            m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+            
             return VLC_SUCCESS;
         }
         case VLC_ML_ARTIST_SET_FAVORITE:
@@ -804,6 +812,14 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             if ( artist->setFavorite( favorite ) == false )
                 return VLC_EGENERIC;
+            
+            vlc_ml_event_t ev;
+            ev.i_type = VLC_ML_EVENT_FAVORITES_CHANGED;
+            ev.favorites_changed.i_entity_id = artistId;
+            ev.favorites_changed.i_entity_type = VLC_ML_PARENT_ARTIST;
+            ev.favorites_changed.b_favorite = favorite;
+            m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+            
             return VLC_SUCCESS;
         }
         case VLC_ML_ALBUM_SET_FAVORITE:
@@ -815,6 +831,14 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             if ( album->setFavorite( favorite ) == false )
                 return VLC_EGENERIC;
+            
+            vlc_ml_event_t ev;
+            ev.i_type = VLC_ML_EVENT_FAVORITES_CHANGED;
+            ev.favorites_changed.i_entity_id = albumId;
+            ev.favorites_changed.i_entity_type = VLC_ML_PARENT_ALBUM;
+            ev.favorites_changed.b_favorite = favorite;
+            m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+            
             return VLC_SUCCESS;
         }
         case VLC_ML_GENRE_SET_FAVORITE:
@@ -826,6 +850,14 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             if ( genre->setFavorite( favorite ) == false)
                 return VLC_EGENERIC;
+            
+            vlc_ml_event_t ev;
+            ev.i_type = VLC_ML_EVENT_FAVORITES_CHANGED;
+            ev.favorites_changed.i_entity_id = genreId;
+            ev.favorites_changed.i_entity_type = VLC_ML_PARENT_GENRE;
+            ev.favorites_changed.b_favorite = favorite;
+            m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+            
             return VLC_SUCCESS;
         }
         case VLC_ML_PLAYLIST_SET_FAVORITE:
@@ -837,6 +869,14 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             if ( playlist->setFavorite( favorite ) == false )
                 return VLC_EGENERIC;
+            
+            vlc_ml_event_t ev;
+            ev.i_type = VLC_ML_EVENT_FAVORITES_CHANGED;
+            ev.favorites_changed.i_entity_id = playlistId;
+            ev.favorites_changed.i_entity_type = VLC_ML_PARENT_PLAYLIST;
+            ev.favorites_changed.b_favorite = favorite;
+            m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+            
             return VLC_SUCCESS;
         }
         default:
@@ -1880,6 +1920,14 @@ int MediaLibrary::controlMedia( int query, va_list args )
             bool favorite = va_arg( args, int );
             if ( m->setFavorite( favorite ) == false )
                 return VLC_EGENERIC;
+            
+            vlc_ml_event_t ev;
+            ev.i_type = VLC_ML_EVENT_FAVORITES_CHANGED;
+            ev.favorites_changed.i_entity_id = mediaId;
+            ev.favorites_changed.i_entity_type = VLC_ML_PARENT_UNKNOWN; // Media doesn't have a parent type in VLC_ML_PARENT_*
+            ev.favorites_changed.b_favorite = favorite;
+            m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+            
             return VLC_SUCCESS;
         }
         case VLC_ML_MEDIA_ADD_BOOKMARK:
