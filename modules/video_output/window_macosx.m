@@ -755,18 +755,6 @@ int Open(vlc_window_t *wnd)
     }
 }
 
-static void EmbedClose(vlc_window_t *wnd)
-{
-    id drawable = (__bridge_transfer id)wnd->handle.nsobject;
-    wnd->handle.nsobject = nil;
-    (void)drawable;
-}
-
-static const struct vlc_window_operations drawable_ops =
-{
-    .destroy = EmbedClose,
-};
-
 static int EmbedOpen(vlc_window_t *wnd)
 {
     NSView *drawable = (__bridge NSView*)
