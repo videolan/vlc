@@ -56,7 +56,7 @@ vlc_module_begin ()
               DVDSUBTRANS_DISABLE_TEXT, DVDSUBTRANS_DISABLE_LONGTEXT )
     add_submodule ()
     set_description( N_("DVD subtitles packetizer") )
-    set_capability( "packetizer", 50 )
+    set_capability( "spu packetizer", 50 )
     set_callbacks( PacketizerOpen, Close )
 vlc_module_end ()
 

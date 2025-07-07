@@ -88,7 +88,7 @@ vlc_module_begin ()
 
     add_submodule ()
     set_description(N_("OggSpots video packetizer"))
-    set_capability("packetizer", 10)
+    set_capability("video packetizer", 10)
     set_callbacks(OpenPacketizer, CloseDecoder)
     add_shortcut("oggspots")
 vlc_module_end ()

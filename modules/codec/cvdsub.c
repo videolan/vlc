@@ -54,7 +54,7 @@ vlc_module_begin ()
 
     add_submodule ()
     set_description( N_("Chaoji VCD subtitle packetizer") )
-    set_capability( "packetizer", 50 )
+    set_capability( "spu packetizer", 50 )
     set_callbacks( PacketizerOpen, DecoderClose )
 vlc_module_end ()
 
