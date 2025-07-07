@@ -651,19 +651,6 @@ static void WindowResize(vlc_window_t *wnd, unsigned width, unsigned height)
     }
 }
 
-/* Request to enable/disable Window decorations */
-static void SetDecoration(vlc_window_t *wnd, bool decorated)
-{
-    VLCVoutWindow *sys = (__bridge VLCVoutWindow*)wnd->sys;
-
-    @autoreleasepool {
-        __weak VLCVideoStandaloneWindowController *weakWc = sys.windowController;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [weakWc setWindowDecorated:decorated];
-        });
-    }
-}
-
 /* Request to enter fullscreen */
 static void WindowSetFullscreen(vlc_window_t *wnd, const char *idstr)
 {
