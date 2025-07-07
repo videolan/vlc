@@ -207,7 +207,6 @@ else
 fi
 if [ -n "$PREBUILT_FAILED" ]; then
     make -j$JOBS fetch
-    make -j$JOBS .gettext
     make -j$JOBS -k || make -j1
 
     if [ "$PACKAGE" = "yes" ]; then
