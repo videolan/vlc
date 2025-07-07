@@ -427,6 +427,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCImageButton.m \
 	gui/macosx/views/VLCImageView.h \
 	gui/macosx/views/VLCImageView.m \
+	gui/macosx/views/VLCLibraryRatingIndicator.h \
+	gui/macosx/views/VLCLibraryRatingIndicator.m \
 	gui/macosx/views/VLCLinearProgressIndicator.h \
 	gui/macosx/views/VLCLinearProgressIndicator.m \
 	gui/macosx/views/VLCLoadingOverlayView.h \

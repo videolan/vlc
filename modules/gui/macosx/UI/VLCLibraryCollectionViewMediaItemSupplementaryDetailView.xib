@@ -278,7 +278,7 @@
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B2d-Zo-xAO">
                                             <rect key="frame" x="84" y="3" width="173" height="184"/>
                                             <subviews>
-                                                <levelIndicator verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="lYc-WP-hlc">
+                                                <levelIndicator verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="lYc-WP-hlc" customClass="VLCLibraryRatingIndicator">
                                                     <rect key="frame" x="0.0" y="168" width="60" height="16"/>
                                                     <levelIndicatorCell key="cell" editable="YES" alignment="left" doubleValue="5" maxValue="5" levelIndicatorStyle="rating" id="bi9-yf-v6w"/>
                                                     <color key="fillColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
