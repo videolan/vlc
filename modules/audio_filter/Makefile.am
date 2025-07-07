@@ -45,7 +45,7 @@ audio_filter_LTLIBRARIES = \
 	libchorus_flanger_plugin.la \
 	libcompressor_plugin.la \
 	libequalizer_plugin.la \
-	libgate_plugin.la \ 
+	libgate_plugin.la \
 	libkaraoke_plugin.la \
 	libnormvol_plugin.la \
 	libgain_plugin.la \
