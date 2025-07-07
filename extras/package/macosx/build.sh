@@ -206,7 +206,7 @@ else
     PREBUILT_FAILED=yes
 fi
 if [ -n "$PREBUILT_FAILED" ]; then
-    make fetch
+    make -j$JOBS fetch
     make -j$JOBS .gettext
     make -j$JOBS -k || make -j1
 
