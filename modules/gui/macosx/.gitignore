@@ -1,2 +1,4 @@
 *.nib
 Resources/Assets.car
+Resources/Shaders.metallib
+shaders/VLCSnowShader.air
