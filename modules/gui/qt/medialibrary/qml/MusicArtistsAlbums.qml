@@ -189,6 +189,9 @@ FocusScope {
             fadingEdge.enableBeginningFade: root.enableBeginningFade
             fadingEdge.enableEndFade: root.enableEndFade
 
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
             onCurrentIndexChanged: {
                 if (!artistList._sidebarInitialyPositioned)
                     return
@@ -363,6 +366,12 @@ FocusScope {
 
             Layout.fillHeight: true
             Layout.fillWidth: true
+
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
 
             rightPadding: root.rightPadding
 
