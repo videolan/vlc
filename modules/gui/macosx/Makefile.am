@@ -56,7 +56,7 @@ metallib_verbose__0 = $(metallib_verbose_0)
 
 libmacosx_plugin_la_METAL_SOURCES = gui/macosx/shaders/VLCSnowShader.metal
 libmacosx_plugin_la_METAL_AIR_FILES = $(libmacosx_plugin_la_METAL_SOURCES:.metal=.air)
-libmacosx_plugin_la_METAL_LIBRARY = gui/macosx/resources/Shaders.metallib
+libmacosx_plugin_la_METAL_LIBRARY = gui/macosx/Resources/Shaders.metallib
 
 $(libmacosx_plugin_la_METAL_LIBRARY): $(libmacosx_plugin_la_METAL_AIR_FILES)
 	$(AM_V_at)$(MKDIR_P) "gui/macosx/shaders"
