@@ -324,6 +324,9 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
+    if( p_dec->fmt_in.i_cat != AUDIO_ES )
+        return VLC_EGENERIC;
+
     switch( p_dec->fmt_in.i_codec )
     {
     case VLC_CODEC_EAC3:

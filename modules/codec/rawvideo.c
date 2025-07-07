@@ -78,6 +78,9 @@ vlc_module_end ()
  */
 static int OpenCommon( decoder_t *p_dec )
 {
+    if( p_dec->fmt_in.i_cat != VIDEO_ES )
+        return VLC_EGENERIC;
+
     const vlc_chroma_description_t *dsc =
         vlc_fourcc_GetChromaDescription( p_dec->fmt_in.i_codec );
     if( dsc == NULL || dsc->plane_count == 0 )

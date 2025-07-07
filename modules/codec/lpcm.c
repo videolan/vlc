@@ -220,6 +220,9 @@ static int OpenCommon( decoder_t *p_dec, bool b_packetizer )
     int i_type;
     int i_header_size;
 
+    if( p_dec->fmt_in.i_cat != AUDIO_ES )
+        return VLC_EGENERIC;
+
     switch( p_dec->fmt_in.i_codec )
     {
     /* DVD LPCM */
