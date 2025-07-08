@@ -1042,10 +1042,6 @@ static void Prepare (vout_display_t *vd, picture_t *pic,
     RenderSubpicture(vd, subpicture);
 }
 
-static void Display(vout_display_t *vd, picture_t *pic)
-{
-}
-
 static int Control (vout_display_t *vd, int query)
 {
     VLCSampleBufferDisplay *sys;
@@ -1154,7 +1150,6 @@ static int Open (vout_display_t *vd,
         static const struct vlc_display_operations ops = {
             .close = Close,
             .prepare = Prepare,
-            .display = Display,
             .control = Control,
             .update_format = UpdateFormat,
         };
