@@ -22,6 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryCollectionViewDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -36,9 +37,11 @@ typedef NS_ENUM(NSUInteger, VLCLibraryFavoritesSection) {
     VLCLibraryFavoritesSectionCount
 };
 
-@interface VLCLibraryFavoritesDataSource : NSObject
+@interface VLCLibraryFavoritesDataSource : NSObject <VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, weak) VLCLibraryModel *libraryModel;
+@property (readwrite, weak) NSCollectionView *collectionView;
+
 - (void)reloadData;
 
 @end

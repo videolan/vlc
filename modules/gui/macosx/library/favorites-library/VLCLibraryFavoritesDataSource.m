@@ -241,4 +241,128 @@
         [self.collectionView reloadData];
     }
 }
+
+#pragma mark - NSCollectionViewDataSource
+
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
+{
+    return _visibleSectionMapping.count;
+}
+
+- (NSInteger)collectionView:(NSCollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
+{
+    const VLCLibraryFavoritesSection favoritesSection = [self sectionForVisibleIndex:section];
+    return [self arrayForSection:favoritesSection].count;
+}
+
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
+     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    
+    const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
+    const VLCMediaLibraryParentGroupType parentType = [self parentTypeForSection:section];
+    const id<VLCMediaLibraryItemProtocol> item =
+        [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+    
+    VLCLibraryRepresentedItem * const representedItem =
+        [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:parentType];
+    viewItem.representedItem = representedItem;
+    return viewItem;
+}
+
+- (NSView *)collectionView:(NSCollectionView *)collectionView
+viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath
+{
+    if([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
+        VLCLibraryCollectionViewSupplementaryElementView * const sectionHeadingView =
+            [collectionView makeSupplementaryViewOfKind:kind
+                                         withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
+                                           forIndexPath:indexPath];
+        
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
+        sectionHeadingView.stringValue = [self titleForSection:section];
+        return sectionHeadingView;
+
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+        VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = 
+            [collectionView makeSupplementaryViewOfKind:kind 
+                                         withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind 
+                                           forIndexPath:indexPath];
+        
+        const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
+
+        mediaItemSupplementaryDetailView.representedItem = representedItem;
+        mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
+        return mediaItemSupplementaryDetailView;
+    }
+
+    return nil;
+}
+
+#pragma mark - VLCLibraryCollectionViewDataSource
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
+                                        forCollectionView:(NSCollectionView *)collectionView
+{
+    const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
+    NSArray * const sectionArray = [self arrayForSection:section];
+    
+    if (indexPath.item >= 0 && indexPath.item < sectionArray.count) {
+        return sectionArray[indexPath.item];
+    }
+    
+    return nil;
+}
+
+- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return nil;
+    }
+    
+    // Search through all visible sections
+    for (NSUInteger visibleIndex = 0; visibleIndex < _visibleSectionMapping.count; visibleIndex++) {
+        const VLCLibraryFavoritesSection section = (VLCLibraryFavoritesSection)[_visibleSectionMapping[visibleIndex] integerValue];
+        NSArray * const sectionArray = [self arrayForSection:section];
+        const NSInteger itemIndex = [self indexOfMediaItem:libraryItem.libraryID inArray:sectionArray];
+        if (itemIndex != NSNotFound) {
+            return [NSIndexPath indexPathForItem:itemIndex inSection:visibleIndex];
+        }
+    }
+    
+    return nil;
+}
+
+- (NSArray<VLCLibraryRepresentedItem *> *)representedItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+                                                     forCollectionView:(NSCollectionView *)collectionView
+{
+    NSMutableArray<VLCLibraryRepresentedItem *> * const representedItems =
+        [NSMutableArray arrayWithCapacity:indexPaths.count];
+
+    for (NSIndexPath * const indexPath in indexPaths) {
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
+        const VLCMediaLibraryParentGroupType parentType = [self parentTypeForSection:section];
+        const id<VLCMediaLibraryItemProtocol> libraryItem =
+            [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+        
+        if (libraryItem) {
+            VLCLibraryRepresentedItem * const representedItem =
+                [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:parentType];
+            [representedItems addObject:representedItem];
+        }
+    }
+
+    return representedItems;
+}
+
+- (NSString *)supplementaryDetailViewKind
+{
+    return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
+}
+
 @end
