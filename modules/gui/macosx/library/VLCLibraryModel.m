@@ -223,6 +223,17 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel resetCachedListOfRecentMedia];
             [libraryModel resetCachedListOfRecentAudioMedia];
             break;
+        case VLC_ML_EVENT_FAVORITES_CHANGED:
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteAudioMediaListReset object:libraryModel];
+                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteVideoMediaListReset object:libraryModel];
+                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteAlbumsListReset object:libraryModel];
+                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteArtistsListReset object:libraryModel];
+                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteGenresListReset object:libraryModel];
+            });
+            break;
+        }
         case VLC_ML_EVENT_DISCOVERY_STARTED:
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
