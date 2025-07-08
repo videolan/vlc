@@ -24,9 +24,19 @@
 
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 
+@class VLCLibraryCollectionView;
+@class VLCLibraryWindow;
+
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryFavoritesDataSource;
+
 @interface VLCLibraryFavoritesViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
+
+@property (readwrite, strong) VLCLibraryFavoritesDataSource *libraryFavoritesDataSource;
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+- (void)presentFavoritesView;
 
 @end
 
