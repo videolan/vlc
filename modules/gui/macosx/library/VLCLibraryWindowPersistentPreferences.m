@@ -25,6 +25,7 @@
 NSString * const VLCLibraryWindowPreferencePrefix = @"VLCLibraryWindow";
 
 NSString * const VLCLibraryHomeLibraryViewModePreferenceKey = @"HomeLibraryViewMode";
+NSString * const VLCLibraryFavoritesLibraryViewModePreferenceKey = @"FavoritesLibraryViewMode";
 NSString * const VLCLibraryVideoLibraryViewModePreferenceKey = @"VideoLibraryViewMode";
 NSString * const VLCLibraryShowsLibraryViewModePreferenceKey = @"ShowsLibraryViewMode";
 NSString * const VLCLibraryAlbumLibraryViewModePreferenceKey = @"AlbumLibraryViewMode";
@@ -95,6 +96,17 @@ static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryHomeLibraryViewModePreferenceKey
                                               value:homeLibraryViewMode];
+}
+
+- (VLCLibraryViewModeSegment)favoritesLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryFavoritesLibraryViewModePreferenceKey];
+}
+
+- (void)setFavoritesLibraryViewMode:(VLCLibraryViewModeSegment)favoritesLibraryViewMode
+{
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryFavoritesLibraryViewModePreferenceKey
+                                              value:favoritesLibraryViewMode];
 }
 
 - (VLCLibraryViewModeSegment)videoLibraryViewMode
