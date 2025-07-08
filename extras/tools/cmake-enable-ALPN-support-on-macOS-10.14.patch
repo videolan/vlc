@@ -20,32 +20,32 @@ diff --git a/Utilities/cmcurl/lib/vtls/sectransp.c b/Utilities/cmcurl/lib/vtls/s
 index 1f37305ce8..c380c134a4 100644
 --- a/Utilities/cmcurl/lib/vtls/sectransp.c
 +++ b/Utilities/cmcurl/lib/vtls/sectransp.c
-@@ -89,6 +89,7 @@
+@@ -88,6 +88,7 @@
  #define CURL_BUILD_MAC_10_9 MAC_OS_X_VERSION_MAX_ALLOWED >= 1090
  #define CURL_BUILD_MAC_10_11 MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
  #define CURL_BUILD_MAC_10_13 MAC_OS_X_VERSION_MAX_ALLOWED >= 101300
-+#define CURL_BUILD_MAC_10_14 MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
++#define CURL_BUILD_MAC_10_13_4 MAC_OS_X_VERSION_MAX_ALLOWED >= 101304
  #define CURL_BUILD_MAC_10_15 MAC_OS_X_VERSION_MAX_ALLOWED >= 101500
  /* These macros mean "the following code is present to allow runtime backward
     compatibility with at least this cat or earlier":
-@@ -1805,7 +1806,7 @@ static CURLcode sectransp_connect_step1(struct Curl_cfilter *cf,
-   }
- #endif /* CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS */
- 
--#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
-+#if (CURL_BUILD_MAC_10_14 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
+@@ -1091,7 +1092,7 @@ static CURLcode sectransp_connect_step1(struct Curl_cf
+   if(result != CURLE_OK)
+     return result;
+
+-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && \
++#if (CURL_BUILD_MAC_10_13_4 || CURL_BUILD_IOS_11) && \
+     defined(HAVE_BUILTIN_AVAILABLE)
    if(connssl->alpn) {
      if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
-       struct alpn_proto_buf proto;
-@@ -2800,7 +2801,7 @@ check_handshake:
+@@ -2083,7 +2084,7 @@ check_handshake:
          break;
      }
- 
--#if(CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
-+#if(CURL_BUILD_MAC_10_14 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
+
+-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && \
++#if (CURL_BUILD_MAC_10_13_4 || CURL_BUILD_IOS_11) && \
+     defined(HAVE_BUILTIN_AVAILABLE)
      if(connssl->alpn) {
        if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
-         CFArrayRef alpnArr = NULL;
--- 
+--
 2.45.0.windows.1
 
