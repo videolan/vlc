@@ -40,6 +40,8 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 
+NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification";
+
 @interface VLCLibraryFavoritesDataSource ()
 {
     NSArray *_favoriteVideoMediaArray;
@@ -248,6 +250,10 @@
     if (self.collectionView.dataSource == self) {
         [self.collectionView reloadData];
     }
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification
+                                                      object:self
+                                                    userInfo:nil];
 }
 
 #pragma mark - NSTableViewDataSource (Master-Detail View)
