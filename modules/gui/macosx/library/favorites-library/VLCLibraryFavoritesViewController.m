@@ -32,21 +32,34 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"
+#import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
+#import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 #import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
 #import "main/VLCMain.h"
 
 @interface VLCLibraryFavoritesViewController ()
 {
+    VLCLibraryMasterDetailViewTableViewDelegate *_favoritesLibraryTableViewDelegate;
+    VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
     VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
     VLCLibraryCollectionViewFlowLayout *_collectionViewLayout;
     NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
+    
+    id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 }
 
 @property (readwrite, weak) NSView *favoritesLibraryView;
+@property (readwrite, weak) NSSplitView *favoritesLibrarySplitView;
 @property (readwrite, weak) NSScrollView *favoritesLibraryCollectionViewScrollView;
 @property (readwrite, weak) VLCLibraryCollectionView *favoritesLibraryCollectionView;
+@property (readwrite, weak) NSScrollView *favoritesLibraryGroupSelectionTableViewScrollView;
+@property (readwrite, weak) NSTableView *favoritesLibraryGroupSelectionTableView;
+@property (readwrite, weak) NSScrollView *favoritesLibraryGroupsTableViewScrollView;
+@property (readwrite, weak) NSTableView *favoritesLibraryGroupsTableView;
 
 @end
 
@@ -57,10 +70,15 @@
     self = [super initWithLibraryWindow:libraryWindow];
     
     if (self) {
+        _favoritesLibraryTableViewDelegate = [[VLCLibraryMasterDetailViewTableViewDelegate alloc] init];
+        _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
+        
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupTableViews];
         [self setupCollectionView];
         [self setupFavoritesDataSource];
         [self setupFavoritesPlaceholderView];
+        [self setupFavoritesLibraryViews];
         [self setupNotifications];
     }
     
@@ -76,8 +94,27 @@
 {
     NSParameterAssert(libraryWindow);
     _favoritesLibraryView = libraryWindow.videoLibraryView;
+    _favoritesLibrarySplitView = libraryWindow.videoLibrarySplitView;
     _favoritesLibraryCollectionViewScrollView = libraryWindow.videoLibraryCollectionViewScrollView;
     _favoritesLibraryCollectionView = libraryWindow.videoLibraryCollectionView;
+    _favoritesLibraryGroupSelectionTableViewScrollView = libraryWindow.videoLibraryGroupSelectionTableViewScrollView;
+    _favoritesLibraryGroupSelectionTableView = libraryWindow.videoLibraryGroupSelectionTableView;
+    _favoritesLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
+    _favoritesLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
+}
+
+- (void)setupTableViews
+{
+    self.favoritesLibrarySplitView.delegate = _splitViewDelegate;
+    [_splitViewDelegate resetDefaultSplitForSplitView:self.favoritesLibrarySplitView];
+
+    NSNib * const tableCellViewNib =
+        [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
+                                 bundle:nil];
+    [self.favoritesLibraryGroupsTableView registerNib:tableCellViewNib
+                                        forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
+    [self.favoritesLibraryGroupSelectionTableView registerNib:tableCellViewNib 
+                                                forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
 }
 
 - (void)setupCollectionView
@@ -119,6 +156,28 @@
     _libraryFavoritesDataSource = [[VLCLibraryFavoritesDataSource alloc] init];
     self.libraryFavoritesDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     self.libraryFavoritesDataSource.collectionView = self.favoritesLibraryCollectionView;
+    self.libraryFavoritesDataSource.masterTableView = self.favoritesLibraryGroupsTableView;
+    self.libraryFavoritesDataSource.detailTableView = self.favoritesLibraryGroupSelectionTableView;
+}
+
+- (void)setupFavoritesLibraryViews
+{
+    _favoritesLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    _favoritesLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+
+    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+
+    _favoritesLibraryCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _favoritesLibraryCollectionViewScrollView.contentInsets = defaultInsets;
+    _favoritesLibraryCollectionViewScrollView.scrollerInsets = scrollerInsets;
+
+    _favoritesLibraryGroupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _favoritesLibraryGroupsTableViewScrollView.contentInsets = defaultInsets;
+    _favoritesLibraryGroupsTableViewScrollView.scrollerInsets = scrollerInsets;
+    _favoritesLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _favoritesLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
+    _favoritesLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
 }
 
 - (void)setupFavoritesPlaceholderView
@@ -183,10 +242,20 @@
 - (void)updatePresentedFavoritesView
 {
     self.favoritesLibraryCollectionView.dataSource = self.libraryFavoritesDataSource;
+    
+    self.favoritesLibraryGroupsTableView.dataSource = self.libraryFavoritesDataSource;
+    self.favoritesLibraryGroupsTableView.target = self.libraryFavoritesDataSource;
+    self.favoritesLibraryGroupsTableView.delegate = _favoritesLibraryTableViewDelegate;
+
+    self.favoritesLibraryGroupSelectionTableView.dataSource = self.libraryFavoritesDataSource;
+    self.favoritesLibraryGroupSelectionTableView.target = self.libraryFavoritesDataSource;
+    self.favoritesLibraryGroupSelectionTableView.delegate = _favoritesLibraryTableViewDelegate;
+    
     [self.libraryFavoritesDataSource reloadData];
     
     if ([self hasFavoriteItems]) {
-        [self presentFavoritesCollectionView];
+        const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.favoritesLibraryViewMode;
+        [self presentFavoritesLibraryView:viewModeSegment];
     } else if (self.libraryFavoritesDataSource.libraryModel.filterString.length > 0) {
         [self.libraryWindow displayNoResultsMessage];
     } else {
@@ -215,6 +284,20 @@
     [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-favorites"]
                                               usingConstraints:self.placeholderImageViewSizeConstraints
                                              displayingMessage:_NS("Your favorite items will appear here.\nMark items as favorites to see them in this view.")];
+}
+
+- (void)presentFavoritesLibraryView:(VLCLibraryViewModeSegment)viewModeSegment
+{
+    [self.libraryWindow displayLibraryView:self.favoritesLibraryView];
+    if (viewModeSegment == VLCLibraryGridViewModeSegment) {
+        self.favoritesLibrarySplitView.hidden = YES;
+        self.favoritesLibraryCollectionViewScrollView.hidden = NO;
+    } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
+        self.favoritesLibrarySplitView.hidden = NO;
+        self.favoritesLibraryCollectionViewScrollView.hidden = YES;
+    } else {
+        NSAssert(false, @"View mode must be grid or list mode");
+    }
 }
 
 #pragma mark - Notification handlers

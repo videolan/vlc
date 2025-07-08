@@ -23,6 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
+#import "library/VLCLibraryDataTypes.h"
 
 @class VLCLibraryCollectionView;
 @class VLCLibraryWindow;
@@ -32,6 +33,14 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryFavoritesDataSource;
 
 @interface VLCLibraryFavoritesViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
+@property (readonly, weak) NSView *favoritesLibraryView;
+@property (readonly, weak) NSSplitView *favoritesLibrarySplitView;
+@property (readonly, weak) NSScrollView *favoritesLibraryCollectionViewScrollView;
+@property (readonly, weak) VLCLibraryCollectionView *favoritesLibraryCollectionView;
+@property (readonly, weak) NSScrollView *favoritesLibraryGroupSelectionTableViewScrollView;
+@property (readonly, weak) NSTableView *favoritesLibraryGroupSelectionTableView;
+@property (readonly, weak) NSScrollView *favoritesLibraryGroupsTableViewScrollView;
+@property (readonly, weak) NSTableView *favoritesLibraryGroupsTableView;
 
 @property (readwrite, strong) VLCLibraryFavoritesDataSource *libraryFavoritesDataSource;
 
