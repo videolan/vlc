@@ -1695,22 +1695,37 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self;
 }
 
+- (instancetype)initWithDisplayString:(NSString *)displayString
+                      withMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+
+    self = [self initWithDisplayString:displayString
+               withPrimaryDetailString:[NSString stringWithFormat:@"%lu items", (unsigned long)mediaItems.count]
+              withSecondaryDetailString:@""];
+    if (self) {
+        _mediaItems = mediaItems;
+        _firstMediaItem = mediaItems.firstObject;
+    }
+    return self;
+}
+
 - (void)moveToTrash
 {
-    [self doesNotRecognizeSelector:_cmd];
-    return;
+    [self iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item) {
+        [item moveToTrash];
+    }];
 }
 
 - (void)revealInFinder
 {
-    [self doesNotRecognizeSelector:_cmd];
-    return;
+    [self.mediaItems.firstObject revealInFinder];
 }
 
 - (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
 {
-    [self doesNotRecognizeSelector:_cmd];
-    return;
+     for (VLCMediaLibraryMediaItem * const childItem in self.mediaItems) {
+        mediaItemBlock(childItem);
+    }
 }
 
 @end
