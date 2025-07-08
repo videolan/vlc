@@ -23,6 +23,7 @@
 #include "util/keyhelper.hpp"
 #include "dialogs/systray/systray.hpp"
 #include "widgets/native/qvlcframe.hpp"
+#include "dialogs/dialogs/dialogmodel.hpp"
 #include <QScreen>
 #include <QQmlProperty>
 #include <cmath>
@@ -152,6 +153,13 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
 
     connect(this, &InterfaceWindowHandler::kc_pressed,
             m_mainCtx, &MainCtx::kc_pressed);
+
+    const auto dem = DialogErrorModel::getInstance<false>(); // expected to be already created
+    assert(dem);
+    connect(dem, &DialogErrorModel::rowsInserted, this, [w = QPointer(m_window)]() {
+        if (Q_LIKELY(w))
+            w->alert(0);
+    });
 
     m_window->installEventFilter(this);
 }
