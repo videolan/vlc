@@ -31,6 +31,8 @@
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryTableCellView.h"
 
+#import "views/VLCImageView.h"
+
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 
@@ -153,6 +155,12 @@
     }];
 }
 
+- (id<VLCMediaLibraryItemProtocol>)createGroupDescriptorForSection:(VLCLibraryFavoritesSection)section
+{
+    return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:[self titleForSection:section]
+                                                    withMediaItems:[self arrayForSection:section]];
+}
+
 #pragma mark - Notification handlers
 
 - (void)libraryModelFavoriteVideoMediaListReset:(NSNotification * const)notification
@@ -240,6 +248,74 @@
     if (self.collectionView.dataSource == self) {
         [self.collectionView reloadData];
     }
+}
+
+#pragma mark - NSTableViewDataSource (Master-Detail View)
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (tableView == self.masterTableView) {
+        return _visibleSectionMapping.count;
+    } else if (tableView == self.detailTableView && self.masterTableView.selectedRow > -1) {
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:self.masterTableView.selectedRow];
+        return [self arrayForSection:section].count;
+    }
+    
+    return 0;
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
+}
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
+{
+    if (tableView == self.masterTableView) {
+        // For master table, return a group descriptor object
+        if (row >= 0 && row < _visibleSectionMapping.count) {
+            const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:row];
+            return [self createGroupDescriptorForSection:section];
+        }
+    } else if (tableView == self.detailTableView && self.masterTableView.selectedRow > -1) {
+        VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:self.masterTableView.selectedRow];
+        NSArray * const sectionArray = [self arrayForSection:section];
+        if (row >= 0 && row < sectionArray.count) {
+            return sectionArray[row];
+        }
+    }
+    
+    return nil;
+}
+
+- (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return NSNotFound;
+    }
+    
+    // Search through all visible sections
+    for (NSNumber * const sectionNumber in _visibleSectionMapping) {
+        const VLCLibraryFavoritesSection section = (VLCLibraryFavoritesSection)[sectionNumber integerValue];
+        NSArray * const sectionArray = [self arrayForSection:section];
+        const NSInteger index = [self indexOfMediaItem:libraryItem.libraryID inArray:sectionArray];
+        if (index != NSNotFound) {
+            return index;
+        }
+    }
+    
+    return NSNotFound;
+}
+
+- (VLCMediaLibraryParentGroupType)currentParentType
+{
+    if (self.masterTableView.selectedRow > -1) {
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:self.masterTableView.selectedRow];
+        return [self parentTypeForSection:section];
+    }
+    return VLCMediaLibraryParentGroupTypeVideoLibrary; // Default fallback
 }
 
 #pragma mark - NSCollectionViewDataSource
