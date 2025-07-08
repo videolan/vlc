@@ -20,11 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryModel;
+
+typedef NS_ENUM(NSUInteger, VLCLibraryFavoritesSection) {
+    VLCLibraryFavoritesSectionVideoMedia = 0,
+    VLCLibraryFavoritesSectionAudioMedia,
+    VLCLibraryFavoritesSectionAlbums,
+    VLCLibraryFavoritesSectionArtists,
+    VLCLibraryFavoritesSectionGenres,
+    VLCLibraryFavoritesSectionCount
+};
+
 @interface VLCLibraryFavoritesDataSource : NSObject
+
+@property (readwrite, weak) VLCLibraryModel *libraryModel;
+- (void)reloadData;
 
 @end
 

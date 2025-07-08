@@ -22,6 +22,223 @@
 
 #import "VLCLibraryFavoritesDataSource.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibraryTableCellView.h"
+
+#import "main/CompatibilityFixes.h"
+#import "main/VLCMain.h"
+
+#import "extensions/NSIndexSet+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
+
+@interface VLCLibraryFavoritesDataSource ()
+{
+    NSArray *_favoriteVideoMediaArray;
+    NSArray *_favoriteAudioMediaArray;
+    NSArray *_favoriteAlbumsArray;
+    NSArray *_favoriteArtistsArray;
+    NSArray *_favoriteGenresArray;
+    VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
+    NSArray<NSNumber *> *_visibleSectionMapping; // Maps visible sections to VLCLibraryFavoritesSection values
+}
+
+@end
+
 @implementation VLCLibraryFavoritesDataSource
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self connect];
+    }
+    return self;
+}
+
+- (NSArray *)arrayForSection:(VLCLibraryFavoritesSection)section
+{
+    switch (section) {
+        case VLCLibraryFavoritesSectionVideoMedia:
+            return _favoriteVideoMediaArray;
+        case VLCLibraryFavoritesSectionAudioMedia:
+            return _favoriteAudioMediaArray;
+        case VLCLibraryFavoritesSectionAlbums:
+            return _favoriteAlbumsArray;
+        case VLCLibraryFavoritesSectionArtists:
+            return _favoriteArtistsArray;
+        case VLCLibraryFavoritesSectionGenres:
+            return _favoriteGenresArray;
+        default:
+            return @[];
+    }
+}
+
+- (NSString *)titleForSection:(VLCLibraryFavoritesSection)section
+{
+    switch (section) {
+        case VLCLibraryFavoritesSectionVideoMedia:
+            return _NS("Favorite Videos");
+        case VLCLibraryFavoritesSectionAudioMedia:
+            return _NS("Favorite Music");
+        case VLCLibraryFavoritesSectionAlbums:
+            return _NS("Favorite Albums");
+        case VLCLibraryFavoritesSectionArtists:
+            return _NS("Favorite Artists");
+        case VLCLibraryFavoritesSectionGenres:
+            return _NS("Favorite Genres");
+        default:
+            return @"";
+    }
+}
+
+- (VLCMediaLibraryParentGroupType)parentTypeForSection:(VLCLibraryFavoritesSection)section
+{
+    switch (section) {
+        case VLCLibraryFavoritesSectionVideoMedia:
+            return VLCMediaLibraryParentGroupTypeVideoLibrary;
+        case VLCLibraryFavoritesSectionAudioMedia:
+            return VLCMediaLibraryParentGroupTypeAudioLibrary;
+        case VLCLibraryFavoritesSectionAlbums:
+            return VLCMediaLibraryParentGroupTypeAlbum;
+        case VLCLibraryFavoritesSectionArtists:
+            return VLCMediaLibraryParentGroupTypeArtist;
+        case VLCLibraryFavoritesSectionGenres:
+            return VLCMediaLibraryParentGroupTypeGenre;
+        default:
+            return VLCMediaLibraryParentGroupTypeUnknown;
+    }
+}
+
+- (VLCLibraryFavoritesSection)sectionForVisibleIndex:(NSInteger)visibleIndex
+{
+    if (visibleIndex < 0 || visibleIndex >= _visibleSectionMapping.count) {
+        return VLCLibraryFavoritesSectionCount; // Invalid
+    }
+    return (VLCLibraryFavoritesSection)[_visibleSectionMapping[visibleIndex] integerValue];
+}
+
+- (NSInteger)visibleIndexForSection:(VLCLibraryFavoritesSection)section
+{
+    NSNumber * const sectionNumber = @(section);
+    NSUInteger index = [_visibleSectionMapping indexOfObject:sectionNumber];
+    return index == NSNotFound ? -1 : (NSInteger)index;
+}
+
+- (void)updateVisibleSectionMapping
+{
+    NSMutableArray<NSNumber *> * const visibleSections = [NSMutableArray array];
+    
+    for (NSUInteger i = 0; i < VLCLibraryFavoritesSectionCount; i++) {
+        NSArray * const sectionArray = [self arrayForSection:i];
+        if (sectionArray.count > 0) {
+            [visibleSections addObject:@(i)];
+        }
+    }
+    
+    _visibleSectionMapping = [visibleSections copy];
+}
+
+- (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
+{
+    return [array indexOfObjectPassingTest:^BOOL(id<VLCMediaLibraryItemProtocol> const findMediaItem, const NSUInteger idx, BOOL * const stop) {
+        NSAssert(findMediaItem != nil, @"Collection should not contain nil media items");
+        return findMediaItem.libraryID == libraryId;
+    }];
+}
+
+#pragma mark - Notification handlers
+
+- (void)libraryModelFavoriteVideoMediaListReset:(NSNotification * const)notification
+{
+    [self reloadData];
+}
+
+- (void)libraryModelFavoriteAudioMediaListReset:(NSNotification * const)notification
+{
+    [self reloadData];
+}
+
+- (void)libraryModelFavoriteAlbumsListReset:(NSNotification * const)notification
+{
+    [self reloadData];
+}
+
+- (void)libraryModelFavoriteArtistsListReset:(NSNotification * const)notification
+{
+    [self reloadData];
+}
+
+- (void)libraryModelFavoriteGenresListReset:(NSNotification * const)notification
+{
+    [self reloadData];
+}
+
+#pragma mark - VLCLibraryDataSource
+
+- (void)connect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelFavoriteVideoMediaListReset:)
+                               name:VLCLibraryModelFavoriteVideoMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelFavoriteAudioMediaListReset:)
+                               name:VLCLibraryModelFavoriteAudioMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelFavoriteAlbumsListReset:)
+                               name:VLCLibraryModelFavoriteAlbumsListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelFavoriteArtistsListReset:)
+                               name:VLCLibraryModelFavoriteArtistsListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelFavoriteGenresListReset:)
+                               name:VLCLibraryModelFavoriteGenresListReset
+                             object:nil];
+
+    [self reloadData];
+}
+
+- (void)disconnect
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)reloadData
+{
+    if (!_libraryModel) {
+        return;
+    }
+
+    [_collectionViewFlowLayout resetLayout];
+
+    _favoriteVideoMediaArray = [self.libraryModel listOfFavoriteVideoMedia];
+    _favoriteAudioMediaArray = [self.libraryModel listOfFavoriteAudioMedia];
+    _favoriteAlbumsArray = [self.libraryModel listOfFavoriteAlbums];
+    _favoriteArtistsArray = [self.libraryModel listOfFavoriteArtists];
+    _favoriteGenresArray = [self.libraryModel listOfFavoriteGenres];
+
+    [self updateVisibleSectionMapping];
+
+    if (self.masterTableView.dataSource == self) {
+        [self.masterTableView reloadData];
+    }
+    if (self.detailTableView.dataSource == self) {
+        [self.detailTableView reloadData];
+    }
+    if (self.collectionView.dataSource == self) {
+        [self.collectionView reloadData];
+    }
+}
 @end
