@@ -300,6 +300,56 @@
     }
 }
 
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    _awaitingPresentingLibraryItem = libraryItem;
+
+    const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.favoritesLibraryViewMode;
+
+    if (viewModeSegment == VLCLibraryGridViewModeSegment) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(presentLibraryItemWaitForCollectionViewDataSourceFinished:)
+                                                   name:VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification
+                                                 object:self.libraryFavoritesDataSource];
+    } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(presentLibraryItemWaitForTableViewDataSourceFinished:)
+                                                   name:VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification
+                                                 object:self.libraryFavoritesDataSource];
+    } else {
+        NSAssert(false, @"View mode must be grid or list mode");
+    }
+}
+
+- (void)presentLibraryItemWaitForCollectionViewDataSourceFinished:(NSNotification *)notification
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self
+                                                  name:VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification
+                                                object:self.libraryFavoritesDataSource];
+
+    _awaitingPresentingLibraryItem = nil;
+}
+
+- (void)presentLibraryItemWaitForTableViewDataSourceFinished:(NSNotification *)notification
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self
+                                                  name:VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification
+                                                object:self.libraryFavoritesDataSource];
+
+    const NSInteger rowForLibraryItem = [self.libraryFavoritesDataSource rowForLibraryItem:_awaitingPresentingLibraryItem];
+    if (rowForLibraryItem != NSNotFound) {
+        NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:rowForLibraryItem];
+        [self.favoritesLibraryGroupsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+        [self.favoritesLibraryGroupsTableView scrollRowToVisible:rowForLibraryItem];
+    }
+
+    _awaitingPresentingLibraryItem = nil;
+}
+
 #pragma mark - Notification handlers
 
 - (void)libraryModelUpdated:(NSNotification *)notification

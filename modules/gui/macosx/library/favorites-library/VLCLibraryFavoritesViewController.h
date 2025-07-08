@@ -24,15 +24,16 @@
 
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryItemPresentingCapable.h"
 
 @class VLCLibraryCollectionView;
 @class VLCLibraryWindow;
+@class VLCLibraryFavoritesDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCLibraryFavoritesDataSource;
+@interface VLCLibraryFavoritesViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<VLCLibraryItemPresentingCapable>
 
-@interface VLCLibraryFavoritesViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
 @property (readonly, weak) NSView *favoritesLibraryView;
 @property (readonly, weak) NSSplitView *favoritesLibrarySplitView;
 @property (readonly, weak) NSScrollView *favoritesLibraryCollectionViewScrollView;
@@ -46,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentFavoritesView;
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
 
