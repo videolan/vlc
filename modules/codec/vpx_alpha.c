@@ -295,8 +295,8 @@ static int FormatUpdate( decoder_t *dec, vlc_video_context *vctx )
             break;
 #endif // _WIN32
         default:
-            msg_Err(dec, "unsupported decoder output %4.4s", (char*)&dec->fmt_out.video.i_chroma);
-            res = VLC_EGENERIC;
+            msg_Warn(dec, "unsupported decoder output %4.4s, not handling alpha",
+                     (char*)&dec->fmt_out.video.i_chroma);
             break;
     }
     if (res == VLC_SUCCESS)
