@@ -557,12 +557,23 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
     return VLC_SUCCESS;
 }
 
-static vlc_tick_t InputSourceGetLength( input_source_t *source, input_item_t *item )
+static vlc_tick_t InputSourceGetLength( input_source_t *source, input_item_t *item,
+                                        bool *live )
 {
     vlc_tick_t length;
-    if( demux_Control( source->p_demux, DEMUX_GET_LENGTH, &length ) )
-        length = 0;
-    if( length == 0 && item != NULL )
+    bool ignored;
+    bool *liveptr;
+    if (live == NULL)
+        liveptr = &ignored;
+    else
+    {
+        liveptr = live;
+        *liveptr = false;
+    }
+
+    if( demux_Control( source->p_demux, DEMUX_GET_LENGTH, &length, liveptr ) )
+        length = VLC_TICK_INVALID;
+    if( length == VLC_TICK_INVALID && item != NULL )
         length = input_item_GetDuration( item );
 
     return length;
@@ -584,13 +595,15 @@ static void InputSourceStatistics(input_source_t *source, input_item_t *item,
     if( demux_Control( source->p_demux, DEMUX_GET_TIME, &i_time ) )
         i_time = VLC_TICK_INVALID;
 
-    i_length = InputSourceGetLength( source, item );
+    bool live;
+    i_length = InputSourceGetLength( source, item, &live );
 
     /* In case of failure (not implemented or in case of seek), use VLC_TICK_INVALID. */
     if (demux_Control( source->p_demux, DEMUX_GET_NORMAL_TIME, &i_normal_time ) != VLC_SUCCESS)
         i_normal_time = VLC_TICK_INVALID;
 
-    es_out_SetTimes( out, f_position, i_time, i_normal_time, i_length );
+    es_out_SetTimes( out, f_position, i_time, i_normal_time, i_length,
+                     live );
 }
 
 /**
@@ -1944,7 +1957,7 @@ static bool Control( input_thread_t *p_input,
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
-            vlc_tick_t i_length = InputSourceGetLength(priv->master, priv->p_item);
+            vlc_tick_t i_length = InputSourceGetLength(priv->master, priv->p_item, NULL);
             double f_val;
             if( i_length > 0 )
             {
@@ -1990,7 +2003,7 @@ static bool Control( input_thread_t *p_input,
                                    !param.time.b_fast_seek );
             if( i_ret )
             {
-                vlc_tick_t i_length = InputSourceGetLength( priv->master, priv->p_item );
+                vlc_tick_t i_length = InputSourceGetLength( priv->master, priv->p_item, NULL );
                 /* Emulate it with a SET_POS */
                 if( i_length > 0 )
                 {

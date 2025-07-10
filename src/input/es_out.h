@@ -86,7 +86,7 @@ enum es_out_query_private_e
     ES_OUT_PRIV_SET_FRAME_NEXT,                     /*                          res=can fail */
 
     /* Set position/time/length */
-    ES_OUT_PRIV_SET_TIMES,                          /* arg1=double f_position arg2=vlc_tick_t i_time arg3=vlc_tick_t i_normal_time arg4=vlc_tick_t i_length res=cannot fail */
+    ES_OUT_PRIV_SET_TIMES,                          /* arg1=double f_position arg2=vlc_tick_t i_time arg3=vlc_tick_t i_normal_time arg4=vlc_tick_t i_length arg5 int b_live res=cannot fail */
 
     /* Set jitter */
     ES_OUT_PRIV_SET_JITTER,                         /* arg1=vlc_tick_t i_pts_delay arg2= vlc_tick_t i_pts_jitter, arg2=int i_cr_average res=cannot fail */
@@ -271,10 +271,10 @@ es_out_SetFrameNext(struct vlc_input_es_out *out )
 static inline void
 es_out_SetTimes(struct vlc_input_es_out *out, double f_position,
                 vlc_tick_t i_time, vlc_tick_t i_normal_time,
-                vlc_tick_t i_length )
+                vlc_tick_t i_length, bool b_live  )
 {
     int i_ret = es_out_PrivControl(out, ES_OUT_PRIV_SET_TIMES, f_position, i_time,
-                                   i_normal_time, i_length);
+                                   i_normal_time, i_length, b_live);
     assert( !i_ret );
 }
 

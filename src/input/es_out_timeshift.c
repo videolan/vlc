@@ -170,6 +170,7 @@ typedef struct attribute_packed
             vlc_tick_t i_time;
             vlc_tick_t i_normal_time;
             vlc_tick_t i_length;
+            vlc_tick_t b_live;
         } times;
     } u;
 } ts_cmd_privcontrol_t;
@@ -1863,11 +1864,13 @@ static int CmdInitPrivControl( ts_cmd_privcontrol_t *p_cmd, input_source_t *in, 
         vlc_tick_t i_time = va_arg( args, vlc_tick_t );
         vlc_tick_t i_normal_time = va_arg( args, vlc_tick_t );
         vlc_tick_t i_length = va_arg( args, vlc_tick_t );
+        bool b_live = va_arg( args, int );
 
         p_cmd->u.times.f_position = f_position;
         p_cmd->u.times.i_time = i_time;
         p_cmd->u.times.i_normal_time = i_normal_time;
         p_cmd->u.times.i_length = i_length;
+        p_cmd->u.times.b_live = b_live;
         break;
     }
     case ES_OUT_PRIV_SET_EOS: /* no arg */
@@ -1897,7 +1900,8 @@ static int CmdExecutePrivControl(struct es_out_timeshift *p_sys, ts_cmd_privcont
                                       p_cmd->u.times.f_position,
                                       p_cmd->u.times.i_time,
                                       p_cmd->u.times.i_normal_time,
-                                      p_cmd->u.times.i_length );
+                                      p_cmd->u.times.i_length,
+                                      p_cmd->u.times.b_live );
     case ES_OUT_PRIV_SET_EOS: /* no arg */
         return es_out_in_PrivControl( p_sys->p_out, in, i_query );
     default: vlc_assert_unreachable();

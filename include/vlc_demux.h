@@ -185,7 +185,14 @@ enum demux_query_e
 
     /* LENGTH/TIME in microsecond, 0 if unknown */
     DEMUX_GET_LENGTH,           /* arg1= vlc_tick_t *   res=    */
-    DEMUX_GET_TIME,             /* arg1= vlc_tick_t *   res=    */
+    /**
+     * Get time and live state
+     *
+     * Set arg2 to true if the stream is live. In that case DEMUX_GET_LENGTH
+     * will represent a seek range, and DEMUX_GET_POSITION the position within
+     * that seek range.
+     * arg1= vlc_tick_t *, arg2 bool * res= */
+    DEMUX_GET_TIME,
     DEMUX_SET_TIME,             /* arg1= vlc_tick_t arg2= bool b_precise   res=can fail    */
     /* Normal or original time, used mainly by the ts module */
     DEMUX_GET_NORMAL_TIME,      /* arg1= vlc_tick_t *   res= can fail, in that case VLC_TICK_0 will be used as NORMAL_TIME */

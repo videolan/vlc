@@ -173,6 +173,7 @@ struct vlc_input_event_times
     vlc_tick_t time;
     vlc_tick_t normal_time;
     vlc_tick_t length;
+    bool live;
 };
 
 struct vlc_input_event_output_clock

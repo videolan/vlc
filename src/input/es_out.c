@@ -3928,6 +3928,7 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         vlc_tick_t i_time = va_arg( args, vlc_tick_t );
         vlc_tick_t i_normal_time = va_arg( args, vlc_tick_t );
         vlc_tick_t i_length = va_arg( args, vlc_tick_t );
+        bool b_live = va_arg( args, int );
 
         if (i_normal_time != VLC_TICK_INVALID)
             source->i_normal_time = i_normal_time;
@@ -3938,7 +3939,7 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         if (p_sys->b_buffering)
         {
             input_SendEventTimes(p_sys->p_input, 0.0, VLC_TICK_INVALID,
-                                 i_normal_time, i_length);
+                                 i_normal_time, i_length, b_live);
             return VLC_SUCCESS;
         }
 
@@ -3964,7 +3965,7 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
             f_position = 0;
 
         input_SendEventTimes(p_sys->p_input, f_position, i_time,
-                             i_normal_time, i_length);
+                             i_normal_time, i_length, b_live);
         return VLC_SUCCESS;
     }
     case ES_OUT_PRIV_SET_JITTER:
