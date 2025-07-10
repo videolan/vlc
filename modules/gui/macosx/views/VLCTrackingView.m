@@ -79,7 +79,7 @@
         weakViewToShow.hidden = NO;
 
         [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context){
-            NSAnimationContext.currentContext.duration = 0.9;
+            NSAnimationContext.currentContext.duration = 0.3;
             weakViewToHide.animator.alphaValue = hideVTH ? 0.0 : 1.0;
             weakViewToShow.animator.alphaValue = hideVTS ? 0.0 : 1.0;
         } completionHandler:^{
