@@ -631,7 +631,7 @@
             <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HXH-MZ-tkf">
+                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" id="HXH-MZ-tkf">
                     <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
                     <clipView key="contentView" id="EeU-rT-tSP">
                         <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>

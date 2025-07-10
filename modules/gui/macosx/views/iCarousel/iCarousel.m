@@ -2348,6 +2348,44 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
     }
 }
 
+- (void)scrollWheel:(NSEvent *)event
+{
+    const CGFloat deltaX = event.scrollingDeltaX;
+    const CGFloat deltaY = event.scrollingDeltaY;
+
+    BOOL isHorizontalGesture = fabs(deltaX) > fabs(deltaY);
+    BOOL isTrackpadGesture = event.hasPreciseScrollingDeltas &&
+                            (event.phase != NSEventPhaseNone || event.momentumPhase != NSEventPhaseNone);
+    
+    if (isHorizontalGesture && fabs(deltaX) > 0.1 && _scrollEnabled) {
+        if (isTrackpadGesture) {
+            CGFloat currentOffset = self.scrollOffset;
+            CGFloat newOffset = currentOffset - (deltaX / 600.0);
+
+            const NSInteger numberOfItems = self.numberOfItems;
+            if (numberOfItems > 0) {
+                newOffset = MAX(0.0, MIN((CGFloat)(numberOfItems - 1), newOffset));
+                self.scrollOffset = newOffset;
+            }
+            [self scrollToItemAtIndex:self.currentItemIndex animated:YES];
+        } else {
+            const NSInteger currentIndex = self.currentItemIndex;
+            const NSInteger numberOfItems = self.numberOfItems;
+
+            if (deltaX > 0.1 && currentIndex > 0) {
+                [self scrollToItemAtIndex:(currentIndex - 1) animated:YES];
+            } else if (deltaX < -0.1 && currentIndex < numberOfItems - 1) {
+                [self scrollToItemAtIndex:(currentIndex + 1) animated:YES];
+            }
+        }
+        return;
+    }
+
+    if (fabs(deltaY) > 0.5 && fabs(deltaX) <= 0.1) {
+        [super scrollWheel:event];
+    }
+}
+
 #pragma mark -
 #pragma mark Keyboard control
 
