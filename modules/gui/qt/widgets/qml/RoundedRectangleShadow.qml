@@ -68,7 +68,7 @@ ShaderEffect {
 
     supportsAtlasTextures: true // irrelevant, but nevertheless...
 
-    // cullMode: ShaderEffect.BackFaceCulling // problematic with item layers
+    // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
     fragmentShader: hollow ? "qrc:///shaders/RoundedRectangleShadow_hollow.frag.qsb"
                            : "qrc:///shaders/RoundedRectangleShadow.frag.qsb"

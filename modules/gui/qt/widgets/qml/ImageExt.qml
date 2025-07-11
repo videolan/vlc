@@ -147,9 +147,7 @@ Item {
 
         antialiasing: root.antialiasing
 
-        // FIXME: Culling seems to cause issues, such as when the view is layered due to
-        //        fading edge effec, this is most likely a Qt bug.
-        // cullMode: ShaderEffect.BackFaceCulling
+        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
         readonly property real radius: Math.min(1.0, Math.max(root.radius / (Math.min(width, height) / 2), 0.0))
         readonly property real radiusTopRight: radius

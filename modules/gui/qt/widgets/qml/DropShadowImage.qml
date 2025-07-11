@@ -102,7 +102,7 @@ Item {
 
         supportsAtlasTextures: true
         blending: true
-        // cullMode: ShaderEffect.BackFaceCulling
+        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
         readonly property Image source: image
 
