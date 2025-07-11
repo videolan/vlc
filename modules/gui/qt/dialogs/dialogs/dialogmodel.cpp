@@ -41,6 +41,11 @@ DialogErrorModel::DialogErrorModel(qt_intf_t * intf, QObject * parent)
 DialogErrorModel::~DialogErrorModel()
 {
     vlc_dialog_provider_set_error_callback(m_intf, nullptr, nullptr);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    assert(qGuiApp);
+    qGuiApp->setBadgeNumber(0);
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------
