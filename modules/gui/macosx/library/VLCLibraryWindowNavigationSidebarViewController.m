@@ -141,7 +141,6 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                withKeyPath:@"arrangedObjects"
                    options:nil];
     [self.outlineView reloadData];
-    [self selectSegment:currentSegmentType];
 
     self.ignoreSegmentSelectionChanges = NO;
 
@@ -153,6 +152,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
             [self.outlineView expandItem:node];
         }
     }
+
+    [self selectSegment:currentSegmentType];
 }
 
 - (void)updateBookmarkObservation
