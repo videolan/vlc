@@ -104,6 +104,7 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
     self.trackNumberTextField.stringValue = @"";
     self.playInstantlyButton.hidden = YES;
     self.trackNumberTextField.hidden = NO;
+    [self playStateOrItemChanged:nil];
 }
 
 - (IBAction)playInstantly:(id)sender
