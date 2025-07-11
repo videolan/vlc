@@ -155,7 +155,7 @@ signals:
                const QString & text, const QString & defaultUsername,
                bool b_ask_store);
 
-    void question(DialogId dialogId, const QString & title, const QString & text, QuestionType type,
+    void question(DialogId dialogId, const QString & title, const QString & text, VLCDialog::QuestionType type,
                   const QString & cancel, const QString & action1, const QString & action2);
 
     void progress(DialogId dialogId, const QString & title, const QString & text,

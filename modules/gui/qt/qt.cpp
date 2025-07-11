@@ -770,6 +770,7 @@ static inline void registerMetaTypes()
     qRegisterMetaType<MLItemId>();
     qRegisterMetaType<QVector<MLItemId>>();
     qRegisterMetaType<QList<QQmlError>>();
+    qRegisterMetaType<VLCDialog::QuestionType>();
 }
 
 static void *Thread( void *obj )
