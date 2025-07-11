@@ -141,12 +141,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                withKeyPath:@"arrangedObjects"
                    options:nil];
     [self.outlineView reloadData];
-
-    NSTreeNode * const targetNode = [self nodeForSegmentType:currentSegmentType];
-    const NSInteger segmentIndex = [self.outlineView rowForItem:targetNode];
-    [self expandParentsOfNode:targetNode];
-    [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentIndex]
-                  byExtendingSelection:NO];
+    [self selectSegment:currentSegmentType];
 
     self.ignoreSegmentSelectionChanges = NO;
 
