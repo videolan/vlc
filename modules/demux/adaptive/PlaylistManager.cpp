@@ -616,6 +616,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             if(cached.b_live && cached.playlistLength == 0)
                 return VLC_EGENERIC;
             *(va_arg (args, vlc_tick_t *)) = cached.playlistLength;
+            *(va_arg (args, bool *)) = cached.b_live;
             break;
         }
 
