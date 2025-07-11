@@ -956,6 +956,12 @@ input_thread_Events(input_thread_t *input_thread,
                 changed = true;
             }
 
+            if (input->live != event->times.live)
+            {
+                input->live = event->times.live;
+                changed = true;
+            }
+
             if (input->normal_time != event->times.normal_time)
             {
                 input->normal_time = event->times.normal_time;
@@ -969,6 +975,7 @@ input_thread_Events(input_thread_t *input_thread,
                     .rate = input->rate,
                     .ts = input->time,
                     .length = input->length,
+                    .live = input->live,
                     .system_date = system_date,
                 };
                 vlc_player_UpdateTimer(player, NULL, false, &point,
@@ -1120,6 +1127,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->rate = 1.f;
     input->capabilities = 0;
     input->length = input->time = VLC_TICK_INVALID;
+    input->live = false;
     input->normal_time = VLC_TICK_0;
     input->pause_date = VLC_TICK_INVALID;
     input->position = 0.f;

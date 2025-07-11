@@ -67,6 +67,7 @@ struct vlc_player_input
     float rate;
     int capabilities;
     vlc_tick_t length;
+    bool live;
 
     double position;
     vlc_tick_t time;
@@ -215,6 +216,7 @@ struct vlc_player_timer
 {
     vlc_mutex_t lock;
 
+    bool input_live;
     vlc_tick_t input_length;
     vlc_tick_t input_normal_time;
     vlc_tick_t last_ts;
