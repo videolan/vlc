@@ -66,7 +66,7 @@ Item {
                 return Qt.rect(0, 0, 0, 0)
         }
 
-        cullMode: ShaderEffect.BackFaceCulling
+        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
         // Simple filter that is only enabled when blending is active.
         // We do not want the source to be rendered below the frosted glass effect.
@@ -94,7 +94,7 @@ Item {
         // there is no effect to show.
         visible: layer.enabled
 
-        // cullMode: ShaderEffect.BackFaceCulling
+        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
         property rect effectRect
 
