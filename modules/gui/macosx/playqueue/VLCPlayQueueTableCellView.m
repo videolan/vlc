@@ -58,6 +58,13 @@ NSString * const VLCDisplayTrackNumberPlayQueueSettingChanged = @"VLCDisplayTrac
                                              object:nil];
 }
 
+- (void)prepareForReuse
+{
+    [super prepareForReuse];
+    [self updateFonts];
+    [self updateColouredElements];
+}
+
 - (void)setRepresentsCurrentPlayQueueItem:(BOOL)representsCurrentPlayQueueItem
 {
     _representsCurrentPlayQueueItem = representsCurrentPlayQueueItem;
