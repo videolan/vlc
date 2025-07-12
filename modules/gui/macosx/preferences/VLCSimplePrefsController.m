@@ -961,10 +961,16 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [defaults setObject:toNSStr(language_map[index].iso) forKey:@"language"];
         [VLCSimplePrefsController updateRightToLeftSettings];
 
+        const BOOL originalDisplayTrackNumberSetting = [defaults boolForKey:VLCDisplayTrackNumberPlayQueueKey];
+
         [defaults setBool:self.intf_displayEndOfPlaybackViewCheckBox.state == NSControlStateValueOn
                    forKey:VLCPlaybackEndViewEnabledKey];
         [defaults setBool:self.intf_displayTrackNumberPlayQueueCheckBox.state == NSControlStateValueOn
                    forKey:VLCDisplayTrackNumberPlayQueueKey];
+        
+        if (originalDisplayTrackNumberSetting != [defaults boolForKey:VLCDisplayTrackNumberPlayQueueKey]) {
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCDisplayTrackNumberPlayQueueSettingChanged object:nil];
+        }
 
         config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 

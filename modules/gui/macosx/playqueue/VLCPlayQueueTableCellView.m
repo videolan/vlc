@@ -40,12 +40,22 @@
 #import <vlc_configuration.h>
 
 NSString * const VLCDisplayTrackNumberPlayQueueKey = @"VLCDisplayTrackNumberPlayQueueKey";
+NSString * const VLCDisplayTrackNumberPlayQueueSettingChanged = @"VLCDisplayTrackNumberPlayQueueSettingChanged";
 
 @implementation VLCPlayQueueTableCellView
 
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(updateRepresentation)
+                                               name:VLCDisplayTrackNumberPlayQueueSettingChanged
+                                             object:nil];
 }
 
 - (void)setRepresentsCurrentPlayQueueItem:(BOOL)representsCurrentPlayQueueItem
@@ -82,6 +92,12 @@ NSString * const VLCDisplayTrackNumberPlayQueueKey = @"VLCDisplayTrackNumberPlay
 - (void)setRepresentedPlayQueueItem:(VLCPlayQueueItem *)item
 {
     _representedPlayQueueItem = item;
+    [self updateRepresentation];
+}
+
+- (void)updateRepresentation
+{
+    VLCPlayQueueItem * const item = self.representedPlayQueueItem;
 
     __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForPlayQueueItem:item withCompletion:^(NSImage * const thumbnail) {
