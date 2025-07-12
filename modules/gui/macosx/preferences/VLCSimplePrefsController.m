@@ -50,6 +50,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "playqueue/VLCPlayQueueTableCellView.h"
 #import "views/VLCPlaybackEndViewController.h"
 
 static struct {
@@ -404,6 +405,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_intf_displayEndOfPlaybackViewCheckBox setTitle:_NS("Display end of playback view")];
     [_intf_statusIconCheckbox setTitle: _NS("Display VLC status menu icon")];
     [_intf_largeFontInListsCheckbox setTitle: _NS("Use large text for list views")];
+    [_intf_displayTrackNumberPlayQueueCheckBox setTitle: _NS("Display album track numbers in play queue")];
 
     [_intf_playbackBehaviourBox setTitle:_NS("Playback behaviour")];
     [_intf_enableNotificationsCheckbox setTitle: _NS("Enable notifications on play queue item change")];
@@ -630,6 +632,8 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     }
 
     self.intf_displayEndOfPlaybackViewCheckBox.state = [defaults boolForKey:VLCPlaybackEndViewEnabledKey] ? NSControlStateValueOn : NSControlStateValueOff;
+
+    self.intf_displayTrackNumberPlayQueueCheckBox.state = [defaults boolForKey:VLCDisplayTrackNumberPlayQueueKey] ? NSControlStateValueOn : NSControlStateValueOff;
 
     [self setupButton:_intf_statusIconCheckbox forBoolValue: "macosx-statusicon"];
 
@@ -959,6 +963,8 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         [defaults setBool:self.intf_displayEndOfPlaybackViewCheckBox.state == NSControlStateValueOn
                    forKey:VLCPlaybackEndViewEnabledKey];
+        [defaults setBool:self.intf_displayTrackNumberPlayQueueCheckBox.state == NSControlStateValueOn
+                   forKey:VLCDisplayTrackNumberPlayQueueKey];
 
         config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 

@@ -62,6 +62,7 @@
                 <outlet property="intf_continueplaybackLabel" destination="3919" id="ZJO-qY-UCq"/>
                 <outlet property="intf_continueplaybackPopup" destination="3920" id="dZ3-SI-SCp"/>
                 <outlet property="intf_displayEndOfPlaybackViewCheckBox" destination="SYi-7I-cKE" id="sTC-Oc-1zX"/>
+                <outlet property="intf_displayTrackNumberPlayQueueCheckBox" destination="QZ2-zA-u6A" id="C0Q-pp-Hx7"/>
                 <outlet property="intf_enableNotificationsCheckbox" destination="3564" id="IIA-ce-g61"/>
                 <outlet property="intf_enableluahttpCheckbox" destination="lpZ-9y-Vfn" id="ieR-ZH-mcd"/>
                 <outlet property="intf_generalSettingsBox" destination="kup-aY-Wqq" id="RsL-yE-DVe"/>
@@ -336,16 +337,28 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="NdO-a5-vue"/>
                                 </connections>
                             </button>
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QZ2-zA-u6A">
+                                <rect key="frame" x="15" y="16" width="286" height="18"/>
+                                <buttonCell key="cell" type="check" title="Display album track numbers in play queue" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="I5V-9N-WTo">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="interfaceSettingChanged:" target="-2" id="eDk-ch-tvU"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="r3P-eU-tEX" firstAttribute="top" secondItem="3892" secondAttribute="bottom" constant="17" id="0lq-Ud-BSO"/>
+                            <constraint firstItem="QZ2-zA-u6A" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="3tY-4q-xya"/>
                             <constraint firstItem="3892" firstAttribute="centerY" secondItem="3900" secondAttribute="centerY" id="I4b-x2-YzY"/>
                             <constraint firstItem="MeC-2c-kJf" firstAttribute="leading" secondItem="r3P-eU-tEX" secondAttribute="leading" id="Oki-bv-W2C"/>
                             <constraint firstItem="3892" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="top" constant="12" id="QjC-Pr-bJB"/>
                             <constraint firstItem="3892" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="SZk-gE-9Fb"/>
-                            <constraint firstAttribute="bottom" secondItem="MeC-2c-kJf" secondAttribute="bottom" constant="17" id="bAb-M0-dQk"/>
+                            <constraint firstAttribute="bottom" secondItem="QZ2-zA-u6A" secondAttribute="bottom" constant="17" id="TXr-OU-qeV"/>
                             <constraint firstItem="r3P-eU-tEX" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="g2X-29-Ah0"/>
                             <constraint firstItem="3900" firstAttribute="leading" secondItem="3892" secondAttribute="trailing" constant="17" id="h9A-kZ-JjD"/>
+                            <constraint firstItem="QZ2-zA-u6A" firstAttribute="top" secondItem="MeC-2c-kJf" secondAttribute="bottom" constant="17" id="qJf-W5-E9J"/>
                             <constraint firstItem="MeC-2c-kJf" firstAttribute="top" secondItem="r3P-eU-tEX" secondAttribute="bottom" constant="17" id="tWH-LK-QkS"/>
                             <constraint firstAttribute="trailing" secondItem="3900" secondAttribute="trailing" constant="20" id="tlF-b1-Tuz"/>
                         </constraints>
