@@ -39,6 +39,8 @@
 #import <vlc_common.h>
 #import <vlc_configuration.h>
 
+NSString * const VLCDisplayTrackNumberPlayQueueKey = @"VLCDisplayTrackNumberPlayQueueKey";
+
 @implementation VLCPlayQueueTableCellView
 
 - (void)dealloc
@@ -72,7 +74,6 @@
 
 - (void)updateColouredElements
 {
-
     self.audioMediaTypeIndicator.textColor = _representsCurrentPlayQueueItem ?
         NSColor.labelColor :
         NSColor.secondaryLabelColor;
@@ -98,7 +99,7 @@
     NSString *playTitle = item.title;
     if (validTitleString) {
         NSString * const trackNumberString = item.inputItem.trackNumber;
-        if (trackNumberString && trackNumberString.length > 0 && ![trackNumberString isEqualToString:@"0"]) {
+        if ([NSUserDefaults.standardUserDefaults boolForKey:VLCDisplayTrackNumberPlayQueueKey] && trackNumberString && trackNumberString.length > 0 && ![trackNumberString isEqualToString:@"0"]) {
             playTitle = [NSString stringWithFormat:@"%@ · %@", trackNumberString, item.inputItem.title];
         } else {
             playTitle = item.inputItem.title;

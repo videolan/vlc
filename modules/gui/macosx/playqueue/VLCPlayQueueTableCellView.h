@@ -27,6 +27,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCDisplayTrackNumberPlayQueueKey;
 
 @interface VLCPlayQueueTableCellView : NSTableCellView
 
