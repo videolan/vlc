@@ -70,6 +70,7 @@
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayerController.h"
 #import "playqueue/VLCPlayQueueModel.h"
+#import "playqueue/VLCPlayQueueTableCellView.h"
 #import "playqueue/VLCPlaybackContinuityController.h"
 
 #import "preferences/prefs.h"
@@ -346,6 +347,7 @@ static VLCMain *sharedInstance = nil;
     NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
     if ([defaults integerForKey:kVLCPreferencesVersion] != 4) {
         [defaults setBool:YES forKey:VLCPlaybackEndViewEnabledKey];
+        [defaults setBool:NO forKey:VLCDisplayTrackNumberPlayQueueKey];
         [self migrateOldPreferences];
     }
 
