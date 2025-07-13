@@ -283,6 +283,7 @@
     self.videoLibraryGroupsTableView.dataSource = self.libraryVideoDataSource;
     self.videoLibraryGroupsTableView.target = self.libraryVideoDataSource;
     self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+    self.videoLibraryGroupsTableViewScrollView.hidden = NO;
 
     self.videoLibraryGroupSelectionTableView.dataSource = self.libraryVideoDataSource;
     self.videoLibraryGroupSelectionTableView.target = self.libraryVideoDataSource;
@@ -311,6 +312,7 @@
     self.videoLibraryGroupsTableView.dataSource = self.libraryShowsDataSource;
     self.videoLibraryGroupsTableView.target = self.libraryShowsDataSource;
     self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+    self.videoLibraryGroupsTableViewScrollView.hidden = NO;
 
     self.videoLibraryGroupSelectionTableView.dataSource = self.libraryShowsDataSource;
     self.videoLibraryGroupSelectionTableView.target = self.libraryShowsDataSource;
@@ -341,9 +343,10 @@
     [self setupMoviesDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryMoviesDataSource;
 
-    self.videoLibraryGroupsTableView.dataSource = self.libraryMoviesDataSource;
-    self.videoLibraryGroupsTableView.target = self.libraryMoviesDataSource;
-    self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+    self.videoLibraryGroupsTableView.dataSource = nil;
+    self.videoLibraryGroupsTableView.target = nil;
+    self.videoLibraryGroupsTableView.delegate = nil;
+    self.videoLibraryGroupsTableViewScrollView.hidden = YES;
 
     self.videoLibraryGroupSelectionTableView.dataSource = self.libraryMoviesDataSource;
     self.videoLibraryGroupSelectionTableView.target = self.libraryMoviesDataSource;
