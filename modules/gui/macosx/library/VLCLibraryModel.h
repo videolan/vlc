@@ -105,6 +105,9 @@ extern NSString * const VLCLibraryModelDiscoveryFailed;
 @property (readonly) size_t numberOfShows;
 @property (readonly) NSArray <VLCMediaLibraryShow *> *listOfShows;
 
+@property (readonly) size_t numberOfMovies;
+@property (readonly) NSArray <VLCMediaLibraryMovie *> *listOfMovies;
+
 @property (readonly) size_t numberOfGroups;
 @property (readonly) NSArray <VLCMediaLibraryGroup *> *listOfGroups;
 
