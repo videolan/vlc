@@ -48,6 +48,7 @@
 #import "library/video-library/VLCLibraryShowsDataSource.h"
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
+#import "library/video-library/VLCLibraryMoviesDataSource.h"
 
 #import "main/VLCMain.h"
 
@@ -166,6 +167,15 @@
     self.libraryShowsDataSource.detailTableView = self.videoLibraryGroupSelectionTableView;
 }
 
+- (void)setupMoviesDataSource
+{
+    _libraryMoviesDataSource = [[VLCLibraryMoviesDataSource alloc] init];
+    self.libraryMoviesDataSource.libraryModel =
+        VLCMain.sharedInstance.libraryController.libraryModel;
+    self.libraryMoviesDataSource.tableView = self.videoLibraryGroupSelectionTableView;
+    self.libraryMoviesDataSource.collectionView = self.videoLibraryCollectionView;
+}
+
 - (void)setupCollectionView
 {
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
@@ -256,6 +266,8 @@
         return self.libraryVideoDataSource;
     } else if (librarySegmentType == VLCLibraryShowsVideoSubSegmentType) {
         return self.libraryShowsDataSource;
+    } else if (librarySegmentType == VLCLibraryMoviesVideoSubSegmentType) {
+        return self.libraryMoviesDataSource;
     } else {
         return nil;
     }
@@ -264,6 +276,7 @@
 - (void)updatePresentedVideoLibraryView
 {
     _libraryShowsDataSource = nil;
+    _libraryMoviesDataSource = nil;
     [self setupVideoDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
 
@@ -291,6 +304,7 @@
 - (void)updatePresentedShowsLibraryView
 {
     _libraryVideoDataSource = nil;
+    _libraryMoviesDataSource = nil;
     [self setupShowsDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryShowsDataSource;
 
@@ -318,6 +332,39 @@
 - (void)presentVideoView
 {
     [self updatePresentedVideoLibraryView];
+}
+
+- (void)updatePresentedMoviesLibraryView
+{
+    _libraryVideoDataSource = nil;
+    _libraryShowsDataSource = nil;
+    [self setupMoviesDataSource];
+    self.videoLibraryCollectionView.dataSource = self.libraryMoviesDataSource;
+
+    self.videoLibraryGroupsTableView.dataSource = self.libraryMoviesDataSource;
+    self.videoLibraryGroupsTableView.target = self.libraryMoviesDataSource;
+    self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+
+    self.videoLibraryGroupSelectionTableView.dataSource = self.libraryMoviesDataSource;
+    self.videoLibraryGroupSelectionTableView.target = self.libraryMoviesDataSource;
+    self.videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
+
+    [self.libraryMoviesDataSource reloadData];
+
+    const BOOL anyMovies = self.libraryMoviesDataSource.libraryModel.numberOfMovies > 0;
+    if (anyMovies) {
+        const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.moviesLibraryViewMode;
+        [self presentVideoLibraryView:viewModeSegment];
+    } else if (self.libraryMoviesDataSource.libraryModel.filterString.length > 0) {
+        [self.libraryWindow displayNoResultsMessage];
+    } else {
+        [self presentPlaceholderVideoLibraryView];
+    }
+}
+
+- (void)presentMoviesView
+{
+    [self updatePresentedMoviesLibraryView];
 }
 
 - (void)presentShowsView
@@ -365,6 +412,12 @@
          self.libraryWindow.videoViewController.view.hidden) {
 
          [self updatePresentedShowsLibraryView];
+     } else if (self.libraryWindow.librarySegmentType == VLCLibraryMoviesVideoSubSegmentType &&
+         ((model.numberOfMovies == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
+          (model.numberOfMovies > 0 && ![self.libraryTargetView.subviews containsObject:_videoLibraryView])) &&
+         self.libraryWindow.videoViewController.view.hidden) {
+
+         [self updatePresentedMoviesLibraryView];
      }
 }
 

@@ -29,6 +29,7 @@
 @class VLCLibraryWindow;
 @class VLCLibraryVideoDataSource;
 @class VLCLibraryShowsDataSource;
+@class VLCLibraryMoviesDataSource;
 
 @protocol VLCMediaLibraryItemProtocol;
 
@@ -48,10 +49,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly, nullable) VLCLibraryVideoDataSource *libraryVideoDataSource;
 @property (readonly, nullable) VLCLibraryShowsDataSource *libraryShowsDataSource;
+@property (readonly, nullable) VLCLibraryMoviesDataSource *libraryMoviesDataSource;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentVideoView;
 - (void)presentShowsView;
+- (void)presentMoviesView;
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
