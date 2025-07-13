@@ -481,6 +481,8 @@ enum vlc_ml_list_queries
     VLC_ML_COUNT_MEDIA,           /**< arg1 (out): size_t*                                                              */
     VLC_ML_LIST_VIDEOS,           /**< arg1 (out): vlc_ml_media_list_t**                                                */
     VLC_ML_COUNT_VIDEOS,          /**< arg1 (out): size_t*                                                              */
+    VLC_ML_LIST_MOVIES,           /**< arg1 (out): vlc_ml_media_list_t**                                                */
+    VLC_ML_COUNT_MOVIES,          /**< arg1 (out): size_t*                                                              */
     VLC_ML_LIST_AUDIOS,           /**< arg1 (out): vlc_ml_media_list_t**                                                */
     VLC_ML_COUNT_AUDIOS,          /**< arg1 (out): size_t*                                                              */
     VLC_ML_LIST_ALBUMS,           /**< arg1 (out): vlc_ml_album_list_t**                                                */
@@ -1659,6 +1661,24 @@ static inline vlc_ml_show_list_t* vlc_ml_list_shows( vlc_medialibrary_t* p_ml, c
     if ( vlc_ml_list( p_ml, VLC_ML_LIST_SHOWS, params, &res ) != VLC_SUCCESS )
         return NULL;
     return res;
+}
+
+static inline vlc_ml_media_list_t* vlc_ml_list_movies(vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params)
+{
+    vlc_assert(p_ml != NULL);
+    vlc_ml_media_list_t* res;
+    if (vlc_ml_list(p_ml, VLC_ML_LIST_MOVIES, params, &res) != VLC_SUCCESS)
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_movies(vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params)
+{
+    vlc_assert(p_ml != NULL);
+    size_t count;
+    if (vlc_ml_list(p_ml, VLC_ML_COUNT_MOVIES, params, &count) != VLC_SUCCESS)
+        return 0;
+    return count;
 }
 
 static inline size_t vlc_ml_count_shows( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )

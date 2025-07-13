@@ -1019,6 +1019,49 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             *va_arg( args, size_t* ) = query->count();
             break;
         }
+        case VLC_ML_LIST_MOVIES:
+        {
+            medialibrary::Query<medialibrary::IMedia> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchVideo( psz_pattern, paramsPtr );
+            else
+                query = m_ml->videoFiles( paramsPtr );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            // Filter for movies only
+            auto items = query->items(nbItems, offset);
+            items.erase(
+                std::remove_if(
+                    items.begin(),
+                    items.end(),
+                    [](const auto& item) {
+                        return item->subType() != medialibrary::IMedia::SubType::Movie;
+                    }),
+                items.end());
+            const auto res = ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(items);
+            *va_arg( args, vlc_ml_media_list_t**) = res;
+            break;
+        }
+        case VLC_ML_COUNT_MOVIES:
+        {
+            medialibrary::Query<medialibrary::IMedia> query;
+            if ( psz_pattern != nullptr )
+                query = m_ml->searchVideo( psz_pattern, paramsPtr );
+            else
+                query = m_ml->videoFiles( paramsPtr );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            // Filter for movies only
+            const auto items = query->items( 0, 0 );
+            const size_t count = std::count_if(
+                items.cbegin(),
+                items.cend(),
+                [](const auto& item) {
+                    return item->subType() == medialibrary::IMedia::SubType::Movie;
+                });
+            *va_arg( args, size_t* ) = count;
+            break;
+        }
         case VLC_ML_LIST_AUDIOS:
         {
             medialibrary::Query<medialibrary::IMedia> query;
