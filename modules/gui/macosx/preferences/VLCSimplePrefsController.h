@@ -112,7 +112,6 @@
 @property (readwrite, weak) IBOutlet NSPopUpButton *intf_languagePopup;
 @property (readwrite, weak) IBOutlet NSTextField *intf_languageLabel;
 @property (readwrite, weak) IBOutlet NSButton *intf_statusIconCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *intf_largeFontInListsCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_displayTrackNumberPlayQueueCheckBox;
 
 // intf pane - control box

@@ -68,7 +68,6 @@
                 <outlet property="intf_generalSettingsBox" destination="kup-aY-Wqq" id="RsL-yE-DVe"/>
                 <outlet property="intf_languageLabel" destination="3892" id="klM-r2-XKf"/>
                 <outlet property="intf_languagePopup" destination="3900" id="USp-A1-Aut"/>
-                <outlet property="intf_largeFontInListsCheckbox" destination="MeC-2c-kJf" id="2mk-ld-N5A"/>
                 <outlet property="intf_last_updateLabel" destination="3560" id="9TG-0W-rqH"/>
                 <outlet property="intf_luahttpBox" destination="drh-ot-Vyn" id="YKi-8n-s8a"/>
                 <outlet property="intf_luahttppwdLabel" destination="3875" id="zl0-da-lHe"/>
@@ -327,16 +326,6 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="Ys3-K6-647"/>
                                 </connections>
                             </button>
-                            <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MeC-2c-kJf">
-                                <rect key="frame" x="15" y="16" width="190" height="18"/>
-                                <buttonCell key="cell" type="check" title="Use large text for list views" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="QEl-8k-Hyj">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="interfaceSettingChanged:" target="-2" id="NdO-a5-vue"/>
-                                </connections>
-                            </button>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QZ2-zA-u6A">
                                 <rect key="frame" x="15" y="16" width="286" height="18"/>
                                 <buttonCell key="cell" type="check" title="Display album track numbers in play queue" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="I5V-9N-WTo">
@@ -351,15 +340,13 @@ Gw
                         <constraints>
                             <constraint firstItem="r3P-eU-tEX" firstAttribute="top" secondItem="3892" secondAttribute="bottom" constant="17" id="0lq-Ud-BSO"/>
                             <constraint firstItem="QZ2-zA-u6A" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="3tY-4q-xya"/>
+                            <constraint firstItem="QZ2-zA-u6A" firstAttribute="top" secondItem="r3P-eU-tEX" secondAttribute="bottom" constant="17" id="5yS-8U-8HV"/>
                             <constraint firstItem="3892" firstAttribute="centerY" secondItem="3900" secondAttribute="centerY" id="I4b-x2-YzY"/>
-                            <constraint firstItem="MeC-2c-kJf" firstAttribute="leading" secondItem="r3P-eU-tEX" secondAttribute="leading" id="Oki-bv-W2C"/>
                             <constraint firstItem="3892" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="top" constant="12" id="QjC-Pr-bJB"/>
                             <constraint firstItem="3892" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="SZk-gE-9Fb"/>
                             <constraint firstAttribute="bottom" secondItem="QZ2-zA-u6A" secondAttribute="bottom" constant="17" id="TXr-OU-qeV"/>
                             <constraint firstItem="r3P-eU-tEX" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="g2X-29-Ah0"/>
                             <constraint firstItem="3900" firstAttribute="leading" secondItem="3892" secondAttribute="trailing" constant="17" id="h9A-kZ-JjD"/>
-                            <constraint firstItem="QZ2-zA-u6A" firstAttribute="top" secondItem="MeC-2c-kJf" secondAttribute="bottom" constant="17" id="qJf-W5-E9J"/>
-                            <constraint firstItem="MeC-2c-kJf" firstAttribute="top" secondItem="r3P-eU-tEX" secondAttribute="bottom" constant="17" id="tWH-LK-QkS"/>
                             <constraint firstAttribute="trailing" secondItem="3900" secondAttribute="trailing" constant="20" id="tlF-b1-Tuz"/>
                         </constraints>
                     </view>

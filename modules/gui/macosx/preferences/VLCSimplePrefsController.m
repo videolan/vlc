@@ -404,7 +404,6 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_intf_continueplaybackLabel setStringValue:_NS("Continue playback")];
     [_intf_displayEndOfPlaybackViewCheckBox setTitle:_NS("Display end of playback view")];
     [_intf_statusIconCheckbox setTitle: _NS("Display VLC status menu icon")];
-    [_intf_largeFontInListsCheckbox setTitle: _NS("Use large text for list views")];
     [_intf_displayTrackNumberPlayQueueCheckBox setTitle: _NS("Display album track numbers in play queue")];
 
     [_intf_playbackBehaviourBox setTitle:_NS("Playback behaviour")];
