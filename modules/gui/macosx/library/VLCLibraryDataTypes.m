@@ -263,20 +263,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @end
 
-@implementation VLCMediaLibraryMovie
-
-- (instancetype)initWithMovie:(struct vlc_ml_movie_t *)p_movie
-{
-    self = [super init];
-    if (self && p_movie != NULL) {
-        _summary = toNSStr(p_movie->psz_summary);
-        _imdbID = toNSStr(p_movie->psz_imdb_id);
-    }
-    return self;
-}
-
-@end
-
 @implementation VLCMediaLibraryShowEpisode
 
 - (instancetype)initWithShowEpisode:(struct vlc_ml_show_episode_t *)p_showEpisode
@@ -1079,7 +1065,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
         switch (p_mediaItem->i_subtype) {
             case VLC_ML_MEDIA_SUBTYPE_MOVIE:
-                _movie = [[VLCMediaLibraryMovie alloc] initWithMovie:&p_mediaItem->movie];
+                _movie = [[VLCMediaLibraryMovie alloc] initWithMediaItem:p_mediaItem];
                 break;
 
             case VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE:
@@ -1630,6 +1616,48 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 - (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
     return self.episodes;
+}
+
+@end
+
+@implementation VLCMediaLibraryMovie
+
+- (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)p_media
+{
+    self = [super init];
+    if (self && p_media != NULL) {
+        // Set up abstract item properties
+        self.libraryID = p_media->i_id;
+        self.smallArtworkGenerated = p_media->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_media->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+        self.displayString = p_media->psz_title ? toNSStr(p_media->psz_title) : @"";
+        self.primaryDetailString = self.displayString;
+        self.secondaryDetailString = @"";
+        self.durationString = [NSString stringWithTime:p_media->i_duration / VLCMediaLibraryMediaItemDurationDenominator];
+
+        // Movie-specific
+        _summary = toNSStr(p_media->movie.psz_summary);
+        _imdbID = toNSStr(p_media->movie.psz_imdb_id);
+    }
+    return self;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    VLCMediaLibraryMediaItem *item = [VLCMediaLibraryMediaItem mediaItemForLibraryID:self.libraryID];
+    return item ? @[item] : @[];
+}
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    return self.mediaItems.firstObject;
+}
+
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
+{
+    for (VLCMediaLibraryMediaItem *item in self.mediaItems) {
+        mediaItemBlock(item);
+    }
 }
 
 @end

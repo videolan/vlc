@@ -689,7 +689,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             vlc_ml_media_t * const p_vlc_media = &p_movie_list->p_items[x];
             // Defensive: only add if subtype is MOVIE
             if (p_vlc_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_MOVIE) {
-                VLCMediaLibraryMovie * const movie = [[VLCMediaLibraryMovie alloc] initWithMovie:&p_vlc_media->movie];
+                VLCMediaLibraryMovie * const movie = [[VLCMediaLibraryMovie alloc] initWithMediaItem:p_vlc_media];
                 if (movie) {
                     [mutableArray addObject:movie];
                 }

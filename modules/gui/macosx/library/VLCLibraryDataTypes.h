@@ -97,15 +97,6 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @end
 
-@interface VLCMediaLibraryMovie : NSObject
-
-- (instancetype)initWithMovie:(struct vlc_ml_movie_t *)p_movie;
-
-@property (readonly) NSString *summary;
-@property (readonly) NSString *imdbID;
-
-@end
-
 @interface VLCMediaLibraryShowEpisode : NSObject
 
 - (instancetype)initWithShowEpisode:(struct vlc_ml_show_episode_t *)p_showEpisode;
@@ -116,8 +107,6 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) uint32_t seasonNumber;
 
 @end
-
-#pragma mark - Media library classes
 
 @protocol VLCLocallyManipulableItemProtocol <NSObject>
 
@@ -154,6 +143,12 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @end
 
+// Base abstract class with common implementations of properties used by media library items.
+// Do not use directly -- subclass to create new media library item types.
+@interface VLCAbstractMediaLibraryItem : NSObject<VLCMediaLibraryItemProtocol>
+
+@end
+
 // Extended VLCMediaLibraryItemProtocol that includes additional properties for media library item
 // audio groups (i.e. artists, genres, etc.)
 @protocol VLCMediaLibraryAudioGroupProtocol <VLCMediaLibraryItemProtocol>
@@ -168,17 +163,13 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @end
 
-// Base abstract class with common implementations of properties used by media library items.
-// Do not use directly -- subclass to create new media library item types.
-@interface VLCAbstractMediaLibraryItem : NSObject<VLCMediaLibraryItemProtocol>
-
-@end
-
 // Like VLCAbstractMediaLibraryItem but with some additional functionality for audio groupings
 // such as artists and genres. Do not use directly, subclass instead.
 @interface VLCAbstractMediaLibraryAudioGroup : VLCAbstractMediaLibraryItem<VLCMediaLibraryAudioGroupProtocol>
 
 @end
+
+#pragma mark - Media library classes
 
 @interface VLCMediaLibraryArtist : VLCAbstractMediaLibraryAudioGroup<VLCMediaLibraryAudioGroupProtocol>
 
@@ -228,6 +219,15 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) uint32_t episodeCount;
 @property (readonly) uint32_t seasonCount;
 @property (readonly) NSArray<VLCMediaLibraryMediaItem *> *episodes;
+
+@end
+
+@interface VLCMediaLibraryMovie : VLCAbstractMediaLibraryItem <VLCMediaLibraryItemProtocol>
+
+- (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)p_media;
+
+@property (readonly) NSString *summary;
+@property (readonly) NSString *imdbID;
 
 @end
 
