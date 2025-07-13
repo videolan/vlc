@@ -37,6 +37,7 @@ typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
     VLCLibraryHeaderSegmentType,
     VLCLibraryVideoSegmentType,
     VLCLibraryShowsVideoSubSegmentType,
+    VLCLibraryMoviesVideoSubSegmentType,
     VLCLibraryMusicSegmentType,
     VLCLibraryArtistsMusicSubSegmentType,
     VLCLibraryAlbumsMusicSubSegmentType,
