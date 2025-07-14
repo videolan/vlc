@@ -1809,6 +1809,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
         p_object = [menuContent vlcObject];
         var_Set(p_object, [menuContent variableName], [menuContent variableValue]);
+
+        if ([menuContent objectType] == VLCObjectTypeAout) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self rebuildAoutMenu];
+            });
+        }
     }
 }
 
