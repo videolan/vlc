@@ -43,6 +43,7 @@
 #include <medialibrary/IBookmark.h>
 #include <medialibrary/IFolder.h>
 
+#include <algorithm>
 #include <sstream>
 #include <initializer_list>
 
