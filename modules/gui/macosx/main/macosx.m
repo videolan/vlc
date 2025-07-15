@@ -107,8 +107,6 @@ int  WindowOpen   (vlc_window_t *);
 #define ITUNES_TEXT N_("Control external music players")
 #define ITUNES_LONGTEXT N_("VLC will pause and resume supported music players on playback.")
 
-#define LARGE_LISTFONT_TEXT N_("Use large text for list views")
-
 static const int itunes_list[] =
     { 0, 1, 2 };
 static const char *const itunes_list_text[] = {
@@ -139,6 +137,7 @@ vlc_module_begin()
         add_bool("macosx-statusicon", true, DISPLAY_STATUS_ICONMENU_TEXT, DISPLAY_STATUS_ICONMENU_LONGTEXT)
         add_bool("macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT)
         add_integer_with_range("macosx-max-volume", 125, 60, 200, VOLUME_MAX_TEXT, NULL)
+        add_obsolete_bool("macosx-large-text")  /* since 4.0.0 */
 
     set_section(N_("Behavior"), 0)
         add_bool("macosx-autoplay", true, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT)
