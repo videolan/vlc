@@ -283,11 +283,13 @@ FocusScope {
                         colorSet: ColorContext.View
                     }
 
-                    Widgets.BlurEffect {
+                    Widgets.DualKawaseBlur {
                         id: blurredBackground
 
-                        radius: 64
+                        radius: 3
 
+                        // TODO: Disable `live`, consider asynchronous loading.
+                        
                         //destination aspect ratio
                         readonly property real dar: parent.width / parent.height
 
@@ -298,23 +300,15 @@ FocusScope {
                         source: textureProviderItem
 
                         Widgets.TextureProviderItem {
-                            // Texture indirection to fool Qt into not creating an implicit
-                            // ShaderEffectSource because source image does not have fill mode
-                            // stretch. "If needed, MultiEffect will internally generate a
-                            // ShaderEffectSource as the texture source.": Qt creates a layer
-                            // if source has children, source is image and does not have
-                            // fill mode stretch or source size is null. In this case,
-                            // we really don't need Qt to create an implicit layer.
-
-                            // Note that this item does not create a new texture, it simply
-                            // represents the source image provider.
                             id: textureProviderItem
 
-                            // Do not set textureSubRect, because we don't want blur to be
-                            // updated everytime the viewport changes. It is better to have
-                            // the static source texture blurred once, and adjust the blur
-                            // than to blur each time the viewport changes.
-
+                            // This should not be necessary anymore since `DualKawaseBlur`
+                            // does not create layer for the source implicitly as `MultiEffect`
+                            // or `FastBlur` does as they deem necessary (in this case, it
+                            // is not necessary). But due to a Qt bug when `mipmap: true` is
+                            // used where texture sampling becomes broken, we need this as
+                            // `QSGTextureView` has a workaround for that bug. This is totally
+                            // acceptable as there is virtually no overhead.
                             source: cover
                         }
 
