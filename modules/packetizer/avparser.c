@@ -92,7 +92,7 @@ int avparser_OpenPacketizer( vlc_object_t *p_this )
      * removing this constraint */
     if( p_dec->fmt_in->i_codec != VLC_CODEC_VP9 )
         return VLC_ENOTSUP;
-    if( p_dec->fmt_in->i_level != 0 && p_dec->fmt_in->i_level != -1 ) // contains alpha extradata
+    if( (p_dec->fmt_in->i_level & 0x1000) != 0 ) // contains alpha extradata
         return VLC_ENOTSUP;
 
     enum AVCodecID i_avcodec_id;
