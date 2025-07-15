@@ -24,6 +24,7 @@
 #include "Time.hpp"
 #include "playlist/CodecDescription.hpp"
 #include "playlist/Role.hpp"
+#include "tools/Macros.hpp"
 
 #include <vlc_common.h>
 #include <list>
@@ -58,6 +59,8 @@ namespace adaptive
 
     class TrackerEvent
     {
+        PREREQ_VIRTUAL(TrackerEvent);
+
         public:
             enum class Type
             {
@@ -190,9 +193,10 @@ namespace adaptive
 
     class SegmentTrackerListenerInterface
     {
+        PREREQ_INTERFACE(SegmentTrackerListenerInterface);
+
         public:
             virtual void trackerEvent(const TrackerEvent &) = 0;
-            virtual ~SegmentTrackerListenerInterface() = default;
     };
 
     class SegmentTracker

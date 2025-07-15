@@ -31,6 +31,7 @@
 #include "BytesRange.hpp"
 #include "ConnectionParams.hpp"
 #include "../ID.hpp"
+#include "../tools/Macros.hpp"
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
@@ -55,8 +56,9 @@ namespace adaptive
 
         class ChunkInterface
         {
+            PREREQ_INTERFACE(ChunkInterface);
+
             public:
-                virtual ~ChunkInterface() {}
                 virtual const std::string & getContentType  () const = 0;
                 virtual RequestStatus getRequestStatus() const = 0;
 
@@ -71,6 +73,7 @@ namespace adaptive
         class AbstractChunkSource : public ChunkInterface
         {
             friend class AbstractConnectionManager;
+            PREREQ_VIRTUAL(AbstractChunkSource);
 
             public:
                 const BytesRange &  getBytesRange   () const;
@@ -92,6 +95,8 @@ namespace adaptive
 
         class AbstractChunk : public ChunkInterface
         {
+            PREREQ_VIRTUAL(AbstractChunk);
+
             public:
                 virtual ~AbstractChunk();
 

@@ -55,9 +55,12 @@ namespace adaptive
                            public SegmentTrackerListenerInterface,
                            public DemuxerFactoryInterface
     {
+        PREREQ_VIRTUAL(AbstractStream);
+
     public:
         AbstractStream(demux_t *);
         virtual ~AbstractStream();
+
         bool init(const StreamFormat &, SegmentTracker *);
 
         void setLanguage(const std::string &);

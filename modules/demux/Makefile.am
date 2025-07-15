@@ -415,6 +415,7 @@ libvlc_adaptive_la_SOURCES = \
     demux/adaptive/tools/FormatNamespace.hpp \
     demux/adaptive/tools/Helper.cpp \
     demux/adaptive/tools/Helper.h \
+    demux/adaptive/tools/Macros.hpp \
     demux/adaptive/tools/MovingAverage.hpp \
     demux/adaptive/tools/Properties.hpp \
     demux/adaptive/tools/Retrieve.cpp \

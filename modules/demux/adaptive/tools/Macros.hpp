@@ -1,11 +1,7 @@
 /*
- * IDownloadRateObserver.h
+ * Macros.hpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2025 VideoLabs, VideoLAN and VLC Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,27 +17,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef MACROS_HPP
+#define MACROS_HPP
 
-#ifndef IDOWNLOADRATEOBSERVER_H_
-#define IDOWNLOADRATEOBSERVER_H_
+#define PREREQ_COPYMOVEASSIGN(classname, op)\
+public:\
+    classname(classname&&) = op;\
+    classname(const classname&) = op;\
+    classname& operator=(classname&&) = op;\
+    classname& operator=(const classname&) = op
 
-#include "../tools/Macros.hpp"
+#define PREREQ_VIRTUAL(classname)\
+    PREREQ_COPYMOVEASSIGN(classname, delete)
 
-#include <vlc_common.h>
-#include <vlc_tick.h>
+#define PREREQ_INTERFACE(classname)\
+public:\
+    classname() = default;\
+    virtual ~classname() = default;\
+    PREREQ_COPYMOVEASSIGN(classname, default)
 
-namespace adaptive
-{
-    class ID;
-
-    class IDownloadRateObserver
-    {
-        PREREQ_INTERFACE(IDownloadRateObserver);
-
-        public:
-            virtual void updateDownloadRate(const ID &, size_t,
-                                            vlc_tick_t, vlc_tick_t) = 0;
-    };
-}
-
-#endif /* IDOWNLOADRATEOBSERVER_H_ */
+#endif // MACROS_HPP

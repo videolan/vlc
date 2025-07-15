@@ -21,6 +21,7 @@
 #define CODECDESCRIPTION_HPP
 
 #include "../tools/Properties.hpp"
+#include "../tools/Macros.hpp"
 #include <vlc_es.h>
 #include <string>
 #include <list>
@@ -31,11 +32,11 @@ namespace adaptive
     {
         class CodecDescription
         {
+            PREREQ_VIRTUAL(CodecDescription);
+
             public:
                 CodecDescription();
                 CodecDescription(const std::string &);
-                CodecDescription(const CodecDescription &) = delete;
-                void operator=(const CodecDescription&) = delete;
                 virtual ~CodecDescription();
                 const es_format_t *getFmt() const;
                 void setDimensions(unsigned, unsigned);

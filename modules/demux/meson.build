@@ -635,6 +635,7 @@ vlc_modules += {
         'adaptive/tools/FormatNamespace.hpp',
         'adaptive/tools/Helper.cpp',
         'adaptive/tools/Helper.h',
+        'adaptive/tools/Macros.hpp',
         'adaptive/tools/MovingAverage.hpp',
         'adaptive/tools/Properties.hpp',
         'adaptive/tools/Retrieve.cpp',

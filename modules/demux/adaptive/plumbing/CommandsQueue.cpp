@@ -48,11 +48,6 @@ AbstractCommand::AbstractCommand( int type_ )
     type = type_;
 }
 
-AbstractCommand::~AbstractCommand()
-{
-
-}
-
 const Times & AbstractCommand::getTimes() const
 {
     return times;

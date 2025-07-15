@@ -20,6 +20,8 @@
 #ifndef SOURCESTREAM_HPP
 #define SOURCESTREAM_HPP
 
+#include "../tools/Macros.hpp"
+
 #include <vlc_common.h>
 #include <vlc_block_helper.h>
 
@@ -29,8 +31,9 @@ namespace adaptive
 
     class AbstractSourceStream
     {
+        PREREQ_INTERFACE(AbstractSourceStream);
+
         public:
-            virtual ~AbstractSourceStream() {}
             virtual stream_t *makeStream() = 0;
             virtual void Reset() = 0;
             virtual size_t Peek(const uint8_t **, size_t) = 0;
@@ -38,6 +41,8 @@ namespace adaptive
 
     class AbstractChunksSourceStream : public AbstractSourceStream
     {
+        PREREQ_VIRTUAL(AbstractChunksSourceStream);
+
         public:
             AbstractChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~AbstractChunksSourceStream();

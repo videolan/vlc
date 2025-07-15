@@ -52,6 +52,9 @@ namespace adaptive
             public:
                 AbstractConnectionManager(vlc_object_t *);
                 ~AbstractConnectionManager();
+                AbstractConnectionManager(AbstractConnectionManager&&) = delete;
+                AbstractConnectionManager& operator=(const AbstractConnectionManager&) = delete;
+                AbstractConnectionManager& operator=(AbstractConnectionManager&&) = delete;
                 virtual void    closeAllConnections () = 0;
                 virtual AbstractConnection * getConnection(ConnectionParams &) = 0;
                 virtual AbstractChunkSource *makeSource(const std::string &,

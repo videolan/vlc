@@ -34,6 +34,8 @@ namespace adaptive
                                         public Indexable<IndexSegment>,
                                         public AttrsNode
         {
+            PREREQ_VIRTUAL(AbstractSegmentBaseType);
+
             public:
                 AbstractSegmentBaseType( SegmentInformation *, AttrsNode::Type );
                 virtual ~AbstractSegmentBaseType();

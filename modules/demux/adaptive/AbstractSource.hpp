@@ -21,13 +21,15 @@
 #define ABSTRACTSOURCE_HPP
 
 #include <vlc_common.h>
+#include "tools/Macros.hpp"
 
 namespace adaptive
 {
     class AbstractSource
     {
+        PREREQ_INTERFACE(AbstractSource);
+
         public:
-            virtual ~AbstractSource() {}
             virtual block_t *readNextBlock() = 0;
     };
 }

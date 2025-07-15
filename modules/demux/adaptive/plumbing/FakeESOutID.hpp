@@ -21,6 +21,7 @@
 #define FAKEESOUTID_HPP
 
 #include "../ID.hpp"
+#include "../tools/Macros.hpp"
 
 #include <vlc_common.h>
 #include <vlc_es.h>
@@ -38,8 +39,9 @@ namespace adaptive
 
     class AbstractFakeESOutID
     {
+        PREREQ_INTERFACE(AbstractFakeESOutID);
+
         public:
-            virtual ~AbstractFakeESOutID() = default;
             virtual es_out_id_t * realESID() const = 0;
             virtual void create() = 0;
             virtual void release() = 0;
@@ -49,6 +51,8 @@ namespace adaptive
 
     class FakeESOutID : public AbstractFakeESOutID
     {
+        PREREQ_VIRTUAL(FakeESOutID);
+
         public:
             FakeESOutID( FakeESOut *, const es_format_t * );
             FakeESOutID( FakeESOut *, const es_format_t *, const SrcID & );

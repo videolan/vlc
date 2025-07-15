@@ -22,6 +22,7 @@
 
 #include "FakeESOutID.hpp"
 #include "../Time.hpp"
+#include "../tools/Macros.hpp"
 
 #include <vlc_common.h>
 #include <vlc_es.h>
@@ -36,8 +37,11 @@ namespace adaptive
     class AbstractCommand
     {
         friend class CommandsFactory;
+        PREREQ_VIRTUAL(AbstractCommand);
+
         public:
-            virtual ~AbstractCommand();
+            AbstractCommand() = delete;
+            virtual ~AbstractCommand() = default;
             virtual void Execute( ) = 0;
             virtual const Times & getTimes() const;
             int getType() const;
@@ -181,6 +185,8 @@ namespace adaptive
 
     class AbstractCommandsQueue
     {
+        PREREQ_VIRTUAL(AbstractCommandsQueue);
+
         public:
             AbstractCommandsQueue();
             virtual ~AbstractCommandsQueue() = default;

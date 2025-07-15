@@ -45,6 +45,9 @@ namespace adaptive
             public:
                 AbstractConnection(vlc_object_t *);
                 virtual ~AbstractConnection();
+                AbstractConnection(AbstractConnection&&) = delete;
+                AbstractConnection& operator=(const AbstractConnection&) = delete;
+                AbstractConnection& operator=(AbstractConnection&&) = delete;
 
                 virtual bool    prepare     (const ConnectionParams &);
                 virtual bool    canReuse     (const ConnectionParams &) const = 0;

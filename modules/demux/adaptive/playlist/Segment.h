@@ -49,9 +49,12 @@ namespace adaptive
 
         class ISegment : public ICanonicalUrl
         {
+            PREREQ_VIRTUAL(ISegment);
+
             public:
                 ISegment(const ICanonicalUrl *parent);
                 virtual ~ISegment();
+
                 /**
                  *  @return true if the segment should be dropped after being read.
                  *          That is basically true when using an Url, and false

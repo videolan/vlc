@@ -22,6 +22,7 @@
 
 #include <vlc_common.h>
 #include <list>
+#include "../tools/Macros.hpp"
 #include "../Time.hpp"
 #include "../ID.hpp"
 #include <vlc_threads.h>
@@ -30,9 +31,10 @@ namespace adaptive
 {
     class ExtraFMTInfoInterface
     {
+        PREREQ_INTERFACE(ExtraFMTInfoInterface);
+
         public:
             virtual void fillExtraFMTInfo( es_format_t * ) const = 0;
-            virtual ~ExtraFMTInfoInterface() = default;
     };
 
     class AbstractCommandsQueue;
@@ -43,6 +45,8 @@ namespace adaptive
     class AbstractFakeEsOut
     {
         friend class EsOutCallbacks;
+        PREREQ_VIRTUAL(AbstractFakeEsOut);
+
         public:
             AbstractFakeEsOut();
             virtual ~AbstractFakeEsOut();

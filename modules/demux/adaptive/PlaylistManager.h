@@ -23,6 +23,7 @@
 #define PLAYLISTMANAGER_H_
 
 #include "logic/AbstractAdaptationLogic.h"
+#include "tools/Macros.hpp"
 #include "Streams.hpp"
 #include <vector>
 
@@ -49,6 +50,8 @@ namespace adaptive
 
     class PlaylistManager
     {
+        PREREQ_VIRTUAL(PlaylistManager);
+
         public:
             PlaylistManager( demux_t *,
                              SharedResources *,

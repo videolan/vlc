@@ -20,6 +20,8 @@
 #ifndef DEMUXER_HPP
 #define DEMUXER_HPP
 
+#include "../tools/Macros.hpp"
+
 #include <vlc_common.h>
 #include <vlc_tick.h>
 #include <string>
@@ -32,6 +34,8 @@ namespace adaptive
 
     class AbstractDemuxer
     {
+        PREREQ_VIRTUAL(AbstractDemuxer);
+
         public:
             enum class Status
             {
@@ -93,10 +97,11 @@ namespace adaptive
 
     class DemuxerFactoryInterface
     {
+        PREREQ_INTERFACE(DemuxerFactoryInterface);
+
         public:
             virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
                                                es_out_t *, AbstractSourceStream *) const = 0;
-            virtual ~DemuxerFactoryInterface() = default;
     };
 }
 

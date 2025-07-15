@@ -24,6 +24,7 @@
 #include <limits>
 #include <stdint.h>
 #include "../Time.hpp"
+#include "../tools/Macros.hpp"
 
 namespace adaptive
 {
@@ -37,6 +38,8 @@ namespace adaptive
 
         class AbstractAttr
         {
+            PREREQ_VIRTUAL(AbstractAttr);
+
             public:
                 enum class Type
                 {
@@ -55,8 +58,6 @@ namespace adaptive
                 };
                 AbstractAttr(enum Type);
                 virtual ~AbstractAttr();
-                AbstractAttr(const AbstractAttr &) = delete;
-                AbstractAttr & operator=(const AbstractAttr &) = delete;
                 Type getType() const;
                 bool operator ==(const AbstractAttr &t) const { return type == t.getType(); }
                 bool operator !=(const AbstractAttr &t) const { return type != t.getType(); }

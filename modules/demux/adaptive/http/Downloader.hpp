@@ -38,6 +38,9 @@ namespace adaptive
             public:
                 Downloader();
                 ~Downloader();
+                Downloader(Downloader&&) = delete;
+                Downloader& operator=(const Downloader&) = delete;
+                Downloader& operator=(Downloader&&) = delete;
                 bool start();
                 void schedule(HTTPChunkBufferedSource *);
                 void cancel(HTTPChunkBufferedSource *);
