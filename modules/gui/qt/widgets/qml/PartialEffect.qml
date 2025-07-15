@@ -98,13 +98,10 @@ Item {
 
         property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
-        Binding on textureSubRect {
-            delayed: true
-            value: Qt.rect(effectRect.x * textureProviderItem.eDPR,
-                           effectRect.y * textureProviderItem.eDPR,
-                           effectRect.width * textureProviderItem.eDPR,
-                           effectRect.height * textureProviderItem.eDPR)
-        }
+        textureSubRect: Qt.rect(effectRect.x * textureProviderItem.eDPR,
+                                effectRect.y * textureProviderItem.eDPR,
+                                effectRect.width * textureProviderItem.eDPR,
+                                effectRect.height * textureProviderItem.eDPR)
 
         onDprChanged: {
             eDPR = MainCtx.effectiveDevicePixelRatio(Window.window)
