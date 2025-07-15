@@ -1310,13 +1310,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/RoundedRectangleShadow.qml \
 	widgets/qml/VoronoiSnow.qml \
 	widgets/qml/DualKawaseBlur.qml
-if HAVE_QT65
-libqml_module_widgets_a_QML += \
-	widgets/qml/BlurEffect.qml
-else
-libqml_module_widgets_a_QML += \
-	widgets/qml/compat/BlurEffect.qml
-endif
 nodist_libqml_module_widgets_a_SOURCES = widgets_qmlassets.cpp
 $(libqml_module_widgets_a_QML:.qml=.cpp) : $(builddir)/widgets/res.qrc
 $(libqml_module_widgets_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/widgets/res.qrc
