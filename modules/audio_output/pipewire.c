@@ -895,6 +895,7 @@ static int Open(vlc_object_t *obj)
     sys->initial.volume = NAN;
     sys->initial.mute = -1;
     sys->nodes = NULL;
+    sys->stream = NULL;
 
     aout->sys = sys;
     aout->start = Start;
