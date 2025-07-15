@@ -53,7 +53,7 @@ Dialog {
     }
 
     Overlay.modal: Item {
-        Widgets.BlurEffect {
+        Widgets.DualKawaseBlur {
             anchors.fill: parent
             anchors.topMargin: MainCtx.windowExtendedMargin
             anchors.leftMargin: MainCtx.windowExtendedMargin
@@ -65,7 +65,7 @@ Dialog {
                 live: true
                 hideSource: true
             }
-            radius: 12
+            radius: 3
         }
     }
 
