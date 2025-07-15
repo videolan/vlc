@@ -23,6 +23,8 @@ shader_sources = [
     'RoundedRectangleShadow.frag',
     'RoundedRectangleShadow_hollow.frag',
     'VoronoiSnow.frag',
+    'DualKawaseBlur_downsample.frag',
+    'DualKawaseBlur_upsample.frag',
 ]
 
 shader_files = files(shader_sources)

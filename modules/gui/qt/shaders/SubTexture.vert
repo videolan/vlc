@@ -24,10 +24,13 @@ layout(location = 0) out vec2 qt_TexCoord0;
 layout(std140, binding = 0) uniform buf {
     mat4 qt_Matrix;
     float qt_Opacity;
+
     vec4 normalRect;
 };
 
 void main() {
+    // TODO: With GLSL 1.30, we can use `textureSize()` and normalize the coordinate here,
+    //       rather than asking an already normalized rectangle.
     qt_TexCoord0 = normalRect.xy + normalRect.zw * qt_MultiTexCoord0;
     gl_Position = qt_Matrix * qt_Vertex;
 }

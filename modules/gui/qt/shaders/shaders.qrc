@@ -17,5 +17,7 @@
         <file alias="RoundedRectangleShadow.frag.qsb">RoundedRectangleShadow.frag.qsb</file>
         <file alias="RoundedRectangleShadow_hollow.frag.qsb">RoundedRectangleShadow_hollow.frag.qsb</file>
         <file alias="VoronoiSnow.frag.qsb">VoronoiSnow.frag.qsb</file>
+        <file alias="DualKawaseBlur_upsample.frag.qsb">DualKawaseBlur_upsample.frag.qsb</file>
+        <file alias="DualKawaseBlur_downsample.frag.qsb">DualKawaseBlur_downsample.frag.qsb</file>
     </qresource>
 </RCC>
