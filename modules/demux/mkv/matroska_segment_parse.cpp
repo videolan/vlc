@@ -1816,6 +1816,8 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("V_VP9") {
             vars.p_fmt->i_codec = VLC_CODEC_VP9;
+            if (vars.p_tk->b_has_alpha)
+                vars.p_fmt->i_level = 0x1000; // mark as containing alpha data
             vars.p_tk->b_pts_only = true;
 
             fill_extra_data( vars.p_tk, 0 );
@@ -1833,8 +1835,12 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                                 vars.p_fmt->i_profile = VP9CodecFeatures[2];
                             break;
                         case 2: // Level
-                            if (length == 1)
-                                vars.p_fmt->i_level = VP9CodecFeatures[2];
+                            if (length == 1) {
+                                if ((vars.p_fmt->i_level & 0x1000) != 0)
+                                    vars.p_fmt->i_level |= VP9CodecFeatures[2];
+                                else
+                                    vars.p_fmt->i_level = VP9CodecFeatures[2];
+                            }
                             break;
                         case 3: // Bit Depth
                         case 4: // Chroma Subsampling
@@ -1845,8 +1851,6 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     remain -= 1 + 1 + length;
                 }
             }
-            if (vars.p_tk->b_has_alpha)
-                vars.p_fmt->i_level = 0x1000; // mark as containing alpha data
         }
         S_CASE("V_AV1") {
             vars.p_fmt->i_codec = VLC_CODEC_AV1;
