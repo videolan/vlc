@@ -428,9 +428,5 @@ void MainUI::registerQMLTypes()
     // Dummy QtQuick.Effects module
     qmlRegisterModule("QtQuick.Effects", 0, 0);
     // Do not protect, types can still be registered.
-#else
-    // Dummy Qt5Compat.GraphicalEffects module
-    qmlRegisterModule("Qt5Compat.GraphicalEffects", 0, 0);
-    // Do not protect, types can still be registered.
 #endif
 }

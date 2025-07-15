@@ -873,12 +873,6 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( multieffect_shaders20 );
     Q_INIT_RESOURCE( multieffect_shaders21 );
     Q_INIT_RESOURCE( multieffect_shaders24 );
-#else
-    Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects );
-    Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects_private );
-    Q_INIT_RESOURCE( qtgraphicaleffectsplugin_raw_qml_0 );
-    Q_INIT_RESOURCE( qtgraphicaleffectsprivate_raw_qml_0 );
-    Q_INIT_RESOURCE( qtgraphicaleffectsshaders );
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)

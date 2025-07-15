@@ -26,8 +26,6 @@ import QtQuick.Templates
 import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Effects // Unconditionally available, dummy if Qt version is less than 6.5.0
-import Qt5Compat.GraphicalEffects // Unconditionally available, dummy if Qt version is equal to or greater than 6.5.0
-
 
 import VLC.MainInterface
 import VLC.Widgets as Widgets
