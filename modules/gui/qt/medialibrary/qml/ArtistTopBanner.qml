@@ -62,17 +62,8 @@ FocusScope {
         sourceSize: artist.cover ? Qt.size(Helpers.alignUp(Screen.desktopAvailableWidth, 32), 0)
                                  : undefined
         mipmap: !!artist.cover
-        // Fill mode is stretch when blur effect is used, otherwise an implicit layer is created.
-        // Having the fill mode stretch does not have a side effect here, because source size
-        // is still calculated as to preserve the aspect ratio as height is left empty (0) and the
-        // image is not shown stretched because it is invisible when blur effect is used:
-        // "If only one dimension of the size is set to greater than 0, the other dimension is
-        //  set in proportion to preserve the source image's aspect ratio. (The fillMode is
-        //  independent of this.)". Unfortunately with old Qt versions we can not do this
-        // because it does not seem to create a layer when fill mode (tiling is wanted)
-        // is changed at a later point.
-        fillMode: artist.cover ? ((visible || (MainCtx.qtVersion() < MainCtx.qtVersionCheck(6, 5, 0))) ? Image.PreserveAspectCrop : Image.Stretch)
-                                : Image.Tile
+
+        fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
 
         visible: !blurEffect.visible
         cache: (source === VLCStyle.noArtArtist)
@@ -86,12 +77,9 @@ FocusScope {
     Item {
         anchors.fill: background
 
-        // The texture is big, and the blur item should only draw the portion of it.
-        // If the blur effect creates an implicit layer, it properly adjusts the
-        // area that it needs to cover. However, as we don't want an additional
-        // layer that keeps getting updated every time the size changes, we feed
-        // the whole static texture. For that reason, we need clipping because
-        // the blur effect is applied to the whole texture and shown as whole:
+        // TODO: Clipping should not be necessary, we can crop like
+        //       `ImageExt` is doing for `PreserveAspectCrop`, but
+        //       `DualKawaseBlur` does not support that for now.
         clip: !blurEffect.sourceNeedsLayering
 
         visible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
@@ -100,24 +88,50 @@ FocusScope {
         // each time the size changes. The source texture is static, so the blur
         // is applied only once and we adjust the viewport through the parent item
         // with clipping.
-        Widgets.BlurEffect {
+        Widgets.DualKawaseBlur {
             id: blurEffect
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.right: parent.right
 
+            // TODO: Disable `live`, consider asynchronous loading and size changes.
+
             // If source image is tiled, layering is necessary:
-            readonly property bool sourceNeedsLayering: (background.fillMode !== Image.Stretch) ||
-                                                        (MainCtx.qtVersion() < MainCtx.qtVersionCheck(6, 5, 0))
+            readonly property bool sourceNeedsLayering: (background.fillMode === Image.Tile)
 
             readonly property real aspectRatio: (background.implicitHeight / background.implicitWidth)
 
             height: sourceNeedsLayering ? background.height : (aspectRatio * width)
 
-            source: background
+            source: textureProviderItem
 
-            radius: VLCStyle.dp(4, VLCStyle.scale)
+            Widgets.TextureProviderItem {
+                id: textureProviderItem
+
+                // Like in `Player.qml`, this is used because when the source is
+                // mipmapped, sometimes it can not be sampled. This is considered
+                // a Qt bug, but `QSGTextureView` has a workaround for that. So,
+                // we can have an indirection here through `TextureProviderItem`.
+                // This is totally acceptable as there is virtually no overhead.
+
+                source: blurEffect.sourceNeedsLayering ? backgroundLayer : background
+            }
+
+            ShaderEffectSource {
+                id: backgroundLayer
+
+                sourceItem: background
+
+                // We hope that Qt does not create the layer unless this is actually used as
+                // texture provider (it is already invisible). GammaRay tells that this is
+                // already the case (I can not access the texture).
+                visible: false
+            }
+
+            // Strong blurring is not wanted here:
+            configuration: Widgets.DualKawaseBlur.Configuration.TwoPass
+            radius: 1
         }
     }
 
