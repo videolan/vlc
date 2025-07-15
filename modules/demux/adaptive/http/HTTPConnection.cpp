@@ -336,10 +336,9 @@ RequestStatus LibVLCHTTPConnection::request(const std::string &path,
         return RequestStatus::GenericError;
     }
 
-    char *psz_realm = nullptr;
     if (status == 401) /* authentication */
     {
-        psz_realm = vlc_http_res_get_basic_realm(source->http_res);
+        char *psz_realm = vlc_http_res_get_basic_realm(source->http_res);
         if (psz_realm)
         {
             vlc_credential_init(&crd, &crd_url);
@@ -350,30 +349,27 @@ RequestStatus LibVLCHTTPConnection::request(const std::string &path,
                                    _("Please enter a valid login name and a "
                                    "password for realm %s."), psz_realm) == 0)
             {
-                if(source->abortandlogin(crd.psz_username, crd.psz_password))
-                {
-                    vlc_credential_clean(&crd);
-                    vlc_UrlClean(&crd_url);
-                    free(psz_realm);
-                    return RequestStatus::Unauthorized;
-                }
-                status = vlc_http_res_get_status(source->http_res);
+                if (!source->abortandlogin(crd.psz_username, crd.psz_password))
+                    status = vlc_http_res_get_status(source->http_res);
             }
+
+            if (status > 0 && status < 400 && crd.psz_realm &&
+                crd.i_get_order > decltype(crd.i_get_order)::GET_FROM_MEMORY_KEYSTORE)
+            {
+                /* Force caching into memory keystore */
+                crd.b_from_keystore = false;
+                crd.b_store = false;
+                vlc_credential_store(&crd, p_object);
+            }
+
+            vlc_credential_clean(&crd);
+            vlc_UrlClean(&crd_url);
+            free(psz_realm);
         }
     }
 
-    if(status > 0 && status < 400 && crd.psz_realm &&
-       crd.i_get_order > decltype(crd.i_get_order)::GET_FROM_MEMORY_KEYSTORE)
-    {
-        /* Force caching into memory keystore */
-        crd.b_from_keystore = false;
-        crd.b_store = false;
-        vlc_credential_store(&crd, p_object);
-    }
-
-    vlc_credential_clean(&crd);
-    vlc_UrlClean(&crd_url);
-    free(psz_realm);
+    if (status == 401)
+        return RequestStatus::Unauthorized;
 
     if (status >= 400)
         return RequestStatus::GenericError;
