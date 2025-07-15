@@ -15,6 +15,7 @@
 # Özgür Turanlı, 2013
 # Ufuk UYUMAZ <ufukuyumaz@gmail.com>, 2013
 # Yaşar TAY <yasartay@yahoo.com>, 2009
+# bolunay, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 2.2.7\n"
@@ -27607,7 +27608,7 @@ msgstr "Hata ve uyarılar görüntülensin"
 
 #: modules/video_filter/opencv_wrapper.c:70
 msgid "Show everything including debug messages"
-msgstr "Hata ayıklama iletileri de katılarak herşey görüntülensin"
+msgstr "Hata ayıklama iletileri de katılarak her şey görüntülensin"
 
 #: modules/video_filter/opencv_wrapper.c:73
 msgid "OpenCV video filter wrapper"
