@@ -24,10 +24,10 @@ import VLC.Widgets as Widgets
 
 // This item can be used as a layer effect.
 // Make sure that the sampler name is set to "source" (default).
-Widgets.BlurEffect {
+Widgets.DualKawaseBlur {
     id: root
 
-    radius: 64
+    radius: 3
 
     property color tint: "transparent"
     property real tintStrength: Qt.colorEqual(tint, "transparent") ? 0.0 : 0.7
