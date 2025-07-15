@@ -906,6 +906,7 @@ qml_modules += {
         'widgets/qml/RadioButtonExt.qml',
         'widgets/qml/RoundedRectangleShadow.qml',
         'widgets/qml/VoronoiSnow.qml',
+        'widgets/qml/DualKawaseBlur.qml',
     ),
 }
 
