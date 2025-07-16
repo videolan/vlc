@@ -162,6 +162,11 @@ fi
 make > $out
 spopd
 
+if [ ! -z "$VLCBUILDDIR" ];then
+    mkdir -p $VLCBUILDDIR
+    pushd $VLCBUILDDIR
+fi
+
 #
 # vlc/contribs
 #
@@ -170,7 +175,8 @@ vlcSetSymbolEnvironment
 vlcSetContribEnvironment "$MINIMAL_OSX_VERSION"
 
 info "Building contribs"
-spushd "${vlcroot}/contrib"
+mkdir -p contrib
+spushd "contrib"
 
 case $LICENSE in
     l)
@@ -191,7 +197,7 @@ if [ "$REBUILD" = "yes" ]; then
     rm -rf $HOST_TRIPLET
 fi
 mkdir -p contrib-$HOST_TRIPLET && cd contrib-$HOST_TRIPLET
-../bootstrap --build=$BUILD_TRIPLET --host=$HOST_TRIPLET $CONTRIBFLAGS > $out
+${vlcroot}/contrib/bootstrap --build=$BUILD_TRIPLET --host=$HOST_TRIPLET $CONTRIBFLAGS > $out
 
 make list
 if [ "$CONTRIBFROMSOURCE" != "yes" ]; then
@@ -233,10 +239,6 @@ fi
 spopd
 
 
-if [ ! -z "$VLCBUILDDIR" ];then
-    mkdir -p $VLCBUILDDIR
-    pushd $VLCBUILDDIR
-fi
 #
 # vlc/configure
 #
@@ -260,6 +262,7 @@ if [ "${vlcroot}/configure" -nt Makefile ]; then
   ${vlcroot}/extras/package/macosx/configure.sh \
       --build=$BUILD_TRIPLET \
       --host=$HOST_TRIPLET \
+      --with-contrib=contrib/$HOST_TRIPLET \
       --with-macosx-version-min=$MINIMAL_OSX_VERSION \
       --with-macosx-sdk=$SDKROOT \
       $CONFIGFLAGS \
