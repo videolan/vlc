@@ -306,6 +306,7 @@ Close(struct vlc_gl_filter *filter)
     vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
     vt->DeleteBuffers(1, &renderer->index_buffer_object);
     vt->DeleteBuffers(1, &renderer->texture_buffer_object);
+    vt->DeleteVertexArrays(1, &renderer->vertex_array_object);
 
     if (renderer->program_id != 0)
         vt->DeleteProgram(renderer->program_id);
@@ -774,6 +775,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     else memcpy(orientation_matrix, MATRIX4_IDENTITY, sizeof(MATRIX4_IDENTITY));
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
+    vt->BindVertexArray(renderer->vertex_array_object);
     assert(renderer->aloc.PicCoordsIn != -1);
     vt->EnableVertexAttribArray(renderer->aloc.PicCoordsIn);
     vt->VertexAttribPointer(renderer->aloc.PicCoordsIn, 2, GL_FLOAT, 0, 0, 0);
@@ -892,6 +894,8 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     InitStereoMatrix(renderer->var.StereoMatrix, renderer->stereo_mode, renderer->multiview_mode);
 
     getViewpointMatrixes(renderer, renderer->projection_mode);
+
+    vt->GenVertexArrays(1, &renderer->vertex_array_object);
 
     vt->GenBuffers(1, &renderer->vertex_buffer_object);
     vt->GenBuffers(1, &renderer->index_buffer_object);

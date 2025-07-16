@@ -85,6 +85,8 @@ struct vlc_gl_renderer
     GLuint index_buffer_object;
     GLuint texture_buffer_object;
 
+    GLuint vertex_array_object;
+
     bool valid_coords;
 
     /* View point */

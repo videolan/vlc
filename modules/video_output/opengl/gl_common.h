@@ -268,6 +268,9 @@ typedef void (APIENTRY *PFNGLBLITFRAMEBUFFERPROC) (GLint srcX0, GLint srcY0, GLi
                                                    GLbitfield mask, GLenum filter);
 typedef void (APIENTRY *PFNGLREADPIXELSPROC) (GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, void *);
 typedef void (APIENTRY *PFNGLGETATTACHEDSHADERPROC)(GLuint, GLsizei, GLsizei*, GLuint*);
+typedef void (APIENTRY *PFNGLBINDVERTEXARRAYPROC) (GLuint array);
+typedef void (APIENTRY *PFNGLDELETEVERTEXARRAYSPROC) (GLsizei n, const GLuint *arrays);
+typedef void (APIENTRY *PFNGLGENVERTEXARRAYSPROC) (GLsizei n, GLuint *arrays);
 
 /* The following are defined in glext.h but not for GLES2 or on Apple systems */
 #if defined(USE_OPENGL_ES2) || defined(__APPLE__)
@@ -417,6 +420,11 @@ typedef struct {
     PFNGLBINDBUFFERPROC    BindBuffer;
     PFNGLBUFFERDATAPROC    BufferData;
     PFNGLDELETEBUFFERSPROC DeleteBuffers;
+
+    /* Vertex arrays commands */
+    PFNGLGENVERTEXARRAYSPROC GenVertexArrays;
+    PFNGLBINDVERTEXARRAYPROC BindVertexArray;
+    PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays;
 
     /* Framebuffers commands */
     PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC GetFramebufferAttachmentParameteriv;

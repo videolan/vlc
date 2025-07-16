@@ -32,6 +32,26 @@
 #include "gl_common.h"
 #include "gl_util.h"
 
+/*
+ * OpenGL3.0+ core profile require a non-default vertex array to be binded
+ * to manipulate VertexAttribPointer
+ * OpenGLES 2.0 doesn't support VertexArrays. As we are only using one vertex array
+ * we can just use pretend we support generating and binding it.
+ */
+static void APIENTRY StubGenVertexArrays(GLsizei n, GLuint *arrays) {
+    //OpengGLES 2.0 only use the default VA, trying to generate more than one
+    //means that we are trying to do something unsupported
+    assert(n == 1);
+    arrays[0] = 0;
+}
+static void APIENTRY StubBindVertexArray(GLuint id) {
+    VLC_UNUSED(id);
+}
+static void APIENTRY StubDeleteVertexArrays(GLsizei n, const GLuint * arrays) {
+    VLC_UNUSED(n);
+    VLC_UNUSED(arrays);
+}
+
 int
 vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
 {
@@ -155,7 +175,6 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     GET_PROC_ADDR_OPTIONAL(FenceSync);
     GET_PROC_ADDR_OPTIONAL(DeleteSync);
     GET_PROC_ADDR_OPTIONAL(ClientWaitSync);
-#undef GET_PROC_ADDR
 
     GL_ASSERT_NOERROR(&api->vt);
     GLint version;
@@ -212,5 +231,20 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     else
         api->supports_sampler3D = false;
 
+    //OpenGL 3.0+ / OpenGLES 3.0+ should provide these functions
+    //On OSX, with OpenGL2 compatible profile, loading theses function would succeed
+    //but they are unusable, so we stub them by default with OpenGL 2 /OpenGLES 2 contextes
+    if (version >= 3) {
+        GET_PROC_ADDR(GenVertexArrays);
+        GET_PROC_ADDR(BindVertexArray);
+        GET_PROC_ADDR(DeleteVertexArrays);
+    } else {
+        api->vt.GenVertexArrays = StubGenVertexArrays;
+        api->vt.BindVertexArray = StubBindVertexArray;
+        api->vt.DeleteVertexArrays = StubDeleteVertexArrays;
+    }
+
     return VLC_SUCCESS;
 }
+
+#undef GET_PROC_ADDR
