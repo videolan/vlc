@@ -42,7 +42,7 @@ extern "C" {
 /**
  * OSD menu position and picture type defines
  */
-enum
+typedef enum vlc_osd_widget_type
 {
     /* Icons */
     OSD_PLAY_ICON = 1,
@@ -52,7 +52,7 @@ enum
     /* Sliders */
     OSD_HOR_SLIDER,
     OSD_VERT_SLIDER,
-};
+} vlc_osd_widget_type;
 
 /**
  * \brief Show EPG information about the current program of an input item
@@ -101,7 +101,7 @@ vout_OSDMessage(vout_thread_t *vout, int channel, const char *format, ...)
  * \param i_type    Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
  */
 VLC_API void vout_OSDSlider( vout_thread_t *p_this, int i_channel,
-                             int i_position, short i_type);
+                             int i_position, vlc_osd_widget_type i_type);
 
 /**
  * Display an Icon on the video output.
@@ -110,7 +110,7 @@ VLC_API void vout_OSDSlider( vout_thread_t *p_this, int i_channel,
  * \param i_type    Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
  */
 VLC_API void vout_OSDIcon( vout_thread_t *p_this, int i_channel,
-                           short i_type);
+                           vlc_osd_widget_type i_type);
 
 /** @} */
 #ifdef __cplusplus

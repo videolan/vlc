@@ -26,6 +26,7 @@
 #include <vlc_vector.h>
 #include <vlc_atomic.h>
 #include <vlc_media_library.h>
+#include <vlc_vout_osd.h>
 
 #include "input/input_internal.h"
 
@@ -531,7 +532,7 @@ void
 vlc_player_osd_Message(vlc_player_t *player, const char *fmt, ...);
 
 void
-vlc_player_osd_Icon(vlc_player_t *player, short type);
+vlc_player_osd_Icon(vlc_player_t *player, vlc_osd_widget_type type);
 
 void
 vlc_player_osd_Position(vlc_player_t *player,

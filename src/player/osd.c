@@ -71,14 +71,14 @@ vouts_osd_Message(vout_thread_t **vouts, size_t count, const char *fmt, ...)
 }
 
 static inline void
-vouts_osd_Icon(vout_thread_t **vouts, size_t count, short type)
+vouts_osd_Icon(vout_thread_t **vouts, size_t count, vlc_osd_widget_type type)
 {
     for (size_t i = 0; i < count; ++i)
         vout_OSDIcon(vouts[i], VOUT_SPU_CHANNEL_OSD, type);
 }
 
 static inline void
-vouts_osd_Slider(vout_thread_t **vouts, size_t count, int position, short type)
+vouts_osd_Slider(vout_thread_t **vouts, size_t count, int position, vlc_osd_widget_type type)
 {
     int channel = type == OSD_HOR_SLIDER ?
         VOUT_SPU_CHANNEL_OSD_HSLIDER : VOUT_SPU_CHANNEL_OSD_VSLIDER;
@@ -107,7 +107,7 @@ vlc_player_osd_Message(vlc_player_t *player, const char *fmt, ...)
 }
 
 void
-vlc_player_osd_Icon(vlc_player_t *player, short type)
+vlc_player_osd_Icon(vlc_player_t *player, vlc_osd_widget_type type)
 {
     size_t count;
     vout_thread_t **vouts = vlc_player_osd_HoldAll(player, &count);

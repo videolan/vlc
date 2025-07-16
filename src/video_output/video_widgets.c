@@ -150,7 +150,7 @@ static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
  * Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
  */
 #define SLIDER_MARGIN_BASE 0.10
-static subpicture_region_t *OSDSlider(int type, int position,
+static subpicture_region_t *OSDSlider(vlc_osd_widget_type type, int position,
                                       const unsigned i_visible_width,
                                       const unsigned i_visible_height)
 {
@@ -204,7 +204,7 @@ static subpicture_region_t *OSDSlider(int type, int position,
  * Create the region for an OSD slider.
  * Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
  */
-static subpicture_region_t *OSDIcon(int type,
+static subpicture_region_t *OSDIcon(vlc_osd_widget_type type,
                                     const unsigned i_visible_width,
                                     const unsigned i_visible_height)
 {
@@ -253,7 +253,7 @@ static subpicture_region_t *OSDIcon(int type,
 }
 
 typedef struct {
-    int type;
+    vlc_osd_widget_type type;
     int value;
 } osdwidget_spu_updater_sys_t;
 
@@ -284,7 +284,7 @@ static void OSDWidgetDestroy(subpicture_t *subpic)
     free(subpic->updater.sys);
 }
 
-static void OSDWidget(vout_thread_t *vout, int channel, int type, int position)
+static void OSDWidget(vout_thread_t *vout, int channel, vlc_osd_widget_type type, int position)
 {
     if (!var_InheritBool(vout, "osd"))
         return;
@@ -322,12 +322,12 @@ static void OSDWidget(vout_thread_t *vout, int channel, int type, int position)
     vout_PutSubpicture(vout, subpic);
 }
 
-void vout_OSDSlider(vout_thread_t *vout, int channel, int position, short type)
+void vout_OSDSlider(vout_thread_t *vout, int channel, int position, vlc_osd_widget_type type)
 {
     OSDWidget(vout, channel, type, position);
 }
 
-void vout_OSDIcon(vout_thread_t *vout, int channel, short type )
+void vout_OSDIcon(vout_thread_t *vout, int channel, vlc_osd_widget_type type )
 {
     OSDWidget(vout, channel, type, 0);
 }
