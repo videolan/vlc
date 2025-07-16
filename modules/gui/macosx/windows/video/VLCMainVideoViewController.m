@@ -53,12 +53,15 @@
 #import "private/PIPSPI.h"
 
 @interface PIPVoutViewController : NSViewController
+@property (nonatomic) NSRect previousBounds;
+@property (nonatomic, copy) void (^boundsChangeHandler)(void);
 @end
 
 @implementation PIPVoutViewController
 
 - (void)setView:(NSView *)view {
     [super setView:view];
+    self.previousBounds = NSZeroRect;
 }
 
 - (void)viewDidLoad {
@@ -75,6 +78,23 @@
 
 - (void)viewDidAppear {
     [super viewDidAppear];
+}
+
+- (void)viewDidLayout 
+{
+    [super viewDidLayout];
+
+    NSRect currentBounds = self.view.bounds;
+    if (!NSIsEmptyRect(currentBounds) && !NSEqualRects(currentBounds, _previousBounds)) {
+            _previousBounds = currentBounds;
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (self.boundsChangeHandler) {
+                    self.boundsChangeHandler();
+                    self.boundsChangeHandler = nil;
+                }
+            });
+    }
 }
 @end
 
@@ -540,7 +560,14 @@
     }
     vlc_mutex_unlock(&p_input->lock);
     _pipViewController.title = window.title;
-    [_pipViewController presentViewControllerAsPictureInPicture:_voutViewController];
+    
+    __weak typeof(self) weakSelf = self;
+    _voutViewController.boundsChangeHandler = ^{
+        typeof(self) strongSelf = weakSelf;
+        if (strongSelf && strongSelf->_voutViewController.presentingViewController == nil) {
+            [strongSelf->_pipViewController presentViewControllerAsPictureInPicture:strongSelf->_voutViewController];
+        }
+    };
     
     if ([window isKindOfClass:VLCLibraryWindow.class]) {
         [self returnToLibrary:self];
