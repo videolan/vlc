@@ -262,10 +262,6 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
 {
     osdwidget_spu_updater_sys_t *sys = subpic->updater.sys;
     subpicture_region_t *p_region;
-    const video_format_t *fmt_dst = cfg->video_dst;
-
-    if (video_format_IsSimilar(cfg->prev_dst, fmt_dst))
-        return;
 
     vlc_spu_regions_Clear( &subpic->regions );
 
