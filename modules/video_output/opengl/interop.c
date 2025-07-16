@@ -63,15 +63,6 @@ vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
     {
         priv->gl.BindTexture(interop->tex_target, textures[i]);
 
-#if !defined(USE_OPENGL_ES2)
-        if (interop->gl->api_type == VLC_OPENGL)
-        {
-            /* Set the texture parameters */
-            priv->gl.TexParameterf(interop->tex_target, GL_TEXTURE_PRIORITY, 1.0);
-            priv->gl.TexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        }
-#endif
-
         priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
