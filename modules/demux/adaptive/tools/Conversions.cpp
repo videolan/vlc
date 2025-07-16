@@ -194,7 +194,7 @@ UTCTime::UTCTime(const std::string &str)
     }
 }
 
-vlc_tick_t UTCTime::mtime() const
+UTCTime::operator vlc_tick_t () const
 {
     return t;
 }

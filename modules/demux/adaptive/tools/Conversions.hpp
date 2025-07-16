@@ -39,7 +39,7 @@ class UTCTime
 {
     public:
         UTCTime(const std::string&);
-        vlc_tick_t mtime() const;
+        operator vlc_tick_t() const;
 
     private:
         vlc_tick_t t;

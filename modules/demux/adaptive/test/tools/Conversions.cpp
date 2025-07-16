@@ -30,28 +30,28 @@
 int Conversions_test()
 {
     UTCTime utc("1970-01-01T00:00:00.000+00:00");
-    Expect(utc.mtime() == 0);
+    Expect(utc == 0);
     utc = UTCTime("1970-01-01T10:00:00.000+10:00");
-    Expect(utc.mtime() == 0);
+    Expect(utc == 0);
     utc = UTCTime("1970-01-01T02:00:00.000+01:02");
-    Expect(utc.mtime() == vlc_tick_from_sec(7200 - 3720));
+    Expect(utc == vlc_tick_from_sec(7200 - 3720));
     utc = UTCTime("1970-01-01T02:00:00.000+0102");
-    Expect(utc.mtime() == vlc_tick_from_sec(7200 - 3720));
+    Expect(utc == vlc_tick_from_sec(7200 - 3720));
     utc = UTCTime("1970-01-01T01:10:00.000+1");
-    Expect(utc.mtime() == vlc_tick_from_sec(10*60));
+    Expect(utc == vlc_tick_from_sec(10*60));
     utc = UTCTime("2019-06-11Z");
-    Expect(utc.mtime() == vlc_tick_from_sec(1560211200));
+    Expect(utc == vlc_tick_from_sec(1560211200));
     utc = UTCTime("2019-06-11T16:52:05.100Z");
-    Expect(utc.mtime() == vlc_tick_from_sec(1560271925) + VLC_TICK_FROM_MS(100));
+    Expect(utc == vlc_tick_from_sec(1560271925) + VLC_TICK_FROM_MS(100));
     utc = UTCTime("2019-06-11T16:52:05.012Z");
-    Expect(utc.mtime() == vlc_tick_from_sec(1560271925) + VLC_TICK_FROM_MS(12));
+    Expect(utc == vlc_tick_from_sec(1560271925) + VLC_TICK_FROM_MS(12));
     utc = UTCTime("T16:52:05.012Z");
 
     /* Check non ms fractional */
     utc = UTCTime("2021-05-28T12:51:32+00:00");
-    Expect(utc.mtime() == vlc_tick_from_sec(1622206292));
+    Expect(utc == vlc_tick_from_sec(1622206292));
     utc = UTCTime("2021-05-28T12:51:32.996000+00:00");
-    Expect(utc.mtime() == vlc_tick_from_sec(1622206292)+VLC_TICK_FROM_MS(996));
+    Expect(utc == vlc_tick_from_sec(1622206292)+VLC_TICK_FROM_MS(996));
 
     IsoTime isotime("PT0H9M56.46S");
     Expect(isotime == (vlc_tick_from_sec(9*60+56)+VLC_TICK_FROM_MS(460)));

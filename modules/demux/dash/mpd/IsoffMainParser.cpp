@@ -139,11 +139,11 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
         }
         else if(attr.name == "availabilityStartTime")
         {
-            mpd->availabilityStartTime = UTCTime(attr.value).mtime();
+            mpd->availabilityStartTime = UTCTime(attr.value);
         }
         else if(attr.name == "availabilityEndTime")
         {
-            mpd->availabilityEndTime = UTCTime(attr.value).mtime();
+            mpd->availabilityEndTime = UTCTime(attr.value);
         }
         else if(attr.name == "timeShiftBufferDepth")
         {

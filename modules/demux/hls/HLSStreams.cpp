@@ -142,7 +142,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 
                 std::string::size_type pos = str.find("LOCAL:");
                 if(pos != std::string::npos && str.length() - pos >= 12+6)
-                    local = UTCTime("T" + str.substr(pos + 6, 12)).mtime();
+                    local = UTCTime("T" + str.substr(pos + 6, 12));
 
                 pos = str.find("MPEGTS:");
                 if(pos != std::string::npos && str.size() - pos > 7)
