@@ -614,7 +614,7 @@ vlc_modules += {
         'adaptive/plumbing/FakeESOutID.hpp',
         'adaptive/plumbing/SourceStream.cpp',
         'adaptive/plumbing/SourceStream.hpp',
-        'adaptive/AbstractSource.hpp',
+        'adaptive/BlockStreamInterface.hpp',
         'adaptive/ID.hpp',
         'adaptive/ID.cpp',
         'adaptive/PlaylistManager.cpp',

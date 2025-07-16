@@ -24,7 +24,7 @@
 #include "HTTPConnection.hpp"
 #include "ConnectionParams.hpp"
 #include "AuthStorage.hpp"
-#include "../AbstractSource.hpp"
+#include "../BlockStreamInterface.hpp"
 #include "../plumbing/SourceStream.hpp"
 #include "../tools/Compatibility.hpp"
 
@@ -84,7 +84,7 @@ const ConnectionParams & AbstractConnection::getRedirection() const
     return locationparams;
 }
 
-class adaptive::http::LibVLCHTTPSource : public adaptive::AbstractSource
+class adaptive::http::LibVLCHTTPSource : public adaptive::BlockStreamInterface
 {
      public:
         LibVLCHTTPSource(vlc_object_t *p_object_, struct vlc_http_cookie_jar_t *jar)

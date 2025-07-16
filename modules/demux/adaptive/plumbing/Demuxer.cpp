@@ -29,7 +29,7 @@
 #include "SourceStream.hpp"
 #include "../StreamFormat.hpp"
 #include "CommandsQueue.hpp"
-#include "../AbstractSource.hpp"
+#include "../BlockStreamInterface.hpp"
 
 using namespace adaptive;
 

@@ -27,7 +27,7 @@
 
 namespace adaptive
 {
-    class AbstractSource;
+    class BlockStreamInterface;
 
     class AbstractSourceStream
     {
@@ -44,7 +44,7 @@ namespace adaptive
         PREREQ_VIRTUAL(AbstractChunksSourceStream);
 
         public:
-            AbstractChunksSourceStream(vlc_object_t *, AbstractSource *);
+            AbstractChunksSourceStream(vlc_object_t *, BlockStreamInterface *);
             virtual ~AbstractChunksSourceStream();
             void Reset() override;
             stream_t *makeStream() override;
@@ -54,7 +54,7 @@ namespace adaptive
             virtual int     Seek(uint64_t) = 0;
             bool b_eof;
             vlc_object_t *p_obj;
-            AbstractSource *source;
+            BlockStreamInterface *source;
 
         private:
             static ssize_t read_Callback(stream_t *, void *, size_t);
@@ -66,7 +66,7 @@ namespace adaptive
     class ChunksSourceStream : public AbstractChunksSourceStream
     {
         public:
-            ChunksSourceStream(vlc_object_t *, AbstractSource *);
+            ChunksSourceStream(vlc_object_t *, BlockStreamInterface *);
             virtual ~ChunksSourceStream();
             void Reset() override;
 
@@ -82,7 +82,7 @@ namespace adaptive
     class BufferedChunksSourceStream : public AbstractChunksSourceStream
     {
         public:
-            BufferedChunksSourceStream(vlc_object_t *, AbstractSource *);
+            BufferedChunksSourceStream(vlc_object_t *, BlockStreamInterface *);
             virtual ~BufferedChunksSourceStream();
             void Reset() override;
 

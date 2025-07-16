@@ -24,14 +24,14 @@
 
 #include "SourceStream.hpp"
 
-#include "../AbstractSource.hpp"
+#include "../BlockStreamInterface.hpp"
 #include "../http/Chunk.h"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 
 using namespace adaptive;
 
-AbstractChunksSourceStream::AbstractChunksSourceStream(vlc_object_t *p_obj_, AbstractSource *source_)
+AbstractChunksSourceStream::AbstractChunksSourceStream(vlc_object_t *p_obj_, BlockStreamInterface *source_)
     : b_eof( false )
     , p_obj( p_obj_ )
     , source( source_ )
@@ -102,7 +102,7 @@ stream_t * AbstractChunksSourceStream::makeStream()
     return p_stream;
 }
 
-ChunksSourceStream::ChunksSourceStream(vlc_object_t *p_obj_, AbstractSource *source_)
+ChunksSourceStream::ChunksSourceStream(vlc_object_t *p_obj_, BlockStreamInterface *source_)
     : AbstractChunksSourceStream(p_obj_, source_)
 {
     p_block = nullptr;
@@ -176,7 +176,7 @@ int ChunksSourceStream::Seek(uint64_t)
     return VLC_EGENERIC;
 }
 
-BufferedChunksSourceStream::BufferedChunksSourceStream(vlc_object_t *p_obj_, AbstractSource *source_)
+BufferedChunksSourceStream::BufferedChunksSourceStream(vlc_object_t *p_obj_, BlockStreamInterface *source_)
     : AbstractChunksSourceStream( p_obj_, source_ )
 {
     i_global_offset = 0;

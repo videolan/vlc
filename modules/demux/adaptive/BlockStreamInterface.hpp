@@ -1,5 +1,5 @@
 /*
- * AbstractSource.hpp
+ * BlockStreamInterface.hpp
  *****************************************************************************
  * Copyright © 2015-2019 - VideoLabs, VideoLAN and VLC Authors
  *
@@ -17,22 +17,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef ABSTRACTSOURCE_HPP
-#define ABSTRACTSOURCE_HPP
+#ifndef BLOCKSTREAMINTERFACE_HPP
+#define BLOCKSTREAMINTERFACE_HPP
 
 #include <vlc_common.h>
 #include "tools/Macros.hpp"
 
 namespace adaptive
 {
-    class AbstractSource
+    class BlockStreamInterface
     {
-        PREREQ_INTERFACE(AbstractSource);
+        PREREQ_INTERFACE(BlockStreamInterface);
 
         public:
             virtual block_t *readNextBlock() = 0;
     };
 }
 
-#endif // ABSTRACTSOURCE_HPP
+#endif // BLOCKSTREAMINTERFACE_HPP
 

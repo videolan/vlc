@@ -22,7 +22,7 @@
 
 #include <vlc_common.h>
 #include "StreamFormat.hpp"
-#include "AbstractSource.hpp"
+#include "BlockStreamInterface.hpp"
 #include "SegmentTracker.hpp"
 
 #include "plumbing/CommandsQueue.hpp"
@@ -50,7 +50,7 @@ namespace adaptive
     using namespace http;
     using namespace playlist;
 
-    class AbstractStream : public AbstractSource,
+    class AbstractStream : public BlockStreamInterface,
                            public ExtraFMTInfoInterface,
                            public SegmentTrackerListenerInterface,
                            public DemuxerFactoryInterface

@@ -393,7 +393,7 @@ libvlc_adaptive_la_SOURCES = \
     demux/adaptive/plumbing/FakeESOutID.hpp \
     demux/adaptive/plumbing/SourceStream.cpp \
     demux/adaptive/plumbing/SourceStream.hpp \
-    demux/adaptive/AbstractSource.hpp \
+    demux/adaptive/BlockStreamInterface.hpp \
     demux/adaptive/ID.hpp \
     demux/adaptive/ID.cpp \
     demux/adaptive/PlaylistManager.cpp \
