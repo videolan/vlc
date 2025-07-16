@@ -254,7 +254,7 @@ static subpicture_region_t *OSDIcon(int type,
 
 typedef struct {
     int type;
-    int position;
+    int value;
 } osdwidget_spu_updater_sys_t;
 
 static void OSDWidgetUpdate(subpicture_t *subpic,
@@ -268,7 +268,7 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
     subpic->i_original_picture_width  = cfg->display_width;
     subpic->i_original_picture_height = cfg->display_height;
     if (sys->type == OSD_HOR_SLIDER || sys->type == OSD_VERT_SLIDER)
-        p_region = OSDSlider(sys->type, sys->position, cfg->display_width, cfg->display_height);
+        p_region = OSDSlider(sys->type, sys->value, cfg->display_width, cfg->display_height);
     else
         p_region = OSDIcon(sys->type, cfg->display_width, cfg->display_height);
     if (p_region)
@@ -295,7 +295,7 @@ static void OSDWidget(vout_thread_t *vout, int channel, int type, int position)
     if (!sys)
         return;
     sys->type     = type;
-    sys->position = position;
+    sys->value    = position;
 
     static const struct vlc_spu_updater_ops spu_ops =
     {
