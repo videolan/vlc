@@ -151,26 +151,27 @@ static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
  */
 #define SLIDER_MARGIN_BASE 0.10
 static subpicture_region_t *OSDSlider(int type, int position,
-                                      const video_format_t *fmt)
+                                      const unsigned i_visible_width,
+                                      const unsigned i_visible_height)
 {
-    const int size = __MAX(fmt->i_visible_width, fmt->i_visible_height);
-    const int margin = size * SLIDER_MARGIN_BASE;
-    const int marginbottom = margin * 0.2;
-    const int marginright = margin * 0.5;
-    uint8_t i_padding = __MIN(1, size * 0.25); /* small sizes */
+    const unsigned size = __MAX(i_visible_width, i_visible_height);
+    const unsigned margin = size * SLIDER_MARGIN_BASE;
+    const unsigned marginbottom = margin * 0.2;
+    const unsigned marginright = margin * 0.5;
+    unsigned i_padding = __MIN(1, size * 0.25); /* small sizes */
 
-    int x, y;
-    int width, height;
+    unsigned x, y;
+    unsigned width, height;
     if (type == OSD_HOR_SLIDER) {
-        width  = __MAX(fmt->i_visible_width - 2 * margin, 1);
-        height = __MAX(fmt->i_visible_height * 0.01,      1);
-        x      = __MIN(fmt->i_x_offset + margin, fmt->i_visible_width - width);
-        y      = __MAX(fmt->i_y_offset + fmt->i_visible_height - marginbottom, 0);
+        width  = __MAX(i_visible_width - 2 * margin, 1);
+        height = __MAX(i_visible_height * 0.01,      1);
+        x      = __MIN(margin, i_visible_width - width);
+        y      = __MAX(i_visible_height - marginbottom, 0);
     } else {
-        width  = __MAX(fmt->i_visible_width * 0.010,       1);
-        height = __MAX(fmt->i_visible_height - 2 * margin, 1);
-        x      = __MAX(fmt->i_x_offset + fmt->i_visible_width - marginright, 0);
-        y      = __MIN(fmt->i_y_offset + margin, fmt->i_visible_height - height);
+        width  = __MAX(i_visible_width * 0.010,       1);
+        height = __MAX(i_visible_height - 2 * margin, 1);
+        x      = __MAX(i_visible_width - marginright, 0);
+        y      = __MIN(margin, i_visible_height - height);
     }
 
     if( (width < 1 + 2 * i_padding) || (height < 1 + 2 * i_padding) )
@@ -203,23 +204,25 @@ static subpicture_region_t *OSDSlider(int type, int position,
  * Create the region for an OSD slider.
  * Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
  */
-static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
+static subpicture_region_t *OSDIcon(int type,
+                                    const unsigned i_visible_width,
+                                    const unsigned i_visible_height)
 {
     const unsigned int size_ratio = 20;
     const unsigned int margin_ratio = 14;
 
-    const unsigned int size   = __MAX(fmt->i_visible_width, fmt->i_visible_height);
+    const unsigned int size   = __MAX(i_visible_width, i_visible_height);
     if( size < size_ratio )
         return NULL;
 
     const unsigned int width  = size / size_ratio;
     const unsigned int height = width;
     const unsigned int margin = size / margin_ratio;
-    const int x      = fmt->i_x_offset + fmt->i_visible_width - margin - width;
-    const int y      = fmt->i_y_offset                        + margin;
+    const int x      = i_visible_width - margin - width;
+    const int y      =                   margin;
 
     subpicture_region_t *r = OSDRegion(__MAX(x, 0),
-                                       __MIN(y, (int)fmt->i_visible_height - (int)height),
+                                       __MIN(y, (int)i_visible_height - (int)height),
                                        width, height);
     if (!r)
         return NULL;
@@ -266,19 +269,12 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
 
     vlc_spu_regions_Clear( &subpic->regions );
 
-    video_format_t fmt = *fmt_dst;
-    fmt.i_width         = fmt.i_width         * fmt.i_sar_num / fmt.i_sar_den;
-    fmt.i_visible_width = fmt.i_visible_width * fmt.i_sar_num / fmt.i_sar_den;
-    fmt.i_x_offset      = fmt.i_x_offset      * fmt.i_sar_num / fmt.i_sar_den;
-    fmt.i_sar_num       = 1;
-    fmt.i_sar_den       = 1;
-
-    subpic->i_original_picture_width  = fmt.i_visible_width;
-    subpic->i_original_picture_height = fmt.i_visible_height;
+    subpic->i_original_picture_width  = cfg->display_width;
+    subpic->i_original_picture_height = cfg->display_height;
     if (sys->type == OSD_HOR_SLIDER || sys->type == OSD_VERT_SLIDER)
-        p_region = OSDSlider(sys->type, sys->position, &fmt);
+        p_region = OSDSlider(sys->type, sys->position, cfg->display_width, cfg->display_height);
     else
-        p_region = OSDIcon(sys->type, &fmt);
+        p_region = OSDIcon(sys->type, cfg->display_width, cfg->display_height);
     if (p_region)
     {
         p_region->b_absolute = true;
