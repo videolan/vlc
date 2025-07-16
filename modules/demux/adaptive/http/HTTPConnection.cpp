@@ -26,6 +26,7 @@
 #include "AuthStorage.hpp"
 #include "../AbstractSource.hpp"
 #include "../plumbing/SourceStream.hpp"
+#include "../tools/Compatibility.hpp"
 
 #include <vlc_stream.h>
 #include <vlc_keystore.h>
@@ -85,11 +86,10 @@ const ConnectionParams & AbstractConnection::getRedirection() const
 
 class adaptive::http::LibVLCHTTPSource : public adaptive::AbstractSource
 {
-     friend class LibVLCHTTPConnection;
-
      public:
-        LibVLCHTTPSource(vlc_object_t *p_object, struct vlc_http_cookie_jar_t *jar)
+        LibVLCHTTPSource(vlc_object_t *p_object_, struct vlc_http_cookie_jar_t *jar)
         {
+            p_object = p_object_;
             http_mgr = vlc_http_mgr_create(p_object, jar);
             http_res = nullptr;
             totalRead = 0;
@@ -183,14 +183,48 @@ class adaptive::http::LibVLCHTTPSource : public adaptive::AbstractSource
             return (*static_cast<LibVLCHTTPSource **>(opaque))->validateResponse(res, resp);
         }
 
+        vlc_object_t *p_object;
         static const struct vlc_http_resource_cbs callbacks;
         size_t totalRead;
         struct vlc_http_mgr *http_mgr;
         BytesRange range;
+        struct vlc_http_resource *http_res;
+        adaptive::optional<std::string> username;
+        adaptive::optional<std::string> password;
+        ConnectionParams lastparams;
 
     public:
-        struct vlc_http_resource *http_res;
-        int create(const char *uri,const std::string &ua,
+        void setCredentials(const char *psz_username, const char *psz_password)
+        {
+            username = psz_username;
+            password = psz_password;
+        }
+
+        bool isInitialized() const
+        {
+            return http_mgr != nullptr;
+        }
+        size_t getTotalRead() const
+        {
+            return totalRead;
+        }
+
+        const char * getResponseHeader(const char *key) const
+        {
+            return vlc_http_msg_get_header(http_res->response, key);
+        }
+
+        const ConnectionParams & getFinalLocation() const
+        {
+            return lastparams;
+        }
+
+        size_t getSize() const
+        {
+            return vlc_http_msg_get_size(http_res->response);
+        }
+
+        int create(const ConnectionParams &params,const std::string &ua,
                    const std::string &ref, const BytesRange &range)
         {
             auto *tpl = static_cast<struct restuple *>(
@@ -200,7 +234,9 @@ class adaptive::http::LibVLCHTTPSource : public adaptive::AbstractSource
 
             tpl->source = this;
             this->range = range;
-            if (vlc_http_res_init(&tpl->resource, &this->callbacks, http_mgr, uri,
+            this->lastparams = params;
+            if (vlc_http_res_init(&tpl->resource, &this->callbacks, http_mgr,
+                                  params.getUrl().c_str(),
                                   ua.empty() ? nullptr : ua.c_str(),
                                   ref.empty() ? nullptr : ref.c_str()))
             {
@@ -211,15 +247,87 @@ class adaptive::http::LibVLCHTTPSource : public adaptive::AbstractSource
             return 0;
         }
 
-        int abortandlogin(const char *user, const char *pass)
+        RequestStatus connect()
+        {
+            if (http_res == nullptr)
+                return RequestStatus::GenericError;
+
+            if (username.has_value() || password.has_value())
+                vlc_http_res_set_login(http_res,
+                                       username.has_value() ? username->c_str() : nullptr,
+                                       password.has_value() ? password->c_str() : nullptr);
+
+            int status = vlc_http_res_get_status(http_res);
+            if (status < 0)
+                return RequestStatus::GenericError;
+
+            if (status == 401) /* authentication */
+            {
+                char *psz_realm = vlc_http_res_get_basic_realm(http_res);
+                if (psz_realm)
+                {
+                    struct vlc_credential crd;
+                    struct vlc_url_t crd_url;
+                    vlc_credential_init(&crd, &crd_url);
+                    vlc_UrlParse(&crd_url, lastparams.getUrl().c_str());
+
+                    crd.psz_authtype = "Basic";
+                    crd.psz_realm = psz_realm;
+                    if (vlc_credential_get(&crd, p_object, NULL, NULL,
+                                           _("HTTP authentication"),
+                                           _("Please enter a valid login name and a "
+                                             "password for realm %s."), psz_realm) == 0)
+                    {
+                        setCredentials(crd.psz_username, crd.psz_password);
+                        if(!abortandlogin())
+                            status = vlc_http_res_get_status(http_res);
+                    }
+
+                    if (status > 0 && status < 400 && crd.psz_realm &&
+                        crd.i_get_order > decltype(crd.i_get_order)::GET_FROM_MEMORY_KEYSTORE)
+                    {
+                        /* Force caching into memory keystore */
+                        crd.b_from_keystore = false;
+                        crd.b_store = false;
+                        vlc_credential_store(&crd, p_object);
+                    }
+
+                    vlc_credential_clean(&crd);
+                    vlc_UrlClean(&crd_url);
+                    free(psz_realm);
+                }
+            }
+
+            if (status == 401)
+                return RequestStatus::Unauthorized;
+
+            if (status >= 400)
+                return RequestStatus::GenericError;
+
+            char *psz_redir = vlc_http_res_get_redirect(http_res);
+            if (psz_redir)
+            {
+                ConnectionParams loc = ConnectionParams(psz_redir);
+                free(psz_redir);
+                if(loc.getScheme().empty())
+                    lastparams.setPath(loc.getPath());
+                else
+                    lastparams = loc;
+                return RequestStatus::Redirection;
+            }
+
+            return RequestStatus::Success;
+        }
+
+        int abortandlogin()
         {
             if(http_res == nullptr)
                 return -1;
 
             free(http_res->username);
-            http_res->username = user ? strdup(user) : nullptr;
+            http_res->username = username.has_value() ? strdup(username->c_str()) : nullptr;
             free(http_res->password);
-            http_res->password = pass ? strdup(pass) : nullptr;
+            http_res->password = password.has_value() ? strdup(password->c_str()) : nullptr;
 
             struct vlc_http_msg *resp = vlc_http_res_open(http_res, &http_res[1]);
             if (resp == nullptr)
@@ -293,7 +401,7 @@ bool LibVLCHTTPConnection::canReuse(const ConnectionParams &params_) const
 RequestStatus LibVLCHTTPConnection::request(const std::string &path,
                                             const BytesRange &range)
 {
-    if(source->http_mgr == nullptr)
+    if(!source->isInitialized())
         return RequestStatus::GenericError;
 
     reset();
@@ -307,85 +415,28 @@ RequestStatus LibVLCHTTPConnection::request(const std::string &path,
     else
         msg_Dbg(p_object, "Retrieving %s", params.getUrl().c_str());
 
-    if(source->create(params.getUrl().c_str(), useragent,referer, range))
+    if(source->create(params, useragent,referer, range))
         return RequestStatus::GenericError;
 
+    /* Set credentials from URL. Deprecated warning will follow */
     struct vlc_credential crd;
     struct vlc_url_t crd_url;
     vlc_UrlParse(&crd_url, params.getUrl().c_str());
-
     vlc_credential_init(&crd, &crd_url);
     int ret = vlc_credential_get(&crd, p_object, NULL, NULL, NULL, NULL);
     if (ret == 0)
-    {
-        vlc_http_res_set_login(source->http_res,
-                               crd.psz_username, crd.psz_password);
-    }
-    else if (ret == -EINTR)
-    {
-        vlc_credential_clean(&crd);
-        vlc_UrlClean(&crd_url);
-        return RequestStatus::GenericError;
-    }
-
-    int status = vlc_http_res_get_status(source->http_res);
-    if (status < 0)
-    {
-        vlc_credential_clean(&crd);
-        vlc_UrlClean(&crd_url);
-        return RequestStatus::GenericError;
-    }
-
-    if (status == 401) /* authentication */
-    {
-        char *psz_realm = vlc_http_res_get_basic_realm(source->http_res);
-        if (psz_realm)
-        {
-            vlc_credential_init(&crd, &crd_url);
-            crd.psz_authtype = "Basic";
-            crd.psz_realm = psz_realm;
-            if (vlc_credential_get(&crd, p_object, NULL, NULL,
-                                   _("HTTP authentication"),
-                                   _("Please enter a valid login name and a "
-                                   "password for realm %s."), psz_realm) == 0)
-            {
-                if (!source->abortandlogin(crd.psz_username, crd.psz_password))
-                    status = vlc_http_res_get_status(source->http_res);
-            }
-
-            if (status > 0 && status < 400 && crd.psz_realm &&
-                crd.i_get_order > decltype(crd.i_get_order)::GET_FROM_MEMORY_KEYSTORE)
-            {
-                /* Force caching into memory keystore */
-                crd.b_from_keystore = false;
-                crd.b_store = false;
-                vlc_credential_store(&crd, p_object);
-            }
-
-            vlc_credential_clean(&crd);
-            vlc_UrlClean(&crd_url);
-            free(psz_realm);
-        }
-    }
-
-    if (status == 401)
-        return RequestStatus::Unauthorized;
-
-    if (status >= 400)
+        source->setCredentials(crd.psz_username, crd.psz_password);
+    vlc_credential_clean(&crd);
+    vlc_UrlClean(&crd_url);
+    if (ret == -EINTR)
         return RequestStatus::GenericError;
 
-    char *psz_redir = vlc_http_res_get_redirect(source->http_res);
-    if(psz_redir)
+    RequestStatus status = source->connect();
+    if (status != RequestStatus::Success)
     {
-        ConnectionParams loc = ConnectionParams(psz_redir);
-        free(psz_redir);
-        if(loc.getScheme().empty())
-        {
-            locationparams = params;
-            locationparams.setPath(loc.getPath());
-        }
-        else locationparams = loc;
-        return RequestStatus::Redirection;
+        if (status == RequestStatus::Redirection)
+            locationparams = source->getFinalLocation();
+        return status;
     }
 
     sourceStream->Reset();
@@ -393,13 +444,13 @@ RequestStatus LibVLCHTTPConnection::request(const std::string &path,
     if(stream == nullptr)
         return RequestStatus::GenericError;
 
-    contentLength = vlc_http_msg_get_size(source->http_res->response);
+    contentLength = source->getSize();
 
-    const char *s = vlc_http_msg_get_header(source->http_res->response, "Content-Type");
+    const char *s = source->getResponseHeader("Content-Type");
     if(s)
         contentType = std::string(s);
 
-    s = vlc_http_msg_get_header(source->http_res->response, "Content-Encoding");
+    s = source->getResponseHeader("Content-Encoding");
     if(s && stream && (strstr(s, "deflate") || strstr(s, "gzip")))
     {
         stream_t *decomp = vlc_stream_FilterNew(stream, "inflate");
@@ -416,7 +467,7 @@ RequestStatus LibVLCHTTPConnection::request(const std::string &path,
 ssize_t LibVLCHTTPConnection::read(void *p_buffer, size_t len)
 {
     ssize_t read = vlc_stream_Read(stream, p_buffer, len);
-    bytesRead = source->totalRead;
+    bytesRead = source->getTotalRead();
     return read;
 }
 
