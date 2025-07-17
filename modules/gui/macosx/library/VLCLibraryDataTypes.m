@@ -44,6 +44,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 typedef vlc_ml_media_list_t* (*library_mediaitem_list_fetch_f)(vlc_medialibrary_t*, const vlc_ml_query_params_t*, int64_t);
 typedef vlc_ml_album_list_t* (*library_album_list_fetch_f)(vlc_medialibrary_t*, const vlc_ml_query_params_t*, int64_t);
 typedef vlc_ml_artist_list_t* (*library_artist_list_fetch_f)(vlc_medialibrary_t*, const vlc_ml_query_params_t*, int64_t);
+typedef int (*library_item_set_favorite_f)(vlc_medialibrary_t*, int64_t, bool);
 
 static vlc_medialibrary_t *getMediaLibrary(void)
 {
@@ -132,6 +133,15 @@ static NSArray<NSString *> *labelsForMediaLibraryItem(const int64_t libraryID) {
         [labels addObject:toNSStr(label->psz_name)];
     }
     return labels.copy;
+}
+
+static int setFavoriteForLibraryItem(library_item_set_favorite_f setFavoriteFunction, const int64_t itemId, const BOOL favorite)
+{
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (!p_mediaLibrary) {
+        return VLC_EGENERIC;
+    }
+    return setFavoriteFunction(p_mediaLibrary, itemId, favorite);
 }
 
 static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const genres)
@@ -566,14 +576,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (int)setFavorite:(BOOL)favorite
 {
-    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
-    if (!p_mediaLibrary) {
-        return VLC_EGENERIC;
-    }
-    const int res = vlc_ml_artist_set_favorite(p_mediaLibrary, self.libraryID, favorite);
-    if (res == VLC_SUCCESS) {
+    const int res = setFavoriteForLibraryItem(vlc_ml_artist_set_favorite, self.libraryID, favorite);
+    if (res == VLC_SUCCESS)
         _favorited = favorite;
-    }
     return res;
 }
 
@@ -699,14 +704,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (int)setFavorite:(BOOL)favorite
 {
-    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
-    if (!p_mediaLibrary) {
-        return VLC_EGENERIC;
-    }
-    const int res = vlc_ml_album_set_favorite(p_mediaLibrary, self.libraryID, favorite);
-    if (res == VLC_SUCCESS) {
+    const int res = setFavoriteForLibraryItem(vlc_ml_album_set_favorite, self.libraryID, favorite);
+    if (res == VLC_SUCCESS)
         _favorited = favorite;
-    }
     return res;
 }
 
@@ -822,14 +822,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (int)setFavorite:(BOOL)favorite
 {
-    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
-    if (!p_mediaLibrary) {
-        return VLC_EGENERIC;
-    }
-    const int res = vlc_ml_genre_set_favorite(p_mediaLibrary, self.libraryID, favorite);
-    if (res == VLC_SUCCESS) {
+    const int res = setFavoriteForLibraryItem(vlc_ml_genre_set_favorite, self.libraryID, favorite);
+    if (res == VLC_SUCCESS)
         _favorited = favorite;
-    }
     return res;
 }
 
@@ -1031,14 +1026,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (int)setFavorite:(BOOL)favorite
 {
-    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
-    if (!p_mediaLibrary) {
-        return VLC_EGENERIC;
-    }
-    const int res = vlc_ml_playlist_set_favorite(p_mediaLibrary, self.libraryID, favorite);
-    if (res == VLC_SUCCESS) {
+    const int res = setFavoriteForLibraryItem(vlc_ml_playlist_set_favorite, self.libraryID, favorite);
+    if (res == VLC_SUCCESS)
         _favorited = favorite;
-    }
     return res;
 }
 
@@ -1662,14 +1652,12 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (int)setFavorite:(BOOL)favorite
 {
-    const int64_t mediaItemId = self.libraryID;
-    vlc_medialibrary_t * const p_ml = vlc_ml_instance_get(getIntf());
-    const int result = vlc_ml_media_set_favorite(p_ml, mediaItemId, favorite);
-    if (result == VLC_SUCCESS)
+    const int res = setFavoriteForLibraryItem(vlc_ml_media_set_favorite, self.libraryID, favorite);
+    if (res == VLC_SUCCESS)
         _favorited = favorite;
     else
-        NSLog(@"Unable to set favorite status of media item: %lli", mediaItemId);
-    return result;
+        NSLog(@"Unable to set favorite status of media item: %lli", self.libraryID);
+    return res;
 }
 
 - (int)toggleFavorite
