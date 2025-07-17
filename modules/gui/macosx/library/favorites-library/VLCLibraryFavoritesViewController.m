@@ -64,7 +64,7 @@
         _favoritesLibraryTableViewDelegate = [[VLCLibraryMasterDetailViewTableViewDelegate alloc] init];
         _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
         
-        [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupProperties];
         [self setupTableViews];
         [self setupCollectionView];
         [self setupFavoritesDataSource];
@@ -81,23 +81,27 @@
     [self updatePresentedFavoritesView];
 }
 
-- (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
+- (void)setupProperties
 {
-    NSParameterAssert(libraryWindow);
-    _favoritesLibraryView = libraryWindow.videoLibraryView;
-    _favoritesLibrarySplitView = libraryWindow.videoLibrarySplitView;
-    _favoritesLibraryCollectionViewScrollView = libraryWindow.videoLibraryCollectionViewScrollView;
-    _favoritesLibraryCollectionView = libraryWindow.videoLibraryCollectionView;
-    _favoritesLibraryGroupSelectionTableViewScrollView = libraryWindow.videoLibraryGroupSelectionTableViewScrollView;
-    _favoritesLibraryGroupSelectionTableView = libraryWindow.videoLibraryGroupSelectionTableView;
-    _favoritesLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
-    _favoritesLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
+    _favoritesLibrarySplitView = [[NSSplitView alloc] init];
+    _favoritesLibraryCollectionViewScrollView = [[NSScrollView alloc] init];
+    _favoritesLibraryCollectionView = [[VLCLibraryCollectionView alloc] init];
+    _favoritesLibraryGroupSelectionTableViewScrollView = [[NSScrollView alloc] init];
+    _favoritesLibraryGroupSelectionTableView = [[NSTableView alloc] init];
+    _favoritesLibraryGroupsTableViewScrollView = [[NSScrollView alloc] init];
+    _favoritesLibraryGroupsTableView = [[NSTableView alloc] init];
 }
 
 - (void)setupTableViews
 {
     self.favoritesLibrarySplitView.delegate = _splitViewDelegate;
     [_splitViewDelegate resetDefaultSplitForSplitView:self.favoritesLibrarySplitView];
+
+    NSTableColumn * const groupsColumn = [[NSTableColumn alloc] initWithIdentifier:@"groups"];
+    NSTableColumn * const selectedGroupColumn = [[NSTableColumn alloc] initWithIdentifier:@"selectedGroup"];
+    
+    [self.favoritesLibraryGroupsTableView addTableColumn:groupsColumn];
+    [self.favoritesLibraryGroupSelectionTableView addTableColumn:selectedGroupColumn];
 
     NSNib * const tableCellViewNib =
         [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
@@ -106,10 +110,26 @@
                                         forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
     [self.favoritesLibraryGroupSelectionTableView registerNib:tableCellViewNib 
                                                 forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
+    
+    self.favoritesLibraryGroupsTableView.headerView = nil;
+    self.favoritesLibraryGroupSelectionTableView.headerView = nil;
+    
+    self.favoritesLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.favoritesLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
 }
 
 - (void)setupCollectionView
 {
+    self.favoritesLibraryCollectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.favoritesLibraryCollectionView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    self.favoritesLibraryCollectionViewScrollView.hasHorizontalScroller = NO;
+    self.favoritesLibraryCollectionViewScrollView.borderType = NSNoBorder;
+    self.favoritesLibraryCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.favoritesLibraryCollectionViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    self.favoritesLibraryCollectionViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    self.favoritesLibraryCollectionViewScrollView.documentView = self.favoritesLibraryCollectionView;
+
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     
     const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
@@ -124,6 +144,10 @@
     
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     collectionView.delegate = _collectionViewDelegate;
+    
+    collectionView.selectable = YES;
+    collectionView.allowsEmptySelection = YES;
+    collectionView.allowsMultipleSelection = YES;
     
     [collectionView registerClass:VLCLibraryCollectionViewItem.class
             forItemWithIdentifier:VLCLibraryCellIdentifier];
@@ -149,26 +173,47 @@
     self.libraryFavoritesDataSource.collectionView = self.favoritesLibraryCollectionView;
     self.libraryFavoritesDataSource.masterTableView = self.favoritesLibraryGroupsTableView;
     self.libraryFavoritesDataSource.detailTableView = self.favoritesLibraryGroupSelectionTableView;
+    
+    self.favoritesLibraryCollectionView.dataSource = self.libraryFavoritesDataSource;
+    
+    self.favoritesLibraryGroupsTableView.dataSource = self.libraryFavoritesDataSource;
+    self.favoritesLibraryGroupsTableView.target = self.libraryFavoritesDataSource;
+    self.favoritesLibraryGroupsTableView.delegate = _favoritesLibraryTableViewDelegate;
+
+    self.favoritesLibraryGroupSelectionTableView.dataSource = self.libraryFavoritesDataSource;
+    self.favoritesLibraryGroupSelectionTableView.target = self.libraryFavoritesDataSource;
+    self.favoritesLibraryGroupSelectionTableView.delegate = _favoritesLibraryTableViewDelegate;
 }
 
 - (void)setupFavoritesLibraryViews
 {
-    _favoritesLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
-    _favoritesLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.favoritesLibraryGroupsTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.favoritesLibrarySplitView.translatesAutoresizingMaskIntoConstraints = NO;
 
     const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
     const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
 
-    _favoritesLibraryCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _favoritesLibraryCollectionViewScrollView.contentInsets = defaultInsets;
-    _favoritesLibraryCollectionViewScrollView.scrollerInsets = scrollerInsets;
+    self.favoritesLibraryGroupsTableViewScrollView.hasHorizontalScroller = NO;
+    self.favoritesLibraryGroupsTableViewScrollView.borderType = NSNoBorder;
+    self.favoritesLibraryGroupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.favoritesLibraryGroupsTableViewScrollView.contentInsets = defaultInsets;
+    self.favoritesLibraryGroupsTableViewScrollView.scrollerInsets = scrollerInsets;
 
-    _favoritesLibraryGroupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _favoritesLibraryGroupsTableViewScrollView.contentInsets = defaultInsets;
-    _favoritesLibraryGroupsTableViewScrollView.scrollerInsets = scrollerInsets;
-    _favoritesLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _favoritesLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
-    _favoritesLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.hasHorizontalScroller = NO;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.borderType = NSNoBorder;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
+
+    self.favoritesLibraryGroupsTableViewScrollView.documentView = self.favoritesLibraryGroupsTableView;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.documentView = self.favoritesLibraryGroupSelectionTableView;
+
+    self.favoritesLibrarySplitView.vertical = YES;
+    self.favoritesLibrarySplitView.dividerStyle = NSSplitViewDividerStyleThin;
+    self.favoritesLibrarySplitView.delegate = _splitViewDelegate;
+    [self.favoritesLibrarySplitView addArrangedSubview:self.favoritesLibraryGroupsTableViewScrollView];
+    [self.favoritesLibrarySplitView addArrangedSubview:self.favoritesLibraryGroupSelectionTableViewScrollView];
 }
 
 - (void)setupFavoritesPlaceholderView
@@ -232,16 +277,6 @@
 
 - (void)updatePresentedFavoritesView
 {
-    self.favoritesLibraryCollectionView.dataSource = self.libraryFavoritesDataSource;
-    
-    self.favoritesLibraryGroupsTableView.dataSource = self.libraryFavoritesDataSource;
-    self.favoritesLibraryGroupsTableView.target = self.libraryFavoritesDataSource;
-    self.favoritesLibraryGroupsTableView.delegate = _favoritesLibraryTableViewDelegate;
-
-    self.favoritesLibraryGroupSelectionTableView.dataSource = self.libraryFavoritesDataSource;
-    self.favoritesLibraryGroupSelectionTableView.target = self.libraryFavoritesDataSource;
-    self.favoritesLibraryGroupSelectionTableView.delegate = _favoritesLibraryTableViewDelegate;
-    
     [self.libraryFavoritesDataSource reloadData];
     
     if ([self hasFavoriteItems]) {
@@ -266,8 +301,7 @@
 
 - (void)presentFavoritesCollectionView
 {
-    [self.libraryWindow displayLibraryView:self.favoritesLibraryView];
-    self.favoritesLibraryCollectionViewScrollView.hidden = NO;
+    [self.libraryWindow displayLibraryView:self.favoritesLibraryCollectionViewScrollView];
 }
 
 - (void)presentPlaceholderFavoritesView
@@ -279,13 +313,10 @@
 
 - (void)presentFavoritesLibraryView:(VLCLibraryViewModeSegment)viewModeSegment
 {
-    [self.libraryWindow displayLibraryView:self.favoritesLibraryView];
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
-        self.favoritesLibrarySplitView.hidden = YES;
-        self.favoritesLibraryCollectionViewScrollView.hidden = NO;
+        [self.libraryWindow displayLibraryView:self.favoritesLibraryCollectionViewScrollView];
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
-        self.favoritesLibrarySplitView.hidden = NO;
-        self.favoritesLibraryCollectionViewScrollView.hidden = YES;
+        [self.libraryWindow displayLibraryView:self.favoritesLibrarySplitView];
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }

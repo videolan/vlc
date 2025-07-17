@@ -34,14 +34,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryFavoritesViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<VLCLibraryItemPresentingCapable>
 
-@property (readonly, weak) NSView *favoritesLibraryView;
-@property (readonly, weak) NSSplitView *favoritesLibrarySplitView;
-@property (readonly, weak) NSScrollView *favoritesLibraryCollectionViewScrollView;
-@property (readonly, weak) VLCLibraryCollectionView *favoritesLibraryCollectionView;
-@property (readonly, weak) NSScrollView *favoritesLibraryGroupSelectionTableViewScrollView;
-@property (readonly, weak) NSTableView *favoritesLibraryGroupSelectionTableView;
-@property (readonly, weak) NSScrollView *favoritesLibraryGroupsTableViewScrollView;
-@property (readonly, weak) NSTableView *favoritesLibraryGroupsTableView;
+@property (readonly, strong) NSSplitView *favoritesLibrarySplitView;
+@property (readonly, strong) NSScrollView *favoritesLibraryCollectionViewScrollView;
+@property (readonly, strong) VLCLibraryCollectionView *favoritesLibraryCollectionView;
+@property (readonly, strong) NSScrollView *favoritesLibraryGroupSelectionTableViewScrollView;
+@property (readonly, strong) NSTableView *favoritesLibraryGroupSelectionTableView;
+@property (readonly, strong) NSScrollView *favoritesLibraryGroupsTableViewScrollView;
+@property (readonly, strong) NSTableView *favoritesLibraryGroupsTableView;
 
 @property (readwrite, strong) VLCLibraryFavoritesDataSource *libraryFavoritesDataSource;
 
