@@ -103,27 +103,18 @@
         appendToPlayQueueAction.backgroundColor = NSColor.VLCAccentColor;
         return @[appendToPlayQueueAction];
     } else if (edge == NSTableRowActionEdgeTrailing) {
-        __block BOOL anyUnfavorited = NO;
-        for (VLCMediaLibraryMediaItem * const item in libraryItem.mediaItems) {
-            if (!item.favorited) {
-                anyUnfavorited = YES;
-                break;
-            }
-        }
+        const BOOL isFavorited = libraryItem.favorited;
         NSString * const displayString =
-            anyUnfavorited ? _NS("Add to Favorites") : _NS("Remove from Favorites");
+            isFavorited ? _NS("Remove from Favorites") : _NS("Add to Favorites");
 
         NSTableViewRowAction * const favoriteAction =
             [NSTableViewRowAction rowActionWithStyle:NSTableViewRowActionStyleRegular
                                                title:displayString
                                              handler:^(NSTableViewRowAction *action, NSInteger r) {
-            [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *const mediaItem) {
-                const BOOL setFavorited = !mediaItem.favorited;
-                [mediaItem setFavorite:setFavorited];
-            }];
+            [libraryItem setFavorite:!isFavorited];
         }];
         favoriteAction.backgroundColor =
-            anyUnfavorited ? NSColor.systemRedColor : NSColor.systemBlueColor;
+            isFavorited ? NSColor.systemBlueColor : NSColor.systemRedColor;
         return @[favoriteAction];
     }
     return @[];

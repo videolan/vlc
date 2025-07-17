@@ -164,16 +164,12 @@
         }
         [self menuItems:_recentsMediaItemRequiringMenuItems setHidden:anyNonRecent];
         
-        __block BOOL anyUnfavorited = NO;
+        BOOL anyUnfavorited = NO;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
-            [item.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * _Nonnull const mediaItem) {
-                if (!mediaItem.favorited) {
-                    anyUnfavorited = YES;
-                    return;
-                }
-            }];
-            if (anyUnfavorited)
+            if (!item.item.favorited) {
+                anyUnfavorited = YES;
                 break;
+            }
         }
         self.favoriteItem.title = anyUnfavorited ? _NS("Add to Favorites") : _NS("Remove from Favorites");
         self.favoriteItem.action = anyUnfavorited ? @selector(addFavorite:) : @selector(removeFavorite:);
@@ -319,9 +315,7 @@
 - (void)setItemsFavorite:(BOOL)favorite
 {
     for (VLCLibraryRepresentedItem * const item in self.representedItems) {
-        [item.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * _Nonnull const mediaItem) {
-            [mediaItem setFavorite:favorite];
-        }];
+        [item.item setFavorite:favorite];
     }
 }
 
