@@ -138,6 +138,10 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) BOOL secondaryActionableDetail;
 @property (readonly) id<VLCMediaLibraryItemProtocol> secondaryActionableDetailLibraryItem;
 @property (readonly) NSArray<NSString *> *labels;
+@property (readonly) BOOL favorited;
+
+- (int)setFavorite:(BOOL)favorite;
+- (int)toggleFavorite;
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
@@ -306,8 +310,6 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) float progress;
 @property (readonly) NSString *title;
 
-@property (readonly) BOOL favorited;
-
 @property (readonly, nullable) VLCMediaLibraryShowEpisode *showEpisode;
 @property (readonly, nullable) VLCMediaLibraryMovie *movie;
 
@@ -334,9 +336,6 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @property (readonly) int trackNumber;
 @property (readonly) int discNumber;
-
-- (int)setFavorite:(BOOL)favorite;
-- (int)toggleFavorite;
 
 @end
 

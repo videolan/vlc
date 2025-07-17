@@ -455,6 +455,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @implementation VLCMediaLibraryArtist
 
 @synthesize numberOfTracks = _numberOfTracks;
+@synthesize favorited = _favorited;
 
 + (nullable instancetype)artistWithID:(int64_t)artistID
 {
@@ -485,6 +486,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _musicBrainzID = toNSStr(p_artist->psz_mb_id);
         _numberOfAlbums = p_artist->i_nb_album;
         _numberOfTracks = p_artist->i_nb_tracks;
+        _favorited = p_artist->b_is_favorite;
     }
     return self;
 }
@@ -562,6 +564,19 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 }
 
+- (int)setFavorite:(BOOL)favorite
+{
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (!p_mediaLibrary) {
+        return VLC_EGENERIC;
+    }
+    const int res = vlc_ml_artist_set_favorite(p_mediaLibrary, self.libraryID, favorite);
+    if (res == VLC_SUCCESS) {
+        _favorited = favorite;
+    }
+    return res;
+}
+
 @end
 
 @interface VLCMediaLibraryAlbum ()
@@ -574,6 +589,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @synthesize numberOfTracks = _numberOfTracks;
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
+@synthesize favorited = _favorited;
 
 + (nullable instancetype)albumWithID:(int64_t)albumID
 {
@@ -606,6 +622,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _numberOfTracks = p_album->i_nb_tracks;
         _duration = p_album->i_duration;
         _year = p_album->i_year;
+        _favorited = p_album->b_is_favorite;
     }
     return self;
 }
@@ -680,11 +697,25 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 }
 
+- (int)setFavorite:(BOOL)favorite
+{
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (!p_mediaLibrary) {
+        return VLC_EGENERIC;
+    }
+    const int res = vlc_ml_album_set_favorite(p_mediaLibrary, self.libraryID, favorite);
+    if (res == VLC_SUCCESS) {
+        _favorited = favorite;
+    }
+    return res;
+}
+
 @end
 
 @implementation VLCMediaLibraryGenre
 
 @synthesize numberOfTracks = _numberOfTracks;
+@synthesize favorited = _favorited;
 
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre
 {
@@ -698,6 +729,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
         _name = toNSStr(p_genre->psz_name);
         _numberOfTracks = p_genre->i_nb_tracks;
+        _favorited = p_genre->b_is_favorite;
     }
     return self;
 }
@@ -788,6 +820,19 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 }
 
+- (int)setFavorite:(BOOL)favorite
+{
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (!p_mediaLibrary) {
+        return VLC_EGENERIC;
+    }
+    const int res = vlc_ml_genre_set_favorite(p_mediaLibrary, self.libraryID, favorite);
+    if (res == VLC_SUCCESS) {
+        _favorited = favorite;
+    }
+    return res;
+}
+
 @end
 
 @interface VLCMediaLibraryGroup ()
@@ -875,6 +920,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @implementation VLCMediaLibraryPlaylist
 
+@synthesize favorited = _favorited;
+
 + (instancetype)playlistForLibraryID:(int64_t)libraryID
 {
     vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
@@ -918,6 +965,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _numberDurationUnknown = p_playlist->i_nb_duration_unknown;
 
         _readOnly = p_playlist->b_is_read_only;
+        _favorited = p_playlist->b_is_favorite;
     }
     return self;
 }
@@ -981,6 +1029,19 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 }
 
+- (int)setFavorite:(BOOL)favorite
+{
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (!p_mediaLibrary) {
+        return VLC_EGENERIC;
+    }
+    const int res = vlc_ml_playlist_set_favorite(p_mediaLibrary, self.libraryID, favorite);
+    if (res == VLC_SUCCESS) {
+        _favorited = favorite;
+    }
+    return res;
+}
+
 @end
 
 @interface VLCMediaLibraryMediaItem ()
@@ -1001,6 +1062,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize secondaryActionableDetail = _secondaryActionableDetail;
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
+@synthesize favorited = _favorited;
 
 #pragma mark - initialization
 
@@ -1737,6 +1799,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize secondaryActionableDetail = _secondaryActionableDetail;
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 @synthesize labels = _labels;
+@synthesize favorited = _favorited;
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
               withPrimaryDetailString:(nullable NSString *)primaryDetailString
