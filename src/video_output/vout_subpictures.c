@@ -1112,7 +1112,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     if ((apply_scale && (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT)) || convert_chroma)
     {
         /* Destroy the cache if unusable */
-        if (!subpicture_region_cache_IsValid(region)) {
+        if (subpicture_region_cache_IsValid(region)) {
             const video_format_t *cachefmt = subpicture_region_cache_GetFormat(region);
             bool is_changed = false;
 
