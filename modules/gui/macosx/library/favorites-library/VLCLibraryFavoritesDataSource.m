@@ -159,8 +159,26 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 - (id<VLCMediaLibraryItemProtocol>)createGroupDescriptorForSection:(VLCLibraryFavoritesSection)section
 {
+    NSArray * const sectionArray = [self arrayForSection:section];
+    
+    // For video and audio media sections, the array already contains VLCMediaLibraryMediaItem objects
+    if (section == VLCLibraryFavoritesSectionVideoMedia || 
+        section == VLCLibraryFavoritesSectionAudioMedia) {
+        return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:[self titleForSection:section]
+                                                        withMediaItems:sectionArray];
+    }
+    
+    // For albums, artists, and genres, we need to extract media items from each item
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [NSMutableArray array];
+    for (id<VLCMediaLibraryItemProtocol> item in sectionArray) {
+        NSArray<VLCMediaLibraryMediaItem *> * const itemMediaItems = item.mediaItems;
+        if (itemMediaItems) {
+            [mediaItems addObjectsFromArray:itemMediaItems];
+        }
+    }
+    
     return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:[self titleForSection:section]
-                                                    withMediaItems:[self arrayForSection:section]];
+                                                    withMediaItems:[mediaItems copy]];
 }
 
 #pragma mark - Notification handlers
