@@ -52,15 +52,6 @@
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 }
 
-@property (readwrite, weak) NSView *favoritesLibraryView;
-@property (readwrite, weak) NSSplitView *favoritesLibrarySplitView;
-@property (readwrite, weak) NSScrollView *favoritesLibraryCollectionViewScrollView;
-@property (readwrite, weak) VLCLibraryCollectionView *favoritesLibraryCollectionView;
-@property (readwrite, weak) NSScrollView *favoritesLibraryGroupSelectionTableViewScrollView;
-@property (readwrite, weak) NSTableView *favoritesLibraryGroupSelectionTableView;
-@property (readwrite, weak) NSScrollView *favoritesLibraryGroupsTableViewScrollView;
-@property (readwrite, weak) NSTableView *favoritesLibraryGroupsTableView;
-
 @end
 
 @implementation VLCLibraryFavoritesViewController
