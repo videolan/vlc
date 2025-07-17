@@ -209,9 +209,29 @@
     [self updateFloatOnTopIndicator];
 }
 
+- (BOOL)isVisualizationActive
+{
+    BOOL isVisualActive;
+    VLCPlayerController * const controller = VLCMain.sharedInstance.playQueueController.playerController;
+    audio_output_t * const p_aout = controller.mainAudioOutput;
+    if (!p_aout) {
+        return NO;
+    }
+    
+    char *psz_visual = var_GetString(p_aout, "visual");
+    isVisualActive = psz_visual && psz_visual[0] != '\0';
+    
+    free(psz_visual);
+    aout_Release(p_aout);
+    
+    return isVisualActive;
+}
+
 - (void)updateDecorativeViewVisibilityOnControllerChange:(VLCPlayerController *)controller
 {
-    const BOOL decorativeViewVisible = controller.currentMediaIsAudioOnly;
+    const BOOL isAudioOnly = controller.currentMediaIsAudioOnly;
+    const BOOL isVisualActive = [self isVisualizationActive];
+    const BOOL decorativeViewVisible = isAudioOnly && !isVisualActive;
     NSView * const targetView = decorativeViewVisible ? self.audioDecorativeView : self.voutView;
     self.voutContainingView.subviews = @[targetView];
     [targetView applyConstraintsToFillSuperview];
