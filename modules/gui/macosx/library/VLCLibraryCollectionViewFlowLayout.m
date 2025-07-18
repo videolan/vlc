@@ -29,6 +29,7 @@
 
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
+#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #pragma mark - Private data
 static const NSUInteger kAnimationSteps = 32;
@@ -312,10 +313,14 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     BOOL isLibrarySupplementaryView = NO;
 
     if ([elementKind isEqualToString:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind] ||
-               [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+        [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
 
         isLibrarySupplementaryView = YES;
         _animationType = self.scrollDirection == NSCollectionViewScrollDirectionVertical ? VLCExpandAnimationTypeVerticalMedium : VLCExpandAnimationTypeHorizontalMedium;
+    } else if ([elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
+
+        isLibrarySupplementaryView = YES;
+        _animationType = self.scrollDirection == NSCollectionViewScrollDirectionVertical ? VLCExpandAnimationTypeVerticalLarge : VLCExpandAnimationTypeHorizontalLarge;
     }
 
     if(isLibrarySupplementaryView) {
@@ -357,7 +362,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 - (NSSet<NSIndexPath *> *)indexPathsToDeleteForSupplementaryViewOfKind:(NSString *)elementKind
 {
     if ([elementKind isEqualToString:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind] ||
-        [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+        [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind] ||
+        [elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
 
         return [self.collectionView indexPathsForVisibleSupplementaryElementsOfKind:elementKind];
     }
