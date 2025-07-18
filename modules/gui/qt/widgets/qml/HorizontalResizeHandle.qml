@@ -19,6 +19,7 @@ import QtQuick
 import QtQuick.Controls
 import VLC.MainInterface
 import VLC.Style
+import VLC.Util
 
 // targetWidth: concerned widget's current width
 // HorizontalResizeHandle actually doesn't resizes target
@@ -29,6 +30,8 @@ MouseArea {
 
     required property int currentWidth
     property int requestedWidth: 0
+    property int minimumWidth: 0
+    property int maximumWidth: Number.MAX_SAFE_INTEGER
 
     property bool atRight: true
 
@@ -55,7 +58,10 @@ MouseArea {
     onPositionChanged: {
         const f = atRight ? 1 : -1
         const delta = mouseX - _previousX
-        root.requestedWidth = (root.currentWidth + (delta * f))
+        root.requestedWidth = Helpers.clamp(
+            root.currentWidth + (delta * f),
+            minimumWidth,
+            maximumWidth)
     }
 
 }

@@ -1064,9 +1064,11 @@ FocusScope {
         sourceComponent: PlaylistPane {
             id: playlistView
 
+            property real maximumWidth: (rootPlayer.width + playlistView.rightPadding) / 2
+
             implicitWidth: Helpers.clamp(MainCtx.playqueuePanel.width
                                  , playlistView.minimumWidth
-                                 , (rootPlayer.width + playlistView.rightPadding) / 2)
+                                 , playlistView.maximumWidth)
             height: playlistpopup.height
 
             useAcrylic: false
@@ -1117,6 +1119,9 @@ FocusScope {
 
                 atRight: false
                 currentWidth: playlistpopup.width
+
+                maximumWidth: playlistView.maximumWidth
+                minimumWidth: playlistView.minimumWidth
 
                 onRequestedWidthChanged: {
                     if (!_inhibitMainCtxUpdate)

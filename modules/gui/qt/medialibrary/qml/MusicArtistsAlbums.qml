@@ -174,17 +174,18 @@ Widgets.PageExt {
 
             property bool _sidebarInitialyPositioned: false
 
+            property int maximumWidth: root.width / 2
+            property int minimumWidth: VLCStyle.colWidth(1) + VLCStyle.column_spacing
+
             model: artistModel
             selectionModel: root.selectionModel
             currentIndex: -1
             z: 1
             Layout.fillHeight: true
+
             Layout.preferredWidth: VLCStyle.isScreenSmall
                                    ? 0
-                                   : Math.round(Helpers.clamp(resizeHandle.requestedWidth,
-                                                              VLCStyle.colWidth(1) + VLCStyle.column_spacing,
-                                                              root.width * .5))
-
+                                   : Helpers.clamp(resizeHandle.requestedWidth, minimumWidth, maximumWidth)
             visible: !VLCStyle.isScreenSmall && (artistModel.count > 0)
             focus: !VLCStyle.isScreenSmall && (artistModel.count > 0)
 
@@ -325,6 +326,8 @@ Widgets.PageExt {
                 z: 1
 
                 currentWidth: artistList.width
+                minimumWidth: artistList.minimumWidth
+                maximumWidth: artistList.maximumWidth
 
                 visible: !VLCStyle.isScreenSmall
 
