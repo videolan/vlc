@@ -396,6 +396,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         return sectionHeadingView;
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+        if ([self isAudioGroupSection:[self sectionForVisibleIndex:indexPath.section]]) {
+            // Redirect to audio group supplementary view
+            return [self collectionView:collectionView 
+                viewForSupplementaryElementOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind 
+                               atIndexPath:indexPath];
+        }
+        
         VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = 
             [collectionView makeSupplementaryViewOfKind:kind 
                                          withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind 
