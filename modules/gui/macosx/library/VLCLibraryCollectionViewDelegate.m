@@ -73,11 +73,23 @@
         return _staticItemSize;
     }
     
-    VLCLibraryCollectionViewFlowLayout * const collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
+    VLCLibraryCollectionViewFlowLayout * const collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout *)collectionViewLayout;
     if (collectionViewLayout) {
+        VLCLibraryCollectionViewItemAspectRatio aspectRatio = _itemsAspectRatio;
+        
+        if ([collectionView.dataSource conformsToProtocol:@protocol(VLCLibraryCollectionViewDataSource)]) {
+            id<VLCLibraryCollectionViewDataSource> libraryDataSource =
+                (id<VLCLibraryCollectionViewDataSource>)collectionView.dataSource;
+
+            if ([libraryDataSource respondsToSelector:@selector(collectionView:aspectRatioForSection:)]) {
+                aspectRatio = [libraryDataSource collectionView:collectionView
+                                          aspectRatioForSection:indexPath.section];
+            }
+        }
+        
         return [VLCLibraryUIUnits adjustedCollectionViewItemSizeForCollectionView:collectionView
                                                                        withLayout:collectionViewFlowLayout
-                                                             withItemsAspectRatio:_itemsAspectRatio];
+                                                             withItemsAspectRatio:aspectRatio];
     }
 
     return NSZeroSize;

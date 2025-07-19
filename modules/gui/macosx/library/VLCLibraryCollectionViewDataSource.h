@@ -23,6 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryDataSource.h"
+#import "library/VLCLibraryUIUnits.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -40,6 +41,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                      forCollectionView:(NSCollectionView *)collectionView;
 
 - (void)reloadData;
+
+@optional
+- (VLCLibraryCollectionViewItemAspectRatio)collectionView:(NSCollectionView *)collectionView
+                                    aspectRatioForSection:(NSInteger)section;
 
 @end
 
