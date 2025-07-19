@@ -462,6 +462,15 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
 #pragma mark - VLCLibraryCollectionViewDataSource
 
+- (VLCLibraryCollectionViewItemAspectRatio)collectionView:(NSCollectionView *)collectionView
+                                    aspectRatioForSection:(NSInteger)section
+{    
+    if ([self sectionForVisibleIndex:section] == VLCLibraryFavoritesSectionVideoMedia) {
+        return VLCLibraryCollectionViewItemAspectRatioVideoItem;
+    }
+    return VLCLibraryCollectionViewItemAspectRatioDefaultItem;
+}
+
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
 {
