@@ -39,6 +39,7 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 #import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
+#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "main/VLCMain.h"
 
 @interface VLCLibraryFavoritesViewController ()
@@ -164,6 +165,15 @@
     [collectionView registerNib:mediaItemSupplementaryDetailViewNib
      forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
                  withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
+    
+    NSString * const audioGroupSupplementaryDetailViewString =
+        NSStringFromClass(VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.class);
+    NSNib * const audioGroupSupplementaryDetailViewNib =
+        [[NSNib alloc] initWithNibNamed:audioGroupSupplementaryDetailViewString bundle:nil];
+    
+    [collectionView registerNib:audioGroupSupplementaryDetailViewNib
+     forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind
+                 withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
 }
 
 - (void)setupFavoritesDataSource

@@ -30,6 +30,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "views/VLCImageView.h"
 
@@ -399,6 +400,20 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
         return mediaItemSupplementaryDetailView;
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
+        VLCLibraryCollectionViewAudioGroupSupplementaryDetailView * const audioGroupSupplementaryDetailView = 
+            [collectionView makeSupplementaryViewOfKind:kind 
+                                         withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier 
+                                           forIndexPath:indexPath];
+        
+        const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
+        const VLCMediaLibraryParentGroupType parentType = [self parentTypeForSection:section];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:parentType];
+
+        audioGroupSupplementaryDetailView.representedItem = representedItem;
+        audioGroupSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
+        return audioGroupSupplementaryDetailView;
     }
 
     return nil;
@@ -462,6 +477,18 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
 - (NSString *)supplementaryDetailViewKind
 {
+    if (self.collectionView.selectionIndexPaths.count > 0) {
+        NSIndexPath * const firstIndexPath = self.collectionView.selectionIndexPaths.anyObject;
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:firstIndexPath.section];
+        
+        // Use audio group supplementary view for albums, artists, and genres
+        if (section == VLCLibraryFavoritesSectionAlbums ||
+            section == VLCLibraryFavoritesSectionArtists ||
+            section == VLCLibraryFavoritesSectionGenres) {
+            return VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind;
+        }
+    }
+    
     return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
 }
 
