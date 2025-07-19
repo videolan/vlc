@@ -28,6 +28,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
@@ -174,6 +175,15 @@
     [collectionView registerNib:audioGroupSupplementaryDetailViewNib
      forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind
                  withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
+    
+    NSString * const mediaListSupplementaryDetailViewString =
+        NSStringFromClass(VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.class);
+    NSNib * const mediaListSupplementaryDetailViewNib =
+        [[NSNib alloc] initWithNibNamed:mediaListSupplementaryDetailViewString bundle:nil];
+    
+    [collectionView registerNib:mediaListSupplementaryDetailViewNib
+     forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind
+                 withIdentifier:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewIdentifier];
 }
 
 - (void)setupFavoritesDataSource

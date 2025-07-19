@@ -26,6 +26,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
@@ -131,9 +132,15 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 - (BOOL)isAudioGroupSection:(VLCLibraryFavoritesSection)section
 {
-    return section == VLCLibraryFavoritesSectionAlbums ||
-           section == VLCLibraryFavoritesSectionArtists ||
+    // Only artists and genres show the audio group view (list of albums)
+    return section == VLCLibraryFavoritesSectionArtists ||
            section == VLCLibraryFavoritesSectionGenres;
+}
+
+- (BOOL)isMediaListSection:(VLCLibraryFavoritesSection)section
+{
+    // Albums show the media list view (list of tracks)
+    return section == VLCLibraryFavoritesSectionAlbums;
 }
 
 - (NSInteger)visibleIndexForSection:(VLCLibraryFavoritesSection)section
@@ -396,10 +403,16 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         return sectionHeadingView;
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
-        if ([self isAudioGroupSection:[self sectionForVisibleIndex:indexPath.section]]) {
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
+        if ([self isAudioGroupSection:section]) {
             // Redirect to audio group supplementary view
             return [self collectionView:collectionView 
                 viewForSupplementaryElementOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind 
+                               atIndexPath:indexPath];
+        } else if ([self isMediaListSection:section]) {
+            // Redirect to media list supplementary view
+            return [self collectionView:collectionView 
+                viewForSupplementaryElementOfKind:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind 
                                atIndexPath:indexPath];
         }
         
@@ -428,6 +441,20 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         audioGroupSupplementaryDetailView.representedItem = representedItem;
         audioGroupSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
         return audioGroupSupplementaryDetailView;
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind]) {
+        VLCLibraryCollectionViewMediaItemListSupplementaryDetailView * const mediaListSupplementaryDetailView = 
+            [collectionView makeSupplementaryViewOfKind:kind 
+                                         withIdentifier:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewIdentifier 
+                                           forIndexPath:indexPath];
+        
+        const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
+        const VLCMediaLibraryParentGroupType parentType = [self parentTypeForSection:section];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:parentType];
+
+        mediaListSupplementaryDetailView.representedItem = representedItem;
+        mediaListSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
+        return mediaListSupplementaryDetailView;
     }
 
     return nil;
@@ -497,6 +524,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         
         if ([self isAudioGroupSection:section]) {
             return VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind;
+        } else if ([self isMediaListSection:section]) {
+            return VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind;
         }
     }
     
