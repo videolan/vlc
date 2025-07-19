@@ -129,6 +129,13 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     return (VLCLibraryFavoritesSection)[_visibleSectionMapping[visibleIndex] integerValue];
 }
 
+- (BOOL)isAudioGroupSection:(VLCLibraryFavoritesSection)section
+{
+    return section == VLCLibraryFavoritesSectionAlbums ||
+           section == VLCLibraryFavoritesSectionArtists ||
+           section == VLCLibraryFavoritesSectionGenres;
+}
+
 - (NSInteger)visibleIndexForSection:(VLCLibraryFavoritesSection)section
 {
     NSNumber * const sectionNumber = @(section);
@@ -481,10 +488,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         NSIndexPath * const firstIndexPath = self.collectionView.selectionIndexPaths.anyObject;
         const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:firstIndexPath.section];
         
-        // Use audio group supplementary view for albums, artists, and genres
-        if (section == VLCLibraryFavoritesSectionAlbums ||
-            section == VLCLibraryFavoritesSectionArtists ||
-            section == VLCLibraryFavoritesSectionGenres) {
+        if ([self isAudioGroupSection:section]) {
             return VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind;
         }
     }
