@@ -39,14 +39,15 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
+#import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
+#import "library/favorites-library/VLCLibraryFavoritesTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
-#import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
 #import "main/VLCMain.h"
 
 @interface VLCLibraryFavoritesViewController ()
 {
-    VLCLibraryMasterDetailViewTableViewDelegate *_favoritesLibraryTableViewDelegate;
+    VLCLibraryFavoritesTableViewDelegate *_favoritesLibraryTableViewDelegate;
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
     VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
     VLCLibraryCollectionViewFlowLayout *_collectionViewLayout;
@@ -64,7 +65,7 @@
     self = [super initWithLibraryWindow:libraryWindow];
     
     if (self) {
-        _favoritesLibraryTableViewDelegate = [[VLCLibraryMasterDetailViewTableViewDelegate alloc] init];
+        _favoritesLibraryTableViewDelegate = [[VLCLibraryFavoritesTableViewDelegate alloc] init];
         _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
         
         [self setupProperties];
