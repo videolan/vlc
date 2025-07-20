@@ -39,8 +39,9 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
-#import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
+#import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
+#import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
 #import "main/VLCMain.h"
 
 @interface VLCLibraryFavoritesViewController ()
@@ -109,15 +110,23 @@
         [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
                                  bundle:nil];
     [self.favoritesLibraryGroupsTableView registerNib:tableCellViewNib
-                                        forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
+                                        forIdentifier:VLCLibraryTableCellViewIdentifier];
     [self.favoritesLibraryGroupSelectionTableView registerNib:tableCellViewNib 
-                                                forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
+                                                forIdentifier:VLCLibraryTableCellViewIdentifier];
+    
+    // Register album cell view for artist/genre sections
+    NSNib * const albumCellViewNib =
+        [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryAlbumTableCellView.class)
+                                 bundle:nil];
+    [self.favoritesLibraryGroupSelectionTableView registerNib:albumCellViewNib
+                                                forIdentifier:VLCAudioLibraryCellIdentifier];
     
     self.favoritesLibraryGroupsTableView.headerView = nil;
     self.favoritesLibraryGroupSelectionTableView.headerView = nil;
     
     self.favoritesLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.favoritesLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+                                                
 }
 
 - (void)setupCollectionView
