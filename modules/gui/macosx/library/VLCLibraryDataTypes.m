@@ -1843,4 +1843,25 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 }
 
+- (int)setFavorite:(BOOL)favorite
+{
+    __block int lastResult = VLC_SUCCESS;
+    __block BOOL hasItems = NO;
+    
+    [self iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * _Nonnull mediaItem) {
+        hasItems = YES;
+        const int result = [mediaItem setFavorite:favorite];
+        if (result != VLC_SUCCESS) {
+            lastResult = result;
+        }
+    }];
+    
+    return hasItems ? lastResult : VLC_EGENERIC;
+}
+
+- (int)toggleFavorite
+{
+    return [self setFavorite:!self.favorited];
+}
+
 @end
