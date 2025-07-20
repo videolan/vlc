@@ -235,6 +235,7 @@
     self.favoritesLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
     self.favoritesLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
     self.favoritesLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.hasHorizontalScroller = NO;
 
     self.favoritesLibraryGroupsTableViewScrollView.documentView = self.favoritesLibraryGroupsTableView;
     self.favoritesLibraryGroupSelectionTableViewScrollView.documentView = self.favoritesLibraryGroupSelectionTableView;
