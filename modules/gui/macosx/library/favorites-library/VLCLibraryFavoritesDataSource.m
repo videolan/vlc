@@ -53,6 +53,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     NSArray<VLCMediaLibraryGenre *> *_favoriteGenresArray;
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     NSArray<NSNumber *> *_visibleSectionMapping; // Maps visible sections to VLCLibraryFavoritesSection values
+    NSMutableDictionary<NSNumber *, NSArray<id<VLCMediaLibraryItemProtocol>> *> *_flattenedRowMappings; // Maps row indices to items for flattened artist/genre views
 }
 
 @end
@@ -63,6 +64,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 {
     self = [super init];
     if (self) {
+        _flattenedRowMappings = [NSMutableDictionary dictionary];
         [self connect];
     }
     return self;
@@ -196,6 +198,21 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
                                                     withMediaItems:[mediaItems copy]];
 }
 
+- (NSArray *)buildFlattenedArrayForAudioGroupSection:(VLCLibraryFavoritesSection)section
+{
+    NSParameterAssert([self isAudioGroupSection:section]);
+    NSArray<id<VLCMediaLibraryAudioGroupProtocol>> * const sectionArray = 
+        (NSArray<id<VLCMediaLibraryAudioGroupProtocol>> *)[self arrayForSection:section];
+    NSMutableArray * const flattenedArray = [NSMutableArray array];
+    
+    for (id<VLCMediaLibraryAudioGroupProtocol> audioGroup in sectionArray) {
+        [flattenedArray addObject:audioGroup];
+        [flattenedArray addObjectsFromArray:audioGroup.albums];
+    }
+    
+    return [flattenedArray copy];
+}
+
 #pragma mark - Notification handlers
 
 - (void)libraryModelFavoriteVideoMediaListReset:(NSNotification * const)notification
@@ -273,6 +290,8 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     _favoriteGenresArray = [self.libraryModel listOfFavoriteGenres];
 
     [self updateVisibleSectionMapping];
+    
+    [_flattenedRowMappings removeAllObjects];
 
     if (self.masterTableView.dataSource == self) {
         [self.masterTableView reloadData];
@@ -297,6 +316,18 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
         return _visibleSectionMapping.count;
     } else if (tableView == self.detailTableView && self.masterTableView.selectedRow > -1) {
         const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:self.masterTableView.selectedRow];
+        
+        // For artist and genre sections, return the flattened count
+        if ([self isAudioGroupSection:section]) {
+            NSArray * const flattenedArray = _flattenedRowMappings[@(section)];
+            if (flattenedArray) {
+                return flattenedArray.count;
+            }
+            NSArray * const newFlattenedArray = [self buildFlattenedArrayForAudioGroupSection:section];
+            _flattenedRowMappings[@(section)] = newFlattenedArray;
+            return newFlattenedArray.count;
+        }
+        
         return [self arrayForSection:section].count;
     }
     
@@ -314,14 +345,20 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 {
     if (tableView == self.masterTableView) {
         // For master table, return a group descriptor object
-        if (row >= 0 && row < _visibleSectionMapping.count) {
-            const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:row];
-            return [self createGroupDescriptorForSection:section];
-        }
+        NSParameterAssert(row >= 0 && row < _visibleSectionMapping.count);
+        return [self createGroupDescriptorForSection:[self sectionForVisibleIndex:row]];
     } else if (tableView == self.detailTableView && self.masterTableView.selectedRow > -1) {
-        VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:self.masterTableView.selectedRow];
-        NSArray * const sectionArray = [self arrayForSection:section];
-        if (row >= 0 && row < sectionArray.count) {
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:self.masterTableView.selectedRow];
+        
+        // For artist and genre sections, use the flattened array
+        if ([self isAudioGroupSection:section]) {
+            NSArray<id<VLCMediaLibraryItemProtocol>> * const flattenedArray = _flattenedRowMappings[@(section)];
+            NSParameterAssert(flattenedArray && row < flattenedArray.count);
+            return flattenedArray[row];
+        } else {
+            // For other sections, use the regular array
+            NSArray<id<VLCMediaLibraryItemProtocol>> * const sectionArray = [self arrayForSection:section];
+            NSParameterAssert(sectionArray && row >= 0 && row < sectionArray.count);
             return sectionArray[row];
         }
     }
