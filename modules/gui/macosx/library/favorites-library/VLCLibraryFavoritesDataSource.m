@@ -46,11 +46,11 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 @interface VLCLibraryFavoritesDataSource ()
 {
-    NSArray *_favoriteVideoMediaArray;
-    NSArray *_favoriteAudioMediaArray;
-    NSArray *_favoriteAlbumsArray;
-    NSArray *_favoriteArtistsArray;
-    NSArray *_favoriteGenresArray;
+    NSArray<VLCMediaLibraryMediaItem *> *_favoriteVideoMediaArray;
+    NSArray<VLCMediaLibraryMediaItem *> *_favoriteAudioMediaArray;
+    NSArray<VLCMediaLibraryAlbum *> *_favoriteAlbumsArray;
+    NSArray<VLCMediaLibraryArtist *> *_favoriteArtistsArray;
+    NSArray<VLCMediaLibraryGenre *> *_favoriteGenresArray;
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     NSArray<NSNumber *> *_visibleSectionMapping; // Maps visible sections to VLCLibraryFavoritesSection values
 }
@@ -68,7 +68,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     return self;
 }
 
-- (NSArray *)arrayForSection:(VLCLibraryFavoritesSection)section
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)arrayForSection:(VLCLibraryFavoritesSection)section
 {
     switch (section) {
         case VLCLibraryFavoritesSectionVideoMedia:
