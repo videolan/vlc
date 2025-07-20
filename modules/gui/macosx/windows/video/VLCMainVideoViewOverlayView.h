@@ -28,8 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
  * NOTE: Needs to occupy the entirety, and exactly, the area of the VLCMainVideoView */
 @interface VLCMainVideoViewOverlayView : NSView
 
-@property (readwrite, assign) BOOL drawGradientForTopControls;
-@property (readwrite, strong) NSColor *darkestGradientColor;
+@property (readwrite, nonatomic, assign) BOOL drawGradientForTopControls;
+@property (readwrite, nonatomic, strong) NSColor *darkestGradientColor;
 
 @end
 
