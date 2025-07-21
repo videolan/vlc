@@ -59,9 +59,16 @@ void QSGTextureView::setTexture(QSGTexture *texture)
             connect(texture, SIGNAL(updateRequested()), this, SLOT(adjustNormalRect()));
             connect(texture, SIGNAL(updateRequested()), this, SIGNAL(updateRequested()));
         }
+
+        adjustNormalRect();
+    }
+    else
+    {
+        // Invalidate the normal rect, so that it is calculated via
+        // `normalizedTextureSubRect()` when there is a texture:
+        m_normalRect.reset();
     }
 
-    adjustNormalRect();
     emit updateRequested();
 }
 
