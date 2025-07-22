@@ -51,9 +51,6 @@
     Q_IMPORT_QML_PLUGIN(QtQuickLayoutsPlugin)
     Q_IMPORT_QML_PLUGIN(QtQuick_WindowPlugin)
     Q_IMPORT_QML_PLUGIN(QtQuickTemplates2Plugin)
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-    Q_IMPORT_QML_PLUGIN(QtQuickEffectsPlugin)
-#endif
     Q_IMPORT_QML_PLUGIN(QtQmlModelsPlugin)
     Q_IMPORT_QML_PLUGIN(QtQmlPlugin)
     Q_IMPORT_QML_PLUGIN(QtQmlWorkerScriptPlugin)

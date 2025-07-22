@@ -4151,11 +4151,6 @@ AS_IF([test "${enable_qt}" != "no"], [
 
       AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE6} and conf ${with_qtconf}])
 
-      AS_IF([test "${have_qt65}" = "yes"], [
-        qt_qml_effects_module="QtQuick.Effects"
-      ], [
-        qt_qml_effects_module="Qt5Compat.GraphicalEffects"
-      ])
       AS_IF([${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
             --qmake "${QMAKE6}" \
             --qtconf "${with_qtconf}" \
@@ -4165,7 +4160,6 @@ AS_IF([test "${enable_qt}" != "no"], [
             QtQuick.Layouts="" \
             QtQuick.Window="" \
             QtQuick.Controls="" \
-            ${qt_qml_effects_module}="" \
             >&AS_MESSAGE_FD ], [
         AC_MSG_RESULT([yes])
       ],[
