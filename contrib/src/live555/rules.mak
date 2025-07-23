@@ -19,7 +19,7 @@ $(TARBALLS)/$(LIVE555_FILE):
 
 .sum-live555: $(LIVE555_FILE)
 
-LIVE_EXTRA_CFLAGS := $(EXTRA_CFLAGS) -fexceptions $(CFLAGS)
+LIVE_EXTRA_CFLAGS := $(EXTRA_CFLAGS) -fexceptions -DNO_OPENSSL=1 $(CFLAGS)
 
 LIVE_TARGET = $(error live555 target not defined!)
 ifdef HAVE_LINUX
