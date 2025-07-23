@@ -26,6 +26,10 @@ import QtQuick
 // NOTE: Extra features are only available with the RHI graphics backend,
 //       particularly when shaders are supported.
 // NOTE: Do not use this type if none of the extra features are used.
+// NOTE: This item is also a texture provider, but for technical reasons, it is through an anonymous
+//       item exposed through `textureProviderItem`. Note that, postprocessing (any non-image/texture
+//       level manipulation) is not going to be reflected in the texture (similar to `Image`). Unless
+//       particularly specified, the extra features of `ImageExt` are postprocessing features.
 Item {
     id: root
 
@@ -53,6 +57,19 @@ Item {
     property alias status: image.status
     property alias shaderStatus: shaderEffect.status
     property alias cache: image.cache
+
+    // Normally `Image` itself is inherently a texture provider (without needing a layer), but
+    // in `ImageExt` case, it is not. Obviously when `Image` is a texture provider, postprocess
+    // manipulations (such as, `fillMode`, or `mirror`) would not be reflected in the texture.
+    // The same applies here, any postprocessing feature such as rounding, background coloring,
+    // outlining, would not be reflected in the texture. Still, we should make it possible to
+    // expose a texture provider so that the texture can be accessed. Unfortunately QML does
+    // not make it possible, but we can simply provide the `Image` here. I purposefully do
+    // not use an alias property, because I do not want to expose the provider as an `Image`,
+    // but rather as `Item`.
+    // WARNING: Consumers who downcast this item to `Image` are doing this on their own
+    //          discretion. It is discouraged, but not forbidden (or evil).
+    readonly property Item textureProviderItem: image
 
     // Padding represents how much the content is shrunk. For now this is a readonly property.
     // Currently it only takes the `softEdgeMax` into calculation, as that's what the shader
