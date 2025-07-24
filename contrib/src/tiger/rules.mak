@@ -18,6 +18,7 @@ $(TARBALLS)/libtiger-$(TIGER_VERSION).tar.gz:
 
 libtiger: libtiger-$(TIGER_VERSION).tar.gz .sum-tiger
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub misc/autotools
 	$(APPLY) $(SRC)/tiger/autotools.patch
 	$(call pkg_static,"misc/pkgconfig/tiger.pc.in")
 	$(MOVE)

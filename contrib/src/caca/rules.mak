@@ -19,6 +19,7 @@ $(TARBALLS)/libcaca-$(CACA_VERSION).tar.gz:
 
 caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub .auto
 	$(APPLY) $(SRC)/caca/caca-fix-compilation-llvmgcc.patch
 	$(APPLY) $(SRC)/caca/caca-fix-pkgconfig.patch
 	$(call pkg_static,"caca/caca.pc.in")

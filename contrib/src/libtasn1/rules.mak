@@ -14,6 +14,7 @@ $(TARBALLS)/libtasn1-$(LIBTASN1_VERSION).tar.gz:
 
 libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(APPLY) $(SRC)/libtasn1/no-executables.patch
 	$(MOVE)
 

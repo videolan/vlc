@@ -37,6 +37,7 @@ $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 
 mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build
 	$(APPLY) $(SRC)/mpg123/no-programs.patch
 	$(call pkg_static,"libmpg123.pc.in")
 	$(MOVE)
