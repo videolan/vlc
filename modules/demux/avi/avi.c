@@ -692,6 +692,11 @@ static int Open( vlc_object_t * p_this )
                     tk->fmt.b_packetized = false;
                 }
 
+                if( tk->fmt.i_codec == VLC_CODEC_H264 && tk->fmt.i_extra )
+                {
+                    tk->fmt.i_original_fourcc = VLC_FOURCC('a','v','c','1');
+                }
+
                 tk->i_samplesize = 0;
                 tk->fmt.video.i_frame_rate = tk->i_rate;
                 tk->fmt.video.i_frame_rate_base = tk->i_scale;
