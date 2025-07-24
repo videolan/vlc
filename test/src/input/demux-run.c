@@ -302,7 +302,7 @@ static int demux_process_stream(const struct vlc_run_args *args, stream_t *s)
     {
         es_out_Delete(out);
         vlc_stream_Delete(s);
-        debug("Error: cannot create demultiplexer: %s\n", name);
+        fprintf(stderr, "Error: cannot create demultiplexer: %s\n", name);
         return -1;
     }
 
