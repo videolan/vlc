@@ -29,6 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_memstream.h>
+#include <assert.h>
 
 #include "../codec/webvtt/webvtt.h"
 
@@ -318,6 +319,10 @@ static size_t getIndexByTime( demux_sys_t *p_sys, vlc_tick_t i_time )
 static void BuildIndex( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( p_sys->index.i_count == 0 )
+        return;
+    assert( p_sys->index.p_array != NULL );
 
     /* Order time entries ascending, start time before end time */
     qsort( p_sys->index.p_array, p_sys->index.i_count,
