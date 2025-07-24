@@ -647,6 +647,7 @@ ifdef HAVE_ANDROID
 # Set it to "" right away to short-circuit this behaviour
 	echo "set(CMAKE_CXX_SYSROOT_FLAG \"\")" >> $@
 	echo "set(CMAKE_C_SYSROOT_FLAG \"\")" >> $@
+	echo "include($(ANDROID_NDK)/build/cmake/android.toolchain.cmake)" >> $@
 endif
 endif
 	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
