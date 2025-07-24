@@ -680,6 +680,9 @@ VLC_REPLACE_DECL([vasprintf], [#include <stdio.h>])
 VLC_REPLACE_DECL([gmtime_r], [#include <time.h>])
 VLC_REPLACE_DECL([localtime_r], [#include <time.h>])
 
+dnl android 21 implements those as static inline, not functions with C linkage
+VLC_REPLACE_DECL([swab], [#include <unistd.h>])
+
 dnl C11 static_assert()
 AC_MSG_CHECKING([for static_assert in assert.h])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <assert.h>], [
