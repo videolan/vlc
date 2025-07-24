@@ -13,7 +13,7 @@ endif
 
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(APPLY) $(SRC)/gpg-error/windres-make.patch
 	$(APPLY) $(SRC)/gpg-error/winrt.patch
 	$(APPLY) $(SRC)/gpg-error/missing-unistd-include.patch

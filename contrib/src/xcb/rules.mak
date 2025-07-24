@@ -21,7 +21,7 @@ $(TARBALLS)/libxcb-$(XCB_VERSION).tar.bz2:
 
 libxcb: libxcb-$(XCB_VERSION).tar.bz2 .sum-xcb
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(call pkg_static,"xcb.pc.in")
 	$(MOVE)
 
