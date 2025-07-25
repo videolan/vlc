@@ -1,0 +1,54 @@
+From bd77aaa19f0c658254f4e2a0c069a1bfcf0dbea2 Mon Sep 17 00:00:00 2001
+From: Moritz Bunkus <mo@bunkus.online>
+Date: Sat, 23 Dec 2023 09:33:04 +0100
+Subject: [PATCH 1/2] EbmlString::ReadFully: use automatic memory
+ management/fewer allocations
+
+(cherry picked from commit ae9bb2580c3e0a79496e72f79185256670abeb95)
+---
+ src/EbmlString.cpp | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/src/EbmlString.cpp b/src/EbmlString.cpp
+index e1f4597..66b3338 100644
+--- a/src/EbmlString.cpp
++++ b/src/EbmlString.cpp
+@@ -142,24 +142,20 @@ filepos_t EbmlString::ReadData(IOCallback & input, ScopeMode ReadFully)
+     return GetSize();
+ 
+   if (GetSize() == 0) {
+-    Value = "";
+-    SetValueIsSet();
++    Value.clear();
++
+   } else {
+-    auto Buffer = (GetSize() + 1 < std::numeric_limits<std::size_t>::max()) ? new (std::nothrow) char[GetSize() + 1] : nullptr;
+-    if (Buffer == nullptr) {
+-      // unable to store the data, skip it
+-      input.setFilePointer(GetSize(), seek_current);
+-    } else {
+-      input.readFully(Buffer, GetSize());
+-      if (Buffer[GetSize()-1] != '\0') {
+-        Buffer[GetSize()] = '\0';
+-      }
+-      Value = Buffer;
+-      delete [] Buffer;
+-      SetValueIsSet();
+-    }
++    Value.resize(GetSize());
++    std::memset(&Value[0], 0, GetSize());
++    input.readFully(&Value[0], GetSize());
++
++    auto PosNull = Value.find('\0');
++    if (PosNull != std::string::npos)
++      Value.resize(PosNull);
+   }
+ 
++  SetValueIsSet();
++
+   return GetSize();
+ }
+ 
+-- 
+2.45.1.windows.1
+
