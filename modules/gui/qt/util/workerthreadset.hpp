@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QElapsedTimer>
 
 // maintains a set of reusable worker threads
 // class is not thread safe and must be accessed from Main thread
