@@ -355,7 +355,7 @@ static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
             if(i_buf < (size_t)i_nalu_length + 2)
                 return 0;
 
-            i_total += i_nalu_length + i_nal_length_size;
+            i_total += i_nalu_length + 4; // annexb_startcode4;
             p_buf += i_nalu_length + 2;
             i_buf -= i_nalu_length + 2;
         }
