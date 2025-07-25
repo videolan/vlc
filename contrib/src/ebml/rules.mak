@@ -16,6 +16,7 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
 	$(APPLY) $(SRC)/ebml/0001-EbmlString-ReadFully-use-automatic-memory-management.patch
 	$(APPLY) $(SRC)/ebml/0002-EbmlUnicodeString-use-std-string-when-reading-instea.patch
+	$(APPLY) $(SRC)/ebml/0001-EbmlMaster-fix-leak-when-reading-upper-level-element.patch
 	$(MOVE)
 
 .ebml: ebml toolchain.cmake
