@@ -261,6 +261,8 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
          *  0x00: field 1
          *  0x01: field 2
          */
+        if(i_src < 1)
+            return;
         const uint8_t *cc = &p_src[0];
         const int i_count_cc = cc[0]&0x1f;
         int i;
@@ -297,6 +299,8 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
          *              u8 cc_data_1
          *              u8 cc_data_2
          */
+        if(i_src < 6)
+            return;
         const int b_truncate = p_src[4] & 0x01;
         const int i_count_cc2 = ((p_src[4] >> 1) & 0x1f);
         const uint8_t *cc = &p_src[5];
@@ -319,6 +323,8 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
     }
     else if( i_payload_type == CC_PAYLOAD_REPLAYTV )
     {
+        if(i_src < 1)
+            return;
         const uint8_t *cc = &p_src[0];
         for( int i_cc_count = i_src >> 2; i_cc_count > 0;
              i_cc_count--, cc += 4 )
@@ -345,6 +351,8 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
          *          un additional_realtimevideodata
          *          un reserved
          */
+        if(i_src < 2)
+            return;
         bs_t s;
         bs_init( &s, &p_src[2], i_src - 2 );
         const int i_cc_count = bs_read( &s, 5 );
