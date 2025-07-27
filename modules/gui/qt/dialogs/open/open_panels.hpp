@@ -169,7 +169,8 @@ class DiscOpenPanel: public OpenPanel
         Dvd,
         Vcd,
         Cdda,
-        BRD
+        BRD,
+        Dvda
     };
 public:
     DiscOpenPanel( QWidget *, qt_intf_t * );

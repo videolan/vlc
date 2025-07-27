@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>319</height>
+    <width>715</width>
+    <height>347</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -36,7 +36,7 @@
       <item row="0" column="1">
        <widget class="QRadioButton" name="dvdRadioButton">
         <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
+         <enum>Qt::LayoutDirection::LeftToRight</enum>
         </property>
         <property name="text">
          <string>DVD</string>
@@ -46,84 +46,34 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
+      <item row="0" column="6">
        <spacer>
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>20</height>
+          <width>16</width>
+          <height>25</height>
          </size>
         </property>
        </spacer>
       </item>
       <item row="0" column="3">
-       <widget class="QRadioButton" name="bdRadioButton">
+       <widget class="QRadioButton" name="dvdaRadioButton">
         <property name="text">
-         <string>Blu-ray</string>
+         <string>DVD-Audio</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
+      <item row="0" column="7">
        <widget class="QRadioButton" name="audioCDRadioButton">
         <property name="text">
          <string>Audio CD</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="6">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="7">
-       <widget class="QRadioButton" name="vcdRadioButton">
-        <property name="text">
-         <string>SVCD/VCD</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>31</width>
-          <height>25</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="1" colspan="4">
-       <widget class="QCheckBox" name="dvdsimple">
-        <property name="toolTip">
-         <string>Disable Disc Menus</string>
-        </property>
-        <property name="text">
-         <string>No disc menus</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3" colspan="6">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="9">
+      <item row="4" column="0" colspan="10">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
          <widget class="QLabel" name="deviceLabel">
@@ -176,15 +126,85 @@
         </item>
        </layout>
       </item>
-      <item row="0" column="4">
+      <item row="0" column="8">
        <spacer>
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>16</width>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="9">
+       <widget class="QRadioButton" name="vcdRadioButton">
+        <property name="text">
+         <string>SVCD/VCD</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="10">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>31</width>
           <height>25</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="4" colspan="6">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QRadioButton" name="bdRadioButton">
+        <property name="text">
+         <string>Blu-ray</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="5">
+       <widget class="QCheckBox" name="dvdsimple">
+        <property name="toolTip">
+         <string>Disable Disc Menus</string>
+        </property>
+        <property name="text">
+         <string>No disc menus</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="4">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
          </size>
         </property>
        </spacer>
@@ -220,7 +240,7 @@
          <bool>false</bool>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight</set>
+         <set>Qt::AlignmentFlag::AlignRight</set>
         </property>
         <property name="value">
          <number>0</number>
@@ -230,10 +250,10 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
+         <enum>QSizePolicy::Policy::Fixed</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -262,7 +282,7 @@
          </sizepolicy>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight</set>
+         <set>Qt::AlignmentFlag::AlignRight</set>
         </property>
        </widget>
       </item>
@@ -294,7 +314,7 @@
          </sizepolicy>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight</set>
+         <set>Qt::AlignmentFlag::AlignRight</set>
         </property>
         <property name="minimum">
          <number>-1</number>
@@ -310,10 +330,10 @@
       <item row="0" column="2">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
+         <enum>QSizePolicy::Policy::Fixed</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -345,7 +365,7 @@
          <bool>false</bool>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight</set>
+         <set>Qt::AlignmentFlag::AlignRight</set>
         </property>
         <property name="suffix">
          <string/>
@@ -367,10 +387,10 @@
    <item>
     <spacer>
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Orientation::Vertical</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
+      <enum>QSizePolicy::Policy::MinimumExpanding</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -384,6 +404,7 @@
  </widget>
  <tabstops>
   <tabstop>dvdRadioButton</tabstop>
+  <tabstop>dvdaRadioButton</tabstop>
   <tabstop>bdRadioButton</tabstop>
   <tabstop>audioCDRadioButton</tabstop>
   <tabstop>vcdRadioButton</tabstop>
