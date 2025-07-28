@@ -325,6 +325,8 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
                     {
                         /* delta_scale */
                         i_tmp = bs_read_se( p_bs );
+                        if(i_tmp < -128 || i_tmp > 127)
+                          return false;
                         i_nextscale = ( i_lastscale + i_tmp + 256 ) % 256;
                         /* useDefaultScalingMatrixFlag = ... */
                     }
