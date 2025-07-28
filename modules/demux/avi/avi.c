@@ -3034,6 +3034,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
 
     p_indx = AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0, false );
     avi_chunk_t ck;
+    AVI_ChunkInit( &ck );
     int64_t  i_position;
     unsigned i_size;
     if( p_indx )
@@ -3045,6 +3046,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
                 AVI_ChunkRead( p_demux->s, &ck, NULL  ) ||
                 ck.common.i_chunk_fourcc != AVIFOURCC_indx )
                 goto exit;
+
             p_indx = &ck.indx;
         }
 
@@ -3147,8 +3149,7 @@ exit:
     else
         msg_Warn( p_demux, "Failed to load an embedded subtitle" );
 
-    if( p_indx == &ck.indx )
-        AVI_ChunkClean( p_demux->s, &ck );
+    AVI_ChunkClean( p_demux->s, &ck );
 }
 
 static avi_track_t * AVI_GetVideoTrackForXsub( demux_sys_t *p_sys )
