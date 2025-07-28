@@ -73,19 +73,20 @@ vlc_module_end ()
 
 static const struct
 {
-    const char *psz_protocol;
-    const char *psz_service_name;
-    bool        b_renderer;
-    int         i_renderer_flags;
+    const char              *psz_protocol;
+    const char              *psz_service_name;
+    enum input_item_type_e  item_type;
+    bool                    b_renderer;
+    int                     i_renderer_flags;
 } protocols[] = {
-    { "ftp", "_ftp._tcp.local", false, 0 },
-    { "smb", "_smb._tcp.local", false, 0 },
-    { "nfs", "_nfs._tcp.local", false, 0 },
-    { "sftp", "_sftp-ssh._tcp.local", false, 0 },
-    { "webdav", "_webdav._tcp.local", false, 0 },
-    { "webdavs", "_webdavs._tcp.local", false, 0 },
-    { "rtsp", "_rtsp._tcp.local", false, 0 },
-    { "chromecast", "_googlecast._tcp.local", true, VLC_RENDERER_CAN_AUDIO },
+    { "ftp", "_ftp._tcp.local", ITEM_TYPE_DIRECTORY, false, 0 },
+    { "smb", "_smb._tcp.local", ITEM_TYPE_DIRECTORY, false, 0 },
+    { "nfs", "_nfs._tcp.local", ITEM_TYPE_DIRECTORY, false, 0 },
+    { "sftp", "_sftp-ssh._tcp.local", ITEM_TYPE_DIRECTORY, false, 0 },
+    { "webdav", "_webdav._tcp.local", ITEM_TYPE_DIRECTORY, false, 0 },
+    { "webdavs", "_webdavs._tcp.local", ITEM_TYPE_DIRECTORY, false, 0 },
+    { "rtsp", "_rtsp._tcp.local", ITEM_TYPE_DIRECTORY, false, 0 },
+    { "chromecast", "_googlecast._tcp.local", ITEM_TYPE_DIRECTORY, true, VLC_RENDERER_CAN_AUDIO },
 };
 
 struct discovery_sys
@@ -108,9 +109,11 @@ struct item
 
 struct srv
 {
-    const char *psz_protocol;
-    char *      psz_device_name;
-    uint16_t    i_port;
+    const char              *psz_protocol;
+    char                    *psz_device_name;
+    uint16_t                i_port;
+    enum input_item_type_e  item_type;
+    bool                    b_renderer;
     struct
     {
         char *      psz_model;
@@ -148,7 +151,7 @@ strrcmp(const char *s1, const char *s2)
 
 static int
 items_add_input( struct discovery_sys *p_sys, services_discovery_t *p_sd,
-                 char *psz_uri, const char *psz_name )
+                 char *psz_uri, const char *psz_name, enum input_item_type_e item_type )
 {
     struct item *p_item = malloc( sizeof(struct item) );
     if( p_item == NULL )
@@ -157,8 +160,11 @@ items_add_input( struct discovery_sys *p_sys, services_discovery_t *p_sd,
         return VLC_ENOMEM;
     }
 
-    input_item_t *p_input_item =
-        input_item_NewDirectory( psz_uri, psz_name, ITEM_NET );
+    input_item_t *p_input_item = NULL;
+    if( item_type == ITEM_TYPE_STREAM )
+        p_input_item = input_item_NewStream( psz_uri, psz_name, INPUT_DURATION_UNSET );
+    else
+        p_input_item = input_item_NewDirectory( psz_uri, psz_name, ITEM_NET );
     if( p_input_item == NULL )
     {
         free( psz_uri );
@@ -329,6 +335,8 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
                         break;
                     p_srv->psz_protocol = protocols[i].psz_protocol;
                     p_srv->i_port = p_entry->data.SRV.port;
+                    p_srv->item_type = protocols[i].item_type;
+                    p_srv->b_renderer = protocols[i].b_renderer;
                     p_srv->renderer.i_renderer_flags = protocols[i].i_renderer_flags;
                     ++i_nb_srv;
                     break;
@@ -438,7 +446,7 @@ new_entries_sd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
             free( psz_uri );
             continue;
         }
-        items_add_input( p_sys, p_sd, psz_uri, p_srv->psz_device_name );
+        items_add_input( p_sys, p_sd, psz_uri, p_srv->psz_device_name, p_srv->item_type );
     }
 
     clear_srvs( p_srvs, i_nb_srv );
