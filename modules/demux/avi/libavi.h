@@ -253,6 +253,7 @@ int     AVI_ChunkRead( stream_t *,
                        avi_chunk_t *p_chk,
                        avi_chunk_t *p_father );
 void    AVI_ChunkClean( stream_t *, avi_chunk_t * );
+void    AVI_ChunkInit( avi_chunk_t * );
 
 int     AVI_ChunkCount_( avi_chunk_t *, vlc_fourcc_t, bool );
 void   *AVI_ChunkFind_ ( avi_chunk_t *, vlc_fourcc_t, int, bool );

@@ -63,7 +63,7 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk,
 {
     const uint8_t *p_peek;
 
-    memset( p_chk, 0, sizeof( avi_chunk_t ) );
+    AVI_ChunkInit( p_chk );
 
     const uint64_t i_pos = vlc_stream_Tell( s );
     if( vlc_stream_Peek( s, &p_peek, 8 ) < 8 )
@@ -1060,9 +1060,14 @@ void AVI_ChunkClean( stream_t *s,
         msg_Warn( s, "unknown chunk: %4.4s (not unloaded)",
                 (char*)&p_chk->common.i_chunk_fourcc );
     }
-    p_chk->common.p_first = NULL;
+    AVI_ChunkInit( p_chk );
 
     return;
+}
+
+void AVI_ChunkInit( avi_chunk_t *p_chk )
+{
+    memset( p_chk, 0, sizeof(*p_chk) );
 }
 
 static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
