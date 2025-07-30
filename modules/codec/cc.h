@@ -158,7 +158,7 @@ static inline void cc_ProbeCEA708OneByte( cc_data_t *c, bool b_start, const uint
                 uint8_t i_extsid = cc & 0x3F;
                 if( i_extsid >= 0x07 )
                 {
-                    const uint8_t mask = (1 << --i_extsid);
+                    const uint64_t mask = (INT64_C(1) << --i_extsid);
                     c->i_708channels |= (mask + (mask - 1));
                 }
                 if( c->cea708.sid_bs == 0 )
