@@ -18,7 +18,8 @@ variables:
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20241111035123
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20230621085943
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20250626142950
+    VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20190627090437
 
 .variables-debian: &variables-debian
@@ -375,7 +376,7 @@ nightly-macos-arm64:
         name: $VLC_ANDROID_IMAGE
     script: |
         git clone https://code.videolan.org/videolan/libvlcjni.git
-        (cd libvlcjni && git checkout 07719e22b223fc31fa9935371d16eba311496890)
+        (cd libvlcjni && git checkout a3613013538860adc74eb1783473bc9405cd5028)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             /bin/sh ./libvlcjni/buildsystem/compile-libvlc.sh --no-jni -a $ANDROID_ARCH --with-prebuilt-contribs
         else
@@ -388,6 +389,8 @@ android-arm:
 
 android-arm64:
     extends: .android-common
+    image:
+        name: $VLC_ANDROID4_IMAGE
     variables: *variables-android-arm64
 
 android-x86:
@@ -396,6 +399,8 @@ android-x86:
 
 android-x86_64:
     extends: .android-common
+    image:
+        name: $VLC_ANDROID4_IMAGE
     variables: *variables-android-x86_64
 
 #
