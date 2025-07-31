@@ -513,8 +513,7 @@ raspbian-arm:
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         fi
         export PATH="${VLC_PATH}:$PATH"
-        mkdir build && cd build
-        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x
+        ./extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x
         # At least compile every targets
         make check TESTS=
 
