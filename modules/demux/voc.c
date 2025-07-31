@@ -306,6 +306,7 @@ static int ReadBlockHeader( demux_t *p_demux )
             }
 
             new_fmt.i_codec = VLC_CODEC_U8;
+            static_assert( INPUT_CHAN_MAX > 32, "INPUT_CHAN_MAX too small" );
             if (buf[3] >= 32)
                 goto corrupt;
             new_fmt.audio.i_channels = buf[3] + 1; /* can't be nul */
@@ -400,6 +401,11 @@ static int ReadBlockHeader( demux_t *p_demux )
             if( new_fmt.audio.i_channels == 0 )
             {
                 msg_Err( p_demux, "0 channels detected" );
+                return VLC_EGENERIC;
+            }
+            if ( new_fmt.audio.i_channels > INPUT_CHAN_MAX )
+            {
+                msg_Err( p_demux, "too many channels detected %" PRIu8, new_fmt.audio.i_channels );
                 return VLC_EGENERIC;
             }
 
