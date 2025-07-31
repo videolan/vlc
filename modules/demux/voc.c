@@ -232,15 +232,13 @@ static int ReadBlockHeader( demux_t *p_demux )
             }
 
             new_fmt.audio.i_channels = 1;
-            new_fmt.audio.i_bytes_per_frame *= new_fmt.audio.i_channels;
             new_fmt.audio.i_blockalign = new_fmt.audio.i_bytes_per_frame;
 
             new_fmt.audio.i_frame_length = new_fmt.audio.i_bytes_per_frame * 8
                                          / new_fmt.audio.i_bitspersample;
 
             new_fmt.audio.i_rate = fix_voc_sr( 1000000L / (256L - buf[0]) );
-            new_fmt.i_bitrate = new_fmt.audio.i_rate * new_fmt.audio.i_bitspersample
-                              * new_fmt.audio.i_channels;
+            new_fmt.i_bitrate = new_fmt.audio.i_rate * new_fmt.audio.i_bitspersample;
 
             break;
 
