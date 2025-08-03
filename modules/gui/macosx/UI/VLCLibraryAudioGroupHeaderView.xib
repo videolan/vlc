@@ -119,6 +119,7 @@
                 <outlet property="detailTextField" destination="8Fd-yT-2AG" id="VVh-Xd-Ma1"/>
                 <outlet property="playButton" destination="UDD-gH-RDW" id="Cvj-Zy-lA5"/>
                 <outlet property="queueButton" destination="Baf-bX-D7M" id="LXJ-9K-2zU"/>
+                <outlet property="stackView" destination="0Si-IF-hfH" id="QDA-wu-RRB"/>
                 <outlet property="titleTextField" destination="VGp-RV-Jl4" id="G9K-eO-d5s"/>
             </connections>
             <point key="canvasLocation" x="-588" y="-314"/>

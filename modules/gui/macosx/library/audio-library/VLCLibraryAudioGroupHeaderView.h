@@ -35,6 +35,7 @@ extern NSString * const VLCLibraryAudioGroupHeaderViewIdentifier;
 
 @property (readwrite, retain, nonatomic) VLCLibraryRepresentedItem *representedItem;
 
+@property (readwrite, weak) IBOutlet NSStackView *stackView;
 @property (readwrite, weak) IBOutlet NSTextField *titleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *detailTextField;
 @property (readwrite, weak) IBOutlet NSButton *playButton;
