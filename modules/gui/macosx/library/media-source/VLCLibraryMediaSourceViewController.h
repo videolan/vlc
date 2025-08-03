@@ -49,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) VLCMediaSourceBaseDataSource *baseDataSource;
 @property (readonly) VLCLibraryMediaSourceViewNavigationStack *navigationStack;
+@property (readonly) NSView *pathControlContainerView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

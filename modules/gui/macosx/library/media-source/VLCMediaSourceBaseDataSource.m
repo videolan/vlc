@@ -151,7 +151,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
-    [self togglePathControlVisibility:!_pathControlVisualEffectView.hidden];
+    [self togglePathControlVisibility:!_pathControlContainerView.hidden];
 }
 
 - (void)loadMediaSources
@@ -539,10 +539,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)togglePathControlVisibility:(BOOL)visible
 {
-    _pathControlVisualEffectView.hidden = !visible;
+    _pathControlContainerView.hidden = !visible;
 
-    const CGFloat pathControlVisualEffectViewHeight = _pathControlVisualEffectView.frame.size.height;
-    const CGFloat scrollViewsTopSpace = visible ? pathControlVisualEffectViewHeight : 0;
+    const CGFloat pathControlContainerViewHeight = _pathControlContainerView.frame.size.height;
+    const CGFloat scrollViewsTopSpace = visible ? pathControlContainerViewHeight : 0;
 
     NSEdgeInsets scrollViewInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
     scrollViewInsets.top += scrollViewsTopSpace;

@@ -96,7 +96,7 @@
     _baseDataSource.collectionViewScrollView = _collectionViewScrollView;
     _baseDataSource.homeButton = _homeButton;
     _baseDataSource.pathControl = _pathControl;
-    _baseDataSource.pathControlVisualEffectView = _pathControlVisualEffectView;
+    _baseDataSource.pathControlContainerView = self.pathControlContainerView;
     _baseDataSource.tableView = _tableView;
     _baseDataSource.tableViewScrollView = _tableViewScrollView;
     [_baseDataSource setupViews];
@@ -185,6 +185,13 @@
 - (void)updatePlaceholderLabel:(NSNotification *)notification
 {
     self.browsePlaceholderLabel.hidden = self.mediaSourceTableView.numberOfRows > 0;
+}
+
+- (NSView *)pathControlContainerView
+{
+    if (@available(macOS 26.0, *))
+        return self.pathControlGlassEffectView;
+    return self.pathControlVisualEffectView;
 }
 
 - (void)presentBrowseView

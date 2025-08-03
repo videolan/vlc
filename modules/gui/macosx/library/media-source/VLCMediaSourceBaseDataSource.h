@@ -49,7 +49,7 @@ extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 @property (readwrite, weak) NSScrollView *tableViewScrollView;
 @property (readwrite, weak) NSButton *homeButton;
 @property (readwrite, weak) VLCInputNodePathControl *pathControl;
-@property (readwrite, weak) NSVisualEffectView *pathControlVisualEffectView;
+@property (readwrite, weak) NSView *pathControlContainerView;
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
 @property (readwrite, nonatomic) VLCMediaSourceDataSource *childDataSource;
 
