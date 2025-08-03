@@ -35,11 +35,18 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCInputNodePathControl.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
+
+@interface VLCLibraryMediaSourceViewController ()
+
+@property (readonly) NSGlassEffectView *pathControlGlassEffectView API_AVAILABLE(macos(26.0));
+
+@end
 
 @implementation VLCLibraryMediaSourceViewController
 
@@ -48,11 +55,11 @@
     self = [super initWithLibraryWindow:libraryWindow];
     if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupPathControlView];
         [self setupBaseDataSource];
         [self setupCollectionView];
         [self setupMediaSourceLibraryViews];
         [self setupPlaceholderLabel];
-        [self setupPathControlView];
 
         NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
         [defaultCenter addObserver:self 
@@ -139,14 +146,39 @@
 
 - (void)setupPathControlView
 {
-    _pathControlViewTopConstraintToSuperview = [NSLayoutConstraint constraintWithItem:self.pathControlVisualEffectView
-                                                                                    attribute:NSLayoutAttributeTop
-                                                                                    relatedBy:NSLayoutRelationEqual
-                                                                                       toItem:self.mediaSourceView
-                                                                                    attribute:NSLayoutAttributeTop
-                                                                                   multiplier:1.
-                                                                                     constant:self.libraryWindow.titlebarHeight];
-    [self.mediaSourceView addConstraint:_pathControlViewTopConstraintToSuperview];
+    if (@available(macOS 26.0, *)) {
+        NSButton * const homeButton = self.homeButton;
+        VLCInputNodePathControl * const pathControl = self.pathControl;
+        pathControl.translatesAutoresizingMaskIntoConstraints = NO;
+        const CGFloat pathControlHeight = pathControl.frame.size.height;
+        
+        _pathControlGlassEffectView = [[NSGlassEffectView alloc] initWithFrame:self.pathControlVisualEffectView.frame];
+        self.pathControlGlassEffectView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.pathControlVisualEffectView removeFromSuperview];
+        [self.mediaSourceView addSubview:self.pathControlGlassEffectView];
+
+        _pathControlViewTopConstraintToSuperview =
+            [self.pathControlGlassEffectView.topAnchor constraintEqualToAnchor:self.mediaSourceView.topAnchor constant:self.libraryWindow.titlebarHeight];
+        [NSLayoutConstraint activateConstraints:@[
+            [self.pathControlGlassEffectView.leadingAnchor constraintEqualToAnchor:self.mediaSourceView.leadingAnchor constant:VLCLibraryUIUnits.smallSpacing],
+            [self.pathControlGlassEffectView.trailingAnchor constraintEqualToAnchor:self.mediaSourceView.trailingAnchor constant:-VLCLibraryUIUnits.smallSpacing],
+            [self.pathControlGlassEffectView.heightAnchor constraintEqualToConstant:pathControlHeight + (VLCLibraryUIUnits.smallSpacing * 2)],
+        ]];
+        NSView * const pathControlContainer = [[NSView alloc] initWithFrame:pathControl.frame];
+        [pathControlContainer addSubview:homeButton];
+        [pathControlContainer addSubview:pathControl];
+        [NSLayoutConstraint activateConstraints:@[
+            [homeButton.leadingAnchor constraintEqualToAnchor:pathControlContainer.leadingAnchor constant:VLCLibraryUIUnits.smallSpacing],
+            [homeButton.centerYAnchor constraintEqualToAnchor:pathControlContainer.centerYAnchor],
+            [pathControl.leadingAnchor constraintEqualToAnchor:homeButton.trailingAnchor constant:VLCLibraryUIUnits.smallSpacing],
+            [pathControl.trailingAnchor constraintEqualToAnchor:pathControlContainer.trailingAnchor constant:-VLCLibraryUIUnits.smallSpacing],
+            [pathControl.centerYAnchor constraintEqualToAnchor:pathControlContainer.centerYAnchor],
+        ]];
+        self.pathControlGlassEffectView.contentView = pathControlContainer;
+    } else {
+        _pathControlViewTopConstraintToSuperview =
+            [self.pathControlVisualEffectView.topAnchor constraintEqualToAnchor:self.mediaSourceView.topAnchor constant:self.libraryWindow.titlebarHeight];
+    }
     _pathControlViewTopConstraintToSuperview.active = YES;
 }
 
