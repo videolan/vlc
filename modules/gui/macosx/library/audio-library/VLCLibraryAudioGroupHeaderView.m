@@ -24,6 +24,7 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import "main/VLCMain.h"
 
@@ -34,6 +35,12 @@
 
 NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGroupHeaderViewIdentifier";
 
+@interface VLCLibraryAudioGroupHeaderView ()
+
+@property NSGlassEffectView *glassBackgroundView API_AVAILABLE(macos(26.0));
+
+@end
+
 @implementation VLCLibraryAudioGroupHeaderView
 
 + (CGSize)defaultHeaderSize
@@ -43,18 +50,32 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
 - (void)awakeFromNib
 {
-    if (@available(macOS 10.14, *)) {
+    if (@available(macOS 10.14, *))
         _playButton.bezelColor = NSColor.VLCAccentColor;
-        [NSApplication.sharedApplication addObserver:self
-                                          forKeyPath:@"effectiveAppearance"
-                                             options:NSKeyValueObservingOptionNew
-                                             context:nil];
-    }
 
-    self.backgroundEffectView.wantsLayer = YES;
-    self.backgroundEffectView.layer.cornerRadius = VLCLibraryUIUnits.smallSpacing;
-    self.backgroundEffectView.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
-    [self updateColoredAppearance:self.effectiveAppearance];
+    if (@available(macOS 26.0, *)) {
+        self.glassBackgroundView = [[NSGlassEffectView alloc] initWithFrame:self.backgroundEffectView.frame];
+
+        [self addSubview:self.glassBackgroundView
+              positioned:NSWindowBelow
+              relativeTo:self.backgroundEffectView];
+        [self.glassBackgroundView applyConstraintsToFillSuperview];
+        [self.backgroundEffectView removeFromSuperview];
+        [self.stackView removeFromSuperview];
+        self.glassBackgroundView.contentView = self.stackView;
+
+    } else {
+        if (@available(macOS 10.14, *)) {
+            [NSApplication.sharedApplication addObserver:self
+                                            forKeyPath:@"effectiveAppearance"
+                                                options:NSKeyValueObservingOptionNew
+                                                context:nil];
+        }
+        self.backgroundEffectView.wantsLayer = YES;
+        self.backgroundEffectView.layer.cornerRadius = VLCLibraryUIUnits.smallSpacing;
+        self.backgroundEffectView.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
+        [self updateColoredAppearance:self.effectiveAppearance];
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
