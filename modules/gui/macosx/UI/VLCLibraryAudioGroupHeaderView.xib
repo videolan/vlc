@@ -58,7 +58,6 @@
                                         <constraint firstItem="UDD-gH-RDW" firstAttribute="centerY" secondItem="eE7-fJ-MtS" secondAttribute="centerY" id="7pl-Xu-lre"/>
                                         <constraint firstItem="Baf-bX-D7M" firstAttribute="centerY" secondItem="eE7-fJ-MtS" secondAttribute="centerY" id="AMr-ZS-8Ot"/>
                                         <constraint firstItem="UDD-gH-RDW" firstAttribute="width" secondItem="Baf-bX-D7M" secondAttribute="width" id="N5Y-W0-Y5P"/>
-                                        <constraint firstAttribute="width" constant="157" id="hWf-p4-ES0"/>
                                     </constraints>
                                     <visibilityPriorities>
                                         <integer value="1000"/>
@@ -89,10 +88,12 @@
                         </textField>
                     </subviews>
                     <constraints>
-                        <constraint firstItem="Yyj-ln-1hz" firstAttribute="leading" secondItem="0Si-IF-hfH" secondAttribute="leading" id="Ci0-Wg-TUY"/>
-                        <constraint firstItem="8Fd-yT-2AG" firstAttribute="leading" secondItem="0Si-IF-hfH" secondAttribute="leading" id="Kyd-AH-vSN"/>
-                        <constraint firstAttribute="trailing" secondItem="Yyj-ln-1hz" secondAttribute="trailing" id="LeP-os-gHu"/>
-                        <constraint firstAttribute="trailing" secondItem="8Fd-yT-2AG" secondAttribute="trailing" id="VyH-Uu-36X"/>
+                        <constraint firstAttribute="bottom" secondItem="8Fd-yT-2AG" secondAttribute="bottom" constant="10" id="8tG-XA-Dhe"/>
+                        <constraint firstItem="Yyj-ln-1hz" firstAttribute="leading" secondItem="0Si-IF-hfH" secondAttribute="leading" constant="10" id="Ci0-Wg-TUY"/>
+                        <constraint firstItem="8Fd-yT-2AG" firstAttribute="leading" secondItem="0Si-IF-hfH" secondAttribute="leading" constant="10" id="Kyd-AH-vSN"/>
+                        <constraint firstAttribute="trailing" secondItem="Yyj-ln-1hz" secondAttribute="trailing" constant="10" id="LeP-os-gHu"/>
+                        <constraint firstItem="Yyj-ln-1hz" firstAttribute="top" secondItem="0Si-IF-hfH" secondAttribute="top" constant="10" id="VPw-ku-aor"/>
+                        <constraint firstAttribute="trailing" secondItem="8Fd-yT-2AG" secondAttribute="trailing" constant="10" id="VyH-Uu-36X"/>
                     </constraints>
                     <visibilityPriorities>
                         <integer value="1000"/>
@@ -108,11 +109,11 @@
                 <constraint firstAttribute="bottom" secondItem="f5b-qJ-770" secondAttribute="bottom" id="CMu-pV-oNq"/>
                 <constraint firstItem="f5b-qJ-770" firstAttribute="leading" secondItem="E6K-GD-bgu" secondAttribute="leading" id="Enr-0y-OWJ"/>
                 <constraint firstItem="f5b-qJ-770" firstAttribute="top" secondItem="E6K-GD-bgu" secondAttribute="top" id="UDS-Of-f99"/>
-                <constraint firstItem="0Si-IF-hfH" firstAttribute="top" secondItem="E6K-GD-bgu" secondAttribute="top" constant="10" id="fw0-cv-Ofa"/>
-                <constraint firstAttribute="trailing" secondItem="0Si-IF-hfH" secondAttribute="trailing" constant="10" id="mM3-Iy-sSh"/>
+                <constraint firstItem="0Si-IF-hfH" firstAttribute="top" secondItem="E6K-GD-bgu" secondAttribute="top" id="fw0-cv-Ofa"/>
+                <constraint firstAttribute="trailing" secondItem="0Si-IF-hfH" secondAttribute="trailing" id="mM3-Iy-sSh"/>
                 <constraint firstAttribute="trailing" secondItem="f5b-qJ-770" secondAttribute="trailing" id="qxE-XE-VRb"/>
-                <constraint firstAttribute="bottom" secondItem="0Si-IF-hfH" secondAttribute="bottom" constant="10" id="sUV-bu-8ug"/>
-                <constraint firstItem="0Si-IF-hfH" firstAttribute="leading" secondItem="E6K-GD-bgu" secondAttribute="leading" constant="10" id="vM8-9F-b9Q"/>
+                <constraint firstAttribute="bottom" secondItem="0Si-IF-hfH" secondAttribute="bottom" id="sUV-bu-8ug"/>
+                <constraint firstItem="0Si-IF-hfH" firstAttribute="leading" secondItem="E6K-GD-bgu" secondAttribute="leading" id="vM8-9F-b9Q"/>
             </constraints>
             <connections>
                 <outlet property="backgroundEffectView" destination="f5b-qJ-770" id="ASu-7B-UGN"/>
