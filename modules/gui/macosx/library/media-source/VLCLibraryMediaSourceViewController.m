@@ -44,7 +44,9 @@
 
 @interface VLCLibraryMediaSourceViewController ()
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
 @property (readonly) NSGlassEffectView *pathControlGlassEffectView API_AVAILABLE(macos(26.0));
+#endif
 
 @end
 
@@ -147,6 +149,7 @@
 - (void)setupPathControlView
 {
     if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         NSButton * const homeButton = self.homeButton;
         VLCInputNodePathControl * const pathControl = self.pathControl;
         pathControl.translatesAutoresizingMaskIntoConstraints = NO;
@@ -175,6 +178,7 @@
             [pathControl.centerYAnchor constraintEqualToAnchor:pathControlContainer.centerYAnchor],
         ]];
         self.pathControlGlassEffectView.contentView = pathControlContainer;
+#endif
     } else {
         _pathControlViewTopConstraintToSuperview =
             [self.pathControlVisualEffectView.topAnchor constraintEqualToAnchor:self.mediaSourceView.topAnchor constant:self.libraryWindow.titlebarHeight];
@@ -189,8 +193,10 @@
 
 - (NSView *)pathControlContainerView
 {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
     if (@available(macOS 26.0, *))
         return self.pathControlGlassEffectView;
+#endif
     return self.pathControlVisualEffectView;
 }
 
