@@ -83,7 +83,9 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
                         change:(NSDictionary<NSKeyValueChangeKey,id> *)change
                        context:(void *)context
 {
-    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
+    if (@available(macOS 26.0, *)) {
+        return;
+    } else if ([keyPath isEqualToString:@"effectiveAppearance"]) {
         NSAppearance * const effectiveAppearance = change[NSKeyValueChangeNewKey];
         [self updateColoredAppearance:effectiveAppearance];
     }
@@ -91,6 +93,9 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
 - (void)updateColoredAppearance:(NSAppearance *)appearance
 {
+    if (@available(macOS 26.0, *))
+        return;
+
     NSParameterAssert(appearance);
     BOOL isDark = NO;
     if (@available(macOS 10.14, *)) {
