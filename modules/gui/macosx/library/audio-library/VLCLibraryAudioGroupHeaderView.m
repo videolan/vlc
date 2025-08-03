@@ -37,7 +37,9 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
 @interface VLCLibraryAudioGroupHeaderView ()
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
 @property NSGlassEffectView *glassBackgroundView API_AVAILABLE(macos(26.0));
+#endif
 
 @end
 
@@ -54,6 +56,7 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
         _playButton.bezelColor = NSColor.VLCAccentColor;
 
     if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         self.glassBackgroundView = [[NSGlassEffectView alloc] initWithFrame:self.backgroundEffectView.frame];
 
         [self addSubview:self.glassBackgroundView
@@ -63,7 +66,7 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
         [self.backgroundEffectView removeFromSuperview];
         [self.stackView removeFromSuperview];
         self.glassBackgroundView.contentView = self.stackView;
-
+#endif
     } else {
         if (@available(macOS 10.14, *)) {
             [NSApplication.sharedApplication addObserver:self
