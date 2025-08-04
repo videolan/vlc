@@ -329,7 +329,7 @@ T.ItemDelegate {
             id: titleTextRect
 
             label: titleLabel
-            forceScroll: highlighted
+            forceScroll: root.visualFocus
             visible: root.title !== ""
             clip: scrolling
 
