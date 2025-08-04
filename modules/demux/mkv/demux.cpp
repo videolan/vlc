@@ -480,6 +480,7 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
     if (std::string(doc_type) != "matroska" && std::string(doc_type) != "webm" )
     {
         msg_Err( p_demux, "Not a Matroska file : DocType = %s ", std::string(doc_type).c_str());
+        delete p_l0;
         return false;
     }
 
@@ -487,6 +488,7 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
     if (uint64(doc_read_version) > 5)
     {
         msg_Err( p_demux, "matroska file needs version %" PRId64 " but only versions 1 to 4 supported", uint64(doc_read_version));
+        delete p_l0;
         return false;
     }
 
