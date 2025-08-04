@@ -662,7 +662,7 @@ static int ParseRLE( decoder_t *p_dec,
             i_code = 0;
             for( unsigned int i_min = 1; i_min <= 0x40 && i_code < i_min; i_min <<= 2 )
             {
-                if( (*pi_offset >> 1) >= p_sys->i_spu_size )
+                if( (*pi_offset >> 1) + 4 >= p_sys->i_spu_size )
                 {
                     msg_Err( p_dec, "out of bounds while reading rle" );
                     return VLC_EGENERIC;
