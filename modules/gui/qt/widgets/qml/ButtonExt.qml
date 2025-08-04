@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2025 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,10 @@ T.Button {
 
     // Properties
 
-    property bool selected: false
+    property bool showText: (text.length > 0)
+
+    property bool selected: false // WARNING: This property is deprecated. Use `checked` instead.
+    checked: selected
 
     property bool busy: false
 
@@ -46,7 +49,7 @@ T.Button {
     property bool extBackgroundAnimation: false
 
     // Aliases
-    property alias iconRotation: icon.rotation
+    property real iconRotation
 
     // Settings
 
@@ -71,6 +74,14 @@ T.Button {
 
     Accessible.onPressAction: control.clicked()
 
+    // Tooltip
+
+    T.ToolTip.visible: (T.ToolTip.text && (!showText || label.implicitWidth > label.width) && (hovered || visualFocus))
+
+    T.ToolTip.delay: VLCStyle.delayToolTipAppear
+
+    T.ToolTip.text: text
+
     // Childs
 
 
@@ -78,100 +89,103 @@ T.Button {
         id: theme
         colorSet: ColorContext.ButtonStandard
 
-        focused: control.activeFocus
+        focused: control.visualFocus
         hovered: control.hovered
         enabled: control.enabled
         pressed: control.down
     }
 
     background: Widgets.AnimatedBackground {
-        id: background
-
-        height: control.height
-        width: control.width
-
         enabled: theme.initialized && !control.extBackgroundAnimation
 
         color: theme.bg.primary
-        border.color: control.visualFocus ? control.colorFocus : theme.border
-    }
+        border.color: control.visualFocus ? control.colorFocus
+                                          : (theme.border.a > 0.0 ? theme.border : color)
 
-    contentItem: Item {
-        implicitWidth: tabRow.implicitWidth
-        implicitHeight: tabRow.implicitHeight
-
-        RowLayout {
-            id: tabRow
-
-            anchors.fill: parent
-
-            spacing: control.spacing
-
-            Item {
-                Layout.fillHeight: true
-
-                implicitWidth: VLCStyle.fontHeight_normal
-                implicitHeight: VLCStyle.fontHeight_normal
-
-                visible: (control.iconTxt !== "") || control.busy
-
-                Widgets.IconLabel {
-                    id: icon
-
-                    anchors.fill: parent
-
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-
-                    visible: (!control.busy)
-
-                    text: control.iconTxt
-
-                    color: control.color
-
-                    font.pixelSize: control.iconSize
-                }
-
-                // FIXME: use Control.Templates
-                BusyIndicator {
-                    anchors.fill: parent
-
-                    padding: 0
-
-                    running: control.busy
-
-                    palette.text: theme.fg.primary
-                }
+        Rectangle {
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: VLCStyle.margin_xxxsmall
+                horizontalCenter: parent.horizontalCenter
             }
 
-            Widgets.ListLabel {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            implicitWidth: (parent.width - VLCStyle.margin_xsmall)
+            implicitHeight: VLCStyle.heightBar_xxxsmall
 
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+            width: control.contentItem?.implicitWidth ?? implicitWidth
 
-                text: control.text
+            visible: (width > 0 && control.checked)
+        }
+    }
 
-                //button text is already exposed
-                Accessible.ignored: true
+    contentItem: RowLayout {
+        spacing: 0
 
-                color: theme.fg.primary
+        Item {
+            Layout.fillWidth: true
+        }
+
+        Widgets.IconLabel {
+            id: iconLabel
+
+            visible: text.length > 0
+
+            rotation: control.iconRotation
+
+            text: control.iconTxt
+
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+
+            color: Qt.alpha(control.color, control.busy ? 0.0 : 1.0)
+
+            font.pixelSize: control.iconSize
+
+            Layout.fillWidth: !label.visible
+            Layout.fillHeight: true
+
+            // FIXME: use `BusyIndicatorExt` when it is ready (!7180)
+            BusyIndicator {
+                anchors.fill: parent
+
+                padding: 0
+
+                running: control.busy
+
+                palette.text: control.color
+                palette.dark: control.color
             }
         }
 
-        Rectangle {
-            anchors.left: tabRow.left
-            anchors.right: tabRow.right
-            anchors.bottom: tabRow.bottom
+        T.Label {
+            id: label
 
-            height: 2
+            visible: control.showText
 
-            visible: control.selected
+            text: control.text
 
-            color: "transparent"
+            verticalAlignment: Text.AlignVCenter
 
-            border.color: theme.accent
+            color: control.color
+
+            elide: Text.ElideRight
+
+            font.pixelSize: VLCStyle.fontSize_normal
+            font.weight: Font.DemiBold
+
+            textFormat: Text.PlainText
+
+            //button text is already exposed
+            Accessible.ignored: true
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.maximumWidth: implicitWidth + 1
+            Layout.leftMargin: iconLabel.visible ? VLCStyle.margin_xsmall : 0
+        }
+
+        Item {
+            Layout.fillWidth: true
         }
     }
 }
