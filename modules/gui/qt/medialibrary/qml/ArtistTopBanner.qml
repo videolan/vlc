@@ -205,6 +205,8 @@ FocusScope {
                         //we probably want to keep this button like the other action buttons
                         colorContext.palette: VLCStyle.palette
 
+                        showText: actionButtons.width > VLCStyle.colWidth(2)
+
                         onClicked: MediaLib.addAndPlay( artist.id )
                     }
 
@@ -213,6 +215,8 @@ FocusScope {
                         iconTxt: VLCIcons.enqueue
                         text: qsTr("Enqueue all")
                         onClicked: MediaLib.addToPlaylist( artist.id )
+
+                        showText: actionButtons.width > VLCStyle.colWidth(2)
                     }
                 }
             }
