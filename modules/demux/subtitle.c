@@ -1100,10 +1100,8 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
         size_t i_len;
 
         i_len = s ? strlen( s ) : 0;
-        if( i_len <= 0 )
+        if( i_len == 0 )
         {
-            if (psz_text)
-                psz_text[i_old] = '\0';
             p_subtitle->psz_text = psz_text;
             return VLC_SUCCESS;
         }
@@ -1114,6 +1112,7 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
+        psz_text[i_old + i_len + 1] = '\0';
         i_old += i_len + 1;
 
         /* replace [br] by \n */
