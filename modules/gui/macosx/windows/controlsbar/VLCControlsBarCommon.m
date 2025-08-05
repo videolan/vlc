@@ -144,18 +144,23 @@
     self.fullscreenButton.accessibilityLabel = self.fullscreenButton.toolTip;
 
     if (@available(macOS 11.0, *)) {
-        _playImage = [NSImage imageWithSystemSymbolName:@"play.circle.fill"
-                               accessibilityDescription:_NS("Play")];
-        _pressedPlayImage = [NSImage imageWithSystemSymbolName:@"play.circle.fill"
-                                      accessibilityDescription:_NS("Play")];
-        _pauseImage = [NSImage imageWithSystemSymbolName:@"pause.circle.fill"
-                                accessibilityDescription:_NS("Pause")];
-        _pressedPauseImage = [NSImage imageWithSystemSymbolName:@"pause.circle.fill"
-                                       accessibilityDescription:_NS("Pause")];
-        _backwardImage = [NSImage imageWithSystemSymbolName:@"backward.fill"
-                                   accessibilityDescription:_NS("Previous")];
-        _forwardImage = [NSImage imageWithSystemSymbolName:@"forward.fill"
-                                  accessibilityDescription:_NS("Next")];
+        if (@available(macOS 26.0, *)) {
+            _playImage = [NSImage imageWithSystemSymbolName:@"play.fill" accessibilityDescription:_NS("Play")];
+            _pressedPlayImage = [NSImage imageWithSystemSymbolName:@"play.fill" accessibilityDescription:_NS("Play")];
+            _pauseImage = [NSImage imageWithSystemSymbolName:@"pause.fill" accessibilityDescription:_NS("Pause")];
+            _pressedPauseImage = [NSImage imageWithSystemSymbolName:@"pause.fill" accessibilityDescription:_NS("Pause")];
+        } else {
+            _playImage = [NSImage imageWithSystemSymbolName:@"play.circle.fill"
+                                accessibilityDescription:_NS("Play")];
+            _pressedPlayImage = [NSImage imageWithSystemSymbolName:@"play.circle.fill"
+                                        accessibilityDescription:_NS("Play")];
+            _pauseImage = [NSImage imageWithSystemSymbolName:@"pause.circle.fill"
+                                    accessibilityDescription:_NS("Pause")];
+            _pressedPauseImage = [NSImage imageWithSystemSymbolName:@"pause.circle.fill"
+                                        accessibilityDescription:_NS("Pause")];
+        }
+        _backwardImage = [NSImage imageWithSystemSymbolName:@"backward.fill" accessibilityDescription:_NS("Previous")];
+        _forwardImage = [NSImage imageWithSystemSymbolName:@"forward.fill" accessibilityDescription:_NS("Next")];
         _fullscreenImage = [NSImage imageWithSystemSymbolName:@"arrow.up.backward.and.arrow.down.forward"
                                      accessibilityDescription:_NS("Fullscreen")];
         _mutedVolumeImage = [NSImage imageWithSystemSymbolName:@"speaker.slash.fill"
