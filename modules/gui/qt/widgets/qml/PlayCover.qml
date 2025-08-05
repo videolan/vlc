@@ -88,7 +88,7 @@ Item {
     Rectangle {
         anchors.fill: parent
 
-        radius: width
+        radius: width / 2
 
         color: "white"
 
