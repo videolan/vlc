@@ -115,7 +115,7 @@ void main()
                                     size - compensatedOffset,
                                     denormalCoord,
                                     blurRadius,
-                                    radius / 2.);
+                                    radius);
 
     fragColor = color * shadow * qt_Opacity; // premultiplied
 
