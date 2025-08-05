@@ -3390,7 +3390,7 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
                  p_track->i_track_ID );
         for( unsigned i_index = 0; i_index < p_stss_data->i_entry_count; i_index++ )
         {
-            if( i_index >= p_stss_data->i_entry_count - 1 ||
+            if( i_index == p_stss_data->i_entry_count - 1 ||
                 i_sample < p_stss_data->i_sample_number[i_index+1] )
             {
                 *pi_sync_sample = p_stss_data->i_sample_number[i_index];
