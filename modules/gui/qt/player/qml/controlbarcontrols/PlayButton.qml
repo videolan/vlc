@@ -247,7 +247,7 @@ T.Control {
         Rectangle {
             anchors.fill: parent
 
-            radius: width
+            radius: width / 2
 
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "#e25b01" }
@@ -275,7 +275,7 @@ T.Control {
                 anchors.margins: _diminished ? (parent.width / 2)
                                              : VLCStyle.dp(2)
 
-                radius: width
+                radius: width / 2
 
                 property bool _diminished: false
 
