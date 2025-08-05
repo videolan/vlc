@@ -172,7 +172,7 @@ T.ItemDelegate {
             Layout.fillHeight: true
             Layout.preferredWidth: height
 
-            radius: width
+            radius: width / 2
 
             source: (model.cover) ? model.cover
                                   : VLCStyle.noArtArtistSmall
