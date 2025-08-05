@@ -67,6 +67,28 @@
     self.playbackRateButton.toolTip = _NS("Playback rate");
     self.playbackRateButton.accessibilityLabel = self.playbackRateButton.toolTip;
 
+    if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+        self.playButton.bordered = YES;
+        self.backwardButton.bordered = YES;
+        self.forwardButton.bordered = YES;
+        self.jumpBackwardButton.bordered = YES;
+        self.jumpForwardButton.bordered = YES;
+
+        self.playButton.borderShape = NSControlBorderShapeCapsule;
+        self.backwardButton.borderShape = NSControlBorderShapeCapsule;
+        self.forwardButton.borderShape = NSControlBorderShapeCapsule;
+        self.jumpBackwardButton.borderShape = NSControlBorderShapeCapsule;
+        self.jumpForwardButton.borderShape = NSControlBorderShapeCapsule;
+
+        self.playButton.bezelStyle = NSBezelStyleGlass;
+        self.backwardButton.bezelStyle = NSBezelStyleGlass;
+        self.forwardButton.bezelStyle = NSBezelStyleGlass;
+        self.jumpBackwardButton.bezelStyle = NSBezelStyleGlass;
+        self.jumpForwardButton.bezelStyle = NSBezelStyleGlass;
+#endif
+    }
+
     _playQueueController = VLCMain.sharedInstance.playQueueController;
     _playerController = _playQueueController.playerController;
 
