@@ -53,7 +53,7 @@ ShaderEffect {
     property real yOffset
 
     // Currently different xRadius/yRadius is not supported.
-    property real radius: (parent ? (parent.effectiveRadius ?? parent.radius) : 0) ?? 0
+    property real radius: (parent ? Math.max(0.0, Math.min(parent.effectiveRadius ?? parent.radius ?? 0, width / 2, height / 2)) : 0) ?? 0
 
     readonly property size size: Qt.size(width, height)
 
