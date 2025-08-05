@@ -258,7 +258,7 @@ static void webvtt_get_cueboxrect( const webvtt_cue_settings_t *p_settings,
     /* we need 100% or size for inner_align to work on writing direction */
     if( p_settings->vertical == WEBVTT_ALIGN_AUTO ) /* Horizontal text */
     {
-        p_rect->y = line_offset > 0 ? line_offset : 1.0 + line_offset;
+        p_rect->y = line_offset >= 0 ? line_offset : 1.0 + line_offset;
         p_rect->w = (extent) ? extent : 1.0;
         if( indent_anchor_position > 0 &&
             (alignment_on_indent_anchor == WEBVTT_ALIGN_LEFT ||
@@ -271,9 +271,9 @@ static void webvtt_get_cueboxrect( const webvtt_cue_settings_t *p_settings,
     else /* Vertical text */
     {
         if( p_settings->vertical == WEBVTT_ALIGN_LEFT )
-            p_rect->x = line_offset > 0 ? 1.0 - line_offset : -line_offset;
+            p_rect->x = line_offset >= 0 ? 1.0 - line_offset : -line_offset;
         else
-            p_rect->x = line_offset > 0 ? line_offset : 1.0 + line_offset;
+            p_rect->x = line_offset >= 0 ? line_offset : 1.0 + line_offset;
         p_rect->y = (extent) ? extent : 1.0;
 
         if( indent_anchor_position > 0 &&
