@@ -135,7 +135,7 @@ MainViewLoader {
 
                 pictureWidth: artistGrid.maxPictureWidth
                 pictureHeight: artistGrid.maxPictureHeight
-                pictureRadius: artistGrid.maxPictureWidth
+                pictureRadius: (width / 2) // "pictureWidth" is image source width, postprocessing is done on item
 
                 image: model.cover || ""
                 fallbackImage: VLCStyle.noArtArtistSmall
