@@ -1229,9 +1229,9 @@ static int Open( vlc_object_t * p_this )
     else
     {
         p_sys->i_timescale = BOXDATA(p_mvhd)->i_timescale;
-        if( p_sys->i_timescale == 0 )
+        if( p_sys->i_timescale == 0 || p_sys->i_timescale > 0x10000000 )
         {
-            msg_Err( p_this, "bad timescale" );
+            msg_Err( p_this, "bad timescale %" PRIu32, p_sys->i_timescale );
             goto error;
         }
     }
