@@ -235,20 +235,6 @@ T.Control {
         implicitWidth: height
         implicitHeight: VLCStyle.icon_medium
 
-        Widgets.RoundedRectangleShadow {
-            id: hoverShadow
-
-            visible: opacity > 0
-            opacity: 0
-
-            radius: parent.width
-
-            blurRadius: VLCStyle.dp(9)
-            yOffset: VLCStyle.dp(4)
-
-            color: theme.accent.alpha(0.29)
-        }
-
         Widgets.AnimatedBackground {
             anchors.fill: parent
             anchors.margins: -border.width
@@ -266,6 +252,18 @@ T.Control {
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "#e25b01" }
                 GradientStop { position: 1.0; color: "#f89a06" }
+            }
+
+            Widgets.RoundedRectangleShadow {
+                id: hoverShadow
+
+                visible: opacity > 0
+                opacity: 0
+
+                blurRadius: VLCStyle.dp(9)
+                yOffset: VLCStyle.dp(4)
+
+                color: theme.accent.alpha(0.29)
             }
 
             Rectangle {
