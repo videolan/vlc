@@ -115,6 +115,8 @@ Loader {
     property alias initialItem: root.sourceComponent
     property alias currentItem: root.item
 
+    readonly property var itemAtIndex: currentItem?.itemAtIndex
+
     // Navigation
 
     // handle cancelAction, if currentIndex is set reset it to 0
