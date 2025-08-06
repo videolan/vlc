@@ -52,6 +52,23 @@ Item {
     // function(index, data) - returns cover for the index in the model in the form {artwork: <string> (file-name), fallback: <string> (file-name)}
     property var coverProvider: null
 
+    // Optional, for now used by the default `getTextureProvider()`:
+    property Item view // can not use `ItemView` because of `ExpandGridView`
+
+    // Optional, function that takes index and returns the texture provider:
+    property var getTextureProvider: function(index) {
+        // Texture provider is not going to be available at all times, particularly
+        // for the cases when the item is not available in the view (large model,
+        // select all case)
+
+        // FIXME: `call(null, index)` is to prevent the following warning:
+        //         > Calling C++ methods with 'this' objects different from the one they
+        //         > were retrieved from is broken, due to historical reasons. The original
+        //         > object is used as 'this' object. You can allow the given 'this' object
+        //         > to be used by setting 'pragma NativeMethodBehavior: AcceptThisObject'
+        return dragItem.view?.itemAtIndex.call(null, index)?.artworkTextureProvider ?? null
+    }
+
     // string => role
     property string coverRole: "cover"
 
@@ -188,7 +205,8 @@ Item {
         else
             return {
                 artwork: data[dragItem.coverRole] || dragItem.defaultCover,
-                fallback: dragItem.defaultCover
+                fallback: dragItem.defaultCover,
+                textureProvider: dragItem.getTextureProvider ? dragItem.getTextureProvider(index) : null
             }
     }
 
@@ -481,6 +499,8 @@ Item {
                 radius: coverRepeater.count > 1 ? dragItem.coverSize : 0.0
                 source: modelData.artwork ?? ""
                 sourceSize: dragItem.imageSourceSize ?? Qt.size(width * eDPR, height * eDPR)
+                textureProviderItem: modelData?.textureProvider ?? null
+
                 backgroundColor: theme.bg.primary
                 borderWidth: VLCStyle.dp(1, VLCStyle.scale)
                 borderColor: theme.border
