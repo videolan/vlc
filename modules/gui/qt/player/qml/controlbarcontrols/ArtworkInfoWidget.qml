@@ -98,6 +98,10 @@ AbstractButton {
     Widgets.DragItem {
         id: dragItem
 
+        getTextureProvider: function() {
+            return root.contentItem?.image
+        }
+
         onRequestData: (_, resolve, reject) => {
             resolve([{
                 "title": Player.title,
@@ -148,6 +152,8 @@ AbstractButton {
 
     contentItem: RowLayout {
         spacing: VLCStyle.margin_xsmall
+
+        property alias image: coverImage
 
         Image {
             id: coverImage
