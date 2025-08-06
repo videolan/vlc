@@ -133,6 +133,8 @@ FocusScope {
                     : VLCStyle.noArtAlbumCover
                 sourceSize: Qt.size(width * eDPR, height * eDPR)
                 backgroundColor: theme.bg.primary
+                textureProviderItem: root.view?.itemAtIndex(root.index)?.artworkTextureProvider ?? null
+
 
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
