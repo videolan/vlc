@@ -48,6 +48,8 @@ T.Control {
                                                       dropAreaLayout.dragPosition.x,
                                                       dropAreaLayout.dragPosition.y)
 
+    readonly property Image artworkTextureProvider: contentItem?.artworkTextureProvider ?? null
+
     // Model roles:
     required property int index
     required property bool isCurrent
@@ -147,6 +149,8 @@ T.Control {
 
     contentItem: RowLayout {
         spacing: 0
+
+        property alias artworkTextureProvider: artwork
 
         Item {
             id: artworkItem
