@@ -44,6 +44,9 @@
     VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
 }
+
+@property (readonly) NSImageSymbolConfiguration *mainButtonsSymbolConfig API_AVAILABLE(macos(26.0));
+
 @end
 
 @implementation VLCMainVideoViewControlsBar
@@ -86,6 +89,8 @@
         self.forwardButton.bezelStyle = NSBezelStyleGlass;
         self.jumpBackwardButton.bezelStyle = NSBezelStyleGlass;
         self.jumpForwardButton.bezelStyle = NSBezelStyleGlass;
+
+        _mainButtonsSymbolConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.whiteColor]];
 #endif
     }
 
@@ -250,6 +255,34 @@
     const BOOL currentItemIsAudio = _playerController.currentMediaIsAudioOnly;
     self.videoButton.hidden = currentItemIsAudio;
     self.subtitlesButton.hidden = currentItemIsAudio;
+}
+
+- (void)playerStateUpdated:(NSNotification *)notification
+{
+    [super playerStateUpdated:notification];
+    if (@available(macOS 26.0, *)) {
+        if (self.mainButtonsSymbolConfig == nil)
+            return;
+        self.playButton.image = [self.playButton.image imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+        self.playButton.alternateImage = [self.playButton.alternateImage imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+    }
+}
+
+- (void)updateCurrentItemDisplayControls:(NSNotification *)notification
+{
+    [super updateCurrentItemDisplayControls:notification];
+    if (@available(macOS 26.0, *)) {
+        if (self.mainButtonsSymbolConfig == nil)
+            return;
+        self.forwardButton.image = [self.forwardButton.image imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+        self.forwardButton.alternateImage = [self.forwardButton.alternateImage imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+        self.backwardButton.image = [self.backwardButton.image imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+        self.backwardButton.alternateImage = [self.backwardButton.alternateImage imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+        self.jumpForwardButton.image = [self.jumpForwardButton.image imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+        self.jumpForwardButton.alternateImage = [self.jumpForwardButton.alternateImage imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+        self.jumpBackwardButton.image = [self.jumpBackwardButton.image imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+        self.jumpBackwardButton.alternateImage = [self.jumpBackwardButton.alternateImage imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+    }
 }
 
 @end

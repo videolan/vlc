@@ -89,4 +89,7 @@
 - (void)updateMuteVolumeButton:(NSNotification *)aNotification;
 - (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification;
 
+- (void)playerStateUpdated:(NSNotification *)notification;
+- (void)updateCurrentItemDisplayControls:(NSNotification *)notification;
+
 @end
