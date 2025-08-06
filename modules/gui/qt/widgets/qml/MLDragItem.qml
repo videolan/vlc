@@ -27,16 +27,18 @@ import VLC.MediaLibrary
 DragItem {
     id: root
 
-    required property MLBaseModel mlModel
-
     // string => role for medialib id, data[id] will be pass to Medialib::mlInputItem for SharedInputItem
     property string mlIDRole: "id"
 
     onRequestData: (indexes, resolve, reject) =>  {
+        console.assert(root.view)
+        console.assert(root.view.model)
+        console.assert(root.view.model.getData)
+        console.assert(root.view.model.getDataFlat)
         if (indexesFlat)
-            mlModel.getDataFlat(indexes, resolve)
+            root.view.model.getDataFlat(indexes, resolve)
         else
-            mlModel.getData(indexes, resolve)
+            root.view.model.getData(indexes, resolve)
     }
 
     onRequestInputItems: (indexes, data, resolve, reject) => {

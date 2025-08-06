@@ -195,7 +195,7 @@ Widgets.TableViewExt {
                              : root.selectionModel.selectedIndexes
         indexesFlat: !!root.selectionModel.selectedIndexesFlat
 
-        mlModel: model
+        view: root
     }
 
     Widgets.MLTableColumns {

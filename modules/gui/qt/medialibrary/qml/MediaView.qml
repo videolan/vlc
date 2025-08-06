@@ -100,7 +100,7 @@ MainViewLoader {
     Widgets.MLDragItem {
         id: dragItemId
 
-        mlModel: root.model
+        view: root.currentItem
 
         coverRole: "small_cover"
 

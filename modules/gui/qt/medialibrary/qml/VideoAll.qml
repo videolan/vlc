@@ -125,7 +125,7 @@ MainViewLoader {
     Widgets.MLDragItem {
         id: dragItem
 
-        mlModel: root.model
+        view: root.currentItem
 
         indexes: indexesFlat ? selectionModel.selectedIndexesFlat
                              : selectionModel.selectedIndexes

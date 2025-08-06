@@ -52,7 +52,8 @@ Item {
     // function(index, data) - returns cover for the index in the model in the form {artwork: <string> (file-name), fallback: <string> (file-name)}
     property var coverProvider: null
 
-    // Optional, for now used by the default `getTextureProvider()`:
+    // Optional, for now used by the default `getTextureProvider()`.
+    // Mandatory for `MLDragItem`, as `MLDragItem` retrieves the model through the view.
     property Item view // can not use `ItemView` because of `ExpandGridView`
 
     // Optional, function that takes index and returns the texture provider:

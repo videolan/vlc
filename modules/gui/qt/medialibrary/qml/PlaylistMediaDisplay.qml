@@ -178,7 +178,7 @@ FocusScope {
     Widgets.MLDragItem {
         id: dragItem
 
-        mlModel: model
+        view: view
 
         indexes: indexesFlat ? view.selectionModel.selectedIndexesFlat
                              : view.selectionModel.selectedIndexes

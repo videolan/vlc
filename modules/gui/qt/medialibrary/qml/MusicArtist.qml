@@ -389,7 +389,8 @@ FocusScope {
     Widgets.MLDragItem {
         id: albumDragItem
 
-        mlModel: albumModel
+        view: (root._currentView instanceof Widgets.TableViewExt) ? root._currentView?.headerItem?.albumsListView
+                                                                  : root._currentView
         indexes: indexesFlat ? albumSelectionModel.selectedIndexesFlat
                              : albumSelectionModel.selectedIndexes
         indexesFlat: !!albumSelectionModel.selectedIndexesFlat
@@ -614,7 +615,7 @@ FocusScope {
             Widgets.MLDragItem {
                 id: tableDragItem
 
-                mlModel: trackModel
+                view: tableView_id
 
                 indexes: indexesFlat ? tableView_id.selectionModel.selectedIndexesFlat
                                      : tableView_id.selectionModel.selectedIndexes

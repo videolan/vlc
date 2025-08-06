@@ -254,7 +254,7 @@ MainViewLoader {
 
         objectName: "PlaylistMediaListDragItem"
 
-        mlModel: model
+        view: root.currentItem
 
         indexes: indexesFlat ? root.selectionModel.selectedIndexesFlat
                              : root.selectionModel.selectedIndexes

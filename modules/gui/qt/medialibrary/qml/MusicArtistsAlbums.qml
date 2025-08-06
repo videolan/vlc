@@ -290,7 +290,7 @@ FocusScope {
             Widgets.MLDragItem {
                 id: musicArtistDragItem
 
-                mlModel: artistModel
+                view: artistList
 
                 indexes: indexesFlat ? selectionModel.selectedIndexesFlat
                                      : selectionModel.selectedIndexes
