@@ -55,14 +55,14 @@
 {
     [super awakeFromNib];
 
-    _bookmarksButton.toolTip = _NS("Bookmarks");
-    _bookmarksButton.accessibilityLabel = _bookmarksButton.toolTip;
+    self.bookmarksButton.toolTip = _NS("Bookmarks");
+    self.bookmarksButton.accessibilityLabel = self.bookmarksButton.toolTip;
 
-    _subtitlesButton.toolTip = _NS("Subtitle settings");
-    _subtitlesButton.accessibilityLabel = _subtitlesButton.toolTip;
+    self.subtitlesButton.toolTip = _NS("Subtitle settings");
+    self.subtitlesButton.accessibilityLabel = self.subtitlesButton.toolTip;
 
-    _audioButton.toolTip = _NS("Audio settings");
-    _audioButton.accessibilityLabel = _audioButton.toolTip;
+    self.audioButton.toolTip = _NS("Audio settings");
+    self.audioButton.accessibilityLabel = self.audioButton.toolTip;
 
     self.videoButton.toolTip = _NS("Video settings");
     self.videoButton.accessibilityLabel = self.videoButton.toolTip;
@@ -72,32 +72,31 @@
 
     if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
-        self.playButton.bordered = YES;
-        self.backwardButton.bordered = YES;
-        self.forwardButton.bordered = YES;
-        self.jumpBackwardButton.bordered = YES;
-        self.jumpForwardButton.bordered = YES;
-
-        self.playButton.borderShape = NSControlBorderShapeCapsule;
-        self.backwardButton.borderShape = NSControlBorderShapeCapsule;
-        self.forwardButton.borderShape = NSControlBorderShapeCapsule;
-        self.jumpBackwardButton.borderShape = NSControlBorderShapeCapsule;
-        self.jumpForwardButton.borderShape = NSControlBorderShapeCapsule;
-
-        self.playButton.bezelStyle = NSBezelStyleGlass;
-        self.backwardButton.bezelStyle = NSBezelStyleGlass;
-        self.forwardButton.bezelStyle = NSBezelStyleGlass;
-        self.jumpBackwardButton.bezelStyle = NSBezelStyleGlass;
-        self.jumpForwardButton.bezelStyle = NSBezelStyleGlass;
-
-        // Remove shadows from XIB
-        self.playButton.layer = [CALayer layer];
-        self.backwardButton.layer = [CALayer layer];
-        self.forwardButton.layer = [CALayer layer];
-        self.jumpBackwardButton.layer = [CALayer layer];
-        self.jumpForwardButton.layer = [CALayer layer];
-
         _mainButtonsSymbolConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.whiteColor]];
+        NSArray<NSButton *> * const buttons = @[
+            self.playButton,
+            self.backwardButton,
+            self.forwardButton,
+            self.jumpBackwardButton,
+            self.jumpForwardButton,
+            self.bookmarksButton,
+            self.subtitlesButton,
+            self.audioButton,
+            self.videoButton,
+            self.fullscreenButton,
+            self.floatOnTopButton,
+            self.playbackRateButton,
+            self.pipButton,
+            self.muteVolumeButton,
+        ];
+        for (NSButton * const button in buttons) {
+            button.bordered = YES;
+            button.borderShape = NSControlBorderShapeCapsule;
+            button.bezelStyle = NSBezelStyleGlass;
+            button.layer = [CALayer layer];
+            button.image = [button.image imageWithSymbolConfiguration:_mainButtonsSymbolConfig];
+            button.alternateImage = [button.alternateImage imageWithSymbolConfiguration:_mainButtonsSymbolConfig];
+        }
 #endif
     }
 
@@ -179,6 +178,13 @@
     self.playbackRateButton.title =
         [NSString stringWithFormat:@"%.1fx", _playerController.playbackRate];
     self.playbackRateButton.enabled = _playerController.rateChangable;
+
+    if (@available(macOS 26.0, *)) {
+        NSMutableAttributedString * const colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:self.playbackRateButton.attributedTitle];
+        const NSRange titleRange = NSMakeRange(0, colorTitle.length);
+        [colorTitle addAttribute:NSForegroundColorAttributeName value:NSColor.whiteColor range:titleRange];
+        self.playbackRateButton.attributedTitle = colorTitle;
+    }
 }
 
 - (IBAction)openPlaybackRate:(id)sender
@@ -289,6 +295,16 @@
         self.jumpForwardButton.alternateImage = [self.jumpForwardButton.alternateImage imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
         self.jumpBackwardButton.image = [self.jumpBackwardButton.image imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
         self.jumpBackwardButton.alternateImage = [self.jumpBackwardButton.alternateImage imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
+    }
+}
+
+- (void)updateMuteVolumeButtonImage
+{
+    [super updateMuteVolumeButtonImage];
+    if (@available(macOS 26.0, *)) {
+        if (self.mainButtonsSymbolConfig == nil)
+            return;
+        self.muteVolumeButton.image = [self.muteVolumeButton.image imageWithSymbolConfiguration:self.mainButtonsSymbolConfig];
     }
 }
 
