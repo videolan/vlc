@@ -90,6 +90,13 @@
         self.jumpBackwardButton.bezelStyle = NSBezelStyleGlass;
         self.jumpForwardButton.bezelStyle = NSBezelStyleGlass;
 
+        // Remove shadows from XIB
+        self.playButton.layer = [CALayer layer];
+        self.backwardButton.layer = [CALayer layer];
+        self.forwardButton.layer = [CALayer layer];
+        self.jumpBackwardButton.layer = [CALayer layer];
+        self.jumpForwardButton.layer = [CALayer layer];
+
         _mainButtonsSymbolConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.whiteColor]];
 #endif
     }
