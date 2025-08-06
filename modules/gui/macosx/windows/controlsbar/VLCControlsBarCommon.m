@@ -251,8 +251,6 @@
     [self.forwardButton setAction:@selector(fwd:)];
     [self.backwardButton setAction:@selector(bwd:)];
 
-    [self playerStateUpdated:nil];
-
     self.artworkImageView.cropsImagesToRoundedCorners = YES;
     self.artworkImageView.image = [NSImage imageNamed:@"noart"];
     self.artworkImageView.contentGravity = VLCImageViewContentGravityResize;
@@ -419,6 +417,7 @@
     [self updateMuteVolumeButtonImage];
     [self updatePlaybackControls:nil];
     [self updateCurrentItemDisplayControls:nil];
+    [self playerStateUpdated:nil];
 }
 
 - (void)updateTimeSlider:(NSNotification *)aNotification;
