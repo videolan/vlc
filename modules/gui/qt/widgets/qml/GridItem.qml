@@ -67,6 +67,8 @@ T.ItemDelegate {
     property alias selectedShadow: selectedShadow
     property alias unselectedShadow: unselectedShadow
 
+    property alias artworkTextureProvider: picture.textureProvider
+
     // Signals
 
     signal playClicked
