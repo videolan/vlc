@@ -114,7 +114,8 @@ MainViewLoader {
 
             return {
                 artwork: data.artwork,
-                fallback: fallbackImage
+                fallback: fallbackImage,
+                textureProvider: root.currentItem.itemAtIndex(index)?.artworkTextureProvider
             }
         }
 
