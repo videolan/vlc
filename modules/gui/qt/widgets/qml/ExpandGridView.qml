@@ -764,6 +764,7 @@ FocusScope {
         }
 
         if (expandIndex >= iMin && expandIndex < iMax) {
+            expandItem.index = expandIndex
             expandItem.model = model.getDataAt(expandIndex)
         }
     }
@@ -1069,6 +1070,8 @@ FocusScope {
             root.expandIndex = root._newExpandIndex
             if (root.expandIndex === -1)
                 return
+            expandItem.index = expandIndex
+            expandItem.view = root
             expandItem.model = model.getDataAt(root.expandIndex)
             /* We must also start the expand animation here since the expandItem implicitHeight is not
                changed if it had the same height at previous opening. */

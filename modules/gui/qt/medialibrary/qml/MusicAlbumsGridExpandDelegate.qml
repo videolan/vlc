@@ -33,6 +33,9 @@ FocusScope {
 
     property var model
 
+    property int index
+    property Item view // can not use `ItemView` because of `ExpandGridView`
+
     property var headerFocusScope
     property var enqueueActionBtn
     property var playActionBtn
