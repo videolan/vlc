@@ -93,6 +93,8 @@ Item {
     property Component titleDelegate: TableRowDelegate {
         id: titleDel
 
+        property alias artworkTextureProvider: cover.textureProvider
+
         RowLayout {
             anchors.fill: parent
             spacing: VLCStyle.margin_normal
