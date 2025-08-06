@@ -610,6 +610,8 @@ FocusScope {
         return _idChildrenList[i]
     }
 
+    readonly property var itemAtIndex: _getItem
+
     function _setItem(id, item) {
         const i = id - _currentRange[0]
         _idChildrenList[i] = item
