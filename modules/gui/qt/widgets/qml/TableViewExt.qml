@@ -188,6 +188,8 @@ FocusScope {
 
     property alias reuseItems: view.reuseItems
 
+    readonly property var itemAtIndex: view.itemAtIndex
+
     // Signals
 
     //forwarded from subview
