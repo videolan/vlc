@@ -73,6 +73,8 @@ Item {
 
     property alias fillMode: image.fillMode
 
+    readonly property Item textureProvider: fallbackImage.visible ? fallbackImage.textureProviderItem : image.textureProviderItem
+
     // Signals
 
     signal playIconClicked(var point)
