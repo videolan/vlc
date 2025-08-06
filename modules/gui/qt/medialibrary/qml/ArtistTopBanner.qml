@@ -159,6 +159,7 @@ FocusScope {
             Widgets.ImageExt {
                 id: roundImage
                 source: root.artist.id ? (root.artist.cover || VLCStyle.noArtArtist) : "" // do not load the fallback image during initialization
+                textureProviderItem: background
                 sourceSize: Qt.size(width * eDPR, height * eDPR)
                 anchors.fill: parent
                 radius: VLCStyle.cover_normal
