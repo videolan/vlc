@@ -165,6 +165,8 @@ FocusScope {
     Loader {
         id: playerSpecializationLoader
 
+        objectName: "playerSpecializationLoader"
+
         anchors {
             left: parent.left
             right: parent.right
