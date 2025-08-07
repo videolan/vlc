@@ -22,6 +22,7 @@
 #include <QScreen>
 
 #include <vlc_window.h>
+#include "compositor.hpp"
 
 VideoWindowHandler::VideoWindowHandler(qt_intf_t* intf, QObject *parent)
     : QObject(parent)
@@ -120,11 +121,64 @@ void VideoWindowHandler::setVideoSize(unsigned int w, unsigned int h, Qt::Window
             }
             else
             {
-                // Convert the size in logical pixels
-                w = qRound( (float)w / factor );
-                h = qRound( (float)h / factor );
-                msg_Dbg( m_intf, "Logical video size: %ux%u", w, h );
+                {
+                    // Convert the size in logical pixels
+                    w = qRound( (float)w / factor );
+                    h = qRound( (float)h / factor );
+                    msg_Dbg( m_intf, "Logical video size: %ux%u", w, h );
+                }
+
+                {
+                    // Video window is anchored to the interface window, this is
+                    // expected because video window is "embedded". It is not the
+                    // other way around, where the window would adjust its size
+                    // depending on the size of the video window. However here,
+                    // with auto resize, the size is solely for the video window.
+                    // So, with the current approach, we need to compensate non-
+                    // video area for setting the window size to make the video
+                    // window have the expected size. If in the future we change
+                    // the approach, we can get rid of this workaround and rather
+                    // set the size of video surface item in the Qt Quick scene.
+                    // Currently this is mostly a case with pinned controls in
+                    // the player page, where the controls do not overlay the
+                    // video window/surface.
+
+                    assert(m_intf);
+                    assert(m_intf->p_compositor); // this slot should not be executed otherwise
+                    const auto quickWindow = m_intf->p_compositor->quickWindow();
+                    assert(quickWindow);
+                    const auto contentItem = quickWindow->contentItem();
+                    assert(contentItem);
+
+                    // I initially wanted to probe the QML video surface item, but
+                    // we can not do that because it is not available when this slot
+                    // is executed. In fact, due to late `MainCtx.hasEmbededVideo`
+                    // adjustment, it still remains "false" with a video input and
+                    // player state is in playing state. Worse, `hasVideoOutput`
+                    // is also "false" in the same situation (player reports playing
+                    // state). Relying on a delay there would be fragile, but we can
+                    // simply probe the loader instead, where the video surface item
+                    // is expected to fill it (so has the same size).
+                    if (const auto playerSpecializationLoader = contentItem->findChild<QQuickItem*>(QStringLiteral("playerSpecializationLoader")))
+                    {
+                        // Capture the current sizes to calculate the compensation, we
+                        // can do this because the compensation is not expected to change
+                        // with the change in the window size:
+                        const auto pslSize = playerSpecializationLoader->size().toSize(); // QML items have logical size too
+                        const auto windowSize = m_window->size();
+
+                        const auto dW = (windowSize.width() - pslSize.width());
+                        const auto dH = (windowSize.height() - pslSize.height());
+                        assert(dW >= 0 && dH >= 0); // psl can not be bigger than the window
+
+                        msg_Dbg( m_intf, "Autoresize interface window size compensation: %ix%i", dW, dH );
+
+                        w += dW;
+                        h += dH;
+                    }
+                }
             }
+
             m_window->resize(std::clamp<int>(w, m_window->minimumWidth(), m_window->maximumWidth()),
                              std::clamp<int>(h, m_window->minimumHeight(), m_window->maximumHeight()));
         }
