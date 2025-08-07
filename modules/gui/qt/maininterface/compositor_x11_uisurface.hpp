@@ -99,7 +99,7 @@ protected:
 private:
     static void applyNvidiaWorkaround(QSurfaceFormat& format);
 
-    QQuickItem* m_rootItem = nullptr;
+    QPointer<QQuickItem> m_rootItem;
     QOpenGLContext *m_context = nullptr;
     QBackingStore *m_backingStore = nullptr;
     QPainter *m_backingStorePainter = nullptr;
