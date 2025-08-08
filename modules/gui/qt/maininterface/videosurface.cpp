@@ -287,15 +287,15 @@ void VideoSurface::itemChange(ItemChange change, const ItemChangeData &value)
             // want to explicitly connect whenever `ItemHasContents`, `isVisible()`, `window()` are all satisfied, which
             // is implicitly the case with `::updatePaintNode()` (it is only called when all these are satisfied). This
             // is strictly for maintenance reasons.
-            if (!value.window)
-            {
-                // We should disconnect here, because when item has no window, `::updatePaintNode()` would not be called:
-                disconnect(m_synchConnection);
-                break;
-            }
+
+            disconnect(m_synchConnection);
+
             // if window changed but is valid, we can signal dpr change just to be sure, It is not clear if Qt signals
             // ItemDevicePixelRatioHasChanged when item's window/scene changes to a new window that has different DPR:
-            [[fallthrough]];
+            if (value.window)
+                [[fallthrough]];
+            else
+                break;
         }
         case ItemDevicePixelRatioHasChanged:
         {
@@ -383,16 +383,10 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
     if (Q_UNLIKELY(!m_provider))
         return node;
 
-    if (w != m_oldWindow)
-    {
-        if (m_oldWindow)
-            disconnect(m_synchConnection); // this does not cover new window is null case, as `::updatePaintNode()` would not be called then
-
-        m_oldWindow = w;
-    }
-
     if (!m_synchConnection)
     {
+        // Disconnection is made in `::itemChange()`'s `ItemSceneChange` handler.
+
         // This is constant:
         if (m_provider->supportsThreadedSurfaceUpdates())
         {
