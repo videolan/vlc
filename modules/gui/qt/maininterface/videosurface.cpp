@@ -279,11 +279,27 @@ void VideoSurface::synchronize()
 
 void VideoSurface::itemChange(ItemChange change, const ItemChangeData &value)
 {
-    if (change == ItemDevicePixelRatioHasChanged || change == ItemSceneChange)
+    switch (change)
     {
-        m_dprChanged = true;
-        // Request update, so that `updatePaintNode()` gets called which updates the DPR for `::synchronize()`:
-        update();
+        case ItemDevicePixelRatioHasChanged:
+        case ItemSceneChange:
+        {
+            m_dprChanged = true;
+            // Request update, so that `updatePaintNode()` gets called which updates the DPR for `::synchronize()`:
+            if (flags().testFlag(ItemHasContents)) // "Only items which specify QQuickItem::ItemHasContents are allowed to call QQuickItem::update()."
+                update();
+            break;
+        }
+        case ItemVisibleHasChanged:
+        {
+            if (!value.boolValue)
+            {
+                // Connection is made in `::updatePaintNode()` (which is called when both the item is visible and `ItemHasContents` is set).
+                disconnect(m_synchConnection);
+            }
+            break;
+        }
+        default: break;
     }
 
     QQuickItem::itemChange(change, value);
@@ -356,19 +372,19 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
             disconnect(m_synchConnection);
 
         m_oldWindow = w;
+    }
 
-        if (w)
+    if (!m_synchConnection)
+    {
+        // This is constant:
+        if (m_provider->supportsThreadedSurfaceUpdates())
         {
-            // This is constant:
-            if (m_provider->supportsThreadedSurfaceUpdates())
-            {
-                // Synchronize just before swapping the frame for better synchronization:
-                m_synchConnection = connect(w, &QQuickWindow::afterRendering, this, &VideoSurface::synchronize, Qt::DirectConnection);
-            }
-            else
-            {
-                m_synchConnection = connect(w, &QQuickWindow::afterAnimating, this, &VideoSurface::synchronize);
-            }
+            // Synchronize just before swapping the frame for better synchronization:
+            m_synchConnection = connect(w, &QQuickWindow::afterRendering, this, &VideoSurface::synchronize, Qt::DirectConnection);
+        }
+        else
+        {
+            m_synchConnection = connect(w, &QQuickWindow::afterAnimating, this, &VideoSurface::synchronize);
         }
     }
 
