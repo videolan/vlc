@@ -250,7 +250,7 @@ void VideoSurface::synchronize()
         position = renderPosition();
     }
 
-    if (m_oldRenderSize != size || m_dprDirty)
+    if (m_allDirty || m_dprDirty || m_oldRenderSize != size)
     {
         if (!size.isEmpty())
         {
@@ -259,7 +259,7 @@ void VideoSurface::synchronize()
         }
     }
 
-    if (m_oldRenderPosition != position || m_dprDirty)
+    if (m_allDirty || m_dprDirty || m_oldRenderPosition != position)
     {
         if (position.x() >= 0.0 && position.y() >= 0.0)
         {
@@ -268,11 +268,13 @@ void VideoSurface::synchronize()
         }
     }
 
-    if (m_dprDirty)
+    if (m_allDirty || m_dprDirty)
     {
         emit surfaceScaleChanged(m_dpr);
         m_dprDirty = false;
     }
+
+    m_allDirty = false;
 }
 
 void VideoSurface::itemChange(ItemChange change, const ItemChangeData &value)
@@ -311,6 +313,17 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged, Qt::DirectConnection);
         connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged, Qt::DirectConnection);
         connect(this, &VideoSurface::surfaceScaleChanged, m_provider, &VideoSurfaceProvider::surfaceScaleChanged, Qt::DirectConnection);
+
+        // With auto connection, this should be queued if the signal was emitted from vout thread,
+        // so that the slot is executed in item's thread:
+        connect(m_provider, &VideoSurfaceProvider::videoEnabledChanged, this, [this](bool enabled) {
+            if (enabled)
+            {
+                m_videoEnabledChanged = true;
+                if (flags().testFlag(ItemHasContents)) // "Only items which specify QQuickItem::ItemHasContents are allowed to call QQuickItem::update()."
+                    update();
+            }
+        });
 
         connect(&m_wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, m_provider, &VideoSurfaceProvider::onMouseWheeled);
 
@@ -364,6 +377,12 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
         m_dpr = w->effectiveDevicePixelRatio();
         m_dprDirty = true;
         m_dprChanged = false;
+    }
+
+    if (m_videoEnabledChanged)
+    {
+        m_allDirty = true;
+        m_videoEnabledChanged = false;
     }
 
     return ViewBlockingRectangle::updatePaintNode(node, data);

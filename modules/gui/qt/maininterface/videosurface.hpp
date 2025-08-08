@@ -133,20 +133,22 @@ private:
     QPointer<QQuickWindow> m_oldWindow;
     QMetaObject::Connection m_synchConnection;
 
-    // This is updated and read from different threads, but during synchronization stage so explicit synchronization
+    // These are updated and read from different threads, but during synchronization stage so explicit synchronization
     // such as atomic boolean or locking is not necessary:
     bool m_dprChanged = false; // itemChange() <-> updatePaintNode() (different threads, but GUI thread is blocked)
+    bool m_videoEnabledChanged = false; // we need to enforce a full fledged synchronization in this case
 
     // These are updated and read from either the item/GUI thread or the render thread:
     QSizeF m_oldRenderSize;
     QPointF m_oldRenderPosition {-1., -1.};
 
-    // m_dpr and m_dprDirty are updated in render thread when the GUI thread is blocked (updatePaintNode()).
-    // m_dprDirty may be updated in GUI thread when threaded updates is not possible. Since m_dprDirty can
+    // m_dpr, m_dprDirty and m_allDirty are updated in render thread when the GUI thread is blocked (updatePaintNode()).
+    // m_dprDirty and m_allDirty may be updated in GUI thread when threaded updates is not possible. Since they can
     // not be updated both in render thread and GUI thread concurrently (as GUI thread is blocked during
     // updatePaintNode() call), data synchronization should not be necessary:
     qreal m_dpr = 1.0;
-    bool m_dprDirty = false;
+    bool m_dprDirty = false; // causes synchronizing dpr-related properties
+    bool m_allDirty = false; // causes synchronizing everything
 };
 
 #endif // VIDEOSURFACE_HPP
