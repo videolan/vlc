@@ -348,6 +348,8 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
     else
     {
         setFlag(ItemHasContents, false);
+        // Connection is made in `::updatePaintNode()` (which is called when both the item is visible and `ItemHasContents` is set).
+        disconnect(m_synchConnection);
     }
 
     emit videoSurfaceProviderChanged();
