@@ -359,6 +359,7 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         connect(&m_wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, m_provider, &VideoSurfaceProvider::onMouseWheeled);
 
         setFlag(ItemHasContents, true);
+        update(); // this should not be necessary right after setting `ItemHasContents`, but just in case
     }
     else
     {
