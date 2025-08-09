@@ -64,7 +64,12 @@
 
     _navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
     _libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
-    _multifunctionSidebarItem = [NSSplitViewItem sidebarWithViewController:self.multifunctionSidebarViewController];
+
+    if (@available(macOS 11.0, *)) {
+        _multifunctionSidebarItem = [NSSplitViewItem inspectorWithViewController:self.multifunctionSidebarViewController];
+    } else {
+        _multifunctionSidebarItem = [NSSplitViewItem sidebarWithViewController:self.multifunctionSidebarViewController];
+    }
 
     if (@available(macOS 11.0, *)) {
         _navSidebarItem.allowsFullHeightLayout = YES;
