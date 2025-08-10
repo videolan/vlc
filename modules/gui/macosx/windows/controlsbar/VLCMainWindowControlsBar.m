@@ -30,6 +30,7 @@
 #import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
@@ -76,6 +77,10 @@
         glassEffectView.cornerRadius = CGFLOAT_MAX;
         self.bottomBarView.drawBorder = NO;
 #endif
+    } else {
+        self.visualEffectView.wantsLayer = YES;
+        self.visualEffectView.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
+        self.visualEffectView.layer.masksToBounds = YES;
     }
 
     _playQueueController = VLCMain.sharedInstance.playQueueController;

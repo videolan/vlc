@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #import "VLCBottomBarView.h"
+#include "library/VLCLibraryUIUnits.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
@@ -67,6 +68,7 @@
     self.wantsLayer = YES;
     self.needsDisplay = YES;
     self.drawBorder = YES;
+    self.layer.masksToBounds = YES;
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -78,13 +80,14 @@
     }
 
     const NSRect barFrame = self.frame;
-    NSBezierPath * const separatorPath = NSBezierPath.bezierPath;
-    [separatorPath moveToPoint:NSMakePoint(NSMinX(barFrame), NSMaxY(barFrame) - 0.5)];
-    [separatorPath lineToPoint:NSMakePoint(NSMaxX(barFrame), NSMaxY(barFrame) - 0.5)];
-    separatorPath.lineWidth = 1.0;
-
+    const CGFloat cornerRadius = VLCLibraryUIUnits.cornerRadius;
+    NSBezierPath * const borderPath = [NSBezierPath bezierPathWithRoundedRect:barFrame 
+                                                                      xRadius:cornerRadius 
+                                                                      yRadius:cornerRadius];
+    
     [NSColor.VLCSubtleBorderColor setStroke];
-    [separatorPath stroke];
+    borderPath.lineWidth = VLCLibraryUIUnits.borderThickness;
+    [borderPath stroke];
 }
 
 @end
