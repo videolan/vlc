@@ -83,11 +83,14 @@
 
     self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, self.multifunctionSidebarItem];
 
-    VLCBottomBarView * const bottomBarView = libraryWindow.controlsBar.bottomBarView;
+    VLCMainWindowControlsBar * const controlsBar = libraryWindow.controlsBar;
+    VLCBottomBarView * const bottomBarView = controlsBar.bottomBarView;
     bottomBarView.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
-        [bottomBarView.leadingAnchor constraintEqualToAnchor:self.libraryTargetViewController.view.leadingAnchor],
-        [bottomBarView.trailingAnchor constraintEqualToAnchor:self.libraryTargetViewController.view.trailingAnchor],
+        [bottomBarView.leadingAnchor constraintEqualToAnchor:self.libraryTargetViewController.view.leadingAnchor
+                                                    constant:VLCLibraryUIUnits.largeSpacing * 2],
+        [bottomBarView.trailingAnchor constraintEqualToAnchor:self.libraryTargetViewController.view.trailingAnchor
+                                                     constant:-(VLCLibraryUIUnits.largeSpacing * 2)],
     ]];
 }
 
