@@ -279,6 +279,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.contentInsets = audioScrollViewContentInsets;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
+
+    // Songs table view needs bottom padding for controls bar
+    const CGFloat controlsBarHeight = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
+    const CGFloat controlsBarPadding = VLCLibraryUIUnits.largeSpacing * 2;
+    NSClipView *clipView = _audioSongTableViewScrollView.contentView;
+    clipView.automaticallyAdjustsContentInsets = NO;
+    clipView.contentInsets = NSEdgeInsetsMake(0, 0, controlsBarHeight + controlsBarPadding, 0);
 }
 
 #pragma mark - Superclass property overrides
