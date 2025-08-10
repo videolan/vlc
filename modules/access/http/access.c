@@ -82,6 +82,7 @@ static int FileControl(stream_t *access, int query, va_list args)
 
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
+        case STREAM_CAN_DOWNLOAD:
             *va_arg(args, bool *) = true;
             break;
 

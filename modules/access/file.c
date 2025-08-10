@@ -361,6 +361,11 @@ static int FileControl( stream_t *p_access, int i_query, va_list args )
             *pb_bool = p_sys->b_pace_control;
             break;
 
+        case STREAM_CAN_DOWNLOAD:
+            pb_bool = va_arg( args, bool * );
+            *pb_bool = true;
+            break;
+
         case STREAM_GET_SIZE:
         case STREAM_GET_MTIME:
         {

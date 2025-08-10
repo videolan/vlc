@@ -255,6 +255,7 @@ enum stream_query_e
     STREAM_CAN_FASTSEEK,                    /**< arg1=(bool *) res=cannot fail */
     STREAM_CAN_PAUSE,                       /**< arg1=(bool *) res=cannot fail */
     STREAM_CAN_CONTROL_PACE,                /**< arg1=(bool *) res=cannot fail */
+    STREAM_CAN_DOWNLOAD,                    /**< arg1=(bool *) res=can fail */
     /* */
     STREAM_GET_SIZE=6,                      /**< arg1=(uint64_t *) res=can fail */
     STREAM_GET_MTIME,                       /**< arg1=(uint64_t *) res=can fail
@@ -466,6 +467,13 @@ VLC_USED static inline bool vlc_stream_CanPace(stream_t *s)
     bool can_control_pace = false;
     vlc_stream_Control(s, STREAM_CAN_CONTROL_PACE, &can_control_pace);
     return can_control_pace;
+}
+
+VLC_USED static inline bool vlc_stream_CanDownload(stream_t *s)
+{
+    bool can_download = false;
+    vlc_stream_Control(s, STREAM_CAN_DOWNLOAD, &can_download);
+    return can_download;
 }
 
 VLC_USED static inline vlc_tick_t vlc_stream_GetPtsDelay(stream_t *s)

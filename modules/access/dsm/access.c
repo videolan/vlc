@@ -733,6 +733,7 @@ static int Control( stream_t *p_access, int i_query, va_list args )
     case STREAM_CAN_SEEK:
     case STREAM_CAN_PAUSE:
     case STREAM_CAN_CONTROL_PACE:
+    case STREAM_CAN_DOWNLOAD:
         *va_arg( args, bool* ) = true;
         break;
 
