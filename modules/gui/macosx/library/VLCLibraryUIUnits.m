@@ -216,10 +216,12 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 {
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
     const CGFloat toolbarHeight = libraryWindow.titlebarHeight;
+    const CGFloat controlsBarHeight = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
+    const CGFloat controlsBarPadding = VLCLibraryUIUnits.largeSpacing * 2; // Additional padding for floating controls bar
 
     return NSEdgeInsetsMake(VLCLibraryUIUnits.mediumSpacing + toolbarHeight,
                             VLCLibraryUIUnits.mediumSpacing,
-                            VLCLibraryUIUnits.mediumSpacing,
+                            controlsBarHeight + controlsBarPadding,
                             VLCLibraryUIUnits.mediumSpacing);
 }
 
