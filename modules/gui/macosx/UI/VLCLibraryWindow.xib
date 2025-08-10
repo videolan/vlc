@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24112" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24112"/>
         <capability name="Search Toolbar Item" minToolsVersion="12.0" minSystemVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,22 +18,22 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="896" height="456"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1019"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="896" height="456"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <splitView autosaveName="librarywindowsplitview" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u8g-jy-S4e">
-                        <rect key="frame" x="0.0" y="48" width="896" height="408"/>
+                        <rect key="frame" x="0.0" y="0.0" width="896" height="456"/>
                     </splitView>
-                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="vUy-jt-gjY" customClass="VLCBottomBarView">
-                        <rect key="frame" x="0.0" y="0.0" width="896" height="48"/>
+                    <customView horizontalHuggingPriority="1" horizontalCompressionResistancePriority="1" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vUy-jt-gjY" customClass="VLCBottomBarView">
+                        <rect key="frame" x="20" y="20" width="856" height="48"/>
                         <subviews>
-                            <visualEffectView blendingMode="behindWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="D5i-Pe-TAl">
-                                <rect key="frame" x="0.0" y="0.0" width="896" height="47"/>
+                            <visualEffectView ambiguous="YES" blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="D5i-Pe-TAl">
+                                <rect key="frame" x="0.0" y="0.0" width="856" height="48"/>
                             </visualEffectView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="MQH-bI-Zdh" customClass="VLCDragDropView">
-                                <rect key="frame" x="0.0" y="0.0" width="896" height="48"/>
+                            <customView ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MQH-bI-Zdh" customClass="VLCDragDropView">
+                                <rect key="frame" x="20" y="0.0" width="816" height="48"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="YAj-e7-KCU" userLabel="New play controls group ">
                                         <rect key="frame" x="16" y="4" width="188" height="40"/>
@@ -123,11 +123,11 @@
                                             <constraint firstItem="jGc-Xw-GYI" firstAttribute="leading" secondItem="72A-6S-lpR" secondAttribute="trailing" constant="16" id="wzB-TW-knV"/>
                                         </constraints>
                                     </customView>
-                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ktr-qT-1fr" customClass="VLCTrackingView">
-                                        <rect key="frame" x="220" y="4" width="456" height="40"/>
+                                    <customView ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ktr-qT-1fr" customClass="VLCTrackingView">
+                                        <rect key="frame" x="220" y="4" width="376" height="40"/>
                                         <subviews>
-                                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
-                                                <rect key="frame" x="170" y="24" width="153" height="16"/>
+                                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
+                                                <rect key="frame" x="130" y="24" width="153" height="16"/>
                                                 <subviews>
                                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d0e-29-yNq" userLabel="Song Name">
                                                         <rect key="frame" x="-2" y="0.0" width="157" height="16"/>
@@ -221,15 +221,15 @@
                                                     <constraint firstItem="5o7-Z0-dqS" firstAttribute="leading" secondItem="SM6-nx-NKD" secondAttribute="leading" id="vGw-cB-VLb"/>
                                                 </constraints>
                                             </customView>
-                                            <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCPlaybackProgressSlider">
-                                                <rect key="frame" x="86" y="-2" width="320" height="20"/>
+                                            <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" ambiguous="YES" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCPlaybackProgressSlider">
+                                                <rect key="frame" x="88" y="0.0" width="236" height="16"/>
                                                 <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="YMg-uo-8nX" customClass="VLCPlaybackProgressSliderCell"/>
                                                 <connections>
                                                     <action selector="timeSliderAction:" target="Uzf-Tf-H8x" id="eDh-39-Ej1"/>
                                                 </connections>
                                             </slider>
-                                            <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
-                                                <rect key="frame" x="406" y="3" width="52" height="11"/>
+                                            <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
+                                                <rect key="frame" x="326" y="3" width="52" height="11"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="48" id="mAg-xF-yHo"/>
                                                 </constraints>
@@ -258,8 +258,8 @@
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="SM6-nx-NKD" secondAttribute="trailing" constant="4" id="wML-fX-wuF"/>
                                         </constraints>
                                     </customView>
-                                    <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
-                                        <rect key="frame" x="692" y="4" width="188" height="40"/>
+                                    <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
+                                        <rect key="frame" x="612" y="4" width="188" height="40"/>
                                         <subviews>
                                             <button horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Bt8-jQ-hUr">
                                                 <rect key="frame" x="0.0" y="13.5" width="16" height="14"/>
@@ -278,7 +278,7 @@
                                                 <rect key="frame" x="21" y="0.0" width="146" height="40"/>
                                                 <subviews>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="noz-yJ-oH4" customClass="VLCVolumeSlider">
-                                                        <rect key="frame" x="6" y="12" width="126" height="17"/>
+                                                        <rect key="frame" x="8" y="14" width="122" height="12"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="48" id="EM2-Hh-lqK"/>
                                                         </constraints>
@@ -288,7 +288,7 @@
                                                         </connections>
                                                     </slider>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="75c-FF-mgb">
-                                                        <rect key="frame" x="110" y="14" width="12" height="12"/>
+                                                        <rect key="frame" x="134" y="14" width="12" height="12"/>
                                                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="VLCVolumeOnTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" id="a9Z-7I-lXJ">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="system" size="10"/>
@@ -302,7 +302,7 @@
                                                         </connections>
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="IAy-58-UPp">
-                                                        <rect key="frame" x="42" y="14" width="12" height="12"/>
+                                                        <rect key="frame" x="0.0" y="14" width="12" height="12"/>
                                                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="VLCVolumeOffTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" id="qTN-dX-Oj5">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="system" size="10"/>
@@ -373,23 +373,20 @@
                             <constraint firstAttribute="height" constant="48" id="Fps-hR-AFq"/>
                             <constraint firstAttribute="bottom" secondItem="MQH-bI-Zdh" secondAttribute="bottom" id="Uo1-sD-OXk"/>
                             <constraint firstItem="D5i-Pe-TAl" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" id="WKP-Ke-OrH"/>
-                            <constraint firstItem="MQH-bI-Zdh" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" id="YVB-nY-sHE"/>
-                            <constraint firstItem="D5i-Pe-TAl" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" constant="1" id="ZD9-R0-yq0"/>
-                            <constraint firstAttribute="trailing" secondItem="MQH-bI-Zdh" secondAttribute="trailing" id="aBH-H2-ykp"/>
+                            <constraint firstItem="MQH-bI-Zdh" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" constant="10" id="YVB-nY-sHE"/>
+                            <constraint firstItem="D5i-Pe-TAl" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" id="ZD9-R0-yq0"/>
+                            <constraint firstAttribute="trailing" secondItem="MQH-bI-Zdh" secondAttribute="trailing" constant="10" id="aBH-H2-ykp"/>
                             <constraint firstItem="MQH-bI-Zdh" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" id="kba-GQ-94a"/>
                             <constraint firstAttribute="trailing" secondItem="D5i-Pe-TAl" secondAttribute="trailing" id="lo1-R4-xx4"/>
                         </constraints>
                     </customView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="bottom" secondItem="u8g-jy-S4e" secondAttribute="bottom" priority="250" id="DQQ-ji-YSy"/>
-                    <constraint firstItem="vUy-jt-gjY" firstAttribute="top" secondItem="u8g-jy-S4e" secondAttribute="bottom" id="QH8-mU-6ZP"/>
-                    <constraint firstItem="vUy-jt-gjY" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="Sse-bx-ewr"/>
-                    <constraint firstAttribute="trailing" secondItem="vUy-jt-gjY" secondAttribute="trailing" id="amK-mR-Fvr"/>
+                    <constraint firstAttribute="bottom" secondItem="u8g-jy-S4e" secondAttribute="bottom" id="DQQ-ji-YSy"/>
                     <constraint firstItem="u8g-jy-S4e" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" id="j4i-Gt-xCB"/>
                     <constraint firstAttribute="trailing" secondItem="u8g-jy-S4e" secondAttribute="trailing" id="lEc-Vr-8M9"/>
                     <constraint firstItem="u8g-jy-S4e" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="s58-Wr-5SV"/>
-                    <constraint firstAttribute="bottom" secondItem="vUy-jt-gjY" secondAttribute="bottom" id="vMr-VQ-r4P"/>
+                    <constraint firstAttribute="bottom" secondItem="vUy-jt-gjY" secondAttribute="bottom" constant="20" id="vMr-VQ-r4P"/>
                 </constraints>
             </view>
             <toolbar key="toolbar" implicitIdentifier="CAE4F278-DC20-4A58-B07E-1580E7B14C87" autosavesConfiguration="NO" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconOnly" sizeMode="regular" id="pr3-TD-J2z">
@@ -463,7 +460,7 @@
                     <searchToolbarItem implicitItemIdentifier="A132890F-6B3D-4523-A71B-B00F095057C4" label="Search" paletteLabel="Search" visibilityPriority="1001" id="dv4-Il-y8X">
                         <nil key="toolTip"/>
                         <searchField key="view" focusRingType="none" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ab6-kR-8Io">
-                            <rect key="frame" x="0.0" y="0.0" width="100" height="22"/>
+                            <rect key="frame" x="0.0" y="0.0" width="100" height="24"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="200" id="hhF-2O-Qx7"/>
                             </constraints>
@@ -631,17 +628,17 @@
             <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" id="HXH-MZ-tkf">
+                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="HXH-MZ-tkf">
                     <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
                     <clipView key="contentView" id="EeU-rT-tSP">
-                        <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
+                        <rect key="frame" x="0.0" y="0.0" width="852" height="808"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <view translatesAutoresizingMaskIntoConstraints="NO" id="OxL-Q0-VBh">
-                                <rect key="frame" x="0.0" y="808" width="851" height="0.0"/>
+                                <rect key="frame" x="0.0" y="808" width="834" height="0.0"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p8n-RC-fWF">
-                                        <rect key="frame" x="0.0" y="0.0" width="851" height="0.0"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="834" height="0.0"/>
                                     </stackView>
                                 </subviews>
                                 <constraints>
@@ -684,7 +681,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
                     <clipView key="contentView" id="SLw-ag-klW">
                         <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView selectable="YES" allowsMultipleSelection="YES" id="neh-e5-MUa" customClass="VLCLibraryCollectionView">
                                 <rect key="frame" x="0.0" y="0.0" width="875" height="158"/>
@@ -713,7 +710,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="OqR-YY-weT">
                                 <rect key="frame" x="0.0" y="0.0" width="230" height="808"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" viewBased="YES" id="ceR-Vd-9ss">
                                         <rect key="frame" x="0.0" y="0.0" width="230" height="808"/>
@@ -772,7 +769,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="0td-vX-CFl">
                                 <rect key="frame" x="0.0" y="0.0" width="638" height="808"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="8M4-Y1-r6Z" customClass="VLCLibraryTableView">
                                         <rect key="frame" x="0.0" y="0.0" width="638" height="808"/>
@@ -851,11 +848,11 @@
                 <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7WD-fy-WtJ">
                     <rect key="frame" x="0.0" y="0.0" width="528" height="411"/>
                     <clipView key="contentView" id="5co-vI-cEn">
-                        <rect key="frame" x="0.0" y="0.0" width="528" height="411"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <rect key="frame" x="0.0" y="0.0" width="528" height="394"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="4cS-pi-5KZ" viewBased="YES" id="vpJ-Oz-Ebz" customClass="VLCLibraryTableView">
-                                <rect key="frame" x="0.0" y="0.0" width="718" height="383"/>
+                                <rect key="frame" x="0.0" y="0.0" width="718" height="366"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -877,7 +874,7 @@
                                                 <rect key="frame" x="11" y="1" width="405" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XpY-BL-Ovl">
+                                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XpY-BL-Ovl">
                                                         <rect key="frame" x="0.0" y="0.0" width="405" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="ZeB-Ae-Vhd">
@@ -909,7 +906,7 @@
                                                 <rect key="frame" x="419" y="1" width="80" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QMo-CO-uFe">
+                                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QMo-CO-uFe">
                                                         <rect key="frame" x="0.0" y="0.0" width="80" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="QqW-Vu-2fV">
@@ -941,7 +938,7 @@
                                                 <rect key="frame" x="502" y="1" width="204" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vyv-sc-JqL">
+                                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vyv-sc-JqL">
                                                         <rect key="frame" x="0.0" y="0.0" width="204" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="Y4L-hX-6Kr">
@@ -961,8 +958,8 @@
                             </tableView>
                         </subviews>
                     </clipView>
-                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Xu2-Uw-wBR">
-                        <rect key="frame" x="0.0" y="-16" width="0.0" height="16"/>
+                    <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Xu2-Uw-wBR">
+                        <rect key="frame" x="0.0" y="394" width="528" height="17"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="UVE-ma-wE8">
@@ -978,7 +975,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="528" height="411"/>
                     <clipView key="contentView" id="tI4-x3-55j">
                         <rect key="frame" x="0.0" y="0.0" width="528" height="411"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView selectable="YES" allowsMultipleSelection="YES" id="r7v-GI-W1U" customClass="VLCLibraryCollectionView">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="411"/>
@@ -1003,7 +1000,7 @@
                     <rect key="frame" x="0.0" y="371" width="528" height="40"/>
                     <subviews>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jfA-Vr-sQc">
-                            <rect key="frame" x="4" y="5" width="38" height="27"/>
+                            <rect key="frame" x="10" y="10" width="26" height="20"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSHomeTemplate" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OHf-j4-3In">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="message" size="11"/>
@@ -1060,7 +1057,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="4uw-9H-2bN">
                                 <rect key="frame" x="0.0" y="0.0" width="298" height="390"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="24" rowSizeStyle="automatic" viewBased="YES" id="hvV-yD-5Kd" customClass="VLCLibraryTableView">
                                         <rect key="frame" x="0.0" y="0.0" width="298" height="390"/>
@@ -1119,7 +1116,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="Zmo-lc-CDL">
                                 <rect key="frame" x="0.0" y="0.0" width="415" height="390"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <collectionView selectable="YES" allowsMultipleSelection="YES" id="ZGR-PZ-7h5" customClass="VLCLibraryCollectionView">
                                         <rect key="frame" x="0.0" y="0.0" width="415" height="390"/>
@@ -1154,7 +1151,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="qva-RZ-DvL">
                                 <rect key="frame" x="0.0" y="0.0" width="312" height="390"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" emptySelection="NO" autosaveColumns="NO" viewBased="YES" id="LNt-ot-2wU" customClass="VLCLibraryTableView">
                                         <rect key="frame" x="0.0" y="0.0" width="312" height="390"/>
@@ -1213,7 +1210,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="xCC-h9-931">
                                 <rect key="frame" x="0.0" y="0.0" width="401" height="390"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="4ll-T2-J16" customClass="VLCLibraryTableView">
                                         <rect key="frame" x="0.0" y="0.0" width="401" height="390"/>
@@ -1276,7 +1273,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
                     <clipView key="contentView" id="2oa-WL-dxA">
                         <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView selectable="YES" allowsMultipleSelection="YES" id="QAt-jP-zE7" customClass="VLCLibraryCollectionView">
                                 <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
@@ -1300,11 +1297,11 @@
                 <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QqV-hX-sZw">
                     <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
                     <clipView key="contentView" id="D1c-vg-zeA">
-                        <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <rect key="frame" x="0.0" y="0.0" width="714" height="373"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView identifier="VLCLibrarySongsTableViewIdentifier" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" rowSizeStyle="automatic" headerView="LR0-xA-UlZ" viewBased="YES" id="Xck-iv-pH4" customClass="VLCLibraryTableView">
-                                <rect key="frame" x="0.0" y="0.0" width="1145" height="362"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1145" height="345"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="17" height="5"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1571,7 +1568,7 @@
                         </subviews>
                     </clipView>
                     <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="2VX-c2-fRL">
-                        <rect key="frame" x="0.0" y="374" width="714" height="16"/>
+                        <rect key="frame" x="0.0" y="373" width="714" height="17"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="NFb-XZ-MAv">
@@ -1612,7 +1609,7 @@
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" image="VLC" id="1yO-EP-f8Q"/>
                 </imageView>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="V2G-WY-Ewc" userLabel="Browse Button" customClass="VLCCustomEmptyLibraryBrowseButton">
-                    <rect key="frame" x="298" y="140" width="99" height="29"/>
+                    <rect key="frame" x="298" y="141" width="99" height="28"/>
                     <buttonCell key="cell" type="recessed" title="Browse" bezelStyle="recessed" imagePosition="left" alignment="center" borderStyle="border" inset="2" id="l2n-Ul-S0e">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                         <font key="font" metaFont="cellTitle"/>
