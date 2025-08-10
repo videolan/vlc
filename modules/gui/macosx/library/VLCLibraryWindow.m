@@ -489,7 +489,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)hideControlsBarImmediately
 {
-    self.controlsBarHeightConstraint.constant = 0;
+    self.controlsBar.bottomBarView.hidden = YES;
+    self.controlsBar.bottomBarView.alphaValue = 0;
 }
 
 - (void)hideControlsBar
@@ -497,21 +498,25 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
         context.duration = VLCLibraryUIUnits.controlsFadeAnimationDuration;
-        self.controlsBarHeightConstraint.animator.constant = 0;
-    } completionHandler:nil];
+        self.controlsBar.bottomBarView.animator.alphaValue = 0;
+    } completionHandler:^{
+        self.controlsBar.bottomBarView.hidden = self.controlsBar.bottomBarView.alphaValue == 0;
+    }];
 }
 
 - (void)showControlsBarImmediately
 {
-    self.controlsBarHeightConstraint.constant = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
+    self.controlsBar.bottomBarView.hidden = NO;
+    self.controlsBar.bottomBarView.alphaValue = 1;
 }
 
 - (void)showControlsBar
 {
+    self.controlsBar.bottomBarView.hidden = NO;
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
         context.duration = VLCLibraryUIUnits.controlsFadeAnimationDuration;
-        self.controlsBarHeightConstraint.animator.constant = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
+        self.controlsBar.bottomBarView.animator.alphaValue = 1;
     } completionHandler:nil];
 }
 
