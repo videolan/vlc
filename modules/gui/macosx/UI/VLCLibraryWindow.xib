@@ -27,16 +27,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="896" height="456"/>
                     </splitView>
                     <customView horizontalHuggingPriority="1" horizontalCompressionResistancePriority="1" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vUy-jt-gjY" customClass="VLCBottomBarView">
-                        <rect key="frame" x="20" y="20" width="856" height="48"/>
+                        <rect key="frame" x="20" y="20" width="856" height="50"/>
                         <subviews>
                             <visualEffectView ambiguous="YES" blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="D5i-Pe-TAl">
-                                <rect key="frame" x="0.0" y="0.0" width="856" height="48"/>
+                                <rect key="frame" x="0.0" y="0.0" width="856" height="50"/>
                             </visualEffectView>
                             <customView ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MQH-bI-Zdh" customClass="VLCDragDropView">
-                                <rect key="frame" x="20" y="0.0" width="816" height="48"/>
+                                <rect key="frame" x="20" y="0.0" width="816" height="50"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="YAj-e7-KCU" userLabel="New play controls group ">
-                                        <rect key="frame" x="16" y="4" width="188" height="40"/>
+                                        <rect key="frame" x="10" y="5" width="188" height="40"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="72A-6S-lpR" userLabel="Jump Back Button">
                                                 <rect key="frame" x="0.0" y="5" width="24" height="32"/>
@@ -124,7 +124,7 @@
                                         </constraints>
                                     </customView>
                                     <customView ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ktr-qT-1fr" customClass="VLCTrackingView">
-                                        <rect key="frame" x="220" y="4" width="376" height="40"/>
+                                        <rect key="frame" x="220" y="5" width="376" height="40"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
                                                 <rect key="frame" x="130" y="24" width="153" height="16"/>
@@ -259,7 +259,7 @@
                                         </constraints>
                                     </customView>
                                     <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
-                                        <rect key="frame" x="612" y="4" width="188" height="40"/>
+                                        <rect key="frame" x="612" y="5" width="188" height="40"/>
                                         <subviews>
                                             <button horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Bt8-jQ-hUr">
                                                 <rect key="frame" x="0.0" y="13.5" width="16" height="14"/>
@@ -354,28 +354,27 @@
                                     </stackView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="S1K-Lp-DVO" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="4" id="6BO-R7-IvY"/>
+                                    <constraint firstItem="S1K-Lp-DVO" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="5" id="6BO-R7-IvY"/>
                                     <constraint firstItem="Ktr-qT-1fr" firstAttribute="leading" secondItem="YAj-e7-KCU" secondAttribute="trailing" constant="16" id="9P6-Y4-CxW"/>
-                                    <constraint firstAttribute="bottom" secondItem="Ktr-qT-1fr" secondAttribute="bottom" constant="4" id="9pB-9C-2xy"/>
-                                    <constraint firstAttribute="trailing" secondItem="S1K-Lp-DVO" secondAttribute="trailing" constant="16" id="BUG-PH-qrw"/>
-                                    <constraint firstAttribute="bottom" secondItem="YAj-e7-KCU" secondAttribute="bottom" constant="4" id="Gqk-sg-bBK"/>
+                                    <constraint firstAttribute="bottom" secondItem="Ktr-qT-1fr" secondAttribute="bottom" constant="5" id="9pB-9C-2xy"/>
+                                    <constraint firstAttribute="trailing" secondItem="S1K-Lp-DVO" secondAttribute="trailing" constant="10" id="BUG-PH-qrw"/>
+                                    <constraint firstAttribute="bottom" secondItem="YAj-e7-KCU" secondAttribute="bottom" constant="5" id="Gqk-sg-bBK"/>
                                     <constraint firstItem="S1K-Lp-DVO" firstAttribute="width" secondItem="YAj-e7-KCU" secondAttribute="width" id="NxM-eQ-3UW"/>
                                     <constraint firstItem="Ktr-qT-1fr" firstAttribute="trailing" secondItem="S1K-Lp-DVO" secondAttribute="leading" constant="-16" id="hN9-7W-Mx1"/>
-                                    <constraint firstAttribute="bottom" secondItem="S1K-Lp-DVO" secondAttribute="bottom" constant="4" id="qCf-Co-yI1"/>
-                                    <constraint firstItem="YAj-e7-KCU" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="4" id="sIM-7y-JNq"/>
-                                    <constraint firstItem="Ktr-qT-1fr" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="4" id="t0h-f6-FGO"/>
-                                    <constraint firstItem="YAj-e7-KCU" firstAttribute="leading" secondItem="MQH-bI-Zdh" secondAttribute="leading" constant="16" id="tkj-nh-Tfb"/>
+                                    <constraint firstAttribute="bottom" secondItem="S1K-Lp-DVO" secondAttribute="bottom" constant="5" id="qCf-Co-yI1"/>
+                                    <constraint firstItem="YAj-e7-KCU" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="5" id="sIM-7y-JNq"/>
+                                    <constraint firstItem="Ktr-qT-1fr" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="5" id="t0h-f6-FGO"/>
+                                    <constraint firstItem="YAj-e7-KCU" firstAttribute="leading" secondItem="MQH-bI-Zdh" secondAttribute="leading" constant="10" id="tkj-nh-Tfb"/>
                                 </constraints>
                             </customView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="D5i-Pe-TAl" secondAttribute="bottom" id="1LS-Zu-gsR"/>
-                            <constraint firstAttribute="height" constant="48" id="Fps-hR-AFq"/>
                             <constraint firstAttribute="bottom" secondItem="MQH-bI-Zdh" secondAttribute="bottom" id="Uo1-sD-OXk"/>
                             <constraint firstItem="D5i-Pe-TAl" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" id="WKP-Ke-OrH"/>
-                            <constraint firstItem="MQH-bI-Zdh" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" constant="10" id="YVB-nY-sHE"/>
+                            <constraint firstItem="MQH-bI-Zdh" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" constant="5" id="YVB-nY-sHE"/>
                             <constraint firstItem="D5i-Pe-TAl" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" id="ZD9-R0-yq0"/>
-                            <constraint firstAttribute="trailing" secondItem="MQH-bI-Zdh" secondAttribute="trailing" constant="10" id="aBH-H2-ykp"/>
+                            <constraint firstAttribute="trailing" secondItem="MQH-bI-Zdh" secondAttribute="trailing" constant="5" id="aBH-H2-ykp"/>
                             <constraint firstItem="MQH-bI-Zdh" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" id="kba-GQ-94a"/>
                             <constraint firstAttribute="trailing" secondItem="D5i-Pe-TAl" secondAttribute="trailing" id="lo1-R4-xx4"/>
                         </constraints>
@@ -564,7 +563,6 @@
                 <outlet property="audioLibraryView" destination="lpg-UW-pTq" id="FYD-PV-Ce2"/>
                 <outlet property="backwardsNavigationButton" destination="Bzq-ZV-i8j" id="Bac-Kb-ut"/>
                 <outlet property="controlsBar" destination="Uzf-Tf-H8x" id="n0G-92-F2Q"/>
-                <outlet property="controlsBarHeightConstraint" destination="Fps-hR-AFq" id="E4g-JQ-fgx"/>
                 <outlet property="emptyLibraryView" destination="YJf-1r-vaC" id="AJB-eN-4u6"/>
                 <outlet property="forwardsNavigationButton" destination="jzy-je-h2k" id="for-Wa-rd"/>
                 <outlet property="gridVsListSegmentedControl" destination="lIg-5J-C5F" id="u6B-Zx-4mX"/>
