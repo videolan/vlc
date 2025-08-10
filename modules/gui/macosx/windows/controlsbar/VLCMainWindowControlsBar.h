@@ -44,6 +44,7 @@
 
 @property (readwrite, strong) IBOutlet VLCTrackingView *thumbnailTrackingView;
 @property (readwrite, strong) IBOutlet NSView *openMainVideoViewButtonOverlay;
+@property (readwrite, strong) IBOutlet NSVisualEffectView *visualEffectView;
 
 - (IBAction)stop:(id)sender;
 - (IBAction)toggleFavorite:(id)sender;

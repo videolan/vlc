@@ -27,6 +27,7 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryWindow.h"
@@ -38,6 +39,7 @@
 #import "playqueue/VLCPlayQueueModel.h"
 #import "playqueue/VLCPlayerController.h"
 
+#import "views/VLCBottomBarView.h"
 #import "views/VLCTimeField.h"
 #import "views/VLCTrackingView.h"
 #import "views/VLCVolumeSlider.h"
@@ -62,6 +64,20 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+
+    if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+        NSGlassEffectView * const glassEffectView = [[NSGlassEffectView alloc] init];
+        glassEffectView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.bottomBarView addSubview:glassEffectView positioned:NSWindowBelow relativeTo:self.dropView];
+        [self.visualEffectView removeFromSuperview];
+        glassEffectView.contentView = self.dropView;
+        [glassEffectView applyConstraintsToFillSuperview];
+        glassEffectView.cornerRadius = CGFLOAT_MAX;
+        self.bottomBarView.drawBorder = NO;
+#endif
+    }
+
     _playQueueController = VLCMain.sharedInstance.playQueueController;
     _playerController = _playQueueController.playerController;
 
