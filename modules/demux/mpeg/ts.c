@@ -420,6 +420,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    /* SetPIDFilter() will read b_access_control, so initialize it first */
     p_sys->b_access_control = true;
     p_sys->b_access_control = ( VLC_SUCCESS == SetPIDFilter( p_sys, patpid, true ) );
 
