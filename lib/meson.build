@@ -1,6 +1,7 @@
 libvlc_sources = [
     'core.c',
     'dialog.c',
+    'downloader.c',
     'renderer_discoverer.c',
     'error.c',
     'log.c',

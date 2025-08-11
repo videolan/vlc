@@ -364,6 +364,7 @@ LibVLC:
    events, deprecated track APIs, deprecated service-discovery/log/audio/video
    stubs, AGL support and libvlc_wait()
  * Remove libvlc_media_player_set_abloop() in favor of explicit AB loop APIs
+ * Add libvlc_downloader API that provides a bitstream of media to client applications
 
 
 Changes between 3.0.23 and 3.0.24-beta1:

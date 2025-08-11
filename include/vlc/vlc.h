@@ -45,6 +45,7 @@ extern "C" {
 #include "libvlc_media_list_player.h"
 #include "libvlc_media_discoverer.h"
 #include "libvlc_dialog.h"
+#include "libvlc_downloader.h"
 #include "libvlc_version.h"
 
 # ifdef __cplusplus

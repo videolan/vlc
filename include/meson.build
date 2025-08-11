@@ -3,6 +3,7 @@ install_headers(
     'vlc/vlc.h',
     'vlc/libvlc.h',
     'vlc/libvlc_dialog.h',
+    'vlc/libvlc_downloader.h',
     'vlc/libvlc_media.h',
     'vlc/libvlc_media_discoverer.h',
     'vlc/libvlc_media_list.h',
