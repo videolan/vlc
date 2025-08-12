@@ -620,7 +620,7 @@ static vlc_tick_t webvtt_domnode_GetPlaybackTime( const webvtt_dom_node_t *p_nod
 static bool webvtt_domnode_Match_Class( const webvtt_dom_node_t *p_node, const char *psz )
 {
     const size_t i_len = strlen( psz );
-    if( p_node->type == NODE_TAG )
+    if( i_len && p_node->type == NODE_TAG )
     {
         const webvtt_dom_tag_t *p_tagnode = (webvtt_dom_tag_t *) p_node;
         for( const char *p = p_tagnode->psz_attrs; p && *p; p++ )
