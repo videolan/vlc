@@ -49,18 +49,20 @@ enum ps_source {
     PS_SOURCE_AOB,     // when reading a DVD-Audio
 };
 
-/* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
+/* 256-0xC0 for normal stream, 256 for VOB stream, 256 for EVOB stream, 8 for AOB stream */
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)
 static inline int ps_id_to_tk( unsigned i_id )
 {
     if( i_id <= 0xff )
         return i_id - 0xc0;
-    else if( (i_id & 0xff00) == 0xbd00 )
+    else if( (i_id & 0xff00) == PS_PACKET_ID_MASK_VOB )
         return 256-0xC0 + (i_id & 0xff);
-    else if( (i_id & 0xff00) == 0xfd00 )
+    else if( (i_id & 0xff00) == PS_PACKET_ID_MASK_EXTENDED )
         return 512-0xc0 + (i_id & 0xff);
-    else
+    else {
+        assert( (i_id & 0xff00) == PS_PACKET_ID_MASK_AOB );
         return 768-0xc0 + (i_id & 0x07);
+    }
 }
 
 typedef struct ps_psm_t ps_psm_t;
