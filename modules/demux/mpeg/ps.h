@@ -530,7 +530,8 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     if( i_skip_extra >= 0 )
         i_skip += i_skip_extra;
     else if( p_pes->i_buffer > i_skip + 3 &&
-             ( ps_pkt_id( p_pes, PS_SOURCE_AOB ) == 0xa001 || ps_pkt_id( p_pes, PS_SOURCE_VOB ) == 0xbda1 ) )
+             ( ps_pkt_id( p_pes, PS_SOURCE_AOB ) == PS_AOB_PACKET_ID_MLP ||
+               ps_pkt_id( p_pes, PS_SOURCE_VOB ) == PS_VOB_PACKET_ID_MLP ) )
         i_skip += 4 + p_pes->p_buffer[i_skip+3];
 
     if( p_pes->i_buffer <= i_skip )
