@@ -623,7 +623,7 @@ static bool webvtt_domnode_Match_Class( const webvtt_dom_node_t *p_node, const c
     if( p_node->type == NODE_TAG )
     {
         const webvtt_dom_tag_t *p_tagnode = (webvtt_dom_tag_t *) p_node;
-        for( const char *p = p_tagnode->psz_attrs; p && psz; p++ )
+        for( const char *p = p_tagnode->psz_attrs; p && *p; p++ )
         {
             p = strstr( p, psz );
             if( !p )
