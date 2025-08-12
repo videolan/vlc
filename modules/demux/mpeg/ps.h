@@ -148,7 +148,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
     tk->i_skip = 0;
     tk->i_id = i_id;
 
-    if( ( i_id&0xff00 ) == 0xbd00 ) /* 0xBD00 -> 0xBDFF, Private Stream 1 */
+    if( ( i_id&0xff00 ) == PS_PACKET_ID_MASK_VOB ) /* 0xBD00 -> 0xBDFF, VOB Private Stream 1 */
     {
         if( ( i_id&0xf8 ) == 0x88 || /* 0x88 -> 0x8f - Can be DTS-HD primary audio in evob */
             ( i_id&0xf8 ) == 0x98 )  /* 0x98 -> 0x9f - Can be DTS-HD secondary audio in evob */
@@ -211,7 +211,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
             return VLC_EGENERIC;
         }
     }
-    else if( (i_id&0xff00) == 0xfd00 ) /* 0xFD00 -> 0xFDFF */
+    else if( (i_id&0xff00) == PS_PACKET_ID_MASK_EXTENDED ) /* EVOB: 0xFD00 -> 0xFDFF */
     {
         uint8_t i_sub_id = i_id & 0xff;
         if( ( i_sub_id >= 0x55 && i_sub_id <= 0x5f ) || /* Can be primary VC-1 in evob */
@@ -225,7 +225,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
             return VLC_EGENERIC;
         }
     }
-    else if( (i_id&0xff00) == 0xa000 ) /* 0xA000 -> 0xA0FF */
+    else if( (i_id&0xff00) == PS_PACKET_ID_MASK_AOB ) /* AOB: 0xA000 -> 0xA0FF */
     {
         uint8_t i_sub_id = i_id & 0x07;
         if( i_sub_id == 0 )
