@@ -357,19 +357,19 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt, enum ps_source 
                 p_pkt[i_start + 6] != 0x80 )
             {
                 /* AOB LPCM extension */
-                return 0xa000 | (i_sub_id & 0x01);
+                return PS_PACKET_ID_MASK_AOB | (i_sub_id & 0x01);
             }
 
             if( i_sub_id == 0xa1 &&
                 source == PS_SOURCE_AOB )
             {
                 /* AOB MLP extension */
-                return 0xa000 | (i_sub_id & 0x01);
+                return PS_PACKET_ID_MASK_AOB | (i_sub_id & 0x01);
             }
         }
 
         /* VOB extension */
-        return 0xbd00 | i_sub_id;
+        return PS_PACKET_ID_MASK_VOB | i_sub_id;
     }
     else if( i_pkt >= 9 &&
              p_pkt[3] == 0xfd &&
@@ -420,7 +420,7 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt, enum ps_source 
                 {
                     int i_stream_id_extension_flag = (p_pkt[i_skip+1] >> 7)&0x1;
                     if( i_stream_id_extension_flag == 0 )
-                        return 0xfd00 | (p_pkt[i_skip+1]&0x7f);
+                        return PS_PACKET_ID_MASK_EXTENDED | (p_pkt[i_skip+1]&0x7f);
                 }
             }
         }
