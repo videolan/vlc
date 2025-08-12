@@ -343,7 +343,7 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt, enum ps_source 
 {
     if(unlikely(i_pkt < 4))
         return 0;
-    if( p_pkt[3] == 0xbd )
+    if( p_pkt[3] == STREAM_ID_PRIVATE_STREAM_1 )
     {
         uint8_t i_sub_id = 0;
         if( i_pkt >= 9 &&
@@ -372,7 +372,7 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt, enum ps_source 
         return PS_PACKET_ID_MASK_VOB | i_sub_id;
     }
     else if( i_pkt >= 9 &&
-             p_pkt[3] == 0xfd &&
+             p_pkt[3] == STREAM_ID_EXTENDED_STREAM_ID &&
              (p_pkt[6]&0xC0) == 0x80 &&   /* mpeg2 */
              (p_pkt[7]&0x01) == 0x01 )    /* extension_flag */
     {
