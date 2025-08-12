@@ -348,19 +348,19 @@ static inline int ps_pkt_id( block_t *p_pkt, enum ps_source source )
                 p_pkt->p_buffer[i_start + 6] != 0x80 )
             {
                 /* AOB LPCM extension */
-                return 0xa000 | (i_sub_id & 0x01);
+                return PS_PACKET_ID_MASK_AOB | (i_sub_id & 0x01);
             }
 
             if( i_sub_id == 0xa1 &&
                 source == PS_SOURCE_AOB )
             {
                 /* AOB MLP extension */
-                return 0xa000 | (i_sub_id & 0x01);
+                return PS_PACKET_ID_MASK_AOB | (i_sub_id & 0x01);
             }
         }
 
         /* VOB extension */
-        return 0xbd00 | i_sub_id;
+        return PS_PACKET_ID_MASK_VOB | i_sub_id;
     }
     else if( p_pkt->p_buffer[3] == 0xfd &&
              p_pkt->i_buffer >= 9 &&
@@ -411,7 +411,7 @@ static inline int ps_pkt_id( block_t *p_pkt, enum ps_source source )
                 {
                     int i_stream_id_extension_flag = (p_pkt->p_buffer[i_skip+1] >> 7)&0x1;
                     if( i_stream_id_extension_flag == 0 )
-                        return 0xfd00 | (p_pkt->p_buffer[i_skip+1]&0x7f);
+                        return PS_PACKET_ID_MASK_EXTENDED | (p_pkt->p_buffer[i_skip+1]&0x7f);
                 }
             }
         }
