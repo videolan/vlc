@@ -28,6 +28,14 @@
 #define PS_STREAM_ID_PACK_HEADER      0xBA
 #define PS_STREAM_ID_SYSTEM_HEADER    0xBB
 
+#define PS_PACKET_ID_MASK_VOB        0xBD00
+#define PS_PACKET_ID_MASK_AOB        0xA000
+#define PS_PACKET_ID_MASK_EXTENDED   0xFD00
+
+#define PS_AOB_PACKET_ID_LPCM        (PS_PACKET_ID_MASK_AOB | 0x00)
+#define PS_AOB_PACKET_ID_MLP         (PS_PACKET_ID_MASK_AOB | 0x01)
+#define PS_VOB_PACKET_ID_MLP         (PS_PACKET_ID_MASK_VOB | 0xA1)
+
 enum ps_source {
     PS_SOURCE_UNKNOWN, // any PS/PES source
     PS_SOURCE_VOB,     // when reading a DVD-Video
