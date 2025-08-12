@@ -544,16 +544,16 @@ static int Demux( demux_t *p_demux )
         {
             int i_id = ps_pkt_id( p_pkt->p_buffer, p_pkt->i_buffer, p_sys->source );
             /* Small heuristic to improve MLP detection from AOB */
-            if( i_id == 0xa001 &&
+            if( i_id == PS_AOB_PACKET_ID_MLP &&
                 p_sys->i_aob_mlp_count < 500 )
             {
                 p_sys->i_aob_mlp_count++;
             }
-            else if( i_id == 0xbda1 &&
+            else if( i_id == PS_VOB_PACKET_ID_MLP &&
                      p_sys->i_aob_mlp_count > 0 )
             {
                 p_sys->i_aob_mlp_count--;
-                i_id = 0xa001;
+                i_id = PS_AOB_PACKET_ID_MLP;
             }
 
             bool b_new = false;
