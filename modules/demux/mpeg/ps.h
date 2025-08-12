@@ -334,7 +334,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
 /* return the id of a PES (should be valid) */
 static inline int ps_pkt_id( block_t *p_pkt, enum ps_source source )
 {
-    if( p_pkt->p_buffer[3] == 0xbd )
+    if( p_pkt->p_buffer[3] == PS_STREAM_ID_PRIVATE_STREAM1 )
     {
         uint8_t i_sub_id = 0;
         if( p_pkt->i_buffer >= 9 &&
@@ -362,7 +362,7 @@ static inline int ps_pkt_id( block_t *p_pkt, enum ps_source source )
         /* VOB extension */
         return PS_PACKET_ID_MASK_VOB | i_sub_id;
     }
-    else if( p_pkt->p_buffer[3] == 0xfd &&
+    else if( p_pkt->p_buffer[3] == PS_STREAM_ID_EXTENDED &&
              p_pkt->i_buffer >= 9 &&
              (p_pkt->p_buffer[6]&0xC0) == 0x80 &&   /* mpeg2 */
              (p_pkt->p_buffer[7]&0x01) == 0x01 )    /* extension_flag */
