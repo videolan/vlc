@@ -338,8 +338,7 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt )
 
             if( i_sub_id == 0xa0 &&
                 i_pkt >= i_start + 7 &&
-                ( p_pkt[i_start + 5] >=  0xc0 ||
-                  p_pkt[i_start + 6] != 0x80 ) )
+                p_pkt[i_start + 6] != 0x80 )
             {
                 /* AOB LPCM extension */
                 return 0xa000 | (i_sub_id & 0x01);
