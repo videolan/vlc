@@ -32,6 +32,9 @@
 #define PS_PACKET_ID_MASK_AOB        0xA000
 #define PS_PACKET_ID_MASK_EXTENDED   0xFD00
 
+/* 0xBD20 + 0x00 to 0x1f */
+#define PS_SPU_ID_OFFSET             0xBD20
+
 #define PS_AOB_PACKET_ID_LPCM        (PS_PACKET_ID_MASK_AOB | 0x00)
 #define PS_AOB_PACKET_ID_MLP         (PS_PACKET_ID_MASK_AOB | 0x01)
 #define PS_VOB_PACKET_ID_MLP         (PS_PACKET_ID_MASK_VOB | 0xA1)

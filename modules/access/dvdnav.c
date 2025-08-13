@@ -66,8 +66,6 @@ dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
 
 #include "disc_helper.h"
 
-#define PS_SPU_ID_OFFSET  0xbd20
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
