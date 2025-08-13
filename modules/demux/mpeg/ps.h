@@ -336,12 +336,20 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt )
             const unsigned i_start = 9 + p_pkt[8];
             i_sub_id = p_pkt[i_start];
 
-            if( (i_sub_id & 0xfe) == 0xa0 &&
+            if( i_sub_id == 0xa0 &&
                 i_pkt >= i_start + 7 &&
                 ( p_pkt[i_start + 5] >=  0xc0 ||
                   p_pkt[i_start + 6] != 0x80 ) )
             {
-                /* AOB LPCM/MLP extension
+                /* AOB LPCM extension */
+                return 0xa000 | (i_sub_id & 0x01);
+            }
+            if( i_sub_id == 0xa1 &&
+                i_pkt >= i_start + 7 &&
+                ( p_pkt[i_start + 5] >=  0xc0 ||
+                  p_pkt[i_start + 6] != 0x80 ) )
+            {
+                /* AOB MLP extension
                 * XXX for MLP I think that the !=0x80 test is not good and
                 * will fail for some valid files */
                 return 0xa000 | (i_sub_id & 0x01);
