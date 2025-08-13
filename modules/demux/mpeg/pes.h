@@ -84,6 +84,8 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
         if( ( p_header[6]&0xC0 ) == 0x80 )
         {
             /* mpeg2 PES */
+            // 9 = syncword(3), stream ID(1), length(2), MPEG2 PES(1), flags(1), header_len(1)
+            // p_header[8] = header_len(1)
             i_skip = p_header[8] + 9;
 
             if( pb_pes_scambling )
