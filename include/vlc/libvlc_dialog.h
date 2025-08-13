@@ -56,6 +56,11 @@ typedef enum libvlc_dialog_question_type
 typedef struct libvlc_dialog_cbs
 {
     /**
+     * Version of struct libvlc_dialog_cbs
+     */
+    uint32_t version;
+
+    /**
      * Called when a login dialog needs to be displayed
      *
      * You can interact with this dialog by calling libvlc_dialog_post_login()

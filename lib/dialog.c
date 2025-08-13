@@ -114,6 +114,9 @@ libvlc_dialog_set_callbacks(libvlc_instance_t *p_instance,
 
     if (p_cbs != NULL)
     {
+        /* No different versions to handle for now */
+        assert(p_cbs->version <= 0);
+
         const vlc_dialog_cbs dialog_cbs = {
             .pf_display_login = p_cbs->pf_display_login ?
                                 display_login_cb : NULL,
