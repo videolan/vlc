@@ -125,6 +125,21 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     _videoImageViewAspectRatioConstraint.priority = NSLayoutPriorityRequired;
     _videoImageViewAspectRatioConstraint.active = NO;
 
+    if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+        self.playInstantlyButton.bordered = YES;
+        self.playInstantlyButton.bezelStyle = NSBezelStyleGlass;
+        self.playInstantlyButton.borderShape = NSControlBorderShapeCircle;
+        self.playInstantlyButton.image = [NSImage imageWithSystemSymbolName:@"play.fill" accessibilityDescription:nil];
+        self.playInstantlyButton.imageScaling = NSImageScaleProportionallyUpOrDown;
+        self.playInstantlyButton.controlSize = NSControlSizeExtraLarge;
+        [NSLayoutConstraint activateConstraints:@[
+            [self.playInstantlyButton.widthAnchor constraintEqualToConstant:VLCLibraryUIUnits.mediumPlaybackControlButtonSize],
+            [self.playInstantlyButton.heightAnchor constraintEqualToConstant:VLCLibraryUIUnits.mediumPlaybackControlButtonSize],
+        ]];
+#endif
+    }
+
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
     self.secondaryInfoTextField.textColor = NSColor.VLClibrarySubtitleColor;
     self.annotationTextField.font = NSFont.VLCLibraryItemAnnotationFont;
