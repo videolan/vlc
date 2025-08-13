@@ -125,6 +125,8 @@ static int ParsePESHeader( struct vlc_logger *p_logger, const uint8_t *p_header,
         if( ( p_header[6]&0xC0 ) == 0x80 )
         {
             /* mpeg2 PES */
+            // 9 = syncword(3), stream ID(1), length(2), MPEG2 PES(1), flags(1), header_len(1)
+            // p_header[8] = header_len(1)
             i_skip = p_header[8] + 9;
 
             h->b_scrambling = p_header[6]&0x30;
