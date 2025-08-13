@@ -52,16 +52,14 @@ static inline unsigned ps_id_to_tk( unsigned i_id )
     assert(i_id >= 0xc0);
     if(unlikely(i_id < 0xc0))
         return 0;
-    else if( i_id <= 0xff )
+    if( i_id <= 0xff )
         return i_id - 0xc0;
-    else if( (i_id & 0xff00) == PS_PACKET_ID_MASK_VOB )
+    if( (i_id & 0xff00) == PS_PACKET_ID_MASK_VOB )
         return 256-0xC0 + (i_id & 0xff);
-    else if( (i_id & 0xff00) == PS_PACKET_ID_MASK_EXTENDED )
+    if( (i_id & 0xff00) == PS_PACKET_ID_MASK_EXTENDED )
         return 512-0xc0 + (i_id & 0xff);
-    else {
-        assert( (i_id & 0xff00) == PS_PACKET_ID_MASK_AOB );
-        return 768-0xc0 + (i_id & 0x07);
-    }
+    assert( (i_id & 0xff00) == PS_PACKET_ID_MASK_AOB );
+    return 768-0xc0 + (i_id & 0x07);
 }
 
 typedef struct ps_psm_t ps_psm_t;
@@ -374,7 +372,7 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt, enum ps_source 
         /* VOB extension */
         return PS_PACKET_ID_MASK_VOB | i_sub_id;
     }
-    else if( i_pkt >= 9 &&
+    if( i_pkt >= 9 &&
              p_pkt[3] == STREAM_ID_EXTENDED_STREAM_ID &&
              (p_pkt[6]&0xC0) == 0x80 &&   /* mpeg2 */
              (p_pkt[7]&0x01) == 0x01 )    /* extension_flag */
@@ -447,7 +445,7 @@ static inline int ps_pkt_size( const uint8_t *p, int i_peek )
             {
                 if( i_peek >= 14 && (p[4] >> 6) == 0x01 )
                     return 14 + (p[13]&0x07);
-                else if( i_peek >= 12 && (p[4] >> 4) == 0x02 )
+                if( i_peek >= 12 && (p[4] >> 4) == 0x02 )
                     return 12;
             }
             break;
