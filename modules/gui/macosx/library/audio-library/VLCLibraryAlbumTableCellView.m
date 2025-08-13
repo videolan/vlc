@@ -144,6 +144,21 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     self.genreNameTextButton.action = @selector(secondaryDetailAction:);
     self.trackingView.viewToHide = self.playInstantlyButton;
 
+    if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+        self.playInstantlyButton.bordered = YES;
+        self.playInstantlyButton.bezelStyle = NSBezelStyleGlass;
+        self.playInstantlyButton.borderShape = NSControlBorderShapeCircle;
+        self.playInstantlyButton.image = [NSImage imageWithSystemSymbolName:@"play.fill" accessibilityDescription:nil];
+        self.playInstantlyButton.imageScaling = NSImageScaleProportionallyUpOrDown;
+        self.playInstantlyButton.controlSize = NSControlSizeExtraLarge;
+        [NSLayoutConstraint activateConstraints:@[
+            [self.playInstantlyButton.widthAnchor constraintEqualToConstant:VLCLibraryUIUnits.mediumPlaybackControlButtonSize],
+            [self.playInstantlyButton.heightAnchor constraintEqualToConstant:VLCLibraryUIUnits.mediumPlaybackControlButtonSize],
+        ]];
+#endif
+    }
+
     if (@available(macOS 10.14, *)) {
         self.artistNameTextButton.contentTintColor = NSColor.VLCAccentColor;
         self.genreNameTextButton.contentTintColor = NSColor.secondaryLabelColor;
