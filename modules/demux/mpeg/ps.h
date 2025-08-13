@@ -329,8 +329,7 @@ static inline int ps_pkt_id( block_t *p_pkt )
 
             if( i_sub_id == 0xa0 &&
                 p_pkt->i_buffer >= i_start + 7 &&
-                ( p_pkt->p_buffer[i_start + 5] >=  0xc0 ||
-                  p_pkt->p_buffer[i_start + 6] != 0x80 ) )
+                p_pkt->p_buffer[i_start + 6] != 0x80 )
             {
                 /* AOB LPCM extension */
                 return 0xa000 | (i_sub_id & 0x01);
