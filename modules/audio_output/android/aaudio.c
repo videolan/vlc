@@ -813,22 +813,13 @@ static void
 Drain(aout_stream_t *stream)
 {
     struct sys *sys = stream->sys;
-    aaudio_stream_state_t state = GetState(stream);
 
     vlc_mutex_lock(&sys->lock);
     sys->draining = true;
     vlc_mutex_unlock(&sys->lock);
 
-    /* In case of differed start, the stream may not have been started yet */
-    if (unlikely(state != AAUDIO_STREAM_STATE_STARTED))
-    {
-        if (state != AAUDIO_STREAM_STATE_STARTING
-         && RequestStart(stream) != VLC_SUCCESS)
-            return;
-
-        if (WaitState(stream, AAUDIO_STREAM_STATE_STARTED) != VLC_SUCCESS)
-            return;
-    }
+    if (unlikely(sys->first_play_date == VLC_TICK_INVALID))
+        aout_stream_DrainedReport(stream);
 }
 
 static void
