@@ -505,7 +505,7 @@ static inline int ps_pkt_parse_system( const uint8_t *p_pkt, size_t i_pkt,
             case 0xB7:
                 if( p_pktend - p < 6 )
                     return VLC_EGENERIC;
-                i_id = ((int)STREAM_ID_EXTENDED_STREAM_ID << 8) | (p[2] & 0x7F);
+                i_id = PS_PACKET_ID_MASK_EXTENDED | (p[2] & 0x7F);
                 p += 6;
                 break;
             default:
