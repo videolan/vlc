@@ -32,6 +32,7 @@
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
@@ -56,6 +57,17 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 - (void)awakeFromNib
 {
     [self prepareForReuse];
+
+    if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+        self.playInstantlyButton.bordered = YES;
+        self.playInstantlyButton.bezelStyle = NSBezelStyleGlass;
+        self.playInstantlyButton.borderShape = NSControlBorderShapeCircle;
+        self.playInstantlyButton.image = [NSImage imageWithSystemSymbolName:@"play.fill" accessibilityDescription:nil];
+        self.playInstantlyButton.imageScaling = NSImageScaleProportionallyUpOrDown;
+        self.playInstantlyButton.controlSize = NSControlSizeExtraLarge;
+#endif
+    }
 }
 
 - (void)prepareForReuse
