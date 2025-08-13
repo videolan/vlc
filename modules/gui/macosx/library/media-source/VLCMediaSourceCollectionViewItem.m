@@ -30,6 +30,7 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "library/media-source/VLCMediaSourceDataSource.h"
 
@@ -67,6 +68,21 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     self.annotationTextField.textColor = NSColor.VLClibraryAnnotationColor;
     self.annotationTextField.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor;
     self.highlightBox.borderColor = NSColor.VLCAccentColor;
+
+        if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+        self.playInstantlyButton.bordered = YES;
+        self.playInstantlyButton.bezelStyle = NSBezelStyleGlass;
+        self.playInstantlyButton.borderShape = NSControlBorderShapeCircle;
+        self.playInstantlyButton.image = [NSImage imageWithSystemSymbolName:@"play.fill" accessibilityDescription:nil];
+        self.playInstantlyButton.imageScaling = NSImageScaleProportionallyUpOrDown;
+        self.playInstantlyButton.controlSize = NSControlSizeExtraLarge;
+        [NSLayoutConstraint activateConstraints:@[
+            [self.playInstantlyButton.widthAnchor constraintEqualToConstant:VLCLibraryUIUnits.mediumPlaybackControlButtonSize],
+            [self.playInstantlyButton.heightAnchor constraintEqualToConstant:VLCLibraryUIUnits.mediumPlaybackControlButtonSize],
+        ]];
+#endif
+    }
 
     if (@available(macOS 10.14, *)) {
         [NSApplication.sharedApplication addObserver:self
