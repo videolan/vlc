@@ -68,8 +68,11 @@ struct sys
     size_t frames_total_bytes;
     /* Bytes of silence written until it started */
     size_t start_silence_bytes;
+    /* Bytes of silence written after it started, used for warning */
+    size_t underrun_warn_bytes;
     /* Bytes of silence written after it started */
-    size_t underrun_bytes;
+    size_t underrun_total_bytes;
+
     /* Date when the data callback should start to process audio */
     vlc_tick_t first_play_date;
     /* True is the data callback started to process audio from the frame FIFO */
@@ -421,7 +424,8 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
 
             if (!sys->draining)
             {
-                sys->underrun_bytes += bytes;
+                sys->underrun_warn_bytes += bytes;
+                sys->underrun_total_bytes += bytes;
                 res = AAUDIO_CALLBACK_RESULT_CONTINUE;
             }
             else
@@ -456,6 +460,9 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
                 TicksToBytes(sys, TIMING_REPORT_DELAY_TICKS);
 
             vlc_tick_t pos_ticks = FramesToTicks(sys, pos_frames);
+            /* underrun 0s don't count in timing reports */
+            vlc_tick_t underrun_ticks = BytesToTicks(sys, sys->underrun_total_bytes);
+            pos_ticks -= underrun_ticks;
 
             /* Add the start silence to the system time and don't subtract
              * it from pos_ticks to avoid (unlikely) negatives ts */
@@ -704,8 +711,8 @@ Play(aout_stream_t *stream, vlc_frame_t *frame, vlc_tick_t date)
     vlc_frame_ChainLastAppend(&sys->frame_last, frame);
     sys->frames_total_bytes += frame->i_buffer;
 
-    size_t underrun_bytes = sys->underrun_bytes;
-    sys->underrun_bytes = 0;
+    size_t underrun_bytes = sys->underrun_warn_bytes;
+    sys->underrun_warn_bytes = 0;
     vlc_mutex_unlock(&sys->lock);
 
     if (underrun_bytes > 0)
@@ -790,7 +797,8 @@ error:
     sys->start_silence_bytes = 0;
     sys->timing_report_last_written_bytes = 0;
     sys->timing_report_delay_bytes = 0;
-    sys->underrun_bytes = 0;
+    sys->underrun_warn_bytes = 0;
+    sys->underrun_total_bytes = 0;
 
     int ret = OpenAAudioStream(stream);
     if (ret != VLC_SUCCESS)
@@ -901,7 +909,9 @@ Start(aout_stream_t *stream, audio_sample_format_t *fmt,
     sys->frame_last = &sys->frame_chain;
     sys->frames_total_bytes = 0;
     sys->start_silence_bytes = 0;
-    sys->underrun_bytes = 0;
+    sys->underrun_warn_bytes = 0;
+    sys->underrun_total_bytes = 0;
+
     sys->started = false;
     sys->draining = false;
     sys->first_pts = sys->first_play_date = VLC_TICK_INVALID;
