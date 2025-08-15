@@ -30,7 +30,15 @@ QSGTexture *QSGTextureView::texture() const
 void QSGTextureView::setTexture(QSGTexture *texture)
 {
     if (m_texture == texture)
+    {
+        if (m_texture)
+        {
+            if (resetState())
+                emit updateRequested();
+        }
+
         return;
+    }
 
     if (m_texture)
     {
@@ -41,21 +49,14 @@ void QSGTextureView::setTexture(QSGTexture *texture)
 
     if (texture)
     {
-        setFiltering(texture->filtering());
-        if (!texture->isAtlasTexture())
-        {
-            // Atlas textures are not rendered if they have mipmap filtering.
-            // Normally it should not happen because atlas textures are not
-            // mipmapped, mipmap filtering should not change anything.
-            setMipmapFiltering(texture->mipmapFiltering());
-        }
-
-        setAnisotropyLevel(texture->anisotropyLevel());
-        setHorizontalWrapMode(texture->horizontalWrapMode());
-        setVerticalWrapMode(texture->verticalWrapMode());
+        resetState();
 
         if (texture->inherits("QSGLayer"))
         {
+            // Since Qt 5, it is guaranteed that slots are executed in the order they
+            // are connected. The order is important here, we want to emit `updateRequested()`
+            // only after necessary adjustments:
+            connect(texture, SIGNAL(updateRequested()), this, SLOT(resetState()));
             connect(texture, SIGNAL(updateRequested()), this, SLOT(adjustNormalRect()));
             connect(texture, SIGNAL(updateRequested()), this, SIGNAL(updateRequested()));
         }
@@ -129,6 +130,62 @@ void QSGTextureView::setRect(const QRect &rect)
         // `normalizedTextureSubRect()` when there is a texture:
         m_normalRect.reset();
     }
+}
+
+bool QSGTextureView::resetState()
+{
+    assert(m_texture); // This method must not be called when there is no target texture.
+
+    bool changeMade = false;
+
+    if (const auto newFiltering = m_texture->filtering(); filtering() != newFiltering)
+    {
+        setFiltering(newFiltering);
+        changeMade = true;
+    }
+
+    {
+        // Qt bug: source `QSGTexture` has mipmap filtering, but has no mipmaps. Depending on the graphics backend,
+        //         this may cause the texture to be not rendered (OpenGL case). As a workaround, we must disable
+        //         mipmap filtering here.
+
+        // Testing `QRhiTexture::flags()` with `QRhiTexture::MipMapped` would make more sense, as that is expected to
+        // actually reflect if the underlying native texture actually has mip maps. But this should be okay also as
+        // RHI stuff are still semi-public as of Qt 6.9, and private before Qt 6.6 (we are supporting Qt 6.2).
+        if (m_texture->hasMipmaps())
+        {
+            if (const auto newMipmapFiltering = m_texture->mipmapFiltering(); mipmapFiltering() != newMipmapFiltering)
+            {
+                setMipmapFiltering(newMipmapFiltering);
+                changeMade = true;
+            }
+        }
+        else if (mipmapFiltering() != QSGTexture::Filtering::None)
+        {
+            setMipmapFiltering(QSGTexture::Filtering::None);
+            changeMade = true;
+        }
+    }
+
+    if (const auto newAnisotropyLevel = m_texture->anisotropyLevel(); anisotropyLevel() != newAnisotropyLevel)
+    {
+        setAnisotropyLevel(newAnisotropyLevel);
+        changeMade = true;
+    }
+
+    if (const auto newHWrapMode = m_texture->horizontalWrapMode(); horizontalWrapMode() != newHWrapMode)
+    {
+        setHorizontalWrapMode(newHWrapMode);
+        changeMade = true;
+    }
+
+    if (const auto newVWrapMode = m_texture->verticalWrapMode(); verticalWrapMode() != newVWrapMode)
+    {
+        setHorizontalWrapMode(newVWrapMode);
+        changeMade = true;
+    }
+
+    return changeMade;
 }
 
 qint64 QSGTextureView::comparisonKey() const
