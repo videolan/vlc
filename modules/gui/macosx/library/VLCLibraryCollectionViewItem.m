@@ -137,6 +137,13 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
             [self.playInstantlyButton.widthAnchor constraintEqualToConstant:VLCLibraryUIUnits.mediumPlaybackControlButtonSize],
             [self.playInstantlyButton.heightAnchor constraintEqualToConstant:VLCLibraryUIUnits.mediumPlaybackControlButtonSize],
         ]];
+
+        self.addToPlayQueueButton.bordered = YES;
+        self.addToPlayQueueButton.bezelStyle = NSBezelStyleGlass;
+        self.addToPlayQueueButton.borderShape = NSControlBorderShapeCapsule;
+        self.addToPlayQueueButton.image = [NSImage imageWithSystemSymbolName:@"ellipsis" accessibilityDescription:nil];
+        self.addToPlayQueueButton.imageScaling = NSImageScaleProportionallyUpOrDown;
+        self.addToPlayQueueButton.controlSize = NSControlSizeSmall;
 #endif
     }
 
