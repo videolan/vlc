@@ -52,12 +52,15 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+
     if (@available(macOS 10.14, *))
         _playButton.bezelColor = NSColor.VLCAccentColor;
 
     if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         self.glassBackgroundView = [[NSGlassEffectView alloc] initWithFrame:self.backgroundEffectView.frame];
+        self.glassBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
 
         [self addSubview:self.glassBackgroundView
               positioned:NSWindowBelow
