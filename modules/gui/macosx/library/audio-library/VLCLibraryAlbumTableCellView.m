@@ -51,12 +51,26 @@ NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibrar
 
 const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
+@interface VLCNonScrollableScrollView : NSScrollView
+@end
+
+@implementation VLCNonScrollableScrollView
+
+- (void)scrollWheel:(NSEvent *)event
+{
+    // Pass the scroll event to the next responder instead of handling it
+    [self.nextResponder scrollWheel:event];
+}
+
+@end
+
 @interface VLCLibraryAlbumTableCellView ()
 {
     VLCLibraryController *_libraryController;
     VLCLibraryItemInternalMediaItemsDataSource *_tracksDataSource;
     VLCLibraryAlbumTracksTableViewDelegate *_tracksTableViewDelegate;
     VLCLibraryTableView *_tracksTableView;
+    NSScrollView *_tracksScrollView;
     NSTableColumn *_column;
 }
 
@@ -175,9 +189,19 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
 - (void)setupTracksTableView
 {
+    // Create scroll view container that doesn't intercept scroll events
+    _tracksScrollView = [[VLCNonScrollableScrollView alloc] initWithFrame:NSZeroRect];
+    _tracksScrollView.borderType = NSNoBorder;
+    _tracksScrollView.hasVerticalScroller = NO;
+    _tracksScrollView.hasHorizontalScroller = NO;
+    _tracksScrollView.drawsBackground = NO;
+    _tracksScrollView.verticalScrollElasticity = NSScrollElasticityNone;
+    _tracksScrollView.horizontalScrollElasticity = NSScrollElasticityNone;
+    
     _tracksTableView = [[VLCLibraryTableView alloc] initWithFrame:NSZeroRect];
     _tracksTableView.identifier = VLCLibraryAlbumTableCellTableViewIdentifier;
     _tracksTableView.allowsMultipleSelection = YES;
+    _tracksTableView.headerView = nil;
     _column = [[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier];
     _column.width = [self expectedTableViewWidth];
     _column.maxWidth = MAXFLOAT;
@@ -197,18 +221,19 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     _tracksTableView.doubleAction = @selector(tracksTableViewDoubleClickAction:);
     _tracksTableView.target = self;
 
-    _tracksTableView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:_tracksTableView];
-    NSString *horizontalVisualConstraints = [NSString stringWithFormat:@"H:|-%f-[_representedImageView]-%f-[_tracksTableView]-%f-|",
+    _tracksScrollView.documentView = _tracksTableView;
+    _tracksScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_tracksScrollView];
+    NSString *horizontalVisualConstraints = [NSString stringWithFormat:@"H:|-%f-[_representedImageView]-%f-[_tracksScrollView]-%f-|",
                                              VLCLibraryUIUnits.largeSpacing,
                                              VLCLibraryUIUnits.largeSpacing,
                                              VLCLibraryUIUnits.largeSpacing];
-    NSString *verticalVisualContraints = [NSString stringWithFormat:@"V:|-%f-[_albumNameTextField]-%f-[_artistNameTextButton]-%f-[_tracksTableView]->=%f-|",
+    NSString *verticalVisualContraints = [NSString stringWithFormat:@"V:|-%f-[_albumNameTextField]-%f-[_artistNameTextButton]-%f-[_tracksScrollView]->=%f-|",
                                           VLCLibraryUIUnits.largeSpacing,
                                           VLCLibraryUIUnits.smallSpacing,
                                           VLCLibraryUIUnits.mediumSpacing,
                                           VLCLibraryUIUnits.largeSpacing];
-    NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksTableView, _representedImageView, _albumNameTextField, _artistNameTextButton);
+    NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksScrollView, _representedImageView, _albumNameTextField, _artistNameTextButton);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalVisualConstraints options:0 metrics:0 views:dict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalVisualContraints options:0 metrics:0 views:dict]];
 
