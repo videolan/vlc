@@ -17,7 +17,7 @@ index 7c8e6e6..ba27306 100644
    if(ptitle->vts_ttn == 0)
        goto fail;
    ptt = ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].ptt;
-+  if (parts >= ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].nr_of_ptts) {
++  if (parts > ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].nr_of_ptts) {
 +      printerr("Too many parts, using the ones available.");
 +      parts = ifo->vts_ptt_srpt->title[ptitle->vts_ttn-1].nr_of_ptts;
 +  }
