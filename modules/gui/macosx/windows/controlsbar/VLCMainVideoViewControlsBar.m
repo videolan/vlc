@@ -58,17 +58,23 @@
     self.bookmarksButton.toolTip = _NS("Bookmarks");
     self.bookmarksButton.accessibilityLabel = self.bookmarksButton.toolTip;
 
-    self.subtitlesButton.toolTip = _NS("Subtitle settings");
+    self.subtitlesButton.toolTip = _NS("Subtitles");
     self.subtitlesButton.accessibilityLabel = self.subtitlesButton.toolTip;
 
-    self.audioButton.toolTip = _NS("Audio settings");
+    self.audioButton.toolTip = _NS("Audio");
     self.audioButton.accessibilityLabel = self.audioButton.toolTip;
 
-    self.videoButton.toolTip = _NS("Video settings");
+    self.videoButton.toolTip = _NS("Video");
     self.videoButton.accessibilityLabel = self.videoButton.toolTip;
 
-    self.playbackRateButton.toolTip = _NS("Playback rate");
+    self.playbackRateButton.toolTip = _NS("Playback Rate");
     self.playbackRateButton.accessibilityLabel = self.playbackRateButton.toolTip;
+
+    self.floatOnTopButton.toolTip = _NS("Float on Top");
+    self.floatOnTopButton.accessibilityLabel = self.floatOnTopButton.toolTip;
+
+    self.pipButton.toolTip = _NS("Picture in Picture");
+    self.pipButton.accessibilityLabel = self.pipButton.toolTip;
 
     if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000

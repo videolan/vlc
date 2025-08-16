@@ -226,6 +226,7 @@
     VLCMediaLibraryMediaItem * const currentMlItem = _playerController.currentMediaLibraryItem;
     self.favoriteButton.hidden = currentMlItem == nil;
     self.favoriteButton.state = currentMlItem.favorited ? NSControlStateValueOn : NSControlStateValueOff;
+    self.favoriteButton.toolTip = currentMlItem.favorited ? _NS("Unmark as Favorite") : _NS("Mark as Favorite");
 }
 
 - (void)toggleFavorite:(id)sender
