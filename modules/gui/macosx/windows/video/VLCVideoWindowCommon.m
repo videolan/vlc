@@ -161,6 +161,10 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     }
 
     self.representedURL = [NSURL URLWithString:inputItem.MRL];
+    
+    if (self.hasActiveVideo && !self.isVisible && !self.playerController.currentMediaIsAudioOnly && self.playerController.videoTracksEnabled) {
+        [self makeKeyAndOrderFront:self];
+    }
 }
 
 - (void)setTitle:(NSString *)title
