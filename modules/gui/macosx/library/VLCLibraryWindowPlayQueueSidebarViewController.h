@@ -41,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSBox *bottomButtonsSeparator;
 @property (readwrite, weak) IBOutlet NSButton *repeatButton;
 @property (readwrite, weak) IBOutlet NSButton *shuffleButton;
+@property (readwrite, weak) IBOutlet NSButton *sortButton;
+@property (readwrite, weak) IBOutlet NSButton *clearButton;
 
 @property (readwrite, nonatomic) NSTextField *counterLabel;
 

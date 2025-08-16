@@ -70,6 +70,11 @@
     self.openMediaButton.title = _NS("Open media...");
     self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
 
+    self.shuffleButton.toolTip = _NS("Shuffle");
+    self.repeatButton.toolTip = _NS("Repeat");
+    self.sortButton.toolTip = _NS("Sort Play Queue");
+    self.clearButton.toolTip = _NS("Clear Play Queue");
+
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
 

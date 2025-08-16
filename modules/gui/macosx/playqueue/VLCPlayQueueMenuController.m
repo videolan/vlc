@@ -71,7 +71,7 @@
     _playMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Play") action:@selector(play:) keyEquivalent:@""];
     _playMenuItem.target = self;
 
-    _removeMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Delete") action:@selector(remove:) keyEquivalent:@""];
+    _removeMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Remove from Play Queue") action:@selector(remove:) keyEquivalent:@""];
     _removeMenuItem.target = self;
 
     _revealInFinderMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
@@ -83,11 +83,11 @@
     _addFilesToPlayQueueMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add File...") action:@selector(addFilesToPlayQueue:) keyEquivalent:@""];
     _addFilesToPlayQueueMenuItem.target = self;
 
-    _clearPlayQueueMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear the play queue") action:@selector(clearPlayQueue:) keyEquivalent:@""];
+    _clearPlayQueueMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear Play Queue") action:@selector(clearPlayQueue:) keyEquivalent:@""];
     _clearPlayQueueMenuItem.target = self;
 
     _playQueueSortingMenuController = [[VLCPlayQueueSortingMenuController alloc] init];
-    _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort") action:nil keyEquivalent:@""];
+    _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort Play Queue") action:nil keyEquivalent:@""];
     [_sortMenuItem setSubmenu:_playQueueSortingMenuController.playQueueSortingMenu];
 
     self.items = @[

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -9,11 +9,13 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowPlayQueueSidebarViewController">
             <connections>
                 <outlet property="bottomButtonsSeparator" destination="ew3-Pn-diG" id="N5L-cw-953"/>
+                <outlet property="clearButton" destination="aKS-lw-hfk" id="30D-7g-SnA"/>
                 <outlet property="dragDropImageBackgroundBox" destination="aUB-Ld-N2o" id="9xc-5h-uRF"/>
                 <outlet property="dragDropView" destination="grx-kk-1X1" id="b1W-Zw-a7Z"/>
                 <outlet property="openMediaButton" destination="ghp-DI-YmZ" id="30J-m7-gLb"/>
                 <outlet property="repeatButton" destination="9xU-Ba-Hys" id="myS-5X-rgK"/>
                 <outlet property="shuffleButton" destination="bdZ-N9-Noa" id="bJz-sR-lGW"/>
+                <outlet property="sortButton" destination="C02-6a-1Uw" id="kfR-K3-lce"/>
                 <outlet property="tableView" destination="Ubg-RS-LWE" id="ZiJ-ca-sOj"/>
                 <outlet property="titleSeparator" destination="ik5-L4-VLw" id="qht-tq-0rB"/>
                 <outlet property="view" destination="NJR-gf-yTs" id="P3C-tn-4va"/>
@@ -22,14 +24,14 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView identifier="VLCLibraryWindowPlayQueueSidebarIdentifier" id="NJR-gf-yTs">
-            <rect key="frame" x="0.0" y="0.0" width="510" height="266"/>
+            <rect key="frame" x="0.0" y="0.0" width="510" height="268"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <box verticalHuggingPriority="751" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ik5-L4-VLw">
-                    <rect key="frame" x="20" y="263" width="470" height="5"/>
+                    <rect key="frame" x="20" y="265" width="470" height="5"/>
                 </box>
                 <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="18" horizontalPageScroll="10" verticalLineScroll="18" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EIb-Is-vco">
-                    <rect key="frame" x="0.0" y="55" width="510" height="210"/>
+                    <rect key="frame" x="0.0" y="57" width="510" height="210"/>
                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="20t-S6-IYS">
                         <rect key="frame" x="0.0" y="0.0" width="510" height="210"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -95,10 +97,10 @@
                     </scroller>
                 </scrollView>
                 <box verticalHuggingPriority="751" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ew3-Pn-diG">
-                    <rect key="frame" x="20" y="52" width="470" height="5"/>
+                    <rect key="frame" x="20" y="54" width="470" height="5"/>
                 </box>
                 <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="grx-kk-1X1" customClass="VLCDragDropView">
-                    <rect key="frame" x="0.0" y="55" width="510" height="210"/>
+                    <rect key="frame" x="0.0" y="57" width="510" height="210"/>
                     <subviews>
                         <box boxType="custom" borderType="line" borderWidth="0.0" cornerRadius="10" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="aUB-Ld-N2o">
                             <rect key="frame" x="188" y="38" width="134" height="134"/>
@@ -139,7 +141,7 @@
                     </constraints>
                 </customView>
                 <stackView distribution="equalCentering" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hc5-GJ-yJe">
-                    <rect key="frame" x="20" y="16" width="470" height="22"/>
+                    <rect key="frame" x="20" y="16" width="470" height="24"/>
                     <subviews>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bdZ-N9-Noa">
                             <rect key="frame" x="0.0" y="0.0" width="24" height="24"/>
