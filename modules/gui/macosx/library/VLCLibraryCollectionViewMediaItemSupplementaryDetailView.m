@@ -71,7 +71,9 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     NSMutableArray<NSString *> * const strings = NSMutableArray.array;
 
     if (actualItem.year > 0) {
-        [strings addObject:[NSString stringWithFormat:@"%u", actualItem.year]];
+        NSDate *yearDate = [NSDate dateWithTimeIntervalSince1970:actualItem.year];
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        [strings addObject:[NSString stringWithFormat:@"%ld", [calendar component:NSCalendarUnitYear fromDate:yearDate]]];
     } else if (actualItem.files.count > 0) {
         VLCMediaLibraryFile * const firstFile = actualItem.files.firstObject;
         const time_t fileLastModTime = firstFile.lastModificationDate;
