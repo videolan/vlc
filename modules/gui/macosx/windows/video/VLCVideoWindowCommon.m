@@ -655,4 +655,12 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     }
 }
 
+- (BOOL)windowShouldClose:(NSWindow *)sender
+{
+    if (!self.playerController.currentMediaIsAudioOnly && self.playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
+        [self.playerController pause];
+    }
+    return YES;
+}
+
 @end
