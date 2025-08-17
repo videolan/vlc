@@ -110,6 +110,8 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         _videoViewController = [[VLCMainVideoViewController alloc] init];
     }
 
+    self.delegate = self;
+
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(mediaMetadataChanged:)
