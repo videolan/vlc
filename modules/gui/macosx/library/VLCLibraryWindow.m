@@ -718,7 +718,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)windowDidEnterFullScreen:(NSNotification *)notification
 {
     [super windowDidEnterFullScreen:notification];
-    if (!self.videoViewController.view.hidden) {
+    if (!self.splitViewController.mainVideoModeEnabled) {
         [self showControlsBar];
     }
 }
