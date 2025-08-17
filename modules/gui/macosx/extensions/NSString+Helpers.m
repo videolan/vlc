@@ -1,7 +1,7 @@
 /*****************************************************************************
  * NSString+Helpers.m: Category with helper functions for NSStrings
  *****************************************************************************
- * Copyright (C) 2002-2019 VLC authors and VideoLAN
+ * Copyright (C) 2002-2025 VLC authors and VideoLAN
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -41,6 +41,7 @@
 
 NSString *const kVLCMediaAudioCD = @"AudioCD";
 NSString *const kVLCMediaDVD = @"DVD";
+NSString *const kVLCMediaAudioDVD = @"AudioDVD";
 NSString *const kVLCMediaVCD = @"VCD";
 NSString *const kVLCMediaSVCD = @"SVCD";
 NSString *const kVLCMediaBD = @"Blu-ray";
@@ -348,6 +349,26 @@ NSString * getVolumeTypeFromMountPath(NSString *mountPath)
             returnValue = kVLCMediaAudioCD;
         } else if (IOObjectConformsTo(service, kIODVDMediaClass)) {
             returnValue = kVLCMediaDVD;
+
+            // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
+            NSFileManager *fileManager = [[NSFileManager alloc] init];
+
+            // check for AUDIO_TS and see if the folder contents identify as an Audio-DVD
+            NSString *audioTSPath = [mountPath stringByAppendingPathComponent:@"AUDIO_TS"];
+            BOOL audioTSExists = NO;
+            [fileManager fileExistsAtPath:audioTSPath isDirectory:&audioTSExists];
+            if (audioTSExists) {
+                NSSet *audioExtensions = [NSSet setWithObjects:@"aob", @"ifo", nil];
+                NSArray *audioTSFolderItems = [fileManager contentsOfDirectoryAtPath:audioTSPath error:nil];
+
+                for (NSString *fileItem in audioTSFolderItems) {
+                    NSString *fileItemExtension = fileItem.pathExtension.lowercaseString;
+                    if ([audioExtensions containsObject:fileItemExtension]) {
+                        returnValue = kVLCMediaAudioDVD;
+                        break;
+                    }
+                }
+            }
         } else if (IOObjectConformsTo(service, kIOBDMediaClass)) {
             returnValue = kVLCMediaBD;
         }

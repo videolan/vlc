@@ -1,7 +1,7 @@
 /*****************************************************************************
  * NSString+Helpers.h: Category with helper functions for NSStrings
  *****************************************************************************
- * Copyright (C) 2002-2019 VLC authors and VideoLAN
+ * Copyright (C) 2002-2025 VLC authors and VideoLAN
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -52,6 +52,7 @@
 
 extern NSString *const kVLCMediaAudioCD;
 extern NSString *const kVLCMediaDVD;
+extern NSString *const kVLCMediaAudioDVD;
 extern NSString *const kVLCMediaVCD;
 extern NSString *const kVLCMediaSVCD;
 extern NSString *const kVLCMediaBD;
