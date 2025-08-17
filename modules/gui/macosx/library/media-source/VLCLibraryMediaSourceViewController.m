@@ -137,7 +137,7 @@
     self.browsePlaceholderLabel.font = NSFont.VLClibrarySectionHeaderFont;
     self.browsePlaceholderLabel.textColor = NSColor.secondaryLabelColor;
     self.browsePlaceholderLabel.alignment = NSTextAlignmentCenter;
-    self.browsePlaceholderLabel.backgroundColor = NSColor.clearColor;
+    self.browsePlaceholderLabel.drawsBackground = NO;
     [self.mediaSourceView addSubview:self.browsePlaceholderLabel];
     [self.mediaSourceView addConstraints:@[
         [self.browsePlaceholderLabel.centerXAnchor constraintEqualToAnchor:self.mediaSourceView.centerXAnchor],
