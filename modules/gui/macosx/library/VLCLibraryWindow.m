@@ -710,8 +710,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [super windowWillEnterFullScreen:notification];
 
-    if (!self.videoViewController.view.hidden) {
+    if (self.splitViewController.mainVideoModeEnabled) {
         [self hideControlsBar];
+    }
+
+    if (self.splitViewController.mainVideoModeEnabled) {
+        self.splitViewController.multifunctionSidebarItem.animator.collapsed = YES;
     }
 }
 
