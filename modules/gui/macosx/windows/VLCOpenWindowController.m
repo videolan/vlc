@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCOpenWindowController.m: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2021 VLC authors and VideoLAN
+ * Copyright (C) 2002-2025 VLC authors and VideoLAN
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -723,6 +723,11 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
             [self setMRL: [NSString stringWithFormat: @"dvdread://%@#%i:%i-", devicePath, [_discDVDwomenusTitleTextField intValue], [_discDVDwomenusChapterTextField intValue]]];
             [self showOpticalMediaView: _discDVDwomenusView withIcon:mediaIcon];
         }
+    } else if ([diskType isEqualToString: kVLCMediaAudioDVD]) {
+        [_discAudioCDLabel setStringValue: [fileManager displayNameAtPath: opticalDevicePath]];
+        [_discAudioCDTrackCountLabel setStringValue: @""];
+        [self showOpticalMediaView: _discAudioCDView withIcon: mediaIcon];
+        [self setMRL: [NSString stringWithFormat: @"dvda://%@", devicePath]];
     } else if ([diskType isEqualToString: kVLCMediaAudioCD]) {
         [_discAudioCDLabel setStringValue: [fileManager displayNameAtPath: opticalDevicePath]];
         [_discAudioCDTrackCountLabel setStringValue: [NSString stringWithFormat:_NS("%i tracks"), [[fileManager subpathsOfDirectoryAtPath: opticalDevicePath error:NULL] count] - 1]]; // minus .TOC.plist
