@@ -126,8 +126,8 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
                                      @"Audio - CD",
                                      nil];
 
-    NSDictionary *appDefaults = @{defaultProfiles : VLCConvertAndSaveProfilesKey,
-                                  defaultProfileNames : VLCConvertAndSaveProfileNamesKey};
+    NSDictionary *appDefaults = @{VLCConvertAndSaveProfilesKey : defaultProfiles,
+                                  VLCConvertAndSaveProfileNamesKey : defaultProfileNames};
 
     [defaults registerDefaults:appDefaults];
 }
