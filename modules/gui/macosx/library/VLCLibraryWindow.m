@@ -573,6 +573,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         return;
     }
 
+    NSAppearance *darkAppearance = nil;
+    if (@available(macOS 10.14, *)) {
+        darkAppearance = [NSAppearance appearanceNamed:NSAppearanceNameDarkAqua];
+    } else {
+        darkAppearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
+    }
+
+    if (darkAppearance) {
+        self.appearance = darkAppearance;
+    }
+
     if (_acquiredVideoView) {
         [self.videoViewController returnVideoView:_acquiredVideoView];
         _acquiredVideoView = nil;
@@ -592,6 +603,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)disableVideoPlaybackAppearance
 {
+    self.appearance = nil;
+
     [self makeFirstResponder:self.splitViewController.multifunctionSidebarViewController.view];
     [VLCMain.sharedInstance.voutProvider updateWindowLevelForHelperWindows:NSNormalWindowLevel];
 
