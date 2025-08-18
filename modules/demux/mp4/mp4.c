@@ -880,7 +880,8 @@ static int Open( vlc_object_t * p_this )
         BOXDATA(p_mvhd)->i_duration < INT64_MAX )
     {
         p_sys->i_timescale = BOXDATA(p_mvhd)->i_timescale;
-        p_sys->i_moov_duration = p_sys->i_duration = BOXDATA(p_mvhd)->i_duration;
+        p_sys->i_moov_duration =
+        p_sys->i_duration =
         p_sys->i_cumulated_duration = BOXDATA(p_mvhd)->i_duration;
     }
     else
