@@ -840,4 +840,9 @@ static inline int vlc_RGBChromaToMask( vlc_fourcc_t fcc, uint32_t *rmask,
     return VLC_SUCCESS;
 }
 
+static inline bool es_format_HasVpxAlpha(const es_format_t *es)
+{
+    return (es->i_level & 0x1000) == 0x1000;
+}
+
 #endif
