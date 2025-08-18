@@ -56,6 +56,13 @@ class TextureProviderItem : public QQuickItem
     Q_OBJECT
 
     Q_PROPERTY(const QQuickItem* source MEMBER m_source NOTIFY sourceChanged FINAL)
+    // NOTE: Although this is named as `textureSubRect`, it is allowed to provide a larger size than
+    //       the texture size. In that case, the texture's wrap mode is going to be relevant, provided
+    //       that the graphics backend supports it. Do note that if the source texture is already a
+    //       sub-texture (such as a texture in the atlas), wrapping would only be applicable outside
+    //       the boundaries of the whole texture and not the source sub-texture, and not considering
+    //       this may expose irrelevant parts of the atlas (this means that wrap mode is effectively
+    //       useless for sub- or atlas textures).
     Q_PROPERTY(QRect textureSubRect MEMBER m_rect NOTIFY rectChanged RESET resetTextureSubRect FINAL)
 
     Q_PROPERTY(QSGTexture::AnisotropyLevel anisotropyLevel MEMBER m_anisotropyLevel NOTIFY anisotropyLevelChanged FINAL)
