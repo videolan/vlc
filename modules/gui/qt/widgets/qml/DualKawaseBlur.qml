@@ -97,7 +97,7 @@ Item {
             source: ds1.source
         }
 
-        readonly property size sourceTextureSize: ds1SourceObserver.textureSize
+        readonly property size sourceTextureSize: ds1SourceObserver.nativeTextureSize
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
@@ -140,7 +140,7 @@ Item {
             source: ds2.source
         }
 
-        readonly property size sourceTextureSize: ds2SourceObserver.textureSize
+        readonly property size sourceTextureSize: ds2SourceObserver.nativeTextureSize
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
@@ -184,7 +184,7 @@ Item {
             source: us1.source
         }
 
-        readonly property size sourceTextureSize: us1SourceObserver.textureSize
+        readonly property size sourceTextureSize: us1SourceObserver.nativeTextureSize
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
@@ -227,7 +227,7 @@ Item {
             source: us2.source
         }
 
-        readonly property size sourceTextureSize: us2SourceObserver.textureSize
+        readonly property size sourceTextureSize: us2SourceObserver.nativeTextureSize
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
