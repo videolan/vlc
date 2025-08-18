@@ -51,7 +51,8 @@ void QSGTextureView::setTexture(QSGTexture *texture)
     {
         resetState();
 
-        if (texture->inherits("QSGLayer"))
+        // Maybe use `QMetaObject::indexOfSignal()` instead to probe `updateRequested()`?
+        if (qobject_cast<QSGTextureView*>(texture) || texture->inherits("QSGLayer"))
         {
             // Since Qt 5, it is guaranteed that slots are executed in the order they
             // are connected. The order is important here, we want to emit `updateRequested()`
