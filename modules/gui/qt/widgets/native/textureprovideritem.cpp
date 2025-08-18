@@ -204,6 +204,20 @@ void QSGTextureViewProvider::setMipmapFiltering(QSGTexture::Filtering filter)
     if (m_textureView.mipmapFiltering() == filter)
         return;
 
+    if (filter != QSGTexture::Filtering::None)
+    {
+        const auto targetTexture = m_textureView.texture();
+        // If there is no target texture, we can accept mipmap filtering. When there becomes a target texture, `QSGTextureView` should
+        // consider this itself anyway if the new target texture has no mipmaps. Workarounds should probably not be over-conservative,
+        // we should not dismiss the case if there is no target texture now but the upcoming texture has mip maps.
+        if (targetTexture && !targetTexture->hasMipmaps())
+        {
+            // Having mip map filtering when there are no mip maps may be problematic with certain graphics backends (like OpenGL).
+            qWarning() << this << "Enabling mip map filtering is blocked if the target texture has no mip maps.";
+            return;
+        }
+    }
+
     m_textureView.setMipmapFiltering(filter);
     emit textureChanged();
 }
