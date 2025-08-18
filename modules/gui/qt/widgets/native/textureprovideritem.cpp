@@ -100,6 +100,12 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
     return m_textureProvider;
 }
 
+void TextureProviderItem::resetTextureSubRect()
+{
+    m_rect = {};
+    emit rectChanged({});
+}
+
 void TextureProviderItem::invalidateSceneGraph()
 {
     // https://doc.qt.io/qt-6/qquickitem.html#graphics-resource-handling

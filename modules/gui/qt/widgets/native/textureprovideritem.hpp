@@ -56,7 +56,7 @@ class TextureProviderItem : public QQuickItem
     Q_OBJECT
 
     Q_PROPERTY(const QQuickItem* source MEMBER m_source NOTIFY sourceChanged FINAL)
-    Q_PROPERTY(QRect textureSubRect MEMBER m_rect NOTIFY rectChanged FINAL)
+    Q_PROPERTY(QRect textureSubRect MEMBER m_rect NOTIFY rectChanged RESET resetTextureSubRect FINAL)
 
     QML_ELEMENT
 public:
@@ -66,6 +66,8 @@ public:
     bool isTextureProvider() const override;
 
     QSGTextureProvider *textureProvider() const override;
+
+    void resetTextureSubRect();
 
 public slots:
     void invalidateSceneGraph();
