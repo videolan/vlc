@@ -36,13 +36,15 @@ class TextureProviderObserver : public QObject
     Q_PROPERTY(const QQuickItem* source MEMBER m_source WRITE setSource NOTIFY sourceChanged FINAL)
 
     // WARNING: Texture properties are updated in the rendering thread.
-    Q_PROPERTY(QSize textureSize READ textureSize NOTIFY textureChanged FINAL)
+    Q_PROPERTY(QSize textureSize READ textureSize NOTIFY textureChanged FINAL) // Scene graph texture size
+    Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize NOTIFY textureChanged FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
 
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
 
     void setSource(const QQuickItem* source);
     QSize textureSize() const;
+    QSize nativeTextureSize() const;
 
 signals:
     void sourceChanged();
@@ -65,6 +67,7 @@ private:
     mutable QMutex m_textureMutex; // Maybe QReadWriteLock would be better.
 
     QSize m_textureSize; // invalid by default
+    QSize m_nativeTextureSize; // invalid by default
 };
 
 #endif // TEXTUREPROVIDEROBSERVER_HPP

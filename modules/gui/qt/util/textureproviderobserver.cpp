@@ -19,6 +19,11 @@
 
 #include <QSGTextureProvider>
 
+#if __has_include(<rhi/qrhi.h>) // RHI is semi-public since Qt 6.6
+#define RHI_HEADER_AVAILABLE
+#include <rhi/qrhi.h>
+#endif
+
 TextureProviderObserver::TextureProviderObserver(QObject *parent)
     : QObject{parent}
 {
@@ -90,6 +95,12 @@ QSize TextureProviderObserver::textureSize() const
     return m_textureSize;
 }
 
+QSize TextureProviderObserver::nativeTextureSize() const
+{
+    QMutexLocker locker(&m_textureMutex);
+    return m_nativeTextureSize;
+}
+
 void TextureProviderObserver::updateTextureSize()
 {
     // Better to lock as early as possible, QML can wait until the
@@ -102,6 +113,26 @@ void TextureProviderObserver::updateTextureSize()
         if (const auto texture = m_provider->texture())
         {
             m_textureSize = texture->textureSize();
+
+            {
+                // Native texture size
+
+                const auto legacyUpdateNativeTextureSize = [&]() {
+                    const auto ntsr = texture->normalizedTextureSubRect();
+                    m_nativeTextureSize = {static_cast<int>(m_textureSize.width() / ntsr.width()), static_cast<int>(m_textureSize.height() / ntsr.height())};
+                };
+
+#ifdef RHI_HEADER_AVAILABLE
+                const QRhiTexture* const rhiTexture = texture->rhiTexture();
+                if (Q_LIKELY(rhiTexture))
+                    m_nativeTextureSize = rhiTexture->pixelSize();
+                else
+                    legacyUpdateNativeTextureSize();
+#else
+                legacyUpdateNativeTextureSize();
+#endif
+            }
+
             return;
         }
     }
