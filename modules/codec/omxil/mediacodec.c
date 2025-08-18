@@ -864,11 +864,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
         case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
         case VLC_CODEC_VP8:
-            if ((p_dec->fmt_in->i_level & 0x1000) != 0) // contains alpha extradata
+            if (es_format_HasVpxAlpha(p_dec->fmt_in)) // contains alpha extradata
                 return VLC_ENOTSUP;
             mime = "video/x-vnd.on2.vp8"; break;
         case VLC_CODEC_VP9:
-            if ((p_dec->fmt_in->i_level & 0x1000) != 0) // contains alpha extradata
+            if (es_format_HasVpxAlpha(p_dec->fmt_in)) // contains alpha extradata
                 return VLC_ENOTSUP;
             mime = "video/x-vnd.on2.vp9"; break;
         }

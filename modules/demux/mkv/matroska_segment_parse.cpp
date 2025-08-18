@@ -1836,7 +1836,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                             break;
                         case 2: // Level
                             if (length == 1) {
-                                if ((vars.p_fmt->i_level & 0x1000) != 0)
+                                if (es_format_HasVpxAlpha(vars.p_fmt))
                                     vars.p_fmt->i_level |= VP9CodecFeatures[2];
                                 else
                                     vars.p_fmt->i_level = VP9CodecFeatures[2];

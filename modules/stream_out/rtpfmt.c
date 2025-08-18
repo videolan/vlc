@@ -644,7 +644,7 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                 rtp_fmt->fmtp = strdup( "sprop-stereo=1" );
             break;
         case VLC_CODEC_VP8:
-            if ((p_fmt->i_level & 0x1000) != 0) // contains alpha extradata
+            if (es_format_HasVpxAlpha(p_fmt)) // contains alpha extradata
                 return VLC_ENOTSUP;
             rtp_fmt->ptname = "VP8";
             rtp_fmt->pf_packetize = rtp_packetize_vp8;

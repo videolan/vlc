@@ -310,7 +310,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     {
 #ifdef ENABLE_VP8_DECODER
     case VLC_CODEC_VP8:
-        if ((dec->fmt_in->i_level & 0x1000) != 0) // contains alpha extradata
+        if (es_format_HasVpxAlpha(dec->fmt_in)) // contains alpha extradata
             return VLC_ENOTSUP;
         // fallthrough
     case VLC_CODEC_WEBP:
@@ -321,7 +321,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 #endif
 #ifdef ENABLE_VP9_DECODER
     case VLC_CODEC_VP9:
-        if ((dec->fmt_in->i_level & 0x1000) != 0) // contains alpha extradata
+        if (es_format_HasVpxAlpha(dec->fmt_in)) // contains alpha extradata
             return VLC_ENOTSUP;
         // fallthrough
     case VLC_CODEC_VP9ALPHA_ES:
@@ -413,7 +413,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     {
 #ifdef ENABLE_VP8_ENCODER
     case VLC_CODEC_VP8:
-        if ((p_enc->fmt_out.i_level & 0x1000) != 0) // contains alpha extradata
+        if (es_format_HasVpxAlpha(&p_enc->fmt_out)) // contains alpha extradata
             return VLC_ENOTSUP;
         // fallthrough
     case VLC_CODEC_WEBP:
@@ -423,7 +423,7 @@ static int OpenEncoder(vlc_object_t *p_this)
 #endif
 #ifdef ENABLE_VP9_ENCODER
     case VLC_CODEC_VP9:
-        if ((p_enc->fmt_out.i_level & 0x1000) != 0) // contains alpha extradata
+        if (es_format_HasVpxAlpha(&p_enc->fmt_out)) // contains alpha extradata
             return VLC_ENOTSUP;
         iface = &vpx_codec_vp9_cx_algo;
         vp_version = 9;

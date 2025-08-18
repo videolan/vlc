@@ -151,7 +151,7 @@ static MMAL_FOURCC_T vlc_to_mmal_es_fourcc(const es_format_t *es)
     case VLC_CODEC_VP6:
         return MMAL_ENCODING_VP6;
     case VLC_CODEC_VP8:
-        if ((es->i_level & 0x1000) != 0) // contains alpha extradata
+        if (es_format_HasVpxAlpha(es)) // contains alpha extradata
             return 0;
         return MMAL_ENCODING_VP8;
     case VLC_CODEC_WMV1:
