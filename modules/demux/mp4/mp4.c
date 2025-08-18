@@ -876,7 +876,8 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_mvhd = MP4_BoxGet( p_sys->p_moov, "mvhd" );
-    if( p_mvhd && BOXDATA(p_mvhd) && BOXDATA(p_mvhd)->i_timescale )
+    if( p_mvhd && BOXDATA(p_mvhd) && BOXDATA(p_mvhd)->i_timescale &&
+        BOXDATA(p_mvhd)->i_duration < INT64_MAX )
     {
         p_sys->i_timescale = BOXDATA(p_mvhd)->i_timescale;
         p_sys->i_moov_duration = p_sys->i_duration = BOXDATA(p_mvhd)->i_duration;
