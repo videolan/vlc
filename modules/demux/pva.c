@@ -391,7 +391,7 @@ static void ParsePES( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_pes = p_sys->p_pes;
-    uint8_t     hdr[30];
+    uint8_t     hdr[20];
 
     unsigned    i_skip;
     ts_90khz_t  i_dts;
@@ -400,10 +400,10 @@ static void ParsePES( demux_t *p_demux )
     p_sys->p_pes = NULL;
 
     /* FIXME find real max size */
-    block_ChainExtract( p_pes, hdr, 30 );
+    size_t hdr_read = block_ChainExtract( p_pes, hdr, ARRAY_SIZE(hdr) );
 
     /* See §2.4.3.6 of ISO 13818-1 */
-    if( hdr[0] != 0 || hdr[1] != 0 || hdr[2] != 1 )
+    if( hdr_read < 9 || hdr[0] != 0 || hdr[1] != 0 || hdr[2] != 1 )
     {
         msg_Warn( p_demux, "invalid hdr [0x%2.2x:%2.2x:%2.2x:%2.2x]",
                   hdr[0], hdr[1],hdr[2],hdr[3] );
@@ -428,7 +428,7 @@ static void ParsePES( demux_t *p_demux )
     p_pes->i_buffer -= i_skip;
     p_pes->p_buffer += i_skip;
 
-    if( hdr[7]&0x80 )    /* has pts */
+    if( hdr[7]&0x80 && hdr_read >= (9+1+5) )    /* has pts */
     {
         i_pts = ((ts_90khz_t)(hdr[ 9]&0x0e ) << 29)|
                  (ts_90khz_t)(hdr[10] << 22)|
@@ -437,7 +437,7 @@ static void ParsePES( demux_t *p_demux )
                  (ts_90khz_t)(hdr[13] >> 1);
         p_pes->i_pts = FROM_SCALE(i_pts);
 
-        if( hdr[7]&0x40 )    /* has dts */
+        if( hdr[7]&0x40 && hdr_read >= (14+1+5) )    /* has dts */
         {
              i_dts = ((ts_90khz_t)(hdr[14]&0x0e ) << 29)|
                      (ts_90khz_t)(hdr[15] << 22)|
