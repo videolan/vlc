@@ -399,8 +399,8 @@ static void ParsePES( demux_t *p_demux )
     uint8_t     hdr[30];
 
     unsigned    i_skip;
-    ts_90khz_t  i_dts = TS_90KHZ_INVALID;
-    ts_90khz_t  i_pts = TS_90KHZ_INVALID;
+    ts_90khz_t  i_dts;
+    ts_90khz_t  i_pts;
 
     p_sys->p_pes = NULL;
 
@@ -420,15 +420,6 @@ static void ParsePES( demux_t *p_demux )
 
     /* we assume mpeg2 PES */
     i_skip = hdr[8] + 9;
-    if( hdr[7]&0x80 )    /* has pts */
-    {
-        i_pts = GetPESTimestamp( &hdr[9] );
-
-        if( hdr[7]&0x40 )    /* has dts */
-        {
-             i_dts = GetPESTimestamp( &hdr[14] );
-        }
-    }
 
     p_pes = block_ChainGather( p_pes );
     if( unlikely(p_pes == NULL) )
@@ -442,10 +433,17 @@ static void ParsePES( demux_t *p_demux )
     p_pes->i_buffer -= i_skip;
     p_pes->p_buffer += i_skip;
 
-    if( i_dts != TS_90KHZ_INVALID )
-        p_pes->i_dts = FROM_SCALE(i_dts);
-    if( i_pts != TS_90KHZ_INVALID )
+    if( hdr[7]&0x80 )    /* has pts */
+    {
+        i_pts = GetPESTimestamp( &hdr[9] );
         p_pes->i_pts = FROM_SCALE(i_pts);
+
+        if( hdr[7]&0x40 )    /* has dts */
+        {
+            i_dts = GetPESTimestamp( &hdr[14] );
+            p_pes->i_dts = FROM_SCALE(i_dts);
+        }
+    }
 
     /* Set PCR */
     if( p_pes->i_pts != VLC_TICK_INVALID )
