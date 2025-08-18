@@ -58,10 +58,43 @@ class TextureProviderItem : public QQuickItem
     Q_PROPERTY(const QQuickItem* source MEMBER m_source NOTIFY sourceChanged FINAL)
     Q_PROPERTY(QRect textureSubRect MEMBER m_rect NOTIFY rectChanged RESET resetTextureSubRect FINAL)
 
+    Q_PROPERTY(QSGTexture::AnisotropyLevel anisotropyLevel MEMBER m_anisotropyLevel NOTIFY anisotropyLevelChanged FINAL)
+    Q_PROPERTY(QSGTexture::WrapMode horizontalWrapMode MEMBER m_horizontalWrapMode NOTIFY horizontalWrapModeChanged FINAL)
+    Q_PROPERTY(QSGTexture::WrapMode verticalWrapMode MEMBER m_verticalWrapMode NOTIFY verticalWrapModeChanged FINAL)
+    // Maybe we should use `Item::smooth` instead of these properties, or maybe not, as we should allow disabling filtering completely.
+    Q_PROPERTY(QSGTexture::Filtering filtering MEMBER m_filtering NOTIFY filteringChanged FINAL)
+    // WARNING: mipmap filtering is not respected if target texture has no mip maps:
+    Q_PROPERTY(QSGTexture::Filtering mipmapFiltering MEMBER m_mipmapFiltering NOTIFY mipmapFilteringChanged FINAL)
+
     QML_ELEMENT
 public:
     TextureProviderItem() = default;
     virtual ~TextureProviderItem();
+
+    // These enumerations must be in sync with `QSGTexture`:
+    // It appears that MOC is not clever enough to consider foreign enumerations with `Q_ENUM` (I tried)...
+    enum _WrapMode {
+        Repeat,
+        ClampToEdge,
+        MirroredRepeat
+    };
+    Q_ENUM(_WrapMode);
+
+    enum _Filtering {
+        None,
+        Nearest,
+        Linear
+    };
+    Q_ENUM(_Filtering);
+
+    enum _AnisotropyLevel {
+        AnisotropyNone,
+        Anisotropy2x,
+        Anisotropy4x,
+        Anisotropy8x,
+        Anisotropy16x
+    };
+    Q_ENUM(_AnisotropyLevel);
 
     bool isTextureProvider() const override;
 
@@ -77,6 +110,12 @@ signals:
     void rectChanged(const QRect& rect);
     void dprChanged();
 
+    void anisotropyLevelChanged(QSGTexture::AnisotropyLevel);
+    void filteringChanged(QSGTexture::Filtering);
+    void mipmapFilteringChanged(QSGTexture::Filtering);
+    void horizontalWrapModeChanged(QSGTexture::WrapMode);
+    void verticalWrapModeChanged(QSGTexture::WrapMode);
+
 protected:
     void releaseResources() override;
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
@@ -87,6 +126,13 @@ private:
 
     mutable QPointer<QSGTextureViewProvider> m_textureProvider;
     mutable QMutex m_textureProviderMutex; // I'm not sure if this mutex is necessary
+
+    std::atomic<QSGTexture::AnisotropyLevel> m_anisotropyLevel = QSGTexture::AnisotropyNone;
+    std::atomic<QSGTexture::Filtering> m_filtering = (smooth() ? QSGTexture::Linear : QSGTexture::Nearest);
+    std::atomic<QSGTexture::WrapMode> m_horizontalWrapMode = QSGTexture::ClampToEdge;
+    std::atomic<QSGTexture::WrapMode> m_verticalWrapMode = QSGTexture::ClampToEdge;
+    // When there are mip maps, no mip map filtering should be fine (unlike no mip maps with mip map filtering):
+    std::atomic<QSGTexture::Filtering> m_mipmapFiltering = QSGTexture::None;
 };
 
 #endif // TEXTUREPROVIDERITEM_HPP
