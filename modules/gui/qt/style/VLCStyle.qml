@@ -47,6 +47,8 @@ QtObject {
         ctx: MainCtx
     }
 
+    readonly property real highPixelDensityThreshold: 5.9 // 150 dpi (dpmm)
+
     // Sizes
     readonly property double margin_xxxsmall: MainCtx.dp(2, scale);
     readonly property double margin_xxsmall: MainCtx.dp(4, scale);
