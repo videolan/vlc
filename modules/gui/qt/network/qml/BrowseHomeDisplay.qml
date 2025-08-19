@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQml.Models
@@ -132,6 +133,8 @@ FocusScope {
         boundsBehavior: Flickable.StopAtBounds
 
         focus: true
+
+        pixelAligned: (Screen.pixelDensity >= VLCStyle.highPixelDensityThreshold) // no need for sub-pixel alignment with high pixel density
 
         contentWidth: column.width
         contentHeight: column.height
