@@ -80,6 +80,10 @@ PlayerControlbarModel::PlayerControlbarModel(QObject *parent) : QObject(parent)
     connect(m_left, &QAbstractListModel::dataChanged, this, &PlayerControlbarModel::contentChanged);
     connect(m_center, &QAbstractListModel::dataChanged, this, &PlayerControlbarModel::contentChanged);
     connect(m_right, &QAbstractListModel::dataChanged, this, &PlayerControlbarModel::contentChanged);
+
+    connect(m_left, &QAbstractListModel::rowsMoved, this, &PlayerControlbarModel::contentChanged);
+    connect(m_center, &QAbstractListModel::rowsMoved, this, &PlayerControlbarModel::contentChanged);
+    connect(m_right, &QAbstractListModel::rowsMoved, this, &PlayerControlbarModel::contentChanged);
 }
 
 PlayerControlbarModel::~PlayerControlbarModel()
