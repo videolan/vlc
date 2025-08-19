@@ -77,6 +77,8 @@ ListView {
 
     // Settings
 
+    pixelAligned: (Screen.pixelDensity >= VLCStyle.highPixelDensityThreshold) // no need for sub-pixel alignment with high pixel density
+
     focus: true
 
     activeFocusOnTab: true
