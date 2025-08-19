@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ******************************************************************************/
 import QtQuick
+import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Templates as T
 
@@ -91,6 +92,8 @@ T.Page {
         // FIXME: make the media rows positioners consider the flickable margins when adjusting flickable `contentY`.
         topMargin: VLCStyle.layoutTitle_top_padding
         bottomMargin: topMargin
+
+        pixelAligned: (Screen.pixelDensity >= VLCStyle.highPixelDensityThreshold) // no need for sub-pixel alignment with high pixel density
 
         property bool _hasMedias: true
 
