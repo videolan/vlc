@@ -19,7 +19,7 @@
 #define TEXTUREPROVIDEROBSERVER_HPP
 
 #include <QObject>
-#include <QMutex>
+#include <QReadWriteLock>
 #include <QPointer>
 #include <QSize>
 #include <QQuickItem>
@@ -36,8 +36,24 @@ class TextureProviderObserver : public QObject
     Q_PROPERTY(const QQuickItem* source MEMBER m_source WRITE setSource NOTIFY sourceChanged FINAL)
 
     // WARNING: Texture properties are updated in the rendering thread.
-    Q_PROPERTY(QSize textureSize READ textureSize NOTIFY textureChanged FINAL) // Scene graph texture size
-    Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize NOTIFY textureChanged FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
+    // WARNING: Individual properties do not necessarily reflect the same texture at any arbitrary time.
+    //          In other words, properties are not updated atomically as a whole but independently
+    //          once the source texture changes. It depends on when you are reading the properties,
+    //          such that if you read properties before `updateTextureSize()` returns, the properties
+    //          may be inconsistent with each other (some reflecting the old texture, some the new
+    //          texture). This is done to reduce blocking the GUI thread from the rendering thread,
+    //          which is a problem unlike vice versa, and is considered acceptable because sampling
+    //          is supposed to be done periodically anyway (the sampling point must be chosen carefully
+    //          to not conflict with the updates, if the properties must reflect the immediately up-to-date
+    //          texture and the properties change each frame, as otherwise it might end up in a
+    //          "forever chase"), so by the time the sampling is done the properties should be consistent.
+    // NOTE: These properties do not provide notify signal, dynamic textures such as layer may
+    //       change rapidly (even though throttled by v-sync in the rendering thread), and if
+    //       such signal is connected to a receiver that lives in the GUI thread, the queued
+    //       invocations can easily backlog. Similar to the high precision timer, we moved
+    //       away from event based approach in favor of sampling based approach here.
+    Q_PROPERTY(QSize textureSize READ textureSize FINAL) // Scene graph texture size
+    Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
 
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
@@ -48,7 +64,6 @@ public:
 
 signals:
     void sourceChanged();
-    void textureChanged();
 
 private slots:
     void updateTextureSize();
@@ -59,15 +74,15 @@ private:
 
     // It is not clear when `QSGTextureProvider::textureChanged()` can be signalled.
     // If it is only signalled during SG synchronization where Qt blocks the GUI thread,
-    // we do not need explicit synchronization here. If it can be signalled at any time,
-    // we can still rely on SG synchronization (instead of explicit synchronization) by
-    // waiting until the next synchronization, but the delay might be more in that case.
-    // At the same time, the source might be living in a different window where the SG
-    // synchronization would not be blocking the (GUI) thread where this observer lives.
-    mutable QMutex m_textureMutex; // Maybe QReadWriteLock would be better.
+    // we do not need explicit synchronization (with atomic, or mutex) here. If it can be
+    // signalled at any time, we can still rely on SG synchronization (instead of explicit
+    // synchronization) by waiting until the next synchronization, but the delay might be
+    // more in that case. At the same time, the source might be living in a different window
+    // where the SG synchronization would not be blocking the (GUI) thread where this
+    // observer lives.
 
-    QSize m_textureSize; // invalid by default
-    QSize m_nativeTextureSize; // invalid by default
+    std::atomic<QSize> m_textureSize {{}}; // invalid by default
+    std::atomic<QSize> m_nativeTextureSize {{}}; // invalid by default
 };
 
 #endif // TEXTUREPROVIDEROBSERVER_HPP
