@@ -652,7 +652,7 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
             break;
         }
 
-        i_id = ps_pkt_id( p, i_size );
+        i_id = ps_pkt_id( p, i_size, PS_SOURCE_VOB );
         if( (i_id&0xffe0) != 0xbd20 )
         {
             /* msg_Dbg( p_demux, "we don't need these ps packets (id=0x1%2.2x)", p[3] ); */
@@ -697,4 +697,3 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
 
     return VLC_SUCCESS;
 }
-
