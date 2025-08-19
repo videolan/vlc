@@ -795,6 +795,8 @@ FocusScope {
 
         boundsBehavior: Flickable.StopAtBounds
 
+        pixelAligned: (Screen.pixelDensity >= VLCStyle.highPixelDensityThreshold) // no need for sub-pixel alignment with high pixel density
+
         ScrollBar.vertical: ScrollBarExt {
             id: flickableScrollBar
         }
