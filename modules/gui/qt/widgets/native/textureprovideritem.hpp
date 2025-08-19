@@ -132,7 +132,6 @@ private:
     QRect m_rect;
 
     mutable QPointer<QSGTextureViewProvider> m_textureProvider;
-    mutable QMutex m_textureProviderMutex; // I'm not sure if this mutex is necessary
 
     std::atomic<QSGTexture::AnisotropyLevel> m_anisotropyLevel = QSGTexture::AnisotropyNone;
     std::atomic<QSGTexture::Filtering> m_filtering = (smooth() ? QSGTexture::Linear : QSGTexture::Nearest);
