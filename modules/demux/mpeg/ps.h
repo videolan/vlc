@@ -35,6 +35,12 @@
 #define PS_STREAM_ID_EXTENDED         0xFD
 #define PS_STREAM_ID_DIRECTORY        0xFF
 
+enum ps_source {
+    PS_SOURCE_UNKNOWN, // any PS/PES source
+    PS_SOURCE_VOB,     // when reading a DVD-Video
+    PS_SOURCE_AOB,     // when reading a DVD-Audio
+};
+
 /* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)
 static inline int ps_id_to_tk( unsigned i_id )
@@ -316,7 +322,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
 }
 
 /* return the id of a PES (should be valid) */
-static inline int ps_pkt_id( block_t *p_pkt )
+static inline int ps_pkt_id( block_t *p_pkt, enum ps_source source )
 {
     if( p_pkt->p_buffer[3] == 0xbd )
     {
@@ -334,14 +340,11 @@ static inline int ps_pkt_id( block_t *p_pkt )
                 /* AOB LPCM extension */
                 return 0xa000 | (i_sub_id & 0x01);
             }
+
             if( i_sub_id == 0xa1 &&
-                p_pkt->i_buffer >= i_start + 7 &&
-                ( p_pkt->p_buffer[i_start + 5] >=  0xc0 ||
-                p_pkt->p_buffer[i_start + 6] != 0x80 ) )
+                source == PS_SOURCE_AOB )
             {
-                /* AOB MLP extension
-                * XXX for MLP I think that the !=0x80 test is not good and
-                * will fail for some valid files */
+                /* AOB MLP extension */
                 return 0xa000 | (i_sub_id & 0x01);
             }
         }
@@ -517,7 +520,7 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     if( i_skip_extra >= 0 )
         i_skip += i_skip_extra;
     else if( p_pes->i_buffer > i_skip + 3 &&
-             ( ps_pkt_id( p_pes ) == 0xa001 || ps_pkt_id( p_pes ) == 0xbda1 ) )
+             ( ps_pkt_id( p_pes, PS_SOURCE_AOB ) == 0xa001 || ps_pkt_id( p_pes, PS_SOURCE_VOB ) == 0xbda1 ) )
         i_skip += 4 + p_pes->p_buffer[i_skip+3];
 
     if( p_pes->i_buffer <= i_skip )

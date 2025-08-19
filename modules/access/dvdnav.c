@@ -1443,7 +1443,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
         }
         default:
         {
-            int i_id = ps_pkt_id( p_pkt );
+            int i_id = ps_pkt_id( p_pkt, PS_SOURCE_VOB );
             if( i_id >= 0xc0 )
             {
                 ps_track_t *tk = &p_sys->tk[ps_id_to_tk(i_id)];

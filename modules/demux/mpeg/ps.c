@@ -110,6 +110,7 @@ struct demux_sys_t
         CDXA_PS,
         PSMF_PS,
     } format;
+    enum ps_source source;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -224,6 +225,19 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->b_seekable  = false;
     p_sys->format      = format;
 
+    p_sys->source = PS_SOURCE_UNKNOWN;
+    if ( likely(p_demux->s->psz_url != NULL) )
+    {
+        size_t url_len = strlen( p_demux->s->psz_url );
+        if ( url_len >= 4 )
+        {
+            if ( !strncasecmp( &p_demux->s->psz_url[url_len-4], ".AOB", 4 ))
+                p_sys->source = PS_SOURCE_AOB;
+            if ( !strncasecmp( &p_demux->s->psz_url[url_len-4], ".VOB", 4 ))
+                p_sys->source = PS_SOURCE_VOB;
+        }
+    }
+
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
     ps_psm_init( &p_sys->psm );
@@ -296,7 +310,7 @@ static int Probe( demux_t *p_demux, bool b_end )
         return VLC_DEMUXER_EOF;
     }
 
-    i_id = ps_pkt_id( p_pkt );
+    i_id = ps_pkt_id( p_pkt, p_sys->source );
     if( i_id >= 0xc0 )
     {
         ps_track_t *tk = &p_sys->tk[ps_id_to_tk(i_id)];
@@ -508,7 +522,7 @@ static int Demux( demux_t *p_demux )
     case PS_STREAM_ID_PRIVATE_STREAM1:
     case PS_STREAM_ID_EXTENDED:
         {
-            int i_id = ps_pkt_id( p_pkt );
+            int i_id = ps_pkt_id( p_pkt, p_sys->source );
             /* Small heuristic to improve MLP detection from AOB */
             if( i_id == 0xa001 &&
                 p_sys->i_aob_mlp_count < 500 )
