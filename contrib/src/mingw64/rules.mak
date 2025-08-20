@@ -1,6 +1,6 @@
 # winpthreads, dxvahd, winrt_headers, dcomp
 
-MINGW64_VERSION := 12.0.0
+MINGW64_VERSION := 13.0.0
 MINGW64_URL := $(SF)/mingw-w64/mingw-w64/mingw-w64-release/mingw-w64-v$(MINGW64_VERSION).tar.bz2
 # MINGW64_HASH=2c35e8ff0d33916bd490e8932cba2049cd1af3d0
 # MINGW64_GITURL := https://git.code.sf.net/p/mingw-w64/mingw-w64
@@ -63,9 +63,7 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
-	$(APPLY) $(SRC)/mingw64/0001-headers-disable-more-strmif-interfaces-in-UWP.patch
-	$(APPLY) $(SRC)/mingw64/0001-crt-add-missing-DXVAHD_CreateDevice-for-x86.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-dxvahd-Add-missing-WINAPI-on-DXVAHD_CreateDe.patch
+	$(APPLY) $(SRC)/mingw64/0001-winnt-define-__MINGW_CXX1-1-4-_CONSTEXPR-found-in-_m.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -179,6 +177,7 @@ endif
 	install $</mingw-w64-headers/include/wincrypt.h     "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/winnt.h        "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/heapapi.h      "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/minwinbase.h   "$(PREFIX)/include"
 
 	# Trick mingw-w64 into just building libwindowsapp.a
 	$(MAKEBUILDDIR)
