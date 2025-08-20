@@ -4,6 +4,9 @@ sd_LTLIBRARIES =
 libpodcast_plugin_la_SOURCES = services_discovery/podcast.c
 sd_LTLIBRARIES += libpodcast_plugin.la
 
+libradio_plugin_la_SOURCES = services_discovery/radio.c
+sd_LTLIBRARIES += libradio_plugin.la
+
 libsap_plugin_la_SOURCES = services_discovery/sap.c access/rtp/sdp.c
 libsap_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libsap_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBZ)
