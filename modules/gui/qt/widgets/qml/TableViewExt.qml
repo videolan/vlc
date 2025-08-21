@@ -195,6 +195,8 @@ FocusScope {
 
     readonly property var itemAtIndex: view.itemAtIndex
 
+    property alias currentSection: view.currentSection
+
     // Signals
 
     //forwarded from subview
