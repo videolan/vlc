@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2020 VLC authors and VideoLAN
+ * Copyright (C) 2025 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQuick
+import QtQuick.Window
 import QtQml.Models
 import QtQuick.Layouts
 
@@ -58,10 +60,8 @@ FocusScope {
     readonly property int currentIndex: {
         if (!_currentView)
            return -1
-        else if (MainCtx.gridView)
-           return _currentView.currentIndex
         else
-           return headerItem.albumsListView.currentIndex
+           return _currentView.currentIndex
     }
 
     property real rightPadding
@@ -82,23 +82,26 @@ FocusScope {
             _currentView.contentY = newContentY
     }
 
-    property Component header: FocusScope {
+    property Component header: T.Pane {
         id: headerFs
-
-        property Item albumsListView: albumsLoader.status === Loader.Ready ? albumsLoader.item.albumsListView: null
 
         focus: true
         height: col.height
         width: root.width
 
+        implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                                implicitContentWidth + leftPadding + rightPadding)
+        implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                                 implicitContentHeight + topPadding + bottomPadding)
+
+        signal changeToNextSectionRequested()
+        signal changeToPreviousSectionRequested()
+
         function setCurrentItemFocus(reason) {
-            if (albumsListView)
-                albumsListView.setCurrentItemFocus(reason);
-            else
-                artistBanner.setCurrentItemFocus(reason);
+            headerFs.forceActiveFocus(reason)
         }
 
-        Column {
+        contentItem: Column {
             id: col
 
             height: implicitHeight
@@ -120,13 +123,211 @@ FocusScope {
                         root.navigationShowHeader(0, height)
                 }
 
-                Navigation.parentItem: root
-                Navigation.downAction: function() {
-                    if (albumsListView)
-                        albumsListView.setCurrentItemFocus(Qt.TabFocusReason);
-                    else
-                        _currentView.setCurrentItemFocus(Qt.TabFocusReason);
+                Connections {
+                    enabled: !MainCtx.gridView
+                    target: trackModel
 
+                    function onSortCriteriaChanged() {
+                        if (MainCtx.albumSections &&
+                            trackModel.sortCriteria !== "album_title") {
+                            MainCtx.albumSections = false
+                        }
+                    }
+                }
+
+                property string _oldSortCriteria
+
+                function adjustAlbumSections() {
+                    if (!artistBanner) // context is lost, Qt 6.2 bug
+                        return
+
+                    if (!(root._currentView instanceof Widgets.TableViewExt))
+                        return
+
+                    if (MainCtx.albumSections) {
+                        const albumTitleSortCriteria = "album_title"
+                        if (trackModel.sortCriteria !== albumTitleSortCriteria) {
+                            artistBanner._oldSortCriteria = trackModel.sortCriteria
+                            trackModel.sortCriteria = albumTitleSortCriteria
+                        }
+                    } else {
+                        if (artistBanner._oldSortCriteria.length > 0) {
+                            trackModel.sortCriteria = artistBanner._oldSortCriteria
+                            artistBanner._oldSortCriteria = ""
+                        }
+                    }
+
+                    if (root._currentView)
+                        root._currentView.albumSections = MainCtx.albumSections
+                }
+
+                Component.onCompleted: {
+                    MainCtx.albumSectionsChanged.connect(artistBanner, adjustAlbumSections)
+                    root._currentViewChanged.connect(artistBanner, adjustAlbumSections)
+                    adjustAlbumSections()
+                }
+
+                Navigation.parentItem: root
+                Navigation.downItem: pinnedMusicAlbumSectionLoader
+            }
+
+            Loader {
+                id: pinnedMusicAlbumSectionLoader
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                active: (root._currentView instanceof Widgets.TableViewExt)
+                visible: active
+
+                sourceComponent: MusicAlbumSectionDelegate {
+                    id: pinnedMusicAlbumSection
+
+                    model: albumModel
+
+                    verticalPadding: VLCStyle.margin_xsmall
+
+                    focus: true
+
+                    readonly property Widgets.TableViewExt tableView: root._currentView
+
+                    section: tableView.currentSection || ""
+
+                    previousSectionButtonEnabled: tableView._firstSectionInstance && (tableView._firstSectionInstance.section !== section)
+                    nextSectionButtonEnabled: tableView._lastSectionInstance && (tableView._lastSectionInstance.section !== section)
+
+                    Component.onCompleted: {
+                        changeToPreviousSectionRequested.connect(headerFs, headerFs.changeToPreviousSectionRequested)
+                        changeToNextSectionRequested.connect(headerFs, headerFs.changeToNextSectionRequested)
+                    }
+
+                    background: Rectangle {
+                        color: theme.bg.secondary
+                    }
+
+                    contentItem: RowLayout {
+                        id: _contentItem
+
+                        spacing: pinnedMusicAlbumSection.spacing
+
+                        readonly property bool compactButtons: (pinnedMusicAlbumSection.width < (displayPositioningButtons ? VLCStyle.colWidth(6)
+                                                                                                                           : VLCStyle.colWidth(5)))
+                        readonly property bool displayPositioningButtons: !!pinnedMusicAlbumSection.tableView?.albumSections // not possible otherwise
+
+                        Widgets.ImageExt {
+                            Layout.fillHeight: true
+
+                            Layout.preferredHeight: VLCStyle.trackListAlbumCover_heigth
+                            Layout.preferredWidth: VLCStyle.trackListAlbumCover_width
+
+                            source: pinnedMusicAlbumSection._albumCover ? pinnedMusicAlbumSection._albumCover : VLCStyle.noArtArtist
+
+                            sourceSize: Qt.size(width * eDPR, height * eDPR)
+
+                            readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
+
+                            backgroundColor: theme.bg.primary
+
+                            fillMode: Image.PreserveAspectFit
+
+                            asynchronous: true
+                            cache: true
+
+                            Widgets.DefaultShadow {
+                                visible: (parent.status === Image.Ready)
+                            }
+                        }
+
+                        Column {
+                            Layout.fillWidth: true
+
+                            MusicAlbumSectionDelegate.TitleLabel {
+                                id: titleLabel
+
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+
+                                delegate: pinnedMusicAlbumSection
+
+                                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+
+                                Layout.fillWidth: true
+
+                                Layout.maximumWidth: implicitWidth
+
+                                font.pixelSize: VLCStyle.fontSize_normal
+                                font.weight: Font.DemiBold
+                            }
+
+                            MusicAlbumSectionDelegate.CaptionLabel {
+                                id: captionLabel
+
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+
+                                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+
+                                delegate: pinnedMusicAlbumSection
+                            }
+                        }
+
+                        MusicAlbumSectionDelegate.PlayButton {
+                            id: playButton
+
+                            delegate: pinnedMusicAlbumSection
+
+                            showText: !_contentItem.compactButtons
+                            focus: true
+
+                            Navigation.parentItem: pinnedMusicAlbumSection
+                            Navigation.rightItem: enqueueButton
+                        }
+
+                        MusicAlbumSectionDelegate.EnqueueButton {
+                            id: enqueueButton
+
+                            delegate: pinnedMusicAlbumSection
+
+                            showText: !_contentItem.compactButtons
+
+                            Navigation.parentItem: pinnedMusicAlbumSection
+                            Navigation.rightItem: previousSectionButton
+                            Navigation.leftItem: playButton
+                        }
+
+                        MusicAlbumSectionDelegate.PreviousSectionButton {
+                            id: previousSectionButton
+
+                            delegate: pinnedMusicAlbumSection
+
+                            visible: _contentItem.displayPositioningButtons
+
+                            showText: !_contentItem.compactButtons
+
+                            Navigation.parentItem: pinnedMusicAlbumSection
+                            Navigation.rightItem: nextSectionButton
+                            Navigation.leftItem: enqueueButton
+                        }
+
+                        MusicAlbumSectionDelegate.NextSectionButton {
+                            id: nextSectionButton
+
+                            delegate: pinnedMusicAlbumSection
+
+                            visible: _contentItem.displayPositioningButtons
+
+                            showText: !_contentItem.compactButtons
+
+                            Navigation.parentItem: pinnedMusicAlbumSection
+                            Navigation.leftItem: previousSectionButton
+                        }
+                    }
+
+                    Navigation.parentItem: root
+                    Navigation.upItem: artistBanner
+                    Navigation.downAction: function() {
+                        tableView.setCurrentItemFocus(Qt.TabFocusReason)
+                    }
                 }
             }
 
@@ -136,157 +337,9 @@ FocusScope {
                 leftPadding: root._contentLeftMargin
                 bottomPadding: VLCStyle.layoutTitle_bottom_padding -
                                (MainCtx.gridView ? 0 : VLCStyle.gridItemSelectedBorder)
+                topPadding: pinnedMusicAlbumSectionLoader.active ? bottomPadding : VLCStyle.layoutTitle_top_padding
 
                 text: qsTr("Albums")
-            }
-
-            Loader {
-                id: albumsLoader
-
-                active: !MainCtx.gridView
-                focus: true
-
-                onActiveFocusChanged: {
-                    // make sure content is visible with activeFocus
-                    if (activeFocus)
-                        root.navigationShowHeader(y, height)
-                }
-
-                sourceComponent: Column {
-                    property alias albumsListView: albumsList
-
-                    width: albumsList.width
-                    height: implicitHeight
-
-                    spacing: VLCStyle.tableView_spacing - VLCStyle.margin_xxxsmall
-
-                    Widgets.ListViewExt {
-                        id: albumsList
-
-                        x: root._contentLeftMargin - VLCStyle.gridItemSelectedBorder
-
-                        width: root.width - root.rightPadding - root._contentLeftMargin - root._contentRightMargin
-                        height: gridHelper.cellHeight + topMargin + bottomMargin + VLCStyle.margin_xxxsmall
-
-                        leftMargin: VLCStyle.gridItemSelectedBorder
-                        rightMargin: leftMargin
-
-                        topMargin: VLCStyle.gridItemSelectedBorder
-                        bottomMargin: VLCStyle.gridItemSelectedBorder
-
-                        displayMarginBeginning: root._contentLeftMargin
-                        displayMarginEnd: root._contentRightMargin + VLCStyle.gridItemSelectedBorder
-
-                        focus: true
-
-                        model: albumModel
-                        selectionModel: albumSelectionModel
-                        orientation: ListView.Horizontal
-                        spacing: VLCStyle.column_spacing
-                        buttonMargin: (gridHelper.cellHeight - gridHelper.textHeight - buttonLeft.height) / 2 +
-                                      VLCStyle.gridItemSelectedBorder
-
-                        Navigation.parentItem: root
-
-                        Navigation.upAction: function() {
-                            artistBanner.setCurrentItemFocus(Qt.TabFocusReason);
-                        }
-
-                        Navigation.downAction: function() {
-                            root.setCurrentItemFocus(Qt.TabFocusReason);
-                        }
-
-                        GridSizeHelper {
-                            id: gridHelper
-
-                            availableWidth: albumsList.width
-                            basePictureWidth: VLCStyle.gridCover_music_width
-                            basePictureHeight: VLCStyle.gridCover_music_height
-                        }
-
-                        delegate: Widgets.GridItem {
-                            id: gridItem
-
-                            required property var model
-                            required property int index
-
-                            y: selectedBorderWidth
-
-                            width: gridHelper.cellWidth
-                            height: gridHelper.cellHeight
-
-                            pictureWidth: gridHelper.maxPictureWidth
-                            pictureHeight: gridHelper.maxPictureHeight
-
-                            image: model.cover || ""
-                            fallbackImage: VLCStyle.noArtAlbumCover
-
-                            fillMode: Image.PreserveAspectCrop
-
-                            title: model.title || qsTr("Unknown title")
-                            subtitle: model.release_year || ""
-                            subtitleVisible: true
-                            textAlignHCenter: true
-                            dragItem: albumDragItem
-
-                            // updates to selection is manually handled for optimization purpose
-                            Component.onCompleted: _updateSelected()
-
-                            onIndexChanged: _updateSelected()
-
-                            onPlayClicked: play()
-                            onItemDoubleClicked: play()
-
-                            onItemClicked: (modifier) => {
-                                albumsList.selectionModel.updateSelection( modifier , albumsList.currentIndex, index )
-                                albumsList.currentIndex = index
-                                albumsList.forceActiveFocus()
-                            }
-
-                            Connections {
-                                target: albumsList.selectionModel
-
-                                function onSelectionChanged(selected, deselected) {
-                                    const idx = albumModel.index(gridItem.index, 0)
-                                    const findInSelection = s => s.find(range => range.contains(idx)) !== undefined
-
-                                    // NOTE: we only get diff of the selection
-                                    if (findInSelection(selected))
-                                        gridItem.selected = true
-                                    else if (findInSelection(deselected))
-                                        gridItem.selected = false
-                                }
-                            }
-
-                            onContextMenuButtonClicked: (_, globalMousePos) => {
-                                albumSelectionModel.updateSelection( Qt.NoModifier , albumsList.currentIndex, index )
-                                contextMenu.popup(albumSelectionModel.selectedIndexes
-                                                  , globalMousePos)
-                            }
-
-                            function play() {
-                                if ( model.id !== undefined ) {
-                                    MediaLib.addAndPlay( model.id )
-                                }
-                            }
-
-                            function _updateSelected() {
-                                selected = albumSelectionModel.isRowSelected(gridItem.index)
-                            }
-                        }
-
-                        onActionAtIndex: (index) => { albumModel.addAndPlay( new Array(index) ) }
-                    }
-
-                    Widgets.ViewHeader {
-                        view: root
-
-                        leftPadding: root._contentLeftMargin
-                        topPadding: 0
-
-                        text: qsTr("Tracks")
-                    }
-                }
             }
         }
     }
@@ -392,7 +445,7 @@ FocusScope {
     Widgets.MLDragItem {
         id: albumDragItem
 
-        view: (root._currentView instanceof Widgets.TableViewExt) ? root._currentView?.headerItem?.albumsListView
+        view: (root._currentView instanceof Widgets.TableViewExt) ? (root._currentView?.headerItem?.albumsListView ?? null)
                                                                   : root._currentView
         indexes: indexesFlat ? albumSelectionModel.selectedIndexesFlat
                              : albumSelectionModel.selectedIndexes
@@ -537,8 +590,230 @@ FocusScope {
             }
 
             header: root.header
-            headerPositioning: ListView.InlineHeader
             rowHeight: VLCStyle.tableCoverRow_height
+
+            property bool albumSections: true
+
+            section.property: "album_id"
+            section.delegate: albumSections ? musicAlbumSectionDelegateComponent : null
+
+            readonly property var _artistId: root.artistId
+
+            on_ArtistIdChanged: {
+                if (albumSections) {
+                    _sections.length = 0 // This clears the sections list
+
+                    // FIXME: Sections may get invalid section name on artist change, Qt bug?
+                    albumSections = false
+                    albumSections = true
+                }
+            }
+
+            Binding on listView.cacheBuffer {
+                // FIXME
+                // https://doc.qt.io/qt-6/qml-qtquick-listview.html#variable-delegate-size-and-section-labels
+                when: tableView_id.albumSections
+                value: Math.max(tableView_id.height * 2, tableView_id.Screen.desktopAvailableHeight)
+            }
+
+            property alias contentYBehavior: contentYBehavior
+
+            property MusicAlbumSectionDelegate _firstSectionInstance
+            property MusicAlbumSectionDelegate _lastSectionInstance
+
+            property list<MusicAlbumSectionDelegate> _sections
+
+            Component {
+                id: musicAlbumSectionDelegateComponent
+
+                MusicAlbumSectionDelegate {
+                    id: musicAlbumSectionDelegate
+
+                    width: tableView_id.width
+
+                    model: albumModel
+
+                    previousSectionButtonEnabled: tableView_id._firstSectionInstance && (tableView_id._firstSectionInstance !== this)
+                    nextSectionButtonEnabled: tableView_id._lastSectionInstance && (tableView_id._lastSectionInstance !== this)
+
+                    Navigation.parentItem: tableView_id
+                    Navigation.upAction: function() {
+                        let item = tableView_id.listView.itemAt(0, y - 1)
+                        if (item) {
+                            item.forceActiveFocus(Qt.BacktabFocusReason)
+                            tableView_id.currentIndex = item.index
+                            tableView_id.positionViewAtIndex(item.index, ItemView.Contain)
+                        }
+                    }
+                    Navigation.downAction: function() {
+                        let item = tableView_id.listView.itemAt(0, y + height + 1)
+                        if (item) {
+                            item.forceActiveFocus(Qt.TabFocusReason)
+                            tableView_id.currentIndex = item.index
+                            tableView_id.positionViewAtIndex(item.index, ItemView.Contain)
+                        }
+                    }
+
+                    Component.onCompleted: {
+                        tableView_id._sections.push(this)
+
+                        // WARNING: Sections are reused.
+                        // NOTE: Scrolling does not change the y of items of content item,
+                        //       listening to y and visible changes is not really terrible.
+                        sectionChanged.connect(this, adjustSectionInstances)
+                        yChanged.connect(this, adjustSectionInstances)
+                        adjustSectionInstances()
+                    }
+
+                    function adjustSectionInstances() {
+                        if (tableView_id._firstSectionInstance) {
+                            if (y < tableView_id._firstSectionInstance.y)
+                                tableView_id._firstSectionInstance = this
+                        } else {
+                            tableView_id._firstSectionInstance = this
+                        }
+
+                        if (tableView_id._lastSectionInstance) {
+                            if (y > tableView_id._lastSectionInstance.y)
+                                tableView_id._lastSectionInstance = this
+                        } else {
+                            tableView_id._lastSectionInstance = this
+                        }
+                    }
+
+                    Connections {
+                        target: tableView_id.headerItem
+
+                        function onChangeToPreviousSectionRequested() {
+                            if (tableView_id.currentSection === musicAlbumSectionDelegate.section)
+                                musicAlbumSectionDelegate.changeToPreviousSectionRequested()
+                        }
+
+                        function onChangeToNextSectionRequested() {
+                            if (tableView_id.currentSection === musicAlbumSectionDelegate.section)
+                                musicAlbumSectionDelegate.changeToNextSectionRequested()
+                        }
+                    }
+
+                    function changeSection(forward: bool) {
+                        // We have to probe the section on demand, as otherwise we
+                        // would have to track the section unnecessarily. Note that
+                        // reusing sections complicates things a lot.
+
+                        const currentSectionFirstItemPosY = (y + height + 1)
+                        let item = tableView_id.listView.itemAt(0, currentSectionFirstItemPosY) // current section first item
+
+                        if (!item || item.ListView.section !== section) {
+                            // If there is no first item, there should be no section:
+                            console.warn("Could not find the required first item at y-pos: %1 of section: %2 (%3)! Manually iterating all items...".arg(currentSectionFirstItemPosY)
+                                                                                                                                                   .arg(section).arg(this))
+                            item = null
+
+                            for (let i = 0; i < tableView_id.count; ++i) {
+                                const t = tableView_id.itemAtIndex(i)
+                                if (t && (t.ListView.section === section)) {
+                                    item = t
+                                    break
+                                } else if (!t) {
+                                    console.debug(this, ": ListView count is %1, but itemAtIndex(%2) returned null!".arg(tableView_id.count).arg(i)) // Too low cacheBuffer?
+                                }
+                            }
+
+                            if (!item) {
+                                console.error(this, ": Could not find the required first item! Try again after increasing the cache buffer of the view.")
+                                return
+                            }
+                        }
+
+                        console.assert(item.index !== undefined)
+
+                        let itemIndex = item.index
+                        let targetSectionName
+
+                        // FIXME: We check each item until reaching the next/previous section. This does not mean that the
+                        //        whole list is checked, still, this should be removed when Qt provides such functionality.
+                        for (let i = itemIndex; forward ? (i < tableView_id.count) : (i >= 0); forward ? ++i : --i) {
+                            item = tableView_id.itemAtIndex(i)
+
+                            if (!item) {
+                                if (!targetSectionName) {
+                                    // This function is called when there is no previous/next section:
+                                    console.error(this, ": Expected item at index", i, "does not exist! Try again after increasing the cache buffer of the view.")
+                                    return
+                                } else {
+                                    break
+                                }
+                            }
+
+                            const currentItemSection = item.ListView.section
+                            console.assert(currentItemSection && currentItemSection.length > 0)
+                            if (currentItemSection !== section) {
+                                itemIndex = i
+                                if (forward) {
+                                    // First item of the next section.
+                                    targetSectionName = currentItemSection
+                                    break
+                                } else {
+                                    if (!targetSectionName) {
+                                        targetSectionName = currentItemSection
+                                    } else if (currentItemSection !== targetSectionName) {
+                                        // First item of the previous section.
+                                        ++itemIndex
+                                        break
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!targetSectionName) {
+                            console.error(this, ": Could not find the target section! Possible Qt bug.")
+                            return
+                        }
+
+                        if (activeFocus) {
+                            // If this section has focus, the target section
+                            // should also have focus:
+                            for (let i = 0; i < _sections.length; ++i) {
+                                const targetSection = _sections[i]
+                                if (targetSection?.section === targetSectionName) {
+                                    targetSection.focus = true
+                                    break
+                                }
+                            }
+                        }
+
+                        // FIXME: Not the best approach, but Qt does not seem to provide an alternative.
+                        //        Adjusting `contentY` is proved to be unreliable, especially when there
+                        //        are sections.
+                        // FIXME: Qt does not provide the `contentY` with `positionViewAtIndex()` for us
+                        //        to animate. For that reason, we capture the new `contentY`, adjust
+                        //        `contentY` to it is old value then enable the animation and set `contentY`
+                        //        to its new value.
+                        const oldContentY = tableView_id.contentY
+                        // NOTE: `positionViewAtIndex()` actually positions the view to the section, so
+                        //       we do not need to subtract the section height here:
+                        tableView_id.positionViewAtIndex(itemIndex, ListView.Beginning)
+                        const newContentY = tableView_id.contentY
+                        if (Math.abs(oldContentY - newContentY) >= Number.EPSILON) {
+                            tableView_id.contentYBehavior.enabled = false
+                            tableView_id.contentY = oldContentY
+                            tableView_id.contentYBehavior.enabled = true
+                            tableView_id.contentY = newContentY
+                            tableView_id.contentYBehavior.enabled = false
+                        }
+                    }
+
+                    onChangeToPreviousSectionRequested: {
+                        changeSection(false)
+                    }
+
+                    onChangeToNextSectionRequested: {
+                        changeSection(true)
+                    }
+                }
+            }
+
+            useCurrentSectionLabel: false
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
@@ -614,6 +889,18 @@ FocusScope {
             onRightClick: trackContextMenu.popup(tableView_id.selectionModel.selectedIndexes, globalMousePos)
 
             onDragItemChanged: console.assert(tableView_id.dragItem === tableDragItem)
+
+            Behavior on listView.contentY {
+                id: contentYBehavior
+
+                enabled: false
+
+                // NOTE: Usage of `SmoothedAnimation` is intentional here.
+                SmoothedAnimation {
+                    duration: VLCStyle.duration_veryLong
+                    easing.type: Easing.InOutSine
+                }
+            }
 
             Widgets.MLDragItem {
                 id: tableDragItem
