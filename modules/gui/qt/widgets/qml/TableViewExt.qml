@@ -140,6 +140,8 @@ FocusScope {
                                                       // contextButton is implemented as fixed column
                                                       - VLCStyle.contextButton_width - (VLCStyle.contextButton_margin * 2)
 
+    property bool sortingFromHeader: true
+
     // Aliases
 
     property alias topMargin: view.topMargin
@@ -398,6 +400,8 @@ FocusScope {
 
                             TapHandler {
                                 onTapped: (eventPoint, button) => {
+                                    if (!root.sortingFromHeader)
+                                        return
                                     if (!(modelData.model.isSortable ?? true))
                                         return
                                     else if (root.model.sortCriteria !== modelData.model.criteria)
