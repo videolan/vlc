@@ -47,6 +47,7 @@
     NSMenuItem *_addFilesToPlayQueueMenuItem;
     NSMenuItem *_clearPlayQueueMenuItem;
     NSMenuItem *_sortMenuItem;
+    NSMenuItem *_createPlaylistMenuItem;
 }
 
 @property (readwrite, atomic) NSArray<NSMenuItem *> *items;
@@ -86,6 +87,9 @@
     _clearPlayQueueMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear Play Queue") action:@selector(clearPlayQueue:) keyEquivalent:@""];
     _clearPlayQueueMenuItem.target = self;
 
+    _createPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Create Playlist from Queue") action:@selector(createPlaylistFromQueue:) keyEquivalent:@""];
+    _createPlaylistMenuItem.target = self;
+
     _playQueueSortingMenuController = [[VLCPlayQueueSortingMenuController alloc] init];
     _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort Play Queue") action:nil keyEquivalent:@""];
     [_sortMenuItem setSubmenu:_playQueueSortingMenuController.playQueueSortingMenu];
@@ -98,6 +102,7 @@
         NSMenuItem.separatorItem,
         _addFilesToPlayQueueMenuItem,
         _clearPlayQueueMenuItem,
+        _createPlaylistMenuItem,
         _sortMenuItem
     ];
 
@@ -106,6 +111,7 @@
         NSMenuItem.separatorItem,
         _addFilesToPlayQueueMenuItem,
         _clearPlayQueueMenuItem,
+        _createPlaylistMenuItem,
         _sortMenuItem
     ];
 
@@ -199,12 +205,53 @@
     [_playQueueController clearPlayQueue];
 }
 
+- (void)createPlaylistFromQueue:(id)sender
+{
+    NSIndexSet * const selectedIndexes = self.playQueueTableView.selectedRowIndexes;
+    
+    // Show an input dialog to get the playlist name
+    NSAlert * const alert = [[NSAlert alloc] init];
+    alert.messageText = selectedIndexes.count > 0 ? _NS("Create Playlist from Selected Items") : _NS("Create Playlist from Queue");
+    alert.informativeText = _NS("Enter a name for the new playlist:");
+    [alert addButtonWithTitle:_NS("Create")];
+    [alert addButtonWithTitle:_NS("Cancel")];
+    
+    NSTextField * const input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+    input.stringValue = _NS("New Playlist");
+    alert.accessoryView = input;
+    
+    const NSInteger response = [alert runModal];
+    if (response != NSAlertFirstButtonReturn) {
+        return;
+    }
+    
+    NSString * const playlistName = input.stringValue;
+    if (playlistName.length == 0) {
+        return;
+    }
+    
+    const BOOL success = selectedIndexes.count > 0
+        ? [_playQueueController createPlaylistFromPlayQueueWithName:playlistName itemIndexes:selectedIndexes] 
+        : [_playQueueController createPlaylistFromPlayQueueWithName:playlistName];
+
+    if (!success) {
+        NSAlert * const errorAlert = [[NSAlert alloc] init];
+        errorAlert.messageText = _NS("Failed to Create Playlist");
+        errorAlert.informativeText = _NS("The playlist could not be created. Please check that the media library is available.");
+        errorAlert.alertStyle = NSAlertStyleWarning;
+        [errorAlert runModal];
+    }
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     if (menuItem == _addFilesToPlayQueueMenuItem) {
         return YES;
 
     } else if (menuItem == _clearPlayQueueMenuItem) {
+        return (self.playQueueTableView.numberOfRows > 0);
+
+    } else if (menuItem == _createPlaylistMenuItem) {
         return (self.playQueueTableView.numberOfRows > 0);
 
     } else if (menuItem == _removeMenuItem ||
