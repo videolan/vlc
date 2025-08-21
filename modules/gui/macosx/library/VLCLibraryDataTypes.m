@@ -319,6 +319,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return nil;
 }
 
+- (BOOL)isFileBacked
+{
+    return YES;
+}
+
 - (id<VLCMediaLibraryItemProtocol>)primaryActionableDetailLibraryItem
 {
     [self doesNotRecognizeSelector:_cmd];
@@ -1053,6 +1058,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 @synthesize favorited = _favorited;
+@synthesize isFileBacked = _isFileBacked;
 
 #pragma mark - initialization
 
@@ -1150,6 +1156,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _progress = p_mediaItem->f_progress;
         _favorited = p_mediaItem->b_is_favorite;
         _title = toNSStr(p_mediaItem->psz_title);
+        _isFileBacked = YES;
 
         switch (p_mediaItem->i_subtype) {
             case VLC_ML_MEDIA_SUBTYPE_MOVIE:
@@ -1801,6 +1808,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 @synthesize labels = _labels;
 @synthesize favorited = _favorited;
+@synthesize isFileBacked = _isFileBacked;
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
               withPrimaryDetailString:(nullable NSString *)primaryDetailString
@@ -1815,6 +1823,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _libraryId = -1;
         _smallArtworkGenerated = NO;
         _smallArtworkMRL = @"";
+        _isFileBacked = NO;
         _primaryActionableDetail = NO;
         _primaryActionableDetailLibraryItem = nil;
         _secondaryActionableDetail = NO;

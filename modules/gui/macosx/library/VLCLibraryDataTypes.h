@@ -124,6 +124,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) BOOL smallArtworkGenerated;
 @property (readonly) NSString *smallArtworkMRL;
 @property (readonly) NSString *displayString;
+@property (readonly) BOOL isFileBacked;
 @property (readonly) NSString *primaryDetailString;
 @property (readonly) NSString *secondaryDetailString;
 @property (readonly) NSString *durationString;
