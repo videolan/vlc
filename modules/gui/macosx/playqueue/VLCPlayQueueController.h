@@ -237,6 +237,21 @@ extern NSString * const VLCPlayQueueItemsRemoved;
  */
 - (int)exportPlaylistToPath:(NSString *)path exportModule:(VLCPlaylistExportModuleDescription *)exportModule;
 
+/**
+ * Creates a new media library playlist from the current playqueue items
+ * @param playlistName the name for the new playlist
+ * @return YES if the playlist was created successfully, NO otherwise
+ */
+- (BOOL)createPlaylistFromPlayQueueWithName:(NSString *)playlistName;
+
+/**
+ * Creates a new media library playlist from selected playqueue items
+ * @param playlistName the name for the new playlist
+ * @param indexes the indexes of the items to add to the playlist
+ * @return YES if the playlist was created successfully, NO otherwise
+ */
+- (BOOL)createPlaylistFromPlayQueueWithName:(NSString *)playlistName itemIndexes:(NSIndexSet *)indexes;
+
 @end
 
 @interface VLCPlaylistExportModuleDescription : NSObject

@@ -24,6 +24,7 @@
 
 #import <vlc_interface.h>
 #import <vlc_player.h>
+#import <vlc_media_library.h>
 
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
@@ -33,6 +34,7 @@
 #import "playqueue/VLCPlayerController.h"
 #import "windows/VLCOpenInputMetadata.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryDataTypes.h"
 
 NSString * const VLCPlaybackOrderChanged = @"VLCPlaybackOrderChanged";
 NSString * const VLCPlaybackRepeatChanged = @"VLCPlaybackRepeatChanged";
@@ -732,6 +734,95 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_SetMediaStoppedAction(_p_playlist, actionAfterStop);
     vlc_playlist_Unlock(_p_playlist);
+}
+
+- (BOOL)createPlaylistFromPlayQueueWithName:(NSString *)playlistName
+{
+    if (!playlistName || playlistName.length == 0) {
+        return NO;
+    }
+    
+    const NSUInteger numberOfItems = self.playQueueModel.numberOfPlayQueueItems;
+    if (numberOfItems == 0) {
+        return NO;
+    }
+    
+    NSIndexSet * const allIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfItems)];
+    return [self createPlaylistFromPlayQueueWithName:playlistName itemIndexes:allIndexes];
+}
+
+- (BOOL)createPlaylistFromPlayQueueWithName:(NSString *)playlistName itemIndexes:(NSIndexSet *)indexes
+{
+    if (playlistName.length == 0 || indexes.count == 0) {
+        msg_Err(getIntf(), "Invalid playlist name or indexes");
+        return NO;
+    }
+
+    vlc_medialibrary_t * const p_ml = getMediaLibrary();
+    if (p_ml == NULL) {
+        msg_Err(getIntf(), "Media library not available");
+        return NO;
+    }
+    
+    // Create the playlist
+    vlc_ml_playlist_t * const p_playlist = vlc_ml_playlist_create(p_ml, playlistName.UTF8String);
+    if (p_playlist == NULL) {
+        msg_Err(getIntf(), "Failed to create playlist '%s'", playlistName.UTF8String);
+        return NO;
+    }
+    
+    // Collect media IDs from the playqueue items
+    NSMutableArray<NSNumber *> * const mediaIds = [NSMutableArray arrayWithCapacity:indexes.count];
+    
+    [indexes enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const _Nonnull stop) {
+        VLCPlayQueueItem * const item = [self.playQueueModel playQueueItemAtIndex:idx];
+        if (item == nil) {
+            msg_Err(getIntf(), "Invalid playqueue item at index %lu", idx);
+            return;
+        }
+        
+        VLCMediaLibraryMediaItem * const mediaLibraryItem = item.mediaLibraryItem;
+        if (mediaLibraryItem == nil) {
+            msg_Err(getIntf(), "No media library item found for playqueue item at index %lu with name '%s'", idx, item.title.UTF8String);
+            return;
+        }
+
+        [mediaIds addObject:@(mediaLibraryItem.libraryID)];
+    }];
+    
+    if (mediaIds.count == 0) {
+        msg_Warn(getIntf(), "No valid media items to add to playlist '%s'", playlistName.UTF8String);
+        vlc_ml_playlist_delete(p_ml, p_playlist->i_id);
+        vlc_ml_playlist_release(p_playlist);
+        return NO;
+    }
+    
+    // Convert NSArray to C array of media IDs
+    int64_t * const p_media_ids = calloc(mediaIds.count, sizeof(int64_t));
+    if (p_media_ids == NULL) {
+        msg_Err(getIntf(), "Could not calloc C media ids");
+        vlc_ml_playlist_delete(p_ml, p_playlist->i_id);
+        vlc_ml_playlist_release(p_playlist);
+        return NO;
+    }
+    
+    for (NSUInteger i = 0; i < mediaIds.count; i++) {
+        p_media_ids[i] = mediaIds[i].longLongValue;
+    }
+    
+    // Add media items to the playlist
+    const int ret = vlc_ml_playlist_append(p_ml, p_playlist->i_id, p_media_ids, mediaIds.count);
+    
+    free(p_media_ids);
+    vlc_ml_playlist_release(p_playlist);
+    
+    if (ret != VLC_SUCCESS) {
+        msg_Err(getIntf(), "Failed to add items to playlist '%s'", playlistName.UTF8String);
+        return NO;
+    }
+    
+    msg_Info(getIntf(), "Successfully created playlist '%s' with %lu items", playlistName.UTF8String, mediaIds.count);
+    return YES;
 }
 
 @end
