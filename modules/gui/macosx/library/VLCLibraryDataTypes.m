@@ -1001,13 +1001,63 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.mediaItems.firstObject;
 }
 
+- (BOOL)isFileBacked
+{
+    if (_MRL == nil || _MRL.length == 0) {
+        return NO;
+    }
+
+    NSURL * const URL = [NSURL URLWithString:_MRL];
+    if (URL == nil || !URL.isFileURL) {
+        return NO;
+    }
+
+    return [NSFileManager.defaultManager fileExistsAtPath:URL.path];
+}
+
 - (void)moveToTrash
 {
-    NSFileManager * const fileManager = NSFileManager.defaultManager;
-    NSURL * const URL = [NSURL URLWithString:_MRL];
-    [fileManager trashItemAtURL:URL
-               resultingItemURL:nil
-                          error:nil];
+    // First check if this playlist has a valid file MRL (e.g., .m3u file)
+    if (_MRL != nil && _MRL.length > 0) {
+        NSURL * const URL = [NSURL URLWithString:_MRL];
+        if (URL == nil || !URL.isFileURL) {
+            NSLog(@"Playlist %@ is not file-backed or is a dir (?)", self.displayString);
+            return;
+        }
+        NSFileManager * const fileManager = NSFileManager.defaultManager;
+        const BOOL fileExists = [fileManager fileExistsAtPath:URL.path];
+        
+        if (!fileExists) {
+            NSLog(@"Playlist file does not exist: %@", URL.path);
+            return;
+        }
+        
+        // This is a file-based playlist, move the file to trash
+        NSError *error = nil;
+        [fileManager trashItemAtURL:URL
+                    resultingItemURL:nil
+                                error:&error];
+        if (error) {
+            NSLog(@"Failed to move playlist file to trash: %@", error);
+        } else {
+            NSLog(@"Successfully moved playlist file %@ to trash", URL.lastPathComponent);
+            return;
+        }
+    }
+    
+    // If no valid file MRL or file doesn't exist, delete from media library
+    vlc_medialibrary_t * const p_ml = getMediaLibrary();
+    if (p_ml == NULL) {
+        NSLog(@"Could not get media library to delete playlist %@", self.displayString);
+        return;
+    }
+    
+    const int result = vlc_ml_playlist_delete(p_ml, self.libraryID);
+    if (result != VLC_SUCCESS) {
+        NSLog(@"Failed to delete playlist %@ with ID %lld from media library", self.displayString, self.libraryID);
+    } else {
+        NSLog(@"Successfully deleted playlist %@ with ID %lld from media library", self.displayString, self.libraryID);
+    }
 }
 
 - (void)revealInFinder
