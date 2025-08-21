@@ -72,7 +72,7 @@
                                    name:VLCLibraryModelPlaylistAdded
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelPlaylistDeleted:)
                                    name:VLCLibraryModelPlaylistDeleted
                                  object:nil];
 
@@ -305,6 +305,15 @@
          (numberOfPlaylists > 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
         self.libraryWindow.videoViewController.view.hidden) {
 
+        [self updatePresentedView];
+    }
+}
+
+- (void)libraryModelPlaylistDeleted:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    if (self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegmentType &&
+        self.libraryWindow.videoViewController.view.hidden) {
         [self updatePresentedView];
     }
 }
