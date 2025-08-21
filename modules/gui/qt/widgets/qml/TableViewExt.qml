@@ -155,6 +155,8 @@ FocusScope {
 
     property alias delegate: view.delegate
 
+    property alias contentItem: view.contentItem
+
     property alias contentY     : view.contentY
     property alias contentHeight: view.contentHeight
 
