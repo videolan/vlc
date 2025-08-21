@@ -98,7 +98,7 @@ NSString *VLCPlaylistItemPasteboardType = @"org.videolan.vlc.playlistitemtype";
 
 - (NSURL *)url
 {
-    if (_playlistItem) {
+    if (!_playlistItem) {
         return nil;
     }
 
