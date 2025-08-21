@@ -40,6 +40,8 @@ extern const CGFloat VLCMediaLibrary720pWidth;
 extern const CGFloat VLCMediaLibrary720pHeight;
 extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
+vlc_medialibrary_t * _Nullable getMediaLibrary(void);
+
 typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
     VLCMediaLibraryParentGroupTypeUnknown = VLC_ML_PARENT_UNKNOWN,
     VLCMediaLibraryParentGroupTypeAlbum = VLC_ML_PARENT_ALBUM,

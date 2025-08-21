@@ -46,9 +46,9 @@ typedef vlc_ml_album_list_t* (*library_album_list_fetch_f)(vlc_medialibrary_t*, 
 typedef vlc_ml_artist_list_t* (*library_artist_list_fetch_f)(vlc_medialibrary_t*, const vlc_ml_query_params_t*, int64_t);
 typedef int (*library_item_set_favorite_f)(vlc_medialibrary_t*, int64_t, bool);
 
-static vlc_medialibrary_t *getMediaLibrary(void)
+vlc_medialibrary_t * _Nullable getMediaLibrary(void)
 {
-    intf_thread_t *p_intf = getIntf();
+    intf_thread_t * const p_intf = getIntf();
     if (!p_intf) {
         return nil;
     }
