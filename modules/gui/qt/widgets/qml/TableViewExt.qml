@@ -141,6 +141,7 @@ FocusScope {
                                                       - VLCStyle.contextButton_width - (VLCStyle.contextButton_margin * 2)
 
     property bool sortingFromHeader: true
+    property bool useCurrentSectionLabel: true
 
     // Aliases
 
@@ -312,7 +313,8 @@ FocusScope {
 
                 text: view.currentSection
                 color: view.colorContext.accent
-                visible: view.headerPositioning === ListView.OverlayHeader
+                visible: root.useCurrentSectionLabel
+                         && view.headerPositioning === ListView.OverlayHeader
                          && text !== ""
                          && view.contentY > (row.height - col.height - row.topPadding)
                          && row.visible
