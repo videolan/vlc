@@ -32,8 +32,10 @@ MLAudio::MLAudio(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data)
     if ( _data->album_track.i_album_id != 0 )
     {
         ml_unique_ptr<vlc_ml_album_t> album(vlc_ml_get_album(_ml, _data->album_track.i_album_id));
-        if (album)
+        if (album) {
+            m_albumId =  album->i_id;
             m_albumTitle =  album->psz_title;
+        }
     }
 
     if ( _data->album_track.i_artist_id != 0 )
@@ -43,6 +45,11 @@ MLAudio::MLAudio(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data)
             m_artist =  artist->psz_name;
     }
 }
+
+MLItemId MLAudio::getAlbumId() const {
+    return {m_albumId, VLC_ML_PARENT_ALBUM};
+}
+
 
 QString MLAudio::getAlbumTitle() const
 {
