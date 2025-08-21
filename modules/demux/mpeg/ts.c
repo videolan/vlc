@@ -1715,7 +1715,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
                     i_pcrref != VLC_TICK_INVALID &&
                     (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
                 {
-                    if( p_block->i_dts + FROM_SCALE_NZ(CLOCK_FREQ/90000) < i_pcrref )
+                    if( p_block->i_dts + FROM_SCALE_NZ(1) < i_pcrref )
                     {
                         p_pmt->pcr.i_pcroffset = i_pcrref - p_block->i_dts + VLC_TICK_FROM_MS(80);
                         msg_Warn( p_demux, "Broken stream: pid %d sends packets with dts %"PRId64
