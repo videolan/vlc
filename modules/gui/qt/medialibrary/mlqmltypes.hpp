@@ -62,6 +62,10 @@ public:
     int64_t id;
     vlc_ml_parent_type type;
 
+    Q_INVOKABLE bool isValid() const {
+        return (id != INVALID_MLITEMID_ID);
+    }
+
     Q_INVOKABLE constexpr bool hasParent() const {
         return (type != VLC_ML_PARENT_UNKNOWN);
     }
