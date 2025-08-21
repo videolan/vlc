@@ -107,6 +107,10 @@ static void convertQVariantListToPlaylistMedias(vlc_medialibrary_t* ml, QVariant
     }
 }
 
+MLItemId MediaLib::deserializeMlItemIdFromString(const QString& serialized_id) {
+    return MLItemId::fromString(serialized_id);
+}
+
 void MediaLib::addToPlaylist(const QString& mrl, const QStringList &options)
 {
     QVector<vlc::playlist::Media> medias;
