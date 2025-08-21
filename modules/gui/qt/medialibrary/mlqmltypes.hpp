@@ -86,14 +86,14 @@ public:
     Q_INVOKABLE static inline MLItemId fromString(const QStringView& serialized_id) {
         const QList<QStringView> parts = serialized_id.split('-'); // Type, ID
         if (parts.length() != 2) {
-            return {-1, VLC_ML_PARENT_UNKNOWN};
+            return {INVALID_MLITEMID_ID, VLC_ML_PARENT_UNKNOWN};
         }
 
         const QStringView type = parts[0].trimmed();
         bool conversionSuccessful = false;
         std::int64_t item_id = parts[1].trimmed().toLongLong(&conversionSuccessful);
         if (!conversionSuccessful) {
-            return {-1, VLC_ML_PARENT_UNKNOWN};
+            return {INVALID_MLITEMID_ID, VLC_ML_PARENT_UNKNOWN};
         }
 
         return { item_id, ml_parent_map.value(type, VLC_ML_PARENT_UNKNOWN) };
