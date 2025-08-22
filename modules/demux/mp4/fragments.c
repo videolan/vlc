@@ -94,6 +94,11 @@ bool MP4_Fragments_Index_Lookup( mp4_fragments_index_t *p_index, stime_t *pi_tim
 }
 
 #ifdef MP4_VERBOSE
+int64_t movietime_to_ms(stime_t time, uint32_t i_movie_timescale)
+{
+    return INT64_C( 1000 ) * time / i_movie_timescale;
+}
+
 void MP4_Fragments_Index_Dump( vlc_object_t *p_obj, const mp4_fragments_index_t *p_index,
                                uint32_t i_movie_timescale )
 {
@@ -112,7 +117,7 @@ void MP4_Fragments_Index_Dump( vlc_object_t *p_obj, const mp4_fragments_index_t 
             char *psz_start = NULL;
             if( 0 < asprintf( &psz_start, "%s [%u]%"PRId64"ms ",
                       (psz_starts) ? psz_starts : "", j,
-                  INT64_C( 1000 ) * p_index->p_times[i * p_index->i_tracks + j] / i_movie_timescale ) )
+                  movietime_to_ms(p_index->p_times[i * p_index->i_tracks + j], i_movie_timescale) ) )
             {
                 free( psz_starts );
                 psz_starts = psz_start;
@@ -121,7 +126,7 @@ void MP4_Fragments_Index_Dump( vlc_object_t *p_obj, const mp4_fragments_index_t 
 
         msg_Dbg( p_obj, "fragment offset @%"PRId64" %"PRId64"ms, start %s",
                  p_index->pi_pos[i],
-                 INT64_C( 1000 ) * i_end / i_movie_timescale, psz_starts );
+                 movietime_to_ms( i_end, i_movie_timescale ), psz_starts );
 
         free( psz_starts );
     }
