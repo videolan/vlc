@@ -27,6 +27,7 @@
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
@@ -360,6 +361,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_close_window setTitle: _NS("Close Window")];
     [_convertandsave setTitle: _NS("Convert / Stream...")];
     [_save_playlist setTitle: _NS("Save Playlist...")];
+    [_savePlayqueueToLibrary setTitle: _NS("Save Play Queue to Library...")];
     [_revealInFinder setTitle: _NS("Reveal in Finder")];
 
     [_editMenu setTitle: _NS("Edit")];
@@ -1383,6 +1385,21 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     }
 }
 
+- (IBAction)savePlayQueueToLibrary:(id)sender
+{
+    // Check if there are items in the play queue
+    if (_playQueueController.playQueueModel.numberOfPlayQueueItems == 0) {
+        NSAlert * const alert = [[NSAlert alloc] init];
+        alert.messageText = _NS("Play Queue is Empty");
+        alert.informativeText = _NS("There are no items in the play queue to save.");
+        alert.alertStyle = NSAlertStyleWarning;
+        [alert runModal];
+        return;
+    }
+    
+    [VLCMain.sharedInstance.libraryController showCreatePlaylistDialogForPlayQueue];
+}
+
 - (IBAction)showConvertAndSave:(id)sender
 {
     [[VLCMain.sharedInstance convertAndSaveWindow] showWindow:self];
@@ -1900,6 +1917,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     if (mi == nil) {
         return YES;
+    } else if (mi == self.savePlayqueueToLibrary) {
+        return _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
     } else if (mi == self.play) {
         return _playerController.playerState == VLC_PLAYER_STATE_PLAYING
             ? _playerController.currentMedia != nil && _playerController.pausable

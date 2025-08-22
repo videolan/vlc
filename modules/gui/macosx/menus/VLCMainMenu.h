@@ -54,6 +54,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *close_window;
 @property (readwrite, weak) IBOutlet NSMenuItem *convertandsave;
 @property (readwrite, weak) IBOutlet NSMenuItem *save_playlist;
+@property (readwrite, weak) IBOutlet NSMenuItem *savePlayqueueToLibrary;
 @property (readwrite, weak) IBOutlet NSMenuItem *revealInFinder;
 
 @property (readwrite, weak) IBOutlet NSMenu *editMenu;
@@ -237,6 +238,7 @@
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
 - (IBAction)savePlaylist:(id)sender;
+- (IBAction)savePlayQueueToLibrary:(id)sender;
 
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;

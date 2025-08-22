@@ -111,6 +111,7 @@
                 <outlet property="rendererNoneItem" destination="eE8-qf-9x9" id="Ol2-yz-0eF"/>
                 <outlet property="repeat" destination="5143" id="ulG-wD-gtG"/>
                 <outlet property="revealInFinder" destination="3945" id="z7n-A2-K5o"/>
+                <outlet property="savePlayqueueToLibrary" destination="24V-9x-Aqt" id="fic-89-xZr"/>
                 <outlet property="save_playlist" destination="1599" id="spC-pk-6W4"/>
                 <outlet property="screen" destination="1016" id="VFv-ey-gJR"/>
                 <outlet property="screenMenu" destination="1015" id="l5t-0E-DfG"/>
@@ -333,6 +334,12 @@
                             <menuItem title="Save Playlist..." keyEquivalent="s" id="1599">
                                 <connections>
                                     <action selector="savePlaylist:" target="-2" id="iHV-3W-w6Z"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save Play Queue to Library..." keyEquivalent="s" id="24V-9x-Aqt">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="savePlayQueueToLibrary:" target="-2" id="UzJ-9r-vul"/>
                                 </connections>
                             </menuItem>
                         </items>
