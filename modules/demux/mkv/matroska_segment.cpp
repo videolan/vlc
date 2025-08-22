@@ -340,28 +340,8 @@ done:
 
 void matroska_segment_c::LoadTags( KaxTags *tags_ )
 {
-    /* Master elements */
-    if( unlikely( tags_->IsFiniteSize() && tags_->GetSize() >= SIZE_MAX ) )
-    {
-        msg_Err( &sys.demuxer, "Tags too big, aborting" );
+    if ( !ReadMaster( *tags_ ) )
         return;
-    }
-    try
-    {
-        EbmlElement *el;
-        int i_upper_level = 0;
-        tags_->Read( es, EBML_CONTEXT(tags_), i_upper_level, el, true );
-        if (i_upper_level != 0)
-        {
-            assert(el != nullptr);
-            delete el;
-        }
-    }
-    catch(...)
-    {
-        msg_Err( &sys.demuxer, "Couldn't read tags" );
-        return;
-    }
 
     struct TagsHandlerPayload
     {
@@ -1298,14 +1278,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
         E_CASE( KaxBlockAdditions, kadditions )
         {
-            EbmlElement *el;
-            int i_upper_level = 0;
-            try
+            if ( vars.obj->ReadMaster( kadditions ) )
             {
-                kadditions.Read( vars.obj->es, EBML_CONTEXT(&kadditions), i_upper_level, el, true );
                 vars.additions = &kadditions;
                 vars.ep->Keep ();
-            } catch (...) {}
+            }
         }
         E_CASE( KaxBlockDuration, kduration )
         {

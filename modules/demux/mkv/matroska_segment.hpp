@@ -160,6 +160,34 @@ public:
 
     bool SameFamily( const matroska_segment_c & of_segment ) const;
 
+    // read a whole EBML master element at once
+    bool ReadMaster(EbmlMaster & m, ScopeMode scope = SCOPE_ALL_DATA)
+    {
+        if( unlikely( m.IsFiniteSize() && m.GetSize() >= SIZE_MAX ) )
+        {
+            msg_Err( VLC_OBJECT(&sys.demuxer), "%s too big, aborting", EBML_NAME(&m) );
+            return false;
+        }
+        try
+        {
+            EbmlElement *el;
+            int i_upper_level = 0;
+            m.Read( es, EBML_CONTEXT(&m), i_upper_level, el, true, scope );
+            if (i_upper_level != 0)
+            {
+                assert(el != nullptr);
+                delete el;
+            }
+        }
+        catch(...)
+        {
+            msg_Err( VLC_OBJECT(&sys.demuxer), "Couldn't read %s", EBML_NAME(&m) );
+            return false;
+        }
+
+        return true;
+    }
+
 private:
     void LoadCues( KaxCues *cues );
     void LoadTags( KaxTags *tags );
