@@ -49,6 +49,11 @@
     return _playQueueArray.count;
 }
 
+- (NSArray<VLCPlayQueueItem *> *)playQueueItems
+{
+    return [_playQueueArray copy];
+}
+
 - (void)dropExistingData
 {
     [_playQueueArray removeAllObjects];
