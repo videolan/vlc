@@ -29,7 +29,7 @@
 
 @interface VLCPlayQueueModel ()
 {
-    NSMutableArray *_playQueueArray;
+    NSMutableArray<VLCPlayQueueItem *> *_playQueueArray;
 }
 @end
 
@@ -63,12 +63,12 @@
     return _playQueueArray[index];
 }
 
-- (void)addItems:(NSArray *)array
+- (void)addItems:(NSArray<VLCPlayQueueItem *> *)array
 {
     [_playQueueArray addObjectsFromArray:array];
 }
 
-- (void)addItems:(NSArray *)array atIndex:(size_t)index count:(size_t)count
+- (void)addItems:(NSArray<VLCPlayQueueItem *> *)array atIndex:(size_t)index count:(size_t)count
 {
     [_playQueueArray insertObjects:array atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)]];
 }
