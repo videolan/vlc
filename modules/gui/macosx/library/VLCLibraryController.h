@@ -27,6 +27,7 @@
 @class VLCInputItem;
 @class VLCLibraryModel;
 @class VLCMediaLibraryMediaItem;
+@class VLCPlayQueueItem;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,6 +48,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (int)reloadFolderWithFileURL:(NSURL *)fileURL;
 
 - (int)clearHistory;
+
+- (void)showCreatePlaylistDialogForPlayQueue;
+- (void)showCreatePlaylistDialogForPlayQueueItems:(NSArray<VLCPlayQueueItem *> *)items;
 
 /**
  * Sort the entire library representation based on:

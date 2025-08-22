@@ -26,6 +26,7 @@
 
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSMenu+VLCAdditions.h"
+#import "library/VLCLibraryController.h"
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayQueueModel.h"
@@ -209,38 +210,21 @@
 {
     NSIndexSet * const selectedIndexes = self.playQueueTableView.selectedRowIndexes;
     
-    // Show an input dialog to get the playlist name
-    NSAlert * const alert = [[NSAlert alloc] init];
-    alert.messageText = selectedIndexes.count > 0 ? _NS("Create Playlist from Selected Items") : _NS("Create Playlist from Queue");
-    alert.informativeText = _NS("Enter a name for the new playlist:");
-    [alert addButtonWithTitle:_NS("Create")];
-    [alert addButtonWithTitle:_NS("Cancel")];
-    
-    NSTextField * const input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
-    input.stringValue = _NS("New Playlist");
-    alert.accessoryView = input;
-    
-    const NSInteger response = [alert runModal];
-    if (response != NSAlertFirstButtonReturn) {
-        return;
+    NSArray<VLCPlayQueueItem *> *items = nil;
+    if (selectedIndexes.count > 0) {
+        NSMutableArray<VLCPlayQueueItem *> * const selectedItems = [NSMutableArray arrayWithCapacity:selectedIndexes.count];
+        [selectedIndexes enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const stop) {
+            VLCPlayQueueItem * const item = [_playQueueController.playQueueModel playQueueItemAtIndex:idx];
+            if (item) {
+                [selectedItems addObject:item];
+            }
+        }];
+        items = selectedItems.copy;
+    } else {
+        items = _playQueueController.playQueueModel.playQueueItems;
     }
     
-    NSString * const playlistName = input.stringValue;
-    if (playlistName.length == 0) {
-        return;
-    }
-    
-    const BOOL success = selectedIndexes.count > 0
-        ? [_playQueueController createPlaylistFromPlayQueueWithName:playlistName itemIndexes:selectedIndexes] 
-        : [_playQueueController createPlaylistFromPlayQueueWithName:playlistName];
-
-    if (!success) {
-        NSAlert * const errorAlert = [[NSAlert alloc] init];
-        errorAlert.messageText = _NS("Failed to Create Playlist");
-        errorAlert.informativeText = _NS("The playlist could not be created. Please check that the media library is available.");
-        errorAlert.alertStyle = NSAlertStyleWarning;
-        [errorAlert runModal];
-    }
+    [VLCMain.sharedInstance.libraryController showCreatePlaylistDialogForPlayQueueItems:items];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
