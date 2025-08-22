@@ -1172,10 +1172,8 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
  *****************************************************************************/
 void matroska_segment_c::ParseInfo( KaxInfo *info )
 {
-    EbmlMaster  *m;
+    EbmlMaster  *m = info;
 
-    /* Master elements */
-    m = static_cast<EbmlMaster *>(info);
     if( unlikely( m->IsFiniteSize() && m->GetSize() >= SIZE_MAX ) )
     {
         msg_Err( &sys.demuxer, "Info too big, aborting" );
