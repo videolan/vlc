@@ -20,6 +20,8 @@ libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz .sum-libmpeg2
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-arm-pld.patch
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-inline.patch
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-mc-neon.patch
+	sed -i.orig -e 's,libvo src test vc++,,' $(UNPACK_DIR)/Makefile.am
+	sed -i.orig -e 's,SUBDIRS,# SUBDIRS,' $(UNPACK_DIR)/libmpeg2/Makefile.am
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub .auto
 	$(MOVE)
 
@@ -29,6 +31,6 @@ LIBMPEG2_CONF := --without-x --disable-sdl
 	$(REQUIRE_GPL)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LIBMPEG2_CONF)
-	$(MAKE) -C $< -C libmpeg2 && $(MAKE) -C $< -C libmpeg2 install
-	$(MAKE) -C $< -C include && $(MAKE) -C $< -C include install
+	$(MAKE) -C $<
+	$(MAKE) -C $< install
 	touch $@
