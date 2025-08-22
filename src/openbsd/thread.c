@@ -25,22 +25,35 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <pthread_np.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_threads.h>
 #include <vlc_atomic.h>
 
+/* Returns the current thread ID */
 unsigned long vlc_thread_id(void)
 {
-     static _Thread_local pid_t tid = -1;
+    /* Use thread-local storage for caching the thread ID */
+    static _Thread_local pid_t tid = -1;
 
-     if (unlikely(tid == -1))
-         tid = getthrid();
+    if (unlikely(tid == -1))
+    {
+        tid = getthrid();
+        if (unlikely(tid == -1)) /* sanity check */
+            tid = 0; /* fallback ID */
+    }
 
-     return tid;
+    return (unsigned long)tid;
 }
 
-void (vlc_thread_set_name)(const char *name)
+/* Sets the current thread's name (safe wrapper) */
+void vlc_thread_set_name(const char *name)
 {
-    pthread_set_name_np(pthread_self(), name);
+    if (!name)
+        return;
+
+    int ret = pthread_set_name_np(pthread_self(), name);
+    if (unlikely(ret != 0))
+        msg_Warn(NULL, "Failed to set thread name: %s", strerror(ret));
 }
