@@ -421,7 +421,7 @@ static void ParsePES( demux_t *p_demux )
                  (ts_90khz_t)(hdr[10] << 22)|
                 ((ts_90khz_t)(hdr[11]&0xfe) << 14)|
                  (ts_90khz_t)(hdr[12] << 7)|
-                 (ts_90khz_t)(hdr[12] >> 1);
+                 (ts_90khz_t)(hdr[13] >> 1);
 
         if( hdr[7]&0x40 )    /* has dts */
         {
