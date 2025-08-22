@@ -94,8 +94,18 @@ bool MP4_Fragments_Index_Lookup( mp4_fragments_index_t *p_index, stime_t *pi_tim
 }
 
 #ifdef MP4_VERBOSE
-int64_t movietime_to_ms(stime_t time, uint32_t i_movie_timescale)
+static inline int64_t movietime_to_ms(stime_t time, uint32_t i_movie_timescale)
 {
+    if( i_movie_timescale == INT64_C( 1000 ) )
+        return time;
+
+    if( time <= INT64_MAX / INT64_C( 1000 ) )
+        return time * INT64_C( 1000 ) / i_movie_timescale;
+
+    /* overflow */
+    int64_t q = time / i_movie_timescale;
+    int64_t r = time % i_movie_timescale;
+    return q * INT64_C( 1000 ) + r * INT64_C( 1000 ) / i_movie_timescale;
     return INT64_C( 1000 ) * time / i_movie_timescale;
 }
 
