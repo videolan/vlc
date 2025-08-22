@@ -1302,7 +1302,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             int i_upper_level = 0;
             try
             {
-                kadditions.Read( vars.obj->es, EBML_CONTEXT(&kadditions), i_upper_level, el, false );
+                kadditions.Read( vars.obj->es, EBML_CONTEXT(&kadditions), i_upper_level, el, true );
                 vars.additions = &kadditions;
                 vars.ep->Keep ();
             } catch (...) {}
