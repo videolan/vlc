@@ -1002,11 +1002,9 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
     struct InfoHandlerPayload {
         demux_t            * p_demuxer;
         matroska_segment_c * obj;
-        EbmlElement       *&  el;
         EbmlMaster        *&   m;
-        int& i_upper_level;
 
-    } captures = { &sys.demuxer, this, el, m, i_upper_level };
+    } captures = { &sys.demuxer, this, m };
 
     MKV_SWITCH_CREATE(EbmlTypeDispatcher, InfoHandlers, InfoHandlerPayload)
     {
@@ -1120,7 +1118,9 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                     return;
                 }
 
-                trans.Read( vars.obj->es, EBML_CONTEXT(&trans), vars.i_upper_level, vars.el, true );
+                EbmlElement *el;
+                int i_upper_level = 0;
+                trans.Read( vars.obj->es, EBML_CONTEXT(&trans), i_upper_level, el, true );
 
                 chapter_translation_c *p_translate = new chapter_translation_c();
 
