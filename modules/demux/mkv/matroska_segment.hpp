@@ -156,6 +156,9 @@ public:
 
     bool SameFamily( const matroska_segment_c & of_segment ) const;
 
+    // read a whole EBML master element at once
+    bool ReadMaster(EbmlMaster & m, ScopeMode scope = SCOPE_ALL_DATA);
+
 private:
     void LoadCues( KaxCues *cues );
     void LoadTags( KaxTags *tags );

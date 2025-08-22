@@ -1294,14 +1294,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
         E_CASE( KaxBlockAdditions, kadditions )
         {
-            EbmlElement *el;
-            int i_upper_level = 0;
-            try
+            if ( vars.obj->ReadMaster( kadditions ) )
             {
-                kadditions.Read( vars.obj->es, EBML_CONTEXT(&kadditions), i_upper_level, el, true );
                 vars.additions = &kadditions;
                 vars.ep->Keep ();
-            } catch (...) {}
+            }
         }
         E_CASE( KaxBlockDuration, kduration )
         {
@@ -1465,4 +1462,31 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             pp_block = NULL;
         }
     }
+}
+
+bool matroska_segment_c::ReadMaster(EbmlMaster & m, ScopeMode scope)
+{
+    if( unlikely( m.IsFiniteSize() && m.GetSize() >= SIZE_MAX ) )
+    {
+        msg_Err( VLC_OBJECT(&sys.demuxer), "%s too big, aborting", EBML_NAME(&m) );
+        return false;
+    }
+    try
+    {
+        EbmlElement *el;
+        int i_upper_level = 0;
+        m.Read( es, EBML_CONTEXT(&m), i_upper_level, el, true, scope );
+        if (i_upper_level != 0)
+        {
+            assert(el != nullptr);
+            delete el;
+        }
+    }
+    catch(...)
+    {
+        msg_Err( VLC_OBJECT(&sys.demuxer), "Couldn't read %s", EBML_NAME(&m) );
+        return false;
+    }
+
+    return true;
 }
