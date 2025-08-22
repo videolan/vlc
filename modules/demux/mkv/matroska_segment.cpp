@@ -351,6 +351,11 @@ void matroska_segment_c::LoadTags( KaxTags *tags_ )
         EbmlElement *el;
         int i_upper_level = 0;
         tags_->Read( es, EBML_CONTEXT(tags_), i_upper_level, el, true );
+        if (i_upper_level != 0)
+        {
+            assert(el != nullptr);
+            delete el;
+        }
     }
     catch(...)
     {

@@ -1113,9 +1113,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
  *****************************************************************************/
 void matroska_segment_c::ParseTracks( KaxTracks *tracks )
 {
-    EbmlElement *el;
-    int i_upper_level = 0;
-
     /* Master elements */
     if( unlikely( tracks->IsFiniteSize() && tracks->GetSize() >= SIZE_MAX ) )
     {
@@ -1124,7 +1121,14 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
     }
     try
     {
+        EbmlElement *el;
+        int i_upper_level = 0;
         tracks->Read( es, EBML_CONTEXT(tracks), i_upper_level, el, true );
+        if (i_upper_level != 0)
+        {
+            assert(el != nullptr);
+            delete el;
+        }
     }
     catch(...)
     {
@@ -1168,9 +1172,7 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
  *****************************************************************************/
 void matroska_segment_c::ParseInfo( KaxInfo *info )
 {
-    EbmlElement *el;
     EbmlMaster  *m;
-    int i_upper_level = 0;
 
     /* Master elements */
     m = static_cast<EbmlMaster *>(info);
@@ -1181,7 +1183,14 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
     }
     try
     {
+        EbmlElement *el;
+        int i_upper_level = 0;
         m->Read( es, EBML_CONTEXT(info), i_upper_level, el, true );
+        if (i_upper_level != 0)
+        {
+            assert(el != nullptr);
+            delete el;
+        }
     }
     catch(...)
     {
@@ -1312,6 +1321,11 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 EbmlElement *el;
                 int i_upper_level = 0;
                 trans.Read( vars.obj->es, EBML_CONTEXT(&trans), i_upper_level, el, true );
+                if (i_upper_level != 0)
+                {
+                    assert(el != nullptr);
+                    delete el;
+                }
 
                 chapter_translation_c *p_translate = new chapter_translation_c();
 
@@ -1512,9 +1526,6 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
  *****************************************************************************/
 void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
 {
-    EbmlElement *el;
-    int i_upper_level = 0;
-
     if( unlikely( attachments->IsFiniteSize() && attachments->GetSize() >= SIZE_MAX ) )
     {
         msg_Err( &sys.demuxer, "Attachments too big, aborting" );
@@ -1522,7 +1533,14 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
     }
     try
     {
+        EbmlElement *el;
+        int i_upper_level = 0;
         attachments->Read( es, EBML_CONTEXT(attachments), i_upper_level, el, true );
+        if (i_upper_level != 0)
+        {
+            assert(el != nullptr);
+            delete el;
+        }
     }
     catch(...)
     {
@@ -1585,6 +1603,11 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
         EbmlElement *el;
         int i_upper_level = 0;
         chapters->Read( es, EBML_CONTEXT(chapters), i_upper_level, el, true );
+        if (i_upper_level != 0)
+        {
+            assert(el != nullptr);
+            delete el;
+        }
     }
     catch(...)
     {
@@ -1675,6 +1698,11 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
         int i_upper_level = 0;
 
         cluster->Read( es, EBML_CONTEXT(cluster), i_upper_level, el, true, read_fully );
+        if (i_upper_level != 0)
+        {
+            assert(el != nullptr);
+            delete el;
+        }
     }
     catch(...)
     {
