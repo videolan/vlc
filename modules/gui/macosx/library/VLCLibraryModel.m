@@ -790,14 +790,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
     if (p_media->i_type == VLC_ML_MEDIA_TYPE_AUDIO || p_media->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN) {
         [self resetCachedListOfAudioMedia];
-
-        if (p_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
-            [self resetCachedListOfShows];
-        }
     }
 
     if (p_media->i_type == VLC_ML_MEDIA_TYPE_VIDEO || p_media->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN) {
         [self resetCachedListOfVideoMedia];
+
+        if (p_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
+            [self resetCachedListOfShows];
+        }
     }
 }
 
