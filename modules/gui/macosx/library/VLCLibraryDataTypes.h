@@ -214,6 +214,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @interface VLCMediaLibraryShow : VLCAbstractMediaLibraryItem<VLCMediaLibraryItemProtocol>
 
++ (nullable instancetype)showWithLibraryId:(int64_t)libraryId;
 - (instancetype)initWithShow:(struct vlc_ml_show_t *)p_show;
 
 @property (readonly) NSString *name;

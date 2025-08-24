@@ -1671,6 +1671,19 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @synthesize episodes = _episodes;
 
++ (nullable instancetype)showWithLibraryId:(const int64_t)libraryId
+{
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (p_mediaLibrary == NULL) {
+        return nil;
+    }
+    vlc_ml_show_t * const p_show = vlc_ml_get_show(p_mediaLibrary, libraryId);
+    if (p_show == NULL) {
+        return nil;
+    }
+    return [[VLCMediaLibraryShow alloc] initWithShow:p_show];
+}
+
 - (instancetype)initWithShow:(struct vlc_ml_show_t *)p_show
 {
     self = [super init];
