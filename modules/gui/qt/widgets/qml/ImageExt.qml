@@ -118,8 +118,13 @@ Item {
     fillMode: Image.PreserveAspectFit
 
     property real radius
+    property real radiusTopRight: radius
+    property real radiusTopLeft: radius
+    property real radiusBottomRight: radius
+    property real radiusBottomLeft: radius
+
     property alias backgroundColor: shaderEffect.backgroundColor
-    readonly property real effectiveRadius: shaderEffect.readyForVisibility ? radius : 0.0
+    readonly property real effectiveRadius: shaderEffect.readyForVisibility ? Math.max(radiusTopRight, radiusTopLeft, radiusBottomRight, radiusBottomLeft) : 0.0
     readonly property color effectiveBackgroundColor: shaderEffect.readyForVisibility ? backgroundColor : "transparent"
 
     // Border:
@@ -166,11 +171,14 @@ Item {
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
-        readonly property real radius: Math.min(1.0, Math.max(root.radius / (Math.min(width, height) / 2), 0.0))
-        readonly property real radiusTopRight: radius
-        readonly property real radiusBottomRight: radius
-        readonly property real radiusTopLeft: radius
-        readonly property real radiusBottomLeft: radius
+        function normalizeRadius(radius: real) : real {
+            return Math.min(1.0, Math.max(radius / (Math.min(width, height) / 2), 0.0))
+        }
+
+        readonly property real radiusTopRight: normalizeRadius(root.radiusTopRight)
+        readonly property real radiusBottomRight: normalizeRadius(root.radiusBottomRight)
+        readonly property real radiusTopLeft: normalizeRadius(root.radiusTopLeft)
+        readonly property real radiusBottomLeft: normalizeRadius(root.radiusBottomLeft)
 
         property color backgroundColor: "transparent"
 
