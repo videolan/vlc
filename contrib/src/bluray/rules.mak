@@ -1,7 +1,7 @@
 # LIBBLURAY
 
-BLURAY_VERSION := 1.3.4
-BLURAY_URL := $(VIDEOLAN)/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.bz2
+BLURAY_VERSION := 1.4.0
+BLURAY_URL := $(VIDEOLAN)/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.xz
 
 ifdef BUILD_DISCS
 PKGS += bluray
@@ -26,33 +26,32 @@ endif
 
 DEPS_bluray = libxml2 $(DEPS_libxml2) freetype2 $(DEPS_freetype2)
 
-BLURAY_CONF = --disable-examples  \
-              --with-libxml2
+BLURAY_CONF = -Dfreetype=enabled -Dlibxml2=enabled
+ifdef HAVE_CROSS_COMPILE
+BLURAY_CONF += -Denable_tools=false
+endif
 
 ifneq ($(WITH_FONTCONFIG), 0)
 DEPS_bluray += fontconfig $(DEPS_fontconfig)
+BLURAY_CONF += -Dfontconfig=enabled
+
 else
-BLURAY_CONF += --without-fontconfig
+BLURAY_CONF += -Dfontconfig=disabled
 endif
 
-ifndef WITH_OPTIMIZATION
-BLURAY_CONF += --disable-optimizations
-endif
-
-$(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:
+$(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.xz:
 	$(call download,$(BLURAY_URL))
 
-.sum-bluray: libbluray-$(BLURAY_VERSION).tar.bz2
+.sum-bluray: libbluray-$(BLURAY_VERSION).tar.xz
 
-bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
+bluray: libbluray-$(BLURAY_VERSION).tar.xz .sum-bluray
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
-	$(call pkg_static,"src/libbluray.pc.in")
+	$(APPLY) $(SRC)/bluray/0001-Link-with-gdi32-when-using-freetype-in-Windows.patch
 	$(MOVE)
 
-.bluray: bluray
+.bluray: bluray crossfile.meson
 	rm -rf $(PREFIX)/share/java/libbluray*.jar
-	cd $< && ./bootstrap
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(BLURAY_CONF)
-	$(MAKE) -C $< install
+	$(MESONCLEAN)
+	$(MESON) $(BLURAY_CONF)
+	+$(MESONBUILD)
 	touch $@
