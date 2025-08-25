@@ -140,6 +140,10 @@
 - (IBAction)goToBookmark:(id)sender
 {
     const NSInteger selectedRow = [_dataTable selectedRow];
+    if (selectedRow < 0) {
+        return;
+    }
+
     VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
     vlc_tick_t bookmarkTime = VLC_TICK_FROM_MS(bookmark.bookmarkTime);
 
@@ -150,6 +154,10 @@
 - (IBAction)remove:(id)sender
 {
     const NSInteger selectedRow = [_dataTable selectedRow];
+    if (selectedRow < 0) {
+        return;
+    }
+
     VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
     [_tableViewDataSource removeBookmark:bookmark];
 }
