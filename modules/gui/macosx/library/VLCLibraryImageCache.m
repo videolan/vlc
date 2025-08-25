@@ -140,26 +140,31 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
                    withCompletion:(void(^)(const NSImage *))completionHandler
 {
     NSURL * const artworkURL = inputItem.artworkURL;
-    NSImage * const image = [[NSImage alloc] initWithContentsOfURL:artworkURL];
     const NSSize imageSize = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
-
-    if (image) {
-        image.size = imageSize;
-        [_imageCache setObject:image forKey:inputItem.MRL];
-        completionHandler(image);
-    } else {
-        [inputItem thumbnailWithSize:imageSize completionHandler:^(NSImage * const image) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (image) {
-                    [_imageCache setObject:image forKey:inputItem.MRL];
-                    completionHandler(image);
-                } else {
-                    NSLog(@"Failed to generate thumbnail for input item %@", inputItem.MRL);
-                    completionHandler([NSImage imageNamed:@"noart.png"]);
-                }
-            });
-        }];
-    }
+    
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        NSImage * image = [[NSImage alloc] initWithContentsOfURL:artworkURL];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (image) {
+                image.size = imageSize;
+                [self->_imageCache setObject:image forKey:inputItem.MRL];
+                completionHandler(image);
+            } else {
+                [inputItem thumbnailWithSize:imageSize completionHandler:^(NSImage * const image) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (image) {
+                            [self->_imageCache setObject:image forKey:inputItem.MRL];
+                            completionHandler(image);
+                        } else {
+                            NSLog(@"Failed to generate thumbnail for input item %@", inputItem.MRL);
+                            completionHandler([NSImage imageNamed:@"noart.png"]);
+                        }
+                    });
+                }];
+            }
+        });
+    });
 }
 
 + (void)thumbnailForPlayQueueItem:(VLCPlayQueueItem *)playQueueItem
