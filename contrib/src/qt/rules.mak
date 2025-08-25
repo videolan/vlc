@@ -57,7 +57,7 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(MOVE)
 
 ifdef HAVE_WIN32
-QTBASE_CONFIG += -DFEATURE_freetype=OFF -DFEATURE_directwrite=ON -DFEATURE_directwrite3=ON
+QTBASE_CONFIG += -DFEATURE_directwrite=ON -DFEATURE_directwrite3=ON
 else
 QTBASE_CONFIG += -DFEATURE_freetype=ON -DFEATURE_system_freetype=ON
 endif
