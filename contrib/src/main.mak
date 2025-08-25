@@ -21,7 +21,7 @@ QTBASE_VERSION_MAJOR := 6.8
 QTBASE_VERSION := $(QTBASE_VERSION_MAJOR).3
 
 # Common download locations
-GNU ?= https://ftp.gnu.org/gnu
+GNU ?= https://ftpmirror.gnu.org/gnu
 SF := https://downloads.sourceforge.net/project
 VIDEOLAN := https://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := https://downloads.videolan.org/pub/contrib
