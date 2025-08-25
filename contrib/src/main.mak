@@ -18,7 +18,7 @@ DATE := $(shell date +%Y%m%d)
 VPATH := $(TARBALLS)
 
 # Common download locations
-GNU ?= http://ftp.gnu.org/gnu
+GNU ?= http://ftpmirror.gnu.org/gnu
 SF := https://netcologne.dl.sourceforge.net/
 VIDEOLAN := http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
