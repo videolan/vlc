@@ -235,7 +235,6 @@ void QSGTextureViewProvider::setMipmapFiltering(QSGTexture::Filtering filter)
         if (targetTexture && !targetTexture->hasMipmaps())
         {
             // Having mip map filtering when there are no mip maps may be problematic with certain graphics backends (like OpenGL).
-            qWarning() << this << "Enabling mip map filtering is blocked if the target texture has no mip maps.";
             return;
         }
     }

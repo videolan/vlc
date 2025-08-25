@@ -139,7 +139,8 @@ private:
     std::atomic<QSGTexture::WrapMode> m_horizontalWrapMode = QSGTexture::ClampToEdge;
     std::atomic<QSGTexture::WrapMode> m_verticalWrapMode = QSGTexture::ClampToEdge;
     // When there are mip maps, no mip map filtering should be fine (unlike no mip maps with mip map filtering):
-    std::atomic<QSGTexture::Filtering> m_mipmapFiltering = QSGTexture::None;
+    // But we want to have mip map filtering by default if the texture has mip maps (if not, it won't be respected):
+    std::atomic<QSGTexture::Filtering> m_mipmapFiltering = QSGTexture::Linear;
 };
 
 #endif // TEXTUREPROVIDERITEM_HPP
