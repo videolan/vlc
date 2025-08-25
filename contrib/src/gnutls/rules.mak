@@ -1,7 +1,7 @@
 # GnuTLS
 
 GNUTLS_MAJVERSION := 3.8
-GNUTLS_VERSION := $(GNUTLS_MAJVERSION).3
+GNUTLS_VERSION := $(GNUTLS_MAJVERSION).10
 GNUTLS_URL := $(GNUGPG)/gnutls/v$(GNUTLS_MAJVERSION)/gnutls-$(GNUTLS_VERSION).tar.xz
 
 # nettle/gmp can't be used with the LGPLv2 license
