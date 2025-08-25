@@ -56,6 +56,7 @@ extern NSString * const VLCLibraryModelArtistDeleted;
 extern NSString * const VLCLibraryModelGenreDeleted;
 extern NSString * const VLCLibraryModelGroupDeleted;
 extern NSString * const VLCLibraryModelPlaylistDeleted;
+extern NSString * const VLCLibraryModelShowDeleted;
 
 extern NSString * const VLCLibraryModelAudioMediaItemUpdated;
 extern NSString * const VLCLibraryModelVideoMediaItemUpdated;
@@ -66,6 +67,7 @@ extern NSString * const VLCLibraryModelArtistUpdated;
 extern NSString * const VLCLibraryModelGenreUpdated;
 extern NSString * const VLCLibraryModelGroupUpdated;
 extern NSString * const VLCLibraryModelPlaylistUpdated;
+extern NSString * const VLCLibraryModelShowUpdated;
 
 extern NSString * const VLCLibraryModelDiscoveryStarted;
 extern NSString * const VLCLibraryModelDiscoveryProgress;
