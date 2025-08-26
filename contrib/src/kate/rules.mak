@@ -1,7 +1,7 @@
 # Kate
 
-KATE_VERSION := 0.4.1
-KATE_URL := $(GOOGLE_CODE)/libkate/libkate-$(KATE_VERSION).tar.gz
+KATE_VERSION := 0.4.3
+KATE_URL := $(XIPH)/kate/libkate-$(KATE_VERSION).tar.gz
 
 PKGS += kate
 ifeq ($(call need_pkg,"kate >= 0.1.5"),)
