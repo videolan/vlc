@@ -340,7 +340,7 @@ MP4_Box_t * MP4_BoxExtract( MP4_Box_t **pp_chain, uint32_t i_type )
  *****************************************************************************/
 static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int      i_read;
+    ssize_t i_read;
     const uint8_t  *p_peek;
 
     if( ( ( i_read = vlc_stream_Peek( p_stream, &p_peek, 32 ) ) < 8 ) )
