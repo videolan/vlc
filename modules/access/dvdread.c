@@ -1713,6 +1713,12 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
 
         t = vlc_input_title_New();
 
+#ifdef DVDREAD_HAS_DVDAUDIO
+        if ( type == DVD_A )
+            t->i_length = FROM_SCALE_NZ( p_sys->p_vmg_file->
+                                        info_table_second_sector->tracks_info[i].len_audio_zone_pts );
+#endif
+
         for( j = 0; j < __MAX( i_chapters, 1 ); j++ )
         {
             s = vlc_seekpoint_New();
