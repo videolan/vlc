@@ -1479,7 +1479,7 @@ static int MP4_ReadBox_vmhd( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"vmhd\" graphics-mode %d opcolor (%d, %d, %d)",
+    msg_Dbg( p_stream, "read box: \"vmhd\" graphics-mode %" PRIu16 " opcolor (%" PRIu16 ", %" PRIu16 ", %" PRIu16 ")",
                       p_box->data.p_vmhd->i_graphics_mode,
                       p_box->data.p_vmhd->i_opcolor[0],
                       p_box->data.p_vmhd->i_opcolor[1],

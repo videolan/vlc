@@ -620,8 +620,8 @@ typedef struct MP4_Box_data_vmhd_s
     uint8_t  i_version;
     uint32_t i_flags;
 
-    int16_t  i_graphics_mode;
-    int16_t  i_opcolor[3];
+    uint16_t i_graphics_mode;
+    uint16_t i_opcolor[3];
 
 } MP4_Box_data_vmhd_t;
 
