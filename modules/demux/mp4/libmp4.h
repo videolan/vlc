@@ -1023,9 +1023,9 @@ typedef struct MP4_descriptor_decoder_config_s
     uint8_t i_objectProfileIndication;
     uint8_t i_streamType;
     int     b_upStream;
-    int     i_buffer_sizeDB;
-    int     i_max_bitrate;
-    int     i_avg_bitrate;
+    uint32_t i_buffer_sizeDB;
+    uint32_t i_max_bitrate;
+    uint32_t i_avg_bitrate;
 
     int     i_decoder_specific_info_len;
     uint8_t *p_decoder_specific_info;
