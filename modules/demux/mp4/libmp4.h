@@ -806,7 +806,7 @@ typedef struct
     uint32_t i_horizresolution;
     uint32_t i_vertresolution;
 
-    uint32_t i_qt_data_size;
+    uint32_t reserved;
     uint16_t i_qt_frame_count;
 
     char     sz_compressorname[32];
