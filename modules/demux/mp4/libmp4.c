@@ -4731,8 +4731,7 @@ static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
 static int MP4_ReadBox_iinf( stream_t *p_stream, MP4_Box_t *p_box )
 {
     const uint8_t *p_versionpeek;
-    size_t i_peek = vlc_stream_Peek( p_stream, &p_versionpeek, 9 );
-    if( i_peek < 9 )
+    if( vlc_stream_Peek( p_stream, &p_versionpeek, 9 ) < 9 )
         return 0;
 
     size_t i_header = 12 + (( p_versionpeek[8] == 0 ) ? 2 : 4);
