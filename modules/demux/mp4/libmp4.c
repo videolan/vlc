@@ -101,6 +101,17 @@ static char * MP4_Time2Str( stime_t i_duration, uint32_t i_scale )
     MP4_GET1BYTE( p_void->i_version ); \
     MP4_GET3BYTES( p_void->i_flags )
 
+#define READ_SAMPLE_DESC_COMMON_8BYTES_HEADER \
+    do\
+    {\
+        if( i_read < 8 )\
+            MP4_READBOX_EXIT( 0 );\
+        for( unsigned i = 0; i < 6 ; i++ )\
+            MP4_GET1BYTE( p_box->data.p_sample_gen->i_reserved1[i] );\
+        MP4_GET2BYTES( p_box->data.p_sample_gen->i_data_reference_index );\
+    } while(0)
+
+
 static char *mp4_getstringz( uint8_t **restrict in, uint64_t *restrict size )
 {
     assert( *size <= SSIZE_MAX );

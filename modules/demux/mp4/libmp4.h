@@ -745,16 +745,6 @@ typedef struct
     uint8_t  i_reserved1[6];\
     uint16_t i_data_reference_index
 
-#define READ_SAMPLE_DESC_COMMON_8BYTES_HEADER \
-    do\
-    {\
-        if( i_read < 8 )\
-            MP4_READBOX_EXIT( 0 );\
-        for( unsigned i = 0; i < 6 ; i++ )\
-            MP4_GET1BYTE( p_box->data.p_sample_gen->i_reserved1[i] );\
-        MP4_GET2BYTES( p_box->data.p_sample_gen->i_data_reference_index );\
-    } while(0)
-
 typedef struct
 {
     SAMPLE_DESC_COMMON_HEADER;
