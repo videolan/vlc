@@ -564,7 +564,7 @@ typedef struct MP4_Box_data_tkhd_s
 
     uint32_t i_reserved2[2];
     int16_t  i_layer;
-    int16_t  i_predefined;
+    int16_t  i_alternate_group;
 
     int16_t  i_volume;
     uint16_t i_reserved3;

@@ -1285,7 +1285,7 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
         MP4_GET4BYTES( p_box->data.p_tkhd->i_reserved2[i] );
     }
     MP4_GET2BYTES( p_box->data.p_tkhd->i_layer );
-    MP4_GET2BYTES( p_box->data.p_tkhd->i_predefined );
+    MP4_GET2BYTES( p_box->data.p_tkhd->i_alternate_group );
     MP4_GET2BYTES( p_box->data.p_tkhd->i_volume );
     MP4_GET2BYTES( p_box->data.p_tkhd->i_reserved3 );
 
