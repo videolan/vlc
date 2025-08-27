@@ -569,8 +569,8 @@ typedef struct MP4_Box_data_tkhd_s
     int16_t  i_volume;
     uint16_t i_reserved3;
     int32_t  i_matrix[9];
-    int32_t  i_width;
-    int32_t  i_height;
+    uint32_t i_width;
+    uint32_t i_height;
     float    f_rotation;
     int      i_flip;
 
