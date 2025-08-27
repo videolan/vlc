@@ -1422,7 +1422,7 @@ typedef struct
         uint8_t i_acmod;
         uint8_t i_lfeon;
         uint8_t i_num_dep_sub;
-        uint16_t i_chan_loc;
+        uint8_t i_chan_loc;
     } stream[8];
 
 } MP4_Box_data_dec3_t;
