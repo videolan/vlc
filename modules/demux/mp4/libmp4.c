@@ -86,6 +86,20 @@ static char * MP4_Time2Str( stime_t i_duration, uint32_t i_scale )
         } \
     } while(0)
 
+#define MP4_SKIPBYTES(size) \
+    do \
+    { \
+        if( (i_read) >= (size) ) \
+        { \
+            p_peek += (size); \
+            i_read -= (size); \
+        } \
+        else \
+        { \
+            i_read = 0; \
+        } \
+    } while(0)
+
 #define MP4_GET1BYTE( dst )  MP4_GETX_PRIVATE( dst, *p_peek, 1 )
 #define MP4_GET2BYTES( dst ) MP4_GETX_PRIVATE( dst, GetWBE(p_peek), 2 )
 #define MP4_GET3BYTES( dst ) MP4_GETX_PRIVATE( dst, Get24bBE(p_peek), 3 )
