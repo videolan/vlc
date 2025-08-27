@@ -3675,10 +3675,7 @@ static int MP4_ReadBox_rdrf( stream_t *p_stream, MP4_Box_t *p_box )
         if( p_box->data.p_rdrf->psz_ref == NULL )
             MP4_READBOX_EXIT( 0 );
 
-        for( unsigned i = 0; i < i_len; i++ )
-        {
-            MP4_GET1BYTE( p_box->data.p_rdrf->psz_ref[i] );
-        }
+        MP4_COPY_BYTES( p_box->data.p_rdrf->psz_ref, i_len );
         p_box->data.p_rdrf->psz_ref[i_len] = '\0';
     }
     else
