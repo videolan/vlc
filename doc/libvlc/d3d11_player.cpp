@@ -693,6 +693,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
     libvlc_media_t *p_media;
     (void)hPrevInstance;
 
+    if (strlen(lpCmdLine) == 0)
+    {
+        printf("Usage: d3d11_player.exe <video_file_path>\nNo file path provided.\n");
+        return 1;
+    }
+
     /* remove "" around the given path */
     if (lpCmdLine[0] == '"')
     {
@@ -754,6 +760,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
                                        &Context );
 
     libvlc_media_player_play( Context.p_mp );
+
+    printf("Available interactions:\n");
+    printf("  - Press 'a' key to cycle through aspect ratios\n");
+    printf("  - Left mouse click to toggle play/pause\n\n");
 
     MSG msg;
 
