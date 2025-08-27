@@ -1239,7 +1239,7 @@ typedef struct MP4_Box_data_tfdt_s
 {
     uint8_t  i_version;
     uint32_t i_flags;
-    int64_t  i_base_media_decode_time;
+    uint64_t i_base_media_decode_time;
 
 } MP4_Box_data_tfdt_t;
 
