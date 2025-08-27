@@ -79,10 +79,10 @@
 
 #ifdef DVDREAD_HAS_DVDAUDIO
 #define SET_AREA( p_demux, title, chapter, angle  ) \
-    (((type) == DVD_A ? DvdAudioReadSetArea : DvdReadSetArea)( p_demux, title, 0, -1 ))
+    (((type) == DVD_A ? DvdAudioReadSetArea : DvdReadSetArea)( p_demux, title, chapter, -1 ))
 #else
 #define SET_AREA( p_demux, title, chapter, angle ) \
-    (DvdReadSetArea( p_demux, title, 0, -1 ))
+    (DvdReadSetArea( p_demux, title, chapter, -1 ))
 #endif
 
 /*local prototype*/
