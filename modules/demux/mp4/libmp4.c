@@ -986,9 +986,7 @@ static int MP4_ReadBox_st3d( stream_t *p_stream, MP4_Box_t *p_box )
     if ( i_version != 0 )
         MP4_READBOX_EXIT( 0 );
 
-    uint32_t i_flags;
-    VLC_UNUSED( i_flags );
-    MP4_GET3BYTES( i_flags );
+    MP4_SKIPBYTES( 3 ); // flags
 
     MP4_Box_data_st3d_t *p_data = p_box->data.p_st3d;
     MP4_GET1BYTE( p_data->i_stereo_mode );
@@ -1005,9 +1003,7 @@ static int MP4_ReadBox_prhd( stream_t *p_stream, MP4_Box_t *p_box )
     if (i_version != 0)
         MP4_READBOX_EXIT( 0 );
 
-    uint32_t i_flags;
-    VLC_UNUSED( i_flags );
-    MP4_GET3BYTES( i_flags );
+    MP4_SKIPBYTES( 3 ); // flags
 
     MP4_Box_data_prhd_t *p_data = p_box->data.p_prhd;
     int32_t fixed16_16;
@@ -1032,9 +1028,7 @@ static int MP4_ReadBox_equi( stream_t *p_stream, MP4_Box_t *p_box )
     if (i_version != 0)
         MP4_READBOX_EXIT( 0 );
 
-    uint32_t i_flags;
-    VLC_UNUSED( i_flags );
-    MP4_GET3BYTES( i_flags );
+    MP4_SKIPBYTES( 3 ); // flags
 
     MP4_Box_data_equi_t *p_data = p_box->data.p_equi;
     MP4_GET4BYTES( p_data->i_projection_bounds_top );
@@ -1054,9 +1048,7 @@ static int MP4_ReadBox_cbmp( stream_t *p_stream, MP4_Box_t *p_box )
     if (i_version != 0)
         MP4_READBOX_EXIT( 0 );
 
-    uint32_t i_flags;
-    VLC_UNUSED( i_flags );
-    MP4_GET3BYTES( i_flags );
+    MP4_SKIPBYTES( 3 ); // flags
 
     MP4_Box_data_cbmp_t *p_data = p_box->data.p_cbmp;
     MP4_GET4BYTES( p_data->i_layout );
@@ -1731,10 +1723,9 @@ static int MP4_ReadBox_cslg( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_cslg_t, NULL );
 
-    unsigned i_version, i_flags;
+    uint8_t i_version;
     MP4_GET1BYTE( i_version );
-    MP4_GET3BYTES( i_flags );
-    VLC_UNUSED(i_flags);
+    MP4_SKIPBYTES( 3 ); // flags
 
     if( i_version > 1 )
         MP4_READBOX_EXIT( 0 );
@@ -2009,9 +2000,7 @@ static int MP4_ReadBox_vpcC( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
 
     /* Skip flags */
-    uint32_t i_flags;
-    MP4_GET3BYTES( i_flags );
-    VLC_UNUSED( i_flags );
+    MP4_SKIPBYTES( 3 ); // flags
 
     MP4_GET1BYTE( p_vpcC->i_profile );
     MP4_GET1BYTE( p_vpcC->i_level );
@@ -2063,10 +2052,8 @@ static int MP4_ReadBox_SmDm( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->i_type != ATOM_mdcv )
     {
         uint8_t i_version;
-        uint32_t i_flags;
         MP4_GET1BYTE( i_version );
-        MP4_GET3BYTES( i_flags );
-        VLC_UNUSED(i_flags);
+        MP4_SKIPBYTES( 3 ); // flags
         if( i_version != 0 )
             MP4_READBOX_EXIT( 0 );
     }
@@ -2111,10 +2098,8 @@ static int MP4_ReadBox_CoLL( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->i_type != ATOM_clli )
     {
         uint8_t i_version;
-        uint32_t i_flags;
         MP4_GET1BYTE( i_version );
-        MP4_GET3BYTES( i_flags );
-        VLC_UNUSED(i_flags);
+        MP4_SKIPBYTES( 3 ); // flags
         if( i_version != 0 )
             MP4_READBOX_EXIT( 0 );
     }
@@ -2466,9 +2451,7 @@ static int MP4_ReadBox_stsdext_srat( stream_t *p_stream, MP4_Box_t *p_box )
     if ( i_read != 8 )
         MP4_READBOX_EXIT( 0 );
 
-    uint32_t i_dummy;
-    VLC_UNUSED( i_dummy );
-    MP4_GET4BYTES( i_dummy ); /* version flags */
+    MP4_SKIPBYTES( 4 ); /* version flags */
     MP4_GET4BYTES( p_srat->i_sample_rate );
 
     MP4_READBOX_EXIT( 1 );
@@ -3428,9 +3411,8 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_Box_data_elst_t *p_elst = p_box->data.p_elst;
 
     uint8_t i_version;
-    uint32_t dummy;
     MP4_GET1BYTE( i_version );
-    MP4_GET3BYTES( dummy ); VLC_UNUSED(dummy);
+    MP4_SKIPBYTES( 3 );  // flags
 
     if( i_version > 1 )
         MP4_READBOX_EXIT( 0 );
@@ -4643,10 +4625,8 @@ static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
     uint16_t i_foo;
 
     uint8_t i_version;
-    uint32_t i_flags;
     MP4_GET1BYTE( i_version );
-    MP4_GET3BYTES( i_flags );
-    VLC_UNUSED(i_flags);
+    MP4_SKIPBYTES( 3 ); // flags
 
     MP4_GET1BYTE( p_data->i_offset_size );
     p_data->i_length_size = p_data->i_offset_size & 0x0F;
@@ -4766,9 +4746,8 @@ static int MP4_ReadBox_iinf( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
 
     uint8_t i_version;
-    uint32_t i_flags;
     MP4_GET1BYTE( i_version );
-    MP4_GET3BYTES( i_flags ); VLC_UNUSED(i_flags);
+    MP4_SKIPBYTES( 3 ); // flags
     if( i_version > 2 )
         MP4_READBOX_EXIT( 0 );
 
@@ -4869,9 +4848,8 @@ static int MP4_ReadBox_pitm( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_Box_data_pitm_t *p_data = p_box->data.p_pitm;
 
     uint8_t i_version;
-    uint32_t i_flags;
     MP4_GET1BYTE( i_version );
-    MP4_GET3BYTES( i_flags ); VLC_UNUSED(i_flags);
+    MP4_SKIPBYTES( 3 ); // flags
 
     if( i_version == 0 )
         MP4_GET2BYTES( p_data->i_item_id );
@@ -4887,9 +4865,8 @@ static int MP4_ReadBox_ispe( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_Box_data_ispe_t *p_data = p_box->data.p_ispe;
 
     uint8_t i_version;
-    uint32_t i_flags;
     MP4_GET1BYTE( i_version );
-    MP4_GET3BYTES( i_flags ); VLC_UNUSED(i_flags);
+    MP4_SKIPBYTES( 3 ); // flags
     if( i_version > 0 )
         MP4_READBOX_EXIT( 0 );
 
