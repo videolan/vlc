@@ -1080,7 +1080,7 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
         case VLC_FOURCC( 'm', 'l', 'p', 'a' ):
             /* spec violation: 32 bits rate instead of fixed point */
             p_fmt->i_codec = VLC_CODEC_TRUEHD;
-            p_fmt->audio.i_rate = (p_soun->i_sampleratehi << 16) | p_soun->i_sampleratelo;
+            p_fmt->audio.i_rate = ((unsigned int)p_soun->i_sampleratehi << 16) | p_soun->i_sampleratelo;
             break;
 
         case ATOM_dtsc: /* DTS */
@@ -1135,7 +1135,7 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
             if( p_track->i_timescale != p_soun->i_sampleratehi && p_soun->i_qt_version == 0 )
             {
                 msg_Warn( p_demux, "i_timescale (%"PRId32") != i_sampleratehi "
-                          "(%u), making both equal (report any problem).",
+                          "(%"PRIu16"), making both equal (report any problem).",
                           p_track->i_timescale, p_soun->i_sampleratehi );
 
                 if( p_soun->i_sampleratehi != 0 )

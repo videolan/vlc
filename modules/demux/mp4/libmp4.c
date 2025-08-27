@@ -2702,7 +2702,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         memcpy( &f_sample_rate, &i_dummy64, 8 );
         msg_Dbg( p_stream, "read box: %f Hz", f_sample_rate );
         /* Rounding error with lo, but we don't care since we do not support fractional audio rate */
-        p_box->data.p_sample_soun->i_sampleratehi = (uint32_t)f_sample_rate;
+        p_box->data.p_sample_soun->i_sampleratehi = (uint16_t)f_sample_rate;
         p_box->data.p_sample_soun->i_sampleratelo = (f_sample_rate - p_box->data.p_sample_soun->i_sampleratehi);
 
         MP4_GET4BYTES( i_channel );
