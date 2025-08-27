@@ -540,7 +540,7 @@ typedef struct MP4_Box_data_mvhd_s
 
     int32_t  i_rate;
     int16_t  i_volume;
-    int16_t  i_reserved1;
+    uint16_t i_reserved1;
     uint32_t i_reserved2[2];
     int32_t  i_matrix[9];
     uint32_t i_predefined[6];
@@ -631,7 +631,7 @@ typedef struct MP4_Box_data_smhd_s
     uint32_t i_flags;
 
     int16_t  i_balance;
-    int16_t  i_reserved;
+    uint16_t i_reserved;
 
 } MP4_Box_data_smhd_t;
 
