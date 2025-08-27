@@ -1049,7 +1049,7 @@ typedef struct MP4_descriptor_ES_s /* ISO/IEC 14496-1 8.3.3 ES_DescrTag */
     int      b_OCRstream;
     int      i_stream_priority;
 
-    int      i_depend_on_ES_ID; /* if b_stream_dependence set */
+    uint16_t  i_depend_on_ES_ID; /* if b_stream_dependence set */
 
     unsigned char *psz_URL;
 
