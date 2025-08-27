@@ -86,6 +86,22 @@ static char * MP4_Time2Str( stime_t i_duration, uint32_t i_scale )
         } \
     } while(0)
 
+#define MP4_COPY_BYTES( dst, size ) \
+    do \
+    { \
+        if( (i_read) >= (size) ) \
+        { \
+            memcpy( &dst, p_peek, size ); \
+            p_peek += (size); \
+            i_read -= (size); \
+        } \
+        else \
+        { \
+            dst = 0; \
+            i_read = 0; \
+        } \
+    } while(0)
+
 #define MP4_SKIPBYTES(size) \
     do \
     { \
