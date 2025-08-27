@@ -448,7 +448,7 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                     p_fmt->i_codec = VLC_CODEC_GREY;
                     break;
                 default:
-                    msg_Dbg( p_demux, "Unrecognized raw video format (depth = %d)",
+                    msg_Dbg( p_demux, "Unrecognized raw video format (depth = %" PRIu16 ")",
                              p_vide->i_depth );
                     p_fmt->i_codec = i_sample_type;
                     break;

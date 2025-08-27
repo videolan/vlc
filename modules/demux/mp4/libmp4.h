@@ -810,7 +810,7 @@ typedef struct
     uint16_t i_qt_frame_count;
 
     char     sz_compressorname[32];
-    int16_t  i_depth;
+    uint16_t i_depth;
 
     int16_t  i_qt_color_table;
     video_palette_t *p_palette;
