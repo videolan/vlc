@@ -51,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)showCreatePlaylistDialogForPlayQueue;
 - (void)showCreatePlaylistDialogForPlayQueueItems:(NSArray<VLCPlayQueueItem *> *)items;
+- (void)showCreatePlaylistDialogForMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems;
 
 /**
  * Sort the entire library representation based on:
