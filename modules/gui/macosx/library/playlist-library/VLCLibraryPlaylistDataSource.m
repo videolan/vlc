@@ -134,7 +134,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 - (void)reloadViewsAtIndex:(NSUInteger)index
           dueToCacheAction:(VLCLibraryDataSourceCacheAction)action
 {
-    NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
+    NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
     NSSet<NSIndexPath *> * const indexPathSet = [NSSet setWithObject:indexPath];
 
     for (NSCollectionView * const collectionView in self.collectionViews) {
