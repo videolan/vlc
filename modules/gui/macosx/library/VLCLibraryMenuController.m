@@ -99,10 +99,14 @@
     _favoriteItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Favorite") action:@selector(toggleFavorite:) keyEquivalent:@""];
     self.favoriteItem.target = self;
 
+    NSMenuItem *createPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Create Playlist from Selection") action:@selector(createPlaylistFromSelection:) keyEquivalent:@""];
+    createPlaylistItem.target = self;
+
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
     [_libraryMenu addMenuItemsFromArray:@[
         playItem,
         appendItem,
+        createPlaylistItem,
         self.favoriteItem,
         bookmarkItem,
         revealItem,
@@ -116,6 +120,7 @@
     _mediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_mediaItemRequiringMenuItems addObject:playItem];
     [_mediaItemRequiringMenuItems addObject:appendItem];
+    [_mediaItemRequiringMenuItems addObject:createPlaylistItem];
     [_mediaItemRequiringMenuItems addObject:self.favoriteItem];
     [_mediaItemRequiringMenuItems addObject:revealItem];
     [_mediaItemRequiringMenuItems addObject:_deleteItem];
@@ -270,6 +275,22 @@
         for (VLCInputItem * const inputItem in self.representedInputItems) {
             [self addInputItemToPlayQueue:inputItem playImmediately:NO];
         }
+    }
+}
+
+- (void)createPlaylistFromSelection:(id)sender
+{
+    if (self.representedItems == nil || self.representedItems.count == 0) {
+        return;
+    }
+    
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [NSMutableArray arrayWithCapacity:self.representedItems.count];
+    for (VLCLibraryRepresentedItem * const representedItem in self.representedItems) {
+        [mediaItems addObjectsFromArray:representedItem.item.mediaItems];
+    }
+    
+    if (mediaItems.count > 0) {
+        [VLCMain.sharedInstance.libraryController showCreatePlaylistDialogForMediaItems:mediaItems];
     }
 }
 
