@@ -294,9 +294,7 @@
 
 - (void)libraryModelUpdated:(NSNotification *)notification
 {
-    NSParameterAssert(notification);
-    VLCLibraryModel * const model = (VLCLibraryModel *)notification.object;
-    NSAssert(model, @"Notification object should be a VLCLibraryModel");
+    VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     const size_t numberOfPlaylists = [model numberOfPlaylistsOfType:playlistType];
 
