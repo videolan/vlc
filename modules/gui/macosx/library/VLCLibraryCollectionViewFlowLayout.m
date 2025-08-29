@@ -194,6 +194,25 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         [self.collectionView.animator scrollRectToVisible:frame];
     } else {
         _animationIsCollapse = NO;
+        
+        if ([self.collectionView.dataSource conformsToProtocol:@protocol(VLCLibraryCollectionViewDataSource)]) {
+            id<VLCLibraryCollectionViewDataSource> const libraryDataSource = 
+                (id<VLCLibraryCollectionViewDataSource>)self.collectionView.dataSource;
+            NSString * const supplementaryDetailViewKind = libraryDataSource.supplementaryDetailViewKind;
+            if (supplementaryDetailViewKind != nil && supplementaryDetailViewKind.length > 0) {
+                NSSet<NSIndexPath *> * const visibleSupplementaryIndexPaths = 
+                    [self.collectionView indexPathsForVisibleSupplementaryElementsOfKind:supplementaryDetailViewKind];
+                
+                for (NSIndexPath * const supplementaryIndexPath in visibleSupplementaryIndexPaths) {
+                    VLCLibraryCollectionViewSupplementaryDetailView * const supplementaryView = 
+                        (VLCLibraryCollectionViewSupplementaryDetailView *)[self.collectionView supplementaryViewForElementKind:supplementaryDetailViewKind atIndexPath:supplementaryIndexPath];
+                    if (supplementaryView != nil) {
+                        supplementaryView.selectedItem = [self.collectionView itemAtIndexPath:indexPath];
+                        supplementaryView.needsDisplay = YES;
+                    }
+                }
+            }
+        }
     }
 }
 
