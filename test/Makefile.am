@@ -32,6 +32,7 @@ player_programs = \
 noinst_PROGRAMS =
 check_PROGRAMS = \
 	test_libvlc_core \
+	test_libvlc_downloader \
 	test_libvlc_equalizer \
 	test_libvlc_media \
 	test_libvlc_media_callback \
@@ -169,6 +170,8 @@ LIBVLC = -L../lib -lvlc
 
 test_libvlc_core_SOURCES = libvlc/core.c
 test_libvlc_core_LDADD = $(LIBVLC)
+test_libvlc_downloader_SOURCES = libvlc/downloader.c
+test_libvlc_downloader_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_equalizer_SOURCES = libvlc/equalizer.c
 test_libvlc_equalizer_LDADD = $(LIBVLC)
 test_libvlc_media_SOURCES = libvlc/media.c
