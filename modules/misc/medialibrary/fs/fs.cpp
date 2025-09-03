@@ -43,6 +43,12 @@ SDFileSystemFactory::SDFileSystemFactory(vlc_object_t *parent,
     : m_parent(parent)
     , m_scheme(scheme)
     , m_callbacks( nullptr )
+    , m_parser(parent, {
+        .types = VLC_PREPARSER_TYPE_PARSE,
+        .max_parser_threads = 1,
+        .max_thumbnailer_threads = 0,
+        .timeout = VLC_TICK_FROM_SEC(15),
+    })
 {
     m_isNetwork = strncasecmp( m_scheme.c_str(), "file://",
                                m_scheme.length() ) != 0;
@@ -131,6 +137,13 @@ libvlc_int_t *
 SDFileSystemFactory::libvlc() const
 {
     return vlc_object_instance(m_parent);
+}
+
+LazyPreparser&
+SDFileSystemFactory::getPreparser()
+{
+    vlc::threads::mutex_locker lock(m_mutex);
+    return m_parser;
 }
 
 void SDFileSystemFactory::onDeviceMounted(const std::string& uuid,

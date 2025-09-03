@@ -41,10 +41,6 @@
 #include <system_error>
 #include <vector>
 
-using InputItemPtr = ::vlc::vlc_shared_data_ptr<input_item_t,
-                                                &input_item_Hold,
-                                                &input_item_Release>;
-
 namespace vlc {
   namespace medialibrary {
 
@@ -114,7 +110,7 @@ struct metadata_request {
     vlc::threads::mutex lock;
     vlc::threads::condition_variable cond;
     /* results */
-    bool success;
+    int status;
     bool probe;
     std::vector<InputItemPtr> *children;
 };
@@ -124,17 +120,18 @@ struct metadata_request {
 
 extern "C" {
 
-static void onParserEnded( input_item_t *, int status, void *data )
+static void onParserEnded( vlc_preparser_req *preparser_req, int status, void *data )
 {
     auto req = static_cast<vlc::medialibrary::metadata_request*>( data );
 
     vlc::threads::mutex_locker lock( req->lock );
-    req->success = status == VLC_SUCCESS;
+    req->status = status;
     req->probe = true;
     req->cond.signal();
+    vlc_preparser_req_Release(preparser_req);
 }
 
-static void onParserSubtreeAdded( input_item_t *, input_item_node_t *subtree,
+static void onParserSubtreeAdded( vlc_preparser_req *, input_item_node_t *subtree,
                                   void *data )
 {
     auto req = static_cast<vlc::medialibrary::metadata_request*>( data );
@@ -155,44 +152,41 @@ static void onParserSubtreeAdded( input_item_t *, input_item_node_t *subtree,
 namespace vlc {
   namespace medialibrary {
 
-static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
-                                   std::vector<InputItemPtr> *out_children )
+bool
+SDDirectory::requestMetadataSync(input_item_t *media,
+                                 std::vector<InputItemPtr> *out_children) const
 {
     metadata_request req;
     req.children = out_children;
     req.probe = false;
-    auto deadline = vlc_tick_now() + VLC_TICK_FROM_SEC( 15 );
 
-    static const input_item_parser_cbs_t cbs = {
+    vlc::threads::mutex_locker lock( req.lock );
+
+    static const struct vlc_preparser_cbs cbs = {
         onParserEnded,
         onParserSubtreeAdded,
         nullptr,
     };
+    int options = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_OPTION_SUBITEMS;
 
-    const struct input_item_parser_cfg cfg= {
-        .cbs = &cbs,
-        .cbs_data = &req,
-        .subitems = true,
-        .interact = false,
-    };
-
-    auto inputParser = vlc::wrap_cptr( input_item_Parse( VLC_OBJECT( libvlc ), media, &cfg ),
-                                       &input_item_parser_id_Release );
-
-    if ( inputParser == nullptr )
+    vlc_preparser_t *preparser = m_fs.getPreparser().instance();
+    if (preparser == nullptr) {
         return false;
-
-    vlc::threads::mutex_locker lock( req.lock );
-    while ( req.probe == false )
-    {
-        auto res = req.cond.timedwait( req.lock, deadline );
-        if ( res != 0 )
-        {
+    }
+    vlc_preparser_req *preparser_req = vlc_preparser_Push(preparser,
+                                                          media, options,
+                                                          &cbs, &req);
+    if (preparser_req == nullptr) {
+        return false;
+    }
+    while (req.probe == false) {
+        req.cond.wait(req.lock);
+    }
+    if (req.status == VLC_ETIMEOUT) {
             throw medialibrary::fs::errors::System(
                 ETIMEDOUT, "Failed to browse directory: Operation timed out" );
-        }
     }
-    return req.success;
+    return req.status == VLC_SUCCESS;
 }
 
 void
@@ -208,7 +202,7 @@ SDDirectory::read() const
     input_item_AddOption( media.get(), "show-hiddenfiles", VLC_INPUT_OPTION_TRUSTED );
     input_item_AddOption( media.get(), "ignore-filetypes=''", VLC_INPUT_OPTION_TRUSTED );
     input_item_AddOption( media.get(), "sub-autodetect-fuzzy=2", VLC_INPUT_OPTION_TRUSTED );
-    auto status = request_metadata_sync( m_fs.libvlc(), media.get(), &children );
+    auto status = requestMetadataSync( media.get(), &children );
 
     if ( status == false )
         throw medialibrary::fs::errors::System(

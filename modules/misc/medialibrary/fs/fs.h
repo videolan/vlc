@@ -25,9 +25,13 @@
 #include <vector>
 #include <vlc_common.h>
 #include <vlc_threads.h>
+#include <vlc_preparser.h>
 #include <vlc_cxx_helpers.hpp>
+
 #include <medialibrary/filesystem/IFileSystemFactory.h>
 #include <medialibrary/IDeviceLister.h>
+
+#include "../LazyPreparser.h"
 
 struct libvlc_int_t;
 
@@ -92,6 +96,9 @@ public:
     bool
     waitForDevice(const std::string& mrl, uint32_t timeout) const override;
 
+    LazyPreparser&
+    getPreparser();
+
 private:
     std::shared_ptr<fs::IDevice>
     deviceByUuid(const std::string& uuid);
@@ -110,6 +117,8 @@ private:
     mutable vlc::threads::condition_variable m_cond;
     std::vector<std::shared_ptr<IDevice>> m_devices;
     std::shared_ptr<IDeviceLister> m_deviceLister;
+
+    LazyPreparser m_parser;
 };
 
   } /* namespace medialibrary */

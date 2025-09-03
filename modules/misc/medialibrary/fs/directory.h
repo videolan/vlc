@@ -31,6 +31,10 @@ namespace vlc {
 
 using namespace ::medialibrary::fs;
 
+using InputItemPtr = ::vlc::vlc_shared_data_ptr<input_item_t,
+                                                &input_item_Hold,
+                                                &input_item_Release>;
+
 class SDDirectory : public IDirectory
 {
 public:
@@ -43,6 +47,7 @@ public:
     bool contains( const std::string& file ) const override;
 
 private:
+    bool requestMetadataSync(input_item_t *media, std::vector<InputItemPtr> *out_children) const;
     void read() const;
     void addFile( std::string mrl, fs::IFile::LinkedFileType, std::string linkedWith ) const;
 
