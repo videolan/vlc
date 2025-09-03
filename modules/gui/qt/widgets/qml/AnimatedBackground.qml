@@ -46,7 +46,13 @@ Rectangle {
     //---------------------------------------------------------------------------------------------
 
     Behavior on border.color {
-        enabled: root.enabled
+        Binding on enabled {
+            // this is delayed because we don't want the animations to run as soon
+            // as root is enabled, as the colors often adjusted depending on enabled,
+            // and to have debouncing.
+            delayed: true
+            value: root.enabled
+        }
 
         ColorAnimation {
             id: borderAnimation
@@ -56,8 +62,14 @@ Rectangle {
     }
 
     Behavior on color {
-        enabled: root.enabled
-        
+        Binding on enabled {
+            // this is delayed because we don't want the animations to run as soon
+            // as root is enabled, as the colors often adjusted depending on enabled,
+            // and to have debouncing.
+            delayed: true
+            value: root.enabled
+        }
+
         ColorAnimation {
             id: bgAnimation
 
