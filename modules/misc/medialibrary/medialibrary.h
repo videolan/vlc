@@ -67,23 +67,16 @@ private:
     struct ParseContext
     {
         ParseContext( MetadataExtractor* mde, medialibrary::parser::IItem& item )
-            : needsProbing( false )
-            , success( false )
+            : status( medialibrary::parser::Status::Fatal )
+            , done( false )
             , mde( mde )
             , item( item )
-            , inputItem( nullptr, &input_item_Release )
-            , inputParser( nullptr, &input_item_parser_id_Release )
         {
         }
-
-        bool needsProbing;
-        bool success;
+        medialibrary::parser::Status status;
+        bool done;
         MetadataExtractor* mde;
         medialibrary::parser::IItem& item;
-        std::unique_ptr<input_item_t, decltype(&input_item_Release)> inputItem;
-        // Needs to be last to be destroyed first, otherwise a late callback
-        // could use some already destroyed fields
-        std::unique_ptr<input_item_parser_id_t, decltype(&input_item_parser_id_Release)> inputParser;
     };
 
 public:
@@ -101,14 +94,12 @@ private:
     void onRestarted() override;
     void stop() override;
 
-    void onParserEnded( ParseContext& ctx, int status );
-    void addSubtree( ParseContext& ctx, input_item_node_t *root );
     void populateItem( medialibrary::parser::IItem& item, input_item_t* inputItem );
 
-    static void onParserEnded( input_item_t *, int status, void *user_data );
-    static void onParserSubtreeAdded( input_item_t *, input_item_node_t *subtree,
+    static void onParserEnded(vlc_preparser_req *, int status, void *user_data);
+    static void onParserSubtreeAdded( vlc_preparser_req *, input_item_node_t *subtree,
                                       void *user_data );
-    static void onAttachmentsAdded( input_item_t *,
+    static void onAttachmentsAdded( vlc_preparser_req *,
                                     input_attachment_t *const *array,
                                     size_t count, void *data );
 
@@ -117,6 +108,7 @@ private:
     vlc::threads::mutex m_mutex;
     ParseContext* m_currentCtx;
     vlc_object_t* m_obj;
+    LazyPreparser m_parser;
 };
 
 class Thumbnailer : public medialibrary::IThumbnailer
