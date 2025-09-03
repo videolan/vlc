@@ -5565,7 +5565,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
         return p_vroot;
     }
 
-    if( vlc_stream_Tell( p_stream ) + 8 < (uint64_t) stream_Size( p_stream ) )
+    if( vlc_stream_Tell( p_stream ) + 8 < i_size )
     {
         /* Get the rest of the file */
         i_result = MP4_ReadBoxContainerChildren( p_stream, p_vroot, NULL );
