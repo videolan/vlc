@@ -375,7 +375,6 @@ static int Probe( demux_t *p_demux, bool b_end )
 static bool FindLength( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t i_current_pos = -1, i_size = 0, i_end = 0;
 
     if( !var_CreateGetBool( p_demux, "ps-trust-timestamps" ) )
         return true;
@@ -385,18 +384,19 @@ static bool FindLength( demux_t *p_demux )
         p_sys->i_length = VLC_TICK_0;
         /* Check beginning */
         int i = 0;
-        i_current_pos = vlc_stream_Tell( p_demux->s );
+        uint64_t i_current_pos = vlc_stream_Tell( p_demux->s );
         while( i < 40 && Probe( p_demux, false ) > 0 ) i++;
 
         /* Check end */
-        i_size = stream_Size( p_demux->s );
-        i_end = VLC_CLIP( i_size, 0, 200000 );
+        uint64_t i_size;
+        if( vlc_stream_GetSize( p_demux->s, &i_size ) != VLC_SUCCESS )
+          return false;
+        uint64_t i_end = VLC_CLIP( i_size, 0, 200000 );
         if( vlc_stream_Seek( p_demux->s, i_size - i_end ) == VLC_SUCCESS )
         {
             i = 0;
             while( i < 400 && Probe( p_demux, true ) > 0 ) i++;
-            if( i_current_pos >= 0 &&
-                vlc_stream_Seek( p_demux->s, i_current_pos ) != VLC_SUCCESS )
+            if( vlc_stream_Seek( p_demux->s, i_current_pos ) != VLC_SUCCESS )
                     return false;
         }
         else return false;
@@ -720,7 +720,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
-    int64_t i64;
+    uint64_t u64;
     int i_ret;
 
     switch( i_query )
@@ -739,11 +739,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_POSITION:
             pf = va_arg( args, double * );
-            i64 = stream_Size( p_demux->s ) - p_sys->i_start_byte;
-            if( i64 > 0 )
+            if( vlc_stream_GetSize( p_demux->s, &u64 ) == VLC_SUCCESS )
             {
                 double current = vlc_stream_Tell( p_demux->s ) - p_sys->i_start_byte;
-                *pf = current / (double)i64;
+                u64 = u64 - p_sys->i_start_byte;
+                *pf = current / (double)u64;
             }
             else
             {
@@ -753,21 +753,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
             f = va_arg( args, double );
-            i64 = stream_Size( p_demux->s ) - p_sys->i_start_byte;
+
+            if( vlc_stream_GetSize( p_demux->s, &u64 ) != VLC_SUCCESS )
+                return VLC_EGENERIC;
+
+            u64 = u64 - p_sys->i_start_byte;
             p_sys->i_current_pts = VLC_TICK_INVALID;
             p_sys->i_scr = VLC_TICK_INVALID;
 
             if( p_sys->format == CDXA_PS )
             {
-                i64 = (int64_t)(i64  * f); /* Align to sector payload */
-                i64 = p_sys->i_start_byte + i64 - (i64 % CDXA_SECTOR_SIZE) + CDXA_SECTOR_HEADER_SIZE;
+                u64 = (uint64_t)(u64  * f); /* Align to sector payload */
+                u64 = p_sys->i_start_byte + u64 - (u64 % CDXA_SECTOR_SIZE) + CDXA_SECTOR_HEADER_SIZE;
             }
             else
             {
-                i64 = p_sys->i_start_byte + (int64_t)(i64 * f);
+                u64 = p_sys->i_start_byte + (uint64_t)(u64 * f);
             }
 
-            i_ret = vlc_stream_Seek( p_demux->s, i64 );
+            i_ret = vlc_stream_Seek( p_demux->s, u64 );
             if( i_ret == VLC_SUCCESS )
             {
                 NotifyDiscontinuity( p_sys->tk, p_demux->out );
@@ -802,10 +806,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 *va_arg( args, vlc_tick_t * ) = p_sys->i_length;
                 return VLC_SUCCESS;
             }
-            else if( p_sys->i_mux_rate > 0 )
+            else if( p_sys->i_mux_rate > 0 &&
+                     vlc_stream_GetSize( p_demux->s, &u64 ) == VLC_SUCCESS )
             {
-                *va_arg( args, vlc_tick_t * ) = vlc_tick_from_samples( stream_Size( p_demux->s ) - p_sys->i_start_byte / 50,
-                    p_sys->i_mux_rate );
+                *va_arg( args, vlc_tick_t * ) =
+                    vlc_tick_from_samples( u64 - p_sys->i_start_byte / 50, p_sys->i_mux_rate );
                 return VLC_SUCCESS;
             }
             *va_arg( args, vlc_tick_t * ) = 0;
