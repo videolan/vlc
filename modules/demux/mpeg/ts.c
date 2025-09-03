@@ -2166,16 +2166,22 @@ int ProbeStart( demux_t *p_demux, int i_program )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
-    int64_t i_stream_size = stream_Size( p_sys->stream );
+    uint64_t i_stream_size;
+    if( vlc_stream_GetSize( p_sys->stream, &i_stream_size ) != VLC_SUCCESS )
+      return VLC_EGENERIC;
 
-    int i_probe_count = 0;
-    int64_t i_pos;
+    if( i_stream_size < p_sys->i_packet_size )
+      return VLC_EGENERIC;
+
+    unsigned i_probe_count = 0;
+    uint64_t i_pos;
     bool b_found = false;
 
     do
     {
-        i_pos = (int64_t)p_sys->i_packet_size * i_probe_count;
-        i_pos = __MIN( i_pos, i_stream_size );
+        i_pos = p_sys->i_packet_size * i_probe_count;
+        if( i_pos > i_stream_size - p_sys->i_packet_size )
+          break;
 
         if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
@@ -2199,16 +2205,21 @@ int ProbeEnd( demux_t *p_demux, int i_program )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
-    int64_t i_stream_size = stream_Size( p_sys->stream );
+    uint64_t i_stream_size;
+    if( vlc_stream_GetSize( p_sys->stream, &i_stream_size ) != VLC_SUCCESS )
+      return VLC_EGENERIC;
 
-    int i_probe_count = PROBE_CHUNK_COUNT;
-    int64_t i_pos;
+    unsigned i_probe_count = PROBE_CHUNK_COUNT;
+    uint64_t i_pos;
     bool b_found = false;
 
     do
     {
-        i_pos = i_stream_size - (p_sys->i_packet_size * i_probe_count);
-        i_pos = __MAX( i_pos, 0 );
+        i_pos = p_sys->i_packet_size * i_probe_count;
+        if( i_stream_size > i_pos )
+          i_pos = i_stream_size - i_pos;
+        else
+          i_pos = 0;
 
         if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
