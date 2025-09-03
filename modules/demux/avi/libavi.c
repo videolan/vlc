@@ -68,7 +68,8 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk,
     const uint64_t i_pos = vlc_stream_Tell( s );
     if( vlc_stream_Peek( s, &p_peek, 8 ) < 8 )
     {
-        if( stream_Size( s ) > 0 && (uint64_t) stream_Size( s ) > i_pos )
+        uint64_t i_size;
+        if( vlc_stream_GetSize( s, &i_size ) == VLC_SUCCESS && i_size > i_pos )
             msg_Warn( s, "can't peek at %"PRIu64, i_pos );
         else
             msg_Dbg( s, "no more data at %"PRIu64, i_pos );
@@ -1164,7 +1165,8 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
         }
     }
 
-    p_list->i_chunk_size = stream_Size( s );
+    if( vlc_stream_GetSize( s, &p_list->i_chunk_size ) != VLC_SUCCESS )
+        p_list->i_chunk_size = 0;
 
     AVI_ChunkDumpDebug_level( VLC_OBJECT(s), p_root, 0 );
     return VLC_SUCCESS;
