@@ -2212,6 +2212,7 @@ int ProbeEnd( demux_t *p_demux, int i_program )
     unsigned i_probe_count = PROBE_CHUNK_COUNT;
     uint64_t i_pos;
     bool b_found = false;
+    const uint64_t i_sync_align_offset = i_initial_pos % p_sys->i_packet_size;
 
     do
     {
@@ -2220,6 +2221,10 @@ int ProbeEnd( demux_t *p_demux, int i_program )
           i_pos = i_stream_size - i_pos;
         else
           i_pos = 0;
+
+        /* Avoid resyncing, as the starting point should be packet aligned */
+        if( i_pos % p_sys->i_packet_size != i_sync_align_offset )
+            i_pos = i_pos - (i_pos % p_sys->i_packet_size) + i_sync_align_offset;
 
         if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
