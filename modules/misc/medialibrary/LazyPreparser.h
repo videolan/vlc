@@ -28,15 +28,17 @@ class LazyPreparser
         {
             vlc::threads::mutex_locker locker(m_mutex);
 
-            if (m_preparser.get() == nullptr) {
+            vlc_preparser_t *preparser = m_preparser.get();
+            if (preparser == nullptr) {
                 m_preparser.reset(vlc_preparser_New(m_obj, &m_cfg));
-                if (m_preparser.get() == nullptr) {
+                preparser = m_preparser.get();
+                if (preparser == nullptr) {
                     msg_Warn(m_obj, "LazyPreparser: Failed to instantiate a vlc_preparser_t!");
                 } else {
                     msg_Dbg(m_obj, "LazyPreparser: vlc_preparser_t created!");
                 }
             }
-            return m_preparser.get();
+            return preparser;
         }
 
         vlc_preparser_t *get()

@@ -144,7 +144,7 @@ private:
     vlc::threads::mutex m_mutex;
     vlc::threads::condition_variable m_cond;
     ThumbnailerCtx* m_currentContext;
-    std::unique_ptr<vlc_preparser_t, void(*)(vlc_preparser_t*)> m_thumbnailer;
+    LazyPreparser m_thumbnailer;
 };
 
 class MediaLibrary : public medialibrary::IMediaLibraryCb

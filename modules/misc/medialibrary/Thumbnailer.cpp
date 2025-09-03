@@ -34,19 +34,14 @@
 #include <stdexcept>
 
 Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
-    : m_currentContext( nullptr )
-    , m_thumbnailer( nullptr, &vlc_preparser_Delete )
+    : m_currentContext(nullptr)
+    , m_thumbnailer(VLC_OBJECT(ml), {
+        .types = VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES,
+        .max_parser_threads = 0,
+        .max_thumbnailer_threads = 1,
+        .timeout = VLC_TICK_FROM_SEC( 3 ),
+    })
 {
-    const struct vlc_preparser_cfg cfg = []{
-        struct vlc_preparser_cfg cfg{};
-        cfg.types = VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES;
-        cfg.timeout = VLC_TICK_FROM_SEC( 3 );
-        cfg.max_thumbnailer_threads = 1;
-        return cfg;
-    }();
-    m_thumbnailer.reset( vlc_preparser_New( VLC_OBJECT( ml ), &cfg ) );
-    if ( unlikely( m_thumbnailer == nullptr ) )
-        throw std::runtime_error( "Failed to instantiate a vlc_preparser_t" );
 }
 
 void Thumbnailer::onThumbnailToFilesComplete(vlc_preparser_req *req, int ,
@@ -111,8 +106,13 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
             .on_ended = onThumbnailToFilesComplete,
         };
 
+        vlc_preparser_t *thumbnailer = m_thumbnailer.instance();
+        if (thumbnailer == nullptr) {
+            return false;
+        }
+
         vlc_preparser_req *preparserReq;
-        preparserReq = vlc_preparser_GenerateThumbnailToFiles(m_thumbnailer.get(),
+        preparserReq = vlc_preparser_GenerateThumbnailToFiles(thumbnailer,
                                                               item.get(),
                                                               &thumb_arg,
                                                               &thumb_out, 1,
@@ -133,9 +133,16 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
 
 void Thumbnailer::stop()
 {
-    vlc_preparser_Cancel(m_thumbnailer.get(), NULL);
+    vlc_preparser_t *thumbnailer = m_thumbnailer.get();
+    if (thumbnailer == nullptr) {
+        return;
+    }
 
-    vlc::threads::mutex_locker lock{ m_mutex };
+    /* vlc_preparser_Cancel can call the callback from this thread so the mutex
+     * must be unlock */
+    vlc_preparser_Cancel(thumbnailer, nullptr);
+
+    vlc::threads::mutex_locker lock(m_mutex);
     if ( m_currentContext != nullptr )
     {
         while (m_currentContext != nullptr && m_currentContext->done == false)
