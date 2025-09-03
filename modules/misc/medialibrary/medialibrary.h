@@ -39,6 +39,8 @@
 #include <cstdarg>
 #include <type_traits>
 
+#include "LazyPreparser.h"
+
 struct vlc_event_t;
 struct vlc_object_t;
 struct vlc_preparser_t;
