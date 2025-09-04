@@ -290,7 +290,7 @@ FocusScope {
 
                         radius: 3
 
-                        // TODO: Disable `live`, consider asynchronous loading.
+                        live: false
                         
                         //destination aspect ratio
                         readonly property real dar: parent.width / parent.height
@@ -321,6 +321,33 @@ FocusScope {
 
                             mode: bgtheme.palette.isDark ? Widgets.FastBlend.Mode.Multiply // multiply makes darker
                                                          : Widgets.FastBlend.Mode.Screen // screen (inverse multiply) makes lighter
+                        }
+
+                        Component.onCompleted: {
+                            // Blur layers are effect-size dependent, so once the user starts resizing the window (hence the effect),
+                            // we should either momentarily turn on live, or repeatedly call `scheduleUpdate()`. Due to the optimization,
+                            // calling `scheduleUpdate()` would continuously create and release intermediate layers, which would be a
+                            // really bad idea. So instead, we turn on live and after some time passes turn it off again.
+                            widthChanged.connect(liveTimer, liveTimer.transientTurnOnLive)
+                            heightChanged.connect(liveTimer, liveTimer.transientTurnOnLive)
+                        }
+
+                        Timer {
+                            id: liveTimer
+
+                            repeat: false
+                            interval: VLCStyle.duration_humanMoment
+
+                            function transientTurnOnLive() {
+                                if (!blurredBackground.sourceTextureIsValid)
+                                    return
+                                blurredBackground.live = true
+                                liveTimer.restart()
+                            }
+
+                            onTriggered: {
+                                blurredBackground.live = false
+                            }
                         }
                     }
                 }
@@ -385,18 +412,46 @@ FocusScope {
                                 cache: false
                                 asynchronous: true
 
-                                sourceSize: Qt.size(maximumSize, maximumSize)
-
-                                Accessible.role: Accessible.Graphic
-                                Accessible.name: qsTr("Cover")
-
                                 onTargetSourceChanged: {
                                     cover.source = targetSource
                                 }
 
                                 onStatusChanged: {
-                                    if (status === Image.Error)
+                                    if (status === Image.Ready) {
+                                        // This also covers source (and other parameters) change and not only initial loading
+                                        if (blurredBackground.sourceTextureIsValid) {
+                                            // Possible image switch and stale texture (especially old Qt without patch c871a52), we
+                                            // should wait one frame for the texture to be updated to avoid applying blur on stale one.
+                                            blurredBackground.scheduleUpdate(true)
+                                        } else {
+                                            // If not valid, the blur effect is going to wait appropriately until valid itself:
+                                            // Initial case (such as switching to player page), or switching images with recent Qt.
+                                            blurredBackground.scheduleUpdate(false)
+                                        }
+                                    } else if (status === Image.Error) {
                                         cover.source = VLCStyle.noArtAlbumCover
+                                    }
+                                }
+
+                                sourceSize: Qt.size(maximumSize, maximumSize)
+
+                                Accessible.role: Accessible.Graphic
+                                Accessible.name: qsTr("Cover")
+
+                                Component.onCompleted: {
+                                    // After the update on source change, there can be another update when the mipmaps are generated.
+                                    // We intentionally do not wait for this, initially using non-mipmapped source should be okay. As
+                                    // the user should not be greeted with a black background until the mipmaps are ready, let alone
+                                    // the possibility of knowing if the mipmaps are actually going to be ready as expected.
+                                    // If the texture is not valid yet (which is signalled the latest), blur effect is going to queue
+                                    // an update itself similar to the case when the source itself changes, so we do not check validity
+                                    // of the texture here.
+                                    blurredBackground.sourceTextureProviderObserver.hasMipmapsChanged.connect(blurredBackground,
+                                                                                                              (hasMipmaps /*: bool */) => {
+                                                                                                                  if (hasMipmaps) {
+                                                                                                                      blurredBackground.scheduleUpdate()
+                                                                                                                  }
+                                                                                                              })
                                 }
 
                                 Widgets.RoundedRectangleShadow {
