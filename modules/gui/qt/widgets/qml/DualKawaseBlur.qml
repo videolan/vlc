@@ -41,10 +41,12 @@ Item {
 
     property int configuration: DualKawaseBlur.Configuration.FourPass
 
-    // NOTE: This property is an optimization hint. When it is false, the result
-    //       may be cached, and the intermediate buffers for the blur passes may
-    //       be released.
-    // TODO: This is pending implementation.
+    // NOTE: This property is also an optimization hint. When it is false, the
+    //       intermediate buffers for the blur passes may be released (only
+    //       the two intermediate layers in four pass mode, we must have one
+    //       layer regardless of the mode, so optimization-wise it has no
+    //       benefit in two pass mode thus should be used solely as behavior
+    //       instead):
     property bool live: true
 
     // Do not hesitate to use an odd number for the radius, there is virtually
@@ -56,7 +58,7 @@ Item {
     //       used even if it is set false here. For that reason, it should not be
     //       necessary to check for opacity (well, accumulated opacity can not be
     //       checked directly in QML anyway).
-    property bool blending: (!ds1SourceObserver.isValid || ds1SourceObserver.hasAlphaChannel)
+    property bool blending: (!sourceTextureIsValid || ds1SourceObserver.hasAlphaChannel)
 
     // source must be a texture provider item. Some items such as `Image` and
     // `ShaderEffectSource` are inherently texture provider. Other items needs
@@ -72,6 +74,60 @@ Item {
     // `QSGTextureView` can also be used instead of sub-texturing here.
     property rect sourceRect
 
+    readonly property bool sourceTextureIsValid: ds1SourceObserver.isValid
+
+    onSourceTextureIsValidChanged: {
+        if (root.sourceTextureIsValid) {
+            if (root._queuedScheduledUpdate) {
+                root._queuedScheduledUpdate = false
+
+                // Normally it should be fine to call `scheduleUpdate()` directly for
+                // the initial layer, even though the subsequent layers must be chained
+                // for update scheduling regardless, but old Qt seems to want it:
+                root.scheduleUpdate(true)
+            }
+        }
+    }
+
+    property var /*QtWindow*/ _window: null // captured window used for chaining through `afterAnimating()`
+
+    property bool _queuedScheduledUpdate: false
+
+    function scheduleUpdate(onNextAfterAnimating /* : bool */ = false) {
+        if (live)
+            return // no-op
+
+        if (!root.sourceTextureIsValid) {
+            root._queuedScheduledUpdate = true // if source texture is not valid, delay the update until valid
+            return
+        }
+
+        if (root._window) {
+            // One possible case for this is that the mipmaps for the source texture were generated too fast, and
+            // the consumer wants to update the blur to make use of the mipmaps before the blur finished chained
+            // updates for the previous source texture which is the non-mipmapped version of the same texture.
+            console.debug(root, "scheduleUpdate(): There is an already ongoing chained update, re-scheduling...")
+            root._queuedScheduledUpdate = true
+            return
+        }
+
+        root._window = root.Window.window
+        if (onNextAfterAnimating) {
+            root._window.afterAnimating.connect(ds1layer, ds1layer.scheduleChainedUpdate)
+        } else {
+            ds1layer.scheduleChainedUpdate()
+        }
+    }
+
+    onLiveChanged: {
+        if (live) {
+            ds1layer.parent = root
+            ds2layer.inhibitParent = false
+        } else {
+            root.scheduleUpdate(false) // this triggers releasing intermediate layers (when applicable)
+        }
+    }
+    
     // TODO: Get rid of this in favor of GLSL 1.30's `textureSize()`
     Connections {
         target: root.Window.window
@@ -166,6 +222,32 @@ Item {
         sourceItem: ds1
         visible: false
         smooth: true
+
+        live: root.live
+
+        function scheduleChainedUpdate() {
+            if (!ds1layer) // context is lost, Qt bug (reproduced with 6.2)
+                return
+
+            // Common for both four and two pass mode:
+            ds1layer.parent = root
+            ds1layer.scheduleUpdate()
+
+            if (root._window) {
+                root._window.afterAnimating.disconnect(ds1layer, ds1layer.scheduleChainedUpdate)
+
+                // In four pass mode, we can release the two intermediate layers:
+                if (root.configuration === DualKawaseBlur.Configuration.FourPass) {
+                    // Scheduling update must be done sequentially for each layer in
+                    // a chain. It seems that each layer needs one frame for it to be
+                    // used as a source in another layer, so we can not schedule
+                    // update for each layer at the same time:
+                    root._window.afterAnimating.connect(ds2layer, ds2layer.scheduleChainedUpdate)
+                } else {
+                    root._window = null
+                }
+            }
+        }
     }
 
     ShaderEffect {
@@ -175,7 +257,8 @@ Item {
         width: ds1.width / 2
         height: ds1.height / 2
 
-        readonly property Item source: ds1layer
+        // Qt uses reference counting, otherwise ds1layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
+        readonly property Item source: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) || !ds1layer.parent) ? null : ds1layer
         property rect normalRect // not necessary here, added because of the warning
         readonly property int radius: root.radius
 
@@ -193,7 +276,7 @@ Item {
 
         visible: false
 
-        fragmentShader: "qrc:///shaders/DualKawaseBlur_downsample.frag.qsb"
+        fragmentShader: source ? "qrc:///shaders/DualKawaseBlur_downsample.frag.qsb" : "" // to prevent warning if source becomes null
 
         supportsAtlasTextures: true
 
@@ -208,9 +291,27 @@ Item {
         // never visible and was never used as texture provider, it should have never allocated
         // resources to begin with.
         sourceItem: (root.configuration === DualKawaseBlur.Configuration.FourPass) ? ds2 : null
+        parent: (!inhibitParent && sourceItem) ? root : null // this seems necessary to release resources even if sourceItem becomes null (non-live case)
 
         visible: false
         smooth: true
+
+        live: root.live
+
+        property bool inhibitParent: false
+
+        function scheduleChainedUpdate() {
+            if (!ds2layer) // context is lost, Qt bug (reproduced with 6.2)
+                return
+
+            ds2layer.inhibitParent = false
+            ds2layer.scheduleUpdate()
+
+            if (root._window) {
+                root._window.afterAnimating.disconnect(ds2layer, ds2layer.scheduleChainedUpdate)
+                root._window.afterAnimating.connect(us1layer, us1layer.scheduleChainedUpdate)
+            }
+        }
     }
 
     ShaderEffect {
@@ -219,7 +320,8 @@ Item {
         width: ds2.width * 2
         height: ds2.height * 2
 
-        readonly property Item source: ds2layer
+        // Qt uses reference counting, otherwise ds2layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
+        readonly property Item source: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) || !ds2layer.parent) ? null : ds2layer
         property rect normalRect // not necessary here, added because of the warning
         readonly property int radius: root.radius
 
@@ -237,7 +339,7 @@ Item {
 
         visible: false
 
-        fragmentShader: "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
+        fragmentShader: source ? "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb" : "" // to prevent warning if source becomes null
 
         supportsAtlasTextures: true
 
@@ -252,9 +354,47 @@ Item {
         // never visible and was never used as texture provider, it should have never allocated
         // resources to begin with.
         sourceItem: (root.configuration === DualKawaseBlur.Configuration.FourPass) ? us1 : null
+        parent: sourceItem ? root : null // this seems necessary to release resources even if sourceItem becomes null (non-live case)
 
         visible: false
         smooth: true
+
+        live: root.live
+
+        function scheduleChainedUpdate() {
+            if (!us1layer) // context is lost, Qt bug (reproduced with 6.2)
+                return
+
+            us1layer.scheduleUpdate()
+
+            if (root._window) {
+                root._window.afterAnimating.disconnect(us1layer, us1layer.scheduleChainedUpdate)
+                root._window.afterAnimating.connect(us1layer, us1layer.releaseResourcesOfIntermediateLayers)
+            }
+        }
+
+        function releaseResourcesOfIntermediateLayers() {
+            if (!ds1layer || !ds2layer) // context is lost, Qt bug (reproduced with 6.2)
+                return
+
+            // Last layer is updated, now it is time to release the intermediate buffers:
+            console.debug(root, ": releasing intermediate layers, expect the video memory consumption to drop.")
+
+            // https://doc.qt.io/qt-6/qquickitem.html#graphics-resource-handling
+            ds1layer.parent = null
+            ds2layer.inhibitParent = true
+
+            if (root._window) {
+                root._window.afterAnimating.disconnect(us1layer, us1layer.releaseResourcesOfIntermediateLayers)
+                root._window = null
+            }
+
+            if (root._queuedScheduledUpdate) {
+                // Tried calling `scheduleUpdate()` before the ongoing chained updates completed.
+                root._queuedScheduledUpdate = false
+                root.scheduleUpdate(false)
+            }
+        }
     }
 
     ShaderEffect {
