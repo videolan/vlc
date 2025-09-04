@@ -45,5 +45,6 @@ ifndef GPL
 endif
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GMP_CONF)
+	$(MAKE) -C $<
 	$(MAKE) -C $< install
 	touch $@
