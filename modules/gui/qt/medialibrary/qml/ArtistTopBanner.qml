@@ -95,7 +95,7 @@ FocusScope {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            // TODO: Disable `live`, consider asynchronous loading and size changes.
+            // NOTE: No need to disable `live`, as this uses two pass mode so there is no video memory saving benefit.
 
             // If source image is tiled, layering is necessary:
             readonly property bool sourceNeedsLayering: (background.fillMode === Image.Tile)
