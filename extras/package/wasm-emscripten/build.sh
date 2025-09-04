@@ -212,7 +212,7 @@ if [ $BUILD_MODE -eq 1 ]; then
 fi
 
 if [ "$VLC_COMPILE_SHARED" -eq "1" ]; then
-    sed -i "s|^postdeps_CXX=.*$|postdeps_CXX='-L/$(dirname $(which emcc))/cache/sysroot/lib/wasm32-emscripten -lal -lhtml5 -lbulkmemory -lstubs -lsockets-mt'|" config.status
+    sed -i "/^postdeps_CXX=.*$/d" config.status
 fi
 
 
