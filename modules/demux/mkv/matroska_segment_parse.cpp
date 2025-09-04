@@ -391,13 +391,13 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxCodecDelay, codecdelay )
         {
             vars.tk->i_codec_delay = static_cast<uint64_t>( codecdelay ) / 1000;
-            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Codec Delay =%" PRIu64,
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Codec Delay=%" PRIu64,
                      vars.tk->i_codec_delay );
         }
         E_CASE( KaxSeekPreRoll, spr )
         {
             vars.tk->i_seek_preroll = static_cast<uint64_t>( spr ) / 1000;
-            debug( vars, "Track Seek Preroll =%" PRIu64, vars.tk->i_seek_preroll );
+            debug( vars, "Track Seek Preroll=%" PRIu64, vars.tk->i_seek_preroll );
         }
 #endif
         E_CASE( KaxContentEncodings, cencs )
