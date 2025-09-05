@@ -374,10 +374,12 @@ FocusScope {
 
                                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
+                                readonly property url targetSource: VLCAccessImage.uri(rootPlayer.coverSource)
+
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                source: VLCAccessImage.uri(rootPlayer.coverSource)
+                                source: targetSource
                                 fillMode: Image.PreserveAspectFit
                                 mipmap: true
                                 cache: false
@@ -387,6 +389,15 @@ FocusScope {
 
                                 Accessible.role: Accessible.Graphic
                                 Accessible.name: qsTr("Cover")
+
+                                onTargetSourceChanged: {
+                                    cover.source = targetSource
+                                }
+
+                                onStatusChanged: {
+                                    if (status === Image.Error)
+                                        cover.source = VLCStyle.noArtAlbumCover
+                                }
 
                                 Widgets.RoundedRectangleShadow {
                                     color: Qt.rgba(0, 0, 0, .18)
