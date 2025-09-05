@@ -6,11 +6,13 @@ PKGS += iconv
 # iconv cannot be detect with pkg-config, but it is mandated by POSIX.
 # Hard-code based on the operating system.
 ifndef HAVE_WIN32
+ifndef HAVE_MACOSX # in macOS 14.4 iconv seems broken (check iconv.m4 tests)
 ifndef HAVE_ANDROID
 PKGS_FOUND += iconv
 else
 ifeq ($(shell expr "$(ANDROID_API)" '>=' '28'), 1)
 PKGS_FOUND += iconv
+endif
 endif
 endif
 endif
