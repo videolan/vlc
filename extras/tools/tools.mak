@@ -82,7 +82,9 @@ nasm: nasm-$(NASM_VERSION).tar.gz
 	$(MOVE)
 
 .buildnasm: nasm
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_FILE += .buildnasm
@@ -100,7 +102,9 @@ cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(MOVE)
 
 .buildcmake: cmake
-	(cd $<; ./configure --prefix=$(PREFIX) $(CMAKEFLAGS) --no-qt-gui -- -DCMAKE_USE_OPENSSL:BOOL=OFF -DBUILD_TESTING:BOOL=OFF && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX) $(CMAKEFLAGS) --no-qt-gui -- -DCMAKE_USE_OPENSSL:BOOL=OFF -DBUILD_TESTING:BOOL=OFF
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_FILE += .buildcmake
@@ -116,7 +120,9 @@ help2man: help2man-$(HELP2MAN_VERSION).tar.xz .xz .tar
 	$(MOVE)
 
 .buildhelp2man: help2man
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_FILE += .buildhelp2man
@@ -140,7 +146,9 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 
 .buildlibtool: libtool .automake .help2man
 	(cd $(UNPACK_DIR) && autoreconf -fv)
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	ln -sf libtool $(PREFIX)/bin/glibtool
 	ln -sf libtoolize $(PREFIX)/bin/glibtoolize
 	touch $@
@@ -159,7 +167,9 @@ tar: tar-$(TAR_VERSION).tar.bz2
 	$(MOVE)
 
 .buildtar: .xz tar
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_PKG += tar
@@ -176,7 +186,10 @@ xz: xz-$(XZ_VERSION).tar.bz2
 	$(MOVE)
 
 .buildxz: xz
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install && rm $(PREFIX)/lib/pkgconfig/liblzma.pc)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
+	rm $(PREFIX)/lib/pkgconfig/liblzma.pc
 	touch $@
 
 CLEAN_PKG += xz
@@ -193,7 +206,9 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
 	$(MOVE)
 
 .buildautoconf: autoconf .pkg-config .m4
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_FILE += .buildautoconf
@@ -213,7 +228,9 @@ automake: automake-$(AUTOMAKE_VERSION).tar.gz
 
 .buildautomake: automake .autoconf
 	(cd $<; ./bootstrap)
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_FILE += .buildautomake
@@ -230,7 +247,9 @@ m4: m4-$(M4_VERSION).tar.gz
 	$(MOVE)
 
 .buildm4: m4
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_FILE += .buildm4
@@ -248,7 +267,9 @@ pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(MOVE)
 
 .buildpkg-config: pkgconfig
-	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static --disable-dependency-tracking && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static --disable-dependency-tracking
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_FILE += .buildpkg-config
@@ -282,7 +303,9 @@ sed: sed-$(SED_VERSION).tar.bz2
 	$(MOVE)
 
 .buildsed: sed
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_PKG += sed
@@ -340,7 +363,9 @@ bison: bison-$(BISON_VERSION).tar.xz .xz .tar
 	$(MOVE)
 
 .buildbison: bison
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_PKG += bison
@@ -359,7 +384,9 @@ flex: flex-$(FLEX_VERSION).tar.gz
 	$(MOVE)
 
 .buildflex: flex
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_PKG += flex
@@ -423,7 +450,9 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(MOVE)
 
 .buildgettext: gettext
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	cd $<; ./configure --prefix=$(PREFIX)
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	touch $@
 
 CLEAN_PKG += gettext
