@@ -16,7 +16,7 @@ variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20221011221351
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20221011230137
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
-    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20250826105319
+    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20250626142950
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
@@ -136,9 +136,6 @@ win64-arm-llvm:
         <<: *variables-win64-arm
         VLCARCH: winarm64-ucrt
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
-        # Clang <= 15 produces incorrect unwind info for code with
-        # branch protection enabled on Windows.
-        CONFIGFLAGS: --disable-branch-protection
 
 uwp32-libvlc-llvm:
     extends: .win-common
@@ -186,9 +183,6 @@ nightly-win64-arm-llvm:
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         LIBVLC_EXTRA_BUILD_FLAGS: -D /
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
-        # Clang <= 15 produces incorrect unwind info for code with
-        # branch protection enabled on Windows.
-        CONFIGFLAGS: --disable-branch-protection
 
 .release-win-common:
     # We don't use any of the .win-common template so just use .docker-template
