@@ -442,6 +442,20 @@ CLEAN_FILE += .buildninja
 # GNU gettext
 #
 
+GETTEXT_CONF = \
+	--disable-relocatable \
+	--disable-java \
+	--disable-native-java \
+	--disable-csharp \
+	--disable-d \
+	--disable-go \
+	--disable-modula2 \
+	--disable-openmp \
+	--without-emacs \
+	--without-included-libxml \
+	--without-git \
+	--without-cvs
+
 gettext-$(GETTEXT_VERSION).tar.gz:
 	$(call download_pkg,$(GETTEXT_URL),gettext)
 
@@ -450,14 +464,14 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(MOVE)
 
 .buildgettext: gettext
-	cd $<; ./configure --prefix=$(PREFIX)
-	+$(MAKE) -C $<
-	+$(MAKE) -C $< install
+	cd $<; ./configure --prefix=$(PREFIX) $(GETTEXT_CONF)
+	+$(MAKE) -C $< EXAMPLESFILES= EXAMPLESDIRS= TESTS=
+	+$(MAKE) -C $< EXAMPLESFILES= EXAMPLESDIRS= TESTS= install
 	touch $@
 
 CLEAN_PKG += gettext
 DISTCLEAN_PKG += gettext-$(GETTEXT_VERSION).tar.gz
-CLEAN_FILE += .gettext
+CLEAN_FILE += .buildgettext
 
 
 #
