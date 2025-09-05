@@ -67,8 +67,8 @@ parts:
     override-build: |
       sed -i 's|0\.19\.8|0\.19\.7|'  configure.ac
       cd extras/tools
-      ./bootstrap
-      make -j $(getconf _NPROCESSORS_ONLN) .nasm .meson .cmake
+      NEEDED="ninja" ./bootstrap
+      make -j $(getconf _NPROCESSORS_ONLN) .nasm .meson .cmake .ninja
       make -j $(getconf _NPROCESSORS_ONLN) .protoc
       cd ../../
       export PATH=$PWD/extras/tools/build/bin:$PATH
