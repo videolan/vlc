@@ -231,19 +231,19 @@
     switch (playlistType) {
         case VLC_ML_PLAYLIST_TYPE_ALL:
             placeholderPlaylistsString =
-                _NS("Your favorite playlists will appear here.\n"
+                _NS("Your playlists will appear here.\n"
                     "Go to the Browse section to add playlists you love.");
             break;
         case VLC_ML_PLAYLIST_TYPE_AUDIO:
         case VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY:
             placeholderPlaylistsString =
-                _NS("Your favorite music playlists will appear here.\n"
+                _NS("Your music playlists will appear here.\n"
                     "Go to the Browse section to add playlists you love.");
             break;
         case VLC_ML_PLAYLIST_TYPE_VIDEO:
         case VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY:
             placeholderPlaylistsString =
-                _NS("Your favorite video playlists will appear here.\n"
+                _NS("Your video playlists will appear here.\n"
                     "Go to the Browse section to add playlists you love.");
             break;
     }

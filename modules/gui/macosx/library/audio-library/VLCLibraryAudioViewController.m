@@ -246,10 +246,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     _placeholderImageNames = @[@"placeholder-group2", @"placeholder-music", @"placeholder-music", @"placeholder-music"];
     _placeholderLabelStrings = @[
-        _NS("Your favorite artists will appear here.\nGo to the Browse section to add artists you love."),
-        _NS("Your favorite albums will appear here.\nGo to the Browse section to add albums you love."),
-        _NS("Your favorite tracks will appear here.\nGo to the Browse section to add tracks you love."),
-        _NS("Your favorite genres will appear here.\nGo to the Browse section to add genres you love."),
+        _NS("Your music artists will appear here.\nGo to the Browse section to add artists you love."),
+        _NS("Your music albums will appear here.\nGo to the Browse section to add albums you love."),
+        _NS("Your music tracks will appear here.\nGo to the Browse section to add tracks you love."),
+        _NS("Your music genres will appear here.\nGo to the Browse section to add genres you love."),
     ];
 }
 

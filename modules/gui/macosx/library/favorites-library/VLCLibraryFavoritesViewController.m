@@ -339,7 +339,7 @@
 {
     [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
                                               usingConstraints:self.placeholderImageViewSizeConstraints
-                                             displayingMessage:_NS("Your favorite items will appear here.\nMark items as favorites to see them in this view.")];
+                                             displayingMessage:_NS("Your favorite media will appear here.\nMark media items as favorites to see them in this view.")];
 }
 
 - (void)presentFavoritesLibraryView:(VLCLibraryViewModeSegment)viewModeSegment

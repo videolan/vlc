@@ -233,7 +233,7 @@
 {
     [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
                                               usingConstraints:self.placeholderImageViewSizeConstraints
-                                             displayingMessage:_NS("Your favorite groups will appear here.")];
+                                             displayingMessage:_NS("Your media groups will appear here.")];
 }
 
 - (void)presentGroupsView

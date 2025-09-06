@@ -168,7 +168,7 @@
 {
     [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
                                               usingConstraints:self.placeholderImageViewSizeConstraints
-                                             displayingMessage:_NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.")];
+                                             displayingMessage:_NS("Your media will appear here.\nGo to the Browse section to add media you love.")];
 }
 
 - (void)presentHomeLibraryView
