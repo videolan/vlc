@@ -969,10 +969,13 @@ static void EsOutChangePosition(es_out_sys_t *p_sys, bool b_flush,
     vlc_list_foreach(pgrm, &p_sys->programs, node)
     {
         input_clock_Reset(pgrm->p_input_clock);
-        vlc_clock_main_Lock(pgrm->clocks.main);
-        pgrm->i_last_pcr = VLC_TICK_INVALID;
-        vlc_clock_Reset(pgrm->clocks.input);
-        vlc_clock_main_Unlock(pgrm->clocks.main);
+        if (pgrm->clocks.input != NULL)
+        {
+            vlc_clock_Lock(pgrm->clocks.input);
+            pgrm->i_last_pcr = VLC_TICK_INVALID;
+            vlc_clock_Reset(pgrm->clocks.input);
+            vlc_clock_Unlock(pgrm->clocks.input);
+        }
     }
 
     p_sys->b_buffering = true;
@@ -1316,6 +1319,7 @@ ClockListenerUpdate(void *opaque, vlc_tick_t ck_system,
                     vlc_tick_t ck_stream, double rate, bool discontinuity)
 {
     es_out_pgrm_t *pgrm = opaque;
+    assert(pgrm->clocks.input != NULL);
     vlc_clock_Lock(pgrm->clocks.input);
 
     if (discontinuity)
@@ -1334,6 +1338,7 @@ static void
 ClockListenerReset(void *opaque)
 {
     es_out_pgrm_t *pgrm = opaque;
+    assert(pgrm->clocks.input != NULL);
     vlc_clock_Lock(pgrm->clocks.input);
     vlc_clock_Reset(pgrm->clocks.input);
     vlc_clock_Unlock(pgrm->clocks.input);
