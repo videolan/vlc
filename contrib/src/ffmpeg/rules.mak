@@ -64,13 +64,6 @@ ifneq ($(findstring amf,$(PKGS)),)
 DEPS_ffmpeg += amf $(DEPS_amf)
 endif
 
-# Postproc
-MAYBE_POSTPROC =
-ifdef GPL
-FFMPEGCONF += --enable-gpl --enable-postproc
-MAYBE_POSTPROC = libpostproc
-endif
-
 # Small size
 ifdef WITH_OPTIMIZATION
 ifdef ENABLE_SMALL
@@ -218,7 +211,7 @@ endif
 
 # Build
 PKGS += ffmpeg
-ifeq ($(call need_pkg,"libavcodec >= $(FFMPEG_LAVC_MIN) libavformat >= 53.21.0 libswscale $(MAYBE_POSTPROC)"),)
+ifeq ($(call need_pkg,"libavcodec >= $(FFMPEG_LAVC_MIN) libavformat >= 53.21.0 libswscale"),)
 PKGS_FOUND += ffmpeg
 endif
 

@@ -1,0 +1,729 @@
+From 6af2145488805dd565dcc28f94de78415258412f Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 7 Nov 2025 11:32:58 +0100
+Subject: [PATCH 2/2] add missing libavcodec headers
+
+Otherwise the code won't compile on its own.
+
+Taken from libavcodec 62.11.100
+---
+ libavcodec/arm/mathops.h  | 108 ++++++++++++++++
+ libavcodec/mathops.h      | 254 ++++++++++++++++++++++++++++++++++++++
+ libavcodec/mips/mathops.h |  67 ++++++++++
+ libavcodec/ppc/mathops.h  |  79 ++++++++++++
+ libavcodec/x86/mathops.h  | 153 +++++++++++++++++++++++
+ libavutil/fixed_dsp.h     |   2 +-
+ 6 files changed, 662 insertions(+), 1 deletion(-)
+ create mode 100644 libavcodec/arm/mathops.h
+ create mode 100644 libavcodec/mathops.h
+ create mode 100644 libavcodec/mips/mathops.h
+ create mode 100644 libavcodec/ppc/mathops.h
+ create mode 100644 libavcodec/x86/mathops.h
+
+diff --git a/libavcodec/arm/mathops.h b/libavcodec/arm/mathops.h
+new file mode 100644
+index 0000000000..dc57c5571c
+--- /dev/null
++++ b/libavcodec/arm/mathops.h
+@@ -0,0 +1,108 @@
++/*
++ * simple math operations
++ * Copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at> et al
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVCODEC_ARM_MATHOPS_H
++#define AVCODEC_ARM_MATHOPS_H
++
++#include <stdint.h>
++#include "config.h"
++#include "libavutil/common.h"
++
++#if HAVE_INLINE_ASM
++
++#if HAVE_ARMV6_INLINE
++#define MULH MULH
++static inline av_const int MULH(int a, int b)
++{
++    int r;
++    __asm__ ("smmul %0, %1, %2" : "=r"(r) : "r"(a), "r"(b));
++    return r;
++}
++
++#define FASTDIV FASTDIV
++static av_always_inline av_const int FASTDIV(int a, int b)
++{
++    int r;
++    __asm__ ("cmp     %2, #2               \n\t"
++             "ldr     %0, [%3, %2, lsl #2] \n\t"
++             "ite     le                   \n\t"
++             "lsrle   %0, %1, #1           \n\t"
++             "smmulgt %0, %0, %1           \n\t"
++             : "=&r"(r) : "r"(a), "r"(b), "r"(ff_inverse) : "cc");
++    return r;
++}
++
++#else /* HAVE_ARMV6_INLINE */
++
++#define FASTDIV FASTDIV
++static av_always_inline av_const int FASTDIV(int a, int b)
++{
++    int r, t;
++    __asm__ ("umull %1, %0, %2, %3"
++             : "=&r"(r), "=&r"(t) : "r"(a), "r"(ff_inverse[b]));
++    return r;
++}
++#endif
++
++#define MLS64(d, a, b) MAC64(d, -(a), b)
++
++#if HAVE_ARMV5TE_INLINE
++
++/* signed 16x16 -> 32 multiply add accumulate */
++#   define MAC16(rt, ra, rb)                                            \
++    __asm__ ("smlabb %0, %1, %2, %0" : "+r"(rt) : "r"(ra), "r"(rb));
++
++/* signed 16x16 -> 32 multiply */
++#   define MUL16 MUL16
++static inline av_const int MUL16(int ra, int rb)
++{
++    int rt;
++    __asm__ ("smulbb %0, %1, %2" : "=r"(rt) : "r"(ra), "r"(rb));
++    return rt;
++}
++
++#endif
++
++#define mid_pred mid_pred
++static inline av_const int mid_pred(int a, int b, int c)
++{
++    int m;
++    __asm__ (
++        "mov   %0, %2  \n\t"
++        "cmp   %1, %2  \n\t"
++        "itt   gt      \n\t"
++        "movgt %0, %1  \n\t"
++        "movgt %1, %2  \n\t"
++        "cmp   %1, %3  \n\t"
++        "it    le      \n\t"
++        "movle %1, %3  \n\t"
++        "cmp   %0, %1  \n\t"
++        "it    gt      \n\t"
++        "movgt %0, %1  \n\t"
++        : "=&r"(m), "+r"(a)
++        : "r"(b), "r"(c)
++        : "cc");
++    return m;
++}
++
++#endif /* HAVE_INLINE_ASM */
++
++#endif /* AVCODEC_ARM_MATHOPS_H */
+diff --git a/libavcodec/mathops.h b/libavcodec/mathops.h
+new file mode 100644
+index 0000000000..aa0bdfe956
+--- /dev/null
++++ b/libavcodec/mathops.h
+@@ -0,0 +1,254 @@
++/*
++ * simple math operations
++ * Copyright (c) 2001, 2002 Fabrice Bellard
++ * Copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at> et al
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++#ifndef AVCODEC_MATHOPS_H
++#define AVCODEC_MATHOPS_H
++
++#include <stdint.h>
++
++#include "libavutil/attributes_internal.h"
++#include "libavutil/common.h"
++#include "config.h"
++
++#define MAX_NEG_CROP 1024
++
++extern const uint32_t ff_inverse[257];
++extern const uint8_t ff_log2_run[41];
++EXTERN const uint32_t ff_square_tab[512];
++extern const uint8_t ff_sqrt_tab[256];
++EXTERN const uint8_t ff_crop_tab[256 + 2 * MAX_NEG_CROP];
++extern const uint8_t ff_zigzag_direct[64];
++extern const uint8_t ff_zigzag_scan[16+1];
++
++#if   ARCH_ARM
++#   include "arm/mathops.h"
++#elif ARCH_MIPS
++#   include "mips/mathops.h"
++#elif ARCH_PPC
++#   include "ppc/mathops.h"
++#elif ARCH_X86
++#   include "x86/mathops.h"
++#endif
++
++/* generic implementation */
++
++#ifndef MUL64
++#   define MUL64(a,b) ((int64_t)(a) * (int64_t)(b))
++#endif
++
++#ifndef MULL
++#   define MULL(a,b,s) (MUL64(a, b) >> (s))
++#endif
++
++#ifndef MULH
++static av_always_inline int MULH(int a, int b){
++    return MUL64(a, b) >> 32;
++}
++#endif
++
++#ifndef UMULH
++static av_always_inline unsigned UMULH(unsigned a, unsigned b){
++    return ((uint64_t)(a) * (uint64_t)(b))>>32;
++}
++#endif
++
++#ifndef MAC64
++#   define MAC64(d, a, b) ((d) += MUL64(a, b))
++#endif
++
++#ifndef MLS64
++#   define MLS64(d, a, b) ((d) -= MUL64(a, b))
++#endif
++
++/* signed 16x16 -> 32 multiply add accumulate */
++#ifndef MAC16
++#   define MAC16(rt, ra, rb) rt += (ra) * (rb)
++#endif
++
++/* signed 16x16 -> 32 multiply */
++#ifndef MUL16
++#   define MUL16(ra, rb) ((ra) * (rb))
++#endif
++
++#ifndef MLS16
++#   define MLS16(rt, ra, rb) ((rt) -= (ra) * (rb))
++#endif
++
++/* median of 3 */
++#ifndef mid_pred
++#define mid_pred mid_pred
++static inline av_const int mid_pred(int a, int b, int c)
++{
++    if(a>b){
++        if(c>b){
++            if(c>a) b=a;
++            else    b=c;
++        }
++    }else{
++        if(b>c){
++            if(c>a) b=c;
++            else    b=a;
++        }
++    }
++    return b;
++}
++#endif
++
++#ifndef median4
++#define median4 median4
++static inline av_const int median4(int a, int b, int c, int d)
++{
++    if (a < b) {
++        if (c < d) return (FFMIN(b, d) + FFMAX(a, c)) / 2;
++        else       return (FFMIN(b, c) + FFMAX(a, d)) / 2;
++    } else {
++        if (c < d) return (FFMIN(a, d) + FFMAX(b, c)) / 2;
++        else       return (FFMIN(a, c) + FFMAX(b, d)) / 2;
++    }
++}
++#endif
++
++#define FF_SIGNBIT(x) ((x) >> CHAR_BIT * sizeof(x) - 1)
++
++#ifndef sign_extend
++static inline av_const int sign_extend(int val, unsigned bits)
++{
++    unsigned shift = 8 * sizeof(int) - bits;
++    union { unsigned u; int s; } v = { (unsigned) val << shift };
++    return v.s >> shift;
++}
++#endif
++
++#ifndef sign_extend64
++static inline av_const int64_t sign_extend64(int64_t val, unsigned bits)
++{
++    unsigned shift = 8 * sizeof(int64_t) - bits;
++    union { uint64_t u; int64_t s; } v = { (uint64_t) val << shift };
++    return v.s >> shift;
++}
++#endif
++
++#ifndef zero_extend
++static inline av_const unsigned zero_extend(unsigned val, unsigned bits)
++{
++    return (val << ((8 * sizeof(int)) - bits)) >> ((8 * sizeof(int)) - bits);
++}
++#endif
++
++#ifndef COPY3_IF_LT
++#define COPY3_IF_LT(x, y, a, b, c, d)\
++if ((y) < (x)) {\
++    (x) = (y);\
++    (a) = (b);\
++    (c) = (d);\
++}
++#endif
++
++#ifndef MASK_ABS
++#define MASK_ABS(mask, level) do {              \
++        mask  = level >> 31;                    \
++        level = (level ^ mask) - mask;          \
++    } while (0)
++#endif
++
++#ifndef NEG_SSR32
++#   define NEG_SSR32(a,s) ((( int32_t)(a))>>(32-(s)))
++#endif
++
++#ifndef NEG_USR32
++#   define NEG_USR32(a,s) (((uint32_t)(a))>>(32-(s)))
++#endif
++
++#if HAVE_BIGENDIAN
++# ifndef PACK_2U8
++#   define PACK_2U8(a,b)     (((a) <<  8) | (b))
++# endif
++# ifndef PACK_4U8
++#   define PACK_4U8(a,b,c,d) (((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
++# endif
++# ifndef PACK_2U16
++#   define PACK_2U16(a,b)    (((a) << 16) | (b))
++# endif
++#else
++# ifndef PACK_2U8
++#   define PACK_2U8(a,b)     (((b) <<  8) | (a))
++# endif
++# ifndef PACK_4U2
++#   define PACK_4U8(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
++# endif
++# ifndef PACK_2U16
++#   define PACK_2U16(a,b)    (((b) << 16) | (a))
++# endif
++#endif
++
++#ifndef PACK_2S8
++#   define PACK_2S8(a,b)     PACK_2U8((a)&255, (b)&255)
++#endif
++#ifndef PACK_4S8
++#   define PACK_4S8(a,b,c,d) PACK_4U8((a)&255, (b)&255, (c)&255, (d)&255)
++#endif
++#ifndef PACK_2S16
++#   define PACK_2S16(a,b)    PACK_2U16((a)&0xffff, (b)&0xffff)
++#endif
++
++#ifndef FASTDIV
++#   define FASTDIV(a,b) ((uint32_t)((((uint64_t)a) * ff_inverse[b]) >> 32))
++#endif /* FASTDIV */
++
++#ifndef ff_sqrt
++#define ff_sqrt ff_sqrt
++static inline av_const unsigned int ff_sqrt(unsigned int a)
++{
++    unsigned int b;
++
++    if (a < 255) return (ff_sqrt_tab[a + 1] - 1) >> 4;
++    else if (a < (1 << 12)) b = ff_sqrt_tab[a >> 4] >> 2;
++#if !CONFIG_SMALL
++    else if (a < (1 << 14)) b = ff_sqrt_tab[a >> 6] >> 1;
++    else if (a < (1 << 16)) b = ff_sqrt_tab[a >> 8]   ;
++#endif
++    else {
++        int s = av_log2_16bit(a >> 16) >> 1;
++        unsigned int c = a >> (s + 2);
++        b = ff_sqrt_tab[c >> (s + 8)];
++        b = FASTDIV(c,b) + (b << s);
++    }
++
++    return b - (a < b * b);
++}
++#endif
++
++static inline av_const float ff_sqrf(float a)
++{
++    return a*a;
++}
++
++static inline int8_t ff_u8_to_s8(uint8_t a)
++{
++    union {
++        uint8_t u8;
++        int8_t  s8;
++    } b;
++    b.u8 = a;
++    return b.s8;
++}
++
++#endif /* AVCODEC_MATHOPS_H */
+diff --git a/libavcodec/mips/mathops.h b/libavcodec/mips/mathops.h
+new file mode 100644
+index 0000000000..bb9dc8375a
+--- /dev/null
++++ b/libavcodec/mips/mathops.h
+@@ -0,0 +1,67 @@
++/*
++ * Copyright (c) 2009 Mans Rullgard <mans@mansr.com>
++ * Copyright (c) 2015 Zhou Xiaoyong <zhouxiaoyong@loongson.cn>
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVCODEC_MIPS_MATHOPS_H
++#define AVCODEC_MIPS_MATHOPS_H
++
++#include <stdint.h>
++#include "config.h"
++#include "libavutil/common.h"
++
++#if HAVE_INLINE_ASM
++
++#if HAVE_LOONGSON3
++
++#define MULH MULH
++static inline av_const int MULH(int a, int b)
++{
++    int c;
++    __asm__ ("dmult %1, %2      \n\t"
++             "mflo %0           \n\t"
++             "dsrl %0, %0, 32   \n\t"
++             : "=r"(c)
++             : "r"(a),"r"(b)
++             : "hi", "lo");
++    return c;
++}
++
++#define mid_pred mid_pred
++static inline av_const int mid_pred(int a, int b, int c)
++{
++    int t = b;
++    __asm__ ("sgt $8, %1, %2    \n\t"
++             "movn %0, %1, $8   \n\t"
++             "movn %1, %2, $8   \n\t"
++             "sgt $8, %1, %3    \n\t"
++             "movz %1, %3, $8   \n\t"
++             "sgt $8, %0, %1    \n\t"
++             "movn %0, %1, $8   \n\t"
++             : "+&r"(t),"+&r"(a)
++             : "r"(b),"r"(c)
++             : "$8");
++    return t;
++}
++
++#endif /* HAVE_LOONGSON3 */
++
++#endif /* HAVE_INLINE_ASM */
++
++#endif /* AVCODEC_MIPS_MATHOPS_H */
+diff --git a/libavcodec/ppc/mathops.h b/libavcodec/ppc/mathops.h
+new file mode 100644
+index 0000000000..dbd714fcd4
+--- /dev/null
++++ b/libavcodec/ppc/mathops.h
+@@ -0,0 +1,79 @@
++/*
++ * simple math operations
++ * Copyright (c) 2001, 2002 Fabrice Bellard
++ * Copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at> et al
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVCODEC_PPC_MATHOPS_H
++#define AVCODEC_PPC_MATHOPS_H
++
++#include <stdint.h>
++#include "config.h"
++#include "libavutil/common.h"
++
++#if HAVE_PPC4XX
++/* signed 16x16 -> 32 multiply add accumulate */
++#define MAC16(rt, ra, rb) \
++    __asm__ ("maclhw %0, %2, %3" : "=r" (rt) : "0" (rt), "r" (ra), "r" (rb));
++
++/* signed 16x16 -> 32 multiply */
++#define MUL16(ra, rb) \
++    ({ int __rt; \
++    __asm__ ("mullhw %0, %1, %2" : "=r" (__rt) : "r" (ra), "r" (rb)); \
++    __rt; })
++#endif
++
++#define MULH MULH
++static inline av_const int MULH(int a, int b){
++    int r;
++    __asm__ ("mulhw %0, %1, %2" : "=r"(r) : "r"(a), "r"(b));
++    return r;
++}
++
++#if !ARCH_PPC64
++static inline av_const int64_t MAC64(int64_t d, int a, int b)
++{
++    union { uint64_t x; unsigned hl[2]; } x = { d };
++    int h, l;
++    __asm__ ("mullw %3, %4, %5   \n\t"
++             "mulhw %2, %4, %5   \n\t"
++             "addc  %1, %1, %3   \n\t"
++             "adde  %0, %0, %2   \n\t"
++             : "+r"(x.hl[0]), "+r"(x.hl[1]), "=&r"(h), "=&r"(l)
++             : "r"(a), "r"(b));
++    return x.x;
++}
++#define MAC64(d, a, b) ((d) = MAC64(d, a, b))
++
++static inline av_const int64_t MLS64(int64_t d, int a, int b)
++{
++    union { uint64_t x; unsigned hl[2]; } x = { d };
++    int h, l;
++    __asm__ ("mullw %3, %4, %5   \n\t"
++             "mulhw %2, %4, %5   \n\t"
++             "subfc %1, %3, %1   \n\t"
++             "subfe %0, %2, %0   \n\t"
++             : "+r"(x.hl[0]), "+r"(x.hl[1]), "=&r"(h), "=&r"(l)
++             : "r"(a), "r"(b));
++    return x.x;
++}
++#define MLS64(d, a, b) ((d) = MLS64(d, a, b))
++#endif
++
++#endif /* AVCODEC_PPC_MATHOPS_H */
+diff --git a/libavcodec/x86/mathops.h b/libavcodec/x86/mathops.h
+new file mode 100644
+index 0000000000..ca7e2dffc1
+--- /dev/null
++++ b/libavcodec/x86/mathops.h
+@@ -0,0 +1,153 @@
++/*
++ * simple math operations
++ * Copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at> et al
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVCODEC_X86_MATHOPS_H
++#define AVCODEC_X86_MATHOPS_H
++
++#include "config.h"
++
++#include "libavutil/common.h"
++#include "libavutil/x86/asm.h"
++
++#if HAVE_INLINE_ASM
++
++#if ARCH_X86_32
++
++#define MULL MULL
++static av_always_inline av_const int MULL(int a, int b, unsigned shift)
++{
++    int rt, dummy;
++    if (__builtin_constant_p(shift))
++    __asm__ (
++        "imull %3               \n\t"
++        "shrdl %4, %%edx, %%eax \n\t"
++        :"=a"(rt), "=d"(dummy)
++        :"a"(a), "rm"(b), "i"(shift & 0x1F)
++    );
++    else
++        __asm__ (
++            "imull %3               \n\t"
++            "shrdl %4, %%edx, %%eax \n\t"
++            :"=a"(rt), "=d"(dummy)
++            :"a"(a), "rm"(b), "c"((uint8_t)shift)
++        );
++    return rt;
++}
++
++#define MULH MULH
++static av_always_inline av_const int MULH(int a, int b)
++{
++    int rt, dummy;
++    __asm__ (
++        "imull %3"
++        :"=d"(rt), "=a"(dummy)
++        :"a"(a), "rm"(b)
++    );
++    return rt;
++}
++
++#define MUL64 MUL64
++static av_always_inline av_const int64_t MUL64(int a, int b)
++{
++    int64_t rt;
++    __asm__ (
++        "imull %2"
++        :"=A"(rt)
++        :"a"(a), "rm"(b)
++    );
++    return rt;
++}
++
++#endif /* ARCH_X86_32 */
++
++#if HAVE_I686
++/* median of 3 */
++#define mid_pred mid_pred
++static inline av_const int mid_pred(int a, int b, int c)
++{
++    int i=b;
++    __asm__ (
++        "cmp    %2, %1 \n\t"
++        "cmovg  %1, %0 \n\t"
++        "cmovg  %2, %1 \n\t"
++        "cmp    %3, %1 \n\t"
++        "cmovl  %3, %1 \n\t"
++        "cmp    %1, %0 \n\t"
++        "cmovg  %1, %0 \n\t"
++        :"+&r"(i), "+&r"(a)
++        :"r"(b), "r"(c)
++    );
++    return i;
++}
++
++#if HAVE_6REGS
++#define COPY3_IF_LT(x, y, a, b, c, d)\
++__asm__ volatile(\
++    "cmpl  %0, %3       \n\t"\
++    "cmovl %3, %0       \n\t"\
++    "cmovl %4, %1       \n\t"\
++    "cmovl %5, %2       \n\t"\
++    : "+&r" (x), "+&r" (a), "+r" (c)\
++    : "r" (y), "r" (b), "r" (d)\
++);
++#endif /* HAVE_6REGS */
++
++#endif /* HAVE_I686 */
++
++#define MASK_ABS(mask, level)                   \
++    __asm__ ("cdq                    \n\t"      \
++             "xorl %1, %0            \n\t"      \
++             "subl %1, %0            \n\t"      \
++             : "+a"(level), "=&d"(mask))
++
++// avoid +32 for shift optimization (gcc should do that ...)
++#define NEG_SSR32 NEG_SSR32
++static inline  int32_t NEG_SSR32( int32_t a, int8_t s){
++    if (__builtin_constant_p(s))
++    __asm__ ("sarl %1, %0\n\t"
++         : "+r" (a)
++         : "i" (-s & 0x1F)
++    );
++    else
++        __asm__ ("sarl %1, %0\n\t"
++               : "+r" (a)
++               : "c" ((uint8_t)(-s))
++        );
++    return a;
++}
++
++#define NEG_USR32 NEG_USR32
++static inline uint32_t NEG_USR32(uint32_t a, int8_t s){
++    if (__builtin_constant_p(s))
++    __asm__ ("shrl %1, %0\n\t"
++         : "+r" (a)
++         : "i" (-s & 0x1F)
++    );
++    else
++        __asm__ ("shrl %1, %0\n\t"
++               : "+r" (a)
++               : "c" ((uint8_t)(-s))
++        );
++    return a;
++}
++
++#endif /* HAVE_INLINE_ASM */
++#endif /* AVCODEC_X86_MATHOPS_H */
+diff --git a/libavutil/fixed_dsp.h b/libavutil/fixed_dsp.h
+index 71df874263..699ecce79f 100644
+--- a/libavutil/fixed_dsp.h
++++ b/libavutil/fixed_dsp.h
+@@ -50,7 +50,7 @@
+ 
+ #include <stdint.h>
+ #include "attributes.h"
+-#include "mathops.h"
++#include "../libavcodec/mathops.h"
+ 
+ typedef struct AVFixedDSPContext {
+     /* Assume len is a multiple of 16, and arrays are 32-byte aligned */
+-- 
+2.45.1.windows.1
+

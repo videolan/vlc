@@ -1,0 +1,24 @@
+From 5beb776fa1faa6c3e7ef28d3242a6c971f91a3cb Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 7 Nov 2025 12:46:24 +0100
+Subject: [PATCH 1/2] force using external libavutil
+
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure b/configure
+index 3a400dffb8..124690ecdb 100755
+--- a/configure
++++ b/configure
+@@ -8103,6 +8103,7 @@ extralibs_avfilter="$avfilter_extralibs"
+ extralibs_postproc="$postproc_extralibs"
+ extralibs_swscale="$swscale_extralibs"
+ extralibs_swresample="$swresample_extralibs"
++requires="libavutil"
+ EOF
+ 
+ for lib in $LIBRARY_LIST; do
+-- 
+2.45.1.windows.1
+
