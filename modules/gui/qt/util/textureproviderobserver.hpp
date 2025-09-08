@@ -60,6 +60,7 @@ class TextureProviderObserver : public QObject
     //       connection (default), it may be queued in the receiver thread:
     Q_PROPERTY(bool hasAlphaChannel READ hasAlphaChannel NOTIFY hasAlphaChannelChanged FINAL)
     Q_PROPERTY(bool hasMipmaps READ hasMipmaps NOTIFY hasMipmapsChanged FINAL)
+    Q_PROPERTY(bool isAtlasTexture READ isAtlasTexture NOTIFY isAtlasTextureChanged FINAL)
 
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
@@ -69,11 +70,13 @@ public:
     QSize nativeTextureSize() const;
     bool hasAlphaChannel() const;
     bool hasMipmaps() const;
+    bool isAtlasTexture() const;
 
 signals:
     void sourceChanged();
     void hasAlphaChannelChanged(bool);
     void hasMipmapsChanged(bool);
+    void isAtlasTextureChanged(bool);
 
 private slots:
     void updateProperties();
@@ -96,6 +99,7 @@ private:
 
     std::atomic<bool> m_hasAlphaChannel = false;
     std::atomic<bool> m_hasMipmaps = false;
+    std::atomic<bool> m_isAtlasTexture = false;
 };
 
 #endif // TEXTUREPROVIDEROBSERVER_HPP

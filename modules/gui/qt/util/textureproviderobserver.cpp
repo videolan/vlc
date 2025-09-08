@@ -117,6 +117,14 @@ bool TextureProviderObserver::hasMipmaps() const
     return m_hasMipmaps.load(std::memory_order_acquire);
 }
 
+bool TextureProviderObserver::isAtlasTexture() const
+{
+    // This is likely called in the QML/GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
+    return m_isAtlasTexture.load(std::memory_order_acquire);
+}
+
 void TextureProviderObserver::updateProperties()
 {
     // This is likely called in the rendering thread.
@@ -175,6 +183,14 @@ void TextureProviderObserver::updateProperties()
                     emit hasMipmapsChanged(hasMipmaps);
             }
 
+            {
+                // Atlas texture
+                const bool isAtlasTexture = texture->isAtlasTexture();
+
+                if (m_isAtlasTexture.exchange(isAtlasTexture, memoryOrder) != isAtlasTexture)
+                    emit isAtlasTextureChanged(isAtlasTexture);
+            }
+
             return;
         }
     }
@@ -186,4 +202,7 @@ void TextureProviderObserver::updateProperties()
 
     if (m_hasMipmaps.exchange(false, memoryOrder))
         emit hasMipmapsChanged(false);
+
+    if (m_isAtlasTexture.exchange(false, memoryOrder))
+        emit isAtlasTextureChanged(false);
 }
