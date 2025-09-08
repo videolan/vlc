@@ -109,6 +109,14 @@ bool TextureProviderObserver::hasAlphaChannel() const
     return m_hasAlphaChannel.load(std::memory_order_acquire);
 }
 
+bool TextureProviderObserver::hasMipmaps() const
+{
+    // This is likely called in the QML/GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
+    return m_hasMipmaps.load(std::memory_order_acquire);
+}
+
 void TextureProviderObserver::updateProperties()
 {
     // This is likely called in the rendering thread.
@@ -159,6 +167,14 @@ void TextureProviderObserver::updateProperties()
                     emit hasAlphaChannelChanged(hasAlphaChannel);
             }
 
+            {
+                // Mipmaps
+                const bool hasMipmaps = texture->hasMipmaps();
+
+                if (m_hasMipmaps.exchange(hasMipmaps, memoryOrder) != hasMipmaps)
+                    emit hasMipmapsChanged(hasMipmaps);
+            }
+
             return;
         }
     }
@@ -167,4 +183,7 @@ void TextureProviderObserver::updateProperties()
 
     if (m_hasAlphaChannel.exchange(false, memoryOrder))
         emit hasAlphaChannelChanged(false);
+
+    if (m_hasMipmaps.exchange(false, memoryOrder))
+        emit hasMipmapsChanged(false);
 }

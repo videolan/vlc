@@ -59,6 +59,7 @@ class TextureProviderObserver : public QObject
     //       These signals may be emitted in the rendering thread, thus if the connection is auto
     //       connection (default), it may be queued in the receiver thread:
     Q_PROPERTY(bool hasAlphaChannel READ hasAlphaChannel NOTIFY hasAlphaChannelChanged FINAL)
+    Q_PROPERTY(bool hasMipmaps READ hasMipmaps NOTIFY hasMipmapsChanged FINAL)
 
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
@@ -67,10 +68,12 @@ public:
     QSize textureSize() const;
     QSize nativeTextureSize() const;
     bool hasAlphaChannel() const;
+    bool hasMipmaps() const;
 
 signals:
     void sourceChanged();
     void hasAlphaChannelChanged(bool);
+    void hasMipmapsChanged(bool);
 
 private slots:
     void updateProperties();
@@ -92,6 +95,7 @@ private:
     std::atomic<QSize> m_nativeTextureSize {{}}; // invalid by default
 
     std::atomic<bool> m_hasAlphaChannel = false;
+    std::atomic<bool> m_hasMipmaps = false;
 };
 
 #endif // TEXTUREPROVIDEROBSERVER_HPP
