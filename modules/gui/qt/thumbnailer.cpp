@@ -57,10 +57,10 @@ public:
 
 	~ThumbnailImageResponse() override
 	{
-		if (m_thread && m_thread->isRunning()) {
-			// The thread runs a single function and should finish quickly; wait briefly.
+		// Ensure any in-flight request is cancelled to unblock the worker quickly
+		cancel();
+		if (m_thread && m_thread->isRunning())
 			m_thread->wait();
-		}
 		// m_thread is set to deleteLater on finished
 		if (!m_providerWeak.isNull())
 			m_providerWeak.data()->decActive();
@@ -74,6 +74,19 @@ public:
 	}
 
 	QString errorString() const override { return m_error; }
+
+	// Allow the engine to cancel work if the image is no longer needed
+	void cancel() override
+	{
+		if (m_canceled.loadRelaxed())
+			return;
+		m_canceled.storeRelaxed(1);
+		if (m_preparser && m_reqId != VLC_PREPARSER_REQ_ID_INVALID) {
+			size_t n = vlc_preparser_Cancel(m_preparser, m_reqId);
+			if (m_owner)
+				msg_Dbg(m_owner, "ThumbnailImageResponse: cancel requested (id=%zu, cancelled=%zu)", (size_t)m_reqId, n);
+		}
+	}
 
 private:
 	QImage generate(const QUrl& mediaUrl, double position, const QSize& requestedSize, bool crop, bool precise)
@@ -130,14 +143,12 @@ private:
 			.on_ended = onEnded,
 		};
 
-		// Configure a per-request preparser timeout: keep small
-	vlc_preparser_SetTimeout(m_preparser, VLC_TICK_FROM_MS(5000));
-
 		// allocate context on heap so it's safe even if we return early
 		Sync* ctx = new Sync();
 
 		const vlc_preparser_req_id id = vlc_preparser_GenerateThumbnail(
 			m_preparser, item, &arg, &cbs, ctx);
+		m_reqId = id;
 		if (id == VLC_PREPARSER_REQ_ID_INVALID) {
 			delete ctx;
 			input_item_Release(item);
@@ -151,13 +162,16 @@ private:
 		const qint64 start = QDateTime::currentMSecsSinceEpoch();
 		const qint64 timeout = 5000;
 		while (!ctx->done.loadRelaxed()) {
+			// If canceled, try to fast-track completion
+			if (m_canceled.loadRelaxed())
+				(void)vlc_preparser_Cancel(m_preparser, id);
 			QThread::msleep(5);
 			if (QDateTime::currentMSecsSinceEpoch() - start > timeout)
 				break; // let internal timeout trigger callback
 		}
 
-	QImage out;
-	if (ctx->done.loadRelaxed() && ctx->status == VLC_SUCCESS && ctx->pic) {
+		QImage out;
+		if (ctx->done.loadRelaxed() && ctx->status == VLC_SUCCESS && ctx->pic) {
 			// Export picture to PNG in-memory, then load QImage from data
 			block_t* block = nullptr;
 			int ret = picture_Export(m_owner, &block, NULL,
@@ -200,6 +214,8 @@ private:
 	vlc_preparser_t* m_preparser = nullptr;
 	vlc_object_t* m_owner = nullptr;
 	QThread* m_thread = nullptr;
+	vlc_preparser_req_id m_reqId = VLC_PREPARSER_REQ_ID_INVALID;
+	QAtomicInt m_canceled{0};
 	mutable QString m_error;
 	QImage m_image;
 };
@@ -222,7 +238,8 @@ ThumbnailImageProvider::ThumbnailImageProvider(qt_intf_t* intf)
 		.types = VLC_PREPARSER_TYPE_THUMBNAIL,
 		.max_parser_threads = 0,
 		.max_thumbnailer_threads = 1,
-		.timeout = 0,
+	// Apply a sane timeout to avoid hangs if a decoder stalls
+	.timeout = VLC_TICK_FROM_MS(5000),
 	};
 	m_preparser = vlc_preparser_New(VLC_OBJECT(libvlc), &cfg);
 	if (!m_preparser)
