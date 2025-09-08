@@ -52,7 +52,11 @@ Item {
     // The effective radius is always going to be a half-integer.
     property int radius: 1
 
-    property bool blending: true
+    // NOTE: It seems that if SG accumulated opacity is lower than 1.0, blending is
+    //       used even if it is set false here. For that reason, it should not be
+    //       necessary to check for opacity (well, accumulated opacity can not be
+    //       checked directly in QML anyway).
+    property bool blending: (!ds1SourceObserver.isValid || ds1SourceObserver.hasAlphaChannel)
 
     // source must be a texture provider item. Some items such as `Image` and
     // `ShaderEffectSource` are inherently texture provider. Other items needs
