@@ -61,6 +61,7 @@ class TextureProviderObserver : public QObject
     Q_PROPERTY(bool hasAlphaChannel READ hasAlphaChannel NOTIFY hasAlphaChannelChanged FINAL)
     Q_PROPERTY(bool hasMipmaps READ hasMipmaps NOTIFY hasMipmapsChanged FINAL)
     Q_PROPERTY(bool isAtlasTexture READ isAtlasTexture NOTIFY isAtlasTextureChanged FINAL)
+    Q_PROPERTY(bool isValid READ isValid NOTIFY isValidChanged FINAL) // whether a texture is provided or not
 
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
@@ -71,12 +72,14 @@ public:
     bool hasAlphaChannel() const;
     bool hasMipmaps() const;
     bool isAtlasTexture() const;
+    bool isValid() const;
 
 signals:
     void sourceChanged();
     void hasAlphaChannelChanged(bool);
     void hasMipmapsChanged(bool);
     void isAtlasTextureChanged(bool);
+    void isValidChanged(bool);
 
 private slots:
     void updateProperties();
@@ -100,6 +103,7 @@ private:
     std::atomic<bool> m_hasAlphaChannel = false;
     std::atomic<bool> m_hasMipmaps = false;
     std::atomic<bool> m_isAtlasTexture = false;
+    std::atomic<bool> m_isValid = false;
 };
 
 #endif // TEXTUREPROVIDEROBSERVER_HPP

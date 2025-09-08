@@ -125,6 +125,14 @@ bool TextureProviderObserver::isAtlasTexture() const
     return m_isAtlasTexture.load(std::memory_order_acquire);
 }
 
+bool TextureProviderObserver::isValid() const
+{
+    // This is likely called in the QML/GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
+    return m_isValid.load(std::memory_order_acquire);
+}
+
 void TextureProviderObserver::updateProperties()
 {
     // This is likely called in the rendering thread.
@@ -191,6 +199,9 @@ void TextureProviderObserver::updateProperties()
                     emit isAtlasTextureChanged(isAtlasTexture);
             }
 
+            if (!m_isValid.exchange(true, memoryOrder))
+                emit isValidChanged(true);
+
             return;
         }
     }
@@ -205,4 +216,7 @@ void TextureProviderObserver::updateProperties()
 
     if (m_isAtlasTexture.exchange(false, memoryOrder))
         emit isAtlasTextureChanged(false);
+
+    if (m_isValid.exchange(false, memoryOrder))
+        emit isValidChanged(false);
 }
