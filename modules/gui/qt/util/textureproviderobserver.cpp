@@ -70,9 +70,9 @@ void TextureProviderObserver::setSource(const QQuickItem *source)
                 m_provider = m_source->textureProvider(); // This can only be called in the rendering thread.
                 assert(m_provider);
 
-                connect(m_provider, &QSGTextureProvider::textureChanged, this, &TextureProviderObserver::updateTextureSize, Qt::DirectConnection);
+                connect(m_provider, &QSGTextureProvider::textureChanged, this, &TextureProviderObserver::updateProperties, Qt::DirectConnection);
 
-                updateTextureSize();
+                updateProperties();
             }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
         };
 
@@ -101,7 +101,15 @@ QSize TextureProviderObserver::nativeTextureSize() const
     return m_nativeTextureSize.load(std::memory_order_acquire);
 }
 
-void TextureProviderObserver::updateTextureSize()
+bool TextureProviderObserver::hasAlphaChannel() const
+{
+    // This is likely called in the QML/GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
+    return m_hasAlphaChannel.load(std::memory_order_acquire);
+}
+
+void TextureProviderObserver::updateProperties()
 {
     // This is likely called in the rendering thread.
     // Rendering thread should avoid blocking the QML/GUI thread. In this case, unlike the high precision
@@ -114,28 +122,41 @@ void TextureProviderObserver::updateTextureSize()
     {
         if (const auto texture = m_provider->texture())
         {
-            const auto textureSize = texture->textureSize();
-            m_textureSize.store(textureSize, memoryOrder);
-
             {
-                // Native texture size
+                // SG and native texture size
 
-                const auto legacyUpdateNativeTextureSize = [&]() {
-                    const auto ntsr = texture->normalizedTextureSubRect();
-                    m_nativeTextureSize.store({static_cast<int>(textureSize.width() / ntsr.width()),
-                                               static_cast<int>(textureSize.height() / ntsr.height())},
-                                              memoryOrder);
-                };
+                // SG texture size:
+                const auto textureSize = texture->textureSize();
+                m_textureSize.store(textureSize, memoryOrder);
+
+                {
+                    // Native texture size
+
+                    const auto legacyUpdateNativeTextureSize = [&]() {
+                        const auto ntsr = texture->normalizedTextureSubRect();
+                        m_nativeTextureSize.store({static_cast<int>(textureSize.width() / ntsr.width()),
+                                                   static_cast<int>(textureSize.height() / ntsr.height())},
+                                                  memoryOrder);
+                    };
 
 #ifdef RHI_HEADER_AVAILABLE
-                const QRhiTexture* const rhiTexture = texture->rhiTexture();
-                if (Q_LIKELY(rhiTexture))
-                    m_nativeTextureSize.store(rhiTexture->pixelSize(), memoryOrder);
-                else
-                    legacyUpdateNativeTextureSize();
+                    const QRhiTexture* const rhiTexture = texture->rhiTexture();
+                    if (Q_LIKELY(rhiTexture))
+                        m_nativeTextureSize.store(rhiTexture->pixelSize(), memoryOrder);
+                    else
+                        legacyUpdateNativeTextureSize();
 #else
-                legacyUpdateNativeTextureSize();
+                    legacyUpdateNativeTextureSize();
 #endif
+                }
+            }
+
+            {
+                // Alpha channel
+                const bool hasAlphaChannel = texture->hasAlphaChannel();
+
+                if (m_hasAlphaChannel.exchange(hasAlphaChannel, memoryOrder) != hasAlphaChannel)
+                    emit hasAlphaChannelChanged(hasAlphaChannel);
             }
 
             return;
@@ -143,4 +164,7 @@ void TextureProviderObserver::updateTextureSize()
     }
 
     m_textureSize.store({}, memoryOrder);
+
+    if (m_hasAlphaChannel.exchange(false, memoryOrder))
+        emit hasAlphaChannelChanged(false);
 }

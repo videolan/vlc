@@ -55,18 +55,25 @@ class TextureProviderObserver : public QObject
     Q_PROPERTY(QSize textureSize READ textureSize FINAL) // Scene graph texture size
     Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
 
+    // NOTE: Since it is not expected that these properties change rapidly, they have notify signals.
+    //       These signals may be emitted in the rendering thread, thus if the connection is auto
+    //       connection (default), it may be queued in the receiver thread:
+    Q_PROPERTY(bool hasAlphaChannel READ hasAlphaChannel NOTIFY hasAlphaChannelChanged FINAL)
+
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
 
     void setSource(const QQuickItem* source);
     QSize textureSize() const;
     QSize nativeTextureSize() const;
+    bool hasAlphaChannel() const;
 
 signals:
     void sourceChanged();
+    void hasAlphaChannelChanged(bool);
 
 private slots:
-    void updateTextureSize();
+    void updateProperties();
 
 private:
     QPointer<const QQuickItem> m_source;
@@ -83,6 +90,8 @@ private:
 
     std::atomic<QSize> m_textureSize {{}}; // invalid by default
     std::atomic<QSize> m_nativeTextureSize {{}}; // invalid by default
+
+    std::atomic<bool> m_hasAlphaChannel = false;
 };
 
 #endif // TEXTUREPROVIDEROBSERVER_HPP
