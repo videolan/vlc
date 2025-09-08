@@ -20,7 +20,6 @@
 
 #include <vlc_interface.h>
 #include <vlc_objects.h>
-#include <vlc/libvlc.h>
 #include <vlc_block.h>
 
 // ---------------------- ThumbnailImageResponse ----------------------
@@ -39,6 +38,9 @@ public:
 	// Snapshot core pointers; avoid dereferencing provider later
 	m_preparser = provider ? provider->preparser() : nullptr;
 	m_owner = provider ? provider->ownerObject() : nullptr;
+	if (m_owner)
+		msg_Dbg(m_owner, "ThumbnailImageResponse: start url=%s pos=%.3f size=%dx%d",
+				qtu(mediaUrl.toString()), position, requestedSize.width(), requestedSize.height());
 		// Run thumbnail request in a worker thread without QtConcurrent
 		m_thread = QThread::create([this, mediaUrl, position, requestedSize, crop, precise]() {
 			QImage img = this->generate(mediaUrl, position, requestedSize, crop, precise);
@@ -62,6 +64,8 @@ public:
 		// m_thread is set to deleteLater on finished
 		if (!m_providerWeak.isNull())
 			m_providerWeak.data()->decActive();
+		if (m_owner)
+			msg_Dbg(m_owner, "ThumbnailImageResponse: destroyed");
 	}
 
 	QQuickTextureFactory *textureFactory() const override
@@ -76,6 +80,8 @@ private:
 	{
 		if (!m_preparser || !m_owner) {
 			m_error = QStringLiteral("No thumbnailer");
+			if (m_owner)
+				msg_Warn(m_owner, "ThumbnailImageResponse: no preparser/owner");
 			return {};
 		}
 
@@ -136,6 +142,8 @@ private:
 			delete ctx;
 			input_item_Release(item);
 			m_error = QStringLiteral("Thumbnail request failed");
+			if (m_owner)
+				msg_Warn(m_owner, "ThumbnailImageResponse: GenerateThumbnail failed");
 			return {};
 		}
 
@@ -165,15 +173,22 @@ private:
 			ctx->pic = nullptr;
 			delete ctx;
 			ctx = nullptr;
+			if (m_owner)
+				msg_Dbg(m_owner, "ThumbnailImageResponse: success (%dx%d)", out.width(), out.height());
 		} else if (!ctx->done.loadRelaxed()) {
 			m_error = QStringLiteral("No thumbnail generated (timeout)");
 			// Detach and let the callback clean up when it eventually fires
 			ctx->detached.storeRelaxed(1);
+			if (m_owner)
+				msg_Warn(m_owner, "ThumbnailImageResponse: timeout waiting for thumbnail");
 		} else {
 			// done but failed or no picture: callback already fired; free ctx here
 			m_error = QStringLiteral("No thumbnail generated");
+			int st = ctx->status; // cache before delete
 			delete ctx;
 			ctx = nullptr;
+			if (m_owner)
+				msg_Warn(m_owner, "ThumbnailImageResponse: done without picture (status=%d)", st);
 		}
 
 		input_item_Release(item);
@@ -195,6 +210,8 @@ ThumbnailImageProvider::ThumbnailImageProvider(qt_intf_t* intf)
 	: QQuickAsyncImageProvider()
 	, m_intf(intf)
 {
+	if (m_intf)
+		msg_Dbg(m_intf, "ThumbnailImageProvider: init");
 	if (qEnvironmentVariableIntValue("VLC_DISABLE_THUMBNAILER") == 1) {
 		msg_Warn(m_intf, "Thumbnailer disabled by VLC_DISABLE_THUMBNAILER=1");
 		return;
@@ -210,24 +227,34 @@ ThumbnailImageProvider::ThumbnailImageProvider(qt_intf_t* intf)
 	m_preparser = vlc_preparser_New(VLC_OBJECT(libvlc), &cfg);
 	if (!m_preparser)
 		msg_Err(m_intf, "Failed to create thumbnail preparser");
+	else
+		msg_Dbg(m_intf, "ThumbnailImageProvider: preparser created");
 }
 
 ThumbnailImageProvider::~ThumbnailImageProvider()
 {
 	m_shuttingDown = true;
+	if (m_intf)
+		msg_Dbg(m_intf, "ThumbnailImageProvider: shutting down, active responses=%d", m_activeResponses.loadRelaxed());
 	// Wait briefly for outstanding responses to finish
 	for (int i = 0; i < 500 && m_activeResponses.loadRelaxed() > 0; ++i)
 		QThread::msleep(2);
 	if (m_preparser)
 		vlc_preparser_Delete(m_preparser);
 	m_preparser = nullptr;
+	if (m_intf)
+		msg_Dbg(m_intf, "ThumbnailImageProvider: destroyed");
 }
 
 QQuickImageResponse* ThumbnailImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
 {
-	if (m_shuttingDown || !m_preparser)
+	if (m_shuttingDown || !m_preparser) {
+		m_activeResponses.ref();
 		return new ThumbnailImageResponse(this, QUrl(), 0.0, requestedSize, false, false);
+	}
 	// id example: "mrl=<url>&pos=0.42&crop=1&precise=0"
+	if (m_intf)
+		msg_Dbg(m_intf, "ThumbnailImageProvider: request id='%s' size=%dx%d", qtu(id), requestedSize.width(), requestedSize.height());
 	QUrlQuery q(id);
 	const QUrl mediaUrl = QUrl(q.queryItemValue(QStringLiteral("mrl")));
 	const double pos = q.queryItemValue(QStringLiteral("pos")).toDouble();
@@ -242,6 +269,9 @@ QQuickImageResponse* ThumbnailImageProvider::requestImageResponse(const QString 
 		sz = QSize(w, h);
 
 	m_activeResponses.ref();
+	if (m_intf)
+		msg_Dbg(m_intf, "ThumbnailImageProvider: dispatch thumbnail pos=%.3f size=%dx%d crop=%d precise=%d",
+				pos, sz.width(), sz.height(), int(crop), int(precise));
 	auto* r = new ThumbnailImageResponse(this, mediaUrl, pos, sz, crop, precise);
 	return r;
 }

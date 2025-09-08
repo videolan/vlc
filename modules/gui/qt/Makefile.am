@@ -53,9 +53,6 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt) -fPIC
 libqt_plugin_la_LIBADD = $(vlc_qt_libs)
-# Link against libvlc for public thumbnail APIs used by thumbnailer.cpp
-# Prefer linking the local libtool archive to avoid picking a system lib
-libqt_plugin_la_LIBADD += $(top_builddir)/lib/libvlc.la
 if HAVE_LIBATOMIC
 libqt_plugin_la_CXXFLAGS += -DQT_HAS_LIBATOMIC
 libqt_plugin_la_LIBADD += -latomic

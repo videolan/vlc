@@ -104,15 +104,17 @@ T.ProgressBar {
     // Thumbnail preview popup above the seek bar, like YouTube
     Popup {
         id: thumbPopup
-        visible: hoverHandler.hovered
+        // Only show when hovering and a video is actually loaded
+        visible: hoverHandler.hovered && Player.hasVideoOutput
         modal: false
         focus: false
         padding: VLCStyle.margin_xsmall
         x: Helpers.clamp(hoverHandler.point.position.x - width/2, 0, control.availableWidth - width)
         y: -height - VLCStyle.dp(6)
         background: Rectangle {
-            radius: VLCStyle.radius_small
-            color: theme.bg.elevated
+            // Use existing, exported style radius and a valid background color role
+            radius: VLCStyle.gridCover_radius
+            color: theme.bg.secondary
             border.color: theme.border
             border.width: 1
         }
@@ -126,8 +128,12 @@ T.ProgressBar {
                 fillMode: Image.PreserveAspectFit
                 cache: false
                 asynchronous: true
-                source: Thumbnailer.buildSource(Player.url, hoverHandler.hovered ? hoverHandler.point.position.x / control.width : Player.position,
-                                                width, height, true, false)
+        // Avoid issuing thumbnail requests before media is available
+        source: (Player.hasVideoOutput && Player.url && Player.url !== "")
+            ? Thumbnailer.buildSource(Player.url,
+                          hoverHandler.hovered ? hoverHandler.point.position.x / control.width : Player.position,
+                          width, height, true, false)
+            : ""
             }
             // Small timestamp under the thumbnail
             Text {

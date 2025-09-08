@@ -558,26 +558,43 @@ static int OpenInternal( qt_intf_t *p_intf )
 #endif
 
 #if (_POSIX_SPAWN >= 0)
-    /* Check if QApplication works */
-    char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, "vlc-qt-check");
-    if (unlikely(path == NULL))
-        return VLC_ENOMEM;
+    /* Ensure Qt chooses a compatible platform in headless/WSL/remote X cases
+     * before probing with the helper, otherwise the probe may fail and skip Qt. */
+    if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
+        qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
+    if (qEnvironmentVariableIsEmpty("QSG_RHI_PREFER_SOFTWARE_RENDERER"))
+        qputenv("QSG_RHI_PREFER_SOFTWARE_RENDERER", QByteArrayLiteral("1"));
 
-    char *argv[] = { path, NULL };
-    pid_t pid;
+    /* Allow bypassing the probe in developer/build-tree environments. */
+    const bool forceQt = !qEnvironmentVariableIsEmpty("VLC_QT_FORCE");
 
-    int val = posix_spawn(&pid, path, NULL, NULL, argv, environ);
-    free(path);
-    if (val)
-        return VLC_ENOMEM;
+    if (!forceQt) {
+        /* Check if QApplication works */
+        char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, "vlc-qt-check");
+        if (unlikely(path == NULL))
+            return VLC_ENOMEM;
 
-    int status;
-    while (waitpid(pid, &status, 0) == -1);
+        char *argv[] = { path, NULL };
+        pid_t pid;
 
-    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-    {
-        msg_Dbg(p_intf, "Qt check failed (%d). Skipping.", status);
-        return VLC_EGENERIC;
+        int val = posix_spawn(&pid, path, NULL, NULL, argv, environ);
+        free(path);
+        if (val) {
+            /* In some build-tree setups, the helper may be missing from libexec.
+             * Fail soft here so we can still try to start the Qt interface. */
+            msg_Warn(p_intf, "Qt probe helper spawn failed (errno=%d), continuing without probe", val);
+        } else {
+            int status;
+            while (waitpid(pid, &status, 0) == -1) {}
+
+            if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+            {
+                msg_Dbg(p_intf, "Qt check failed (%d). Skipping.", status);
+                return VLC_EGENERIC;
+            }
+        }
+    } else {
+        msg_Dbg(p_intf, "VLC_QT_FORCE set, bypassing Qt probe helper");
     }
 #endif
 
