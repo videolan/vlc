@@ -7,7 +7,7 @@ FFMPEG_REVISION := 0
 FFMPEG_VERSION := $(FFMPEG_MAJVERSION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
-FFMPEG_GITURL := $(VIDEOLAN_GIT)/ffmpeg.git
+FFMPEG_GITURL := https://code.ffmpeg.org/FFmpeg/FFmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 
 FFMPEG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(FFMPEG_HASH))))
