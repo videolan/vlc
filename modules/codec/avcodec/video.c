@@ -624,7 +624,7 @@ static int InitVideoDecCommon( decoder_t *p_dec )
     p_dec->pf_flush  = Flush;
 
     /* XXX: Writing input format makes little sense. */
-    if( p_context->profile != FF_PROFILE_UNKNOWN )
+    if( p_context->profile != AVPROFILE(UNKNOWN) )
         p_dec->fmt_in.i_profile = p_context->profile;
     if( p_context->level != FF_LEVEL_UNKNOWN )
         p_dec->fmt_in.i_level = p_context->level;

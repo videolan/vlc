@@ -48,25 +48,25 @@ struct picture_sys_t {
 #include "../../packetizer/h264_nal.h"
 #include "../../packetizer/hevc_nal.h"
 
-static const int PROF_MPEG2_MAIN[]   = { FF_PROFILE_MPEG2_SIMPLE,
-                                         FF_PROFILE_MPEG2_MAIN,
-                                         FF_PROFILE_UNKNOWN };
-static const int PROF_H264_HIGH[]    = { FF_PROFILE_H264_BASELINE,
-                                         FF_PROFILE_H264_CONSTRAINED_BASELINE,
-                                         FF_PROFILE_H264_MAIN,
-                                         FF_PROFILE_H264_HIGH,
-                                         FF_PROFILE_UNKNOWN };
-static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN,
-                                         FF_PROFILE_UNKNOWN };
-static const int PROF_HEVC_MAIN10[]  = { FF_PROFILE_HEVC_MAIN,
-                                         FF_PROFILE_HEVC_MAIN_10,
-                                         FF_PROFILE_UNKNOWN };
+static const int PROF_MPEG2_MAIN[]   = { AVPROFILE(MPEG2_SIMPLE),
+                                         AVPROFILE(MPEG2_MAIN),
+                                         AVPROFILE(UNKNOWN) };
+static const int PROF_H264_HIGH[]    = { AVPROFILE(H264_BASELINE),
+                                         AVPROFILE(H264_CONSTRAINED_BASELINE),
+                                         AVPROFILE(H264_MAIN),
+                                         AVPROFILE(H264_HIGH),
+                                         AVPROFILE(UNKNOWN) };
+static const int PROF_HEVC_MAIN[]    = { AVPROFILE(HEVC_MAIN),
+                                         AVPROFILE(UNKNOWN) };
+static const int PROF_HEVC_MAIN10[]  = { AVPROFILE(HEVC_MAIN),
+                                         AVPROFILE(HEVC_MAIN_10),
+                                         AVPROFILE(UNKNOWN) };
 
-static const int PROF_VP9_MAIN[]    = { FF_PROFILE_VP9_0, FF_PROFILE_UNKNOWN };
-static const int PROF_VP9_10[]      = { FF_PROFILE_VP9_2, FF_PROFILE_UNKNOWN };
+static const int PROF_VP9_MAIN[]    = { AVPROFILE(VP9_0), AVPROFILE(UNKNOWN) };
+static const int PROF_VP9_10[]      = { AVPROFILE(VP9_2), AVPROFILE(UNKNOWN) };
 
-static const int PROF_AV1_MAIN[]    = { FF_PROFILE_AV1_MAIN, FF_PROFILE_UNKNOWN };
-static const int PROF_AV1_HIGH[]    = { FF_PROFILE_AV1_HIGH, FF_PROFILE_AV1_MAIN, FF_PROFILE_UNKNOWN };
+static const int PROF_AV1_MAIN[]    = { AVPROFILE(AV1_MAIN), AVPROFILE(UNKNOWN) };
+static const int PROF_AV1_HIGH[]    = { AVPROFILE(AV1_HIGH), AVPROFILE(AV1_MAIN), AVPROFILE(UNKNOWN) };
 
 #include <winapifamily.h>
 #if defined(WINAPI_FAMILY)
@@ -436,7 +436,7 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
     bool is_supported = false;
     if (profile <= 0)
         is_supported = true;
-    else for (const int *p_profile = &mode->p_profiles[0]; *p_profile != FF_PROFILE_UNKNOWN; ++p_profile)
+    else for (const int *p_profile = &mode->p_profiles[0]; *p_profile != AVPROFILE(UNKNOWN); ++p_profile)
     {
         if (*p_profile == profile)
         {

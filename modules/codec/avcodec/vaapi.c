@@ -100,9 +100,9 @@ static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
         count = 18;
         break;
     case AV_CODEC_ID_HEVC:
-        if (ctx->profile == FF_PROFILE_HEVC_MAIN)
+        if (ctx->profile == AVPROFILE(HEVC_MAIN))
             i_profile = VAProfileHEVCMain;
-        else if (ctx->profile == FF_PROFILE_HEVC_MAIN_10)
+        else if (ctx->profile == AVPROFILE(HEVC_MAIN_10))
         {
             i_profile = VAProfileHEVCMain10;
             i_vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;
@@ -116,10 +116,10 @@ static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
         count = 5;
         break;
     case AV_CODEC_ID_VP9:
-        if (ctx->profile == FF_PROFILE_VP9_0)
+        if (ctx->profile == AVPROFILE(VP9_0))
             i_profile = VAProfileVP9Profile0;
 #if VA_CHECK_VERSION( 0, 39, 0 )
-        else if (ctx->profile == FF_PROFILE_VP9_2)
+        else if (ctx->profile == AVPROFILE(VP9_2))
         {
             i_profile = VAProfileVP9Profile2;
             i_vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;

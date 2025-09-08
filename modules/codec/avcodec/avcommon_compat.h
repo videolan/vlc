@@ -144,4 +144,10 @@
 
 #endif
 
+#if LIBAVCODEC_VERSION_CHECK(60,26,100)
+# define AVPROFILE(prof) (AV_PROFILE_##prof)
+#else
+# define AVPROFILE(prof) (FF_PROFILE_##prof)
+#endif
+
 #endif
