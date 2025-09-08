@@ -1,7 +1,7 @@
-From 493ea35f144dbe4dc5abbd18edfb803cba1dcaf0 Mon Sep 17 00:00:00 2001
+From 9994ac6f9f137441dfc3d49a5c9b6f914166dd25 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 22 Jan 2018 11:09:56 +0100
-Subject: [PATCH 1/9] avcodec/h264_slice: use the new SAR early when setting
+Subject: [PATCH 02/10] avcodec/h264_slice: use the new SAR early when setting
  the decoder
 
 If we don't do that get_format might not be called for a while and the proper
@@ -13,10 +13,10 @@ See the sample mentioned here: https://trac.videolan.org/vlc/ticket/19435
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/libavcodec/h264_slice.c b/libavcodec/h264_slice.c
-index a66b75ca80..094b36ae28 100644
+index 7e53e38cca..a4bf58af1c 100644
 --- a/libavcodec/h264_slice.c
 +++ b/libavcodec/h264_slice.c
-@@ -1079,8 +1079,10 @@ static int h264_init_ps(H264Context *h, const H264SliceContext *sl, int first_sl
+@@ -1090,8 +1090,10 @@ static int h264_init_ps(H264Context *h, const H264SliceContext *sl, int first_sl
          || (non_j_pixfmt(h->avctx->pix_fmt) != non_j_pixfmt(get_pixel_format(h, 0))))
          must_reinit = 1;
  
@@ -29,5 +29,5 @@ index a66b75ca80..094b36ae28 100644
      if (!h->setup_finished) {
          h->avctx->profile = ff_h264_get_profile(sps);
 -- 
-2.45.0.windows.1
+2.45.1.windows.1
 

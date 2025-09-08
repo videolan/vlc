@@ -1,17 +1,17 @@
-From 28a1eaf1477329824b38dd75c8d44ee9239848e3 Mon Sep 17 00:00:00 2001
+From 347cf74983357ade0b7e768769713913015e9d0b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Felix=20Paul=20K=C3=BChne?= <fkuehne@videolan.org>
 Date: Sun, 17 Mar 2024 16:03:53 +0100
-Subject: [PATCH 7/9] fix compilation for xrOS
+Subject: [PATCH 10/10] fix compilation for xrOS
 
 ---
  libavcodec/videotoolbox.c | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/libavcodec/videotoolbox.c b/libavcodec/videotoolbox.c
-index 505483ef66..0bfaa3d097 100644
+index ccba249140..b2f38905a7 100644
 --- a/libavcodec/videotoolbox.c
 +++ b/libavcodec/videotoolbox.c
-@@ -788,7 +788,9 @@ static CFDictionaryRef videotoolbox_buffer_attributes_create(int width,
+@@ -818,7 +818,9 @@ static CFDictionaryRef videotoolbox_buffer_attributes_create(int width,
      CFDictionarySetValue(buffer_attributes, kCVPixelBufferWidthKey, w);
      CFDictionarySetValue(buffer_attributes, kCVPixelBufferHeightKey, h);
  #if TARGET_OS_IPHONE
@@ -22,5 +22,5 @@ index 505483ef66..0bfaa3d097 100644
      CFDictionarySetValue(buffer_attributes, kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey, kCFBooleanTrue);
  #endif
 -- 
-2.45.0.windows.1
+2.45.1.windows.1
 

@@ -1,7 +1,7 @@
-From 8353ed0ad5634cee0d66936e5ccbe54aa845dff7 Mon Sep 17 00:00:00 2001
+From b8a6a11e1be9712e4274de8f9dc49b63f3a1e54c Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 3 Oct 2019 14:05:40 +0200
-Subject: [PATCH 2/9] avcodec/dxva2_hevc: add support for parsing HEVC Range
+Subject: [PATCH 03/10] avcodec/dxva2_hevc: add support for parsing HEVC Range
  Extension data
 
 ---
@@ -27,7 +27,7 @@ index 27f40e5519..67ce8d3871 100644
   * @defgroup lavc_codec_hwaccel_d3d11va Direct3D11
   * @ingroup lavc_codec_hwaccel
 diff --git a/libavcodec/d3d12va_hevc.c b/libavcodec/d3d12va_hevc.c
-index 7686f0eb6c..2b1633fca9 100644
+index e72d49b7d9..a19931b7de 100644
 --- a/libavcodec/d3d12va_hevc.c
 +++ b/libavcodec/d3d12va_hevc.c
 @@ -33,7 +33,7 @@
@@ -39,7 +39,7 @@ index 7686f0eb6c..2b1633fca9 100644
      DXVA_Qmatrix_HEVC      qm;
      unsigned               slice_count;
      DXVA_Slice_HEVC_Short  slice_short[MAX_SLICES];
-@@ -148,15 +148,18 @@ static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPU
+@@ -151,15 +151,18 @@ static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPU
  
  static int d3d12va_hevc_end_frame(AVCodecContext *avctx)
  {
@@ -111,7 +111,7 @@ index bdec6112e9..1520964878 100644
   * @defgroup lavc_codec_hwaccel_dxva2 DXVA2
   * @ingroup lavc_codec_hwaccel
 diff --git a/libavcodec/dxva2_hevc.c b/libavcodec/dxva2_hevc.c
-index d01d1e76e8..cc922f5077 100644
+index 85698dfcce..7c11621f5a 100644
 --- a/libavcodec/dxva2_hevc.c
 +++ b/libavcodec/dxva2_hevc.c
 @@ -28,11 +28,12 @@
@@ -181,7 +181,7 @@ index d01d1e76e8..cc922f5077 100644
      pp->wFormatAndSequenceInfoFlags = (sps->chroma_format_idc             <<  0) |
                                        (sps->separate_colour_plane         <<  2) |
                                        ((sps->bit_depth - 8)               <<  3) |
-@@ -411,16 +442,18 @@ static int dxva2_hevc_decode_slice(AVCodecContext *avctx,
+@@ -412,16 +443,18 @@ static int dxva2_hevc_decode_slice(AVCodecContext *avctx,
  
  static int dxva2_hevc_end_frame(AVCodecContext *avctx)
  {
@@ -203,7 +203,7 @@ index d01d1e76e8..cc922f5077 100644
                                      commit_bitstream_and_slice_buffer);
      return ret;
 diff --git a/libavcodec/dxva2_internal.h b/libavcodec/dxva2_internal.h
-index 224a867ebc..7f3e5938ac 100644
+index 6cbd0e42d7..6c301ae85a 100644
 --- a/libavcodec/dxva2_internal.h
 +++ b/libavcodec/dxva2_internal.h
 @@ -33,6 +33,7 @@
@@ -259,15 +259,15 @@ index 224a867ebc..7f3e5938ac 100644
  #define DXVA_SHARED_CONTEXT(avctx) ((FFDXVASharedContext *)((avctx)->internal->hwaccel_priv_data))
  
  #define DXVA_CONTEXT(avctx) (AVDXVAContext *)((avctx)->hwaccel_context ? (avctx)->hwaccel_context : (&(DXVA_SHARED_CONTEXT(avctx)->ctx)))
-@@ -171,7 +210,7 @@ void ff_dxva2_h264_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
- 
+@@ -172,7 +211,7 @@ void ff_dxva2_h264_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
  void ff_dxva2_h264_fill_scaling_lists(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_Qmatrix_H264 *qm);
  
+ #if CONFIG_HEVC_D3D12VA_HWACCEL || CONFIG_HEVC_D3D11VA_HWACCEL || CONFIG_HEVC_D3D11VA2_HWACCEL || CONFIG_HEVC_DXVA2_HWACCEL
 -void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_PicParams_HEVC *pp);
 +void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_PicParams_HEVC_Rext *pp);
  
  void ff_dxva2_hevc_fill_scaling_lists(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_Qmatrix_HEVC *qm);
- 
+ #endif
 -- 
-2.45.0.windows.1
+2.45.1.windows.1
 
