@@ -1,16 +1,15 @@
-From 2dbcebff1e80541d8aa71041f36a086856987373 Mon Sep 17 00:00:00 2001
+From 6bca9ec4f826cab7ed941dd34535fc251f253659 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 23 Jan 2018 13:01:22 +0100
-Subject: [PATCH 8/9] fix crash on bogus frame reference in MPEG-2 with
- DXVA
+Subject: [PATCH 01/10] fix crash on bogus frame reference in MPEG-2 with DXVA
 
+It was added for VC-1 in fe6037fd04db8837dcdb9013f9c4ad4e7eb0592e but not in MPEG-2.
 ---
  libavcodec/dxva2_mpeg2.c | 4 ++--
- libavcodec/dxva2_vc1.c   | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/libavcodec/dxva2_mpeg2.c b/libavcodec/dxva2_mpeg2.c
-index d88e782414..c3097cb6e5 100644
+index 7955bcdea2..e559c4a97d 100644
 --- a/libavcodec/dxva2_mpeg2.c
 +++ b/libavcodec/dxva2_mpeg2.c
 @@ -50,11 +50,11 @@ void ff_dxva2_mpeg2_fill_picture_parameters(AVCodecContext *avctx,
@@ -28,5 +27,5 @@ index d88e782414..c3097cb6e5 100644
      else
          pp->wBackwardRefPictureIndex = 0xffff;
 -- 
-2.45.0.windows.1
+2.45.1.windows.1
 

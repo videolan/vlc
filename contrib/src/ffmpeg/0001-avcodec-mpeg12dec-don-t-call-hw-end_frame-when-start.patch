@@ -1,8 +1,8 @@
-From 9ec0de5f215f6d7e6854e619071f79ff095432ad Mon Sep 17 00:00:00 2001
+From de7c10a54b8beb95882273a1c4b391e82d00bc98 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 12 Feb 2021 08:20:56 +0100
-Subject: [PATCH 1/2] avcodec/mpeg12dec: don't call hw->end_frame when starting
- second field decoding
+Subject: [PATCH 06/10] avcodec/mpeg12dec: don't call hw->end_frame when
+ starting second field decoding
 
 This call is unbalanced with a hwaccel->start_frame. It fixes some crashes
 because this call ends up using uninitialized memory. Decoding works as
@@ -12,10 +12,10 @@ expected after this patch.
  1 file changed, 8 deletions(-)
 
 diff --git a/libavcodec/mpeg12dec.c b/libavcodec/mpeg12dec.c
-index 4f784611de..a9e2383892 100644
+index 3ea8d02e1b..f22396f66e 100644
 --- a/libavcodec/mpeg12dec.c
 +++ b/libavcodec/mpeg12dec.c
-@@ -1340,14 +1340,6 @@ static int mpeg_field_start(Mpeg1Context *s1, const uint8_t *buf, int buf_size)
+@@ -1308,14 +1308,6 @@ static int mpeg_field_start(Mpeg1Context *s1, const uint8_t *buf, int buf_size)
              av_log(s->avctx, AV_LOG_ERROR, "first field missing\n");
              return AVERROR_INVALIDDATA;
          }
@@ -31,5 +31,5 @@ index 4f784611de..a9e2383892 100644
          if (ret < 0)
              return ret;
 -- 
-2.45.0.windows.1
+2.45.1.windows.1
 
