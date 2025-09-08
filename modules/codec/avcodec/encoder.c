@@ -1067,7 +1067,7 @@ errmsg:
         p_sys->i_sample_bytes = (p_enc->fmt_in.audio.i_bitspersample / 8);
         p_sys->i_frame_size = p_context->frame_size > 1 ?
                                     p_context->frame_size :
-                                    AV_INPUT_BUFFER_MIN_SIZE;
+                                    16384; // AV_INPUT_BUFFER_MIN_SIZE
         p_sys->i_buffer_out = av_samples_get_buffer_size(NULL,
                 p_enc->fmt_out.audio.i_channels, p_sys->i_frame_size,
                 p_sys->p_context->sample_fmt, DEFAULT_ALIGN);
