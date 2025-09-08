@@ -492,30 +492,30 @@ int InitVideoEnc( vlc_object_t *p_this )
     psz_val = var_GetString( p_enc, ENC_CFG_PREFIX "aac-profile" );
     /* libavcodec uses faac encoder atm, and it has issues with
      * other than low-complexity profile, so default to that */
-    p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
+    p_sys->i_aac_profile = AVPROFILE(AAC_LOW);
     if( psz_val && *psz_val )
     {
         if( !strncmp( psz_val, "main", 4 ) )
-            p_sys->i_aac_profile = FF_PROFILE_AAC_MAIN;
+            p_sys->i_aac_profile = AVPROFILE(AAC_MAIN);
         else if( !strncmp( psz_val, "low", 3 ) )
-            p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
+            p_sys->i_aac_profile = AVPROFILE(AAC_LOW);
         else if( !strncmp( psz_val, "ssr", 3 ) )
-            p_sys->i_aac_profile = FF_PROFILE_AAC_SSR;
+            p_sys->i_aac_profile = AVPROFILE(AAC_SSR);
         else if( !strncmp( psz_val, "ltp", 3 ) )
-            p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
+            p_sys->i_aac_profile = AVPROFILE(AAC_LTP);
 /* These require libavcodec with libfdk-aac */
         else if( !strncmp( psz_val, "hev2", 4 ) )
-            p_sys->i_aac_profile = FF_PROFILE_AAC_HE_V2;
+            p_sys->i_aac_profile = AVPROFILE(AAC_HE_V2);
         else if( !strncmp( psz_val, "hev1", 4 ) )
-            p_sys->i_aac_profile = FF_PROFILE_AAC_HE;
+            p_sys->i_aac_profile = AVPROFILE(AAC_HE);
         else if( !strncmp( psz_val, "ld", 2 ) )
-            p_sys->i_aac_profile = FF_PROFILE_AAC_LD;
+            p_sys->i_aac_profile = AVPROFILE(AAC_LD);
         else if( !strncmp( psz_val, "eld", 3 ) )
-            p_sys->i_aac_profile = FF_PROFILE_AAC_ELD;
+            p_sys->i_aac_profile = AVPROFILE(AAC_ELD);
         else
         {
             msg_Warn( p_enc, "unknown AAC profile requested, setting it to low" );
-            p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
+            p_sys->i_aac_profile = AVPROFILE(AAC_LOW);
         }
     }
     free( psz_val );

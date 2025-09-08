@@ -195,10 +195,10 @@ static int CheckCodecConfig(vlc_va_t *va, AVCodecContext *ctx, VADisplay va_dpy,
     VAProfile profile;
     switch (ctx->profile)
     {
-        case FF_PROFILE_AV1_MAIN:
+        case AVPROFILE(AV1_MAIN):
             profile = VAProfileAV1Profile0;
             break;
-        case FF_PROFILE_AV1_HIGH:
+        case AVPROFILE(AV1_HIGH):
             profile = VAProfileAV1Profile1;
             break;
         default:
