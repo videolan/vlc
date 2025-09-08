@@ -156,6 +156,7 @@ moc_headers = files(
     'widgets/native/searchlineedit.hpp',
     'widgets/native/viewblockingrectangle.hpp',
     'widgets/native/textureprovideritem.hpp',
+    'thumbnailer.hpp',
 )
 
 if host_system == 'windows'
@@ -512,6 +513,7 @@ qt_plugin_sources = files(
     'widgets/native/doubleclickignoringitem.hpp',
     'widgets/native/textureprovideritem.cpp',
     'widgets/native/textureprovideritem.hpp',
+    'thumbnailer.cpp',
 )
 
 if host_system == 'windows'

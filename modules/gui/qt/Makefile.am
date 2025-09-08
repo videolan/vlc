@@ -53,6 +53,9 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt) -fPIC
 libqt_plugin_la_LIBADD = $(vlc_qt_libs)
+# Link against libvlc for public thumbnail APIs used by thumbnailer.cpp
+# Prefer linking the local libtool archive to avoid picking a system lib
+libqt_plugin_la_LIBADD += $(top_builddir)/lib/libvlc.la
 if HAVE_LIBATOMIC
 libqt_plugin_la_CXXFLAGS += -DQT_HAS_LIBATOMIC
 libqt_plugin_la_LIBADD += -latomic
@@ -86,6 +89,7 @@ endif
 
 libqt_plugin_la_SOURCES = \
 	qt.cpp qt.hpp plugins.hpp \
+	thumbnailer.cpp thumbnailer.hpp \
 	dialogs/bookmarks/bookmarks.cpp dialogs/bookmarks/bookmarks.hpp \
 	dialogs/dialogs/dialogmodel.cpp \
 	dialogs/dialogs/dialogmodel.hpp \
@@ -380,6 +384,7 @@ moc_verbose__0 = $(moc_verbose_0)
 dialogs/dialogs_provider.moc.cpp dialogs/vlm/vlm.moc.cpp: $(top_builddir)/config.h
 
 nodist_libqt_plugin_la_SOURCES = \
+	thumbnailer.moc.cpp \
 	dialogs/bookmarks/bookmarks.moc.cpp \
 	dialogs/dialogs/dialogmodel.moc.cpp \
 	dialogs/dialogs_provider.moc.cpp \
