@@ -12,7 +12,7 @@ FFMPEG_REVISION := 0
 FFMPEG_VERSION := $(FFMPEG_MAJVERSION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
-FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
+FFMPEG_GITURL := https://code.ffmpeg.org/FFmpeg/FFmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 USE_FFMPEG := 1
 else
