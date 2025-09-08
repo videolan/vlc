@@ -207,6 +207,7 @@ void TextureProviderObserver::updateProperties()
     }
 
     m_textureSize.store({}, memoryOrder);
+    m_nativeTextureSize.store({}, memoryOrder);
 
     if (m_hasAlphaChannel.exchange(false, memoryOrder))
         emit hasAlphaChannelChanged(false);
