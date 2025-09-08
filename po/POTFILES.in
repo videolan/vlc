@@ -1287,6 +1287,7 @@ share/lua/http/mobile_view.html
 
 #modules/gui/qt/ui/about.h
 #modules/gui/qt/ui/equalizer.h
+#modules/gui/qt/ui/fingerprintdialog.h
 #modules/gui/qt/ui/messages_panel.h
 #modules/gui/qt/ui/open.h
 #modules/gui/qt/ui/open_capture.h
