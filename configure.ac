@@ -2675,9 +2675,9 @@ AS_HELP_STRING([--enable-merge-ffmpeg], [merge FFmpeg-based plugins (default dis
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
-dnl We require ffmpeg >= 4.2
-dnl Ubuntu Focal (20.04 LTS) has 4.2, debian stable (bookworm) has 5.1
-PKG_HAVE_WITH_MODULES([AVCODEC], [libavcodec >= 58.54.100 libavutil >= 56.31.100],
+dnl We require ffmpeg >= 4.4
+dnl Ubuntu Jammy (22.04 LTS) has 4.4, debian stable (bookworm) has 5.1
+PKG_HAVE_WITH_MODULES([AVCODEC], [libavcodec >= 58.134.100 libavutil >= 56.70.100],
                        [libavcodec codec (default enabled)], [yes])
 
 dnl
@@ -2824,7 +2824,7 @@ AS_HELP_STRING([--enable-avformat], [libavformat containers (default enabled)]),
 ])
 have_avformat="no"
 AS_IF([test "${enable_avformat}" != "no"], [
-  PKG_CHECK_MODULES(AVFORMAT,[libavformat >= 58.29.100 libavcodec libavutil], [
+  PKG_CHECK_MODULES(AVFORMAT,[libavformat >= 58.76.100 libavcodec libavutil], [
       have_avformat="yes"
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"

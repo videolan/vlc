@@ -195,9 +195,9 @@ librist_dep = dependency('librist', required: get_option('rist'))
 mtp_dep = dependency('libmtp', version: '>=1.0.0', required: get_option('mtp'))
 
 # FFmpeg
-avformat_dep = dependency('libavformat', version: '>= 58.29.100', required: get_option('avformat'))
-avcodec_dep  = dependency('libavcodec', version: '>= 58.54.100', required: get_option('avcodec'))
-avutil_dep   = dependency('libavutil', version: '>= 56.31.100', required: false)
+avformat_dep = dependency('libavformat', version: '>= 58.76.100', required: get_option('avformat'))
+avcodec_dep  = dependency('libavcodec', version: '>= 58.134.100', required: get_option('avcodec'))
+avutil_dep   = dependency('libavutil', version: '>= 56.70.100', required: false)
 
 # Freetype, used by text_renderer and ASS access
 freetype_dep = dependency('freetype2', 'freetype', required: get_option('freetype'))
