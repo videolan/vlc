@@ -47,6 +47,7 @@ variables:
         VLCARCH: winarm64-ucrt
         HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-w64-mingw32
+        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
 .variables-macos-x86_64: &variables-macos-x86_64
         VLC_PATH: /Users/videolanci/sandbox/bin
@@ -134,7 +135,6 @@ win64-arm-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64-arm
-        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
 uwp32-libvlc-llvm:
     extends: .win-common
@@ -180,7 +180,6 @@ nightly-win64-arm-llvm:
         <<: *variables-win64-arm
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         LIBVLC_EXTRA_BUILD_FLAGS: -D /
-        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
 .release-win-common:
     # We don't use any of the .win-common template so just use .docker-template
