@@ -2676,7 +2676,7 @@ AS_HELP_STRING([--enable-merge-ffmpeg], [merge FFmpeg-based plugins (default dis
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
 dnl We require ffmpeg >= 4.4
-dnl Ubuntu Jammy (22.04 LTS) has 4.4, debian stable (bookworm) has 5.1
+dnl Ubuntu Jammy (22.04 LTS) has 4.4, debian stable (trixie) has 7.1
 PKG_HAVE_WITH_MODULES([AVCODEC], [libavcodec >= 58.134.100 libavutil >= 56.70.100],
                        [libavcodec codec (default enabled)], [yes])
 
