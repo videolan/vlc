@@ -1632,7 +1632,10 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, double f_ratio, bool b_acc
         if( p_sys->i_length == 0 )
         {
             avi_track_t *p_stream = NULL;
-            uint64_t i_pos;
+            uint64_t i_pos, i_stream_size;
+
+            if( vlc_stream_GetSize( p_demux->s, &i_stream_size ) != VLC_SUCCESS )
+                goto failandresetpos;
 
             if ( !p_sys->i_movi_lastchunk_pos && /* set when index is successfully loaded */
                  ! ( p_sys->i_avih_flags & AVIF_ISINTERLEAVED ) )
@@ -1650,8 +1653,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, double f_ratio, bool b_acc
             f_ratio = __MAX( f_ratio, 0 );
 
             /* try to find chunk that is at i_percent or the file */
-            i_pos = __MAX( f_ratio * stream_Size( p_demux->s ),
-                           p_sys->i_movi_begin );
+            i_pos = __MAX( f_ratio * i_stream_size, p_sys->i_movi_begin );
             /* search first selected stream (and prefer non-EOF ones) */
             for( unsigned i = 0; i < p_sys->i_track; i++ )
             {
@@ -1751,15 +1753,16 @@ failandresetpos:
 static double ControlGetPosition( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    uint64_t i_size;
 
     if( p_sys->i_length != 0 )
     {
         return (double)p_sys->i_time / (double)p_sys->i_length;
     }
-    else if( stream_Size( p_demux->s ) > 0 )
+    else if( vlc_stream_GetSize( p_demux->s, &i_size ) == VLC_SUCCESS && i_size )
     {
-        double i64 = (uint64_t)vlc_stream_Tell( p_demux->s );
-        return i64 / stream_Size( p_demux->s );
+        double i64 = vlc_stream_Tell( p_demux->s );
+        return i64 / i_size;
     }
     return 0.0;
 }
@@ -2777,7 +2780,8 @@ static void AVI_IndexCreate( demux_t *p_demux )
     avi_chunk_list_t *p_movi;
 
     unsigned int i_stream;
-    uint32_t i_movi_end;
+    uint64_t i_movi_end;
+    uint64_t i_stream_size;
 
     vlc_tick_t i_dialog_update;
     vlc_dialog_id *p_dialog_id = NULL;
@@ -2791,11 +2795,13 @@ static void AVI_IndexCreate( demux_t *p_demux )
         return;
     }
 
+    if( vlc_stream_GetSize( p_demux->s, &i_stream_size ) != VLC_SUCCESS )
+        return;
+
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
         avi_index_Init( &p_sys->track[i_stream]->idx );
 
-    i_movi_end = __MIN( (uint32_t)(p_movi->i_chunk_pos + p_movi->i_chunk_size),
-                        stream_Size( p_demux->s ) );
+    i_movi_end = __MIN( p_movi->i_chunk_pos + p_movi->i_chunk_size, i_stream_size );
 
     vlc_stream_Seek( p_demux->s, p_movi->i_chunk_pos + 12 );
     msg_Warn( p_demux, "creating index from LIST-movi, will take time !" );
@@ -2803,7 +2809,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
     /* Only show dialog if AVI is > 10MB */
     i_dialog_update = vlc_tick_now();
-    if( stream_Size( p_demux->s ) > 10000000 )
+    if( i_stream_size > 10000000 )
     {
         p_dialog_id =
             vlc_dialog_display_progress( p_demux, false, 0.0, _("Cancel"),
@@ -2822,7 +2828,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
                 break;
 
             double f_current = vlc_stream_Tell( p_demux->s );
-            double f_size    = stream_Size( p_demux->s );
+            double f_size    = i_stream_size;
             double f_pos     = f_current / f_size;
             vlc_dialog_update_progress( p_demux, p_dialog_id, f_pos );
 

@@ -43,6 +43,10 @@ Item {
     // Aliases
 
     property alias radius: image.radius
+    property alias radiusTopRight: image.radiusTopRight
+    property alias radiusTopLeft: image.radiusTopLeft
+    property alias radiusBottomRight: image.radiusBottomRight
+    property alias radiusBottomLeft: image.radiusBottomLeft
 
     property alias color: image.backgroundColor
 
@@ -132,6 +136,10 @@ Item {
         anchors.fill: parent
 
         radius: root.radius
+        radiusTopRight: root.radiusTopRight
+        radiusTopLeft: root.radiusTopLeft
+        radiusBottomRight: root.radiusBottomRight
+        radiusBottomLeft: root.radiusBottomLeft
 
         backgroundColor: root.color
 

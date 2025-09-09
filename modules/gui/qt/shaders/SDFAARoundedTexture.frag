@@ -88,6 +88,7 @@ void main()
     // Therefore, we have to normalize the coordinate for the distance
     // function to [0, 1]:
     vec2 normalCoord = vec2(1.0, 1.0) / (qt_SubRect_source.zw) * (qt_TexCoord0 - (qt_SubRect_source.zw + qt_SubRect_source.xy)) + vec2(1.0, 1.0);
+    normalCoord.y = (1.0 - normalCoord.y); // invert y-axis because texture coordinates have origin at the top
 
     vec2 p = (size.xy * ((2.0 * normalCoord) - 1)) / size.y;
     // Signed distance:

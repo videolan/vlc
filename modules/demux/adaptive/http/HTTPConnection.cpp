@@ -548,8 +548,8 @@ RequestStatus StreamUrlConnection::request(const std::string &path,
         contentLength = range.getEndByte() - range.getStartByte() + 1;
     }
 
-    int64_t i_size = stream_Size(p_streamurl);
-    if(i_size > -1)
+    uint64_t i_size;
+    if(vlc_stream_GetSize(p_streamurl, &i_size) == VLC_SUCCESS)
     {
         if(!range.isValid() || contentLength > (size_t) i_size)
             contentLength = (size_t) i_size;

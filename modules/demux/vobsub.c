@@ -653,7 +653,7 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
         }
 
         i_id = ps_pkt_id( p, i_size, PS_SOURCE_VOB );
-        if( (i_id&0xffe0) != 0xbd20 )
+        if( (i_id&0xffe0) != PS_SPU_ID_OFFSET )
         {
             /* msg_Dbg( p_demux, "we don't need these ps packets (id=0x1%2.2x)", p[3] ); */
             p += i_size;
@@ -672,7 +672,7 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
             block_Release( p_pkt );
             continue;
         }
-        i_spu = i_id&0x1f;
+        i_spu = i_id & ~PS_SPU_ID_OFFSET;
         /* msg_Dbg( p_demux, "SPU track %d size %d", i_spu, i_size ); */
 
         for( i = 0; i < p_sys->i_tracks; i++ )

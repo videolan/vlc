@@ -39,7 +39,6 @@ private:
 TextureProviderItem::~TextureProviderItem()
 {
     {
-        QMutexLocker lock(&m_textureProviderMutex);
         if (m_textureProvider)
         {
             // https://doc.qt.io/qt-6/qquickitem.html#graphics-resource-handling
@@ -63,7 +62,6 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
 {
     // This method is called from the rendering thread.
 
-    QMutexLocker lock(&m_textureProviderMutex);
     if (!m_textureProvider)
     {
         m_textureProvider = new QSGTextureViewProvider;
@@ -134,7 +132,6 @@ void TextureProviderItem::invalidateSceneGraph()
 
     // This slot is called from the rendering thread.
     {
-        QMutexLocker lock(&m_textureProviderMutex);
         if (m_textureProvider)
         {
             delete m_textureProvider;
@@ -151,7 +148,6 @@ void TextureProviderItem::releaseResources()
     // QQuickItem::releaseResources() is guaranteed to have a valid window when it is called:
     assert(window());
     {
-        QMutexLocker lock(&m_textureProviderMutex);
         if (m_textureProvider)
         {
             window()->scheduleRenderJob(new TextureProviderCleaner(m_textureProvider), QQuickWindow::BeforeSynchronizingStage);
@@ -235,7 +231,6 @@ void QSGTextureViewProvider::setMipmapFiltering(QSGTexture::Filtering filter)
         if (targetTexture && !targetTexture->hasMipmaps())
         {
             // Having mip map filtering when there are no mip maps may be problematic with certain graphics backends (like OpenGL).
-            qWarning() << this << "Enabling mip map filtering is blocked if the target texture has no mip maps.";
             return;
         }
     }

@@ -39,6 +39,7 @@
 
 #import <vlc_input.h>
 #import <vlc_url.h>
+#import <vlc_common.h>
 
 @interface VLCLibraryMenuController ()
 {
@@ -96,6 +97,11 @@
                                                           keyEquivalent:@""];
     bookmarkItem.target = self;
 
+    NSMenuItem * const addToLibraryItem = [[NSMenuItem alloc] initWithTitle:_NS("Add to Media Library")
+                                                                      action:@selector(addToMediaLibrary:)
+                                                               keyEquivalent:@""];
+    addToLibraryItem.target = self;
+
     _favoriteItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Favorite") action:@selector(toggleFavorite:) keyEquivalent:@""];
     self.favoriteItem.target = self;
 
@@ -109,6 +115,7 @@
         createPlaylistItem,
         self.favoriteItem,
         bookmarkItem,
+        addToLibraryItem,
         revealItem,
         _deleteItem,
         markUnseenItem,
@@ -139,6 +146,7 @@
 
     _folderInputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_folderInputItemRequiringMenuItems addObject:bookmarkItem];
+    [_folderInputItemRequiringMenuItems addObject:addToLibraryItem];
 }
 
 - (void)menuItems:(NSHashTable<NSMenuItem*>*)menuItems
@@ -362,6 +370,36 @@
 {
     for (VLCLibraryRepresentedItem * const item in self.representedItems) {
         [item.item setFavorite:favorite];
+    }
+}
+
+- (void)addToMediaLibrary:(id)sender
+{
+    if (self.representedInputItems == nil || self.representedInputItems.count == 0) {
+        return;
+    }
+    
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    
+    for (VLCInputItem * const inputItem in self.representedInputItems) {
+        if (inputItem.inputType != ITEM_TYPE_DIRECTORY) {
+            continue;
+        }
+        
+        NSString * const inputItemMRL = inputItem.MRL;
+        NSURL * const folderURL = [NSURL URLWithString:inputItemMRL];
+        
+        if (folderURL == nil) {
+            msg_Warn(getIntf(), "Invalid URL for folder: %s", inputItemMRL.UTF8String);
+            continue;
+        }
+        
+        const int result = [libraryController addFolderWithFileURL:folderURL];
+        if (result == VLC_SUCCESS) {
+            msg_Info(getIntf(), "Added folder to media library: %s", inputItemMRL.UTF8String);
+        } else {
+            msg_Warn(getIntf(), "Failed to add folder to media library: %s (error %d)", inputItemMRL.UTF8String, result);
+        }
     }
 }
 

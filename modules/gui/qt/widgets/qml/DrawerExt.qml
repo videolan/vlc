@@ -114,7 +114,7 @@ FocusScope {
 
                 PropertyAction{
                     target: content
-                    property: "visible"
+                    properties: "visible,enabled"
                 }
             }
         },
@@ -124,7 +124,7 @@ FocusScope {
             SequentialAnimation {
                 PropertyAction {
                     target: content
-                    property: "visible"
+                    properties: "visible,enabled"
                 }
 
                 NumberAnimation {

@@ -1079,6 +1079,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     const int64_t i_start_time = p_sys->ic->start_time != AV_NOPTS_VALUE ? p_sys->ic->start_time : 0;
     double f, *pf;
     int64_t i64;
+    uint64_t u64;
 
     switch( i_query )
     {
@@ -1087,12 +1088,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
-            pf = va_arg( args, double * ); *pf = 0.0;
-            i64 = stream_Size( p_demux->s );
-            if( i64 > 0 )
+            pf = va_arg( args, double * );
+            if( vlc_stream_GetSize( p_demux->s, &u64 ) != VLC_SUCCESS )
+            {
+                *pf = 0.0;
+            }
+            else
             {
                 double current = vlc_stream_Tell( p_demux->s );
-                *pf = current / (double)i64;
+                *pf = current / (double)u64;
             }
 
             if( (p_sys->ic->duration != (int64_t)AV_NOPTS_VALUE) && (p_sys->i_pcr > 0) )
@@ -1115,7 +1119,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->ic->duration == (int64_t)AV_NOPTS_VALUE ||
                 (av_seek_frame( p_sys->ic, -1, i64, AVSEEK_FLAG_BACKWARD ) < 0) )
             {
-                int64_t i_size = stream_Size( p_demux->s );
+                uint64_t i_size;
+                if( vlc_stream_GetSize( p_demux->s, &i_size ) != VLC_SUCCESS ||
+                    i_size > INT64_MAX )
+                {
+                    msg_Err( p_demux, "Can not use stream size for SET_POSITION" );
+                    return VLC_EGENERIC;
+                }
+
                 i64 = (i_size * f);
 
                 msg_Warn( p_demux, "DEMUX_SET_BYTE_POSITION: %"PRId64, i64 );

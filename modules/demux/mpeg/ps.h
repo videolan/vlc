@@ -28,27 +28,38 @@
 #define PS_STREAM_ID_PACK_HEADER      0xBA
 #define PS_STREAM_ID_SYSTEM_HEADER    0xBB
 
+#define PS_PACKET_ID_MASK_VOB        0xBD00
+#define PS_PACKET_ID_MASK_AOB        0xA000
+#define PS_PACKET_ID_MASK_EXTENDED   0xFD00
+
+/* 0xBD20 + 0x00 to 0x1f */
+#define PS_SPU_ID_OFFSET             (PS_PACKET_ID_MASK_VOB | 0x20)
+
+#define PS_AOB_PACKET_ID_LPCM        (PS_PACKET_ID_MASK_AOB | 0x00)
+#define PS_AOB_PACKET_ID_MLP         (PS_PACKET_ID_MASK_AOB | 0x01)
+#define PS_VOB_PACKET_ID_MLP         (PS_PACKET_ID_MASK_VOB | 0xA1)
+
 enum ps_source {
     PS_SOURCE_UNKNOWN, // any PS/PES source
     PS_SOURCE_VOB,     // when reading a DVD-Video
     PS_SOURCE_AOB,     // when reading a DVD-Audio
 };
 
-/* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
+/* 256-0xC0 for normal stream, 256 for VOB stream, 256 for EVOB stream, 8 for AOB stream */
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)
 static inline unsigned ps_id_to_tk( unsigned i_id )
 {
     assert(i_id >= 0xc0);
     if(unlikely(i_id < 0xc0))
         return 0;
-    else if( i_id <= 0xff )
+    if( i_id <= 0xff )
         return i_id - 0xc0;
-    else if( (i_id & 0xff00) == 0xbd00 )
+    if( (i_id & 0xff00) == PS_PACKET_ID_MASK_VOB )
         return 256-0xC0 + (i_id & 0xff);
-    else if( (i_id & 0xff00) == 0xfd00 )
+    if( (i_id & 0xff00) == PS_PACKET_ID_MASK_EXTENDED )
         return 512-0xc0 + (i_id & 0xff);
-    else
-        return 768-0xc0 + (i_id & 0x07);
+    assert( (i_id & 0xff00) == PS_PACKET_ID_MASK_AOB );
+    return 768-0xc0 + (i_id & 0x07);
 }
 
 typedef struct ps_psm_t ps_psm_t;
@@ -138,7 +149,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
     tk->i_skip = 0;
     tk->i_id = i_id;
 
-    if( ( i_id&0xff00 ) == 0xbd00 ) /* 0xBD00 -> 0xBDFF, Private Stream 1 */
+    if( ( i_id&0xff00 ) == PS_PACKET_ID_MASK_VOB ) /* 0xBD00 -> 0xBDFF, VOB Private Stream 1 */
     {
         if( ( i_id&0xf8 ) == 0x88 || /* 0x88 -> 0x8f - Can be DTS-HD primary audio in evob */
             ( i_id&0xf8 ) == 0x98 )  /* 0x98 -> 0x9f - Can be DTS-HD secondary audio in evob */
@@ -201,7 +212,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
             return VLC_EGENERIC;
         }
     }
-    else if( (i_id&0xff00) == 0xfd00 ) /* 0xFD00 -> 0xFDFF */
+    else if( (i_id&0xff00) == PS_PACKET_ID_MASK_EXTENDED ) /* EVOB: 0xFD00 -> 0xFDFF */
     {
         uint8_t i_sub_id = i_id & 0xff;
         if( ( i_sub_id >= 0x55 && i_sub_id <= 0x5f ) || /* Can be primary VC-1 in evob */
@@ -215,7 +226,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
             return VLC_EGENERIC;
         }
     }
-    else if( (i_id&0xff00) == 0xa000 ) /* 0xA000 -> 0xA0FF */
+    else if( (i_id&0xff00) == PS_PACKET_ID_MASK_AOB ) /* AOB: 0xA000 -> 0xA0FF */
     {
         uint8_t i_sub_id = i_id & 0x07;
         if( i_sub_id == 0 )
@@ -333,7 +344,7 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt, enum ps_source 
 {
     if(unlikely(i_pkt < 4))
         return 0;
-    if( p_pkt[3] == 0xbd )
+    if( p_pkt[3] == STREAM_ID_PRIVATE_STREAM_1 )
     {
         uint8_t i_sub_id = 0;
         if( i_pkt >= 9 &&
@@ -347,22 +358,22 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt, enum ps_source 
                 p_pkt[i_start + 6] != 0x80 )
             {
                 /* AOB LPCM extension */
-                return 0xa000 | (i_sub_id & 0x01);
+                return PS_PACKET_ID_MASK_AOB | (i_sub_id & 0x01);
             }
 
             if( i_sub_id == 0xa1 &&
                 source == PS_SOURCE_AOB )
             {
                 /* AOB MLP extension */
-                return 0xa000 | (i_sub_id & 0x01);
+                return PS_PACKET_ID_MASK_AOB | (i_sub_id & 0x01);
             }
         }
 
         /* VOB extension */
-        return 0xbd00 | i_sub_id;
+        return PS_PACKET_ID_MASK_VOB | i_sub_id;
     }
-    else if( i_pkt >= 9 &&
-             p_pkt[3] == 0xfd &&
+    if( i_pkt >= 9 &&
+             p_pkt[3] == STREAM_ID_EXTENDED_STREAM_ID &&
              (p_pkt[6]&0xC0) == 0x80 &&   /* mpeg2 */
              (p_pkt[7]&0x01) == 0x01 )    /* extension_flag */
     {
@@ -410,7 +421,7 @@ static inline int ps_pkt_id( const uint8_t *p_pkt, size_t i_pkt, enum ps_source 
                 {
                     int i_stream_id_extension_flag = (p_pkt[i_skip+1] >> 7)&0x1;
                     if( i_stream_id_extension_flag == 0 )
-                        return 0xfd00 | (p_pkt[i_skip+1]&0x7f);
+                        return PS_PACKET_ID_MASK_EXTENDED | (p_pkt[i_skip+1]&0x7f);
                 }
             }
         }
@@ -434,7 +445,7 @@ static inline int ps_pkt_size( const uint8_t *p, int i_peek )
             {
                 if( i_peek >= 14 && (p[4] >> 6) == 0x01 )
                     return 14 + (p[13]&0x07);
-                else if( i_peek >= 12 && (p[4] >> 4) == 0x02 )
+                if( i_peek >= 12 && (p[4] >> 4) == 0x02 )
                     return 12;
             }
             break;
@@ -492,7 +503,7 @@ static inline int ps_pkt_parse_system( const uint8_t *p_pkt, size_t i_pkt,
             case 0xB7:
                 if( p_pktend - p < 6 )
                     return VLC_EGENERIC;
-                i_id = ((int)STREAM_ID_EXTENDED_STREAM_ID << 8) | (p[2] & 0x7F);
+                i_id = PS_PACKET_ID_MASK_EXTENDED | (p[2] & 0x7F);
                 p += 6;
                 break;
             default:
@@ -530,8 +541,8 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     if( i_skip_extra >= 0 )
         i_skip += i_skip_extra;
     else if( p_pes->i_buffer > i_skip + 3 &&
-             ( ps_pkt_id( p_pes->p_buffer, p_pes->i_buffer, PS_SOURCE_AOB ) == 0xa001 ||
-               ps_pkt_id( p_pes->p_buffer, p_pes->i_buffer, PS_SOURCE_VOB ) == 0xbda1 ) )
+             ( ps_pkt_id( p_pes->p_buffer, p_pes->i_buffer, PS_SOURCE_AOB ) == PS_AOB_PACKET_ID_MLP ||
+               ps_pkt_id( p_pes->p_buffer, p_pes->i_buffer, PS_SOURCE_VOB ) == PS_VOB_PACKET_ID_MLP ) )
         i_skip += 4 + p_pes->p_buffer[i_skip+3];
 
     if( p_pes->i_buffer <= i_skip )

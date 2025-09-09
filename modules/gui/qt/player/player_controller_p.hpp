@@ -101,7 +101,7 @@ public:
     VLCDuration  m_length;
 
 #ifdef QT_HAS_LIBATOMIC
-    std::atomic<vlc_player_timer_smpte_timecode> m_highResolutionTime;
+    std::atomic<vlc_player_timer_smpte_timecode> m_highResolutionTime {{}};
 #else
     vlc_player_timer_smpte_timecode m_highResolutionTime {};
     mutable QReadWriteLock m_highResolutionTimeLock;

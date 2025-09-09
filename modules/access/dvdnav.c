@@ -66,8 +66,6 @@ dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
 
 #include "disc_helper.h"
 
-#define PS_SPU_ID_OFFSET  0xbd20
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -1595,7 +1593,7 @@ static void ESNew( demux_t *p_demux, int i_id )
 
     if( tk->b_configured ) return;
 
-    if( ps_track_fill( tk, 0, i_id, NULL, 0, true ) )
+    if( ps_track_fill( tk, NULL, i_id, NULL, 0, true ) )
     {
         msg_Warn( p_demux, "unknown codec for id=0x%x", i_id );
         return;

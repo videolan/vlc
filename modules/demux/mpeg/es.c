@@ -685,8 +685,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              * a raw approximation with time/position */
             if( i_ret && !p_sys->i_bitrate )
             {
-                float f_pos = (double)(uint64_t)( vlc_stream_Tell( p_demux->s ) ) /
-                              (double)(uint64_t)( stream_Size( p_demux->s ) );
+                uint64_t i_stream_size;
+                if( vlc_stream_GetSize( p_demux->s, &i_stream_size ) != VLC_SUCCESS )
+                    return VLC_EGENERIC;
+
+                uint64_t i_pos = vlc_stream_Tell( p_demux->s );
+                float f_pos = (double)i_pos / (double)i_stream_size;
                 /* The first few seconds are guaranteed to be very whacky,
                  * don't bother trying ... Too bad */
                 if( f_pos < 0.01f ||

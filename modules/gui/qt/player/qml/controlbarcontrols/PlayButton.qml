@@ -67,6 +67,12 @@ T.Control {
     Accessible.onPressAction: MainPlaylistController.togglePlayPause()
     Accessible.onToggleAction: MainPlaylistController.togglePlayPause()
 
+    // Tooltip
+
+    T.ToolTip.visible: (hovered || visualFocus)
+    T.ToolTip.delay: VLCStyle.delayToolTipAppear
+    T.ToolTip.text: root.Accessible.name
+
     // States
 
     states: [

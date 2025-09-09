@@ -128,7 +128,7 @@ else
     if [ -z "$2" ];then
         FOUND="$FOUND $1"
     else
-        gotver=`$1 --version | head -1 | sed s/'.* '//`
+        gotver=`$1 --version | head -1 | grep -o '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' | head -1`
         check_version $1 $gotver $2
     fi
 fi

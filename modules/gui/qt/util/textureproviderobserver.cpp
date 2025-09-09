@@ -19,6 +19,11 @@
 
 #include <QSGTextureProvider>
 
+#if __has_include(<rhi/qrhi.h>) // RHI is semi-public since Qt 6.6
+#define RHI_HEADER_AVAILABLE
+#include <rhi/qrhi.h>
+#endif
+
 TextureProviderObserver::TextureProviderObserver(QObject *parent)
     : QObject{parent}
 {
@@ -31,8 +36,7 @@ void TextureProviderObserver::setSource(const QQuickItem *source)
         return;
 
     {
-        QMutexLocker locker(&m_textureMutex);
-        m_textureSize = {};
+        m_textureSize = QSize{}; // memory order does not matter, `setSource()` is not called frequently.
 
         if (m_source)
         {
@@ -67,11 +71,8 @@ void TextureProviderObserver::setSource(const QQuickItem *source)
                 assert(m_provider);
 
                 connect(m_provider, &QSGTextureProvider::textureChanged, this, &TextureProviderObserver::updateTextureSize, Qt::DirectConnection);
-                connect(m_provider, &QSGTextureProvider::textureChanged, this, &TextureProviderObserver::textureChanged);
 
                 updateTextureSize();
-
-                emit textureChanged(); // This should be safe if QML engine uses auto connection (default), otherwise we need to queue ourselves.
             }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
         };
 
@@ -86,25 +87,60 @@ void TextureProviderObserver::setSource(const QQuickItem *source)
 
 QSize TextureProviderObserver::textureSize() const
 {
-    QMutexLocker locker(&m_textureMutex);
-    return m_textureSize;
+    // This is likely called in the QML/GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
+    return m_textureSize.load(std::memory_order_acquire);
+}
+
+QSize TextureProviderObserver::nativeTextureSize() const
+{
+    // This is likely called in the QML/GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
+    return m_nativeTextureSize.load(std::memory_order_acquire);
 }
 
 void TextureProviderObserver::updateTextureSize()
 {
-    // Better to lock as early as possible, QML can wait until the
-    // update completes to get the up-to-date size (if it requests
-    // read for any reason meanwhile).
-    QMutexLocker locker(&m_textureMutex);
+    // This is likely called in the rendering thread.
+    // Rendering thread should avoid blocking the QML/GUI thread. In this case, unlike the high precision
+    // timer case, it should be fine because the size may be inaccurate in the worst case until the next
+    // frame when the size is sampled again. In high precision timer case, accuracy is favored over
+    // potential stuttering.
+    constexpr auto memoryOrder = std::memory_order_relaxed;
 
     if (m_provider)
     {
         if (const auto texture = m_provider->texture())
         {
-            m_textureSize = texture->textureSize();
+            const auto textureSize = texture->textureSize();
+            m_textureSize.store(textureSize, memoryOrder);
+
+            {
+                // Native texture size
+
+                const auto legacyUpdateNativeTextureSize = [&]() {
+                    const auto ntsr = texture->normalizedTextureSubRect();
+                    m_nativeTextureSize.store({static_cast<int>(textureSize.width() / ntsr.width()),
+                                               static_cast<int>(textureSize.height() / ntsr.height())},
+                                              memoryOrder);
+                };
+
+#ifdef RHI_HEADER_AVAILABLE
+                const QRhiTexture* const rhiTexture = texture->rhiTexture();
+                if (Q_LIKELY(rhiTexture))
+                    m_nativeTextureSize.store(rhiTexture->pixelSize(), memoryOrder);
+                else
+                    legacyUpdateNativeTextureSize();
+#else
+                legacyUpdateNativeTextureSize();
+#endif
+            }
+
             return;
         }
     }
 
-    m_textureSize = {};
+    m_textureSize.store({}, memoryOrder);
 }

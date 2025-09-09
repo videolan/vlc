@@ -821,7 +821,7 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
 
     if( tk->b_configured ) return;
 
-    if( ps_track_fill( tk, 0, i_id, NULL, 0, true ) )
+    if( ps_track_fill( tk, NULL, i_id, NULL, 0, true ) )
     {
         msg_Warn( p_demux, "unknown codec for id=0x%x", i_id );
         return;
@@ -1092,17 +1092,17 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                 switch( p_vts->vtsi_mat->vts_audio_attr[i - 1].audio_format )
                 {
                 case 0x00: /* A52 */
-                    i_id = (0x80 + i_position) | 0xbd00;
+                    i_id = (0x80 + i_position) | PS_PACKET_ID_MASK_VOB;
                     break;
                 case 0x02:
                 case 0x03: /* MPEG audio */
                     i_id = 0xc000 + i_position;
                     break;
                 case 0x04: /* LPCM */
-                    i_id = (0xa0 + i_position) | 0xbd00;
+                    i_id = (0xa0 + i_position) | PS_PACKET_ID_MASK_VOB;
                     break;
                 case 0x06: /* DTS */
-                    i_id = (0x88 + i_position) | 0xbd00;
+                    i_id = (0x88 + i_position) | PS_PACKET_ID_MASK_VOB;
                     break;
                 default:
                     i_id = 0;
@@ -1154,7 +1154,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                     i_position = ( i_spu_control >> 24 ) & 0x7F;
                 }
 
-                i_id = (0x20 + i_position) | 0xbd00;
+                i_id = (0x20 + i_position) | PS_PACKET_ID_MASK_VOB;
 
                 ESNew( p_demux, i_id, p_sys->p_vts_file->vtsi_mat->
                        vts_subp_attr[i - 1].lang_code );

@@ -4657,11 +4657,11 @@ static int ProbeIndex( demux_t *p_demux )
     if ( MP4_BoxCount( p_sys->p_root, "/mfra" ) )
         return VLC_EGENERIC;
 
-    i_stream_size = stream_Size( p_demux->s );
-    if ( ( i_stream_size >> 62 ) ||
-         ( i_stream_size < MP4_MFRO_BOXSIZE ) ||
-         ( vlc_stream_Seek( p_demux->s, i_stream_size - MP4_MFRO_BOXSIZE ) != VLC_SUCCESS )
-       )
+    if ( vlc_stream_GetSize( p_demux->s, &i_stream_size ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
+
+    if ( i_stream_size < MP4_MFRO_BOXSIZE ||
+         vlc_stream_Seek( p_demux->s, i_stream_size - MP4_MFRO_BOXSIZE ) != VLC_SUCCESS )
     {
         msg_Dbg( p_demux, "Probing tail for mfro has failed" );
         return VLC_EGENERIC;

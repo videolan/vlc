@@ -582,12 +582,22 @@
     _pipViewController.title = window.title;
     
     __weak typeof(self) weakSelf = self;
-    _voutViewController.boundsChangeHandler = ^{
-        typeof(self) strongSelf = weakSelf;
-        if (strongSelf && strongSelf->_voutViewController.presentingViewController == nil) {
-            [strongSelf->_pipViewController presentViewControllerAsPictureInPicture:strongSelf->_voutViewController];
-        }
-    };
+    
+    if (controller.currentMediaIsAudioOnly) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            typeof(self) strongSelf = weakSelf;
+            if (strongSelf && strongSelf->_voutViewController.presentingViewController == nil) {
+                [strongSelf->_pipViewController presentViewControllerAsPictureInPicture:strongSelf->_voutViewController];
+            }
+        });
+    } else {
+        _voutViewController.boundsChangeHandler = ^{
+            typeof(self) strongSelf = weakSelf;
+            if (strongSelf && strongSelf->_voutViewController.presentingViewController == nil) {
+                [strongSelf->_pipViewController presentViewControllerAsPictureInPicture:strongSelf->_voutViewController];
+            }
+        };
+    }
     
     if ([window isKindOfClass:VLCLibraryWindow.class]) {
         [self returnToLibrary:self];

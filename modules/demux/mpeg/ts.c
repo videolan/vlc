@@ -900,6 +900,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     double f, *pf;
     bool b_bool, *pb_bool;
     int64_t i64;
+    uint64_t u64;
     int i_int;
     const ts_pmt_t *p_pmt = NULL;
     const ts_pat_t *p_pat = GetPID(p_sys, 0)->u.p_pat;
@@ -954,10 +955,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
         }
 
-        if( (i64 = stream_Size( p_sys->stream) ) > 0 )
+        if( vlc_stream_GetSize( p_sys->stream, &u64 ) == VLC_SUCCESS )
         {
             uint64_t offset = vlc_stream_Tell( p_sys->stream );
-            *pf = (double)offset / (double)i64;
+            *pf = (double)offset / (double)u64;
             return VLC_SUCCESS;
         }
         break;
@@ -1001,9 +1002,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
         }
 
-        i64 = stream_Size( p_sys->stream );
-        if( i64 > 0 &&
-            vlc_stream_Seek( p_sys->stream, (int64_t)(i64 * f) ) == VLC_SUCCESS )
+        if( vlc_stream_GetSize( p_sys->stream, &u64 ) == VLC_SUCCESS &&
+            vlc_stream_Seek( p_sys->stream, (uint64_t)(u64 * f) ) == VLC_SUCCESS )
         {
             ReadyQueuesPostSeek( p_demux );
             return VLC_SUCCESS;
@@ -1786,18 +1786,69 @@ static void PESDataChainHandle( vlc_object_t *p_obj, void *priv, block_t *p_data
     ParsePESDataChain( (demux_t *)p_obj, (ts_pid_t *) priv, p_data, i_flags, i_appendpcr );
 }
 
+static bool CheckAndResync( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    const uint8_t *p_peek;
+    if( vlc_stream_Peek( p_sys->stream, &p_peek, 1 ) != 1 )
+        return true;
+
+    /* Check sync byte and re-sync if needed */
+    if( p_peek[0] == 0x47 )
+        return true;
+
+    msg_Warn( p_demux, "lost synchro at %" PRIu64, vlc_stream_Tell( p_sys->stream ) );
+
+    for( ;; )
+    {
+        ssize_t i_peek = 0;
+        unsigned i_skip = 0;
+
+        i_peek = vlc_stream_Peek( p_sys->stream, &p_peek,
+                                  p_sys->i_packet_size * 10 );
+        if( i_peek < 0 || (size_t)i_peek < p_sys->i_packet_size + 1 )
+        {
+            msg_Dbg( p_demux, "eof ?" );
+            return false;
+        }
+
+        while( i_skip < i_peek - p_sys->i_packet_size )
+        {
+            if( p_peek[i_skip + p_sys->i_packet_header_size] == 0x47 &&
+                p_peek[i_skip + p_sys->i_packet_header_size + p_sys->i_packet_size] == 0x47 )
+                break;
+            i_skip++;
+        }
+        msg_Dbg( p_demux, "skipping %d bytes of garbage at %"PRIu64,
+                 i_skip, vlc_stream_Tell( p_sys->stream ) );
+        if (vlc_stream_Read( p_sys->stream, NULL, i_skip ) != i_skip)
+            return false;
+
+        if( i_skip < i_peek - p_sys->i_packet_size )
+            break;
+    }
+    msg_Dbg( p_demux, "resynced at %" PRIu64, vlc_stream_Tell( p_sys->stream ) );
+
+    return true;
+}
+
 static block_t* ReadTSPacket( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( !CheckAndResync( p_demux) )
+        return NULL;
 
     block_t     *p_pkt;
 
     /* Get a new TS packet */
     if( !( p_pkt = vlc_stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
     {
-        int64_t size = stream_Size( p_sys->stream );
-        if( size >= 0 && (uint64_t)size == vlc_stream_Tell( p_sys->stream ) )
-            msg_Dbg( p_demux, "EOF at %"PRIu64, vlc_stream_Tell( p_sys->stream ) );
+        uint64_t size;
+        if( vlc_stream_GetSize( p_sys->stream, &size ) == VLC_SUCCESS &&
+            size == vlc_stream_Tell( p_sys->stream ) )
+            msg_Dbg( p_demux, "EOF at %"PRIu64, size );
         else
             msg_Dbg( p_demux, "Can't read TS packet at %"PRIu64, vlc_stream_Tell(p_sys->stream) );
         return NULL;
@@ -1816,51 +1867,6 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     p_pkt->p_buffer += p_sys->i_packet_header_size;
     p_pkt->i_buffer -= p_sys->i_packet_header_size;
 
-    /* Check sync byte and re-sync if needed */
-    if( p_pkt->p_buffer[0] != 0x47 )
-    {
-        msg_Warn( p_demux, "lost synchro" );
-        block_Release( p_pkt );
-        for( ;; )
-        {
-            const uint8_t *p_peek;
-            int i_peek = 0;
-            unsigned i_skip = 0;
-
-            i_peek = vlc_stream_Peek( p_sys->stream, &p_peek,
-                    p_sys->i_packet_size * 10 );
-            if( i_peek < 0 || (unsigned)i_peek < p_sys->i_packet_size + 1 )
-            {
-                msg_Dbg( p_demux, "eof ?" );
-                return NULL;
-            }
-
-            while( i_skip < i_peek - p_sys->i_packet_size )
-            {
-                if( p_peek[i_skip + p_sys->i_packet_header_size] == 0x47 &&
-                        p_peek[i_skip + p_sys->i_packet_header_size + p_sys->i_packet_size] == 0x47 )
-                {
-                    break;
-                }
-                i_skip++;
-            }
-            msg_Dbg( p_demux, "skipping %d bytes of garbage at %"PRIu64,
-                     i_skip, vlc_stream_Tell( p_sys->stream ) );
-            if (vlc_stream_Read( p_sys->stream, NULL, i_skip ) != i_skip)
-                return NULL;
-
-            if( i_skip < i_peek - p_sys->i_packet_size )
-            {
-                break;
-            }
-        }
-        msg_Dbg( p_demux, "resynced at %" PRIu64, vlc_stream_Tell( p_sys->stream ) );
-        if( !( p_pkt = vlc_stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
-        {
-            msg_Dbg( p_demux, "eof ?" );
-            return NULL;
-        }
-    }
     return p_pkt;
 }
 
@@ -1968,7 +1974,10 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, vlc_tick_t i_see
     if( p_pmt->pcr.i_first == i_seektime && p_sys->b_canseek )
         return vlc_stream_Seek( p_sys->stream, 0 );
 
-    const int64_t i_stream_size = stream_Size( p_sys->stream );
+    uint64_t i_stream_size;
+    if( vlc_stream_GetSize( p_sys->stream, &i_stream_size ) != VLC_SUCCESS )
+      return VLC_EGENERIC;
+
     if( !p_sys->b_canfastseek || i_stream_size < p_sys->i_packet_size )
         return VLC_EGENERIC;
 
@@ -2272,7 +2281,10 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, vlc_tick_t i_pcr )
             vlc_stream_Tell( p_sys->stream ) > p_pmt->i_last_dts_byte )
         {
             if( p_pmt->i_last_dts_byte == 0 ) /* first run */
-                p_pmt->i_last_dts_byte = stream_Size( p_sys->stream );
+            {
+                if( vlc_stream_GetSize( p_sys->stream, &p_pmt->i_last_dts_byte ) != VLC_SUCCESS )
+                    msg_Dbg( p_demux, "Can't get stream size" );
+            }
             else
             {
                 p_pmt->i_last_dts = i_pcr;

@@ -68,6 +68,49 @@ Item {
     // `QSGTextureView` can also be used instead of sub-texturing here.
     property rect sourceRect
 
+    // TODO: Get rid of this in favor of GLSL 1.30's `textureSize()`
+    Connections {
+        target: root.Window.window
+        enabled: root.visible
+
+        function onAfterAnimating() {
+            // Sampling point for getting the native texture sizes:
+            // This is emitted from the GUI thread.
+
+            // Unlike high resolution timer widget, we should not
+            // need to explicitly schedule update here, because if
+            // an update is necessary, it should have been scheduled
+            // implicitly (due to source texture provider's signal
+            // `textureChanged()`).
+
+            ds1.sourceTextureSize = ds1SourceObserver.nativeTextureSize
+            ds2.sourceTextureSize = ds2SourceObserver.nativeTextureSize
+            us1.sourceTextureSize = us1SourceObserver.nativeTextureSize
+            us2.sourceTextureSize = us2SourceObserver.nativeTextureSize
+
+            // It is not clear if `ShaderEffect` updates the uniform
+            // buffer after `afterAnimating()` signal but before the
+            // next frame. This is important because if `ShaderEffect`
+            // updates the uniform buffer during item polish, we already
+            // missed it here (`afterAnimating()` is signalled afterward).
+            // However, we can call `ensurePolished()` slot to ask for
+            // re-polish, which in case the `ShaderEffect` should now
+            // consider the new values. If it does not exist (Qt 6.2),
+            // we will rely on the next frame in worst case, which
+            // should be fine as long as the size does not constantly
+            // change in each frame.
+            if (ds1.ensurePolished)
+            {
+                // No need to check for if such slot exists for each,
+                // this is basically Qt version check in disguise.
+                ds1.ensurePolished()
+                ds2.ensurePolished()
+                us1.ensurePolished()
+                us2.ensurePolished()
+            }
+        }
+    }
+
     ShaderEffect {
         id: ds1
 
@@ -97,7 +140,7 @@ Item {
             source: ds1.source
         }
 
-        readonly property size sourceTextureSize: ds1SourceObserver.textureSize
+        property size sourceTextureSize
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
@@ -140,7 +183,7 @@ Item {
             source: ds2.source
         }
 
-        readonly property size sourceTextureSize: ds2SourceObserver.textureSize
+        property size sourceTextureSize
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
@@ -184,7 +227,7 @@ Item {
             source: us1.source
         }
 
-        readonly property size sourceTextureSize: us1SourceObserver.textureSize
+        property size sourceTextureSize
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
@@ -227,7 +270,7 @@ Item {
             source: us2.source
         }
 
-        readonly property size sourceTextureSize: us2SourceObserver.textureSize
+        property size sourceTextureSize
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 

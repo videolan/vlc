@@ -132,14 +132,14 @@ private:
     QRect m_rect;
 
     mutable QPointer<QSGTextureViewProvider> m_textureProvider;
-    mutable QMutex m_textureProviderMutex; // I'm not sure if this mutex is necessary
 
     std::atomic<QSGTexture::AnisotropyLevel> m_anisotropyLevel = QSGTexture::AnisotropyNone;
     std::atomic<QSGTexture::Filtering> m_filtering = (smooth() ? QSGTexture::Linear : QSGTexture::Nearest);
     std::atomic<QSGTexture::WrapMode> m_horizontalWrapMode = QSGTexture::ClampToEdge;
     std::atomic<QSGTexture::WrapMode> m_verticalWrapMode = QSGTexture::ClampToEdge;
     // When there are mip maps, no mip map filtering should be fine (unlike no mip maps with mip map filtering):
-    std::atomic<QSGTexture::Filtering> m_mipmapFiltering = QSGTexture::None;
+    // But we want to have mip map filtering by default if the texture has mip maps (if not, it won't be respected):
+    std::atomic<QSGTexture::Filtering> m_mipmapFiltering = QSGTexture::Linear;
 };
 
 #endif // TEXTUREPROVIDERITEM_HPP
