@@ -44,7 +44,7 @@ variables:
 
 .variables-win64-arm: &variables-win64-arm
         SHORTARCH: arm64
-        VLCARCH: winarm64
+        VLCARCH: winarm64-ucrt
         HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
@@ -134,7 +134,6 @@ win64-arm-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64-arm
-        VLCARCH: winarm64-ucrt
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
 uwp32-libvlc-llvm:
@@ -179,7 +178,6 @@ nightly-win64-arm-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64-arm
-        VLCARCH: winarm64-ucrt
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         LIBVLC_EXTRA_BUILD_FLAGS: -D /
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
