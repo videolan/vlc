@@ -220,6 +220,12 @@ release-win64:
         name: $VLC_WIN64_IMAGE
     variables: *variables-win64
 
+release-win64-arm:
+    extends: .release-win-common
+    image:
+        name: $VLC_WIN_LLVM_UCRT_IMAGE
+    variables: *variables-win64-arm
+
 #
 # Debian
 #
