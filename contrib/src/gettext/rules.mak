@@ -61,12 +61,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(GETTEXT_CONF)
-ifndef HAVE_ANDROID
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
-else
-	# Android 32bits does not have localeconv
 	+$(MAKEBUILD) -C gettext-runtime
 	+$(MAKEBUILD) -C gettext-runtime install
-endif
 	touch $@
