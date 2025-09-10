@@ -349,8 +349,8 @@ uint8_t * hevc_create_dcr( const struct hevc_dcr_params *p_params,
                            bool b_completeness, size_t *pi_size );
 
 /* Converts HEVCDecoderConfigurationRecord to Annex B format */
-uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
-                                   size_t *pi_res, uint8_t *pi_nal_length_size );
+bool hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
+                              uint8_t **pp_res, size_t *pi_res, uint8_t *pi_nal_length_size );
 
 /*
  * POC computing

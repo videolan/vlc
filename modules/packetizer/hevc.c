@@ -250,23 +250,21 @@ static int Open(vlc_object_t *p_this)
     /* Check if we have hvcC as extradata */
     if(hevc_ishvcC(p_extra, i_extra))
     {
-        p_dec->pf_packetize = PacketizeHVC1;
-
-        /* Clear hvcC/HVC1 extra, to be replaced with AnnexB */
-        free(p_dec->fmt_out.p_extra);
-        p_dec->fmt_out.i_extra = 0;
-
-        size_t i_new_extra = 0;
-        p_dec->fmt_out.p_extra =
-                hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra,
-                                        &i_new_extra, &p_sys->i_nal_length_size);
-        if(!p_dec->fmt_out.p_extra)
+        uint8_t *p_new_extra;
+        size_t i_new_extra;
+        if(!hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra,
+                                    &p_new_extra, &i_new_extra,
+                                    &p_sys->i_nal_length_size))
         {
             msg_Err( p_dec, "Invalid HVCC extradata");
             Close( VLC_OBJECT(p_dec) );
             return VLC_EGENERIC;
         }
+        /* Clear hvcC/HVC1 extra, to be replaced with AnnexB */
+        free(p_dec->fmt_out.p_extra);
+        p_dec->fmt_out.p_extra = p_new_extra;
         p_dec->fmt_out.i_extra = i_new_extra;
+        p_dec->pf_packetize = PacketizeHVC1;
     }
     else
     {

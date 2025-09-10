@@ -303,16 +303,16 @@ struct hevc_slice_segment_header_t
 };
 
 /* Computes size and does check the whole struct integrity */
-static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
+static bool get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf, size_t *pi_res )
 {
     size_t i_total = 0;
 
     if( i_buf < HEVC_MIN_HVCC_SIZE )
-        return 0;
+        return false;
 
     const uint8_t i_nal_length_size = (p_buf[21] & 0x03) + 1;
     if(i_nal_length_size == 3)
-        return 0;
+        return false;
 
     const uint8_t i_num_array = p_buf[22];
     p_buf += 23; i_buf -= 23;
@@ -320,7 +320,7 @@ static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
     for( uint8_t i = 0; i < i_num_array; i++ )
     {
         if(i_buf < 3)
-            return 0;
+            return false;
 
         const uint16_t i_num_nalu = p_buf[1] << 8 | p_buf[2];
         p_buf += 3; i_buf -= 3;
@@ -328,11 +328,11 @@ static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
         for( uint16_t j = 0; j < i_num_nalu; j++ )
         {
             if(i_buf < 2)
-                return 0;
+                return false;
 
             const uint16_t i_nalu_length = p_buf[0] << 8 | p_buf[1];
             if(i_buf < (size_t)i_nalu_length + 2)
-                return 0;
+                return false;
 
             i_total += i_nalu_length + 4; // annexb_startcode4;
             p_buf += i_nalu_length + 2;
@@ -340,48 +340,53 @@ static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
         }
     }
 
-    return i_total;
+    *pi_res = i_total;
+    return true;
 }
 
-uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
-                                   size_t *pi_result, uint8_t *pi_nal_length_size )
+bool hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
+                              uint8_t **pp_result, size_t *pi_result,
+                              uint8_t *pi_nal_length_size )
 {
-    *pi_result = get_hvcC_to_AnnexB_NAL_size( p_buf, i_buf ); /* Does all checks */
-    if( *pi_result == 0 )
-        return NULL;
+    size_t i_result;
+    if(!get_hvcC_to_AnnexB_NAL_size( p_buf, i_buf, &i_result )) /* Does all checks */
+        return false;
 
-    if( pi_nal_length_size )
-        *pi_nal_length_size = hevc_getNALLengthSize( p_buf );
-
-    uint8_t *p_ret;
-    uint8_t *p_out_buf = p_ret = malloc( *pi_result );
-    if( !p_out_buf )
+    const uint8_t i_nal_length_size = hevc_getNALLengthSize( p_buf );
+    uint8_t *p_out_buf = NULL;
+    if( i_result > 0 )
     {
-        *pi_result = 0;
-        return NULL;
-    }
+        p_out_buf = malloc( i_result );
+        if( !p_out_buf )
+            return false;
 
-    const uint8_t i_num_array = p_buf[22];
-    p_buf += 23;
+        const uint8_t i_num_array = p_buf[22];
+        p_buf += 23;
 
-    for( uint8_t i = 0; i < i_num_array; i++ )
-    {
-        const uint16_t i_num_nalu = p_buf[1] << 8 | p_buf[2];
-        p_buf += 3;
-
-        for( uint16_t j = 0; j < i_num_nalu; j++ )
+        for( uint8_t i = 0; i < i_num_array; i++ )
         {
-            const uint16_t i_nalu_length = p_buf[0] << 8 | p_buf[1];
+            const uint16_t i_num_nalu = p_buf[1] << 8 | p_buf[2];
+            p_buf += 3;
 
-            memcpy( p_out_buf, annexb_startcode4, 4 );
-            memcpy( &p_out_buf[4], &p_buf[2], i_nalu_length );
+            for( uint16_t j = 0; j < i_num_nalu; j++ )
+            {
+                const uint16_t i_nalu_length = p_buf[0] << 8 | p_buf[1];
 
-            p_out_buf += 4 + i_nalu_length;
-            p_buf += 2 + i_nalu_length;
+                memcpy( p_out_buf, annexb_startcode4, 4 );
+                memcpy( &p_out_buf[4], &p_buf[2], i_nalu_length );
+
+                p_out_buf += 4 + i_nalu_length;
+                p_buf += 2 + i_nalu_length;
+            }
         }
     }
 
-    return p_ret;
+    *pp_result = p_out_buf;
+    *pi_result = i_result;
+    if( pi_nal_length_size )
+        *pi_nal_length_size = i_nal_length_size;
+
+    return true;
 }
 
 static bool hevc_parse_scaling_list_rbsp( bs_t *p_bs )
