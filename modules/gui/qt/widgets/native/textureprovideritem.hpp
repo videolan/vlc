@@ -115,7 +115,6 @@ public slots:
 signals:
     void sourceChanged(const QQuickItem *source);
     void rectChanged(const QRect& rect);
-    void dprChanged();
 
     void anisotropyLevelChanged(QSGTexture::AnisotropyLevel);
     void filteringChanged(QSGTexture::Filtering);
@@ -125,7 +124,6 @@ signals:
 
 protected:
     void releaseResources() override;
-    void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
 
 private:
     QPointer<const QQuickItem> m_source;

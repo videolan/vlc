@@ -158,16 +158,6 @@ void TextureProviderItem::releaseResources()
     QQuickItem::releaseResources();
 }
 
-void TextureProviderItem::itemChange(ItemChange change, const ItemChangeData &value)
-{
-    if (change == ItemDevicePixelRatioHasChanged)
-    {
-        emit dprChanged();
-    }
-
-    QQuickItem::itemChange(change, value);
-}
-
 void QSGTextureViewProvider::adjustTexture()
 {
     if (m_textureProvider)
