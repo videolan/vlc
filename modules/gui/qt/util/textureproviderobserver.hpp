@@ -66,7 +66,7 @@ class TextureProviderObserver : public QObject
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
 
-    void setSource(const QQuickItem* source);
+    void setSource(const QQuickItem* source, bool enforce = false);
     QSize textureSize() const;
     QSize nativeTextureSize() const;
     bool hasAlphaChannel() const;

@@ -18,6 +18,7 @@
 #include "textureproviderobserver.hpp"
 
 #include <QSGTextureProvider>
+#include <QQmlInfo>
 
 #if __has_include(<rhi/qrhi.h>) // RHI is semi-public since Qt 6.6
 #define RHI_HEADER_AVAILABLE
@@ -30,9 +31,9 @@ TextureProviderObserver::TextureProviderObserver(QObject *parent)
 
 }
 
-void TextureProviderObserver::setSource(const QQuickItem *source)
+void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
 {
-    if (m_source == source)
+    if (!enforce && (m_source == source))
         return;
 
     {
@@ -59,12 +60,34 @@ void TextureProviderObserver::setSource(const QQuickItem *source)
     {
         assert(m_source->isTextureProvider());
 
-        const auto init = [this]() {
+        const auto init = [this, enforce]() {
             const auto window = m_source->window();
             assert(window);
 
-            connect(window, &QQuickWindow::beforeSynchronizing, this, [this, window]() {
-                assert(m_source->window() == window);
+            connect(window, &QQuickWindow::beforeSynchronizing, this, [this, window, source = m_source, enforce]() {
+                if (Q_UNLIKELY(source != m_source)) // either different or null pointer
+                    return; // we can simply return here, as if new source is valid a new connection would be established (this slot becomes stale either way)
+
+                if (Q_UNLIKELY(m_source->window() != window))
+                {
+                    // This may happen if the source item changes its window before its old window starts synchronizing in the current or the next frame.
+                    // There may be two situations:
+                    // - Source item has a new valid window. This may happen if the item is moved to another window (such as by adjusting visual parent).
+                    //   In this case it would be fine to continue if multiple windows are bound to the same rendering thread, but better to not risk it.
+                    // - Source item no longer has a window. This is more likely than the former.
+                    qmlDebug(this) << "source item's window: " << m_source->window() << " is not matching with the captured one: " << window << ". Trying again...";
+                    QMetaObject::invokeMethod(this, [this, enforce]() {
+                        if (Q_UNLIKELY(enforce))
+                        {
+                            qmlWarning(this) << "source item changed its window again, bailing out.";
+                            setSource(nullptr); // bail out, tried once
+                        }
+                        else
+                            setSource(m_source, true);
+                    }, Qt::QueuedConnection);
+                    return;
+                }
+
                 assert(!m_provider);
 
                 m_provider = m_source->textureProvider(); // This can only be called in the rendering thread.
