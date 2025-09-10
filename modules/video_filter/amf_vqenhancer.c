@@ -261,7 +261,7 @@ error:
 
 vlc_module_begin()
     set_description(N_("AMD VQ Enhancer"))
-    add_shortcut(N_("amf_vqenhancer"))
+    add_shortcut("amf_vqenhancer")
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callback_video_filter(D3D11CreateAMFVQE)
 vlc_module_end()

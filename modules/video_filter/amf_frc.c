@@ -34,7 +34,7 @@ static int D3D11CreateAMFFRC(filter_t *);
 
 vlc_module_begin()
     set_description(N_("AMD Frame Rate Doubler"))
-    add_shortcut(N_("amf_frc"))
+    add_shortcut("amf_frc")
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callback_video_filter(D3D11CreateAMFFRC)
 
