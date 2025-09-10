@@ -679,13 +679,13 @@ vlc_module_begin()
 #ifdef HAVE_AMF_ENHANCER
     add_submodule()
     set_description(N_("AMD VQ Enhancer"))
-    add_shortcut(N_("amf_vqenhancer"))
+    add_shortcut("amf_vqenhancer")
     set_callbacks( D3D11CreateAMFVQE, D3D11CloseAMFVQE )
 #endif
 #ifdef HAVE_AMF_FRC
     add_submodule()
     set_description(N_("AMD Frame Rate Doubler"))
-    add_shortcut(N_("amf_frc"))
+    add_shortcut("amf_frc")
     set_callbacks( D3D11CreateAMFFRC, D3D11CloseAMFFRC )
     add_bool( "frc-indicator", false, N_("Show indicator"), NULL, false )
 #endif
