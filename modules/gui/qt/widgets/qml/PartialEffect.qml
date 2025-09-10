@@ -103,8 +103,12 @@ Item {
                                 effectRect.width * textureProviderItem.eDPR,
                                 effectRect.height * textureProviderItem.eDPR)
 
-        onDprChanged: {
-            eDPR = MainCtx.effectiveDevicePixelRatio(Window.window)
+        Connections {
+            target: MainCtx
+
+            function onIntfDevicePixelRatioChanged() {
+                textureProviderItem.eDPR = MainCtx.effectiveDevicePixelRatio(textureProviderItem.Window.window)
+            }
         }
 
         onChildrenChanged: {
