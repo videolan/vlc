@@ -368,21 +368,20 @@ static int Open( vlc_object_t *p_this )
          * The fmt_out.p_extra should contain all the SPS and PPS with 4 byte startcodes */
         if( h264_isavcC( p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra ) )
         {
-            free( p_dec->fmt_out.p_extra );
-            size_t i_size;
-            p_dec->fmt_out.p_extra = h264_avcC_to_AnnexB_NAL( p_dec->fmt_in->p_extra,
-                                                              p_dec->fmt_in->i_extra,
-                                                             &i_size,
-                                                             &p_sys->i_avcC_length_size );
-            p_dec->fmt_out.i_extra = i_size;
-            p_sys->b_recovered = !!p_dec->fmt_out.i_extra;
-
-            if(!p_dec->fmt_out.p_extra)
+            size_t i_newextra_size; uint8_t *p_newextra;
+            if( !h264_avcC_to_AnnexB_NAL( p_dec->fmt_in->p_extra,
+                                          p_dec->fmt_in->i_extra,
+                                          &p_newextra, &i_newextra_size,
+                                          &p_sys->i_avcC_length_size ) )
             {
                 msg_Err( p_dec, "Invalid AVC extradata");
                 Close( p_this );
                 return VLC_EGENERIC;
             }
+            free( p_dec->fmt_out.p_extra );
+            p_dec->fmt_out.p_extra = p_newextra;
+            p_dec->fmt_out.i_extra = i_newextra_size;
+            p_sys->b_recovered = !!p_dec->fmt_out.i_extra;
         }
         else
         {

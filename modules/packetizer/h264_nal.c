@@ -107,12 +107,12 @@ bool h264_isavcC( const uint8_t *p_buf, size_t i_buf )
             );
 }
 
-static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
+static bool get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf, size_t *pi_res )
 {
     size_t i_total = 0;
 
     if( i_buf < H264_MIN_AVCC_SIZE )
-        return 0;
+        return false;
 
     p_buf += 5;
     i_buf -= 5;
@@ -126,63 +126,70 @@ static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
         for ( unsigned int i = 0; i < i_loop_end; i++ )
         {
             if( i_buf < 2 )
-                return 0;
+                return false;
 
             uint16_t i_nal_size = (p_buf[0] << 8) | p_buf[1];
             if(i_nal_size > i_buf - 2)
-                return 0;
+                return false;
             i_total += i_nal_size + 4;
             p_buf += i_nal_size + 2;
             i_buf -= i_nal_size + 2;
         }
 
         if( j == 0 && i_buf < 1 )
-            return 0;
+            return false;
     }
-    return i_total;
+    *pi_res = i_total;
+    return true;
 }
 
-uint8_t *h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
-                                  size_t *pi_result, uint8_t *pi_nal_length_size )
+bool h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
+                              uint8_t **pp_result, size_t *pi_result,
+                              uint8_t *pi_nal_length_size )
 {
-    *pi_result = get_avcC_to_AnnexB_NAL_size( p_buf, i_buf ); /* Does check min size */
-    if( *pi_result == 0 )
-        return NULL;
+    size_t i_result;
+    if( !get_avcC_to_AnnexB_NAL_size( p_buf, i_buf, &i_result ) ) /* Does check min size */
+        return false;
 
     /* Read infos in first 6 bytes */
-    if ( pi_nal_length_size )
-        *pi_nal_length_size = (p_buf[4] & 0x03) + 1;
+    const uint8_t i_nal_length_size = (p_buf[4] & 0x03) + 1;
 
-    uint8_t *p_ret;
-    uint8_t *p_out_buf = p_ret = malloc( *pi_result );
-    if( !p_out_buf )
+    uint8_t *p_out_buf = NULL;
+    if( i_result > 0 )
     {
-        *pi_result = 0;
-        return NULL;
-    }
+        p_out_buf = malloc( i_result );
+        if( !p_out_buf )
+            return false;
 
-    p_buf += 5;
+        p_buf += 5;
 
-    for ( unsigned int j = 0; j < 2; j++ )
-    {
-        const unsigned int i_loop_end = p_buf[0] & (j == 0 ? 0x1f : 0xff);
-        p_buf++;
-
-        for ( unsigned int i = 0; i < i_loop_end; i++)
+        for ( unsigned int j = 0; j < 2; j++ )
         {
-            uint16_t i_nal_size = (p_buf[0] << 8) | p_buf[1];
-            p_buf += 2;
+            const unsigned int i_loop_end = p_buf[0] & (j == 0 ? 0x1f : 0xff);
+            p_buf++;
 
-            memcpy( p_out_buf, annexb_startcode4, 4 );
-            p_out_buf += 4;
+            for ( unsigned int i = 0; i < i_loop_end; i++)
+            {
+                uint16_t i_nal_size = (p_buf[0] << 8) | p_buf[1];
+                p_buf += 2;
 
-            memcpy( p_out_buf, p_buf, i_nal_size );
-            p_out_buf += i_nal_size;
-            p_buf += i_nal_size;
+                memcpy( p_out_buf, annexb_startcode4, 4 );
+                p_out_buf += 4;
+
+                memcpy( p_out_buf, p_buf, i_nal_size );
+                p_out_buf += i_nal_size;
+                p_buf += i_nal_size;
+            }
         }
     }
 
-    return p_ret;
+    *pp_result = p_out_buf;
+    *pi_result = i_result;
+
+    if ( pi_nal_length_size )
+        *pi_nal_length_size = i_nal_length_size;
+
+    return true;
 }
 
 void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,

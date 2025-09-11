@@ -1040,11 +1040,8 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             h264_isavcC(p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra) )
         {
             size_t i_filled_len = 0;
-            uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(
-                        p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra,
-                        &i_filled_len, NULL );
-
-            if( p_buf == NULL )
+            if( !h264_avcC_to_AnnexB_NAL( p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra,
+                                          &p_buf, &i_filled_len, NULL )
             {
                 msg_Dbg(p_dec, "h264_avcC_to_AnnexB_NAL() failed");
                 goto error;
