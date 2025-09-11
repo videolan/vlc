@@ -11,10 +11,14 @@ MSIDIR=$(abs_srcdir)/extras/package/win32/msi
 W_MSIDIR=`$(WIN32_PATH_CMD) -w '$(MSIDIR)'`
 MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
 W_MSIBUILDDIR=`$(WIN32_PATH_CMD) -w '$(MSIBUILDDIR)'`
+if HAVE_ARM64
+MSIOUTFILE=vlc-$(VERSION)-winarm64.msi
+else
 if HAVE_WIN64
 MSIOUTFILE=vlc-$(VERSION)-win64.msi
 else
 MSIOUTFILE=vlc-$(VERSION)-win32.msi
+endif
 endif
 
 heat: package-win-strip
