@@ -535,8 +535,8 @@ macos-arm64:
         - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
         - mkdir nightlies
-        - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.dmg/")
-        - mv build/vlc-*.tar.gz nightlies/$(basename build/vlc-*.tar.gz | sed "s/\.tar\.gz/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.tar\.gz/")
+        - mv vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.dmg/")
+        - mv vlc-*.tar.gz nightlies/$(basename build/vlc-*.tar.gz | sed "s/\.tar\.gz/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.tar\.gz/")
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
