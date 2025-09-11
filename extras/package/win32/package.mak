@@ -15,10 +15,14 @@ include extras/package/npapi.am
 build-npapi: package-win-install
 endif
 
+if HAVE_ARM64
+WINVERSION=vlc-$(VERSION)-winarm64
+else
 if HAVE_WIN64
 WINVERSION=vlc-$(VERSION)-win64
 else
 WINVERSION=vlc-$(VERSION)-win32
+endif
 endif
 
 package-win-install:
