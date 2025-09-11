@@ -128,16 +128,19 @@ else
 	$(STRIP) $@
 endif
 
+package-win32-src: package-win-strip
 if HAVE_MAKENSIS
-package-win32-exe: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll extras/package/win32/NSIS/vlc.win32.nsi
 # Script installer
 	cp    $(top_builddir)/extras/package/win32/NSIS/vlc.win32.nsi "$(win32_destdir)/"
 	cp    $(top_builddir)/extras/package/win32/NSIS/spad.nsi      "$(win32_destdir)/"
-	cp -r $(srcdir)/extras/package/win32/NSIS/languages    "$(win32_destdir)/"
-	cp -r $(srcdir)/extras/package/win32/NSIS/helpers      "$(win32_destdir)/"
+	cp -r $(srcdir)/extras/package/win32/NSIS/languages           "$(win32_destdir)/"
+	cp -r $(srcdir)/extras/package/win32/NSIS/helpers             "$(win32_destdir)/"
 	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
 	cp "$(top_srcdir)/extras/package/win32/NSIS/vlc_branding.bmp" "$(win32_destdir)/NSIS/"
+endif
 
+if HAVE_MAKENSIS
+package-win32-exe: package-win32-src $(win32_destdir)/NSIS/nsProcess.dll extras/package/win32/NSIS/vlc.win32.nsi
 # Create package
 	$(MAKENSIS) "$(win32_destdir)/spad.nsi"
 	$(MAKENSIS) "$(win32_destdir)/vlc.win32.nsi"
@@ -167,14 +170,7 @@ package-win32: package-win32-zip package-win32-7zip package-win32-exe
 
 package-win32-debug: package-win32-debug-zip package-win32-debug-7zip
 
-package-win32-release: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll package-win-sdk
-	cp    $(top_builddir)/extras/package/win32/NSIS/vlc.win32.nsi "$(win32_destdir)/"
-	cp    $(top_builddir)/extras/package/win32/NSIS/spad.nsi      "$(win32_destdir)/"
-	cp -r $(srcdir)/extras/package/win32/NSIS/languages    		  "$(win32_destdir)/"
-	cp -r $(srcdir)/extras/package/win32/NSIS/helpers      		  "$(win32_destdir)/"
-	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
-	cp "$(top_srcdir)/extras/package/win32/NSIS/vlc_branding.bmp" "$(win32_destdir)/NSIS/"
-
+package-win32-release: package-win32-src $(win32_destdir)/NSIS/nsProcess.dll package-win-sdk
 	mkdir -p "$(win32_destdir)/msi/"
 	cp    $(top_builddir)/extras/package/win32/msi/config.wxi	  "$(win32_destdir)/msi/"
 	cp    $(top_srcdir)/extras/package/win32/msi/axvlc.wxs		  "$(win32_destdir)/msi/"
@@ -192,7 +188,7 @@ package-wince: package-win-strip
 	rm -f -- vlc-$(VERSION)-wince.zip
 	zip -r -9 vlc-$(VERSION)-wince.zip vlc-$(VERSION)
 
-.PHONY: package-win-install package-win-common package-win-strip package-win32-exe package-win32-zip package-win32-debug-zip package-win32-7zip package-win32-debug-7zip package-win32-cleanup package-win32 package-win32-debug package-wince
+.PHONY: package-win-install package-win-common package-win-strip package-win32-src package-win32-exe package-win32-zip package-win32-debug-zip package-win32-7zip package-win32-debug-7zip package-win32-cleanup package-win32 package-win32-debug package-wince
 
 EXTRA_DIST += \
 	extras/package/win32/vlc.exe.manifest \
@@ -237,5 +233,3 @@ EXTRA_DIST += \
 	extras/package/win32/NSIS/languages/IcelandicExtra.nsh \
 	extras/package/win32/NSIS/languages/LatvianExtra.nsh \
 	extras/package/win32/NSIS/languages/IndonesianExtra.nsh
-
-

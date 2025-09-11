@@ -626,8 +626,10 @@ else
     elif [ "$INSTALLER" = "r" ]; then
         make package-win32
     elif [ "$INSTALLER" = "u" ]; then
-        make package-win32-release
+        make -j$JOBS package-win32-release package-win32-exe package-msi
         sha512sum vlc-*-release.7z
+        sha512sum vlc-*-*.exe
+        sha512sum vlc-*-*.msi
     elif [ "$INSTALLER" = "m" ]; then
         make package-msi
     elif [ -n "$INSTALL_PATH" ]; then
