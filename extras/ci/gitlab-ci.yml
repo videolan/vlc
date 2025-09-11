@@ -203,10 +203,12 @@ nightly-win64-arm-llvm:
         --upload-url $CRASH_DRAGON_SUBMIT_URL
         -p win --version $RELEASE_TAG
         --prod VLC --log INFO
-        --strip-path $CI_PROJECT_DIR $CI_PROJECT_DIR/$SHORTARCH/symbols-$RELEASE_TAG
+        --strip-path $CI_PROJECT_DIR $CI_PROJECT_DIR/${VLCARCH}/symbols-$RELEASE_TAG
     artifacts:
       paths:
-        - $CI_PROJECT_DIR/$SHORTARCH/vlc-*release.7z
+        - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*-release.7z
+        - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*.exe
+        - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*.msi
 
 release-win32:
     extends: .release-win-common
