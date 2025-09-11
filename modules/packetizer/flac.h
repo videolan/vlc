@@ -246,7 +246,7 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
         return 0;
 
     /* Invalid Sample/Frame number */
-    if (!stream_info || stream_info->total_samples != 0 && i_fsnumber > stream_info->total_samples)
+    if (stream_info && stream_info->total_samples != 0 && i_fsnumber > stream_info->total_samples)
         return 0;
 
     i_header += i_read;
