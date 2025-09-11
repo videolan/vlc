@@ -1,0 +1,28 @@
+From b988fa74ec18de6214b18f723e48331d9a7802ae Mon Sep 17 00:00:00 2001
+From: Tom Tan <Tom.Tan@microsoft.com>
+Date: Wed, 2 Jan 2019 15:06:59 -0800
+Subject: [PATCH] Extract intruction pointer correctly for Windows ARM64
+
+Bug: 893460
+Change-Id: Ibbdf734e72c29c4779b6a701dceec1626056a9ba
+Reviewed-on: https://chromium-review.googlesource.com/c/1393763
+Reviewed-by: Joshua Peraza <jperaza@chromium.org>
+---
+ src/client/windows/handler/exception_handler.cc | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/client/windows/handler/exception_handler.cc b/src/client/windows/handler/exception_handler.cc
+index c369b65d6..ad45b2000 100644
+--- a/src/client/windows/handler/exception_handler.cc
++++ b/src/client/windows/handler/exception_handler.cc
+@@ -976,7 +976,9 @@ bool ExceptionHandler::WriteMinidumpWithExceptionForProcess(
+ #if defined(_M_IX86)
+           exinfo->ContextRecord->Eip;
+ #elif defined(_M_AMD64)
+-        exinfo->ContextRecord->Rip;
++          exinfo->ContextRecord->Rip;
++#elif defined(_M_ARM64)
++          exinfo->ContextRecord->Pc;
+ #else
+ #error Unsupported platform
+ #endif
