@@ -377,6 +377,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             vars.tk->i_extra_data = cpriv.GetSize();
             if( vars.tk->i_extra_data > 0 )
             {
+                free( vars.tk->p_extra_data );
                 vars.tk->p_extra_data = static_cast<uint8_t*>( malloc( vars.tk->i_extra_data ) );
 
                 if( likely( vars.tk->p_extra_data ) )
