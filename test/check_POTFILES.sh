@@ -1,10 +1,8 @@
 #! /bin/sh
-
-top_srcdir="${srcdir}/.."
-
 set -xe
 
-cd ${top_srcdir}
+SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
+cd "${SCRIPT_PATH}/.."
 
 grep -v '^#' po/POTFILES.in | \
 while read f
