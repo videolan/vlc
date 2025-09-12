@@ -937,6 +937,7 @@
 		8ED6C28203E2EB1C0059A3A7 /* VLCOpenWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCOpenWindowController.m; sourceTree = "<group>"; };
 		8ED6C28503E2EB1C0059A3A7 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prefs.h; sourceTree = "<group>"; };
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = prefs.m; sourceTree = "<group>"; };
+		CAA639942E6C914000C9A71D /* VLCClassicMainVideoView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCClassicMainVideoView.xib; sourceTree = "<group>"; };
 		CC0663341566C34C003A411C /* VLCConvertAndSaveWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = VLCConvertAndSaveWindowController.h; sourceTree = "<group>"; };
 		CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = VLCConvertAndSaveWindowController.m; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
@@ -2188,6 +2189,7 @@
 				536283FA2911476A00640C15 /* VLCLibrarySongTableCellView.xib */,
 				7DE2F0482282D7980040DD0A /* VLCLibraryTableCellView.xib */,
 				534E8E3729A04F95009503F8 /* VLCMainVideoView.xib */,
+				CAA639942E6C914000C9A71D /* VLCClassicMainVideoView.xib */,
 				7D67318322C8F3F60000AD40 /* VLCMediaSourceCollectionViewItem.xib */,
 				7DF14FBC2270CB1C0008ABE4 /* VLCMediaSourceDeviceCollectionViewItem.xib */,
 				530429942DD1ED66004BB598 /* VLCPlaybackEndView.xib */,
