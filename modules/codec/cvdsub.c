@@ -348,7 +348,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
     uint8_t       *p     = p_spu->p_buffer + p_sys->metadata_offset;
     uint8_t       *p_end = p + p_sys->metadata_length;
 
-    for( ; p < p_end; p += 4 )
+    for( ; &p[3] < p_end; p += 4 )
     {
         switch( p[0] )
         {
