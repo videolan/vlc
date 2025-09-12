@@ -2354,6 +2354,8 @@ static int MP4_ReadBox_sgpd( stream_t *p_stream, MP4_Box_t *p_box )
                     if( i_read < 2 )
                     {
                         free( p_sgpd->p_entries );
+                        p_sgpd->i_entry_count = 0;
+                        p_sgpd->p_entries = NULL;
                         MP4_READBOX_EXIT( 0 );
                     }
                     union
@@ -2369,6 +2371,8 @@ static int MP4_ReadBox_sgpd( stream_t *p_stream, MP4_Box_t *p_box )
             default:
                 vlc_assert_unreachable();
                 free( p_sgpd->p_entries );
+                p_sgpd->i_entry_count = 0;
+                p_sgpd->p_entries = NULL;
                 MP4_READBOX_EXIT( 0 );
         }
     }
