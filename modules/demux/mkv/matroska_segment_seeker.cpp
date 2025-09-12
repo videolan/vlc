@@ -510,16 +510,22 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
 
     while( EbmlElement * el = ms.ep.Get() )
     {
-        if( MKV_CHECKED_PTR_DECL( p_tc, KaxClusterTimecode, el ) )
-        {
-            p_tc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA );
-            ms.cluster->InitTimecode( static_cast<uint64>( *p_tc ), ms.i_timescale );
-            add_cluster(ms.cluster);
-            break;
+        try {
+            if( MKV_CHECKED_PTR_DECL( p_tc, KaxClusterTimecode, el ) )
+            {
+                p_tc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA );
+                ms.cluster->InitTimecode( static_cast<uint64>( *p_tc ), ms.i_timescale );
+                add_cluster(ms.cluster);
+                break;
+            }
+            else if( MKV_CHECKED_PTR_DECL( p_tc, EbmlCrc32, el ) )
+            {
+                p_tc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA ); /* avoid a skip that may fail */
+            }
         }
-        else if( MKV_CHECKED_PTR_DECL( p_tc, EbmlCrc32, el ) )
+        catch(...)
         {
-            p_tc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA ); /* avoid a skip that may fail */
+            msg_Err( &ms.sys.demuxer,"Error while reading %s",  EBML_NAME(el) );
         }
     }
 
