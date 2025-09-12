@@ -23,6 +23,7 @@ Release HOWTO
     git push origin <VERSION>
 
  * Tarballs (Use a clean tree !!!)
+  - Edit POTFILES.in to include generated Qt UI files (doesn't work out of tree)
   - Use 'make distcheck' to make sure all files are exported correctly
   - copy the tar.xz file on ganesh.videolan.org
   - generate SHA, MD5 hashes and OpenPGP signature of these files :
