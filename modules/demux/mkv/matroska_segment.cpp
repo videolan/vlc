@@ -1243,7 +1243,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 return;
             }
 
-            filepos_t read = ksblock.ReadData( vars.obj->es.I_O() );
+            filepos_t read = 0;
+            try {
+                read = ksblock.ReadData( vars.obj->es.I_O() );
+            } catch(...) {
+            }
             if (read == 0 && ksblock.GetSize() != 0) {
                 msg_Err( vars.p_demuxer,"Error while reading %s",  EBML_NAME(&ksblock) );
                 return;
@@ -1267,7 +1271,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
         E_CASE( KaxBlock, kblock )
         {
-            filepos_t read = kblock.ReadData( vars.obj->es.I_O() );
+            filepos_t read = 0;
+            try {
+                read = kblock.ReadData( vars.obj->es.I_O() );
+            } catch(...) {
+            }
             if (unlikely(read == 0) && kblock.GetSize() != 0) {
                 msg_Err( vars.p_demuxer,"Error while reading %s",  EBML_NAME(&kblock) );
                 return;
