@@ -210,6 +210,45 @@ nightly-win64-arm-llvm:
         - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*.exe
         - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*.msi
 
+release-debian:
+    extends: .docker-template
+    only:
+      - tags
+    tags:
+        - release
+        - amd64
+    image:
+        name: $VLC_DEBIAN_IMAGE
+    script: |
+        export NCPU=$(getconf _NPROCESSORS_ONLN)
+
+        # Build tools
+        ( cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse )
+        export PATH="$(pwd)/extras/tools/build/bin:$PATH"
+
+        # Build contribs
+        mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
+        ../bootstrap
+        make list
+        make -j$NCPU --output-sync=recurse fetch
+        make -j$NCPU --output-sync=recurse
+        cd ../../
+
+        # Include Qt UI files in po files
+        sed -i 's,#modules/,modules/,g' po/POTFILES.in
+
+        # Build VLC
+        ./bootstrap
+        ./configure
+        make -j$NCPU
+
+        ./test/check_POTFILES.sh
+        make -j$NCPU dist
+    artifacts:
+      paths:
+        - $CI_PROJECT_DIR/vlc-*.tar.xz
+    variables: *variables-debian
+
 release-win32:
     extends: .release-win-common
     image:
