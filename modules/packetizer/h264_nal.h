@@ -50,6 +50,10 @@ extern "C" {
 #define H264_SPS_ID_MAX (31)
 #define H264_PPS_ID_MAX (255)
 #define H264_SPSEXT_ID_MAX H264_SPS_ID_MAX
+#define H264_MAX_NUM_SPS (H264_SPS_ID_MAX + 1)
+#define H264_MAX_NUM_PPS (H264_PPS_ID_MAX + 1)
+#define H264_MAX_NUM_SPSEXT (H264_SPSEXT_ID_MAX + 1)
+
 
 enum h264_nal_unit_type_e
 {

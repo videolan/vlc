@@ -87,16 +87,16 @@ typedef struct
     {
         block_t *p_block;
         h264_sequence_parameter_set_t *p_sps;
-    } sps[H264_SPS_ID_MAX + 1];
+    } sps[H264_MAX_NUM_SPS];
     struct
     {
         block_t *p_block;
         h264_picture_parameter_set_t *p_pps;
-    } pps[H264_PPS_ID_MAX + 1];
+    } pps[H264_MAX_NUM_PPS];
     struct
     {
         block_t *p_block;
-    } spsext[H264_SPSEXT_ID_MAX + 1];
+    } spsext[H264_MAX_NUM_SPSEXT];
     const h264_sequence_parameter_set_t *p_active_sps;
     const h264_picture_parameter_set_t *p_active_pps;
 
@@ -318,19 +318,19 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_new_sps = false;
     p_sys->b_new_pps = false;
 
-    for( i = 0; i <= H264_SPS_ID_MAX; i++ )
+    for( i = 0; i < H264_MAX_NUM_SPS; i++ )
     {
         p_sys->sps[i].p_sps = NULL;
         p_sys->sps[i].p_block = NULL;
     }
     p_sys->p_active_sps = NULL;
-    for( i = 0; i <= H264_PPS_ID_MAX; i++ )
+    for( i = 0; i < H264_MAX_NUM_PPS; i++ )
     {
         p_sys->pps[i].p_pps = NULL;
         p_sys->pps[i].p_block = NULL;
     }
     p_sys->p_active_pps = NULL;
-    for( i = 0; i <= H264_SPSEXT_ID_MAX; i++ )
+    for( i = 0; i < H264_MAX_NUM_SPSEXT; i++ )
         p_sys->spsext[i].p_block = NULL;
     p_sys->i_recovery_frame_cnt = UINT_MAX;
 
@@ -1032,21 +1032,21 @@ wrap_h264_xps_release(h264_release_pps, h264_picture_parameter_set_t)
 
 static void ReleaseXPS( decoder_sys_t *p_sys )
 {
-    for( int i = 0; i <= H264_SPS_ID_MAX; i++ )
+    for( int i = 0; i < H264_MAX_NUM_SPS; i++ )
     {
         if( !p_sys->sps[i].p_block )
             continue;
         block_Release( p_sys->sps[i].p_block );
         h264_release_sps( p_sys->sps[i].p_sps );
     }
-    for( int i = 0; i <= H264_PPS_ID_MAX; i++ )
+    for( int i = 0; i < H264_MAX_NUM_PPS; i++ )
     {
         if( !p_sys->pps[i].p_block )
             continue;
         block_Release( p_sys->pps[i].p_block );
         h264_release_pps( p_sys->pps[i].p_pps );
     }
-    for( int i = 0; i <= H264_SPSEXT_ID_MAX; i++ )
+    for( int i = 0; i < H264_MAX_NUM_SPSEXT; i++ )
     {
         if( p_sys->spsext[i].p_block )
             block_Release( p_sys->spsext[i].p_block );

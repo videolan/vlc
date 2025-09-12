@@ -54,9 +54,9 @@ struct hxxx_helper
     uint8_t i_config_version;
     union {
         struct {
-            struct hxxx_helper_nal sps_list[H264_SPS_ID_MAX + 1];
-            struct hxxx_helper_nal pps_list[H264_PPS_ID_MAX + 1];
-            struct hxxx_helper_nal spsext_list[H264_SPS_ID_MAX + 1];
+            struct hxxx_helper_nal sps_list[H264_MAX_NUM_SPS];
+            struct hxxx_helper_nal pps_list[H264_MAX_NUM_PPS];
+            struct hxxx_helper_nal spsext_list[H264_MAX_NUM_SPS];
             uint8_t i_current_sps;
             uint8_t i_sps_count;
             uint8_t i_pps_count;
