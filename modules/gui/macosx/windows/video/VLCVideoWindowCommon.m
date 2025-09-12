@@ -130,7 +130,6 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
     _playerController = VLCMain.sharedInstance.playQueueController.playerController;
-    _videoViewController = [[VLCMainVideoViewController alloc] init];
 
     [self mediaMetadataChanged:nil];
 
