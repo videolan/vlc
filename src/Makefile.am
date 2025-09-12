@@ -563,7 +563,7 @@ $(srcdir)/revision.txt:
 
 stamp-revision:
 	$(AM_V_at)rm -f -- revision.tmp
-	$(AM_V_GEN)if ! git \
+	$(AM_V_GEN)if ! git -c safe.directory='*' \
 			-C "$(top_srcdir)" describe \
 			--tags --long --match '?.*.*' --always; then \
 		cat $(srcdir)/revision.txt ; \
