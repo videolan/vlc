@@ -121,8 +121,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define ERROR_TEXT N_( "Show unimportant error and warnings dialogs" )
 
-#define QT_DARK_TEXT N_( "Applies a dark palette to the style." )
-#define QT_DARK_LONGTEXT N_( "Applies a dark palette to the style. Works best with Fusion style." )
+#define QT_DARK_TEXT N_( "Enable Dark Mode" )
+#define QT_DARK_LONGTEXT N_( "Applies a dark theme to the style." )
 
 #define UPDATER_TEXT N_( "Activate the updates availability notification" )
 #define UPDATER_LONGTEXT N_( "Activate the automatic notification of new " \
@@ -260,7 +260,7 @@ vlc_module_begin ()
     add_integer( "qt-continue", 1, CONTINUE_PLAYBACK_TEXT, CONTINUE_PLAYBACK_TEXT, false )
             change_integer_list(i_continue_list, psz_continue_list_text )
     add_bool( "qt-dark-palette", false, QT_DARK_TEXT,
-                  QT_DARK_LONGTEXT, false )	
+                  QT_DARK_LONGTEXT, false )
 
 #ifdef UPDATE_CHECK
     add_bool( "qt-updates-notif", true, UPDATER_TEXT,
@@ -699,7 +699,7 @@ static void *ThreadPlatform( void *obj, char *platform_name )
     // Apply dark palette only if dark palette is enabled
     if (isDarkPaletteEnabled(p_intf))
         applyDarkPalette();
-    
+
     /* Launch */
     app.exec();
 
