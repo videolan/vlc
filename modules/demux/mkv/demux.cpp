@@ -630,7 +630,10 @@ bool demux_sys_t::PreloadLinked()
         return false;
 
     if ( unlikely(p_current_vsegment->CurrentEdition() == NULL) )
+    {
+        delete p_current_vsegment;
         return false;
+    }
 
     /* Set current chapter */
     p_current_vsegment->p_current_vchapter = p_current_vsegment->CurrentEdition()->getChapterbyTimecode(0);
