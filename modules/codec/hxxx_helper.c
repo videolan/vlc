@@ -176,8 +176,8 @@ helper_load_sei(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal)
     hh->hevc.i_sei_count++;
 }
 
-#define LOAD_xPS(list, count, id, max, xpstype, xpsdecode, xpsrelease) \
-    if (helper_search_nal(list, count, max+1, p_nal, i_nal) != NULL)\
+#define LOAD_xPS(list, count, id, maxnum, xpstype, xpsdecode, xpsrelease) \
+    if (helper_search_nal(list, count, maxnum, p_nal, i_nal) != NULL)\
         return VLC_SUCCESS;\
     xpstype *p_xps = xpsdecode(p_nal, i_nal, true);\
     if (!p_xps)\
@@ -210,7 +210,7 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal
     {
         h264_get_xps_id(p_nal, i_nal, &i_id);
         LOAD_xPS(hh->h264.sps_list, hh->h264.i_sps_count,
-                 i_id, H264_SPS_ID_MAX,
+                 i_id, H264_MAX_NUM_SPS,
                  h264_sequence_parameter_set_t,
                  h264_decode_sps,
                  h264_release_sps);
@@ -221,7 +221,7 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal
     {
         h264_get_xps_id(p_nal, i_nal, &i_id);
         LOAD_xPS(hh->h264.pps_list, hh->h264.i_pps_count,
-                 i_id, H264_PPS_ID_MAX,
+                 i_id, H264_MAX_NUM_PPS,
                  h264_picture_parameter_set_t,
                  h264_decode_pps,
                  h264_release_pps);
@@ -231,7 +231,7 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal
     {
         h264_get_xps_id(p_nal, i_nal, &i_id);
         LOAD_xPS(hh->h264.spsext_list, hh->h264.i_spsext_count,
-                 i_id, H264_SPSEXT_ID_MAX,
+                 i_id, H264_MAX_NUM_SPSEXT,
                  h264_sequence_parameter_set_extension_t,
                  h264_decode_sps_extension,
                  h264_release_sps_extension);
@@ -308,7 +308,7 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal
         if( !hevc_get_xps_id(p_nal, i_nal, &i_id) )
             return VLC_EGENERIC;
         LOAD_xPS(hh->hevc.vps_list, hh->hevc.i_vps_count,
-                 i_id, HEVC_VPS_ID_MAX,
+                 i_id, HEVC_MAX_NUM_VPS,
                  hevc_video_parameter_set_t,
                  hevc_decode_vps,
                  hevc_rbsp_release_vps);
@@ -320,7 +320,7 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal
         if( !hevc_get_xps_id(p_nal, i_nal, &i_id) )
             return VLC_EGENERIC;
         LOAD_xPS(hh->hevc.sps_list, hh->hevc.i_sps_count,
-                 i_id, HEVC_SPS_ID_MAX,
+                 i_id, HEVC_MAX_NUM_SPS,
                  hevc_sequence_parameter_set_t,
                  hevc_decode_sps,
                  hevc_rbsp_release_sps);
@@ -332,7 +332,7 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal
         if( !hevc_get_xps_id(p_nal, i_nal, &i_id) )
             return VLC_EGENERIC;
         LOAD_xPS(hh->hevc.pps_list, hh->hevc.i_pps_count,
-                 i_id, HEVC_PPS_ID_MAX,
+                 i_id, HEVC_MAX_NUM_PPS,
                  hevc_picture_parameter_set_t,
                  hevc_decode_pps,
                  hevc_rbsp_release_pps);
