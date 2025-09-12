@@ -63,9 +63,9 @@ struct hxxx_helper
             uint8_t i_spsext_count;
         } h264;
         struct {
-            struct hxxx_helper_nal sps_list[HEVC_SPS_ID_MAX + 1];
-            struct hxxx_helper_nal pps_list[HEVC_PPS_ID_MAX + 1];
-            struct hxxx_helper_nal vps_list[HEVC_VPS_ID_MAX + 1];
+            struct hxxx_helper_nal sps_list[HEVC_MAX_NUM_SPS];
+            struct hxxx_helper_nal pps_list[HEVC_MAX_NUM_PPS];
+            struct hxxx_helper_nal vps_list[HEVC_MAX_NUM_VPS];
             struct hxxx_helper_nal sei_list[HXXX_HELPER_SEI_COUNT];
             uint8_t i_current_sps;
             uint8_t i_current_vps;

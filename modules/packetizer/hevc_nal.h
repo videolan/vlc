@@ -30,6 +30,9 @@ extern "C" {
 #define HEVC_VPS_ID_MAX 15
 #define HEVC_SPS_ID_MAX 15
 #define HEVC_PPS_ID_MAX 63
+#define HEVC_MAX_NUM_VPS (HEVC_VPS_ID_MAX + 1)
+#define HEVC_MAX_NUM_SPS (HEVC_SPS_ID_MAX + 1)
+#define HEVC_MAX_NUM_PPS (HEVC_PPS_ID_MAX + 1)
 
 enum hevc_general_profile_idc_e
 {

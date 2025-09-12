@@ -80,9 +80,9 @@ typedef struct
 
     uint8_t  i_nal_length_size;
 
-    struct hevc_tuple_s rg_vps[HEVC_VPS_ID_MAX + 1],
-                        rg_sps[HEVC_SPS_ID_MAX + 1],
-                        rg_pps[HEVC_PPS_ID_MAX + 1];
+    struct hevc_tuple_s rg_vps[HEVC_MAX_NUM_VPS],
+                        rg_sps[HEVC_MAX_NUM_SPS],
+                        rg_pps[HEVC_MAX_NUM_PPS];
 
     const hevc_video_parameter_set_t    *p_active_vps;
     const hevc_sequence_parameter_set_t *p_active_sps;
@@ -296,7 +296,7 @@ static void Close(vlc_object_t *p_this)
     block_ChainRelease(p_sys->pre.p_chain);
     block_ChainRelease(p_sys->post.p_chain);
 
-    for(unsigned i=0;i<=HEVC_PPS_ID_MAX; i++)
+    for(unsigned i=0;i<HEVC_MAX_NUM_PPS; i++)
     {
         if(p_sys->rg_pps[i].p_decoded)
             hevc_rbsp_release_pps(p_sys->rg_pps[i].p_decoded);
@@ -304,7 +304,7 @@ static void Close(vlc_object_t *p_this)
             block_Release(p_sys->rg_pps[i].p_nal);
     }
 
-    for(unsigned i=0;i<=HEVC_SPS_ID_MAX; i++)
+    for(unsigned i=0;i<HEVC_MAX_NUM_SPS; i++)
     {
         if(p_sys->rg_sps[i].p_decoded)
             hevc_rbsp_release_sps(p_sys->rg_sps[i].p_decoded);
@@ -312,7 +312,7 @@ static void Close(vlc_object_t *p_this)
             block_Release(p_sys->rg_sps[i].p_nal);
     }
 
-    for(unsigned i=0;i<=HEVC_VPS_ID_MAX; i++)
+    for(unsigned i=0;i<HEVC_MAX_NUM_VPS; i++)
     {
         if(p_sys->rg_vps[i].p_decoded)
             hevc_rbsp_release_vps(p_sys->rg_vps[i].p_decoded);
@@ -506,7 +506,7 @@ static block_t *GetXPSCopy(decoder_sys_t *p_sys)
     block_t *p_chain = NULL;
     block_t **pp_append = &p_chain;
     struct hevc_tuple_s *xpstype[3] = {p_sys->rg_vps, p_sys->rg_sps, p_sys->rg_pps};
-    size_t xpsmax[3] = {HEVC_VPS_ID_MAX+1, HEVC_SPS_ID_MAX+1, HEVC_PPS_ID_MAX+1};
+    size_t xpsmax[3] = {HEVC_MAX_NUM_VPS, HEVC_MAX_NUM_SPS, HEVC_MAX_NUM_PPS};
     for(size_t i=0; i<3; i++)
     {
         struct hevc_tuple_s *xps = xpstype[i];
@@ -523,7 +523,7 @@ static block_t *GetXPSCopy(decoder_sys_t *p_sys)
 
 static bool XPSReady(decoder_sys_t *p_sys)
 {
-    for(unsigned i=0;i<=HEVC_PPS_ID_MAX; i++)
+    for(unsigned i=0;i<HEVC_MAX_NUM_PPS; i++)
     {
         const hevc_picture_parameter_set_t *p_pps = p_sys->rg_pps[i].p_decoded;
         if (p_pps)
@@ -557,8 +557,8 @@ static void AppendAsAnnexB(const block_t *p_block,
     }
 }
 
-#define APPENDIF(idmax, set, rg, b) \
-    for(size_t i=0; i<=idmax; i++)\
+#define APPENDIF(maxcount, set, rg, b) \
+    for(size_t i=0; i<maxcount; i++)\
     {\
         if(((set != rg[i].p_decoded) == !b) && rg[i].p_nal)\
         {\
@@ -576,12 +576,12 @@ static void SetsToAnnexB(decoder_sys_t *p_sys,
     uint8_t *p_data = NULL;
     size_t i_data = 0;
 
-    APPENDIF(HEVC_VPS_ID_MAX, p_vps, p_sys->rg_vps, true);
-    APPENDIF(HEVC_VPS_ID_MAX, p_vps, p_sys->rg_vps, false);
-    APPENDIF(HEVC_SPS_ID_MAX, p_sps, p_sys->rg_sps, true);
-    APPENDIF(HEVC_SPS_ID_MAX, p_sps, p_sys->rg_sps, false);
-    APPENDIF(HEVC_PPS_ID_MAX, p_pps, p_sys->rg_pps, true);
-    APPENDIF(HEVC_PPS_ID_MAX, p_pps, p_sys->rg_pps, false);
+    APPENDIF(HEVC_MAX_NUM_VPS, p_vps, p_sys->rg_vps, true);
+    APPENDIF(HEVC_MAX_NUM_VPS, p_vps, p_sys->rg_vps, false);
+    APPENDIF(HEVC_MAX_NUM_SPS, p_sps, p_sys->rg_sps, true);
+    APPENDIF(HEVC_MAX_NUM_SPS, p_sps, p_sys->rg_sps, false);
+    APPENDIF(HEVC_MAX_NUM_PPS, p_pps, p_sys->rg_pps, true);
+    APPENDIF(HEVC_MAX_NUM_PPS, p_pps, p_sys->rg_pps, false);
 
     /* because we copy to i_extra :/ */
     if(i_data <= INT_MAX)
