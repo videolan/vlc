@@ -10,10 +10,16 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainVideoViewController">
             <connections>
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
+                <outlet property="fakeTitleBar" destination="VIa-0w-fl8" id="EvT-Rx-xF4"/>
+                <outlet property="fakeTitleBarHeightConstraint" destination="amB-S5-eDf" id="NFm-6D-mkF"/>
                 <outlet property="floatOnTopIndicatorImageView" destination="CrW-mq-gge" id="hqR-4Z-a18"/>
                 <outlet property="loadingIndicator" destination="xOQ-YR-iAc" id="CtX-Yo-UX2"/>
                 <outlet property="playQueueButton" destination="Drq-if-dw4" id="BZe-Cr-mzZ"/>
+                <outlet property="playQueueButtonTopConstraint" destination="upk-uZ-i0p" id="93W-Yu-w5Z"/>
+                <outlet property="playQueueButtonTrailingConstraint" destination="W2N-pT-Euw" id="NxJ-O5-Qu5"/>
                 <outlet property="returnButton" destination="UoQ-34-Pox" id="nyY-OF-9zj"/>
+                <outlet property="returnButtonLeadingConstraint" destination="9Kp-XF-aBn" id="Ax9-Sl-Imd"/>
+                <outlet property="returnButtonTopConstraint" destination="mw7-vU-2vi" id="cHZ-kY-t4E"/>
                 <outlet property="view" destination="WRu-Ic-lQK" id="B9p-x5-Kd8"/>
                 <outlet property="voutContainingView" destination="MTR-ds-I8o" id="cim-tb-1lO"/>
                 <outlet property="voutView" destination="mAS-4a-RS8" id="GeX-XO-HYC"/>
@@ -46,44 +52,8 @@
                     <subviews>
                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="mAS-4a-RS8" customClass="VLCVoutView">
                             <rect key="frame" x="0.0" y="0.0" width="1027" height="442"/>
-                            <subviews>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UoQ-34-Pox">
-                                    <rect key="frame" x="20" y="393" width="22" height="29"/>
-                                    <shadow key="shadow" blurRadius="2">
-                                        <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </shadow>
-                                    <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CU4-UE-tsW">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                        <imageReference key="image" image="NSLeftFacingTriangleTemplate" symbolScale="large"/>
-                                    </buttonCell>
-                                    <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <connections>
-                                        <action selector="returnToLibrary:" target="-2" id="rnL-S1-zSR"/>
-                                    </connections>
-                                </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Drq-if-dw4">
-                                    <rect key="frame" x="976" y="393" width="31" height="29"/>
-                                    <shadow key="shadow" blurRadius="2">
-                                        <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </shadow>
-                                    <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VDP-ql-lW8">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                        <imageReference key="image" image="NSListViewTemplate" symbolScale="large"/>
-                                    </buttonCell>
-                                    <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <connections>
-                                        <action selector="togglePlayQueue:" target="-2" id="WrP-vg-etw"/>
-                                    </connections>
-                                </button>
-                            </subviews>
                             <constraints>
-                                <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="mAS-4a-RS8" secondAttribute="top" constant="20" id="4Vt-fM-INo"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="288" id="BvW-zM-Gro"/>
-                                <constraint firstItem="Drq-if-dw4" firstAttribute="top" secondItem="mAS-4a-RS8" secondAttribute="top" constant="20" id="XDR-Bl-bgl"/>
-                                <constraint firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="20" id="ebL-qv-FNA"/>
-                                <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="mAS-4a-RS8" secondAttribute="leading" constant="20" id="lah-le-wNi"/>
                             </constraints>
                         </customView>
                     </subviews>
@@ -94,6 +64,42 @@
                         <constraint firstAttribute="bottom" secondItem="mAS-4a-RS8" secondAttribute="bottom" id="xjG-dc-nlA"/>
                     </constraints>
                 </customView>
+                <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="VIa-0w-fl8">
+                    <rect key="frame" x="0.0" y="480" width="1027" height="0.0"/>
+                    <constraints>
+                        <constraint firstAttribute="height" id="amB-S5-eDf"/>
+                    </constraints>
+                </visualEffectView>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UoQ-34-Pox">
+                    <rect key="frame" x="20" y="431" width="22" height="29"/>
+                    <shadow key="shadow" blurRadius="2">
+                        <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </shadow>
+                    <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CU4-UE-tsW">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <imageReference key="image" image="NSLeftFacingTriangleTemplate" symbolScale="large"/>
+                    </buttonCell>
+                    <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
+                    <connections>
+                        <action selector="returnToLibrary:" target="-2" id="rnL-S1-zSR"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Drq-if-dw4">
+                    <rect key="frame" x="976" y="431" width="31" height="29"/>
+                    <shadow key="shadow" blurRadius="2">
+                        <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </shadow>
+                    <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VDP-ql-lW8">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <imageReference key="image" image="NSListViewTemplate" symbolScale="large"/>
+                    </buttonCell>
+                    <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
+                    <connections>
+                        <action selector="togglePlayQueue:" target="-2" id="WrP-vg-etw"/>
+                    </connections>
+                </button>
                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CjJ-z0-ITu">
                     <rect key="frame" x="478" y="243" width="72" height="32"/>
                     <subviews>
@@ -357,12 +363,19 @@
                 <constraint firstItem="MTR-ds-I8o" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="2cq-kJ-XAR"/>
                 <constraint firstAttribute="trailing" secondItem="5hr-Af-mP0" secondAttribute="trailing" id="5yl-W5-VBS"/>
                 <constraint firstItem="5hr-Af-mP0" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="7gd-3t-64T"/>
+                <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="mAS-4a-RS8" secondAttribute="leading" constant="20" id="9Kp-XF-aBn"/>
                 <constraint firstAttribute="trailing" secondItem="MTR-ds-I8o" secondAttribute="trailing" id="E2t-0S-hdB"/>
                 <constraint firstItem="5hr-Af-mP0" firstAttribute="leading" secondItem="MTR-ds-I8o" secondAttribute="leading" id="Igk-9z-emn"/>
+                <constraint firstItem="VIa-0w-fl8" firstAttribute="top" secondItem="mAS-4a-RS8" secondAttribute="top" id="LDJ-0B-cOU"/>
+                <constraint firstItem="VIa-0w-fl8" firstAttribute="trailing" secondItem="mAS-4a-RS8" secondAttribute="trailing" id="Rhf-ft-veJ"/>
                 <constraint firstItem="MTR-ds-I8o" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="TJ3-v0-eiw"/>
+                <constraint firstItem="mAS-4a-RS8" firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="20" id="W2N-pT-Euw"/>
+                <constraint firstItem="VIa-0w-fl8" firstAttribute="leading" secondItem="mAS-4a-RS8" secondAttribute="leading" id="hNg-m7-HhA"/>
                 <constraint firstItem="CjJ-z0-ITu" firstAttribute="centerX" secondItem="MTR-ds-I8o" secondAttribute="centerX" id="hfn-UA-xPa"/>
                 <constraint firstItem="5hr-Af-mP0" firstAttribute="top" secondItem="MTR-ds-I8o" secondAttribute="bottom" id="jDM-XK-4IS"/>
                 <constraint firstAttribute="bottom" secondItem="5hr-Af-mP0" secondAttribute="bottom" id="lXS-qr-OEg"/>
+                <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="mAS-4a-RS8" secondAttribute="top" constant="20" id="mw7-vU-2vi"/>
+                <constraint firstItem="Drq-if-dw4" firstAttribute="top" secondItem="mAS-4a-RS8" secondAttribute="top" constant="20" id="upk-uZ-i0p"/>
                 <constraint firstItem="CjJ-z0-ITu" firstAttribute="centerY" secondItem="MTR-ds-I8o" secondAttribute="centerY" id="w0k-F4-w6O"/>
             </constraints>
             <point key="canvasLocation" x="-507.5" y="-232"/>
