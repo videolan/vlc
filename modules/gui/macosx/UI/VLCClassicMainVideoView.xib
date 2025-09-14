@@ -38,9 +38,9 @@
                 <outlet property="muteVolumeButton" destination="afi-4d-rQk" id="y6R-6o-2OM"/>
                 <outlet property="pipButton" destination="yEi-SZ-SIS" id="vFi-Ln-9lT"/>
                 <outlet property="playButton" destination="PCC-8a-sVF" id="ddT-ZM-Jhz"/>
-                <outlet property="timeField" destination="3ri-8b-8mw" id="f0i-Gh-R8V"/>
+                <outlet property="timeField" destination="f4v-2z-dQ1" id="7kP-c4-1Rv"/>
                 <outlet property="timeSlider" destination="qNZ-Fh-W8i" id="Fkk-fj-s5Q"/>
-                <outlet property="trailingTimeField" destination="f4v-2z-dQ1" id="AXX-AU-lF0"/>
+                <outlet property="trailingTimeField" destination="3ri-8b-8mw" id="vrZ-ps-Gkf"/>
                 <outlet property="volumeSlider" destination="fKc-2d-Uu6" id="2pU-fH-Afo"/>
             </connections>
         </customObject>
