@@ -129,6 +129,9 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="5hr-Af-mP0">
                     <rect key="frame" x="0.0" y="0.0" width="1027" height="38"/>
                     <subviews>
+                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="sep-line-top">
+                            <rect key="frame" x="0.0" y="35" width="1027" height="5"/>
+                        </box>
                         <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="AXA-01-AU8" customClass="VLCImageButton">
                             <rect key="frame" x="-1" y="-1" width="48" height="40"/>
                             <shadow key="shadow" blurRadius="20">
@@ -328,9 +331,11 @@
                         </stackView>
                     </subviews>
                     <constraints>
+                        <constraint firstItem="sep-line-top" firstAttribute="leading" secondItem="5hr-Af-mP0" secondAttribute="leading" id="2qs-Oc-0iQ"/>
                         <constraint firstItem="AXA-01-AU8" firstAttribute="width" secondItem="V9d-hX-iyg" secondAttribute="width" id="6Xb-Cr-4s3"/>
                         <constraint firstItem="V9d-hX-iyg" firstAttribute="centerY" secondItem="5hr-Af-mP0" secondAttribute="centerY" id="72N-YC-W4S"/>
                         <constraint firstItem="AXA-01-AU8" firstAttribute="leading" secondItem="5hr-Af-mP0" secondAttribute="leading" constant="5" id="Ajh-Cy-gox"/>
+                        <constraint firstItem="sep-line-top" firstAttribute="top" secondItem="5hr-Af-mP0" secondAttribute="top" id="Btm-xc-Fxd"/>
                         <constraint firstItem="Kb6-da-vSR" firstAttribute="centerY" secondItem="5hr-Af-mP0" secondAttribute="centerY" id="EdK-qC-e0V"/>
                         <constraint firstItem="AXA-01-AU8" firstAttribute="centerY" secondItem="5hr-Af-mP0" secondAttribute="centerY" id="EnE-2L-wBh"/>
                         <constraint firstItem="sF5-Z0-bef" firstAttribute="leading" secondItem="PCC-8a-sVF" secondAttribute="trailing" constant="5" id="G3J-50-BR7"/>
@@ -349,6 +354,7 @@
                         <constraint firstItem="PCC-8a-sVF" firstAttribute="width" secondItem="sF5-Z0-bef" secondAttribute="width" id="dXF-sz-z4c"/>
                         <constraint firstItem="aAq-uE-mLW" firstAttribute="leading" secondItem="sF5-Z0-bef" secondAttribute="trailing" constant="5" id="eyX-7z-y6N"/>
                         <constraint firstItem="LIP-09-gHL" firstAttribute="centerY" secondItem="5hr-Af-mP0" secondAttribute="centerY" id="kvw-CD-5dD"/>
+                        <constraint firstAttribute="trailing" secondItem="sep-line-top" secondAttribute="trailing" id="oTf-sL-MFV"/>
                         <constraint firstItem="aAq-uE-mLW" firstAttribute="centerY" secondItem="5hr-Af-mP0" secondAttribute="centerY" id="pmy-FH-xIH"/>
                         <constraint firstItem="V9d-hX-iyg" firstAttribute="leading" secondItem="AXA-01-AU8" secondAttribute="trailing" constant="5" id="qTY-xe-IHm"/>
                         <constraint firstItem="zyp-45-IgR" firstAttribute="centerY" secondItem="5hr-Af-mP0" secondAttribute="centerY" id="qyN-Rp-Zah"/>
