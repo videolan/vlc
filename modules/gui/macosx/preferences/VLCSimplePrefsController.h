@@ -177,6 +177,7 @@
 @property (readwrite, weak) IBOutlet NSButton *video_onTopCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *video_videodecoCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *video_resizeToNativeSizeCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *video_useClassicLayoutCheckbox;
 
 // video pane - fullscreen box
 @property (readwrite, weak) IBOutlet NSBox *video_fullscreenBox;

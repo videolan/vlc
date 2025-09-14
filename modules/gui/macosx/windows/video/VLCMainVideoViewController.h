@@ -31,6 +31,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCUseClassicVideoPlayerLayoutKey;
+
 @interface VLCMainVideoViewController : NSViewController
 
 @property (readwrite, strong) IBOutlet NSView *voutContainingView;

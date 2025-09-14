@@ -52,6 +52,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "playqueue/VLCPlayQueueTableCellView.h"
 #import "views/VLCPlaybackEndViewController.h"
+#import "windows/video/VLCMainVideoViewController.h"
 
 static struct {
     const char iso[6];
@@ -716,6 +717,8 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [self setupButton:_video_videodecoCheckbox forBoolValue: "video-deco"];
     [self setupButton:_video_pauseWhenMinimizedCheckbox forBoolValue: "macosx-pause-minimized"];
     [self setupButton:_video_resizeToNativeSizeCheckbox forBoolValue: "macosx-video-autoresize"];
+    
+    self.video_useClassicLayoutCheckbox.state = [defaults boolForKey:VLCUseClassicVideoPlayerLayoutKey] ? NSControlStateValueOn : NSControlStateValueOff;
 
     [_video_devicePopup removeAllItems];
     i = 0;
@@ -1027,6 +1030,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         config_PutInt("macosx-pause-minimized", [_video_pauseWhenMinimizedCheckbox state]);
         config_PutInt("macosx-video-autoresize", [_video_resizeToNativeSizeCheckbox state]);
+        
+        [NSUserDefaults.standardUserDefaults setBool:self.video_useClassicLayoutCheckbox.state == NSControlStateValueOn
+                                              forKey:VLCUseClassicVideoPlayerLayoutKey];
 
         config_PutInt("embedded-video", [_video_embeddedCheckbox state]);
         config_PutInt("macosx-nativefullscreenmode", [_video_nativeFullscreenCheckbox state]);

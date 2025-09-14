@@ -52,6 +52,8 @@
 
 #import "private/PIPSPI.h"
 
+NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerLayoutKey";
+
 @interface PIPVoutViewController : NSViewController
 @property (nonatomic) NSRect previousBounds;
 @property (nonatomic, copy) void (^boundsChangeHandler)(void);
@@ -116,7 +118,9 @@
 
 - (instancetype)init
 {
-    self = [super initWithNibName:@"VLCMainVideoView" bundle:nil];
+    const BOOL classic = [NSUserDefaults.standardUserDefaults boolForKey:VLCUseClassicVideoPlayerLayoutKey];
+    NSString * const nibName = classic ? @"VLCClassicMainVideoView" : @"VLCMainVideoView";
+    self = [super initWithNibName:nibName bundle:nil];
     if (self) {
         _isFadingIn = NO;
 

@@ -86,6 +86,7 @@
 #import "windows/logging/VLCLogWindowController.h"
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
+#import "windows/video/VLCMainVideoViewController.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
@@ -348,6 +349,7 @@ static VLCMain *sharedInstance = nil;
     if ([defaults integerForKey:kVLCPreferencesVersion] != 4) {
         [defaults setBool:YES forKey:VLCPlaybackEndViewEnabledKey];
         [defaults setBool:NO forKey:VLCDisplayTrackNumberPlayQueueKey];
+        [defaults setBool:YES forKey:VLCUseClassicVideoPlayerLayoutKey];
         [self migrateOldPreferences];
     }
 

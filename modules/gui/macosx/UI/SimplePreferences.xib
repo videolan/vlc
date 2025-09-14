@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23727" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23727"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -157,6 +157,7 @@
                 <outlet property="video_snap_prefixTextField" destination="2474" id="O5Q-MK-Cz3"/>
                 <outlet property="video_snap_seqnumCheckbox" destination="2476" id="Fa0-ZE-QW9"/>
                 <outlet property="video_startInFullscreenCheckbox" destination="5Db-fa-Ffw" id="eK9-Wr-Nym"/>
+                <outlet property="video_useClassicLayoutCheckbox" destination="6yQ-ig-eP0" id="2Yd-Dh-NMh"/>
                 <outlet property="video_videoBox" destination="3722" id="bRq-1u-kBT"/>
                 <outlet property="video_videodecoCheckbox" destination="3728" id="yE0-ry-RZA"/>
                 <outlet property="window" destination="2265" id="mGG-NZ-eoi"/>
@@ -167,7 +168,7 @@
             <windowStyleMask key="styleMask" titled="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="105" y="903" width="580" height="620"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1800" height="1125"/>
             <view key="contentView" id="2266">
                 <rect key="frame" x="0.0" y="0.0" width="580" height="620"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -176,7 +177,7 @@
                         <rect key="frame" x="0.0" y="44" width="580" height="576"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="ecH-Hh-jJF" customClass="VLCSimplePrefsClipView">
                             <rect key="frame" x="1" y="1" width="578" height="574"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view translatesAutoresizingMaskIntoConstraints="NO" id="HOX-DS-Fgr" userLabel="content view">
                                     <rect key="frame" x="0.0" y="0.0" width="578" height="574"/>
@@ -286,10 +287,10 @@ Gw
         </window>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="2311" userLabel="Interface">
-            <rect key="frame" x="0.0" y="-19" width="597" height="549"/>
+            <rect key="frame" x="0.0" y="0.0" width="597" height="573"/>
             <subviews>
                 <box borderType="line" title="General Settings" translatesAutoresizingMaskIntoConstraints="NO" id="kup-aY-Wqq">
-                    <rect key="frame" x="18" y="397" width="563" height="131"/>
+                    <rect key="frame" x="18" y="421" width="563" height="131"/>
                     <view key="contentView" id="wFl-aV-3Hn">
                         <rect key="frame" x="4" y="5" width="555" height="111"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -352,13 +353,13 @@ Gw
                     </view>
                 </box>
                 <box borderType="line" title="Playback control" translatesAutoresizingMaskIntoConstraints="NO" id="CZP-ZN-k6p">
-                    <rect key="frame" x="18" y="328" width="563" height="65"/>
+                    <rect key="frame" x="18" y="328" width="563" height="89"/>
                     <view key="contentView" id="gj4-zO-E26">
-                        <rect key="frame" x="4" y="5" width="555" height="45"/>
+                        <rect key="frame" x="4" y="5" width="555" height="69"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3919">
-                                <rect key="frame" x="15" y="17" width="117" height="16"/>
+                                <rect key="frame" x="15" y="41" width="117" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Continue playback" usesSingleLineMode="YES" id="3923">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -366,7 +367,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3920">
-                                <rect key="frame" x="144" y="11" width="398" height="25"/>
+                                <rect key="frame" x="144" y="35" width="398" height="25"/>
                                 <popUpButtonCell key="cell" type="push" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3921">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="message"/>
@@ -848,10 +849,10 @@ Gw
             <point key="canvasLocation" x="265.5" y="1003"/>
         </customView>
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="2440" userLabel="Video">
-            <rect key="frame" x="0.0" y="-20" width="582" height="543"/>
+            <rect key="frame" x="0.0" y="0.0" width="582" height="572"/>
             <subviews>
                 <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2448">
-                    <rect key="frame" x="18" y="506" width="106" height="18"/>
+                    <rect key="frame" x="18" y="535" width="106" height="18"/>
                     <buttonCell key="cell" type="check" title="Enable Video" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3477">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -861,19 +862,29 @@ Gw
                     </connections>
                 </button>
                 <box verticalHuggingPriority="249" title="Display" translatesAutoresizingMaskIntoConstraints="NO" id="2449">
-                    <rect key="frame" x="17" y="358" width="548" height="141"/>
+                    <rect key="frame" x="17" y="358" width="548" height="170"/>
                     <view key="contentView" id="eGM-I9-pBb">
-                        <rect key="frame" x="4" y="5" width="540" height="121"/>
+                        <rect key="frame" x="4" y="5" width="540" height="150"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2452">
-                                <rect key="frame" x="15" y="94" width="218" height="18"/>
+                                <rect key="frame" x="15" y="123" width="218" height="18"/>
                                 <buttonCell key="cell" type="check" title="Show video within main window" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3479">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="videoSettingChanged:" target="-2" id="jdL-pA-9Ed"/>
+                                </connections>
+                            </button>
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6yQ-ig-eP0">
+                                <rect key="frame" x="15" y="95" width="212" height="18"/>
+                                <buttonCell key="cell" type="check" title="Use classic video player layout" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="hMN-gu-1VU">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="videoSettingChanged:" target="-2" id="qef-S5-w02"/>
                                 </connections>
                             </button>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2451">
@@ -923,13 +934,15 @@ Gw
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="rpy-5O-tek" secondAttribute="trailing" constant="17" id="B4h-FQ-7aL"/>
                             <constraint firstItem="2451" firstAttribute="top" secondItem="4a1-oW-HKH" secondAttribute="bottom" constant="12" id="DId-Tv-O07"/>
                             <constraint firstItem="rpy-5O-tek" firstAttribute="leading" secondItem="2452" secondAttribute="leading" id="KNc-3N-uYy"/>
+                            <constraint firstItem="6yQ-ig-eP0" firstAttribute="leading" secondItem="2452" secondAttribute="leading" id="MpH-Rx-aFH"/>
                             <constraint firstItem="2451" firstAttribute="leading" secondItem="rpy-5O-tek" secondAttribute="leading" id="O89-st-t01"/>
+                            <constraint firstItem="6yQ-ig-eP0" firstAttribute="top" secondItem="2452" secondAttribute="bottom" constant="12" id="YMn-dn-aKz"/>
                             <constraint firstItem="2452" firstAttribute="top" secondItem="eGM-I9-pBb" secondAttribute="top" constant="10" id="Zf8-Vt-ftS"/>
                             <constraint firstItem="2452" firstAttribute="leading" secondItem="eGM-I9-pBb" secondAttribute="leading" constant="17" id="dxV-cD-quf"/>
                             <constraint firstAttribute="bottom" secondItem="3728" secondAttribute="bottom" constant="12" id="eDu-6Y-ggq"/>
+                            <constraint firstItem="rpy-5O-tek" firstAttribute="top" secondItem="6yQ-ig-eP0" secondAttribute="bottom" constant="12" id="mON-fs-ju4"/>
                             <constraint firstItem="3728" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2451" secondAttribute="trailing" constant="17" id="qd2-aN-XVK"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3728" secondAttribute="trailing" constant="17" id="rDL-Im-FxZ"/>
-                            <constraint firstItem="rpy-5O-tek" firstAttribute="top" secondItem="2452" secondAttribute="bottom" constant="11" id="rH1-SK-emj"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2452" secondAttribute="trailing" constant="17" id="tZx-bu-85x"/>
                             <constraint firstItem="4a1-oW-HKH" firstAttribute="leading" secondItem="rpy-5O-tek" secondAttribute="leading" id="vPv-oH-IkT"/>
                         </constraints>
@@ -1212,7 +1225,7 @@ Gw
                     </view>
                 </box>
                 <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hrj-mH-eqd" userLabel="half size helper view">
-                    <rect key="frame" x="291" y="503" width="271" height="23"/>
+                    <rect key="frame" x="291" y="532" width="271" height="23"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="23" id="5d3-4W-bXj"/>
                     </constraints>
@@ -1874,7 +1887,7 @@ Gw
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="action" editable="NO" width="297" minWidth="40" maxWidth="1000" id="2671">
+                                    <tableColumn identifier="action" editable="NO" width="282.5" minWidth="40" maxWidth="1000" id="2671">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Action">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -1886,7 +1899,7 @@ Gw
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                     </tableColumn>
-                                    <tableColumn identifier="shortcut" editable="NO" width="216" minWidth="8" maxWidth="1000" id="2672">
+                                    <tableColumn identifier="shortcut" editable="NO" width="201.5" minWidth="8" maxWidth="1000" id="2672">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Shortcut">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -1958,7 +1971,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="433" y="441" width="440" height="170"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1800" height="1125"/>
             <view key="contentView" id="2678">
                 <rect key="frame" x="0.0" y="0.0" width="440" height="170"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2049,7 +2062,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="340" y="383" width="485" height="254"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1800" height="1125"/>
             <view key="contentView" id="3746">
                 <rect key="frame" x="0.0" y="0.0" width="485" height="254"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2384,7 +2397,7 @@ Gw
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                     </tableColumn>
-                                    <tableColumn editable="NO" width="200" minWidth="40" maxWidth="1000" id="QBg-HT-Vvb">
+                                    <tableColumn editable="NO" width="171" minWidth="40" maxWidth="1000" id="QBg-HT-Vvb">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
