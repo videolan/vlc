@@ -112,6 +112,8 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 }
 
 @property NSWindow *retainedWindow;
+@property (readonly) BOOL classic;
+
 @end
 
 @implementation VLCMainVideoViewController
@@ -122,6 +124,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     NSString * const nibName = classic ? @"VLCClassicMainVideoView" : @"VLCMainVideoView";
     self = [super initWithNibName:nibName bundle:nil];
     if (self) {
+        _classic = classic;
         _isFadingIn = NO;
 
         NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
@@ -163,8 +166,11 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     _audioDecorativeView = [VLCMainVideoViewAudioMediaDecorativeView fromNibWithOwner:self];
     _audioDecorativeView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    _bottomButtonStackViewConstraint =
-        [self.bottomBarView.topAnchor constraintEqualToAnchor:self.centralControlsStackView.bottomAnchor];
+    if (!self.classic) {
+        // Only set up button constraints for standard layout
+        _bottomButtonStackViewConstraint =
+            [self.bottomBarView.topAnchor constraintEqualToAnchor:self.centralControlsStackView.bottomAnchor];
+    }
 
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playQueueController.playerController;
@@ -642,7 +648,19 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     [self.view addSubview:videoView
                positioned:NSWindowBelow
                relativeTo:self.mainControlsView];
-    [videoView applyConstraintsToFillSuperview];
+    
+    if (self.classic) {
+        videoView.translatesAutoresizingMaskIntoConstraints = NO;
+        [NSLayoutConstraint activateConstraints:@[
+            [videoView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+            [videoView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+            [videoView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+            [videoView.bottomAnchor constraintEqualToAnchor:self.bottomBarView.topAnchor]
+        ]];
+    } else {
+        [videoView applyConstraintsToFillSuperview];
+    }
+    
     [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
 }
 
