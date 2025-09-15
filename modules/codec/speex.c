@@ -177,6 +177,10 @@ typedef struct
  * Local prototypes
  ****************************************************************************/
 
+#define SPEEX_HEADER_SIZE 80 /* Speex manual, table 7.1 */
+#define SPEEX_STRING "Speex   "
+#define SPEEX_STRING_LEN (sizeof(SPEEX_STRING)-1)
+
 static block_t *Packetize  ( decoder_t *, block_t ** );
 static int      DecodeAudio  ( decoder_t *, block_t * );
 static int      DecodeRtpSpeexPacket( decoder_t *, block_t *);
@@ -401,6 +405,21 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     return DecodeBlock( p_dec, pp_block );
 }
 
+static int BuildExtradata( es_format_t *fmtout,
+                           size_t pi_size[2], const void *pp_data[2] )
+{
+    size_t i_xiph_headers_size;
+    void *p_xiph_headers;
+    if( xiph_PackHeaders( &i_xiph_headers_size, &p_xiph_headers,
+                          pi_size, pp_data, 2 ) != VLC_SUCCESS )
+        return VLC_ENOMEM;
+
+    fmtout->i_extra = i_xiph_headers_size;
+    fmtout->p_extra = p_xiph_headers;
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * ProcessHeaders: process Speex headers.
  *****************************************************************************/
@@ -409,14 +428,49 @@ static int ProcessHeaders( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     ogg_packet oggpacket;
 
+    /* Extradata formats war
+
+     - Xiph headers with Speex Header and usually vorbis comment
+       1 byte (N-1) packets, N-1 variable length payload sizes
+
+     - Unsourced, as seen in our mux
+       Speex Header and Vorbis comment, 2 BE bytes separated
+
+     - SPXN through avformat
+       Set to the ISOBMFF wave/frma box content
+     */
+
+    const uint8_t *p_extra = p_dec->fmt_in->p_extra;
+    const size_t i_extra = p_dec->fmt_in->i_extra;
+
+    /* Where does that Xiph as extradata packets mapping comes from ?
+       Seems internally used for long time */
     size_t pi_size[XIPH_MAX_HEADER_COUNT];
     const void *pp_data[XIPH_MAX_HEADER_COUNT];
-    size_t i_count;
-    if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
-                           p_dec->fmt_in->i_extra, p_dec->fmt_in->p_extra) )
-        return VLC_EGENERIC;
-    if( i_count < 2 )
-        return VLC_EGENERIC;
+    size_t i_num_xiph_headers;
+    if( xiph_SplitHeaders( pi_size, pp_data, &i_num_xiph_headers,
+                           i_extra, p_extra ) ||
+        i_num_xiph_headers < 2 || pi_size[0] < SPEEX_HEADER_SIZE ||
+        memcmp( pp_data[0], SPEEX_STRING, SPEEX_STRING_LEN ) )
+    {
+        /* Check for Speex Header / Comment */
+        const uint8_t *p_header = (uint8_t *)
+                strnstr( (const char *) p_extra, SPEEX_STRING, i_extra );
+        if( !p_header )
+        {
+            msg_Err( p_dec, "Speex header missing" );
+            return VLC_EGENERIC;
+        }
+
+        size_t i_header = i_extra - (p_header - p_extra);
+        if( i_header < SPEEX_HEADER_SIZE )
+            return VLC_EGENERIC;
+
+        pp_data[0] = p_header;
+        pi_size[0] = SPEEX_HEADER_SIZE;
+        pp_data[1] = &p_header[SPEEX_HEADER_SIZE];
+        pi_size[1] = i_header - SPEEX_HEADER_SIZE;
+    }
 
     oggpacket.granulepos = -1;
     oggpacket.e_o_s = 0;
@@ -439,18 +493,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     ParseSpeexComments( p_dec, &oggpacket );
 
     if( p_sys->b_packetizer )
-    {
-        void* p_extra = realloc( p_dec->fmt_out.p_extra,
-                                 p_dec->fmt_in->i_extra );
-        if( unlikely( p_extra == NULL ) )
-        {
-            return VLC_ENOMEM;
-        }
-        p_dec->fmt_out.p_extra = p_extra;
-        p_dec->fmt_out.i_extra = p_dec->fmt_in->i_extra;
-        memcpy( p_dec->fmt_out.p_extra,
-                p_dec->fmt_in->p_extra, p_dec->fmt_out.i_extra );
-    }
+        BuildExtradata( &p_dec->fmt_out, pi_size, pp_data );
 
     return VLC_SUCCESS;
 }
