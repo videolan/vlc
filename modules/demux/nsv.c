@@ -252,7 +252,7 @@ static int Demux( demux_t *p_demux )
                     {
                         p++;
                     }
-                    if( *p == 0 && p + 1 < &p_frame->p_buffer[p_frame->i_buffer] )
+                    if( p + 1 < &p_frame->p_buffer[p_frame->i_buffer] && *p == 0 )
                     {
                         p_frame->i_buffer -= p + 1 - p_frame->p_buffer;
                         p_frame->p_buffer = p + 1;
@@ -645,4 +645,3 @@ static int ReadNSVs( demux_t *p_demux )
 
     return VLC_SUCCESS;
 }
-
