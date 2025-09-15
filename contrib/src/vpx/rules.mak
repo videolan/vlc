@@ -140,6 +140,14 @@ ifeq ($(ARCH),aarch64)
 VPX_LDFLAGS += -arch arm64
 endif
 endif
+ifdef HAVE_DARWIN_OS
+ifeq ($(ARCH),$(filter $(ARCH), arm aarch64))
+ifneq ($(call clang_at_least, 13), true)
+# arm_neon.h broken on clang 12
+VPX_CONF += --disable-neon-dotprod
+endif
+endif
+endif
 
 ifndef WITH_OPTIMIZATION
 VPX_CONF += --disable-optimizations
