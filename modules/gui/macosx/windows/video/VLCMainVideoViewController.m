@@ -222,6 +222,13 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     if (self.classic) {
         _videoViewBottomToViewConstraint = [self.voutContainingView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor];
         self.videoViewBottomToViewConstraint.active = NO;
+
+        NSVisualEffectView * const controlsBackgroundView = [[NSVisualEffectView alloc] initWithFrame:self.bottomBarView.frame];
+        controlsBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+        controlsBackgroundView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+        controlsBackgroundView.material = NSVisualEffectMaterialTitlebar;
+        [self.bottomBarView addSubview:controlsBackgroundView positioned:NSWindowBelow relativeTo:self.bottomBarView.subviews.firstObject];
+        [controlsBackgroundView applyConstraintsToFillSuperview];
     }
 }
 
