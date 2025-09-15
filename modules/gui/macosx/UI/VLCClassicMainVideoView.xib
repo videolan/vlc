@@ -22,6 +22,7 @@
                 <outlet property="returnButton" destination="UoQ-34-Pox" id="nyY-OF-9zj"/>
                 <outlet property="returnButtonLeadingConstraint" destination="return-btn-leading" id="Ax9-Sl-Imd"/>
                 <outlet property="returnButtonTopConstraint" destination="return-btn-top" id="cHZ-kY-t4E"/>
+                <outlet property="videoViewBottomConstraint" destination="video-to-controls" id="video-bottom-constraint"/>
                 <outlet property="view" destination="WRu-Ic-lQK" id="B9p-x5-Kd8"/>
                 <outlet property="voutContainingView" destination="MTR-ds-I8o" id="cim-tb-1lO"/>
                 <outlet property="voutView" destination="mAS-4a-RS8" id="GeX-XO-HYC"/>

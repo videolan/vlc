@@ -49,6 +49,7 @@ extern NSString * const VLCUseClassicVideoPlayerLayoutKey;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *returnButtonLeadingConstraint;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *playQueueButtonTopConstraint;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *playQueueButtonTrailingConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 @property (readwrite, strong) IBOutlet NSVisualEffectView *fakeTitleBar;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
 @property (readwrite, strong) IBOutlet NSProgressIndicator *loadingIndicator;
@@ -60,6 +61,7 @@ extern NSString * const VLCUseClassicVideoPlayerLayoutKey;
 
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *centerButtonStackInViewConstraint;
 @property (readonly) NSLayoutConstraint *bottomButtonStackViewConstraint;
+@property (readonly) NSLayoutConstraint *videoViewBottomToViewConstraint;
 
 @property (readonly, strong) VLCMainVideoViewAudioMediaDecorativeView *audioDecorativeView;
 @property (readwrite, nonatomic) BOOL autohideControls;

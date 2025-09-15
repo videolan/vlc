@@ -217,6 +217,12 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     [self setupAudioDecorativeView];
     [self.controlsBar update];
     [self updateFloatOnTopIndicator];
+    
+    // For classic layout, create constraint for video view to fill main view when controls are hidden
+    if (self.classic) {
+        _videoViewBottomToViewConstraint = [self.voutContainingView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor];
+        self.videoViewBottomToViewConstraint.active = NO;
+    }
 }
 
 - (BOOL)isVisualizationActive
@@ -393,6 +399,11 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
         [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:0.0f];
+        
+        if (self.classic && self.videoViewBottomConstraint && self.videoViewBottomToViewConstraint) {
+            self.videoViewBottomConstraint.active = NO;
+            self.videoViewBottomToViewConstraint.active = YES;
+        }
     } completionHandler:nil];
 }
 
@@ -424,6 +435,12 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
     if (!_autohideControls) {
         _mainControlsView.alphaValue = 1.0f;
+        
+        // For classic layout, ensure video view is constrained when controls are always visible
+        if (self.classic && self.videoViewBottomConstraint && self.videoViewBottomToViewConstraint) {
+            self.videoViewBottomToViewConstraint.active = NO;
+            self.videoViewBottomConstraint.active = YES;
+        }
         return;
     }
 
@@ -431,6 +448,11 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         self->_isFadingIn = YES;
         [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:1.0f];
+        
+        if (self.classic && self.videoViewBottomConstraint && self.videoViewBottomToViewConstraint) {
+            self.videoViewBottomToViewConstraint.active = NO;
+            self.videoViewBottomConstraint.active = YES;
+        }
     } completionHandler:^{
         self->_isFadingIn = NO;
         [self startAutohideTimer];
@@ -654,9 +676,16 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         [NSLayoutConstraint activateConstraints:@[
             [videoView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
             [videoView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [videoView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-            [videoView.bottomAnchor constraintEqualToAnchor:self.bottomBarView.topAnchor]
+            [videoView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
         ]];
+        
+        // Create constraint for video view bottom to main view bottom (for when controls are hidden)
+        _videoViewBottomToViewConstraint = [videoView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor];
+        
+        // The videoViewBottomConstraint outlet connects video bottom to controls top (for when controls are visible)
+        // Start with controls visible, so activate the XIB constraint
+        self.videoViewBottomConstraint.active = YES;
+        self.videoViewBottomToViewConstraint.active = NO;
     } else {
         [videoView applyConstraintsToFillSuperview];
     }
