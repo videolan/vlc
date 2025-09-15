@@ -150,6 +150,12 @@ endif
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) $(LDFLAGS)
 endif
 ifdef HAVE_MACOSX
+ifeq ($(ARCH),$(filter $(ARCH), arm aarch64))
+ifneq ($(call clang_at_least, 13), true)
+# arm_neon.h broken on clang 12
+VPX_CONF += --disable-neon-dotprod
+endif
+endif
 VPX_LDFLAGS := -L$(MACOSX_SDK)/usr/lib -isysroot $(MACOSX_SDK) -mmacosx-version-min=10.7
 endif
 VPX_LDFLAGS += -arch $(PLATFORM_SHORT_ARCH)
