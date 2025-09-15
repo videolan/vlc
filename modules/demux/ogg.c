@@ -2709,7 +2709,6 @@ static bool Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     bs_t bitstream;
     unsigned int i_fps_numerator;
     unsigned int i_fps_denominator;
-    int i_keyframe_frequency_force;
     int i_major;
     int i_minor;
     int i_subminor;
@@ -2748,16 +2747,8 @@ static bool Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     p_stream->fmt.i_bitrate = bs_read( &bitstream, 24 );
     bs_skip( &bitstream, 6 ); /* quality */
 
-    i_keyframe_frequency_force = 1 << bs_read( &bitstream, 5 );
-
     /* granule_shift = i_log( frequency_force -1 ) */
-    p_stream->i_granule_shift = 0;
-    i_keyframe_frequency_force--;
-    while( i_keyframe_frequency_force )
-    {
-        p_stream->i_granule_shift++;
-        i_keyframe_frequency_force >>= 1;
-    }
+    p_stream->i_granule_shift = bs_read( &bitstream, 5 );
 
     i_version = i_major * 1000000 + i_minor * 1000 + i_subminor;
     p_stream->i_first_frame_index = (i_version >= 3002001) ? 1 : 0;
