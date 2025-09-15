@@ -74,12 +74,22 @@ public:
     class ModelSource
     {
     public:
-        virtual ~ModelSource() = default;
+        virtual ~ModelSource()
+        {
+            // At this point, pure virtual methods are not available.
+            m_isDying = true;
+        }
+
         //the revision must be incremented each time the model changes
         virtual size_t getModelRevision() const = 0;
 
         //return the data matching the pattern
         virtual std::vector<ItemType> getModelData(const QString& pattern) const = 0;
+
+        bool isDying() const { return m_isDying; }
+
+    private:
+        bool m_isDying = false;
     };
 
 public:
@@ -102,7 +112,8 @@ public:
     size_t countTask(std::function<void(size_t taskId, size_t count)> cb) override
     {
         return runTaskAsync([this, cb](size_t taskId) {
-            updateData();
+            if (!updateData())
+                return;
             cb(taskId, m_items.size());
         });
     }
@@ -112,7 +123,8 @@ public:
         std::function<void(size_t taskId, std::vector<ItemType>& data)> cb) override
     {
          return runTaskAsync([this, offset, limit, cb](size_t taskId) {
-            updateData();
+            if (!updateData())
+                return;
             std::vector<ItemType> data;
             if (offset < m_items.size())
             {
@@ -135,7 +147,8 @@ public:
         std::function<void(size_t taskId, size_t count, std::vector<ItemType>& data)> cb) override
     {
         return runTaskAsync([this, offset, limit, cb](size_t taskId) {
-            updateData();
+            if (!updateData())
+                return;
             std::vector<ItemType> data;
             if (offset < m_items.size())
             {
@@ -153,15 +166,20 @@ public:
         });
     }
 
-    void updateData()
+    bool updateData()
     {
+        if (m_source->isDying())
+            return false;
+
         if (m_revision == m_source->getModelRevision())
-            return;
+            return true;
 
         m_items = m_source->getModelData(m_pattern);
         std::sort(m_items.begin(), m_items.end(), m_compare);
 
         m_revision = m_source->getModelRevision();
+
+        return true;
     }
 
     const ModelSource* m_source;
