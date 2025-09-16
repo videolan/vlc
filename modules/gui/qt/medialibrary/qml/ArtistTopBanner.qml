@@ -118,6 +118,11 @@ FocusScope {
                 source: blurEffect.sourceNeedsLayering ? backgroundLayer : background
             }
 
+            // Instead of clipping in the parent, denote the viewport here so we both
+            // do not need to clip the excess, and also save significant video memory:
+            viewportRect: !blurEffect.sourceNeedsLayering ? Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
+                                                          : Qt.rect(0, 0, 0, 0)
+
             ShaderEffectSource {
                 id: backgroundLayer
 
