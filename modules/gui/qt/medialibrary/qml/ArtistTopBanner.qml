@@ -59,7 +59,7 @@ FocusScope {
 
         asynchronous: true
         source: root.artist.id ? (root.artist.cover || VLCStyle.noArtArtist) : "" // do not load the fallback image during initialization
-        sourceSize: artist.cover ? Qt.size(Helpers.alignUp(Screen.desktopAvailableWidth, 32), 0)
+        sourceSize: artist.cover ? Qt.size(Helpers.alignUp(Screen.desktopAvailableWidth / 2, 32), 0)
                                  : undefined
         mipmap: !!artist.cover
 
