@@ -113,6 +113,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
 @property NSWindow *retainedWindow;
 @property (readonly) BOOL classic;
+@property (readwrite) BOOL voutTaken;
 
 @end
 
@@ -126,6 +127,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     if (self) {
         _classic = classic;
         _isFadingIn = NO;
+        _voutTaken = NO;
 
         NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
@@ -394,6 +396,10 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
 - (void)hideControls
 {
+    if (self.voutTaken) {
+        return;
+    }
+
     [self stopAutohideTimer];
 
     NSPoint mousePos = [self.view.window mouseLocationOutsideOfEventStream];
@@ -436,6 +442,10 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
 - (void)showControls
 {
+    if (self.voutTaken) {
+        return;
+    }
+
     [self stopAutohideTimer];
     [self updatePlayQueueToggleState];
     [self updateLibraryControls];
@@ -660,6 +670,10 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
 - (nullable NSView *)acquireVideoView
 {
+    if (self.voutTaken) {
+        return nil;
+    }
+    self.voutTaken = YES;
     [self.voutContainingView removeFromSuperview];
     return self.voutContainingView;
 }
@@ -693,6 +707,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     }
     
     [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
+    self.voutTaken = NO;
 }
 
 - (void)displayPlaybackEndView
