@@ -58,7 +58,7 @@ Item {
     //       used even if it is set false here. For that reason, it should not be
     //       necessary to check for opacity (well, accumulated opacity can not be
     //       checked directly in QML anyway).
-    property bool blending: (!sourceTextureIsValid || ds1SourceObserver.hasAlphaChannel)
+    property bool blending: (!sourceTextureIsValid || sourceTextureProviderObserver.hasAlphaChannel)
 
     // source must be a texture provider item. Some items such as `Image` and
     // `ShaderEffectSource` are inherently texture provider. Other items needs
@@ -74,7 +74,9 @@ Item {
     // `QSGTextureView` can also be used instead of sub-texturing here.
     property rect sourceRect
 
-    readonly property bool sourceTextureIsValid: ds1SourceObserver.isValid
+    property alias sourceTextureProviderObserver: ds1SourceObserver // for accessory
+
+    readonly property bool sourceTextureIsValid: sourceTextureProviderObserver.isValid
 
     onSourceTextureIsValidChanged: {
         if (root.sourceTextureIsValid) {
