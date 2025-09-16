@@ -682,6 +682,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         
         // Create constraint for video view bottom to main view bottom (for when controls are hidden)
         _videoViewBottomToViewConstraint = [videoView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor];
+        _videoViewBottomConstraint = [videoView.bottomAnchor constraintEqualToAnchor:self.bottomBarView.topAnchor];
         
         // The videoViewBottomConstraint outlet connects video bottom to controls top (for when controls are visible)
         // Start with controls visible, so activate the XIB constraint
