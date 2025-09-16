@@ -85,6 +85,10 @@ Item {
     // `QSGTextureView` can also be used instead of sub-texturing here.
     property rect sourceRect
 
+    // Viewport rect allows to discard an unwanted area in effect's local coordinates.
+    // Since the discard occurs at layer level, using this saves video memory.
+    property rect viewportRect
+
     property alias sourceTextureProviderObserver: ds1SourceObserver // for accessory
 
     readonly property bool sourceTextureIsValid: sourceTextureProviderObserver.isValid
@@ -140,7 +144,7 @@ Item {
             root.scheduleUpdate(false) // this triggers releasing intermediate layers (when applicable)
         }
     }
-    
+
     // TODO: Get rid of this in favor of GLSL 1.30's `textureSize()`
     Connections {
         target: root.Window.window
@@ -238,6 +242,15 @@ Item {
 
         live: root.live
 
+        // Divided by two, because viewport rect is local to the final upsampler (us2), which is the painter delegate here (regardless of the mode):
+        // Viewport rect is only relevant for the last layer, so in here (ds1layer) it is only for the two-pass mode:
+        sourceRect: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) &&
+                    (root.viewportRect.width > 0 && root.viewportRect.height > 0)) ? Qt.rect(root.viewportRect.x / 2,
+                                                                                             root.viewportRect.y / 2,
+                                                                                             root.viewportRect.width / 2,
+                                                                                             root.viewportRect.height / 2)
+                                                                                   : Qt.rect(0, 0, 0, 0)
+        
         function scheduleChainedUpdate() {
             if (!ds1layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
@@ -374,6 +387,15 @@ Item {
 
         live: root.live
 
+        // Divided by two, because viewport rect is local to the final upsampler (us2), which is the painter delegate here (regardless of the mode):
+        // No need to check for the mode, because this is not used in two pass mode (calculations are negligible).
+        // TODO: Investigate if we can propagate the viewport rect back to the intermediate layers in four-pass mode to save more video memory.
+        sourceRect: (root.viewportRect.width > 0 && root.viewportRect.height > 0) ? Qt.rect(root.viewportRect.x / 2,
+                                                                                            root.viewportRect.y / 2,
+                                                                                            root.viewportRect.width / 2,
+                                                                                            root.viewportRect.height / 2)
+                                                                                  : Qt.rect(0, 0, 0, 0)
+
         function scheduleChainedUpdate() {
             if (!us1layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
@@ -413,7 +435,10 @@ Item {
     ShaderEffect {
         id: us2
 
-        anchors.fill: parent // {us1/ds1}.size * 2
+        // {us1/ds1}.size * 2
+        anchors.centerIn: parent
+        width: (root.viewportRect.width > 0) ? root.viewportRect.width : parent.width
+        height: (root.viewportRect.height > 0) ? root.viewportRect.height : parent.height
 
         readonly property Item source: (root.configuration === DualKawaseBlur.Configuration.TwoPass) ? ds1layer : us1layer
         property rect normalRect // not necessary here, added because of the warning
