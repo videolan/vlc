@@ -673,7 +673,10 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
     block_t *p_block = block_Alloc( derivation_data.ImageGrid.output_width *
                                     derivation_data.ImageGrid.output_height * 4 );
     if( !p_block )
+    {
+        image_HandlerDelete( handler );
         return VLC_EGENERIC;
+    }
     *pp_block = p_block;
 
     es_format_Init( fmt, VIDEO_ES, VLC_CODEC_RGBA );
