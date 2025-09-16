@@ -1242,6 +1242,7 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
         { "v4l",    ITEM_TYPE_CARD, false },
         { "vcd",    ITEM_TYPE_DISC, false },
         { "vdr",    ITEM_TYPE_STREAM, true },
+        { "vlctest_",ITEM_TYPE_FILE, false },
         { "wasapi", ITEM_TYPE_CARD, false },
         { "window", ITEM_TYPE_CARD, false },
     };
