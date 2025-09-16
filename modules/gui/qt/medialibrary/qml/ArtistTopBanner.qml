@@ -77,11 +77,6 @@ FocusScope {
     Item {
         anchors.fill: background
 
-        // TODO: Clipping should not be necessary, we can crop like
-        //       `ImageExt` is doing for `PreserveAspectCrop`, but
-        //       `DualKawaseBlur` does not support that for now.
-        clip: !blurEffect.sourceNeedsLayering
-
         visible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
         // This blur effect does not create an implicit layer that is updated
