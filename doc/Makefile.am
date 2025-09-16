@@ -18,6 +18,7 @@ LIBVLC_SAMPLES = \
 	libvlc/win_player.c \
 	libvlc/CMakeLists.txt \
 	libvlc/appkit_player.m \
+	libvlc/downloader.c \
 	libvlc/parser.c \
 	libvlc/media_discoverer.c \
 	libvlc/renderer_discoverer.c \
@@ -30,6 +31,7 @@ AM_LDFLAGS = -no-install $(LDFLAGS_vlc) -L../src/ -lvlccore -L../lib -lvlc
 
 samples_libvlc_example_SOURCES = libvlc/example.c
 samples_libvlc_thumbnailer_SOURCES = libvlc/thumbnailer.c
+samples_libvlc_downloader_SOURCES = libvlc/downloader.c
 samples_libvlc_parser_SOURCES = libvlc/parser.c
 samples_libvlc_media_discoverer_SOURCES = libvlc/media_discoverer.c
 samples_libvlc_renderer_discoverer_SOURCES = libvlc/renderer_discoverer.c
@@ -38,6 +40,7 @@ samples_libvlc_player_SOURCES = libvlc/player.c
 check_PROGRAMS = \
 	samples_libvlc_example \
 	samples_libvlc_thumbnailer \
+	samples_libvlc_downloader \
 	samples_libvlc_parser \
 	samples_libvlc_media_discoverer \
 	samples_libvlc_renderer_discoverer \
