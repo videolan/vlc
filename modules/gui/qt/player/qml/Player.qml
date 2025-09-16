@@ -305,6 +305,10 @@ FocusScope {
                         tint: bgtheme.palette.isDark ? "black" : "white"
                         tintStrength: 0.5
 
+                        // The window naturally clips the content, but having this saves some
+                        // video memory, depending on the excess content in the last layer:
+                        viewportRect: Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
+
                         Widgets.TextureProviderItem {
                             id: textureProviderItem
 
