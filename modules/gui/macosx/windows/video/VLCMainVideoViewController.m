@@ -403,14 +403,14 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         return;
     }
 
+    if (self.classic) {
+        self.videoViewBottomConstraint.active = NO;
+        self.videoViewBottomToViewConstraint.active = YES;
+    }
+
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
         [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:0.0f];
-        
-        if (self.classic && self.videoViewBottomConstraint && self.videoViewBottomToViewConstraint) {
-            self.videoViewBottomConstraint.active = NO;
-            self.videoViewBottomToViewConstraint.active = YES;
-        }
     } completionHandler:nil];
 }
 
@@ -440,14 +440,13 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     [self updatePlayQueueToggleState];
     [self updateLibraryControls];
 
+    if (self.classic) {
+        self.videoViewBottomToViewConstraint.active = NO;
+        self.videoViewBottomConstraint.active = YES;
+    }
+
     if (!_autohideControls) {
-        _mainControlsView.alphaValue = 1.0f;
-        
-        // For classic layout, ensure video view is constrained when controls are always visible
-        if (self.classic && self.videoViewBottomConstraint && self.videoViewBottomToViewConstraint) {
-            self.videoViewBottomToViewConstraint.active = NO;
-            self.videoViewBottomConstraint.active = YES;
-        }
+        _mainControlsView.alphaValue = 1.0f;        
         return;
     }
 
@@ -455,11 +454,6 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         self->_isFadingIn = YES;
         [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:1.0f];
-        
-        if (self.classic && self.videoViewBottomConstraint && self.videoViewBottomToViewConstraint) {
-            self.videoViewBottomToViewConstraint.active = NO;
-            self.videoViewBottomConstraint.active = YES;
-        }
     } completionHandler:^{
         self->_isFadingIn = NO;
         [self startAutohideTimer];
