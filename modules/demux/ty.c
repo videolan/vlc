@@ -1958,7 +1958,10 @@ static int get_chunk_header(demux_t *p_demux)
     p_sys->rec_hdrs = parse_chunk_headers(p_hdr_buf, i_num_recs, &i_payload_size);
     free(p_hdr_buf);
     if (unlikely(p_sys->rec_hdrs == NULL))
+    {
+        p_sys->i_num_recs = 0;
         return VLC_ENOMEM;
+    }
 
     p_sys->i_stuff_cnt = CHUNK_SIZE - 4 -
         (p_sys->i_num_recs * REC_SIZE) - i_payload_size;
