@@ -92,6 +92,9 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
             provider->setAnisotropyLevel(weakThis->m_anisotropyLevel);
             provider->setHorizontalWrapMode(weakThis->m_horizontalWrapMode);
             provider->setVerticalWrapMode(weakThis->m_verticalWrapMode);
+
+            if (weakThis->m_detachAtlasTextures)
+                provider->requestDetachFromAtlas();
         };
 
         // These are going to be queued when necessary:
@@ -103,6 +106,11 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
         connect(this, &TextureProviderItem::anisotropyLevelChanged, m_textureProvider, &QSGTextureViewProvider::setAnisotropyLevel);
         connect(this, &TextureProviderItem::horizontalWrapModeChanged, m_textureProvider, &QSGTextureViewProvider::setHorizontalWrapMode);
         connect(this, &TextureProviderItem::verticalWrapModeChanged, m_textureProvider, &QSGTextureViewProvider::setVerticalWrapMode);
+
+        connect(this, &TextureProviderItem::detachAtlasTexturesChanged, m_textureProvider, [provider = m_textureProvider](bool detach) {
+            if (detach)
+                provider->requestDetachFromAtlas();
+        });
 
         // When the target texture changes, the texture view may reset its state, so we need to synchronize in that case:
         connect(m_textureProvider, &QSGTextureProvider::textureChanged, m_textureProvider, synchronizeState); // Executed in texture provider's thread
@@ -259,4 +267,9 @@ void QSGTextureViewProvider::setVerticalWrapMode(QSGTexture::WrapMode vwrap)
 
     m_textureView.setVerticalWrapMode(vwrap);
     emit textureChanged();
+}
+
+void QSGTextureViewProvider::requestDetachFromAtlas()
+{
+    m_textureView.requestDetachFromAtlas();
 }

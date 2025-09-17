@@ -49,6 +49,8 @@ public:
     void setAnisotropyLevel(QSGTexture::AnisotropyLevel level);
     void setHorizontalWrapMode(QSGTexture::WrapMode hwrap);
     void setVerticalWrapMode(QSGTexture::WrapMode vwrap);
+
+    void requestDetachFromAtlas();
 };
 
 class TextureProviderItem : public QQuickItem
@@ -62,8 +64,9 @@ class TextureProviderItem : public QQuickItem
     //       sub-texture (such as a texture in the atlas), wrapping would only be applicable outside
     //       the boundaries of the whole texture and not the source sub-texture, and not considering
     //       this may expose irrelevant parts of the atlas (this means that wrap mode is effectively
-    //       useless for sub- or atlas textures).
+    //       useless for sub- or atlas textures). In such a case, `detachAtlasTextures` can be used.
     Q_PROPERTY(QRect textureSubRect MEMBER m_rect NOTIFY rectChanged RESET resetTextureSubRect FINAL)
+    Q_PROPERTY(bool detachAtlasTextures MEMBER m_detachAtlasTextures NOTIFY detachAtlasTexturesChanged FINAL)
 
     Q_PROPERTY(QSGTexture::AnisotropyLevel anisotropyLevel MEMBER m_anisotropyLevel NOTIFY anisotropyLevelChanged FINAL)
     Q_PROPERTY(QSGTexture::WrapMode horizontalWrapMode MEMBER m_horizontalWrapMode NOTIFY horizontalWrapModeChanged FINAL)
@@ -122,6 +125,8 @@ signals:
     void horizontalWrapModeChanged(QSGTexture::WrapMode);
     void verticalWrapModeChanged(QSGTexture::WrapMode);
 
+    void detachAtlasTexturesChanged(bool);
+
 protected:
     void releaseResources() override;
 
@@ -138,6 +143,7 @@ private:
     // When there are mip maps, no mip map filtering should be fine (unlike no mip maps with mip map filtering):
     // But we want to have mip map filtering by default if the texture has mip maps (if not, it won't be respected):
     std::atomic<QSGTexture::Filtering> m_mipmapFiltering = QSGTexture::Linear;
+    std::atomic<bool> m_detachAtlasTextures = false;
 };
 
 #endif // TEXTUREPROVIDERITEM_HPP
