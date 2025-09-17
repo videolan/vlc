@@ -112,9 +112,6 @@ void QSGTextureView::setRect(const QRect &rect)
     if (m_rect == rect)
         return;
 
-    if (!rect.isValid())
-        return;
-
     m_rect = rect;
 
     // We need the source texture in order to calculate the normal rect.
@@ -122,7 +119,10 @@ void QSGTextureView::setRect(const QRect &rect)
     // later in `normalizedTextureSubRect()`.
     if (m_texture)
     {
-        adjustNormalRect();
+        if (m_rect.isValid())
+            adjustNormalRect();
+        else
+            m_normalRect.reset();
         emit updateRequested();
     }
     else

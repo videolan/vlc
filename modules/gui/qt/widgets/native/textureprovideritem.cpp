@@ -83,11 +83,6 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
             }
         };
 
-        const auto adjustRect = [provider = m_textureProvider](const QRect& rect) {
-            if (rect.isValid())
-                provider->setRect(rect);
-        };
-
         const auto synchronizeState = [weakThis = QPointer(this), provider = m_textureProvider]() {
             if (Q_UNLIKELY(!weakThis))
                 return;
@@ -101,7 +96,7 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
 
         // These are going to be queued when necessary:
         connect(this, &TextureProviderItem::sourceChanged, m_textureProvider, adjustSource);
-        connect(this, &TextureProviderItem::rectChanged, m_textureProvider, adjustRect);
+        connect(this, &TextureProviderItem::rectChanged, m_textureProvider, &QSGTextureViewProvider::setRect);
 
         connect(this, &TextureProviderItem::filteringChanged, m_textureProvider, &QSGTextureViewProvider::setFiltering);
         connect(this, &TextureProviderItem::mipmapFilteringChanged, m_textureProvider, &QSGTextureViewProvider::setMipmapFiltering);
@@ -114,7 +109,8 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
 
         // Initial adjustments:
         adjustSource(m_source);
-        adjustRect(m_rect);
+        if (m_rect.isValid())
+            m_textureProvider->setRect(m_rect);
         synchronizeState();
     }
     return m_textureProvider;
