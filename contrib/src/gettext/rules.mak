@@ -18,11 +18,11 @@ gettext: gettext-$(GETTEXT_VERSION).tar.xz .sum-gettext
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(call update_autoconfig,libtextstyle/build-aux)
 	# disable useless gettext-runtime targets
-	sed -i.orig -e 's,doc ,,' $(UNPACK_DIR)/gettext-runtime/Makefile.am
-	sed -i.orig -e 's,intl-java intl-csharp intl-d intl-modula2 ,,' $(UNPACK_DIR)/gettext-runtime/Makefile.am
-	sed -i.orig -e 's, tests,,' $(UNPACK_DIR)/gettext-runtime/Makefile.am
+	sed -i.orig -e 's,doc ,,g' $(UNPACK_DIR)/gettext-runtime/Makefile.in
+	sed -i.orig -e 's,intl-java intl-csharp intl-d intl-modula2 ,,g' $(UNPACK_DIR)/gettext-runtime/Makefile.in
+	sed -i.orig -e 's, tests,,g' $(UNPACK_DIR)/gettext-runtime/Makefile.in
 	# disable useless gettext-tools configure
-	sed -i.orig -e 's,gettext-runtime libtextstyle gettext-tools,gettext-runtime libtextstyle,' $(UNPACK_DIR)/configure.ac
+	sed -i.orig -e 's,gettext-runtime libtextstyle gettext-tools,gettext-runtime libtextstyle,g' $(UNPACK_DIR)/configure
 	$(MOVE)
 
 DEPS_gettext = iconv $(DEPS_iconv) libxml2 $(DEPS_libxml2)
@@ -66,7 +66,6 @@ GETTEXT_CONF += ac_cv_func_faccessat=no
 endif
 
 .gettext: gettext
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(GETTEXT_CONF)
 	+$(MAKEBUILD) -C gettext-runtime bin_PROGRAMS=
