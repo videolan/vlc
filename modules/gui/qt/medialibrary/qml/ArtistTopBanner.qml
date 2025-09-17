@@ -121,11 +121,10 @@ FocusScope {
             ShaderEffectSource {
                 id: backgroundLayer
 
-                sourceItem: background
+                // Setting source item to null should release the resources:
+                // WARNING: If live was false, we would also need to set parent to null.
+                sourceItem: blurEffect.sourceNeedsLayering ? background : null
 
-                // We hope that Qt does not create the layer unless this is actually used as
-                // texture provider (it is already invisible). GammaRay tells that this is
-                // already the case (I can not access the texture).
                 visible: false
             }
 
