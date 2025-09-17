@@ -26,7 +26,7 @@ class QSGTextureView : public QSGDynamicTexture
 {
     Q_OBJECT
 
-    QSGTexture* m_texture = nullptr;
+    QPointer<QSGTexture> m_texture;
     QRect m_rect;
     mutable std::optional<QRectF> m_normalRect;
     mutable bool m_normalRectChanged = false;
