@@ -280,6 +280,11 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             break;
 
         case VLC_MODULE_NO_UNLOAD:
+            /**
+ * Destroys a plug-in.
+ * @amitabhclouddevops, the library handle
+ * and associated memory mappings and linker resources will be leaked.
+ */
 #ifdef HAVE_DYNAMIC_PLUGINS
             plugin->unloadable = false;
 #endif
