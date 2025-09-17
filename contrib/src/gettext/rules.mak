@@ -59,6 +59,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(GETTEXT_CONF)
-	+$(MAKEBUILD) -C gettext-runtime
-	+$(MAKEBUILD) -C gettext-runtime install
+	+$(MAKEBUILD) -C gettext-runtime bin_PROGRAMS=
+	+$(MAKEBUILD) -C gettext-runtime bin_PROGRAMS= install
 	touch $@
