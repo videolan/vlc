@@ -92,14 +92,18 @@ FocusScope {
 
             // NOTE: No need to disable `live`, as this uses two pass mode so there is no video memory saving benefit.
 
-            // If source image is tiled, layering is necessary:
-            readonly property bool sourceNeedsLayering: (background.fillMode === Image.Tile)
+            readonly property bool sourceNeedsTiling: (background.fillMode === Image.Tile)
 
             readonly property real aspectRatio: (background.implicitHeight / background.implicitWidth)
 
-            height: sourceNeedsLayering ? background.height : (aspectRatio * width)
+            height: sourceNeedsTiling ? background.height : (aspectRatio * width)
 
             source: textureProviderItem
+
+            // Instead of clipping in the parent, denote the viewport here so we both
+            // do not need to clip the excess, and also save significant video memory:
+            viewportRect: !blurEffect.sourceNeedsLayering ? Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
+                                                          : Qt.rect(0, 0, 0, 0)
 
             Widgets.TextureProviderItem {
                 id: textureProviderItem
@@ -110,22 +114,17 @@ FocusScope {
                 // we can have an indirection here through `TextureProviderItem`.
                 // This is totally acceptable as there is virtually no overhead.
 
-                source: blurEffect.sourceNeedsLayering ? backgroundLayer : background
-            }
+                source: background
 
-            // Instead of clipping in the parent, denote the viewport here so we both
-            // do not need to clip the excess, and also save significant video memory:
-            viewportRect: !blurEffect.sourceNeedsLayering ? Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
-                                                          : Qt.rect(0, 0, 0, 0)
+                detachAtlasTextures: blurEffect.sourceNeedsTiling
 
-            ShaderEffectSource {
-                id: backgroundLayer
+                horizontalWrapMode: blurEffect.sourceNeedsTiling ? Widgets.TextureProviderItem.Repeat : Widgets.TextureProviderItem.ClampToEdge
+                verticalWrapMode: blurEffect.sourceNeedsTiling ? Widgets.TextureProviderItem.Repeat : Widgets.TextureProviderItem.ClampToEdge
 
-                // Setting source item to null should release the resources:
-                // WARNING: If live was false, we would also need to set parent to null.
-                sourceItem: blurEffect.sourceNeedsLayering ? background : null
-
-                visible: false
+                textureSubRect: blurEffect.sourceNeedsTiling ? Qt.rect(blurEffect.width / 8,
+                                                                       blurEffect.height / 8,
+                                                                       blurEffect.width * 1.25,
+                                                                       blurEffect.height * 1.25) : undefined
             }
 
             // Strong blurring is not wanted here:
