@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Cymrodor <aled@aledpowell.cymru>, 2020\n"
 "Language-Team: Welsh (https://app.transifex.com/yaron/teams/16553/cy/)\n"
@@ -5049,7 +5049,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Methwyd agor \"%s\" i'w ysgrifennu"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6303,7 +6303,7 @@ msgstr "Mewnbwn DeckLink SDI gan Blackmagic "
 msgid "10 bits"
 msgstr "10 did"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "Capsiynau cyfyng 1"
 
@@ -7638,19 +7638,19 @@ msgstr "Porth y twnel HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr ""
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "Dilysiad RTSP"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "Mae angen enw a chyfrinair cywir i fewngofnodi."
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "Methodd y cysylltiad RTSP"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr ""
 
@@ -12251,7 +12251,7 @@ msgstr "Amgodiwr sain pwynt penodol MP3"
 msgid "S/PDIF pass-through decoder"
 msgstr ""
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -12579,7 +12579,7 @@ msgstr "Datgodiwr isdeitlau testun"
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1252"
@@ -14548,7 +14548,7 @@ msgstr "Datblecsydd AIFF"
 msgid "ASF/WMV demuxer"
 msgstr "Datblecsydd ASF/WMV"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "Methwyd datblecsu'r ffrwd ASF"
 
@@ -14596,15 +14596,15 @@ msgstr "Enw'r fformat"
 msgid "Internal libavcodec format name"
 msgstr ""
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr ""
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr ""
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -14612,27 +14612,27 @@ msgstr ""
 "Ail-greu mynegai ar gyfer y ffeil AVI. Defnyddiwch hwn os yw'ch ffeil AVI "
 "wedi'i difrodi neu yn anghyflawn a bod dim modd ei gyrchu."
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "Gofyn am weithred"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "Cywiro pob tro"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "Cywiro byth"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "Cywiro pan bo angen"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "Datblecsydd AVI"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -14642,27 +14642,27 @@ msgid ""
 "What do you want to do?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "Peidio ei chwarae"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "Adeiladu mynegai yna chwarae"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "Chwarae fel y mae"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "Mynegai AVI anghywir neu goll"
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "Yn trwsio Mynegai AVI..."
 
@@ -15071,27 +15071,27 @@ msgstr ""
 msgid "Clean"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "Datblecsydd ffrwd MP4"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr ""
 
@@ -15590,23 +15590,23 @@ msgstr "Disgrifiad yr isdeitlau"
 msgid "TTA demuxer"
 msgstr "Datblecsydd TTA"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr ""
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "Datblecsio sain/fideo TY Stream"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "Capsiynau cyfyng 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "Capsiynau cyfyng 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "Capsiynau cyfyng 4"
 
@@ -20837,11 +20837,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Dangos deialogau rhybyddion a gwalliau di-bwys"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "Galluogi sain"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -21159,16 +21160,8 @@ msgstr ""
 msgid "AMD VQ Enhancer"
 msgstr ""
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 msgid "AMD Frame Rate Doubler"
-msgstr ""
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
@@ -22935,7 +22928,7 @@ msgstr "Pecynnydd sain A/52"
 msgid "avparser packetizer"
 msgstr ""
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr ""
 
@@ -27897,8 +27890,9 @@ msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
+#, fuzzy
 msgid "Fingerprinting track..."
-msgstr ""
+msgstr "Pin mewnbwn sain"
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -28146,8 +28140,9 @@ msgid "Menus"
 msgstr "Dewislenni"
 
 #: modules/gui/qt/ui/profiles.h:728
+#, fuzzy
 msgid "Fra&me Rate"
-msgstr ""
+msgstr "Cyfradd sampl"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -28692,16 +28687,19 @@ msgid "Spatial luma strength"
 msgstr "Aneglurder gofodol"
 
 #: modules/gui/qt/ui/video_effects.h:1339
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "Aneglurder gofodol"
 
 #: modules/gui/qt/ui/video_effects.h:1340
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "Aneglurder gofodol"
 
 #: modules/gui/qt/ui/video_effects.h:1341
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "Aneglurder gofodol"
 
 #: modules/gui/qt/ui/vlm.h:283
 msgid "VLM configurator"

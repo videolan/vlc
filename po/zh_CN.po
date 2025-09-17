@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Dian Li <xslidian@gmail.com>, 2022\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/yaron/teams/16553/"
@@ -5044,7 +5044,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "无法以写入模式打开「%s」"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6281,7 +6281,7 @@ msgstr "Blackmagic DeckLink SDI 输入"
 msgid "10 bits"
 msgstr "10 bits"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "隐藏式字幕 1"
 
@@ -7651,19 +7651,19 @@ msgstr "HTTP 隧道端口"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "用于通过 HTTP 隧道访问 RTSP/RTP 的端口。"
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "RTSP 身份验证"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "请输入有效的登录名和密码。"
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "RTSP 连接失败"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr "对流的访问被服务器配置拒绝。"
 
@@ -12416,7 +12416,7 @@ msgstr "MP3 定点音频编码器"
 msgid "S/PDIF pass-through decoder"
 msgstr "S/PDIF 呈递解码器"
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -12742,7 +12742,7 @@ msgstr "文本字幕解码器"
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "GB18030"
@@ -14805,7 +14805,7 @@ msgstr "AIFF 分流器"
 msgid "ASF/WMV demuxer"
 msgstr "ASF/WMV 分流器"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "无法分流 ASF 流"
 
@@ -14853,15 +14853,15 @@ msgstr "格式名称"
 msgid "Internal libavcodec format name"
 msgstr "libavcodec 内部格式名称"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "强制交错模式"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "强制创建索引"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -14869,27 +14869,27 @@ msgstr ""
 "为 AVI 文件重新创建索引。如果您的 AVI 文件已损坏或不完整 (无法定位) 请使用此"
 "功能。"
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "询问操作"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "总是修复"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "不修复"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "需要时修复"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "AVI 分流器"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -14903,27 +14903,27 @@ msgstr ""
 "该步骤对于大文件可能会耗费较长时间。\n"
 "您打算如何操作?"
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "不要播放"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "建立索引再播放"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "原样播放"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr "索引损坏或缺失"
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "AVI 索引损坏或丢失"
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "正在修复 AVI 索引..."
 
@@ -15332,27 +15332,27 @@ msgstr "露骨"
 msgid "Clean"
 msgstr "纯净"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr "仅限 M4A 音频"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr "忽略 iTunes 音频文件的非音频轨道"
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "MP4 串流分流器"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr "不要定位"
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr "建立索引"
 
@@ -15859,23 +15859,23 @@ msgstr "字幕描述"
 msgid "TTA demuxer"
 msgstr "TTA 分流器"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr "TY"
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "TY 流音频/视频分流"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "隐藏式字幕 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "隐藏式字幕 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "隐藏式字幕 4"
 
@@ -21106,11 +21106,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "显示不重要的错误和警告消息对话框"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "启用软件模式"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -21432,18 +21433,10 @@ msgstr "设置图像色度，在 0.01 和 10 之间。默认为 1。"
 msgid "AMD VQ Enhancer"
 msgstr "立体增强器"
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 #, fuzzy
 msgid "AMD Frame Rate Doubler"
 msgstr "帧率(&M)"
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
-msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 #, fuzzy
@@ -23260,7 +23253,7 @@ msgstr "A/52 音频封包器"
 msgid "avparser packetizer"
 msgstr "avparser 封包器"
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr "AV1 视频封包器"
 

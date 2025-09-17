@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2021\n"
 "Language-Team: Polish (https://app.transifex.com/yaron/teams/16553/pl/)\n"
@@ -5290,7 +5290,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Nie można otworzyć \"%s\" dla zapisu"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6561,7 +6561,7 @@ msgstr "Wejście SDI Blackmagic DeckLink"
 msgid "10 bits"
 msgstr "10 bitów"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "Zamknięte napisy 1"
 
@@ -7997,19 +7997,19 @@ msgstr "Port tunelu HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "Port używany do tunelowania RTSP/RTP przez HTTP."
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "Uwierzytelnienie RTSP"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "Proszę wpisać prawidłową nazwę użytkownika i hasło."
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "Połączenie RTSP nieudane"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr "Dostęp do strumienia jest zabroniony przez konfigurację serwera."
 
@@ -12955,7 +12955,7 @@ msgstr "MP3 - koder audio stałego punktu"
 msgid "S/PDIF pass-through decoder"
 msgstr "Dekoder przesyłania dźwięku S/PDIF"
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -13286,7 +13286,7 @@ msgstr "Dekoder napisów tekstowych"
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1250"
@@ -15438,7 +15438,7 @@ msgstr "Demultiplekser AIFF"
 msgid "ASF/WMV demuxer"
 msgstr "Demultiplekser ASF/WMV"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "Nie można demuksować strumienia ASF"
 
@@ -15486,15 +15486,15 @@ msgstr "Nazwa formatu"
 msgid "Internal libavcodec format name"
 msgstr "Wewnętrzna nazwa formatu libavcodec"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "Wymuś metodę przeplotową"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "Wymuszenie tworzenia indeksu"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -15502,27 +15502,27 @@ msgstr ""
 "Odtwórz indeks dla pliku AVI. Użyj tego, jeśli Twój plik AVI jest uszkodzony "
 "lub niekompletny (nie ma podglądu)."
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "Pytaj o akcję"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "Zawsze naprawiaj"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "Nigdy nie naprawiaj"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "Naprawiaj w razie potrzeby"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "Demultiplekser AVI"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15538,27 +15538,27 @@ msgstr ""
 "Ta procedura może zająć sporo czasu przy dużym pliku.\n"
 "Co chcesz zrobić?"
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "Nie odtwarzaj"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "Napraw indeks potem odegraj"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "Odtwarzaj bez zmian"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr "Uszkodzony lub brakujący indeks"
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "Uszkodzony lub brakujący indeks AVI..."
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "Naprawiam indeks AVI..."
 
@@ -15982,27 +15982,27 @@ msgstr "Wyraźny"
 msgid "Clean"
 msgstr "Czysty"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr "Tylko dźwięk M4A"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr "Ignoruj niedźwiękowe utwory z plików audio iTunes"
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "Demultiplekser strumienia MP4"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr "Nie szukaj"
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr "Napraw indeks"
 
@@ -16537,23 +16537,23 @@ msgstr "Opis napisów"
 msgid "TTA demuxer"
 msgstr "Demultiplekser TTA"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr "TY"
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "Demux TY strumienia dźwięku/obrazu"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "Zamknięte napisy 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "Zamknięte napisy 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "Zamknięte napisy 4"
 
@@ -21880,11 +21880,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Pokaż drobne błędy i dialogi ostrzeżeń"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "Włącz tryb oprogramowania"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -22229,18 +22230,10 @@ msgstr "Ustawia gammę obrazu między 0.01 i 10. Domyślna to 1."
 msgid "AMD VQ Enhancer"
 msgstr "Wzmacniacz stereo"
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 #, fuzzy
 msgid "AMD Frame Rate Doubler"
 msgstr "Liczba &klatek"
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
-msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 #, fuzzy
@@ -24112,7 +24105,7 @@ msgstr "Pakietowiec dźwięku A/52"
 msgid "avparser packetizer"
 msgstr "Pakietowiec avparser"
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr "Pakietowiec obrazu AV1"
 

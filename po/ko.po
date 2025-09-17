@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: JungHee Lee <daemul72@gmail.com>, 2023\n"
 "Language-Team: Korean (https://app.transifex.com/yaron/teams/16553/ko/)\n"
@@ -5192,7 +5192,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "쓰기위해 \"%s\" 열기 실패"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6456,7 +6456,7 @@ msgstr "Blackmagic DeckLink SDI 입력"
 msgid "10 bits"
 msgstr "10 비트"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "특수 자막 1"
 
@@ -7864,19 +7864,19 @@ msgstr "HTTP 터널 포트"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "HTTP 을 통한 RTSP/RTP 터널링에 사용할 포트."
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "RTSP 인증"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "정확한 로그인 이름 및 비밀번호를 입력하세요."
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "RTSP 연결에 실패했습니다"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr "서버 구성으로 스트림의 접근이 거부되었습니다."
 
@@ -12756,7 +12756,7 @@ msgstr "MP3 고정 소수점 오디오 인코더"
 msgid "S/PDIF pass-through decoder"
 msgstr "S/PDIF 패스스루 디코더"
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -13084,7 +13084,7 @@ msgstr "텍스트 자막  디코더"
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP949"
@@ -15183,7 +15183,7 @@ msgstr "AIFF demuxer"
 msgid "ASF/WMV demuxer"
 msgstr "ASF/WMV demuxer"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "ASF 스트림을 demux 할 수 없음"
 
@@ -15231,15 +15231,15 @@ msgstr "형식 이름"
 msgid "Internal libavcodec format name"
 msgstr "내부 livavcodec 형식 이름"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "인터리브 방식을 강제 지정합니다"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "강제로 인덱스를 생성합니다"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -15247,27 +15247,27 @@ msgstr ""
 "AVI 파일의 인덱스를 재생성합니다. AVI 파일이 손상되었거나 불완전할 때 (탐색불"
 "능) 사용하세요."
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "실행 전 묻기"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "항상 고치기"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "고치지 않기"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "필요시 고치기"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "AVI demuxer"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15282,27 +15282,27 @@ msgstr ""
 "이 작업은 파일이 크면 시간이 오래 걸릴 수 있습니다.\n"
 "어떻게 할까요?"
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "재생하지 않음"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "인덱스를 만들고 재생"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "그대로 재생"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr "손상 또는 누락된 인덱스"
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "깨지거나 없는 AVI 인덱스"
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "AVI 인덱스 수정..."
 
@@ -15720,27 +15720,27 @@ msgstr "명백한"
 msgid "Clean"
 msgstr "깨끗한"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr "M4A 오디오만"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr "아이튠즈 오디오 파일에서 오디오가 아닌 트랙 무시하기"
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "MP4 스트림 demuxer"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr "찾지 않음"
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr "인덱스 만들기"
 
@@ -16262,23 +16262,23 @@ msgstr "자막 설명"
 msgid "TTA demuxer"
 msgstr "TTA demuxer"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr "TY"
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "TY 스트림 오디오/비디오 demux"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "특수 자막 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "특수 자막 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "특수 자막 4"
 
@@ -21558,11 +21558,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "중요하지 않은 오류 및 경고 대화상자 표시"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "소프트웨어 모드 활성화"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -21900,18 +21901,10 @@ msgstr "이미지 감마 설정, 0.01 과 10 사이. 기본 1."
 msgid "AMD VQ Enhancer"
 msgstr "스테레오 강화"
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 #, fuzzy
 msgid "AMD Frame Rate Doubler"
 msgstr "프레임 레이트"
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
-msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 #, fuzzy
@@ -23764,7 +23757,7 @@ msgstr "A/52 오디오 패킷타이저"
 msgid "avparser packetizer"
 msgstr "AVparser 패킷타이저"
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr "AV1 비디오 패킷타이저"
 

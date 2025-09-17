@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Arnold Marko <arnold.marko@gmail.com>, 2023\n"
 "Language-Team: Slovenian (https://app.transifex.com/yaron/teams/16553/sl/)\n"
@@ -5320,7 +5320,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Odpiranje »%s« za zapisovanje je spodletelo"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6598,7 +6598,7 @@ msgstr "Vhod Blackmagic DeckLink SDI"
 msgid "10 bits"
 msgstr "10-bitno"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "Opisni podnapisi 1"
 
@@ -8028,19 +8028,19 @@ msgstr "Tunelska HTTP vrata"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "Vrata pri uporabi tunelov RTSP/RTP prek HTTP."
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "RTSP overitev"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "Vnesite veljavno prijavno ime in geslo."
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "Povezava RTSP je spodletela"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr "Nastavitev strežnika je zavrnila dostop do pretoka."
 
@@ -12977,7 +12977,7 @@ msgstr "Točkovni kodirnik zvoka MP3"
 msgid "S/PDIF pass-through decoder"
 msgstr "Odkodirnik prehoda S/PDIF"
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -13309,7 +13309,7 @@ msgstr "Odkodirnik podnapisov Text"
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1252"
@@ -15452,7 +15452,7 @@ msgstr "Odvijalnik AIFF"
 msgid "ASF/WMV demuxer"
 msgstr "Odvijalnik ASF/WMV"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "Ni mogoče odviti pretoka ASF"
 
@@ -15500,15 +15500,15 @@ msgstr "Ime formata"
 msgid "Internal libavcodec format name"
 msgstr "Ime oblike notranjega kodeka libavcodec"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "Prepletena metoda"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "Ustvarjanje kazala"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -15516,27 +15516,27 @@ msgstr ""
 "Možnost določa način odziva pri zaznani napaki med predvajanjem okvarjene "
 "datoteke AVI."
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "Pokaži možnosti izbire"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "Vedno popravi"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "Nikoli ne popravi"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "Popravi ob potrebi"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "Odvijalnik AVI"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15552,27 +15552,27 @@ msgstr ""
 "To opravilo je lahko pri velikih datotekah dolgotrajno.\n"
 "Kako želite nadaljevati?"
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "Ne predvajaj"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "Postavi kazalo in predvajaj"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "Predvajaj kot je"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr "Okvarjeno ali manjkajoče kazalo"
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "Okvarjeno ali manjkajoče kazalo AVI"
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "Poteka popravljanje kazala AVI ..."
 
@@ -15997,27 +15997,27 @@ msgstr "Kočljivo"
 msgid "Clean"
 msgstr "Počisti"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr "Le zvok M4A"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr "Prezri ne-zvočne datoteke med datotekami iTunes"
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "Odvijalnik pretoka MP4"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr "Ne išči po posnetku"
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr "Izgradi kazalo"
 
@@ -16549,23 +16549,23 @@ msgstr "Opis podnapisov"
 msgid "TTA demuxer"
 msgstr "Odvijalnik TTA"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr "TY"
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "Odvijanje TY zapisa zvoka/slike"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "Opisni podnapisi 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "Opisni podnapisi 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "Opisni podnapisi 4"
 
@@ -21890,11 +21890,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Pokaži manj pomembne napake in opozorila"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "Omogoči programski način"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -22233,18 +22234,10 @@ msgstr "Nastavitev barve slike med 0.01 in 10. Privzeta vrednost je 1."
 msgid "AMD VQ Enhancer"
 msgstr "Izboljševalnik učinka stereo"
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 #, fuzzy
 msgid "AMD Frame Rate Doubler"
 msgstr "Hitrost &sličic"
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
-msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 #, fuzzy
@@ -24108,7 +24101,7 @@ msgstr "Paketnik zvoka A/52"
 msgid "avparser packetizer"
 msgstr "Paketnik avparser"
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr "AV1 paketirnik vicea"
 

@@ -26,7 +26,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2022\n"
 "Language-Team: Finnish (https://app.transifex.com/yaron/teams/16553/fi/)\n"
@@ -5358,7 +5358,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Tiedoston \"%s\" avaus tallennusta varten epäonnistui"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6637,7 +6637,7 @@ msgstr "Blackmagic DeckLink SDI -tulo"
 msgid "10 bits"
 msgstr "10 bittiä"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "Closed captions -tekstitys 1"
 
@@ -8084,19 +8084,19 @@ msgstr "HTTP-tunnelin portti"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "HTTP:n päällä käytettävän RTSP/RTP-yhteyden portti"
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "RTSP-todennus"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "Anna oikea käyttäjänimi ja salasana."
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "RTSP-yhteys epäonnistui"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr "Palvelimen asetukset estävät virtautukseen pääsyn."
 
@@ -13058,7 +13058,7 @@ msgstr "MP3-kiintopisteäänen pakkaaja"
 msgid "S/PDIF pass-through decoder"
 msgstr "S/PDIF läpikulun purkukooderi"
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -13390,7 +13390,7 @@ msgstr "Tekstityksen purkukooderi"
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1252"
@@ -15565,7 +15565,7 @@ msgstr "AIFF demultiplekseri"
 msgid "ASF/WMV demuxer"
 msgstr "ASF/WMV demultiplekseri"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "ASF-virran kanavointia ei voitu purkaa"
 
@@ -15613,15 +15613,15 @@ msgstr "Formaattinimi"
 msgid "Internal libavcodec format name"
 msgstr "Sisäisen libavcodec-formaatin nimi"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "Pakota lomitettu tapa"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "Indeksin luonnin pakotus"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -15629,27 +15629,27 @@ msgstr ""
 "Valitse, luodaanko AVI-tiedoston indeksi uudelleen. Voit käyttää tätä, jos "
 "AVI-tiedostosi on vioittunut tai keskeneräinen (jos sitä ei pysty kelaamaan)."
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "Kysy"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "Korjaa"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "Älä korjaa"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "Korjaa tarvittaessa"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "AVI demultiplekseri"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15664,27 +15664,27 @@ msgstr ""
 "Tämä voi kestää kauan suuressa tiedostossa.\n"
 "Mitä haluat tehdä? "
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "Älä toista"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "Rakenna indeksi ja toista"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "Toista tällaisenaan"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr "Viallinen tai puuttuva indeksi"
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "Vioittunut tai puuttuva AVI-indeksi"
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "Korjataan AVI-indeksiä..."
 
@@ -16112,27 +16112,27 @@ msgstr "Selkeä"
 msgid "Clean"
 msgstr "Puhdas"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr "Vain M4A-ääni"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr "Ohita muut ääniraidat iTunes-äänitiedostoissa "
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "MP4 suoratoiston demultiplekseri"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr "Älä kelaa"
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr "Rakenna indexi"
 
@@ -16662,23 +16662,23 @@ msgstr "Tekstityksen kuvaus"
 msgid "TTA demuxer"
 msgstr "TTA demultiplekseri"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr "TY"
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "TY Stream äänen/videon kanavoinninpurkaja"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "Closed captions -tekstitys 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "Closed captions -tekstitys 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "Closed captions -tekstitys 4"
 
@@ -21989,11 +21989,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Näytä vähemmän tärkeät virhe- ja huomautusikkunat"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "Ota käyttöön ohjelmistotila"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -22337,18 +22338,10 @@ msgstr "Aseta kuvan gamma, väliltä 0.01 ja 10. Oletusarvo on 1."
 msgid "AMD VQ Enhancer"
 msgstr "Stereon parantaja"
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 #, fuzzy
 msgid "AMD Frame Rate Doubler"
 msgstr "Ruu&dunpäivitysnopeus"
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
-msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 #, fuzzy
@@ -24217,7 +24210,7 @@ msgstr "A/52-äänen pakkaaja"
 msgid "avparser packetizer"
 msgstr "avparser pakkaaja"
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr "AV1 videon pakkaaja"
 

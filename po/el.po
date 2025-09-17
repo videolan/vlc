@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Angelos Chraniotis, 2023\n"
 "Language-Team: Greek (https://app.transifex.com/yaron/teams/16553/el/)\n"
@@ -5438,7 +5438,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Αποτυχία ανοίγματος του \"%s\" για εγγραφή"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6721,7 +6721,7 @@ msgstr "Είσοδος Blackmagic DeckLink SDI"
 msgid "10 bits"
 msgstr "10 bits"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "Ενσωματωμένες λεζάντες 1"
 
@@ -8179,19 +8179,19 @@ msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr ""
 "Θύρα που θα χρησιμοποιηθεί για τη διοχέτευση του RTSP/RTP αντί για HTTP."
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "Ταυτοποίηση RTSP"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "Παρακαλούμε εισάγετε ένα έγκυρο όνομα και συνθηματικό χρήστη."
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "Η  σύνδεση RTSP απέτυχε"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr "Η πρόσβαση στη μετάδοση απορρίφθηκε από τις ρυθμίσεις του διακομιστή."
 
@@ -13250,7 +13250,7 @@ msgstr "Κωδικοποιητής ήχου MP3 σταθερού σημείου 
 msgid "S/PDIF pass-through decoder"
 msgstr "Αποκωδικοποιητής S/PDIF pass-through"
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -13583,7 +13583,7 @@ msgstr "Αποκωδικοποιητής υπότιτλων κειμένου"
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1253"
@@ -15781,7 +15781,7 @@ msgstr "Αποπολυπλέκτης AIFF"
 msgid "ASF/WMV demuxer"
 msgstr "Αποπολυπλέκτης ASF/WMV"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "Αδυναμία αποπολυπλεξίας της μετάδοσης ASF"
 
@@ -15829,15 +15829,15 @@ msgstr "Όνομα μορφής"
 msgid "Internal libavcodec format name"
 msgstr "Όνομα μορφής του εσωτερικού libavcodec"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "Επιβολή μεθόδου διεμπλοκής"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "Επιβολή δημιουργίας ευρετηρίου"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -15845,27 +15845,27 @@ msgstr ""
 "Αναδημιουργία ενός ευρετηρίου για το αρχείο AVI. Χρησιμοποιήστε το εάν το "
 "αρχείο AVI σας είναι κατεστραμμένο ή ατελές (χωρίς δυνατότητα ανίχνευσης)."
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "Ερώτηση για ενέργεια"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "Να γίνεται πάντοτε επιδιόρθωση"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "Να μη γίνεται ποτέ επιδιόρθωση"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "Επιδιόρθωση όταν χρειαστεί"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "Αποπολυπλέκτης AVI"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15881,27 +15881,27 @@ msgstr ""
 "Αυτό το βήμα ίσως διαρκέσει αρκετά για ένα μεγάλο αρχείο.\n"
 "Τι θέλετε να γίνει;"
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "Να μην γίνει αναπαραγωγή"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "Δημιουργία ευρετηρίου και μετά αναπαραγωγή"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "Αναπαραγωγή ως έχει"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr "Το ευρετήριο λείπει ή είναι κατεστραμμένο"
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "Το ευρετήριο AVI λείπει ή είναι κατεστραμμένο"
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "Επιδιόρθωση ευρετηρίου AVI..."
 
@@ -16330,27 +16330,27 @@ msgstr "Αποκλειστικό"
 msgid "Clean"
 msgstr "Καθαρό"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr "M4A μόνο ήχος"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr "Αγνόηση μη ηχητικών κομματιών από τα αρχεία ήχου του iTunes"
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "Αποπολυπλέκτης μετάδοσης MP4"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr "Χωρίς ανίχνευση"
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr "Δημιουργία ευρετηρίου"
 
@@ -16891,23 +16891,23 @@ msgstr "Περιγραφή υπότιτλου"
 msgid "TTA demuxer"
 msgstr "Αποπολυπλέκτης TTA"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr "TY"
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "Αποπολυπλεξία ήχου/βίντεο μετάδοσης TY"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "Ενσωματωμένες λεζάντες 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "Ενσωματωμένες λεζάντες 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "Ενσωματωμένες λεζάντες 4"
 
@@ -22278,11 +22278,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Προβολή μη σημαντικών διαλόγων σφαλμάτων και προειδοποιήσεων"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "Ενεργοποίηση λειτουργίας λογισμικού"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -22637,18 +22638,10 @@ msgstr "Ορίστε το γάμμα της εικόνας, μεταξύ 0,01 κ
 msgid "AMD VQ Enhancer"
 msgstr "Stereo Enhancer"
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 #, fuzzy
 msgid "AMD Frame Rate Doubler"
 msgstr "Ρυθμός &καρέ"
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
-msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 #, fuzzy
@@ -24546,7 +24539,7 @@ msgstr "Πακετοποιητής ήχου A/52"
 msgid "avparser packetizer"
 msgstr "πακετοποιητής avparser "
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr "Πακετοποιητής βίντεο AV1"
 

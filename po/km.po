@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Sam A. T. <qamnott@gmail.com>, 2021\n"
 "Language-Team: Khmer (https://app.transifex.com/yaron/teams/16553/km/)\n"
@@ -5102,7 +5102,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "បាន​បរាជ័យ​ក្នុង​កា​របើក \"%s\" ដើម្បី​សរសេរ"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6344,7 +6344,7 @@ msgstr "ព័ត៌មាន​បញ្ចូល Blackmagic DeckLink SDI"
 msgid "10 bits"
 msgstr "១០ ប៊ីត"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "បាន​បិទ​ចំណងជើង ១"
 
@@ -7728,19 +7728,19 @@ msgstr "ច្រក​ធ្យូនែល HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "ច្រក​ដែល​ត្រូវ​ប្រើ​សម្រាប់​ធ្យូនែល RTSP/RTP តាម HTTP ។"
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "ការ​ផ្ទៀង​ផ្ទាត់ RTSP"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "សូម​បញ្ចូល​ឈ្មោះ​ចូល និង​ពាក្យសម្ងាត់​ដែល​ត្រឹមត្រូវ។"
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "ការ​តភ្ជាប់ RTSP បាន​បរាជ័យ"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr "ការ​ចូល​ដំណើរការ​ស្ទ្រីម​ត្រូវ​បាន​បដិសេធ​ដោយ​ការ​កំណត់​រចនាសម្ព័ន្ធ​ម៉ាស៊ីន​មេ។"
 
@@ -12508,7 +12508,7 @@ msgstr "អ៊ិនកូដឌ័រ​អូឌីយ៉ូ​ចំណុច
 msgid "S/PDIF pass-through decoder"
 msgstr ""
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -12836,7 +12836,7 @@ msgstr "កម្មវិធី​ដោះ​លេខ​កូដ​ចំណ
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1252"
@@ -14890,7 +14890,7 @@ msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស AIFF"
 msgid "ASF/WMV demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស ASF/WMV"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "មិន​អាច​មិន​ទ្វេ​ទិស​ស្ទ្រីម ASF បានទេ"
 
@@ -14938,15 +14938,15 @@ msgstr "ឈ្មោះ​ទ្រង់ទ្រាយ"
 msgid "Internal libavcodec format name"
 msgstr "ឈ្មោះ​ទ្រង់ទ្រាយ libavcodec ខាងក្នុង"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "បង្ចំ​វិធីសាស្ត្រ​ដែល​បាន​ដាក់​បញ្ចូល"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "បង្ខំ​ការ​បង្កើត​លិបិក្រម"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -14954,27 +14954,27 @@ msgstr ""
 "បង្កើត​លិបិក្រម​សម្រាប់​ឯកសារ AVI ឡើងវិញ ។ ប្រើ​វា ប្រសិន​បើ​ឯកសារ AVI របស់​អ្នក​ខូច ឬ​មិន​បញ្ចប់​"
 "ទាំងស្រុង (មិន​អាច​រក​ឃើញ) ។"
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "សួរ​រក​សកម្មភាព"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "ជួសជុល​ជា​និច្ច"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "កុំ​ជួស​ជុល"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "ជួសជុល​នៅ​ពេល​ចាំបាច់"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស AVI"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -14984,27 +14984,27 @@ msgid ""
 "What do you want to do?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "កុំ​ចាក់"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "បង្កើត​លិបិក្រម រួច​ចាក់"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "ចាក់"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "លិបិក្រម AVI បាន​ខូច ឬ​បាត់"
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "កំពុង​ជួសជុល​លិបិក្រម AVI..."
 
@@ -15418,27 +15418,27 @@ msgstr ""
 msgid "Clean"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស​ស្ទ្រីម MP4"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr ""
 
@@ -15945,23 +15945,23 @@ msgstr "សេចក្ដី​ពណ៌នា​ចំណង​ជើង​រ
 msgid "TTA demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស TTA"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr "TY"
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "ទ្វេ​ទិស​អូឌីយ៉ូ​/​វីដេអូ​ស្ទ្រីម TY"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "បាន​បិទ​ចំណងជើង ២"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "បាន​បិទ​ចំណងជើង ៣"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "បាន​បិទ​​ចំណងជើង ៤"
 
@@ -21193,11 +21193,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "បង្ហាញ​ប្រអប់​ព្រមាន និង​កំហុស​ដែល​មិន​សំខាន់"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "បើក​របៀប​កម្មវិធី"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -21527,16 +21528,8 @@ msgstr "កំណត់​ហ្កាម៉ា​រូបភាព ចន្�
 msgid "AMD VQ Enhancer"
 msgstr "ការ​ធ្វើឲ្យ​ស្តេរ៉េអូ​ប្រសើរ​ឡើង"
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 msgid "AMD Frame Rate Doubler"
-msgstr ""
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
@@ -23352,7 +23345,7 @@ msgstr "កម្មវិធី​វេច​ខ្ចប់​អូឌីយ
 msgid "avparser packetizer"
 msgstr ""
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr ""
 
@@ -28660,8 +28653,9 @@ msgid "Menus"
 msgstr "ម៉ឺនុយ"
 
 #: modules/gui/qt/ui/profiles.h:728
+#, fuzzy
 msgid "Fra&me Rate"
-msgstr ""
+msgstr "អត្រា​គំរូ"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"

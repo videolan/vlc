@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Dilip Re, 2021\n"
 "Language-Team: Malayalam (https://app.transifex.com/yaron/teams/16553/ml/)\n"
@@ -5225,7 +5225,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "റൈറ്റ് ചെയ്യാനായി  \"%s\" തുറക്കുന്നതില്‍ പരാജയപ്പെട്ടു"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6495,7 +6495,7 @@ msgstr "ബ്ലാക്ക്മാജിക്ക് ഡെക്ക്ല�
 msgid "10 bits"
 msgstr "10 ബിറ്റുകള്‍"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "അടച്ച ശീര്‍ഷകങ്ങള്‍ 1"
 
@@ -7923,19 +7923,19 @@ msgstr "എച്ച്ടിടിപി ടണല്‍ പോര്‍ട്�
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "എച്ച്‌ടി‌ടി‌പിയുടെ പുറത്തു ആര്‍‌ടി‌എസ്‌പി/ആര്‍‌ടി‌പി ടണലിങ്ങിന് വേണ്ടി ഉപയോഗിയ്ക്കുന്ന പോര്‍ട്ട്"
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "ആര്‍ടിഎസ്പി ഓതന്റിക്കേഷന്‍"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "സാധുതയുള്ള ലോഗിന്‍ നാമവും പാസ്വേര്‍ഡും നല്‍കുക."
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr "ആര്‍ടിഎസ്പി ബന്ധം പരാജയപ്പെട്ടു"
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr "സ്ട്രീമിലേക്കുള്ള പ്രവേശനം സെര്‍വര്‍ കോണ്‍ഫിഗറേഷനാല്‍ നിഷേധിക്കപ്പെട്ടു."
 
@@ -12859,7 +12859,7 @@ msgstr "എംപി3 ഫിക്സഡ് പോയിന്റ് ഓഡി�
 msgid "S/PDIF pass-through decoder"
 msgstr "S / PDIF പാസ്-ത്രൂ ഡീകോഡർ"
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -13188,7 +13188,7 @@ msgstr "ടെക്സ്റ്റ് ഉപശീര്‍ഷക ഡീക്�
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1252"
@@ -15313,7 +15313,7 @@ msgstr "എഐഎഫ്എഫഅ ഡീമക്സര്‍"
 msgid "ASF/WMV demuxer"
 msgstr "എഎസ്എഫ്/ഡബ്ല്യുഎംവി ഡീമക്സര്‍"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "എ‌എസ്‌എഫ് സ്ട്രീം ഡിമക്സ് ചെയ്യാന്‍ കഴിഞ്ഞില്ല"
 
@@ -15361,15 +15361,15 @@ msgstr "ഫോര്‍മാറ്റ് നാമം"
 msgid "Internal libavcodec format name"
 msgstr "അകത്തുള്ള ലിബ്എ‌വികൊഡെക് ഘടന പേര്"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "ഇടപ്പിഴഞ്ഞ വഴി നിര്‍ബന്ധിക്കുക"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "സൂചിക നിര്‍മ്മിക്കുന്നത് നിര്‍ബന്ധിക്കുക"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -15377,27 +15377,27 @@ msgstr ""
 "എ‌വി‌ഐ ഫയലുകള്‍ക്ക് വേണ്ടി ഒരു സൂചിക വീണ്ടും നിര്‍മ്മിക്കുക. നിങ്ങളുടെ എ‌വി‌ഐ ഫയല്‍ കേടായതോ "
 "അല്ലെങ്കില്‍ പൂര്‍ണ്ണമല്ലെങ്കില്‍ ഇത് ഉപയോഗിക്കുക (തിരഞ്ഞെടുക്കാന്‍ കഴിയാത്തത്)"
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "നടപടി ആവശ്യപ്പെടുക"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "എപ്പോഴും ഫിക്സ് ചെയ്യുക"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "ഫിക്സ് ചെയ്യരുത്"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "ആവശ്യമുള്ളപ്പോള്‍ ഫിക്സ് ചെയ്യുക"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "എവിഐ ഡീമക്സര്‍"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15412,27 +15412,27 @@ msgstr ""
 "ഈ ഘട്ടത്തിൽ വലിയ ഫയൽ നിർമിക്കലും സമയനഷ്ടവും സംഭവിച്ചേക്കാം \n"
 "നിങ്ങൾ എന്താണ് ചെയ്യാൻ ഉദേശിക്കുന്നത്?"
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "പ്ലേ ചെയ്യരുത്"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "സൂചിക നിര്‍മ്മിച്ചതിന്‍ശേഷം പ്ലേ ചെയ്യുക"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "ഉള്ളതുപോലേ പ്ലേ ചെയ്യുക"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr "സൂചിക കേടാണ് അല്ലെങ്കിൽ കാണുന്നില്ല"
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "പൊട്ടിപ്പോയ അല്ലെങ്കില്‍ നഷ്ട്ടപ്പെട്ട എ‌വി‌ഐ സൂചിക"
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "എവിഐ ഇന്‍ഡെക്സ് ഫിക്സ് ചെയ്യുന്നു..."
 
@@ -15852,27 +15852,27 @@ msgstr "സ്പഷ്ടമായത്"
 msgid "Clean"
 msgstr "വൃത്തിയാക്കുക"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr "M4A ശബ്ദം മാത്രം"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr "ഐട്യൂൺസ് ഓഡിയോ ഫയലുകളിൽ നിന്ന് നോൺ ഓഡിയോ ട്രാക്കുകൾ അവഗണിക്കുക"
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "എം‌പി4 സ്ട്രീം ടിമക്സര്‍"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr "എം‌പി4"
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr "തേടരുത് "
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr "സൂചിക നിർമ്മിക്കുക"
 
@@ -16398,23 +16398,23 @@ msgstr "ഉപശീര്‍ഷക വിവരണം"
 msgid "TTA demuxer"
 msgstr "ടിടിഎ ഡീമക്സര്‍"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr "ടിവൈ"
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "ടി‌വി സ്ട്രീം ഓഡിയോ/വീഡിയോ ടിമാക്സ്"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "അടച്ച ശീര്‍ഷകങ്ങള്‍ 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "അടച്ച ശീര്‍ഷകങ്ങള്‍ 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "അടച്ച ശീര്‍ഷകങ്ങള്‍ 4"
 
@@ -21722,11 +21722,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "അപ്രധാന പിശകും മുന്നറിയിപ്പ് ഡയലോഗുകളും കാണിക്കുക"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "സോഫ്ട്വെയര്‍ മോഡ് സാധ്യമാക്കുക"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -22067,18 +22068,10 @@ msgstr "ചിത്ര ഗാമ 0.01 നും 10 നും ഇടയ്ക്
 msgid "AMD VQ Enhancer"
 msgstr "സ്റ്റീരിയോ എന്‍ഹാന്‍സര്‍"
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 #, fuzzy
 msgid "AMD Frame Rate Doubler"
 msgstr "Fra&me Rate"
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
-msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 #, fuzzy
@@ -23945,7 +23938,7 @@ msgstr "A/52 ഓഡിയോ പാക്കറ്റൈസര്‍"
 msgid "avparser packetizer"
 msgstr "എവിപാര്‍സര്‍ പാക്കറ്റൈസര്‍"
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr "AV1 വീഡിയോ പാക്കറ്റൈസർ"
 

@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-08 12:03+0200\n"
+"POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Симеон Цветков <sicvetkov@uni-sofia.bg>, 2021\n"
 "Language-Team: Bulgarian (https://app.transifex.com/yaron/teams/16553/bg/)\n"
@@ -5234,7 +5234,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Неуспех при отварянето на \"%s\" за запис"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2843
+#: modules/demux/avi/avi.c:2878
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -6473,7 +6473,7 @@ msgstr ""
 msgid "10 bits"
 msgstr ""
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:770
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
 msgstr "Затворени заглавия 1"
 
@@ -7863,19 +7863,19 @@ msgstr "Порт на тунела HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "Порт за тунелиране на RTSP/RTP по HTTP."
 
-#: modules/access/live555.cpp:673
+#: modules/access/live555.cpp:677
 msgid "RTSP authentication"
 msgstr "RTSP достоверност"
 
-#: modules/access/live555.cpp:674
+#: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
 msgstr "Моля, въведете валидно потребителско име и парола"
 
-#: modules/access/live555.cpp:699
+#: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
 msgstr ""
 
-#: modules/access/live555.cpp:700
+#: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
 msgstr ""
 
@@ -12639,7 +12639,7 @@ msgstr ""
 msgid "S/PDIF pass-through decoder"
 msgstr ""
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:907
+#: modules/codec/speex.c:59 modules/codec/speex.c:910
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -12969,7 +12969,7 @@ msgstr ""
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1251"
@@ -15068,7 +15068,7 @@ msgstr "Демултиплексор AIFF "
 msgid "ASF/WMV demuxer"
 msgstr "Демултиплексор ASF/WMV"
 
-#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:834
+#: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
 msgstr "Не може да се демултиплексира ASF потока"
 
@@ -15116,15 +15116,15 @@ msgstr "Име на формата"
 msgid "Internal libavcodec format name"
 msgstr ""
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
 msgstr "Задаване на \"слоев\" режим"
 
-#: modules/demux/avi/avi.c:57
+#: modules/demux/avi/avi.c:58
 msgid "Force index creation"
 msgstr "Повторно създаване на индекса"
 
-#: modules/demux/avi/avi.c:59
+#: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -15132,27 +15132,27 @@ msgstr ""
 "Повторно създаване на индекса за AVI файловете. Използвайте това, ако AVI "
 "файла е повреден или непълен (невъзможен е преход)."
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Ask for action"
 msgstr "Питане за действие"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Always fix"
 msgstr "Винаги да се поправя"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Never fix"
 msgstr "Без поправяне"
 
-#: modules/demux/avi/avi.c:70
+#: modules/demux/avi/avi.c:71
 msgid "Fix when necessary"
 msgstr "Поправи, когато е нужно"
 
-#: modules/demux/avi/avi.c:74
+#: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
 msgstr "Демултиплексор AVI"
 
-#: modules/demux/avi/avi.c:904 modules/demux/mp4/mp4.c:4370
+#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15162,27 +15162,27 @@ msgid ""
 "What do you want to do?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:912
+#: modules/demux/avi/avi.c:918
 msgid "Do not play"
 msgstr "Без възпроизвеждане"
 
-#: modules/demux/avi/avi.c:913
+#: modules/demux/avi/avi.c:919
 msgid "Build index then play"
 msgstr "Създаване на индекса и след това възпроизвеждане"
 
-#: modules/demux/avi/avi.c:914
+#: modules/demux/avi/avi.c:920
 msgid "Play as is"
 msgstr "Възпроизвеждане и спиране"
 
-#: modules/demux/avi/avi.c:915 modules/demux/mp4/mp4.c:4381
+#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
 msgid "Broken or missing Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2844
+#: modules/demux/avi/avi.c:2879
 msgid "Broken or missing AVI Index"
 msgstr "Повреден или липсващ индекс на AVI файла..."
 
-#: modules/demux/avi/avi.c:2845
+#: modules/demux/avi/avi.c:2880
 msgid "Fixing AVI Index..."
 msgstr "Поправяне индекса на AVI..."
 
@@ -15602,27 +15602,27 @@ msgstr ""
 msgid "Clean"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "M4A audio only"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
 msgstr "Демултиплексор на потока MP4"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:58
 msgid "MP4"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:4378
+#: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:4379
+#: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
 msgstr ""
 
@@ -16140,23 +16140,23 @@ msgstr "Описание на субтитри"
 msgid "TTA demuxer"
 msgstr "Демултиплексор TTA"
 
-#: modules/demux/ty.c:60
+#: modules/demux/ty.c:62
 msgid "TY"
 msgstr ""
 
-#: modules/demux/ty.c:61
+#: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
 msgstr "TY поток аудио/видео демултиплексор"
 
-#: modules/demux/ty.c:771
+#: modules/demux/ty.c:784
 msgid "Closed captions 2"
 msgstr "Затворени заглавия 2"
 
-#: modules/demux/ty.c:772
+#: modules/demux/ty.c:785
 msgid "Closed captions 3"
 msgstr "Затворени заглавия 3"
 
-#: modules/demux/ty.c:773
+#: modules/demux/ty.c:786
 msgid "Closed captions 4"
 msgstr "Затворени заглавия 4"
 
@@ -21379,11 +21379,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Показване на незначителни грешки и предупредителни прозорци"
 
 #: modules/gui/qt/qt.cpp:124
-msgid "Applies a dark palette to the style."
-msgstr ""
+#, fuzzy
+msgid "Enable Dark Mode"
+msgstr "Включване на режим мегабас"
 
 #: modules/gui/qt/qt.cpp:125
-msgid "Applies a dark palette to the style. Works best with Fusion style."
+msgid "Applies a dark theme to the style."
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:127
@@ -21713,16 +21714,8 @@ msgstr "Настройка на гамата на изображението, м
 msgid "AMD VQ Enhancer"
 msgstr ""
 
-#: modules/hw/d3d11/d3d11_filters.c:682
-msgid "amf_vqenhancer"
-msgstr ""
-
 #: modules/hw/d3d11/d3d11_filters.c:687
 msgid "AMD Frame Rate Doubler"
-msgstr ""
-
-#: modules/hw/d3d11/d3d11_filters.c:688
-msgid "amf_frc"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
@@ -23537,7 +23530,7 @@ msgstr "Аудио опаковчик A/52"
 msgid "avparser packetizer"
 msgstr ""
 
-#: modules/packetizer/av1.c:582
+#: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
 msgstr ""
 
@@ -28695,8 +28688,9 @@ msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
+#, fuzzy
 msgid "Fingerprinting track..."
-msgstr ""
+msgstr "Източник на аудиото"
 
 #: modules/gui/qt/ui/messages_panel.h:137
 #, fuzzy
@@ -28903,8 +28897,9 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
+#, fuzzy
 msgid "&MPEG-TS"
-msgstr ""
+msgstr "Демултиплекскор MPEG-PS"
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "RAW"
@@ -28956,8 +28951,9 @@ msgid "Menus"
 msgstr "Меню"
 
 #: modules/gui/qt/ui/profiles.h:728
+#, fuzzy
 msgid "Fra&me Rate"
-msgstr ""
+msgstr "Честота на дискретизация"
 
 #: modules/gui/qt/ui/profiles.h:729
 #, fuzzy
@@ -29013,8 +29009,9 @@ msgid "Profile &Name"
 msgstr "Име на профила"
 
 #: modules/gui/qt/ui/sout.h:200
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Изберете \"Допълнителни опции \", за да видите всички опции."
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Destination Setup"
@@ -29061,8 +29058,9 @@ msgid "Option Setup"
 msgstr "Опции"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "Изберете \"Допълнителни опции \", за да видите всички опции."
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Miscellaneous Options"
