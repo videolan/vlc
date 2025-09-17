@@ -284,7 +284,20 @@ QSGTexture *QSGTextureView::removedFromAtlas(QRhiResourceUpdateBatch *batch) con
 void QSGTextureView::commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *resourceUpdates)
 {
     if (m_texture)
+    {
+        if (m_detachFromAtlasPending)
+        {
+            if (isAtlasTexture())
+            {
+                const auto oldTexture = m_texture;
+                if (removedFromAtlas(resourceUpdates))
+                    qDebug() << this << ": Detached" << oldTexture << "from the atlas, and re-targeted to" << m_texture;
+            }
+            m_detachFromAtlasPending = false;
+        }
+
         m_texture->commitTextureOperations(rhi, resourceUpdates);
+    }
 }
 
 bool QSGTextureView::updateTexture()
@@ -306,3 +319,7 @@ bool QSGTextureView::updateTexture()
     return ret;
 }
 
+void QSGTextureView::requestDetachFromAtlas()
+{
+    m_detachFromAtlasPending = true;
+}

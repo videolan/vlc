@@ -30,6 +30,7 @@ class QSGTextureView : public QSGDynamicTexture
     QRect m_rect;
     mutable std::optional<QRectF> m_normalRect;
     mutable bool m_normalRectChanged = false;
+    bool m_detachFromAtlasPending = false;
 
 private slots:
     bool adjustNormalRect() const;
@@ -74,6 +75,9 @@ public:
     void commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *resourceUpdates) override;
 
     bool updateTexture() override;
+
+    // Detaches from atlas (when applicable) upon the next `commitTextureOperations()` call:
+    void requestDetachFromAtlas();
 
 signals:
     void updateRequested();
