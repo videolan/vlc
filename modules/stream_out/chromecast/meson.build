@@ -9,8 +9,11 @@ if protobuf_dep.found()
     # protoc provide compatibility with version x.y now. But version 21.y.z
     # still outputs the previous kind of version naming up until 3.21.12.z
     # included, so the first version with the x.y format is 22.0.
+    # in 3.4.1 protoc reports a version of 3.4.0, before that there were no minor release
     protobuf_version_list = protobuf_dep.version().split('.')
-    if protobuf_dep.version().version_compare('< 3.22.0.0')
+    if protobuf_dep.version().version_compare('< 3.5.0')
+        protoc_version = '@0@.@1@'.format(protobuf_version_list[0], protobuf_version_list[1])
+    elif protobuf_dep.version().version_compare('< 3.22.0.0')
         protoc_version = '@0@.@1@.@2@'.format(
             protobuf_version_list[0],
             protobuf_version_list[1],
