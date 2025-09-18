@@ -1,0 +1,257 @@
+From 9c7d1c1d132aa44369ea349ac1aa55570cf7a073 Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Wed, 17 Sep 2025 13:44:57 +0200
+Subject: [PATCH] WIP: Core: Add operator[] to our bidirectional meta-iterators
+
+It's required by std::random_access_iterator_tag.
+
+-- This shows that our non-const iterators are actually no real
+iterators at all because the QVariantRefs and QVariantPointers they
+produce don't survive further iteration.
+
+Pick-to: 6.10 6.9 6.8
+Task-number: QTBUG-140181
+Change-Id: Icb9c72395ea5c1a26069ac66d969c98fb9a58407
+---
+ src/corelib/kernel/qassociativeiterable.cpp   | 20 +++++
+ src/corelib/kernel/qassociativeiterable.h     |  2 +
+ src/corelib/kernel/qsequentialiterable.cpp    | 18 ++++
+ src/corelib/kernel/qsequentialiterable.h      |  2 +
+ .../corelib/kernel/qvariant/tst_qvariant.cpp  | 88 ++++++++++++++++++-
+ 5 files changed, 126 insertions(+), 4 deletions(-)
+
+diff --git a/src/corelib/kernel/qassociativeiterable.cpp b/src/corelib/kernel/qassociativeiterable.cpp
+index db17c392a2a..6fe69c737d2 100644
+--- a/src/corelib/kernel/qassociativeiterable.cpp
++++ b/src/corelib/kernel/qassociativeiterable.cpp
+@@ -49,6 +49,16 @@ QVariantPointer<QAssociativeIterator> QAssociativeIterator::operator->() const
+     return QVariantPointer<QAssociativeIterator>(this);
+ }
+ 
++/*!
++    Returns the item offset from the current one by \a n, converted to a
++    QVariantRef. The resulting QVariantRef resolves to the mapped value if
++    there is one, or to the key value if not.
++ */
++QVariantRef<QAssociativeIterator> QAssociativeIterator::operator[](qsizetype n) const
++{
++    return *QAssociativeIterator(*this + n);
++}
++
+ /*!
+     Returns the key this iterator points to.
+ */
+@@ -92,6 +102,16 @@ QVariantConstPointer QAssociativeConstIterator::operator->() const
+     return QVariantConstPointer(operator*());
+ }
+ 
++/*!
++    Returns the item offset from the current one by \a n, converted to a
++    QVariant. The return value is the mapped value if there is one, or the key
++    value if not.
++ */
++QVariant QAssociativeConstIterator::operator[](qsizetype n) const
++{
++    return *QAssociativeConstIterator(*this + n);
++}
++
+ /*!
+     \class QAssociativeIterable
+     \since 5.2
+diff --git a/src/corelib/kernel/qassociativeiterable.h b/src/corelib/kernel/qassociativeiterable.h
+index f3963d350ea..e95662cd05c 100644
+--- a/src/corelib/kernel/qassociativeiterable.h
++++ b/src/corelib/kernel/qassociativeiterable.h
+@@ -26,6 +26,7 @@ public:
+ 
+     QVariantRef<QAssociativeIterator> operator*() const;
+     QVariantPointer<QAssociativeIterator> operator->() const;
++    QVariantRef<QAssociativeIterator> operator[](qsizetype n) const;
+ };
+ 
+ class Q_CORE_EXPORT QAssociativeConstIterator : public QConstIterator<QMetaAssociation>
+@@ -45,6 +46,7 @@ public:
+ 
+     QVariant operator*() const;
+     QVariantConstPointer operator->() const;
++    QVariant operator[](qsizetype n) const;
+ };
+ 
+ class Q_CORE_EXPORT QAssociativeIterable : public QIterable<QMetaAssociation>
+diff --git a/src/corelib/kernel/qsequentialiterable.cpp b/src/corelib/kernel/qsequentialiterable.cpp
+index c331f1de631..cdd1e5546b0 100644
+--- a/src/corelib/kernel/qsequentialiterable.cpp
++++ b/src/corelib/kernel/qsequentialiterable.cpp
+@@ -194,6 +194,15 @@ QVariantPointer<QSequentialIterator> QSequentialIterator::operator->() const
+     return QVariantPointer<QSequentialIterator>(this);
+ }
+ 
++/*!
++    Returns the item offset from the current one by \a n,
++    converted to a QVariantRef.
++*/
++QVariantRef<QSequentialIterator> QSequentialIterator::operator[](qsizetype n) const
++{
++    return *QSequentialIterator(*this + n);
++}
++
+ /*!
+     Returns the current item, converted to a QVariant.
+ */
+@@ -212,4 +221,13 @@ QVariantConstPointer QSequentialConstIterator::operator->() const
+     return QVariantConstPointer(operator*());
+ }
+ 
++/*!
++    Returns the item offset from the current one by \a n,
++    converted to a QVariant.
++ */
++QVariant QSequentialConstIterator::operator[](qsizetype n) const
++{
++    return *QSequentialConstIterator(*this + n);
++}
++
+ QT_END_NAMESPACE
+diff --git a/src/corelib/kernel/qsequentialiterable.h b/src/corelib/kernel/qsequentialiterable.h
+index dac146d2ad3..24367f16de0 100644
+--- a/src/corelib/kernel/qsequentialiterable.h
++++ b/src/corelib/kernel/qsequentialiterable.h
+@@ -22,6 +22,7 @@ public:
+ 
+     QVariantRef<QSequentialIterator> operator*() const;
+     QVariantPointer<QSequentialIterator> operator->() const;
++    QVariantRef<QSequentialIterator> operator[](qsizetype n) const;
+ };
+ 
+ class Q_CORE_EXPORT QSequentialConstIterator : public QConstIterator<QMetaSequence>
+@@ -37,6 +38,7 @@ public:
+ 
+     QVariant operator*() const;
+     QVariantConstPointer operator->() const;
++    QVariant operator[](qsizetype n) const;
+ };
+ 
+ class Q_CORE_EXPORT QSequentialIterable : public QIterable<QMetaSequence>
+diff --git a/tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp b/tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp
+index d79e0e82f8a..4d6e450e9d5 100644
+--- a/tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp
++++ b/tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp
+@@ -361,6 +361,7 @@ private slots:
+     void iterateAssociativeContainerElements_data();
+     void iterateAssociativeContainerElements() { runTestFunction(); }
+     void iterateContainerElements();
++    void modifyContainerElements();
+     void pairElements_data();
+     void pairElements() { runTestFunction(); }
+ 
+@@ -5117,8 +5118,12 @@ void tst_QVariant::iterateContainerElements()
+         QSequentialIterable::const_iterator it = iter.begin();
+         QSequentialIterable::const_iterator end = iter.end();
+         QCOMPARE(ints.at(1), *(it + 1));
+-        int i = 0;
+-        for ( ; it != end; ++it, ++i) {
++
++        for (int i = 0, end = ints.size(); i != end; ++i) {
++            QCOMPARE(ints.at(i), it[i]);
++        }
++
++        for (int i = 0; it != end; ++it, ++i) {
+             QCOMPARE(ints.at(i), *it);
+         }
+ 
+@@ -5141,8 +5146,12 @@ void tst_QVariant::iterateContainerElements()
+         QAssociativeIterable::const_iterator it = iter.begin();
+         QAssociativeIterable::const_iterator end = iter.end();
+         QCOMPARE(*(++mapping.begin()), (*(it + 1)).toString());
+-        int i = 0;
+-        for ( ; it != end; ++it, ++i) {
++
++        for (int i = 0, end = mapping.size(); i != end; ++i) {
++            QCOMPARE(*(std::next(mapping.begin(), i)), it[i].toString());
++        }
++
++        for (int i = 0; it != end; ++it, ++i) {
+             QCOMPARE(*(std::next(mapping.begin(), i)), (*it).toString());
+         }
+ 
+@@ -5173,6 +5182,77 @@ void tst_QVariant::iterateContainerElements()
+     }
+ }
+ 
++void tst_QVariant::modifyContainerElements()
++{
++    {
++        QList<int> ints({1, 2, 3});
++        QSequentialIterable iter;
++        QVERIFY(QMetaType::view(
++                    QMetaType::fromType<QList<int>>(), &ints,
++                    QMetaType::fromType<QSequentialIterable>(), &iter));
++        QSequentialIterable::iterator it = iter.mutableBegin();
++        QSequentialIterable::iterator end = iter.mutableEnd();
++
++        *(it + 1) = 4;
++        QCOMPARE(ints.at(1), 4);
++
++        for (int i = 0, end = ints.size(); i != end; ++i) {
++            it[i] = i + 10;
++            QCOMPARE(ints.at(i), i + 10);
++        }
++
++        for (int i = 0; it != end; ++it, ++i) {
++            *it = i + 20;
++            QCOMPARE(ints.at(i), i + 20);
++        }
++
++        it = iter.mutableBegin();
++        QCOMPARE(ints.at(0), 30);
++        QCOMPARE(ints.at(1), 40);
++        QCOMPARE(ints.at(2), 50);
++    }
++
++    {
++        QMap<int, QString> mapping({ {1, "one"}, {2, "two"}, {3, "three"} });
++        QAssociativeIterable iter;
++        QVERIFY(QMetaType::view(
++                    QMetaType::fromType<QMap<int, QString>>(), &mapping,
++                    QMetaType::fromType<QAssociativeIterable>(), &iter));
++        QAssociativeIterable::iterator it = iter.mutableBegin();
++        QAssociativeIterable::iterator end = iter.mutableEnd();
++        (*(it + 1)) = QStringLiteral("four");
++        QCOMPARE(*(++mapping.begin()), "four");
++
++        for (int i = 0, end = mapping.size(); i != end; ++i) {
++            it[i] = QString::number(i);
++            QCOMPARE(*std::next(mapping.begin(), i), QString::number(i));
++        }
++
++        for (int i = 0; it != end; ++it, ++i) {
++            *it = QString::number(i + 10);
++            QCOMPARE(*std::next(mapping.begin(), i), QString::number(i + 10));
++        }
++
++        it = iter.mutableBegin();
++        *(it++) = "one";
++        *(it++) = "two";
++        *(it++) = "three";
++
++        QCOMPARE(mapping, (QMap<int, QString>({ {1, "one"}, {2, "two"}, {3, "three"} })));
++    }
++
++    {
++        QVariantMap container({{"one", 1}});
++        QAssociativeIterable iter;
++        QMetaType::view(
++                    QMetaType::fromType<QVariantMap>(), &container,
++                    QMetaType::fromType<QAssociativeIterable>(), &iter);
++        iter.setValue("one", 5);
++        const auto f = iter.constFind("one");
++        QCOMPARE(*f, QVariant(5));
++    }
++}
++
+ template <typename Pair> static void testVariantPairElements()
+ {
+     QFETCH(std::function<void(void *)>, makeValue);
+-- 
+2.43.0
+
