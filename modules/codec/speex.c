@@ -650,7 +650,11 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 
             p_new_block = block_Alloc( i_bytes_in_speex_frame );
             if( unlikely(p_new_block == NULL) )
+            {
+                if( p_block )
+                    block_Release( p_block );
                 return NULL;
+            }
 
             memset( p_new_block->p_buffer, 0xff, i_bytes_in_speex_frame );
 
@@ -692,6 +696,12 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 
                 *pp_block = p_block;
             }
+            else
+            {
+                if( p_block )
+                    block_Release( p_block );
+            }
+
             speex_bits_reset( &p_sys->bits );
 
             free( p_frame_holder );
