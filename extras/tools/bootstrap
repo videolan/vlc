@@ -137,7 +137,7 @@ check cmake 3.17.0
 check yasm
 check_tar
 check_sed
-check_majmin protoc 3.1.0
+check_majmin protoc 3.4.0
 check ant
 check xz
 check bison 3.0.0
