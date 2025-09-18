@@ -198,6 +198,7 @@ nightly-win64-arm-llvm:
     script:
       - export PATH=/opt/breakpad/bin:$PATH
       - ./extras/package/win32/build.sh -r -l -i u -a $HOST_ARCH -b https://win.crashes.videolan.org $UWP_EXTRA_BUILD_FLAGS
+      - echo "RELEASE_TAG=$RELEASE_TAG"
       - >
         ./extras/breakpad/symb_upload.py
         --upload-url $CRASH_DRAGON_SUBMIT_URL
