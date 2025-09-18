@@ -190,6 +190,7 @@ static const int pi_channels_maps[6] =
  ****************************************************************************/
 
 #define SPEEX_HEADER_SIZE 80 /* Speex manual, table 7.1 */
+#define SPEEX_HEADER_FRAMES_PER_PACKET_OFFSET (SPEEX_HEADER_SIZE - 16)
 #define SPEEX_STRING "Speex   "
 #define SPEEX_STRING_LEN (sizeof(SPEEX_STRING)-1)
 
@@ -418,7 +419,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     return DecodeBlock( p_dec, pp_block );
 }
 
-static int BuildExtradata( es_format_t *fmtout,
+static int BuildExtradata( es_format_t *fmtout, bool b_packetizer,
                            unsigned pi_size[2], const void *pp_data[2] )
 {
     int i_xiph_headers_size;
@@ -429,6 +430,10 @@ static int BuildExtradata( es_format_t *fmtout,
 
     fmtout->i_extra = i_xiph_headers_size;
     fmtout->p_extra = p_xiph_headers;
+
+    /* Patch frames_per_packet */
+    if( b_packetizer )
+        SetDWLE( &((uint8_t *)p_xiph_headers)[2 /* xiph */ + SPEEX_HEADER_FRAMES_PER_PACKET_OFFSET], 1 );
 
     return VLC_SUCCESS;
 }
@@ -506,7 +511,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     ParseSpeexComments( p_dec, &oggpacket );
 
     if( p_sys->b_packetizer )
-        BuildExtradata( &p_dec->fmt_out, pi_size, pp_data );
+        BuildExtradata( &p_dec->fmt_out, true, pi_size, pp_data );
 
     return VLC_SUCCESS;
 }
