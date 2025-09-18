@@ -13,8 +13,8 @@ default:
     interruptible: true
 
 variables:
-    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20221011221351
-    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20221011230137
+    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20221023191128
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20221023193231
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
