@@ -7,7 +7,6 @@ import logging
 import requests
 import io
 import shutil
-import typing
 
 class Dumper:
     def __init__(self, strip_path: str = None):
@@ -144,7 +143,7 @@ class MacDumper(Dumper):
 
 
 class OutputStore:
-    def store(self, dump: typing.io.TextIO, meta):
+    def store(self, dump: io.TextIOBase, meta):
         assert(False)
 
 class HTTPOutputStore(OutputStore):
@@ -157,7 +156,7 @@ class HTTPOutputStore(OutputStore):
         if prod:
             self.extra_args["prod"] = prod
 
-    def store(self, dump: typing.io.TextIO, meta):
+    def store(self, dump: io.TextIOBase, meta):
         post_args = {**meta, **self.extra_args}
         r = requests.post(self.url, post_args, files={"symfile": dump})
         if not r.ok:
@@ -169,7 +168,7 @@ class LocalDirOutputStore(OutputStore):
         super().__init__()
         self.rootdir = rootdir
 
-    def store(self, dump: typing.io, meta):
+    def store(self, dump: io.IOBase, meta):
         basepath = os.path.join(self.rootdir, meta["debug_file"], meta["debug_identifier"])
         if not os.path.exists(basepath):
             os.makedirs(basepath)
