@@ -79,22 +79,29 @@
     if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         _mainButtonsSymbolConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.whiteColor]];
-        NSArray<NSButton *> * const buttons = @[
-            self.playButton,
-            self.backwardButton,
-            self.forwardButton,
-            self.jumpBackwardButton,
-            self.jumpForwardButton,
-            self.bookmarksButton,
-            self.subtitlesButton,
-            self.audioButton,
-            self.videoButton,
-            self.fullscreenButton,
-            self.floatOnTopButton,
-            self.playbackRateButton,
-            self.pipButton,
-            self.muteVolumeButton,
-        ];
+
+        NSMutableArray<NSButton *> * const buttons = [NSMutableArray array];
+
+#define ADD_BUTTON_IF_EXISTS(button) if (button) [buttons addObject:button]
+        
+        // Only add non-nil buttons to avoid crash
+        ADD_BUTTON_IF_EXISTS(self.playButton);
+        ADD_BUTTON_IF_EXISTS(self.backwardButton);
+        ADD_BUTTON_IF_EXISTS(self.forwardButton);
+        ADD_BUTTON_IF_EXISTS(self.jumpBackwardButton);
+        ADD_BUTTON_IF_EXISTS(self.jumpForwardButton);
+        ADD_BUTTON_IF_EXISTS(self.bookmarksButton);
+        ADD_BUTTON_IF_EXISTS(self.subtitlesButton);
+        ADD_BUTTON_IF_EXISTS(self.audioButton);
+        ADD_BUTTON_IF_EXISTS(self.videoButton);
+        ADD_BUTTON_IF_EXISTS(self.fullscreenButton);
+        ADD_BUTTON_IF_EXISTS(self.floatOnTopButton);
+        ADD_BUTTON_IF_EXISTS(self.playbackRateButton);
+        ADD_BUTTON_IF_EXISTS(self.pipButton);
+        ADD_BUTTON_IF_EXISTS(self.muteVolumeButton);
+        
+#undef ADD_BUTTON_IF_EXISTS
+        
         for (NSButton * const button in buttons) {
             button.bordered = YES;
             button.borderShape = NSControlBorderShapeCapsule;
