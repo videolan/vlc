@@ -341,7 +341,9 @@ protobuf: protobuf-$(PROTOBUF_VERSION).tar.gz
 	$(MOVE)
 
 .buildprotoc: protobuf
-	(cd $< && ./configure --prefix="$(PREFIX)" --disable-shared --enable-static --disable-dependency-tracking && $(MAKE) && $(MAKE) install)
+	cd $< && ./configure --prefix="$(PREFIX)" --disable-shared --enable-static --disable-dependency-tracking
+	+$(MAKE) -C $<
+	+$(MAKE) -C $< install
 	(find $(PREFIX) -name 'protobuf*.pc' -exec rm -f {} \;)
 	touch $@
 
