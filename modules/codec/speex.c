@@ -662,6 +662,8 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
                 (char*)p_new_block->p_buffer,
                 (int)i_bytes_in_speex_frame );
 
+            speex_bits_advance( &p_sys->bits, i_bits_in_speex_frame );
+
             /*
              * Move the remaining part of the original packet (subsequent
              * frames, if there are any) into the beginning
@@ -678,25 +680,19 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
                  * the speex terminator code.
                  */
                 i_bytes_in_speex_frame--;
-                speex_bits_write( &p_sys->bits,
-                    (char*)p_block->p_buffer,
-                    p_block->i_buffer - i_bytes_in_speex_frame );
 
-                p_block = block_Realloc( p_block,
-                    0,
-                    p_block->i_buffer-i_bytes_in_speex_frame );
-                if( unlikely(p_block == NULL) )
+                unsigned i=0;
+                for( unsigned towrite = speex_bits_remaining( &p_sys->bits ); towrite; )
                 {
-                    block_Release( p_new_block );
-                    return NULL;
+                    p_block->p_buffer[i++] = speex_bits_unpack_unsigned(&p_sys->bits, 8);
+                    towrite -= __MIN(towrite, 8);
                 }
+
+                p_block->i_buffer -= i_bytes_in_speex_frame;
 
                 *pp_block = p_block;
             }
-            else
-            {
-                speex_bits_reset( &p_sys->bits );
-            }
+            speex_bits_reset( &p_sys->bits );
 
             free( p_frame_holder );
             return SendPacket( p_dec, p_new_block);
