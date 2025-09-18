@@ -3832,15 +3832,24 @@ AS_IF([test -n "$PKG_CONFIG"],[
         dnl silently checks the protoc version matches the protobuf library
         PROTOC_FULL_VERSION="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '//)"
         PROTOC_MAJ_VERSION="$(echo ${PROTOC_FULL_VERSION} | cut -d '.' -f -1)"
-        AS_IF([test "${PROTOC_MAJ_VERSION}" -lt "22" ], [
-            dnl protoc x.y.z is compatible with protobuf x.y.z
-            PROTOBUF_VERSION="$(echo ${PROTOC_FULL_VERSION})"
-            PROTOBUF_TEST="protobuf-lite == ${PROTOBUF_VERSION}"
+        AS_IF([test "${PROTOC_MAJ_VERSION}" -lt "5" ], [
+            dnl protoc x.y.0 is compatible with protobuf x.y.*
+            PROTOBUF_VERSION="$(echo ${PROTOC_FULL_VERSION} | cut -d '.' -f -2)"
+            PROTOBUF_MAX_VERSION="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
+            PROTOBUF_TEST="protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${PROTOBUF_MAX_VERSION}"
         ],[
+          AS_IF([test "${PROTOC_MAJ_VERSION}" -lt "22" ], [
+            dnl protoc x.y.z is compatible with protobuf x.y.z
+            PROTOBUF_VERSION="$(echo ${PROTOC_FULL_VERSION} | cut -d '.' -f -3)"
+            dnl the protoc version is in the x.y.z format but protobuf version is in the x.y.z.r format
+            PROTOBUF_MAX_VERSION="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
+            PROTOBUF_TEST="protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${PROTOBUF_MAX_VERSION}"
+          ],[
             dnl protoc x.y is compatible with protobuf x.y.*
             PROTOBUF_VERSION="$(echo ${PROTOC_FULL_VERSION} | cut -d '.' -f -2)"
             PROTOBUF_MAX_VERSION="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
             PROTOBUF_TEST="protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${PROTOBUF_MAX_VERSION}"
+          ])
         ])
         AC_MSG_CHECKING([protobuf-lite matches ${PROTOC} version ${PROTOBUF_VERSION}])
         ($PKG_CONFIG --exists --print-errors "${PROTOBUF_TEST}") 2>&AS_MESSAGE_FD
