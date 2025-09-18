@@ -191,12 +191,10 @@ config.sub-$(CONFIGSUB_VERSION):
 config.guess: UNPACK_DIR=.
 config.guess: config.guess-$(CONFIGGUESS_VERSION)
 	cp -f $< $@
-	$(APPLY) $(TOOLS)/config.guess-config-add-support-for-arm64_32.patch
 
 config.sub:UNPACK_DIR=.
 config.sub: config.sub-$(CONFIGSUB_VERSION)
 	cp -f $< $@
-	$(APPLY) $(TOOLS)/config.sub-config-add-support-for-arm64_32.patch
 
 .buildconfigguess: config.guess config.sub
 	# install in a dummy autoconf so that VLC contribs pick it
