@@ -1,5 +1,5 @@
 # FRIBIDI
-FRIBIDI_VERSION := 1.0.12
+FRIBIDI_VERSION := 1.0.16
 FRIBIDI_URL := $(GITHUB)/fribidi/fribidi/releases/download/v$(FRIBIDI_VERSION)/fribidi-$(FRIBIDI_VERSION).tar.xz
 
 PKGS += fribidi
