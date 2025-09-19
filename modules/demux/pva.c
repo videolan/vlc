@@ -408,10 +408,14 @@ static void ParsePES( demux_t *p_demux )
     size_t hdr_read = block_ChainExtract( p_pes, hdr, ARRAY_SIZE(hdr) );
 
     /* See §2.4.3.6 of ISO 13818-1 */
-    if( hdr_read < 9 || hdr[0] != 0 || hdr[1] != 0 || hdr[2] != 1 )
-    {
-        msg_Warn( p_demux, "invalid hdr [0x%2.2x:%2.2x:%2.2x:%2.2x]",
-                  hdr[0], hdr[1],hdr[2],hdr[3] );
+    if( hdr_read < 9 ) {
+        msg_Warn( p_demux, "invalid hdr size (%zu)", hdr_read);
+        block_ChainRelease( p_pes );
+        return;
+    }
+    if( hdr[0] != 0 || hdr[1] != 0 || hdr[2] != 1 ) {
+        msg_Warn( p_demux, "invalid hdr [0x%2.2x:%2.2x:%2.2x]",
+                  hdr[0], hdr[1], hdr[2] );
         block_ChainRelease( p_pes );
         return;
     }
