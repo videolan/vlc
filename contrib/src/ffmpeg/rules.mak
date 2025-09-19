@@ -137,7 +137,13 @@ endif
 
 # Darwin
 ifdef HAVE_DARWIN_OS
-FFMPEGCONF += --arch=$(ARCH) --target-os=darwin --extra-cflags="$(CFLAGS)"
+ifeq ($(ARCH),arm64_32)
+# TODO remove when FFMpeg supports arm64_32
+FFMPEGCONF += --arch=aarch64_32
+else
+FFMPEGCONF += --arch=$(ARCH)
+endif
+FFMPEGCONF += --target-os=darwin --extra-cflags="$(CFLAGS)"
 FFMPEGCONF += --disable-lzma
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
