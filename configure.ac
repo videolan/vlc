@@ -4444,7 +4444,7 @@ then
   AS_IF([test "${METALLIB}" = "no"], [
     AC_PATH_PROG(METALLIB, [metallib], [no])
     AS_IF([test "${METALLIB}" = "no"], [
-      AC_MSG_ERROR([metallib was not found, but is required for --enable-macosx])
+      AC_MSG_ERROR([metallib was not found, but is required for --enable-macosx, try xcodebuild -downloadComponent MetalToolchain])
     ])
   ])
 
