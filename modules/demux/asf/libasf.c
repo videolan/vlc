@@ -1287,7 +1287,8 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
         else if( i_type == ASF_METADATA_TYPE_BYTE )
         {
             /* Byte array */
-            static const char hex[16] = "0123456789ABCDEF";
+            static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                                         '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
             p_ec->ppsz_value[i] = malloc( 2*i_size + 1 );
             if( p_ec->ppsz_value[i] )
