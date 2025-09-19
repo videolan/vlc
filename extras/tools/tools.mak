@@ -10,7 +10,7 @@ TARBALLS := $(TOOLS)
 #
 
 ifeq ($(shell command -v curl >/dev/null 2>&1 || echo FAIL),)
-download = curl -f -L -- "$(1)" > "$@.tmp" && touch $@.tmp && mv $@.tmp $@
+download = curl -f -L --retry 3 --output "$@" -- "$(1)"
 else ifeq ($(shell command -v wget >/dev/null 2>&1 || echo FAIL),)
 download = rm -f $@.tmp && \
 	wget --passive -c -p -O $@.tmp "$(1)" && \
