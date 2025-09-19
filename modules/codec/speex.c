@@ -647,7 +647,17 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
                 i_pcm_output_size = 0, i_bits_in_speex_frame = 0;
             block_t *p_new_block = NULL;
 
-            i_pcm_output_size = p_sys->p_header->frame_size * sizeof(short);
+            spx_int32_t frame_size = 0;
+            if( speex_decoder_ctl( p_sys->p_state, SPEEX_GET_FRAME_SIZE, &frame_size ) != 0 ||
+                frame_size <= 0 || (size_t)frame_size > INT_MAX / sizeof(short) )
+            {
+                msg_Warn( p_dec, "Invalid or unknown frame size %d", frame_size );
+                if( p_block )
+                    block_Release( p_block );
+                return NULL;
+            }
+
+            i_pcm_output_size = frame_size * sizeof(short);
 
             /* Alloc/Update our temp buffer if needed */
             void *p_realloc = realloc( p_sys->p_tempbuffer, i_pcm_output_size );
