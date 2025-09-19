@@ -895,6 +895,8 @@ static int OpenCommon(vlc_window_t *wnd, char *display, xcb_connection_t *conn,
         InitKeyboardExtension(wnd);
     else
         sys->xkb.ctx = NULL;
+#else
+    VLC_UNUSED(events);
 #endif
 
     if (InitRandR(wnd) == VLC_SUCCESS) {
