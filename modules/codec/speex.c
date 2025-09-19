@@ -913,13 +913,17 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     if( p_sys->i_frame_in_packet < p_sys->p_header->frames_per_packet )
     {
         block_t *p_aout_buffer;
-        if( p_sys->p_header->frame_size == 0 )
+        spx_int32_t frame_size = 0;
+        if( speex_decoder_ctl( p_sys->p_state, SPEEX_GET_FRAME_SIZE, &frame_size ) != 0 ||
+            frame_size <= 0 || (size_t)frame_size > INT_MAX )
+        {
+            msg_Warn( p_dec, "Invalid or unknown frame size %d", frame_size );
             return NULL;
+        }
 
         if( decoder_UpdateAudioFormat( p_dec ) )
             return NULL;
-        p_aout_buffer =
-            decoder_NewAudioBuffer( p_dec, p_sys->p_header->frame_size );
+        p_aout_buffer = decoder_NewAudioBuffer( p_dec, frame_size );
         if( !p_aout_buffer )
         {
             return NULL;
@@ -943,13 +947,13 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
         if( p_sys->p_header->nb_channels == 2 )
             speex_decode_stereo_int( (int16_t *)p_aout_buffer->p_buffer,
-                                     p_sys->p_header->frame_size,
+                                     frame_size,
                                      &p_sys->stereo );
 
         /* Date management */
         p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
         p_aout_buffer->i_length =
-            date_Increment( &p_sys->end_date, p_sys->p_header->frame_size )
+            date_Increment( &p_sys->end_date, frame_size )
             - p_aout_buffer->i_pts;
 
         p_sys->i_frame_in_packet++;
