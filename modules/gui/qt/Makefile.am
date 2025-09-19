@@ -1361,7 +1361,8 @@ libqt_plugin_la_SHADER := shaders/FadingEdge.frag \
                           shaders/RoundedRectangleShadow_hollow.frag \
                           shaders/VoronoiSnow.frag \
                           shaders/DualKawaseBlur_upsample.frag \
-                          shaders/DualKawaseBlur_downsample.frag
+                          shaders/DualKawaseBlur_downsample.frag \
+                          shaders/DualKawaseBlur_upsample_postprocess.frag
 if ENABLE_QT
 
 libqt_plugin_la_LIBADD += libqml_module_dialogs.a \

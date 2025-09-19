@@ -3,6 +3,7 @@
 // WARNING: This file must be in sync with DualKawaseBlur.frag
 // TODO: Generate this shader at build time.
 #define UPSAMPLE
+#define POSTPROCESS
 
 /*****************************************************************************
  * Copyright (C) 2025 VLC authors and VideoLAN

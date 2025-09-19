@@ -32,6 +32,13 @@ layout(std140, binding = 0) uniform qt_buf {
     vec4 normalRect; // unused, but Qt needs it as it used in first-pass vertex shader for sub-texturing (Qt bug?)
     vec2 sourceTextureSize;
     int radius;
+
+#ifdef POSTPROCESS
+    vec4 tint;
+    float tintStrength;
+    float exclusionStrength;
+    float noiseStrength;
+#endif
 };
 
 layout(binding = 1) uniform sampler2D source;
@@ -53,7 +60,12 @@ vec4 upsample(vec2 uv, vec2 halfpixel)
     sum += fromPremult(texture(source, uv + vec2(halfpixel.x, -halfpixel.y))) * 2.0;
     sum += fromPremult(texture(source, uv + vec2(0.0, -halfpixel.y * 2.0)));
     sum += fromPremult(texture(source, uv + vec2(-halfpixel.x, -halfpixel.y))) * 2.0;
-    return toPremult(sum / 12.0);
+    sum = sum / 12.0;
+#ifdef POSTPROCESS
+    return sum;
+#else
+    return toPremult(sum);
+#endif
 }
 #endif
 
@@ -66,7 +78,12 @@ vec4 downsample(vec2 uv, vec2 halfpixel)
     sum += fromPremult(texture(source, uv + halfpixel.xy));
     sum += fromPremult(texture(source, uv + vec2(halfpixel.x, -halfpixel.y)));
     sum += fromPremult(texture(source, uv - vec2(halfpixel.x, -halfpixel.y)));
-    return toPremult(sum / 8.0);
+    sum = sum / 8.0;
+#ifdef POSTPROCESS
+    return sum;
+#else
+    return toPremult(sum);
+#endif
 }
 #endif
 
@@ -98,5 +115,23 @@ void main()
     //       really important with the blur effect, so maybe it makes sense).
     vec2 halfpixel = (radius - 0.5) / sourceTextureSize;
 
-    fragColor = SAMPLE(uv, halfpixel) * qt_Opacity; // premultiplied alpha
+    vec4 result = SAMPLE(uv, halfpixel);
+
+#ifdef POSTPROCESS
+    // Exclusion:
+    vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
+    result = exclude(result, exclColor);
+
+    // Tint:
+    result = mix(result, fromPremult(tint), tintStrength);
+
+    // Noise:
+    float r = rand(qt_TexCoord0) - 0.5;
+    vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
+    result += noise;
+
+    result = toPremult(result);
+#endif
+
+    fragColor = result * qt_Opacity; // premultiplied alpha
 }
