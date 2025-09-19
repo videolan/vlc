@@ -301,6 +301,10 @@ FocusScope {
 
                         source: textureProviderItem
 
+                        postprocess: true
+                        tint: bgtheme.palette.isDark ? "black" : "white"
+                        tintStrength: 0.5
+
                         Widgets.TextureProviderItem {
                             id: textureProviderItem
 
@@ -312,15 +316,6 @@ FocusScope {
                             // `QSGTextureView` has a workaround for that bug. This is totally
                             // acceptable as there is virtually no overhead.
                             source: cover
-                        }
-
-                        Widgets.FastBlend {
-                            anchors.fill: parent
-
-                            color: Qt.rgba(0.5, 0.5, 0.5, 1.0)
-
-                            mode: bgtheme.palette.isDark ? Widgets.FastBlend.Mode.Multiply // multiply makes darker
-                                                         : Widgets.FastBlend.Mode.Screen // screen (inverse multiply) makes lighter
                         }
 
                         Component.onCompleted: {
