@@ -119,18 +119,18 @@ static int ReadTextChunk( demux_t *p_demux,  uint64_t i_chunk_size, uint32_t i_d
         return VLC_EGENERIC;
 
     static const struct {
-        const char  psz_name[4];
+        const char  chunk_id[4];
         int         i_meta;
     } p_dsc[4] = {
-        { "NAME", vlc_meta_Title },
-        { "AUTH", vlc_meta_Artist },
-        { "(c) ", vlc_meta_Copyright },
-        { "ANNO", vlc_meta_Description }
+        { {'N', 'A', 'M', 'E'}, vlc_meta_Title },
+        { {'A', 'U', 'T', 'H'}, vlc_meta_Artist },
+        { {'(', 'c', ')', ' '}, vlc_meta_Copyright },
+        { {'A', 'N', 'N', 'O'}, vlc_meta_Description }
     };
 
     for( size_t i = 0; i < ARRAY_SIZE( p_dsc ); i++ )
     {
-        if( memcmp(p_peek, p_dsc[i].psz_name, 4) )
+        if( memcmp(p_peek, p_dsc[i].chunk_id, 4) )
             continue;
 
         char *psz_value = malloc( i_data_size + 1 );
