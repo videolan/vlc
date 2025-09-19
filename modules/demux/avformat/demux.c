@@ -1207,7 +1207,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             vlc_meta_t *p_meta = va_arg( args, vlc_meta_t * );
             AVDictionary *dict = p_sys->ic->metadata;
 
-            for( unsigned i = 0; i < sizeof(names) / sizeof(*names); i++)
+            for( unsigned i = 0; i < ARRAY_SIZE(names); i++)
             {
                 AVDictionaryEntry *e = av_dict_get( dict, names[i], NULL, 0 );
                 if( e != NULL && e->value != NULL && IsUTF8(e->value) )
