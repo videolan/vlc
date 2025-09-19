@@ -39,6 +39,16 @@ Item {
         TwoPass // 1 downsample + 1 upsample (1 layer/buffer)
     }
 
+    /// <postprocess>
+    // The following property must be set in order to make other properties respected:
+    property bool postprocess: false
+
+    property alias tint: us2.tint
+    property alias tintStrength: us2.tintStrength
+    property alias noiseStrength: us2.noiseStrength
+    property alias exclusionStrength: us2.exclusionStrength
+    /// </postprocess>
+
     property int configuration: DualKawaseBlur.Configuration.FourPass
 
     // NOTE: This property is also an optimization hint. When it is false, the
@@ -58,7 +68,8 @@ Item {
     //       used even if it is set false here. For that reason, it should not be
     //       necessary to check for opacity (well, accumulated opacity can not be
     //       checked directly in QML anyway).
-    property bool blending: (!sourceTextureIsValid || sourceTextureProviderObserver.hasAlphaChannel)
+    property bool blending: (!sourceTextureIsValid || sourceTextureProviderObserver.hasAlphaChannel ||
+                             (postprocess && (tintStrength > 0.0 && tint.a < 1.0)))
 
     // source must be a texture provider item. Some items such as `Image` and
     // `ShaderEffectSource` are inherently texture provider. Other items needs
@@ -420,7 +431,13 @@ Item {
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
-        fragmentShader: "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
+        property color tint: "transparent"
+        property real tintStrength: 0.0
+        property real noiseStrength: 0.0
+        property real exclusionStrength: 0.0
+
+        fragmentShader: root.postprocess ? "qrc:///shaders/DualKawaseBlur_upsample_postprocess.frag.qsb"
+                                         : "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
 
         supportsAtlasTextures: true
 
