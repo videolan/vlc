@@ -214,6 +214,7 @@ nightly-win64-arm-llvm:
         - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*-release.7z
         - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*.exe
         - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*.msi
+        - $CI_PROJECT_DIR/${VLCARCH}/symbols-*
 
 release-debian:
     extends: .docker-template
