@@ -339,8 +339,10 @@ static int OpenDecoder(vlc_object_t *p_this)
     dec->p_sys = sys;
 
     int i_thread_count = var_InheritInteger(p_this, "vpx-threads");
+    if (i_thread_count <= 0)
+        i_thread_count = vlc_GetCPUCount();
     struct vpx_codec_dec_cfg deccfg = {
-        .threads = i_thread_count ? i_thread_count : __MIN(vlc_GetCPUCount(), 16)
+        .threads = __MIN(i_thread_count, 16)
     };
 
     msg_Dbg(p_this, "VP%d: using libvpx version %s (build options %s)",
