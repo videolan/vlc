@@ -61,6 +61,11 @@
 #define DITHERING_CUTOFF 0.01
 #define DITHERING_STRENGTH 0.01
 
+vec4 exclude(vec4 src, vec4 dst)
+{
+    return src + dst - 2.0 * src * dst;
+}
+
 vec4 fromPremult(vec4 color) {
     vec4 result = vec4(0.0);
     result.rgb = color.rgb / max(1.0/256.0, color.a);
