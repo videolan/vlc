@@ -864,7 +864,6 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
         p_sys->p_header->frame_size ) - p_aout_buffer->i_pts;
 
 
-    p_sys->i_frame_in_packet++;
     block_Release( p_speex_bit_block );
     decoder_QueueAudio( p_dec, p_aout_buffer );
     return VLCDEC_SUCCESS;
