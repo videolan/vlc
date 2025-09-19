@@ -790,7 +790,6 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
         if ( !p_sys->p_state )
         {
             msg_Err( p_dec, "Could not allocate a Speex decoder." );
-            free( p_sys->p_header );
             return VLCDEC_SUCCESS;
         }
 
@@ -811,8 +810,6 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
                                &i_speex_frame_size ) )
         {
             msg_Err( p_dec, "Could not determine the frame size." );
-            speex_decoder_destroy( p_sys->p_state );
-            free( p_sys->p_header );
             return VLCDEC_SUCCESS;
         }
         p_dec->fmt_out.audio.i_bytes_per_frame = i_speex_frame_size;
