@@ -1046,7 +1046,7 @@ static int rtp_packetize_eac3(sout_stream_id_sys_t *id, block_t *in)
     uint_fast8_t frag_count = (in->i_buffer + mtu - 1) / mtu - 1;
     uint8_t frame_type = frag_count > 0;
 
-    for (unsigned int i = 0; i < frag_count; i++) {
+    for (uint_fast8_t i = 0; i < frag_count; i++) {
         bool last = i == (frag_count - 1);
         size_t len = last ? in->i_buffer : mtu;
         block_t *out = block_Alloc(14 + len);
