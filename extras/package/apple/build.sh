@@ -241,7 +241,7 @@ set_host_triplet()
     # Therefore we construct a triplet here without a version number, which
     # will not match the autoconf "guessed" host machine triplet.
     VLC_HOST_TRIPLET="${triplet_arch}-apple-darwin"
-    VLC_HOST_TRIPLET="${VLC_HOST_TRIPLET/arm64/aarch64}"
+    VLC_HOST_TRIPLET="${VLC_HOST_TRIPLET/arm64-/aarch64-}"
 }
 
 # Set the VLC_BUILD_TRIPLET based on the architecture
