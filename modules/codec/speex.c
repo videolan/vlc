@@ -672,7 +672,13 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
             speex_bits_read_from( &p_sys->bits, (char*)p_oggpacket->packet,
                 p_oggpacket->bytes);
             i_bits_before = speex_bits_remaining( &p_sys->bits );
-            speex_decode_int(p_sys->p_state, &p_sys->bits, p_sys->p_tempbuffer);
+            if( speex_decode_int(p_sys->p_state, &p_sys->bits, p_sys->p_tempbuffer) != 0 )
+            {
+                msg_Info( p_dec, "Corrupted packet, discarding" );
+                if( p_block )
+                    block_Release( p_block );
+                return NULL;
+            }
             i_bits_after = speex_bits_remaining( &p_sys->bits );
 
             i_bits_in_speex_frame = i_bits_before - i_bits_after;
