@@ -165,6 +165,7 @@ typedef struct
     SpeexStereoState stereo;
     void *p_state;
     unsigned int rtp_rate;
+    spx_int16_t *p_tempbuffer;
 
     /*
      * Common properties
@@ -210,6 +211,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_sys->b_packetizer = b_packetizer;
     p_sys->rtp_rate = p_dec->fmt_in->audio.i_rate;
     p_sys->b_has_headers = false;
+    p_sys->p_tempbuffer = NULL;
 
     date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 
@@ -638,18 +640,26 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     {
         if ( p_sys->p_header->frames_per_packet > 1 )
         {
-            short *p_frame_holder = NULL;
             int i_bits_before = 0, i_bits_after = 0, i_bytes_in_speex_frame = 0,
                 i_pcm_output_size = 0, i_bits_in_speex_frame = 0;
             block_t *p_new_block = NULL;
 
-            i_pcm_output_size = p_sys->p_header->frame_size;
-            p_frame_holder = (short*)xmalloc( sizeof(short)*i_pcm_output_size );
+            i_pcm_output_size = p_sys->p_header->frame_size * sizeof(short);
+
+            /* Alloc/Update our temp buffer if needed */
+            void *p_realloc = realloc( p_sys->p_tempbuffer, i_pcm_output_size );
+            if( !p_realloc )
+            {
+                if( p_block )
+                    block_Release( p_block );
+                return NULL;
+            }
+            p_sys->p_tempbuffer = p_realloc;
 
             speex_bits_read_from( &p_sys->bits, (char*)p_oggpacket->packet,
                 p_oggpacket->bytes);
             i_bits_before = speex_bits_remaining( &p_sys->bits );
-            speex_decode_int(p_sys->p_state, &p_sys->bits, p_frame_holder);
+            speex_decode_int(p_sys->p_state, &p_sys->bits, p_sys->p_tempbuffer);
             i_bits_after = speex_bits_remaining( &p_sys->bits );
 
             i_bits_in_speex_frame = i_bits_before - i_bits_after;
@@ -713,7 +723,6 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 
             speex_bits_reset( &p_sys->bits );
 
-            free( p_frame_holder );
             return SendPacket( p_dec, p_new_block);
         }
         else
@@ -986,6 +995,8 @@ static void CloseDecoder( vlc_object_t *p_this )
         speex_decoder_destroy( p_sys->p_state );
         speex_bits_destroy( &p_sys->bits );
     }
+
+    free( p_sys->p_tempbuffer );
 
     free( p_sys->p_header );
     free( p_sys );
