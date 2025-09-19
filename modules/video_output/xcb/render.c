@@ -121,6 +121,7 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     unsigned sw = reg->place.width;
     unsigned sh = reg->place.height;
     xcb_rectangle_t rects[] = { { 0, 0, sw, sh }, };
+    VLC_UNUSED(subpic);
 
     xcb_create_pixmap(conn, 32, sys->drawable.subpic, sys->root,
         pic->format.i_width, pic->format.i_height);
@@ -416,8 +417,6 @@ static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
 
 static int Control(vout_display_t *vd, int query)
 {
-    vout_display_sys_t *sys = vd->sys;
-
     switch (query) {
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
