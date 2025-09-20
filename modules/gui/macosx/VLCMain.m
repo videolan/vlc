@@ -272,8 +272,6 @@ static VLCMain *sharedInstance = nil;
 
             if (dayOfYear >= 354)
                 [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"VLC-Xmas"]];
-            else
-                [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"VLC"]];
         }
     }
 
