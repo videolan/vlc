@@ -1,6 +1,6 @@
 # HARFBUZZ
 
-HARFBUZZ_VERSION := 11.4.4
+HARFBUZZ_VERSION := 11.5.0
 HARFBUZZ_URL := $(GITHUB)/harfbuzz/harfbuzz/releases/download/$(HARFBUZZ_VERSION)/harfbuzz-$(HARFBUZZ_VERSION).tar.xz
 PKGS += harfbuzz
 ifeq ($(call need_pkg,"harfbuzz"),)
