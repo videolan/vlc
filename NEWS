@@ -34,7 +34,7 @@ Input:
 
 Interface:
  * Add option to use dark palette (Qt)
- * Add compilation support for Qt6 and newer versions of Qt5
+ * Add compilation support for newer versions of Qt5
 
 Service Discovery:
  * UPnP: remove SAT>IP channel list fallback
