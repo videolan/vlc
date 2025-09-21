@@ -140,7 +140,8 @@ int opus_header_parse(const unsigned char *packet, int len, OpusHeader *h)
     p.pos = 0;
     str[8] = 0;
     if (len<19)return 0;
-    read_chars(&p, (unsigned char*)str, 8);
+    if (!read_chars(&p, (unsigned char*)str, 8))
+        return 0;
     if (memcmp(str, "OpusHead", 8)!=0)
         return 0;
 
