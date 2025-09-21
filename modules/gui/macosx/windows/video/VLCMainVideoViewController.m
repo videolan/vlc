@@ -225,12 +225,23 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         _videoViewBottomToViewConstraint = [self.voutContainingView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor];
         self.videoViewBottomToViewConstraint.active = NO;
 
-        NSVisualEffectView * const controlsBackgroundView = [[NSVisualEffectView alloc] initWithFrame:self.bottomBarView.frame];
-        controlsBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
-        controlsBackgroundView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
-        controlsBackgroundView.material = NSVisualEffectMaterialTitlebar;
-        [self.bottomBarView addSubview:controlsBackgroundView positioned:NSWindowBelow relativeTo:self.bottomBarView.subviews.firstObject];
-        [controlsBackgroundView applyConstraintsToFillSuperview];
+        if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+            NSGlassEffectContainerView * const glassEffectView = [[NSGlassEffectContainerView alloc] initWithFrame:self.bottomBarView.frame];
+            glassEffectView.translatesAutoresizingMaskIntoConstraints = NO;
+            [self.classicViewBottomBarContainerView addSubview:glassEffectView];
+            [glassEffectView applyConstraintsToFillSuperview];
+            [self.bottomBarView removeFromSuperview];
+            glassEffectView.contentView = self.bottomBarView;
+#endif
+        } else {
+            NSVisualEffectView * const controlsBackgroundView = [[NSVisualEffectView alloc] initWithFrame:self.bottomBarView.frame];
+            controlsBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+            controlsBackgroundView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+            controlsBackgroundView.material = NSVisualEffectMaterialTitlebar;
+            [self.bottomBarView addSubview:controlsBackgroundView positioned:NSWindowBelow relativeTo:self.bottomBarView.subviews.firstObject];
+            [controlsBackgroundView applyConstraintsToFillSuperview];
+        }
     }
 }
 

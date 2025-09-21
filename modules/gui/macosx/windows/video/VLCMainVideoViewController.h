@@ -54,6 +54,7 @@ extern NSString * const VLCUseClassicVideoPlayerLayoutKey;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
 @property (readwrite, strong) IBOutlet NSProgressIndicator *loadingIndicator;
 @property (readwrite, strong) IBOutlet NSImageView *floatOnTopIndicatorImageView;
+@property (readwrite, strong) IBOutlet NSView *classicViewBottomBarContainerView;
 
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *playButtonSizeConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *prevButtonSizeConstraint;

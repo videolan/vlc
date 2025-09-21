@@ -10,6 +10,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainVideoViewController">
             <connections>
                 <outlet property="bottomBarView" destination="qsP-dd-T9O" id="TQq-45-V7D"/>
+                <outlet property="classicViewBottomBarContainerView" destination="c6I-1E-UZH" id="jCJ-Xd-CfV"/>
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
                 <outlet property="fakeTitleBar" destination="VIa-0w-fl8" id="EvT-Rx-xF4"/>
                 <outlet property="fakeTitleBarHeightConstraint" destination="amB-S5-eDf" id="NFm-6D-mkF"/>
