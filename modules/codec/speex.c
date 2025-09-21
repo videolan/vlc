@@ -836,6 +836,7 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
             case -2:
                 msg_Err( p_dec, "decoding error: corrupted stream?" );
             case -1: /* End of stream */
+                block_Release( p_aout_buffer );
                 return NULL;
         }
 
