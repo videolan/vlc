@@ -663,7 +663,7 @@ VLC_API void *vlc_threadvar_get(vlc_threadvar_t);
 VLC_API int vlc_clone(vlc_thread_t *th, void *(*entry)(void *),
                       void *data) VLC_USED;
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__COVERITY__)
 static
 VLC_UNUSED_FUNC
 VLC_WARN_CALL("thread name too big")
@@ -815,7 +815,7 @@ VLC_API void vlc_tick_sleep(vlc_tick_t delay);
 #define VLC_HARD_MIN_SLEEP  VLC_TICK_FROM_MS(10)   /* 10 milliseconds = 1 tick at 100Hz */
 #define VLC_SOFT_MIN_SLEEP  VLC_TICK_FROM_SEC(9)   /* 9 seconds */
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__COVERITY__)
 
 /* Linux has 100, 250, 300 or 1000Hz
  *
