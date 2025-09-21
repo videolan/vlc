@@ -780,6 +780,7 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
             (int16_t*)p_aout_buffer->p_buffer );
     if ( i_decode_ret < 0 )
     {
+        block_Release( p_aout_buffer );
         msg_Err( p_dec, "Decoding failed. Perhaps we have a bad stream?" );
         return VLCDEC_SUCCESS;
     }
