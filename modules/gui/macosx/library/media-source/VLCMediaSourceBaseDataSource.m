@@ -151,7 +151,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
-    [self togglePathControlVisibility:!_pathControlContainerView.hidden];
+    [self togglePathControlVisibility:self.childDataSource != nil];
 }
 
 - (void)loadMediaSources
