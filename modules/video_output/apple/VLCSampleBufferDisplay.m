@@ -131,12 +131,8 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
         uint32_t srcHeight = CVPixelBufferGetHeight(pixelBuffer);
         uint32_t dstWidth = rotated ? srcHeight : srcWidth;
         uint32_t dstHeight = rotated ? srcWidth : srcHeight;
-#if defined(TARGET_OS_VISION) && TARGET_OS_VISION
-        const int numValues = 5;
-#else
-        const int numValues = 6;
-#endif
-        CFTypeRef keys[numValues] = {
+
+        CFTypeRef keys[] = {
             kCVPixelBufferPixelFormatTypeKey,
             kCVPixelBufferWidthKey,
             kCVPixelBufferHeightKey,
@@ -149,7 +145,7 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
 #endif
         };
 
-        CFTypeRef values[numValues] = {
+        CFTypeRef values[] = {
             (__bridge CFNumberRef)(@(CVPixelBufferGetPixelFormatType(pixelBuffer))),
             (__bridge CFNumberRef)(@(dstWidth)),
             (__bridge CFNumberRef)(@(dstHeight)),
@@ -159,8 +155,10 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
             kCFBooleanTrue
 #endif
         };
+        _Static_assert(ARRAY_SIZE(keys) == ARRAY_SIZE(values),
+            "Mismatch between keys and values array sizes");
 
-        CFDictionaryRef poolAttr = CFDictionaryCreate(NULL, keys, values, numValues, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        CFDictionaryRef poolAttr = CFDictionaryCreate(NULL, keys, values, ARRAY_SIZE(keys), &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
         OSStatus status = CVPixelBufferPoolCreate(NULL, NULL, poolAttr, &_rotationPool);
         CFRelease(poolAttr);
