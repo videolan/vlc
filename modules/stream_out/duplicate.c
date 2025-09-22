@@ -105,7 +105,7 @@ static bool ESSelected( struct vlc_logger *, const es_format_t *fmt,
  * duplicated stream and select the lowest to forward it to the sink.
  *****************************************************************************/
 
-static void *PCRSelectorAdd( sout_stream_t *stream, 
+static void *PCRSelectorAdd( sout_stream_t *stream,
                              const es_format_t *fmt,
                              const char *es_id )
 {
@@ -161,7 +161,7 @@ static sout_stream_t *PCRSelectorNew( sout_stream_t *parent )
         sout_StreamNew( VLC_OBJECT(parent), "duplicate-pcr-select{}" );
     if( unlikely(selector == NULL) )
         return NULL;
-    
+
     static const struct sout_stream_operations ops = {
         .add = PCRSelectorAdd,
         .del = PCRSelectorDel,
@@ -172,7 +172,7 @@ static sout_stream_t *PCRSelectorNew( sout_stream_t *parent )
     };
     selector->ops = &ops;
     selector->p_sys = parent->p_sys;
-    
+
     return selector;
 }
 
@@ -463,7 +463,7 @@ static int Send( sout_stream_t *p_stream, void *_id, vlc_frame_t *frame )
             vlc_frame_Release( frame );
             return VLC_ENOMEM;
         }
-            
+
         sout_StreamIdSend( dup_id->stream_owner, dup_id->id, to_send );
     }
 
