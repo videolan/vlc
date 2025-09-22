@@ -137,10 +137,10 @@ typedef struct
     int i_chapter, i_chapters;
     int cur_chapter;
     int i_angle, i_angles;
-    
+
     dvd_type_t type;
-    union 
-    { 
+    union
+    {
         /* Video tables */
         struct
         {
@@ -366,7 +366,7 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
 /*Call Backs*/
 static int Open( vlc_object_t *p_this )
 {
-    if( OpenCommon( p_this, DVD_V ) != VLC_SUCCESS ) 
+    if( OpenCommon( p_this, DVD_V ) != VLC_SUCCESS )
     {
         msg_Dbg( p_this, "Trying DVD-Audio as a fallback" );
         return OpenCommon( p_this, DVD_A );
@@ -487,7 +487,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #endif
                 length = dvdtime_to_time( &p_sys->p_cur_pgc->playback_time );
 
-                *va_arg( args, vlc_tick_t * ) = p_sys->i_title_offset * length 
+                *va_arg( args, vlc_tick_t * ) = p_sys->i_title_offset * length
                     / p_sys->i_title_blocks;
                 return VLC_SUCCESS;
             }
@@ -1241,7 +1241,7 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
          */
         msg_Dbg( p_demux, "open ATS %d, for group %d",
                  p_vmg->info_table_second_sector->tracks_info[i_title].group_property, i_title+ 1 );
-    
+
         /* Ifo ats */
         /* reusing p_vts variable for p_ats */
         if( p_sys->p_vts_file != NULL )
@@ -1274,9 +1274,9 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
                  i_title, p_sys->i_ttn,
                  p_sys->i_title_start_block, p_sys->i_title_end_block,
                  p_sys->i_title_blocks );
-                 
+
         /* The structure of DVD-A discs seems to be the following
-         * each ATS IFO-> is a GROUP -> Contains multiple titles, Span across one or more AOBs -> each title contains multiple tracks or "Trackpoints", 
+         * each ATS IFO-> is a GROUP -> Contains multiple titles, Span across one or more AOBs -> each title contains multiple tracks or "Trackpoints",
          *
          * trackpoints are counted as tracks. They have records in the pointer table, and nr_pointer_records will include trackpoints. this is why it is different to nr_tracks*/
 
@@ -1338,7 +1338,7 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
             - p_sys->p_title_table->atsi_track_pointer_rows[0].start_sector;
 
         msg_Dbg(p_demux, "Title Offset: %d", p_sys->i_title_offset);
-        
+
         p_sys->i_pack_len = 0;
         /* current block relative to start of title*/
         p_sys->i_cur_block=p_sys->p_title_table->atsi_track_pointer_rows[i_track].start_sector;
