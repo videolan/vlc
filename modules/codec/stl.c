@@ -478,8 +478,10 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
     int rc = ParseGSI(dec, sys);
-    if (VLC_SUCCESS != rc)
+    if (VLC_SUCCESS != rc) {
+        free(sys);
         return rc;
+    }
 
     for(size_t i=0; i<=STL_GROUPS_MAX; i++)
         sys->groups[i].pp_segment_last = &sys->groups[i].p_segment;
