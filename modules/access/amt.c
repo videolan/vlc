@@ -324,6 +324,9 @@ typedef struct _access_sys_t
     bool tryAMT;
 } access_sys_t;
 
+_Static_assert(sizeof((access_sys_t){0}.glob_ulNonce) == NONCE_LEN,
+    "glob_ulNonce doesn't match expected nonce length");
+
 /* Standard open/close functions */
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
