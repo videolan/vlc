@@ -227,14 +227,13 @@ int CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lcname,
     CFArrayRef matchedFontDescriptions = NULL;
 
     /* we search for family name, display name and name to find them all */
-    const size_t numberOfAttributes = 3;
-    CTFontDescriptorRef coreTextFontDescriptors[numberOfAttributes];
-    CFMutableDictionaryRef coreTextAttributes[numberOfAttributes];
-    CFStringRef attributeNames[numberOfAttributes] = {
+    CFStringRef attributeNames[] = {
         kCTFontFamilyNameAttribute,
         kCTFontDisplayNameAttribute,
         kCTFontNameAttribute,
     };
+    CTFontDescriptorRef coreTextFontDescriptors[ARRAY_SIZE(attributeNames)];
+    CFMutableDictionaryRef coreTextAttributes[ARRAY_SIZE(attributeNames)];
 
 #ifndef NDEBUG
     msg_Dbg(fs->p_obj, "Creating new family for '%s'", psz_lcname);
@@ -243,7 +242,7 @@ int CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lcname,
     CFStringRef familyName = CFStringCreateWithCString(kCFAllocatorDefault,
                                                        psz_lcname,
                                                        kCFStringEncodingUTF8);
-    for (size_t x = 0; x < numberOfAttributes; x++) {
+    for (size_t x = 0; x < ARRAY_SIZE(attributeNames); x++) {
         coreTextAttributes[x] = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
         CFDictionaryAddValue(coreTextAttributes[x], attributeNames[x], familyName);
         coreTextFontDescriptors[x] = CTFontDescriptorCreateWithAttributes(coreTextAttributes[x]);
@@ -251,7 +250,7 @@ int CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lcname,
 
     CFArrayRef coreTextFontDescriptorsArray = CFArrayCreate(kCFAllocatorDefault,
                                                             (const void **)&coreTextFontDescriptors,
-                                                            numberOfAttributes, NULL);
+                                                            ARRAY_SIZE(attributeNames), NULL);
 
     coreTextFontCollection = CTFontCollectionCreateWithFontDescriptors(coreTextFontDescriptorsArray, 0);
     if (coreTextFontCollection == NULL) {
@@ -306,7 +305,7 @@ end:
         CFRelease(coreTextFontCollection);
     }
 
-    for (size_t x = 0; x < numberOfAttributes; x++) {
+    for (size_t x = 0; x < ARRAY_SIZE(attributeNames); x++) {
         CFRelease(coreTextAttributes[x]);
         CFRelease(coreTextFontDescriptors[x]);
     }
