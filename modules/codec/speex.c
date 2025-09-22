@@ -615,6 +615,8 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    speex_bits_reset( &p_sys->bits );
+
     date_Set( &p_sys->end_date, 0 );
 }
 
