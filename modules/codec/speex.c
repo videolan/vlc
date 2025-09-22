@@ -750,6 +750,7 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
     if ( !date_Get( &p_sys->end_date ) )
         date_Set( &p_sys->end_date, p_speex_bit_block->i_dts );
 
+    assert( p_sys->p_header->frame_size > 0 );
     /*
       Ask for a new audio output buffer and make sure
       we get one.
@@ -759,7 +760,7 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
     else
         p_aout_buffer = decoder_NewAudioBuffer( p_dec,
             p_sys->p_header->frame_size );
-    if ( !p_aout_buffer || p_aout_buffer->i_buffer == 0 )
+    if ( !p_aout_buffer )
     {
         msg_Err(p_dec, "Oops: No new buffer was returned!");
         return VLCDEC_SUCCESS;
