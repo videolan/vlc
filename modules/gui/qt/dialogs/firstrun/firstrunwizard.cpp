@@ -188,7 +188,7 @@ void FirstRunWizard::MLaddNewFolder()
     QUrl newEntryPoint = QFileDialog::getExistingDirectoryUrl( this, qtr("Choose a folder to add to the Media Library"),
                                                                QUrl( QDir::homePath() ));
 
-    if( !newEntryPoint.isEmpty() )
+    if( !newEntryPoint.isEmpty() && !mlFoldersEditor->contains( newEntryPoint ) )
         mlFoldersEditor->add( newEntryPoint );
 }
 
@@ -362,7 +362,8 @@ void FirstRunWizard::addDefaults()
         if( folder == nullptr )
             continue;
         auto folderMrl = vlc::wrap_cptr( vlc_path2uri( folder.get(), nullptr ) );
-        mlFoldersEditor->add( QUrl( folderMrl.get() ) );
+        if ( !mlFoldersEditor->contains( QUrl( folderMrl.get() ) ) )
+            mlFoldersEditor->add( QUrl( folderMrl.get() ) );
     }
 
     mlDefaults = true;

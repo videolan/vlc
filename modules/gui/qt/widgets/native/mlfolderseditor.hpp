@@ -41,6 +41,9 @@ public:
     void setMLFoldersModel( MLFoldersBaseModel *foldersModel );
     void add( const QUrl &mrl );
 
+    // verifies if one URL in m_newEntries matches with the argument
+    bool contains(const QUrl &url);
+
     // call 'commit' to apply changes
     void commit();
 
