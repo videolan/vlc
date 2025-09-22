@@ -79,7 +79,7 @@
 
 #ifdef DVDREAD_HAS_DVDAUDIO
 #define SET_AREA( p_demux, title, chapter, angle  ) \
-    (((type) == DVD_A ? DvdAudioReadSetArea : DvdReadSetArea)( p_demux, title, chapter, -1 ))
+    (((p_sys->type) == DVD_A ? DvdAudioReadSetArea : DvdReadSetArea)( p_demux, title, chapter, -1 ))
 #else
 #define SET_AREA( p_demux, title, chapter, angle ) \
     (DvdReadSetArea( p_demux, title, chapter, -1 ))
@@ -443,7 +443,6 @@ static vlc_tick_t dvdtime_to_time( dvd_time_t *dtime )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    dvd_type_t type = p_sys->type;
     double f, *pf;
     bool *pb;
     input_title_t ***ppp_title;
@@ -471,7 +470,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             f = va_arg( args, double );
 
 #ifdef DVDREAD_HAS_DVDAUDIO
-            if ( type == DVD_A )
+            if ( p_sys->type == DVD_A )
                 return DvdAudioReadSeek( p_demux, f * p_sys->i_title_blocks );
             else
 #endif
@@ -482,7 +481,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 vlc_tick_t length;
 #ifdef DVDREAD_HAS_DVDAUDIO
-                if (type == DVD_A )
+                if (p_sys->type == DVD_A )
                         length = FROM_SCALE_NZ( ( uint64_t ) p_sys->p_title_table->length_pts );
                 else
 #endif
@@ -500,7 +499,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 vlc_tick_t length;
 #ifdef DVDREAD_HAS_DVDAUDIO
-                if ( type == DVD_A )
+                if ( p_sys->type == DVD_A )
                     length = FROM_SCALE_NZ( ( uint64_t ) p_sys->p_title_table->length_pts );
                 else
 #endif
@@ -1680,14 +1679,13 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
     VLC_UNUSED( pi_angle );
 
     demux_sys_t *p_sys = p_demux->p_sys;
-    dvd_type_t type = p_sys->type;
     input_title_t *t;
     seekpoint_t *s;
 
     /* Find out number of titles/chapters */
     int32_t i_titles;
 #ifdef DVDREAD_HAS_DVDAUDIO
-    if ( type == DVD_A )
+    if ( p_sys->type == DVD_A )
         i_titles = p_sys->p_vmg_file->info_table_second_sector->nr_of_titles;
     else
 #endif
@@ -1703,7 +1701,7 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
         int j;
 
 #ifdef DVDREAD_HAS_DVDAUDIO
-        if ( type == DVD_A )
+        if ( p_sys->type == DVD_A )
             i_chapters = p_sys->p_vmg_file->info_table_second_sector->tracks_info[i].nr_chapters_in_title;
         else
 #endif
@@ -1714,7 +1712,7 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
         t = vlc_input_title_New();
 
 #ifdef DVDREAD_HAS_DVDAUDIO
-        if ( type == DVD_A )
+        if ( p_sys->type == DVD_A )
             t->i_length = FROM_SCALE_NZ( p_sys->p_vmg_file->
                                         info_table_second_sector->tracks_info[i].len_audio_zone_pts );
 #endif
