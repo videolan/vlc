@@ -279,10 +279,16 @@ static inline size_t vlc_array_count( const vlc_array_t * p_array )
 }
 
 #ifndef __cplusplus
+static inline const void *vlc_array_item_at_index( const vlc_array_t *ar,
+                                                   size_t idx )
+{
+    return ar->pp_elems[idx];
+}
+
 # define vlc_array_item_at_index(ar, idx) \
     _Generic((ar), \
-        const vlc_array_t *: ((ar)->pp_elems[idx]), \
-        vlc_array_t *: ((ar)->pp_elems[idx]))
+        const vlc_array_t *: (vlc_array_item_at_index)(ar, idx), \
+        vlc_array_t *: (void *)(vlc_array_item_at_index)(ar, idx))
 #else
 static inline void *vlc_array_item_at_index( vlc_array_t *ar, size_t idx )
 {
