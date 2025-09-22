@@ -174,6 +174,7 @@ static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
 
 static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t projection)
 {
+    VLC_UNUSED(projection);
     vout_display_sys_t *sys = vd->sys;
     PlacePicture(vd, &sys->place, vd->cfg->display);
     sys->restart_renderer = true;
