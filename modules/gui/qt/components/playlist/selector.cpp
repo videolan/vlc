@@ -424,7 +424,20 @@ PLSelItem * PLSelector::addItem (
       new QTreeWidgetItem( parentItem ) : new QTreeWidgetItem( this );
 
   PLSelItem *selItem = new PLSelItem( item, qtr( str ) );
-  if ( bold ) selItem->setStyleSheet( "font-weight: bold;" );
+
+
+  if ( bold ) {
+      auto updateStyle = [selItem]() {
+          selItem->setStyleSheet( "font-weight: bold;" );
+      };
+      updateStyle();
+//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+#if !HAS_QT57
+      connect(qApp, &QApplication::paletteChanged, selItem, [selItem, updateStyle](){
+          updateStyle();
+      });
+#endif
+  }
   setItemWidget( item, 0, selItem );
   item->setData( 0, TYPE_ROLE, (int)type );
   if( !drop ) item->setFlags( item->flags() & ~Qt::ItemIsDropEnabled );

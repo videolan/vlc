@@ -584,6 +584,9 @@ static void *ThreadPlatform( void *obj, char *platform_name )
     QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
 #endif
+#if HAS_QT57
+    QApplication::setAttribute( Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
+#endif
 
     /* Start the QApplication here */
     QVLCApp app( argc, argv );

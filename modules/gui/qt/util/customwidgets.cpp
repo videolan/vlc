@@ -417,7 +417,8 @@ void QToolButtonExt::clickedSlot()
 YesNoCheckBox::YesNoCheckBox( QWidget *parent ) : QCheckBox( parent )
 {
     setEnabled( false );
-    setStyleSheet("\
+    auto updateStyle = [this]() {
+        setStyleSheet("\
                   QCheckBox::indicator:unchecked:hover,\
                   QCheckBox::indicator:unchecked {\
                       image: url(:/toolbar/clear.svg);\
@@ -427,4 +428,12 @@ YesNoCheckBox::YesNoCheckBox( QWidget *parent ) : QCheckBox( parent )
                       image: url(:/valid.svg);\
                   }\
         ");
+    };
+    updateStyle();
+//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+#if !HAS_QT57
+    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+        updateStyle();
+    });
+#endif
 }

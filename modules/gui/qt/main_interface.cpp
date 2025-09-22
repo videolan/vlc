@@ -574,12 +574,22 @@ inline void MainInterface::createStatusBar()
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
-    timeLabel->setStyleSheet(
+    auto updateStyle = [=]() {
+        timeLabel->setStyleSheet(
             "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
-    speedLabel->setStyleSheet(
+        speedLabel->setStyleSheet(
             "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
-    /* pad both label and its tooltip */
-    nameLabel->setStyleSheet( "padding-left: 5px; padding-right: 5px;" );
+        /* pad both label and its tooltip */
+        nameLabel->setStyleSheet( "padding-left: 5px; padding-right: 5px;" );
+
+    };
+    updateStyle();
+//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+#if !HAS_QT57
+    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+        updateStyle();
+    });
+#endif
 
     /* and adding those */
     statusBarr->addWidget( nameLabel, 8 );

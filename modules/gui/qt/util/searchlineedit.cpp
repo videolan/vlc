@@ -37,6 +37,7 @@
 #include <QRect>
 #include <QStyle>
 #include <QStyleOption>
+#include <QApplication>
 
 #include <vlc_intf_strings.h>
 
@@ -51,16 +52,24 @@ SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 
     CONNECT( clearButton, clicked(), this, clear() );
 
-    int frameWidth = style()->pixelMetric( QStyle::PM_DefaultFrameWidth, 0, this );
-
-    QFontMetrics metrics( font() );
-    QString styleSheet = QString( "min-height: %1px; "
-                                  "padding-top: 1px; "
-                                  "padding-bottom: 1px; "
-                                  "padding-right: %2px;" )
-                                  .arg( metrics.height() + ( 2 * frameWidth ) )
-                                  .arg( clearButton->sizeHint().width() + 6 );
-    setStyleSheet( styleSheet );
+    auto updateStyle = [=]() {
+        int frameWidth = style()->pixelMetric( QStyle::PM_DefaultFrameWidth, 0, this );
+        QFontMetrics metrics( font() );
+        QString styleSheet = QString( "min-height: %1px; "
+                                     "padding-top: 1px; "
+                                     "padding-bottom: 1px; "
+                                     "padding-right: %2px;" )
+                                 .arg( metrics.height() + ( 2 * frameWidth ) )
+                                 .arg( clearButton->sizeHint().width() + 6 );
+        setStyleSheet( styleSheet );
+    };
+    updateStyle();
+//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+#if !HAS_QT57
+    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+        updateStyle();
+    });
+#endif
 
     setMessageVisible( true );
 

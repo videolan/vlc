@@ -48,6 +48,7 @@
 #endif
 
 #define HAS_QT56 ( QT_VERSION >= 0x050600 )
+#define HAS_QT57 ( QT_VERSION >= 0x050700 )
 #define HAS_QT510 ( QT_VERSION >= 0x051000 )
 
 enum {

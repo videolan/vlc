@@ -989,7 +989,19 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     CONNECT( THEMIM->getIM(), remainingTimeChanged( bool ),
               this, setRemainingTime( bool ) );
 
-    setStyleSheet( "QLabel { padding-left: 4px; padding-right: 4px; }" );
+
+    auto updateStyle = [this]() {
+        setStyleSheet( "TimeLabel {  padding-left: 4px; padding-right: 4px; }" );
+    };
+
+    updateStyle();
+
+//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+#if !HAS_QT57
+    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+        updateStyle();
+    });
+#endif
 }
 
 void TimeLabel::setRemainingTime( bool remainingTime )
