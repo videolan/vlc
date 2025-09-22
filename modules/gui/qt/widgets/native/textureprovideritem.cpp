@@ -99,7 +99,7 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
 
         // These are going to be queued when necessary:
         connect(this, &TextureProviderItem::sourceChanged, m_textureProvider, adjustSource);
-        connect(this, &TextureProviderItem::rectChanged, m_textureProvider, &QSGTextureViewProvider::setRect);
+        connect(this, &TextureProviderItem::rectChanged, m_textureProvider, &QSGTextureViewProvider::setRect, Qt::DirectConnection);
 
         connect(this, &TextureProviderItem::filteringChanged, m_textureProvider, &QSGTextureViewProvider::setFiltering);
         connect(this, &TextureProviderItem::mipmapFilteringChanged, m_textureProvider, &QSGTextureViewProvider::setMipmapFiltering);
