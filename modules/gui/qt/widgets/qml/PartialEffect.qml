@@ -41,10 +41,21 @@ Item {
     // Rectangular area where the effect should be applied:
     property alias effectRect: textureProviderItem.effectRect
 
+    // Not mandatory to provide, but when feasible (such as, effect is not
+    // an isolated inner area), provide it for optimization. When not provided,
+    // the source visual is going to cover the whole area, and if source is not
+    // opaque (blending is enabled), the effect part is going to be filtered in
+    // fragment shader, which is more expensive than sub-texturing by means of
+    // this property. That being said, when source is opaque (blending is off),
+    // then providing this may serve no purpose due to early fragment test as
+    // long as the scene graph uses depth buffer (default). For that reason, it
+    // is recommended to provide this only in non-opaque cases (blending is set):
+    property rect sourceVisualRect
+
     property Item effect
     property string samplerName: "source"
 
-    // Enable blending if background of source is not opaque.
+    // Enable blending if source or the effect is not opaque.
     // This comes with a performance penalty.
     property alias blending: sourceProxy.blending
 
@@ -53,14 +64,17 @@ Item {
     ShaderEffect {
         id: sourceProxy
 
-        anchors.fill: parent
+        x: root.sourceVisualRect.x
+        y: root.sourceVisualRect.y
+        width: useSubTexture ? root.sourceVisualRect.width : parent.width
+        height: useSubTexture ? root.sourceVisualRect.height : parent.height
 
         blending: false
 
-        property alias source: root.source
+        readonly property Item source: useSubTexture ? sourceVisualTextureProviderItem : root.source
 
         readonly property rect discardRect: {
-            if (blending)
+            if (blending && !useSubTexture)
                 return Qt.rect(textureProviderItem.x / root.width,
                                textureProviderItem.y / root.height,
                                (textureProviderItem.x + textureProviderItem.width) / root.width,
@@ -69,14 +83,25 @@ Item {
                 return Qt.rect(0, 0, 0, 0)
         }
 
+        readonly property bool useSubTexture: (root.sourceVisualRect.width > 0.0 && root.sourceVisualRect.height > 0.0)
+
+        supportsAtlasTextures: true
+
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
-        // Simple filter that is only enabled when blending is active.
-        // We do not want the source to be rendered below the frosted glass effect.
-        // NOTE: It might be a better idea to enable this at all times if texture sampling
-        //       is costlier than branching.
+        fragmentShader: (discardRect.width > 0.0 && discardRect.height > 0.0) ? "qrc:///shaders/RectFilter.frag.qsb" : ""
 
-        fragmentShader: blending ? "qrc:///shaders/RectFilter.frag.qsb" : ""
+        Widgets.TextureProviderItem {
+            id: sourceVisualTextureProviderItem
+            source: root.source
+
+            // If the effect is in a isolated inner area, filtering is necessary. Otherwise, we can simply
+            // use sub-texturing for the source itself as well (we already use sub-texture for the effect area).
+            textureSubRect: (sourceProxy.useSubTexture) ? Qt.rect(root.sourceVisualRect.x * textureProviderItem.eDPR,
+                                                                  root.sourceVisualRect.y * textureProviderItem.eDPR,
+                                                                  root.sourceVisualRect.width * textureProviderItem.eDPR,
+                                                                  root.sourceVisualRect.height * textureProviderItem.eDPR) : undefined
+        }
     }
 
     // We use texture provider that uses QSGTextureView.
@@ -109,19 +134,6 @@ Item {
             function onIntfDevicePixelRatioChanged() {
                 textureProviderItem.eDPR = MainCtx.effectiveDevicePixelRatio(textureProviderItem.Window.window)
             }
-        }
-
-        onChildrenChanged: {
-            // Do not add visual(QQuickItem) children to this item,
-            // because Qt thinks that it needs to use implicit layering.
-            // "If needed, MultiEffect will internally generate a
-            // ShaderEffectSource as the texture source."
-            // Adding children to a texture provider item is not going
-            // make them rendered in the texture. Instead, simply add
-            // to the source. If source is layered, the source would
-            // be a `ShaderEffectSource`, in that case `sourceItem`
-            // can be used to reach to the real source.
-            console.assert(textureProviderItem.children.length === 0)
         }
 
         // Effect's source is sub-texture through the texture provider:
