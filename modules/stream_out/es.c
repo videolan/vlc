@@ -241,8 +241,8 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     }
 
     p_sys->count_sync += id->synchronous;
-    return id;
     (void)es_id;
+    return id;
 }
 
 static void Del( sout_stream_t *p_stream, void *_id )

@@ -799,8 +799,8 @@ CreateSubBlock(demux_t *demux, struct mock_track *track)
     b->i_buffer = len;
 
     free(text);
-    return b;
     (void) track;
+    return b;
 }
 
 static int

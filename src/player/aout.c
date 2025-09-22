@@ -115,8 +115,8 @@ vlc_player_AoutCallback(vlc_object_t *this, const char *var,
     else
         vlc_assert_unreachable();
 
-    return VLC_SUCCESS;
     (void) this;
+    return VLC_SUCCESS;
 }
 
 float

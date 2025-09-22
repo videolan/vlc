@@ -199,8 +199,8 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
         }
     }
 
-    return VLC_EGENERIC;
     (void)p_stream;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -467,8 +467,8 @@ static int Send( sout_stream_t *p_stream, void *_id, vlc_frame_t *frame )
         sout_StreamIdSend( dup_id->stream_owner, dup_id->id, to_send );
     }
 
-    return VLC_SUCCESS;
     (void)p_stream;
+    return VLC_SUCCESS;
 }
 
 static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )

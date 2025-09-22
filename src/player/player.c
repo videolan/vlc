@@ -1907,8 +1907,8 @@ vlc_player_CorkCallback(vlc_object_t *this, const char *var,
 
     vlc_player_Unlock(player);
 
-    return VLC_SUCCESS;
     (void) this; (void) var;
+    return VLC_SUCCESS;
 }
 
 vlc_object_t *

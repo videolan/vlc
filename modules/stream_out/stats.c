@@ -88,8 +88,8 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     vlc_hash_md5_Init( &id->hash );
 
     msg_Dbg( p_stream, "%s: Adding track type:%s id:%d", p_sys->prefix, id->type, id->id);
-    return id;
     (void)es_id;
+    return id;
 }
 
 static void Del( sout_stream_t *p_stream, void *_id )

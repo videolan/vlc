@@ -203,8 +203,8 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
 error:
     free( id );
-    return NULL;
     (void)es_id;
+    return NULL;
 }
 
 static void Del( sout_stream_t *p_stream, void *id )

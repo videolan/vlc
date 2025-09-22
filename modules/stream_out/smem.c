@@ -289,8 +289,8 @@ Add(sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id)
         id = AddVideo( p_stream, p_fmt );
     else if ( p_fmt->i_cat == AUDIO_ES )
         id = AddAudio( p_stream, p_fmt );
-    return id;
     (void)es_id;
+    return id;
 }
 
 static void *AddVideo( sout_stream_t *p_stream, const es_format_t *p_fmt )

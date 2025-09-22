@@ -291,8 +291,8 @@ static int hls_sub_segmenter_Control(sout_mux_t *mux, int query, va_list args)
         return VLC_ENOTSUP;
 
     *(va_arg(args, bool *)) = false;
-    return VLC_SUCCESS;
     (void)mux;
+    return VLC_SUCCESS;
 }
 
 sout_mux_t *CreateSubtitleSegmenter(sout_access_out_t *access,

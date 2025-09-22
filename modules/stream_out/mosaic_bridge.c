@@ -273,8 +273,8 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
     msg_Dbg( p_stream, "mosaic bridge id=%s pos=%d", p_es->psz_id, i );
 
-    return p_owner;
     (void)es_id;
+    return p_owner;
 }
 
 static void Del( sout_stream_t *p_stream, void *id )
