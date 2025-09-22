@@ -1256,13 +1256,11 @@ static void amt_send_relay_discovery_msg( stream_t *p_access, char *relay_ip )
 static void amt_send_relay_request( stream_t *p_access, char *relay_ip )
 {
     char         chaSendBuffer[AMT_REQUEST_MSG_LEN];
-    uint32_t     ulNonce;
     int          nRet;
     access_sys_t *sys = p_access->p_sys;
 
     memset( chaSendBuffer, 0, sizeof(chaSendBuffer) );
 
-    ulNonce = 0;
     nRet = 0;
 
     /*
@@ -1292,8 +1290,7 @@ static void amt_send_relay_request( stream_t *p_access, char *relay_ip )
     chaSendBuffer[2] = 0;
     chaSendBuffer[3] = 0;
 
-    ulNonce = sys->glob_ulNonce;
-    memcpy( &chaSendBuffer[4], &ulNonce, sizeof(uint32_t) );
+    memcpy( &chaSendBuffer[4], &sys->glob_ulNonce, sizeof(sys->glob_ulNonce) );
 
     nRet = send( sys->sAMT, chaSendBuffer, sizeof(chaSendBuffer), 0 );
 
@@ -1401,7 +1398,6 @@ static int amt_send_mem_update( stream_t *p_access, bool leave)
     int           i_sendBufSize = i_amt_hdr_len + IP_HDR_IGMP_LEN;
     int           i_sendBufSizeIPv6 = i_amt_hdr_len + i_ipv6_hdr_len + MLD_REPORT_LEN;
     char          pSendBuffer[MAC_LEN + NONCE_LEN + AMT_HDR_LEN + IPv6_HOP_BY_HOP_OPTION_LEN + IPv6_FIXED_HDR_LEN + MLD_REPORT_LEN] = { 0 };
-    uint32_t      ulNonce = 0;
     access_sys_t *sys = p_access->p_sys;
 
     pSendBuffer[0] = AMT_MEM_UPD;
@@ -1410,8 +1406,7 @@ static int amt_send_mem_update( stream_t *p_access, bool leave)
     memcpy( &pSendBuffer[2], sys->relay_mem_query_msg.uchaMAC, MAC_LEN );
 
     /* copy nonce */
-    ulNonce = sys->glob_ulNonce;
-    memcpy( &pSendBuffer[8], &ulNonce, NONCE_LEN );
+    memcpy( &pSendBuffer[8], &sys->glob_ulNonce, sizeof(sys->glob_ulNonce) );
 
     if ( sys->mcastGroupAddr.sin.sin_family == AF_INET )
     {
