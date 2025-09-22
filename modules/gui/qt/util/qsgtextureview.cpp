@@ -17,6 +17,10 @@
  *****************************************************************************/
 #include "qsgtextureview.hpp"
 
+#include <QThread>
+#include <QCoreApplication>
+
+
 QSGTextureView::QSGTextureView(QSGTexture *texture)
 {
     setTexture(texture);
@@ -76,6 +80,14 @@ void QSGTextureView::setTexture(QSGTexture *texture)
 
 bool QSGTextureView::adjustNormalRect() const
 {
+    QMutexLocker lock(&m_rectMutex);
+    return adjustNormalRectWithoutLocking();
+}
+
+bool QSGTextureView::adjustNormalRectWithoutLocking() const
+{
+    assert(QThread::currentThread() == m_texture->thread());
+
     if (!m_rect.isValid())
         return false;
 
@@ -104,32 +116,106 @@ bool QSGTextureView::adjustNormalRect() const
 
 QRect QSGTextureView::rect() const
 {
+    QMutexLocker lock(&m_rectMutex);
     return m_rect;
 }
 
 void QSGTextureView::setRect(const QRect &rect)
 {
+    QMutexLocker<QMutex> lock(&m_rectMutex); // WARNING: `::unlock()` is used below.
+
     if (m_rect == rect)
         return;
 
     m_rect = rect;
 
+    const bool threadIsObjectsThread = (QThread::currentThread() == thread());
+
     // We need the source texture in order to calculate the normal rect.
     // If texture is not available when the rect is set, it will be done
     // later in `normalizedTextureSubRect()`.
-    if (m_texture)
+    if (threadIsObjectsThread && m_texture)
     {
         if (m_rect.isValid())
-            adjustNormalRect();
+        {
+            // If current thread is object's thread, we can check `m_texture`
+            // and call `adjustNormalRect()`, which is not thread safe, which
+            // is also the reason we do not need to protect `m_texture` with
+            // the same mutex:
+            adjustNormalRectWithoutLocking();
+        }
         else
+        {
             m_normalRect.reset();
-        emit updateRequested();
+        }
+
+        lock.unlock();
+        emit updateRequested(); // emit the signal when the mutex is not locked
     }
     else
     {
+        // If current thread is not object's thread, we reset the normal
+        // rect and request a queued update. The repeated queued updates
+        // are compressed as per the thread's (the render thread) event
+        // loop in the worst case, and the render loop (per frame) in the
+        // best/expected case. When an update is requested, the subsequent
+        // `normalizedTextureSubRect()` call should calculate the normal
+        // rectangle. `normalizedTextureSubRect()` may also be called
+        // at any arbitrary time without an update request from the view
+        // side by the scene graph renderer, which makes sure that the
+        // up-to-date value of the rectangle is used without any cost,
+        // because the render loop is already throttled by v-sync, it
+        // would just throttle less if it needs to wait for mutex to be
+        // unlocked. Note that the render thread's event loop can
+        // already be tied to frame presentation, where in that case
+        // the best and worst cases do not differ, though this is an
+        // implementation detail of Qt. Regarding render loop updates
+        // (best case), see the "fast-track" note in `::updateRequest()`.
+        // Regarding calling `setRect()` when the render thread locked
+        // the mutex (due to reading) in `normalizedTextureSubRect()`,
+        // then the main/GUI thread would need to wait. However, that
+        // is considered negligible as the normalization calculation
+        // should be really fast, and usually `setRect()` is expected
+        // to be called upon scene graph synchronization anyway (as
+        // that is when the source texture emits `updateRequested()`).
+
         // Invalidate the normal rect, so that it is calculated via
         // `normalizedTextureSubRect()` when there is a texture:
         m_normalRect.reset();
+
+        // We do not request an update if thread is object's thread
+        // because in that case this branch is only taken when there
+        // is no texture, which means update request would be useless:
+        if (!threadIsObjectsThread)
+        {
+            if (!m_pendingUpdateRequestRectChange)
+            {
+                // The compression is essential to not let queued (due to different thread) `updateRequested()`
+                // signals accumulate and backlog the receiver's event loop when `setRect()` is called repeatedly,
+                // such as during resize. Again, the compression here is aggressive for texture update, but we
+                // also request update during `updateTexture()`, which is called per frame hence more relaxed.
+                m_pendingUpdateRequestRectChange = true;
+
+                lock.unlock();
+
+                QMetaObject::invokeMethod(this, [this]() {
+                    bool requestUpdate = false;
+                    if (m_texture)
+                    {
+                        QMutexLocker<QMutex> lock(&m_rectMutex);
+                        if (m_pendingUpdateRequestRectChange)
+                        {
+                            requestUpdate = true;
+                            m_pendingUpdateRequestRectChange = false;
+                        }
+                    }
+                    if (requestUpdate)
+                        emit updateRequested(); // emit the signal when the mutex is not locked
+                    // If there is no texture at the moment, do not signal `updateRequested()`,
+                    // as it is signalled implicitly when there is a texture.
+                }, Qt::QueuedConnection);
+            }
+        }
     }
 }
 
@@ -204,6 +290,7 @@ QRhiTexture *QSGTextureView::rhiTexture() const
 QSize QSGTextureView::textureSize() const
 {
     assert(m_texture);
+    QMutexLocker lock(&m_rectMutex);
     if (m_rect.isNull())
         return m_texture->textureSize();
     else
@@ -226,8 +313,10 @@ QRectF QSGTextureView::normalizedTextureSubRect() const
 {
     assert(m_texture);
 
+    QMutexLocker lock(&m_rectMutex);
+
     if (!m_normalRect.has_value())
-        adjustNormalRect();
+        adjustNormalRectWithoutLocking();
 
     QRectF subRect = m_texture->normalizedTextureSubRect();
 
@@ -304,16 +393,35 @@ bool QSGTextureView::updateTexture()
 {
     bool ret = false;
 
-    if (const auto dynamicTexture = qobject_cast<QSGDynamicTexture*>(m_texture))
+    if (m_texture)
     {
-        if (dynamicTexture->updateTexture())
-            ret = true;
-    }
+        if (const auto dynamicTexture = qobject_cast<QSGDynamicTexture*>(m_texture))
+        {
+            if (dynamicTexture->updateTexture())
+                ret = true;
+        }
 
-    if (m_normalRectChanged)
-    {
-        ret = true;
-        m_normalRectChanged = false;
+        {
+            // We can "fast-track" the request here, essentially relaxing the aggressive render thread's
+            // event loop compression to render loop (per frame) compression:
+            bool requestUpdate = false;
+            {
+                QMutexLocker lock(&m_rectMutex);
+                if (m_pendingUpdateRequestRectChange)
+                {
+                    requestUpdate = true;
+                    m_pendingUpdateRequestRectChange = false;
+                }
+            }
+            if (requestUpdate)
+                emit updateRequested(); // emit the signal when the mutex is not locked
+        }
+
+        if (m_normalRectChanged)
+        {
+            ret = true;
+            m_normalRectChanged = false;
+        }
     }
 
     return ret;

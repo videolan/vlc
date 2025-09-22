@@ -19,6 +19,7 @@
 #define QSGTEXTUREVIEW_HPP
 
 #include <QSGTexture>
+#include <QMutex>
 
 #include <optional>
 
@@ -28,12 +29,15 @@ class QSGTextureView : public QSGDynamicTexture
 
     QPointer<QSGTexture> m_texture;
     QRect m_rect;
+    mutable QMutex m_rectMutex; // protects `m_rect`, `m_normalRect`, and `m_pendingUpdateRequestRectChange`
+    bool m_pendingUpdateRequestRectChange = false;
     mutable std::optional<QRectF> m_normalRect;
     mutable bool m_normalRectChanged = false;
     bool m_detachFromAtlasPending = false;
 
 private slots:
     bool adjustNormalRect() const;
+    bool adjustNormalRectWithoutLocking() const;
 
 public slots:
     // Reset the view texture state to the target texture state.
@@ -57,8 +61,8 @@ public:
     void setTexture(QSGTexture* texture);
 
     // Subtexturing:
-    QRect rect() const;
-    void setRect(const QRect& rect);
+    QRect rect() const; // this method is thread-safe
+    void setRect(const QRect& rect); // this method is thread-safe
 
     qint64 comparisonKey() const override;
     QRhiTexture *rhiTexture() const override;
