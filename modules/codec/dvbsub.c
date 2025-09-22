@@ -1025,7 +1025,7 @@ static void alternative_CLUT( decoder_t *p_dec, bs_t *s, uint16_t i_segment_leng
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint16_t      i_processed_length;
     int           i_id, i_version;
-    dvbsub_clut_t *p_clut, *p_next;
+    dvbsub_clut_t *p_clut;
 
     i_id = bs_read( s, 8 );
     i_version = bs_read( s, 4 );
