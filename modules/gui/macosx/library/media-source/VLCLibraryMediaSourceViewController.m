@@ -76,6 +76,15 @@
     return self;
 }
 
+- (void)dealloc
+{
+    if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+        [self.pathControlGlassEffectView removeFromSuperview];
+#endif
+    }
+}
+
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     NSParameterAssert(libraryWindow);

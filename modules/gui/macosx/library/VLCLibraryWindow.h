@@ -91,8 +91,11 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSScrollView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
 @property (readwrite, weak) IBOutlet VLCLibraryCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
 @property (readwrite, weak) IBOutlet NSView *mediaSourceView;
-@property (readwrite, weak) IBOutlet NSButton *mediaSourceHomeButton;
-@property (readwrite, weak) IBOutlet VLCInputNodePathControl *mediaSourcePathControl;
+// These two media source controls are held strongly due to their handling within the media source view controller.
+// Specifically, we do some custom handling to give them the glass background on macOS 26.0 and later; to avoid deallocation
+// when removing the glass container view from the media source view, we must hold them strongly.
+@property (readwrite, strong) IBOutlet NSButton *mediaSourceHomeButton;
+@property (readwrite, strong) IBOutlet VLCInputNodePathControl *mediaSourcePathControl;
 @property (readwrite, weak) IBOutlet NSVisualEffectView *mediaSourcePathControlVisualEffectView;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *mediaSourceTableView;
