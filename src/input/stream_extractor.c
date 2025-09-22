@@ -392,7 +392,7 @@ stream_extractor_AttachParsed( stream_t** source, const struct mrl_info *mrli )
 
     while( idx < count )
     {
-        char* id = vlc_array_item_at_index( &mrli->identifiers, idx );
+        const char* id = vlc_array_item_at_index( &mrli->identifiers, idx );
 
         if( vlc_stream_extractor_Attach( source, id, NULL,
                                         (char const **) mrli->volumes.pp_elems,
