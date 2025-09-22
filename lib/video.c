@@ -310,11 +310,11 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
 
 libvlc_video_stereo_mode_t libvlc_video_get_video_stereo_mode(libvlc_media_player_t *p_mi)
 {
-    static_assert( libvlc_VideoStereoAuto       == VIDEO_STEREO_OUTPUT_AUTO &&
-                   libvlc_VideoStereoStereo     == VIDEO_STEREO_OUTPUT_STEREO &&
-                   libvlc_VideoStereoLeftEye    == VIDEO_STEREO_OUTPUT_LEFT_ONLY &&
-                   libvlc_VideoStereoRightEye   == VIDEO_STEREO_OUTPUT_RIGHT_ONLY &&
-                   libvlc_VideoStereoSideBySide == VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE,
+    static_assert( libvlc_VideoStereoAuto       == (int)VIDEO_STEREO_OUTPUT_AUTO &&
+                   libvlc_VideoStereoStereo     == (int)VIDEO_STEREO_OUTPUT_STEREO &&
+                   libvlc_VideoStereoLeftEye    == (int)VIDEO_STEREO_OUTPUT_LEFT_ONLY &&
+                   libvlc_VideoStereoRightEye   == (int)VIDEO_STEREO_OUTPUT_RIGHT_ONLY &&
+                   libvlc_VideoStereoSideBySide == (int)VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE,
                    "stereo mode mismatch" );
 
     return var_GetInteger(p_mi, "video-stereo-mode");
