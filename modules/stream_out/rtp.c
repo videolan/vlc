@@ -451,30 +451,26 @@ static int Open( vlc_object_t *p_this )
 
     if ((psz == NULL) || !strcasecmp (psz, "udp"))
         (void)0; /* default */
-    else
-    if (!strcasecmp (psz, "dccp"))
+    else if (!strcasecmp (psz, "dccp"))
     {
         p_sys->proto = IPPROTO_DCCP;
         p_sys->rtcp_mux = true; /* Force RTP/RTCP mux */
     }
 #if 0
-    else
-    if (!strcasecmp (psz, "sctp"))
+    else if (!strcasecmp (psz, "sctp"))
     {
         p_sys->proto = IPPROTO_TCP;
         p_sys->rtcp_mux = true; /* Force RTP/RTCP mux */
     }
 #endif
 #if 0
-    else
-    if (!strcasecmp (psz, "tcp"))
+    else if (!strcasecmp (psz, "tcp"))
     {
         p_sys->proto = IPPROTO_TCP;
         p_sys->rtcp_mux = true; /* Force RTP/RTCP mux */
     }
 #endif
-    else
-    if (!strcasecmp (psz, "udplite") || !strcasecmp (psz, "udp-lite"))
+    else if (!strcasecmp (psz, "udplite") || !strcasecmp (psz, "udp-lite"))
         p_sys->proto = IPPROTO_UDPLITE;
     else
         msg_Warn (p_this, "unknown or unsupported transport protocol \"%s\"",
@@ -1008,11 +1004,9 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char 
         uint16_t i_port = 0;
         if( p_fmt == NULL )
             ;
-        else
-        if( p_fmt->i_cat == AUDIO_ES && p_sys->i_port_audio > 0 )
+        else if( p_fmt->i_cat == AUDIO_ES && p_sys->i_port_audio > 0 )
             i_port = p_sys->i_port_audio;
-        else
-        if( p_fmt->i_cat == VIDEO_ES && p_sys->i_port_video > 0 )
+        else if( p_fmt->i_cat == VIDEO_ES && p_sys->i_port_video > 0 )
             i_port = p_sys->i_port_video;
 
         /* We do not need the ES lock (p_sys->lock_es) here, because
@@ -1095,23 +1089,23 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char 
     }
 
     if( p_fmt != NULL )
-    switch( p_fmt->i_codec )
-    {
-        case VLC_CODEC_MULAW:
-        case VLC_CODEC_ALAW:
-        case VLC_CODEC_U8:
-            rtp_set_ptime (id, 20, 1);
-            break;
-        case VLC_CODEC_S16B:
-        case VLC_CODEC_S16L:
-            rtp_set_ptime (id, 20, 2);
-            break;
-        case VLC_CODEC_S24B:
-            rtp_set_ptime (id, 20, 3);
-            break;
-        default:
-            break;
-    }
+        switch( p_fmt->i_codec )
+        {
+            case VLC_CODEC_MULAW:
+            case VLC_CODEC_ALAW:
+            case VLC_CODEC_U8:
+                rtp_set_ptime (id, 20, 1);
+                break;
+            case VLC_CODEC_S16B:
+            case VLC_CODEC_S16L:
+                rtp_set_ptime (id, 20, 2);
+                break;
+            case VLC_CODEC_S24B:
+                rtp_set_ptime (id, 20, 3);
+                break;
+            default:
+                break;
+        }
 
 #if 0 /* No payload formats sets this at the moment */
     int cscov = -1;
