@@ -66,7 +66,11 @@
     _libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
 
     if (@available(macOS 11.0, *)) {
-        _multifunctionSidebarItem = [NSSplitViewItem inspectorWithViewController:self.multifunctionSidebarViewController];
+        if ([NSSplitViewItem respondsToSelector:@selector(inspectorWithViewController:)]) {
+            _multifunctionSidebarItem = [NSSplitViewItem performSelector:@selector(inspectorWithViewController:) withObject:self.multifunctionSidebarViewController];
+        } else {
+            _multifunctionSidebarItem = [NSSplitViewItem sidebarWithViewController:self.multifunctionSidebarViewController];
+        }
     } else {
         _multifunctionSidebarItem = [NSSplitViewItem sidebarWithViewController:self.multifunctionSidebarViewController];
     }
