@@ -58,6 +58,7 @@
 #include <vlc_block.h>
 #include <vlc_interrupt.h>
 #include <vlc_url.h>
+#include <vlc_rand.h>
 
 #ifdef HAVE_POLL_H
  #include <poll.h>
@@ -1218,13 +1219,11 @@ error:
 static void amt_send_relay_discovery_msg( stream_t *p_access, char *relay_ip )
 {
     char          chaSendBuffer[AMT_DISCO_MSG_LEN];
-    unsigned int  ulNonce;
     ssize_t       nRet;
     access_sys_t *sys = p_access->p_sys;
 
     /* initialize variables */
     memset( chaSendBuffer, 0, sizeof(chaSendBuffer) );
-    ulNonce = 0;
 
     /*
      * create AMT discovery message format
@@ -1239,10 +1238,8 @@ static void amt_send_relay_discovery_msg( stream_t *p_access, char *relay_ip )
     chaSendBuffer[3] = 0;
 
     /* create nonce and copy into send buffer */
-    srand( (unsigned int)time(NULL) );
-    ulNonce = htonl( rand() );
-    memcpy( &chaSendBuffer[4], &ulNonce, sizeof(ulNonce) );
-    sys->glob_ulNonce = ulNonce;
+    vlc_rand_bytes (&sys->glob_ulNonce, sizeof (sys->glob_ulNonce));
+    memcpy( &chaSendBuffer[4], &sys->glob_ulNonce, sizeof(sys->glob_ulNonce) );
 
     /* send it */
     nRet = sendto( sys->sAMT, chaSendBuffer, sizeof(chaSendBuffer), 0, &sys->relayDiscoAddr.sa, sys->relayDiscoAddr.sin.sin_family == AF_INET ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6));
