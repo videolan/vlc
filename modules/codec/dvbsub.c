@@ -1075,7 +1075,7 @@ static void alternative_CLUT( decoder_t *p_dec, bs_t *s, uint16_t i_segment_leng
     bool error = false;
     i_processed_length = 4;
     if (output_bit_depth != DVBSUB_ST_BITDEPTH_8BIT &&
-        output_bit_depth == DVBSUB_ST_BITDEPTH_10BIT)
+        output_bit_depth != DVBSUB_ST_BITDEPTH_10BIT)
     {
         msg_Err( p_dec, "unsupported alternative clut bitdepth: %i", output_bit_depth );
         error = true;
