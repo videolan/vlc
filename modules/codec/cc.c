@@ -1121,7 +1121,7 @@ static void Eia608Strlcat( char *d, const char *s, int i_max )
         d[i_max-1] = '\0';
 }
 
-#define CAT(t) Eia608Strlcat( psz_text, t, i_text_max )
+#define CAT(t) Eia608Strlcat( psz_text, t, ARRAY_SIZE(psz_text) )
 
 static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row )
 {
@@ -1135,8 +1135,7 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row 
     eia608_font_t prev_font = EIA608_FONT_REGULAR;
 
     char utf8[4];
-    const unsigned i_text_max = 4 * EIA608_SCREEN_COLUMNS + 1;
-    char psz_text[i_text_max + 1];
+    char psz_text[(4 * EIA608_SCREEN_COLUMNS + 1) + 1];
     psz_text[0] = '\0';
 
     /* Search the start */
