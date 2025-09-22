@@ -466,9 +466,8 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
      * reinstanciate a lot the scaler, and as we do not support subpel blending
      * it looks ugly (text unaligned).
      */
-    const int i_max_region = 4;
-    rectangle_t region[i_max_region];
-    const int i_region = BuildRegions( region, i_max_region, p_img, p_fmt_dst->i_width, p_fmt_dst->i_height );
+    rectangle_t region[4];
+    const int i_region = BuildRegions( region, ARRAY_SIZE(region), p_img, p_fmt_dst->i_width, p_fmt_dst->i_height );
 
     if( i_region <= 0 )
     {
