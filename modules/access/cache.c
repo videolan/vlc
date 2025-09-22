@@ -53,8 +53,7 @@ vlc_access_cache_entry_New(void *context, const char *url, const char *username,
     entry->username = username ? strdup(username) : NULL;
     if (!entry->url || (entry->username == NULL) != (username == NULL))
     {
-        free(entry->url);
-        free(entry);
+        vlc_access_cache_entry_Delete(entry);
         return NULL;
     }
 
