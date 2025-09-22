@@ -311,7 +311,6 @@ void FirstRunWizard::initializePage( int id )
  * Processes the default options on rejection of the FirstRun Wizard.
  * The default options are:
  * - Yes to metadata
- * - Default folders in the Media Library
  * - System/Auto colour scheme
  * - Modern VLC layout
  */
@@ -329,13 +328,6 @@ void FirstRunWizard::reject()
     config_PutInt( "qt-menubar", 0 );
     config_PutInt( "qt-titlebar", 0 );
     p_intf->p_mi->setPinVideoControls( 0 );
-
-    /* Folders Page settings */
-    if ( mlFoldersEditor )
-    {
-        addDefaults();
-        mlFoldersEditor->commit();
-    }
 
     if( p_intf->p_mi->getMediaLibrary() )
         p_intf->p_mi->getMediaLibrary()->reload();
