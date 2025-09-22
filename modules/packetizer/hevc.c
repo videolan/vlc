@@ -506,7 +506,7 @@ static block_t *GetXPSCopy(decoder_sys_t *p_sys)
     block_t *p_chain = NULL;
     block_t **pp_append = &p_chain;
     struct hevc_tuple_s *xpstype[3] = {p_sys->rg_vps, p_sys->rg_sps, p_sys->rg_pps};
-    size_t xpsmax[3] = {HEVC_VPS_ID_MAX, HEVC_SPS_ID_MAX, HEVC_PPS_ID_MAX};
+    size_t xpsmax[3] = {HEVC_VPS_ID_MAX+1, HEVC_SPS_ID_MAX+1, HEVC_PPS_ID_MAX+1};
     for(size_t i=0; i<3; i++)
     {
         struct hevc_tuple_s *xps = xpstype[i];
