@@ -576,9 +576,9 @@ inline void MainInterface::createStatusBar()
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
     auto updateStyle = [=]() {
         timeLabel->setStyleSheet(
-            "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
+            "QLabel:hover { color: black; background-color: rgba(255, 255, 255, 50%) }" );
         speedLabel->setStyleSheet(
-            "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
+            "QLabel:hover { color: black; background-color: rgba(255, 255, 255, 50%) }" );
         /* pad both label and its tooltip */
         nameLabel->setStyleSheet( "padding-left: 5px; padding-right: 5px;" );
 
