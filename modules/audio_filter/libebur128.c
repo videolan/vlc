@@ -60,10 +60,10 @@ CreateEbuR128State(filter_t *filter, int mode)
         error = ebur128_set_channel(state, 2, EBUR128_LEFT_SURROUND);
         if (error != EBUR128_SUCCESS)
             goto error;
-        ebur128_set_channel(state, 3, EBUR128_RIGHT_SURROUND);
+        error = ebur128_set_channel(state, 3, EBUR128_RIGHT_SURROUND);
         if (error != EBUR128_SUCCESS)
             goto error;
-        ebur128_set_channel(state, 4, EBUR128_CENTER);
+        error = ebur128_set_channel(state, 4, EBUR128_CENTER);
         if (error != EBUR128_SUCCESS)
             goto error;
 
