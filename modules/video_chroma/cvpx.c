@@ -598,6 +598,7 @@ static picture_t *VideoBufferNew(filter_t *filter)
 
 static struct vlc_decoder_device *VideoHoldDevice(vlc_object_t *obj, void *sys)
 {
+    VLC_UNUSED(obj);
     filter_t *cvpx_chain = sys;
     return filter_HoldDecoderDevice(cvpx_chain);
 }
