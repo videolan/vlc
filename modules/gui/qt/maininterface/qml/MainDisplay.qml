@@ -263,6 +263,8 @@ FocusScope {
                                         width,
                                         height - stackView.height)
 
+                    sourceVisualRect: blending ? Qt.rect(0, 0, width, effectRect.y) : Qt.rect(0, 0, 0, 0)
+
                     effect: frostedGlassEffect
 
                     Widgets.FrostedGlassEffect {
