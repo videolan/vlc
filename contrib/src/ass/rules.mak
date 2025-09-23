@@ -13,9 +13,6 @@ endif
 
 ifdef HAVE_ANDROID
 WITH_FONTCONFIG = 0
-ifeq ($(ANDROID_ABI), x86)
-WITH_ASS_ASM = 0
-endif
 else
 ifdef HAVE_DARWIN_OS
 WITH_FONTCONFIG = 0
