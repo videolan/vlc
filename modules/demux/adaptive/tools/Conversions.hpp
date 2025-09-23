@@ -50,16 +50,10 @@ template<typename T> class Integer
     public:
         Integer(const std::string &str)
         {
-            try
-            {
-                std::istringstream in(str);
-                in.imbue(std::locale("C"));
-                in >> value;
-                if (in.fail() || in.bad())
-                    value = 0;
-            } catch (...) {
+            std::istringstream in(str);
+            in.imbue(std::locale("C"));
+            if(!(in >> value))
                 value = 0;
-            }
         }
 
         operator T() const

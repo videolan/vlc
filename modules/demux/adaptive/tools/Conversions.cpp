@@ -107,22 +107,24 @@ UTCTime::UTCTime(const std::string &str)
     try
     {
         /* Date */
-        for(int i=UTCTIME_YEAR;i<=UTCTIME_DAY && !in.eof();i++)
+        for(int i=UTCTIME_YEAR;i<=UTCTIME_DAY && in.good();i++)
         {
             if(i!=UTCTIME_YEAR)
                 in.ignore(1);
-            in >> values[i];
+            if(in.good())
+              in >> values[i];
         }
         /* Time */
         if (!in.eof() && in.peek() == 'T')
         {
-            for(int i=UTCTIME_HOUR;i<=UTCTIME_SEC && !in.eof();i++)
+            for(int i=UTCTIME_HOUR;i<=UTCTIME_SEC && in.good();i++)
             {
                 in.ignore(1);
-                in >> values[i];
+                if(in.good())
+                  in >> values[i];
             }
         }
-        if(!in.eof() && in.peek() == '.')
+        if(in.good() && in.peek() == '.')
         {
             in.ignore(1);
             values[UTCTIME_FRAC_NUM] = 0;
@@ -133,42 +135,46 @@ UTCTime::UTCTime(const std::string &str)
                 values[UTCTIME_FRAC_NUM] = values[UTCTIME_FRAC_NUM] * 10 + (c - '0');
                 values[UTCTIME_FRAC_DEN] *= 10;
                 in.ignore(1);
+                if(!in.good())
+                  break;
                 c = in.peek();
             }
         }
         /* Timezone */
-        if(!in.eof() && in.peek() == 'Z')
+        if(in.good() && in.peek() == 'Z')
         {
             in.ignore(1);
         }
-        else if (!in.eof() && (in.peek() == '+' || in.peek() == '-'))
+        else if (in.good() && (in.peek() == '+' || in.peek() == '-'))
         {
             int sign = (in.peek() == '+') ? 1 : -1;
             int tz = 0;
             in.ignore(1);
 
-            if(!in.eof())
+            if(in.good())
             {
                 std::string tzspec;
                 in >> tzspec;
-
-                if(tzspec.length() >= 4)
+                if(!in.fail())
                 {
+                  if(tzspec.length() >= 4)
+                  {
                     tz = sign * std::stoul(tzspec.substr(0, 2)) * 60;
                     if(tzspec.length() == 5 && tzspec.find(':') == 2)
-                        tz += sign * std::stoul(tzspec.substr(3, 2));
+                      tz += sign * std::stoul(tzspec.substr(3, 2));
                     else
-                        tz += sign * std::stoul(tzspec.substr(2, 2));
-                }
-                else
-                {
+                      tz += sign * std::stoul(tzspec.substr(2, 2));
+                  }
+                  else
+                  {
                     tz = sign * std::stoul(tzspec) * 60;
+                  }
+                  values[UTCTIME_TZ] = tz;
                 }
-                values[UTCTIME_TZ] = tz;
             }
         }
 
-        if (!in.fail() && !in.bad()) {
+        if (!in.fail()) {
             struct tm tm;
 
             tm.tm_year = values[UTCTIME_YEAR] - 1900;
