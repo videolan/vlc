@@ -489,6 +489,7 @@ static musicbrainz_recording_t * GetMusicbrainzInfo( vlc_object_t *obj,
     if( psz_disc_id )
     {
         recording = musicbrainz_lookup_recording_by_discid( &cfg, psz_disc_id );
+        free( psz_disc_id );
     }
     else /* Fuzzy lookup using TOC */
     {
