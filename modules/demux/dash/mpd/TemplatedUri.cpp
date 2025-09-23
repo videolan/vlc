@@ -54,12 +54,15 @@ static std::string::size_type TokenEnd(const std::string &str,
             std::istringstream iss(str.substr(pos + 1, fmtend - pos));
             iss.imbue(std::locale("C"));
             formatwidth = 1; /* %d -> default width = 1 */
-            if(std::isdigit(iss.peek())) /* [n]d */
-                iss >> formatwidth;
-            if (iss.peek() != 'd') /* should be trailing d */
-                return std::string::npos;
-            /* return end of token position */
-            return fmtend;
+            if(iss.good())
+            {
+                if(std::isdigit(iss.peek())) /* [n]d */
+                    iss >> formatwidth;
+                if (iss.fail() || iss.peek() != 'd') /* should be trailing d */
+                    return std::string::npos;
+                /* return end of token position */
+                return fmtend;
+            }
         }
     }
     return std::string::npos;
