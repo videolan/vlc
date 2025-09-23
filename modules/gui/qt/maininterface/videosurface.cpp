@@ -330,12 +330,18 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         disconnect(this, nullptr, m_provider, nullptr);
         disconnect(&m_wheelEventConverter, nullptr, m_provider, nullptr);
         disconnect(m_provider, nullptr, this, nullptr);
+
+        assert(m_provider->videoSurface() == this);
+        m_provider->setVideoSurface({});
     }
 
     m_provider = newVideoSurfaceProvider;
 
     if (m_provider)
     {
+        if (const auto current = m_provider->videoSurface())
+            current->setVideoSurfaceProvider(nullptr); // it is probably not a good idea to break the QML binding here
+
         connect(this, &VideoSurface::mouseMoved, m_provider, &VideoSurfaceProvider::onMouseMoved);
         connect(this, &VideoSurface::mousePressed, m_provider, &VideoSurfaceProvider::onMousePressed);
         connect(this, &VideoSurface::mouseDblClicked, m_provider, &VideoSurfaceProvider::onMouseDoubleClick);
@@ -357,6 +363,9 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         });
 
         connect(&m_wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, m_provider, &VideoSurfaceProvider::onMouseWheeled);
+
+        assert(!m_provider->videoSurface());
+        m_provider->setVideoSurface(this);
 
         setFlag(ItemHasContents, true);
         update(); // this should not be necessary right after setting `ItemHasContents`, but just in case

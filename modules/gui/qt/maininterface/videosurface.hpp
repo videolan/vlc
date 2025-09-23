@@ -34,10 +34,14 @@ extern "C" {
 Q_MOC_INCLUDE( "maininterface/mainctx.hpp")
 
 class MainCtx;
+class VideoSurface;
 
 class VideoSurfaceProvider : public QObject
 {
     Q_OBJECT
+
+    QPointer<VideoSurface> m_videoSurface;
+
 public:
     VideoSurfaceProvider(bool threadedSurfaceUpdates = false, QObject* parent = nullptr);
     virtual ~VideoSurfaceProvider() {}
@@ -48,6 +52,9 @@ public:
 
     void setVideoEmbed(bool embed);
     bool hasVideoEmbed() const;
+
+    QPointer<VideoSurface> videoSurface() { return m_videoSurface; }
+    void setVideoSurface(QPointer<VideoSurface> videoSurface) { m_videoSurface = videoSurface; }
 
     bool supportsThreadedSurfaceUpdates() const { return m_threadedSurfaceUpdates; };
 
