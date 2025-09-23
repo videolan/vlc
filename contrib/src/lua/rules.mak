@@ -1,6 +1,6 @@
 # Lua 5.1
 
-LUA_VERSION := 5.1.4
+LUA_VERSION := 5.1.5
 LUA_URL := http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
 
 # Reverse priority order
