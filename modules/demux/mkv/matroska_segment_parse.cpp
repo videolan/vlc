@@ -1282,7 +1282,10 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                     trans.begin(), trans.end(), &p_translate
                 );
 
-                vars.obj->translations.push_back( p_translate );
+                if (p_translate->isValid())
+                    vars.obj->translations.push_back( p_translate );
+                else
+                    delete p_translate;
             }
             catch(...)
             {
