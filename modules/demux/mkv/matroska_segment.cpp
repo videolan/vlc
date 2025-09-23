@@ -310,7 +310,7 @@ bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *
                           // the SimpleTag is valid if ParseSimpleTags returns `true`
 
             if (vars.obj->ParseSimpleTags( &st, &simple, vars.target_type ))
-              vars.out.sub_tags.push_back( st );
+              vars.out.sub_tags.push_back( std::move(st) );
         }
     };
     SimpleTagHandler::Dispatcher().iterate( tag->begin(), tag->end(), &payload );
@@ -421,7 +421,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags_ )
                     SimpleTag simple;
 
                     if (vars.obj->ParseSimpleTags( &simple, &entry, vars.target_type ))
-                        vars.tag.simple_tags.push_back( simple );
+                        vars.tag.simple_tags.push_back( std::move(simple) );
                 }
                 E_CASE_DEFAULT( el )
                 {
@@ -430,7 +430,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags_ )
             };
 
             TagHandler::Dispatcher().iterate( entry.begin(), entry.end(), &payload );
-            vars.obj->tags.push_back(tag);
+            vars.obj->tags.push_back(std::move(tag));
         }
         E_CASE_DEFAULT( el )
         {
