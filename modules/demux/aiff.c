@@ -114,6 +114,9 @@ static int ReadTextChunk( demux_t *p_demux,  uint64_t i_chunk_size, uint32_t i_d
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint8_t *p_peek;
 
+    if ( i_data_size >= SIZE_MAX )
+        return VLC_ENOMEM;
+
     ssize_t ret = vlc_stream_Peek( p_demux->s, &p_peek, i_chunk_size );
     if( ret == -1 || (size_t) ret != i_chunk_size )
         return VLC_EGENERIC;
