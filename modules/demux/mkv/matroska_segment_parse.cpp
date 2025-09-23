@@ -1078,6 +1078,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 }
                 E_CASE( KaxChapterTranslateID, translated_id )
                 {
+                    delete vars->p_translated;
                     vars->p_translated = new KaxChapterTranslateID( translated_id );
                 }
             };
