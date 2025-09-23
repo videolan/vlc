@@ -7,6 +7,10 @@ ifeq ($(call need_pkg,"libass"),)
 PKGS_FOUND += ass
 endif
 
+ifneq ($(filter aarch64 i386 x86_64, $(ARCH)),)
+WITH_ASS_ASM = 1
+endif
+
 ifdef HAVE_ANDROID
 WITH_FONTCONFIG = 0
 ifeq ($(ANDROID_ABI), x86)
