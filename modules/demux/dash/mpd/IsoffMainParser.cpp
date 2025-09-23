@@ -112,7 +112,7 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     mpd->b_needsUpdates = false;
 
-    for(auto attr: attributes)
+    for(auto & attr: attributes)
     {
         if(attr.name == "mediaPresentationDuration")
         {

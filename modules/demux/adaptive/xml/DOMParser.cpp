@@ -183,7 +183,7 @@ void    DOMParser::print                    (Node *node, int offset)
 
     const Node::Attributes &attributes = node->getAttributes();
 
-    for(auto attr : attributes)
+    for(auto & attr : attributes)
         msg_Dbg(this->stream, " %s=%s", attr.name.c_str(), attr.value.c_str());
 
     msg_Dbg(this->stream, "\n");
