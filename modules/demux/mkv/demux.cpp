@@ -242,6 +242,7 @@ bool demux_sys_t::PreloadLinked()
                                     if ( st.tag_name == "TITLE" )
                                     {
                                         msg_Dbg( &demuxer, "Using title \"%s\" from tag for edition %" PRIu64, st.value.c_str (), i_ed_uid );
+                                        free(p_title->psz_name);
                                         p_title->psz_name = strdup( st.value.c_str () );
                                         break;
                                     }
