@@ -604,7 +604,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                 {
                     if(tag->getAttributeByName(typecat.type))
                     {
-                        for(auto codec : entry.codecs)
+                        for(auto & codec : entry.codecs)
                         {
                             if(codec.cat == typecat.cat)
                             {
@@ -732,7 +732,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                     auto groupmapit = groupsmap.find(mediainfo.group);
                     if(groupmapit != groupsmap.end())
                     {
-                        for(auto p : (*groupmapit).second)
+                        for(auto & p : (*groupmapit).second)
                         {
                             FormatNamespace fns(p.first);
                             for(auto typecat : typescats)
