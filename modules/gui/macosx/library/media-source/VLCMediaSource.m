@@ -466,7 +466,7 @@ static const char *const myFoldersDescription = "My Folders";
             [url getResourceValue:&isInternal forKey:NSURLVolumeIsInternalKey error:nil];
             [url getResourceValue:&isLocal forKey:NSURLVolumeIsLocalKey error:nil];
             
-            const enum input_item_type_e inputType = isDirectory.boolValue ? isEjectable.boolValue ? ITEM_TYPE_DISC : ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
+            const enum input_item_type_e inputType = isDirectory.boolValue ? (isVolume.boolValue && isEjectable.boolValue) ? ITEM_TYPE_DISC : ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
             const enum input_item_net_type netType = isLocal.boolValue ? ITEM_LOCAL : ITEM_NET;
 
             const char * const psz_filename = url.absoluteString.UTF8String;
