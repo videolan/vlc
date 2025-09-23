@@ -34,8 +34,8 @@ Item {
 
     property bool playCoverShowPlay: true
 
-    readonly property real effectiveRadius: image.visible ? image.effectiveRadius
-                                                          : (fallbackImage.visible ? fallbackImage.effectiveRadius
+    readonly property real effectiveRadius: fallbackImage.visible ? fallbackImage.effectiveRadius
+                                                                  : (image.visible ? image.effectiveRadius
                                                                                    : 0.0)
 
     readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
