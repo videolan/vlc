@@ -1,5 +1,5 @@
 # ASS
-ASS_VERSION := 0.17.3
+ASS_VERSION := 0.17.4
 ASS_URL := $(GITHUB)/libass/libass/releases/download/$(ASS_VERSION)/libass-$(ASS_VERSION).tar.gz
 
 PKGS += ass
@@ -37,9 +37,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
-	$(APPLY) $(SRC)/ass/0001-aarch64-Set-the-right-intended-alignment-for-constan.patch
 	$(UPDATE_AUTOCONFIG)
-	$(APPLY) $(SRC)/ass/0001-aarch64-Set-the-right-intended-alignment-for-constan.patch
 	$(call pkg_static,"libass.pc.in")
 	$(MOVE)
 
