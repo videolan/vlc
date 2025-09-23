@@ -437,7 +437,7 @@ SegmentSeeker::mark_range_as_searched( Range data )
             merged.push_back( *it );
         }
 
-        _ranges_searched = merged;
+        _ranges_searched = std::move(merged);
     }
 }
 
