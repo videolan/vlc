@@ -253,15 +253,43 @@ FocusScope {
                                (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
                                (miniPlayer.visible || (loaderProgress.active && loaderProgress.item.visible))
 
+                // Blurring requires to access neighbour pixels, thus the source texture should be bigger than
+                // the effect so that the effect have access to the neighbor pixels for the pixels near the
+                // border, where the extra size would depend on the blur configuration. When the source is
+                // static, this problem is harder to notice, but when the source is not static, such as
+                // during scrolling, not considering this causes glitches in the bottom side. `PartialEffect`,
+                // since 03b0de26, already provides the effect the whole source texture with a proper sub-rect,
+                // so the effect here can sample the top edge neighbour pixels, but for the bottom edge we
+                // need to configure the layer:
+                readonly property int bottomExtension: 16
+                layer.sourceRect: Qt.rect(0, 0, width, height + bottomExtension)
+
+                Rectangle {
+                    // Extension of parent rectangle for the bottom extension.
+                    anchors.top: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: stackViewParent.bottomExtension
+                    visible: stackViewParent.layer.enabled && (height > 0)
+                    color: parent.color
+                }
+
                 layer.effect: Widgets.PartialEffect {
                     id: stackViewParentLayerEffect
 
+                    // Setting `height` does not seem to work here. Anchoring the effect is not very nice, but it works:
+                    anchors.fill: parent
+                    anchors.bottomMargin: -stackViewParent.bottomExtension
+
                     blending: stackViewParent.color.a < (1.0 - Number.EPSILON)
 
+                    // Each pass of the blur effect also suffers from the border neighbour pixel issue mentioned
+                    // above, making all the borders problematic, to a less considerable extent. For that reason,
+                    // we extend both the top and the bottom edges and use viewport to prevent overdraw:
                     effectRect: Qt.rect(0,
-                                        stackView.height,
+                                        stackView.height - stackViewParent.bottomExtension,
                                         width,
-                                        height - stackView.height)
+                                        height - stackView.height + stackViewParent.bottomExtension)
 
                     sourceVisualRect: blending ? Qt.rect(0, 0, width, effectRect.y) : Qt.rect(0, 0, 0, 0)
 
@@ -277,6 +305,12 @@ FocusScope {
                         }
 
                         tint: frostedTheme.bg.secondary
+
+                        // Prevent overdraw (the extension margin should not be painted):
+                        viewportRect: Qt.rect(0,
+                                              stackViewParent.bottomExtension,
+                                              width,
+                                              height - (2 * stackViewParent.bottomExtension))
                     }
                 }
 
