@@ -315,7 +315,7 @@ bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *
                               // the SimpleTag is valid if ParseSimpleTags returns `true`
 
                 if (ParseSimpleTags( &st, kts_ptr, target_type )) {
-                  pout_simple->sub_tags.push_back( st );
+                  pout_simple->sub_tags.push_back( std::move(st) );
                 }
             }
             /*TODO Handle binary tags*/
@@ -439,7 +439,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                     SimpleTag simple;
 
                     if (ParseSimpleTags(&simple, kts_ptr, target_type )) {
-                      tag.simple_tags.push_back( simple );
+                      tag.simple_tags.push_back( std::move(simple) );
                     }
                 }
                 else
@@ -448,7 +448,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                 }
             }
             eparser.Up();
-            this->tags.push_back(tag);
+            this->tags.push_back(std::move(tag));
         }
         else
         {
