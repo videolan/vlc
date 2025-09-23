@@ -29,6 +29,7 @@
 #include "mkv.hpp"
 
 #include <optional>
+#include <limits>
 
 namespace mkv {
 
@@ -36,12 +37,18 @@ class chapter_translation_c
 {
 public:
     chapter_translation_c()
-        :p_translated(NULL)
+        :p_translated(nullptr)
+        ,codec_id(std::numeric_limits<unsigned int>::max())
     {}
 
     ~chapter_translation_c()
     {
         delete p_translated;
+    }
+
+    constexpr bool isValid() const {
+        return p_translated != nullptr &&
+               codec_id != std::numeric_limits<unsigned int>::max();
     }
 
     KaxChapterTranslateID  *p_translated;
