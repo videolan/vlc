@@ -675,9 +675,6 @@ static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
                 const char *track_artist = cddb_track_get_artist(t);
                 if (NONEMPTY(track_artist))
                 {
-                    if (str == NULL)
-                        str = track_artist;
-                    else
                     if (strcmp(str, track_artist))
                     {
                         str = NULL;
