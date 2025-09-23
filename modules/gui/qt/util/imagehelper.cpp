@@ -31,6 +31,7 @@
 #include <QImageIOHandler>
 #include <QPluginLoader>
 #include <QFile>
+#include <QThread>
 #include "imagehelper.hpp"
 
 
@@ -75,22 +76,32 @@ QPixmap ImageHelper::loadSvgToPixmap( const QString &path, qint32 i_width, qint3
 
 QImageIOHandler *ImageHelper::createSvgImageIOHandler()
 {
-    static const auto plugin = []() -> QPointer<QImageIOPlugin> {
-#ifdef QT_STATIC
-        const auto& staticPlugins = QPluginLoader::staticInstances();
-        const auto it = std::find_if(staticPlugins.begin(), staticPlugins.end(), [](QObject *obj) -> bool {
-            return obj->inherits("QSvgPlugin");
-        });
+    static const auto plugin = []() {
+        QPointer<QImageIOPlugin> plugin;
 
-        if (it != staticPlugins.end())
-            return qobject_cast<QImageIOPlugin*>(*it);
-        else
-            return nullptr;
+        const auto retrieve = [&plugin]() {
+#ifdef QT_STATIC
+            const auto& staticPlugins = QPluginLoader::staticInstances();
+            const auto it = std::find_if(staticPlugins.begin(), staticPlugins.end(), [](QObject *obj) -> bool {
+                return obj->inherits("QSvgPlugin");
+            });
+
+            if (it != staticPlugins.end())
+                plugin = qobject_cast<QImageIOPlugin*>(*it);
 #else
-        QPluginLoader loader(QStringLiteral("imageformats/qsvg")); // Official Qt plugin
-        // No need to check the metadata (or inherits `QSvgPlugin`), a plugin named "qsvg" should already support svg.
-        return qobject_cast<QImageIOPlugin*>(loader.instance());
+            QPluginLoader loader(QStringLiteral("imageformats/qsvg")); // Official Qt plugin
+            // No need to check the metadata (or inherits `QSvgPlugin`), a plugin named "qsvg" should already support svg.
+            plugin = qobject_cast<QImageIOPlugin*>(loader.instance());
 #endif
+        };
+
+        assert(qApp); // do not call before QApplication is constructed.
+        if (QThread::currentThread() == qApp->thread())
+            retrieve();
+        else
+            QMetaObject::invokeMethod(qApp, retrieve, Qt::BlockingQueuedConnection);
+
+        return plugin;
     }();
 
     if (!plugin)

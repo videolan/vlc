@@ -24,6 +24,8 @@
 #include <QPointer>
 #include <QWidget>
 #include <QFileInfo>
+#include <QThread>
+#include <QApplication>
 
 #include "util/color_svg_image_provider.hpp"
 
@@ -99,22 +101,32 @@ ColorizedSvgIcon ColorizedSvgIcon::colorizedIconForWidget(const QString &fileNam
 
 QIconEngine *ColorizedSvgIcon::svgIconEngine()
 {
-    static const auto plugin = []() -> QPointer<QIconEnginePlugin> {
-#ifdef QT_STATIC
-        const auto& staticPlugins = QPluginLoader::staticInstances();
-        const auto it = std::find_if(staticPlugins.begin(), staticPlugins.end(), [](QObject *obj) -> bool {
-            return obj->inherits("QSvgIconPlugin");
-        });
+    static const auto plugin = []() {
+        QPointer<QIconEnginePlugin> plugin;
 
-        if (it != staticPlugins.end())
-            return qobject_cast<QIconEnginePlugin*>(*it);
-        else
-            return nullptr;
+        const auto retrieve = [&plugin]() {
+#ifdef QT_STATIC
+            const auto& staticPlugins = QPluginLoader::staticInstances();
+            const auto it = std::find_if(staticPlugins.begin(), staticPlugins.end(), [](QObject *obj) -> bool {
+                return obj->inherits("QSvgIconPlugin");
+            });
+
+            if (it != staticPlugins.end())
+                plugin = qobject_cast<QIconEnginePlugin*>(*it);
 #else
-        QPluginLoader loader(QStringLiteral("iconengines/qsvgicon")); // Official Qt plugin
-        // No need to check the metadata (or inherits `QSvgIconPlugin`), a plugin named "qsvgicon" should already support svg.
-        return qobject_cast<QIconEnginePlugin*>(loader.instance());
+            QPluginLoader loader(QStringLiteral("iconengines/qsvgicon")); // Official Qt plugin
+            // No need to check the metadata (or inherits `QSvgIconPlugin`), a plugin named "qsvgicon" should already support svg.
+            plugin = qobject_cast<QIconEnginePlugin*>(loader.instance());
 #endif
+        };
+
+        assert(qApp); // do not call before QApplication is constructed.
+        if (QThread::currentThread() == qApp->thread())
+            retrieve();
+        else
+            QMetaObject::invokeMethod(qApp, retrieve, Qt::BlockingQueuedConnection);
+
+        return plugin;
     }();
 
     if (!plugin)
