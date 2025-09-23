@@ -158,7 +158,8 @@ Item {
 
         visible: readyForVisibility
 
-        readonly property bool readyForVisibility: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
+        readonly property bool readyForVisibility: (image.status === Image.Ready) /* TODO: investigate using TextureProviderObserver::isValid instead */ &&
+                                                   (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
                                                    (root.radius > 0.0 || root.borderWidth > 0 || backgroundColor.a > 0.0 || root.fillMode === Image.PreserveAspectCrop)
 
         smooth: root.smooth
