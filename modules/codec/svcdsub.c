@@ -89,7 +89,6 @@ typedef struct
 
   uint16_t i_image_offset;      /* offset from subtitle_data to compressed
                                    image data */
-  size_t i_image_length;           /* size of the compressed image data */
   size_t second_field_offset;      /* offset of odd raster lines */
   size_t metadata_offset;          /* offset to data describing the image */
   size_t metadata_length;          /* length of metadata */
@@ -417,16 +416,15 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
     p_sys->second_field_offset = GETINT16(p);
     i_buffer -= 2;
     p_sys->i_image_offset  = p - p_block->p_buffer;
-    p_sys->i_image_length  = p_sys->i_spu_size - p_sys->i_image_offset;
     p_sys->metadata_length = p_sys->i_image_offset;
 
 #ifndef NDEBUG
     msg_Dbg( p_dec, "x-start: %d, y-start: %d, width: %d, height %d, "
-             "spu size: %zu, duration: %"PRIu64" (d:%zu p:%"PRIu16")",
+             "spu size: %zu, duration: %"PRIu64" (p:%"PRIu16")",
              p_sys->i_x_start, p_sys->i_y_start,
              p_sys->i_width, p_sys->i_height,
              p_sys->i_spu_size, p_sys->i_duration,
-             p_sys->i_image_length, p_sys->i_image_offset);
+             p_sys->i_image_offset);
 
     for( i = 0; i < 4; i++ )
     {
