@@ -315,9 +315,11 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
 
     p_sys->i_spu_size = (p[0] << 8) + p[1] + 4; p += 2;
 
-    /* FIXME: check data sanity */
     p_sys->metadata_offset = (p[0] <<  8) +   p[1]; p +=2;
-    p_sys->metadata_length = p_sys->i_spu_size - p_sys->metadata_offset;
+    if ( p_sys->i_spu_size > p_sys->metadata_offset )
+        p_sys->metadata_length = p_sys->i_spu_size - p_sys->metadata_offset;
+    else
+        p_sys->metadata_length = 0; // unusable metadata
 
     p_sys->i_image_offset = 4;
 
