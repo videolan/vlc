@@ -60,8 +60,12 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 - (void)setup
 {
     _libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    [self connect];
     [self reloadData];
+}
 
+- (void)connect
+{
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(playlistsReset:)
