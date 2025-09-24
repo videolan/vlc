@@ -265,7 +265,7 @@ typedef struct
 static int get_chunk_header(demux_t *);
 static vlc_tick_t get_pts( const uint8_t *buf );
 static int find_es_header( const uint8_t *header,
-                           const uint8_t *buffer, int i_search_len );
+                           const uint8_t *buffer, size_t buffer_len, size_t i_search_len );
 static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct);
 static int ty_stream_seek_time(demux_t *, uint64_t);
 
@@ -582,11 +582,11 @@ static vlc_tick_t get_pts( const uint8_t *buf )
 
 /* =========================================================================== */
 static int find_es_header( const uint8_t *header,
-                           const uint8_t *buffer, int i_search_len )
+                           const uint8_t *buffer, size_t buffer_len, size_t i_search_len )
 {
-    int count;
+    size_t count;
 
-    for( count = 0; count < i_search_len; count++ )
+    for( count = 0; count < i_search_len && count + 4 < buffer_len; count++ )
     {
         if( !memcmp( &buffer[count], header, 4 ) )
             return count;
@@ -695,7 +695,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
          * on S1, only 0x06 has PES.  On S2, however, most all do.
          * Do NOT Pass the PES Header to the MPEG2 codec */
         size_t search_len = __MIN(l_rec_size - sizeof(ty_VideoPacket), 5);
-        esOffset1 = find_es_header( ty_VideoPacket, p_block_in->p_buffer, search_len );
+        esOffset1 = find_es_header( ty_VideoPacket, p_block_in->p_buffer, p_block_in->i_buffer, search_len );
         if( esOffset1 != -1 )
         {
             //msg_Dbg(p_demux, "Video PES hdr in pkt type 0x%02x at offset %d",
@@ -872,10 +872,10 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
             /* get the PTS out of this PES header (MPEG or AC3) */
             if (p_sys->audio_type == TIVO_AUDIO_MPEG)
                 esOffset1 = find_es_header(ty_MPEGAudioPacket,
-                        p_sys->pes_buffer, 5);
+                        p_sys->pes_buffer, ARRAY_SIZE(p_sys->pes_buffer), 5);
             else
                 esOffset1 = find_es_header(ty_AC3AudioPacket,
-                        p_sys->pes_buffer, 5);
+                        p_sys->pes_buffer, ARRAY_SIZE(p_sys->pes_buffer), 5);
             if (esOffset1 < 0)
             {
                 /* god help us; something's really wrong */
@@ -911,7 +911,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         /* MPEG Audio with PES Header, either SA or DTiVo   */
         /* ================================================ */
         esOffset1 = find_es_header( ty_MPEGAudioPacket,
-                p_block_in->p_buffer, 5 );
+                p_block_in->p_buffer, p_block_in->i_buffer, 5 );
 
         /*msg_Dbg(p_demux, "buffer has %#02x %#02x %#02x %#02x",
            p_block_in->p_buffer[0], p_block_in->p_buffer[1],
@@ -970,7 +970,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         /* DTiVo AC3 Audio Data with PES Header             */
         /* ================================================ */
         esOffset1 = find_es_header( ty_AC3AudioPacket,
-                p_block_in->p_buffer, 5 );
+                p_block_in->p_buffer, p_block_in->i_buffer, 5 );
 
 #if 0
         msg_Dbg(p_demux, "buffer has "
@@ -1848,7 +1848,7 @@ static int analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
                     p_hdrs[i].l_rec_size > 15) {
                 /* first make sure we're aligned */
                 int i_pes_offset = find_es_header(ty_MPEGAudioPacket,
-                        &p_chunk[i_data_offset], 5);
+                        &p_chunk[i_data_offset], chunk_size - i_data_offset, 5);
                 if (i_pes_offset >= 0) {
                     /* pes found. on SA, PES has hdr data at offset 6, not PTS. */
                     //msg_Dbg(p_demux, "probe: mpeg es header found in rec %d at offset %d",
