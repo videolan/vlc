@@ -1770,6 +1770,7 @@ static int analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_num_recs, i;
+    size_t chunk_size = CHUNK_SIZE;
     ty_rec_hdr_t *p_hdrs;
     int i_num_6e0, i_num_be0, i_num_9c0, i_num_3c0;
     int i_payload_size;
@@ -1787,6 +1788,7 @@ static int analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
     }
 
     p_chunk += CHUNK_HEADER_SIZE;       /* skip past rec count & SEQ bytes */
+    chunk_size -= CHUNK_HEADER_SIZE;
     //msg_Dbg(p_demux, "probe: chunk has %d recs", i_num_recs);
     p_hdrs = parse_chunk_headers(p_chunk, i_num_recs, &i_payload_size);
     if (unlikely(p_hdrs == NULL))
@@ -1872,6 +1874,11 @@ static int analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
                 }
             }
             i_data_offset += p_hdrs[i].l_rec_size;
+            if (i_data_offset > chunk_size)
+            {
+                msg_Dbg(p_demux, "rec[%d] overflows the size of the records %ld, aborting", i, p_hdrs[i].l_rec_size);
+                break;
+            }
         }
     }
     free(p_hdrs);
