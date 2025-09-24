@@ -284,8 +284,7 @@ char *vlc_stream_ReadLine( stream_t *s )
         {
             assert( priv->text.char_width == 2 );
             uint8_t inc;
-            ssize_t i_inc = vlc_stream_Read( s, &inc, priv->text.char_width );
-            assert( i_inc == i_data );
+            ssize_t i_inc = vlc_stream_Read( s, &inc, 1 );
             if( i_inc > 0 )
                 msg_Err( s, "discarding incomplete UTF-16 sequence at EOF: 0x%02x", inc );
             return NULL;
