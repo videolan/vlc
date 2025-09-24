@@ -1853,7 +1853,8 @@ static int analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
                     /* pes found. on SA, PES has hdr data at offset 6, not PTS. */
                     //msg_Dbg(p_demux, "probe: mpeg es header found in rec %d at offset %d",
                             //i, i_pes_offset);
-                    if ((p_chunk[i_data_offset + 6 + i_pes_offset] & 0x80) == 0x80) {
+                    if (i_data_offset + 6 + i_pes_offset < chunk_size &&
+                        (p_chunk[i_data_offset + 6 + i_pes_offset] & 0x80) == 0x80) {
                         /* S1SA or S2(any) Mpeg Audio (PES hdr, not a PTS start) */
                         if (p_sys->tivo_series == TIVO_SERIES1)
                             msg_Dbg(p_demux, "detected Stand-Alone Tivo" );
