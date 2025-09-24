@@ -36,7 +36,7 @@ static void mp4_box_iterator_Init( mp4_box_iterator_t *p_it,
 
 static bool mp4_box_iterator_Next( mp4_box_iterator_t *p_it )
 {
-    while( p_it->i_buffer > 8 )
+    if( p_it->i_buffer > 8 )
     {
         const uint8_t *p = p_it->p_buffer;
         const size_t i_size = GetDWBE( p );
@@ -50,7 +50,6 @@ static bool mp4_box_iterator_Next( mp4_box_iterator_t *p_it )
             p_it->i_buffer -= i_size;
             return true;
         }
-        else break;
     }
     return false;
 }
