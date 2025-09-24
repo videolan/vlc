@@ -86,7 +86,6 @@ typedef struct
 
   uint16_t i_image_offset;      /* offset from subtitle_data to compressed
                                    image data */
-  size_t i_image_length;           /* size of the compressed image data */
   size_t first_field_offset;       /* offset of even raster lines */
   size_t second_field_offset;      /* offset of odd raster lines */
   size_t metadata_offset;          /* offset to data describing the image */
@@ -321,11 +320,10 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
     p_sys->metadata_length = p_sys->i_spu_size - p_sys->metadata_offset;
 
     p_sys->i_image_offset = 4;
-    p_sys->i_image_length = p_sys->metadata_offset - p_sys->i_image_offset;
 
 #ifdef DEBUG_CVDSUB
-    msg_Dbg( p_dec, "total size: %zu  image size: %zu",
-             p_sys->i_spu_size, p_sys->i_image_length );
+    msg_Dbg( p_dec, "total size: %zu  metadata size: %zu",
+             p_sys->i_spu_size, p_sys->metadata_length );
 #endif
 }
 
