@@ -277,7 +277,7 @@ static int  parse_master(demux_t *p_demux);
 
 static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
 static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
-static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
+static bool DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
 
 static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 );
 
@@ -481,7 +481,8 @@ static int Demux( demux_t *p_demux )
         case 0x01:
         case 0x02:
             /* closed captions/XDS */
-            DemuxRecCc( p_demux, p_rec, p_block_in );
+            if (!DemuxRecCc( p_demux, p_rec, p_block_in ))
+                return VLC_DEMUXER_EGENERIC;
             break;
 
         default:
@@ -1020,7 +1021,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
     return 0;
 }
 
-static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
+static bool DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_field;
@@ -1039,8 +1040,7 @@ static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block
     if( i_field == 1 )
         DemuxDecodeXds( p_demux, rec_hdr->ex[0], rec_hdr->ex[1] );
 
-    cc_AppendData( &p_sys->cc, CC_PKT_BYTE0(i_field), rec_hdr->ex );
-    return 0;
+    return cc_AppendData( &p_sys->cc, CC_PKT_BYTE0(i_field), rec_hdr->ex );
 }
 
 /* seek to a position within the stream, if possible */
