@@ -865,6 +865,7 @@ set_value( libvlc_media_player_t *p_mi, const char *restrict name,
             var_TriggerCallback( pp_vouts[i], "sub-source" );
         vlc_object_release( pp_vouts[i] );
     }
+    free (pp_vouts);
 
     if( opt->type == 0 )
         free( new_val.psz_string );
