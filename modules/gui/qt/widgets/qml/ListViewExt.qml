@@ -552,7 +552,23 @@ ListView {
             root.updateSelection(event.modifiers, oldIndex, newIndex);
 
             // NOTE: If we skip this call the item might end up under the header.
-            positionViewAtIndex(currentIndex, ItemView.Contain);
+            if (root.highlightFollowsCurrentItem) {
+                // FIXME: Items can go beneath `OverlayHeader` or `OverlayFooter`.
+                //        We should move the header and footer outside of the view,
+                //        if we do not want that behavior instead of having this
+                //        workaround, as Qt does not seem to offer that configuration
+                //        as a built-in mode in its views.
+
+                if (root.headerItem && (root.headerPositioning !== ListView.InlineHeader)) {
+                    if (root.currentItem.y < (root.headerItem.y + root.headerItem.height))
+                        positionViewAtIndex(currentIndex, ItemView.Contain);
+                }
+
+                if (root.footerItem && (root.footerPositioning !== ListView.InlineFooter)) {
+                    if (root.currentItem.y > root.footerItem.y)
+                        positionViewAtIndex(currentIndex, ItemView.Contain);
+                }
+            }
 
             // NOTE: We make sure we have the proper visual focus on components.
             if (oldIndex < currentIndex)
