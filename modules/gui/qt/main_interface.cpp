@@ -391,7 +391,7 @@ void MainInterface::createResumePanel( QWidget *w )
     connect( resumeTimer, &QTimer::timeout, this, &MainInterface::hideResumePanel );
     connect( cancel, &QToolButton::clicked, this, &MainInterface::hideResumePanel );
     connect( THEMIM->getIM(), &InputManager::resumePlayback, this, &MainInterface::showResumePanel );
-    BUTTONACT( ok, resumePlayback() );
+    BUTTONACT( ok, resumePlayback );
 
     w->layout()->addWidget( resumePanel );
 }

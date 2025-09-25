@@ -139,7 +139,7 @@ FileDestBox::FileDestBox( QWidget *_parent, intf_thread_t * _p_intf ) : VirtualD
 
     layout->addWidget(fileSelectButton, 1, 5, 1, 1);
     CT( fileEdit );
-    BUTTONACT( fileSelectButton, fileBrowse() );
+    BUTTONACT( fileSelectButton, fileBrowse );
 }
 
 QString FileDestBox::getMRL( const QString& mux )

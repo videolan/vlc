@@ -86,7 +86,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 #if 0
     QPushButton *update = new QPushButton( qtr( "Update" ) ); // Temporary to test
     buttonsBox->addButton( update, QDialogButtonBox::ActionRole );
-    BUTTONACT( update, updateInfos() );
+    BUTTONACT( update, updateInfos );
 #endif
 
     buttonsBox->addButton( new QPushButton( qtr( "&Close" ) ),

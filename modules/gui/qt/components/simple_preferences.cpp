@@ -767,7 +767,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.skinsLabel->setFont( italicFont );
 
 #ifdef _WIN32
-            BUTTONACT( ui.assoButton, assoDialog() );
+            BUTTONACT( ui.assoButton, assoDialog );
 #else
             ui.osGroupBox->hide();
 #endif

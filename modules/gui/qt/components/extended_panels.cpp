@@ -221,7 +221,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( eraseMaskText, editingFinished() )
     SETUP_VFILTER_OPTION( eraseYSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( eraseXSpin, valueChanged( int ) )
-    BUTTONACT( ui.eraseBrowseBtn, browseEraseFile() );
+    BUTTONACT( ui.eraseBrowseBtn, browseEraseFile );
 
     SETUP_VFILTER( marq )
     SETUP_VFILTER_OPTION( marqMarqueeText, textChanged( const QString& ) )
@@ -232,7 +232,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( logoYSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( logoXSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( logoOpacitySlider, valueChanged( int ) )
-    BUTTONACT( ui.logoBrowseBtn, browseLogo() );
+    BUTTONACT( ui.logoBrowseBtn, browseLogo );
 
     SETUP_VFILTER( gradfun )
     SETUP_VFILTER_OPTION( gradfunRadiusSlider, valueChanged( int ) )
@@ -1502,7 +1502,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     connect( THEMIM->getIM(), &InputManager::synchroChanged, this, &SyncControls::update );
     BUTTON_SET_ACT_I( updateButton, "", update,
-            qtr( "Force update of this dialog's values" ), update() );
+            qtr( "Force update of this dialog's values" ), update );
 
     initSubsDuration();
 

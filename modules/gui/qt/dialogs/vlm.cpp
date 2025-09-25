@@ -141,14 +141,14 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     connect( ui.vlmListItem, &QListWidget::currentRowChanged,
              this, &VLMDialog::selectVLMItem );
 
-    BUTTONACT( closeButton, close() );
-    BUTTONACT( exportButton, exportVLMConf() );
-    BUTTONACT( importButton, importVLMConf() );
-    BUTTONACT( ui.addButton, addVLMItem() );
-    BUTTONACT( ui.clearButton, clearWidgets() );
-    BUTTONACT( ui.saveButton, saveModifications() );
-    BUTTONACT( ui.inputButton, selectInput() );
-    BUTTONACT( ui.outputButton, selectOutput() );
+    BUTTONACT( closeButton, close );
+    BUTTONACT( exportButton, exportVLMConf );
+    BUTTONACT( importButton, importVLMConf );
+    BUTTONACT( ui.addButton, addVLMItem );
+    BUTTONACT( ui.clearButton, clearWidgets );
+    BUTTONACT( ui.saveButton, saveModifications );
+    BUTTONACT( ui.inputButton, selectInput );
+    BUTTONACT( ui.outputButton, selectOutput );
 
     if( !restoreGeometry( getSettings()->value("VLM/geometry").toByteArray() ) )
     {
@@ -491,8 +491,8 @@ VLMAWidget::VLMAWidget( VLMWrapper *_vlm, const QString& _name,
     deleteButton->setToolTip("Delete");
     objLayout->addWidget( deleteButton, 0, 6 );
 
-    BUTTONACT( modifyButton, modify() );
-    BUTTONACT( deleteButton, del() );
+    BUTTONACT( modifyButton, modify );
+    BUTTONACT( deleteButton, del );
     connect( this, &VLMAWidget::clicked, this, &VLMAWidget::toggleEnabled );
 }
 
@@ -542,9 +542,9 @@ VLMBroadcast::VLMBroadcast( VLMWrapper *vlm, const QString& _name,
     loopButton->setToolTip( qtr("Repeat") );
     objLayout->addWidget( loopButton, 1, 2 );
 
-    BUTTONACT( playButton, togglePlayPause() );
-    BUTTONACT( stopButton, stop() );
-    BUTTONACT( loopButton, toggleLoop() );
+    BUTTONACT( playButton, togglePlayPause );
+    BUTTONACT( stopButton, stop );
+    BUTTONACT( loopButton, toggleLoop );
 
     update();
 }

@@ -70,9 +70,9 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf)
 
     mainLayout->addWidget( buttonBox, 1, 0, 1, 3 );
 
-    BUTTONACT( gotoButton, close() );
-    BUTTONACT( cancelButton, cancel() );
-    BUTTONACT( resetButton, reset() );
+    BUTTONACT( gotoButton, close );
+    BUTTONACT( cancelButton, cancel );
+    BUTTONACT( resetButton, reset );
 
     QVLCTools::restoreWidgetPosition( p_intf, "gototimedialog", this );
 }

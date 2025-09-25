@@ -93,10 +93,10 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.subGroupBox->setEnabled( false );
 
     /* Connects  */
-    BUTTONACT( ui.fileBrowseButton, browseFile() );
-    BUTTONACT( ui.removeFileButton, removeFile() );
+    BUTTONACT( ui.fileBrowseButton, browseFile );
+    BUTTONACT( ui.removeFileButton, removeFile );
 
-    BUTTONACT( ui.subBrowseButton, browseFileSub() );
+    BUTTONACT( ui.subBrowseButton, browseFileSub );
     connect( ui.subGroupBox, &QGroupBox::toggled, this, &FileOpenPanel::updateMRL );
 
     connect( ui.fileListWidg, &QListWidget::itemChanged, this, &FileOpenPanel::updateMRL );
@@ -340,14 +340,14 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 #endif
 
     /* CONNECTs */
-    BUTTONACT( ui.dvdRadioButton,     updateButtons() );
-    BUTTONACT( ui.bdRadioButton,      updateButtons() );
-    BUTTONACT( ui.vcdRadioButton,     updateButtons() );
-    BUTTONACT( ui.audioCDRadioButton, updateButtons() );
-    BUTTONACT( ui.dvdsimple,          updateButtons() );
-    BUTTONACT( ui.browseDiscButton, browseDevice() );
+    BUTTONACT( ui.dvdRadioButton,     updateButtons );
+    BUTTONACT( ui.bdRadioButton,      updateButtons );
+    BUTTONACT( ui.vcdRadioButton,     updateButtons );
+    BUTTONACT( ui.audioCDRadioButton, updateButtons );
+    BUTTONACT( ui.dvdsimple,          updateButtons );
+    BUTTONACT( ui.browseDiscButton, browseDevice );
     BUTTON_SET_ACT_I( ui.ejectButton, "", toolbar/eject, qtr( "Eject the disc" ),
-            eject() );
+            eject );
 
     connect( ui.deviceCombo, &QComboBox::editTextChanged, this, &DiscOpenPanel::updateMRL );
     connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DiscOpenPanel::updateMRL );
@@ -744,7 +744,7 @@ void CaptureOpenPanel::initialize()
 
     ui.setupUi( this );
 
-    BUTTONACT( ui.advancedButton, advancedDialog() );
+    BUTTONACT( ui.advancedButton, advancedDialog );
     connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CaptureOpenPanel::enableAdvancedDialog );
 
     /* Create two stacked layouts in the main comboBoxes */
@@ -1009,20 +1009,20 @@ void CaptureOpenPanel::initialize()
     CuMRL( dvbPskBox, currentIndexChanged ( int ) );
     CuMRL( dvbBandBox, currentIndexChanged ( int ) );
 
-    BUTTONACT( dvbc, updateButtons() );
-    BUTTONACT( dvbs, updateButtons() );
-    BUTTONACT( dvbs2, updateButtons() );
-    BUTTONACT( dvbt, updateButtons() );
-    BUTTONACT( dvbt2, updateButtons() );
-    BUTTONACT( atsc, updateButtons() );
-    BUTTONACT( cqam, updateButtons() );
-    BUTTONACT( dvbc, updateMRL() );
-    BUTTONACT( dvbt, updateMRL() );
-    BUTTONACT( dvbt2, updateMRL() );
-    BUTTONACT( dvbs, updateMRL() );
-    BUTTONACT( dvbs2, updateMRL() );
-    BUTTONACT( atsc, updateMRL() );
-    BUTTONACT( cqam, updateMRL() );
+    BUTTONACT( dvbc, updateButtons );
+    BUTTONACT( dvbs, updateButtons );
+    BUTTONACT( dvbs2, updateButtons );
+    BUTTONACT( dvbt, updateButtons );
+    BUTTONACT( dvbt2, updateButtons );
+    BUTTONACT( atsc, updateButtons );
+    BUTTONACT( cqam, updateButtons );
+    BUTTONACT( dvbc, updateMRL );
+    BUTTONACT( dvbt, updateMRL );
+    BUTTONACT( dvbt2, updateMRL );
+    BUTTONACT( dvbs, updateMRL );
+    BUTTONACT( dvbs2, updateMRL );
+    BUTTONACT( atsc, updateMRL );
+    BUTTONACT( cqam, updateMRL );
     configList << "dvb-adapter" << "dvb-frequency" << "dvb-modulation"
                << "dvb-bandwidth";
     }

@@ -90,10 +90,10 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     layout->addWidget( saveMetaButton, 2, 6 );
     layout->addWidget( closeButton, 2, 7 );
 
-    BUTTONACT( closeButton, close() );
+    BUTTONACT( closeButton, close );
 
     /* The tabs buttons are shown in the main dialog for space and cosmetics */
-    BUTTONACT( saveMetaButton, saveMeta() );
+    BUTTONACT( saveMetaButton, saveMeta );
 
     /* Let the MetaData Panel update the URI */
     connect( MP, &MetaPanel::uriSet, this, &MediaInfoDialog::updateURI );

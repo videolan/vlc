@@ -137,12 +137,12 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     else
         setSimple();
 
-    BUTTONACT( save, save() );
-    BUTTONACT( cancel, cancel() );
-    BUTTONACT( reset, reset() );
+    BUTTONACT( save, save );
+    BUTTONACT( cancel, cancel );
+    BUTTONACT( reset, reset );
 
-    BUTTONACT( simple, setSimple() );
-    BUTTONACT( all, setAdvanced() );
+    BUTTONACT( simple, setSimple );
+    BUTTONACT( all, setAdvanced );
 
     QVLCTools::restoreWidgetPosition( p_intf, "Preferences", this, QSize( 800 , 700 ) );
 }

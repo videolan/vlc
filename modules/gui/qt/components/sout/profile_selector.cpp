@@ -71,9 +71,9 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     newButton->setToolTip( qtr( "Create a new profile" ) );
     layout->addWidget(newButton);
 
-    BUTTONACT( newButton, newProfile() );
-    BUTTONACT( editButton, editProfile() );
-    BUTTONACT( deleteButton, deleteProfile() );
+    BUTTONACT( newButton, newProfile );
+    BUTTONACT( editButton, editProfile );
+    BUTTONACT( deleteButton, deleteProfile );
     fillProfilesCombo();
 
     connect( profileBox, QOverload<int>::of(&QComboBox::activated),
@@ -448,10 +448,10 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     QPushButton *saveButton = new QPushButton(
                 ( qs_name.isEmpty() ) ? qtr( "Create" ) : qtr( "Save" ) );
     ui.buttonBox->addButton( saveButton, QDialogButtonBox::AcceptRole );
-    BUTTONACT( saveButton, close() );
+    BUTTONACT( saveButton, close );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
     ui.buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
-    BUTTONACT( cancelButton, reject() );
+    BUTTONACT( cancelButton, reject );
 
     connect( ui.valueholder_video_copy, &QCheckBox::stateChanged,
              this, &VLCProfileEditor::activatePanels );

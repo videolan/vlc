@@ -74,7 +74,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     ui.destBox->addItem( "UDP (legacy)" );
     ui.destBox->addItem( "Icecast" );
 
-    BUTTONACT( ui.addButton, addDest() );
+    BUTTONACT( ui.addButton, addDest );
 
 //     /* Connect everything to the updateMRL function */
 #define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );

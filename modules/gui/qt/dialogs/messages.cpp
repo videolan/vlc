@@ -116,8 +116,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     tabChanged(0);
 
-    BUTTONACT( updateButton, updateOrClear() );
-    BUTTONACT( ui.saveLogButton, save() );
+    BUTTONACT( updateButton, updateOrClear );
+    BUTTONACT( ui.saveLogButton, save );
     connect( ui.filterEdit, &QLineEdit::editingFinished, this, &MessagesDialog::updateConfig );
     connect( ui.filterEdit, &QLineEdit::textChanged, this, &MessagesDialog::filterMessages );
     connect( ui.bottomButtonsBox, &QDialogButtonBox::rejected, this, &MessagesDialog::hide );

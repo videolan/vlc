@@ -93,12 +93,12 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
              this, &BookmarksDialog::updateButtons );
     connect( bookmarksList->selectionModel(), &QItemSelectionModel::selectionChanged,
              this, &BookmarksDialog::updateButtons );
-    BUTTONACT( addButton, add() );
-    BUTTONACT( delButton, del() );
-    BUTTONACT( clearButton, clear() );
+    BUTTONACT( addButton, add );
+    BUTTONACT( delButton, del );
+    BUTTONACT( clearButton, clear );
 
 #if 0
-    BUTTONACT( extractButton, extract() );
+    BUTTONACT( extractButton, extract );
 #endif
     connect( buttonsBox, &QDialogButtonBox::rejected, this, &BookmarksDialog::close );
     updateButtons();
