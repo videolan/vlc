@@ -74,10 +74,10 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     art->setToolTip( qtr( "Double click to get media information" ) );
     artContainer->addWidget( art );
 
-    CONNECT( THEMIM->getIM(), artChanged( QString ),
-             art, showArtUpdate( const QString& ) );
-    CONNECT( THEMIM->getIM(), artChanged( input_item_t * ),
-             art, showArtUpdate( input_item_t * ) );
+    connect( THEMIM->getIM(), QOverload<QString>::of(&InputManager::artChanged),
+             art, QOverload<const QString &>::of(&CoverArtLabel::showArtUpdate) );
+    connect( THEMIM->getIM(), QOverload<input_item_t *>::of(&InputManager::artChanged),
+             art, QOverload<input_item_t *>::of(&CoverArtLabel::showArtUpdate) );
 
     leftSplitter->addWidget( artContainer );
 
@@ -104,8 +104,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     locationBar = new LocationBar( model );
     locationBar->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
     topbarLayout->addWidget( locationBar );
-    CONNECT( locationBar, invoked( const QModelIndex & ),
-             mainView, browseInto( const QModelIndex & ) );
+    connect( locationBar, &LocationBar::invoked,
+             mainView, QOverload<const QModelIndex &>::of(&StandardPLPanel::browseInto) );
 
     /* Button to switch views */
     QToolButton *viewButton = new QToolButton( this );
@@ -114,7 +114,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     topbarLayout->addWidget( viewButton );
 
     viewButton->setMenu( StandardPLPanel::viewSelectionMenu( mainView ));
-    CONNECT( viewButton, clicked(), mainView, cycleViews() );
+    connect( viewButton, &QToolButton::clicked, mainView, &StandardPLPanel::cycleViews );
 
     /* Search */
     searchEdit = new SearchLineEdit( this );
@@ -122,19 +122,19 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     searchEdit->setMinimumWidth( 80 );
     searchEdit->setToolTip( qtr("Search the playlist") );
     topbarLayout->addWidget( searchEdit );
-    CONNECT( searchEdit, textChanged( const QString& ),
-             mainView, search( const QString& ) );
-    CONNECT( searchEdit, searchDelayedChanged( const QString& ),
-             mainView, searchDelayed( const QString & ) );
+    connect( searchEdit, &SearchLineEdit::textChanged,
+             mainView, &StandardPLPanel::search );
+    connect( searchEdit, &SearchLineEdit::searchDelayedChanged,
+             mainView, &StandardPLPanel::searchDelayed );
 
-    CONNECT( mainView, viewChanged( const QModelIndex& ),
-             this, changeView( const QModelIndex &) );
+    connect( mainView, &StandardPLPanel::viewChanged,
+             this, &PlaylistWidget::changeView );
 
     /* Connect the activation of the selector to a redefining of the PL */
     DCONNECT( selector, categoryActivated( playlist_item_t *, bool ),
               mainView, setRootItem( playlist_item_t *, bool ) );
     mainView->setRootItem( p_root, false );
-    CONNECT( selector, SDCategorySelected(bool), mainView, setWaiting(bool) );
+    connect( selector, &PLSelector::SDCategorySelected, mainView, &StandardPLPanel::setWaiting );
 
     /* */
     split = new QSplitter( this );
@@ -236,7 +236,11 @@ LocationBar::LocationBar( VLCModel *m )
 {
     setModel( m );
     mapper = new QSignalMapper( this );
-    CONNECT( mapper, mapped( int ), this, invoke( int ) );
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    connect( mapper, &QSignalMapper::mappedInt, this, &LocationBar::invoke );
+#else
+    connect( mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &LocationBar::invoke );
+#endif
 
     btnMore = new LocationButton( "...", false, true, this );
     menuMore = new QMenu( this );
@@ -263,10 +267,10 @@ void LocationBar::setIndex( const QModelIndex &index )
 
         QAction *action = new QAction( text, this );
         actions.append( action );
-        CONNECT( btn, clicked(), action, trigger() );
+        connect( btn, &QAbstractButton::clicked, action, &QAction::trigger );
 
         mapper->setMapping( action, model->itemId( i ) );
-        CONNECT( action, triggered(), mapper, map() );
+        connect( action, &QAction::triggered, mapper, QOverload<>::of(&QSignalMapper::map) );
 
         first = false;
 

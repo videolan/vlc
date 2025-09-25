@@ -146,10 +146,10 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     BUTTONACT(okButton,close());
     BUTTONACT(cancelButton,cancel());
 
-    CONNECT( convertRadio, toggled(bool), convertPanel, setEnabled(bool) );
-    CONNECT(profile, optionsChanged(), this, setDestinationFileExtension());
-    CONNECT(fileLine, editingFinished(), this, setDestinationFileExtension());
-    CONNECT(fileLine, textChanged(const QString&), this, validate());
+    connect( convertRadio, &QRadioButton::toggled, convertPanel, &QWidget::setEnabled );
+    connect(profile, &VLCProfileSelector::optionsChanged, this, &ConvertDialog::setDestinationFileExtension);
+    connect(fileLine, &QLineEdit::editingFinished, this, &ConvertDialog::setDestinationFileExtension);
+    connect(fileLine, &QLineEdit::textChanged, this, &ConvertDialog::validate);
 
     validate();
 }

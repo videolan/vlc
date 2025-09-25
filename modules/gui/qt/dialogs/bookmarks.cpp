@@ -80,19 +80,19 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
     layout->addWidget( buttonsBox );
     layout->addWidget( bookmarksList );
 
-    CONNECT( THEMIM->getIM(), bookmarksChanged(),
-             this, update() );
+    connect( THEMIM->getIM(), &InputManager::bookmarksChanged,
+             this, &BookmarksDialog::update );
 
-    CONNECT( bookmarksList, activated( QModelIndex ), this,
-             activateItem( QModelIndex ) );
-    CONNECT( bookmarksList, itemChanged( QTreeWidgetItem*, int ),
-             this, edit( QTreeWidgetItem*, int ) );
-    CONNECT( bookmarksList->model(), rowsInserted( const QModelIndex &, int, int ),
-             this, updateButtons() );
-    CONNECT( bookmarksList->model(), rowsRemoved( const QModelIndex &, int, int ),
-             this, updateButtons() );
-    CONNECT( bookmarksList->selectionModel(), selectionChanged( const QItemSelection &, const QItemSelection & ),
-             this, updateButtons() );
+    connect( bookmarksList, &QTreeWidget::activated, this,
+             &BookmarksDialog::activateItem );
+    connect( bookmarksList, &QTreeWidget::itemChanged,
+             this, &BookmarksDialog::edit );
+    connect( bookmarksList->model(), &QAbstractItemModel::rowsInserted,
+             this, &BookmarksDialog::updateButtons );
+    connect( bookmarksList->model(), &QAbstractItemModel::rowsRemoved,
+             this, &BookmarksDialog::updateButtons );
+    connect( bookmarksList->selectionModel(), &QItemSelectionModel::selectionChanged,
+             this, &BookmarksDialog::updateButtons );
     BUTTONACT( addButton, add() );
     BUTTONACT( delButton, del() );
     BUTTONACT( clearButton, clear() );
@@ -100,7 +100,7 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
 #if 0
     BUTTONACT( extractButton, extract() );
 #endif
-    CONNECT( buttonsBox, rejected(), this, close() );
+    connect( buttonsBox, &QDialogButtonBox::rejected, this, &BookmarksDialog::close );
     updateButtons();
 
     restoreWidgetPosition( "Bookmarks", QSize( 435, 280 ) );

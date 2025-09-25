@@ -51,8 +51,8 @@ DialogHandler::DialogHandler (intf_thread_t *p_intf, QObject *_parent)
     };
     vlc_dialog_provider_set_callbacks(p_intf, &cbs, this);
 
-    CONNECT(this, errorDisplayed(const QString &, const QString &),
-            this, displayError(const QString &, const QString &));
+    connect(this, &DialogHandler::errorDisplayed,
+            this, &DialogHandler::displayError);
 
     CONNECT(this, loginDisplayed(vlc_dialog_id *, const QString &,
                                  const QString &, const QString &, bool),
@@ -233,8 +233,8 @@ void DialogHandler::displayLogin(vlc_dialog_id *p_id, const QString &title,
     buttonBox->addButton( okButton, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    CONNECT( buttonBox, accepted(), dialog, accept() );
-    CONNECT( buttonBox, rejected(), dialog, reject() );
+    connect( buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept );
+    connect( buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject );
     layout->addWidget (buttonBox);
 
     dialog->setLayout (layout);
@@ -312,7 +312,7 @@ DialogWrapper::DialogWrapper(DialogHandler *p_handler, intf_thread_t *p_intf,
     , p_id(p_id)
     , p_dialog(p_dialog)
 {
-    CONNECT(p_dialog, finished(int), this, finish(int));
+    connect(p_dialog, &QDialog::finished, this, &DialogWrapper::finish);
 }
 
 DialogWrapper::~DialogWrapper()
@@ -340,7 +340,7 @@ LoginDialogWrapper::LoginDialogWrapper(DialogHandler *p_handler,
     , passLine(passLine)
     , checkbox(checkbox)
 {
-    CONNECT(p_dialog, accepted(), this, accept());
+    connect(p_dialog, &QDialog::accepted, this, &LoginDialogWrapper::accept);
 }
 
 void LoginDialogWrapper::accept()
@@ -366,8 +366,8 @@ QuestionDialogWrapper::QuestionDialogWrapper(DialogHandler *p_handler,
     , action1(action1)
     , action2(action2)
 {
-    CONNECT(p_box, buttonClicked(QAbstractButton *),
-            this, buttonClicked(QAbstractButton *));
+    connect(p_box, &QMessageBox::buttonClicked,
+            this, &QuestionDialogWrapper::buttonClicked);
 }
 
 void QuestionDialogWrapper::buttonClicked(QAbstractButton *button)

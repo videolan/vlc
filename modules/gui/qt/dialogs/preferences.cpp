@@ -159,20 +159,20 @@ void PrefsDialog::setAdvanced()
         tree_filter = new SearchLineEdit( simple_tree_panel );
         tree_filter->setMinimumHeight( 26 );
 
-        CONNECT( tree_filter, textChanged( const QString &  ),
-                this, advancedTreeFilterChanged( const QString & ) );
+        connect( tree_filter, &SearchLineEdit::textChanged,
+                this, &PrefsDialog::advancedTreeFilterChanged );
 
         advanced_tree_panel->layout()->addWidget( tree_filter );
 
         current_filter = new QCheckBox( qtr("Only show current") );
         current_filter->setToolTip(
                     qtr("Only show modules related to current playback") );
-        CONNECT( current_filter, stateChanged(int),
-                 this, onlyLoadedToggled() );
+        connect( current_filter, &QCheckBox::stateChanged,
+                 this, &PrefsDialog::onlyLoadedToggled );
         advanced_tree_panel->layout()->addWidget( current_filter );
 
         QShortcut *search = new QShortcut( QKeySequence( QKeySequence::Find ), tree_filter );
-        CONNECT( search, activated(), tree_filter, setFocus() );
+        connect( search, &QShortcut::activated, tree_filter, QOverload<>::of(&SearchLineEdit::setFocus) );
     }
 
     /* If don't have already and advanced TREE, then create it */
@@ -182,9 +182,9 @@ void PrefsDialog::setAdvanced()
         p_list = module_list_get( &count );
         advanced_tree = new PrefsTree( p_intf, simple_tree_panel, p_list, count );
         /* and connections */
-        CONNECT( advanced_tree,
-                 currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ),
-                 this, changeAdvPanel( QTreeWidgetItem * ) );
+        connect( advanced_tree,
+                 &PrefsTree::currentItemChanged,
+                 this, &PrefsDialog::changeAdvPanel );
         advanced_tree_panel->layout()->addWidget( advanced_tree );
         advanced_tree_panel->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
     }
@@ -212,9 +212,9 @@ void PrefsDialog::setSimple()
     if( !simple_tree )
     {
          simple_tree = new SPrefsCatList( p_intf, simple_tree_panel );
-         CONNECT( simple_tree,
-                  currentItemChanged( int ),
-                  this,  changeSimplePanel( int ) );
+         connect( simple_tree,
+                  &SPrefsCatList::currentItemChanged,
+                  this,  &PrefsDialog::changeSimplePanel );
         simple_tree_panel->layout()->addWidget( simple_tree );
         simple_tree_panel->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
     }

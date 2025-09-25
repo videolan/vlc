@@ -111,6 +111,11 @@ public slots:
     void showView( int );
     void setWaiting( bool ); /* spinner */
 
+    void search( const QString& searchText );
+    void searchDelayed( const QString& searchText );
+
+    void cycleViews();
+
 private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
@@ -121,9 +126,6 @@ private slots:
 
     void gotoPlayingItem();
 
-    void search( const QString& searchText );
-    void searchDelayed( const QString& searchText );
-
     void popupPlView( const QPoint & );
     void popupSelectColumn( QPoint );
     void popupAction( QAction * );
@@ -131,7 +133,6 @@ private slots:
     void decreaseZoom() { updateZoom( -1 ); };
     void toggleColumnShown( int );
 
-    void cycleViews();
     void updateViewport(); /* spinner */
 
 signals:

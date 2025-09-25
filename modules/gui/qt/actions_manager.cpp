@@ -49,7 +49,7 @@ ActionsManager::ActionsManager( intf_thread_t * _p_i )
     CONNECT( this, rendererItemRemoved( vlc_renderer_item_t* ),
              this, onRendererItemRemoved( vlc_renderer_item_t* ) );
     m_stop_scan_timer.setSingleShot( true );
-    CONNECT( &m_stop_scan_timer, timeout(), this, StopRendererScan() );
+    connect( &m_stop_scan_timer, &QTimer::timeout, this, &ActionsManager::StopRendererScan );
 }
 
 ActionsManager::~ActionsManager()

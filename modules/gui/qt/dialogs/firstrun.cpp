@@ -107,6 +107,6 @@ void FirstRun::buildPrivDialog()
 
     gLayout->addWidget( buttonsBox, 2, 0, 2, 3 );
 
-    CONNECT( buttonsBox, accepted(), this, save() );
+    connect( buttonsBox, &QDialogButtonBox::accepted, this, &FirstRun::save );
     buttonsBox->setFocus();
 }

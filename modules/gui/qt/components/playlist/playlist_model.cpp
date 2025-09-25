@@ -64,10 +64,10 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
               this, processInputItemUpdate( input_item_t *) );
     DCONNECT( THEMIM, inputChanged( bool ),
               this, processInputItemUpdate( ) );
-    CONNECT( THEMIM, playlistItemAppended( int, int ),
-             this, processItemAppend( int, int ) );
-    CONNECT( THEMIM, playlistItemRemoved( int ),
-             this, processItemRemoval( int ) );
+    connect( THEMIM, &MainInputManager::playlistItemAppended,
+             this, &PLModel::processItemAppend );
+    connect( THEMIM, &MainInputManager::playlistItemRemoved,
+             this, &PLModel::processItemRemoval );
 }
 
 PLModel::~PLModel()

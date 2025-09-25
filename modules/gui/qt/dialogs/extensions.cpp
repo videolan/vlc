@@ -52,8 +52,8 @@ ExtensionsDialogProvider::ExtensionsDialogProvider( intf_thread_t *_p_intf,
 {
     vlc_dialog_provider_set_ext_callback( p_intf, DialogCallback, NULL );
 
-    CONNECT( this, SignalDialog( extension_dialog_t* ),
-             this, UpdateExtDialog( extension_dialog_t* ) );
+    connect( this, &ExtensionsDialogProvider::SignalDialog,
+             this, &ExtensionsDialogProvider::UpdateExtDialog );
 }
 
 ExtensionsDialogProvider::~ExtensionsDialogProvider()
@@ -71,8 +71,8 @@ ExtensionDialog* ExtensionsDialogProvider::CreateExtDialog(
                                                    p_extensions_manager,
                                                    p_dialog );
     p_dialog->p_sys_intf = (void*) dialog;
-    CONNECT( dialog, destroyDialog( extension_dialog_t* ),
-             this, DestroyExtDialog( extension_dialog_t* ) );
+    connect( dialog, &ExtensionDialog::destroyDialog,
+             this, &ExtensionsDialogProvider::DestroyExtDialog );
     return dialog;
 }
 
@@ -167,8 +167,8 @@ ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
          , p_dialog( _p_dialog ), has_lock(true)
 {
     assert( p_dialog );
-    CONNECT( ExtensionsDialogProvider::getInstance(), destroyed(),
-             this, parentDestroyed() );
+    connect( ExtensionsDialogProvider::getInstance(), &ExtensionsDialogProvider::destroyed,
+             this, &ExtensionDialog::parentDestroyed );
 
     msg_Dbg( p_intf, "Creating a new dialog: '%s'", p_dialog->psz_title );
     this->setWindowFlags( Qt::WindowMinMaxButtonsHint
@@ -217,7 +217,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
         case EXTENSION_WIDGET_BUTTON:
             button = new QPushButton( qfu( p_widget->psz_text ), this );
             clickMapper->setMapping( button, new WidgetMapper( button, p_widget ) );
-            CONNECT( button, clicked(), clickMapper, map() );
+            connect( button, &QPushButton::clicked, clickMapper, QOverload<>::of(&QSignalMapper::map) );
             p_widget->p_sys_intf = button;
             return button;
 
@@ -246,8 +246,8 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             textInput->setEchoMode( QLineEdit::Normal );
             inputMapper->setMapping( textInput, new WidgetMapper( textInput, p_widget ) );
             /// @note: maybe it would be wiser to use textEdited here?
-            CONNECT( textInput, textChanged(const QString &),
-                     inputMapper, map() );
+            connect( textInput, &QLineEdit::textChanged,
+                     inputMapper, QOverload<>::of(&QSignalMapper::map) );
             p_widget->p_sys_intf = textInput;
             return textInput;
 
@@ -258,8 +258,8 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             textInput->setEchoMode( QLineEdit::Password );
             inputMapper->setMapping( textInput, new WidgetMapper( textInput, p_widget ) );
             /// @note: maybe it would be wiser to use textEdited here?
-            CONNECT( textInput, textChanged(const QString &),
-                     inputMapper, map() );
+            connect( textInput, &QLineEdit::textChanged,
+                     inputMapper, QOverload<>::of(&QSignalMapper::map) );
             p_widget->p_sys_intf = textInput;
             return textInput;
 
@@ -268,7 +268,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             checkBox->setText( qfu( p_widget->psz_text ) );
             checkBox->setChecked( p_widget->b_checked );
             clickMapper->setMapping( checkBox, new WidgetMapper( checkBox, p_widget ) );
-            CONNECT( checkBox, stateChanged( int ), clickMapper, map() );
+            connect( checkBox, &QCheckBox::stateChanged, clickMapper, QOverload<>::of(&QSignalMapper::map) );
             p_widget->p_sys_intf = checkBox;
             return checkBox;
 
@@ -289,8 +289,13 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                     comboBox->setCurrentIndex( idx );
             }
             selectMapper->setMapping( comboBox, new WidgetMapper( comboBox, p_widget ) );
-            CONNECT( comboBox, currentIndexChanged( const QString& ),
-                     selectMapper, map() );
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+            connect( comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                     selectMapper, QOverload<>::of(&QSignalMapper::map) );
+#else
+            connect( comboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
+                     selectMapper, QOverload<>::of(&QSignalMapper::map) );
+#endif
             return comboBox;
 
         case EXTENSION_WIDGET_LIST:
@@ -306,8 +311,8 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                 list->addItem( item );
             }
             selectMapper->setMapping( list, new WidgetMapper( list, p_widget ) );
-            CONNECT( list, itemSelectionChanged(),
-                     selectMapper, map() );
+            connect( list, &QListWidget::itemSelectionChanged,
+                     selectMapper, QOverload<>::of(&QSignalMapper::map) );
             return list;
 
         case EXTENSION_WIDGET_SPIN_ICON:
@@ -568,7 +573,7 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
             button->setText( qfu( p_widget->psz_text ) );
             clickMapper->removeMappings( button );
             clickMapper->setMapping( button, new WidgetMapper( button, p_widget ) );
-            CONNECT( button, clicked(), clickMapper, map() );
+            connect( button, &QPushButton::clicked, clickMapper, QOverload<>::of(&QSignalMapper::map) );
             return button;
 
         case EXTENSION_WIDGET_IMAGE:

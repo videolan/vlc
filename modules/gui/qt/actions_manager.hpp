@@ -100,6 +100,8 @@ public slots:
     void StopRendererScan();
     void RendererSelected( QAction * );
 
+    virtual void doAction( int );
+
 protected slots:
     void onRendererItemAdded( vlc_renderer_item_t* );
     void onRendererItemRemoved( vlc_renderer_item_t* );
@@ -107,8 +109,6 @@ protected slots:
     void snapshot();
     void playlist();
     void frame();
-
-    virtual void doAction( int );
 
 signals:
     void rendererItemAdded( vlc_renderer_item_t* );

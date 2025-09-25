@@ -102,7 +102,7 @@ void PLSelItem::addAction( ItemAction act, const QString& tooltip )
     layout->addWidget( lblAction, 0 );
     lblAction->hide();
 
-    CONNECT( lblAction, clicked(), this, triggerAction() );
+    connect( lblAction, &SelectorActionButton::clicked, this, &PLSelItem::triggerAction );
 }
 
 
@@ -131,10 +131,10 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     podcastsParentId = -1;
 
     /* Podcast connects */
-    CONNECT( THEMIM, playlistItemAppended( int, int ),
-             this, plItemAdded( int, int ) );
-    CONNECT( THEMIM, playlistItemRemoved( int ),
-             this, plItemRemoved( int ) );
+    connect( THEMIM, &MainInputManager::playlistItemAppended,
+             this, &PLSelector::plItemAdded );
+    connect( THEMIM, &MainInputManager::playlistItemRemoved,
+             this, &PLSelector::plItemRemoved );
     DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
               this, inputItemUpdate( input_item_t * ) );
 
@@ -152,10 +152,10 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
      * See QStyle::SH_ItemView_ActivateItemOnSingleClick
      ***/
     curItem = NULL;
-    CONNECT( this, itemActivated( QTreeWidgetItem *, int ),
-             this, setSource( QTreeWidgetItem *) );
-    CONNECT( this, itemClicked( QTreeWidgetItem *, int ),
-             this, setSource( QTreeWidgetItem *) );
+    connect( this, &PLSelector::itemActivated,
+             this, &PLSelector::setSource );
+    connect( this, &PLSelector::itemClicked,
+             this, &PLSelector::setSource );
 }
 
 PLSelector::~PLSelector()
@@ -277,7 +277,7 @@ void PLSelector::createItems()
             {
                 selItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PODCAST ) );
                 selItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
-                CONNECT( selItem, action( PLSelItem* ), this, podcastAdd( PLSelItem* ) );
+                connect( selItem, &PLSelItem::action, this, &PLSelector::podcastAdd );
                 podcastsParent = selItem->treeItem();
                 icon = QIcon( ":/sidebar/podcast.svg" );
             }
@@ -457,7 +457,7 @@ PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
     item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( p_item ) );
     item->treeItem()->setData( 0, PL_ITEM_ID_ROLE, QVariant(p_item->i_id) );
     item->treeItem()->setData( 0, IN_ITEM_ROLE, QVariant::fromValue( p_item->p_input ) );
-    CONNECT( item, action( PLSelItem* ), this, podcastRemove( PLSelItem* ) );
+    connect( item, &PLSelItem::action, this, &PLSelector::podcastRemove );
     return item;
 }
 

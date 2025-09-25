@@ -76,9 +76,14 @@ AbstractController::AbstractController( intf_thread_t * _p_i, QWidget *_parent )
 
     /* Main action provider */
     toolbarActionsMapper = new QSignalMapper( this );
-    CONNECT( toolbarActionsMapper, mapped( int ),
-             ActionsManager::getInstance( p_intf  ), doAction( int ) );
-    connect( THEMIM->getIM(), &InputManager::playingStatusChanged, this, &AbstractController::setStatus);
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    connect( toolbarActionsMapper, &QSignalMapper::mappedInt,
+            ActionsManager::getInstance( p_intf  ), &ActionsManager::doAction );
+#else
+    connect( toolbarActionsMapper, QOverload<int>::of(&QSignalMapper::mapped),
+             ActionsManager::getInstance( p_intf  ), &ActionsManager::doAction );
+#endif
+    connect( THEMIM->getIM(), &InputManager::playingStatusChanged, this, &AbstractController::setStatus );
 
     setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
 }
@@ -286,8 +291,8 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         QToolButtonExt *but = new QToolButtonExt;
         setupButton( but );
         BUTTON_SET_BAR( but );
-        CONNECT( but, shortClicked(), THEMIM, prev() );
-        CONNECT( but, longClicked(), THEAM, skipBackward() );
+        connect( but, &QToolButtonExt::shortClicked, THEMIM, &MainInputManager::prev );
+        connect( but, &QToolButtonExt::longClicked, THEAM, &ActionsManager::skipBackward );
         widget = but;
         }
         break;
@@ -295,8 +300,8 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         QToolButtonExt *but = new QToolButtonExt;
         setupButton( but );
         BUTTON_SET_BAR( but );
-        CONNECT( but, shortClicked(), THEMIM, next() );
-        CONNECT( but, longClicked(), THEAM, skipForward() );
+        connect( but, &QToolButtonExt::shortClicked, THEMIM, &MainInputManager::next );
+        connect( but, &QToolButtonExt::longClicked, THEAM, &ActionsManager::skipForward );
         widget = but;
         }
         break;
@@ -356,7 +361,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     case INPUT_SLIDER: {
         SeekSlider *slider = new SeekSlider( p_intf, Qt::Horizontal, NULL, !b_shiny );
         SeekPoints *chapters = new SeekPoints( this, p_intf );
-        CONNECT( THEMIM->getIM(), chapterChanged( bool ), chapters, update() );
+        connect( THEMIM->getIM(), &InputManager::chapterChanged, chapters, &SeekPoints::update );
         slider->setChapters( chapters );
 
         /* Update the position when the IM has changed */
@@ -580,7 +585,6 @@ QFrame *AbstractController::discFrame()
        navigation changes */
     connect( THEMIM->getIM(), &InputManager::chapterChanged, chapFrame, &QFrame::setVisible );
     connect( THEMIM->getIM(), &InputManager::titleChanged, menuFrame, &QFrame::setVisible );
-
     /* Changes the IM navigation when triggered on the nav buttons */
     connect( prevSectionButton, &QToolButton::clicked, THEMIM->getIM(), &InputManager::sectionPrev );
     connect( nextSectionButton, &QToolButton::clicked, THEMIM->getIM(), &InputManager::sectionNext );
@@ -597,7 +601,8 @@ QFrame *AbstractController::telexFrame()
     QFrame *telexFrame = new QFrame( this );
     QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
     telexLayout->setSpacing( 0 ); telexLayout->setContentsMargins( 0, 0, 0, 0 );
-    connect( THEMIM->getIM(),  &InputManager::teletextPossible, telexFrame, &QFrame::setVisible );
+    connect( THEMIM->getIM(), &InputManager::teletextPossible,
+             telexFrame, &QFrame::setVisible );
 
     /* On/Off button */
     QToolButton *telexOn = new QToolButton;
@@ -610,7 +615,7 @@ QFrame *AbstractController::telexFrame()
 
     /* Teletext Activation and set */
     connect( telexOn, &QToolButton::clicked, THEMIM->getIM(), &InputManager::activateTeletext );
-    connect( THEMIM->getIM(), &InputManager::teletextPossible , telexOn, &QToolButton::setChecked );
+    connect( THEMIM->getIM(), &InputManager::teletextPossible, telexOn, &QToolButton::setEnabled );
 
     /* Transparency button */
     QToolButton *telexTransparent = new QToolButton;
@@ -679,11 +684,11 @@ QFrame *AbstractController::telexFrame()
 
     /* Page change and set */
     connect( telexPage, QOverload<int>::of(&QSpinBox::valueChanged), THEMIM->getIM(), &InputManager::telexSetPage );
-    connect( THEMIM->getIM(), &InputManager::newTelexPageSet, telexPage, &QSpinBox::setValue);
+    connect( THEMIM->getIM(), &InputManager::newTelexPageSet, telexPage, &QSpinBox::setValue );
 
     connect( THEMIM->getIM(), &InputManager::teletextActivated, telexPage, &QSpinBox::setEnabled);
     connect( THEMIM->getIM(), &InputManager::teletextActivated, telexTransparent, &QToolButton::setEnabled );
-    CONNECT( THEMIM->getIM(), &InputManager::teletextActivated, telexOn, &QToolButton::setChecked );
+    connect( THEMIM->getIM(), &InputManager::teletextActivated, telexOn, &QToolButton::setChecked );
     return telexFrame;
 }
 #undef BUTTON_SET_BAR
@@ -843,7 +848,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     screenRes = getSettings()->value( "FullScreen/screen" ).toRect();
     isWideFSC = getSettings()->value( "FullScreen/wide" ).toBool();
 
-    CONNECT( this, fullscreenChanged( bool ), THEMIM, changeFullscreen( bool ) );
+    connect( this, QOverload<bool>::of(&FullscreenControllerWidget::fullscreenChanged), THEMIM, &MainInputManager::changeFullscreen );
 
     Q_ASSERT( _parent );
     _parent->installEventFilter( this );

@@ -188,8 +188,8 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     previewBox->setLayout( new QVBoxLayout() );
     previewBox->layout()->addWidget( previewWidget );
     mainLayout->addWidget( previewBox, 5, 6, 3, 3 );
-    CONNECT( positionCheckbox, stateChanged(int),
-             previewWidget, setBarsTopPosition(int) );
+    connect( positionCheckbox, &QCheckBox::stateChanged,
+             previewWidget, &PreviewWidget::setBarsTopPosition );
 
     /* Buttons */
     QDialogButtonBox *okCancel = new QDialogButtonBox;
@@ -201,7 +201,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
 
     BUTTONACT( deleteButton, deleteProfile() );
     BUTTONACT( newButton, newProfile() );
-    CONNECT( profileCombo, currentIndexChanged( int ), this, changeProfile( int ) );
+    connect( profileCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ToolbarEditDialog::changeProfile );
     BUTTONACT( okButton, close() );
     BUTTONACT( cancelButton, cancel() );
     mainLayout->addWidget( okCancel, 8, 0, 1, 9 );

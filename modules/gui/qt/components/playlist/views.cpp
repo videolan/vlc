@@ -447,8 +447,8 @@ void PlTreeView::setModel( QAbstractItemModel * model )
 {
     QTreeView::setModel( model );
     VLCModel *m = static_cast<VLCModel*>(model);
-    CONNECT( this, expanded( const QModelIndex & ),
-             m, ensureArtRequested( const QModelIndex & ) );
+    connect( this, &PlTreeView::expanded,
+             m, &VLCModel::ensureArtRequested );
 }
 
 void PlTreeView::startDrag ( Qt::DropActions supportedActions )
@@ -480,8 +480,8 @@ PicFlowView::PicFlowView( QAbstractItemModel *p_model, QWidget *parent ) : QAbst
     layout->setContentsMargins( 0, 0, 0, 0 );
     picFlow = new PictureFlow( this, p_model );
     picFlow->setContextMenuPolicy( Qt::CustomContextMenu );
-    connect( picFlow, SIGNAL(customContextMenuRequested( const QPoint & )),
-             this,    SIGNAL(customContextMenuRequested( const QPoint & )) );
+    connect( picFlow, &PictureFlow::customContextMenuRequested,
+             this,    &PicFlowView::customContextMenuRequested );
     layout->addWidget( picFlow );
     picFlow->setSlideSize(QSize( 4*LISTVIEW_ART_SIZE, 3*LISTVIEW_ART_SIZE) );
     setSelectionMode( QAbstractItemView::SingleSelection );

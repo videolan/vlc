@@ -33,6 +33,7 @@
 #include <QDateTime>
 #include <QTimeZone>
 
+#include "EPGItem.hpp"
 #include "EPGWidget.hpp"
 #include "EPGRuler.hpp"
 #include "EPGView.hpp"
@@ -71,17 +72,17 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     layout->addWidget( rootWidget );
     setLayout( layout );
 
-    CONNECT( m_epgView, rangeChanged(const QDateTime &, const QDateTime &),
-             m_rulerWidget, setRange(const QDateTime &, const QDateTime &) );
+    connect( m_epgView, &EPGView::rangeChanged,
+             m_rulerWidget, &EPGRuler::setRange );
 
-    CONNECT( m_epgView->horizontalScrollBar(), valueChanged(int),
-             m_rulerWidget, setOffset(int) );
-    CONNECT( m_epgView->verticalScrollBar(), valueChanged(int),
-             m_channelsWidget, setOffset(int) );
-    connect( m_epgView, SIGNAL( itemFocused(EPGItem*)),
-             this, SIGNAL(itemSelectionChanged(EPGItem*)) );
-    CONNECT( m_epgView, programAdded(const EPGProgram *), m_channelsWidget, addProgram(const EPGProgram *) );
-    CONNECT( m_epgView, programActivated(int), this, activateProgram(int) );
+    connect( m_epgView->horizontalScrollBar(), &QScrollBar::valueChanged,
+             m_rulerWidget, &EPGRuler::setOffset );
+    connect( m_epgView->verticalScrollBar(), &QScrollBar::valueChanged,
+             m_channelsWidget, &EPGChannels::setOffset );
+    connect( m_epgView, &EPGView::itemFocused,
+             this, &EPGWidget::itemSelectionChanged );
+    connect( m_epgView, &EPGView::programAdded, m_channelsWidget, &EPGChannels::addProgram );
+    connect( m_epgView, &EPGView::programActivated, this, &EPGWidget::activateProgram );
 }
 
 void EPGWidget::reset()

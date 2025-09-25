@@ -207,7 +207,7 @@ void MainInterfaceWin32::createTaskBarButtons()
                      "ThumbBarAddButtons", hr );
     }
     connect( THEMIM->getIM(), &InputManager::playingStatusChanged,
-             this, &MainInterfaceWin32::changeThumbbarButtons);
+             this, &MainInterfaceWin32::changeThumbbarButtons );
     connect( THEMIM, &MainInputManager::playlistItemAppended,
             this, &MainInterfaceWin32::playlistItemAppended );
     connect( THEMIM, &MainInputManager::playlistItemRemoved,

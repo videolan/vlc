@@ -159,13 +159,15 @@ private:
     QString latestSearch;
     QFont   customFont;
 
+public slots:
+    virtual void activateItem( const QModelIndex &index ) Q_DECL_OVERRIDE;
+
 private slots:
     void processInputItemUpdate( input_item_t *);
     void processInputItemUpdate();
     void processItemRemoval( int i_pl_itemid );
     void processItemAppend( int i_pl_itemid, int i_pl_itemidparent );
     void activateItem( playlist_item_t *p_item );
-    virtual void activateItem( const QModelIndex &index ) Q_DECL_OVERRIDE;
 };
 
 class PlMimeData : public QMimeData

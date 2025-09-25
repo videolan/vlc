@@ -48,10 +48,10 @@ QMenuView::QMenuView( QWidget * parent, int _iMaxVisibleCount )
     m_model = NULL;
 
     /* Rebuild the Menu just before showing it */
-    CONNECT( this, aboutToShow(), this, rebuild() );
+    connect( this, &QMenuView::aboutToShow, this, &QMenuView::rebuild );
 
     /* */
-    CONNECT( this, triggered(QAction*), this, activate(QAction*) );
+    connect( this, &QMenuView::triggered, this, &QMenuView::activate );
 }
 
 /* */

@@ -63,7 +63,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
     setTextElideMode( Qt::ElideNone );
 
     setUniformRowHeights( true );
-    CONNECT( this, itemExpanded(QTreeWidgetItem*), this, resizeColumns() );
+    connect( this, &PrefsTree::itemExpanded, this, &PrefsTree::resizeColumns );
 
     /* Nice icons */
 #define BI( a,b) QIcon a##_icon = QIcon( b )

@@ -653,9 +653,9 @@ PictureFlow::PictureFlow(QWidget* parent, QAbstractItemModel* _p_model): QWidget
 
     d->animator = new PictureFlowAnimator;
     d->animator->state = d->state;
-    QObject::connect(&d->animator->animateTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
+    QObject::connect(&d->animator->animateTimer, &QTimer::timeout, this, &PictureFlow::updateAnimation);
 
-    QObject::connect(&d->triggerTimer, SIGNAL(timeout()), this, SLOT(render()));
+    QObject::connect(&d->triggerTimer, &QTimer::timeout, this, &PictureFlow::render);
 
     setAttribute(Qt::WA_StaticContents, true);
     setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -1036,34 +1036,34 @@ void PictureFlowPrivate::setModel(QAbstractItemModel * m)
 {
     if (state->model)
     {
-        disconnect(state->model, SIGNAL(columnsAboutToBeInserted(const QModelIndex & , int , int)),
-                   this, SLOT(columnsAboutToBeInserted(const QModelIndex & , int , int)));
-        disconnect(state->model, SIGNAL(columnsAboutToBeRemoved(const QModelIndex & , int , int)),
-                   this, SLOT(columnsAboutToBeRemoved(const QModelIndex & , int , int)));
-        disconnect(state->model, SIGNAL(columnsInserted(const QModelIndex & , int , int)),
-                   this, SLOT(columnsInserted(const QModelIndex & , int , int)));
-        disconnect(state->model, SIGNAL(columnsRemoved(const QModelIndex & , int , int)),
-                   this, SLOT(columnsRemoved(const QModelIndex & , int , int)));
-        disconnect(state->model, SIGNAL(dataChanged(const QModelIndex & , const QModelIndex &)),
-                   this, SLOT(dataChanged(const QModelIndex & , const QModelIndex &)));
-        disconnect(state->model, SIGNAL(headerDataChanged(Qt::Orientation , int , int)),
-                   this, SLOT(headerDataChanged(Qt::Orientation , int , int)));
-        disconnect(state->model, SIGNAL(layoutAboutToBeChanged()),
-                   this, SLOT(layoutAboutToBeChanged()));
-        disconnect(state->model, SIGNAL(layoutChanged()),
-                   this, SLOT(layoutChanged()));
-        disconnect(state->model, SIGNAL(modelAboutToBeReset()),
-                   this, SLOT(modelAboutToBeReset()));
-        disconnect(state->model, SIGNAL(modelReset()),
-                   this, SLOT(modelReset()));
-        disconnect(state->model, SIGNAL(rowsAboutToBeInserted(const QModelIndex & , int , int)),
-                   this, SLOT(rowsAboutToBeInserted(const QModelIndex & , int , int)));
-        disconnect(state->model, SIGNAL(rowsAboutToBeRemoved(const QModelIndex & , int , int)),
-                   this, SLOT(rowsAboutToBeRemoved(const QModelIndex & , int , int)));
-        disconnect(state->model, SIGNAL(rowsInserted(const QModelIndex & , int , int)),
-                   this, SLOT(rowsInserted(const QModelIndex & , int , int)));
-        disconnect(state->model, SIGNAL(rowsRemoved(const QModelIndex & , int , int)),
-                   this, SLOT(rowsRemoved(const QModelIndex & , int , int)));
+        disconnect(state->model, &QAbstractItemModel::columnsAboutToBeInserted,
+                   this, &PictureFlowPrivate::columnsAboutToBeInserted);
+        disconnect(state->model, &QAbstractItemModel::columnsAboutToBeRemoved,
+                   this, &PictureFlowPrivate::columnsAboutToBeRemoved);
+        disconnect(state->model, &QAbstractItemModel::columnsInserted,
+                   this, &PictureFlowPrivate::columnsInserted);
+        disconnect(state->model, &QAbstractItemModel::columnsRemoved,
+                   this, &PictureFlowPrivate::columnsRemoved);
+        disconnect(state->model, &QAbstractItemModel::dataChanged,
+                   this, &PictureFlowPrivate::dataChanged);
+        disconnect(state->model, &QAbstractItemModel::headerDataChanged,
+                   this, &PictureFlowPrivate::headerDataChanged);
+        disconnect(state->model, &QAbstractItemModel::layoutAboutToBeChanged,
+                   this, &PictureFlowPrivate::layoutAboutToBeChanged);
+        disconnect(state->model, &QAbstractItemModel::layoutChanged,
+                   this, &PictureFlowPrivate::layoutChanged);
+        disconnect(state->model, &QAbstractItemModel::modelAboutToBeReset,
+                   this, &PictureFlowPrivate::modelAboutToBeReset);
+        disconnect(state->model, &QAbstractItemModel::modelReset,
+                   this, &PictureFlowPrivate::modelReset);
+        disconnect(state->model, &QAbstractItemModel::rowsAboutToBeInserted,
+                   this, &PictureFlowPrivate::rowsAboutToBeInserted);
+        disconnect(state->model, &QAbstractItemModel::rowsAboutToBeRemoved,
+                   this, &PictureFlowPrivate::rowsAboutToBeRemoved);
+        disconnect(state->model, &QAbstractItemModel::rowsInserted,
+                   this, &PictureFlowPrivate::rowsInserted);
+        disconnect(state->model, &QAbstractItemModel::rowsRemoved,
+                   this, &PictureFlowPrivate::rowsRemoved);
     }
 
     state->model = (VLCModel*)m;
@@ -1071,34 +1071,34 @@ void PictureFlowPrivate::setModel(QAbstractItemModel * m)
     {
         rootindex = state->model->parent(QModelIndex());
 
-        connect(state->model, SIGNAL(columnsAboutToBeInserted(const QModelIndex & , int , int)),
-                this, SLOT(columnsAboutToBeInserted(const QModelIndex & , int , int)));
-        connect(state->model, SIGNAL(columnsAboutToBeRemoved(const QModelIndex & , int , int)),
-                this, SLOT(columnsAboutToBeRemoved(const QModelIndex & , int , int)));
-        connect(state->model, SIGNAL(columnsInserted(const QModelIndex & , int , int)),
-                this, SLOT(columnsInserted(const QModelIndex & , int , int)));
-        connect(state->model, SIGNAL(columnsRemoved(const QModelIndex & , int , int)),
-                this, SLOT(columnsRemoved(const QModelIndex & , int , int)));
-        connect(state->model, SIGNAL(dataChanged(const QModelIndex & , const QModelIndex &)),
-                this, SLOT(dataChanged(const QModelIndex & , const QModelIndex &)));
-        connect(state->model, SIGNAL(headerDataChanged(Qt::Orientation , int , int)),
-                this, SLOT(headerDataChanged(Qt::Orientation , int , int)));
-        connect(state->model, SIGNAL(layoutAboutToBeChanged()),
-                this, SLOT(layoutAboutToBeChanged()));
-        connect(state->model, SIGNAL(layoutChanged()),
-                this, SLOT(layoutChanged()));
-        connect(state->model, SIGNAL(modelAboutToBeReset()),
-                this, SLOT(modelAboutToBeReset()));
-        connect(state->model, SIGNAL(modelReset()),
-                this, SLOT(modelReset()));
-        connect(state->model, SIGNAL(rowsAboutToBeInserted(const QModelIndex & , int , int)),
-                this, SLOT(rowsAboutToBeInserted(const QModelIndex & , int , int)));
-        connect(state->model, SIGNAL(rowsAboutToBeRemoved(const QModelIndex & , int , int)),
-                this, SLOT(rowsAboutToBeRemoved(const QModelIndex & , int , int)));
-        connect(state->model, SIGNAL(rowsInserted(const QModelIndex & , int , int)),
-                this, SLOT(rowsInserted(const QModelIndex & , int , int)));
-        connect(state->model, SIGNAL(rowsRemoved(const QModelIndex & , int , int)),
-                this, SLOT(rowsRemoved(const QModelIndex & , int , int)));
+        connect(state->model, &QAbstractItemModel::columnsAboutToBeInserted,
+                this, &PictureFlowPrivate::columnsAboutToBeInserted);
+        connect(state->model, &QAbstractItemModel::columnsAboutToBeRemoved,
+                this, &PictureFlowPrivate::columnsAboutToBeRemoved);
+        connect(state->model, &QAbstractItemModel::columnsInserted,
+                this, &PictureFlowPrivate::columnsInserted);
+        connect(state->model, &QAbstractItemModel::columnsRemoved,
+                this, &PictureFlowPrivate::columnsRemoved);
+        connect(state->model, &QAbstractItemModel::dataChanged,
+                this, &PictureFlowPrivate::dataChanged);
+        connect(state->model, &QAbstractItemModel::headerDataChanged,
+                this, &PictureFlowPrivate::headerDataChanged);
+        connect(state->model, &QAbstractItemModel::layoutAboutToBeChanged,
+                this, &PictureFlowPrivate::layoutAboutToBeChanged);
+        connect(state->model, &QAbstractItemModel::layoutChanged,
+                this, &PictureFlowPrivate::layoutChanged);
+        connect(state->model, &QAbstractItemModel::modelAboutToBeReset,
+                this, &PictureFlowPrivate::modelAboutToBeReset);
+        connect(state->model, &QAbstractItemModel::modelReset,
+                this, &PictureFlowPrivate::modelReset);
+        connect(state->model, &QAbstractItemModel::rowsAboutToBeInserted,
+                this, &PictureFlowPrivate::rowsAboutToBeInserted);
+        connect(state->model, &QAbstractItemModel::rowsAboutToBeRemoved,
+                this, &PictureFlowPrivate::rowsAboutToBeRemoved);
+        connect(state->model, &QAbstractItemModel::rowsInserted,
+                this, &PictureFlowPrivate::rowsInserted);
+        connect(state->model, &QAbstractItemModel::rowsRemoved,
+                this, &PictureFlowPrivate::rowsRemoved);
     }
 
     reset();

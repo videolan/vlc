@@ -76,8 +76,8 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     BUTTONACT( deleteButton, deleteProfile() );
     fillProfilesCombo();
 
-    CONNECT( profileBox, activated( int ),
-             this, updateOptions( int ) );
+    connect( profileBox, QOverload<int>::of(&QComboBox::activated),
+             this, &VLCProfileSelector::updateOptions );
     updateOptions( qMax(profileBox->currentIndex(), 0) );
 }
 
@@ -453,18 +453,18 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     ui.buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
     BUTTONACT( cancelButton, reject() );
 
-    CONNECT( ui.valueholder_video_copy, stateChanged( int ),
-             this, activatePanels() );
-    CONNECT( ui.valueholder_audio_copy, stateChanged( int ),
-             this, activatePanels() );
-    CONNECT( ui.valueholder_subtitles_overlay, stateChanged( int ),
-             this, activatePanels() );
-    CONNECT( ui.valueholder_vcodec_bitrate, editingFinished( ),
-             this, fixBirateState() );
-    CONNECT( ui.valueholder_vcodec_qp, editingFinished( ),
-             this, fixQPState() );
-    CONNECT( ui.valueholder_video_codec, currentIndexChanged( int ),
-             this, codecSelected() );
+    connect( ui.valueholder_video_copy, &QCheckBox::stateChanged,
+             this, &VLCProfileEditor::activatePanels );
+    connect( ui.valueholder_audio_copy, &QCheckBox::stateChanged,
+             this, &VLCProfileEditor::activatePanels );
+    connect( ui.valueholder_subtitles_overlay, &QCheckBox::stateChanged,
+             this, &VLCProfileEditor::activatePanels );
+    connect( ui.valueholder_vcodec_bitrate, &QSpinBox::editingFinished,
+             this, &VLCProfileEditor::fixBirateState );
+    connect( ui.valueholder_vcodec_qp, &QSpinBox::editingFinished,
+             this, &VLCProfileEditor::fixQPState );
+    connect( ui.valueholder_video_codec, QOverload<int>::of(&QComboBox::currentIndexChanged),
+             this, &VLCProfileEditor::codecSelected );
     reset();
 
     fillProfile( value );
@@ -534,7 +534,7 @@ inline void VLCProfileEditor::registerCodecs()
     ui.button->setProperty( "capsubs", sub );\
     ui.button->setProperty( "capstream", stream );\
     ui.button->setProperty( "capchaps", chaps );\
-    CONNECT( ui.button, clicked(bool), this, muxSelected() );
+    connect( ui.button, &QRadioButton::clicked, this, &VLCProfileEditor::muxSelected );
     SETMUX( PSMux, "ps", "ps",  true, true, false, true, false, true )
     SETMUX( TSMux, "ts", "ts",  true, true, false, true, true, false )
     SETMUX( WEBMux, "webm", "avformat", true, true, false, false, true, false )

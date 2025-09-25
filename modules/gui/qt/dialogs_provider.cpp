@@ -80,11 +80,20 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
 
     /* Various signal mappers for the menus */
     menusMapper = new QSignalMapper();
-    CONNECT( menusMapper, mapped(QObject *), this, menuAction( QObject *) );
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    connect( menusMapper, &QSignalMapper::mappedObject, this, &DialogsProvider::menuAction );
+#else
+    connect( menusMapper, QOverload<QObject *>::of(&QSignalMapper::mapped), this, &DialogsProvider::menuAction );
+#endif
 
     menusUpdateMapper = new QSignalMapper();
-    CONNECT( menusUpdateMapper, mapped(QObject *),
-             this, menuUpdateAction( QObject *) );
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    connect( menusUpdateMapper, &QSignalMapper::mappedObject,
+            this, &DialogsProvider::menuUpdateAction );
+#else
+    connect( menusUpdateMapper, QOverload<QObject *>::of(&QSignalMapper::mapped),
+             this, &DialogsProvider::menuUpdateAction );
+#endif
 
     new DialogHandler (p_intf, this );
 }

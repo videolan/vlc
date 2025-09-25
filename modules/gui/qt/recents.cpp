@@ -57,10 +57,14 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
     times = QStringList();
 
     signalMapper = new QSignalMapper( this );
-    CONNECT( signalMapper,
-            mapped(const QString & ),
+    connect( signalMapper,
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+            &QSignalMapper::mappedString,
+#else
+            QOverload<const QString &>::of(&QSignalMapper::mapped),
+#endif
             this,
-            playMRL( const QString & ) );
+            &RecentsMRL::playMRL );
 
     /* Load the filter psz */
     char* psz_tmp = var_InheritString( p_intf, "qt-recentplay-filter" );

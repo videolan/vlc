@@ -426,8 +426,8 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     fadeAnimation->setStartValue( 0.0 );
     fadeAnimation->setEndValue( 1.0 );
     fadeAnimation->setEasingCurve( QEasingCurve::OutSine );
-    CONNECT( fadeAnimation, valueChanged( const QVariant & ),
-             this, update() );
+    connect( fadeAnimation, &QPropertyAnimation::valueChanged,
+             this, QOverload<>::of(&BackgroundWidget::update) );
 
     connect( THEMIM->getIM(), QOverload<QString>::of(&InputManager::artChanged),
              this, &BackgroundWidget::updateArt );
@@ -545,7 +545,7 @@ EasterEggBackgroundWidget::EasterEggBackgroundWidget( intf_thread_t *p_intf )
     b_enabled = false;
     timer = new QTimer( this );
     timer->setInterval( 100 );
-    CONNECT( timer, timeout(), this, spawnFlakes() );
+    connect( timer, &QTimer::timeout, this, &EasterEggBackgroundWidget::spawnFlakes );
     if ( isVisible() && b_enabled ) timer->start();
     defaultArt = QString( ":/logo/vlc128-xmas.png" );
     updateArt( "" );
@@ -736,7 +736,7 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
     slowerButton->setAutoRaise( true );
     slowerButton->setToolTip( tooltipL[SLOWER_BUTTON] );
     slowerButton->setIcon( QIcon( iconL[SLOWER_BUTTON] ) );
-    connect( slowerButton, &QToolButton::clicked, THEMIM->getIM(), &InputManager::slower);
+    connect( slowerButton, &QToolButton::clicked, THEMIM->getIM(), &InputManager::slower );
 
     QToolButton *fasterButton = new QToolButton( this );
     fasterButton->setMaximumSize( QSize( 26, 16 ) );
@@ -817,7 +817,7 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
 {
     setContextMenuPolicy( Qt::ActionsContextMenu );
     connect( THEMIM->getIM(), QOverload<QString>::of(&InputManager::artChanged),
-             this, QOverload<const QString&>::of(&CoverArtLabel::showArtUpdate) );
+             this, QOverload<const QString &>::of(&CoverArtLabel::showArtUpdate) );
 
     setMinimumHeight( 128 );
     setMinimumWidth( 128 );
@@ -825,11 +825,11 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     setAlignment( Qt::AlignCenter );
 
     QAction *action = new QAction( qtr( "Download cover art" ), this );
-    CONNECT( action, triggered(), this, askForUpdate() );
+    connect( action, &QAction::triggered, this, &CoverArtLabel::askForUpdate );
     addAction( action );
 
     action = new QAction( qtr( "Add cover art from file" ), this );
-    CONNECT( action, triggered(), this, setArtFromFile() );
+    connect( action, &QAction::triggered, this, &CoverArtLabel::setArtFromFile );
     addAction( action );
 
     p_item = THEMIM->currentInputItem();
@@ -945,7 +945,7 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
              this, QOverload<float>::of(&TimeLabel::setDisplayPosition) );
 
     connect( THEMIM->getIM(), &InputManager::positionUpdated,
-              this, QOverload<float , vlc_tick_t, int>::of(&TimeLabel::setDisplayPosition) );
+              this, QOverload<float, vlc_tick_t, int>::of(&TimeLabel::setDisplayPosition) );
 
     connect( this, &TimeLabel::broadcastRemainingTime,
          THEMIM->getIM(), &InputManager::remainingTimeChanged );

@@ -953,15 +953,15 @@ void InputManager::setAtoB()
     {
         timeB = var_GetInteger( p_mim->getInput(), "time"  );
         var_SetInteger( p_mim->getInput(), "time" , timeA );
-        CONNECT( this, positionUpdated( float, int64_t, int ),
-                 this, AtoBLoop( float, int64_t, int ) );
+        connect( this, &InputManager::positionUpdated,
+                 this, &InputManager::AtoBLoop );
     }
     else
     {
         timeA = 0;
         timeB = 0;
-        disconnect( this, SIGNAL( positionUpdated( float, int64_t, int ) ),
-                    this, SLOT( AtoBLoop( float, int64_t, int ) ) );
+        disconnect( this, &InputManager::positionUpdated,
+                    this, &InputManager::AtoBLoop );
     }
     emit AtoBchanged( (timeA != 0 ), (timeB != 0 ) );
 }
@@ -989,7 +989,11 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
 
     /* Audio Menu */
     menusAudioMapper = new QSignalMapper();
-    CONNECT( menusAudioMapper, mapped(QString), this, menusUpdateAudio( QString ) );
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    connect( menusAudioMapper, &QSignalMapper::mappedString, this, &MainInputManager::menusUpdateAudio );
+#else
+    connect( menusAudioMapper, QOverload<const QString &>::of(&QSignalMapper::mapped), this, &MainInputManager::menusUpdateAudio );
+#endif
 
     /* Core Callbacks */
     var_AddCallback( THEPL, "item-change", MainInputManager::ItemChanged, im );

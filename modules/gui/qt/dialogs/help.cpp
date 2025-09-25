@@ -67,7 +67,7 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     layout->addWidget( helpBrowser );
     layout->addWidget( closeButtonBox );
 
-    CONNECT( closeButtonBox, rejected(), this, close() );
+    connect( closeButtonBox, &QDialogButtonBox::rejected, this, &HelpDialog::close );
     restoreWidgetPosition( "Help", QSize( 500, 450 ) );
 }
 
@@ -234,10 +234,10 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     setWindowRole( "vlc-update" );
 
     BUTTONACT( recheckButton, UpdateOrDownload() );
-    CONNECT( ui.updateDialogButtonBox, rejected(), this, close() );
+    connect( ui.updateDialogButtonBox, &QDialogButtonBox::rejected, this, &UpdateDialog::close );
 
-    CONNECT( ui.updateNotifyButtonBox, accepted(), this, UpdateOrDownload() );
-    CONNECT( ui.updateNotifyButtonBox, rejected(), this, close() );
+    connect( ui.updateNotifyButtonBox, &QDialogButtonBox::accepted, this, &UpdateDialog::UpdateOrDownload );
+    connect( ui.updateNotifyButtonBox, &QDialogButtonBox::rejected, this, &UpdateDialog::close );
 
     /* Create the update structure */
     p_update = update_New( p_intf );

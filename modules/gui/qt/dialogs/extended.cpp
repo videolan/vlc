@@ -63,20 +63,20 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     QTabWidget *audioTab = new QTabWidget( audioWidget );
 
     equal = new Equalizer( p_intf, audioTab );
-    CONNECT( equal, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
+    connect( equal, &Equalizer::configChanged, this, &ExtendedDialog::putAudioConfig );
     audioTab->addTab( equal, qtr( "Equalizer" ) );
 
     Compressor *compres = new Compressor( p_intf, audioTab );
-    CONNECT( compres, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
+    connect( compres, &Compressor::configChanged, this, &ExtendedDialog::putAudioConfig );
     audioTab->addTab( compres, qtr( "Compressor" ) );
 
     Spatializer *spatial = new Spatializer( p_intf, audioTab );
-    CONNECT( spatial, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
+    connect( spatial, &Spatializer::configChanged, this, &ExtendedDialog::putAudioConfig );
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
     audioLayout->addWidget( audioTab );
 
     StereoWidener *stereowiden = new StereoWidener( p_intf, audioTab );
-    CONNECT( stereowiden, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
+    connect( stereowiden, &StereoWidener::configChanged, this, &ExtendedDialog::putAudioConfig );
     audioTab->addTab( stereowiden, qtr( "Stereo Widener" ) );
     audioLayout->addWidget( audioTab );
 
@@ -84,7 +84,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     QGridLayout *advancedTabLayout = new QGridLayout;
 
     PitchShifter *pitchshifter = new PitchShifter( p_intf, audioTab );
-    CONNECT( pitchshifter, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
+    connect( pitchshifter, &PitchShifter::configChanged, this, &ExtendedDialog::putAudioConfig );
 
     advancedTabLayout->setColumnStretch( 1, 10 );
     advancedTabLayout->addWidget( pitchshifter );
@@ -101,7 +101,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     QTabWidget *videoTab = new QTabWidget( videoWidget );
 
     videoEffect = new ExtVideo( p_intf, videoTab );
-    CONNECT( videoEffect, configChanged(QString, QVariant), this, putVideoConfig(QString, QVariant) );
+    connect( videoEffect, &ExtVideo::configChanged, this, &ExtendedDialog::putVideoConfig );
     videoLayout->addWidget( videoTab );
     videoTab->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
 
@@ -117,7 +117,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     }
 
     layout->addWidget( mainTabW );
-    CONNECT( mainTabW, currentChanged(int), this, currentTabChanged(int) );
+    connect( mainTabW, &QTabWidget::currentChanged, this, &ExtendedDialog::currentTabChanged );
 
     /* Bottom buttons */
     QDialogButtonBox *buttonBox = new QDialogButtonBox( Qt::Horizontal, this );
@@ -130,8 +130,8 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
         new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
     layout->addWidget( buttonBox );
 
-    CONNECT( buttonBox, rejected(), this, close() );
-    CONNECT( m_applyButton, clicked(), this, saveConfig() );
+    connect( buttonBox, &QDialogButtonBox::rejected, this, &ExtendedDialog::close );
+    connect( m_applyButton, &QPushButton::clicked, this, &ExtendedDialog::saveConfig );
 
     /* Restore geometry or move this dialog on the left pane of the MI */
     if( !restoreGeometry( getSettings()->value("EPanel/geometry").toByteArray() ) )

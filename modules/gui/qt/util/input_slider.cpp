@@ -165,11 +165,11 @@ SeekSlider::SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_pare
     startAnimLoadingTimer->setSingleShot( true );
     startAnimLoadingTimer->setInterval( 500 );
 
-    connect( MainInputManager::getInstance(), &MainInputManager::inputChanged, this , &SeekSlider::inputUpdated );
-    CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
-    CONNECT( seekLimitTimer, timeout(), this, updatePos() );
-    CONNECT( hideHandleTimer, timeout(), this, hideHandle() );
-    CONNECT( startAnimLoadingTimer, timeout(), this, startAnimLoading() );
+    connect( MainInputManager::getInstance(), &MainInputManager::inputChanged, this, &SeekSlider::inputUpdated );
+    connect( this, &SeekSlider::sliderMoved, this, &SeekSlider::startSeekTimer );
+    connect( seekLimitTimer, &QTimer::timeout, this, &SeekSlider::updatePos );
+    connect( hideHandleTimer, &QTimer::timeout, this, &SeekSlider::hideHandle );
+    connect( startAnimLoadingTimer, &QTimer::timeout, this, &SeekSlider::startAnimLoading );
     mTimeTooltip->installEventFilter( this );
 
     connect(&wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, this, [this](int vlcButton){

@@ -61,7 +61,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     ui.destTab->setTabsClosable( true );
     QTabBar* tb = ui.destTab->findChild<QTabBar*>();
     if( tb != NULL ) tb->tabButton(0, QTabBar::RightSide)->hide();
-    CONNECT( ui.destTab, tabCloseRequested( int ), this, closeTab( int ) );
+    connect( ui.destTab, &QTabWidget::tabCloseRequested, this, &SoutDialog::closeTab );
     ui.destTab->setTabIcon( 0, QIcon( ":/buttons/playlist/playlist_add.svg" ) );
 
     ui.destBox->addItem( qtr( "File" ) );
@@ -82,7 +82,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     /* Misc */
     CB( soutAll );
     CB( localOutput ); CB( transcodeBox );
-    CONNECT( ui.profileSelect, optionsChanged(), this, updateMRL() );
+    connect( ui.profileSelect, &VLCProfileSelector::optionsChanged, this, &SoutDialog::updateMRL );
 
     setButtonText( QWizard::BackButton, qtr("Back") );
     setButtonText( QWizard::CancelButton, qtr("Cancel") );
@@ -151,7 +151,7 @@ void SoutDialog::addDest( )
     }
 
     int index = ui.destTab->addTab( db, caption );
-    CONNECT( db, mrlUpdated(), this, updateMRL() );
+    connect( db, &VirtualDestBox::mrlUpdated, this, &SoutDialog::updateMRL );
     ui.destTab->setCurrentIndex( index );
     updateMRL();
 }

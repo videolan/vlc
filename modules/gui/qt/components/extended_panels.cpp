@@ -260,16 +260,16 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
 #undef SETUP_VFILTER
 #undef SETUP_VFILTER_OPTION
 
-    CONNECT( ui.cropTopPx, valueChanged( int ), this, cropChange() );
-    CONNECT( ui.cropBotPx, valueChanged( int ), this, cropChange() );
-    CONNECT( ui.cropLeftPx, valueChanged( int ), this, cropChange() );
-    CONNECT( ui.cropRightPx, valueChanged( int ), this, cropChange() );
-    CONNECT( ui.leftRightCropSync, toggled ( bool ), this, cropChange() );
-    CONNECT( ui.topBotCropSync, toggled ( bool ), this, cropChange() );
-    CONNECT( ui.topBotCropSync, toggled( bool ),
-             ui.cropBotPx, setDisabled( bool ) );
-    CONNECT( ui.leftRightCropSync, toggled( bool ),
-             ui.cropRightPx, setDisabled( bool ) );
+    connect( ui.cropTopPx, QOverload<int>::of(&QSpinBox::valueChanged), this, &ExtVideo::cropChange );
+    connect( ui.cropBotPx, QOverload<int>::of(&QSpinBox::valueChanged), this, &ExtVideo::cropChange );
+    connect( ui.cropLeftPx, QOverload<int>::of(&QSpinBox::valueChanged), this, &ExtVideo::cropChange );
+    connect( ui.cropRightPx, QOverload<int>::of(&QSpinBox::valueChanged), this, &ExtVideo::cropChange );
+    connect( ui.leftRightCropSync, &QCheckBox::toggled, this, &ExtVideo::cropChange );
+    connect( ui.topBotCropSync, &QCheckBox::toggled, this, &ExtVideo::cropChange );
+    connect( ui.topBotCropSync, &QCheckBox::toggled,
+             ui.cropBotPx, &QSpinBox::setDisabled );
+    connect( ui.leftRightCropSync, &QCheckBox::toggled,
+             ui.cropRightPx, &QSpinBox::setDisabled );
 }
 
 void ExtVideo::cropChange()
@@ -739,8 +739,8 @@ void ExtV4l2::Refresh( void )
                         }
                         var_FreeList( &val2, &text2 );
 
-                        CONNECT( combobox, currentIndexChanged( int ), this,
-                                 ValueChange( int ) );
+                        connect( combobox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+                                 QOverload<int>::of(&ExtV4l2::ValueChange) );
                         hlayout->addWidget( combobox );
                     }
                     else
@@ -763,8 +763,8 @@ void ExtV4l2::Refresh( void )
                                          &val2, NULL ) )
                             slider->setSingleStep( val2.i_int );
                         slider->setValue( i_val );
-                        CONNECT( slider, valueChanged( int ), this,
-                                 ValueChange( int ) );
+                        connect( slider, &QSlider::valueChanged, this,
+                                 QOverload<int>::of(&ExtV4l2::ValueChange) );
                         hlayout->addWidget( slider );
                     }
                     layout->addLayout( hlayout );
@@ -776,8 +776,8 @@ void ExtV4l2::Refresh( void )
                     button->setObjectName( qfu( psz_var ) );
                     button->setChecked( var_GetBool( p_obj, psz_var ) );
 
-                    CONNECT( button, clicked( bool ), this,
-                             ValueChange( bool ) );
+                    connect( button, &QCheckBox::clicked, this,
+                             QOverload<bool>::of(&ExtV4l2::ValueChange) );
                     layout->addWidget( button );
                     break;
                 }
@@ -788,8 +788,8 @@ void ExtV4l2::Refresh( void )
                         QPushButton *button = new QPushButton( name, box );
                         button->setObjectName( qfu( psz_var ) );
 
-                        CONNECT( button, clicked( bool ), this,
-                                 ValueChange( bool ) );
+                        connect( button, &QPushButton::clicked, this,
+                                 QOverload<bool>::of(&ExtV4l2::ValueChange) );
                         layout->addWidget( button );
                     }
                     else
@@ -875,13 +875,13 @@ FilterSliderData::FilterSliderData( QObject *parent,
     slider->setMinimum( p_data->f_min / p_data->f_resolution );
     slider->setMaximum( p_data->f_max / p_data->f_resolution );
     nameLabel->setText( p_data->descs );
-    CONNECT( slider, valueChanged( int ), this, updateText( int ) );
+    connect( slider, &QSlider::valueChanged, this, &FilterSliderData::updateText );
     setValue( initialValue() );
     /* In case current == min|max text would not be first updated */
     if ( slider->value() == slider->maximum() ||
          slider->value() == slider->minimum() )
         updateText( slider->value() );
-    CONNECT( slider, valueChanged( int ), this, onValueChanged( int ) );
+    connect( slider, &QSlider::valueChanged, this, &FilterSliderData::onValueChanged );
 }
 
 void FilterSliderData::setValue( float f )
@@ -949,8 +949,8 @@ AudioFilterControlWidget::AudioFilterControlWidget
 
 void AudioFilterControlWidget::connectConfigChanged( FilterSliderData *slider )
 {
-    connect( slider, SIGNAL( configChanged(QString, QVariant) ),
-             this, SIGNAL( configChanged(QString, QVariant) ) );
+    connect( slider, &FilterSliderData::configChanged,
+             this, &AudioFilterControlWidget::configChanged );
 }
 
 void AudioFilterControlWidget::build()
@@ -992,7 +992,7 @@ void AudioFilterControlWidget::build()
         slidersBox->setChecked( true );
     else
         slidersBox->setChecked( false );
-    CONNECT( slidersBox, toggled(bool), this, enable(bool) );
+    connect( slidersBox, &QGroupBox::toggled, this, &AudioFilterControlWidget::enable );
 
     free( psz_af );
 }
@@ -1030,10 +1030,10 @@ EqualizerSliderData::EqualizerSliderData( QObject *parent, intf_thread_t *_p_int
     slider->setMinimum( p_data->f_min / p_data->f_resolution );
     slider->setMaximum( p_data->f_max / p_data->f_resolution );
     nameLabel->setText( p_data->descs );
-    CONNECT( slider, valueChanged( int ), this, updateText( int ) );
+    connect( slider, &QSlider::valueChanged, this, &EqualizerSliderData::updateText );
     setValue( initialValue() );
     updateText( slider->value() );
-    CONNECT( slider, valueChanged( int ), this, onValueChanged( int ) );
+    connect( slider, &QSlider::valueChanged, this, &EqualizerSliderData::onValueChanged );
 }
 
 QStringList EqualizerSliderData::getBandsFromAout() const
@@ -1236,7 +1236,7 @@ void Equalizer::build()
         ui.presetsCombo->addItem( icon, qtr( preset_list_text[i] ),
                                      QVariant( preset_list[i] ) );
     }
-    CONNECT( ui.presetsCombo, activated(int), this, setCorePreset(int) );
+    connect( ui.presetsCombo, QOverload<int>::of(&QComboBox::activated), this, &Equalizer::setCorePreset );
 
     /* Set enable checkbox */
     vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
@@ -1248,13 +1248,13 @@ void Equalizer::build()
 
     /* To enable or disable subwidgets */
     /* If that list grows, better iterate over layout's childs */
-    CONNECT( ui.enableCheck, toggled(bool), ui.presetsCombo, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.presetLabel, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.eq2PassCheck, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.slidersPlaceholder, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.preampSlider, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.preampValue, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.preampLabel, setEnabled(bool) );
+    connect( ui.enableCheck, &QCheckBox::toggled, ui.presetsCombo, &QComboBox::setEnabled );
+    connect( ui.enableCheck, &QCheckBox::toggled, ui.presetLabel, &QLabel::setEnabled );
+    connect( ui.enableCheck, &QCheckBox::toggled, ui.eq2PassCheck, &QCheckBox::setEnabled );
+    connect( ui.enableCheck, &QCheckBox::toggled, ui.slidersPlaceholder, &QWidget::setEnabled );
+    connect( ui.enableCheck, &QCheckBox::toggled, ui.preampSlider, &QSlider::setEnabled );
+    connect( ui.enableCheck, &QCheckBox::toggled, ui.preampValue, &QLabel::setEnabled );
+    connect( ui.enableCheck, &QCheckBox::toggled, ui.preampLabel, &QLabel::setEnabled );
 
     if( psz_af && filterIsPresent( qfu(psz_af), name ) )
         ui.enableCheck->setChecked( true );
@@ -1265,11 +1265,11 @@ void Equalizer::build()
     ui.enableCheck->toggle(); ui.enableCheck->toggle();
 
     free( psz_af );
-    CONNECT( ui.enableCheck, toggled(bool), this, enable(bool) );
+    connect( ui.enableCheck, &QCheckBox::toggled, this, &Equalizer::enable );
 
     /* Connect and set 2 Pass checkbox */
     ui.eq2PassCheck->setChecked( var_InheritBool( p_aout, "equalizer-2pass" ) );
-    CONNECT( ui.eq2PassCheck, toggled(bool), this, enable2Pass(bool) );
+    connect( ui.eq2PassCheck, &QCheckBox::toggled, this, &Equalizer::enable2Pass );
     if( p_aout )
         vlc_object_release( p_aout );
 }
@@ -1405,7 +1405,7 @@ SyncWidget::SyncWidget( QWidget *_parent ) : QWidget( _parent )
     spinBox.setSingleStep( 0.1 );
     spinBox.setSuffix( " s" );
     spinBox.setButtonSymbols( QDoubleSpinBox::PlusMinus );
-    CONNECT( &spinBox, valueChanged( double ), this, valueChangedHandler( double ) );
+    connect( &spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncWidget::valueChangedHandler );
     layout->addWidget( &spinBox );
     layout->addWidget( &spinLabel );
     layout->setContentsMargins( 0, 0, 0, 0 );
@@ -1497,10 +1497,10 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     /* Various Connects */
     connect( AVSpin, &SyncWidget::valueChanged, this, &SyncControls::advanceAudio ) ;
     connect( subsSpin, &SyncWidget::valueChanged, this, &SyncControls::advanceSubs ) ;
-    connect( subSpeedSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsSpeed);
-    connect( subDurationSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsDuration);
+    connect( subSpeedSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsSpeed );
+    connect( subDurationSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsDuration );
 
-    CONNECT( THEMIM->getIM(), synchroChanged(), this, update() );
+    connect( THEMIM->getIM(), &InputManager::synchroChanged, this, &SyncControls::update );
     BUTTON_SET_ACT_I( updateButton, "", update,
             qtr( "Force update of this dialog's values" ), update() );
 

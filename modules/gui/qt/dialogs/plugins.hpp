@@ -241,7 +241,7 @@ public:
 
     static QColor getColorByAddonType( int );
 
-protected slots:
+public slots:
     void addonAdded( addon_entry_t * );
     void addonChanged( const addon_entry_t * );
 

@@ -97,10 +97,10 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( ui.removeFileButton, removeFile() );
 
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
-    CONNECT( ui.subGroupBox, toggled( bool ), this, updateMRL() );
+    connect( ui.subGroupBox, &QGroupBox::toggled, this, &FileOpenPanel::updateMRL );
 
-    CONNECT( ui.fileListWidg, itemChanged( QListWidgetItem * ), this, updateMRL() );
-    CONNECT( ui.subInput, textChanged( const QString& ), this, updateMRL() );
+    connect( ui.fileListWidg, &QListWidget::itemChanged, this, &FileOpenPanel::updateMRL );
+    connect( ui.subInput, &QLineEdit::textChanged, this, &FileOpenPanel::updateMRL );
     updateButtons();
 }
 
@@ -151,7 +151,7 @@ inline void FileOpenPanel::BuildOldPanel()
     // Add the DialogBox to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
 
-    CONNECT( lineFileEdit, textChanged( const QString& ), this, updateMRL() );
+    connect( lineFileEdit, &QLineEdit::textChanged, this, &FileOpenPanel::updateMRL );
     dialogBox->installEventFilter( this );
 }
 
@@ -349,13 +349,17 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTON_SET_ACT_I( ui.ejectButton, "", toolbar/eject, qtr( "Eject the disc" ),
             eject() );
 
-    CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
-    CONNECT( ui.deviceCombo, currentIndexChanged( QString ), this, updateMRL());
-    CONNECT( ui.titleSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.dvdsimple, toggled( bool ), this, updateMRL());
+    connect( ui.deviceCombo, &QComboBox::editTextChanged, this, &DiscOpenPanel::updateMRL );
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DiscOpenPanel::updateMRL );
+#else
+    connect( ui.deviceCombo, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this, &DiscOpenPanel::updateMRL );
+#endif
+    connect( ui.titleSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &DiscOpenPanel::updateMRL );
+    connect( ui.chapterSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &DiscOpenPanel::updateMRL );
+    connect( ui.audioSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &DiscOpenPanel::updateMRL );
+    connect( ui.subtitlesSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &DiscOpenPanel::updateMRL );
+    connect( ui.dvdsimple, &QCheckBox::toggled, this, &DiscOpenPanel::updateMRL );
 
     /* Run once the updateButtons function in order to fill correctly the comboBoxes */
     updateButtons();
@@ -641,7 +645,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
-    CONNECT( ui.urlComboBox, editTextChanged( const QString& ), this, updateMRL());
+    connect( ui.urlComboBox, &QComboBox::editTextChanged, this, &NetOpenPanel::updateMRL );
 
     /* */
     if( var_InheritBool( p_intf, "qt-recentplay" ) )
@@ -745,7 +749,7 @@ void CaptureOpenPanel::initialize()
     ui.setupUi( this );
 
     BUTTONACT( ui.advancedButton, advancedDialog() );
-    CONNECT( ui.deviceCombo, currentIndexChanged(int), this, enableAdvancedDialog(int) );
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CaptureOpenPanel::enableAdvancedDialog );
 
     /* Create two stacked layouts in the main comboBoxes */
     QStackedLayout *stackedDevLayout = new QStackedLayout;
@@ -1116,12 +1120,12 @@ void CaptureOpenPanel::initialize()
     CuMRL( screenFPS, valueChanged( double ) );
 
     /* General connects */
-    CONNECT( ui.deviceCombo, activated( int ) ,
-             stackedDevLayout, setCurrentIndex( int ) );
-    CONNECT( ui.deviceCombo, activated( int ),
-             stackedPropLayout, setCurrentIndex( int ) );
-    CONNECT( ui.deviceCombo, activated( int ), this, updateMRL() );
-    CONNECT( ui.deviceCombo, activated( int ), this, updateButtons() );
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::activated),
+             stackedDevLayout, &QStackedLayout::setCurrentIndex );
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::activated),
+             stackedPropLayout, &QStackedLayout::setCurrentIndex );
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::activated), this, &CaptureOpenPanel::updateMRL );
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::activated), this, &CaptureOpenPanel::updateButtons );
 
 #undef CuMRL
 #undef addModuleAndLayouts
@@ -1360,8 +1364,8 @@ void CaptureOpenPanel::advancedDialog()
     QPushButton *closeButton = new QPushButton( qtr( "OK" ) );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
 
-    CONNECT( closeButton, clicked(), adv, accept() );
-    CONNECT( cancelButton, clicked(), adv, reject() );
+    connect( closeButton, &QPushButton::clicked, adv, &QDialog::accept );
+    connect( cancelButton, &QPushButton::clicked, adv, &QDialog::reject );
 
     advButtonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
     advButtonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
