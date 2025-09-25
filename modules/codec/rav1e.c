@@ -101,6 +101,7 @@ static block_t *Encode(encoder_t *enc, picture_t *p_pict)
                 {
                     block_ChainRelease(p_out);
                     p_out = NULL;
+                    again = false;
                     break;
                 }
 
