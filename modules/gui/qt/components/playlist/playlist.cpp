@@ -131,8 +131,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
              this, &PlaylistWidget::changeView );
 
     /* Connect the activation of the selector to a redefining of the PL */
-    DCONNECT( selector, categoryActivated( playlist_item_t *, bool ),
-              mainView, setRootItem( playlist_item_t *, bool ) );
+    connect( selector, &PLSelector::categoryActivated,
+             mainView, QOverload<playlist_item_t *, bool>::of(&StandardPLPanel::setRootItem), Qt::DirectConnection );
     mainView->setRootItem( p_root, false );
     connect( selector, &PLSelector::SDCategorySelected, mainView, &StandardPLPanel::setWaiting );
 

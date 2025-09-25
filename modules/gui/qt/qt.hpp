@@ -140,8 +140,6 @@ template<typename... Args> struct QOverload {
 
 #define CONNECT( a, b, c, d ) \
         connect( a, SIGNAL(b), c, SLOT(d) )
-#define DCONNECT( a, b, c, d ) \
-        connect( a, SIGNAL(b), c, SLOT(d), Qt::DirectConnection )
 #define BUTTONACT( b, a ) connect( b, &QPushButton::clicked, this, QOverload<>::of(&std::remove_pointer_t<decltype(this)>::a) )
 
 #define BUTTON_SET( button, text, tooltip )  \

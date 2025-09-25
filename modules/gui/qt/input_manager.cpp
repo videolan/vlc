@@ -1006,8 +1006,8 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     mute.addCallback(   this, SLOT(notifyMute(bool)) );
 
     /* Warn our embedded IM about input changes */
-    DCONNECT( this, inputChanged( bool ),
-              im, inputChangedHandler() );
+    connect( this, &MainInputManager::inputChanged,
+             im, &InputManager::inputChangedHandler, Qt::DirectConnection );
 }
 
 MainInputManager::~MainInputManager()

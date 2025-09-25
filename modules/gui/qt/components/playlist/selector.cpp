@@ -135,8 +135,8 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
              this, &PLSelector::plItemAdded );
     connect( THEMIM, &MainInputManager::playlistItemRemoved,
              this, &PLSelector::plItemRemoved );
-    DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
-              this, inputItemUpdate( input_item_t * ) );
+    connect( THEMIM->getIM(), &InputManager::metaChanged,
+             this, &PLSelector::inputItemUpdate, Qt::DirectConnection );
 
     createItems();
 

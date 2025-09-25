@@ -60,10 +60,10 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     latestSearch      = QString();
 
     rebuild( p_root );
-    DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
-              this, processInputItemUpdate( input_item_t *) );
-    DCONNECT( THEMIM, inputChanged( bool ),
-              this, processInputItemUpdate( ) );
+    connect( THEMIM->getIM(), &InputManager::metaChanged,
+             this, QOverload<input_item_t *>::of(&PLModel::processInputItemUpdate), Qt::DirectConnection );
+    connect( THEMIM, &MainInputManager::inputChanged,
+             this, QOverload<>::of(&PLModel::processInputItemUpdate), Qt::DirectConnection );
     connect( THEMIM, &MainInputManager::playlistItemAppended,
              this, &PLModel::processItemAppend );
     connect( THEMIM, &MainInputManager::playlistItemRemoved,

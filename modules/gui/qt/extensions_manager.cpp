@@ -49,8 +49,8 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
     menuMapper = new QSignalMapper( this );
     connect( menuMapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL, this, &ExtensionsManager::triggerMenu );
     connect( THEMIM->getIM(), &InputManager::playingStatusChanged, this, &ExtensionsManager::playingChanged );
-    DCONNECT( THEMIM, inputChanged( bool ),
-              this, inputChanged( ) );
+    connect( THEMIM, &MainInputManager::inputChanged,
+             this, &ExtensionsManager::inputChanged, Qt::DirectConnection );
     connect( THEMIM->getIM(), &InputManager::metaChanged,
              this, &ExtensionsManager::metaChanged );
     b_unloading = false;

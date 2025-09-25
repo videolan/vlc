@@ -118,8 +118,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     showView( i_savedViewMode );
 
-    DCONNECT( THEMIM, leafBecameParent( int ),
-              this, browseInto( int ) );
+    connect( THEMIM, &MainInputManager::leafBecameParent,
+             this, QOverload<int>::of(&StandardPLPanel::browseInto), Qt::DirectConnection );
 
     connect( model, &VLCModel::currentIndexChanged,
              this, &StandardPLPanel::handleExpansion );
