@@ -681,15 +681,15 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
                 return NULL;
             }
 
-            memset( p_new_block->p_buffer, 0xff, i_bytes_in_speex_frame );
-
             /*
              * Copy the first frame in this packet to a new packet.
              */
             speex_bits_rewind( &p_sys->bits );
-            speex_bits_write( &p_sys->bits,
-                (char*)p_new_block->p_buffer,
-                (int)i_bytes_in_speex_frame );
+            int written = speex_bits_write( &p_sys->bits,
+                                           (char*)p_new_block->p_buffer,
+                                           i_bytes_in_speex_frame );
+            if( written < i_bytes_in_speex_frame )
+                memset( &p_new_block->p_buffer[written], 0xff, i_bytes_in_speex_frame - written );
 
             speex_bits_advance( &p_sys->bits, i_bits_in_speex_frame );
 
