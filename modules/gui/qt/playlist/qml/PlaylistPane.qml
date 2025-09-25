@@ -267,6 +267,10 @@ T.Pane {
                 contextMenu.popup(-1, globalPos)
             }
 
+            Component.onCompleted: {
+                MainPlaylistController.currentIndexChanged.connect(listView, (index) => { listView.currentIndex = index })
+            }
+
             Connections {
                 target: listView.model
 
