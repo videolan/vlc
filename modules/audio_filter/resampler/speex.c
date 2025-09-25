@@ -120,10 +120,14 @@ static void Close (filter_t *filter)
 static block_t *Resample (filter_t *filter, block_t *in)
 {
     SpeexResamplerState *st = filter->p_sys;
+    block_t *out = NULL;
 
     const size_t framesize = filter->fmt_out.audio.i_bytes_per_frame;
     const unsigned irate = filter->fmt_in.audio.i_rate;
     const unsigned orate = filter->fmt_out.audio.i_rate;
+
+    if( speex_resampler_set_rate (st, irate, orate) != RESAMPLER_ERR_SUCCESS )
+        goto error;
 
     spx_uint32_t ilen = in->i_nb_samples;
     spx_uint32_t olen = ((ilen + 2) * orate * UINT64_C(11))
@@ -132,8 +136,6 @@ static block_t *Resample (filter_t *filter, block_t *in)
     block_t *out = block_Alloc (olen * framesize);
     if (unlikely(out == NULL))
         goto error;
-
-    speex_resampler_set_rate (st, irate, orate);
 
     int err;
     if (filter->fmt_in.audio.i_format == VLC_CODEC_FL32)
