@@ -141,12 +141,12 @@ static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, Q
 
 #define SETUP_VFILTER( widget ) \
     setup_vfilter( p_intf, #widget, ui.widget##Enable ); \
-    CONNECT( ui.widget##Enable, clicked(), this, updateFilters() );
+    connect( ui.widget##Enable, &std::remove_pointer_t<decltype(ui.widget##Enable)>::clicked, this, &ExtVideo::updateFilters );
 
 #define SETUP_VFILTER_OPTION( widget, signal ) \
     initComboBoxItems( ui.widget ); \
     setWidgetValue( ui.widget ); \
-    CONNECT( ui.widget, signal, this, updateFilterOptions() );
+    connect( ui.widget, signal, this, &ExtVideo::updateFilterOptions );
 
 ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
             QObject( _parent ), p_intf( _p_intf )
@@ -154,105 +154,105 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     ui.setupUi( _parent );
 
     SETUP_VFILTER( adjust )
-    SETUP_VFILTER_OPTION( hueSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( contrastSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( brightnessSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( saturationSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( gammaSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( brightnessThresholdCheck, stateChanged( int ) )
+    SETUP_VFILTER_OPTION( hueSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( contrastSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( brightnessSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( saturationSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( gammaSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( brightnessThresholdCheck, &QCheckBox::stateChanged )
 
     SETUP_VFILTER( extract )
-    SETUP_VFILTER_OPTION( extractComponentText, textChanged( const QString& ) )
+    SETUP_VFILTER_OPTION( extractComponentText, &QLineEdit::textChanged )
 
     SETUP_VFILTER( posterize )
 
     SETUP_VFILTER( colorthres )
-    SETUP_VFILTER_OPTION( colorthresColorText, textChanged( const QString& ) )
-    SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( colorthresSimilaritythresSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( colorthresColorText, &QLineEdit::textChanged )
+    SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( colorthresSimilaritythresSlider, &QSlider::valueChanged )
 
     SETUP_VFILTER( sepia )
-    SETUP_VFILTER_OPTION( sepiaIntensitySpin, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( sepiaIntensitySpin, QOverload<int>::of(&QSpinBox::valueChanged) )
 
     SETUP_VFILTER( invert )
 
     SETUP_VFILTER( gradient )
-    SETUP_VFILTER_OPTION( gradientModeCombo, currentIndexChanged( QString ) )
-    SETUP_VFILTER_OPTION( gradientTypeCheck, stateChanged( int ) )
-    SETUP_VFILTER_OPTION( gradientCartoonCheck, stateChanged( int ) )
+    SETUP_VFILTER_OPTION( gradientModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged) )
+    SETUP_VFILTER_OPTION( gradientTypeCheck, &QCheckBox::stateChanged )
+    SETUP_VFILTER_OPTION( gradientCartoonCheck, &QCheckBox::stateChanged )
 
     SETUP_VFILTER( motionblur )
-    SETUP_VFILTER_OPTION( blurFactorSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( blurFactorSlider, &QSlider::valueChanged )
 
     SETUP_VFILTER( motiondetect )
 
     SETUP_VFILTER( psychedelic )
 
     SETUP_VFILTER( sharpen )
-    SETUP_VFILTER_OPTION( sharpenSigmaSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( sharpenSigmaSlider, &QSlider::valueChanged )
 
     SETUP_VFILTER( ripple )
 
     SETUP_VFILTER( wave )
 
     SETUP_VFILTER( transform )
-    SETUP_VFILTER_OPTION( transformTypeCombo, currentIndexChanged( QString ) )
+    SETUP_VFILTER_OPTION( transformTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged) )
 
     SETUP_VFILTER( rotate )
-    SETUP_VFILTER_OPTION( rotateAngleDial, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( rotateAngleDial, &VLCQDial::valueChanged )
     ui.rotateAngleDial->setWrapping( true );
     ui.rotateAngleDial->setNotchesVisible( true );
 
     SETUP_VFILTER( puzzle )
-    SETUP_VFILTER_OPTION( puzzleRowsSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( puzzleColsSpin, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( puzzleRowsSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( puzzleColsSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
 
     SETUP_VFILTER( magnify )
 
     SETUP_VFILTER( clone )
-    SETUP_VFILTER_OPTION( cloneCountSpin, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( cloneCountSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
 
     SETUP_VFILTER( wall )
-    SETUP_VFILTER_OPTION( wallRowsSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( wallColsSpin, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( wallRowsSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( wallColsSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
 
 
     SETUP_VFILTER( erase )
-    SETUP_VFILTER_OPTION( eraseMaskText, editingFinished() )
-    SETUP_VFILTER_OPTION( eraseYSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( eraseXSpin, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( eraseMaskText, &QLineEdit::editingFinished )
+    SETUP_VFILTER_OPTION( eraseYSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( eraseXSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
     BUTTONACT( ui.eraseBrowseBtn, browseEraseFile );
 
     SETUP_VFILTER( marq )
-    SETUP_VFILTER_OPTION( marqMarqueeText, textChanged( const QString& ) )
-    SETUP_VFILTER_OPTION( marqPositionCombo, currentIndexChanged( QString ) )
+    SETUP_VFILTER_OPTION( marqMarqueeText, &QLineEdit::textChanged )
+    SETUP_VFILTER_OPTION( marqPositionCombo, QOverload<int>::of(&QComboBox::currentIndexChanged) )
 
     SETUP_VFILTER( logo )
-    SETUP_VFILTER_OPTION( logoFileText, editingFinished() )
-    SETUP_VFILTER_OPTION( logoYSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( logoXSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( logoOpacitySlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( logoFileText, &QLineEdit::editingFinished )
+    SETUP_VFILTER_OPTION( logoYSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( logoXSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( logoOpacitySlider, &QSlider::valueChanged )
     BUTTONACT( ui.logoBrowseBtn, browseLogo );
 
     SETUP_VFILTER( gradfun )
-    SETUP_VFILTER_OPTION( gradfunRadiusSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( gradfunRadiusSlider, &QSlider::valueChanged )
 
     SETUP_VFILTER( grain )
-    SETUP_VFILTER_OPTION( grainVarianceSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( grainVarianceSlider, &QSlider::valueChanged )
 
     SETUP_VFILTER( mirror )
 
     SETUP_VFILTER( gaussianblur )
-    SETUP_VFILTER_OPTION( gaussianblurSigmaSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( gaussianblurSigmaSlider, &QSlider::valueChanged )
 
     SETUP_VFILTER( antiflicker )
-    SETUP_VFILTER_OPTION( antiflickerSofteningSizeSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( antiflickerSofteningSizeSlider, &QSlider::valueChanged )
 
     SETUP_VFILTER( hqdn3d )
-    SETUP_VFILTER_OPTION( hqdn3dLumaSpatSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( hqdn3dLumaTempSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( hqdn3dChromaSpatSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( hqdn3dChromaTempSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( hqdn3dLumaSpatSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( hqdn3dLumaTempSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( hqdn3dChromaSpatSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( hqdn3dChromaTempSlider, &QSlider::valueChanged )
 
 
     SETUP_VFILTER( anaglyph )
@@ -381,10 +381,10 @@ void ExtVideo::updateFilters()
 }
 
 #define UPDATE_AND_APPLY_TEXT( widget, file ) \
-    CONNECT( ui.widget, textChanged( const QString& ), \
-             this, updateFilterOptions() ); \
+    QMetaObject::Connection connection = connect( ui.widget, &QLineEdit::textChanged, \
+             this, &ExtVideo::updateFilterOptions ); \
     ui.widget->setText( toNativeSeparators( file ) ); \
-    ui.widget->disconnect( SIGNAL( textChanged( const QString& ) ) );
+    disconnect( connection );
 
 void ExtVideo::browseLogo()
 {

@@ -766,7 +766,7 @@ void CaptureOpenPanel::initialize()
     name ## PropPage->setLayout( name ## PropLayout );                \
     ui.deviceCombo->addItem( qtr( label ), QVariant( number ) );
 
-#define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
+#define CuMRL( widget, slot ) connect( widget, slot, this, &CaptureOpenPanel::updateMRL );
 
 #ifdef _WIN32
     /*********************
@@ -799,9 +799,9 @@ void CaptureOpenPanel::initialize()
             1, 0, 3, 1 );
 
     /* dshow CONNECTs */
-    CuMRL( vdevDshowW, changed() );
-    CuMRL( adevDshowW, changed() );
-    CuMRL( dshowVSizeLine, textChanged( const QString& ) );
+    CuMRL( vdevDshowW, &StringListConfigControl::changed );
+    CuMRL( adevDshowW, &StringListConfigControl::changed );
+    CuMRL( dshowVSizeLine, &QLineEdit::textChanged );
     configList << "dshow-vdev" << "dshow-adev" << "dshow-size";
     }
 #else /* _WIN32 */
@@ -853,11 +853,11 @@ void CaptureOpenPanel::initialize()
             1, 0, 3, 2 );
 
     /* v4l2 CONNECTs */
-    CuMRL( v4l2VideoDevice->lineEdit(), textChanged( const QString& ) );
-    CuMRL( v4l2VideoDevice,  currentIndexChanged ( int ) );
-    CuMRL( v4l2AudioDevice->lineEdit(), textChanged( const QString& ) );
-    CuMRL( v4l2AudioDevice,  currentIndexChanged ( int ) );
-    CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
+    CuMRL( v4l2VideoDevice->lineEdit(), &QLineEdit::textChanged );
+    CuMRL( v4l2VideoDevice, QOverload<int>::of(&QComboBox::currentIndexChanged) );
+    CuMRL( v4l2AudioDevice->lineEdit(), &QLineEdit::textChanged );
+    CuMRL( v4l2AudioDevice, QOverload<int>::of(&QComboBox::currentIndexChanged) );
+    CuMRL( v4l2StdBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
     configList << "v4l2-standard";
     }
 
@@ -899,10 +899,10 @@ void CaptureOpenPanel::initialize()
     jackPropLayout->addWidget( jackConnect, 1, 2 );
 
     /* Jack CONNECTs */
-    CuMRL( jackChannels, valueChanged( int ) );
-    CuMRL( jackPace, stateChanged( int ) );
-    CuMRL( jackConnect, stateChanged( int ) );
-    CuMRL( jackPortsSelected, textChanged( const QString& ) );
+    CuMRL( jackChannels, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( jackPace, &QCheckBox::stateChanged );
+    CuMRL( jackConnect, &QCheckBox::stateChanged );
+    CuMRL( jackPortsSelected, &QLineEdit::textChanged );
     configList << "jack-input-use-vlc-pace" << "jack-input-auto-connect";
     }
 #endif
@@ -1002,12 +1002,12 @@ void CaptureOpenPanel::initialize()
             2, 0, 2, 1 );
 
     /* DVB CONNECTs */
-    CuMRL( dvbCard, valueChanged ( int ) );
-    CuMRL( dvbFreq, valueChanged ( int ) );
-    CuMRL( dvbSrate, valueChanged ( int ) );
-    CuMRL( dvbQamBox, currentIndexChanged ( int ) );
-    CuMRL( dvbPskBox, currentIndexChanged ( int ) );
-    CuMRL( dvbBandBox, currentIndexChanged ( int ) );
+    CuMRL( dvbCard, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( dvbFreq, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( dvbSrate, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( dvbQamBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
+    CuMRL( dvbPskBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
+    CuMRL( dvbBandBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
 
     BUTTONACT( dvbc, updateButtons );
     BUTTONACT( dvbs, updateButtons );
@@ -1084,10 +1084,10 @@ void CaptureOpenPanel::initialize()
                             2, 0, 1, 1 );
 
     /* PVR CONNECTs */
-    CuMRL( pvrDevice, editTextChanged( const QString& ) );
-    CuMRL( pvrAudioDevice, editTextChanged( const QString& ) );
-    CuMRL( pvrFreq, valueChanged ( int ) );
-    CuMRL( pvrNormBox, currentIndexChanged ( int ) );
+    CuMRL( pvrDevice, &QComboBox::editTextChanged );
+    CuMRL( pvrAudioDevice, &QComboBox::editTextChanged );
+    CuMRL( pvrFreq, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( pvrNormBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
     }
 #endif
 
@@ -1113,7 +1113,7 @@ void CaptureOpenPanel::initialize()
     screenPropLayout->addWidget( screenFPS, 0, 1 );
 
     /* Screen connect */
-    CuMRL( screenFPS, valueChanged( double ) );
+    CuMRL( screenFPS, QOverload<double>::of(&QDoubleSpinBox::valueChanged) );
 
     /* General connects */
     connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::activated),

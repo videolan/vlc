@@ -77,7 +77,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     BUTTONACT( ui.addButton, addDest );
 
 //     /* Connect everything to the updateMRL function */
-#define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );
+#define CB( x ) connect( ui.x, &QCheckBox::toggled, this, &SoutDialog::updateMRL );
 
     /* Misc */
     CB( soutAll );
