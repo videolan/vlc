@@ -1031,12 +1031,16 @@ static void *Thread( void *obj )
     p_intf->p_mainPlayerController = new PlayerController(p_intf);
     p_intf->p_mainPlaylistController = new vlc::playlist::PlaylistController(p_intf->p_playlist);
 
-    std::unique_ptr<ModelRecoveryAgent> playlistModelRecoveryAgent;
-    QMetaObject::invokeMethod(&app, [&playlistModelRecoveryAgent, p_intf]() {
+    std::optional playlistModelRecoveryAgent = std::unique_ptr<ModelRecoveryAgent>();
+    QMetaObject::invokeMethod(&app, [&playlistModelRecoveryAgent, settings = QPointer(p_intf->mainSettings), mpc = QPointer(p_intf->p_mainPlaylistController)]() {
+        if (Q_UNLIKELY(!playlistModelRecoveryAgent)) // std::optional is nullopt, reset() was already called
+            return;
+        if (Q_UNLIKELY(!settings || !mpc))
+            return;
         try {
-            playlistModelRecoveryAgent = std::make_unique<ModelRecoveryAgent>(p_intf->mainSettings,
+            playlistModelRecoveryAgent = std::make_unique<ModelRecoveryAgent>(settings.get(),
                                                                               QStringLiteral("Playlist"),
-                                                                              p_intf->p_mainPlaylistController);
+                                                                              mpc.get());
         } catch (...){ }
     }, Qt::QueuedConnection);
 
