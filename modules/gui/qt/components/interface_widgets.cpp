@@ -746,15 +746,6 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
     fasterButton->setIcon( QIcon( iconL[FASTER_BUTTON] ) );
     CONNECT( fasterButton, clicked(), THEMIM->getIM(), faster() );
 
-/*    spinBox = new QDoubleSpinBox();
-    spinBox->setDecimals( 2 );
-    spinBox->setMaximum( 32 );
-    spinBox->setMinimum( 0.03F );
-    spinBox->setSingleStep( 0.10F );
-    spinBox->setAlignment( Qt::AlignRight );
-
-    CONNECT( spinBox, valueChanged( double ), this, updateSpinBoxRate( double ) ); */
-
     QGridLayout* speedControlLayout = new QGridLayout( this );
     speedControlLayout->addWidget( speedSlider, 0, 0, 1, 3 );
     speedControlLayout->addWidget( slowerButton, 1, 0 );

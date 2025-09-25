@@ -119,6 +119,15 @@ struct vlc_playlist_locker {
 #define qtr( i ) QString::fromUtf8( vlc_gettext(i) )
 #define qtu( i ) ((i).toUtf8().constData())
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 7, 0)
+template<typename... Args> struct QOverload {
+    template<typename T, typename Ret> static Ret(T::*of(Ret(T::*f)(Args...)))(Args...)
+    {
+        return f;
+    }
+};
+#endif
+
 #define CONNECT( a, b, c, d ) \
         connect( a, SIGNAL(b), c, SLOT(d) )
 #define DCONNECT( a, b, c, d ) \
