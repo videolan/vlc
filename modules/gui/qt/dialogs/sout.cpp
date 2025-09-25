@@ -78,9 +78,6 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
 
 //     /* Connect everything to the updateMRL function */
 #define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );
-#define CT( x ) CONNECT( ui.x, textChanged( const QString& ), this, updateMRL() );
-#define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateMRL() );
-#define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
 
     /* Misc */
     CB( soutAll );
@@ -92,9 +89,6 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     setButtonText( QWizard::NextButton, qtr("Next") );
     setButtonText( QWizard::FinishButton, qtr("Stream") );
 
-#undef CC
-#undef CS
-#undef CT
 #undef CB
 }
 
