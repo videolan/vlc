@@ -282,6 +282,7 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
     switch (type) {
         case DVD_A:
             msg_Err( p_demux, "Version of libdvdread does not support DVD-audio" );
+            free( psz_file );
             return VLC_EGENERIC;
         default:
             p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
@@ -291,6 +292,7 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
     switch (type) {
         case DVD_A:
             msg_Err( p_demux, "Version of libdvdread does not support DVD-audio" );
+            free( psz_file );
             return VLC_EGENERIC;
         default:
             dvd_reader_t *p_dvdread = DVDOpen( psz_path );
