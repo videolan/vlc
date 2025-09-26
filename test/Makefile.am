@@ -444,6 +444,11 @@ vlc_demux_run_LDFLAGS = -no-install -static
 vlc_demux_run_LDADD = libvlc_demux_run.la
 vlc_demux_dec_run_SOURCES = vlc-demux-run.c
 vlc_demux_dec_run_LDFLAGS = -no-install -static
+if HAVE_OSX
+vlc_demux_dec_run_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../lib/.libs/"
+vlc_demux_dec_run_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../src/.libs/"
+vlc_demux_dec_run_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../Frameworks/"
+endif
 vlc_demux_dec_run_LDADD = libvlc_demux_dec_run.la
 EXTRA_PROGRAMS += vlc-demux-run vlc-demux-dec-run
 
