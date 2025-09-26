@@ -643,7 +643,10 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
                     0,
                     p_block->i_buffer-i_bytes_in_speex_frame );
                 if( unlikely(p_block == NULL) )
+                {
+                    block_Release( p_new_block );
                     return NULL;
+                }
 
                 *pp_block = p_block;
             }
