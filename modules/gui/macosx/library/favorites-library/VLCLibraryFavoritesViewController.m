@@ -39,6 +39,7 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
+#import "library/VLCLibraryTableView.h"
 #import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
 #import "library/favorites-library/VLCLibraryFavoritesTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
@@ -91,9 +92,9 @@
     _favoritesLibraryCollectionViewScrollView = [[NSScrollView alloc] init];
     _favoritesLibraryCollectionView = [[VLCLibraryCollectionView alloc] init];
     _favoritesLibraryGroupSelectionTableViewScrollView = [[NSScrollView alloc] init];
-    _favoritesLibraryGroupSelectionTableView = [[NSTableView alloc] init];
+    _favoritesLibraryGroupSelectionTableView = [[VLCLibraryTableView alloc] init];
     _favoritesLibraryGroupsTableViewScrollView = [[NSScrollView alloc] init];
-    _favoritesLibraryGroupsTableView = [[NSTableView alloc] init];
+    _favoritesLibraryGroupsTableView = [[VLCLibraryTableView alloc] init];
 }
 
 - (void)setupTableViews
