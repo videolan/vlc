@@ -632,8 +632,8 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
             if ( i_bits_after > 7 )
             {
                 /* round-down since we rounded-up earlier (to include
-             * the speex terminator code.
-             */
+                 * the speex terminator code.
+                 */
                 i_bytes_in_speex_frame--;
                 speex_bits_write( &p_sys->bits,
                     (char*)p_block->p_buffer,
@@ -660,7 +660,7 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
         }
         else
         {
-                return SendPacket( p_dec, p_block );
+            return SendPacket( p_dec, p_block );
         }
     }
     else
@@ -904,7 +904,6 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
             return;
     }
 
-    /* */
     char *psz_mode;
     if( asprintf( &psz_mode, "%s%s", p_mode->modeName, p_sys->p_header->vbr ? " VBR" : "" ) >= 0 )
     {
