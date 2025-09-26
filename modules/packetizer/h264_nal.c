@@ -553,20 +553,20 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
     bs_skip( p_bs, 1 ); // entropy coding mode flag
     p_pps->i_pic_order_present_flag = bs_read( p_bs, 1 );
 
-    unsigned num_slice_groups = bs_read_ue( p_bs ) + 1;
-    if( num_slice_groups > 8 ) /* never has value > 7. Annex A, G & J */
+    unsigned num_slice_groups_minus1 = bs_read_ue( p_bs );
+    if( num_slice_groups_minus1 > 7 ) /* never has value > 7. Annex A, G & J */
         return false;
-    if( num_slice_groups > 1 )
+    if( num_slice_groups_minus1 > 0 )
     {
         unsigned slice_group_map_type = bs_read_ue( p_bs );
         if( slice_group_map_type == 0 )
         {
-            for( unsigned i = 0; i < num_slice_groups; i++ )
+            for( unsigned i = 0; i <= num_slice_groups_minus1; i++ )
                 bs_read_ue( p_bs ); /* run_length_minus1[group] */
         }
         else if( slice_group_map_type == 2 )
         {
-            for( unsigned i = 0; i < num_slice_groups; i++ )
+            for( unsigned i = 0; i < num_slice_groups_minus1; i++ )
             {
                 bs_read_ue( p_bs ); /* top_left[group] */
                 bs_read_ue( p_bs ); /* bottom_right[group] */
@@ -581,10 +581,10 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
         {
             unsigned pic_size_in_maps_units = bs_read_ue( p_bs ) + 1;
             unsigned sliceGroupSize = 1;
-            while(num_slice_groups > 1)
+            while(num_slice_groups_minus1 > 0)
             {
                 sliceGroupSize++;
-                num_slice_groups = ((num_slice_groups - 1) >> 1) + 1;
+                num_slice_groups_minus1 = num_slice_groups_minus1 >> 1;
             }
             for( unsigned i = 0; i < pic_size_in_maps_units; i++ )
             {
