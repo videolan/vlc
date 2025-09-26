@@ -627,8 +627,13 @@ static block_t *EncodeFrames( encoder_t *p_enc, block_t *p_aout_buf )
     for ( int i = 0; i < i_num_frames; ++i )
     {
         block_t *p_block = block_Alloc( i_frame_size );
-        if( !p_block )
+        if( unlikely(p_block == NULL) )
+        {
+            if( p_first_block )
+                block_ChainRelease( p_first_block );
+
             return NULL;
+        }
 
         uint8_t *frame = (uint8_t *)p_block->p_buffer;
         frame[0] = 1;  /* one frame in packet */
