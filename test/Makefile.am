@@ -428,12 +428,12 @@ libvlc_demux_dec_run_la_LIBADD += \
 	../modules/libsvcdsub_plugin.la \
 	../modules/libtextst_plugin.la \
 	../modules/libsubstx3g_plugin.la
-endif
 if HAVE_ZVBI
 libvlc_demux_dec_run_la_LIBADD += ../modules/libzvbi_plugin.la
 endif
 if HAVE_TELX
 libvlc_demux_dec_run_la_LIBADD += ../modules/libtelx_plugin.la
+endif
 endif
 EXTRA_LTLIBRARIES += libvlc_demux_dec_run.la
 
