@@ -115,7 +115,7 @@ UTCTime::UTCTime(const std::string &str)
               in >> values[i];
         }
         /* Time */
-        if (!in.eof() && in.peek() == 'T')
+        if (in.good() && in.peek() == 'T')
         {
             for(int i=UTCTIME_HOUR;i<=UTCTIME_SEC && in.good();i++)
             {
