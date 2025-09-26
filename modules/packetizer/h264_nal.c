@@ -590,12 +590,12 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
         else if( slice_group_map_type == 6 )
         {
             unsigned pic_size_in_maps_units = bs_read_ue( p_bs ) + 1;
-            unsigned sliceGroupSize = 1;
-            while(num_slice_groups_minus1 > 0)
+            // Ceil( Log2( num_slice_groups_minus1 + 1 ) )
+            static const int ceil_log2_table[8] =
             {
-                sliceGroupSize++;
-                num_slice_groups_minus1 = num_slice_groups_minus1 >> 1;
-            }
+                0,1,2,2,3,3,3,3
+            };
+            unsigned sliceGroupSize = ceil_log2_table[num_slice_groups_minus1];
             for( unsigned i = 0; i < pic_size_in_maps_units; i++ )
             {
                 bs_skip( p_bs, sliceGroupSize );
