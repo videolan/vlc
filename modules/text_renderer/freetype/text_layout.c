@@ -1178,7 +1178,7 @@ static int LayoutLine( filter_t *p_filter,
     int i_last_run = -1;
     run_desc_t *p_run = 0;
     const text_style_t *p_style = 0;
-    FT_Face p_face = 0;
+    FT_Face p_face = NULL;
     FT_Vector pen = { .x = 0, .y = 0 };
 
     vlc_ftcache_metrics_t metrics = { 0 };
@@ -1303,7 +1303,7 @@ static int LayoutLine( filter_t *p_filter,
         int i_line_offset    = 0;
         int i_line_thickness = 0;
 
-        if( p_ch->p_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
+        if( ( p_ch->p_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) ) && p_face )
         {
             i_line_offset =
                 labs( FT_FLOOR( FT_MulFix( p_face->underline_position,
