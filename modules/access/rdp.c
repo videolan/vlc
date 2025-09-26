@@ -143,7 +143,7 @@ static BOOL desktopResizeHandler( rdpContext *p_context )
         p_sys->es = NULL;
     }
 
-    vlc_fourcc_t i_chroma = 0;
+    vlc_fourcc_t i_chroma;
     /* Now init and fill es format */
     switch ( p_gdi->dstFormat )
     {
@@ -193,9 +193,6 @@ static BOOL desktopResizeHandler( rdpContext *p_context )
             i_chroma = VLC_CODEC_RGBX;
             break;
     }
-
-    if (unlikely(i_chroma == 0))
-        return FALSE;
 
     es_format_t fmt;
     es_format_Init( &fmt, VIDEO_ES, i_chroma );
