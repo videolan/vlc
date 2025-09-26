@@ -586,10 +586,8 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
                 0,1,2,2,3,3,3,3
             };
             unsigned sliceGroupSize = ceil_log2_table[num_slice_groups_minus1];
-            for( unsigned i = 0; i < pic_size_in_maps_units; i++ )
-            {
-                bs_skip( p_bs, sliceGroupSize );
-            }
+            // slice_group_id[]
+            bs_skip( p_bs, sliceGroupSize * pic_size_in_maps_units );
         }
     }
 
