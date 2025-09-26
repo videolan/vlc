@@ -93,11 +93,15 @@ static int Open(filter_t *p_filter)
 
     filter_chain_t *p_chain = filter_chain_NewVideo(p_filter, false, &p_filter->owner);
     if (p_chain == NULL)
+    {
+        es_format_Clean(&fmt_intermediate);
         return VLC_ENOMEM;
+    }
     filter_chain_Reset(p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out);
 
     int ret;
     ret = filter_chain_AppendConverter(p_chain, &fmt_intermediate);
+    es_format_Clean(&fmt_intermediate);
     if (ret != VLC_SUCCESS)
         return ret;
 
