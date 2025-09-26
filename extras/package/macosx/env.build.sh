@@ -93,7 +93,7 @@ vlcSetBaseEnvironment() {
         python3Path=""
     fi
 
-    export PATH="${VLC_ROOT_DIR}/extras/tools/build/bin:${VLC_ROOT_DIR}/contrib/${LOCAL_BUILD_TRIPLET}/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
+    export PATH="${VLC_ROOT_DIR}/extras/tools/build/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
 }
 
 vlcSetSymbolEnvironment() {
