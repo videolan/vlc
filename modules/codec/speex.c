@@ -1035,15 +1035,12 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * encoder_sys_t: encoder descriptor
  *****************************************************************************/
-#define MAX_FRAME_BYTES 2000
-
 struct encoder_sys_t
 {
     /*
      * Input properties
      */
     char *p_buffer;
-    char p_buffer_out[MAX_FRAME_BYTES];
 
     /*
      * Speex properties
@@ -1269,15 +1266,17 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         p_sys->i_frames_in_packet = 0;
 
         speex_bits_insert_terminator( &p_sys->bits );
-        i_out = speex_bits_write( &p_sys->bits, p_sys->p_buffer_out,
-                                  MAX_FRAME_BYTES );
-        speex_bits_reset( &p_sys->bits );
+
+        i_out = speex_bits_nbytes( &p_sys->bits );
 
         p_block = block_Alloc( i_out );
         if( unlikely(p_block == NULL) )
             break;
 
-        memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
+        i_out = speex_bits_write( &p_sys->bits, (char *)p_block->p_buffer, i_out );
+        p_block->i_buffer = i_out;
+
+        speex_bits_reset( &p_sys->bits );
 
         p_block->i_length = (vlc_tick_t)1000000 *
             (vlc_tick_t)p_sys->i_frame_length * p_sys->header.frames_per_packet /
