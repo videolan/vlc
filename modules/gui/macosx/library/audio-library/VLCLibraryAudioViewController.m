@@ -281,9 +281,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     // Songs table view needs bottom padding for controls bar
     const CGFloat controlsBarHeight = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
     const CGFloat controlsBarPadding = VLCLibraryUIUnits.largeSpacing * 2;
-    NSClipView *clipView = _audioSongTableViewScrollView.contentView;
+    NSClipView * const clipView = _audioSongTableViewScrollView.contentView;
+    const CGFloat topInset = self.libraryWindow.titlebarHeight + self.audioSongTableView.headerView.frame.size.height;
     clipView.automaticallyAdjustsContentInsets = NO;
-    clipView.contentInsets = NSEdgeInsetsMake(0, 0, controlsBarHeight + controlsBarPadding, 0);
+    clipView.contentInsets = NSEdgeInsetsMake(topInset, 0, controlsBarHeight + controlsBarPadding, 0);
 }
 
 #pragma mark - Superclass property overrides
