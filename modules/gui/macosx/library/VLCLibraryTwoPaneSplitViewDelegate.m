@@ -31,8 +31,13 @@
 
 - (void)resetDefaultSplitForSplitView:(NSSplitView *)splitView
 {
-    [splitView setPosition:VLCLibraryUIUnits.librarySplitViewSelectionViewDefaultWidth
-          ofDividerAtIndex:0];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSParameterAssert(splitView != nil);
+        NSParameterAssert(splitView.window != nil);
+        NSParameterAssert(splitView.subviews.count >= 2);
+        [splitView setPosition:VLCLibraryUIUnits.librarySplitViewSelectionViewDefaultWidth
+              ofDividerAtIndex:0];
+    });
 }
 
 - (CGFloat)splitView:(NSSplitView *)splitView
