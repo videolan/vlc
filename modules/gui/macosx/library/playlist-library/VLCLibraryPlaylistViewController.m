@@ -32,6 +32,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
@@ -61,6 +62,7 @@
 
     if (self) {
         _dataSource = [[VLCLibraryPlaylistDataSource alloc] init];
+        _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
         [self setupPlaylistCollectionView];
         [self setupPlaylistTableView];
@@ -159,7 +161,7 @@
 
     self.listViewSplitView.vertical = YES;
     self.listViewSplitView.dividerStyle = NSSplitViewDividerStyleThin;
-    self.listViewSplitView.delegate = self;
+    self.listViewSplitView.delegate = self.splitViewDelegate;
     [self.listViewSplitView addArrangedSubview:self.masterTableViewScrollView];
     [self.listViewSplitView addArrangedSubview:self.detailTableViewScrollView];
 
@@ -263,6 +265,7 @@
         viewToPresent = self.collectionViewScrollView;
     } else {
         viewToPresent = self.listViewSplitView;
+        [self.splitViewDelegate resetDefaultSplitForSplitView:self.listViewSplitView];
     }
     NSParameterAssert(viewToPresent != nil);
     [self.libraryWindow displayLibraryView:viewToPresent];
@@ -330,19 +333,6 @@
         [self.dataSource connect];
     }
     [self.libraryWindow hideLoadingOverlay];
-}
-
-#pragma mark - NSSplitViewDelegate
-
-- (CGFloat)splitView:(NSSplitView *)splitView 
-constrainMinCoordinate:(CGFloat)proposedMinimumPosition
-         ofSubviewAt:(NSInteger)dividerIndex
-{
-    if (dividerIndex == 0) {
-        return VLCLibraryUIUnits.librarySplitViewSelectionViewDefaultWidth;
-    } else {
-        return VLCLibraryUIUnits.librarySplitViewMainViewMinimumWidth;
-    }
 }
 
 @end
