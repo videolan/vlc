@@ -244,7 +244,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
 + (const CGFloat)librarySplitViewSelectionViewDefaultWidth
 {
-    return 180.;
+    return 280.;
 }
 
 + (const CGFloat)librarySplitViewMainViewMinimumWidth
