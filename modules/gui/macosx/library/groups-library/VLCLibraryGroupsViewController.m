@@ -35,6 +35,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
@@ -134,6 +135,7 @@
     _groupsTableViewScrollView = [[NSScrollView alloc] init];
     _selectedGroupTableViewScrollView = [[NSScrollView alloc] init];
     _tableViewDelegate = [[VLCLibraryMasterDetailViewTableViewDelegate alloc] init];
+    _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
     _groupsTableView = [[VLCLibraryTableView alloc] init];
     _selectedGroupTableView = [[VLCLibraryTableView alloc] init];
     _listViewSplitView = [[NSSplitView alloc] init];
@@ -164,7 +166,7 @@
 
     self.listViewSplitView.vertical = YES;
     self.listViewSplitView.dividerStyle = NSSplitViewDividerStyleThin;
-    self.listViewSplitView.delegate = self;
+    self.listViewSplitView.delegate = self.splitViewDelegate;
     [self.listViewSplitView addArrangedSubview:self.groupsTableViewScrollView];
     [self.listViewSplitView addArrangedSubview:self.selectedGroupTableViewScrollView];
 
@@ -246,6 +248,7 @@
             [self.libraryWindow displayLibraryView:self.collectionViewScrollView];
         } else {
             [self.libraryWindow displayLibraryView:self.listViewSplitView];
+            [self.splitViewDelegate resetDefaultSplitForSplitView:self.listViewSplitView];
         }
     } else if (self.dataSource.libraryModel.filterString.length > 0) {
         [self.libraryWindow displayNoResultsMessage];
@@ -270,19 +273,6 @@
         [self.groupsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:groupRow]
                           byExtendingSelection:NO];
         [self.groupsTableView scrollRowToVisible:groupRow];
-    }
-}
-
-#pragma mark - NSSplitViewDelegate
-
-- (CGFloat)splitView:(NSSplitView *)splitView
-constrainMinCoordinate:(CGFloat)proposedMinimumPosition
-         ofSubviewAt:(NSInteger)dividerIndex
-{
-    if (dividerIndex == 0) {
-        return VLCLibraryUIUnits.librarySplitViewSelectionViewDefaultWidth;
-    } else {
-        return VLCLibraryUIUnits.librarySplitViewMainViewMinimumWidth;
     }
 }
 
