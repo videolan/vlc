@@ -137,7 +137,6 @@
 {
     // Split view with table views
     self.videoLibrarySplitView.delegate = _splitViewDelegate;
-    [_splitViewDelegate resetDefaultSplitForSplitView:self.videoLibrarySplitView];
 
     NSNib * const tableCellViewNib =
         [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
@@ -391,6 +390,7 @@
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
         self.videoLibrarySplitView.hidden = NO;
         self.videoLibraryCollectionViewScrollView.hidden = YES;
+        [_splitViewDelegate resetDefaultSplitForSplitView:self.videoLibrarySplitView];
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }

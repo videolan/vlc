@@ -100,7 +100,6 @@
 - (void)setupTableViews
 {
     self.favoritesLibrarySplitView.delegate = _splitViewDelegate;
-    [_splitViewDelegate resetDefaultSplitForSplitView:self.favoritesLibrarySplitView];
 
     NSTableColumn * const groupsColumn = [[NSTableColumn alloc] initWithIdentifier:@"groups"];
     NSTableColumn * const selectedGroupColumn = [[NSTableColumn alloc] initWithIdentifier:@"selectedGroup"];
@@ -349,6 +348,7 @@
         [self.libraryWindow displayLibraryView:self.favoritesLibraryCollectionViewScrollView];
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
         [self.libraryWindow displayLibraryView:self.favoritesLibrarySplitView];
+        [_splitViewDelegate resetDefaultSplitForSplitView:self.favoritesLibrarySplitView];
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
