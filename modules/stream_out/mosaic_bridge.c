@@ -641,6 +641,7 @@ static int Open( vlc_object_t *p_this )
         if ( vlc_fourcc_GetChromaDescription( p_sys->i_chroma ) == NULL )
         {
             msg_Err( p_stream, "Unknown chroma" );
+            free( val.psz_string );
             free( p_sys );
             return VLC_EINVAL;
         }
