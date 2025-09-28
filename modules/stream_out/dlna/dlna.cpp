@@ -886,8 +886,10 @@ int OpenSout( vlc_object_t *p_this )
 
     int http_port = var_InheritInteger(p_stream, SOUT_CFG_PREFIX "http-port");
     bool b_supports_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
-    char *base_url = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "base_url");
-    char *device_url = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "url");
+    auto base_url = vlc::wrap_cptr(
+        var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "base_url"));
+    auto device_url = vlc::wrap_cptr(
+        var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "url"));
     if ( device_url == nullptr)
     {
         msg_Err( p_stream, "missing Url" );
@@ -907,7 +909,7 @@ int OpenSout( vlc_object_t *p_this )
         goto error;
     try {
         p_sys->renderer = std::make_shared<MediaRenderer>(p_stream,
-                            p_sys->p_upnp, base_url, device_url);
+                            p_sys->p_upnp, base_url.get(), device_url.get());
     }
     catch ( const std::bad_alloc& ) {
         msg_Err( p_stream, "Failed to create a MediaRenderer");
@@ -920,14 +922,9 @@ int OpenSout( vlc_object_t *p_this )
     p_stream->p_sys = p_sys;
     p_stream->ops = &ops;
 
-    free(base_url);
-    free(device_url);
-
     return VLC_SUCCESS;
 
 error:
-    free(base_url);
-    free(device_url);
     delete p_sys;
     return VLC_EGENERIC;
 }
