@@ -618,7 +618,10 @@ AudioDeviceCycle(audio_output_t *aout, char **p_name)
     char **ids, **names;
     int n = aout_DevicesList(aout, &ids, &names);
     if (n == -1)
+    {
+        free(device);
         goto end;
+    }
 
     int index;
     for (index = 0; index < n; ++index)
