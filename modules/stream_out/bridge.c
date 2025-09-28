@@ -345,6 +345,7 @@ static int OpenOut( vlc_object_t *p_this )
     if( asprintf( &p_sys->psz_name, "bridge-struct-%s", val.psz_string )<0 )
     {
         free( val.psz_string );
+        free( p_sys->new_id );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -363,6 +364,7 @@ static void CloseOut( sout_stream_t *p_stream )
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
 
     free( p_sys->psz_name );
+    free( p_sys->new_id );
     free( p_sys );
 }
 
