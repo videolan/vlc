@@ -120,7 +120,7 @@ static const struct vlc_chroma_ffmpeg chroma_table[] =
 #endif
 
     /* Packed RGB formats */
-    {VLC_CODEC_RGB233, AV_PIX_FMT_RGB8,  COLOR_RANGE_UNDEF },
+    {VLC_CODEC_RGB332, AV_PIX_FMT_RGB8,  COLOR_RANGE_UNDEF },
     {VLC_CODEC_BGR233, AV_PIX_FMT_BGR8,  COLOR_RANGE_UNDEF },
 
     {VLC_CODEC_RGB565BE, AV_PIX_FMT_RGB565BE,  COLOR_RANGE_UNDEF },
