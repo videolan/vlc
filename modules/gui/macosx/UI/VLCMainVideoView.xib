@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24112" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24127" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment version="101000" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24112"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24127"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -215,24 +215,24 @@
                                                             <action selector="toggleFloatOnTop:" target="3" id="BvH-qi-jx1"/>
                                                         </connections>
                                                     </button>
-                                                    <button wantsLayer="YES" horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="dYZ-ri-Kra" customClass="VLCImageButton">
-                                                        <rect key="frame" x="303" y="0.0" width="44" height="28"/>
-                                                        <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="arrow.up.left.and.arrow.down.right" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Z8g-js-0W6">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="fullscreen:" target="3" id="0Kk-UV-WtF"/>
-                                                        </connections>
-                                                    </button>
                                                     <button wantsLayer="YES" horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="yEi-SZ-SIS" customClass="VLCImageButton">
-                                                        <rect key="frame" x="352" y="0.0" width="47" height="28"/>
+                                                        <rect key="frame" x="303" y="0.0" width="48" height="28"/>
                                                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="pip.enter" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Q7p-GS-7p0">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="onPipButtonClick:" target="3" id="2Yi-Jo-2No"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button wantsLayer="YES" horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="dYZ-ri-Kra" customClass="VLCImageButton">
+                                                        <rect key="frame" x="356" y="0.0" width="43" height="28"/>
+                                                        <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="arrow.up.left.and.arrow.down.right" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Z8g-js-0W6">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="fullscreen:" target="3" id="0Kk-UV-WtF"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -303,6 +303,9 @@
                                                 </customSpacing>
                                             </stackView>
                                         </subviews>
+                                        <constraints>
+                                            <constraint firstItem="afi-4d-rQk" firstAttribute="height" secondItem="dYZ-ri-Kra" secondAttribute="height" id="ISh-e8-r9g"/>
+                                        </constraints>
                                         <visibilityPriorities>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
