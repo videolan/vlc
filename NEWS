@@ -5,6 +5,9 @@ Codecs:
  * Use FFmpeg 8.1 (upgraded from 4.4)
  * Support OpenAPV decoder (FFmpeg 8 and OpenAPV)
 
+Lua:
+ * Remove broken youtube.lua plugin
+
 Contrib:
  * Update libarchive to 3.8.5
  * Update amf to 1.5.0

@@ -154,7 +154,6 @@ nobase_vlclib_DATA += \
 	lua/playlist/soundcloud.luac \
 	lua/playlist/vimeo.luac \
 	lua/playlist/vocaroo.luac \
-	lua/playlist/youtube.luac \
 	lua/playlist/twitch.luac \
 	lua/sd/icecast.luac \
 	lua/sd/jamendo.luac \
@@ -174,7 +173,6 @@ nobase_doc_DATA = \
 	lua/meta/reader/filename.lua \
 	lua/playlist/README.txt \
 	lua/playlist/liveleak.lua \
-	lua/playlist/youtube.lua \
 	lua/sd/README.txt \
 	lua/sd/icecast.lua \
 	lua/sd/icast.lua \
@@ -292,7 +290,6 @@ EXTRA_DIST += \
 	lua/playlist/soundcloud.lua \
 	lua/playlist/vimeo.lua \
 	lua/playlist/vocaroo.lua \
-	lua/playlist/youtube.lua \
 	lua/playlist/twitch.lua \
 	lua/playlist/zapiks.lua \
 	lua/sd/README.txt \
