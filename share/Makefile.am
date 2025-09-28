@@ -41,7 +41,6 @@ LUA_MODULES = \
 	lua/playlist/soundcloud.lua \
 	lua/playlist/vimeo.lua \
 	lua/playlist/vocaroo.lua \
-	lua/playlist/youtube.lua \
 	lua/playlist/twitch.lua \
 	lua/playlist/zapiks.lua \
 	lua/sd/fmc.lua \
@@ -193,7 +192,6 @@ nobase_doc_DATA = \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
 	lua/playlist/README.txt \
-	lua/playlist/youtube.lua \
 	lua/sd/README.txt \
 	$(LUA_MODULES_DOC) \
 	$(NULL)
