@@ -282,6 +282,8 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->psz_keyfile && ( LoadCryptFile( p_access ) < 0 ) )
     {
+        free( p_sys->key_uri );
+        free( p_sys->psz_keyfile );
         free( p_sys->psz_indexUrl );
         free( p_sys->psz_indexPath );
         free( p_sys );
@@ -290,6 +292,7 @@ static int Open( vlc_object_t *p_this )
     }
     else if( !p_sys->psz_keyfile && ( CryptSetup( p_access, NULL ) < 0 ) )
     {
+        free( p_sys->key_uri );
         free( p_sys->psz_indexUrl );
         free( p_sys->psz_indexPath );
         free( p_sys );
@@ -817,6 +820,7 @@ static void Close( vlc_object_t * p_this )
         destroySegment( segment );
     }
 
+    free( p_sys->psz_keyfile );
     free( p_sys->psz_indexUrl );
     free( p_sys->psz_indexPath );
     free( p_sys );
