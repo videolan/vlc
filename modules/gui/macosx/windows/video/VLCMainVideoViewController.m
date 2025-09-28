@@ -493,10 +493,8 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 {
     VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil && _displayLibraryControls) {
-        NSView * const sidebarView =
-            libraryWindow.splitViewController.multifunctionSidebarViewController.view;
-        self.playQueueButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:sidebarView] ?
-            NSControlStateValueOff : NSControlStateValueOn;
+        const BOOL sidebarCollapsed = libraryWindow.splitViewController.multifunctionSidebarItem.isCollapsed;
+        self.playQueueButton.state = sidebarCollapsed ? NSControlStateValueOff : NSControlStateValueOn;
     }
 }
 
