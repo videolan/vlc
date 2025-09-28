@@ -279,6 +279,8 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         self.prevButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         self.playButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         self.nextButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
+        self.jumpBackwardButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
+        self.jumpForwardButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
     } else {
         [self setAutohideControls:YES];
@@ -287,6 +289,8 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         self.prevButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
         self.playButtonSizeConstraint.constant = VLCLibraryUIUnits.largePlaybackControlButtonSize;
         self.nextButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
+        self.jumpBackwardButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
+        self.jumpForwardButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
     }
 }
 

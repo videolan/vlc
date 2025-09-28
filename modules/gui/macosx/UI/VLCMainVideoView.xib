@@ -16,6 +16,8 @@
                 <outlet property="fakeTitleBar" destination="jnw-gL-nrF" id="7lZ-al-c3d"/>
                 <outlet property="fakeTitleBarHeightConstraint" destination="wY4-If-nIp" id="wPt-X4-mgu"/>
                 <outlet property="floatOnTopIndicatorImageView" destination="CrW-mq-gge" id="hqR-4Z-a18"/>
+                <outlet property="jumpBackwardButtonSizeConstraint" destination="Xh5-1i-dxH" id="AZa-08-Q0X"/>
+                <outlet property="jumpForwardButtonSizeConstraint" destination="OBA-WG-jaz" id="03p-9F-1ex"/>
                 <outlet property="loadingIndicator" destination="xOQ-YR-iAc" id="CtX-Yo-UX2"/>
                 <outlet property="mainControlsView" destination="D4V-Zd-qvB" id="KwM-ya-ETn"/>
                 <outlet property="nextButtonSizeConstraint" destination="M5n-CD-fd3" id="WIM-QF-IMG"/>
