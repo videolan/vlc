@@ -1355,13 +1355,11 @@ static int Direct3D9CreateShaders(vout_display_t *vd)
             goto error; /* Unrecognized entry in the list. */
         /* The source code of the shader needs to be read from a file. */
         char *filepath = var_InheritString(vd, "direct3d9-shader-file");
-        if (!filepath || !*filepath)
-        {
-            free(filepath);
+        if (!filepath)
             goto error;
-        }
         /* Open file, find its size with fseek/ftell and read its content in a buffer. */
         fs = fopen(filepath, "rb");
+        free(filepath);
         if (!fs)
             goto error;
         int ret = fseek(fs, 0, SEEK_END);
