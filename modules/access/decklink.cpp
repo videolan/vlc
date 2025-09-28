@@ -437,6 +437,7 @@ static int GetAudioConn(demux_t *demux)
         return VLC_EGENERIC;
     }
 
+    free(opt);
     if (sys->config->SetInt(bmdDeckLinkConfigAudioInputConnection, c) != S_OK) {
         msg_Err(demux, "Failed to set audio input connection");
         return VLC_EGENERIC;
