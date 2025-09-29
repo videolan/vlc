@@ -44,10 +44,10 @@ ActionsManager::ActionsManager( intf_thread_t * _p_i )
     : p_intf( _p_i )
     , m_scanning( false )
 {
-    CONNECT( this, rendererItemAdded( vlc_renderer_item_t* ),
-             this, onRendererItemAdded( vlc_renderer_item_t* ) );
-    CONNECT( this, rendererItemRemoved( vlc_renderer_item_t* ),
-             this, onRendererItemRemoved( vlc_renderer_item_t* ) );
+    connect( this, SIGNAL( rendererItemAdded( vlc_renderer_item_t* ) ),
+             this, SLOT( onRendererItemAdded( vlc_renderer_item_t* ) ) );
+    connect( this, SIGNAL( rendererItemRemoved( vlc_renderer_item_t* ) ),
+             this, SLOT( onRendererItemRemoved( vlc_renderer_item_t* ) ) );
     m_stop_scan_timer.setSingleShot( true );
     connect( &m_stop_scan_timer, &QTimer::timeout, this, &ActionsManager::StopRendererScan );
 }

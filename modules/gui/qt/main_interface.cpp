@@ -469,7 +469,7 @@ void MainInterface::createMainWidget( QSettings *creationSettings )
          && var_InheritBool( p_intf, "qt-icon-change" ) )
     {
         bgWidget = new EasterEggBackgroundWidget( p_intf );
-        CONNECT( this, kc_pressed(), bgWidget, animate() );
+        connect( this, SIGNAL( kc_pressed() ), bgWidget, SLOT( animate() ) );
     }
     else
         bgWidget = new BackgroundWidget( p_intf );
@@ -591,7 +591,7 @@ inline void MainInterface::createStatusBar()
     statusBarr->addPermanentWidget( speedLabel, 0 );
     statusBarr->addPermanentWidget( timeLabel, 0 );
 
-    CONNECT( nameLabel, doubleClicked(), THEDP, epgDialog() );
+    connect( nameLabel, SIGNAL( doubleClicked() ), THEDP, SLOT( epgDialog() ) );
     /* timeLabel behaviour:
        - double clicking opens the goto time dialog
        - right-clicking and clicking just toggle between remaining and

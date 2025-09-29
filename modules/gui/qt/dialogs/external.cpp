@@ -54,27 +54,27 @@ DialogHandler::DialogHandler (intf_thread_t *p_intf, QObject *_parent)
     connect(this, &DialogHandler::errorDisplayed,
             this, &DialogHandler::displayError);
 
-    CONNECT(this, loginDisplayed(vlc_dialog_id *, const QString &,
-                                 const QString &, const QString &, bool),
-            this, displayLogin(vlc_dialog_id *, const QString &, const QString &,
-                               const QString &, bool));
+    connect(this, SIGNAL(loginDisplayed(vlc_dialog_id *, const QString &,
+                                        const QString &, const QString &, bool)),
+            this, SLOT(displayLogin(vlc_dialog_id *, const QString &, const QString &,
+                                    const QString &, bool)));
 
-    CONNECT(this, questionDisplayed(vlc_dialog_id *, const QString &,
-                                    const QString &, int, const QString &,
-                                    const QString &, const QString &),
-            this, displayQuestion(vlc_dialog_id *, const QString &, const QString &,
-                                  int, const QString &, const QString &,
-                                  const QString &));
+    connect(this, SIGNAL(questionDisplayed(vlc_dialog_id *, const QString &,
+                                           const QString &, int, const QString &,
+                                           const QString &, const QString &)),
+            this, SLOT(displayQuestion(vlc_dialog_id *, const QString &, const QString &,
+                                       int, const QString &, const QString &,
+                                       const QString &)));
 
-    CONNECT(this, progressDisplayed(vlc_dialog_id *, const QString &, const QString &,
-                                    bool, float, const QString &),
-            this, displayProgress(vlc_dialog_id *, const QString &, const QString &,
-                                  bool, float, const QString &));
+    connect(this, SIGNAL(progressDisplayed(vlc_dialog_id *, const QString &, const QString &,
+                                           bool, float, const QString &)),
+            this, SLOT(displayProgress(vlc_dialog_id *, const QString &, const QString &,
+                                       bool, float, const QString &)));
 
-    CONNECT(this, cancelled(vlc_dialog_id *), this, cancel(vlc_dialog_id *));
+    connect(this, SIGNAL(cancelled(vlc_dialog_id *)), this, SLOT(cancel(vlc_dialog_id *)));
 
-    CONNECT(this, progressUpdated(vlc_dialog_id *, float, const QString &),
-            this, updateProgress(vlc_dialog_id *, float, const QString &));
+    connect(this, SIGNAL(progressUpdated(vlc_dialog_id *, float, const QString &)),
+            this, SLOT(updateProgress(vlc_dialog_id *, float, const QString &)));
 }
 
 DialogHandler::~DialogHandler()
@@ -392,7 +392,7 @@ ProgressDialogWrapper::ProgressDialogWrapper(DialogHandler *p_handler,
     : DialogWrapper(p_handler, p_intf, p_id, p_progress)
     , b_indeterminate(b_indeterminate)
 {
-    CONNECT(p_progress, canceled(void), this, finish(void));
+    connect(p_progress, SIGNAL(canceled(void)), this, SLOT(finish(void)));
 }
 
 void ProgressDialogWrapper::updateProgress(float f_position, const QString &text)
