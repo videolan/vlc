@@ -1068,10 +1068,9 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     const SpeexMode *p_speex_mode = &speex_nb_mode;
-    int i_tmp, i;
-    const char *pp_header[2];
-    int pi_header[2];
-    uint8_t *p_extra; size_t i_extra;
+    int i_tmp;
+    const void *pp_header[2];
+    unsigned pi_header[2];
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_SPEEX &&
         !p_enc->obj.force )
@@ -1168,25 +1167,15 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     /* Create and store headers */
-    pp_header[0] = speex_header_to_packet( &p_sys->header, &pi_header[0] );
+    pp_header[0] = speex_header_to_packet( &p_sys->header, &i_tmp );
+    pi_header[0] = i_tmp;
     pp_header[1] = "ENCODER=VLC media player";
     pi_header[1] = sizeof("ENCODER=VLC media player");
 
-    i_extra = 3 * 2 + pi_header[0] + pi_header[1];
-    p_extra = malloc( i_extra );
-    if( !p_extra )
+    if( BuildExtradata( &p_enc->fmt_out, false, pi_header, pp_header ) != VLC_SUCCESS )
     {
         CloseEncoder( p_this );
         return VLC_ENOMEM;
-    }
-    p_enc->fmt_out.i_extra = i_extra;
-    p_enc->fmt_out.p_extra = p_extra;
-    for( i = 0; i < 2; i++ )
-    {
-        *(p_extra++) = pi_header[i] >> 8;
-        *(p_extra++) = pi_header[i] & 0xFF;
-        memcpy( p_extra, pp_header[i], pi_header[i] );
-        p_extra += pi_header[i];
     }
 
     msg_Dbg( p_enc, "encoding: frame size:%d, channels:%d, samplerate:%d",
