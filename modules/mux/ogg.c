@@ -815,7 +815,13 @@ static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
     }
 
     *pp_buffer = calloc( FISBONE_BASE_SIZE + headers.i_size, 1 );
-    if ( !*pp_buffer ) return;
+    if ( unlikely( *pp_buffer == NULL ) )
+    {
+        free( headers.psz_content_type );
+        free( headers.psz_role );
+        return;
+    }
+
     p_buffer = *pp_buffer;
 
     memcpy( p_buffer, "fisbone", 8 );
