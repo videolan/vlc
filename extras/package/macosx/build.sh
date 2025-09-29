@@ -301,7 +301,7 @@ if [ "$PACKAGETYPE" = "u" ]; then
     find VLC.app/ -type f -name "Breakpad" -exec strip -x {} \;
 
     if [ "$BUILD_TRIPLET" = "$HOST_TRIPLET" ]; then
-        bin/vlc-cache-gen VLC.app/Contents/MacOS/plugins
+        bin/vlc-cache-gen VLC.app/Contents/Frameworks/plugins
     fi
 
     info "Building VLC release archive"
