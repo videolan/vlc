@@ -147,9 +147,9 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
     {
         action = menu->addAction( text, THEMIM, member );
     }
-    action->setData( VLCMenuBar::ACTION_STATIC |
-                     ( bStatic ) ? VLCMenuBar::ACTION_ALWAYS_ENABLED
-                                 : VLCMenuBar::ACTION_NONE
+    action->setData( static_cast<int>( VLCMenuBar::ACTION_STATIC |
+                     ( bStatic ? VLCMenuBar::ACTION_ALWAYS_ENABLED
+                               : VLCMenuBar::ACTION_NONE ) )
                    );
     return action;
 }
@@ -1249,7 +1249,7 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object )
 
 #define TEXT_OR_VAR qfue ( text.psz_string ? text.psz_string : psz_var )
 
-void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
+void VLCMenuBar::UpdateItem( intf_thread_t *, QMenu *menu,
         const char *psz_var, vlc_object_t *p_object, bool b_submenu )
 {
     vlc_value_t val, text;
