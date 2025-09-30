@@ -413,11 +413,7 @@ QMenu* StandardPLPanel::viewSelectionMenu( StandardPLPanel *panel )
 {
     QMenu *viewMenu = new QMenu( qtr( "Playlist View Mode" ), panel );
     QSignalMapper *viewSelectionMapper = new QSignalMapper( viewMenu );
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-    connect( viewSelectionMapper, &QSignalMapper::mappedInt, panel, &StandardPLPanel::showView );
-#else
-    connect( viewSelectionMapper, QOverload<int>::of(&QSignalMapper::mapped), panel, &StandardPLPanel::showView );
-#endif
+    connect( viewSelectionMapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL, panel, &StandardPLPanel::showView );
 
     QActionGroup *viewGroup = new QActionGroup( viewMenu );
 # define MAX_VIEW StandardPLPanel::VIEW_COUNT
@@ -680,13 +676,8 @@ void StandardPLPanel::createTreeView()
 
     /* SignalMapper for columns */
     selectColumnsSigMapper = new QSignalMapper( this );
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-    connect( selectColumnsSigMapper, &QSignalMapper::mappedInt,
-            this, &StandardPLPanel::toggleColumnShown );
-#else
-    connect( selectColumnsSigMapper, QOverload<int>::of(&QSignalMapper::mapped),
+    connect( selectColumnsSigMapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL,
              this, &StandardPLPanel::toggleColumnShown );
-#endif
 
     viewStack->addWidget( treeView );
 }

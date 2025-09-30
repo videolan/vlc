@@ -989,11 +989,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
 
     /* Audio Menu */
     menusAudioMapper = new QSignalMapper();
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-    connect( menusAudioMapper, &QSignalMapper::mappedString, this, &MainInputManager::menusUpdateAudio );
-#else
-    connect( menusAudioMapper, QOverload<const QString &>::of(&QSignalMapper::mapped), this, &MainInputManager::menusUpdateAudio );
-#endif
+    connect( menusAudioMapper, QSIGNALMAPPER_MAPPEDSTR_SIGNAL, this, &MainInputManager::menusUpdateAudio );
 
     /* Core Callbacks */
     var_AddCallback( THEPL, "item-change", MainInputManager::ItemChanged, im );

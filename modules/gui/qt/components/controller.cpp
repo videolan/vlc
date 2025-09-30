@@ -76,14 +76,9 @@ AbstractController::AbstractController( intf_thread_t * _p_i, QWidget *_parent )
 
     /* Main action provider */
     toolbarActionsMapper = new QSignalMapper( this );
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-    connect( toolbarActionsMapper, &QSignalMapper::mappedInt,
-            ActionsManager::getInstance( p_intf  ), &ActionsManager::doAction );
-#else
-    connect( toolbarActionsMapper, QOverload<int>::of(&QSignalMapper::mapped),
+    connect( toolbarActionsMapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL,
              ActionsManager::getInstance( p_intf  ), &ActionsManager::doAction );
-#endif
-    connect( THEMIM->getIM(), &InputManager::playingStatusChanged, this, &AbstractController::setStatus );
+    connect( THEMIM->getIM(), &InputManager::playingStatusChanged, this, &AbstractController::setStatus);
 
     setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
 }

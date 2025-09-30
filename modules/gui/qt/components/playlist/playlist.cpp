@@ -236,11 +236,7 @@ LocationBar::LocationBar( VLCModel *m )
 {
     setModel( m );
     mapper = new QSignalMapper( this );
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-    connect( mapper, &QSignalMapper::mappedInt, this, &LocationBar::invoke );
-#else
-    connect( mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &LocationBar::invoke );
-#endif
+    connect( mapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL, this, &LocationBar::invoke );
 
     btnMore = new LocationButton( "...", false, true, this );
     menuMore = new QMenu( this );
