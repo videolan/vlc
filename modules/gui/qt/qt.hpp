@@ -129,10 +129,6 @@ struct vlc_playlist_locker {
     button->setText( text );                 \
     button->setToolTip( tooltip );
 
-#define BUTTON_SET_ACT( button, text, tooltip, thisslot ) \
-    BUTTON_SET( button, text, tooltip );                  \
-    BUTTONACT( button, thisslot );
-
 #define BUTTON_SET_IMG( button, text, image, tooltip )    \
     BUTTON_SET( button, text, tooltip );                  \
     button->setIcon( QIcon( ":/"#image ".svg") );
