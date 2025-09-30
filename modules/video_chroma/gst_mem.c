@@ -103,11 +103,17 @@ static int Open(filter_t *p_filter)
     ret = filter_chain_AppendConverter(p_chain, &fmt_intermediate);
     es_format_Clean(&fmt_intermediate);
     if (ret != VLC_SUCCESS)
+    {
+        filter_chain_Delete(p_chain);
         return ret;
+    }
 
     ret = filter_chain_AppendConverter(p_chain, NULL);
     if (ret != VLC_SUCCESS)
+    {
+        filter_chain_Delete(p_chain);
         return ret;
+    }
 
     p_filter->p_sys = p_chain;
     p_filter->ops = &chain_ops;
