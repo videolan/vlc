@@ -350,11 +350,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
             eject() );
 
     connect( ui.deviceCombo, &QComboBox::editTextChanged, this, &DiscOpenPanel::updateMRL );
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
     connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DiscOpenPanel::updateMRL );
-#else
-    connect( ui.deviceCombo, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this, &DiscOpenPanel::updateMRL );
-#endif
     connect( ui.titleSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &DiscOpenPanel::updateMRL );
     connect( ui.chapterSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &DiscOpenPanel::updateMRL );
     connect( ui.audioSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &DiscOpenPanel::updateMRL );

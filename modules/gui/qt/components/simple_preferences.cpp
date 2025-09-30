@@ -799,13 +799,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             if ( ui.stylesCombo->currentIndex() < 0 )
                 ui.stylesCombo->setCurrentIndex( 0 ); /* default */
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
             connect( ui.stylesCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, ui]( int index ) {
                 SPrefsPanel::changeStyle(ui.stylesCombo->itemText(index));
             });
-#else
-            connect( ui.stylesCombo, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this, &SPrefsPanel::changeStyle );
-#endif
             optionWidgets["styleCB"] = ui.stylesCombo;
 
             radioGroup = new QButtonGroup(this);

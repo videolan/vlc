@@ -289,13 +289,8 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                     comboBox->setCurrentIndex( idx );
             }
             selectMapper->setMapping( comboBox, new WidgetMapper( comboBox, p_widget ) );
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
             connect( comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
                      selectMapper, QOverload<>::of(&QSignalMapper::map) );
-#else
-            connect( comboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
-                     selectMapper, QOverload<>::of(&QSignalMapper::map) );
-#endif
             return comboBox;
 
         case EXTENSION_WIDGET_LIST:
