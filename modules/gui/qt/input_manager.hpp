@@ -158,7 +158,7 @@ private:
     bool            b_video;
     vlc_tick_t      timeA, timeB;
 
-    void customEvent( QEvent * );
+    void customEvent( QEvent * ) override;
 
     void addCallbacks();
     void delCallbacks();
@@ -288,7 +288,7 @@ private:
     MainInputManager( intf_thread_t * );
     virtual ~MainInputManager();
 
-    void customEvent( QEvent * );
+    void customEvent( QEvent * ) override;
 
     InputManager            *im;
     input_thread_t          *p_input;

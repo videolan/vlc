@@ -105,7 +105,7 @@ public:
 protected:
     QSignalMapper *menusMapper;
     QSignalMapper *menusUpdateMapper;
-    void customEvent( QEvent *);
+    void customEvent( QEvent *) override;
 
 private:
     DialogsProvider( intf_thread_t *);

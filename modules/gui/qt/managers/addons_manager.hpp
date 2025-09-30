@@ -68,7 +68,7 @@ public:
     static void addonFoundCallback( addons_manager_t *, addon_entry_t * );
     static void addonsDiscoveryEndedCallback( addons_manager_t * );
     static void addonChangedCallback( addons_manager_t *, addon_entry_t * );
-    void customEvent( QEvent * );
+    void customEvent( QEvent * ) override;
     void install( QByteArray id );
     void remove( QByteArray id );
     static QString getAddonType( int );

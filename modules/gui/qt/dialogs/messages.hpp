@@ -43,7 +43,7 @@ private:
 
     Ui::messagesPanelWidget ui;
     static void sinkMessage( void *, vlc_log_t *, unsigned );
-    void customEvent( QEvent * );
+    void customEvent( QEvent * ) override;
     void sinkMessage( const MsgEvent * );
     bool matchFilter( const QString& );
 
