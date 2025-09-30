@@ -52,7 +52,6 @@
 #define HAS_QT510 ( QT_VERSION >= 0x051000 )
 
 enum {
-    DialogEventTypeOffset = 0,
     IMEventTypeOffset     = 100,
     PLEventTypeOffset     = 200,
     MsgEventTypeOffset    = 300,
