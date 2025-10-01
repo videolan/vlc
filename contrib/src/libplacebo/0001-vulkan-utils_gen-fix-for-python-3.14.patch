@@ -1,0 +1,31 @@
+From 37088af8d779600fcd915618e4867c328b3d181e Mon Sep 17 00:00:00 2001
+From: Nicolas Chauvet <kwizart@gmail.com>
+Date: Tue, 29 Jul 2025 11:42:35 +0200
+Subject: [PATCH] vulkan/utils_gen: fix for python 3.14
+
+Python 3.14+ has added more type checking. This patch fixes usage
+
+Fixes: https://github.com/haasn/libplacebo/issues/335
+
+Signed-off-by: Nicolas Chauvet <kwizart@gmail.com>
+---
+ src/vulkan/utils_gen.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/vulkan/utils_gen.py b/src/vulkan/utils_gen.py
+index 4bbe185b..27204fe6 100644
+--- a/src/vulkan/utils_gen.py
++++ b/src/vulkan/utils_gen.py
+@@ -238,7 +238,8 @@ if __name__ == '__main__':
+     if not xmlfile or xmlfile == '':
+         xmlfile = find_registry_xml(datadir)
+ 
+-    registry = VkXML(ET.parse(xmlfile))
++    tree = ET.parse(xmlfile)
++    registry = VkXML(tree.getroot())
+     with open(outfile, 'w') as f:
+         f.write(TEMPLATE.render(
+             vkresults = get_vkenum(registry, 'VkResult'),
+-- 
+2.45.1.windows.1
+
