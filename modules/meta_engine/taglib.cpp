@@ -173,7 +173,11 @@ File* VLCTagLib::ExtResolver<T>::createFileFromStream(IOStream* s, bool, AudioPr
         std::string fext = filename.substr(namesize - ext.length(), ext.length());
         std::transform(fext.begin(), fext.end(), fext.begin(), ::toupper);
         if(fext == ext)
+#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
+            return new T(s, false, AudioProperties::Fast, ID3v2::FrameFactory::instance());
+#else
             return new T(s, ID3v2::FrameFactory::instance(), false, AudioProperties::Fast);
+#endif
     }
 
     return nullptr;
