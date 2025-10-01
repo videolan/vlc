@@ -58,7 +58,7 @@ FocusScope {
         anchors.fill: parent
 
         asynchronous: true
-        source: artist.cover || VLCStyle.noArtArtist
+        source: root.artist.id ? (root.artist.cover || VLCStyle.noArtArtist) : "" // do not load the fallback image during initialization
         sourceSize: artist.cover ? Qt.size(Helpers.alignUp(Screen.desktopAvailableWidth, 32), 0)
                                  : undefined
         mipmap: !!artist.cover
@@ -160,7 +160,7 @@ FocusScope {
 
             Widgets.ImageExt {
                 id: roundImage
-                source: artist.cover || VLCStyle.noArtArtist
+                source: root.artist.id ? (root.artist.cover || VLCStyle.noArtArtist) : "" // do not load the fallback image during initialization
                 sourceSize: Qt.size(width * eDPR, height * eDPR)
                 anchors.fill: parent
                 radius: VLCStyle.cover_normal
