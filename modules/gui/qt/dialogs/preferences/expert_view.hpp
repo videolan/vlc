@@ -60,8 +60,8 @@ protected:
 #endif // QT_NO_CONTEXTMENU
 
 private:
-    void modifyItem( const QModelIndex & );
-    void toggleItem( const QModelIndex & );
+    void modifyItemPrivate( const QModelIndex & );
+    void toggleItemPrivate( const QModelIndex & );
     QAction *reset_action;
     QAction *toggle_action;
     QAction *modify_action;

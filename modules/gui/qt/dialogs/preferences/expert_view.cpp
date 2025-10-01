@@ -68,8 +68,8 @@ ExpertPrefsTable::ExpertPrefsTable( QWidget *parent ) :
     copy_value_action = new QAction( qtr( "Copy &value" ), this );
 
     connect( reset_action, &QAction::triggered, this, &ExpertPrefsTable::resetItem );
-    connect( toggle_action, &QAction::triggered, this, QOverload<>::of(&ExpertPrefsTable::toggleItem) );
-    connect( modify_action, &QAction::triggered, this, QOverload<>::of(&ExpertPrefsTable::modifyItem) );
+    connect( toggle_action, &QAction::triggered, this, &ExpertPrefsTable::toggleItem );
+    connect( modify_action, &QAction::triggered, this, &ExpertPrefsTable::modifyItem );
     connect( copy_name_action, &QAction::triggered, this, &ExpertPrefsTable::copyItemName );
     connect( copy_value_action, &QAction::triggered, this, &ExpertPrefsTable::copyItemValue );
 }
@@ -136,11 +136,11 @@ void ExpertPrefsTable::resetItem()
 
 void ExpertPrefsTable::toggleItem()
 {
-    toggleItem( currentIndex() );
+    toggleItemPrivate( currentIndex() );
 }
 
 /* this obviously only applies to boolean options! */
-void ExpertPrefsTable::toggleItem( const QModelIndex &index )
+void ExpertPrefsTable::toggleItemPrivate( const QModelIndex &index )
 {
     if( !index.isValid() )
         return;
@@ -152,10 +152,10 @@ void ExpertPrefsTable::modifyItem()
     QModelIndex index = currentIndex();
     if( !index.isValid() )
         return;
-    modifyItem( index );
+    modifyItemPrivate( index );
 }
 
-void ExpertPrefsTable::modifyItem( const QModelIndex &index )
+void ExpertPrefsTable::modifyItemPrivate( const QModelIndex &index )
 {
     ExpertPrefsTableItem *item = myModel()->itemAt( index );
     module_config_t *cfg_item = item->getConfig();
@@ -207,11 +207,11 @@ void ExpertPrefsTable::doubleClicked( const QModelIndex &index )
 {
     if( index.data( ExpertPrefsTableModel::TypeClassRole ).toInt() == CONFIG_ITEM_BOOL )
     {
-        toggleItem( index );
+        toggleItemPrivate( index );
         myModel()->notifyUpdatedRow( index.row() );
     }
     else
-        modifyItem( index );
+        modifyItemPrivate( index );
 }
 
 /*********************************************************************
