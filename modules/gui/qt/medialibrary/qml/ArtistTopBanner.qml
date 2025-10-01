@@ -77,7 +77,7 @@ FocusScope {
     Item {
         anchors.fill: background
 
-        visible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+        visible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) && (root.artist.id) // do not display the effect during initialization
 
         // This blur effect does not create an implicit layer that is updated
         // each time the size changes. The source texture is static, so the blur
