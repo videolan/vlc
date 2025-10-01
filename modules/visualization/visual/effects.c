@@ -573,6 +573,9 @@ static int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
     i_nb_bands *= i_sections;
 
+    if( i_sections <= 0 )
+        vlc_assert_unreachable();
+
     for ( i = 0 ; i< i_nb_bands/i_sections ;i++)
     {
         /* We search the maximum on one scale */
