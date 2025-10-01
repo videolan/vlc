@@ -71,7 +71,7 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     layout->addWidget(newButton);
 
     BUTTONACT( newButton, &VLCProfileSelector::newProfile );
-    BUTTONACT( editButton, QOverload<>::of(&VLCProfileSelector::editProfile) );
+    BUTTONACT( editButton, &VLCProfileSelector::editProfile );
     BUTTONACT( deleteButton, &VLCProfileSelector::deleteProfile );
     fillProfilesCombo();
 
@@ -130,16 +130,16 @@ inline void VLCProfileSelector::fillProfilesCombo()
 
 void VLCProfileSelector::newProfile()
 {
-    editProfile( "", "" );
+    editProfilePrivate( "", "" );
 }
 
 void VLCProfileSelector::editProfile()
 {
-    editProfile( profileBox->currentText(),
+    editProfilePrivate( profileBox->currentText(),
                  profileBox->itemData( profileBox->currentIndex() ).toString() );
 }
 
-void VLCProfileSelector::editProfile( const QString& qs, const QString& value )
+void VLCProfileSelector::editProfilePrivate( const QString& qs, const QString& value )
 {
     /* Create the Profile Editor */
     QWidget* windowWidget = window();

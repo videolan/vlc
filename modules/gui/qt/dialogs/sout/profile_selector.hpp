@@ -49,7 +49,7 @@ public:
 private:
     QComboBox *profileBox;
     void fillProfilesCombo();
-    void editProfile( const QString&, const QString& );
+    void editProfilePrivate( const QString&, const QString& );
     void saveProfiles();
     QString mux;
     SoutChain transcode;
