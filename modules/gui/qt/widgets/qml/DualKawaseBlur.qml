@@ -114,6 +114,9 @@ Item {
         if (live)
             return // no-op
 
+        if (root.GraphicsInfo.shaderType !== GraphicsInfo.RhiShader)
+            return // not applicable
+
         if (!root.sourceTextureIsValid) {
             root._queuedScheduledUpdate = true // if source texture is not valid, delay the update until valid
             return
