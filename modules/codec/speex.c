@@ -294,8 +294,9 @@ static int CreateDefaultHeader( decoder_t *p_dec )
     speex_init_header( p_header, rate, p_dec->fmt_in->audio.i_channels, mode );
     p_header->frames_per_packet = 160 << i_mode;
 
-    oggpacket.packet = (unsigned char *) speex_header_to_packet( p_header,
-            (int *) &oggpacket.bytes );
+    int i_tmp;
+    oggpacket.packet = (unsigned char *) speex_header_to_packet( p_header, &i_tmp );
+    oggpacket.bytes = i_tmp;
     if( !oggpacket.packet )
     {
         ret = VLC_ENOMEM;
