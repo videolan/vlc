@@ -60,11 +60,4 @@ GPERF_VERSION=3.1
 GPERF_URL=$(GNU)/gperf/gperf-$(GPERF_VERSION).tar.gz
 
 CONFIGGUESS_VERSION=a2287c3041a3f2a204eb942e09c015eab00dc7dd
-# git.savannah.gnu.org connection is too unreliable
-# CONFIGGUESS_URL=https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=$(CONFIGGUESS_VERSION)
-CONFIGGUESS_URL=https://raw.githubusercontent.com/tianon/mirror-gnu-config/$(CONFIGGUESS_VERSION)/config.guess
-
 CONFIGSUB_VERSION=a2287c3041a3f2a204eb942e09c015eab00dc7dd
-# git.savannah.gnu.org connection is too unreliable
-# CONFIGSUB_URL=https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=$(CONFIGGUESS_VERSION)
-CONFIGSUB_URL=https://raw.githubusercontent.com/tianon/mirror-gnu-config/$(CONFIGSUB_VERSION)/config.sub
