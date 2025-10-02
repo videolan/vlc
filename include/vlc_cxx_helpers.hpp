@@ -51,7 +51,7 @@ namespace
 // building as C++17 (noexcept becomes part of the function signature stating there)
 
 // Wraps a pointer with a custom releaser
-// ex: auto ptr = vlc_wrap_cptr( input_item, &input_item_Release );
+// ex: auto ptr = vlc::wrap_cptr( input_item, &input_item_Release );
 
 ///
 /// Wraps a C pointer into a std::unique_ptr
@@ -60,7 +60,7 @@ namespace
 /// T is the pointee type, and R is an arbitrary releaser type.
 ///
 /// ptr will be automatically released by calling r( ptr ) when falling out of
-/// scope (whether by returning of by throwing an exception
+/// scope (whether by returning or by throwing an exception).
 ///
 /// @param ptr a C pointer
 /// @param r An instance of a Callable type, that will be invoked with ptr
@@ -82,7 +82,7 @@ inline auto wrap_cptr( T* ptr, Releaser&& r ) noexcept
 /// releaser type.
 ///
 /// ptr will be automatically released by calling r( ptr ) when falling out of
-/// scope (whether by returning of by throwing an exception
+/// scope (whether by returning or by throwing an exception).
 ///
 /// This function is equivalent to wrap_cptr, except that the returned
 /// unique_ptr provides an operator[] for array access instead of operator* and
