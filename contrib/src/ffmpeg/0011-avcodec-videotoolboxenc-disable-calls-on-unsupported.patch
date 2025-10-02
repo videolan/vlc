@@ -23,7 +23,7 @@ index da7b291b03..6b263ee6e9 100644
  
 -#if defined (MAC_OS_X_VERSION_10_13) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_13)
 -    if (__builtin_available(macOS 10.13, *)) {
-+#if (TARGET_OS_OSX    && defined(__MAC_13_0)    && __MAC_OS_X_VERSION_MAX_ALLOWED  >= __MAC_13_0)     || \
++#if (TARGET_OS_OSX    && defined(__MAC_10_13)   && __MAC_OS_X_VERSION_MAX_ALLOWED  >= __MAC_10_13)    || \
 +    (TARGET_OS_IOS    && defined(__IPHONE_11_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)  || \
 +    (TARGET_OS_TV     && defined(__TVOS_11_0)   && __TV_OS_VERSION_MAX_ALLOWED     >= __TVOS_11_0)
 +    if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, *)) {
