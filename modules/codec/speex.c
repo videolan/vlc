@@ -276,7 +276,7 @@ static int CreateDefaultHeader( decoder_t *p_dec )
 
     const SpeexMode *mode;
     int ret = VLC_SUCCESS;
-    oggpacket.packet = NULL;
+    char *p_header_alloc = NULL;
 
     switch( rate )
     {
@@ -295,13 +295,15 @@ static int CreateDefaultHeader( decoder_t *p_dec )
     p_header->frames_per_packet = 160 << i_mode;
 
     int i_tmp;
-    oggpacket.packet = (unsigned char *) speex_header_to_packet( p_header, &i_tmp );
-    oggpacket.bytes = i_tmp;
-    if( !oggpacket.packet )
+    p_header_alloc = speex_header_to_packet( p_header, &i_tmp );
+    if( !p_header_alloc )
     {
         ret = VLC_ENOMEM;
         goto cleanup;
     }
+
+    oggpacket.packet = (unsigned char *) p_header_alloc;
+    oggpacket.bytes = i_tmp;
 
     oggpacket.b_o_s = 1;
     oggpacket.e_o_s = 0;
@@ -316,8 +318,8 @@ static int CreateDefaultHeader( decoder_t *p_dec )
     }
 
 cleanup:
-    free( oggpacket.packet );
-    free( p_header );
+    speex_header_free( p_header_alloc );
+    speex_header_free( p_header );
 
     return ret;
 }
@@ -1016,7 +1018,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     free( p_sys->p_tempbuffer );
 
-    free( p_sys->p_header );
+    speex_header_free( p_sys->p_header );
     free( p_sys );
 }
 
@@ -1155,16 +1157,20 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     /* Create and store headers */
-    pp_header[0] = speex_header_to_packet( &p_sys->header, &i_tmp );
+    char *p_header_alloc;
+    pp_header[0] = p_header_alloc = speex_header_to_packet( &p_sys->header, &i_tmp );
     pi_header[0] = i_tmp;
     pp_header[1] = "ENCODER=VLC media player";
     pi_header[1] = sizeof("ENCODER=VLC media player");
 
-    if( BuildExtradata( &p_enc->fmt_out, false, pi_header, pp_header ) != VLC_SUCCESS )
+    if( !p_header_alloc ||
+        BuildExtradata( &p_enc->fmt_out, false, pi_header, pp_header ) != VLC_SUCCESS )
     {
+        speex_header_free( p_header_alloc );
         CloseEncoder( p_enc );
         return VLC_ENOMEM;
     }
+    speex_header_free( p_header_alloc );
 
     static const struct vlc_encoder_operations ops =
     {
