@@ -316,7 +316,7 @@ cvpxpool_new_cvpx(CVPixelBufferPoolRef pool)
     return cvpx;
 }
 
-CFStringRef 
+CFStringRef
 cvpx_map_YCbCrMatrix_from_vcs(video_color_space_t color_space)
 {
     switch (color_space) {
@@ -332,7 +332,7 @@ cvpx_map_YCbCrMatrix_from_vcs(video_color_space_t color_space)
         break;
     default:
         if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *)) {
-            enum iso_23001_8_mc mc_cicp = 
+            enum iso_23001_8_mc mc_cicp =
                 vlc_coeffs_to_iso_23001_8_mc(color_space);
             return CVYCbCrMatrixGetStringForIntegerCodePoint(mc_cicp);
         }
@@ -340,7 +340,7 @@ cvpx_map_YCbCrMatrix_from_vcs(video_color_space_t color_space)
     return NULL;
 }
 
-CFStringRef 
+CFStringRef
 cvpx_map_ColorPrimaries_from_vcp(video_color_primaries_t color_primaries)
 {
     switch (color_primaries) {
@@ -356,7 +356,7 @@ cvpx_map_ColorPrimaries_from_vcp(video_color_primaries_t color_primaries)
         break;
     default:
         if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *)) {
-            enum iso_23001_8_cp cp_cicp = 
+            enum iso_23001_8_cp cp_cicp =
                 vlc_primaries_to_iso_23001_8_cp(color_primaries);
             return CVColorPrimariesGetStringForIntegerCodePoint(cp_cicp);
         }
@@ -364,7 +364,7 @@ cvpx_map_ColorPrimaries_from_vcp(video_color_primaries_t color_primaries)
     return NULL;
 }
 
-CFStringRef 
+CFStringRef
 cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func)
 {
     switch (transfer_func) {
@@ -373,7 +373,7 @@ cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func)
             return kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ;
         break;
     case TRANSFER_FUNC_BT709:
-    /* note: as stated by CVImageBuffer.h, 
+    /* note: as stated by CVImageBuffer.h,
        kCVImageBufferTransferFunction_ITU_R_709_2 is equivalent to
        kCVImageBufferTransferFunction_ITU_R_2020 and preferred
     */
@@ -425,12 +425,12 @@ bool cvpx_has_attachment(CVPixelBufferRef pixelBuffer, CFStringRef key) {
 
 
 
-void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx, 
+void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx,
                                          const video_format_t *fmt)
 {
     if (!cvpx_has_attachment(cvpx, kCVImageBufferYCbCrMatrixKey))
     {
-        CFStringRef color_matrix = 
+        CFStringRef color_matrix =
             cvpx_map_YCbCrMatrix_from_vcs(fmt->space);
         if (color_matrix) {
             CVBufferSetAttachment(
@@ -444,7 +444,7 @@ void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx,
 
     if (!cvpx_has_attachment(cvpx, kCVImageBufferColorPrimariesKey))
     {
-        CFStringRef color_primaries = 
+        CFStringRef color_primaries =
             cvpx_map_ColorPrimaries_from_vcp(fmt->primaries);
         if (color_primaries) {
             CVBufferSetAttachment(
@@ -458,7 +458,7 @@ void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx,
 
     if (!cvpx_has_attachment(cvpx, kCVImageBufferTransferFunctionKey))
     {
-        CFStringRef color_transfer_func = 
+        CFStringRef color_transfer_func =
             cvpx_map_TransferFunction_from_vtf(fmt->transfer);
         if (color_transfer_func) {
             CVBufferSetAttachment(
@@ -469,7 +469,7 @@ void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx,
             );
         }
     }
-    
+
     if (!cvpx_has_attachment(cvpx, kCVImageBufferGammaLevelKey))
     {
         Float32 gamma = 0;
@@ -487,7 +487,7 @@ void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx,
             );
             CFRelease(value);
         }
-    }    
+    }
 }
 
 struct cvpx_video_context
