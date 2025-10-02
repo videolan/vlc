@@ -408,11 +408,11 @@ cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func)
 }
 
 bool cvpx_has_attachment(CVPixelBufferRef pixelBuffer, CFStringRef key) {
-#if (TARGET_OS_OSX    && defined(__MAC_10_12)   && MAC_OS_X_VERSION_MAX_ALLOWED    >= __MAC_10_12) ||\
+#if (TARGET_OS_OSX    && defined(__MAC_12_0)    && MAC_OS_X_VERSION_MAX_ALLOWED    >= __MAC_12_0) ||\
     (TARGET_OS_IOS    && defined(__IPHONE_15_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_15_0) || \
     (TARGET_OS_TV     && defined(__TVOS_15_0)   && __TV_OS_VERSION_MAX_ALLOWED     >= __TVOS_15_0) || \
     (TARGET_OS_WATCH  && defined(__WATCHOS_8_0) && __WATCH_OS_VERSION_MAX_ALLOWED  >= __WATCHOS_8_0)
-    if (__builtin_available(macOS 10.12, iOS 15, tvOS 15, watchOS 8, *)) {
+    if (__builtin_available(macOS 12.0, iOS 15, tvOS 15, watchOS 8, *)) {
         return CVBufferHasAttachment(pixelBuffer, key);
     }
 #endif
