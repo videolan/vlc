@@ -333,6 +333,7 @@ static int Activate( vlc_object_t *p_this )
     if ( filter_chain_AppendConverter( p_sys->p_chain, NULL, NULL ) )
     {
         msg_Err( p_filter, "Could not append scaling filter" );
+        filter_chain_Delete( p_sys->p_chain );
         free( p_sys );
         return VLC_EGENERIC;
     }
