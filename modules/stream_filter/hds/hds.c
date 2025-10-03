@@ -1334,6 +1334,13 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     return VLC_ENOMEM;
                 }
             } else {
+                if( current_element_idx == MAX_XML_DEPTH - 1u )
+                {
+                    msg_Err( s, "Too many XML elements, quitting" );
+                    free(media_id);
+                    return VLC_EGENERIC;
+                }
+
                 if ( !( element_stack[++current_element_idx] = strdup( node ) ) )
                 {
                     free(media_id);
