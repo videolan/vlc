@@ -142,10 +142,7 @@ inline std::unique_ptr<T[], void (*)(void*)> wrap_carray( T* ptr ) noexcept
 ///
 ///     my_type_t *raw_ptr = /* ... */;
 ///     MyTypePtr ptr(raw_ptr);
-
-// In C++17, the template declaration could be replaced by:
-//     template<typename T, auto HOLD, auto RELEASE>
-template <typename T, typename H, typename R, H HOLD, R RELEASE>
+template <typename T, auto HOLD, auto RELEASE>
 class vlc_shared_data_ptr {
     T *ptr = nullptr;
 
@@ -271,10 +268,8 @@ public:
     }
 };
 
-// useful due to the unnecessarily complex template declaration before C++17
 #define vlc_shared_data_ptr_type(type, hold, release) \
-    ::vlc::vlc_shared_data_ptr<type, decltype(&hold), decltype(&release), \
-                               &hold, &release>
+    ::vlc::vlc_shared_data_ptr<type, &hold, &release>
 
 #if defined(VLC_THREADS_H_) || defined(DOC)
 
