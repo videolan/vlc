@@ -136,7 +136,7 @@ inline std::unique_ptr<T[], void (*)(void*)> wrap_carray( T* ptr ) noexcept
 /// To create a new shared resource wrapper type for my_type_t, simply declare:
 ///
 ///     using MyTypePtr =
-///         vlc_shared_data_ptr_type(my_type_t, my_type_Hold, my_type_Release);
+///         ::vlc::vlc_shared_data_ptr<my_type_t, &my_type_Hold, &my_type_Release>;
 ///
 /// Then use it to wrap a raw C pointer:
 ///
@@ -267,9 +267,6 @@ public:
         ptr = newptr;
     }
 };
-
-#define vlc_shared_data_ptr_type(type, hold, release) \
-    ::vlc::vlc_shared_data_ptr<type, &hold, &release>
 
 #if defined(VLC_THREADS_H_) || defined(DOC)
 
