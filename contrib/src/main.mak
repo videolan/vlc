@@ -836,6 +836,14 @@ ifdef HAVE_WIN32
 	MESON_CROSSFILE_ENV += WINDRES="$(WINDRES)"
 endif
 
+ifdef HAVE_DARWIN_OS
+ifdef HAVE_IOS
+	MESON_CROSSFILE_ENV += OSX_SYSROOT="$(IOS_SDK)"
+else
+	MESON_CROSSFILE_ENV += OSX_SYSROOT="$(MACOSX_SDK)"
+endif
+endif
+
 crossfile.meson: $(SRC)/gen-meson-machinefile.py
 	$(MESON_CROSSFILE_ENV) $(SRC)/gen-meson-machinefile.py $@
 	cat $@
