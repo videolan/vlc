@@ -33,7 +33,7 @@
 
 static void player_renderer_changed(vlc_player_t *, vlc_renderer_item_t *new_item, void *data);
 
-using RendererItemPtr = vlc_shared_data_ptr_type(vlc_renderer_item_t, vlc_renderer_item_hold, vlc_renderer_item_release);
+using RendererItemPtr = ::vlc::vlc_shared_data_ptr<vlc_renderer_item_t, &vlc_renderer_item_hold, &vlc_renderer_item_release>;
 using vlc_player_locker = vlc_locker<vlc_player_t, vlc_player_Lock, vlc_player_Unlock>;
 
 struct ItemEntry

@@ -49,13 +49,13 @@
 
 //PlayerController private implementation
 
-using SharedEsId = vlc_shared_data_ptr_type(vlc_es_id_t,
-                                            vlc_es_id_Hold,
-                                            vlc_es_id_Release);
+using SharedEsId = ::vlc::vlc_shared_data_ptr<vlc_es_id_t,
+                                              &vlc_es_id_Hold,
+                                              &vlc_es_id_Release>;
 
-using SharedTitleList = vlc_shared_data_ptr_type(vlc_player_title_list,
-                                                 vlc_player_title_list_Hold,
-                                                 vlc_player_title_list_Release);
+using SharedTitleList = ::vlc::vlc_shared_data_ptr<vlc_player_title_list,
+                                                   &vlc_player_title_list_Hold,
+                                                   &vlc_player_title_list_Release>;
 
 PlayerControllerPrivate::~PlayerControllerPrivate()
 {

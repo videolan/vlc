@@ -59,8 +59,8 @@ CHECK_ADDON_STATE_MATCH(UNINSTALLING);
 
 namespace {
 
-using AddonPtr = vlc_shared_data_ptr_type(addon_entry_t,
-                                          addon_entry_Hold, addon_entry_Release);
+using AddonPtr = ::vlc::vlc_shared_data_ptr<addon_entry_t,
+                                     &addon_entry_Hold, &addon_entry_Release>;
 
 class AddonItem {
 public:

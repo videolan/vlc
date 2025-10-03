@@ -24,13 +24,13 @@
 #include <vlc_media_source.h>
 #include <vlc_cxx_helpers.hpp>
 
-using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
-                                                vlc_media_source_Hold,
-                                                vlc_media_source_Release);
+using MediaSourcePtr = ::vlc::vlc_shared_data_ptr<vlc_media_source_t,
+                                                  &vlc_media_source_Hold,
+                                                  &vlc_media_source_Release>;
 
-using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
-                                              vlc_media_tree_Hold,
-                                              vlc_media_tree_Release);
+using MediaTreePtr = ::vlc::vlc_shared_data_ptr<vlc_media_tree_t,
+                                                &vlc_media_tree_Hold,
+                                                &vlc_media_tree_Release>;
 
 class MediaTreeLocker
 {

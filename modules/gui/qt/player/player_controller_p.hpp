@@ -120,7 +120,7 @@ public:
     TrackListModel m_audioTracks;
     TrackListModel m_subtitleTracks;
 
-    vlc_shared_data_ptr_type(vlc_es_id_t, vlc_es_id_Hold, vlc_es_id_Release) m_secondarySpuEsId;
+    ::vlc::vlc_shared_data_ptr<vlc_es_id_t, &vlc_es_id_Hold, &vlc_es_id_Release> m_secondarySpuEsId;
 
     VLCDuration  m_audioDelay;
     VLCDuration  m_subtitleDelay;

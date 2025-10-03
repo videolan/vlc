@@ -22,9 +22,9 @@
 
 #include "../util/renderer_manager.hpp"
 
-using RendererItemPtr = vlc_shared_data_ptr_type(vlc_renderer_item_t,
-    vlc_renderer_item_hold,
-    vlc_renderer_item_release);
+using RendererItemPtr = ::vlc::vlc_shared_data_ptr<vlc_renderer_item_t,
+    &vlc_renderer_item_hold,
+    &vlc_renderer_item_release>;
 
 class TestClass : public QObject
 {

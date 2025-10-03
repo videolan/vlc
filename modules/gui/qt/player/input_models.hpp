@@ -90,7 +90,7 @@ private:
 
         QString m_title;
         //vlc_es_id_t *m_id = NULL;
-        vlc_shared_data_ptr_type(vlc_es_id_t, vlc_es_id_Hold, vlc_es_id_Release) m_id;
+        ::vlc::vlc_shared_data_ptr<vlc_es_id_t, &vlc_es_id_Hold, &vlc_es_id_Release> m_id;
         bool m_selected = false;
     };
     QList<Data> m_data;
@@ -139,7 +139,7 @@ signals:
 
 private:
     vlc_player_t* m_player;
-    typedef vlc_shared_data_ptr_type(vlc_player_title_list, vlc_player_title_list_Hold, vlc_player_title_list_Release) PlayerTitleList;
+    typedef ::vlc::vlc_shared_data_ptr<vlc_player_title_list, &vlc_player_title_list_Hold, &vlc_player_title_list_Release> PlayerTitleList;
     PlayerTitleList m_titleList;
     int m_current = -1;
     int m_count = 0;

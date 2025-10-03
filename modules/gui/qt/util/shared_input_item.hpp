@@ -30,9 +30,9 @@
 #include <vlc_cxx_helpers.hpp>
 
 
-using SharedInputItem = vlc_shared_data_ptr_type(input_item_t,
-                                                 input_item_Hold,
-                                                 input_item_Release);
+using SharedInputItem = ::vlc::vlc_shared_data_ptr<input_item_t,
+                                                   &input_item_Hold,
+                                                   &input_item_Release>;
 
 Q_DECLARE_METATYPE(SharedInputItem)
 

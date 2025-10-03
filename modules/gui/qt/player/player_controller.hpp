@@ -38,8 +38,8 @@ Q_MOC_INCLUDE("util/renderer_manager.hpp")
 
 using vlc_player_locker = vlc_locker<vlc_player_t, vlc_player_Lock, vlc_player_Unlock>;
 
-using SharedVOutThread = vlc_shared_data_ptr_type(vout_thread_t, vout_Hold, vout_Release);
-using SharedAOut = vlc_shared_data_ptr_type(audio_output_t, aout_Hold, aout_Release);
+using SharedVOutThread = ::vlc::vlc_shared_data_ptr<vout_thread_t, &vout_Hold, &vout_Release>;
+using SharedAOut = ::vlc::vlc_shared_data_ptr<audio_output_t, &aout_Hold, &aout_Release>;
 
 class RendererManager;
 class QSignalMapper;

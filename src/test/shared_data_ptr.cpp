@@ -21,7 +21,7 @@ static void mockrc_Release(mockrc *p)
     p->count--;
 }
 
-using MockRcPtr = vlc_shared_data_ptr_type(mockrc, mockrc_Hold, mockrc_Release);
+using MockRcPtr = ::vlc::vlc_shared_data_ptr<mockrc, &mockrc_Hold, &mockrc_Release>;
 
 static void test_raii()
 {

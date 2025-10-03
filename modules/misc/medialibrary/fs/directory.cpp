@@ -41,9 +41,9 @@
 #include <system_error>
 #include <vector>
 
-using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                              input_item_Hold,
-                                              input_item_Release);
+using InputItemPtr = ::vlc::vlc_shared_data_ptr<input_item_t,
+                                                &input_item_Hold,
+                                                &input_item_Release>;
 
 namespace vlc {
   namespace medialibrary {

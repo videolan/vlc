@@ -34,9 +34,9 @@
 //namespace vlc {
 //  namespace playlist {
 
-using SharedPlaylistItem = vlc_shared_data_ptr_type(vlc_playlist_item_t,
-                                                    vlc_playlist_item_Hold,
-                                                    vlc_playlist_item_Release);
+using SharedPlaylistItem = ::vlc::vlc_shared_data_ptr<vlc_playlist_item_t,
+                                                      &vlc_playlist_item_Hold,
+                                                      &vlc_playlist_item_Release>;
 
 /**
  * Playlist item wrapper.

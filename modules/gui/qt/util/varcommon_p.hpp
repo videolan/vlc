@@ -89,7 +89,7 @@ public:
 private:
     static void obj_hold( vout_thread_t* obj ) { vout_Hold(obj); }
     static void obj_release( vout_thread_t* obj ) { vout_Release(obj); }
-    typedef vlc_shared_data_ptr_type(vout_thread_t, obj_hold, obj_release) SharedPtr;
+    typedef ::vlc::vlc_shared_data_ptr<vout_thread_t, &obj_hold, &obj_release> SharedPtr;
     SharedPtr m_object;
 };
 
@@ -149,7 +149,7 @@ public:
 private:
     static void obj_hold( audio_output_t* obj ) { aout_Hold(obj); }
     static void obj_release( audio_output_t* obj ) { aout_Release(obj); }
-    typedef vlc_shared_data_ptr_type(audio_output_t, obj_hold, obj_release) SharedPtr;
+    typedef ::vlc::vlc_shared_data_ptr<audio_output_t, &obj_hold, &obj_release> SharedPtr;
     SharedPtr m_object;
 };
 
