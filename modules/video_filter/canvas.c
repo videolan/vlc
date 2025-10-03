@@ -345,6 +345,7 @@ static int Activate( filter_t *p_filter )
     if ( ret != VLC_SUCCESS )
     {
         msg_Err( p_filter, "Could not append scaling filter" );
+        filter_chain_Delete( p_sys->p_chain );
         free( p_sys );
         return ret;
     }
