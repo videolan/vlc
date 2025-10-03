@@ -1029,7 +1029,7 @@ static chunk_t* generate_new_chunk(
         fragments_accum += (
             (hds_stream->segment_runs[srun_entry+1].first_segment -
              hds_stream->segment_runs[srun_entry].first_segment) *
-            hds_stream->segment_runs[srun_entry].fragments_per_segment );
+            (uint64_t)hds_stream->segment_runs[srun_entry].fragments_per_segment );
     }
 
     chunk->seg_num = segment;
