@@ -1327,7 +1327,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
         switch( type )
         {
         case XML_READER_STARTELEM:
-            if( current_element_idx == 0 && element_stack[current_element_idx] == 0 ) {
+            if( current_element_idx == 0 && element_stack[current_element_idx] == NULL ) {
                 if( !( element_stack[current_element_idx] = strdup( node ) ) )
                 {
                     free(media_id);
@@ -1360,7 +1360,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
 
             free( current_element );
             current_element = NULL;
-            element_stack[current_element_idx--] = 0;
+            element_stack[current_element_idx--] = NULL;
             break;
         }
 
