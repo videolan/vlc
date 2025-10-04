@@ -500,8 +500,8 @@ bool libvlc_video_get_teletext_transparency( libvlc_media_player_t *p_mi )
 /******************************************************************************
  * libvlc_video_set_deinterlace : enable/disable/auto deinterlace and filter
  *****************************************************************************/
-void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
-                                   const char *psz_mode )
+int libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
+                                  const char *psz_mode )
 {
     if (deinterlace != 0 && deinterlace != 1)
         deinterlace = -1;
@@ -513,7 +513,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
      && strcmp (psz_mode, "yadif")    && strcmp (psz_mode, "yadif2x")
      && strcmp (psz_mode, "phosphor") && strcmp (psz_mode, "ivtc")
      && strcmp (psz_mode, "auto"))
-        return;
+        return -1;
 
     if (psz_mode && deinterlace != 0)
         var_SetString (p_mi, "deinterlace-mode", psz_mode);
@@ -533,6 +533,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
         vout_Release(p_vout);
     }
     free (pp_vouts);
+    return 0;
 }
 
 /* ************** */
