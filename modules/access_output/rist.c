@@ -36,6 +36,10 @@
 #define RIST_CFG_PREFIX "sout-rist-"
 #include "../access/rist.h"
 
+#if !defined RIST_DEFAULT_RECOVERY_LENGTH_MIN
+# define RIST_DEFAULT_RECOVERY_LENGTH_MIN RIST_DEFAULT_RECOVERY_LENGHT_MIN
+#endif
+
 static const char *const ppsz_sout_options[] = {
     RIST_CFG_MAX_PACKET_SIZE,
     RIST_URL_PARAM_VIRT_SRC_PORT,
@@ -296,7 +300,7 @@ vlc_module_begin()
     add_integer( RIST_CFG_PREFIX RIST_URL_PARAM_VERBOSE_LEVEL, RIST_DEFAULT_VERBOSE_LEVEL,
             RIST_VERBOSE_LEVEL_TEXT, RIST_VERBOSE_LEVEL_LONGTEXT )
         change_integer_list( verbose_level_type, verbose_level_type_names )
-    add_integer( RIST_CFG_PREFIX RIST_CFG_LATENCY, RIST_DEFAULT_RECOVERY_LENGHT_MIN,
+    add_integer( RIST_CFG_PREFIX RIST_CFG_LATENCY, RIST_DEFAULT_RECOVERY_LENGTH_MIN,
             BUFFER_TEXT, BUFFER_LONGTEXT )
     add_string( RIST_CFG_PREFIX RIST_URL_PARAM_CNAME, NULL, RIST_CNAME_TEXT,
             RIST_CNAME_LONGTEXT )
