@@ -689,7 +689,9 @@ static int ChangeProjectionCallback( vlc_object_t *obj, char const *name,
         default: projection = "unknown"; break;
     }
 
-    vout_OSDMessage(vout, VOUT_SPU_CHANNEL_OSD, "Projection: %s", projection);
+    if (cur.i_int != prev.i_int)
+        vout_OSDMessage(vout, VOUT_SPU_CHANNEL_OSD,
+                        "Projection: %s", projection);
     if (cur.i_int == -1)
     {
         vout_ResetProjection(vout);
