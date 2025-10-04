@@ -536,6 +536,20 @@ int libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
     return 0;
 }
 
+int libvlc_video_get_deinterlace(libvlc_media_player_t *mp, char **modep)
+{
+    int tristate = var_GetInteger(mp, "deinterlace");
+
+    if (modep != NULL) {
+        if (tristate != 0)
+            *modep = var_GetString(mp, "deinterlace-mode");
+        else
+            *modep = NULL;
+    }
+
+    return tristate;
+}
+
 /* ************** */
 /* module helpers */
 /* ************** */

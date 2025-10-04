@@ -2387,6 +2387,24 @@ int libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, unsigned num,
                                 unsigned int i_height );
 
 /**
+ * Gets the deinterlacing parameters.
+ *
+ * If \p modep is not NULL, it will be set to a heap-allocated nul-terminated
+ * character string indicating the current deinterlacing algorithm name.
+ * If no algorithm is selected or if allocation fails, it be set to NULL.
+ * The value should be freed with the C run-time's free() function to avoid
+ * leaking.
+ *
+ * \param mpi media player instance
+ * \param modep storage space for hold the mode name (or NULL) [OUT]
+ * \retval -1 deinterlacing is selected automatically
+ * \retval 0 deinterlacing is forcefully disabled
+ * \retval 1 deinterlacing is forcefully enabled
+ */
+LIBVLC_API int libvlc_video_get_deinterlace(libvlc_media_player_t *mp,
+                                            char **modep);
+
+/**
  * Enable or disable deinterlace filter
  *
  * \param p_mi libvlc media player
