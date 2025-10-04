@@ -89,7 +89,8 @@ static void stream_control_info(void *data, uint32_t id,
             for (size_t i = 0; i < control->n_values; i++)
                  vol = fmaxf(vol, control->values[i]);
 
-            aout_VolumeReport(s->aout, vol);
+            /* Cubic root as the reciprocal mapping of set_volume()'s */
+            aout_VolumeReport(s->aout, cbrtf(vol));
             break;
         }
     }
@@ -389,6 +390,7 @@ static void vlc_pw_stream_set_volume(struct vlc_pw_stream *s, float vol)
 {
     const struct pw_stream_control *old;
 
+    vol = vol * vol * vol; /* same cubic mapping as VLC's software volume */
     vlc_pw_lock(s->context);
     old = pw_stream_get_control(s->stream, SPA_PROP_channelVolumes);
     if (old != NULL) {
