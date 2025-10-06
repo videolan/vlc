@@ -259,17 +259,13 @@ picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
     int i_ret = 0;
     p_sys->b_bake_request = false;
 
-    if ((p_sys->pi_order == NULL) || (p_sys->ps_desk_planes == NULL) || (p_sys->ps_pict_planes == NULL)  || (p_sys->ps_puzzle_array == NULL) || (p_sys->ps_pieces == NULL))
-        p_sys->b_init = false;
-
-    if ((p_sys->ps_pieces_shapes == NULL) && p_sys->s_current_param.b_advanced && (p_sys->s_current_param.i_shape_size != 0))
-        p_sys->b_init = false;
-
     /* assert initialized & allocated data match with current frame characteristics */
     if ( p_sys->s_allocated.i_planes != p_pic_out->i_planes)
         p_sys->b_init = false;
-    p_sys->s_current_param.i_planes = p_pic_out->i_planes;
-    if (p_sys->ps_pict_planes != NULL) {
+
+    if ((p_sys->pi_order == NULL) || (p_sys->ps_desk_planes == NULL) || (p_sys->ps_pict_planes == NULL)  || (p_sys->ps_puzzle_array == NULL) || (p_sys->ps_pieces == NULL)) {
+        p_sys->b_init = false;
+    } else if (p_sys->b_init) {
         for (uint8_t i_plane = 0; i_plane < p_sys->s_allocated.i_planes; i_plane++) {
             if ( (p_sys->ps_pict_planes[i_plane].i_lines != p_pic_in->p[i_plane].i_visible_lines)
                     || (p_sys->ps_pict_planes[i_plane].i_width != p_pic_in->p[i_plane].i_visible_pitch / p_pic_in->p[i_plane].i_pixel_pitch)
@@ -278,6 +274,11 @@ picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
                 p_sys->b_init = false;
         }
     }
+
+    if ((p_sys->ps_pieces_shapes == NULL) && p_sys->s_current_param.b_advanced && (p_sys->s_current_param.i_shape_size != 0))
+        p_sys->b_init = false;
+
+    p_sys->s_current_param.i_planes = p_pic_out->i_planes;
 
     p_sys->s_current_param.i_pict_width  = (int) p_pic_in->p[0].i_visible_pitch / p_pic_in->p[0].i_pixel_pitch;
     p_sys->s_current_param.i_pict_height = (int) p_pic_in->p[0].i_visible_lines;
