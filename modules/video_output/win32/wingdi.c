@@ -60,7 +60,6 @@ vlc_module_end ()
 typedef struct vout_display_sys_t
 {
     struct event_thread_t    *video_wnd;
-    bool                     size_changed;
     bool                     place_changed;
 
     /* Our offscreen bitmap and its framebuffer */
@@ -130,22 +129,19 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->place_changed || sys->size_changed)
+    if (sys->place_changed)
     {
         bool err = false;
         HWND hwnd = CommonVideoHWND(sys->video_wnd);
         HDC hdc = GetDC(hwnd);
-        if (sys->size_changed)
-            err |= ChangeSize(vd, hdc);
-        if (sys->place_changed)
-            err |= ChangePlace(vd, hdc);
+        err |= ChangeSize(vd, hdc);
+        err |= ChangePlace(vd, hdc);
         ReleaseDC(hwnd, hdc);
 
         if (unlikely(err))
             return;
 
         sys->place_changed = false;
-        sys->size_changed = false;
     }
 
     assert((LONG)picture->format.i_visible_width  == sys->bmiInfo.bmiHeader.biWidth &&
