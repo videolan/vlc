@@ -130,6 +130,7 @@ static void svg_LoadTemplate( filter_t *p_filter )
         {
             msg_Err( p_filter, "'%s' not found in SVG template", SVG_TEMPLATE_BODY_TOKEN );
             free( psz_template );
+            psz_template = NULL;
         }
         else *((char*)p_sys->psz_token) = 0;
     }
