@@ -198,7 +198,6 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    sys->size_changed = true;
     sys->place_changed = true;
     if (CommonWindowInit(vd, &sys->video_wnd, false))
         goto error;
