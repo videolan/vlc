@@ -194,7 +194,6 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    sys->place_changed = true;
     if (CommonWindowInit(vd, &sys->video_wnd, false))
         goto error;
 
@@ -313,6 +312,8 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     sys->off_dc = CreateCompatibleDC(window_dc);
 
     int err = ChangeSize(vd, window_dc);
+    if (err == VLC_SUCCESS)
+        err = ChangePlace(vd, window_dc);
     if (err != VLC_SUCCESS)
         DeleteDC(sys->off_dc);
 
