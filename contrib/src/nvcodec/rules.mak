@@ -2,7 +2,7 @@
 # NVCODEC_GITURL := $(VIDEOLAN_GIT)/ffmpeg/nv-codec-headers.git
 # NVCODEC_GITURL := $(GITHUB)/FFmpeg/nv-codec-headers.git
 NVCODEC_VERSION := 13.0.19.0
-NVCODEC_URL := https://code.ffmpeg.org/FFmpeg/nv-codec-headers/archive/n$(NVCODEC_VERSION).tar.gz
+NVCODEC_URL := https://code.ffmpeg.org/FFmpeg/nv-codec-headers/releases/download/n$(NVCODEC_VERSION)/nv-codec-headers-$(NVCODEC_VERSION).tar.gz
 
 ifndef HAVE_DARWIN_OS
 ifndef HAVE_WINSTORE # no LoadLibrary
@@ -18,7 +18,6 @@ $(TARBALLS)/nv-codec-headers-$(NVCODEC_VERSION).tar.gz:
 
 .sum-nvcodec: nv-codec-headers-$(NVCODEC_VERSION).tar.gz
 
-nvcodec: UNPACK_DIR=nv-codec-headers
 nvcodec: nv-codec-headers-$(NVCODEC_VERSION).tar.gz .sum-nvcodec
 	$(UNPACK)
 	$(MOVE)
