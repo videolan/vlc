@@ -29,8 +29,6 @@
 
 #include <vlc_threads.h>
 
-int vlc_cond_timedwait_daytime(vlc_cond_t *, vlc_mutex_t *, time_t);
-
 /*
  * Queued mutex
  *

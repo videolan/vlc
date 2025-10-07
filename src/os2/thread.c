@@ -339,54 +339,6 @@ int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
     return rc == 0 ? 0 : ETIMEDOUT;
 }
 
-int vlc_atomic_timedwait_daytime(void *addr, unsigned value, time_t deadline)
-{
-    atomic_uint *futex = addr;
-    struct wait_bucket *bucket = wait_bucket_enter( futex );
-
-    ULONG rc = 0;
-
-    vlc_cleanup_push( wait_bucket_leave, bucket );
-
-    if( value == atomic_load_explicit( futex, memory_order_relaxed ))
-    {
-        vlc_tick_t delay;
-
-        DosReleaseMutexSem( bucket->lock );
-
-        do
-        {
-            ULONG ms;
-            ULONG count;
-
-            delay = deadline - time( NULL );
-
-            if( delay < 0 )
-                ms = 0;
-            else if( delay >= ( LONG_MAX / 1000 ))
-                ms = LONG_MAX;
-            else
-                ms = delay * 1000;
-
-            rc = vlc_WaitForSingleObject( bucket->wait, ms );
-            if( rc == 0 )
-            {
-                DosResetEventSem( bucket->wait, &count );
-                break;
-            }
-        } while( delay > 0 );
-
-        DosRequestMutexSem( bucket->lock, SEM_INDEFINITE_WAIT );
-    }
-    else
-        vlc_testcancel();
-
-    wait_bucket_leave( bucket );
-    vlc_cleanup_pop();
-
-    return rc == 0 ? 0 : ETIMEDOUT;
-}
-
 void vlc_atomic_notify_one(void *addr)
 {
     vlc_atomic_notify_all(addr);

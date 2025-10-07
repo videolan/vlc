@@ -38,8 +38,6 @@ using std::memory_order_acq_rel;
 # include <vlc_common.h>
 # include <vlc_tick.h>
 
-#include <time.h> /* vlc_atomic_timedwait_daytime */
-
 #define VLC_STATIC_RC { \
     .refs = (uintptr_t) 1 \
 }
@@ -115,8 +113,6 @@ VLC_API void vlc_atomic_wait(void *addr, unsigned val);
  */
 VLC_API
 int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline);
-
-int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline);
 
 /**
  * Wakes up one thread on an address.

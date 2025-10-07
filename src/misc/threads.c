@@ -305,19 +305,6 @@ int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
     return ret;
 }
 
-int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
-                               time_t deadline)
-{
-    struct vlc_cond_waiter waiter;
-    int ret;
-
-    vlc_cond_wait_prepare(&waiter, cond, mutex);
-    ret = vlc_atomic_timedwait_daytime(&waiter.value, 0, deadline);
-    vlc_cond_wait_finish(&waiter, cond, mutex);
-
-    return ret;
-}
-
 /*** Generic semaphores ***/
 
 void vlc_sem_init (vlc_sem_t *sem, unsigned value)

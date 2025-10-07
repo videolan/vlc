@@ -136,14 +136,6 @@ int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
     return vlc_atomic_timedwait_timespec(addr, value, &ts);
 }
 
-int vlc_atomic_timedwait_daytime(void *addr, unsigned value, time_t deadline)
-{
-    struct timespec ts = { .tv_sec = deadline, .tv_nsec = 0 };
-
-    vlc_timespec_adjust(CLOCK_REALTIME, &ts);
-    return vlc_atomic_timedwait_timespec(addr, value, &ts);
-}
-
 void vlc_atomic_notify_one(void *addr)
 {
     vlc_atomic_notify_all(addr);

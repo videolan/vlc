@@ -129,23 +129,3 @@ int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
      }
      return errno;
 }
-
-int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline)
-{
-    struct timespec ts = { .tv_sec = deadline, .tv_nsec = 0 };
-
-    if (vlc_futex_wait(addr, FUTEX_CLOCK_REALTIME, val, &ts) == 0)
-        return 0;
-
-    switch (errno) {
-        case EINTR:
-        case EAGAIN:
-            return 0;
-        case EFAULT:
-        case EINVAL:
-            vlc_assert_unreachable(); /* BUG! */
-        default:
-            break;
-     }
-     return errno;
-}

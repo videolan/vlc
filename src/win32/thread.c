@@ -311,31 +311,6 @@ int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
     }
 }
 
-int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline)
-{
-    time_t delay;
-
-    for(;;)
-    {
-        delay = deadline - time(NULL);
-
-        if (delay < 0)
-            return ETIMEDOUT; // deadline passed
-
-        DWORD ms;
-        static_assert(sizeof(unsigned long) <= sizeof(DWORD), "unknown max DWORD");
-        if (unlikely(delay > (ULONG_MAX / 1000)))
-            ms = ULONG_MAX;
-        else
-            ms = delay * 1000;
-
-        if (WaitOnAddress(addr, &val, sizeof (val), ms))
-            return 0;
-        if (GetLastError() == ERROR_TIMEOUT)
-            return ETIMEDOUT;
-    }
-}
-
 void vlc_atomic_notify_one(void *addr)
 {
     WakeByAddressSingle(addr);
