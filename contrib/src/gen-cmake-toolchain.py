@@ -45,6 +45,7 @@ _add_environ_val('CMAKE_CXX_COMPILER_AR', 'AR')
 _add_environ_val('CMAKE_LINKER', 'LD')
 
 _add_environ_cached_val_not_empty('CMAKE_OSX_SYSROOT', 'OSX_SYSROOT')
+_add_environ_cached_val_not_empty('CMAKE_OSX_DEPLOYMENT_TARGET', 'OSX_DEPLOYMENT_TARGET')
 
 _add_environ_val('CMAKE_C_COMPILER', 'CC')
 _add_environ_val('CMAKE_CXX_COMPILER', 'CXX')
