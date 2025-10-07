@@ -17,7 +17,7 @@ public:
     void    mute();
     void    setfeedback(float val);
     float    getfeedback();
-// private:
+private:
     float    feedback;
     float    *buffer;
     int    bufsize;
