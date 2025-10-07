@@ -733,8 +733,24 @@ CMAKE_SYSTEM_NAME = WindowsStore
 endif
 endif
 endif
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 CMAKE_SYSTEM_NAME = Darwin
+else
+ifdef HAVE_TVOS
+CMAKE_SYSTEM_NAME = tvOS
+else
+ifdef HAVE_WATCHOS
+CMAKE_SYSTEM_NAME = watchOS
+else
+ifdef HAVE_XROS
+CMAKE_SYSTEM_NAME = visionOS
+else
+ifdef HAVE_IOS
+CMAKE_SYSTEM_NAME = iOS
+endif
+endif
+endif
+endif
 endif
 ifdef HAVE_EMSCRIPTEN
 CMAKE_SYSTEM_NAME = Emscripten
