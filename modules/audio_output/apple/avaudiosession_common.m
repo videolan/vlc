@@ -33,10 +33,8 @@
 #if defined(TARGET_OS_VISION) && TARGET_OS_VISION
 #define MIN_VISIONOS 1.0
 #define VISIONOS_API_AVAILABLE , visionos(MIN_VISIONOS)
-#define VISIONOS_AVAILABLE , visionOS MIN_VISIONOS
 #else
 #define VISIONOS_API_AVAILABLE
-#define VISIONOS_AVAILABLE
 #endif
 
 void
@@ -76,7 +74,7 @@ avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
 
     if (spatial_audio)
     {
-        if (@available(iOS 15.0, watchOS 8.0, tvOS 15.0 VISIONOS_AVAILABLE, *))
+        if (@available(iOS 15.0, watchOS 8.0, tvOS 15.0, *))
         {
             /* Not mandatory, SpatialAudio can work without it. It just signals to
              * the user that he is playing spatial content */
@@ -161,7 +159,7 @@ GetRouteSharingPolicy(audio_output_t *p_aout)
     AVAudioSessionRouteSharingPolicy policy = AVAudioSessionRouteSharingPolicyLongFormAudio;
     AVAudioSessionRouteSharingPolicy video_policy;
 #if TARGET_OS_IOS || TARGET_OS_VISION
-    if (@available(iOS 13.0 VISIONOS_AVAILABLE, *))
+    if (@available(iOS 13.0, *))
         video_policy = AVAudioSessionRouteSharingPolicyLongFormVideo;
     else
 #endif
@@ -205,7 +203,7 @@ avas_SetActive(audio_output_t *p_aout, AVAudioSession *instance, bool active,
 
     if (active)
     {
-        if (@available(iOS 11.0, watchOS 7.0, tvOS 11.0 VISIONOS_AVAILABLE, *))
+        if (@available(iOS 11.0, watchOS 7.0, tvOS 11.0, *))
         {
             AVAudioSessionRouteSharingPolicy policy = GetRouteSharingPolicy(p_aout);
 
