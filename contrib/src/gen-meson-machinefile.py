@@ -90,6 +90,17 @@ if args.type == 'internal':
     _add_environ_val('windres', 'WINDRES')
     _add_environ_val('cmake', 'CMAKE')
 
+    # built-in options section
+    args.file.write("\n[built-in options]\n")
+    _add_environ_val('c_args', 'CFLAGS_BUILTIN')
+    _add_environ_val('cpp_args', 'CPPFLAGS_BUILTIN')
+    _add_environ_val('objc_args', 'OBJCFLAGS_BUILTIN')
+    _add_environ_val('objcpp_args', 'OBJCPPFLAGS_BUILTIN')
+    _add_environ_val('c_link_args', 'LDFLAGS_C_BUILTIN')
+    _add_environ_val('cpp_link_args', 'LDFLAGS_CPP_BUILTIN')
+    _add_environ_val('objc_link_args', 'LDFLAGS_OBJC_BUILTIN')
+    _add_environ_val('objcpp_link_args', 'LDFLAGS_OBJCPP_BUILTIN')
+
     # Properties section
     args.file.write("\n[properties]\n")
     args.file.write("needs_exe_wrapper = true\n")
@@ -144,4 +155,3 @@ elif args.type.startswith('external'):
 
 else:
     assert False, 'Unhandled type!'
-
