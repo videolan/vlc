@@ -1385,18 +1385,13 @@ AH_BOTTOM([
 ])
 
   dnl Check for -funroll-loops
-  VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -funroll-loops"
-  CXXFLAGS="${CXXFLAGS} -funroll-loops"
-  OBJCFLAGS="${OBJCFLAGS} -funroll-loops"
-  AC_CACHE_CHECK([if $CC accepts -funroll-loops], [ac_cv_c_unroll_loops], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-      ac_cv_c_unroll_loops=yes
-    ], [
-      ac_cv_c_unroll_loops=no
-    ])
-  ])
-  AS_IF([test "${ac_cv_c_unroll_loops}" = "no"], [VLC_RESTORE_FLAGS])
+  AX_APPEND_COMPILE_FLAGS([-funroll-loops], [CFLAGS], [-Werror])
+  AC_LANG_PUSH(C++)
+  AX_APPEND_COMPILE_FLAGS([-funroll-loops], [CXXFLAGS], [-Werror])
+  AC_LANG_POP(C++)
+  AC_LANG_PUSH(Objective C)
+  AX_APPEND_COMPILE_FLAGS([-funroll-loops], [OBJCFLAGS], [-Werror])
+  AC_LANG_POP(Objective C)
 
   AS_IF([test "$enable_debug" = "no"], [
     dnl Check for -fomit-frame-pointer
