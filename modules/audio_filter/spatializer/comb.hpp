@@ -16,8 +16,7 @@
 class comb
 {
 public:
-    comb();
-    void    setbuffer(float *buf, int size);
+    comb(float *buf, int size);
     inline  float    process(float inp);
     void    mute();
     void    setdamp(float val);

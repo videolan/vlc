@@ -7,16 +7,12 @@
 #include "allpass.hpp"
 #include <stddef.h>
 
-allpass::allpass()
+allpass::allpass(float *buf, int size) :
+    feedback(0.5f),
+    buffer(buf),
+    bufsize(size),
+    bufidx(0)
 {
-    bufidx = 0;
-    buffer = NULL;
-}
-
-void allpass::setbuffer(float *buf, int size)
-{
-    buffer = buf;
-    bufsize = size;
 }
 
 void allpass::mute()
