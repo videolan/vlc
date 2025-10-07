@@ -825,15 +825,16 @@ endif
 endif
 endif
 
-crossfile.meson: $(SRC)/gen-meson-machinefile.py
-	$(HOSTTOOLS) \
+MESON_CROSSFILE_ENV = $(HOSTTOOLS) \
 	CMAKE="$(shell command -v cmake)" \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \
 	HOST_SYSTEM="$(MESON_SYSTEM_NAME)" \
 	HOST_ARCH="$(subst i386,x86,$(ARCH))" \
-	HOST="$(HOST)" \
-	$(SRC)/gen-meson-machinefile.py $@
+	HOST="$(HOST)"
+
+crossfile.meson: $(SRC)/gen-meson-machinefile.py
+	$(MESON_CROSSFILE_ENV) $(SRC)/gen-meson-machinefile.py $@
 	cat $@
 
 # Default pattern rules
