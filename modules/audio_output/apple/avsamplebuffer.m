@@ -45,10 +45,8 @@
 #if defined(TARGET_OS_VISION) && TARGET_OS_VISION
     #define MIN_VISIONOS 1.0
     #define VISIONOS_API_AVAILABLE , visionos(MIN_VISIONOS)
-    #define VISIONOS_AVAILABLE , visionOS MIN_VISIONOS
 #else
     #define VISIONOS_API_AVAILABLE
-    #define VISIONOS_AVAILABLE
 #endif
 
 #pragma mark Private
@@ -525,7 +523,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
                     selector:@selector(flushedAutomatically:)
                         name:AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification
                       object:nil];
-    if (@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0 VISIONOS_AVAILABLE, *))
+    if (@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *))
     {
         [notifCenter addObserver:self
                         selector:@selector(outputConfigurationChanged:)
@@ -619,7 +617,7 @@ Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 static void
 Close(vlc_object_t *obj)
 {
-    if (@available(macOS MIN_MACOS, iOS MIN_IOS, tvOS MIN_TVOS, watchOS MIN_WATCHOS VISIONOS_AVAILABLE, *))
+    if (@available(macOS MIN_MACOS, iOS MIN_IOS, tvOS MIN_TVOS, watchOS MIN_WATCHOS, *))
     {
         audio_output_t *aout = (audio_output_t *)obj;
         /* Transfer ownership back from VLC to ARC so that it can be released. */
@@ -633,7 +631,7 @@ Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
-    if (@available(macOS MIN_MACOS, iOS MIN_IOS, tvOS MIN_TVOS, watchOS MIN_WATCHOS VISIONOS_AVAILABLE, *))
+    if (@available(macOS MIN_MACOS, iOS MIN_IOS, tvOS MIN_TVOS, watchOS MIN_WATCHOS, *))
     {
         aout->sys = (__bridge_retained void*) [[VLCAVSample alloc] init:aout];
         if (aout->sys == nil)
