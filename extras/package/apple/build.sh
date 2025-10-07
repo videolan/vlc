@@ -423,6 +423,10 @@ write_config_mak()
     printf '%s := %s\n' "RANLIB" "${VLC_HOST_RANLIB}" >&3
     printf '%s := %s\n' "NM" "${VLC_HOST_NM}" >&3
 
+    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET" "${VLC_DEPLOYMENT_TARGET}" >&3
+    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET_CFLAG" "${VLC_DEPLOYMENT_TARGET_CFLAG}" >&3
+    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET_LDFLAG" "${VLC_DEPLOYMENT_TARGET_LDFLAG}" >&3
+
     # Add the ac_cv_ var exports in the config.mak for the contribs
     echo "Appending ac_cv_ vars to config.mak"
     vlcSetSymbolEnvironment ac_var_to_export_ac_var >&3
