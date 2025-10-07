@@ -162,6 +162,7 @@ vlcSetContribEnvironment() {
     export CXXFLAGS="-Werror=partial-availability"
     export OBJCFLAGS="-Werror=partial-availability"
 
+    export VLC_DEPLOYMENT_TARGET="$MINIMAL_OSX_VERSION"
     export EXTRA_CFLAGS="-isysroot $SDKROOT -mmacosx-version-min=$MINIMAL_OSX_VERSION -DMACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -arch $ACTUAL_HOST_ARCH"
     export EXTRA_LDFLAGS="-isysroot $SDKROOT -mmacosx-version-min=$MINIMAL_OSX_VERSION -DMACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -arch $ACTUAL_HOST_ARCH"
     export XCODE_FLAGS="MACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -sdk $SDKROOT WARNING_CFLAGS=-Werror=partial-availability"
