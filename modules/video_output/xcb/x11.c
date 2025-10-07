@@ -393,6 +393,7 @@ static int Open (vout_display_t *vd,
         sys->segment = 0;
 
     /* Setup vout_display_t once everything is fine */
+    ResetPictures(vd, fmtp);
     vd->ops = &ops;
 
     (void) context;
