@@ -188,7 +188,7 @@ void revmodel::update()
     }
 }
 
-// The following get/set functions are not inlined, because
+// The following set functions are not inlined, because
 // speed is never an issue when calling them, and also
 // because as you develop the reverb model, you may
 // wish to take dynamic action when they are called.
@@ -199,20 +199,10 @@ void revmodel::setroomsize(float value)
     update();
 }
 
-float revmodel::getroomsize()
-{
-    return (roomsize-offsetroom)/scaleroom;
-}
-
 void revmodel::setdamp(float value)
 {
     damp = value*scaledamp;
     update();
-}
-
-float revmodel::getdamp()
-{
-    return damp/scaledamp;
 }
 
 void revmodel::setwet(float value)
@@ -221,30 +211,15 @@ void revmodel::setwet(float value)
     update();
 }
 
-float revmodel::getwet()
-{
-    return wet/scalewet;
-}
-
 void revmodel::setdry(float value)
 {
     dry = value*scaledry;
-}
-
-float revmodel::getdry()
-{
-    return dry/scaledry;
 }
 
 void revmodel::setwidth(float value)
 {
     width = value;
     update();
-}
-
-float revmodel::getwidth()
-{
-    return width;
 }
 
 void revmodel::setmode(float value)

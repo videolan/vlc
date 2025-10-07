@@ -23,15 +23,10 @@ public:
     void    processreplace(float *inputL, float *outputL, long numsamples, int skip);
     void    processmix(float *inputL, float *outputL, long numsamples, int skip);
     void    setroomsize(float value);
-    float    getroomsize();
     void    setdamp(float value);
-    float    getdamp();
     void    setwet(float value);
-    float    getwet();
     void    setdry(float value);
-    float    getdry();
     void    setwidth(float value);
-    float    getwidth();
     void    setmode(float value);
 private:
     void    update();

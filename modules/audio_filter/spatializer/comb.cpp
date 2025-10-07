@@ -32,19 +32,9 @@ void comb::setdamp(float val)
     damp2 = 1-val;
 }
 
-float comb::getdamp()
-{
-    return damp1;
-}
-
 void comb::setfeedback(float val)
 {
     feedback = val;
-}
-
-float comb::getfeedback()
-{
-    return feedback;
 }
 
 // ends

@@ -21,9 +21,7 @@ public:
     inline  float    process(float inp);
     void    mute();
     void    setdamp(float val);
-    float    getdamp();
     void    setfeedback(float val);
-    float    getfeedback();
 private:
     float    feedback;
     float    filterstore;

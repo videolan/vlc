@@ -30,9 +30,4 @@ void allpass::setfeedback(float val)
     feedback = val;
 }
 
-float allpass::getfeedback()
-{
-    return feedback;
-}
-
 //ends
