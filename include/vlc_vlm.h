@@ -33,7 +33,7 @@
  * VLC stream manager
  *
  * VLM is the server core in vlc that allows streaming of multiple media streams
- * at the same time. It provides broadcast, schedule and video on demand features
+ * at the same time. It provides broadcast features
  * for streaming using several streaming and network protocols.
  * @{
  * \file
@@ -74,13 +74,6 @@ typedef struct
     bool        b_paused;   /*< vlm media instance is paused */
     float       f_rate;     // normal is 1.0f
 } vlm_media_instance_t;
-
-#if 0
-typedef struct
-{
-
-} vlm_schedule_t
-#endif
 
 /** VLM events
  * You can catch vlm event by adding a callback on the variable "intf-event"
@@ -158,10 +151,6 @@ enum vlm_query_e
     VLM_GET_MEDIA_INSTANCE_POSITION,    /* arg1=int64_t id, arg2=const char *psz_instance_name arg3=double *   */
     /* Set instance position ([0.0 .. 1.0]) */
     VLM_SET_MEDIA_INSTANCE_POSITION,    /* arg1=int64_t id, arg2=const char *psz_instance_name arg3=double     */
-
-    /* Schedule control */
-    VLM_CLEAR_SCHEDULES,                /* no arg */
-    /* TODO: missing schedule control */
 
     /* */
 };

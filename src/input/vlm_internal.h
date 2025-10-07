@@ -52,26 +52,6 @@ typedef struct
     vlm_media_instance_sys_t **instance;
 } vlm_media_sys_t;
 
-typedef struct
-{
-    /* names "schedule" is reserved */
-    char    *psz_name;
-    bool b_enabled;
-    /* list of commands to execute on date */
-    int i_command;
-    char **command;
-
-    /* the date of 1st execution */
-    time_t date;
-
-    /* if != 0, repeat period in seconds */
-    time_t period;
-    /* number of times you have to repeat
-       i_repeat < 0 : endless repeat     */
-    int i_repeat;
-} vlm_schedule_sys_t;
-
-
 struct vlm_t
 {
     struct vlc_object_t obj;
@@ -91,14 +71,9 @@ struct vlm_t
     /* Media list */
     int                i_media;
     vlm_media_sys_t    **media;
-
-    /* Schedule list */
-    int            i_schedule;
-    vlm_schedule_sys_t **schedule;
 };
 
 int vlm_ControlInternal( vlm_t *p_vlm, int i_query, ... );
 int ExecuteCommand( vlm_t *, const char *, vlm_message_t ** );
-void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_sys_t *sched );
 
 #endif

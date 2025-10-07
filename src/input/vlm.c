@@ -151,7 +151,6 @@ vlm_t *vlm_New( libvlc_int_t *libvlc, const char *psz_vlmconf )
     p_vlm->exiting = false;
     p_vlm->i_id = 1;
     TAB_INIT( p_vlm->i_media, p_vlm->media );
-    TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );
     var_Create( p_vlm, "intf-event", VLC_VAR_ADDRESS );
 
     if( vlc_clone( &p_vlm->thread, Manage, p_vlm ) )
@@ -211,10 +210,6 @@ void vlm_Delete( vlm_t *p_vlm )
     vlm_ControlInternal( p_vlm, VLM_CLEAR_MEDIAS );
     TAB_CLEAN( p_vlm->i_media, p_vlm->media );
 
-    vlm_ControlInternal( p_vlm, VLM_CLEAR_SCHEDULES );
-    TAB_CLEAN( p_vlm->i_schedule, p_vlm->schedule );
-    vlc_mutex_unlock( &p_vlm->lock );
-
     vlc_mutex_lock( &p_vlm->lock_manage );
     p_vlm->exiting = true;
     vlc_cond_signal( &p_vlm->wait_manage );
@@ -250,16 +245,10 @@ static void* Manage( void* p_object )
     vlc_thread_set_name("vlc-vlm");
 
     vlm_t *vlm = (vlm_t*)p_object;
-    time_t lastcheck;
     bool exiting;
-
-    time(&lastcheck);
 
     do
     {
-        char **ppsz_scheduled_commands = NULL;
-        int    i_scheduled_commands = 0;
-
         /* destroy the inputs that wants to die, and launch the next input */
         vlc_mutex_lock( &vlm->lock );
         for( int i = 0; i < vlm->i_media; i++ )
@@ -293,89 +282,12 @@ static void* Manage( void* p_object )
             }
         }
 
-        /* scheduling */
-        time_t now, nextschedule = 0;
-
-        time(&now);
-
-        for( int i = 0; i < vlm->i_schedule; i++ )
-        {
-            time_t real_date = vlm->schedule[i]->date;
-
-            if( vlm->schedule[i]->b_enabled )
-            {
-                bool b_now = false;
-                if( vlm->schedule[i]->date == 0 ) // now !
-                {
-                    vlm->schedule[i]->date = now;
-                    real_date = now;
-                    b_now = true;
-                }
-                else if( vlm->schedule[i]->period != 0 )
-                {
-                    int j = 0;
-                    while( ((vlm->schedule[i]->date + j *
-                             vlm->schedule[i]->period) <= lastcheck) &&
-                           ( vlm->schedule[i]->i_repeat > j ||
-                             vlm->schedule[i]->i_repeat < 0 ) )
-                    {
-                        j++;
-                    }
-
-                    real_date = vlm->schedule[i]->date + j *
-                        vlm->schedule[i]->period;
-                }
-
-                if( real_date <= now )
-                {
-                    if( real_date > lastcheck || b_now )
-                    {
-                        for( int j = 0; j < vlm->schedule[i]->i_command; j++ )
-                        {
-                            TAB_APPEND( i_scheduled_commands,
-                                        ppsz_scheduled_commands,
-                                        strdup(vlm->schedule[i]->command[j] ) );
-                        }
-                    }
-                }
-                else if( nextschedule == 0 || real_date < nextschedule )
-                {
-                    nextschedule = real_date;
-                }
-            }
-        }
-
-        while( i_scheduled_commands )
-        {
-            vlm_message_t *message = NULL;
-            char *psz_command = ppsz_scheduled_commands[0];
-            ExecuteCommand( vlm, psz_command,&message );
-
-            /* for now, drop the message */
-            vlm_MessageDelete( message );
-            TAB_REMOVE( i_scheduled_commands,
-                        ppsz_scheduled_commands,
-                        psz_command );
-            free( psz_command );
-        }
-
-        lastcheck = now;
         vlc_mutex_unlock( &vlm->lock );
 
         vlc_mutex_lock( &vlm->lock_manage );
 
         while( !vlm->input_state_changed && !(exiting = vlm->exiting) )
-        {
-            if( nextschedule )
-            {
-                if( vlc_cond_timedwait_daytime( &vlm->wait_manage,
-                                                &vlm->lock_manage,
-                                                nextschedule ) )
-                    break;
-            }
-            else
-                vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
-        }
+            vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
         vlm->input_state_changed = false;
         vlc_mutex_unlock( &vlm->lock_manage );
     }
@@ -421,7 +333,7 @@ static vlm_media_sys_t *vlm_ControlMediaGetByName( vlm_t *p_vlm, const char *psz
 static int vlm_MediaDescriptionCheck( vlm_t *p_vlm, vlm_media_t *p_cfg )
 {
     if( !p_cfg || !p_cfg->psz_name ||
-        !strcmp( p_cfg->psz_name, "all" ) || !strcmp( p_cfg->psz_name, "media" ) || !strcmp( p_cfg->psz_name, "schedule" ) )
+        !strcmp( p_cfg->psz_name, "all" ) || !strcmp( p_cfg->psz_name, "media" ))
         return VLC_EGENERIC;
 
     for( int i = 0; i < p_vlm->i_media; i++ )
@@ -831,14 +743,6 @@ static int vlm_ControlMediaInstanceClear( vlm_t *p_vlm, int64_t id )
     return VLC_SUCCESS;
 }
 
-static int vlm_ControlScheduleClear( vlm_t *p_vlm )
-{
-    while( p_vlm->i_schedule > 0 )
-        vlm_ScheduleDelete( p_vlm, p_vlm->schedule[0] );
-
-    return VLC_SUCCESS;
-}
-
 static int vlm_vaControlInternal( vlm_t *p_vlm, int i_query, va_list args )
 {
     vlm_media_t *p_dsc;
@@ -940,9 +844,6 @@ static int vlm_vaControlInternal( vlm_t *p_vlm, int i_query, va_list args )
         psz_id = (const char*)va_arg( args, const char* );
         d_double = (double)va_arg( args, double );
         return vlm_ControlMediaInstanceSetTimePosition( p_vlm, id, psz_id, -1, d_double );
-
-    case VLM_CLEAR_SCHEDULES:
-        return vlm_ControlScheduleClear( p_vlm );
 
     default:
         msg_Err( p_vlm, "unknown VLM query" );
