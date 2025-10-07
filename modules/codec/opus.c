@@ -376,9 +376,19 @@ static int ProcessHeaders( decoder_t *p_dec )
     {
         OpusHeader header;
         opus_header_init(&header);
+
         opus_prepare_header( p_dec->fmt_in->audio.i_channels ? p_dec->fmt_in->audio.i_channels : 2,
                              p_dec->fmt_in->audio.i_rate ? p_dec->fmt_in->audio.i_rate : 48000,
                              &header );
+
+        /* This is the only case where opus_write_header will try to read header.stream_map */
+        if( header.channel_mapping == 1 )
+        {
+            /* default mapping */
+            static const unsigned char map[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+            memcpy(header.stream_map, map, sizeof(map));
+        }
+
         int ret = opus_write_header( &p_alloc, &i_extra, &header,
                                      opus_get_version_string() );
         opus_header_clean(&header);
