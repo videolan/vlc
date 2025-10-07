@@ -1395,19 +1395,13 @@ AH_BOTTOM([
 
   AS_IF([test "$enable_debug" = "no"], [
     dnl Check for -fomit-frame-pointer
-    VLC_SAVE_FLAGS
-    CFLAGS="${CFLAGS} -fomit-frame-pointer"
-    CXXFLAGS="${CXXFLAGS} -fomit-frame-pointer"
-    OBJCFLAGS="${OBJCFLAGS} -fomit-frame-pointer"
-    AC_CACHE_CHECK([if $CC accepts -fomit-frame-pointer],
-      [ac_cv_c_omit_frame_pointer], [
-      AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-        ac_cv_c_omit_frame_pointer=yes
-      ], [
-        ac_cv_c_omit_frame_pointer=no
-      ])
-    ])
-    AS_IF([test "${ac_cv_c_omit_frame_pointer}" = "no"], [VLC_RESTORE_FLAGS])
+    AX_APPEND_COMPILE_FLAGS([-fomit-frame-pointer], [CFLAGS], [-Werror])
+    AC_LANG_PUSH(C++)
+    AX_APPEND_COMPILE_FLAGS([-fomit-frame-pointer], [CXXFLAGS], [-Werror])
+    AC_LANG_POP(C++)
+    AC_LANG_PUSH(Objective C)
+    AX_APPEND_COMPILE_FLAGS([-fomit-frame-pointer], [OBJCFLAGS], [-Werror])
+    AC_LANG_POP(Objective C)
   ])
 
 ])
