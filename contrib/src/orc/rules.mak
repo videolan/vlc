@@ -24,7 +24,7 @@ orc: orc-$(ORC_VERSION).tar.bz2 .sum-orc
 
 ORC_CONF := -Dauto_features=disabled
 
-.orc: orc
+.orc: orc crossfile.meson
 	$(MESONCLEAN)
 	$(MESON) $(ORC_CONF)
 	+$(MESONBUILD)
