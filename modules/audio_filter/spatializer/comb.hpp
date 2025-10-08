@@ -17,16 +17,16 @@ class comb
 {
 public:
     comb(float *buf, int size);
-    inline  float    process(float inp);
-    void    mute();
-    void    setdamp(float val);
-    void    setfeedback(float val);
+    inline float process(float inp);
+    void   mute();
+    void   setdamp(float val);
+    void   setfeedback(float val);
 private:
-    float    feedback;
-    float    filterstore;
-    float    damp1;
-    float    damp2;
-    float    *buffer;
+    float  feedback;
+    float  filterstore;
+    float  damp1;
+    float  damp2;
+    float  *buffer;
     int    bufsize;
     int    bufidx;
 };

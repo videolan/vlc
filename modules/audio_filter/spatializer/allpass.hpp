@@ -12,12 +12,12 @@ class allpass
 {
 public:
     allpass(float *buf, int size);
-    inline  float    process(float inp);
-    void    mute();
-    void    setfeedback(float val);
+    inline float process(float inp);
+    void   mute();
+    void   setfeedback(float val);
 private:
-    float    feedback;
-    float    *buffer;
+    float  feedback;
+    float  *buffer;
     int    bufsize;
     int    bufidx;
 };
