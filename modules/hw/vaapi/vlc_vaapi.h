@@ -225,7 +225,7 @@ vlc_vaapi_ExportSurfaceHandle(vlc_object_t *o,
         VAStatus s = f(args);                           \
         if (s != VA_STATUS_SUCCESS)                     \
         {                                               \
-            msg_Err(o, "%s: %s", #f, vaErrorStr(s));    \
+            msg_Err(o, "%s: 0x%x %s", #f, s, vaErrorStr(s));    \
             goto error;                                 \
         }                                               \
     } while (0)
