@@ -25,7 +25,7 @@ smb2: libsmb2-$(SMB2_VERSION).tar.gz .sum-smb2
 
 SMB2_CONF := -DENABLE_LIBKRB5=OFF
 
-.smb2: smb2
+.smb2: smb2 toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) $(SMB2_CONF)
 	+$(CMAKEBUILD)
