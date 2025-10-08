@@ -764,6 +764,9 @@ static void OldEngineClunkyRollInfoPatch( decoder_t *p_dec, ASS_Track *p_track )
 
     stream_t *p_memstream = vlc_stream_MemoryNew( p_dec, p_dec->fmt_in->p_extra,
                                                   p_dec->fmt_in->i_extra, true );
+    if (unlikely(!p_memstream))
+        return;
+
     char *s = vlc_stream_ReadLine( p_memstream );
     unsigned playres[2] = {0, 0};
     bool b_hotfix = false;
