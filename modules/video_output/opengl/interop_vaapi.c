@@ -194,7 +194,11 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
     unsigned num_planes = 0;
 
 #if VA_CHECK_VERSION(1, 1, 0)
-    VA_CALL(o, vaSyncSurface, priv->vadpy, vlc_vaapi_PicGetSurface(pic));
+    {
+        VAStatus s = vaSyncSurface(priv->vadpy, vlc_vaapi_PicGetSurface(pic));
+        if (s != VA_STATUS_SUCCESS) // non-fatal. ex: VA_STATUS_ERROR_DECODING_ERROR
+            msg_Warn(o, "vaSyncSurface: 0x%x %s", s, vaErrorStr(s));
+    }
     if (vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
                                       VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
                                       VA_EXPORT_SURFACE_READ_ONLY | VA_EXPORT_SURFACE_SEPARATE_LAYERS,
