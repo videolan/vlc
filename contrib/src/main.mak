@@ -467,6 +467,11 @@ ifdef HAVE_DARWIN_OS
 MESONFLAGS += -Dobjc_args="$(CFLAGS)" -Dobjc_link_args="$(LDFLAGS)" -Dobjcpp_args="$(CXXFLAGS)" -Dobjcpp_link_args="$(LDFLAGS)"
 endif
 
+MESONCOMPILEFLAGS =
+ifeq ($(V),1)
+MESONCOMPILEFLAGS += -v
+endif
+
 ifdef HAVE_CROSS_COMPILE
 # When cross-compiling meson uses the env vars like
 # CC, CXX, etc. and CFLAGS, CXXFLAGS, etc. for the
@@ -488,7 +493,7 @@ else
 MESON = $(HOSTTOOLS) meson setup $(MESONFLAGS)
 endif
 MESONCLEAN = rm -rf $</build
-MESONBUILD = meson compile -C $</build $(MESON_BUILD) && meson install -C $</build
+MESONBUILD = meson compile -C $</build $(MESON_BUILD) $(MESONCOMPILEFLAGS) && meson install -C $</build
 
 ifeq ($(V),1)
 CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
