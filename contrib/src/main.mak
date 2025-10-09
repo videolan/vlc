@@ -530,6 +530,11 @@ ifdef HAVE_DARWIN_OS
 MESONFLAGS += -Dobjc_args="$(CFLAGS)" -Dobjc_link_args="$(LDFLAGS)" -Dobjcpp_args="$(CXXFLAGS)" -Dobjcpp_link_args="$(LDFLAGS)"
 endif
 
+MESONCOMPILEFLAGS =
+ifeq ($(V),1)
+MESONCOMPILEFLAGS += -v
+endif
+
 ifdef HAVE_CROSS_COMPILE
 # When cross-compiling meson uses the env vars like
 # CC, CXX, etc. and CFLAGS, CXXFLAGS, etc. for the
@@ -550,7 +555,7 @@ else
 MESON = $(HOSTTOOLS) meson setup $(MESONFLAGS)
 endif
 MESONCLEAN = rm -rf $(BUILD_DIR)/meson-private
-MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) && meson install -C $(BUILD_DIR)
+MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) $(MESONCOMPILEFLAGS) && meson install -C $(BUILD_DIR)
 
 # shared Qt config
 ifeq ($(call system_tool_majmin, qmake6 -query QT_VERSION 2>/dev/null),$(QTBASE_VERSION_MAJOR))
