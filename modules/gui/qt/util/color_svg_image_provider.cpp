@@ -251,7 +251,7 @@ QQuickImageResponse* SVGColorImageImageProvider::requestImageResponse(const QStr
 }
 
 
-SVGColorImageBuilder::SVGColorImageBuilder(QString path, QObject* parent)
+SVGColorImageBuilder::SVGColorImageBuilder(const QString &path, QObject* parent)
     : QObject(parent)
 {
     m_query.addQueryItem(PATH_KEY, path);
@@ -308,7 +308,7 @@ SVGColorImage::SVGColorImage(QObject* parent)
     : QObject(parent)
 {}
 
-SVGColorImageBuilder* SVGColorImage::colorize(QString path)
+SVGColorImageBuilder* SVGColorImage::colorize(const QString &path)
 {
     SVGColorImageBuilder* builder = new SVGColorImageBuilder(path);
     QQmlEngine::setObjectOwnership(builder, QQmlEngine::JavaScriptOwnership);

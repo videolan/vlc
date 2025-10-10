@@ -120,7 +120,7 @@ void BaseModel::setSearchPattern( const QString& pattern )
         /* No changes */
         return;
 
-    d->m_searchPattern = patternToApply;
+    d->m_searchPattern = std::move(patternToApply);
     emit searchPatternChanged();
 }
 
