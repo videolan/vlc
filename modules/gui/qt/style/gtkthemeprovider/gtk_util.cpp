@@ -116,7 +116,7 @@ GtkCssContext AppendCssNodeToStyleContextImpl(
         gtk_style_context_set_parent(child_context, context);
 
         gtk_widget_path_unref(path);
-        return GtkCssContext(child_context);
+        return GtkCssContext(std::move(child_context));
     }
 }
 
@@ -342,7 +342,7 @@ GtkCssContext AppendCssNodeToStyleContext(GtkCssContext context,
                 break;
             }
             case CSS_CLASS:
-                classes.push_back(token);
+                classes.push_back(std::move(token));
                 break;
             case CSS_PSEUDOCLASS: {
                 GtkStateFlags state_flag = GTK_STATE_FLAG_NORMAL;
@@ -392,7 +392,7 @@ GtkCssContext AppendCssNodeToStyleContext(GtkCssContext context,
 
     float scale = std::round(GetDeviceScaleFactor());
 
-    return AppendCssNodeToStyleContextImpl(context, gtype, name, object_name,
+    return AppendCssNodeToStyleContextImpl(std::move(context), gtype, name, object_name,
                                            classes, state, scale);
 }
 
@@ -432,7 +432,7 @@ GdkRGBA GetBgColorFromStyleContext(GtkCssContext context) {
                       "}");
     MySize size(24, 24);
     CairoSurface surface(size);
-    RenderBackground(size, surface.cairo(), context);
+    RenderBackground(size, surface.cairo(), std::move(context));
     return surface.GetAveragePixelValue(false);
 }
 
@@ -467,7 +467,7 @@ void ApplyCssProviderToContext(GtkCssContext context,
 
 void ApplyCssToContext(GtkCssContext context, const std::string& css) {
     auto provider = GetCssProvider(css);
-    ApplyCssProviderToContext(context, provider);
+    ApplyCssProviderToContext(std::move(context), provider);
 }
 
 void RenderBackground(const MySize& size,
@@ -504,7 +504,7 @@ GdkRGBA GetFocusColor(const std::string& css_selector)
 
 GdkRGBA GetSelectionBgColor(const std::string& css_selector) {
     auto context = GetStyleContextFromCss(css_selector);
-    return GetBgColorFromStyleContext(context);
+    return GetBgColorFromStyleContext(std::move(context));
 }
 
 
