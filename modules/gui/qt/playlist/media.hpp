@@ -43,7 +43,7 @@ public:
         }
     }
 
-    Media(QString uri, QString name, const QStringList &options = {})
+    Media(const QString &uri, const QString &name, const QStringList &options = {})
     {
         auto uUri = uri.toUtf8();
         auto uName = name.toUtf8();

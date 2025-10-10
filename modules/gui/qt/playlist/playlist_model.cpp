@@ -65,7 +65,7 @@ on_playlist_items_reset(vlc_playlist_t *playlist,
     that->callAsync([=]() {
         if (that->m_playlist != playlist)
             return;
-        that->onItemsReset(newContent);
+        that->onItemsReset(std::move(newContent));
     });
 }
 
@@ -79,7 +79,7 @@ on_playlist_items_added(vlc_playlist_t *playlist, size_t index,
     that->callAsync([=]() {
         if (that->m_playlist != playlist)
             return;
-        that->onItemsAdded(added, index);
+        that->onItemsAdded(std::move(added), index);
     });
 }
 
@@ -171,7 +171,7 @@ PlaylistListModelPrivate::~PlaylistListModelPrivate()
     }
 }
 
-void PlaylistListModelPrivate::onItemsReset(const QVector<PlaylistItem>& newContent)
+void PlaylistListModelPrivate::onItemsReset(const QVector<PlaylistItem>&& newContent)
 {
     Q_Q(PlaylistListModel);
     q->beginResetModel();
@@ -190,7 +190,7 @@ void PlaylistListModelPrivate::onItemsReset(const QVector<PlaylistItem>& newCont
     emit q->countChanged(m_items.size());
 }
 
-void PlaylistListModelPrivate::onItemsAdded(const QVector<PlaylistItem>& added, size_t index)
+void PlaylistListModelPrivate::onItemsAdded(const QVector<PlaylistItem>&& added, size_t index)
 {
     Q_Q(PlaylistListModel);
     int count = added.size();

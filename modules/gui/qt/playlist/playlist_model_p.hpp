@@ -51,8 +51,8 @@ public:
 #endif
     }
 
-    void onItemsReset(const QVector<PlaylistItem>& items);
-    void onItemsAdded(const QVector<PlaylistItem>& added, size_t index);
+    void onItemsReset(const QVector<PlaylistItem>&& items);
+    void onItemsAdded(const QVector<PlaylistItem>&& added, size_t index);
     void onItemsMoved(size_t index, size_t count, size_t target);
     void onItemsRemoved(size_t index, size_t count);
 

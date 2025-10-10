@@ -193,10 +193,10 @@ signals:
 
     void currentIndexChanged(ssize_t index);
     void itemsReset(QVector<PlaylistItem>);
-    void itemsAdded(size_t index, QVector<PlaylistItem>);
+    void itemsAdded(size_t index, const QVector<PlaylistItem>&);
     void itemsMoved(size_t index, size_t count, size_t target);
     void itemsRemoved(size_t index, size_t count);
-    void itemsUpdated(size_t index, QVector<PlaylistItem>);
+    void itemsUpdated(size_t index, const QVector<PlaylistItem>&);
 
     void initializedChanged();
 
