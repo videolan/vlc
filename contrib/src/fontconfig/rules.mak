@@ -21,6 +21,7 @@ fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz .sum-fontconfig
 	$(RM) $(UNPACK_DIR)/src/fcobjshash.gperf
 	# include the generated fcobjshash.h, not the one from src/
 	sed -i.orig -e 's,"fcobjshash.h",<fcobjshash.h>,' $(UNPACK_DIR)/src/fcobjs.c
+	$(APPLY) $(SRC)/fontconfig/0001-detect-mkostemp-with-stdlib.h.patch
 	$(call pkg_static, "fontconfig.pc.in")
 	$(MOVE)
 
@@ -50,6 +51,7 @@ endif
 DEPS_fontconfig = freetype2 $(DEPS_freetype2) libxml2 $(DEPS_libxml2)
 
 .fontconfig: fontconfig
+	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(FONTCONFIG_CONF)
 	+$(MAKEBUILD)
