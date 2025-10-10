@@ -80,7 +80,8 @@ GETTEXT_CONF += \
 endif
 
 .gettext: gettext
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GETTEXT_CONF)
-	$(MAKE) -C $< -C gettext-runtime
-	cd $< && $(MAKE) -C gettext-runtime install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(GETTEXT_CONF)
+	+$(MAKEBUILD) -C gettext-runtime
+	+$(MAKEBUILD) -C gettext-runtime install
 	touch $@
