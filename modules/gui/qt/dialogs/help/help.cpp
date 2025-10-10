@@ -363,7 +363,7 @@ void UpdateDialog::checkOrDownload()
         QString dest_dir = QDir::tempPath();
         if( !dest_dir.isEmpty() )
         {
-            dest_dir = toNativeSepNoSlash( dest_dir ) + DIR_SEP;
+            dest_dir = toNativeSepNoSlash( std::move(dest_dir) ) + DIR_SEP;
             msg_Dbg( p_intf, "Downloading to folder: %s", qtu( dest_dir ) );
             toggleVisible();
             m_model->download(dest_dir);

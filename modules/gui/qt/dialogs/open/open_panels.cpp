@@ -662,8 +662,9 @@ void DiscOpenPanel::browseDevice()
             QFileDialog::ShowDirsOnly, schemes ).toLocalFile();
     if( !dir.isEmpty() )
     {
-        ui.deviceCombo->addItem( toNativeSepNoSlash( dir ) );
-        ui.deviceCombo->setCurrentIndex( ui.deviceCombo->findText( toNativeSepNoSlash( dir ) ) );
+        const QString dirNoSlash = toNativeSepNoSlash( std::move(dir) );
+        ui.deviceCombo->addItem( dirNoSlash );
+        ui.deviceCombo->setCurrentIndex( ui.deviceCombo->findText( dirNoSlash ) );
     }
 
     updateMRL();
@@ -1445,7 +1446,7 @@ void CaptureOpenPanel::advancedDialog()
                     break;
             }
         }
-        advMRL = tempMRL;
+        advMRL = std::move(tempMRL);
         updateMRL();
     }
     qDeleteAll( controls );

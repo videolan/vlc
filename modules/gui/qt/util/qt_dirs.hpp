@@ -28,7 +28,7 @@
 
 #define toNativeSeparators( s ) QDir::toNativeSeparators ( s )
 
-static inline QString removeTrailingSlash( QString s )
+static inline QString removeTrailingSlash( QString&& s )
 {
     if( ( s.length() > 1 ) && ( s[s.length()-1] == QLatin1Char( '/' ) ) )
         s.remove( s.length() - 1, 1 );

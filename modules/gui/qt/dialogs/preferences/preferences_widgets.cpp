@@ -410,7 +410,7 @@ void DirectoryConfigControl::updateField()
                   QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
 
     if( dir.isNull() ) return;
-    text->setText( toNativeSepNoSlash( dir ) );
+    text->setText( toNativeSepNoSlash( std::move(dir) ) );
 }
 
 /********* String / Font **********/

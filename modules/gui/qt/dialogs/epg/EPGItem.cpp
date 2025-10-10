@@ -166,8 +166,8 @@ bool EPGItem::setData( const vlc_epg_event_t *data )
         m_start = newtime;
         m_name = newname;
         setToolTip( newname );
-        m_description = newdesc;
-        m_shortDescription = newshortdesc;
+        m_description = std::move(newdesc);
+        m_shortDescription = std::move(newshortdesc);
         setDuration( data->i_duration );
         setRating( data->i_rating );
         m_descitems.clear();

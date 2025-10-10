@@ -497,7 +497,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         {
             p_arg->i_results = 1;
             p_arg->psz_results = (char **)vlc_alloc( p_arg->i_results, sizeof( char * ) );
-            p_arg->psz_results[0] = strdup( qtu( toNativeSepNoSlash( file ) ) );
+            p_arg->psz_results[0] = strdup( qtu( toNativeSepNoSlash( std::move(file) ) ) );
         }
         else
             p_arg->i_results = 0;
