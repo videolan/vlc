@@ -124,7 +124,7 @@ void PlayerControllerPrivate::UpdateName(input_item_t* media)
     if( m_name != name )
     {
         emit q->nameChanged( name );
-        m_name = name;
+        m_name = std::move(name);
     }
 }
 
@@ -142,7 +142,7 @@ void PlayerControllerPrivate::UpdateArt(input_item_t *p_item)
         return;
 
     /* Update Art meta */
-    m_artUrl = url;
+    m_artUrl = std::move(url);
     emit q->artChanged( m_artUrl );
 }
 
