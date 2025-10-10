@@ -3613,9 +3613,6 @@ static bool Ogg_ReadOggSpotsHeader( logical_stream_t *p_stream,
         i_granulerate_denominator = 1;
     }
 
-    if ( !i_granulerate_numerator || !i_granulerate_denominator )
-        return false;
-
     /* Normalize granulerate */
     vlc_ureduce(&p_stream->fmt.video.i_frame_rate,
                 &p_stream->fmt.video.i_frame_rate_base,
