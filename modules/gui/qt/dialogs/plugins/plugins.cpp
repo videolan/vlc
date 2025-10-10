@@ -470,7 +470,7 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     frames << ":/misc/wait2.svg";
     frames << ":/misc/wait3.svg";
     frames << ":/misc/wait4.svg";
-    spinnerAnimation = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
+    spinnerAnimation = new PixmapAnimator( this, std::move(frames), SPINNER_SIZE, SPINNER_SIZE );
     connect( spinnerAnimation, &PixmapAnimator::pixmapReady,
              addonsView->viewport(), QOverload<>::of(&QWidget::update) );
     addonsView->viewport()->installEventFilter( this );
