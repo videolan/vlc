@@ -183,7 +183,7 @@ class CustomCoverImageResponse : public QQuickImageResponse
 public:
     CustomCoverImageResponse(CoverData data, MediaLib *ml)
         : ml {ml}
-        , data{data}
+        , data{std::move(data)}
     {
         // uses Qt::QueuedConnection to give the receiver time to connect to finish()
         QMetaObject::invokeMethod(this, &CustomCoverImageResponse::start, Qt::QueuedConnection);
@@ -309,5 +309,5 @@ QQuickImageResponse *MLCustomCover::requestImageResponse(const QString &id, cons
     if (requestedSize.isValid())
         data.size = requestedSize;
 
-    return new CustomCoverImageResponse(data, m_ml);
+    return new CustomCoverImageResponse(std::move(data), m_ml);
 }

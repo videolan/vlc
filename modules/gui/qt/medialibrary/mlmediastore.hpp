@@ -49,7 +49,7 @@ public:
     bool contains(const QString &mrl) const;
 
 signals:
-    void updated(const QString &mrl, MLMedia media);
+    void updated(const QString &mrl, const MLMedia &media);
 
 private:
     static void onVlcMlEvent(void* data

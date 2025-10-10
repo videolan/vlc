@@ -381,7 +381,7 @@ void MLBookmarkModel::onPlaybackStateChanged( vlc_player_t *, vlc_player_state s
 }
 
 
-void MLBookmarkModel::updateMediaId(uint64_t revision, const QString mediaUri)
+void MLBookmarkModel::updateMediaId(uint64_t revision, const QString &mediaUri)
 {
     if (mediaUri.isEmpty())
     {

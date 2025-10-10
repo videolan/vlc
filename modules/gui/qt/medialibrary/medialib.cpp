@@ -75,7 +75,7 @@ static void convertQUrlToPlaylistMedias(QUrl mrl, const QStringList& options, QV
     medias.push_back(media);
 }
 
-static void convertQStringToPlaylistMedias(QString mrl, const QStringList& options, QVector<vlc::playlist::Media>& medias)
+static void convertQStringToPlaylistMedias(const QString &mrl, const QStringList& options, QVector<vlc::playlist::Media>& medias)
 {
     vlc::playlist::Media media{ mrl, mrl, options };
     medias.push_back(media);

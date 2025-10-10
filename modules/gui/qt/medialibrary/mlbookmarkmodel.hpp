@@ -90,7 +90,7 @@ private:
                                         void* data );
     void playerLengthChanged();
 
-    void updateMediaId(uint64_t revision, const QString mediaUri);
+    void updateMediaId(uint64_t revision, const QString &mediaUri);
     static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
 
     int columnToRole(int column) const;
