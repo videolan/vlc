@@ -30,7 +30,7 @@ void QVLCBool::setValue(bool value)
     setValueInternal(value);
 }
 
-void QVLCString::setValue(QString value)
+void QVLCString::setValue(const QString &value)
 {
     setValueInternal(value);
 }

@@ -114,7 +114,7 @@ class QVLCVariable : public QObject
 
 public:
     template<typename T>
-    QVLCVariable(T* object, QString property, QObject* parent)
+    QVLCVariable(T* object, const QString &property, QObject* parent)
         : QObject(parent)
         , m_object(new VLCObjectHolderImpl<T>(nullptr))
         , m_property(property)
@@ -193,7 +193,7 @@ protected:
         if (m_object->get() != object)
             return;
         if (m_value != value) {
-            m_value = value;
+            m_value = std::move(value);
             Derived* derived = static_cast<Derived*>(this);
             emit derived->valueChanged( m_value );
         }
@@ -225,7 +225,7 @@ public:
     Q_PROPERTY(bool value READ getValue WRITE setValue NOTIFY valueChanged FINAL)
 
     template<typename T>
-    QVLCBool(T* object, QString property, QObject* parent = nullptr)
+    QVLCBool(T* object, const QString &property, QObject* parent = nullptr)
         : QVLCVariable<QVLCBool, bool>(object, property, parent)
     {
         resetObject<T>(object);
@@ -251,7 +251,7 @@ public:
     Q_PROPERTY(QString value READ getValue WRITE setValue NOTIFY valueChanged FINAL)
 
     template<typename T>
-    QVLCString(T* object, QString property, QObject* parent = nullptr)
+    QVLCString(T* object, const QString &property, QObject* parent = nullptr)
         : QVLCVariable<QVLCString, QString>(object, property, parent)
     {
         resetObject<T>(object);
@@ -263,7 +263,7 @@ public:
     }
 
 public slots:
-    void setValue(QString value);
+    void setValue(const QString &value);
 
 signals:
     void valueChanged( QString );
@@ -277,7 +277,7 @@ public:
     Q_PROPERTY(float value READ getValue WRITE setValue NOTIFY valueChanged FINAL)
 
     template<typename T>
-    QVLCFloat(T* object, QString property, QObject* parent = nullptr)
+    QVLCFloat(T* object, const QString &property, QObject* parent = nullptr)
         : QVLCVariable<QVLCFloat, float>(object, property, parent)
     {
         resetObject<T>(object);
@@ -304,7 +304,7 @@ public:
     Q_PROPERTY(int64_t value READ getValue WRITE setValue NOTIFY valueChanged FINAL)
 
     template<typename T>
-    QVLCInteger(T* object, QString property, QObject* parent = nullptr)
+    QVLCInteger(T* object, const QString &property, QObject* parent = nullptr)
         : QVLCVariable<QVLCInteger, int64_t>(object, property, parent)
     {
         resetObject<T>(object);
