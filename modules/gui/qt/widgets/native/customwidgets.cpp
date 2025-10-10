@@ -91,7 +91,7 @@ SpinningIcon::SpinningIcon( QWidget *parent ) : QLabel( parent )
     frames << ":/misc/wait2.svg";
     frames << ":/misc/wait3.svg";
     frames << ":/misc/wait4.svg";
-    animator = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
+    animator = new PixmapAnimator( this, std::move(frames), SPINNER_SIZE, SPINNER_SIZE );
     connect( animator, &PixmapAnimator::pixmapReady, this, [=]( const QPixmap &pixmap ) {
         this->setPixmap( pixmap );
         this->repaint();
