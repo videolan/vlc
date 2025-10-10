@@ -62,9 +62,6 @@ ifdef HAVE_WINSTORE
 DEPS_gnutls += alloweduwp $(DEPS_alloweduwp)
 endif
 
-ifdef HAVE_ANDROID
-GNUTLS_ENV := gl_cv_header_working_stdint_h=yes
-endif
 ifdef HAVE_WIN32
 	GNUTLS_CONF += --without-idn
 ifeq ($(ARCH),aarch64)
@@ -75,7 +72,7 @@ endif
 
 .gnutls: gnutls
 	$(MAKEBUILDDIR)
-	$(GNUTLS_ENV) $(MAKECONFIGURE) $(GNUTLS_CONF)
+	$(MAKECONFIGURE) $(GNUTLS_CONF)
 ifdef HAVE_DARWIN_OS
 	# Add missing frameworks to Libs.private for Darwin
 	cd $< && sed -i.orig -e s/"Libs.private:"/"Libs.private: -framework Security -framework CoreFoundation"/g $(BUILD_DIRUNPACK)/lib/gnutls.pc
