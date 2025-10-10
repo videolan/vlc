@@ -1350,7 +1350,7 @@ static block_t *J2K_Parse( demux_t *p_demux, block_t *p_block, bool b_interlaced
 
     uint16_t i_den = GetWBE( &p_buf[8] );
     uint16_t i_num = GetWBE( &p_buf[10] );
-    if( i_den == 0 )
+    if( i_den == 0 || i_num == 0 )
         goto invalid;
     p_block->i_length = vlc_tick_from_samples( i_den, i_num );
 
