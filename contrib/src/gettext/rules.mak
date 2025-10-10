@@ -69,14 +69,10 @@ ifdef HAVE_MACOSX
 # using headers (which would make them unavailable with
 # -Werror=partial-availability), so we need to manually mark them unavailable.
 # These are unavailable in macOS 10.7.
-GETTEXT_CONF += \
-    ac_cv_func_clock_gettime=no \
-    ac_cv_func_faccessat=no \
-    ac_cv_func_fdopendir=no \
-    ac_cv_func_futimens=no \
-    ac_cv_func_memset_s=no \
-    ac_cv_func_openat=no \
-    ac_cv_func_utimensat=no
+
+# macOS 10.10
+GETTEXT_CONF += ac_cv_func_faccessat=no
+
 endif
 
 .gettext: gettext
