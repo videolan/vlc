@@ -1665,7 +1665,7 @@ void KeySelectorControl::reset_all( enum KeySelectorControl::ColumnIndex column 
     }
 }
 
-void KeySelectorControl::reassign_key( KeyTableItem *item, QString key,
+void KeySelectorControl::reassign_key( KeyTableItem *item, const QString &key,
                                        enum KeySelectorControl::ColumnIndex column )
 {
     for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
@@ -1739,12 +1739,12 @@ void KeyTableItem::set_keys( QString keys, enum KeySelectorControl::ColumnIndex 
     setFont( KeySelectorControl::ACTION_COL,  font );
 }
 
-bool KeyTableItem::contains_key( QString key, enum KeySelectorControl::ColumnIndex column )
+bool KeyTableItem::contains_key( const QString &key, enum KeySelectorControl::ColumnIndex column )
 {
     return get_keys( column ).split( "\t" ).contains( key );
 }
 
-void KeyTableItem::remove_key( QString key, enum KeySelectorControl::ColumnIndex column )
+void KeyTableItem::remove_key( const QString &key, enum KeySelectorControl::ColumnIndex column )
 {
     QStringList keys_list = get_keys( column ).split( "\t" );
     if( keys_list.removeAll( key ) )

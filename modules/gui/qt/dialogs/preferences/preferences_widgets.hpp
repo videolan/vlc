@@ -444,7 +444,7 @@ protected:
     void reset( KeyTableItem *, enum ColumnIndex );
     void reset_all( enum KeySelectorControl::ColumnIndex column );
     /** Reassign key to specified item */
-    void reassign_key( KeyTableItem *item, QString keys,
+    void reassign_key( KeyTableItem *item, const QString &keys,
                        enum KeySelectorControl::ColumnIndex column );
     void copy_value( KeyTableItem *, enum KeySelectorControl::ColumnIndex );
 
@@ -484,8 +484,8 @@ public:
     {
         set_keys( (keys) ? qfut( keys ) : qfu( "" ), column );
     }
-    bool contains_key( QString, enum KeySelectorControl::ColumnIndex );
-    void remove_key( QString, enum KeySelectorControl::ColumnIndex );
+    bool contains_key( const QString&, enum KeySelectorControl::ColumnIndex );
+    void remove_key( const QString&, enum KeySelectorControl::ColumnIndex );
     struct KeyItemAttr normal;
     struct KeyItemAttr global;
 };
