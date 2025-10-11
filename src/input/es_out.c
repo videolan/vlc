@@ -4453,12 +4453,12 @@ static void EsOutUpdateInfo(es_out_sys_t *p_sys,
                                       (double)fmt->video.i_frame_rate
                                       / (double)fmt->video.i_frame_rate_base );
        }
-       if( fmt->i_codec != p_fmt_es->i_codec )
+       if( fmt->video.i_chroma != 0 )
        {
            psz_codec_description = vlc_fourcc_GetDescription( VIDEO_ES,
-                                                              fmt->i_codec );
+                                                              fmt->video.i_chroma );
            info_category_AddCodecInfo( p_cat, _("Decoded format"),
-                                       fmt->i_codec,
+                                       fmt->video.i_chroma,
                                        psz_codec_description );
        }
        {
