@@ -1,0 +1,10 @@
+[main]
+host = https://app.transifex.com
+
+[o:yaron:p:vlc-trans:r:vlc-30]
+file_filter            = <lang>.po
+source_file            = vlc.pot
+type                   = PO
+minimum_perc           = 10
+resource_name          = 'VLC 3.0'
+lang_map = as_IN: as, ks_IN: ks, ku_IQ: ku
