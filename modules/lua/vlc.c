@@ -61,6 +61,19 @@
 #define INDEX_TEXT N_( "Directory index" )
 #define INDEX_LONGTEXT N_( "Allow to build directory index" )
 
+#define SOCKS_SERVER_TEXT N_("SOCKS server")
+#define SOCKS_SERVER_LONGTEXT N_( \
+    "SOCKS proxy server to use. This must be of the form " \
+    "address:port. It will be used for all TCP connections" )
+
+#define SOCKS_USER_TEXT N_("SOCKS user name")
+#define SOCKS_USER_LONGTEXT N_( \
+    "User name to be used for connection to the SOCKS proxy." )
+
+#define SOCKS_PASS_TEXT N_("SOCKS password")
+#define SOCKS_PASS_LONGTEXT N_( \
+    "Password to be used for connection to the SOCKS proxy." )
+
 #define TELNETHOST_TEXT N_( "Host" )
 #define TELNETHOST_LONGTEXT N_( "This is the host on which the " \
     "interface will listen. It defaults to all network interfaces (0.0.0.0)." \
@@ -648,6 +661,14 @@ vlc_module_begin ()
         set_capability( "interface", 0 )
         set_callbacks( Open_LuaIntf, Close_LuaIntf )
         add_shortcut( "luaintf" )
+
+        set_section( N_( "Socks proxy") , NULL )
+        add_string( "socks", NULL,
+                    SOCKS_SERVER_TEXT, SOCKS_SERVER_LONGTEXT )
+        add_string( "socks-user", NULL,
+                    SOCKS_USER_TEXT, SOCKS_USER_LONGTEXT )
+        add_password( "socks-pwd", NULL,
+                      SOCKS_PASS_TEXT, SOCKS_PASS_LONGTEXT )
 
     add_submodule ()
         set_section( N_("Lua HTTP"), 0 )
