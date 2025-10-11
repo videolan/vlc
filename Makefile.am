@@ -73,8 +73,6 @@ EXTRA_DIST += \
 # Various utilities ( editor syntax files, D-Bus controller ... )
 ##############################################################################
 EXTRA_DIST += \
-	extras/analyser/zsh_completion.sh \
-	extras/analyser/zsh.cpp \
 	extras/analyser/emacs.init \
 	extras/analyser/vlc.vim \
 	extras/analyser/valgrind.suppressions \
