@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_plugin.h>
+#include <vlc_url.h>
 
 #include <ctype.h>
 #include <math.h>
@@ -239,7 +240,7 @@ static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
 static void Fix( demux_t * );
-static char * get_language_from_filename( const char * );
+static char *get_language_from_url(const char *);
 
 /*****************************************************************************
  * Decoder format output function
@@ -708,7 +709,7 @@ static int Open ( vlc_object_t *p_this )
     }
     else
     {
-        fmt.psz_language = get_language_from_filename( p_demux->psz_filepath );
+        fmt.psz_language = get_language_from_url( p_demux->psz_url );
         if( fmt.psz_language )
             msg_Dbg( p_demux, "selected '%s' as possible filename language substring of subtitle: %s",
                      fmt.psz_language, p_demux->psz_location );
@@ -2498,39 +2499,40 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
 
 /* Tries to extract language from common filename patterns PATH/filename.LANG.ext
    and PATH/Subs/x_LANG.ext (where 'x' is an integer). */
-static char * get_language_from_filename( const char * psz_sub_file )
+static char *get_language_from_url(const char *urlstr)
 {
-    char *psz_ret = NULL;
-    char *psz_tmp;
+    vlc_url_t url;
+    const char *filename = NULL;
+    char *ret = NULL;
 
-    if( !psz_sub_file )
+    assert(urlstr != NULL);
+
+    if (vlc_UrlParse(&url, urlstr) != 0)
         return NULL;
+    if (url.psz_path != NULL)
+        filename = strrchr(url.psz_path, '/');
+    if (filename != NULL) {
+        filename++; // skip forward slash
 
-    /* Remove path */
-    const char *psz_fname = strrchr( psz_sub_file, DIR_SEP_CHAR );
-    psz_fname = (psz_fname == NULL) ? psz_sub_file : psz_fname + 1;
+        const char *ext = strrchr(filename, '.');
 
-    char *psz_work = strdup( psz_fname );
-    if( !psz_work )
-        return NULL;
+        if (ext != NULL) {
+            /* Get string between last two periods, hopefully the language. */
+            const char *lang = memrchr(filename, '.', ext - filename);
 
-    psz_tmp = strrchr( psz_work, '.' ); /* Find extension */
-    if( psz_tmp )
-    {
-        psz_tmp[0] = '\0'; /* Remove it */
+            /* Otherwise try string after last underscore. */
+            if (lang == NULL)
+                lang = memrchr(filename, '_', ext - filename);
 
-        /* Get substr after next last period - hopefully our language string */
-        psz_tmp = strrchr( psz_work, '.' );
-        /* Otherwise try substr after last underscore for alternate pattern */
-        if( !psz_tmp )
-            psz_tmp = strchr( psz_work, '_' );
-
-        if( psz_tmp )
-            psz_ret = strdup(++psz_tmp);
+            if (lang != NULL) {
+                lang++; // skip period or underscore
+                ret = strndup(lang, ext - lang);
+            }
+       }
     }
 
-    free( psz_work );
-    return psz_ret;
+    vlc_UrlClean(&url);
+    return ret;
 }
 
 #ifdef ENABLE_TEST
