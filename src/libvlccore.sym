@@ -310,7 +310,6 @@ vlc_tick_wait
 net_Accept
 net_Connect
 net_ConnectDgram
-net_ConnectTCP
 net_Listen
 net_ListenClose
 net_OpenDgram

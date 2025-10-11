@@ -24,6 +24,7 @@ liblua_plugin_la_SOURCES = \
 	lua/libs/sd.c \
 	lua/libs/stream.c \
 	lua/libs/strings.c \
+	lua/libs/tcp.c \
 	lua/libs/variables.c lua/libs/variables.h \
 	lua/libs/video.c \
 	lua/libs/vlm.c \

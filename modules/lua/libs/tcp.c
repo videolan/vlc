@@ -35,6 +35,7 @@
 
 #include <vlc_network.h>
 #include <vlc_interrupt.h>
+#include "../libs.h"
 
 /*****************************************************************************
  * SocksNegotiate:

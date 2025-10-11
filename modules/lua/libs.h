@@ -58,4 +58,6 @@ void luaopen_win( lua_State *L );
 int vlclua_url_parse( lua_State *L );
 int vlclua_input_item_get( lua_State *L, input_item_t *p_item );
 
+int net_ConnectTCP(vlc_object_t *, const char *, int);
+
 #endif
