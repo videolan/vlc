@@ -30,6 +30,7 @@
 func	rvv_hflip_\bits
 	// a0:out_base, a1:out_stride, a2:in_base, a3:in_stride
 	// a4:width, a5:height
+	lpad	0
 	.if	\order
 	slli	t4, a4, \order
 	add	a2, a2, t4
@@ -65,6 +66,7 @@ endfunc
 func	rvv_transpose_\bits
 	// a0:out_base, a1:out_stride, a2:in_base, a3:in_stride
 	// a4:in_width/out_height, a5:in_height/out_width
+	lpad	0
 1:
 	mv	t0, a0
 	mv	t2, a2

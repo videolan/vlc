@@ -32,3 +32,9 @@
 		.purgem	endfunc
 	.endm
 .endm
+
+#if !defined (__riscv_zicfilp)
+.macro	lpad	lpl
+	auipc	zero, \lpl
+.endm
+#endif

@@ -25,6 +25,7 @@
 	.align	2
 
 func	merge8_rvv
+	lpad	0
 	csrwi	vxrm, 0
 1:
 	vsetvli	t0, a3, e8, m8, ta, ma
@@ -42,6 +43,7 @@ func	merge8_rvv
 endfunc
 
 func	merge16_rvv
+	lpad	0
 	csrwi	vxrm, 0
 	srli	a3, a3, 1
 1:

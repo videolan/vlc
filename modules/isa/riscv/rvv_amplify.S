@@ -23,6 +23,7 @@
 	.option	arch, +v
 
 func	rvv_amplify_f32
+	lpad	0
 	srli	a2, a2, 2
 #if defined (__riscv_float_abi_soft)
 	fmv.w.x	fa0, a3
@@ -42,6 +43,7 @@ func	rvv_amplify_f32
 endfunc
 
 func	rvv_amplify_f64
+	lpad	0
 	srli	a2, a2, 3
 #if defined (__riscv_float_abi_soft) || defined (__riscv_float_abi_single)
 	fmv.d.x	fa0, a3
@@ -61,6 +63,7 @@ func	rvv_amplify_f64
 endfunc
 
 func	rvv_amplify_i16
+	lpad	0
 	srli	a2, a2, 1
 1:
 	vsetvli	t0, a2, e16, m8, ta, ma
@@ -77,6 +80,7 @@ func	rvv_amplify_i16
 endfunc
 
 func	rvv_amplify_i32
+	lpad	0
 	srli	a2, a2, 2
 1:
 	vsetvli	t0, a2, e32, m8, ta, ma
@@ -93,6 +97,7 @@ func	rvv_amplify_i32
 endfunc
 
 func	rvv_amplify_u8
+	lpad	0
 1:
 	vsetvli	t0, a2, e8, m8, ta, ma
 	vle8.v	v16, (a1)
