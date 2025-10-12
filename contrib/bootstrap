@@ -377,6 +377,8 @@ add_make "TOPSRC_BUILT := $TOPSRC_BUILT"
 add_make "TOPDST := .."
 add_make "-include config.mak"
 add_make 'include $(TOPSRC)/src/main.mak'
+mkdir -p "$BOOTSTRAP_PATH/tarballs" || exit $?
+test -e rust-toolchain.toml && unlink rust-toolchain.toml
+ln -s "$(dirname "$0")/src/rust-toolchain.toml" rust-toolchain.toml
 echo "Bootstrap completed."
 ${MAKE} help
-mkdir -p $BOOTSTRAP_PATH/tarballs || exit $?
