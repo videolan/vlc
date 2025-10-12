@@ -18,20 +18,18 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "macros.S"
+
 	.option arch, +v
-	.text
-	.align	2
 
 	.macro transforms, bits, order
 	.if	\bits - (8 << \order)
 	.error	"Mismatched parameters"
 	.endif
 
-	.globl	rvv_hflip_\bits
-	.type	rvv_hflip_\bits, %function
+func	rvv_hflip_\bits
 	// a0:out_base, a1:out_stride, a2:in_base, a3:in_stride
 	// a4:width, a5:height
-rvv_hflip_\bits :
 	.if	\order
 	slli	t4, a4, \order
 	add	a2, a2, t4
@@ -40,11 +38,12 @@ rvv_hflip_\bits :
 	.endif
 	li	t6, -(1 << \order)
 	add	a2, a2, t6
-
-1:	mv	t0, a0
+1:
+	mv	t0, a0
 	mv	t2, a2
 	mv	t4, a4
-2:	vsetvli	t5, t4, e\bits, m8, ta, ma
+2:
+	vsetvli	t5, t4, e\bits, m8, ta, ma
 	sub	t4, t4, t5
 	vlse\bits\().v	v0, (t2), t6
 	.if	\order
@@ -59,20 +58,21 @@ rvv_hflip_\bits :
 	add	a0, a0, a1
 	add	a2, a2, a3
 	bnez	a5, 1b
-	ret
-	.size	rvv_hflip_\bits, . - rvv_hflip_\bits
 
-	.globl	rvv_transpose_\bits
-	.type	rvv_transpose_\bits, %function
+	ret
+endfunc
+
+func	rvv_transpose_\bits
 	// a0:out_base, a1:out_stride, a2:in_base, a3:in_stride
 	// a4:in_width/out_height, a5:in_height/out_width
-rvv_transpose_\bits :
-1:	mv	t0, a0
+1:
+	mv	t0, a0
 	mv	t2, a2
 	mv	t4, a4
 	/* For the sake of locality, the inner loop transposes VL rows at once
 	 * rather than one column. */
-2:	vsetvli	t5, a5, e\bits, m8, ta, ma
+2:
+	vsetvli	t5, a5, e\bits, m8, ta, ma
 	vlse\bits\().v	v0, (t2), a3
 	addi	t2, t2, (1 << \order)
 	vse\bits\().v	v0, (t0)
@@ -88,9 +88,9 @@ rvv_transpose_\bits :
 	add	a0, a0, t5	// VL output columns done
 	add	a2, a2, t3	// VL input rows done
 	bnez	a5, 1b
-	ret
-	.size	rvv_transpose_\bits, . - rvv_transpose_\bits
 
+	ret
+endfunc
 	.endm // transforms
 
 	transforms	 8, 0

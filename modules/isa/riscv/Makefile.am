@@ -8,6 +8,8 @@ libtransform_rvv_plugin_la_SOURCES = \
 libvolume_rvv_plugin_la_SOURCES = isa/riscv/mixer.c isa/riscv/rvv_amplify.S
 libvolume_rvv_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 
+EXTRA_DIST += isa/riscv/macros.S
+
 if HAVE_RVV
 riscv_LTLIBRARIES = \
 	libdeinterlace_rvv_plugin.la \
