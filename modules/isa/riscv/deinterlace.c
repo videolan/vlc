@@ -36,7 +36,9 @@ static void Probe(void *data)
         struct deinterlace_functions *const f = data;
 
         f->merges[0] = merge8_rvv;
-        f->merges[1] = merge16_rvv;
+
+        if (vlc_CPU_RV_B())
+            f->merges[1] = merge16_rvv;
     }
 }
 

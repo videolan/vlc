@@ -20,7 +20,7 @@
 
 #include "macros.S"
 
-	.option	arch, +v
+	.option	arch, +b, +v
 
 func	rvv_amplify_f32
 	lpad	0
@@ -30,13 +30,12 @@ func	rvv_amplify_f32
 #endif
 1:
 	vsetvli	t0, a2, e32, m8, ta, ma
-	slli	t1, t0, 2
 	vle32.v	v16, (a1)
-	add	a1, a1, t1
+	sh2add	a1, t0, a1
 	vfmul.vf	v16, v16, fa0
 	sub	a2, a2, t0
 	vse32.v	v16, (a0)
-	add	a0, a0, t1
+	sh2add	a0, t0, a0
 	bnez	a2, 1b
 
 	ret
@@ -50,13 +49,12 @@ func	rvv_amplify_f64
 #endif
 1:
 	vsetvli	t0, a2, e64, m8, ta, ma
-	slli	t1, t0, 3
 	vle64.v	v16, (a1)
-	add	a1, a1, t1
+	sh3add	a1, t0, a1
 	vfmul.vf	v16, v16, fa0
 	sub	a2, a2, t0
 	vse64.v	v16, (a0)
-	add	a0, a0, t1
+	sh3add	a0, t0, a0
 	bnez	a2, 1b
 
 	ret
@@ -67,13 +65,12 @@ func	rvv_amplify_i16
 	srli	a2, a2, 1
 1:
 	vsetvli	t0, a2, e16, m8, ta, ma
-	slli	t1, t0, 1
 	vle16.v	v16, (a1)
-	add	a1, a1, t1
+	sh1add	a1, t0, a1
 	vmulhsu.vx	v16, v16, a3
 	sub	a2, a2, t0
 	vse16.v	v16, (a0)
-	add	a0, a0, t1
+	sh1add	a0, t0, a0
 	bnez	a2, 1b
 
 	ret
@@ -84,13 +81,12 @@ func	rvv_amplify_i32
 	srli	a2, a2, 2
 1:
 	vsetvli	t0, a2, e32, m8, ta, ma
-	slli	t1, t0, 2
 	vle32.v	v16, (a1)
-	add	a1, a1, t1
+	sh2add	a1, t0, a1
 	vmulhsu.vx	v16, v16, a3
 	sub	a2, a2, t0
 	vse32.v	v16, (a0)
-	add	a0, a0, t1
+	sh2add	a0, t0, a0
 	bnez	a2, 1b
 
 	ret

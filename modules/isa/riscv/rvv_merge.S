@@ -20,9 +20,7 @@
 
 #include "macros.S"
 
-	.option arch, +v
-	.text
-	.align	2
+	.option arch, +b, +v
 
 func	merge8_rvv
 	lpad	0
@@ -48,15 +46,14 @@ func	merge16_rvv
 	srli	a3, a3, 1
 1:
 	vsetvli	t0, a3, e16, m8, ta, ma
-	slli	t1, t0, 1
 	vle16.v	v16, (a1)
-	add	a1, a1, t1
+	sh1add	a1, t0, a1
 	vle16.v	v24, (a2)
-	add	a2, a2, t1
+	sh1add	a2, t0, a2
 	vaaddu.vv	v16, v16, v24
 	sub	a3, a3, t0
 	vse16.v	v16, (a0)
-	add	a0, a0, t1
+	sh1add	a0, t0, a0
 	bnez	a3, 1b
 
 	ret

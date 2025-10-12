@@ -95,7 +95,7 @@ static int Probe(vlc_object_t *obj)
 {
     audio_volume_t *volume = (audio_volume_t *)obj;
 
-    if (!vlc_CPU_RV_V())
+    if (!vlc_CPU_RV_V() || !vlc_CPU_RV_B())
         return VLC_ENOTSUP;
 
     switch (volume->format) {
