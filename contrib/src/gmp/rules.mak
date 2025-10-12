@@ -20,6 +20,10 @@ GMP_CONF += --disable-assembly
 endif
 endif
 
+ifeq ($(call need_pkg,"gmp"),)
+PKGS_FOUND += gmp
+endif
+
 $(TARBALLS)/gmp-$(GMP_VERSION).tar.xz:
 	$(call download_pkg,$(GMP_URL),gmp)
 
