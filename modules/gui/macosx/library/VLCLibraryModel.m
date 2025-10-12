@@ -107,17 +107,17 @@ NSString * const VLCLibraryModelDiscoveryFailed = @"VLCLibraryModelDiscoveryFail
 
 @property (readwrite) NSArray<VLCMediaLibraryFolderObserver *> *folderObservers;
 
-@property (readwrite, atomic) NSArray *cachedAudioMedia;
-@property (readwrite, atomic) NSArray *cachedArtists;
-@property (readwrite, atomic) NSArray *cachedAlbums;
-@property (readwrite, atomic) NSArray *cachedGenres;
-@property (readwrite, atomic) NSArray *cachedVideoMedia;
-@property (readwrite, atomic) NSArray *cachedListOfShows;
-@property (readwrite, atomic) NSArray *cachedListOfMovies;
-@property (readwrite, atomic) NSArray *cachedListOfGroups;
-@property (readwrite, atomic) NSArray *cachedRecentMedia;
-@property (readwrite, atomic) NSArray *cachedRecentAudioMedia;
-@property (readwrite, atomic) NSArray *cachedListOfMonitoredFolders;
+@property (readwrite, nonatomic) NSArray *cachedAudioMedia;
+@property (readwrite, nonatomic) NSArray *cachedArtists;
+@property (readwrite, nonatomic) NSArray *cachedAlbums;
+@property (readwrite, nonatomic) NSArray *cachedGenres;
+@property (readwrite, nonatomic) NSArray *cachedVideoMedia;
+@property (readwrite, nonatomic) NSArray *cachedListOfShows;
+@property (readwrite, nonatomic) NSArray *cachedListOfMovies;
+@property (readwrite, nonatomic) NSArray *cachedListOfGroups;
+@property (readwrite, nonatomic) NSArray *cachedRecentMedia;
+@property (readwrite, nonatomic) NSArray *cachedRecentAudioMedia;
+@property (readwrite, nonatomic) NSArray *cachedListOfMonitoredFolders;
 
 - (void)resetCachedListOfRecentMedia;
 - (void)resetCachedListOfRecentAudioMedia;
