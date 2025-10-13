@@ -60,12 +60,17 @@ if __name__ == "__main__":
     parser.add_argument("--debug",
                         required=False, action='store_true',
                         help="debug mode")
+    parser.add_argument("--moc_include_dirs",
+                        required=False, action='store_true',
+                        help="moc include dirs")
     args = parser.parse_args()
 
     result = ''
     sources = [ os.path.join(args.builddir, '.qmake.stash') ]
     in_sources = False
     makefile = call_qmake(args.qmake, args.qtconf, args.builddir, args.pro, args.debug)
+
+    moc_include_dirs_re = re.compile(r"^\s+moc_include_dirs\s+(.*)")
     for line in makefile.splitlines():
         if in_sources:
             l = line.strip()
@@ -110,6 +115,11 @@ if __name__ == "__main__":
                             result += ' -l' + libname[3:]
                     else:
                         result += ' ' + lib
+        elif args.moc_include_dirs:
+            m = moc_include_dirs_re.match(line)
+            if m:
+                for i in l.strip().split(' '):
+                    result += f"-I{i}"
 
     for generated in sources:
         if os.path.exists(generated):

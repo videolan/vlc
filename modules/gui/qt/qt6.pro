@@ -38,3 +38,8 @@ qtHaveModule(quick-private) {
 QT += quick-private
 DEFINES += QT_DECLARATIVE_PRIVATE
 }
+
+#Get default include paths for moc
+#moc_incude_dirs is not a real command, it only serves as a marker for grepping
+moc_include_dirs_target.commands = moc_include_dirs $$QMAKE_DEFAULT_INCDIRS
+QMAKE_EXTRA_TARGETS += moc_include_dirs_target

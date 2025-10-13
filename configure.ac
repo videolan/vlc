@@ -4144,9 +4144,16 @@ AS_IF([test "${enable_qt}" != "no"], [
         --builddir ${ac_pwd}/modules/gui/qt \
         --ldflags \
         ${qmake_additional_params})
+      QT_MOC_INCLUDE_DIRS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+        --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+        --pro ${srcdir_abs}/modules/gui/qt/qt6.pro \
+        --builddir ${ac_pwd}/modules/gui/qt \
+        --moc_include_dirs \
+        ${qmake_additional_params})
       AC_SUBST([QT_LIBS])
       AC_SUBST([QT_CFLAGS])
       AC_SUBST([QT_LDFLAGS])
+      AC_SUBST([QT_MOC_INCLUDE_DIRS])
 
       QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     -query QT_HOST_LIBEXECS 2>/dev/null)"
       QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}

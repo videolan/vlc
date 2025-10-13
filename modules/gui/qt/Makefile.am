@@ -717,6 +717,7 @@ uic_verbose__0 = $(uic_verbose_0)
 
 MOC_CPPFLAGS = $(DEFS) \
 	-I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) \
+	$(QT_MOC_INCLUDE_DIRS) \
 	$(QT_CFLAGS) \
 	$(libqt_plugin_la_CPPFLAGS)
 if HAVE_DARWIN
