@@ -161,8 +161,9 @@ vlcSetContribEnvironment() {
     if [ -z "$SDKROOT" ]; then
         export SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
     fi
+    SDK_VERSION="$(xcrun --sdk $SDKROOT --show-sdk-version)"
 
-    echo "Setting contrib environment with minimum macOS version $MINIMAL_OSX_VERSION and SDK $SDKROOT"
+    echo "Setting contrib environment with minimum macOS version $MINIMAL_OSX_VERSION and SDK $SDK_VERSION at $SDKROOT"
 
     # Usually, VLCs contrib libraries do not support partial availability at runtime.
     # Forcing those errors has two reasons:
