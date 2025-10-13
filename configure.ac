@@ -4156,6 +4156,10 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_PATH_PROGS(RCC, [rcc], rcc, ["${QT_LIBEXEC_DIRECTORY}"])
       AC_PATH_PROGS(UIC, [uic], uic, ["${QT_LIBEXEC_DIRECTORY}"])
       AC_PATH_PROGS(QSB, [qsb], qsb, ["${QT_SHADERTOOLS_BIN_DIRECTORY}"])
+      AS_IF([test "${MOC}" = "no" -o "${RCC}" = "no" -o "${UIC}" = "no" -o "${QSB}" = "no"], [
+          AC_MSG_WARN([some qt build tools are missing])
+          have_qt="no"
+      ])
       AC_PATH_PROGS(QMLCACHEGEN, [qmlcachegen], no, ["${QT_QML_LIBEXEC_DIRECTORY}"])
       AS_IF([test "${QMLCACHEGEN}" = "no"], [
           AC_MSG_WARN([qmlcachegen not found])
