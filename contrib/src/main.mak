@@ -117,6 +117,12 @@ CXX := clang++
 endif
 endif
 
+get_version2_num =$(shell echo $(1) | awk -F. '{ printf("%d%02d\n", $$1,$$2); }')
+ifdef HAVE_DARWIN_OS
+# the CI currently has 14.5 (macos-xcode15), 12.3 (monterey), 10.13/10.15 (old-macmini)
+darwin_sdk_at_most  = $(shell [ $(call get_version2_num, $(shell xcrun --sdk $(SDKROOT) -show-sdk-version)) -le $(call get_version2_num, $(1)) ] && echo true)
+endif
+
 # -fno-stack-check is a workaround for a possible
 # bug in Xcode 11 or macOS 10.15+
 ifdef HAVE_DARWIN_OS
