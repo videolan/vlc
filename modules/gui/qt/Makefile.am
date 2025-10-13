@@ -573,6 +573,7 @@ endif
 # X11 compositor
 
 if HAVE_X
+if HAVE_QT_XCB
 if HAVE_XCB
 if HAVE_XCB_DAMAGE
 if HAVE_XCB_XFIXES
@@ -616,7 +617,7 @@ if ENABLE_QT
 gui_LTLIBRARIES += libqt_x11_plugin.la
 endif
 
-
+endif
 endif
 endif
 endif
