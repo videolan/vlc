@@ -41,6 +41,7 @@ if lua_dep.found() and get_option('lua').enabled()
     'libs/sd.c',
     'libs/stream.c',
     'libs/strings.c',
+    'libs/tcp.c',
     'libs/variables.c',
     'libs/variables.h',
     'libs/video.c',
