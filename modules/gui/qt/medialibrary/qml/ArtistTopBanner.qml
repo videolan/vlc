@@ -33,7 +33,7 @@ FocusScope {
 
     property int rightPadding: 0
 
-    property var artist: ({})
+    required property var artist
 
     implicitHeight: VLCStyle.artistBanner_height
 

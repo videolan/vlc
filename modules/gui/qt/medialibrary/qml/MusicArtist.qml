@@ -68,7 +68,9 @@ FocusScope {
 
     property alias _currentView: loader.item
 
-    property var _artist: ({})
+    property var _artist: ({
+        id: 0
+    })
 
     function navigationShowHeader(y, height) {
         const newContentY = Helpers.flickablePositionContaining(_currentView, y, height, 0, 0)
