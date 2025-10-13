@@ -29,6 +29,8 @@ ToolTipExt {
     height: implicitHeight + background.arrowHeight
     bottomInset: height - implicitHeight
 
+    implicitHeight: (implicitContentHeight + topPadding + bottomPadding)
+
     x: _x
     y: pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5))
 
