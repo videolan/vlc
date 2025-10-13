@@ -90,6 +90,8 @@ unsigned vlc_CPU_raw(void)
     const unsigned long hwcap = getauxval(AT_HWCAP);
     unsigned int flags = 0;
 
+    if (hwcap & HWCAP_RV('B'))
+        flags |= VLC_CPU_RV_B;
     if (hwcap & HWCAP_RV('V'))
         flags |= VLC_CPU_RV_V;
 

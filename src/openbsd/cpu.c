@@ -87,6 +87,8 @@ unsigned vlc_CPU_raw(void)
 
     elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap));
 
+    if (hwcap & HWCAP_RV('B'))
+        flags |= VLC_CPU_RV_B;
     if (hwcap & HWCAP_RV('V'))
         flags |= VLC_CPU_RV_V;
 
