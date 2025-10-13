@@ -5,7 +5,10 @@ BREAKPAD_VERSION := 0.1.3
 BREAKPAD_URL := http://download.videolan.org/pub/contrib/breakpad/breakpad-$(BREAKPAD_VERSION).tar.gz
 
 ifdef HAVE_MACOSX
+# fails to build on newer SDK because of missing libarclite (found in 13.1, missing in 13.3 from XCode 14.3)
+ifeq ($(call darwin_sdk_at_most, 13.1), true)
 PKGS += breakpad
+endif
 endif
 
 $(TARBALLS)/breakpad-$(BREAKPAD_VERSION).tar.gz:

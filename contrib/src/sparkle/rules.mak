@@ -4,7 +4,10 @@ SPARKLE_VERSION := 1.16.0
 SPARKLE_URL := $(GITHUB)/sparkle-project/Sparkle/archive/$(SPARKLE_VERSION).zip
 
 ifdef HAVE_MACOSX
+# fails to build on newer SDK because of missing libarclite (found in 13.1, missing in 13.3 from XCode 14.3)
+ifeq ($(call darwin_sdk_at_most, 13.1), true)
 PKGS += sparkle
+endif
 endif
 
 $(TARBALLS)/Sparkle-$(SPARKLE_VERSION).zip:

@@ -4,7 +4,10 @@ GROWL_VERSION := 2.0.1
 GROWL_URL := https://download.videolan.org/contrib/GrowlSDK-$(GROWL_VERSION)-src.tar.gz
 
 ifdef HAVE_MACOSX
+# fails to build on newer SDK because of missing libarclite (found in 13.1, missing in 13.3 from XCode 14.3)
+ifeq ($(call darwin_sdk_at_most, 13.1), true)
 PKGS += growl
+endif
 endif
 
 $(TARBALLS)/GrowlSDK-$(GROWL_VERSION)-src.tar.gz:
