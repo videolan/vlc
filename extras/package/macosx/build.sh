@@ -163,6 +163,12 @@ export STRIP="`xcrun --find strip`"
 export SDKROOT
 export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${BUILD_TRIPLET}/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
 
+SDK_VERSION="$(xcrun --show-sdk-version)"
+XCODE_VERSION="$(xcodebuild -version)"
+
+info "Building with minimum macOS version $MINIMAL_OSX_VERSION and SDK $SDK_VERSION at $SDKROOT using $XCODE_VERSION"
+
+
 # Select avcodec flavor to compile contribs with
 export USE_FFMPEG=1
 
