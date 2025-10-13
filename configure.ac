@@ -2565,8 +2565,10 @@ AC_ARG_ENABLE([mpc],
 if test "${enable_mpc}" != "no"
 then
     AC_CHECK_HEADERS([mpc/mpcdec.h], [
+      AC_CHECK_LIB([mpcdec], [mpc_demux_init], [
         VLC_ADD_PLUGIN([mpc])
         VLC_ADD_LIBS([mpc],[-lmpcdec])
+      ],, [$LIBM])
     ])
 fi
 
