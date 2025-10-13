@@ -163,11 +163,19 @@ unsigned vlc_CPU_raw(void);
 #   define HAVE_FPU 1
 #  endif
 #  define VLC_CPU_RV_V 0x1
+#  define VLC_CPU_RV_B 0x2
 
 #  ifdef __riscv_v
 #   define vlc_CPU_RV_V() (1)
 #  else
 #   define vlc_CPU_RV_V() ((vlc_CPU() & VLC_CPU_RV_V) != 0)
+#  endif
+
+#  if (defined (__riscv_b) || (defined (__riscv_zba) && defined (__riscv_zbb) \
+                            && defined (__riscv_zbs)))
+#   define vlc_CPU_RV_B() (1)
+#  else
+#   define vlc_CPU_RV_B() ((vlc_CPU() & VLC_CPU_RV_B) != 0)
 #  endif
 
 # else

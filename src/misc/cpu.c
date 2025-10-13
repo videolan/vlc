@@ -186,6 +186,8 @@ void vlc_CPU_dump (vlc_object_t *obj)
         vlc_memstream_puts(&stream, "ARM_NEON ");
 
 #elif defined (__riscv)
+    if (vlc_CPU_RV_B())
+        vlc_memstream_puts(&stream, "B ");
     if (vlc_CPU_RV_V())
         vlc_memstream_puts(&stream, "V ");
 
