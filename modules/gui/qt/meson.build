@@ -1046,7 +1046,15 @@ if qt6_dep.found()
         ]
     endif
 
-    if x11_dep.found() and xcb_dep.found()
+    qt_xcb_check = '''
+    #include <qtgui-config.h>
+    #if QT_FEATURE_xcb != 1
+    #error "Qt doesn't have xcb support"
+    #endif
+    '''
+    qt_features_xcb = cpp.compiles(qt_xcb_check, dependencies: qt6_dep, name: 'Qt features xcb')
+
+    if x11_dep.found() and xcb_dep.found() and qt_features_xcb
         qt_extra_deps += xcb_dep
         qt_extra_deps += x11_dep
         qt_extra_flags += '-DQT_HAS_XCB'
