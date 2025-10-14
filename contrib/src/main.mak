@@ -161,8 +161,12 @@ ifneq ($(findstring clang, $(shell $(CC) --version 2>/dev/null)),)
 HAVE_CLANG := 1
 CLANG_VERSION := $(shell $(CC) --version | head -1 | grep -o '[0-9]\+\.' | head -1 | cut -d '.' -f 1)
 clang_at_least = $(shell [ $(CLANG_VERSION) -ge $(1) ] && echo true)
+clang_at_most  = $(shell [ $(CLANG_VERSION) -le $(1) ] && echo true)
+clang_major_is = $(shell [ $(CLANG_VERSION) -eq $(1) ] && echo true)
 else
 clang_at_least = $(shell echo false)
+clang_at_most  = $(shell echo false)
+clang_major_is = $(shell echo false)
 endif
 
 cppcheck = $(shell printf '$(2)' | $(CC) $(CFLAGS) -E -dM - 2>/dev/null | grep -E $(1))
