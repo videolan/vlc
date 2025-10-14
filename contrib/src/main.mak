@@ -121,6 +121,12 @@ get_version2_num =$(shell echo $(1) | awk -F. '{ printf("%d%02d\n", $$1,$$2); }'
 ifdef HAVE_DARWIN_OS
 # the CI currently has 14.5 (macos-xcode15), 12.3 (monterey), 10.13/10.15 (old-macmini)
 darwin_sdk_at_most  = $(shell [ $(call get_version2_num, $(shell xcrun --sdk $(SDKROOT) -show-sdk-version)) -le $(call get_version2_num, $(1)) ] && echo true)
+
+ifdef VLC_DEPLOYMENT_TARGET
+darwin_min_os_at_least  = $(shell [ $(call get_version2_num, $(VLC_DEPLOYMENT_TARGET)) -ge $(call get_version2_num, $(1)) ] && echo true)
+else
+darwin_min_os_at_least  = $(shell echo false)
+endif
 endif
 
 # -fno-stack-check is a workaround for a possible
