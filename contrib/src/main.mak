@@ -130,13 +130,6 @@ darwin_min_os_at_least  = $(shell echo false)
 endif
 endif
 
-# -fno-stack-check is a workaround for a possible
-# bug in Xcode 11 or macOS 10.15+
-ifdef HAVE_DARWIN_OS
-EXTRA_CFLAGS += -fno-stack-check
-XCODE_FLAGS += OTHER_CFLAGS=-fno-stack-check
-endif
-
 ifdef HAVE_MACOSX
 EXTRA_CXXFLAGS += -stdlib=libc++
 ifeq ($(ARCH),aarch64)
@@ -194,6 +187,15 @@ GCC_VERSION := $(shell $(CC) --version | head -1 | grep -o '[0-9]\+\.' | head -1
 gcc_at_least = $(shell [ $(GCC_VERSION) -ge $(1) ] && echo true)
 gcc_at_most  = $(shell [ $(GCC_VERSION) -le $(1) ] && echo true)
 gcc_major_is = $(shell [ $(GCC_VERSION) -eq $(1) ] && echo true)
+endif
+endif
+
+# -fno-stack-check is a workaround for a possible
+# bug in Xcode 11 or macOS 10.15+
+ifdef HAVE_DARWIN_OS
+ifeq ($(call clang_major_is, 11), true)
+EXTRA_CFLAGS += -fno-stack-check
+XCODE_FLAGS += OTHER_CFLAGS=-fno-stack-check
 endif
 endif
 
