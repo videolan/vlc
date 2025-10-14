@@ -105,13 +105,6 @@ CXX := clang++
 endif
 endif
 
-# -fno-stack-check is a workaround for a possible
-# bug in Xcode 11 or macOS 10.15+
-ifdef HAVE_DARWIN_OS
-EXTRA_CFLAGS += -fno-stack-check
-XCODE_FLAGS += OTHER_CFLAGS=-fno-stack-check
-endif
-
 ifdef HAVE_MACOSX
 EXTRA_CXXFLAGS += -stdlib=libc++
 ifeq ($(ARCH),aarch64)
@@ -167,6 +160,15 @@ else
 clang_at_least = $(shell echo false)
 clang_at_most  = $(shell echo false)
 clang_major_is = $(shell echo false)
+endif
+
+# -fno-stack-check is a workaround for a possible
+# bug in Xcode 11 or macOS 10.15+
+ifdef HAVE_DARWIN_OS
+ifeq ($(call clang_major_is, 11), true)
+EXTRA_CFLAGS += -fno-stack-check
+XCODE_FLAGS += OTHER_CFLAGS=-fno-stack-check
+endif
 endif
 
 cppcheck = $(shell printf '$(2)' | $(CC) $(CFLAGS) -E -dM - 2>/dev/null | grep -E $(1))
