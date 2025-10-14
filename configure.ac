@@ -163,10 +163,15 @@ case "${host_os}" in
     SYS=darwin
     ac_cv_func_aligned_alloc=no
 
-    dnl Work around an Xcode 11 bug, fixed in Xcode 11.3.1
-    AX_APPEND_FLAG([-fno-stack-check], [CFLAGS])
-    AX_APPEND_FLAG([-fno-stack-check], [CXXFLAGS])
-    AX_APPEND_FLAG([-fno-stack-check], [OBJCFLAGS])
+    AC_MSG_CHECKING([if AppleClang requires -fno-stack-check])
+    COMPILER_VERSION_MAJ="$(${CC} -dumpversion | cut -d '.' -f -1)"
+    AS_IF([ test ${COMPILER_VERSION_MAJ} -eq 11 ],[
+      dnl Work around an Xcode 11 bug, fixed in Xcode 11.3.1
+      AC_MSG_RESULT([yes])
+      AX_APPEND_FLAG([-fno-stack-check], [CFLAGS])
+      AX_APPEND_FLAG([-fno-stack-check], [CXXFLAGS])
+      AX_APPEND_FLAG([-fno-stack-check], [OBJCFLAGS])
+    ],[AC_MSG_RESULT([no])])
 
     case "${host_cpu}" in
       i?86)
