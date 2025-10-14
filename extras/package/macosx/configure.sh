@@ -23,7 +23,7 @@ OPTIONS="
         --disable-caca
         --disable-pulse
         --disable-vnc
-        --with-macosx-version-min=10.11
+        --with-macosx-version-min=$MINIMAL_OSX_VERSION
         --without-x
 "
 
