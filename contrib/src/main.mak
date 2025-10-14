@@ -377,6 +377,8 @@ check_githash = \
 
 ifeq ($(V),1)
 TAR_VERBOSE := v
+else
+ZIP_QUIET := -q
 endif
 
 checksum = \
@@ -390,7 +392,7 @@ UNPACK = $(RM) -R $@ \
 	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar $(TAR_VERBOSE)xzfo $(f)) \
 	$(foreach f,$(filter %.tar.bz2,$^), && tar $(TAR_VERBOSE)xjfo $(f)) \
 	$(foreach f,$(filter %.tar.xz,$^), && tar $(TAR_VERBOSE)xJfo $(f)) \
-	$(foreach f,$(filter %.zip,$^), && unzip $(f) $(UNZIP_PARAMS))
+	$(foreach f,$(filter %.zip,$^), && unzip $(ZIP_QUIET) $(f) $(UNZIP_PARAMS))
 UNPACK_DIR = $(patsubst %.tar,%,$(basename $(notdir $<)))
 APPLY = (cd $(UNPACK_DIR) && patch -fp1) <
 pkg_static = (cd $(UNPACK_DIR) && $(SRC_BUILT)/pkg-static.sh $(1))
