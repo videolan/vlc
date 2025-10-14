@@ -251,6 +251,9 @@ CONTRIBFLAGS=
 if [ "$PACKAGETYPE" = "u" ]; then
     # release package should have sparkle, breakpad, growl
     CONTRIBFLAGS="$CONTRIBFLAGS --enable-sparkle --enable-breakpad --enable-growl"
+elif [ "$PACKAGETYPE" = "n" ]; then
+    # nightly package should have growl
+    CONTRIBFLAGS="$CONTRIBFLAGS --enable-growl"
 fi
 
 info "Building contribs"
@@ -323,6 +326,9 @@ fi
 if [ "$PACKAGETYPE" = "u" ]; then
     # release package should have sparkle, breakpad, growl
     CONFIGFLAGS="$CONFIGFLAGS --enable-sparkle --enable-breakpad --enable-growl"
+elif [ "$PACKAGETYPE" = "n" ]; then
+    # nightly package should have growl
+    CONFIGFLAGS="$CONFIGFLAGS --enable-growl"
 fi
 
 if [ "${vlcroot}/configure" -nt Makefile ]; then
