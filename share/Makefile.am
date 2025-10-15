@@ -149,7 +149,7 @@ skins2_default_vlt_FILES = \
 	skins2/default/subX/vol_slider.png
 
 skins2/default.vlt: $(skins2_default_vlt_FILES)
-	$(AM_V_at)mkdir -p skins2
+	$(AM_V_at)$(MKDIR_P) "skins2"
 	$(AM_V_at)rm -f -- skins2/default.vlt.tmp
 	$(AM_V_GEN)GZIP=--no-name \
 	tar cvvzf skins2/default.vlt.tmp \
@@ -174,7 +174,7 @@ luac_verbose_0 = @echo "  LUAC   $@";
 	done; \
 	echo "Attempt to byte-compile unknown file: $(<)!"; \
 	exit 1
-	$(AM_V_at)mkdir -p "$$(dirname '$@')"
+	$(AM_V_at)$(MKDIR_P) "$$(dirname '$@')"
 	$(luac_verbose)$(LUAC) -o $@ $<
 
 if BUILD_LUA

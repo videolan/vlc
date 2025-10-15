@@ -30,7 +30,7 @@ xib_verbose_0 = @echo "  XIB     " $@;
 xib_verbose__0 = $(xib_verbose_0)
 
 .xib.nib:
-	$(AM_V_at)mkdir -p -- gui/macosx/UI
+	$(AM_V_at)$(MKDIR_P) "gui/macosx/UI"
 	$(xib_verbose)$(XIB) --errors --warnings --notices \
 	  --module VLC --auto-activate-custom-fonts --target-device mac \
 	  --minimum-deployment-target 10.11 --output-format human-readable-text \

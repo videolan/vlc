@@ -126,7 +126,7 @@ sout_LTLIBRARIES += $(LTLIBstream_out_chromaprint)
 SUFFIXES += .proto .pb.cc
 
 stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc: stream_out/chromecast/cast_channel.proto
-	$(AM_V_at)mkdir -p stream_out/chromecast/@PROTOBUF_VERSION@
+	$(AM_V_at)$(MKDIR_P) "stream_out/chromecast/@PROTOBUF_VERSION@"
 	$(AM_V_GEN)$(PROTOC) --cpp_out=stream_out/chromecast/@PROTOBUF_VERSION@ -I$(srcdir)/stream_out/chromecast $<
 
 stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.h: stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc
@@ -143,7 +143,7 @@ libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/cast.cpp stre
                                              stream_out/chromecast/chromecast_communication.cpp
 nodist_libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc
 libstream_out_chromecast_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Istream_out/chromecast/@PROTOBUF_VERSION@ $(CHROMECAST_CFLAGS)
-libstream_out_chromecast_plugin_la_LIBADD = $(CHROMECAST_LIBS) $(SOCKET_LIBS) libvlc_json.la 
+libstream_out_chromecast_plugin_la_LIBADD = $(CHROMECAST_LIBS) $(SOCKET_LIBS) libvlc_json.la
 CLEANFILES += $(nodist_libstream_out_chromecast_plugin_la_SOURCES)
 
 if ENABLE_SOUT
