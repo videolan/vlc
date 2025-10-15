@@ -54,15 +54,15 @@ metallib_verbose_ = $(metallib_verbose__$(AM_DEFAULT_VERBOSITY))
 metallib_verbose_0 = @echo "  METALLIB " $@;
 metallib_verbose__0 = $(metallib_verbose_0)
 
-libmacosx_plugin_la_METAL_SOURCES = gui/macosx/shaders/VLCSnowShader.metal
-libmacosx_plugin_la_METAL_AIR_FILES = $(libmacosx_plugin_la_METAL_SOURCES:.metal=.air)
+libmacosx_plugin_la_METAL_srcs = gui/macosx/shaders/VLCSnowShader.metal
+libmacosx_plugin_la_METAL_AIR_FILES = $(libmacosx_plugin_la_METAL_srcs:.metal=.air)
 libmacosx_plugin_la_METAL_LIBRARY = gui/macosx/Resources/Shaders.metallib
 
 $(libmacosx_plugin_la_METAL_LIBRARY): $(libmacosx_plugin_la_METAL_AIR_FILES)
 	$(AM_V_at)$(MKDIR_P) "gui/macosx/shaders"
 	$(metallib_verbose)$(METALLIB) $(libmacosx_plugin_la_METAL_AIR_FILES) -o $@
 
-EXTRA_DIST += $(libmacosx_plugin_la_METAL_SOURCES)
+EXTRA_DIST += $(libmacosx_plugin_la_METAL_srcs)
 BUILT_SOURCES += $(libmacosx_plugin_la_METAL_LIBRARY)
 CLEANFILES += $(libmacosx_plugin_la_METAL_AIR_FILES) $(libmacosx_plugin_la_METAL_LIBRARY)
 
