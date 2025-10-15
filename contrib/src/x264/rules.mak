@@ -51,6 +51,16 @@ endif
 endif
 endif
 
+ifneq ($(filter arm aarch64, $(ARCH)),)
+ifndef HAVE_WIN32
+X264_ASM_USES_CC:=1
+endif
+endif
+
+ifdef X264_ASM_USES_CC
+X264CONF += --extra-asflags="$(EXTRA_CFLAGS)"
+endif
+
 $(TARBALLS)/x264-$(X264_VERSION).tar.xz:
 	$(call download_git,$(X264_GITURL),,$(X264_HASH))
 
