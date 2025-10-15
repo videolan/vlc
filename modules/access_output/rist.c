@@ -31,7 +31,9 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_rand.h>
+#ifndef _WIN32
 #include <sys/time.h>
+#endif
 
 #define RIST_CFG_PREFIX "sout-rist-"
 #include "../access/rist.h"
@@ -322,4 +324,3 @@ vlc_module_begin()
     set_callbacks( Open, Close )
 
 vlc_module_end ()
-
