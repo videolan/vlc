@@ -616,13 +616,7 @@ static void st_SessionClose (vlc_tls_t *session) {
     msg_Dbg(sys->obj, "close TLS session");
 
     if (sys->p_context) {
-#if TARGET_OS_IPHONE
         CFRelease(sys->p_context);
-#else
-        if (SSLDisposeContext(sys->p_context) != noErr) {
-            msg_Err(sys->obj, "error deleting context");
-        }
-#endif
     }
     free(sys);
 }
@@ -663,18 +657,11 @@ static vlc_tls_t *st_SessionOpenCommon(vlc_object_t *obj,
     tls->ops = &st_ops;
 
     SSLContextRef p_context = NULL;
-#if TARGET_OS_IPHONE
     p_context = SSLCreateContext(NULL, b_server ? kSSLServerSide : kSSLClientSide, kSSLStreamType);
     if (p_context == NULL) {
         msg_Err(obj, "cannot create ssl context");
         goto error;
     }
-#else
-    if (SSLNewContext(b_server, &p_context) != noErr) {
-        msg_Err(obj, "error calling SSLNewContext");
-        goto error;
-    }
-#endif
 
     sys->p_context = p_context;
 
