@@ -52,7 +52,9 @@
 
 #include <windows.h>
 #include <d3d9.h>
+#ifdef HAVE_D3DX9EFFECT_H
 #include <d3dx9effect.h>
+#endif
 #include "../../video_chroma/d3d9_fmt.h"
 #include <dxvahd.h>
 
@@ -663,6 +665,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     return VLC_SUCCESS;
 }
 
+#ifdef HAVE_D3DX9EFFECT_H
 static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source, size_t source_length)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -717,6 +720,7 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
     }
     return VLC_SUCCESS;
 }
+#endif
 
 #define MAX_SHADER_FILE_SIZE  (1024*1024)
 
@@ -732,6 +736,7 @@ static int Direct3D9CreateShaders(vout_display_t *vd)
     if (!selected_shader)
         return VLC_SUCCESS; /* Nothing to do */
 
+#ifdef HAVE_D3DX9EFFECT_H
     const char *shader_source_builtin = NULL;
     char *shader_source_file = NULL;
     FILE *fs = NULL;
@@ -785,11 +790,12 @@ static int Direct3D9CreateShaders(vout_display_t *vd)
     return VLC_SUCCESS;
 
 error:
-    Direct3D9DestroyShaders(vd);
-    free(selected_shader);
     free(shader_source_file);
     if (fs)
         fclose(fs);
+#endif // HAVE_D3DX9EFFECT_H
+    Direct3D9DestroyShaders(vd);
+    free(selected_shader);
     return VLC_EGENERIC;
 }
 
