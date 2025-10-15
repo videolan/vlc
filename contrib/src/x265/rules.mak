@@ -33,6 +33,16 @@ x265: x265_$(X265_VERSION).tar.gz .sum-x265
 
 X265_CONF := -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
 
+ifdef HAVE_DARWIN_OS
+ifneq ($(filter arm aarch64, $(ARCH)),)
+ifdef HAVE_IOS
+X265_CONF += -DASM_FLAGS="-mmacosx-version-min=10.7;-isysroot;$(IOS_SDK)"
+else
+X265_CONF += -DASM_FLAGS="-mmacosx-version-min=10.7;-isysroot;$(MACOSX_SDK)"
+endif
+endif
+endif
+
 .x265: x265 toolchain.cmake
 	$(REQUIRE_GPL)
 	$(CMAKECLEAN)
