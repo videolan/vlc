@@ -2792,6 +2792,7 @@ dnl
 dnl DXGI debug
 dnl
 AC_CHECK_HEADERS([dxgidebug.h])
+AC_CHECK_HEADERS([d3dx9effect.h])
 
 dnl
 dnl IStorageFolder

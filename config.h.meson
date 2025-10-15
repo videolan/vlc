@@ -104,6 +104,9 @@
 /* Define if the compiler supports typeof. */
 #mesondefine HAVE_CXX_TYPEOF
 
+/* Define to 1 if you have the <d3dx9effect.h> header file. */
+#mesondefine HAVE_D3DX9EFFECT_H
+
 /* Define to 1 if you have the `dirfd' function. */
 #mesondefine HAVE_DIRFD
 
