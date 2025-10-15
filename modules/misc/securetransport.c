@@ -313,25 +313,6 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
 
     /* get leaf certificate */
     /* SSLCopyPeerCertificates is only available on OSX 10.5 or later */
-#if !TARGET_OS_IPHONE
-    CFArrayRef cert_chain = NULL;
-    ret = SSLCopyPeerCertificates(sys->p_context, &cert_chain);
-    if (ret != noErr || !cert_chain) {
-        result = -1;
-        goto out;
-    }
-
-    if (CFArrayGetCount(cert_chain) == 0) {
-        CFRelease(cert_chain);
-        result = -1;
-        goto out;
-    }
-
-    leaf_cert = (SecCertificateRef)CFArrayGetValueAtIndex(cert_chain, 0);
-    CFRetain(leaf_cert);
-    CFRelease(cert_chain);
-#else
-    /* SecTrustGetCertificateAtIndex is only available on 10.7 or iOS */
     if (SecTrustGetCertificateCount(trust) == 0) {
         result = -1;
         goto out;
@@ -339,8 +320,6 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
 
     leaf_cert = SecTrustGetCertificateAtIndex(trust, 0);
     CFRetain(leaf_cert);
-#endif
-
 
     /* check if leaf already accepted */
     CFIndex max = CFArrayGetCount(sys->p_cred->whitelist);
