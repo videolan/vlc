@@ -174,6 +174,18 @@ case $OS in
            esac
         fi
         ;;
+      watchos)
+        if test -z "$SIMULATOR"; then
+          case $ARCH in
+            aarch64|arm64)
+              return_triplet aarch64-apple-watchos
+              ;;
+            arm64_32)
+              return_triplet arm64_32-apple-watchos
+              ;;
+           esac
+        fi
+        ;;
 
     esac
     abort_err "Unsupported Darwin triplet '$TRIPLET' for '$DARWIN'"
