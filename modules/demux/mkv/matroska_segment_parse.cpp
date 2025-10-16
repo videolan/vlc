@@ -2159,6 +2159,9 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             if( unlikely( p_tk->p_sys->Init() ) )
                 throw std::runtime_error ("p_tk->p_sys->Init() failed when handling A_REAL/28_8");
 
+            if (i_codec == VLC_CODEC_COOK || i_codec == VLC_CODEC_ATRAC3)
+                p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
+
             if( version == 4 )
             {
                 real_audio_private_v4 * v4 = (real_audio_private_v4*) priv;
@@ -2181,17 +2184,11 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             if (!A_REAL__is_valid (vars))
                 return;
 
-            real_audio_private * priv = (real_audio_private*) vars.p_tk->p_extra_data;
-            vars.p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
-
             A_REAL__helper (vars, VLC_CODEC_COOK);
         }
         S_CASE("A_REAL/ATRC") {
             if (!A_REAL__is_valid (vars))
                 return;
-
-            real_audio_private * priv = (real_audio_private*) vars.p_tk->p_extra_data;
-            vars.p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
 
             A_REAL__helper (vars, VLC_CODEC_ATRAC3);
         }
