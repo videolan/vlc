@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.8.0
+LIBARCHIVE_VERSION := 3.8.2
 LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
@@ -40,8 +40,6 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-zstd-use-GetNativeSystemInfo-to-get-the-number-of-th.patch
-	$(APPLY) $(SRC)/libarchive/0001-cmake-add-uuid-library-when-using-xmllite.patch
-	$(APPLY) $(SRC)/libarchive/38ac49553d430f1b28c7624e5e9788125fdad187.patch
 	# don't use CreateHardLinkW on old UWP
 	$(APPLY) $(SRC)/libarchive/0001-Disable-CreateHardLinkW-usage-on-old-UWP-targets.patch
 	$(APPLY) $(SRC)/libarchive/0003-Use-VirtualAllocFromApp-for-old-UWP-targets.patch
