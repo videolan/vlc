@@ -2107,7 +2107,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 memset( &p_extra[18], 0, 30  - 18 );
             }
         }
-        static void A_PCM__helper (HandlerPayload& vars, uint32_t i_codec) {
+        static void A_PCM__helper (HandlerPayload& vars, vlc_fourcc_t i_codec) {
             ONLY_FMT(AUDIO);
             vars.p_fmt->i_codec = i_codec;
             vars.p_fmt->audio.i_blockalign = ( vars.p_fmt->audio.i_bitspersample + 7 ) / 8 * vars.p_fmt->audio.i_channels;
@@ -2138,7 +2138,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 
             return true;
         }
-        static void A_REAL__helper (HandlerPayload& vars, uint32_t i_codec) {
+        static void A_REAL__helper (HandlerPayload& vars, vlc_fourcc_t i_codec) {
             mkv_track_t        * p_tk = vars.p_tk;
             real_audio_private * priv = (real_audio_private*) p_tk->p_extra_data;
 
