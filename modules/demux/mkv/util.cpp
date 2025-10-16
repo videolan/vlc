@@ -392,6 +392,45 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
 
 int32_t Cook_PrivateTrackData::Init()
 {
+    // real_audio_private
+    bytes.skip(4);                      // fourcc
+
+    /* FIXME RALF and SIPR */
+    uint16_t version = bytes.GetBE16(); // version
+    bytes.skip(2);                      // unknown1
+    bytes.skip(12);                     // unknown2
+    bytes.skip(2);                      // unknown3
+    bytes.skip(2);                      // flavor
+    bytes.skip(4);                      // coded_frame_size
+    bytes.skip(3*4);                    // unknown4
+    i_sub_packet_h   = bytes.GetBE16(); // sub_packet_h
+    i_frame_size     = bytes.GetBE16(); // frame_size
+    i_subpacket_size = bytes.GetBE16(); // sub_packet_size
+    bytes.skip(2);                      // unknown5
+
+    if( version == 4 )
+    {
+        // real_audio_private_v4
+        i_rate          = bytes.GetBE16(); // sample_rate
+        bytes.skip(2);                     // unknown
+        i_bitspersample = bytes.GetBE16(); // sample_size
+        i_channels      = bytes.GetBE16(); // channels
+    }
+    else if( version == 5 )
+    {
+        // real_audio_private_v5
+        bytes.skip(4);                     // unknown1
+        bytes.skip(2);                     // unknown2
+        i_rate          = bytes.GetBE16(); // sample_rate
+        bytes.skip(2);                     // unknown2
+        i_bitspersample = bytes.GetBE16(); // sample_size
+        i_channels      = bytes.GetBE16(); // channels
+    }
+    else
+        return 0;
+    if (bytes.hasErrors())
+        return 0;
+
     i_subpackets = (size_t) i_sub_packet_h * (size_t) i_frame_size / (size_t) i_subpacket_size;
     p_subpackets = static_cast<block_t**> ( calloc(i_subpackets, sizeof(block_t*)) );
 

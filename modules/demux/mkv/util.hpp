@@ -131,18 +131,24 @@ struct real_audio_private_v5
 class Cook_PrivateTrackData : public PrivateTrackData
 {
 public:
-    Cook_PrivateTrackData(uint16_t sph, uint16_t fs, uint16_t sps):
-        i_sub_packet_h(sph), i_frame_size(fs), i_subpacket_size(sps),
-        p_subpackets(NULL), i_subpackets(0), i_subpacket(0){}
+    Cook_PrivateTrackData(const uint8_t *reader, size_t reader_len):
+        bytes(reader, reader_len) {}
     ~Cook_PrivateTrackData();
     int32_t Init();
 
     uint16_t i_sub_packet_h;
     uint16_t i_frame_size;
     uint16_t i_subpacket_size;
-    block_t  **p_subpackets;
-    size_t   i_subpackets;
-    size_t   i_subpacket;
+
+    uint16_t i_rate;
+    uint16_t i_bitspersample;
+    uint16_t i_channels;
+
+    block_t  **p_subpackets = NULL;
+    size_t   i_subpackets = 0;
+    size_t   i_subpacket = 0;
+private:
+    ByteReader bytes;
 };
 
 block_t * packetize_wavpack( const mkv_track_t &, uint8_t *, size_t);

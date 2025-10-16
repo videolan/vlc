@@ -2140,42 +2140,27 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         static void A_REAL__helper (HandlerPayload& vars, vlc_fourcc_t i_codec) {
             mkv_track_t        * p_tk = vars.p_tk;
-            real_audio_private * priv = (real_audio_private*) p_tk->p_extra_data;
 
             p_tk->fmt.i_codec = i_codec;
 
-            /* FIXME RALF and SIPR */
-            uint16_t version = (uint16_t) hton16(priv->version);
-
-            p_tk->p_sys = new Cook_PrivateTrackData(
-                  hton16( priv->sub_packet_h ),
-                  hton16( priv->frame_size ),
-                  hton16( priv->sub_packet_size )
+            Cook_PrivateTrackData * p_realaudio = new Cook_PrivateTrackData(
+                p_tk->p_extra_data,
+                p_tk->i_extra_data
             );
+            p_tk->p_sys = p_realaudio;
 
-            if( unlikely( !p_tk->p_sys ) )
-                throw std::runtime_error ("p_tk->p_sys is NULL when handling A_REAL/28_8");
+            if( unlikely( !p_realaudio ) )
+                throw std::runtime_error ("Cook_PrivateTrackData is NULL when handling A_REAL/28_8");
 
-            if( unlikely( p_tk->p_sys->Init() ) )
-                throw std::runtime_error ("p_tk->p_sys->Init() failed when handling A_REAL/28_8");
+            if( unlikely( p_realaudio->Init() ) )
+                throw std::runtime_error ("Cook_PrivateTrackData::Init() failed when handling A_REAL/28_8");
 
             if (i_codec == VLC_CODEC_COOK || i_codec == VLC_CODEC_ATRAC3)
-                p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
+                p_tk->fmt.audio.i_blockalign = p_realaudio->i_subpacket_size;
 
-            if( version == 4 )
-            {
-                real_audio_private_v4 * v4 = (real_audio_private_v4*) priv;
-                p_tk->fmt.audio.i_channels = hton16(v4->channels);
-                p_tk->fmt.audio.i_bitspersample = hton16(v4->sample_size);
-                p_tk->fmt.audio.i_rate = hton16(v4->sample_rate);
-            }
-            else if( version == 5 )
-            {
-                real_audio_private_v5 * v5 = (real_audio_private_v5*) priv;
-                p_tk->fmt.audio.i_channels = hton16(v5->channels);
-                p_tk->fmt.audio.i_bitspersample = hton16(v5->sample_size);
-                p_tk->fmt.audio.i_rate = hton16(v5->sample_rate);
-            }
+            p_tk->fmt.audio.i_rate          = p_realaudio->i_rate;
+            p_tk->fmt.audio.i_bitspersample = p_realaudio->i_bitspersample;
+            p_tk->fmt.audio.i_channels      = p_realaudio->i_channels;
             msg_Dbg(vars.p_demuxer, "%d channels %d bits %d Hz",p_tk->fmt.audio.i_channels, p_tk->fmt.audio.i_bitspersample, p_tk->fmt.audio.i_rate);
 
             fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 78);
