@@ -208,24 +208,28 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
             if( size < p_sys->i_subpacket_size )
                 return;
 
-            block_t *p_block = block_Alloc( p_sys->i_subpacket_size );
-            if( !p_block )
-                return;
-
-            memcpy( p_block->p_buffer, p_frame, p_sys->i_subpacket_size );
-            p_block->i_dts = VLC_TICK_INVALID;
-            p_block->i_pts = VLC_TICK_INVALID;
-            if( !p_sys->i_subpacket )
+            if (likely(p_sys->p_subpackets[i_index] == nullptr))
             {
-                p_tk->i_last_dts =
-                p_block->i_pts = i_pts;
+                // the index was not used
+                block_t *p_block = block_Alloc( p_sys->i_subpacket_size );
+                if( !p_block )
+                    return;
+
+                memcpy( p_block->p_buffer, p_frame, p_sys->i_subpacket_size );
+                p_block->i_dts = VLC_TICK_INVALID;
+                p_block->i_pts = VLC_TICK_INVALID;
+                if( p_sys->i_subpacket == 0 )
+                {
+                    p_tk->i_last_dts =
+                    p_block->i_pts = i_pts;
+                }
+                p_sys->p_subpackets[i_index] = p_block;
             }
 
             p_frame += p_sys->i_subpacket_size;
             size -=  p_sys->i_subpacket_size;
 
             p_sys->i_subpacket++;
-            p_sys->p_subpackets[i_index] = p_block;
         }
     }
     else
@@ -236,8 +240,11 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
     {
         for( size_t i = 0; i < p_sys->i_subpackets; i++)
         {
-            send_Block( p_demux, p_tk, p_sys->p_subpackets[i], 1, 0 );
-            p_sys->p_subpackets[i] = NULL;
+            if (likely(p_sys->p_subpackets[i]))
+            {
+                send_Block( p_demux, p_tk, p_sys->p_subpackets[i], 1, 0 );
+                p_sys->p_subpackets[i] = NULL;
+            }
         }
         p_sys->i_subpacket = 0;
     }
