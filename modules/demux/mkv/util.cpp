@@ -174,7 +174,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
 
     if( p_tk->i_last_dts == VLC_TICK_INVALID )
     {
-        for( size_t i = 0; i < p_sys->i_subpackets; i++)
+        for( size_t i = 0; i < p_sys->p_subpackets.size(); i++)
             if( p_sys->p_subpackets[i] )
             {
                 block_Release(p_sys->p_subpackets[i]);
@@ -202,7 +202,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
         {
             size_t i_index = (size_t) p_sys->i_sub_packet_h * i +
                           ((p_sys->i_sub_packet_h + 1) / 2) * (y&1) + (y>>1);
-            if( i_index >= p_sys->i_subpackets )
+            if( unlikely(i_index >= p_sys->p_subpackets.size()) )
                 return;
 
             if( size < p_sys->i_subpacket_size )
@@ -236,9 +236,9 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
     {
         /*TODO*/
     }
-    if( p_sys->i_subpacket == p_sys->i_subpackets )
+    if( p_sys->i_subpacket == p_sys->p_subpackets.size() )
     {
-        for( size_t i = 0; i < p_sys->i_subpackets; i++)
+        for( size_t i = 0; i < p_sys->p_subpackets.size(); i++)
         {
             if (likely(p_sys->p_subpackets[i]))
             {
@@ -468,25 +468,17 @@ int32_t Cook_PrivateTrackData::Init()
     if (bytes.hasErrors())
         return 0;
 
-    i_subpackets = (size_t) i_sub_packet_h * (size_t) i_frame_size / (size_t) i_subpacket_size;
-    p_subpackets = static_cast<block_t**> ( calloc(i_subpackets, sizeof(block_t*)) );
-
-    if( unlikely( !p_subpackets ) )
-    {
-        i_subpackets = 0;
-        return 1;
-    }
+    size_t i_subpackets = (size_t) i_sub_packet_h * (size_t) i_frame_size / (size_t) i_subpacket_size;
+    p_subpackets.resize(i_subpackets);
 
     return 0;
 }
 
 Cook_PrivateTrackData::~Cook_PrivateTrackData()
 {
-    for( size_t i = 0; i < i_subpackets; i++ )
+    for( size_t i = 0; i < p_subpackets.size(); i++ )
         if( p_subpackets[i] )
             block_Release( p_subpackets[i] );
-
-    free( p_subpackets );
 }
 
 static inline void fill_wvpk_block(uint16_t version, uint32_t block_samples, uint32_t flags,

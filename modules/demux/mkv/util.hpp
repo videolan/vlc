@@ -109,8 +109,7 @@ public:
     uint16_t i_bitspersample;
     uint16_t i_channels;
 
-    block_t  **p_subpackets = NULL;
-    size_t   i_subpackets = 0;
+    std::vector<block_t *> p_subpackets;
     size_t   i_subpacket = 0;
 private:
     ByteReader bytes;
