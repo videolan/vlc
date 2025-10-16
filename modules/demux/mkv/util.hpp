@@ -91,42 +91,6 @@ private:
 };
 
 #define SIZEOF_REALAUDIO_PRIVATE  (4+2+2+12+2+2+4+(3*4)+2+2+2+2)
-struct real_audio_private
-{
-    uint32_t fourcc;
-    uint16_t version;
-    uint16_t unknown1;
-    uint8_t  unknown2[12];
-    uint16_t unknown3;
-    uint16_t flavor;
-    uint32_t coded_frame_size;
-    uint32_t unknown4[3];
-    uint16_t sub_packet_h;
-    uint16_t frame_size;
-    uint16_t sub_packet_size;
-    uint16_t unknown5;
-};
-
-struct real_audio_private_v4
-{
-    real_audio_private header;
-    uint16_t sample_rate;
-    uint16_t unknown;
-    uint16_t sample_size;
-    uint16_t channels;
-};
-
-
-struct real_audio_private_v5
-{
-    real_audio_private header;
-    uint32_t unknown1;
-    uint16_t unknown2;
-    uint16_t sample_rate;
-    uint16_t unknown3;
-    uint16_t sample_size;
-    uint16_t channels;
-};
 
 class Cook_PrivateTrackData : public PrivateTrackData
 {
