@@ -2157,6 +2157,8 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 
             if (i_codec == VLC_CODEC_COOK || i_codec == VLC_CODEC_ATRAC3)
                 p_tk->fmt.audio.i_blockalign = p_realaudio->i_subpacket_size;
+            else // VLC_CODEC_RA_288
+                p_tk->fmt.audio.i_blockalign = p_realaudio->coded_frame_size;
 
             p_tk->fmt.audio.i_rate          = p_realaudio->i_rate;
             p_tk->fmt.audio.i_bitspersample = p_realaudio->i_bitspersample;

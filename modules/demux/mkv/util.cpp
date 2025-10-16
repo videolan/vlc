@@ -438,7 +438,7 @@ int32_t Cook_PrivateTrackData::Init()
     bytes.skip(12);                     // unknown2
     bytes.skip(2);                      // unknown3
     bytes.skip(2);                      // flavor
-    bytes.skip(4);                      // coded_frame_size
+    coded_frame_size = bytes.GetBE32(); // coded_frame_size
     bytes.skip(3*4);                    // unknown4
     i_sub_packet_h   = bytes.GetBE16(); // sub_packet_h
     i_frame_size     = bytes.GetBE16(); // frame_size

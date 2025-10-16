@@ -100,6 +100,7 @@ public:
     ~Cook_PrivateTrackData();
     int32_t Init();
 
+    uint32_t coded_frame_size;
     uint16_t i_sub_packet_h;
     uint16_t i_frame_size;
     uint16_t i_subpacket_size;
