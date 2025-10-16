@@ -186,6 +186,15 @@ case $OS in
            esac
         fi
         ;;
+      xros)
+        if test -z "$SIMULATOR"; then
+          case $ARCH in
+            aarch64|arm64)
+              return_triplet aarch64-apple-visionos
+              ;;
+           esac
+        fi
+        ;;
 
     esac
     abort_err "Unsupported Darwin triplet '$TRIPLET' for '$DARWIN'"
