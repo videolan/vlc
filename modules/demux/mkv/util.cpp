@@ -169,7 +169,7 @@ block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)
 void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, vlc_tick_t i_pts)
 {
     uint8_t * p_frame = p_blk->p_buffer;
-    Cook_PrivateTrackData * p_sys = (Cook_PrivateTrackData *) p_tk->p_sys;
+    Cook_PrivateTrackData * p_sys = static_cast<Cook_PrivateTrackData *>(p_tk->p_sys);
     size_t size = p_blk->i_buffer;
 
     if( p_tk->i_last_dts == VLC_TICK_INVALID )
