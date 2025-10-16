@@ -2127,7 +2127,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             ONLY_FMT(AUDIO);
             uint8_t *p = vars.p_tk->p_extra_data;
 
-            if (vars.p_tk->i_extra_data <= sizeof(real_audio_private))
+            if (vars.p_tk->i_extra_data <= SIZEOF_REALAUDIO_PRIVATE)
                 return false;
 
             if( memcmp( p, ".ra", 3 ) ) {

@@ -39,6 +39,7 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
 int UpdatePCR( demux_t * p_demux );
 
 
+#define SIZEOF_REALAUDIO_PRIVATE  (4+2+2+12+2+2+4+(3*4)+2+2+2+2)
 struct real_audio_private
 {
     uint32_t fourcc;
