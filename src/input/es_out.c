@@ -2259,6 +2259,7 @@ static es_out_id_t *EsOutAddLocked(es_out_sys_t *p_sys,
     vlc_mouse_Init(&es->oldmouse);
     es->mouse_event_cb = MouseEventCb;
     es->mouse_event_userdata = es;
+    es->mouse_being_dragged = false;
     es->i_pts_level = VLC_TICK_INVALID;
     es->delay = VLC_TICK_MAX;
 
