@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.8.0
+LIBARCHIVE_VERSION := 3.8.2
 LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
@@ -37,7 +37,6 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-zstd-use-GetNativeSystemInfo-to-get-the-number-of-th.patch
-	$(APPLY) $(SRC)/libarchive/0001-cmake-add-uuid-library-when-using-xmllite.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
