@@ -57,7 +57,7 @@ private:
 
     QTabWidget *infoTabW;
 
-    InputStatsPanel *ISP;
+    InputStatsPanel *ISP = nullptr;
     MetaPanel *MP;
     InfoPanel *IP;
     ExtraMetaPanel *EMP;
