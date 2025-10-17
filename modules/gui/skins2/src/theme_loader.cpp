@@ -365,7 +365,7 @@ bool ThemeLoader::findFile( const std::string &rootDir, const std::string &rFile
                 // Found the theme file?
                 if( rFileName == std::string( pszDirContent ) )
                 {
-                    themeFilePath = newURI;
+                    themeFilePath = std::move(newURI);
                     vlc_closedir( pCurrDir );
                     return true;
                 }
