@@ -831,7 +831,7 @@ int SkinParser::convertInRange( const char *value, int minValue, int maxValue,
 }
 
 
-const std::string SkinParser::generateId() const
+std::string SkinParser::generateId() const
 {
     static int i = 1;
 
@@ -844,7 +844,7 @@ const std::string SkinParser::generateId() const
 }
 
 
-const std::string SkinParser::uniqueId( const std::string &id )
+std::string SkinParser::uniqueId( const std::string &id )
 {
     std::string newId;
 

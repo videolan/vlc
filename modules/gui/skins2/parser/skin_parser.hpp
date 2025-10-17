@@ -91,10 +91,10 @@ private:
     //@}
 
     /// Generate a new id
-    const std::string generateId() const;
+    std::string generateId() const;
 
     /// Check if the id is unique, and if not generate a new one
-    const std::string uniqueId( const std::string &id );
+    std::string uniqueId( const std::string &id );
 
     /// Management of relative positions
     void getRefDimensions( int &rWidth, int &rHeight, bool toScreen ) const;
