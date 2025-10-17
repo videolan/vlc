@@ -31,7 +31,7 @@
 #include "file_bitmap.hpp"
 
 FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
-                        std::string fileName, uint32_t aColor, int nbFrames,
+                        const std::string &fileName, uint32_t aColor, int nbFrames,
                         int fps, int nbLoops ):
     GenericBitmap( pIntf, nbFrames, fps, nbLoops ), m_width( 0 ), m_height( 0 ),
     m_pData( NULL )
@@ -42,16 +42,18 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
 
     video_format_Init( &fmt_out, VLC_CODEC_RGBA );
 
+    std::string uriName = fileName;
+
     if( strstr( fileName.c_str(), "://" ) == NULL )
     {
         char *psz_uri = vlc_path2uri( fileName.c_str(), NULL );
         if( !psz_uri )
             return;
-        fileName = psz_uri;
+        uriName = psz_uri;
         free( psz_uri );
     }
 
-    pPic = image_ReadUrl( pImageHandler, fileName.c_str(), &fmt_out );
+    pPic = image_ReadUrl( pImageHandler, uriName.c_str(), &fmt_out );
     if( !pPic )
     {
         video_format_Clean( &fmt_out );
