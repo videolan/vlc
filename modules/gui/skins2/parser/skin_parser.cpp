@@ -869,7 +869,7 @@ const std::string SkinParser::uniqueId( const std::string &id )
     return newId;
 }
 
-void SkinParser::getRefDimensions( int &rWidth, int &rHeight, bool toScreen )
+void SkinParser::getRefDimensions( int &rWidth, int &rHeight, bool toScreen ) const
 {
     if( toScreen )
     {
@@ -905,7 +905,7 @@ void SkinParser::getRefDimensions( int &rWidth, int &rHeight, bool toScreen )
 }
 
 
-int SkinParser::getDimension( std::string value, int refDimension )
+int SkinParser::getDimension( const std::string &value, int refDimension )
 {
     std::string::size_type leftPos;
 
@@ -927,7 +927,7 @@ int SkinParser::getDimension( std::string value, int refDimension )
 }
 
 
-int SkinParser::getPosition( std::string position )
+int SkinParser::getPosition( const std::string &position ) const
 {
     if( position == "-1" )
         return POS_UNDEF;
@@ -956,10 +956,10 @@ int SkinParser::getPosition( std::string position )
 }
 
 
-void SkinParser::convertPosition( std::string position, std::string xOffset,
-                          std::string yOffset, std::string xMargin,
-                          std::string yMargin, int width, int height,
-                          int refWidth, int refHeight, int* p_x, int* p_y )
+void SkinParser::convertPosition( const std::string &position, const std::string &xOffset,
+                          const std::string &yOffset, const std::string &xMargin,
+                          const std::string &yMargin, int width, int height,
+                          int refWidth, int refHeight, int* p_x, int* p_y ) const
 {
     int iPosition = getPosition( position );
     if( iPosition != POS_UNDEF )

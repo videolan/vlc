@@ -97,16 +97,16 @@ private:
     const std::string uniqueId( const std::string &id );
 
     /// Management of relative positions
-    void getRefDimensions( int &rWidth, int &rHeight, bool toScreen );
-    int getDimension( std::string value, int refDimension );
-    int getPosition( std::string value );
+    void getRefDimensions( int &rWidth, int &rHeight, bool toScreen ) const;
+    static int getDimension( const std::string &value, int refDimension );
+    int getPosition( const std::string &value ) const;
     void updateWindowPos( int width, int height );
 
-    void convertPosition( std::string position,
-                          std::string xOffset, std::string yOffset,
-                          std::string xMargin, std::string yMargin,
+    void convertPosition( const std::string &position,
+                          const std::string &xOffset, const std::string &yOffset,
+                          const std::string &xMargin, const std::string &yMargin,
                           int width, int height, int refWidth, int refHeight,
-                          int* p_x, int* p_y );
+                          int* p_x, int* p_y ) const;
 
     /// Helper for handleBeginElement: Provide default attribute if missing.
     static void DefaultAttr( AttrList_t &attr, const char *a, const char *b )
