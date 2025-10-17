@@ -87,7 +87,7 @@ void ExprEvaluator::parse( const std::string &rExpr )
                     // Pop the stack
                     std::string lastOp = opStack.back();
                     opStack.pop_back();
-                    m_stack.push_back( lastOp );
+                    m_stack.push_back( std::move(lastOp) );
                 }
                 opStack.push_back( token );
             }
