@@ -34,7 +34,7 @@ class CmdCallback : public CmdGeneric
 public:
     CmdCallback( intf_thread_t *pIntf, vlc_value_t newVal,
                  void (VlcProc::*func)(vlc_value_t),
-                 std::string label )
+                 const std::string &label )
         : CmdGeneric( pIntf ), m_newVal( newVal ),
           m_label( label ), m_pfExecute( func )
     {
