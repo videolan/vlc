@@ -33,7 +33,7 @@ class ArtBitmap: public FileBitmap
 {
 public:
 
-    std::string getUriName() { return m_uriName; }
+    std::string getUriName() const { return m_uriName; }
 
     /// Constructor/destructor
     ArtBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,

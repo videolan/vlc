@@ -69,7 +69,7 @@ ArtManager::~ArtManager( )
     }
 
     std::list<ArtBitmap*>::const_iterator it;
-    for( it = m_listBitmap.begin(); it != m_listBitmap.end(); ++it )
+    for( it = m_listBitmap.cbegin(); it != m_listBitmap.cend(); ++it )
         delete *it;
     m_listBitmap.clear();
 }
@@ -85,7 +85,7 @@ ArtBitmap* ArtManager::getArtBitmap( const std::string &uriName )
 
     // check whether art is already loaded
     std::list<ArtBitmap*>::const_iterator it;
-    for( it = m_listBitmap.begin(); it != m_listBitmap.end(); ++it )
+    for( it = m_listBitmap.cbegin(); it != m_listBitmap.cend(); ++it )
     {
         if( (*it)->getUriName() == uriName )
             return *it;
