@@ -41,7 +41,7 @@ SUFFIXES += .air .metal
 
 metal_verbose = $(metal_verbose_$(V))
 metal_verbose_ = $(metal_verbose__$(AM_DEFAULT_VERBOSITY))
-metal_verbose_0 = @echo "  METAL     " $@;
+metal_verbose_0 = @echo "  METAL   " $@;
 metal_verbose__0 = $(metal_verbose_0)
 
 # Rule to compile .metal to .air
@@ -51,7 +51,7 @@ metal_verbose__0 = $(metal_verbose_0)
 
 metallib_verbose = $(metallib_verbose_$(V))
 metallib_verbose_ = $(metallib_verbose__$(AM_DEFAULT_VERBOSITY))
-metallib_verbose_0 = @echo "  METALLIB " $@;
+metallib_verbose_0 = @echo " METALLIB " $@;
 metallib_verbose__0 = $(metallib_verbose_0)
 
 libmacosx_plugin_la_METAL_srcs = gui/macosx/shaders/VLCSnowShader.metal

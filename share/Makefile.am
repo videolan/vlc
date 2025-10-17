@@ -163,7 +163,7 @@ skins2/default.vlt: $(skins2_default_vlt_FILES)
 #
 luac_verbose = $(luac_verbose_$(V))
 luac_verbose_ = $(luac_verbose_$(AM_DEFAULT_VERBOSITY))
-luac_verbose_0 = @echo "  LUAC   $@";
+luac_verbose_0 = @echo "  LUAC     $@";
 
 .lua.luac:
 	$(AM_V_at)for f in $(EXTRA_DIST); do \

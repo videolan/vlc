@@ -1505,7 +1505,7 @@ libqml_module_widgets_a_SOURCES = $(libqml_module_widgets_a_QML)
 
 cachegen_verbose = $(cachegen_verbose_$(V))
 cachegen_verbose_ = $(cachegen_verbose__$(AM_DEFAULT_VERBOSITY))
-cachegen_verbose_0 = @echo "CACHEGEN" $@;
+cachegen_verbose_0 = @echo " CACHEGEN " $@;
 cachegen_verbose__0 = $(cachegen_verbose_0)
 
 if HAVE_QT67

@@ -771,10 +771,10 @@ checkheaders.h   = $(pluginsinclude_HEADERS.h:../include/%=checkheader_%.check)
 checkheaders.hpp = $(pluginsinclude_HEADERS.hpp:../include/%=checkheader_%.check)
 checkheaders.all = $(checkheaders.h) $(checkheaders.hpp)
 
-$(checkheaders.all): checkheader_verbose_0 = @echo "  CHECK  $(@:checkheader_%.check=%)";
-$(checkheaders.all): skip_checkheader_verbose_0 = @echo "  CHECK  $(@:checkheader_%.check=%) (SKIPPED)";
-#$(checkheaders.hpp): checkheader_verbose_0 = @echo "  CHECK  $(@:checkheader_%_hpp=%.hpp)";
-#$(checkheaders.hpp): skip_checkheader_verbose_0 = @echo "  CHECK  $(@:checkheader_%_hpp=%.hpp) (SKIPPED)";
+$(checkheaders.all): checkheader_verbose_0 = @echo "  CHECK    $(@:checkheader_%.check=%)";
+$(checkheaders.all): skip_checkheader_verbose_0 = @echo "  CHECK    $(@:checkheader_%.check=%) (SKIPPED)";
+#$(checkheaders.hpp): checkheader_verbose_0 = @echo "  CHECK    $(@:checkheader_%_hpp=%.hpp)";
+#$(checkheaders.hpp): skip_checkheader_verbose_0 = @echo "  CHECK    $(@:checkheader_%_hpp=%.hpp) (SKIPPED)";
 
 nodist_check_SCRIPTS = $(checkheaders.all)
 MOSTLYCLEANFILES += \

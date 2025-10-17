@@ -104,7 +104,7 @@ libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc $(top_srcdir)/extras/package/win32
 
 checkheader_verbose = $(checkheader_verbose_$(V))
 checkheader_verbose_ = $(checkheader_verbose_$(AM_DEFAULT_VERBOSITY))
-checkheader_verbose_0 = @echo "  CHECK  $(@:checkheader_%_h=vlc/%.h)";
+checkheader_verbose_0 = @echo "  CHECK    $(@:checkheader_%_h=vlc/%.h)";
 checkheader_verbose__0 = $(checkheader_verbose_0)
 nodist_check_SCRIPTS = $(pkginclude_HEADERS:../include/vlc/%.h=checkheader_%_h)
 MOSTLYCLEANFILES = \
