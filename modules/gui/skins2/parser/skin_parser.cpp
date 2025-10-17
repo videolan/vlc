@@ -387,7 +387,7 @@ void SkinParser::handleBeginElement( const std::string &rName, AttrList_t &attr 
         m_curLayer++;
         m_pData->m_listPanel.push_back( panel );
         // Add the panel to the stack
-        m_panelStack.push_back( panelId );
+        m_panelStack.push_back( std::move(panelId) );
     }
 
     else if( rName == "Playlist" )
@@ -1017,5 +1017,5 @@ void SkinParser::updateWindowPos( int width, int height )
                      width, height, refWidth, refHeight,
                      &win.m_xPos, &win.m_yPos );
 
-    m_pData->m_listWindow.push_back( win );
+    m_pData->m_listWindow.push_back( std::move(win) );
 }
