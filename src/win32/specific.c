@@ -49,7 +49,7 @@ static int system_InitWSA(int hi, int lo)
 }
 
 /**
- * Initializes MME timer, Winsock.
+ * Initializes Winsock.
  */
 void system_Init(void)
 {
