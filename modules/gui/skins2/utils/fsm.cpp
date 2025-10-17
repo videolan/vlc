@@ -53,7 +53,7 @@ void FSM::addTransition( const std::string &state1, const std::string &event,
         return;
     }
 
-    m_transitions[key] = data;
+    m_transitions[key] = std::move(data);
 }
 
 
