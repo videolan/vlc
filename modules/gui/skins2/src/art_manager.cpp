@@ -75,7 +75,7 @@ ArtManager::~ArtManager( )
 }
 
 
-ArtBitmap* ArtManager::getArtBitmap( std::string uriName )
+ArtBitmap* ArtManager::getArtBitmap( const std::string &uriName )
 {
     if( !uriName.size() )
         return NULL;

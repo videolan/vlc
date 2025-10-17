@@ -37,7 +37,7 @@ public:
 
     /// Constructor/destructor
     ArtBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
-               std::string uriName ) :
+               const std::string &uriName ) :
         FileBitmap( pIntf, pImageHandler, uriName, -1 ),
         m_uriName( uriName ) {}
     virtual ~ArtBitmap() {}
@@ -60,7 +60,7 @@ public:
     static void destroy( intf_thread_t *pIntf );
 
     /// Retrieve for the art file from uri name
-    ArtBitmap* getArtBitmap( std::string uriName );
+    ArtBitmap* getArtBitmap( const std::string &uriName );
 
 protected:
     // Protected because it is a singleton
