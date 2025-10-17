@@ -67,7 +67,7 @@ void X11DragDrop::dndEnter( ldata_t data )
         for( unsigned long i=0; i<nitems; i++ )
         {
             std::string dataType = XGetAtomName( XDISPLAY, dataList[i] );
-            dataTypes.push_back( dataType );
+            dataTypes.push_back( std::move(dataType) );
         }
         XFree( (void*)dataList );
     }
@@ -78,7 +78,7 @@ void X11DragDrop::dndEnter( ldata_t data )
             if( data[i] != None )
             {
                 std::string dataType = XGetAtomName( XDISPLAY, data[i] );
-                dataTypes.push_back( dataType );
+                dataTypes.push_back( std::move(dataType) );
             }
         }
     }
