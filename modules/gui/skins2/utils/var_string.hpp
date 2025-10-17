@@ -40,7 +40,7 @@ public:
     virtual const std::string &getType() const { return m_type; }
 
     /// Set the internal value
-    virtual void set( std::string str );
+    virtual void set( const std::string &str );
     virtual std::string get() const { return m_value; }
 
 private:

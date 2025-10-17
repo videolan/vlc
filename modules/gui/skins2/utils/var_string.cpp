@@ -26,7 +26,7 @@
 const std::string VarString::m_type = "string";
 
 
-void VarString::set( std::string str )
+void VarString::set( const std::string &str )
 {
     // If the value has changed, notify the observers
     if( m_value != str )
