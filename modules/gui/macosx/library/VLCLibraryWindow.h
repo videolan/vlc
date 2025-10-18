@@ -52,7 +52,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryViewModeSegment) {
     VLCLibraryLargestSentinelViewModeSegment
 };
 
-@interface VLCLibraryWindow : VLCFullVideoViewWindow<NSUserInterfaceItemIdentification, VLCDragDropTarget, VLCLibraryItemPresentingCapable>
+@interface VLCLibraryWindow : VLCFullVideoViewWindow<NSUserInterfaceItemIdentification, VLCDragDropTarget, VLCLibraryItemPresentingCapable, NSSearchFieldDelegate>
 
 extern const CGFloat VLCLibraryWindowMinimalWidth;
 extern const CGFloat VLCLibraryWindowMinimalHeight;

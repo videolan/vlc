@@ -101,7 +101,7 @@ const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
-@interface VLCLibraryWindow ()
+@interface VLCLibraryWindow () <NSControlTextEditingDelegate>
 {
     NSInteger _currentSelectedViewModeSegment;
     VLCVideoWindowCommon *_temporaryAudioDecorativeWindow;
@@ -206,6 +206,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self setViewForSelectedSegment];
     [self setupLoadingOverlayView];
+
+    self.librarySearchField.delegate = self;
 }
 
 - (void)dealloc
@@ -374,6 +376,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                                            selector:@selector(updateFilterString)
                                                            userInfo:nil
                                                             repeats:NO];
+    
+    // Trigger completions
+    NSText * const fieldEditor = self.librarySearchField.currentEditor;
+    if (fieldEditor) {
+        [fieldEditor complete:sender];
+    }
 }
 
 - (void)updateFilterString
@@ -690,6 +698,47 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     [super mouseMoved:o_event];
+}
+
+#pragma mark - NSControlTextEditingDelegate
+
+- (NSArray<NSString *> *)control:(NSControl *)control
+                         textView:(NSTextView *)textView
+                      completions:(NSArray<NSString *> *)words
+              forPartialWordRange:(NSRange)charRange
+              indexOfSelectedItem:(NSInteger *)index
+{
+    // Get the partial word being completed
+    NSString * const currentText = textView.string;
+    NSString * const partialWord = [currentText substringWithRange:charRange];
+    
+    if (partialWord.length == 0) {
+        return @[];
+    }
+    
+    NSMutableSet<NSString *> * const suggestionStrings = NSMutableSet.set;
+    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    
+    // Collect all titles that match the partial word
+    NSArray<VLCMediaLibraryMediaItem *> * const videos = libraryModel.listOfVideoMedia;
+    for (VLCMediaLibraryMediaItem * const video in videos) {
+        NSString * const title = video.displayString;
+        if (title && [title.lowercaseString hasPrefix:partialWord.lowercaseString]) {
+            [suggestionStrings addObject:title];
+        }
+    }
+    
+    NSArray<VLCMediaLibraryMediaItem *> * const audioMedia = libraryModel.listOfAudioMedia;
+    for (VLCMediaLibraryMediaItem * const audio in audioMedia) {
+        NSString * const title = audio.displayString;
+        if (title && [title.lowercaseString hasPrefix:partialWord.lowercaseString]) {
+            [suggestionStrings addObject:title];
+        }
+    }
+    
+    NSArray<NSString *> * const sortedSuggestions = [suggestionStrings.allObjects sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    NSArray<NSString *> * const limitedSuggestions = [sortedSuggestions subarrayWithRange:NSMakeRange(0, MIN(sortedSuggestions.count, 5))];
+    return limitedSuggestions;
 }
 
 #pragma mark -
