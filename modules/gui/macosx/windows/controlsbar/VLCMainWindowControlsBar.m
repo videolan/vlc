@@ -70,12 +70,12 @@
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         NSGlassEffectView * const glassEffectView = [[NSGlassEffectView alloc] init];
         glassEffectView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.bottomBarView addSubview:glassEffectView positioned:NSWindowBelow relativeTo:self.dropView];
-        [self.visualEffectView removeFromSuperview];
+        self.bottomBarView.subviews = @[glassEffectView];
         glassEffectView.contentView = self.dropView;
         [glassEffectView applyConstraintsToFillSuperview];
         glassEffectView.cornerRadius = CGFLOAT_MAX;
         self.bottomBarView.drawBorder = NO;
+        self.bottomBarView.clipsToBounds = NO;
 #endif
     } else {
         self.visualEffectView.wantsLayer = YES;
