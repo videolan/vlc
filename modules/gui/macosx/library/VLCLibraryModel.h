@@ -147,6 +147,8 @@ extern NSString * const VLCLibraryModelDiscoveryFailed;
 @property (readonly) size_t numberOfFavoriteGenres;
 @property (readonly) NSArray <VLCMediaLibraryGenre *> *listOfFavoriteGenres;
 
+@property (readonly) NSArray <NSString *> *listOfMediaTitles;
+
 @end
 
 NS_ASSUME_NONNULL_END

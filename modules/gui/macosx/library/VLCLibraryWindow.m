@@ -716,29 +716,28 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         return @[];
     }
     
-    NSMutableSet<NSString *> * const suggestionStrings = NSMutableSet.set;
+    // Get cached titles from library model
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    if (!libraryModel) {
+        return @[];
+    }
     
-    // Collect all titles that match the partial word
-    NSArray<VLCMediaLibraryMediaItem *> * const videos = libraryModel.listOfVideoMedia;
-    for (VLCMediaLibraryMediaItem * const video in videos) {
-        NSString * const title = video.displayString;
-        if (title && [title.lowercaseString hasPrefix:partialWord.lowercaseString]) {
-            [suggestionStrings addObject:title];
+    NSArray<NSString *> * const allTitles = libraryModel.listOfMediaTitles;
+    NSMutableArray<NSString *> * const matchingTitles = [NSMutableArray array];
+    
+    // Filter titles that match the partial word
+    for (NSString * const title in allTitles) {
+        if (![title.lowercaseString hasPrefix:partialWord.lowercaseString]) {
+            continue;
+        }
+        [matchingTitles addObject:title];
+        if (matchingTitles.count >= 5) {
+            break;
         }
     }
     
-    NSArray<VLCMediaLibraryMediaItem *> * const audioMedia = libraryModel.listOfAudioMedia;
-    for (VLCMediaLibraryMediaItem * const audio in audioMedia) {
-        NSString * const title = audio.displayString;
-        if (title && [title.lowercaseString hasPrefix:partialWord.lowercaseString]) {
-            [suggestionStrings addObject:title];
-        }
-    }
-    
-    NSArray<NSString *> * const sortedSuggestions = [suggestionStrings.allObjects sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-    NSArray<NSString *> * const limitedSuggestions = [sortedSuggestions subarrayWithRange:NSMakeRange(0, MIN(sortedSuggestions.count, 5))];
-    return limitedSuggestions;
+    *index = -1;
+    return matchingTitles;
 }
 
 #pragma mark -

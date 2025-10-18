@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCLibraryModel.h"
+#include <sys/qos.h>
 
 #import "VLCMediaLibraryFolderObserver.h"
 
@@ -103,6 +104,7 @@ NSString * const VLCLibraryModelDiscoveryFailed = @"VLCLibraryModelDiscoveryFail
     dispatch_queue_t _artistCacheModificationQueue;
     dispatch_queue_t _genreCacheModificationQueue;
     dispatch_queue_t _groupCacheModificationQueue;
+    dispatch_queue_t _mediaTitlesCacheModificationQueue;
 }
 
 @property (readwrite) NSArray<VLCMediaLibraryFolderObserver *> *folderObservers;
@@ -118,6 +120,7 @@ NSString * const VLCLibraryModelDiscoveryFailed = @"VLCLibraryModelDiscoveryFail
 @property (readwrite, nonatomic) NSArray *cachedRecentMedia;
 @property (readwrite, nonatomic) NSArray *cachedRecentAudioMedia;
 @property (readwrite, nonatomic) NSArray *cachedListOfMonitoredFolders;
+@property (readwrite, nonatomic) NSArray *cachedMediaTitles;
 
 - (void)resetCachedListOfRecentMedia;
 - (void)resetCachedListOfRecentAudioMedia;
@@ -127,6 +130,7 @@ NSString * const VLCLibraryModelDiscoveryFailed = @"VLCLibraryModelDiscoveryFail
 - (void)resetCachedListOfShows;
 - (void)resetCachedListOfGroups;
 - (void)resetCachedListOfMonitoredFolders;
+- (void)resetCachedListOfMediaTitles;
 - (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem;
 - (void)handleMediaItemAddedEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handlePlaylistAddedEvent:(const vlc_ml_event_t * const)p_event;
@@ -309,6 +313,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         _artistCacheModificationQueue = dispatch_queue_create("artistCacheModificationQueue", DISPATCH_QUEUE_CONCURRENT);
         _genreCacheModificationQueue = dispatch_queue_create("genreCacheModificationQueue", DISPATCH_QUEUE_CONCURRENT);
         _groupCacheModificationQueue = dispatch_queue_create("groupCacheModificationQueue", DISPATCH_QUEUE_CONCURRENT);
+        _mediaTitlesCacheModificationQueue = dispatch_queue_create("mediaTitlesCacheModificationQueue", DISPATCH_QUEUE_CONCURRENT);
 
         _defaultNotificationCenter = NSNotificationCenter.defaultCenter;
         [_defaultNotificationCenter addObserver:self
@@ -397,6 +402,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedAudioMedia = mediaArray;
             [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaListReset withObject:self];
+            [self resetCachedListOfMediaTitles];
         });
     });
 }
@@ -575,6 +581,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedVideoMedia = [mutableArray copy];
             [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaListReset withObject:self];
+            [self resetCachedListOfMediaTitles];
         });
     });
 }
@@ -586,6 +593,46 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
     
     return [self readCachedArray:_cachedVideoMedia fromQueue:_mediaItemCacheModificationQueue];
+}
+
+- (void)resetCachedListOfMediaTitles
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+        NSMutableSet<NSString *> * const titleSet = NSMutableSet.set;
+        
+        NSArray<VLCMediaLibraryMediaItem *> * const videos = self.listOfVideoMedia;
+        for (VLCMediaLibraryMediaItem * const video in videos) {
+            NSString * const title = video.displayString;
+            if (title) {
+                [titleSet addObject:title];
+            }
+        }
+        
+        NSArray<VLCMediaLibraryMediaItem *> * const audioMedia = self.listOfAudioMedia;
+        for (VLCMediaLibraryMediaItem * const audio in audioMedia) {
+            NSString * const title = audio.displayString;
+            if (title) {
+                [titleSet addObject:title];
+            }
+        }
+
+        NSArray<NSString *> * const sortedTitles = [titleSet.allObjects sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+
+        dispatch_barrier_async(self->_mediaTitlesCacheModificationQueue, ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                self.cachedMediaTitles = sortedTitles;
+            });
+        });
+    });
+}
+
+- (NSArray<NSString *> *)listOfMediaTitles
+{
+    if (!_cachedMediaTitles) {
+        [self resetCachedListOfMediaTitles];
+    }
+    
+    return [self readCachedArray:_cachedMediaTitles fromQueue:_mediaTitlesCacheModificationQueue];
 }
 
 - (void)getListOfRecentMediaOfType:(vlc_ml_media_type_t)type
