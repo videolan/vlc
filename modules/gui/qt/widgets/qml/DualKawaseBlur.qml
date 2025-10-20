@@ -443,6 +443,8 @@ Item {
         width: (root.viewportRect.width > 0) ? root.viewportRect.width : parent.width
         height: (root.viewportRect.height > 0) ? root.viewportRect.height : parent.height
 
+        visible: us2SourceObserver.isValid
+
         readonly property Item source: (root.configuration === DualKawaseBlur.Configuration.TwoPass) ? ds1layer : us1layer
         property rect normalRect // not necessary here, added because of the warning
         readonly property int radius: root.radius
