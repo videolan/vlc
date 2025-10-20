@@ -1,0 +1,40 @@
+From 27adb21b7b7144701db67e0ebeb978842af5ab7b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Mon, 20 Oct 2025 11:39:03 +0200
+Subject: [PATCH] CompilerABI: always do the ABI compilation as an EXECUTABLE
+
+All callers of CMAKE_DETERMINE_COMPILER_ABI pass a source
+file with a main().
+
+This fixes the c++ implicit library not detected for iOS, tvOS, watchOS, visionOS.
+---
+ Modules/CMakeDetermineCompilerABI.cmake | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Modules/CMakeDetermineCompilerABI.cmake b/Modules/CMakeDetermineCompilerABI.cmake
+index 4a75e25a92..0cf6e7c8da 100644
+--- a/Modules/CMakeDetermineCompilerABI.cmake
++++ b/Modules/CMakeDetermineCompilerABI.cmake
+@@ -68,9 +68,11 @@ function(CMAKE_DETERMINE_COMPILER_ABI lang src)
+     set(_orig_lc_all      $ENV{LC_ALL})
+     set(_orig_lc_messages $ENV{LC_MESSAGES})
+     set(_orig_lang        $ENV{LANG})
++    set(_orig_CMAKE_FEATURE_DETECTION_TARGET_TYPE ${CMAKE_TRY_COMPILE_TARGET_TYPE})
+     set(ENV{LC_ALL}      C)
+     set(ENV{LC_MESSAGES} C)
+     set(ENV{LANG}        C)
++    set(CMAKE_TRY_COMPILE_TARGET_TYPE "EXECUTABLE")
+     try_compile(CMAKE_${lang}_ABI_COMPILED
+       SOURCES ${src}
+       CMAKE_FLAGS ${CMAKE_FLAGS}
+@@ -87,6 +89,7 @@ function(CMAKE_DETERMINE_COMPILER_ABI lang src)
+     set(ENV{LC_ALL}      ${_orig_lc_all})
+     set(ENV{LC_MESSAGES} ${_orig_lc_messages})
+     set(ENV{LANG}        ${_orig_lang})
++    set(CMAKE_TRY_COMPILE_TARGET_TYPE ${_orig_CMAKE_FEATURE_DETECTION_TARGET_TYPE})
+ 
+     # Move result from cache to normal variable.
+     set(CMAKE_${lang}_ABI_COMPILED ${CMAKE_${lang}_ABI_COMPILED})
+-- 
+2.50.1 (Apple Git-155)
+
