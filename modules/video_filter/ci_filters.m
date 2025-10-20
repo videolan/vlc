@@ -139,7 +139,8 @@ static struct filter_desc       filter_desc_table[] =
         { "adjust", @"CIHueAdjust" },
         {
             { "hue", @"inputAngle", {{{-180.f, +180.f}, {+3.f, -3.f}}}, VLC_VAR_FLOAT }
-        }
+        },
+        NULL, NULL
     },
     [FILTER_ADJUST_COLOR_CONTROLS] =
     {
@@ -148,39 +149,45 @@ static struct filter_desc       filter_desc_table[] =
             { "contrast",   @"inputContrast",   {{{.0f, 2.f}, {.0f, 2.f}}},   VLC_VAR_FLOAT },
             { "brightness", @"inputBrightness", {{{.0f, 2.f}, {-1.f, +1.f}}}, VLC_VAR_FLOAT },
             { "saturation", @"inputSaturation", {{{.0f, 3.f}, {.0f, 2.7f}}},  VLC_VAR_FLOAT }
-        }
+        },
+        NULL, NULL
     },
     [FILTER_ADJUST_GAMMA] =
     {
         { "adjust", @"CIGammaAdjust" },
         {
             { "gamma", @"inputPower", {{{.01f, 1.f}, {10.f, 1.f}}, {{1.f, 10.f}, {1.f, .01f}}}, VLC_VAR_FLOAT }
-        }
+        },
+        NULL, NULL
     },
     [FILTER_INVERT] =
     {
-        { "invert", @"CIColorInvert" }
+        { "invert", @"CIColorInvert" }, { { } },
+        NULL, NULL
     },
     [FILTER_POSTERIZE] =
     {
         { "posterize", @"CIColorPosterize" },
         {
             { "posterize-level", @"inputLevels", {{{2.f, 256.f}, {2.f, 256.f}}}, VLC_VAR_INTEGER }
-        }
+        },
+        NULL, NULL
     },
     [FILTER_SEPIA] =
     {
         { "sepia", @"CISepiaTone" },
         {
             { "sepia-intensity", @"inputIntensity", {{{.0f, 255.f}, {.0f, 1.f}}}, VLC_VAR_INTEGER }
-        }
+        },
+        NULL, NULL
     },
     [FILTER_SHARPEN] =
     {
         { "sharpen", @"CISharpenLuminance" },
         {
             { "sharpen-sigma", @"inputSharpness", {{{.0f, 2.f}, {.0f, 5.f}}}, VLC_VAR_FLOAT }
-        }
+        },
+        NULL, NULL
     },
     [FILTER_PSYCHEDELIC] =
     {
@@ -190,7 +197,7 @@ static struct filter_desc       filter_desc_table[] =
     },
     [FILTER_CUSTOM] =
     {
-        { "custom" }, { { } },
+        { "custom", NULL }, { { } },
         filter_PsychedelicInit,
         filter_PsychedelicControl
     },
