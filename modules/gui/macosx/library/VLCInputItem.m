@@ -68,8 +68,8 @@ static void cb_subtree_added(input_item_t *p_item, input_item_node_t *p_node, vo
 
 static const struct input_item_parser_cbs_t parserCallbacks =
 {
-    cb_parsing_ended,
-    cb_subtree_added,
+    .on_ended = cb_parsing_ended,
+    .on_subtree_added = cb_subtree_added,
 };
 
 @implementation VLCInputItem
