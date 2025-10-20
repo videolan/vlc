@@ -159,13 +159,12 @@ static void WindowUnsetFullscreen(vlc_window_t *wnd)
 static atomic_bool b_intf_starting = false;
 
 static const struct vlc_window_operations ops = {
-    WindowEnable,
-    WindowDisable,
-    WindowResize,
-    NULL,
-    WindowSetState,
-    WindowUnsetFullscreen,
-    WindowSetFullscreen,
+    .enable = WindowEnable,
+    .disable = WindowDisable,
+    .resize = WindowResize,
+    .set_state = WindowSetState,
+    .unset_fullscreen = WindowUnsetFullscreen,
+    .set_fullscreen = WindowSetFullscreen,
 };
 
 int WindowOpen(vlc_window_t *p_wnd)
