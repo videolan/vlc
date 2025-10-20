@@ -104,6 +104,24 @@ public:
     };
     Q_ENUM(Mode)
 
+    Q_PROPERTY(bool openDialogVisible READ openDialogVisible NOTIFY openDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool firstRunDialogVisible READ firstRunDialogVisible NOTIFY firstRunDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool extendedDialogVisible READ extendedDialogVisible NOTIFY extendedDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool messagesDialogVisible READ messagesDialogVisible NOTIFY messagesDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool gotoTimeDialogVisible READ gotoTimeDialogVisible NOTIFY gotoTimeDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool vlmDialogVisible READ vlmDialogVisible NOTIFY vlmDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool helpDialogVisible READ helpDialogVisible NOTIFY helpDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool aboutDialogVisible READ aboutDialogVisible NOTIFY aboutDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool mediaInfoDialogVisible READ mediaInfoDialogVisible NOTIFY mediaInfoDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool bookmarkDialogVisible READ bookmarkDialogVisible NOTIFY bookmarkDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool podcastDialogVisible READ podcastDialogVisible NOTIFY podcastDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool pluginDialogVisible READ pluginDialogVisible NOTIFY pluginDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool egpDialogVisible READ egpDialogVisible NOTIFY egpDialogVisibleChanged FINAL)
+    Q_PROPERTY(bool prefsDialogVisible READ prefsDialogVisible NOTIFY prefsDialogVisibleChanged FINAL)
+#ifdef UPDATE_CHECK
+    Q_PROPERTY(bool updateDialogVisible READ updateDialogVisible NOTIFY updateDialogVisibleChanged FINAL)
+#endif
+
     static DialogsProvider *getInstance()
     {
         const auto instance = Singleton<DialogsProvider>::getInstance<false>();
@@ -134,11 +152,13 @@ public:
                                               bool* ok = nullptr);
 
 protected:
-    void customEvent( QEvent *);
+    void customEvent( QEvent *) override;
+
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     DialogsProvider( qt_intf_t * );
-    virtual ~DialogsProvider();
+    virtual ~DialogsProvider() override;
 
     void loadMediaFile( es_format_category_e category, int filter, const QString& dialogTitle );
 
@@ -241,9 +261,46 @@ public slots:
 public:
     void PLAppendDialog( OpenDialog::OpenTab tab = OpenDialog::OPEN_FILE_TAB );
 
+    bool openDialogVisible() const;
+    bool firstRunDialogVisible() const;
+    bool extendedDialogVisible() const;
+    bool messagesDialogVisible() const;
+    bool gotoTimeDialogVisible() const;
+    bool vlmDialogVisible() const;
+    bool helpDialogVisible() const;
+    bool aboutDialogVisible() const;
+    bool mediaInfoDialogVisible() const;
+    bool bookmarkDialogVisible() const;
+    bool podcastDialogVisible() const;
+    bool pluginDialogVisible() const;
+    bool egpDialogVisible() const;
+    bool prefsDialogVisible() const;
+#ifdef UPDATE_CHECK
+    bool updateDialogVisible() const;
+#endif
+
 signals:
     void releaseMouseEvents();
     void showToolbarEditorDialog();
+
+    //visiblity signal
+    void openDialogVisibleChanged();
+    void firstRunDialogVisibleChanged();
+    void extendedDialogVisibleChanged();
+    void messagesDialogVisibleChanged();
+    void gotoTimeDialogVisibleChanged();
+    void vlmDialogVisibleChanged();
+    void helpDialogVisibleChanged();
+    void aboutDialogVisibleChanged();
+    void mediaInfoDialogVisibleChanged();
+    void bookmarkDialogVisibleChanged();
+    void podcastDialogVisibleChanged();
+    void pluginDialogVisibleChanged();
+    void egpDialogVisibleChanged();
+    void prefsDialogVisibleChanged();
+#ifdef UPDATE_CHECK
+    void updateDialogVisibleChanged();
+#endif
 };
 
 class DialogEvent : public QEvent

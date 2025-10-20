@@ -72,6 +72,31 @@
 #define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
                                            N_("Open Folder") )
 
+#define BASE_DIALOG(X) \
+    X(prefsDialog) \
+    X(openDialog) \
+    X(firstRunDialog) \
+    X(extendedDialog) \
+    X(messagesDialog) \
+    X(gotoTimeDialog) \
+    X(vlmDialog) \
+    X(helpDialog) \
+    X(aboutDialog) \
+    X(mediaInfoDialog) \
+    X(bookmarkDialog) \
+    X(podcastDialog) \
+    X(pluginDialog)\
+    X(egpDialog)
+
+
+#ifdef UPDATE_CHECK
+#define ALL_DIALOG(X) \
+    BASE_DIALOG(X) \
+    X(updateDialog)
+#else
+#define ALL_DIALOG(X) BASE_DIALOG(X)
+#endif
+
 DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
     : QObject( NULL ), p_intf( _p_intf ), m_parser( nullptr, &input_item_parser_id_Release )
 
@@ -229,6 +254,32 @@ void DialogsProvider::customEvent( QEvent *event )
         }
     }
 }
+
+bool DialogsProvider::eventFilter(QObject *watched, QEvent *event) {
+    assert(event);
+    assert(watched);
+
+#define CASE_DIALOG(dialog) \
+    if (watched == m_ ## dialog .get()) { \
+        emit dialog ## VisibleChanged(); \
+        break;\
+    }
+
+    switch (event->type()) {
+    case QEvent::Hide:
+    case QEvent::Show:
+    case QEvent::Close:
+    case QEvent::Destroy:
+    {
+        ALL_DIALOG(CASE_DIALOG)
+        break;
+    }
+    default:
+        break;
+    }
+    return false;
+}
+
 
 /****************************************************************************
  * Individual simple dialogs
@@ -971,13 +1022,24 @@ void DialogsProvider::sendKey( int key )
 template<typename T>
 void DialogsProvider::ensureDialog(std::unique_ptr<T>& dialog)
 {
-    if (!dialog)
+    if (!dialog) {
         dialog = std::make_unique<T>(p_intf);
+        //install event filter to track visibility
+        dialog->installEventFilter(this);
+    }
 }
 
 template<typename T>
-void DialogsProvider::toggleDialogVisible(std::unique_ptr<T>& dialog)
-{
+void DialogsProvider::toggleDialogVisible(std::unique_ptr<T>& dialog) {
     ensureDialog(dialog);
     dialog->toggleVisible();
 }
+
+#define DIALOG_VISIBLE_GETTER(dialog) \
+    bool DialogsProvider:: dialog ## Visible() const { \
+        if (!m_ ## dialog) \
+            return false; \
+        return m_ ## dialog->isVisible(); \
+    }
+
+ALL_DIALOG(DIALOG_VISIBLE_GETTER)
