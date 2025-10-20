@@ -1213,6 +1213,9 @@ AS_IF([test "${enable_extra_checks}" = "yes"], [
     AC_LANG_PUSH(C++)
     AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=excess-initializers], [CXXFLAGS])
     AC_LANG_POP(C++)
+    AC_LANG_PUSH([Objective C])
+    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=excess-initializers -Werror=incompatible-pointer-types -Werror=int-conversion -Werror=implicit-int], [OBJCFLAGS])
+    AC_LANG_POP([Objective C])
 ])
 
 # Casting incompatible functions is notoriously bug prone with emscripten:
