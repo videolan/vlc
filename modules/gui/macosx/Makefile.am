@@ -59,7 +59,7 @@ libmacosx_plugin_la_METAL_AIR_FILES = $(libmacosx_plugin_la_METAL_srcs:.metal=.a
 libmacosx_plugin_la_METAL_LIBRARY = gui/macosx/Resources/Shaders.metallib
 
 $(libmacosx_plugin_la_METAL_LIBRARY): $(libmacosx_plugin_la_METAL_AIR_FILES)
-	$(AM_V_at)$(MKDIR_P) "gui/macosx/shaders"
+	$(AM_V_at)$(MKDIR_P) "gui/macosx/Resources"
 	$(metallib_verbose)$(METALLIB) $(libmacosx_plugin_la_METAL_AIR_FILES) -o $@
 
 EXTRA_DIST += $(libmacosx_plugin_la_METAL_srcs)
