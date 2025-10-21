@@ -20,7 +20,8 @@ spatialaudio: spatialaudio-$(SPATIALAUDIO_VERSION).tar.bz2 .sum-spatialaudio
 	$(UNPACK)
 	$(MOVE)
 
-SPATIALAUDIO_CONF := -DMYSOFA_ROOT_DIR=$(PREFIX) -DHAVE_MIT_HRTF=OFF
+SPATIALAUDIO_CONF := -DMYSOFA_ROOT_DIR=$(PREFIX) -DHAVE_MIT_HRTF=OFF \
+	-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 .spatialaudio: spatialaudio toolchain.cmake
 	$(CMAKECLEAN)

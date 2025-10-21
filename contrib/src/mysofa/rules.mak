@@ -23,7 +23,8 @@ mysofa: libmysofa-$(MYSOFA_VERSION).tar.gz .sum-mysofa
 	$(UNPACK)
 	$(MOVE)
 
-MYSOFA_CONF := -DBUILD_TESTS=OFF
+MYSOFA_CONF := -DBUILD_TESTS=OFF \
+	-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 .mysofa: mysofa toolchain.cmake
 	$(CMAKECLEAN)
