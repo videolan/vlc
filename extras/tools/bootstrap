@@ -15,6 +15,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 
+MIN_AUTOCONF=2.69
+MIN_AUTOMAKE=1.15
+MIN_BISON=3.0.0
+MIN_CMAKE=3.17.0
+MIN_LIBTOOL=2.4
+MIN_M4=1.4.16
+MIN_MESON=0.60.0
+MIN_NASM=2.14
+MIN_PROTOC=3.4.0
+
 export LC_ALL=
 FOUND=
 
@@ -150,23 +160,23 @@ else
 fi
 }
 
-check autoconf 2.69
-check automake 1.15
-check m4 1.4.16
-check libtool 2.4
+check autoconf $MIN_AUTOCONF
+check automake $MIN_AUTOMAKE
+check m4 $MIN_M4
+check libtool $MIN_LIBTOOL
 check pkg-config
-check cmake 3.17.0
+check cmake $MIN_CMAKE
 check yasm
 check_tar
 check_sed
-check_majmin protoc 3.4.0
+check_majmin protoc $MIN_PROTOC
 check ant
 check xz
-check bison 3.0.0
+check bison $MIN_BISON
 check flex
-check_nasm 2.14
+check_nasm $MIN_NASM
 check help2man
-check meson 0.60.0
+check meson $MIN_MESON
 check_ninja
 check gettext
 
