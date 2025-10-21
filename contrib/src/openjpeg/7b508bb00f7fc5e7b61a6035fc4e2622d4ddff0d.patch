@@ -1,0 +1,22 @@
+From 7b508bb00f7fc5e7b61a6035fc4e2622d4ddff0d Mon Sep 17 00:00:00 2001
+From: Kai Pastor <dg0yt@darc.de>
+Date: Fri, 26 Sep 2025 07:19:41 +0200
+Subject: [PATCH] Handle '-lpthread'
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7403e1891..5c5f4e5ce 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -336,7 +336,7 @@ function(get_pkgconfig_deps NAME OUT)
+     list(REMOVE_ITEM link_libs "${OPENJPEG_LIBRARY_NAME}")
+     set(deps "")
+     foreach(item IN LISTS link_libs)
+-      if(item STREQUAL "-pthread")
++      if(item STREQUAL "-pthread" OR item STREQUAL "-lpthread")
+         string(APPEND deps " ${item}")
+       else()
+         string(APPEND deps " -l${item}")
