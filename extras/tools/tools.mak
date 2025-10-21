@@ -83,8 +83,6 @@ cmake-$(CMAKE_VERSION).tar.gz:
 
 cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(UNPACK)
-	$(APPLY) $(TOOLS)/cmake-enable-ALPN-support-on-macOS-10.14.patch
-	$(APPLY) $(TOOLS)/0001-CompilerABI-always-do-the-ABI-compilation-as-an-EXEC.patch
 	$(MOVE)
 
 .buildcmake: cmake
