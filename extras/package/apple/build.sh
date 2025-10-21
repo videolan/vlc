@@ -621,8 +621,13 @@ APPL_LIBTOOL=$(xcrun -f libtool) \
 
 echo "Building needed tools (if missing)"
 
+TOOLS_BOOTSTRAP=
+if [ "$VLC_HOST_OS" = "xros" ]; then
+    TOOLS_BOOTSTRAP="$TOOLS_BOOTSTRAP --min-cmake=3.28.0"
+fi
+
 cd "$VLC_SRC_DIR/extras/tools" || abort_err "Failed cd to tools dir"
-./bootstrap || abort_err "Bootstrapping tools failed"
+./bootstrap $TOOLS_BOOTSTRAP || abort_err "Bootstrapping tools failed"
 $MAKE || abort_err "Building tools failed"
 echo ""
 
