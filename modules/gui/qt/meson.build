@@ -894,6 +894,7 @@ qml_modules += {
         'widgets/qml/ViewHeader.qml',
         'widgets/qml/ProgressIndicator.qml',
         'widgets/qml/ImageExt.qml',
+        'widgets/qml/EnhancedImageExt.qml',
         'widgets/qml/ScrollBarExt.qml',
         'widgets/qml/FastBlend.qml',
         'widgets/qml/RadioButtonExt.qml',
