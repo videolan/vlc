@@ -18,7 +18,7 @@ glew: glew-$(GLEW_VERSION).tgz .sum-glew
 
 .glew: glew toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE) -S $</build/cmake
+	$(HOSTVARS_CMAKE) $(CMAKE) -S $</build/cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

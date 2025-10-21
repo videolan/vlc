@@ -14,7 +14,7 @@ $(TARBALLS)/protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz:
 
 DEPS_protobuf = zlib $(DEPS_zlib)
 
-PROTOBUF_COMMON_CONF := -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_DEBUG_POSTFIX:STRING=
+PROTOBUF_COMMON_CONF := -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_DEBUG_POSTFIX:STRING= -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 PROTOBUF_CONF := $(PROTOBUF_COMMON_CONF)
 
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf

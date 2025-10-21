@@ -18,7 +18,7 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(APPLY) $(SRC)/taglib/0001-Implement-ID3v2-readStyle-avoid-worst-case.patch
 	$(MOVE)
 
-TAGLIB_CONF := -DBUILD_BINDINGS=OFF
+TAGLIB_CONF := -DBUILD_BINDINGS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 ifdef HAVE_WINSTORE
 TAGLIB_CONF += -DPLATFORM_WINRT=ON
 endif
