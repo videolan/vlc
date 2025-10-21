@@ -1,0 +1,58 @@
+From fba847ed1ec85661c869c4266870e76621aa19a7 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 5 Sep 2022 16:13:05 +0200
+Subject: [PATCH 1/3] add the C++ runtime to the packages to link to
+
+gcc needs libstdc++ and clang needs libc++.
+---
+ CMakeLists.txt          | 22 ++++++++++++++++++++++
+ libchromaprint.pc.cmake |  1 +
+ 2 files changed, 23 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 01b7df7..b7fc8a9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -181,6 +181,28 @@ else()
+ endif()
+ 
+ if(NOT BUILD_FRAMEWORK)
++	foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
++		if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
++			list(APPEND PKG_LIBS "${LIB}")
++		elseif(LIB MATCHES "-l:lib.*.a")
++			string(LENGTH ${LIB} LIBLEN)
++			math(EXPR LIBLEN "${LIBLEN}-8")
++			string(SUBSTRING ${LIB} 6 ${LIBLEN} DIRECT_LIB)
++			list(APPEND PKG_LIBS "-l${DIRECT_LIB}")
++		elseif(LIB MATCHES "-l.*")
++			list(APPEND PKG_LIBS "${LIB}")
++		else()
++			list(APPEND PKG_LIBS "-l${LIB}")
++		endif()
++	endforeach()
++	if(PKG_LIBS)
++		# Blacklist for MinGW-w64
++    list(REMOVE_DUPLICATES PKG_LIBS)
++		list(REMOVE_ITEM PKG_LIBS
++			"-lmingw32" "-lgcc_s" "-lgcc" "-lmoldname" "-lmingwex" "-lmingwthrd"
++			"-lmsvcrt" "-lpthread" "-ladvapi32" "-lshell32" "-luser32" "-lkernel32")
++		string(REPLACE ";" " " CHROMAPRINT_ADDITIONAL_LIBS "${PKG_LIBS}")
++	endif()
+   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libchromaprint.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc @ONLY)
+   install(
+     FILES ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc
+diff --git a/libchromaprint.pc.cmake b/libchromaprint.pc.cmake
+index dbe8f98..7c54356 100644
+--- a/libchromaprint.pc.cmake
++++ b/libchromaprint.pc.cmake
+@@ -8,5 +8,6 @@ Description: Audio fingerprint library
+ URL: http://acoustid.org/chromaprint
+ Version: @PROJECT_VERSION@
+ Libs: -L${libdir} -lchromaprint
++Libs.private: @CHROMAPRINT_ADDITIONAL_LIBS@
+ Cflags: -I${includedir}
+ 
+-- 
+2.45.1.windows.1
+

@@ -1,6 +1,6 @@
 # chromaprint
 
-CHROMAPRINT_VERSION := 1.5.1
+CHROMAPRINT_VERSION := 1.6.0
 CHROMAPRINT_URL := $(GITHUB)/acoustid/chromaprint/releases/download/v$(CHROMAPRINT_VERSION)/chromaprint-$(CHROMAPRINT_VERSION).tar.gz
 
 PKGS += chromaprint
@@ -15,8 +15,10 @@ $(TARBALLS)/chromaprint-$(CHROMAPRINT_VERSION).tar.gz:
 
 chromaprint: chromaprint-$(CHROMAPRINT_VERSION).tar.gz .sum-chromaprint
 	$(UNPACK)
-	$(APPLY) $(SRC)/chromaprint/0001-contribs-chromaprint-more-fixes-for-.pc-file.patch
-	$(APPLY) $(SRC)/chromaprint/0002-add-the-C-runtime-to-the-packages-to-link-to.patch
+	$(APPLY) $(SRC)/chromaprint/0001-add-the-C-runtime-to-the-packages-to-link-to.patch
+	$(APPLY) $(SRC)/chromaprint/0002-add-required-FFmpeg-libraries-to-the-generated-pkg-c.patch
+	$(APPLY) $(SRC)/chromaprint/0003-chromaprint-add-ability-to-link-with-VDSP-Accelerate.patch
+	$(call pkg_static,"libchromaprint.pc.cmake")
 	$(MOVE)
 
 DEPS_chromaprint = ffmpeg $(DEPS_ffmpeg)

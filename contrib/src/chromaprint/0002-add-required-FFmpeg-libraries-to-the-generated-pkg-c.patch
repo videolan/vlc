@@ -1,0 +1,60 @@
+From a1a113301d4b3ff1c67e71aa6dbbe2a19721c409 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 21 Oct 2025 12:06:23 +0200
+Subject: [PATCH 2/3] add required FFmpeg libraries to the generated pkg-config
+
+---
+ CMakeLists.txt          | 5 +++++
+ libchromaprint.pc.cmake | 1 +
+ 2 files changed, 6 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b7fc8a9..ccf0269 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -80,6 +80,7 @@ if(FFMPEG_LIBRARIES)
+   cmake_push_check_state(RESET)
+   set(CMAKE_REQUIRED_LIBRARIES ${FFMPEG_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} -lm)
+   cmake_pop_check_state()
++  list(APPEND EXTRA_PC_REQUIRES "libavcodec" "libavutil")
+ endif()
+ 
+ if(NOT FFT_LIB OR FFT_LIB STREQUAL "fftw3" OR FFT_LIB STREQUAL "fftw3f")
+@@ -128,12 +129,14 @@ if(FFT_LIB STREQUAL "vdsp")
+ elseif(FFT_LIB STREQUAL "avtx")
+   if(FFMPEG_LIBAVUTIL_TX_FOUND)
+     set(USE_AVTX ON)
++    list(APPEND EXTRA_PC_REQUIRES "libavutil")
+   else()
+     message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+   endif()
+ elseif(FFT_LIB STREQUAL "avfft")
+   if(FFMPEG_LIBAVCODEC_FFT_FOUND)
+     set(USE_AVFFT ON)
++    list(APPEND EXTRA_PC_REQUIRES "libavcodec" "libavutil")
+   else()
+     message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+   endif()
+@@ -203,6 +206,8 @@ if(NOT BUILD_FRAMEWORK)
+ 			"-lmsvcrt" "-lpthread" "-ladvapi32" "-lshell32" "-luser32" "-lkernel32")
+ 		string(REPLACE ";" " " CHROMAPRINT_ADDITIONAL_LIBS "${PKG_LIBS}")
+ 	endif()
++  list(REMOVE_DUPLICATES EXTRA_PC_REQUIRES)
++  string(REPLACE ";" " " CHROMAPRINT_REQUIRES "${EXTRA_PC_REQUIRES}")
+   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libchromaprint.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc @ONLY)
+   install(
+     FILES ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc
+diff --git a/libchromaprint.pc.cmake b/libchromaprint.pc.cmake
+index 7c54356..2772988 100644
+--- a/libchromaprint.pc.cmake
++++ b/libchromaprint.pc.cmake
+@@ -9,5 +9,6 @@ URL: http://acoustid.org/chromaprint
+ Version: @PROJECT_VERSION@
+ Libs: -L${libdir} -lchromaprint
+ Libs.private: @CHROMAPRINT_ADDITIONAL_LIBS@
++Requires: @CHROMAPRINT_REQUIRES@
+ Cflags: -I${includedir}
+ 
+-- 
+2.45.1.windows.1
+

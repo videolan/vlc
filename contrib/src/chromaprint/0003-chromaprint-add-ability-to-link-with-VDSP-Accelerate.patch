@@ -1,0 +1,43 @@
+From e46d31b90672fa5ecf5bf2a378fd66c956a6fb76 Mon Sep 17 00:00:00 2001
+From: Pavlov Konstantin <thresh@videolan.org>
+Date: Fri, 8 Dec 2017 13:12:30 +0100
+Subject: [PATCH 3/3] chromaprint: add ability to link with VDSP/Accelerate
+ Framework on macOS.
+
+---
+ CMakeLists.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ccf0269..0401a7c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -123,6 +123,7 @@ endif()
+ if(FFT_LIB STREQUAL "vdsp")
+   if(ACCELERATE_LIBRARIES)
+     set(USE_VDSP ON)
++    list(APPEND EXTRA_PC_LIBS "-F${ACCELERATE_LIBRARIES} -framework Accelerate")
+   else()
+     message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+   endif()
+@@ -184,7 +185,7 @@ else()
+ endif()
+ 
+ if(NOT BUILD_FRAMEWORK)
+-	foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
++	foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES} ${EXTRA_PC_LIBS})
+ 		if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
+ 			list(APPEND PKG_LIBS "${LIB}")
+ 		elseif(LIB MATCHES "-l:lib.*.a")
+@@ -192,7 +193,7 @@ if(NOT BUILD_FRAMEWORK)
+ 			math(EXPR LIBLEN "${LIBLEN}-8")
+ 			string(SUBSTRING ${LIB} 6 ${LIBLEN} DIRECT_LIB)
+ 			list(APPEND PKG_LIBS "-l${DIRECT_LIB}")
+-		elseif(LIB MATCHES "-l.*")
++		elseif(LIB MATCHES "-l.*" OR LIB MATCHES "-F.*")
+ 			list(APPEND PKG_LIBS "${LIB}")
+ 		else()
+ 			list(APPEND PKG_LIBS "-l${LIB}")
+-- 
+2.50.1 (Apple Git-155)
+
