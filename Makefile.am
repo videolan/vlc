@@ -60,7 +60,6 @@ EXTRA_DIST += \
 	extras/tools/tools.mak \
 	extras/tools/SHA512SUMS \
 	extras/tools/automake-clang.patch \
-	extras/tools/cmake-enable-ALPN-support-on-macOS-10.14.patch \
 	extras/tools/libtool-2.4.7-bitcode.patch \
 	extras/tools/libtool-2.4.7-clang-libs.patch \
 	extras/tools/libtool-2.4.7-response-files.patch
