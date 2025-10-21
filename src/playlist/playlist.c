@@ -85,7 +85,6 @@ vlc_playlist_Delete(vlc_playlist_t *playlist)
     assert(vlc_list_is_empty(&playlist->listeners));
 
     if (playlist->parser != NULL) {
-        vlc_preparser_Cancel(playlist->parser, VLC_PREPARSER_REQ_ID_INVALID);
         vlc_preparser_Delete(playlist->parser);
     }
 
