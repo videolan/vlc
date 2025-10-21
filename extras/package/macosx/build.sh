@@ -224,7 +224,7 @@ if [ "$REBUILD" = "yes" ]; then
     make clean
     ./bootstrap > $out
 fi
-make > $out
+make -j$JOBS > $out
 spopd
 
 #
