@@ -36,7 +36,7 @@
 #include "input/input_internal.h"
 #include "fetcher.h"
 
-union vlc_preparser_cbs
+union vlc_preparser_cbs_internal
 {
     const input_item_parser_cbs_t *parser;
     const struct vlc_thumbnailer_cbs *thumbnailer;
@@ -73,7 +73,7 @@ struct task
     input_item_t *item;
     int options;
     struct vlc_thumbnailer_arg thumb_arg;
-    union vlc_preparser_cbs cbs;
+    union vlc_preparser_cbs_internal cbs;
     void *userdata;
     vlc_preparser_req_id id;
 
@@ -94,7 +94,7 @@ struct task
 static struct task *
 TaskNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_t *item,
         int options, const struct vlc_thumbnailer_arg *thumb_arg,
-        union vlc_preparser_cbs cbs, void *userdata)
+        union vlc_preparser_cbs_internal cbs, void *userdata)
 {
     struct task *task = malloc(sizeof(*task));
     if (!task)
@@ -669,7 +669,7 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
 
     assert(cbs != NULL && cbs->on_ended != NULL);
 
-    union vlc_preparser_cbs task_cbs = {
+    union vlc_preparser_cbs_internal task_cbs = {
         .parser = cbs,
     };
 
@@ -706,7 +706,7 @@ vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
     assert(preparser->thumbnailer != NULL);
     assert(cbs != NULL && cbs->on_ended != NULL);
 
-    union vlc_preparser_cbs task_cbs = {
+    union vlc_preparser_cbs_internal task_cbs = {
         .thumbnailer = cbs,
     };
 
@@ -797,7 +797,7 @@ vlc_preparser_GenerateThumbnailToFiles( vlc_preparser_t *preparser, input_item_t
     assert(cbs != NULL && cbs->on_ended != NULL);
     assert(outputs != NULL && output_count > 0);
 
-    union vlc_preparser_cbs task_cbs = {
+    union vlc_preparser_cbs_internal task_cbs = {
         .thumbnailer_to_files = cbs,
     };
 
