@@ -1,0 +1,57 @@
+From 2bb9b9f83ac7d0daa919bbe73159d57a7d5a1a52 Mon Sep 17 00:00:00 2001
+From: yaswanthsastry <yaswanth.sastry@multicorewareinc.com>
+Date: Mon, 7 Apr 2025 11:27:36 +0530
+Subject: [PATCH 4/4] Fix for CMake Build Errors in MacOS
+
+---
+ source/CMakeLists.txt | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index 00528245d..a8e6b143b 100755
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -6,18 +6,14 @@ if(NOT CMAKE_BUILD_TYPE)
+         FORCE)
+ endif()
+ message(STATUS "cmake version ${CMAKE_VERSION}")
+-if(POLICY CMP0025)
+-    cmake_policy(SET CMP0025 OLD) # report Apple's Clang as just Clang
+-endif()
++
+ if(POLICY CMP0042)
+     cmake_policy(SET CMP0042 NEW) # MACOSX_RPATH
+ endif()
+-if(POLICY CMP0054)
+-    cmake_policy(SET CMP0054 OLD) # Only interpret if() arguments as variables or keywords when unquoted
+-endif()
++
+ 
+ project (x265)
+-cmake_minimum_required (VERSION 2.8.8) # OBJECT libraries require 2.8.8
++cmake_minimum_required (VERSION 2.8.8...3.10) # OBJECT libraries require 2.8.8
+ include(CheckIncludeFiles)
+ include(CheckFunctionExists)
+ include(CheckSymbolExists)
+@@ -168,7 +164,7 @@ if(APPLE)
+   add_definitions(-DMACOS=1)
+ endif()
+ 
+-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
++if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+     set(CLANG 1)
+ endif()
+ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+@@ -723,6 +719,9 @@ if((MSVC_IDE OR XCODE OR GCC) AND ENABLE_ASSEMBLY)
+     if(ARM OR CROSS_COMPILE_ARM)
+     # compile ARM arch asm files here
+         enable_language(ASM)
++        if(APPLE)
++            set(ARM_ARGS ${ARM_ARGS} -arch ${CMAKE_OSX_ARCHITECTURES})
++        endif()
+         foreach(ASM ${ARM_ASMS})
+ 			set(ASM_SRC ${CMAKE_CURRENT_SOURCE_DIR}/common/arm/${ASM})
+             list(APPEND ASM_SRCS ${ASM_SRC})
+-- 
+2.50.1 (Apple Git-155)
+
