@@ -15,21 +15,18 @@ $(TARBALLS)/freetype-$(FREETYPE2_VERSION).tar.xz:
 
 freetype: freetype-$(FREETYPE2_VERSION).tar.xz .sum-freetype2
 	$(UNPACK)
-	$(call pkg_static, "builds/unix/freetype2.in")
 	$(MOVE)
 
 DEPS_freetype2 = zlib $(DEPS_zlib)
 
-FREETYPE_CONF = -DFT_DISABLE_ZLIB=OFF -DFT_DISABLE_PNG=ON -DFT_DISABLE_BZIP2=ON \
-                -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=ON -DFT_DISABLE_HARFBUZZ=ON \
-                -DFT_DISABLE_BROTLI=ON
+FREETYPE_CONF := -Dpng=disabled -Dbzip2=disabled -Dharfbuzz=disabled \
+                 -Dbrotli=disabled
 
-.freetype2: freetype toolchain.cmake
+.freetype2: freetype crossfile.meson
 ifndef AD_CLAUSES
 	$(REQUIRE_GPL)
 endif
-	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE) $(FREETYPE_CONF)
-	+$(CMAKEBUILD)
-	$(CMAKEINSTALL)
+	$(MESONCLEAN)
+	$(MESON) $(FREETYPE_CONF)
+	+$(MESONBUILD)
 	touch $@
