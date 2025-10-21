@@ -51,10 +51,10 @@ Item {
     asynchronous: true
 
     property alias asynchronous: image.asynchronous
-    property alias source: image.source
+    property url source
     property alias sourceSize: image.sourceSize
     property alias sourceClipRect: image.sourceClipRect
-    property alias status: image.status
+    readonly property int status: shaderEffect.source.status
     property alias shaderStatus: shaderEffect.status
     property alias cache: image.cache
 
@@ -69,7 +69,17 @@ Item {
     // but rather as `Item`.
     // WARNING: Consumers who downcast this item to `Image` are doing this on their own
     //          discretion. It is discouraged, but not forbidden (or evil).
-    readonly property Item textureProviderItem: image
+    readonly property Item sourceTextureProviderItem: image
+    // NOTE:    It is allowed to adjust this property to use an external texture provider, where
+    //          in that case the texture provider item should provide a subset of `Image`'s
+    //          interface, that is, provide `status` and `implicitWidth`/`implicitHeight` that
+    //          reflect the texture size.
+    property Item textureProviderItem: sourceTextureProviderItem
+
+    // NOTE:    If the texture provider used does not require `ImageExt` to load the image, this
+    //          should be disabled.
+    // WARNING: In non-RHI mode, this setting is not respected.
+    property bool loadImages: (textureProviderItem === image)
 
     // Padding represents how much the content is shrunk. For now this is a readonly property.
     // Currently it only takes the `softEdgeMax` into calculation, as that's what the shader
@@ -107,6 +117,11 @@ Item {
     //       only one dimension set. Currently `fillMode` is
     //       preferred instead of `sourceSize` because we need
     //       to have control over both width and height.
+    // NOTE: Fill mode can be overridden, even when a foreign
+    //       texture provider is used. In that case, `ImageExt`
+    //       makes the required painted size calculations itself.
+    //       The mode is still subject to the same restrictions
+    //       mentioned above.
     property alias fillMode: image.fillMode
 
     // Unlike QQuickImage where it needs `clip: true` (clip node)
@@ -150,17 +165,21 @@ Item {
         anchors.alignWhenCentered: true
         anchors.centerIn: parent
 
-        implicitWidth: (image.status === Image.Ready) ? image.implicitWidth : 64
-        implicitHeight: (image.status === Image.Ready) ? image.implicitHeight : 64
+        implicitWidth: (source.status === Image.Ready) ? source.implicitWidth : 64
+        implicitHeight: (source.status === Image.Ready) ? source.implicitHeight : 64
 
-        width: ((image.status !== Image.Ready) || (image.fillMode === Image.PreserveAspectCrop)) ? root.width : image.paintedWidth
-        height: ((image.status !== Image.Ready) || (image.fillMode === Image.PreserveAspectCrop)) ? root.height : image.paintedHeight
+        width: ((source.status !== Image.Ready) || (root.fillMode === Image.PreserveAspectCrop)) ? root.width : effectivePaintedSize.width
+        height: ((source.status !== Image.Ready) || (root.fillMode === Image.PreserveAspectCrop)) ? root.height : effectivePaintedSize.height
 
         visible: readyForVisibility
 
-        readonly property bool readyForVisibility: (image.status === Image.Ready) /* TODO: investigate using TextureProviderObserver::isValid instead */ &&
+        readonly property bool readyForVisibility: (source.status === Image.Ready) &&
                                                    (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
-                                                   (root.radius > 0.0 || root.borderWidth > 0 || backgroundColor.a > 0.0 || root.fillMode === Image.PreserveAspectCrop)
+                                                   (root.radius > 0.0 ||
+                                                    root.borderWidth > 0 ||
+                                                    backgroundColor.a > 0.0 ||
+                                                    source !== image ||
+                                                    root.fillMode === Image.PreserveAspectCrop)
 
         smooth: root.smooth
 
@@ -196,28 +215,66 @@ Item {
                 return ret
 
             // No need to calculate if image is not ready
-            if (image.status !== Image.Ready)
+            if (source.status !== Image.Ready)
                 return ret
 
-            const implicitScale = implicitWidth / implicitHeight
-            const scale = width / height
+            const implicitRatio = implicitWidth / implicitHeight
+            const ratio = width / height
 
-            if (scale > implicitScale)
+            if (ratio > implicitRatio)
                 ret.height = (implicitHeight - implicitWidth) / 2 / implicitHeight
-            else if (scale < implicitScale)
+            else if (ratio < implicitRatio)
                 ret.width = (implicitWidth - implicitHeight) / 2 / implicitWidth
 
             return ret
         }
 
+        // If source is a foreign `Image`, its `paintedWidth`/`paintedHeight` would not be based on the root size and can not be used.
+        // In that case, we calculate the painted size ourselves (see `effectivePaintedSize`). We also allow overriding the source's
+        // fill mode in that case. If source is a foreign item we still do the same to allow overriding the fill mode here.
+        readonly property size effectivePaintedSize: {
+            let ret = Qt.size(0.0, 0.0)
+
+            // No need to calculate if foreign texture provider is not used:
+            if (source === image)
+                return Qt.size(source.paintedWidth, source.paintedHeight)
+
+            // No need to calculate if image is not ready
+            if (source.status !== Image.Ready)
+                return ret
+
+            // NOTE: Calculations are based on `QQuickImage`
+            // WARNING: Note that `PreserveAspectCrop` mode does not use painted size and therefore is not handled here (see `cropRate`).
+            if (root.fillMode === Image.PreserveAspectFit) {
+                const widthScale = root.width / implicitWidth
+                const heightScale = root.height / implicitHeight
+
+                if (widthScale <= heightScale) {
+                    ret.width = root.width
+                    ret.height = widthScale * implicitHeight
+                } else {
+                    ret.width = heightScale * implicitWidth
+                    ret.height = root.height
+                }
+            } else if (root.fillMode === Image.Pad) {
+                ret.width = implicitWidth
+                ret.height = implicitHeight
+            } else {
+                ret.width = root.width
+                ret.height = root.height
+            }
+
+            return ret
+        }
+
         // (2 / width) seems to be a good coefficient to make it similar to `Rectangle.border`:
-        readonly property double borderRange: (image.status === Image.Ready) ? (root.borderWidth / width * 2.) : 0.0 // no need for outlining if there is no image (nothing to outline)
+        readonly property double borderRange: (source.status === Image.Ready) ? (root.borderWidth / width * 2.) : 0.0 // no need for outlining if there is no image (nothing to outline)
         readonly property color borderColor: root.borderColor
 
         // QQuickImage as texture provider, no need for ShaderEffectSource.
         // In this case, we simply ask the Image to provide its texture,
         // so that we can make use of our custom shader.
-        readonly property Image source: image
+        readonly property Item source: root.textureProviderItem ?? image
 
         fragmentShader: (cropRate.width > 0.0 || cropRate.height > 0.0) || (root.borderWidth > 0) ? "qrc:///shaders/SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb"
                                                                                                   : "qrc:///shaders/SDFAARoundedTexture.frag.qsb"
@@ -230,6 +287,8 @@ Item {
         anchors.fill: parent
 
         smooth: root.smooth
+
+        source: (root.loadImages || (shaderEffect.GraphicsInfo.shaderType !== GraphicsInfo.RhiShader)) ? root.source : ""
 
         // Image should not be visible when there is rounding and RHI shader is supported.
         // This is simply when the shader effect is invisible. However, Do not use `!shaderEffect.visible`,
