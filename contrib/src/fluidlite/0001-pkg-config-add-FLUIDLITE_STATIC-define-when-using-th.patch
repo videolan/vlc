@@ -1,0 +1,23 @@
+From 983eac30575d93ce81505c3d0c8ac38f183f4d8c Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 22 Oct 2025 08:06:40 +0200
+Subject: [PATCH] pkg-config: add FLUIDLITE_STATIC define when using the static
+ library
+
+---
+ fluidlite.pc.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fluidlite.pc.in b/fluidlite.pc.in
+index 33b41ca..6a689ef 100644
+--- a/fluidlite.pc.in
++++ b/fluidlite.pc.in
+@@ -10,4 +10,5 @@ Version: @fluidlite_VERSION@
+ Libs: -L${libdir} -lfluidlite
+ Libs.private: @PC_LIBS@
+ Cflags: -I${includedir}
++Cflags.private: -DFLUIDLITE_STATIC
+ Requires.private: @PC_REQUIRES@
+-- 
+2.45.1.windows.1
+
