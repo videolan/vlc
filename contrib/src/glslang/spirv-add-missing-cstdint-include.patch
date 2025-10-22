@@ -1,0 +1,27 @@
+From 3a79afb1f561acfc4b2986945efa20a394f6090e Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Fri, 2 Aug 2024 22:44:21 +0100
+Subject: [PATCH] SPIRV/SpvBuilder.h: add missing <cstdint> include
+
+Without the change `glslang` build fails on upcoming `gcc-15` as:
+
+    In file included from /build/source/SPIRV/GlslangToSpv.cpp:45:
+    SPIRV/SpvBuilder.h:248:30: error: 'uint32_t' has not been declared
+      248 |     Id makeDebugLexicalBlock(uint32_t line);
+          |                              ^~~~~~~~
+---
+ SPIRV/SpvBuilder.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/SPIRV/SpvBuilder.h b/SPIRV/SpvBuilder.h
+index f86dd81b3b..d688436a6e 100644
+--- a/SPIRV/SpvBuilder.h
++++ b/SPIRV/SpvBuilder.h
+@@ -56,6 +56,7 @@ namespace spv {
+ }
+ 
+ #include <algorithm>
++#include <cstdint>
+ #include <map>
+ #include <memory>
+ #include <set>

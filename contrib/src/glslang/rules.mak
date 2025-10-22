@@ -25,6 +25,7 @@ $(TARBALLS)/glslang-$(GLSLANG_VERSION).tar.gz:
 glslang: glslang-$(GLSLANG_VERSION).tar.gz .sum-glslang
 	$(UNPACK)
 	$(APPLY) $(SRC)/glslang/glslang-win32.patch
+	$(APPLY) $(SRC)/glslang/spirv-add-missing-cstdint-include.patch
 	$(MOVE)
 
 GLSLANG_CONF := -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_CTEST=OFF
