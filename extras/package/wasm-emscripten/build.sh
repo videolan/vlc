@@ -140,8 +140,8 @@ diagnostic "vlc contribs: bootstrap"
             --disable-asdcplib --disable-caca --disable-gettext \
             --disable-goom \
             --disable-lua --disable-luac --disable-sqlite \
-            --disable-medialibrary --disable-mpcdec --disable-schroedinger \
-            --disable-orc --disable-protobuf --disable-sidplay2 \
+            --disable-medialibrary --disable-mpcdec \
+            --disable-protobuf --disable-sidplay2 \
             --disable-spatialaudio --disable-speex \
             --disable-speexdsp --disable-taglib --disable-zvbi \
             --disable-rnnoise --disable-libaribcaption \

@@ -8,7 +8,6 @@ OPTIONS="
       --enable-theora
       --enable-avcodec --enable-merge-ffmpeg
       --enable-libass
-      --enable-schroedinger
       --enable-live555
       --enable-dvdread
       --enable-shout
