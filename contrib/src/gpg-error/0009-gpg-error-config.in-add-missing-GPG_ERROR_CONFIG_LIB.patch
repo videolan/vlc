@@ -1,0 +1,27 @@
+From 3a566f07a5b89e78eff2459a6b26f7c91d609820 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 23 Oct 2025 12:20:16 +0200
+Subject: [PATCH 09/12] gpg-error-config.in: add missing
+ GPG_ERROR_CONFIG_LIBS_PRIVATE
+
+Otherwise the confirmity check fails
+---
+ src/gpg-error-config.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gpg-error-config.in b/src/gpg-error-config.in
+index 3b45928..e50a9d2 100644
+--- a/src/gpg-error-config.in
++++ b/src/gpg-error-config.in
+@@ -84,7 +84,7 @@ while test $# -gt 0; do
+             fi
+ 	    ;;
+ 	--libs)
+-	    output="$output @GPG_ERROR_CONFIG_LIBS@"
++	    output="$output @GPG_ERROR_CONFIG_LIBS@ @GPG_ERROR_CONFIG_LIBS_PRIVATE@"
+             if test $mt = yes ; then
+                 output="$output @GPG_ERROR_CONFIG_MT_LIBS@"
+             fi
+-- 
+2.45.1.windows.1
+

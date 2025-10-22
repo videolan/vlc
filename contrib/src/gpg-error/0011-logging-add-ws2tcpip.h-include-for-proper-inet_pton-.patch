@@ -1,0 +1,25 @@
+From db67d9ab41548f9f56a578dbe1c11800dd8b9487 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 23 Oct 2025 12:23:02 +0200
+Subject: [PATCH 11/12] logging: add ws2tcpip.h include for proper inet_pton
+ definition
+
+---
+ src/logging.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/logging.c b/src/logging.c
+index 4f52d80..5aded01 100644
+--- a/src/logging.c
++++ b/src/logging.c
+@@ -37,6 +37,7 @@
+ # ifdef HAVE_WINSOCK2_H
+ #  include <winsock2.h>
+ # endif
++# include <ws2tcpip.h>
+ # include <windows.h>
+ #else /*!HAVE_W32_SYSTEM*/
+ # include <sys/socket.h>
+-- 
+2.45.1.windows.1
+
