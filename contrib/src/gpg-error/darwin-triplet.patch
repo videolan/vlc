@@ -1,18 +1,36 @@
+From ff86256a860862007e6c42918a4ee5d1b858f056 Mon Sep 17 00:00:00 2001
+From: Alexandre Janniaux <ajanni@videolabs.io>
+Date: Mon, 27 Apr 2020 14:11:28 +0200
+Subject: [PATCH 01/12] fix darwin triplet handling
+
+Instead of copying the header files around, change the triplet
+canonicalization function to correctly remove version numbers for
+darwin triplets.
+
+de-versionning was done before alias selection, and armv7-apple-darwin
+wasn't aliased to arm-apple-darwin, leading to failure finding the
+correct triplet.
+---
+ src/mkheader.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
 diff --git a/src/mkheader.c b/src/mkheader.c
-index 5aeb1e7..121d029 100644
+index 2d7298c..000a224 100644
 --- a/src/mkheader.c
 +++ b/src/mkheader.c
-@@ -91,23 +91,41 @@ canon_host_triplet (const char *triplet)
+@@ -119,6 +119,8 @@ canon_host_triplet (const char *triplet, int no_vendor_hack, char **r_os)
      {"armv5-unknown-linux-musleabi"   },
      {"armv6-unknown-linux-musleabihf" },
-
+ 
 +    {"armv7-apple-darwin", "arm-apple-darwin"},
 +
      { NULL }
    };
    int i;
-   const char *lastalias = NULL;
-
+@@ -127,14 +129,29 @@ canon_host_triplet (const char *triplet, int no_vendor_hack, char **r_os)
+   char *p;
+   char *result;
+ 
 +    /* Darwin triplet de-versioning */
 +  char *res_triplet = xstrdup (triplet);
 +
@@ -37,10 +55,18 @@ index 5aeb1e7..121d029 100644
            if (!lastalias)
              break; /* Ooops: first entry has no alias.  */
 +          free(res_triplet);
-           return xstrdup (lastalias);
+           result = xstrdup (lastalias);
+           goto leave;
          }
+@@ -168,7 +185,7 @@ canon_host_triplet (const char *triplet, int no_vendor_hack, char **r_os)
+       goto leave;
      }
--  return xstrdup (triplet);
-+
-+  return res_triplet;
- }
+ 
+-  result = xstrdup (triplet);
++  result = res_triplet;
+  leave:
+   /* Find the OS part.  */
+   if (r_os)
+-- 
+2.45.1.windows.1
+

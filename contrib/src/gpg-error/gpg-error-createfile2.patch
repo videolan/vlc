@@ -1,9 +1,49 @@
---- libgpg-error/src/estream.c.uwp	2023-05-23 09:53:33.222246200 +0200
-+++ libgpg-error/src/estream.c	2023-05-22 12:00:18.105186500 +0200
-@@ -4561,6 +4561,17 @@ tmpfd (void)
- #else
+From 52f575635bed478b1c82f8a756fff6ea645cc3e3 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 23 May 2023 14:31:16 +0200
+Subject: [PATCH 05/12] use CreateFile2 in Win8 as CreateFileW is forbidden in
+ UWP
+
+---
+ src/estream.c     | 24 ++++++++++++++++++++++++
+ src/spawn-w32.c   | 12 ++++++++++++
+ src/w32-gettext.c | 10 ++++++++++
+ 3 files changed, 46 insertions(+)
+
+diff --git a/src/estream.c b/src/estream.c
+index 42027b4..a99a019 100644
+--- a/src/estream.c
++++ b/src/estream.c
+@@ -2030,6 +2030,17 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
+   else
+     creation_distribution |= OPEN_EXISTING;
+ 
++#if _WIN32_WINNT >= 0x0602 // _WIN32_WINNT_WIN8
++  CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++  memset (&createExParams, 0, sizeof(createExParams));
++  createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++  createExParams.dwFileFlags = flags_and_attrs;
++  hd = CreateFile2 (wpath,
++                    desired_access,
++                    share_mode,
++                    creation_distribution, 
++                    &createExParams);
++#else
+   hd = CreateFileW (wpath,
+                     desired_access,
+                     share_mode,
+@@ -2037,6 +2048,7 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
+                     creation_distribution,
+                     flags_and_attrs,
+                     NULL); /* template file  */
++#endif
+   if (hd == INVALID_HANDLE_VALUE)
+     {
+       _set_errno (map_w32_to_errno (GetLastError ()));
+@@ -5107,6 +5119,17 @@ tmpfd (void)
+           value <<= 4;
+         }
        strcpy (p, ".tmp");
- #endif
 +#if _WIN32_WINNT >= 0x0602 // _WIN32_WINNT_WIN8
 +      CREATEFILE2_EXTENDED_PARAMETERS params;
 +      memset (&params, 0, sizeof params);
@@ -15,48 +55,67 @@
 +                         CREATE_NEW,
 +                         &params);
 +#else
-       file = CreateFile (buffer,
+       file = CreateFileW (buffer,
                           GENERIC_READ | GENERIC_WRITE,
                           0,
-@@ -4568,6 +4579,7 @@ tmpfd (void)
+@@ -5114,6 +5137,7 @@ tmpfd (void)
                           CREATE_NEW,
                           FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
                           NULL);
 +#endif
        if (file != INVALID_HANDLE_VALUE)
          {
- #ifdef HAVE_W32CE_SYSTEM
---- libgpg-error/src/w32-gettext.c.uwp	2023-05-23 09:53:33.184247600 +0200
-+++ libgpg-error/src/w32-gettext.c	2023-05-22 11:45:24.077340000 +0200
-@@ -53,7 +53,7 @@
- #include "init.h"
- #include "gpg-error.h"
+           int fd = _open_osfhandle ((intptr_t)file, 0);
+diff --git a/src/spawn-w32.c b/src/spawn-w32.c
+index 324b5fe..eca56c0 100644
+--- a/src/spawn-w32.c
++++ b/src/spawn-w32.c
+@@ -270,10 +270,22 @@ w32_open_null (int for_write)
+ {
+   HANDLE hfile;
  
--#if defined(HAVE_W32CE_SYSTEM) || WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP)
-+#if defined(HAVE_W32CE_SYSTEM) || !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
- /* Forward declaration.  */
- static wchar_t *utf8_to_wchar (const char *string, size_t length, size_t *retlen);
- 
-@@ -72,9 +72,22 @@ MyCreateFileA (LPCSTR lpFileName, DWORD
-   if (!filename)
-     return INVALID_HANDLE_VALUE;
- 
-+#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
-+  CREATEFILE2_EXTENDED_PARAMETERS createExParams;
-+  createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
-+  createExParams.dwFileAttributes = dwFlagsAndAttributes & 0xFFFF;
-+  createExParams.dwFileFlags = dwFlagsAndAttributes & 0xFFF00000;
-+  createExParams.dwSecurityQosFlags = dwFlagsAndAttributes & 0x000F0000;
-+  createExParams.lpSecurityAttributes = lpSecurityAttributes;
-+  createExParams.hTemplateFile = hTemplateFile;
-+
-+  result = CreateFile2 (filename, dwDesiredAccess, dwSharedMode,
-+			dwCreationDisposition, &createExParams);
++#if _WIN32_WINNT >= 0x0602 // _WIN32_WINNT_WIN8
++    {
++      CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++      memset (&createExParams, 0, sizeof(createExParams));
++      createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++      hfile = CreateFile2 (L"nul",
++                           for_write? GENERIC_WRITE : GENERIC_READ,
++                           FILE_SHARE_READ | FILE_SHARE_WRITE,
++                           OPEN_EXISTING, &createExParams);
++    }
 +#else
-   result = CreateFileW (filename, dwDesiredAccess, dwSharedMode,
- 			lpSecurityAttributes, dwCreationDisposition,
- 			dwFlagsAndAttributes, hTemplateFile);
+   hfile = CreateFileW (L"nul",
+                        for_write? GENERIC_WRITE : GENERIC_READ,
+                        FILE_SHARE_READ | FILE_SHARE_WRITE,
+                        NULL, OPEN_EXISTING, 0, NULL);
 +#endif
- 
-   err = GetLastError ();
-   free (filename);
+   if (hfile == INVALID_HANDLE_VALUE)
+     _gpgrt_log_debug ("can't open 'nul': ec=%d\n", (int)GetLastError ());
+   return hfile;
+diff --git a/src/w32-gettext.c b/src/w32-gettext.c
+index 817c1ca..467abba 100644
+--- a/src/w32-gettext.c
++++ b/src/w32-gettext.c
+@@ -1216,8 +1216,18 @@ load_domain (const char *filename)
+     if (!wfilename)
+       fh = INVALID_HANDLE_VALUE;
+     else
++#if _WIN32_WINNT >= 0x0602 // _WIN32_WINNT_WIN8
++    {
++      CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++      memset (&createExParams, 0, sizeof(createExParams));
++      createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++      fh = CreateFile2 (wfilename, GENERIC_READ, FILE_SHARE_WRITE,
++                        OPEN_EXISTING, &createExParams);
++    }
++#else
+       fh = CreateFileW (wfilename, GENERIC_READ, FILE_SHARE_WRITE, NULL,
+                         OPEN_EXISTING, 0, NULL);
++#endif
+     xfree (wfilename);
+   }
+   if (fh == INVALID_HANDLE_VALUE)
+-- 
+2.45.1.windows.1
+

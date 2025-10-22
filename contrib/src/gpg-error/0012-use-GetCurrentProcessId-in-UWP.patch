@@ -1,0 +1,28 @@
+From 8709f63dd0384c67929ab2ef9c18733f78533c8b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 23 Oct 2025 12:24:20 +0200
+Subject: [PATCH 12/12] use GetCurrentProcessId() in UWP
+
+getpid() is not declared
+---
+ src/logging.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/logging.c b/src/logging.c
+index 5aded01..2cacb45 100644
+--- a/src/logging.c
++++ b/src/logging.c
+@@ -62,6 +62,10 @@
+ #  define S_IROTH S_IRUSR
+ #  define S_IWOTH S_IWUSR
+ # endif
++
++# if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++#  define getpid()  GetCurrentProcessId()
++# endif
+ #endif
+ 
+ 
+-- 
+2.45.1.windows.1
+
