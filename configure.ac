@@ -4755,6 +4755,11 @@ AS_IF([test "${enable_libgcrypt}" != "no"], [
 
   AS_IF([test "${ac_cv_lib_gcrypt}" = "yes"], [
     AC_DEFINE([HAVE_GCRYPT], 1, [Defined if having gcrypt])
+    PKG_CHECK_MODULES([GPGERROR], [gpg-error], [
+      have_gpg_error="yes"
+    ], [
+      have_gpg_error="no"
+    ])
   ], [
     AS_IF([test "${enable_libgcrypt}" = "yes"], [
       AC_MSG_ERROR([libgcrypt version 1.6.0 or higher not found. Install libgcrypt or pass --disable-libgcrypt.])
@@ -4763,7 +4768,11 @@ AS_IF([test "${enable_libgcrypt}" != "no"], [
 ])
 
 AS_IF([test -z "$GCRYPT_LIBS"], [
-  GCRYPT_LIBS="-lgcrypt -lgpg-error"
+  AS_IF([test "${have_gpg_error}" = "yes"],[
+    GCRYPT_LIBS="-lgcrypt ${GPGERROR_LIBS}"
+  ],[
+    GCRYPT_LIBS="-lgcrypt -lgpg-error"
+  ])
 ])
 
 AC_SUBST([GCRYPT_CFLAGS])
