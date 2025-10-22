@@ -3012,11 +3012,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([DAALA], [], [daaladec daalaenc], [experimental daala codec], [disabled])
 
 dnl
-dnl  schroedinger decoder plugin (for dirac format video)
-dnl
-PKG_ENABLE_MODULES_VLC([SCHROEDINGER], [], [schroedinger-1.0 >= 1.0.10], [dirac decoder and encoder using schroedinger], [auto])
-
-dnl
 dnl  OpenAPV decoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([OPENAPV], [], [oapv >= 0.2], [OpenAPV decoder], [auto])

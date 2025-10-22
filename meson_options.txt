@@ -244,11 +244,6 @@ option('mpg123',
     value : 'auto',
     description : 'Enable/disable libmpg123 support')
 
-option('schroedinger',
-    type : 'feature',
-    value : 'auto',
-    description : 'Enable/disable schroedinger support')
-
 option('openapv',
     type : 'feature',
     value : 'auto',

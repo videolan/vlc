@@ -95,14 +95,6 @@ if ENABLE_SOUT
 codec_LTLIBRARIES += librtpvideo_plugin.la
 endif
 
-
-libschroedinger_plugin_la_SOURCES = codec/schroedinger.c
-libschroedinger_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_schroedinger)
-libschroedinger_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libschroedinger_plugin_la_LIBADD = $(LIBS_schroedinger)
-EXTRA_LTLIBRARIES += libschroedinger_plugin.la
-codec_LTLIBRARIES += $(LTLIBschroedinger)
-
 libopenapv_plugin_la_SOURCES = codec/openapv.c
 libopenapv_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_openapv)
 libopenapv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'

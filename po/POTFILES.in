@@ -313,7 +313,6 @@ modules/codec/png.c
 modules/codec/qsv.c
 modules/codec/rawvideo.c
 modules/codec/rtpvideo.c
-modules/codec/schroedinger.c
 modules/codec/scte18.c
 modules/codec/scte18.h
 modules/codec/scte27.c

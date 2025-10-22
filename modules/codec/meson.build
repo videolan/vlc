@@ -157,18 +157,6 @@ vlc_modules += {
     'sources' : files('rtpvideo.c')
 }
 
-# Dirac decoder and encoder using schroedinger
-schroedinger_dep = dependency('schroedinger-1.0',
-                              version: '>= 1.0.10',
-                              required: get_option('schroedinger'))
-vlc_modules += {
-    'name' : 'schroedinger',
-    'sources' : files('schroedinger.c'),
-    'dependencies' : [schroedinger_dep],
-    'enabled' : schroedinger_dep.found(),
-}
-
-# Dirac decoder and encoder using schroedinger
 openapv_dep = dependency('oapv',
                               version: '>= 0.2',
                               required: get_option('openapv'))
