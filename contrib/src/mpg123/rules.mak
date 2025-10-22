@@ -38,6 +38,8 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
 	$(call update_autoconfig,build)
 	$(call pkg_static,"libmpg123.pc.in")
+	$(call pkg_static,"libout123.pc.in")
+	$(call pkg_static,"libsyn123.pc.in")
 	$(MOVE)
 
 .mpg123: mpg123
