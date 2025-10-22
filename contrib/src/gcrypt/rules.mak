@@ -14,6 +14,7 @@ $(TARBALLS)/libgcrypt-$(GCRYPT_VERSION).tar.bz2:
 
 gcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(UNPACK)
+	$(call pkg_static,"src/libgcrypt.pc.in")
 	$(APPLY) $(SRC)/gcrypt/disable-tests-compilation.patch
 	$(APPLY) $(SRC)/gcrypt/fix-pthread-detection.patch
 	$(APPLY) $(SRC)/gcrypt/0001-compat-provide-a-getpid-replacement-that-works-on-Wi.patch
