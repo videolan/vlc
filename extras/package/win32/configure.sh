@@ -9,7 +9,6 @@ OPTIONS="
       --enable-avcodec --enable-merge-ffmpeg
       --enable-mpc
       --enable-libass
-      --enable-schroedinger
       --enable-realrtsp
       --enable-live555
       --enable-shout
