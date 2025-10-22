@@ -87,6 +87,7 @@ class PodcastConfigDialog;
 class PluginDialog;
 class EpgDialog;
 class UpdateDialog;
+class PrefsDialog;
 
 class DialogsProvider : public QObject, public Singleton<DialogsProvider>
 {
@@ -147,6 +148,8 @@ private:
     std::unique_ptr<QMenu> videoPopupMenu;
     std::unique_ptr<QMenu> audioPopupMenu;
     std::unique_ptr<QMenu> miscPopupMenu;
+
+    QPointer<PrefsDialog> m_prefsDialog;
 
     std::unique_ptr<OpenDialog> m_openDialog;
     std::unique_ptr<FirstRunWizard> m_firstRunDialog;

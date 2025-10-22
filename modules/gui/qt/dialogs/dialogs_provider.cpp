@@ -238,17 +238,16 @@ const QEvent::Type DialogEvent::DialogEvent_Type =
 
 void DialogsProvider::prefsDialog()
 {
-    static QPointer<PrefsDialog> p;
-
-    if (Q_LIKELY(!p))
+    if (Q_LIKELY(!m_prefsDialog))
     {
-        p = new PrefsDialog( nullptr, p_intf );
-        p->setAttribute(Qt::WA_DeleteOnClose);
-        p->open();
+        m_prefsDialog = new PrefsDialog( nullptr, p_intf );
+        m_prefsDialog->setAttribute(Qt::WA_DeleteOnClose);
+        m_prefsDialog->installEventFilter(this);
+        m_prefsDialog->open();
     }
     else
     {
-        p->reject();
+        m_prefsDialog->reject();
     }
 }
 
