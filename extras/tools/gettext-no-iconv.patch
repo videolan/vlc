@@ -1,0 +1,25 @@
+--- gettext/libtextstyle/lib/iconv-ostream.c.orig	2025-10-22 13:15:49
++++ gettext/libtextstyle/lib/iconv-ostream.c	2025-10-22 13:15:54
+@@ -245,7 +245,7 @@ static void
+ }
+ 
+ static void
+-iconv_ostream__flush (iconv_ostream_t stream)
++iconv_ostream__flush (iconv_ostream_t stream, ostream_flush_scope_t scope)
+ {
+   abort ();
+ }
+@@ -256,6 +256,13 @@ iconv_ostream__free (iconv_ostream_t stream)
+   abort ();
+ }
+ 
++iconv_ostream_t
++iconv_ostream_create (const char *from_encoding, const char *to_encoding,
++                      ostream_t destination)
++{
++  return NULL;
++}
++
+ /* Accessors.  */
+ 
+ static const char *

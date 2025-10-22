@@ -485,6 +485,7 @@ gettext-$(GETTEXT_VERSION).tar.gz:
 .getgettext: gettext-$(GETTEXT_VERSION).tar.gz
 gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) $(TOOLS)/gettext-no-iconv.patch
 	$(MOVE)
 
 .buildgettext: gettext
