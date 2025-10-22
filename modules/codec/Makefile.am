@@ -597,7 +597,7 @@ codec_LTLIBRARIES += $(LTLIBrav1e)
 endif
 
 libtwolame_plugin_la_SOURCES = codec/twolame.c
-libtwolame_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DLIBTWOLAME_STATIC
+libtwolame_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libtwolame_plugin_la_CFLAGS = $(AM_CFLAGS) $(TWOLAME_CFLAGS)
 libtwolame_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libtwolame_plugin_la_LIBADD = $(TWOLAME_LIBS) $(LIBM)

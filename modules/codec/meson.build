@@ -864,7 +864,6 @@ vlc_modules += {
     'name' : 'twolame',
     'sources' : files('twolame.c'),
     'dependencies' : [twolame_dep],
-    'c_args' : ['-DLIBTWOLAME_STATIC'],
     'enabled' : twolame_dep.found(),
 }
 

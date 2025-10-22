@@ -2965,7 +2965,7 @@ AS_IF([test "${enable_vpx}" != "no"],[
 dnl
 dnl twolame encoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([TWOLAME], [], [twolame], [MPEG Audio Layer 2 encoder], [auto], [], [], [ -DLIBTWOLAME_STATIC])
+PKG_ENABLE_MODULES_VLC([TWOLAME], [], [twolame], [MPEG Audio Layer 2 encoder], [auto])
 
 dnl
 dnl fdk-aac encoder plugin
