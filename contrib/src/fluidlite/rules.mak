@@ -18,7 +18,7 @@ $(TARBALLS)/fluidlite-$(FLUID_HASH).tar.xz:
 	$(call check_githash,$(FLUID_HASH))
 	touch $@
 
-DEPS_fluidlite = ogg $(DEPS_ogg)
+DEPS_fluidlite = vorbis $(DEPS_vorbis)
 
 fluidlite: fluidlite-$(FLUID_HASH).tar.xz .sum-fluidlite
 	$(UNPACK)
@@ -26,9 +26,11 @@ fluidlite: fluidlite-$(FLUID_HASH).tar.xz .sum-fluidlite
 	$(call pkg_static,"fluidlite.pc.in")
 	$(MOVE)
 
+FLUIDLITE_CONF := -DENABLE_SF3=ON
+
 .fluidlite: fluidlite toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(FLUIDLITE_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
