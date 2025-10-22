@@ -18,9 +18,10 @@ $(TARBALLS)/twolame-$(TWOLAME_VERSION).tar.gz:
 twolame: twolame-$(TWOLAME_VERSION).tar.gz .sum-twolame
 	$(UNPACK)
 	$(call update_autoconfig,build-scripts)
+	$(call pkg_static,"twolame.pc.in")
 	$(MOVE)
 
-TWOLAME_CONF := CFLAGS="${CFLAGS} -DLIBTWOLAME_STATIC"
+TWOLAME_CONF := --enable-static
 
 .twolame: twolame
 	$(MAKEBUILDDIR)
