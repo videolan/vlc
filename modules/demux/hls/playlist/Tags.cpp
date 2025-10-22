@@ -70,7 +70,7 @@ std::vector<uint8_t> Attribute::hexSequence() const
     return ret;
 }
 
-static inline std::istream& operator>>(std::istream& is, adaptive::optional<std::size_t>& data)
+static inline std::istream& operator>>(std::istream& is, std::optional<std::size_t>& data)
 {
     size_t val;
     if(is >> val)
@@ -81,7 +81,7 @@ static inline std::istream& operator>>(std::istream& is, adaptive::optional<std:
 ByteRange Attribute::getByteRange() const
 {
     std::size_t length;
-    adaptive::optional<std::size_t> offset;
+    std::optional<std::size_t> offset;
     std::istringstream is(value);
     is.imbue(std::locale("C"));
 

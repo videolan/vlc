@@ -24,7 +24,6 @@
 #ifndef COMMONATTRIBUTESELEMENTS_H
 #define COMMONATTRIBUTESELEMENTS_H
 
-#include "../tools/Compatibility.hpp"
 #include "../tools/Properties.hpp"
 #include "../tools/Macros.hpp"
 #include <string>

@@ -20,21 +20,20 @@
 #ifndef TAGS_HPP
 #define TAGS_HPP
 
-#include "../../adaptive/tools/Compatibility.hpp"
-
 #include <stdint.h>
 
 #include <string>
 #include <vector>
 #include <list>
 #include <utility>
+#include <optional>
 
 namespace hls
 {
 
     namespace playlist
     {
-        using ByteRange = std::pair<adaptive::optional<std::size_t>,std::size_t>;
+        using ByteRange = std::pair<std::optional<std::size_t>,std::size_t>;
 
         class Attribute
         {

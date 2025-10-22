@@ -26,7 +26,8 @@
 #include "AuthStorage.hpp"
 #include "../BlockStreamInterface.hpp"
 #include "../plumbing/SourceStream.hpp"
-#include "../tools/Compatibility.hpp"
+
+#include <optional>
 
 #include <vlc_stream.h>
 #include <vlc_keystore.h>
@@ -189,8 +190,8 @@ class adaptive::http::LibVLCHTTPSource : public adaptive::BlockStreamInterface
         struct vlc_http_mgr *http_mgr;
         BytesRange range;
         struct vlc_http_resource *http_res;
-        adaptive::optional<std::string> username;
-        adaptive::optional<std::string> password;
+        std::optional<std::string> username;
+        std::optional<std::string> password;
         ConnectionParams lastparams;
 
     public:

@@ -27,6 +27,7 @@
 
 #include <vector>
 #include <string>
+#include <optional>
 
 #include "CommonAttributesElements.h"
 #include "SegmentInformation.hpp"
@@ -68,8 +69,8 @@ namespace adaptive
                 Role                            role;
                 std::vector<BaseRepresentation *>   representations;
                 std::string                     lang;
-                optional<bool>                  segmentAligned;
-                optional<bool>                  bitswitchAble;
+                std::optional<bool>             segmentAligned;
+                std::optional<bool>             bitswitchAble;
         };
     }
 }

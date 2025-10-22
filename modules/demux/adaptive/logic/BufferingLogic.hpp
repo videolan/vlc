@@ -23,7 +23,7 @@
 #include <vlc_common.h>
 #include <vlc_tick.h>
 
-#include "../tools/Compatibility.hpp"
+#include <optional>
 
 namespace adaptive
 {
@@ -61,7 +61,7 @@ namespace adaptive
                 vlc_tick_t userMinBuffering;
                 vlc_tick_t userMaxBuffering;
                 vlc_tick_t userLiveDelay;
-                optional<bool> userLowLatency;
+                std::optional<bool> userLowLatency;
         };
 
         class DefaultBufferingLogic : public AbstractBufferingLogic

@@ -365,8 +365,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                     ByteRange range = ctx_byterange->getValue().getByteRange();
                     if(!range.first.has_value()) /* first == offset, second = length */
                         range.first = prevbyterangeoffset;
-                    prevbyterangeoffset = range.first.value() + range.second;
-                    segment->setByteRange(range.first.value(), prevbyterangeoffset - 1);
+                    prevbyterangeoffset = *range.first + range.second;
+                    segment->setByteRange(*range.first, prevbyterangeoffset - 1);
                     ctx_byterange = nullptr;
                 }
                 segment->setDiscontinuitySequenceNumber(discontinuitySequence);

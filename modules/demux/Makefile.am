@@ -407,7 +407,6 @@ libvlc_adaptive_la_SOURCES = \
     demux/adaptive/Streams.cpp \
     demux/adaptive/Streams.hpp \
     demux/adaptive/Time.hpp \
-    demux/adaptive/tools/Compatibility.hpp \
     demux/adaptive/tools/Conversions.hpp \
     demux/adaptive/tools/Conversions.cpp \
     demux/adaptive/tools/Debug.hpp \
