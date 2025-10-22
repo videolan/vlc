@@ -36,6 +36,7 @@ FAAD2_CONF := --without-drm
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(FAAD2_CONF)
 	sed -i.orig "s/shrext_cmds/shrext/g" $(BUILD_DIR)/libtool
+	$(call pkg_static,"$(BUILD_DIRUNPACK)/libfaad/faad2.pc")
 	+$(MAKEBUILD) -C libfaad
 	+$(MAKEBUILD) -C libfaad install
 	touch $@
