@@ -289,7 +289,7 @@ FocusScope {
                     effectRect: Qt.rect(0,
                                         stackView.height - stackViewParent.bottomExtension,
                                         width,
-                                        height - stackView.height + stackViewParent.bottomExtension)
+                                        loaderProgress.height + miniPlayer.height + 2 * stackViewParent.bottomExtension)
 
                     sourceVisualRect: blending ? Qt.rect(0, 0, width, effectRect.y) : Qt.rect(0, 0, 0, 0)
 
