@@ -1054,5 +1054,6 @@ vlc_preparser_GetBestThumbnailerFormat
 vlc_preparser_GenerateThumbnail
 vlc_preparser_GenerateThumbnailToFiles
 vlc_preparser_Cancel
+vlc_preparser_req_GetItem
 vlc_preparser_Delete
 vlc_preparser_SetTimeout

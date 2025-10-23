@@ -919,6 +919,12 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req *req 
     return count;
 }
 
+input_item_t *vlc_preparser_req_GetItem(vlc_preparser_req *req)
+{
+    assert(req != NULL);
+    return req->item;
+}
+
 void vlc_preparser_SetTimeout( vlc_preparser_t *preparser,
                                vlc_tick_t timeout )
 {

@@ -374,6 +374,18 @@ VLC_API size_t vlc_preparser_Cancel( vlc_preparser_t *preparser,
                                      vlc_preparser_req *req );
 
 /**
+ * Fetch the input item associated with the request.
+ *
+ * @param req request handle returned by vlc_preparser_Push(),
+ * vlc_preparser_GenerateThumbnail(), or vlc_preparser_GenerateThumbnailToFiles().
+ * @return input_item_t associated with the request
+ *
+ * @note The returned input item is held by the request, it must not be
+ * released by the caller.
+ */
+VLC_API input_item_t *vlc_preparser_req_GetItem(vlc_preparser_req *req);
+
+/**
  * This function destroys the preparser object and thread.
  *
  * @param preparser the preparser object
