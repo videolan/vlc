@@ -94,7 +94,7 @@ class NetworkMediaModelPrivate
 public:
     NetworkMediaModelPrivate(NetworkMediaModel* pub)
         : LocalListBaseModelPrivate<NetworkMediaItemPtr>(pub)
-        , m_preparseSem(1), m_parserId(VLC_PREPARSER_REQ_ID_INVALID)
+        , m_preparseSem(1), m_parserReq(NULL)
     {}
 
 public:
@@ -409,8 +409,8 @@ public:
             std::vector<SharedInputItem> itemList;
             {
                 MediaTreeLocker lock{tree};
-                if (m_parserId != VLC_PREPARSER_REQ_ID_INVALID)
-                    vlc_preparser_Cancel( parser, m_parserId );
+                if (m_parserReq != NULL)
+                    vlc_preparser_Cancel( parser, m_parserReq );
                 m_path = {QVariant::fromValue(PathNode(m_treeItem, m_name))};
                 if (vlc_media_tree_Find( tree.get(), m_treeItem.media.get(), &mediaNode, &parent))
                 {
@@ -438,7 +438,7 @@ public:
         }
 
         m_preparseSem.acquire();
-        m_parserId = vlc_media_tree_Preparse( tree.get(), parser, m_treeItem.media.get() );
+        m_parserReq = vlc_media_tree_Preparse( tree.get(), parser, m_treeItem.media.get() );
 
         m_listener = std::move( l );
 
@@ -481,7 +481,7 @@ public:
 
     struct ListenerCb;
 private:
-    vlc_preparser_req_id m_parserId;
+    vlc_preparser_req *m_parserReq;
 };
 
 // NetworkMediaModel::ListenerCb implementation
@@ -513,10 +513,10 @@ NetworkMediaModel::~NetworkMediaModel()
         auto parser = d->m_ctx->getNetworkPreparser();
         if (likely(parser != NULL))
         {
-            if (d->m_parserId != VLC_PREPARSER_REQ_ID_INVALID)
+            if (d->m_parserReq != NULL)
             {
-                vlc_preparser_Cancel( parser, d->m_parserId );
-                d->m_parserId = VLC_PREPARSER_REQ_ID_INVALID;
+                vlc_preparser_Cancel( parser, d->m_parserReq );
+                d->m_parserReq = NULL;
             }
             //wait for the callback call on cancel
             d->m_preparseSem.acquire();

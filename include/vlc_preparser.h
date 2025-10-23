@@ -42,9 +42,15 @@
  * It will also issue art fetching requests.
  */
 typedef struct vlc_preparser_t vlc_preparser_t;
-typedef size_t vlc_preparser_req_id;
 
-#define VLC_PREPARSER_REQ_ID_INVALID 0
+/**
+ * Preparser request opaque handle.
+ *
+ * Identifies a request submitted via vlc_preparser_Push(),
+ * vlc_preparser_GenerateThumbnail(), or vlc_preparser_GenerateThumbnailToFiles().
+ * It can be passed to vlc_preparser_Cancel() to cancel that request.
+ */
+typedef struct vlc_preparser_req vlc_preparser_req;
 
 #define VLC_PREPARSER_TYPE_PARSE            0x01
 #define VLC_PREPARSER_TYPE_FETCHMETA_LOCAL  0x02
@@ -270,11 +276,11 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
  * @param cbs_userdata opaque pointer used by the callbacks
  * @param id unique id provided by the caller. This is can be used to cancel
  * the request with vlc_preparser_Cancel()
- * @return VLC_PREPARSER_REQ_ID_INVALID in case of error, or a valid id if the
+ * @return NULL in case of error, or a valid request handle if the
  * item was scheduled for preparsing. If this returns an
  * error, the on_preparse_ended will *not* be invoked
  */
-VLC_API vlc_preparser_req_id
+VLC_API vlc_preparser_req *
 vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item, int type_option,
                     const input_item_parser_cbs_t *cbs, void *cbs_userdata );
 
@@ -286,14 +292,14 @@ vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item, int type_opt
  * @param arg pointer to the arg struct, NULL for default options
  * @param cbs callback to listen to events (can't be NULL)
  * @param cbs_userdata opaque pointer used by the callbacks
- * @return VLC_PREPARSER_REQ_ID_INVALID in case of error, or a valid id if the
+ * @return NULL in case of error, or a valid request handle if the
  * item was scheduled for thumbnailing. If this returns an
  * error, the thumbnailer.on_ended callback will *not* be invoked
  *
  * The provided input_item will be held by the thumbnailer and can safely be
  * released safely after calling this function.
  */
-VLC_API vlc_preparser_req_id
+VLC_API vlc_preparser_req *
 vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
                                  const struct vlc_thumbnailer_arg *arg,
                                  const struct vlc_thumbnailer_cbs *cbs,
@@ -332,14 +338,14 @@ vlc_preparser_CheckThumbnailerFormat(enum vlc_thumbnailer_format format);
  * @param output_count outputs array size, must be > 1
  * @param cbs callback to listen to events (can't be NULL)
  * @param cbs_userdata opaque pointer used by the callbacks
- * @return VLC_PREPARSER_REQ_ID_INVALID in case of error, or a valid id if the
+ * @return NULL in case of error, or a valid request handle if the
  * item was scheduled for thumbnailing. If this returns an
  * error, the thumbnailer.on_ended callback will *not* be invoked
  *
  * The provided input_item will be held by the thumbnailer and can safely be
  * released safely after calling this function.
  */
-VLC_API vlc_preparser_req_id
+VLC_API vlc_preparser_req *
 vlc_preparser_GenerateThumbnailToFiles( vlc_preparser_t *preparser, input_item_t *item,
                                         const struct vlc_thumbnailer_arg *arg,
                                         const struct vlc_thumbnailer_output *outputs,
@@ -348,15 +354,24 @@ vlc_preparser_GenerateThumbnailToFiles( vlc_preparser_t *preparser, input_item_t
                                         void *cbs_userdata );
 
 /**
- * This function cancel all preparsing requests for a given id
+ * This function cancels ongoing or queued preparsing/thumbnail generation
+ * for a given request handle.
  *
  * @param preparser the preparser object
- * @param id unique id returned by vlc_preparser_Push(),
- * VLC_PREPARSER_REQ_ID_INVALID to cancels all tasks
+ * @param req request handle returned by vlc_preparser_Push(),
+ * vlc_preparser_GenerateThumbnail(), or vlc_preparser_GenerateThumbnailToFiles().
+ * Pass NULL to cancel all pending and running tasks.
  * @return number of tasks cancelled
+ *
+ * @note
+ * - When a request is cancelled, the `on_ended` callback will be triggered
+ *   with -EINTR status.
+ *
+ * - If the request is already in a terminated state (finished, cancelled, or error),
+ *   the call is a no-op and no callback will be invoked.
  */
 VLC_API size_t vlc_preparser_Cancel( vlc_preparser_t *preparser,
-                                     vlc_preparser_req_id id );
+                                     vlc_preparser_req *req );
 
 /**
  * This function destroys the preparser object and thread.
@@ -375,4 +390,3 @@ VLC_API void vlc_preparser_SetTimeout( vlc_preparser_t *preparser,
 /** @} vlc_preparser */
 
 #endif
-

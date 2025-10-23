@@ -80,8 +80,8 @@ vlc_playlist_ItemsInserted(vlc_playlist_t *playlist, size_t index, size_t count,
     for (size_t i = index; i < index + count; ++i)
     {
         vlc_playlist_item_t *item = playlist->items.data[i];
-        item->preparser_id = vlc_playlist_AutoPreparse(playlist, item->media,
-                                                       subitems);
+        item->preparser_req = vlc_playlist_AutoPreparse(playlist, item->media,
+                                                        subitems);
     }
 }
 
@@ -238,7 +238,7 @@ vlc_playlist_Clear(vlc_playlist_t *playlist)
     VLC_UNUSED(ret); /* what could we do? */
 
     if (playlist->parser != NULL)
-        vlc_preparser_Cancel(playlist->parser, VLC_PREPARSER_REQ_ID_INVALID);
+        vlc_preparser_Cancel(playlist->parser, NULL);
 
     vlc_playlist_ClearItems(playlist);
     vlc_playlist_ItemsReset(playlist);
@@ -319,8 +319,8 @@ vlc_playlist_Remove(vlc_playlist_t *playlist, size_t index, size_t count)
     for (size_t i = 0; i < count; ++i) {
         vlc_playlist_item_t *item = playlist->items.data[index + i];
         if (playlist->parser != NULL
-                && item->preparser_id != VLC_PREPARSER_REQ_ID_INVALID)
-            vlc_preparser_Cancel(playlist->parser, item->preparser_id);
+                && item->preparser_req != NULL)
+            vlc_preparser_Cancel(playlist->parser, item->preparser_req);
 
         vlc_playlist_item_Release(item);
     }
@@ -356,8 +356,8 @@ vlc_playlist_Replace(vlc_playlist_t *playlist, size_t index,
 
     vlc_playlist_item_t *old = playlist->items.data[index];
     if (playlist->parser != NULL
-            && old->preparser_id != VLC_PREPARSER_REQ_ID_INVALID)
-        vlc_preparser_Cancel(playlist->parser, old->preparser_id);
+            && old->preparser_req != NULL)
+        vlc_preparser_Cancel(playlist->parser, old->preparser_req);
     vlc_playlist_item_Release(old);
     playlist->items.data[index] = item;
 

@@ -36,7 +36,7 @@ vlc_playlist_item_New(input_item_t *media, uint64_t id)
 
     vlc_atomic_rc_init(&item->rc);
     item->id = id;
-    item->preparser_id = VLC_PREPARSER_REQ_ID_INVALID;
+    item->preparser_req = NULL;
     item->media = media;
     input_item_Hold(media);
     return item;

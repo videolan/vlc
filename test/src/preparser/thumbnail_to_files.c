@@ -154,11 +154,11 @@ static void on_ended(input_item_t *item, int status,
                 free(option);
             }
 
-            vlc_preparser_req_id req_id =
+            vlc_preparser_req *req =
                 vlc_preparser_Push(context->preparser, thumb,
                                    VLC_PREPARSER_TYPE_PARSE,
                                    &parser_cbs, context);
-            assert(req_id != VLC_PREPARSER_REQ_ID_INVALID);
+            assert(req != NULL);
             input_item_Release(thumb);
         }
     }
@@ -329,18 +329,18 @@ int main(int argc, const char *argv[])
     input_item_t *item = input_item_New(MOCK_URL, "mock");
     assert(item != NULL);
 
-    vlc_preparser_req_id req_id =
+    vlc_preparser_req *req =
         vlc_preparser_GenerateThumbnailToFiles(preparser, item, &arg,
                                                entries, test_count,
                                                &cbs, &context);
 
-    assert(req_id != VLC_PREPARSER_REQ_ID_INVALID);
+    assert(req != NULL);
 
     /* Wait for all tests */
     for (size_t i = 0; i < test_count; ++i)
         vlc_sem_wait(&context.sem);
 
-    size_t count = vlc_preparser_Cancel(preparser, req_id);
+    size_t count = vlc_preparser_Cancel(preparser, req);
     assert(count == 0); /* Should not be cancelled and already processed */
 
     for (size_t i = 0; i < test_count; ++i)

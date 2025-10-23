@@ -31,7 +31,7 @@ struct vlc_playlist_item
 {
     input_item_t *media;
     uint64_t id;
-    vlc_preparser_req_id preparser_id;
+    vlc_preparser_req *preparser_req;
     vlc_atomic_rc_t rc;
 };
 

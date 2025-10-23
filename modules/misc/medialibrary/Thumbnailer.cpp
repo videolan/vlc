@@ -110,14 +110,14 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
             .on_ended = onThumbnailToFilesComplete,
         };
 
-        vlc_preparser_req_id requestId;
-        requestId = vlc_preparser_GenerateThumbnailToFiles(m_thumbnailer.get(),
-                                                           item.get(),
-                                                           &thumb_arg,
-                                                           &thumb_out, 1,
-                                                           &cbs, &ctx);
+        vlc_preparser_req *preparserReq;
+        preparserReq = vlc_preparser_GenerateThumbnailToFiles(m_thumbnailer.get(),
+                                                              item.get(),
+                                                              &thumb_arg,
+                                                              &thumb_out, 1,
+                                                              &cbs, &ctx);
 
-        if (requestId == VLC_PREPARSER_REQ_ID_INVALID)
+        if (preparserReq == NULL)
         {
             m_currentContext = nullptr;
             return false;
@@ -132,7 +132,7 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
 
 void Thumbnailer::stop()
 {
-    vlc_preparser_Cancel(m_thumbnailer.get(), VLC_PREPARSER_REQ_ID_INVALID);
+    vlc_preparser_Cancel(m_thumbnailer.get(), NULL);
 
     vlc::threads::mutex_locker lock{ m_mutex };
     if ( m_currentContext != nullptr )

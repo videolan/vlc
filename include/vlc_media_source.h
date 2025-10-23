@@ -236,10 +236,10 @@ vlc_media_tree_Find(vlc_media_tree_t *tree, const input_item_t *media,
  * \param tree   the media tree (not necessarily locked)
  * \param parser a valid preparser
  * \param media  the media to preparse
- * \returns VLC_PREPARSER_REQ_ID_INVALID in case of error, or a valid id if the
+ * \returns NULL in case of error, or a valid request handle if the
  * item was scheduled for preparsing. Cancel it vlc_preparser_Cancel().
  */
-VLC_API vlc_preparser_req_id
+VLC_API vlc_preparser_req *
 vlc_media_tree_Preparse(vlc_media_tree_t *tree, vlc_preparser_t *parser,
                         input_item_t *media);
 

@@ -150,7 +150,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
         vlc_mutex_lock( &ctx.lock );
 
-        vlc_preparser_req_id id;
+        vlc_preparser_req *req;
         struct vlc_thumbnailer_arg thumb_arg;
         if ( test_params[i].b_use_pos )
         {
@@ -170,9 +170,9 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         static const struct vlc_thumbnailer_cbs cbs = {
             .on_ended = thumbnailer_callback,
         };
-        id = vlc_preparser_GenerateThumbnail( p_thumbnailer, p_item, &thumb_arg,
-                                              &cbs, &ctx );
-        assert( id != VLC_PREPARSER_REQ_ID_INVALID );
+        req = vlc_preparser_GenerateThumbnail( p_thumbnailer, p_item, &thumb_arg,
+                                               &cbs, &ctx );
+        assert( req != NULL );
 
         while ( ctx.b_done == false )
             vlc_cond_wait( &ctx.cond, &ctx.lock );
@@ -220,10 +220,10 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
 
     vlc_sem_t sem;
     vlc_sem_init(&sem, 0);
-    vlc_preparser_req_id id =
+    vlc_preparser_req *req =
         vlc_preparser_GenerateThumbnail( p_thumbnailer, p_item, NULL, &cbs, &sem );
 
-    vlc_preparser_Cancel( p_thumbnailer, id );
+    vlc_preparser_Cancel( p_thumbnailer, req );
 
     vlc_sem_wait(&sem);
 

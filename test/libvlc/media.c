@@ -261,13 +261,13 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
     vlc_preparser_t *parser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
                                                 &cfg);
     assert(parser != NULL);
-    vlc_preparser_req_id id = vlc_preparser_Push(parser, p_item, options, &cbs, &sem);
-    assert(id != VLC_PREPARSER_REQ_ID_INVALID);
+    vlc_preparser_req *req = vlc_preparser_Push(parser, p_item, options, &cbs, &sem);
+    assert(req != NULL);
 
     if (wait_and_cancel > 0)
     {
         vlc_tick_sleep( VLC_TICK_FROM_MS(wait_and_cancel) );
-        size_t count = vlc_preparser_Cancel(parser, id);
+        size_t count = vlc_preparser_Cancel(parser, req);
         assert(count == 1);
     }
     vlc_sem_wait(&sem);

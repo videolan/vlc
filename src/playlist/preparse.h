@@ -27,7 +27,7 @@
 typedef struct vlc_playlist vlc_playlist_t;
 typedef struct input_item_node_t input_item_node_t;
 
-vlc_preparser_req_id
+vlc_preparser_req *
 vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
                           bool parse_subitems);
 

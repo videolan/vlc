@@ -124,7 +124,7 @@ class Thumbnailer : public medialibrary::IThumbnailer
         Thumbnailer* thumbnailer;
         bool done;
         bool error;
-        vlc_preparser_req_id id;
+        vlc_preparser_req *req;
     };
 public:
     Thumbnailer(vlc_medialibrary_module_t* ml);

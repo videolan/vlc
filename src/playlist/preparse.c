@@ -110,7 +110,7 @@ static const input_item_parser_cbs_t preparser_callbacks = {
     .on_subtree_added = on_subtree_added,
 };
 
-vlc_preparser_req_id
+vlc_preparser_req *
 vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
                           bool parse_subitems)
 {
@@ -137,7 +137,7 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
         enum input_item_type_e input_type = input_item_GetType(input, &input_net);
 
         if (input_net)
-            return VLC_PREPARSER_REQ_ID_INVALID;
+            return NULL;
 
         switch (input_type)
         {
@@ -147,7 +147,7 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
             case ITEM_TYPE_PLAYLIST:
                 break;
             default:
-                return VLC_PREPARSER_REQ_ID_INVALID;
+                return NULL;
         }
 
         int options = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
@@ -157,5 +157,5 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
         return vlc_preparser_Push(playlist->parser, input, options,
                                   &preparser_callbacks, playlist);
     }
-    return VLC_PREPARSER_REQ_ID_INVALID;
+    return NULL;
 }

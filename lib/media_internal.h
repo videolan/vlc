@@ -49,7 +49,7 @@ struct libvlc_media_t
     atomic_uint worker_count;
 
     _Atomic libvlc_media_parsed_status_t parsed_status;
-    vlc_preparser_req_id id;
+    vlc_preparser_req *req;
 };
 
 /* Media Descriptor */

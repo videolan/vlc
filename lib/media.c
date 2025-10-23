@@ -329,6 +329,7 @@ static void input_item_preparse_ended(input_item_t *item,
             vlc_assert_unreachable();
     }
     send_parsed_changed( p_md, new_status );
+    p_md->req = NULL;
 
     if (atomic_fetch_sub_explicit(&p_md->worker_count, 1,
                                   memory_order_release) == 1)
@@ -374,7 +375,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
 
     p_md->p_input_item->libvlc_owner = p_md;
     atomic_init(&p_md->parsed_status, libvlc_media_parsed_status_none);
-    p_md->id = VLC_PREPARSER_REQ_ID_INVALID;
+    p_md->req = NULL;
 
     libvlc_event_manager_init( &p_md->event_manager, p_md );
 
@@ -818,9 +819,9 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
 
     vlc_preparser_SetTimeout(parser, VLC_TICK_FROM_MS(timeout));
 
-    media->id = vlc_preparser_Push(parser, item, parse_scope,
-                             &preparser_callbacks, media);
-    if (media->id == VLC_PREPARSER_REQ_ID_INVALID)
+    media->req = vlc_preparser_Push(parser, item, parse_scope,
+                                    &preparser_callbacks, media);
+    if (media->req == NULL)
     {
         atomic_fetch_sub_explicit(&media->worker_count, 1,
                                   memory_order_relaxed);
@@ -835,10 +836,10 @@ libvlc_media_parse_stop(libvlc_instance_t *inst, libvlc_media_t *media)
 {
     vlc_preparser_t *parser = libvlc_get_preparser(inst);
     assert(parser != NULL);
-    if (media->id != VLC_PREPARSER_REQ_ID_INVALID)
+    if (media->req != NULL)
     {
-        vlc_preparser_Cancel(parser, media->id);
-        media->id = VLC_PREPARSER_REQ_ID_INVALID;
+        vlc_preparser_Cancel(parser, media->req);
+        media->req = NULL;
     }
 }
 
@@ -927,7 +928,7 @@ struct libvlc_media_thumbnail_request_t
     unsigned int height;
     bool crop;
     libvlc_picture_type_t type;
-    vlc_preparser_req_id id;
+    vlc_preparser_req *preparser_req;
 };
 
 static void media_on_thumbnail_ready( input_item_t *item, int status,
@@ -982,9 +983,9 @@ libvlc_media_thumbnail_request( libvlc_instance_t *inst,
     static const struct vlc_thumbnailer_cbs cbs = {
         .on_ended = media_on_thumbnail_ready,
     };
-    req->id = vlc_preparser_GenerateThumbnail( thumb, md->p_input_item, thumb_arg,
-                                               &cbs, req );
-    if ( req->id == VLC_PREPARSER_REQ_ID_INVALID )
+    req->preparser_req = vlc_preparser_GenerateThumbnail( thumb, md->p_input_item,
+                                                          thumb_arg, &cbs, req );
+    if ( req->preparser_req == NULL )
     {
         free( req );
         libvlc_media_release( md );
@@ -1043,7 +1044,7 @@ void libvlc_media_thumbnail_request_destroy( libvlc_media_thumbnail_request_t *r
     vlc_preparser_t *thumb = libvlc_get_thumbnailer(req->instance);
     assert(thumb != NULL);
 
-    vlc_preparser_Cancel( thumb, req->id );
+    vlc_preparser_Cancel( thumb, req->preparser_req );
     libvlc_media_release( req->md );
     libvlc_release(req->instance);
     free( req );
