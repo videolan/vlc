@@ -218,11 +218,11 @@ error:
  * \internal
  * input_item_subitemtree_added (Private) (vlc event Callback)
  */
-static void input_item_subtree_added(input_item_t *item,
+static void input_item_subtree_added(vlc_preparser_req *req,
                                      input_item_node_t *node,
                                      void *user_data)
 {
-    VLC_UNUSED(item);
+    VLC_UNUSED(req);
     libvlc_media_t * p_md = user_data;
     libvlc_media_add_subtree(p_md, node);
     input_item_node_Delete(node);
@@ -241,11 +241,11 @@ void libvlc_media_add_subtree(libvlc_media_t *p_md, const input_item_node_t *nod
     libvlc_event_send( &p_md->event_manager, &event );
 }
 
-static void input_item_attachments_added( input_item_t *item,
+static void input_item_attachments_added( vlc_preparser_req *req,
                                           input_attachment_t *const *array,
                                           size_t count, void *user_data )
 {
-    VLC_UNUSED(item);
+    VLC_UNUSED(req);
     libvlc_media_t * p_md = user_data;
     libvlc_event_t event;
 
@@ -304,10 +304,10 @@ static void send_parsed_changed( libvlc_media_t *p_md,
  * \internal
  * input_item_preparse_ended (Private) (vlc event Callback)
  */
-static void input_item_preparse_ended(input_item_t *item,
+static void input_item_preparse_ended(vlc_preparser_req *req,
                                       int status, void *user_data)
 {
-    VLC_UNUSED(item);
+    VLC_UNUSED(req);
     libvlc_media_t * p_md = user_data;
     libvlc_media_parsed_status_t new_status;
 
@@ -722,7 +722,7 @@ libvlc_media_get_filestat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
     return 1;
 }
 
-static const input_item_parser_cbs_t preparser_callbacks = {
+static const struct vlc_preparser_cbs preparser_callbacks = {
     .on_ended = input_item_preparse_ended,
     .on_subtree_added = input_item_subtree_added,
     .on_attachments_added = input_item_attachments_added,
@@ -931,10 +931,10 @@ struct libvlc_media_thumbnail_request_t
     vlc_preparser_req *preparser_req;
 };
 
-static void media_on_thumbnail_ready( input_item_t *item, int status,
+static void media_on_thumbnail_ready( vlc_preparser_req *request, int status,
                                       picture_t* thumbnail, void* data )
 {
-    (void) item;
+    (void) request;
     (void) status;
 
     libvlc_media_thumbnail_request_t *req = data;

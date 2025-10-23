@@ -38,7 +38,7 @@
 
 union vlc_preparser_cbs_internal
 {
-    const input_item_parser_cbs_t *parser;
+    const struct vlc_preparser_cbs *parser;
     const struct vlc_thumbnailer_cbs *thumbnailer;
     const struct vlc_thumbnailer_to_files_cbs *thumbnailer_to_files;
 };
@@ -167,7 +167,7 @@ NotifyPreparseEnded(struct vlc_preparser_req *req)
     else if (req->preparse_status == VLC_SUCCESS)
         input_item_SetPreparsed(req->item);
 
-    req->cbs.parser->on_ended(req->item, req->preparse_status,
+    req->cbs.parser->on_ended(req, req->preparse_status,
                               req->userdata);
 }
 
@@ -192,7 +192,7 @@ OnParserSubtreeAdded(input_item_t *item, input_item_node_t *subtree,
         return;
 
     if (req->cbs.parser->on_subtree_added)
-        req->cbs.parser->on_subtree_added(req->item, subtree, req->userdata);
+        req->cbs.parser->on_subtree_added(req, subtree, req->userdata);
 }
 
 static void
@@ -207,7 +207,7 @@ OnParserAttachmentsAdded(input_item_t *item,
         return;
 
     if (req->cbs.parser->on_attachments_added)
-        req->cbs.parser->on_attachments_added(req->item, array, count,
+        req->cbs.parser->on_attachments_added(req, array, count,
                                               req->userdata);
 }
 
@@ -422,11 +422,11 @@ ThumbnailerToFilesRun(void *userdata)
 error:
     PreparserRemoveTask(preparser, req);
     if (req->preparse_status == VLC_SUCCESS)
-        req->cbs.thumbnailer_to_files->on_ended(req->item, req->preparse_status,
+        req->cbs.thumbnailer_to_files->on_ended(req, req->preparse_status,
                                                 result_array, req->output_count,
                                                 req->userdata);
     else
-        req->cbs.thumbnailer_to_files->on_ended(req->item, req->preparse_status,
+        req->cbs.thumbnailer_to_files->on_ended(req, req->preparse_status,
                                                 NULL, 0, req->userdata);
     picture_Release(pic);
     PreparserRequestDelete(req);
@@ -505,7 +505,7 @@ ThumbnailerRun(void *userdata)
         assert((req->options & VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES) == 0);
 
         PreparserRemoveTask(preparser, req);
-        req->cbs.thumbnailer->on_ended(req->item, req->preparse_status,
+        req->cbs.thumbnailer->on_ended(req, req->preparse_status,
                                        req->preparse_status == VLC_SUCCESS ?
                                        pic : NULL, req->userdata);
     }
@@ -516,7 +516,7 @@ ThumbnailerRun(void *userdata)
         if (req->preparse_status != VLC_SUCCESS)
         {
             PreparserRemoveTask(preparser, req);
-            req->cbs.thumbnailer_to_files->on_ended(req->item, req->preparse_status,
+            req->cbs.thumbnailer_to_files->on_ended(req, req->preparse_status,
                                                     NULL, 0, req->userdata);
         }
         else
@@ -639,7 +639,7 @@ error_parser:
 vlc_preparser_req *
 vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
                     int type_options,
-                    const input_item_parser_cbs_t *cbs,
+                    const struct vlc_preparser_cbs *cbs,
                     void *cbs_userdata )
 {
     assert((type_options & VLC_PREPARSER_TYPE_THUMBNAIL) == 0);
@@ -882,20 +882,20 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req *req 
                                         VLC_PREPARSER_TYPE_FETCHMETA_ALL))
                 {
                     assert((req_itr->options & VLC_PREPARSER_TYPE_THUMBNAIL) == 0);
-                    req_itr->cbs.parser->on_ended(req_itr->item, req_itr->preparse_status,
+                    req_itr->cbs.parser->on_ended(req_itr, req_itr->preparse_status,
                                                   req_itr->userdata);
                 }
                 else if (req_itr->options & VLC_PREPARSER_TYPE_THUMBNAIL)
                 {
                     assert((req_itr->options & VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES) == 0);
-                    req_itr->cbs.thumbnailer->on_ended(req_itr->item,
+                    req_itr->cbs.thumbnailer->on_ended(req_itr,
                                                        req_itr->preparse_status, NULL,
                                                        req_itr->userdata);
                 }
                 else
                 {
                     assert(req_itr->options & VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES);
-                    req_itr->cbs.thumbnailer_to_files->on_ended(req_itr->item,
+                    req_itr->cbs.thumbnailer_to_files->on_ended(req_itr,
                                                                 req_itr->preparse_status,
                                                                 NULL, 0,
                                                                 req_itr->userdata);

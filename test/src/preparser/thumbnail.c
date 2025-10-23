@@ -68,10 +68,10 @@ struct test_ctx
     bool b_done;
 };
 
-static void thumbnailer_callback( input_item_t *item, int status,
+static void thumbnailer_callback( vlc_preparser_req *req, int status,
                                   picture_t* thumbnail, void *data )
 {
-    (void) item;
+    (void) req;
     struct test_ctx* p_ctx = data;
     vlc_mutex_lock( &p_ctx->lock );
 
@@ -186,10 +186,10 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
     }
 }
 
-static void thumbnailer_callback_cancel( input_item_t *item, int status,
+static void thumbnailer_callback_cancel( vlc_preparser_req *req, int status,
                                          picture_t* p_thumbnail, void *data )
 {
-    (void) item;
+    (void) req;
     assert( p_thumbnail == NULL );
     assert( status == -EINTR );
 

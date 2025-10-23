@@ -49,7 +49,7 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
         throw std::runtime_error( "Failed to instantiate a vlc_preparser_t" );
 }
 
-void Thumbnailer::onThumbnailToFilesComplete(input_item_t *, int ,
+void Thumbnailer::onThumbnailToFilesComplete(vlc_preparser_req *, int ,
                                              const bool *result_array,
                                              size_t result_count, void *data)
 {

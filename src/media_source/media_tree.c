@@ -130,9 +130,10 @@ vlc_media_tree_ClearChildren(input_item_node_t *root)
 }
 
 static void
-media_subtree_changed(input_item_t *media, input_item_node_t *node,
+media_subtree_changed(vlc_preparser_req *req, input_item_node_t *node,
                       void *userdata)
 {
+    input_item_t *media = vlc_preparser_req_GetItem(req);
     vlc_media_tree_t *tree = userdata;
 
     vlc_media_tree_Lock(tree);
@@ -159,8 +160,9 @@ media_subtree_changed(input_item_t *media, input_item_node_t *node,
 }
 
 static void
-media_subtree_preparse_ended(input_item_t *media, int status, void *user_data)
+media_subtree_preparse_ended(vlc_preparser_req *req, int status, void *user_data)
 {
+    input_item_t *media = vlc_preparser_req_GetItem(req);
     vlc_media_tree_t *tree = user_data;
 
     vlc_media_tree_Lock(tree);
@@ -322,7 +324,7 @@ vlc_media_tree_Remove(vlc_media_tree_t *tree, input_item_t *media)
     return true;
 }
 
-static const input_item_parser_cbs_t preparser_callbacks = {
+static const struct vlc_preparser_cbs preparser_callbacks = {
     .on_ended = media_subtree_preparse_ended,
     .on_subtree_added = media_subtree_changed,
 };

@@ -76,10 +76,10 @@ vlc_playlist_ExpandItemFromNode(vlc_playlist_t *playlist,
 }
 
 static void
-on_subtree_added(input_item_t *media, input_item_node_t *subtree,
+on_subtree_added(vlc_preparser_req *req, input_item_node_t *subtree,
                  void *userdata)
 {
-    VLC_UNUSED(media); /* retrieved by subtree->p_item */
+    VLC_UNUSED(req); /* retrieved by subtree->p_item */
     vlc_playlist_t *playlist = userdata;
 
     vlc_playlist_Lock(playlist);
@@ -89,9 +89,9 @@ on_subtree_added(input_item_t *media, input_item_node_t *subtree,
 }
 
 static void
-on_preparse_ended(input_item_t *media, int status, void *userdata)
+on_preparse_ended(vlc_preparser_req *req, int status, void *userdata)
 {
-    VLC_UNUSED(media); /* retrieved by subtree->p_item */
+    input_item_t *media = vlc_preparser_req_GetItem(req);
     vlc_playlist_t *playlist = userdata;
 
     if (status != VLC_SUCCESS)
@@ -105,7 +105,7 @@ on_preparse_ended(input_item_t *media, int status, void *userdata)
     vlc_playlist_Unlock(playlist);
 }
 
-static const input_item_parser_cbs_t preparser_callbacks = {
+static const struct vlc_preparser_cbs preparser_callbacks = {
     .on_ended = on_preparse_ended,
     .on_subtree_added = on_subtree_added,
 };

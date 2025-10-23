@@ -134,7 +134,7 @@ public:
     void stop() override;
 
 private:
-    static void onThumbnailToFilesComplete(input_item_t *item, int status,
+    static void onThumbnailToFilesComplete(vlc_preparser_req *req, int status,
                                            const bool *result_array,
                                            size_t result_count, void *data);
 

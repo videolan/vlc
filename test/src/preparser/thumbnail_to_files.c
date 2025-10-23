@@ -82,8 +82,9 @@ struct context
     vlc_sem_t sem;
 };
 
-static void parser_on_ended(input_item_t *item, int status, void *userdata)
+static void parser_on_ended(vlc_preparser_req *req, int status, void *userdata)
 {
+    input_item_t *item = vlc_preparser_req_GetItem(req);
     struct context *context = userdata;
     assert(status == VLC_SUCCESS);
 
@@ -113,15 +114,15 @@ static void parser_on_ended(input_item_t *item, int status, void *userdata)
     vlc_sem_post(&context->sem);
 }
 
-static void on_ended(input_item_t *item, int status,
+static void on_ended(vlc_preparser_req *req, int status,
                      const bool *result_array, size_t result_count, void *data)
 {
     struct context *context = data;
-    (void) item;
+    (void) req;
     assert(status == VLC_SUCCESS);
     assert(context->test_count == result_count);
 
-    static const struct input_item_parser_cbs_t parser_cbs = {
+    static const struct vlc_preparser_cbs parser_cbs = {
         .on_ended = parser_on_ended,
     };
 

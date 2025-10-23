@@ -208,20 +208,20 @@ static void test_media_tracks(libvlc_instance_t *vlc)
     libvlc_media_release (media);
 }
 
-static void input_item_preparse_timeout( input_item_t *item,
+static void input_item_preparse_timeout( vlc_preparser_req *req,
                                          int status, void *user_data )
 {
-    VLC_UNUSED(item);
+    VLC_UNUSED(req);
     vlc_sem_t *p_sem = user_data;
 
     assert( status == VLC_ETIMEOUT );
     vlc_sem_post(p_sem);
 }
 
-static void input_item_preparse_cancel( input_item_t *item,
+static void input_item_preparse_cancel( vlc_preparser_req *req,
                                         int status, void *user_data )
 {
-    VLC_UNUSED(item);
+    VLC_UNUSED(req);
     vlc_sem_t *p_sem = user_data;
 
     assert( status == -EINTR );
@@ -246,7 +246,7 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
 
     vlc_sem_t sem;
     vlc_sem_init (&sem, 0);
-    const input_item_parser_cbs_t cbs = {
+    const struct vlc_preparser_cbs cbs = {
         .on_ended = wait_and_cancel > 0 ? input_item_preparse_cancel
                                         : input_item_preparse_timeout,
     };
