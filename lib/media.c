@@ -307,7 +307,6 @@ static void send_parsed_changed( libvlc_media_t *p_md,
 static void input_item_preparse_ended(vlc_preparser_req *req,
                                       int status, void *user_data)
 {
-    VLC_UNUSED(req);
     libvlc_media_t * p_md = user_data;
     libvlc_media_parsed_status_t new_status;
 
@@ -329,6 +328,7 @@ static void input_item_preparse_ended(vlc_preparser_req *req,
             vlc_assert_unreachable();
     }
     send_parsed_changed( p_md, new_status );
+    vlc_preparser_req_Release( req );
     p_md->req = NULL;
 
     if (atomic_fetch_sub_explicit(&p_md->worker_count, 1,
@@ -934,7 +934,6 @@ struct libvlc_media_thumbnail_request_t
 static void media_on_thumbnail_ready( vlc_preparser_req *request, int status,
                                       picture_t* thumbnail, void* data )
 {
-    (void) request;
     (void) status;
 
     libvlc_media_thumbnail_request_t *req = data;
@@ -950,6 +949,8 @@ static void media_on_thumbnail_ready( vlc_preparser_req *request, int status,
     libvlc_event_send( &p_media->event_manager, &event );
     if ( pic != NULL )
         libvlc_picture_release( pic );
+
+    vlc_preparser_req_Release( request );
 }
 
 // Start an asynchronous thumbnail generation

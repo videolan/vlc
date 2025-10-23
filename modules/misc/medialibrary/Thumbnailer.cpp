@@ -49,7 +49,7 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
         throw std::runtime_error( "Failed to instantiate a vlc_preparser_t" );
 }
 
-void Thumbnailer::onThumbnailToFilesComplete(vlc_preparser_req *, int ,
+void Thumbnailer::onThumbnailToFilesComplete(vlc_preparser_req *req, int ,
                                              const bool *result_array,
                                              size_t result_count, void *data)
 {
@@ -64,6 +64,7 @@ void Thumbnailer::onThumbnailToFilesComplete(vlc_preparser_req *, int ,
     }
     ctx->thumbnailer->m_currentContext = nullptr;
     ctx->thumbnailer->m_cond.broadcast();
+    vlc_preparser_req_Release( req );
 }
 
 bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,

@@ -1026,6 +1026,7 @@ static void on_preparse_ended_callback(vlc_preparser_req *req,
     input_item_t *p_item = vlc_preparser_req_GetItem(req);
     PlayerControllerPrivate *me = reinterpret_cast<PlayerControllerPrivate *>(userdata);
     me->onArtFetchEnded(p_item, input_item_IsArtFetched(p_item));
+    vlc_preparser_req_Release(req);
 }
 
 

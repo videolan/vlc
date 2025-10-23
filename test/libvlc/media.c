@@ -211,21 +211,21 @@ static void test_media_tracks(libvlc_instance_t *vlc)
 static void input_item_preparse_timeout( vlc_preparser_req *req,
                                          int status, void *user_data )
 {
-    VLC_UNUSED(req);
     vlc_sem_t *p_sem = user_data;
 
     assert( status == VLC_ETIMEOUT );
     vlc_sem_post(p_sem);
+    vlc_preparser_req_Release(req);
 }
 
 static void input_item_preparse_cancel( vlc_preparser_req *req,
                                         int status, void *user_data )
 {
-    VLC_UNUSED(req);
     vlc_sem_t *p_sem = user_data;
 
     assert( status == -EINTR );
     vlc_sem_post(p_sem);
+    vlc_preparser_req_Release(req);
 }
 
 static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,

@@ -112,13 +112,13 @@ static void parser_on_ended(vlc_preparser_req *req, int status, void *userdata)
     assert(es_fmt->video.i_height == test_entry->out_height);
 
     vlc_sem_post(&context->sem);
+    vlc_preparser_req_Release(req);
 }
 
 static void on_ended(vlc_preparser_req *req, int status,
                      const bool *result_array, size_t result_count, void *data)
 {
     struct context *context = data;
-    (void) req;
     assert(status == VLC_SUCCESS);
     assert(context->test_count == result_count);
 
@@ -163,6 +163,7 @@ static void on_ended(vlc_preparser_req *req, int status,
             input_item_Release(thumb);
         }
     }
+    vlc_preparser_req_Release(req);
 }
 
 static int get_formats(enum vlc_thumbnailer_format *out_format,

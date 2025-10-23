@@ -103,6 +103,7 @@ on_preparse_ended(vlc_preparser_req *req, int status, void *userdata)
         vlc_playlist_Notify(playlist, on_items_updated, index,
                             &playlist->items.data[index], 1);
     vlc_playlist_Unlock(playlist);
+    vlc_preparser_req_Release(req);
 }
 
 static const struct vlc_preparser_cbs preparser_callbacks = {

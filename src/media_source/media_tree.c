@@ -177,6 +177,7 @@ media_subtree_preparse_ended(vlc_preparser_req *req, int status, void *user_data
     }
     vlc_media_tree_Notify(tree, on_preparse_end, subtree_root, status);
     vlc_media_tree_Unlock(tree);
+    vlc_preparser_req_Release(req);
 }
 
 static inline void

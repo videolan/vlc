@@ -87,6 +87,8 @@ struct vlc_preparser_req
     struct vlc_runnable runnable; /**< to be passed to the executor */
 
     struct vlc_list node; /**< node of vlc_preparser_t.submitted_tasks */
+
+    vlc_atomic_rc_t rc;
 };
 
 static struct vlc_preparser_req *
@@ -106,6 +108,7 @@ PreparserRequestNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_
     req->pic = NULL;
     req->outputs = NULL;
     req->output_count = 0;
+    vlc_atomic_rc_init(&req->rc);
 
     if (thumb_arg == NULL)
         req->thumb_arg = (struct vlc_thumbnailer_arg) {
@@ -220,7 +223,7 @@ OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
     struct vlc_preparser_req *req = userdata;
 
     NotifyPreparseEnded(req);
-    PreparserRequestDelete(req);
+    vlc_preparser_req_Release(req);
 }
 
 static const input_fetcher_callbacks_t input_fetcher_callbacks = {
@@ -312,7 +315,7 @@ ParserRun(void *userdata)
 
 end:
     NotifyPreparseEnded(req);
-    PreparserRequestDelete(req);
+    vlc_preparser_req_Release(req);
 }
 
 static bool
@@ -429,7 +432,7 @@ error:
         req->cbs.thumbnailer_to_files->on_ended(req, req->preparse_status,
                                                 NULL, 0, req->userdata);
     picture_Release(pic);
-    PreparserRequestDelete(req);
+    vlc_preparser_req_Release(req);
     free(result_array);
 }
 
@@ -542,7 +545,7 @@ ThumbnailerRun(void *userdata)
 
 error:
     if (req != NULL)
-        PreparserRequestDelete(req);
+        vlc_preparser_req_Release(req);
 }
 
 static void
@@ -553,6 +556,13 @@ Interrupt(struct vlc_preparser_req *req)
         vlc_interrupt_kill(req->i11e_ctx);
 
     vlc_sem_post(&req->preparse_ended);
+}
+
+static struct vlc_preparser_req *
+PreparserRequestRetain(struct vlc_preparser_req *req)
+{
+    vlc_atomic_rc_inc(&req->rc);
+    return req;
 }
 
 vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent,
@@ -670,11 +680,11 @@ vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
 
         vlc_executor_Submit(preparser->parser, &req->runnable);
 
-        return req;
+        return PreparserRequestRetain(req);
     }
 
     int ret = Fetch(req);
-    return ret == VLC_SUCCESS ? req : NULL;
+    return ret == VLC_SUCCESS ? PreparserRequestRetain(req) : NULL;
 }
 
 vlc_preparser_req *
@@ -700,7 +710,7 @@ vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
 
     vlc_executor_Submit(preparser->thumbnailer, &req->runnable);
 
-    return req;
+    return PreparserRequestRetain(req);
 }
 
 static int
@@ -834,7 +844,7 @@ vlc_preparser_GenerateThumbnailToFiles( vlc_preparser_t *preparser, input_item_t
 
     vlc_executor_Submit(preparser->thumbnailer, &req->runnable);
 
-    return req;
+    return PreparserRequestRetain(req);
 }
 
 size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req *req )
@@ -900,7 +910,7 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req *req 
                                                                 NULL, 0,
                                                                 req_itr->userdata);
                 }
-                PreparserRequestDelete(req_itr);
+                vlc_preparser_req_Release(req_itr);
 
                 /* Small optimisation in the likely case where the user cancel
                  * only one task */
@@ -929,6 +939,15 @@ void vlc_preparser_SetTimeout( vlc_preparser_t *preparser,
                                vlc_tick_t timeout )
 {
     preparser->timeout = timeout;
+}
+
+void vlc_preparser_req_Release( vlc_preparser_req *req )
+{
+    assert(req != NULL);
+    if (!vlc_atomic_rc_dec(&req->rc))
+        return;
+
+    PreparserRequestDelete(req);
 }
 
 void vlc_preparser_Delete( vlc_preparser_t *preparser )

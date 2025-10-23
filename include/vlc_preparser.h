@@ -49,6 +49,13 @@ typedef struct vlc_preparser_t vlc_preparser_t;
  * Identifies a request submitted via vlc_preparser_Push(),
  * vlc_preparser_GenerateThumbnail(), or vlc_preparser_GenerateThumbnailToFiles().
  * It can be passed to vlc_preparser_Cancel() to cancel that request.
+ *
+ * @note
+ * - Validity starts when a submit function returns a non-NULL handle and ends
+ *   with vlc_preparser_req_Release().
+ *
+ * - The user must ensure that callbacks and their context remain valid
+ *   until request termination.
  */
 typedef struct vlc_preparser_req vlc_preparser_req;
 
@@ -425,6 +432,25 @@ VLC_API size_t vlc_preparser_Cancel( vlc_preparser_t *preparser,
  * released by the caller.
  */
 VLC_API input_item_t *vlc_preparser_req_GetItem(vlc_preparser_req *req);
+
+/**
+ * Release a preparser request handle.
+ *
+ * @param req the preparser request handle
+ *
+ * @note
+ * - The request handle is retained when returned by a submit function.
+ *
+ * - Mandatory to call to avoid memory leaks.
+ *
+ * - It is safe to call this API from within the on_ended callback.
+ *
+ * - The request handle should not be used after calling this function.
+ *
+ * - If called on an active request, it doesn't cancel the preparsing request,
+ *   use vlc_preparser_Cancel() for that.
+ */
+VLC_API void vlc_preparser_req_Release( vlc_preparser_req *req );
 
 /**
  * This function destroys the preparser object and thread.
