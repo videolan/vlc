@@ -73,7 +73,7 @@
 #pragma mark -
 #pragma mark Init
 
-- (instancetype)init:(intf_thread_t *)intf;
+- (instancetype)init:(intf_thread_t *)intf
 {
     self = [super init];
     if (self) {
