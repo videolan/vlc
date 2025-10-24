@@ -138,18 +138,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     }
 }
 
-static void addShadow(NSImageView *__unsafe_unretained imageView)
-{
-    NSShadow *buttonShadow = [[NSShadow alloc] init];
-
-    buttonShadow.shadowBlurRadius = 15.0f;
-    buttonShadow.shadowOffset = CGSizeMake(0.0f, -5.0f);
-    buttonShadow.shadowColor = [NSColor blackColor];
-
-    imageView.wantsLayer = YES;
-    imageView.shadow = buttonShadow;
-}
-
 @interface VLCLibraryWindow ()
 
 @property BOOL presentLoadingOverlayOnVideoPlaybackHide;
