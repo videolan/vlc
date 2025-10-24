@@ -16,7 +16,7 @@ $(TARBALLS)/jack1-$(JACK_VERSION).tar.gz:
 
 jack: jack1-$(JACK_VERSION).tar.gz .sum-jack
 	$(UNPACK)
-	# $(call update_autoconfig,.)
+	$(call update_autoconfig,.)
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/jack/config-osx.patch
 endif
