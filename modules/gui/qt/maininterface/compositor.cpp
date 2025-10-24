@@ -286,14 +286,28 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
 
     m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>(canDoThreadedSurfaceUpdates());
     m_mainCtx->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
-    const bool backendIsOpenVg = QQuickWindow::sceneGraphBackend() == QLatin1String("openvg");
-    if (!backendIsOpenVg && (flags & CompositorVideo::CAN_SHOW_PIP) && var_InheritBool(m_intf, "qt-pip-mode"))
+
+    const QQuickWindow *const quickWindow = this->quickWindow();
+    assert(quickWindow);
+    assert(quickWindow->handle()); // Make sure `::create()` was called before
+    assert(quickWindow->rendererInterface());
+    // `ViewBlockingRectangle` only supports RHI with depth buffer (which is the default) or software mode:
+    const bool hasDepthBufferOrSoftwareMode = (quickWindow->format().depthBufferSize() > 0) ||
+                                              (quickWindow->rendererInterface()->graphicsApi() == QSGRendererInterface::Software);
+    if (!hasDepthBufferOrSoftwareMode)
+        qWarning() << this << ": interface window has no depth buffer, pip player and backdrop blur will not be functional!";
+
+    if (hasDepthBufferOrSoftwareMode && (flags & CompositorVideo::CAN_SHOW_PIP) && var_InheritBool(m_intf, "qt-pip-mode"))
     {
         m_mainCtx->setCanShowVideoPIP(true);
     }
     m_mainCtx->setWindowSuportExtendedFrame(flags & CompositorVideo::HAS_EXTENDED_FRAME);
-    if (!backendIsOpenVg && (flags & CompositorVideo::HAS_ACRYLIC))
+    if (hasDepthBufferOrSoftwareMode && (flags & CompositorVideo::HAS_ACRYLIC))
     {
+        // FIXME: Normally window backdrop blur effect does not require depth buffer, provided that there is nothing between
+        //        the window and the scene item that paints. Unfortunately this is not the case in multiple cases, due to
+        //        various reasons. Because of that, we disable blur altogether when there is no depth buffer.
+
 #ifndef _WIN32
         assert(qGuiApp);
         if (qGuiApp->platformName().startsWith(QLatin1String("wayland")) && Q_LIKELY(!window->isActive()))
