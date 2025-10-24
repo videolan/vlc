@@ -420,7 +420,7 @@
     [self playerStateUpdated:nil];
 }
 
-- (void)updateTimeSlider:(NSNotification *)aNotification;
+- (void)updateTimeSlider:(NSNotification *)aNotification
 {
     if (_isTimeSliderBeingDragged) {
         return;

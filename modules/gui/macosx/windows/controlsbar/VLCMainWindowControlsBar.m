@@ -172,7 +172,7 @@
     [self.volumeUpButton setEnabled: !b_muted];
 }
 
-- (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification;
+- (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification
 {
     [super updateCurrentItemDisplayControls:aNotification];
 

@@ -394,7 +394,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)addPlayQueueItems:(NSArray <VLCOpenInputMetadata *> *)itemArray
               atPosition:(size_t)insertionIndex
-           startPlayback:(BOOL)startPlayback;
+           startPlayback:(BOOL)startPlayback
 {
     /* note: we don't add the item as cached data to the model here
      * because this will be done asynchronously through the callback */

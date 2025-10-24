@@ -486,7 +486,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return artist;
 }
 
-- (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
+- (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist
 {
     self = [super init];
     if (self && p_artist != NULL) {
@@ -572,7 +572,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.genres.firstObject;
 }
 
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
 {
     for(VLCMediaLibraryAlbum* album in self.albums) {
         [album iterateMediaItemsWithBlock:mediaItemBlock];
@@ -903,7 +903,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.groupMediaItems;
 }
 
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
 {
     for (VLCMediaLibraryMediaItem * const item in self.mediaItems) {
         [item iterateMediaItemsWithBlock:mediaItemBlock];
@@ -1451,7 +1451,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return _secondaryActionableDetailLibraryItem;
 }
 
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
 {
     mediaItemBlock(self);
 }

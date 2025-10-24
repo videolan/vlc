@@ -849,7 +849,7 @@ static int BossCallback(vlc_object_t *p_this,
     return self.currentMedia.duration;
 }
 
-- (NSURL *)URLOfCurrentMediaItem;
+- (NSURL *)URLOfCurrentMediaItem
 {
     if (!self.currentMedia) {
         return nil;
@@ -858,7 +858,7 @@ static int BossCallback(vlc_object_t *p_this,
     return [NSURL URLWithString:self.currentMedia.MRL];
 }
 
-- (NSString*)nameOfCurrentMediaItem;
+- (NSString*)nameOfCurrentMediaItem
 {
     if (!self.currentMedia) {
         return nil;

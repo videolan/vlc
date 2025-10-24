@@ -944,7 +944,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return [self readCachedArray:_cachedListOfMonitoredFolders fromQueue:_mediaItemCacheModificationQueue];
 }
 
-- (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(const enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
+- (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(const enum vlc_ml_parent_type)parentType forID:(int64_t)ID
 {
     const vlc_ml_query_params_t queryParams = [self queryParams];
     vlc_ml_album_list_t *p_albumList = vlc_ml_list_albums_of(_p_mediaLibrary, &queryParams, parentType, ID);

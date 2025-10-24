@@ -210,7 +210,7 @@ static void bookmarksLibraryCallback(void *p_data, const vlc_ml_event_t *p_event
 - (void)tableView:(NSTableView *)tableView
    setObjectValue:(id)object
    forTableColumn:(NSTableColumn *)tableColumn
-              row:(NSInteger)row;
+              row:(NSInteger)row
 {
     VLCBookmark * const bookmark = [self bookmarkForRow:row];
     VLCBookmark * const originalBookmark = [bookmark copy];
