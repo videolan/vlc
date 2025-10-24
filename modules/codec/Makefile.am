@@ -52,9 +52,9 @@ codec_LTLIBRARIES += libg711_plugin.la
 
 libfluidsynth_plugin_la_SOURCES = codec/fluidsynth.c
 libfluidsynth_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DDATADIR=\"$(datadir)\"
-libfluidsynth_plugin_la_CFLAGS = $(AM_CFLAGS) $(FLUIDSYNTH_CFLAGS)
+libfluidsynth_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_fluidsynth)
 libfluidsynth_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libfluidsynth_plugin_la_LIBADD = $(FLUIDSYNTH_LIBS)
+libfluidsynth_plugin_la_LIBADD = $(LIBS_fluidsynth)
 EXTRA_LTLIBRARIES += libfluidsynth_plugin.la
 codec_LTLIBRARIES += $(LTLIBfluidsynth)
 if HAVE_DARWIN
