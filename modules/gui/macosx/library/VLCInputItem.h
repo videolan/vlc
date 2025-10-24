@@ -88,7 +88,7 @@ extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 
 @end
 
-NSDictionary<NSString *, id> * const commonInputItemData(NSArray<VLCInputItem*> * const inputItems);
+NSDictionary<NSString *, id> *commonInputItemData(NSArray<VLCInputItem*> * const inputItems);
 
 @interface VLCInputNode : NSObject
 

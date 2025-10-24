@@ -544,7 +544,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 @end
 
 
-NSDictionary<NSString *, id> * const commonInputItemData(NSArray<VLCInputItem *> * const inputItems)
+NSDictionary<NSString *, id> *commonInputItemData(NSArray<VLCInputItem *> * const inputItems)
 {
     if (inputItems.count == 0) {
         return @{};
