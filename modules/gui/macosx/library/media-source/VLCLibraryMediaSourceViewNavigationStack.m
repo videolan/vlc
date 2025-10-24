@@ -88,7 +88,7 @@
 - (void)installHandlersOnMediaSource:(VLCMediaSource *)mediaSource
 {
     mediaSource.willStartGeneratingChildNodesForNodeHandler = ^(input_item_node_t * const node) {
-        const NSInteger rootMostAffectedState = [_navigationStates indexOfObjectPassingTest:^BOOL(VLCLibraryMediaSourceViewNavigationState * const _Nonnull obj, const NSUInteger idx, BOOL * const _Nonnull stop) {
+        const NSInteger rootMostAffectedState = [_navigationStates indexOfObjectPassingTest:^BOOL(VLCLibraryMediaSourceViewNavigationState * const _Nonnull obj, const NSUInteger __unused idx, BOOL * const __unused stop) {
             return obj.currentNodeDisplayed.vlcInputItemNode == node;
         }];
 

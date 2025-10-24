@@ -106,7 +106,7 @@
 {
     NSNumber * const showIdNumber = notification.object;
     const NSInteger showLibraryId = showIdNumber.integerValue;
-    const NSInteger rowIndex = [self.backingArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryShow * const show, const NSUInteger idx, BOOL * const stop) {
+    const NSInteger rowIndex = [self.backingArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryShow * const show, const NSUInteger __unused idx, BOOL * const __unused stop) {
         return show.libraryID == showLibraryId;
     }];
     if (rowIndex == NSNotFound) {

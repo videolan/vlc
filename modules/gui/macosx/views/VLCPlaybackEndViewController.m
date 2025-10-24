@@ -110,7 +110,7 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
     } else if (item.mediaSubType == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
         NSArray<VLCMediaLibraryShow *> * const shows =
             VLCMain.sharedInstance.libraryController.libraryModel.listOfShows;
-        const NSInteger showContainingEpisodeIdx = [shows indexOfObjectPassingTest:^BOOL(VLCMediaLibraryShow * const show, const NSUInteger idx, BOOL * const stop) {
+        const NSInteger showContainingEpisodeIdx = [shows indexOfObjectPassingTest:^BOOL(VLCMediaLibraryShow * const show, const NSUInteger __unused idx, BOOL * const __unused stop) {
             itemIndex = [show.mediaItems indexOfMediaLibraryItem:item];
             return itemIndex != NSNotFound;
         }];
@@ -153,7 +153,7 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
         componentsSeparatedByString:@";"];
     NSArray<NSString *> * const itemPlayableSiblingItemPaths = [[itemSiblingItemPaths
         sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]
-        filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString * const _Nonnull siblingItemPath, NSDictionary<NSString *, id> * const _Nullable bindings) {
+        filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString * const _Nonnull siblingItemPath, NSDictionary<NSString *, id> * const _Nullable __unused bindings) {
             return [playableExtensions containsObject:siblingItemPath.pathExtension.lowercaseString];
         }]];
     const NSInteger itemIdx = [itemPlayableSiblingItemPaths indexOfObject:itemUrl.lastPathComponent];

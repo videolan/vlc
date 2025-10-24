@@ -92,7 +92,7 @@ const CGFloat VLCLibraryInternalMediaItemRowHeight = 40.;
         return NSNotFound;
     }
 
-    return [self.internalMediaItems indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const item, NSUInteger index, BOOL * const stop) {
+    return [self.internalMediaItems indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const item, const NSUInteger __unused index, BOOL * const __unused stop) {
         return item.libraryID == libraryItem.libraryID;
     }];
 }

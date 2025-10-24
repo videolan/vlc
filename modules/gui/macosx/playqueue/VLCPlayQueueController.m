@@ -490,7 +490,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
     __block vlc_playlist_item_t **items = calloc(indexes.count, sizeof(vlc_playlist_item_t *));
     __block NSUInteger pos = 0;
-    [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+    [indexes enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const __unused stop) {
         VLCPlayQueueItem *item = [self->_playQueueModel playQueueItemAtIndex:idx];
         items[pos++] = item.playlistItem;
     }];

@@ -212,7 +212,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     NSArray<VLCInputItem *> * const selectedInputItems =
         [dataSource mediaSourceInputItemsAtIndexPaths:indexPaths];
     const NSInteger mediaSourceItemIndex = [selectedInputItems indexOfObjectPassingTest:^BOOL(
-        VLCInputItem * const inputItem, const NSUInteger idx, BOOL * const stop
+        VLCInputItem * const inputItem, const NSUInteger __unused idx, BOOL * const __unused stop
     ) {
         return [inputItem.MRL isEqualToString:_representedInputItem.MRL];
     }];

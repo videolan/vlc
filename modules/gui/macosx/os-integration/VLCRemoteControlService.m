@@ -167,7 +167,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
         NSImage * const coverArtImage = [[NSImage alloc] initWithContentsOfURL:artworkURL];
         if (coverArtImage) {
             MPMediaItemArtwork * const mpartwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:coverArtImage.size
-                                                                                   requestHandler:^NSImage* _Nonnull(CGSize size) {
+                                                                                   requestHandler:^NSImage* _Nonnull(CGSize __unused size) {
                 return coverArtImage;
             }];
             currentlyPlayingTrackInfo[MPMediaItemPropertyArtwork] = mpartwork;

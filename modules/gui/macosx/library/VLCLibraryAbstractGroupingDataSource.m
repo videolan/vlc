@@ -56,8 +56,8 @@
 - (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
 {
     return [array indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> findItem,
-                                                 const NSUInteger idx,
-                                                 BOOL * const stop) {
+                                                 const NSUInteger __unused idx,
+                                                 BOOL * const __unused stop) {
         NSAssert(findItem != nil, @"Collection should not contain nil items");
         return findItem.libraryID == libraryId;
     }];
@@ -190,8 +190,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     __block NSInteger itemInternalMediaItemIndex = NSNotFound;
     const NSInteger itemIndex =
         [self.backingArray indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> item,
-                                                          const NSUInteger idx,
-                                                          BOOL * const stop) {
+                                                          const NSUInteger __unused idx,
+                                                          BOOL * const __unused stop) {
             itemInternalMediaItemIndex =
                 [self indexOfMediaItem:libraryItem.libraryID inArray:item.mediaItems];
             return itemInternalMediaItemIndex != NSNotFound;

@@ -93,7 +93,7 @@
             (id<VLCLibraryTableViewDataSource>)dataSource;
 
         if ([indices containsIndex:clickedRow]) {
-            [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const stop) {
+            [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const __unused stop) {
                 const id<VLCMediaLibraryItemProtocol> mediaItem =
                     [vlcLibraryDataSource libraryItemAtRow:index forTableView:self];
                 const VLCMediaLibraryParentGroupType parentType =
@@ -122,7 +122,7 @@
             (VLCMediaSourceDataSource*)dataSource;
         NSAssert(mediaSourceDataSource != nil, @"This should be a valid pointer");
 
-        [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const stop) {
+        [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const __unused stop) {
             VLCInputItem * const mediaSourceInputItem = 
                 [mediaSourceDataSource mediaSourceInputItemAtRow:index];
             [mediaSourceInputItems addObject:mediaSourceInputItem];

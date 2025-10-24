@@ -238,7 +238,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (void)statusViewDeactivated:(NSNotification *)notification
 {
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const __unused context) {
         self.statusNotifierView.animator.alphaValue = 0.0;
     } completionHandler:^{
         self.statusNotifierView.hidden = YES;
@@ -267,8 +267,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         NSMutableArray<NSTreeNode *> * const nextLevelNodes = NSMutableArray.array;
 
         const NSInteger nodeIdx = [nodes indexOfObjectPassingTest:^BOOL(NSTreeNode * const obj,
-                                                                        NSUInteger idx,
-                                                                        BOOL * const stop) {
+                                                                        const NSUInteger __unused idx,
+                                                                        BOOL * const __unused stop) {
             VLCLibrarySegment * const segment = obj.representedObject;
             const BOOL matching = segment.segmentType == segmentType;
             if (!matching) {
@@ -411,7 +411,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     VLCLibrarySegment * const segment = (VLCLibrarySegment *)treeNode.representedObject;
     NSTreeNode * const selectedSegmentItem = (NSTreeNode *)[self.outlineView itemAtRow:self.outlineView.selectedRow];
     VLCLibrarySegment * const selectedSegment = (VLCLibrarySegment *)selectedSegmentItem.representedObject;
-    const NSInteger childNodeIndex = [segment.childNodes indexOfObjectPassingTest:^BOOL(NSTreeNode * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    const NSInteger childNodeIndex = [segment.childNodes indexOfObjectPassingTest:^BOOL(NSTreeNode * const _Nonnull obj, const NSUInteger __unused idx, BOOL * const _Nonnull __unused stop) {
         VLCLibrarySegment * const childSegment = (VLCLibrarySegment *)obj;
         return childSegment.segmentType == selectedSegment.segmentType;
     }];

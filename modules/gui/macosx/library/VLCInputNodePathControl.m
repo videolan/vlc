@@ -71,7 +71,7 @@
         return;
     }
 
-    const NSUInteger indexOfItem = [self.pathItems indexOfObjectPassingTest:^BOOL(NSPathControlItem * const searchItem, const NSUInteger idx, BOOL * const stop) {
+    const NSUInteger indexOfItem = [self.pathItems indexOfObjectPassingTest:^BOOL(NSPathControlItem * const searchItem, const NSUInteger __unused idx, BOOL * const __unused stop) {
         return [searchItem.image.accessibilityDescription isEqualToString:item.image.accessibilityDescription];
     }];
 

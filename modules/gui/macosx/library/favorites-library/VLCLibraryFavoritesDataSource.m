@@ -168,7 +168,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 - (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
 {
-    return [array indexOfObjectPassingTest:^BOOL(id<VLCMediaLibraryItemProtocol> const findMediaItem, const NSUInteger idx, BOOL * const stop) {
+    return [array indexOfObjectPassingTest:^BOOL(id<VLCMediaLibraryItemProtocol> const findMediaItem, const NSUInteger __unused idx, BOOL * const __unused stop) {
         NSAssert(findMediaItem != nil, @"Collection should not contain nil media items");
         return findMediaItem.libraryID == libraryId;
     }];

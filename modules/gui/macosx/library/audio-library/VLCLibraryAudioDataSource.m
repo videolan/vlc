@@ -107,7 +107,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     if (self.currentParentType == VLCMediaLibraryParentGroupTypeAudioLibrary) {
         NSString * const currentItemMrl = currentInputItem.MRL;
 
-        const NSUInteger itemIndexInDisplayedCollection = [self.displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
+        const NSUInteger itemIndexInDisplayedCollection = [self.displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger __unused idx, BOOL * const __unused stop) {
             VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)element;
             return [mediaItem.inputItem.MRL isEqualToString:currentItemMrl];
         }];
@@ -319,7 +319,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (NSUInteger)findSelectedItemNewIndex:(id<VLCMediaLibraryItemProtocol>)item
 {
-    return [self.displayedCollection indexOfObjectPassingTest:^BOOL(const id element, const NSUInteger idx, BOOL * const stop) {
+    return [self.displayedCollection indexOfObjectPassingTest:^BOOL(const id element, const NSUInteger __unused idx, BOOL * const __unused stop) {
         const id<VLCMediaLibraryItemProtocol> itemElement = (id<VLCMediaLibraryItemProtocol>)element;
         return itemElement.libraryID == item.libraryID;
     }];
@@ -564,7 +564,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (NSUInteger)indexForMediaLibraryItemWithId:(const int64_t)itemId
 {
-    return [self.displayedCollection indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> item, const NSUInteger idx, BOOL * const stop) {
+    return [self.displayedCollection indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> item, const NSUInteger __unused idx, BOOL * const __unused stop) {
         NSAssert(item != nil, @"Cache list should not contain nil items");
         return item.libraryID == itemId;
     }];

@@ -1045,7 +1045,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                                  ))action
 {
     dispatch_barrier_async(_mediaItemCacheModificationQueue, ^{
-        BOOL (^idCheckBlock)(VLCMediaLibraryMediaItem * const, const NSUInteger, BOOL * const) = ^BOOL(VLCMediaLibraryMediaItem * const mediaItem, const NSUInteger idx, BOOL * const stop) {
+        BOOL (^idCheckBlock)(VLCMediaLibraryMediaItem * const, const NSUInteger, BOOL * const) = ^BOOL(VLCMediaLibraryMediaItem * const mediaItem, const NSUInteger __unused idx, BOOL * const __unused stop) {
             NSAssert(mediaItem != nil, @"Cache list should not contain nil media items");
             return mediaItem.libraryID == libraryId;
         };
@@ -1115,7 +1115,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         const NSUInteger recentMediaIndex,
         NSMutableArray * const showsArray,
         const NSUInteger showIndex,
-        const NSUInteger showEpisodeIndex
+        const NSUInteger __unused showEpisodeIndex
     ) {
         if (cachedMediaArray == nil || cachedMediaIndex == NSNotFound) {
             NSLog(@"Could not handle update for media library item with id %lld in model", itemId);
@@ -1179,7 +1179,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         const NSUInteger recentMediaIndex,
         NSMutableArray * const showsArray,
         const NSUInteger showIndex,
-        const NSUInteger showEpisodeIndex
+        const NSUInteger __unused showEpisodeIndex
     ) {
 
         if (cachedMediaArray == nil || cachedMediaIndex == NSNotFound) {
@@ -1238,7 +1238,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (NSInteger)indexForAudioGroupInCache:(NSArray * const)cache withItemId:(const int64_t)itemId
 {
-    return [cache indexOfObjectPassingTest:^BOOL(id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem, const NSUInteger idx, BOOL * const stop) {
+    return [cache indexOfObjectPassingTest:^BOOL(id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem, const NSUInteger __unused idx, BOOL * const __unused stop) {
         NSAssert(audioGroupItem != nil, @"Cache list should not contain nil audio group items");
         return audioGroupItem.libraryID == itemId;
     }];
@@ -1415,8 +1415,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSMutableArray * const mutableGroups = self.cachedListOfGroups.mutableCopy;
         const NSUInteger groupIdx =
             [mutableGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
-                                                          const NSUInteger idx,
-                                                          BOOL * const stop) {
+                                                          const NSUInteger __unused idx,
+                                                          BOOL * const __unused stop) {
             return group.libraryID == itemId;
         }];
 
@@ -1449,8 +1449,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     dispatch_barrier_async(_groupCacheModificationQueue, ^{
         const NSUInteger groupIdx = 
             [self.cachedListOfGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
-                                                                    const NSUInteger idx,
-                                                                    BOOL * const stop) {
+                                                                    const NSUInteger __unused idx,
+                                                                    BOOL * const __unused stop) {
             NSAssert(group != nil, @"Cache list should not contain nil groups");
             return group.libraryID == itemId;
         }];

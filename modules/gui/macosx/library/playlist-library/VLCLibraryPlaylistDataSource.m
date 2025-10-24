@@ -107,8 +107,8 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     const int64_t playlistId = [(NSNumber *)notification.object longLongValue];
     const NSInteger playlistIdx =
         [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist * const playlist,
-                                                       const NSUInteger idx,
-                                                       BOOL * const stop) {
+                                                       const NSUInteger __unused idx,
+                                                       BOOL * const __unused stop) {
             return playlist.libraryID == playlistId;
         }];
     VLCMediaLibraryPlaylist * const playlist = self.playlists[playlistIdx];
@@ -157,7 +157,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (NSUInteger)indexForPlaylistWithId:(const int64_t)itemId
 {
-    return [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist *playlist, const NSUInteger idx, BOOL * const stop) {
+    return [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist *playlist, const NSUInteger __unused idx, BOOL * const __unused stop) {
         NSAssert(playlist != nil, @"Cache list should not contain nil playlists");
         return playlist.libraryID == itemId;
     }];
@@ -232,7 +232,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     if (libraryItem == nil) {
         return NSNotFound;
     }
-    return [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist *playlist, const NSUInteger idx, BOOL * const stop) {
+    return [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist *playlist, const NSUInteger __unused idx, BOOL * const __unused stop) {
         return playlist.libraryID == libraryItem.libraryID;
     }];
 }

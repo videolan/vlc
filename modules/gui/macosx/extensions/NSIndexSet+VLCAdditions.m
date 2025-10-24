@@ -27,7 +27,7 @@
 - (NSSet<NSIndexPath *> *)indexPathSetWithSection:(NSInteger)section
 {
     NSMutableSet<NSIndexPath *> * const indexPathSet = NSMutableSet.set;
-    [self enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop){
+    [self enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * const __unused stop){
         NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:idx inSection:section];
         [indexPathSet addObject:indexPath];
     }];

@@ -161,9 +161,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
         return;
     }
 
-    const NSUInteger runtimeOption = [options indexOfObjectPassingTest:^BOOL(NSString * const obj, NSUInteger i, BOOL *b){
-        VLC_UNUSED(i);
-        VLC_UNUSED(b);
+    const NSUInteger runtimeOption = [options indexOfObjectPassingTest:^BOOL(NSString * const obj, const NSUInteger __unused idx, BOOL * const __unused stop){
         return [obj hasPrefix:@"start-time"] || [obj hasPrefix:@"stop-time"];
     }];
 

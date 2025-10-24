@@ -105,8 +105,8 @@
 
     const int64_t itemId = self.item.firstMediaItem.libraryID;
     return [items indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const mediaItem,
-                                                 const NSUInteger idx,
-                                                 BOOL * const stop) {
+                                                 const NSUInteger __unused idx,
+                                                 BOOL * const __unused stop) {
         return mediaItem.libraryID == itemId;
     }];
 }

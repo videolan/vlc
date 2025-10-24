@@ -61,7 +61,7 @@
         return NO;
     }
     
-    const NSInteger childNodeIndex = [segment.childNodes indexOfObjectPassingTest:^BOOL(NSTreeNode * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    const NSInteger childNodeIndex = [segment.childNodes indexOfObjectPassingTest:^BOOL(NSTreeNode * _Nonnull obj, const NSUInteger __unused idx, BOOL * const __unused stop) {
         VLCLibrarySegment * const childSegment = (VLCLibrarySegment *)obj;
         return childSegment.segmentType == selectedSegment.segmentType;
     }];

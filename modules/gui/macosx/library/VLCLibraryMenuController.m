@@ -170,7 +170,7 @@
 
         BOOL anyNonRecent = NO;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
-            if ([recents indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([recents indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * _Nonnull obj, NSUInteger __unused idx, BOOL * __unused stop) {
                 return obj.libraryID == item.item.libraryID;
             }] == NSNotFound) {
                 anyNonRecent = YES;

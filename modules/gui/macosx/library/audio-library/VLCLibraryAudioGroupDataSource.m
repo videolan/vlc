@@ -133,8 +133,8 @@
 
 - (NSInteger)rowContainingMediaItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
-    return [self.representedAudioGroup.albums indexOfObjectPassingTest:^BOOL(VLCMediaLibraryAlbum *album, NSUInteger idx, BOOL *stop) {
-        return [album.mediaItems indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem *item, NSUInteger idx, BOOL *stop) {
+    return [self.representedAudioGroup.albums indexOfObjectPassingTest:^BOOL(VLCMediaLibraryAlbum * const album, const NSUInteger __unused idx, BOOL * const __unused stop) {
+        return [album.mediaItems indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const item, const NSUInteger __unused idx, BOOL * const __unused stop) {
             return item.libraryID == libraryItem.libraryID;
         }] != NSNotFound;
     }];

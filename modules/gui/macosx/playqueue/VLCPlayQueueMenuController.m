@@ -162,7 +162,7 @@
     NSMutableArray * const inputItems = NSMutableArray.array;
     NSIndexSet * const selectedIndices = self.playQueueTableView.selectedRowIndexes;
 
-    [selectedIndices enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const stop) {
+    [selectedIndices enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const __unused stop) {
         VLCPlayQueueItem * const item =
             [self->_playQueueController.playQueueModel playQueueItemAtIndex:idx];
         if (item == nil) {
@@ -213,7 +213,7 @@
     NSArray<VLCPlayQueueItem *> *items = nil;
     if (selectedIndexes.count > 0) {
         NSMutableArray<VLCPlayQueueItem *> * const selectedItems = [NSMutableArray arrayWithCapacity:selectedIndexes.count];
-        [selectedIndexes enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const stop) {
+        [selectedIndexes enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const __unused stop) {
             VLCPlayQueueItem * const item = [_playQueueController.playQueueModel playQueueItemAtIndex:idx];
             if (item) {
                 [selectedItems addObject:item];

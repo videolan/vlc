@@ -94,9 +94,9 @@
         NSTableViewRowAction * const appendToPlayQueueAction =
             [NSTableViewRowAction rowActionWithStyle:NSTableViewRowActionStyleRegular
                                                title:_NS("Append to Play Queue")
-                                             handler:^(NSTableViewRowAction *action, NSInteger r) {
+                                             handler:^(NSTableViewRowAction * const __unused action, const NSInteger __unused row) {
                 VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-                for (VLCMediaLibraryMediaItem *mediaItem in libraryItem.mediaItems) {
+                for (VLCMediaLibraryMediaItem * const mediaItem in libraryItem.mediaItems) {
                     [libraryController appendItemToPlayQueue:mediaItem playImmediately:NO];
                 }
         }];
@@ -110,7 +110,7 @@
         NSTableViewRowAction * const favoriteAction =
             [NSTableViewRowAction rowActionWithStyle:NSTableViewRowActionStyleRegular
                                                title:displayString
-                                             handler:^(NSTableViewRowAction *action, NSInteger r) {
+                                             handler:^(NSTableViewRowAction * const __unused action, const NSInteger __unused row) {
             [libraryItem setFavorite:!isFavorited];
         }];
         favoriteAction.backgroundColor =
