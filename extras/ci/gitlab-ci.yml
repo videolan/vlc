@@ -570,7 +570,7 @@ nightly-macos-arm64:
         if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
           EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --package-contribs"
         fi
-        ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH $EXTRA_BUILD_FLAGS
+        ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH $EXTRA_BUILD_FLAGS $EXTRA_TARGET_FLAGS
 
 ios-arm64:
     extends: .apple-os-common
@@ -594,7 +594,9 @@ tvos-arm64:
     extends: .apple-os-common
     tags:
         - macos-xcode15
-    variables: *variables-tvos-arm64
+    variables:
+        <<: *variables-tvos-arm64
+        EXTRA_TARGET_FLAGS: --enable-shared
 
 watchos-arm64_32:
     extends: .apple-os-common
