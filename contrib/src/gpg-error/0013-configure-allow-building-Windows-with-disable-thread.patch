@@ -1,0 +1,38 @@
+From 596a63bc148d6e644b28987c7210f5d9cbb8feac Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 24 Oct 2025 08:28:33 +0200
+Subject: [PATCH 13/13] configure: allow building Windows with
+ --disable-threads
+
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a24453e..500714c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -141,9 +141,9 @@ case "${host}" in
+ esac
+ 
+ 
+-if test "$have_w32_system" != yes; then
++dnl if test "$have_w32_system" != yes; then
+   gl_THREADLIB_EARLY
+-fi
++dnl fi
+ 
+ # We build libgpg-error with large file support so that we have a 64
+ # bit off_t.  Our external interface uses the gpgrt_off_t which is
+@@ -617,7 +617,7 @@ if test "$have_w32_system" = yes; then
+     if test "$have_w64_system" = yes; then
+       AC_DEFINE(HAVE_W64_SYSTEM,1,[Defined if we run on 64 bit W32 API system])
+     fi
+-    force_use_syscfg=yes
++    dnl force_use_syscfg=yes
+ fi
+ if test x"$gl_use_threads" = xno; then
+   lock_obj_h_generated=yes
+-- 
+2.45.1.windows.1
+
