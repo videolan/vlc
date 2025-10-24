@@ -121,7 +121,7 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
 
     if (parentMediaItemCollection == nil ||
         itemIndex == NSNotFound ||
-        itemIndex + 1 >= parentMediaItemCollection.count
+        (NSUInteger)(itemIndex + 1) >= parentMediaItemCollection.count
     ) {
         return [self nextItemForInputItem:item.inputItem];
     }
@@ -158,7 +158,7 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
         }]];
     const NSInteger itemIdx = [itemPlayableSiblingItemPaths indexOfObject:itemUrl.lastPathComponent];
     NSParameterAssert(itemIdx != NSNotFound);
-    if (itemIdx + 1 >= itemPlayableSiblingItemPaths.count) {
+    if ((NSUInteger)(itemIdx + 1) >= itemPlayableSiblingItemPaths.count) {
         NSLog(@"Played item was last in parent folder.");
         return nil;
     }

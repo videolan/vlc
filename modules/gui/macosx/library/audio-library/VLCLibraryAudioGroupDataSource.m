@@ -142,7 +142,7 @@
 
 - (void)handleAlbumUpdateInRow:(NSInteger)row
 {
-    NSParameterAssert(row >= 0 && row < self.representedListOfAlbums.count);
+    NSParameterAssert(row >= 0 && (NSUInteger)row < self.representedListOfAlbums.count);
     NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:row];
     NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndex:0];
     NSSet * const indexPaths = [NSSet setWithObject:[NSIndexPath indexPathForItem:row inSection:0]];
@@ -319,7 +319,7 @@
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    if (row < 0 || row >= self.representedListOfAlbums.count) {
+    if (row < 0 || (NSUInteger)row >= self.representedListOfAlbums.count) {
         return nil;
     }
 
@@ -372,7 +372,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 {
     if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind]) {
         NSArray<VLCMediaLibraryAlbum *> * const albums = self.representedListOfAlbums;
-        if (albums == nil || albums.count == 0 || indexPath.item >= albums.count) {
+        if (albums == nil || albums.count == 0 || indexPath.item < 0 || (NSUInteger)indexPath.item >= albums.count) {
             return nil;
         }
 

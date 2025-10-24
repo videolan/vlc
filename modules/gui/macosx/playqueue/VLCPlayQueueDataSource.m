@@ -96,7 +96,7 @@ static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
     }
 
     cellView.representedPlayQueueItem = item;
-    cellView.representsCurrentPlayQueueItem = _playQueueController.currentPlayQueueIndex == row;
+    cellView.representsCurrentPlayQueueItem = _playQueueController.currentPlayQueueIndex == (size_t)row;
 
     return cellView;
 }

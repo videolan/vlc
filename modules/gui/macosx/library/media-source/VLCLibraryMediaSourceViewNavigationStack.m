@@ -102,7 +102,7 @@
     };
 
     mediaSource.didFinishGeneratingChildNodesForNodeHandler = ^(input_item_node_t * const node) {
-        for (size_t i = 0; i < node->i_children; i++) {
+        for (int i = 0; i < node->i_children; i++) {
             input_item_node_t * const childNode = node->pp_children[i];
             NSURL * const url = [NSURL URLWithString:toNSStr(childNode->p_item->psz_uri)];
             VLCLibraryMediaSourceViewNavigationState * const affectedState = [self.affectedPathControlStates objectForKey:url];

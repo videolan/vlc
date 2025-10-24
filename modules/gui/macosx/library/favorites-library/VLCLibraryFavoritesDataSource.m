@@ -126,7 +126,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 - (VLCLibraryFavoritesSection)sectionForVisibleIndex:(NSInteger)visibleIndex
 {
-    if (visibleIndex < 0 || visibleIndex >= _visibleSectionMapping.count) {
+    if (visibleIndex < 0 || (NSUInteger)visibleIndex >= _visibleSectionMapping.count) {
         return VLCLibraryFavoritesSectionCount; // Invalid
     }
     return (VLCLibraryFavoritesSection)[_visibleSectionMapping[visibleIndex] integerValue];
@@ -166,7 +166,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     _visibleSectionMapping = [visibleSections copy];
 }
 
-- (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
+- (NSUInteger)indexOfMediaItem:(const int64_t)libraryId inArray:(NSArray const *)array
 {
     return [array indexOfObjectPassingTest:^BOOL(id<VLCMediaLibraryItemProtocol> const findMediaItem, const NSUInteger __unused idx, BOOL * const __unused stop) {
         NSAssert(findMediaItem != nil, @"Collection should not contain nil media items");
@@ -345,7 +345,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 {
     if (tableView == self.masterTableView) {
         // For master table, return a group descriptor object
-        NSParameterAssert(row >= 0 && row < _visibleSectionMapping.count);
+        NSParameterAssert(row >= 0 && (NSUInteger)row < _visibleSectionMapping.count);
         return [self createGroupDescriptorForSection:[self sectionForVisibleIndex:row]];
     } else if (tableView == self.detailTableView && self.masterTableView.selectedRow > -1) {
         const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:self.masterTableView.selectedRow];
@@ -353,12 +353,12 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
         // For artist and genre sections, use the flattened array
         if ([self isAudioGroupSection:section]) {
             NSArray<id<VLCMediaLibraryItemProtocol>> * const flattenedArray = _flattenedRowMappings[@(section)];
-            NSParameterAssert(flattenedArray && row < flattenedArray.count);
+            NSParameterAssert(flattenedArray && (NSUInteger)row < flattenedArray.count);
             return flattenedArray[row];
         } else {
             // For other sections, use the regular array
             NSArray<id<VLCMediaLibraryItemProtocol>> * const sectionArray = [self arrayForSection:section];
-            NSParameterAssert(sectionArray && row >= 0 && row < sectionArray.count);
+            NSParameterAssert(sectionArray && row >= 0 && (NSUInteger)row < sectionArray.count);
             return sectionArray[row];
         }
     }
@@ -514,7 +514,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
     NSArray * const sectionArray = [self arrayForSection:section];
     
-    if (indexPath.item >= 0 && indexPath.item < sectionArray.count) {
+    if (indexPath.item >= 0 && (NSUInteger)indexPath.item < sectionArray.count) {
         return sectionArray[indexPath.item];
     }
     

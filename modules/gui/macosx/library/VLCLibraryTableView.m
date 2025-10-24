@@ -76,10 +76,10 @@
 
     NSMutableIndexSet * const indices = self.selectedRowIndexes.mutableCopy;
     const NSUInteger hasSelectedIndices = indices.count > 0;
-    const NSUInteger clickedRow = self.clickedRow;
+    const NSInteger clickedRow = self.clickedRow;
 
     if (!hasSelectedIndices) {
-        if (clickedRow == -1) {
+        if (clickedRow == -1L) {
             return;
         } else {
             [indices addIndex:clickedRow];

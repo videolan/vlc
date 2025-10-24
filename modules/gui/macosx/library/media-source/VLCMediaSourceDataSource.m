@@ -75,7 +75,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                     withEventHandler:(dispatch_block_t)eventHandlerBlock
 {
     const uintptr_t descriptor = open(url.path.UTF8String, O_EVTONLY);
-    if (descriptor == -1) {
+    if (descriptor == (uintptr_t)-1) {
         return nil;
     }
     struct stat fileStat;

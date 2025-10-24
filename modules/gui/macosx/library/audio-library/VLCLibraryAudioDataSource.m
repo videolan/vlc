@@ -686,7 +686,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    if (row < 0 || row >= self.displayedCollection.count) {
+    if (row < 0 || (NSUInteger)row >= self.displayedCollection.count) {
         return nil;
     }
 
@@ -707,7 +707,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         [tableView scrollRowToVisible:selectedRow];
     }
 
-    if (selectedRow >= self.displayedCollection.count) {
+    if (selectedRow >= 0 && (NSUInteger)selectedRow >= self.displayedCollection.count) {
         return;
     }
 

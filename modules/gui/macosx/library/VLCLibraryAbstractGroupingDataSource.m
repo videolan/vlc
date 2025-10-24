@@ -53,7 +53,7 @@
     [self.collectionView reloadData];
 }
 
-- (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
+- (NSUInteger)indexOfMediaItem:(const int64_t)libraryId inArray:(NSArray const *)array
 {
     return [array indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> findItem,
                                                  const NSUInteger __unused idx,

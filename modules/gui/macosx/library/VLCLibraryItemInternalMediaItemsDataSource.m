@@ -79,7 +79,7 @@ const CGFloat VLCLibraryInternalMediaItemRowHeight = 40.;
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    if (row < 0 || row >= self.internalMediaItems.count) {
+    if (row < 0 || (NSUInteger)row >= self.internalMediaItems.count) {
         return nil;
     }
 

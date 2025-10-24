@@ -66,7 +66,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     return self;
 }
 
-- (NSUInteger)indexOfMediaItemInCollection:(const NSUInteger)libraryId
+- (NSUInteger)indexOfMediaItemInCollection:(const int64_t)libraryId
 {
     return [self.collectionArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const findMediaItem, const NSUInteger __unused idx, BOOL * const __unused stop) {
         NSAssert(findMediaItem != nil, @"Collection should not contain nil media items");
@@ -212,7 +212,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)reloadDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
 {
-    NSUInteger mediaItemIndex = [self indexOfMediaItemInCollection:mediaItem.libraryID];
+    const NSUInteger mediaItemIndex = [self indexOfMediaItemInCollection:mediaItem.libraryID];
     if (mediaItemIndex == NSNotFound) {
         return;
     }

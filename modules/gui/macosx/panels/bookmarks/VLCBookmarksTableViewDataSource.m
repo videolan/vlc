@@ -143,7 +143,7 @@ static void bookmarksLibraryCallback(void *p_data, const vlc_ml_event_t *p_event
 
     NSMutableArray<VLCBookmark *> * const tempBookmarks = [NSMutableArray arrayWithCapacity:vlcBookmarks->i_nb_items];
 
-    for (int i = 0; i < vlcBookmarks->i_nb_items; i++) {
+    for (size_t i = 0; i < vlcBookmarks->i_nb_items; i++) {
         vlc_ml_bookmark_t vlcBookmark = vlcBookmarks->p_items[i];
         VLCBookmark * const bookmark = [VLCBookmark bookmarkWithVlcBookmark:vlcBookmark];
         [tempBookmarks addObject:bookmark];
@@ -181,7 +181,7 @@ static void bookmarksLibraryCallback(void *p_data, const vlc_ml_event_t *p_event
 
 - (VLCBookmark *)bookmarkForRow:(NSInteger)row
 {
-    NSParameterAssert(row >= 0 || row < _bookmarks.count);
+    NSParameterAssert(row >= 0 || (NSUInteger)row < _bookmarks.count);
     return [_bookmarks objectAtIndex:row];
 }
 

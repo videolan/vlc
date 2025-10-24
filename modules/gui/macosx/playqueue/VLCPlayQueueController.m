@@ -389,7 +389,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 - (void)addPlayQueueItems:(NSArray <VLCOpenInputMetadata *> *)array
 {
     BOOL b_autoplay = var_InheritBool(getIntf(), "macosx-autoplay");
-    [self addPlayQueueItems:array atPosition:-1 startPlayback:b_autoplay];
+    [self addPlayQueueItems:array atPosition:NSUIntegerMax startPlayback:b_autoplay];
 }
 
 - (void)addPlayQueueItems:(NSArray <VLCOpenInputMetadata *> *)itemArray
@@ -420,7 +420,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
         int ret = 0;
         size_t actualInsertionIndex = insertionIndex;
-        if (insertionIndex == -1) {
+        if (insertionIndex == NSUIntegerMax) {
             actualInsertionIndex = vlc_playlist_Count(_p_playlist);
         }
         ret = vlc_playlist_Insert(_p_playlist,
@@ -441,7 +441,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
         vlc_playlist_Unlock(_p_playlist);
         input_item_Release(p_input);
 
-        if (insertionIndex != -1) {
+        if (insertionIndex != NSUIntegerMax) {
             insertionIndex++;
         }
     }
@@ -455,7 +455,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     int ret = 0;
 
     vlc_playlist_Lock(_p_playlist);
-    if (insertionIndex == -1) {
+    if (insertionIndex == NSUIntegerMax) {
         insertionIndex = vlc_playlist_Count(_p_playlist);
     }
     ret = vlc_playlist_InsertOne(_p_playlist, insertionIndex, p_inputItem);

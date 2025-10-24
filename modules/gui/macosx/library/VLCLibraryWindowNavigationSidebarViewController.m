@@ -175,7 +175,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         }
         NSURL * const locationUrl = [NSURL URLWithString:locationMrl];
         const uintptr_t descriptor = open(locationUrl.path.UTF8String, O_EVTONLY);
-        if (descriptor == -1) {
+        if (descriptor == (uintptr_t)-1) {
             continue;
         }
         struct stat fileStat;
