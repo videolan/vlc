@@ -417,8 +417,6 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
     [self stopAutohideTimer];
 
-    NSPoint mousePos = [self.view.window mouseLocationOutsideOfEventStream];
-
     if ([self mouseOnControls]) {
         [self showControls];
         return;

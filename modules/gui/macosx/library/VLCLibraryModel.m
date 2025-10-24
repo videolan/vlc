@@ -1053,7 +1053,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Recents can contain media items the other two do
         NSMutableArray * const recentsMutable = self.cachedRecentMedia.mutableCopy;
         const NSUInteger recentsIndex = [recentsMutable indexOfObjectPassingTest:idCheckBlock];
-        const BOOL isInRecents = recentsIndex != NSNotFound;
 
         NSMutableArray * const videoMutable = self.cachedVideoMedia.mutableCopy;
         const NSUInteger videoIndex = [videoMutable indexOfObjectPassingTest:idCheckBlock];
@@ -1079,7 +1078,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         NSMutableArray * const recentAudiosMutable = self.cachedRecentAudioMedia.mutableCopy;
         const NSUInteger recentAudiosIndex = [recentAudiosMutable indexOfObjectPassingTest:idCheckBlock];
-        const BOOL isInRecentAudios = recentAudiosIndex != NSNotFound;
 
         NSMutableArray * const audioMutable = self.cachedAudioMedia.mutableCopy;
         const NSUInteger audioIndex = [self.cachedAudioMedia indexOfObjectPassingTest:idCheckBlock];

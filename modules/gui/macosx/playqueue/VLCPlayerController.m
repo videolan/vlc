@@ -1717,7 +1717,7 @@ static int BossCallback(vlc_object_t *p_this,
     double b_pos = -1;
     
     vlc_player_Lock(_p_player);
-    const enum vlc_player_abloop state = vlc_player_GetAtoBLoop(_p_player, &a_time, &a_pos, &b_time, &b_pos);
+    vlc_player_GetAtoBLoop(_p_player, &a_time, &a_pos, &b_time, &b_pos);
     vlc_player_Unlock(_p_player);
 
     _aLoopTime = a_time;

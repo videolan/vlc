@@ -80,6 +80,10 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     }
     struct stat fileStat;
     const int statResult = fstat(descriptor, &fileStat);
+    if (statResult == -1) {
+        NSLog(@"Failed to stat file %@: %s", url.path, strerror(errno));
+        return nil;
+    }
 
     const dispatch_queue_t globalQueue =
         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);

@@ -210,6 +210,7 @@ static const char *const myFoldersDescription = "My Folders";
 
         NSArray<NSURL *> * const picturesUrls = [fileManager URLsForDirectory:NSPicturesDirectory
                                                                     inDomains:NSUserDomainMask];
+        addIfNotEmpty(picturesUrls);
     }
     return self;
 }

@@ -1380,7 +1380,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     switch (self.mediaSubType) {
     case VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE:
     {
-        VLCInputItem * const inputItem = self.inputItem;
         VLCMediaLibraryShowEpisode * const episodeInfo = self.showEpisode;
         return [NSString stringWithFormat:_NS("Season %u, Episode %u"),
                 episodeInfo.seasonNumber, episodeInfo.episodeNumber];

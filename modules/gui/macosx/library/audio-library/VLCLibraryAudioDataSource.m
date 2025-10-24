@@ -903,9 +903,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         carouselItemView.frame = itemFrame;
     }
 
-    // TODO: Find a more elegant way to do this
-    VLCLibraryHomeViewBaseCarouselContainerView * const containerView = (VLCLibraryHomeViewBaseCarouselContainerView *)carousel.superview;
-
     const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:index forTableView:nil];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
                                                                                              parentType:self.currentParentType];

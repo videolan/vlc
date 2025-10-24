@@ -196,7 +196,6 @@ static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
                                           edge:(NSTableRowActionEdge)edge
 {
     if (edge == NSTableRowActionEdgeTrailing) {
-        VLCPlayQueueModel * const model = _playQueueController.playQueueModel;
         VLCPlayQueueItem * const item = [_playQueueController.playQueueModel playQueueItemAtIndex:row];
         if (item == nil) {
             return @[];

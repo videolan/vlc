@@ -132,7 +132,7 @@
     if (randomItem != nil) {
         const BOOL isVideo = randomItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
         const VLCMediaLibraryParentGroupType parentType = isVideo ? VLCMediaLibraryParentGroupTypeVideoLibrary : VLCMediaLibraryParentGroupTypeAudioLibrary;
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:randomItem parentType:VLCMediaLibraryParentGroupTypeUnknown];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:randomItem parentType:parentType];
 
         self.representedItem = representedItem;
         self.explanationTextField.stringValue = _NS("From your library");
