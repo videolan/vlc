@@ -71,7 +71,7 @@ NSString * const VLCLibraryPlayQueueModeDefaultsKey = @"VLCLibraryPlayQueueMode"
 #pragma mark core callbacks
 
 static void
-cb_playlist_items_reset(vlc_playlist_t *playlist,
+cb_playlist_items_reset(vlc_playlist_t *const __unused playlist,
                         vlc_playlist_item_t *const items[],
                         size_t numberOfItems,
                         void *p_data)
@@ -88,7 +88,7 @@ cb_playlist_items_reset(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_items_added(vlc_playlist_t *playlist,
+cb_playlist_items_added(vlc_playlist_t *const __unused playlist,
                         size_t insertionIndex,
                         vlc_playlist_item_t *const items[],
                         size_t numberOfAddedItems,
@@ -106,7 +106,7 @@ cb_playlist_items_added(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_items_moved(vlc_playlist_t *playlist,
+cb_playlist_items_moved(vlc_playlist_t *const __unused playlist,
                         size_t index,
                         size_t numberOfMovedItems,
                         size_t target,
@@ -119,7 +119,7 @@ cb_playlist_items_moved(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_items_removed(vlc_playlist_t *playlist,
+cb_playlist_items_removed(vlc_playlist_t *const __unused playlist,
                           size_t index,
                           size_t count,
                           void *p_data)
@@ -131,7 +131,7 @@ cb_playlist_items_removed(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_items_updated(vlc_playlist_t *playlist,
+cb_playlist_items_updated(vlc_playlist_t *const __unused playlist,
                           size_t firstUpdatedIndex,
                           vlc_playlist_item_t *const items[],
                           size_t numberOfUpdatedItems,
@@ -144,7 +144,7 @@ cb_playlist_items_updated(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_playback_repeat_changed(vlc_playlist_t *playlist,
+cb_playlist_playback_repeat_changed(vlc_playlist_t *const __unused playlist,
                                     enum vlc_playlist_playback_repeat repeat,
                                     void *p_data)
 {
@@ -155,7 +155,7 @@ cb_playlist_playback_repeat_changed(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_playback_order_changed(vlc_playlist_t *playlist,
+cb_playlist_playback_order_changed(vlc_playlist_t *const __unused playlist,
                                    enum vlc_playlist_playback_order order,
                                    void *p_data)
 {
@@ -166,7 +166,7 @@ cb_playlist_playback_order_changed(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_current_item_index_changed(vlc_playlist_t *playlist,
+cb_playlist_current_item_index_changed(vlc_playlist_t *const __unused playlist,
                                  ssize_t index,
                                  void *p_data)
 {
@@ -177,7 +177,7 @@ cb_playlist_current_item_index_changed(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_has_prev_changed(vlc_playlist_t *playlist,
+cb_playlist_has_prev_changed(vlc_playlist_t *const __unused playlist,
                              bool has_prev,
                              void *p_data)
 {
@@ -188,7 +188,7 @@ cb_playlist_has_prev_changed(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_has_next_changed(vlc_playlist_t *playlist,
+cb_playlist_has_next_changed(vlc_playlist_t *const __unused playlist,
                              bool has_next,
                              void *p_data)
 {
@@ -199,7 +199,7 @@ cb_playlist_has_next_changed(vlc_playlist_t *playlist,
 }
 
 static void
-cb_playlist_media_stopped_action_changed(vlc_playlist_t *p_playlist,
+cb_playlist_media_stopped_action_changed(vlc_playlist_t *const __unused p_playlist,
                                          enum vlc_playlist_media_stopped_action newAction,
                                          void *p_data)
 {

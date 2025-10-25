@@ -408,23 +408,22 @@ static void cb_player_program_selection_changed(vlc_player_t *p_player,
     });
 }
 
-static void cb_player_atobloop_changed(vlc_player_t *p_player,
+static void cb_player_atobloop_changed(vlc_player_t * __unused p_player,
                                        enum vlc_player_abloop new_state,
-                                       vlc_tick_t time, double pos,
+                                       vlc_tick_t __unused time,
+                                       double __unused pos,
                                        void *p_data)
 {
-    VLC_UNUSED(p_player);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController ABLoopStateChanged:new_state];
     });
 }
 
-static void cb_player_item_meta_changed(vlc_player_t *p_player,
+static void cb_player_item_meta_changed(vlc_player_t * __unused p_player,
                                         input_item_t *p_mediaItem,
                                         void *p_data)
 {
-    VLC_UNUSED(p_player);
     input_item_Hold(p_mediaItem);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
@@ -432,17 +431,13 @@ static void cb_player_item_meta_changed(vlc_player_t *p_player,
     });
 }
 
-static void cb_player_vout_changed(vlc_player_t *p_player,
-                                   enum vlc_player_vout_action action,
-                                   vout_thread_t *p_vout,
-                                   enum vlc_vout_order order,
+static void cb_player_vout_changed(vlc_player_t * __unused p_player,
+                                   enum vlc_player_vout_action __unused action,
+                                   vout_thread_t * __unused p_vout,
+                                   enum vlc_vout_order __unused order,
                                    vlc_es_id_t *es_id,
                                    void *p_data)
 {
-    VLC_UNUSED(p_player);
-    VLC_UNUSED(p_vout);
-    VLC_UNUSED(order);
-
     if (vlc_es_id_GetCat(es_id) != VIDEO_ES)
         return;
 
@@ -509,7 +504,7 @@ static void cb_player_timer_paused(const vlc_tick_t system_date, void * const p_
     });
 }
 
-static void cb_player_timer_seeked(const struct vlc_player_timer_point * const p_value, void * const p_data)
+static void cb_player_timer_seeked(const struct vlc_player_timer_point * const __unused p_value, void * const p_data)
 {
     VLCPlayerController * const playerController = (__bridge VLCPlayerController *)p_data;
     dispatch_async(dispatch_get_main_queue(), ^{

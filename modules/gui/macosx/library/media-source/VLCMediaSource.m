@@ -39,8 +39,8 @@ NSString *VLCMediaSourceChildrenAdded = @"VLCMediaSourceChildrenAdded";
 NSString *VLCMediaSourceChildrenRemoved = @"VLCMediaSourceChildrenRemoved";
 NSString *VLCMediaSourcePreparsingEnded = @"VLCMediaSourcePreparsingEnded";
 
-static void cb_children_reset(vlc_media_tree_t *p_tree,
-                              input_item_node_t *p_node,
+static void cb_children_reset(vlc_media_tree_t * __unused p_tree,
+                              input_item_node_t * __unused p_node,
                               void *p_data)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -50,10 +50,10 @@ static void cb_children_reset(vlc_media_tree_t *p_tree,
     });
 }
 
-static void cb_children_added(vlc_media_tree_t *p_tree,
-                              input_item_node_t *p_node,
-                              input_item_node_t *const p_children[],
-                              size_t count,
+static void cb_children_added(vlc_media_tree_t * __unused p_tree,
+                              input_item_node_t * __unused p_node,
+                              input_item_node_t *const __unused p_children[],
+                              size_t __unused count,
                               void *p_data)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -63,10 +63,10 @@ static void cb_children_added(vlc_media_tree_t *p_tree,
     });
 }
 
-static void cb_children_removed(vlc_media_tree_t *p_tree,
-                                input_item_node_t *p_node,
-                                input_item_node_t *const p_children[],
-                                size_t count,
+static void cb_children_removed(vlc_media_tree_t * __unused p_tree,
+                                input_item_node_t * __unused p_node,
+                                input_item_node_t *const __unused p_children[],
+                                size_t __unused count,
                                 void *p_data)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -76,9 +76,9 @@ static void cb_children_removed(vlc_media_tree_t *p_tree,
     });
 }
 
-static void cb_preparse_ended(vlc_media_tree_t *p_tree,
-                              input_item_node_t *p_node,
-                              int status,
+static void cb_preparse_ended(vlc_media_tree_t * __unused p_tree,
+                              input_item_node_t * __unused p_node,
+                              int __unused status,
                               void *p_data)
 {
     dispatch_async(dispatch_get_main_queue(), ^{

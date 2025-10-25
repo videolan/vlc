@@ -112,8 +112,11 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
 
 @end
 
-static int ShowFullscreenController(vlc_object_t *p_this, const char *psz_variable,
-                                    vlc_value_t old_val, vlc_value_t new_val, void *param)
+static int ShowFullscreenController(vlc_object_t * __unused p_this,
+                                    const char * __unused psz_variable,
+                                    vlc_value_t __unused old_val,
+                                    vlc_value_t __unused new_val,
+                                    void * __unused param)
 {
     @autoreleasepool {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -125,8 +128,11 @@ static int ShowFullscreenController(vlc_object_t *p_this, const char *psz_variab
     }
 }
 
-static int ShowController(vlc_object_t *p_this, const char *psz_variable,
-                          vlc_value_t old_val, vlc_value_t new_val, void *param)
+static int ShowController(vlc_object_t * __unused p_this,
+                          const char * __unused psz_variable,
+                          vlc_value_t __unused old_val,
+                          vlc_value_t __unused new_val,
+                          void * __unused param)
 {
     @autoreleasepool {
         dispatch_async(dispatch_get_main_queue(), ^{
