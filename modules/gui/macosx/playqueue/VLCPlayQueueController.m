@@ -586,6 +586,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)setPlaybackOrder:(enum vlc_playlist_playback_order)playbackOrder
 {
+    // Set the ivar first and then we will receive whatever has been applied via vlc_playlist_SetPlaybackOrder
+    [self playQueuePlaybackOrderUpdated:playbackOrder];
+
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_SetPlaybackOrder(_p_playlist, playbackOrder);
     vlc_playlist_Unlock(_p_playlist);
@@ -593,6 +596,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)setPlaybackRepeat:(enum vlc_playlist_playback_repeat)playbackRepeat
 {
+    // Set the ivar first and then we will receive whatever has been applied via vlc_playlist_SetPlaybackRepeat
+    [self playQueuePlaybackRepeatUpdated:playbackRepeat];
+
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_SetPlaybackRepeat(_p_playlist, playbackRepeat);
     vlc_playlist_Unlock(_p_playlist);
@@ -730,6 +736,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)setActionAfterStop:(enum vlc_playlist_media_stopped_action)actionAfterStop
 {
+    // Set the ivar first and then we will receive whatever has been enabled via actionAfterStopChanged
+    [self stopActionChanged:actionAfterStop];
+
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_SetMediaStoppedAction(_p_playlist, actionAfterStop);
     vlc_playlist_Unlock(_p_playlist);

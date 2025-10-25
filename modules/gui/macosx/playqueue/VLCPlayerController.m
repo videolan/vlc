@@ -1057,6 +1057,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setPlaybackRate:(float)playbackRate
 {
+    // Set the ivar first and then we will receive whatever has been applied via newRateValue
+    [self newRateValue:playbackRate];
+
     vlc_player_Lock(_p_player);
     vlc_player_ChangeRate(_p_player, playbackRate);
     vlc_player_Unlock(_p_player);
@@ -1265,6 +1268,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setSelectedTitleIndex:(size_t)selectedTitleIndex
 {
+    // Set the ivar first and then we will receive whatever has been selected via selectedTitleChanged
+    [self selectedTitleChanged:selectedTitleIndex];
+
     vlc_player_Lock(_p_player);
     vlc_player_SelectTitleIdx(_p_player, selectedTitleIndex);
     vlc_player_Unlock(_p_player);
@@ -1304,6 +1310,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setSelectedChapterIndex:(size_t)selectedChapterIndex
 {
+    // Set the ivar first and then we will receive whatever has been selected via selectedChapterChanged
+    [self selectedChapterChanged:selectedChapterIndex];
+
     vlc_player_Lock(_p_player);
     vlc_player_SelectChapterIdx(_p_player, selectedChapterIndex);
     vlc_player_Unlock(_p_player);
@@ -1359,6 +1368,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setTeletextEnabled:(BOOL)teletextEnabled
 {
+    // Set the ivar first and then we will receive whatever has been enabled via teletextEnabledChanged
+    [self teletextEnabledChanged:teletextEnabled];
+
     vlc_player_Lock(_p_player);
     vlc_player_SetTeletextEnabled(_p_player, teletextEnabled);
     vlc_player_Unlock(_p_player);
@@ -1373,6 +1385,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setTeletextPage:(unsigned int)teletextPage
 {
+    // Set the ivar first and then we will receive whatever has been selected via teletextPageChanged
+    [self teletextPageChanged:teletextPage];
+
     vlc_player_Lock(_p_player);
     vlc_player_SelectTeletextPage(_p_player, teletextPage);
     vlc_player_Unlock(_p_player);
@@ -1387,6 +1402,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setTeletextTransparent:(BOOL)teletextTransparent
 {
+    // Set the ivar first and then we will receive whatever has been enabled via teletextTransparencyChanged
+    [self teletextTransparencyChanged:teletextTransparent];
+
     vlc_player_Lock(_p_player);
     vlc_player_SetTeletextTransparency(_p_player, teletextTransparent);
     vlc_player_Unlock(_p_player);
@@ -1401,6 +1419,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setAudioDelay:(vlc_tick_t)audioDelay
 {
+    // Set the ivar first and then we will receive whatever has been enabled via audioDelayChanged
+    [self audioDelayChanged:audioDelay];
+
     vlc_player_Lock(_p_player);
     vlc_player_SetAudioDelay(_p_player, audioDelay, VLC_PLAYER_WHENCE_ABSOLUTE);
     vlc_player_Unlock(_p_player);
@@ -1415,6 +1436,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setSubtitlesDelay:(vlc_tick_t)subtitlesDelay
 {
+    // Set the ivar first and then we will receive whatever has been enabled via subtitlesDelayChanged
+    [self subtitlesDelayChanged:subtitlesDelay];
+
     vlc_player_Lock(_p_player);
     vlc_player_SetSubtitleDelay(_p_player, subtitlesDelay, VLC_PLAYER_WHENCE_ABSOLUTE);
     vlc_player_Unlock(_p_player);
@@ -1454,6 +1478,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setSubtitlesFPS:(float)subtitlesFPS
 {
+    // Set the ivar first and then we will receive whatever has been enabled via subtitlesFPSChanged
+    [self subtitlesFPSChanged:subtitlesFPS];
+
     vlc_player_Lock(_p_player);
     vlc_player_SetAssociatedSubsFPS(_p_player, subtitlesFPS);
     vlc_player_Unlock(_p_player);
@@ -1502,6 +1529,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setRendererItem:(vlc_renderer_item_t *)rendererItem
 {
+    // Set the ivar first and then we will receive whatever has been enabled via rendererChanged
+    [self rendererChanged:rendererItem];
+
     vlc_player_Lock(_p_player);
     vlc_player_SetRenderer(_p_player, rendererItem);
     vlc_player_Unlock(_p_player);
@@ -1757,6 +1787,9 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setEnableRecording:(BOOL)enableRecording
 {
+    // Set the ivar first and then we will receive whatever has been enabled via recordingChanged
+    [self recordingChanged:enableRecording];
+
     vlc_player_Lock(_p_player);
     vlc_player_SetRecordingEnabled(_p_player, enableRecording, NULL);
     vlc_player_Unlock(_p_player);
@@ -1780,6 +1813,8 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setFullscreen:(BOOL)fullscreen
 {
+    // Set the ivar first and then we will receive whatever has been enabled via fullscreenChanged
+    [self fullscreenChanged:fullscreen];
     vlc_player_vout_SetFullscreen(_p_player, fullscreen);
 }
 
@@ -1803,6 +1838,8 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setWallpaperMode:(BOOL)wallpaperMode
 {
+    // Set the ivar first and then we will receive whatever has been enabled via wallpaperModeChanged
+    [self wallpaperModeChanged:wallpaperMode];
     vlc_player_vout_SetWallpaperModeEnabled(_p_player, wallpaperMode);
 }
 
@@ -1887,6 +1924,8 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setVolume:(float)volume
 {
+    // Set the ivar first and then we will receive whatever has been enabled via volumeChanged
+    [self volumeChanged:volume];
     vlc_player_aout_SetVolume(_p_player, volume);
 }
 
@@ -1909,6 +1948,8 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)setMute:(BOOL)mute
 {
+    // Set the ivar first and then we will receive whatever has been enabled via muteChanged
+    [self muteChanged:mute];
     vlc_player_aout_Mute(_p_player, mute);
 }
 

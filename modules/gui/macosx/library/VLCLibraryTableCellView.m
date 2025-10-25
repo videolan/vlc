@@ -159,6 +159,8 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
     self.singlePrimaryTitleTextField.hidden = NO;
     self.singlePrimaryTitleTextField.stringValue = sectionString;
     self.representedImageView.image = [NSImage imageNamed: @"noart.png"];
+
+    _representedVideoLibrarySection = section;
 }
 
 - (void)playMediaItemInstantly:(id)sender

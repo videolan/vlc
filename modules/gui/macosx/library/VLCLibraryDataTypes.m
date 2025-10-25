@@ -1725,8 +1725,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @implementation VLCMediaLibraryShow
 
-@synthesize episodes = _episodes;
-
 + (nullable instancetype)showWithLibraryId:(const int64_t)libraryId
 {
     vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
