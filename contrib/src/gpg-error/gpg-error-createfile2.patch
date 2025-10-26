@@ -11,7 +11,7 @@ Subject: [PATCH 05/12] use CreateFile2 in Win8 as CreateFileW is forbidden in
  3 files changed, 46 insertions(+)
 
 diff --git a/src/estream.c b/src/estream.c
-index 42027b4..a99a019 100644
+index 763e811..9fda47e 100644
 --- a/src/estream.c
 +++ b/src/estream.c
 @@ -2030,6 +2030,17 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
@@ -43,7 +43,7 @@ index 42027b4..a99a019 100644
 @@ -5107,6 +5119,17 @@ tmpfd (void)
            value <<= 4;
          }
-       strcpy (p, ".tmp");
+       wcscpy (p, L".tmp");
 +#if _WIN32_WINNT >= 0x0602 // _WIN32_WINNT_WIN8
 +      CREATEFILE2_EXTENDED_PARAMETERS params;
 +      memset (&params, 0, sizeof params);
