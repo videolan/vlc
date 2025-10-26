@@ -13,6 +13,8 @@ ifeq ($(ARCH),mips64el)
 GMP_CONF += --disable-assembly
 endif
 endif
+# gmp requires C99 and is _not_ forward-compatible with C23.
+GMP_CONF += CFLAGS="$(CFLAGS) -std=gnu99"
 
 ifdef HAVE_WIN32
 ifeq ($(ARCH),arm)
