@@ -669,8 +669,11 @@ static void CEA708_Window_Scroll( cea708_window_t *p_w )
                 cea708_text_row_t *row = p_w->rows[i];
                 if( row->lastcol < row->firstcol ) /* should not happen */
                     continue;
-                memmove( &row->characters[row->firstcol + 1], &row->characters[row->firstcol],
-                         (row->lastcol - row->firstcol + 1) * 4U );
+
+                size_t start = (size_t) row->firstcol * 4U;
+                size_t count = (size_t) (row->lastcol - row->firstcol + 1) * 4U;
+                memmove( &row->characters[start + 4U], &row->characters[start],
+                         count );
                 memmove( &row->styles[row->firstcol + 1], &row->styles[row->firstcol],
                          (row->lastcol - row->firstcol + 1) * sizeof(cea708_pen_style_t) );
                 row->firstcol++;
@@ -690,8 +693,10 @@ static void CEA708_Window_Scroll( cea708_window_t *p_w )
                     continue;
                 if( row->firstcol > 0 )
                 {
-                    memmove( &row->characters[row->firstcol - 1], &row->characters[row->firstcol],
-                             (row->lastcol - row->firstcol + 1) * 4U );
+                    size_t start = (size_t) row->firstcol * 4U;
+                    size_t count = (size_t) (row->lastcol - row->firstcol + 1) * 4U;
+                    memmove( &row->characters[start -4U], &row->characters[start],
+                             count );
                     memmove( &row->styles[row->firstcol - 1], &row->styles[row->firstcol],
                              (row->lastcol - row->firstcol + 1) * sizeof(cea708_pen_style_t) );
                     row->firstcol--;
