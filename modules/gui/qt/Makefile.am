@@ -22,10 +22,8 @@ EXTRA_DIST = qt6.pro qtest.pro quicktest.pro scripts
 vlc_qt_libs = $(QT_LIBS)
 RCC_EXTRA_PARAMS =
 
-if HAVE_QT_ZSTD
-RCC_EXTRA_PARAMS += -compress-algo=zstd
-else
-RCC_EXTRA_PARAMS += -compress-algo=zlib
+if !HAVE_QT_ZSTD
+RCC_EXTRA_PARAMS += --no-zstd
 endif
 
 vlc_qt_check_SOURCES = vlc-qt-check.cpp plugins.hpp

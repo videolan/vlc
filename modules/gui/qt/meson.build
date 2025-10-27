@@ -917,10 +917,8 @@ if qt6_dep.found()
     #error "Qt can not decompress zstd. Resources are going to be compressed using zlib."
     #endif
     '''
-    if cpp.compiles(qt_zstd_check, dependencies: qt6_dep, name: 'Qt supports decompressing zstd')
-        qt_rcc_extra_arguments += '-compress-algo=zstd'
-    else
-        qt_rcc_extra_arguments += '-compress-algo=zlib'
+    if not cpp.compiles(qt_zstd_check, dependencies: qt6_dep, name: 'Qt supports decompressing zstd')
+        qt_rcc_extra_arguments += '--no-zstd'
     endif
 
     atomic_lib = cc.find_library('atomic', required: false)
