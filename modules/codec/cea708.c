@@ -667,11 +667,13 @@ static void CEA708_Window_Scroll( cea708_window_t *p_w )
     {
         case CEA708_WA_DIRECTION_LTR:
             /* Move RIGHT */
-            if( CEA708_Window_MaxCol( p_w ) == CEA708_WINDOW_MAX_ROWS - 1 )
+            if( CEA708_Window_MaxCol( p_w ) == CEA708_WINDOW_MAX_COLS - 1 )
                 CEA708_Window_Truncate( p_w, CEA708_WA_DIRECTION_LTR );
             for( int i=p_w->i_firstrow; i <= p_w->i_lastrow; i++ )
             {
                 cea708_text_row_t *row = p_w->rows[i];
+                if( !row )
+                    continue;
                 if( row->lastcol < row->firstcol ) /* should not happen */
                     continue;
 
