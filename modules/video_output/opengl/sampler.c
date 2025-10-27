@@ -274,10 +274,13 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
     }
 
     const struct vlc_gl_format *glfmt = &sampler->glfmt;
-    /* To guarantee variable names length, we need to fix the number
-     * of texture from now on. */
     const unsigned tex_count = glfmt->tex_count;
-    if (tex_count >= 10)
+    /* To guarantee variable names length, we need to fix the number
+     * of texture from now on.
+     * tex_count > PICTURE_PLANE_MAX (5) would overflow uloc.Textures
+     * tex_count > 9 would overflow the char name[] string during
+     * snprintf operations. */
+    if (tex_count >= PICTURE_PLANE_MAX)
         vlc_assert_unreachable();
 
     for (unsigned i = 0; i < tex_count; ++i)
