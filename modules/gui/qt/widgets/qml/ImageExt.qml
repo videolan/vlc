@@ -164,16 +164,7 @@ Item {
 
         smooth: root.smooth
 
-        // NOTE: There are two ways to support atlas textures, one is by setting `supportsAtlasTextures`
-        //       and the other is by defining `qt_SubRect_source` in the shader uniform block. If either
-        //       of these is satisfied, the atlas texture will be used (`removedFromAtlas()` not called).
-        //       Even though the shader uses `qt_SubRect_source`, `supportsAtlasTextures` also used to
-        //       be set, mainly for indication and also to make Qt calculate the atlas coordinate for
-        //       the texture coordinate (location 0) itself rather than doing it manually. However, it
-        //       was observed that Qt fails to provide the proper coordinate where atlas is taken into
-        //       account initially. In order to fix it, we now calculate the coordinate in the shader
-        //       manually so that there is no glitch on initialization.
-        supportsAtlasTextures: false // WARNING: We *do* support atlas textures through `qt_SubRect_source`.
+        supportsAtlasTextures: true
 
         blending: true
 

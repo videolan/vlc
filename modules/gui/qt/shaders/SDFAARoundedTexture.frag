@@ -83,19 +83,11 @@ float sdRoundBox( in vec2 p, in vec2 b, in vec4 r )
 
 void main()
 {
-    // This is what `qt_TexCoord0` is when `supportsAtlasTextures` is true.
-    // We do not want to rely on that but rather calculate manually because
-    // it is provided by Qt with a delay. The uniform block already defines
-    // `qt_SubRect_source` so there is no problem of using the atlas texture
-    // even when `supportsAtlasTextures` is false. The texture does not need
-    // to be independent if the uniform block defines `qt_SubRect_source`:
-    vec2 atlasCoord = qt_SubRect_source.xy + qt_SubRect_source.zw * qt_TexCoord0;
-
     // The signed distance function works when the primitive is centered.
     // If the texture is in the atlas, this condition is not satisfied.
     // Therefore, we have to normalize the coordinate for the distance
     // function to [0, 1]:
-    vec2 normalCoord = vec2(1.0, 1.0) / (qt_SubRect_source.zw) * (atlasCoord - (qt_SubRect_source.zw + qt_SubRect_source.xy)) + vec2(1.0, 1.0);
+    vec2 normalCoord = vec2(1.0, 1.0) / (qt_SubRect_source.zw) * (qt_TexCoord0 - (qt_SubRect_source.zw + qt_SubRect_source.xy)) + vec2(1.0, 1.0);
     normalCoord.y = (1.0 - normalCoord.y); // invert y-axis because texture coordinates have origin at the top
 
     vec2 p = (size.xy * ((2.0 * normalCoord) - 1)) / size.y;
@@ -112,9 +104,9 @@ void main()
         float k = qt_SubRect_source.z + qt_SubRect_source.x - normalCropRate;
         float l = qt_SubRect_source.x + normalCropRate;
 
-        texCoord.x = (k - l) / (qt_SubRect_source.z) * (atlasCoord.x - qt_SubRect_source.x) + l;
+        texCoord.x = (k - l) / (qt_SubRect_source.z) * (qt_TexCoord0.x - qt_SubRect_source.x) + l;
     }
-    // else { texCoord.x = atlasCoord.x; }
+    // else { texCoord.x = qt_TexCoord0.x; }
 
     // if (cropRate.y > 0.0)
     {
@@ -123,13 +115,13 @@ void main()
         float k = qt_SubRect_source.w + qt_SubRect_source.y - normalCropRate;
         float l = qt_SubRect_source.y + normalCropRate;
 
-        texCoord.y = (k - l) / (qt_SubRect_source.w) * (atlasCoord.y - qt_SubRect_source.y) + l;
+        texCoord.y = (k - l) / (qt_SubRect_source.w) * (qt_TexCoord0.y - qt_SubRect_source.y) + l;
     }
-    // else { texCoord.y = atlasCoord.y; }
+    // else { texCoord.y = qt_TexCoord0.y; }
 
     vec4 texel = texture(source, texCoord);
 #else
-    vec4 texel = texture(source, atlasCoord);
+    vec4 texel = texture(source, qt_TexCoord0);
 #endif
 
 #ifdef BACKGROUND_SUPPORT
