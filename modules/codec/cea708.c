@@ -561,7 +561,7 @@ static uint8_t CEA708_Window_MinCol( const cea708_window_t *p_w )
     uint8_t i_min = CEA708_WINDOW_MAX_COLS;
     for( int i=p_w->i_firstrow; i <= p_w->i_lastrow; i++ )
     {
-        const cea708_text_row_t *p_row = p_w->rows[p_w->row];
+        const cea708_text_row_t *p_row = p_w->rows[i];
         if( p_row && p_row->firstcol < i_min )
             i_min = p_row->firstcol;
     }
@@ -573,7 +573,7 @@ static uint8_t CEA708_Window_MaxCol( const cea708_window_t *p_w )
     uint8_t i_max = 0;
     for( int i=p_w->i_firstrow; i <= p_w->i_lastrow; i++ )
     {
-        const cea708_text_row_t *p_row = p_w->rows[p_w->row];
+        const cea708_text_row_t *p_row = p_w->rows[i];
         if( p_row && p_row->lastcol > i_max )
             i_max = p_row->lastcol;
     }
