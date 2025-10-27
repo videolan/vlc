@@ -10,6 +10,7 @@ install_headers(
     'vlc/libvlc_media_list_player.h',
     'vlc/libvlc_media_player.h',
     'vlc/libvlc_media_track.h',
+    'vlc/libvlc_parser.h',
     'vlc/libvlc_picture.h',
     'vlc/libvlc_renderer_discoverer.h',
     'vlc/libvlc_version.h',
