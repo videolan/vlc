@@ -600,6 +600,8 @@ static void CEA708_Window_Truncate( cea708_window_t *p_w, int i_direction )
             for( int i=p_w->i_firstrow; i <= p_w->i_lastrow; i++ )
             {
                 cea708_text_row_t *row = p_w->rows[i];
+                if (!row)
+                    continue;
                 if( row->lastcol == i_max )
                 {
                     if( row->firstcol >= row->lastcol )
@@ -611,6 +613,12 @@ static void CEA708_Window_Truncate( cea708_window_t *p_w, int i_direction )
                         else if( i == p_w->i_lastrow )
                             p_w->i_lastrow--;
                     }
+                    else
+                    {
+                        /* Drop rightmost column */
+                        row->lastcol--;
+                    }
+                   
                 }
             }
         }
@@ -621,6 +629,8 @@ static void CEA708_Window_Truncate( cea708_window_t *p_w, int i_direction )
             for( int i=p_w->i_firstrow; i <= p_w->i_lastrow; i++ )
             {
                 cea708_text_row_t *row = p_w->rows[i];
+                if (!row)
+                    continue;
                 if( row->firstcol == i_min )
                 {
                     if( row->firstcol >= row->lastcol )
@@ -632,6 +642,12 @@ static void CEA708_Window_Truncate( cea708_window_t *p_w, int i_direction )
                         else if( i == p_w->i_lastrow )
                             p_w->i_lastrow--;
                     }
+                    else
+                    {
+                        /* Drop leftmost column */
+                        row->firstcol++;
+                    }
+                   
                 }
             }
         }
