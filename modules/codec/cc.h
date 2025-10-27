@@ -410,7 +410,7 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
         {
             if( i_src < 5 ) // Shall be 5 bytes
                 return;
-            p_src += 5; i_src += 5;
+            p_src += 5; i_src -= 5;
         }
         /* 5.4 ccdata_section */
         if( cdp_flags & CDP_FLAG_CC_DATA_PRESENT )
