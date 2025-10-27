@@ -684,14 +684,19 @@ static void CEA708_Window_Scroll( cea708_window_t *p_w )
             for( int i=p_w->i_firstrow; i <= p_w->i_lastrow; i++ )
             {
                 cea708_text_row_t *row = p_w->rows[i];
+                if( !row )
+                    continue;
                 if( row->lastcol < row->firstcol ) /* should not happen */
                     continue;
-                memmove( &row->characters[row->firstcol - 1], &row->characters[row->firstcol],
-                         (row->lastcol - row->firstcol + 1) * 4U );
-                memmove( &row->styles[row->firstcol - 1], &row->styles[row->firstcol],
-                         (row->lastcol - row->firstcol + 1) * sizeof(cea708_pen_style_t) );
-                row->firstcol--;
-                row->lastcol--;
+                if( row->firstcol > 0 )
+                {
+                    memmove( &row->characters[row->firstcol - 1], &row->characters[row->firstcol],
+                             (row->lastcol - row->firstcol + 1) * 4U );
+                    memmove( &row->styles[row->firstcol - 1], &row->styles[row->firstcol],
+                             (row->lastcol - row->firstcol + 1) * sizeof(cea708_pen_style_t) );
+                    row->firstcol--;
+                    row->lastcol--;
+                }
             }
             break;
         case CEA708_WA_DIRECTION_TB:
