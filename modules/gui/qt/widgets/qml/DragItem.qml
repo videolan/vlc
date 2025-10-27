@@ -56,6 +56,7 @@ Item {
     property string coverRole: "cover"
 
     property real padding: VLCStyle.margin_xsmall
+    property real margins: VLCStyle.margin_large
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -67,7 +68,7 @@ Item {
     signal requestInputItems(var indexes, var data, var resolve, var reject)
 
     function coversXPos(index) {
-        return VLCStyle.margin_small + (coverSize / 1.5) * index;
+        return VLCStyle.margin_small + (coverSize / 1.5) * index + margins;
     }
 
     /**
@@ -121,15 +122,16 @@ Item {
 
     Drag.dragType: Drag.None
 
-    Drag.hotSpot.x: - VLCStyle.dragDelta
+    Drag.hotSpot.x: - VLCStyle.dragDelta + margins
 
-    Drag.hotSpot.y: - VLCStyle.dragDelta
+    Drag.hotSpot.y: - VLCStyle.dragDelta + margins
 
     width: padding * 2
            + coversXPos(_displayedCoversCount - 1) + coverSize + VLCStyle.margin_small
            + subtitleLabel.width
+           + margins /* one margins comes from `coversXPos()` */
 
-    height: coverSize + padding * 2
+    height: coverSize + padding * 2 + margins * 2
 
     enabled: false
 
@@ -417,10 +419,27 @@ Item {
     Rectangle {
         /* background */
         anchors.fill: parent
+        anchors.margins: dragItem.margins
+
         color: fsmLoadingFailed.active ? theme.bg.negative : theme.bg.primary
         border.color: theme.border
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         radius: VLCStyle.dp(6, VLCStyle.scale)
+
+        Widgets.RoundedRectangleShadow {
+            blending: false // offscreen stacked below everything, no need for blending even though it is not opaque
+
+            // Blur radius can not be greater than (margin / compensationFactor), as in that case it would need bigger
+            // size than the item size to compensate. If you want bigger blur radius, either decrease the compensation
+            // factor which can lead to visible clipping, or increase the margin:
+            blurRadius: (dragItem.margins / compensationFactor)
+
+            yOffset: VLCStyle.dp(4, VLCStyle.scale)
+
+            color: Qt.rgba(0, 0, 0, .2)
+
+            compensationFactor: 4.0 // Large compensation factor is to prevent clipping and strong shadow at the same time
+        }
     }
 
     Repeater {
