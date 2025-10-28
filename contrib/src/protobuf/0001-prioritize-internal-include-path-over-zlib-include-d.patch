@@ -1,0 +1,31 @@
+From 951c32bb0ee6467c2ae35b8402513ed2cf3292db Mon Sep 17 00:00:00 2001
+From: Pierre Lamot <pierre@videolabs.io>
+Date: Tue, 28 Oct 2025 11:30:43 +0100
+Subject: [PATCH] prioritize internal include path over zlib include
+ directories
+
+this fix compilation when older protobuf headers are present in zlib include
+path
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 04cb330..f8579a1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -296,9 +296,9 @@ else (MSVC)
+ endif (MSVC)
+ 
+ include_directories(
+-  ${ZLIB_INCLUDE_DIRECTORIES}
+   ${protobuf_BINARY_DIR}
+-  ${protobuf_SOURCE_DIR}/src)
++  ${protobuf_SOURCE_DIR}/src
++  ${ZLIB_INCLUDE_DIRECTORIES})
+ 
+ if (protobuf_UNICODE)
+   add_definitions(-DUNICODE -D_UNICODE)
+-- 
+2.43.0
+

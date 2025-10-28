@@ -48,6 +48,7 @@ protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 	$(RM) -Rf $@ $(UNPACK_DIR) && mkdir -p $(UNPACK_DIR)
 	tar $(TAR_VERBOSE)xzfo "$<" -C $(UNPACK_DIR) --strip-components=1
 	$(APPLY) $(SRC)/protobuf/0001-Fix-9947-make-the-ABI-identical-between-debug-and-no.patch
+	$(APPLY) $(SRC)/protobuf/0001-prioritize-internal-include-path-over-zlib-include-d.patch
 	# add a dummy install command to disable some installation
 	sed -i.old '1s;^;function (noinstall ...)\nendfunction()\n;' $(UNPACK_DIR)/cmake/install.cmake
 	# don't install pkg-config files (on top of the target ones)
@@ -73,6 +74,7 @@ protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 protobuf: protobuf-$(PROTOBUF_PACKAGE).tar.gz .sum-protobuf
 	$(UNPACK)
 	$(APPLY) $(SRC)/protobuf/0001-Fix-9947-make-the-ABI-identical-between-debug-and-no.patch
+	$(APPLY) $(SRC)/protobuf/0001-prioritize-internal-include-path-over-zlib-include-d.patch
 	# add a dummy install command to disable some installation
 	sed -i.old '1s;^;function (noinstall ...)\nendfunction()\n;' $(UNPACK_DIR)/cmake/install.cmake
 	# don't build libprotoc
