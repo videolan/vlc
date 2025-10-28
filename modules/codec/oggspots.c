@@ -350,6 +350,12 @@ static picture_t* DecodePacket(decoder_t* p_dec, block_t* p_block)
         goto error;
     }
 
+    if (i_img_offset > p_block->i_buffer) {
+        msg_Dbg(p_dec, "Invalid byte offset: %u exceeds packet size %zu",
+                i_img_offset, p_block->i_buffer);
+        goto error;
+    }
+
     /* Image format */
     es_format_t fmt_in = *p_dec->fmt_in;
     if ( !memcmp(&p_block->p_buffer[4], "PNG", 3) ) {
