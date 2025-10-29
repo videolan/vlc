@@ -1757,9 +1757,46 @@ static void ClearCSSStyles( webvtt_dom_node_t *p_node )
 {
     if( webvtt_domnode_supportsCSSStyle( p_node ) )
         webvtt_domnode_setCSSStyle( p_node, NULL );
-    webvtt_dom_node_t *p_child = webvtt_domnode_getFirstChild( p_node );
-    for ( ; p_child ; p_child = p_child->p_next )
-        ClearCSSStyles( p_child );
+
+    /* start from leaves */
+    p_node = webvtt_domnode_getFirstChild( p_node );
+    if( !p_node )
+        return;
+
+    vlc_array_t stack;
+    vlc_array_init( &stack );
+
+    while( p_node )
+    {
+        if( webvtt_domnode_supportsCSSStyle( p_node ) )
+            webvtt_domnode_setCSSStyle( p_node, NULL );
+
+        webvtt_dom_node_t *p_child = webvtt_domnode_getFirstChild( p_node );
+        if( p_child ) /* explore first */
+        {
+            if( p_node->p_next )
+                vlc_array_append( &stack, p_node->p_next );
+            p_node = p_child;
+        }
+        else
+        {
+            p_node = p_node->p_next;
+
+            if( !p_node )
+            {
+                /* continue on parent sibling */
+                size_t idx = vlc_array_count( &stack );
+                if( idx )
+                {
+                    p_node = vlc_array_item_at_index( &stack, idx - 1 );
+                    vlc_array_remove( &stack, idx - 1 );
+                    p_node = p_node->p_next;
+                }
+            }
+        }
+    }
+
+    vlc_array_clear( &stack );
 }
 
 #ifdef HAVE_CSS
