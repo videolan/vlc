@@ -1482,12 +1482,13 @@ static int bluray_esOutControl(es_out_t *p_out, input_source_t *in, int i_query,
                                        esout_priv->overlay.p_video_es,
                                        esout_priv->overlay.channels[i_plane]);
                 esout_priv->overlay.channels[i_plane] = VOUT_SPU_CHANNEL_INVALID;
+                break;
             }
-            else
+            if (likely(i_plane < MAX_OVERLAY))
             {
                 assert((ssize_t)esout_priv->overlay.channels[i_plane] == VOUT_SPU_CHANNEL_INVALID);
-                i_ret = VLC_EGENERIC;
             }
+            i_ret = VLC_EGENERIC;
             break;
         }
 
