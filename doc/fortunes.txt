@@ -3,13 +3,7 @@
 
   -- #videolan
 %
-<Stef> bon j'ai trouvé d'où venait les trashs d'images
-<sam> t'es un dieu
-<Stef> bin justement ct de ma faute :)
-<sam> t'es une merde
 
-  -- #videolan
-%
 <colin> p_bit_stream->buffer |=((u32) *(p_bit_stream->byte_stream.p_byte++))
 <colin>     << (24 - p_bit_stream->i_available);
 <colin> psychopathes
@@ -163,11 +157,6 @@
 
   -- #videolan
 %
-The VCR is to the American film producer and the American public as
-the Boston strangler is to the woman home alone.
-
-  -- Jack Valenti (president of the MPAA) on April 12, 1982
-%
 <Meuuh> then we need to update download.html
 <Meuuh> what do we still have ?
 <sam> the mail, freshmeat, the videolan.org news
@@ -186,10 +175,6 @@ the Boston strangler is to the woman home alone.
 <lool> /exec -o figlet -f small 'ali is so stupid !'
 <sam> I'm not absolutely positive it was a good idea to teach her
 <sam> it's like handing a rocket launcher to a 6yr old ...
-
-  -- #videolan
-%
-<|sF|Vengance|> do u have any videos of porn u can send me?
 
   -- #videolan
 %
@@ -275,12 +260,6 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<Meuuh> mais putain de bordel de chiottes de bite à cul de merde de sa race
-<Dnumgis> I think it may be a good thing that i don't understand that
-          sentence fully
-
-  -- #videolan
-%
 <Dnumgis> I just burned an amb duron trying to compile vlc :(
 <Meuuh> is it my fault ?
 <Dnumgis> no
@@ -291,13 +270,6 @@ the Boston strangler is to the woman home alone.
 %
 <Meuuh> pleasehelp : are you trying with a dolby trailer ?
 <pleasehelp> no... using windows
-
-  -- #videolan
-%
-<Meuuh> you want to be in a porn movie with me ?
-<ali> are we well paid for doing that ?
-<Meuuh> ali : no but they say you take a lot of pleasure in that job
-<ali> Meuuh: i know
 
   -- #videolan
 %
@@ -344,11 +316,6 @@ the Boston strangler is to the woman home alone.
 <sam> dudes, you'll hate me again: bootstrap will now need an argument :)
 <Dnumgis> sam: hate you already
 <gibalou> sam: don't worry sam, we already hated you ;)
-
-  -- #videolan
-%
-<haroldo> hi I've got some nice xxx videos, and I'd like to exchange with 
-          anyone 
 
   -- #videolan
 %
@@ -440,11 +407,6 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<Meuuh> gang_bang12.avi
-<Meuuh> sound is ok but I don't really care
-
-  -- #videolan
-%
 <Dnumgis> sounds perfectly normal
 <tooney> ah
 <Dnumgis> very wrong, but normal in vlc
@@ -491,11 +453,6 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<Purge> im going to open a vlc fan club
-<Purge> and we'll go on riots and kill all mplayer and wmp users
-
-  -- #videolan
-%
 <maleki> any girls here with a webcam
 
   -- #videolan
@@ -521,15 +478,6 @@ the Boston strangler is to the woman home alone.
 < boggle> sgagers: use zorglubs command, it will copy the needed 
                    timeslice to file2.mpeg
 < sgagers> boggle: zorglubs is an utility of ffmpeg?
-
-  -- #videolan
-%
-<Golf3r_1> hello
-<Golf3r_1> any place where I can get golf videos ?
-<E-bola> lol
-<E-bola> are u serious?
-<Golf3r_1> fuk off
-*** Signoff: Golf3r_1 ("Leaving")
 
   -- #videolan
 %
@@ -602,11 +550,6 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-< dionoea> http://nightlies.videolan.org
-< arakis> lol....sounds like a porn site!!!
-
-  -- #videolan
-%
 -!- tumu [n=tumu@GYKMDCCCXXIX.dsl.saunalahti.fi] has quit ["~"]
 * Dnumgis notes that tumu must be one of very few with dsl in their sauna
 
@@ -642,12 +585,6 @@ VLC is the greatest thing since sliced bread!
 <sam> I thought he was banned for sending a patch to mplayer
   -- #videolan
 %
-< Dnumgis> Meuuh: munhoney is writing some fec system based on vlc
-< Meuuh> Dnumgis : a fuck system ? I may be interested !
-< Dnumgis> Meuuh: still single? :)
-< Meuuh> Dnumgis : and always will be
-  -- #videolan
-%
 * kinema loves VideoLAN.
 < kinema> and it's developers
 < funman> what is your sex ? ( i may be interested )
@@ -679,17 +616,6 @@ VLC is the greatest thing since sliced bread!
 <Dnumgis> it's illegal to use fake id
   -- #videolan
 %
-< thedj> i need a girlfriend. that would make it so much easier not to do VLC :D
-< j-b> thedj: how old are you ?
-< j-b> thedj: you can buy cheap in Russia... :D Ask thresh 
-< thedj> lol
-< thedj> haha. i'm rereading my line and it gets funier :D
-< thedj> not to DO vlc :D
-< thedj> i'd DO my girlfriend instead ..
-< j-b> if you get one, could you get one for Meuuh
-< thedj> yes. i see about bulk discount for the vlc devs :D
-  -- #videolan, one night, late, 0.8.6-test2 is just out...
-%
 < j-b> my mother is desperate because she thinks I am gay, because I haven't presented my gfs...
 < thedj> j-b: i know the feeling
 < LordRPI> my mother gets upset if I tell her I'm at a bar without a girl
@@ -699,13 +625,6 @@ VLC is the greatest thing since sliced bread!
 < tumu> lonely drunk is good
   -- #videolan, same night, 4:38 am
  %
-Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember last time i saw a woman
-< funman> :o(
-< Meuuh> to good to miss
-< funman> Meuuh: i was lying i live with my mother
-< Meuuh> a mother is not generally considered a woman
-  -- #videolan
-%
 <olsen_> hi, how can i adjust the brightness?
 <Dnumgis> olsen_: usually there is a nob on your monitor
   -- #videolan
@@ -718,28 +637,6 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 <zigovr3> what is atsc ?
 <xtophe> like dvb but in america
 <xtophe> with packet measured in inches instead of mm
-  -- #videolan
-%
-13:35 < kwolf_> hello
-13:35 < kwolf_> anyone here i can bug? :-)
-[ monologue ... noone helps ]
-14:01 < kwolf_> anyone?
-14:03 < kwolf_> please *whine*
-14:04 < kwolf_> i am a girl, i need help :-D
-14:06 < Dnumgis> kwolf_: I'm a lonely geek who know your answer, are you good looking?
-  -- #videolan
-%
-< wereHamster> for (i=0;i<10;++i) printf("I'm a girl\n")
-< wereHamster> am I a girl now?
-< Dnumgis> wereHamster: you definitly need to send me a picture before I belive you :)
-< Foxdie> live webcam ftw
-< Dnumgis> Foxdie: right, I'll definitly need a live webcam to belive wereHamster is a girl
-< Dnumgis> Foxdie: as a matter of fact all streaming related support requests here should be formulated as follows: "I'm a nice looking girl that have problems making my live webcam work"
-  -- #videolan
-%
-<DrkMatter> Working with video and audio coding/decoding is one of the most
-            tiresome, confusing experience I've ever had.
-<sam> try anal sex next time
   -- #videolan
 %
 < Bond493> Can anyone refer me to some documents which describe the VLC player internal? I'd 
@@ -805,11 +702,6 @@ VLC development is NOT about being a sed god.
           dated
   -- #videolan
 %
-<j-b> You don't have humour ?
-<kneer0w> what i do have is a pms'ing girlfriend sitting right next to me
-          expecting this movie to work
-  -- #videolan
-%
 < alesan> ok my wife is yelling I have to go to bed with her
 < alesan> uff
 < alesan> see you tomorrow
@@ -836,67 +728,12 @@ VLC development is NOT about being a sed god.
 <Meuuh> ha, NOW you can go into the fortunes
   -- #videolan
 %
-< dionoea> tu veux transcoder une fille?
-< funman> j aimerais bien la streamer direct chez moi
-< dionoea> kewl :)
-< dionoea> avec la texture et tout ?
-< funman> ouais surtout les 2 macro blocks pectoraux
-  -- #vd
-%
-<kdubois> vlc seems to need more than control-c to kill it lately, do other people experience this too?
-<thresh> yeah, it needs up to four black men to kill vlc for me
- -- #videolan
-%
-< sam> 16:52 <&timecop> sam: can that homosexual volume slider please go away in next vlc
-< sam> 16:52 <&timecop> this is a fucking joke
-< sam> 16:52 <&timecop> who made that UI
-< sam> because I know you like positive feedback
-< ivoire> mouarf
-< ivoire> -positiv +constructiv feedback
-< ivoire> sam: you can configure the color sheme of the volume slider
-< ivoire> if you xant pink slide bar you can
-< ivoire> -x+w
-< sam> I see homosexuality as positive
-< sam> look at what it did to Apple sales
-< thedj> LMAO
- -- #videolan
-%
 < Daught> wait cygwin does not even have qt4...
 < Daught> if I have to disable more stuff I will end up with windows media player
-%
-< thedj> no, captcha are reasonably easy to crack.
-< ILEoo> just put up a porn site and ask user to check that captcha before showing video/images -> captcha cracked easily ;)
-< thedj> that's one way :D
-< thedj> MadlyMad: from our own sam..... http://caca.zoy.org/wiki/PWNtcha
-< MadlyMad> oh okey, impressive
-< thresh> sam was probably tired checking captchas on porn sites
-< sam> I saw that
-< thresh> wasnt me
-< thresh> a coworker of mine typed that, really
- -- #videolan
-%
-< jpsaman> where is dionoea when you need him?
-< j-b> at work?
-< xtophe> without internet
-< DiDjCodt> he's slicing some pyramids in pieces...
-< TypX> or he has been rapt by alien
-< TypX> and will come back in six month as usual
-< linkfanel> dionoea has been raped by aliens???
- -- #videolan
 %
 < thedj> lloyd: i'd use CSA, simple and no nonsense.
 < lloyd> i like simple and no nonsense.. like us brits.. not overly dramatic or noisy..
 < j-b> isn't Amy WineHouse brit?
- -- #videolan
-%
-< gatty> *grmbl* my room smells of melting silicon
-< TypX> buy better condoms
-< gatty> o_O
-< linkfanel> TypX: condoms are made of rubber
-< linkfanel> or sheep bowels for people allergic to rubber
-< courmisch> you don't know what TypX uses condoms _with_ though
-< TypX> linkfanel: never heard of silicone lubricant?
-< linkfanel> and what, your dick shoot lava?
  -- #videolan
 %
 < funman> some program for fun
@@ -921,13 +758,6 @@ VLC development is NOT about being a sed god.
 %
 <xxcv> (wrong == right is still wrong right ?)
  -- #videolan, Raffarin-attitude
-%
-< funman> is starcraft 1 better than starcraft 2, or much better than starcraft 2?
-< TypX> never tried the first one
-< funman> fuck you then
-< funman> the man who never played starcraft 1 is a virgin!
-< TypX> I'd say the man who is still playing starcraft 1 is still a virgin
- -- #videolan
 %
 < sam> is there still a way to force the video decoder used by VLC? --codec no longer exists
 < mru> there's always butterflies
@@ -1042,30 +872,6 @@ reactor leaks ionizing radiations."
 < courmisch> VLC: what's the difference between ripping and reading?
 < TypX> courmisch: Jack the Reader was way less dangerous than Jack the Ripper
  -- #videolan, badum ching
-%
-< refp> I'm going to bed (super early for a refp)
-< refp> maybe 2017 will be the year I adjust to some sort of normal rythm
-< refp> maybe.
-< courmisch> Yeah right
-< refp> courmisch: I mean.. it _could_ happen!
-< j-b> it could
-< courmisch> these days, it seems there are only two ways to get a normal rythm
-< courmisch> have kids or have strict working hours
- * refp goes of to kindnap some kids
-< refp> kindnap.. I of course meant kidnap, but maybe "kindnapping" is the same thing, but doing
-        so in a kind manner
-* courmisch dials polisen
-< j-b> refp: kidnapping in a kind manner?
-< j-b> wtf?
-< refp> yes, I already see how that would play out in court so maybe I shouldn't
-< refp> anyhow.. time to sleep (and no, I will not kindnap anything)
-* refp *ploff*
-< No_se> refp: This is a smart approach: You should really get to on of courmisch's solutions
-         that way. By the kidnapped kids or the strict working hours in jail
-< refp> No_se: if I could bring my laptop to jail I'm not sure I'd mind that bad.. as long as
-         there's an internet connection, coffee, and a place to smoke
-* refp is now gone (fo'real)
- -- #videolan, kind-napping and jails
 %
 < wm4> poor guy can't afford proper pants
 < j-b> yeah, poor guy
