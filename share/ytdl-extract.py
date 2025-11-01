@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 #
-# Copyright (C) 2020 Rémi Denis-Courmont
+# Copyright (C) 2020 Rémi Denis-Courmont, Brandon Li
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by
@@ -17,8 +17,20 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 
 import sys
+import os
 import json
 import urllib.parse
+import argparse
+
+# Parse first so we can set sys.path
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--py-path', dest='py_path')
+parser.add_argument('url')
+args, _ = parser.parse_known_args()
+
+if args.py_path:
+    sys.path.insert(0, args.py_path)
+
 import yt_dlp
 
 class logger(object):
@@ -63,13 +75,13 @@ def url_process(ie_url):
     # Rebuild the original IE entry
     entry = { }
 
-    for p in urllib.parse.parse_qsl(url[9:]):
+    for p in urllib.parse.parse_qsl(ie_url[9:]):  # <-- use parameter
         entry[p[0]] = p[1]
 
     infos = dl.process_ie_result(entry, download=False)
     print(json.dumps(infos))
 
-url = sys.argv[1]
+url = args.url
 
 if url.startswith('ytdl:///?'):
     url_process(url)

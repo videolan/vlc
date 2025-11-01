@@ -353,7 +353,16 @@ static int OpenCommon(vlc_object_t *obj)
 
     struct ytdl_json jsdata;
     pid_t pid;
-    const char *argv[] = { path, s->psz_url, NULL };
+    char *py_path = var_InheritString(obj, "ytdl-path");
+    const char *argv[5];
+    size_t i = 0;
+    argv[i++] = path;
+    if (py_path != NULL && py_path[0] != '\0') {
+        argv[i++] = "--py-path"; // add additional path
+        argv[i++] = py_path;
+    }
+    argv[i++] = s->psz_url;
+    argv[i] = NULL;
 
     jsdata.logger = s->obj.logger;
     jsdata.fd = ytdl_popen(&pid, argv);
@@ -361,10 +370,11 @@ static int OpenCommon(vlc_object_t *obj)
     if (jsdata.fd == -1) {
         msg_Dbg(obj, "cannot start %s: %s", path, vlc_strerror_c(errno));
         free(path);
+        free(py_path);
         return VLC_EGENERIC;
     }
-
     free(path);
+    free(py_path);
 
     int val = json_parse(&jsdata, &sys->json);
 
@@ -442,7 +452,7 @@ vlc_module_begin()
     set_callbacks(OpenFilter, Close)
     add_bool("ytdl", true, N_("Enable YT-DL"), NULL)
         change_safe()
-
+    add_directory("ytdl-path", NULL, N_("YT-DL Module Path"), NULL)
     add_submodule()
     set_capability("access", 0)
     add_shortcut("ytdl")
