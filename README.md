@@ -45,7 +45,7 @@ VLC is available for the following platforms:
 
 Not all platforms receive the same amount of care, due to our limited resources.
 
-**Nota Bene**: The [Android app](https://code.videolan.org/videolan/vlc-android/) and
+**Note*: The [Android app](https://code.videolan.org/videolan/vlc-android/) and
 the [iOS app](https://code.videolan.org/videolan/vlc-ios/) are located in different repositories
 than the main one.
 
