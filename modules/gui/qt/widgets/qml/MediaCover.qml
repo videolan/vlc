@@ -89,7 +89,7 @@ Item {
 
     // If this type is used within a reusable delegate, connect `ItemView::reused()` to this function.
     function reinitialize() {
-        _loadTimeout = false
+        root._loadTimeout = false
         fallbackImage.source = Qt.binding(() => { return fallbackImage.defaultSource })
         image.source = Qt.binding(() => { return image.defaultSource })
     }
