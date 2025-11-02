@@ -378,6 +378,7 @@ Widgets.PageExt {
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
+            sortMenu: root.sortMenu
 
             rightPadding: root.rightPadding
 

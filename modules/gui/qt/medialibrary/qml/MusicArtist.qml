@@ -28,6 +28,7 @@ import VLC.Util
 import VLC.Widgets as Widgets
 import VLC.MainInterface
 import VLC.Style
+import VLC.Menus
 
 FocusScope {
     id: root
@@ -92,6 +93,8 @@ FocusScope {
                 root.sortCriteria = root._effectiveModel.sortCriteria
         }
     }
+
+    property SortMenu sortMenu: null
 
     // current index of album model
     readonly property int currentIndex: {
@@ -363,21 +366,37 @@ FocusScope {
 
                     Navigation.parentItem: root
                     Navigation.upItem: artistBanner
-                    Navigation.downAction: function() {
-                        tableView.setCurrentItemFocus(Qt.TabFocusReason)
-                    }
+                    Navigation.downItem: viewHeader
                 }
             }
 
-            Widgets.ViewHeader {
-                view: root
+            Widgets.PageExt.DefaultPageHeader {
+                id: viewHeader
+
+                //search box can overlap component below, make sure it has
+                //a higher z index
+                z: 2
+
+                anchors {
+                        left: parent.left
+                        right: parent.right
+                }
+
+                text: qsTr("Albums")
+
+                sortMenu: root.sortMenu
 
                 leftPadding: root._contentLeftMargin
+                rightPadding: root._contentRightMargin
                 bottomPadding: VLCStyle.layoutTitle_bottom_padding -
                                (MainCtx.gridView ? 0 : VLCStyle.gridItemSelectedBorder)
                 topPadding: pinnedMusicAlbumSectionLoader.active ? bottomPadding : VLCStyle.layoutTitle_top_padding
 
-                text: qsTr("Albums")
+                Navigation.parentItem: root
+                Navigation.upItem: artistBanner
+                Navigation.downAction: function() {
+                    tableView.setCurrentItemFocus(Qt.TabFocusReason)
+                }
             }
         }
     }
