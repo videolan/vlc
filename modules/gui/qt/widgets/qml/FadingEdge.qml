@@ -199,18 +199,22 @@ Item {
 
             onBeginningFadeSizeChanged: {
                 if (!beginningFadeBehavior.enabled) {
-                    Qt.callLater(() => {
-                        beginningFadeBehavior.enabled = true
-                    })
+                    Qt.callLater(effect._enableBeginningFadeBehavior)
                 }
             }
 
             onEndFadeSizeChanged: {
                 if (!endFadeBehavior.enabled) {
-                    Qt.callLater(() => {
-                        endFadeBehavior.enabled = true
-                    })
+                    Qt.callLater(effect._enableEndFadeBehavior)
                 }
+            }
+
+            function _enableBeginningFadeBehavior() {
+                beginningFadeBehavior.enabled = true
+            }
+
+            function _enableEndFadeBehavior() {
+                endFadeBehavior.enabled = true
             }
 
             Component.onCompleted: {
