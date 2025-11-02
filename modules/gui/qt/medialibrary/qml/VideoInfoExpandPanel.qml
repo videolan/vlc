@@ -131,22 +131,20 @@ FocusScope {
                         focus: true
                         spacing: VLCStyle.margin_large
 
-                        model: ObjectModel {
-                            Widgets.ActionButtonPrimary {
-                                id: playActionBtn
+                        Widgets.ActionButtonPrimary {
+                            id: playActionBtn
 
-                                iconTxt: VLCIcons.play
-                                text: qsTr("Play")
-                                onClicked: MediaLib.addAndPlay( model.id )
-                            }
+                            iconTxt: VLCIcons.play
+                            text: qsTr("Play")
+                            onClicked: MediaLib.addAndPlay( model.id )
+                        }
 
-                            Widgets.ButtonExt {
-                                id: enqueueActionBtn
+                        Widgets.ButtonExt {
+                            id: enqueueActionBtn
 
-                                iconTxt: VLCIcons.enqueue
-                                text: qsTr("Enqueue")
-                                onClicked: MediaLib.addToPlaylist( model.id )
-                            }
+                            iconTxt: VLCIcons.enqueue
+                            text: qsTr("Enqueue")
+                            onClicked: MediaLib.addToPlaylist( model.id )
                         }
 
                         Navigation.parentItem: root

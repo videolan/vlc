@@ -154,33 +154,32 @@ FocusScope {
 
                 Layout.alignment: Qt.AlignCenter
 
-                model: ObjectModel {
-                    Widgets.ActionButtonPrimary {
-                        id: _playActionBtn
+                Widgets.ActionButtonPrimary {
+                    id: _playActionBtn
 
-                        iconTxt: VLCIcons.play
-                        text: qsTr("Play")
-                        onClicked: MediaLib.addAndPlay( root.model.id )
+                    iconTxt: VLCIcons.play
+                    text: qsTr("Play")
+                    onClicked: MediaLib.addAndPlay( root.model.id )
 
-                        onActiveFocusChanged: {
-                            // root.setCurrentItemFocus sets active focus to playActionBtn, but it gets stolen
-                            // by the delegate of the first track at initial load when playActionBtn is in the
-                            // header of tracks
-                            if (VLCStyle.isScreenSmall && root.forcePlayActionBtnFocusOnce) {
-                                root.forcePlayActionBtnFocusOnce = false
-                                root.playActionBtn.forceActiveFocus(Qt.TabFocusReason)
-                            }
+                    onActiveFocusChanged: {
+                        // root.setCurrentItemFocus sets active focus to playActionBtn, but it gets stolen
+                        // by the delegate of the first track at initial load when playActionBtn is in the
+                        // header of tracks
+                        if (VLCStyle.isScreenSmall && root.forcePlayActionBtnFocusOnce) {
+                            root.forcePlayActionBtnFocusOnce = false
+                            root.playActionBtn.forceActiveFocus(Qt.TabFocusReason)
                         }
                     }
-
-                    Widgets.ButtonExt {
-                        id: _enqueueActionBtn
-
-                        iconTxt: VLCIcons.enqueue
-                        text: qsTr("Enqueue")
-                        onClicked: MediaLib.addToPlaylist( root.model.id )
-                    }
                 }
+
+                Widgets.ButtonExt {
+                    id: _enqueueActionBtn
+
+                    iconTxt: VLCIcons.enqueue
+                    text: qsTr("Enqueue")
+                    onClicked: MediaLib.addToPlaylist( root.model.id )
+                }
+
 
                 Navigation.parentItem: root
                 Navigation.rightItem: VLCStyle.isScreenSmall ? root.headerFocusScope : tracks

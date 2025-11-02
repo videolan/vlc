@@ -88,7 +88,7 @@ T.ToolBar {
     contentItem:  Column {
         id: pLBannerSources
 
-        property alias model: globalMenuGroup.model
+        property alias model: globalMenuRepeater.model
 
             anchors {
                 fill: parent
@@ -103,7 +103,7 @@ T.ToolBar {
                 anchors.rightMargin: VLCStyle.applicationHorizontalMargin
 
                 property bool colapseTabButtons: globalToolbar.width  > (Math.max(globalToolbarLeft.width, globalToolbarRight.width) + VLCStyle.applicationHorizontalMargin)* 2
-                                                 + globalMenuGroup.model.count * VLCStyle.bannerTabButton_width_large
+                                                 + globalMenuRepeater.model.count * VLCStyle.bannerTabButton_width_large
 
                 //drag and dbl click the titlebar in CSD mode
                 Loader {
@@ -183,12 +183,17 @@ T.ToolBar {
                             Navigation.leftItem: history_back
                             Navigation.downItem: localMenuView.visible ?  localMenuView : localToolbar
 
-                            delegate: Widgets.BannerTabButton {
-                                iconTxt: model.icon
-                                showText: globalToolbar.colapseTabButtons
-                                selected: History.match(History.viewPath, ["mc", model.name])
-                                onClicked: root.itemClicked(model.index)
-                                height: globalMenuGroup.height
+                            Repeater {
+                                id: globalMenuRepeater
+
+                                delegate: Widgets.BannerTabButton {
+
+                                    iconTxt: model.icon
+                                    showText: globalToolbar.colapseTabButtons
+                                    selected: History.match(History.viewPath, ["mc", model.name])
+                                    onClicked: root.itemClicked(model.index)
+                                    height: globalMenuGroup.height
+                                }
                             }
                         }
                     }
@@ -255,43 +260,41 @@ T.ToolBar {
                             }
                         }
 
-                        model: ObjectModel {
-                            Widgets.IconToolButton {
-                                id: list_grid_btn
+                        Widgets.IconToolButton {
+                            id: list_grid_btn
 
-                                visible: MainCtx.hasGridListMode
-                                width: VLCStyle.bannerButton_width
-                                height: VLCStyle.bannerButton_height
-                                font.pixelSize: VLCStyle.icon_banner
-                                text: MainCtx.gridView ? VLCIcons.list : VLCIcons.grid
-                                description: qsTr("List/Grid")
-                                onClicked: MainCtx.gridView = !MainCtx.gridView
-                                enabled: true
+                            visible: MainCtx.hasGridListMode
+                            width: VLCStyle.bannerButton_width
+                            height: VLCStyle.bannerButton_height
+                            font.pixelSize: VLCStyle.icon_banner
+                            text: MainCtx.gridView ? VLCIcons.list : VLCIcons.grid
+                            description: qsTr("List/Grid")
+                            onClicked: MainCtx.gridView = !MainCtx.gridView
+                            enabled: true
+                        }
+
+                        Widgets.SortControl {
+                            id: sortControl
+
+                            width: VLCStyle.bannerButton_width
+                            height: VLCStyle.bannerButton_height
+
+                            font.pixelSize: VLCStyle.icon_banner
+
+                            visible: MainCtx.sort.available
+
+                            enabled: visible
+
+                            model: MainCtx.sort.model
+
+                            sortKey:  MainCtx.sort.criteria
+                            sortOrder: MainCtx.sort.order
+
+                            onSortSelected: (key) => {
+                                MainCtx.sort.criteria = key
                             }
-
-                            Widgets.SortControl {
-                                id: sortControl
-
-                                width: VLCStyle.bannerButton_width
-                                height: VLCStyle.bannerButton_height
-
-                                font.pixelSize: VLCStyle.icon_banner
-
-                                visible: MainCtx.sort.available
-
-                                enabled: visible
-
-                                model: MainCtx.sort.model
-
-                                sortKey:  MainCtx.sort.criteria
-                                sortOrder: MainCtx.sort.order
-
-                                onSortSelected: (key) => {
-                                    MainCtx.sort.criteria = key
-                                }
-                                onSortOrderSelected: (type) => {
-                                    MainCtx.sort.order = type
-                                }
+                            onSortOrderSelected: (type) => {
+                                MainCtx.sort.order = type
                             }
                         }
 
@@ -385,100 +388,98 @@ T.ToolBar {
                         }
                         spacing: VLCStyle.margin_normal
 
-                        model: ObjectModel {
+                        Widgets.SearchBox {
+                            id: searchBox
 
-                            Widgets.SearchBox {
-                                id: searchBox
+                            // set max width so that search field not overflows with small screens
+                            // assumes all other sibling is a button of 'VLCStyle.bannerButton_width' width
+                            maxSearchFieldWidth: root.width
+                                                 - (VLCStyle.bannerButton_width * playlistGroup.count)
+                                                 - (playlistGroup.spacing * (playlistGroup.count - 1))
+                                                 - playlistGroup.anchors.rightMargin
+                                                 - VLCStyle.margin_small // padding to left
 
-                                // set max width so that search field not overflows with small screens
-                                // assumes all other sibling is a button of 'VLCStyle.bannerButton_width' width
-                                maxSearchFieldWidth: root.width
-                                                     - (VLCStyle.bannerButton_width * playlistGroup.count)
-                                                     - (playlistGroup.spacing * (playlistGroup.count - 1))
-                                                     - playlistGroup.anchors.rightMargin
-                                                     - VLCStyle.margin_small // padding to left
+                            visible: MainCtx.search.available
+                            height: VLCStyle.bannerButton_height
+                            buttonWidth: VLCStyle.bannerButton_width
+                        }
 
-                                visible: MainCtx.search.available
-                                height: VLCStyle.bannerButton_height
-                                buttonWidth: VLCStyle.bannerButton_width
-                            }
+                        Widgets.IconToolButton {
+                            id: playlist_btn
 
-                            Widgets.IconToolButton {
-                                id: playlist_btn
+                            checked: MainCtx.playlistVisible
 
-                                checked: MainCtx.playlistVisible
+                            font.pixelSize: VLCStyle.icon_banner
+                            text: VLCIcons.playlist
+                            description: qsTr("Playlist")
+                            width: VLCStyle.bannerButton_width
+                            height: VLCStyle.bannerButton_height
+                            highlighted: MainCtx.playlistVisible
 
-                                font.pixelSize: VLCStyle.icon_banner
-                                text: VLCIcons.playlist
-                                description: qsTr("Playlist")
-                                width: VLCStyle.bannerButton_width
-                                height: VLCStyle.bannerButton_height
-                                highlighted: MainCtx.playlistVisible
+                            onClicked:  MainCtx.playlistVisible = !MainCtx.playlistVisible
 
-                                onClicked:  MainCtx.playlistVisible = !MainCtx.playlistVisible
+                            DropArea {
+                                anchors.fill: parent
 
-                                DropArea {
-                                    anchors.fill: parent
+                                onContainsDragChanged: {
+                                    if (containsDrag)
+                                        _timer.restart()
+                                    else
+                                        _timer.stop()
+                                }
 
-                                    onContainsDragChanged: {
-                                        if (containsDrag)
-                                            _timer.restart()
-                                        else
-                                            _timer.stop()
-                                    }
-
-                                    onEntered: (drag) => {
-                                        if (root.playlistPane) {
-                                            console.assert(root.playlistPane.isDropAcceptableFunc)
-                                            console.assert(root.playlistPane.model)
-                                            if (root.playlistPane.isDropAcceptableFunc(drag, root.playlistPane.model.count)) {
-                                                drag.accept()
-                                            } else {
-                                                drag.accepted = false
-                                            }
+                                onEntered: (drag) => {
+                                    if (root.playlistPane) {
+                                        console.assert(root.playlistPane.isDropAcceptableFunc)
+                                        console.assert(root.playlistPane.model)
+                                        if (root.playlistPane.isDropAcceptableFunc(drag, root.playlistPane.model.count)) {
+                                            drag.accept()
                                         } else {
                                             drag.accepted = false
                                         }
-                                    }
-
-                                    onDropped: (drop) => {
-                                        if (root.playlistPane) {
-                                            console.assert(root.playlistPane.acceptDropFunc)
-                                            root.playlistPane.acceptDropFunc(root.playlistPane.model.count, drop)
-                                        }
-                                    }
-
-                                    Timer {
-                                        id: _timer
-                                        interval: VLCStyle.duration_humanMoment
-
-                                        onTriggered: {
-                                            MainCtx.playlistVisible = true
-                                        }
+                                    } else {
+                                        drag.accepted = false
                                     }
                                 }
-                            }
 
-                            Widgets.IconToolButton {
-                                id: menu_selector
+                                onDropped: (drop) => {
+                                    if (root.playlistPane) {
+                                        console.assert(root.playlistPane.acceptDropFunc)
+                                        root.playlistPane.acceptDropFunc(root.playlistPane.model.count, drop)
+                                    }
+                                }
 
-                                visible: !MainCtx.hasToolbarMenu
-                                font.pixelSize: VLCStyle.icon_banner
-                                text: VLCIcons.more
-                                description: qsTr("Menu")
-                                width: VLCStyle.bannerButton_width
-                                height: VLCStyle.bannerButton_height
-                                checked: contextMenu.shown
+                                Timer {
+                                    id: _timer
+                                    interval: VLCStyle.duration_humanMoment
 
-                                onClicked: contextMenu.popup(this.mapToGlobal(0, height))
-
-                                Menus.QmlGlobalMenu {
-                                    id: contextMenu
-                                    ctx: MainCtx
-                                    playerViewVisible: History.match(History.viewPath, ["player"])
+                                    onTriggered: {
+                                        MainCtx.playlistVisible = true
+                                    }
                                 }
                             }
                         }
+
+                        Widgets.IconToolButton {
+                            id: menu_selector
+
+                            visible: !MainCtx.hasToolbarMenu
+                            font.pixelSize: VLCStyle.icon_banner
+                            text: VLCIcons.more
+                            description: qsTr("Menu")
+                            width: VLCStyle.bannerButton_width
+                            height: VLCStyle.bannerButton_height
+                            checked: contextMenu.shown
+
+                            onClicked: contextMenu.popup(this.mapToGlobal(0, height))
+
+                            Menus.QmlGlobalMenu {
+                                id: contextMenu
+                                ctx: MainCtx
+                                playerViewVisible: History.match(History.viewPath, ["player"])
+                            }
+                        }
+
 
                         Navigation.parentItem: root
                         Navigation.leftItem: localMenuView

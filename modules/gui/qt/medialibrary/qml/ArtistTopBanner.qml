@@ -207,30 +207,30 @@ FocusScope {
                 Layout.fillWidth: true
                 Layout.topMargin: VLCStyle.margin_large
 
-                model: ObjectModel {
-                    Widgets.ActionButtonPrimary {
-                        id: playActionBtn
-                        iconTxt: VLCIcons.play
-                        text: qsTr("Play all")
-                        focus: true
 
-                        //we probably want to keep this button like the other action buttons
-                        colorContext.palette: VLCStyle.palette
+                Widgets.ActionButtonPrimary {
+                    id: playActionBtn
+                    iconTxt: VLCIcons.play
+                    text: qsTr("Play all")
+                    focus: true
 
-                        showText: actionButtons.width > VLCStyle.colWidth(2)
+                    //we probably want to keep this button like the other action buttons
+                    colorContext.palette: VLCStyle.palette
 
-                        onClicked: MediaLib.addAndPlay( artist.id )
-                    }
+                    showText: actionButtons.width > VLCStyle.colWidth(2)
 
-                    Widgets.ActionButtonOverlay {
-                        id: enqueueActionBtn
-                        iconTxt: VLCIcons.enqueue
-                        text: qsTr("Enqueue all")
-                        onClicked: MediaLib.addToPlaylist( artist.id )
-
-                        showText: actionButtons.width > VLCStyle.colWidth(2)
-                    }
+                    onClicked: MediaLib.addAndPlay( artist.id )
                 }
+
+                Widgets.ActionButtonOverlay {
+                    id: enqueueActionBtn
+                    iconTxt: VLCIcons.enqueue
+                    text: qsTr("Enqueue all")
+                    onClicked: MediaLib.addToPlaylist( artist.id )
+
+                    showText: actionButtons.width > VLCStyle.colWidth(2)
+                }
+
             }
 
             Item {

@@ -22,7 +22,7 @@ import QtQuick.Templates as T
 import VLC.MainInterface
 import VLC.Util
 
-T.Control {
+T.Container {
     id: root
 
     // Properties
@@ -31,16 +31,6 @@ T.Control {
 
     property int _countEnabled: 0
 
-    // Aliases
-
-    property alias model: repeater.model
-    property alias delegate: repeater.delegate
-
-    property alias count: repeater.count
-
-    function itemAt(index) {
-        return repeater.itemAt(index)
-    }
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
@@ -146,6 +136,8 @@ T.Control {
 
         Repeater{
             id: repeater
+
+            model: root.contentModel
 
             onItemAdded: (index, item) => {
                 if (item.enabled) root._countEnabled += 1;

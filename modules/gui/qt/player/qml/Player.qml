@@ -541,27 +541,25 @@ FocusScope {
                                 componentCompleted = true
                             }
 
-                            model: ObjectModel {
-                                Widgets.IconToolButton {
-                                    text: VLCIcons.skip_back
-                                    font.pixelSize: VLCStyle.icon_audioPlayerButton
-                                    onClicked: Player.jumpBwd()
-                                    description: qsTr("Step back")
-                                }
+                            Widgets.IconToolButton {
+                                text: VLCIcons.skip_back
+                                font.pixelSize: VLCStyle.icon_audioPlayerButton
+                                onClicked: Player.jumpBwd()
+                                description: qsTr("Step back")
+                            }
 
-                                Widgets.IconToolButton {
-                                    text: VLCIcons.visualization
-                                    font.pixelSize: VLCStyle.icon_audioPlayerButton
-                                    onClicked: Player.toggleVisualization()
-                                    description: qsTr("Visualization")
-                                }
+                            Widgets.IconToolButton {
+                                text: VLCIcons.visualization
+                                font.pixelSize: VLCStyle.icon_audioPlayerButton
+                                onClicked: Player.toggleVisualization()
+                                description: qsTr("Visualization")
+                            }
 
-                                Widgets.IconToolButton{
-                                    text: VLCIcons.skip_for
-                                    font.pixelSize: VLCStyle.icon_audioPlayerButton
-                                    onClicked: Player.jumpFwd()
-                                    description: qsTr("Step forward")
-                                }
+                            Widgets.IconToolButton{
+                                text: VLCIcons.skip_for
+                                font.pixelSize: VLCStyle.icon_audioPlayerButton
+                                onClicked: Player.jumpFwd()
+                                description: qsTr("Step forward")
                             }
                         }
                     }

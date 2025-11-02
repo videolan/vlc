@@ -76,35 +76,33 @@ RowLayout {
 
         Navigation.leftItem: playbackBtn
 
-        model: ObjectModel {
-            TrackColumn {
-                title: qsTr("Subtitle")
-                tracksModel: Player.subtitleTracks
-                menuIcon: VLCIcons.expand
-                menuText: qsTr("Menu")
-                onMenuAction: (menuPos)  => {
-                    menuSubtitle.popup(menuPos)
-                }
+        TrackColumn {
+            title: qsTr("Subtitle")
+            tracksModel: Player.subtitleTracks
+            menuIcon: VLCIcons.expand
+            menuText: qsTr("Menu")
+            onMenuAction: (menuPos)  => {
+                menuSubtitle.popup(menuPos)
             }
+        }
 
-            TrackColumn {
-                title: qsTr("Audio")
-                tracksModel: Player.audioTracks
-                menuIcon: VLCIcons.expand
-                menuText: qsTr("Menu")
-                onMenuAction: (menuPos)  => {
-                    menuAudio.popup(menuPos)
-                }
+        TrackColumn {
+            title: qsTr("Audio")
+            tracksModel: Player.audioTracks
+            menuIcon: VLCIcons.expand
+            menuText: qsTr("Menu")
+            onMenuAction: (menuPos)  => {
+                menuAudio.popup(menuPos)
             }
+        }
 
-            TrackColumn {
-                title: qsTr("Video Tracks")
-                tracksModel: Player.videoTracks
-                menuIcon: VLCIcons.add
-                menuText: qsTr("Add")
-                onMenuAction: (menuPos) => {
-                    DialogsProvider.loadVideoFile()
-                }
+        TrackColumn {
+            title: qsTr("Video Tracks")
+            tracksModel: Player.videoTracks
+            menuIcon: VLCIcons.add
+            menuText: qsTr("Add")
+            onMenuAction: (menuPos) => {
+                DialogsProvider.loadVideoFile()
             }
         }
     }
