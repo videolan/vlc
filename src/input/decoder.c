@@ -597,7 +597,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     if (created_vout == 0)
     {
         // video context didn't change
-        if (vctx != NULL && p_owner->vctx == vctx)
+        if (p_owner->vctx == vctx)
             return 0;
     }
     assert(p_owner->p_vout);
