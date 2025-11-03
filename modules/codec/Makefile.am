@@ -132,6 +132,13 @@ libschroedinger_plugin_la_LIBADD = $(LIBS_schroedinger)
 EXTRA_LTLIBRARIES += libschroedinger_plugin.la
 codec_LTLIBRARIES += $(LTLIBschroedinger)
 
+libopenapv_plugin_la_SOURCES = codec/openapv.c
+libopenapv_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_openapv)
+libopenapv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libopenapv_plugin_la_LIBADD = $(LIBS_openapv)
+EXTRA_LTLIBRARIES += libopenapv_plugin.la
+codec_LTLIBRARIES += $(LTLIBopenapv)
+
 
 ### Image codecs ###
 
