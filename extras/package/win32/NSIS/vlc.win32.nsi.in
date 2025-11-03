@@ -26,7 +26,7 @@
 ManifestDPIAware true
 Unicode true
 
-!define INSTALL_ACTIVEX
+; !define INSTALL_ACTIVEX
 
 Var ReinstallType
 Var ReinstallUninstallBtn
