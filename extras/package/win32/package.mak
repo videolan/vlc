@@ -105,7 +105,7 @@ package-win-activex: build-npapi
 	mkdir -p "$(win32_destdir)/sdk/activex/"
 	cp $(top_builddir)/npapi-vlc/activex/README.TXT $(top_builddir)/npapi-vlc/share/test/test.html $(win32_destdir)/sdk/activex/
 
-package-win-strip: package-win-common package-win-activex
+package-win-strip: package-win-common
 	mkdir -p "$(win32_debugdir)"/
 if ENABLE_PDB
 	find $(win32_destdir) -type f -name '*.pdb' | while read i; \
