@@ -137,10 +137,6 @@
                             <File Id='libvlc.dll' Name='libvlc.dll' KeyPath='yes' Vital='yes' DiskId='1' />
                         </Component>
 
-                        <Component Id='CompAxvlc' Guid='cabe28b1-5586-4ac3-815b-4f3a834c0d54' Win64="$(var.Win64)">
-                            <File Id='axvlc.dll' Name='axvlc.dll' KeyPath='yes' DiskId='1' />
-                        </Component>
-
                         <Component Id='CompCacheGen' Guid='e1b4a499-e223-4c18-9de0-258f12b8dcfa' Win64="$(var.Win64)">
                             <File Id='vlc_cache_gen.exe' Name='vlc-cache-gen.exe' KeyPath='yes' DiskId='1' />
                         </Component>
@@ -303,12 +299,6 @@
             <ComponentGroupRef Id='CompLuaGroup' />
             <!--<ComponentGroupRef Id='CompSkinsGroup' />-->
 
-            <Feature Id='WEBPLUGINS' Title='Web plugins' Level='1' AllowAdvertise="no">
-                <Feature Id='ACTIVEX' Title='ActiveX plugin' Level='1' AllowAdvertise="no">
-                    <ComponentRef Id='CompAxvlc' />
-                    <ComponentGroupRef Id='CompAxvlcGroup' />
-                </Feature>
-            </Feature>
             <Feature Id='FILEASSOCIATION' Title='File associations' Level='1' AllowAdvertise="no">
                 <Feature Id='VIDEOFILEASSOCIATION' Title='Video' Level='1' AllowAdvertise="no">
                     <ComponentRef Id='CompVideoFileAssociation' />
@@ -376,28 +366,3 @@
        </UI>
    </Product>
 </Wix>
-
-<!--
-    BACKUP: MANUAL REGISTRATION OF AXVLC.DLL
-     **** THIS METHOD IS DEPRECATED ****
-
-    Within the <InstallExecuteSequence> node:
-    <Custom Action="RegisterAxvlc" After="InstallFinalize">NOT Installed</Custom>
-    <Custom Action="UnregisterAxvlc" Before="InstallInitialize">Installed</Custom>
-
-    Within the package add these custom actions:
-
-    <CustomAction Id            = "RegisterAxvlc"
-                  Directory     = "APPLICATIONFOLDER"
-                  ExeCommand    = 'regsvr32.exe /s "[APPLICATIONFOLDER]axvlc.dll"'
-                  Return        = "check" />
-
-    <CustomAction Id            = "UnregisterAxvlc"
-                  Directory     = "APPLICATIONFOLDER"
-                  ExeCommand    = 'regsvr32.exe /s /u "[APPLICATIONFOLDER]axvlc.dll"' />
-
-    Finally within the <UI> node:
-
-    <ProgressText Action="RegisterAxvlc">Registering DirectX plugin...</ProgressText>
-    <ProgressText Action="UnregisterAxvlc">Removing DirectX plugin...</ProgressText>
--->

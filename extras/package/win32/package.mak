@@ -177,7 +177,6 @@ package-win32-debug: package-win32-debug-zip package-win32-debug-7zip
 package-win32-release: package-win32-src $(win32_destdir)/NSIS/nsProcess.dll package-win-sdk
 	mkdir -p "$(win32_destdir)/msi/"
 	cp    $(top_builddir)/extras/package/win32/msi/config.wxi	  "$(win32_destdir)/msi/"
-	cp    $(top_srcdir)/extras/package/win32/msi/axvlc.wxs		  "$(win32_destdir)/msi/"
 	cp    $(top_srcdir)/extras/package/win32/msi/bannrbmp.bmp	  "$(win32_destdir)/msi/"
 	cp    $(top_srcdir)/extras/package/win32/msi/extensions.wxs	  "$(win32_destdir)/msi/"
 	cp    $(top_srcdir)/extras/package/win32/msi/LICENSE.rtf	  "$(win32_destdir)/msi/"
