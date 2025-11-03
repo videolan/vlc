@@ -1309,6 +1309,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_NOTCHLC, "NotchLC"),
 
     B(VLC_CODEC_RTP_VIDEO_RAW, "RTP raw video"),
+
+    B(VLC_CODEC_APV, "Advanced Professional Video (APV)"),
 };
 
 static const staticentry_t p_list_audio[] = {

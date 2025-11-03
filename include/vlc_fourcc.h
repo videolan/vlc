@@ -198,6 +198,7 @@
 #define VLC_CODEC_AGM             VLC_FOURCC('A','G','M','0')
 #define VLC_CODEC_NOTCHLC         VLC_FOURCC('n','c','l','c')
 #define VLC_CODEC_RTP_VIDEO_RAW   VLC_FOURCC('R','T','P','V')
+#define VLC_CODEC_APV             VLC_FOURCC('a','p','v','1')
 
 /***********
  * Chromas
