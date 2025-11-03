@@ -622,12 +622,14 @@ APPL_LIBTOOL=$(xcrun -f libtool) \
 echo "Building needed tools (if missing)"
 
 TOOLS_BOOTSTRAP=
-if [ "$VLC_HOST_OS" = "xros" ]; then
-    TOOLS_BOOTSTRAP="$TOOLS_BOOTSTRAP --min-cmake=3.28.0"
-fi
-# force local build until implicit C++ is properly supported, cmake 4.x is OK
-if [ "$VLC_HOST_OS" = "ios" ] || [ "$VLC_HOST_OS" = "tvos" ] || [ "$VLC_HOST_OS" = "watchos" ] || [ "$VLC_HOST_OS" = "xros" ]; then
-    TOOLS_BOOTSTRAP="$TOOLS_BOOTSTRAP --min-cmake=3.31.10"
+if [ "$VLC_USE_PREBUILT_CONTRIBS" = "0" ]; then
+    if [ "$VLC_HOST_OS" = "xros" ]; then
+        TOOLS_BOOTSTRAP="$TOOLS_BOOTSTRAP --min-cmake=3.28.0"
+    fi
+    # force local build until implicit C++ is properly supported, cmake 4.x is OK
+    if [ "$VLC_HOST_OS" = "ios" ] || [ "$VLC_HOST_OS" = "tvos" ] || [ "$VLC_HOST_OS" = "watchos" ] || [ "$VLC_HOST_OS" = "xros" ]; then
+        TOOLS_BOOTSTRAP="$TOOLS_BOOTSTRAP --min-cmake=3.31.10"
+    fi
 fi
 
 cd "$VLC_SRC_DIR/extras/tools" || abort_err "Failed cd to tools dir"
