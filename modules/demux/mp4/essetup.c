@@ -639,6 +639,24 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
             break;
         }
 
+        case ATOM_apv1:
+        {
+            const MP4_Box_t *p_binary = MP4_BoxGet(  p_sample, "apvC" );
+            if( p_binary && p_binary->data.p_binary->i_blob > 4 &&
+                GetDWBE(p_binary->data.p_binary->p_blob) == 0 ) /* fullbox header */
+            {
+                size_t i_extra = p_binary->data.p_binary->i_blob - 4;
+                uint8_t *p_extra = malloc(i_extra);
+                if( likely( p_extra ) )
+                {
+                    p_fmt->i_extra = i_extra;
+                    p_fmt->p_extra = p_extra;
+                    memcpy( p_extra, ((uint8_t *)p_binary->data.p_binary->p_blob) + 4, i_extra);
+                }
+            }
+            break;
+        }
+
         /* avc1: send avcC (h264 without annexe B, ie without start code)*/
         case VLC_FOURCC( 'a', 'v', 'c', '3' ):
         case VLC_FOURCC( 'a', 'v', 'c', '1' ):
