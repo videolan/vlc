@@ -1165,6 +1165,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_PIXLET, "Apple Pixlet" ),
         A("pxlt"),
+
+    B(VLC_CODEC_APV, "Advanced Professional Video (APV)"),
 };
 
 static const staticentry_t p_list_audio[] = {
