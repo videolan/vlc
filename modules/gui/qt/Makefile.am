@@ -1307,7 +1307,8 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/RadioButtonExt.qml \
 	widgets/qml/RoundedRectangleShadow.qml \
 	widgets/qml/VoronoiSnow.qml \
-	widgets/qml/DualKawaseBlur.qml
+	widgets/qml/DualKawaseBlur.qml \
+	widgets/qml/CheckBoxExt.qml
 nodist_libqml_module_widgets_a_SOURCES = widgets_qmlassets.cpp
 $(libqml_module_widgets_a_QML:.qml=.cpp) : $(builddir)/widgets/res.qrc
 $(libqml_module_widgets_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/widgets/res.qrc
