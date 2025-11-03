@@ -1254,6 +1254,29 @@ static void EsOutDecodersStopBuffering(es_out_sys_t *p_sys, bool b_forced)
                                i_stream_start);
     vlc_clock_main_Unlock(p_sys->p_pgrm->clocks.main);
 
+    /* If pause was requested during buffering previously, set pause state now
+     * that buffering is complete and clock references are established. Use
+     * EsOutChangePause to properly pause both decoders and clocks. */
+    if (input_priv(p_sys->p_input)->b_pause_after_buffering)
+    {
+        input_priv(p_sys->p_input)->b_pause_after_buffering = false;
+
+        /* ES out should not be paused yet: a deferred pause is never applied to
+         * es_out before this point, and all synchronous pauses clear the
+         * b_pause_after_buffering flag. */
+        assert(!p_sys->b_paused);
+
+        const vlc_tick_t i_pause_date = vlc_tick_now();
+        EsOutChangePause(p_sys, true, i_pause_date);
+
+        /* Update input state if not already paused */
+        if (input_priv(p_sys->p_input)->i_state != PAUSE_S)
+        {
+            input_priv(p_sys->p_input)->i_state = PAUSE_S;
+            input_SendEventState(p_sys->p_input, PAUSE_S, i_pause_date);
+        }
+    }
+
     foreach_es_then_es_slaves(p_es)
     {
         if( !p_es->p_dec )

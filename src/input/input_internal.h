@@ -506,6 +506,7 @@ typedef struct input_thread_private_t
     bool        is_running;
     bool        is_stopped;
     bool        b_recording;
+    bool        b_pause_after_buffering; /* Defer pause until after buffering */
     float       rate;
 
     /* Playtime configuration and state */

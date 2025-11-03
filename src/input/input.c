@@ -275,6 +275,7 @@ input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *p_item,
     priv->is_running = false;
     priv->is_stopped = false;
     priv->b_recording = false;
+    priv->b_pause_after_buffering = false;
     priv->rate = 1.f;
     TAB_INIT( priv->i_attachment, priv->attachment );
     priv->p_sout   = NULL;
