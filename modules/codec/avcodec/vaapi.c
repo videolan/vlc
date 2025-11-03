@@ -246,6 +246,38 @@ error:
     return VLC_EGENERIC;
 }
 
+static int AVHWFramesContextCompare(const AVHWFramesContext *c1,
+                                    const AVHWFramesContext *c2)
+{
+    return c1->width == c2->width && c1->height == c2->height &&
+           c1->format == c2->format && c1->sw_format == c2->sw_format &&
+           c1->initial_pool_size == c2->initial_pool_size ? 0 : 1;
+}
+
+static vlc_video_context *
+ReuseVideoContext(vlc_video_context *vctx, AVBufferRef *hwframes_ref_new)
+{
+    if (vctx == NULL)
+        return NULL;
+
+    struct vaapi_vctx *vaapi_vctx =
+    vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_VAAPI);
+
+    AVHWFramesContext *hwframes_ctx_prev =
+        (AVHWFramesContext*)vaapi_vctx->hwframes_ref->data;
+
+    AVHWFramesContext *hwframes_ctx_new =
+        (AVHWFramesContext*)hwframes_ref_new->data;
+
+    if (AVHWFramesContextCompare(hwframes_ctx_prev, hwframes_ctx_new) != 0)
+        return NULL;
+
+    vctx = vlc_video_context_Hold(vctx);
+    av_buffer_unref(&vaapi_vctx->hwframes_ref);
+    vaapi_vctx->hwframes_ref = hwframes_ref_new;
+    return vctx;
+}
+
 static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
 {
     AVCodecContext *ctx = cfg->avctx;
@@ -360,23 +392,27 @@ static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
         return VLC_EGENERIC;
     }
 
-    vlc_video_context *vctx =
-        vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_VAAPI,
-                                 sizeof(struct vaapi_vctx), &vaapi_ctx_ops);
+    vlc_video_context *vctx = ReuseVideoContext(cfg->vctx_prev, hwframes_ref);
     if (vctx == NULL)
     {
-        av_buffer_unref(&hwframes_ref);
-        av_buffer_unref(&ctx->hw_frames_ctx);
-        return VLC_EGENERIC;
+        vctx = 
+            vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_VAAPI,
+                                    sizeof(struct vaapi_vctx), &vaapi_ctx_ops);
+        if (vctx == NULL)
+        {
+            av_buffer_unref(&hwframes_ref);
+            av_buffer_unref(&ctx->hw_frames_ctx);
+            return VLC_EGENERIC;
+        }
+
+        struct vaapi_vctx *vaapi_vctx =
+            vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_VAAPI);
+
+        vaapi_vctx->va_dpy = va_dpy;
+        vaapi_vctx->hwframes_ref = hwframes_ref;
+        vlc_sem_init(&vaapi_vctx->pool_sem, hwframes_ctx->initial_pool_size);
+        vaapi_vctx->dynamic_pool = hwframes_ctx->initial_pool_size < 1;
     }
-
-    struct vaapi_vctx *vaapi_vctx =
-        vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_VAAPI);
-
-    vaapi_vctx->va_dpy = va_dpy;
-    vaapi_vctx->hwframes_ref = hwframes_ref;
-    vlc_sem_init(&vaapi_vctx->pool_sem, hwframes_ctx->initial_pool_size);
-    vaapi_vctx->dynamic_pool = hwframes_ctx->initial_pool_size < 1;
 
     msg_Info(va, "Using %s", vaQueryVendorString(va_dpy));
 
