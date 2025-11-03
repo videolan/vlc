@@ -298,6 +298,10 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
 #if LIBAVCODEC_VERSION_CHECK( 57, 79, 100 )
     { VLC_CODEC_FMVC, AV_CODEC_ID_FMVC },
 #endif
+#if LIBAVCODEC_VERSION_CHECK( 62, 1, 100 )
+    { VLC_CODEC_APV, AV_CODEC_ID_APV },
+#endif
+
 };
 
 /*
