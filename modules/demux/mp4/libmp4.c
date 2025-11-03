@@ -4551,6 +4551,7 @@ static const struct
     { ATOM_av1C,    MP4_ReadBox_av1C,         ATOM_av01 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc1 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc3 },
+    { ATOM_apvC,    MP4_ReadBox_Binary,       ATOM_apv1 },
     { ATOM_hvcC,    MP4_ReadBox_Binary,       0 },
     { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp08 },
     { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp09 },
