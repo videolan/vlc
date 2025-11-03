@@ -60,6 +60,15 @@ struct vlc_va_cfg
     video_format_t *video_fmt_out;
 
     /**
+    * Pointer to the previous video context
+    *
+    * Only valid if use_hwframes is true and when recreating the va module.
+    * This context can be re-used (held, and set to vctx_out) if the internal
+    * format/size matches the new cfg.
+    */
+    vlc_video_context *vctx_prev;
+
+    /**
      * Pointer to the used video context
      *
      * The video context must be allocated from the dec_device, filled and set

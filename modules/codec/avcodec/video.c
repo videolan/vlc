@@ -750,7 +750,8 @@ static void ffmpeg_CloseVa(decoder_t *p_dec, AVCodecContext *context)
 static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
                          enum AVPixelFormat hwfmt,
                          const AVPixFmtDescriptor *src_desc,
-                         vlc_decoder_device *dec_device)
+                         vlc_decoder_device *dec_device,
+                         vlc_video_context *vctx)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -762,6 +763,7 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
         .fmt_in = p_dec->fmt_in,
         .dec_device = dec_device,
         .video_fmt_out = &p_dec->fmt_out.video,
+        .vctx_prev = vctx,
         .vctx_out = NULL,
         .use_hwframes = false,
         .extra_pictures = 0,
@@ -792,8 +794,10 @@ static int ffmpeg_RecreateVa(decoder_t *p_dec, AVCodecContext *p_context,
                              enum AVPixelFormat swfmt)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    assert(p_sys->use_hwframes);
     assert(p_sys->vctx_out != NULL);
 
+    vlc_video_context *vctx = vlc_video_context_Hold(p_sys->vctx_out);
     vlc_decoder_device *dec_device =
         vlc_video_context_HoldDevice(p_sys->vctx_out);
 
@@ -802,9 +806,10 @@ static int ffmpeg_RecreateVa(decoder_t *p_dec, AVCodecContext *p_context,
     const AVPixFmtDescriptor *src_desc = av_pix_fmt_desc_get(swfmt);
 
     int ret = ffmpeg_OpenVa(p_dec, p_context, p_sys->pix_fmt,
-                            src_desc, dec_device);
+                            src_desc, dec_device, vctx);
     if (dec_device != NULL)
         vlc_decoder_device_Release(dec_device);
+    vlc_video_context_Release(vctx);
     return ret;
 }
 
@@ -921,7 +926,8 @@ int InitVideoHwDec( vlc_object_t *obj )
         if (ret != VLC_SUCCESS)
             continue;
 
-        ret = ffmpeg_OpenVa(p_dec, p_context, hwfmts[i], src_desc, dec_device);
+        ret = ffmpeg_OpenVa(p_dec, p_context, hwfmts[i], src_desc, dec_device,
+                            NULL);
         if (dec_device != NULL)
             vlc_decoder_device_Release(dec_device);
 
@@ -2140,7 +2146,7 @@ no_reuse:
         if (ret != VLC_SUCCESS)
             continue;
 
-        ret = ffmpeg_OpenVa(p_dec, p_context, hwfmt, src_desc, dec_device);
+        ret = ffmpeg_OpenVa(p_dec, p_context, hwfmt, src_desc, dec_device, NULL);
         if (dec_device != NULL)
             vlc_decoder_device_Release(dec_device);
 
