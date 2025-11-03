@@ -137,7 +137,7 @@ T.Button {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
 
-            color: Qt.alpha(control.color, control.busy ? 0.0 : 1.0)
+            color: control.busy ? "transparent" : control.color
 
             font.pixelSize: control.iconSize
 
