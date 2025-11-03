@@ -244,6 +244,11 @@ option('schroedinger',
     value : 'auto',
     description : 'Enable/disable schroedinger support')
 
+option('openapv',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable OpenAPV decoder support')
+
 option('rsvg',
     type : 'feature',
     value : 'auto',

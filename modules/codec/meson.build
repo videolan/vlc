@@ -168,6 +168,17 @@ vlc_modules += {
     'enabled' : schroedinger_dep.found(),
 }
 
+# Dirac decoder and encoder using schroedinger
+openapv_dep = dependency('oapv',
+                              version: '>= 0.2',
+                              required: get_option('openapv'))
+vlc_modules += {
+    'name' : 'openapv',
+    'sources' : files('openapv.c'),
+    'dependencies' : [openapv_dep],
+    'enabled' : openapv_dep.found(),
+}
+
 # RTP Raw video codec
 vlc_modules += {
     'name' : 'rtp_rawvid',
