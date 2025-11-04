@@ -121,7 +121,9 @@ QtObject {
         else
             newContentY = flickable.contentY
 
-        return clamp(newContentY, flickable.originY, flickable.originY + flickable.contentHeight)
+        return clamp(newContentY,
+                     flickable.originY - flickable.topMargin,
+                     flickable.originY + flickable.contentHeight - flickable.height + flickable.bottomMargin)
     }
 
     function isArray(obj) {
