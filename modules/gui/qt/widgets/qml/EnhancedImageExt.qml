@@ -55,6 +55,17 @@ ImageExt {
         implicitWidth: (source instanceof Image) ? source.implicitWidth : textureSize.width
         implicitHeight: (source instanceof Image) ? source.implicitHeight : textureSize.height
 
+        readonly property bool sourceNeedsTiling: (root.fillMode === Image.Tile ||
+                                                   root.fillMode === Image.TileVertically ||
+                                                   root.fillMode === Image.TileHorizontally)
+
+        detachAtlasTextures: sourceNeedsTiling
+
+        horizontalWrapMode: sourceNeedsTiling ? TextureProviderItem.Repeat : TextureProviderItem.ClampToEdge
+        verticalWrapMode: sourceNeedsTiling ? TextureProviderItem.Repeat : TextureProviderItem.ClampToEdge
+
+        textureSubRect: sourceNeedsTiling ? Qt.rect(0, 0, root.paintedWidth, root.paintedHeight) : undefined
+
         property size textureSize
 
         Connections {
