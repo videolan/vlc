@@ -619,12 +619,18 @@ static int Handshake(intf_thread_t *p_this)
 
     p_buffer_pos = strstr(p_buffer_pos, "http://");
     if (!p_buffer_pos || strlen(p_buffer_pos) == 7)
+    {
+        vlc_UrlClean(&p_sys->p_nowp_url);
         goto proto;
+    }
 
     /* We need to read the submission url */
     psz_url = strndup(p_buffer_pos, strcspn(p_buffer_pos, "\n"));
     if (!psz_url)
+    {
+        vlc_UrlClean(&p_sys->p_nowp_url);
         goto oom;
+    }
 
     /* parse the submission url */
     vlc_UrlParse(&p_sys->p_submit_url, psz_url);
