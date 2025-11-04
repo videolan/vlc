@@ -74,6 +74,11 @@ Item {
     //          in that case the texture provider item should provide a subset of `Image`'s
     //          interface, that is, provide `status` and `implicitWidth`/`implicitHeight` that
     //          reflect the texture size.
+    // NOTE:    If `textureProviderItem` is set to `null`, the default `Image` is going to be
+    //          used as fallback. For that reason, it is recommended to keep providing the
+    //          `source` url if there is a possibility of `textureProviderItem` being `null`
+    //          as long as it is applicable (not all texture providers may be sourced from
+    //          a source url, or the source url may also be lost and not tracked anymore).
     property Item textureProviderItem: sourceTextureProviderItem
 
     // NOTE:    If the texture provider used does not require `ImageExt` to load the image, this
