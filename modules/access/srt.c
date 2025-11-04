@@ -352,7 +352,7 @@ static int Open(vlc_object_t *p_this)
 {
     stream_t     *p_stream = (stream_t*)p_this;
     stream_sys_t *p_sys = NULL;
-    vlc_url_t     parsed_url = { 0 };
+    vlc_url_t     parsed_url;
 
     p_sys = vlc_obj_calloc( p_this, 1, sizeof( *p_sys ) );
     if( unlikely( p_sys == NULL ) )
@@ -368,6 +368,7 @@ static int Open(vlc_object_t *p_this)
     {
         msg_Err( p_stream, "Failed to parse input URL (%s)",
             p_stream->psz_url );
+        vlc_UrlClean( &parsed_url );
         goto failed;
     }
 
