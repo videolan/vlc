@@ -94,34 +94,14 @@ Item {
     readonly property real paintedHeight: (shaderEffect.readyForVisibility) ? shaderEffect.height
                                                                             : (image.clip ? image.height : image.paintedHeight)
 
-    // NOTE: Fill mode is not guaranteed to be supported,
-    //       it is supported to the extent QQuickImage
-    //       provides properly filled texture, paintedWidth/Height,
-    //       and applies attributes such as tiling (QSGTexture::Repeat)
-    //       to the texture itself WHILE being invisible.
-    //       Invisible items usually are not requested to
-    //       update their paint node, so it is not clear if QQuickImage
-    //       would synchronize QSGTexture attributes with its
-    //       node when it is invisible (rounding is active).
-    // NOTE: Experiments show that preserve aspect ratio can
-    //       be supported, because QQuickImage provides
-    //       appropriate painted size when it is invisible,
-    //       and the generated texture is pre-filled. In
-    //       the future, Qt Quick may prefer doing this
-    //       within its shader, but for now, we should be
-    //       able to use it. Currently, as of Qt 6.8,
-    //       PreserveAspectCrop, PreserveAspectFit, and
-    //       Stretch can be considered supported.
-    // NOTE: If you need a more guaranteed way to preserve
-    //       the aspect ratio, you can use `sourceSize` with
-    //       only one dimension set. Currently `fillMode` is
-    //       preferred instead of `sourceSize` because we need
-    //       to have control over both width and height.
-    // NOTE: Fill mode can be overridden, even when a foreign
-    //       texture provider is used. In that case, `ImageExt`
-    //       makes the required painted size calculations itself.
-    //       The mode is still subject to the same restrictions
-    //       mentioned above.
+    // NOTE: ImageExt calculates the painted size at all times,
+    //       regardless of whether a foreign texture provider
+    //       is used, because although `Image` provides painted
+    //       size when hidden at the moment, this approach is
+    //       considered more reliable.
+    // WARNING: If foreign texture provider is used, tile fill
+    //          modes are not supported by default. For that
+    //          purpose, `EnhancedImageExt` can be used.
     property alias fillMode: image.fillMode
 
     // Unlike QQuickImage where it needs `clip: true` (clip node)
@@ -168,8 +148,8 @@ Item {
         implicitWidth: (source.status === Image.Ready) ? source.implicitWidth : 64
         implicitHeight: (source.status === Image.Ready) ? source.implicitHeight : 64
 
-        width: ((source.status !== Image.Ready) || (root.fillMode === Image.PreserveAspectCrop)) ? root.width : effectivePaintedSize.width
-        height: ((source.status !== Image.Ready) || (root.fillMode === Image.PreserveAspectCrop)) ? root.height : effectivePaintedSize.height
+        width: paintedSize.width
+        height: paintedSize.height
 
         visible: readyForVisibility
 
@@ -229,31 +209,29 @@ Item {
             return ret
         }
 
-        // If source is a foreign `Image`, its `paintedWidth`/`paintedHeight` would not be based on the root size and can not be used.
-        // In that case, we calculate the painted size ourselves (see `effectivePaintedSize`). We also allow overriding the source's
-        // fill mode in that case. If source is a foreign item we still do the same to allow overriding the fill mode here.
-        readonly property size effectivePaintedSize: {
+        readonly property size paintedSize: {
             let ret = Qt.size(0.0, 0.0)
 
-            // No need to calculate if foreign texture provider is not used:
-            if (source === image)
-                return Qt.size(source.paintedWidth, source.paintedHeight)
-
-            // No need to calculate if image is not ready
+            // No need to calculate if the texture is not ready:
             if (source.status !== Image.Ready)
                 return ret
 
-            // NOTE: Calculations are based on `QQuickImage`
-            // WARNING: Note that `PreserveAspectCrop` mode does not use painted size and therefore is not handled here (see `cropRate`).
-            if (root.fillMode === Image.PreserveAspectFit) {
+            // NOTE: Calculations are based on `QQuickImage`,
+            //       except preserve aspect crop (see `cropRate`).
+            if (root.fillMode === Image.PreserveAspectCrop) {
+                return Qt.size(root.width, root.height)
+            } else if (root.fillMode === Image.PreserveAspectFit) {
                 const widthScale = root.width / implicitWidth
                 const heightScale = root.height / implicitHeight
 
-                if (widthScale <= heightScale) {
+                if (widthScale < heightScale) {
                     ret.width = root.width
                     ret.height = widthScale * implicitHeight
-                } else {
+                } else if (widthScale > heightScale) {
                     ret.width = heightScale * implicitWidth
+                    ret.height = root.height
+                } else {
+                    ret.width = root.width
                     ret.height = root.height
                 }
             } else if (root.fillMode === Image.Pad) {
@@ -263,6 +241,16 @@ Item {
                 ret.width = root.width
                 ret.height = root.height
             }
+
+            /// <debug>
+            // Debug only, we use our calculation for reliability regardless of the source:
+            if (source === image) {
+               if (image.paintedWidth !== ret.width || source.paintedHeight !== ret.height) {
+                   console.debug(root, "painted sizes of the default texture provider and the calculation differ: (%1, %2), (%3, %4)"
+                                       .arg(image.paintedWidth).arg(image.paintedHeight).arg(ret.width).arg(ret.height))
+               }
+            }
+            /// </debug>
 
             return ret
         }
