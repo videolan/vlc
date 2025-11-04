@@ -460,6 +460,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys, const char *path 
                             NULL, NULL ) == -EINTR )
     {
         vlc_credential_clean( &credential );
+        vlc_UrlClean( &url );
         goto error;
     }
 
