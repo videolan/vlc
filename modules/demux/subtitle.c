@@ -2508,7 +2508,10 @@ static char *get_language_from_url(const char *urlstr)
     assert(urlstr != NULL);
 
     if (vlc_UrlParse(&url, urlstr) != 0)
+    {
+        vlc_UrlClean(&url);
         return NULL;
+    }
     if (url.psz_path != NULL)
         filename = strrchr(url.psz_path, '/');
     if (filename != NULL) {
