@@ -184,7 +184,7 @@ AbstractButton {
             }
 
             Widgets.DefaultShadow {
-
+                visible: (coverImage.status === Image.Ready)
             }
         }
 
