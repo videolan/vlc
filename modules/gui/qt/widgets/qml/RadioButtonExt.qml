@@ -20,6 +20,7 @@
 import QtQuick
 import QtQuick.Templates as T
 
+import VLC.MainInterface
 import VLC.Style
 
 // Based on Qt Quick Basic Style:
@@ -34,6 +35,11 @@ T.RadioButton {
 
     padding: VLCStyle.margin_xxsmall
     spacing: VLCStyle.margin_xxsmall
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: function(event) {
+        Navigation.defaultKeyAction(event)
+    }
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
