@@ -319,7 +319,10 @@ static int Open(vlc_object_t *obj)
     if (vlc_credential_get(&sys->credential, access, "smb-user", "smb-pwd",
                            NULL, NULL)
         == -EINTR)
+    {
+        vlc_UrlClean(&url);
         goto error;
+    }
 
     smbc_stat_fn stat_fn = smbc_getFunctionStat(sys->ctx);
     assert(stat_fn);
