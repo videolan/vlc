@@ -295,7 +295,7 @@ Item {
         // because the root item may be invisible (`grabToImage()` call on an invisible
         // item case). In that case, shader effect would report invisible although it
         // would appear in the grabbed image.
-        visible: !shaderEffect.readyForVisibility
+        visible: (status === Image.Ready) && !shaderEffect.readyForVisibility
 
         // Clipping is not a big concern for rendering performance
         // with the software or openvg scene graph adaptations.
