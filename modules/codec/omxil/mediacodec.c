@@ -871,6 +871,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             if (es_format_HasVpxAlpha(p_dec->fmt_in)) // contains alpha extradata
                 return VLC_ENOTSUP;
             mime = "video/x-vnd.on2.vp9"; break;
+        case VLC_CODEC_APV:
+            mime = "video/avp"; break;
         }
     }
     else
