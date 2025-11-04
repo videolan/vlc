@@ -41,6 +41,7 @@ Item {
         id: primaryShadow
 
         parent: root.parent // similar to how Repeater behaves
+        z: root.z
 
         opacity: root.opacity
         visible: root.visible
@@ -51,6 +52,7 @@ Item {
         id: secondaryShadow
 
         parent: root.parent // similar to how Repeater behaves
+        z: root.z
 
         opacity: root.opacity
         visible: root.visible

@@ -322,6 +322,8 @@ T.ItemDelegate {
 
                 secondaryVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
                 secondaryBlurRadius: VLCStyle.dp(72, VLCStyle.scale)
+
+                z: -1
             }
         }
 
