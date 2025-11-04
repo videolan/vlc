@@ -150,8 +150,8 @@ QtObject {
         const mappedRect = flickable.mapFromItem(item.parent, Qt.rect(item.x, item.y, item.width, item.height))
         // Flickable does not fully contain the item:
         if ((mappedRect.y < 0) || ((mappedRect.y + mappedRect.height) > flickable.height))
-            flickable.contentY = Math.min(Math.max(-flickable.topMargin,
+            flickable.contentY = Math.min(Math.max(flickable.originY - flickable.topMargin,
                                                    flickable.contentItem.mapFromItem(item.parent, item.x, item.y).y - Math.max(0, ((flickable.height - item.height) / 2))),
-                                          flickable.contentHeight - flickable.height + flickable.bottomMargin)
+                                          flickable.originY + flickable.contentHeight - flickable.height + flickable.bottomMargin)
     }
 }
