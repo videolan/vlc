@@ -308,7 +308,9 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             break;
 
         case VLC_PLAYER_STATE_PAUSED:
-            assert(player->global_state == VLC_PLAYER_STATE_PLAYING);
+            /* Can pause from PLAYING or STARTED (deferred pause during buffering) */
+            assert(player->global_state == VLC_PLAYER_STATE_PLAYING
+                   || player->global_state == VLC_PLAYER_STATE_STARTED);
             assert(state_date != VLC_TICK_INVALID);
             input->pause_date = state_date;
 
