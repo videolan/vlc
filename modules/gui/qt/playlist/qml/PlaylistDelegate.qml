@@ -210,8 +210,26 @@ T.Control {
                     }
                 }
 
+                Rectangle {
+                    // NOTE: If the image is opaque and if there is depth buffer, this rectangle
+                    //       is not going to be painted by the graphics backend. Though, it will
+                    //       still have its own scene graph node, as well as QML item.
+                    // TODO: Investigate if using `ImageExt` just for its built-in background
+                    //       coloring is worth it.
+                    anchors.centerIn: parent
+                    anchors.alignWhenCentered: false
+                    width: parent.paintedWidth
+                    height: parent.paintedHeight
+                    z: -1
+
+                    color: theme.bg.primary
+
+                    visible: (artwork.status === Image.Ready)
+                }
+
                 Widgets.DefaultShadow {
                     visible: (artwork.status === Image.Ready)
+                    z: -2
                 }
             }
 
