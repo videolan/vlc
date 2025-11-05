@@ -1184,7 +1184,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_META:
         {
-            static const char names[][10] = {
+            static const char names[][11] = {
                 [vlc_meta_Title] = "title",
                 [vlc_meta_Artist] = "artist",
                 [vlc_meta_Genre] = "genre",
