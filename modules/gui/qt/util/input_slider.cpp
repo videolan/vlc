@@ -723,6 +723,7 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
 void SoundSlider::wheelEvent( QWheelEvent *event )
 {
     wheelEventConverter.wheelEvent(event);
+    event->accept();
     emit sliderReleased();
 }
 
