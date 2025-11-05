@@ -698,15 +698,32 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
 
     pixGradient.setMask( mask );
     pixGradient2.setMask( mask );
+
+    connect(&wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, this, [this](int vlcButton){
+        int newvalue = 0;
+        //ignore modifiers
+        switch (vlcButton & 0x00FF0000) {
+        case KEY_MOUSEWHEELDOWN:
+        case KEY_MOUSEWHEELLEFT:
+            newvalue = value() - f_step;
+            break;
+        case KEY_MOUSEWHEELUP:
+        case KEY_MOUSEWHEELRIGHT:
+            newvalue = value() + f_step;
+            break;
+        default:
+            return;
+        }
+
+        setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
+        emit sliderMoved( value() );
+    });
 }
 
 void SoundSlider::wheelEvent( QWheelEvent *event )
 {
-    int newvalue = value() + event->angleDelta().y() / QWheelEvent::DefaultDeltasPerStep * f_step;
-    setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
-
+    wheelEventConverter.wheelEvent(event);
     emit sliderReleased();
-    emit sliderMoved( value() );
 }
 
 void SoundSlider::mousePressEvent( QMouseEvent *event )

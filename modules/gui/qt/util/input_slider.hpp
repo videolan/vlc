@@ -178,6 +178,8 @@ private:
     QFont textfont;
     QRect textrect;
 
+    WheelToVLCConverter wheelEventConverter;
+
     void changeValue( int x ); /* Function to modify the value from pixel x() */
 };
 
