@@ -1209,9 +1209,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             for( unsigned i = 0; i < sizeof(names) / sizeof(*names); i++)
             {
-                if( !names[i][0] )
-                    continue;
-
                 AVDictionaryEntry *e = av_dict_get( dict, names[i], NULL, 0 );
                 if( e != NULL && e->value != NULL && IsUTF8(e->value) )
                     vlc_meta_Set( p_meta, i, e->value );
