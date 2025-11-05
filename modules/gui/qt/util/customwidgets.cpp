@@ -109,7 +109,7 @@ void VLCQDial::paintEvent( QPaintEvent *event )
 /***************************************************************************
  * Hotkeys converters
  ***************************************************************************/
-int qtKeyModifiersToVLC( QInputEvent* e )
+int qtKeyModifiersToVLC( const QInputEvent* e )
 {
     int i_keyModifiers = 0;
     if( e->modifiers() & Qt::ShiftModifier ) i_keyModifiers |= KEY_MODIFIER_SHIFT;
@@ -265,7 +265,7 @@ static int keycmp( const void *a, const void *b )
     return *q - m->qt;
 }
 
-int qtEventToVLCKey( QKeyEvent *e )
+int qtEventToVLCKey( const QKeyEvent *e )
 {
     int qtk = e->key();
     uint32_t i_vlck = 0;
@@ -294,7 +294,7 @@ int qtEventToVLCKey( QKeyEvent *e )
     return i_vlck;
 }
 
-int qtWheelEventToVLCKey( QWheelEvent *e )
+int qtWheelEventToVLCKey( const QWheelEvent *e )
 {
     const qreal v_cos_deadzone = 0.45; // ~63 degrees
     const qreal h_cos_deadzone = 0.95; // ~15 degrees
