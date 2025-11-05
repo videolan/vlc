@@ -31,6 +31,7 @@
 #endif
 
 #include "styles/seekstyle.hpp"
+#include "customwidgets.hpp"
 
 #include <QSlider>
 #include <QPainter>
@@ -120,6 +121,8 @@ private:
     QSequentialAnimationGroup *animLoading;
     QTimer *hideHandleTimer;
     QTimer *startAnimLoadingTimer;
+
+    WheelToVLCConverter wheelEventConverter;
 
 public slots:
     void setPosition( float, int64_t, int );

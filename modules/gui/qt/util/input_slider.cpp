@@ -34,6 +34,8 @@
 #include "adapters/seekpoints.hpp"
 #include "input_manager.hpp"
 #include "imagehelper.hpp"
+#include "customwidgets.hpp"
+#include <vlc_actions.h>
 
 #include <QPaintEvent>
 #include <QPainter>
@@ -169,6 +171,31 @@ SeekSlider::SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_pare
     CONNECT( hideHandleTimer, timeout(), this, hideHandle() );
     CONNECT( startAnimLoadingTimer, timeout(), this, startAnimLoading() );
     mTimeTooltip->installEventFilter( this );
+
+    connect(&wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, this, [this](int vlcButton){
+        vlc_tick_t i_size = var_InheritInteger( this->p_intf->obj.libvlc, "short-jump-size" );
+        int i_mode = var_InheritInteger( this->p_intf->obj.libvlc, "hotkeys-x-wheel-mode" );
+
+        //ignore modifiers
+        switch (vlcButton & 0x00FF0000) {
+        case KEY_MOUSEWHEELDOWN:
+        case KEY_MOUSEWHEELLEFT:
+            if (i_mode != 3)
+                i_size = - i_size;
+            break;
+        case KEY_MOUSEWHEELUP:
+        case KEY_MOUSEWHEELRIGHT:
+            if (i_mode == 3)
+                i_size = - i_size;
+            break;
+        default:
+            break;
+        }
+
+        float posOffset = static_cast<float>( i_size ) / static_cast<float>( inputLength );
+        setValue( value() + posOffset * maximum() );
+        emit sliderDragged( value() / static_cast<float>( maximum() ) );
+    });
 }
 
 SeekSlider::~SeekSlider()
@@ -405,15 +432,7 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
 {
     /* Don't do anything if we are for somehow reason sliding */
     if( !isSliding && isEnabled() )
-    {
-        vlc_tick_t i_size = var_InheritInteger( p_intf->obj.libvlc, "short-jump-size" );
-        int i_mode = var_InheritInteger( p_intf->obj.libvlc, "hotkeys-x-wheel-mode" );
-        if ( ( event->angleDelta().x() < 0 && i_mode != 3 ) || ( event->angleDelta().x() > 0 && i_mode == 3 ) )
-            i_size = - i_size;
-        float posOffset = static_cast<float>( i_size ) / static_cast<float>( inputLength );
-        setValue( value() + posOffset * maximum() );
-        emit sliderDragged( value() / static_cast<float>( maximum() ) );
-    }
+        wheelEventConverter.wheelEvent(event);
     event->accept();
 }
 
