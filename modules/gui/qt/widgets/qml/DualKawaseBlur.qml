@@ -153,7 +153,7 @@ Item {
     //       though the shader is written in GLSL 4.40.
     Connections {
         target: root.Window.window
-        enabled: root.visible
+        enabled: root.visible && root.live
 
         function onAfterAnimating() {
             // Sampling point for getting the native texture sizes:
@@ -278,6 +278,10 @@ Item {
             if (!ds1layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
 
+            ds1.sourceTextureSize = ds1.tpObserver.nativeTextureSize
+            if (ds1.ensurePolished)
+                ds1.ensurePolished()
+
             // Common for both four and two pass mode:
             ds1layer.parent = root
             ds1layer.scheduleUpdate()
@@ -331,6 +335,10 @@ Item {
             if (!ds2layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
 
+            ds2.sourceTextureSize = ds2.tpObserver.nativeTextureSize
+            if (ds2.ensurePolished)
+                ds2.ensurePolished()
+
             ds2layer.inhibitParent = false
             ds2layer.scheduleUpdate()
 
@@ -379,6 +387,10 @@ Item {
             if (!us1layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
 
+            us1.sourceTextureSize = us1.tpObserver.nativeTextureSize
+            if (us1.ensurePolished)
+                us1.ensurePolished()
+
             us1layer.scheduleUpdate()
 
             if (root._window) {
@@ -390,6 +402,8 @@ Item {
         function releaseResourcesOfIntermediateLayers() {
             if (!ds1layer || !ds2layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
+
+            us2.sourceTextureSize = us2.tpObserver.nativeTextureSize
 
             // Last layer is updated, now it is time to release the intermediate buffers:
             console.debug(root, ": releasing intermediate layers, expect the video memory consumption to drop.")
