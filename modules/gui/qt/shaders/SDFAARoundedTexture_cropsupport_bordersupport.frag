@@ -110,7 +110,7 @@ void main()
 #ifdef CROP_SUPPORT
     vec2 texCoord;
 
-    // if (cropRate.x > 0.0)
+    if (cropRate.x > 0.0)
     {
         float normalCropRate = qt_SubRect_source.z * cropRate.x;
 
@@ -119,9 +119,12 @@ void main()
 
         texCoord.x = (k - l) / (qt_SubRect_source.z) * (qt_TexCoord0.x - qt_SubRect_source.x) + l;
     }
-    // else { texCoord.x = qt_TexCoord0.x; }
+    else
+    {
+        texCoord.x = qt_TexCoord0.x;
+    }
 
-    // if (cropRate.y > 0.0)
+    if (cropRate.y > 0.0)
     {
         float normalCropRate = qt_SubRect_source.w * cropRate.y;
 
@@ -130,7 +133,10 @@ void main()
 
         texCoord.y = (k - l) / (qt_SubRect_source.w) * (qt_TexCoord0.y - qt_SubRect_source.y) + l;
     }
-    // else { texCoord.y = qt_TexCoord0.y; }
+    else
+    {
+        texCoord.y = qt_TexCoord0.y;
+    }
 
     vec4 texel = texture(source, texCoord);
 #else
