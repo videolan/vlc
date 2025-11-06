@@ -504,6 +504,10 @@ CMAKECONFIG = cmake -S $< -B $(BUILD_DIR) \
 ifeq ($(V),1)
 CMAKECONFIG += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endif
+ifdef HAVE_EMSCRIPTEN
+# by default emcmake forces the processor to X86 to mark it as 32-bit
+CMAKECONFIG += -DEMSCRIPTEN_SYSTEM_PROCESSOR=$(ARCH)
+endif
 
 CMAKE = $(CMAKECONFIG) \
 		-DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
