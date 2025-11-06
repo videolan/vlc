@@ -1,14 +1,14 @@
-From d4cbfe90ad686d4bed08d38757d2bddfaba4506e Mon Sep 17 00:00:00 2001
+From bed81fbf76b81b6468a8e04cd07155f8358773ab Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:19:07 +0200
-Subject: [PATCH 07/12] don't use GetThreadLocale on UWP
+Subject: [PATCH 07/14] don't use GetThreadLocale on UWP
 
 ---
  src/w32-gettext.c | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/src/w32-gettext.c b/src/w32-gettext.c
-index 10a9904..2a64d4e 100644
+index bf085cd..3186458 100644
 --- a/src/w32-gettext.c
 +++ b/src/w32-gettext.c
 @@ -648,8 +648,12 @@ my_nl_locale_name (const char *categoryname)

@@ -1,4 +1,4 @@
-From 16b77efaa8d027ac2b3ebbb481c713462137c66a Mon Sep 17 00:00:00 2001
+From 749be993cfc7a9994f4e0733182fc6dbb88bd655 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 6 Nov 2025 13:31:25 +0100
 Subject: [PATCH 14/14] core: disable locking API with --disable-threads
@@ -11,11 +11,13 @@ In particular LOCK_ABI_VERSION is not set.
  src/gen-lock-obj.sh | 2 ++
  src/gpgrt-int.h     | 9 +++++++++
  src/posix-lock.c    | 3 +++
+ src/posix-thread.c  | 3 +++
  src/w32-lock.c      | 3 +++
- 4 files changed, 17 insertions(+)
+ src/w32-thread.c    | 3 +++
+ 6 files changed, 23 insertions(+)
 
 diff --git a/src/gen-lock-obj.sh b/src/gen-lock-obj.sh
-index 014667f..b8b4597 100755
+index 6e78c5f..ae867ba 100755
 --- a/src/gen-lock-obj.sh
 +++ b/src/gen-lock-obj.sh
 @@ -59,6 +59,8 @@ typedef struct
@@ -28,7 +30,7 @@ index 014667f..b8b4597 100755
  else
  AWK_VERSION_OUTPUT=$($AWK 'BEGIN { print PROCINFO["version"] }')
 diff --git a/src/gpgrt-int.h b/src/gpgrt-int.h
-index 0e6b268..1158a3f 100644
+index 8d2a936..f859a5b 100644
 --- a/src/gpgrt-int.h
 +++ b/src/gpgrt-int.h
 @@ -137,12 +137,21 @@ void _gpgrt_post_syscall (void);
@@ -71,6 +73,24 @@ index 85ec660..79a639a 100644
  }
 +
 +#endif /* !GPGRT_LOCK_NOT_SUPPORTED */
+diff --git a/src/posix-thread.c b/src/posix-thread.c
+index 36c81ba..f3d3a0f 100644
+--- a/src/posix-thread.c
++++ b/src/posix-thread.c
+@@ -43,6 +43,7 @@
+ 
+ #include "thread.h"
+ 
++#ifndef GPGRT_LOCK_NOT_SUPPORTED
+ 
+ 
+ gpg_err_code_t
+@@ -66,3 +67,5 @@ _gpgrt_yield (void)
+ 
+   return 0;
+ }
++
++#endif /* !GPGRT_LOCK_NOT_SUPPORTED */
 diff --git a/src/w32-lock.c b/src/w32-lock.c
 index feed1e6..cd14f5c 100644
 --- a/src/w32-lock.c
@@ -85,6 +105,24 @@ index feed1e6..cd14f5c 100644
  get_lock_object (gpgrt_lock_t *lockhd)
 @@ -159,3 +160,5 @@ _gpgrt_lock_destroy (gpgrt_lock_t *lockhd)
    lock->started = -1;
+   return 0;
+ }
++
++#endif /* !GPGRT_LOCK_NOT_SUPPORTED */
+diff --git a/src/w32-thread.c b/src/w32-thread.c
+index c389635..69599f2 100644
+--- a/src/w32-thread.c
++++ b/src/w32-thread.c
+@@ -35,6 +35,7 @@
+ #include "gpgrt-int.h"
+ #include "thread.h"
+ 
++#ifndef GPGRT_LOCK_NOT_SUPPORTED
+ 
+ gpg_err_code_t
+ _gpgrt_yield (void)
+@@ -44,3 +45,5 @@ _gpgrt_yield (void)
+   _gpgrt_post_syscall ();
    return 0;
  }
 +

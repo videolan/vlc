@@ -1,7 +1,7 @@
-From db67d9ab41548f9f56a578dbe1c11800dd8b9487 Mon Sep 17 00:00:00 2001
+From 349afde1939f2faaad667024428bd02cb26af86b Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:23:02 +0200
-Subject: [PATCH 11/12] logging: add ws2tcpip.h include for proper inet_pton
+Subject: [PATCH 11/14] logging: add ws2tcpip.h include for proper inet_pton
  definition
 
 ---
