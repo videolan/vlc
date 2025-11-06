@@ -32,6 +32,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 	$(APPLY) $(SRC)/gpg-error/0011-logging-add-ws2tcpip.h-include-for-proper-inet_pton-.patch
 	$(APPLY) $(SRC)/gpg-error/0012-use-GetCurrentProcessId-in-UWP.patch
 	$(APPLY) $(SRC)/gpg-error/0013-configure-allow-building-Windows-with-disable-thread.patch
+	$(APPLY) $(SRC)/gpg-error/0014-core-disable-locking-API-with-disable-threads.patch
 
 	$(MOVE)
 

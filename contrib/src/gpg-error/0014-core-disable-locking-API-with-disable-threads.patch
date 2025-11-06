@@ -1,0 +1,94 @@
+From 16b77efaa8d027ac2b3ebbb481c713462137c66a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 6 Nov 2025 13:31:25 +0100
+Subject: [PATCH 14/14] core: disable locking API with --disable-threads
+
+The _gpgrt_lock_t structure used in the specialized lock API's are not
+matching the structure set by gen-lock-obj.sh with --disable-threads.
+
+In particular LOCK_ABI_VERSION is not set.
+---
+ src/gen-lock-obj.sh | 2 ++
+ src/gpgrt-int.h     | 9 +++++++++
+ src/posix-lock.c    | 3 +++
+ src/w32-lock.c      | 3 +++
+ 4 files changed, 17 insertions(+)
+
+diff --git a/src/gen-lock-obj.sh b/src/gen-lock-obj.sh
+index 014667f..b8b4597 100755
+--- a/src/gen-lock-obj.sh
++++ b/src/gen-lock-obj.sh
+@@ -59,6 +59,8 @@ typedef struct
+ } gpgrt_lock_t;
+ 
+ #define GPGRT_LOCK_INITIALIZER {-1}
++
++#define GPGRT_LOCK_NOT_SUPPORTED 1
+ EOF
+ else
+ AWK_VERSION_OUTPUT=$($AWK 'BEGIN { print PROCINFO["version"] }')
+diff --git a/src/gpgrt-int.h b/src/gpgrt-int.h
+index 0e6b268..1158a3f 100644
+--- a/src/gpgrt-int.h
++++ b/src/gpgrt-int.h
+@@ -137,12 +137,21 @@ void _gpgrt_post_syscall (void);
+ 
+ const char *_gpg_error_check_version (const char *req_version);
+ 
++#ifdef GPGRT_LOCK_NOT_SUPPORTED
++#define _gpgrt_lock_init(l)     0
++#define _gpgrt_lock_lock(l)     0
++#define _gpgrt_lock_trylock(l)  0
++#define _gpgrt_lock_unlock(l)   0
++#define _gpgrt_lock_destroy(l)  0
++#define _gpgrt_yield()          0
++#else
+ gpg_err_code_t _gpgrt_lock_init (gpgrt_lock_t *lockhd);
+ gpg_err_code_t _gpgrt_lock_lock (gpgrt_lock_t *lockhd);
+ gpg_err_code_t _gpgrt_lock_trylock (gpgrt_lock_t *lockhd);
+ gpg_err_code_t _gpgrt_lock_unlock (gpgrt_lock_t *lockhd);
+ gpg_err_code_t _gpgrt_lock_destroy (gpgrt_lock_t *lockhd);
+ gpg_err_code_t _gpgrt_yield (void);
++#endif
+ 
+ 
+ 
+diff --git a/src/posix-lock.c b/src/posix-lock.c
+index 85ec660..79a639a 100644
+--- a/src/posix-lock.c
++++ b/src/posix-lock.c
+@@ -42,6 +42,7 @@
+ #include "lock.h"
+ #include "posix-lock-obj.h"
+ 
++#ifndef GPGRT_LOCK_NOT_SUPPORTED
+ 
+ #if USE_POSIX_THREADS
+ # if USE_POSIX_THREADS_FROM_LIBC && HAVE_SYS_SINGLE_THREADED_H
+@@ -298,3 +299,5 @@ _gpgrt_lock_destroy (gpgrt_lock_t *lockhd)
+ 
+   return rc;
+ }
++
++#endif /* !GPGRT_LOCK_NOT_SUPPORTED */
+diff --git a/src/w32-lock.c b/src/w32-lock.c
+index feed1e6..cd14f5c 100644
+--- a/src/w32-lock.c
++++ b/src/w32-lock.c
+@@ -37,6 +37,7 @@
+ #include "w32-lock-obj.h"
+ 
+ 
++#ifndef GPGRT_LOCK_NOT_SUPPORTED
+ 
+ static _gpgrt_lock_t *
+ get_lock_object (gpgrt_lock_t *lockhd)
+@@ -159,3 +160,5 @@ _gpgrt_lock_destroy (gpgrt_lock_t *lockhd)
+   lock->started = -1;
+   return 0;
+ }
++
++#endif /* !GPGRT_LOCK_NOT_SUPPORTED */
+-- 
+2.45.1.windows.1
+
