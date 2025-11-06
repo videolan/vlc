@@ -301,6 +301,13 @@ T.Pane {
                 acceptDrop: listView.acceptDropFunc
 
                 onContainsDragChanged: listView.updateItemContainsDrag(this, containsDrag)
+
+                onIsCurrentChanged: {
+                    if (isCurrent)
+                        listView.fadingEdge.excludeItem = delegate
+                    else if (listView.fadingEdge.excludeItem === delegate)
+                        listView.fadingEdge.excludeItem = null
+                }
             }
 
             Keys.onDeletePressed: model.removeItems(selectionModel.selectedIndexesFlat)
