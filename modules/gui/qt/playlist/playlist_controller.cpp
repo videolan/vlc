@@ -220,8 +220,13 @@ on_playlist_items_updated(vlc_playlist_t *playlist, size_t index,
             size_t currentIndex = static_cast<size_t>(that->m_currentIndex);
             if (currentIndex >= index && currentIndex < index + len)
             {
-                that->m_currentItem = vec[currentIndex - index];
-                emit that->q_func()->currentItemChanged();
+                const auto newCurrentItem = vec[currentIndex - index];
+                const auto currentItem = that->m_currentItem.raw();
+                // Even if vlc_playlist_item_t is the same, assign unconditionally to
+                // update the data:
+                that->m_currentItem = newCurrentItem;
+                if (currentItem != newCurrentItem.raw())
+                    emit that->q_func()->currentItemChanged();
             }
         }
     });
