@@ -270,7 +270,10 @@ T.Pane {
             }
 
             Component.onCompleted: {
-                MainPlaylistController.currentIndexChanged.connect(listView, (index) => { listView.currentIndex = index })
+                // WARNING: Tracking the current item and not the current index is intentional here.
+                MainPlaylistController.currentItemChanged.connect(listView, () => {
+                    listView.positionViewAtIndex(MainPlaylistController.currentIndex, ListView.Contain)
+                })
             }
 
             Connections {
