@@ -534,6 +534,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o,
             case VLC_CODEC_I444_12L:
             case VLC_CODEC_I444_10L:
             case VLC_CODEC_I444:
+            case VLC_CODEC_I422_10L:
             case VLC_CODEC_I420:
                 psz_sampler[0] = "SAMPLE_TRIPLANAR_TO_YUVA";
                 psz_shader_resource_views[0] = "3"; shader_views[0] = 3;
