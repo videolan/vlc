@@ -23,12 +23,11 @@ import VLC.Util
 Item {
     id: root
 
-    // backgroundColor is only needed for sub-pixel
-    // font rendering. Or, if the background color
-    // needs to be known during rendering in general.
-    // Ideally it should be fully opaque, otherwise
-    // the background here may blend with the actual
-    // background.
+    // Provide background color for sub-pixel font
+    // rendering, even if it is not fully opaque.
+    // If possible, provide a fully opaque color
+    // so that layering is not used for the view,
+    // which results lower memory consumption:
     property alias backgroundColor: backgroundRect.color
 
     property alias sourceItem: shaderEffectSource.sourceItem
@@ -62,6 +61,94 @@ Item {
         visible: shaderEffectSource.visible && (color.a > 0.0)
     }
 
+    // Fading edge effect provider when background is opaque:
+    // This is an optimization, because layering is not used.
+    component FadingEdgeRectangleForOpaqueBackground : Rectangle {
+        id: fadingEdgeRectangle
+
+        implicitHeight: root.fadeSize
+        implicitWidth: root.fadeSize
+
+        visible: (opacity > 0.0) && (root.backgroundColor.a > (1.0 - Number.EPSILON))
+
+        opacity: enabled ? 1.0 : 0.0
+
+        // Animating opacity is expected to be less expensive than animating gradient stop.
+        Behavior on opacity {
+            id: opacityBehavior
+
+            enabled: false
+
+            NumberAnimation {
+                duration: VLCStyle.duration_short
+                easing.type: Easing.InOutSine
+            }
+        }
+
+        // This is used to prevent animating at initialization.
+        Timer {
+            interval: 50
+            running: true
+            onTriggered: {
+                opacityBehavior.enabled = true
+            }
+        }
+
+        required property color colorStop0
+        required property color colorStop1
+
+        // FIXME: Qt 6.2 switching orientation within `Gradient` is problematic
+        gradient: (root.orientation === Qt.Horizontal) ? horizontalGradient
+                                                       : verticalGradient
+
+        Gradient {
+            id: horizontalGradient
+
+            orientation: Gradient.Horizontal
+
+            GradientStop { position: 0.0; color: fadingEdgeRectangle.colorStop0; }
+            GradientStop { position: 1.0; color: fadingEdgeRectangle.colorStop1; }
+        }
+
+        Gradient {
+            id: verticalGradient
+
+            orientation: Gradient.Vertical
+
+            GradientStop { position: 0.0; color: fadingEdgeRectangle.colorStop0; }
+            GradientStop { position: 1.0; color: fadingEdgeRectangle.colorStop1; }
+        }
+    }
+
+    FadingEdgeRectangleForOpaqueBackground {
+        anchors {
+            top: shaderEffectSource.top
+            left: shaderEffectSource.left
+
+            bottom: (root.orientation === Qt.Horizontal) ? shaderEffectSource.bottom : undefined
+            right: (root.orientation === Qt.Vertical) ? shaderEffectSource.right : undefined
+        }
+
+        enabled: root.enableBeginningFade
+        colorStop0: root.backgroundColor
+        colorStop1: "transparent"
+    }
+
+    FadingEdgeRectangleForOpaqueBackground {
+        anchors {
+            bottom: shaderEffectSource.bottom
+            right: shaderEffectSource.right
+
+            top: (root.orientation === Qt.Horizontal) ? shaderEffectSource.top : undefined
+            left: (root.orientation === Qt.Vertical) ? shaderEffectSource.left : undefined
+        }
+
+        enabled: root.enableEndFade
+        colorStop0: "transparent"
+        colorStop1: root.backgroundColor
+    }
+
+    // Fading edge effect provider when background is not opaque:
     ShaderEffectSource {
         id: shaderEffectSource
 
@@ -86,6 +173,7 @@ Item {
         smooth: false
 
         visible: effectCompatible &&
+                 (root.backgroundColor.a < 1.0) &&
                  ((root.enableBeginningFade || root.enableEndFade) ||
                  ((shaderEffect) && (shaderEffect.beginningFadeSize > 0 || shaderEffect.endFadeSize > 0)))
 
