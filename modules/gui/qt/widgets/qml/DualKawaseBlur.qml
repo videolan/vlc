@@ -89,7 +89,7 @@ Item {
     // Since the discard occurs at layer level, using this saves video memory.
     property rect viewportRect
 
-    property alias sourceTextureProviderObserver: ds1SourceObserver // for accessory
+    property alias sourceTextureProviderObserver: ds1.tpObserver // for accessory
 
     readonly property bool sourceTextureIsValid: sourceTextureProviderObserver.isValid
 
@@ -148,7 +148,9 @@ Item {
         }
     }
 
-    // TODO: Get rid of this in favor of GLSL 1.30's `textureSize()`
+    // TODO: We could use `textureSize()` and get rid of this, but we
+    //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
+    //       though the shader is written in GLSL 4.40.
     Connections {
         target: root.Window.window
         enabled: root.visible
@@ -163,10 +165,10 @@ Item {
             // implicitly (due to source texture provider's signal
             // `textureChanged()`).
 
-            ds1.sourceTextureSize = ds1SourceObserver.nativeTextureSize
-            ds2.sourceTextureSize = ds2SourceObserver.nativeTextureSize
-            us1.sourceTextureSize = us1SourceObserver.nativeTextureSize
-            us2.sourceTextureSize = us2SourceObserver.nativeTextureSize
+            ds1.sourceTextureSize = ds1.tpObserver.nativeTextureSize
+            ds2.sourceTextureSize = ds2.tpObserver.nativeTextureSize
+            us1.sourceTextureSize = us1.tpObserver.nativeTextureSize
+            us2.sourceTextureSize = us2.tpObserver.nativeTextureSize
 
             // It is not clear if `ShaderEffect` updates the uniform
             // buffer after `afterAnimating()` signal but before the
@@ -191,49 +193,63 @@ Item {
         }
     }
 
-    ShaderEffect {
+    component DefaultShaderEffect : ShaderEffect {
+        id: shaderEffect
+
+        required property Item source
+        readonly property int radius: root.radius
+
+        property size sourceTextureSize
+        property rect normalRect // may not be necessary, but still needed to prevent warning
+
+        property alias tpObserver: textureProviderObserver
+
+        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
+
+        // Maybe we should have vertex shader unconditionally, and calculate the half pixel there instead of fragment shader?
+        vertexShader: (normalRect.width > 0.0 && normalRect.height > 0.0) ? "qrc:///shaders/SubTexture.vert.qsb"
+                                                                          : ""
+
+        supportsAtlasTextures: true
+
+        blending: root.blending
+
+        visible: false
+
+        TextureProviderObserver {
+            id: textureProviderObserver
+            source: shaderEffect.source
+        }
+    }
+
+    component DownsamplerShaderEffect : DefaultShaderEffect {
+        fragmentShader: source ? "qrc:///shaders/DualKawaseBlur_downsample.frag.qsb"
+                               : "" // to prevent warning if source becomes null
+    }
+
+    component UpsamplerShaderEffect : DefaultShaderEffect {
+        fragmentShader: source ? "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
+                               : "" // to prevent warning if source becomes null
+    }
+
+    DownsamplerShaderEffect {
         id: ds1
 
         // When downsampled, we can decrease the size here so that the layer occupies less VRAM:
         width: parent.width / 2
         height: parent.height / 2
 
-        readonly property Item source: root.source
+        source: root.source
 
         // TODO: Instead of normalizing here, we could use GLSL 1.30's `textureSize()`
         //       and normalize in the vertex shader, but we can not because we are
         //       targeting GLSL 1.20/ESSL 1.0, even though the shader is written in
         //       GLSL 4.40.
-        readonly property rect normalRect: (root.sourceRect.width > 0.0 && root.sourceRect.height > 0.0) ? Qt.rect(root.sourceRect.x / sourceTextureSize.width,
-                                                                                                                   root.sourceRect.y / sourceTextureSize.height,
-                                                                                                                   root.sourceRect.width / sourceTextureSize.width,
-                                                                                                                   root.sourceRect.height / sourceTextureSize.height)
-                                                                                                         : Qt.rect(0.0, 0.0, 0.0, 0.0)
-
-        readonly property int radius: root.radius
-
-        // TODO: We could use `textureSize()` and get rid of this, but we
-        //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
-        //       though the shader is written in GLSL 4.40.
-        TextureProviderObserver {
-            id: ds1SourceObserver
-            source: ds1.source
-        }
-
-        property size sourceTextureSize
-
-        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
-
-        fragmentShader: "qrc:///shaders/DualKawaseBlur_downsample.frag.qsb"
-        // Maybe we should have vertex shader unconditionally, and calculate the half pixel there instead of fragment shader?
-        vertexShader: (normalRect.width > 0.0 && normalRect.height > 0.0) ? "qrc:///shaders/SubTexture.vert.qsb"
-                                                                          : ""
-
-        visible: false
-
-        supportsAtlasTextures: true
-
-        blending: root.blending
+        normalRect: (root.sourceRect.width > 0.0 && root.sourceRect.height > 0.0) ? Qt.rect(root.sourceRect.x / sourceTextureSize.width,
+                                                                                            root.sourceRect.y / sourceTextureSize.height,
+                                                                                            root.sourceRect.width / sourceTextureSize.width,
+                                                                                            root.sourceRect.height / sourceTextureSize.height)
+                                                                                  : Qt.rect(0.0, 0.0, 0.0, 0.0)
     }
 
     ShaderEffectSource {
@@ -279,7 +295,7 @@ Item {
         }
     }
 
-    ShaderEffect {
+    DownsamplerShaderEffect {
         id: ds2
 
         // When downsampled, we can decrease the size here so that the layer occupies less VRAM:
@@ -287,29 +303,7 @@ Item {
         height: ds1.height / 2
 
         // Qt uses reference counting, otherwise ds1layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
-        readonly property Item source: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) || !ds1layer.parent) ? null : ds1layer
-        property rect normalRect // not necessary here, added because of the warning
-        readonly property int radius: root.radius
-
-        // TODO: We could use `textureSize()` and get rid of this, but we
-        //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
-        //       though the shader is written in GLSL 4.40.
-        TextureProviderObserver {
-            id: ds2SourceObserver
-            source: ds2.source
-        }
-
-        property size sourceTextureSize
-
-        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
-
-        visible: false
-
-        fragmentShader: source ? "qrc:///shaders/DualKawaseBlur_downsample.frag.qsb" : "" // to prevent warning if source becomes null
-
-        supportsAtlasTextures: true
-
-        blending: root.blending
+        source: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) || !ds1layer.parent) ? null : ds1layer
     }
 
     ShaderEffectSource {
@@ -343,36 +337,14 @@ Item {
         }
     }
 
-    ShaderEffect {
+    UpsamplerShaderEffect {
         id: us1
 
         width: ds2.width * 2
         height: ds2.height * 2
 
         // Qt uses reference counting, otherwise ds2layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
-        readonly property Item source: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) || !ds2layer.parent) ? null : ds2layer
-        property rect normalRect // not necessary here, added because of the warning
-        readonly property int radius: root.radius
-
-        // TODO: We could use `textureSize()` and get rid of this, but we
-        //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
-        //       though the shader is written in GLSL 4.40.
-        TextureProviderObserver {
-            id: us1SourceObserver
-            source: us1.source
-        }
-
-        property size sourceTextureSize
-
-        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
-
-        visible: false
-
-        fragmentShader: source ? "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb" : "" // to prevent warning if source becomes null
-
-        supportsAtlasTextures: true
-
-        blending: root.blending
+        source: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) || !ds2layer.parent) ? null : ds2layer
     }
 
     ShaderEffectSource {
@@ -435,7 +407,7 @@ Item {
         }
     }
 
-    ShaderEffect {
+    UpsamplerShaderEffect {
         id: us2
 
         // {us1/ds1}.size * 2
@@ -443,23 +415,9 @@ Item {
         width: (root.viewportRect.width > 0) ? root.viewportRect.width : parent.width
         height: (root.viewportRect.height > 0) ? root.viewportRect.height : parent.height
 
-        visible: us2SourceObserver.isValid
+        visible: tpObserver.isValid
 
-        readonly property Item source: (root.configuration === DualKawaseBlur.Configuration.TwoPass) ? ds1layer : us1layer
-        property rect normalRect // not necessary here, added because of the warning
-        readonly property int radius: root.radius
-
-        // TODO: We could use `textureSize()` and get rid of this, but we
-        //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
-        //       though the shader is written in GLSL 4.40.
-        TextureProviderObserver {
-            id: us2SourceObserver
-            source: us2.source
-        }
-
-        property size sourceTextureSize
-
-        // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
+        source: (root.configuration === DualKawaseBlur.Configuration.TwoPass) ? ds1layer : us1layer
 
         property color tint: "transparent"
         property real tintStrength: 0.0
@@ -468,9 +426,5 @@ Item {
 
         fragmentShader: root.postprocess ? "qrc:///shaders/DualKawaseBlur_upsample_postprocess.frag.qsb"
                                          : "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
-
-        supportsAtlasTextures: true
-
-        blending: root.blending
     }
 }
