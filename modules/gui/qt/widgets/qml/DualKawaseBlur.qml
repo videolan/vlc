@@ -166,8 +166,10 @@ Item {
             // `textureChanged()`).
 
             ds1.sourceTextureSize = ds1.tpObserver.nativeTextureSize
-            ds2.sourceTextureSize = ds2.tpObserver.nativeTextureSize
-            us1.sourceTextureSize = us1.tpObserver.nativeTextureSize
+            if (root.configuration === DualKawaseBlur.Configuration.FourPass) {
+                ds2.sourceTextureSize = ds2.tpObserver.nativeTextureSize
+                us1.sourceTextureSize = us1.tpObserver.nativeTextureSize
+            }
             us2.sourceTextureSize = us2.tpObserver.nativeTextureSize
 
             // It is not clear if `ShaderEffect` updates the uniform
@@ -186,8 +188,10 @@ Item {
                 // No need to check for if such slot exists for each,
                 // this is basically Qt version check in disguise.
                 ds1.ensurePolished()
-                ds2.ensurePolished()
-                us1.ensurePolished()
+                if (root.configuration === DualKawaseBlur.Configuration.FourPass) {
+                    ds2.ensurePolished()
+                    us1.ensurePolished()
+                }
                 us2.ensurePolished()
             }
         }
