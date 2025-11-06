@@ -1,7 +1,7 @@
-From 8709f63dd0384c67929ab2ef9c18733f78533c8b Mon Sep 17 00:00:00 2001
+From 6fbb7b9ec5d4102e1a4c2fcbdc31dd080959963d Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:24:20 +0200
-Subject: [PATCH 12/12] use GetCurrentProcessId() in UWP
+Subject: [PATCH 12/14] use GetCurrentProcessId() in UWP
 
 getpid() is not declared
 ---

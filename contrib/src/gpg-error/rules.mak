@@ -1,5 +1,5 @@
 # GPGERROR
-GPGERROR_VERSION := 1.49
+GPGERROR_VERSION := 1.56
 GPGERROR_URL := $(GNUGPG)/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.bz2
 
 $(TARBALLS)/libgpg-error-$(GPGERROR_VERSION).tar.bz2:
@@ -28,11 +28,11 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 	$(APPLY) $(SRC)/gpg-error/0007-don-t-use-GetThreadLocale-on-UWP.patch
 	$(APPLY) $(SRC)/gpg-error/0008-don-t-use-GetUserNameW-on-Windows-10.patch
 	$(APPLY) $(SRC)/gpg-error/0009-gpg-error-config.in-add-missing-GPG_ERROR_CONFIG_LIB.patch
-	$(APPLY) $(SRC)/gpg-error/0010-spawn-w32-don-t-compile-non-public-spawn-API.patch
 	$(APPLY) $(SRC)/gpg-error/0011-logging-add-ws2tcpip.h-include-for-proper-inet_pton-.patch
 	$(APPLY) $(SRC)/gpg-error/0012-use-GetCurrentProcessId-in-UWP.patch
 	$(APPLY) $(SRC)/gpg-error/0013-configure-allow-building-Windows-with-disable-thread.patch
 	$(APPLY) $(SRC)/gpg-error/0014-core-disable-locking-API-with-disable-threads.patch
+	$(APPLY) $(SRC)/gpg-error/0015-core-disable-process-spawning-with-disable-threads.patch
 
 	$(MOVE)
 

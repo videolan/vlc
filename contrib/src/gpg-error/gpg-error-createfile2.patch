@@ -1,20 +1,20 @@
-From 52f575635bed478b1c82f8a756fff6ea645cc3e3 Mon Sep 17 00:00:00 2001
+From 2b5fff174b5b9ebaff32e653f3accea0ac782acb Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 23 May 2023 14:31:16 +0200
-Subject: [PATCH 05/12] use CreateFile2 in Win8 as CreateFileW is forbidden in
+Subject: [PATCH 05/14] use CreateFile2 in Win8 as CreateFileW is forbidden in
  UWP
 
 ---
  src/estream.c     | 24 ++++++++++++++++++++++++
- src/spawn-w32.c   | 12 ++++++++++++
+ src/spawn-w32.c   | 13 +++++++++++++
  src/w32-gettext.c | 10 ++++++++++
- 3 files changed, 46 insertions(+)
+ 3 files changed, 47 insertions(+)
 
 diff --git a/src/estream.c b/src/estream.c
-index 763e811..9fda47e 100644
+index 6062001..f7ab037 100644
 --- a/src/estream.c
 +++ b/src/estream.c
-@@ -2030,6 +2030,17 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
+@@ -2058,6 +2058,17 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
    else
      creation_distribution |= OPEN_EXISTING;
  
@@ -32,7 +32,7 @@ index 763e811..9fda47e 100644
    hd = CreateFileW (wpath,
                      desired_access,
                      share_mode,
-@@ -2037,6 +2048,7 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
+@@ -2065,6 +2076,7 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
                      creation_distribution,
                      flags_and_attrs,
                      NULL); /* template file  */
@@ -40,7 +40,7 @@ index 763e811..9fda47e 100644
    if (hd == INVALID_HANDLE_VALUE)
      {
        _set_errno (map_w32_to_errno (GetLastError ()));
-@@ -5107,6 +5119,17 @@ tmpfd (void)
+@@ -5148,6 +5160,17 @@ tmpfd (void)
            value <<= 4;
          }
        wcscpy (p, L".tmp");
@@ -58,7 +58,7 @@ index 763e811..9fda47e 100644
        file = CreateFileW (buffer,
                           GENERIC_READ | GENERIC_WRITE,
                           0,
-@@ -5114,6 +5137,7 @@ tmpfd (void)
+@@ -5155,6 +5178,7 @@ tmpfd (void)
                           CREATE_NEW,
                           FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
                           NULL);
@@ -67,34 +67,35 @@ index 763e811..9fda47e 100644
          {
            int fd = _open_osfhandle ((intptr_t)file, 0);
 diff --git a/src/spawn-w32.c b/src/spawn-w32.c
-index 324b5fe..eca56c0 100644
+index ecc9437..cb15dd0 100644
 --- a/src/spawn-w32.c
 +++ b/src/spawn-w32.c
-@@ -270,10 +270,22 @@ w32_open_null (int for_write)
- {
-   HANDLE hfile;
- 
+@@ -224,10 +224,23 @@ w32_open_null (int for_write, int enable_null_device)
+       memset (&sec_attr, 0, sizeof sec_attr );
+       sec_attr.nLength = sizeof sec_attr;
+       sec_attr.bInheritHandle = TRUE;
 +#if _WIN32_WINNT >= 0x0602 // _WIN32_WINNT_WIN8
 +    {
 +      CREATEFILE2_EXTENDED_PARAMETERS createExParams;
 +      memset (&createExParams, 0, sizeof(createExParams));
 +      createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++      createExParams.lpSecurityAttributes = &sec_attr;
 +      hfile = CreateFile2 (L"nul",
 +                           for_write? GENERIC_WRITE : GENERIC_READ,
 +                           FILE_SHARE_READ | FILE_SHARE_WRITE,
 +                           OPEN_EXISTING, &createExParams);
 +    }
 +#else
-   hfile = CreateFileW (L"nul",
-                        for_write? GENERIC_WRITE : GENERIC_READ,
-                        FILE_SHARE_READ | FILE_SHARE_WRITE,
-                        NULL, OPEN_EXISTING, 0, NULL);
+       hfile = CreateFileW (L"nul",
+                            for_write? GENERIC_WRITE : GENERIC_READ,
+                            FILE_SHARE_READ | FILE_SHARE_WRITE,
+                            &sec_attr, OPEN_EXISTING, 0, NULL);
 +#endif
-   if (hfile == INVALID_HANDLE_VALUE)
-     _gpgrt_log_debug ("can't open 'nul': ec=%d\n", (int)GetLastError ());
-   return hfile;
+       if (hfile == INVALID_HANDLE_VALUE)
+         _gpgrt_log_debug ("can't open 'nul': ec=%d\n", (int)GetLastError ());
+       return hfile;
 diff --git a/src/w32-gettext.c b/src/w32-gettext.c
-index 817c1ca..467abba 100644
+index 5b15a77..42aa01c 100644
 --- a/src/w32-gettext.c
 +++ b/src/w32-gettext.c
 @@ -1216,8 +1216,18 @@ load_domain (const char *filename)

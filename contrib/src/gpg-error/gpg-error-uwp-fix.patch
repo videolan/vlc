@@ -1,18 +1,53 @@
-From 9b691eb3b55e4d8ee027e56109081f90cef21dd7 Mon Sep 17 00:00:00 2001
+From 803dc7c5daecc9044483a9b0ad848b52f95e4189 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 15 May 2023 08:20:15 +0200
-Subject: [PATCH 03/12] fix UWP build
+Subject: [PATCH 03/15] fix UWP build
 
 ---
- src/mkheader.c                       |  2 +-
- 2 files changed, 45 insertions(+), 1 deletion(-)
- create mode 100644 src/syscfg/lock-obj-pub.mingw32uwp.h
+ src/init.c     | 8 +++++++-
+ src/mkheader.c | 2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
+diff --git a/src/init.c b/src/init.c
+index 7f970d9..4fe6b90 100644
+--- a/src/init.c
++++ b/src/init.c
+@@ -82,8 +82,9 @@ static void
+ windows_specific_init (void)
+ {
+   OSVERSIONINFO osvi;
+-  HMODULE hntdll = GetModuleHandle ("ntdll.dll");
++  HMODULE hntdll = GetModuleHandleA ("ntdll.dll");
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   memset (&osvi,0,sizeof(osvi));
+   osvi.dwOSVersionInfoSize = sizeof(osvi);
+   GetVersionEx (&osvi);
+@@ -91,6 +92,7 @@ windows_specific_init (void)
+   /* The feature of process/thread attribute is available on Vista or
+      later.  */
+   windows_features.is_vista_or_later = (osvi.dwMajorVersion >= 6);
++#endif
+ 
+   if (hntdll && GetProcAddress (hntdll, "wine_get_version"))
+     windows_features.semihosted_by_wine = 1;
+@@ -589,7 +591,11 @@ _gpgrt_windows_feature (int k)
+   switch (k)
+     {
+     case GPGRT_WINDOWS_PROC_ATTRIBUTE:
++#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++      return 0;
++#else
+       return windows_features.is_vista_or_later;
++#endif
+ 
+     case GPGRT_WINDOWS_UNDER_WINE:
+       return windows_features.semihosted_by_wine;
 diff --git a/src/mkheader.c b/src/mkheader.c
-index 000a224..659508f 100644
+index 7c772e6..779e0ab 100644
 --- a/src/mkheader.c
 +++ b/src/mkheader.c
-@@ -625,7 +625,7 @@ write_special (const char *fname, int lnr, const char *tag)
+@@ -623,7 +623,7 @@ write_special (const char *fname, int lnr, const char *tag)
      }
    else if (!strcmp (tag, "include:os-add"))
      {

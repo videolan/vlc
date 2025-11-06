@@ -1,7 +1,7 @@
-From 3a566f07a5b89e78eff2459a6b26f7c91d609820 Mon Sep 17 00:00:00 2001
+From 8ceb454e05af8be392dc18309f1800a4945398a5 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:20:16 +0200
-Subject: [PATCH 09/12] gpg-error-config.in: add missing
+Subject: [PATCH 09/14] gpg-error-config.in: add missing
  GPG_ERROR_CONFIG_LIBS_PRIVATE
 
 Otherwise the confirmity check fails

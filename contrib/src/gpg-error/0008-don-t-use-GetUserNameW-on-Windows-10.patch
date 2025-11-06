@@ -1,7 +1,7 @@
-From 4d64477f730529cecdf9ee8ec03bf409e039f85e Mon Sep 17 00:00:00 2001
+From e2df6855f455bf3731d407e00da7d6a39827b0ea Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:19:44 +0200
-Subject: [PATCH 08/12] don't use GetUserNameW on Windows 10+
+Subject: [PATCH 08/14] don't use GetUserNameW on Windows 10+
 
 It's not available in UWP
 ---
@@ -9,10 +9,10 @@ It's not available in UWP
  1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/src/sysutils.c b/src/sysutils.c
-index 8eee084..a94430b 100644
+index b6d6a55..2830452 100644
 --- a/src/sysutils.c
 +++ b/src/sysutils.c
-@@ -594,10 +594,11 @@ _gpgrt_getusername (void)
+@@ -685,10 +685,11 @@ _gpgrt_getusername (void)
    char *result = NULL;
  
  #ifdef HAVE_W32_SYSTEM
@@ -25,7 +25,7 @@ index 8eee084..a94430b 100644
  
    GetUserNameW (wtmp, &wsize);
    wbuf = _gpgrt_malloc (wsize * sizeof *wbuf);
-@@ -614,6 +615,21 @@ _gpgrt_getusername (void)
+@@ -705,6 +706,21 @@ _gpgrt_getusername (void)
      }
    buf = _gpgrt_wchar_to_utf8 (wbuf, wsize);
    xfree (wbuf);

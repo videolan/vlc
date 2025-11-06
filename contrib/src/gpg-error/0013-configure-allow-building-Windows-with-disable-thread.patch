@@ -1,7 +1,7 @@
-From 596a63bc148d6e644b28987c7210f5d9cbb8feac Mon Sep 17 00:00:00 2001
+From aa9ec7d915bb43cb35e685f384142eb347ccea9b Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 24 Oct 2025 08:28:33 +0200
-Subject: [PATCH 13/13] configure: allow building Windows with
+Subject: [PATCH 13/14] configure: allow building Windows with
  --disable-threads
 
 ---
@@ -9,11 +9,11 @@ Subject: [PATCH 13/13] configure: allow building Windows with
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index a24453e..500714c 100644
+index c327835..4ed37e1 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -141,9 +141,9 @@ case "${host}" in
- esac
+@@ -154,9 +154,9 @@ esac
+ AC_SUBST(EXTRA_LIBS_FOR_BUILD)
  
  
 -if test "$have_w32_system" != yes; then
@@ -24,7 +24,7 @@ index a24453e..500714c 100644
  
  # We build libgpg-error with large file support so that we have a 64
  # bit off_t.  Our external interface uses the gpgrt_off_t which is
-@@ -617,7 +617,7 @@ if test "$have_w32_system" = yes; then
+@@ -634,7 +634,7 @@ if test "$have_w32_system" = yes; then
      if test "$have_w64_system" = yes; then
        AC_DEFINE(HAVE_W64_SYSTEM,1,[Defined if we run on 64 bit W32 API system])
      fi
