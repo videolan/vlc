@@ -30,11 +30,17 @@ NavigableRow {
 
     Accessible.role: Accessible.PageTabList
 
-    delegate: BannerTabButton {
-        text: model.displayText
-        selected: model.name === row.currentView
-        showCurrentIndicator: false
-        height: VLCStyle.localToolbar_height
-        onClicked: row.clicked(index)
+    property alias model: repeater.model
+
+    Repeater {
+        id: repeater
+
+        delegate: BannerTabButton {
+            text: model.displayText
+            selected: model.name === row.currentView
+            showCurrentIndicator: false
+            height: VLCStyle.localToolbar_height
+            onClicked: row.clicked(index)
+        }
     }
 }
