@@ -118,11 +118,7 @@ ListView {
 
     footer: Item {
         implicitHeight: playerBtnDND.height
-
-        Binding on implicitWidth {
-            delayed: true
-            value: Math.max(implicitHeight, playerBtnDND.width - x)
-        }
+        implicitWidth: Math.max(implicitHeight, playerBtnDND.width - x)
 
         property alias dropVisible: footerDropArea.containsDrag
 

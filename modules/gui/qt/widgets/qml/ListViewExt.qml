@@ -223,11 +223,7 @@ ListView {
             id: footerItem
 
             implicitWidth: root.contentWidth
-
-            Binding on implicitHeight {
-                delayed: true
-                value: Math.max(VLCStyle.icon_normal, root.height - y - (root.headerItem?.height ?? 0))
-            }
+            implicitHeight: Math.max(VLCStyle.icon_normal, root.height - y - (root.headerItem?.height ?? 0))
 
             property alias firstItemIndicatorVisible: firstItemIndicator.visible
 
