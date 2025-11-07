@@ -172,7 +172,7 @@ FocusScope {
                         bottomMargin: VLCStyle.gridItemSelectedBorder
 
                         displayMarginBeginning: root._contentLeftMargin
-                        displayMarginEnd: root._contentRightMargin
+                        displayMarginEnd: root._contentRightMargin + VLCStyle.gridItemSelectedBorder
 
                         focus: true
 
