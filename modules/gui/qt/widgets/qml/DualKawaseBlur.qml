@@ -244,6 +244,15 @@ Item {
                                : "" // to prevent warning if source becomes null
     }
 
+    component DefaultShaderEffectSource : ShaderEffectSource {
+        // This is necessary to release resources even if `sourceItem` becomes null (non-live case):
+        parent: sourceItem ? root : null
+
+        visible: false
+        live: root.live
+        smooth: true
+    }
+
     DownsamplerShaderEffect {
         id: ds1
 
@@ -264,14 +273,10 @@ Item {
                                                                                   : Qt.rect(0.0, 0.0, 0.0, 0.0)
     }
 
-    ShaderEffectSource {
+    DefaultShaderEffectSource {
         id: ds1layer
 
         sourceItem: ds1
-        visible: false
-        smooth: true
-
-        live: root.live
 
         // Last layer for two pass mode, so use the viewport rect:
         sourceRect: (root.mode === DualKawaseBlur.Mode.TwoPass) ? root._localViewportRect : Qt.rect(0, 0, 0, 0)
@@ -316,7 +321,7 @@ Item {
         source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds1layer.parent) ? null : ds1layer
     }
 
-    ShaderEffectSource {
+    DefaultShaderEffectSource {
         id: ds2layer
 
         // So that if the mode is two pass (this is not used), the buffer is released:
@@ -324,12 +329,7 @@ Item {
         // never visible and was never used as texture provider, it should have never allocated
         // resources to begin with.
         sourceItem: (root.mode === DualKawaseBlur.Mode.FourPass) ? ds2 : null
-        parent: (!inhibitParent && sourceItem) ? root : null // this seems necessary to release resources even if sourceItem becomes null (non-live case)
-
-        visible: false
-        smooth: true
-
-        live: root.live
+        parent: (!inhibitParent && sourceItem) ? root : null // necessary to release resources even if `sourceItem` becomes null (non-live case)
 
         property bool inhibitParent: false
 
@@ -361,7 +361,7 @@ Item {
         source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds2layer.parent) ? null : ds2layer
     }
 
-    ShaderEffectSource {
+    DefaultShaderEffectSource {
         id: us1layer
 
         // So that if the mode is two pass (this is not used), the buffer is released:
@@ -369,12 +369,6 @@ Item {
         // never visible and was never used as texture provider, it should have never allocated
         // resources to begin with.
         sourceItem: (root.mode === DualKawaseBlur.Mode.FourPass) ? us1 : null
-        parent: sourceItem ? root : null // this seems necessary to release resources even if sourceItem becomes null (non-live case)
-
-        visible: false
-        smooth: true
-
-        live: root.live
 
         // Last layer for four pass mode, so use the viewport rect:
         // No need to check for the mode because this layer is not used in two pass mode anyway.
