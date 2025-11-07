@@ -1908,6 +1908,36 @@ static void ControlSetEsList(input_thread_t *input,
     free(array);
 }
 
+static int ControlSetTime( input_thread_t *p_input, vlc_tick_t val,
+                           bool fast_seek )
+{
+    input_thread_private_t *priv = input_priv(p_input);
+    int i_ret;
+
+    i_ret = demux_SetTime( priv->master->p_demux, priv->i_start + val,
+                           !fast_seek );
+    if( i_ret )
+    {
+        vlc_tick_t i_length = InputSourceGetLength( priv->master, priv->p_item, NULL );
+        /* Emulate it with a SET_POS */
+        if( i_length > 0 )
+        {
+            double f_pos = (double)(priv->i_start + val) / (double)i_length;
+            i_ret = demux_SetPosition( priv->master->p_demux, f_pos,
+                                       !fast_seek );
+        }
+    }
+
+    if( i_ret == VLC_SUCCESS )
+    {
+        if( priv->i_slave > 0 )
+            SlaveSeek( p_input );
+        priv->master->b_eof = false;
+    }
+
+    return i_ret;
+}
+
 static bool Control( input_thread_t *p_input,
                      int i_type, input_control_param_t param )
 {
@@ -1963,8 +1993,6 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_TIME:
         {
-            int i_ret;
-
             if( priv->b_recording )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_TIME ignored while recording" );
@@ -1974,32 +2002,14 @@ static bool Control( input_thread_t *p_input,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
 
-            i_ret = demux_SetTime( priv->master->p_demux, priv->i_start + param.time.i_val,
-                                   !param.time.b_fast_seek );
-            if( i_ret )
-            {
-                vlc_tick_t i_length = InputSourceGetLength( priv->master, priv->p_item, NULL );
-                /* Emulate it with a SET_POS */
-                if( i_length > 0 )
-                {
-                    double f_pos = (double)(priv->i_start + param.time.i_val) / (double)i_length;
-                    i_ret = demux_SetPosition( priv->master->p_demux, f_pos,
-                                               !param.time.b_fast_seek );
-                }
-            }
-            if( i_ret )
-            {
-                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME @%"PRId64
-                         " failed or not possible", param.time.i_val );
-            }
-            else
-            {
-                if( priv->i_slave > 0 )
-                    SlaveSeek( p_input );
-                priv->master->b_eof = false;
+            int i_ret = ControlSetTime( p_input, param.time.i_val,
+                                        param.time.b_fast_seek );
 
+            if( i_ret )
+                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME @%"PRId64
+                          " failed or not possible", param.time.i_val );
+            else
                 b_force_update = true;
-            }
             break;
         }
 
