@@ -128,7 +128,7 @@ FocusScope {
             }
 
             // Strong blurring is not wanted here:
-            configuration: Widgets.DualKawaseBlur.Configuration.TwoPass
+            mode: Widgets.DualKawaseBlur.Mode.TwoPass
             radius: 1
         }
     }

@@ -34,7 +34,7 @@ Item {
     implicitWidth: source ? Math.min(source.paintedWidth ?? Number.MAX_VALUE, source.width) : 0
     implicitHeight: source ? Math.min(source.paintedHeight ?? Number.MAX_VALUE, source.height) : 0
 
-    enum Configuration {
+    enum Mode {
         FourPass, // 2 downsample + 2 upsamples (3 layers/buffers)
         TwoPass // 1 downsample + 1 upsample (1 layer/buffer)
     }
@@ -49,7 +49,7 @@ Item {
     property alias exclusionStrength: us2.exclusionStrength
     /// </postprocess>
 
-    property int configuration: DualKawaseBlur.Configuration.FourPass
+    property int mode: DualKawaseBlur.Mode.FourPass
 
     // NOTE: This property is also an optimization hint. When it is false, the
     //       intermediate buffers for the blur passes may be released (only
@@ -166,7 +166,7 @@ Item {
             // `textureChanged()`).
 
             ds1.sourceTextureSize = ds1.tpObserver.nativeTextureSize
-            if (root.configuration === DualKawaseBlur.Configuration.FourPass) {
+            if (root.mode === DualKawaseBlur.Mode.FourPass) {
                 ds2.sourceTextureSize = ds2.tpObserver.nativeTextureSize
                 us1.sourceTextureSize = us1.tpObserver.nativeTextureSize
             }
@@ -188,7 +188,7 @@ Item {
                 // No need to check for if such slot exists for each,
                 // this is basically Qt version check in disguise.
                 ds1.ensurePolished()
-                if (root.configuration === DualKawaseBlur.Configuration.FourPass) {
+                if (root.mode === DualKawaseBlur.Mode.FourPass) {
                     ds2.ensurePolished()
                     us1.ensurePolished()
                 }
@@ -267,7 +267,7 @@ Item {
 
         // Divided by two, because viewport rect is local to the final upsampler (us2), which is the painter delegate here (regardless of the mode):
         // Viewport rect is only relevant for the last layer, so in here (ds1layer) it is only for the two-pass mode:
-        sourceRect: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) &&
+        sourceRect: ((root.mode === DualKawaseBlur.Mode.TwoPass) &&
                     (root.viewportRect.width > 0 && root.viewportRect.height > 0)) ? Qt.rect(root.viewportRect.x / 2,
                                                                                              root.viewportRect.y / 2,
                                                                                              root.viewportRect.width / 2,
@@ -290,7 +290,7 @@ Item {
                 root._window.afterAnimating.disconnect(ds1layer, ds1layer.scheduleChainedUpdate)
 
                 // In four pass mode, we can release the two intermediate layers:
-                if (root.configuration === DualKawaseBlur.Configuration.FourPass) {
+                if (root.mode === DualKawaseBlur.Mode.FourPass) {
                     // Scheduling update must be done sequentially for each layer in
                     // a chain. It seems that each layer needs one frame for it to be
                     // used as a source in another layer, so we can not schedule
@@ -311,17 +311,17 @@ Item {
         height: ds1.height / 2
 
         // Qt uses reference counting, otherwise ds1layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
-        source: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) || !ds1layer.parent) ? null : ds1layer
+        source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds1layer.parent) ? null : ds1layer
     }
 
     ShaderEffectSource {
         id: ds2layer
 
-        // So that if configuration is two pass (this is not used), the buffer is released:
-        // This is mainly relevant for switching configuration case, as initially if this was
+        // So that if the mode is two pass (this is not used), the buffer is released:
+        // This is mainly relevant for switching the mode case, as initially if this was
         // never visible and was never used as texture provider, it should have never allocated
         // resources to begin with.
-        sourceItem: (root.configuration === DualKawaseBlur.Configuration.FourPass) ? ds2 : null
+        sourceItem: (root.mode === DualKawaseBlur.Mode.FourPass) ? ds2 : null
         parent: (!inhibitParent && sourceItem) ? root : null // this seems necessary to release resources even if sourceItem becomes null (non-live case)
 
         visible: false
@@ -356,17 +356,17 @@ Item {
         height: ds2.height * 2
 
         // Qt uses reference counting, otherwise ds2layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
-        source: ((root.configuration === DualKawaseBlur.Configuration.TwoPass) || !ds2layer.parent) ? null : ds2layer
+        source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds2layer.parent) ? null : ds2layer
     }
 
     ShaderEffectSource {
         id: us1layer
 
-        // So that if configuration is two pass (this is not used), the buffer is released:
-        // This is mainly relevant for switching configuration case, as initially if this was
+        // So that if the mode is two pass (this is not used), the buffer is released:
+        // This is mainly relevant for switching the mode case, as initially if this was
         // never visible and was never used as texture provider, it should have never allocated
         // resources to begin with.
-        sourceItem: (root.configuration === DualKawaseBlur.Configuration.FourPass) ? us1 : null
+        sourceItem: (root.mode === DualKawaseBlur.Mode.FourPass) ? us1 : null
         parent: sourceItem ? root : null // this seems necessary to release resources even if sourceItem becomes null (non-live case)
 
         visible: false
@@ -435,7 +435,7 @@ Item {
 
         visible: tpObserver.isValid
 
-        source: (root.configuration === DualKawaseBlur.Configuration.TwoPass) ? ds1layer : us1layer
+        source: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
 
         property color tint: "transparent"
         property real tintStrength: 0.0
