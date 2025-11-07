@@ -1938,6 +1938,33 @@ static int ControlSetTime( input_thread_t *p_input, vlc_tick_t val,
     return i_ret;
 }
 
+static int ControlSetPosition( input_thread_t *p_input, double val,
+                               bool fast_seek )
+{
+    input_thread_private_t *priv = input_priv(p_input);
+
+    vlc_tick_t i_length = InputSourceGetLength(priv->master, priv->p_item, NULL);
+    if( i_length > 0 )
+    {
+        /* Calculate the updated position according to the current track duration */
+        if (priv->i_stop != 0)
+            val = (priv->i_start + val * (priv->i_stop - priv->i_start)) / i_length;
+        else
+            val = (priv->i_start + val * (i_length - priv->i_start)) / i_length;
+    }
+
+    int i_ret = demux_SetPosition( priv->master->p_demux, val, !fast_seek );
+
+    if( i_ret == VLC_SUCCESS )
+    {
+        if( priv->i_slave > 0 )
+            SlaveSeek( p_input );
+        priv->master->b_eof = false;
+    }
+
+    return i_ret;
+}
+
 static bool Control( input_thread_t *p_input,
                      int i_type, input_control_param_t param )
 {
@@ -1962,32 +1989,15 @@ static bool Control( input_thread_t *p_input,
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
-            vlc_tick_t i_length = InputSourceGetLength(priv->master, priv->p_item, NULL);
-            double f_val;
-            if( i_length > 0 )
-            {
-                /* Calculate the updated position according to the current track duration */
-                if (priv->i_stop != 0)
-                    f_val = (priv->i_start + param.pos.f_val * (priv->i_stop - priv->i_start)) / i_length;
-                else
-                    f_val = (priv->i_start + param.pos.f_val * (i_length - priv->i_start)) / i_length;
-            }
-            else
-                f_val = param.pos.f_val;
-            if( demux_SetPosition( priv->master->p_demux, f_val,
-                                   !param.pos.b_fast_seek ) )
-            {
+
+            int i_ret = ControlSetPosition( p_input, param.pos.f_val,
+                                            param.pos.b_fast_seek );
+
+            if( i_ret )
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION "
                          "%2.1f%% failed", param.pos.f_val * 100.f );
-            }
             else
-            {
-                if( priv->i_slave > 0 )
-                    SlaveSeek( p_input );
-                priv->master->b_eof = false;
-
                 b_force_update = true;
-            }
             break;
         }
 
