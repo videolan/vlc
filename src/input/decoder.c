@@ -1749,14 +1749,13 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
     decoder_t *p_dec = &p_owner->dec;
     decoder_t *p_packetizer = p_owner->p_packetizer;
 
-    if( p_owner->error )
-        return;
-
     if( p_packetizer != NULL && p_packetizer->pf_flush != NULL )
         p_packetizer->pf_flush( p_packetizer );
 
     if ( p_dec->pf_flush != NULL )
         p_dec->pf_flush( p_dec );
+
+    p_owner->error = false;
 }
 
 /**
