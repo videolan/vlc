@@ -24,6 +24,7 @@ soxr: soxr-$(SOXR_VERSION)-Source.tar.xz .sum-soxr
 	$(APPLY) $(SRC)/soxr/soxr-check-function.patch
 	$(APPLY) $(SRC)/soxr/aarch64.patch
 	$(APPLY) $(SRC)/soxr/0001-Allocate-an-extra-real-number.patch
+	$(APPLY) $(SRC)/soxr/0001-use-libavutil-tx-code-instead-of-avfft-in-newer-FFmp.patch
 	$(call pkg_static,"src/soxr.pc.in")
 	$(MOVE)
 
