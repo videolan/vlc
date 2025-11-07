@@ -53,23 +53,11 @@ T.ScrollBar {
         hovered: true
     }
 
-    component DefaultBehavior : Behavior {
-        // WARNING: Qt bug: OpacityAnimator is bugged
-        NumberAnimation {
-            easing.type: Easing.OutSine
-            duration: VLCStyle.duration_veryShort
-        }
-    }
-
     background: Rectangle {
         color: theme.bg.primary
         radius: (control.horizontal ? height : width) / 2
 
-        opacity: (control._shown && control.interacting) ? 1.0 : 0.0
-
-        visible: (opacity > 0.0)
-
-        DefaultBehavior on opacity { }
+        visible: (control._shown && control.interacting)
     }
 
     contentItem: Rectangle {
@@ -79,11 +67,7 @@ T.ScrollBar {
         radius: (control.horizontal ? height : width) / 2
         color: theme.fg.secondary
 
-        visible: (opacity > 0.0)
-
-        opacity: control._shown ? 1.0 : 0.0
-
-        DefaultBehavior on opacity { }
+        visible: control._shown
 
         component SizeBehavior : Behavior {
             NumberAnimation {
