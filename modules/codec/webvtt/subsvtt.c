@@ -260,27 +260,39 @@ static void webvtt_get_cueboxrect( const webvtt_cue_settings_t *p_settings,
     {
         p_rect->y = line_offset >= 0 ? line_offset : 1.0 + line_offset;
         p_rect->w = (extent) ? extent : 1.0;
-        if( indent_anchor_position > 0 &&
-            (alignment_on_indent_anchor == WEBVTT_ALIGN_LEFT ||
-             alignment_on_indent_anchor == WEBVTT_ALIGN_START) )
+
+        if( indent_anchor_position > 0 )
         {
-            p_rect->x  = indent_anchor_position;
-            p_rect->w -= p_rect->x;
+            if( alignment_on_indent_anchor == WEBVTT_ALIGN_LEFT ||
+                alignment_on_indent_anchor == WEBVTT_ALIGN_START )
+            {
+                p_rect->x  = indent_anchor_position;
+                p_rect->w -= p_rect->x;
+            }
+            else if( alignment_on_indent_anchor == WEBVTT_ALIGN_CENTER )
+            {
+                p_rect->x  = indent_anchor_position - 0.5;
+                p_rect->w  = p_rect->x >= 0 ? 1.0 - p_rect->x: 1.0 + p_rect->x;
+            }
         }
     }
-    else /* Vertical text */
+    else /* Vertical text, but no support in the text renderer */
     {
-        if( p_settings->vertical == WEBVTT_ALIGN_LEFT )
+        if( p_settings->vertical == WEBVTT_ALIGN_RIGHT )
             p_rect->x = line_offset >= 0 ? 1.0 - line_offset : -line_offset;
         else
             p_rect->x = line_offset >= 0 ? line_offset : 1.0 + line_offset;
-        p_rect->y = (extent) ? extent : 1.0;
+        p_rect->w = (extent >= 0) ? extent : 1.0;
 
-        if( indent_anchor_position > 0 &&
-            alignment_on_indent_anchor == WEBVTT_ALIGN_START )
+        if( p_settings->vertical == WEBVTT_ALIGN_LEFT )
         {
             p_rect->y  = indent_anchor_position;
-            p_rect->h -= p_rect->y;
+            p_rect->h  = 1.0 - p_rect->y;
+        }
+        else
+        {
+            p_rect->y  = 1.0 - indent_anchor_position;
+            p_rect->h  = 1.0 - p_rect->y;
         }
     }
 }
