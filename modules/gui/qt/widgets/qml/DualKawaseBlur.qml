@@ -89,6 +89,14 @@ Item {
     // Since the discard occurs at layer level, using this saves video memory.
     property rect viewportRect
 
+    // Local viewport rect is viewport rect divided by two, because it is used as the source
+    // rect of last layer, which is 2x upsampled by the painter delegate (us2):
+    readonly property rect _localViewportRect: ((viewportRect.width > 0 && viewportRect.height > 0)) ? Qt.rect(viewportRect.x / 2,
+                                                                                                               viewportRect.y / 2,
+                                                                                                               viewportRect.width / 2,
+                                                                                                               viewportRect.height / 2)
+                                                                                                     : Qt.rect(0, 0, 0, 0)
+
     property alias sourceTextureProviderObserver: ds1.tpObserver // for accessory
 
     readonly property bool sourceTextureIsValid: sourceTextureProviderObserver.isValid
@@ -265,14 +273,8 @@ Item {
 
         live: root.live
 
-        // Divided by two, because viewport rect is local to the final upsampler (us2), which is the painter delegate here (regardless of the mode):
-        // Viewport rect is only relevant for the last layer, so in here (ds1layer) it is only for the two-pass mode:
-        sourceRect: ((root.mode === DualKawaseBlur.Mode.TwoPass) &&
-                    (root.viewportRect.width > 0 && root.viewportRect.height > 0)) ? Qt.rect(root.viewportRect.x / 2,
-                                                                                             root.viewportRect.y / 2,
-                                                                                             root.viewportRect.width / 2,
-                                                                                             root.viewportRect.height / 2)
-                                                                                   : Qt.rect(0, 0, 0, 0)
+        // Last layer for two pass mode, so use the viewport rect:
+        sourceRect: (root.mode === DualKawaseBlur.Mode.TwoPass) ? root._localViewportRect : Qt.rect(0, 0, 0, 0)
         
         function scheduleChainedUpdate() {
             if (!ds1layer) // context is lost, Qt bug (reproduced with 6.2)
@@ -374,14 +376,9 @@ Item {
 
         live: root.live
 
-        // Divided by two, because viewport rect is local to the final upsampler (us2), which is the painter delegate here (regardless of the mode):
-        // No need to check for the mode, because this is not used in two pass mode (calculations are negligible).
-        // TODO: Investigate if we can propagate the viewport rect back to the intermediate layers in four-pass mode to save more video memory.
-        sourceRect: (root.viewportRect.width > 0 && root.viewportRect.height > 0) ? Qt.rect(root.viewportRect.x / 2,
-                                                                                            root.viewportRect.y / 2,
-                                                                                            root.viewportRect.width / 2,
-                                                                                            root.viewportRect.height / 2)
-                                                                                  : Qt.rect(0, 0, 0, 0)
+        // Last layer for four pass mode, so use the viewport rect:
+        // No need to check for the mode because this layer is not used in two pass mode anyway.
+        sourceRect: root._localViewportRect
 
         function scheduleChainedUpdate() {
             if (!us1layer) // context is lost, Qt bug (reproduced with 6.2)
