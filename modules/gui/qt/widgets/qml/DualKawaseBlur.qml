@@ -39,17 +39,17 @@ Item {
         TwoPass // 1 downsample + 1 upsample (1 layer/buffer)
     }
 
+    property int mode: DualKawaseBlur.Mode.FourPass
+
     /// <postprocess>
     // The following property must be set in order to make other properties respected:
     property bool postprocess: false
 
-    property alias tint: us2.tint
-    property alias tintStrength: us2.tintStrength
-    property alias noiseStrength: us2.noiseStrength
-    property alias exclusionStrength: us2.exclusionStrength
+    property color tint: "transparent"
+    property real tintStrength: 0.0
+    property real noiseStrength: 0.0
+    property real exclusionStrength: 0.0
     /// </postprocess>
-
-    property int mode: DualKawaseBlur.Mode.FourPass
 
     // NOTE: This property is also an optimization hint. When it is false, the
     //       intermediate buffers for the blur passes may be released (only
@@ -437,10 +437,10 @@ Item {
 
         source: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
 
-        property color tint: "transparent"
-        property real tintStrength: 0.0
-        property real noiseStrength: 0.0
-        property real exclusionStrength: 0.0
+        property alias tint: root.tint
+        property alias tintStrength: root.tintStrength
+        property alias noiseStrength: root.noiseStrength
+        property alias exclusionStrength: root.exclusionStrength
 
         fragmentShader: root.postprocess ? "qrc:///shaders/DualKawaseBlur_upsample_postprocess.frag.qsb"
                                          : "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
