@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 #
-# Copyright (C) 2020 Rémi Denis-Courmont, Brandon Li
+# Copyright (C) 2020 Rémi Denis-Courmont
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by
@@ -17,19 +17,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 
 import sys
-import os
 import json
-import argparse
-
-# Parse first so we can set sys.path
-parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('--py-path', dest='py_path')
-parser.add_argument('url')
-args, _ = parser.parse_known_args()
-
-if args.py_path:
-    sys.path.insert(0, args.py_path)
-
 import yt_dlp
 
 class logger(object):
@@ -54,5 +42,5 @@ def url_extract(url):
     infos = dl.extract_info(url, download=False)
     print(json.dumps(dl.sanitize_info(infos)))
 
-url = args.url
+url = sys.argv[1]
 url_extract(url)
