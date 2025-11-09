@@ -353,9 +353,9 @@ static int OpenCommon(vlc_object_t *obj, const char *src_url)
     if (unlikely(sys == NULL))
         return VLC_EGENERIC;
 
-    char *path = strdup("yt-dlp");
+    char *path = var_InheritString(obj, "ytdl-path");
     if (unlikely(path == NULL))
-        return VLC_EGENERIC;
+        return VLC_EINVAL;
 
     struct ytdl_json jsdata;
     pid_t pid;
@@ -463,6 +463,8 @@ vlc_module_begin()
     set_callbacks(OpenFilter, Close)
     add_bool("ytdl", true, N_("Enable YT-DL"), NULL)
         change_safe()
+    add_loadfile("ytdl-path", "yt-dlp" EXEEXT,
+                 N_("Path to YT-DLP"), N_("Path to YT-DLP"))
 
     add_submodule()
     set_capability("access", 0)
