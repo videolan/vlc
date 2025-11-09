@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <errno.h>
 #include <math.h>
 #include <signal.h>
@@ -339,7 +340,7 @@ static void Close(vlc_object_t *obj)
     json_free(&sys->json);
 }
 
-static int OpenCommon(vlc_object_t *obj)
+static int OpenCommon(vlc_object_t *obj, const char *src_url)
 {
     stream_t *s = (stream_t *)obj;
 
@@ -361,7 +362,7 @@ static int OpenCommon(vlc_object_t *obj)
         argv[i++] = "--py-path"; // add additional path
         argv[i++] = py_path;
     }
-    argv[i++] = s->psz_url;
+    argv[i++] = src_url;
     argv[i] = NULL;
 
     jsdata.logger = s->obj.logger;
@@ -441,7 +442,15 @@ static int OpenFilter(vlc_object_t *obj)
     if (!var_InheritBool(obj, "ytdl"))
         return VLC_EGENERIC;
 
-    return OpenCommon(obj);
+    return OpenCommon(obj, s->psz_url);
+}
+
+static int OpenAccess(vlc_object_t *obj)
+{
+    stream_t *s = (stream_t *)obj;
+
+    assert(s->psz_url != NULL);
+    return OpenCommon(obj, s->psz_url);
 }
 
 vlc_module_begin()
@@ -456,5 +465,5 @@ vlc_module_begin()
     add_submodule()
     set_capability("access", 0)
     add_shortcut("ytdl")
-    set_callbacks(OpenCommon, Close)
+    set_callbacks(OpenAccess, Close)
 vlc_module_end()
