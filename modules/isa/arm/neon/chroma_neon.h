@@ -45,26 +45,6 @@ struct yuv_pack
     size_t pitch;
 };
 
-/* I420 to YUYV conversion. */
-void i420_yuyv_neon (struct yuv_pack *const out,
-                     const struct yuv_planes *const in,
-                     int width, int height);
-
-/* I420 to UYVY conversion. */
-void i420_uyvy_neon (struct yuv_pack *const out,
-                     const struct yuv_planes *const in,
-                     int width, int height);
-
-/* I422 to YUYV conversion. */
-void i422_yuyv_neon (struct yuv_pack *const out,
-                     const struct yuv_planes *const in,
-                     int width, int height);
-
-/* I422 to UYVY conversion. */
-void i422_uyvy_neon (struct yuv_pack *const out,
-                     const struct yuv_planes *const in,
-                     int width, int height);
-
 /* YUYV to I422 conversion. */
 void yuyv_i422_neon (struct yuv_planes *const out,
                      const struct yuv_pack *const in,

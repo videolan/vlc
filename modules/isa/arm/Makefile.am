@@ -12,8 +12,6 @@ endif
 
 libchroma_yuv_neon_plugin_la_SOURCES = \
 	isa/arm/neon/deinterleave_chroma.S \
-	isa/arm/neon/i420_yuyv.S \
-	isa/arm/neon/i422_yuyv.S \
 	isa/arm/neon/yuyv_i422.S \
 	isa/arm/neon/chroma_yuv.c isa/arm/neon/chroma_neon.h
 libchroma_yuv_neon_plugin_LIBTOOLFLAGS = --tag=CC
