@@ -39,6 +39,7 @@
 #include <vlc_input_item.h>
 #include <vlc_plugin.h>
 #include <vlc_spawn.h>
+#include <vlc_strings.h>
 #include <vlc_interrupt.h>
 
 struct ytdl_json {
@@ -220,18 +221,22 @@ static int ReadItem(stream_t *s, input_item_node_t *node,
     double duration = json_get_num(json, "duration");
     vlc_tick_t ticks = isnan(duration) ? INPUT_DURATION_UNSET
                                        : lround(duration * CLOCK_FREQ);
+    char *wrapurl;
 
     if (title == NULL)
         title = url;
+    if (unlikely(asprintf(&wrapurl, "ytdl://%s", url) == -1))
+        return VLC_ENOMEM;
 
-    input_item_t *item = input_item_NewStream(url, title, ticks);
+    input_item_t *item = input_item_NewStream(wrapurl, title, ticks);
+
+    free(wrapurl);
 
     if (unlikely(item == NULL))
         return VLC_ENOMEM;
 
     /* Don't care to lock, the item is still private. */
     GetMeta(item->p_meta, json);
-    input_item_AddOption(item, "no-ytdl", 0);
     input_item_node_AppendItem(node, item);
     input_item_Release(item);
 
@@ -448,9 +453,14 @@ static int OpenFilter(vlc_object_t *obj)
 static int OpenAccess(vlc_object_t *obj)
 {
     stream_t *s = (stream_t *)obj;
+    const char *url = s->psz_url;
 
-    assert(s->psz_url != NULL);
-    return OpenCommon(obj, s->psz_url);
+    assert(url != NULL);
+
+    if (vlc_ascii_strncasecmp(url, "ytdl://", 7) == 0)
+        url += 7;
+
+    return OpenCommon(obj, url);
 }
 
 vlc_module_begin()
