@@ -16,15 +16,11 @@ libgrey_yuv_plugin_la_SOURCES = video_chroma/grey_yuv.c
 libi420_rgb_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
 	video_chroma/i420_rgb8.c video_chroma/i420_rgb16.c video_chroma/i420_rgb_c.h
 
-libi420_yuy2_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
-
 libi420_nv12_plugin_la_SOURCES = video_chroma/i420_nv12.c
 libi420_nv12_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libi420_nv12_plugin_la_LIBADD = libchroma_copy.la
 
 libi422_i420_plugin_la_SOURCES = video_chroma/i422_i420.c
-
-libi422_yuy2_plugin_la_SOURCES = video_chroma/i422_yuy2.c video_chroma/i422_yuy2.h
 
 librv32_plugin_la_SOURCES = video_chroma/rv32.c
 
@@ -38,10 +34,8 @@ liborient_plugin_la_SOURCES = video_chroma/orient.c video_chroma/orient.h
 
 chroma_LTLIBRARIES = \
 	libi420_rgb_plugin.la \
-	libi420_yuy2_plugin.la \
 	libi420_nv12_plugin.la \
 	libi422_i420_plugin.la \
-	libi422_yuy2_plugin.la \
 	libgrey_yuv_plugin.la \
 	libyuy2_i420_plugin.la \
 	libyuy2_i422_plugin.la \
@@ -53,31 +47,14 @@ chroma_LTLIBRARIES = \
 
 EXTRA_LTLIBRARIES += libswscale_plugin.la
 
-# AltiVec
-libi420_yuy2_altivec_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
-libi420_yuy2_altivec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DPLUGIN_ALTIVEC
-
-if HAVE_ALTIVEC
-chroma_LTLIBRARIES += \
-	libi420_yuy2_altivec_plugin.la
-endif
-
 # SSE2
 libi420_rgb_sse2_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
 	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_sse2.h
 libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DPLUGIN_SSE2
 
-libi420_yuy2_sse2_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
-libi420_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DPLUGIN_SSE2
-
-libi422_yuy2_sse2_plugin_la_SOURCES = video_chroma/i422_yuy2.c video_chroma/i422_yuy2.h
-libi422_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DPLUGIN_SSE2
-
 if HAVE_SSE2
 chroma_LTLIBRARIES += \
-	libi420_rgb_sse2_plugin.la \
-	libi420_yuy2_sse2_plugin.la \
-	libi422_yuy2_sse2_plugin.la
+	libi420_rgb_sse2_plugin.la
 endif
 
 libcvpx_plugin_la_SOURCES = codec/vt_utils.c codec/vt_utils.h video_chroma/cvpx.c
