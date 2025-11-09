@@ -47,7 +47,6 @@ def url_extract(url):
     opts = {
         'extract_flat': 'in_playlist',
         'logger': logger(),
-        'youtube_include_dash_manifest': False,
     }
 
     dl = yt_dlp.YoutubeDL(opts)
@@ -67,7 +66,6 @@ def url_extract(url):
 def url_process(ie_url):
     opts = {
         'logger': logger(),
-        'youtube_include_dash_manifest': False,
     }
 
     dl = yt_dlp.YoutubeDL(opts)
