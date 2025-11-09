@@ -62,7 +62,7 @@ def url_extract(url):
                  url = 'ytdl:///?' + urllib.parse.urlencode(entry)
                  entry['url'] = url;
 
-    print(json.dumps(infos))
+    print(json.dumps(dl.sanitize_info(infos)))
 
 def url_process(ie_url):
     opts = {
