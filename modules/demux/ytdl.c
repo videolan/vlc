@@ -76,7 +76,7 @@ static int ytdl_popen(pid_t *restrict pid, const char *argv[])
         return -1;
 
     int fdv[] = { -1, fds[1], STDERR_FILENO, -1 };
-    int val = vlc_spawn(pid, argv[0], fdv, argv);
+    int val = vlc_spawnp(pid, argv[0], fdv, argv);
 
     vlc_close(fds[1]);
 
@@ -353,13 +353,15 @@ static int OpenCommon(vlc_object_t *obj, const char *src_url)
     if (unlikely(sys == NULL))
         return VLC_EGENERIC;
 
-    char *path = config_GetSysPath(VLC_PKG_DATA_DIR, "ytdl-extract.py");
+    char *path = strdup("yt-dlp");
     if (unlikely(path == NULL))
         return VLC_EGENERIC;
 
     struct ytdl_json jsdata;
     pid_t pid;
-    const char *argv[] = { path, src_url, NULL };
+    const char *argv[] = {
+        path, "--flat-playlist", "--dump-single-json", "--", src_url, NULL
+    };
 
     jsdata.logger = s->obj.logger;
     jsdata.fd = ytdl_popen(&pid, argv);
