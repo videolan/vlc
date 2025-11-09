@@ -19,7 +19,6 @@
 import sys
 import os
 import json
-import urllib.parse
 import argparse
 
 # Parse first so we can set sys.path
@@ -53,35 +52,7 @@ def url_extract(url):
 
     # Process a given URL
     infos = dl.extract_info(url, download=False)
-
-    if 'entries' in infos:
-        for entry in infos['entries']:
-             if 'ie_key' in entry and entry['ie_key']:
-                 # Flat-extracted playlist entry
-                 url = 'ytdl:///?' + urllib.parse.urlencode(entry)
-                 entry['url'] = url;
-
     print(json.dumps(dl.sanitize_info(infos)))
 
-def url_process(ie_url):
-    opts = {
-        'logger': logger(),
-    }
-
-    dl = yt_dlp.YoutubeDL(opts)
-
-    # Rebuild the original IE entry
-    entry = { }
-
-    for p in urllib.parse.parse_qsl(ie_url[9:]):  # <-- use parameter
-        entry[p[0]] = p[1]
-
-    infos = dl.process_ie_result(entry, download=False)
-    print(json.dumps(infos))
-
 url = args.url
-
-if url.startswith('ytdl:///?'):
-    url_process(url)
-else:
-    url_extract(url)
+url_extract(url)
