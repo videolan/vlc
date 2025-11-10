@@ -540,11 +540,9 @@ TESTS += adaptive_test
 libytdl_plugin_la_SOURCES = demux/ytdl.c
 libytdl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DEXEEXT=\"$(EXEEXT)\"
 libytdl_plugin_la_LIBADD = libvlc_json.la
-if !HAVE_WIN32
 if !HAVE_ANDROID
 if !HAVE_EMSCRIPTEN
 demux_LTLIBRARIES += libytdl_plugin.la
-endif
 endif
 endif
 
