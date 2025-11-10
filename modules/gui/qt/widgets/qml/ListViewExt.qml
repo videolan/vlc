@@ -466,11 +466,13 @@ ListView {
     }
 
     function nextPage() {
-        root.contentX += (Math.min(root.width, (root.contentWidth - root.width - root.contentX)))
+        root.contentX = Math.min(root.contentX + root.width,
+                                 root.originX + root.contentWidth - root.width + root.rightMargin)
     }
 
     function prevPage() {
-        root.contentX -= Math.min(root.width,root.contentX - root.originX)
+        root.contentX = Math.max(root.contentX - root.width,
+                                 root.originX - root.leftMargin)
     }
 
     // Add an indirection here because additional control
