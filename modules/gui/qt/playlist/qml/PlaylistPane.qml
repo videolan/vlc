@@ -269,10 +269,35 @@ T.Pane {
                 contextMenu.popup(-1, globalPos)
             }
 
+            Behavior on contentY {
+                id: contentYBehavior
+
+                enabled: false
+
+                // NOTE: Usage of `SmoothedAnimation` is intentional here.
+                SmoothedAnimation {
+                    duration: VLCStyle.duration_veryLong
+                    easing.type: Easing.InOutSine
+                }
+            }
+
             Component.onCompleted: {
                 // WARNING: Tracking the current item and not the current index is intentional here.
                 MainPlaylistController.currentItemChanged.connect(listView, () => {
+                    // FIXME: Qt does not provide the `contentY` with `positionViewAtIndex()` for us
+                    //        to animate. For that reason, we capture the new `contentY`, adjust
+                    //        `contentY` to it is old value then enable the animation and set `contentY`
+                    //        to its new value.
+                    const oldContentY = listView.contentY
                     listView.positionViewAtIndex(MainPlaylistController.currentIndex, ListView.Contain)
+                    const newContentY = listView.contentY
+                    if (Math.abs(oldContentY - newContentY) >= Number.EPSILON) {
+                        contentYBehavior.enabled = false
+                        listView.contentY = oldContentY
+                        contentYBehavior.enabled = true
+                        listView.contentY = newContentY
+                        contentYBehavior.enabled = false
+                    }
                 })
             }
 
