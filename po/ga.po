@@ -10,11 +10,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Seanán Ó Coistín, 2023\n"
+"Last-Translator: Seanán Ó Coistín, 2024\n"
 "Language-Team: Irish (https://app.transifex.com/yaron/teams/16553/ga/)\n"
 "Language: ga\n"
 "MIME-Version: 1.0\n"
@@ -172,7 +172,7 @@ msgstr "Socruithe físeáin coiteann"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
-msgstr ""
+msgstr "U"
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -558,21 +558,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -2166,8 +2166,8 @@ msgstr "Cóimheas treoíochta foinseach"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 
@@ -2929,9 +2929,8 @@ msgstr "Seachfhreastalaí HTTP"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 
 #: src/libvlc-module.c:853
@@ -5752,8 +5751,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -8033,8 +8032,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8058,9 +8057,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Sruth %d"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8496,9 +8494,9 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -10829,9 +10827,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Gach Comhad"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -10898,8 +10895,8 @@ msgstr ""
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 
 #: modules/codec/dvbsub.c:95
@@ -11588,10 +11585,10 @@ msgstr ""
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -12764,7 +12761,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16972,9 +16968,8 @@ msgstr "Leacaigh uile"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Sábháil an seinnliosta"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -20549,9 +20544,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Taispeáin fógraí do bhotúin agus rabhaidh neamhthábhachtacha"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Cumasaigh fuaim"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -20868,18 +20862,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Feabhsaitheoir steiréó"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
 msgid "AMD Frame Rate Doubler"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Taispeáin an phríomhfhuinneog"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -26391,38 +26383,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Ailíniú an fhíseáin"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Roghnaigh dath amháin sa bhfíseán"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Líneach (is tapúla)"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Point Sampler"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Oideasraí comhbhrúite/díchomhbhrúite físeáin"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Taifeach"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Modúil aschurtha"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -26433,9 +26419,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Ar barr i gcónaí"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -27489,9 +27474,8 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "Méarlorg"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
@@ -27502,9 +27486,8 @@ msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "Méarlorg"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -27531,9 +27514,8 @@ msgid "Show &more options"
 msgstr "Taispeáin tuilleadh roghanna"
 
 #: modules/gui/qt/ui/open.h:263
-#, fuzzy
 msgid "Change the caching for the media"
-msgstr "Athraigh am tosaithe don meán"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:265
 msgid " ms"
@@ -27576,9 +27558,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "UU'U':nn'n':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:283
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Athraigh am tosaithe don meán"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:286
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27671,9 +27652,8 @@ msgid "Please enter a network URL:"
 msgstr "Cuir isteach URL líonra:"
 
 #: modules/gui/qt/ui/profiles.h:699
-#, fuzzy
 msgid "Profile edition"
-msgstr "Ainm na Beathaisnéisíne In Easnamh"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:700
 msgid "FLAC"
@@ -27752,9 +27732,8 @@ msgid "Menus"
 msgstr "Roghchláir"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Luas samplach"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -27781,43 +27760,36 @@ msgid " kb/s"
 msgstr " kb/s"
 
 #: modules/gui/qt/ui/profiles.h:737 modules/gui/qt/ui/profiles.h:757
-#, fuzzy
 msgid "Encoding parameters"
-msgstr "An caighdeán ionchódaithe"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:740
-#, fuzzy
 msgid "Frame size"
-msgstr "Méid an tseomra"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:743 modules/gui/qt/ui/profiles.h:746
 msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:756
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Luas samplach"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:764
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Ainm na Beathaisnéisíne In Easnamh"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:200
-#, fuzzy
 msgid "Set up media sources to stream"
-msgstr "Roghnaigh \"Ardroghanna\" chun gach rogha a fheiceáil."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:202
-#, fuzzy
 msgid "Destination Setup"
-msgstr "Sprioc"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Roghnaigh \"Ardroghanna\" chun gach rogha a fheiceáil."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:204
 msgid ""
@@ -27834,14 +27806,12 @@ msgid "Display locally"
 msgstr "Taispeáin go logánta"
 
 #: modules/gui/qt/ui/sout.h:209
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "Ardroghanna"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:210
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Roghnaigh \"Ardroghanna\" chun gach rogha a fheiceáil."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:211
 msgid "Activate Transcoding"
@@ -27852,9 +27822,8 @@ msgid "Option Setup"
 msgstr "Socrú roghanna"
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr "Roghnaigh \"Ardroghanna\" chun gach rogha a fheiceáil."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Miscellaneous Options"
@@ -27865,9 +27834,8 @@ msgid "Stream all elementary streams"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "Socruithe coiteann aschurtha an tsrutha"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid " %"
@@ -27890,14 +27858,12 @@ msgid "Visualization:"
 msgstr "Léirshamhlú:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:420
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "Cumasaigh fuaim"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
-#, fuzzy
 msgid "Replay gain mode:"
-msgstr "Athsheinn arís"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
 msgid "Normalize volume to:"
@@ -27924,9 +27890,8 @@ msgid "Submit played tracks stats to Last.fm"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:354
-#, fuzzy
 msgid "Codecs"
-msgstr "Scéim Comhbhrúite"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:355
 msgid "x264 profile and level selection"
@@ -27977,9 +27942,8 @@ msgid "Live555 stream transport"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:373
-#, fuzzy
 msgid "Default caching policy"
-msgstr "Ionchódú Réamhshocraithe"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:534
 msgid "Menus language:"
@@ -28018,14 +27982,12 @@ msgid "Show media change popup:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Start in minimal view mode"
-msgstr "Tosaigh in amharc íosta (gan roghchláir)"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Force window style:"
-msgstr "Fuinneoga ghníomhacha"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Integrate video in interface"
@@ -28036,23 +27998,20 @@ msgid "Show systray icon"
 msgstr "Taispeáin deilbhín tráidire an chórais"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Socruithe an phríomhchomhéadainan"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Bain feidhm as seinnliosta le craiceann"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:553
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "Seinn agus stad"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:556
 msgid "Pause on the last frame of a video"
@@ -28063,9 +28022,8 @@ msgid "Allow only one instance"
 msgstr "Ceadaigh ásc amháin"
 
 #: modules/gui/qt/ui/sprefs_interface.h:561
-#, fuzzy
 msgid "Activate updates notifier"
-msgstr "Gníomhachtaigh an fógra a thaispeántar nuair atá nuashonrú ar fáil"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:563
 msgid "Every "
@@ -28084,18 +28042,16 @@ msgid "Operating System Integration"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:571
-#, fuzzy
 msgid "File extensions association"
-msgstr " Iarmhíreanna oscailte comhad"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:572
 msgid "Set up associations..."
 msgstr "Socraigh na comhcheangail..."
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:290
-#, fuzzy
 msgid "Enable On Screen Display (OSD)"
-msgstr "Taispeáint Ar An Scáileán"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
 msgid "Show media title on video start"
@@ -28154,14 +28110,12 @@ msgid "KVA"
 msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:324
-#, fuzzy
 msgid "Deinterlacing"
-msgstr "Díchrosfhigh"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:326
-#, fuzzy
 msgid "Force Aspect Ratio"
-msgstr "Glasaigh an Cóimheas Treoíochta"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:331
 msgid "vlc-snap"
@@ -28184,9 +28138,8 @@ msgid "Run manually"
 msgstr "Rith de láimh"
 
 #: modules/gui/qt/ui/streampanel.h:174
-#, fuzzy
 msgid "Setup schedule"
-msgstr "Clár Ama"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:175
 msgid "Run on schedule"
@@ -28275,9 +28228,8 @@ msgid "Mask"
 msgstr "Aghaidh fidil"
 
 #: modules/gui/qt/ui/video_effects.h:1325
-#, fuzzy
 msgid "Anaglyph 3D"
-msgstr "Anaiglif"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1326
 msgid "Mirror"
@@ -28288,9 +28240,8 @@ msgid "Motion detect"
 msgstr "Braith gluaisne"
 
 #: modules/gui/qt/ui/video_effects.h:1331
-#, fuzzy
 msgid "Spatial blur"
-msgstr "Spásúil"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1335
 msgid "Anti-Flickering"
@@ -28301,14 +28252,12 @@ msgid "Soften"
 msgstr "Bogaigh"
 
 #: modules/gui/qt/ui/video_effects.h:1337
-#, fuzzy
 msgid "Denoiser"
-msgstr "Fuaim"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1338
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Spásúil"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1339
 msgid "Temporal luma strength"
@@ -28327,9 +28276,8 @@ msgid "VLM configurator"
 msgstr "Cumraitheoir VLM"
 
 #: modules/gui/qt/ui/vlm.h:284
-#, fuzzy
 msgid "Media Manager Edition"
-msgstr "Eolas an mheáin"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:285
 msgid "Name:"
@@ -28356,9 +28304,8 @@ msgid "Time Control"
 msgstr "Rialtán Ama"
 
 #: modules/gui/qt/ui/vlm.h:292
-#, fuzzy
 msgid "Mux Control"
-msgstr "Rialtán"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:293
 msgid "Muxer:"
@@ -28369,6 +28316,5 @@ msgid "AAAA; "
 msgstr "AAAA; "
 
 #: modules/gui/qt/ui/vlm.h:299
-#, fuzzy
 msgid "Media Manager List"
-msgstr "Eolas an mheáin"
+msgstr ""

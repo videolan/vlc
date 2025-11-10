@@ -9,7 +9,7 @@
 # rajesh.v5 <v295rajesh@outlook.com>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
@@ -543,21 +543,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -567,27 +567,27 @@ msgid ""
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>VLC మాధ్యమ ప్రదర్శకం సహాయానికి స్వాగతం</"
-"h2><h3>పత్రీకరణ</h3><p>VLC పత్రీకరణను వీడియోల్యాన్ యొక్క <a href=\"http://"
-"wiki.videolan.org\">వికీ</a> వెబ్‌సైటులో చూడవచ్చు.</p><p>ఒకవేళ మీరు VLC మాధ్యమ ప్రదర్శకానికి "
-"కొత్త అయితే, దయచేసి<br><a href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>VLC మాధ్యమ ప్రదర్శకం పరిచయం</em> చదువండి</a>.</"
-"p><p>ప్రదర్శకాన్ని ఎలా వాడాలో తెలిపే కొంత సమాచారాన్ని <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>VLC మాధ్యమ ప్రదర్శకంతో ఫైళ్ళను ఎలా ఆడించాలి</em></a>\" "
-"పత్రంలో చూడగలరు.</p><p>భద్రపరుచుట, పరివర్తించుట, ట్రాన్సుకోడింగు, ఎన్కోడింగు, మక్సింగు మరియు "
-"స్ట్రీమింగు వంటి కర్తవ్యాలకు, <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">స్ట్రీమింగు పత్రీకరణ</a> నందు ఉపయోగపడే సమాచారాన్ని "
-"చూడవచ్చు.</p><p>ఒకవేళ మీకు పదజాలం ఖచ్చితంగా తెలియకపోతే, దయచేసి <a href=\"http://"
-"wiki.videolan.org/Knowledge_Base\">విజ్ఞాన మూలాన్ని</a> సంప్రదించండి.</p><p>ప్రధాన "
-"కీబోర్డు అడ్డదారులను తెలుసుకొనుటకు, <a href=\"http://wiki.videolan.org/"
-"Hotkeys\">అడ్డదారులు</a> పేజీని చదువండి.</p><h3>సహాయం</h3><p>ఏదైనా ప్రశ్న అడిగేముందు, "
-"దయచేసి <a href=\"http://www.videolan.org/support/faq.html\">FAQ</a> చదువండి.</"
-"p><p>ఆ తరువాత <a href=\"http://forum.videolan.org\">చర్చావేదికలు</a>, <a "
-"href=\"http://www.videolan.org/vlc/lists.html\">మెయిలింగు-జాబితాలు</a> లేదా మా IRC "
-"ఛానల్ (<em>#videolan</em> on irc.freenode.net) నందు సహాయం పొందండి (మరియు చెయ్యండి).</"
-"p><h3>పరియోజనకు సహాయం చెయ్యండి</h3><p>తొడుగులను రూపొందించుటకు, పత్రీకరణను అనువదించుటకు, "
-"కోడును పరీక్షించుటకు మీ విలువైన సమయాన్ని కొంత వెచ్చించుట ద్వారా వీడియోల్యాన్ పరిజయోన సంఘానికి "
-"సహాయపడవచ్చును. మాకు సహాయం చేయడానికి నిధులను మరియు సామాగ్రిని కూడా ఇవ్వవచ్చు. అంతేకాకుండా, మీరు VLC "
-"మాధ్యమ ప్రదర్శకాన్ని <b>ప్రోత్సాహించవచ్చు</b>.</p></body></html>"
+"h2><h3>పత్రీకరణ</h3><p>VLC పత్రీకరణను వీడియోల్యాన్ యొక్క <a href=\"http://wiki.videolan."
+"org\">వికీ</a> వెబ్‌సైటులో చూడవచ్చు.</p><p>ఒకవేళ మీరు VLC మాధ్యమ ప్రదర్శకానికి కొత్త అయితే, "
+"దయచేసి<br><a href=\"http://wiki.videolan.org/Documentation:"
+"VLC_for_dummies\"><em>VLC మాధ్యమ ప్రదర్శకం పరిచయం</em> చదువండి</a>.</p><p>ప్రదర్శకాన్ని "
+"ఎలా వాడాలో తెలిపే కొంత సమాచారాన్ని <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>VLC మాధ్యమ ప్రదర్శకంతో ఫైళ్ళను ఎలా ఆడించాలి</em></a>\" పత్రంలో చూడగలరు.</"
+"p><p>భద్రపరుచుట, పరివర్తించుట, ట్రాన్సుకోడింగు, ఎన్కోడింగు, మక్సింగు మరియు స్ట్రీమింగు వంటి "
+"కర్తవ్యాలకు, <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">స్ట్రీమింగు పత్రీకరణ</a> నందు ఉపయోగపడే సమాచారాన్ని చూడవచ్చు.</p><p>ఒకవేళ "
+"మీకు పదజాలం ఖచ్చితంగా తెలియకపోతే, దయచేసి <a href=\"http://wiki.videolan.org/"
+"Knowledge_Base\">విజ్ఞాన మూలాన్ని</a> సంప్రదించండి.</p><p>ప్రధాన కీబోర్డు అడ్డదారులను "
+"తెలుసుకొనుటకు, <a href=\"http://wiki.videolan.org/Hotkeys\">అడ్డదారులు</a> పేజీని "
+"చదువండి.</p><h3>సహాయం</h3><p>ఏదైనా ప్రశ్న అడిగేముందు, దయచేసి <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a> చదువండి.</p><p>ఆ తరువాత <a "
+"href=\"http://forum.videolan.org\">చర్చావేదికలు</a>, <a href=\"http://www."
+"videolan.org/vlc/lists.html\">మెయిలింగు-జాబితాలు</a> లేదా మా IRC ఛానల్ (<em>#videolan</"
+"em> on irc.freenode.net) నందు సహాయం పొందండి (మరియు చెయ్యండి).</p><h3>పరియోజనకు సహాయం "
+"చెయ్యండి</h3><p>తొడుగులను రూపొందించుటకు, పత్రీకరణను అనువదించుటకు, కోడును పరీక్షించుటకు మీ "
+"విలువైన సమయాన్ని కొంత వెచ్చించుట ద్వారా వీడియోల్యాన్ పరిజయోన సంఘానికి సహాయపడవచ్చును. మాకు సహాయం చేయడానికి "
+"నిధులను మరియు సామాగ్రిని కూడా ఇవ్వవచ్చు. అంతేకాకుండా, మీరు VLC మాధ్యమ ప్రదర్శకాన్ని "
+"<b>ప్రోత్సాహించవచ్చు</b>.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -2149,8 +2149,8 @@ msgstr "మూల రూప నిష్పత్తి"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 
@@ -2907,9 +2907,8 @@ msgstr "HTTP ప్రోక్సీ"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 
 #: src/libvlc-module.c:853
@@ -5720,8 +5719,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -7995,8 +7994,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8020,9 +8019,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "ప్రవాహం %d"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8458,9 +8456,9 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -10789,9 +10787,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "అన్ని దస్త్రాలు"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -10858,8 +10855,8 @@ msgstr ""
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 
 #: modules/codec/dvbsub.c:95
@@ -11542,10 +11539,10 @@ msgstr ""
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -12718,7 +12715,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16912,9 +16908,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "ప్రదర్శనజాబితాను భద్రపర్చు"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -20460,9 +20455,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "ఆడియోని చేతనపరుచు"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -26293,38 +26287,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "వీడియో కొడెక్"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
 msgid "Select the upscaling mode for video."
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "బిట్స్ పర్ సాంపిల్"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "మాదిరిరేటు"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "వీడియో కొడెక్‌లు"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "విభాజకత"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "అవుట్‌పుట్ పర్వికాలు"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -26335,9 +26323,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "ఎల్లప్పుడు పైన ఉంచు"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -27379,9 +27366,8 @@ msgstr "సంభాషణ"
 #: modules/gui/qt/ui/sprefs_interface.h:532
 #: modules/gui/qt/ui/sprefs_subtitles.h:288
 #: modules/gui/qt/ui/sprefs_video.h:310 modules/gui/qt/ui/streampanel.h:165
-#, fuzzy
 msgid "Form"
-msgstr "ఆకృతి"
+msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:132
 msgid "Preset"
@@ -27392,9 +27378,8 @@ msgid "0.00 dB"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "శ్రవ్యక అమరికలు"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
@@ -27405,18 +27390,16 @@ msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "శ్రవ్యక అమరికలు"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:138
-#, fuzzy
 msgid "&Filter:"
-msgstr "వడబోత:"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
 msgid "&Save as..."
@@ -27435,9 +27418,8 @@ msgid "Show &more options"
 msgstr "మరిన్ని ఐచ్ఛికాలను చూపించు (&m)"
 
 #: modules/gui/qt/ui/open.h:263
-#, fuzzy
 msgid "Change the caching for the media"
-msgstr "మాధ్యమం ప్రారంభ సమయాన్ని మార్చు"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:265
 msgid " ms"
@@ -27452,9 +27434,8 @@ msgid "Start Time"
 msgstr "ప్రారంభ సమయం"
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Stop Time"
-msgstr "ఆగు సమయం"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:269
 msgid "Edit Options"
@@ -27481,9 +27462,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:283
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "మాధ్యమం ప్రారంభ సమయాన్ని మార్చు"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:286
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27542,14 +27522,12 @@ msgid "Audio and Subtitles"
 msgstr "ఆడియో మరియు ఉపశీర్షికలు"
 
 #: modules/gui/qt/ui/open_file.h:142
-#, fuzzy
 msgid "Use a sub&title file"
-msgstr "ఉపశీర్షిక దస్త్రాన్ని వాడు"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:144
-#, fuzzy
 msgid "Select the subtitle file"
-msgstr "దస్త్రాన్ని ఎంచుకొను"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:148
 msgid "Choose one or more media file to open"
@@ -27576,18 +27554,16 @@ msgid "Please enter a network URL:"
 msgstr "దయచేసి ఒక నెట్‌వర్క్ URL ప్రవేశపెట్టండి:"
 
 #: modules/gui/qt/ui/profiles.h:699
-#, fuzzy
 msgid "Profile edition"
-msgstr "ప్రవర పేరు"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:700
 msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV మక్సర్"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "Ogg/Ogm"
@@ -27610,9 +27586,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "RAW"
@@ -27647,46 +27622,40 @@ msgid "Features"
 msgstr "విశిష్టతలు"
 
 #: modules/gui/qt/ui/profiles.h:717
-#, fuzzy
 msgid "Streamable"
-msgstr "ప్రవాహం పేరు"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:718
 msgid "Chapters"
 msgstr "అధ్యాయాలు"
 
 #: modules/gui/qt/ui/profiles.h:721
-#, fuzzy
 msgid "Menus"
-msgstr "మెను"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "మాదిరి రేటు"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:729
-#, fuzzy
 msgid "Same as source"
-msgstr "వనరు"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid " fps"
 msgstr " fps"
 
 #: modules/gui/qt/ui/profiles.h:732
-#, fuzzy
 msgid "Custom options"
-msgstr "స్వరూపణం ఐచ్ఛికాలు"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid "&Quality"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:734 modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "Not Used"
-msgstr "అమర్చలేదు"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:755
 msgid " kb/s"
@@ -27697,38 +27666,32 @@ msgid "Encoding parameters"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:740
-#, fuzzy
 msgid "Frame size"
-msgstr "చట్రం రేటు"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:743 modules/gui/qt/ui/profiles.h:746
-#, fuzzy
 msgid "px"
-msgstr " px"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:756
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "మాదిరి రేటు"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:764
-#, fuzzy
 msgid "Profile &Name"
-msgstr "ప్రవర పేరు"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:200
-#, fuzzy
 msgid "Set up media sources to stream"
-msgstr "అన్ని ఐచ్ఛికాలను చూచుటకు \"అధునాతన ఐచ్ఛికాలు\" ఎంచుకోండి."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Destination Setup"
 msgstr "గమ్యం అమరిక"
 
 #: modules/gui/qt/ui/sout.h:203
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "అన్ని ఐచ్ఛికాలను చూచుటకు \"అధునాతన ఐచ్ఛికాలు\" ఎంచుకోండి."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:204
 msgid ""
@@ -27745,14 +27708,12 @@ msgid "Display locally"
 msgstr "స్థానికంగా ప్రదర్శించు"
 
 #: modules/gui/qt/ui/sout.h:209
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "అధునాతన ఐచ్ఛికాలు"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:210
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "అన్ని ఐచ్ఛికాలను చూచుటకు \"అధునాతన ఐచ్ఛికాలు\" ఎంచుకోండి."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:211
 msgid "Activate Transcoding"
@@ -27763,9 +27724,8 @@ msgid "Option Setup"
 msgstr "ఐచ్ఛిక అమరిక"
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr "అన్ని ఐచ్ఛికాలను చూచుటకు \"అధునాతన ఐచ్ఛికాలు\" ఎంచుకోండి."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Miscellaneous Options"
@@ -27776,9 +27736,8 @@ msgid "Stream all elementary streams"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "సాధారణ ప్రవాహం అవుట్‌పుట్ అమరికలు"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid " %"
@@ -27801,9 +27760,8 @@ msgid "Visualization:"
 msgstr "దృశ్యమానములు:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:420
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "ఆడియోని చేతనపరుచు"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
 msgid "Replay gain mode:"
@@ -27882,9 +27840,8 @@ msgid "RTP over RTSP (TCP)"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:372
-#, fuzzy
 msgid "Live555 stream transport"
-msgstr "HTTP ప్రత్యక్ష ప్రవాహం అవుట్‌పుట్"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:373
 msgid "Default caching policy"
@@ -27935,18 +27892,16 @@ msgid "Force window style:"
 msgstr "బలవంతపు కిటికీ శైలి:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
-#, fuzzy
 msgid "Integrate video in interface"
-msgstr "ప్రధాన అంతరవర్తికి అమరికలు"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:548
 msgid "Show systray icon"
 msgstr "వ్యవస్థపళ్ళెం ప్రతీకను చూపించు"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "ప్రధాన అంతరవర్తికి అమరికలు"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use a dark palette"
@@ -27957,9 +27912,8 @@ msgid "Skin resource file:"
 msgstr "తొడుగు మూల దస్త్రం:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:553
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "ఆడించు మరియు ఆపు"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:556
 msgid "Pause on the last frame of a video"
@@ -28018,9 +27972,8 @@ msgid "Default encoding"
 msgstr "అప్రమేయ ఎన్కోడింగ్"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
-#, fuzzy
 msgid "Subtitle effects"
-msgstr "ఉపశీర్షిక కోడెక్లు"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:303
 msgid "Add a shadow"
@@ -28043,9 +27996,8 @@ msgid "Add a background"
 msgstr "ఒక నేపథ్యాన్ని జతచేయి"
 
 #: modules/gui/qt/ui/sprefs_video.h:313
-#, fuzzy
 msgid "O&utput"
-msgstr "అవుట్‌పుట్"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "DirectX"
@@ -28141,18 +28093,16 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1279
-#, fuzzy
 msgid "Negate colors"
-msgstr "సంచయాన్ని సృష్టించు"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1292
 msgid "Colors"
 msgstr "రంగులు"
 
 #: modules/gui/qt/ui/video_effects.h:1293
-#, fuzzy
 msgid "Interactive Zoom"
-msgstr "అంతరవర్తి"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Angle"
@@ -28184,9 +28134,8 @@ msgid "Anaglyph 3D"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1326
-#, fuzzy
 msgid "Mirror"
-msgstr "దోషం"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1330
 msgid "Motion detect"
@@ -28201,9 +28150,8 @@ msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1336
-#, fuzzy
 msgid "Soften"
-msgstr "సాఫ్ట్"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1337
 msgid "Denoiser"

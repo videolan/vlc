@@ -9,14 +9,14 @@
 # iskr <iscreamd@gmail.com>, 2013
 # Schafer Gergő <gergoschafer@gmail.com>, 2017
 # F E <efi99@freemail.hu>, 2021
-# Balázs Meskó <meskobalazs@mailbox.org>, 2022
+# Balázs Meskó <meskobalazs@mailbox.org>, 2022-2025
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2022\n"
+"Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2025\n"
 "Language-Team: Hungarian (https://app.transifex.com/yaron/teams/16553/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -255,7 +255,7 @@ msgstr "Hangkodekek"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr "A csak hangkódolók és dekódolók beállításai."
+msgstr "A csak hanghoz való dekódolók és kódolók beállításai."
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
@@ -263,7 +263,8 @@ msgstr "Feliratkodekek"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
-msgstr "A feliratok, teletext és CC-dekódolók és -kódolók beállításai."
+msgstr ""
+"A feliratok, a teletext és a CC-dekódolók illetve -kódolók beállításai."
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
@@ -585,21 +586,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -611,8 +612,8 @@ msgstr ""
 "charset=utf-8” /></head><body><h2>Üdvözli a VLC médialejátszó súgója</"
 "h2><h3>Dokumentáció</h3><p>A VLC dokumentációját a VideoLAN <a href=\"http://"
 "wiki.videolan.org\">wiki</a> webhelyén találhatja meg.</p><p>Ha még nem "
-"használta a VLC médialejátszót, akkor olvassa el a <br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>VLC médialejátszó "
+"használta a VLC médialejátszót, akkor olvassa el a <br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>VLC médialejátszó "
 "bemutatása</em></a> című oldalt.</p><p>A lejátszó használatáról a <br>„<a "
 "href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>Hogyan lehet "
 "fájlokat lejátszani a VLC médialejátszóval</em></a>” dokumentumban olvashat. "
@@ -626,12 +627,12 @@ msgstr ""
 "Hotkeys\">gyorsbillentyűk</a> oldalt. </p><h3>Segítség</h3><p>Kérdések "
 "feltétele előtt tekintse meg a <a href=\"http://wiki.videolan.org/"
 "Frequently_Asked_Questions\">Gyakran ismételt kérdéseket</a>.</p><p>Ezután "
-"segítséget kérhet (és adhat) a <a href=\"http://"
-"forum.videolan.org\">fórumokon</a>, a <a href=\"http://www.videolan.org/vlc/"
-"lists.html\">levelezőlistákon</a> vagy az IRC csatornán (<a href=\"http://"
-"www.videolan.org/webirc/\"><em>#videolan</em></a> az irc.freenode.net "
-"hálózaton).</p><h3>Közreműködés a projektben</h3><p>Szabadideje egy részének "
-"a közösségre áldozásával: sminkek tervezésével, a dokumentáció fordításával, "
+"segítséget kérhet (és adhat) a <a href=\"http://forum.videolan."
+"org\">fórumokon</a>, a <a href=\"http://www.videolan.org/vlc/lists."
+"html\">levelezőlistákon</a> vagy az IRC csatornán (<a href=\"http://www."
+"videolan.org/webirc/\"><em>#videolan</em></a> az irc.freenode.net hálózaton)."
+"</p><h3>Közreműködés a projektben</h3><p>Szabadideje egy részének a "
+"közösségre áldozásával: sminkek tervezésével, a dokumentáció fordításával, "
 "teszteléssel és programozással segítheti a VideoLAN projektet. Ezen kívül "
 "anyagilag és felszerelésekkel is segíthet. Természetesen <b>népszerűsítheti</"
 "b> is a VLC médialejátszót.</p></body></html>"
@@ -1292,7 +1293,8 @@ msgstr "A bemenet nem nyitható meg"
 #: src/input/input.c:2764
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
-msgstr "A VLC nem képes megnyitni a(z) „%s” MRL-t."
+msgstr ""
+"A VLC nem képes megnyitni a(z) „%s” MRL-t. A részletekért nézze meg a naplót."
 
 #: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:409
 #: modules/gui/macosx/VLCMainMenu.m:410
@@ -1534,7 +1536,7 @@ msgstr ""
 
 #: src/libvlc-module.c:68
 msgid "Interface module"
-msgstr "Felületmodul"
+msgstr "Felületi modul"
 
 #: src/libvlc-module.c:70
 msgid ""
@@ -1856,11 +1858,11 @@ msgstr ""
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
-msgstr "Zajvédelem"
+msgstr "Hangcsúcsvédelem "
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr "Védelem a hangugrás ellen"
+msgstr "Védelem a hangcsúcsok ellen"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
@@ -1918,7 +1920,7 @@ msgstr ""
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:311
 msgid "Enable video"
-msgstr "Video engedélyezése"
+msgstr "Videó engedélyezése"
 
 #: src/libvlc-module.c:260
 msgid ""
@@ -1995,7 +1997,7 @@ msgstr ""
 
 #: src/libvlc-module.c:288
 msgid "Video alignment"
-msgstr "Kép igazítása"
+msgstr "Videó igazítása"
 
 #: src/libvlc-module.c:290
 msgid ""
@@ -2176,7 +2178,7 @@ msgstr "Váltottsorosság-mentesítési mód"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr "A videofeldolgozáshoz használandó váltottsorosság-mentesítési módszer."
+msgstr "A videófeldolgozáshoz használandó váltottsorosság-mentesítési módszer."
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
@@ -2227,15 +2229,15 @@ msgstr ""
 
 #: src/libvlc-module.c:379
 msgid "Video splitter module"
-msgstr "Videoszétválasztó modul"
+msgstr "Videószétválasztó modul"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
-msgstr "Ez videoszétválasztókat vesz fel, mint a klónozás vagy a fal"
+msgstr "Ez videószétválasztókat add hozzá, mint a klónozás vagy a fal"
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
-msgstr "Videoszűrő modul"
+msgstr "Videószűrő modul"
 
 #: src/libvlc-module.c:385
 msgid ""
@@ -2247,27 +2249,27 @@ msgstr ""
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
-msgstr "Video-pillanatképek könyvtára (vagy fájlnév)"
+msgstr "Videó-pillanatképek könyvtára (vagy fájlneve)"
 
 #: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
-msgstr "A videó pillanatképek tárolására használt könyvtár."
+msgstr "A videó-pillanatképek tárolására használt könyvtár."
 
 #: src/libvlc-module.c:393 src/libvlc-module.c:395
 msgid "Video snapshot file prefix"
-msgstr "Video-pillanatképek fájlelőtagja"
+msgstr "Videó-pillanatképek fájlelőtagja"
 
 #: src/libvlc-module.c:397
 msgid "Video snapshot format"
-msgstr "Videó pillanatképek formátuma"
+msgstr "Videó-pillanatképek formátuma"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
-msgstr "A video-pillanatképek tárolására használandó képformátum"
+msgstr "A videó-pillanatképek tárolására használandó képformátum"
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
-msgstr "Videó pillanatkép előnézet készítése"
+msgstr "Videó pillanatkép-előnézetének megjelenítése"
 
 #: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
@@ -2329,8 +2331,8 @@ msgstr "Forrás méretaránya"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Ez kényszeríti a forrás méretarányát. Például egyes DVD-k azt állítják, hogy "
@@ -3224,13 +3226,12 @@ msgstr "HTTP proxy"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
-"Használandó HTTP proxy, a következő formában: http://"
-"[felhasználó[:jelszó]@]proxy.tartomány:port/ ; ha üres, akkor a http_proxy "
-"környezeti változó kerül felhasználásra."
+"Használandó HTTP proxy, a következő formában: http://[felhasználó[:"
+"jelszó]@]proxy.tartomány:port/ ; ha üres, akkor a http_proxy környezeti "
+"változó kerül felhasználásra."
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
@@ -6210,8 +6211,8 @@ msgstr "Nem található bemeneti hangeszköz"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Úgy tűnik, nincs megfelelő hangbemeneti eszköz a Machez csatlakoztatva. "
 "Ellenőrizze a csatlakozókat és az illesztőprogramokat."
@@ -6422,9 +6423,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "A használandó CDDB kiszolgáló címe."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8673,12 +8673,12 @@ msgstr "SMB hitelesítés szükséges"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "A számítógéphez (%s), amelyhez kapcsolódni próbál, hitelesítés szükséges.\n"
-"Adjon meg egy felhasználónevet (ideálisan tartománynévvel, "
-"TARTOMÁNY;felhasználónév formátumban) és egy jelszót."
+"Adjon meg egy felhasználónevet (ideálisan tartománynévvel, TARTOMÁNY;"
+"felhasználónév formátumban) és egy jelszót."
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
 msgid "SRT"
@@ -8703,9 +8703,8 @@ msgid "Password for stream encryption"
 msgstr "Jelszó az adatfolyam titkosításához"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRT folyamkimenet"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9154,15 +9153,14 @@ msgstr "v4l2 meghajtó vezérlése"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "A v4l2 meghajtó vezérlésének beállítása a kapcsos zárójelek között megadott, "
-"vesszőkkel elválasztott értékekkel (például: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3}). Az elérhető vezérlési "
-"lehetőségekért növelje a részletességet (-vvv) vagy használja a v4l2-ctl "
-"alkalmazást."
+"vesszőkkel elválasztott értékekkel (például: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3}). Az elérhető vezérlési lehetőségekért növelje a "
+"részletességet (-vvv) vagy használja a v4l2-ctl alkalmazást."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9736,14 +9734,12 @@ msgid "SRT stream output"
 msgstr "SRT folyamkimenet"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "RIST maximális csomagméret"
+msgstr ""
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "RIST maximális csomagméret"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11707,9 +11703,8 @@ msgstr ""
 "automatikus"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Minden fájl"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11778,8 +11773,8 @@ msgstr "Alkép helyzete"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Az alkép helyzetének kényszerítése a videóhoz képest (0=középre, 1=balra, "
 "2=jobbra, 4=fent, 8=lent, illetve ezek kombinációja összegezve, például "
@@ -12553,10 +12548,10 @@ msgstr "Arány vezérlés pontossága"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "Az „avbr” (átlagos változó bitsebesség) módszer tűrési százaléka. Például a "
 "10 a 800 kbps bitsebesség mellett azt jelenti, hogy a kódoló megpróbál a 720 "
@@ -13142,7 +13137,7 @@ msgstr "A DVD-feliratokban használt összes átlátszósági effektus eltávol�
 
 #: modules/codec/spudec/spudec.c:50
 msgid "DVD subtitles decoder"
-msgstr "DVD feliratdekódoló"
+msgstr "DVD-feliratdekódoló"
 
 #: modules/codec/spudec/spudec.c:51
 msgid "DVD subtitles"
@@ -13150,7 +13145,7 @@ msgstr "DVD-feliratok"
 
 #: modules/codec/spudec/spudec.c:60
 msgid "DVD subtitles packetizer"
-msgstr "DVD feliratdaraboló"
+msgstr "DVD-feliratdaraboló"
 
 #: modules/codec/stl.c:47
 msgid "EBU STL subtitles decoder"
@@ -13822,7 +13817,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16177,8 +16171,8 @@ msgstr "Extra paraméter"
 #: modules/demux/mpeg/ts.c:86
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
-"Lehetővé teszi a felhasználónak extra paraméter meghatározását "
-"(pmt_pid=pid:folyam_típus[,…])"
+"Lehetővé teszi a felhasználónak extra paraméter meghatározását (pmt_pid=pid:"
+"folyam_típus[,…])"
 
 #: modules/demux/mpeg/ts.c:88
 msgid "Set id of ES to PID"
@@ -17473,7 +17467,7 @@ msgstr "Napló frissítése"
 
 #: modules/gui/macosx/VLCLogWindowController.m:108
 msgid "Refresh the log output"
-msgstr "Napló kimenet frissítése"
+msgstr "Naplókimenet frissítése"
 
 #: modules/gui/macosx/VLCLogWindowController.m:110
 msgid "Clear log"
@@ -17481,11 +17475,11 @@ msgstr "Napló törlése"
 
 #: modules/gui/macosx/VLCLogWindowController.m:111
 msgid "Clear the log output"
-msgstr "Napló kimenet törlése"
+msgstr "Naplókimenet törlése"
 
 #: modules/gui/macosx/VLCLogWindowController.m:113
 msgid "Toggle details"
-msgstr "Részletek kapcsolása"
+msgstr "Részletek be/ki"
 
 #: modules/gui/macosx/VLCLogWindowController.m:114
 msgid "Show/hide details about a log message"
@@ -17494,7 +17488,7 @@ msgstr "Egy naplóüzenet részleteinek megjelenítése/elrejtése"
 #: modules/gui/macosx/VLCLogWindowController.m:198
 #, c-format
 msgid "VLC Debug Log (%s).txt"
-msgstr "VLC Hibakeresési Napló (%s).txt"
+msgstr "VLC hibakeresési napló (%s).txt"
 
 #: modules/gui/macosx/VLCMain+OldPrefs.m:118
 msgid "Remove old preferences?"
@@ -17620,7 +17614,7 @@ msgstr "Beillesztés"
 
 #: modules/gui/macosx/VLCMainMenu.m:371 modules/gui/macosx/VLCPlaylist.m:227
 msgid "Select All"
-msgstr "Mindent kijelöl"
+msgstr "Összes kijelölése"
 
 #: modules/gui/macosx/VLCMainMenu.m:372
 msgid "Find"
@@ -17636,7 +17630,7 @@ msgstr "Előző és Következő gombok megjelenítése"
 
 #: modules/gui/macosx/VLCMainMenu.m:377 modules/gui/macosx/macosx.m:119
 msgid "Show Shuffle & Repeat Buttons"
-msgstr "A Véletlen és Ismétlés gombok megjelenítése"
+msgstr "Keverés és Ismétlés gombok megjelenítése"
 
 #: modules/gui/macosx/VLCMainMenu.m:379 modules/gui/macosx/macosx.m:122
 msgid "Show Audio Effects Button"
@@ -17901,7 +17895,7 @@ msgstr "Feliratkozás podcastra"
 #: modules/gui/macosx/VLCMainWindow.m:225
 #: modules/gui/qt/components/playlist/selector.cpp:581
 msgid "Enter URL of the podcast to subscribe to:"
-msgstr "Adja meg a podcast URL-címét a feliratkozáshoz:"
+msgstr "Adja meg a podcast webcímét a feliratkozáshoz:"
 
 #: modules/gui/macosx/VLCMainWindow.m:230
 msgid "Unsubscribe from a podcast"
@@ -17969,7 +17963,7 @@ msgstr "Forrás megnyitása"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:131
 msgid "Media Resource Locator (MRL)"
-msgstr "Media Resource Locator (MRL, médiaforrás leíró)"
+msgstr "Media Resource Locator (MRL, médiaforrásleíró)"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:133
 #: modules/gui/macosx/VLCOpenWindowController.m:193
@@ -18181,7 +18175,7 @@ msgstr "Felirat igazítása"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:366
 msgid "Dismiss the subtitle setup dialog"
-msgstr "A felirat beállítási ablak bezárása"
+msgstr "Feliratbeállítási párbeszédablak bezárása"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:367
 msgid "Font Properties"
@@ -18236,7 +18230,7 @@ msgstr "Átkódolás beállításai"
 
 #: modules/gui/macosx/VLCOutput.m:85 modules/gui/macosx/VLCOutput.m:95
 msgid "Bitrate (kb/s)"
-msgstr "Bitsebesség (kb/mp)"
+msgstr "Bitsebesség (kb/s)"
 
 #: modules/gui/macosx/VLCOutput.m:102
 msgid "Stream Announcing"
@@ -18245,7 +18239,7 @@ msgstr "Közvetítés bejelentése"
 #: modules/gui/macosx/VLCOutput.m:413
 #: modules/gui/qt/components/preferences_widgets.cpp:302
 msgid "Save File"
-msgstr "Fájlmentés"
+msgstr "Fájl mentése"
 
 #: modules/gui/macosx/VLCPlaylist.m:90
 msgid "Track Number"
@@ -18275,9 +18269,8 @@ msgstr "Összes összecsukása"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Lejátszólista mentése"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18377,7 +18370,7 @@ msgstr "MÉDIATÁR"
 
 #: modules/gui/macosx/VLCSidebarDataSource.m:72
 msgid "MY COMPUTER"
-msgstr "SAJÁTGÉP"
+msgstr "SAJÁT SZAMÍTÓGÉP"
 
 #: modules/gui/macosx/VLCSidebarDataSource.m:73
 msgid "DEVICES"
@@ -18418,7 +18411,7 @@ msgstr "Felirat és képernyőkijelzés (OSD) beállításai"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:249
 msgid "Input & Codec Settings"
-msgstr "Bemenet és kodekek beállításai"
+msgstr "Bemeneti és kodekbeállítások"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
 msgid "General Audio"
@@ -18478,7 +18471,7 @@ msgstr "A felvételek tárolására használandó könyvtár vagy fájlnév"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Repair AVI Files"
-msgstr "AVI fájlok javítása"
+msgstr "AVI-fájlok javítása"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:306
 msgid "Default Caching Level"
@@ -18494,7 +18487,7 @@ msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
 msgstr ""
-"Használja a részletes beállításokat egyéni gyorsítótárazási értékek "
+"Használja a részletes beállításokat az egyéni gyorsítótárazási értékek "
 "beállításához az egyes hozzáférési modulokhoz."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:309
@@ -18564,7 +18557,7 @@ msgstr "Lejátszás viselkedése"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "Enable notifications on playlist item change"
-msgstr "Értesítések engedélyezése lejátszólista elem váltásakor"
+msgstr "Értesítések engedélyezése lejátszólista-elemváltáskor"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:339
 #: modules/gui/macosx/macosx.m:125
@@ -18671,7 +18664,7 @@ msgstr "A natív teljes képernyős mód használata"
 #: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/qt/ui/sprefs_video.h:327
 msgid "Video snapshots"
-msgstr "Videó pillanatképek"
+msgstr "Videó-pillanatképek"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:382
 #: modules/meta_engine/folder.c:70
@@ -18737,7 +18730,7 @@ msgstr "Legnagyobb késleltetés"
 #: modules/gui/macosx/VLCSimplePrefsController.m:835
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
-msgstr "Beállítások visszaállítása"
+msgstr "Beállítások alaphelyzetbe állítása"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:838
 msgid ""
@@ -18751,7 +18744,7 @@ msgid ""
 "\n"
 "Are you sure you want to continue?"
 msgstr ""
-"Ez alapállapotba állítja a VLC médialejátszó beállításait.\n"
+"Ez alaphelyzetbe állítja a VLC médialejátszó beállításait.\n"
 "\n"
 "Ne feledje, hogy a VLC újra fog indulni a folyamat során, így a jelenlegi "
 "lejátszólista törlésre kerül, és az esetleg folyamatban lévő lejátszási, "
@@ -18759,7 +18752,7 @@ msgstr ""
 "\n"
 "A médiagyűjteményt ez nem befolyásolja.\n"
 "\n"
-"Biztosan folytatja?"
+"Biztos, hogy folytatja?"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1108
 msgid ""
@@ -18786,7 +18779,7 @@ msgid ""
 "Press new keys for\n"
 "\"%@\""
 msgstr ""
-"Nyomja meg a következő új billentyűit:\n"
+"Nyomja meg az új billentyűket a következőhöz:\n"
 " „%@”"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1462
@@ -18817,7 +18810,7 @@ msgstr "Főablak megjelenítése"
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
 msgid "Path/URL Action"
-msgstr "Útvonal/URL művelet"
+msgstr "Útvonal- vagy webcímművelet"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
 msgid "Nothing playing"
@@ -18829,7 +18822,7 @@ msgstr "Válasszon fájlt a Finderben"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
 msgid "Copy URL to clipboard"
-msgstr "URL másolása a vágólapra"
+msgstr "Webcím vágólatra másolása"
 
 #: modules/gui/macosx/VLCStringUtility.m:242
 msgid "Not Set"
@@ -18837,7 +18830,7 @@ msgstr "Nincs beállítva"
 
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
 msgid "sec."
-msgstr "mp"
+msgstr "mp."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1442 modules/gui/qt/qt.cpp:216
@@ -18903,7 +18896,7 @@ msgid ""
 "Set 0 to disable."
 msgstr ""
 "Felirat hosszának újraszámolása a\n"
-"tartalmuk és ezen érték alapján.\n"
+"tartalma és ezen érték alapján.\n"
 "0=kikapcsolás."
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:188
@@ -21970,9 +21963,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "A nem fontos hiba- és figyelmeztető párbeszédablakok megjelenítése"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Szoftveres mód bekapcsolása"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -22315,19 +22307,16 @@ msgstr ""
 "A kép gamma értékének beállítása 0.01 és 10 között. Az alapértelmezés az 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Sztereójavító"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "&Képkockasebesség"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Oldalsáv megjelenítése"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22812,8 +22801,8 @@ msgid ""
 msgstr ""
 "Parancsok elfogadása ebből a forrásból. A CLI alapértelmezettje a szabványos "
 "bemenet, de képes egyszerű TCP-foglalathoz is csatlakozni "
-"(„localhost:4212”), vagy a telnet protokollt használni („telnet://"
-"0.0.0.0:4212”)"
+"(„localhost:4212”), vagy a telnet protokollt használni "
+"(„telnet://0.0.0.0:4212”)"
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
@@ -27801,8 +27790,8 @@ msgid ""
 "Prefix of the output images filenames. Output filenames will have the "
 "\"prefixNUMBER.format\" form if replace is not true."
 msgstr ""
-"A kimeneti képek fájlnevének előtagja. A kimeneti fájlok neve "
-"„előtagSORSZÁM.formátum” alakú lesz, ha a helyettesítés nincs bekapcsolva."
+"A kimeneti képek fájlnevének előtagja. A kimeneti fájlok neve „előtagSORSZÁM."
+"formátum” alakú lesz, ha a helyettesítés nincs bekapcsolva."
 
 #: modules/video_filter/scene.c:81
 msgid "Directory path prefix"
@@ -28256,39 +28245,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Ajánlott videokimenet a Windows 8 és újabb verziókhoz"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Video átméretezése"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Válasszon ki egy színt a videóban"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bitek mintánként"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "SoX újramintavételező"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Videokodekek"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Felbontás"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Kimeneti modulok"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -28299,9 +28281,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Mindig felül"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -29437,24 +29418,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Ujjlenyomat"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Válasszon közvetítési módszert"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Hanglenyomat követése (az Acoustid alapján)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Ujjlenyomat"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29697,9 +29674,8 @@ msgid "Menus"
 msgstr "Menük"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Minta&vételi frekvencia"
+msgstr "&Képkockasebesség"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29971,9 +29947,8 @@ msgid "Auto raising the interface:"
 msgstr "A felület automatikus feldobása:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Sminkelt lejátszólista használata"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30288,21 +30263,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Médiakezelési lista"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP csatornalista"
-
-#~ msgid "Master List"
-#~ msgstr "Fő lista"
-
-#~ msgid "Server List"
-#~ msgstr "Kiszolgálólista"
-
-#~ msgid "Custom List"
-#~ msgstr "Egyéni lista"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "SRT szeletméret (bájtban)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Kriptográfiai kulcs hossza bájtban"

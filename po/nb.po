@@ -27,11 +27,11 @@
 # Alexander Jansen <bornxlo@gmail.com>, 2023
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Alexander Jansen <bornxlo@gmail.com>, 2023\n"
+"Last-Translator: Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2024\n"
 "Language-Team: Norwegian Bokmål (https://app.transifex.com/yaron/teams/16553/"
 "nb/)\n"
 "Language: nb\n"
@@ -599,21 +599,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -631,16 +631,16 @@ msgstr ""
 "href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>hvordan "
 "spille av filer i VLC</em></a>\".</p><p>For alle oppgaver som lagring, "
 "konvertering, omkoding, koding, multipleksing og kringkasting, finner du "
-"nyttig informasjon i <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">kringkastingsdokumentasjonen</a>.</p><p>Hvis "
-"du er usikker på faguttrykkene, kan du ta en titt i <a href=\"http://"
-"wiki.videolan.org/Knowledge_Base\">kunnskapsdatabasen</a>.</p><p>For å lære "
-"de mest vanlige hurtigtastene, kan du lese sida for <a href=\"http://"
-"wiki.videolan.org/Hotkeys\">hurtigtaster</a>.</p><h3>Hjelp</h3><p>Før du "
-"stiller spørsmål, bør du ta en titt i våre <a href=\"http://www.videolan.org/"
-"support/faq.html\">OSS</a>.</p><p>Du kan deretter få (eller gi) hjelp på <a "
-"href=\"http://forum.videolan.org\">forumet</a>, <a href=\"http://"
-"www.videolan.org/vlc/lists.html\">e-postlista</a> eller IRC-kanalen "
+"nyttig informasjon i <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">kringkastingsdokumentasjonen</a>.</p><p>Hvis du er usikker "
+"på faguttrykkene, kan du ta en titt i <a href=\"http://wiki.videolan.org/"
+"Knowledge_Base\">kunnskapsdatabasen</a>.</p><p>For å lære de mest vanlige "
+"hurtigtastene, kan du lese sida for <a href=\"http://wiki.videolan.org/"
+"Hotkeys\">hurtigtaster</a>.</p><h3>Hjelp</h3><p>Før du stiller spørsmål, bør "
+"du ta en titt i våre <a href=\"http://www.videolan.org/support/faq."
+"html\">OSS</a>.</p><p>Du kan deretter få (eller gi) hjelp på <a "
+"href=\"http://forum.videolan.org\">forumet</a>, <a href=\"http://www."
+"videolan.org/vlc/lists.html\">e-postlista</a> eller IRC-kanalen "
 "(<em>#videolan</em> på irc.freenode.net).</p><h3>Bidra til prosjektet</"
 "h3><p>Du kan hjelpe VideoLAN ved å gi bort litt av tiden din til miljøet "
 "vårt. Du kan for eksempel utforme temaer, oversette dokumentasjonen, teste "
@@ -832,16 +832,17 @@ msgstr ""
 "og som overkjører tidligere innstillinger.\n"
 "\n"
 "Strømmens MRL-syntaks:\n"
-"[[tilgang][/demultiplekser]://]URL[#[tittel][:kapittel][-[tittel]"
-"[:kapittel]]]\n"
+"[[tilgang][/demultiplekser]://]URL[#[tittel][:kapittel][-[tittel][:"
+"kapittel]]]\n"
 "[:innstilling=verdi …]\n"
 "\n"
 "Mange av de globale --options kan også bli brukt som spesifikke :options.\n"
 "Flere par av :option=value kan spesifiseres.\n"
 "\n"
 "Nettadressesyntaks:\n"
-"file:///<filbane> Standard mediefil\n"
-"http://<vert>[:port]/<fil> HTTP-nettadresse\n"
+"file:///filbane/fil  Standard mediefil\n"
+"https://<vert>[:port]/fil     HTTPS-nettadresse\n"
+"http://host[:port]/fil     HTTP-nettadresse\n"
 "ftp://<vert>[:port]/<fil> FTP-nettadresse\n"
 "mms://<vert>[:port]/<fil> MMS-nettadresse\n"
 "screen:// Skjermklipp\n"
@@ -2326,8 +2327,8 @@ msgstr "Kildens sideforhold (aspect ratio)"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Dette tvinger frem kildens visningsforhold. For eksempel lyver noen DVD-er "
@@ -3198,9 +3199,8 @@ msgstr "HTTP-mellomtjener"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "HTTP-mellomtjeneren som skal brukes. Den må være i formatet http://"
 "[bruker@]minmellomtjener.mittdomene:minport/ ; dersom feltet er tomt, vil "
@@ -6131,8 +6131,8 @@ msgstr "Ingen lydinngangsenhet funnet"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Mac-en din ser ikke ut til å være utstyrt med en passende lydinndataenhet. "
 "Sjekk tilkoblingene og driverne dine."
@@ -6339,9 +6339,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Adressen til CDDB-tjeneren som skal brukes."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -6621,8 +6620,8 @@ msgid ""
 "Force the DirectShow video input to use a specific chroma format (eg. I420 "
 "(default), RV24, etc.)"
 msgstr ""
-"Tving DirectShow-videoinndataen til å bruke et bestemt krominansformat "
-"(f.eks. standarden İ420, RV24, osv.)"
+"Tving DirectShow-videoinndataen til å bruke et bestemt krominansformat (f."
+"eks. standarden İ420, RV24, osv.)"
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
@@ -8094,19 +8093,19 @@ msgstr "RDP eksternt skrivebord"
 
 #: modules/access/rist.c:65
 msgid "Range"
-msgstr ""
+msgstr "Rekkevidde"
 
 #: modules/access/rist.c:65
 msgid "Bitmask"
-msgstr ""
+msgstr "Bitmaske"
 
 #: modules/access/rist.c:1127 modules/access_output/rist.c:849
 msgid "RIST"
-msgstr ""
+msgstr "RIST"
 
 #: modules/access/rist.c:1128
 msgid "RIST input"
-msgstr ""
+msgstr "RIST-inndata"
 
 #: modules/access/rist.c:1133
 msgid "RIST maximum packet size (bytes)"
@@ -8124,19 +8123,19 @@ msgstr ""
 
 #: modules/access/rist.c:1138
 msgid "RIST latency (ms)"
-msgstr ""
+msgstr "RIST-latens (ms)"
 
 #: modules/access/rist.c:1139
 msgid "RIST nack retry interval (ms)"
-msgstr ""
+msgstr "RIST nack gjenforsøksintervall (ms)"
 
 #: modules/access/rist.c:1141
 msgid "RIST reorder buffer (ms)"
-msgstr ""
+msgstr "RIST omorganisere buffer (ms)"
 
 #: modules/access/rist.c:1143
 msgid "RIST maximum retry count"
-msgstr ""
+msgstr "RIST maksimalt antall gjenforsøk"
 
 #: modules/access/rist.c:1145
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8302,11 +8301,11 @@ msgstr "UDP-mottaksbufferstørrelse (bytes)"
 
 #: modules/access/satip.c:63
 msgid "Request multicast stream"
-msgstr ""
+msgstr "Be om multicast-strøm"
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr ""
+msgstr "Be tjeneren sende strømmen som multicast."
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
@@ -8555,8 +8554,8 @@ msgstr "SMB-autentisering påkrevd"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8577,12 +8576,11 @@ msgstr "SRT-latens (ms)"
 
 #: modules/access/srt.c:440 modules/access_output/srt.c:468
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Passord for strømkryptering"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRT-kringkastingsutdata"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8614,7 +8612,7 @@ msgstr "Genererer for et tidskodeunderbilde som er en hovedstrøm"
 
 #: modules/access/udp.c:61
 msgid "UDP Source timeout (sec)"
-msgstr ""
+msgstr "Tidsavbrudd for UDP-kilder (sek)"
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8698,7 +8696,7 @@ msgstr "Frekvens"
 
 #: modules/access/v4l2/v4l2.c:77
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr ""
+msgstr "Mottakerfrekvens i Hz eller kHz (se avlusingsutdata)"
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -9026,9 +9024,9 @@ msgstr "v4L2-driverkontroller"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -9298,7 +9296,7 @@ msgstr "Filstrømmingsutdata"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
 msgid "Username that will be requested to access the stream."
-msgstr ""
+msgstr "Forespurt brukernavn for tilgang til strømming."
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9446,7 +9444,7 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:824
 msgid "RIST data output caching size (ms)"
-msgstr ""
+msgstr "RIST datautgang caching størrelse (ms)"
 
 #: modules/access_output/rist.c:826
 msgid ""
@@ -9490,11 +9488,11 @@ msgstr ""
 
 #: modules/access_output/rist.c:850
 msgid "RIST stream output"
-msgstr ""
+msgstr "RIST-strømmingsutdata"
 
 #: modules/access_output/rist.c:855
 msgid "RIST target packet size (bytes)"
-msgstr ""
+msgstr "RIST-målpakkestørrelse (byte)"
 
 #: modules/access_output/shout.c:65
 msgid "Name to give to this stream/channel on the shoutcast/icecast server."
@@ -9859,7 +9857,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
-msgstr ""
+msgstr "Hodetelefonmodus (binaural)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
@@ -10718,7 +10716,7 @@ msgstr ""
 
 #: modules/audio_output/jack.c:94
 msgid "JACK client name"
-msgstr ""
+msgstr "JACK-klientnavn"
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
@@ -10906,11 +10904,11 @@ msgstr "AUMIDI"
 
 #: modules/codec/arib/aribsub.c:46
 msgid "Ignore ruby (furigana)"
-msgstr ""
+msgstr "Ignorer ruby (furigana)"
 
 #: modules/codec/arib/aribsub.c:47
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr ""
+msgstr "Ignorer ruby (furigana) i undertittelen."
 
 #: modules/codec/arib/aribsub.c:48
 msgid "Use Core Text renderer"
@@ -10988,7 +10986,7 @@ msgstr "Direkte opptegning"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Show corrupted frames"
-msgstr ""
+msgstr "Vis ødelagte rammer"
 
 #: modules/codec/avcodec/avcodec.h:61
 msgid "Prefer visual artifacts instead of missing frames"
@@ -11547,9 +11545,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Alle filer"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11557,7 +11554,7 @@ msgstr ""
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
-msgstr ""
+msgstr "Dav1d-videodekoder"
 
 #: modules/codec/dca.c:63
 msgid "DTS dynamic range compression"
@@ -11618,8 +11615,8 @@ msgstr "Underbildeplassering"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Du kan fremtvinge underbildets plassering i videoen (0 = midten, 1 = "
 "venstre, 2 = høyre, 4 = øverst, 8 = nederst). Du kan også kombinere "
@@ -12151,7 +12148,7 @@ msgstr "Media Foundation Transform-dekoder"
 
 #: modules/codec/mpg123.c:67
 msgid "MPEG audio decoder using mpg123"
-msgstr ""
+msgstr "MPEG-lyddekoder med bruk av mpg123"
 
 #: modules/codec/oggspots.c:86
 msgid "OggSpots video decoder"
@@ -12364,10 +12361,10 @@ msgstr "RateControls nøyaktighet"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -12807,7 +12804,7 @@ msgstr "Dirac-videodekoder gjennom libschroedinger"
 
 #: modules/codec/scte18.c:41
 msgid "SCTE-18 decoder"
-msgstr ""
+msgstr "SCTE-18-dekoder"
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -13316,11 +13313,11 @@ msgstr "Theora-videokoder"
 
 #: modules/codec/ttml/ttml.c:45
 msgid "TTML decoder"
-msgstr ""
+msgstr "TTML-dekoder"
 
 #: modules/codec/ttml/ttml.c:46
 msgid "TTML subtitles decoder"
-msgstr ""
+msgstr "TTML-undertekstdekoder"
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
@@ -13328,7 +13325,7 @@ msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr ""
+msgstr "TTML-demukser"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13607,7 +13604,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -14679,8 +14675,8 @@ msgid ""
 msgstr ""
 "\n"
 "Advarsel: Om du ikke lengre får tilgang til grensesnittet, åpne et "
-"kommandolinjevindu, gå til katalogen hvor du installerte VLC og kjør \"vlc "
-"-I qt\"\n"
+"kommandolinjevindu, gå til katalogen hvor du installerte VLC og kjør \"vlc -"
+"I qt\"\n"
 
 #: modules/control/lirc.c:47
 msgid "Change the lirc configuration file"
@@ -15228,7 +15224,7 @@ msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Maks bufring (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15236,7 +15232,7 @@ msgstr "Adaptiv logikk"
 
 #: modules/demux/adaptive/adaptive.cpp:82
 msgid "Use regular HTTP modules"
-msgstr ""
+msgstr "Bruk vanlige HTTP-moduler"
 
 #: modules/demux/adaptive/adaptive.cpp:83
 msgid "Connect using HTTP access instead of custom HTTP code"
@@ -15277,7 +15273,7 @@ msgstr "Høyeste båndbredde/kvalitet"
 
 #: modules/demux/adaptive/adaptive.cpp:123
 msgid "Force"
-msgstr ""
+msgstr "Tving"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -17186,7 +17182,7 @@ msgstr "Innholdsliste"
 #: modules/gui/macosx/VLCInputManager.m:478
 #: modules/gui/macosx/VLCInputManager.m:505
 msgid "VLC media playback"
-msgstr ""
+msgstr "VLC medieavspilling"
 
 #: modules/gui/macosx/VLCLogWindowController.m:94
 #: modules/gui/qt/dialogs/messages.cpp:77
@@ -17197,7 +17193,7 @@ msgstr "Meldinger"
 
 #: modules/gui/macosx/VLCLogWindowController.m:104
 msgid "Save log"
-msgstr ""
+msgstr "Lagre logg"
 
 #: modules/gui/macosx/VLCLogWindowController.m:105
 msgid "Save the debug log to a file"
@@ -17205,7 +17201,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:107
 msgid "Refresh log"
-msgstr ""
+msgstr "Oppdater logg"
 
 #: modules/gui/macosx/VLCLogWindowController.m:108
 msgid "Refresh the log output"
@@ -17213,7 +17209,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:110
 msgid "Clear log"
-msgstr ""
+msgstr "Tøm logg"
 
 #: modules/gui/macosx/VLCLogWindowController.m:111
 msgid "Clear the log output"
@@ -18003,9 +17999,8 @@ msgstr "Fold sammen alle"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Lagre spilleliste"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -19054,7 +19049,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:113
 msgid "Dim keyboard backlight during fullscreen playback"
-msgstr ""
+msgstr "Demp tastaturets bakgrunnsbelysning under fullskjermavspilling"
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -20406,8 +20401,8 @@ msgstr "Lagre fil …"
 msgid ""
 "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 msgstr ""
-"Pakkeutvidelser (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv "
-"*.webm)"
+"Pakkeutvidelser (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *."
+"webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:185
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -20734,7 +20729,7 @@ msgstr "Lagre loggfil som …"
 
 #: modules/gui/qt/dialogs/messages.cpp:258
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr ""
+msgstr "Tekst / Logger (*.log *.txt);; Alt (*.*)"
 
 #: modules/gui/qt/dialogs/messages.cpp:264
 msgid "Application"
@@ -21197,7 +21192,7 @@ msgstr "Lagre VLM-oppsett som…"
 
 #: modules/gui/qt/dialogs/vlm.cpp:260 modules/gui/qt/dialogs/vlm.cpp:329
 msgid "VLM conf (*.vlm);;All (*)"
-msgstr ""
+msgstr "VLM-oppsett (*.vlm);;Alle filer (*)"
 
 #: modules/gui/qt/dialogs/vlm.cpp:327
 msgid "Open VLM configuration..."
@@ -21690,9 +21685,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Vis uviktige feil- og advarsels-infobokser."
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Skru på programvaremodus"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -22024,19 +22018,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Bestem bildegammaen, mellom 0,01 og 10. Standarden er 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Stereoforbedrer"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Bil&defrekvens"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Vis sidelinje"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22123,7 +22114,7 @@ msgstr "MMAL-basert vout-tillegg for Raspberry Pi"
 
 #: modules/hw/vaapi/filters.c:1185
 msgid "VAAPI filters"
-msgstr ""
+msgstr "VAAPI-filtere"
 
 #: modules/hw/vaapi/filters.c:1186
 msgid "Video Accelerated API filters"
@@ -22418,7 +22409,7 @@ msgstr "syslog"
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
-msgstr ""
+msgstr "Systemlogger (syslog)"
 
 #: modules/lua/extension.c:1200
 msgid "Extension not responding!"
@@ -22508,8 +22499,8 @@ msgid ""
 msgstr ""
 "Aksepter kommandoer fra denne kilden. CLIen bruker STDIN som standard "
 "(\"*konsoll\"), men kan også bindes til en simpel TCP-sokkel "
-"(\"lokalvert:4212\") eller til å bruke telnet-protokollen (\"telnet://"
-"0.0.0.0:4212\")."
+"(\"lokalvert:4212\") eller til å bruke telnet-protokollen "
+"(\"telnet://0.0.0.0:4212\")."
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
@@ -23193,7 +23184,7 @@ msgstr ""
 
 #: modules/misc/audioscrobbler.c:713
 msgid "Last.fm username not set"
-msgstr ""
+msgstr "Last.fm-brukernavnet er ikke valgt"
 
 #: modules/misc/audioscrobbler.c:714
 msgid ""
@@ -23880,11 +23871,11 @@ msgstr "A/52-lydinnpakker"
 
 #: modules/packetizer/avparser.h:49
 msgid "avparser packetizer"
-msgstr ""
+msgstr "avparser-innpakker"
 
 #: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
-msgstr ""
+msgstr "AV1-videoinnpakker"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23961,17 +23952,17 @@ msgstr ""
 
 #: modules/services_discovery/avahi.c:69
 msgid "Avahi Renderer Discovery"
-msgstr ""
+msgstr "Oppdagelse av Avahi Renderer"
 
 #: modules/services_discovery/bonjour.m:45
 #: modules/services_discovery/bonjour.m:63
 #: modules/services_discovery/bonjour.m:455
 msgid "Bonjour Network Discovery"
-msgstr ""
+msgstr "Oppdagelse av Bonjour Network"
 
 #: modules/services_discovery/bonjour.m:71
 msgid "Bonjour Renderer Discovery"
-msgstr ""
+msgstr "Oppdagelse av Bonjour Renderer"
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -23999,11 +23990,11 @@ msgstr "Mine bilder"
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:646
 msgid "mDNS Network Discovery"
-msgstr ""
+msgstr "Oppdagelse av mDNS Network"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
-msgstr ""
+msgstr "Oppdagelse av mDNS Renderer"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24236,7 +24227,7 @@ msgstr ""
 
 #: modules/spu/audiobargraph_v.c:56
 msgid "Bar width in pixel"
-msgstr ""
+msgstr "Bar-bredde i piksler"
 
 #: modules/spu/audiobargraph_v.c:57
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
@@ -24244,7 +24235,7 @@ msgstr ""
 
 #: modules/spu/audiobargraph_v.c:58
 msgid "Bar Height in pixel"
-msgstr ""
+msgstr "Bar-høyde i piksler"
 
 #: modules/spu/audiobargraph_v.c:59
 msgid "Height in pixel of BarGraph to be displayed."
@@ -25160,6 +25151,8 @@ msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
+"Dette setter HTTP-porten til den lokale tjeneren som brukes til å strømme "
+"medier til Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1198
@@ -25180,19 +25173,19 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:217
 msgid "High (high quality and high bandwidth)"
-msgstr ""
+msgstr "Høy (høy kvalitet og høy båndbredde)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
 msgid "Medium (medium quality and medium bandwidth)"
-msgstr ""
+msgstr "Medium (medium kvalitet og medium båndbredde)"
 
 #: modules/stream_out/chromecast/cast.cpp:219
 msgid "Low (low quality and low bandwidth)"
-msgstr ""
+msgstr "Lav (lav kvalitet og lav båndbredde)"
 
 #: modules/stream_out/chromecast/cast.cpp:220
 msgid "Low CPU (low quality but high bandwidth)"
-msgstr ""
+msgstr "Lav CPU (lav kvalitet men høy båndbredde)"
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Conversion quality"
@@ -25231,10 +25224,12 @@ msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"Casting av denne videoen krever konvertering. Denne konverteringen kan bruke "
+"all tilgjengelig kraft og kan derfor tømme batteriet raskt."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:511
 msgid "Chromecast demux wrapper"
-msgstr ""
+msgstr "Chromecast demux-omslag"
 
 #: modules/stream_out/cycle.c:326
 msgid "cycle"
@@ -26135,7 +26130,7 @@ msgstr "Skyggedistanse"
 
 #: modules/text_renderer/freetype/freetype.c:118
 msgid "Text direction"
-msgstr ""
+msgstr "Tekstretning"
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -26316,7 +26311,7 @@ msgstr "YUVP-konverterer"
 
 #: modules/video_filter/adjust.c:67
 msgid "Image hue (-180..180)"
-msgstr ""
+msgstr "Bildefarging (-180..180)"
 
 #: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
@@ -27916,39 +27911,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Anbefalt video-utdata i Windows 8 og senere versjoner "
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Videoskalering"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Velg én farge i videoen"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bit per måling"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Samplingsfrekvens"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Videokodek"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Oppløsning"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Eksportmoduler"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -27959,9 +27947,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Alltid øverst"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -29087,24 +29074,20 @@ msgid "0.00 dB"
 msgstr "0,00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Fingeravtrykk"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Velg strømmemetode"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Fingeravtrykksfinner for spor (basert på AcoustID)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Fingeravtrykk"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29347,9 +29330,8 @@ msgid "Menus"
 msgstr "Meny"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Sa&mplingsfrekvens"
+msgstr "Bil&defrekvens"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29528,9 +29510,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Hopp over H.264-løkkeavblokkingsfilter"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "Valg av x264-profil og nivå"
+msgstr "x264 forhåndsinnstilling og optimalisering"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Optical drive"
@@ -29617,14 +29598,12 @@ msgid "Show systray icon"
 msgstr "Vis ikon i systemkurven"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Når grensesnittet skal løftes"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Bruk en tematisert spilleliste"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -29939,12 +29918,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Mediebehandlerliste"
-
-#~ msgid "Master List"
-#~ msgstr "Hovedliste"
-
-#~ msgid "Server List"
-#~ msgstr "Tjenerliste"
-
-#~ msgid "Custom List"
-#~ msgstr "Egendefinert liste"

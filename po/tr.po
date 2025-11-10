@@ -19,11 +19,11 @@
 # Emin Tufan Çetin <etcetin@gmail.com>, 2023
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2023\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2025\n"
 "Language-Team: Turkish (https://app.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -540,7 +540,7 @@ msgstr "Tümü yinelensin"
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:535
 #: modules/gui/macosx/VLCMainMenu.m:398
 msgid "Repeat One"
-msgstr "Biri yinelensin"
+msgstr "Birini yinele"
 
 #: include/vlc_intf_strings.h:81 src/libvlc-module.c:1429
 #: modules/gui/macosx/VLCMainMenu.m:397
@@ -590,21 +590,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -615,32 +615,31 @@ msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>VLC ortam oynatıcısı Yardımına "
 "hoşgeldiniz</h2><h3>Belgeler</h3><p>VLC belgelerini VideoLAN <a "
-"href=\"http://wiki.videolan.org\">wiki</a> web sitesinde bulabilirsiniz.</"
+"href=\"http://wiki.videolan.org\">wiki</a> sitesinde bulabilirsiniz.</"
 "p><p>VLC ortam oynatıcıyı kullanmaya yeni başladıysanız <br><a href=\"http://"
 "wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
 "media player</em></a> belgesini okuyun.</p><p>Oynatıcıyı nasıl "
 "kullanacağınız ile ilgili bilgileri <br>\"<a href=\"http://wiki.videolan.org/"
 "Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
 "a>\" belgesinde bulabilirsiniz.</p><p>Tüm kaydetme, dönüştürme, çoklama ve "
-"akış işlemleri için <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">Streaming Documentation</a> belgesi içinde "
-"yararlı bilgiler bulabilirsiniz.</p><p>Kullanılan deyimler hakkında yeterli "
-"bilginiz yoksa <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge "
-"base</a> bölümünden yararlanabilirsiniz.</p><p>Temel kısayol tuşları "
-"hakkında <a href=\"http://wiki.videolan.org/Hotkeys\">shortcuts</a>  "
-"sayfasından bilgi edinebilirsiniz.</p><h3>Yardım</h3><p>Bir soru sormadan "
-"önce <a href=\"http://www.videolan.org/support/faq.html\">FAQ</a> bölümünden "
-"sık sorulan sorulara bakın.</p><p>Ayrıca <a href=\"http://"
-"forum.videolan.org\">Forums</a>, forum ve <a href=\"http://www.videolan.org/"
-"vlc/lists.html\">mailing-lists</a> posta listesinden ya da IRC sohbet "
-"kanalımızdan ( <a href=\"http://www.videolan.org/webirc/\"><em>#videolan</"
-"em></a> on irc.freenode.net ) sorularınıza yanıt bulabilirsiniz.</"
-"p><h3>Projemizi destekleyin</h3><p>VideoLAN projesine zaman ayırarak, "
-"kullanıcılara yardım etmek, görsel tasarlamak, belgeleri çevirmek, "
-"uygulamayı denemek ve kod yazmak gibi çeşitli şekillerde katkıda "
-"bulunabilirsiniz. Ayrıca bize para ya da malzeme bağışında bulunabilirsiniz. "
-"Ve tabi ki VLC Ortam Oynatıcısının <b>tanıtımını</b> yapabilirsiniz.</p></"
-"body></html>"
+"akış işlemleri için <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">Streaming Documentation</a> belgesi içinde yararlı "
+"bilgiler bulabilirsiniz.</p><p>Kullanılan deyimler hakkında yeterli bilginiz "
+"yoksa <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a> "
+"bölümünden yararlanabilirsiniz.</p><p>Temel kısayol tuşları hakkında <a "
+"href=\"http://wiki.videolan.org/Hotkeys\">shortcuts</a>  sayfasından bilgi "
+"edinebilirsiniz.</p><h3>Yardım</h3><p>Bir soru sormadan önce <a "
+"href=\"http://www.videolan.org/support/faq.html\">FAQ</a> bölümünden sık "
+"sorulan sorulara bakın.</p><p>Ayrıca <a href=\"http://forum.videolan."
+"org\">Forums</a>, forum ve <a href=\"http://www.videolan.org/vlc/lists."
+"html\">mailing-lists</a> posta listesinden ya da IRC sohbet kanalımızdan "
+"( <a href=\"http://www.videolan.org/webirc/\"><em>#videolan</em></a> on irc."
+"freenode.net ) sorularınıza yanıt bulabilirsiniz.</p><h3>Projemizi "
+"destekleyin</h3><p>VideoLAN projesine zaman ayırarak, kullanıcılara yardım "
+"etmek, görsel tasarlamak, belgeleri çevirmek, uygulamayı denemek ve kod "
+"yazmak gibi çeşitli şekillerde katkıda bulunabilirsiniz. Ayrıca bize para ya "
+"da malzeme bağışında bulunabilirsiniz. Ve tabi ki VLC Ortam Oynatıcısının "
+"<b>tanıtımını</b> yapabilirsiniz.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -835,7 +834,7 @@ msgstr ""
 "\n"
 "İnternet adresinin yazımı:\n"
 "  file://dosyaadi            Normal ortam dosyası\n"
-"  http://sunucu[:kapı]/dosya            HTTP Web adresi\n"
+"  http://sunucu[:kapı]/dosya            HTTP İnternet adresi\n"
 "  ftp://sunucu[:kapı]/dosya             FTP adresi\n"
 "  mms://sunucu[:kapı]/dosya             MMS adresi\n"
 "  screen://                      Ekran yakalama\n"
@@ -1488,7 +1487,7 @@ msgstr "Telnet"
 
 #: src/interface/interface.c:96
 msgid "Web"
-msgstr "Web"
+msgstr "İnternet"
 
 #: src/interface/interface.c:99
 msgid "Mouse Gestures"
@@ -2337,8 +2336,8 @@ msgstr "Kaynak en boy oranı"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Bu seçenek, kaynak en boy oranını belirler. Örneğin; bazı DVD'ler aslında "
@@ -2929,7 +2928,7 @@ msgid ""
 "filters here and configure them in the \"subsources filters\" modules "
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
-"Alt görsel altsisteminin davranışı buradan ayarlanır. Örneğin bazı alt "
+"Alt görsel alt sisteminin davranışı buradan ayarlanır. Örneğin bazı alt "
 "görsel kaynakları (logo, vb) kullanılabilir. Süzgeçler buradan açıldıktan "
 "sonra, modüller bölümündeki \"alt görsel süzgeçleri\" başlığından "
 "yapılandırılabilir. Ayarlanacak pek çok alt görsel seçeneği bulunur."
@@ -3231,9 +3230,8 @@ msgstr "HTTP vekil sunucu"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "HTTP vekil sunucunun kullanılabilmesi için şöyle yazılması gerekir:  http://"
 "[kullanıcı@]vekilsunucum.etkialanim:baglantinoktam/ ; boş ise, http_proxy "
@@ -3773,7 +3771,7 @@ msgid ""
 "metadata)."
 msgstr ""
 "Oynatma listesindeki ögeler otomatik olarak önceden ayrıştırılır (bazı üst "
-"verileri elde etmek için)"
+"verileri almak için)"
 
 #: src/libvlc-module.c:1122
 msgid "Preparsing timeout"
@@ -3787,7 +3785,7 @@ msgstr "Milisaniye olarak bir ögenin ön hazırlığı için harcanacak en uzun
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:569
 msgid "Allow metadata network access"
-msgstr "Üst veriye ağ üzerinden erişilebilsin"
+msgstr "Üst verilere ağ üzerinden erişilebilsin"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
@@ -3861,7 +3859,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1160
 msgid "Repeat all"
-msgstr "Tümü yinelensin"
+msgstr "Tümünü yinele"
 
 #: src/libvlc-module.c:1162
 msgid "VLC will keep playing the playlist indefinitely."
@@ -4901,7 +4899,7 @@ msgstr "Socks vekil sunucusu"
 
 #: src/libvlc-module.c:1836 modules/demux/xiph_metadata.h:55
 msgid "Metadata"
-msgstr "Üst veri"
+msgstr "Üst veriler"
 
 #: src/libvlc-module.c:1937
 msgid "Decoders"
@@ -5022,7 +5020,7 @@ msgstr "Tarayıcı geri"
 
 #: src/misc/actions.c:56
 msgid "Browser Favorites"
-msgstr "Tarayıcı sık kullanılanlar"
+msgstr "Tarayıcı sık kullanılanları"
 
 #: src/misc/actions.c:57
 msgid "Browser Forward"
@@ -6193,8 +6191,8 @@ msgstr "Herhangi bir ses girişi aygıtı bulunamadı"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Kullandığınız MAC uygun bir ses giriş aygıtına sahip değil gibi görünüyor. "
 "Bağlantılarınızı ve sürücüleri denetleyin."
@@ -6275,8 +6273,7 @@ msgstr "Blu-Ray menüleri kullanılsın"
 #: modules/access/bluray.c:73
 msgid "Use Blu-ray menus. If disabled, the movie will start directly"
 msgstr ""
-"Bu seçenek açıldığında, Blu-Ray menüleri kullanılır. Kapatıldığında doğrudan "
-"film başlar"
+"Açıldığında, Blu-Ray menüleri kullanılır. Kapatıldığında doğrudan film başlar"
 
 #: modules/access/bluray.c:75
 msgid "Region code"
@@ -6404,12 +6401,11 @@ msgstr "[cdda:][aygıt][@[kayıt]]"
 
 #: modules/access/cdda.c:1022
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "MusicBrainz sunucusu"
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Kullanılacak CDDB sunucusunun adresi."
+msgstr "Kullanılacak MusicBrainz sunucusunun adresi."
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8416,8 +8412,8 @@ msgid ""
 "Optimize the capture by fragmenting the screen in chunks of predefined "
 "height (16 might be a good value, and 0 means disabled)."
 msgstr ""
-"Bu seçenek açıldığında, ekran önceden belirlenmiş boyda parçalara bölünerek "
-"yakalama iyileştirilir (16 iyi bir değer olabilir, 0 kapalı anlamına gelir)."
+"Açıldığında, ekran önceden belirlenmiş boyda parçalara bölünerek yakalama "
+"iyileştirilir (16 iyi bir değer olabilir, 0 kapalı anlamına gelir)."
 
 #: modules/access/screen/screen.c:55 modules/access/screen/xcb.c:47
 msgid "Region top row"
@@ -8639,8 +8635,8 @@ msgstr "SMB kimlik doğrulaması gerekli"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "Bağlanmaya çalıştığınız bilgisayar (%s) için kimlik doğrulaması gerekiyor.\n"
 "Lütfen bir kullanıcı adı (ideal olarak etki alanı ile ETKİALANI;KullanıcıAdı "
@@ -8668,9 +8664,8 @@ msgid "Password for stream encryption"
 msgstr "Akış şifreleme parolası"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRT akış çıkışı"
+msgstr " SRT akışı kimliği"
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9117,9 +9112,9 @@ msgstr "v4l2 sürücü denetimleri"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "v4l2 sürücü denetimlerini virgül (,) ile ayrılmış bir liste halinde ve "
 "isteğe bağlı olarak ve yaylı parantezler ile sınırlayarak ayarlayabilirsiniz "
@@ -9681,8 +9676,8 @@ msgid ""
 "of streams) on the icecast/shoutcast website. Requires the bitrate "
 "information specified for shoutcast. Requires Ogg streaming for icecast."
 msgstr ""
-"Açıldığında, sunucu, Icecast/shoutcast web sitesindeki 'Sarı Sayfalarda' "
-"(akış rehberi) herkese açık şekilde listelenir. Shoutcast için bit hızının "
+"Açıldığında, sunucu, Icecast/shoutcast sitesindeki 'Sarı Sayfalarda' (akış "
+"rehberi) herkese açık şekilde listelenir. Shoutcast için bit hızının "
 "belirtilmesi gerekir. Icecast için Ogg akışı gerekir."
 
 #: modules/access_output/shout.c:111
@@ -9694,14 +9689,12 @@ msgid "SRT stream output"
 msgstr "SRT akış çıkışı"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "En büyük RIST paketi boyutu (bayt)"
+msgstr "SRT en büyük yük paketi boyutu (bayt)"
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "En büyük RIST paketi boyutu (bayt)"
+msgstr "SRT en yüksek bant genişliği tavanı (bayt)"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10637,7 +10630,7 @@ msgid ""
 "through is active."
 msgstr ""
 "Ses çıkışı için kullanılabilecek kanallar. Giriş, çıkıştan daha fazla kanala "
-"sahipse, kanallar karıştırılarak kanal sayısı azaltılır. Sayısal geçiş etkin "
+"sahipse, kanallar karıştırılarak kanal sayısı azaltılır. Sayısal geçiş açık "
 "ise bu parametre yok sayılır."
 
 #: modules/audio_output/alsa.c:76
@@ -10715,9 +10708,8 @@ msgid ""
 "You should configure your speaker layout with \"Audio Midi Setup\" in /"
 "Applications/Utilities. VLC will output Stereo only."
 msgstr ""
-"Hoparlör yerleşim düzeninizi /Uygulamalar/Araçlar içindeki \"Ses Midi "
-"Kurulumu\" aracı ile yapılandırmalısınız. VLC yalnızca çift kanal çıkış "
-"verecek."
+"Hoparlör yerleşiminizi /Uygulamalar/Araçlar içindeki \"Ses Midi kurulumu\" "
+"aracı ile yapılandırmalısınız. VLC yalnızca çift kanal çıkış verecek."
 
 #: modules/audio_output/auhal.c:1178
 msgid ""
@@ -11652,13 +11644,14 @@ msgstr ""
 "Varsayılan değer 0: Otomatik"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Tüm dosyalar"
+msgstr "Tüm katmanlar"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
 msgstr ""
+"Tüm uzamsal katmanların görüntülenip görüntülenmeyeceği, varsayılan değer: "
+"False"
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
@@ -11723,8 +11716,8 @@ msgstr "Alt görsel konumu"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Alt görselin görüntü üzerindeki konumunu belirler (0=ortada, 1: Solda, 2: "
 "Sağda, 4: Üstte, 8: Altta. Bu değerler toplayarak da kullanılabilir. 6: Sağ "
@@ -12491,10 +12484,10 @@ msgstr "Hız denetiminin kararlılığı"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "Ortalama Değişken Bit Hızı 'avbr' yönteminin yüzde toleransı. (Örneğin 800 "
 "Kbps bit hızında 10 değeri, kod çözücünün 880 Kbps ile 730 Kbps arasında "
@@ -13761,7 +13754,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -14833,7 +14825,7 @@ msgstr "Taramasızlığı aç"
 
 #: modules/control/hotkeys.c:1319
 msgid "Subtitle position: no active subtitle"
-msgstr "Alt yazı konumu: Etkin alt yazı yok"
+msgstr "Alt yazı konumu: Etkin bir alt yazı yok"
 
 #: modules/control/hotkeys.c:1331
 #, c-format
@@ -15674,7 +15666,7 @@ msgid ""
 "If non empty and image-decode is true, the image will be converted to the "
 "specified chroma."
 msgstr ""
-"Bu seçenek boş değil ve görsel kod çözme seçeneği etkin ise, görsel "
+"Bu seçenek boş değil ve görsel kod çözme seçeneği açık ise, görsel "
 "belirtilen renk doygunluğuna dönüştürülür."
 
 #: modules/demux/image.c:61
@@ -16113,8 +16105,8 @@ msgstr "Fazladan PMT"
 #: modules/demux/mpeg/ts.c:86
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
-"Bu seçenek, kullanıcının fazladan pmt belirtebilmesini sağlar "
-"(pmt_pid=pid:stream_type[,...])."
+"Bu seçenek, kullanıcının fazladan pmt belirtebilmesini sağlar (pmt_pid=pid:"
+"stream_type[,...])."
 
 #: modules/demux/mpeg/ts.c:88
 msgid "Set id of ES to PID"
@@ -16702,16 +16694,15 @@ msgid ""
 "href=\"https://www.videolan.org/contribute/\"><span style=\" text-"
 "decoration: underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC ortam oynatıcısı, gönüllülerden oluşan <a href=\"https://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
-"\">VideoLAN</span></a> topluluğu tarafından geliştirilen, özgür ve açık "
-"kaynaklı bir ortam oynatma, kodlama ve akış sağlama uygulamasıdır.</p><p>VLC "
-"kendi içsel kodlayıcı/çözücülerini kullanır, yaygın kullanılan tüm "
-"platformlarda çalışır ve neredeyse tüm dosya biçimlerini, CD, DVD, ağ "
-"akışları, yakalama kartları ve diğer ortam biçimlerini oynatabilir!</p><p><a "
-"href=\"https://www.videolan.org/contribute/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">Bize katılarak yardımcı "
-"olabilirsiniz!</span></a>"
+"<p>VLC ortam oynatıcısı, gönüllülerden oluşan <a href=\"https://www.videolan."
+"org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+"span></a> topluluğu tarafından geliştirilen, özgür ve açık kaynaklı bir "
+"ortam oynatma, kodlama ve akış sağlama uygulamasıdır.</p><p>VLC kendi içsel "
+"kodlayıcı/çözücülerini kullanır, yaygın kullanılan tüm platformlarda çalışır "
+"ve neredeyse tüm dosya biçimlerini, CD, DVD, ağ akışları, yakalama kartları "
+"ve diğer ortam biçimlerini oynatabilir!</p><p><a href=\"https://www.videolan."
+"org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Bize katılarak yardımcı olabilirsiniz!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -16725,7 +16716,7 @@ msgstr "Oynatma listesi işleyicileri"
 #: modules/gui/qt/dialogs/plugins.cpp:392
 #: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
-msgstr "Hizmet agılama"
+msgstr "Hizmet algılama"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:109
 #: modules/gui/qt/dialogs/plugins.cpp:396
@@ -16745,7 +16736,7 @@ msgstr "Kapak ve üst veri getiriciler"
 #: modules/gui/qt/dialogs/plugins.cpp:402
 #: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
-msgstr "Uzantılar"
+msgstr "Eklentiler"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:116
 msgid "Show Installed Only"
@@ -16754,7 +16745,7 @@ msgstr "Yalnızca kurulmuşlar görüntülensin"
 #: modules/gui/macosx/VLCAddonsWindowController.m:118
 #: modules/gui/qt/dialogs/plugins.cpp:430
 msgid "Find more addons online"
-msgstr "Çevrimiçi eklentilere bakın"
+msgstr "Çevrim içi eklentilere bakın"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:128
 #: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:85
@@ -17483,11 +17474,11 @@ msgstr "Hizmetler"
 
 #: modules/gui/macosx/VLCMainMenu.m:349
 msgid "Hide VLC"
-msgstr "VLC uygulaması gizlensin"
+msgstr "VLC uygulamasını gizle"
 
 #: modules/gui/macosx/VLCMainMenu.m:350
 msgid "Hide Others"
-msgstr "Diğerleri gizlensin"
+msgstr "Diğerlerini gizle"
 
 #: modules/gui/macosx/VLCMainMenu.m:351
 #: modules/gui/macosx/VLCSimplePrefsController.m:391
@@ -17504,7 +17495,7 @@ msgstr "1:Dosya"
 
 #: modules/gui/macosx/VLCMainMenu.m:355
 msgid "Advanced Open File..."
-msgstr "Gelişmiş dosya açma..."
+msgstr "Gelişmiş dosya aç..."
 
 #: modules/gui/macosx/VLCMainMenu.m:356
 msgid "Open File..."
@@ -17568,19 +17559,19 @@ msgstr "Görünüm"
 
 #: modules/gui/macosx/VLCMainMenu.m:375 modules/gui/macosx/macosx.m:116
 msgid "Show Previous & Next Buttons"
-msgstr "Önceki / sonraki düğmeleri görüntülensin"
+msgstr "Önceki / sonraki düğmelerini görüntüle"
 
 #: modules/gui/macosx/VLCMainMenu.m:377 modules/gui/macosx/macosx.m:119
 msgid "Show Shuffle & Repeat Buttons"
-msgstr "Karıştırma ve yineleme düğmeleri görüntülensin"
+msgstr "Karıştırma ve yineleme düğmelerini görüntüle"
 
 #: modules/gui/macosx/VLCMainMenu.m:379 modules/gui/macosx/macosx.m:122
 msgid "Show Audio Effects Button"
-msgstr "Ses etkileri düğmesi görüntülensin"
+msgstr "Ses etkileri düğmesini görüntüle"
 
 #: modules/gui/macosx/VLCMainMenu.m:381
 msgid "Show Sidebar"
-msgstr "Yan çubuk görüntülensin"
+msgstr "Kenar çubuğu görüntülensin"
 
 #: modules/gui/macosx/VLCMainMenu.m:382
 msgid "Playlist Table Columns"
@@ -17602,7 +17593,7 @@ msgstr "Kayıt eşleme"
 #: modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/qt/components/controller.hpp:110
 msgid "A→B Loop"
-msgstr "A→B çevrim"
+msgstr "A→B çevrimi"
 
 #: modules/gui/macosx/VLCMainMenu.m:401
 msgid "Quit after Playback"
@@ -17695,7 +17686,7 @@ msgstr "Çerçeve kalınlığı"
 
 #: modules/gui/macosx/VLCMainMenu.m:462 modules/gui/macosx/VLCMainMenu.m:463
 msgid "Background Opacity"
-msgstr "Arka Plan saydamlığı"
+msgstr "Arka plan saydamlığı"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
 msgid "Background Color"
@@ -17764,11 +17755,11 @@ msgstr "VLC Ortam oynatıcısı yardımı..."
 
 #: modules/gui/macosx/VLCMainMenu.m:491
 msgid "Online Documentation..."
-msgstr "Çevrimiçi belgeler..."
+msgstr "Çevrim içi belgeler..."
 
 #: modules/gui/macosx/VLCMainMenu.m:492
 msgid "VideoLAN Website..."
-msgstr "VideoLAN web sitesi..."
+msgstr "VideoLAN sitesi..."
 
 #: modules/gui/macosx/VLCMainMenu.m:493
 msgid "Make a donation..."
@@ -17776,7 +17767,7 @@ msgstr "Bağış yapmayı düşünün..."
 
 #: modules/gui/macosx/VLCMainMenu.m:494
 msgid "Online Forum..."
-msgstr "Çevrimiçi forum..."
+msgstr "Çevrim içi forum..."
 
 #: modules/gui/macosx/VLCMainMenu.m:1158
 msgid "File Format:"
@@ -17864,10 +17855,10 @@ msgid ""
 "provide this functionality, VLC will send information about your contents to "
 "trusted services in an anonymized form."
 msgstr ""
-"VLC, oynatma deneyiminizi zenginleştirmek için çevrimiçi olarak albüm kapağı "
-"ve üst verileri denetler. Örneğin bir ses CD oynatılırken, oynatılan kayıt "
-"ile ilgili bilgileri görüntüler. VLC bu işlevi kullanabilmek için içeriğiniz "
-"hakkında anonim bilgileri güvenilir hizmetlere gönderir."
+"VLC, oynatma deneyiminizi zenginleştirmek için çevrim içi olarak albüm "
+"kapağı ve üst verileri denetler. Örneğin bir ses CD oynatılırken, oynatılan "
+"kayıt ile ilgili bilgileri görüntüler. VLC bu işlevi kullanabilmek için "
+"içeriğiniz hakkında anonim bilgileri güvenilir hizmetlere gönderir."
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:68
 msgid "Show/Hide Playlist"
@@ -18208,9 +18199,8 @@ msgstr "Tümünü daralt"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Oynatma listesini kaydet"
+msgstr "Oynatma listesini karıştır"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18514,7 +18504,7 @@ msgstr "Güncellemeler otomatik olarak denetlensin"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:346
 msgid "HTTP web interface"
-msgstr "HTTP web arayüzü"
+msgstr "HTTP İnternet arayüzü"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:347
 msgid "Enable HTTP web interface"
@@ -19435,7 +19425,7 @@ msgstr " i                      Bilgi kutusunu görüntüler/gizler"
 
 #: modules/gui/ncurses.c:863
 msgid " M                      Show/Hide metadata box"
-msgstr " M                      Üst Veri kutusunu görüntüler/gizler"
+msgstr " M                      Üst veriler kutusunu görüntüler/gizler"
 
 #: modules/gui/ncurses.c:864
 msgid " L                      Show/Hide messages box"
@@ -20031,7 +20021,7 @@ msgstr "&Parmak izi"
 
 #: modules/gui/qt/components/info_panels.cpp:133
 msgid "Find meta data using audio fingerprinting"
-msgstr "Ses parmak izi kullanılarak üst veri bulunsun"
+msgstr "Ses parmak izi kullanılarak üst veriler bulunsun"
 
 #: modules/gui/qt/components/info_panels.cpp:154
 msgid "Comments"
@@ -20507,7 +20497,7 @@ msgstr ""
 
 #: modules/gui/qt/components/simple_preferences.cpp:766
 msgid "VLC skins website"
-msgstr "VLC temaları web sitesi"
+msgstr "VLC temaları sitesi"
 
 #: modules/gui/qt/components/simple_preferences.cpp:794
 msgid "System's default"
@@ -20621,8 +20611,8 @@ msgstr "Dosyayı kaydet..."
 msgid ""
 "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 msgstr ""
-"Taşıyıcılar (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv "
-"*.webm)"
+"Taşıyıcılar (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *."
+"webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:185
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -20870,16 +20860,15 @@ msgid ""
 "href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC ortam oynatıcısı, gönüllülerden oluşan <a href=\"http://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
-"\">VideoLAN</span></a> topluluğu tarafından geliştirilen, özgür ve açık "
-"kaynaklı bir ortam oynatma, kodlama ve akış sunma uygulamasıdır.</p><p>VLC "
-"kendi içsel kodlayıcı/çözücülerini kullanır, yaygın kullanılan tüm "
-"platformlarda çalışır ve neredeyse tüm dosya biçimlerini, CD, DVD, ağ "
-"akışları, yakalama kartları ve diğer ortam biçimlerini oynatabilir!</p><p><a "
-"href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
-"underline; color:#0057ae;\">Siz de bize katılarak yardımcı olabilirsiniz!</"
-"span></a>"
+"<p>VLC ortam oynatıcısı, gönüllülerden oluşan <a href=\"http://www.videolan."
+"org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+"span></a> topluluğu tarafından geliştirilen, özgür ve açık kaynaklı bir "
+"ortam oynatma, kodlama ve akış sunma uygulamasıdır.</p><p>VLC kendi içsel "
+"kodlayıcı/çözücülerini kullanır, yaygın kullanılan tüm platformlarda çalışır "
+"ve neredeyse tüm dosya biçimlerini, CD, DVD, ağ akışları, yakalama kartları "
+"ve diğer ortam biçimlerini oynatabilir!</p><p><a href=\"http://www.videolan."
+"org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Siz de bize katılarak yardımcı olabilirsiniz!</span></a>"
 
 #: modules/gui/qt/dialogs/help.cpp:225
 msgid "&Recheck version"
@@ -21041,11 +21030,11 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:79
 msgid "Plugins and extensions"
-msgstr "Uygulama ekleri ve uzantılar"
+msgstr "Uygulama ekleri ve eklentiler"
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
 msgid "Active Extensions"
-msgstr "Etkin uzantılar"
+msgstr "Etkin eklentiler"
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -21066,7 +21055,7 @@ msgstr "Ayrıntlı bilgiler..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:266
 msgid "Reload extensions"
-msgstr "Uzantıları yeniden yükle"
+msgstr "Eklentileri yeniden yükle"
 
 #: modules/gui/qt/dialogs/plugins.cpp:385
 msgid ""
@@ -21088,8 +21077,8 @@ msgid ""
 "Service discoveries adds new sources to your playlist such as web radios, "
 "video websites, ..."
 msgstr ""
-"Hizmet aramaları, oynatma listenize, web radyoları, görüntü siteleri gibi "
-"yeni kaynaklar ekler."
+"Hizmet aramaları, oynatma listenize, İnternet radyoları, görüntü siteleri "
+"gibi yeni kaynaklar ekler."
 
 #: modules/gui/qt/dialogs/plugins.cpp:400
 msgid "Retrieves extra info and art for playlist items"
@@ -21100,7 +21089,7 @@ msgstr ""
 msgid ""
 "Extensions brings various enhancements. Check descriptions for more details"
 msgstr ""
-"Uzantılar çeşitli geliştirmeler sağlar. Ayrıntılı bilgi için açıklamalara "
+"Eklentiler çeşitli geliştirmeler sağlar. Ayrıntılı bilgi için açıklamalara "
 "bakın"
 
 #: modules/gui/qt/dialogs/plugins.cpp:424
@@ -21143,7 +21132,7 @@ msgstr "Sürüm"
 #: modules/gui/qt/dialogs/plugins.cpp:1418
 #: modules/gui/qt/dialogs/plugins.cpp:1528
 msgid "Website"
-msgstr "Web sitesi"
+msgstr "Site"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1540 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Files"
@@ -21883,7 +21872,7 @@ msgid ""
 msgstr ""
 "Bu seçenek, arayüz, oynatma listesi ve geliştirilmiş pano pencerelerinin "
 "saydamlığını 0.1 ile 1 arasında olacak şekilde ayarlar. Bu seçenek yalnızca "
-"Windows ve karma uzantıları ile X11 üzerinde çalışır."
+"Windows ve karma eklentileri ile X11 üzerinde çalışır."
 
 #: modules/gui/qt/qt.cpp:116
 msgid "Fullscreen controller opacity between 0.1 and 1"
@@ -21897,20 +21886,19 @@ msgid ""
 msgstr ""
 "Bu seçenek, tam ekran görünümünde arayüz, oynatma listesi ve geliştirilmiş "
 "pano pencerelerinin saydamlığını 0.1 ile 1 arasında olacak şekilde ayarlar. "
-"Bu seçenek yalnızca Windows ve karma uzantıları ile X11 üzerinde çalışır."
+"Bu seçenek yalnızca Windows ve karma eklentileri ile X11 üzerinde çalışır."
 
 #: modules/gui/qt/qt.cpp:122
 msgid "Show unimportant error and warnings dialogs"
 msgstr "Önemsiz hata ve uyarı pencereleri görüntülensin"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Yazılımsal kip kullanılsın"
+msgstr "Koyu kipi aç"
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
-msgstr ""
+msgstr "Biçeme koyu kipi uygular."
 
 #: modules/gui/qt/qt.cpp:127
 msgid "Activate the updates availability notification"
@@ -21998,11 +21986,11 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:161
 msgid "Load extensions on startup"
-msgstr "Uzantılar başlangıçta yüklensin"
+msgstr "Eklentiler başlangıçta yüklensin"
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Automatically load the extensions module on startup."
-msgstr "Açıldığında, uzantılar modülü başlangıçta otomatik olarak yüklenir."
+msgstr "Açıldığında, eklentiler modülü başlangıçta otomatik olarak yüklenir."
 
 #: modules/gui/qt/qt.cpp:165
 msgid "Start in minimal view (without menus)"
@@ -22249,19 +22237,16 @@ msgstr ""
 "Görüntü gamma değerini 0.01 ile 10 arasında ayarlayın. Varsayılan değer 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Çift kanal genişletici"
+msgstr "AMD VQ genişletici"
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Ka&re hızı"
+msgstr "AMD kare hızını ikiye artırıcı"
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Yan çubuk görüntülensin"
+msgstr "Gösterge görüntülensin"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22674,9 +22659,9 @@ msgid ""
 "password, or set a password in </p><p>Preferences &gt; All &gt; Main "
 "interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
 msgstr ""
-"<p>Web arayüzü parolası ayarlanmamış.</p><p>Lütfen --http-password komutuyla "
-"ya da </p><p>Ayarlar> Tüm> Temel arayüz > Lua > Lua HTTP > Parola bölümünden "
-"değiştirin.</p>"
+"<p>İnternet arayüzü parolası ayarlanmamış.</p><p>Lütfen --http-password "
+"komutuyla ya da </p><p>Ayarlar> Tüm> Temel arayüz > Lua > Lua HTTP > Parola "
+"bölümünden değiştirin.</p>"
 
 #: modules/lua/vlc.c:49
 msgid "Lua interface"
@@ -22770,19 +22755,19 @@ msgstr "Lua Telnet"
 
 #: modules/lua/vlc.c:135
 msgid "Lua Meta Fetcher"
-msgstr "Lua üst veri toplayıcı"
+msgstr "Lua üst verileri toplayıcı"
 
 #: modules/lua/vlc.c:136
 msgid "Fetch meta data using lua scripts"
-msgstr "Üst veri Lua betikleri kullanılarak toplanır"
+msgstr "Üst veriler Lua betikleri kullanılarak toplanır"
 
 #: modules/lua/vlc.c:141
 msgid "Lua Meta Reader"
-msgstr "Lua üst veri okuyucu"
+msgstr "Lua üst verileri okuyucu"
 
 #: modules/lua/vlc.c:142
 msgid "Read meta data using lua scripts"
-msgstr "Üst veri Lua betikleri kullanılarak okunur"
+msgstr "Üst veriler Lua betikleri kullanılarak okunur"
 
 #: modules/lua/vlc.c:148
 msgid "Lua Playlist"
@@ -22810,7 +22795,7 @@ msgstr "Lua SD modülü"
 
 #: modules/meta_engine/folder.c:71
 msgid "Folder meta data"
-msgstr "Klasör üst verisi"
+msgstr "Klasör üst verileri"
 
 #: modules/meta_engine/folder.c:75
 msgid "Album art filename"
@@ -23445,7 +23430,7 @@ msgstr "acoustid"
 
 #: modules/misc/fingerprinter.c:74
 msgid "Track fingerprinter (based on Acoustid)"
-msgstr "Kayıt tanıyıcı (Acoustid tabanlı)"
+msgstr "Kayıt parmak izi çıkarma (Acoustid tabanlı)"
 
 #: modules/misc/gnutls.c:482
 msgid ""
@@ -24656,7 +24641,7 @@ msgid ""
 "using meta data or time format string sequences."
 msgstr ""
 "Milisaniye olarak, metin güncellemeleri arasındaki süre. Bu ayar özellikle "
-"üst veri ya da zamana bağlı metinler kullanıyorsanız işe yarar."
+"üst verleri ya da zamana bağlı metinler kullanıyorsanız işe yarar."
 
 #: modules/spu/marq.c:109
 msgid ""
@@ -25785,8 +25770,8 @@ msgid ""
 "(Session Descriptor)."
 msgstr ""
 "Buraya, SDP (oturum belirteci) içinde duyurulan ve akış hakkında ayrıntılı "
-"bilgi içeren bir İnternet adresi yazabilirsiniz (yayıncı kurumun web sitesi "
-"adresi gibi)."
+"bilgi içeren bir İnternet adresi yazabilirsiniz (yayıncı kurumun site adresi "
+"gibi)."
 
 #: modules/stream_out/rtp.c:109 modules/stream_out/standard.c:72
 msgid "Session email"
@@ -26052,8 +26037,8 @@ msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
-"Dst için yardımcı ayar, VLC uygulamasının gelen akışları dinleyeceği "
-"adres:kapı. dst=bind+'/'+yol. dst-parametresi bunun yerine geçer."
+"Dst için yardımcı ayar, VLC uygulamasının gelen akışları dinleyeceği adres:"
+"kapı. dst=bind+'/'+yol. dst-parametresi bunun yerine geçer."
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
@@ -27703,8 +27688,8 @@ msgid ""
 "Prefix of the output images filenames. Output filenames will have the "
 "\"prefixNUMBER.format\" form if replace is not true."
 msgstr ""
-"Çıkış dosya adlarının ön eki. Değiştir seçeneği etkin değilse, çıkış dosya "
-"adları \"ön_ek.SAYI.biçim\" şeklinde olacaktır."
+"Çıkış dosya adlarının ön eki. Değiştir seçeneği açık değilse, çıkış dosya "
+"adları \"önek.SAYI.biçim\" şeklinde olur."
 
 #: modules/video_filter/scene.c:81
 msgid "Directory path prefix"
@@ -28161,56 +28146,48 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Windows 8 ve sonraki sürümler için önerilen görüntü çıkışı"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Görüntü ölçeği"
+msgstr "Görüntü çözünürlüğünü artırma kipi"
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Görüntünün bir rengini seçin"
+msgstr "Görüntü çözünürlüğünü artırma kipini seçin."
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Her örnekteki bit"
+msgstr "Doğrusal örnekleyici"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "SoX yeniden örnekleyici"
+msgstr "Nokta örnekleyici"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Görüntü kodlayıcı/çözücüleri"
+msgstr "Görüntü işleyici"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Çözünürlük"
+msgstr "Süper çözünürlük"
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Çıkış modülleri"
+msgstr "HDR çıkış kipi"
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
-msgstr ""
+msgstr "Kaynak SDR olsa bile HDR çıkışı kullanılsın"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Never out HDR"
-msgstr ""
+msgstr "HDR asla kullanılmasın"
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Her zaman üstte"
+msgstr "Her zaman HDR kullanılsın"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
-msgstr ""
+msgstr "SDR çözünürlüğünden HDR oluşturulsun"
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
@@ -29192,15 +29169,15 @@ msgstr "Süre:"
 #: share/lua/http/index.html:25 share/lua/http/mobile_browse.html:24
 #: share/lua/http/mobile_equalizer.html:24 share/lua/http/mobile_view.html:24
 msgid "VLC media player - Web Interface"
-msgstr "VLC ortam oynatıcısı - Web arayüzü"
+msgstr "VLC ortam oynatıcısı - İnternet arayüzü"
 
 #: share/lua/http/index.html:233
 msgid "Hide / Show Library"
-msgstr "Kitaplık görüntülensin / gizlensin"
+msgstr "Kitaplığı görüntüle / gizle"
 
 #: share/lua/http/index.html:234
 msgid "Hide / Show Viewer"
-msgstr "Görüntüleyici görüntülensin / gizlensin"
+msgstr "Görüntüleyiciyi görüntüle / gizle"
 
 #: share/lua/http/index.html:235
 msgid "Manage Streams"
@@ -29249,9 +29226,10 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
-"VLC, web arayüzünün mobil sürümüne bağlanan bir QR kodu görüntüleyebilir. Bu "
-"QR kodunu oluşturmak için, VLC ortam oynatıcısı kopyanızın web arayüzü "
-"adresi, İnternet üzerinden Google Image Charts web hizmetine iletilecektir."
+"VLC, İnternet arayüzünün mobil sürümüne bağlanan bir QR kodu "
+"görüntüleyebilir. Bu QR kodunu oluşturmak için, VLC ortam oynatıcısı "
+"kopyanızın İnternet arayüzü adresi, İnternet üzerinden Google Image Charts "
+"İnternet hizmetine iletilecektir."
 
 #: share/lua/http/index.html:284
 msgid "Do you want to go ahead with this?"
@@ -29334,24 +29312,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Parmak izi"
+msgstr "Ses parmak izi çıkarma"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Akış yöntemini seçin"
+msgstr "Eşleşen bir kimlik seçin"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Kayıt tanıyıcı (Acoustid tabanlı)"
+msgstr "Herhangi bir parmak izi bulunamadı"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Parmak izi"
+msgstr "İzin parmak izi çıkarılıyor..."
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29596,9 +29570,8 @@ msgid "Menus"
 msgstr "Menüler"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Ör&nekleme hızı"
+msgstr "Ka&re hızı"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29870,9 +29843,8 @@ msgid "Auto raising the interface:"
 msgstr "Otomatik arayüz açma:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Tema uygulanmış oynatma listesi kullanılsın"
+msgstr "Koyu bir palet kullanılsın"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30187,21 +30159,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Ortam yöneticisi listesi"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP kanal listesi"
-
-#~ msgid "Master List"
-#~ msgstr "Ana liste"
-
-#~ msgid "Server List"
-#~ msgstr "Sunucu listesi"
-
-#~ msgid "Custom List"
-#~ msgstr "Özel liste"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "SRT parça boyutu (bayt)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Bayt olarak şifreleme anahtarı uzunluğu"

@@ -15,11 +15,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: JungHee Lee <daemul72@gmail.com>, 2023\n"
+"Last-Translator: Junghee Lee <daemul72@gmail.com>, 2025\n"
 "Language-Team: Korean (https://app.transifex.com/yaron/teams/16553/ko/)\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -41,7 +41,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "VLC 기본설정"
+msgstr "VLC 환경설정"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
@@ -162,23 +162,23 @@ msgstr "기타 오디오 설정 및 모듈"
 #: modules/gui/qt/ui/profiles.h:720 modules/gui/qt/ui/profiles.h:724
 #: modules/gui/qt/ui/sprefs_video.h:323
 msgid "Video"
-msgstr "비디오"
+msgstr "동영상"
 
 #: include/vlc_config_cat.h:74
 msgid "Video settings"
-msgstr "비디오 설정"
+msgstr "동영상 설정"
 
 #: include/vlc_config_cat.h:76
 msgid "General video settings"
-msgstr "일반 비디오 설정"
+msgstr "일반 동영상 설정"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
-msgstr "비디오 출력 모듈의 일반 설정"
+msgstr "동영상 출력 모듈의 일반 설정"
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr "비디오 필터는 비디오 스트림을 처리하는데 사용됩니다."
+msgstr "동영상 필터는 동영상 스트림을 처리하는데 사용됩니다."
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
@@ -195,7 +195,7 @@ msgstr "스플리터"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr "비디오 스플리터는 스트림을 여러 개의 비디오로 분리합니다."
+msgstr "동영상 스플리터는 스트림을 여러 개의 동영상로 분리합니다."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -235,15 +235,15 @@ msgstr "Demuxer"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr "Demuxer는 오디오와 비디오 스트림을 분리하기 위해 사용됩니다."
+msgstr "Demuxer는 오디오와 동영상 스트림을 분리하기 위해 사용됩니다."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
-msgstr "비디오 코덱"
+msgstr "동영상 코덱"
 
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
-msgstr "비디오, 이미지 또는 비디오+오디오 디코더 및 인코더 설정."
+msgstr "동영상, 이미지 또는 동영상+오디오 디코더 및 인코더 설정."
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
@@ -301,7 +301,7 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
-"Muxer는 모든 기본적인 스트림(비디오, 오디오, ...)을 하나로 묶는 캡슐화 형식"
+"Muxer는 모든 기본적인 스트림(동영상, 오디오, ...)을 하나로 묶는 캡슐화 형식"
 "을 생성합니다. 이 설정은 항상 특정 Muxer를 사용하도록 해 줍니다. 여러분은 아"
 "마도 이렇게 설정해서는 안 될 것입니다.\n"
 "또한 각 Muxer에서 사용할 기본 매개변수를 설정할 수 있습니다."
@@ -358,7 +358,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "VLC의 VOD (주문형 비디오) 구현"
+msgstr "VLC의 VOD (주문형 동영상) 구현"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
@@ -575,21 +575,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -599,30 +599,30 @@ msgid ""
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>VLC 미디어 재생기 도움말에 오신 것을 환영"
-"합니다!</h2><h3>문서</h3><p>VideoLAN <a href=\"http://wiki.videolan.org\">위"
-"키</a> 웹사이트에서 VLC 문서를 찾을 수 있습니다.</p><p>만약 VLC를 처음 사용"
-"해 보신다면, <br><a href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>VLC 미디어 재생기 소개</em></a> 문서를 읽"
-"어보시기 바랍니다.</p><p>VLC를 사용하는 방법은 <br>\"<a href=\"http://"
-"wiki.videolan.org/Documentation:Play_HowTo\"><em>VLC 미디어 재생기로 파일 재"
-"생하기</em></a>\" 문서에서 설명하고 있습니다.</p><p>저장, 변환, 트랜스코딩, "
-"인코딩, 먹싱, 스트리밍 작업에 대한 모든 정보는 <a href=\"http://"
-"wiki.videolan.org/Documentation:Streaming_HowTo\">스트리밍 문서</a>에서 찾아"
-"볼 수 있습니다.</p><p>만약 여기서 사용하는 용어들이 궁금하다면, <a "
-"href=\"http://wiki.videolan.org/Knowledge_Base\">지식 베이스</a>를 참조하십시"
-"오.</p><p>기본 키보드 단축키들을 알아보고 싶다면, <a href=\"http://"
-"wiki.videolan.org/Hotkeys\">단축키</a> 페이지가 도움이 될 것입니다.</p><h3>도"
-"움말</h3><p>모르는 내용을 질문하기 전에, 먼저 <a href=\"http://"
-"wiki.videolan.org/Frequently_Asked_Questions\">FAQ</a>를 참조해 주시기 바랍니"
-"다.</p><p>다른 VLC에 대한 도움말은 <a href=\"http://forum.videolan.org\">포럼"
-"</a>, <a href=\"http://www.videolan.org/vlc/lists.html\">메일링 리스트</a> 혹"
-"은 IRC 채널 ( <a href=\"http://www.videolan.org/webirc/\"><em>#videolan</"
-"em></a> on irc.freenode.net ) 에서 얻을 수 있을 것입니다.</p><h3>프로젝트에 "
-"공헌하기</h3><p>여러분의 시간을 약간 투자하여 스킨을 제작하거나, 문서를 번역"
-"하거나, 프로그램을 테스트하거나, 작성하는 방식으로 커뮤니티를 도와서 "
-"VideoLan 프로젝트에 공헌할 수 있습니다.혹은 기부금 혹은 장비를 제공하여 도울 "
-"수도 있습니다. 아니면 VLC 미디어 재생기를 <b>사람들에게 알리는 일</b>도 큰 도"
-"움이 됩니다.</body></html>"
+"합니다!</h2><h3>설명서</h3><p>VideoLAN <a href=\"http://wiki.videolan.org\">"
+"위키</a> 웹사이트에서 VLC 설명서를 찾을 수 있습니다.</p><p>만약 VLC를 처음 사"
+"용해 보신다면, <br><a href=\"http://wiki.videolan.org/Documentation:"
+"VLC_for_dummies\"><em>VLC 미디어 재생기 소개</em></a> 문서를 읽어보시기 바랍"
+"니다.</p><p>VLC를 사용하는 방법은 <br>\"<a href=\"http://wiki.videolan.org/"
+"Documentation:Play_HowTo\"><em>VLC 미디어 재생기로 파일 재생하기</em></a>\" "
+"문서에서 설명하고 있습니다.</p><p>저장, 변환, 트랜스코딩, 인코딩, 먹싱, 스트"
+"리밍 작업에 대한 모든 정보는 <a href=\"http://wiki.videolan.org/"
+"Documentation:Streaming_HowTo\">스트리밍 설명서</a>에서 찾아볼 수 있습니다.</"
+"p><p>만약 여기서 사용하는 용어들이 궁금하다면, <a href=\"http://wiki."
+"videolan.org/Knowledge_Base\">지식 베이스</a>를 참조하십시오.</p><p>기본 키보"
+"드 단축키들을 알아보고 싶다면, <a href=\"http://wiki.videolan.org/Hotkeys\">"
+"단축키</a> 페이지가 도움이 될 것입니다.</p><h3>도움말</h3><p>모르는 내용을 질"
+"문하기 전에, 먼저 <a href=\"http://wiki.videolan.org/"
+"Frequently_Asked_Questions\">FAQ</a>를 참조해 주시기 바랍니다.</p><p>다른 VLC"
+"에 대한 도움말은 <a href=\"http://forum.videolan.org\">포럼</a>, <a "
+"href=\"http://www.videolan.org/vlc/lists.html\">메일링 리스트</a> 혹은 IRC 채"
+"널 ( <a href=\"http://www.videolan.org/webirc/\"><em>#videolan</em></a> on "
+"irc.freenode.net ) 에서 얻을 수 있을 것입니다.</p><h3>프로젝트에 공헌하기</"
+"h3><p>여러분의 시간을 약간 투자하여 스킨을 제작하거나, 설명서를 번역하거나, "
+"프로그램을 테스트하거나, 작성하는 방식으로 커뮤니티를 도와서 VideoLan 프로젝"
+"트에 공헌할 수 있습니다.혹은 기부금 혹은 장비를 제공하여 도울 수도 있습니다. "
+"아니면 VLC 미디어 재생기를 <b>사람들에게 알리는 일</b>도 큰 도움이 됩니다.</"
+"body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -920,7 +920,7 @@ msgstr "미확인 코덱"
 
 #: src/input/decoder.c:1903
 msgid "VLC could not identify the audio or video codec"
-msgstr "VLC가 오디오/비디오 코덱을 확인할 수 없습니다"
+msgstr "VLC가 오디오/동영상 코덱을 확인할 수 없습니다"
 
 #: src/input/decoder.c:1914
 msgid "packetizer"
@@ -1066,7 +1066,7 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3208
 msgid "Video resolution"
-msgstr "비디오 해상도"
+msgstr "동영상 해상도"
 
 #: src/input/es_out.c:3213
 msgid "Buffer dimensions"
@@ -1398,7 +1398,7 @@ msgstr "챕터"
 #: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:435
 #: modules/gui/macosx/VLCMainMenu.m:436
 msgid "Video Track"
-msgstr "비디오 트랙"
+msgstr "동영상 트랙"
 
 #: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:418
 #: modules/gui/macosx/VLCMainMenu.m:419
@@ -1584,7 +1584,7 @@ msgid ""
 "When this is enabled, the preferences and/or interfaces will show all "
 "available options, including those that most users should never touch."
 msgstr ""
-"이 옵션을 선택하면, 기본설정이나 인터페이스에서 대부분의 활성화자들은 거의 쓰"
+"이 옵션을 선택하면, 환경설정이나 인터페이스에서 대부분의 활성화자들은 거의 쓰"
 "지 않는 것을 포함한 활성화 가능한 모든 옵션을 보여줄 것입니다."
 
 #: src/libvlc-module.c:105
@@ -1710,7 +1710,7 @@ msgid ""
 "This delays the audio output. The delay must be given in milliseconds. This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
-"오디오 출력을 지연시킵니다. 지연은 밀리초로 주어져야 합니다. 비디오과 오디오 "
+"오디오 출력을 지연시킵니다. 지연은 밀리초로 주어져야 합니다. 동영상과 오디오 "
 "사이의 지연을 인지한다면 조정할수 있습니다."
 
 #: src/libvlc-module.c:168
@@ -1867,34 +1867,34 @@ msgid ""
 "\"video filters\" modules section. You can also set many miscellaneous video "
 "options."
 msgstr ""
-"이 옵션들은 비디오 출력 서브시스템의 동작을 변경하도록 허용합니다. 예를 들어 "
-"비디오 필터를 활성화할게 할수 있습니다 (디인터레이싱, 이미지 조정, 기타). 여"
-"기에서 그 필터들을 활성화함으로 하고 \"비디오 필터\" 모듈 섹션에서 구성하세"
-"요. 여러 잡다한 비디오 옵션들도 구성할수 있습니다."
+"이 옵션들은 동영상 출력 서브시스템의 동작을 변경하도록 허용합니다. 예를 들어 "
+"동영상 필터를 활성화할게 할수 있습니다 (디인터레이싱, 이미지 조정, 기타). 여"
+"기에서 그 필터들을 활성화함으로 하고 \"동영상 필터\" 모듈 섹션에서 구성하세"
+"요. 여러 잡다한 동영상 옵션들도 구성할수 있습니다."
 
 #: src/libvlc-module.c:253
 msgid "Video output module"
-msgstr "비디오 출력 모듈"
+msgstr "동영상 출력 모듈"
 
 #: src/libvlc-module.c:255
 msgid ""
 "This is the the video output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
-"VLC에서 사용하는 비디오 출력 방식입니다. 기본 동작은 사용 가능한 최상의 방식"
+"VLC에서 사용하는 동영상 출력 방식입니다. 기본 동작은 사용 가능한 최상의 방식"
 "을 자동으로 선택하는 것입니다."
 
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:311
 msgid "Enable video"
-msgstr "비디오 활성화"
+msgstr "동영상 활성화"
 
 #: src/libvlc-module.c:260
 msgid ""
 "You can completely disable the video output. The video decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
-"비디오을 아주 끌 수 있습니다. 비디오을 추출하는 과정이 생략되기 때문에, 처리"
+"동영상을 아주 끌 수 있습니다. 동영상을 추출하는 과정이 생략되기 때문에, 처리"
 "량이 어느 정도 줄어듭니다."
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
@@ -1902,14 +1902,14 @@ msgstr ""
 #: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
-msgstr "비디오 너비"
+msgstr "동영상 너비"
 
 #: src/libvlc-module.c:265
 msgid ""
 "You can enforce the video width. By default (-1) VLC will adapt to the video "
 "characteristics."
 msgstr ""
-"비디오의 너비를 강제적으로 지정할 수가 있습니다. 기본값인 -1은 비디오의 특성"
+"동영상의 너비를 강제적으로 지정할 수가 있습니다. 기본값인 -1은 동영상의 특성"
 "에 맞춥니다."
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
@@ -1917,46 +1917,46 @@ msgstr ""
 #: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
-msgstr "비디오 높이"
+msgstr "동영상 높이"
 
 #: src/libvlc-module.c:270
 msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"비디오의 높이를 강제적으로 지정할 수가 있습니다. 기본값인 -1은 비디오의 특성"
+"동영상의 높이를 강제적으로 지정할 수가 있습니다. 기본값인 -1은 동영상의 특성"
 "에 맞춥니다. "
 
 #: src/libvlc-module.c:273
 msgid "Video X coordinate"
-msgstr "비디오 X 좌표"
+msgstr "동영상 X 좌표"
 
 #: src/libvlc-module.c:275
 msgid ""
 "You can enforce the position of the top left corner of the video window (X "
 "coordinate)."
-msgstr "비디오 창의 왼쪽 상단 모서리의 위치(X 좌표)를 적용할 수 있습니다."
+msgstr "동영상 창의 왼쪽 상단 모서리의 위치(X 좌표)를 적용할 수 있습니다."
 
 #: src/libvlc-module.c:278
 msgid "Video Y coordinate"
-msgstr "비디오 Y 좌표"
+msgstr "동영상 Y 좌표"
 
 #: src/libvlc-module.c:280
 msgid ""
 "You can enforce the position of the top left corner of the video window (Y "
 "coordinate)."
-msgstr "비디오 창의 왼쪽 상단 모서리 위치(Y 좌표)를 적용할 수 있습니다."
+msgstr "동영상 창의 왼쪽 상단 모서리 위치(Y 좌표)를 적용할 수 있습니다."
 
 #: src/libvlc-module.c:283
 msgid "Video title"
-msgstr "비디오 제목"
+msgstr "동영상 제목"
 
 #: src/libvlc-module.c:285
 msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
 msgstr ""
-"비디오 창의 사용자 지정 제목 (비디오이 인터페이스와 결합되지 않은 경우)."
+"동영상 창의 사용자 지정 제목 (동영상이 인터페이스와 결합되지 않은 경우)."
 
 #: src/libvlc-module.c:288
 msgid "Video alignment"
@@ -1968,7 +1968,7 @@ msgid ""
 "centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use "
 "combinations of these values, like 6=4+2 meaning top-right)."
 msgstr ""
-"창에서 비디오의 정렬을 시행합니다. 기본적으로 (0) 이면 가운데 (0=가운데, 1=왼"
+"창에서 동영상의 정렬을 시행합니다. 기본적으로 (0) 이면 가운데 (0=가운데, 1=왼"
 "쪽, 2=오른쪽, 4=상단, 8=하단, 또한 이 값들을 조합해서 사용할수 있습니다. "
 "6=4+2는 오른쪽 상단을 의미합니다)."
 
@@ -2038,35 +2038,35 @@ msgstr "화면 크기 조절하기"
 
 #: src/libvlc-module.c:300
 msgid "You can zoom the video by the specified factor."
-msgstr "지정한 비율로 비디오 화면의 크기를 조절할 수 있습니다."
+msgstr "지정한 비율로 동영상 화면의 크기를 조절할 수 있습니다."
 
 #: src/libvlc-module.c:302
 msgid "Grayscale video output"
-msgstr "흑백 비디오 출력"
+msgstr "흑백 동영상 출력"
 
 #: src/libvlc-module.c:304
 msgid ""
 "Output video in grayscale. As the color information aren't decoded, this can "
 "save some processing power."
 msgstr ""
-"비디오을 흑백으로 출력합니다. 컬러 정보를 디코딩하지 않기 때문에 약간의 처리 "
+"동영상을 흑백으로 출력합니다. 컬러 정보를 디코딩하지 않기 때문에 약간의 처리 "
 "능력을 절약할 수 있습니다."
 
 #: src/libvlc-module.c:307
 msgid "Embedded video"
-msgstr "비디오 창 결합"
+msgstr "동영상 창 결합"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
-msgstr "비디오 출력 창을 기본 인터페이스에 내장합니다."
+msgstr "동영상 출력 창을 기본 인터페이스에 내장합니다."
 
 #: src/libvlc-module.c:311
 msgid "Fullscreen video output"
-msgstr "전체화면 비디오 출력"
+msgstr "전체화면 동영상 출력"
 
 #: src/libvlc-module.c:313
 msgid "Start video in fullscreen mode"
-msgstr "전체화면 모드에서 비디오을 시작합니다."
+msgstr "전체화면 모드에서 동영상을 시작합니다."
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 msgid "Always on top"
@@ -2074,7 +2074,7 @@ msgstr "항상 위에"
 
 #: src/libvlc-module.c:317
 msgid "Always place the video window on top of other windows."
-msgstr "항상 비디오 출력창을 다른 창 위에 둡니다."
+msgstr "항상 동영상 출력창을 다른 창 위에 둡니다."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
@@ -2083,31 +2083,31 @@ msgstr "배경 모드 활성화"
 #: src/libvlc-module.c:321
 msgid ""
 "The wallpaper mode allows you to display the video as the desktop background."
-msgstr "배경 모드는 비디오을 데스크탑의 배경으로 재생할 수 있도록 해 줍니다."
+msgstr "배경 모드는 동영상을 데스크탑의 배경으로 재생할 수 있도록 해 줍니다."
 
 #: src/libvlc-module.c:324
 msgid "Show media title on video"
-msgstr "비디오 재생시 미디어 제목 표시"
+msgstr "동영상 재생시 미디어 제목 표시"
 
 #: src/libvlc-module.c:326
 msgid "Display the title of the video on top of the movie."
-msgstr "동영상의 상단에 비디오 제목을 표시합니다."
+msgstr "영화의 상단에 동영상 제목을 표시합니다."
 
 #: src/libvlc-module.c:328
 msgid "Show video title for x milliseconds"
-msgstr "비디오 제목 표시 시간 (밀리초)"
+msgstr "동영상 제목 표시 시간 (밀리초)"
 
 #: src/libvlc-module.c:330
 msgid "Show the video title for n milliseconds, default is 5000 ms (5 sec.)"
-msgstr "n 밀리초 동안 비디오 제목을 출력합니다. 기본값은 5000 밀리초 (5 초)"
+msgstr "n 밀리초 동안 동영상 제목을 출력합니다. 기본값은 5000 밀리초 (5 초)"
 
 #: src/libvlc-module.c:332
 msgid "Position of video title"
-msgstr "비디오 제목 위치"
+msgstr "동영상 제목 위치"
 
 #: src/libvlc-module.c:334
 msgid "Place on video where to display the title (default bottom center)."
-msgstr "비디오 재생을 시작할 때 제목을 표시할 위치입니다 (기본값 하단 가운데)."
+msgstr "동영상 재생을 시작할 때 제목을 표시할 위치입니다 (기본값 하단 가운데)."
 
 #: src/libvlc-module.c:336
 msgid "Hide cursor and fullscreen controller after x milliseconds"
@@ -2136,7 +2136,7 @@ msgstr "디인터레이스 모드"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr "비디오 처리에 사용할 디인터레이스 방식"
+msgstr "동영상 처리에 사용할 디인터레이스 방식"
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
@@ -2170,7 +2170,7 @@ msgstr "화면 보호기 끄기"
 
 #: src/libvlc-module.c:372
 msgid "Disable the screensaver during video playback."
-msgstr "비디오 재생 중에 화면 보호기를 사용하지 않습니다."
+msgstr "동영상 재생 중에 화면 보호기를 사용하지 않습니다."
 
 #: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/ui/sprefs_video.h:314
@@ -2182,52 +2182,52 @@ msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
 msgstr ""
-"VLC는 비디오 주변에 창 캡션, 프레임 등을 생성하는 것을 방지하여 \"최소\" 창"
+"VLC는 동영상 주변에 창 캡션, 프레임 등을 생성하는 것을 방지하여 \"최소\" 창"
 "을 제공합니다."
 
 #: src/libvlc-module.c:379
 msgid "Video splitter module"
-msgstr "비디오 스플리터 모듈"
+msgstr "동영상 스플리터 모듈"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
-msgstr "복제(Clone)나 벽(Wall)같은 비디오 스플리터를 추가합니다."
+msgstr "복제(Clone)나 벽(Wall)같은 동영상 스플리터를 추가합니다."
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
-msgstr "비디오 필터 모듈"
+msgstr "동영상 필터 모듈"
 
 #: src/libvlc-module.c:385
 msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr ""
-"디인터레이싱 또는 비디오 왜곡의 비디오 품질을 향상하기 위해 후처리 필터를 추"
+"디인터레이싱 또는 동영상 왜곡의 동영상 품질을 향상하기 위해 후처리 필터를 추"
 "가합니다."
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
-msgstr "비디오 스냅샷 디렉터리 (또는 파일명)"
+msgstr "동영상 스냅샷 디렉터리 (또는 파일명)"
 
 #: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
-msgstr "비디오 스냅샷을 저장할 디렉터리."
+msgstr "동영상 스냅샷을 저장할 디렉터리."
 
 #: src/libvlc-module.c:393 src/libvlc-module.c:395
 msgid "Video snapshot file prefix"
-msgstr "비디오 스냅샷 파일 접두사"
+msgstr "동영상 스냅샷 파일 접두사"
 
 #: src/libvlc-module.c:397
 msgid "Video snapshot format"
-msgstr "비디오 스냅샷 형식"
+msgstr "동영상 스냅샷 형식"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
-msgstr "비디오 스냅샷 저장에 사용되는 이미지 형식입니다."
+msgstr "동영상 스냅샷 저장에 사용되는 이미지 형식입니다."
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
-msgstr "비디오 스냅샷 미리보기 출력하기"
+msgstr "동영상 스냅샷 미리보기 출력하기"
 
 #: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
@@ -2243,19 +2243,19 @@ msgstr "스냅샷 번호 매기기에 타임스탬프 대신 일련 번호를 �
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
-msgstr "비디오 스냅샷 너비"
+msgstr "동영상 스냅샷 너비"
 
 #: src/libvlc-module.c:411
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
-"비디오 스냅샷의 너비를 강제할 수 있습니다. 기본적으로 원본 너비를 유지합니다"
+"동영상 스냅샷의 너비를 강제할 수 있습니다. 기본적으로 원본 너비를 유지합니다"
 "(-1). 0을 사용하면 화면 비율을 유지하기 위해 너비의 크기를 조절합니다."
 
 #: src/libvlc-module.c:415
 msgid "Video snapshot height"
-msgstr "비디오 스냅샷 높이"
+msgstr "동영상 스냅샷 높이"
 
 #: src/libvlc-module.c:417
 msgid ""
@@ -2263,19 +2263,19 @@ msgid ""
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
-"비디오 스냅샷의 높이를 강제할수 있습니다. 기본적으로 원본 높이를 유지합니다"
+"동영상 스냅샷의 높이를 강제할수 있습니다. 기본적으로 원본 높이를 유지합니다"
 "(-1). 0을 사용하면 화면 비율을 유지하기 위해 높이의 크기를 조절합니다."
 
 #: src/libvlc-module.c:421
 msgid "Video cropping"
-msgstr "비디오 자르기"
+msgstr "동영상 자르기"
 
 #: src/libvlc-module.c:423
 msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
-"비디오 소스의 자르기를 강제 지정합니다. 허용 형식은 전체적인 이미지 모양을 표"
+"동영상 소스의 자르기를 강제 지정합니다. 허용 형식은 전체적인 이미지 모양을 표"
 "현하는 x:y (4:3, 16:9, 기타) 입니다."
 
 #: src/libvlc-module.c:427
@@ -2286,26 +2286,26 @@ msgstr "원본 화면 비율"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "원본 화면 비율을 강제로 적용합니다. 예를 들어 어떤 DVD는 실제로는 4:3인데 "
-"16:9로 재생됩니다. 동영상에 화면 비율 정보가 없을 때 VLC에서 힌트로 사용될 "
-"수 있습니다. 인정되는 형식은 전체 이미지 비율을 나타내는 x:y (4:3, 16:9 등) "
-"나, 픽셀의 네모짐을 표시하는 실수 (1.25, 1.3333 등) 입니다."
+"16:9로 재생됩니다. 이는 VLC에서 영화에 화면비 정보가 없는 경우를 파악하는 데"
+"에도 도움이 될 수 있습니다. 인정되는 형식은 전체 이미지 비율을 나타내는 x:y "
+"(4:3, 16:9 등) 나, 픽셀의 네모짐을 표시하는 실수 (1.25, 1.3333 등) 입니다."
 
 #: src/libvlc-module.c:436
 msgid "Video Auto Scaling"
-msgstr "비디오 자동 크기조정"
+msgstr "동영상 자동 크기조정"
 
 #: src/libvlc-module.c:438
 msgid "Let the video scale to fit a given window or fullscreen."
-msgstr "창이나 전체화면에 비디오 크기를 맞춥니다."
+msgstr "창이나 전체화면에 동영상 크기를 맞춥니다."
 
 #: src/libvlc-module.c:440
 msgid "Video scaling factor"
-msgstr "비디오 크기조정 비율"
+msgstr "동영상 크기조정 비율"
 
 #: src/libvlc-module.c:442
 msgid ""
@@ -2313,7 +2313,7 @@ msgid ""
 "Default value is 1.0 (original video size)."
 msgstr ""
 "크기조절 비율은 자동 크기조정을 사용하지 않을 때 사용됩니다.\n"
-"기본값은 1.0 입니다 (원본 비디오 크기)."
+"기본값은 1.0 입니다 (원본 동영상 크기)."
 
 #: src/libvlc-module.c:445
 msgid "Custom crop ratios list"
@@ -2349,9 +2349,9 @@ msgid ""
 "incorrectly sets height to 1088 lines. You should only disable this option "
 "if your video has a non-standard format requiring all 1088 lines."
 msgstr ""
-"깨진 인코더가 높이를 1088 라인으로 부정확하게 설정한다 하더라도 1080 비디오 "
+"깨진 인코더가 높이를 1088 라인으로 부정확하게 설정한다 하더라도 1080 동영상 "
 "형식의 HDTV를 적절하게 다룰 수 있도록 해 줍니다.  1088 라인 전체가 필요한 비"
-"표준 형식의 비디오라면 이 옵션을 비활성화해야만 합니다."
+"표준 형식의 동영상라면 이 옵션을 비활성화해야만 합니다."
 
 #: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
@@ -2376,8 +2376,8 @@ msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
-"MPEG2 스트림에서 프레임 버리기를 허용합니다. 프레임 버리기는 컴퓨터가 동영상"
-"을 재생하기에 충분하지 않은 경우에 발생합니다."
+"MPEG2 스트림에서 프레임드롭핑을 활성화합니다. 프레임 드롭은 컴퓨터 성능이 충"
+"분하지 않을 때 발생합니다."
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
@@ -2387,7 +2387,7 @@ msgstr "늦은 프레임 버리기"
 msgid ""
 "This drops frames that are late (arrive to the video output after their "
 "intended display date)."
-msgstr "(모니터 갱신율 이후에 비디오 출력에 도달하는) 느린 프레임을 버립니다."
+msgstr "(모니터 갱신율 이후에 동영상 출력에 도달하는) 느린 프레임을 버립니다."
 
 #: src/libvlc-module.c:478
 msgid "Quiet synchro"
@@ -2398,7 +2398,7 @@ msgid ""
 "This avoids flooding the message log with debug output from the video output "
 "synchronization mechanism."
 msgstr ""
-"비디오 출력 동기화 메카니즘의 디버그 출력시에 메시지 로그가 너무 많이 넘치는 "
+"동영상 출력 동기화 메카니즘의 디버그 출력시에 메시지 로그가 너무 많이 넘치는 "
 "것을 막습니다."
 
 #: src/libvlc-module.c:483
@@ -2407,7 +2407,7 @@ msgstr "키 누름 이벤트"
 
 #: src/libvlc-module.c:485
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
-msgstr "(내장이 아닌) 비디오 창에서 VLC 단축키를 활성화합니다."
+msgstr "(내장이 아닌) 동영상 창에서 VLC 단축키를 활성화합니다."
 
 #: src/libvlc-module.c:487 modules/spu/remoteosd.c:91
 msgid "Mouse events"
@@ -2415,7 +2415,7 @@ msgstr "마우스 이벤트"
 
 #: src/libvlc-module.c:489
 msgid "This enables handling of mouse clicks on the video."
-msgstr "비디오에서 마우스 클릭 처리를 활성화합니다."
+msgstr "동영상에서 마우스 클릭 처리를 활성화합니다."
 
 #: src/libvlc-module.c:497
 msgid ""
@@ -2672,7 +2672,7 @@ msgstr "선호하는 클로즈드 캡션 디코더"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
-msgstr "선호하는 비디오 해상도"
+msgstr "선호하는 동영상 해상도"
 
 #: src/libvlc-module.c:618
 msgid ""
@@ -2681,8 +2681,8 @@ msgid ""
 "option if you don't have enough CPU power or network bandwidth to play "
 "higher resolutions."
 msgstr ""
-"여러 비디오 형식을 사용할 수 있을 때, 이 설정에 가장 가까운(초과하지는 않는) "
-"라인 개수의 해상도를 선택합니다. CPU 파워나 네트워크 대역폭이 고해상도 비디오"
+"여러 동영상 형식을 사용할 수 있을 때, 이 설정에 가장 가까운(초과하지는 않는) "
+"라인 개수의 해상도를 선택합니다. CPU 파워나 네트워크 대역폭이 고해상도 동영상"
 "을 재생하기에 충분하지 않으면 이 옵션을 사용하세요."
 
 #: src/libvlc-module.c:624
@@ -2873,7 +2873,8 @@ msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
 msgstr ""
-"이 옵션으로 동영상 아래쪽에 자막의 위치를 지정할 수 있습니다. 몇 번 해보세요."
+"이 옵션을 사용하면 영화 위에 자막을 배치하는 대신 영화 아래에 배치할 수 있습"
+"니다. 여러 위치를 시도해 보세요."
 
 #: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
@@ -2902,7 +2903,7 @@ msgid ""
 "VLC can display messages on the video. This is called OSD (On Screen "
 "Display)."
 msgstr ""
-"VLC 는 비디오에 메시지를 표시할 수 있습니다. 이것을 OSD(모니터 조정 기능)라"
+"VLC 는 동영상에 메시지를 표시할 수 있습니다. 이것을 OSD(모니터 조정 기능)라"
 "고 합니다."
 
 #: src/libvlc-module.c:722
@@ -2927,7 +2928,7 @@ msgid ""
 "images or text over the video (like a logo, arbitrary text, ...)."
 msgstr ""
 "소위 \"서브픽처 소스\" 라고 칭하는 것을 추가합니다. 이 필터들은 이미지(로고같"
-"은)나 텍스트를 비디오 위에 입혀 줍니다."
+"은)나 텍스트를 동영상 위에 입혀 줍니다."
 
 #: src/libvlc-module.c:731
 msgid "Subpictures filter module"
@@ -2950,8 +2951,8 @@ msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
 msgstr ""
-"자막 파일명을 지정하지 않으면(동영상 파일명에 기반함), 자막 파일을 자동으로 "
-"감지합니다."
+"자막 파일 이름이 지정되지 않은 경우, 자막 파일을 자동으로 감지합니다(영화의 "
+"파일명에 기반함)."
 
 #: src/libvlc-module.c:741
 msgid "Subtitle autodetection fuzziness"
@@ -2967,12 +2968,12 @@ msgid ""
 "3 = subtitle file matching the movie name with additional chars\n"
 "4 = subtitle file matching the movie name exactly"
 msgstr ""
-"어떻게 자막 및 동영상 파일명이 일치하게 할지를 결정. 옵션은:\n"
+"어떻게 자막 및 영화 파일명이 일치하게 할지를 결정. 옵션은:\n"
 "0 = 자막 자동 감지 하지 않음\n"
 "1 = 모든 자막 파일\n"
-"2 = 동영상 이름이 포함된 모든 자막 파일\n"
-"3 = 부가적인 문자를 포함한 동영상 이름이 일치하는 자막 파일\n"
-"4 = 동영상 이름과 정확히 일치하는 자막 파일"
+"2 = 영화 이름이 포함된 모든 자막 파일\n"
+"3 = 부가적인 문자를 포함한 영화 이름이 일치하는 자막 파일\n"
+"4 = 영화 이름과 정확히 일치하는 자막 파일"
 
 #: src/libvlc-module.c:751
 msgid "Subtitle autodetection paths"
@@ -3151,9 +3152,8 @@ msgstr "HTTP 프록시"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "사용할 HTTP 프록시는 반드시 http://[user@]myproxy.mydomain:myport/ 의 형식이"
 "어야 합니다; 이 값이 없으면, http_proxy 환경 변수값 사용을 시도합니다."
@@ -3316,7 +3316,7 @@ msgstr "모든 ES의 스트리밍 활성화"
 
 #: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
-msgstr "모든 기본적인 스트림(비디오, 오디오 및 자막)을 스트리밍합니다."
+msgstr "모든 기본적인 스트림(동영상, 오디오 및 자막)을 스트리밍합니다."
 
 #: src/libvlc-module.c:939
 msgid "Display while streaming"
@@ -3328,14 +3328,14 @@ msgstr "스트리밍 동안 스트림 부분적으로 재생."
 
 #: src/libvlc-module.c:943
 msgid "Enable video stream output"
-msgstr "비디오 스트림 출력 활성화"
+msgstr "동영상 스트림 출력 활성화"
 
 #: src/libvlc-module.c:945
 msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"스트림 출력 장치를 활성화 중일 때 비디오 스트림을 스트림 출력 장치에 리다이렉"
+"스트림 출력 장치를 활성화 중일 때 동영상 스트림을 스트림 출력 장치에 리다이렉"
 "트할 것인지 선택하세요."
 
 #: src/libvlc-module.c:948
@@ -3483,7 +3483,7 @@ msgid ""
 "automatically detected. You should not set this as a global option unless "
 "you really know what you are doing."
 msgstr ""
-"디멀티플렉서는 (오디오나 비디오 스트림과 같은) \"기본\" 스트림을 분리하기 위"
+"디멀티플렉서는 (오디오나 동영상 스트림과 같은) \"기본\" 스트림을 분리하기 위"
 "해 사용됩니다. 옳은 demuxer가 자동으로 감지되지 않는 경우에 사용할 수 있습니"
 "다. 무슨 내용인지 정확하게 모른다면 이 옵션을 전체 옵션으로 설정해서는 안 됩"
 "니다."
@@ -4104,7 +4104,7 @@ msgstr "다음 프레임"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
-msgstr "다음 프레임으로 이동할 단축키를 선택하세요."
+msgstr "다음 프레임으로 가기할 단축키를 선택하세요."
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
@@ -4568,7 +4568,7 @@ msgstr "(미리 정의된) 다음 소스 화면 비율을 순차적으로 선택
 
 #: src/libvlc-module.c:1403
 msgid "Cycle video crop"
-msgstr "비디오 자르기 순차 선택"
+msgstr "동영상 자르기 순차 선택"
 
 #: src/libvlc-module.c:1404
 msgid "Cycle through a predefined list of crop formats."
@@ -4628,11 +4628,11 @@ msgstr "컨텍스트 팝업 메뉴를 표시합니다."
 
 #: src/libvlc-module.c:1420
 msgid "Take video snapshot"
-msgstr "비디오 스냅샷 찍기"
+msgstr "동영상 스냅샷 찍기"
 
 #: src/libvlc-module.c:1421
 msgid "Takes a video snapshot and writes it to disk."
-msgstr "비디오 스냅샷을 찍고 디스크에 기록합니다."
+msgstr "동영상 스냅샷을 찍고 디스크에 기록합니다."
 
 #: src/libvlc-module.c:1423 modules/gui/macosx/VLCMainMenu.m:387
 #: modules/gui/qt/components/controller.hpp:110
@@ -4663,35 +4663,35 @@ msgstr "화면 크기 초기화"
 
 #: src/libvlc-module.c:1438 src/libvlc-module.c:1439
 msgid "Crop one pixel from the top of the video"
-msgstr "비디오 상단: 한 픽셀 자르기"
+msgstr "동영상 상단: 한 픽셀 자르기"
 
 #: src/libvlc-module.c:1440 src/libvlc-module.c:1441
 msgid "Uncrop one pixel from the top of the video"
-msgstr "비디오 상단: 한 픽셀 자르기 해제"
+msgstr "동영상 상단: 한 픽셀 자르기 해제"
 
 #: src/libvlc-module.c:1443 src/libvlc-module.c:1444
 msgid "Crop one pixel from the left of the video"
-msgstr "비디오 왼쪽: 한 픽셀 자르기"
+msgstr "동영상 왼쪽: 한 픽셀 자르기"
 
 #: src/libvlc-module.c:1445 src/libvlc-module.c:1446
 msgid "Uncrop one pixel from the left of the video"
-msgstr "비디오 왼쪽: 한 픽셀 자르기 해제"
+msgstr "동영상 왼쪽: 한 픽셀 자르기 해제"
 
 #: src/libvlc-module.c:1448 src/libvlc-module.c:1449
 msgid "Crop one pixel from the bottom of the video"
-msgstr "비디오 하단: 한 픽셀 자르기"
+msgstr "동영상 하단: 한 픽셀 자르기"
 
 #: src/libvlc-module.c:1450 src/libvlc-module.c:1451
 msgid "Uncrop one pixel from the bottom of the video"
-msgstr "비디오 하단: 한 픽셀 자르기 해제"
+msgstr "동영상 하단: 한 픽셀 자르기 해제"
 
 #: src/libvlc-module.c:1453 src/libvlc-module.c:1454
 msgid "Crop one pixel from the right of the video"
-msgstr "비디오 오른쪽: 한 픽셀 자르기"
+msgstr "동영상 오른쪽: 한 픽셀 자르기"
 
 #: src/libvlc-module.c:1455 src/libvlc-module.c:1456
 msgid "Uncrop one pixel from the right of the video"
-msgstr "비디오 오른쪽: 한 픽셀 자르기 해제"
+msgstr "동영상 오른쪽: 한 픽셀 자르기 해제"
 
 #: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
@@ -4711,11 +4711,11 @@ msgstr "반시계 방향으로 시점 회전하기 (360°)"
 
 #: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
-msgstr "비디오 출력의 배경 모드 토글하기"
+msgstr "동영상 출력의 배경 모드 토글하기"
 
 #: src/libvlc-module.c:1466
 msgid "Toggle wallpaper mode in video output."
-msgstr "비디오 출력의 배경 모드를 토글합니다."
+msgstr "동영상 출력의 배경 모드를 토글합니다."
 
 #: src/libvlc-module.c:1468
 msgid "Cycle through audio devices"
@@ -5963,7 +5963,7 @@ msgstr "줄루어"
 
 #: src/video_output/vout_intf.c:169
 msgid "Autoscale video"
-msgstr "비디오 자동배율"
+msgstr "동영상 자동배율"
 
 #: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:439
 #: modules/gui/macosx/VLCMainMenu.m:440
@@ -6062,8 +6062,8 @@ msgstr "오디오 입력 장치를 찾을 수 없습니다"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "사용자의 맥은 적당한 오디오 입력 장치를 갖추지 못한 것 같습니다. 컨넥터와 드"
 "라이버를 확인하세요."
@@ -6091,22 +6091,22 @@ msgstr "AVFoundation 오디오 캡처 모듈."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
-msgstr "AVFoundation 비디오 캡처"
+msgstr "AVFoundation 동영상 캡처"
 
 #: modules/access/avcapture.m:67
 msgid "AVFoundation video capture module."
-msgstr "AVFoundation 비디오 캡처 모듈."
+msgstr "AVFoundation 동영상 캡처 모듈."
 
 #: modules/access/avcapture.m:376 modules/access/avcapture.m:406
 msgid "No video devices found"
-msgstr "비디오 장치가 없습니다"
+msgstr "동영상 장치가 없습니다"
 
 #: modules/access/avcapture.m:377
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
-"사용자의 맥은 적당한 비디오 출력 장치를 갖추고 있지 않는 것 같습니다. 컨넥터"
+"사용자의 맥은 적당한 동영상 출력 장치를 갖추고 있지 않는 것 같습니다. 컨넥터"
 "와 드라이버를 확인하세요."
 
 #: modules/access/avcapture.m:407
@@ -6143,7 +6143,7 @@ msgstr "블루레이 메뉴"
 
 #: modules/access/bluray.c:73
 msgid "Use Blu-ray menus. If disabled, the movie will start directly"
-msgstr "블루레이 메뉴를 사용합니다. 비활성화시 동영상이 바로 시작됩니다."
+msgstr "블루레이 메뉴를 사용합니다. 비활성화시 영화가 바로 시작됩니다."
 
 #: modules/access/bluray.c:75
 msgid "Region code"
@@ -6273,9 +6273,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "사용할 CDDB 서버의 주소"
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -6346,14 +6345,14 @@ msgstr ""
 
 #: modules/access/decklink.cpp:54
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr "사용할 입력 비디오 모드. 자동 감지하려면 공백으로 놔두세요."
+msgstr "사용할 입력 동영상 모드. 자동 감지하려면 공백으로 놔두세요."
 
 #: modules/access/decklink.cpp:56
 msgid ""
 "Desired input video mode for DeckLink captures. This value should be a "
 "FOURCC code in textual form, e.g. \"ntsc\"."
 msgstr ""
-"DeckLink 캡처에 요구되는 입력 비디오 모드. 이 값은 텍스트 형식의 FourCC 코드"
+"DeckLink 캡처에 요구되는 입력 동영상 모드. 이 값은 텍스트 형식의 FourCC 코드"
 "여야 합니다. 예. \"ntsc\""
 
 #: modules/access/decklink.cpp:60 modules/video_output/decklink.cpp:100
@@ -6394,14 +6393,14 @@ msgstr ""
 
 #: modules/access/decklink.cpp:76 modules/video_output/decklink.cpp:115
 msgid "Video connection"
-msgstr "비디오 연결"
+msgstr "동영상 연결"
 
 #: modules/access/decklink.cpp:78
 msgid ""
 "Video connection to use for DeckLink captures. Valid choices: sdi, hdmi, "
 "opticalsdi, component, composite, svideo. Leave blank for card default."
 msgstr ""
-"DeckLink 캡처에 사용할 비디오 연결. 유효한 선택: sdi, hdmi, opticalsdi, "
+"DeckLink 캡처에 사용할 동영상 연결. 유효한 선택: sdi, hdmi, opticalsdi, "
 "component, composite, svideo. 카드 기본값을 쓰려면 공백으로 놔 두세요."
 
 #: modules/access/decklink.cpp:87 modules/access/linsys/linsys_sdi.c:94
@@ -6496,14 +6495,14 @@ msgstr "DSS"
 #: modules/access/dshow/dshow.cpp:130
 #: modules/gui/qt/components/open_panels.cpp:818
 msgid "Video device name"
-msgstr "비디오 장치 이름"
+msgstr "동영상 장치 이름"
 
 #: modules/access/dshow/dshow.cpp:132
 msgid ""
 "Name of the video device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"DirectShow 플러그인이 사용하는 비디오 장치 이름. 아무것도 지정하지 않으면, 기"
+"DirectShow 플러그인이 사용하는 동영상 장치 이름. 아무것도 지정하지 않으면, 기"
 "본 장치가 사용됩니다."
 
 #: modules/access/dshow/dshow.cpp:135
@@ -6523,7 +6522,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:793
 msgid "Video size"
-msgstr "비디오 크기"
+msgstr "동영상 크기"
 
 #: modules/access/dshow/dshow.cpp:142
 msgid ""
@@ -6531,7 +6530,7 @@ msgid ""
 "don't specify anything the default size for your device will be used. You "
 "can specify a standard size (cif, d1, ...) or <width>x<height>."
 msgstr ""
-"DirectShow 플러그인이 표시할 비디오 크기. 만약 아무것도 지정하지 않으면 장치"
+"DirectShow 플러그인이 표시할 동영상 크기. 만약 아무것도 지정하지 않으면 장치"
 "의 기본 크기가 사용되게 됩니다. 표준 크기 (cif, d1, ...) 또는 "
 "<width>x<height> 로 지정할수 있습니다."
 
@@ -6545,26 +6544,26 @@ msgstr "사용할 입력 사진 화면 비율 정의합니다. 기본값은 4:3�
 
 #: modules/access/dshow/dshow.cpp:147 modules/access/v4l2/v4l2.c:53
 msgid "Video input chroma format"
-msgstr "비디오 입력 크로마 형식"
+msgstr "동영상 입력 크로마 형식"
 
 #: modules/access/dshow/dshow.cpp:149
 msgid ""
 "Force the DirectShow video input to use a specific chroma format (eg. I420 "
 "(default), RV24, etc.)"
 msgstr ""
-"DirectShow 비디오 입력이 특정 크로마 형식을 사용하도록 합니다 (예, I420 (기본"
+"DirectShow 동영상 입력이 특정 크로마 형식을 사용하도록 합니다 (예, I420 (기본"
 "값), RV24, 등.)"
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
-msgstr "비디오 입력 프레임 속도"
+msgstr "동영상 입력 프레임 속도"
 
 #: modules/access/dshow/dshow.cpp:153
 msgid ""
 "Force the DirectShow video input to use a specific frame rate (eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
-"DirectShow 비디오 입력이 지정한 프레임 속도를 사용하도록 합니다 (예. 0 은 기"
+"DirectShow 동영상 입력이 지정한 프레임 속도를 사용하도록 합니다 (예. 0 은 기"
 "본값, 25, 29.97, 50, 59.94, 기타)"
 
 #: modules/access/dshow/dshow.cpp:155
@@ -6604,7 +6603,7 @@ msgstr "이것은 채널을 무시합니다. Hz로 측정됨."
 #: modules/gui/qt/components/open_panels.cpp:846
 #: modules/gui/qt/components/open_panels.cpp:1067
 msgid "Video standard"
-msgstr "비디오 표준"
+msgstr "동영상 표준"
 
 #: modules/access/dshow/dshow.cpp:169
 msgid "Tuner country code"
@@ -6628,7 +6627,7 @@ msgstr "튜너 입력 방식 선택 (케이블/안테나)."
 
 #: modules/access/dshow/dshow.cpp:176
 msgid "Video input pin"
-msgstr "비디오 입력 핀"
+msgstr "동영상 입력 핀"
 
 #: modules/access/dshow/dshow.cpp:178
 msgid ""
@@ -6637,7 +6636,7 @@ msgid ""
 "\"Device config\" area, and use those numbers here. -1 means that settings "
 "will not be changed."
 msgstr ""
-"컴포지트, s-video나 튜너같은 비디오 입력 소스를 선택하세요. 이 구성은 하드웨"
+"컴포지트, s-video나 튜너같은 동영상 입력 소스를 선택하세요. 이 구성은 하드웨"
 "어에 따라 다르기 때문에 \"장치 구성\" 항목에서 잘 동작하는 구성을 찾고 그 숫"
 "자를 여기에 사용해야 합니다. -1은 구성을 바꾸지 않는다는 것을 의미합니다."
 
@@ -6647,15 +6646,15 @@ msgstr "오디오 입력 핀"
 
 #: modules/access/dshow/dshow.cpp:184
 msgid "Select the audio input source. See the \"video input\" option."
-msgstr "오디오 입력 소스 선택. \"비디오 입력\" 옵션을 보세요."
+msgstr "오디오 입력 소스 선택. \"동영상 입력\" 옵션을 보세요."
 
 #: modules/access/dshow/dshow.cpp:185
 msgid "Video output pin"
-msgstr "비디오 출력 핀"
+msgstr "동영상 출력 핀"
 
 #: modules/access/dshow/dshow.cpp:187
 msgid "Select the video output type. See the \"video input\" option."
-msgstr "비디오 출력 형식 선택. \"비디오 입력\" 옵션을 보세요."
+msgstr "동영상 출력 형식 선택. \"동영상 입력\" 옵션을 보세요."
 
 #: modules/access/dshow/dshow.cpp:188
 msgid "Audio output pin"
@@ -6663,7 +6662,7 @@ msgstr "오디오 출력 핀"
 
 #: modules/access/dshow/dshow.cpp:190
 msgid "Select the audio output type. See the \"video input\" option."
-msgstr "오디오 출력 형식 선택. \"비디오 입력\" 옵션을 보세요."
+msgstr "오디오 출력 형식 선택. \"동영상 입력\" 옵션을 보세요."
 
 #: modules/access/dshow/dshow.cpp:192
 msgid "AM Tuner mode"
@@ -6715,7 +6714,7 @@ msgstr "캡처에 실패함"
 
 #: modules/access/dshow/dshow.cpp:517
 msgid "No video or audio device selected."
-msgstr "선택한 비디오 또는 오디오 장치가 없습니다."
+msgstr "선택한 동영상 또는 오디오 장치가 없습니다."
 
 #: modules/access/dshow/dshow.cpp:591
 msgid "VLC cannot open ANY capture device. Check the error log for details."
@@ -7206,11 +7205,11 @@ msgid ""
 "Please check the preferences."
 msgstr ""
 "선택한 디지털 튜너는 지정한 변수를 지원하지 않습니다.\n"
-"기본설정을 검사해 보세요."
+"환경설정을 검사해 보세요."
 
 #: modules/access/dv.c:57
 msgid "Digital Video (Firewire/ieee1394) input"
-msgstr "디지털 비디오 (Firewire/ieee1394) 입력"
+msgstr "디지털 동영상 (Firewire/ieee1394) 입력"
 
 #: modules/access/dv.c:58
 msgid "DV"
@@ -7519,8 +7518,8 @@ msgid ""
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
 "HTTP 서버에 제공되는 응용프로그램의 이름과 버전을 재정의합니다 (예: HTTP \"사"
-"용자 에이전트\"). 이름과 버전은 슬래시로 구분해야 합니다 (예: \"FooBar/"
-"1.2.3\")."
+"용자 에이전트\"). 이름과 버전은 슬래시로 구분해야 합니다 (예: "
+"\"FooBar/1.2.3\")."
 
 #: modules/access/idummy.c:41 modules/access_output/dummy.c:44
 #: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
@@ -7599,7 +7598,7 @@ msgstr "너비"
 
 #: modules/access/imem.c:84
 msgid "Width of video or subtitle elementary streams"
-msgstr "비디오 또는 기본적인 자막 스트림의 너비"
+msgstr "동영상 또는 기본적인 자막 스트림의 너비"
 
 #: modules/access/imem.c:86 modules/access/v4l2/v4l2.c:66
 #: modules/demux/rawvid.c:51
@@ -7612,7 +7611,7 @@ msgstr "높이"
 
 #: modules/access/imem.c:87
 msgid "Height of video or subtitle elementary streams"
-msgstr "비디오 또는 기본적인 자막 스트림의 높이"
+msgstr "동영상 또는 기본적인 자막 스트림의 높이"
 
 #: modules/access/imem.c:89
 msgid "Display aspect ratio"
@@ -7620,11 +7619,11 @@ msgstr "출력 화면 비율"
 
 #: modules/access/imem.c:91
 msgid "Display aspect ratio of a video elementary stream"
-msgstr "기본적인 비디오 스트림의 화면 비율 화면표시"
+msgstr "기본적인 동영상 스트림의 화면 비율 화면표시"
 
 #: modules/access/imem.c:95
 msgid "Frame rate of a video elementary stream"
-msgstr "기본적인 비디오 스트림의 프레임 속도"
+msgstr "기본적인 동영상 스트림의 프레임 속도"
 
 #: modules/access/imem.c:97
 msgid "Callback cookie string"
@@ -7719,17 +7718,17 @@ msgstr "캡쳐시 보드의 요구되는 연결을 설정할 수 있게 해 줍�
 #: modules/access/linsys/linsys_hdsdi.c:75
 #: modules/access/linsys/linsys_sdi.c:71
 msgid "Video ID"
-msgstr "비디오 ID"
+msgstr "동영상 ID"
 
 #: modules/access/linsys/linsys_hdsdi.c:77
 #: modules/access/linsys/linsys_sdi.c:73
 msgid "Allows you to set the ES ID of the video."
-msgstr "비디오의 ES ID를 설정합니다."
+msgstr "동영상의 ES ID를 설정합니다."
 
 #: modules/access/linsys/linsys_hdsdi.c:80
 #: modules/access/linsys/linsys_sdi.c:76
 msgid "Allows you to force the aspect ratio of the video."
-msgstr "비디오의 화면 비율을 강제로 지정합니다."
+msgstr "동영상의 화면 비율을 강제로 지정합니다."
 
 #: modules/access/linsys/linsys_hdsdi.c:81
 #: modules/access/linsys/linsys_sdi.c:77
@@ -7825,7 +7824,7 @@ msgid ""
 "RTSP start frame buffer size of the video track, can be increased in case of "
 "broken pictures due to too small buffer."
 msgstr ""
-"비디오 트랙의 RTSP 시작 프레임 버퍼 크기는 너무 작은 버퍼 때문에 화면이 깨지"
+"동영상 트랙의 RTSP 시작 프레임 버퍼 크기는 너무 작은 버퍼 때문에 화면이 깨지"
 "는 경우 늘릴 수 있습니다."
 
 #: modules/access/live555.cpp:98
@@ -8474,8 +8473,8 @@ msgstr "SMB 인증이 필요합니다"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "연결하려는 컴퓨터 (%s)에 인증이 필요합니다.\n"
 "사용자명(원칙적으로 도메인;사용자명 형식을 사용하는 도메인 이름)과 비밀번호"
@@ -8502,9 +8501,8 @@ msgid "Password for stream encryption"
 msgstr "스트림 암호화용 비밀번호"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRT 스트림 출력"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8552,11 +8550,11 @@ msgstr "기본값 재설정"
 
 #: modules/access/v4l2/v4l2.c:44
 msgid "Video capture device"
-msgstr "비디오 캡처 장치"
+msgstr "동영상 캡처 장치"
 
 #: modules/access/v4l2/v4l2.c:45
 msgid "Video capture device node."
-msgstr "비디오 캡처 장치 노드"
+msgstr "동영상 캡처 장치 노드"
 
 #: modules/access/v4l2/v4l2.c:46
 msgid "VBI capture device"
@@ -8572,7 +8570,7 @@ msgstr "표준"
 
 #: modules/access/v4l2/v4l2.c:52
 msgid "Video standard (Default, SECAM, PAL, or NTSC)."
-msgstr "비디오 표준 (기본, SECAM, PAL, NTSC)."
+msgstr "동영상 표준 (기본, SECAM, PAL, NTSC)."
 
 #: modules/access/v4l2/v4l2.c:55
 msgid ""
@@ -8581,7 +8579,7 @@ msgid ""
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
-"Video4Linux2 비디오 장치가 특정 크로마 형식을 사용하도록 합니다 (예: 원시 이"
+"Video4Linux2 동영상 장치가 특정 크로마 형식을 사용하도록 합니다 (예: 원시 이"
 "미지는 I420 또는 I422, M-JPEG 압축 입력은 MJPG). 전체 목록: GREY, I240, "
 "RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, I420, I411, I410, MJPG"
 
@@ -8750,7 +8748,7 @@ msgstr "자동 이득 조절"
 
 #: modules/access/v4l2/v4l2.c:116
 msgid "Automatically set the video gain."
-msgstr "자동으로 비디오 이득을 설정합니다."
+msgstr "자동으로 동영상 이득을 설정합니다."
 
 #: modules/access/v4l2/v4l2.c:117 modules/audio_filter/gain.c:62
 msgid "Gain"
@@ -8947,14 +8945,14 @@ msgstr "v4l2 드라이버 컨트롤"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "v4l2 드라이버 컨트롤을 중괄호로 선택적으로 캡슐화된 쉼표로 구분된 목록을 사용"
-"하여 지정한 값으로 설정합니다. (예: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ) 사용 가능한 컨트롤을 나열"
-"하려면 상세설명(-vv)을 증가시키거나 v4l2-ctl 응용프로그램을 사용하십시오."
+"하여 지정한 값으로 설정합니다. (예: {video_bitrate=6000000,audio_crc=0,"
+"stream_type=3} ) 사용 가능한 컨트롤을 나열하려면 상세설명(-vv)을 증가시키거"
+"나 v4l2-ctl 응용프로그램을 사용하십시오."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9012,7 +9010,7 @@ msgstr "Video4Linux 입력"
 
 #: modules/access/v4l2/v4l2.c:280
 msgid "Video input"
-msgstr "비디오 입력"
+msgstr "동영상 입력"
 
 #: modules/access/v4l2/v4l2.c:317
 msgid "Tuner"
@@ -9024,7 +9022,7 @@ msgstr "컨트롤"
 
 #: modules/access/v4l2/v4l2.c:333
 msgid "Video capture controls (if supported by the device)"
-msgstr "비디오 캡처 컨트롤 (장치가 지원하는 경우)"
+msgstr "동영상 캡처 컨트롤 (장치가 지원하는 경우)"
 
 #: modules/access/v4l2/v4l2.c:424
 msgid "Video4Linux compressed A/V input"
@@ -9511,14 +9509,12 @@ msgid "SRT stream output"
 msgstr "SRT 스트림 출력"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "RIST 최대 패킷 크기 (바이트)"
+msgstr ""
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "RIST 최대 패킷 크기 (바이트)"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9550,7 +9546,7 @@ msgstr "UDP 스트림 출력"
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
-msgstr "ARM NEON 비디오 크로마 변환"
+msgstr "ARM NEON 동영상 크로마 변환"
 
 #: modules/arm_neon/volume.c:38
 msgid "ARM NEON audio volume"
@@ -9558,7 +9554,7 @@ msgstr "ARM NEON 오디오 음량"
 
 #: modules/arm_neon/yuv_rgb.c:36
 msgid "ARM NEON video chroma YUV->RGBA"
-msgstr "ARM NEON 비디오 크로마 YUV->RGBA"
+msgstr "ARM NEON 동영상 크로마 YUV->RGBA"
 
 #: modules/audio_filter/audiobargraph_a.c:39
 msgid "Defines if BarGraph information should be sent"
@@ -9665,7 +9661,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:60
 msgid "Characteristic dimension"
-msgstr "공간의 특성"
+msgstr "특징적인 크기"
 
 #: modules/audio_filter/channel_mixer/headphone.c:62
 msgid "Distance between front left speaker and listener in meters."
@@ -10798,7 +10794,7 @@ msgstr "AES3/SMPTE 302M 오디오 패킷타이저"
 
 #: modules/codec/aom.c:52
 msgid "AOM video decoder"
-msgstr "AOM 비디오 디코더"
+msgstr "AOM 동영상 디코더"
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10879,13 +10875,13 @@ msgid ""
 "This includes (MS)MPEG4, DivX, SV1,H261, H263, H264, WMV, WMA, AAC, AMR, DV, "
 "MJPEG and other codecs"
 msgstr ""
-"FFmpeg 라이브러리가 제공하는 다양한 오디오와 비디오 디코더/인코더. 이것은 "
+"FFmpeg 라이브러리가 제공하는 다양한 오디오와 동영상 디코더/인코더. 이것은 "
 "(MS)MPEG4, DivX, SV1,H261, H263, H264, WMV, WMA, AAC, AMR, DV, MJPEG 과 다른 "
 "코덱을 포함합니다."
 
 #: modules/codec/avcodec/avcodec.c:80
 msgid "FFmpeg audio/video decoder"
-msgstr "FFmpeg 오디오/비디오 디코더"
+msgstr "FFmpeg 오디오/동영상 디코더"
 
 #: modules/codec/avcodec/avcodec.c:82 modules/codec/gstreamer/gstdecode.c:96
 #: modules/codec/omxil/mediacodec.c:185 modules/codec/omxil/omxil.c:148
@@ -10900,7 +10896,7 @@ msgstr "인코딩"
 
 #: modules/codec/avcodec/avcodec.c:153
 msgid "FFmpeg audio/video encoder"
-msgstr "FFmpeg 오디오/비디오 인코더"
+msgstr "FFmpeg 오디오/동영상 인코더"
 
 #: modules/codec/avcodec/avcodec.h:57
 msgid "Direct rendering"
@@ -11069,11 +11065,11 @@ msgstr "두 레퍼런스 프레임 간에 코딩이 될 B 프레임의 개수."
 
 #: modules/codec/avcodec/avcodec.h:133
 msgid "Video bitrate tolerance"
-msgstr "비디오 비트 전송속도 허용오차"
+msgstr "동영상 비트 전송속도 허용오차"
 
 #: modules/codec/avcodec/avcodec.h:134
 msgid "Video bitrate tolerance in kbit/s."
-msgstr "비디오 비트 전송속도 허용오차 (kbit/s)."
+msgstr "동영상 비트 전송속도 허용오차 (kbit/s)."
 
 #: modules/codec/avcodec/avcodec.h:136
 msgid "Interlaced encoding"
@@ -11181,19 +11177,19 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:185
 msgid "Minimum video quantizer scale"
-msgstr "최소 비디오 양자화기 배율"
+msgstr "최소 동영상 양자화기 배율"
 
 #: modules/codec/avcodec/avcodec.h:186
 msgid "Minimum video quantizer scale."
-msgstr "최소 비디오 양자화기 배율."
+msgstr "최소 동영상 양자화기 배율."
 
 #: modules/codec/avcodec/avcodec.h:189
 msgid "Maximum video quantizer scale"
-msgstr "최대 비디오 양자화기 배율"
+msgstr "최대 동영상 양자화기 배율"
 
 #: modules/codec/avcodec/avcodec.h:190
 msgid "Maximum video quantizer scale."
-msgstr "최대 비디오 양자화기 배율."
+msgstr "최대 동영상 양자화기 배율."
 
 #: modules/codec/avcodec/avcodec.h:193
 msgid "Trellis quantization"
@@ -11211,7 +11207,7 @@ msgstr "고정 양자화기 배율"
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
-msgstr "VBR 인코딩용 고정 비디오 양자화 배율조정 (허용 값: 0.01 에서 255.0)."
+msgstr "VBR 인코딩용 고정 동영상 양자화 배율조정 (허용 값: 0.01 에서 255.0)."
 
 #: modules/codec/avcodec/avcodec.h:201
 msgid "Strict standard compliance"
@@ -11299,11 +11295,11 @@ msgstr ""
 
 #: modules/codec/avcodec/d3d11va.c:67
 msgid "Direct3D11 Video Acceleration"
-msgstr "Direct3D11 비디오 가속"
+msgstr "Direct3D11 동영상 가속"
 
 #: modules/codec/avcodec/dxva2.c:55
 msgid "DirectX Video Acceleration (DXVA) 2.0"
-msgstr "DirectX 비디오 가속 (DXVA) 2.0"
+msgstr "DirectX 동영상 가속 (DXVA) 2.0"
 
 #: modules/codec/avcodec/encoder.c:399
 #, c-format
@@ -11329,7 +11325,7 @@ msgstr "알 수 없음"
 
 #: modules/codec/avcodec/encoder.c:926
 msgid "video"
-msgstr "비디오"
+msgstr "동영상"
 
 #: modules/codec/avcodec/encoder.c:927
 msgid "audio"
@@ -11346,11 +11342,11 @@ msgstr "VLC가 %4.4s %s 인코더를 열 수 없습니다."
 
 #: modules/codec/avcodec/vaapi.c:388
 msgid "VA-API video decoder via DRM"
-msgstr "DRM VA-API 비디오 디코더"
+msgstr "DRM VA-API 동영상 디코더"
 
 #: modules/codec/avcodec/vaapi.c:393
 msgid "VA-API video decoder"
-msgstr "VA-API 비디오 디코더"
+msgstr "VA-API 동영상 디코더"
 
 #: modules/codec/bpg.c:49
 msgid "BPG image decoder"
@@ -11376,11 +11372,11 @@ msgstr "특수 자막 디코더"
 
 #: modules/codec/cdg.c:88
 msgid "CDG video decoder"
-msgstr "CDG 비디오 디코더"
+msgstr "CDG 동영상 디코더"
 
 #: modules/codec/crystalhd.c:90
 msgid "Crystal HD hardware video decoder"
-msgstr "크리스탈 HD 하드웨어 비디오 디코더"
+msgstr "크리스탈 HD 하드웨어 동영상 디코더"
 
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
@@ -11410,15 +11406,15 @@ msgstr "1과 1000 사이의 키프레임 간격을 강제 지정합니다."
 
 #: modules/codec/daala.c:120
 msgid "Daala video decoder"
-msgstr "Daala 비디오 디코더"
+msgstr "Daala 동영상 디코더"
 
 #: modules/codec/daala.c:125
 msgid "Daala video packetizer"
-msgstr "Daala 비디오 패킷타이저"
+msgstr "Daala 동영상 패킷타이저"
 
 #: modules/codec/daala.c:132
 msgid "Daala video encoder"
-msgstr "Daala 비디오 인코더"
+msgstr "Daala 동영상 인코더"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11427,7 +11423,7 @@ msgstr "크로마 형식"
 #: modules/codec/daala.c:144 modules/codec/schroedinger.c:55
 msgid ""
 "Picking chroma format will force a conversion of the video into that format"
-msgstr "크로마 형식을 선택하면 해당 형식으로 비디오을 변환하게 할 것입니다."
+msgstr "크로마 형식을 선택하면 해당 형식으로 동영상을 변환하게 할 것입니다."
 
 #: modules/codec/dav1d.c:52
 msgid "Frames Threads"
@@ -11446,9 +11442,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr "타일 디코딩에 사용되는 최대 스레드 개수, 기본값 0=자동"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "모든 파일"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11456,7 +11451,7 @@ msgstr ""
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
-msgstr "Dav1d 비디오 디코더"
+msgstr "Dav1d 동영상 디코더"
 
 #: modules/codec/dca.c:63
 msgid "DTS dynamic range compression"
@@ -11516,10 +11511,10 @@ msgstr "서브픽처 위치"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
-"비디오에 출력할 서브픽처 위치를 적용할 수 있습니다 (0=가운데, 1=왼쪽, 2=오른"
+"동영상에 출력할 서브픽처 위치를 적용할 수 있습니다 (0=가운데, 1=왼쪽, 2=오른"
 "쪽, 4=상단, 8=하단, 또한 이 값들을 조합해서 사용할수 있습니다, 예 6=오른쪽 상"
 "단)."
 
@@ -12023,7 +12018,7 @@ msgstr ""
 
 #: modules/codec/libmpeg2.c:140
 msgid "MPEG I/II video decoder (using libmpeg2)"
-msgstr "MPEG I/II 비디오 디코더 (libmpeg2 사용)"
+msgstr "MPEG I/II 동영상 디코더 (libmpeg2 사용)"
 
 #: modules/codec/lpcm.c:60
 msgid "Linear PCM audio decoder"
@@ -12051,11 +12046,11 @@ msgstr "MPEG 오디오 디코더 (mpg123 사용)"
 
 #: modules/codec/oggspots.c:86
 msgid "OggSpots video decoder"
-msgstr "OggSpots 비디오 디코더"
+msgstr "OggSpots 동영상 디코더"
 
 #: modules/codec/oggspots.c:92
 msgid "OggSpots video packetizer"
-msgstr "OggSpots 비디오 패킷타이저"
+msgstr "OggSpots 동영상 패킷타이저"
 
 #: modules/codec/omxil/omxil.c:139
 msgid "OMX direct rendering"
@@ -12067,15 +12062,15 @@ msgstr "OMX 직접 렌더링을 활성화합니다."
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
-msgstr "오디오/비디오 디코더 (OpenMax IL 사용)"
+msgstr "오디오/동영상 디코더 (OpenMax IL 사용)"
 
 #: modules/codec/omxil/omxil.c:172
 msgid "Video encoder (using OpenMAX IL)"
-msgstr "비디오 인코더 (OpenMAX IL 사용)"
+msgstr "동영상 인코더 (OpenMAX IL 사용)"
 
 #: modules/codec/omxil/vout.c:49
 msgid "OpenMAX IL video output"
-msgstr "OpenMAX IL 비디오 출력"
+msgstr "OpenMAX IL 동영상 출력"
 
 #: modules/codec/opus.c:65
 msgid "Opus audio decoder"
@@ -12091,11 +12086,11 @@ msgstr "Opus 오디오 인코더"
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
-msgstr "PNG 비디오 디코더"
+msgstr "PNG 동영상 디코더"
 
 #: modules/codec/png.c:100
 msgid "PNG video encoder"
-msgstr "PNG 비디오 인코더"
+msgstr "PNG 동영상 인코더"
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -12106,7 +12101,7 @@ msgid ""
 "Allow the use of the Intel Media SDK software implementation of the codecs "
 "if no QuickSync Video hardware acceleration is present on the system."
 msgstr ""
-"퀵싱크 비디오 하드웨어 가속이 시스템상에 존재하지 않으면, 그 코덱의 인텔 미디"
+"퀵싱크 동영상 하드웨어 가속이 시스템상에 존재하지 않으면, 그 코덱의 인텔 미디"
 "어 SDK 소프트웨어를 사용합니다."
 
 #: modules/codec/qsv.c:61
@@ -12275,10 +12270,10 @@ msgstr "압축율조정의 정밀도"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "'avbr' (평균 가변 비트 전송속도) 방식의 허용 오차입니다. (예: 비트 전송속도"
 "가 800 kbps인 10은 인코더가 880 kbps 이상이나 730 kbps 미만으로 가지 못하도"
@@ -12307,7 +12302,7 @@ msgid ""
 "block rows. If numslice is not set, the encoder may choose any slice "
 "partitioning allowed by the codec standard."
 msgstr ""
-"각 비디오 프레임에서 조각의 수; 각 조각은 하나 이상의 매크로블록 가로줄을 포"
+"각 동영상 프레임에서 조각의 수; 각 조각은 하나 이상의 매크로블록 가로줄을 포"
 "함하고 있습니다. numslice 가 설정되지 않으면, 인코더는 코덱 표준에 의해 허용"
 "된 어떤 slice partitioning(조각 부분)이라도 선택할 수 있습니다."
 
@@ -12331,19 +12326,19 @@ msgstr ""
 
 #: modules/codec/qsv.c:193
 msgid "Intel QuickSync Video encoder for MPEG4-Part10/MPEG2 (aka H.264/H.262)"
-msgstr " MPEG4-Part10/MPEG2(H.264/H.262)용 인텔 퀵싱크 비디오 인코더"
+msgstr " MPEG4-Part10/MPEG2(H.264/H.262)용 인텔 퀵싱크 동영상 인코더"
 
 #: modules/codec/rawvideo.c:64
 msgid "Pseudo raw video decoder"
-msgstr "유사 원시 비디오 디코더"
+msgstr "유사 원시 동영상 디코더"
 
 #: modules/codec/rawvideo.c:71
 msgid "Pseudo raw video packetizer"
-msgstr "유사 원시 비디오 패킷타이저"
+msgstr "유사 원시 동영상 패킷타이저"
 
 #: modules/codec/rtpvideo.c:45
 msgid "Raw video encoder for RTP"
-msgstr "RTP용 원시 비디오 인코더"
+msgstr "RTP용 원시 동영상 인코더"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12363,7 +12358,7 @@ msgstr "레이트 컨트롤 방법"
 
 #: modules/codec/schroedinger.c:64
 msgid "Method used to encode the video sequence"
-msgstr "비디오 시퀀스를 인코딩하는데 사용되는 방법"
+msgstr "동영상 시퀀스를 인코딩하는데 사용되는 방법"
 
 #: modules/codec/schroedinger.c:77
 msgid "Constant noise threshold mode"
@@ -12399,7 +12394,7 @@ msgstr "GOP 구조"
 
 #: modules/codec/schroedinger.c:88
 msgid "GOP structure used to encode the video sequence"
-msgstr "비디오 시퀀스를 인코딩하기 위해 사용되는 GOP 구조"
+msgstr "동영상 시퀀스를 인코딩하기 위해 사용되는 GOP 구조"
 
 #: modules/codec/schroedinger.c:100
 msgid ""
@@ -12714,11 +12709,11 @@ msgstr "기본 프로필"
 
 #: modules/codec/schroedinger.c:363
 msgid "Dirac video decoder using libschroedinger"
-msgstr "libschroedinger를 이용한 Dirac 비디오 디코더"
+msgstr "libschroedinger를 이용한 Dirac 동영상 디코더"
 
 #: modules/codec/schroedinger.c:371
 msgid "Dirac video encoder using libschroedinger"
-msgstr "libschroedinger를 이용한 Dirac 비디오 인코더"
+msgstr "libschroedinger를 이용한 Dirac 동영상 인코더"
 
 #: modules/codec/scte18.c:41
 msgid "SCTE-18 decoder"
@@ -12746,7 +12741,7 @@ msgstr "SDL Image 디코더"
 
 #: modules/codec/sdl_image.c:61
 msgid "SDL_image video decoder"
-msgstr "SDL_image 비디오 디코더"
+msgstr "SDL_image 동영상 디코더"
 
 #: modules/codec/shine.c:64
 msgid "MP3 fixed point audio encoder"
@@ -13151,7 +13146,7 @@ msgstr "이미지에 적용할 스케일 요소"
 
 #: modules/codec/svg.c:63
 msgid "SVG video decoder"
-msgstr "SVG 비디오 디코더"
+msgstr "SVG 동영상 디코더"
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -13213,15 +13208,15 @@ msgstr "후처리 품질"
 
 #: modules/codec/theora.c:116
 msgid "Theora video decoder"
-msgstr "Theora 비디오 디코더"
+msgstr "Theora 동영상 디코더"
 
 #: modules/codec/theora.c:124
 msgid "Theora video packetizer"
-msgstr "Theora 비디오 패킷타이저"
+msgstr "Theora 동영상 패킷타이저"
 
 #: modules/codec/theora.c:131
 msgid "Theora video encoder"
-msgstr "Theora 비디오 인코더"
+msgstr "Theora 동영상 인코더"
 
 #: modules/codec/ttml/ttml.c:45
 msgid "TTML decoder"
@@ -13289,7 +13284,7 @@ msgstr "하드웨어 디코더만 사용하기"
 
 #: modules/codec/videotoolbox.m:90
 msgid "VideoToolbox video decoder"
-msgstr "VideoToolbox 비디오 디코더"
+msgstr "VideoToolbox 동영상 디코더"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -13343,11 +13338,11 @@ msgstr ""
 
 #: modules/codec/vpx.c:66
 msgid "WebM video decoder"
-msgstr "WebM 비디오 디코더"
+msgstr "WebM 동영상 디코더"
 
 #: modules/codec/vpx.c:75
 msgid "WebM video encoder"
-msgstr "WebM 비디오 인코더"
+msgstr "WebM 동영상 인코더"
 
 #: modules/codec/webvtt/webvtt.c:40
 msgid "WEBVTT decoder"
@@ -13516,7 +13511,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -13600,7 +13594,7 @@ msgid ""
 " 4: top bottom - L is on top, R on bottom\n"
 " 5: frame alternation - one view per frame"
 msgstr ""
-"입체적인 비디오이 프레임 배열을 정의하기 위해:\n"
+"입체적인 동영상이 프레임 배열을 정의하기 위해:\n"
 "0: checkerboard 바둑판 - 픽셀은 L과 R에서 교대로\n"
 "1: column alternation 세로줄 교대 - L과 R은 세로줄로 인터레이스됨\n"
 "2: row alternation 가로줄 교대 - L과 R은 가로줄로 인터레이스됨\n"
@@ -14298,7 +14292,7 @@ msgid ""
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg. "
 "6 = top-right)."
 msgstr ""
-"비디오에 문자다중방송 위치를 적용할 수 있습니다 (0=가운데, 1=왼쪽, 2=오른쪽, "
+"동영상에 문자다중방송 위치를 적용할 수 있습니다 (0=가운데, 1=왼쪽, 2=오른쪽, "
 "4=상단, 8=하단, 또한 이 값들을 조합해서 사용하수 있습니다, 예 6 = 오른쪽 상"
 "단)."
 
@@ -14378,7 +14372,7 @@ msgid ""
 msgstr ""
 "기본적으로 더미 인터페이스 플러그인은 도스 명령어 상자를 시작합니다. Quiet 모"
 "드를 사용하면 이 명령어 상자가 나타나지 않지만 VLC를 멈추려고 하는데 아무런 "
-"비디오 창이 열리지 않는다면 꽤나 번거러울 수 있습니다."
+"동영상 창이 열리지 않는다면 꽤나 번거러울 수 있습니다."
 
 #: modules/control/dummy.c:50
 msgid "Dummy interface"
@@ -14613,7 +14607,7 @@ msgstr "동작 제어 인터페이스"
 msgid ""
 "Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors to rotate the video"
 msgstr ""
-"비디오을 회전하기위해 HDAPS, AMS, APPLESMC 또는 UNIMOTION 모션 감지기 사용"
+"동영상을 회전하기위해 HDAPS, AMS, APPLESMC 또는 UNIMOTION 모션 감지기 사용"
 
 #: modules/control/netsync.c:56
 msgid "Network master clock"
@@ -14763,8 +14757,8 @@ msgid ""
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
 "기본적으로 RC 인터페이스 플러그인은 도스 명령어 상자를 시작합니다. Quiet 모드"
-"를 사용하면 이 명령어 상자가 나타나지 않지만 VLC를 멈추려고 하는데 아무런 비"
-"디오 창이 열리지 않는다면 꽤나 번거러울 수 있습니다."
+"를 사용하면 이 명령어 상자가 나타나지 않지만 VLC를 멈추려고 하는데 아무런 동"
+"영상 창이 열리지 않는다면 꽤나 번거러울 수 있습니다."
 
 #: modules/control/oldrc.c:187
 msgid "RC"
@@ -14817,7 +14811,7 @@ msgstr "| prev . . . . . . . . . . . . .  재생목록의 이전 항목"
 
 #: modules/control/oldrc.c:796
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
-msgstr "| goto  . . . . . . . . . . . . 인덱스의 항목으로 이동"
+msgstr "| goto  . . . . . . . . . . . . 인덱스의 항목으로 가기"
 
 #: modules/control/oldrc.c:797
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
@@ -14949,15 +14943,15 @@ msgstr "| atrack [X] . . . . . . . . . 오디오 트랙 설정/받기"
 
 #: modules/control/oldrc.c:831
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
-msgstr "| vtrack [X] . . . . . . . . . . . 비디오 트랙 설정/받기"
+msgstr "| vtrack [X] . . . . . . . . . . . 동영상 트랙 설정/받기"
 
 #: modules/control/oldrc.c:832
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
-msgstr "| vratio [X] . . . . . . . . 비디오 화면 비율 지정/받기"
+msgstr "| vratio [X] . . . . . . . . 동영상 화면 비율 지정/받기"
 
 #: modules/control/oldrc.c:833
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
-msgstr "| vcrop [X]  . . . . . . . . . 비디오 자르기 설정/받기"
+msgstr "| vcrop [X]  . . . . . . . . . 동영상 자르기 설정/받기"
 
 #: modules/control/oldrc.c:834
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
@@ -14965,7 +14959,7 @@ msgstr "| vzoom [X] . . . . . . . . . 화면 확대/축소 설정/받기"
 
 #: modules/control/oldrc.c:835
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
-msgstr "| snapshot  . . . . . . . . . . . . 비디오 스냅샷 찍기"
+msgstr "| snapshot  . . . . . . . . . . . . 동영상 스냅샷 찍기"
 
 #: modules/control/oldrc.c:836
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
@@ -15017,22 +15011,22 @@ msgstr "+-[들어오는]"
 #: modules/control/oldrc.c:1740 modules/gui/ncurses.c:810
 #, c-format
 msgid "| input bytes read : %8.0f KiB"
-msgstr "| 입력 바이트 읽음   : %8.0f KiB"
+msgstr "| 읽은 입력 바이트 : %8.0f KiB"
 
 #: modules/control/oldrc.c:1742 modules/gui/ncurses.c:812
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
-msgstr "| 입력 비트 전송속도    :   %6.0f kb/s"
+msgstr "| 입력 비트레이트    :   %6.0f kb/s"
 
 #: modules/control/oldrc.c:1744 modules/gui/ncurses.c:814
 #, c-format
 msgid "| demux bytes read : %8.0f KiB"
-msgstr "| demux 바이트 읽음 : %8.0f KiB"
+msgstr "| 읽은 demux 바이트 : %8.0f KiB"
 
 #: modules/control/oldrc.c:1746 modules/gui/ncurses.c:816
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
-msgstr "| demux 비트 전송속도  :   %6.0f kb/s"
+msgstr "| demux 비트레이트 :   %6.0f kb/s"
 
 #: modules/control/oldrc.c:1748
 #, c-format
@@ -15046,22 +15040,22 @@ msgstr "| 불연속             :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1754 modules/gui/ncurses.c:822
 msgid "+-[Video Decoding]"
-msgstr "+-[비디오 디코딩]"
+msgstr "+-[동영상 디코딩]"
 
 #: modules/control/oldrc.c:1755 modules/gui/ncurses.c:824
 #, c-format
 msgid "| video decoded    :    %5<PRIi64>"
-msgstr "| 디코드한 비디오    :    %5<PRIi64>"
+msgstr "| 디코드한 동영상    :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1757 modules/gui/ncurses.c:826
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
-msgstr "| 출력한 프레임      :    %5<PRIi64>"
+msgstr "| 화면표시된 프레임 :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1759 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
-msgstr "| 분실한 프레임      :    %5<PRIi64>"
+msgstr "| 손실된 프레임      :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1763 modules/gui/ncurses.c:834
 msgid "+-[Audio Decoding]"
@@ -15070,17 +15064,17 @@ msgstr "+-[오디오 디코딩]"
 #: modules/control/oldrc.c:1764 modules/gui/ncurses.c:836
 #, c-format
 msgid "| audio decoded    :    %5<PRIi64>"
-msgstr "| 디코드한 오디오    :    %5<PRIi64>"
+msgstr "| 디코드한 오디오   :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1766 modules/gui/ncurses.c:838
 #, c-format
 msgid "| buffers played   :    %5<PRIi64>"
-msgstr "| 재생한 버퍼        :    %5<PRIi64>"
+msgstr "| 재생된 버퍼        :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1768 modules/gui/ncurses.c:840
 #, c-format
 msgid "| buffers lost     :    %5<PRIi64>"
-msgstr "| 분실한 버퍼        :    %5<PRIi64>"
+msgstr "| 손실된 버퍼        :    %5<PRIi64>"
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
@@ -15753,7 +15747,7 @@ msgid ""
 "This is the frame rate used as a fallback when playing MPEG video elementary "
 "streams."
 msgstr ""
-"기본적인 MPEG 비디오 스트림을 재생할 때 대체로 사용되는 프레임 속도입니다."
+"기본적인 MPEG 동영상 스트림을 재생할 때 대체로 사용되는 프레임 속도입니다."
 
 #: modules/demux/mpeg/es.c:60
 msgid "MPEG-I/II/4 / A52 / DTS / MLP audio"
@@ -15765,7 +15759,7 @@ msgstr "오디오 ES"
 
 #: modules/demux/mpeg/es.c:73
 msgid "MPEG-4 video"
-msgstr "MPEG-4 비디오"
+msgstr "MPEG-4 동영상"
 
 #: modules/demux/mpeg/h26x.c:47
 msgid "Desired frame rate for the stream."
@@ -15773,15 +15767,15 @@ msgstr "해당 스트림에 요구되는 프레임 속도입니다."
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
-msgstr "H264 비디오 demuxer"
+msgstr "H264 동영상 demuxer"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr "HEVC/H.265 비디오 demuxer"
+msgstr "HEVC/H.265 동영상 demuxer"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
-msgstr "MPEG-I/II 비디오 demuxer"
+msgstr "MPEG-I/II 동영상 demuxer"
 
 #: modules/demux/mpeg/ps.c:44
 msgid "Trust MPEG timestamps"
@@ -15978,7 +15972,7 @@ msgstr "샤우트캐스트 성인 컨텐츠 표시"
 
 #: modules/demux/playlist/playlist.c:47
 msgid "Show NC17 rated video streams when using shoutcast video playlists."
-msgstr "샤우트캐스트 비디오 재생목록 사용시 NC17 등급 비디오 스트림 표시."
+msgstr "샤우트캐스트 동영상 재생목록 사용시 NC17 등급 동영상 스트림 표시."
 
 #: modules/demux/playlist/playlist.c:50
 msgid "Skip ads"
@@ -16172,23 +16166,23 @@ msgstr ""
 
 #: modules/demux/rawdv.c:51
 msgid "DV (Digital Video) demuxer"
-msgstr "DV (디지털 비디오) demuxer"
+msgstr "DV (디지털 동영상) demuxer"
 
 #: modules/demux/rawvid.c:44
 msgid ""
 "This is the desired frame rate when playing raw video streams. In the form "
 "30000/1001 or 29.97"
 msgstr ""
-"원시 비디오 스트림 재생시 요구되는 프레임 속도 입니다.  30000/1001 또는 "
+"원시 동영상 스트림 재생시 요구되는 프레임 속도 입니다.  30000/1001 또는 "
 "29.97 형태로"
 
 #: modules/demux/rawvid.c:48
 msgid "This specifies the width in pixels of the raw video stream."
-msgstr "원시 비디오 스트림의 너비를 픽셀단위로 지정합니다."
+msgstr "원시 동영상 스트림의 너비를 픽셀단위로 지정합니다."
 
 #: modules/demux/rawvid.c:52
 msgid "This specifies the height in pixels of the raw video stream."
-msgstr "원시 비디오 스트림의 높이를 픽셀단위로 지정합니다."
+msgstr "원시 동영상 스트림의 높이를 픽셀단위로 지정합니다."
 
 #: modules/demux/rawvid.c:55
 msgid "Force chroma (Use carefully)"
@@ -16200,7 +16194,7 @@ msgstr "크로마를 강제 지정합니다. 4 문자의 문자열로 되어 있
 
 #: modules/demux/rawvid.c:64
 msgid "Raw video demuxer"
-msgstr "원시 비디오 demuxer"
+msgstr "원시 동영상 demuxer"
 
 #: modules/demux/real.c:71
 msgid "Real demuxer"
@@ -16268,7 +16262,7 @@ msgstr "TY"
 
 #: modules/demux/ty.c:63
 msgid "TY Stream audio/video demux"
-msgstr "TY 스트림 오디오/비디오 demux"
+msgstr "TY 스트림 오디오/동영상 demux"
 
 #: modules/demux/ty.c:784
 msgid "Closed captions 2"
@@ -16288,7 +16282,7 @@ msgstr "VC-1 스트림에 요구되는 프레임 속도입니다."
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
-msgstr "VC1 비디오 demuxer"
+msgstr "VC1 동영상 demuxer"
 
 #: modules/demux/vobsub.c:51
 msgid "Vobsub subtitles parser"
@@ -16395,9 +16389,9 @@ msgstr ""
 "의 자발적인 참여자들이 만든 개방된 오픈 소스 미디어 재생기, 인코더 및 스트리"
 "머입니다. <p>VLC는 자체적인 내장 코덱을 사용하고, 기본적으로 널리 사용되는 모"
 "든 플랫폼에서 작동하며, 거의 모든 파일, CD, DVD, 네트웍 스트림, 캡처 카드와 "
-"다른 미디어 형식을 읽을 수 있습니다!</p><p><a href=\"https://"
-"www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">도와주고 참여해주세요!</span></a>"
+"다른 미디어 형식을 읽을 수 있습니다!</p><p><a href=\"https://www.videolan."
+"org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">도와주고 참여해주세요!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -16834,7 +16828,7 @@ msgstr "캡슐화"
 #: share/lua/http/dialogs/create_stream.html:160
 #: modules/gui/qt/ui/profiles.h:749
 msgid "Video codec"
-msgstr "비디오 코덱"
+msgstr "동영상 코덱"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:157
 #: share/lua/http/dialogs/create_stream.html:178
@@ -16845,7 +16839,7 @@ msgstr "오디오 코덱"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:161
 #: modules/gui/qt/ui/profiles.h:725
 msgid "Keep original video track"
-msgstr "원본 비디오 트랙 유지"
+msgstr "원본 동영상 트랙 유지"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:165
 #: modules/gui/qt/ui/profiles.h:747
@@ -16874,7 +16868,7 @@ msgstr "원본 오디오 트랙 유지"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:179
 #: modules/gui/qt/ui/profiles.h:762
 msgid "Overlay subtitles on the video"
-msgstr "비디오에 자막 오버레이하기"
+msgstr "동영상에 자막 오버레이하기"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:183
 msgid "Stream Destination"
@@ -17120,11 +17114,11 @@ msgstr "VLC 디버그 로그 (%s).rtf"
 
 #: modules/gui/macosx/VLCMain+OldPrefs.m:118
 msgid "Remove old preferences?"
-msgstr "이전 기본설정을 제거할까요?"
+msgstr "이전 환경설정을 제거할까요?"
 
 #: modules/gui/macosx/VLCMain+OldPrefs.m:119
 msgid "We just found an older version of VLC's preferences files."
-msgstr "이전 버전의 VLC 기본설정 파일을 발견했습니다."
+msgstr "이전 버전의 VLC 환경설정 파일을 발견했습니다."
 
 #: modules/gui/macosx/VLCMain+OldPrefs.m:120
 msgid "Move To Trash and Relaunch VLC"
@@ -17161,7 +17155,7 @@ msgstr "업데이트 확인..."
 
 #: modules/gui/macosx/VLCMainMenu.m:342
 msgid "Preferences..."
-msgstr "기본설정..."
+msgstr "환경설정..."
 
 #: modules/gui/macosx/VLCMainMenu.m:348
 msgid "Services"
@@ -17352,7 +17346,7 @@ msgstr "항상 맨 앞"
 #: modules/gui/macosx/VLCSimplePrefsController.m:378
 #: modules/gui/qt/ui/sprefs_video.h:316
 msgid "Fullscreen Video Device"
-msgstr "전체화면 비디오 장치"
+msgstr "전체화면 동영상 장치"
 
 #: modules/gui/macosx/VLCMainMenu.m:447 modules/gui/macosx/VLCMainMenu.m:448
 #: modules/video_filter/postproc.c:201
@@ -17413,7 +17407,7 @@ msgstr "오디오 효과..."
 
 #: modules/gui/macosx/VLCMainMenu.m:479
 msgid "Video Effects..."
-msgstr "비디오 효과..."
+msgstr "동영상 효과..."
 
 #: modules/gui/macosx/VLCMainMenu.m:480
 msgid "Bookmarks..."
@@ -17450,7 +17444,7 @@ msgstr "VLC 미디어 재생기 도움말..."
 
 #: modules/gui/macosx/VLCMainMenu.m:491
 msgid "Online Documentation..."
-msgstr "온라인 문서..."
+msgstr "온라인 설명서..."
 
 #: modules/gui/macosx/VLCMainMenu.m:492
 msgid "VideoLAN Website..."
@@ -17458,7 +17452,7 @@ msgstr "VideoLAN 웹 사이트..."
 
 #: modules/gui/macosx/VLCMainMenu.m:493
 msgid "Make a donation..."
-msgstr "기부하기..."
+msgstr "후원하기..."
 
 #: modules/gui/macosx/VLCMainMenu.m:494
 msgid "Online Forum..."
@@ -17888,9 +17882,8 @@ msgstr "모두 접기"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "재생목록 저장"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -17938,7 +17931,7 @@ msgstr "디코딩된 블록"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:88
 msgid "Displayed frames"
-msgstr "표시된 프레임"
+msgstr "화면표시된 프레임"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:89
 msgid "Lost frames"
@@ -18021,7 +18014,7 @@ msgstr "오디오 설정"
 #: modules/gui/qt/components/simple_preferences.cpp:252
 #: modules/gui/qt/components/simple_preferences.cpp:380
 msgid "Video Settings"
-msgstr "비디오 설정"
+msgstr "동영상 설정"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:247
 #: modules/gui/qt/components/simple_preferences.cpp:254
@@ -18256,12 +18249,12 @@ msgstr "디스플레이"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:369
 msgid "Show video within the main window"
-msgstr "기본 창 내에서 비디오 표시"
+msgstr "기본 창 내에서 동영상 표시"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:370
 #: modules/gui/macosx/macosx.m:104 modules/gui/qt/qt.cpp:181
 msgid "Pause the video playback when minimized"
-msgstr "최소화시 비디오 재생을 일시정지"
+msgstr "최소화시 동영상 재생을 일시정지"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:374
 msgid "Fullscreen settings"
@@ -18283,7 +18276,7 @@ msgstr "기본 전체화면 모드 사용하기"
 #: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/qt/ui/sprefs_video.h:327
 msgid "Video snapshots"
-msgstr "비디오 스냅샷"
+msgstr "동영상 스냅샷"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:382
 #: modules/meta_engine/folder.c:70
@@ -18313,7 +18306,7 @@ msgstr "모두 재설정"
 #: modules/gui/macosx/VLCSimplePrefsController.m:395
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
 msgid "Preferences"
-msgstr "기본설정"
+msgstr "환경설정"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:568
 msgid ""
@@ -18349,7 +18342,7 @@ msgstr "가장 높은 지연시간"
 #: modules/gui/macosx/VLCSimplePrefsController.m:835
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
-msgstr "기본설정 재설정"
+msgstr "환경설정 재설정"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:838
 msgid ""
@@ -18363,7 +18356,7 @@ msgid ""
 "\n"
 "Are you sure you want to continue?"
 msgstr ""
-"이것은 VLC 미디어 재생기의 기본설정을 재설정할 것입니다.\n"
+"이것은 VLC 미디어 재생기의 환경설정을 재설정할 것입니다.\n"
 "\n"
 "VLC가 처리과정 중에 재시작해서 현재 재생목록을 비우고, 그 결과로 재생, 스트리"
 "밍이나 트랜스코딩 동작이 즉시 중단될 것입니다.\n"
@@ -18379,7 +18372,7 @@ msgstr "이 설정은 원래의 전체화면 모드가 활성화되기 때문에
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1177
 msgid "Choose the folder to save your video snapshots to."
-msgstr "비디오 스냅샷을 저장할 폴더를 선택하세요."
+msgstr "동영상 스냅샷을 저장할 폴더를 선택하세요."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1179
 #: modules/gui/macosx/VLCSimplePrefsController.m:1278
@@ -18451,7 +18444,7 @@ msgstr "초"
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1442 modules/gui/qt/qt.cpp:216
 msgid "Audio/Video"
-msgstr "오디오/비디오"
+msgstr "오디오/동영상"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:51
 #: modules/gui/qt/components/extended_panels.cpp:1446
@@ -18460,12 +18453,12 @@ msgstr "오디오 트랙 동기화:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:53
 msgid "A positive value means that the audio is ahead of the video"
-msgstr "양수 값은 오디오가 비디오에 앞선다는 것을 의미합니다."
+msgstr "양수 값은 오디오가 동영상에 앞선다는 것을 의미합니다."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:54
 #: modules/gui/qt/components/extended_panels.cpp:1454
 msgid "Subtitles/Video"
-msgstr "자막/비디오"
+msgstr "자막/동영상"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:55
 #: modules/gui/qt/components/extended_panels.cpp:1458
@@ -18474,7 +18467,7 @@ msgstr "자막 트랙 동기화:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:57
 msgid "A positive value means that the subtitles are ahead of the video"
-msgstr "양수 값은 자막이 비디오에 앞선다는 것을 의미합니다."
+msgstr "양수 값은 자막이 동영상에 앞선다는 것을 의미합니다."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:58
 #: modules/gui/qt/components/extended_panels.cpp:1465
@@ -18518,7 +18511,7 @@ msgstr ""
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:188
 #: modules/gui/qt/dialogs/extended.cpp:108
 msgid "Video Effects"
-msgstr "비디오 효과"
+msgstr "동영상 효과"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:192
 msgid "Basic"
@@ -18779,7 +18772,7 @@ msgstr "프로필 구성하기..."
 
 #: modules/gui/macosx/macosx.m:51
 msgid "Video device"
-msgstr "비디오 장치"
+msgstr "동영상 장치"
 
 #: modules/gui/macosx/macosx.m:52
 msgid ""
@@ -18787,8 +18780,8 @@ msgid ""
 "The screen number correspondance can be found in the video device selection "
 "menu."
 msgstr ""
-"기본으로 '전체화면' 에서 비디오 표시에 사용할 화면 개수. 화면 번호 대응은 비"
-"디오 장치 선택 메뉴에서 찾을수 있습니다."
+"기본으로 '전체화면' 에서 동영상 표시에 사용할 화면 개수. 화면 번호 대응은 동"
+"영상 장치 선택 메뉴에서 찾을수 있습니다."
 
 #: modules/gui/macosx/macosx.m:56
 msgid "Opaqueness"
@@ -18799,7 +18792,7 @@ msgid ""
 "Set the transparency of the video output. 1 is non-transparent (default) 0 "
 "is fully transparent."
 msgstr ""
-"비디오 출력의 투명도 정하기. 1은 불투명 (기본값) 이고 0 은 완전 투명입니다."
+"동영상 출력의 투명도 정하기. 1은 불투명 (기본값) 이고 0 은 완전 투명입니다."
 
 #: modules/gui/macosx/macosx.m:60
 msgid "Black screens in fullscreen"
@@ -18807,7 +18800,7 @@ msgstr "전체 화면 시 검은 화면"
 
 #: modules/gui/macosx/macosx.m:61
 msgid "In fullscreen mode, keep screen where there is no video displayed black"
-msgstr "전체화면 모드일때 검게 표시된 비디오 없는 화면 유지"
+msgstr "전체화면 모드일때 검게 표시된 동영상 없는 화면 유지"
 
 #: modules/gui/macosx/macosx.m:64
 msgid "Show Fullscreen controller"
@@ -18899,7 +18892,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:98 modules/gui/qt/qt.cpp:95
 msgid "Resize interface to the native video size"
-msgstr "인터페이스 크기를 원래 비디오 크기(1x)에 맞춰 조절하기"
+msgstr "인터페이스 크기를 원래 동영상 크기(1x)에 맞춰 조절하기"
 
 #: modules/gui/macosx/macosx.m:99 modules/gui/qt/qt.cpp:96
 msgid ""
@@ -18909,9 +18902,9 @@ msgid ""
 " By default, interface resize to the native video size."
 msgstr ""
 "두 가지 방법이 있습니다:\n"
-" - 인터페이스 크기를 원래 비디오 크기(100%)에 맞추기\n"
-" - 비디오 크기를 인터페이스 크기에 맞추기\n"
-"기본값은 인터페이스 크기를 비디오 크기에 맞춰 조절합니다."
+" - 인터페이스 크기를 원래 동영상 크기(100%)에 맞추기\n"
+" - 동영상 크기를 인터페이스 크기에 맞추기\n"
+"기본값은 인터페이스 크기를 동영상 크기에 맞춰 조절합니다."
 
 #: modules/gui/macosx/macosx.m:105 modules/gui/qt/qt.cpp:183
 msgid ""
@@ -18940,8 +18933,8 @@ msgid ""
 "fullscreen. Automatic brightness adjustment should be disabled in System "
 "Preferences."
 msgstr ""
-"비디오을 전체 화면에서 재생하는 동안 맥북 키보드 백라이트를 끕니다. 시스템 기"
-"본설정에서 자동 밝기 조절을 비활성화해야 합니다."
+"동영상을 전체 화면에서 재생하는 동안 맥북 키보드 백라이트를 끕니다. 시스템 환"
+"경설정에서 자동 밝기 조절을 비활성화해야 합니다."
 
 #: modules/gui/macosx/macosx.m:117
 msgid "Shows the previous and next buttons in the main window."
@@ -19003,7 +18996,7 @@ msgstr "없음"
 
 #: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:189
 msgid "Maximum Volume displayed"
-msgstr "최대 표시 음량"
+msgstr "최대 음량 화면표시됨"
 
 #: modules/gui/macosx/macosx.m:149
 msgid "Mac OS X interface"
@@ -19023,7 +19016,7 @@ msgstr "애플 리모트와 미디어 키"
 
 #: modules/gui/macosx/macosx.m:196
 msgid "Video output"
-msgstr "비디오 출력"
+msgstr "동영상 출력"
 
 #: modules/gui/macosx/misc.m:301
 msgid "B"
@@ -19165,7 +19158,7 @@ msgstr " v                      자막 트랙 순차 선택"
 
 #: modules/gui/ncurses.c:882
 msgid " b                      Cycle through video tracks"
-msgstr " b                      비디오 트랙 순차 선택"
+msgstr " b                      동영상 트랙 순차 선택"
 
 #: modules/gui/ncurses.c:883
 msgid " n, p                   Next/Previous playlist item"
@@ -19234,7 +19227,7 @@ msgstr " O                      제목 순으로 재생목록 역정렬하기"
 
 #: modules/gui/ncurses.c:906
 msgid " g                      Go to the current playing item"
-msgstr " g                      현재 재생 항목으로 이동하기"
+msgstr " g                      현재 재생 항목으로 가기하기"
 
 #: modules/gui/ncurses.c:907
 msgid " /                      Look for an item"
@@ -19714,7 +19707,7 @@ msgid ""
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
 "만들어진 미디어 또는 스트림에 대한 정보.\n"
-"Muxer, 오디오 및 비디오 코덱, 자막이 나타납니다."
+"Muxer, 오디오 및 동영상 코덱, 자막이 나타납니다."
 
 #: modules/gui/qt/components/info_panels.cpp:548
 msgid "Current media / stream statistics"
@@ -19756,7 +19749,7 @@ msgstr "블럭"
 
 #: modules/gui/qt/components/info_panels.cpp:592
 msgid "Displayed"
-msgstr "출력"
+msgstr "화면표시됨"
 
 #: modules/gui/qt/components/info_panels.cpp:593
 #: modules/gui/qt/components/info_panels.cpp:595
@@ -19770,7 +19763,7 @@ msgstr "손실"
 
 #: modules/gui/qt/components/info_panels.cpp:599
 msgid "Played"
-msgstr "재생"
+msgstr "재생됨"
 
 #: modules/gui/qt/components/info_panels.cpp:600
 #: modules/gui/qt/components/info_panels.cpp:601
@@ -20192,7 +20185,7 @@ msgstr "오디오 파일"
 #: modules/gui/qt/components/simple_preferences.cpp:1354
 #: modules/gui/qt/dialogs_provider.hpp:41
 msgid "Video Files"
-msgstr "비디오 파일"
+msgstr "동영상 파일"
 
 #: modules/gui/qt/components/simple_preferences.cpp:1355
 #: modules/gui/qt/dialogs_provider.hpp:43
@@ -20508,7 +20501,7 @@ msgstr "정기적으로 VLC 업데이트 확인하기"
 
 #: modules/gui/qt/dialogs/gototime.cpp:41
 msgid "Go to Time"
-msgstr "시간으로 이동"
+msgstr "시간으로 가기"
 
 #: modules/gui/qt/dialogs/gototime.cpp:47
 msgid "&Go"
@@ -20516,7 +20509,7 @@ msgstr "이동(&G)"
 
 #: modules/gui/qt/dialogs/gototime.cpp:55
 msgid "Go to time"
-msgstr "시간으로 이동"
+msgstr "시간으로 가기"
 
 #: modules/gui/qt/dialogs/help.cpp:84 modules/gui/qt/dialogs/plugins.cpp:1375
 #: modules/gui/qt/dialogs/plugins.cpp:1458
@@ -20539,9 +20532,9 @@ msgstr ""
 "의 자발적인 참여자들이 만든 무료 오픈 소스 미디어 재생기, 인코딩 및 스트리밍 "
 "도구입니다. <p>VLC는 자체적인 내장 코덱을 사용하며, 기본적으로 모든 유명한 플"
 "랫폼에서 동작합니다. 그리고 거의 모든 파일, CD, DVD, 네트워크 스트림, 캡처 카"
-"드와 기타 미디어 형식을 읽을 수 있습니다!</p><p><a href=\"http://"
-"www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">참여하세요!</span></a>"
+"드와 기타 미디어 형식을 읽을 수 있습니다!</p><p><a href=\"http://www."
+"videolan.org/contribute/\"><span style=\" text-decoration: underline; color:"
+"#0057ae;\">참여하세요!</span></a>"
 
 #: modules/gui/qt/dialogs/help.cpp:225
 msgid "&Recheck version"
@@ -20734,7 +20727,7 @@ msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
 msgstr ""
-"스킨은 재생기의 외관을 사용자 정의합니다. 기본설정을 통해 활성화할 수 있습니"
+"스킨은 재생기의 외관을 사용자 정의합니다. 환경설정을 통해 활성화할 수 있습니"
 "다."
 
 #: modules/gui/qt/dialogs/plugins.cpp:389
@@ -20750,7 +20743,7 @@ msgid ""
 "Service discoveries adds new sources to your playlist such as web radios, "
 "video websites, ..."
 msgstr ""
-"서비스 검색은 사용자의 재생목록에 웹 라디오나 비디오 웹사이트 등의 새로운 소"
+"서비스 검색은 사용자의 재생목록에 웹 라디오나 동영상 웹사이트 등의 새로운 소"
 "스를 추가해 줍니다."
 
 #: modules/gui/qt/dialogs/plugins.cpp:400
@@ -20822,11 +20815,11 @@ msgstr "단순"
 
 #: modules/gui/qt/dialogs/preferences.cpp:77
 msgid "Switch to simple preferences view"
-msgstr "단순 기본설정 보기로 전환하기"
+msgstr "단순 환경설정 보기로 전환하기"
 
 #: modules/gui/qt/dialogs/preferences.cpp:80
 msgid "Switch to full preferences view"
-msgstr "고급 기본설정 보기로 전환하기"
+msgstr "전체 환경설정 보기로 전환하기"
 
 #: modules/gui/qt/dialogs/preferences.cpp:96
 msgid "Save and close the dialog"
@@ -20834,7 +20827,7 @@ msgstr "대화창 저장 및 닫기"
 
 #: modules/gui/qt/dialogs/preferences.cpp:98
 msgid "&Reset Preferences"
-msgstr "기본설정 재설정(&R)"
+msgstr "환경설정 재설정(&R)"
 
 #: modules/gui/qt/dialogs/preferences.cpp:167
 msgid "Only show current"
@@ -20846,11 +20839,11 @@ msgstr "현재 재생에 관련된 모듈만 표시"
 
 #: modules/gui/qt/dialogs/preferences.cpp:206
 msgid "Advanced Preferences"
-msgstr "고급 기본설정"
+msgstr "고급 환경설정"
 
 #: modules/gui/qt/dialogs/preferences.cpp:227
 msgid "Simple Preferences"
-msgstr "단순 기본설정"
+msgstr "단순 환경설정"
 
 #: modules/gui/qt/dialogs/preferences.cpp:311
 msgid "Cannot save Configuration"
@@ -20858,11 +20851,11 @@ msgstr "구성을 저장할 수 없습니다"
 
 #: modules/gui/qt/dialogs/preferences.cpp:312
 msgid "Preferences file could not be saved"
-msgstr "기본설정 파일을 저장하지 못했습니다"
+msgstr "환경설정 파일을 저장하지 못했습니다"
 
 #: modules/gui/qt/dialogs/preferences.cpp:337
 msgid "Are you sure you want to reset your VLC media player preferences?"
-msgstr "VLC 미디어 재생기의 기본설정을 재설정 할까요?"
+msgstr "VLC 미디어 재생기의 환경설정을 재설정 할까요?"
 
 #: modules/gui/qt/dialogs/sout.cpp:43 modules/gui/qt/ui/sout.h:198
 msgid "Stream Output"
@@ -20924,7 +20917,7 @@ msgstr "기본 도구모음"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:97
 msgid "Above the Video"
-msgstr "비디오 위에"
+msgstr "동영상 위에"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:100
 msgid "Toolbar position:"
@@ -21032,7 +21025,7 @@ msgstr "일정"
 
 #: modules/gui/qt/dialogs/vlm.cpp:69
 msgid "Video On Demand ( VOD )"
-msgstr "주문형 비디오 ( VOD )"
+msgstr "주문형 동영상 ( VOD )"
 
 #: modules/gui/qt/dialogs/vlm.cpp:74
 msgid "Hours / Minutes / Seconds:"
@@ -21170,7 +21163,7 @@ msgstr "오디오(&A)"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1062
 msgid "&Video"
-msgstr "비디오(&V)"
+msgstr "동영상(&V)"
 
 #: modules/gui/qt/menus.cpp:340 modules/gui/qt/menus.cpp:1069
 msgid "Subti&tle"
@@ -21254,7 +21247,7 @@ msgstr "인터페이스 사용자 정의(&Z)..."
 
 #: modules/gui/qt/menus.cpp:448
 msgid "&Preferences"
-msgstr "기본설정(&P)"
+msgstr "환경설정(&P)"
 
 #: modules/gui/qt/menus.cpp:469
 msgid "&View"
@@ -21338,7 +21331,7 @@ msgstr "자막 트랙(&T)"
 
 #: modules/gui/qt/menus.cpp:683
 msgid "Video &Track"
-msgstr "비디오 트랙(&T)"
+msgstr "동영상 트랙(&T)"
 
 #: modules/gui/qt/menus.cpp:687
 msgid "&Fullscreen"
@@ -21478,13 +21471,14 @@ msgstr "스캔 중..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
-msgstr "단순 설정 대신 고급 기본설정 표시"
+msgstr "단순 환경설정 대신 고급 환경설정 표시"
 
 #: modules/gui/qt/qt.cpp:82
 msgid ""
 "Show advanced preferences and not simple preferences when opening the "
 "preferences dialog."
-msgstr "기본설정 대화상자를 열 때 단순 설정 말고 고급 설정을 표시합니다."
+msgstr ""
+"환경설정 대화상자를 열 때 단순 환경설정 대신 고급 환경설정을 표시합니다."
 
 #: modules/gui/qt/qt.cpp:86 modules/gui/skins2/src/skin_main.cpp:499
 msgid "Systray icon"
@@ -21512,7 +21506,7 @@ msgstr "제목 표시줄에 재생 중인 항목의 이름 표시하기"
 
 #: modules/gui/qt/qt.cpp:102
 msgid "Show the name of the song or video in the controller window title."
-msgstr "재생 중인 창 상단의 제목 표시줄에 곡이나 비디오의 이름을 표시합니다."
+msgstr "재생 중인 창 상단의 제목 표시줄에 곡이나 동영상의 이름을 표시합니다."
 
 #: modules/gui/qt/qt.cpp:105
 msgid "Show notification popup on track change"
@@ -21558,9 +21552,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "중요하지 않은 오류 및 경고 대화상자 표시"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "소프트웨어 모드 활성화"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -21704,7 +21697,7 @@ msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
 msgstr ""
-"이 옵션은 비디오/오디오 재생 시작시 인터페이스를 자동으로 올릴 것인지 아닌지"
+"이 옵션은 동영상/오디오 재생 시작시 인터페이스를 자동으로 올릴 것인지 아닌지"
 "를 설정합니다."
 
 #: modules/gui/qt/qt.cpp:195
@@ -21812,15 +21805,15 @@ msgstr "스킨이 적용된 재생목록 사용하기"
 
 #: modules/gui/skins2/src/skin_main.cpp:509
 msgid "Display video in a skinned window if any"
-msgstr "가능하면 비디오을 스킨을 입힌 창에 보여주기"
+msgstr "가능하면 동영상을 스킨을 입힌 창에 보여주기"
 
 #: modules/gui/skins2/src/skin_main.cpp:511
 msgid ""
 "When set to 'no', this parameter is intended to give old skins a chance to "
 "play back video even though no video tag is implemented"
 msgstr ""
-"'no'라고 설정하면, 이 변수는, 설사 아무 비디오 태그도 구현되어 있지 않더라"
-"도, 이전 스킨이 비디오을 재생할 수 있는 기회를 주도록 되어 있습니다."
+"'no'라고 설정하면, 이 변수는, 설사 아무 동영상 태그도 구현되어 있지 않더라"
+"도, 이전 스킨이 동영상을 재생할 수 있는 기회를 주도록 되어 있습니다."
 
 #: modules/gui/skins2/src/skin_main.cpp:536
 msgid "Skinnable Interface"
@@ -21897,19 +21890,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "이미지 감마 설정, 0.01 과 10 사이. 기본 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "스테레오 강화"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "프레임 레이트"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "사이드바 표시"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -21925,7 +21915,7 @@ msgid ""
 "option must only be used with the MMAL video output plugin."
 msgstr ""
 "프레임을 호스트 메모리 대신에 PRI VideoCore에 직접 디코드합니다. 이 옵션은 "
-"MMAL 비디오 출력 플러그인 사용시에만 사용해야 합니다."
+"MMAL 동영상 출력 플러그인 사용시에만 사용해야 합니다."
 
 #: modules/hw/mmal/codec.c:58
 msgid "MMAL decoder"
@@ -21954,38 +21944,38 @@ msgstr "MMAL 기반 디인터레이스 필터 플러그인"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
-msgstr "비디오이 표시되는 비디오코어 레이어"
+msgstr "동영상이 표시되는 동영상코어 레이어"
 
 #: modules/hw/mmal/vout.c:51
 msgid ""
 "VideoCore layer where the video is displayed. Subpictures are displayed "
 "directly above and a black background directly below."
 msgstr ""
-"비디오코어 레이어는 비디오이 표시되는 곳입니다. 서브픽처는 그 위에, 그 아래에"
+"동영상코어 레이어는 동영상이 표시되는 곳입니다. 서브픽처는 그 위에, 그 아래에"
 "는 검은색 배경을 각각 직접 출력합니다."
 
 #: modules/hw/mmal/vout.c:54
 msgid "Blank screen below video."
-msgstr "비디오 하단에 빈 화면."
+msgstr "동영상 하단에 빈 화면."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
-msgstr "비디오 하단에 빈 화면을 렌더링합니다. VideoCore 부하가 증가합니다."
+msgstr "동영상 하단에 빈 화면을 렌더링합니다. VideoCore 부하가 증가합니다."
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
-msgstr "HDMI 리프레시 속도를 비디오에 맞춥니다."
+msgstr "HDMI 리프레시 속도를 동영상에 맞춥니다."
 
 #: modules/hw/mmal/vout.c:63
 msgid "Force interlaced video mode."
-msgstr "인터레이스 비디오 모드를를 강제 지정합니다."
+msgstr "인터레이스 동영상 모드를를 강제 지정합니다."
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
 "Force the HDMI output into an interlaced video mode for interlaced video "
 "content."
 msgstr ""
-"인터레이스 비디오 컨텐츠에 대해 HDMI 출력을 인터레이스 비디오 모드로 강제 설"
+"인터레이스 동영상 컨텐츠에 대해 HDMI 출력을 인터레이스 동영상 모드로 강제 설"
 "정합니다."
 
 #: modules/hw/mmal/vout.c:75
@@ -22002,15 +21992,15 @@ msgstr "VAAPI 필터"
 
 #: modules/hw/vaapi/filters.c:1186
 msgid "Video Accelerated API filters"
-msgstr "비디오 가속 API 필터"
+msgstr "동영상 가속 API 필터"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
-msgstr "VDPAU 조절 비디오 필터"
+msgstr "VDPAU 조절 동영상 필터"
 
 #: modules/hw/vdpau/avcodec.c:222
 msgid "VDPAU video decoder"
-msgstr "VDPAU 비디오 디코더"
+msgstr "VDPAU 동영상 디코더"
 
 #: modules/hw/vdpau/chroma.c:883
 msgid "Temporal-spatial"
@@ -22062,7 +22052,7 @@ msgstr "VDPAU 출력"
 
 #: modules/hw/vdpau/sharpen.c:143
 msgid "VDPAU sharpen video filter"
-msgstr "VDPAU 날카롭게 비디오 필터"
+msgstr "VDPAU 날카롭게 동영상 필터"
 
 #: modules/keystore/file.c:54
 msgid "File keystore (plaintext)"
@@ -22102,7 +22092,7 @@ msgstr "첫 번째 잠금 해제 후, 이 기기에서만"
 
 #: modules/keystore/keychain.m:51
 msgid "When passcode set, on this device only"
-msgstr "암호가 설정되면, 이 기기에서만"
+msgstr "비밀번호 지정 시, 이 기기에서만 적용"
 
 #: modules/keystore/keychain.m:52
 msgid "Always, on this device only"
@@ -22319,7 +22309,7 @@ msgid ""
 "interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
 msgstr ""
 "웹 인터페이스의 비밀번호를 설정하지 않았습니다. --http-password를 사용하거나 "
-"기본설정의 > 전체 > 기본 인터페이스 > Lua > Lua HTTP > 비밀번호 에서 비밀번호"
+"환경설정의 > 전체 > 기본 인터페이스 > Lua > Lua HTTP > 비밀번호 에서 비밀번호"
 "를 정하세요."
 
 #: modules/lua/vlc.c:49
@@ -23394,7 +23384,7 @@ msgid ""
 "in bytes"
 msgstr ""
 "ASF 비트 전송속도를 추정하지 않습니다. 이 설정으로 Windows 미디어 재생기가 스"
-"트림하는 내용을 어떻게 캐쉬할 것인지 조절할 수 있습니다. 오디오+비디오 비트 "
+"트림하는 내용을 어떻게 캐쉬할 것인지 조절할 수 있습니다. 오디오+동영상 비트 "
 "전송속도(바이트)로 지정합니다"
 
 #: modules/mux/asf.c:73
@@ -23403,7 +23393,7 @@ msgstr "ASF Muxer"
 
 #: modules/mux/asf.c:563
 msgid "Unknown Video"
-msgstr "알 수 없는 비디오"
+msgstr "알 수 없는 동영상"
 
 #: modules/mux/avi.c:55
 msgid "Subject"
@@ -23470,13 +23460,13 @@ msgstr "PS Muxer"
 
 #: modules/mux/mpeg/ts.c:102
 msgid "Video PID"
-msgstr "비디오 PID"
+msgstr "동영상 PID"
 
 #: modules/mux/mpeg/ts.c:103
 msgid ""
 "Assign a fixed PID to the video stream. The PCR PID will automatically be "
 "the video."
-msgstr "비디오 스트림에 고정 PID 지정. PCR PID 는 자동으로 비디오이 됩니다."
+msgstr "동영상 스트림에 고정 PID 지정. PCR PID 는 자동으로 동영상이 됩니다."
 
 #: modules/mux/mpeg/ts.c:105
 msgid "Audio PID"
@@ -23657,7 +23647,7 @@ msgstr "영상 암호화"
 
 #: modules/mux/mpeg/ts.c:171
 msgid "Crypt video using CSA"
-msgstr "CSA 방식으로 비디오을 암호화 합니다"
+msgstr "CSA 방식으로 동영상을 암호화 합니다"
 
 #: modules/mux/mpeg/ts.c:181
 msgid "CSA Key in use"
@@ -23759,7 +23749,7 @@ msgstr "AVparser 패킷타이저"
 
 #: modules/packetizer/av1.c:585
 msgid "AV1 video packetizer"
-msgstr "AV1 비디오 패킷타이저"
+msgstr "AV1 동영상 패킷타이저"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23779,11 +23769,11 @@ msgstr "FLAC 오디오 패킷타이저"
 
 #: modules/packetizer/h264.c:62
 msgid "H.264 video packetizer"
-msgstr "H.264 비디오 패킷타이저"
+msgstr "H.264 동영상 패킷타이저"
 
 #: modules/packetizer/hevc.c:57
 msgid "HEVC/H.265 video packetizer"
-msgstr "HEVC/H.265 비디오 패킷타이저"
+msgstr "HEVC/H.265 동영상 패킷타이저"
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -23795,7 +23785,7 @@ msgstr "MPEG4 오디오 패킷타이저"
 
 #: modules/packetizer/mpeg4video.c:55
 msgid "MPEG4 video packetizer"
-msgstr "MPEG4 비디오 패킷타이저"
+msgstr "MPEG4 동영상 패킷타이저"
 
 #: modules/packetizer/mpegaudio.c:88
 msgid "MPEG audio layer I/II/III packetizer"
@@ -23815,11 +23805,11 @@ msgstr ""
 
 #: modules/packetizer/mpegvideo.c:74
 msgid "MPEG-I/II video packetizer"
-msgstr "MPEG-I/II 비디오 패킷타이저"
+msgstr "MPEG-I/II 동영상 패킷타이저"
 
 #: modules/packetizer/mpegvideo.c:75
 msgid "MPEG Video"
-msgstr "MPEG 비디오"
+msgstr "MPEG 동영상"
 
 #: modules/packetizer/vc1.c:54
 msgid "VC-1 packetizer"
@@ -23851,7 +23841,7 @@ msgstr "Bonjour 렌더러 검색"
 #: modules/services_discovery/mediadirs.c:133
 #: modules/services_discovery/mediadirs.c:357
 msgid "My Videos"
-msgstr "내 비디오"
+msgstr "내 동영상"
 
 #: modules/services_discovery/mediadirs.c:78
 #: modules/services_discovery/mediadirs.c:141
@@ -24002,11 +23992,11 @@ msgstr "사용자"
 #: modules/services_discovery/udev.c:58 modules/services_discovery/udev.c:99
 #: modules/services_discovery/udev.c:447
 msgid "Video capture"
-msgstr "비디오 캡처"
+msgstr "동영상 캡처"
 
 #: modules/services_discovery/udev.c:59
 msgid "Video capture (Video4Linux)"
-msgstr "비디오 캡처 (Video4Linux)"
+msgstr "동영상 캡처 (Video4Linux)"
 
 #: modules/services_discovery/udev.c:68
 msgid "Audio capture (ALSA)"
@@ -24097,7 +24087,7 @@ msgid ""
 "4=top, 8=bottom, you can also use combinations of these values, eg 6 = top-"
 "right)."
 msgstr ""
-"비디오에서 막대 그래프 위치를 강제 지정합니다 (0=가운데, 1=왼쪽, 2=오른쪽, 4="
+"동영상에서 막대 그래프 위치를 강제 지정합니다 (0=가운데, 1=왼쪽, 2=오른쪽, 4="
 "상단, 8=하단, 또한 이 값들을 조합해서 사용할수 있습니다, 예. 6 = 오른쪽 상"
 "단)."
 
@@ -24119,11 +24109,11 @@ msgstr "표시되는 막대그래프의 픽셀 높이입니다."
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
-msgstr "오디오 막대그래프 비디오 부소스"
+msgstr "오디오 막대그래프 동영상 부소스"
 
 #: modules/spu/audiobargraph_v.c:80
 msgid "Audio Bar Graph Video"
-msgstr "오디오 막대그래프 비디오"
+msgstr "오디오 막대그래프 동영상"
 
 #: modules/spu/dynamicoverlay/dynamicoverlay.c:60
 msgid "Input FIFO"
@@ -24143,7 +24133,7 @@ msgstr "응답이 쓰여질 FIFO"
 
 #: modules/spu/dynamicoverlay/dynamicoverlay.c:67
 msgid "Dynamic video overlay"
-msgstr "다이내믹 비디오 오버레이"
+msgstr "다이내믹 동영상 오버레이"
 
 #: modules/spu/dynamicoverlay/dynamicoverlay.c:68
 #: share/lua/http/dialogs/create_stream.html:245
@@ -24203,12 +24193,12 @@ msgid ""
 "Enforce the logo position on the video (0=center, 1=left, 2=right, 4=top, "
 "8=bottom, you can also use combinations of these values, eg 6 = top-right)."
 msgstr ""
-"비디오에 로고 위치를 강제 지정합니다 (0=가운데, 1=왼쪽, 2=오른쪽, 4=상단, 8="
+"동영상에 로고 위치를 강제 지정합니다 (0=가운데, 1=왼쪽, 2=오른쪽, 4=상단, 8="
 "하단, 또한 이 값들을 조합해서 사용할수 있습니다, 예. 6 = 오른쪽 상단)."
 
 #: modules/spu/logo.c:74
 msgid "Use a local picture as logo on the video"
-msgstr "로컬 그림을 비디오의 로고로 사용하기"
+msgstr "로컬 그림을 동영상의 로고로 사용하기"
 
 #: modules/spu/logo.c:93
 msgid "Logo sub source"
@@ -24220,7 +24210,7 @@ msgstr "로고 오버레이"
 
 #: modules/spu/logo.c:112
 msgid "Logo video filter"
-msgstr "로고 비디오 필터"
+msgstr "로고 동영상 필터"
 
 #: modules/spu/marq.c:90
 msgid ""
@@ -24302,7 +24292,7 @@ msgid ""
 "then blue. #000000 = black, #FF0000 = red, #00FF00 = green, #FFFF00 = yellow "
 "(red + green), #FFFFFF = white"
 msgstr ""
-"비디오에 렌더링될 텍스트 색상. 16진수여야 합니다 (HTML 색상처럼). 첫번째 두 "
+"동영상에 렌더링될 텍스트 색상. 16진수여야 합니다 (HTML 색상처럼). 첫번째 두 "
 "문자는 빨간색, 그 다음은 녹색, 그 다음은 파란색입니다. #000000 = 검은색, "
 "#FF0000 = 빨간색, #00FF00 = 녹색, #FFFF00 = 노란색 (빨간색 + 녹색), #FFFFFF "
 "= 하얀색"
@@ -24317,12 +24307,12 @@ msgid ""
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg "
 "6 = top-right)."
 msgstr ""
-"비디오의 마키 위치를 강제할수 있습니다 (0=중앙, 1=왼쪽, 2=오른쪽, 4=상단, 8="
+"동영상의 마키 위치를 강제할수 있습니다 (0=중앙, 1=왼쪽, 2=오른쪽, 4=상단, 8="
 "하단, 또한 이 값들을 조합해서 사용할수 있습니다, 예 6 = 오른쪽 상단)."
 
 #: modules/spu/marq.c:134
 msgid "Display text above the video"
-msgstr "비디오 위에 텍스트 출력하기"
+msgstr "동영상 위에 텍스트 출력하기"
 
 #: modules/spu/marq.c:141
 msgid "Marquee"
@@ -24392,7 +24382,7 @@ msgid ""
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg "
 "6 = top-right)."
 msgstr ""
-"비디오에 모자이크 정렬을 강제 지정할 수 있습니다 (0=가운데, 1=왼쪽, 2=오른"
+"동영상에 모자이크 정렬을 강제 지정할 수 있습니다 (0=가운데, 1=왼쪽, 2=오른"
 "쪽, 4=상단, 8=하단, 또한 이 값들을 조합해서 사용할 수 있습니다, 예 6=오른쪽 "
 "상단)."
 
@@ -24502,7 +24492,7 @@ msgstr "오프셋"
 
 #: modules/spu/mosaic.c:176
 msgid "Mosaic video sub source"
-msgstr "모자이크 비디오 부 소스"
+msgstr "모자이크 동영상 부 소스"
 
 #: modules/spu/mosaic.c:177
 msgid "Mosaic"
@@ -24648,7 +24638,7 @@ msgid ""
 "4=top, 8=bottom; you can also use combinations of these values, eg 6 = top-"
 "right)."
 msgstr ""
-"비디오에 문자 위치를 적용할 수 있습니다 (0=가운데, 1=왼쪽, 2=오른쪽, 4=상단, "
+"동영상에 문자 위치를 적용할 수 있습니다 (0=가운데, 1=왼쪽, 2=오른쪽, 4=상단, "
 "8=하단, 또한 이 값들을 조합해서 사용할 수 있습니다, 예. 6=오른쪽 상단)."
 
 #: modules/spu/rss.c:164
@@ -24665,7 +24655,7 @@ msgstr ""
 
 #: modules/spu/rss.c:167
 msgid "Display a RSS or ATOM Feed on your video"
-msgstr "비디오에 RSS나 Atom 피드를 표시합니다"
+msgstr "동영상에 RSS나 Atom 피드를 표시합니다"
 
 #: modules/spu/rss.c:182
 msgid "Don't show"
@@ -24905,7 +24895,7 @@ msgid ""
 "this value (in milliseconds, should be >= 100 ms). For high values, you will "
 "need to raise caching values."
 msgstr ""
-"사진 비디오 출력에서 나오는 화면들은 이 값에 따라서 지연될 것입니다 (밀리초, "
+"사진 동영상 출력에서 나오는 화면들은 이 값에 따라서 지연될 것입니다 (밀리초, "
 "100 ms 이상이 되야 함). 높은 값에 대해서는, 캐쉬값을 올려야 할 것입니다."
 
 #: modules/stream_out/bridge.c:56
@@ -25081,7 +25071,7 @@ msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
-"이 비디오을 전송하려면 변환이 필요합니다. 이 변환은 사용 가능한 모든 전원을 "
+"이 동영상을 전송하려면 변환이 필요합니다. 이 변환은 사용 가능한 모든 전원을 "
 "사용할 수 있으며 배터리를 빨리 소모할 수 있습니다."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:511
@@ -25130,7 +25120,7 @@ msgstr "오디오 렌더링 활성화/활성화 안함."
 
 #: modules/stream_out/display.c:43
 msgid "Enable/disable video rendering."
-msgstr "비디오 렌더링 활성화/활성화 안함."
+msgstr "동영상 렌더링 활성화/활성화 안함."
 
 #: modules/stream_out/display.c:44
 msgid "Delay (ms)"
@@ -25166,11 +25156,11 @@ msgstr "오디오에 사용될 출력 접근 방식입니다."
 
 #: modules/stream_out/es.c:49
 msgid "Video output access method"
-msgstr "비디오 출력 접근 방법"
+msgstr "동영상 출력 접근 방법"
 
 #: modules/stream_out/es.c:51
 msgid "This is the output access method that will be used for video."
-msgstr "비디오에 사용될 출력 접근 방식입니다."
+msgstr "동영상에 사용될 출력 접근 방식입니다."
 
 #: modules/stream_out/es.c:53 modules/stream_out/standard.c:45
 msgid "Output muxer"
@@ -25190,11 +25180,11 @@ msgstr "오디오에 사용될 Muxer입니다."
 
 #: modules/stream_out/es.c:59
 msgid "Video output muxer"
-msgstr "비디오 출력 Muxer"
+msgstr "동영상 출력 Muxer"
 
 #: modules/stream_out/es.c:61
 msgid "This is the muxer that will be used for video."
-msgstr "비디오에 사용될 Muxer입니다."
+msgstr "동영상에 사용될 Muxer입니다."
 
 #: modules/stream_out/es.c:63
 msgid "Output URL"
@@ -25214,11 +25204,11 @@ msgstr "오디오에 사용될 출력 URI입니다."
 
 #: modules/stream_out/es.c:69
 msgid "Video output URL"
-msgstr "비디오 출력 URL"
+msgstr "동영상 출력 URL"
 
 #: modules/stream_out/es.c:71
 msgid "This is the output URI that will be used for video."
-msgstr "비디오에 사용될 출력 URI입니다."
+msgstr "동영상에 사용될 출력 URI입니다."
 
 #: modules/stream_out/es.c:80
 msgid "Elementary stream output"
@@ -25240,12 +25230,12 @@ msgstr "이 서브픽처에 대한 식별자 문자열 지정"
 #: modules/stream_out/mosaic_bridge.c:107
 #: modules/stream_out/transcode/transcode.c:69
 msgid "Output video width."
-msgstr "출력 비디오 너비."
+msgstr "출력 동영상 너비."
 
 #: modules/stream_out/mosaic_bridge.c:110
 #: modules/stream_out/transcode/transcode.c:72
 msgid "Output video height."
-msgstr "출력 비디오 높이."
+msgstr "출력 동영상 높이."
 
 #: modules/stream_out/mosaic_bridge.c:111
 msgid "Sample aspect ratio"
@@ -25258,11 +25248,11 @@ msgstr "대상의 샘플 화면 비율(1:1, 3:4, 2:3)입니다."
 #: modules/stream_out/mosaic_bridge.c:115
 #: modules/stream_out/transcode/transcode.c:79
 msgid "Video filter"
-msgstr "비디오 필터"
+msgstr "동영상 필터"
 
 #: modules/stream_out/mosaic_bridge.c:117
 msgid "Video filters will be applied to the video stream."
-msgstr "비디오 스트림에 비디오 필터가 적용될 것입니다."
+msgstr "동영상 스트림에 동영상 필터가 적용될 것입니다."
 
 #: modules/stream_out/mosaic_bridge.c:119
 msgid "Image chroma"
@@ -25274,7 +25264,7 @@ msgid ""
 "Alphamask or Bluescreen video filter."
 msgstr ""
 "특정 크로마 사용을 강제 지정합니다. 알파마스크Alphamask나 블루스크린"
-"Bluescreen 비디오 필터를 사용하려면 YUVA를 사용하세요."
+"Bluescreen 동영상 필터를 사용하려면 YUVA를 사용하세요."
 
 #: modules/stream_out/mosaic_bridge.c:126
 msgid "Transparency of the mosaic picture."
@@ -25399,7 +25389,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:116
 msgid "This allows you to specify the base port for the RTP streaming."
-msgstr "RTP 스트리밍의 기준 동영상 포트 지정을 허용합니다."
+msgstr "이를 통해 RTP 스트리밍을 위한 기본 포트를 지정할 수 있습니다."
 
 #: modules/stream_out/rtp.c:117
 msgid "Audio port"
@@ -25412,12 +25402,12 @@ msgstr "RTP 스트리밍의 기본 오디오 포트 지정을 허용합니다."
 
 #: modules/stream_out/rtp.c:120
 msgid "Video port"
-msgstr "비디오 포트"
+msgstr "동영상 포트"
 
 #: modules/stream_out/rtp.c:122
 msgid ""
 "This allows you to specify the default video port for the RTP streaming."
-msgstr "RTP 스트리밍의 기본 비디오 포트 지정을 허용합니다."
+msgstr "RTP 스트리밍의 기본 동영상 포트 지정을 허용합니다."
 
 #: modules/stream_out/rtp.c:130
 msgid "RTP/RTCP multiplexing"
@@ -25522,14 +25512,14 @@ msgstr "기본적인 스트림의 언어 변경"
 
 #: modules/stream_out/smem.c:61
 msgid "Video prerender callback"
-msgstr "비디오 prerender callback"
+msgstr "동영상 prerender callback"
 
 #: modules/stream_out/smem.c:62
 msgid ""
 "Address of the video prerender callback function. This function will set the "
 "buffer where render will be done."
 msgstr ""
-"비디오 prerender callback 함수의 주소. 이 함수는 렌더링이 될 버퍼를 정할 것입"
+"동영상 prerender callback 함수의 주소. 이 함수는 렌더링이 될 버퍼를 정할 것입"
 "니다."
 
 #: modules/stream_out/smem.c:65
@@ -25546,14 +25536,14 @@ msgstr ""
 
 #: modules/stream_out/smem.c:69
 msgid "Video postrender callback"
-msgstr "비디오 postrender callback"
+msgstr "동영상 postrender callback"
 
 #: modules/stream_out/smem.c:70
 msgid ""
 "Address of the video postrender callback function. This function will be "
 "called when the render is into the buffer."
 msgstr ""
-"비디오 postrender callback 함수의 주소. 이 함수는 렌더가 버퍼에 있을 때 호출"
+"동영상 postrender callback 함수의 주소. 이 함수는 렌더가 버퍼에 있을 때 호출"
 "될 것입니다."
 
 #: modules/stream_out/smem.c:73
@@ -25570,11 +25560,11 @@ msgstr ""
 
 #: modules/stream_out/smem.c:77
 msgid "Video Callback data"
-msgstr "비디오 Callback 데이터"
+msgstr "동영상 Callback 데이터"
 
 #: modules/stream_out/smem.c:78
 msgid "Data for the video callback function."
-msgstr "비디오 callback 함수에 대한 데이터"
+msgstr "동영상 callback 함수에 대한 데이터"
 
 #: modules/stream_out/smem.c:80
 msgid "Audio callback data"
@@ -25665,21 +25655,21 @@ msgstr "표준 스트림 출력"
 
 #: modules/stream_out/transcode/transcode.c:45
 msgid "Video encoder"
-msgstr "비디오 인코더"
+msgstr "동영상 인코더"
 
 #: modules/stream_out/transcode/transcode.c:47
 msgid ""
 "This is the video encoder module that will be used (and its associated "
 "options)."
-msgstr "사용될 비디오 인코더 모듈 (및 관련 옵션) 입니다."
+msgstr "사용될 동영상 인코더 모듈 (및 관련 옵션) 입니다."
 
 #: modules/stream_out/transcode/transcode.c:49
 msgid "Destination video codec"
-msgstr "대상 비디오 코덱"
+msgstr "대상 동영상 코덱"
 
 #: modules/stream_out/transcode/transcode.c:51
 msgid "This is the video codec that will be used."
-msgstr "사용될 비디오 코덱입니다."
+msgstr "사용될 동영상 코덱입니다."
 
 #: modules/stream_out/transcode/transcode.c:52
 #: share/lua/http/dialogs/create_stream.html:212
@@ -25688,31 +25678,31 @@ msgstr "영상 비트 전송속도"
 
 #: modules/stream_out/transcode/transcode.c:54
 msgid "Target bitrate of the transcoded video stream."
-msgstr "변환된 비디오 스트림의 목표 비트 전송속도."
+msgstr "변환된 동영상 스트림의 목표 비트 전송속도."
 
 #: modules/stream_out/transcode/transcode.c:55
 msgid "Video scaling"
-msgstr "비디오 크기조정"
+msgstr "동영상 크기조정"
 
 #: modules/stream_out/transcode/transcode.c:57
 msgid "Scale factor to apply to the video while transcoding (eg: 0.25)"
-msgstr "트랜스코딩시 비디오에 적용할 크기조절 비율 (예: 0.25)"
+msgstr "트랜스코딩시 동영상에 적용할 크기조절 비율 (예: 0.25)"
 
 #: modules/stream_out/transcode/transcode.c:58
 msgid "Video frame-rate"
-msgstr "비디오 프레임 속도"
+msgstr "동영상 프레임 속도"
 
 #: modules/stream_out/transcode/transcode.c:60
 msgid "Target output frame rate for the video stream."
-msgstr "비디오 스트림의 목표 출력 프레임 속도입니다."
+msgstr "동영상 스트림의 목표 출력 프레임 속도입니다."
 
 #: modules/stream_out/transcode/transcode.c:61
 msgid "Deinterlace video"
-msgstr "비디오 디인터레이스"
+msgstr "동영상 디인터레이스"
 
 #: modules/stream_out/transcode/transcode.c:63
 msgid "Deinterlace the video before encoding."
-msgstr "인코딩 전에 비디오 디인터레이스."
+msgstr "인코딩 전에 동영상 디인터레이스."
 
 #: modules/stream_out/transcode/transcode.c:64
 msgid "Deinterlace module"
@@ -25728,22 +25718,22 @@ msgstr "영상 최대 너비"
 
 #: modules/stream_out/transcode/transcode.c:75
 msgid "Maximum output video width."
-msgstr "출력되는 비디오의 최대 너비."
+msgstr "출력되는 동영상의 최대 너비."
 
 #: modules/stream_out/transcode/transcode.c:76
 msgid "Maximum video height"
-msgstr "비디오 최대 높이"
+msgstr "동영상 최대 높이"
 
 #: modules/stream_out/transcode/transcode.c:78
 msgid "Maximum output video height."
-msgstr "출력되는 비디오의 최대 높이."
+msgstr "출력되는 동영상의 최대 높이."
 
 #: modules/stream_out/transcode/transcode.c:81
 msgid ""
 "Video filters will be applied to the video streams (after overlays are "
 "applied). You can enter a colon-separated list of filters."
 msgstr ""
-"비디오 필터가 비디오 스트림에 적용될 것입니다 (오버레이 적용 후에). 콜론으로 "
+"동영상 필터가 동영상 스트림에 적용될 것입니다 (오버레이 적용 후에). 콜론으로 "
 "분리한 필터 목록을 입력할 수 있습니다."
 
 #: modules/stream_out/transcode/transcode.c:84
@@ -25823,8 +25813,8 @@ msgid ""
 "overlayed directly onto the video. You can specify a colon-separated list of "
 "subpicture modules."
 msgstr ""
-"오버레이(\"서브픽처\"라고도 알려진)를 변환된 비디오 스트림에 추가할 수 있도"
-"록 합니다. 필터로 만들어진 서브픽처는 비디오상에 직접 오버레이될 것입니다. 서"
+"오버레이(\"서브픽처\"라고도 알려진)를 변환된 동영상 스트림에 추가할 수 있도"
+"록 합니다. 필터로 만들어진 서브픽처는 동영상상에 직접 오버레이될 것입니다. 서"
 "브픽처 모듈 목록을 콜론으로 구분해서 지정할 수 있습니다."
 
 #: modules/stream_out/transcode/transcode.c:123
@@ -25842,7 +25832,7 @@ msgstr "높은 우선순위"
 #: modules/stream_out/transcode/transcode.c:128
 msgid ""
 "Runs the optional encoder thread at the OUTPUT priority instead of VIDEO."
-msgstr "출력 우선순위에 비디오 대신 선택적인 인코더 스레드를 실행합니다."
+msgstr "출력 우선순위에 동영상 대신 선택적인 인코더 스레드를 실행합니다."
 
 #: modules/stream_out/transcode/transcode.c:130
 msgid "Picture pool size"
@@ -25898,7 +25888,7 @@ msgid ""
 "set to something different than 0 this option will override the relative "
 "font size."
 msgstr ""
-"이것은 비디오상에 렌더링될 글꼴의 기본 크기입니다. 0 이외의 다른 값을 설정하"
+"이것은 동영상상에 렌더링될 글꼴의 기본 크기입니다. 0 이외의 다른 값을 설정하"
 "면, 이 옵션은 상대적인 글꼴 크기를 무시합니다."
 
 #: modules/text_renderer/freetype/freetype.c:91
@@ -25910,7 +25900,7 @@ msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
-"비디오에 렌더링될 텍스트 글자의 불투명도 (투명도의 반대). 0 = 투명, 255 = 완"
+"동영상에 렌더링될 텍스트 글자의 불투명도 (투명도의 반대). 0 = 투명, 255 = 완"
 "전 불투명."
 
 #: modules/text_renderer/freetype/freetype.c:95
@@ -25924,7 +25914,7 @@ msgid ""
 "then blue. #000000 = black, #FF0000 = red, #00FF00 = green, #FFFF00 = yellow "
 "(red + green), #FFFFFF = white"
 msgstr ""
-"비디오에 렌더링될 텍스트 색상. 16진수여야 합니다 (HTML 색상처럼). 첫번째 두 "
+"동영상에 렌더링될 텍스트 색상. 16진수여야 합니다 (HTML 색상처럼). 첫번째 두 "
 "문자는 빨간색, 그 다음은 녹색, 그 다음은 파란색입니다. #000000 = 검은색, "
 "#FF0000 = 빨간색, #00FF00 = 녹색, #FFFF00 = 노란색 (빨간색 + 녹색), #FFFFFF "
 "= 하얀색"
@@ -25938,7 +25928,7 @@ msgid ""
 "This is the relative default size of the fonts that will be rendered on the "
 "video. If absolute font size is set, relative size will be overridden."
 msgstr ""
-"이것은 비디오상에 렌더링될 글꼴의 상대적인 기본 크기입니다. 절대적인 글꼴 크"
+"이것은 동영상상에 렌더링될 글꼴의 상대적인 기본 크기입니다. 절대적인 글꼴 크"
 "기로 설정하면, 상대적인 크기는 무시될 것입니다."
 
 #: modules/text_renderer/freetype/freetype.c:106
@@ -26036,7 +26026,7 @@ msgstr "더미 글꼴 렌더러"
 
 #: modules/video_chroma/chain.c:46
 msgid "Video filtering using a chain of video filter modules"
-msgstr "일련의 비디오 필터 모듈을 이용하는 비디오 필터링"
+msgstr "일련의 동영상 필터 모듈을 이용하는 동영상 필터링"
 
 #: modules/video_chroma/grey_yuv.c:55 modules/video_chroma/i420_yuy2.c:86
 #: modules/video_chroma/i422_i420.c:57 modules/video_chroma/i422_yuy2.c:71
@@ -26138,7 +26128,7 @@ msgstr "Bicubic Spline"
 
 #: modules/video_chroma/swscale.c:69 modules/video_filter/scale.c:48
 msgid "Video scaling filter"
-msgstr "비디오 크기조정 필터"
+msgstr "동영상 크기조정 필터"
 
 #: modules/video_chroma/swscale.c:70
 msgid "Swscale"
@@ -26194,7 +26184,7 @@ msgstr "유리의 색 구성표 정의하기"
 
 #: modules/video_filter/anaglyph.c:71
 msgid "Convert 3D picture to anaglyph image video filter"
-msgstr "3D 사진 > 입체 이미지 변환 비디오 필터"
+msgstr "3D 사진 > 입체 이미지 변환 동영상 필터"
 
 #: modules/video_filter/antiflicker.c:51
 msgid "Window size"
@@ -26214,7 +26204,7 @@ msgstr "부드럽게 하는데 고려할 프레임 수 (0에서 30)"
 
 #: modules/video_filter/antiflicker.c:67
 msgid "antiflicker video filter"
-msgstr "깜박임 방지 비디오 필터"
+msgstr "깜박임 방지 동영상 필터"
 
 #: modules/video_filter/antiflicker.c:68
 msgid "antiflicker"
@@ -26262,7 +26252,7 @@ msgstr "증강현실 공 게임"
 
 #: modules/video_filter/ball.c:123
 msgid "Ball video filter"
-msgstr "공 비디오 필터"
+msgstr "공 동영상 필터"
 
 #: modules/video_filter/ball.c:124
 msgid "Ball"
@@ -26338,7 +26328,7 @@ msgstr "혼합 이미지"
 
 #: modules/video_filter/blend.cpp:44
 msgid "Video pictures blending"
-msgstr "비디오 사진 혼합"
+msgstr "동영상 사진 혼합"
 
 #: modules/video_filter/bluescreen.c:38
 msgid ""
@@ -26401,7 +26391,7 @@ msgstr ""
 
 #: modules/video_filter/bluescreen.c:78
 msgid "Bluescreen video filter"
-msgstr "블루스크린 비디오 필터"
+msgstr "블루스크린 동영상 필터"
 
 #: modules/video_filter/bluescreen.c:79
 msgid "Bluescreen"
@@ -26437,20 +26427,20 @@ msgstr ""
 
 #: modules/video_filter/canvas.c:93
 msgid "Pad video"
-msgstr "비디오 채우기"
+msgstr "동영상 채우기"
 
 #: modules/video_filter/canvas.c:95
 msgid ""
 "If enabled, video will be padded to fit in canvas after scaling. Otherwise, "
 "video will be cropped to fix in canvas after scaling."
 msgstr ""
-"이 옵션을 활성화하면, 크기조정 후의 캔바스에 맞추기 위해 비디오을 확장할 것입"
-"니다. 그게 아니면, 크기조절 후의 캔바스에 맞추기 위해서 비디오을 잘라낼 것입"
+"이 옵션을 활성화하면, 크기조정 후의 캔바스에 맞추기 위해 동영상을 확장할 것입"
+"니다. 그게 아니면, 크기조절 후의 캔바스에 맞추기 위해서 동영상을 잘라낼 것입"
 "니다."
 
 #: modules/video_filter/canvas.c:97
 msgid "Automatically resize and pad a video"
-msgstr "자동으로 비디오 크기를 조절하고 채우기"
+msgstr "자동으로 동영상 크기를 조절하고 채우기"
 
 #: modules/video_filter/canvas.c:105
 msgid "Canvas"
@@ -26458,7 +26448,7 @@ msgstr "캔버스"
 
 #: modules/video_filter/canvas.c:106
 msgid "Canvas video filter"
-msgstr "캔버스 비디오 필터"
+msgstr "캔버스 동영상 필터"
 
 #: modules/video_filter/ci_filters.m:756
 msgid "Use a specific Core Image Filter"
@@ -26471,7 +26461,7 @@ msgstr "예: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 
 #: modules/video_filter/ci_filters.m:764
 msgid "Mac OS X hardware video filters"
-msgstr "맥 OS X 하드웨어 비디오 필터"
+msgstr "맥 OS X 하드웨어 동영상 필터"
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -26487,7 +26477,7 @@ msgstr ""
 
 #: modules/video_filter/colorthres.c:60
 msgid "Select one color in the video"
-msgstr "비디오의 한 색상을 선택하세요"
+msgstr "동영상의 한 색상을 선택하세요"
 
 #: modules/video_filter/colorthres.c:70
 msgid "Color threshold filter"
@@ -26571,7 +26561,7 @@ msgstr "자르기/채우기"
 
 #: modules/video_filter/croppadd.c:80
 msgid "Video cropping filter"
-msgstr "비디오 자르기 필터"
+msgstr "동영상 자르기 필터"
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -26633,7 +26623,7 @@ msgstr ""
 "입력 프레임 경계를 가로질러 떨어지는 출력 프레임의 색상을 처리하는 방식을 선"
 "택합니다. \n"
 "\n"
-"Latest: 새 (밝기) 필드에서만 크로마 가져오기. 캠코더의 비디오같은 인터레이스 "
+"Latest: 새 (밝기) 필드에서만 크로마 가져오기. 캠코더의 동영상같은 인터레이스 "
 "입력에 좋음. \n"
 "\n"
 "ArtLine: top 필드에서 크로마 라인 1을, bottom 필드에서 라인 2 등을 가져옵니"
@@ -26661,11 +26651,11 @@ msgstr ""
 
 #: modules/video_filter/deinterlace/deinterlace.c:299
 msgid "Deinterlacing video filter"
-msgstr "디인터레이싱 비디오 필터"
+msgstr "디인터레이싱 동영상 필터"
 
 #: modules/video_filter/edgedetection.c:39
 msgid "Edge detection video filter"
-msgstr "가장자리 검출 비디오 필터"
+msgstr "가장자리 검출 동영상 필터"
 
 #: modules/video_filter/edgedetection.c:40
 msgid "Edge detection"
@@ -26689,11 +26679,11 @@ msgstr "마스크 Y 좌표."
 
 #: modules/video_filter/erase.c:63
 msgid "Remove zones of the video using a picture as mask"
-msgstr "그림을 마스크로 사용하는 비디오의 구역을 제거합니다"
+msgstr "그림을 마스크로 사용하는 동영상의 구역을 제거합니다"
 
 #: modules/video_filter/erase.c:68
 msgid "Erase video filter"
-msgstr "비디오 삭제 필터"
+msgstr "동영상 삭제 필터"
 
 #: modules/video_filter/erase.c:69
 msgid "Erase"
@@ -26709,11 +26699,11 @@ msgstr "추출할 RGB 컴포넌트. 0은 빨간색, 1은 녹색, 2는 파란색.
 
 #: modules/video_filter/extract.c:67
 msgid "Extract RGB component video filter"
-msgstr "RGB 요소 추출 비디오 필터"
+msgstr "RGB 요소 추출 동영상 필터"
 
 #: modules/video_filter/fps.c:45
 msgid "FPS conversion video filter"
-msgstr "FPS 변환 비디오 필터"
+msgstr "FPS 변환 동영상 필터"
 
 #: modules/video_filter/fps.c:46
 msgid "FPS Converter"
@@ -26721,7 +26711,7 @@ msgstr "FPS 변환기"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
-msgstr "양방향 비디오 필터 고정"
+msgstr "양방향 동영상 필터 고정"
 
 #: modules/video_filter/freeze.c:79
 msgid "Freeze"
@@ -26765,7 +26755,7 @@ msgstr "픽셀값을 수정하기 위해 사용되는 세기"
 
 #: modules/video_filter/gradfun.c:59
 msgid "Gradfun video filter"
-msgstr "Gradfun 비디오 필터"
+msgstr "Gradfun 동영상 필터"
 
 #: modules/video_filter/gradfun.c:60
 msgid "Gradfun"
@@ -26809,7 +26799,7 @@ msgstr "color gradient나 edge detection 효과 적용하기"
 
 #: modules/video_filter/gradient.c:81
 msgid "Gradient video filter"
-msgstr "기울기 비디오 필터"
+msgstr "기울기 동영상 필터"
 
 #: modules/video_filter/grain.c:54
 msgid "Variance of the gaussian noise"
@@ -26833,7 +26823,7 @@ msgstr "노이즈 그레인의 최대 기간, 픽셀 단위"
 
 #: modules/video_filter/grain.c:64
 msgid "Grain video filter"
-msgstr "그레인 비디오 필터"
+msgstr "그레인 동영상 필터"
 
 #: modules/video_filter/grain.c:65
 msgid "Grain"
@@ -26869,7 +26859,7 @@ msgstr "고품질 3D 노이즈감소 필터"
 
 #: modules/video_filter/invert.c:50
 msgid "Invert video filter"
-msgstr "비디오 반전 필터"
+msgstr "동영상 반전 필터"
 
 #: modules/video_filter/invert.c:51
 msgid "Color inversion"
@@ -26877,7 +26867,7 @@ msgstr "색상 반전"
 
 #: modules/video_filter/magnify.c:49
 msgid "Magnify/Zoom interactive video filter"
-msgstr "화면 확대/크기조절 비디오 필터"
+msgstr "화면 확대/크기조절 동영상 필터"
 
 #: modules/video_filter/magnify.c:50
 msgid "Magnify"
@@ -26918,15 +26908,15 @@ msgstr "오른쪽에서 왼쪽/하단에서 상단"
 
 #: modules/video_filter/mirror.c:80
 msgid "Mirror video filter"
-msgstr "비디오 미러링 필터"
+msgstr "동영상 미러링 필터"
 
 #: modules/video_filter/mirror.c:81
 msgid "Mirror video"
-msgstr "비디오 미러링"
+msgstr "동영상 미러링"
 
 #: modules/video_filter/mirror.c:82
 msgid "Splits video in two same parts, like in a mirror"
-msgstr "미러에서처럼 비디오을 두개의 같은 부분으로 나누기"
+msgstr "미러에서처럼 동영상을 두개의 같은 부분으로 나누기"
 
 #: modules/video_filter/motionblur.c:54
 msgid "Blur factor (1-127)"
@@ -26942,11 +26932,11 @@ msgstr "모션 블러 필터"
 
 #: modules/video_filter/motiondetect.c:48
 msgid "Motion detect video filter"
-msgstr "모션 인식 비디오 필터"
+msgstr "모션 인식 동영상 필터"
 
 #: modules/video_filter/oldmovie.c:179
 msgid "Old movie effect video filter"
-msgstr "고전 영화 효과 비디오 필터"
+msgstr "고전 영화 효과 동영상 필터"
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
@@ -26982,11 +26972,11 @@ msgstr "RGB32"
 
 #: modules/video_filter/opencv_wrapper.c:65
 msgid "Don't display any video"
-msgstr "비디오 표시하지 않기"
+msgstr "동영상 표시하지 않기"
 
 #: modules/video_filter/opencv_wrapper.c:66
 msgid "Display the input video"
-msgstr "입력 비디오 표시"
+msgstr "입력 동영상 표시"
 
 #: modules/video_filter/opencv_wrapper.c:66
 msgid "Display the processed video"
@@ -27037,7 +27027,7 @@ msgstr "Wrapper 필터 출력"
 
 #: modules/video_filter/opencv_wrapper.c:90
 msgid "Determines what (if any) video is displayed by the wrapper filter"
-msgstr "Wrapper 필터로 표시되는 비디오(있는 경우)를 결정합니다"
+msgstr "Wrapper 필터로 표시되는 동영상(있는 경우)를 결정합니다"
 
 #: modules/video_filter/opencv_wrapper.c:93
 msgid "OpenCV internal filter name"
@@ -27053,11 +27043,11 @@ msgstr "포스터화 단계 (색상의 수는 이 값의 세제곱입니다)"
 
 #: modules/video_filter/posterize.c:68
 msgid "Posterize video filter"
-msgstr "포스터화 비디오 필터"
+msgstr "포스터화 동영상 필터"
 
 #: modules/video_filter/posterize.c:70
 msgid "Posterize video by lowering the number of colors"
-msgstr "색상의 수를 줄여서 비디오을 포스터화합니다."
+msgstr "색상의 수를 줄여서 동영상을 포스터화합니다."
 
 #: modules/video_filter/postproc.c:71
 msgid ""
@@ -27078,7 +27068,7 @@ msgstr "FFmpeg 후처리 필터 체인"
 
 #: modules/video_filter/postproc.c:85
 msgid "Video post processing filter"
-msgstr "비디오 후처리 필터"
+msgstr "동영상 후처리 필터"
 
 #: modules/video_filter/postproc.c:86
 msgid "Postproc"
@@ -27094,7 +27084,7 @@ msgstr "가장 높음"
 
 #: modules/video_filter/psychedelic.c:54
 msgid "Psychedelic video filter"
-msgstr "사이키델릭 비디오 필터"
+msgstr "사이키델릭 동영상 필터"
 
 #: modules/video_filter/puzzle.c:53 modules/video_filter/puzzle.c:54
 msgid "Number of puzzle rows"
@@ -27202,7 +27192,7 @@ msgstr "0/90/180/270/미러"
 
 #: modules/video_filter/puzzle.c:85
 msgid "Puzzle interactive game video filter"
-msgstr "퍼즐 게임 비디오 필터"
+msgstr "퍼즐 게임 동영상 필터"
 
 #: modules/video_filter/puzzle.c:86
 msgid "Puzzle"
@@ -27210,7 +27200,7 @@ msgstr "퍼즐"
 
 #: modules/video_filter/ripple.c:53
 msgid "Ripple video filter"
-msgstr "Ripple 비디오 필터"
+msgstr "Ripple 동영상 필터"
 
 #: modules/video_filter/ripple.c:54
 msgid "Ripple"
@@ -27230,7 +27220,7 @@ msgstr "모션 감지기 사용하기"
 
 #: modules/video_filter/rotate.c:71
 msgid "Rotate video filter"
-msgstr "비디오 회전 필터"
+msgstr "동영상 회전 필터"
 
 #: modules/video_filter/rotate.c:72 modules/gui/qt/ui/video_effects.h:1298
 msgid "Rotate"
@@ -27249,7 +27239,7 @@ msgid ""
 "You can enforce the image width. By default (-1) VLC will adapt to the video "
 "characteristics."
 msgstr ""
-"비디오의 너비를 강제적으로 지정할 수가 있습니다. 디폴트 값인 -1은 비디오의 특"
+"동영상의 너비를 강제적으로 지정할 수가 있습니다. 디폴트 값인 -1은 동영상의 특"
 "성에 맞춥니다. "
 
 #: modules/video_filter/scene.c:68
@@ -27257,7 +27247,7 @@ msgid ""
 "You can enforce the image height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"비디오의 높이를 강제적으로 지정할 수가 있습니다. 디폴트 값인 -1은 비디오의 특"
+"동영상의 높이를 강제적으로 지정할 수가 있습니다. 디폴트 값인 -1은 동영상의 특"
 "성에 맞춥니다. "
 
 #: modules/video_filter/scene.c:72
@@ -27308,7 +27298,7 @@ msgstr ""
 
 #: modules/video_filter/scene.c:91
 msgid "Send your video to picture files"
-msgstr "비디오을 그림 파일로 전송하기"
+msgstr "동영상을 그림 파일로 전송하기"
 
 #: modules/video_filter/scene.c:95
 msgid "Scene filter"
@@ -27316,7 +27306,7 @@ msgstr "장면 필터"
 
 #: modules/video_filter/scene.c:96
 msgid "Scene video filter"
-msgstr "장면 비디오 필터"
+msgstr "장면 동영상 필터"
 
 #: modules/video_filter/sepia.c:59
 msgid "Sepia intensity"
@@ -27328,11 +27318,11 @@ msgstr "세피아 효과의 강도"
 
 #: modules/video_filter/sepia.c:65
 msgid "Sepia video filter"
-msgstr "세피아 비디오 필터"
+msgstr "세피아 동영상 필터"
 
 #: modules/video_filter/sepia.c:67
 msgid "Gives video a warmer tone by applying sepia effect"
-msgstr "세피아 효과를 적용해서 비디오에 따스한 톤 주기"
+msgstr "세피아 효과를 적용해서 동영상에 따스한 톤 주기"
 
 #: modules/video_filter/sharpen.c:48
 msgid "Sharpen strength (0-2)"
@@ -27348,7 +27338,7 @@ msgstr "윤곽선 사이의 명암 증가"
 
 #: modules/video_filter/sharpen.c:68
 msgid "Sharpen video filter"
-msgstr "날카롭게 비디오 필터"
+msgstr "날카롭게 동영상 필터"
 
 #: modules/video_filter/transform.c:49
 msgid "Transform type"
@@ -27364,7 +27354,7 @@ msgstr "Anti-transpose"
 
 #: modules/video_filter/transform.c:58
 msgid "Video transformation filter"
-msgstr "비디오 변환 필터"
+msgstr "동영상 변환 필터"
 
 #: modules/video_filter/transform.c:59
 msgid "Transformation"
@@ -27372,19 +27362,19 @@ msgstr "변환"
 
 #: modules/video_filter/transform.c:60
 msgid "Rotate or flip the video"
-msgstr "비디오 회전 또는 뒤집기"
+msgstr "동영상 회전 또는 뒤집기"
 
 #: modules/video_filter/vhs.c:105
 msgid "VHS movie effect video filter"
-msgstr "VHS 동영상 효과 비디오 필터"
+msgstr "VHS 영상 효과 동영상 필터"
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
-msgstr "VHS 동영상"
+msgstr "VHS 영상"
 
 #: modules/video_filter/wave.c:53
 msgid "Wave video filter"
-msgstr "물결 비디오 필터"
+msgstr "물결 동영상 필터"
 
 #: modules/video_filter/wave.c:54
 msgid "Wave"
@@ -27396,7 +27386,7 @@ msgstr "아스키 아트"
 
 #: modules/video_output/aa.c:61
 msgid "ASCII-art video output"
-msgstr "아스키-아트 비디오 출력"
+msgstr "아스키-아트 동영상 출력"
 
 #: modules/video_output/android/window.c:50
 msgid "Android Window"
@@ -27408,7 +27398,7 @@ msgstr "안드로이드 본래의 창"
 
 #: modules/video_output/caca.c:57
 msgid "Color ASCII art video output"
-msgstr "컬러 아스키 아트 비디오 출력"
+msgstr "컬러 아스키 아트 동영상 출력"
 
 #: modules/video_output/caopengllayer.m:957
 msgid "Core Animation OpenGL Layer (Mac OS X)"
@@ -27485,11 +27475,11 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:117
 msgid "Video connection for DeckLink output."
-msgstr "DeckLink 출력의 비디오 연결"
+msgstr "DeckLink 출력의 동영상 연결"
 
 #: modules/video_output/decklink.cpp:121
 msgid "Use 10 bits per pixel for video frames."
-msgstr "비디오 프레임에 픽셀당 10비트를 사용하세요."
+msgstr "동영상 프레임에 픽셀당 10비트를 사용하세요."
 
 #: modules/video_output/decklink.cpp:239
 msgid "DecklinkOutput"
@@ -27505,11 +27495,11 @@ msgstr "DeckLink 일반 옵션"
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Output module"
-msgstr "DeckLink 비디오 출력 모듈"
+msgstr "DeckLink 동영상 출력 모듈"
 
 #: modules/video_output/decklink.cpp:251
 msgid "DeckLink Video Options"
-msgstr "DeckLink 비디오 옵션"
+msgstr "DeckLink 동영상 옵션"
 
 #: modules/video_output/decklink.cpp:274
 msgid "DeckLink Audio Output module"
@@ -27528,7 +27518,7 @@ msgid ""
 "Video will be embedded in this pre-existing window. If zero, a new window "
 "will be created."
 msgstr ""
-"비디오은 이 미리 존재하는 창에 내장될 것입니다. 만약 0이면, 새 창이 생성될 것"
+"동영상은 이 미리 존재하는 창에 내장될 것입니다. 만약 0이면, 새 창이 생성될 것"
 "입니다."
 
 #: modules/video_output/drawable.c:46 modules/video_output/xcb/window.c:728
@@ -27537,7 +27527,7 @@ msgstr "나타낼수 있음"
 
 #: modules/video_output/drawable.c:47 modules/video_output/xcb/window.c:729
 msgid "Embedded window video"
-msgstr "내장된 Windows 비디오"
+msgstr "내장된 Windows 동영상"
 
 #: modules/video_output/fb.c:56
 msgid "Framebuffer device"
@@ -27593,7 +27583,7 @@ msgstr ""
 
 #: modules/video_output/fb.c:92
 msgid "GNU/Linux framebuffer video output"
-msgstr "GNU/리눅스 프레임버퍼 비디오 출력"
+msgstr "GNU/리눅스 프레임버퍼 동영상 출력"
 
 #: modules/video_output/glx.c:288
 msgid "GLX"
@@ -27612,16 +27602,16 @@ msgid ""
 "Enable this option if the diagonal stripes are displayed when the window "
 "size is equal to or smaller than the movie size."
 msgstr ""
-"창 크기가 동영상 크기와 같거나 작을 때, 대각선 줄무늬가 출력되면 이 옵션을 활"
-"성화하세요."
+"창 크기가 영화 크기와 같거나 작을 때, 대각선 줄무늬가 출력되면 이 옵션을 활성"
+"화하세요."
 
 #: modules/video_output/kva.c:55 modules/gui/qt/ui/sprefs_video.h:322
 msgid "Video mode"
-msgstr "비디오 모드"
+msgstr "동영상 모드"
 
 #: modules/video_output/kva.c:57
 msgid "Select a proper video mode to be used by KVA."
-msgstr "KAI에 의해 사용될 적당한 비디오 모드를 선택하세요."
+msgstr "KAI에 의해 사용될 적당한 동영상 모드를 선택하세요."
 
 #: modules/video_output/kva.c:62
 msgid "SNAP"
@@ -27641,11 +27631,11 @@ msgstr "DIVE"
 
 #: modules/video_output/kva.c:72
 msgid "K Video Acceleration video output"
-msgstr "K 비디오 가속 비디오 출력"
+msgstr "K 동영상 가속 동영상 출력"
 
 #: modules/video_output/macosx.m:75
 msgid "Mac OS X OpenGL video output"
-msgstr "맥 OS X OpenGL 비디오 출력"
+msgstr "맥 OS X OpenGL 동영상 출력"
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
@@ -27665,7 +27655,7 @@ msgstr "OpenGL ES2"
 
 #: modules/video_output/opengl/display.c:50
 msgid "OpenGL for Embedded Systems 2 video output"
-msgstr "임베디드 시스템 2용 OpenGL 비디오 출력"
+msgstr "임베디드 시스템 2용 OpenGL 동영상 출력"
 
 #: modules/video_output/opengl/display.c:61
 msgid "OpenGL"
@@ -27673,7 +27663,7 @@ msgstr "OpenGL"
 
 #: modules/video_output/opengl/display.c:62
 msgid "OpenGL video output"
-msgstr "OpenGL 비디오 출력"
+msgstr "OpenGL 동영상 출력"
 
 #: modules/video_output/opengl/egl.c:457
 msgid "EGL"
@@ -27685,7 +27675,7 @@ msgstr "OpenGL의 EGL 확장"
 
 #: modules/video_output/win32/direct3d9.c:74
 msgid "The desktop mode allows you to display the video on the desktop."
-msgstr "데스크탑 모드에서는 비디오을 데스크탑 상에 출력할 수 있습니다."
+msgstr "데스크탑 모드에서는 동영상을 데스크탑 상에 출력할 수 있습니다."
 
 #: modules/video_output/win32/direct3d9.c:76
 #: modules/video_output/win32/direct3d11.c:70
@@ -27719,50 +27709,43 @@ msgstr "HLSL 파일"
 
 #: modules/video_output/win32/direct3d9.c:88
 msgid "Recommended video output for Windows Vista and later versions"
-msgstr "Windows Vista 이상 버전에서 권장되는 비디오 출력"
+msgstr "Windows Vista 이상 버전에서 권장되는 동영상 출력"
 
 #: modules/video_output/win32/direct3d9.c:95
 msgid "Direct3D9 video output"
-msgstr "Direct3D9 비디오 출력"
+msgstr "Direct3D9 동영상 출력"
 
 #: modules/video_output/win32/direct3d11.c:69
 msgid "Recommended video output for Windows 8 and later versions"
-msgstr "Windows 8 이상 버전에서 권장되는 비디오 출력"
+msgstr "Windows 8 이상 버전에서 권장되는 동영상 출력"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "비디오 크기조정"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "비디오의 한 색상을 선택하세요"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "샘플당 비트"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "SoX 리샘플러"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "비디오 코덱"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "해상도"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "출력 모듈"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -27773,9 +27756,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "항상 위에"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -27783,7 +27765,7 @@ msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
-msgstr "Direct3D11 비디오 출력"
+msgstr "Direct3D11 동영상 출력"
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:318
@@ -27800,19 +27782,19 @@ msgstr ""
 
 #: modules/video_output/win32/directdraw.c:70
 msgid "Overlay video output"
-msgstr "오버레이 비디오 출력"
+msgstr "오버레이 동영상 출력"
 
 #: modules/video_output/win32/directdraw.c:72
 msgid ""
 "Overlay is the hardware acceleration capability of your video card (ability "
 "to render video directly). VLC will try to use it by default."
 msgstr ""
-"오버레이는 비디오 카드의 하드웨어 가속 기능입니다 (직접 비디오을 렌더링하는 "
+"오버레이는 동영상 카드의 하드웨어 가속 기능입니다 (직접 동영상을 렌더링하는 "
 "기능). VLC는 기본적으로 이것을 사용하려고 시도합니다."
 
 #: modules/video_output/win32/directdraw.c:75
 msgid "Use video buffers in system memory"
-msgstr "시스템 메모리에서 비디오 버퍼를 사용"
+msgstr "시스템 메모리에서 동영상 버퍼를 사용"
 
 #: modules/video_output/win32/directdraw.c:77
 msgid ""
@@ -27821,8 +27803,8 @@ msgid ""
 "hardware acceleration (like rescaling or YUV->RGB conversions). This option "
 "doesn't have any effect when using overlays."
 msgstr ""
-"비디오 메모리 대신에 시스템 메모리에 비디오 버퍼를 생성합니다. 이것은 권장하"
-"지 않습니다. 대게 비디오 메모리 사용은 더 많은 하드웨어 가속의 이점이 있기 때"
+"동영상 메모리 대신에 시스템 메모리에 동영상 버퍼를 생성합니다. 이것은 권장하"
+"지 않습니다. 대게 동영상 메모리 사용은 더 많은 하드웨어 가속의 이점이 있기 때"
 "문입니다 (크기조정이나 YUV->RGB 변환). 이 옵션은 오버레이를 사용할 때는 아무 "
 "효과가 없습니다."
 
@@ -27835,7 +27817,7 @@ msgid ""
 "Try to use triple buffering when using YUV overlays. That results in much "
 "better video quality (no flickering)."
 msgstr ""
-"YUV 오버레이 사용시 삼중 버퍼링을 사용해 보세요. 훨신 나은 비디오 품질을 얻"
+"YUV 오버레이 사용시 삼중 버퍼링을 사용해 보세요. 훨신 나은 동영상 품질을 얻"
 "을 수 있습니다 (깜박임 없는)."
 
 #: modules/video_output/win32/directdraw.c:87
@@ -27848,7 +27830,7 @@ msgid ""
 "of the display that you want the video window to open on. For example, \"\\"
 "\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"."
 msgstr ""
-"다중 모니터 구성에서 비디오 창을 열 디스플레이의 Windows 장치 이름을 지정할 "
+"다중 모니터 구성에서 동영상 창을 열 디스플레이의 Windows 장치 이름을 지정할 "
 "수 있습니다. 예: \"\\\\.\\DISPLAY1\" 또는 \"\\\\.\\DISPLAY2\"."
 
 #: modules/video_output/win32/directdraw.c:93
@@ -27856,12 +27838,12 @@ msgid ""
 "Recommended video output for Windows XP. Incompatible with Vista's Aero "
 "interface"
 msgstr ""
-"Windows XP에 권장되는 비디오 출력입니다. Vista의 Aero 인터페이스와 호환되지 "
+"Windows XP에 권장되는 동영상 출력입니다. Vista의 Aero 인터페이스와 호환되지 "
 "않음"
 
 #: modules/video_output/win32/directdraw.c:103
 msgid "DirectX (DirectDraw) video output"
-msgstr "DirectX (DirectDraw) 비디오 출력"
+msgstr "DirectX (DirectDraw) 동영상 출력"
 
 #: modules/video_output/win32/directdraw.c:245
 msgid "Wallpaper"
@@ -27869,11 +27851,11 @@ msgstr "바탕화면"
 
 #: modules/video_output/win32/glwin32.c:52
 msgid "OpenGL video output for Windows"
-msgstr "Windows용 OpenGL 비디오 출력"
+msgstr "Windows용 OpenGL 동영상 출력"
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
-msgstr "Windows GDI 비디오 출력"
+msgstr "Windows GDI 동영상 출력"
 
 #: modules/video_output/win32/wgl.c:42
 msgid "GPU affinity"
@@ -27892,24 +27874,24 @@ msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
 msgstr ""
-"더미 비디오 출력이, 가장 효율적인 크로마를 사용해서 성능을 향상하려고 시도하"
+"더미 동영상 출력이, 가장 효율적인 크로마를 사용해서 성능을 향상하려고 시도하"
 "는 대신에, 특정 크로마 형식을 사용해서 이미지를 강제로 생성하도록 합니다."
 
 #: modules/video_output/vdummy.c:48
 msgid "Dummy video output"
-msgstr "더미 비디오 출력"
+msgstr "더미 동영상 출력"
 
 #: modules/video_output/vdummy.c:58
 msgid "Statistics video output"
-msgstr "통계 비디오 출력"
+msgstr "통계 동영상 출력"
 
 #: modules/video_output/vmem.c:43
 msgid "Video memory buffer width."
-msgstr "비디오 메모리 버퍼 길이."
+msgstr "동영상 메모리 버퍼 길이."
 
 #: modules/video_output/vmem.c:46
 msgid "Video memory buffer height."
-msgstr "비디오 메모리 버퍼 높이."
+msgstr "동영상 메모리 버퍼 높이."
 
 #: modules/video_output/vmem.c:48
 msgid "Pitch"
@@ -27917,7 +27899,7 @@ msgstr "Pitch (X축 회전)"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
-msgstr "비디오 메모리 버퍼 피치, 바이트 단위."
+msgstr "동영상 메모리 버퍼 피치, 바이트 단위."
 
 #: modules/video_output/vmem.c:51
 msgid "Chroma"
@@ -27930,11 +27912,11 @@ msgstr "4개의 문자열로 메모리 이미지의 크로마를 출력합니다
 
 #: modules/video_output/vmem.c:59
 msgid "Video memory output"
-msgstr "비디오 메모리 출력"
+msgstr "동영상 메모리 출력"
 
 #: modules/video_output/vmem.c:60
 msgid "Video memory"
-msgstr "비디오 메모리"
+msgstr "동영상 메모리"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
@@ -27947,7 +27929,7 @@ msgid ""
 "Video will be rendered with this Wayland display. If empty, the default "
 "display will be used."
 msgstr ""
-"비디오은 이 웨이랜드 디스플레이로 렌더링됩니다. 비어 있으면, 기본 디스플레이"
+"동영상은 이 웨이랜드 디스플레이로 렌더링됩니다. 비어 있으면, 기본 디스플레이"
 "가 사용됩니다."
 
 #: modules/video_output/wayland/shell.c:411
@@ -27964,7 +27946,7 @@ msgstr "WL SHM"
 
 #: modules/video_output/wayland/shm.c:509
 msgid "Wayland shared memory video output"
-msgstr "웨이랜드 공유 메모리 비디오 출력"
+msgstr "웨이랜드 공유 메모리 동영상 출력"
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -28004,7 +27986,7 @@ msgid ""
 "Video will be rendered with this X11 display. If empty, the default display "
 "will be used."
 msgstr ""
-"비디오은 이 X11 출력으로 렌더될 것입니다. 비어 있으면, 기본 출력이 사용됩니"
+"동영상은 이 X11 출력으로 렌더될 것입니다. 비어 있으면, 기본 출력이 사용됩니"
 "다."
 
 #: modules/video_output/xcb/window.c:705
@@ -28017,7 +27999,7 @@ msgstr "X 윈도우"
 
 #: modules/video_output/xcb/window.c:715
 msgid "X11 video window (XCB)"
-msgstr "X11 비디오 창 (XCB)"
+msgstr "X11 동영상 창 (XCB)"
 
 #: modules/video_output/xcb/x11.c:48
 msgid "X11"
@@ -28025,7 +28007,7 @@ msgstr "X11"
 
 #: modules/video_output/xcb/x11.c:49
 msgid "X11 video output (XCB)"
-msgstr "X11 비디오 출력 (XCB)"
+msgstr "X11 동영상 출력 (XCB)"
 
 #: modules/video_output/xcb/xvideo.c:44
 msgid "XVideo adaptor number"
@@ -28048,7 +28030,7 @@ msgid ""
 "XVideo image format id to use. By default, VLC will try to use the best "
 "match for the video being played."
 msgstr ""
-"사용할 XVideo 이미지 형식 id. VLC는 기본적으로 재생중인 비디오에 가장 알맞은 "
+"사용할 XVideo 이미지 형식 id. VLC는 기본적으로 재생중인 동영상에 가장 알맞은 "
 "것을 사용하려 할 것입니다."
 
 #: modules/video_output/xcb/xvideo.c:62
@@ -28084,7 +28066,7 @@ msgid ""
 "The YUV4MPEG2 header is compatible with mplayer yuv video output and "
 "requires YV12/I420 fourcc."
 msgstr ""
-"YUV4MPEG2 헤더는 Mplayer YUV 비디오 출력과 호환되고 YV12/I420 fourcc를 필요"
+"YUV4MPEG2 헤더는 Mplayer YUV 동영상 출력과 호환되고 YV12/I420 fourcc를 필요"
 "로 합니다."
 
 #: modules/video_output/yuv.c:58
@@ -28093,40 +28075,40 @@ msgstr "YUV 출력"
 
 #: modules/video_output/yuv.c:59
 msgid "YUV video output"
-msgstr "YUV 비디오 출력"
+msgstr "YUV 동영상 출력"
 
 #: modules/video_splitter/clone.c:40
 msgid "Number of video windows in which to clone the video."
-msgstr "비디오을 복제할 비디오 창의 수입니다."
+msgstr "동영상을 복제할 동영상 창의 수입니다."
 
 #: modules/video_splitter/clone.c:43
 msgid "Video output modules"
-msgstr "비디오 출력 모듈"
+msgstr "동영상 출력 모듈"
 
 #: modules/video_splitter/clone.c:44
 msgid ""
 "You can use specific video output modules for the clones. Use a comma-"
 "separated list of modules."
 msgstr ""
-"복제를 위해서 특정 비디오 출력 모듈을 사용할 수 있습니다. 쉼표로 구분한 모듈 "
+"복제를 위해서 특정 동영상 출력 모듈을 사용할 수 있습니다. 쉼표로 구분한 모듈 "
 "목록을 사용하세요."
 
 #: modules/video_splitter/clone.c:47
 msgid "Duplicate your video to multiple windows and/or video output modules"
-msgstr "여러 개의 창 및/또는 비디오 출력 모듈에 비디오을 복제하기"
+msgstr "여러 개의 창 및/또는 동영상 출력 모듈에 동영상을 복제하기"
 
 #: modules/video_splitter/clone.c:55
 msgid "Clone video filter"
-msgstr "복제Clone 비디오 필터"
+msgstr "복제Clone 동영상 필터"
 
 #: modules/video_splitter/panoramix.c:61
 msgid ""
 "Select the number of horizontal video windows in which to split the video"
-msgstr "비디오을 분할할 수평 비디오 창의 수 선택"
+msgstr "동영상을 분할할 수평 동영상 창의 수 선택"
 
 #: modules/video_splitter/panoramix.c:65
 msgid "Select the number of vertical video windows in which to split the video"
-msgstr "비디오을 분할할 수직 비디오 창의 수 선택"
+msgstr "동영상을 분할할 수직 동영상 창의 수 선택"
 
 #: modules/video_splitter/panoramix.c:68 modules/video_splitter/wall.c:54
 msgid "Active windows"
@@ -28138,11 +28120,11 @@ msgstr "쉼표로 구분된 활성 창 목록, 기본값은 모두"
 
 #: modules/video_splitter/panoramix.c:74
 msgid "Split the video in multiple windows to display on a wall of screens"
-msgstr "비디오을 화면 벽에 출력하기 위해 다수의 창으로 분할하기"
+msgstr "동영상을 화면 벽에 출력하기 위해 다수의 창으로 분할하기"
 
 #: modules/video_splitter/panoramix.c:81
 msgid "Panoramix: wall with overlap video filter"
-msgstr "파노라믹스: 겹치는 비디오 필터가 있는 벽"
+msgstr "파노라믹스: 겹치는 동영상 필터가 있는 벽"
 
 #: modules/video_splitter/panoramix.c:82
 msgid "Panoramix"
@@ -28338,11 +28320,11 @@ msgstr "혼합 영역의 화이트 레벨을 선택하세요 (파란색 또는 V
 
 #: modules/video_splitter/wall.c:47
 msgid "Number of horizontal windows in which to split the video."
-msgstr "비디오을 분할할 가로 창 수입니다."
+msgstr "동영상을 분할할 가로 창 수입니다."
 
 #: modules/video_splitter/wall.c:51
 msgid "Number of vertical windows in which to split the video."
-msgstr "비디오을 분할할 세로 창 수입니다."
+msgstr "동영상을 분할할 세로 창 수입니다."
 
 #: modules/video_splitter/wall.c:58
 msgid "Element aspect ratio"
@@ -28354,7 +28336,7 @@ msgstr "벽을 만드는 개별적인 디스플레이의 화면 비율입니다.
 
 #: modules/video_splitter/wall.c:68
 msgid "Wall video filter"
-msgstr "벽Wall 비디오 필터"
+msgstr "벽Wall 동영상 필터"
 
 #: modules/video_splitter/wall.c:69
 msgid "Image wall"
@@ -28443,11 +28425,11 @@ msgstr "메뉴에 사용되는 글꼴"
 
 #: modules/visualization/projectm.cpp:66 modules/visualization/vsxu.cpp:53
 msgid "The width of the video window, in pixels."
-msgstr "비디오 창의 너비(픽셀)입니다."
+msgstr "동영상 창의 너비(픽셀)입니다."
 
 #: modules/visualization/projectm.cpp:69 modules/visualization/vsxu.cpp:56
 msgid "The height of the video window, in pixels."
-msgstr "비디오 창의 높이(픽셀)입니다."
+msgstr "동영상 창의 높이(픽셀)입니다."
 
 #: modules/visualization/projectm.cpp:71
 msgid "Mesh width"
@@ -28495,11 +28477,11 @@ msgstr ""
 
 #: modules/visualization/visual/visual.c:55
 msgid "The width of the effects video window, in pixels."
-msgstr "효과 비디오 창의 너비(픽셀)입니다."
+msgstr "효과 동영상 창의 너비(픽셀)입니다."
 
 #: modules/visualization/visual/visual.c:59
 msgid "The height of the effects video window, in pixels."
-msgstr "효과 비디오 창의 높이(픽셀)입니다."
+msgstr "효과 동영상 창의 높이(픽셀)입니다."
 
 #: modules/visualization/visual/visual.c:61
 msgid "FFT window"
@@ -28665,7 +28647,7 @@ msgstr "멀티플렉서"
 
 #: share/lua/http/dialogs/create_stream.html:266
 msgid "Video FPS"
-msgstr "비디오 FPS"
+msgstr "동영상 FPS"
 
 #: share/lua/http/dialogs/create_stream.html:297
 msgid "MUX options"
@@ -28673,7 +28655,7 @@ msgstr "먹스 옵션"
 
 #: share/lua/http/dialogs/create_stream.html:303
 msgid "Video scale"
-msgstr "비디오 크기"
+msgstr "동영상 크기"
 
 #: share/lua/http/dialogs/create_stream.html:330
 #: share/lua/http/dialogs/create_stream.html:374
@@ -28877,24 +28859,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "지문(&F)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "스트리밍 방식 선택"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "지문 인식 (Acoustid에 기반함)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "지문(&F)"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29137,9 +29115,8 @@ msgid "Menus"
 msgstr "메뉴"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "샘플 레이트"
+msgstr "프레임 레이트"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29311,7 +29288,7 @@ msgstr "하드웨어 가속 디코딩"
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Video quality post-processing level"
-msgstr "비디오 품질 후처리 레벨"
+msgstr "동영상 품질 후처리 레벨"
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "Skip H.264 in-loop deblocking filter"
@@ -29375,7 +29352,7 @@ msgstr "기본 스타일 사용하기"
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
 msgid "Resize interface to video size"
-msgstr "비디오 크기에 인터페이스 맞추기"
+msgstr "동영상 크기에 인터페이스 맞추기"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Show controls in full screen mode"
@@ -29399,7 +29376,7 @@ msgstr "창 스타일 강제 지정:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Integrate video in interface"
-msgstr "인터페이스에 비디오 통합하기"
+msgstr "인터페이스에 동영상 통합하기"
 
 #: modules/gui/qt/ui/sprefs_interface.h:548
 msgid "Show systray icon"
@@ -29410,9 +29387,8 @@ msgid "Auto raising the interface:"
 msgstr "인터페이스 자동 올리기:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "스킨이 적용된 재생목록 사용하기"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -29424,7 +29400,7 @@ msgstr "재생목록과 중복실행"
 
 #: modules/gui/qt/ui/sprefs_interface.h:556
 msgid "Pause on the last frame of a video"
-msgstr "비디오의 마지막 프레임에서 일시정지"
+msgstr "동영상의 마지막 프레임에서 일시정지"
 
 #: modules/gui/qt/ui/sprefs_interface.h:559
 msgid "Allow only one instance"
@@ -29464,7 +29440,7 @@ msgstr "모니터 조정 기능(OSD) 활성화"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
 msgid "Show media title on video start"
-msgstr "비디오 재생 시작시 미디어 제목 표시"
+msgstr "동영상 재생 시작시 미디어 제목 표시"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:293
 msgid "Enable subtitles"
@@ -29512,7 +29488,7 @@ msgstr "DirectX"
 
 #: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Accelerated video output (Overlay)"
-msgstr "비디오 오버레이(가속) 출력"
+msgstr "동영상 오버레이(가속) 출력"
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "KVA"
@@ -29727,21 +29703,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "미디어 관리자 목록"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP 채널 목록"
-
-#~ msgid "Master List"
-#~ msgstr "마스터 목록"
-
-#~ msgid "Server List"
-#~ msgstr "서버 목록"
-
-#~ msgid "Custom List"
-#~ msgstr "사용자 지정 목록"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "SRT 청크 크기 (바이트)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "크립토 키 길이, 바이트 단위"

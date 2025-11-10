@@ -8,7 +8,7 @@
 # Timur Seber <seber.tatsoft@gmail.com>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
@@ -573,21 +573,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -602,27 +602,26 @@ msgstr ""
 "дә сезнең VLC медиа уйнаткычын куллануда тәҗрибәгез булмаса, <br>«<a "
 "href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>VLC "
 "медиа уйнаткычы белән танышу</em></a>» битенә күчегез.</p><p>Уйнаткыч белән "
-"куллану мәгълүматы <br>«<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>Ничек VLC медиа уйнаткычы ярдәмендә файлларны "
-"уйнатырга</em></a>» документында бар.</p><p>Агымнарны саклау, конвертлау, "
-"яңадан кодлау, кодлау һәм мультиплекслау буенча, шулай ук агымлы тапшырулар "
-"буенча файдалы мәгълүматны сез <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">Агымлы тапшырулар Документациясе</a>ндә таба "
-"аласыз.</p><p>Терминология буенча авырлыклар туса, <a href=\"http://"
-"wiki.videolan.org/Knowledge_Base\">белем базасы</a>на мөрәҗәгать итегез.</"
-"p><p>Төп «Кайнар төймәләр» исемлеген алу өчен <a href=\"http://"
-"wiki.videolan.org/Hotkeys\">Кайнар төймәләр</a> битенә күчегез.</"
-"p><h3>Ярдәм</h3><p>Берәр сорау бирер алдыннан, «<a href=\"http://"
-"www.videolan.org/support/faq.html\">Еш Сораулар</a>» бүлегендәге мәгълүмат "
-"белән танышыгыз.</p><p>Шулай ук сез <a href=\"http://"
-"forum.videolan.org\">Форумда</a>, <a href=\"http://www.videolan.org/vlc/"
-"lists.html\">хатлар җибәрү исемлегендә</a> яки безнең IRC каналыбызда "
-"(<em>#videolan</em>, irc.freenode.net сайтында) сораулар яки тәкъдимнәр бирә "
-"аласыз.</p><h3>Проектка булышу</h3><p>Сез VideoLAN проекты берләшмәсенә "
-"булышып, тышчалар дизайнын ясап, документацияне тәрҗемә итеп, тикшерүләр "
-"уздырып яки программалап булыша аласыз. Шулай ук сез безгә матди ярдәм "
-"күрсәтә аласыз. Һәм, шулай ук, VLC медиа уйнаткычын <b>тарата</b> аласыз.</"
-"p></body></html>"
+"куллану мәгълүматы <br>«<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>Ничек VLC медиа уйнаткычы ярдәмендә файлларны уйнатырга</"
+"em></a>» документында бар.</p><p>Агымнарны саклау, конвертлау, яңадан "
+"кодлау, кодлау һәм мультиплекслау буенча, шулай ук агымлы тапшырулар буенча "
+"файдалы мәгълүматны сез <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">Агымлы тапшырулар Документациясе</a>ндә таба аласыз.</"
+"p><p>Терминология буенча авырлыклар туса, <a href=\"http://wiki.videolan.org/"
+"Knowledge_Base\">белем базасы</a>на мөрәҗәгать итегез.</p><p>Төп «Кайнар "
+"төймәләр» исемлеген алу өчен <a href=\"http://wiki.videolan.org/"
+"Hotkeys\">Кайнар төймәләр</a> битенә күчегез.</p><h3>Ярдәм</h3><p>Берәр "
+"сорау бирер алдыннан, «<a href=\"http://www.videolan.org/support/faq."
+"html\">Еш Сораулар</a>» бүлегендәге мәгълүмат белән танышыгыз.</p><p>Шулай "
+"ук сез <a href=\"http://forum.videolan.org\">Форумда</a>, <a href=\"http://"
+"www.videolan.org/vlc/lists.html\">хатлар җибәрү исемлегендә</a> яки безнең "
+"IRC каналыбызда (<em>#videolan</em>, irc.freenode.net сайтында) сораулар яки "
+"тәкъдимнәр бирә аласыз.</p><h3>Проектка булышу</h3><p>Сез VideoLAN проекты "
+"берләшмәсенә булышып, тышчалар дизайнын ясап, документацияне тәрҗемә итеп, "
+"тикшерүләр уздырып яки программалап булыша аласыз. Шулай ук сез безгә матди "
+"ярдәм күрсәтә аласыз. Һәм, шулай ук, VLC медиа уйнаткычын <b>тарата</b> "
+"аласыз.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -2250,8 +2249,8 @@ msgstr "Чыгыш яклар нисбәте"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 
@@ -3008,9 +3007,8 @@ msgstr ""
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 
 #: src/libvlc-module.c:853
@@ -5819,8 +5817,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -8094,8 +8092,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8119,9 +8117,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Агым %d"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8557,9 +8554,9 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -10888,9 +10885,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Бөтен файллар"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -10957,8 +10953,8 @@ msgstr ""
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 
 #: modules/codec/dvbsub.c:95
@@ -11641,10 +11637,10 @@ msgstr ""
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -12817,7 +12813,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -17013,9 +17008,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Уйнату битен сакларга"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -20563,9 +20557,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Аудионы кабызырга"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -26398,38 +26391,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Видеоны масштаблау"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Субтитрлар файлын сайларга"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Бит"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Point Sampler"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Видеокодеклар"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Ачыклык"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Чыгару модульләре"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -26440,9 +26427,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Тәрәзәләр өстеннән"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -27475,9 +27461,8 @@ msgstr ""
 
 #: modules/gui/qt/ui/about.h:282 modules/gui/qt/ui/open.h:255
 #: modules/gui/qt/ui/podcast_configuration.h:98
-#, fuzzy
 msgid "Dialog"
-msgstr "Тагалог теле"
+msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:129 modules/gui/qt/ui/open_disk.h:293
 #: modules/gui/qt/ui/open_net.h:93 modules/gui/qt/ui/sprefs_audio.h:407
@@ -27497,9 +27482,8 @@ msgid "0.00 dB"
 msgstr "0.00 дБ"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "Аудио көйләүләре"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
@@ -27510,38 +27494,32 @@ msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "Аудио көйләүләре"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "Хәбәрләрнең тәфсиллеге (0,1,2)"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:138
-#, fuzzy
 msgid "&Filter:"
-msgstr "Сөзгеч:"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
-#, fuzzy
 msgid "&Save as..."
-msgstr "Сакларга..."
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "Modules Tree"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:258
-#, fuzzy
 msgid "Show extended options"
-msgstr "Өстәмә көйләүләрне күрсәтергә"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:260
-#, fuzzy
 msgid "Show &more options"
-msgstr "Өстәмә көйләүләрне күрсәтергә"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:263
 msgid "Change the caching for the media"
@@ -27556,19 +27534,16 @@ msgid "MRL"
 msgstr "MRL"
 
 #: modules/gui/qt/ui/open.h:267
-#, fuzzy
 msgid "Start Time"
-msgstr "&Башлау"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Stop Time"
-msgstr "Туктату вакыты"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:269
-#, fuzzy
 msgid "Edit Options"
-msgstr "Өстәмә көйләүләр"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:270
 msgid "Extra media"
@@ -27579,9 +27554,8 @@ msgid "Complete MRL for VLC internal"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:275
-#, fuzzy
 msgid "Select the file"
-msgstr "Субтитрлар файлын сайларга"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:279
 msgid "Change the start time for the media"
@@ -27600,23 +27574,20 @@ msgid "Play another media synchronously (extra audio file, ...)"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:94
-#, fuzzy
 msgid "Capture mode"
-msgstr "Стерео режимы"
+msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:96
 msgid "Select the capture device type"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:98
-#, fuzzy
 msgid "Device Selection"
-msgstr "Билгеләнгәнне бетерергә"
+msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:99
-#, fuzzy
 msgid "Options"
-msgstr "Өстәмә көйләүләр"
+msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:101
 msgid "Access advanced options to tweak the device"
@@ -27627,9 +27598,8 @@ msgid "Advanced options..."
 msgstr "Өстәмә көйләүләр..."
 
 #: modules/gui/qt/ui/open_disk.h:294
-#, fuzzy
 msgid "Disc Selection"
-msgstr "Медиа: Сайлау"
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:298
 msgid "SVCD/VCD"
@@ -27644,9 +27614,8 @@ msgid "No disc menus"
 msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:303
-#, fuzzy
 msgid "Disc device"
-msgstr "Видео җайланмасы"
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:305
 msgid "Starting Position"
@@ -27665,14 +27634,12 @@ msgid "Select the subtitle file"
 msgstr "Субтитрлар файлын сайларга"
 
 #: modules/gui/qt/ui/open_file.h:148
-#, fuzzy
 msgid "Choose one or more media file to open"
-msgstr "Ачу өчен бер яки берничә файл сайлагыз"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:150
-#, fuzzy
 msgid "File Selection"
-msgstr "Медиа: Сайлау"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:151
 msgid "You can select local files with the following list and buttons."
@@ -27683,19 +27650,16 @@ msgid "Add..."
 msgstr ""
 
 #: modules/gui/qt/ui/open_net.h:94
-#, fuzzy
 msgid "Network Protocol"
-msgstr "Челтәр синхронлаштыруы"
+msgstr ""
 
 #: modules/gui/qt/ui/open_net.h:95
-#, fuzzy
 msgid "Please enter a network URL:"
-msgstr "Зинһар, яңа профиль исемен языгыз"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:699
-#, fuzzy
 msgid "Profile edition"
-msgstr "Профиль исеме"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:700
 msgid "FLAC"
@@ -27762,23 +27726,20 @@ msgid "Features"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:717
-#, fuzzy
 msgid "Streamable"
-msgstr "Агым фильтрлары"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:718
 msgid "Chapters"
 msgstr "Бүлекләр"
 
 #: modules/gui/qt/ui/profiles.h:721
-#, fuzzy
 msgid "Menus"
-msgstr "Меню"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Дискретлау ешлыгы"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -27789,9 +27750,8 @@ msgid " fps"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:732
-#, fuzzy
 msgid "Custom options"
-msgstr "Өстәмә &Сайланмалар"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid "&Quality"
@@ -27802,47 +27762,40 @@ msgid "Not Used"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:755
-#, fuzzy
 msgid " kb/s"
-msgstr "%u кб/сек"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:737 modules/gui/qt/ui/profiles.h:757
 msgid "Encoding parameters"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:740
-#, fuzzy
 msgid "Frame size"
-msgstr "Кадрлар ешлыгы"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:743 modules/gui/qt/ui/profiles.h:746
-#, fuzzy
 msgid "px"
-msgstr " пкс"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:756
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Дискретлау ешлыгы"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:764
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Профиль исеме"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:200
-#, fuzzy
 msgid "Set up media sources to stream"
-msgstr "Бөтен көйләүләрне күрү өчен, «Бөтен көйләүләр»гә басыгыз."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Destination Setup"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Бөтен көйләүләрне күрү өчен, «Бөтен көйләүләр»гә басыгыз."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:204
 msgid ""
@@ -27859,52 +27812,44 @@ msgid "Display locally"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:209
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "Өстәмә көйләүләр"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:210
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Бөтен көйләүләрне күрү өчен, «Бөтен көйләүләр»гә басыгыз."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:211
-#, fuzzy
 msgid "Activate Transcoding"
-msgstr "Субтитрлар кодлануы"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Option Setup"
-msgstr "Өстәмә көйләүләр"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr "Бөтен көйләүләрне күрү өчен, «Бөтен көйләүләр»гә басыгыз."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
-#, fuzzy
 msgid "Miscellaneous Options"
-msgstr "Башка"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:215
 msgid "Stream all elementary streams"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "Агымны чыгаруның төп көйләүләре"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid " %"
 msgstr " %"
 
 #: modules/gui/qt/ui/sprefs_audio.h:413
-#, fuzzy
 msgid "Output module:"
-msgstr "Чыгару модульләре"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:416
 msgid "Use S/PDIF when available"
@@ -27915,51 +27860,44 @@ msgid "Effects"
 msgstr "Эффектлар"
 
 #: modules/gui/qt/ui/sprefs_audio.h:419
-#, fuzzy
 msgid "Visualization:"
-msgstr "Визуальләштерү"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:420
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "Аудионы кабызырга"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
-#, fuzzy
 msgid "Replay gain mode:"
-msgstr "Replay Gain"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
 msgid "Normalize volume to:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
-#, fuzzy
 msgid "Tracks"
-msgstr "Язма"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Preferred audio language:"
 msgstr "Аудио өчен кулайрак тел:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:425
-#, fuzzy
 msgid "Password:"
-msgstr "Серсүз"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:426
-#, fuzzy
 msgid "Username:"
-msgstr "Кулланучы исеме"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:427
 msgid "Submit played tracks stats to Last.fm"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:354
-#, fuzzy
 msgid "Codecs"
-msgstr "Кодек"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:355
 msgid "x264 profile and level selection"
@@ -27970,9 +27908,8 @@ msgid "Hardware-accelerated decoding"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:357
-#, fuzzy
 msgid "Video quality post-processing level"
-msgstr "Видеоны пост-эшкәртү фильтры"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "Skip H.264 in-loop deblocking filter"
@@ -28031,14 +27968,12 @@ msgid "This is VLC's default interface, with a native look and feel."
 msgstr "Гадәттәге VLC күренеше, гади кыяфәтле."
 
 #: modules/gui/qt/ui/sprefs_interface.h:540
-#, fuzzy
 msgid "Use native style"
-msgstr "Актив субтитрлар юк"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
-#, fuzzy
 msgid "Resize interface to video size"
-msgstr "Видео деинтерлейсингы"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Show controls in full screen mode"
@@ -28061,19 +27996,16 @@ msgid "Force window style:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
-#, fuzzy
 msgid "Integrate video in interface"
-msgstr "Күренеш белән бәйләнеш"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:548
-#, fuzzy
 msgid "Show systray icon"
-msgstr "Көйләүләрне күрсәтү"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Төп күренешнең көйләүләре"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use a dark palette"
@@ -28084,9 +28016,8 @@ msgid "Skin resource file:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:553
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "Уйнатырга һәм туктатырга"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:556
 msgid "Pause on the last frame of a video"
@@ -28121,9 +28052,8 @@ msgid "File extensions association"
 msgstr "Файллар төренә бәйләнеш"
 
 #: modules/gui/qt/ui/sprefs_interface.h:572
-#, fuzzy
 msgid "Set up associations..."
-msgstr "Көйләүләр..."
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:290
 msgid "Enable On Screen Display (OSD)"
@@ -28170,9 +28100,8 @@ msgid "Add a background"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:313
-#, fuzzy
 msgid "O&utput"
-msgstr "Агымны чыгару"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "DirectX"
@@ -28187,9 +28116,8 @@ msgid "KVA"
 msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:324
-#, fuzzy
 msgid "Deinterlacing"
-msgstr "Деинтерлейсинг"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:326
 msgid "Force Aspect Ratio"
@@ -28204,9 +28132,8 @@ msgid "Stuff"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:171
-#, fuzzy
 msgid "Edit settings"
-msgstr "Аудио көйләүләре"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Control"
@@ -28217,38 +28144,32 @@ msgid "Run manually"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:174
-#, fuzzy
 msgid "Setup schedule"
-msgstr "Телетекст: тапшырулар программасы"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:175
-#, fuzzy
 msgid "Run on schedule"
-msgstr "Телетекст: тапшырулар программасы"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:176
-#, fuzzy
 msgid "Status"
-msgstr "Халәт юлы"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:177
 msgid "P/P"
 msgstr "P/P"
 
 #: modules/gui/qt/ui/streampanel.h:180
-#, fuzzy
 msgid "Prev"
-msgstr "Алдан карау"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:181
-#, fuzzy
 msgid "Add Input"
-msgstr "Кертү"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:182
-#, fuzzy
 msgid "Edit Input"
-msgstr "Кертү"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:183
 msgid "Clear List"
@@ -28280,18 +28201,16 @@ msgid "Negate colors"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1292
-#, fuzzy
 msgid "Colors"
-msgstr "Төсле хәбәрләр"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1293
 msgid "Interactive Zoom"
 msgstr "Интерактив зурайту"
 
 #: modules/gui/qt/ui/video_effects.h:1299
-#, fuzzy
 msgid "Angle"
-msgstr "Медиа: Почмакны үзгәртү"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1306
 #: modules/gui/qt/ui/video_effects.h:1323
@@ -28319,9 +28238,8 @@ msgid "Anaglyph 3D"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1326
-#, fuzzy
 msgid "Mirror"
-msgstr "Хаталар"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1330
 msgid "Motion detect"
@@ -28340,9 +28258,8 @@ msgid "Soften"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1337
-#, fuzzy
 msgid "Denoiser"
-msgstr "HQ Denoiser 3D"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1338
 msgid "Spatial luma strength"
@@ -28365,9 +28282,8 @@ msgid "VLM configurator"
 msgstr "VLM конфинураторы"
 
 #: modules/gui/qt/ui/vlm.h:284
-#, fuzzy
 msgid "Media Manager Edition"
-msgstr "Медиафайл турында Мәгълүмат"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:285
 msgid "Name:"
@@ -28378,19 +28294,16 @@ msgid "Input:"
 msgstr "Кертү:"
 
 #: modules/gui/qt/ui/vlm.h:288
-#, fuzzy
 msgid "Select Input"
-msgstr "Файл кертү"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:289
-#, fuzzy
 msgid "Output:"
-msgstr "Кертү:"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:290
-#, fuzzy
 msgid "Select Output"
-msgstr "Агымны чыгару"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:291
 msgid "Time Control"
@@ -28401,15 +28314,13 @@ msgid "Mux Control"
 msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:293
-#, fuzzy
 msgid "Muxer:"
-msgstr "Мультиплексорлар"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:294
 msgid "AAAA; "
 msgstr "AAAA; "
 
 #: modules/gui/qt/ui/vlm.h:299
-#, fuzzy
 msgid "Media Manager List"
-msgstr "Медиа: Почмакны үзгәртү"
+msgstr ""

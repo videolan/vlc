@@ -18,11 +18,11 @@
 # Aefgh Threenine <aefgh3962@gmail.com>, 2023
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Aefgh Threenine <aefgh3962@gmail.com>, 2023\n"
+"Last-Translator: Aefgh Threenine <aefgh3962@gmail.com>, 2025\n"
 "Language-Team: Thai (https://app.transifex.com/yaron/teams/16553/th/)\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -574,21 +574,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -600,23 +600,22 @@ msgstr ""
 "charset=utf-8\" /></head><body><h2>ยินดีต้อนรับสู่คู่มือการใช้งานโปรแกรมเล่นสื่อ VLC</"
 "h2><h3>เอกสาร</h3><p>คุณสามารถหาเอกสารการใช้งาน VLC ได้จากเว็บไซต์ <a "
 "href=\"http://wiki.videolan.org\">วิกิ</a> ของ VideoLAN</"
-"p><p>หากคุณเพิ่งจะเคยเริ่มใช้งานโปรแกรมเส่นสื่อ VLC โปรดอ่าน<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>การใช้โปรแกรมเล่นสื่อ VLC "
+"p><p>หากคุณเพิ่งจะเคยเริ่มใช้งานโปรแกรมเส่นสื่อ VLC โปรดอ่าน<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>การใช้โปรแกรมเล่นสื่อ VLC "
 "สำหรับผู้เริ่มต้น</em></a></p><p>คุณสามารถหาข้อมูลการใช้งานโปรแกรมได้จาก<br>เอกสาร <a "
 "href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>วิธีเล่นแฟ้มต่างๆ "
 "ด้วยโปรแกรมเล่นสื่อ VLC</em></a></p><p>สำหรับการใช้งานด้านการเก็บบันทึกข้อมูล "
 "การแปลงข้อมูล การแปลงรหัส การลงรหัส การรวมกระแส และการทำกระแส "
-"คุณน่าจะหาข้อมูลที่เป็นประโยชน์ได้ที่ <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">เอกสารการใช้งานกระแสข้อมูล</a></"
-"p><p>ถ้าคุณไม่เข้าใจคำศัพท์เฉพาะทาง โปรดศึกษา <a href=\"http://wiki.videolan.org/"
-"Knowledge_Base\">คลังความรู้</a></p><p>เกี่ยวกับการใช้งานปุ่มลัดหลักๆ ของแป้นพิมพ์ "
-"โปรดศึกษาที่หน้า <a href=\"http://wiki.videolan.org/Hotkeys\">ปุ่มลัดต่างๆ</a></"
-"p><h3>วิธีใช้</h3><p>ก่อนที่จะถามคำถามใดก็ตาม โปรดค้นคว้าที่ <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a> ก่อน</p><p>จากนั้น คุณอาจจะขอ "
-"(และให้) ความช่วยเหลือได้ที่ <a href=\"http://forum.videolan.org\">กระดานสนทนา</a> "
-"<a href=\"http://www.videolan.org/vlc/lists.html\">กลุ่มเมล</a> หรือห้องสนทนา "
-"IRC ของพวกเรา (<em>#videolan</em> ที่ irc.freenode.net).</"
-"p><h3>การมีส่วนร่วมกับโครงการ</h3><p>คุณสามารถช่วยโครงการ VideoLAN "
+"คุณน่าจะหาข้อมูลที่เป็นประโยชน์ได้ที่ <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">เอกสารการใช้งานกระแสข้อมูล</a></p><p>ถ้าคุณไม่เข้าใจคำศัพท์เฉพาะทาง "
+"โปรดศึกษา <a href=\"http://wiki.videolan.org/Knowledge_Base\">คลังความรู้</a></"
+"p><p>เกี่ยวกับการใช้งานปุ่มลัดหลักๆ ของแป้นพิมพ์ โปรดศึกษาที่หน้า <a href=\"http://wiki."
+"videolan.org/Hotkeys\">ปุ่มลัดต่างๆ</a></p><h3>วิธีใช้</h3><p>ก่อนที่จะถามคำถามใดก็ตาม "
+"โปรดค้นคว้าที่ <a href=\"http://www.videolan.org/support/faq.html\">FAQ</a> ก่อน</"
+"p><p>จากนั้น คุณอาจจะขอ (และให้) ความช่วยเหลือได้ที่ <a href=\"http://forum.videolan."
+"org\">กระดานสนทนา</a> <a href=\"http://www.videolan.org/vlc/lists."
+"html\">กลุ่มเมล</a> หรือห้องสนทนา IRC ของพวกเรา (<em>#videolan</em> ที่ irc."
+"freenode.net).</p><h3>การมีส่วนร่วมกับโครงการ</h3><p>คุณสามารถช่วยโครงการ VideoLAN "
 "โดยสละเวลาของคุณในการช่วยเหลือชุมชน ออกแบบหน้ากาก แปลเอกสาร ทดสอบโปรแกรม "
 "และเขียนโปรแกรม นอกจากนี้ คุณยังสามารถสมทบทุนและเครื่องมืออุปกรณ์เพื่อช่วยเหลือพวกเราได้ "
 "และแน่นอนว่าคุณสามารถช่วย <b>โฆษณา</b> โปรแกรมเล่นสื่อ VLC ได้อีกด้วย</p></body></html>"
@@ -805,8 +804,8 @@ msgstr ""
 "            และจะมีผลไปทับค่าตั้งก่อนหน้า\n"
 "\n"
 "รูปแบบของ MRL ของกระแส:\n"
-"  [[ส่วนเข้าถึงแหล่ง][/ส่วนแยกกระแส]://]URL[#[ชื่อเรื่อง][:ชื่อตอน][-[ชื่อเรื่อง]"
-"[:ชื่อตอน]]]\n"
+"  [[ส่วนเข้าถึงแหล่ง][/ส่วนแยกกระแส]://]URL[#[ชื่อเรื่อง][:ชื่อตอน][-[ชื่อเรื่อง][:"
+"ชื่อตอน]]]\n"
 "  [:ตัวเลือก=ค่า ...]\n"
 "\n"
 "  ตัวเลือกทั่วไปในรูป --ตัวเลือก หลายตัวสามารถใช้แบบเจาะจงกับ MRL ในรูป :ตัวเลือก ได้\n"
@@ -2271,8 +2270,8 @@ msgstr "สัดส่วนภาพต้นฉบับ"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "นี่เป็นการบังคับสัดส่วนของภาพต้นฉบับ ตัวอย่างเช่น ดีวีดีบางแผ่นระบุสัดส่วนภาพเป็น 16:9 "
@@ -2773,8 +2772,8 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
-"คุณสามารถกำหนดรายชื่อของที่คั่นสำหรับกระแสหนึ่งๆ ได้ในรูป "
-"\"{name=ชื่อที่คั่น,time=เวลาเริ่มเล่น(ถ้ามี),bytes=ไบต์เริ่มเล่น(ถ้ามี)},{...}\""
+"คุณสามารถกำหนดรายชื่อของที่คั่นสำหรับกระแสหนึ่งๆ ได้ในรูป \"{name=ชื่อที่คั่น,"
+"time=เวลาเริ่มเล่น(ถ้ามี),bytes=ไบต์เริ่มเล่น(ถ้ามี)},{...}\""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -3119,9 +3118,8 @@ msgstr "พร็อกซี HTTP"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "พร็อกซี HTTP ที่จะใช้ โดยต้องอยู่ในรูป http://[ผู้ใช้@]โฮสต์.โดเมน:พอร์ต/ ถ้าเว้นว่างไว้ "
 "ก็จะลองใช้ค่าจากตัวแปรสภาพแวดล้อม http_proxy"
@@ -5227,7 +5225,7 @@ msgstr "แฟ้มที่ดาวนโหลดมา \"%s\" ชำรุ�
 msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
-msgstr "โปรแกรมรุ่นใหม่ได้รับการดาวน์โหลดเรียบร้อย ท่านต้องการปิดโปรแกรมเพื่อติดตั้งทันทีหรือไม่"
+msgstr "โปรแกรมรุ่นใหม่ได้รับการดาวน์โหลดเรียบร้อย คุณต้องการปิดโปรแกรมเพื่อติดตั้งทันทีหรือไม่"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:200
 msgid "Install"
@@ -6003,8 +6001,8 @@ msgstr "ไม่พบอุปกรณ์นำเข้าเสียง"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "ดูเหมือนว่า Mac ของคุณจะไม่ได้มาพร้อมกับอุปกรณ์นำเข้าเสียงที่เหมาะสม "
 "โปรดตรวจสอบขั้วต่อและไดรเวอร์ของคุณ"
@@ -6012,7 +6010,7 @@ msgstr ""
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
 #: modules/access/disc_helper.h:56
 msgid "Problem accessing a system resource"
-msgstr ""
+msgstr "เกิดปัญหาขณะเข้าถึงทรัพยากรระบบ"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
@@ -6040,7 +6038,7 @@ msgstr ""
 
 #: modules/access/avcapture.m:376 modules/access/avcapture.m:406
 msgid "No video devices found"
-msgstr ""
+msgstr "ไม่พบอุปกรณ์วิดีโอ"
 
 #: modules/access/avcapture.m:377
 msgid ""
@@ -6087,13 +6085,13 @@ msgstr "ใช้เมนูบลูเรย์; หากปิดใช้ 
 
 #: modules/access/bluray.c:75
 msgid "Region code"
-msgstr ""
+msgstr "รหัสภูมิภาค"
 
 #: modules/access/bluray.c:76
 msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
-msgstr ""
+msgstr "รหัสภูมิภาคของเครื่องเล่นบลูเรย์ บางแผ่นสามารถเล่นได้ก็ต่อเมื่อมีรหัสภูมิภาคที่ถูกต้องเท่านั้น"
 
 #: modules/access/bluray.c:103 modules/services_discovery/udev.c:603
 #: modules/gui/qt/ui/open_disk.h:296
@@ -6106,13 +6104,13 @@ msgstr "การรองรับแผ่นบลูเรย์ (libbluray)
 
 #: modules/access/bluray.c:847
 msgid "Path doesn't appear to be a Blu-ray"
-msgstr ""
+msgstr "พาธดูเหมือนจะไม่ใช่บลูเรย์"
 
 #: modules/access/bluray.c:862
 msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
-msgstr "แผ่นบลูเรย์จำเป็นต้องใช้ไลบรารี AACS ในการอ่านรหัส แต่ถว่าคุณยังไม่ได้ติดตั้งมัน"
+msgstr "แผ่นบลูเรย์จำเป็นต้องใช้ไลบรารี AACS ในการอ่านรหัส แต่ว่าคุณยังไม่ได้ติดตั้งมัน"
 
 #: modules/access/bluray.c:868
 msgid "Blu-ray Disc is corrupted."
@@ -6120,19 +6118,19 @@ msgstr "แผ่นบลูเรย์ชำรุด"
 
 #: modules/access/bluray.c:870
 msgid "Missing AACS configuration file!"
-msgstr "แฟ้มการปรับแต่ง AACS ตกหล่น!"
+msgstr "ไฟล์การกำหนดค่า AACS ตกหล่น!"
 
 #: modules/access/bluray.c:872
 msgid "No valid processing key found in AACS config file."
-msgstr ""
+msgstr "ไม่พบ processing key ที่ถูกต้องในไฟล์การกำหนดค่า AACS"
 
 #: modules/access/bluray.c:874
 msgid "No valid host certificate found in AACS config file."
-msgstr ""
+msgstr "ไม่พบใบรับรองโฮสต์ที่ถูกต้องในไฟล์การกำหนดค่า AACS"
 
 #: modules/access/bluray.c:876
 msgid "AACS Host certificate revoked."
-msgstr ""
+msgstr "ใบรับรองโฮสต์ AACS ถูกเพิกถอน"
 
 #: modules/access/bluray.c:878
 msgid "AACS MMC failed."
@@ -6180,7 +6178,7 @@ msgstr "เมนูบนสุด"
 
 #: modules/access/bluray.c:2116
 msgid "First Play"
-msgstr ""
+msgstr "เล่นครั้งแรก"
 
 #: modules/access/cdda.c:716
 #, c-format
@@ -6205,9 +6203,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "ที่อยู่ของเซิร์ฟเวอร์ CDDB ที่จะใข้"
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -6227,19 +6224,19 @@ msgstr "CDDB เซิร์ฟเวอร์พอร์ตที่จะใ�
 
 #: modules/access/concat.c:303
 msgid "Inputs list"
-msgstr ""
+msgstr "รายชื่ออินพุต"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr ""
+msgstr "รายชื่อของ URL อินพุตคั่นด้วยจุลภาคที่จะผนวกเข้าด้วยกัน"
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
-msgstr ""
+msgstr "การผนวกเข้าด้วยกัน"
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
-msgstr ""
+msgstr "อินพุตที่มีการผนวกเข้าด้วยกัน"
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6247,15 +6244,15 @@ msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
-msgstr "ส่วนนำเข้ากล้องถ่ายรูปดิจิทัล IIDC (หัวเสียบ FireWire)"
+msgstr "อินพุตกล้องดิจิทัล IIDC (หัวเสียบ FireWire)"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
-msgstr "แฟ้ม KDM"
+msgstr "ไฟล์ KDM"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
-msgstr ""
+msgstr "พาธไปยังไฟล์ XML สำหรับ Key Delivery Message"
 
 #: modules/access/dcp/dcp.cpp:77
 msgid "DCP"
@@ -6263,7 +6260,7 @@ msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:79
 msgid "Digital Cinema Package module"
-msgstr ""
+msgstr "โมดูล Digital Cinema Package"
 
 #: modules/access/decklink.cpp:49
 msgid "Input card to use"
@@ -6368,11 +6365,11 @@ msgstr "อัตราส่วนภาพ (4:3, 16:9) ค่าเริ่�
 
 #: modules/access/decklink.cpp:102
 msgid "DeckLink"
-msgstr ""
+msgstr "DeckLink"
 
 #: modules/access/decklink.cpp:103
 msgid "Blackmagic DeckLink SDI input"
-msgstr ""
+msgstr "อินพุต Blackmagic DeckLink SDI"
 
 #: modules/access/decklink.cpp:123 modules/video_output/decklink.cpp:119
 msgid "10 bits"
@@ -6380,7 +6377,7 @@ msgstr "10 บิต"
 
 #: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
-msgstr "ส่วนรับที่ปิด 1"
+msgstr "คำบรรยายแบบซ่อนได้ 1"
 
 #: modules/access/disc_helper.h:57
 msgid ""
@@ -6388,6 +6385,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"อาจเป็นไปได้ว่า macOS ปิดกั้นการเข้าถึงแผ่นของคุณไว้ โปรดเปิด \"การตั้งค่าระบบ\" -> "
+"\"ความปลอดภัยและความเป็นส่วนตัว\" และอนุญาตให้ VLC เข้าถึงสื่อภายนอกของคุณในส่วน "
+"\"ไฟล์และโฟลเดอร์\""
 
 #: modules/access/dshow/dshow.cpp:92
 msgid "Cable"
@@ -6416,13 +6416,14 @@ msgstr "DSS"
 #: modules/access/dshow/dshow.cpp:130
 #: modules/gui/qt/components/open_panels.cpp:818
 msgid "Video device name"
-msgstr "ชื่ออุปกรณ์เล่นวีดิทัศน์"
+msgstr "ชื่ออุปกรณ์เล่นวิดีโอ"
 
 #: modules/access/dshow/dshow.cpp:132
 msgid ""
 "Name of the video device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
-msgstr "ชื่ออุปกรณ์วิดีโอที่จะใช้โดยปลั๊กอิน DirectShow ถ้าคุณไม่ระบุ อุปกรณ์เริ่มต้นจะถูกใช้"
+msgstr ""
+"ชื่ออุปกรณ์เล่นวิดีโอที่จะใช้โดยปลั๊กอิน DirectShow ถ้าคุณไม่ระบุชื่ออุปกรณ์ ก็จะใช้อุปกรณ์ปริยาย"
 
 #: modules/access/dshow/dshow.cpp:135
 #: modules/gui/qt/components/open_panels.cpp:826
@@ -6435,11 +6436,12 @@ msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
+"ชื่ออุปกรณ์เล่นเสียงที่จะใช้โดยปลั๊กอิน DirectShow ถ้าคุณไม่ระบุชื่ออุปกรณ์ ก็จะใช้อุปกรณ์ปริยาย"
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:793
 msgid "Video size"
-msgstr "ขนาดวีดิทัศน์"
+msgstr "ขนาดวิดีโอ"
 
 #: modules/access/dshow/dshow.cpp:142
 msgid ""
@@ -6541,7 +6543,7 @@ msgstr "เลือกชนิดอินพุตของเครื่อ
 
 #: modules/access/dshow/dshow.cpp:176
 msgid "Video input pin"
-msgstr ""
+msgstr "อินพุตพินสำหรับวิดีโอ"
 
 #: modules/access/dshow/dshow.cpp:178
 msgid ""
@@ -6550,30 +6552,34 @@ msgid ""
 "\"Device config\" area, and use those numbers here. -1 means that settings "
 "will not be changed."
 msgstr ""
+"เลือกแหล่งอินพุตวิดีโอ เช่น คอมโพสิต, s-video, หรือ เครื่องรับ "
+"และเนื่องจากการตั้งค่าเหล่านี้เป็นการตั้งค่าสำหรับเฉพาะฮาร์ดแวร์แต่ละตัว "
+"คุณควรหาการตั้งค่าที่เหมาะสมในส่วน \"Device config\" และใช้ค่าตัวเลขเหล่านั้นในส่วนนั้น โดย "
+"-1 หมายความว่าการตั้งค่านั้นจะไม่ถูกเปลี่ยนแปลง"
 
 #: modules/access/dshow/dshow.cpp:182
 msgid "Audio input pin"
-msgstr ""
+msgstr "อินพุตพินสำหรับเสียง"
 
 #: modules/access/dshow/dshow.cpp:184
 msgid "Select the audio input source. See the \"video input\" option."
-msgstr ""
+msgstr "เลือกแหล่งอินพุตเสียง ดูที่ตัวเลือก \"อินพุตวิดีโอ\""
 
 #: modules/access/dshow/dshow.cpp:185
 msgid "Video output pin"
-msgstr ""
+msgstr "เอาต์พุตพินสำหรับวิดีโอ"
 
 #: modules/access/dshow/dshow.cpp:187
 msgid "Select the video output type. See the \"video input\" option."
-msgstr ""
+msgstr "เลือกชนิดเอาต์พุตวิดีโอ ดูที่ตัวเลือก \"อินพุตวิดีโอ\""
 
 #: modules/access/dshow/dshow.cpp:188
 msgid "Audio output pin"
-msgstr ""
+msgstr "เอาต์พุตพินสำหรับเสียง"
 
 #: modules/access/dshow/dshow.cpp:190
 msgid "Select the audio output type. See the \"video input\" option."
-msgstr ""
+msgstr "เลือกชนิดเอาต์พุตเสียง ดูที่ตัวเลือก \"อินพุตวิดีโอ\""
 
 #: modules/access/dshow/dshow.cpp:192
 msgid "AM Tuner mode"
@@ -6584,6 +6590,8 @@ msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
+"โหมดเครื่องรับ AM สามารถเป็นได้ทั้งค่าดั้งเดิม (0), ทีวี (1), วิทยุ AM (2), วิทยุ FM (3) หรือ "
+"DSS (4)"
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6594,7 +6602,7 @@ msgstr "เลือกรูปแบบอินพุตเสียงด้
 #: modules/stream_out/transcode/transcode.c:94
 #: share/lua/http/dialogs/create_stream.html:281
 msgid "Audio sample rate"
-msgstr "ตัวอย่างอัตราเสียง"
+msgstr "อัตราการสุ่มตัวอย่างเสียง"
 
 #: modules/access/dshow/dshow.cpp:203
 msgid "Select audio input format with the given sample rate (if non 0)"
@@ -6623,7 +6631,7 @@ msgstr "ส่วนรับล้มเหลว"
 
 #: modules/access/dshow/dshow.cpp:517
 msgid "No video or audio device selected."
-msgstr "ยังไม่ได้เลือกอุปกรณ์เสียงหรืออุปกรณ์วีดิทัศน์"
+msgstr "ยังไม่ได้เลือกอุปกรณ์เสียงหรืออุปกรณ์วิดีโอ"
 
 #: modules/access/dshow/dshow.cpp:591
 msgid "VLC cannot open ANY capture device. Check the error log for details."
@@ -6641,19 +6649,19 @@ msgstr "อุปกรณ์จับสัญญาณ \"%s\" ไม่รอ�
 
 #: modules/access/dsm/access.c:72 modules/access/dsm/sd.c:138
 msgid "Windows networks"
-msgstr ""
+msgstr "เครือข่าย Windows"
 
 #: modules/access/dsm/access.c:74
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr ""
+msgstr "อินพุตและเบราว์เซอร์ SMB (ตำแหน่งร่วมบนเครือข่าย Windows) ของ libdsm"
 
 #: modules/access/dsm/access.c:78
 msgid "libdsm SMB input"
-msgstr ""
+msgstr "อินพุต SMB ของ libdsm"
 
 #: modules/access/dsm/access.c:98
 msgid "libdsm NETBIOS discovery module"
-msgstr ""
+msgstr "โมดูลค้นพบ NETBIOS ของ libdsm"
 
 #: modules/access/dtv/access.c:43
 msgid "DVB adapter"
@@ -6664,6 +6672,8 @@ msgid ""
 "If there is more than one digital broadcasting adapter, the adapter number "
 "must be selected. Numbering starts from zero."
 msgstr ""
+"ถ้ามีอะแดปเตอร์รับสัญญาณดิจิทัลมากกว่าหนึ่งตัว ก็จะต้องเลือกหมายเลขอะแดปเตอร์ด้วย "
+"โดยการเรียงตัวเลขจะเริ่มจากศูนย์"
 
 #: modules/access/dtv/access.c:48
 msgid "DVB device"
@@ -6674,16 +6684,20 @@ msgid ""
 "If the adapter provides multiple independent tuner devices, the device "
 "number must be selected. Numbering starts from zero."
 msgstr ""
+"ถ้าอะแดปเตอร์มีอุปกรณ์เครื่องรับแบบอิสระหลายตัวให้ ก็จะต้องเลือกหมายเลขอุปกรณ์ด้วย "
+"โดยการเรียงตัวเลขจะเริ่มจากศูนย์"
 
 #: modules/access/dtv/access.c:52
 msgid "Do not demultiplex"
-msgstr ""
+msgstr "ไม่ต้องดีมัลติเพล็กซ์"
 
 #: modules/access/dtv/access.c:54
 msgid ""
 "Only useful programs are normally demultiplexed from the transponder. This "
 "option will disable demultiplexing and receive all programs."
 msgstr ""
+"เฉพาะช่องรายการที่เป็นประโยชน์เท่านั้นที่โดยปกติจะดีมัลติเพล็กซ์จากทรานสปอนเดอร์ "
+"ตัวเลือกนี้จะปิดใช้งานการดีมัลติเพล็กซ์และรับสัญญาณช่องรายการทั้งหมด"
 
 #: modules/access/dtv/access.c:57
 msgid "Network name"
@@ -6691,7 +6705,7 @@ msgstr "ชื่อเครือข่าย"
 
 #: modules/access/dtv/access.c:58
 msgid "Unique network name in the System Tuning Spaces"
-msgstr ""
+msgstr "ชื่อเครือข่ายแบบไม่ซ้ำใน Tuning Spaces ของระบบ"
 
 #: modules/access/dtv/access.c:60
 msgid "Network name to create"
@@ -6699,7 +6713,7 @@ msgstr "ชื่อเครือข่ายที่จะสร้าง"
 
 #: modules/access/dtv/access.c:61
 msgid "Create unique name in the System Tuning Spaces"
-msgstr ""
+msgstr "สร้างชื่อแบบไม่ซ้ำใน Tuning Spaces ของระบบ"
 
 #: modules/access/dtv/access.c:63
 msgid "Frequency (Hz)"
@@ -6710,22 +6724,24 @@ msgid ""
 "TV channels are grouped by transponder (a.k.a. multiplex) on a given "
 "frequency. This is required to tune the receiver."
 msgstr ""
+"ช่องสัญญาณทีวีจะจัดกลุ่มโดยทรานสปอนเดอร์ (หรือที่เรียกว่า มัลติเพล็กซ์) บนความถี่ตามที่ระบุ "
+"ค่านี้จำเป็นต่อการปรับแต่งตัวรับสัญญาณ"
 
 #: modules/access/dtv/access.c:68 modules/gui/qt/components/open_panels.cpp:967
 msgid "Modulation / Constellation"
-msgstr ""
+msgstr "การมอดูเลต / คอนสเตลเลชัน"
 
 #: modules/access/dtv/access.c:69
 msgid "Layer A modulation"
-msgstr ""
+msgstr "การมอดูเลตชั้น A"
 
 #: modules/access/dtv/access.c:70
 msgid "Layer B modulation"
-msgstr ""
+msgstr "การมอดูเลตชั้น B"
 
 #: modules/access/dtv/access.c:71
 msgid "Layer C modulation"
-msgstr ""
+msgstr "การมอดูเลตชั้น C"
 
 #: modules/access/dtv/access.c:73
 msgid ""
@@ -6733,26 +6749,32 @@ msgid ""
 "(depending on the delivery system). If the demodulator cannot detect the "
 "constellation automatically, it needs to be configured manually."
 msgstr ""
+"สัญญาณดิจิทัลสามารถมอดูเลตได้ตามคอนสเตลเลชันที่แตกต่างกัน (โดยขึ้นอยู่กับระบบการนำส่ง) "
+"ถ้าดีมอดูเลเตอร์ไม่สามารถตรวจพบคอนสเตลเลชันโดยอัตโนมัติได้ "
+"ก็จะต้องกำหนดค่าของดีมอดูเลเตอร์ใหม่ด้วยตนเอง"
 
 #: modules/access/dtv/access.c:88
 msgid "Symbol rate (bauds)"
-msgstr ""
+msgstr "Symbol rate (บอด)"
 
 #: modules/access/dtv/access.c:90
 msgid ""
 "The symbol rate must be specified manually for some systems, notably DVB-C, "
 "DVB-S and DVB-S2."
 msgstr ""
+"Symbol rate จะต้องระบุด้วยตนเองสำหรับบางระบบ อย่างเช่น DVB-C, DVB-S และ DVB-S2"
 
 #: modules/access/dtv/access.c:93
 msgid "Spectrum inversion"
-msgstr ""
+msgstr "การผกผันของสเปกตรัม"
 
 #: modules/access/dtv/access.c:95
 msgid ""
 "If the demodulator cannot detect spectral inversion correctly, it needs to "
 "be configured manually."
 msgstr ""
+"ถ้าดีมอดูเลเตอร์ไม่สามารถตรวจพบการผกผันของสเปกตรัมได้อย่างถูก้อง "
+"ก็จะต้องกำหนดค่าของดีมอดูเลเตอร์ใหม่ด้วยตนเอง"
 
 #: modules/access/dtv/access.c:101
 msgid "FEC code rate"
@@ -6760,11 +6782,11 @@ msgstr "อัตรารหัส FEC"
 
 #: modules/access/dtv/access.c:102
 msgid "High-priority code rate"
-msgstr ""
+msgstr "อัตรารหัสที่มีความสำคัญสูง"
 
 #: modules/access/dtv/access.c:103
 msgid "Low-priority code rate"
-msgstr ""
+msgstr "อัตรารหัสที่มีความสำคัญต่ำ"
 
 #: modules/access/dtv/access.c:104
 msgid "Layer A code rate"
@@ -6780,11 +6802,11 @@ msgstr "อัตรารหัสชั้น B"
 
 #: modules/access/dtv/access.c:108
 msgid "The code rate for Forward Error Correction can be specified."
-msgstr ""
+msgstr "อัตรารหัสสำหรับการแก้ไขข้อผิดพลาดล่วงหน้าสามารถระบุได้"
 
 #: modules/access/dtv/access.c:118
 msgid "Transmission mode"
-msgstr ""
+msgstr "โหมดการส่งสัญญาณ"
 
 #: modules/access/dtv/access.c:126
 msgid "Bandwidth (MHz)"
@@ -8296,8 +8318,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8321,9 +8343,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "กระแส %d"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8759,9 +8780,9 @@ msgstr "ส่วนควบคุมไดร์ฟเวอร์ของ v4
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -11095,9 +11116,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "แฟ้มทั้งหมด"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11164,8 +11184,8 @@ msgstr "ตำแหน่งภาพเล็กซ้อนทับ"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 
 #: modules/codec/dvbsub.c:95
@@ -11848,10 +11868,10 @@ msgstr ""
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -13024,7 +13044,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -17226,9 +17245,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "บันทึกผังเล่น"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -20796,9 +20814,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "แสดงกล่องโต้ตอบของข้อผิดพลาดและคำเตือนที่ไม่สำคัญ"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "เปิดใช้รูปแบบซอฟต์แวร์"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -21127,9 +21144,8 @@ msgid "AMD Frame Rate Doubler"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "แสดงแถบข้าง"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -26644,39 +26660,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "การปรับสัดส่วนภาพวีดิทัศน์"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "เลือกโหมดอัตราขยายเสียง"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "จำนวนบิตต่อตัวอย่าง"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "ตัวอย่างของอัตรา"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "ตัวอ่าน-ลงรหัสวีดิทัศน์"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "ความละเอียด"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "มอดูลขาออก"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -26687,9 +26696,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "อยู่บนสุดเสมอ"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -27734,9 +27742,8 @@ msgstr "กล่องโต้ตอบ"
 #: modules/gui/qt/ui/sprefs_interface.h:532
 #: modules/gui/qt/ui/sprefs_subtitles.h:288
 #: modules/gui/qt/ui/sprefs_video.h:310 modules/gui/qt/ui/streampanel.h:165
-#, fuzzy
 msgid "Form"
-msgstr "รูปแบบ"
+msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:132
 msgid "Preset"
@@ -27747,9 +27754,8 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "ค่าตั้งเสียง"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
@@ -27760,14 +27766,12 @@ msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "ค่าตั้งเสียง"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "ระดับรายละเอียด"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:138
 msgid "&Filter:"
@@ -27806,9 +27810,8 @@ msgid "Start Time"
 msgstr "เวลาเริ่ม"
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Stop Time"
-msgstr "เวลาหยุด"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:269
 msgid "Edit Options"
@@ -27835,9 +27838,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:283
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "เปลี่ยนเวลาในการเริ่มเล่นของสื่อ"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:286
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27896,9 +27898,8 @@ msgid "Audio and Subtitles"
 msgstr "เสียงและบทบรรยาย"
 
 #: modules/gui/qt/ui/open_file.h:142
-#, fuzzy
 msgid "Use a sub&title file"
-msgstr "ใช้แฟ้มบทบรรยาย"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:144
 msgid "Select the subtitle file"
@@ -27937,9 +27938,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "ตัวรวมกระแส MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "Ogg/Ogm"
@@ -27962,9 +27962,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "RAW"
@@ -28011,9 +28010,8 @@ msgid "Menus"
 msgstr "เมนู"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "อัตราการชักตัวอย่าง"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -28052,14 +28050,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:756
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "อัตราการชักตัวอย่าง"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:764
-#, fuzzy
 msgid "Profile &Name"
-msgstr "ชื่อโพรไฟล์"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:200
 msgid "Set up media sources to stream"
@@ -28084,9 +28080,8 @@ msgid "New destination"
 msgstr "เพิ่มการส่ง"
 
 #: modules/gui/qt/ui/sout.h:207
-#, fuzzy
 msgid "Display locally"
-msgstr "แสดง"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:209
 msgid "Transcoding Options"
@@ -28105,9 +28100,8 @@ msgid "Option Setup"
 msgstr "ตั้งค่าตัวเลือก"
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr "เลือกปลายทางที่จะทำกระแสส่งไป"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Miscellaneous Options"
@@ -28118,9 +28112,8 @@ msgid "Stream all elementary streams"
 msgstr "ทำกระแสพวกกระแสมูลฐานทั้งหมด"
 
 #: modules/gui/qt/ui/sout.h:216
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "ค่าตั้งทั่วไปของส่วนส่งกระแส"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid " %"
@@ -28143,9 +28136,8 @@ msgid "Visualization:"
 msgstr "มโนภาพ:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:420
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "เปิดใช้งานการยืดเสียง"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
 msgid "Replay gain mode:"
@@ -28196,9 +28188,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:359
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "การเลือกระดับและโพรไฟล์ x264"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Optical drive"
@@ -28285,14 +28276,12 @@ msgid "Show systray icon"
 msgstr "แสดงไอคอนในถาดระบบ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "ส่วนติดต่อ Ncurses"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "ใช้รูปแบบผังเล่นของหน้ากาก"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -28383,9 +28372,8 @@ msgid "Add a background"
 msgstr "ตั้งเป็นพื้นหลัง"
 
 #: modules/gui/qt/ui/sprefs_video.h:313
-#, fuzzy
 msgid "O&utput"
-msgstr "ส่วนแสดงผล"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "DirectX"
@@ -28400,9 +28388,8 @@ msgid "KVA"
 msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:324
-#, fuzzy
 msgid "Deinterlacing"
-msgstr "รวมภาพสอดประสาน"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:326
 msgid "Force Aspect Ratio"
@@ -28429,14 +28416,12 @@ msgid "Run manually"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:174
-#, fuzzy
 msgid "Setup schedule"
-msgstr "ตารางเวลา"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:175
-#, fuzzy
 msgid "Run on schedule"
-msgstr "ตารางเวลา"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:176
 msgid "Status"
@@ -28533,28 +28518,24 @@ msgid "Motion detect"
 msgstr "ตรวจจับการเคลื่อนไหว"
 
 #: modules/gui/qt/ui/video_effects.h:1331
-#, fuzzy
 msgid "Spatial blur"
-msgstr "สภาวะเสียง"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1335
 msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1336
-#, fuzzy
 msgid "Soften"
-msgstr "นุ่มนวล"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1337
-#, fuzzy
 msgid "Denoiser"
-msgstr "Noise"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1338
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "สภาวะเสียง"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1339
 msgid "Temporal luma strength"

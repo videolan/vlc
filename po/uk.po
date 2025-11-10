@@ -8,7 +8,7 @@
 # Андрій Бандура <andriykopanytsia@gmail.com>, 2013-2017, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
@@ -580,21 +580,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -609,9 +609,9 @@ msgstr ""
 "p><p>Якщо ви користуєтеся VLC віднедавна, будь ласка, прочитайте <br><a "
 "href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Вступ у "
 "VLC</em></a>. </p><p>Можна знайти деяку інформацію щодо користування плеєром "
-"у документі <br>«<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>Як відтворювати файли за допомогою VLC</em></"
-"a>».</p><p>Щодо збереження, конвертування, переконвертації, кодування, "
+"у документі <br>«<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>Як відтворювати файли за допомогою VLC</em></a>».</"
+"p><p>Щодо збереження, конвертування, переконвертації, кодування, "
 "мультиплексування й потокових задач можна знайти корисну інформацію в <a "
 "href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">документації "
 "щодо мовлення</a>.</p><p>Якщо ви не впевнені в термінології, будь ласка, "
@@ -621,8 +621,8 @@ msgstr ""
 "скорочень</a>.</p><h3>Довідка</h3><p>Перед тим, як поставити будь-яке "
 "питання, будь ласка, прочитайте <a href=\"http://www.videolan.org/support/"
 "faq.html\">FAQ</a>.</p><p>Можна допомогти й отримати допомогу на <a "
-"href=\"http://forum.videolan.org\">форумах</a>, у <a href=\"http://"
-"www.videolan.org/vlc/lists.html\">списках розсилки</a> або на IRC-каналі "
+"href=\"http://forum.videolan.org\">форумах</a>, у <a href=\"http://www."
+"videolan.org/vlc/lists.html\">списках розсилки</a> або на IRC-каналі "
 "(<em>#videolan</em> на irc.freenode.net).</p><h3>Внески до проекту</"
 "h3><p>Можна допомогти проекту VideoLAN, надаючи поради спільноті, "
 "розробляючи обкладинки, перекладаючи документацію, а також тестуванням і "
@@ -813,8 +813,8 @@ msgstr ""
 "           має пріоритет, вищий за попереднє значення.\n"
 "\n"
 "Синтаксис MRL-потоку:\n"
-"  [[доступ][/демультиплексор]://]URL-адреса[@[розділ][:частина][-[розділ]"
-"[:частина]]] [:опція=значення …]\n"
+"  [[доступ][/демультиплексор]://]URL-адреса[@[розділ][:частина][-[розділ][:"
+"частина]]] [:опція=значення …]\n"
 "\n"
 "  Більшість загальних --опцій також може використовуватися в :опціях MRL.\n"
 "  Можна зазначити кілька пар пар :опція=значення.\n"
@@ -2319,8 +2319,8 @@ msgstr "Вихідне співвідношення сторін"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Задає примусове співвідношення сторін джерела. Наприклад, деякі DVD "
@@ -2843,9 +2843,8 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
-"Можна вручну вказати список закладок потоку у форматі «{name=назва-"
-"закладки,time=необов’язковий-зсув-часу,bytes=необов’язковий-зсув-у-байтах},"
-"{…}»"
+"Можна вручну вказати список закладок потоку у форматі «{name=назва-закладки,"
+"time=необов’язковий-зсув-часу,bytes=необов’язковий-зсув-у-байтах},{…}»"
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -3216,9 +3215,8 @@ msgstr "HTTP-проксі"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "Використовуваний HTTP-проксі. Припустимий формат: «http://"
 "[користувач@]проксі.домен:порт/». Якщо поле пусте, використовуватиметься "
@@ -3241,8 +3239,8 @@ msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
-"Використовуваний проксі-сервер SOCKS. Необхідно вказати у форматі "
-"„адреса:порт“. Використовуватиметься для всіх TCP-з’єднань"
+"Використовуваний проксі-сервер SOCKS. Необхідно вказати у форматі „адреса:"
+"порт“. Використовуватиметься для всіх TCP-з’єднань"
 
 #: src/libvlc-module.c:862
 msgid "SOCKS user name"
@@ -6165,8 +6163,8 @@ msgstr "Вхідного звукового пристрою не знайден
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Вірогідно, ваш Mac не оснащений відповідним пристроєм для введення відео. "
 "Будь ласка, перевірте роз'єми і драйвери."
@@ -6378,9 +6376,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Використовувана адреса сервера CDDB"
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8629,8 +8626,8 @@ msgstr "Потрібна автентифікація SMB"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "Комп'ютер (%s), до якого ви намагаєтеся під'єднатися, вимагає "
 "автентифікації.\n"
@@ -8659,9 +8656,8 @@ msgid "Password for stream encryption"
 msgstr "Пароль для потокового шифрування"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Вивід потоку по SRT"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9110,15 +9106,14 @@ msgstr "Параметри драйвера v4l2"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "Задає параметра драйвера v4l2, визначені у списку, елементи якого розділені "
-"комами, взятому у фігурні дужки (приклад: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3}). Для перегляду доступних "
-"значень збільшіть інформативність виводу (-vv) або скористайтеся програмою "
-"v4l2-ctl."
+"комами, взятому у фігурні дужки (приклад: {video_bitrate=6000000,audio_crc=0,"
+"stream_type=3}). Для перегляду доступних значень збільшіть інформативність "
+"виводу (-vv) або скористайтеся програмою v4l2-ctl."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9686,14 +9681,12 @@ msgid "SRT stream output"
 msgstr "Вивід потоку по SRT"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "Найбільший розмір пакету RIST (у байтах)"
+msgstr ""
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "Найбільший розмір пакету RIST (у байтах)"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11649,9 +11642,8 @@ msgstr ""
 "автоматичне визначення"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Усі файли"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11720,8 +11712,8 @@ msgstr "Позиція підмалюнку"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Ви можете задати позицію підмалюнку на відео (0 = центр, 1 = ліворуч, 2 = "
 "праворуч, 4 = зверху, 8 = знизу, ви можете також використовувати комбінації "
@@ -12487,10 +12479,10 @@ msgstr "Точністю управління частотою"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "Допустимий відсоток відхилення частоти для методу 'avbr' (середній змінний "
 "бітрейт) (наприклад, при значенні 10 і бітрейті 800 кбіт/с кодер прагнутиме "
@@ -13747,7 +13739,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16725,9 +16716,9 @@ msgstr ""
 "underline; color:#0057ae;\">VideoLAN</span></a> спільноти.</p><p>VLC "
 "використовує власні внутрішні кодеки, працює по суті на кожній популярній "
 "платформі і може читати майже всі файли медіа, CD, DVD, мережеві потоки, "
-"карти захоплення та інші формати медіа!</p><p><a href=\"https://"
-"www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">Допоможіть та приєднайтеся до нас!</span></a>"
+"карти захоплення та інші формати медіа!</p><p><a href=\"https://www.videolan."
+"org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Допоможіть та приєднайтеся до нас!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -18223,9 +18214,8 @@ msgstr "Згорнути все"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Зберегти список відтворення"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -21925,9 +21915,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Показувати неважливі діалоги помилок та попереджень"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Увімкнути програмний режим"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -22135,8 +22124,8 @@ msgstr "Зберегти список відтворення"
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
-"Список відтворення XSPF |*.xspf|файл M3U |*.m3u|Список відтворення HTML |"
-"*.html"
+"Список відтворення XSPF |*.xspf|файл M3U |*.m3u|Список відтворення HTML |*."
+"html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -22271,19 +22260,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Вкажіть гаму зображення від 0.01 до 10. Стандартно: 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Cтерео підсилювач"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Частота &кадрів"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Показати бічну панель"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -28181,39 +28167,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Рекомендований відеовивід для Windows 8 та більш пізніх версій"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Масштабування відео"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Оберіть один колір у відео"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Біт на фрагмент"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Передискретизатор SoX"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Відеокодеки"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Роздільна здатність"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Модулі виводу"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -28224,9 +28203,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Завжди над іншими вікнами"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -29339,24 +29317,20 @@ msgid "0.00 dB"
 msgstr "0.00 дБ"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Ідентифікація"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Вибрати метод мовлення"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Відстежувати відбитки пальця (на основі Acoustid)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Ідентифікація"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29600,9 +29574,8 @@ msgid "Menus"
 msgstr "Меню"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Частота &дискретизації"
+msgstr "Частота &кадрів"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29873,9 +29846,8 @@ msgid "Auto raising the interface:"
 msgstr "Автоматичний підйом інтерфейсу:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Використовувати оформлений список відтворення"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30190,21 +30162,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Список медіаменеджеру"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "Список каналів SAT>IP"
-
-#~ msgid "Master List"
-#~ msgstr "Основний список"
-
-#~ msgid "Server List"
-#~ msgstr "Серверний список"
-
-#~ msgid "Custom List"
-#~ msgstr "Власний список"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "Розмір фрагмента SRT (байти)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Довжина криптоключа у байтах"

@@ -3,18 +3,18 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2023
+# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2025
 # Tadashi Jokagi <elf@elf.no-ip.org>, 2004-2009
 # ever_green, 2018
 # Tōen Androme Mitani, 2021
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Felix Paul Kühne <fkuehne@gmail.com>, 2023\n"
+"Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/yaron/teams/16553/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -580,21 +580,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -604,32 +604,31 @@ msgid ""
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>VLCメディアプレイヤーのヘルプへようこそ</"
-"h2><h3>ドキュメンテーション</h3><p>VideoLANの<a href=\"http://"
-"wiki.videolan.org\">wiki</a> ウェブサイトでVLCのドキュメントを見つけることが"
-"できます。</p><p>もし、はじめてVLCメディアプレイヤーをご利用になるなら、ぜ"
-"ひ、<a href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>は"
-"じめてのVLCメディアプレイヤー</em></a>をご覧ください。</p><p>どのようにプレイ"
-"ヤーを使用するかについては、\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>VLCメディアプレイヤーでファイルを再生する方法"
-"</em></a>\"が役立つでしょう。</p><p>保存、変換、トランスコーディング、エン"
-"コーディング、ミキシング、それからストリーミングのすべてについては、<a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">ストリーミン"
-"グのドキュメント</a>から様々な役立つ情報を見つけることができるでしょう。</"
-"p><p>もし、用語について不安がある場合、<a href=\"http://wiki.videolan.org/"
-"Knowledge_Base\">ナレッジベース</a>を確認してみてください。</p><p>メインの"
-"キーボードによるショートカットについて理解するためには、<a href=\"http://"
-"wiki.videolan.org/Hotkeys\">ショートカット</a>のページを参照ください。</"
-"p><h3>ヘルプ</h3><p>質問をする前に<a href=\"http://www.videolan.org/support/"
-"faq.html\">FAQ</a>をご一読ください。</p><p><a href=\"http://"
-"forum.videolan.org\">フォーラム</a>や<a href=\"http://www.videolan.org/vlc/"
-"lists.html\">メーリングリスト</a>、irc.freenode.netのIRCチャンネル"
-"(<em>#videolan</em> on irc.freenode.net)</p>では、あなたがヘルプを受けたり"
-"（または、提供したり）できるかも知れません。</p><h3>プロジェクトへの貢献</"
-"h3><p>VideoLANプロジェクトに参加し、コミュニティを援助することができます。ス"
-"キンをデザインしたり、ドキュメントを翻訳したり、コードをテストすることができ"
-"ます。また、資金や物資を私達に提供していただくことも可能です。もちろん、あな"
-"たが他の人に VLCメディアプレイヤーを<b>推奨</b>することもできます。</p></"
-"body></html>"
+"h2><h3>ドキュメンテーション</h3><p>VideoLANの<a href=\"http://wiki.videolan."
+"org\">wiki</a> ウェブサイトでVLCのドキュメントを見つけることができます。</"
+"p><p>もし、はじめてVLCメディアプレイヤーをご利用になるなら、ぜひ、<a "
+"href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>はじめて"
+"のVLCメディアプレイヤー</em></a>をご覧ください。</p><p>どのようにプレイヤーを"
+"使用するかについては、\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>VLCメディアプレイヤーでファイルを再生する方法</em></a>\"が役"
+"立つでしょう。</p><p>保存、変換、トランスコーディング、エンコーディング、ミキ"
+"シング、それからストリーミングのすべてについては、<a href=\"http://wiki."
+"videolan.org/Documentation:Streaming_HowTo\">ストリーミングのドキュメント</a>"
+"から様々な役立つ情報を見つけることができるでしょう。</p><p>もし、用語について"
+"不安がある場合、<a href=\"http://wiki.videolan.org/Knowledge_Base\">ナレッジ"
+"ベース</a>を確認してみてください。</p><p>メインのキーボードによるショートカッ"
+"トについて理解するためには、<a href=\"http://wiki.videolan.org/Hotkeys\">"
+"ショートカット</a>のページを参照ください。</p><h3>ヘルプ</h3><p>質問をする前"
+"に<a href=\"http://www.videolan.org/support/faq.html\">FAQ</a>をご一読くださ"
+"い。</p><p><a href=\"http://forum.videolan.org\">フォーラム</a>や<a "
+"href=\"http://www.videolan.org/vlc/lists.html\">メーリングリスト</a>、irc."
+"freenode.netのIRCチャンネル(<em>#videolan</em> on irc.freenode.net)</p>では、"
+"あなたがヘルプを受けたり（または、提供したり）できるかも知れません。</p><h3>"
+"プロジェクトへの貢献</h3><p>VideoLANプロジェクトに参加し、コミュニティを援助"
+"することができます。スキンをデザインしたり、ドキュメントを翻訳したり、コード"
+"をテストすることができます。また、資金や物資を私達に提供していただくことも可"
+"能です。もちろん、あなたが他の人に VLCメディアプレイヤーを<b>推奨</b>すること"
+"もできます。</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -2305,8 +2304,8 @@ msgstr "ソースのアスペクト比"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "ソースのアスペクト比を固定化します。例えば、いくつかのDVDはアスペクト比が4:3"
@@ -3188,9 +3187,8 @@ msgstr "HTTPプロキシー"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "使用されるHTTPプロキシーをhttp://[user@]myproxy.mydomain:myport/の形式で指定"
 "します。何も指定されない場合、http_proxy環境変数が使用されます。"
@@ -6099,8 +6097,8 @@ msgstr "オーディオ入力デバイスが見つかりません"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "あなたのMacはオーディオ入力デバイスが見つかりません。コネクターおよびドライ"
 "バーを確認してください。"
@@ -6311,12 +6309,11 @@ msgstr "[cdda:][device][@[track]]"
 
 #: modules/access/cdda.c:1022
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "Musicbrainzサーバー"
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "使用するCDDB サーバーのアドレスを指定します。"
+msgstr "musicbrainzサーバーとして使用するアドレス"
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8551,8 +8548,8 @@ msgstr "SMB認証が必要です"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "接続しようとしているコンピューター (%s) は認証が必要です。\n"
 "ユーザー名 (ドメイン名;ユーザー名の形式でドメインを指定することが望ましい) と"
@@ -8579,9 +8576,8 @@ msgid "Password for stream encryption"
 msgstr "ストリーム暗号化のパスワード"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRTストリーム出力"
+msgstr " SRTストリームID"
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8711,11 +8707,11 @@ msgstr "チューナーのモノラル/ステレオの切り替えとトラッ�
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
-msgstr "制御のリセット"
+msgstr "コントロールのリセット"
 
 #: modules/access/v4l2/v4l2.c:83
 msgid "Reset controls to defaults."
-msgstr "制御をデフォルトに戻す"
+msgstr "コントロールをデフォルトに戻す"
 
 #: modules/access/v4l2/v4l2.c:84
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:206
@@ -9024,9 +9020,9 @@ msgstr "v4l2ドライバ制御"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "カンマ区切りでv4l2ドライバ制御の値リストを括弧{}で括って指定します。(例: "
 "{video_bitrate=6000000,audio_crc=0,stream_type=3} ) 使用可能な制御を表示する"
@@ -9599,14 +9595,12 @@ msgid "SRT stream output"
 msgstr "SRTストリーム出力"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "RIST最大パケットサイズ (バイト)"
+msgstr "SRT最大ペイロードサイズ (バイト)"
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "RIST最大パケットサイズ (バイト)"
+msgstr "SRT最大帯域幅 (バイト)"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11544,13 +11538,12 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr "タイトルのデコードに使用される最大スレッド数, デフォルトは0:自動"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "すべてのファイル"
+msgstr "すべてのレイヤー"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
-msgstr ""
+msgstr "すべてのレイヤーを表示するかどうか、デフォルトは表示しない"
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
@@ -11615,8 +11608,8 @@ msgstr "サブピクチャーの位置"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "ビデオ上のサブピクチャーの位置を指定します。(0:中央, 1:左, 2:右, 4:上, 8:下, "
 "これらを組み合わせることも可能です。例えば、6=右上)"
@@ -12382,10 +12375,10 @@ msgstr "レート制御の正確性"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "'avbr' (平均可変ビットレート)メソッドの許容範囲をパーセンテージで指定します。"
 "(例えば、800 kbpsの10%の場合、エンコーダーは730kbpsから880kbpsの範囲で処理す"
@@ -13635,7 +13628,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -17597,7 +17589,7 @@ msgstr "ヘルプ"
 
 #: modules/gui/macosx/VLCMainMenu.m:489
 msgid "VLC media player Help..."
-msgstr "VLCヘルプ"
+msgstr "VLCメディアプレイヤーのヘルプ"
 
 #: modules/gui/macosx/VLCMainMenu.m:491
 msgid "Online Documentation..."
@@ -18043,9 +18035,8 @@ msgstr "折り畳む"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "プレイリストを保存"
+msgstr "プレイリストをシャッフル"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -21749,13 +21740,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "重要でないエラーと警告ダイアログを表示"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "ソフトウェアモードの有効化"
+msgstr "ダークモードを有効化"
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
-msgstr ""
+msgstr "スタイルにダークテーマを適用"
 
 #: modules/gui/qt/qt.cpp:127
 msgid "Activate the updates availability notification"
@@ -22090,19 +22080,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "画像のガンマを0.01～10の範囲で設定します。デフォルトは1です。"
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "ステレオエンハンサー"
+msgstr "AMD VQエンハンサー"
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "フレームレート (&m)"
+msgstr "AMDフレームレートダブラー"
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "サイドバーを表示"
+msgstr "インジケーターを表示"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -23610,7 +23597,7 @@ msgstr "不明なビデオ"
 
 #: modules/mux/avi.c:55
 msgid "Subject"
-msgstr "題名"
+msgstr "タイトル"
 
 #: modules/mux/avi.c:56
 msgid "Encoder"
@@ -24172,9 +24159,9 @@ msgid ""
 "This enables actual parsing of the announces by the SAP module. Otherwise, "
 "all announcements are parsed by the \"live555\" (RTP/RTSP) module."
 msgstr ""
-"SAMPモジュールによるアナウンスの解析を有効にします。それ以外の場合、"
-"\"live555\"（RTP/RTSP)モジュールによってすべてのアナウンスメントが解析されま"
-"す。"
+"SAMPモジュールによるアナウンスの解析を有効にします。それ以外の場"
+"合、\"live555\"（RTP/RTSP)モジュールによってすべてのアナウンスメントが解析さ"
+"れます。"
 
 #: modules/services_discovery/sap.c:95
 msgid "SAP Strict mode"
@@ -27985,56 +27972,48 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Windows 8以降のバージョンに推奨されるビデオ出力"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "ビデオスケーリング"
+msgstr "ビデオアップスケーリングモード"
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "ビデオ中の色を1色選択します。"
+msgstr "ビデオのアップスケーリングモードを選択してください"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "ビット/サンプル"
+msgstr "リニアサンプラー"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "SoXリサンプラー"
+msgstr "ポイントサンプラー"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "ビデオコーデック"
+msgstr "ビデオプロセッサー"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "解像度"
+msgstr "スーパー解像度"
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "出力モジュール"
+msgstr "HDRの出力モード"
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
-msgstr ""
+msgstr "ソースがSDRでもHDR出力を使用する"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Never out HDR"
-msgstr ""
+msgstr "HDR出力しない"
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "常に手前に表示"
+msgstr "常にHDR出力する"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
-msgstr ""
+msgstr "SDRからHDRを生成する"
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
@@ -29058,7 +29037,7 @@ msgid ""
 "web service to generate this QR code."
 msgstr ""
 "VLCはモバイル版のウェブインターフェイスにリンクするQRコードを表示することがで"
-"きます。お使いのVLCメディアプレーヤーインスタンスのウェブインターフェイスの"
+"きます。お使いのVLCメディアプレイヤーインスタンスのウェブインターフェイスの"
 "ウェブアドレスは、このQRコードを生成するためにインターネット経由でGoogle "
 "Image Chartsウェブサービスに送信されます。\n"
 "\n"
@@ -29147,24 +29126,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "フィンガープリント (&F)"
+msgstr "オーディオフィンガープリント"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "ストリーミング方法を選択してください"
+msgstr "一致するIDを選択してください"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "フィンガープリントトラック (Acoustidベース)"
+msgstr "フィンガープリントが見つかりません"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "フィンガープリント (&F)"
+msgstr "フィンガープリントトラック..."
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29407,9 +29382,8 @@ msgid "Menus"
 msgstr "メニュー"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "サンプリングレート (&m)"
+msgstr "フレームレート (&m)"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29682,9 +29656,8 @@ msgid "Auto raising the interface:"
 msgstr "インターフェースを手前に表示:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "スキン化されたプレイリストの使用"
+msgstr "ダークパレットを使用"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -29999,21 +29972,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "メディアマネージャーリスト"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP チャンネルリスト"
-
-#~ msgid "Master List"
-#~ msgstr "マスターリスト"
-
-#~ msgid "Server List"
-#~ msgstr "サーバーリスト"
-
-#~ msgid "Custom List"
-#~ msgstr "カスタムリスト"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "SRTチャンクサイズ (バイト)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "暗号キーの長さ(バイト)"

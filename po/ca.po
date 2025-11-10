@@ -25,11 +25,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Joan Monguillot <jmonguillot@gmail.com>, 2023\n"
+"Last-Translator: Joan Monguillot <jmonguillot@gmail.com>, 2025\n"
 "Language-Team: Catalan (https://app.transifex.com/yaron/teams/16553/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -602,21 +602,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -631,26 +631,25 @@ msgstr ""
 "un nou usuari del reproductor VLC, llegiu el fitxer <br><a href=\"http://"
 "wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introducció a VLC "
 "media player</em></a>.</p><p>Trobareu informació sobre com utilitzar el "
-"reproductor al fitxer<br>«<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>Com reproduir arxius amb VLC media player</"
-"em></a>».</p><p>Per obtenir informació sobre les tasques com desar, "
-"transcodificar, convertir, multiplexar, codificar i transmetre, trobareu "
-"informació útil a l'arxiu <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">Streaming Documentation</a>.</p><p>Si teniu "
-"problemes amb la terminologia, podeu consultar la <a href=\"http://"
-"wiki.videolan.org/Knowledge_Base\">base de coneixement</a>.</p><p>Per "
-"entendre les tecles de drecera principals podeu llegir la pàgina de <a "
-"href=\"http://wiki.videolan.org/Hotkeys\">dreceres</a>.</p><h3>Ajuda</"
-"h3><p>Abans de formular una pregunta, consulteu l'apartat de preguntes "
-"freqüents, <a href=\"http://wiki.videolan.org/"
-"Frequently_Asked_Questions\">FAQ</a>.</p><p>podeu obtenir (o donar) ajuda "
-"als <a href=\"http://forum.videolan.org\">Fòrums</a>, les <a href=\"http://"
-"www.videolan.org/vlc/lists.html\"> llistes de correu</a> o el nostre canal "
-"IRC (<a href=\"http://www.videolan.org/webirc/\"><em>#videolan</em></a> a "
-"irc.freenode.net ).</p><h3>Contribució al projecte</h3><p>Podeu ajudar al "
-"projecte de VideoLAN si invertiu una part del vostre temps a ajudar a la "
-"comunitat, dissenyar aparences, traduir documentació, fer proves o "
-"programar. Podeu també fer un donatiu i donar material per a ajudar-nos. "
+"reproductor al fitxer<br>«<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>Com reproduir arxius amb VLC media player</em></a>».</"
+"p><p>Per obtenir informació sobre les tasques com desar, transcodificar, "
+"convertir, multiplexar, codificar i transmetre, trobareu informació útil a "
+"l'arxiu <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">Streaming Documentation</a>.</p><p>Si teniu problemes amb "
+"la terminologia, podeu consultar la <a href=\"http://wiki.videolan.org/"
+"Knowledge_Base\">base de coneixement</a>.</p><p>Per entendre les tecles de "
+"drecera principals podeu llegir la pàgina de <a href=\"http://wiki.videolan."
+"org/Hotkeys\">dreceres</a>.</p><h3>Ajuda</h3><p>Abans de formular una "
+"pregunta, consulteu l'apartat de preguntes freqüents, <a href=\"http://wiki."
+"videolan.org/Frequently_Asked_Questions\">FAQ</a>.</p><p>podeu obtenir (o "
+"donar) ajuda als <a href=\"http://forum.videolan.org\">Fòrums</a>, les <a "
+"href=\"http://www.videolan.org/vlc/lists.html\"> llistes de correu</a> o el "
+"nostre canal IRC (<a href=\"http://www.videolan.org/webirc/\"><em>#videolan</"
+"em></a> a irc.freenode.net ).</p><h3>Contribució al projecte</h3><p>Podeu "
+"ajudar al projecte de VideoLAN si invertiu una part del vostre temps a "
+"ajudar a la comunitat, dissenyar aparences, traduir documentació, fer proves "
+"o programar. Podeu també fer un donatiu i donar material per a ajudar-nos. "
 "Evidentment també podeu ajudar <b>amb la promoció</b> del reproductor VLC.</"
 "p></body></html>"
 
@@ -2367,8 +2366,8 @@ msgstr "Relació d'aspecte de la font"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Aquesta opció permet forçar la relació d'aspecte de la font. Per exemple, "
@@ -3290,9 +3289,8 @@ msgstr "Servidor intermediari HTTP"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "La forma per a utilitzar l'intermediari de l'HTTP és http://"
 "[user@]elmeuservidor.elmeudomini:elmeuport/. Si no s'especifica res, "
@@ -4024,15 +4022,14 @@ msgstr ""
 
 #: src/libvlc-module.c:1193
 msgid "Use media library"
-msgstr "Empra la biblioteca multimèdia"
+msgstr "Empra la mediateca"
 
 #: src/libvlc-module.c:1195
 msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
 msgstr ""
-"La biblioteca multimèdia es desa i es torna a carregar cada vegada que "
-"s'inicia el VLC."
+"La mediateca es desa i es torna a carregar cada vegada que s'inicia el VLC."
 
 #: src/libvlc-module.c:1198 modules/gui/qt/ui/sprefs_interface.h:555
 msgid "Display playlist tree"
@@ -5576,7 +5573,7 @@ msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
-"La nova versió s'ha descarregat correctament. Voleu tancar el VLC i "
+"La nova versió s'ha descarregat satisfactòriament. Voleu tancar el VLC i "
 "instal·lar-lo ara?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:200
@@ -5592,7 +5589,7 @@ msgstr "Actualitza el reproductor multimèdia VLC"
 #: modules/gui/macosx/VLCSidebarDataSource.m:70
 #: modules/gui/qt/components/playlist/selector.cpp:236
 msgid "Media Library"
-msgstr "Biblioteca multimèdia"
+msgstr "Mediateca"
 
 #: src/text/iso-639_def.h:40
 msgid "Afar"
@@ -6355,8 +6352,8 @@ msgstr "No s'ha trobat cap dispositiu d'entrada d'àudio"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "El vostre Mac no sembla estar equipat amb un dispositiu d'entrada d'àudio "
 "adient. Si us plau, reviseu els connectors i controladors."
@@ -6571,12 +6568,11 @@ msgstr "[cdda:][dispositiu][@[pista]]"
 
 #: modules/access/cdda.c:1022
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "Servidor Musicbrainz"
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Adreça del servidor CDDB que s'ha d'utilitzar."
+msgstr "Adreça del servidor musicbrainz que s'utilitzarà."
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -6890,7 +6886,7 @@ msgid ""
 "Show the properties dialog of the selected device before starting the stream."
 msgstr ""
 "Aquesta opció permet mostrar el diàleg de les propietats del dispositiu "
-"seleccionat abans de començar el stream."
+"seleccionat abans de començar l'estríming ."
 
 #: modules/access/dshow/dshow.cpp:159
 msgid "Tuner properties"
@@ -8107,8 +8103,8 @@ msgstr "Configuració de l'àudio"
 #: modules/access/linsys/linsys_sdi.c:79
 msgid "Allows you to set audio configuration (id=group,pair:id=group,pair...)."
 msgstr ""
-"Aquesta opció permet definir la configuració de l'àudio (id=grup, "
-"parell:id=grup, parell...)."
+"Aquesta opció permet definir la configuració de l'àudio (id=grup, parell:"
+"id=grup, parell...)."
 
 #: modules/access/linsys/linsys_hdsdi.c:89
 msgid "HD-SDI Input"
@@ -8607,11 +8603,11 @@ msgstr "Mida de la memòria intermèdia (bytes) de recepció de l'UDP"
 
 #: modules/access/satip.c:63
 msgid "Request multicast stream"
-msgstr "Sol·liciti el stream de multidifusió"
+msgstr "Sol·licitar l'estríming de multidifusió"
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr "Sol·licitar al servidor que enviï el stream com multidifusió"
+msgstr "Sol·licitar al servidor que enviï l'estríming com multidifusió"
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
@@ -8879,8 +8875,8 @@ msgstr "SMB requereix autenticació"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "L'ordinador (%s)al qual intentes connectar-te requereix autenticació.\n"
 "Si us plau, proporcioni un nom d'usuari (idealment un nom de domini usant el "
@@ -8904,12 +8900,11 @@ msgstr "Latència del SRT (ms)"
 
 #: modules/access/srt.c:440 modules/access_output/srt.c:468
 msgid "Password for stream encryption"
-msgstr "Contrasenya per a la codificació del stream"
+msgstr "Contrasenya per a la codificació de l'estríming"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Sortida de stream SRT"
+msgstr "ID de l'estríming SRT"
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9361,9 +9356,9 @@ msgstr "Controls del controlador del v4l2"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "Estableixi els controls del controlador v4l2 als valors especificats usant "
 "una llista separada per comes, i entre claus (per exemple: "
@@ -9640,7 +9635,7 @@ msgstr "Sortida de flux del fitxer"
 msgid "Username that will be requested to access the stream."
 msgstr ""
 "Aquesta opció us permet determinar el nom d'usuari que necessitareu per "
-"accedir al stream"
+"accedir a l'estríming."
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9897,11 +9892,12 @@ msgstr "URL amb informació sobre el flux o el vostre canal."
 
 #: modules/access_output/shout.c:93
 msgid "Bitrate information of the transcoded stream."
-msgstr "Informació de la taxa de bits del stream transcodificada."
+msgstr "Informació de la taxa de bits de l'estríming transcodificat."
 
 #: modules/access_output/shout.c:96
 msgid "Samplerate information of the transcoded stream."
-msgstr "Informació sobre la freqüència de mostratge del stream transcodificat."
+msgstr ""
+"Informació sobre la freqüència de mostratge de l'estríming transcodificat."
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
@@ -9909,7 +9905,7 @@ msgstr "Nombre de canals"
 
 #: modules/access_output/shout.c:99
 msgid "Number of channels information of the transcoded stream."
-msgstr "Informació sobre el nombre de canals del stream transcodificat."
+msgstr "Informació sobre el nombre de canals de l'estríming transcodificat."
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
@@ -9918,7 +9914,7 @@ msgstr "Qualitat de l'Ogg Vorbis"
 #: modules/access_output/shout.c:102
 msgid "Ogg Vorbis Quality information of the transcoded stream."
 msgstr ""
-"Informació sobre la qualitat de l'Ogg Vorbis del stream transcodificat."
+"Informació sobre la qualitat de l'Ogg Vorbis de l'estríming transcodificat."
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
@@ -9941,17 +9937,15 @@ msgstr "Sortida IceCAST"
 
 #: modules/access_output/srt.c:458
 msgid "SRT stream output"
-msgstr "Sortida de stream SRT"
+msgstr "Sortida de l'estríming SRT"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "Mida màxima del paquet RIST (bytes)"
+msgstr "Mida màxima de càrrega útil de SRT (bytes)"
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "Mida màxima del paquet RIST (bytes)"
+msgstr "Sostre d'amplada de banda màxima de SRT (bytes)"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11932,13 +11926,12 @@ msgstr ""
 "defecte 0=automàtic"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Tots els fitxers"
+msgstr "Totes les capes"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
-msgstr ""
+msgstr "Si s'han de mostrar o no totes les capes espacials, per defecte fals"
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
@@ -12003,8 +11996,8 @@ msgstr "Posició de les subimatges"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Aquesta opció permet forçar la posició de la subimatge al vídeo (0=centre, "
 "1=esquerra, 2=dreta, 4=superior, 8=inferior, també podeu utilitzar "
@@ -12218,9 +12211,9 @@ msgid ""
 "attributes, in the form of GstCaps (Stream Capabilities) to decoder."
 msgstr ""
 "DecodeBin és un element contenidor, que pot afegir i gestionar múltiples "
-"elements. A més afegeix analitzadors d'stream elementals que poden "
+"elements. A més afegeix analitzadors d'estríming elementals que poden "
 "proporcionar més informació, com el perfil del códec, el nivell i altres "
-"atributs, en forma de GstCaps (Capacitats d'stream) per a descodificar."
+"atributs, en forma de GstCaps (Capacitats d'estríming) per a descodificar."
 
 #: modules/codec/gstreamer/gstdecode.c:93
 msgid "GStreamer Based Decoder"
@@ -12601,7 +12594,7 @@ msgstr "Codificador de vídeo PNG"
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
-msgstr "Habilita el mode de programari"
+msgstr "Activa el mode de programari"
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -12697,7 +12690,7 @@ msgstr ""
 "MPEG2, IdrInterval defineix l'interval de la seqüència capçalera en termes "
 "de fotogrames-I. Si IdrInterval=N, l'SDK inserta la capçalera de seqüència "
 "abans de cada fotograma-I Nth. Si IdrInterval=0 (per defecte), l'SDK "
-"insereix la capçalera de seqüència una vegada al principi de l'stream."
+"insereix la capçalera de seqüència una vegada al principi de l'estríming."
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
@@ -12781,10 +12774,10 @@ msgstr "Precisió del RateControl"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "Tolerància en percentatge del mètode «avbr» (variable mitjana de taxa de "
 "bits). (Per exemple, 10 amb una taxa de bits de 800 kpbs farà que el "
@@ -14063,7 +14056,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15718,7 +15710,7 @@ msgstr "Amplada de banda fixa en KiB/s"
 
 #: modules/demux/adaptive/adaptive.cpp:73
 msgid "Preferred bandwidth for non adaptive streams"
-msgstr "Amplada de banda preferida per als streams no ajustables"
+msgstr "Amplada de banda preferida per als estrímings no ajustables"
 
 #: modules/demux/adaptive/adaptive.cpp:75
 msgid "Live Playback delay (ms)"
@@ -16435,8 +16427,8 @@ msgstr "PMT addicional"
 #: modules/demux/mpeg/ts.c:86
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
-"Aquesta opció permet especificar un pmt addicional "
-"(pmt_oid=pid:stream_type[,...])."
+"Aquesta opció permet especificar un pmt addicional (pmt_oid=pid:"
+"stream_type[,...])."
 
 #: modules/demux/mpeg/ts.c:88
 msgid "Set id of ES to PID"
@@ -16510,11 +16502,11 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:126
 msgid "Trust in-stream PCR"
-msgstr "Confia en el PCR en streaming"
+msgstr "Confia en el PCR en estríming"
 
 #: modules/demux/mpeg/ts.c:127
 msgid "Use the stream PCR as a reference."
-msgstr "Usa el PCR en stream com a una referència."
+msgstr "Usa el PCR en estríming com a referència."
 
 #: modules/demux/mpeg/ts.c:134 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
@@ -16542,7 +16534,7 @@ msgstr "Descripció en àudio per als discapacitats visuals"
 
 #: modules/demux/mpeg/ts_psi.c:424
 msgid "Clean audio for the hearing impaired"
-msgstr "Àudio net per als discapacitats auditius"
+msgstr "Àudio net per a persones amb discapacitat auditiva"
 
 #: modules/demux/mpeg/ts_psi.c:425
 msgid "Spoken subtitles for the visually impaired"
@@ -16567,11 +16559,11 @@ msgstr "Teletext: Planificació del programa"
 
 #: modules/demux/mpeg/ts_psi.c:611
 msgid "Teletext subtitles: hearing impaired"
-msgstr "Subtítols de teletext: Per a persones amb problemes auditius"
+msgstr "Subtítols de teletext: Per a persones amb discapacitat auditiva"
 
 #: modules/demux/mpeg/ts_psi.c:828
 msgid "DVB subtitles: hearing impaired"
-msgstr "Subtítols DVB: Per a persones amb problemes auditius"
+msgstr "Subtítols DVB: Per a persones amb discapacitat auditiva"
 
 #: modules/demux/mpeg/ts_psi.c:1337
 msgid "clean effects"
@@ -16579,7 +16571,7 @@ msgstr "neteja els efectes"
 
 #: modules/demux/mpeg/ts_psi.c:1338
 msgid "hearing impaired"
-msgstr "problemes auditius"
+msgstr "discapacitat auditiva"
 
 #: modules/demux/mpeg/ts_psi.c:1339
 msgid "visual impaired commentary"
@@ -18543,9 +18535,8 @@ msgstr "Redueix-ho tot"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Desa la llista de reproducció"
+msgstr "Llista de reproducció aleatòria"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -19026,7 +19017,8 @@ msgstr ""
 "reproducció es buidarà i qualsevol reproducció, flux en xarxa o activitats "
 "de transcodificació s'aturaran de forma immediata.\n"
 "\n"
-"Això no afectarà la biblioteca multimèdia.\n"
+"Això no afectarà la mediateca.\n"
+"\n"
 "Esteu segur que voleu continuar?"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1108
@@ -20979,8 +20971,8 @@ msgstr "Desa el fitxer..."
 msgid ""
 "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 msgstr ""
-"Contenidors (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv "
-"*.webm)"
+"Contenidors (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *."
+"webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:185
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -22276,13 +22268,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Mostra errors i diàlegs d'avís poc importants"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Habilita el mode de programari"
+msgstr "Activa el mode fosc"
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
-msgstr ""
+msgstr "Aplica un tema fosc a l'estil."
 
 #: modules/gui/qt/qt.cpp:127
 msgid "Activate the updates availability notification"
@@ -22632,19 +22623,16 @@ msgstr ""
 "1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Potenciador de l'estèreo"
+msgstr "Potenciador AMD VQ"
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Velocitat dels fotogra&mes"
+msgstr "Duplicador de freqüència de fotogrames d'AMD"
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Mostra la barra lateral"
+msgstr "Mostra l'indicador"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -28628,56 +28616,48 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Sortida de vídeo recomanada per al Windows 8 i versions posteriors"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Escalat del vídeo"
+msgstr "Mode d'augment d'escala de vídeo"
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Seleccioneu un color al vídeo"
+msgstr "Seleccioneu el mode d'augment d'escala de vídeo."
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bits per mostra"
+msgstr "Mostrejador lineal"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Remostrador SoX"
+msgstr "Mostrejador puntual"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Còdecs de vídeo"
+msgstr "Processador de vídeo"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Resolució"
+msgstr "Superresolució"
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Mòduls de sortida"
+msgstr "Mode de sortida HDR"
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
-msgstr ""
+msgstr "Utilitzeu la sortida HDR fins i tot si la font és SDR."
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Never out HDR"
-msgstr ""
+msgstr "Mai surt HDR"
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Sempre visible"
+msgstr "Sempre surt HDR"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
-msgstr ""
+msgstr "Genera HDR a partir de SDR"
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
@@ -29834,24 +29814,20 @@ msgid "0.00 dB"
 msgstr "0,00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Empremta dactilar"
+msgstr "Empremta digital d'àudio"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Seleccioneu el mètode de retransmissió"
+msgstr "Seleccioneu una identitat coincident"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Empremta digital de pista (basada en Acoustid)"
+msgstr "No s'ha trobat cap empremta digital"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Empremta dactilar"
+msgstr "Fent l'empremta digital de la pista..."
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -30097,9 +30073,8 @@ msgid "Menus"
 msgstr "Menús"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Freqüència de &mostreig"
+msgstr "Velocitat dels fotogra&mes"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -30374,9 +30349,8 @@ msgid "Auto raising the interface:"
 msgstr "Activació automàtica de la interfície:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Empra una llista de reproducció amb aparença"
+msgstr "Utilitzeu una paleta fosca"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30691,21 +30665,3 @@ msgstr "AAAA;"
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Llista de gestió d'elements multimèdia"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "Llista de canals SAT>IP"
-
-#~ msgid "Master List"
-#~ msgstr "Llista principal"
-
-#~ msgid "Server List"
-#~ msgstr "Llista de servidors"
-
-#~ msgid "Custom List"
-#~ msgstr "Llista personalitzada"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "Mida del tros de SRT (bytes)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Longitud de la clau de criptografia en bytes"

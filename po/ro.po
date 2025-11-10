@@ -21,7 +21,7 @@
 # Simona Iacob <s@zp1.net>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
@@ -598,21 +598,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -624,29 +624,29 @@ msgstr ""
 "charset=utf-8\" /></head><body><h2>Bun venit la ajutorul VLC media player</"
 "h2><h3>Documentație</h3><p>Poți găsi documentație (în limba engleză) pe "
 "saitul <a href=\"http://wiki.videolan.org\">wiki</a> al VideoLAN.</p><p>Dacă "
-"ești nou-venit la VLC media player, citește<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introducere în VLC "
-"media player</em></a>.</p><p>Unele informații despre cum să utilizezi "
-"playerul le vei găsi în doumentul<br><a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>Cum să redai fișiere cu VLC media player</"
-"em></a>.</p><p>Pentru toate sarcinile de salvare, conversie, transcodare, "
-"codare, multiplexare și streaming, ar trebui să găsești informații utile în "
-"<a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">documentația pentru streaming</a>.</"
-"p><p>Dacă ești nesigur în privința terminologiei, consultă <a href=\"http://"
-"wiki.videolan.org/Knowledge_Base\">baza de cunoștințe</a>.</p><p>Pentru a "
-"înțelege scurtăturile principale de tastatură, citește pagina de <a "
-"href=\"http://wiki.videolan.org/Hotkeys\">scurtături</a>.</p><h3>Ajutor</"
-"h3><p>Înainte de a pune orice întrebare, uită-te peste <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>După aceea ai putea cere "
-"(și oferi) ajutor pe <a href=\"http://forum.videolan.org\">forumuri</a>, <a "
-"href=\"http://www.videolan.org/vlc/lists.html\">liste de discuții</a>, sau "
-"pe canalul nostru de IRC ( <em>#videolan</em> pe irc.freenode.net).</"
-"p><h3>Contribuie la proiect</h3><p>Poți ajuta proiectul VideoLAN oferind "
-"câte ceva din timpul tău pentru a ajuta comunitatea, pentru a dezvolta "
-"tematici, pentru a traduce documente, pentru a testa și a coda. Poți de "
-"asemenea să oferi fonduri și materiale pentru a ne ajuta. Și desigur, poți "
-"<b>promova</b> VLC media player.</p></body></html>"
+"ești nou-venit la VLC media player, citește<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introducere în VLC media "
+"player</em></a>.</p><p>Unele informații despre cum să utilizezi playerul le "
+"vei găsi în doumentul<br><a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>Cum să redai fișiere cu VLC media player</em></a>.</"
+"p><p>Pentru toate sarcinile de salvare, conversie, transcodare, codare, "
+"multiplexare și streaming, ar trebui să găsești informații utile în <a "
+"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">documentația "
+"pentru streaming</a>.</p><p>Dacă ești nesigur în privința terminologiei, "
+"consultă <a href=\"http://wiki.videolan.org/Knowledge_Base\">baza de "
+"cunoștințe</a>.</p><p>Pentru a înțelege scurtăturile principale de "
+"tastatură, citește pagina de <a href=\"http://wiki.videolan.org/"
+"Hotkeys\">scurtături</a>.</p><h3>Ajutor</h3><p>Înainte de a pune orice "
+"întrebare, uită-te peste <a href=\"http://www.videolan.org/support/faq."
+"html\">FAQ</a>.</p><p>După aceea ai putea cere (și oferi) ajutor pe <a "
+"href=\"http://forum.videolan.org\">forumuri</a>, <a href=\"http://www."
+"videolan.org/vlc/lists.html\">liste de discuții</a>, sau pe canalul nostru "
+"de IRC ( <em>#videolan</em> pe irc.freenode.net).</p><h3>Contribuie la "
+"proiect</h3><p>Poți ajuta proiectul VideoLAN oferind câte ceva din timpul "
+"tău pentru a ajuta comunitatea, pentru a dezvolta tematici, pentru a traduce "
+"documente, pentru a testa și a coda. Poți de asemenea să oferi fonduri și "
+"materiale pentru a ne ajuta. Și desigur, poți <b>promova</b> VLC media "
+"player.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -2350,8 +2350,8 @@ msgstr "Raport de aspect al sursei"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Forțează raportul de aspect al sursei. De exemplu, unele DVD-uri pretind a "
@@ -3256,9 +3256,8 @@ msgstr "Proxy HTTP"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "Proxy-ul HTTP de folosit. Trebuie să fie de forma http://"
 "[utilizator@]proxyulmeu.domeniulmeu:portulmeu/ ; dacă este gol, va fi "
@@ -6236,8 +6235,8 @@ msgstr "Niciun dispozitiv de intrare audio găsit"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Computerul Mac nu pare să fie echipat cu un dispozitiv de intrare audio "
 "adecvat. Verificați conectorii și driverele."
@@ -6453,9 +6452,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Adresa serverului CDDB folosit."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8724,8 +8722,8 @@ msgstr "Este necesară autentificarea SMB"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "Calculatorul (%s) la care încercați să vă conectați necesită autentificare.\n"
 "Vă rugăm să furnizați un nume de utilizator (în mod ideal, un nume de "
@@ -8752,9 +8750,8 @@ msgid "Password for stream encryption"
 msgstr "Parola pentru criptarea fluxului"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Flux de ieșire SRT"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9204,9 +9201,9 @@ msgstr "Controale driver v4l2"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "Setează comenzile driverului v4l2 la valorile specificate utilizând o listă "
 "separată prin virgulă, opțional încapsulată de acolade (de exemplu: "
@@ -9787,14 +9784,12 @@ msgid "SRT stream output"
 msgstr "Flux de ieșire SRT"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "Dimensiunea maximă a pachetului RIST (bytes)"
+msgstr ""
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "Dimensiunea maximă a pachetului RIST (bytes)"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11763,9 +11758,8 @@ msgstr ""
 "0=auto"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Toate fișierele"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11834,8 +11828,8 @@ msgstr "Poziție subimagine"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Puteți forța poziția subimaginii pe imaginea video (0=centru, 1=stânga, "
 "2=dreapta, 4=sus, 8=jos, puteți de asemenea să folosiți combinații ale "
@@ -12613,10 +12607,10 @@ msgstr "Accuracy of RateControl"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "Toleranța în procente a metodei \"avbr\" (Average Variable BitRate). (de "
 "exemplu, 10 cu un bitrate de 800 kbps înseamnă că encoderul încearcă să nu "
@@ -13891,7 +13885,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16265,8 +16258,8 @@ msgstr "PMT suplimentar"
 #: modules/demux/mpeg/ts.c:86
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
-"Permite unui utilizator să specifice un pmt suplimentar "
-"(pmt_pid=pid:tip_flux[,...])."
+"Permite unui utilizator să specifice un pmt suplimentar (pmt_pid=pid:"
+"tip_flux[,...])."
 
 #: modules/demux/mpeg/ts.c:88
 msgid "Set id of ES to PID"
@@ -16860,8 +16853,8 @@ msgid ""
 "decoration: underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC media player este un lector media gratuit și cu sursă liberă, codor, "
-"și streamer făcut de voluntarii din comunitatea <a href=\"https://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"și streamer făcut de voluntarii din comunitatea <a href=\"https://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>.</p><p>VLC folosește codorii săi interni, "
 "funcționează pe toate platformele populare, și poate citi aproape toate "
 "fișierele, CD-uri, DVD-uri, fluxuri de rețea, plăci de captură și alte "
@@ -18368,9 +18361,8 @@ msgstr "Restrânge totul"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Salvează lista de redare"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -21047,8 +21039,8 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC media player este un player media gratuit și cu sursă liberă, codor, "
-"și streamer făcut de voluntarii din comunitatea <a href=\"http://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"și streamer făcut de voluntarii din comunitatea <a href=\"http://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>.</p><p>VLC folosește codorii săi interni, "
 "funcționează pe toate platformele populare, și poate citi aproape toate "
 "fișierele, CD-uri, DVD-uri, fluxuri de rețea, plăci de captură și alte "
@@ -22084,9 +22076,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Afișarea dialogurilor de eroare și avertismente neimportante"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Activează modul sofware"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -22431,19 +22422,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Stabiliți gama imaginii, între 0,01 și 10. Implicit este 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Intensificator Stereo"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Rata de fra&me"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Afișați bara laterală"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22925,8 +22913,8 @@ msgid ""
 msgstr ""
 "Acceptă comenzi din această sursă. CLI folosește în mod implicit stdin "
 "(\"*console\"), dar se poate conecta și la un socket TCP simplu "
-"(\"localhost:4212\") sau poate folosi protocolul telnet (\"telnet://"
-"0.0.0.0:4212\")."
+"(\"localhost:4212\") sau poate folosi protocolul telnet "
+"(\"telnet://0.0.0.0:4212\")."
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
@@ -28401,39 +28389,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Ieșire video recomandată pentru Windows 8 și versiunile ulterioare"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Scalare video"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Selectează o culoare în video"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Biți per eșantion"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Reeșantionare SoX"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Codori video"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Rezoluție"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Module de ieșire"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -28444,9 +28425,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Întotdeauna deasupra"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -29585,24 +29565,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Amprentă digitală"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Selectați metoda de streaming"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Amprente de traseu (bazate pe Acoustid)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Amprentă digitală"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29845,9 +29821,8 @@ msgid "Menus"
 msgstr "Meniuri"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Rata Sa&mple"
+msgstr "Rata de fra&me"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -30119,9 +30094,8 @@ msgid "Auto raising the interface:"
 msgstr "Ridicarea automată a interfeței:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Folosește o listă de redare cu tematică"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30436,21 +30410,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Lista gestionarului media"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP lista de canale"
-
-#~ msgid "Master List"
-#~ msgstr "Lista principală"
-
-#~ msgid "Server List"
-#~ msgstr "Lista de servere"
-
-#~ msgid "Custom List"
-#~ msgstr "Lista personalizată"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "Dimensiunea pachetului SRT (octeți)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Lungimea cheii criptografice în octeți"

@@ -16,7 +16,7 @@
 # Sendoa Sojo <sendoasojo@gmail.com>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
@@ -597,21 +597,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -622,34 +622,33 @@ msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>Ongi etorri VLC multimedia-"
 "erreproduzigailuaren laguntzara</h2><h3>Dokumentazioa</h3><p>VLCren "
-"dokumentazioa aurkituko duzu VideoLAN-en <a href=\"http://"
-"wiki.videolan.org\">wiki</a> web-orrian.</p><p>VLC multimedia-"
-"erreproduzigailua lehenengoz erabiltzen baduzu, arren irakur ezazu <br><a "
-"href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>VLC "
-"multimedia-errepdoduzigailuari buruzko sarrera</em></a>.</"
-"p><p>Erreproduzigailua erabiltzeko moduari buruzko informazioa aurkituko "
-"duzu <br>\"<a href=\"http://wiki.videolan.org/"
+"dokumentazioa aurkituko duzu VideoLAN-en <a href=\"http://wiki.videolan."
+"org\">wiki</a> web-orrian.</p><p>VLC multimedia-erreproduzigailua lehenengoz "
+"erabiltzen baduzu, arren irakur ezazu <br><a href=\"http://wiki.videolan.org/"
+"Documentation:VLC_for_dummies\"><em>VLC multimedia-errepdoduzigailuari "
+"buruzko sarrera</em></a>.</p><p>Erreproduzigailua erabiltzeko moduari "
+"buruzko informazioa aurkituko duzu <br>\"<a href=\"http://wiki.videolan.org/"
 "Documentation:Play_HowTo\"><em>Nola erreproduzitu fitxategiak VLC multimedia-"
 "erreproduzigailuarekin</em></a>\" dokumentuan.</p><p>Gordetzeari, "
 "bihurtzeari, transkodeketari, kodeketari, multiplexatzeari eta modu "
 "jarraituan transmititzeari buruzko zeregin guztiei dagokienez, informazio "
-"erabilgarria aurkituko duzu <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">Transmisio jarraituei buruzko "
-"dokumentazioan</a>.</p><p>Terminologia ezagutzen ez baduzu, kontsulta ezazu "
-"<a href=\"http://wiki.videolan.org/Knowledge_Base\">jakintza-basea</a>.</"
-"p><p>Laster-tekla nagusiak ezagutzeko, irakurri <a href=\"http://"
-"wiki.videolan.org/Hotkeys\">laster-teklak</a> orria.</p><h3>Laguntza</"
-"h3><p>Galdera bat egin aurretik, mesedez kontsultatu <a href=\"http://"
-"www.videolan.org/support/faq.html\">Maiz egiten diren galderak</a>.</"
-"p><p>Ondoren, laguntza eskuratu (eta eskaini) ahal izango duzu <a "
-"href=\"http://forum.videolan.org\">foroetan</a>, <a href=\"http://"
-"www.videolan.org/vlc/lists.html\">posta-zerrendetan</a> edo gure IRC "
-"kanalean (<em>#videolan</em>, hemen: irc.freenode.net).</p><h3>Parte hartu "
-"proiektuan</h3><p>VideoLAN proiektuari zure denboraren zati bat eskain "
-"diezaiokezu komunitateari laguntzeko, azalak diseinatzeko, dokumentazioa "
-"itzultzeko, probak egiteko eta kodea sortzeko. Horrez gain, dirua eta "
-"materiala eman ditzakezu guri laguntzeko. Eta, noski, VLC multimedia-"
-"erreproduzigailuaren <b>publizitatea</b> egin dezakezu.</p></body></html>"
+"erabilgarria aurkituko duzu <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">Transmisio jarraituei buruzko dokumentazioan</a>.</"
+"p><p>Terminologia ezagutzen ez baduzu, kontsulta ezazu <a href=\"http://wiki."
+"videolan.org/Knowledge_Base\">jakintza-basea</a>.</p><p>Laster-tekla "
+"nagusiak ezagutzeko, irakurri <a href=\"http://wiki.videolan.org/"
+"Hotkeys\">laster-teklak</a> orria.</p><h3>Laguntza</h3><p>Galdera bat egin "
+"aurretik, mesedez kontsultatu <a href=\"http://www.videolan.org/support/faq."
+"html\">Maiz egiten diren galderak</a>.</p><p>Ondoren, laguntza eskuratu (eta "
+"eskaini) ahal izango duzu <a href=\"http://forum.videolan.org\">foroetan</"
+"a>, <a href=\"http://www.videolan.org/vlc/lists.html\">posta-zerrendetan</a> "
+"edo gure IRC kanalean (<em>#videolan</em>, hemen: irc.freenode.net).</"
+"p><h3>Parte hartu proiektuan</h3><p>VideoLAN proiektuari zure denboraren "
+"zati bat eskain diezaiokezu komunitateari laguntzeko, azalak diseinatzeko, "
+"dokumentazioa itzultzeko, probak egiteko eta kodea sortzeko. Horrez gain, "
+"dirua eta materiala eman ditzakezu guri laguntzeko. Eta, noski, VLC "
+"multimedia-erreproduzigailuaren <b>publizitatea</b> egin dezakezu.</p></"
+"body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -2359,8 +2358,8 @@ msgstr "Jatorrizko aspektu-erlazioa"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Honek jatorrizko aspektu-erlazioa behartzen du. Esate baterako, DVD batzuek "
@@ -2893,8 +2892,8 @@ msgid ""
 "{...}\""
 msgstr ""
 "Transmisio jarraitu baterako laster-marken zerrenda bat eskuz zehaztu "
-"dezakezu, forma honekin: \"{name=bookmark-name,time=optional-time-"
-"offset,bytes=optional-byte-offset},{...}\""
+"dezakezu, forma honekin: \"{name=bookmark-name,time=optional-time-offset,"
+"bytes=optional-byte-offset},{...}\""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -3270,9 +3269,8 @@ msgstr "HTTP proxya"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "Erabili beharreko HTTP proxyak forma hau eduki behar du: http://"
 "[erabiltzailea[:pasahitza]@]nireproxya.niredomeinua:nireataka/; hutsik "
@@ -6276,8 +6274,8 @@ msgstr "Ez da audio sarrera-gailurik aurkitu"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Ez dirudi Mac ordenagailuak audio sarrera-gailu egokirik duenik. Egiaztatu "
 "konektoreak eta kontrolatzaileak."
@@ -6491,9 +6489,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Erabili beharreko CDDB zerbitzariaren helbidea."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8008,8 +8005,8 @@ msgstr "Audio-konfigurazioa"
 #: modules/access/linsys/linsys_sdi.c:79
 msgid "Allows you to set audio configuration (id=group,pair:id=group,pair...)."
 msgstr ""
-"Audio-konfigurazioa ezartzea baimentzen dizu "
-"(id=taldea,parea:id=taldea,parea...)."
+"Audio-konfigurazioa ezartzea baimentzen dizu (id=taldea,parea:id=taldea,"
+"parea...)."
 
 #: modules/access/linsys/linsys_hdsdi.c:89
 msgid "HD-SDI Input"
@@ -8765,8 +8762,8 @@ msgstr "SMB autentifikazioa behar da"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "Konektatzen saiatzen ari zaren ordenagailuak (%s) autentifikazioa eskatzen "
 "du.\n"
@@ -8796,9 +8793,8 @@ msgid "Password for stream encryption"
 msgstr "Transmisio zifraturako pasahitza"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRT transmisio jarraituaren irteera"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9247,16 +9243,15 @@ msgstr "v4l2 kontrolatzaile-kontrolak"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "Ezarri zehaztutako balioak v4l2 kontrolatzailearen kontroletan; balio horiek "
 "komaz bereizitako zerrenda batean zehaztu behar dira eta, nahi izanez gero, "
-"kortxeteak erabiliz kapsulatu daitezke (adibidez: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). Erabilgarri dauden "
-"kontrolak zerrendatzeko, handitu xehetasun-maila (-vv) edo erabili v4l2-ctl "
-"aplikazioa."
+"kortxeteak erabiliz kapsulatu daitezke (adibidez: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). Erabilgarri dauden kontrolak zerrendatzeko, "
+"handitu xehetasun-maila (-vv) edo erabili v4l2-ctl aplikazioa."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9833,14 +9828,12 @@ msgid "SRT stream output"
 msgstr "SRT transmisio jarraituaren irteera"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "RIST paketearen gehienezko tamaina (byte)"
+msgstr ""
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "RIST paketearen gehienezko tamaina (byte)"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11806,9 +11799,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr "Lauzak deskodetzeko gehieneko hari kopurua, lehenetsia 0=auto"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Fitxategi guztiak"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11877,8 +11869,8 @@ msgstr "Azpiirudiaren posizioa"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Azpiirudiak bideoan duen posizioa zehaztu dezakezu (0=erdian, 1=ezkerrean, "
 "2=eskuinean, 4=goian, 8=behean; halaber, balio horiek konbina ditzakezu, "
@@ -12659,10 +12651,10 @@ msgstr "Zehaztasun emari-kontrola"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "Tolerantzia 'avbr'-rentzat (Average Variable BitRate), ehunekotan. (adib. 10 "
 "ezarrita 800 kbps-ko bit-emari batekin, kodetzailea saiatuko da ez joaten "
@@ -13937,7 +13929,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16316,8 +16307,8 @@ msgstr "PMT gehigarria"
 #: modules/demux/mpeg/ts.c:86
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
-"Erabiltzaile bati pmt gehigarri bat zehazteko aukera ematen dio "
-"(pmt_pid=pid:stream_type[,...])."
+"Erabiltzaile bati pmt gehigarri bat zehazteko aukera ematen dio (pmt_pid=pid:"
+"stream_type[,...])."
 
 #: modules/demux/mpeg/ts.c:88
 msgid "Set id of ES to PID"
@@ -16919,9 +16910,9 @@ msgstr ""
 "komunitateko boluntarioek egina.</p><p>VLC-k bere barruko kodekak erabiltzen "
 "ditu, plataforma ezagun guztietan lan egiten du eta fitxategi gehienak "
 "irakur ditzake, CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak "
-"eta beste multimedia formatu batzuk!</p><p><a href=\"https://"
-"www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">Lagundu eta kide bihurtu!</span></a>"
+"eta beste multimedia formatu batzuk!</p><p><a href=\"https://www.videolan."
+"org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Lagundu eta kide bihurtu!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -18421,9 +18412,8 @@ msgstr "Tolestu denak"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Gorde erreprodukzio-zerrenda"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -20864,8 +20854,8 @@ msgstr "Gorde fitxategia..."
 msgid ""
 "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 msgstr ""
-"Edukiontziak (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv "
-"*.webm)"
+"Edukiontziak (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *."
+"webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:185
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -22169,9 +22159,8 @@ msgstr ""
 "Erakutsi garrantzitsuak ez diren errore eta abisuen elkarrizketa-koadroak"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Gaitu software modua"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -22515,19 +22504,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Ezarri irudiaren gamma 0,01 eta 10 artean. Lehenespena 1 da."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Areagotzaile estereoa"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "&Marko-emaria"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Erakutsi alboko barra"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -23011,8 +22997,8 @@ msgid ""
 msgstr ""
 "Iturburu honetako komandoak onartzen ditu. CLI lehenetsiak stdin-rako "
 "(\"*console\"), baina batu daiteke ere TCP hartune batera "
-"(\"localhost:4212\") edo telnet protokoloa erabili (\"telnet://"
-"0.0.0.0:4212\")"
+"(\"localhost:4212\") edo telnet protokoloa erabili "
+"(\"telnet://0.0.0.0:4212\")"
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
@@ -26366,9 +26352,9 @@ msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
-"vlc sarrerako transmisio jarraituei entzuteko lortu behar den "
-"helbidea:ataka. Laguntzailearen ezarpena dst-rako, dst=lotu+'/'+bide-izena. "
-"'dst-parameter'-ek gainidatzi egiten du ezarpen hau."
+"vlc sarrerako transmisio jarraituei entzuteko lortu behar den helbidea:"
+"ataka. Laguntzailearen ezarpena dst-rako, dst=lotu+'/'+bide-izena. 'dst-"
+"parameter'-ek gainidatzi egiten du ezarpen hau."
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
@@ -28512,39 +28498,32 @@ msgstr ""
 "Windows 8-rako eta geroagoko bertsioetarako gomendatutako bideo-irteera"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Bideo-eskala"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Hautatu bideoko kolore bat"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bit lagineko"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "SoX birlagingailua"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Bideo-kodekak"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Bereizmena"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Irteera-moduluak"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -28555,9 +28534,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Beti gainean"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -29679,24 +29657,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Hatz-marka"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Aukeratu transmisio  metodoa"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Jarraitu hatz-marka (Acoustid-n oinarrituta)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Hatz-marka"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29941,9 +29915,8 @@ msgid "Menus"
 msgstr "Menuak"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "&Lagin-emaria"
+msgstr "&Marko-emaria"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -30215,9 +30188,8 @@ msgid "Auto raising the interface:"
 msgstr "Interfazea automatikoki azaleratzea:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Erabili erreprodukzio-zerrenda azalduna"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30532,21 +30504,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP kanalen zerrenda"
-
-#~ msgid "Master List"
-#~ msgstr "Zerrenda maisua"
-
-#~ msgid "Server List"
-#~ msgstr "Zerbitzarien zerrenda"
-
-#~ msgid "Custom List"
-#~ msgstr "Zerrenda pertsonalizatua"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "SRT zatiaren tamaina (byteak)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Zifratze-gakoaren luzera bytetan"

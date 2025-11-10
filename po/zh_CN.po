@@ -13,11 +13,11 @@
 # QWERT, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Dian Li <xslidian@gmail.com>, 2022\n"
+"Last-Translator: Dian Li (xslidian) <xslidian@gmail.com>, 2025\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/yaron/teams/16553/"
 "zh_CN/)\n"
 "Language: zh_CN\n"
@@ -565,21 +565,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -592,23 +592,22 @@ msgstr ""
 "档</h3><p>您可以在 VideoLAN 的 <a href=\"http://wiki.videolan.org\">wiki</a> "
 "网站上找到 VLC 的文档。</p><p>如果您是 VLC media player 的新手，请阅读<a "
 "href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>VLC "
-"media player 介绍</em></a>。</p><p>您可以在《<a href=\"http://"
-"wiki.videolan.org/Documentation:Play_HowTo\"><em>如何使用 VLC media player 播"
-"放文件</em></a>》找到一些如何使用播放器的信息。</p><p>如果您要完成保存、转"
-"换、转码、编码、混流或串流任务，可以在 <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">串流处理文档</a> 中找到有用的信息。</p><p>如"
-"果您不是十分明白术语，请查阅 <a href=\"http://wiki.videolan.org/"
-"Knowledge_Base\">知识库</a>。</p><p>要了解主要的快捷键，请阅读 <a "
-"href=\"http://wiki.videolan.org/Hotkeys\">快捷键</a> 页。</p><h3>帮助</h3><p>"
-"在提出任何问题之前，请您先自行参考 <a href=\"http://www.videolan.org/support/"
-"faq.html\">FAQ</a>。</p><p>在这以后您可以在 <a href=\"http://"
-"forum.videolan.org\">论坛</a>、<a href=\"http://www.videolan.org/vlc/"
-"lists.html\">邮件列表</a>或我们的 IRC 频道 (irc.freenode.net 上的 <a "
-"href=\"http://www.videolan.org/webirc/\"><em>#videolan</em></a>) 中获取 (或给"
-"予) 帮助。</p><h3>为此项目做贡献</h3><p>您可以奉献出您的一些时间，通过帮助社"
-"区、设计外观、翻译文档、测试、编写代码等方式帮助 VideoLAN 项目。您也可以为我"
-"们提供资金或材料。当然，您也可以 <b>推广</b> VLC media player。</p></body></"
-"html>"
+"media player 介绍</em></a>。</p><p>您可以在《<a href=\"http://wiki.videolan."
+"org/Documentation:Play_HowTo\"><em>如何使用 VLC media player 播放文件</em></"
+"a>》找到一些如何使用播放器的信息。</p><p>如果您要完成保存、转换、转码、编码、"
+"混流或串流任务，可以在 <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">串流处理文档</a> 中找到有用的信息。</p><p>如果您不是十分明"
+"白术语，请查阅 <a href=\"http://wiki.videolan.org/Knowledge_Base\">知识库</"
+"a>。</p><p>要了解主要的快捷键，请阅读 <a href=\"http://wiki.videolan.org/"
+"Hotkeys\">快捷键</a> 页。</p><h3>帮助</h3><p>在提出任何问题之前，请您先自行参"
+"考 <a href=\"http://www.videolan.org/support/faq.html\">FAQ</a>。</p><p>在这"
+"以后您可以在 <a href=\"http://forum.videolan.org\">论坛</a>、<a "
+"href=\"http://www.videolan.org/vlc/lists.html\">邮件列表</a>或我们的 IRC 频"
+"道 (irc.freenode.net 上的 <a href=\"http://www.videolan.org/webirc/"
+"\"><em>#videolan</em></a>) 中获取 (或给予) 帮助。</p><h3>为此项目做贡献</"
+"h3><p>您可以奉献出您的一些时间，通过帮助社区、设计外观、翻译文档、测试、编写"
+"代码等方式帮助 VideoLAN 项目。您也可以为我们提供资金或材料。当然，您也可以 "
+"<b>推广</b> VLC media player。</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -2230,8 +2229,8 @@ msgstr "源宽高比"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "强制指定源宽高比。例如某些 DVD 自称为 16:9，但实际上是 4:3 的。这也可以在影片"
@@ -3054,9 +3053,8 @@ msgstr "HTTP 代理"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "要使用的 HTTP 代理必须是以下形式 http://[用户名@]我的代理.我的域名:我的端口/ "
 "的形式;如果为空将会尝试 http_proxy 环境变量。"
@@ -5910,8 +5908,8 @@ msgstr "未找到音频输入设备"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr "您的 Mac 似乎未配备合适的音频输入设备。请检查您的接头及驱动程序。"
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -6103,9 +6101,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "要使用的 CDDB 服务器地址。"
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -6456,8 +6453,9 @@ msgid ""
 "\"Device config\" area, and use those numbers here. -1 means that settings "
 "will not be changed."
 msgstr ""
-"选择视频输入源，例如混合、s-视频 或调谐器。由于这些设置是取决于硬件，您应该在"
-"“设备配置”区域查找较佳的设置，并在这里使用对应数值。-1 表示设置将不会被更改。"
+"选择视频输入源，例如混合、s-视频 或调谐器。由于这些设置是取决于硬件，您应该"
+"在“设备配置”区域查找较佳的设置，并在这里使用对应数值。-1 表示设置将不会被更"
+"改。"
 
 #: modules/access/dshow/dshow.cpp:182
 msgid "Audio input pin"
@@ -8248,8 +8246,8 @@ msgstr "SMB 需要身份验证"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "您尝试连接的计算机 (%s) 需要身份验证。\n"
 "请提供用户名 (可同时提供域名称，格式为 域名称;用户名) 以及密码。"
@@ -8275,9 +8273,8 @@ msgid "Password for stream encryption"
 msgstr "流加密密码"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRT 流输出"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8717,13 +8714,13 @@ msgstr "v4l2 驱动控制"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
-"设置 v4l2 驱动控制的值  (例如: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} )，用逗号分隔，可以放在大括"
-"号内。要列出可用的控制项目，请增强提示程度 (-vvv) 或使用 v4l2-ctl 应用程序。"
+"设置 v4l2 驱动控制的值  (例如: {video_bitrate=6000000,audio_crc=0,"
+"stream_type=3} )，用逗号分隔，可以放在大括号内。要列出可用的控制项目，请增强"
+"提示程度 (-vvv) 或使用 v4l2-ctl 应用程序。"
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9272,14 +9269,12 @@ msgid "SRT stream output"
 msgstr "SRT 流输出"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "RIST 最大数据包大小(字节)"
+msgstr ""
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "RIST 最大数据包大小(字节)"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11139,9 +11134,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr "用于 tile 解码的最大线程数，默认0=自动"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "所有文件"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11209,8 +11203,8 @@ msgstr "子画面位置"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "您可以强制指定子画面在视频上的位置 (0=居中、1=左、2=右、4=上、8=下，您也可以"
 "组合使用这些值，例如 6=右上)。"
@@ -11942,10 +11936,10 @@ msgstr "码率控制精度"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "「avbr」(平均可变码率) 方法所容忍的百分比。(如对 800 kbps 的码率设置 10，则编"
 "码器将尝试既不超过 880 kbps 又不低于 730 kbps。目标精度在一定的收敛期后方可达"
@@ -13160,7 +13154,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15504,7 +15497,8 @@ msgstr "数字电视标准"
 msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
-msgstr "选择数字电视标准。本功能会影响 EPG 节目信息与字幕的显示。"
+msgstr ""
+"选择与数字电视标准相对应的模式。本功能会影响 EPG 节目信息与字幕的显示。"
 
 #: modules/demux/mpeg/ts.c:139
 msgid "MPEG Transport Stream demuxer"
@@ -17474,9 +17468,8 @@ msgstr "全部收缩"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "保存播放列表"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -19985,7 +19978,7 @@ msgstr "容器"
 
 #: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:434
 msgid "Program Guide"
-msgstr "程序向导"
+msgstr "节目指南"
 
 #: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:283
 #: modules/gui/qt/ui/about.h:284
@@ -21106,9 +21099,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "显示不重要的错误和警告消息对话框"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "启用软件模式"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -21429,19 +21421,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "设置图像色度，在 0.01 和 10 之间。默认为 1。"
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "立体增强器"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "帧率(&M)"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "显示侧边栏"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -25090,8 +25079,8 @@ msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
-"用于流的文件名。本项为输出目标（dst）的辅助设置项，dst=绑定地址（bind）"
-"+'/'+文件名（path）。输出目标参数可覆盖本项。"
+"用于流的文件名。本项为输出目标（dst）的辅助设置项，dst=绑定地址"
+"（bind）+'/'+文件名（path）。输出目标参数可覆盖本项。"
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
@@ -27113,39 +27102,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Windows 8 及更高版本推荐使用的视频输出"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "视频缩放"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "选择视频中的颜色"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "位每采样"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "SoX 重采样器"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "视频编解码器"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "分辨率"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "输出模块"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -27156,9 +27138,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "总在最前"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -28232,24 +28213,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "指纹(&F)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "选择流模式"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "轨道指纹识别服务 (基于 Acoustid)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "指纹(&F)"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -28492,9 +28469,8 @@ msgid "Menus"
 msgstr "菜单"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "采样率(&M)"
+msgstr "帧率(&M)"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -28765,9 +28741,8 @@ msgid "Auto raising the interface:"
 msgstr "自动唤起界面:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "播放列表使用定制皮肤"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -29082,21 +29057,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "媒体管理器列表"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP 频道列表"
-
-#~ msgid "Master List"
-#~ msgstr "主列表"
-
-#~ msgid "Server List"
-#~ msgstr "服务器列表"
-
-#~ msgid "Custom List"
-#~ msgstr "自定义列表"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "SRT 分块大小 (字节)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "加密密钥长度 (字节)"

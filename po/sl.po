@@ -11,14 +11,14 @@
 # Peter Klofutar, 2014-2016
 # Rok Žerdin <zerdin.rok1@gmail.com>, 2017
 # Matej Urbančič <>, 2018
-# Arnold Marko <arnold.marko@gmail.com>, 2023
+# Arnold Marko <arnold.marko@gmail.com>, 2023-2025
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Arnold Marko <arnold.marko@gmail.com>, 2023\n"
+"Last-Translator: Arnold Marko <arnold.marko@gmail.com>, 2025\n"
 "Language-Team: Slovenian (https://app.transifex.com/yaron/teams/16553/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -585,21 +585,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -612,21 +612,20 @@ msgstr ""
 "h2><h3>Dokumentacija</h3><p>Dokumentacija predvajalnika VLC je na voljo na "
 "spletišču <a href=\"http://wiki.videolan.org\">Wiki VideoLAN</a>.</"
 "p><p>Priporočeno je, da začetniki pred prvo uporabo predvajalnika preberejo "
-"poglavje <br><a href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>Uvod v uporabo predvajalnika VLC</em></"
-"a>.</p><p>Podrobnosti o načinu uporabe so zavedene v poglavju <br>»<a "
+"poglavje <br><a href=\"http://wiki.videolan.org/Documentation:"
+"VLC_for_dummies\"><em>Uvod v uporabo predvajalnika VLC</em></a>.</"
+"p><p>Podrobnosti o načinu uporabe so zavedene v poglavju <br>»<a "
 "href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>Kako "
 "predvajati datoteke s predvajalnikom VLC?</em></a>«.</p><p>Za shranjevanje, "
 "pretvarjanje, kodiranje, preoblikovanje, zvijanje in pretakanje si je dobro "
-"prebrati <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">dokumentacijo pretakanja</a>.</"
-"p><p>Terminološki opisi in tehnično izrazoslovje je zbrano v <a "
-"href=\"http://wiki.videolan.org/Knowledge_Base\">zbirki znanja</a>.</"
-"p><p>Tipkovne bližnjice so zbrane na strani <a href=\"http://"
-"wiki.videolan.org/Hotkeys\">tipkovnih povezav</a>.</p><h3>Pomoč</h3><p>Pred "
-"zastavljanjem vprašanj si najprej preberite <a href=\"http://"
-"www.videolan.org/support/faq.html\">najpogosteje zastavljena vprašanja "
-"(FAQ)</a>.</p><p>Pomoč lahko poiščete tudi na <a href=\"http://"
+"prebrati <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">dokumentacijo pretakanja</a>.</p><p>Terminološki opisi in "
+"tehnično izrazoslovje je zbrano v <a href=\"http://wiki.videolan.org/"
+"Knowledge_Base\">zbirki znanja</a>.</p><p>Tipkovne bližnjice so zbrane na "
+"strani <a href=\"http://wiki.videolan.org/Hotkeys\">tipkovnih povezav</a>.</"
+"p><h3>Pomoč</h3><p>Pred zastavljanjem vprašanj si najprej preberite <a "
+"href=\"http://www.videolan.org/support/faq.html\">najpogosteje zastavljena "
+"vprašanja (FAQ)</a>.</p><p>Pomoč lahko poiščete tudi na <a href=\"http://"
 "forum.videolan.org\">forumih</a>, na <a href=\"http://www.videolan.org/vlc/"
 "lists.html\">poštnem seznamu</a> ali na kanalu IRC (<em>#videolan</em> na "
 "irc.freenode.net).</p><h3>Podpora projektu</h3><p>Projektu lahko pomagate na "
@@ -2332,15 +2331,15 @@ msgstr "Izvorno razmerje velikosti"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Izbira določa vsiljeno razmerje velikosti slike. Nekateri pogoni DVD "
 "javljajo privzeto vrednost razmerja kot 16:9, čeprav so posnetki dejansko v "
 "razmerju 4:3. Možnost določa tudi privzet način prikazovanja v predvajalniku "
-"VLC, kadar posnetki nimajo teh podatkov. Vrednost določa ustrezno razmerje "
-"x:y (4:3, 16:9, ...) širine in višine, ali pa je razmerje določeno s "
+"VLC, kadar posnetki nimajo teh podatkov. Vrednost določa ustrezno razmerje x:"
+"y (4:3, 16:9, ...) širine in višine, ali pa je razmerje določeno s "
 "plavajočimi števili, ki opredeljujejo kvadratnost točk v obliki (1.25, "
 "1.3333, ...)."
 
@@ -2809,11 +2808,11 @@ msgstr "Nastavitev določa čas trajanja predvajanja (v sekundah)."
 
 #: src/libvlc-module.c:646 modules/gui/qt/ui/sprefs_input.h:360
 msgid "Fast seek"
-msgstr "Hitro iskanje"
+msgstr "Hitro preskakovanje"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
-msgstr "Prednostno upoštevaj hitrost iskanja pred natančnostjo med iskanjem"
+msgstr "Hitrost naj ima pri preskakovanju prednost pred natančnoatjo"
 
 #: src/libvlc-module.c:650
 msgid "Playback speed"
@@ -3231,13 +3230,12 @@ msgstr "Posredniški strežnik HTTP"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
-"Določitev posredniškega strežnika HTTP v obliki http://"
-"[uporabnik]@]mojproxy.mojadomena:moja vrata/ . V primeru, da vrednost ni "
-"navedena bo uporabljena sistemska nastavitev."
+"Določitev posredniškega strežnika HTTP v obliki http://[uporabnik]@]mojproxy."
+"mojadomena:moja vrata/ . V primeru, da vrednost ni navedena bo uporabljena "
+"sistemska nastavitev."
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
@@ -4885,7 +4883,7 @@ msgstr "Nastavitve stez"
 
 #: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Playback control"
-msgstr "Upravljanje predvajanja"
+msgstr "Nadzor predvajanja"
 
 #: src/libvlc-module.c:1782
 msgid "Default devices"
@@ -6194,8 +6192,8 @@ msgstr "Ni zaznane vhodne zvočne naprave"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Vaš Mac najbrž ni opremljen z ustrezno vhodno zvočno napravo. Preverite "
 "priključke in gonilnike."
@@ -6396,11 +6394,11 @@ msgstr "Zvočni CD – Posnetek %02i"
 #: modules/access/cdda.c:1003 modules/gui/macosx/VLCOpenWindowController.m:169
 #: modules/gui/qt/ui/open_disk.h:297
 msgid "Audio CD"
-msgstr "Zvokovni CD"
+msgstr "Avdio CD"
 
 #: modules/access/cdda.c:1004
 msgid "Audio CD input"
-msgstr "Zvokovni CD vhod"
+msgstr "Avdio CD vhod"
 
 #: modules/access/cdda.c:1013
 msgid "[cdda:][device][@[track]]"
@@ -6408,12 +6406,11 @@ msgstr "[cdda:][device][@[track]]"
 
 #: modules/access/cdda.c:1022
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "Musicbrainz strežnik"
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Nastavitev naslova strežnika CDDB."
+msgstr "Naslov musicbrainz strežnika, ki bo uporabljen."
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -6421,7 +6418,7 @@ msgstr "Strežnik CDDB"
 
 #: modules/access/cdda.c:1026
 msgid "Address of the CDDB server to use."
-msgstr "Nastavitev naslova strežnika CDDB."
+msgstr "Naslov CDDB strežnika, ki bo uporabljen."
 
 #: modules/access/cdda.c:1027
 msgid "CDDB port"
@@ -6429,7 +6426,7 @@ msgstr "Vrata CDDB"
 
 #: modules/access/cdda.c:1028
 msgid "CDDB Server port to use."
-msgstr "Nastavitev vrat strežnika CDDBo."
+msgstr "Vrata CDDB strežnika, ki bodo uporabljena."
 
 #: modules/access/concat.c:303
 msgid "Inputs list"
@@ -6453,15 +6450,15 @@ msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
-msgstr "Vhodna digitalna kamera IIDC (FireWire)"
+msgstr "Vhod digitalne IIDC kamere (FireWire)"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
-msgstr "Datoteka KDM"
+msgstr "KDM datoteka"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
-msgstr "Pod do datoteke XML ključa KDM"
+msgstr "Pod do XML datoteke za KDM ključ"
 
 #: modules/access/dcp/dcp.cpp:77
 msgid "DCP"
@@ -6469,7 +6466,7 @@ msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:79
 msgid "Digital Cinema Package module"
-msgstr "Modul za paket digitalnega kina (DCP)"
+msgstr "Modul za digitalne kino pakete (DCP)"
 
 #: modules/access/decklink.cpp:49
 msgid "Input card to use"
@@ -6485,27 +6482,28 @@ msgstr ""
 
 #: modules/access/decklink.cpp:54
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr "Želeni način video vhoda. Pustite prazno za samodejno zaznavanje."
+msgstr ""
+"Želeni način delovanja video vhoda. Pustite prazno za samodejno zaznavanje."
 
 #: modules/access/decklink.cpp:56
 msgid ""
 "Desired input video mode for DeckLink captures. This value should be a "
 "FOURCC code in textual form, e.g. \"ntsc\"."
 msgstr ""
-"Želeni način vhoda slike za zajeme DeckLink. Ta vrednost mora biti koda "
-"FOURCC v besedilni obliki, npr. »ntsc«."
+"Želeni način delovanja vhoda za zajem z DeckLink. Vrednost mora biti FOURCC "
+"koda v besedilni obliki, kot je npr. »ntsc«."
 
 #: modules/access/decklink.cpp:60 modules/video_output/decklink.cpp:100
 msgid "Audio connection"
-msgstr "Zvokovna povezava"
+msgstr "Avdio povezava"
 
 #: modules/access/decklink.cpp:62
 msgid ""
 "Audio connection to use for DeckLink captures. Valid choices: embedded, "
 "aesebu, analog. Leave blank for card default."
 msgstr ""
-"Katera zvokovna povezava naj se uporabi za zajeme DeckLink. Veljavne izbire: "
-"vstavljena, aesebu, analogna. Pustite prazno za privzeto nastavitev kartice."
+"Katera avdio povezava naj se uporabi za zajeme DeckLink. Veljavne izbire: "
+"vključena, aesebu, analogna. Pustite prazno za privzeto kartico."
 
 #: modules/access/decklink.cpp:66 modules/demux/rawaud.c:43
 #: modules/video_output/decklink.cpp:105
@@ -6516,13 +6514,13 @@ msgstr "Frekvenca vzorčenja zvoka (Hz)"
 msgid ""
 "Audio sampling rate (in hertz) for DeckLink captures. 0 disables audio input."
 msgstr ""
-"Hitrost vzorčenja zvoka (v hertzih) za zajeme DeckLink. Vredno9st 0 "
-"onemogoči zvokovni vhod."
+"Hitrost vzorčenja zvoka (v hertzih) za zajeme DeckLink. Vrednost 0 onemogoči "
+"avdio vhod."
 
 #: modules/access/decklink.cpp:71 modules/access/dshow/dshow.cpp:197
 #: modules/video_output/decklink.cpp:110
 msgid "Number of audio channels"
-msgstr "Število zvokovnih kanalov"
+msgstr "Število avdio kanalov"
 
 #: modules/access/decklink.cpp:73
 msgid ""
@@ -6675,7 +6673,7 @@ msgid ""
 "don't specify anything the default size for your device will be used. You "
 "can specify a standard size (cif, d1, ...) or <width>x<height>."
 msgstr ""
-"Ime zvokovne naprave, ki bo uporabljena za prikaz predstavne vsebine "
+"Ime zvočne naprave, ki bo uporabljena za prikaz predstavne vsebine "
 "DirectShow. V primeru, da ni nastavljena nobena naprava, bo program uporabil "
 "privzeto vrednost."
 
@@ -8647,8 +8645,8 @@ msgstr "Zahtevana je overitev SMB"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "Računalnik (%s), s katerim želite vzpostaviti povezavo, zahteva overitev.\n"
 "Vpisati je treba uporabniško ime (ime domene v zapisu DOMENA;uporabniško "
@@ -8675,9 +8673,8 @@ msgid "Password for stream encryption"
 msgstr "Geslo za šifriranje pretoka"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Odvod pretoka SRT"
+msgstr "ID SRT pretoka"
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9120,19 +9117,19 @@ msgstr "Način glasnosti (povišanje nizkih tonov)."
 
 #: modules/access/v4l2/v4l2.c:188
 msgid "v4l2 driver controls"
-msgstr "Tipkovne bližnjice gonilnika v4l2"
+msgstr "Nadzor gonilnika v4l2"
 
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "Nastavitev gonilnika v4l2 z vrednostmi, ločenimi z vejico, zapisanimi na "
-"seznamu z zavitimi oklepaji (primer: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). Za izpis razpoložljivih "
-"možnosti, uporabite zastavico (-vvv) ali pa program v4l2-ctl."
+"seznamu z zavitimi oklepaji (primer: {video_bitrate=6000000,audio_crc=0,"
+"stream_type=3} ). Za izpis razpoložljivih možnosti, uporabite zastavico (-"
+"vvv) ali pa program v4l2-ctl."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9698,14 +9695,12 @@ msgid "SRT stream output"
 msgstr "Odvod pretoka SRT"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "RIST največja velikost paketov (bajtov)"
+msgstr "Največja velikost SRT tovora (bajtov)"
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "RIST največja velikost paketov (bajtov)"
+msgstr "Največja dovoljena SRT pasovna širina (bajtov)"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10035,11 +10030,11 @@ msgstr "Hitrost zamika globine obsipavanja v ms na sekundo predvajanja"
 #: modules/audio_filter/stereo_widen.c:60
 #: modules/gui/qt/components/extended_panels.cpp:1368
 msgid "Feedback gain"
-msgstr "Povratno usklajevanje"
+msgstr "Povratno ojačanje"
 
 #: modules/audio_filter/chorus_flanger.c:89
 msgid "Gain on Feedback loop"
-msgstr "Usklajevanje na povratni zanki"
+msgstr "Ojačitev na povratni zanki"
 
 #: modules/audio_filter/chorus_flanger.c:91
 msgid "Wet mix"
@@ -10139,11 +10134,11 @@ msgstr "Zvokovni filter za zvijanje A/52->S/PDIF"
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
-msgstr "Predloge uravnalnika zvoka"
+msgstr "Predloge izenačevalnika zvoka"
 
 #: modules/audio_filter/equalizer.c:59
 msgid "Preset to use for the equalizer."
-msgstr "Predloge za uporabo uravnalnika zvoka"
+msgstr "Predloge za uporabo izenačevalnika zvoka"
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Bands gain"
@@ -10190,13 +10185,13 @@ msgstr "Določilo splošnega usklajevanja v dB (-20 ... 20)."
 
 #: modules/audio_filter/equalizer.c:80
 msgid "Equalizer with 10 bands"
-msgstr "Uravnalnik z 10 trakovi"
+msgstr "Izenačevalnik z 10 pasovi"
 
 #: modules/audio_filter/equalizer.c:81
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:271
 #: modules/gui/qt/dialogs/extended.cpp:67 share/lua/http/index.html:237
 msgid "Equalizer"
-msgstr "Uravnalnik zvoka"
+msgstr "Izenačevalnik zvoka"
 
 #: modules/audio_filter/equalizer_presets.h:54
 msgid "Flat"
@@ -10332,7 +10327,7 @@ msgstr "Izenačevalik glasnosti"
 
 #: modules/audio_filter/param_eq.c:52 modules/audio_filter/param_eq.c:53
 msgid "Parametric Equalizer"
-msgstr "Parametrsko uravnavanje zvoka"
+msgstr "Parametrični izenačevalnik"
 
 #: modules/audio_filter/param_eq.c:58
 msgid "Low freq (Hz)"
@@ -11626,27 +11621,26 @@ msgstr "Niti sličic"
 #: modules/codec/dav1d.c:53
 msgid "Max number of threads used for frame decoding, default 0=auto"
 msgstr ""
-"Največje število nit, ki se uporablja za dekodiranje sličic. Privzeto je "
+"Največje število niti, ki se uporablja za dekodiranje sličic. Privzeto je "
 "0=samodejno"
 
 #: modules/codec/dav1d.c:54
 msgid "Tiles Threads"
-msgstr "Niti razdelov"
+msgstr "Niti razdelkov"
 
 #: modules/codec/dav1d.c:55
 msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
-"Največje število nit, ki se uporablja za dekodiranje razdelkov. Privzeto je "
+"Največje število niti, ki se uporablja za dekodiranje razdelkov. Privzeto je "
 "0=samodejno"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Vse datoteke"
+msgstr "Vse plasti"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
-msgstr ""
+msgstr "Ali naj se prikažejo vse prostorske plasti - privzeto je ne"
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
@@ -11711,8 +11705,8 @@ msgstr "Položaj nalepke na zaslonu"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Določiti je mogoče položaj nalepk na sliki posnetka (0=sredina, 1=levo, "
 "2=desno, 4=zgoraj, 8=spodaj, vrednosti je mogoče seštevati, npr: 6=zgoraj "
@@ -12484,10 +12478,10 @@ msgstr "Natančnost nadzora hitrosti"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "Odstopanje v odstotkih metode »avbr« (Average Variable BitRate) (Vrednost 10 "
 "z bitno hitrostjo 800 kb/s pomeni, da kodirnik poskuša ohraniti hitrost med "
@@ -13609,9 +13603,9 @@ msgid ""
 "improving quality for a given bitrate at the cost of seeking precision. Use "
 "-1 for infinite."
 msgstr ""
-"Določitev največjega razmika med sličicami IDR. Večje vrednosti ohranjajo "
-"bite, s čimer se izboljša kakovost za privzeto bitno hitrost na račun "
-"natančnosti iskanja. Uporabite vrednost -1 za neskončen razmik."
+"Določitev največjega razmika med IDR-sličicami. Večje vrednosti ohranjajo "
+"bite, s čimer se izboljša kakovost za privzeto bitno hitrost, a na račun "
+"natančnosti preskakovanja. Uporabite -1 za neskončno."
 
 #: modules/codec/x264.c:76
 msgid "Minimum GOP size"
@@ -13628,14 +13622,14 @@ msgid ""
 "If scenecuts appear within this interval, they are still encoded as I-"
 "frames, but do not start a new GOP."
 msgstr ""
-"Določevanje najmanjšega razmika med IDR-slikami. V H.264, I-sličice niso "
-"nujno vezane na zaprto skupino slik (GOP), ker so P-sličice lahko napovedane "
-"preko več sličic in ne le preko tistih, ki so neposredno pred njim. (več "
-"informacij med referenčnimi možnostmi sličic). Zaradi tega I-sličic ni "
-"mogoče vedno iskati. IDR-sličice omejujejo P-sličice pri navezovanju na "
-"katerokoli sliko pred IDR-sličicami. \n"
-"V primeru, da se izrezi pojavijo znotraj tega zamika, so še vedno kodirani "
-"kot I-sličice, vendar se ne začnejo kot nova skupina slik."
+"Določitev najmanjšega razmika med IDR-slikami. V H.264, I-sličice niso nujno "
+"vezane na zaključeno skupino slik (GOP), ker je P-sličica lahko napovedana v "
+"več sličicah, ne le tisti, ki je neposredno pred njo (glej tudi možnost "
+"referenčne sličice). Zaradi tega I-sličic ni mogoče vedno preskakovati. IDR-"
+"sličice omejujejo nadaljnje P-sličice kot referenco za katerokoli sliko pred "
+"IDR-sličicO. \n"
+"V primeru, da se scenski rez pojavi znotraj tega intervala, so še vedno "
+"kodirani kot I-sličice, vendar ne začnejo nove GOP skupine sličic."
 
 #: modules/codec/x264.c:86
 msgid "Use recovery points to close GOPs"
@@ -13754,7 +13748,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15130,7 +15123,7 @@ msgstr "| chapter_p . . . . prejšnje poglavje trenutnega predmeta"
 
 #: modules/control/oldrc.c:809
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
-msgstr "| seek X . . . iskanje po času (primer `seek 12')"
+msgstr "| seek X . . . preskakovanje v sekundah (primer `seek 12')"
 
 #: modules/control/oldrc.c:810
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
@@ -15513,8 +15506,8 @@ msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
 msgstr ""
-"Možnost določa način odziva pri zaznani napaki med predvajanjem okvarjene "
-"datoteke AVI."
+"Ponovno ustvari indeks za AVI datoteko. Uporabite to, če je AVI datoteka "
+"okvarjena ali nepopolna (po njej ni mogoče preskakovati)"
 
 #: modules/demux/avi/avi.c:68
 msgid "Ask for action"
@@ -15545,12 +15538,12 @@ msgid ""
 "This step might take a long time on a large file.\n"
 "What do you want to do?"
 msgstr ""
-"Ker je kazalo te datoteke okvarjeno, ali pa manjka, iskanje po posnetku ne "
-"bo delovalo pravilno.\n"
-"Predvajalnik lahko težavo reši tako, da postavi začasno kazalo v pomnilniku "
-"in s tem omogoči iskanje.\n"
-"To opravilo je lahko pri velikih datotekah dolgotrajno.\n"
-"Kako želite nadaljevati?"
+"Ker je indeks te datoteke AVI okvarjeno ali manjka, preskakovanje po "
+"posnetku ne bo delovalo pravilno.\n"
+"Predvajalnik datoteke ne more popraviti, lahko pa ustvari začasni indeks v "
+"pomnilniku.\n"
+"Pri velikih datotekah lahko to opravilo vzame veliko časa.\n"
+"Kaj želite storiti?"
 
 #: modules/demux/avi/avi.c:918
 msgid "Do not play"
@@ -15622,7 +15615,7 @@ msgstr "Uvoz mape"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
-msgstr "Filter preprečevanja iskanja med odvijanjem"
+msgstr "Filter preprečevanja preskakovanja med odvijanjem"
 
 #: modules/demux/flac.c:52
 msgid "FLAC demuxer"
@@ -15746,7 +15739,7 @@ msgstr "Išči po deležu posnetka in ne po času"
 
 #: modules/demux/mkv/mkv.cpp:74
 msgid "Seek based on percent not time."
-msgstr "Možnost omogoča iskanje po odstotku posnetka namesto po času."
+msgstr "Preskakovanje po odstotkih in ne po času."
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid "Dummy Elements"
@@ -16015,7 +16008,7 @@ msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
-msgstr "Ne išči po posnetku"
+msgstr "Brez preskakovanja"
 
 #: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
@@ -16157,9 +16150,9 @@ msgid ""
 "Seek and position based on a percent byte position, not a PCR generated time "
 "position. If seeking doesn't work property, turn on this option."
 msgstr ""
-"Išči in nastavi položaj glede na položaj odstotka bajtov, ne na položaj "
-"časa, ki ga je ustvaril PCR. Če iskanje ne deluje pravilno, vključite to "
-"možnost."
+"Preskakovanje in položaj, ki temelji na položaju bytea za odstotke in ne na "
+"položaj časa, ki bi  ga ustvaril PCR. Če preskakovanje ne deluje pravilno, "
+"uporabite to možnost."
 
 #: modules/demux/mpeg/ts.c:126
 msgid "Trust in-stream PCR"
@@ -17000,7 +16993,7 @@ msgstr "Nazaj"
 #: modules/gui/macosx/VLCControlsBarCommon.m:183
 #: modules/gui/macosx/VLCFSPanelController.m:135
 msgid "Seek backward"
-msgstr "Išči nazaj"
+msgstr "Preskakovanje nazaj"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:88
 #: modules/gui/macosx/VLCControlsBarCommon.m:185
@@ -17012,7 +17005,7 @@ msgstr "Naprej"
 #: modules/gui/macosx/VLCControlsBarCommon.m:186
 #: modules/gui/macosx/VLCFSPanelController.m:132
 msgid "Seek forward"
-msgstr "Išči naprej"
+msgstr "Preskakovanje naprej"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:93
 msgid "Playback position"
@@ -18184,9 +18177,8 @@ msgstr "Zloži vse"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Shrani seznam predvajanja"
+msgstr "Premešaj seznam predvajanja"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -19492,7 +19484,7 @@ msgstr " <, >                   naslednje/prejšnje poglavje"
 #: modules/gui/ncurses.c:887
 #, c-format
 msgid " <left>,<right>         Seek -/+ 1%%"
-msgstr " <levo>,<desno>     Iskanje -/+ 1%%"
+msgstr " <levo>,<desno>     Preskakovanje -/+ 1%%"
 
 #: modules/gui/ncurses.c:888
 msgid " a, z                   Volume Up/Down"
@@ -19591,7 +19583,7 @@ msgstr "[Predvajalnik]"
 #: modules/gui/ncurses.c:927
 #, c-format
 msgid " <up>,<down>            Seek +/-5%%"
-msgstr " <↑>,<↓>                 iskanje +/-5%%"
+msgstr " <up>,<down>             Preskakovanje +/-5%%"
 
 #: modules/gui/ncurses.c:1046
 msgid "[Repeat]"
@@ -20984,7 +20976,7 @@ msgstr "&Izbor"
 #: modules/gui/qt/dialogs/open.cpp:116 modules/gui/qt/dialogs/open.cpp:211
 #: modules/gui/qt/dialogs/openurl.cpp:56
 msgid "&Enqueue"
-msgstr "&Uvrsti predmete"
+msgstr "&V vrsto"
 
 #: modules/gui/qt/dialogs/open.cpp:118 modules/gui/qt/dialogs/open.cpp:215
 #: modules/gui/qt/dialogs/openurl.cpp:53 modules/gui/qt/menus.cpp:829
@@ -21890,13 +21882,12 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Pokaži manj pomembne napake in opozorila"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Omogoči programski način"
+msgstr "Vklop temnega načina"
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
-msgstr ""
+msgstr "Slogu pripiše temno temo."
 
 #: modules/gui/qt/qt.cpp:127
 msgid "Activate the updates availability notification"
@@ -22230,19 +22221,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Nastavitev barve slike med 0.01 in 10. Privzeta vrednost je 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Izboljševalnik učinka stereo"
+msgstr "AMD VQ obogatitev"
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Hitrost &sličic"
+msgstr "AMD podvojitev števila sličic na sekundo"
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Pokaži stransko vrstico"
+msgstr "Prikaži indikator"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22722,8 +22710,8 @@ msgid ""
 msgstr ""
 "Nastavitev omogoči prejem ukazov prek ukazne vrstice. Privzeto je to "
 "standardni vhod konzole (\"*console\"), vendar pa je to lahko tudi običajni "
-"vtič TCP (\"localhost:4212\") oziroma uporaba protokola telnet (\"telnet://"
-"0.0.0.0:4212\")"
+"vtič TCP (\"localhost:4212\") oziroma uporaba protokola telnet "
+"(\"telnet://0.0.0.0:4212\")"
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
@@ -25236,11 +25224,13 @@ msgstr "Velikost predbranja pri vnaprejšnjem pridobivanju (v bajtih)"
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Seek threshold"
-msgstr "Prag iskanja"
+msgstr "Prag preskakovanja"
 
 #: modules/stream_filter/prefetch.c:542
 msgid "Prefetch forward seek threshold (bytes)"
-msgstr "Velikost praga za iskanje pri vnaprejšnjem pridobivanju (v bajtih)"
+msgstr ""
+"Velikost praga za vnaprejšnje pridobivanje podatkov ob preskakovanju (v "
+"bajtih)"
 
 #: modules/stream_filter/record.c:49
 msgid "Internal stream record"
@@ -27691,8 +27681,8 @@ msgid ""
 "Prefix of the output images filenames. Output filenames will have the "
 "\"prefixNUMBER.format\" form if replace is not true."
 msgstr ""
-"Predpona imena datoteke slik. Ime slike bo imelo obliko "
-"»predponaŠTEVILKA.zapis«, če ni omogočena možnost prepisovanja."
+"Predpona imena datoteke slik. Ime slike bo imelo obliko »predponaŠTEVILKA."
+"zapis«, če ni omogočena možnost prepisovanja."
 
 #: modules/video_filter/scene.c:81
 msgid "Directory path prefix"
@@ -28148,56 +28138,48 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Priporočeni izhod slike za Windows 8 in kasnejše različice"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Merilo slike"
+msgstr "Način povečanja ločljivosti videa"
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Izbor ene barve na posnetku"
+msgstr "Izbira načina povečanja videa."
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bitna globina"
+msgstr "Linearni vzorčevalnik"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Prevzorčevalnik SoX"
+msgstr "Točkovni vzorčevalnik"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Video kodeki"
+msgstr "Video procesor"
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Ločljivost"
+msgstr "Super ločljivost"
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Moduli izhodov"
+msgstr "HDR način prikaza"
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
-msgstr ""
+msgstr "Uporabi HDR tudi s SDR viri."
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Never out HDR"
-msgstr ""
+msgstr "Nikoli ne prikaži HDR"
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Okno je vedno na vrhu"
+msgstr "Vedno prikaži HDR"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
-msgstr ""
+msgstr "Ustvari HDR iz SDR"
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
@@ -29309,24 +29291,20 @@ msgid "0.00 dB"
 msgstr "0,00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Prstni odtis"
+msgstr "Zvočni prstni odtis"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Izbor načina pretakanja"
+msgstr "Izberi ustrezno identiteto"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Prstni odtis skladbe (na osnovi Acoustid)"
+msgstr "Noben prstni odtis ni bil najden"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Prstni odtis"
+msgstr "Iskanje prstnih odtisov..."
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29569,9 +29547,8 @@ msgid "Menus"
 msgstr "Meniji"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Hitrost &vzorčenja"
+msgstr "Hitrost &sličic"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29842,9 +29819,8 @@ msgid "Auto raising the interface:"
 msgstr "Samodejno prikazovanje vmesnika:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Uporabi preobleko za seznam predvajanja"
+msgstr "Uporabi temno paleto"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30159,21 +30135,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Seznam upravljalnika vsebin"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "Seznam kanalov SAT>IP"
-
-#~ msgid "Master List"
-#~ msgstr "Glavni seznam"
-
-#~ msgid "Server List"
-#~ msgstr "Strežniški seznam"
-
-#~ msgid "Custom List"
-#~ msgstr "Seznam po meri"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "Velikost dela SRT (v bajtih)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Dolžina šifrirnega ključa v bajtih"

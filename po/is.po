@@ -11,11 +11,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2022\n"
+"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2024\n"
 "Language-Team: Icelandic (https://app.transifex.com/yaron/teams/16553/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
@@ -572,21 +572,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -599,30 +599,29 @@ msgstr ""
 "margmiðlunarspilarans</h2><h3>Hjálparskjöl</h3><p>Þú getur fundið ýmis "
 "hjálparskjöl á  <a href=\"http://wiki.videolan.org\">kvikusvæði</a> VideoLAN."
 "</p><p>Ef þú ert nýbyrjaður að nota VLC margmiðlunarspilarann, endilega "
-"lestu þá<br><a href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>Introduction to VLC media player</em></"
-"a>.</p><p>Þú finnur ýmsar upplýsingar um hvernig hægt er að nota spilarann í "
-"<br>\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>How "
-"to play files with VLC media player</em></a>\" skjalinu.</p><p>Hvað varðar "
-"allt sem tengist vistun, umbreytingu, umkóðun (transcode), kóðun, fléttun "
-"(muxing) og streymingu, þá ættirðu að finna ýmsar gagnlegar upplýsingar í <a "
+"lestu þá<br><a href=\"http://wiki.videolan.org/Documentation:"
+"VLC_for_dummies\"><em>Introduction to VLC media player</em></a>.</p><p>Þú "
+"finnur ýmsar upplýsingar um hvernig hægt er að nota spilarann í <br>\"<a "
+"href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>How to play "
+"files with VLC media player</em></a>\" skjalinu.</p><p>Hvað varðar allt sem "
+"tengist vistun, umbreytingu, umkóðun (transcode), kóðun, fléttun (muxing) og "
+"streymingu, þá ættirðu að finna ýmsar gagnlegar upplýsingar í <a "
 "href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
 "Documentation</a>.</p><p>Ef þú ert óviss um hugtök og skilgreiningar, flettu "
 "þá upp í <a href=\"http://wiki.videolan.org/"
 "Knowledge_Base\">þekkingargrunninum</a>.</p><p>Til að skilja helstu "
 "flýtilykla á lyklaborðinu, lestu það sem stendur á síðunni um <a "
 "href=\"http://wiki.videolan.org/Hotkeys\">flýtivísanir</a>.</p><h3>Hjálp</"
-"h3><p>Áður en þá spyrð spurninga, skoðaðu fyrst <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ - Algengar spurningar</a>.</"
-"p><p>Síðan geturðu fengið (og gefið) hjálp á <a href=\"http://"
-"forum.videolan.org\">Forums</a> spjallsvæðum, á <a href=\"http://"
-"www.videolan.org/vlc/lists.html\">póstlistum</a> eða á IRC rásinni "
-"(<em>#videolan</em> á irc.freenode.net).</p><h3>Styðja verkefnið</h3><p>Þú "
-"getur hjálpað VideoLAN verkefninu með því að gefa þér tíma til að hjálpa "
-"öðrum notendum, við að hanna skinn, við að þýða skjöl, við að prófa og við "
-"að forrita. Þú getur líka gefið fjármuni eða tækjakost til að hjálpa okkur. "
-"Að sjálfsögðu geturðu líka gert þitt til að <b>kynna</b> VLC "
-"margmiðlunarspilarann.</p></body></html>"
+"h3><p>Áður en þá spyrð spurninga, skoðaðu fyrst <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ - Algengar spurningar</a>.</p><p>Síðan "
+"geturðu fengið (og gefið) hjálp á <a href=\"http://forum.videolan."
+"org\">Forums</a> spjallsvæðum, á <a href=\"http://www.videolan.org/vlc/lists."
+"html\">póstlistum</a> eða á IRC rásinni (<em>#videolan</em> á irc.freenode."
+"net).</p><h3>Styðja verkefnið</h3><p>Þú getur hjálpað VideoLAN verkefninu "
+"með því að gefa þér tíma til að hjálpa öðrum notendum, við að hanna skinn, "
+"við að þýða skjöl, við að prófa og við að forrita. Þú getur líka gefið "
+"fjármuni eða tækjakost til að hjálpa okkur. Að sjálfsögðu geturðu líka gert "
+"þitt til að <b>kynna</b> VLC margmiðlunarspilarann.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -1245,7 +1244,7 @@ msgstr "Ekki hægt að opna inntak"
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
-"VLC gat ekki opnað MRL '%s'. Athugaðu annálinn fyrir frekari upplýsingar."
+"VLC gat ekki opnað MRL '%s'. Athugaðu atvikaskrána fyrir frekari upplýsingar."
 
 #: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:409
 #: modules/gui/macosx/VLCMainMenu.m:410
@@ -2221,8 +2220,8 @@ msgstr "Upprunaleg stærðarhlutföll"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 
@@ -3005,9 +3004,8 @@ msgstr "HTTP-milliþjónn"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 
 #: src/libvlc-module.c:853
@@ -3027,8 +3025,8 @@ msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
-"SOCKS-milliþjónn sem á að nota. Þetta verður að vera á forminu "
-"vistfang:gátt. Þetta verður notað fyrir allar TCP-tengingar"
+"SOCKS-milliþjónn sem á að nota. Þetta verður að vera á forminu vistfang:"
+"gátt. Þetta verður notað fyrir allar TCP-tengingar"
 
 #: src/libvlc-module.c:862
 msgid "SOCKS user name"
@@ -4346,19 +4344,19 @@ msgstr "Víxla sýnileika skjátextaspors."
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
-msgstr ""
+msgstr "Fletta í gegnum næsta auðkenni dagskrárþjónustu"
 
 #: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
-msgstr ""
+msgstr "Fletta í gegnum næsta tiltæka auðkenni dagskrárþjónustu (SID)."
 
 #: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
-msgstr ""
+msgstr "Fletta í gegnum fyrra auðkenni dagskrárþjónustu"
 
 #: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
-msgstr ""
+msgstr "Fletta í gegnum fyrra tiltæka auðkenni dagskrárþjónustu (SID)."
 
 #: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
@@ -5865,8 +5863,8 @@ msgstr "Ekkert inntakstæki hljóðs fannst"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -6063,9 +6061,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Veffang fyrir CDDB miðlara sem nota skal."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -6489,7 +6486,7 @@ msgstr "Ekkert mynd- eða hljóðtæki valið."
 #: modules/access/dshow/dshow.cpp:591
 msgid "VLC cannot open ANY capture device. Check the error log for details."
 msgstr ""
-"VLC gat ekki opnað NEITT upptökutæki. Athugaðu annálinn fyrir frekari "
+"VLC gat ekki opnað NEITT upptökutæki. Athugaðu atvikaskrána fyrir frekari "
 "upplýsingar."
 
 #: modules/access/dshow/dshow.cpp:1055
@@ -8166,8 +8163,8 @@ msgstr "Auðkenningar SMB krafist"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8191,9 +8188,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRT-streymisúttak"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8633,9 +8629,9 @@ msgstr "Stjórnun v4l2 rekils"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -9173,9 +9169,8 @@ msgid "SRT stream output"
 msgstr "SRT-streymisúttak"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "Stærð SRT-köggla (bæti)"
+msgstr ""
 
 #: modules/access_output/srt.c:475
 msgid "SRT maximum bandwidth ceiling (bytes)"
@@ -9717,11 +9712,11 @@ msgstr "Margföldun mögnunar"
 
 #: modules/audio_filter/gain.c:59
 msgid "Increase or decrease the gain (default 1.0)"
-msgstr ""
+msgstr "Auka eða minnka mögnun (sjálfgefið 1.0)"
 
 #: modules/audio_filter/gain.c:63
 msgid "Gain control filter"
-msgstr ""
+msgstr "Stýrisía mögnunar"
 
 #: modules/audio_filter/karaoke.c:33 modules/demux/xiph_metadata.h:51
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:260
@@ -9829,11 +9824,11 @@ msgstr "Gæði endursöfnunar"
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
 msgid "Resampling quality, from worst to best"
-msgstr ""
+msgstr "Gæði endursöfnunar, frá versta til besta"
 
 #: modules/audio_filter/resampler/soxr.c:67
 msgid "SoX Resampler"
-msgstr ""
+msgstr "SoX endursafnari"
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10973,9 +10968,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Allar skrár"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11042,8 +11036,8 @@ msgstr ""
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 
 #: modules/codec/dvbsub.c:95
@@ -11729,10 +11723,10 @@ msgstr ""
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -12907,7 +12901,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -13923,7 +13916,7 @@ msgstr ""
 
 #: modules/control/netsync.c:56
 msgid "Network master clock"
-msgstr ""
+msgstr "Aðalklukka netkerfis"
 
 #: modules/control/netsync.c:57
 msgid ""
@@ -13933,7 +13926,7 @@ msgstr ""
 
 #: modules/control/netsync.c:61
 msgid "Master server IP address"
-msgstr ""
+msgstr "IP-vistfang aðalþjóns"
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -15645,14 +15638,14 @@ msgid ""
 "decoration: underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC margmiðlunarspilarinn er frjáls og opinn margmiðlunarspilari, kóðari "
-"og streymari sem útbúinn er af sjálfboðaliðunum í <a href=\"https://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"og streymari sem útbúinn er af sjálfboðaliðunum í <a href=\"https://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a> samfélaginu.</p><p>VLC styðst við innbyggða "
 "kóðunarlykla (codecs), virkar á nokkurn veginn hvaða stýrikerfi sem er, og "
 "getur lesið næstum því allar skrár, CD-diska, DVD-diska, netstreymi, "
-"upptökukort og aðrar margmiðlunarskrár!</p><p><a href=\"https://"
-"www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">Hjálpaðu til og taktu þátt!</span></a>"
+"upptökukort og aðrar margmiðlunarskrár!</p><p><a href=\"https://www.videolan."
+"org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Hjálpaðu til og taktu þátt!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -16674,7 +16667,7 @@ msgstr "Spilunarlisti..."
 
 #: modules/gui/macosx/VLCMainMenu.m:482 modules/gui/macosx/VLCPlaylist.m:228
 msgid "Media Information..."
-msgstr "Upplýsinar um miðla"
+msgstr "Upplýsingar um miðla..."
 
 #: modules/gui/macosx/VLCMainMenu.m:483
 msgid "Messages..."
@@ -17125,9 +17118,8 @@ msgstr "Fella allt saman"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Vista spilunarlista"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -19476,8 +19468,8 @@ msgstr "Vista skrá..."
 msgid ""
 "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 msgstr ""
-"Gagnageymar - containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav "
-"*.raw *.flv *.webm)"
+"Gagnageymar - containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *."
+"raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:185
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -19728,14 +19720,14 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC margmiðlunarspilarinn er frjáls og opinn margmiðlunarspilari, kóðari "
-"og streymari sem útbúinn er af sjálfboðaliðunum í <a href=\"http://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"og streymari sem útbúinn er af sjálfboðaliðunum í <a href=\"http://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a> samfélaginu.</p><p>VLC styðst við innbyggða "
 "kóðunarlykla (codecs), virkar á nokkurn veginn hvaða stýrikerfi sem er, og "
 "getur lesið næstum því allar skrár, CD-diska, DVD-diska, netstreymi, "
-"upptökukort og aðrar margmiðlunarskrár!</p><p><a href=\"http://"
-"www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">Hjálpaðu til og taktu þátt!</span></a>"
+"upptökukort og aðrar margmiðlunarskrár!</p><p><a href=\"http://www.videolan."
+"org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Hjálpaðu til og taktu þátt!</span></a>"
 
 #: modules/gui/qt/dialogs/help.cpp:225
 msgid "&Recheck version"
@@ -19767,7 +19759,7 @@ msgstr "Upp kom villa þegar verið var að athuga með uppfærslu..."
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:52
 msgid "Current Media Information"
-msgstr "Upplýsinar um núverandi gagnamiðil"
+msgstr "Upplýsingar um núverandi gagnamiðil"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:64
 msgid "&General"
@@ -19795,15 +19787,15 @@ msgstr "Staðsetning:"
 
 #: modules/gui/qt/dialogs/messages.cpp:88
 msgid "Saves all the displayed logs to a file"
-msgstr "Vistar alla birt annála í skrá"
+msgstr "Vistar allar birtar atvikaskráningar í skrá"
 
 #: modules/gui/qt/dialogs/messages.cpp:256
 msgid "Save log file as..."
-msgstr "Vista annál sem..."
+msgstr "Vista atvikaskrá sem..."
 
 #: modules/gui/qt/dialogs/messages.cpp:258
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr "Textar / annálar (*.log *.txt);; Allt (*.*)"
+msgstr "Textar / Atvikaskrár (*.log *.txt);; Allt (*.*)"
 
 #: modules/gui/qt/dialogs/messages.cpp:264
 msgid "Application"
@@ -20742,9 +20734,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Sýna óverulegar villur og viðvaranir"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Virkja hugbúnaðarham"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -21061,14 +21052,12 @@ msgid "AMD VQ Enhancer"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Ra&mmatíðni"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Sýna hliðarspjald"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -21324,11 +21313,11 @@ msgstr ""
 
 #: modules/logger/android.c:85
 msgid "Android log"
-msgstr ""
+msgstr "Android-atvikaskrá"
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
-msgstr ""
+msgstr "Android-atvikaskrá með logcat"
 
 #: modules/logger/console.c:147
 msgid "Be quiet"
@@ -21336,15 +21325,15 @@ msgstr "Hljóðlátt"
 
 #: modules/logger/console.c:148
 msgid "Turn off all messages on the console."
-msgstr ""
+msgstr "Ekki birta nein skilaboð á skipanalínuskjánum."
 
 #: modules/logger/console.c:151
 msgid "Console log"
-msgstr ""
+msgstr "Skipanagluggi"
 
 #: modules/logger/console.c:152
 msgid "Console logger"
-msgstr ""
+msgstr "Atvikaskráning skipanalínu"
 
 #: modules/logger/file.c:193
 msgid "HTML"
@@ -21356,31 +21345,31 @@ msgstr "Upplýsingar"
 
 #: modules/logger/file.c:203
 msgid "Debug"
-msgstr "Aflúsa"
+msgstr "Villukemba"
 
 #: modules/logger/file.c:205
 msgid "Log to file"
-msgstr "Annál í skrá"
+msgstr "Atvikaskrá í skrá"
 
 #: modules/logger/file.c:206
 msgid "Log all VLC messages to a text file."
-msgstr "Skrifa annál allra VLC skilaboða í textaskrá."
+msgstr "Skrifa atvikaskrá allra VLC skilaboða í textaskrá."
 
 #: modules/logger/file.c:208
 msgid "Log filename"
-msgstr "Skráarheiti annáls"
+msgstr "Skráarheiti atvikaskrár"
 
 #: modules/logger/file.c:209
 msgid "Specify the log filename."
-msgstr "Tilgreindu skráarheiti annáls."
+msgstr "Tilgreindu skráarheiti atvikaskrár."
 
 #: modules/logger/file.c:211
 msgid "Log format"
-msgstr "Snið annála"
+msgstr "Snið atvikaskráa"
 
 #: modules/logger/file.c:212
 msgid "Specify the logging format."
-msgstr ""
+msgstr "Skilgreindu snið atvikaskráningar."
 
 #: modules/logger/file.c:214
 msgid "Verbosity"
@@ -21394,11 +21383,11 @@ msgstr ""
 
 #: modules/logger/file.c:219
 msgid "Logger"
-msgstr ""
+msgstr "Atvikaskráning"
 
 #: modules/logger/file.c:220
 msgid "File logger"
-msgstr ""
+msgstr "Atvikaskráning í skrá"
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -21410,7 +21399,7 @@ msgstr ""
 
 #: modules/logger/syslog.c:138
 msgid "System log (syslog)"
-msgstr ""
+msgstr "Atvikaskráning kerfis (syslog)"
 
 #: modules/logger/syslog.c:139
 msgid "Emit log messages through the POSIX system log."
@@ -21426,11 +21415,11 @@ msgstr ""
 
 #: modules/logger/syslog.c:144
 msgid "Identity"
-msgstr "Perónuauðkenni"
+msgstr "Auðkenni"
 
 #: modules/logger/syslog.c:145
 msgid "Process identity in system log."
-msgstr ""
+msgstr "Búnaður"
 
 #: modules/logger/syslog.c:147
 msgid "Facility"
@@ -21438,15 +21427,15 @@ msgstr ""
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
-msgstr ""
+msgstr "Búnaður fyrir atvikaskráningu kerfis"
 
 #: modules/logger/syslog.c:151
 msgid "syslog"
-msgstr ""
+msgstr "kerfisskráning"
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
-msgstr ""
+msgstr "Atvikaskráning kerfis (syslog)"
 
 #: modules/lua/extension.c:1200
 msgid "Extension not responding!"
@@ -22289,27 +22278,31 @@ msgstr ""
 
 #: modules/misc/gnutls.c:753
 msgid "Use system trust database"
-msgstr ""
+msgstr "Nota traustgagnagrunn kerfis"
 
 #: modules/misc/gnutls.c:755
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "operating system trust database to authenticate TLS sessions."
 msgstr ""
+"Treysta rótarskilríkjum CA-vottunarstöðvar sem geymd eru í traustgagnagrunni "
+"kerfisins til að auðkenna TLS-setur."
 
 #: modules/misc/gnutls.c:758
 msgid "Trust directory"
-msgstr "Treysta möppu"
+msgstr "Mappa fyrir treyst"
 
 #: modules/misc/gnutls.c:760
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "specified directory to authenticate TLS sessions."
 msgstr ""
+"Treysta rótarskilríkjum CA-vottunarstöðvar sem geymd eru í uppgefinni möppu "
+"til að auðkenna TLS-setur."
 
 #: modules/misc/gnutls.c:763
 msgid "TLS cipher priorities"
-msgstr ""
+msgstr "Forgangur TLS-dulritunartákna (cipher)"
 
 #: modules/misc/gnutls.c:764
 msgid ""
@@ -22359,11 +22352,11 @@ msgstr ""
 
 #: modules/misc/logger.c:49
 msgid "Logging"
-msgstr "Skráning annáls"
+msgstr "Atvikaskráning"
 
 #: modules/misc/logger.c:50
 msgid "File logging"
-msgstr "Skráarannáll"
+msgstr "Skráning atvika í skrá"
 
 #: modules/misc/playlist/export.c:51
 msgid "M3U playlist export"
@@ -26610,39 +26603,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Kvörðun myndmerkis"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Veldu einn lit í myndskeiðinu"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bitar í sýni"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Safntíðni"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Kóðunarlyklar fyrir myndmerki"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Upplausn"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Úttakseiningar"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -26653,9 +26639,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Alltaf efst"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -27724,23 +27709,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Fingrafar"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Veldu aðferð við streymi"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
 msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Fingrafar"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -27983,9 +27965,8 @@ msgid "Menus"
 msgstr "Valmyndir"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Sa&fntíðni"
+msgstr "Ra&mmatíðni"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -28206,7 +28187,7 @@ msgstr "Tungumál valmynda:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:535
 msgid "Look and feel"
-msgstr "Útlit og viðkoma"
+msgstr "Útlit og viðmót"
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
 msgid "Use custom skin"
@@ -28257,9 +28238,8 @@ msgid "Auto raising the interface:"
 msgstr "Lyfta viðmótinu sjálfvirkt:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Nota spilunarlista með skinni"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -28574,18 +28554,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Listi fyrir miðlastjórnun"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP rásalisti"
-
-#~ msgid "Master List"
-#~ msgstr "Aðallisti"
-
-#~ msgid "Server List"
-#~ msgstr "Listi á vefþjóni"
-
-#~ msgid "Custom List"
-#~ msgstr "Sérsniðinn listi"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Lengd dulritunarlykils í bætum"

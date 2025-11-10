@@ -15,11 +15,11 @@
 # Andrejs Pavars <andrejs.pavars@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2022\n"
+"Last-Translator: Ojārs Spriņķis, 2024\n"
 "Language-Team: Latvian (https://app.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -588,21 +588,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -617,19 +617,19 @@ msgstr ""
 "p><p>Ja jūs esat jaunpienācējs VLC mediju atskaņotājā, lūdzu, izlasiet<br><a "
 "href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Ievads "
 "VLC mediju atskaņotājā</em></a>.</p><p>Jūs atradīsiet mazliet informācijas "
-"par to, kā lietot atskaņotāju, dokumentā <br>\"<a href=\"http://"
-"wiki.videolan.org/Documentation:Play_HowTo\"><em>Kā atskaņot datnes ar VLC "
-"mediju atskaņotāju</em></a>\".</p><p>Visiem saglabāšanas, pārveidošanas, "
+"par to, kā lietot atskaņotāju, dokumentā <br>\"<a href=\"http://wiki."
+"videolan.org/Documentation:Play_HowTo\"><em>Kā atskaņot datnes ar VLC mediju "
+"atskaņotāju</em></a>\".</p><p>Visiem saglabāšanas, pārveidošanas, "
 "pārkodēšanas, iekodēšanas, multipleksēšanas un straumēšanas uzdevumiem jums "
 "vajadzētu atrast noderīgu informāciju <a href=\"http://wiki.videolan.org/"
 "Documentation:Streaming_HowTo\">Straumēšanas dokumentācija</a>.</p><p>Ja jūs "
 "neesat pārliecināts par terminoloģiju, lūdzu, konsultējieties <a "
 "href=\"http://wiki.videolan.org/Knowledge_Base\">zināšanu bāzē</a>.</"
-"p><p>Lai saprastu galvenās tastatūras saīsnes, lasiet <a href=\"http://"
-"wiki.videolan.org/Hotkeys\">saīšņu</a> lapu.</p><h3>Palīdzība</h3><p>Pirms "
-"uzdot jebkādus jautājumus, lūdzu pievērsiet sevi pie <a href=\"http://"
-"www.videolan.org/support/faq.html\">BUJ</a>.</p><p>Jūs tad varētu iegūt (un "
-"sniegt) palīdzību <a href=\"http://forum.videolan.org\">Forumos</a>, <a "
+"p><p>Lai saprastu galvenās tastatūras saīsnes, lasiet <a href=\"http://wiki."
+"videolan.org/Hotkeys\">saīšņu</a> lapu.</p><h3>Palīdzība</h3><p>Pirms uzdot "
+"jebkādus jautājumus, lūdzu pievērsiet sevi pie <a href=\"http://www.videolan."
+"org/support/faq.html\">BUJ</a>.</p><p>Jūs tad varētu iegūt (un sniegt) "
+"palīdzību <a href=\"http://forum.videolan.org\">Forumos</a>, <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">adresātu sarakstos</a> vai "
 "mūsu IRC kanālā (<em>#videolan</em> uz irc.freenode.net).</p><h3>Dodiet "
 "ieguldījumu projektā</h3><p>Jūs varat palīdzēt VideoLAN projektam, dodot "
@@ -826,8 +826,8 @@ msgstr ""
 "[:nodaļa]]]\n"
 "  [:opcija=vērtība ...]\n"
 "\n"
-"  Daudzas no globālajām --opcijām var arī tikt lietotas kā MRL "
-"specifiskas :opcijas.\n"
+"  Daudzas no globālajām --opcijām var arī tikt lietotas kā MRL specifiskas :"
+"opcijas.\n"
 "  Vairāki :opcija=vērtība pāri var tikt norādīti.\n"
 "\n"
 "URL sintakse:\n"
@@ -2328,8 +2328,8 @@ msgstr "Avota malu attiecības"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Šis piespiež avota malu attiecības. Piemēram, daži DVD apgalvo, ka ir 16:9, "
@@ -3218,9 +3218,8 @@ msgstr "HTTP starpniekserveris"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "HTTP starpniekserveris, kurš tiks lietots. Tam vajag būt formā http://"
 "[lietotājs@]mansstarpniekserveris.mansdomēns:mansports/ ; ja tukšs, tiks "
@@ -4220,7 +4219,7 @@ msgstr "Ļoti īss lēciena garums, sekundēs."
 
 #: src/libvlc-module.c:1286
 msgid "Short jump length"
-msgstr "Īss leciena garums"
+msgstr "Īss lēciena garums"
 
 #: src/libvlc-module.c:1287
 msgid "Short jump length, in seconds."
@@ -6182,8 +6181,8 @@ msgstr "Nav atrasta audio ievades ierīce"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Nešķiet, ka jūsu Mac būtu aprīkots ar piemērotu audio ievades ierīci. Lūdzu, "
 "pārbaudiet savus savienotājus un dziņus."
@@ -6393,9 +6392,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Adrese CDDB serverim, kuru lietot."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8634,8 +8632,8 @@ msgstr "Vajadzīga SMB autentifikācija"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "Dators (%s), pie kura jūs mēģināt pieslēgties, pieprasa autentifikāciju.\n"
 "Lūdzu, sniedziet lietotājvārdu (ideālā gadījumā domēna vārdu, lietojot "
@@ -8662,9 +8660,8 @@ msgid "Password for stream encryption"
 msgstr "Parole straumju šifrēšanai"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "SRT straumju izvade"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9114,9 +9111,9 @@ msgstr "v4l2 dziņa vadīklas"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "Iestatiet v4l2 dziņa vadīklas uz vērtībām, norādītām, lietojot komatu "
 "atdalītu sarakstu, pēc izvēles iekapsulētu ar figūriekavām (piem.: "
@@ -9688,14 +9685,12 @@ msgid "SRT stream output"
 msgstr "SRT straumju izvade"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "RIST maksimālais paketes izmērs (baiti)"
+msgstr ""
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "RIST maksimālais paketes izmērs (baiti)"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11641,9 +11636,8 @@ msgstr ""
 "automātisks"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Visas datnes"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11712,8 +11706,8 @@ msgstr "Apakšbildes novietojums"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Jūs varat uzspiest apakšbildes pozīciju uz video (0=centrā, 1=pa kreisi, "
 "2=pa labi, 4=augšā, 8=apakšā, jūs varat arī lietot šo vērtību kombinācijas, "
@@ -12480,10 +12474,10 @@ msgstr "Ātrumkontroles precizitāte"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "'avbr' (vidējā mainīgā bitu pārraides ātruma) metodes tolerance procentos. "
 "(piem., 10 ar bitu pārraides ātrumu 800 kb/s nozīmē, ka iekodētājs mēģinās "
@@ -13745,7 +13739,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16026,7 +16019,7 @@ msgstr "Nemeklēt"
 
 #: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
-msgstr "Būvēt indeksu"
+msgstr "Izveidot rādītāju"
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
@@ -16391,7 +16384,7 @@ msgstr "Aplādes tips"
 
 #: modules/demux/playlist/podcast.c:329
 msgid "Podcast Size"
-msgstr "Aplādes izmērs"
+msgstr "Aplādes lielums"
 
 #: modules/demux/playlist/podcast.c:330
 #, c-format
@@ -16770,7 +16763,7 @@ msgstr "Atinstalēt"
 #: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:535
 msgid "Skins"
-msgstr "Ādiņas"
+msgstr "Apvalki"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
@@ -18190,9 +18183,8 @@ msgstr "Sakļaut visu"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Saglabāt atskaņošanas sarakstu"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -21892,9 +21884,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Rādīt nesvarīgus kļūdu un brīdinājumu dialoglodziņus"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Ieslēgt programmatūras režīmu"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -22236,19 +22227,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Iestatīt attēla gammu, starp 0.01 un 10. Noklusējas uz 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Stereo uzlabotājs"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Kadru no&maiņas ātrums"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Rādīt sānjoslu"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -23727,11 +23715,11 @@ msgstr "\"Novērtējums\", kuru ielikt ASF komentāros."
 
 #: modules/mux/asf.c:66
 msgid "Packet Size"
-msgstr "Paketes izmērs"
+msgstr "Paketes lielums"
 
 #: modules/mux/asf.c:67
 msgid "ASF packet size -- default is 4096 bytes"
-msgstr "ASF paketes izmērs -- noklusējums ir 4096 baiti"
+msgstr "ASF paketes lielums -- noklusējums ir 4096 baiti"
 
 #: modules/mux/asf.c:68
 msgid "Bitrate override"
@@ -24216,13 +24204,13 @@ msgstr "Mana mūzika"
 
 #: modules/services_discovery/mediadirs.c:84
 msgid "Picture"
-msgstr "Bilde"
+msgstr "Attēls"
 
 #: modules/services_discovery/mediadirs.c:85
 #: modules/services_discovery/mediadirs.c:149
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
-msgstr "Manas bildes"
+msgstr "Mani attēli"
 
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
@@ -25229,19 +25217,19 @@ msgstr "Straumes priekšieneses filtrs"
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Buffer size"
-msgstr "Bufera izmērs"
+msgstr "Bufera lielums"
 
 #: modules/stream_filter/prefetch.c:536
 msgid "Prefetch buffer size (KiB)"
-msgstr "Priekšieneses bufera izmērs (kibibaitos)"
+msgstr "Priekšieneses bufera lielums (kibibaitos)"
 
 #: modules/stream_filter/prefetch.c:538
 msgid "Read size"
-msgstr "Lasīšanas izmērs"
+msgstr "Lasīšanas lielums"
 
 #: modules/stream_filter/prefetch.c:539
 msgid "Prefetch background read size (bytes)"
-msgstr "Priekšieneses fona lasīšanas izmērs (baitos)"
+msgstr "Priekšieneses fona lasīšanas lielums (baitos)"
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Seek threshold"
@@ -26258,7 +26246,7 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:130
 msgid "Picture pool size"
-msgstr "Bilžu kopas izmērs"
+msgstr "Attēlu kopas lielums"
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
@@ -26302,7 +26290,7 @@ msgstr "Fonta datne fontam, kuru jūs vēlaties lietot"
 
 #: modules/text_renderer/freetype/freetype.c:86
 msgid "Font size in pixels"
-msgstr "Fonta izmērs pikseļos"
+msgstr "Fonta lielums pikseļos"
 
 #: modules/text_renderer/freetype/freetype.c:87
 msgid ""
@@ -26310,9 +26298,9 @@ msgid ""
 "set to something different than 0 this option will override the relative "
 "font size."
 msgstr ""
-"Šis ir noklusējuma izmērs fontiem, kuri tiks renderēti uz video. Ja "
+"Šis ir noklusējuma lielums fontiem, kuri tiks renderēti uz video. Ja "
 "iestatīts uz kaut ko atšķirīgu nekā 0, šī opcija pārrakstīs relatīvo fonta "
-"izmēru."
+"lielumu."
 
 #: modules/text_renderer/freetype/freetype.c:91
 msgid "Text opacity"
@@ -26344,15 +26332,15 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:100
 msgid "Relative font size"
-msgstr "Relatīvais fonta izmērs"
+msgstr "Relatīvais fonta lielums"
 
 #: modules/text_renderer/freetype/freetype.c:101
 msgid ""
 "This is the relative default size of the fonts that will be rendered on the "
 "video. If absolute font size is set, relative size will be overridden."
 msgstr ""
-"Šis ir relatīvais noklusējuma izmērs fontiem, kuri tiks renderēti uz video. "
-"Ja absolūtais fonta izmērs ir iestatīts, relatīvais izmērs tiks pārlabots."
+"Šis ir relatīvais noklusējuma lielums fontiem, kuri tiks renderēti uz video. "
+"Ja absolūtais fonta lielums ir iestatīts, relatīvais lielums tiks pārlabots."
 
 #: modules/text_renderer/freetype/freetype.c:106
 msgid "Background opacity"
@@ -27740,15 +27728,15 @@ msgstr ""
 
 #: modules/video_filter/scene.c:91
 msgid "Send your video to picture files"
-msgstr "Sūtīt jūsu video uz bilžu datnēm"
+msgstr "Sūtīt jūsu video uz attēlu datnēm"
 
 #: modules/video_filter/scene.c:95
 msgid "Scene filter"
-msgstr "Scēnas filtrs"
+msgstr "Ainas filtrs"
 
 #: modules/video_filter/scene.c:96
 msgid "Scene video filter"
-msgstr "Scēnas video filtrs"
+msgstr "Ainas video filtrs"
 
 #: modules/video_filter/sepia.c:59
 msgid "Sepia intensity"
@@ -28167,39 +28155,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Ieteicamā video izvade priekš Windows 8 un vēlākām versijām"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Video mērogošana"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Atlasiet vienu krāsu iekš video"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Biti uz nolasi"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "SoX pārģenerētājs"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Video kodeki"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Izšķirtspēja"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Izvades moduļi"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -28210,9 +28191,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Vienmēr virspusē"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -29330,24 +29310,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Pirkstu nospiedums"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Atlasiet straumēšanas metodi"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Celiņa pirkstu nospiedumu noņēmējs (bāzēts uz Acoustid)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Pirkstu nospiedums"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29590,9 +29566,8 @@ msgid "Menus"
 msgstr "Izvēlnes"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "&Diskretizācijas frekvence"
+msgstr "Kadru no&maiņas ātrums"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29863,9 +29838,8 @@ msgid "Auto raising the interface:"
 msgstr "Saskarnes automātiskā parādīšana:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Lietot atskaņošanas sarakstu ar ādiņu"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30180,21 +30154,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Mediju pārvaldnieka saraksts"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP kanālu saraksts"
-
-#~ msgid "Master List"
-#~ msgstr "Galvenais saraksts"
-
-#~ msgid "Server List"
-#~ msgstr "Serveru saraksts"
-
-#~ msgid "Custom List"
-#~ msgstr "Pielāgots saraksts"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "SRT gabala izmērs (baiti)"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Šifrēšanas atslēgas garums baitos"

@@ -10,7 +10,7 @@
 # Wiebe Tokkel <justmarkus@gmx.net>, 2016-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
@@ -243,8 +243,8 @@ msgstr "Fideokodeks"
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
 msgstr ""
-"Ynstellingen foar fideo, ôfbyldingen of fideo+audiodekodearders en "
-"-kodearders. "
+"Ynstellingen foar fideo, ôfbyldingen of fideo+audiodekodearders en -"
+"kodearders. "
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
@@ -582,21 +582,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -608,23 +608,22 @@ msgstr ""
 "charset=utf-8\" /></head><body><h2>Wolkom by VLC media player Help</"
 "h2><h3>Dokumintaasje</h3><p>Jo  kinne dokumintaasje foar VLC fine op "
 "VideoLAN's <a href=\"http://wiki.videolan.org\">wiki</a> webstee.</p><p>At "
-"VLC media player foar jo nij is, lês dan de <br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Yntroduksje fan VLC "
-"media player (Ingelsk)</em></a>.</p><p>Jo fine wat ynformaasje oer it bruken "
-"fan de spiler yn <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>Hoe bestannen ôf te spyljen mei VLC media "
-"player (Ingelsk)</em></a>\".</p><p>Foar alle bewar-, konvertear-, "
-"transkoader-, kodear-, muks- en streamtaken kinne jo brûkbere ynformaasje "
-"fine yn de <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">Stream-dokimintaasje (Ingelsk)</a>.</p><p>As "
-"jo net wiis wurde kinne út de terminology, lês dan de <a href=\"http://"
-"wiki.videolan.org/Knowledge_Base\">kennisbank (Ingelsk)</a>.</p><p>Foar de "
-"haadfluchkaaien, lês de <a href=\"http://wiki.videolan.org/"
+"VLC media player foar jo nij is, lês dan de <br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Yntroduksje fan VLC media "
+"player (Ingelsk)</em></a>.</p><p>Jo fine wat ynformaasje oer it bruken fan "
+"de spiler yn <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>Hoe bestannen ôf te spyljen mei VLC media player (Ingelsk)</"
+"em></a>\".</p><p>Foar alle bewar-, konvertear-, transkoader-, kodear-, muks- "
+"en streamtaken kinne jo brûkbere ynformaasje fine yn de <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Stream-dokimintaasje "
+"(Ingelsk)</a>.</p><p>As jo net wiis wurde kinne út de terminology, lês dan "
+"de <a href=\"http://wiki.videolan.org/Knowledge_Base\">kennisbank (Ingelsk)</"
+"a>.</p><p>Foar de haadfluchkaaien, lês de <a href=\"http://wiki.videolan.org/"
 "Hotkeys\">fluchkaaien</a> page.</p><h3>Help</h3><p>Foardat jo fragen stelle, "
 "graach earst de <a href=\"http://www.videolan.org/support/faq.html\">FAQ "
 "(Ingelsk)</a> lêze.</p><p>Jo kin dan wol ris help krije (of jaan) op de <a "
-"href=\"http://forum.videolan.org\">Forums</a>, de <a href=\"http://"
-"www.videolan.org/vlc/lists.html\">mail-listen</a> of ús IRC-kanaal "
+"href=\"http://forum.videolan.org\">Forums</a>, de <a href=\"http://www."
+"videolan.org/vlc/lists.html\">mail-listen</a> of ús IRC-kanaal "
 "(<em>#videolan</em> op irc.freenode.net).</p><h3>Draach by oan it project</"
 "h3><p>Jo kinne it VideoLAN-project helpe troch wat fan jo tiid te jaan mei "
 "it helpen fan de mienskip , jo hûden te ûntwerpen, de dokumintaasje oer te "
@@ -2332,8 +2331,8 @@ msgstr "Byldferhâldingen fan de boarne"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Dit forsearret de byldferhâldingen. Bygelyks, guon DVD's kleme 16:9 te wêzen "
@@ -2853,8 +2852,8 @@ msgid ""
 "{...}\""
 msgstr ""
 "Jo kinne hânmjittich in list fan blêdwizers meitsje foar in stream fan de "
-"folgjende foarm  \"{name=blêdwizer-namme,time=opsjonele-tiid-"
-"offset,bytes=opsjonele-byte-offset},{...}\""
+"folgjende foarm  \"{name=blêdwizer-namme,time=opsjonele-tiid-offset,"
+"bytes=opsjonele-byte-offset},{...}\""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -3222,13 +3221,12 @@ msgstr "HTTP-proxy"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
-"HTTP-proxy om te gebruiken. Moet in het formaat http://"
-"[gebruiker@]mijnproxy.mijndomein:mijnpoort/ zijn; indien leeg zal de "
-"http_proxy omgevingsvariabele geprobeerd worden."
+"HTTP-proxy om te gebruiken. Moet in het formaat http://[gebruiker@]mijnproxy."
+"mijndomein:mijnpoort/ zijn; indien leeg zal de http_proxy omgevingsvariabele "
+"geprobeerd worden."
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
@@ -3351,10 +3349,10 @@ msgid ""
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
-"Lijst van codecs die VLC in volgorde zal gebruiken. Bijvoorbeeld, "
-"'dummy,a52' zal de dummy en a52 codecs eerst proberen voordat anderen "
-"geprobeerd worden.  Alleen geavanceerde gebruikers mogen deze optie "
-"aanpassen, aangezien dit het afspelen van alle streams onmogelijk kan maken."
+"Lijst van codecs die VLC in volgorde zal gebruiken. Bijvoorbeeld, 'dummy,"
+"a52' zal de dummy en a52 codecs eerst proberen voordat anderen geprobeerd "
+"worden.  Alleen geavanceerde gebruikers mogen deze optie aanpassen, "
+"aangezien dit het afspelen van alle streams onmogelijk kan maken."
 
 #: src/libvlc-module.c:915
 msgid "Preferred encoders list"
@@ -6183,8 +6181,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -6388,9 +6386,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Webadres van de CDDB-server om te gebruiken."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -7870,8 +7867,8 @@ msgstr "Audiokonfiguraasje"
 #: modules/access/linsys/linsys_sdi.c:79
 msgid "Allows you to set audio configuration (id=group,pair:id=group,pair...)."
 msgstr ""
-"Staat u toe om de audioconfiguratie in te stellen "
-"(id=group,pair:id=group,pair...)."
+"Staat u toe om de audioconfiguratie in te stellen (id=group,pair:id=group,"
+"pair...)."
 
 #: modules/access/linsys/linsys_hdsdi.c:89
 msgid "HD-SDI Input"
@@ -8617,8 +8614,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8642,9 +8639,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Stream %d"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9088,9 +9084,9 @@ msgstr "v4l2-driver bediening"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -11610,9 +11606,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Alle bestanden"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11681,8 +11676,8 @@ msgstr "Positie subafbeelding:"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "U kunt hier de subafbeelingpositie op de video forceren (0=centreren, 1= "
 "links, 2=rechts, 4=boven, 8=onder, u kunt ook combinaties van deze waarden "
@@ -12428,10 +12423,10 @@ msgstr "Nauwkeurigheid van RateControl"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -13407,8 +13402,8 @@ msgid ""
 "Force a specific encoding quality between 0.0 (high) and 50.0 (low), instead "
 "of specifying a particular bitrate. This will produce a VBR stream."
 msgstr ""
-"Forceer een specifieke codeerkwaliteit tussen 0.0 (hoog) en 50.0 (laag), "
-"i.p.v. een specifieke bitrate. Dit zal een VBR-stream produceren."
+"Forceer een specifieke codeerkwaliteit tussen 0.0 (hoog) en 50.0 (laag), i.p."
+"v. een specifieke bitrate. Dit zal een VBR-stream produceren."
 
 #: modules/codec/twolame.c:59
 msgid "Stereo mode"
@@ -13676,7 +13671,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16575,8 +16569,8 @@ msgid ""
 "decoration: underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC media player is een gratis en opensource mediaspeler, encoder en "
-"streamer, gemaakt door de vrijwilligers van de <a href=\"https://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"streamer, gemaakt door de vrijwilligers van de <a href=\"https://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>-gemeenschap.</p><p>VLC gebruikt zijn eigen interne "
 "codecs, werkt op vrijwel elk populair platform en kan bijna alle bestanden, "
 "cd's, dvd's, netwerkstreams, opnamekaarten en andere mediaformaten lezen!</"
@@ -18075,9 +18069,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Afspeellijst opslaan"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -20485,8 +20478,8 @@ msgstr "Bestand opslaan..."
 msgid ""
 "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 msgstr ""
-"Containerbestanden (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw "
-"*.flv *.webm)"
+"Containerbestanden (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *."
+"flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:185
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -20740,13 +20733,13 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC media player is een gratis en opensource mediaspeler, encoder en "
-"streamer, gemaakt door de vrijwilligers van de <a href=\"http://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
-"\">VideoLAN</span></a>-gemeenschap.</p><p>VLC gebruikt zijn eigen interne "
-"codecs, werkt op vrijwel elk populair platform en kan bijna alle bestanden, "
-"cd's, dvd's, netwerkstreams, opnamekaarten en andere mediaformaten lezen!</"
-"p><p><a href=\"http://www.videolan.org/contribute/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">Help ons en doe mee!</span></a>"
+"streamer, gemaakt door de vrijwilligers van de <a href=\"http://www.videolan."
+"org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+"span></a>-gemeenschap.</p><p>VLC gebruikt zijn eigen interne codecs, werkt "
+"op vrijwel elk populair platform en kan bijna alle bestanden, cd's, dvd's, "
+"netwerkstreams, opnamekaarten en andere mediaformaten lezen!</p><p><a "
+"href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">Help ons en doe mee!</span></a>"
 
 #: modules/gui/qt/dialogs/help.cpp:225
 msgid "&Recheck version"
@@ -21771,9 +21764,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Onbelangrijke fout- en waarschuwingsdialogen weergeven"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Softwaremodus inschakelen"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -22104,18 +22096,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Zet de gamma van de afbeelding, tussen 0.01 en 10. Standaard is 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Stereo-verbetering"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
 msgid "AMD Frame Rate Doubler"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Zijbalk weergeven"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22586,8 +22576,8 @@ msgid ""
 msgstr ""
 "Commando's van deze bron accepteren. De CLI-standaard is stdin "
 "(\"*console\"), maar kan ook verbinden met een plain TCP socket "
-"(\"localhost:4212\") of het telnet-protocol gebruiken (\"telnet://"
-"0.0.0.0:4212\")"
+"(\"localhost:4212\") of het telnet-protocol gebruiken "
+"(\"telnet://0.0.0.0:4212\")"
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
@@ -27991,39 +27981,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Video schalen"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Selecteer een kleur in de video"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bits per sample"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Samplerate"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Fideokodeks"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Resolúsje"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Utfiermodules"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -28034,9 +28017,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Boppe-op hâlde"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -29169,23 +29151,20 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Vingerafdruk"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Streammethode selecteren"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
 msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Vingerafdruk"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29228,9 +29207,8 @@ msgid "Start Time"
 msgstr "Start tijd"
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Stop Time"
-msgstr "Stoptiid"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:269
 msgid "Edit Options"
@@ -29257,9 +29235,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'h':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:283
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Verander de starttijd voor het medium"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:286
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -29358,9 +29335,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV demuxer"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "Ogg/Ogm"
@@ -29383,9 +29359,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "RAW"
@@ -29432,9 +29407,8 @@ msgid "Menus"
 msgstr "Menu's"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Samplefluggens"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -29449,9 +29423,8 @@ msgid "Custom options"
 msgstr "Aangepaste opties"
 
 #: modules/gui/qt/ui/profiles.h:733
-#, fuzzy
 msgid "&Quality"
-msgstr "VBR-kwaliteit"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:734 modules/gui/qt/ui/profiles.h:735
 msgid "Not Used"
@@ -29474,14 +29447,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:756
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Samplefluggens"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:764
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Profielnaam"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:200
 msgid "Set up media sources to stream"
@@ -29616,9 +29587,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "H.264 in-loop deblocking filter overslaan"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profiel- en niveauselectie"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Optical drive"
@@ -29707,14 +29677,12 @@ msgid "Show systray icon"
 msgstr "Pictogram in systeemvak weergeven"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses-ynterfaasje"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Gebruik een afspeellijst met thema"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -29805,9 +29773,8 @@ msgid "Add a background"
 msgstr "Achtergrond toevoegen"
 
 #: modules/gui/qt/ui/sprefs_video.h:313
-#, fuzzy
 msgid "O&utput"
-msgstr "Utfier"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "DirectX"

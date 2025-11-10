@@ -3,20 +3,20 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Bjørn I. <bjorn.svindseth@online.no>, 2015-2023
+# Bjørn I. <bjorn.svindseth@online.no>, 2015-2025
 # Copyright (C) Eirik U. Birkeland <eirbir@gmail.com>, 2009
 # Copyright (C) Jon Stødle <jonstodle@gmail.com>, 2009
 # Eirik U. Birkeland <eirbir@gmail.com>, 2009-2010
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Bjørn I., 2023\n"
-"Language-Team: Norwegian Nynorsk (https://app.transifex.com/yaron/teams/"
-"16553/nn/)\n"
+"Last-Translator: Bjørn I., 2025\n"
+"Language-Team: Norwegian Nynorsk (https://app.transifex.com/yaron/"
+"teams/16553/nn/)\n"
 "Language: nn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -460,7 +460,7 @@ msgstr "Tilpassa &bokmerke"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
-msgstr "&VLM-oppsett"
+msgstr "&VLM-innstillingar"
 
 #: include/vlc_intf_strings.h:62
 msgid "&About"
@@ -577,21 +577,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -609,9 +609,9 @@ msgstr ""
 "wiki.videolan.org/Documentation:Play_HowTo\"><em>Korleis spela av filer i "
 "VLC mediespelar</em></a>».</p><p>For alle lagrings-, konverterings-, "
 "transkodings-, kodings-, muksings-, og strøymingsoppgåvene, kan du finna "
-"nyttig informasjon i <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">strøymingsdokumentasjonen</a>.</p><p>Viss du "
-"er terminologien, kan du sjå i <a href=\"http://wiki.videolan.org/"
+"nyttig informasjon i <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">strøymingsdokumentasjonen</a>.</p><p>Viss du er "
+"terminologien, kan du sjå i <a href=\"http://wiki.videolan.org/"
 "Knowledge_Base\">kunnskapsbasen</a>.</p><p>For å læra deg hovudsnøggtastane, "
 "kan du lesa sida «<a href=\"http://wiki.videolan.org/Hotkeys\">Snøggtastar</"
 "a>».</p><h3>Hjelp</h3><p>Før du spør, kan du gjerne lesa <a href=\"http://"
@@ -623,7 +623,7 @@ msgstr ""
 "gje litt av tida di til brukargruppa, til å utforme drakter, til å omsetje "
 "dokumentasjon, til å testa og til å programmera. Du kan òg donera pengar og "
 "materiale for å hjelpa oss. Og sjølvsagt kan du <b>reklamera</b> for VLC "
-"mediaspelar.</p></body></html>"
+"mediespelar.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -940,7 +940,7 @@ msgstr "Straum %d"
 
 #: src/input/es_out.c:1463 src/input/es_out.c:1465
 msgid "Scrambled"
-msgstr "Blanda"
+msgstr "Kryptert"
 
 #: src/input/es_out.c:1463 modules/keystore/keychain.m:41
 #: modules/lua/extension.c:1199
@@ -1321,7 +1321,7 @@ msgstr "Spor-ID"
 
 #: src/input/meta.c:73
 msgid "Number of Tracks"
-msgstr "Tal på spor"
+msgstr "Antal spor"
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -1337,7 +1337,7 @@ msgstr "Episode"
 
 #: src/input/meta.c:77
 msgid "Show Name"
-msgstr "Vis namn"
+msgstr "Programnamn"
 
 #: src/input/meta.c:78
 msgid "Actors"
@@ -1598,7 +1598,7 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr "Mediarolle"
+msgstr "Medierolle"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1749,7 +1749,7 @@ msgstr "Av"
 
 #: src/libvlc-module.c:189
 msgid "Stereo audio output mode"
-msgstr "Stereo-lyd ut-modus"
+msgstr "Stereolyd ut-modus"
 
 #: src/libvlc-module.c:195 src/misc/actions.c:112
 #: modules/gui/qt/components/preferences_widgets.cpp:1421
@@ -2139,11 +2139,11 @@ msgstr "Film NTSC (IVTC)"
 
 #: src/libvlc-module.c:371
 msgid "Disable screensaver"
-msgstr "Slå av pauseskjerm"
+msgstr "Slå av skjermsparar"
 
 #: src/libvlc-module.c:372
 msgid "Disable the screensaver during video playback."
-msgstr "Slå av pauseskjermen under videoavspeling."
+msgstr "Slå avskjermspararen under videoavspeling."
 
 #: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/ui/sprefs_video.h:314
@@ -2248,7 +2248,7 @@ msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
-"Du kan velja å alltid klippa til kjeldevideoen. Tillatne format er x:y (4:3, "
+"Du kan velja å alltid skjera til kjeldevideoen. Tillatne format er x:y (4:3, "
 "16:9 osb.), som uttrykkjer det globale biletforholdet."
 
 #: src/libvlc-module.c:427
@@ -2259,8 +2259,8 @@ msgstr "Biletformat på kjelde"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Du kan velja å alltid bruka same storleiksforhold på kjelda. For eksempel er "
@@ -2700,7 +2700,7 @@ msgstr "Straumen vil stoppe på denne staden (i sekund)."
 
 #: src/libvlc-module.c:642
 msgid "Run time"
-msgstr "Lengda"
+msgstr "Speletid"
 
 #: src/libvlc-module.c:644
 msgid "The stream will run this duration (in seconds)."
@@ -3079,9 +3079,8 @@ msgstr "HTTP-mellomtenar"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 
 #: src/libvlc-module.c:853
@@ -4882,11 +4881,11 @@ msgstr "Insert"
 
 #: src/misc/actions.c:82
 msgid "Media Angle"
-msgstr "Mediavinkel"
+msgstr "Medievinkel"
 
 #: src/misc/actions.c:83
 msgid "Media Audio Track"
-msgstr "Medialydspor"
+msgstr "Medielydspor"
 
 #: src/misc/actions.c:84
 msgid "Media Forward"
@@ -4894,7 +4893,7 @@ msgstr "Media framover"
 
 #: src/misc/actions.c:85
 msgid "Media Menu"
-msgstr "Mediameny"
+msgstr "Mediemeny"
 
 #: src/misc/actions.c:86
 msgid "Media Next Frame"
@@ -5949,8 +5948,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -6140,9 +6139,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Adressa til CDDB-tenaren som skal brukast."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8229,8 +8227,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8254,9 +8252,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Straum %d"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8692,9 +8689,9 @@ msgstr "v4L2-driverkontrollare"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -10426,7 +10423,7 @@ msgstr "AES3/SMPTE 302M-lydførpakkar"
 
 #: modules/codec/aom.c:52
 msgid "AOM video decoder"
-msgstr "AOM videodekodar"
+msgstr "AOM-videodekodar"
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10483,7 +10480,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Bidir"
-msgstr "To-vegs"
+msgstr "Tovegs"
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-key"
@@ -10619,7 +10616,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:106
 msgid "Codec name"
-msgstr "Kodek-namn"
+msgstr "Kodeknamn"
 
 #: modules/codec/avcodec/avcodec.h:107
 msgid "Internal libavcodec codec name"
@@ -11023,9 +11020,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Alle filer"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11092,8 +11088,8 @@ msgstr "Underbiletets plassering"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 
 #: modules/codec/dvbsub.c:95
@@ -11776,10 +11772,10 @@ msgstr ""
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -12219,7 +12215,7 @@ msgstr ""
 
 #: modules/codec/scte27.c:42
 msgid "SCTE-27 decoder"
-msgstr "SCTE-27 dekodar"
+msgstr "SCTE-27-dekodar"
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -12636,7 +12632,7 @@ msgstr "SVG videodekodar"
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
-msgstr ""
+msgstr "T.140 tekstkodar"
 
 #: modules/codec/telx.c:54
 msgid "Override page"
@@ -12704,11 +12700,11 @@ msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
 msgid "TTML subtitles decoder"
-msgstr ""
+msgstr "TTML undertekstdekodar"
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
-msgstr ""
+msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
@@ -12955,7 +12951,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -14114,7 +14109,7 @@ msgstr "RC"
 
 #: modules/control/oldrc.c:190
 msgid "Remote control interface"
-msgstr ""
+msgstr "Fjernkontrollgrensesnitt"
 
 #: modules/control/oldrc.c:370
 msgid "Remote control interface initialized. Type `help' for help."
@@ -15690,8 +15685,8 @@ msgid ""
 "decoration: underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC mediespelar er ein fri og open kjeldekode-mediespelar, straumkodar og "
-"kringkastar (streamer) som er laga av dei frivillige i <a href=\"https://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"kringkastar (streamer) som er laga av dei frivillige i <a href=\"https://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>-fellesskapet.</p><p>VLC brukar eigne interne kodekar, "
 "fungerer på praktisk talt alle filer, CD-ar, DVD-ar, nettverksstraumar, "
 "opptakskort og andre medieformat!</p><p><a href=\"https://www.videolan.org/"
@@ -16824,7 +16819,7 @@ msgstr "Vel podkasten du vil melda deg av:"
 
 #: modules/gui/macosx/VLCMainWindow.m:257
 msgid "Check for album art and metadata?"
-msgstr ""
+msgstr "Sjå etter plateomslag og metadata?"
 
 #: modules/gui/macosx/VLCMainWindow.m:257
 msgid "Enable Metadata Retrieval"
@@ -17168,9 +17163,8 @@ msgstr "Fald saman alle"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Lagra speleliste"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18591,8 +18585,7 @@ msgstr "Shift+L"
 
 #: modules/gui/qt/components/controller.cpp:457
 msgid "Click to toggle between loop all, loop one and no loop"
-msgstr ""
-"Klikk for å veksle mellom Spel i ring, Gjenta ein, og Ingen gjentaking."
+msgstr "Klikk for å veksle mellom Spel i ring, Gjenta ein, og Inga gjentaking."
 
 #: modules/gui/qt/components/controller.cpp:558
 msgid "Previous Chapter/Title"
@@ -18958,7 +18951,7 @@ msgstr "Inndata/Lese"
 
 #: modules/gui/qt/components/info_panels.cpp:576
 msgid "Media data size"
-msgstr "Mediadatastorleik"
+msgstr "Mediedatastorleik"
 
 #: modules/gui/qt/components/info_panels.cpp:582
 msgid "Demuxed data size"
@@ -19264,7 +19257,7 @@ msgid ""
 "Drop a file here or select a media source from the left."
 msgstr ""
 "Spelelista er tom.\n"
-"Slepp ei fil her eller vel ei mediakjelde frå sidestolpen."
+"Slepp ei fil her eller vel ei mediekjelde frå sidestolpen."
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:143
 msgid "Icons"
@@ -19586,7 +19579,7 @@ msgstr "Pakk ut"
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
 #: modules/gui/qt/dialogs/vlm.cpp:130
 msgid "&Close"
-msgstr "&Lukk"
+msgstr "&Lat att"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:76
 msgid "Bytes"
@@ -19749,9 +19742,9 @@ msgid ""
 "href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC media player er ein fri og open kjeldekode-mediespelar, kodar og "
-"strøymar/kringkastar, som er laga av frivillige i<a href=\"http://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"<p>VLC mediespelar er ein fri og open kjeldekode-mediespelar, kodar og "
+"strøymar/kringkastar, som er laga av frivillige i <a href=\"http://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>-samfunnet.</p><p>VLC brukar interne kodekar, fungerer "
 "på praktisk talt alle populære platformer, og kan lesa nesten alle typar "
 "filer, CD-ar, DVD-ar, nettverksstraumar, opptakskort og andre medieformat!</"
@@ -19788,7 +19781,7 @@ msgstr "Det oppstod ein feil under oppdateringssjekken …"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:52
 msgid "Current Media Information"
-msgstr "Gjeldande mediainformasjon"
+msgstr "Gjeldande medieinformasjon"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:64
 msgid "&General"
@@ -19861,7 +19854,7 @@ msgstr "&Plate"
 
 #: modules/gui/qt/dialogs/open.cpp:95
 msgid "&Network"
-msgstr "&Nettverksstraum"
+msgstr "&Nettverk"
 
 #: modules/gui/qt/dialogs/open.cpp:97
 msgid "Capture &Device"
@@ -19935,7 +19928,7 @@ msgstr "&Søk:"
 #: modules/gui/qt/dialogs/plugins.cpp:258
 #: modules/gui/qt/dialogs/plugins.cpp:1291
 msgid "More information..."
-msgstr "Meir informasjon"
+msgstr "Meir informasjon..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:266
 msgid "Reload extensions"
@@ -19974,11 +19967,11 @@ msgstr "Berre installert"
 
 #: modules/gui/qt/dialogs/plugins.cpp:530
 msgid "Retrieving addons..."
-msgstr "Hentar utvidingar"
+msgstr "Hentar tillegg..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:541
 msgid "No addons found"
-msgstr "Fann ingen utvidingar"
+msgstr "Fann ingen tillegg"
 
 #: modules/gui/qt/dialogs/plugins.cpp:820
 msgid "This addon has been installed manually. VLC can't manage it by itself."
@@ -20167,7 +20160,7 @@ msgstr "Førehndsvising"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
-msgstr "&Lukk"
+msgstr "&Lat att"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:226
 msgid "Profile Name"
@@ -20291,7 +20284,7 @@ msgstr "Opna mappe"
 
 #: modules/gui/qt/dialogs_provider.cpp:68
 msgid "Open Folder"
-msgstr "Opne ein mappe"
+msgstr "Opna mappe"
 
 #: modules/gui/qt/dialogs_provider.cpp:633
 msgid "Open playlist..."
@@ -20561,7 +20554,7 @@ msgstr "Storleiks&forhold"
 
 #: modules/gui/qt/menus.cpp:695
 msgid "&Crop"
-msgstr "&Klipp til"
+msgstr "&Skjer til"
 
 #: modules/gui/qt/menus.cpp:699
 msgid "&Deinterlace"
@@ -20756,9 +20749,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Slå på programvaremodus"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -20786,7 +20778,7 @@ msgstr "Spør om nettverkspraksis ved oppstart"
 
 #: modules/gui/qt/qt.cpp:135
 msgid "Save the recently played items in the menu"
-msgstr "Lagre nyleg spelte element i menyen"
+msgstr "Lagra nyleg spelte element i menyen"
 
 #: modules/gui/qt/qt.cpp:137
 msgid "List of words separated by | to filter"
@@ -21071,18 +21063,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Stereoforbetrar"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
 msgid "AMD Frame Rate Doubler"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Vis sidestolpe"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22034,7 +22024,7 @@ msgstr "Ballade"
 
 #: modules/meta_engine/ID3Genres.h:150
 msgid "Power Ballad"
-msgstr "Powerballade"
+msgstr "Power-ballade"
 
 #: modules/meta_engine/ID3Genres.h:151
 msgid "Rhythmic Soul"
@@ -22058,7 +22048,7 @@ msgstr "Trommesolo"
 
 #: modules/meta_engine/ID3Genres.h:156
 msgid "Acapella"
-msgstr "Acapella"
+msgstr "A capella"
 
 #: modules/meta_engine/ID3Genres.h:157
 msgid "Euro-House"
@@ -22114,7 +22104,7 @@ msgstr "Kristen gangsta-rap"
 
 #: modules/meta_engine/ID3Genres.h:170
 msgid "Heavy Metal"
-msgstr "Heavy Metal"
+msgstr "Hardrock, tungrock"
 
 #: modules/meta_engine/ID3Genres.h:171
 msgid "Black Metal"
@@ -26597,39 +26587,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Videoskalering"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Vel undertekstfil"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bit per utval"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Samplingsfrekvens"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Videokodekar"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Oppløysing"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Utdata-modular"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -26640,9 +26623,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Alltid øvst"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -27698,28 +27680,24 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Fingeravtrykk"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Vel strøymemetode"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
 msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Fingeravtrykk"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "Detaljnivå (0,1,2)"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:138
 msgid "&Filter:"
@@ -27958,9 +27936,8 @@ msgid "Menus"
 msgstr "Menyar"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Sa&mplingsrate"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -27987,9 +27964,8 @@ msgid " kb/s"
 msgstr " kb/s"
 
 #: modules/gui/qt/ui/profiles.h:737 modules/gui/qt/ui/profiles.h:757
-#, fuzzy
 msgid "Encoding parameters"
-msgstr "ATSC-mottaksparameter"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:740
 msgid "Frame size"
@@ -28008,9 +27984,8 @@ msgid "Profile &Name"
 msgstr "Profil&namn"
 
 #: modules/gui/qt/ui/sout.h:200
-#, fuzzy
 msgid "Set up media sources to stream"
-msgstr "Vel målmappe å strøyma til"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Destination Setup"
@@ -28039,37 +28014,32 @@ msgid "Transcoding Options"
 msgstr "Innstillingar for omkoding"
 
 #: modules/gui/qt/ui/sout.h:210
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Vel «Avanserte innstillingar» for å sjå alle vala."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:211
 msgid "Activate Transcoding"
 msgstr "Slå på omkoding"
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Option Setup"
-msgstr "Innstillingar for målmappe"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr "Vel målmappe å strøyma til"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Miscellaneous Options"
 msgstr "Ymse innstillingar"
 
 #: modules/gui/qt/ui/sout.h:215
-#, fuzzy
 msgid "Stream all elementary streams"
-msgstr "Samplingsfrekvensen til ein lydhovedstraum."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "Generelle innstillingar for straumutdata"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid " %"
@@ -28144,9 +28114,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Hopp over intern avblokkingsfilter for H.264"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profil- og nivå-val"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Optical drive"
@@ -28214,7 +28183,7 @@ msgstr "Set avspelinga på pause når minimert"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Show media change popup:"
-msgstr "Vis beskjed ved mediaskifte:"
+msgstr "Vis beskjed ved medieskifte:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Start in minimal view mode"
@@ -28233,18 +28202,16 @@ msgid "Show systray icon"
 msgstr "Vis systemtrauikon"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses-grensesnitt"
+msgstr "Automatisk heving av grensesnittet:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Bruk ei draktspeleliste"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
-msgstr ""
+msgstr "Resursfil for tema:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Playlist and Instances"
@@ -28268,11 +28235,11 @@ msgstr "Søk etter "
 
 #: modules/gui/qt/ui/sprefs_interface.h:564
 msgid "Save recently played items"
-msgstr "Lagre nyleg spelte element"
+msgstr "Lagra nyleg spelte element"
 
 #: modules/gui/qt/ui/sprefs_interface.h:567
 msgid "Separate words by | (without space)"
-msgstr ""
+msgstr "Separer ord med | (utan mellomrom)"
 
 #: modules/gui/qt/ui/sprefs_interface.h:570
 msgid "Operating System Integration"
@@ -28292,7 +28259,7 @@ msgstr "Aktiver overleggsvising (OSD)"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
 msgid "Show media title on video start"
-msgstr "Vis mediatittel ved videostart"
+msgstr "Vis medietittel ved videostart"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:293
 msgid "Enable subtitles"
@@ -28331,9 +28298,8 @@ msgid "Add a background"
 msgstr "Legg til ein bakgrunn"
 
 #: modules/gui/qt/ui/sprefs_video.h:313
-#, fuzzy
 msgid "O&utput"
-msgstr "Utgang"
+msgstr "U&tdata"
 
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "DirectX"
@@ -28361,7 +28327,7 @@ msgstr "vlc-snap"
 
 #: modules/gui/qt/ui/streampanel.h:169
 msgid "Stuff"
-msgstr ""
+msgstr "Ting"
 
 #: modules/gui/qt/ui/streampanel.h:171
 msgid "Edit settings"
@@ -28467,7 +28433,7 @@ msgstr "Maske"
 
 #: modules/gui/qt/ui/video_effects.h:1325
 msgid "Anaglyph 3D"
-msgstr ""
+msgstr "Raud-blå 3D"
 
 #: modules/gui/qt/ui/video_effects.h:1326
 msgid "Mirror"
@@ -28478,28 +28444,24 @@ msgid "Motion detect"
 msgstr "Rørslefølar"
 
 #: modules/gui/qt/ui/video_effects.h:1331
-#, fuzzy
 msgid "Spatial blur"
-msgstr "Spatial"
+msgstr "Romleg uskarpleik"
 
 #: modules/gui/qt/ui/video_effects.h:1335
 msgid "Anti-Flickering"
-msgstr ""
+msgstr "Anti-flimmer"
 
 #: modules/gui/qt/ui/video_effects.h:1336
-#, fuzzy
 msgid "Soften"
-msgstr "Soft"
+msgstr "Mjuk opp"
 
 #: modules/gui/qt/ui/video_effects.h:1337
-#, fuzzy
 msgid "Denoiser"
-msgstr "Bråk"
+msgstr "Støyfjernar"
 
 #: modules/gui/qt/ui/video_effects.h:1338
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Spatial"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1339
 msgid "Temporal luma strength"
@@ -28518,9 +28480,8 @@ msgid "VLM configurator"
 msgstr "VLM-oppsett"
 
 #: modules/gui/qt/ui/vlm.h:284
-#, fuzzy
 msgid "Media Manager Edition"
-msgstr "Medieinformasjon"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:285
 msgid "Name:"
@@ -28559,9 +28520,5 @@ msgid "AAAA; "
 msgstr "AAAA; "
 
 #: modules/gui/qt/ui/vlm.h:299
-#, fuzzy
 msgid "Media Manager List"
-msgstr "Mediavinkel"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "SAT>IP-kanalliste"
+msgstr "Mediehandsamingsliste"

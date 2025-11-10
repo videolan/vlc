@@ -4,16 +4,16 @@
 #
 # Translators:
 # André de Barros Martins Ribeiro  <andrerib at ajato.com dot br>, 2003
-# ssdoria <ssdoria@gmail.com>, 2008-2022
+# ssdoria <ssdoria@gmail.com>, 2008-2024
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: ssdoria <ssdoria@gmail.com>, 2022\n"
-"Language-Team: Portuguese (Brazil) (https://app.transifex.com/yaron/teams/"
-"16553/pt_BR/)\n"
+"Last-Translator: ssdoria <ssdoria@gmail.com>, 2024\n"
+"Language-Team: Portuguese (Brazil) (https://app.transifex.com/yaron/"
+"teams/16553/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -581,21 +581,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -608,29 +608,28 @@ msgstr ""
 "VLC</h2><h3>Documentação</h3><p>Você pode encontrar a documentação do VLC no "
 "<a href=\"http://wiki.videolan.org\">wiki</a> da VideoLAN .</p><p>Se o "
 "reprodutor de mídias VLC é novo para você, por favor leia a<br><a "
-"href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>Introdução ao reprodutor de mídias VLC</"
-"em></a>.</p><p>Você encontrará informações sobre como usar o reprodutor no "
-"documento <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>Como reproduzir arquivos com o reprodutor de "
-"mídias VLC</em></a>\".</p><p>Para todas as tarefas de salvar, converter, "
-"transcodificar, codificar, combinar e criar transmissões, você deve "
-"encontrar informações úteis na <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">Documentação sobre transmissões</a>.</"
-"p><p>Se você não está fluente na terminologia, por favor consulte a <a "
-"href=\"http://wiki.videolan.org/Knowledge_Base\">base de conhecimento</a>.</"
-"p><p>Para conhecer as principais teclas de atalho, leia a página <a "
-"href=\"http://wiki.videolan.org/Hotkeys\">atalhos</a>.</p><h3>Ajuda</"
-"h3><p>Antes de fazer uma pergunta, por favor verifique as <a href=\"http://"
-"www.videolan.org/support/faq.html\">Perguntas Freqüentes</a>.</p><p>Você "
-"poderá encontrar (e fornecer) ajuda nos <a href=\"http://"
-"forum.videolan.org\">Fóruns</a>, nas <a href=\"http://www.videolan.org/vlc/"
-"lists.html\">listas de discussão</a> ou em nosso canal IRC (<em>#videolan</"
-"em> em irc.freenode.net).</p><h3>Contribua no projeto</h3><p>Você pode "
-"ajudar o projeto VideoLAN doando seu tempo para ajudar a comunidade, para "
-"desenhar capas, para traduzir a documentação, para testar e para programar. "
-"Você pode também doar dinheiro e material para nos ajudar. E, claro, você "
-"pode <b>promover</b> o reprodutor de mídias VLC.</p></body></html>"
+"href=\"http://wiki.videolan.org/Documentation:"
+"VLC_for_dummies\"><em>Introdução ao reprodutor de mídias VLC</em></a>.</"
+"p><p>Você encontrará informações sobre como usar o reprodutor no documento "
+"<br>\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>Como "
+"reproduzir arquivos com o reprodutor de mídias VLC</em></a>\".</p><p>Para "
+"todas as tarefas de salvar, converter, transcodificar, codificar, combinar e "
+"criar transmissões, você deve encontrar informações úteis na <a "
+"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Documentação "
+"sobre transmissões</a>.</p><p>Se você não está fluente na terminologia, por "
+"favor consulte a <a href=\"http://wiki.videolan.org/Knowledge_Base\">base de "
+"conhecimento</a>.</p><p>Para conhecer as principais teclas de atalho, leia a "
+"página <a href=\"http://wiki.videolan.org/Hotkeys\">atalhos</a>.</"
+"p><h3>Ajuda</h3><p>Antes de fazer uma pergunta, por favor verifique as <a "
+"href=\"http://www.videolan.org/support/faq.html\">Perguntas Freqüentes</a>.</"
+"p><p>Você poderá encontrar (e fornecer) ajuda nos <a href=\"http://forum."
+"videolan.org\">Fóruns</a>, nas <a href=\"http://www.videolan.org/vlc/lists."
+"html\">listas de discussão</a> ou em nosso canal IRC (<em>#videolan</em> em "
+"irc.freenode.net).</p><h3>Contribua no projeto</h3><p>Você pode ajudar o "
+"projeto VideoLAN doando seu tempo para ajudar a comunidade, para desenhar "
+"capas, para traduzir a documentação, para testar e para programar. Você pode "
+"também doar dinheiro e material para nos ajudar. E, claro, você pode "
+"<b>promover</b> o reprodutor de mídias VLC.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -816,8 +815,8 @@ msgstr ""
 "            e que sobrepõe as configurações anteriores.\n"
 "\n"
 "Sintaxe do transmissão MRL:\n"
-"  [[access][/demux]://]URL[@[título][:capítulo][-[título][:capítulo]]] "
-"[:opção=valor ...]\n"
+"  [[access][/demux]://]URL[@[título][:capítulo][-[título][:capítulo]]] [:"
+"opção=valor ...]\n"
 "\n"
 "  Muitas das opções globais --opções podem ser usadas também como :opção MRL "
 "específicas.\n"
@@ -2326,8 +2325,8 @@ msgstr "Proporção da fonte"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Escolhe a proporção da fonte. Por exemplo, alguns DVD pedem que seja 16:9 e "
@@ -2849,8 +2848,8 @@ msgid ""
 "{...}\""
 msgstr ""
 "É possível entregar manualmente uma lista de preferidos a um transmissão na "
-"forma \"{nome=nome-do-preferido,instante=deslocamento-de-tempo-"
-"opcional,bytes=deslocamento-opcional-de-bytes},{...}\""
+"forma \"{nome=nome-do-preferido,instante=deslocamento-de-tempo-opcional,"
+"bytes=deslocamento-opcional-de-bytes},{...}\""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -3146,9 +3145,9 @@ msgid ""
 msgstr ""
 "Define o endereço em que o servidor RTSP aguardará conexões, bem como o "
 "caminho base da mídia RTSP VOD. A sintaxe é enderço/caminho. Por padrão o "
-"servidor atenderá em todos os endereços IP. Especifique um endereço IP "
-"(e.g. ::1 ou 127.0.0.1) ou um nome de máquina (e.g. localhost) para limitar "
-"a uma interface de rede específica."
+"servidor atenderá em todos os endereços IP. Especifique um endereço IP (e."
+"g. ::1 ou 127.0.0.1) ou um nome de máquina (e.g. localhost) para limitar a "
+"uma interface de rede específica."
 
 #: src/libvlc-module.c:817
 msgid "HTTP server port"
@@ -3220,9 +3219,8 @@ msgstr "Proxy HTTP"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "Proxy HTTP a ser usado. Deve ser preenchido no formato http://"
 "[usuário@]meuproxy.meudomínio:minhaporta/ ; se vazio, a variável de ambiente "
@@ -6185,8 +6183,8 @@ msgstr "Nenhum dispositivo de entrada de áudio encontrado"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 "Seu Mac não parece ser equipado com um dispositivo de áudio apropriado. Por "
 "favor, verifique as conexões e drivers."
@@ -6403,9 +6401,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Endereço do servidor CDDB a ser usado."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8663,8 +8660,8 @@ msgstr "É necessária uma autenticação SMB "
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 "O computador (%s) que está sendo contactado solicita autenticação.\n"
 "Por favor informe um nome de usuário (preferencialmente um nome de domínio "
@@ -8692,9 +8689,8 @@ msgid "Password for stream encryption"
 msgstr "Senha para criptografia do transmissão"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "Saída de transmissão SRT"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9142,9 +9138,9 @@ msgstr "controles do driver v4l2"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 "Ajusta os controles do driver v4l2 para os valores especificados, usando uma "
 "lista separada por vírgulas, opcionalmente encapsulada por chaves (e.g.: "
@@ -9721,14 +9717,12 @@ msgid "SRT stream output"
 msgstr "Saída de transmissão SRT"
 
 #: modules/access_output/srt.c:471
-#, fuzzy
 msgid "SRT maximum payload size (bytes)"
-msgstr "Tamanho máximo do pacote RIST (bytes)"
+msgstr ""
 
 #: modules/access_output/srt.c:475
-#, fuzzy
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr "Tamanho máximo do pacote RIST (bytes)"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11695,9 +11689,8 @@ msgstr ""
 "ladrilhos. Padrão 0=automático"
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Todos os arquivos"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11766,8 +11759,8 @@ msgstr "Posição da subtela"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "Você pode impor a posição da subtela no vídeo (0=centro, 1=esquerda, "
 "2=direita, 4=topo, 8=base. Você também pode usar combinações desses valores, "
@@ -12543,10 +12536,10 @@ msgstr "Precisão do Controle de Taxa"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 "Tolerância em percentagem do método \"avbr (Taxa de Bits de Variação Média). "
 "(Ex.: 10 com uma taxa de bits de 800 kbps significa que o codificador tenta "
@@ -13815,7 +13808,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15714,7 +15706,7 @@ msgstr "Importar Pasta"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
-msgstr "Procurarar filtro de descombinação de prevenção"
+msgstr "Filtro de descombinação de prevenção de busca"
 
 #: modules/demux/flac.c:52
 msgid "FLAC demuxer"
@@ -16108,7 +16100,7 @@ msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:4382
 msgid "Do not seek"
-msgstr "Não procurar"
+msgstr "Não buscar"
 
 #: modules/demux/mp4/mp4.c:4383
 msgid "Build index"
@@ -18280,9 +18272,8 @@ msgstr "Recolher Todos"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Salvar lista de reprodução"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -20704,8 +20695,8 @@ msgstr "Salvar arquivo..."
 msgid ""
 "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 msgstr ""
-"Contêineres (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv "
-"*.webm)"
+"Contêineres (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *."
+"webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:185
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -20961,8 +20952,8 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>O Reprodutor de Mídias VLC é um reprodutor, codificador gerador de "
-"transmissões livre, feito por voluntários da comunidade <a href=\"http://"
-"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"transmissões livre, feito por voluntários da comunidade <a href=\"http://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>.</p><p>O VLC usa codificadores próprios, trabalha com "
 "plataformas populares e pode ler quase todos os arquivos, CDs, DVDs, "
 "transmissões de rede, placas de captura e outros formatos de mídia!</p><p><a "
@@ -21993,9 +21984,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Exibir erros menos críticos e janelas de aviso"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Habilitar modo de software"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -22340,19 +22330,16 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Configura o gama da imagem, entre 0.01 e 10. O padrão é 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
-#, fuzzy
 msgid "AMD VQ Enhancer"
-msgstr "Aperfeiçoador de Estéreo"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Taxa de &Quadros"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Exibir Barra Lateral"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22836,8 +22823,8 @@ msgid ""
 msgstr ""
 "Aceita comandos desta origem. A interface de linha de comandos tem como "
 "padrão de entrada o stdin (\"*console\"), mas pode também associar a um "
-"socket TCP (\"localhost:4212\")  ou usar o protocolo telnetl (\"telnet://"
-"0.0.0.0:4212\")"
+"socket TCP (\"localhost:4212\")  ou usar o protocolo telnetl "
+"(\"telnet://0.0.0.0:4212\")"
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
@@ -28298,39 +28285,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Saída de vídeo recomendada para o Windows 8 e versões posteriores"
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Aumento do vídeo"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Selecionar uma cor no vídeo"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bits por amostra"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Reamostragem do SoX"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Codificadores de vídeo"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Resolução"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Módulos de saída"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -28341,9 +28321,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Sempre visível"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -29474,24 +29453,20 @@ msgid "0.00 dB"
 msgstr "0,00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "Impressão &Digital"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
-#, fuzzy
 msgid "Select a matching identity"
-msgstr "Selecione um Método de Transmissão"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
-#, fuzzy
 msgid "No fingerprint has been found"
-msgstr "Criador de impressão digital de trilhas (baseado em Acoustid)"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "Impressão &Digital"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29735,9 +29710,8 @@ msgid "Menus"
 msgstr "Menus"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Taxa de A&mostragem"
+msgstr "Taxa de &Quadros"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -30009,9 +29983,8 @@ msgid "Auto raising the interface:"
 msgstr "Iniciar automaticamente a interface:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Usar uma lista de reprodução com capa"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -30326,21 +30299,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Lista do Gerenciador de Mídias"
-
-#~ msgid "SAT>IP channel list"
-#~ msgstr "Lista de canais SAT>IP"
-
-#~ msgid "Master List"
-#~ msgstr "Lista Principal"
-
-#~ msgid "Server List"
-#~ msgstr "Lista do Servidor"
-
-#~ msgid "Custom List"
-#~ msgstr "Lista Personalizada"
-
-#~ msgid "SRT chunk size (bytes)"
-#~ msgstr "Tamanho (bytes) da porção do SRT"
-
-#~ msgid "Crypto key length in bytes"
-#~ msgstr "Tamanho da chave criptográfica em bytes"

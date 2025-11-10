@@ -9,7 +9,7 @@
 # Vaidotas Kalvelis <vaidotaskal@gmail.com>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
@@ -579,21 +579,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -605,8 +605,8 @@ msgstr ""
 "charset=utf-8\" /></head><body><h2>Jus sveikina VLC leistuvės žinynas </"
 "h2><h3>Dokumentacija</h3><p>VLC dokumentaciją galite rasti VideoLAN <a "
 "href=\"http://wiki.videolan.org\">wiki</a> svetainėje.</p><p>Jei esate pirmą "
-"kartą naudojatės VLC leistuve, perskaitykite<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>VLC leistuvės "
+"kartą naudojatės VLC leistuve, perskaitykite<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>VLC leistuvės "
 "pradžiamokslį</em></a>.</p> <p>Šiek tiek informacijos, kaip naudotis "
 "leistuve rasite dokumente<br><a href=\"http://wiki.videolan.org/"
 "Documentation:Play_HowTo\"><em>Kaip žiūrėti bei klausytis failus VLC "
@@ -620,8 +620,8 @@ msgstr ""
 "p><h3>Pagalba</h3><p>Prieš užduodami bet kokį klausimą, pirmiausia ieškokite "
 "atsakymo <a href=\"http://www.videolan.org/support/faq.html\">dažniausiai "
 "užduodamų klausimų puslapyje</a>.</p><p>Pagalbos taip pat rasite <a "
-"href=\"http://forum.videolan.org\">forumuose</a>, <a href=\"http://"
-"www.videolan.org/vlc/lists.html\">elektroninio pašto grupėje</a> ar mūsų IRC "
+"href=\"http://forum.videolan.org\">forumuose</a>, <a href=\"http://www."
+"videolan.org/vlc/lists.html\">elektroninio pašto grupėje</a> ar mūsų IRC "
 "kanale (<em>#videolan</em> adresu irc.freenode.net).</p><h3>Prisidėkite prie "
 "projekto </h3><p>Jūs galite prisidėti prie VideoLAN projekto padėdami VLC "
 "bendruomenei, kurdami apipavidalinimus, versdami dokumentaciją, išbandydami "
@@ -812,8 +812,8 @@ msgstr ""
 "            jo atlikimą ir nustelbianti ankstesnes nuostatas.\n"
 "\n"
 "MRL srauto sintaksė:\n"
-"  [[prieiga][/išpynimo_metodas]://]URL[@[įrašas][:skyrius][-[įrašas]"
-"[:skyrius]]] [:parametras=vertė ...]\n"
+"  [[prieiga][/išpynimo_metodas]://]URL[@[įrašas][:skyrius][-[įrašas][:"
+"skyrius]]] [:parametras=vertė ...]\n"
 "\n"
 "  Daug bendrų --parinkčių gali būti naudojamos kaip specifinės :parinktys.\n"
 "  Gali būti naudojama daugybė :parinktis=vertė porų.\n"
@@ -2308,8 +2308,8 @@ msgstr "Šaltinio vaizdo santykis"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Priverstinai pakeičiamas šaltinio vaizdo pločio ir aukščio santykis. "
@@ -3150,9 +3150,8 @@ msgstr "HTTP įgaliotasis serveris"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
 "Naudotinas HTTP įgaliotasis serveris. Turi būti nurodytas formatu http://"
 "[vartotojas@]proksi.sritis:prievadas; jei nenurodoma, mėginamas naudoti "
@@ -3175,8 +3174,8 @@ msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
-"Naudotinas SOCKS įgaliotasis serveris. Turi būti formatu "
-"„adresas:prievadas“. Bus naudojamas visiems TCP ryšiams."
+"Naudotinas SOCKS įgaliotasis serveris. Turi būti formatu „adresas:"
+"prievadas“. Bus naudojamas visiems TCP ryšiams."
 
 #: src/libvlc-module.c:862
 msgid "SOCKS user name"
@@ -3279,10 +3278,10 @@ msgid ""
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
-"Sąrašas kodavimo priemonių, kurioms VLC teiks pirmenybę. Pavyzdžiui, "
-"„dummy,a52“ išmėgins tuščiąjį ir a52 kodavimus prieš mėgindama kitus. Šią "
-"parinktį turėtų keisti tik patyrę naudotojai, kadangi ji gali sugadinti visų "
-"jūsų srautų grojimą."
+"Sąrašas kodavimo priemonių, kurioms VLC teiks pirmenybę. Pavyzdžiui, „dummy,"
+"a52“ išmėgins tuščiąjį ir a52 kodavimus prieš mėgindama kitus. Šią parinktį "
+"turėtų keisti tik patyrę naudotojai, kadangi ji gali sugadinti visų jūsų "
+"srautų grojimą."
 
 #: src/libvlc-module.c:915
 msgid "Preferred encoders list"
@@ -6045,8 +6044,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -6238,9 +6237,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "Naudotinas CDDB serverio adresas."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8361,8 +8359,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8386,9 +8384,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "%d srautas"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8824,9 +8821,9 @@ msgstr "v4l2 tvarkyklės valdiklis"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -11192,9 +11189,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "Visi failai"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11261,8 +11257,8 @@ msgstr ""
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 
 #: modules/codec/dvbsub.c:95
@@ -11958,10 +11954,10 @@ msgstr ""
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -13137,7 +13133,6 @@ msgid "CABAC"
 msgstr ""
 
 #: modules/codec/x264.c:133
-#, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -17384,9 +17379,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "Įrašyti grojaraštį"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -21000,9 +20994,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr "Rodyti nereikšmingas klaidas ir įspėjančiuosius pranešimus"
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "Įgalinti garsą"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -21328,14 +21321,12 @@ msgid "AMD VQ Enhancer"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:687
-#, fuzzy
 msgid "AMD Frame Rate Doubler"
-msgstr "Kadrų &dažnis"
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "Rodyti šoninę juostą"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -26941,39 +26932,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "Vaizdo dydžio priderinimas"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "Pasirinkti vieną spalvą vaizde"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "Bitų kiekis elemente"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "Garso elementų dažnis"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "Vaizdo kodavimas"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "Skiriamoji geba"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "Išvesties moduliai"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -26984,9 +26968,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "Visada viršuje"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -28056,9 +28039,8 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "&Piršto antspaudas"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
@@ -28069,18 +28051,16 @@ msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "&Piršto antspaudas"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
 msgstr "Pranešimų &išsamumas:"
 
 #: modules/gui/qt/ui/messages_panel.h:138
-#, fuzzy
 msgid "&Filter:"
-msgstr "Filtras:"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
 msgid "&Save as..."
@@ -28115,9 +28095,8 @@ msgid "Start Time"
 msgstr "Pradžios laikas"
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Stop Time"
-msgstr "Pabaigos laikas"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:269
 msgid "Edit Options"
@@ -28144,9 +28123,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'v':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:283
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Keisti kūrinio pradžios laiką"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:286
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28239,9 +28217,8 @@ msgid "Please enter a network URL:"
 msgstr "Įveskite tinklo URL:"
 
 #: modules/gui/qt/ui/profiles.h:699
-#, fuzzy
 msgid "Profile edition"
-msgstr "Profilis nepavadintas"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:700
 msgid "FLAC"
@@ -28308,9 +28285,8 @@ msgid "Features"
 msgstr "Savybės"
 
 #: modules/gui/qt/ui/profiles.h:717
-#, fuzzy
 msgid "Streamable"
-msgstr "Srauto pavadinimas"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:718
 msgid "Chapters"
@@ -28321,7 +28297,6 @@ msgid "Menus"
 msgstr "Meniu"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
 msgstr "Kadrų &dažnis"
 
@@ -28362,29 +28337,24 @@ msgid "px"
 msgstr " tšk"
 
 #: modules/gui/qt/ui/profiles.h:756
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Garso elementų dažnis"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:764
 msgid "Profile &Name"
 msgstr "&Profilio pavadinimas"
 
 #: modules/gui/qt/ui/sout.h:200
-#, fuzzy
 msgid "Set up media sources to stream"
 msgstr ""
-"Pasirinkite „Sudėtingesni nustatymai“ norėdami matyti visus nustatymus."
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Destination Setup"
 msgstr "Paskirties parinktys"
 
 #: modules/gui/qt/ui/sout.h:203
-#, fuzzy
 msgid "Select destinations to stream to"
 msgstr ""
-"Pasirinkite „Sudėtingesni nustatymai“ norėdami matyti visus nustatymus."
 
 #: modules/gui/qt/ui/sout.h:204
 msgid ""
@@ -28407,9 +28377,8 @@ msgid "Transcoding Options"
 msgstr "Perkodavimo parinktys"
 
 #: modules/gui/qt/ui/sout.h:210
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Srauto siuntimo ir perkodavimo parinktys"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:211
 msgid "Activate Transcoding"
@@ -28420,10 +28389,8 @@ msgid "Option Setup"
 msgstr "Parametrų konfigūracija"
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Set up any additional options for streaming"
 msgstr ""
-"Pasirinkite „Sudėtingesni nustatymai“ norėdami matyti visus nustatymus."
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Miscellaneous Options"
@@ -28506,9 +28473,8 @@ msgid "Video quality post-processing level"
 msgstr "Vaizdo kokybės galutinio apdorojimo lygis"
 
 #: modules/gui/qt/ui/sprefs_input.h:358
-#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "Praleisti kartojimo filtrą"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "x264 preset and tuning selection"
@@ -28599,23 +28565,20 @@ msgid "Show systray icon"
 msgstr "Ženkliukas sistemos dėkle"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses sąsaja"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "Grojaraščiui naudoti apipavidalinimą"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
 msgstr "Apipavidalinimo failas:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:553
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "Grojaraščių analizatoriai"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:556
 msgid "Pause on the last frame of a video"
@@ -28860,24 +28823,20 @@ msgid "Denoiser"
 msgstr "Triukšmo šalinimas"
 
 #: modules/gui/qt/ui/video_effects.h:1338
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Erdvinis suliejimas"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1339
-#, fuzzy
 msgid "Temporal luma strength"
-msgstr "Erdvinis suliejimas"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1340
-#, fuzzy
 msgid "Spatial chroma strength"
-msgstr "Erdvinis suliejimas"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1341
-#, fuzzy
 msgid "Temporal chroma strength"
-msgstr "Erdvinis suliejimas"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:283
 msgid "VLM configurator"

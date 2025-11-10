@@ -31,11 +31,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.13\n"
+"Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-09-17 13:40+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Mohamed Alosman <aboosamah94@hotmail.com>, 2021\n"
+"Last-Translator: tarak oueriache <igosad@protonmail.com>, 2024\n"
 "Language-Team: Arabic (https://app.transifex.com/yaron/teams/16553/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -591,21 +591,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://"
-"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
-"media player</em></a>.</p><p>You will find some information on how to use "
-"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
-"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
-"muxing and streaming tasks, you should find useful information in the <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
-"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://"
-"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
-"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
+"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -617,25 +617,25 @@ msgstr ""
 "html; charset=utf-8\" /></head><body><h2>مرحبا بك في مساعدة مشغّل الوسائط "
 "VLC</h2><h3>التوثيق</h3><p>يمكنك العثور على توثيق VLC في موقع <a "
 "href=\"http://wiki.videolan.org\">الويكي</a> لِ‍ VideoLAN.</p><p>إن كنت حديث "
-"العهد بِ‍ VLC، فرجاءً اقرأ<br><a href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>مقدّمة إلى مشغّل الوسائط VLC</em></a>.</"
-"p><p>ستجد بعض المعلومات حول كيفية استخدام المشغّل في مستند <br>”<a "
-"href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>طريقة تشغيل "
-"الملفات بمشغّل الوسائط VLC</em></a>“.</p><p>ستجد في <a href=\"http://"
-"wiki.videolan.org/Documentation:Streaming_HowTo\">توثيق التدفقات</a> كل ما "
-"تحتاج لمهام الحفظ، والتحويل، وتبديل الترميز، والترميز، والمزج والتدفق.</"
-"p><p>إن لم تكن متأكدا من المصطلحات فطالع <a href=\"http://wiki.videolan.org/"
-"Knowledge_Base\">قاعدة المعرفة</a>.</p><p>لفهم اختصارات لوحة المفاتيح "
-"الأساسية اقرأ صفحة <a href=\"http://wiki.videolan.org/Hotkeys\">الاختصارات</"
-"a>.</p><h3>المساعدة</h3><p>رجاءً وقبل طرح أي سؤال طالع صفحة <a href=\"http://"
-"www.videolan.org/support/faq.html\">الأسئلة الشائعة</a>.</p><p>بعدها يمكنك "
-"الحصول (وربما تقديم) المساعدة في <a href=\"http://"
-"forum.videolan.org\">المنتدى</a>، أو <a href=\"http://www.videolan.org/vlc/"
-"lists.html\">القوائم البريدية</a> أو قناتنا على آي‌آر‌سي (<em>‎#videolan</em> "
-"على irc.freenode.net).</p><h3>المساهمة في المشروع</h3><p>يمكنك مساعدة مشروع "
-"VideoLAN بتوفير بعض الوقت لمساعدة المجتمع، أو لتصميم السمات، أو لترجمة "
-"التوثيق، أو للاختبار أو للبرمجة. يمكنك ايضا التبرع ماليا أو ماديا حتى. وطبعا "
-"يمكنك <b>الترويج</b> لمشغل الوسائط VLC.</p></body></html>"
+"العهد بِ‍ VLC، فرجاءً اقرأ<br><a href=\"http://wiki.videolan.org/Documentation:"
+"VLC_for_dummies\"><em>مقدّمة إلى مشغّل الوسائط VLC</em></a>.</p><p>ستجد بعض "
+"المعلومات حول كيفية استخدام المشغّل في مستند <br>”<a href=\"http://wiki."
+"videolan.org/Documentation:Play_HowTo\"><em>طريقة تشغيل الملفات بمشغّل "
+"الوسائط VLC</em></a>“.</p><p>ستجد في <a href=\"http://wiki.videolan.org/"
+"Documentation:Streaming_HowTo\">توثيق التدفقات</a> كل ما تحتاج لمهام الحفظ، "
+"والتحويل، وتبديل الترميز، والترميز، والمزج والتدفق.</p><p>إن لم تكن متأكدا "
+"من المصطلحات فطالع <a href=\"http://wiki.videolan.org/Knowledge_Base\">قاعدة "
+"المعرفة</a>.</p><p>لفهم اختصارات لوحة المفاتيح الأساسية اقرأ صفحة <a "
+"href=\"http://wiki.videolan.org/Hotkeys\">الاختصارات</a>.</p><h3>المساعدة</"
+"h3><p>رجاءً وقبل طرح أي سؤال طالع صفحة <a href=\"http://www.videolan.org/"
+"support/faq.html\">الأسئلة الشائعة</a>.</p><p>بعدها يمكنك الحصول (وربما "
+"تقديم) المساعدة في <a href=\"http://forum.videolan.org\">المنتدى</a>، أو <a "
+"href=\"http://www.videolan.org/vlc/lists.html\">القوائم البريدية</a> أو "
+"قناتنا على آي‌آر‌سي (<em>‎#videolan</em> على irc.freenode.net).</p><h3>المساهمة "
+"في المشروع</h3><p>يمكنك مساعدة مشروع VideoLAN بتوفير بعض الوقت لمساعدة "
+"المجتمع، أو لتصميم السمات، أو لترجمة التوثيق، أو للاختبار أو للبرمجة. يمكنك "
+"ايضا التبرع ماليا أو ماديا حتى. وطبعا يمكنك <b>الترويج</b> لمشغل الوسائط VLC."
+"</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -824,8 +824,8 @@ msgstr ""
 " [[access][/demux]://]URL[#[title][:chapter][-[title][:chapter]]]\n"
 " [:option=value ...]\n"
 "\n"
-" ‎‫يمكن استخدام العديد من الخيارات العمومية ‎--options كخيارات MRL خاصة "
-"‎:options.‏\n"
+" ‎‫يمكن استخدام العديد من الخيارات العمومية ‎--options كخيارات MRL خاصة ‎:"
+"options.‏\n"
 " ‎‫يمكن تحديد عدد من أزواج الخيارات ‎:option=value.‏\n"
 "\n"
 "‎‫صياغة العناوين:\n"
@@ -1977,9 +1977,9 @@ msgid ""
 "centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use "
 "combinations of these values, like 6=4+2 meaning top-right)."
 msgstr ""
-"إجبار الوضع الخطي للفديو في النافذة، فرضًا (0):سيكون محورها "
-"( المركز=0 ،اليسار=1 ،اليمين = 2 ، اعلى=4 ، 8 اسفل=8 ، يمكنك ايضا استخدام "
-"مزيج من هذه القيم ، مثل 6 = 4 +2 يعنى أعلى اليمين )"
+"إجبار الوضع الخطي للفديو في النافذة، فرضًا (0):سيكون محورها ( المركز=0 ،"
+"اليسار=1 ،اليمين = 2 ، اعلى=4 ، 8 اسفل=8 ، يمكنك ايضا استخدام مزيج من هذه "
+"القيم ، مثل 6 = 4 +2 يعنى أعلى اليمين )"
 
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:83
@@ -2296,8 +2296,8 @@ msgstr "نسبة أبعاد المصدر"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are "
-"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are x:"
+"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "يعمل هذا على إجبار النسبة الباعية للمصدر. بعض اسطوانات دي‌ڤي‌دي تقول أنها ١٦:٩ "
@@ -3156,13 +3156,11 @@ msgstr "وكيل HTTP"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://"
-"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
-"variable will be tried."
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
-"وكيل HTTP المراد استخدامه يجب أن يكون بالشكل http://"
-"[user@]myproxy.mydomain:myport/ ؛  إذا كانت فارغة، فستتم تجربة متغير البيئة "
-"http_proxy."
+"وكيل HTTP المراد استخدامه يجب أن يكون بالشكل http://[user@]myproxy.mydomain:"
+"myport/ ؛  إذا كانت فارغة، فستتم تجربة متغير البيئة http_proxy."
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
@@ -3671,35 +3669,37 @@ msgstr ""
 
 #: src/libvlc-module.c:1117
 msgid "Automatically preparse items"
-msgstr ""
+msgstr "التحليل المسبق للإدخالات تلقائيًا"
 
 #: src/libvlc-module.c:1119
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
+"يقوم تلقائيًا بتحليل الإدخالات المضافة إلى قائمة التشغيل (لاسترداد بعض "
+"البيانات التعريفية)."
 
 #: src/libvlc-module.c:1122
 msgid "Preparsing timeout"
-msgstr ""
+msgstr "مهلة ما قبل التحليل"
 
 #: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr ""
+msgstr "الحد الأقصى للوقت المسموح به لإعداد عنصر، بالمللي ثانية"
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:342
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:569
 msgid "Allow metadata network access"
-msgstr ""
+msgstr "السماح بالوصول إلى شبكة البيانات التعريفية"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
-msgstr ""
+msgstr "طي"
 
 #: src/libvlc-module.c:1131
 msgid "Expand"
-msgstr ""
+msgstr "وسّع"
 
 #: src/libvlc-module.c:1133
 msgid "Subdirectory behavior"
@@ -3719,7 +3719,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1140
 msgid "Ignored extensions"
-msgstr ""
+msgstr "ملحقات تم تجاهلها"
 
 #: src/libvlc-module.c:1142
 msgid ""
@@ -3734,11 +3734,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
-msgstr ""
+msgstr "أظهر الملفات المخفية"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "تجاهل الملفات التي تبدأ بـ \".\""
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3749,6 +3749,8 @@ msgid ""
 "Specifies the services discovery modules to preload, separated by colons. "
 "Typical value is \"sap\"."
 msgstr ""
+"يحدد وحدات اكتشاف الخدمات التي سيتم تحميلها مسبقًا، مفصولة بنقطتين. القيمة "
+"النموذجية هي \"sap\"."
 
 #: src/libvlc-module.c:1156
 msgid "Play files randomly forever"
@@ -3816,13 +3818,13 @@ msgstr "ابدأ بتشغيل محتوى قائمة التشغيل تلقائي�
 
 #: src/libvlc-module.c:1188
 msgid "Pause on audio communication"
-msgstr ""
+msgstr "توقف مؤقتًا عن الاتصال الصوتي"
 
 #: src/libvlc-module.c:1190
 msgid ""
 "If pending audio communication is detected, playback will be paused "
 "automatically."
-msgstr ""
+msgstr "إذا تم اكتشاف اتصال صوتي معلق، فسيتم إيقاف التشغيل مؤقتًا تلقائيًا."
 
 #: src/libvlc-module.c:1193
 msgid "Use media library"
@@ -3843,6 +3845,7 @@ msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
 msgstr ""
+"يمكن لقائمة التشغيل استخدام شجرة لتصنيف بعض العناصر، مثل محتويات الدليل."
 
 #: src/libvlc-module.c:1209
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
@@ -3855,35 +3858,39 @@ msgstr "تجاهل"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "التحكم في مستوى الصوت"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "التحكم بالوضعية"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "تم عكس التحكم في الوضع"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "التحكم بالمحور العمودي لعجلة الماوس"
 
 #: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
+"يمكن للمحور الرأسي لعجلة الماوس (لأعلى/لأسفل) التحكم في مستوى الصوت أو "
+"الموضع أو تجاهله."
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "التحكم بالمحور الأفقي لعجلة الماوس"
 
 #: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
+"يمكن لمحور عجلة الماوس الأفقي (يسار/يمين) التحكم في مستوى الصوت أو الموضع أو "
+"تجاهله."
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:98
@@ -4146,6 +4153,8 @@ msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr ""
+"حدد المفتاح لتحريك المحدد لأعلى في قوائم DVD / حرك نقطة العرض لأعلى (درجة "
+"الصوت)."
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
@@ -4156,6 +4165,8 @@ msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr ""
+"حدد المفتاح لتحريك المحدد لأسفل في قوائم DVD / حرك نقطة العرض لأسفل (درجة "
+"الصوت)."
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
@@ -4166,6 +4177,8 @@ msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
+"حدد المفتاح لتحريك المحدد إلى اليسار في قوائم DVD / نقل نقطة العرض إلى "
+"اليسار (زاوية الإنعراج)."
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
@@ -4176,6 +4189,8 @@ msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
+"حدد المفتاح لتحريك المحدد لليمين في قوائم DVD / حرك نقطة العرض إلى اليمين "
+"(زاوية الإنعراج)."
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -4191,7 +4206,7 @@ msgstr "انتقل إلى قائمة دي‌ڤي‌دي"
 
 #: src/libvlc-module.c:1306
 msgid "Select the key to take you to the DVD menu"
-msgstr ""
+msgstr "حدد المفتاح لينقلك إلى قائمة DVD"
 
 #: src/libvlc-module.c:1307
 msgid "Select previous DVD title"
@@ -4199,7 +4214,7 @@ msgstr "اختر عنوان دي‌ڤي‌دي السابق"
 
 #: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
-msgstr ""
+msgstr "حدد المفتاح لاختيار العنوان السابق من قرص DVD"
 
 #: src/libvlc-module.c:1309
 msgid "Select next DVD title"
@@ -4207,7 +4222,7 @@ msgstr "اختر عنوان دي‌ڤي‌دي التالي"
 
 #: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
-msgstr ""
+msgstr "حدد المفتاح لاختيار العنوان التالي من قرص DVD"
 
 #: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
@@ -4215,7 +4230,7 @@ msgstr "اختر فصل دي‌ڤي‌دي السابق"
 
 #: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr ""
+msgstr "حدد المفتاح لاختيار الفصل السابق من قرص DVD"
 
 #: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
@@ -4223,7 +4238,7 @@ msgstr "اختر فصل دي‌ڤي‌دي التالي"
 
 #: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr ""
+msgstr "حدد المفتاح لاختيار الفصل التالي من قرص DVD"
 
 #: src/libvlc-module.c:1315
 msgid "Volume up"
@@ -4270,67 +4285,69 @@ msgstr "اختر المفتاح الساخن الذي يُقلّل تأخر ال
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "إعادة ضبط مقياس نص الترجمة"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "قم بتوسيع نطاق نص الترجمة"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "تقليص نص الترجمة"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "حدد المفتاح لتغيير حجم نص الترجمة"
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
-msgstr ""
+msgstr "مزامنة الترجمة / الطابع الزمني للصوت المرجعي"
 
 #: src/libvlc-module.c:1330
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
 msgstr ""
+"حدد المفتاح لوضع إشارة مرجعية على الطابع الزمني الصوتي عند مزامنة الترجمة."
 
 #: src/libvlc-module.c:1331
 msgid "Subtitle sync / bookmark subtitle timestamp"
-msgstr ""
+msgstr "مزامنة الترجمة/الطابع الزمني للترجمة المرجعية"
 
 #: src/libvlc-module.c:1332
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
 msgstr ""
+"حدد المفتاح لوضع إشارة مرجعية على الطابع الزمني للترجمة عند مزامنة الترجمات."
 
 #: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr ""
+msgstr "مزامنة الترجمة / مزامنة الطوابع الزمنية للصوت والترجمة"
 
 #: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
-msgstr ""
+msgstr "حدد المفتاح لمزامنة الطوابع الزمنية للصوت والترجمة المرجعية."
 
 #: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
-msgstr ""
+msgstr "مزامنة الترجمة / إعادة ضبط مزامنة الصوت والترجمة"
 
 #: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
-msgstr ""
+msgstr "حدد المفتاح لإعادة ضبط مزامنة الطوابع الزمنية للصوت والترجمة."
 
 #: src/libvlc-module.c:1337
 msgid "Subtitle position up"
-msgstr ""
+msgstr "موضع الترجمة لأعلى"
 
 #: src/libvlc-module.c:1338
 msgid "Select the key to move subtitles higher."
-msgstr ""
+msgstr "حدد المفتاح لنقل الترجمة إلى أعلى."
 
 #: src/libvlc-module.c:1339
 msgid "Subtitle position down"
-msgstr ""
+msgstr "موضع الترجمة لأسفل"
 
 #: src/libvlc-module.c:1340
 msgid "Select the key to move subtitles lower."
-msgstr ""
+msgstr "حدد المفتاح لتحريك الترجمة إلى الأسفل."
 
 #: src/libvlc-module.c:1341
 msgid "Audio delay up"
@@ -4499,11 +4516,11 @@ msgstr ".(دورة بين مختلف مسارات السمعي المتوفرة 
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr ""
+msgstr "قم بتدوير مسار الترجمة بترتيب عكسي"
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr ""
+msgstr "قم بالتنقل عبر مسارات الترجمة المتوفرة بترتيب عكسي."
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -4515,27 +4532,27 @@ msgstr ".دورة بين مختلف مسارات العناوين الثانوي
 
 #: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
-msgstr ""
+msgstr "تبديل الترجمة"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
-msgstr ""
+msgstr "تبديل رؤية مسار الترجمة."
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
-msgstr ""
+msgstr "دورة معرف خدمة البرنامج التالي"
 
 #: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
-msgstr ""
+msgstr "التنقل عبر معرفات خدمة البرنامج التالي المتوفرة (SIDs)."
 
 #: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
-msgstr ""
+msgstr "دورة معرف خدمة البرنامج السابق"
 
 #: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
-msgstr ""
+msgstr "التنقل عبر معرفات خدمة البرنامج السابقة المتوفرة (SIDs)."
 
 #: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
@@ -4555,27 +4572,27 @@ msgstr ". دورة داخل قائمة معرّفة مسبقا ذات صيغة �
 
 #: src/libvlc-module.c:1405
 msgid "Toggle autoscaling"
-msgstr ""
+msgstr "تبديل القياس التلقائي"
 
 #: src/libvlc-module.c:1406
 msgid "Activate or deactivate autoscaling."
-msgstr ""
+msgstr "تنشيط أو إلغاء تنشيط القياس التلقائي."
 
 #: src/libvlc-module.c:1407
 msgid "Increase scale factor"
-msgstr ""
+msgstr "زيادة عامل الحجم"
 
 #: src/libvlc-module.c:1409
 msgid "Decrease scale factor"
-msgstr ""
+msgstr "تقليل عامل الحجم"
 
 #: src/libvlc-module.c:1411
 msgid "Toggle deinterlacing"
-msgstr ""
+msgstr "تبديل التشابك"
 
 #: src/libvlc-module.c:1412
 msgid "Activate or deactivate deinterlacing."
-msgstr ""
+msgstr "تنشيط أو إلغاء تنشيط التشابك."
 
 #: src/libvlc-module.c:1413
 msgid "Cycle deinterlace modes"
@@ -4583,7 +4600,7 @@ msgstr "احاطة أنماط التشويش"
 
 #: src/libvlc-module.c:1414
 msgid "Cycle through available deinterlace modes."
-msgstr ""
+msgstr "قم بالتنقل عبر أوضاع التشابك المتاحة."
 
 #: src/libvlc-module.c:1415
 msgid "Show controller in fullscreen"
@@ -4626,15 +4643,15 @@ msgstr ".مُرشح  بداية التسجيل  بدء/إيقاف"
 
 #: src/libvlc-module.c:1426
 msgid "Normal/Loop/Repeat"
-msgstr ""
+msgstr "عادي/حلقة/تكرار"
 
 #: src/libvlc-module.c:1427
 msgid "Toggle Normal/Loop/Repeat playlist modes"
-msgstr ""
+msgstr "تبديل أوضاع قائمة التشغيل العادية/الدورانية/التكرارية"
 
 #: src/libvlc-module.c:1430
 msgid "Toggle random playlist playback"
-msgstr ""
+msgstr "تبديل تشغيل قائمة التشغيل العشوائية"
 
 #: src/libvlc-module.c:1435 src/libvlc-module.c:1436
 msgid "Un-Zoom"
@@ -4658,7 +4675,7 @@ msgstr "ونكروب احد عناصر الصورة من اليسار من ال�
 
 #: src/libvlc-module.c:1448 src/libvlc-module.c:1449
 msgid "Crop one pixel from the bottom of the video"
-msgstr ""
+msgstr "قم بقص بكسل واحد من أسفل الفيديو"
 
 #: src/libvlc-module.c:1450 src/libvlc-module.c:1451
 msgid "Uncrop one pixel from the bottom of the video"
@@ -4674,35 +4691,35 @@ msgstr "احد عناصر الصورة من يسار الڤديو  Uncrop "
 
 #: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
-msgstr ""
+msgstr "تقليص مجال الرؤية (360 درجة)"
 
 #: src/libvlc-module.c:1460
 msgid "Expand the viewpoint field of view (360°)"
-msgstr ""
+msgstr "قم بتوسيع مجال الرؤية (360 درجة)"
 
 #: src/libvlc-module.c:1461
 msgid "Roll the viewpoint clockwise (360°)"
-msgstr ""
+msgstr "قم بتدوير نقطة الرؤية في اتجاه عقارب الساعة (360 درجة)"
 
 #: src/libvlc-module.c:1462
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr ""
+msgstr "قم بتدوير نقطة الرؤية عكس اتجاه عقارب الساعة (360 درجة)"
 
 #: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
-msgstr ""
+msgstr "تبديل وضع الخلفية في إخراج الفيديو"
 
 #: src/libvlc-module.c:1466
 msgid "Toggle wallpaper mode in video output."
-msgstr ""
+msgstr "تبديل وضع الخلفية في إخراج الفيديو."
 
 #: src/libvlc-module.c:1468
 msgid "Cycle through audio devices"
-msgstr ""
+msgstr "التنقل بين الأجهزة الصوتية"
 
 #: src/libvlc-module.c:1469
 msgid "Cycle through available audio devices"
-msgstr ""
+msgstr "التنقل بين أجهزة الصوت المتاحة"
 
 #: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
 #: modules/gui/macosx/VLCMainMenu.m:434 modules/gui/macosx/VLCMainMenu.m:512
@@ -4785,7 +4802,7 @@ msgstr "خيارات الأداء"
 
 #: src/libvlc-module.c:2061
 msgid "Clock source"
-msgstr ""
+msgstr "مصدر الساعة"
 
 #: src/libvlc-module.c:2179
 msgid "Hot keys"
@@ -4826,10 +4843,12 @@ msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
 msgstr ""
+"تعليمات الطباعة على وحدة نمطية محددة (يمكن دمجها مع --advanced و --help-"
+"verbose). ضع بادئة اسم الوحدة بـ = للمطابقات الصارمة."
 
 #: src/libvlc-module.c:2771
 msgid "no configuration option will be loaded nor saved to config file"
-msgstr ""
+msgstr "لن يتم تحميل أي خيار تكوين أو حفظه في ملف التكوين"
 
 #: src/libvlc-module.c:2773
 msgid "reset the current config to the default values"
@@ -4849,7 +4868,7 @@ msgstr "اطبع معلومات الإصدارة"
 
 #: src/libvlc-module.c:2819
 msgid "core program"
-msgstr ""
+msgstr "البرنامج الأساسي"
 
 #: src/misc/actions.c:52
 msgid "Backspace"
@@ -5155,7 +5174,7 @@ msgstr "%.1f KiB"
 #: src/misc/update.c:488
 #, c-format
 msgid "%<PRIu64> B"
-msgstr ""
+msgstr "%<PRIu64> ب"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
@@ -5219,6 +5238,8 @@ msgid ""
 "It was not possible to download a cryptographic signature for the downloaded "
 "file \"%s\". Thus, it was deleted."
 msgstr ""
+"لم يكن من الممكن تنزيل توقيع التشفير للملف الذي تم تنزيله \"%s\". ولذا، تم "
+"حذفه."
 
 #: src/misc/update.c:661 src/misc/update.c:673
 msgid "Invalid signature"
@@ -5230,6 +5251,8 @@ msgid ""
 "The cryptographic signature for the downloaded file \"%s\" was invalid and "
 "could not be used to securely verify it. Thus, the file was deleted."
 msgstr ""
+"كان التوقيع المشفر للملف الذي تم تنزيله \"%s\" غير صالح ولا يمكن استخدامه "
+"للتحقق منه بشكل آمن. ولذا، تم حذف الملف."
 
 #: src/misc/update.c:686
 msgid "File not verifiable"
@@ -5241,6 +5264,8 @@ msgid ""
 "It was not possible to securely verify the downloaded file \"%s\". Thus, it "
 "was deleted."
 msgstr ""
+"لم يكن من الممكن التحقق بشكل آمن من الملف الذي تم تنزيله \"%s\". ولذا، تم "
+"حذفه."
 
 #: src/misc/update.c:698 src/misc/update.c:710
 msgid "File corrupted"
@@ -5502,7 +5527,7 @@ msgstr "الإينكتيتت"
 
 #: src/text/iso-639_def.h:97
 msgid "Interlingue"
-msgstr ""
+msgstr "الغربية"
 
 #: src/text/iso-639_def.h:98
 msgid "Interlingua"
@@ -5530,7 +5555,7 @@ msgstr "اليابانية"
 
 #: src/text/iso-639_def.h:105
 msgid "Greenlandic, Kalaallisut"
-msgstr ""
+msgstr "جرينلاند، كالاليسوت"
 
 #: src/text/iso-639_def.h:106
 msgid "Kannada"
@@ -5682,7 +5707,7 @@ msgstr "الشيشيوا ؛ نيانجا "
 
 #: src/text/iso-639_def.h:143
 msgid "Occitan; Provençal"
-msgstr ""
+msgstr "الأوكيتانية. بروفنسال"
 
 #: src/text/iso-639_def.h:144
 msgid "Oriya"
@@ -5934,7 +5959,7 @@ msgstr "الزولو"
 
 #: src/video_output/vout_intf.c:169
 msgid "Autoscale video"
-msgstr ""
+msgstr "مقياس تلقائي للفيديو"
 
 #: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:439
 #: modules/gui/macosx/VLCMainMenu.m:440
@@ -5956,6 +5981,8 @@ msgid ""
 "Pass alsa:// to open the default ALSA capture device, or alsa://SOURCE to "
 "open a specific device named SOURCE."
 msgstr ""
+"قم بتمرير alsa:// لفتح جهاز التقاط ALSA الافتراضي، أو alsa://SOURCE لفتح "
+"جهاز محدد يسمى SOURCE."
 
 #: modules/access/alsa.c:49
 msgid "192000 Hz"
@@ -6015,7 +6042,7 @@ msgstr "ALSA"
 
 #: modules/access/alsa.c:57
 msgid "ALSA audio capture"
-msgstr ""
+msgstr "ALSA التقاط الصوت"
 
 #: modules/access/attachment.c:44
 msgid "Attachment"
@@ -6023,44 +6050,48 @@ msgstr "المرفق"
 
 #: modules/access/attachment.c:45
 msgid "Attachment input"
-msgstr ""
+msgstr "مدخلات المرفقات"
 
 #: modules/access/avaudiocapture.m:212
 msgid "No Audio Input device found"
-msgstr ""
+msgstr "لم يتم العثور على جهاز إدخال الصوت"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input "
-"device.Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
 msgstr ""
+"يبدو أن جهاز Mac الخاص بك غير مزود بجهاز إدخال صوتي مناسب. يرجى التحقق من "
+"الموصلات وبرامج التشغيل لديك."
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
 #: modules/access/disc_helper.h:56
 msgid "Problem accessing a system resource"
-msgstr ""
+msgstr "مشكلة في الوصول إلى مورد النظام"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"يرجى فتح \"تفضيلات النظام\" -> \"الأمان والخصوصية\" والسماح لـ VLC بالوصول "
+"إلى الميكروفون الخاص بك."
 
 #: modules/access/avaudiocapture.m:341
 msgid "AVFoundation Audio Capture"
-msgstr ""
+msgstr "AVFoundation التقاط الصوت"
 
 #: modules/access/avaudiocapture.m:342
 msgid "AVFoundation audio capture module."
-msgstr ""
+msgstr "وحدة التقاط الصوت AVFoundation."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
-msgstr ""
+msgstr "AVFoundation التقاط الفيديو"
 
 #: modules/access/avcapture.m:67
 msgid "AVFoundation video capture module."
-msgstr ""
+msgstr "وحدة التقاط الفيديو AVFoundation."
 
 #: modules/access/avcapture.m:376 modules/access/avcapture.m:406
 msgid "No video devices found"
@@ -6071,26 +6102,32 @@ msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
+"يبدو أن جهاز Mac الخاص بك غير مزود بجهاز إدخال فيديو مناسب. يرجى التحقق من "
+"الموصلات وبرامج التشغيل الخاصة بك."
 
 #: modules/access/avcapture.m:407
 msgid ""
 "Your Mac does not seem to be equipped with a suitable input device. Please "
 "check your connectors and drivers."
 msgstr ""
+"يبدو أن جهاز Mac الخاص بك غير مزود بجهاز إدخال مناسب. يرجى التحقق من "
+"الموصلات وبرامج التشغيل الخاصة بك."
 
 #: modules/access/avcapture.m:435
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"يرجى فتح \"تفضيلات النظام\" -> \"الأمان والخصوصية\" والسماح لبرنامج VLC "
+"بالوصول إلى الكاميرا الخاصة بك."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
-msgstr ""
+msgstr "AVIO"
 
 #: modules/access/avio.h:34
 msgid "libavformat AVIO access"
-msgstr ""
+msgstr "الوصول الى libavformat AVIO"
 
 #: modules/access/avio.h:44
 msgid "libavformat AVIO access output"
@@ -6141,15 +6178,15 @@ msgstr "أسطوانة بلو-ري تالفة."
 
 #: modules/access/bluray.c:870
 msgid "Missing AACS configuration file!"
-msgstr ""
+msgstr "ملف تكوين AACS مفقود!"
 
 #: modules/access/bluray.c:872
 msgid "No valid processing key found in AACS config file."
-msgstr ""
+msgstr "لم يتم العثور على مفتاح معالجة صالح في ملف تكوين AACS."
 
 #: modules/access/bluray.c:874
 msgid "No valid host certificate found in AACS config file."
-msgstr ""
+msgstr "لم يتم العثور على شهادة مضيف صالحة في ملف تكوين AACS."
 
 #: modules/access/bluray.c:876
 msgid "AACS Host certificate revoked."
@@ -6167,7 +6204,7 @@ msgstr "تحتاج أسطوانة بلو-ري هذه مكتبة لفكّ ترم�
 
 #: modules/access/bluray.c:891
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
-msgstr ""
+msgstr "مكتبة فك تشفير BD+ الخاصة بنظامك لا تعمل. تكوين مفقود؟"
 
 #: modules/access/bluray.c:924
 msgid "Java required"
@@ -6188,7 +6225,7 @@ msgstr "لم يُعثر على «جاڤا» في النظام."
 
 #: modules/access/bluray.c:949
 msgid "Failed to start bluray playback. Please try without menu support."
-msgstr ""
+msgstr "فشل في بدء تشغيل بلوراي. يرجى المحاولة بدون دعم القائمة."
 
 #: modules/access/bluray.c:990 modules/access/bluray.c:2823
 #: modules/access/bluray.c:2828
@@ -6197,11 +6234,11 @@ msgstr "خطأ في بلو-ري"
 
 #: modules/access/bluray.c:2113
 msgid "Top Menu"
-msgstr ""
+msgstr "القائمة العلوية"
 
 #: modules/access/bluray.c:2116
 msgid "First Play"
-msgstr ""
+msgstr "التشغيل الأول"
 
 #: modules/access/cdda.c:716
 #, c-format
@@ -6226,9 +6263,8 @@ msgid "Musicbrainz Server"
 msgstr ""
 
 #: modules/access/cdda.c:1023
-#, fuzzy
 msgid "Address of the musicbrainz server to use."
-msgstr "عنوان خادوم CDDB المطلوب استخدامه."
+msgstr ""
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -6248,19 +6284,19 @@ msgstr "منفذ خادوم CDDB المطلوب استخدامه."
 
 #: modules/access/concat.c:303
 msgid "Inputs list"
-msgstr ""
+msgstr "قائمة المدخلات"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr ""
+msgstr "قائمة مفصولة بفواصل لعناوين URL المدخلة للتسلسل."
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
-msgstr ""
+msgstr "سلسلة"
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
-msgstr ""
+msgstr "المدخلات المتسلسلة"
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6268,15 +6304,15 @@ msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
-msgstr ""
+msgstr "إدخال الكاميرا الرقمية IIDC (FireWire)."
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
-msgstr ""
+msgstr "ملف KDM"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
-msgstr ""
+msgstr "المسار إلى ملف XML لرسالة تسليم المفتاح"
 
 #: modules/access/dcp/dcp.cpp:77
 msgid "DCP"
@@ -6284,37 +6320,43 @@ msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:79
 msgid "Digital Cinema Package module"
-msgstr ""
+msgstr "وحدة حزمة السينما الرقمية"
 
 #: modules/access/decklink.cpp:49
 msgid "Input card to use"
-msgstr ""
+msgstr "بطاقة الإدخال المراد استخدامها"
 
 #: modules/access/decklink.cpp:51
 msgid ""
 "DeckLink capture card to use, if multiple exist. The cards are numbered from "
 "0."
 msgstr ""
+"بطاقة التقاط DeckLink للاستخدام، في حالة وجود نسخ متعددة. يتم ترقيم البطاقات "
+"من 0."
 
 #: modules/access/decklink.cpp:54
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr ""
+msgstr "وضع إدخال الفيديو المطلوب. اتركه فارغًا للاكتشاف التلقائي."
 
 #: modules/access/decklink.cpp:56
 msgid ""
 "Desired input video mode for DeckLink captures. This value should be a "
 "FOURCC code in textual form, e.g. \"ntsc\"."
 msgstr ""
+"وضع إدخال الفيديو المطلوب لالتقاط DeckLink. يجب أن تكون هذه القيمة رمز "
+"FOURCC على شكل نصي، على سبيل المثال. \"ntsc\"."
 
 #: modules/access/decklink.cpp:60 modules/video_output/decklink.cpp:100
 msgid "Audio connection"
-msgstr ""
+msgstr "اتصال صوتي"
 
 #: modules/access/decklink.cpp:62
 msgid ""
 "Audio connection to use for DeckLink captures. Valid choices: embedded, "
 "aesebu, analog. Leave blank for card default."
 msgstr ""
+"اتصال صوتي لاستخدامه في التقاط DeckLink. الاختيارات الصالحة: مضمن، aesebu، "
+"التناظرية. اتركه فارغًا للبطاقة الافتراضية."
 
 #: modules/access/decklink.cpp:66 modules/demux/rawaud.c:43
 #: modules/video_output/decklink.cpp:105
@@ -6325,6 +6367,8 @@ msgstr "معدل استعيان الصوت (هرتز)"
 msgid ""
 "Audio sampling rate (in hertz) for DeckLink captures. 0 disables audio input."
 msgstr ""
+"معدل أخذ العينات الصوتية (بالهرتز) لالتقاط DeckLink.  قيمة 0 لتعطيل إدخال "
+"الصوت."
 
 #: modules/access/decklink.cpp:71 modules/access/dshow/dshow.cpp:197
 #: modules/video_output/decklink.cpp:110
@@ -6336,16 +6380,20 @@ msgid ""
 "Number of input audio channels for DeckLink captures. Must be 2, 8 or 16. 0 "
 "disables audio input."
 msgstr ""
+"عدد قنوات الصوت المدخلة لالتقاط DeckLink. يجب أن يكون 2 أو 8 أو 16. 0 يعطل "
+"إدخال الصوت."
 
 #: modules/access/decklink.cpp:76 modules/video_output/decklink.cpp:115
 msgid "Video connection"
-msgstr ""
+msgstr "اتصال الفيديو"
 
 #: modules/access/decklink.cpp:78
 msgid ""
 "Video connection to use for DeckLink captures. Valid choices: sdi, hdmi, "
 "opticalsdi, component, composite, svideo. Leave blank for card default."
 msgstr ""
+"اتصال فيديو لاستخدامه في التقاط DeckLink. الخيارات الصالحة: sdi، hdmi، "
+"Opticalsdi، Component، Composite، svideo. اتركه فارغًا للبطاقة الافتراضية."
 
 #: modules/access/decklink.cpp:87 modules/access/linsys/linsys_sdi.c:94
 msgid "SDI"
@@ -6369,7 +6417,7 @@ msgstr "مركب"
 
 #: modules/access/decklink.cpp:87
 msgid "S-Video"
-msgstr ""
+msgstr "S-Video"
 
 #: modules/access/decklink.cpp:94
 msgid "Embedded"
@@ -6389,11 +6437,11 @@ msgstr "نسبة الأبعاد (4:3، 16:9). يفترض أن يكون المب�
 
 #: modules/access/decklink.cpp:102
 msgid "DeckLink"
-msgstr ""
+msgstr "DeckLink"
 
 #: modules/access/decklink.cpp:103
 msgid "Blackmagic DeckLink SDI input"
-msgstr ""
+msgstr "مدخل Blackmagic DeckLink SDI"
 
 #: modules/access/decklink.cpp:123 modules/video_output/decklink.cpp:119
 msgid "10 bits"
@@ -6401,7 +6449,7 @@ msgstr "10 بيتات"
 
 #: modules/access/decklink.cpp:358 modules/demux/ty.c:783
 msgid "Closed captions 1"
-msgstr ""
+msgstr "التسميات التوضيحية المغلقة 1"
 
 #: modules/access/disc_helper.h:57
 msgid ""
@@ -6409,6 +6457,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"من المحتمل أن نظام التشغيل macOS يمنع الوصول إلى القرص الخاص بك. يرجى فتح "
+"\"تفضيلات النظام\" -> \"الأمان والخصوصية\" والسماح لـ VLC بالوصول إلى "
+"الوسائط الخارجية الخاصة بك في قسم \"الملفات والمجلدات\"."
 
 #: modules/access/dshow/dshow.cpp:92
 msgid "Cable"
@@ -6458,6 +6509,8 @@ msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
+"اسم جهاز الصوت الذي سيتم استخدامه بواسطة البرنامج الإضافي DirectShow. إذا لم "
+"تحدد أي شيء، فسيتم استخدام الجهاز الافتراضي."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:793
@@ -6470,18 +6523,23 @@ msgid ""
 "don't specify anything the default size for your device will be used. You "
 "can specify a standard size (cif, d1, ...) or <width>x<height>."
 msgstr ""
+"حجم الفيديو الذي سيتم عرضه بواسطة البرنامج المساعد DirectShow. إذا لم تحدد "
+"أي شيء، فسيتم استخدام الحجم الافتراضي لجهازك. يمكنك تحديد حجم قياسي (cif، "
+"d1، ...) أو <width>x<height>."
 
 #: modules/access/dshow/dshow.cpp:145 modules/access/v4l2/v4l2.c:196
 msgid "Picture aspect-ratio n:m"
-msgstr ""
+msgstr "نسبة أبعاد الصورة n:m"
 
 #: modules/access/dshow/dshow.cpp:146 modules/access/v4l2/v4l2.c:197
 msgid "Define input picture aspect-ratio to use. Default is 4:3"
 msgstr ""
+"تحديد نسبة العرض إلى الارتفاع لصورة الإدخال المراد استخدامها. الافتراضي هو "
+"4:3"
 
 #: modules/access/dshow/dshow.cpp:147 modules/access/v4l2/v4l2.c:53
 msgid "Video input chroma format"
-msgstr ""
+msgstr "تنسيق كروما لإدخال الفيديو"
 
 #: modules/access/dshow/dshow.cpp:149
 msgid ""
@@ -6500,6 +6558,8 @@ msgid ""
 "Force the DirectShow video input to use a specific frame rate (eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
+"فرض إدخال فيديو DirectShow لاستخدام معدل إطارات محدد (على سبيل المثال، 0 "
+"يعني الافتراضي، 25، 29.97، 50، 59.94، وما إلى ذلك)"
 
 #: modules/access/dshow/dshow.cpp:155
 msgid "Device properties"
@@ -6528,17 +6588,17 @@ msgstr ".(قناة التلفزيون التي سيستعملها المستقب
 
 #: modules/access/dshow/dshow.cpp:166
 msgid "Tuner Frequency"
-msgstr ""
+msgstr "تردد الموالف"
 
 #: modules/access/dshow/dshow.cpp:167
 msgid "This overrides the channel. Measured in Hz."
-msgstr ""
+msgstr "وهذا يتجاوز القناة. تقاس بالهرتز."
 
 #: modules/access/dshow/dshow.cpp:168
 #: modules/gui/qt/components/open_panels.cpp:846
 #: modules/gui/qt/components/open_panels.cpp:1067
 msgid "Video standard"
-msgstr ""
+msgstr "معيار الفيديو"
 
 #: modules/access/dshow/dshow.cpp:169
 msgid "Tuner country code"
@@ -6571,6 +6631,10 @@ msgid ""
 "\"Device config\" area, and use those numbers here. -1 means that settings "
 "will not be changed."
 msgstr ""
+"حدد مصدر إدخال الفيديو، مثل الفيديو المركب أو s-video أو الموالف. نظرًا لأن "
+"هذه الإعدادات خاصة بالأجهزة، فيجب عليك العثور على إعدادات جيدة في منطقة "
+"\"تكوين الجهاز\"، واستخدام هذه الأرقام هنا. -1 يعني أنه لن يتم تغيير "
+"الإعدادات."
 
 #: modules/access/dshow/dshow.cpp:182
 msgid "Audio input pin"
@@ -6605,11 +6669,14 @@ msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
+"وضع موالف AM. يمكن أن يكون أحد الخيارات الافتراضية (0)، أو التلفزيون (1)، أو "
+"راديو AM (2)، أو راديو FM (3)، أو DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
 "Select audio input format with the given number of audio channels (if non 0)"
 msgstr ""
+"حدد تنسيق إدخال الصوت مع العدد المحدد من القنوات الصوتية (إذا لم يكن 0)"
 
 #: modules/access/dshow/dshow.cpp:201
 #: modules/stream_out/transcode/transcode.c:94
@@ -6619,15 +6686,15 @@ msgstr "معدل العينه السمعيه "
 
 #: modules/access/dshow/dshow.cpp:203
 msgid "Select audio input format with the given sample rate (if non 0)"
-msgstr ""
+msgstr "حدد تنسيق إدخال الصوت بمعدل العينة المحدد (إذا لم يكن 0)"
 
 #: modules/access/dshow/dshow.cpp:205
 msgid "Audio bits per sample"
-msgstr ""
+msgstr "بتات الصوت لكل عينة"
 
 #: modules/access/dshow/dshow.cpp:207
 msgid "Select audio input format with the given bits/sample (if non 0)"
-msgstr ""
+msgstr "حدد تنسيق إدخال الصوت مع البتات/العينات المحددة (إذا لم يكن 0)"
 
 #: modules/access/dshow/dshow.cpp:219
 msgid "DirectShow"
@@ -6649,11 +6716,12 @@ msgstr "لا جهاز صوت أو صورة محدد."
 #: modules/access/dshow/dshow.cpp:591
 msgid "VLC cannot open ANY capture device. Check the error log for details."
 msgstr ""
+"لا يمكن لبرنامج VLC فتح أي جهاز التقاط. راجع سجل الأخطاء للحصول على التفاصيل."
 
 #: modules/access/dshow/dshow.cpp:1055
 msgid ""
 "The device you selected cannot be used, because its type is not supported."
-msgstr ""
+msgstr "لا يمكن استخدام الجهاز الذي حددته، لأن نوعه غير مدعوم."
 
 #: modules/access/dshow/dshow.cpp:1126
 #, c-format
@@ -6662,29 +6730,31 @@ msgstr "لا يدعم جهاز الالتقاط ”%s“ المعاملات ال
 
 #: modules/access/dsm/access.c:72 modules/access/dsm/sd.c:138
 msgid "Windows networks"
-msgstr ""
+msgstr "شبكات ويندوز"
 
 #: modules/access/dsm/access.c:74
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr ""
+msgstr "إدخال ومتصفح SMB الخاص بـ libdsm (مشاركات شبكة Windows)."
 
 #: modules/access/dsm/access.c:78
 msgid "libdsm SMB input"
-msgstr ""
+msgstr "إدخال libdsm SMB"
 
 #: modules/access/dsm/access.c:98
 msgid "libdsm NETBIOS discovery module"
-msgstr ""
+msgstr "وحدة اكتشاف libdsm NETBIOS"
 
 #: modules/access/dtv/access.c:43
 msgid "DVB adapter"
-msgstr ""
+msgstr "محول DVB"
 
 #: modules/access/dtv/access.c:45
 msgid ""
 "If there is more than one digital broadcasting adapter, the adapter number "
 "must be selected. Numbering starts from zero."
 msgstr ""
+"إذا كان هناك أكثر من محول بث رقمي، فيجب تحديد رقم المحول. الترقيم يبدأ من "
+"الصفر"
 
 #: modules/access/dtv/access.c:48
 msgid "DVB device"
@@ -6695,16 +6765,20 @@ msgid ""
 "If the adapter provides multiple independent tuner devices, the device "
 "number must be selected. Numbering starts from zero."
 msgstr ""
+"إذا كان المحول يوفر أجهزة موالف مستقلة ومتعددة، فيجب تحديد رقم الجهاز. "
+"الترقيم يبدأ من الصفر"
 
 #: modules/access/dtv/access.c:52
 msgid "Do not demultiplex"
-msgstr ""
+msgstr "لاتقم بـ فك مزج الإشارات"
 
 #: modules/access/dtv/access.c:54
 msgid ""
 "Only useful programs are normally demultiplexed from the transponder. This "
 "option will disable demultiplexing and receive all programs."
 msgstr ""
+"عادةً ما يتم فك مزج إشارات البرامج المفيدة فقط من جهاز الإرسال والاستقبال. "
+"سيؤدي هذا الخيار إلى تعطيل فك مزج الإشارات واستقبال كافة البرامج."
 
 #: modules/access/dtv/access.c:57
 msgid "Network name"
@@ -6712,7 +6786,7 @@ msgstr "اسم الشبكة"
 
 #: modules/access/dtv/access.c:58
 msgid "Unique network name in the System Tuning Spaces"
-msgstr ""
+msgstr "اسم شبكة فريد في مساحات ضبط النظام"
 
 #: modules/access/dtv/access.c:60
 msgid "Network name to create"
@@ -6720,7 +6794,7 @@ msgstr "اسم الشبكة المراد إنشاؤها"
 
 #: modules/access/dtv/access.c:61
 msgid "Create unique name in the System Tuning Spaces"
-msgstr ""
+msgstr "قم بإنشاء اسم فريد في مساحات ضبط النظام"
 
 #: modules/access/dtv/access.c:63
 msgid "Frequency (Hz)"
@@ -6731,22 +6805,24 @@ msgid ""
 "TV channels are grouped by transponder (a.k.a. multiplex) on a given "
 "frequency. This is required to tune the receiver."
 msgstr ""
+"يتم تجميع القنوات التلفزيونية بواسطة جهاز الإرسال والاستقبال (المعروف أيضًا "
+"باسم تعدد الإرسال) على تردد معين. وهذا مطلوب لضبط المتلقي."
 
 #: modules/access/dtv/access.c:68 modules/gui/qt/components/open_panels.cpp:967
 msgid "Modulation / Constellation"
-msgstr ""
+msgstr "التحوير / الكوكبة"
 
 #: modules/access/dtv/access.c:69
 msgid "Layer A modulation"
-msgstr ""
+msgstr "تحوير الطبقة \"أ\""
 
 #: modules/access/dtv/access.c:70
 msgid "Layer B modulation"
-msgstr ""
+msgstr "تحوير الطبقة \"ب\""
 
 #: modules/access/dtv/access.c:71
 msgid "Layer C modulation"
-msgstr ""
+msgstr "تحوير الطبقة \"ج\""
 
 #: modules/access/dtv/access.c:73
 msgid ""
@@ -6754,62 +6830,67 @@ msgid ""
 "(depending on the delivery system). If the demodulator cannot detect the "
 "constellation automatically, it needs to be configured manually."
 msgstr ""
+"يمكن تعديل الإشارة الرقمية وفقًا لمجموعات مختلفة (حسب نظام التوصيل). إذا لم "
+"يتمكن مزيل التشكيل من اكتشاف الكوكبة تلقائيًا، فيجب تكوينه يدويًا."
 
 #: modules/access/dtv/access.c:88
 msgid "Symbol rate (bauds)"
-msgstr ""
+msgstr "معدل الرمز (باود)"
 
 #: modules/access/dtv/access.c:90
 msgid ""
 "The symbol rate must be specified manually for some systems, notably DVB-C, "
 "DVB-S and DVB-S2."
 msgstr ""
+"يجب تحديد معدل الرموز يدويًا لبعض الأنظمة، ولا سيما DVB-C وDVB-S وDVB-S2."
 
 #: modules/access/dtv/access.c:93
 msgid "Spectrum inversion"
-msgstr ""
+msgstr "انعكاس الطيف"
 
 #: modules/access/dtv/access.c:95
 msgid ""
 "If the demodulator cannot detect spectral inversion correctly, it needs to "
 "be configured manually."
 msgstr ""
+"إذا لم يتمكن مزيل التشكيل من اكتشاف الانعكاس الطيفي بشكل صحيح، فيجب تكوينه "
+"يدويًا."
 
 #: modules/access/dtv/access.c:101
 msgid "FEC code rate"
-msgstr ""
+msgstr "معدل رمز FEC"
 
 #: modules/access/dtv/access.c:102
 msgid "High-priority code rate"
-msgstr ""
+msgstr "معدل رمز الأولوية العالية"
 
 #: modules/access/dtv/access.c:103
 msgid "Low-priority code rate"
-msgstr ""
+msgstr "معدل رمز الأولوية المنخفضة"
 
 #: modules/access/dtv/access.c:104
 msgid "Layer A code rate"
-msgstr ""
+msgstr "معدل ترميز الطبقة \"أ\""
 
 #: modules/access/dtv/access.c:105
 msgid "Layer B code rate"
-msgstr ""
+msgstr "معدل ترميز الطبقة \"ب\""
 
 #: modules/access/dtv/access.c:106
 msgid "Layer C code rate"
-msgstr ""
+msgstr "معدل ترميز الطبقة \"ج\""
 
 #: modules/access/dtv/access.c:108
 msgid "The code rate for Forward Error Correction can be specified."
-msgstr ""
+msgstr "يمكن تحديد معدل التعليمات البرمجية لتصحيح الأخطاء إلى الأمام."
 
 #: modules/access/dtv/access.c:118
 msgid "Transmission mode"
-msgstr "طريقة الإرسال"
+msgstr "وضع الإرسال"
 
 #: modules/access/dtv/access.c:126
 msgid "Bandwidth (MHz)"
-msgstr ""
+msgstr "عرض النطاق الترددي (ميغاهرتز)"
 
 #: modules/access/dtv/access.c:131
 msgid "10 MHz"
@@ -6837,55 +6918,55 @@ msgstr "1.712 MHz"
 
 #: modules/access/dtv/access.c:135
 msgid "Guard interval"
-msgstr ""
+msgstr "فاصل الحراسة"
 
 #: modules/access/dtv/access.c:143
 msgid "Hierarchy mode"
-msgstr ""
+msgstr "وضع التسلسل الهرمي"
 
 #: modules/access/dtv/access.c:151
 msgid "DVB-T2 Physical Layer Pipe"
-msgstr ""
+msgstr "أنابيب الطبقة المادية DVB-T2"
 
 #: modules/access/dtv/access.c:153
 msgid "Layer A segments count"
-msgstr ""
+msgstr "عدد شرائح الطبقة أ"
 
 #: modules/access/dtv/access.c:154
 msgid "Layer B segments count"
-msgstr ""
+msgstr "عدد شرائح الطبقة ب"
 
 #: modules/access/dtv/access.c:155
 msgid "Layer C segments count"
-msgstr ""
+msgstr "عدد شرائح الطبقة ج"
 
 #: modules/access/dtv/access.c:157
 msgid "Layer A time interleaving"
-msgstr ""
+msgstr "طبقة تشذير الوقت \"أ\""
 
 #: modules/access/dtv/access.c:158
 msgid "Layer B time interleaving"
-msgstr ""
+msgstr "طبقة تشذير الوقت \"ب\""
 
 #: modules/access/dtv/access.c:159
 msgid "Layer C time interleaving"
-msgstr ""
+msgstr "طبقة تشذير الوقت \"ج\""
 
 #: modules/access/dtv/access.c:161
 msgid "Stream identifier"
-msgstr ""
+msgstr "معرف البث"
 
 #: modules/access/dtv/access.c:163
 msgid "Pilot"
-msgstr ""
+msgstr "تجريبي"
 
 #: modules/access/dtv/access.c:165
 msgid "Roll-off factor"
-msgstr ""
+msgstr "عامل التدحرج"
 
 #: modules/access/dtv/access.c:170
 msgid "0.35 (same as DVB-S)"
-msgstr ""
+msgstr "0.35 (مثل DVB-S)"
 
 #: modules/access/dtv/access.c:170
 msgid "0.20"
@@ -6897,21 +6978,23 @@ msgstr "0.25"
 
 #: modules/access/dtv/access.c:173
 msgid "Transport stream ID"
-msgstr ""
+msgstr "معرف بث النقل"
 
 #: modules/access/dtv/access.c:175
 msgid "Polarization (Voltage)"
-msgstr ""
+msgstr "الاستقطاب (الجهد)"
 
 #: modules/access/dtv/access.c:177
 msgid ""
 "To select the polarization of the transponder, a different voltage is "
 "normally applied to the low noise block-downconverter (LNB)."
 msgstr ""
+"لتحديد استقطاب جهاز الإرسال والاستقبال، يتم عادةً تطبيق جهد مختلف على محول "
+"خفض الضوضاء المنخفض (LNB)."
 
 #: modules/access/dtv/access.c:180
 msgid "Unspecified (0V)"
-msgstr ""
+msgstr "غير محدد (0 فولت)"
 
 #: modules/access/dtv/access.c:181
 msgid "Vertical (13V)"
@@ -6923,11 +7006,11 @@ msgstr "أفقي (18V)"
 
 #: modules/access/dtv/access.c:182
 msgid "Circular Right Hand (13V)"
-msgstr ""
+msgstr "اليد اليمنى الدائرية (13 فولت)"
 
 #: modules/access/dtv/access.c:182
 msgid "Circular Left Hand (18V)"
-msgstr ""
+msgstr "يد يسرى دائرية (18 فولت)"
 
 #: modules/access/dtv/access.c:184
 msgid "High LNB voltage"
@@ -6939,14 +7022,17 @@ msgid ""
 "receiver are long, higher voltage may be required.\n"
 "Not all receivers support this."
 msgstr ""
+"إذا كانت الكابلات بين محول خفض الضوضاء المنخفض للقمر الصناعي وجهاز الاستقبال "
+"طويلة، فقد تكون هناك حاجة إلى جهد أعلى.\n"
+"ليس كل أجهزة الاستقبال تدعم هذا."
 
 #: modules/access/dtv/access.c:190
 msgid "Local oscillator low frequency (kHz)"
-msgstr ""
+msgstr "المذبذب المحلي ذو التردد المنخفض (كيلو هرتز)"
 
 #: modules/access/dtv/access.c:191
 msgid "Local oscillator high frequency (kHz)"
-msgstr ""
+msgstr "مذبذب محلي عالي التردد (كيلو هرتز)"
 
 #: modules/access/dtv/access.c:193
 msgid ""
@@ -6954,10 +7040,12 @@ msgid ""
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
+"سوف يقوم المحول السفلي (LNB) بطرح تردد المذبذب المحلي من تردد إرسال القمر "
+"الصناعي. والنتيجة هي التردد المتوسط (IF) على كابل التردد اللاسلكي."
 
 #: modules/access/dtv/access.c:196
 msgid "Universal LNB switch frequency (kHz)"
-msgstr ""
+msgstr "تردد مفتاح LNB العالمي (كيلو هرتز)"
 
 #: modules/access/dtv/access.c:198
 msgid ""
@@ -6965,20 +7053,25 @@ msgid ""
 "oscillator high frequency will be used as reference. Furthermore the "
 "automatic continuous 22kHz tone will be sent."
 msgstr ""
+"إذا تجاوز تردد الإرسال عبر الأقمار الصناعية تردد التبديل، فسيتم استخدام "
+"التردد العالي للمذبذب كمرجع. علاوة على ذلك، سيتم إرسال نغمة 22 كيلو هرتز "
+"التلقائية المستمرة."
 
 #: modules/access/dtv/access.c:201
 msgid "Continuous 22kHz tone"
-msgstr ""
+msgstr "نغمة مستمرة 22 كيلو هرتز"
 
 #: modules/access/dtv/access.c:203
 msgid ""
 "A continuous tone at 22kHz can be sent on the cable. This normally selects "
 "the higher frequency band from a universal LNB."
 msgstr ""
+"يمكن إرسال نغمة مستمرة عند 22 كيلو هرتز عبر الكابل. يؤدي هذا عادةً إلى تحديد "
+"نطاق التردد الأعلى من LNB العالمي."
 
 #: modules/access/dtv/access.c:206
 msgid "DiSEqC LNB number"
-msgstr ""
+msgstr "رقم DiSEqC LNB"
 
 #: modules/access/dtv/access.c:208
 msgid ""
@@ -6986,6 +7079,9 @@ msgid ""
 "downconverters (LNB) through a DiSEqC 1.0 switch, the correct LNB can be "
 "selected (1 to 4). If there is no switch, this parameter should be 0."
 msgstr ""
+"إذا كان جهاز استقبال القمر الصناعي متصلاً بمحولات خفض الضوضاء المنخفضة "
+"المتعددة (LNB) من خلال مفتاح DiSEqC 1.0، فيمكن تحديد LNB الصحيح (من 1 إلى "
+"4). إذا لم يكن هناك مفتاح، يجب أن تكون هذه المدخلة 0."
 
 #: modules/access/dtv/access.c:214 modules/access/v4l2/v4l2.c:136
 #: modules/access/v4l2/v4l2.c:163 modules/access/v4l2/v4l2.c:201
@@ -6994,7 +7090,7 @@ msgstr "غير محدد"
 
 #: modules/access/dtv/access.c:218
 msgid "Uncommitted DiSEqC LNB number"
-msgstr ""
+msgstr "رقم DiSEqC LNB غير الملتزم به"
 
 #: modules/access/dtv/access.c:220
 msgid ""
@@ -7004,6 +7100,10 @@ msgid ""
 "selected (1 to 4). If there is no uncommitted switch, this parameter should "
 "be 0."
 msgstr ""
+"إذا كان جهاز استقبال القمر الصناعي متصلاً بعدة محولات خفض الضوضاء المنخفضة "
+"(LNB) من خلال سلسلة مكونة من المفتاح غير الملتزم DiSEqC 1.1 والمفتاح الملتزم "
+"DiSEqC 1.0، فيمكن تحديد LNB الصحيح غير الملتزم (من 1 إلى 4). إذا لم يكن هناك "
+"مفتاح غير ملتزم به، فيجب أن تكون هذه المدخلة 0."
 
 #: modules/access/dtv/access.c:227
 msgid "Network identifier"
@@ -7011,47 +7111,49 @@ msgstr "محدد الشبكة"
 
 #: modules/access/dtv/access.c:228
 msgid "Satellite azimuth"
-msgstr ""
+msgstr "سمت القمر الصناعي"
 
 #: modules/access/dtv/access.c:229
 msgid "Satellite azimuth in tenths of degree"
-msgstr ""
+msgstr "سمت القمر الصناعي في أعشار الدرجة"
 
 #: modules/access/dtv/access.c:230
 msgid "Satellite elevation"
-msgstr ""
+msgstr "ارتفاع القمر الصناعي"
 
 #: modules/access/dtv/access.c:231
 msgid "Satellite elevation in tenths of degree"
-msgstr ""
+msgstr "ارتفاع القمر الصناعي في أعشار الدرجة"
 
 #: modules/access/dtv/access.c:232
 msgid "Satellite longitude"
-msgstr ""
+msgstr "خط طول القمر الصناعي"
 
 #: modules/access/dtv/access.c:234
 msgid "Satellite longitude in tenths of degree. West is negative."
-msgstr ""
+msgstr "خط طول القمر الصناعي بعشر الدرجة. الغرب سلبي."
 
 #: modules/access/dtv/access.c:236
 msgid "Satellite range code"
-msgstr ""
+msgstr "رمز نطاق القمر الصناعي"
 
 #: modules/access/dtv/access.c:237
 msgid "Satellite range code as defined by manufacturer e.g. DISEqC switch code"
 msgstr ""
+"رمز نطاق القمر الصناعي كما هو محدد من قبل الشركة المصنعة، على سبيل المثال. "
+"رمز التبديل DISEqC"
 
 #: modules/access/dtv/access.c:241
 msgid "Major channel"
-msgstr ""
+msgstr "قناة رئيسية"
 
 #: modules/access/dtv/access.c:242
 msgid "ATSC minor channel"
-msgstr ""
+msgstr "قناة ATSC الثانوية"
 
 #: modules/access/dtv/access.c:243
 msgid "Physical channel"
-msgstr ""
+msgstr "القناة المادية"
 
 #: modules/access/dtv/access.c:249
 msgid "DTV"
@@ -7059,39 +7161,39 @@ msgstr "DTV"
 
 #: modules/access/dtv/access.c:250
 msgid "Digital Television and Radio"
-msgstr ""
+msgstr "التلفزيون الرقمي والراديو"
 
 #: modules/access/dtv/access.c:288
 msgid "Terrestrial reception parameters"
-msgstr ""
+msgstr "معلمات الاستقبال الأرضي"
 
 #: modules/access/dtv/access.c:300
 msgid "DVB-T reception parameters"
-msgstr ""
+msgstr "معلمات استقبال DVB-T"
 
 #: modules/access/dtv/access.c:316
 msgid "ISDB-T reception parameters"
-msgstr ""
+msgstr "معلمات الاستقبال ISDB-T"
 
 #: modules/access/dtv/access.c:357
 msgid "Cable and satellite reception parameters"
-msgstr ""
+msgstr "معلمات استقبال الكابلات والأقمار الصناعية"
 
 #: modules/access/dtv/access.c:369
 msgid "DVB-S2 parameters"
-msgstr ""
+msgstr "معلّمات DVB-S2"
 
 #: modules/access/dtv/access.c:380
 msgid "ISDB-S parameters"
-msgstr ""
+msgstr "معلّمات ISDB-S"
 
 #: modules/access/dtv/access.c:385
 msgid "Satellite equipment control"
-msgstr ""
+msgstr "التحكم في معدات الأقمار الصناعية"
 
 #: modules/access/dtv/access.c:427
 msgid "ATSC reception parameters"
-msgstr ""
+msgstr "معلّمات الاستقبال ATSC"
 
 #: modules/access/dtv/access.c:481
 msgid "Digital broadcasting"
@@ -7102,10 +7204,12 @@ msgid ""
 "The selected digital tuner does not support the specified parameters.\n"
 "Please check the preferences."
 msgstr ""
+"الموالف الرقمي المحدد لا يدعم المعلمات المحددة.\n"
+"يرجى التحقق من التفضيلات."
 
 #: modules/access/dv.c:57
 msgid "Digital Video (Firewire/ieee1394) input"
-msgstr ""
+msgstr "إدخال الفيديو الرقمي (Firewire/ieee1394)."
 
 #: modules/access/dv.c:58
 msgid "DV"
@@ -7113,41 +7217,43 @@ msgstr "DV"
 
 #: modules/access/dvb/access.c:66
 msgid "Probe DVB card for capabilities"
-msgstr ""
+msgstr "دقق في بطاقة DVB لمعرفة القدرات"
 
 #: modules/access/dvb/access.c:67
 msgid ""
 "Some DVB cards do not like to be probed for their capabilities, you can "
 "disable this feature if you experience some trouble."
 msgstr ""
+"بعض بطاقات DVB لا تحب أن يتم فحص قدراتها، يمكنك تعطيل هذه الميزة إذا واجهت "
+"بعض المشاكل."
 
 #: modules/access/dvb/access.c:70
 msgid "Satellite scanning config"
-msgstr ""
+msgstr "تكوين المسح عبر الأقمار الصناعية"
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
-msgstr ""
+msgstr "اسم ملف التكوين في share/dvb/dvb-s."
 
 #: modules/access/dvb/access.c:73
 msgid "Scan tuning list"
-msgstr ""
+msgstr "قائمة ضبط المسح"
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
-msgstr ""
+msgstr "اسم الملف الذي يحتوي على بيانات ضبط المسح الأولي."
 
 #: modules/access/dvb/access.c:76
 msgid "Use NIT for scanning services"
-msgstr ""
+msgstr "استخدم NIT لخدمات المسح الضوئي"
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
-msgstr ""
+msgstr "DVB"
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
-msgstr ""
+msgstr "مدخل DVB مع دعم v4l2"
 
 #: modules/access/dvb/scan.c:817
 #, c-format
@@ -7155,10 +7261,12 @@ msgid ""
 "%.1f MHz (%d services)\n"
 "~%s remaining"
 msgstr ""
+"%.1f ميغاهيرتز (%d الخدمات)\n"
+"~%s باقي"
 
 #: modules/access/dvb/scan.c:827
 msgid "Scanning DVB"
-msgstr ""
+msgstr "مسح DVB"
 
 #: modules/access/dvdnav.c:78 modules/access/dvdread.c:76
 msgid "DVD angle"
@@ -7201,6 +7309,8 @@ msgstr "فشل اعادة التشغيل "
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr ""
+"لا يمكن لبرنامج VLC تعيين عنوان قرص DVD. ربما لا يستطيع فك تشفير القرص "
+"بأكمله."
 
 #: modules/access/dvdread.c:84
 msgid "DVD without menus"
@@ -7208,16 +7318,16 @@ msgstr "بدون قوائمDVD "
 
 #: modules/access/dvdread.c:85
 msgid "DVDRead Input (no menu support)"
-msgstr ""
+msgstr "إدخال DVDRead (لا يوجد دعم للقائمة)"
 
 #: modules/access/dvdread.c:237
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
-msgstr ""
+msgstr "تعذر على DVDRead فتح القرص \"%s\"."
 
 #: modules/access/dvdread.c:253
 msgid "Cannot play a non-UDF mastered DVD."
-msgstr ""
+msgstr "لا يمكن تشغيل قرص DVD بصيغة غير UDF."
 
 #: modules/access/dvdread.c:512
 #, c-format
@@ -7252,11 +7362,11 @@ msgstr "الدليل"
 
 #: modules/access/fs.c:53
 msgid "List special files"
-msgstr ""
+msgstr "قائمة الملفات الخاصة"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
-msgstr ""
+msgstr "قم بتضمين الأجهزة والأنابيب عند إدراج الدلائل"
 
 #: modules/access/ftp.c:69 modules/access/live555.cpp:85
 #: modules/access/rdp.c:65 modules/access/sftp.c:55
@@ -7306,12 +7416,12 @@ msgstr "الحساب الذي سيستخدم للاتصال."
 
 #: modules/access/ftp.c:79
 msgid "FTP authentication"
-msgstr ""
+msgstr "مصادقة بروتوكول نقل الملفات FTP"
 
 #: modules/access/ftp.c:80
 #, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr ""
+msgstr "الرجاء إدخال معلومات تسجيل دخول وكلمة مرور صالحة لاتصال ftp بـ %s"
 
 #: modules/access/ftp.c:85
 msgid "FTP input"
@@ -7361,15 +7471,15 @@ msgstr "استيثاق HTTP"
 #: modules/access/http.c:304 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
-msgstr ""
+msgstr "الرجاء إدخال اسم تسجيل دخول صالح وكلمة مرور لـ realm %s."
 
 #: modules/access/http/access.c:288
 msgid "HTTPS input"
-msgstr ""
+msgstr "إدخال HTTPS"
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7377,27 +7487,27 @@ msgstr "تدفق مستمّر"
 
 #: modules/access/http/access.c:297
 msgid "Keep reading a resource that keeps being updated."
-msgstr ""
+msgstr "استمر في قراءة المورد الذي يتم تحديثه باستمرار."
 
 #: modules/access/http/access.c:299
 msgid "Cookies forwarding"
-msgstr ""
+msgstr "إعادة توجيه ملفات تعريف الارتباط"
 
 #: modules/access/http/access.c:300
 msgid "Forward cookies across HTTP redirections."
-msgstr ""
+msgstr "إعادة توجيه ملفات تعريف الارتباط عبر عمليات إعادة توجيه HTTP."
 
 #: modules/access/http/access.c:301
 msgid "Referrer"
-msgstr ""
+msgstr "المُحيل"
 
 #: modules/access/http/access.c:302
 msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
-msgstr ""
+msgstr "قم بتوفير عنوان URL للإحالة، أي HTTP \"المُحيل\" (كذا)."
 
 #: modules/access/http/access.c:306
 msgid "User agent"
-msgstr ""
+msgstr "وكيل المستخدم"
 
 #: modules/access/http/access.c:307
 msgid ""
@@ -7405,6 +7515,9 @@ msgid ""
 "server, i.e. the HTTP \"User-Agent\". Name and version must be separated by "
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
+"تجاوز اسم التطبيق وإصداره كما هو مقدم إلى خادم HTTP، أي \"وكيل مستخدم\" "
+"HTTP. يجب أن يتم الفصل بين الاسم والإصدار بشرطة مائلة للأمام، على سبيل "
+"المثال. \"فوبار/1.2.3\"."
 
 #: modules/access/idummy.c:41 modules/access_output/dummy.c:44
 #: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
@@ -7415,7 +7528,7 @@ msgstr "عديم الفائدة"
 
 #: modules/access/idummy.c:42
 msgid "Dummy input"
-msgstr ""
+msgstr "المدخلات الوهمية"
 
 #: modules/access/imem.c:49 modules/gui/qt/components/playlist/sorting.h:59
 #: modules/stream_out/bridge.c:41 modules/stream_out/mosaic_bridge.c:101
@@ -7424,7 +7537,7 @@ msgstr "المعرّف"
 
 #: modules/access/imem.c:51 modules/demux/image.c:46
 msgid "Set the ID of the elementary stream"
-msgstr ""
+msgstr "قم بتعيين معرف البث الأولي"
 
 #: modules/access/imem.c:53 modules/demux/image.c:48
 msgid "Group"
@@ -7432,7 +7545,7 @@ msgstr "المجموعة"
 
 #: modules/access/imem.c:55 modules/demux/image.c:50
 msgid "Set the group of the elementary stream"
-msgstr ""
+msgstr "قم بتعيين مجموعة البث الأولي"
 
 #: modules/access/imem.c:57
 msgid "Category"
@@ -7440,7 +7553,7 @@ msgstr "فئة"
 
 #: modules/access/imem.c:59
 msgid "Set the category of the elementary stream"
-msgstr ""
+msgstr "قم بتعيين فئة البث الأولي"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:363
 #: modules/gui/qt/managers/addons_manager.cpp:98
@@ -7453,15 +7566,15 @@ msgstr "بيانات"
 
 #: modules/access/imem.c:69
 msgid "Set the codec of the elementary stream"
-msgstr ""
+msgstr "قم بتعيين برنامج الترميز للتيار الأولي"
 
 #: modules/access/imem.c:73
 msgid "Language of the elementary stream as described by ISO639"
-msgstr ""
+msgstr "لغة التدفق الأولي كما هو موضح في ISO639"
 
 #: modules/access/imem.c:77
 msgid "Sample rate of an audio elementary stream"
-msgstr ""
+msgstr "معدل العينة للتيار الصوتي الأولي"
 
 #: modules/access/imem.c:79 modules/audio_output/amem.c:51
 msgid "Channels count"
@@ -7469,7 +7582,7 @@ msgstr "عداد القنوات"
 
 #: modules/access/imem.c:81
 msgid "Channels count of an audio elementary stream"
-msgstr ""
+msgstr "عدد القنوات للتيار الصوتي الأساسي"
 
 #: modules/access/imem.c:83 modules/access/v4l2/v4l2.c:65
 #: modules/demux/rawvid.c:47
@@ -7483,7 +7596,7 @@ msgstr "العرض"
 
 #: modules/access/imem.c:84
 msgid "Width of video or subtitle elementary streams"
-msgstr ""
+msgstr "عرض بثوث الفيديو أو الترجمة الأولية"
 
 #: modules/access/imem.c:86 modules/access/v4l2/v4l2.c:66
 #: modules/demux/rawvid.c:51
@@ -7496,7 +7609,7 @@ msgstr "الارتفاع"
 
 #: modules/access/imem.c:87
 msgid "Height of video or subtitle elementary streams"
-msgstr ""
+msgstr "ارتفاع بثوث الفيديو أو الترجمة الأولية"
 
 #: modules/access/imem.c:89
 msgid "Display aspect ratio"
@@ -7504,43 +7617,43 @@ msgstr "اعرض نسبة الأبعاد"
 
 #: modules/access/imem.c:91
 msgid "Display aspect ratio of a video elementary stream"
-msgstr ""
+msgstr "عرض نسبة العرض إلى الارتفاع لبث الفيديو الأساسي"
 
 #: modules/access/imem.c:95
 msgid "Frame rate of a video elementary stream"
-msgstr ""
+msgstr "معدل الإطارات لبث الفيديو الأساسي"
 
 #: modules/access/imem.c:97
 msgid "Callback cookie string"
-msgstr ""
+msgstr "سلسلة ملفات تعريف الارتباط لرد الاتصال"
 
 #: modules/access/imem.c:99
 msgid "Text identifier for the callback functions"
-msgstr ""
+msgstr "معرف النص لوظائف رد الاتصال"
 
 #: modules/access/imem.c:101
 msgid "Callback data"
-msgstr ""
+msgstr "بيانات رد الاتصال"
 
 #: modules/access/imem.c:103
 msgid "Data for the get and release functions"
-msgstr ""
+msgstr "البيانات الخاصة بوظائف الحصول والإصدار"
 
 #: modules/access/imem.c:105
 msgid "Get function"
-msgstr ""
+msgstr "الحصول على وظيفة"
 
 #: modules/access/imem.c:107
 msgid "Address of the get callback function"
-msgstr ""
+msgstr "عنوان وظيفة رد الاتصال"
 
 #: modules/access/imem.c:109
 msgid "Release function"
-msgstr ""
+msgstr "وظيفة الإصدار"
 
 #: modules/access/imem.c:111
 msgid "Address of the release callback function"
-msgstr ""
+msgstr "عنوان وظيفة رد الاتصال الإصدار"
 
 #: modules/access/imem.c:113
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:236
@@ -7550,31 +7663,31 @@ msgstr "الحجم"
 
 #: modules/access/imem.c:115
 msgid "Size of stream in bytes"
-msgstr ""
+msgstr "حجم البث بالبايت"
 
 #: modules/access/imem.c:118 modules/access/imem.c:119
 msgid "Memory input"
-msgstr ""
+msgstr "إدخال الذاكرة"
 
 #: modules/access/imem-access.c:165
 msgid "Memory stream"
-msgstr ""
+msgstr "تيار الذاكرة"
 
 #: modules/access/imem-access.c:166
 msgid "In-memory stream input"
-msgstr ""
+msgstr "إدخال تيار في الذاكرة"
 
 #: modules/access/jack.c:59
 msgid "Pace"
-msgstr ""
+msgstr "الوتيرة"
 
 #: modules/access/jack.c:61
 msgid "Read the audio stream at VLC pace rather than Jack pace."
-msgstr ""
+msgstr "اقرأ البث الصوتي بسرعة VLC بدلاً من سرعة Jack."
 
 #: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:898
 msgid "Auto connection"
-msgstr ""
+msgstr "اتصال تلقائي"
 
 #: modules/access/jack.c:64
 msgid "Automatically connect VLC input ports to available output ports."
@@ -7598,7 +7711,7 @@ msgstr "رابط #"
 msgid ""
 "Allows you to set the desired link of the board for the capture (starting at "
 "0)."
-msgstr ""
+msgstr "يسمح لك بتعيين الرابط المطلوب للوحة الالتقاط (بدءًا من 0)."
 
 #: modules/access/linsys/linsys_hdsdi.c:75
 #: modules/access/linsys/linsys_sdi.c:71
@@ -7608,12 +7721,12 @@ msgstr "فيديوID "
 #: modules/access/linsys/linsys_hdsdi.c:77
 #: modules/access/linsys/linsys_sdi.c:73
 msgid "Allows you to set the ES ID of the video."
-msgstr ""
+msgstr "يسمح لك بتعيين معرف ES للفيديو."
 
 #: modules/access/linsys/linsys_hdsdi.c:80
 #: modules/access/linsys/linsys_sdi.c:76
 msgid "Allows you to force the aspect ratio of the video."
-msgstr ""
+msgstr "يسمح لك بفرض نسبة العرض إلى الارتفاع للفيديو."
 
 #: modules/access/linsys/linsys_hdsdi.c:81
 #: modules/access/linsys/linsys_sdi.c:77
@@ -7624,10 +7737,11 @@ msgstr "تهيئة الصوت"
 #: modules/access/linsys/linsys_sdi.c:79
 msgid "Allows you to set audio configuration (id=group,pair:id=group,pair...)."
 msgstr ""
+"يسمح لك بضبط تكوين الصوت (المعرف=المجموعة،الزوج:المعرف=المجموعة،الزوج...)"
 
 #: modules/access/linsys/linsys_hdsdi.c:89
 msgid "HD-SDI Input"
-msgstr ""
+msgstr "مدخل HD-SDI"
 
 #: modules/access/linsys/linsys_hdsdi.c:90
 msgid "HD-SDI"
@@ -7635,28 +7749,28 @@ msgstr "HD-SDI"
 
 #: modules/access/linsys/linsys_sdi.c:80
 msgid "Teletext configuration"
-msgstr ""
+msgstr "تكوين النص التليفزيوني"
 
 #: modules/access/linsys/linsys_sdi.c:82
 msgid ""
 "Allows you to set Teletext configuration (id=line1-lineN with both fields)."
-msgstr ""
+msgstr "يتيح لك ضبط تكوين قناة المعلومات (المعرف=line1-lineN مع كلا الحقلين)."
 
 #: modules/access/linsys/linsys_sdi.c:83
 msgid "Teletext language"
-msgstr ""
+msgstr "لغة النص التلفزيوني"
 
 #: modules/access/linsys/linsys_sdi.c:85
 msgid "Allows you to set Teletext language (page=lang/type,...)."
-msgstr ""
+msgstr "يتيح لك ضبط لغة نصوص المعلومات (page=lang/type,...)."
 
 #: modules/access/linsys/linsys_sdi.c:93
 msgid "SDI Input"
-msgstr ""
+msgstr "مدخل SDI"
 
 #: modules/access/linsys/linsys_sdi.c:114
 msgid "SDI Demux"
-msgstr ""
+msgstr "فك دمج إشارات SDI"
 
 #: modules/access/live555.cpp:75
 msgid "Kasenna RTSP dialect"
@@ -7668,16 +7782,20 @@ msgid ""
 "parameter VLC will try this dialect, but then it cannot connect to normal "
 "RTSP servers."
 msgstr ""
+"تستخدم خوادم Kasenna لهجة قديمة وغير قياسية لـ RTSP. باستخدام هذه المعلمة، "
+"سيحاول VLC هذه اللهجة، ولكن بعد ذلك لا يمكنه الاتصال بخوادم RTSP العادية."
 
 #: modules/access/live555.cpp:80
 msgid "WMServer RTSP dialect"
-msgstr ""
+msgstr "لهجة WMServer RTSP"
 
 #: modules/access/live555.cpp:81
 msgid ""
 "WMServer uses a nonstandard dialect of RTSP. Selecting this parameter will "
 "tell VLC to assume some options contrary to RFC 2326 guidelines."
 msgstr ""
+"يستخدم WMServer لهجة غير قياسية لـ RTSP. سيؤدي تحديد هذه المعلمة إلى إخبار "
+"VLC بافتراض بعض الخيارات المخالفة لإرشادات RFC 2326."
 
 #: modules/access/live555.cpp:86
 msgid ""
@@ -7694,13 +7812,15 @@ msgstr "يضبط كلمة السر للاتصال في حال لم يُضبط ا
 
 #: modules/access/live555.cpp:91
 msgid "RTSP frame buffer size"
-msgstr ""
+msgstr "حجم المخزن المؤقت لإطار RTSP"
 
 #: modules/access/live555.cpp:92
 msgid ""
 "RTSP start frame buffer size of the video track, can be increased in case of "
 "broken pictures due to too small buffer."
 msgstr ""
+"يمكن زيادة حجم المخزن المؤقت لإطار بدء تشغيل RTSP لمسار الفيديو في حالة وجود "
+"صور مكسورة بسبب المخزن المؤقت الصغير جدًا."
 
 #: modules/access/live555.cpp:98
 msgid "RTP/RTSP/SDP demuxer (using Live555)"
@@ -7724,7 +7844,7 @@ msgstr "المنفذ ليُستخدم لمصدر RTP للجلسة"
 
 #: modules/access/live555.cpp:119 modules/access/live555.cpp:120
 msgid "Force multicast RTP via RTSP"
-msgstr ""
+msgstr "فرض البث المتعدد RTP عبر RTSP"
 
 #: modules/access/live555.cpp:123 modules/access/live555.cpp:124
 msgid "Tunnel RTSP and RTP over HTTP"
@@ -7748,11 +7868,11 @@ msgstr ".يرجى إدخال  إسم دخول وكلمة السرصالحين "
 
 #: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
-msgstr ""
+msgstr "فشل اتصال RTSP"
 
 #: modules/access/live555.cpp:704
 msgid "Access to the stream is denied by the server configuration."
-msgstr ""
+msgstr "تم رفض الوصول إلى الدفق من خلال تكوين الخادم."
 
 #: modules/access/mms/mms.c:49
 msgid "Force selection of all streams"
@@ -7776,13 +7896,15 @@ msgstr ".دائماً إختيار التدفق ذو معدل البت الأع�
 
 #: modules/access/mms/mms.c:58
 msgid "TCP/UDP timeout (ms)"
-msgstr ""
+msgstr "مهلة TCP/UDP (بالمللي ثانية)"
 
 #: modules/access/mms/mms.c:59
 msgid ""
 "Amount of time (in ms) to wait before aborting network reception of data. "
 "Note that there will be 10 retries before completely giving up."
 msgstr ""
+"مقدار الوقت (بالمللي ثانية) للانتظار قبل إيقاف استقبال البيانات على الشبكة. "
+"لاحظ أنه ستكون هناك 10 محاولات قبل الاستسلام تمامًا."
 
 #: modules/access/mms/mms.c:63
 msgid "Microsoft Media Server (MMS) input"
@@ -7807,25 +7929,26 @@ msgstr "تعذر على VLC قراءة الملف: %s"
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
-msgstr ""
+msgstr "قم بتعيين NFS uid/guid تلقائيًا"
 
 #: modules/access/nfs.c:50
 msgid ""
 "If uid/gid are not specified in the url, VLC will automatically set a uid/"
 "gid."
 msgstr ""
+"إذا لم يتم تحديد uid/gid في عنوان url، فسيقوم VLC تلقائيًا بتعيين uid/gid."
 
 #: modules/access/nfs.c:57
 msgid "NFS"
-msgstr ""
+msgstr "NFS"
 
 #: modules/access/nfs.c:58
 msgid "NFS input"
-msgstr ""
+msgstr "مدخلات NFS"
 
 #: modules/access/nfs.c:114
 msgid "NFS operation failed"
-msgstr ""
+msgstr "فشلت عملية NFS"
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -7841,6 +7964,8 @@ msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, "
 "48000)"
 msgstr ""
+"عينة من تدفق الصوت الملتقط، بالهرتز (على سبيل المثال: 11025، 22050، 44100، "
+"48000)"
 
 #: modules/access/oss.c:76
 msgid "OSS"
@@ -7855,14 +7980,16 @@ msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
 "open a specific source named SOURCE."
 msgstr ""
+"قم بتمرير النبض: // لفتح مصدر PulseAudio الافتراضي، أو النبض: // SOURCE لفتح "
+"مصدر محدد يسمى SOURCE."
 
 #: modules/access/pulse.c:42
 msgid "PulseAudio"
-msgstr ""
+msgstr "PulseAudio"
 
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
-msgstr ""
+msgstr "إدخال PulseAudio"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -7870,7 +7997,7 @@ msgstr "اتصال معمّى"
 
 #: modules/access/rdp.c:74
 msgid "Acquisition rate (in fps)"
-msgstr ""
+msgstr "معدل الاكتساب (بالإطارات في الثانية)"
 
 #: modules/access/rdp.c:85
 msgid "RDP"
@@ -7878,99 +8005,107 @@ msgstr "RDP"
 
 #: modules/access/rdp.c:89
 msgid "RDP Remote Desktop"
-msgstr ""
+msgstr "الوصول عن بعد RDP"
 
 #: modules/access/rist.c:65
 msgid "Range"
-msgstr ""
+msgstr "نطاق"
 
 #: modules/access/rist.c:65
 msgid "Bitmask"
-msgstr ""
+msgstr "قناع نقطي"
 
 #: modules/access/rist.c:1127 modules/access_output/rist.c:849
 msgid "RIST"
-msgstr ""
+msgstr "RIST"
 
 #: modules/access/rist.c:1128
 msgid "RIST input"
-msgstr ""
+msgstr "إدخال RIST"
 
 #: modules/access/rist.c:1133
 msgid "RIST maximum packet size (bytes)"
-msgstr ""
+msgstr "RIST الحد الأقصى لحجم الحزمة (بايت)"
 
 #: modules/access/rist.c:1135
 msgid "RIST demux/decode maximum jitter (default is 5ms)"
-msgstr ""
+msgstr "RIST demux/decode الحد الأقصى من الارتعاش (الافتراضي هو 5 مللي ثانية)"
 
 #: modules/access/rist.c:1136
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the algorithm will consume"
 msgstr ""
+"يتحكم هذا في الحد الأقصى من الارتعاش الذي سيتم تمريره إلى سلسلة فك دمج "
+"الاشارات/فك الترميز. كلما انخفضت القيمة، زاد عدد دورات وحدة المعالجة "
+"المركزية التي ستستهلكها الخوارزمية"
 
 #: modules/access/rist.c:1138
 msgid "RIST latency (ms)"
-msgstr ""
+msgstr "زمن استجابة RIST (ملي ثانية)"
 
 #: modules/access/rist.c:1139
 msgid "RIST nack retry interval (ms)"
-msgstr ""
+msgstr "الفاصل الزمني لإعادة محاولة RIST (بالمللي ثانية)"
 
 #: modules/access/rist.c:1141
 msgid "RIST reorder buffer (ms)"
-msgstr ""
+msgstr "المخزن المؤقت لإعادة ترتيب RIST (ملي ثانية)"
 
 #: modules/access/rist.c:1143
 msgid "RIST maximum retry count"
-msgstr ""
+msgstr "الحد الأقصى لعدد مرات إعادة المحاولة للـ RIST"
 
 #: modules/access/rist.c:1145
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
-msgstr ""
+msgstr "نوع RIST nack، حيث 0 = النطاق، 1 = قناع البت. الافتراضي هو النطاق"
 
 #: modules/access/rist.c:1147
 msgid "Disable NACK output packets"
-msgstr ""
+msgstr "تعطيل حزم الإخراج NACK"
 
 #: modules/access/rist.c:1148
 msgid "Use this to disable packet recovery"
-msgstr ""
+msgstr "استخدم هذا لتعطيل استرداد الحزمة"
 
 #: modules/access/rist.c:1149
 msgid "Do not check for a valid rtcp message from the encoder"
-msgstr ""
+msgstr "لا تتحقق من وجود رسالة rtcp صالحة من برنامج التشفير"
 
 #: modules/access/rist.c:1150
 msgid ""
 "Send nack messages even when we have not confirmed that the encoder is on "
 "our local network."
 msgstr ""
+"أرسل رسائل nack حتى عندما لا نتأكد من وجود برنامج التشفير على شبكتنا المحلية."
 
 #: modules/access/rtp/rtp.c:44
 msgid "RTCP (local) port"
-msgstr ""
+msgstr "منفذ RTCP (المحلي)."
 
 #: modules/access/rtp/rtp.c:46
 msgid ""
 "RTCP packets will be received on this transport protocol port. If zero, "
 "multiplexed RTP/RTCP is used."
 msgstr ""
+"سيتم استلام حزم RTCP على منفذ بروتوكول النقل هذا. إذا كان الصفر، يتم استخدام "
+"RTP/RTCP متعدد الإرسال."
 
 #: modules/access/rtp/rtp.c:49 modules/stream_out/rtp.c:144
 msgid "SRTP key (hexadecimal)"
-msgstr ""
+msgstr "مفتاح SRTP (سداسي عشري)"
 
 #: modules/access/rtp/rtp.c:51
 msgid ""
 "RTP packets will be authenticated and deciphered with this Secure RTP master "
 "shared secret key. This must be a 32-character-long hexadecimal string."
 msgstr ""
+"ستتم مصادقة حزم RTP وفك تشفيرها باستخدام المفتاح السري المشترك الرئيسي "
+"Secure RTP. يجب أن يكون هذا سلسلة سداسية عشرية مكونة من 32 حرفًا."
 
 #: modules/access/rtp/rtp.c:55 modules/stream_out/rtp.c:150
 msgid "SRTP salt (hexadecimal)"
-msgstr ""
+msgstr "رمز سولت SRTP (سداسي عشري)"
 
 #: modules/access/rtp/rtp.c:57 modules/stream_out/rtp.c:152
 msgid ""
@@ -7982,49 +8117,56 @@ msgstr ""
 
 #: modules/access/rtp/rtp.c:60
 msgid "Maximum RTP sources"
-msgstr ""
+msgstr "الحد الأقصى لمصادر RTP"
 
 #: modules/access/rtp/rtp.c:62
 msgid "How many distinct active RTP sources are allowed at a time."
-msgstr ""
+msgstr "ما عدد مصادر RTP النشطة المميزة المسموح بها في المرة الواحدة."
 
 #: modules/access/rtp/rtp.c:64
 msgid "RTP source timeout (sec)"
-msgstr ""
+msgstr "مهلة مصدر RTP (ثانية)"
 
 #: modules/access/rtp/rtp.c:66
 msgid "How long to wait for any packet before a source is expired."
-msgstr ""
+msgstr "كم من الوقت يجب انتظار أي حزمة قبل انتهاء صلاحية المصدر."
 
 #: modules/access/rtp/rtp.c:68
 msgid "Maximum RTP sequence number dropout"
-msgstr ""
+msgstr "العدد الأقصى لانقطاع الحزم المتسلسلة لـ RTP"
 
 #: modules/access/rtp/rtp.c:70
 msgid ""
 "RTP packets will be discarded if they are too much ahead (i.e. in the "
 "future) by this many packets from the last received packet."
 msgstr ""
+"سيتم تجاهل حزم RTP إذا كانت متقدمة جدًا (أي في المستقبل) بهذا العدد من الحزم "
+"من آخر حزمة تم استلامها."
 
 #: modules/access/rtp/rtp.c:73
 msgid "Maximum RTP sequence number misordering"
-msgstr ""
+msgstr "العدد الأقصى لخطأ ترتيب الحزم المتسلسلة لـ RTP"
 
 #: modules/access/rtp/rtp.c:75
 msgid ""
 "RTP packets will be discarded if they are too far behind (i.e. in the past) "
 "by this many packets from the last received packet."
 msgstr ""
+"سيتم تجاهل حزم RTP إذا كانت متخلفة جدًا (أي في الماضي) عن طريق هذا العدد من "
+"الحزم من آخر حزمة تم استلامها."
 
 #: modules/access/rtp/rtp.c:78
 msgid "RTP payload format assumed for dynamic payloads"
-msgstr ""
+msgstr "تنسيق حمولة RTP المفترض للحمولات الديناميكية"
 
 #: modules/access/rtp/rtp.c:81
 msgid ""
 "This payload format will be assumed for dynamic payload types (between 96 "
 "and 127) if it can't be determined otherwise with out-of-band mappings (SDP)"
 msgstr ""
+"سيتم افتراض تنسيق الحمولة النافعة هذا لأنواع الحمولة النافعة الديناميكية "
+"(بين 96 و127) إذا لم يكن من الممكن تحديده بطريقة أخرى باستخدام تعيينات خارج "
+"النطاق (SDP)"
 
 #: modules/access/rtp/rtp.c:95 modules/stream_out/rtp.c:187
 msgid "RTP"
@@ -8032,11 +8174,11 @@ msgstr "RTP"
 
 #: modules/access/rtp/rtp.c:96
 msgid "Real-Time Protocol (RTP) input"
-msgstr ""
+msgstr "مُدْخَل بروتوكول الوقت الحقيقي (RTP)."
 
 #: modules/access/rtp/rtp.c:773
 msgid "SDP required"
-msgstr ""
+msgstr "مطلوب SDP"
 
 #: modules/access/rtp/rtp.c:774
 #, c-format
@@ -8044,6 +8186,8 @@ msgid ""
 "A description in SDP format is required to receive the RTP stream. Note that "
 "rtp:// URIs cannot work with dynamic RTP payload format (%<PRIu8>)."
 msgstr ""
+"مطلوب وصف بتنسيق SDP لتلقي تدفق حزم RTP. لاحظ أن عناوين URL لـ rtp:// لا "
+"يمكنها العمل مع تنسيق حمولة RTP الديناميكي (%<PRIu8>)."
 
 #: modules/access/rtsp/access.c:48 modules/access/rtsp/access.c:49
 msgid "Real RTSP"
@@ -8068,19 +8212,19 @@ msgstr ".المطلوبة لا يمكن اثباتها  RTSP دوره"
 
 #: modules/access/satip.c:60 modules/access/udp.c:59
 msgid "Receive buffer"
-msgstr ""
+msgstr "تلقي المخزن المؤقت"
 
 #: modules/access/satip.c:61 modules/access/udp.c:60
 msgid "UDP receive buffer size (bytes)"
-msgstr ""
+msgstr "حجم المخزن المؤقت لاستقبال UDP (بايت)"
 
 #: modules/access/satip.c:63
 msgid "Request multicast stream"
-msgstr ""
+msgstr "طلب دفق البث المتعدد"
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr ""
+msgstr "اطلب من الخادم إرسال الدفق كبث متعدد"
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
@@ -8090,7 +8234,7 @@ msgstr "مضيف"
 
 #: modules/access/satip.c:70
 msgid "SAT>IP Receiver Plugin"
-msgstr ""
+msgstr "SAT> البرنامج المساعد لاستقبال IP"
 
 #: modules/access/screen/screen.c:45
 #: modules/gui/qt/components/open_panels.cpp:1104
@@ -8111,27 +8255,27 @@ msgstr ""
 
 #: modules/access/screen/screen.c:55 modules/access/screen/xcb.c:47
 msgid "Region top row"
-msgstr ""
+msgstr "المنطقة في الصف العلوي"
 
 #: modules/access/screen/screen.c:57 modules/access/screen/xcb.c:49
 msgid "Ordinate of the capture region in pixels."
-msgstr ""
+msgstr "ترتيب منطقة الالتقاط بالبكسل"
 
 #: modules/access/screen/screen.c:59 modules/access/screen/xcb.c:43
 msgid "Region left column"
-msgstr ""
+msgstr "المنطقة في العمود الأيسر"
 
 #: modules/access/screen/screen.c:61 modules/access/screen/xcb.c:45
 msgid "Abscissa of the capture region in pixels."
-msgstr ""
+msgstr "الإحداثي السيني لمنطقة الالتقاط بالبكسل."
 
 #: modules/access/screen/screen.c:63 modules/access/screen/xcb.c:51
 msgid "Capture region width"
-msgstr ""
+msgstr "عرض منطقة الإلتقاط"
 
 #: modules/access/screen/screen.c:65 modules/access/screen/xcb.c:55
 msgid "Capture region height"
-msgstr ""
+msgstr "إرتفاع منطقة الإلتقاط"
 
 #: modules/access/screen/screen.c:67 modules/access/screen/xcb.c:59
 #: modules/gui/macosx/VLCOpenWindowController.m:214
@@ -8140,7 +8284,7 @@ msgstr "إتبّع الفأرة"
 
 #: modules/access/screen/screen.c:69 modules/access/screen/xcb.c:61
 msgid "Follow the mouse when capturing a subscreen."
-msgstr ""
+msgstr "اتبع الماوس عند التقاط شاشة فرعية."
 
 #: modules/access/screen/screen.c:73
 msgid "Mouse pointer image"
@@ -8149,23 +8293,23 @@ msgstr "صورة مؤشر الفأرة"
 #: modules/access/screen/screen.c:75
 msgid ""
 "If specified, will use the image to draw the mouse pointer on the capture."
-msgstr ""
+msgstr "إذا تم تحديدها، سيتم استخدام الصورة لرسم مؤشر الماوس على الالتقاط."
 
 #: modules/access/screen/screen.c:80
 msgid "Display ID"
-msgstr ""
+msgstr "معرف العرض"
 
 #: modules/access/screen/screen.c:82
 msgid "Display ID. If not specified, main display ID is used."
-msgstr ""
+msgstr "معرف العرض إذا لم يتم تحديده، فسيتم استخدام معرف العرض الرئيسي."
 
 #: modules/access/screen/screen.c:83
 msgid "Screen index"
-msgstr ""
+msgstr "فهرس الشاشة"
 
 #: modules/access/screen/screen.c:85
 msgid "Index of screen (1, 2, 3, ...). Alternative to Display ID."
-msgstr ""
+msgstr "فهرس الشاشة (1، 2، 3، ...). بديل لمعرف العرض."
 
 #: modules/access/screen/screen.c:98
 msgid "Screen Input"
@@ -8325,8 +8469,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format "
-"DOMAIN;username) and a password."
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8350,9 +8494,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
-#, fuzzy
 msgid " SRT Stream ID"
-msgstr "تدفق %d"
+msgstr ""
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -8788,9 +8931,9 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
-"controls, increase verbosity (-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -10996,8 +11139,8 @@ msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
 msgstr ""
-".(المقسم الى كميات صغيرة من اجل رفع الكتلال الصغيرة في حدود الاطار(فرضًا "
-":0.0 )"
+".(المقسم الى كميات صغيرة من اجل رفع الكتلال الصغيرة في حدود "
+"الاطار(فرضًا :0.0 )"
 
 #: modules/codec/avcodec/avcodec.h:221
 msgid "Luminance elimination"
@@ -11057,7 +11200,7 @@ msgstr ""
 
 #: modules/codec/avcodec/encoder.c:926
 msgid "unknown"
-msgstr ""
+msgstr "غير معروف"
 
 #: modules/codec/avcodec/encoder.c:926
 msgid "video"
@@ -11178,9 +11321,8 @@ msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
 
 #: modules/codec/dav1d.c:56
-#, fuzzy
 msgid "All Layers"
-msgstr "كل الملفات"
+msgstr ""
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -11249,8 +11391,8 @@ msgstr "Subpicture position"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-"e.g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
+"g. 6=top-right)."
 msgstr ""
 "يمكنك ان تنفذ دون الموقف صورة على الڤديو \n"
 " المركز=0 ،اليسار=1 ، اليمين=2 ،القمة =4 ،القاع=8 ، كما يمكنك إستخدام مزيج \n"
@@ -11940,10 +12082,10 @@ msgstr ""
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
-"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
-"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
-"after a certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
+"certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -13143,7 +13285,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15385,8 +15526,8 @@ msgid ""
 "value as the PID in the TS stream, instead of 1, 2, 3, etc. Useful to do "
 "'#duplicate{..., select=\"es=<pid>\"}'."
 msgstr ""
-".'#duplicate{..., select=\"es=<pid>\"}'' السيل ، بدلا من 1 ، 2 ، 3 ، "
-"الخ .المفيد ان يفعل 'إختيار= \" TS  في PID   يتولاها الى نفس القيمه كما VLC  "
+".'#duplicate{..., select=\"es=<pid>\"}'' السيل ، بدلا من 1 ، 2 ، 3 ، الخ ."
+"المفيد ان يفعل 'إختيار= \" TS  في PID   يتولاها الى نفس القيمه كما VLC  "
 "الداخلية تحدد هوية كل تيار ابتدائي في "
 
 #: modules/demux/mpeg/ts.c:94 modules/mux/mpeg/ts.c:173
@@ -17408,9 +17549,8 @@ msgstr "اطوِ الكل"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
-#, fuzzy
 msgid "Shuffle playlist"
-msgstr "احفظ قائمة التشغيل"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -19163,7 +19303,7 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1420
 msgid "(Delayed)"
-msgstr ""
+msgstr "(تأخير)"
 
 #: modules/gui/qt/components/extended_panels.cpp:1507
 msgid "Force update of this dialog's values"
@@ -20997,9 +21137,8 @@ msgid "Show unimportant error and warnings dialogs"
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:124
-#, fuzzy
 msgid "Enable Dark Mode"
-msgstr "فعّل وضع الخلفية"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Applies a dark theme to the style."
@@ -21321,9 +21460,8 @@ msgid "AMD Frame Rate Doubler"
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:690
-#, fuzzy
 msgid "Show indicator"
-msgstr "اعرض الشريط الجانبي"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22957,10 +23095,10 @@ msgid ""
 "enhances the efficiency of the shaping algorithm, since I frames are usually "
 "the biggest frames in the stream."
 msgstr ""
-"، اذا تمكن وتشكيل محدد TS موكير ستضع الحدود في نهاية أي صور.وفي تلك "
-"الحاله ،تشكيل المده التي قدمها المستخدم اسوأ حالة استخدامها عندما لا توفر "
-"الاطار المرجعي. هذا يعزز الكفاءه في تشكيل الخوارزميه ، ولما كنت عادة اطر اطر "
-"أكبر في التيار. "
+"، اذا تمكن وتشكيل محدد TS موكير ستضع الحدود في نهاية أي صور.وفي تلك الحاله ،"
+"تشكيل المده التي قدمها المستخدم اسوأ حالة استخدامها عندما لا توفر الاطار "
+"المرجعي. هذا يعزز الكفاءه في تشكيل الخوارزميه ، ولما كنت عادة اطر اطر أكبر "
+"في التيار. "
 
 #: modules/mux/mpeg/ts.c:151
 msgid "PCR interval (ms)"
@@ -23732,9 +23870,9 @@ msgid ""
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg "
 "6 = top-right)."
 msgstr ""
-".(يمكنك تطبيق تنسيق فسيفساء على الڤديو  (المركز=0,   اليسار=1 ،  "
-"اليمين=2 ,القمة =4 , القاع=8 ، كما يمكنك إستخدام مزيج من هذه القيم على سبيل "
-"المثال : 6 = اعلى اليمين "
+".(يمكنك تطبيق تنسيق فسيفساء على الڤديو  (المركز=0,   اليسار=1 ،  اليمين=2 ,"
+"القمة =4 , القاع=8 ، كما يمكنك إستخدام مزيج من هذه القيم على سبيل المثال : 6 "
+"= اعلى اليمين "
 
 #: modules/spu/mosaic.c:117
 msgid "Positioning method"
@@ -26931,39 +27069,32 @@ msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
-#, fuzzy
 msgid "Video Upscaling Mode"
-msgstr "الڤديو  المتسلق"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:75
-#, fuzzy
 msgid "Select the upscaling mode for video."
-msgstr "حدد وضع كسب إعادة التشغيل"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Linear Sampler"
-msgstr "بِت لكلّ عيّنة "
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Point Sampler"
-msgstr "معدّل الإعتيان"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Video Processor"
-msgstr "مرمازات الڤديو"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:80
-#, fuzzy
 msgid "Super Resolution"
-msgstr "دقة الشاشة"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
-#, fuzzy
 msgid "HDR Output Mode"
-msgstr "وحدات الخرج"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
@@ -26974,9 +27105,8 @@ msgid "Never out HDR"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
-#, fuzzy
 msgid "Always output HDR"
-msgstr "بالأعلى دائما"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
@@ -28051,9 +28181,8 @@ msgid "0.00 dB"
 msgstr "٠,٠٠ ديسيبِل"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
-#, fuzzy
 msgid "Audio Fingerprinting"
-msgstr "الب&صمة"
+msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
@@ -28064,9 +28193,8 @@ msgid "No fingerprint has been found"
 msgstr ""
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
-#, fuzzy
 msgid "Fingerprinting track..."
-msgstr "الب&صمة"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -28093,9 +28221,8 @@ msgid "Show &more options"
 msgstr "أظهر الم&زيد من الخيارات"
 
 #: modules/gui/qt/ui/open.h:263
-#, fuzzy
 msgid "Change the caching for the media"
-msgstr "غيّر وقت بدء الوسائط"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:265
 msgid " ms"
@@ -28110,9 +28237,8 @@ msgid "Start Time"
 msgstr "وقت البدء"
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Stop Time"
-msgstr "وقت التوقّف"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:269
 msgid "Edit Options"
@@ -28139,9 +28265,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:283
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "غيّر وقت بدء الوسائط"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:286
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28240,9 +28365,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "موكسير MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "Ogg/Ogm"
@@ -28265,9 +28389,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "RAW"
@@ -28314,9 +28437,8 @@ msgid "Menus"
 msgstr "القوائم"
 
 #: modules/gui/qt/ui/profiles.h:728
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "  نسبة نموذجية"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
@@ -28331,9 +28453,8 @@ msgid "Custom options"
 msgstr "خيارات مخصصة"
 
 #: modules/gui/qt/ui/profiles.h:733
-#, fuzzy
 msgid "&Quality"
-msgstr "جودة VBR"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:734 modules/gui/qt/ui/profiles.h:735
 msgid "Not Used"
@@ -28356,29 +28477,24 @@ msgid "px"
 msgstr "بكسِل"
 
 #: modules/gui/qt/ui/profiles.h:756
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "  نسبة نموذجية"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:764
-#, fuzzy
 msgid "Profile &Name"
-msgstr "اسم اللاحة"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:200
-#, fuzzy
 msgid "Set up media sources to stream"
-msgstr "اختر ”الخيارات المتقدمة“ لمطالعة كل الخيارات."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:202
-#, fuzzy
 msgid "Destination Setup"
-msgstr "المقصد"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "اختر ”الخيارات المتقدمة“ لمطالعة كل الخيارات."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:204
 msgid ""
@@ -28407,37 +28523,32 @@ msgid "Activate Transcoding"
 msgstr "فعّل تحويل الترميز"
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Option Setup"
-msgstr "خيارات"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr "اختر ”الخيارات المتقدمة“ لمطالعة كل الخيارات."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Miscellaneous Options"
 msgstr "خيارات متفرقة"
 
 #: modules/gui/qt/ui/sout.h:215
-#, fuzzy
 msgid "Stream all elementary streams"
-msgstr "دفق جميع التدفقات الأولية (الفيديو والصوت والترجمات)"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "الإعدادات العامة لخرج الدفق"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid " %"
 msgstr " %"
 
 #: modules/gui/qt/ui/sprefs_audio.h:413
-#, fuzzy
 msgid "Output module:"
-msgstr "وحدات الخرج"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:416
 msgid "Use S/PDIF when available"
@@ -28448,19 +28559,16 @@ msgid "Effects"
 msgstr "المُؤثّرات"
 
 #: modules/gui/qt/ui/sprefs_audio.h:419
-#, fuzzy
 msgid "Visualization:"
-msgstr "التصوير البصري"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:420
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "تمكين تمديد وقت الصوت"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
-#, fuzzy
 msgid "Replay gain mode:"
-msgstr "وضع إعادة تشغيل الكسب"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
 msgid "Normalize volume to:"
@@ -28503,14 +28611,12 @@ msgid "Video quality post-processing level"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:358
-#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "تخطى مرشح الحلقة"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:359
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "طور x264 واختار المستوى"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Optical drive"
@@ -28525,28 +28631,24 @@ msgid "Damaged or incomplete AVI file"
 msgstr "ملف AVI غير كامل و تالِف"
 
 #: modules/gui/qt/ui/sprefs_input.h:369
-#, fuzzy
 msgid "HTTP proxy URL"
-msgstr "وكيل HTTP"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:370
 msgid "HTTP (default)"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:371
-#, fuzzy
 msgid "RTP over RTSP (TCP)"
-msgstr " (TCP) RTSP انتهى  RTP  استعمال       "
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:372
-#, fuzzy
 msgid "Live555 stream transport"
-msgstr "ملف ناتج التيار"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:373
-#, fuzzy
 msgid "Default caching policy"
-msgstr "مستوى الاختزان المبدئي"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:534
 msgid "Menus language:"
@@ -28593,23 +28695,20 @@ msgid "Force window style:"
 msgstr "أجبِر نمط النوافذ:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
-#, fuzzy
 msgid "Integrate video in interface"
-msgstr " المرشح مقلوب الڤديو"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:548
 msgid "Show systray icon"
 msgstr "اعرض أيقونة في صينية النظام"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses الوصله "
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
-#, fuzzy
 msgid "Use a dark palette"
-msgstr "إستعمال قائمة التشغيل المسلوخة "
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -28700,9 +28799,8 @@ msgid "Add a background"
 msgstr "أضِف خلفية"
 
 #: modules/gui/qt/ui/sprefs_video.h:313
-#, fuzzy
 msgid "O&utput"
-msgstr "الخرج"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "DirectX"
