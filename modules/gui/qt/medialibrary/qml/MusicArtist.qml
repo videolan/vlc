@@ -73,6 +73,9 @@ FocusScope {
     })
 
     function navigationShowHeader(y, height) {
+        if (!(_currentView instanceof Flickable))
+            return
+
         const newContentY = Helpers.flickablePositionContaining(_currentView, y, height, 0, 0)
 
         if (newContentY !== _currentView.contentY)

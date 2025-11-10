@@ -121,9 +121,7 @@ QtObject {
         else
             newContentY = flickable.contentY
 
-        return clamp(newContentY,
-                     flickable.originY - flickable.topMargin,
-                     flickable.originY + flickable.contentHeight - flickable.height + flickable.bottomMargin)
+        return getFlickableBoundedContentY(flickable, newContentY)
     }
 
     function isArray(obj) {
@@ -152,9 +150,9 @@ QtObject {
         const mappedRect = flickable.mapFromItem(item.parent, Qt.rect(item.x, item.y, item.width, item.height))
         // Flickable does not fully contain the item:
         if ((mappedRect.y < 0) || ((mappedRect.y + mappedRect.height) > flickable.height))
-            flickable.contentY = Math.min(Math.max(flickable.originY - flickable.topMargin,
-                                                   flickable.contentItem.mapFromItem(item.parent, item.x, item.y).y - Math.max(0, ((flickable.height - item.height) / 2))),
-                                          flickable.originY + flickable.contentHeight - flickable.height + flickable.bottomMargin)
+            flickable.contentY = getFlickableBoundedContentY(flickable,
+                                                             flickable.contentItem.mapFromItem(item.parent, item.x, item.y).y -
+                                                             Math.max(0, ((flickable.height - item.height) / 2)))
     }
 
     function getFlickableBoundedContentX(flickable: Flickable, contentX: real) : real {
