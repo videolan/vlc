@@ -208,15 +208,12 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
         api->is_gles = true;
         /* OpenGL ES 2 includes support for non-power of 2 textures by specification
          * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
-        api->supports_npot = true;
         if (!api->glsl_version)
             api->glsl_version = version >= 3 ? 300 : 100;
     }
     else
     {
         api->is_gles = false;
-        api->supports_npot = vlc_gl_HasExtension(&extension_vt, "GL_ARB_texture_non_power_of_two") ||
-                             vlc_gl_HasExtension(&extension_vt, "GL_APPLE_texture_2D_limited_npot");
         if (!api->glsl_version)
             api->glsl_version = 120;
     }

@@ -41,9 +41,6 @@ struct vlc_gl_api {
     /* True if the current API is OpenGL ES, set by the caller */
     bool is_gles;
 
-    /* Non-power-of-2 texture size support */
-    bool supports_npot;
-
     /* Multisampling for anti-aliasing */
     bool supports_multisample;
 

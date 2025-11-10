@@ -296,17 +296,10 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
         vlc_vector_foreach(r, &subpicture->regions) {
             gl_region_t *glr = &sr->regions[i];
 
-            glr->width  = r->p_picture->format.i_visible_width;
-            glr->height = r->p_picture->format.i_visible_height;
-            if (!sr->api->supports_npot) {
-                glr->width  = stdc_bit_ceil(r->p_picture->format.i_visible_width);
-                glr->height = stdc_bit_ceil(r->p_picture->format.i_visible_height);
-                glr->tex_width  = (float) r->p_picture->format.i_visible_width  / glr->width;
-                glr->tex_height = (float) r->p_picture->format.i_visible_height / glr->height;
-            } else {
-                glr->tex_width  = 1.0;
-                glr->tex_height = 1.0;
-            }
+            glr->width  = stdc_bit_ceil(r->p_picture->format.i_visible_width);
+            glr->height = stdc_bit_ceil(r->p_picture->format.i_visible_height);
+            glr->tex_width  = (float) r->p_picture->format.i_visible_width  / glr->width;
+            glr->tex_height = (float) r->p_picture->format.i_visible_height / glr->height;
             glr->alpha  = (float)r->i_alpha / 255;
             glr->left   =  2.0 * (r->place.x                  ) / sr->output_width  - 1.0;
             glr->top    = -2.0 * (r->place.y                  ) / sr->output_height + 1.0;
