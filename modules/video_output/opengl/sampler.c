@@ -590,9 +590,10 @@ InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
             image_ext = image_external;
     }
 
-    int ret = asprintf(&sampler->shader.extensions,
-        "#extension GL_OES_texture_3D : enable\n"
-        "%s", image_ext);
+    const char *texture3D_ext = priv->api->supports_sampler3D
+        ? "#extension GL_OES_texture_3D : enable\n" : "";
+
+    int ret = asprintf(&sampler->shader.extensions,"%s%s\n", image_ext, texture3D_ext);
     if (ret <= 0)
     {
         if (ret == 0)
