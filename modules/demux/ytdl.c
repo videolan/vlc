@@ -29,6 +29,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>         /* STDERR_FILENO */
+#ifdef _WIN32
+# include <processthreadsapi.h>
+#endif
 
 #include "json/json.h"
 #include <vlc_common.h>
@@ -88,6 +91,34 @@ static int ytdl_popen(pid_t *restrict pid, const char *argv[])
 
     return fds[0];
 }
+
+#ifdef _WIN32
+static int vlc_kill(pid_t pid, int signum)
+{
+    HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    BOOL res;
+
+    if (h == NULL) {
+        errno = ESRCH;
+        return -1;
+    }
+
+    if (signum > 0)
+        res = TerminateProcess(h, signum);
+    else
+        res = TRUE;
+
+    CloseHandle(h);
+
+    if (!res) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    return 0;
+}
+#define kill(p, s) vlc_kill(p, s)
+#endif
 
 struct ytdl_playlist {
     struct json_object json;
