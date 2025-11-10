@@ -25,6 +25,13 @@ FadingEdge {
 
     required property ListView listView
 
+    // NOTE: In addition to the `currentItem`, `excludeItem`
+    //       may be used to direct the fading edge effect to
+    //       disable the effect if fade region overlaps with
+    //       the `excludeItem`. The behavior is undefined if
+    //       `excludeItem` is not a visual child of `sourceItem`.
+    property Item excludeItem
+
     sourceItem: listView.contentItem
 
     beginningMargin: listView.displayMarginBeginning
@@ -60,17 +67,25 @@ FadingEdge {
                                                                                   listView.currentItem.height)
                                                                         : Qt.rect(-1, -1, -1, -1)
 
+    readonly property rect _excludeItemMappedRect: excludeItem ? Qt.rect(excludeItem.x - sourceX,
+                                                                         excludeItem.y - sourceY,
+                                                                         excludeItem.width,
+                                                                         excludeItem.height)
+                                                                        : Qt.rect(-1, -1, -1, -1)
+
     readonly property bool _disableBeginningFade: (!!listView.headerItem && (listView.headerPositioning !== ListView.InlineHeader)) ||
                                                   !_fadeRectEnoughSize ||
                                                   (orientation === Qt.Vertical ? listView.atYBeginning
                                                                                : listView.atXBeginning) ||
-                                                  !Helpers.itemIntersects(beginningArea, _currentItemMappedRect)
+                                                  !Helpers.itemIntersects(beginningArea, _currentItemMappedRect) ||
+                                                  (excludeItem && !Helpers.itemIntersects(beginningArea, _excludeItemMappedRect))
 
     readonly property bool _disableEndFade: (!!listView.footerItem && (listView.footerPositioning !== ListView.InlineFooter)) ||
                                             !_fadeRectEnoughSize ||
                                             (orientation === Qt.Vertical ? listView.atYEnd
                                                                          : listView.atXEnd) ||
-                                            !Helpers.itemIntersects(endArea, _currentItemMappedRect)
+                                            !Helpers.itemIntersects(endArea, _currentItemMappedRect) ||
+                                            (excludeItem && !Helpers.itemIntersects(endArea, _excludeItemMappedRect))
 
     Binding on enableBeginningFade {
         // This explicit binding is to override `enableBeginningFade` when it is not feasible to have fading edge.
