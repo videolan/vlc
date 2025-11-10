@@ -547,6 +547,10 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
         (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 130) ||
         (priv->gl->api_type == VLC_OPENGL_ES2 && priv->glsl_version >= 300);
 
+    //GLES has no texture rectangle
+    bool has_texture_rect_func =
+        (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 140);
+
     const bool is_yuv = vlc_fourcc_IsYUV(sampler->glfmt.fmt.i_chroma);
 
     switch (tex_target)
@@ -561,7 +565,7 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
             break;
         case GL_TEXTURE_RECTANGLE:
             *glsl_sampler = "sampler2DRect";
-            *texture = "texture2DRect";
+            *texture = has_texture_rect_func ? "texture" : "texture2DRect";
             break;
         default:
             vlc_assert_unreachable();
