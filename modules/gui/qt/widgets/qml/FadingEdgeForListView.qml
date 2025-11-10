@@ -77,14 +77,14 @@ FadingEdge {
                                                   !_fadeRectEnoughSize ||
                                                   (orientation === Qt.Vertical ? listView.atYBeginning
                                                                                : listView.atXBeginning) ||
-                                                  !Helpers.itemIntersects(beginningArea, _currentItemMappedRect) ||
+                                                  (currentItem && !Helpers.itemIntersects(beginningArea, _currentItemMappedRect)) ||
                                                   (excludeItem && !Helpers.itemIntersects(beginningArea, _excludeItemMappedRect))
 
     readonly property bool _disableEndFade: (!!listView.footerItem && (listView.footerPositioning !== ListView.InlineFooter)) ||
                                             !_fadeRectEnoughSize ||
                                             (orientation === Qt.Vertical ? listView.atYEnd
                                                                          : listView.atXEnd) ||
-                                            !Helpers.itemIntersects(endArea, _currentItemMappedRect) ||
+                                            (currentItem && !Helpers.itemIntersects(endArea, _currentItemMappedRect)) ||
                                             (excludeItem && !Helpers.itemIntersects(endArea, _excludeItemMappedRect))
 
     Binding on enableBeginningFade {
