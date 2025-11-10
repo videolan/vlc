@@ -35,7 +35,6 @@
 #include <vlc_threads.h>
 #include <vlc_input.h>
 #include <vlc_es_out.h>
-#include <vlc_decoder.h>
 #include <vlc_input_item.h>
 #include <vlc_list.h>
 
@@ -44,7 +43,6 @@
 #include "../src/libvlc.h"
 #include "../lib/libvlc_internal.h"
 #include "../src/input/es_out.h"
-#include "../src/input/input_internal.h"
 #include "../src/input/decoder.h"
 #include "../src/input/source.h"
 

@@ -25,8 +25,11 @@
 #define LIBVLC_INPUT_DECODER_H 1
 
 #include <vlc_common.h>
+#include <vlc_decoder.h>
 #include <vlc_codec.h>
 #include <vlc_mouse.h>
+
+#include "input_internal.h"
 
 struct vlc_clock_t;
 

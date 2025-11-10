@@ -41,7 +41,6 @@
 #include <vlc_meta.h>
 #include <vlc_dialog.h>
 #include <vlc_modules.h>
-#include <vlc_decoder.h>
 #include <vlc_picture_pool.h>
 #include <vlc_tracer.h>
 #include <vlc_list.h>
@@ -50,7 +49,6 @@
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
 #include "../clock/clock.h"
-#include "input_internal.h"
 #include "decoder.h"
 #include "resource.h"
 #include "../libvlc.h"
