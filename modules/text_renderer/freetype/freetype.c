@@ -536,6 +536,7 @@ static void RenderBackground( const subpicture_region_t *p_region_in,
     }
 }
 
+
 static void RenderCharAXYZ( filter_t *p_filter,
                            picture_t *p_picture,
                            const line_desc_t *p_line,
@@ -546,11 +547,14 @@ static void RenderCharAXYZ( filter_t *p_filter,
 {
     VLC_UNUSED(p_filter);
     /* Render all glyphs and underline/strikethrough */
+    filter_sys_t *p_sys = p_filter ? p_filter->p_sys : NULL;
     for( int i = p_line->i_first_visible_char_index; i <= p_line->i_last_visible_char_index; i++ )
     {
         const line_character_t *ch = &p_line->p_character[i];
-        const FT_BitmapGlyph p_glyph = g == 0 ? ch->p_shadow : g == 1 ? ch->p_outline : ch->p_glyph;
-        if( !p_glyph )
+        /* select appropriate glyph: shadow(0), outline(1), normal(2) */
+        const FT_BitmapGlyph p_glyph_selected = g == 0 ? ch->p_shadow : g == 1 ? ch->p_outline : ch->p_glyph;
+        const FT_BitmapGlyph p_glyph_main = ch->p_glyph;
+        if( !p_glyph_selected && !p_glyph_main )
             continue;
 
         uint8_t i_a = ch->p_style->i_font_alpha;
@@ -592,8 +596,33 @@ static void RenderCharAXYZ( filter_t *p_filter,
         uint8_t i_x, i_y, i_z;
         draw->extract( i_color, &i_x, &i_y, &i_z );
 
+        /* Choose glyph to draw and compute its position.
+         * If the shadow glyph was not pre-generated (ch->p_shadow == NULL),
+         * we fallback to using the main glyph bitmap, shifted by the configured
+         * shadow vector (scaled by current default font size). This avoids
+         * requiring glyph creation earlier in the pipeline while still making
+         * the shadow visible when the UI option is enabled.
+         */
+        const FT_BitmapGlyph p_glyph = p_glyph_selected ? p_glyph_selected : p_glyph_main;
+
         int i_glyph_y = i_offset_y - p_glyph->top;
         int i_glyph_x = i_offset_x + p_glyph->left;
+
+        /* If we're rendering the shadow and we need to fallback to main glyph,
+         * apply the configured shadow shift in pixel units.
+         */
+        if( g == 0 && !p_glyph_selected && p_sys )
+        {
+            /* p_sys->f_shadow_vector_{x,y} are fractions of font size.
+             * Use i_font_default_size (set during Render) as a reasonable scale.
+             * Round to nearest int.
+             */
+            int i_font_ref = p_sys->i_font_default_size ? p_sys->i_font_default_size : 1;
+            int sx = (int)lrintf(p_sys->f_shadow_vector_x * (float)i_font_ref);
+            int sy = (int)lrintf(p_sys->f_shadow_vector_y * (float)i_font_ref);
+            i_glyph_x += sx;
+            i_glyph_y += sy;
+        }
 
         draw->blend( p_picture, i_glyph_x, i_glyph_y,
                     i_a, i_x, i_y, i_z, p_glyph );
@@ -608,6 +637,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
                            draw );
     }
 }
+
 
 static inline void RenderAXYZ( filter_t *p_filter,
                               const subpicture_region_t *p_region_in,
