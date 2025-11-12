@@ -1413,6 +1413,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         else if( xiph_AppendHeaders( &p_stream->i_headers, &p_stream->p_headers,
                                      p_oggpacket->bytes, p_oggpacket->packet ) )
         {
+            free(p_stream->p_headers);
             p_stream->i_headers = 0;
             p_stream->p_headers = NULL;
         }
