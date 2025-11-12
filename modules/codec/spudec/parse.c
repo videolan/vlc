@@ -109,6 +109,9 @@ static void CLUTIdxToYUV(const struct subs_format_t *subs,
 static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
                          subpicture_t *p_spu )
 {
+    if (p_spu->p_region == NULL)
+        return;
+
     plane_t *p_plane = &p_spu->p_region->p_picture->p[0];
     video_palette_t *p_palette = p_spu->p_region->fmt.p_palette;
 
