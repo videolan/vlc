@@ -59,6 +59,7 @@ Codecs:
  * Improve 708 decoder
  * Support AGM decoder
  * Support VP4 decoder
+ * Support OpenAPV decoder (FFmpeg 8 and OpenAPV)
  * Add NVDEC hardware decoder
  * Remove SDL_image support
 
@@ -5841,4 +5842,3 @@ iPaq port:
   * fixed crash on directory change in Familiar interface
   * added qte_main module for use in all modules that need Opie or Qte support
   * native video output module for Qt Embedded/Opie is not working
-
