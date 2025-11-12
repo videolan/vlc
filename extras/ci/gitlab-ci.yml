@@ -619,7 +619,7 @@ xros-arm64:
         name: $VLC_ANDROID_IMAGE
     script: |
         git clone https://code.videolan.org/videolan/libvlcjni.git
-        (cd libvlcjni && git checkout e90807431330d949b855b37695b9004af6b00bd9)
+        (cd libvlcjni && git checkout b39434016d07928498b915e4164a02a6a3f2f695)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
           CONTRIB_FLAGS="--with-prebuilt-contribs"
         elif [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
