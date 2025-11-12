@@ -41,6 +41,8 @@ typedef struct qtwayland_t
     void (*resize)(struct qtwayland_t*, size_t width, size_t height);
     void (*rescale)(struct qtwayland_t*, double scale);
 
+    void (*commitSurface)(struct qtwayland_t*);
+
     void (*close)(struct qtwayland_t*);
 } qtwayland_t;
 

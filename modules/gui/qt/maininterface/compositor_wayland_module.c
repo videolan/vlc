@@ -364,6 +364,18 @@ static void Rescale(struct qtwayland_t* obj, double scale)
         CommitScale(obj);
 }
 
+static void CommitSurface(struct qtwayland_t* obj)
+{
+    assert(obj);
+    qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
+    assert(sys);
+
+    if (!sys->video_surface)
+        return;
+
+    wl_surface_commit(sys->video_surface);
+}
+
 static void Close(qtwayland_t* obj)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)(obj->p_sys);
@@ -460,6 +472,7 @@ int OpenCompositor(vlc_object_t* p_this)
     obj->move = Move;
     obj->resize = Resize;
     obj->rescale = Rescale;
+    obj->commitSurface = CommitSurface;
 
     obj->p_sys = sys;
 
