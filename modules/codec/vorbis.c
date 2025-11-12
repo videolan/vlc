@@ -857,6 +857,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         if( xiph_AppendHeaders( &p_enc->fmt_out.i_extra, &p_enc->fmt_out.p_extra,
                                 header[i].bytes, header[i].packet ) )
         {
+            free(p_enc->fmt_out.p_extra);
             p_enc->fmt_out.i_extra = 0;
             p_enc->fmt_out.p_extra = NULL;
         }
