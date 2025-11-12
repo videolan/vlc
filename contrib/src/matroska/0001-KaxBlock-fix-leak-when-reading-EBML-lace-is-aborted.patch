@@ -35,7 +35,7 @@ index fd37ad5..29073b5 100644
 +          {
              SizeRead = LastBufferSize;
 -            cursor = _tmpBuf = new binary[FrameNum*4]; /// \warning assume the mean size will be coded in less than 4 bytes
-+            auto _tmpBuf = std::make_unique<binary>(FrameNum*4); /// \warning assume the mean size will be coded in less than 4 bytes
++            auto _tmpBuf = std::make_unique<binary[]>(FrameNum*4); /// \warning assume the mean size will be coded in less than 4 bytes
 +            cursor = _tmpBuf.get();
              Result += input.read(cursor, FrameNum*4);
              FrameSize = ReadCodedSizeValue(cursor, SizeRead, SizeUnknown);
