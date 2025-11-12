@@ -230,12 +230,8 @@ void CompositorVideo::commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb d
     // these signals are emitted. VOut window might not be set, or worse, compositor's
     // internal preparations might not be completed yet:
     constexpr auto connType = static_cast<Qt::ConnectionType>(Qt::UniqueConnection | Qt::DirectConnection);
-    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
-            this, &CompositorVideo::onSurfacePositionChanged, connType);
-    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
-            this, &CompositorVideo::onSurfaceSizeChanged, connType);
-    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceScaleChanged,
-            this, &CompositorVideo::onSurfaceScaleChanged, connType);
+    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePropertiesChanged,
+            this, &CompositorVideo::onSurfacePropertiesChanged, connType);
 }
 
 void CompositorVideo::windowDestroy()
@@ -243,12 +239,8 @@ void CompositorVideo::windowDestroy()
     // Current thread may not be the thread where
     // m_videoSurfaceProvider belongs to, so do not delete
     // it here:
-    disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
-               this, &CompositorVideo::onSurfacePositionChanged);
-    disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
-               this, &CompositorVideo::onSurfaceSizeChanged);
-    disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceScaleChanged,
-               this, &CompositorVideo::onSurfaceScaleChanged);
+    disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePropertiesChanged,
+               this, &CompositorVideo::onSurfacePropertiesChanged);
 
     m_wnd = nullptr;
 }

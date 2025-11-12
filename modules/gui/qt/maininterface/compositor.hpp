@@ -25,6 +25,8 @@
 #include <memory>
 
 #include <QObject>
+#include <QPointF>
+#include <QSizeF>
 
 #include <vlc_common.h>
 
@@ -151,6 +153,12 @@ protected:
 
     bool setBlurBehind(QWindow* window, bool enable = true);
 
+    // The following method should return true if surface updates can be combined:
+    // Note that in such a case, `::commitSurface()` must be implemented.
+    virtual bool canDoCombinedSurfaceUpdates() const { return false; };
+
+    virtual void commitSurface() {}
+
 protected:
     /**
      * @brief commonGUICreate setup the QML view for video composition
@@ -178,9 +186,28 @@ private slots:
     void adjustBlurBehind();
 
 protected slots:
+    // WARNING: If `::canDoCombinedSurfaceUpdates()` returns `true`, individual
+    //          position and size change handlers should ideally not commit the
+    //          changes , for the compositor to apply the changes at the same
+    //          time with an explicit call to `commitSurface()`:
     virtual void onSurfacePositionChanged(const QPointF&) {}
     virtual void onSurfaceSizeChanged(const QSizeF&) {}
     virtual void onSurfaceScaleChanged(qreal) {}
+
+    virtual void onSurfacePropertiesChanged(const std::optional<QSizeF>& size,
+                                            const std::optional<QPointF>& position,
+                                            const std::optional<qreal>& scale)
+    {
+        if (size)
+            onSurfaceSizeChanged(*size);
+        if (position)
+            onSurfacePositionChanged(*position);
+        if (scale)
+            onSurfaceScaleChanged(*scale);
+
+        if (canDoCombinedSurfaceUpdates())
+            commitSurface();
+    }
 
 protected:
     qt_intf_t *m_intf = nullptr;

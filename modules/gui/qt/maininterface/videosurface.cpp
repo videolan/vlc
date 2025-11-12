@@ -108,11 +108,13 @@ void VideoSurfaceProvider::onKeyPressed(int key, Qt::KeyboardModifiers modifiers
         vlc_window_ReportKeyPress(m_voutWindow, vlckey);
 }
 
-void VideoSurfaceProvider::onSurfaceSizeChanged(QSizeF size)
+void VideoSurfaceProvider::onSurfacePropertiesChanged(const std::optional<QSizeF>& size,
+                                                      const std::optional<QPointF>& position,
+                                                      const std::optional<qreal>& scale)
 {
-    emit surfaceSizeChanged(size);
-    if (m_voutWindow)
-        vlc_window_ReportSize(m_voutWindow, std::ceil(size.width()), std::ceil(size.height()));
+    emit surfacePropertiesChanged(size, position, scale);
+    if (m_voutWindow && size)
+        vlc_window_ReportSize(m_voutWindow, std::ceil(size->width()), std::ceil(size->height()));
 }
 
 
@@ -250,11 +252,15 @@ void VideoSurface::synchronize()
         position = renderPosition();
     }
 
+    std::optional<QSizeF> newSize;
+    std::optional<QPointF> newPosition;
+    std::optional<qreal> newScale;
+
     if (m_allDirty || m_dprDirty || m_oldRenderSize != size)
     {
         if (!size.isEmpty())
         {
-            emit surfaceSizeChanged(size * m_dpr);
+            newSize = size * m_dpr;
             m_oldRenderSize = size;
         }
     }
@@ -263,16 +269,19 @@ void VideoSurface::synchronize()
     {
         if (position.x() >= 0.0 && position.y() >= 0.0)
         {
-            emit surfacePositionChanged(position * m_dpr); // render position is relative to scene/viewport
+            newPosition = position * m_dpr; // render position is relative to scene/viewport
             m_oldRenderPosition = position;
         }
     }
 
     if (m_allDirty || m_dprDirty)
     {
-        emit surfaceScaleChanged(m_dpr);
+        newScale = m_dpr;
         m_dprDirty = false;
     }
+
+    if (newPosition || newSize || newScale)
+        emit surfacePropertiesChanged(newSize, newPosition, newScale);
 
     m_allDirty = false;
 }
@@ -347,9 +356,7 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         connect(this, &VideoSurface::mouseDblClicked, m_provider, &VideoSurfaceProvider::onMouseDoubleClick);
         connect(this, &VideoSurface::mouseReleased, m_provider, &VideoSurfaceProvider::onMouseReleased);
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
-        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged, Qt::DirectConnection);
-        connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged, Qt::DirectConnection);
-        connect(this, &VideoSurface::surfaceScaleChanged, m_provider, &VideoSurfaceProvider::surfaceScaleChanged, Qt::DirectConnection);
+        connect(this, &VideoSurface::surfacePropertiesChanged, m_provider, &VideoSurfaceProvider::onSurfacePropertiesChanged, Qt::DirectConnection);
 
         // With auto connection, this should be queued if the signal was emitted from vout thread,
         // so that the slot is executed in item's thread:

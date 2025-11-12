@@ -62,9 +62,9 @@ signals:
     void ctxChanged(MainCtx*);
     bool videoEnabledChanged(bool);
     bool hasVideoEmbedChanged(bool);
-    void surfacePositionChanged(QPointF position);
-    void surfaceSizeChanged(QSizeF size);
-    void surfaceScaleChanged(qreal);
+    void surfacePropertiesChanged(const std::optional<QSizeF>& size,
+                                  const std::optional<QPointF>& position,
+                                  const std::optional<qreal>& scale);
 
 public slots:
     void onWindowClosed();
@@ -74,7 +74,9 @@ public slots:
     void onMouseMoved( float x, float y );
     void onMouseWheeled(int vlcButton);
     void onKeyPressed(int key, Qt::KeyboardModifiers modifiers);
-    void onSurfaceSizeChanged(QSizeF size);
+    void onSurfacePropertiesChanged(const std::optional<QSizeF>& size,
+                                    const std::optional<QPointF>& position,
+                                    const std::optional<qreal>& scale);
 
 protected:
     vlc_window_t* m_voutWindow = nullptr;
@@ -115,9 +117,9 @@ protected:
 
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
 signals:
-    void surfaceSizeChanged(QSizeF);
-    void surfacePositionChanged(QPointF);
-    void surfaceScaleChanged(qreal);
+    void surfacePropertiesChanged(const std::optional<QSizeF>& size,
+                                  const std::optional<QPointF>& position,
+                                  const std::optional<qreal>& scale);
 
     void mousePressed( int vlcButton );
     void mouseReleased( int vlcButton );
