@@ -328,7 +328,9 @@ void CompositorDirectComposition::onSurfacePositionChanged(const QPointF& positi
 
     m_videoVisual->SetOffsetX(position.x());
     m_videoVisual->SetOffsetY(position.y());
-    m_dcompDevice->Commit();
+
+    // WARNING: Commit is requested explicitly through `::commitSurface()` after size
+    //          and position changes are applied.
 }
 
 void CompositorDirectComposition::onSurfaceSizeChanged(const QSizeF&)
@@ -470,6 +472,12 @@ bool CompositorDirectComposition::eventFilter(QObject *watched, QEvent *event)
     }
 
     return QObject::eventFilter(watched, event);
+}
+
+void CompositorDirectComposition::commitSurface()
+{
+    assert(m_dcompDevice);
+    m_dcompDevice->Commit();
 }
 
 }
