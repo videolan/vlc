@@ -35,6 +35,8 @@ FocusScope {
     implicitHeight: continueBtn.y + continueBtn.implicitHeight
     implicitWidth: maxWidth
 
+    baselineOffset: label.baselineOffset
+
     visible: false
     enabled: visible
 
