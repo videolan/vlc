@@ -188,77 +188,75 @@ FocusScope {
 
             Navigation.parentItem: root
 
-            model: ObjectModel {
-                HomeDeviceView {
-                    id: foldersSection
+            HomeDeviceView {
+                id: foldersSection
 
-                    title: qsTr("Folders")
+                title: qsTr("Folders")
 
-                    model: StandardPathModel {
-                        //we only have a handfull of standard path (5 or 6)
-                        //so we don't limit them
+                model: StandardPathModel {
+                    //we only have a handfull of standard path (5 or 6)
+                    //so we don't limit them
 
-                        sortCriteria: MainCtx.sort.criteria
-                        sortOrder: MainCtx.sort.order
-                        searchPattern: MainCtx.search.pattern
-                    }
+                    sortCriteria: MainCtx.sort.criteria
+                    sortOrder: MainCtx.sort.order
+                    searchPattern: MainCtx.search.pattern
                 }
+            }
 
-                HomeDeviceView {
-                    id: computerSection
+            HomeDeviceView {
+                id: computerSection
 
-                    title: qsTr("Computer")
+                title: qsTr("Computer")
 
-                    model: NetworkDeviceModel {
-                        ctx: MainCtx
+                model: NetworkDeviceModel {
+                    ctx: MainCtx
 
-                        sd_source: NetworkDeviceModel.CAT_MYCOMPUTER
-                        source_name: "*"
+                    sd_source: NetworkDeviceModel.CAT_MYCOMPUTER
+                    source_name: "*"
 
-                        limit: computerSection.maximumCount
+                    limit: computerSection.maximumCount
 
-                        sortOrder: MainCtx.sort.order
-                        sortCriteria: MainCtx.sort.criteria
-                        searchPattern: MainCtx.search.pattern
-                    }
+                    sortOrder: MainCtx.sort.order
+                    sortCriteria: MainCtx.sort.criteria
+                    searchPattern: MainCtx.search.pattern
                 }
+            }
 
-                HomeDeviceView {
-                    id: deviceSection
+            HomeDeviceView {
+                id: deviceSection
 
-                    title: qsTr("Devices")
+                title: qsTr("Devices")
 
-                    model: NetworkDeviceModel {
-                        ctx: MainCtx
+                model: NetworkDeviceModel {
+                    ctx: MainCtx
 
-                        limit: deviceSection.maximumCount
+                    limit: deviceSection.maximumCount
 
-                        sortOrder: MainCtx.sort.order
-                        sortCriteria: MainCtx.sort.criteria
-                        searchPattern: MainCtx.search.pattern
+                    sortOrder: MainCtx.sort.order
+                    sortCriteria: MainCtx.sort.criteria
+                    searchPattern: MainCtx.search.pattern
 
-                        sd_source: NetworkDeviceModel.CAT_DEVICES
-                        source_name: "*"
-                    }
+                    sd_source: NetworkDeviceModel.CAT_DEVICES
+                    source_name: "*"
                 }
+            }
 
-                HomeDeviceView {
-                    id: lanSection
+            HomeDeviceView {
+                id: lanSection
 
-                    title: qsTr("Network")
+                title: qsTr("Network")
 
-                    model: NetworkDeviceModel {
-                        ctx: MainCtx
+                model: NetworkDeviceModel {
+                    ctx: MainCtx
 
-                        sd_source: NetworkDeviceModel.CAT_LAN
-                        source_name: "*"
+                    sd_source: NetworkDeviceModel.CAT_LAN
+                    source_name: "*"
 
-                        limit: lanSection.maximumCount
+                    limit: lanSection.maximumCount
 
-                        sortOrder: MainCtx.sort.order
-                        sortCriteria: MainCtx.sort.criteria
-                        searchPattern: MainCtx.search.pattern
-                    }
+                    sortOrder: MainCtx.sort.order
+                    sortCriteria: MainCtx.sort.criteria
+                    searchPattern: MainCtx.search.pattern
                 }
             }
         }
