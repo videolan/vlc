@@ -1266,6 +1266,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             }
             if (read == 0 && ksblock.GetSize() != 0) {
                 msg_Err( vars.p_demuxer,"Error while reading %s",  EBML_NAME(&ksblock) );
+                ksblock.ReleaseFrames();
                 return;
             }
             vars.simpleblock = &ksblock;
@@ -1294,6 +1295,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             }
             if (unlikely(read == 0) && kblock.GetSize() != 0) {
                 msg_Err( vars.p_demuxer,"Error while reading %s",  EBML_NAME(&kblock) );
+                kblock.ReleaseFrames();
                 return;
             }
             vars.block = &kblock;
