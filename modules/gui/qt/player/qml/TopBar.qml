@@ -241,9 +241,14 @@ FocusScope{
                                      : logoGroup.implicitWidth
 
         implicitHeight: {
-            if (root.resumeVisible)
-                return resumeDialog.implicitHeight
-            else if (_showTopBar)
+            if (root.resumeVisible) {
+                // Only if there are multiple lines use `resumeDialog`'s implicit height, otherwise the video
+                // window may get resized by few pixels unnecessarily when `resumeDialog` is no longer visible.
+                if (resumeDialog.implicitHeight >= (logoGroup.implicitHeight + resumeDialog.baselineOffset))
+                    return resumeDialog.implicitHeight
+                else
+                    return logoGroup.implicitHeight
+            } else if (_showTopBar)
                 return logoGroup.implicitHeight
             else
                 return 0
