@@ -80,6 +80,10 @@ public:
 
     bool canDoThreadedSurfaceUpdates() const override { return true; };
 
+protected:
+    bool canDoCombinedSurfaceUpdates() const override { return true; };
+    void commitSurface() override;
+
 protected slots:
     void onSurfacePositionChanged(const QPointF&) override;
     void onSurfaceSizeChanged(const QSizeF&) override;

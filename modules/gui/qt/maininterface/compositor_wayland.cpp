@@ -215,6 +215,12 @@ void CompositorWayland::windowDisable()
     commonWindowDisable();
 }
 
+void CompositorWayland::commitSurface()
+{
+    assert(m_waylandImpl);
+    m_waylandImpl->commitSurface(m_waylandImpl);
+}
+
 void CompositorWayland::onSurfacePositionChanged(const QPointF& position)
 {
     QMargins margins = m_qmlView->frameMargins();
@@ -222,11 +228,13 @@ void CompositorWayland::onSurfacePositionChanged(const QPointF& position)
     qreal qtDpr = m_qmlView.get()->effectiveDevicePixelRatio();
     qreal nativeDpr = dprForWindow(m_qmlView.get());
 
+    // WARNING: Commit is requested explicitly through `::commitSurface()` after size
+    //          and position changes are applied:
     m_waylandImpl->move(
         m_waylandImpl,
         (margins.left() * qtDpr + position.x() ) / nativeDpr,
         (margins.top()  * qtDpr + position.y() ) / nativeDpr,
-        true
+        false
     );
 }
 
@@ -234,10 +242,12 @@ void CompositorWayland::onSurfaceSizeChanged(const QSizeF& size)
 {
     qreal nativeDpr = dprForWindow(m_qmlView.get());
 
+    // WARNING: Commit is requested explicitly through `::commitSurface()` after size
+    //          and position changes are applied:
     m_waylandImpl->resize(m_waylandImpl,
                         std::ceil(size.width() / nativeDpr),
                         std::ceil(size.height() / nativeDpr),
-                        true);
+                        false);
 }
 
 void CompositorWayland::onSurfaceScaleChanged(qreal dpr)
