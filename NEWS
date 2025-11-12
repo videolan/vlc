@@ -1,3 +1,10 @@
+Changes between 3.0.23 and 3.0.24:
+----------------------------------
+
+Codecs:
+ * Support OpenAPV decoder (FFmpeg 8 and OpenAPV)
+
+
 Changes between 3.0.22 and 3.0.23:
 ----------------------------------
 
@@ -6204,4 +6211,3 @@ iPaq port:
   * fixed crash on directory change in Familiar interface
   * added qte_main module for use in all modules that need Opie or Qte support
   * native video output module for Qt Embedded/Opie is not working
-
