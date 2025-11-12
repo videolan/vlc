@@ -37,8 +37,8 @@ typedef struct qtwayland_t
 
     void (*enable)(struct qtwayland_t*, const vlc_window_cfg_t *);
     void (*disable)(struct qtwayland_t*);
-    void (*move)(struct qtwayland_t*, int x, int y);
-    void (*resize)(struct qtwayland_t*, size_t width, size_t height);
+    void (*move)(struct qtwayland_t*, int x, int y, bool commitSurface);
+    void (*resize)(struct qtwayland_t*, size_t width, size_t height, bool commitSurface);
     void (*rescale)(struct qtwayland_t*, double scale);
 
     void (*commitSurface)(struct qtwayland_t*);

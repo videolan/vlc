@@ -225,7 +225,8 @@ void CompositorWayland::onSurfacePositionChanged(const QPointF& position)
     m_waylandImpl->move(
         m_waylandImpl,
         (margins.left() * qtDpr + position.x() ) / nativeDpr,
-        (margins.top()  * qtDpr + position.y() ) / nativeDpr
+        (margins.top()  * qtDpr + position.y() ) / nativeDpr,
+        true
     );
 }
 
@@ -235,7 +236,8 @@ void CompositorWayland::onSurfaceSizeChanged(const QSizeF& size)
 
     m_waylandImpl->resize(m_waylandImpl,
                         std::ceil(size.width() / nativeDpr),
-                        std::ceil(size.height() / nativeDpr));
+                        std::ceil(size.height() / nativeDpr),
+                        true);
 }
 
 void CompositorWayland::onSurfaceScaleChanged(qreal dpr)
