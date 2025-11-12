@@ -476,8 +476,6 @@ qt_plugin_sources = files(
     'util/fast_gaussian_blur_template.h',
     'util/effects_image_provider.cpp',
     'util/effects_image_provider.hpp',
-    'util/qsgroundedrectangularimagenode.cpp',
-    'util/qsgroundedrectangularimagenode.hpp',
     'util/qsgtextureview.cpp',
     'util/qsgtextureview.hpp',
     'util/textureproviderobserver.cpp',

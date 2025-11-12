@@ -328,8 +328,6 @@ libqt_plugin_la_SOURCES = \
 	util/fast_gaussian_blur_template.h \
 	util/effects_image_provider.cpp \
 	util/effects_image_provider.hpp \
-	util/qsgroundedrectangularimagenode.cpp \
-	util/qsgroundedrectangularimagenode.hpp \
 	util/qsgtextureview.cpp \
 	util/qsgtextureview.hpp \
 	util/dismiss_popup_event_filter.cpp \
