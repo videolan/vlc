@@ -400,7 +400,8 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
     if (Q_UNLIKELY(!m_provider))
         return node;
 
-    if (!m_synchConnection)
+    // WARNING: For some reason `::updatePaintNode()` is called initially when the item is invisible.
+    if (!m_synchConnection && isVisible())
     {
         // Disconnection is made in `::itemChange()`'s `ItemSceneChange` handler.
 
