@@ -445,6 +445,9 @@ int32_t Cook_PrivateTrackData::Init()
     i_subpacket_size = bytes.GetBE16(); // sub_packet_size
     bytes.skip(2);                      // unknown5
 
+    if ( i_subpacket_size == 0 )
+        return 0;
+
     if( version == 4 )
     {
         // real_audio_private_v4
