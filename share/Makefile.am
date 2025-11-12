@@ -104,8 +104,6 @@ nobase_dist_pkgdata_SCRIPTS = \
 	utils/audio-vlc-default.sh \
 	utils/video-vlc-default.sh \
 	$(NULL)
-
-dist_pkgdata_SCRIPTS = ytdl-extract.py
 endif
 
 EXTRA_DIST += \

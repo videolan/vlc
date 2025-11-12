@@ -547,6 +547,10 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
         (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 130) ||
         (priv->gl->api_type == VLC_OPENGL_ES2 && priv->glsl_version >= 300);
 
+    //GLES has no texture rectangle
+    bool has_texture_rect_func =
+        (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 140);
+
     const bool is_yuv = vlc_fourcc_IsYUV(sampler->glfmt.fmt.i_chroma);
 
     switch (tex_target)
@@ -561,7 +565,7 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
             break;
         case GL_TEXTURE_RECTANGLE:
             *glsl_sampler = "sampler2DRect";
-            *texture = "texture2DRect";
+            *texture = has_texture_rect_func ? "texture" : "texture2DRect";
             break;
         default:
             vlc_assert_unreachable();
@@ -590,9 +594,10 @@ InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
             image_ext = image_external;
     }
 
-    int ret = asprintf(&sampler->shader.extensions,
-        "#extension GL_OES_texture_3D : enable\n"
-        "%s", image_ext);
+    const char *texture3D_ext = priv->api->supports_sampler3D
+        ? "#extension GL_OES_texture_3D : enable\n" : "";
+
+    int ret = asprintf(&sampler->shader.extensions,"%s%s\n", image_ext, texture3D_ext);
     if (ret <= 0)
     {
         if (ret == 0)

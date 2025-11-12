@@ -231,25 +231,15 @@ vlc_gl_importer_New(struct vlc_gl_interop *interop)
     struct vlc_gl_extension_vt extension_vt;
     vlc_gl_LoadExtensionFunctions(interop->gl, &extension_vt);
 
-    /* OpenGL ES 2 includes support for non-power of 2 textures by specification. */
-    bool supports_npot = interop->gl->api_type == VLC_OPENGL_ES2
-        || vlc_gl_HasExtension(&extension_vt, "GL_ARB_texture_non_power_of_two")
-        || vlc_gl_HasExtension(&extension_vt, "GL_APPLE_texture_2D_limited_npot");
-
     /* Texture size */
     for (unsigned j = 0; j < interop->tex_count; j++) {
         GLsizei w = (interop->fmt_out.i_visible_width + interop->fmt_out.i_x_offset) * interop->texs[j].w.num
                   / interop->texs[j].w.den;
         GLsizei h = (interop->fmt_out.i_visible_height + interop->fmt_out.i_y_offset) *  interop->texs[j].h.num
                   / interop->texs[j].h.den;
-        if (supports_npot) {
-            glfmt->tex_widths[j]  = w;
-            glfmt->tex_heights[j] = h;
-        } else {
-            glfmt->tex_widths[j]  = stdc_bit_ceil((unsigned)w);
-            glfmt->tex_heights[j] = stdc_bit_ceil((unsigned)h);
-        }
-
+	glfmt->tex_widths[j]  = w;
+	glfmt->tex_heights[j] = h;
+	
         glfmt->formats[j] = interop->texs[j].format;
     }
 

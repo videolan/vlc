@@ -41,12 +41,10 @@
 #include <vlc_fourcc.h>
 #include <vlc_meta.h>
 #include <vlc_list.h>
-#include <vlc_decoder.h>
 #include <vlc_memstream.h>
 #include <vlc_tracer.h>
 #include <vlc_replay_gain.h>
 
-#include "input_internal.h"
 #include "./source.h"
 #include "../clock/input_clock.h"
 #include "../clock/clock.h"

@@ -36,19 +36,12 @@ static void ProbeChroma(vlc_chroma_conv_vec *vec)
 {
 #define PACKED_CHROMAS VLC_CODEC_YUYV, VLC_CODEC_UYVY, VLC_CODEC_YVYU, VLC_CODEC_VYUY
 
-    vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_I420, PACKED_CHROMAS);
-    vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_YV12, PACKED_CHROMAS);
-    vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_I422, PACKED_CHROMAS);
-
     vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_NV12, VLC_CODEC_I420,
         VLC_CODEC_YV12);
     vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_NV21, VLC_CODEC_I420,
         VLC_CODEC_YV12);
 
     vlc_chroma_conv_add(vec, 0.75, VLC_CODEC_NV24, VLC_CODEC_I444, false);
-
-    vlc_chroma_conv_add_out_inlist(vec, 0.75, VLC_CODEC_I422, VLC_CODEC_NV16,
-        PACKED_CHROMAS);
 }
 vlc_module_begin ()
     set_description (N_("ARM NEON video chroma conversions"))
@@ -74,44 +67,6 @@ vlc_module_end ()
         (pict)->V_PIXELS, (pict)->U_PIXELS, (pict)->U_PITCH }
 #define DEFINE_UV_PACK(pack, pict) \
     struct yuv_pack pack = { (pict)->U_PIXELS, (pict)->U_PITCH }
-
-/* Planar YUV420 to packed YUV422 */
-static void I420_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
-{
-    DEFINE_PACK(out, dst);
-    DEFINE_PLANES(in, src);
-    i420_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
-                    filter->fmt_in.video.i_height);
-}
-VIDEO_FILTER_WRAPPER (I420_YUYV)
-
-static void I420_YVYU (filter_t *filter, picture_t *src, picture_t *dst)
-{
-    DEFINE_PACK(out, dst);
-    DEFINE_PLANES_SWAP(in, src);
-    i420_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
-                    filter->fmt_in.video.i_height);
-}
-VIDEO_FILTER_WRAPPER (I420_YVYU)
-
-static void I420_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
-{
-    DEFINE_PACK(out, dst);
-    DEFINE_PLANES(in, src);
-    i420_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
-                    filter->fmt_in.video.i_height);
-}
-VIDEO_FILTER_WRAPPER (I420_UYVY)
-
-static void I420_VYUY (filter_t *filter, picture_t *src, picture_t *dst)
-{
-    DEFINE_PACK(out, dst);
-    DEFINE_PLANES_SWAP(in, src);
-    i420_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
-                    filter->fmt_in.video.i_height);
-}
-VIDEO_FILTER_WRAPPER (I420_VYUY)
-
 
 /* Semiplanar NV12/21/16/24 to planar I420/YV12/I422/I444 */
 static void copy_y_plane(filter_t *filter, picture_t *src, picture_t *dst)
@@ -157,44 +112,6 @@ SEMIPLANAR_FILTERS (Semiplanar_Planar_420, 2, 2)
 SEMIPLANAR_FILTERS_SWAP (Semiplanar_Planar_420_Swap, 2, 2)
 SEMIPLANAR_FILTERS (Semiplanar_Planar_422, 2, 1)
 SEMIPLANAR_FILTERS (Semiplanar_Planar_444, 1, 1)
-
-
-/* Planar YUV422 to packed YUV422 */
-static void I422_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
-{
-    DEFINE_PACK(out, dst);
-    DEFINE_PLANES(in, src);
-    i422_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
-                    filter->fmt_in.video.i_height);
-}
-VIDEO_FILTER_WRAPPER (I422_YUYV)
-
-static void I422_YVYU (filter_t *filter, picture_t *src, picture_t *dst)
-{
-    DEFINE_PACK(out, dst);
-    DEFINE_PLANES_SWAP(in, src);
-    i422_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
-                    filter->fmt_in.video.i_height);
-}
-VIDEO_FILTER_WRAPPER (I422_YVYU)
-
-static void I422_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
-{
-    DEFINE_PACK(out, dst);
-    DEFINE_PLANES(in, src);
-    i422_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
-                    filter->fmt_in.video.i_height);
-}
-VIDEO_FILTER_WRAPPER (I422_UYVY)
-
-static void I422_VYUY (filter_t *filter, picture_t *src, picture_t *dst)
-{
-    DEFINE_PACK(out, dst);
-    DEFINE_PLANES_SWAP(in, src);
-    i422_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
-                    filter->fmt_in.video.i_height);
-}
-VIDEO_FILTER_WRAPPER (I422_VYUY)
 
 
 /* Packed YUV422 to planar YUV422 */
@@ -244,67 +161,6 @@ static int Open (filter_t *filter)
 
     switch (filter->fmt_in.video.i_chroma)
     {
-        /* Planar to packed */
-        case VLC_CODEC_I420:
-            switch (filter->fmt_out.video.i_chroma)
-            {
-                case VLC_CODEC_YUYV:
-                    filter->ops = &I420_YUYV_ops;
-                    break;
-                case VLC_CODEC_UYVY:
-                    filter->ops = &I420_UYVY_ops;
-                    break;
-                case VLC_CODEC_YVYU:
-                    filter->ops = &I420_YVYU_ops;
-                    break;
-                case VLC_CODEC_VYUY:
-                    filter->ops = &I420_VYUY_ops;
-                    break;
-                default:
-                    return VLC_EGENERIC;
-            }
-            break;
-
-        case VLC_CODEC_YV12:
-            switch (filter->fmt_out.video.i_chroma)
-            {
-                case VLC_CODEC_YUYV:
-                    filter->ops = &I420_YVYU_ops;
-                    break;
-                case VLC_CODEC_UYVY:
-                    filter->ops = &I420_VYUY_ops;
-                    break;
-                case VLC_CODEC_YVYU:
-                    filter->ops = &I420_YUYV_ops;
-                    break;
-                case VLC_CODEC_VYUY:
-                    filter->ops = &I420_UYVY_ops;
-                    break;
-                default:
-                    return VLC_EGENERIC;
-            }
-            break;
-
-        case VLC_CODEC_I422:
-            switch (filter->fmt_out.video.i_chroma)
-            {
-                case VLC_CODEC_YUYV:
-                    filter->ops = &I422_YUYV_ops;
-                    break;
-                case VLC_CODEC_UYVY:
-                    filter->ops = &I422_UYVY_ops;
-                    break;
-                case VLC_CODEC_YVYU:
-                    filter->ops = &I422_YVYU_ops;
-                    break;
-                case VLC_CODEC_VYUY:
-                    filter->ops = &I422_VYUY_ops;
-                    break;
-                default:
-                    return VLC_EGENERIC;
-            }
-            break;
-
         /* Semiplanar to planar */
         case VLC_CODEC_NV12:
             switch (filter->fmt_out.video.i_chroma)

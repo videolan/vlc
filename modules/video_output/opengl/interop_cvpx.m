@@ -129,6 +129,9 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
     {
+        assert(IOSurfaceGetWidthOfPlane(surface, i) >= tex_width[i]);
+        assert(IOSurfaceGetHeightOfPlane(surface, i) >= tex_height[i]);
+
         priv->gl.ActiveTexture(GL_TEXTURE0 + i);
         priv->gl.BindTexture(interop->tex_target, textures[i]);
 

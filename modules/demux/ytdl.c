@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <errno.h>
 #include <math.h>
 #include <signal.h>
@@ -38,6 +39,7 @@
 #include <vlc_input_item.h>
 #include <vlc_plugin.h>
 #include <vlc_spawn.h>
+#include <vlc_strings.h>
 #include <vlc_interrupt.h>
 
 struct ytdl_json {
@@ -74,7 +76,7 @@ static int ytdl_popen(pid_t *restrict pid, const char *argv[])
         return -1;
 
     int fdv[] = { -1, fds[1], STDERR_FILENO, -1 };
-    int val = vlc_spawn(pid, argv[0], fdv, argv);
+    int val = vlc_spawnp(pid, argv[0], fdv, argv);
 
     vlc_close(fds[1]);
 
@@ -219,18 +221,22 @@ static int ReadItem(stream_t *s, input_item_node_t *node,
     double duration = json_get_num(json, "duration");
     vlc_tick_t ticks = isnan(duration) ? INPUT_DURATION_UNSET
                                        : lround(duration * CLOCK_FREQ);
+    char *wrapurl;
 
     if (title == NULL)
         title = url;
+    if (unlikely(asprintf(&wrapurl, "ytdl://%s", url) == -1))
+        return VLC_ENOMEM;
 
-    input_item_t *item = input_item_NewStream(url, title, ticks);
+    input_item_t *item = input_item_NewStream(wrapurl, title, ticks);
+
+    free(wrapurl);
 
     if (unlikely(item == NULL))
         return VLC_ENOMEM;
 
     /* Don't care to lock, the item is still private. */
     GetMeta(item->p_meta, json);
-    input_item_AddOption(item, "no-ytdl", 0);
     input_item_node_AppendItem(node, item);
     input_item_Release(item);
 
@@ -339,7 +345,7 @@ static void Close(vlc_object_t *obj)
     json_free(&sys->json);
 }
 
-static int OpenCommon(vlc_object_t *obj)
+static int OpenCommon(vlc_object_t *obj, const char *src_url)
 {
     stream_t *s = (stream_t *)obj;
 
@@ -347,22 +353,15 @@ static int OpenCommon(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_EGENERIC;
 
-    char *path = config_GetSysPath(VLC_PKG_DATA_DIR, "ytdl-extract.py");
+    char *path = var_InheritString(obj, "ytdl-path");
     if (unlikely(path == NULL))
-        return VLC_EGENERIC;
+        return VLC_EINVAL;
 
     struct ytdl_json jsdata;
     pid_t pid;
-    char *py_path = var_InheritString(obj, "ytdl-path");
-    const char *argv[5];
-    size_t i = 0;
-    argv[i++] = path;
-    if (py_path != NULL && py_path[0] != '\0') {
-        argv[i++] = "--py-path"; // add additional path
-        argv[i++] = py_path;
-    }
-    argv[i++] = s->psz_url;
-    argv[i] = NULL;
+    const char *argv[] = {
+        path, "--flat-playlist", "--dump-single-json", "--", src_url, NULL
+    };
 
     jsdata.logger = s->obj.logger;
     jsdata.fd = ytdl_popen(&pid, argv);
@@ -370,11 +369,10 @@ static int OpenCommon(vlc_object_t *obj)
     if (jsdata.fd == -1) {
         msg_Dbg(obj, "cannot start %s: %s", path, vlc_strerror_c(errno));
         free(path);
-        free(py_path);
         return VLC_EGENERIC;
     }
+
     free(path);
-    free(py_path);
 
     int val = json_parse(&jsdata, &sys->json);
 
@@ -441,7 +439,20 @@ static int OpenFilter(vlc_object_t *obj)
     if (!var_InheritBool(obj, "ytdl"))
         return VLC_EGENERIC;
 
-    return OpenCommon(obj);
+    return OpenCommon(obj, s->psz_url);
+}
+
+static int OpenAccess(vlc_object_t *obj)
+{
+    stream_t *s = (stream_t *)obj;
+    const char *url = s->psz_url;
+
+    assert(url != NULL);
+
+    if (vlc_ascii_strncasecmp(url, "ytdl://", 7) == 0)
+        url += 7;
+
+    return OpenCommon(obj, url);
 }
 
 vlc_module_begin()
@@ -452,9 +463,11 @@ vlc_module_begin()
     set_callbacks(OpenFilter, Close)
     add_bool("ytdl", true, N_("Enable YT-DL"), NULL)
         change_safe()
-    add_directory("ytdl-path", NULL, N_("YT-DL Module Path"), NULL)
+    add_loadfile("ytdl-path", "yt-dlp" EXEEXT,
+                 N_("Path to YT-DLP"), N_("Path to YT-DLP"))
+
     add_submodule()
     set_capability("access", 0)
     add_shortcut("ytdl")
-    set_callbacks(OpenCommon, Close)
+    set_callbacks(OpenAccess, Close)
 vlc_module_end()

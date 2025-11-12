@@ -41,7 +41,6 @@
 #include <vlc_meta.h>
 #include <vlc_dialog.h>
 #include <vlc_modules.h>
-#include <vlc_decoder.h>
 #include <vlc_picture_pool.h>
 #include <vlc_tracer.h>
 #include <vlc_list.h>
@@ -50,7 +49,6 @@
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
 #include "../clock/clock.h"
-#include "input_internal.h"
 #include "decoder.h"
 #include "resource.h"
 #include "../libvlc.h"
@@ -1751,14 +1749,13 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
     decoder_t *p_dec = &p_owner->dec;
     decoder_t *p_packetizer = p_owner->p_packetizer;
 
-    if( p_owner->error )
-        return;
-
     if( p_packetizer != NULL && p_packetizer->pf_flush != NULL )
         p_packetizer->pf_flush( p_packetizer );
 
     if ( p_dec->pf_flush != NULL )
         p_dec->pf_flush( p_dec );
+
+    p_owner->error = false;
 }
 
 /**

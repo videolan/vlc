@@ -140,9 +140,15 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
         "precision mediump float;\n"
         "#endif\n"
 
-        "attribute vec2 vertex_pos;\n"
-        "attribute vec2 tex_coords_in;\n"
-        "varying vec2 tex_coords;\n"
+        "#if __VERSION__ < 300\n"
+          "attribute vec2 vertex_pos;\n"
+          "attribute vec2 tex_coords_in;\n"
+          "varying vec2 tex_coords;\n"
+        "#else\n"
+          "in vec2 vertex_pos;\n"
+          "in vec2 tex_coords_in;\n"
+          "out vec2 tex_coords;\n"
+        "#endif\n"
         "void main() {\n"
         "  tex_coords = tex_coords_in;\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
@@ -153,17 +159,43 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
         "precision mediump float;\n"
         "#endif\n"
 
+        "#if (defined(GL_ES) && __VERSION__ >= 300) || (!defined(GL_ES) && __VERSION__ >= 130)\n"
+          "#define vlc_texture texture\n"
+        "#else\n"
+          "#define vlc_texture texture2D\n"
+        "#endif\n"
+
+        "#if __VERSION__ < 300\n"
+          "#define FragColor gl_FragColor\n"
+        "#else\n"
+          "out vec4 FragColor;\n"
+        "#endif\n"
+
         "uniform sampler2D sampler;\n"
         "uniform float alpha;\n"
-        "varying vec2 tex_coords;\n"
+        "#if __VERSION__ < 300\n"
+          "varying vec2 tex_coords;\n"
+        "#else\n"
+          "in vec2 tex_coords;\n"
+        "#endif\n"
         "void main() {\n"
-        "  vec4 color = texture2D(sampler, tex_coords);\n"
+        "  vec4 color = vlc_texture(sampler, tex_coords);\n"
         "  color.a *= alpha;\n"
-        "  gl_FragColor = color;\n"
+        "  FragColor = color;\n"
         "}\n";
 
-    const char *glsl_version = gl->api_type == VLC_OPENGL ?
-        "#version 120\n" : "#version 100\n";
+    char *glsl_version = NULL;
+
+    if (gl->api_type == VLC_OPENGL_ES2)
+        glsl_version = strdup("#version 100\n");
+    else
+    {
+        int target_version = __MIN(api->glsl_version, 410);
+        if (asprintf(&glsl_version, "#version %d\n", target_version) <= 0)
+           goto error_1;
+    }
+    if (!glsl_version)
+        goto error_1;
 
     const char *vertex_shader[] = {
         glsl_version,
@@ -201,6 +233,7 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
 error_2:
     vt->DeleteProgram(sr->program_id);
 error_1:
+    free(glsl_version);
     free(sr);
 
     return NULL;
@@ -263,17 +296,10 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
         vlc_vector_foreach(r, &subpicture->regions) {
             gl_region_t *glr = &sr->regions[i];
 
-            glr->width  = r->p_picture->format.i_visible_width;
-            glr->height = r->p_picture->format.i_visible_height;
-            if (!sr->api->supports_npot) {
-                glr->width  = stdc_bit_ceil(r->p_picture->format.i_visible_width);
-                glr->height = stdc_bit_ceil(r->p_picture->format.i_visible_height);
-                glr->tex_width  = (float) r->p_picture->format.i_visible_width  / glr->width;
-                glr->tex_height = (float) r->p_picture->format.i_visible_height / glr->height;
-            } else {
-                glr->tex_width  = 1.0;
-                glr->tex_height = 1.0;
-            }
+            glr->width  = stdc_bit_ceil(r->p_picture->format.i_visible_width);
+            glr->height = stdc_bit_ceil(r->p_picture->format.i_visible_height);
+            glr->tex_width  = (float) r->p_picture->format.i_visible_width  / glr->width;
+            glr->tex_height = (float) r->p_picture->format.i_visible_height / glr->height;
             glr->alpha  = (float)r->i_alpha / 255;
             glr->left   =  2.0 * (r->place.x                  ) / sr->output_width  - 1.0;
             glr->top    = -2.0 * (r->place.y                  ) / sr->output_height + 1.0;
