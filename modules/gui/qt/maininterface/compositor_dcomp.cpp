@@ -164,6 +164,8 @@ bool CompositorDirectComposition::init()
 
 void CompositorDirectComposition::setup()
 {
+    //Setup shouldn't be called once we are shutting down
+    assert(m_mainCtx);
     assert(m_quickView);
     const auto rhi = m_quickView->rhi();
     assert(rhi);
@@ -351,6 +353,16 @@ void CompositorDirectComposition::unloadGUI()
 {
     m_acrylicSurface.reset();
     m_interfaceWindowHandler.reset();
+
+    {
+        QMutexLocker lock(&m_setupStateLock);
+        if (m_quickView) {
+            disconnect(m_quickView.get(), &QQuickWindow::frameSwapped,
+                       this, &CompositorDirectComposition::setup);
+        }
+        m_setupState = SetupState::Fail;
+        m_setupStateCond.notify_all();
+    }
 
     //at this point we need to unload the QML content but the window still need to
     //be valid as it may still be used by the vout window.
