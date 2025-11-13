@@ -1722,7 +1722,6 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
 
             sys->displayed.decoded   = NULL;
             sys->displayed.date      = VLC_TICK_INVALID;
-            sys->displayed.timestamp = VLC_TICK_INVALID;
         }
     }
 
