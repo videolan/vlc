@@ -19,7 +19,7 @@ Decoders:
  * Disable decoding using libdca, libmpeg2 and liba52 by default in favor of libavcodec
 
 Demuxers:
- * Support for DMX audio music (MUS) files
+ * Add support for DMX audio music (MUS) files
  * Handle mkv-use-chapter-codec option
  * Add A_ATRAC/AT1 support in matroska
  * Prevent FLAC seeking logic get stuck
@@ -28,6 +28,7 @@ Demuxers:
  * Cut QNap title on first invalid character
  * Fix display of certain JPEG files
  * Fix playback of very short ASF files (duration less than 1s)
+ * Multiple fixes in MPEG-TS
  * Fix crashes in multiple demuxers (reported by rub.de, oss-fuzz and others)
 
 Input:
@@ -36,6 +37,7 @@ Input:
 Interface:
  * Add option to use dark palette (Qt)
  * Add compilation support for newer versions of Qt5
+ * Qt: Fix scrolling on volume slider
 
 Service Discovery:
  * UPnP: remove SAT>IP channel list fallback
@@ -46,6 +48,7 @@ Video Output:
 
 Video Filter:
  * Add AMD GPU Frame Rate Doubler (Direct3D11)
+ * Improve visualization of low frequencies in spectrogram
 
 Contrib:
  * Update amf to 1.4.34
@@ -57,7 +60,7 @@ Contrib:
  * Update glew to 2.1.0
  * Update gmp to 6.3.0
  * Udpate gnutls to 3.8.10
- * Update harfbuzz to 11.4.4
+ * Update harfbuzz to 11.5.0
  * Update iconv to 1.17
  * Update libarchive to 3.8.0 including support for RAR 5.0
  * Update libass to 0.17.3
@@ -66,22 +69,38 @@ Contrib:
  * Update libogg to 1.3.6
  * Update libpng to 1.6.50
  * Update libvpx to 1.15.2
+ * Update lua to 5.1.5
  * Update openjpeg to 2.5.0
  * Update orc to 0.4.33
  * Update srt to 1.5.3
  * Update taglib to 1.13.1
  * Update zlib to 1.3.1
+ * and more 3rd party updates
  * libmpeg2, libdca and liba52 are no longer build by default
  * build ragel inside harfbuzz if necessary
 
 Misc:
  * gnutls: remove manual DH prime bits setting
  * Avoid very large fonts in portrait mode
+ * Update of most translations
 
 Many thanks to the Sovereign Tech Agency (https://www.sovereign.tech/), and
 especially their Sovereign Tech Fund program, for helping VLC sustainability and safety.
 Thanks to oss-fuzz as well for their help and resources to find issues.
 Thanks to their support, 3.0.22 becomes the VLC release with the most security fixes ever!
+
+Security:
+ * Heap Buffer Overflow READ in TY, NSV, CVDsub, SPU, Subrip, TX3G, MPJEG demuxers and decoders
+ * Heap Buffer Overflow Write in RLE, MP4, TX3G demuxers and decoders
+ * Assert failure in AVI, MP4 demuxers and Core
+ * Null dereferences in CSS, Flac and VTT modules
+ * Use-after Free in SVG decoder
+ * Crash in Subtitles core, in jpeg2 inside TS
+ * Multiple crashes and OOB in CEA-708 subtitles
+ * OOB read on Oggspot, MP4
+ * Multiple leaks in MKV, ASF/WMV, CAF and PS demuxers, WebVTT and SVCD decoders
+ * Busy loop in WebVTT
+  (The list above is not exhaustive)
 
 
 Changes between 3.0.20 and 3.0.21:
