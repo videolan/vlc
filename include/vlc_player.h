@@ -487,7 +487,7 @@ vlc_player_NextVideoFrame(vlc_player_t *player);
  *
  * @note Since all players actions are asynchronous, this function won't
  * reflect the new state immediately. Wait for the
- * vlc_players_cbs.on_state_changed event to be notified.
+ * vlc_player_cbs.on_state_changed event to be notified.
  *
  * @see vlc_player_state
  * @see vlc_player_cbs.on_state_changed
@@ -2621,7 +2621,7 @@ struct vlc_player_vout_cbs
  * Get and hold the main video output
  *
  * @warning the returned vout_thread_t * must be released with vout_Release().
- * @see vlc_players_cbs.on_vout_changed
+ * @see vlc_player_cbs.on_vout_changed
  *
  * @note The player is guaranteed to always hold one valid vout. Only vout
  * variables can be changed from this instance. The vout returned before
@@ -2639,7 +2639,7 @@ vlc_player_vout_Hold(vlc_player_t *player);
  * @warning All vout_thread_t * element of the array must be released with
  * vout_Release(). The returned array must be freed.
  *
- * @see vlc_players_cbs.on_vout_changed
+ * @see vlc_player_cbs.on_vout_changed
  *
  * @param player player instance
  * @param count valid pointer to store the array count
