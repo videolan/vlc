@@ -161,6 +161,14 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
             w->alert(0);
     });
 
+    connect(
+        &m_wheelAccumulator, &WheelToVLCConverter::wheelUpDown,
+        this, [this] (int steps, Qt::KeyboardModifiers modifiers) {
+            if (modifiers != Qt::ControlModifier)
+                return;
+            emit incrementIntfUserScaleFactor(steps > 0);
+    });
+
     m_window->installEventFilter(this);
 }
 
@@ -267,7 +275,7 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
         if (wheelEvent->modifiers() == Qt::ControlModifier)
         {
-            emit incrementIntfUserScaleFactor(wheelEvent->angleDelta().y() > 0);
+            m_wheelAccumulator.wheelEvent(wheelEvent);
             wheelEvent->accept();
             return true;
         }

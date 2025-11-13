@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QWindow>
 #include <QPointer>
+#include "util/vlchotkeyconverter.hpp"
 
 class MainCtx;
 class InterfaceWindowHandler : public QObject
@@ -85,6 +86,8 @@ protected:
     bool m_hasResizeCursor = false;
 
     QRect m_interfaceGeometry;
+
+    WheelToVLCConverter m_wheelAccumulator;
 
     static const Qt::Key kc[10]; /* easter eggs */
     int i_kc_offset = 0;
