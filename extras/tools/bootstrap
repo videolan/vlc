@@ -203,20 +203,12 @@ esac
 
 BOOTSTRAP_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
-cat > Makefile << EOF
-TOOLS = $BOOTSTRAP_PATH
-MAKEFLAGS += -j$CPUS
-CMAKEFLAGS += --parallel=$CPUS
-PREFIX=\$(abspath ./build)
-PATH=\${PREFIX}/bin:$PATH
-EOF
-
 for t in $FOUND; do
-    echo ".$t:" >> Makefile
+    TARGET_FOUND=".$t $TARGET_FOUND"
 done
 
 for t in $NEEDED; do
-    echo .$t: .build$t >> Makefile
+    TARGET_NEEDED=".$t $TARGET_NEEDED"
     case "$t" in
         *$DEPS_ONLY*)
             ;; # Dependency only, not build by default
@@ -229,7 +221,21 @@ done
 
 [ -n "$PACKAGES" ] && mkdir -p build/bin && echo "To-be-built packages: $PACKAGES"
 
-cat >> Makefile << EOF
+cat > Makefile << EOF
+TOOLS = $BOOTSTRAP_PATH
+MAKEFLAGS += -j$CPUS
+CMAKEFLAGS += --parallel=$CPUS
+PREFIX=\$(abspath ./build)
+PATH=\${PREFIX}/bin:$PATH
+
+$TARGET_FOUND:
+	@echo "Available in the system"
+	touch \$@
+
+.SECONDEXPANSION:
+$TARGET_NEEDED: \$\$(subst .,.build,\$\$@)
+	touch \$@
+
 all: $TARGETS
 	@echo "You are ready to build VLC and its contribs"
 
