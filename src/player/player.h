@@ -331,6 +331,18 @@ vlc_player_get_input_locked(vlc_player_t *player)
     } \
 } while(0)
 
+#define vlc_player_SendEventCount(player, event, count, ...) do { \
+    vlc_player_listener_id *listener; \
+    count = 0; \
+    vlc_list_foreach(listener, &player->listeners, node) \
+    { \
+        if (listener->cbs->event) { \
+            listener->cbs->event(player, ##__VA_ARGS__, listener->cbs_data); \
+            count++; \
+        } \
+    } \
+} while(0)
+
 static inline const char *
 es_format_category_to_string(enum es_format_category_e cat)
 {
