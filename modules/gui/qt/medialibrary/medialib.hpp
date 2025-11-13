@@ -91,7 +91,7 @@ public:
      * @param uiCB, this callback is executed on the Qt thread, it takes as first argument the
      *     id of the tasks, and as second argument the context that was created for the ML callback
      *
-     * @param queue, this allows to specify if the task must be exectuted on a specific queue, if nullptr
+     * @param queue, this allows to specify if the task must be executed on a specific queue, if nullptr
      * task may be run by any thread in the threadpool. this is useful if you want to ensure that tasks must
      * be executed in order.
      *
