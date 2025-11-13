@@ -128,6 +128,7 @@ libvlccore_sources_base = files(
     'playlist/sort.c',
     'preparser/art.c',
     'preparser/art.h',
+    'preparser/external.c',
     'preparser/fetcher.c',
     'preparser/fetcher.h',
     'preparser/ipc.c',

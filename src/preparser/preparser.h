@@ -59,6 +59,10 @@ void *vlc_preparser_internal_New(vlc_preparser_t *preparser,
                                  vlc_object_t *parent,
                                  const struct vlc_preparser_cfg *cfg);
 
+void *vlc_preparser_external_New(vlc_preparser_t *preparser,
+                                 vlc_object_t *parent,
+                                 const struct vlc_preparser_cfg *cfg);
+
 /* Preparser Request */
 struct vlc_preparser_req_operations {
     /* Called by `vlc_preparser_req_GetItem`. */

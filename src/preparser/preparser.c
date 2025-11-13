@@ -41,7 +41,7 @@ vlc_preparser_t *vlc_preparser_New(vlc_object_t *obj,
         return NULL;
     }
     if (cfg->external_process) {
-        vlc_assert_unreachable();
+        preparser->sys = vlc_preparser_external_New(preparser, obj, cfg);
     } else {
         preparser->sys = vlc_preparser_internal_New(preparser, obj, cfg);
     }
