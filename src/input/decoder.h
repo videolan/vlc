@@ -115,6 +115,11 @@ void vlc_input_decoder_StopWait( vlc_input_decoder_t * );
 bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * );
 
 /**
+ * This function forces the display of the next picture
+ */
+void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_dec );
+
+/**
  * This function Creates and adds the requested SubDec.
  *
  * The sub decoder returned by this function must be deleted with
@@ -123,11 +128,6 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * );
 vlc_input_decoder_t *
 vlc_input_decoder_CreateSubDec(vlc_input_decoder_t *dec,
                                const struct vlc_input_decoder_cfg *cfg);
-
-/**
- * This function forces the display of the next picture
- */
-void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_dec );
 
 struct vlc_subdec_desc
 {
