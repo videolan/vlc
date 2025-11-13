@@ -805,11 +805,10 @@ static void InitProperties( input_thread_t *input )
     assert(master);
 
     int capabilities = 0;
-    bool b_can_seek;
 
-    if( demux_Control( master->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
-        b_can_seek = false;
-    if( b_can_seek )
+    if( demux_Control( master->p_demux, DEMUX_CAN_SEEK, &master->b_can_seek ) )
+        master->b_can_seek = false;
+    if( master->b_can_seek )
         capabilities |= VLC_INPUT_CAPABILITIES_SEEKABLE;
 
     if( master->b_can_pause || !master->b_can_pace_control )

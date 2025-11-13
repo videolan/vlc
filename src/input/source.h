@@ -57,6 +57,7 @@ struct input_source_t
 
     /* Properties */
     bool b_can_pause;
+    bool b_can_seek;
     bool b_can_pace_control;
     bool b_can_rate_control;
     bool b_can_stream_record;
