@@ -145,8 +145,8 @@ private:
     quint64 m_taskId;
     Ctx m_ctx; //default constructed
     const QObject* m_obj = nullptr;
-    std::function<void (Ctx&)> m_mlFun;
-    std::function<void (quint64, Ctx&)> m_uiFun;
+    const std::function<void (Ctx&)> m_mlFun;
+    const std::function<void (quint64, Ctx&)> m_uiFun;
 };
 
 template<typename Ctx>
