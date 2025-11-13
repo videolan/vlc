@@ -115,6 +115,7 @@ src/network/tls.c
 src/network/udp.c
 src/player/osd.c
 src/player/player.c
+src/player/input.c
 src/stream_output/sap.c
 src/stream_output/stream_output.c
 src/stream_output/stream_output.h

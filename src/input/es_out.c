@@ -502,6 +502,27 @@ decoder_on_new_audio_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
                               memory_order_relaxed);
 }
 
+static void
+decoder_frame_next_status(vlc_input_decoder_t *decoder, int status,
+                              void *userdata)
+{
+    (void) decoder;
+
+    es_out_id_t *id = userdata;
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
+
+    const struct vlc_input_event event = {
+        .type = INPUT_EVENT_FRAME_NEXT_STATUS,
+        .frame_next_status = status,
+    };
+
+    input_SendEvent(p_sys->p_input, &event);
+}
+
 static int
 decoder_get_attachments(vlc_input_decoder_t *decoder,
                         input_attachment_t ***ppp_attachment,
@@ -526,6 +547,7 @@ static const struct vlc_input_decoder_callbacks decoder_cbs = {
     .on_thumbnail_ready = decoder_on_thumbnail_ready,
     .on_new_video_stats = decoder_on_new_video_stats,
     .on_new_audio_stats = decoder_on_new_audio_stats,
+    .frame_next_status = decoder_frame_next_status,
     .get_attachments = decoder_get_attachments,
 };
 

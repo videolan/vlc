@@ -2316,6 +2316,14 @@ static bool Control( input_thread_t *p_input,
         }
 
         case INPUT_CONTROL_SET_FRAME_NEXT:
+            if (!priv->master->b_can_pause)
+            {
+                input_SendEvent(p_input, &(struct vlc_input_event) {
+                    .type = INPUT_EVENT_FRAME_NEXT_STATUS,
+                    .frame_next_status = -ENOTSUP,
+                });
+                break;
+            }
             if( priv->i_state == PAUSE_S )
             {
                 es_out_SetFrameNext( priv->p_es_out );
@@ -2323,10 +2331,17 @@ static bool Control( input_thread_t *p_input,
             else if( priv->i_state == PLAYING_S )
             {
                 ControlPause( p_input, i_control_date );
+                input_SendEvent(p_input, &(struct vlc_input_event) {
+                    .type = INPUT_EVENT_FRAME_NEXT_STATUS,
+                    .frame_next_status = -EAGAIN,
+                });
             }
             else
             {
-                msg_Err( p_input, "invalid state for frame next" );
+                input_SendEvent(p_input, &(struct vlc_input_event) {
+                    .type = INPUT_EVENT_FRAME_NEXT_STATUS,
+                    .frame_next_status = -EINVAL,
+                });
             }
             b_force_update = true;
             break;

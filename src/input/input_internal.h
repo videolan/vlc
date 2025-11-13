@@ -159,6 +159,9 @@ typedef enum input_event_type_e
 
     /* Mouse event */
     INPUT_EVENT_MOUSE_LEFT,
+
+    /* frame-next status */
+    INPUT_EVENT_FRAME_NEXT_STATUS,
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -347,6 +350,8 @@ struct vlc_input_event
         struct vlc_input_event_attachments attachments;
         /* INPUT_EVENT_NAV_FAILED */
         int nav_type;
+        /* INPUT_EVENT_FRAME_NEXT_STATUS */
+        int frame_next_status;
     };
 };
 

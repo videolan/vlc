@@ -2732,19 +2732,24 @@ void vlc_input_decoder_Wait( vlc_input_decoder_t *p_owner )
 void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
 {
     assert( p_owner->paused );
+    assert( p_owner->cat == VIDEO_ES );
 
     vlc_fifo_Lock( p_owner->p_fifo );
+
+    if( p_owner->video.vout == NULL )
+    {
+        decoder_Notify( p_owner, frame_next_status, -EBUSY );
+        vlc_fifo_Unlock( p_owner->p_fifo );
+        return;
+    }
+
     p_owner->frames_countdown++;
     vlc_fifo_Signal( p_owner->p_fifo );
-    vlc_fifo_Unlock( p_owner->p_fifo );
 
-    vlc_fifo_Lock(p_owner->p_fifo);
-    if( p_owner->cat == VIDEO_ES )
-    {
-        if( p_owner->video.vout )
-            vout_NextPicture( p_owner->video.vout );
-    }
-    vlc_fifo_Unlock(p_owner->p_fifo);
+    vout_NextPicture( p_owner->video.vout );
+    /* TODO: it should be notified from the vout */
+    decoder_Notify( p_owner, frame_next_status, 0 );
+    vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
 size_t vlc_input_decoder_GetFifoSize( vlc_input_decoder_t *p_owner )

@@ -1334,10 +1334,8 @@ vlc_player_NextVideoFrame(vlc_player_t *player)
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return;
-    int ret = input_ControlPushHelper(input->thread,
-                                      INPUT_CONTROL_SET_FRAME_NEXT, NULL);
-    if (ret == VLC_SUCCESS)
-        vlc_player_osd_Message(player, _("Next frame"));
+    input_ControlPushHelper(input->thread,
+                            INPUT_CONTROL_SET_FRAME_NEXT, NULL);
 }
 
 enum vlc_player_state

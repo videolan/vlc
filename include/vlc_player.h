@@ -477,6 +477,11 @@ vlc_player_Resume(vlc_player_t *player);
 /**
  * Pause and display the next video frame
  *
+ * @note Works only on streams that can pause..
+ *
+ * @note listen to the vlc_player_cbs.on_next_frame_status to be notified when
+ * the next frame is displayed.
+ *
  * @param player locked player instance
  */
 VLC_API void
@@ -3317,6 +3322,19 @@ struct vlc_player_cbs
     void (*on_stopping_current_media)(vlc_player_t *player, input_item_t *current_media,
                                       enum vlc_player_media_stopping_reason stopping_reason,
                                       void *data);
+
+    /**
+     * Called when the next frame, following a call to
+     * `vlc_player_NextVideoFrame()`, is displayed.
+     *
+     * @see vlc_player_NextVideoFrame()
+     *
+     * @param player locked player instance
+     * @param status 0 in case of success, -EAGAIN on first call (paused),
+     * -EBUSY in case of video error, -ENOTSUP if can't pause,
+     * -EINVAL in case of invalid state
+     */
+    void (*on_next_frame_status)(vlc_player_t *player, int status, void *data);
 };
 
 /**
