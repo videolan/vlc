@@ -71,9 +71,9 @@ check_tar() {
 if ! tar PcJ /dev/null >/dev/null 2>&1 && ! tar PcJf /dev/null /dev/null 2>&1
 then
     echo "tar doesn't support xz (J option)"
-    NEEDED="$NEEDED tar xz"
+    NEEDED="$NEEDED tar"
 else
-    FOUND="$FOUND tar xz"
+    FOUND="$FOUND tar"
 fi
 }
 
