@@ -119,6 +119,12 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * );
  */
 void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_dec );
 
+/*
+ * This function reset the decoder for normal playback after a previous or a
+ * next frame call.
+ */
+void vlc_input_decoder_StopFrameNext( vlc_input_decoder_t *p_dec );
+
 /**
  * This function Creates and adds the requested SubDec.
  *
