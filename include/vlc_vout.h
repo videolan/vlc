@@ -148,8 +148,10 @@ VLC_API void vout_FlushSubpictureChannel( vout_thread_t *, size_t );
 /**
  * This function will ensure that all ready/displayed pictures have at most
  * the provided date.
+ *
+ * @return the last displayed pts before flush
  */
-VLC_API void vout_Flush( vout_thread_t *p_vout, vlc_tick_t i_date );
+VLC_API vlc_tick_t vout_Flush( vout_thread_t *p_vout, vlc_tick_t i_date );
 
 /**
  * Empty all the pending pictures in the vout

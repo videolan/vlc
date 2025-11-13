@@ -1744,18 +1744,21 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
     sys->first_picture = true;
 }
 
-void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
+vlc_tick_t vout_Flush(vout_thread_t *vout, vlc_tick_t date)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
 
     vout_control_Hold(&sys->control);
     vout_FlushUnlocked(sys, false, date);
+    vlc_tick_t displayed_pts = sys->displayed.timestamp;
     vout_control_Release(&sys->control);
 
     struct vlc_tracer *tracer = GetTracer(sys);
     if (tracer != NULL)
         vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "flushed");
+
+    return displayed_pts;
 }
 
 void vout_NextPicture(vout_thread_t *vout)
