@@ -66,7 +66,7 @@ static void setGtkColor(vlc_qt_theme_provider_t* obj,
 static void setGtkColorSet(vlc_qt_theme_provider_t* obj,
                            vlc_qt_theme_color_set set, vlc_qt_theme_color_section section,
                            vlc_qt_theme_color_name name,
-                           std::function<GdkRGBA (std::string)> getter, const std::string &selector)
+                           std::function<GdkRGBA (const std::string&)> getter, const std::string &selector)
 {
     setGtkColor(obj, set, section, name, VQTC_STATE_NORMAL, getter(selector));
     setGtkColor(obj, set, section, name, VQTC_STATE_DISABLED, getter(selector + ":disabled"));
@@ -79,27 +79,27 @@ static void setGtkColorSetBg(vlc_qt_theme_provider_t* obj,
                            vlc_qt_theme_color_set set,  vlc_qt_theme_color_name name,
                              const std::string &selector)
 {
-    setGtkColorSet(obj, set, VQTC_SECTION_BG, name, GetBgColor, std::move(selector));
+    setGtkColorSet(obj, set, VQTC_SECTION_BG, name, GetBgColor, selector);
 }
 
 static void setGtkColorSetFg(vlc_qt_theme_provider_t* obj,
                            vlc_qt_theme_color_set set,  vlc_qt_theme_color_name name,
                              const std::string &selector)
 {
-    setGtkColorSet(obj, set, VQTC_SECTION_FG, name, GetFgColor, std::move(selector));
+    setGtkColorSet(obj, set, VQTC_SECTION_FG, name, GetFgColor, selector);
 }
 
 static void setGtkColorSetFgFromBg(vlc_qt_theme_provider_t* obj,
                            vlc_qt_theme_color_set set,  vlc_qt_theme_color_name name,
                                    const std::string &selector)
 {
-    setGtkColorSet(obj, set, VQTC_SECTION_FG, name, GetBgColor, std::move(selector));
+    setGtkColorSet(obj, set, VQTC_SECTION_FG, name, GetBgColor, selector);
 }
 
 
 static void setGtkColorSetBorder(vlc_qt_theme_provider_t* obj, vlc_qt_theme_color_set set, const std::string &selector)
 {
-    setGtkColorSet(obj, set, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, GetBorderColor, std::move(selector));
+    setGtkColorSet(obj, set, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, GetBorderColor, selector);
 }
 
 static void setGtkColorSetHighlight(vlc_qt_theme_provider_t* obj, vlc_qt_theme_color_set set, const std::string &selector)
