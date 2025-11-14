@@ -716,6 +716,10 @@ static void ProcessEvents( intf_thread_t *p_intf,
             break;
         case SIGNAL_STATE:
             vlc_dictionary_insert( &player_properties, "PlaybackStatus", NULL );
+            if ( p_intf->p_sys->b_can_play )
+            {
+                vlc_dictionary_insert( &player_properties, "CanPlay", NULL );
+            }
             break;
         case SIGNAL_RATE:
             vlc_dictionary_insert( &player_properties, "Rate", NULL );
