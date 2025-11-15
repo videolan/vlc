@@ -325,6 +325,8 @@ public slots:
     void setSecondarySubtitleDelayMS( int );
     float getSubtitleFPS( ) const;
     void setSubtitleFPS( float );
+    Q_INVOKABLE void setSubtitleMargin( int margin );
+    Q_INVOKABLE void setSecondarySubtitleMargin( int margin );
 
     //title/chapters/menu
     TitleListModel* getTitles();
