@@ -25,9 +25,11 @@
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 #import "library/VLCLibraryItemPresentingCapable.h"
+#import "library/audio-library/VLCLibraryAudioDataSourceHeaderDelegate.h"
 
 @class VLCLibraryAudioDataSource;
 @class VLCLibraryAudioGroupDataSource;
+@class VLCLibraryAudioGroupTableHeaderView;
 @class VLCLibraryCollectionView;
 @class VLCLibraryWindow;
 
@@ -35,12 +37,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryAudioViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<VLCLibraryItemPresentingCapable>
+@interface VLCLibraryAudioViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<VLCLibraryItemPresentingCapable, VLCLibraryAudioDataSourceHeaderDelegate>
 
 @property (readonly, weak) NSView *audioLibraryView;
 @property (readonly, weak) NSSplitView *audioLibrarySplitView;
 @property (readonly, weak) NSScrollView *audioCollectionSelectionTableViewScrollView;
 @property (readonly, weak) NSTableView *audioCollectionSelectionTableView;
+@property (readonly, strong) VLCLibraryAudioGroupTableHeaderView *audioCollectionHeaderView;
 @property (readonly, weak) NSScrollView *audioGroupSelectionTableViewScrollView;
 @property (readonly, weak) NSTableView *audioGroupSelectionTableView;
 @property (readonly, weak) NSScrollView *audioSongTableViewScrollView;

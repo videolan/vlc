@@ -42,6 +42,7 @@
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupHeaderView.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAudioTableViewDelegate.h"
 
@@ -159,6 +160,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioDataSource.songsTableView = _audioSongTableView;
     _audioDataSource.collectionView = _audioLibraryCollectionView;
     _audioDataSource.gridModeListTableView = _audioLibraryGridModeSplitViewListTableView;
+    _audioDataSource.headerDelegate = self;
     [_audioDataSource setup];
 
     _audioGroupDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
@@ -185,6 +187,15 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
+    const NSRect headerFrame = NSMakeRect(0.f,
+                                          0.f,
+                                          _audioGroupSelectionTableView.bounds.size.width,
+                                          VLCLibraryAudioGroupTableHeaderViewHeight);
+    _audioCollectionHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame];
+    _audioCollectionHeaderView.autoresizingMask = NSViewWidthSizable;
+
+    _audioGroupSelectionTableView.headerView = self.audioCollectionHeaderView;
+
     _audioGroupSelectionTableView.dataSource = _audioGroupDataSource;
     _audioGroupSelectionTableView.delegate = _audioGroupLibraryTableViewDelegate;
 
@@ -194,6 +205,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     _audioSongTableView.dataSource = _audioDataSource;
     _audioSongTableView.delegate = _audioLibraryTableViewDelegate;
+
+    [_audioDataSource applySelectionForTableView:_audioCollectionSelectionTableView];
 }
 
 - (void)setupGridModeSplitView
@@ -563,6 +576,26 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     }
 
     [self.libraryWindow hideLoadingOverlay];
+}
+
+- (void)audioDataSource:(VLCLibraryAudioDataSource *)dataSource
+updateHeaderForTableView:(NSTableView *)tableView
+    withRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
+          fallbackTitle:(NSString *)fallbackTitle
+         fallbackDetail:(NSString *)fallbackDetail
+{
+    if (tableView != self.audioCollectionSelectionTableView &&
+        tableView != self.audioGroupSelectionTableView &&
+        ![self.audioGroupDataSource.tableViews containsObject:tableView])
+        return;
+
+    if (representedItem != nil) {
+        self.audioCollectionHeaderView.representedItem = representedItem;
+    } else {
+        [self.audioCollectionHeaderView updateWithRepresentedItem:nil
+                                                    fallbackTitle:fallbackTitle
+                                                   fallbackDetail:fallbackDetail];
+    }
 }
 
 @end
