@@ -24,6 +24,7 @@
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryTableViewDataSource.h"
+#import "library/audio-library/VLCLibraryAudioDataSourceHeaderDelegate.h"
 
 #include "views/iCarousel/iCarousel.h"
 
@@ -60,6 +61,8 @@ extern NSString * const VLCLibraryYearSortDescriptorKey;
 
 extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification;
 
+@class VLCLibraryRepresentedItem;
+
 @interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource, iCarouselDataSource>
 
 @property (readwrite, weak) VLCLibraryModel *libraryModel;
@@ -68,6 +71,7 @@ extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotif
 @property (readwrite, weak) NSCollectionView *collectionView;
 @property (readwrite, weak) iCarousel *carouselView;
 @property (readwrite, weak) NSTableView *gridModeListTableView;
+@property (readwrite, weak, nullable) id<VLCLibraryAudioDataSourceHeaderDelegate> headerDelegate;
 
 @property (nonatomic, readwrite, assign) VLCAudioLibrarySegment audioLibrarySegment;
 @property (readwrite, strong) VLCLibraryAudioGroupDataSource *audioGroupDataSource;
@@ -80,6 +84,7 @@ extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotif
 - (void)setup;
 - (void)reloadData;
 - (void)tableView:(NSTableView * const)tableView selectRowIndices:(NSIndexSet * const)indices;
+- (void)applySelectionForTableView:(NSTableView *)tableView;
 
 @end
 

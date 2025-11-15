@@ -693,6 +693,48 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     return self.displayedCollection[row];
 }
 
+- (void)applySelectionForTableView:(NSTableView *)tableView
+{
+    if (tableView == nil ||
+        (tableView != self.collectionSelectionTableView && tableView != self.gridModeListTableView)) {
+        return;
+    }
+
+    const NSInteger selectedRow = tableView.selectedRow;
+    if (selectedRow >= 0 && (NSUInteger)selectedRow >= self.displayedCollection.count) {
+        return;
+    }
+
+    const BOOL shouldClearSelection = self.currentParentType == VLCMediaLibraryParentGroupTypeAudioLibrary ||
+                                      self.currentParentType == VLCMediaLibraryParentGroupTypeRecentAudios ||
+                                      selectedRow < 0 ||
+                                      self.displayedCollectionUpdating;
+
+    const id<VLCMediaLibraryAudioGroupProtocol> selectedItem =
+        shouldClearSelection ? nil : self.displayedCollection[selectedRow];
+    self.audioGroupDataSource.representedAudioGroup = selectedItem;
+
+    VLCLibraryRepresentedItem *representedItem = nil;
+    NSString *fallbackTitle = nil;
+    NSString *fallbackDetail = nil;
+
+    if (self.displayAllArtistsGenresTableEntry && selectedRow == 0) {
+        fallbackTitle = (self.currentParentType == VLCMediaLibraryParentGroupTypeGenre)
+            ? _NS("All genres")
+            : _NS("All artists");
+    } else if (selectedItem != nil) {
+        representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:selectedItem parentType:self.currentParentType];
+        fallbackTitle = selectedItem.displayString;
+        fallbackDetail = selectedItem.primaryDetailString;
+    }
+
+    [self.headerDelegate audioDataSource:self
+                updateHeaderForTableView:tableView
+                     withRepresentedItem:representedItem
+                           fallbackTitle:fallbackTitle
+                          fallbackDetail:fallbackDetail];
+}
+
 - (void)tableView:(NSTableView * const)tableView selectRowIndices:(NSIndexSet * const)indices
 {
     NSParameterAssert(tableView);
@@ -711,14 +753,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         return;
     }
 
-    if (self.currentParentType == VLCMediaLibraryParentGroupTypeAudioLibrary ||
-        self.currentParentType == VLCMediaLibraryParentGroupTypeRecentAudios ||
-        selectedRow < 0 ||
-        self.displayedCollectionUpdating) {
-        self.audioGroupDataSource.representedAudioGroup = nil;
-    } else {
-        self.audioGroupDataSource.representedAudioGroup = self.displayedCollection[selectedRow];
-    }
+    [self applySelectionForTableView:tableView];
 }
 
 - (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors
