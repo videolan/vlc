@@ -75,6 +75,7 @@
 
 - (void)addChild:(VLCPLItem *)item atPos:(int)pos
 {
+    pos = VLC_CLIP(pos, 0, (int)_children.count);
     [_children insertObject:item atIndex:pos];
     [item setParent: self];
 
