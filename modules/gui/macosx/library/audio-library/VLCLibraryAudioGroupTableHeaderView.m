@@ -41,6 +41,7 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 @property NSTextField *detailField;
 @property NSButton *playButton;
 @property NSButton *queueButton;
+@property CGFloat backgroundEdgeInset;
 
 @end
 
@@ -67,24 +68,42 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 
 - (void)commonInit
 {
-    self.wantsLayer = YES;
+    NSView *contentHostView = self;
+    self.backgroundEdgeInset = 0.f;
 
-    if (@available(macOS 10.14, *)) {
-        NSVisualEffectView * const visualEffectView = [[NSVisualEffectView alloc] initWithFrame:self.bounds];
-        visualEffectView.translatesAutoresizingMaskIntoConstraints = NO;
-        visualEffectView.material = NSVisualEffectMaterialHeaderView;
-        visualEffectView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
-        visualEffectView.state = NSVisualEffectStateFollowsWindowActiveState;
-        [self addSubview:visualEffectView];
-        self.backgroundView = visualEffectView;
-    } else {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+    if (@available(macOS 26.0, *)) {
+        NSGlassEffectView * const glassView = [[NSGlassEffectView alloc] initWithFrame:self.bounds];
+        glassView.translatesAutoresizingMaskIntoConstraints = NO;
+        NSView * const glassContentView = [[NSView alloc] initWithFrame:glassView.bounds];
+        glassContentView.translatesAutoresizingMaskIntoConstraints = NO;
+        glassView.contentView = glassContentView;
+        self.backgroundView = glassView;
+        contentHostView = glassContentView;
+        self.backgroundEdgeInset = VLCLibraryUIUnits.largeSpacing * 1.75;
+    }
+#endif
+    if (self.backgroundView == nil) {
+        self.wantsLayer = YES;
+
+        if (@available(macOS 10.14, *)) {
+            NSVisualEffectView * const visualEffectView = [[NSVisualEffectView alloc] initWithFrame:self.bounds];
+            visualEffectView.translatesAutoresizingMaskIntoConstraints = NO;
+            visualEffectView.material = NSVisualEffectMaterialHeaderView;
+            visualEffectView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+            visualEffectView.state = NSVisualEffectStateFollowsWindowActiveState;
+            self.backgroundView = visualEffectView;
+        }
+    }
+    if (self.backgroundView == nil) {
         NSView * const fallbackBackgroundView = [[NSView alloc] initWithFrame:self.bounds];
         fallbackBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
         fallbackBackgroundView.wantsLayer = YES;
         fallbackBackgroundView.layer.backgroundColor = NSColor.windowBackgroundColor.CGColor;
-        [self addSubview:fallbackBackgroundView];
         self.backgroundView = fallbackBackgroundView;
     }
+
+    [self addSubview:self.backgroundView];
 
     self.titleField = [self buildLabelWithFont:NSFont.VLClibrarySectionHeaderFont
                                       textColor:NSColor.labelColor
@@ -95,16 +114,16 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     self.playButton = [self buildActionButtonWithTitle:_NS("Play") action:@selector(play:)];
     self.queueButton = [self buildActionButtonWithTitle:_NS("Queue") action:@selector(enqueue:)];
 
-    NSStackView *labelsStack = [NSStackView stackViewWithViews:@[self.titleField, self.detailField]];
+    NSStackView * const labelsStack = [NSStackView stackViewWithViews:@[self.titleField, self.detailField]];
     labelsStack.translatesAutoresizingMaskIntoConstraints = NO;
     labelsStack.orientation = NSUserInterfaceLayoutOrientationVertical;
     labelsStack.alignment = NSLayoutAttributeLeading;
     labelsStack.spacing = VLCLibraryUIUnits.smallSpacing;
     [labelsStack setContentHuggingPriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
-    [labelsStack setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [labelsStack setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
     self.labelsStackView = labelsStack;
 
-    NSStackView *buttonsStack = [NSStackView stackViewWithViews:@[self.playButton, self.queueButton]];
+    NSStackView * const buttonsStack = [NSStackView stackViewWithViews:@[self.playButton, self.queueButton]];
     buttonsStack.translatesAutoresizingMaskIntoConstraints = NO;
     buttonsStack.orientation = NSUserInterfaceLayoutOrientationHorizontal;
     buttonsStack.alignment = NSLayoutAttributeCenterY;
@@ -113,33 +132,32 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     [buttonsStack setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
     self.buttonsStackView = buttonsStack;
 
-    NSStackView *rootStack = [NSStackView new];
-    rootStack.translatesAutoresizingMaskIntoConstraints = NO;
-    rootStack.orientation = NSUserInterfaceLayoutOrientationHorizontal;
-    rootStack.alignment = NSLayoutAttributeCenterY;
-    rootStack.spacing = VLCLibraryUIUnits.largeSpacing;
-    [rootStack addArrangedSubview:labelsStack];
-    [rootStack addArrangedSubview:buttonsStack];
-    self.rootStackView = rootStack;
+    [contentHostView addSubview:labelsStack];
+    [contentHostView addSubview:buttonsStack];
 
-    [self addSubview:rootStack];
+    const CGFloat backgroundInset = self.backgroundEdgeInset;
+    const CGFloat horizontalContentInset = VLCLibraryUIUnits.mediumSpacing;
+    const CGFloat verticalContentInset = VLCLibraryUIUnits.smallSpacing;
 
     [NSLayoutConstraint activateConstraints:@[
-        [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor],
+        [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor constant:backgroundInset * 0.66],
         [self.backgroundView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
         [self.backgroundView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
-        [self.backgroundView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
-
-        [rootStack.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:VLCLibraryUIUnits.largeSpacing],
-        [self.trailingAnchor constraintEqualToAnchor:rootStack.trailingAnchor constant:VLCLibraryUIUnits.largeSpacing],
-        [rootStack.topAnchor constraintEqualToAnchor:self.topAnchor constant:VLCLibraryUIUnits.mediumSpacing],
-        [self.bottomAnchor constraintEqualToAnchor:rootStack.bottomAnchor constant:VLCLibraryUIUnits.mediumSpacing],
+        [self.backgroundView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-backgroundInset],
+        [labelsStack.leadingAnchor constraintEqualToAnchor:contentHostView.leadingAnchor constant:horizontalContentInset],
+        [labelsStack.centerYAnchor constraintEqualToAnchor:contentHostView.centerYAnchor],
+        [contentHostView.trailingAnchor constraintEqualToAnchor:buttonsStack.trailingAnchor constant:horizontalContentInset],
+        [buttonsStack.centerYAnchor constraintEqualToAnchor:contentHostView.centerYAnchor],
+        [buttonsStack.leadingAnchor constraintGreaterThanOrEqualToAnchor:labelsStack.trailingAnchor constant:VLCLibraryUIUnits.largeSpacing],
     ]];
 
-    self.layer.cornerRadius = VLCLibraryUIUnits.smallSpacing;
-    self.layer.masksToBounds = YES;
-    self.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
-    [self updateAppearance];
+    if (@available(macOS 26.0, *)) {
+    } else {
+        self.layer.cornerRadius = VLCLibraryUIUnits.smallSpacing;
+        self.layer.masksToBounds = YES;
+        self.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
+        [self updateAppearance];
+    }
 }
 
 - (NSTextField *)buildLabelWithFont:(NSFont *)font textColor:(NSColor *)color alignment:(NSTextAlignment)alignment
@@ -182,6 +200,9 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 
 - (void)updateAppearance
 {
+    if (@available(macOS 26.0, *))
+        return;
+
     if (@available(macOS 10.14, *)) {
         NSAppearance *appearance = self.effectiveAppearance;
         BOOL isDark = NO;
@@ -199,17 +220,6 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 {
     [super viewDidChangeEffectiveAppearance];
     [self updateAppearance];
-}
-
-- (void)layout
-{
-    [super layout];
-    self.backgroundView.frame = self.bounds;
-}
-
-- (NSSize)intrinsicContentSize
-{
-    return NSMakeSize(NSViewNoIntrinsicMetric, VLCLibraryAudioGroupTableHeaderViewHeight);
 }
 
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem

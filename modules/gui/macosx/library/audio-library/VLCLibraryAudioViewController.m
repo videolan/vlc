@@ -187,10 +187,15 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
+    CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderViewHeight;
+    if (@available(macOS 26.0, *)) {
+        headerHeight += VLCLibraryUIUnits.largeSpacing * 2.f;
+    }
+
     const NSRect headerFrame = NSMakeRect(0.f,
                                           0.f,
                                           _audioGroupSelectionTableView.bounds.size.width,
-                                          VLCLibraryAudioGroupTableHeaderViewHeight);
+                                          headerHeight);
     _audioCollectionHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame];
     _audioCollectionHeaderView.autoresizingMask = NSViewWidthSizable;
 
