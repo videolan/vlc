@@ -96,7 +96,7 @@ private: // Functions
 
     void endTransaction();
 
-    void setTransactionPending(bool);
+    bool setTransactionPending(bool);
 
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
