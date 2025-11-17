@@ -19,7 +19,6 @@
 
 #include <QVariant>
 #include <QQuickItem>
-#include <QQmlEngine>
 
 #include <memory>
 

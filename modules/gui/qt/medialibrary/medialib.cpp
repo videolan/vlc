@@ -23,6 +23,8 @@
 
 #include <utility>
 
+#include <QQmlEngine>
+
 MediaLib::MediaLib(qt_intf_t *_intf, vlc::playlist::PlaylistController* playlistController, QObject *_parent)
     : QObject( _parent )
     , m_intf( _intf )

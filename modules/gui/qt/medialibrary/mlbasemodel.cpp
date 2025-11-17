@@ -29,6 +29,7 @@
 #include "util/base_model_p.hpp"
 #include "util/asynctask.hpp"
 
+#include <QQmlEngine>
 
 
 /// MLListCache
