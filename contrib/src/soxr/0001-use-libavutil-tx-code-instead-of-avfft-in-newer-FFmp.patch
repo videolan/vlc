@@ -1,19 +1,19 @@
-From d950ec16ad02c11b1fe41d9e873311a2b2b35d2f Mon Sep 17 00:00:00 2001
+From 2c850fdfdd5568ba6ed2e5a0578b6fa244b3c31e Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 7 Nov 2025 14:38:39 +0100
 Subject: [PATCH] use libavutil tx code instead of avfft in newer FFmpeg
 
 The code is using the replacement code from libavcodec 7.1 using the tx API.
 ---
- src/avfft32.c  | 112 +++++++++++++++++++++++++++++++++++++++++++++++++
- src/avfft32s.c | 112 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 224 insertions(+)
+ src/avfft32.c  | 109 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/avfft32s.c | 109 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 218 insertions(+)
 
 diff --git a/src/avfft32.c b/src/avfft32.c
-index fe651f5..409b478 100644
+index fe651f5..04ab065 100644
 --- a/src/avfft32.c
 +++ b/src/avfft32.c
-@@ -3,13 +3,121 @@
+@@ -3,13 +3,118 @@
  
  #include <stdlib.h>
  #include <math.h>
@@ -21,14 +21,13 @@ index fe651f5..409b478 100644
 +#define USE_LAVUTIL_TX  (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57,19,100))
 +#if USE_LAVUTIL_TX
 +# include <libavutil/tx.h>
++# include <libavutil/mem.h>
 +# include <string.h>
-+# include <stdlib.h>
 +
 +typedef struct AVTXWrapper {
 +    AVTXContext *ctx;
 +    av_tx_fn fn;
 +
-+    ptrdiff_t stride;
 +    int len;
 +    int inv;
 +
@@ -43,28 +42,27 @@ index fe651f5..409b478 100644
 +#if USE_LAVUTIL_TX
 +static void * forward_setup(int len) {
 +    int ret;
-+    float scale = (0) ? 0.5f : 1.0f;
++    float scale = 0 ? 0.5f : 1.0f;
 +    AVTXWrapper *s;
 +
-+    s = malloc(sizeof(*s));
++    s = av_mallocz(sizeof(*s));
 +    if (!s)
 +        return NULL;
 +
-+    s->stride = (0) ? sizeof(AVComplexFloat) : sizeof(float);
 +    s->len = 1 << (int)(log(len)/log(2)+.5);
-+    s->inv = (0);
++    s->inv = 0;
 +
-+    ret = av_tx_init(&s->ctx, &s->fn, AV_TX_FLOAT_RDFT, (0),
++    ret = av_tx_init(&s->ctx, &s->fn, AV_TX_FLOAT_RDFT, 0,
 +                     s->len, &scale, 0x0);
 +    if (ret < 0) {
-+        free(s);
++        av_free(s);
 +        return NULL;
 +    }
 +
-+    s->tmp = malloc((s->len + 2)*sizeof(float));
++    s->tmp = av_malloc((s->len + 2)*sizeof(float));
 +    if (!s->tmp) {
 +        av_tx_uninit(&s->ctx);
-+        free(s);
++        av_free(s);
 +        return NULL;
 +    }
 +
@@ -72,28 +70,27 @@ index fe651f5..409b478 100644
 +}
 +static void * backward_setup(int len) {
 +    int ret;
-+    float scale = (1) ? 0.5f : 1.0f;
++    float scale = 1 ? 0.5f : 1.0f;
 +    AVTXWrapper *s;
 +
-+    s = malloc(sizeof(*s));
++    s = av_mallocz(sizeof(*s));
 +    if (!s)
 +        return NULL;
 +
-+    s->stride = (1) ? sizeof(AVComplexFloat) : sizeof(float);
 +    s->len = 1 << (int)(log(len)/log(2)+.5);
-+    s->inv = (1);
++    s->inv = 1;
 +
-+    ret = av_tx_init(&s->ctx, &s->fn, AV_TX_FLOAT_RDFT, (1),
++    ret = av_tx_init(&s->ctx, &s->fn, AV_TX_FLOAT_RDFT, 1,
 +                     s->len, &scale, 0x0);
 +    if (ret < 0) {
-+        free(s);
++        av_free(s);
 +        return NULL;
 +    }
 +
-+    s->tmp = malloc((s->len + 2)*sizeof(float));
++    s->tmp = av_malloc((s->len + 2)*sizeof(float));
 +    if (!s->tmp) {
 +        av_tx_uninit(&s->ctx);
-+        free(s);
++        av_free(s);
 +        return NULL;
 +    }
 +
@@ -111,7 +108,7 @@ index fe651f5..409b478 100644
 +        src[1] = 0.0f;
 +    }
 +
-+    w->fn(w->ctx, dst, (void *)src, w->stride);
++    w->fn(w->ctx, dst, (void *)src, sizeof(float));
 +
 +    if (!w->inv) {
 +        dst[1] = dst[w->len];
@@ -123,8 +120,8 @@ index fe651f5..409b478 100644
 +{
 +    if (s) {
 +        av_tx_uninit(&s->ctx);
-+        free(s->tmp);
-+        free(s);
++        av_free(s->tmp);
++        av_free(s);
 +    }
 +}
 +#else
@@ -135,7 +132,7 @@ index fe651f5..409b478 100644
  static int multiplier(void) {return 2;}
  static void nothing(void) {}
  static int flags(void) {return 0;}
-@@ -17,7 +125,11 @@ static int flags(void) {return 0;}
+@@ -17,7 +122,11 @@ static int flags(void) {return 0;}
  fn_t _soxr_rdft32_cb[] = {
    (fn_t)forward_setup,
    (fn_t)backward_setup,
@@ -148,10 +145,10 @@ index fe651f5..409b478 100644
    (fn_t)rdft,
    (fn_t)rdft,
 diff --git a/src/avfft32s.c b/src/avfft32s.c
-index 5a7e62d..9ffbe47 100644
+index 5a7e62d..b03f154 100644
 --- a/src/avfft32s.c
 +++ b/src/avfft32s.c
-@@ -2,13 +2,121 @@
+@@ -2,13 +2,118 @@
   * Licence for this file: LGPL v2.1                  See LICENCE for details. */
  
  #include <math.h>
@@ -159,14 +156,13 @@ index 5a7e62d..9ffbe47 100644
 +#define USE_LAVUTIL_TX  (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57,19,100))
 +#if USE_LAVUTIL_TX
 +# include <libavutil/tx.h>
++# include <libavutil/mem.h>
 +# include <string.h>
-+# include <stdlib.h>
 +
 +typedef struct AVTXWrapper {
 +    AVTXContext *ctx;
 +    av_tx_fn fn;
 +
-+    ptrdiff_t stride;
 +    int len;
 +    int inv;
 +
@@ -181,28 +177,27 @@ index 5a7e62d..9ffbe47 100644
 +#if USE_LAVUTIL_TX
 +static void * forward_setup(int len) {
 +    int ret;
-+    float scale = (0) ? 0.5f : 1.0f;
++    float scale = 0 ? 0.5f : 1.0f;
 +    AVTXWrapper *s;
 +
-+    s = malloc(sizeof(*s));
++    s = av_mallocz(sizeof(*s));
 +    if (!s)
 +        return NULL;
 +
-+    s->stride = (0) ? sizeof(AVComplexFloat) : sizeof(float);
 +    s->len = 1 << (int)(log(len)/log(2)+.5);
-+    s->inv = (0);
++    s->inv = 0;
 +
-+    ret = av_tx_init(&s->ctx, &s->fn, AV_TX_FLOAT_RDFT, (0),
++    ret = av_tx_init(&s->ctx, &s->fn, AV_TX_FLOAT_RDFT, 0,
 +                     s->len, &scale, 0x0);
 +    if (ret < 0) {
-+        free(s);
++        av_free(s);
 +        return NULL;
 +    }
 +
-+    s->tmp = malloc((s->len + 2)*sizeof(float));
++    s->tmp = av_malloc((s->len + 2)*sizeof(float));
 +    if (!s->tmp) {
 +        av_tx_uninit(&s->ctx);
-+        free(s);
++        av_free(s);
 +        return NULL;
 +    }
 +
@@ -210,28 +205,27 @@ index 5a7e62d..9ffbe47 100644
 +}
 +static void * backward_setup(int len) {
 +    int ret;
-+    float scale = (1) ? 0.5f : 1.0f;
++    float scale = 1 ? 0.5f : 1.0f;
 +    AVTXWrapper *s;
 +
-+    s = malloc(sizeof(*s));
++    s = av_mallocz(sizeof(*s));
 +    if (!s)
 +        return NULL;
 +
-+    s->stride = (1) ? sizeof(AVComplexFloat) : sizeof(float);
 +    s->len = 1 << (int)(log(len)/log(2)+.5);
-+    s->inv = (1);
++    s->inv = 1;
 +
-+    ret = av_tx_init(&s->ctx, &s->fn, AV_TX_FLOAT_RDFT, (1),
++    ret = av_tx_init(&s->ctx, &s->fn, AV_TX_FLOAT_RDFT, 1,
 +                     s->len, &scale, 0x0);
 +    if (ret < 0) {
-+        free(s);
++        av_free(s);
 +        return NULL;
 +    }
 +
-+    s->tmp = malloc((s->len + 2)*sizeof(float));
++    s->tmp = av_malloc((s->len + 2)*sizeof(float));
 +    if (!s->tmp) {
 +        av_tx_uninit(&s->ctx);
-+        free(s);
++        av_free(s);
 +        return NULL;
 +    }
 +
@@ -249,7 +243,7 @@ index 5a7e62d..9ffbe47 100644
 +        src[1] = 0.0f;
 +    }
 +
-+    w->fn(w->ctx, dst, (void *)src, w->stride);
++    w->fn(w->ctx, dst, (void *)src, sizeof(float));
 +
 +    if (!w->inv) {
 +        dst[1] = dst[w->len];
@@ -261,8 +255,8 @@ index 5a7e62d..9ffbe47 100644
 +{
 +    if (s) {
 +        av_tx_uninit(&s->ctx);
-+        free(s->tmp);
-+        free(s);
++        av_free(s->tmp);
++        av_free(s);
 +    }
 +}
 +#else
@@ -273,7 +267,7 @@ index 5a7e62d..9ffbe47 100644
  static int multiplier(void) {return 2;}
  static void nothing(void) {}
  static int flags(void) {return RDFT_IS_SIMD;}
-@@ -16,7 +124,11 @@ static int flags(void) {return RDFT_IS_SIMD;}
+@@ -16,7 +121,11 @@ static int flags(void) {return RDFT_IS_SIMD;}
  fn_t _soxr_rdft32s_cb[] = {
    (fn_t)forward_setup,
    (fn_t)backward_setup,
