@@ -153,7 +153,7 @@ static int Open(vlc_object_t *object)
 
     date_Init(&sys->end_date, dec->fmt_in->audio.i_rate, 1);
 
-    for (unsigned i = 0; i < sizeof(sys->shuffle) / sizeof(*sys->shuffle); i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(sys->shuffle); i++) {
         const unsigned a = sys->is_pal ? 18 : 15;
         const unsigned b = 3 * a;
         sys->shuffle[i] = 80 * ((21 * (i % 3) + 9 * (i / 3) + ((i / a) % 3)) % b) +
