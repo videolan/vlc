@@ -116,7 +116,7 @@ static const char *ParseFEC(const char *str)
          return NULL;
      str += 4;
 
-     const struct fec *f = bsearch(str, tab, sizeof (tab) / sizeof(tab[0]),
+     const struct fec *f = bsearch(str, tab, ARRAY_SIZE(tab),
                                    sizeof (tab[0]), cmp);
      return (f != NULL) ? f->vlc : NULL;
 }
@@ -139,7 +139,7 @@ static const char *ParseModulation(const char *str)
      if( str == NULL )
          return NULL;
 
-     const struct mod *m = bsearch(str, tab, sizeof (tab) / sizeof(tab[0]),
+     const struct mod *m = bsearch(str, tab, ARRAY_SIZE(tab),
                                    sizeof (tab[0]), cmp);
      return (m != NULL) ? m->vlc : NULL;
 }
@@ -160,7 +160,7 @@ static const char *ParseGuard(const char *str)
          return NULL;
      str += 15;
 
-     const struct guard *g = bsearch(str, tab, sizeof (tab) / sizeof(tab[0]),
+     const struct guard *g = bsearch(str, tab, ARRAY_SIZE(tab),
                                      sizeof (tab[0]), cmp);
      return (g != NULL) ? g->vlc : NULL;
 }
