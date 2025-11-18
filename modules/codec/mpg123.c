@@ -111,9 +111,7 @@ static int MPG123Open( decoder_t *p_dec )
         static const long mp3_rates[] = {
             8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000,
         };
-        for( size_t i = 0;
-            i < sizeof(mp3_rates) / sizeof(*mp3_rates) && i_ret == MPG123_OK;
-            ++i )
+        for( size_t i = 0; i < ARRAY_SIZE(mp3_rates) && i_ret == MPG123_OK; ++i )
         {
             i_ret =  mpg123_format( p_sys->p_handle, mp3_rates[i],
                                     MPG123_MONO | MPG123_STEREO,
