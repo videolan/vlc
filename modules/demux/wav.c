@@ -247,7 +247,7 @@ static int Open( vlc_object_t * p_this )
                                                       AOUT_CHAN_CENTER }; */
 
                 /* Try to complete with pair */
-                for( unsigned i = 0; i < sizeof(pi_pair)/sizeof(*pi_pair); i++ )
+                for( unsigned i = 0; i < ARRAY_SIZE(pi_pair); i++ )
                 {
                     if( i_missing >= 2 && !(p_sys->i_channel_mask & pi_pair[i] ) )
                     {
@@ -256,7 +256,7 @@ static int Open( vlc_object_t * p_this )
                     }
                 }
                 /* Well fill up with what we can */
-                for( unsigned i = 0; i < sizeof(pi_channels_aout)/sizeof(*pi_channels_aout) && i_missing > 0; i++ )
+                for( unsigned i = 0; i < ARRAY_SIZE(pi_channels_aout) && i_missing > 0; i++ )
                 {
                     if( !( p_sys->i_channel_mask & pi_channels_aout[i] ) )
                     {
@@ -293,7 +293,7 @@ static int Open( vlc_object_t * p_this )
             AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, AOUT_CHAN_REARCENTER };
 
         for( unsigned i = 0; i < p_sys->fmt.audio.i_channels &&
-             i < (sizeof(pi_default_channels) / sizeof(*pi_default_channels));
+             i < ARRAY_SIZE(pi_default_channels);
              i++ )
             p_sys->i_channel_mask |= pi_default_channels[i];
     }
