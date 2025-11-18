@@ -88,7 +88,7 @@ static void vlc_dispatch_sync(void (^block_function)())
     vlc_sem_init(&performed, 0);
 
     CFStringRef modes_cfstrings[] = {
-        kCFRunLoopDefaultMode,
+        kCFRunLoopCommonMode,
         CFSTR("org.videolan.vlccore.window"),
     };
 
