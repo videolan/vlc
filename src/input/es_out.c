@@ -663,7 +663,8 @@ static void EsOutTerminate(es_out_sys_t *p_sys)
     {
         if (es->p_dec != NULL)
         {
-            vlc_input_decoder_Flush(es->p_dec);
+            if (!vlc_input_decoder_IsDrained(es->p_dec))
+                vlc_input_decoder_Flush(es->p_dec);
             vlc_input_decoder_Delete(es->p_dec);
         }
 
@@ -2455,7 +2456,8 @@ static void EsOutDestroyDecoder(es_out_sys_t *sys,
 
     EsOutDeleteSubESes(sys, p_es);
 
-    vlc_input_decoder_Flush(p_es->p_dec);
+    if (!vlc_input_decoder_IsDrained(p_es->p_dec))
+        vlc_input_decoder_Flush(p_es->p_dec);
     vlc_input_decoder_Delete( p_es->p_dec );
     p_es->p_dec = NULL;
     if( p_es->p_pgrm->p_master_es_clock == p_es->p_clock )
@@ -2468,7 +2470,8 @@ static void EsOutDestroyDecoder(es_out_sys_t *sys,
 
     if( p_es->p_dec_record )
     {
-        vlc_input_decoder_Flush(p_es->p_dec_record);
+        if (!vlc_input_decoder_IsDrained(p_es->p_dec_record))
+            vlc_input_decoder_Flush(p_es->p_dec_record);
         vlc_input_decoder_Delete( p_es->p_dec_record );
         p_es->p_dec_record = NULL;
     }
