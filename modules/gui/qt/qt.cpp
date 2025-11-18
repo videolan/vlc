@@ -415,45 +415,47 @@ bool isDarkPaletteEnabled(intf_thread_t *p_intf) {
 
 void applyDarkPalette() {
     QPalette darkPalette;
-    QColor darkColor("#2d2d2d");
-    QColor gray("#808080");
-    QColor lightGray("#aaaaaa");
-    QColor baseColor("#191919");
+    static const QColor darkColor  (33, 33, 33);
+    static const QColor gray       (75,75,75);
+    static const QColor lightGray  (138, 138, 138);
+    static const QColor baseColor  (18, 18, 18);
+    static const QColor linkColor  (255, 168, 81);
+    static const QColor accentColor (42, 130, 218);
 
     // Active group (the currently focused window)
-    darkPalette.setColor(QPalette::Active, QPalette::Window, darkColor);
-    darkPalette.setColor(QPalette::Active, QPalette::WindowText, Qt::white);
-    darkPalette.setColor(QPalette::Active, QPalette::Base, baseColor);
-    darkPalette.setColor(QPalette::Active, QPalette::AlternateBase, darkColor);
-    darkPalette.setColor(QPalette::Active, QPalette::Button, darkColor);
-    darkPalette.setColor(QPalette::Active, QPalette::ButtonText, Qt::white);
-    darkPalette.setColor(QPalette::Active, QPalette::Text, Qt::white);
-    darkPalette.setColor(QPalette::Active, QPalette::Highlight, QColor("#2A82DA"));
+    darkPalette.setColor(QPalette::Active, QPalette::Window,          darkColor);
+    darkPalette.setColor(QPalette::Active, QPalette::WindowText,      Qt::white);
+    darkPalette.setColor(QPalette::Active, QPalette::Base,            baseColor);
+    darkPalette.setColor(QPalette::Active, QPalette::AlternateBase,   darkColor);
+    darkPalette.setColor(QPalette::Active, QPalette::Button,          darkColor);
+    darkPalette.setColor(QPalette::Active, QPalette::ButtonText,      Qt::white);
+    darkPalette.setColor(QPalette::Active, QPalette::Text,            Qt::white);
+    darkPalette.setColor(QPalette::Active, QPalette::Highlight,       accentColor);
     darkPalette.setColor(QPalette::Active, QPalette::HighlightedText, Qt::white);
-    darkPalette.setColor(QPalette::Active, QPalette::Link, QColor("#FFA851"));
+    darkPalette.setColor(QPalette::Active, QPalette::Link,            linkColor);
 
     // Inactive group (unfocused window)
-    darkPalette.setColor(QPalette::Inactive, QPalette::Window, darkColor);
-    darkPalette.setColor(QPalette::Inactive, QPalette::WindowText, lightGray);
-    darkPalette.setColor(QPalette::Inactive, QPalette::Base, baseColor);
-    darkPalette.setColor(QPalette::Inactive, QPalette::AlternateBase, darkColor);
-    darkPalette.setColor(QPalette::Inactive, QPalette::Button, darkColor);
-    darkPalette.setColor(QPalette::Inactive, QPalette::ButtonText, lightGray);
-    darkPalette.setColor(QPalette::Inactive, QPalette::Text, lightGray);
-    darkPalette.setColor(QPalette::Inactive, QPalette::Highlight, QColor("#2A82DA"));
+    darkPalette.setColor(QPalette::Inactive, QPalette::Window,          darkColor);
+    darkPalette.setColor(QPalette::Inactive, QPalette::WindowText,      lightGray);
+    darkPalette.setColor(QPalette::Inactive, QPalette::Base,            baseColor);
+    darkPalette.setColor(QPalette::Inactive, QPalette::AlternateBase,   darkColor);
+    darkPalette.setColor(QPalette::Inactive, QPalette::Button,          darkColor);
+    darkPalette.setColor(QPalette::Inactive, QPalette::ButtonText,      lightGray);
+    darkPalette.setColor(QPalette::Inactive, QPalette::Text,            lightGray);
+    darkPalette.setColor(QPalette::Inactive, QPalette::Highlight,       accentColor);
     darkPalette.setColor(QPalette::Inactive, QPalette::HighlightedText, lightGray);
 
     // Disabled group (grayed-out widgets)
-    darkPalette.setColor(QPalette::Disabled, QPalette::Window, darkColor);
-    darkPalette.setColor(QPalette::Disabled, QPalette::WindowText, lightGray);
-    darkPalette.setColor(QPalette::Disabled, QPalette::Base, baseColor);
-    darkPalette.setColor(QPalette::Disabled, QPalette::AlternateBase, darkColor);
-    darkPalette.setColor(QPalette::Disabled, QPalette::Button, lightGray.darker());
-    darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText, gray);
-    darkPalette.setColor(QPalette::Disabled, QPalette::Text, gray);
-    darkPalette.setColor(QPalette::Disabled, QPalette::Highlight, gray);
+    darkPalette.setColor(QPalette::Disabled, QPalette::Window,          darkColor);
+    darkPalette.setColor(QPalette::Disabled, QPalette::WindowText,      lightGray);
+    darkPalette.setColor(QPalette::Disabled, QPalette::Base,            baseColor);
+    darkPalette.setColor(QPalette::Disabled, QPalette::AlternateBase,   darkColor);
+    darkPalette.setColor(QPalette::Disabled, QPalette::Button,          baseColor);
+    darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText,      gray);
+    darkPalette.setColor(QPalette::Disabled, QPalette::Text,            gray);
+    darkPalette.setColor(QPalette::Disabled, QPalette::Highlight,       gray);
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, gray);
-    darkPalette.setColor(QPalette::Disabled, QPalette::Light, darkColor);
+    darkPalette.setColor(QPalette::Disabled, QPalette::Light,           darkColor);
 
     // Apply the dark palette globally
     QApplication::setPalette(darkPalette);
