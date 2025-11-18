@@ -178,26 +178,19 @@ check_tool()
 set_deployment_target()
 {
     VLC_DEPLOYMENT_TARGET="$1"
-    VLC_DEPLOYMENT_TARGET_LDFLAG="${VLC_HOST_OS}"
     VLC_DEPLOYMENT_TARGET_CFLAG="-m$VLC_HOST_OS"
 
-    if [ "$VLC_HOST_OS" = "macosx" ]; then
-        VLC_DEPLOYMENT_TARGET_LDFLAG="macos"
-    else
-        VLC_DEPLOYMENT_TARGET_LDFLAG="${VLC_HOST_OS}"
-    fi
-
     if [ -n "$VLC_HOST_PLATFORM_SIMULATOR" ]; then
-        VLC_DEPLOYMENT_TARGET_LDFLAG="${VLC_HOST_OS}-simulator"
         VLC_DEPLOYMENT_TARGET_CFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}-simulator"
     fi
-    VLC_DEPLOYMENT_TARGET_LDFLAG="-Wl,-platform_version,${VLC_DEPLOYMENT_TARGET_LDFLAG},${VLC_DEPLOYMENT_TARGET},${VLC_APPLE_SDK_VERSION}"
 
-    # xrOS does not support the minimal version flag in clang 15.x (yet ?)
+    # TODO: To support setting the min version for xrOS we need to use a target triplet
     if [ "$VLC_HOST_OS" != "xros" ]; then
         VLC_DEPLOYMENT_TARGET_CFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}-version-min=${VLC_DEPLOYMENT_TARGET}"
+        VLC_DEPLOYMENT_TARGET_LDFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}"
     else
-	    VLC_DEPLOYMENT_TARGET_CFLAG=""
+        VLC_DEPLOYMENT_TARGET_CFLAG=""
+        VLC_DEPLOYMENT_TARGET_LDFLAG=""
     fi
 }
 
