@@ -814,7 +814,7 @@ int InitVideoEnc( vlc_object_t *p_this )
         p_context->channel_layout = channel_mask[p_context->channels][1];
         uint64_t channel_mask = p_context->channel_layout;
 #endif
-        for( unsigned i = 0; i < sizeof(pi_channels_map)/sizeof(*pi_channels_map); i++ )
+        for( unsigned i = 0; i < ARRAY_SIZE(pi_channels_map); i++ )
         {
             if( channel_mask & pi_channels_map[i][0] )
             {
@@ -949,7 +949,7 @@ errmsg:
                 char txt[4];
             } fcc = { .value = p_enc->fmt_out.i_codec };
 
-            if (likely((unsigned)p_enc->fmt_in.i_cat < sizeof (types) / sizeof (types[0])))
+            if (likely((unsigned)p_enc->fmt_in.i_cat < ARRAY_SIZE(types)))
                 type = types[p_enc->fmt_in.i_cat];
             msg_Err( p_enc, "cannot open %4.4s %s encoder", fcc.txt, type );
             vlc_dialog_display_error( p_enc, _("Streaming / Transcoding failed"),
