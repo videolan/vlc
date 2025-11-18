@@ -38,6 +38,7 @@
 #include "dialogs_provider.hpp" /* THEDP creation */
 #ifdef _WIN32
 # include "main_interface_win32.hpp"
+# include "util/qvlcframe.hpp" /* Accent Color */
 #else
 # include "main_interface.hpp"   /* MainInterface creation */
 #endif
@@ -420,7 +421,12 @@ void applyDarkPalette() {
     static const QColor lightGray  (138, 138, 138);
     static const QColor baseColor  (18, 18, 18);
     static const QColor linkColor  (255, 168, 81);
-    static const QColor accentColor (42, 130, 218);
+
+#ifdef Q_OS_WIN
+    QColor accentColor = getWindowsAccentColor();
+#else
+    QColor accentColor (42, 130, 218);
+#endif
 
     // Active group (the currently focused window)
     darkPalette.setColor(QPalette::Active, QPalette::Window,          darkColor);

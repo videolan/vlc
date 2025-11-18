@@ -37,10 +37,16 @@
 
 #ifdef _WIN32
     #include <QLibrary>
-    #include <dwmapi.h>
+
+    // Typedefs for functions
+    typedef HRESULT(WINAPI *DwmSetWindowAttributeFunc)(HWND, DWORD, LPCVOID, DWORD);
+    typedef HRESULT(WINAPI *DwmGetColorizationColorFunc)(DWORD*, BOOL*);
+
+    // Dark mode constants
+    constexpr DWORD DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+    constexpr DWORD DWMWA_USE_DARK_MODE_UNDOCUMENTED = 19;
 
     inline bool setImmersiveDarkModeAttribute(HWND hwnd, bool enable) {
-        typedef HRESULT(WINAPI *DwmSetWindowAttributeFunc)(HWND, DWORD, LPCVOID, DWORD);
         static const auto dwmSetWindowAttributeFunc = []() -> DwmSetWindowAttributeFunc {
             HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
             if (GetProcAddress(hKernel32, "GetSystemCpuSetInformation") == NULL)
@@ -55,13 +61,8 @@
 
         const BOOL pvAttribute = enable ? TRUE : FALSE;
 
-        enum Attribute : DWORD {
-            DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
-            DWMWA_USE_DARK_MODE_UNDOCUMENTED = 19
-        };
-
-        return SUCCEEDED(dwmSetWindowAttributeFunc(hwnd, Attribute::DWMWA_USE_IMMERSIVE_DARK_MODE, &pvAttribute, sizeof(pvAttribute)))
-            || SUCCEEDED(dwmSetWindowAttributeFunc(hwnd, Attribute::DWMWA_USE_DARK_MODE_UNDOCUMENTED, &pvAttribute, sizeof(pvAttribute)));
+        return SUCCEEDED(dwmSetWindowAttributeFunc(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &pvAttribute, sizeof(pvAttribute)))
+            || SUCCEEDED(dwmSetWindowAttributeFunc(hwnd, DWMWA_USE_DARK_MODE_UNDOCUMENTED, &pvAttribute, sizeof(pvAttribute)));
     }
 
     // Overloaded function to apply dark mode to QWidget*
@@ -72,6 +73,63 @@
             return setImmersiveDarkModeAttribute(hwnd,true);  // Call the HWND version
         }
         return false;
+    }
+
+    // Get Windows accent color
+    inline QColor getWindowsAccentColor()
+    {
+        static const auto dwmGetColorizationColorFunc = []() -> DwmGetColorizationColorFunc {
+            QLibrary dwmapidll("dwmapi");
+            return reinterpret_cast<DwmGetColorizationColorFunc>(dwmapidll.resolve("DwmGetColorizationColor"));
+        }();
+        static const QColor fallbackColor(42, 130, 218);
+        if (!dwmGetColorizationColorFunc) return fallbackColor;
+
+        DWORD color = 0;
+        BOOL opaque = FALSE;
+        HRESULT hr = dwmGetColorizationColorFunc(&color, &opaque);
+
+        if (FAILED(hr)) return fallbackColor;
+
+        QColor c(qRed(color), qGreen(color), qBlue(color));
+        
+        int h = c.hue();
+        int s = c.saturation();
+        int v = c.value();
+
+        // 1) Make the color DARKER overall (to match dark-theme highlights)
+        v = qBound(60, v, 160);   // Old: 120–220, New: 60–160 → much darker
+
+        // 2) Ensure enough saturation so it's not muddy/gray
+        s = qBound(80, s, 255);   // Old: s >= 55 → now greater minimum
+
+        // 3) Prevent neon colors (very bright + very saturated)
+        if (s > 220 && v > 140) {
+            s = 200;
+            v = 120;
+        }
+
+        // 4) Special casing for yellow / green hues.
+        // These colors have poor contrast with white unless darkened heavily.
+        if (h >= 30 && h <= 85) {         // Yellow to yellow-green
+            h = (h - 10 + 360) % 360;     // Shift toward orange (warmer, safer)
+            s = qBound(100, s, 180);      // Prevent neon yellows
+            v = qBound(70,  v, 130);      // Ensure dark-ish gold
+        }
+        else if (h >= 85 && h <= 140) {   // Greens → shift toward teal
+            h = (h + 20) % 360;           // Move green → teal for better white contrast
+            s = qBound(100, s, 220);
+            v = qBound(60,  v, 140);
+        }
+
+        // 5) Final normalization: ensure contras
+        if (v > 150) v = 150;     // Hard cap brightness
+        if (s < 80)  s = 80;      // Hard floor saturation
+
+        // Rebuild safe accent
+        c.setHsv(h, s, v);
+
+        return c;
     }
 
 #endif
@@ -147,7 +205,7 @@ public:
         if (isDarkPaletteEnabled(p_intf))
             setImmersiveDarkModeAttribute(this);
 #endif
-	};
+    };
     virtual ~QVLCFrame()   {};
 
     void toggleVisible()
@@ -241,12 +299,12 @@ class QVLCMW : public QMainWindow
 {
 public:
     QVLCMW( intf_thread_t *_p_intf ) : QMainWindow( NULL ), p_intf( _p_intf )
-	{
+    {
 #ifdef Q_OS_WIN
         if (isDarkPaletteEnabled(p_intf))
             setImmersiveDarkModeAttribute(this);
 #endif
-	}
+    }
     void toggleVisible()
     {
         if( isVisible() ) hide();
