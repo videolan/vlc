@@ -214,7 +214,7 @@ static void fill_channels_info(audio_format_t *audio)
     };
 
     unsigned chans = audio->i_channels;
-    if (chans < sizeof(pi_channels_map) / sizeof(pi_channels_map[0]))
+    if (chans < ARRAY_SIZE(pi_channels_map))
         audio->i_physical_channels = pi_channels_map[chans];
 }
 
@@ -3488,12 +3488,12 @@ static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
         {24000,1001}, {24,1}, {25,1}, {30000,1001}, {30,1},
         {50,1}, {60000,1001}, {60,1}, {15000,1001}, {25,2},
     };
-    static const size_t u_dirac_frate_tbl = sizeof(p_dirac_frate_tbl)/sizeof(*p_dirac_frate_tbl);
+    static const size_t u_dirac_frate_tbl = ARRAY_SIZE(p_dirac_frate_tbl);
 
     static const uint32_t pu_dirac_vidfmt_frate[] = { /* table C.1 */
         1, 9, 10, 9, 10, 9, 10, 4, 3, 7, 6, 4, 3, 7, 6, 2, 2, 7, 6, 7, 6,
     };
-    static const size_t u_dirac_vidfmt_frate = sizeof(pu_dirac_vidfmt_frate)/sizeof(*pu_dirac_vidfmt_frate);
+    static const size_t u_dirac_vidfmt_frate = ARRAY_SIZE(pu_dirac_vidfmt_frate);
 
     bs_t bs;
 
