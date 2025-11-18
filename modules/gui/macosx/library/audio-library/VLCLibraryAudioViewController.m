@@ -44,6 +44,7 @@
 #import "library/audio-library/VLCLibraryAudioGroupHeaderView.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
 #import "library/audio-library/VLCLibraryAudioTableViewDelegate.h"
 
 #import "library/playlist-library/VLCLibraryPlaylistViewController.h"
@@ -200,6 +201,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionHeaderView.autoresizingMask = NSViewWidthSizable;
 
     _audioGroupSelectionTableView.headerView = self.audioCollectionHeaderView;
+    _audioGroupSelectionTableView.tableColumns.firstObject.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
 
     _audioGroupSelectionTableView.dataSource = _audioGroupDataSource;
     _audioGroupSelectionTableView.delegate = _audioGroupLibraryTableViewDelegate;

@@ -282,6 +282,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupDataSource.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupHeaderView.h \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupHeaderView.m \
+	gui/macosx/library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h \
+	gui/macosx/library/audio-library/VLCLibraryAudioGroupTableHeaderCell.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupTableHeaderView.h \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupTableHeaderView.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h \
