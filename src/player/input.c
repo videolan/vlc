@@ -272,6 +272,12 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
         case VLC_PLAYER_STATE_STOPPING:
             input->started = false;
 
+            /* Note: no need to hold the media here, as it is already protected
+               by the player lock. User can hold the input_item, if they want
+               to use it beyond the callback scope. */
+            input_item_t *media = input_GetItem(input->thread);
+            vlc_player_SendEvent(player, on_stopping_current_media, media);
+
             vlc_player_UpdateTimerEvent(player, NULL,
                                         VLC_PLAYER_TIMER_EVENT_DISCONTINUITY,
                                         VLC_TICK_INVALID);

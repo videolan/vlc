@@ -3272,7 +3272,8 @@ struct vlc_player_cbs
      *
      * @note This can be called from the PLAYING state, before the
      * player requests the next media, or from the STOPPING state, ie.
-     * when the player is stopping.
+     * when the player is stopping, or by an internal transition
+     * (e.g., when the media reaches the end of file or errors out).
      *
      * @see vlc_player_SetCurrentMedia()
      * @see vlc_player_Stop()
