@@ -202,6 +202,7 @@ vlc_player_destructor_Thread(void *data)
         struct vlc_player_input *input;
         vlc_list_foreach(input, &player->destructor.inputs, node)
         {
+            input_Stop(input->thread);
             vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                          VLC_TICK_INVALID);
             vlc_player_destructor_AddStoppingInput(player, input);
@@ -210,7 +211,6 @@ vlc_player_destructor_Thread(void *data)
              * until input_Close() and the event is sent from the thread
              * that will call this function. */
             input_item_t *media = input_GetItem(input->thread);
-            input_Stop(input->thread);
             vlc_player_SendEvent(player, on_stopping_current_media, media);
         }
 
