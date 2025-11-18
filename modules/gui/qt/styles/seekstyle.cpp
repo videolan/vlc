@@ -73,6 +73,8 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
         if ( const SeekStyle::SeekStyleOption *slideroptions =
              qstyleoption_cast<const SeekStyle::SeekStyleOption *>( option ) )
         {
+            /* theme detection */
+            bool dark = isDarkPaletteEnabled(nullptr);
             qreal sliderPos = -1;
 
             /* Get the needed subcontrols to draw the slider */
@@ -94,19 +96,52 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
                         * (qreal)slideroptions->sliderPosition;
 
                 /* set the background color and gradient */
-                QColor backgroundBase( slideroptions->palette.window().color() );
+                QColor backgroundBase = slideroptions->palette.color(QPalette::Window);
                 QLinearGradient backgroundGradient( 0, 0, 0, slideroptions->rect.height() );
-                backgroundGradient.setColorAt( 0.0, backgroundBase.darker( 140 ) );
-                backgroundGradient.setColorAt( 1.0, backgroundBase );
+
+                if (dark)
+                {
+                    QColor top(0x25, 0x25, 0x25);
+                    QColor bot(0x65, 0x65, 0x65);
+
+                    backgroundGradient.setColorAt(0.00, top);
+                    backgroundGradient.setColorAt(1.00, bot);
+                } else {
+                    backgroundGradient.setColorAt(0.0, backgroundBase.darker(140));
+                    backgroundGradient.setColorAt(1.0, backgroundBase);
+                }
 
                 /* set the foreground color and gradient */
                 QColor foregroundBase( 50, 156, 255 );
                 QLinearGradient foregroundGradient( 0, 0, 0, groove.height() );
-                foregroundGradient.setColorAt( 0.0,  foregroundBase );
-                foregroundGradient.setColorAt( 1.0,  foregroundBase.darker( 125 ) );
+
+                if (dark) {
+                    #ifdef Q_OS_WIN
+                        /* use accent color on windows dark mode */
+                        foregroundBase = slideroptions->palette.color(QPalette::Highlight);
+                    #endif
+                    /* adjust gradient dynamically based on accent */
+                    int v = foregroundBase.value();
+                    int lighterFactor = 130 + (255 - v) / 3;
+                    lighterFactor = qBound(130, lighterFactor, 200);
+
+                    int darkerFactor = 100 + v / 20;
+                    darkerFactor = qBound(100, darkerFactor, 115);
+
+                    foregroundGradient.setColorAt(0.0, foregroundBase.lighter(lighterFactor));
+                    foregroundGradient.setColorAt(1.0, foregroundBase.darker(darkerFactor));
+                } else {
+                    /* original vlc blue gloss */
+                    foregroundGradient.setColorAt(0.0, foregroundBase);
+                    foregroundGradient.setColorAt(1.0, foregroundBase.darker(125));
+                }
 
                 /* draw a slight 3d effect on the bottom */
-                painter->setPen( QColor( 230, 230, 230 ) );
+                if (dark)
+                    painter->setPen(slideroptions->palette.color(QPalette::Mid));
+                else
+                    painter->setPen(QColor(230, 230, 230));
+
                 painter->setBrush( Qt::NoBrush );
                 painter->drawRoundedRect( groove.adjusted( 0, 2, 0, 0 ), RADIUS, RADIUS );
 
@@ -180,7 +215,10 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
                             foreach( int64_t time, slideroptions->points )
                             {
                                 int x = groove.x() + time / 1000000.0 / slideroptions->length * groove.width();
-                                painter->setPen( foreground );
+                                QColor tick = p.color(QPalette::Mid);
+                                if (dark)
+                                    tick = p.color(QPalette::Light);
+                                painter->setPen(tick);
                                 painter->setBrush( Qt::NoBrush );
                                 painter->drawLine( x, slideroptions->rect.height(), x, slideroptions->rect.height() - CHAPTERSSPOTSIZE );
                             }
@@ -198,16 +236,45 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
 
                         /* prepare the handle's gradient */
                         QLinearGradient handleGradient( 0, 0, 0, hSize.height() );
-                        handleGradient.setColorAt( 0.0, p.window().color().lighter( 120 ) );
-                        handleGradient.setColorAt( 0.9, p.window().color().darker( 120 ) );
+
+                        // pick theme-based base color
+                        QColor base = p.color(QPalette::Window);
+
+                        QColor handleTop;
+                        QColor handleBottom;
+
+                        if (dark) {
+                            handleTop = base.lighter(105);
+                            handleBottom = base.darker(110);
+                        } else {
+                            handleTop = base.lighter(120);
+                            handleBottom = base.darker(120);
+                        }
+
+                        handleGradient.setColorAt(0.0, handleTop);
+                        handleGradient.setColorAt(0.9, handleBottom);
 
                         /* prepare the handle's shadow gradient */
-                        QColor shadowBase = p.shadow().color();
-                        if( shadowBase.lightness() > 100 )
-                            shadowBase = QColor( 60, 60, 60 ); // Palette's shadow is too bright
-                        QColor shadowDark( shadowBase.darker( 150 ) );
-                        QColor shadowLight( shadowBase.lighter( 180 ) );
-                        shadowLight.setAlpha( 50 );
+                        QColor shadowBase = p.color(QPalette::Shadow);
+
+                        QColor shadowDark;
+                        QColor shadowLight;
+
+                        if (dark) {
+                            if (shadowBase.lightness() > 70)
+                                shadowBase = QColor(20,20,20);
+
+                            shadowDark = shadowBase.darker(130);
+                            shadowLight = shadowBase.lighter(140);
+                            shadowLight.setAlpha(40);
+                        } else {
+                            if (shadowBase.lightness() < 200)
+                                shadowBase = QColor(60,60,60);
+
+                            shadowDark = shadowBase.darker(150);
+                            shadowLight = shadowBase.lighter(180);
+                            shadowLight.setAlpha(60);
+}
 
                         QRadialGradient shadowGradient( shadowPos.x() + ( sSize.width() / 2 ),
                                                         shadowPos.y() + ( sSize.height() / 2 ),
