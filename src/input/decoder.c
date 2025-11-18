@@ -30,6 +30,7 @@
 #endif
 #include <assert.h>
 #include <stdatomic.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_block.h>
@@ -220,7 +221,7 @@ struct vlc_input_decoder_t
     vlc_tick_t pause_date;
     vlc_tick_t delay, output_delay;
     float rate, output_rate;
-    unsigned frames_countdown;
+    int frames_countdown;
     bool paused, output_paused;
 
     bool error;
@@ -2564,7 +2565,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
      * to display one frame/subtitle */
     if( p_owner->paused && ( cat == VIDEO_ES || cat == SPU_ES )
      && p_owner->frames_countdown == 0 )
-        p_owner->frames_countdown++;
+        p_owner->frames_countdown = 1;
 
     if ( p_owner->p_sout_input != NULL )
     {
@@ -2739,6 +2740,13 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
     if( p_owner->video.vout == NULL )
     {
         decoder_Notify( p_owner, frame_next_status, -EBUSY );
+        vlc_fifo_Unlock( p_owner->p_fifo );
+        return;
+    }
+
+    if( unlikely( p_owner->frames_countdown == INT_MAX ) )
+    {
+        decoder_Notify( p_owner, frame_next_status, -EINVAL );
         vlc_fifo_Unlock( p_owner->p_fifo );
         return;
     }
