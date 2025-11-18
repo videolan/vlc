@@ -1260,15 +1260,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
 
         // Block calling queue while we modify the cache, preventing dangerous concurrent modification
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
-            [mutableAudioGroupCache replaceObjectAtIndex:audioGroupIndex withObject:audioGroupItem];
-            NSArray * const immutableCopy = [mutableAudioGroupCache copy];
+        NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
+        [mutableAudioGroupCache replaceObjectAtIndex:audioGroupIndex withObject:audioGroupItem];
+        NSArray * const immutableCopy = [mutableAudioGroupCache copy];
 
-            const IMP cacheSetterImp = [self methodForSelector:setterSelector];
-            void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
-            cacheSetterFunction(self, setterSelector, immutableCopy);
+        const IMP cacheSetterImp = [self methodForSelector:setterSelector];
+        void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
+        cacheSetterFunction(self, setterSelector, immutableCopy);
 
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
         });
     });
@@ -1292,16 +1292,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         const id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem = cache[audioGroupIndex];
 
-        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
-            [mutableAudioGroupCache removeObjectAtIndex:audioGroupIndex];
-            NSArray * const immutableCopy = [mutableAudioGroupCache copy];
+        NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
+        [mutableAudioGroupCache removeObjectAtIndex:audioGroupIndex];
+        NSArray * const immutableCopy = [mutableAudioGroupCache copy];
 
-            const IMP cacheSetterImp = [self methodForSelector:setterSelector];
-            void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
-            cacheSetterFunction(self, setterSelector, immutableCopy);
+        const IMP cacheSetterImp = [self methodForSelector:setterSelector];
+        void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
+        cacheSetterFunction(self, setterSelector, immutableCopy);
 
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
         });
     });
@@ -1423,12 +1422,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            VLCMediaLibraryGroup * const group = mutableGroups[groupIdx];
-            [mutableGroups removeObjectAtIndex:groupIdx];
-            self.cachedListOfGroups = mutableGroups.copy;
+        VLCMediaLibraryGroup * const groupToDelete = mutableGroups[groupIdx];
+        [mutableGroups removeObjectAtIndex:groupIdx];
+        self.cachedListOfGroups = mutableGroups.copy;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupDeleted
-                                                            object:group];
+                                                            object:groupToDelete];
         });
     });
 }
@@ -1458,11 +1458,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableGroups = self.cachedListOfGroups.mutableCopy;
-            [mutableGroups replaceObjectAtIndex:groupIdx withObject:group];
-            self.cachedListOfGroups = mutableGroups.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupUpdated object:group];
+        NSMutableArray * const mutableGroups = self.cachedListOfGroups.mutableCopy;
+        [mutableGroups replaceObjectAtIndex:groupIdx withObject:group];
+        self.cachedListOfGroups = mutableGroups.copy;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupUpdated
+                                                            object:group];
         });
     });
 }
