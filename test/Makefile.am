@@ -14,6 +14,7 @@ check_PROGRAMS = \
 	test_libvlc_media \
 	test_libvlc_media_callback \
 	test_libvlc_media_thumbnail_argb \
+	test_libvlc_media_thumbnail_rgba \
 	test_libvlc_media_thumbnail_jpeg \
 	test_libvlc_media_thumbnail_png \
 	test_libvlc_media_thumbnail_webp \
@@ -138,6 +139,9 @@ test_libvlc_media_callback_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_argb_SOURCES = libvlc/media_thumbnail.c
 test_libvlc_media_thumbnail_argb_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_argb_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Argb -DTEST_REQUIRED_MODULES=\"avcodec\"
+test_libvlc_media_thumbnail_rgba_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_rgba_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_libvlc_media_thumbnail_rgba_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Rgba -DTEST_REQUIRED_MODULES=\"avcodec\"
 test_libvlc_media_thumbnail_png_SOURCES = libvlc/media_thumbnail.c
 test_libvlc_media_thumbnail_png_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_png_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Png -DTEST_REQUIRED_MODULES=\"png\"

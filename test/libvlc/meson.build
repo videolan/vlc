@@ -40,6 +40,19 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_libvlc_media_thumbnail_rgba',
+    'sources' : files('media_thumbnail.c'),
+    'link_with' : [libvlc, libvlccore],
+    'suite' : ['libvlc', 'test_libvlc_media_thumbnail'],
+    'c_args' : [
+        '-DTEST_THUMB_TYPE=libvlc_picture_Rgba',
+        '-DTEST_REQUIRED_MODULES="avcodec"',
+    ],
+    'module_depends': ['demux_mock', 'swscale', 'avcodec'],
+}
+
+
+vlc_tests += {
     'name' : 'test_libvlc_media_thumbnail_jpeg',
     'sources' : files('media_thumbnail.c'),
     'link_with' : [libvlc, libvlccore],
