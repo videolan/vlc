@@ -73,6 +73,7 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
         [libvlc_picture_Png] = VLC_CODEC_PNG,
         [libvlc_picture_Argb] = VLC_CODEC_ARGB,
         [libvlc_picture_WebP] = VLC_CODEC_WEBP,
+        [libvlc_picture_Rgba] = VLC_CODEC_RGBA,
     };
     assert(ARRAY_SIZE(table) > type && table[type] != 0);
     vlc_fourcc_t format = table[type];
@@ -191,7 +192,7 @@ libvlc_picture_type_t libvlc_picture_type( const libvlc_picture_t* pic )
 
 unsigned int libvlc_picture_get_stride( const libvlc_picture_t *pic )
 {
-    assert( pic->type == libvlc_picture_Argb );
+    assert( pic->type == libvlc_picture_Argb || pic->type == libvlc_picture_Rgba );
     return pic->fmt.i_width * 4;
 }
 

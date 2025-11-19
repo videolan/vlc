@@ -36,6 +36,7 @@ typedef enum libvlc_picture_type_t
     libvlc_picture_Png,
     libvlc_picture_Jpg,
     libvlc_picture_WebP,
+    libvlc_picture_Rgba,
 } libvlc_picture_type_t;
 
 /**
