@@ -269,7 +269,7 @@ on_playlist_playback_order_changed(vlc_playlist_t *playlist,
 }
 
 static void
-on_playlist_current_item_changed(vlc_playlist_t *playlist, ssize_t index,
+on_playlist_current_index_changed(vlc_playlist_t *playlist, ssize_t index,
                                  void *userdata)
 {
     PlaylistControllerPrivate *that = static_cast<PlaylistControllerPrivate *>(userdata);
@@ -355,7 +355,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = []{
     cbs.on_items_updated = on_playlist_items_updated;
     cbs.on_playback_repeat_changed = on_playlist_playback_repeat_changed;
     cbs.on_playback_order_changed= on_playlist_playback_order_changed;
-    cbs.on_current_index_changed = on_playlist_current_item_changed;
+    cbs.on_current_index_changed = on_playlist_current_index_changed;
     cbs.on_has_next_changed = on_playlist_has_next_changed;
     cbs.on_has_prev_changed = on_playlist_has_prev_changed;
     cbs.on_media_stopped_action_changed = on_media_stopped_action_changed;
