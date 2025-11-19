@@ -276,7 +276,8 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
                by the player lock. User can hold the input_item, if they want
                to use it beyond the callback scope. */
             input_item_t *media = input_GetItem(input->thread);
-            vlc_player_SendEvent(player, on_stopping_current_media, media);
+            vlc_player_SendEvent(player, on_stopping_current_media,
+                                 media, input->stopping_reason);
 
             vlc_player_UpdateTimerEvent(player, NULL,
                                         VLC_PLAYER_TIMER_EVENT_DISCONTINUITY,
@@ -347,6 +348,7 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
             break;
         case END_S:
             input->playing = false;
+            input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_EOS;
             vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                          VLC_TICK_INVALID);
             vlc_player_destructor_AddStoppingInput(input->player, input);
@@ -364,6 +366,7 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
              * the input thread and we won't reach END_S. */
             if (!input->playing)
             {
+                input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_ERROR;
                 vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                              VLC_TICK_INVALID);
                 vlc_player_destructor_AddStoppingInput(input->player, input);
@@ -1042,8 +1045,11 @@ input_thread_Events(input_thread_t *input_thread,
             break;
         case INPUT_EVENT_DEAD:
             if (input->started) /* Can happen with early input_thread fails */
+            {
+                input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_ERROR;
                 vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                              VLC_TICK_INVALID);
+            }
             vlc_player_destructor_AddJoinableInput(player, input);
             break;
         case INPUT_EVENT_VBI_PAGE:
@@ -1130,6 +1136,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 
     input->state = VLC_PLAYER_STATE_STOPPED;
     input->error = VLC_PLAYER_ERROR_NONE;
+    input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_ERROR;
     input->rate = 1.f;
     input->capabilities = 0;
     input->length = input->time = VLC_TICK_INVALID;

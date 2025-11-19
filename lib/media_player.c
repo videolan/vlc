@@ -79,10 +79,12 @@ on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
 
 static void
 on_stopping_current_media(vlc_player_t *player, input_item_t *media,
-                         void *data)
+                          enum vlc_player_media_stopping_reason stopping_reason,
+                          void *data)
 {
     assert(media != NULL);
     (void) player;
+    (void) stopping_reason;
 
     libvlc_media_player_t *mp = data;
 

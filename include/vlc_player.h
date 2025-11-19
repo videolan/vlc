@@ -302,6 +302,19 @@ enum vlc_player_abloop
     VLC_PLAYER_ABLOOP_B,
 };
 
+/**
+ * Reason why the current media is stopping
+ */
+enum vlc_player_media_stopping_reason
+{
+    /** The media is stopping because of an error (default) */
+    VLC_PLAYER_MEDIA_STOPPING_ERROR,
+    /** The media reached the end of stream */
+    VLC_PLAYER_MEDIA_STOPPING_EOS,
+    /** The media is stopping because of a user request */
+    VLC_PLAYER_MEDIA_STOPPING_USER,
+};
+
 /** Player capability: can seek */
 #define VLC_PLAYER_CAP_SEEK (1<<0)
 /** Player capability: can pause */
@@ -3279,11 +3292,13 @@ struct vlc_player_cbs
      * @see vlc_player_Stop()
      *
      * @param player locked player instance
-     * @param prev_media media currently stopping
+     * @param current_media media currently stopping
+     * @param stopping_reason reason why the media is stopping
      * @param data opaque pointer set by vlc_player_AddListener()
      */
-    void (*on_stopping_current_media)(vlc_player_t *player,
-            input_item_t *current_media, void *data);
+    void (*on_stopping_current_media)(vlc_player_t *player, input_item_t *current_media,
+                                      enum vlc_player_media_stopping_reason stopping_reason,
+                                      void *data);
 };
 
 /**
