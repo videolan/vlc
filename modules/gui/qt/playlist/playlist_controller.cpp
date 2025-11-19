@@ -290,8 +290,15 @@ on_playlist_current_index_changed(vlc_playlist_t *playlist, ssize_t index,
             that->m_currentIndex = index;
             emit q->currentIndexChanged(that->m_currentIndex);
         }
-        that->m_currentItem = newItem;
-        emit q->currentItemChanged();
+
+        // Unlike items updated callback, we should not need to unconditionally
+        // set the current item to update data because this is only a current
+        // index changed callback.
+        if (that->m_currentItem.raw() != newItem.raw())
+        {
+            that->m_currentItem = newItem;
+            emit q->currentItemChanged();
+        }
     });
 }
 
