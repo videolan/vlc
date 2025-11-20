@@ -243,7 +243,7 @@ void CloseIntf (vlc_object_t *p_this)
 
 static VLCMain *sharedInstance = nil;
 
-+ (VLCMain *)sharedInstance;
++ (VLCMain *)sharedInstance
 {
     static dispatch_once_t pred;
     dispatch_once(&pred, ^{
