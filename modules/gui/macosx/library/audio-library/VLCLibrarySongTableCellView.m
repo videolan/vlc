@@ -133,6 +133,7 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
         self.trackNumberTextField.stringValue = [NSString stringWithFormat:@"%d", mediaItem.trackNumber];
     }
 
+    [self playStateOrItemChanged:nil];
 }
 
 @end
