@@ -259,7 +259,7 @@ static void EsOutDeleteInfoEs(es_out_sys_t *, es_out_id_t *es);
 static void EsOutUnselectEs(es_out_sys_t *out, es_out_id_t *es, bool b_update);
 static void EsOutDecoderChangeDelay(es_out_sys_t *out, es_out_id_t *p_es);
 static void EsOutDecodersChangePause(es_out_sys_t *out, bool b_paused, vlc_tick_t i_date);
-static void EsOutChangePosition(es_out_sys_t *out, bool b_flush, es_out_id_t *p_next_frame_es);
+static void EsOutChangePosition(es_out_sys_t *out, es_out_id_t *p_next_frame_es);
 static void EsOutProgramChangePause(es_out_sys_t *out, bool b_paused, vlc_tick_t i_date);
 static void EsOutProgramsChangeRate(es_out_sys_t *out);
 static void EsOutDecodersStopBuffering(es_out_sys_t *out, bool b_forced);
@@ -883,7 +883,7 @@ static void EsOutStopNextFrame(es_out_sys_t *p_sys)
 {
     assert( p_sys->p_next_frame_es != NULL );
     /* Flush every ES except the video one */
-    EsOutChangePosition(p_sys, true, p_sys->p_next_frame_es );
+    EsOutChangePosition(p_sys, p_sys->p_next_frame_es );
     p_sys->p_next_frame_es = NULL;
 }
 
@@ -941,7 +941,7 @@ static void EsOutChangeRate(es_out_sys_t *p_sys, float rate)
             vlc_input_decoder_ChangeRate( es->p_dec, rate );
 }
 
-static void EsOutChangePosition(es_out_sys_t *p_sys, bool b_flush,
+static void EsOutChangePosition(es_out_sys_t *p_sys,
                                 es_out_id_t *p_next_frame_es)
 {
     es_out_id_t *p_es;
@@ -952,7 +952,7 @@ static void EsOutChangePosition(es_out_sys_t *p_sys, bool b_flush,
     {
         if( p_es->p_dec != NULL )
         {
-            if( b_flush && p_es != p_next_frame_es )
+            if( p_es != p_next_frame_es )
                 vlc_input_decoder_Flush( p_es->p_dec );
             if( !p_sys->b_buffering )
             {
@@ -1021,7 +1021,7 @@ static void EsOutDecodersStopBuffering(es_out_sys_t *p_sys, bool b_forced)
      * increase the buffering duration. */
     if (i_stream_duration < 0)
     {
-        EsOutChangePosition(p_sys, true, NULL);
+        EsOutChangePosition(p_sys, NULL);
         return;
     }
 
@@ -3520,7 +3520,7 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
 
     case ES_OUT_RESET_PCR:
         msg_Dbg( p_sys->p_input, "ES_OUT_RESET_PCR called" );
-        EsOutChangePosition(p_sys, true, NULL);
+        EsOutChangePosition(p_sys, NULL);
         return VLC_SUCCESS;
 
     case ES_OUT_SET_GROUP:
