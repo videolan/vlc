@@ -116,6 +116,9 @@ public:
     int64_t asMilliseconds() const override;
     int64_t asSeconds() const override;
     bool valid() const override;
+
+private:
+    bool m_valid;
 };
 
 class VLCTime : public VLCTick

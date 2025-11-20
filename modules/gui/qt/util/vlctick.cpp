@@ -168,22 +168,28 @@ int VLCTick::toMilliseconds() const
 
 VLCDuration::VLCDuration()
     : VLCTick(0)
+    , m_valid(false)
 {
+
 }
 
 VLCDuration::VLCDuration(vlc_tick_t t)
     : VLCTick(t)
+    , m_valid(true)
 {
 }
 
 VLCDuration VLCDuration::operator*(double f) const
 {
-    return VLCDuration(m_ticks * f);
+    if (m_valid)
+        return VLCDuration(m_ticks * f);
+    else
+        return {};
 }
 
 bool VLCDuration::operator==(const VLCDuration &rhs) const
 {
-    return m_ticks == rhs.m_ticks;
+    return m_valid == rhs.m_valid && m_ticks == rhs.m_ticks;
 }
 
 bool VLCDuration::operator>(const VLCDuration &rhs) const
@@ -198,7 +204,10 @@ double VLCDuration::toSecf() const
 
 VLCDuration VLCDuration::scale(float scalar) const
 {
-    return VLCDuration(m_ticks * scalar);
+    if (m_valid)
+        return VLCDuration(m_ticks * scalar);
+    else
+        return {};
 }
 
 VLCDuration VLCDuration::fromMS(int64_t ms)
@@ -218,7 +227,7 @@ int64_t VLCDuration::asSeconds() const
 
 bool VLCDuration::valid() const
 {
-    return true;
+    return m_valid;
 }
 
 ///// VLCTime
