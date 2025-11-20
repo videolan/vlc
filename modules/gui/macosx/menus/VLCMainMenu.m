@@ -1113,7 +1113,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     currentDevice = aout_DeviceGet(p_aout);
     NSMenuItem *_tmp;
 
-    for (NSUInteger x = 0; x < numberOfAudioDevices; x++) {
+    for (NSUInteger x = 0; x < (NSUInteger)numberOfAudioDevices; x++) {
         _tmp = [_audioDeviceMenu addItemWithTitle:toNSStr(names[x]) action:@selector(toggleAudioDevice:) keyEquivalent:@""];
         [_tmp setTarget:self];
         [_tmp setTag:[[NSString stringWithFormat:@"%s", ids[x]] intValue]];
@@ -1124,7 +1124,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     free(currentDevice);
 
-    for (NSUInteger x = 0; x < numberOfAudioDevices; x++) {
+    for (NSUInteger x = 0; x < (NSUInteger)numberOfAudioDevices; x++) {
         free(ids[x]);
         free(names[x]);
     }
@@ -1210,7 +1210,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     // FIXME re-write using VLCPlayerController
     NSInteger count = [_postprocessingMenu numberOfItems];
-    for (NSUInteger x = 0; x < count; x++)
+    for (NSUInteger x = 0; x < (NSUInteger)count; x++)
         [[_postprocessingMenu itemAtIndex:x] setState:NSOffState];
 
     if ([sender tag] == -1) {
@@ -2021,7 +2021,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                             ofObject:(vlc_object_t *)object
                       withObjectType:(VLCObjectType)objectType
                             andValue:(vlc_value_t)value
-                      ofVariableType:(int)type;
+                      ofVariableType:(int)type
 {
     self = [super init];
 
