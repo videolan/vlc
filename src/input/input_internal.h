@@ -162,6 +162,8 @@ typedef enum input_event_type_e
 
     /* frame-next status */
     INPUT_EVENT_FRAME_NEXT_STATUS,
+    /* frame-previous status */
+    INPUT_EVENT_FRAME_PREVIOUS_STATUS,
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -352,6 +354,8 @@ struct vlc_input_event
         int nav_type;
         /* INPUT_EVENT_FRAME_NEXT_STATUS */
         int frame_next_status;
+        /* INPUT_EVENT_FRAME_PREVIOUS_STATUS */
+        int frame_previous_status;
     };
 };
 
@@ -469,6 +473,14 @@ typedef union
         bool enabled;
         char *dir_path;
     } record_state;
+    struct
+    {
+        vlc_tick_t pts;
+        unsigned frame_rate;
+        unsigned frame_rate_base;
+        int steps;
+        bool failed;
+    } frame_previous_seek;
 } input_control_param_t;
 
 typedef struct
@@ -547,6 +559,12 @@ typedef struct input_thread_private_t
 
     vlc_thread_t thread;
     vlc_interrupt_t interrupt;
+
+    struct {
+        vlc_tick_t last_pts;
+        bool enabled;
+        bool end;
+    } prev_frame;
 } input_thread_private_t;
 
 static inline input_thread_private_t *input_priv(input_thread_t *input)
@@ -608,6 +626,8 @@ enum input_control_e
     INPUT_CONTROL_SET_RECORD_STATE,
 
     INPUT_CONTROL_SET_FRAME_NEXT,
+    INPUT_CONTROL_SET_FRAME_PREVIOUS,
+    INPUT_CONTROL_SEEK_FRAME_PREVIOUS,
 
     INPUT_CONTROL_SET_RENDERER,
 

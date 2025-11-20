@@ -488,6 +488,19 @@ VLC_API void
 vlc_player_NextVideoFrame(vlc_player_t *player);
 
 /**
+ * Pause and display the previous video frame
+ *
+ * @note Works only on streams that can pause, seek and pace.
+ *
+ * @note listen to the vlc_player_cbs.on_prev_frame_status to be notified when
+ * the previous frame is displayed.
+ *
+ * @param player locked player instance
+ */
+VLC_API void
+vlc_player_PreviousVideoFrame(vlc_player_t *player);
+
+/**
  * Get the state of the player
  *
  * @note Since all players actions are asynchronous, this function won't
@@ -3335,6 +3348,22 @@ struct vlc_player_cbs
      * -EINVAL in case of invalid state
      */
     void (*on_next_frame_status)(vlc_player_t *player, int status, void *data);
+
+    /**
+    * Called when the previous frame, following a call to
+    * `vlc_player_PreviousVideoFrame()`, is displayed.
+    *
+    * @see vlc_player_PreviousVideoFrame()
+    *
+    * @param player locked player instance
+    * @param status 0 in case of success,
+    * -EAGAIN on first call (paused) or on first frame,
+    * -EBUSY in case of video error,
+    * -ENOTSUP if can't pause/seek/pace,
+    * -EINVAL in case of invalid state,
+    * -ERANGE if the player could not seek back
+    */
+    void (*on_prev_frame_status)(vlc_player_t *player, int status, void *data);
 };
 
 /**

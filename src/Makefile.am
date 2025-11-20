@@ -279,6 +279,7 @@ libvlccore_la_SOURCES = \
 	clock/input_clock.c \
 	clock/clock.c \
 	input/decoder.c \
+	input/decoder_prevframe.c \
 	input/decoder_device.c \
 	input/decoder_helpers.c \
 	input/demux.c \
@@ -307,6 +308,7 @@ libvlccore_la_SOURCES = \
 	clock/clock.h \
 	clock/clock_internal.h \
 	input/decoder.h \
+	input/decoder_prevframe.h \
 	input/demux.h \
 	input/es_out.h \
 	input/event.h \

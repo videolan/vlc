@@ -54,6 +54,11 @@ struct vlc_input_decoder_callbacks {
                                unsigned lost, unsigned played, void *userdata);
     void (*frame_next_status)(vlc_input_decoder_t *decoder, int status,
                               void *userdata);
+    void (*frame_previous_status)(vlc_input_decoder_t *decoder, int status,
+                                  void *userdata);
+    void (*frame_previous_seek)(vlc_input_decoder_t *decoder, vlc_tick_t pts,
+                                unsigned frame_rate, unsigned frame_rate_base,
+                                int steps, bool failed, void *userdata);
     /* requests */
     int (*get_attachments)(vlc_input_decoder_t *decoder,
                            input_attachment_t ***ppp_attachment,
@@ -119,6 +124,11 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * );
  */
 void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_dec );
 
+/**
+ * This function forces the display of the previous picture
+ */
+void vlc_input_decoder_FramePrevious( vlc_input_decoder_t *p_dec );
+
 /*
  * This function reset the decoder for normal playback after a previous or a
  * next frame call.
@@ -142,6 +152,7 @@ struct vlc_subdec_desc
 };
 
 void vlc_subdec_desc_Clean(struct vlc_subdec_desc *desc);
+
 
 struct vlc_input_decoder_status
 {

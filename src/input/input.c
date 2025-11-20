@@ -281,6 +281,8 @@ input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *p_item,
     priv->b_out_pace_control = priv->type == INPUT_TYPE_THUMBNAILING;
     priv->p_renderer = cfg->renderer && priv->type == INPUT_TYPE_PLAYBACK ?
                 vlc_renderer_item_hold( cfg->renderer ) : NULL;
+    priv->prev_frame.enabled = priv->prev_frame.end = false;
+    priv->prev_frame.last_pts = VLC_TICK_INVALID;
 
     priv->viewpoint_changed = false;
     /* Fetch the viewpoint from the mediaplayer or the playlist if any */
@@ -1964,6 +1966,76 @@ static int ControlSetPosition( input_thread_t *p_input, double val,
     return i_ret;
 }
 
+static void
+ResetFramePrevious(input_thread_t *input)
+{
+    input_thread_private_t *priv = input_priv(input);
+    priv->prev_frame.enabled = priv->prev_frame.end = false;
+}
+
+/* Seek commands sent by the video decoder to reach the previous frame */
+static void SeekFramePrevious(input_thread_t *input, vlc_tick_t pts,
+                              unsigned frame_rate, unsigned frame_rate_base,
+                              int steps, bool failed)
+{
+    input_thread_private_t *priv = input_priv(input);
+    assert(priv->master->b_can_seek);
+
+    if (!priv->prev_frame.enabled)
+        return; /* prev-frame was canceled with a user seek */
+
+    assert(!priv->prev_frame.end);
+
+    float fps;
+    if (frame_rate == 0 || frame_rate_base == 0)
+        fps = 30; /* Assume a good default */
+    else
+        fps = ceil(frame_rate / (float) frame_rate_base);
+
+    /* pts is stream based, subtract normal time to seek */
+    pts -= priv->master->i_normal_time;
+    /* Seek a little back */
+    vlc_tick_t steps_duration = vlc_tick_rate_duration(fps) * steps;
+    pts -= steps_duration;
+
+    if (pts < VLC_TICK_0)
+        pts = VLC_TICK_0;
+
+    if (pts == priv->prev_frame.last_pts && failed)
+    {
+        priv->prev_frame.end = pts == VLC_TICK_0;
+        /* Either we reached start of file or the decoder asked to seek at the
+         * same pts (should not happen, this is  invalid). */
+        es_out_PrivControl(priv->p_es_out, ES_OUT_PRIV_RESET_PCR_FRAME_PREV,
+                           0);
+        input_SendEvent(input, &(struct vlc_input_event) {
+            .type = INPUT_EVENT_FRAME_PREVIOUS_STATUS,
+            .frame_previous_status = priv->prev_frame.end ? -EAGAIN : -EINVAL,
+        });
+        return;
+    }
+
+    priv->prev_frame.last_pts = pts;
+    vlc_tick_t buffering_duration = steps_duration;
+
+    /* Add an extra buffering, to add more chance to reach the previous-frame */
+    buffering_duration += vlc_tick_rate_duration(fps) * 5;
+
+    /* Reset the decoders states and clock sync but not the decoder requesting
+     * the seek */
+    es_out_PrivControl(priv->p_es_out, ES_OUT_PRIV_RESET_PCR_FRAME_PREV,
+                       buffering_duration);
+
+    int ret = ControlSetTime(input, pts, false);
+    if (ret == VLC_SUCCESS)
+        return; /* The decoder will send the status */
+
+    input_SendEvent(input, &(struct vlc_input_event) {
+            .type = INPUT_EVENT_FRAME_PREVIOUS_STATUS,
+            .frame_previous_status = -ENOTSUP,
+    });
+}
+
 static bool Control( input_thread_t *p_input,
                      int i_type, input_control_param_t param )
 {
@@ -1988,6 +2060,7 @@ static bool Control( input_thread_t *p_input,
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
+            ResetFramePrevious( p_input );
 
             int i_ret = ControlSetPosition( p_input, param.pos.f_val,
                                             param.pos.b_fast_seek );
@@ -2010,6 +2083,7 @@ static bool Control( input_thread_t *p_input,
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
+            ResetFramePrevious( p_input );
 
             int i_ret = ControlSetTime( p_input, param.time.i_val,
                                         param.time.b_fast_seek );
@@ -2028,6 +2102,7 @@ static bool Control( input_thread_t *p_input,
                 case PLAYING_S:
                     if( priv->i_state == PAUSE_S )
                     {
+                        ResetFramePrevious( p_input );
                         ControlUnpause( p_input, i_control_date );
                         b_force_update = true;
                     }
@@ -2230,6 +2305,7 @@ static bool Control( input_thread_t *p_input,
                 break;
 
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
+            ResetFramePrevious( p_input );
             demux_Control(priv->master->p_demux,
                           DEMUX_SET_TITLE, i_title);
             break;
@@ -2272,6 +2348,7 @@ static bool Control( input_thread_t *p_input,
                 break;
 
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
+            ResetFramePrevious( p_input );
             demux_Control( priv->master->p_demux,
                            DEMUX_SET_SEEKPOINT, i_seekpoint );
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
@@ -2345,6 +2422,7 @@ static bool Control( input_thread_t *p_input,
             }
             if( priv->i_state == PAUSE_S )
             {
+                ResetFramePrevious( p_input );
                 es_out_SetFrameNext( priv->p_es_out );
             }
             else if( priv->i_state == PLAYING_S )
@@ -2364,7 +2442,55 @@ static bool Control( input_thread_t *p_input,
             }
             b_force_update = true;
             break;
-
+        case INPUT_CONTROL_SET_FRAME_PREVIOUS:
+            if (!priv->master->b_can_seek || !priv->master->b_can_pause
+             || !priv->master->b_can_pace_control)
+            {
+                input_SendEvent(p_input, &(struct vlc_input_event) {
+                    .type = INPUT_EVENT_FRAME_PREVIOUS_STATUS,
+                    .frame_previous_status = -ENOTSUP,
+                });
+                break;
+            }
+            if (priv->prev_frame.end)
+            {
+                input_SendEvent(p_input, &(struct vlc_input_event) {
+                    .type = INPUT_EVENT_FRAME_PREVIOUS_STATUS,
+                    .frame_previous_status = -EAGAIN,
+                });
+                break;
+            }
+            if( priv->i_state == PAUSE_S )
+            {
+                priv->prev_frame.last_pts = VLC_TICK_INVALID;
+                priv->prev_frame.enabled = true;
+                es_out_SetFramePrevious( priv->p_es_out );
+            }
+            else if( priv->i_state == PLAYING_S )
+            {
+                ControlPause( p_input, i_control_date );
+                input_SendEvent(p_input, &(struct vlc_input_event) {
+                    .type = INPUT_EVENT_FRAME_PREVIOUS_STATUS,
+                    .frame_next_status = -EAGAIN,
+                });
+            }
+            else
+            {
+                msg_Err( p_input, "invalid state for frame prev" );
+                input_SendEvent(p_input, &(struct vlc_input_event) {
+                    .type = INPUT_EVENT_FRAME_PREVIOUS_STATUS,
+                    .frame_previous_status = -EINVAL,
+                });
+            }
+            b_force_update = true;
+            break;
+        case INPUT_CONTROL_SEEK_FRAME_PREVIOUS:
+            SeekFramePrevious(p_input, param.frame_previous_seek.pts,
+                              param.frame_previous_seek.frame_rate,
+                              param.frame_previous_seek.frame_rate_base,
+                              param.frame_previous_seek.steps,
+                              param.frame_previous_seek.failed);
+            break;
         case INPUT_CONTROL_SET_RENDERER:
         {
             vlc_renderer_item_t *p_item = param.val.p_address;

@@ -236,6 +236,11 @@ void vlc_input_decoder_FrameNext(vlc_input_decoder_t *p_dec)
     (void)p_dec;
 }
 
+void vlc_input_decoder_FramePrevious(vlc_input_decoder_t *p_dec)
+{
+    (void)p_dec;
+}
+
 void vlc_input_decoder_StopFrameNext(vlc_input_decoder_t *p_dec)
 {
     (void)p_dec;
@@ -293,6 +298,13 @@ bool input_Stopped(input_thread_t *input)
 {
     (void)input;
     return false;
+}
+
+int input_ControlPush(input_thread_t *input,
+                      int type, const input_control_param_t *param)
+{
+    (void)input; (void)type; (void)param;
+    return 0;
 }
 
 input_item_t * input_GetItem(input_thread_t *input)

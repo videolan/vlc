@@ -884,6 +884,7 @@ vlc_player_DisplayFrameError(vlc_player_t *player,
                              const char *title, const char *title_error,
                              int status)
 {
+    static const char erange[] = {N_("can't seek back")};
     static const char ebusy[] = {N_("no video found")};
     static const char enotusp[] = {N_("can't pause/seek/pace")};
     static const char einval[] = {N_("invalid state")};
@@ -894,6 +895,9 @@ vlc_player_DisplayFrameError(vlc_player_t *player,
             vlc_player_osd_Message(player, title);
             break;
         case -EAGAIN:
+            break;
+        case -ERANGE:
+            vlc_dialog_display_error(player, title_error, erange);
             break;
         case -EBUSY:
             vlc_dialog_display_error(player, title_error, ebusy);
@@ -922,6 +926,22 @@ vlc_player_input_FrameNextStatus(struct vlc_player_input *input, int status)
 
     vlc_player_DisplayFrameError(player, _("Next frame"),
                                  _("Next frame error"), status);
+}
+
+static void
+vlc_player_input_FramePreviousStatus(struct vlc_player_input *input, int status)
+{
+    vlc_player_t *player = input->player;
+
+    unsigned count;
+    vlc_player_SendEventCount(player, on_prev_frame_status, count, status);
+
+    /* Don't display errors if status is handled by the player user */
+    if (count != 0)
+        return;
+
+    vlc_player_DisplayFrameError(player, _("Previous frame"),
+                                 _("Previous frame error"), status);
 }
 
 static bool
@@ -1149,6 +1169,10 @@ input_thread_Events(input_thread_t *input_thread,
         case INPUT_EVENT_FRAME_NEXT_STATUS:
             vlc_player_input_FrameNextStatus(input,
                                              event->frame_next_status);
+            break;
+        case INPUT_EVENT_FRAME_PREVIOUS_STATUS:
+            vlc_player_input_FramePreviousStatus(input,
+                                                 event->frame_previous_status);
             break;
         default:
             handled = false;

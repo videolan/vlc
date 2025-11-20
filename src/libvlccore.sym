@@ -899,6 +899,7 @@ vlc_player_Lock
 vlc_player_Navigate
 vlc_player_New
 vlc_player_NextVideoFrame
+vlc_player_PreviousVideoFrame
 vlc_player_osd_Message
 vlc_player_Pause
 vlc_player_program_Delete

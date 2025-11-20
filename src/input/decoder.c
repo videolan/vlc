@@ -52,6 +52,8 @@
 #include "../clock/clock.h"
 #include "decoder.h"
 #include "resource.h"
+#include "decoder_prevframe.h"
+
 #include "../libvlc.h"
 
 #include "../video_output/vout_internal.h"
@@ -127,6 +129,10 @@ struct decoder_video
     vlc_mutex_t mouse_lock;
     vlc_mouse_event mouse_event;
     void *mouse_opaque;
+
+    /* previous-frame */
+    struct decoder_prevframe pf;
+    vlc_tick_t pf_pts;
 };
 
 struct decoder_audio
@@ -293,6 +299,97 @@ static inline vlc_input_decoder_t *dec_get_owner( decoder_t *p_dec )
 static inline bool vlc_input_decoder_IsSynchronous( const vlc_input_decoder_t *dec )
 {
     return dec->p_sout != NULL;
+}
+
+static void Decoder_SeekPreviousFrame(vlc_input_decoder_t *owner, int steps,
+                                      bool failed)
+{
+    vlc_fifo_Assert(owner->p_fifo);
+    assert(steps != DEC_PF_SEEK_STEPS_NONE);
+
+    if (steps > DEC_PF_SEEK_STEPS_MAX)
+    {
+        /* Too much failing attempt */
+        decoder_Notify(owner, frame_previous_status, -ERANGE);
+    }
+    else
+    {
+        vlc_tick_t pts = owner->video.pf_pts;
+        unsigned frame_rate = owner->fmt.video.i_frame_rate;
+        unsigned frame_rate_base = owner->fmt.video.i_frame_rate_base;
+        /* Request the input to seek back */
+        decoder_Notify(owner, frame_previous_seek, pts,
+                       frame_rate, frame_rate_base, steps, failed);
+    }
+}
+
+static void Decoder_DisplayPreviousFrame(vlc_input_decoder_t *owner, picture_t *pic)
+{
+    vlc_fifo_Assert(owner->p_fifo);
+
+    if (owner->video.vout == NULL)
+    {
+        picture_Release(pic);
+        return;
+    }
+
+    vout_PutPicture(owner->video.vout, pic);
+    vout_NextPicture(owner->video.vout);
+
+    decoder_Notify(owner, frame_previous_status, 0);
+}
+
+static picture_t *Decoder_HandlePreviousFrame(vlc_input_decoder_t *owner,
+                                              picture_t *pic)
+{
+    int seek_steps;
+    pic = decoder_prevframe_AddPic(&owner->video.pf, pic,
+                                   &owner->video.pf_pts, &seek_steps);
+    if (pic != NULL)
+    {
+        owner->b_first = false;
+        picture_t *resume_pic = pic->p_next;
+        assert(resume_pic->p_next == NULL);
+        pic->p_next = NULL;
+        Decoder_DisplayPreviousFrame(owner, pic);
+        /* Keep picture for normal playback or next-frame (if resumed) */
+        pic = resume_pic;
+    }
+
+    if (seek_steps != DEC_PF_SEEK_STEPS_NONE)
+        Decoder_SeekPreviousFrame(owner, seek_steps, pic == NULL);
+
+    if (pic == NULL)
+        return NULL;
+
+    /* Wait for a new prev-frame request. If we don't wait, we will fill the
+     * vout with frames following the prev-frame, they won't be displayed but
+     * this will make next flush quite difficult to handle. When both
+     * prev-frame and resumed frames are in the fifo, it's ambiguous which
+     * frames should be flushed vs. retained during a flush operation. */
+    while (owner->frames_countdown == -1
+        && !decoder_prevframe_IsActive(&owner->video.pf))
+        vlc_fifo_Wait(owner->p_fifo);
+
+    if (decoder_prevframe_IsActive(&owner->video.pf))
+    {
+        picture_Release(pic);
+        return NULL;
+    }
+    return pic;
+}
+
+static void Decoder_RequestFramePrevious(vlc_input_decoder_t *owner)
+{
+    vlc_fifo_Assert(owner->p_fifo);
+    assert(owner->video.pf_pts != VLC_TICK_INVALID);
+
+    int seek_steps;
+    decoder_prevframe_Request(&owner->video.pf, &seek_steps);
+
+    if (seek_steps != DEC_PF_SEEK_STEPS_NONE)
+        Decoder_SeekPreviousFrame(owner, seek_steps, false);
+    vlc_fifo_Signal(owner->p_fifo);
 }
 
 static void Decoder_ChangeOutputPause( vlc_input_decoder_t *p_owner, bool paused, vlc_tick_t date )
@@ -861,6 +958,7 @@ static picture_t *ModuleThread_NewVideoBuffer( decoder_t *p_dec )
     assert( p_owner->video.out_pool );
 
     picture_t *pic = picture_pool_Wait( p_owner->video.out_pool );
+
     if (pic)
         picture_Reset( pic );
     return pic;
@@ -1368,6 +1466,15 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
 
         if( p_vout )
             vout_FlushAll( p_vout );
+    }
+
+    /* previous-frame handling */
+    if (unlikely(p_owner->paused) && p_vout != NULL &&
+        decoder_prevframe_IsActive(&p_owner->video.pf))
+    {
+        p_picture = Decoder_HandlePreviousFrame(p_owner, p_picture);
+        if (p_picture == NULL)
+            return VLC_ENOENT;
     }
 
     if( p_owner->b_first && p_owner->b_waiting )
@@ -2042,6 +2149,10 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
             vlc_mutex_init( &p_owner->video.mouse_lock );
             p_owner->video.mouse_event = NULL;
             p_owner->video.mouse_opaque = NULL;
+
+            decoder_prevframe_Init( &p_owner->video.pf );
+            p_owner->video.pf_pts = VLC_TICK_INVALID;
+
             if( cfg->input_type == INPUT_TYPE_THUMBNAILING )
                 p_dec->cbs = &dec_thumbnailer_cbs;
             else
@@ -2581,8 +2692,15 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
     }
     else if( cat == VIDEO_ES )
     {
-        if( p_owner->video.vout && p_owner->video.started )
+        if( p_owner->video.vout && p_owner->video.started
+         && p_owner->frames_countdown != -1 )
+        {
+            /* prev-frame: don't flush if frames_countdown == -1. If requests
+             * are sent in a burst, we want to avoid flushing the previous
+             * frame that is being displayed. */
             vout_FlushAll( p_owner->video.vout );
+        }
+        decoder_prevframe_Flush( &p_owner->video.pf );
     }
     else if( cat == SPU_ES )
     {
@@ -2662,6 +2780,7 @@ void vlc_input_decoder_ChangePause( vlc_input_decoder_t *p_owner,
      * while the input is paused (e.g. add sub file), then b_paused is
      * (incorrectly) false. FIXME: This is a bug in the decoder owner. */
     vlc_fifo_Lock( p_owner->p_fifo );
+
     p_owner->paused = b_paused;
     p_owner->pause_date = i_date;
     p_owner->frames_countdown = 0;
@@ -2733,9 +2852,20 @@ void vlc_input_decoder_Wait( vlc_input_decoder_t *p_owner )
     vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
+static void StopFrameNextLocked(vlc_input_decoder_t *owner)
+{
+    decoder_prevframe_Reset(&owner->video.pf);
+    owner->video.pf_pts = VLC_TICK_INVALID;
+    if (owner->frames_countdown == -1)
+        owner->frames_countdown = 0;
+    vlc_fifo_Signal(owner->p_fifo);
+}
+
 void vlc_input_decoder_StopFrameNext(vlc_input_decoder_t *owner)
 {
-    (void) owner;
+    vlc_fifo_Lock(owner->p_fifo);
+    StopFrameNextLocked(owner);
+    vlc_fifo_Unlock(owner->p_fifo);
 }
 
 void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
@@ -2759,6 +2889,7 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
         return;
     }
 
+    StopFrameNextLocked( p_owner );
     p_owner->frames_countdown++;
     vlc_fifo_Signal( p_owner->p_fifo );
 
@@ -2766,6 +2897,40 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
     /* TODO: it should be notified from the vout */
     decoder_Notify( p_owner, frame_next_status, 0 );
     vlc_fifo_Unlock( p_owner->p_fifo );
+}
+
+void vlc_input_decoder_FramePrevious(vlc_input_decoder_t *owner)
+{
+    assert(owner->paused);
+    assert(owner->cat == VIDEO_ES);
+
+    vlc_fifo_Lock(owner->p_fifo);
+
+    if (!owner->video.started)
+    {
+        decoder_Notify(owner, frame_previous_status, -EBUSY);
+        vlc_fifo_Unlock(owner->p_fifo);
+        return;
+    }
+
+    if (owner->frames_countdown != -1)
+    {
+        owner->frames_countdown = -1;
+
+        owner->video.pf_pts = vout_FlushAll(owner->video.vout);
+    }
+
+    if (owner->video.pf_pts == VLC_TICK_INVALID)
+    {
+        /* No frame displayed yet (that's a success) */
+        decoder_Notify(owner, frame_previous_status, 0);
+        vlc_fifo_Unlock(owner->p_fifo);
+        return;
+    }
+
+    Decoder_RequestFramePrevious(owner);
+
+    vlc_fifo_Unlock(owner->p_fifo);
 }
 
 size_t vlc_input_decoder_GetFifoSize( vlc_input_decoder_t *p_owner )

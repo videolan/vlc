@@ -634,6 +634,11 @@ static int ControlLockedSetFrameNext(struct es_out_timeshift *p_sys, input_sourc
     return es_out_in_PrivControl( p_sys->p_out, in, ES_OUT_PRIV_SET_FRAME_NEXT );
 }
 
+static int ControlLockedSetFramePrevious(struct es_out_timeshift *p_sys, input_source_t *in )
+{
+    return es_out_in_PrivControl( p_sys->p_out, in, ES_OUT_PRIV_SET_FRAME_PREVIOUS );
+}
+
 static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
                           va_list args )
 {
@@ -808,6 +813,10 @@ static int PrivControlLocked(struct vlc_input_es_out *p_tsout,
     case ES_OUT_PRIV_SET_FRAME_NEXT:
     {
         return ControlLockedSetFrameNext(p_sys, in);
+    }
+    case ES_OUT_PRIV_SET_FRAME_PREVIOUS:
+    {
+        return ControlLockedSetFramePrevious(p_sys, in);
     }
     case ES_OUT_PRIV_GET_GROUP_FORCED:
         return es_out_in_vaPrivControl( p_sys->p_out, in, i_query, args );

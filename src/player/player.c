@@ -1338,6 +1338,16 @@ vlc_player_NextVideoFrame(vlc_player_t *player)
                             INPUT_CONTROL_SET_FRAME_NEXT, NULL);
 }
 
+void
+vlc_player_PreviousVideoFrame(vlc_player_t *player)
+{
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+    if (!input)
+        return;
+    input_ControlPushHelper(input->thread,
+                            INPUT_CONTROL_SET_FRAME_PREVIOUS, NULL);
+}
+
 enum vlc_player_state
 vlc_player_GetState(vlc_player_t *player)
 {
