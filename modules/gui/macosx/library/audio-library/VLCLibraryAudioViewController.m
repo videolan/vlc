@@ -471,7 +471,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentLibraryItemWaitForDataSourceFinished:(nullable NSNotification *)aNotification
 {
-    if (self.audioDataSource.displayedCollectionCount < self.audioDataSource.collectionToDisplayCount) {
+    if ((NSUInteger)self.audioDataSource.displayedCollectionCount < self.audioDataSource.collectionToDisplayCount) {
         return;
     }
     
