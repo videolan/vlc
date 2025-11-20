@@ -214,6 +214,7 @@ typedef struct
     vlc_tick_t  i_pts_delay;
     vlc_tick_t  i_tracks_pts_delay;
     vlc_tick_t  i_pts_jitter;
+    vlc_tick_t  i_last_pts_jitter;
     int         i_cr_average;
     float       rate;
 
@@ -931,6 +932,14 @@ static es_out_id_t *EsOutStopNextFrame(es_out_sys_t *p_sys)
     vlc_input_decoder_StopFrameNext(p_sys->p_next_frame_es->p_dec);
     es_out_id_t *noflush_es = p_sys->p_next_frame_es;
     p_sys->p_next_frame_es = NULL;
+    if (p_sys->i_last_pts_jitter != p_sys->i_pts_jitter)
+    {
+        /* Safe to change jitter because this function is always followed by
+         * EsOutChangePosition() */
+        EsOutSetJitter(p_sys, p_sys->i_pts_delay, p_sys->i_last_pts_jitter,
+                       p_sys->i_cr_average);
+        p_sys->i_last_pts_jitter = VLC_TICK_INVALID;
+    }
     return noflush_es;
 }
 
@@ -4012,6 +4021,29 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
 
         return VLC_SUCCESS;
     }
+    case ES_OUT_PRIV_RESET_PCR_FRAME_PREV:
+    {
+        const vlc_tick_t buffering_duration = va_arg(args, vlc_tick_t);
+        /* Check if we have enough buffering to reach the current frame */
+        vlc_tick_t new_jitter = buffering_duration - p_sys->i_pts_delay;
+        if (new_jitter > p_sys->i_pts_jitter)
+        {
+            new_jitter += p_sys->i_pts_jitter;
+
+            msg_Warn(p_sys->p_input,
+                     "previous-frame: seek-back (%d ms) longer than buffering, "
+                     "adding %d ms to pts-delay",
+                     (int)MS_FROM_VLC_TICK(buffering_duration),
+                     (int)MS_FROM_VLC_TICK(new_jitter));
+            if (p_sys->i_last_pts_jitter == VLC_TICK_INVALID)
+                p_sys->i_last_pts_jitter = p_sys->i_pts_jitter;
+            EsOutSetJitter(p_sys, p_sys->i_pts_delay, new_jitter,
+                           p_sys->i_cr_average);
+        }
+
+        EsOutChangePosition( p_sys, NULL );
+        return VLC_SUCCESS;
+    }
     case ES_OUT_PRIV_SET_FRAME_NEXT:
         EsOutFrameNext(p_sys);
         return VLC_SUCCESS;
@@ -4205,7 +4237,7 @@ input_EsOutNew(input_thread_t *p_input, input_source_t *main_source, float rate,
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
     p_sys->i_audio_delay = p_sys->i_spu_delay = p_sys->i_video_delay = 0;
     p_sys->i_pts_delay = p_sys->i_tracks_pts_delay = p_sys->i_pts_jitter
-                       = VLC_TICK_INVALID;
+                       = p_sys->i_last_pts_jitter = VLC_TICK_INVALID;
     p_sys->i_cr_average = 0;
 
     p_sys->user_clock_source = clock_source_Inherit( VLC_OBJECT(p_input) );

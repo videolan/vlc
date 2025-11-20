@@ -623,6 +623,12 @@ ControlLockedSetRate(struct es_out_timeshift *p_sys,
     }
     return i_ret;
 }
+static int ControlLockedResetPcrDecoder(struct es_out_timeshift *p_sys, input_source_t *in,
+                                        vlc_tick_t duration)
+{
+    return es_out_in_PrivControl(p_sys->p_out, in, ES_OUT_PRIV_RESET_PCR_FRAME_PREV, duration);
+
+}
 static int ControlLockedSetFrameNext(struct es_out_timeshift *p_sys, input_source_t *in )
 {
     return es_out_in_PrivControl( p_sys->p_out, in, ES_OUT_PRIV_SET_FRAME_NEXT );
@@ -793,6 +799,11 @@ static int PrivControlLocked(struct vlc_input_es_out *p_tsout,
         const float rate = va_arg( args, double );
 
         return ControlLockedSetRate(p_sys, in, src_rate, rate);
+    }
+    case ES_OUT_PRIV_RESET_PCR_FRAME_PREV:
+    {
+        const vlc_tick_t duration = va_arg( args, vlc_tick_t );
+        return ControlLockedResetPcrDecoder(p_sys, in, duration);
     }
     case ES_OUT_PRIV_SET_FRAME_NEXT:
     {

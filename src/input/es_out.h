@@ -82,6 +82,9 @@ enum es_out_query_private_e
     /* Set rate */
     ES_OUT_PRIV_SET_RATE,                           /* arg1=double source_rate arg2=double rate res=can fail */
 
+    /* RESET_PCR coming from decoders, when searching for a previous frame */
+    ES_OUT_PRIV_RESET_PCR_FRAME_PREV,               /* arg1=vlc_tick_t buffering_duration, res=cannot fail */
+
     /* Set next frame */
     ES_OUT_PRIV_SET_FRAME_NEXT,                     /*                          res=can fail */
 
