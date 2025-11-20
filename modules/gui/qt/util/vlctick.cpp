@@ -36,12 +36,12 @@ VLCTick::VLCTick(vlc_tick_t ticks)
 
 bool VLCTick::isSubSecond() const
 {
-    return asMilliseconds() < 1000;
+    return valid() && asMilliseconds() < 1000;
 }
 
 bool VLCTick::isSubHour() const
 {
-    return asSeconds() < 3600;
+    return valid() && asSeconds() < 3600;
 }
 
 QString VLCTick::formatHMS(int formatFlags) const
