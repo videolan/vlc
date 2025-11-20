@@ -47,10 +47,10 @@
     [super viewDidLoad];
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    [libraryWindow.videoViewController.view addObserver:self
-                                            forKeyPath:@"hidden"
-                                               options:0
-                                               context:nil];
+    [libraryWindow addObserver:self
+                    forKeyPath:VLCLibraryWindowEmbeddedVideoPlaybackActiveKey
+                       options:0
+                       context:nil];
 
     self.splitView.wantsLayer = YES;
 
@@ -107,12 +107,11 @@
                       ofObject:(id)object
                         change:(NSDictionary *)change
                        context:(void *)context
-
 {
-    if([keyPath isEqualToString:@"hidden"]) {
+    if([keyPath isEqualToString:VLCLibraryWindowEmbeddedVideoPlaybackActiveKey]) {
         VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-        const BOOL videoViewClosed = libraryWindow.videoViewController.view.hidden;
-        _navSidebarItem.collapsed = !videoViewClosed;
+        const BOOL videoPlaybackActive = libraryWindow.embeddedVideoPlaybackActive;
+        _navSidebarItem.collapsed = videoPlaybackActive;
     }
 }
 

@@ -406,19 +406,19 @@
     if (self.libraryWindow.librarySegmentType == VLCLibraryVideoSegmentType &&
         ((videoCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
          (videoCount > 0 && ![self.libraryTargetView.subviews containsObject:_videoLibraryView])) &&
-        self.libraryWindow.videoViewController.view.hidden) {
+        !self.libraryWindow.embeddedVideoPlaybackActive) {
 
         [self updatePresentedVideoLibraryView];
     } else if (self.libraryWindow.librarySegmentType == VLCLibraryShowsVideoSubSegmentType &&
          ((showsCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
           (showsCount > 0 && ![self.libraryTargetView.subviews containsObject:_videoLibraryView])) &&
-         self.libraryWindow.videoViewController.view.hidden) {
+         !self.libraryWindow.embeddedVideoPlaybackActive) {
 
          [self updatePresentedShowsLibraryView];
      } else if (self.libraryWindow.librarySegmentType == VLCLibraryMoviesVideoSubSegmentType &&
          ((model.numberOfMovies == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
           (model.numberOfMovies > 0 && ![self.libraryTargetView.subviews containsObject:_videoLibraryView])) &&
-         self.libraryWindow.videoViewController.view.hidden) {
+         !self.libraryWindow.embeddedVideoPlaybackActive) {
 
          [self updatePresentedMoviesLibraryView];
      }

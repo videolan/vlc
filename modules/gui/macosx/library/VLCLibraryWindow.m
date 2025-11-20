@@ -100,6 +100,7 @@
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
+NSString * const VLCLibraryWindowEmbeddedVideoPlaybackActiveKey = @"embeddedVideoPlaybackActive";
 
 @interface VLCLibraryWindow () <NSControlTextEditingDelegate>
 {
@@ -402,7 +403,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (IBAction)backwardsNavigationAction:(id)sender
 {
-    self.videoViewController.view.hidden
+    !self.embeddedVideoPlaybackActive
         ? [((VLCLibraryMediaSourceViewController *)self.librarySegmentViewController).navigationStack backwards]
         : [self disableVideoPlaybackAppearance];
 }
@@ -598,6 +599,10 @@ static int ShowController(vlc_object_t * __unused p_this,
 
     self.splitViewController.mainVideoModeEnabled = YES;
 
+    [self willChangeValueForKey:VLCLibraryWindowEmbeddedVideoPlaybackActiveKey];
+    _embeddedVideoPlaybackActive = YES;
+    [self didChangeValueForKey:VLCLibraryWindowEmbeddedVideoPlaybackActiveKey];
+
     if ([self.librarySegmentViewController isKindOfClass:VLCLibraryAbstractMediaLibrarySegmentViewController.class]) {
         [(VLCLibraryAbstractMediaLibrarySegmentViewController *)self.librarySegmentViewController disconnect];
     }
@@ -622,6 +627,10 @@ static int ShowController(vlc_object_t * __unused p_this,
     }
 
     self.splitViewController.mainVideoModeEnabled = NO;
+
+    [self willChangeValueForKey:VLCLibraryWindowEmbeddedVideoPlaybackActiveKey];
+    _embeddedVideoPlaybackActive = NO;
+    [self didChangeValueForKey:VLCLibraryWindowEmbeddedVideoPlaybackActiveKey];
 
     if (self.presentLoadingOverlayOnVideoPlaybackHide) {
         [self showLoadingOverlay];
@@ -680,7 +689,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)mouseMoved:(NSEvent *)o_event
 {
-    if (!self.videoViewController.view.hidden) {
+    if (self.embeddedVideoPlaybackActive) {
         NSPoint mouseLocation = [o_event locationInWindow];
         NSView *videoView = self.videoViewController.view;
         NSRect videoViewRect = [videoView convertRect:videoView.frame toView:self.contentView];

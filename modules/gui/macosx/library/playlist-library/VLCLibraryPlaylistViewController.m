@@ -304,7 +304,7 @@
     if (self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegmentType &&
         ((numberOfPlaylists == 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:self.libraryWindow.emptyLibraryView]) ||
          (numberOfPlaylists > 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
-        self.libraryWindow.videoViewController.view.hidden) {
+        !self.libraryWindow.embeddedVideoPlaybackActive) {
 
         [self updatePresentedView];
     }
@@ -314,7 +314,7 @@
 {
     NSParameterAssert(notification);
     if (self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegmentType &&
-        self.libraryWindow.videoViewController.view.hidden) {
+        !self.libraryWindow.embeddedVideoPlaybackActive) {
         [self updatePresentedView];
     }
 }

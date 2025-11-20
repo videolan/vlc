@@ -539,7 +539,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
          self.libraryWindow.librarySegmentType == VLCLibraryGenresMusicSubSegmentType) &&
         ((audioCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
          (audioCount > 0 && ![self.libraryTargetView.subviews containsObject:_audioLibraryView])) &&
-        self.libraryWindow.videoViewController.view.hidden) {
+        !self.libraryWindow.embeddedVideoPlaybackActive) {
 
         [self updatePresentedView];
     }

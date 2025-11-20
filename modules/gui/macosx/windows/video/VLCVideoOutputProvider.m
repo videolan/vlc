@@ -556,7 +556,7 @@ static int WindowFloatOnTop(vlc_object_t *obj,
     }
 
     if (videoWindow.class == VLCLibraryWindow.class
-        && !videoWindow.videoViewController.view.hidden) {
+        && ((VLCLibraryWindow *)videoWindow).embeddedVideoPlaybackActive) {
         [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
     } else {
         [videoWindow close];

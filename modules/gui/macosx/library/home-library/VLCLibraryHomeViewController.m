@@ -193,7 +193,7 @@
          (videoCount > 0 && !homeLibraryViewPresent) ||
          (audioCount == 0 && !emptyLibraryViewPresent) ||
          (audioCount > 0 && !homeLibraryViewPresent)) &&
-        self.libraryWindow.videoViewController.view.hidden) {
+        !self.libraryWindow.embeddedVideoPlaybackActive) {
 
         [self updatePresentedView];
     }
