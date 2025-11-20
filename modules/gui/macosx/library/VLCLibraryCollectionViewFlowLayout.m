@@ -120,7 +120,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     NSMutableArray *generatedAnimationSteps = [NSMutableArray arrayWithCapacity:kAnimationSteps];
 
     // Easing out cubic
-    for(int i = 0; i < kAnimationSteps; ++i) {
+    for(NSUInteger i = 0; i < kAnimationSteps; ++i) {
         CGFloat progress = (CGFloat)i  / (CGFloat)kAnimationSteps;
         progress -= 1;
         generatedAnimationSteps[i] = @(dimension * (progress * progress * progress + 1) + kDetailViewCollapsedHeight);
@@ -291,12 +291,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         return [super layoutAttributesForElementsInRect:rect];
     }
 
-    NSRect selectedItemFrame = [[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame];
-
     // Computed attributes from parent
     NSMutableArray<__kindof NSCollectionViewLayoutAttributes *> * const layoutAttributesArray =
         [super layoutAttributesForElementsInRect:rect].mutableCopy;
-    for (int i = 0; i < layoutAttributesArray.count; i++) {
+    for (NSUInteger i = 0; i < layoutAttributesArray.count; i++) {
         NSCollectionViewLayoutAttributes * const attributes = layoutAttributesArray[i].copy;
         NSString * const elementKind = attributes.representedElementKind;
 
@@ -470,11 +468,11 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 @end
 
 static CVReturn detailViewAnimationCallback(
-                                            CVDisplayLinkRef displayLink,
-                                            const CVTimeStamp *inNow,
-                                            const CVTimeStamp *inOutputTime,
-                                            CVOptionFlags flagsIn,
-                                            CVOptionFlags *flagsOut,
+                                            CVDisplayLinkRef displayLink __unused,
+                                            const CVTimeStamp *inNow __unused,
+                                            const CVTimeStamp *inOutputTime __unused,
+                                            CVOptionFlags flagsIn __unused,
+                                            CVOptionFlags *flagsOut __unused,
                                             void *displayLinkContext)
 {
     if (displayLinkContext == nil) {
