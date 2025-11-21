@@ -873,6 +873,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     audio_output_t *aout = aout_stream_aout(stream);
 
     assert (block->i_pts != VLC_TICK_INVALID);
+    assert (stream->timing.pause_date == VLC_TICK_INVALID);
 
     block->i_length = vlc_tick_from_samples( block->i_nb_samples,
                                    stream->input_format.i_rate );
