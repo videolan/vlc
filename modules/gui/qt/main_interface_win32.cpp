@@ -248,6 +248,7 @@ bool MainInterfaceWin32::nativeEventFilter(const QByteArray &, void *message, lo
                         THEMIM->next();
                         break;
                 }
+                return true;
             }
             break;
         case WM_APPCOMMAND:
