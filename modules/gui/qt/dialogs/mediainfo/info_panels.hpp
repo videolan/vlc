@@ -50,7 +50,7 @@ class MetaPanel: public QWidget
     Q_OBJECT
 public:
     MetaPanel( QWidget *, qt_intf_t * );
-    void saveMeta();
+    bool saveMeta();
 
     bool isInEditMode();
     void setEditMode( bool );

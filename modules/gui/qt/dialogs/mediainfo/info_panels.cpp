@@ -50,6 +50,7 @@
 #include <QApplication>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QMessageBox>
 
 /************************************************************************
  * Single panels
@@ -255,12 +256,14 @@ void MetaPanel::update( const SharedInputItem& p_item )
 /**
  * Save the MetaData, triggered by parent->save Button
  **/
-void MetaPanel::saveMeta()
+bool MetaPanel::saveMeta()
 {
     const auto input = p_input.get();
 
-    if( input == NULL )
-        return;
+    if( input == NULL ) {
+        QMessageBox::warning( this, qtr("Metadata"), qtr("Not editing a file") );
+        return false;
+    }
 
     /* now we read the modified meta data */
     input_item_SetTitle(  input, qtu( title_text->text() ) );
@@ -276,11 +279,15 @@ void MetaPanel::saveMeta()
     input_item_SetPublisher( input, qtu( publisher_text->text() ) );
     input_item_SetDescription( input, qtu( description_text->toPlainText() ) );
 
-    input_item_WriteMeta( VLC_OBJECT(p_intf), input );
-
     /* Reset the status of the mode. No need to emit any signal because parent
        is the only caller */
     b_inEditMode = false;
+    int vlcret = input_item_WriteMeta( VLC_OBJECT(p_intf), input );
+    if (vlcret != VLC_SUCCESS) {
+        QMessageBox::warning( this, qtr("Metadata"), qtr("Failed to save metadata") );
+        return false;
+    }
+    return true;
 }
 
 

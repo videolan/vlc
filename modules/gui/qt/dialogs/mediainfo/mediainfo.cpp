@@ -152,8 +152,9 @@ int MediaInfoDialog::currentTab()
 
 void MediaInfoDialog::saveMeta()
 {
-    MP->saveMeta();
-    saveMetaButton->hide();
+    bool success = MP->saveMeta();
+    if (success)
+        saveMetaButton->hide();
 }
 
 void MediaInfoDialog::updateAllTabs( const SharedInputItem& p_item )
