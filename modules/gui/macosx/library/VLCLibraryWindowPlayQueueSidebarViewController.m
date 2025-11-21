@@ -22,6 +22,8 @@
 
 #import "VLCLibraryWindowPlayQueueSidebarViewController.h"
 
+#import <QuartzCore/QuartzCore.h>
+
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
@@ -87,6 +89,44 @@
                            selector:@selector(repeatStateUpdated:)
                                name:VLCPlaybackRepeatChanged
                              object:nil];
+
+    [self setupBlurredHeaderFooter];
+}
+
+- (void)setupBlurredHeaderFooter
+{
+    if (@available(macOS 10.14, *)) {
+        const CGFloat footerHeight = self.footerContainerView.frame.size.height;
+
+        NSVisualEffectView *footerBlurView = [[NSVisualEffectView alloc] initWithFrame:self.footerContainerView.bounds];
+        footerBlurView.translatesAutoresizingMaskIntoConstraints = NO;
+        footerBlurView.material = NSVisualEffectMaterialHeaderView;
+        footerBlurView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+
+        [self.footerContainerView addSubview:footerBlurView];
+        [NSLayoutConstraint activateConstraints:@[
+            [footerBlurView.topAnchor constraintEqualToAnchor:self.footerContainerView.topAnchor],
+            [footerBlurView.leadingAnchor constraintEqualToAnchor:self.footerContainerView.leadingAnchor],
+            [footerBlurView.trailingAnchor constraintEqualToAnchor:self.footerContainerView.trailingAnchor],
+            [footerBlurView.bottomAnchor constraintEqualToAnchor:self.footerContainerView.bottomAnchor]
+        ]];
+
+        NSScrollView *scrollView = self.tableView.enclosingScrollView;
+        for (NSLayoutConstraint *constraint in scrollView.superview.constraints) {
+            if (constraint.firstItem == scrollView && constraint.firstAttribute == NSLayoutAttributeBottom &&
+                constraint.secondItem == self.footerContainerView && constraint.secondAttribute == NSLayoutAttributeTop) {
+                constraint.active = NO;
+                break;
+            }
+        }
+
+        [NSLayoutConstraint activateConstraints:@[
+            [scrollView.bottomAnchor constraintEqualToAnchor:self.footerContainerView.bottomAnchor]
+        ]];
+
+        scrollView.automaticallyAdjustsContentInsets = NO;
+        scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerHeight, 0);
+    }
 }
 
 - (NSString *)title

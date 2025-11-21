@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryWindowPlayQueueSidebarViewController : VLCLibraryWindowAbstractSidebarViewController
 
 @property (readwrite, weak) IBOutlet NSTableView *tableView;
+@property (readwrite, weak) IBOutlet NSView *footerContainerView;
 @property (readwrite, weak) IBOutlet VLCDragDropView *dragDropView;
 @property (readwrite, weak) IBOutlet NSBox *dragDropImageBackgroundBox;
 @property (readwrite, weak) IBOutlet NSButton *openMediaButton;

@@ -12,6 +12,7 @@
                 <outlet property="clearButton" destination="aKS-lw-hfk" id="30D-7g-SnA"/>
                 <outlet property="dragDropImageBackgroundBox" destination="aUB-Ld-N2o" id="9xc-5h-uRF"/>
                 <outlet property="dragDropView" destination="grx-kk-1X1" id="b1W-Zw-a7Z"/>
+                <outlet property="footerContainerView" destination="ftr-ct-999" id="ftr-o1-999"/>
                 <outlet property="openMediaButton" destination="ghp-DI-YmZ" id="30J-m7-gLb"/>
                 <outlet property="repeatButton" destination="9xU-Ba-Hys" id="myS-5X-rgK"/>
                 <outlet property="shuffleButton" destination="bdZ-N9-Noa" id="bJz-sR-lGW"/>
@@ -96,9 +97,20 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
-                <box verticalHuggingPriority="751" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ew3-Pn-diG">
-                    <rect key="frame" x="20" y="54" width="470" height="5"/>
-                </box>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="ftr-ct-999">
+                    <rect key="frame" x="0.0" y="0.0" width="510" height="57"/>
+                    <subviews>
+                        <box verticalHuggingPriority="751" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ew3-Pn-diG">
+                            <rect key="frame" x="20" y="54" width="470" height="5"/>
+                        </box>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="57" id="ftr-h-001"/>
+                        <constraint firstItem="ew3-Pn-diG" firstAttribute="leading" secondItem="ftr-ct-999" secondAttribute="leading" constant="20" id="ftr-l-001"/>
+                        <constraint firstAttribute="trailing" secondItem="ew3-Pn-diG" secondAttribute="trailing" constant="20" id="ftr-t-001"/>
+                        <constraint firstItem="ew3-Pn-diG" firstAttribute="top" secondItem="ftr-ct-999" secondAttribute="top" id="ftr-top-001"/>
+                    </constraints>
+                </customView>
                 <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="grx-kk-1X1" customClass="VLCDragDropView">
                     <rect key="frame" x="0.0" y="57" width="510" height="210"/>
                     <subviews>
@@ -220,18 +232,19 @@
                 <constraint firstItem="grx-kk-1X1" firstAttribute="top" secondItem="ik5-L4-VLw" secondAttribute="bottom" id="AoR-Q7-XYJ"/>
                 <constraint firstItem="ik5-L4-VLw" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" constant="20" id="CW2-KK-Z5t"/>
                 <constraint firstItem="EIb-Is-vco" firstAttribute="top" secondItem="ik5-L4-VLw" secondAttribute="bottom" id="Cyw-MK-W8n"/>
-                <constraint firstAttribute="trailing" secondItem="ew3-Pn-diG" secondAttribute="trailing" constant="20" id="Hwc-K8-2WQ"/>
+                <constraint firstAttribute="trailing" secondItem="ik5-L4-VLw" secondAttribute="trailing" constant="20" id="ef5-v1-Rm6"/>
                 <constraint firstAttribute="trailing" secondItem="EIb-Is-vco" secondAttribute="trailing" id="UAJ-gH-fWy"/>
+                <constraint firstAttribute="bottom" secondItem="ftr-ct-999" secondAttribute="bottom" id="ftr-bot-999"/>
+                <constraint firstItem="ftr-ct-999" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" id="ftr-lead-999"/>
+                <constraint firstAttribute="trailing" secondItem="ftr-ct-999" secondAttribute="trailing" id="ftr-trail-999"/>
+                <constraint firstItem="EIb-Is-vco" firstAttribute="bottom" secondItem="ftr-ct-999" secondAttribute="top" id="scr-bot-001"/>
                 <constraint firstItem="hc5-GJ-yJe" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" constant="20" id="Ums-3j-iWc"/>
                 <constraint firstAttribute="bottom" secondItem="hc5-GJ-yJe" secondAttribute="bottom" constant="16" id="XfY-Lh-mBE"/>
                 <constraint firstAttribute="trailing" secondItem="hc5-GJ-yJe" secondAttribute="trailing" constant="20" id="chv-hJ-pjk"/>
-                <constraint firstAttribute="trailing" secondItem="ik5-L4-VLw" secondAttribute="trailing" constant="20" id="ef5-v1-Rm6"/>
                 <constraint firstItem="hc5-GJ-yJe" firstAttribute="top" secondItem="ew3-Pn-diG" secondAttribute="bottom" constant="16" id="fcg-kI-gzS"/>
                 <constraint firstItem="ew3-Pn-diG" firstAttribute="top" secondItem="grx-kk-1X1" secondAttribute="bottom" id="haK-Qu-HJv"/>
                 <constraint firstItem="EIb-Is-vco" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" id="kEZ-5n-pxq"/>
                 <constraint firstItem="grx-kk-1X1" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" id="mCw-UE-mS0"/>
-                <constraint firstItem="ew3-Pn-diG" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" constant="20" id="qow-FG-3aN"/>
-                <constraint firstItem="EIb-Is-vco" firstAttribute="bottom" secondItem="ew3-Pn-diG" secondAttribute="top" id="y82-Wx-neg"/>
             </constraints>
             <point key="canvasLocation" x="-148" y="45"/>
         </customView>
