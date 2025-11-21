@@ -1105,7 +1105,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         return;
 
     int numberOfAudioDevices = aout_DevicesList(p_aout, &ids, &names);
-    if (numberOfAudioDevices == -1) {
+    if (numberOfAudioDevices < 0) {
         aout_Release(p_aout);
         return;
     }
