@@ -177,6 +177,7 @@ private:
     QColor foreground;
     QFont textfont;
     QRect textrect;
+    bool dark = false;
 
     WheelToVLCConverter wheelEventConverter;
 

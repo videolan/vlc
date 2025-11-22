@@ -634,6 +634,8 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
 
     pixGradient = QPixmap( pixOutside.size() );
     pixGradient2 = QPixmap( pixOutside.size() );
+    dark = isDarkPaletteEnabled(nullptr);
+
 #if HAS_QT56
     pixGradient.setDevicePixelRatio(QApplication::primaryScreen()->devicePixelRatio());
     pixGradient2.setDevicePixelRatio(QApplication::primaryScreen()->devicePixelRatio());
@@ -817,7 +819,10 @@ void SoundSlider::paintEvent( QPaintEvent *e )
     painter.drawPixmap( 0, 0, offsetDst, height(), *paintGradient, 0, 0, offsetSrc, paintGradient->height() );
     painter.drawPixmap( 0, 0, width(), height(), pixOutside, 0, 0,  pixOutside.width(), pixOutside.height() );
 
-    painter.setPen( foreground );
+    if (dark)
+        painter.setPen(Qt::white);
+    else
+        painter.setPen(foreground);
     painter.setFont( textfont );
     painter.drawText( textrect, Qt::AlignRight | Qt::AlignVCenter,
                       QString::number( value() ) + '%' );
