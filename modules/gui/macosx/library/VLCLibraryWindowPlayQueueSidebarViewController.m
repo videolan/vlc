@@ -38,6 +38,7 @@
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
 #import "windows/VLCOpenWindowController.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 @implementation VLCLibraryWindowPlayQueueSidebarViewController
 
@@ -95,37 +96,51 @@
 
 - (void)setupBlurredHeaderFooter
 {
-    if (@available(macOS 10.14, *)) {
+    if (@available(macOS 26.0, *)) {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         const CGFloat footerHeight = self.footerContainerView.frame.size.height;
 
-        NSVisualEffectView *footerBlurView = [[NSVisualEffectView alloc] initWithFrame:self.footerContainerView.bounds];
+        [self.bottomButtonsSeparator removeFromSuperview];
+
+        NSGlassEffectView * const glassFooterView = [[NSGlassEffectView alloc] init];
+        glassFooterView.translatesAutoresizingMaskIntoConstraints = NO;
+        glassFooterView.contentView = self.buttonStack;
+        glassFooterView.cornerRadius = CGFLOAT_MAX;
+
+        self.footerContainerView.subviews = @[glassFooterView];
+        self.footerContainerView.clipsToBounds = NO;
+        [glassFooterView applyConstraintsToFillSuperview];
+
+        self.scrollViewDefaultBottomConstraint.active = NO;
+        self.footerContainerViewDefaultBottomConstraint.active = NO;
+
+        [NSLayoutConstraint activateConstraints:@[
+            [self.scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+            [self.buttonStack.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-VLCLibraryUIUnits.mediumSpacing]
+        ]];
+
+        self.scrollView.automaticallyAdjustsContentInsets = NO;
+        self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerHeight, 0);
+#endif
+    } else if (@available(macOS 10.14, *)) {
+        const CGFloat footerHeight = self.footerContainerView.frame.size.height;
+
+        NSVisualEffectView * const footerBlurView = [[NSVisualEffectView alloc] initWithFrame:self.footerContainerView.bounds];
         footerBlurView.translatesAutoresizingMaskIntoConstraints = NO;
         footerBlurView.material = NSVisualEffectMaterialHeaderView;
         footerBlurView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
 
         [self.footerContainerView addSubview:footerBlurView];
-        [NSLayoutConstraint activateConstraints:@[
-            [footerBlurView.topAnchor constraintEqualToAnchor:self.footerContainerView.topAnchor],
-            [footerBlurView.leadingAnchor constraintEqualToAnchor:self.footerContainerView.leadingAnchor],
-            [footerBlurView.trailingAnchor constraintEqualToAnchor:self.footerContainerView.trailingAnchor],
-            [footerBlurView.bottomAnchor constraintEqualToAnchor:self.footerContainerView.bottomAnchor]
-        ]];
+        [footerBlurView applyConstraintsToFillSuperview];
 
-        NSScrollView *scrollView = self.tableView.enclosingScrollView;
-        for (NSLayoutConstraint *constraint in scrollView.superview.constraints) {
-            if (constraint.firstItem == scrollView && constraint.firstAttribute == NSLayoutAttributeBottom &&
-                constraint.secondItem == self.footerContainerView && constraint.secondAttribute == NSLayoutAttributeTop) {
-                constraint.active = NO;
-                break;
-            }
-        }
+        self.scrollViewDefaultBottomConstraint.active = NO;
 
         [NSLayoutConstraint activateConstraints:@[
-            [scrollView.bottomAnchor constraintEqualToAnchor:self.footerContainerView.bottomAnchor]
+            [self.scrollView.bottomAnchor constraintEqualToAnchor:self.footerContainerView.bottomAnchor]
         ]];
 
-        scrollView.automaticallyAdjustsContentInsets = NO;
-        scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerHeight, 0);
+        self.scrollView.automaticallyAdjustsContentInsets = NO;
+        self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerHeight, 0);
     }
 }
 

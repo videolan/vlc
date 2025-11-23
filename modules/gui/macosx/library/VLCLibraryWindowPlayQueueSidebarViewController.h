@@ -20,6 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <AppKit/AppKit.h>
 #import <Cocoa/Cocoa.h>
 
 #import "VLCLibraryWindowAbstractSidebarViewController.h"
@@ -44,6 +45,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *shuffleButton;
 @property (readwrite, weak) IBOutlet NSButton *sortButton;
 @property (readwrite, weak) IBOutlet NSButton *clearButton;
+@property (readwrite, weak) IBOutlet NSStackView *buttonStack;
+@property (readwrite, weak) IBOutlet NSScrollView *scrollView;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *footerContainerViewDefaultBottomConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *scrollViewDefaultBottomConstraint;
 
 @property (readwrite, nonatomic) NSTextField *counterLabel;
 
