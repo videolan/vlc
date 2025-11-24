@@ -1,4 +1,4 @@
-Changes between 3.0.21 and 3.0.22-rc2:
+Changes between 3.0.21 and 3.0.22:
 ----------------------------------
 
 Core:
@@ -35,9 +35,11 @@ Input:
  * Fix SFTP seeking for large files on 32-bit OS
 
 Interface:
- * Add option to use dark palette (Qt)
- * Add compilation support for newer versions of Qt5
+ * Qt: Add option to use dark palette
+ * Qt: Add compilation support for newer versions of Qt5
  * Qt: Fix scrolling on volume slider
+ * macOS: fix crashes when drag'n drop items in the playlist
+ * KDE: fix MPRIS state when started from file
 
 Service Discovery:
  * UPnP: remove SAT>IP channel list fallback
@@ -98,7 +100,8 @@ Security:
  * Crash in Subtitles core, in jpeg2 inside TS
  * Multiple crashes and OOB in CEA-708 subtitles
  * OOB read on Oggspot, MP4
- * Multiple leaks in MKV, ASF/WMV, CAF and PS demuxers, WebVTT and SVCD decoders
+ * Multiple leaks in MKV, ASF/WMV, CAF and PS demuxers, Ogg, Theora, Vorbis,
+   WebVTT and SVCD decoders
  * Busy loop in WebVTT
   (The list above is not exhaustive)
 
