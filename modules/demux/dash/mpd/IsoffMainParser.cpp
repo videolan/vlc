@@ -346,7 +346,7 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
 
 #ifdef ADAPTATIVE_ADVANCED_DEBUG
         if(adaptationSet->description.empty())
-            adaptationSet->description.Set(adaptationSet->getID().str());
+            adaptationSet->description = adaptationSet->getID().str();
 #endif
 
         if(!adaptationSet->getRepresentations().empty())
