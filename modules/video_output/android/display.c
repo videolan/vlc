@@ -71,6 +71,7 @@ static void subpicture_SetDisplaySize(vout_display_t *vd, unsigned width, unsign
 {
     struct sys *sys = vd->sys;
     struct subpicture *sub = &sys->sub;
+    vlc_gl_sub_renderer_SetOutputSize(sub->renderer, width, height);
     vlc_gl_Resize(sub->gl, width, height);
     sub->place_changed = true;
 }
@@ -111,6 +112,10 @@ static bool subpicture_NeedDraw(vout_display_t *vd,
         /* Need to draw one last time in order to clear the current subpicture */
         return true;
     }
+
+    /* If the window/surface size changed, we MUST redraw */
+    if (sub->place_changed)
+        return true;
 
     sub->clear = true;
 
