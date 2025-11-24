@@ -118,6 +118,7 @@ namespace adaptive
             bool hasSynchronizationReference() const;
             void setSynchronizationReference(const SynchronizationReference &);
             void setSrcID( const SrcID & );
+            void setPCRTrusted( bool );
             void schedulePCRReset();
             void scheduleAllForDeletion(); /* Queue Del commands for non Del issued ones */
             void recycleAll(); /* Cancels all commands and send fakees for recycling */
@@ -145,6 +146,14 @@ namespace adaptive
             vlc_tick_t timestamps_offset;
             int priority;
             bool b_in_commands_group;
+            enum class PcrStatus
+            {
+                WaitingFirst,
+                Evaluating,
+                Valid,
+                Broken,
+            } pcrstatus;
+            vlc_tick_t pcrcomparison;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
             std::list<FakeESOutID *> declared;

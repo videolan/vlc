@@ -278,6 +278,7 @@ bool AbstractStream::startDemux()
 
     demuxersource->Reset();
     demuxfirstchunk = true;
+    fakeEsOut()->setPCRTrusted(format != StreamFormat::Type::MPEG2TS);
     demuxer = createDemux(format);
     if(!demuxer && format != StreamFormat())
         msg_Err(p_realdemux, "Failed to create demuxer %p %s", (void *)demuxer,

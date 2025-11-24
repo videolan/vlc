@@ -148,6 +148,8 @@ FakeESOut::FakeESOut( es_out_t *es, AbstractCommandsQueue *queue,
     associated.b_timestamp_set = false;
     expected.b_timestamp_set = false;
     priority = ES_PRIORITY_SELECTABLE_MIN;
+    pcrstatus = PcrStatus::Valid;
+    pcrcomparison = VLC_TICK_INVALID;
     vlc_mutex_init(&lock);
 }
 
@@ -381,6 +383,12 @@ void FakeESOut::setSynchronizationReference(const SynchronizationReference &r)
 void FakeESOut::setSrcID( const SrcID &s )
 {
     srcID = s;
+}
+
+void FakeESOut::setPCRTrusted( bool b )
+{
+    pcrstatus = b ? PcrStatus::Valid : PcrStatus::WaitingFirst;
+    pcrcomparison = VLC_TICK_INVALID;
 }
 
 void FakeESOut::schedulePCRReset()
@@ -651,6 +659,8 @@ int FakeESOut::esOutSend(es_out_id_t *p_es, block_t *p_block)
         times = synchronizationReference.second.segment;
         times.offsetBy(p_block->i_dts - times.demux);
         assert(times.media != VLC_TICK_INVALID);
+        /* For bogus PCR */
+        pcrcomparison = p_block->i_dts;
     }
 
    AbstractCommand *command = commandsfactory->createEsOutSendCommand( es_id, times, p_block );
@@ -696,7 +706,8 @@ int FakeESOut::esOutControl(int i_query, va_list args)
 
             SegmentTimes times;
 
-            if(synchronizationReference.second.segment.demux != VLC_TICK_INVALID)
+            if( pcrstatus != PcrStatus::WaitingFirst &&
+                synchronizationReference.second.segment.demux != VLC_TICK_INVALID )
             {
                 pcr = fixTimestamp( pcr );
 
@@ -706,6 +717,26 @@ int FakeESOut::esOutControl(int i_query, va_list args)
                 times.offsetBy(pcr - times.demux);
             }
             else pcr = VLC_TICK_INVALID;
+
+            /* Offset/Bad PCR handling */
+            if( pcrstatus == PcrStatus::WaitingFirst )
+            {
+                pcrstatus = PcrStatus::Evaluating;
+            }
+            else if( pcrstatus == PcrStatus::Evaluating &&
+                pcrcomparison != VLC_TICK_INVALID && pcr != VLC_TICK_INVALID )
+            {
+                if( std::llabs(pcr - pcrcomparison) > vlc_tick_from_sec(2) )
+                    pcrstatus = PcrStatus::Broken;
+                else
+                    pcrstatus = PcrStatus::Valid;
+            }
+
+            if( pcrstatus == PcrStatus::Broken )
+            {
+                times = SegmentTimes();
+                pcr = VLC_TICK_INVALID;
+            }
 
             AbstractCommand *command = commandsfactory->createEsOutControlPCRCommand( i_group, times, pcr );
             if( likely(command) )
