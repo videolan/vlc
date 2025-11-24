@@ -85,6 +85,7 @@ struct vlc_clock_main_t
     vlc_tick_t delay;
     struct vlc_clock_context *context;
 
+    bool paused;
     vlc_tick_t pause_date;
 
     unsigned wait_sync_ref_priority;
@@ -393,6 +394,7 @@ static void vlc_clock_main_reset(vlc_clock_main_t *main_clock)
     AvgResetAndFill(&main_clock->coeff_avg, ctx->coeff);
 
     main_clock->wait_sync_ref_priority = UINT_MAX;
+    main_clock->pause_date = VLC_TICK_INVALID;
     vlc_cond_broadcast(&main_clock->cond);
 }
 
@@ -604,7 +606,7 @@ vlc_clock_input_start(vlc_clock_t *clock,
     struct vlc_clock_context *context
         = main_clock->context;
 
-    struct vlc_clock_context *last_context = 
+    struct vlc_clock_context *last_context =
         vlc_list_last_entry_or_null(&main_clock->prev_contexts, struct vlc_clock_context, node);
 
     if (last_context != NULL)
@@ -925,7 +927,7 @@ bool vlc_clock_IsPaused(const vlc_clock_t *clock)
     AssertLocked(clock);
 
     vlc_clock_main_t *main_clock = clock->owner;
-    return main_clock->pause_date != VLC_TICK_INVALID;
+    return main_clock->paused;
 }
 
 int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t deadline)
@@ -975,6 +977,7 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vl
     ctx->start_time =
         clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
 
+    main_clock->paused = false;
     main_clock->pause_date = VLC_TICK_INVALID;
     main_clock->input_dejitter = DEFAULT_PTS_DELAY;
     main_clock->output_dejitter = AOUT_MAX_PTS_ADVANCE * 2;
@@ -1049,13 +1052,18 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
 {
     vlc_mutex_assert(&main_clock->lock);
 
-    assert(paused == (main_clock->pause_date == VLC_TICK_INVALID));
+    assert(paused != main_clock->paused);
+    main_clock->paused = paused;
 
     if (paused)
     {
         main_clock->pause_date = now;
         return;
     }
+
+    /* Reset was called before resume from Pause */
+    if (main_clock->pause_date == VLC_TICK_INVALID)
+        return;
 
     struct vlc_clock_context *ctx = main_clock->context;
     /**
@@ -1267,7 +1275,7 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
     struct vlc_clock_context *ctx = main_clock->context;
 
     /* The master has always the 0 priority */
-    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, "input", true, 
+    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, "input", true,
                                                0, NULL, NULL);
     if (!clock)
         return NULL;
