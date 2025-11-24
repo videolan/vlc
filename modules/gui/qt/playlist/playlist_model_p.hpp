@@ -66,7 +66,7 @@ public:
     QVector<PlaylistItem> m_items;
     ssize_t m_current = -1;
 
-    vlc_tick_t m_duration = 0;
+    VLCDuration m_duration = VLCDuration{};
 };
 
 } //namespace playlist

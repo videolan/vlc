@@ -1623,6 +1623,7 @@ test_ml_model_SOURCES = \
 	tests/test_ml_model.cpp \
 	util/base_model.hpp util/base_model_p.hpp  util/base_model.cpp \
 	util/listcache.hpp \
+	util/vlctick.cpp util/vlctick.hpp \
 	util/locallistcacheloader.hpp \
 	medialibrary/mlqmltypes.hpp \
 	medialibrary/mlbasemodel.hpp medialibrary/mlbasemodel.cpp \
@@ -1636,6 +1637,7 @@ nodist_test_ml_model_SOURCES = \
 	util/base_model.moc.cpp \
 	util/listcache.moc.cpp \
 	util/locallistcacheloader.moc.cpp \
+	util/vlctick.moc.cpp \
 	medialibrary/mlqmltypes.moc.cpp \
 	medialibrary/mlbasemodel.moc.cpp \
 	medialibrary/medialib.moc.cpp \

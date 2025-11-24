@@ -30,6 +30,8 @@
 #include <QUrl>
 #include <QMetaType>
 
+#include "util/vlctick.hpp"
+
 
 //namespace vlc {
 //  namespace playlist {
@@ -53,7 +55,7 @@ public:
     Q_PROPERTY(QString artist READ getArtist CONSTANT  FINAL)
     Q_PROPERTY(QString album READ getAlbum CONSTANT  FINAL)
     Q_PROPERTY(QUrl artwork READ getArtwork CONSTANT  FINAL)
-    Q_PROPERTY(vlc_tick_t duration READ getDuration CONSTANT  FINAL)
+    Q_PROPERTY(VLCDuration duration READ getDuration CONSTANT  FINAL)
     Q_PROPERTY(QUrl url READ getUrl CONSTANT  FINAL)
 
     PlaylistItem(vlc_playlist_item_t *item = nullptr);
@@ -84,7 +86,7 @@ public:
 
     QUrl getArtwork() const;
 
-    vlc_tick_t getDuration() const;
+    VLCDuration getDuration() const;
 
     QUrl getUrl() const;
 
@@ -103,7 +105,7 @@ private:
         QString album;
         QUrl artwork;
 
-        vlc_tick_t duration;
+        VLCDuration duration;
 
         QUrl url;
     };

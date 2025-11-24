@@ -178,7 +178,7 @@ void PlaylistListModelPrivate::onItemsReset(const QVector<PlaylistItem>&& newCon
     m_items = newContent;
     q->endResetModel();
 
-    m_duration = VLC_TICK_FROM_SEC(0);
+    m_duration = VLCDuration();
     if (m_items.size())
     {
         for(const auto& i : m_items)
@@ -242,6 +242,14 @@ void PlaylistListModelPrivate::onItemsRemoved(size_t index, size_t count)
     m_items.remove(index, count);
     q->endRemoveRows();
 
+    //maybe we removed the only valid elements
+    if (m_duration.toVLCTick() == 0 && m_duration.valid())
+    {
+        m_duration = VLCDuration();
+        for(const auto& i : m_items)
+            m_duration += i.getDuration();
+    }
+
     emit q->countChanged(m_items.size());
 }
 
@@ -303,7 +311,7 @@ VLCDuration
 PlaylistListModel::getDuration() const
 {
     Q_D(const PlaylistListModel);
-    return VLCDuration(d->m_duration);
+    return d->m_duration;
 }
 
 PlaylistItem

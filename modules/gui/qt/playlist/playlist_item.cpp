@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "playlist_item.hpp"
+#include "util/vlctick.hpp"
 #include <vlc_input_item.h>
 
 //namespace vlc {
@@ -61,7 +62,7 @@ QUrl PlaylistItem::getArtwork() const
     return d->artwork;
 }
 
-vlc_tick_t PlaylistItem::getDuration() const
+VLCDuration PlaylistItem::getDuration() const
 {
     return d->duration;
 }
@@ -75,7 +76,11 @@ void PlaylistItem::sync() {
     input_item_t *media = inputItem();
     assert(media);
     vlc_mutex_locker locker(&media->lock);
-    d->duration = media->i_duration;
+    d->duration =
+        (media->i_duration == INPUT_DURATION_INDEFINITE
+            || media->i_duration == INPUT_DURATION_UNSET)
+        ? VLCDuration{}
+        : VLCDuration{media->i_duration};
     d->url      = media->psz_uri;
 
     if (media->p_meta) {
