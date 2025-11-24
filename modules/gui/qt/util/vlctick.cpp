@@ -197,6 +197,34 @@ bool VLCDuration::operator>(const VLCDuration &rhs) const
     return m_ticks > rhs.m_ticks;
 }
 
+VLCDuration VLCDuration::operator+(const VLCDuration &rhs) const
+{
+    if (m_valid || rhs.m_valid)
+        return VLCDuration{m_ticks + rhs.m_ticks};
+    return VLCDuration{};
+}
+
+VLCDuration& VLCDuration::operator+=(const VLCDuration &rhs)
+{
+    m_valid |= rhs.m_valid;
+    m_ticks += rhs.m_ticks;
+    return *this;
+}
+
+VLCDuration VLCDuration::operator-(const VLCDuration &rhs) const
+{
+    if (m_valid || rhs.m_valid)
+        return VLCDuration{m_ticks + rhs.m_ticks};
+    return VLCDuration{};
+}
+
+VLCDuration& VLCDuration::operator-=(const VLCDuration &rhs)
+{
+    m_valid |= rhs.m_valid;
+    m_ticks -= rhs.m_ticks;
+    return *this;
+}
+
 double VLCDuration::toSecf() const
 {
     return secf_from_vlc_tick(m_ticks);

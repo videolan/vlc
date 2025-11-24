@@ -104,6 +104,10 @@ public:
     VLCDuration(vlc_tick_t);
 
     VLCDuration operator*(double) const;
+    VLCDuration operator+(const VLCDuration &) const;
+    VLCDuration& operator+=(const VLCDuration &);
+    VLCDuration operator-(const VLCDuration &) const;
+    VLCDuration& operator-=(const VLCDuration &);
     bool operator==(const VLCDuration &) const;
     bool operator>(const VLCDuration &) const;
 
