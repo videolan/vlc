@@ -318,6 +318,27 @@ int CommandsQueue_test()
         }
         queue.Process(DT(VLC_TICK_0 + OFFSET + vlc_tick_from_sec(0)));
         Expect(esout.output.size() == 1);
+        queue.Abort(true);
+        esout.cleanup();
+
+        /* PCR handling when set to INVALID */
+        for(size_t i=0; i<3; i++)
+        {
+            block_t *data = block_Alloc(0);
+            Expect(data);
+            data->i_dts = VLC_TICK_0 + vlc_tick_from_sec(i);
+            cmd = factory.createEsOutSendCommand(id0, SegmentTimes(), data);
+            queue.Schedule(cmd);
+        }
+        Expect(queue.getDemuxedAmount(DT(VLC_TICK_0)).continuous == 0);
+        Expect(queue.getBufferingLevel().continuous == VLC_TICK_INVALID);
+        cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(), VLC_TICK_INVALID);
+        queue.Schedule(cmd);
+        Expect(queue.getDemuxedAmount(DT(VLC_TICK_0)).continuous == vlc_tick_from_sec(2));
+        Expect(queue.getBufferingLevel().continuous == VLC_TICK_0 + vlc_tick_from_sec(2));
+        queue.Process(DT(VLC_TICK_0 + vlc_tick_from_sec(5)));
+        Expect(esout.output.size() == 3);
+
 
     } catch(...) {
         delete id0;

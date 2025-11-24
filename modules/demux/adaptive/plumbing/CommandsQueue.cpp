@@ -351,8 +351,18 @@ void CommandsQueue::Schedule( AbstractCommand *command, EsType )
     else if( command->getType() == ES_OUT_SET_GROUP_PCR )
     {
         if(command->getTimes().continuous != VLC_TICK_INVALID)
+        {
             bufferinglevel = command->getTimes();
-        LockedCommit();
+            LockedCommit();
+        }
+        else
+        {
+            /* Try to use the reordered/committed tail when the pcr was invalid */
+            LockedCommit();
+            if(!commands.empty() &&
+                commands.back().second->getTimes().continuous != VLC_TICK_INVALID)
+                bufferinglevel = commands.back().second->getTimes();
+        }
         commands.push_back( Queueentry(nextsequence++, command) );
     }
     else
