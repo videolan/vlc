@@ -597,6 +597,7 @@ static void EsOutPropsInit( es_out_es_props_t *p_props,
     p_props->i_channel = (psz_trackvar) ? var_GetInteger( p_input, psz_trackvar ): -1;
     p_props->i_demux_id = -1;
     p_props->p_main_es = NULL;
+    p_props->ppsz_language = NULL;
 
     if( input_type != INPUT_TYPE_PREPARSING && psz_langvar )
     {
@@ -4163,7 +4164,7 @@ struct vlc_input_es_out *
 input_EsOutNew(input_thread_t *p_input, input_source_t *main_source, float rate,
                enum input_type input_type)
 {
-    es_out_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
+    es_out_sys_t *p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return NULL;
 
@@ -4183,6 +4184,7 @@ input_EsOutNew(input_thread_t *p_input, input_source_t *main_source, float rate,
     p_sys->i_mode   = ES_OUT_MODE_NONE;
     p_sys->input_type = input_type;
 
+    p_sys->p_pgrm = NULL;
     vlc_list_init(&p_sys->programs);
     vlc_list_init(&p_sys->es);
     vlc_list_init(&p_sys->es_slaves);
@@ -4201,15 +4203,25 @@ input_EsOutNew(input_thread_t *p_input, input_source_t *main_source, float rate,
     p_sys->cc_decoder = var_InheritInteger( p_input, "captions" );
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
+    p_sys->i_audio_delay = p_sys->i_spu_delay = p_sys->i_video_delay = 0;
+    p_sys->i_pts_delay = p_sys->i_tracks_pts_delay = p_sys->i_pts_jitter
+                       = VLC_TICK_INVALID;
+    p_sys->i_cr_average = 0;
 
     p_sys->user_clock_source = clock_source_Inherit( VLC_OBJECT(p_input) );
+    p_sys->i_id = 0;
 
     p_sys->i_pause_date = -1;
 
     p_sys->rate = rate;
+    p_sys->b_paused = false;
 
     p_sys->b_buffering = true;
+    p_sys->i_buffering_extra_initial = p_sys->i_buffering_extra_stream
+                                     = p_sys->i_buffering_extra_system
+                                     = VLC_TICK_INVALID;
     p_sys->b_draining = false;
+    p_sys->p_sout_record = NULL;
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
 
