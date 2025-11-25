@@ -471,6 +471,9 @@ void
 vlc_player_input_HandleState(struct vlc_player_input *, enum vlc_player_state,
                              vlc_tick_t state_date);
 
+void
+vlc_player_input_HandleAtoBLoop(struct vlc_player_input *input);
+
 /*
  * player_timer.c
 */

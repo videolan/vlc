@@ -61,7 +61,7 @@ vlc_player_input_GetPos(struct vlc_player_input *input, bool seeking,
     return input->position;
 }
 
-static void
+void
 vlc_player_input_HandleAtoBLoop(struct vlc_player_input *input)
 {
     if (!input->abloop_state[0].set || !input->abloop_state[1].set)
