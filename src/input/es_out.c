@@ -921,12 +921,21 @@ static int EsOutSetRecord(es_out_sys_t *p_sys, bool b_record, const char *dir_pa
     return VLC_SUCCESS;
 }
 
-static void EsOutStopNextFrame(es_out_sys_t *p_sys)
+static es_out_id_t *EsOutStopNextFrame(es_out_sys_t *p_sys)
+{
+    if (p_sys->p_next_frame_es == NULL || p_sys->p_next_frame_es->p_dec == NULL)
+        return NULL;
+    vlc_input_decoder_StopFrameNext(p_sys->p_next_frame_es->p_dec);
+    es_out_id_t *noflush_es = p_sys->p_next_frame_es;
+    p_sys->p_next_frame_es = NULL;
+    return noflush_es;
+}
+
+static void EsOutResumeFromNextFrame(es_out_sys_t *p_sys)
 {
     assert( p_sys->p_next_frame_es != NULL );
     /* Flush every ES except the video one */
-    EsOutChangePosition(p_sys, p_sys->p_next_frame_es );
-    p_sys->p_next_frame_es = NULL;
+    EsOutChangePosition(p_sys, EsOutStopNextFrame(p_sys));
 }
 
 static void EsOutChangePause(es_out_sys_t *p_sys, bool b_paused, vlc_tick_t i_date)
@@ -940,7 +949,7 @@ static void EsOutChangePause(es_out_sys_t *p_sys, bool b_paused, vlc_tick_t i_da
     else
     {
         if( p_sys->p_next_frame_es != NULL )
-            EsOutStopNextFrame(p_sys);
+            EsOutResumeFromNextFrame(p_sys);
 
         if( p_sys->i_buffering_extra_initial > 0 )
         {
@@ -1063,6 +1072,7 @@ static void EsOutDecodersStopBuffering(es_out_sys_t *p_sys, bool b_forced)
      * increase the buffering duration. */
     if (i_stream_duration < 0)
     {
+        EsOutStopNextFrame(p_sys);
         EsOutChangePosition(p_sys, NULL);
         return;
     }
@@ -2618,7 +2628,7 @@ static void EsOutUnselectEs(es_out_sys_t *p_sys, es_out_id_t *es, bool b_update)
     }
 
     if( p_sys->p_next_frame_es == es )
-        EsOutStopNextFrame(p_sys);
+        EsOutResumeFromNextFrame(p_sys);
 
     EsOutDestroyDecoder(p_sys, es);
     es->forced = false;
@@ -3562,6 +3572,7 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
 
     case ES_OUT_RESET_PCR:
         msg_Dbg( p_sys->p_input, "ES_OUT_RESET_PCR called" );
+        EsOutStopNextFrame(p_sys);
         EsOutChangePosition(p_sys, NULL);
         return VLC_SUCCESS;
 

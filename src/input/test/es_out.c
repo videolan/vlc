@@ -236,6 +236,11 @@ void vlc_input_decoder_FrameNext(vlc_input_decoder_t *p_dec)
     (void)p_dec;
 }
 
+void vlc_input_decoder_StopFrameNext(vlc_input_decoder_t *p_dec)
+{
+    (void)p_dec;
+}
+
 vlc_input_decoder_t *
 vlc_input_decoder_CreateSubDec(vlc_input_decoder_t *dec,
                                const struct vlc_input_decoder_cfg *cfg)
