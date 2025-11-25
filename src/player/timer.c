@@ -527,14 +527,15 @@ vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source)
 }
 
 int
-vlc_player_GetTimerPoint(vlc_player_t *player, bool seeking,
+vlc_player_GetTimerPoint(vlc_player_t *player, bool *seeking,
                          vlc_tick_t system_now,
                          vlc_tick_t *out_ts, double *out_pos)
 {
     int ret = VLC_EGENERIC;
     vlc_mutex_lock(&player->timer.lock);
-    if (seeking
-     && (player->timer.seek_ts != VLC_TICK_INVALID || player->timer.seek_position >= 0.0f))
+    bool timer_seeking = player->timer.seek_ts != VLC_TICK_INVALID
+                      || player->timer.seek_position >= 0.0f;
+    if (*seeking && timer_seeking)
     {
         if (out_ts != NULL)
         {
@@ -569,6 +570,8 @@ vlc_player_GetTimerPoint(vlc_player_t *player, bool seeking,
         ret = VLC_SUCCESS;
     }
 
+    if (ret == VLC_SUCCESS)
+        *seeking = timer_seeking;
 end:
     vlc_mutex_unlock(&player->timer.lock);
     return ret;

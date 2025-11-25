@@ -43,7 +43,7 @@ vlc_player_input_GetTime(struct vlc_player_input *input, bool seeking,
     vlc_tick_t ts;
 
     if (input == player->input
-     && vlc_player_GetTimerPoint(player, seeking, system_now, &ts, NULL) == 0)
+     && vlc_player_GetTimerPoint(player, &seeking, system_now, &ts, NULL) == 0)
         return ts;
     return input->time;
 }
@@ -56,7 +56,7 @@ vlc_player_input_GetPos(struct vlc_player_input *input, bool seeking,
     double pos;
 
     if (input == player->input
-     && vlc_player_GetTimerPoint(player, seeking, system_now, NULL, &pos) == 0)
+     && vlc_player_GetTimerPoint(player, &seeking, system_now, NULL, &pos) == 0)
         return pos;
     return input->position;
 }

@@ -508,7 +508,7 @@ void
 vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source);
 
 int
-vlc_player_GetTimerPoint(vlc_player_t *player, bool seeking,
+vlc_player_GetTimerPoint(vlc_player_t *player, bool *seeking,
                          vlc_tick_t system_now,
                          vlc_tick_t *out_ts, double *out_pos);
 
