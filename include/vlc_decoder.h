@@ -86,6 +86,15 @@ VLC_API void vlc_input_decoder_Decode( vlc_input_decoder_t *p_dec, struct vlc_fr
 VLC_API void vlc_input_decoder_Drain( vlc_input_decoder_t * );
 
 /**
+ * Returns the drained state
+ *
+ * @warning This function need to be polled (every few ms) to know when the
+ * decoder is drained
+ * @return true if drained (after a call to vlc_input_decoder_Drain())
+ */
+ VLC_API bool vlc_input_decoder_IsDrained( vlc_input_decoder_t * );
+
+/**
  * Requests that the decoder immediately discard all pending buffers.
  * This is useful when seeking or when deselecting a stream.
  */

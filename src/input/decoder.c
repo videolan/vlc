@@ -2486,6 +2486,28 @@ void vlc_input_decoder_Decode(vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
     vlc_input_decoder_DecodeWithStatus(p_owner, frame, b_do_pace, NULL);
 }
 
+static bool vlc_input_decoder_IsDrainedLocked(vlc_input_decoder_t *owner)
+{
+    vlc_fifo_Assert(owner->p_fifo);
+
+    if (owner->p_sout_input != NULL)
+        return true;
+    else if (owner->fmt.i_cat == VIDEO_ES && owner->video.vout != NULL)
+        return vout_IsEmpty(owner->video.vout);
+    else if(owner->fmt.i_cat == AUDIO_ES && owner->audio.stream != NULL)
+        return vlc_aout_stream_IsDrained( owner->audio.stream);
+    else
+        return true; /* TODO subtitles support */
+}
+
+bool vlc_input_decoder_IsDrained(vlc_input_decoder_t *owner)
+{
+    vlc_fifo_Lock(owner->p_fifo);
+    bool drained = vlc_input_decoder_IsDrainedLocked(owner);
+    vlc_fifo_Unlock(owner->p_fifo);
+    return drained;
+}
+
 bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
 {
     assert( !p_owner->b_waiting );
@@ -2497,16 +2519,8 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
         return false;
     }
 
-    bool b_empty;
+    bool b_empty = vlc_input_decoder_IsDrainedLocked( p_owner );
 
-    if( p_owner->p_sout_input != NULL )
-        b_empty = true;
-    else if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->video.vout != NULL )
-        b_empty = vout_IsEmpty( p_owner->video.vout );
-    else if( p_owner->fmt.i_cat == AUDIO_ES && p_owner->audio.stream != NULL )
-        b_empty = vlc_aout_stream_IsDrained( p_owner->audio.stream );
-    else
-        b_empty = true; /* TODO subtitles support */
     vlc_fifo_Unlock( p_owner->p_fifo );
 
     return b_empty;
