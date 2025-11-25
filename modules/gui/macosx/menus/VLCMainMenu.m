@@ -244,11 +244,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [extMgr buildMenu:_extensionsMenu];
     [_extensions setEnabled:([_extensionsMenu numberOfItems] > 0)];
 
-    // FIXME: Implement preference for autoloading extensions on mac
-    // FIXME: this is definitely the wrong place to do this.
-    if (![extMgr isLoaded] && ![extMgr cannotLoad])
-        [extMgr loadExtensions];
-
     /* setup post-proc menu */
     [_postprocessingMenu removeAllItems];
     [_postprocessingMenu setAutoenablesItems: YES];
