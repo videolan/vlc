@@ -334,7 +334,6 @@ selector:
             vlc_css_selector_AddSpecifier( $$, $2 );
             $2->combinator = RELATION_DESCENDENT;
         }
-        else $$ = $2;
     }
     | selector combinator simple_selector {
         $$ = $1;
@@ -343,7 +342,6 @@ selector:
             vlc_css_selector_AddSpecifier( $$, $3 );
             $3->combinator = $2;
         }
-        else $$ = $3;
     }
     | selector error {
         vlc_css_selectors_Delete( $1 );
