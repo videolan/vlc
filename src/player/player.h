@@ -290,10 +290,10 @@ struct vlc_player_t
         vlc_thread_t thread;
         vlc_cond_t wait;
         vlc_cond_t notify;
-        struct vlc_list inputs;
+        struct vlc_list stop_inputs;
         struct vlc_list stopping_inputs;
         struct vlc_list joinable_inputs;
-    } destructor;
+    } mainloop;
 
     struct vlc_player_timer timer;
 };

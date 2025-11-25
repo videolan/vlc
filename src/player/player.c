@@ -131,20 +131,20 @@ vlc_player_destructor_AddInput(vlc_player_t *player,
         input->started = false;
         /* Add this input to the stop list: it will be stopped by the
          * destructor thread */
-        assert(!vlc_list_HasInput(&player->destructor.stopping_inputs, input));
-        assert(!vlc_list_HasInput(&player->destructor.joinable_inputs, input));
-        vlc_list_append(&input->node, &player->destructor.inputs);
+        assert(!vlc_list_HasInput(&player->mainloop.stopping_inputs, input));
+        assert(!vlc_list_HasInput(&player->mainloop.joinable_inputs, input));
+        vlc_list_append(&input->node, &player->mainloop.stop_inputs);
     }
     else
     {
         /* Add this input to the joinable list: it will be deleted by the
          * destructor thread */
-        assert(!vlc_list_HasInput(&player->destructor.inputs, input));
-        assert(!vlc_list_HasInput(&player->destructor.joinable_inputs, input));
-        vlc_list_append(&input->node, &player->destructor.joinable_inputs);
+        assert(!vlc_list_HasInput(&player->mainloop.stop_inputs, input));
+        assert(!vlc_list_HasInput(&player->mainloop.joinable_inputs, input));
+        vlc_list_append(&input->node, &player->mainloop.joinable_inputs);
     }
 
-    vlc_cond_signal(&input->player->destructor.wait);
+    vlc_cond_signal(&input->player->mainloop.wait);
 }
 
 void
@@ -152,12 +152,12 @@ vlc_player_destructor_AddStoppingInput(vlc_player_t *player,
                                        struct vlc_player_input *input)
 {
     /* Add this input to the stopping list */
-    if (vlc_list_HasInput(&player->destructor.inputs, input))
+    if (vlc_list_HasInput(&player->mainloop.stop_inputs, input))
         vlc_list_remove(&input->node);
-    if (!vlc_list_HasInput(&player->destructor.stopping_inputs, input))
+    if (!vlc_list_HasInput(&player->mainloop.stopping_inputs, input))
     {
-        vlc_list_append(&input->node, &player->destructor.stopping_inputs);
-        vlc_cond_signal(&input->player->destructor.wait);
+        vlc_list_append(&input->node, &player->mainloop.stopping_inputs);
+        vlc_cond_signal(&input->player->mainloop.wait);
     }
 }
 
@@ -165,7 +165,7 @@ void
 vlc_player_destructor_AddJoinableInput(vlc_player_t *player,
                                        struct vlc_player_input *input)
 {
-    if (vlc_list_HasInput(&player->destructor.stopping_inputs, input))
+    if (vlc_list_HasInput(&player->mainloop.stopping_inputs, input))
         vlc_list_remove(&input->node);
 
     assert(!input->started);
@@ -174,13 +174,13 @@ vlc_player_destructor_AddJoinableInput(vlc_player_t *player,
 
 static bool vlc_player_destructor_IsEmpty(vlc_player_t *player)
 {
-    return vlc_list_is_empty(&player->destructor.inputs)
-        && vlc_list_is_empty(&player->destructor.stopping_inputs)
-        && vlc_list_is_empty(&player->destructor.joinable_inputs);
+    return vlc_list_is_empty(&player->mainloop.stop_inputs)
+        && vlc_list_is_empty(&player->mainloop.stopping_inputs)
+        && vlc_list_is_empty(&player->mainloop.joinable_inputs);
 }
 
 static void *
-vlc_player_destructor_Thread(void *data)
+vlc_player_mainloop_Thread(void *data)
 {
     vlc_player_t *player = data;
 
@@ -195,12 +195,12 @@ vlc_player_destructor_Thread(void *data)
     {
         /* Wait for an input to stop or close. No while loop here since we want
          * to leave this code path when the player is deleting. */
-        if (vlc_list_is_empty(&player->destructor.inputs)
-         && vlc_list_is_empty(&player->destructor.joinable_inputs))
-            vlc_cond_wait(&player->destructor.wait, &player->lock);
+        if (vlc_list_is_empty(&player->mainloop.stop_inputs)
+         && vlc_list_is_empty(&player->mainloop.joinable_inputs))
+            vlc_cond_wait(&player->mainloop.wait, &player->lock);
 
         struct vlc_player_input *input;
-        vlc_list_foreach(input, &player->destructor.inputs, node)
+        vlc_list_foreach(input, &player->mainloop.stop_inputs, node)
         {
             input_Stop(input->thread);
             input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_USER;
@@ -211,8 +211,8 @@ vlc_player_destructor_Thread(void *data)
 
         bool keep_sout = true;
         const bool inputs_changed =
-            !vlc_list_is_empty(&player->destructor.joinable_inputs);
-        vlc_list_foreach(input, &player->destructor.joinable_inputs, node)
+            !vlc_list_is_empty(&player->mainloop.joinable_inputs);
+        vlc_list_foreach(input, &player->mainloop.joinable_inputs, node)
         {
             vlc_player_UpdateMLStates(player, input);
 
@@ -1940,7 +1940,7 @@ vlc_player_InitLocks(vlc_player_t *player, enum vlc_player_lock_type lock_type)
     vlc_mutex_init(&player->vout_listeners_lock);
     vlc_mutex_init(&player->aout_listeners_lock);
     vlc_cond_init(&player->start_delay_cond);
-    vlc_cond_init(&player->destructor.wait);
+    vlc_cond_init(&player->mainloop.wait);
 }
 
 void
@@ -1955,7 +1955,7 @@ vlc_player_Delete(vlc_player_t *player)
     }
 
     player->deleting = true;
-    vlc_cond_signal(&player->destructor.wait);
+    vlc_cond_signal(&player->mainloop.wait);
 
     assert(vlc_list_is_empty(&player->listeners));
     assert(vlc_list_is_empty(&player->metadata_listeners));
@@ -1964,7 +1964,7 @@ vlc_player_Delete(vlc_player_t *player)
 
     vlc_mutex_unlock(&player->lock);
 
-    vlc_join(player->destructor.thread, NULL);
+    vlc_join(player->mainloop.thread, NULL);
 
     if (player->media)
         input_item_Release(player->media);
@@ -2008,9 +2008,9 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type)
     vlc_list_init(&player->metadata_listeners);
     vlc_list_init(&player->vout_listeners);
     vlc_list_init(&player->aout_listeners);
-    vlc_list_init(&player->destructor.inputs);
-    vlc_list_init(&player->destructor.stopping_inputs);
-    vlc_list_init(&player->destructor.joinable_inputs);
+    vlc_list_init(&player->mainloop.stop_inputs);
+    vlc_list_init(&player->mainloop.stopping_inputs);
+    vlc_list_init(&player->mainloop.joinable_inputs);
     player->start_paused = false;
     player->pause_on_cork = false;
     player->corked = false;
@@ -2086,7 +2086,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type)
     vlc_player_InitLocks(player, lock_type);
     vlc_player_InitTimer(player);
 
-    if (vlc_clone(&player->destructor.thread, vlc_player_destructor_Thread,
+    if (vlc_clone(&player->mainloop.thread, vlc_player_mainloop_Thread,
                   player) != 0)
     {
         vlc_player_DestroyTimer(player);
