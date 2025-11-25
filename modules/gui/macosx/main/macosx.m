@@ -107,6 +107,9 @@ int  WindowOpen   (vlc_window_t *);
 #define ITUNES_TEXT N_("Control external music players")
 #define ITUNES_LONGTEXT N_("VLC will pause and resume supported music players on playback.")
 
+#define AUTOLOAD_EXTENSIONS_TEXT N_("Automatically load extensions on startup")
+#define AUTOLOAD_EXTENSIONS_LONGTEXT N_("Automatically load and enable VLC extensions when the application starts.")
+
 static const int itunes_list[] =
     { 0, 1, 2 };
 static const char *const itunes_list_text[] = {
@@ -146,6 +149,7 @@ vlc_module_begin()
         add_bool("macosx-pause-minimized", false, PAUSE_MINIMIZED_TEXT, PAUSE_MINIMIZED_LONGTEXT)
         add_bool("macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, NULL)
         add_bool("macosx-dim-keyboard", false, DIM_KEYBOARD_PLAYBACK_TEXT, DIM_KEYBOARD_PLAYBACK_LONGTEXT)
+        add_bool("macosx-autoload-extensions", true, AUTOLOAD_EXTENSIONS_TEXT, AUTOLOAD_EXTENSIONS_LONGTEXT)
         add_integer("macosx-control-itunes", 1, ITUNES_TEXT, ITUNES_LONGTEXT)
         change_integer_list(itunes_list, itunes_list_text)
         add_integer("macosx-continue-playback", 0, CONTINUE_PLAYBACK_TEXT, CONTINUE_PLAYBACK_LONGTEXT)
