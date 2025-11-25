@@ -439,7 +439,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	medialibrary/mlgenremodel.moc.cpp \
 	medialibrary/mlthreadpool.moc.cpp \
 	medialibrary/mlqmltypes.moc.cpp \
-	medialibrary/mlmedia.moc.cpp \
 	medialibrary/mlrecentmediamodel.moc.cpp \
 	medialibrary/mlrecentvideomodel.moc.cpp \
 	medialibrary/mlurlmodel.moc.cpp \

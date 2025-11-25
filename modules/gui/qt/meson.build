@@ -86,7 +86,6 @@ moc_headers = files(
     'medialibrary/mlgenremodel.hpp',
     'medialibrary/mlthreadpool.hpp',
     'medialibrary/mlqmltypes.hpp',
-    'medialibrary/mlmedia.hpp',
     'medialibrary/mlrecentmediamodel.hpp',
     'medialibrary/mlrecentvideomodel.hpp',
     'medialibrary/mlurlmodel.hpp',
