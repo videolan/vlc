@@ -22,8 +22,6 @@
 
 #import "VLCMainMenu.h"
 
-#import "coreinteraction/VLCVideoFilterHelper.h"
-
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -1191,19 +1189,16 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)_disablePostProcessing
 {
-    // FIXME re-write using VLCPlayerController
-    [VLCVideoFilterHelper setVideoFilter:"postproc" on:false];
+    [_playerController enableVideoFilterWithName:@"postproc" state:NO];
 }
 
 - (void)_enablePostProcessing
 {
-    // FIXME re-write using VLCPlayerController
-    [VLCVideoFilterHelper setVideoFilter:"postproc" on:true];
+    [_playerController enableVideoFilterWithName:@"postproc" state:YES];
 }
 
 - (void)togglePostProcessing:(id)sender
 {
-    // FIXME re-write using VLCPlayerController
     NSInteger count = [_postprocessingMenu numberOfItems];
     for (NSUInteger x = 0; x < (NSUInteger)count; x++)
         [[_postprocessingMenu itemAtIndex:x] setState:NSOffState];
@@ -1215,7 +1210,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [self _enablePostProcessing];
         [sender setState:NSOnState];
 
-        [VLCVideoFilterHelper setVideoFilterProperty:"postproc-q" forFilter:"postproc" withValue:(vlc_value_t){ .i_int = [sender tag] }];
+        [_playerController setVideoFilterProperty:@"postproc-q" forFilter:@"postproc" withValue:(vlc_value_t){ .i_int = [sender tag] }];
     }
 }
 
