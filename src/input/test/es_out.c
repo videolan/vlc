@@ -138,10 +138,15 @@ void vlc_input_decoder_StopWait(vlc_input_decoder_t *owner)
     owner->started = true;
 }
 
-bool vlc_input_decoder_IsEmpty(vlc_input_decoder_t *owner)
+bool vlc_input_decoder_IsDrained(vlc_input_decoder_t *owner)
 {
     (void)owner;
     return owner->drained;
+}
+
+bool vlc_input_decoder_IsEmpty(vlc_input_decoder_t *owner)
+{
+    return vlc_input_decoder_IsDrained(owner);
 }
 
 void vlc_input_decoder_DecodeWithStatus(

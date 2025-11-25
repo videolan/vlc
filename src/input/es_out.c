@@ -3090,8 +3090,8 @@ EsOutDrainDecoder(es_out_sys_t *p_sys, es_out_id_t *es, bool wait)
      * bit too long if the ES is deleted in the middle of a stream. */
     while( !input_Stopped(p_sys->p_input) && !p_sys->b_buffering )
     {
-        if( vlc_input_decoder_IsEmpty( es->p_dec ) &&
-            ( !es->p_dec_record || vlc_input_decoder_IsEmpty( es->p_dec_record ) ))
+        if( vlc_input_decoder_IsDrained( es->p_dec ) &&
+            ( !es->p_dec_record || vlc_input_decoder_IsDrained( es->p_dec_record ) ))
             break;
         /* FIXME there should be a way to have auto deleted es, but there will be
          * a problem when another codec of the same type is created (mainly video) */
