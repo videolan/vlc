@@ -2056,6 +2056,29 @@ static int BossCallback(vlc_object_t *p_this,
     return VLC_SUCCESS;
 }
 
+- (int)setVideoFilterProperty:(NSString *)property forFilter:(NSString *)filterName withValue:(vlc_value_t)value
+{
+    if (property == nil || property.length == 0 || filterName == nil || filterName.length == 0) {
+        return VLC_EINVAL;
+    }
+
+    vout_thread_t * const p_vout = [self mainVideoOutputThread];
+    if (p_vout == NULL) {
+        return VLC_EGENERIC;
+    }
+
+    const char * const propertyUTF8String = property.UTF8String;
+    int i_type = var_Type(p_vout, propertyUTF8String);
+    if (i_type == 0) {
+        i_type = config_GetType(propertyUTF8String);
+    }
+
+    i_type &= VLC_VAR_CLASS;
+    var_SetChecked(p_vout, propertyUTF8String, i_type, value);
+    vout_Release(p_vout);
+    return VLC_SUCCESS;
+}
+
 @end
 
 @implementation VLCInputStats

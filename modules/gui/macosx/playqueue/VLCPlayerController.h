@@ -897,6 +897,15 @@ extern const CGFloat VLCVolumeDefault;
  */
 - (int)enableVideoFilterWithName:(NSString *)name state:(BOOL)state;
 
+/**
+ * Set a property value for a video filter
+ * @param property the property name to set
+ * @param filterName the name of the video filter
+ * @param value the value to set
+ * @return VLC_SUCCESS on success, error code otherwise
+ */
+- (int)setVideoFilterProperty:(NSString *)property forFilter:(NSString *)filterName withValue:(vlc_value_t)value;
+
 @end
 
 @interface VLCInputStats : NSObject
