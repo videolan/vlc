@@ -219,6 +219,7 @@ var_Read_float(const char *psz)
 #define OPTIONS_GLOBAL(X) \
     X(node_count, ssize_t, add_integer, Ssize, 0, NO_FREE) \
     X(length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(5000), NO_FREE) \
+    X(report_length, bool, add_bool, Bool, true, NO_FREE) \
     X(audio_track_count, ssize_t, add_integer, Ssize, 0, NO_FREE) \
     X(video_track_count, ssize_t, add_integer, Ssize, 0, NO_FREE) \
     X(sub_track_count, ssize_t, add_integer, Ssize, 0, NO_FREE) \
@@ -557,6 +558,8 @@ Control(demux_t *demux, int query, va_list args)
                 VLC_TICK_0 + sys->pts_offset + va_arg(args, double) * sys->length;
             return VLC_SUCCESS;
         case DEMUX_GET_LENGTH:
+            if (!sys->report_length)
+                return VLC_EGENERIC;
             *va_arg(args, vlc_tick_t *) = sys->length;
             return VLC_SUCCESS;
         case DEMUX_GET_NORMAL_TIME:
