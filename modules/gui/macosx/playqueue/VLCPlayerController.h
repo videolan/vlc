@@ -889,6 +889,14 @@ extern const CGFloat VLCVolumeDefault;
 
 - (int)enableAudioFilterWithName:(NSString *)name state:(BOOL)state;
 
+/**
+ * Enable or disable a video filter by name
+ * @param name the name of the video filter module
+ * @param state YES to enable, NO to disable
+ * @return VLC_SUCCESS on success, error code otherwise
+ */
+- (int)enableVideoFilterWithName:(NSString *)name state:(BOOL)state;
+
 @end
 
 @interface VLCInputStats : NSObject

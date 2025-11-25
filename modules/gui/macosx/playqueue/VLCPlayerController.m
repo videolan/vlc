@@ -24,6 +24,7 @@
 #include "vlc_player.h"
 
 #import <vlc_configuration.h>
+#import <vlc_modules.h>
 #import <vlc_url.h>
 
 #import "extensions/NSString+Helpers.h"
@@ -1972,6 +1973,87 @@ static int BossCallback(vlc_object_t *p_this,
     }
 
     return vlc_player_aout_EnableFilter(_p_player, [name UTF8String], state);
+}
+
+- (int)enableVideoFilterWithName:(NSString *)name state:(BOOL)state
+{
+    if (name == nil || name.length == 0) {
+        return VLC_EINVAL;
+    }
+
+    vout_thread_t * const p_vout = [self mainVideoOutputThread];
+    if (p_vout == NULL) {
+        return VLC_EGENERIC;
+    }
+
+    const char * const nameUTF8String = name.UTF8String;
+    module_t * const p_obj = module_find(nameUTF8String);
+    if (p_obj == NULL) {
+        vout_Release(p_vout);
+        return VLC_EGENERIC;
+    }
+
+    const char *psz_filter_type = NULL;
+    if (module_provides(p_obj, "video splitter")) {
+        psz_filter_type = "video-splitter";
+    } else if (module_provides(p_obj, "video filter")) {
+        psz_filter_type = "video-filter";
+    } else if (module_provides(p_obj, "sub source")) {
+        psz_filter_type = "sub-source";
+    } else if (module_provides(p_obj, "sub filter")) {
+        psz_filter_type = "sub-filter";
+    }
+
+    if (psz_filter_type == NULL) {
+        vout_Release(p_vout);
+        return VLC_EGENERIC;
+    }
+
+    char *psz_string = var_InheritString(p_vout, psz_filter_type);
+
+    if (state) {
+        if (psz_string == NULL) {
+            psz_string = strdup(nameUTF8String);
+        } else if (strstr(psz_string, nameUTF8String) == NULL) {
+            char *psz_tmp = NULL;
+            if (asprintf(&psz_tmp, "%s:%s", psz_string, nameUTF8String) == -1) {
+                free((void *)psz_string);
+                vout_Release(p_vout);
+                return VLC_ENOMEM;
+            }
+            free((void *)psz_string);
+            psz_string = psz_tmp;
+        }
+    } else {
+        if (psz_string == NULL) {
+            vout_Release(p_vout);
+            return VLC_SUCCESS;
+        }
+
+        char *const psz_parser = strstr(psz_string, nameUTF8String);
+        if (psz_parser != NULL) {
+            const size_t name_len = [name lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+            if (*(psz_parser + name_len) == ':') {
+                memmove((void *)psz_parser, psz_parser + name_len + 1,
+                        strlen(psz_parser + name_len + 1) + 1);
+            } else {
+                *psz_parser = '\0';
+            }
+
+            if (*psz_string != '\0' && *(psz_string + strlen(psz_string) - 1) == ':') {
+                *(psz_string + strlen(psz_string) - 1) = '\0';
+            }
+        } else {
+            free((void *)psz_string);
+            vout_Release(p_vout);
+            return VLC_SUCCESS;
+        }
+    }
+
+    var_SetString(p_vout, psz_filter_type, psz_string);
+    free((void *)psz_string);
+    vout_Release(p_vout);
+    return VLC_SUCCESS;
 }
 
 @end
