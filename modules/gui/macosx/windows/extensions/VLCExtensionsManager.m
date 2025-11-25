@@ -58,6 +58,11 @@
 
         _isUnloading = false;
         b_failed = false;
+
+        // Load extensions if autoload preference is enabled
+        if (var_InheritBool(getIntf(), "macosx-autoload-extensions")) {
+            [self loadExtensions];
+        }
     }
 
     return self;
