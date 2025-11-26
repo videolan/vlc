@@ -162,7 +162,6 @@
         NSButton * const homeButton = self.homeButton;
         VLCInputNodePathControl * const pathControl = self.pathControl;
         pathControl.translatesAutoresizingMaskIntoConstraints = NO;
-        const CGFloat pathControlHeight = pathControl.frame.size.height;
         
         _pathControlGlassEffectView = [[NSGlassEffectView alloc] initWithFrame:self.pathControlVisualEffectView.frame];
         self.pathControlGlassEffectView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -174,17 +173,22 @@
         [NSLayoutConstraint activateConstraints:@[
             [self.pathControlGlassEffectView.leadingAnchor constraintEqualToAnchor:self.mediaSourceView.leadingAnchor constant:VLCLibraryUIUnits.smallSpacing],
             [self.pathControlGlassEffectView.trailingAnchor constraintEqualToAnchor:self.mediaSourceView.trailingAnchor constant:-VLCLibraryUIUnits.smallSpacing],
-            [self.pathControlGlassEffectView.heightAnchor constraintEqualToConstant:pathControlHeight + (VLCLibraryUIUnits.smallSpacing * 2)],
         ]];
-        NSView * const pathControlContainer = [[NSView alloc] initWithFrame:pathControl.frame];
+        NSView * const pathControlContainer = [[NSView alloc] init];
+        pathControlContainer.translatesAutoresizingMaskIntoConstraints = NO;
+        homeButton.translatesAutoresizingMaskIntoConstraints = NO;
         [pathControlContainer addSubview:homeButton];
         [pathControlContainer addSubview:pathControl];
         [NSLayoutConstraint activateConstraints:@[
             [homeButton.leadingAnchor constraintEqualToAnchor:pathControlContainer.leadingAnchor constant:VLCLibraryUIUnits.smallSpacing],
             [homeButton.centerYAnchor constraintEqualToAnchor:pathControlContainer.centerYAnchor],
+            [homeButton.topAnchor constraintGreaterThanOrEqualToAnchor:pathControlContainer.topAnchor constant:VLCLibraryUIUnits.smallSpacing],
+            [homeButton.bottomAnchor constraintLessThanOrEqualToAnchor:pathControlContainer.bottomAnchor constant:-VLCLibraryUIUnits.smallSpacing],
             [pathControl.leadingAnchor constraintEqualToAnchor:homeButton.trailingAnchor constant:VLCLibraryUIUnits.smallSpacing],
             [pathControl.trailingAnchor constraintEqualToAnchor:pathControlContainer.trailingAnchor constant:-VLCLibraryUIUnits.smallSpacing],
             [pathControl.centerYAnchor constraintEqualToAnchor:pathControlContainer.centerYAnchor],
+            [pathControl.topAnchor constraintGreaterThanOrEqualToAnchor:pathControlContainer.topAnchor constant:VLCLibraryUIUnits.smallSpacing],
+            [pathControl.bottomAnchor constraintLessThanOrEqualToAnchor:pathControlContainer.bottomAnchor constant:-VLCLibraryUIUnits.smallSpacing],
         ]];
         self.pathControlGlassEffectView.contentView = pathControlContainer;
 #endif
