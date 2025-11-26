@@ -82,7 +82,7 @@ endif
 
 QTBASE_COMMON_CONFIG := -DFEATURE_pkg_config=OFF -DINPUT_openssl=no \
 	-DFEATURE_dbus=OFF -DFEATURE_zstd=OFF -DFEATURE_concurrent=OFF -DFEATURE_androiddeployqt=OFF \
-	-DFEATURE_sql=OFF -DFEATURE_testlib=OFF \
+	-DFEATURE_sql=OFF \
 	-DFEATURE_xml=OFF -DFEATURE_printsupport=OFF -DFEATURE_network=OFF \
 	-DFEATURE_pdf=OFF \
 	-DQT_BUILD_EXAMPLES=OFF -DQT_GENERATE_SBOM=OFF
@@ -100,14 +100,14 @@ QTBASE_CONFIG += $(QTBASE_COMMON_CONFIG) \
     -DFEATURE_gif=OFF \
 	-DFEATURE_harfbuzz=ON -DFEATURE_system_harfbuzz=ON -DFEATURE_jpeg=ON -DFEATURE_system_jpeg=ON \
 	-DFEATURE_png=ON -DFEATURE_system_png=ON -DFEATURE_zlib=ON -DFEATURE_system_zlib=ON \
-	-DFEATURE_movie=OFF -DFEATURE_whatsthis=OFF -DFEATURE_lcdnumber=OFF \
+	-DFEATURE_movie=OFF -DFEATURE_whatsthis=OFF -DFEATURE_lcdnumber=OFF -DFEATURE_testlib=ON \
 	-DFEATURE_syntaxhighlighter=OFF -DFEATURE_undoview=OFF -DFEATURE_splashscreen=OFF \
 	-DFEATURE_dockwidget=OFF -DFEATURE_statusbar=OFF -DFEATURE_statustip=OFF \
 	-DFEATURE_keysequenceedit=OFF -DFEATURE_mdiarea=OFF \
 	-DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) $(QT_HOST_PATH)
 
 QTBASE_NATIVE_CONFIG := $(QTBASE_COMMON_CONFIG) -DQT_BUILD_TESTS=FALSE \
-	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF \
+	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF -DFEATURE_testlib=OFF \
 	-DFEATURE_vnc=OFF -DFEATURE_linuxfb=OFF -DFEATURE_xlib=OFF \
 	-DFEATURE_vulkan=OFF -DFEATURE_imageformatplugin=OFF \
 	-DFEATURE_xkbcommon=OFF -DFEATURE_evdev=OFF -DFEATURE_sessionmanager=OFF -DFEATURE_png=OFF \

@@ -71,7 +71,8 @@ QT_DECLARATIVE_COMMON_CONFIG := \
 	-DFEATURE_quick_sprite=OFF \
 	-DFEATURE_quick_canvas=OFF \
 	-DFEATURE_quick_path=OFF \
-	-DFEATURE_quicktemplates2_calendar=OFF
+	-DFEATURE_quicktemplates2_calendar=OFF \
+	-DQT_FEATURE_testlib=OFF
 
 QT_DECLARATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
 	$(QT_CMAKE_CONFIG)
