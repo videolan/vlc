@@ -190,18 +190,20 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     }
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        NSArray *newCollectionArray = nil;
         switch(self->_groupDescriptor.group) {
             case VLCMediaLibraryParentGroupTypeVideoLibrary:
-                self.collectionArray = self->_libraryModel.listOfVideoMedia;
+                newCollectionArray = self->_libraryModel.listOfVideoMedia;
                 break;
             case VLCMediaLibraryParentGroupTypeRecentVideos:
-                self.collectionArray = self->_libraryModel.listOfRecentMedia;
+                newCollectionArray = self->_libraryModel.listOfRecentMedia;
                 break;
             default:
                 return;
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
+            self.collectionArray = newCollectionArray;
             [self.collectionView reloadData];
             [self.carouselView reloadData];
             [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
