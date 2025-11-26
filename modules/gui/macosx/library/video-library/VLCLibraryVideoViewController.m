@@ -427,10 +427,16 @@
 - (void)presentLibraryItemWaitForCollectionViewDataSourceFinished:(NSNotification *)notification
 {
     [NSNotificationCenter.defaultCenter removeObserver:self
-                                                  name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                                  name:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                                 object:self.libraryVideoDataSource];
 
-    // TODO: Present for collection view
+    NSIndexPath * const indexPath = [self.libraryVideoDataSource indexPathForLibraryItem:_awaitingPresentingLibraryItem];
+    if (indexPath != nil) {
+        NSSet * const indexPathSet = [NSSet setWithObject:indexPath];
+        [self.videoLibraryCollectionView selectItemsAtIndexPaths:indexPathSet scrollPosition:NSCollectionViewScrollPositionTop];
+        [self.videoLibraryCollectionView scrollToItemsAtIndexPaths:indexPathSet scrollPosition:NSCollectionViewScrollPositionTop];
+    }
+
     _awaitingPresentingLibraryItem = nil;
 }
 
@@ -462,14 +468,14 @@
 
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(presentLibraryItemWaitForTableViewDataSourceFinished:)
+                                           selector:@selector(presentLibraryItemWaitForCollectionViewDataSourceFinished:)
                                                name:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                              object:self.libraryVideoDataSource];
 
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
         [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(presentLibraryItemWaitForTableViewDataSourceFinished:)
-                                               name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                               name:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                              object:self.libraryVideoDataSource];
 
     } else {
