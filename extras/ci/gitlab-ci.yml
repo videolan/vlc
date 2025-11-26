@@ -267,6 +267,7 @@ nightly-win64-arm-llvm:
 #
 debian-contrib:
     extends: .base-template
+    when: manual # disabled
     image:
         name: $VLC_DEBIAN_IMAGE
     rules:
