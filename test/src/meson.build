@@ -106,18 +106,191 @@ vlc_tests += {
 }
 
 vlc_tests += {
-    'name' : 'test_src_player',
+    'name' : 'test_src_player_attachments',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/attachments.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_capabilities',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/capabilities.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_discontinuities',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/discontinuities.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_errors',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/errors.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_es_selection',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/es_selection.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_lifecycle',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/lifecycle.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_loudness',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/loudness.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_media',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/media.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_outputs',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/outputs.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_pause',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/pause.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_programs',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/programs.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_seeks',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/seeks.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_teletext',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/teletext.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_timers',
     'sources' : files(
         'player/common.h',
         'player/modules.c',
         'player/timers.h',
-        'player/player.c'),
+        'player/timers.c'),
     'suite' : ['src', 'test_src'],
     'link_with' : [libvlc, libvlccore],
     'module_depends' : vlc_plugins_targets.keys()
-    #['demux_mock', 'araw', 'rawvideo', 'tdummy', 'dummy',
-    # 'wdummy', 'vdummy', 'adummy', 'ebur128', 'subsdec',
-    # 'zvbi', ...],
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_titles',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/titles.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_tracks',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/tracks.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_src_player_tracks_ids',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/tracks_ids.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
 }
 
 vlc_tests += {

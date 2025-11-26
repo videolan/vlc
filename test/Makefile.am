@@ -34,7 +34,23 @@ check_PROGRAMS = \
 	test_src_preparser_thumbnail \
 	test_src_preparser_thumbnail_to_files \
 	test_src_input_decoder \
-	test_src_player \
+	test_src_player_attachments \
+	test_src_player_capabilities \
+	test_src_player_discontinuities \
+	test_src_player_errors \
+	test_src_player_es_selection \
+	test_src_player_lifecycle \
+	test_src_player_loudness \
+	test_src_player_media \
+	test_src_player_outputs \
+	test_src_player_pause \
+	test_src_player_programs \
+	test_src_player_seeks \
+	test_src_player_teletext \
+	test_src_player_timers \
+	test_src_player_titles \
+	test_src_player_tracks \
+	test_src_player_tracks_ids \
 	test_src_interface_dialog \
 	test_src_media_source \
 	test_src_misc_bits \
@@ -195,9 +211,57 @@ test_src_preparser_thumbnail_SOURCES = src/preparser/thumbnail.c
 test_src_preparser_thumbnail_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_preparser_thumbnail_to_files_SOURCES = src/preparser/thumbnail_to_files.c
 test_src_preparser_thumbnail_to_files_LDADD = $(LIBVLCCORE) $(LIBVLC)
-test_src_player_SOURCES = src/player/common.h src/player/modules.c src/player/timers.h \
-	src/player/player.c
-test_src_player_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_attachments_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/attachments.c
+test_src_player_attachments_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_capabilities_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/capabilities.c
+test_src_player_capabilities_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_discontinuities_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/discontinuities.c
+test_src_player_discontinuities_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_errors_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/errors.c
+test_src_player_errors_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_es_selection_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/es_selection.c
+test_src_player_es_selection_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_lifecycle_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/lifecycle.c
+test_src_player_lifecycle_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_loudness_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/loudness.c
+test_src_player_loudness_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_media_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/media.c
+test_src_player_media_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_outputs_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/outputs.c
+test_src_player_outputs_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_pause_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/pause.c
+test_src_player_pause_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_programs_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/programs.c
+test_src_player_programs_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_seeks_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/seeks.c
+test_src_player_seeks_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_teletext_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/teletext.c
+test_src_player_teletext_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_timers_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/timers.c src/player/timers.h
+test_src_player_timers_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_titles_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/titles.c
+test_src_player_titles_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_tracks_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/tracks.c
+test_src_player_tracks_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_tracks_ids_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/tracks_ids.c
+test_src_player_tracks_ids_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
 test_src_misc_bits_SOURCES = src/misc/bits.c
 test_src_misc_bits_LDADD = $(LIBVLC)
 test_src_misc_epg_SOURCES = src/misc/epg.c
