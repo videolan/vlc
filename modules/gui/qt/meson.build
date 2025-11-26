@@ -1183,6 +1183,7 @@ if qt6_dep.found()
             'util/locallistcacheloader.hpp'),
         'suite': ['qt'],
         'link_with': [libvlccore],
+        'link_args': qt_link_args,
         'dependencies': [qt6_dep, qt_extra_deps],
     }
 
@@ -1218,6 +1219,7 @@ if qt6_dep.found()
             'suite': ['qt'],
             'include_directories' : qt_include_dir,
             'link_with': [libvlccore, libvlc],
+            'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
         }
 
@@ -1238,6 +1240,7 @@ if qt6_dep.found()
             'suite': ['qt'],
             'include_directories' : qt_include_dir,
             'link_with': [libvlccore, libvlc],
+            'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
         }
 
@@ -1256,6 +1259,7 @@ if qt6_dep.found()
             ),
             'suite': ['qt'],
             'include_directories' : qt_include_dir,
+            'link_args': qt_link_args,
             'dependencies': [qt6_dep, qtest_qt6_dep]
         }
 
@@ -1277,6 +1281,7 @@ if qt6_dep.found()
             'suite': ['qt'],
             'include_directories' : qt_include_dir,
             'link_with': [libvlccore, libvlc],
+            'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
         }
     endif
