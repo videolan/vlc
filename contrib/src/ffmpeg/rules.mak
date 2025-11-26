@@ -145,7 +145,7 @@ ifdef HAVE_IOS
 FFMPEGCONF += --enable-pic --extra-ldflags="$(EXTRA_CFLAGS) -isysroot $(IOS_SDK)"
 ifdef HAVE_WATCHOS
 FFMPEGCONF += --disable-everything
-FFMPEGCONF += --enable-decoder='aac,aac_latm,aac_fixed,aadec,ac3,adpcm_*,aiff,alac,alsdec,amrnb,amrwb,ape,atrac1,atrac3,atrac3plus,atrac9,binkaudio_dct,binkaudio_rdft,bmv_audio,cook,dca,derf,dpcm,dts,dvaudio,eaac,eac3,flac,flv,g722,g723,g726,g729,gsm,metasound,mpc7,mpc8,mpegaudiodec_fixed,mp3,m4a,nellymoser,opus,pcm_*,qdmc,qdm2,ra144,ra288,ralf,rka,shorten,tta,tak,truespeech,vorbis,wavpack,wma,wmalossless,wmapro,wmavoice'
+FFMPEGCONF += --enable-decoder='aac,aac_latm,aac_fixed,aadec,ac3,adpcm_*,aiff,alac,alsdec,amrnb,amrwb,ape,atrac1,atrac3,atrac3plus,atrac9,binkaudio_dct,binkaudio_rdft,bmv_audio,cook,dca,derf,dirac,dpcm,dts,dvaudio,eaac,eac3,flac,flv,g722,g723,g726,g729,gsm,metasound,mpc7,mpc8,mpegaudiodec_fixed,mp3,m4a,nellymoser,opus,pcm_*,qdmc,qdm2,ra144,ra288,ralf,rka,shorten,tta,tak,truespeech,vorbis,wavpack,wma,wmalossless,wmapro,wmavoice'
 FFMPEGCONF += --enable-parser='aac,aac_latm,ac3,adpcm,amr,aac_latm,ape,cook,dca,dvaudio,flac,g723,g729,gsm,mlp,mpegaudio,opus,sipr,vorbis,xma'
 FFMPEGCONF += --enable-demuxer='aac,ac3,adts,aiff,ape,asf,au,avi,caf,daud,dirac,dts,dv,ea,flac,flv,gsm,ivf,matroska,mmf,mov,mp3,mpeg,ogg,pcm,rm,sbc,sdp,shorten,voc,w64,wav,wv'
 FFMPEGCONF += --enable-swresample
