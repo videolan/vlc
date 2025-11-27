@@ -503,13 +503,11 @@ v4l2_std_id var_InheritStandard (vlc_object_t *obj, const char *varname)
     if (name == NULL)
         return V4L2_STD_UNKNOWN;
 
-    const size_t n = sizeof (standards_vlc) / sizeof (*standards_vlc);
+    const size_t n = ARRAY_SIZE(standards_vlc);
 
-    static_assert (sizeof (standards_vlc) / sizeof (*standards_vlc)
-                         == sizeof (standards_v4l2) / sizeof (*standards_v4l2),
+    static_assert (ARRAY_SIZE(standards_vlc) == ARRAY_SIZE(standards_v4l2),
                    "Inconsistent standards tables");
-    static_assert (sizeof (standards_vlc) / sizeof (*standards_vlc)
-                         == sizeof (standards_user) / sizeof (*standards_user),
+    static_assert (ARRAY_SIZE(standards_vlc) == ARRAY_SIZE(standards_user),
                    "Inconsistent standards tables");
 
     for (size_t i = 0; i < n; i++)

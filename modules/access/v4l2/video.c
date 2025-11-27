@@ -673,7 +673,7 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
 
 static const vlc_v4l2_fmt_t *vlc_from_v4l2_fourcc (uint32_t fourcc)
 {
-     for (size_t i = 0; i < sizeof (v4l2_fmts) / sizeof (v4l2_fmts[0]); i++)
+     for (size_t i = 0; i < ARRAY_SIZE(v4l2_fmts); i++)
          if (v4l2_fmts[i].v4l2 == fourcc)
              return v4l2_fmts + i;
      return NULL;
@@ -686,7 +686,7 @@ static size_t vlc_v4l2_fmt_rank (const vlc_v4l2_fmt_t *fmt)
 
     ptrdiff_t d = fmt - v4l2_fmts;
     assert (d >= 0);
-    assert (d < (ptrdiff_t)(sizeof (v4l2_fmts) / sizeof (v4l2_fmts[0])));
+    assert (d < (ptrdiff_t)(ARRAY_SIZE(v4l2_fmts)));
     return d;
 }
 

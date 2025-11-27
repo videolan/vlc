@@ -335,7 +335,7 @@ static vlc_v4l2_ctrl_t *ControlCreate (int fd,
 
     /* Search for a well-known control */
     const vlc_v4l2_ctrl_name_t *known;
-    known = bsearch (&query->id, controls, sizeof (controls) / sizeof (*known),
+    known = bsearch (&query->id, controls, ARRAY_SIZE(controls),
                      sizeof (*known), cidcmp);
     if (known != NULL)
         strcpy (ctrl->name, known->name);
@@ -719,7 +719,7 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
     while (v4l2_ioctl (fd, VIDIOC_QUERYCTRL, &query) >= 0)
     {
         ctrl_type_cb handler = NULL;
-        if (query.type < (sizeof (handlers) / sizeof (handlers[0])))
+        if (query.type < ARRAY_SIZE(handlers))
             handler = handlers[query.type];
         if (handler == NULL)
             handler = ControlAddUnknown;
