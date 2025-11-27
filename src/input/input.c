@@ -664,6 +664,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     bool b_pause_after_eof = b_interactive &&
                            var_InheritBool( p_input, "play-and-pause" );
     bool b_paused_at_eof = false;
+    bool eof_signaled = false;
 
     demux_t *p_demux = input_priv(p_input)->master->p_demux;
     const bool b_can_demux = p_demux->ops != NULL ?
@@ -695,6 +696,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                     i_intf_update = 0;
 
                 b_paused_at_eof = false;
+                eof_signaled = false;
             }
             else if( !es_out_IsEmpty( input_priv(p_input)->p_es_out ) )
             {
@@ -703,9 +705,23 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             }
             else
             {
+                bool eof_handled;
+                if( !eof_signaled )
+                {
+                    eof_handled =
+                        input_SendEvent(p_input, &(struct vlc_input_event) {
+                            .type = INPUT_EVENT_EOF,
+                        });
+                    eof_signaled = true;
+                }
+                else
+                    eof_handled = true;
+
+                if (eof_handled)
+                    i_wakeup = -1;
                 /* Pause after eof only if the input is pausable.
                  * This way we won't trigger timeshifting for nothing */
-                if( b_pause_after_eof && input_priv(p_input)->master->b_can_pause )
+                else if( b_pause_after_eof && input_priv(p_input)->master->b_can_pause )
                 {
                     if( b_paused_at_eof )
                         break;

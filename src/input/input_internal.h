@@ -82,6 +82,9 @@ typedef enum input_event_type_e
     INPUT_EVENT_STATE,
     /* b_dead is true */
     INPUT_EVENT_DEAD,
+    /* If the event is not handled, or if the listener is returning false,
+     * the input will be stopped normally at EOF */
+    INPUT_EVENT_EOF,
 
     /* "rate" has changed */
     INPUT_EVENT_RATE,

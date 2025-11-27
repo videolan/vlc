@@ -926,6 +926,9 @@ input_thread_Events(input_thread_t *input_thread,
             vlc_player_input_HandleStateEvent(input, event->state.value,
                                               event->state.date);
             break;
+        case INPUT_EVENT_EOF:
+            handled = false;
+            break;
         case INPUT_EVENT_RATE:
             input->rate = event->rate;
             vlc_player_SendEvent(player, on_rate_changed, input->rate);
