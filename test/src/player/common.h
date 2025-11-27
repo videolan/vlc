@@ -650,6 +650,18 @@ state_equal(vec_on_state_changed *vec, int location, enum vlc_player_state state
     assert(state_equal(ctx, -1, VLC_PLAYER_STATE_STOPPED)); \
 } while(0)
 
+
+static inline size_t
+get_buffering_count(struct ctx *ctx)
+{
+    vec_on_buffering_changed *vec = &ctx->report.on_buffering_changed;
+    size_t count = 0;
+    for (size_t i = 0; i < vec->size; ++i)
+        if (vec->data[i] == 1.0f)
+            count++;
+    return count;
+}
+
 static inline void
 ctx_reset(struct ctx *ctx)
 {
@@ -1118,6 +1130,8 @@ test_end(struct ctx *ctx)
 
     player_set_rate(ctx, 1.0f);
     vlc_player_SetStartPaused(player, false);
+    vlc_player_SetPlayAndPause(player, false);
+    vlc_player_SetRepeatCount(player, 0);
 
     ctx_reset(ctx);
 }

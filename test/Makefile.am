@@ -11,6 +11,7 @@ player_programs = \
 	test_src_player_attachments \
 	test_src_player_capabilities \
 	test_src_player_discontinuities \
+	test_src_player_eof \
 	test_src_player_errors \
 	test_src_player_es_selection \
 	test_src_player_lifecycle \
@@ -224,6 +225,9 @@ test_src_player_capabilities_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
 test_src_player_discontinuities_SOURCES = src/player/common.h src/player/modules.c \
 	src/player/discontinuities.c
 test_src_player_discontinuities_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_eof_SOURCES = src/player/common.h src/player/modules.c \
+	src/player/eof.c
+test_src_player_eof_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
 test_src_player_errors_SOURCES = src/player/common.h src/player/modules.c \
 	src/player/errors.c
 test_src_player_errors_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
