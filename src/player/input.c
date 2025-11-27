@@ -61,30 +61,36 @@ vlc_player_input_GetPos(struct vlc_player_input *input, bool seeking,
     return input->position;
 }
 
-void
-vlc_player_input_HandleAtoBLoop(struct vlc_player_input *input)
+bool
+vlc_player_input_HandleAtoBLoop(struct vlc_player_input *input, bool forced)
 {
     if (!input->abloop_state[0].set || !input->abloop_state[1].set)
-        return;
+        return false;
 
     vlc_player_t *player = input->player;
 
     if (player->input != input)
-        return;
+        return false;
 
     vlc_tick_t now = vlc_tick_now();
     if (input->abloop_state[0].time != VLC_TICK_INVALID
      && input->abloop_state[1].time != VLC_TICK_INVALID)
     {
         vlc_tick_t time = vlc_player_input_GetTime(input, false, now);
-        if (time != VLC_TICK_INVALID && time >= input->abloop_state[1].time)
+        if (forced
+         || (time != VLC_TICK_INVALID && time >= input->abloop_state[1].time))
             vlc_player_SetTime(player, input->abloop_state[0].time);
-        return;
+        return true;
     }
 
     double pos = vlc_player_input_GetPos(input, false, now);
-    if (pos >= input->abloop_state[1].pos)
+    if (forced || pos >= input->abloop_state[1].pos)
+    {
         vlc_player_SetPosition(player, input->abloop_state[0].pos);
+        return true;
+    }
+
+    return false;
 }
 
 int
@@ -963,7 +969,7 @@ input_thread_Events(input_thread_t *input_thread,
                 vlc_player_SendEvent(player, on_position_changed,
                                      input->time, input->position);
 
-                vlc_player_input_HandleAtoBLoop(input);
+                vlc_player_input_HandleAtoBLoop(input, false);
             }
             if (input->length != duration)
             {
