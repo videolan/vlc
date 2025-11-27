@@ -3281,7 +3281,7 @@ HRESULT BDAGraph::Register()
         return hr;
     }
 
-    size_t len = sizeof(pwsz_graph_name) / sizeof(pwsz_graph_name[0]);
+    const size_t len = ARRAY_SIZE(pwsz_graph_name);
     _snwprintf( pwsz_graph_name, len - 1, L"VLC BDA Graph %08p Pid %08x",
         p_filter_graph, ::GetCurrentProcessId() );
     pwsz_graph_name[len-1] = 0;
