@@ -107,7 +107,9 @@ vlc_tests += {
 
 vlc_tests += {
     'name' : 'test_src_player',
-    'sources' : files('player/player.c'),
+    'sources' : files(
+        'player/common.h',
+        'player/player.c'),
     'suite' : ['src', 'test_src'],
     'link_with' : [libvlc, libvlccore],
     'module_depends' : vlc_plugins_targets.keys()
