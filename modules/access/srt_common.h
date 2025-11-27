@@ -40,6 +40,16 @@
 #define SRT_PARAM_POLL_TIMEOUT                "poll-timeout"
 #define SRT_PARAM_KEY_LENGTH                  "key-length"
 #define SRT_PARAM_STREAMID                    "streamid"
+#define SRT_PARAM_MODE                        "mode"
+
+/* SRT modes */
+#define SRT_MODE_CALLER_TEXT        "caller"
+#define SRT_MODE_LISTENER_TEXT      "listener"
+
+typedef enum srt_mode {
+    SRT_MODE_CALLER,
+    SRT_MODE_LISTENER,
+} srt_mode_t;
 
 
 #define SRT_DEFAULT_BANDWIDTH_OVERHEAD_LIMIT 25
@@ -62,6 +72,13 @@
 static const int srt_key_lengths[] = { 16, 24, 32, };
 static const char * const srt_key_length_names[] = { N_( "16 bytes" ), N_(
         "24 bytes" ), N_( "32 bytes" ), };
+/* SRT modes */
+#define SRT_MODE_TEXT N_( "SRT mode" )
+#define SRT_DEFAULT_MODE SRT_MODE_CALLER
+static const char * const srt_mode_names[] = { SRT_MODE_CALLER_TEXT,
+        SRT_MODE_LISTENER_TEXT, };
+static const int srt_mode_values[] = { SRT_MODE_CALLER,
+        SRT_MODE_LISTENER, };
 
 typedef struct srt_params {
     int latency;
@@ -70,6 +87,7 @@ typedef struct srt_params {
     int payload_size;
     int bandwidth_overhead_limit;
     const char* streamid;
+    srt_mode_t mode;
 } srt_params_t;
 
 bool srt_parse_url(char* url, srt_params_t* params);

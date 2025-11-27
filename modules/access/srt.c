@@ -99,7 +99,15 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
     char *psz_streamid = var_InheritString( p_stream, SRT_PARAM_STREAMID );
     bool streamid_needs_free = true;
     char *url = NULL;
-    srt_params_t params;
+    srt_params_t params = {
+        .latency = -1,
+        .passphrase = NULL,
+        .key_length = SRT_DEFAULT_KEY_LENGTH,
+        .payload_size = SRT_DEFAULT_PAYLOAD_SIZE,
+        .bandwidth_overhead_limit = SRT_DEFAULT_BANDWIDTH_OVERHEAD_LIMIT,
+        .streamid = NULL,
+        .mode = SRT_DEFAULT_MODE, /* default = caller */
+    };
     struct addrinfo hints = {
         .ai_socktype = SOCK_DGRAM,
     }, *res = NULL;
@@ -107,16 +115,43 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
     stream_sys_t *p_sys = p_stream->p_sys;
     bool failed = false;
 
-    stat = vlc_getaddrinfo( p_sys->psz_host, p_sys->i_port, &hints, &res );
-    if ( stat )
-    {
-        msg_Err( p_stream, "Cannot resolve [%s]:%d (reason: %s)",
-                 p_sys->psz_host,
-                 p_sys->i_port,
-                 gai_strerror( stat ) );
+    /* Parse URL */
+    if (p_stream->psz_url) {
+        url = strdup( p_stream->psz_url );
+        if ( !url ) {
+            failed = true;
+            goto out;
+        }
 
-        failed = true;
-        goto out;
+        if (srt_parse_url( url, &params )) {
+            if (params.latency != -1)
+                i_latency = params.latency;
+            if (params.passphrase != NULL) {
+                free(psz_passphrase);
+                passphrase_needs_free = false;
+                psz_passphrase = (char *) params.passphrase;
+            }
+            if (params.streamid != NULL) {
+                free(psz_streamid);
+                streamid_needs_free = false;
+                psz_streamid = (char *) params.streamid;
+            }
+        }
+    }
+
+    if (params.mode != SRT_MODE_LISTENER)
+    {
+        stat = vlc_getaddrinfo( p_sys->psz_host, p_sys->i_port, &hints, &res);
+        if ( stat )
+        {
+            msg_Err( p_stream, "Cannot resolve [%s]:%d (reason: %s)",
+                    p_sys->psz_host,
+                    p_sys->i_port,
+                    gai_strerror( stat ) );
+
+            failed = true;
+            goto out;
+        }
     }
 
     /* Always start with a fresh socket */
@@ -125,31 +160,13 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
         srt_epoll_remove_usock( p_sys->i_poll_id, p_sys->sock );
         srt_close( p_sys->sock );
     }
-
+    
     p_sys->sock = srt_create_socket( );
     if ( p_sys->sock == SRT_INVALID_SOCK )
     {
         msg_Err( p_stream, "Failed to open socket." );
         failed = true;
         goto out;
-    }
-
-    if (p_stream->psz_url) {
-        url = strdup( p_stream->psz_url );
-        if (srt_parse_url( url, &params )) {
-            if (params.latency != -1)
-                i_latency = params.latency;
-            if (params.passphrase != NULL) {
-                free( psz_passphrase );
-                passphrase_needs_free = false;
-                psz_passphrase = (char *) params.passphrase;
-            }
-            if (params.streamid != NULL ) {
-                free( psz_streamid );
-                streamid_needs_free = false;
-                psz_streamid = (char *) params.streamid;
-            }
-        }
     }
 
     /* Make SRT non-blocking */
@@ -187,18 +204,99 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
                 SRTO_STREAMID, psz_streamid, strlen(psz_streamid) );
     }
 
-    srt_epoll_add_usock( p_sys->i_poll_id, p_sys->sock,
-        &(int) { SRT_EPOLL_ERR | SRT_EPOLL_IN });
+    msg_Dbg(p_stream, "SRT mode=%d host='%s' port=%d", params.mode,
+            p_sys->psz_host ? p_sys->psz_host : "(null)", p_sys->i_port);
 
-    /* Schedule a connect */
-    msg_Dbg( p_stream, "Schedule SRT connect (dest address: %s, port: %d).",
-        p_sys->psz_host, p_sys->i_port);
+    if (params.mode == SRT_MODE_CALLER)
+    {
+        /* Schedule a connect */
+        msg_Dbg( p_stream, "Schedule SRT connect (dest address: %s, port: %d).",
+            p_sys->psz_host, p_sys->i_port);
+    
+        stat = srt_connect( p_sys->sock, res->ai_addr, res->ai_addrlen );
+        if (stat == SRT_ERROR) {
+            msg_Err( p_stream, "Failed to connect to server (reason: %s)",
+                    srt_getlasterror_str() );
+            failed = true;
+            goto out;
+        }
 
-    stat = srt_connect( p_sys->sock, res->ai_addr, res->ai_addrlen );
-    if (stat == SRT_ERROR) {
-        msg_Err( p_stream, "Failed to connect to server (reason: %s)",
-                srt_getlasterror_str() );
+        srt_epoll_add_usock( p_sys->i_poll_id, p_sys->sock,
+            &(int) { SRT_EPOLL_ERR | SRT_EPOLL_IN });
+    }
+    else if (params.mode == SRT_MODE_LISTENER)
+    {
+        msg_Dbg(p_stream, "Binding for SRT listener.");
+
+        struct addrinfo hints = {
+            .ai_family   = AF_UNSPEC,
+            .ai_socktype = SOCK_DGRAM,
+            .ai_flags    = AI_PASSIVE
+        }, *res_local = NULL;
+
+        /* Use the specific NIC or NULL for wildcard */
+        char *node = NULL;
+        if (p_sys->psz_host && *p_sys->psz_host)
+            node = p_sys->psz_host;
+        
+        stat = vlc_getaddrinfo(node, p_sys->i_port, &hints, &res_local);
+        if (stat) {
+            msg_Err(p_stream, "Cannot resolve local address (reason: %s)", gai_strerror(stat));
+            failed = true; goto out;
+        }
+
+        /* If binding IPv6 configure the socket */
+        if (res_local->ai_family == AF_INET6) {
+            srt_setsockopt(p_sys->sock, 0, SRTO_IPV6ONLY, &(int) { 0 }, sizeof(int));
+        }
+
+        srt_setsockopt(p_sys->sock, 0, SRTO_REUSEADDR, &(int) { 1 }, sizeof(int));
+
+        stat = srt_bind(p_sys->sock, res_local->ai_addr, res_local->ai_addrlen);
+        if ( stat ) {
+            msg_Err(p_stream, "Failed to bind socket (reason: %s)", srt_getlasterror_str());
+            freeaddrinfo(res_local);
+            failed = true;
+            goto out;
+        }
+
+        freeaddrinfo(res_local);
+
+        stat = srt_listen(p_sys->sock, 1);
+        if ( stat ) {
+            msg_Err(p_stream, "Failed to listen on socket (reason: %s)", srt_getlasterror_str());
+            failed = true;
+            goto out;
+        }
+
+        if (srt_epoll_add_usock(p_sys->i_poll_id, p_sys->sock,
+            &(int) { SRT_EPOLL_ERR | SRT_EPOLL_IN }) < 0) {
+            msg_Err(p_stream, "epoll add failed: %s", srt_getlasterror_str());
+            failed = true;
+            goto out;
+        }
+
+        /* Try to accept a caller (non-blocking). */
+        SRTSOCKET accepted = srt_accept(p_sys->sock, NULL, NULL);
+        if (accepted == SRT_INVALID_SOCK) {
+            int serr;
+            srt_getlasterror(&serr);
+            if (serr != SRT_EASYNCRCV && serr != SRT_EASYNCSND && serr != SRT_ETIMEOUT) {
+                msg_Warn(p_stream, "srt_accept() temporary error: %s", srt_getlasterror_str());
+            }
+        } else {
+            srt_epoll_remove_usock(p_sys->i_poll_id, p_sys->sock);
+            srt_close(p_sys->sock);
+            p_sys->sock = accepted;
+            srt_epoll_add_usock(p_sys->i_poll_id, p_sys->sock,
+                &(int) { SRT_EPOLL_ERR | SRT_EPOLL_IN });
+        }
+    }
+    else
+    {
+        msg_Err(p_stream, "Unknown SRT mode %d", params.mode);
         failed = true;
+        goto out;
     }
 
     /* Reset the number of chunks to allocate as the bitrate of
@@ -218,7 +316,8 @@ out:
         free( psz_passphrase );
     if (streamid_needs_free)
         free( psz_streamid );
-    freeaddrinfo( res );
+    if (res)
+        freeaddrinfo( res );
     free( url );
 
     return !failed;
@@ -252,9 +351,9 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
 
     SRTSOCKET ready[1];
     int readycnt = 1;
-    while ( srt_epoll_wait( p_sys->i_poll_id,
-        ready, &readycnt, 0, 0,
-        i_poll_timeout, NULL, 0, NULL, 0 ) >= 0)
+    while ( (readycnt = 1,
+             srt_epoll_wait(p_sys->i_poll_id, ready, &readycnt,
+                            0, 0, i_poll_timeout, NULL, 0, NULL, 0)) >= 0)
     {
         if ( readycnt < 0  || ready[0] != p_sys->sock )
         {
@@ -265,6 +364,23 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
 
         switch( srt_getsockstate( p_sys->sock ) )
         {
+            case SRTS_LISTENING: {
+                /* Try to accept a caller (non-blocking). */
+                SRTSOCKET accepted = srt_accept(p_sys->sock, NULL, NULL);
+                if (accepted == SRT_INVALID_SOCK) {
+                    int serr; srt_getlasterror(&serr);
+                    /* No pending connection yet: keep waiting. */
+                    continue;
+                }
+                /* Swap listening socket -> connected socket */
+                srt_epoll_remove_usock(p_sys->i_poll_id, p_sys->sock);
+                srt_close(p_sys->sock);
+                p_sys->sock = accepted;
+                srt_epoll_add_usock(p_sys->i_poll_id, p_sys->sock,
+                    &(int){ SRT_EPOLL_ERR | SRT_EPOLL_IN });
+                /* Now loop back; next iteration will see CONNECTED. */
+                continue;
+            }
             case SRTS_CONNECTED:
                 /* Good to go */
                 break;
@@ -373,7 +489,11 @@ static int Open(vlc_object_t *p_this)
     }
 
     p_sys->psz_host = vlc_obj_strdup( p_this, parsed_url.psz_host );
-    p_sys->i_port = parsed_url.i_port;
+
+    if ( parsed_url.i_port != 0 )
+        p_sys->i_port = parsed_url.i_port;
+    else
+        p_sys->i_port = SRT_DEFAULT_PORT;
 
     vlc_UrlClean( &parsed_url );
 
@@ -436,7 +556,10 @@ vlc_module_begin ()
             SRT_KEY_LENGTH_TEXT, NULL )
     change_integer_list( srt_key_lengths, srt_key_length_names )
     add_string(SRT_PARAM_STREAMID, "",
-            N_(" SRT Stream ID"), NULL)
+            N_( "SRT Stream ID"), NULL)
+    add_integer( SRT_PARAM_MODE, SRT_DEFAULT_MODE,
+            SRT_MODE_TEXT, NULL )
+    change_integer_list( srt_mode_values, srt_mode_names )
     change_safe()
 
     set_capability("access", 0)

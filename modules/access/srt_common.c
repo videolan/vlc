@@ -106,6 +106,7 @@ bool srt_parse_url(char* url, srt_params_t* params)
     params->payload_size = -1;
     params->bandwidth_overhead_limit = -1;
     params->streamid = NULL;
+    params->mode = SRT_MODE_CALLER;
 
     /* Parse URL parameters */
     query = find( url, '?' );
@@ -147,6 +148,12 @@ bool srt_parse_url(char* url, srt_params_t* params)
                     if (temp >= 0)
                         params->bandwidth_overhead_limit = temp;
 
+                } else if (strcmp (local_params[i].key, SRT_PARAM_MODE) == 0) {
+                    if (strcmp(val, SRT_MODE_LISTENER_TEXT) == 0) {
+                        params->mode = SRT_MODE_LISTENER;
+                    } else {
+                        params->mode = SRT_MODE_CALLER;
+                    }
                 }
             }
         }
