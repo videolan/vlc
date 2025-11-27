@@ -179,6 +179,43 @@ static bool vlc_player_destructor_IsEmpty(vlc_player_t *player)
         && vlc_list_is_empty(&player->mainloop.joinable_inputs);
 }
 
+void
+vlc_player_SignalAtoBLoop(vlc_player_t *player)
+{
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+
+    if (!input || !input->abloop_state[0].set || !input->abloop_state[1].set)
+        return;
+
+    vlc_cond_signal(&player->mainloop.wait);
+}
+
+static vlc_tick_t
+vlc_player_GetAtoBLoopDeadline(vlc_player_t *player)
+{
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+
+    if (!input || !input->abloop_state[0].set || !input->abloop_state[1].set)
+        return VLC_TICK_MIN;
+
+    vlc_tick_t now = vlc_tick_now();
+    vlc_tick_t ts;
+    bool seeking = false;
+    if (vlc_player_GetTimerPoint(player, &seeking, now, &ts, NULL) != 0)
+        return VLC_TICK_MIN;
+    if (seeking)
+        return VLC_TICK_MIN;
+
+    vlc_tick_t b_time = input->abloop_state[1].time;
+    if (b_time == VLC_TICK_INVALID)
+    {
+        if (input->length == VLC_TICK_INVALID)
+            return VLC_TICK_MIN;
+        b_time = input->abloop_state[1].pos * input->length;
+    }
+    return now + (b_time - ts) * input->rate;
+}
+
 static void *
 vlc_player_mainloop_Thread(void *data)
 {
@@ -195,9 +232,20 @@ vlc_player_mainloop_Thread(void *data)
     {
         /* Wait for an input to stop or close. No while loop here since we want
          * to leave this code path when the player is deleting. */
+        vlc_tick_t deadline = vlc_player_GetAtoBLoopDeadline(player);
+        bool timeout = false;
         if (vlc_list_is_empty(&player->mainloop.stop_inputs)
          && vlc_list_is_empty(&player->mainloop.joinable_inputs))
-            vlc_cond_wait(&player->mainloop.wait, &player->lock);
+        {
+            if (deadline == VLC_TICK_MIN)
+                vlc_cond_wait(&player->mainloop.wait, &player->lock);
+            else
+                timeout = vlc_cond_timedwait(&player->mainloop.wait,
+                                             &player->lock, deadline) != 0;
+        }
+
+        if (timeout && player->input != NULL)
+            vlc_player_input_HandleAtoBLoop(player->input, true);
 
         struct vlc_player_input *input;
         vlc_list_foreach(input, &player->mainloop.stop_inputs, node)

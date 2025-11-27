@@ -943,6 +943,7 @@ input_thread_Events(input_thread_t *input_thread,
             break;
         case INPUT_EVENT_RATE:
             input->rate = event->rate;
+            vlc_player_SignalAtoBLoop(player);
             vlc_player_SendEvent(player, on_rate_changed, input->rate);
             break;
         case INPUT_EVENT_CAPABILITIES:
@@ -1004,6 +1005,7 @@ input_thread_Events(input_thread_t *input_thread,
                 };
                 vlc_player_UpdateTimer(player, NULL, false, &point,
                                        input->normal_time, 0, 0, priv->i_start);
+                vlc_player_SignalAtoBLoop(player);
             }
             break;
         }

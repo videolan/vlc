@@ -361,6 +361,9 @@ void
 vlc_player_destructor_AddJoinableInput(vlc_player_t *player,
                                        struct vlc_player_input *input);
 
+void
+vlc_player_SignalAtoBLoop(vlc_player_t *player);
+
 /*
  * player_track.c
  */
