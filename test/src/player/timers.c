@@ -255,6 +255,7 @@ test_timers(struct ctx *ctx)
     {
         .on_update = timers_on_update,
         .on_paused = timers_on_paused,
+        .on_seek = timers_on_seek,
     };
     static const struct vlc_player_timer_smpte_cbs smpte_cbs =
     {

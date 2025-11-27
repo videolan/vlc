@@ -15,12 +15,17 @@ struct report_timer
         REPORT_TIMER_POINT,
         REPORT_TIMER_TC,
         REPORT_TIMER_PAUSED,
+        REPORT_TIMER_SEEK,
     } type;
     union
     {
         struct vlc_player_timer_point point;
         struct vlc_player_timer_smpte_timecode tc;
         vlc_tick_t paused_date;
+        struct {
+            struct vlc_player_timer_point point;
+            bool finished;
+        } seek;
     };
 };
 typedef struct VLC_VECTOR(struct report_timer) vec_report_timer;
@@ -54,6 +59,21 @@ timers_on_paused(vlc_tick_t system_date, void *data)
         .type = REPORT_TIMER_PAUSED,
         .paused_date = system_date,
     };
+    bool success = vlc_vector_push(&timer->vec, report);
+    assert(success);
+}
+
+static inline void
+timers_on_seek(const struct vlc_player_timer_point *point, void *data)
+{
+    struct timer_state *timer = data;
+    struct report_timer report =
+    {
+        .type = REPORT_TIMER_SEEK,
+    };
+    report.seek.finished = point == NULL;
+    if (!report.seek.finished)
+        report.seek.point = *point;
     bool success = vlc_vector_push(&timer->vec, report);
     assert(success);
 }
