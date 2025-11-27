@@ -454,7 +454,7 @@ bool input_Stopped( input_thread_t *input )
     return ret;
 }
 
-static void StartTitle( input_thread_t * p_input )
+static void StartTitle( input_thread_t * p_input, bool restart )
 {
     input_thread_private_t *priv = input_priv(p_input);
     vlc_value_t val;
@@ -463,6 +463,11 @@ static void StartTitle( input_thread_t * p_input )
     val.i_int = priv->master->i_title_start - priv->master->i_title_offset;
     if( val.i_int > 0 && val.i_int < priv->master->i_title )
         input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE, &val );
+    else if( restart )
+    {
+        val.i_int = 0;
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE, &val );
+    }
 
     val.i_int = priv->master->i_seekpoint_start -
                 priv->master->i_seekpoint_offset;
@@ -551,18 +556,7 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
     }
 
     input_thread_private_t *priv = input_priv(p_input);
-    /* Seek to start title/seekpoint */
-    val.i_int = priv->master->i_title_start - priv->master->i_title_offset;
-    if( val.i_int < 0 || val.i_int >= priv->master->i_title )
-        val.i_int = 0;
-    input_ControlPushHelper( p_input,
-                       INPUT_CONTROL_SET_TITLE, &val );
-
-    val.i_int = priv->master->i_seekpoint_start -
-                priv->master->i_seekpoint_offset;
-    if( val.i_int > 0 /* TODO: check upper boundary */ )
-        input_ControlPushHelper( p_input,
-                           INPUT_CONTROL_SET_SEEKPOINT, &val );
+    StartTitle( p_input, true );
 
     /* Seek to start position */
     if( priv->i_start > 0 )
@@ -1357,7 +1351,7 @@ static int Init( input_thread_t * p_input )
 
     if( priv->type != INPUT_TYPE_PREPARSING )
     {
-        StartTitle( p_input );
+        StartTitle( p_input, false );
         SetSubtitlesOptions( p_input );
         LoadSlaves( p_input );
         InitPrograms( p_input );
