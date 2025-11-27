@@ -718,22 +718,22 @@ function:
     FUNCTION maybe_space expr ')' maybe_space {
         $$.type = TYPE_FUNCTION; $$.function = $3;
         $$.psz = $1;
-        if(*$$.psz != 0)
+        if($1 && *$$.psz != 0)
             $$.psz[strlen($$.psz) - 1] = 0;
     } |
     FUNCTION maybe_space expr TOKEN_EOF {
         $$.type = TYPE_FUNCTION; $$.function = $3; $$.psz = $1;
-        if(*$$.psz != 0)
+        if($1 && *$$.psz != 0)
             $$.psz[strlen($$.psz) - 1] = 0;
     } |
     FUNCTION maybe_space ')' maybe_space {
         $$.type = TYPE_FUNCTION; $$.function = NULL; $$.psz = $1;
-        if(*$$.psz != 0)
+        if($1 && *$$.psz != 0)
             $$.psz[strlen($$.psz) - 1] = 0;
     } |
     FUNCTION maybe_space error {
         $$.type = TYPE_FUNCTION; $$.function = NULL; $$.psz = $1;
-        if(*$$.psz != 0)
+        if($1 && *$$.psz != 0)
             $$.psz[strlen($$.psz) - 1] = 0;
   }
   ;
