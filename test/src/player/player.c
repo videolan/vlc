@@ -2529,61 +2529,62 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
         }
     }
 
-/* If there is no master source, we can't known which sources (audio or video)
- * will feed the timer. Indeed the first source that trigger a clock update
- * will be used as a timer source (and audio/video goes through decoder threads
- * and output threads, adding more uncertainty). */
+    /* If there is no master source, we can't known which sources (audio or
+     * video) will feed the timer. Indeed the first source that trigger a clock
+     * update will be used as a timer source (and audio/video goes through
+     * decoder threads and output threads, adding more uncertainty). */
     if ((ctx->flags & CLOCK_MASTER_MONOTONIC) == 0)
     {
-    /* Assertions for the regular timer that received all update points */
-    if (track_count != 0)
-    {
-        struct timer_state *timer = &timers[REGULAR_TIMER_IDX];
-        vec_report_timer *vec = &timer->vec;
-
-        /* Check that we didn't miss any update points */
-        assert(vec->size > 1);
-        size_t point_count = 1;
-        for (size_t i = 1; i < vec->size - 1; ++i)
+        /* Assertions for the regular timer that received all update points */
+        if (track_count != 0)
         {
-            struct report_timer *prev_report = &vec->data[i - 1];
-            struct report_timer *report = &vec->data[i];
+            struct timer_state *timer = &timers[REGULAR_TIMER_IDX];
+            vec_report_timer *vec = &timer->vec;
 
-            /* Don't count forced points */
-            if (report->point.ts != prev_report->point.ts)
+            /* Check that we didn't miss any update points */
+            assert(vec->size > 1);
+            size_t point_count = 1;
+            for (size_t i = 1; i < vec->size - 1; ++i)
             {
-                assert(report->point.ts == prev_report->point.ts + SAMPLE_LENGTH);
-                point_count++;
+                struct report_timer *prev_report = &vec->data[i - 1];
+                struct report_timer *report = &vec->data[i];
+
+                /* Don't count forced points */
+                if (report->point.ts != prev_report->point.ts)
+                {
+                    assert(report->point.ts ==
+                           prev_report->point.ts + SAMPLE_LENGTH);
+                    point_count++;
+                }
+            }
+            assert(vec->data[vec->size - 2].point.ts
+                == length - SAMPLE_LENGTH + VLC_TICK_0);
+            assert(point_count == MAX_UPDATE_COUNT);
+        }
+
+        /* Assertions for the regular filtered timer */
+        {
+            struct timer_state *timer = &timers[REGULAR_DELAY_TIMER_IDX];
+            vec_report_timer *vec = &timer->vec;
+
+            /* It should not receive all update points */
+            assert(vec->size < MAX_UPDATE_COUNT);
+            assert(vec->size > 1);
+
+            for (size_t i = 1; i < vec->size; ++i)
+            {
+                struct report_timer *prev_report = &vec->data[i - 1];
+                struct report_timer *report = &vec->data[i];
+                if (i < vec->size - 1)
+                {
+                    if (i == 1)
+                        assert(prev_report->point.system_date == INT64_MAX);
+                    else
+                        assert(report->point.system_date -
+                               prev_report->point.system_date >= timer->delay);
+                }
             }
         }
-        assert(vec->data[vec->size - 2].point.ts
-               == length - SAMPLE_LENGTH + VLC_TICK_0);
-        assert(point_count == MAX_UPDATE_COUNT);
-    }
-
-    /* Assertions for the regular filtered timer */
-    {
-        struct timer_state *timer = &timers[REGULAR_DELAY_TIMER_IDX];
-        vec_report_timer *vec = &timer->vec;
-
-        /* It should not receive all update points */
-        assert(vec->size < MAX_UPDATE_COUNT);
-        assert(vec->size > 1);
-
-        for (size_t i = 1; i < vec->size; ++i)
-        {
-            struct report_timer *prev_report = &vec->data[i - 1];
-            struct report_timer *report = &vec->data[i];
-            if (i < vec->size - 1)
-            {
-                if (i == 1)
-                    assert(prev_report->point.system_date == INT64_MAX);
-                else
-                    assert(report->point.system_date - prev_report->point.system_date
-                           >= timer->delay);
-            }
-        }
-    }
     }
 
     if (track_count > 0)
