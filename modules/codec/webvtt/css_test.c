@@ -425,11 +425,56 @@ error:
     return 1;
 }
 
+static int test_error_cases(void)
+{
+    const char *css =
+        /* Invalid charset */
+        "@charset \"UTF-8\" extra;\n"
+        "@charset ;\n"
+        /* Invalid block */
+        "el1 { color { ; color: red } }\n"
+        "el2 { color: red; }\n"
+        "el3 { color: red !important fail; }\n"
+        "el4 { font-family: ; }\n"
+        "el5 { weight: *; }\n"
+        "el6 { color: red; !important }\n"
+        /* Invalid selectors */
+        "#123abc { color: red; }\n" /* HASH starting with digit triggers YYERROR */
+        "el7 + ;\n" /* combinators without right side */
+        "el8 ~ ;\n"
+        "el9 > ;\n"
+        "el10 , ;\n"
+        /* Invalid declarations */
+        "div { ; }\n"
+        "div { color: ; }\n"
+        "div { color: *; }\n"
+        /* Invalid function / expr */
+        "div { foo(): 1; }\n"
+        "div { bar( ; }\n"
+    ;
+
+    PARSE_CSS("test_error_cases");
+
+    /* We just want to make sure the parser
+     * does not crash on error handling and backtracking
+     * and frees memory */
+
+    VLC_UNUSED(rule);
+
+    vlc_css_parser_Clean(&p);
+    return 0;
+
+error:
+    vlc_css_parser_Clean(&p);
+    return 1;
+}
+
 int main(void)
 {
     return test_element_selectors() ||
            test_attributes_selectors() ||
            test_pseudo_selectors() ||
            test_combinators() ||
-           test_values();
+           test_values() ||
+           test_error_cases();
 }
