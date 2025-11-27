@@ -2030,7 +2030,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type)
     player->sub_string_ids = NULL;
 
     player->play_and_pause = false;
-    player->repeat = var_InheritInteger(player, "input-repeat");
+    player->repeat = 0;
 
 #define VAR_CREATE(var, flag) do { \
     if (var_Create(player, var, flag) != VLC_SUCCESS) \
