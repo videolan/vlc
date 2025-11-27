@@ -1238,6 +1238,13 @@ vlc_player_SetStartPaused(vlc_player_t *player, bool start_paused)
     player->start_paused = start_paused;
 }
 
+void
+vlc_player_SetPlayAndPause(vlc_player_t *player, bool play_and_pause)
+{
+    vlc_player_assert_locked(player);
+    player->play_and_pause = play_and_pause;
+}
+
 static void
 vlc_player_SetPause(vlc_player_t *player, bool pause)
 {
@@ -2015,6 +2022,8 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type)
     player->video_string_ids = player->audio_string_ids =
     player->sub_string_ids = NULL;
 
+    player->play_and_pause = var_InheritBool(player, "play-and-pause");
+
 #define VAR_CREATE(var, flag) do { \
     if (var_Create(player, var, flag) != VLC_SUCCESS) \
         goto error; \
@@ -2045,7 +2054,6 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type)
     /* TODO: Override these variables since the player handle media ended
      * action itself. */
     VAR_CREATE("start-paused", VLC_VAR_BOOL);
-    VAR_CREATE("play-and-pause", VLC_VAR_BOOL);
 
     /* Initialize the shared HTTP cookie jar */
     vlc_value_t cookies;

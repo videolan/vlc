@@ -927,7 +927,13 @@ input_thread_Events(input_thread_t *input_thread,
                                               event->state.date);
             break;
         case INPUT_EVENT_EOF:
-            handled = false;
+            if (player->play_and_pause)
+            {
+                vlc_player_Pause(player);
+                handled = true;
+            }
+            else
+                handled = false;
             break;
         case INPUT_EVENT_RATE:
             input->rate = event->rate;

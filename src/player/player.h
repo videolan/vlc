@@ -246,6 +246,7 @@ struct vlc_player_t
     vlc_cond_t start_delay_cond;
 
     bool start_paused;
+    bool play_and_pause;
 
     bool pause_on_cork;
     bool corked;

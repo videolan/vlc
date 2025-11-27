@@ -156,6 +156,15 @@ VLC_API void
 vlc_player_SetStartPaused(vlc_player_t *player, bool start_paused);
 
 /**
+ * Pause when reaching EOF
+ *
+ * @param player locked player instance
+ * @param play_and_pause true to pause the player when reaching EOF
+ */
+VLC_API void
+vlc_player_SetPlayAndPause(vlc_player_t *player, bool play_and_pause);
+
+/**
  * Enable or disable pause on cork event
  *
  * If enabled, the player will automatically pause and resume on cork events.
