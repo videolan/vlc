@@ -202,13 +202,13 @@ closing_brace:
 charset:
   CHARSET_SYM maybe_space STRING maybe_space ';' {
       free( $3 );
-      $$ = 0;
+      $$ = NULL;
   }
   | CHARSET_SYM error invalid_block {
-      $$ = 0;
+      $$ = NULL;
   }
   | CHARSET_SYM error ';' {
-      $$ = 0;
+      $$ = NULL;
   }
 ;
 
@@ -216,10 +216,10 @@ ignored_charset:
     CHARSET_SYM maybe_space STRING maybe_space ';' {
         // Ignore any @charset rule not at the beginning of the style sheet.
         free( $3 );
-        $$ = 0;
+        $$ = NULL;
     }
     | CHARSET_SYM maybe_space ';' {
-        $$ = 0;
+        $$ = NULL;
     }
 ;
 
