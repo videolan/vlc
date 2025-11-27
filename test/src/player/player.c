@@ -263,6 +263,7 @@ struct media_params
 #define DISABLE_VIDEO        (1 << 2)
 #define DISABLE_AUDIO        (1 << 3)
 #define AUDIO_INSTANT_DRAIN  (1 << 4)
+#define CLOCK_MASTER_MONOTONIC (1 << 5)
 
 struct ctx
 {
@@ -2285,9 +2286,8 @@ ctx_init(struct ctx *ctx, int flags)
         (flags & DISABLE_VIDEO) ? "--no-video" : "--video",
         (flags & DISABLE_AUDIO) ? "--no-audio" : "--audio",
         "--text-renderer=tdummy,none",
-#ifdef TEST_CLOCK_MONOTONIC
-        "--clock-master=monotonic",
-#endif
+        (flags & CLOCK_MASTER_MONOTONIC) ?
+            "--clock-master=monotonic" : "--clock-master=auto"
     };
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(argv), argv);
     assert(vlc);
@@ -2533,8 +2533,8 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
  * will feed the timer. Indeed the first source that trigger a clock update
  * will be used as a timer source (and audio/video goes through decoder threads
  * and output threads, adding more uncertainty). */
-#ifndef TEST_CLOCK_MONOTONIC
-
+    if ((ctx->flags & CLOCK_MASTER_MONOTONIC) == 0)
+    {
     /* Assertions for the regular timer that received all update points */
     if (track_count != 0)
     {
@@ -2584,7 +2584,7 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
             }
         }
     }
-#endif
+    }
 
     if (track_count > 0)
         test_timers_assert_smpte(&timers[SMPTE_TIMER_IDX], length, fps, false, 3);
@@ -2606,7 +2606,8 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
 static void
 test_timers(struct ctx *ctx)
 {
-    test_log("timers\n");
+    test_log("timers%s\n",
+             (ctx->flags & CLOCK_MASTER_MONOTONIC) ? " (monotonic)" : "");
 
     vlc_player_t *player = ctx->player;
 
@@ -2990,7 +2991,8 @@ test_attachments(struct ctx *ctx)
 static void
 test_clock_discontinuities(struct ctx *ctx)
 {
-    test_log("discontinuities\n");
+    test_log("discontinuities%s\n",
+        (ctx->flags & CLOCK_MASTER_MONOTONIC) ? " (monotonic)" : "");
 
     vlc_player_t *player = ctx->player;
 
@@ -3163,17 +3165,23 @@ main(void)
     test_tracks(&ctx, false);
     test_tracks_ids(&ctx);
     test_programs(&ctx);
-    test_timers(&ctx);
     test_teletext(&ctx);
     test_attachments(&ctx);
 
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), true);
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), false);
 
+    test_timers(&ctx);
+    ctx_destroy(&ctx);
+    ctx_init(&ctx, CLOCK_MASTER_MONOTONIC);
+    test_timers(&ctx);
     ctx_destroy(&ctx);
 
     /* Test with instantaneous audio drain */
     ctx_init(&ctx, AUDIO_INSTANT_DRAIN);
+    test_clock_discontinuities(&ctx);
+    ctx_destroy(&ctx);
+    ctx_init(&ctx, CLOCK_MASTER_MONOTONIC|AUDIO_INSTANT_DRAIN);
     test_clock_discontinuities(&ctx);
     ctx_destroy(&ctx);
 
