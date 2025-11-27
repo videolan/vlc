@@ -158,7 +158,7 @@ static int initialize_audio_format(struct vlc_pw_stream *s, es_format_t *fmt, vl
     {
         uint16_t vlc_chan = 0;
         uint32_t pos = s->audio_format.info.raw.position[i];
-        if (pos < sizeof (vlc_chans) / sizeof (vlc_chans[0]))
+        if (pos < ARRAY_SIZE(vlc_chans))
             vlc_chan = vlc_chans[pos];
 
         if (vlc_chan == 0)
