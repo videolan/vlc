@@ -926,6 +926,9 @@ input_thread_Events(input_thread_t *input_thread,
                                               event->state.date);
             break;
         case INPUT_EVENT_EOF:
+            handled = vlc_player_input_HandleAtoBLoop(input, true);
+            if (handled)
+                break;
             if (player->play_and_pause)
             {
                 vlc_player_Pause(player);
