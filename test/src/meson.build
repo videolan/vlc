@@ -109,6 +109,7 @@ vlc_tests += {
     'name' : 'test_src_player',
     'sources' : files(
         'player/common.h',
+        'player/timers.h',
         'player/player.c'),
     'suite' : ['src', 'test_src'],
     'link_with' : [libvlc, libvlccore],
