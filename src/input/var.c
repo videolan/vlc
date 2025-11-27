@@ -81,8 +81,6 @@ void vlc_object_InitInputConfig(vlc_object_t *obj,
         var_Create(obj, "sout-spu", VLC_VAR_BOOL | inherit_flag);
         var_Create(obj, "sout-keep",  VLC_VAR_BOOL | inherit_flag);
 
-        var_Create(obj, "input-repeat",
-                    VLC_VAR_INTEGER|inherit_flag);
         var_Create(obj, "start-time", VLC_VAR_FLOAT|inherit_flag);
         var_Create(obj, "stop-time", VLC_VAR_FLOAT|inherit_flag);
         var_Create(obj, "run-time", VLC_VAR_FLOAT|inherit_flag);

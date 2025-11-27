@@ -129,6 +129,8 @@ struct vlc_player_input
         bool has_video_tracks;
         bool has_audio_tracks;
     } ml;
+
+    unsigned repeat;
 };
 
 struct vlc_player_listener_id
@@ -280,6 +282,7 @@ struct vlc_player_t
 #define VLC_PLAYER_EOS_BURST_THRESHOLD VLC_TICK_FROM_MS(250)
     vlc_tick_t last_eos;
     unsigned eos_burst_count;
+    unsigned repeat;
 
     bool deleting;
     struct

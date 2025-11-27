@@ -165,6 +165,15 @@ VLC_API void
 vlc_player_SetPlayAndPause(vlc_player_t *player, bool play_and_pause);
 
 /**
+ * Repeat playback when reaching EOF
+ *
+ * @param player locked player instance
+ * @param repeat_count number of time to restart the same media
+ */
+VLC_API void
+vlc_player_SetRepeatCount(vlc_player_t *player, unsigned repeat_count);
+
+/**
  * Enable or disable pause on cork event
  *
  * If enabled, the player will automatically pause and resume on cork events.

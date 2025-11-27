@@ -552,24 +552,6 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
         SlaveDemux( p_input );
 }
 
-static int MainLoopTryRepeat( input_thread_t *p_input )
-{
-    int i_repeat = var_GetInteger( p_input, "input-repeat" );
-    if( i_repeat <= 0 )
-        return VLC_EGENERIC;
-
-    msg_Dbg( p_input, "repeating the same input (%d)", i_repeat );
-    if( i_repeat > 0 )
-    {
-        i_repeat--;
-        var_SetInteger( p_input, "input-repeat", i_repeat );
-    }
-
-    ResetPosition( p_input );
-
-    return VLC_SUCCESS;
-}
-
 static vlc_tick_t InputSourceGetLength( input_source_t *source, input_item_t *item,
                                         bool *live )
 {
@@ -716,10 +698,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 if (eof_handled)
                     i_wakeup = -1;
                 else
-                {
-                    if( MainLoopTryRepeat( p_input ) )
-                        break;
-                }
+                    break;
             }
 
             /* Update interface and statistics */

@@ -932,6 +932,13 @@ input_thread_Events(input_thread_t *input_thread,
                 vlc_player_Pause(player);
                 handled = true;
             }
+            else if (input->repeat > 0)
+            {
+                input->repeat--;
+                handled =
+                    input_ControlPush(input->thread,
+                                      INPUT_CONTROL_RESET_POSITION, NULL) == 0;
+            }
             else
                 handled = false;
             break;
@@ -1200,6 +1207,8 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         .cbs = &cbs,
         .cbs_data = input,
     };
+
+    input->repeat = player->repeat;
 
     input->thread = input_Create(player, item, &cfg);
     if (!input->thread)

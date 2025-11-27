@@ -1245,6 +1245,13 @@ vlc_player_SetPlayAndPause(vlc_player_t *player, bool play_and_pause)
     player->play_and_pause = play_and_pause;
 }
 
+void
+vlc_player_SetRepeatCount(vlc_player_t *player, unsigned repeat_count)
+{
+    vlc_player_assert_locked(player);
+    player->repeat = repeat_count;
+}
+
 static void
 vlc_player_SetPause(vlc_player_t *player, bool pause)
 {
@@ -2023,6 +2030,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type)
     player->sub_string_ids = NULL;
 
     player->play_and_pause = var_InheritBool(player, "play-and-pause");
+    player->repeat = var_InheritInteger(player, "input-repeat");
 
 #define VAR_CREATE(var, flag) do { \
     if (var_Create(player, var, flag) != VLC_SUCCESS) \
