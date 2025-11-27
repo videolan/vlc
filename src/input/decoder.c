@@ -655,6 +655,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         }
         size_t pic_count = dpb_size + p_dec->i_extra_picture_buffers;
         pic_count ++; /* Held by the vout */
+        pic_count ++; /* Held by previous-frame handling or filters */
         picture_pool_t *pool = picture_pool_NewFromFormat( &p_dec->fmt_out.video,
                                                            pic_count );
 
