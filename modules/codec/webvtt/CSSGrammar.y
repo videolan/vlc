@@ -326,19 +326,31 @@ selector:
     }
     | selector_with_trailing_whitespace simple_selector
     {
-        $$ = $1;
-        if ($$ && $2)
+        if( $1 && $2 )
         {
-            vlc_css_selector_AddSpecifier( $$, $2 );
+            vlc_css_selector_AddSpecifier( $1, $2 );
             $2->combinator = RELATION_DESCENDENT;
+            $$ = $1;
+        }
+        else
+        {
+            vlc_css_selectors_Delete( $1 );
+            vlc_css_selectors_Delete( $2 );
+            $$ = NULL;
         }
     }
     | selector combinator simple_selector {
-        $$ = $1;
-        if ($$ && $3)
+        if( $1 && $3 )
         {
-            vlc_css_selector_AddSpecifier( $$, $3 );
+            vlc_css_selector_AddSpecifier( $1, $3 );
             $3->combinator = $2;
+            $$ = $1;
+        }
+        else
+        {
+            vlc_css_selectors_Delete( $1 );
+            vlc_css_selectors_Delete( $3 );
+            $$ = NULL;
         }
     }
     | selector error {
