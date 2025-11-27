@@ -114,7 +114,7 @@ static int dvb_parse_modulation (const char *str, int def)
         { "QAM",     QAM_AUTO },
         { "QPSK",   QPSK      },
     };
-    return dvb_parse_str (str, mods, sizeof (mods) / sizeof (*mods), def);
+    return dvb_parse_str (str, mods, ARRAY_SIZE(mods), def);
 }
 
 static int dvb_parse_fec (uint32_t fec)
@@ -136,8 +136,7 @@ static int dvb_parse_fec (uint32_t fec)
         { VLC_FEC(9,10), FEC_9_10 },
         { VLC_FEC_AUTO,  FEC_AUTO },
     };
-    return dvb_parse_int (fec, rates, sizeof (rates) / sizeof (*rates),
-                          FEC_AUTO);
+    return dvb_parse_int (fec, rates, ARRAY_SIZE(rates), FEC_AUTO);
 }
 
 
@@ -526,7 +525,7 @@ unsigned dvb_enum_systems (dvb_device_t *d)
     {
         unsigned sys = prop[1].u.buffer.data[i];
 
-        if (sys >= (sizeof (systab) / sizeof (systab[0])) || !systab[sys])
+        if (sys >= ARRAY_SIZE(systab) || !systab[sys])
         {
             msg_Warn (d->obj, "unknown delivery system %u", sys);
             continue;
@@ -782,7 +781,7 @@ int dvb_set_sec (dvb_device_t *d, uint64_t freq_Hz, char pol,
         };
         uint_fast16_t mHz = freq / 1000;
 
-        for (size_t i = 0; i < sizeof (tab) / sizeof (tab[0]); i++)
+        for (size_t i = 0; i < ARRAY_SIZE(tab); i++)
              if (mHz >= tab[i].min && mHz <= tab[i].max)
              {
                  lowf = tab[i].low * 1000;
@@ -982,8 +981,7 @@ static int dvb_parse_transmit_mode (int i)
         { 32, TRANSMISSION_MODE_32K  },
 #endif
     };
-    return dvb_parse_int (i, tab, sizeof (tab) / sizeof (*tab),
-                          TRANSMISSION_MODE_AUTO);
+    return dvb_parse_int (i, tab, ARRAY_SIZE(tab), TRANSMISSION_MODE_AUTO);
 }
 
 static int dvb_parse_guard (uint32_t guard)
@@ -1000,8 +998,7 @@ static int dvb_parse_guard (uint32_t guard)
 #endif
         { VLC_GUARD_AUTO,    GUARD_INTERVAL_AUTO },
     };
-    return dvb_parse_int (guard, tab, sizeof (tab) / sizeof (*tab),
-                          GUARD_INTERVAL_AUTO);
+    return dvb_parse_int (guard, tab, ARRAY_SIZE(tab), GUARD_INTERVAL_AUTO);
 }
 
 static int dvb_parse_hierarchy (int i)
@@ -1013,8 +1010,7 @@ static int dvb_parse_hierarchy (int i)
         { HIERARCHY_2,     2 },
         { HIERARCHY_4,     4 },
     };
-    return dvb_parse_int (i, tab, sizeof (tab) / sizeof (*tab),
-                          HIERARCHY_AUTO);
+    return dvb_parse_int (i, tab, ARRAY_SIZE(tab), HIERARCHY_AUTO);
 }
 
 int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *modstr,
