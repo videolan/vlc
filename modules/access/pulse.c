@@ -329,7 +329,7 @@ static int Open(vlc_object_t *obj)
 
     /* The ES should be initialized before stream_read_cb(), but how? */
     const struct pa_sample_spec *pss = pa_stream_get_sample_spec(s);
-    if ((unsigned)pss->format >= sizeof (fourccs) / sizeof (fourccs[0])) {
+    if ((unsigned)pss->format >= ARRAY_SIZE(fourccs)) {
         msg_Err(obj, "unknown PulseAudio sample format %u",
                 (unsigned)pss->format);
         goto error;
