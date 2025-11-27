@@ -454,6 +454,22 @@ bool input_Stopped( input_thread_t *input )
     return ret;
 }
 
+static void StartTitle( input_thread_t * p_input )
+{
+    input_thread_private_t *priv = input_priv(p_input);
+    vlc_value_t val;
+
+    /* Start title/chapter */
+    val.i_int = priv->master->i_title_start - priv->master->i_title_offset;
+    if( val.i_int > 0 && val.i_int < priv->master->i_title )
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE, &val );
+
+    val.i_int = priv->master->i_seekpoint_start -
+                priv->master->i_seekpoint_offset;
+    if( val.i_int > 0 /* TODO: check upper boundary */ )
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
+}
+
 /*****************************************************************************
  * Main loop: Fill buffers from access, and demux
  *****************************************************************************/
@@ -890,22 +906,6 @@ static void FillFileStatsIfAny( input_thread_t * p_input )
     uint64_t mtime;
     if( vlc_stream_GetMTime(stream_filters, &mtime) == VLC_SUCCESS )
         input_item_AddStat( priv->p_item, "mtime", mtime );
-}
-
-static void StartTitle( input_thread_t * p_input )
-{
-    input_thread_private_t *priv = input_priv(p_input);
-    vlc_value_t val;
-
-    /* Start title/chapter */
-    val.i_int = priv->master->i_title_start - priv->master->i_title_offset;
-    if( val.i_int > 0 && val.i_int < priv->master->i_title )
-        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE, &val );
-
-    val.i_int = priv->master->i_seekpoint_start -
-                priv->master->i_seekpoint_offset;
-    if( val.i_int > 0 /* TODO: check upper boundary */ )
-        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 }
 
 static void SetStopStart( input_thread_t * p_input )
