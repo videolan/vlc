@@ -2029,7 +2029,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type)
     player->video_string_ids = player->audio_string_ids =
     player->sub_string_ids = NULL;
 
-    player->play_and_pause = var_InheritBool(player, "play-and-pause");
+    player->play_and_pause = false;
     player->repeat = var_InheritInteger(player, "input-repeat");
 
 #define VAR_CREATE(var, flag) do { \
