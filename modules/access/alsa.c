@@ -397,7 +397,7 @@ static int Open (vlc_object_t *obj)
     }
 
     snd_pcm_format_t format = SND_PCM_FORMAT_UNKNOWN;
-    for (size_t i = 0; i < sizeof (choices) / sizeof (choices[0]); i++)
+    for (size_t i = 0; i < ARRAY_SIZE(choices); i++)
         if (snd_pcm_hw_params_test_format (pcm, hw, choices[i]) == 0)
         {
             val = snd_pcm_hw_params_set_format (pcm, hw, choices[i]);
@@ -417,7 +417,7 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    assert ((size_t)format < (sizeof (formats) / sizeof (formats[0])));
+    assert ((size_t)format < ARRAY_SIZE(formats));
     es_format_Init (&fmt, AUDIO_ES, formats[format]);
     fmt.audio.i_format = fmt.i_codec;
 
@@ -436,7 +436,7 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
     assert (param > 0);
-    assert (param < (sizeof (channel_maps) / sizeof (channel_maps[0])));
+    assert (param < ARRAY_SIZE(channel_maps));
     fmt.audio.i_channels = param;
     fmt.audio.i_physical_channels = channel_maps[param - 1];
 
