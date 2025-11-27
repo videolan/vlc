@@ -33,53 +33,25 @@
 #define CHECK(test) run = (test); fprintf(stderr, "* Running test %s\n", run);
 #define EXPECT(foo) if(!(foo)) BAILOUT(run)
 
-const char * css =
+#define PARSE_CSS(r) \
+    const char *run = r;\
+    vlc_css_parser_t p;\
+    vlc_css_parser_Init(&p);\
+    bool b = vlc_css_parser_ParseBytes(&p, (const uint8_t *)css, strlen(css));\
+    EXPECT(b);\
+    vlc_css_parser_Debug(&p);\
+    const vlc_css_rule_t *rule = p.rules.p_first
+
+
+static int test_element_selectors(void)
+{
+    const char * css =
         "el1 { float0: 1; }\n"
         ".class1 { hex1: #F0000f; }\n"
         "#id1 { text2: \"foo bar\"; }\n"
-        ":pseudo { text2: \"foobar\"; }\n"
-        "attrib[foo=\"bar\"] { text2: \"foobar\"; }\n"
-        "attrib2[foo] { text2: \"foobar\"; }\n"
-        "attribincludes[foo~=\"bar\"] { text2: \"foobar\"; }\n"
-        "attribdashmatch[foo|=\"bar\"] { text2: \"foobar\"; }\n"
-        "attribstarts[foo^=\"bar\"] { text2: \"foobar\"; }\n"
-        "attribends[foo$=\"bar\"] { text2: \"foobar\"; }\n"
-        "attribcontains[foo*=\"bar\"] { text2: \"foobar\"; }\n"
-        "parent1 child1 { float0: 1; }\n"
-        "el2,el3 { float0: 1; }\n"
-        "el4+el0 { float0: 1; }\n"
-        "el5~el0 { float0: 1; }\n"
-        "el6>el0 { float0: 1; }\n"
-        "values { "
-        "  neg: -1;"
-        "  ems: 100em;"
-        "  exs: 100ex;"
-        "  pixels: 100px;"
-        "  points: 100pt; "
-        "  mm: 100mm;"
-        "  percent: 100%;"
-        "  ms: 100ms;"
-        "  hz: 100Hz;"
-        "  degrees: 100deg;"
-        "  dimension: 100 -200em 300px;"
-        "  string: \"foobar\";"
-        "  function: foo(1);"
-        "  identifier: foobar;"
-        "  hexcolor: #ff00ff;"
-        "  unicoderange: U+00-FF;"
-        "  uri: url(http://crap/);"
-        "}\n"
-;
+    ;
 
-int main(void)
-{
-    const char *run ="parsing";
-    vlc_css_parser_t p;
-    vlc_css_parser_Init(&p);
-    bool b = vlc_css_parser_ParseBytes(&p, (const uint8_t *)css, strlen(css));
-    EXPECT(b);
-    vlc_css_parser_Debug(&p);
-    const vlc_css_rule_t *rule = p.rules.p_first;
+    PARSE_CSS("test_element_selectors");
 
     CHECK("element selector");
     EXPECT(rule && rule->b_valid);
@@ -113,14 +85,29 @@ int main(void)
     EXPECT(decl->expr->seq[0].term.type == TYPE_STRING);
     EXPECT(!strcmp(decl->expr->seq[0].term.psz,"foo bar"));
 
-    CHECK("pseudoclass selector");
-    rule = rule->p_next;
-    EXPECT(rule && rule->b_valid);
-    EXPECT(!strcmp(rule->p_selectors->psz_name,"pseudo"));
-    EXPECT(rule->p_selectors->type == SELECTOR_PSEUDOCLASS);
+    vlc_css_parser_Clean(&p);
+    return 0;
+
+error:
+    vlc_css_parser_Clean(&p);
+    return 1;
+}
+
+static int test_attributes_selectors(void)
+{
+    const char * css =
+        "attrib[foo=\"bar\"] { text2: \"foobar\"; }\n"
+        "attrib2[foo] { text2: \"foobar\"; }\n"
+        "attribincludes[foo~=\"bar\"] { text2: \"foobar\"; }\n"
+        "attribdashmatch[foo|=\"bar\"] { text2: \"foobar\"; }\n"
+        "attribstarts[foo^=\"bar\"] { text2: \"foobar\"; }\n"
+        "attribends[foo$=\"bar\"] { text2: \"foobar\"; }\n"
+        "attribcontains[foo*=\"bar\"] { text2: \"foobar\"; }\n"
+    ;
+
+    PARSE_CSS("test_attributes_selectors");
 
     CHECK("attribute selector equals");
-    rule = rule->p_next;
     EXPECT(rule && rule->b_valid);
     EXPECT(!strcmp(rule->p_selectors->psz_name,"attrib"));
     EXPECT(rule->p_selectors->type == SELECTOR_SIMPLE);
@@ -201,8 +188,48 @@ int main(void)
     EXPECT(rule->p_selectors->specifiers.p_first->p_matchsel);
     EXPECT(!strcmp(rule->p_selectors->specifiers.p_first->p_matchsel->psz_name, "bar"));
 
+    vlc_css_parser_Clean(&p);
+    return 0;
+
+error:
+    vlc_css_parser_Clean(&p);
+    return 1;
+}
+
+static int test_pseudo_selectors(void)
+{
+    const char * css =
+        ":pseudo { text2: \"foobar\"; }\n"
+    ;
+
+    PARSE_CSS("test_pseudo_selectors");
+
+    CHECK("pseudoclass selector");
+    EXPECT(rule && rule->b_valid);
+    EXPECT(!strcmp(rule->p_selectors->psz_name,"pseudo"));
+    EXPECT(rule->p_selectors->type == SELECTOR_PSEUDOCLASS);
+
+    vlc_css_parser_Clean(&p);
+    return 0;
+
+error:
+    vlc_css_parser_Clean(&p);
+    return 1;
+}
+
+static int test_combinators(void)
+{
+    const char * css =
+        "parent1 child1 { float0: 1; }\n"
+        "el2,el3 { float0: 1; }\n"
+        "el4+el0 { float0: 1; }\n"
+        "el5~el0 { float0: 1; }\n"
+        "el6>el0 { float0: 1; }\n"
+    ;
+
+    PARSE_CSS("test_combinators");
+
     CHECK("selectors combination parent child");
-    rule = rule->p_next;
     EXPECT(rule && rule->b_valid);
     EXPECT(!strcmp(rule->p_selectors->psz_name,"parent1"));
     EXPECT(rule->p_selectors->specifiers.p_first);
@@ -240,11 +267,44 @@ int main(void)
     EXPECT(rule->p_selectors->specifiers.p_first->combinator == RELATION_CHILD);
     EXPECT(!strcmp(rule->p_selectors->specifiers.p_first->psz_name, "el0"));
 
+    vlc_css_parser_Clean(&p);
+    return 0;
+
+error:
+    vlc_css_parser_Clean(&p);
+    return 1;
+}
+
+static int test_values(void)
+{
+    const char * css =
+        "values { "
+        "  neg: -1;"
+        "  ems: 100em;"
+        "  exs: 100ex;"
+        "  pixels: 100px;"
+        "  points: 100pt; "
+        "  mm: 100mm;"
+        "  percent: 100%;"
+        "  ms: 100ms;"
+        "  hz: 100Hz;"
+        "  degrees: 100deg;"
+        "  dimension: 100 -200em 300px;"
+        "  string: \"foobar\";"
+        "  function: foo(1);"
+        "  identifier: foobar;"
+        "  hexcolor: #ff00ff;"
+        "  unicoderange: U+00-FF;"
+        "  uri: url(http://crap/);"
+        "}\n"
+    ;
+
+    PARSE_CSS("test_values");
+
     CHECK("values");
-    rule = rule->p_next;
     EXPECT(rule && rule->b_valid);
     EXPECT(!strcmp(rule->p_selectors->psz_name,"values"));
-    decl = rule->p_declarations;
+    const vlc_css_declaration_t *decl = rule->p_declarations;
     EXPECT(decl && !strcmp(decl->psz_property, "neg"));
     EXPECT(decl->expr && decl->expr->i_count);
     EXPECT(decl->expr->seq[0].term.type == TYPE_NONE);
@@ -340,4 +400,13 @@ int main(void)
 error:
     vlc_css_parser_Clean(&p);
     return 1;
+}
+
+int main(void)
+{
+    return test_element_selectors() ||
+           test_attributes_selectors() ||
+           test_pseudo_selectors() ||
+           test_combinators() ||
+           test_values();
 }
