@@ -189,9 +189,7 @@ maybe_sgml:
 
 maybe_charset:
    /* empty */
-  | charset {
-    vlc_css_rules_Delete($1);
-  }
+  | charset
   ;
 
 closing_brace:
