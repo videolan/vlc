@@ -2302,6 +2302,10 @@ static bool Control( input_thread_t *p_input,
             break;
         }
 
+        case INPUT_CONTROL_RESET_POSITION:
+            ResetPosition( p_input );
+            break;
+
         case INPUT_CONTROL_ADD_SLAVE:
             if( param.val.p_address )
             {
