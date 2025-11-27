@@ -64,7 +64,8 @@ vlc_player_input_GetPos(struct vlc_player_input *input, bool seeking,
 bool
 vlc_player_input_HandleAtoBLoop(struct vlc_player_input *input, bool forced)
 {
-    if (!input->abloop_state[0].set || !input->abloop_state[1].set)
+    if (!input->abloop_state[0].set || !input->abloop_state[1].set
+     || (input->capabilities & VLC_PLAYER_CAP_SEEK) == 0)
         return false;
 
     vlc_player_t *player = input->player;

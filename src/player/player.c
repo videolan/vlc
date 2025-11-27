@@ -1471,8 +1471,8 @@ vlc_player_SetAtoBLoop(vlc_player_t *player, enum vlc_player_abloop abloop)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
-    if (!input || !vlc_player_CanSeek(player))
-        return VLC_EGENERIC;
+    if (!input )
+        return VLC_EINVAL;
 
     vlc_tick_t time = vlc_player_GetTime(player);
     float pos = vlc_player_GetPosition(player);
@@ -1487,6 +1487,12 @@ vlc_player_SetAtoBLoop(vlc_player_t *player, enum vlc_player_abloop abloop)
             input->abloop_state[0].set = true;
             break;
         case VLC_PLAYER_ABLOOP_B:
+            if (!vlc_player_CanSeek(player))
+            {
+                input->abloop_state[0].set = false;
+                return VLC_EGENERIC;
+            }
+
             if (!input->abloop_state[0].set)
                 return VLC_EGENERIC;
             input->abloop_state[1].time = time;
@@ -1537,8 +1543,8 @@ vlc_player_SetAtoBLoopTime(vlc_player_t *player, vlc_tick_t a_time, vlc_tick_t b
 
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
-    if (!input || !vlc_player_CanSeek(player))
-        return VLC_EGENERIC;
+    if (!input)
+        return VLC_EINVAL;
 
     input->abloop_state[0].time = a_time;
     input->abloop_state[0].pos = 0;
@@ -1565,8 +1571,8 @@ vlc_player_SetAtoBLoopPosition(vlc_player_t *player, double a_pos, double b_pos)
 
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
-    if (!input || !vlc_player_CanSeek(player))
-        return VLC_EGENERIC;
+    if (!input)
+        return VLC_EINVAL;
 
     input->abloop_state[0].time = VLC_TICK_INVALID;
     input->abloop_state[0].pos = a_pos;
