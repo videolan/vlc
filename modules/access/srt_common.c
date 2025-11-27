@@ -112,7 +112,7 @@ bool srt_parse_url(char* url, srt_params_t* params)
     query = find( url, '?' );
     if (query) {
         num_params = srt_url_parse_query( query, "&", local_params,
-                sizeof(local_params) / sizeof(struct parsed_param) );
+                ARRAY_SIZE(local_params));
         if (num_params > 0) {
             rc = true;
             for (i = 0; i < num_params; ++i) {
