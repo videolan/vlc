@@ -362,19 +362,27 @@ selector:
 
 simple_selector:
     element_name {
+        if( !$1 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
         $$ = vlc_css_selector_New( SELECTOR_SIMPLE, $1 );
+        if( !$$ )
+            YYNOMEM; // destructors called
         free( $1 );
     }
     | element_name specifier_list {
+        if( !$1 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
         $$ = vlc_css_selector_New( SELECTOR_SIMPLE, $1 );
-        if( $$ && $2 )
-        {
+        if( !$$ )
+            YYNOMEM; // destructors called
+        if( $2 )
             vlc_css_selector_AddSpecifier( $$, $2 );
-        }
-        else
-        {
-            vlc_css_selectors_Delete( $2 );
-        }
         free( $1 );
     }
     | specifier_list {
@@ -397,7 +405,8 @@ specifier_list:
             $$ = $1;
             while( $1->specifiers.p_first )
                 $1 = $1->specifiers.p_first;
-            vlc_css_selector_AddSpecifier( $1, $2 );
+            if( $2 )
+                vlc_css_selector_AddSpecifier( $1, $2 );
         }
         else $$ = $2;
     }
@@ -409,17 +418,28 @@ specifier_list:
 
 specifier:
     IDSEL {
+        if( !$1 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
         $$ = vlc_css_selector_New( SPECIFIER_ID, $1 );
+        if( !$$ )
+            YYNOMEM; // $1 destructor called
         free( $1 );
     }
     /* Case when #fffaaa like token is lexed as HEX instead of IDSEL */
   | HASH {
-        if ($1[0] >= '0' && $1[0] <= '9') {
+        if ( !$1 || ($1[0] >= '0' && $1[0] <= '9') )
+        {
             $$ = NULL;
+            YYERROR; // $1 destructor called
         } else {
             $$ = vlc_css_selector_New( SPECIFIER_ID, $1 );
+            if( !$$ )
+                YYNOMEM;  // $1 destructor called
+            free( $1 );
         }
-        free( $1 );
     }
   | class
   | attrib
@@ -428,7 +448,14 @@ specifier:
 
 class:
     '.' IDENT {
+        if( !$2 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
         $$ = vlc_css_selector_New( SPECIFIER_CLASS, $2 );
+        if( !$$ )
+            YYNOMEM; // $2 destructor called
         free( $2 );
     }
   ;
@@ -441,15 +468,29 @@ attr_name:
 
 attrib:
     '[' maybe_space attr_name ']' {
+        if( !$3 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
         $$ = vlc_css_selector_New( SPECIFIER_ATTRIB, $3 );
         free( $3 );
     }
     | '[' maybe_space attr_name match maybe_space ident_or_string maybe_space ']' {
-        $$ = vlc_css_selector_New( SPECIFIER_ATTRIB, $3 );
-        if( $$ )
+        if( !$6 || !$3 )
         {
-            $$->match = $4;
-            $$->p_matchsel = vlc_css_selector_New( SPECIFIER_ID, $6 );
+            $$ = NULL;
+            YYERROR;
+        }
+        $$ = vlc_css_selector_New( SPECIFIER_ATTRIB, $3 );
+        if( !$$ )
+            YYNOMEM;
+        $$->match = $4;
+        $$->p_matchsel = vlc_css_selector_New( SPECIFIER_ID, $6 );
+        if ( !$$->p_matchsel )
+        {
+            vlc_css_selectors_Delete( $$ );
+            YYNOMEM;
         }
         free( $3 );
         free( $6 );
@@ -484,41 +525,81 @@ ident_or_string:
 
 pseudo:
     ':' IDENT {
+        if( !$2 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
         $$ = vlc_css_selector_New( SELECTOR_PSEUDOCLASS, $2 );
+        if( !$$ )
+            YYNOMEM;
         free( $2 );
     }
     | ':' ':' IDENT {
+        if( !$3 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
         $$ = vlc_css_selector_New( SELECTOR_PSEUDOELEMENT, $3 );
+        if( !$$ )
+            YYNOMEM;
         free( $3 );
     }
     // used by :nth-*
     | ':' FUNCTION maybe_space maybe_unary_operator NUMBER maybe_space ')' {
+        if( !$2 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
+
         if(*$2 != 0)
             $2[strlen($2) - 1] = 0;
         $$ = vlc_css_selector_New( SELECTOR_PSEUDOCLASS, $2 );
+        if( !$$ )
+            YYNOMEM;
         $5.val *= $4;
+
         free( $2 );
         vlc_css_term_Clean( $5 );
     }
     // required for WEBVTT weirdos cue::(::past)
     | ':' ':' FUNCTION maybe_space selector maybe_space ')' {
+        if( !$3 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
+
         if(*$3 != 0)
             $3[strlen($3) - 1] = 0;
         $$ = vlc_css_selector_New( SELECTOR_PSEUDOELEMENT, $3 );
-        free( $3 );
-        if( $$ && $5 )
+        if( !$$ )
+            YYNOMEM;
+
+        if( $5 )
         {
             vlc_css_selector_AddSpecifier( $$, $5 );
             $5->combinator = RELATION_SELF;
         }
-        else
-            vlc_css_selectors_Delete( $5 );
+
+        free( $3 );
     }
     // used by :nth-*(odd/even) and :lang
     | ':' FUNCTION maybe_space IDENT maybe_space ')' {
+        if( !$2 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
+
         if(*$2 != 0)
             $2[strlen($2) - 1] = 0;
         $$ = vlc_css_selector_New( SELECTOR_PSEUDOCLASS, $2 );
+        if( !$$ )
+            YYNOMEM;
+
         free( $2 );
         free( $4 );
     }
@@ -586,15 +667,15 @@ decl_list:
 
 declaration:
     property ':' maybe_space expr prio {
-        if( $4 )
+        if( !$1 || !$4 )
         {
-            $$ = vlc_css_declaration_New( $1 );
-            if( $$ )
-                $$->expr = $4;
-            else
-                vlc_css_expression_Delete( $4 );
+            $$ = NULL;
+            YYERROR;
         }
-        else $$ = NULL;
+        $$ = vlc_css_declaration_New( $1 );
+        if( !$$ )
+            YYNOMEM;
+        $$->expr = $4;
         free( $1 );
     }
     |
@@ -658,12 +739,18 @@ expr:
     term {
         $$ = vlc_css_expression_New( $1 );
         if( !$$ )
-            vlc_css_term_Clean( $1 );
+            YYNOMEM;
     }
     | expr operator term {
         $$ = $1;
-        if( !$1 || !vlc_css_expression_AddTerm($1, $2, $3) )
-            vlc_css_term_Clean( $3 );
+        if( !$1 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
+
+        if( !vlc_css_expression_AddTerm($1, $2, $3) )
+            YYNOMEM;
     }
     | expr invalid_block_list {
         vlc_css_expression_Delete( $1 );
