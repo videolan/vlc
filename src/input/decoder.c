@@ -685,12 +685,11 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         p_owner->video.started = true;
 
         Decoder_UpdateOutState( p_owner );
-        vlc_fifo_Unlock(p_owner->p_fifo);
 
         if (vout_state == INPUT_RESOURCE_VOUT_STARTED)
             decoder_Notify(p_owner, on_vout_started, p_vout,
                            p_owner->video.vout_order);
-
+        vlc_fifo_Unlock(p_owner->p_fifo);
         return 0;
     }
     else
@@ -886,10 +885,10 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
         msg_Warn( p_dec, "no vout found, dropping subpicture" );
         if( p_owner->spu.vout )
         {
+            vlc_fifo_Lock( p_owner->p_fifo );
             assert(p_owner->spu.channel != VOUT_SPU_CHANNEL_INVALID);
             decoder_Notify(p_owner, on_vout_stopped, p_owner->spu.vout);
 
-            vlc_fifo_Lock( p_owner->p_fifo );
             vout_UnregisterSubpictureChannel(p_owner->spu.vout,
                                              p_owner->spu.channel);
             p_owner->spu.channel = VOUT_SPU_CHANNEL_INVALID;
@@ -903,10 +902,10 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
 
     if( p_owner->spu.vout != p_vout )
     {
+        vlc_fifo_Lock(p_owner->p_fifo);
+
         if (p_owner->spu.vout) /* notify the previous vout deletion unlocked */
             decoder_Notify(p_owner, on_vout_stopped, p_owner->spu.vout);
-
-        vlc_fifo_Lock(p_owner->p_fifo);
 
         if (p_owner->spu.vout)
         {
@@ -934,10 +933,10 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
 
         p_owner->spu.vout = p_vout;
         Decoder_UpdateOutState(p_owner);
-        vlc_fifo_Unlock(p_owner->p_fifo);
 
         assert(channel_order != VLC_VOUT_ORDER_NONE);
         decoder_Notify(p_owner, on_vout_started, p_vout, channel_order);
+        vlc_fifo_Unlock(p_owner->p_fifo);
     }
     else
         vout_Release(p_vout);
@@ -1429,9 +1428,8 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     if (success != VLC_SUCCESS)
         vout_lost++;
 
-    vlc_fifo_Unlock(p_owner->p_fifo);
-
     decoder_Notify(p_owner, on_new_video_stats, 1, vout_lost, displayed, vout_late);
+    vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
 static vlc_decoder_device * thumbnailer_get_device( decoder_t *p_dec )
@@ -1461,17 +1459,14 @@ static picture_t *thumbnailer_buffer_new( decoder_t *p_dec )
 static void ModuleThread_QueueThumbnail( decoder_t *p_dec, picture_t *p_pic )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
-    bool b_first;
 
     vlc_fifo_Lock(p_owner->p_fifo);
-    b_first = p_owner->b_first;
+    if( p_owner->b_first )
+        decoder_Notify(p_owner, on_thumbnail_ready, p_pic);
     p_owner->b_first = false;
     vlc_fifo_Unlock(p_owner->p_fifo);
 
-    if( b_first )
-        decoder_Notify(p_owner, on_thumbnail_ready, p_pic);
     picture_Release( p_pic );
-
 }
 
 static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_audio )
@@ -1567,9 +1562,8 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
     if (success != VLC_SUCCESS)
         aout_lost++;
 
-    vlc_fifo_Unlock(p_owner->p_fifo);
-
     decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played);
+    vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
 static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_subpic )
