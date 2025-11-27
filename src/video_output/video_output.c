@@ -283,8 +283,7 @@ bool vout_IsEmpty(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    if (!sys->decoder_fifo)
-        return true;
+    assert(sys->decoder_fifo);
 
     return picture_fifo_IsEmpty(sys->decoder_fifo);
 }
@@ -1818,7 +1817,6 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
                                         cfg->mouse_event, cfg->mouse_opaque);
     vlc_mutex_unlock(&sys->window_lock);
 
-    sys->decoder_fifo = picture_fifo_New();
     sys->private_pool = NULL;
 
     sys->filter.configuration = NULL;
@@ -1937,11 +1935,6 @@ error:
         vlc_video_context_Release(sys->filter.src_vctx);
         sys->filter.src_vctx = NULL;
     }
-    if (sys->decoder_fifo != NULL)
-    {
-        picture_fifo_Delete(sys->decoder_fifo);
-        sys->decoder_fifo = NULL;
-    }
     vlc_mutex_lock(&sys->window_lock);
     vout_display_window_SetMouseHandler(sys->display_cfg.window, NULL, NULL);
     vlc_mutex_unlock(&sys->window_lock);
@@ -2028,11 +2021,6 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     }
     free(sys->filter.configuration);
 
-    if (sys->decoder_fifo != NULL)
-    {
-        picture_fifo_Delete(sys->decoder_fifo);
-        sys->decoder_fifo = NULL;
-    }
     assert(sys->private_pool == NULL);
 
     vlc_mutex_lock(&sys->window_lock);
@@ -2122,6 +2110,8 @@ void vout_Release(vout_thread_t *vout)
         return;
     }
 
+    picture_fifo_Delete(sys->decoder_fifo);
+
     free(sys->splitter_name);
     free(sys->display_cfg.icc_profile);
 
@@ -2177,6 +2167,13 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vout_thread_sys_t *sys = p_vout;
     sys->dummy = false;
 
+    sys->decoder_fifo = picture_fifo_New();
+    if (sys->decoder_fifo == NULL)
+    {
+        vlc_object_delete(vout);
+        return NULL;
+    }
+
     /* Register the VLC variable and callbacks. On the one hand, the variables
      * must be ready early on because further initializations below depend on
      * some of them. On the other hand, the callbacks depend on said
@@ -2192,6 +2189,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     if (config_GetType("video-splitter")) {
         char *splitter_name = var_InheritString(vout, "video-splitter");
         if (unlikely(splitter_name == NULL)) {
+            picture_fifo_Delete(sys->decoder_fifo);
             vlc_object_delete(vout);
             return NULL;
         }
@@ -2245,6 +2243,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     if (sys->display_cfg.window == NULL) {
         if (sys->spu)
             spu_Destroy(sys->spu);
+        picture_fifo_Delete(sys->decoder_fifo);
         vlc_object_delete(vout);
         return NULL;
     }
