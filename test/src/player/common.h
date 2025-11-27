@@ -189,6 +189,7 @@ struct media_params
     bool can_pause;
     bool error;
     bool null_names;
+    bool report_length;
     vlc_tick_t pts_delay;
 
     const char *config;
@@ -214,6 +215,7 @@ struct media_params
     .can_pause = true, \
     .error = false, \
     .null_names = false, \
+    .report_length = true, \
     .pts_delay = DEFAULT_PTS_DELAY, \
     .config = NULL, \
     .discontinuities = NULL, \
@@ -781,7 +783,8 @@ create_mock_media(const char *name, const struct media_params *params)
         "sub_packetized=%d;length=%"PRId64";audio_sample_length=%"PRId64";"
         "video_frame_rate=%u;video_frame_rate_base=%u;"
         "title_count=%zu;chapter_count=%zu;"
-        "can_seek=%d;can_pause=%d;error=%d;null_names=%d;pts_delay=%"PRId64";"
+        "can_seek=%d;can_pause=%d;error=%d;null_names=%d;"
+        "report_length=%d;ts_delay=%"PRId64";"
         "config=%s;discontinuities=%s;attachment_count=%zu",
         params->track_count[VIDEO_ES], params->track_count[AUDIO_ES],
         params->track_count[SPU_ES], params->program_count,
@@ -790,7 +793,7 @@ create_mock_media(const char *name, const struct media_params *params)
         params->video_frame_rate, params->video_frame_rate_base,
         params->title_count, params->chapter_count,
         params->can_seek, params->can_pause, params->error, params->null_names,
-        params->pts_delay,
+        params->report_length, params->pts_delay,
         params->config ? params->config : "",
         params->discontinuities ? params->discontinuities : "",
         params->attachment_count);
