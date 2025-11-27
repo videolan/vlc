@@ -155,7 +155,7 @@ static const char *const resp_hdrv[][2] = {
     { "set-cookie",       "foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; "
                           "version=1" },
 };
-static const unsigned resp_hdrc = sizeof (resp_hdrv) / sizeof (resp_hdrv[0]);
+static const unsigned resp_hdrc = ARRAY_SIZE(resp_hdrv);
 
 static unsigned stream_header_tables;
 

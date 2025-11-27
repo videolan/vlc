@@ -117,7 +117,7 @@ static const char *vlc_h2_type_name(uint_fast8_t type)
         [VLC_H2_FRAME_CONTINUATION]  = "CONTINUATION",
     };
 
-    if (type >= (sizeof (names) / sizeof (names[0])) || names[type][0] == '\0')
+    if (type >= ARRAY_SIZE(names) || names[type][0] == '\0')
         return "<unknown>";
     return names[type];
 }
@@ -326,7 +326,7 @@ const char *vlc_h2_setting_name(uint_fast16_t id)
         [VLC_H2_SETTING_MAX_HEADER_LIST_SIZE]   = "Header list size",
     };
 
-    if (id >= sizeof (names) / sizeof (names[0]) || names[id][0] == '\0')
+    if (id >= ARRAY_SIZE(names) || names[id][0] == '\0')
         id = 0;
     return names[id];
 }
@@ -397,7 +397,7 @@ const char *vlc_h2_strerror(uint_fast32_t code)
         [VLC_H2_HTTP_1_1_REQUIRED]   = "Required HTTP/1.1",
     };
 
-    if (code >= sizeof (names) / sizeof (names[0]) || names[code][0] == '\0')
+    if (code >= ARRAY_SIZE(names) || names[code][0] == '\0')
         return "Unknown error";
     return names[code];
 }
@@ -975,8 +975,7 @@ static int vlc_h2_parse_generic(struct vlc_h2_parser *p,
 
     assert(p->headers.sid == 0);
 
-    if (type < sizeof (vlc_h2_parsers) / sizeof (vlc_h2_parsers[0])
-     && vlc_h2_parsers[type] != NULL)
+    if (type < ARRAY_SIZE(vlc_h2_parsers) && vlc_h2_parsers[type] != NULL)
         func = vlc_h2_parsers[type];
 
     return func(p, f, len, id);

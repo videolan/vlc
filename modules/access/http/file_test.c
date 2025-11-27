@@ -307,7 +307,7 @@ static struct vlc_http_msg *stream_read_headers(struct vlc_http_stream *s)
     }
 
     memmove(replies, replies + 1, sizeof (replies) - sizeof (replies[0]));
-    replies[(sizeof (replies) / sizeof (replies[0])) - 1] = NULL;
+    replies[ARRAY_SIZE(replies) - 1] = NULL;
 
     return m;
 }
