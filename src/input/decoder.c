@@ -653,8 +653,10 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
             dpb_size = 2;
             break;
         }
+        size_t pic_count = dpb_size + p_dec->i_extra_picture_buffers;
+        pic_count ++; /* Held by the vout */
         picture_pool_t *pool = picture_pool_NewFromFormat( &p_dec->fmt_out.video,
-                            dpb_size + p_dec->i_extra_picture_buffers + 1 );
+                                                           pic_count );
 
         if( pool == NULL)
         {
