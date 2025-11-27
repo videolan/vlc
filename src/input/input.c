@@ -701,26 +701,29 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 msg_Dbg( p_input, "waiting decoder fifos to empty" );
                 i_wakeup = vlc_tick_now() + INPUT_IDLE_SLEEP;
             }
-            /* Pause after eof only if the input is pausable.
-             * This way we won't trigger timeshifting for nothing */
-            else if( b_pause_after_eof && input_priv(p_input)->master->b_can_pause )
-            {
-                if( b_paused_at_eof )
-                    break;
-
-                input_control_param_t param;
-                param.val.i_int = PAUSE_S;
-
-                msg_Dbg( p_input, "pausing at EOF (pause after each)");
-                Control( p_input, INPUT_CONTROL_SET_STATE, param );
-
-                b_paused = true;
-                b_paused_at_eof = true;
-            }
             else
             {
-                if( MainLoopTryRepeat( p_input ) )
-                    break;
+                /* Pause after eof only if the input is pausable.
+                 * This way we won't trigger timeshifting for nothing */
+                if( b_pause_after_eof && input_priv(p_input)->master->b_can_pause )
+                {
+                    if( b_paused_at_eof )
+                        break;
+
+                    input_control_param_t param;
+                    param.val.i_int = PAUSE_S;
+
+                    msg_Dbg( p_input, "pausing at EOF (pause after each)");
+                    Control( p_input, INPUT_CONTROL_SET_STATE, param );
+
+                    b_paused = true;
+                    b_paused_at_eof = true;
+                }
+                else
+                {
+                    if( MainLoopTryRepeat( p_input ) )
+                        break;
+                }
             }
 
             /* Update interface and statistics */
