@@ -2272,6 +2272,13 @@ REPORT_LIST
 static void
 ctx_init(struct ctx *ctx, int flags)
 {
+    static bool test_initialized = false;
+    if (!test_initialized)
+    {
+        test_init();
+        test_initialized = true;
+    }
+
     const char * argv[] = {
         "-v",
         "--ignore-config",
@@ -3134,8 +3141,6 @@ test_es_selection_override(struct ctx *ctx)
 int
 main(void)
 {
-    test_init();
-
     struct ctx ctx;
 
     /* Test with --aout=none --vout=none */
