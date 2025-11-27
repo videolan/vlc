@@ -461,8 +461,6 @@ PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
         media_stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
     else if (var_InheritBool(obj, "play-and-stop"))
         media_stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_STOP;
-    else if (var_InheritBool(obj, "play-and-pause"))
-        media_stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_PAUSE;
     else
         media_stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE;
 

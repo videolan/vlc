@@ -206,8 +206,6 @@ vlc_playlist_SetMediaStoppedAction(vlc_playlist_t *playlist,
 {
     vlc_playlist_AssertLocked(playlist);
     playlist->stopped_action = action;
-    var_SetBool(playlist->player, "play-and-pause",
-                action == VLC_PLAYLIST_MEDIA_STOPPED_PAUSE);
     vlc_playlist_UpdateNextMedia(playlist);
     vlc_playlist_Notify(playlist, on_media_stopped_action_changed, action);
 }

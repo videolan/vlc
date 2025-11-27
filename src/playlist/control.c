@@ -439,7 +439,6 @@ vlc_playlist_UpdateNextMedia(vlc_playlist_t *playlist)
     switch (playlist->stopped_action)
     {
         case VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE:
-        case VLC_PLAYLIST_MEDIA_STOPPED_PAUSE:
         case VLC_PLAYLIST_MEDIA_STOPPED_EXIT:
         {
             ssize_t index = vlc_playlist_GetNextMediaIndex(playlist);

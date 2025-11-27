@@ -176,8 +176,6 @@ enum vlc_playlist_preparsing
 enum vlc_playlist_media_stopped_action {
     /** Continue (or stop if there is no next media), default behavior */
     VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE,
-    /** Pause when reaching the end of file */
-    VLC_PLAYLIST_MEDIA_STOPPED_PAUSE,
     /** Stop, even if there is a next media to play */
     VLC_PLAYLIST_MEDIA_STOPPED_STOP,
     /** Exit VLC */
