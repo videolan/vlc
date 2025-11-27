@@ -475,6 +475,18 @@ static void StartTitle( input_thread_t * p_input, bool restart )
         input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 }
 
+static void ResetPosition( input_thread_t *p_input )
+{
+    input_thread_private_t *priv = input_priv(p_input);
+    StartTitle( p_input, true );
+
+    /* Seek to start position */
+    if( priv->i_start > 0 )
+        input_SetTime( p_input, 0, false );
+    else
+        input_SetPosition( p_input, 0.0f, false );
+}
+
 /*****************************************************************************
  * Main loop: Fill buffers from access, and demux
  *****************************************************************************/
@@ -546,8 +558,6 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
     if( i_repeat <= 0 )
         return VLC_EGENERIC;
 
-    vlc_value_t val;
-
     msg_Dbg( p_input, "repeating the same input (%d)", i_repeat );
     if( i_repeat > 0 )
     {
@@ -555,14 +565,7 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
         var_SetInteger( p_input, "input-repeat", i_repeat );
     }
 
-    input_thread_private_t *priv = input_priv(p_input);
-    StartTitle( p_input, true );
-
-    /* Seek to start position */
-    if( priv->i_start > 0 )
-        input_SetTime( p_input, 0, false );
-    else
-        input_SetPosition( p_input, 0.0f, false );
+    ResetPosition( p_input );
 
     return VLC_SUCCESS;
 }
