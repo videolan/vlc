@@ -3136,10 +3136,6 @@ main(void)
 {
     test_init();
 
-    /* Keep an instance to keep the module bank loaded */
-    libvlc_instance_t *dummy = libvlc_new(0, NULL);
-    assert(dummy != NULL);
-
     struct ctx ctx;
 
     /* Test with --aout=none --vout=none */
@@ -3192,8 +3188,6 @@ main(void)
     test_audio_loudness_meter(&ctx);
 
     ctx_destroy(&ctx);
-
-    libvlc_release(dummy);
     return 0;
 }
 
