@@ -281,19 +281,16 @@ unary_operator:
 ruleset:
     selector_list '{' maybe_space declaration_list closing_brace {
         $$ = vlc_css_rule_New();
-        if($$)
-        {
-            $$->p_selectors = $1;
-            $$->p_declarations = $4;
-        }
+        if( !$$ )
+            YYNOMEM;
+        $$->p_selectors = $1;
+        $$->p_declarations = $4;
     }
   ;
 
 selector_list:
     selector %prec UNIMPORTANT_TOK {
-        if ($1) {
-            $$ = $1;
-        }
+        $$ = $1;
     }
     | selector_list ',' maybe_space selector %prec UNIMPORTANT_TOK {
         if ($1 && $4 )
