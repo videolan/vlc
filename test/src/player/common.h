@@ -784,7 +784,7 @@ create_mock_media(const char *name, const struct media_params *params)
         "video_frame_rate=%u;video_frame_rate_base=%u;"
         "title_count=%zu;chapter_count=%zu;"
         "can_seek=%d;can_pause=%d;error=%d;null_names=%d;"
-        "report_length=%d;ts_delay=%"PRId64";"
+        "report_length=%d;pts_delay=%"PRId64";"
         "config=%s;discontinuities=%s;attachment_count=%zu",
         params->track_count[VIDEO_ES], params->track_count[AUDIO_ES],
         params->track_count[SPU_ES], params->program_count,
