@@ -91,3 +91,35 @@ timers_smpte_on_update(const struct vlc_player_timer_smpte_timecode *tc,
     bool success = vlc_vector_push(&timer->vec, report);
     assert(success);
 }
+
+static inline void
+player_add_timer(vlc_player_t *player, struct timer_state *timer, bool smpte,
+                 vlc_tick_t delay)
+{
+    static const struct vlc_player_timer_cbs cbs =
+    {
+        .on_update = timers_on_update,
+        .on_paused = timers_on_paused,
+        .on_seek = timers_on_seek,
+    };
+
+    static const struct vlc_player_timer_smpte_cbs smpte_cbs =
+    {
+        .on_update = timers_smpte_on_update,
+    };
+
+    vlc_vector_init(&timer->vec);
+    timer->delay = delay;
+    if (smpte)
+        timer->id = vlc_player_AddSmpteTimer(player, &smpte_cbs, timer);
+    else
+        timer->id = vlc_player_AddTimer(player, timer->delay, &cbs, timer);
+    assert(timer->id);
+}
+
+static inline void
+player_remove_timer(vlc_player_t *player, struct timer_state *timer)
+{
+    vlc_vector_clear(&timer->vec);
+    vlc_player_RemoveTimer(player, timer->id);
+}
