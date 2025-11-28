@@ -78,7 +78,7 @@ static void yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
 
 %}
 
-%expect 10
+%expect 7
 
 %nonassoc LOWEST_PREC
 
@@ -678,48 +678,33 @@ declaration:
         $$->expr = $4;
         free( $1 );
     }
-    |
-    property error {
-        free( $1 );
-        $$ = NULL;
-    }
-    |
-    property ':' maybe_space error expr prio {
-        free( $1 );
-        vlc_css_expression_Delete( $5 );
-        /* The default movable type template has letter-spacing: .none;  Handle this by looking for
-        error tokens at the start of an expr, recover the expr and then treat as an error, cleaning
-        up and deleting the shifted expr.  */
-        $$ = NULL;
-    }
-    |
-    property ':' maybe_space expr prio error {
+    | property ':' maybe_space expr error {
+        /* e.g. color: red !important fail;  or color: red; garbage */
         free( $1 );
         vlc_css_expression_Delete( $4 );
-        /* When we encounter something like p {color: red !important fail;} we should drop the declaration */
         $$ = NULL;
     }
-    |
-    IMPORTANT_SYM maybe_space {
-        /* Handle this case: div { text-align: center; !important } Just reduce away the stray !important. */
-        $$ = NULL;
-    }
-    |
-    property ':' maybe_space {
+    | property ':' maybe_space error {
+        /* color: garbage */
         free( $1 );
-        /* div { font-family: } Just reduce away this property with no value. */
         $$ = NULL;
     }
-    |
-    property ':' maybe_space error {
+    | property error {
+        /* color garbage */
         free( $1 );
-        /* if we come across rules with invalid values like this case: p { weight: *; }, just discard the rule */
         $$ = NULL;
     }
-    |
-    property invalid_block {
-        /* if we come across: div { color{;color:maroon} }, ignore everything within curly brackets */
+    | property ':' maybe_space {
+        /* color: ; */
         free( $1 );
+        $$ = NULL;
+    }
+    | property invalid_block {
+        free( $1 );
+        $$ = NULL;
+    }
+    | IMPORTANT_SYM maybe_space {
+        /* stray !important */
         $$ = NULL;
     }
   ;
@@ -741,42 +726,36 @@ expr:
         if( !$$ )
             YYNOMEM;
     }
-    | expr operator term {
-        $$ = $1;
+    | expr term {
         if( !$1 )
         {
             $$ = NULL;
             YYERROR;
         }
-
-        if( !vlc_css_expression_AddTerm($1, $2, $3) )
+        $$ = $1;
+        if( !vlc_css_expression_AddTerm( $1, ' ', $2 ) )
             YYNOMEM;
     }
-    | expr invalid_block_list {
-        vlc_css_expression_Delete( $1 );
-        $$ = NULL;
-    }
-    | expr invalid_block_list error {
-        vlc_css_expression_Delete( $1 );
-        $$ = NULL;
-    }
-    | expr error {
-        vlc_css_expression_Delete( $1 );
-        $$ = NULL;
+    | expr operator maybe_space term {
+        if( !$1 )
+        {
+            $$ = NULL;
+            YYERROR;
+        }
+        $$ = $1;
+        if( !vlc_css_expression_AddTerm( $1, '/', $4 ) )
+            YYNOMEM;
     }
   ;
 
 operator:
-    '/' maybe_space {
-        $$ = '/';
-    }
-  | ',' maybe_space {
-        $$ = ',';
-    }
-  | /* empty */ {
-        $$ = 0;
-  }
-  ;
+      '/' maybe_space {
+          $$ = '/';
+      }
+    | ',' maybe_space {
+          $$ = ',';
+      }
+    ;
 
 term:
   unary_term { $$ = $1; }
