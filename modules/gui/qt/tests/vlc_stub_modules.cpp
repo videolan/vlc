@@ -187,9 +187,7 @@ static const char * test_defaults_args[] = {
     "-v", "--vout=vdummy", "--aout=adummy", "--text-renderer=tdummy", "--media-library"
 };
 
-static const int test_defaults_nargs =
-    sizeof (test_defaults_args) / sizeof (test_defaults_args[0]);
-
+static const int test_defaults_nargs = ARRAY_SIZE(test_defaults_args);
 
 bool VLCTestingEnv::init()
 {
