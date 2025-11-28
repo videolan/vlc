@@ -251,17 +251,6 @@ test_timers(struct ctx *ctx)
 
     vlc_player_t *player = ctx->player;
 
-    static const struct vlc_player_timer_cbs cbs =
-    {
-        .on_update = timers_on_update,
-        .on_paused = timers_on_paused,
-        .on_seek = timers_on_seek,
-    };
-    static const struct vlc_player_timer_smpte_cbs smpte_cbs =
-    {
-        .on_update = timers_smpte_on_update,
-    };
-
     /* Configure timers */
     struct timer_state timers[TIMER_COUNT];
 
@@ -270,18 +259,14 @@ test_timers(struct ctx *ctx)
 
     /* Filter some points in order to not be flooded */
     timers[REGULAR_DELAY_TIMER_IDX].delay = SOURCE_DELAY_TIMER_VALUE;
+    timers[SMPTE_TIMER_IDX].delay = VLC_TICK_INVALID;
 
     /* Create all timers */
     for (size_t i = 0; i < ARRAY_SIZE(timers); ++i)
     {
         vlc_vector_init(&timers[i].vec);
-        if (i == SMPTE_TIMER_IDX)
-            timers[i].id = vlc_player_AddSmpteTimer(player, &smpte_cbs,
-                                                    &timers[i]);
-        else
-            timers[i].id = vlc_player_AddTimer(player, timers[i].delay, &cbs,
-                                               &timers[i]);
-        assert(timers[i].id);
+        bool smpte = i == SMPTE_TIMER_IDX;
+        player_add_timer(player, &timers[i], smpte, timers[i].delay);
     }
 
     /* Test all timers using valid tracks */
@@ -338,8 +323,7 @@ test_timers(struct ctx *ctx)
     for (size_t i = 0; i < ARRAY_SIZE(timers); ++i)
     {
         struct timer_state *timer = &timers[i];
-        vlc_vector_clear(&timer->vec);
-        vlc_player_RemoveTimer(player, timer->id);
+        player_remove_timer(player, timer);
     }
 }
 
