@@ -2490,7 +2490,9 @@ static bool vlc_input_decoder_IsDrainedLocked(vlc_input_decoder_t *owner)
 {
     vlc_fifo_Assert(owner->p_fifo);
 
-    if (owner->p_sout_input != NULL)
+    if (owner->b_draining)
+        return false;
+    else if (owner->p_sout_input != NULL)
         return true;
     else if (owner->fmt.i_cat == VIDEO_ES && owner->video.vout != NULL)
         return vout_IsEmpty(owner->video.vout);
@@ -2503,7 +2505,7 @@ static bool vlc_input_decoder_IsDrainedLocked(vlc_input_decoder_t *owner)
 bool vlc_input_decoder_IsDrained(vlc_input_decoder_t *owner)
 {
     vlc_fifo_Lock(owner->p_fifo);
-    bool drained = !owner->b_draining && vlc_input_decoder_IsDrainedLocked(owner);
+    bool drained = vlc_input_decoder_IsDrainedLocked(owner);
     vlc_fifo_Unlock(owner->p_fifo);
     return drained;
 }
