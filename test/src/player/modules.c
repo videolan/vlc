@@ -33,7 +33,9 @@ static void aout_Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
         sys->first_pts = block->i_pts;
 
         struct ctx *ctx = sys->ctx;
+        vlc_player_Lock(ctx->player);
         VEC_PUSH(on_aout_first_pts, sys->first_pts);
+        vlc_player_Unlock(ctx->player);
     }
 
     aout_TimingReport(aout, sys->first_play_date + sys->pos - VLC_TICK_0,
