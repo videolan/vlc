@@ -883,7 +883,7 @@ static int DrawMessages(intf_thread_t *intf)
             MainBoxWrite(sys, l++, "[%s] %s", msg->psz_module, sys->msgs[i].msg);
         }
 
-        if (++i == sizeof sys->msgs / sizeof *sys->msgs)
+        if (++i == ARRAY_SIZE(sys->msgs))
             i = 0;
 
         if (i == sys->i_msgs) /* did we loop around the ring buffer ? */
@@ -1106,7 +1106,7 @@ static char *GetDiscDevice(const char *name)
     };
     char *device;
 
-    for (unsigned i = 0; i < sizeof devs / sizeof *devs; i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(devs); i++) {
         size_t n = devs[i].n;
         if (!strncmp(name, devs[i].s, n)) {
             if (name[n] == '@' || name[n] == '\0')
@@ -1644,7 +1644,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *msg,
     free(sys->msgs[sys->i_msgs].msg);
     sys->msgs[sys->i_msgs].msg = text;
 
-    if (++sys->i_msgs == (sizeof sys->msgs / sizeof *sys->msgs))
+    if (++sys->i_msgs == ARRAY_SIZE(sys->msgs))
         sys->i_msgs = 0;
 
     vlc_mutex_unlock(&sys->msg_lock);
@@ -1772,7 +1772,7 @@ static void Close(vlc_object_t *p_this)
     endwin();   /* Close the ncurses interface */
 
     vlc_LogSet(vlc_object_instance(p_this), NULL, NULL);
-    for(unsigned i = 0; i < sizeof sys->msgs / sizeof *sys->msgs; i++) {
+    for(unsigned i = 0; i < ARRAY_SIZE(sys->msgs); i++) {
         if (sys->msgs[i].item)
             msg_Free(sys->msgs[i].item);
         free(sys->msgs[i].msg);
