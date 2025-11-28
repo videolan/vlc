@@ -433,7 +433,7 @@ void X11Factory::initCursors( )
         { kResizeNESW, "bottom_left_corner" },
     };
     // retrieve cursors from default theme
-    for( unsigned i = 0; i < sizeof(cursors) / sizeof(cursors[0]); i++ )
+    for( unsigned i = 0; i < ARRAY_SIZE(cursors); i++ )
         mCursors[cursors[i].type] =
             XcursorLibraryLoadCursor( display, cursors[i].name );
 
