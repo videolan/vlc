@@ -7,6 +7,25 @@ AUTOMAKE_OPTIONS = subdir-objects
 ###############################################################################
 # Unit/regression test
 ###############################################################################
+player_programs = \
+	test_src_player_attachments \
+	test_src_player_capabilities \
+	test_src_player_discontinuities \
+	test_src_player_errors \
+	test_src_player_es_selection \
+	test_src_player_lifecycle \
+	test_src_player_loudness \
+	test_src_player_media \
+	test_src_player_outputs \
+	test_src_player_pause \
+	test_src_player_programs \
+	test_src_player_seeks \
+	test_src_player_teletext \
+	test_src_player_timers \
+	test_src_player_titles \
+	test_src_player_tracks \
+	test_src_player_tracks_ids
+
 noinst_PROGRAMS =
 check_PROGRAMS = \
 	test_libvlc_core \
@@ -34,23 +53,6 @@ check_PROGRAMS = \
 	test_src_preparser_thumbnail \
 	test_src_preparser_thumbnail_to_files \
 	test_src_input_decoder \
-	test_src_player_attachments \
-	test_src_player_capabilities \
-	test_src_player_discontinuities \
-	test_src_player_errors \
-	test_src_player_es_selection \
-	test_src_player_lifecycle \
-	test_src_player_loudness \
-	test_src_player_media \
-	test_src_player_outputs \
-	test_src_player_pause \
-	test_src_player_programs \
-	test_src_player_seeks \
-	test_src_player_teletext \
-	test_src_player_timers \
-	test_src_player_titles \
-	test_src_player_tracks \
-	test_src_player_tracks_ids \
 	test_src_interface_dialog \
 	test_src_media_source \
 	test_src_misc_bits \
@@ -80,6 +82,8 @@ check_PROGRAMS = \
 	test_modules_mux_webvtt \
 	test_modules_stream_out_hls_subtitles_segmenter \
 	$(NULL)
+
+check_PROGRAMS += $(player_programs)
 
 if HAVE_GL
 check_PROGRAMS += \
@@ -395,6 +399,9 @@ test_modules_stream_out_hls_subtitles_segmenter_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
+
+checkplayer:
+	$(MAKE) check_PROGRAMS="$(player_programs)" check
 
 FORCE:
 	@echo "Generated source cannot be phony. Go away." >&2
