@@ -160,7 +160,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
 
             ofs -= p_sys->i_data_pos;
-            vlc_tick_t pts =
+            vlc_tick_t pts = VLC_TICK_0 +
                 vlc_tick_from_samples( ofs * 8, p_sys->fmt.i_bitrate );
             date_Set( &p_sys->pts, pts );
             break;
