@@ -26,6 +26,8 @@
 #include "virtual_segment.hpp"
 #include "../../codec/webvtt/helpers.h"
 
+#include "lzokay.hpp"
+
 namespace mkv {
 
 /*****************************************************************************
@@ -150,6 +152,76 @@ block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
     return p_block;
 }
 #endif
+
+bool lzo1x_decompress_extra( demux_t * p_demux, mkv_track_t & tk )
+{
+    lzokay::EResult result;
+    size_t n = 0, total_out = 0;
+    uint8_t * p_new_extra = nullptr;
+
+    msg_Dbg(p_demux,"Inflating private data");
+
+    do
+    {
+        n++;
+        void *alloc = realloc(p_new_extra, n * 1024);
+        if( alloc == nullptr )
+        {
+            msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %u",
+                      tk.i_number );
+            free(p_new_extra);
+            return false;
+        }
+
+        p_new_extra = static_cast<uint8_t *>( alloc );
+        result = lzokay::decompress( tk.p_extra_data, tk.i_extra_data,
+                                     p_new_extra, n * 1024, total_out );
+    }
+    while ( result == lzokay::EResult::OutputOverrun );
+
+    if( result != lzokay::EResult::Success )
+    {
+        msg_Err( p_demux, "LZO1X private data decompression failed. Result: %d", (int)result );
+        free(p_new_extra);
+        return false;
+    }
+
+    free( tk.p_extra_data );
+    tk.i_extra_data = total_out;
+    tk.p_extra_data = p_new_extra;
+
+    return true;
+}
+
+block_t *block_lzo1x_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
+    lzokay::EResult result;
+    size_t dstsize = 0, n;
+    block_t *p_block;
+
+    n = 0;
+    p_block = block_Alloc( 0 );
+    do
+    {
+        n++;
+        p_block = block_Realloc( p_block, 0, n * 1000 );
+        result = lzokay::decompress( p_in_block->p_buffer, p_in_block->i_buffer,
+                                     p_block->p_buffer, p_block->i_buffer, dstsize );
+    }
+    while( result == lzokay::EResult::OutputOverrun );
+
+    if( result != lzokay::EResult::Success )
+    {
+        msg_Err( p_this, "LZO1X decompression failed. Result: %d", (int)result );
+        block_Release( p_block );
+        return p_in_block;
+    }
+
+    p_block = block_Realloc( p_block, 0, dstsize );
+    p_block->i_buffer = dstsize;
+    block_Release( p_in_block );
+
+    return p_block;
+}
 
 /* Utility function for BlockDecode */
 block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)

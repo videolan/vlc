@@ -624,6 +624,14 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
         }
         else
 #endif
+        if( track.i_compression_type == MATROSKA_COMPRESSION_LZOX &&
+            track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
+        {
+            p_block = block_lzo1x_decompress( VLC_OBJECT(p_demux), p_block );
+            if( p_block == NULL )
+                break;
+        }
+        else
         if( track.i_compression_type == MATROSKA_COMPRESSION_HEADER &&
             track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
         {

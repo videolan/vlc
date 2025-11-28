@@ -293,6 +293,7 @@ if libebml_dep.found() and libmatroska_dep.found()
             'mkv/chapter_command_script.cpp',
             'mkv/chapter_command_script_common.cpp',
             'mkv/stream_io_callback.cpp',
+            'mkv/lzokay.cpp',
             'mkv/vlc_colors.c',
             'mp4/libmp4.c',
             '../packetizer/dts_header.c',

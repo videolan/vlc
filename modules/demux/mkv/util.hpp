@@ -30,6 +30,8 @@ namespace mkv {
 int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t & tk );
 block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block );
 #endif
+bool lzo1x_decompress_extra( demux_t * p_demux, mkv_track_t & tk );
+block_t *block_lzo1x_decompress( vlc_object_t *p_this, block_t *p_in_block );
 
 block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset);
 void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, vlc_tick_t i_pts);

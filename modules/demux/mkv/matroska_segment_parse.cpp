@@ -463,6 +463,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             vars.tk->i_compression_type = static_cast<uint32_t>( compalg );
             debug( vars, "Compression Algorithm: %i", vars.tk->i_compression_type );
             if ( ( vars.tk->i_compression_type != MATROSKA_COMPRESSION_ZLIB ) &&
+                 ( vars.tk->i_compression_type != MATROSKA_COMPRESSION_LZOX ) &&
                  ( vars.tk->i_compression_type != MATROSKA_COMPRESSION_HEADER ) )
             {
                 msg_Err( vars.p_demuxer, "Track Compression method %d not supported", vars.tk->i_compression_type );
@@ -1091,6 +1092,15 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             return;
         }
 #endif
+        if( p_track->i_compression_type == MATROSKA_COMPRESSION_LZOX &&
+            p_track->i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
+            p_track->i_extra_data && p_track->p_extra_data &&
+            !lzo1x_decompress_extra( &sys.demuxer, *p_track ) )
+        {
+            msg_Err(&sys.demuxer, "Couldn't handle the track %u compression", p_track->i_number );
+            delete p_track;
+            return;
+        }
         if( !TrackInit( p_track ) )
         {
             msg_Err(&sys.demuxer, "Couldn't init track %u", p_track->i_number );
