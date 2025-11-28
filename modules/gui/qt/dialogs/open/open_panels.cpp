@@ -65,7 +65,7 @@
    Combobox will automatically do autocompletion on the edit zone */
 #define POPULATE_WITH_DEVS(ppsz_devlist, targetCombo) \
     QStringList targetCombo ## StringList = QStringList(); \
-    for ( size_t i = 0; i< sizeof(ppsz_devlist) / sizeof(*ppsz_devlist); i++ ) \
+    for ( size_t i = 0; i< ARRAY_SIZE(ppsz_devlist); i++ ) \
         targetCombo ## StringList << QString( ppsz_devlist[ i ] ); \
     targetCombo->addItems( QDir( "/dev/" )\
         .entryList( targetCombo ## StringList, QDir::System )\
@@ -394,7 +394,7 @@ void DiscOpenPanel::onFocus()
     ui.deviceCombo->clear();
     wchar_t szDrives[512];
     szDrives[0] = L'\0';
-    if( GetLogicalDriveStringsW( sizeof( szDrives ) / sizeof( *szDrives ) - 1, szDrives ) )
+    if( GetLogicalDriveStringsW( ARRAY_SIZE(szDrives) - 1, szDrives ) )
     {
         wchar_t *drive = szDrives;
         DWORD oldMode;

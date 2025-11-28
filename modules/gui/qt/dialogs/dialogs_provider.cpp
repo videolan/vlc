@@ -731,7 +731,7 @@ void DialogsProvider::savePlayingToPlaylist()
     QStringList filters;
     QString ext = getSettings()->value( "last-playlist-ext" ).toString();
 
-    for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(types); i++ )
     {
         QString tmp = qfut( types[i].filter_name ) + " (*." + types[i].filter_patterns + ")";
         if( ext == qfu( types[i].filter_patterns ) )
@@ -752,7 +752,7 @@ void DialogsProvider::savePlayingToPlaylist()
         return;
 
     /* First test if the file extension is set, and different to selected filter */
-    for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++)
+    for( size_t i = 0; i < ARRAY_SIZE(types); i++)
     {
         if ( file.endsWith( QString( "." ) + qfu( types[i].filter_patterns ) ) )
         {
@@ -765,7 +765,7 @@ void DialogsProvider::savePlayingToPlaylist()
     /* otherwise apply the selected extension */
     if ( !psz_last_playlist_ext )
     {
-        for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++)
+        for( size_t i = 0; i < ARRAY_SIZE(types); i++)
         {
             if ( selected.startsWith( qfut( types[i].filter_name ) ) )
             {
