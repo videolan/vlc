@@ -262,8 +262,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
     p_md->p_input_item      = p_input_item;
     vlc_atomic_rc_init(&p_md->rc);
 
-    atomic_init(&p_md->worker_count, 0);
-
     p_md->p_input_item->libvlc_owner = p_md;
     atomic_init(&p_md->parsed_status, libvlc_media_parsed_status_none);
     p_md->req = NULL;
@@ -379,18 +377,11 @@ void libvlc_media_add_option_flag( libvlc_media_t * p_md,
 // Delete a media descriptor object
 void libvlc_media_release( libvlc_media_t *p_md )
 {
-    unsigned int ref;
-
     if (!p_md)
         return;
 
     if( !vlc_atomic_rc_dec(&p_md->rc) )
         return;
-
-    /* Wait for all async tasks to stop. */
-    while ((ref = atomic_load_explicit(&p_md->worker_count,
-                                       memory_order_acquire)) > 0)
-        vlc_atomic_wait(&p_md->worker_count, ref);
 
     if( p_md->p_subitems )
         libvlc_media_list_release( p_md->p_subitems );
@@ -615,11 +606,10 @@ libvlc_media_get_filestat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
     return 1;
 }
 
-// Get Parsed status for media descriptor object
-libvlc_media_parsed_status_t
-libvlc_media_get_parsed_status(libvlc_media_t *media)
+bool
+libvlc_media_is_parsed(libvlc_media_t *media)
 {
-    return atomic_load(&media->parsed_status);
+    return atomic_load(&media->parsed_status) == libvlc_media_parsed_status_done;
 }
 
 // Sets media descriptor's user_data

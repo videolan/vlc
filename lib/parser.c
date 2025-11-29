@@ -23,239 +23,322 @@
 #endif
 
 #include <assert.h>
-#include <errno.h>
-#include <limits.h>
-
 #include <vlc/libvlc.h>
-#include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
-#include <vlc/libvlc_events.h>
+#include <vlc/libvlc_parser.h>
+#include <vlc/libvlc_picture.h>
 
 #include <vlc_common.h>
 #include <vlc_atomic.h>
+#include <vlc_preparser.h>
 
 #include "../src/libvlc.h"
-
 #include "libvlc_internal.h"
 #include "media_internal.h"
 #include "picture_internal.h"
 
-static void input_item_subtree_added(vlc_preparser_req *req,
-                                     input_item_node_t *node,
-                                     void *user_data)
+struct libvlc_parser_t
 {
-    VLC_UNUSED(req);
-    libvlc_media_t * p_md = user_data;
-    libvlc_media_add_subtree(p_md, node);
+    libvlc_instance_t *libvlc;
+    vlc_preparser_t *preparser;
+};
+
+union libvlc_parser_cbs_internal
+{
+    const struct libvlc_parser_cbs *parser;
+    /* TODO: thumbnailer callbacks */
+};
+
+struct libvlc_parser_task
+{
+    /* media to parse */
+    libvlc_media_t *media;
+
+    /* parser/thumbnailer callbacks */
+    union libvlc_parser_cbs_internal cbs;
+
+    /* opaque data for cbs */
+    void *cbs_opaque;
+
+    /* preparser request handle */
+    vlc_preparser_req *preparser_req;
+
+    /* task reference count */
+    vlc_atomic_rc_t rc;
+};
+
+/* Internal function to copy the required members of the request object into a heap-allocated
+   structure for further processing. The object is allocated on the heap to ensure it remains
+   valid for the entire duration of the parsing or thumbnailing operation. */
+static struct libvlc_parser_task *
+libvlc_parser_task_new(libvlc_media_t *media,
+                       union libvlc_parser_cbs_internal cbs,
+                       void *cbs_opaque)
+{
+    struct libvlc_parser_task *task = malloc(sizeof(*task));
+    if (task == NULL)
+        return NULL;
+
+    task->media = libvlc_media_retain(media);
+    task->cbs = cbs;
+    task->cbs_opaque = cbs_opaque;
+    task->preparser_req = NULL;
+    vlc_atomic_rc_init(&task->rc);
+    return task;
+}
+
+/* Internal function to destroy the heap allocated task object */
+static void libvlc_parser_task_destroy(struct libvlc_parser_task *task)
+{
+    if (task->preparser_req != NULL)
+        vlc_preparser_req_Release(task->preparser_req);
+
+    libvlc_media_release(task->media);
+    free(task);
+}
+
+static void vlc_preparser_subtree_added(vlc_preparser_req *req,
+                                        input_item_node_t *node,
+                                        void *user_data)
+{
+    struct libvlc_parser_task *task = user_data;
+    input_item_t *item = vlc_preparser_req_GetItem(req);
+    assert(task->media->p_input_item == item);
+    libvlc_media_add_subtree(task->media, node);
     input_item_node_Delete(node);
 }
 
-static void send_parsed_changed( libvlc_media_t *p_md,
-                                 libvlc_media_parsed_status_t new_status )
+static void
+vlc_preparser_ended(vlc_preparser_req *req, int status, void *user_data)
 {
-    libvlc_event_t event;
+    struct libvlc_parser_task *task = user_data;
+    input_item_t *item = vlc_preparser_req_GetItem(req);
+    assert(task->media->p_input_item == item);
 
-    if (atomic_exchange(&p_md->parsed_status, new_status) == new_status)
-        return;
-
-    /* Duration event */
-    event.type = libvlc_MediaDurationChanged;
-    event.u.media_duration_changed.new_duration =
-        libvlc_time_from_vlc_tick(input_item_GetDuration( p_md->p_input_item ));
-    libvlc_event_send( &p_md->event_manager, &event );
-
-    /* Meta event */
-    event.type = libvlc_MediaMetaChanged;
-    event.u.media_meta_changed.meta_type = 0;
-    libvlc_event_send( &p_md->event_manager, &event );
-
-    /* Parsed event */
-    event.type = libvlc_MediaParsedChanged;
-    event.u.media_parsed_changed.new_status = new_status;
-    libvlc_event_send( &p_md->event_manager, &event );
-}
-
-/**
- * \internal
- * input_item_preparse_ended (Private) (vlc event Callback)
- */
-static void input_item_preparse_ended(vlc_preparser_req *req,
-                                      int status, void *user_data)
-{
-    libvlc_media_t * p_md = user_data;
-    libvlc_media_parsed_status_t new_status;
-
-    switch( status )
+    libvlc_parser_status_t parser_status;
+    switch (status)
     {
         case VLC_EGENERIC:
-            new_status = libvlc_media_parsed_status_failed;
+            parser_status = libvlc_parser_status_failed;
             break;
         case VLC_ETIMEOUT:
-            new_status = libvlc_media_parsed_status_timeout;
+            parser_status = libvlc_parser_status_timeout;
             break;
         case -EINTR:
-            new_status = libvlc_media_parsed_status_cancelled;
+            parser_status = libvlc_parser_status_cancelled;
             break;
         case VLC_SUCCESS:
-            new_status = libvlc_media_parsed_status_done;
+            parser_status = libvlc_parser_status_done;
             break;
         default:
             vlc_assert_unreachable();
     }
-    send_parsed_changed( p_md, new_status );
-    vlc_preparser_req_Release( req );
-    p_md->req = NULL;
 
-    if (atomic_fetch_sub_explicit(&p_md->worker_count, 1,
-                                  memory_order_release) == 1)
-        vlc_atomic_notify_one(&p_md->worker_count);
+    /* The media only tracks whether it ended up parsed; the detailed
+       outcome is reported to the caller through parser_status below. A
+       failed/timed out/cancelled parse leaves the media unparsed. */
+    atomic_store(&task->media->parsed_status,
+                 parser_status == libvlc_parser_status_done
+                     ? libvlc_media_parsed_status_done
+                     : libvlc_media_parsed_status_none);
+
+    task->cbs.parser->on_parsed(
+        task->cbs_opaque, task, parser_status);
+
+    libvlc_parser_task_release(task);
 }
 
-static void input_item_attachments_added( vlc_preparser_req *req,
-                                          input_attachment_t *const *array,
-                                          size_t count, void *user_data )
+static void vlc_preparser_attachments_added(vlc_preparser_req *req,
+                                            input_attachment_t *const *array,
+                                            size_t count,
+                                            void *user_data)
 {
-    VLC_UNUSED(req);
-    libvlc_media_t * p_md = user_data;
-    libvlc_event_t event;
+    struct libvlc_parser_task *task = user_data;
+    input_item_t *item = vlc_preparser_req_GetItem(req);
+    assert(task->media->p_input_item == item);
 
-    libvlc_picture_list_t* list =
-        libvlc_picture_list_from_attachments(array, count);
-    if( !list )
+    if (task->cbs.parser->on_attachments_added == NULL)
         return;
-    if( !libvlc_picture_list_count(list) )
+
+    libvlc_picture_list_t *list =
+        libvlc_picture_list_from_attachments(array, count);
+    if (!list)
+        return;
+    if (!libvlc_picture_list_count(list))
     {
-        libvlc_picture_list_destroy( list );
+        libvlc_picture_list_destroy(list);
         return;
     }
 
-    /* Construct the event */
-    event.type = libvlc_MediaAttachedThumbnailsFound;
-    event.u.media_attached_thumbnails_found.thumbnails = list;
-
-    /* Send the event */
-    libvlc_event_send( &p_md->event_manager, &event );
-
-    libvlc_picture_list_destroy( list );
+    task->cbs.parser->on_attachments_added(task->cbs_opaque,
+                                           task,
+                                           list);
+    libvlc_picture_list_destroy(list);
 }
 
 static const struct vlc_preparser_cbs preparser_callbacks = {
-    .on_ended = input_item_preparse_ended,
-    .on_subtree_added = input_item_subtree_added,
-    .on_attachments_added = input_item_attachments_added,
+    .on_ended = vlc_preparser_ended,
+    .on_subtree_added = vlc_preparser_subtree_added,
+    .on_attachments_added = vlc_preparser_attachments_added,
 };
 
-int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
-                               libvlc_media_parse_flag_t parse_flag,
-                               int timeout)
+/* Calculate a combination of VLC_PREPARSER_TYPE_* and VLC_PREPARSER_OPTION_* flags
+   (to be passed to vlc_preparser_Push) from libvlc_media_parse_flag_t. Return -1 to skip parsing */
+static int get_parser_type_options(libvlc_media_parse_flag_t parse_flag)
 {
-    libvlc_media_parsed_status_t expected = libvlc_media_parsed_status_none;
-
-    while (!atomic_compare_exchange_weak(&media->parsed_status, &expected,
-                                        libvlc_media_parsed_status_pending))
-        if (expected == libvlc_media_parsed_status_pending
-         || expected == libvlc_media_parsed_status_done)
-            return -1;
-
-    vlc_preparser_t *parser = libvlc_get_preparser(inst);
-    if (unlikely(parser == NULL))
-        return -1;
-
-    input_item_t *item = media->p_input_item;
     int parse_scope = 0;
-    unsigned int ref = atomic_load_explicit(&media->worker_count,
-                                            memory_order_relaxed);
-    do
+    bool do_parse = false, do_fetch = false;
+
+    if (parse_flag & libvlc_media_parse)
     {
-        if (unlikely(ref == UINT_MAX))
-            return -1;
-    }
-    while (!atomic_compare_exchange_weak_explicit(&media->worker_count,
-                                                  &ref, ref + 1,
-                                                  memory_order_relaxed,
-                                                  memory_order_relaxed));
-
-    bool input_net;
-    enum input_item_type_e input_type = input_item_GetType(item, &input_net);
-
-    bool do_parse, do_fetch;
-    if (parse_flag & libvlc_media_parse_forced)
         do_parse = true;
-    else
-    {
-        if (input_net)
-            do_parse = parse_flag & libvlc_media_parse_network;
-        else if (parse_flag & libvlc_media_parse_local)
-        {
-            switch (input_type)
-            {
-                case ITEM_TYPE_NODE:
-                case ITEM_TYPE_FILE:
-                case ITEM_TYPE_DIRECTORY:
-                case ITEM_TYPE_PLAYLIST:
-                    do_parse = true;
-                    break;
-                default:
-                    do_parse = false;
-                    break;
-            }
-        }
-        else
-            do_parse = false;
+        parse_scope |= VLC_PREPARSER_TYPE_PARSE;
     }
 
-    if (do_parse)
-        parse_scope |= VLC_PREPARSER_TYPE_PARSE;
-
-    do_fetch = false;
     if (parse_flag & libvlc_media_fetch_local)
     {
-        parse_scope |= VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
         do_fetch = true;
+        parse_scope |= VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
     }
+
     if (parse_flag & libvlc_media_fetch_network)
     {
-        parse_scope |= VLC_PREPARSER_TYPE_FETCHMETA_NET;
         do_fetch = true;
+        parse_scope |= VLC_PREPARSER_TYPE_FETCHMETA_NET;
     }
 
     if (!do_parse && !do_fetch)
-    {
-        send_parsed_changed( media, libvlc_media_parsed_status_skipped );
-        atomic_fetch_sub_explicit(&media->worker_count, 1,
-                                  memory_order_relaxed);
-        return 0;
-    }
+        return -1; /* nothing to parse/fetch */
 
     if (parse_flag & libvlc_media_do_interact)
         parse_scope |= VLC_PREPARSER_OPTION_INTERACT;
+
     parse_scope |= VLC_PREPARSER_OPTION_SUBITEMS;
 
-    if (timeout == -1)
-        timeout = var_InheritInteger(inst->p_libvlc_int, "preparse-timeout");
-
-    vlc_preparser_SetTimeout(parser, VLC_TICK_FROM_MS(timeout));
-
-    media->req = vlc_preparser_Push(parser, item, parse_scope,
-                                    &preparser_callbacks, media);
-    if (media->req == NULL)
-    {
-        atomic_fetch_sub_explicit(&media->worker_count, 1,
-                                  memory_order_relaxed);
-        return -1;
-    }
-    return 0;
+    return parse_scope;
 }
 
-// Stop parsing of the media
-void
-libvlc_media_parse_stop(libvlc_instance_t *inst, libvlc_media_t *media)
+/* retain a reference to the parser task */
+static struct libvlc_parser_task *
+libvlc_parser_task_retain(struct libvlc_parser_task *task)
 {
-    vlc_preparser_t *parser = libvlc_get_preparser(inst);
+    vlc_atomic_rc_inc(&task->rc);
+    return task;
+}
+
+libvlc_parser_task *
+libvlc_parser_queue(libvlc_parser_t *parser,
+                    const libvlc_parser_request_t *req,
+                    const struct libvlc_parser_cbs *cbs,
+                    void *cbs_opaque)
+{
     assert(parser != NULL);
-    if (media->req != NULL)
+    assert(req != NULL && req->media != NULL);
+    assert(cbs != NULL && cbs->on_parsed != NULL);
+
+    /* No different versions to handle for now */
+    assert(req->version <= 0);
+    assert(cbs->version <= 0);
+
+    int type_options = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_OPTION_SUBITEMS;
+    if (req->parse_flags != 0)
     {
-        vlc_preparser_Cancel(parser, media->req);
-        media->req = NULL;
+        type_options = get_parser_type_options(req->parse_flags);
+        if (type_options == -1) /* nothing to parse/fetch */
+            return NULL;
     }
+
+    libvlc_media_t *media = req->media;
+    input_item_t *item = media->p_input_item;
+
+    union libvlc_parser_cbs_internal req_cbs = {
+        .parser = cbs,
+    };
+
+    struct libvlc_parser_task *task = libvlc_parser_task_new(media, req_cbs, cbs_opaque);
+    if (task == NULL)
+        return NULL;
+
+    task->preparser_req = vlc_preparser_Push(parser->preparser,
+                                             item,
+                                             type_options,
+                                             &preparser_callbacks,
+                                             task);
+
+    if (task->preparser_req == NULL)
+    {
+        libvlc_parser_task_destroy(task);
+        return NULL;
+    }
+
+    return libvlc_parser_task_retain(task);
+}
+
+size_t libvlc_parser_cancel_request(libvlc_parser_t *parser,
+                                    libvlc_parser_task *task)
+{
+    if (task == NULL)
+        return vlc_preparser_Cancel(parser->preparser, NULL);
+
+    return vlc_preparser_Cancel(parser->preparser, task->preparser_req);
+}
+
+libvlc_parser_t *libvlc_parser_new(libvlc_instance_t *inst,
+                                   const struct libvlc_parser_cfg *cfg)
+{
+    assert(inst != NULL);
+    assert(cfg != NULL);
+    libvlc_time_t timeout;
+
+    /* No different versions to handle for now */
+    assert(cfg->version <= 0);
+
+    libvlc_parser_t *parser = malloc(sizeof(*parser));
+    if (parser == NULL)
+        return NULL;
+
+    if (cfg->timeout == -1)
+        timeout = var_InheritInteger(inst->p_libvlc_int, "preparse-timeout");
+    else
+        timeout = cfg->timeout;
+
+    const struct vlc_preparser_cfg preparser_cfg = {
+        .types = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_ALL |
+                 VLC_PREPARSER_TYPE_THUMBNAIL,
+        .max_parser_threads = cfg->max_parser_threads,
+        .timeout = vlc_tick_from_libvlc_time(timeout),
+        .external_process = false,
+    };
+    parser->preparser =
+        vlc_preparser_New(VLC_OBJECT(inst->p_libvlc_int), &preparser_cfg);
+    if (parser->preparser == NULL)
+    {
+        free(parser);
+        return NULL;
+    }
+    parser->libvlc = libvlc_retain(inst);
+
+    return parser;
+}
+
+libvlc_media_t *libvlc_parser_task_get_media(libvlc_parser_task *task)
+{
+    assert(task != NULL);
+    return task->media;
+}
+
+void libvlc_parser_task_release(libvlc_parser_task *task)
+{
+    assert(task != NULL);
+    if (!vlc_atomic_rc_dec(&task->rc))
+        return;
+
+    libvlc_parser_task_destroy(task);
+}
+
+void libvlc_parser_destroy(libvlc_parser_t *parser)
+{
+    vlc_preparser_Delete(parser->preparser);
+    libvlc_release(parser->libvlc);
+    free(parser);
 }

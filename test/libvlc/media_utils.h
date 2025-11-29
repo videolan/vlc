@@ -20,11 +20,17 @@
  **********************************************************************/
 
 static void
-libvlc_media_parse_finished_event(const libvlc_event_t *p_ev, void *p_data)
+libvlc_media_parse_finished_event(void *opaque, libvlc_parser_task *task,
+                                  libvlc_parser_status_t status)
 {
-    (void) p_ev;
-    vlc_sem_t *p_sem = p_data;
-    vlc_sem_post(p_sem);
+    libvlc_media_t *media = libvlc_parser_task_get_media(task);
+    assert(media != NULL);
+    assert(libvlc_media_is_parsed(media) ==
+           (status == libvlc_parser_status_done));
+
+    vlc_sem_t *sem = opaque;
+    vlc_sem_post(sem);
+    libvlc_parser_task_release(task);
 }
 
 static inline void
@@ -34,15 +40,29 @@ libvlc_media_parse_sync(libvlc_instance_t *vlc, libvlc_media_t *p_m,
     vlc_sem_t sem;
     vlc_sem_init(&sem, 0);
 
-    libvlc_event_manager_t *p_em = libvlc_media_event_manager(p_m);
-    libvlc_event_attach(p_em, libvlc_MediaParsedChanged,
-                        libvlc_media_parse_finished_event, &sem);
+    static const struct libvlc_parser_cbs cbs = {
+        .version = 0,
+        .on_parsed = libvlc_media_parse_finished_event,
+    };
 
-    int i_ret = libvlc_media_parse_request(vlc, p_m, parse_flag, timeout);
-    assert(i_ret == 0);
+    const struct libvlc_parser_cfg cfg = {
+        .version = 0,
+        .max_parser_threads = 1,
+        .timeout = timeout,
+    };
+
+    libvlc_parser_t *parser = libvlc_parser_new(vlc, &cfg);
+    assert(parser != NULL);
+    libvlc_parser_request_t req = {
+        .version = 0,
+        .media = p_m,
+        .parse_flags = parse_flag,
+    };
+
+    libvlc_parser_task *task = libvlc_parser_queue(parser, &req, &cbs, &sem);
+    assert(task != NULL);
 
     vlc_sem_wait (&sem);
 
-    libvlc_event_detach(p_em, libvlc_MediaParsedChanged,
-                        libvlc_media_parse_finished_event, &sem);
+    libvlc_parser_destroy(parser);
 }

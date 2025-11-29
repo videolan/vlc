@@ -1597,7 +1597,7 @@ LIBVLC_API void libvlc_media_player_set_video_title_display( libvlc_media_player
  *
  * \version LibVLC 4.0.0 and later.
  *
- * \note You need to call libvlc_media_parse_request() or play the media
+ * \note You need to parse using libvlc_parser_queue() or play the media
  * at least once before calling this function.  Not doing this will result in
  * an empty list.
  *

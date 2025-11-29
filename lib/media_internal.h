@@ -33,6 +33,13 @@
 #include <vlc_preparser.h>
 #include <vlc_atomic.h>
 
+/* internal parse state of a media */
+typedef enum libvlc_media_parsed_status_t
+{
+    libvlc_media_parsed_status_none,
+    libvlc_media_parsed_status_done,
+} libvlc_media_parsed_status_t;
+
 struct libvlc_media_t
 {
     libvlc_event_manager_t event_manager;
@@ -42,11 +49,6 @@ struct libvlc_media_t
 
     VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t*) p_subitems; /* A media descriptor can have Sub items. This is the only dependency we really have on media_list */
     void *p_user_data;
-
-    /* Idle protection to prevent the media from being released during
-     * preparsing. The preparse will be cancelled but the release will
-     * be blocking until no async code is using the media anymore. */
-    atomic_uint worker_count;
 
     _Atomic libvlc_media_parsed_status_t parsed_status;
     vlc_preparser_req *req;
