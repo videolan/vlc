@@ -226,6 +226,12 @@ FocusScope {
                     }
                 }
 
+                SubtitleDragOverlay {
+                    id: subtitleDragOverlay
+                    anchors.fill: parent
+                    // No z-index needed, will be stacked in order with siblings
+                }
+
                 Rectangle {
                     anchors.top: parent.top
                     anchors.left: parent.left
