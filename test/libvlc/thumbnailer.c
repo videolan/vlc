@@ -41,12 +41,12 @@
 # error Define TEST_THUMB_TYPE to a libvlc_picture_type_t value
 #endif
 
-static void thumbnail_generated(const libvlc_event_t *event, void *user_data)
+static void thumbnail_generated(void *opaque, libvlc_parser_task *task, libvlc_picture_t *picture)
 {
-    (void)event;
-    assert(event->u.media_thumbnail_generated.p_thumbnail != NULL);
-    vlc_sem_t *sem = user_data;
+    assert(picture != NULL);
+    vlc_sem_t *sem = opaque;
     vlc_sem_post(sem);
+    libvlc_parser_task_release(task);
 }
 
 static void test_media_thumbnail(libvlc_instance_t *vlc, const char *location,
@@ -62,18 +62,39 @@ static void test_media_thumbnail(libvlc_instance_t *vlc, const char *location,
     vlc_sem_t sem;
     vlc_sem_init (&sem, 0);
 
-    libvlc_event_manager_t *em = libvlc_media_event_manager(media);
-    libvlc_event_attach(em, libvlc_MediaThumbnailGenerated, thumbnail_generated, &sem);
+    static const struct libvlc_thumbnailer_cbs cbs = {
+        .version = 0,
+        .on_ended = thumbnail_generated,
+    };
 
-    libvlc_media_thumbnail_request_t *request =
-        libvlc_media_thumbnail_request_by_pos(
-            vlc, media, 0.f, libvlc_media_thumbnail_seek_precise,
-            width, height, false, picture_type, 0);
+    const struct libvlc_parser_cfg cfg = {
+        .version = 0,
+        .max_thumbnailer_threads = 1,
+        .timeout = 0,
+    };
+
+    libvlc_parser_t *parser = libvlc_parser_new(vlc, &cfg);
+    assert(parser != NULL);
+
+    libvlc_thumbnailer_request_t request = {
+        .version = 0,
+        .media = media,
+        .seek = {
+            .type = libvlc_thumbnailer_seek_pos,
+            .value = { .pos = 0.f },
+            .speed = libvlc_media_thumbnail_seek_precise,
+        },
+        .width = width,
+        .height = height,
+        .crop = false,
+        .type = picture_type,
+        .hw_dec = false,
+    };
+    libvlc_parser_task *task = libvlc_parser_queue_thumbnailing(parser, &request, &cbs, &sem);
+    assert(task != NULL);
 
     vlc_sem_wait(&sem);
-    libvlc_media_thumbnail_request_destroy(request);
-
-    libvlc_event_detach(em, libvlc_MediaThumbnailGenerated, thumbnail_generated, &sem);
+    libvlc_parser_destroy(parser);
     libvlc_media_release(media);
 }
 

@@ -75,9 +75,6 @@ libvlc_media_get_tracklist
 libvlc_media_get_type
 libvlc_media_get_user_data
 libvlc_media_is_parsed
-libvlc_media_thumbnail_request_by_time
-libvlc_media_thumbnail_request_by_pos
-libvlc_media_thumbnail_request_destroy
 libvlc_media_track_hold
 libvlc_media_track_release
 libvlc_media_tracklist_at
@@ -124,6 +121,7 @@ libvlc_media_new_as_node
 libvlc_parser_new
 libvlc_parser_destroy
 libvlc_parser_queue
+libvlc_parser_queue_thumbnailing
 libvlc_parser_cancel_request
 libvlc_parser_task_get_media
 libvlc_parser_task_release
