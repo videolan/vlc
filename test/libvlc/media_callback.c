@@ -130,9 +130,10 @@ static ssize_t AccessReadBlocking(void *opaque, unsigned char *buf, size_t len)
     return 0;
 }
 
-static void UnblockRead(void *opaque, libvlc_media_t *media)
+static void UnblockRead(void *opaque, libvlc_media_t *media, libvlc_stopping_reason_t reason)
 {
     (void)media;
+    (void)reason;
     fprintf(stderr, "test: Player: Unblock read\n");
     struct imem_root *imem = opaque;
     vlc_sem_post(&imem->wait);

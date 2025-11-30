@@ -114,7 +114,12 @@ on_stopping_current_media(vlc_player_t *player, input_item_t *item,
     libvlc_media_t *media = item->libvlc_owner;
     assert(media != NULL);
 
-    mp->cbs->on_media_stopping(mp->cbs_opaque, media);
+    static_assert((int) VLC_PLAYER_MEDIA_STOPPING_ERROR == libvlc_stopping_reason_error &&
+                  (int) VLC_PLAYER_MEDIA_STOPPING_EOS == libvlc_stopping_reason_eos &&
+                  (int) VLC_PLAYER_MEDIA_STOPPING_USER == libvlc_stopping_reason_user,
+                  "libvlc_stopping_reason_t mismatch");
+
+    mp->cbs->on_media_stopping(mp->cbs_opaque, media, (int) stopping_reason);
 }
 
 static void

@@ -206,6 +206,18 @@ typedef enum libvlc_list_action_t {
 } libvlc_list_action_t;
 
 /**
+ * Enumeration of media stopping reasons
+ */
+typedef enum libvlc_stopping_reason_t {
+    /** media is stopping due to an error (default) */
+    libvlc_stopping_reason_error,
+    /** media has reached the end of stream */
+    libvlc_stopping_reason_eos,
+    /** media is stopping due to user request */
+    libvlc_stopping_reason_user,
+} libvlc_stopping_reason_t;
+
+/**
  * Opaque equalizer handle.
  *
  * Equalizer settings can be applied to a media player.
@@ -242,12 +254,15 @@ struct libvlc_media_player_cbs
      *
      * This can be called from the PLAYING state, before the
      * player requests the next media, or from the STOPPING state, ie.
-     * when the player is stopping.
+     * when the player is stopping, or by an internal transition
+     * (e.g., when the media reaches the end of file or errors out).
      *
      * \param opaque opaque pointer set by libvlc_media_player_new()
      * \param media stopping media
+     * \param stopping_reason reason why the media is stopping
      */
-    void (*on_media_stopping)( void *opaque, libvlc_media_t *media );
+    void (*on_media_stopping)( void *opaque, libvlc_media_t *media,
+                               libvlc_stopping_reason_t stopping_reason );
 
     /**
      * Callback prototype that notify when the player state changed
