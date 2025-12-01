@@ -115,7 +115,7 @@ static void parser_on_ended(vlc_preparser_req *req, int status, void *userdata)
     vlc_preparser_req_Release(req);
 }
 
-static void on_ended(vlc_preparser_req *req, int status,
+static void on_ended(vlc_preparser_req *thumbnailer_req, int status,
                      const bool *result_array, size_t result_count, void *data)
 {
     struct context *context = data;
@@ -155,15 +155,15 @@ static void on_ended(vlc_preparser_req *req, int status,
                 free(option);
             }
 
-            vlc_preparser_req *req =
+            vlc_preparser_req *parser_req =
                 vlc_preparser_Push(context->preparser, thumb,
                                    VLC_PREPARSER_TYPE_PARSE,
                                    &parser_cbs, context);
-            assert(req != NULL);
+            assert(parser_req != NULL);
             input_item_Release(thumb);
         }
     }
-    vlc_preparser_req_Release(req);
+    vlc_preparser_req_Release(thumbnailer_req);
 }
 
 static int get_formats(enum vlc_thumbnailer_format *out_format,
