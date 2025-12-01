@@ -41,6 +41,9 @@
 #import "extensions/NSView+VLCAdditions.h"
 
 @implementation VLCLibraryWindowPlayQueueSidebarViewController
+{
+    CAGradientLayer *_scrollViewGradientMask;
+}
 
 @synthesize counterLabel = _counterLabel;
 
@@ -94,9 +97,41 @@
     [self setupBlurredHeaderFooter];
 }
 
+- (void)setupScrollViewGradientMask
+{
+    const CGFloat gradientHeight = VLCLibraryUIUnits.mediumSpacing;
+
+    _scrollViewGradientMask = [CAGradientLayer layer];
+    _scrollViewGradientMask.colors = @[
+        (__bridge id)[NSColor colorWithWhite:1.0 alpha:0.0].CGColor,
+        (__bridge id)[NSColor colorWithWhite:1.0 alpha:1.0].CGColor
+    ];
+    _scrollViewGradientMask.startPoint = CGPointMake(0.5, 0.0);
+    _scrollViewGradientMask.endPoint = CGPointMake(0.5, 1.0);
+    _scrollViewGradientMask.locations = @[@0.0, @(gradientHeight / self.scrollView.bounds.size.height)];
+
+    self.scrollView.wantsLayer = YES;
+    self.scrollView.layer.mask = _scrollViewGradientMask;
+    _scrollViewGradientMask.frame = self.scrollView.bounds;
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(scrollViewFrameDidChange:)
+                                               name:NSViewFrameDidChangeNotification
+                                             object:self.scrollView];
+}
+
+- (void)scrollViewFrameDidChange:(NSNotification *)notification
+{
+    if (!_scrollViewGradientMask) {
+        return;
+    }
+    _scrollViewGradientMask.frame = self.scrollView.bounds;
+}
+
 - (void)setupBlurredHeaderFooter
 {
     const CGFloat footerHeight = self.footerContainerView.frame.size.height;
+    [self setupScrollViewGradientMask];
 
     if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
