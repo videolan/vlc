@@ -200,6 +200,8 @@ static int test_pseudo_selectors(void)
 {
     const char * css =
         ":pseudo { text2: \"foobar\"; }\n"
+        "::cue(b) { color: red; }\n" /* WebVTT special */
+        "::cue(v[voice=\"Tom\"]) { color: blue; }\n"
     ;
 
     PARSE_CSS("test_pseudo_selectors");
@@ -208,6 +210,27 @@ static int test_pseudo_selectors(void)
     EXPECT(rule && rule->b_valid);
     EXPECT(!strcmp(rule->p_selectors->psz_name,"pseudo"));
     EXPECT(rule->p_selectors->type == SELECTOR_PSEUDOCLASS);
+
+    CHECK("pseudoelement ::cue");
+    rule = rule->p_next;
+    EXPECT(rule && rule->b_valid);
+    EXPECT(!strcmp(rule->p_selectors->psz_name,"cue"));
+    EXPECT(rule->p_selectors->type == SELECTOR_PSEUDOELEMENT);
+
+    CHECK("pseudoelement ::cue(v[voice])");
+    rule = rule->p_next;
+    EXPECT(rule && rule->b_valid);
+    EXPECT(!strcmp(rule->p_selectors->psz_name,"cue"));
+    EXPECT(rule->p_selectors->type == SELECTOR_PSEUDOELEMENT);
+    EXPECT(rule->p_selectors->specifiers.p_first);
+    EXPECT(rule->p_selectors->specifiers.p_first->type == SELECTOR_SIMPLE);
+    EXPECT(!strcmp(rule->p_selectors->specifiers.p_first->psz_name, "v"));
+    EXPECT(rule->p_selectors->specifiers.p_first->specifiers.p_first);
+    EXPECT(rule->p_selectors->specifiers.p_first->specifiers.p_first->type == SPECIFIER_ATTRIB);
+    EXPECT(!strcmp(rule->p_selectors->specifiers.p_first->specifiers.p_first->psz_name, "voice"));
+    EXPECT(rule->p_selectors->specifiers.p_first->specifiers.p_first->p_matchsel);
+    EXPECT(rule->p_selectors->specifiers.p_first->specifiers.p_first->p_matchsel->match == MATCH_EQUALS);
+    EXPECT(!strcmp(rule->p_selectors->specifiers.p_first->specifiers.p_first->p_matchsel->psz_name, "Tom"));
 
     vlc_css_parser_Clean(&p);
     return 0;
