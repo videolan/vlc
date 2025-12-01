@@ -73,7 +73,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
 error:
     block_Release( p_block );
-    decoder_QueueVideo( p_dec, p_pic );
+    if ( p_pic )
+        decoder_QueueVideo( p_dec, p_pic );
     return VLCDEC_SUCCESS;
 }
 
