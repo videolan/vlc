@@ -278,7 +278,7 @@ FocusScope {
                     id: stackViewParentLayerEffect
 
                     // Setting `height` does not seem to work here. Anchoring the effect is not very nice, but it works:
-                    anchors.fill: parent
+                    anchors.fill: stackViewParent // WARNING: layered item is not necessarily the visual parent of its layer effect.
                     anchors.bottomMargin: -stackViewParent.bottomExtension
 
                     blending: stackViewParent.color.a < (1.0 - Number.EPSILON)
