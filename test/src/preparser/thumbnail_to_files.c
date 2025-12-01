@@ -118,6 +118,7 @@ static void parser_on_ended(vlc_preparser_req *req, int status, void *userdata)
 static void on_ended(vlc_preparser_req *thumbnailer_req, int status,
                      const bool *result_array, size_t result_count, void *data)
 {
+    (void) thumbnailer_req;
     struct context *context = data;
     assert(status == VLC_SUCCESS);
     assert(context->test_count == result_count);
@@ -163,7 +164,6 @@ static void on_ended(vlc_preparser_req *thumbnailer_req, int status,
             input_item_Release(thumb);
         }
     }
-    vlc_preparser_req_Release(thumbnailer_req);
 }
 
 static int get_formats(enum vlc_thumbnailer_format *out_format,
@@ -344,6 +344,7 @@ int main(int argc, const char *argv[])
 
     size_t count = vlc_preparser_Cancel(preparser, req);
     assert(count == 0); /* Should not be cancelled and already processed */
+    vlc_preparser_req_Release(req);
 
     for (size_t i = 0; i < test_count; ++i)
         if (fd_array[i] != -1)
