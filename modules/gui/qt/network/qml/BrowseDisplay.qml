@@ -109,6 +109,8 @@ Widgets.PageLoader {
                     { text: qsTr("Url"),        criteria: "mrl"  }
                 ]
 
+                anchors.fill: parent
+
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
 
@@ -141,13 +143,15 @@ Widgets.PageLoader {
 
             title: deviceModel.name
 
+            sortModel: [
+                { text: qsTr("Alphabetic"), criteria: "name" },
+                { text: qsTr("Url"),        criteria: "mrl"  }
+            ]
+
             BrowseDeviceView {
                 id: viewDevice
 
-                property var sortModel: [
-                    { text: qsTr("Alphabetic"), criteria: "name" },
-                    { text: qsTr("Url"),        criteria: "mrl"  }
-                ]
+                anchors.fill: parent
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd

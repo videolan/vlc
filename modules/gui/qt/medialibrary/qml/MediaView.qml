@@ -32,8 +32,6 @@ import VLC.Style
 MainViewLoader {
     id: root
 
-    required property string headerText
-
     property int listHeaderPositioning: ListView.OverlayHeader // ListView.InlineHeader, when as a row
 
     // Currently only respected by the list view:
@@ -119,30 +117,6 @@ MainViewLoader {
     }
 
     Component {
-        id: headerComponent
-
-        Widgets.ViewHeader {
-            view: root
-
-            visible: view.count > 0
-
-            text: root.headerText
-
-            seeAllButton.visible: root.seeAllButtonVisible
-
-            Navigation.parentItem: root
-            Navigation.downAction: function () {
-                if (root.currentItem?.setCurrentItemFocus)
-                    root.currentItem.setCurrentItemFocus(Qt.TabFocusReason)
-            }
-
-            Component.onCompleted: {
-                seeAllButtonClicked.connect(root.seeAllButtonClicked)
-            }
-        }
-    }
-
-    Component {
         id: gridComponent
 
         Widgets.ExpandGridItemView {
@@ -153,8 +127,6 @@ MainViewLoader {
             model: root.model
 
             selectionModel: root.selectionModel
-
-            headerDelegate: headerComponent
 
             basePictureWidth: root.gridCoverWidth
             basePictureHeight: root.gridCoverHeight
@@ -167,7 +139,6 @@ MainViewLoader {
             reuseItems: root.reuseItems
 
             Navigation.parentItem: root
-            Navigation.upItem: headerItem
 
             delegate: Widgets.GridItem {
                 id: gridDelegate
@@ -282,8 +253,6 @@ MainViewLoader {
 
             sortModel: _availableRowWidth >= VLCStyle.colWidth(4) ? _sortModelLarge : _sortModelSmall
 
-            preferredHeader: headerComponent
-
             headerPositioning: root.listHeaderPositioning
 
             rowHeight: VLCStyle.tableCoverRow_height
@@ -303,7 +272,6 @@ MainViewLoader {
             reuseItems: root.reuseItems
 
             Navigation.parentItem: root
-            Navigation.upItem: headerItem
 
             rowContextMenu: contextMenu
 

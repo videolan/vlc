@@ -60,24 +60,6 @@ FocusScope {
     property bool enableBeginningFade: true
     property bool enableEndFade: true
 
-    property Component header: Widgets.ViewHeader {
-        view: root
-
-        text: root.title
-
-        seeAllButton.visible: root.model.count < root.model.maximumCount
-
-        Navigation.parentItem: root
-
-        Navigation.downAction: function() {
-            loader.setCurrentItemFocus(Qt.TabFocusReason)
-        }
-
-        onSeeAllButtonClicked: reason => root.seeAll(reason)
-    }
-
-    property string title
-
     property bool interactive: true
 
     property bool reuseItems: true
@@ -206,8 +188,6 @@ FocusScope {
 
             model: root.model
 
-            headerDelegate: root.header
-
             selectionModel: modelSelect
 
             interactive: root.interactive
@@ -215,8 +195,6 @@ FocusScope {
             reuseItems: root.reuseItems
 
             Navigation.parentItem: root
-
-            Navigation.upItem: headerItem
 
             onActionAtIndex: (index) => { root.onAction(index) }
 
@@ -324,8 +302,6 @@ FocusScope {
             reuseItems: root.reuseItems
 
             Navigation.parentItem: root
-
-            Navigation.upItem: headerItem
 
             onActionForSelection: selection => root.onAction(selection[0].row)
 

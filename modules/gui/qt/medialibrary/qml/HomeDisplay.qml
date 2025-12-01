@@ -76,6 +76,8 @@ Widgets.PageLoader {
             VideoAll {
                 id: continueWatching
 
+                anchors.fill: parent
+
                 focus: true
 
                 model: MLRecentVideoModel {
@@ -114,6 +116,8 @@ Widgets.PageLoader {
             MediaView {
                 focus: true
 
+                anchors.fill: parent
+
                 model: MLMediaModel {
                     favoriteOnly: true
 
@@ -143,6 +147,8 @@ Widgets.PageLoader {
 
             MediaView {
                 focus: true
+
+                anchors.fill: parent
 
                 model: MLMediaModel {
                     ml: MediaLib
