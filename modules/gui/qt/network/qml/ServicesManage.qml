@@ -24,158 +24,167 @@ import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Network
 
-Widgets.ListViewExt {
-    id: servicesView
+Widgets.PageExt {
+    id: root
 
-    // required by g_root to indicate view with 'grid' or 'list' mode
-    readonly property bool hasGridListMode: false
-    readonly property bool isSearchable: true
+    title: qsTr("Install services")
 
-    property var pagePrefix: []
+    Widgets.ListViewExt {
+        id: servicesView
 
-    model: ServicesDiscoveryModel {
-        id: discoveryModel
+        // required by g_root to indicate view with 'grid' or 'list' mode
+        readonly property bool hasGridListMode: false
+        readonly property bool isSearchable: true
 
-        ctx: MainCtx
+        property var pagePrefix: []
 
-        typeFilter: ServicesDiscoveryModel.TYPE_SERVICE_DISCOVERY
-        searchPattern: MainCtx.search.pattern
-        sortOrder: MainCtx.sort.order
-        sortCriteria: MainCtx.sort.criteria
+        anchors.fill: parent
 
-        onLoadingChanged: {
-            // Adjust the cursor. Unless the loaded item (view) sets a cursor
-            // globally or for itself, this is going to be respected. It should
-            // be noted that cursor adjustment is conventionally not delayed,
-            // unlike indicators:
-            if (loading) {
-                MainCtx.setCursor(servicesView, Qt.BusyCursor)
-            } else {
-                MainCtx.unsetCursor(servicesView)
+
+        model: ServicesDiscoveryModel {
+            id: discoveryModel
+
+            ctx: MainCtx
+
+            typeFilter: ServicesDiscoveryModel.TYPE_SERVICE_DISCOVERY
+            searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
+
+            onLoadingChanged: {
+                // Adjust the cursor. Unless the loaded item (view) sets a cursor
+                // globally or for itself, this is going to be respected. It should
+                // be noted that cursor adjustment is conventionally not delayed,
+                // unlike indicators:
+                if (loading) {
+                    MainCtx.setCursor(servicesView, Qt.BusyCursor)
+                } else {
+                    MainCtx.unsetCursor(servicesView)
+                }
+            }
+
+            Component.onCompleted: {
+                discoveryModel.loadFromDefaultRepository()
+                loadingChanged() // make sure the handler is called
             }
         }
 
-        Component.onCompleted: {
-            discoveryModel.loadFromDefaultRepository()
-            loadingChanged() // make sure the handler is called
-        }
-    }
+        topMargin: VLCStyle.margin_large
+        leftMargin: VLCStyle.margin_large
+        rightMargin: VLCStyle.margin_large
+        spacing: VLCStyle.margin_xsmall
 
-    topMargin: VLCStyle.margin_large
-    leftMargin: VLCStyle.margin_large
-    rightMargin: VLCStyle.margin_large
-    spacing: VLCStyle.margin_xsmall
+        delegate: Rectangle {
+            width: servicesView.width - VLCStyle.margin_large * 2
+            height: row.implicitHeight + VLCStyle.margin_small * 2
+            color: servicesView.colorContext.bg.secondary
 
-    delegate: Rectangle {
-        width: servicesView.width - VLCStyle.margin_large * 2
-        height: row.implicitHeight + VLCStyle.margin_small * 2
-        color: servicesView.colorContext.bg.secondary
+            onActiveFocusChanged: if (activeFocus) action_btn.forceActiveFocus()
 
-        onActiveFocusChanged: if (activeFocus) action_btn.forceActiveFocus()
+            RowLayout {
+                id: row
 
-        RowLayout {
-            id: row
+                spacing: VLCStyle.margin_xsmall
+                anchors.fill: parent
+                anchors.margins: VLCStyle.margin_small
 
-            spacing: VLCStyle.margin_xsmall
-            anchors.fill: parent
-            anchors.margins: VLCStyle.margin_small
+                Image {
 
-            Image {
+                    width: VLCStyle.icon_large
+                    height: VLCStyle.icon_large
+                    fillMode: Image.PreserveAspectFit
+                    source: model.artwork
 
-                width: VLCStyle.icon_large
-                height: VLCStyle.icon_large
-                fillMode: Image.PreserveAspectFit
-                source: model.artwork
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+                }
 
-                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-            }
+                ColumnLayout {
+                    id: content
 
-            ColumnLayout {
-                id: content
-
-                spacing: 0
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                RowLayout {
                     spacing: 0
-
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    Column {
+                    RowLayout {
+                        spacing: 0
+
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        Widgets.SubtitleLabel {
-                            text: model.name
-                            width: parent.width
-                            color: servicesView.colorContext.fg.primary
-                        }
+                        Column {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
 
-                        Widgets.CaptionLabel {
-                            color: servicesView.colorContext.fg.primary
-                            textFormat: Text.StyledText
-                            text: model.author ? qsTr("by <b>%1</b>").arg(model.author) : qsTr("by <b>Unknown</b>")
-                            topPadding: VLCStyle.margin_xxxsmall
-                            width: parent.width
-                        }
-                    }
+                            Widgets.SubtitleLabel {
+                                text: model.name
+                                width: parent.width
+                                color: servicesView.colorContext.fg.primary
+                            }
 
-                    Widgets.ButtonExt {
-                        id: action_btn
-
-                        focus: true
-                        iconTxt: model.state === ServicesDiscoveryModel.STATE_INSTALLED ? VLCIcons.del : VLCIcons.add
-                        busy: model.state === ServicesDiscoveryModel.STATE_INSTALLING || model.state === ServicesDiscoveryModel.STATE_UNINSTALLING
-                        text: {
-                            switch(model.state) {
-                            case ServicesDiscoveryModel.STATE_INSTALLED:
-                                return qsTr("Remove")
-                            case ServicesDiscoveryModel.STATE_NOTINSTALLED:
-                                return qsTr("Install")
-                            case ServicesDiscoveryModel.STATE_INSTALLING:
-                                return qsTr("Installing")
-                            case ServicesDiscoveryModel.STATE_UNINSTALLING:
-                                return qsTr("Uninstalling")
+                            Widgets.CaptionLabel {
+                                color: servicesView.colorContext.fg.primary
+                                textFormat: Text.StyledText
+                                text: model.author ? qsTr("by <b>%1</b>").arg(model.author) : qsTr("by <b>Unknown</b>")
+                                topPadding: VLCStyle.margin_xxxsmall
+                                width: parent.width
                             }
                         }
 
-                        onClicked: {
-                            if (model.state === ServicesDiscoveryModel.STATE_NOTINSTALLED)
-                                discoveryModel.installService(index)
-                            else if (model.state === ServicesDiscoveryModel.STATE_INSTALLED)
-                                discoveryModel.removeService(index)
+                        Widgets.ButtonExt {
+                            id: action_btn
+
+                            focus: true
+                            iconTxt: model.state === ServicesDiscoveryModel.STATE_INSTALLED ? VLCIcons.del : VLCIcons.add
+                            busy: model.state === ServicesDiscoveryModel.STATE_INSTALLING || model.state === ServicesDiscoveryModel.STATE_UNINSTALLING
+                            text: {
+                                switch(model.state) {
+                                case ServicesDiscoveryModel.STATE_INSTALLED:
+                                    return qsTr("Remove")
+                                case ServicesDiscoveryModel.STATE_NOTINSTALLED:
+                                    return qsTr("Install")
+                                case ServicesDiscoveryModel.STATE_INSTALLING:
+                                    return qsTr("Installing")
+                                case ServicesDiscoveryModel.STATE_UNINSTALLING:
+                                    return qsTr("Uninstalling")
+                                }
+                            }
+
+                            onClicked: {
+                                if (model.state === ServicesDiscoveryModel.STATE_NOTINSTALLED)
+                                    discoveryModel.installService(index)
+                                else if (model.state === ServicesDiscoveryModel.STATE_INSTALLED)
+                                    discoveryModel.removeService(index)
+                            }
                         }
                     }
-                }
 
-                Widgets.CaptionLabel {
-                    elide: Text.ElideRight
-                    text:  model.description || model.summary || qsTr("No information available")
-                    color: servicesView.colorContext.fg.secondary
-                    topPadding: VLCStyle.margin_xsmall
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: implicitHeight
-                }
+                    Widgets.CaptionLabel {
+                        elide: Text.ElideRight
+                        text:  model.description || model.summary || qsTr("No information available")
+                        color: servicesView.colorContext.fg.secondary
+                        topPadding: VLCStyle.margin_xsmall
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: implicitHeight
+                    }
 
-                Widgets.CaptionLabel {
-                    text: qsTr("Score: %1/5  Downloads: %2")
-                        .arg( (5 * model.score / discoveryModel.maxScore).toFixed(1) )
-                        .arg(model.downloads)
-                    topPadding: VLCStyle.margin_xsmall
-                    color: servicesView.colorContext.fg.secondary
-                    Layout.fillWidth: true
+                    Widgets.CaptionLabel {
+                        text: qsTr("Score: %1/5  Downloads: %2")
+                            .arg( (5 * model.score / discoveryModel.maxScore).toFixed(1) )
+                            .arg(model.downloads)
+                        topPadding: VLCStyle.margin_xsmall
+                        color: servicesView.colorContext.fg.secondary
+                        Layout.fillWidth: true
+                    }
                 }
             }
         }
-    }
 
-    Widgets.BusyIndicatorExt {
-        runningDelayed: discoveryModel.loading
-        anchors.centerIn: parent
-        color: servicesView.colorContext.fg.primary
-        z: 1
+        Widgets.BusyIndicatorExt {
+            runningDelayed: discoveryModel.loading
+            anchors.centerIn: parent
+            color: servicesView.colorContext.fg.primary
+            z: 1
+        }
     }
 }

@@ -28,113 +28,118 @@ import VLC.Network
 import VLC.Dialogs
 import VLC.Menus
 
-Widgets.ExpandGridItemView {
+Widgets.PageExt {
     id: root
+
+    title: qsTr("Services")
 
     signal browseServiceManage(int reason)
     signal browseSourceRoot(string sourceName, int reason)
 
+    hasGridListMode: false
+    isSearchable: true
 
-    readonly property bool hasGridListMode: false
-    readonly property bool isSearchable: true
+    Widgets.ExpandGridItemView {
+        //settings
+        id: grid
 
-    focus: true
+        anchors.fill: parent
 
-    //settings
+        focus: true
 
-    basePictureWidth: VLCStyle.gridCover_network_width
-    basePictureHeight: VLCStyle.gridCover_network_height
-    subtitleHeight: 0
+        basePictureWidth: VLCStyle.gridCover_network_width
+        basePictureHeight: VLCStyle.gridCover_network_height
+        subtitleHeight: 0
 
-    model: sourcesModel
+        model: sourcesModel
 
-    delegate: Widgets.GridItem {
+        delegate: Widgets.GridItem {
+            property var model: ({})
+            property int index: -1
+            readonly property bool is_dummy: model.type === NetworkSourcesModel.TYPE_DUMMY
+            readonly property bool is_podcast: !is_dummy && model.name && model.name.startsWith("podcast")
 
-        property var model: ({})
-        property int index: -1
-        readonly property bool is_dummy: model.type === NetworkSourcesModel.TYPE_DUMMY
-        readonly property bool is_podcast: !is_dummy && model.name && model.name.startsWith("podcast")
+            width: grid.cellWidth;
+            height: grid.cellHeight;
 
-        width: root.cellWidth;
-        height: root.cellHeight;
+            pictureWidth: grid.maxPictureWidth
+            pictureHeight: grid.maxPictureHeight
 
-        pictureWidth: root.maxPictureWidth
-        pictureHeight: root.maxPictureHeight
-
-        title: is_dummy ? qsTr("Add a service") : model.long_name
-        subtitle: ""
-        playCoverShowPlay: false
-        image: {
-            if (is_dummy) {
-                return SVGColorImage.colorize("qrc:///placeholder/add_service.svg")
-                    .color1(this.colorContext.fg.secondary)
-                    .accent(this.colorContext.accent)
-                    .uri()
-            } else if (model.artwork && model.artwork.toString() !== "") {
-                //if the source is a qrc artwork, we should colorize it
-                if (model.artwork.toString().match(/qrc:\/\/.*svg/))
-                {
-                    return SVGColorImage.colorize(model.artwork)
+            title: is_dummy ? qsTr("Add a service") : model.long_name
+            subtitle: ""
+            playCoverShowPlay: false
+            image: {
+                if (is_dummy) {
+                    return SVGColorImage.colorize("qrc:///placeholder/add_service.svg")
                         .color1(this.colorContext.fg.secondary)
                         .accent(this.colorContext.accent)
                         .uri()
+                } else if (model.artwork && model.artwork.toString() !== "") {
+                    //if the source is a qrc artwork, we should colorize it
+                    if (model.artwork.toString().match(/qrc:\/\/.*svg/))
+                    {
+                        return SVGColorImage.colorize(model.artwork)
+                            .color1(this.colorContext.fg.secondary)
+                            .accent(this.colorContext.accent)
+                            .uri()
+                    }
+
+                    return model.artwork
                 }
 
-                return model.artwork
+                // use fallbackImage
+                return ""
             }
 
-            // use fallbackImage
-            return ""
+            fallbackImage: {
+                return SVGColorImage.colorize("qrc:///sd/directory.svg")
+                    .color1(this.colorContext.fg.secondary)
+                    .uri()
+            }
+
+            onItemDoubleClicked: {
+                if (is_dummy)
+                    root.browseServiceManage(Qt.MouseFocusReason)
+                else
+                    root.browseSourceRoot(model.name, Qt.TabFocusReason)
+            }
+
+            onItemClicked : (modifier, select) => {
+                if (select)
+                    grid.selectionModel.updateSelection(modifier, grid.currentIndex, index)
+                grid.currentIndex = index
+                grid.currentItem.forceActiveFocus(Qt.MouseFocusReason)
+            }
+
+            onContextMenuButtonClicked: (menuParent, globalMousePos) => {
+                if (is_podcast) {
+                    serviceContextMenu.popup(globalMousePos, [qsTr("Configure...")])
+                }
+            }
         }
 
-        fallbackImage: {
-            return SVGColorImage.colorize("qrc:///sd/directory.svg")
-                .color1(this.colorContext.fg.secondary)
-                .uri()
-        }
+        onActionAtIndex: (index) => {
+            const itemData = sourcesModel.getDataAt(index);
 
-        onItemDoubleClicked: {
-            if (is_dummy)
-                root.browseServiceManage(Qt.MouseFocusReason)
+            if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
+                browseServiceManage(Qt.TabFocusReason)
             else
-                root.browseSourceRoot(model.name, Qt.TabFocusReason)
+                browseSourceRoot(itemData.name, Qt.TabFocusReason)
         }
 
-        onItemClicked : (modifier, select) => {
-            if (select)
-                root.selectionModel.updateSelection(modifier, root.currentIndex, index)
-            root.currentIndex = index
-            root.currentItem.forceActiveFocus(Qt.MouseFocusReason)
+        Navigation.cancelAction: function() {
+            History.previous(Qt.BacktabFocusReason)
         }
 
-        onContextMenuButtonClicked: (menuParent, globalMousePos) => {
-            if (is_podcast) {
-                serviceContextMenu.popup(globalMousePos, [qsTr("Configure...")])
-            }
+        NetworkSourcesModel {
+            id: sourcesModel
+
+            ctx: MainCtx
+
+            searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
         }
-    }
-
-    onActionAtIndex: (index) => {
-        const itemData = sourcesModel.getDataAt(index);
-
-        if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
-            browseServiceManage(Qt.TabFocusReason)
-        else
-            browseSourceRoot(itemData.name, Qt.TabFocusReason)
-    }
-
-    Navigation.cancelAction: function() {
-        History.previous(Qt.BacktabFocusReason)
-    }
-
-    NetworkSourcesModel {
-        id: sourcesModel
-
-        ctx: MainCtx
-
-        searchPattern: MainCtx.search.pattern
-        sortOrder: MainCtx.sort.order
-        sortCriteria: MainCtx.sort.criteria
     }
 
     StringListMenu {

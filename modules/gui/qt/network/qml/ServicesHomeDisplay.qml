@@ -93,33 +93,19 @@ Widgets.PageLoader {
     Component {
         id: serviceSourceComponent
 
-        Widgets.PageExt {
+        ServicesSources {
+            id: serviceSource
 
-            title: qsTr("Services")
-
-            ServicesSources {
-                id: serviceSource
-
-                anchors.fill: parent
-
-                onBrowseServiceManage:  (reason) => root._showServiceManage(reason)
-                onBrowseSourceRoot: (name, reason) => root. _showServiceRoot(name, reason)
-            }
+            onBrowseServiceManage:  (reason) => root._showServiceManage(reason)
+            onBrowseSourceRoot: (name, reason) => root. _showServiceRoot(name, reason)
         }
     }
 
     Component {
         id: serviceManageComponent
 
-        Widgets.PageExt {
-
-            title: qsTr("Install services")
-
-            ServicesManage {
-                id: serviceSource
-
-                anchors.fill: parent
-            }
+        ServicesManage {
+            id: serviceSource
         }
     }
 
