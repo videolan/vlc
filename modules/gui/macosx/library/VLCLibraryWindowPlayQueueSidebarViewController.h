@@ -48,6 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSStackView *buttonStack;
 @property (readwrite, weak) IBOutlet NSScrollView *scrollView;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *footerContainerViewDefaultBottomConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *footerContainerViewLeadingConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *footerContainerViewTrailingConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *scrollViewDefaultBottomConstraint;
 
 @property (readwrite, nonatomic) NSTextField *counterLabel;

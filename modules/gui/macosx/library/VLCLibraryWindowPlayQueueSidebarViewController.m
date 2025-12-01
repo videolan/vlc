@@ -96,10 +96,10 @@
 
 - (void)setupBlurredHeaderFooter
 {
+    const CGFloat footerHeight = self.footerContainerView.frame.size.height;
+
     if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
-        const CGFloat footerHeight = self.footerContainerView.frame.size.height;
-
         [self.bottomButtonsSeparator removeFromSuperview];
 
         NSGlassEffectView * const glassFooterView = [[NSGlassEffectView alloc] init];
@@ -111,20 +111,32 @@
         self.footerContainerView.clipsToBounds = NO;
         [glassFooterView applyConstraintsToFillSuperview];
 
+        self.buttonStack.edgeInsets = NSEdgeInsetsMake(
+            VLCLibraryUIUnits.mediumSpacing,
+            VLCLibraryUIUnits.largeSpacing,
+            VLCLibraryUIUnits.mediumSpacing,
+            VLCLibraryUIUnits.largeSpacing
+        );
+
         self.scrollViewDefaultBottomConstraint.active = NO;
         self.footerContainerViewDefaultBottomConstraint.active = NO;
+        self.footerContainerViewLeadingConstraint.constant = VLCLibraryUIUnits.largeSpacing;
+        self.footerContainerViewTrailingConstraint.constant = VLCLibraryUIUnits.largeSpacing;
+
+        NSLayoutConstraint * const footerBottomConstraint =
+            [self.buttonStack.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor
+                                                          constant:-VLCLibraryUIUnits.largeSpacing];
 
         [NSLayoutConstraint activateConstraints:@[
             [self.scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-            [self.buttonStack.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-VLCLibraryUIUnits.mediumSpacing]
+            footerBottomConstraint
         ]];
 
+        const CGFloat footerTopLine = footerHeight + -footerBottomConstraint.constant + VLCLibraryUIUnits.smallSpacing;
         self.scrollView.automaticallyAdjustsContentInsets = NO;
-        self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerHeight, 0);
+        self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerTopLine, 0);
 #endif
     } else if (@available(macOS 10.14, *)) {
-        const CGFloat footerHeight = self.footerContainerView.frame.size.height;
-
         NSVisualEffectView * const footerBlurView = [[NSVisualEffectView alloc] initWithFrame:self.footerContainerView.bounds];
         footerBlurView.translatesAutoresizingMaskIntoConstraints = NO;
         footerBlurView.material = NSVisualEffectMaterialHeaderView;
