@@ -47,7 +47,7 @@ private:
         QModelIndex idx = m_model->index(row, 0);
         QCOMPARE(m_model->data(idx, RendererManager::TYPE), "type");
         QCOMPARE(m_model->data(idx, RendererManager::NAME), QString("name%1").arg(id));
-        QCOMPARE(m_model->data(idx, RendererManager::SOUT), QString("dummy{ip=%1.%1.%1.%1,port=%1,extra sout}").arg(id));
+        QCOMPARE(m_model->data(idx, RendererManager::SOUT), QString("dummy{ip=%1.%1.%1.%1,port=%1,device-name=name%1,extra sout}").arg(id));
         QCOMPARE(m_model->data(idx, RendererManager::ICON_URI), QString("icon://"));
         QCOMPARE(m_model->data(idx, RendererManager::FLAGS), id);
     }

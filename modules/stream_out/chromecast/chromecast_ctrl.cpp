@@ -37,6 +37,7 @@
 #include <cerrno>
 #include <iomanip>
 
+#include <vlc_fixups.h>
 #include <vlc_stream.h>
 #include <vlc_rand.h>
 #include <vlc_threads.h>
@@ -153,6 +154,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_cc_time_date( VLC_TICK_INVALID )
  , m_cc_time( VLC_TICK_INVALID )
  , m_pingRetriesLeft( PING_WAIT_RETRIES )
+ , m_device_name(_("Unknown"))
 {
     m_communication = new ChromecastCommunication( p_this,
         getHttpStreamPath(), getHttpStreamPort(),
@@ -166,6 +168,13 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     ss << "http://" << m_communication->getServerIp() << ":" << port;
     m_art_http_ip = ss.str();
 
+    char *device_name = var_GetString(p_this, "sout-chromecast-device-name");
+    if (device_name)
+    {
+        m_device_name = device_name;
+        free(device_name);
+    }
+    
     m_common.p_opaque = this;
     m_common.pf_set_demux_enabled = set_demux_enabled;
     m_common.pf_get_time         = get_time;

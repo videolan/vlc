@@ -188,7 +188,7 @@ static int AccessOpen(vlc_object_t *);
 static void AccessClose(vlc_object_t *);
 
 static const char *const ppsz_sout_options[] = {
-    "ip", "port",  "http-port", "video", NULL
+    "ip", "port", "http-port", "video", "device-name", NULL
 };
 
 /*****************************************************************************
@@ -222,6 +222,8 @@ vlc_module_begin ()
     add_string(SOUT_CFG_PREFIX "ip", NULL, NULL, NULL)
         change_private()
     add_integer(SOUT_CFG_PREFIX "port", CHROMECAST_CONTROL_PORT, NULL, NULL)
+        change_private()
+    add_string(SOUT_CFG_PREFIX "device-name", NULL, NULL, NULL)
         change_private()
     add_bool(SOUT_CFG_PREFIX "video", true, NULL, NULL)
         change_private()
@@ -767,10 +769,19 @@ bool sout_stream_sys_t::canDecodeVideo( const es_format_t *es ) const
 {
     if( transcoding_state & TRANSCODING_VIDEO )
         return false;
+
+    const std::string suffix = "(Chromecast)";
+    const std::string name = p_intf->getDeviceName();
+    const bool original_chromecast = name.size() >= suffix.size() &&
+        std::equal(suffix.rbegin(), suffix.rend(), name.rbegin());
+
     switch( es->i_codec )
     {
-        case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
+            if (original_chromecast) 
+                // Original Chromecasts do not support HEVC
+                return false;
+        case VLC_CODEC_H264:
             return true;
         case VLC_CODEC_VP8:
             if (es_format_HasVpxAlpha(es)) // contains alpha extradata
