@@ -6,6 +6,7 @@
 
 #include "lzokay.hpp"
 #include <cstring>
+#include <limits>
 
 /*
  * Based on documentation from the Linux sources: Documentation/lzo.txt
@@ -39,7 +40,7 @@ static uint16_t get_le16(const uint8_t* p) {
 }
 #endif
 
-constexpr std::size_t Max255Count = std::size_t(~0) / 255 - 2;
+constexpr std::size_t Max255Count = std::numeric_limits<size_t>::max() / 255 - 2;
 
 #define NEEDS_IN(count) \
   if (inp + (count) > inp_end) { \
