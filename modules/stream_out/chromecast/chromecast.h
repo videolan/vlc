@@ -189,6 +189,8 @@ struct intf_sys_t
     std::string getHttpStreamPath() const;
     std::string getHttpArtRoot() const;
 
+    std::string getDeviceName() const { return m_device_name; };
+
     int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
     void interrupt_wake_up();
 private:
@@ -247,6 +249,7 @@ private:
     const int      m_device_port;
     std::string    m_mime;
     std::string    m_device_addr;
+    std::string    m_device_name;
 
     std::string m_appTransportId;
     unsigned m_last_request_id;
