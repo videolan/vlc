@@ -66,9 +66,9 @@ Widgets.PageExt {
             visible: model.count > 0
             focus: model.count > 0
 
-            searchPattern: MainCtx.search.pattern
-            sortOrder: MainCtx.sort.order
-            sortCriteria: MainCtx.sort.criteria
+            searchPattern: root.search.pattern
+            sortOrder: root.sort.order
+            sortCriteria: root.sort.criteria
 
             Navigation.parentItem: root
             Navigation.cancelAction: function() {

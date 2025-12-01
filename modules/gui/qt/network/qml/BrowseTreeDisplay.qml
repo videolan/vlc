@@ -50,6 +50,9 @@ Widgets.PageExt {
         leftPadding: VLCStyle.dynamicAppMargins(width) + VLCStyle.layout_left_margin + root.leftPadding
         rightPadding: VLCStyle.dynamicAppMargins(width) + VLCStyle.layout_right_margin + root.rightPadding
 
+        sort: root.sort
+        search: root.search
+
         Navigation.parentItem: root
         Navigation.downItem: loader
 

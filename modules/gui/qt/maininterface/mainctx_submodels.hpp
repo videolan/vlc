@@ -21,10 +21,12 @@
 #include <QObject>
 #include <QString>
 #include <QJSValue>
+#include <QQmlEngine>
 
 class SearchCtx: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(QString pattern MEMBER m_pattern NOTIFY patternChanged FINAL)
     Q_PROPERTY(bool available MEMBER m_available NOTIFY availableChanged FINAL)
 
@@ -46,6 +48,7 @@ private:
 class SortCtx: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(bool available READ getAvailable WRITE setAvailable NOTIFY availableChanged FINAL)
     Q_PROPERTY(QJSValue model READ getModel WRITE setModel NOTIFY modelChanged FINAL)
     Q_PROPERTY(QString criteria READ getCriteria WRITE setCriteria NOTIFY criteriaChanged FINAL)

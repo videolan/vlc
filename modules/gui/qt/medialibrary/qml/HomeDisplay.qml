@@ -83,9 +83,9 @@ Widgets.PageLoader {
                 model: MLRecentVideoModel {
                     ml: MediaLib
 
-                    sortCriteria: MainCtx.sort.criteria
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: continueWatchingPage.sort.criteria
+                    sortOrder: continueWatchingPage.sort.order
+                    searchPattern: continueWatchingPage.search.pattern
                 }
 
                 sectionProperty: model.sortCriteria === "title" ? "title_first_symbol" : ""
@@ -123,9 +123,9 @@ Widgets.PageLoader {
 
                     ml: MediaLib
 
-                    sortCriteria: MainCtx.sort.criteria || "insertion"
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: favoritesPage.sort.criteria || "insertion"
+                    sortOrder: favoritesPage.sort.order
+                    searchPattern: favoritesPage.search.pattern
                 }
 
                 displayMarginBeginning: root.displayMarginBeginning
@@ -153,9 +153,9 @@ Widgets.PageLoader {
                 model: MLMediaModel {
                     ml: MediaLib
 
-                    sortCriteria: MainCtx.sort.criteria || "insertion"
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: newMediaPage.sort.criteria || "insertion"
+                    sortOrder: newMediaPage.sort.order
+                    searchPattern: newMediaPage.search.pattern
                 }
 
                 displayMarginBeginning: root.displayMarginBeginning

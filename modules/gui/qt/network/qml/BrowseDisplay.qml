@@ -100,6 +100,7 @@ Widgets.PageLoader {
         id: browseFolders
 
         Widgets.PageExt {
+            id: browseFoldersPage
 
             title: folderModel.name
 
@@ -119,9 +120,9 @@ Widgets.PageLoader {
 
                 model: StandardPathModel {
                     id: folderModel
-                    sortCriteria: MainCtx.sort.criteria
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: browseFoldersPage.sort.criteria
+                    sortOrder: browseFoldersPage.sort.order
+                    searchPattern: browseFoldersPage.search.pattern
                 }
 
                 onBrowse: (tree, reason) => { root._showBrowseNode(tree, reason) }
@@ -136,7 +137,7 @@ Widgets.PageLoader {
 
         Widgets.PageExt {
 
-            id: devicePage
+            id: browseDevicePage
 
             //@type {NetworkDeviceModel.SDCatType}
             required property int sd_source
@@ -164,12 +165,12 @@ Widgets.PageLoader {
 
                     ctx: MainCtx
 
-                    sd_source: devicePage.sd_source
+                    sd_source: browseDevicePage.sd_source
                     source_name: "*"
 
-                    sortCriteria: MainCtx.sort.criteria
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: browseDevicePage.sort.criteria
+                    sortOrder: browseDevicePage.sort.order
+                    searchPattern: browseDevicePage.search.pattern
                 }
 
                 onBrowse: (tree, reason) => {
@@ -185,6 +186,7 @@ Widgets.PageLoader {
         id: browseComponent
 
         BrowseTreeDisplay {
+            id: browseTreePage
 
             property alias tree: mediaModel.tree
 
@@ -199,9 +201,9 @@ Widgets.PageLoader {
 
                 ctx: MainCtx
 
-                sortCriteria: MainCtx.sort.criteria
-                sortOrder: MainCtx.sort.order
-                searchPattern: MainCtx.search.pattern
+                sortCriteria: browseTreePage.sort.criteria
+                sortOrder: browseTreePage.sort.order
+                searchPattern: browseTreePage.search.pattern
             }
 
             contextMenu: NetworkMediaContextMenu {

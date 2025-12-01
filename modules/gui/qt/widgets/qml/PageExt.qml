@@ -51,28 +51,45 @@ T.Page {
     property bool enableBeginningFade: true
     property bool enableEndFade: true
 
+    readonly property SearchCtx search: _searchCtx
+    readonly property SortCtx sort: _sortCtx
+
+
+    SearchCtx {
+        id: _searchCtx
+        available: root.isSearchable
+    }
+
+    SortCtx {
+        id: _sortCtx
+
+        readonly property string _sortCriteriaKey: ["sortCriteria", ...root.pagePrefix].join("/")
+        readonly property string _sortOrderKey:  ["sortOrder", ...root.pagePrefix].join("/")
+
+        available: Helpers.isArray(root.sortModel) && (root.sortModel).length > 0
+        model: root.sortModel
+
+        //save & restore setting of the page
+        Component.onCompleted: {
+            const criteria = MainCtx.settingValue(_sortCriteriaKey, undefined)
+            if (criteria !== undefined)
+                _sortCtx.criteria = criteria
+
+            const order = MainCtx.settingValue(_sortOrderKey, undefined)
+            if (order !== undefined)
+                _sortCtx.order = parseInt(order)
+        }
+
+        Component.onDestruction: {
+            MainCtx.setSettingValue(_sortCriteriaKey, _sortCtx.criteria)
+            MainCtx.setSettingValue(_sortOrderKey, _sortCtx.order)
+        }
+    }
+
     Binding {
         target: MainCtx
         property: "hasGridListMode";
-        value: hasGridListMode
-    }
-
-    Binding {
-        target: MainCtx.search
-        property: "available";
-        value: isSearchable
-    }
-
-    Binding {
-        target: MainCtx.sort
-        property: "model";
-        value: sortModel
-    }
-
-    Binding {
-        target: MainCtx.sort
-        property: "available";
-        value: Helpers.isArray(root.sortModel) && (root.sortModel).length > 0
+        value: root.hasGridListMode
     }
 
     on_FirstChildChanged: {
@@ -97,6 +114,9 @@ T.Page {
 
         sortMenu: root.sortMenu
 
+        search: _searchCtx
+        sort: _sortCtx
+
         Navigation.parentItem: root
         Navigation.downItem: root._firstChild
     }
@@ -108,6 +128,9 @@ T.Page {
         property alias text: label.text
 
         property alias sortMenu: gridSortFilter.sortMenu
+
+        property alias search: gridSortFilter.search
+        property alias sort: gridSortFilter.sort
 
         position: T.ToolBar.Header
 
@@ -155,6 +178,8 @@ T.Page {
             GridSortFilterControls {
                 id: gridSortFilter
                 focus: true
+                sort: _sortCtx
+                search: _searchCtx
                 Navigation.parentItem: defaultPageHeader
             }
         }

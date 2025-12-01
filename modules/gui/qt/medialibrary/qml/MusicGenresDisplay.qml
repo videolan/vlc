@@ -47,6 +47,8 @@ Widgets.PageLoader {
         id: genresComponent
 
         Widgets.PageExt {
+            id: genrePage
+
             title: qsTr("Genres")
 
             /* List View */
@@ -63,9 +65,9 @@ Widgets.PageLoader {
                 enableBeginningFade: root.enableBeginningFade
                 enableEndFade: root.enableEndFade
 
-                searchPattern: MainCtx.search.pattern
-                sortOrder: MainCtx.sort.order
-                sortCriteria: MainCtx.sort.criteria
+                searchPattern: genrePage.search.pattern
+                sortOrder: genrePage.sort.order
+                sortCriteria: genrePage.sort.criteria
 
                 onShowAlbumView: (id, name, reason) => {
                     History.push([...root.pagePrefix, "albums"], { parentId: id, genreName: name }, reason)
@@ -78,6 +80,7 @@ Widgets.PageLoader {
         id: albumGenreComponent
 
         Widgets.PageExt {
+            id: albumGenrePage
             property string genreName: ""
             property alias parentId: albumsView.parentId
 
@@ -91,9 +94,9 @@ Widgets.PageLoader {
 
                 focus: true
 
-                searchPattern: MainCtx.search.pattern
-                sortOrder: MainCtx.sort.order
-                sortCriteria: MainCtx.sort.criteria
+                searchPattern: albumGenrePage.search.pattern
+                sortOrder: albumGenrePage.sort.order
+                sortCriteria: albumGenrePage.sort.criteria
 
                 onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
             }

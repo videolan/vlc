@@ -53,48 +53,63 @@ FocusScope {
 
     property bool isSearchable: true
 
-    property string searchPattern
-    property int sortOrder
-    property string sortCriteria
-
     readonly property MLBaseModel _effectiveModel: MainCtx.gridView ? albumModel : trackModel
 
-    onSearchPatternChanged: {
-        _effectiveModel.searchPattern = root.searchPattern
+    on_EffectiveModelChanged: root._effectiveModel.sortCriteria = root.sort.criteria
+
+    Connections {
+        target: root.sort
+
+        function onOrderChanged() {
+            root._effectiveModel.sortOrder = root.sort.order
+        }
+
+        function onCriteriaChanged() {
+            // FIXME: Criteria is set to empty for a brief period during initialization,
+            //        call later prevents setting the criteria empty.
+            Qt.callLater(() => {
+                root._effectiveModel.sortCriteria = root.sort.criteria
+            })
+        }
     }
 
-    onSortOrderChanged: {
-        _effectiveModel.sortOrder = root.sortOrder
-    }
+    Connections {
+        target: root.search
 
-    onSortCriteriaChanged: {
-        // FIXME: Criteria is set to empty for a brief period during initialization,
-        //        call later prevents setting the criteria empty.
-        Qt.callLater(() => {
-            _effectiveModel.sortCriteria = root.sortCriteria
-        })
+        function onPatternChanged() {
+            root._effectiveModel.searchPattern = root.search.pattern
+        }
     }
 
     Connections {
         target: root._effectiveModel
 
         function onSearchPatternChanged() {
-            if (root.searchPattern !== root._effectiveModel.searchPattern)
-                root.searchPattern = root._effectiveModel.searchPattern
+            if (root.search.pattern !== root._effectiveModel.searchPattern)
+                root.search.pattern = root._effectiveModel.searchPattern
         }
 
         function onSortOrderChanged() {
-            if (root.sortOrder !== root._effectiveModel.sortOrder)
-                root.sortOrder = root._effectiveModel.sortOrder
+            if (root.sort.order !== root._effectiveModel.sortOrder)
+                root.sort.order = root._effectiveModel.sortOrder
         }
 
         function onSortCriteriaChanged() {
-            if (root.sortCriteria !== root._effectiveModel.sortCriteria)
-                root.sortCriteria = root._effectiveModel.sortCriteria
+            if (root.sort.criteria !== root._effectiveModel.sortCriteria)
+                root.sort.criteria = root._effectiveModel.sortCriteria
         }
     }
 
-    property SortMenu sortMenu: null
+    required property SearchCtx search
+    required property SortCtx sort
+
+    SortMenuAlbums {
+        id: sortMenuAlbums
+
+        ctx: MainCtx
+
+        sectionsVisible: !MainCtx.gridView
+    }
 
     // current index of album model
     readonly property int currentIndex: {
@@ -165,11 +180,11 @@ FocusScope {
 
                 Connections {
                     enabled: !MainCtx.gridView
-                    target: trackModel
+                    target: root.sort
 
-                    function onSortCriteriaChanged() {
+                    function onCriteriaChanged() {
                         if (MainCtx.albumSections &&
-                            trackModel.sortCriteria !== "album_title") {
+                            root.sort.criteria !== "album_title") {
                             MainCtx.albumSections = false
                         }
                     }
@@ -186,13 +201,13 @@ FocusScope {
 
                     if (MainCtx.albumSections) {
                         const albumTitleSortCriteria = "album_title"
-                        if (trackModel.sortCriteria !== albumTitleSortCriteria) {
-                            artistBanner._oldSortCriteria = trackModel.sortCriteria
-                            trackModel.sortCriteria = albumTitleSortCriteria
+                        if (root.sort.criteria !== albumTitleSortCriteria) {
+                            artistBanner._oldSortCriteria = root.sort.criteria
+                            root.sort.criteria = albumTitleSortCriteria
                         }
                     } else {
                         if (artistBanner._oldSortCriteria.length > 0) {
-                            trackModel.sortCriteria = artistBanner._oldSortCriteria
+                            root.sort.criteria = artistBanner._oldSortCriteria
                             artistBanner._oldSortCriteria = ""
                         }
                     }
@@ -384,7 +399,10 @@ FocusScope {
 
                 text: qsTr("Albums")
 
-                sortMenu: root.sortMenu
+                sortMenu: sortMenuAlbums
+
+                search: root.search
+                sort: root.sort
 
                 leftPadding: root._contentLeftMargin
                 rightPadding: root._contentRightMargin
@@ -487,6 +505,9 @@ FocusScope {
         ml: MediaLib
         parentId: artistId
 
+        searchPattern: root.search.pattern
+        sortOrder: root.sort.order
+
         onCountChanged: {
             if (albumModel.count > 0 && !albumSelectionModel.hasSelection) {
                 root.resetFocus()
@@ -515,6 +536,9 @@ FocusScope {
 
         ml: MediaLib
         parentId: albumModel.parentId
+
+        searchPattern: root.search.pattern
+        sortOrder: root.sort.order
     }
 
     MLContextMenu {

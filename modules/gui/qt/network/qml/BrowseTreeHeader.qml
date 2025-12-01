@@ -39,6 +39,9 @@ T.Pane {
     required property BaseModel providerModel
     property var path: providerModel?.path ?? []
 
+    property alias sort: gridSortFilter.sort
+    property alias search: gridSortFilter.search
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
 

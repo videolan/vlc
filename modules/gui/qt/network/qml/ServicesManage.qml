@@ -47,9 +47,9 @@ Widgets.PageExt {
             ctx: MainCtx
 
             typeFilter: ServicesDiscoveryModel.TYPE_SERVICE_DISCOVERY
-            searchPattern: MainCtx.search.pattern
-            sortOrder: MainCtx.sort.order
-            sortCriteria: MainCtx.sort.criteria
+            searchPattern: root.search.pattern
+            sortOrder: root.sort.order
+            sortCriteria: root.sort.criteria
 
             onLoadingChanged: {
                 // Adjust the cursor. Unless the loaded item (view) sets a cursor

@@ -213,9 +213,9 @@ Widgets.PageExt {
                     //we only have a handfull of standard path (5 or 6)
                     //so we don't limit them
 
-                    sortCriteria: MainCtx.sort.criteria
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: root.sort.criteria
+                    sortOrder: root.sort.order
+                    searchPattern: root.search.pattern
                 }
             }
 
@@ -242,9 +242,9 @@ Widgets.PageExt {
 
                     limit: computerSection.maximumCount
 
-                    sortOrder: MainCtx.sort.order
-                    sortCriteria: MainCtx.sort.criteria
-                    searchPattern: MainCtx.search.pattern
+                    sortOrder: root.sort.order
+                    sortCriteria: root.sort.criteria
+                    searchPattern: root.search.pattern
                 }
             }
 
@@ -268,9 +268,9 @@ Widgets.PageExt {
 
                     limit: deviceSection.maximumCount
 
-                    sortOrder: MainCtx.sort.order
-                    sortCriteria: MainCtx.sort.criteria
-                    searchPattern: MainCtx.search.pattern
+                    sortOrder: root.sort.order
+                    sortCriteria: root.sort.criteria
+                    searchPattern: root.search.pattern
 
                     sd_source: NetworkDeviceModel.CAT_DEVICES
                     source_name: "*"
@@ -300,9 +300,9 @@ Widgets.PageExt {
 
                     limit: lanSection.maximumCount
 
-                    sortOrder: MainCtx.sort.order
-                    sortCriteria: MainCtx.sort.criteria
-                    searchPattern: MainCtx.search.pattern
+                    sortOrder: root.sort.order
+                    sortCriteria: root.sort.criteria
+                    searchPattern: root.search.pattern
                 }
             }
         }

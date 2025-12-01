@@ -221,9 +221,9 @@ Widgets.PageExt {
                 model: MLRecentVideoModel {
                     ml: MediaLib
 
-                    sortCriteria: MainCtx.sort.criteria
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: root.sort.criteria
+                    sortOrder: root.sort.order
+                    searchPattern: root.search.pattern
 
                     // FIXME: Make limit 0 load no items, instead of loading all items.
                     limit: MainCtx.gridView ? Math.max(continueWatchingRow.currentItem?.nbItemPerRow ?? null, 1) : 5
@@ -301,9 +301,9 @@ Widgets.PageExt {
 
                     ml: MediaLib
 
-                    sortCriteria: MainCtx.sort.criteria || "insertion"
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: root.sort.criteria || "insertion"
+                    sortOrder: root.sort.order
+                    searchPattern: root.search.pattern
 
                     // FIXME: Make limit 0 load no items, instead of loading all items.
                     limit: MainCtx.gridView ? Math.max(favoritesRow.currentItem?.nbItemPerRow ?? null, 1) : 5
@@ -373,9 +373,9 @@ Widgets.PageExt {
                 model: MLMediaModel {
                     ml: MediaLib
 
-                    sortCriteria: MainCtx.sort.criteria || "insertion"
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    sortCriteria: root.sort.criteria || "insertion"
+                    sortOrder: root.sort.order
+                    searchPattern: root.search.pattern
 
                     // FIXME: Make limit 0 load no items, instead of loading all items.
                     limit: MainCtx.gridView ? Math.max(newMediaRow.currentItem?.nbItemPerRow ?? null, 1) : 5

@@ -41,10 +41,6 @@ Widgets.PageExt {
     property alias model: artistModel
     property alias selectionModel: selectionModel
 
-    property alias searchPattern: albumSubView.searchPattern
-    property alias sortOrder: albumSubView.sortOrder
-    property alias sortCriteria: albumSubView.sortCriteria
-
     property alias currentIndex: artistList.currentIndex
     property alias currentAlbumIndex: albumSubView.currentIndex
 
@@ -69,12 +65,6 @@ Widgets.PageExt {
         { text: qsTr("Album Title"), criteria: "album_title" },
         { text: qsTr("Duration"), criteria: "duration" }
     ]
-
-    sortMenu: SortMenuAlbums {
-        ctx: MainCtx
-
-        sectionsVisible: !MainCtx.gridView
-    }
 
     onInitialAlbumIndexChanged: resetFocus()
     onInitialIndexChanged: resetFocus()
@@ -373,12 +363,14 @@ Widgets.PageExt {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            search: root.search
+            sort: root.sort
+
             enableBeginningFade: root.enableBeginningFade
             enableEndFade: root.enableEndFade
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
-            sortMenu: root.sortMenu
 
             rightPadding: root.rightPadding
 

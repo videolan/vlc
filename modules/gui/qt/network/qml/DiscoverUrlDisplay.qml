@@ -119,7 +119,7 @@ Widgets.PageExt {
                     item.Navigation.upItem = searchField
                     item.Navigation.parentItem =  root
 
-                    item.searchPattern = Qt.binding(() => MainCtx.search.pattern)
+                    item.searchPattern = Qt.binding(() => root.search.pattern)
                 }
             }
         }

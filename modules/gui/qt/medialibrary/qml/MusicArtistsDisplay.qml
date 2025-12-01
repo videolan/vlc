@@ -50,6 +50,7 @@ Widgets.PageLoader {
         id: allArtistsComponent
 
         Widgets.PageExt {
+            id: artistPage
 
             title: qsTr("Artists")
 
@@ -60,9 +61,9 @@ Widgets.PageLoader {
 
                 focus: true
 
-                searchPattern: MainCtx.search.pattern
-                sortOrder: MainCtx.sort.order
-                sortCriteria: MainCtx.sort.criteria
+                searchPattern: artistPage.search.pattern
+                sortOrder: artistPage.sort.order
+                sortCriteria: artistPage.sort.criteria
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
@@ -81,25 +82,6 @@ Widgets.PageLoader {
         id: artistAlbumsComponent
 
         MusicArtistsAlbums {
-            searchPattern: MainCtx.search.pattern
-            sortOrder: MainCtx.sort.order
-            sortCriteria: MainCtx.sort.criteria
-
-            onSearchPatternChanged: {
-                MainCtx.search.pattern = searchPattern
-                seachPattern = Qt.binding(() => { return MainCtx.search.pattern })
-            }
-
-            onSortOrderChanged: {
-                MainCtx.sort.order = sortOrder
-                sortOrder = Qt.binding(() => { return MainCtx.sort.order })
-            }
-
-            onSortCriteriaChanged: {
-                MainCtx.sort.criteria = sortCriteria
-                sortCriteria = Qt.binding(() => { return MainCtx.sort.criteria })
-            }
-
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
