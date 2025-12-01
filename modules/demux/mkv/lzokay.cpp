@@ -4,6 +4,10 @@
  * https://github.com/AxioDL/lzokay
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "lzokay.hpp"
 #include <cstring>
 #include <limits>
@@ -15,30 +19,16 @@
 
 namespace lzokay {
 
-#if _WIN32
-#define HOST_BIG_ENDIAN 0
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define HOST_BIG_ENDIAN 1
-#else
-#define HOST_BIG_ENDIAN 0
-#endif
+static inline uint16_t get_le16(const void *p)
+{
+  uint16_t val;
 
-#if HOST_BIG_ENDIAN
-static uint16_t get_le16(const uint8_t* p) {
-  uint16_t val = *reinterpret_cast<const uint16_t*>(p);
-#if __GNUC__
-  return __builtin_bswap16(val);
-#elif _WIN32
-  return _byteswap_ushort(val);
-#else
-  return (val = (val << 8) | ((val >> 8) & 0xFF));
+  memcpy (&val, p, sizeof (val));
+#ifdef WORDS_BIGENDIAN
+  val = (val << 8) | (val >> 8);
 #endif
+  return val;
 }
-#else
-static uint16_t get_le16(const uint8_t* p) {
-  return *reinterpret_cast<const uint16_t*>(p);
-}
-#endif
 
 constexpr std::size_t Max255Count = std::numeric_limits<size_t>::max() / 255 - 2;
 
