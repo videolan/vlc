@@ -915,6 +915,7 @@ FocusScope {
 
             x: 0
             y: root.topMargin
+            z: 5
 
             //load the header early (when the first row is visible)
             visible: flickable.contentY < (root.headerHeight + root.rowHeight + root.topMargin)
@@ -929,6 +930,7 @@ FocusScope {
 
             y: root.topMargin + root.headerHeight + (root.rowHeight * (Math.ceil(model.count / nbItemPerRow))) +
                root._expandItemVerticalSpace
+            z: 5
         }
 
         Connections {
