@@ -245,9 +245,13 @@ static int SSHSessionInit( stream_t *p_access, const char *psz_host, int i_port 
         goto error;
 
     int i_ret;
+    #if LIBSSH2_VERSION_NUM >= 0x010208
+    while( ( i_ret = libssh2_session_handshake( p_sys->ssh_session, p_sys->i_socket ) )
+           == LIBSSH2_ERROR_EAGAIN );
+    #else
     while( ( i_ret = libssh2_session_startup( p_sys->ssh_session, p_sys->i_socket ) )
            == LIBSSH2_ERROR_EAGAIN );
-
+    #endif            
     if( i_ret != 0 )
         goto error;
 
