@@ -265,6 +265,12 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
             timer->cbs->on_paused(system_date, timer->data);
     }
 
+    vlc_list_foreach(timer, &player->timer.smpte_source.listeners, node)
+    {
+        if (timer->smpte_cbs->on_paused != NULL)
+            timer->smpte_cbs->on_paused(system_date, timer->data);
+    }
+
     vlc_mutex_unlock(&player->timer.lock);
 }
 

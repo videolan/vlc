@@ -3488,6 +3488,13 @@ struct vlc_player_timer_smpte_cbs
      */
     void (*on_update)(const struct vlc_player_timer_smpte_timecode *tc,
                       void *data);
+
+    /**
+     * The player timer is paused (can be NULL).
+     *
+     * @see vlc_player_timer_cbs.on_paused
+     */
+    void (*on_paused)(vlc_tick_t system_date, void *data);
 };
 
 /**
