@@ -40,6 +40,10 @@ struct vlc_input_decoder_callbacks {
                             void *userdata);
     void (*on_vout_stopped)(vlc_input_decoder_t *decoder, vout_thread_t *vout,
                             void *userdata);
+    void (*on_output_paused)(vlc_input_decoder_t *decoder, bool paused,
+                             vlc_tick_t pause_date,
+                             void *userdata);
+
     void (*on_thumbnail_ready)(vlc_input_decoder_t *decoder, picture_t *pic,
                                void *userdata);
 

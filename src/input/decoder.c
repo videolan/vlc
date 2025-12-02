@@ -1829,6 +1829,8 @@ static void *DecoderThread( void *p_data )
         if( p_owner->paused != p_owner->output_paused )
         {   /* Update playing/paused status of the output */
             Decoder_ChangeOutputPause( p_owner, p_owner->paused, p_owner->pause_date );
+            decoder_Notify(p_owner, on_output_paused, p_owner->paused,
+                           p_owner->pause_date);
             continue;
         }
 
