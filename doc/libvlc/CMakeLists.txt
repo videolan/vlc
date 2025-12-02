@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 # configure with your own path
 #  -DLIBVLC_SDK_INC:STRING=S:/sources/build/win64/win64/vlc-4.0.0-dev/sdk/include
