@@ -293,6 +293,15 @@ static inline void input_SendEventVout(input_thread_t *p_input,
     });
 }
 
+static inline void input_SendEventOutputState(input_thread_t *p_input,
+                                              const struct vlc_input_event_output_state *state)
+{
+    input_SendEvent(p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_OUTPUT_STATE,
+        .output_state = *state,
+    });
+}
+
 /*****************************************************************************
  * Event for control.c/input.c
  *****************************************************************************/

@@ -134,6 +134,9 @@ typedef enum input_event_type_e
     /* A vout_thread_t object has been created/deleted by *the input* */
     INPUT_EVENT_VOUT,
 
+    /* The output state changed (paused or resumed) */
+    INPUT_EVENT_OUTPUT_STATE,
+
     /* (pre-)parsing events */
     INPUT_EVENT_SUBITEMS,
 
@@ -273,6 +276,16 @@ struct vlc_input_event_vout
     vlc_es_id_t *id;
 };
 
+struct vlc_input_event_output_state
+{
+    enum {
+        VLC_INPUT_EVENT_OUTPUT_STATE_RESUMED,
+        VLC_INPUT_EVENT_OUTPUT_STATE_PAUSED,
+    } action;
+    vlc_tick_t paused_date;
+    vlc_es_id_t *id;
+};
+
 struct vlc_input_event_attachments
 {
     input_attachment_t *const* array;
@@ -318,6 +331,8 @@ struct vlc_input_event
         float cache;
         /* INPUT_EVENT_VOUT */
         struct vlc_input_event_vout vout;
+        /* INPUT_EVENT_OUTPUT_STATE */
+        struct vlc_input_event_output_state output_state;
         /* INPUT_EVENT_SUBITEMS */
         input_item_node_t *subitems;
         /* INPUT_EVENT_VBI_PAGE */
