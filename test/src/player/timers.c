@@ -20,10 +20,13 @@ test_timers_assert_smpte(struct timer_state *timer,
 
     /* Check that we didn't miss any update points */
     assert(vec->data[0].tc.frames == 0);
+    struct report_timer *prev_report = NULL;
+
     for (size_t i = 0; i < vec->size; ++i)
     {
-        struct report_timer *prev_report = i > 0 ? &vec->data[i - 1] : NULL;
         struct report_timer *report = &vec->data[i];
+        if (report->type != REPORT_TIMER_TC)
+            continue;
 
         assert(report->tc.seconds == (i / fps));
         if (prev_report)
@@ -37,11 +40,11 @@ test_timers_assert_smpte(struct timer_state *timer,
                 assert(report->tc.frames == prev_report->tc.frames + 1);
         }
 
-        assert(report->type == REPORT_TIMER_TC);
         assert(report->tc.drop_frame == drop_frame);
         assert(report->tc.frame_resolution == frame_resolution);
+        prev_report = report;
     }
-    assert(VEC_LAST(vec).tc.frames + 1 == fps * duration / VLC_TICK_FROM_SEC(1));
+    assert(prev_report->tc.frames + 1 == fps * duration / VLC_TICK_FROM_SEC(1));
 }
 
 static void
@@ -54,10 +57,17 @@ test_timers_assert_smpte_dropframe(struct timer_state *timer, unsigned minute,
     vec_report_timer *vec = &timer->vec;
 
     bool last_second_seen = false, minute_seen = false;
-    for (size_t i = 1; i < vec->size; ++i)
+    struct report_timer *prev_report = NULL;
+    for (size_t i = 0; i < vec->size; ++i)
     {
-        struct report_timer *prev_report = &vec->data[i - 1];
         struct report_timer *report = &vec->data[i];
+        if (report->type != REPORT_TIMER_TC)
+            continue;
+        if (prev_report == NULL)
+        {
+            prev_report = report;
+            continue;
+        }
 
         assert(report->tc.drop_frame == true);
         assert(report->tc.frame_resolution == 2);
@@ -96,6 +106,7 @@ test_timers_assert_smpte_dropframe(struct timer_state *timer, unsigned minute,
         else if (prev_report->tc.minutes != 0 && prev_report->tc.seconds != 0
               && prev_report->tc.frames != 0)
             assert(report->tc.frames == prev_report->tc.frames + 1);
+        prev_report = report;
     }
 
     /* Assert that we've seen the full last second and the new minute */
@@ -232,7 +243,8 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
     {
         struct timer_state *timer = &timers[SMPTE_TIMER_IDX];
         vec_report_timer *vec = &timer->vec;
-        assert(vec->size == 0);
+        assert(vec->size == 1);
+        assert(timer->vec.data[0].type == REPORT_TIMER_PAUSED);
     }
     test_end(ctx);
 

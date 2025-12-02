@@ -121,6 +121,7 @@ player_add_timer(vlc_player_t *player, struct timer_state *timer, bool smpte,
     static const struct vlc_player_timer_smpte_cbs smpte_cbs =
     {
         .on_update = timers_smpte_on_update,
+        .on_paused = timers_on_paused,
     };
 
     vlc_vector_init(&timer->vec);
