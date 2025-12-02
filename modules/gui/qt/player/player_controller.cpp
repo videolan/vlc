@@ -1092,9 +1092,11 @@ static const vlc_player_timer_cbs player_timer_cbs = []{
     return cbs;
 }();
 
-static const struct vlc_player_timer_smpte_cbs player_timer_smpte_cbs = {
-    on_player_timer_smpte_update
-};
+static const struct vlc_player_timer_smpte_cbs player_timer_smpte_cbs = []{
+    struct vlc_player_timer_smpte_cbs cbs {};
+    cbs.on_update = on_player_timer_smpte_update;
+    return cbs;
+}();
 
 // art fetcher callbacks
 
