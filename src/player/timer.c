@@ -63,6 +63,30 @@ vlc_player_SendTimerSeek(vlc_player_t *player,
 }
 
 static void
+vlc_player_SendTimerPause(vlc_player_t *player,
+                          struct vlc_player_timer_source *source,
+                          vlc_tick_t system_date, bool is_smpte)
+{
+    (void) player;
+
+    vlc_player_timer_id *timer;
+    vlc_list_foreach(timer, &source->listeners, node)
+    {
+        if (is_smpte)
+        {
+            if (timer->smpte_cbs->on_paused != NULL)
+                timer->smpte_cbs->on_paused(system_date, timer->data);
+        }
+        else
+        {
+            timer->last_update_date = VLC_TICK_INVALID;
+            if (timer->cbs->on_paused != NULL)
+                timer->cbs->on_paused(system_date, timer->data);
+        }
+    }
+}
+
+static void
 vlc_player_SendTimerSourceUpdates(vlc_player_t *player,
                                   struct vlc_player_timer_source *source,
                                   bool force_update,
@@ -202,7 +226,6 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
     /* Discontinuity is signalled by all output clocks and the input.
      * discard the event if it was already signalled or not on the good
      * es_source. */
-    bool notify = false;
     struct vlc_player_timer_source *bestsource = &player->timer.best_source;
 
     switch (event)
@@ -232,9 +255,18 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
             break;
 
         case VLC_PLAYER_TIMER_EVENT_PAUSED:
-            notify = true;
             assert(system_date != VLC_TICK_INVALID);
             player->timer.paused = true;
+
+            for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
+            {
+                struct vlc_player_timer_source *source = &player->timer.sources[i];
+                if (source->es != es_source)
+                    continue;
+                vlc_player_SendTimerPause(player, source, system_date,
+                                          i == VLC_PLAYER_TIMER_TYPE_SMPTE);
+            }
+
             break;
 
         case VLC_PLAYER_TIMER_EVENT_PLAYING:
@@ -244,32 +276,19 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
 
         case VLC_PLAYER_TIMER_EVENT_STOPPING:
             player->timer.stopping = true;
-            notify = true;
+            for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
+            {
+                struct vlc_player_timer_source *source = &player->timer.sources[i];
+                vlc_player_SendTimerPause(player, source, system_date,
+                                          i == VLC_PLAYER_TIMER_TYPE_SMPTE);
+            }
             break;
 
         default:
             vlc_assert_unreachable();
     }
 
-    if (!notify)
-    {
-        vlc_mutex_unlock(&player->timer.lock);
-        return;
-    }
 
-    vlc_player_timer_id *timer;
-    vlc_list_foreach(timer, &bestsource->listeners, node)
-    {
-        timer->last_update_date = VLC_TICK_INVALID;
-        if (timer->cbs->on_paused != NULL)
-            timer->cbs->on_paused(system_date, timer->data);
-    }
-
-    vlc_list_foreach(timer, &player->timer.smpte_source.listeners, node)
-    {
-        if (timer->smpte_cbs->on_paused != NULL)
-            timer->smpte_cbs->on_paused(system_date, timer->data);
-    }
 
     vlc_mutex_unlock(&player->timer.lock);
 }
@@ -352,16 +371,12 @@ vlc_player_UpdateTimerBestSource(vlc_player_t *player, vlc_es_id_t *es_source,
                                  bool force_update)
 {
     /* Best source priority:
-     * 1/ es_source != NULL when paused (any ES tracks when paused. Indeed,
-     * there is likely no audio update (master) when paused but only video
-     * ones, via vlc_player_NextVideoFrame() for example)
-     * 2/ es_source != NULL + master (from the master ES track)
-     * 3/ es_source != NULL (from the first ES track updated)
-     * 4/ es_source == NULL (from the input)
+     * 1/ es_source != NULL + master (from the master ES track)
+     * 2/ es_source != NULL (from the first ES track updated)
+     * 3/ es_source == NULL (from the input)
      */
     struct vlc_player_timer_source *source = &player->timer.best_source;
-    if (!source->es || es_source_is_master
-     || (es_source && player->timer.paused))
+    if (!source->es || es_source_is_master)
         source->es = es_source;
 
     /* Notify the best source */

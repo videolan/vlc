@@ -1049,6 +1049,12 @@ input_thread_Events(input_thread_t *input_thread,
         case INPUT_EVENT_VOUT:
             vlc_player_input_HandleVoutEvent(input, &event->vout);
             break;
+        case INPUT_EVENT_OUTPUT_STATE:
+            if (event->output_state.action == VLC_INPUT_EVENT_OUTPUT_STATE_PAUSED)
+                vlc_player_UpdateTimerEvent(player, event->output_state.id,
+                                            VLC_PLAYER_TIMER_EVENT_PAUSED,
+                                            event->output_state.paused_date);
+            break;
         case INPUT_EVENT_ITEM_META:
         case INPUT_EVENT_ITEM_INFO:
             vlc_player_SendEvent(player, on_media_meta_changed,
