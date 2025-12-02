@@ -190,7 +190,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderViewHeight;
     if (@available(macOS 26.0, *)) {
-        headerHeight += VLCLibraryUIUnits.largeSpacing * 2.f;
+        headerHeight += VLCLibraryUIUnits.largeSpacing * 2;
     }
 
     const NSRect headerFrame = NSMakeRect(0.f,
@@ -201,6 +201,12 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionHeaderView.autoresizingMask = NSViewWidthSizable;
 
     _audioGroupSelectionTableView.headerView = self.audioCollectionHeaderView;
+    if (@available(macOS 26.0, *)) {
+        _audioGroupSelectionTableView.clipsToBounds = NO;
+        _audioGroupSelectionTableViewScrollView.clipsToBounds = NO;
+        _audioGroupSelectionTableViewScrollView.contentView.clipsToBounds = NO;
+        self.libraryWindow.contentView.clipsToBounds = NO;
+    }
     _audioGroupSelectionTableView.tableColumns.firstObject.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
 
     _audioGroupSelectionTableView.dataSource = _audioGroupDataSource;
@@ -288,7 +294,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableViewScrollView.contentInsets = audioScrollViewContentInsets;
     _audioCollectionSelectionTableViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
     _audioGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _audioGroupSelectionTableViewScrollView.contentInsets = audioScrollViewContentInsets;
+    NSEdgeInsets adjustedInsets = audioScrollViewContentInsets;
+    adjustedInsets.top -= VLCLibraryUIUnits.largeSpacing;
+    _audioGroupSelectionTableViewScrollView.contentInsets = adjustedInsets;
     _audioGroupSelectionTableViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
 
     _audioLibraryGridModeSplitViewListTableViewScrollView.automaticallyAdjustsContentInsets = NO;

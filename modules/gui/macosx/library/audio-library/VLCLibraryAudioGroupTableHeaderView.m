@@ -80,7 +80,7 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
         glassView.contentView = glassContentView;
         self.backgroundView = glassView;
         contentHostView = glassContentView;
-        self.backgroundEdgeInset = VLCLibraryUIUnits.largeSpacing * 1.75;
+        self.backgroundEdgeInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
     }
 #endif
     if (self.backgroundView == nil) {
@@ -140,7 +140,7 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     const CGFloat verticalContentInset = VLCLibraryUIUnits.smallSpacing;
 
     [NSLayoutConstraint activateConstraints:@[
-        [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor constant:backgroundInset * 0.66],
+        [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor constant:VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing],
         [self.backgroundView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
         [self.backgroundView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
         [self.backgroundView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-backgroundInset],
