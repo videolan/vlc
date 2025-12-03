@@ -545,7 +545,7 @@ static int Map2Mask (vlc_object_t *obj, const snd_pcm_chmap_t *restrict map)
         const unsigned pos = map->pos[i];
         uint_fast16_t vlc_chan = 0;
 
-        if (pos < sizeof (vlc_chans) / sizeof (vlc_chans[0]))
+        if (pos < ARRAY_SIZE(vlc_chans))
             vlc_chan = vlc_chans[pos];
         if (vlc_chan == 0)
         {
