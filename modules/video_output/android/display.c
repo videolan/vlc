@@ -543,12 +543,8 @@ static void SetVideoLayout(vout_display_t *vd)
     if (!sys->can_set_video_layout)
         return;
 
-    video_format_t rot_fmt;
-    video_format_ApplyRotation(&rot_fmt, vd->source);
-    AWindowHandler_setVideoLayout(sys->awh, rot_fmt.i_width, rot_fmt.i_height,
-                                  rot_fmt.i_visible_width,
-                                  rot_fmt.i_visible_height,
-                                  rot_fmt.i_sar_num, rot_fmt.i_sar_den);
+    AWindowHandler_setVideoLayout(sys->awh, vd->cfg->display.width, vd->cfg->display.height,
+                                  vd->place);
 }
 
 static void UpdateASCGeometry(vout_display_t *vd)
@@ -632,7 +628,7 @@ static void Close(vout_display_t *vd)
     struct sys *sys = vd->sys;
 
     if (sys->can_set_video_layout)
-        AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0, 0, 0);
+        AWindowHandler_setVideoLayout(sys->awh, 0, 0, vd->place);
 
     if (sys->asc.sc != NULL)
     {
