@@ -386,7 +386,7 @@ static bool OpenDrmDevice(vlc_gl_t* gl, drmDevice* device)
     drmDevice* devices[64];
     char* render_node = NULL;
 
-    int n = drmGetDevices2(0, devices, sizeof(devices) / sizeof(devices[0]));
+    int n = drmGetDevices2(0, devices, ARRAY_SIZE(devices));
     for (int i = 0; i < n; ++i)
     {
         drmDevice* dev = devices[i];
