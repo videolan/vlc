@@ -362,7 +362,7 @@ static int DeviceSelect(audio_output_t *p_aout, const char *psz_id)
 
     if (psz_id)
     {
-        for (unsigned int i = 0; i < sizeof(au_devs) / sizeof(au_devs[0]); ++i)
+        for (unsigned int i = 0; i < ARRAY_SIZE(au_devs); ++i)
         {
             if (!strcmp(psz_id, au_devs[i].psz_id))
             {
@@ -427,7 +427,7 @@ Open(vlc_object_t *obj)
 
     aout_SoftVolumeInit( aout );
 
-    for (unsigned int i = 0; i< sizeof(au_devs) / sizeof(au_devs[0]); ++i)
+    for (unsigned int i = 0; i< ARRAY_SIZE(au_devs); ++i)
         aout_HotplugReport(aout, au_devs[i].psz_id, au_devs[i].psz_name);
 
     return VLC_SUCCESS;
