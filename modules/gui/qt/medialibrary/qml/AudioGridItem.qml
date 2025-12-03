@@ -30,8 +30,7 @@ Widgets.GridItem {
     image: model.cover || ""
     fallbackImage: VLCStyle.noArtAlbumCover
 
-    fillMode: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) ? Image.PreserveAspectCrop
-                                                                   : Image.PreserveAspectFit
+    fillMode: Image.PreserveAspectCrop
 
     title: model.title || qsTr("Unknown title")
     subtitle: model.main_artist || qsTr("Unknown artist")
