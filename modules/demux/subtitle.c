@@ -251,6 +251,11 @@ static int Control( demux_t *, int, va_list );
 static void Fix( demux_t * );
 static char * get_language_from_filename( const char * );
 
+static vlc_tick_t vlc_tick_from_HMS( int h, int m, int s )
+{
+    return vlc_tick_from_sec(h * INT64_C(3600) + m * INT64_C(60) + s);
+}
+
 /*****************************************************************************
  * Decoder format output function
  *****************************************************************************/
@@ -1153,7 +1158,7 @@ static int subtitle_ParseSubRipTimingValue(int64_t *timing_value,
 
 success:
     (*timing_value) = VLC_TICK_0
-        + vlc_tick_from_sec(h1 * 3600 + m1 * 60 + s1)
+        + vlc_tick_from_HMS(h1, m1, s1)
         + VLC_TICK_FROM_MS(d1);
 
     return VLC_SUCCESS;
@@ -1200,15 +1205,14 @@ static int subtitle_ParseSubViewerTiming( subtitle_t *p_subtitle,
 
     if( sscanf( s, "%d:%d:%d.%d,%d:%d:%d.%d",
                 &h1, &m1, &s1, &d1, &h2, &m2, &s2, &d2) == 8 )
-    {
-        p_subtitle->i_start = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1) +
-                              VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
+        return VLC_EGENERIC;
 
-        p_subtitle->i_stop  = vlc_tick_from_sec( h2 * 3600 + m2 * 60 + s2 ) +
-                              VLC_TICK_FROM_MS( d2 ) + VLC_TICK_0;
-        return VLC_SUCCESS;
-    }
-    return VLC_EGENERIC;
+    p_subtitle->i_start = vlc_tick_from_HMS( h1, m1, s1 ) +
+                          VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
+
+    p_subtitle->i_stop  = vlc_tick_from_HMS( h2, m2, s2 ) +
+                          VLC_TICK_FROM_MS( d2 ) + VLC_TICK_0;
+    return VLC_SUCCESS;
 }
 
 /* ParseSubViewer
@@ -1290,9 +1294,9 @@ static int  ParseSSA( vlc_object_t *p_obj, subs_properties_t *p_props,
                 psz_text = psz_temp;
             }
 
-            p_subtitle->i_start = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1 ) +
+            p_subtitle->i_start = vlc_tick_from_HMS( h1, m1, s1 ) +
                                   VLC_TICK_FROM_MS( c1 * 10 ) + VLC_TICK_0;
-            p_subtitle->i_stop  = vlc_tick_from_sec( h2 * 3600 + m2 * 60 + s2 ) +
+            p_subtitle->i_stop  = vlc_tick_from_HMS( h2, m2, s2 ) +
                                   VLC_TICK_FROM_MS( c2 * 10 ) + VLC_TICK_0;
             p_subtitle->psz_text = psz_text;
             return VLC_SUCCESS;
@@ -1342,7 +1346,7 @@ static int ParseVplayer( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( sscanf( s, "%d:%d:%d%*c%[^\r\n]",
                     &h1, &m1, &s1, psz_text ) == 4 )
         {
-            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1 );
+            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_HMS( h1, m1, s1 );
             p_subtitle->i_stop  = -1;
             break;
         }
@@ -1503,7 +1507,7 @@ static int ParseDVDSubtitle(vlc_object_t *p_obj, subs_properties_t *p_props,
                     "{T %d:%d:%d:%d",
                     &h1, &m1, &s1, &c1 ) == 4 )
         {
-            p_subtitle->i_start = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1 ) +
+            p_subtitle->i_start = vlc_tick_from_HMS( h1, m1, s1 ) +
                                   VLC_TICK_FROM_MS( c1 * 10 ) + VLC_TICK_0;
             p_subtitle->i_stop = -1;
             break;
@@ -1684,8 +1688,8 @@ static int ParsePJS(vlc_object_t *p_obj, subs_properties_t *p_props,
         if( sscanf (s, "%d,%d,\"%[^\n\r]", &t1, &t2, psz_text ) == 3 )
         {
             /* 1/10th of second ? Frame based ? FIXME */
-            p_subtitle->i_start = VLC_TICK_0 + 10 * t1;
-            p_subtitle->i_stop = VLC_TICK_0 + 10 * t2;
+            p_subtitle->i_start = VLC_TICK_0 + INT64_C(10) * t1;
+            p_subtitle->i_stop = VLC_TICK_0 + INT64_C(10) * t2;
             /* Remove latest " */
             psz_text[ strlen(psz_text) - 1 ] = '\0';
 
@@ -1830,10 +1834,10 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( sscanf( s, "%d:%d:%d.%d %d:%d:%d.%d %[^\n\r]",
                     &h1, &m1, &s1, &f1, &h2, &m2, &s2, &f2, psz_text ) == 9 )
         {
-            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_sec( ( h1 *3600 + m1 * 60 + s1 ) +
-                (int64_t)( ( f1 +  p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution ) );
-            p_subtitle->i_stop = VLC_TICK_0 + vlc_tick_from_sec( ( h2 *3600 + m2 * 60 + s2 ) +
-                (int64_t)( ( f2 +  p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution ) );
+            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_HMS( h1, m1, s1 ) +
+                vlc_tick_from_sec( ( f1 +  p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution );
+            p_subtitle->i_stop = VLC_TICK_0 + vlc_tick_from_HMS( h2, m2, s2 ) +
+                vlc_tick_from_sec( ( f2 +  p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution );
             break;
         }
         /* Short time lines */
@@ -1891,7 +1895,7 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
                          sscanf( &psz_text[shift], "%d.%d", &sec, &f);
                          sec *= inv;
                      }
-                     p_props->jss.i_time_shift = ( ( h * 3600 + m * 60 + sec )
+                     p_props->jss.i_time_shift = ( ( h * INT64_C(3600) + m * INT64_C(60) + sec )
                          * p_props->jss.i_time_resolution + f ) * inv;
                  }
                  break;
@@ -2067,8 +2071,8 @@ static int ParsePSB( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( sscanf( s, "{%d:%d:%d}{%d:%d:%d}%[^\r\n]",
                     &h1, &m1, &s1, &h2, &m2, &s2, psz_text ) == 7 )
         {
-            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1 );
-            p_subtitle->i_stop  = VLC_TICK_0 + vlc_tick_from_sec( h2 * 3600 + m2 * 60 + s2 );
+            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_HMS( h1, m1, s1 );
+            p_subtitle->i_stop  = VLC_TICK_0 + vlc_tick_from_HMS( h2, m2, s2 );
             break;
         }
         free( psz_text );
@@ -2090,12 +2094,12 @@ static vlc_tick_t ParseRealTime( const char *psz )
     int h, m, s, f;
     if( sscanf( psz, "%d:%d:%d.%d", &h, &m, &s, &f ) == 4 )
     {
-        return vlc_tick_from_sec((( h * 60 + m ) * 60 ) + s )
+        return vlc_tick_from_HMS( h, m, s )
                + VLC_TICK_FROM_MS(f * 10) + VLC_TICK_0;
     }
     if( sscanf( psz, "%d:%d.%d", &m, &s, &f ) == 3 )
     {
-        return vlc_tick_from_sec(( m * 60 ) + s )
+        return vlc_tick_from_HMS( 0, m, s )
                + VLC_TICK_FROM_MS(f * 10) + VLC_TICK_0;
     }
     if( sscanf( psz, "%d.%d", &s, &f ) == 2 )
@@ -2105,7 +2109,7 @@ static vlc_tick_t ParseRealTime( const char *psz )
     }
     if( sscanf( psz, "%d:%d", &m, &s ) == 2 )
     {
-        return vlc_tick_from_sec(( m * 60 ) + s )
+        return vlc_tick_from_HMS( 0, m, s )
                + VLC_TICK_0;
     }
     if( sscanf( psz, "%d", &s ) == 1 )
@@ -2238,7 +2242,7 @@ static int ParseDKS( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( sscanf( s, "[%d:%d:%d]%[^\r\n]",
                     &h1, &m1, &s1, psz_text ) == 4 )
         {
-            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1 );
+            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_HMS( h1, m1, s1 );
 
             s = TextGetLine( txt );
             if( !s )
@@ -2248,7 +2252,7 @@ static int ParseDKS( vlc_object_t *p_obj, subs_properties_t *p_props,
             }
 
             if( sscanf( s, "[%d:%d:%d]", &h2, &m2, &s2 ) == 3 )
-                p_subtitle->i_stop  = vlc_tick_from_sec(h2 * 3600 + m2 * 60 + s2 );
+                p_subtitle->i_stop  = vlc_tick_from_HMS( h2, m2, s2 );
             else
                 p_subtitle->i_stop  = -1;
             break;
@@ -2287,7 +2291,7 @@ static int ParseSubViewer1( vlc_object_t *p_obj, subs_properties_t *p_props,
 
         if( sscanf( s, "[%d:%d:%d]", &h1, &m1, &s1 ) == 3 )
         {
-            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1 );
+            p_subtitle->i_start = VLC_TICK_0 + vlc_tick_from_HMS( h1, m1, s1 );
 
             s = TextGetLine( txt );
             if( !s )
@@ -2305,7 +2309,7 @@ static int ParseSubViewer1( vlc_object_t *p_obj, subs_properties_t *p_props,
             }
 
             if( sscanf( s, "[%d:%d:%d]", &h2, &m2, &s2 ) == 3 )
-                p_subtitle->i_stop  = vlc_tick_from_sec( h2 * 3600 + m2 * 60 + s2 );
+                p_subtitle->i_stop  = vlc_tick_from_HMS( h2, m2, s2 );
             else
                 p_subtitle->i_stop  = -1;
 
@@ -2339,10 +2343,10 @@ static int ParseCommonSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
                     &h1, &m1, &s1, &d1,
                     &h2, &m2, &s2, &d2 ) == 8 )
         {
-            p_subtitle->i_start = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1 ) +
+            p_subtitle->i_start = vlc_tick_from_HMS( h1, m1, s1 ) +
                                   VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
 
-            p_subtitle->i_stop  = vlc_tick_from_sec( h2 * 3600 + m2 * 60 + s2 ) +
+            p_subtitle->i_stop  = vlc_tick_from_HMS( h2, m2, s2 ) +
                                   VLC_TICK_FROM_MS( d2 ) + VLC_TICK_0;
             if( p_subtitle->i_start < p_subtitle->i_stop )
                 break;
@@ -2425,7 +2429,7 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
             continue;
 
         /* convert everything to seconds */
-        uint64_t i_frames = h * 3600 + m * 60 + s;
+        int64_t i_frames = h * INT64_C(3600) + m * INT64_C(60) + s;
 
         if( c == ';' && p_rate->b_drop_allowed ) /* dropframe */
         {
