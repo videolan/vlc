@@ -453,7 +453,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
                         const audio_sample_format_t *restrict outfmt,
                         config_chain_t *cfg)
 {
-    const unsigned max = sizeof (filters->tab) / sizeof (filters->tab[0]);
+    const unsigned max = ARRAY_SIZE(filters->tab);
     if (filters->count >= max)
     {
         msg_Err (obj, "maximum of %u filters reached", max);
