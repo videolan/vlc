@@ -268,6 +268,7 @@ pkg-config-$(PKGCFG_VERSION).tar.gz:
 pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(UNPACK)
 	mv pkg-config-lite-$(PKGCFG_VERSION) pkg-config-$(PKGCFG_VERSION)
+	$(APPLY) $(TOOLS)/pkg-config-stdc23-port.patch
 	$(MOVE)
 
 .buildpkg-config: pkgconfig

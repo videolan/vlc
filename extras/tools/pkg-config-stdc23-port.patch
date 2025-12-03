@@ -1,0 +1,29 @@
+From: Khalid Masum <khalid.masum.92@gmail.com>
+Subject: glib-snippet: port to stdc23
+
+stdc=23 has a new keyword "bool" l. Therefore, it cannot
+be used as any other symbol name. Therefore, compilers that
+default to stdc23 or later, like gcc-15 fail to compile it.
+
+This patch fixes it.
+
+--- b/glib-snippet.c	2025-12-02 09:55:25.595319484 +0600
++++ a/glib-snippet.c	2013-01-27 02:21:06.000000000 +0600
+@@ -1187,7 +1187,7 @@
+   gpointer arg_data;
+   union
+   {
+-    gboolean bool;
++    gboolean boolean;
+     gint integer;
+     gchar *str;
+     gchar **array;
+@@ -2454,7 +2454,7 @@
+           switch (change->arg_type)
+             {
+             case G_OPTION_ARG_NONE:
+-              *(gboolean *)change->arg_data = change->prev.bool;
++              *(gboolean *)change->arg_data = change->prev.boolean;
+               break;
+             case G_OPTION_ARG_INT:
+               *(gint *)change->arg_data = change->prev.integer;
