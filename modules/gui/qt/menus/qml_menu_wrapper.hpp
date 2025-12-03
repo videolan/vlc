@@ -135,6 +135,16 @@ signals:
     void grouping(MainCtx::Grouping grouping);
 };
 
+class SortMenuAlbums : public SortMenu
+{
+    Q_OBJECT
+
+    SIMPLE_MENU_PROPERTY(bool, sectionsVisible, false)
+
+protected:
+    void onPopup(QMenu * menu) override;
+};
+
 //inherit VLCMenuBar so we can access menu creation functions
 class QmlGlobalMenu : public VLCMenuBar
 {
