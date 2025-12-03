@@ -65,14 +65,14 @@ static uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym)
         return sym - 0x1000000;
 
 #if 0
-    for (size_t i = 0; i < sizeof (tab) / sizeof (tab[0]); i++)
+    for (size_t i = 0; i < ARRAY_SIZE(tab); i++)
         if (i > 0 && tab[i-1].x11 >= tab[i].x11)
         {
             fprintf (stderr, "key %x and %x are not ordered properly\n",
                      tab[i-1].x11, tab[i].x11);
             abort ();
         }
-    for (size_t i = 0; i < sizeof (old) / sizeof (old[0]); i++)
+    for (size_t i = 0; i < ARRAY_SIZE(old); i++)
         if (i > 0 && old[i-1].x11 >= old[i].x11)
         {
             fprintf (stderr, "key %x and %x are not ordered properly\n",
@@ -82,13 +82,11 @@ static uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym)
 #endif
 
     /* Special keys */
-    res = bsearch (&sym, tab, sizeof (tab) / sizeof (tab[0]), sizeof (tab[0]),
-                   keysymcmp);
+    res = bsearch (&sym, tab, ARRAY_SIZE(tab), sizeof (tab[0]), keysymcmp);
     if (res != NULL)
         return res->vlc;
     /* Legacy X11 symbols outside the Unicode range */
-    res = bsearch (&sym, old, sizeof (old) / sizeof (old[0]), sizeof (old[0]),
-                   keysymcmp);
+    res = bsearch (&sym, old, ARRAY_SIZE(old), sizeof (old[0]), keysymcmp);
     if (res != NULL)
         return res->vlc;
 
