@@ -40,7 +40,7 @@
         <file alias="preferences.svg">pixmaps/menu/preferences.svg</file>
         <file alias="ic_fluent_previous.svg">pixmaps/menu/ic_fluent_previous.svg</file>
         <file alias="profile_new.svg">pixmaps/menu/profile_new.svg</file>
-        <file alias="record.svg">pixmaps/menu/record.svg</file>
+        <file alias="ic_fluent_record.svg">pixmaps/menu/ic_fluent_record.svg</file>
         <file alias="remove.svg">pixmaps/menu/remove.svg</file>
         <file alias="ic_fluent_arrow_repeat_all.svg">pixmaps/menu/ic_fluent_arrow_repeat_all.svg</file>
         <file alias="repeat_off.svg">pixmaps/menu/repeat_off.svg</file>

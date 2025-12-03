@@ -53,7 +53,7 @@
         {"key":"playlist_clear", "path": "./icons/ic_playlist_clear.svg"},
         {"key":"previous", "path": "./icons/ic_fluent_previous.svg"},
         {"key":"profile_new", "path": "./icons/profile_new.svg"},
-        {"key":"record", "path": "./icons/record.svg"},
+        {"key":"record", "path": "./icons/ic_fluent_record.svg"},
         {"key":"remove", "path": "./icons/remove.svg"},
         {"key":"renderer", "path": "./icons/ic_fluent_cast.svg"},
         {"key":"repeat_all", "path": "./icons/ic_fluent_arrow_repeat_all.svg"},

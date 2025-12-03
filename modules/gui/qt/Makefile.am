@@ -843,7 +843,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/podcast.svg \
 	pixmaps/icons/ic_fluent_previous.svg \
 	pixmaps/icons/profile_new.svg \
-	pixmaps/icons/record.svg \
+	pixmaps/icons/ic_fluent_record.svg \
 	pixmaps/icons/remove.svg \
 	pixmaps/icons/ic_fluent_cast.svg \
 	pixmaps/icons/ic_fluent_arrow_repeat_all.svg \
@@ -905,7 +905,7 @@ libqt_plugin_la_RES = \
 	pixmaps/menu/preferences.svg \
 	pixmaps/menu/ic_fluent_previous.svg \
 	pixmaps/menu/profile_new.svg \
-	pixmaps/menu/record.svg \
+	pixmaps/menu/ic_fluent_record.svg \
 	pixmaps/menu/remove.svg \
 	pixmaps/menu/ic_fluent_arrow_repeat_all.svg \
 	pixmaps/menu/repeat_off.svg \
