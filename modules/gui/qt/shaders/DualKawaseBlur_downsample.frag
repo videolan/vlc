@@ -39,6 +39,7 @@ layout(std140, binding = 0) uniform qt_buf {
 
 #ifdef POSTPROCESS
     vec4 tint;
+    vec4 backgroundColor;
     float tintStrength;
     float exclusionStrength;
     float noiseStrength;
@@ -129,12 +130,16 @@ void main()
     // Tint:
     result.rgb = mix(result.rgb, fromPremult(tint).rgb, tintStrength);
 
+    result = toPremult(result);
+
+    // Background color:
+    // Source over blending, premultiplied (S + D * (1 - S.a)):
+    result = result + backgroundColor * (1.0 - result.a);
+
     // Noise:
     float r = rand(qt_TexCoord0) - 0.5;
-    vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
+    vec4 noise = vec4(r,r,r,r) * noiseStrength;
     result += noise;
-
-    result = toPremult(result);
 #endif
 
     fragColor = result * qt_Opacity; // premultiplied alpha
