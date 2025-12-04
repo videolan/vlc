@@ -105,6 +105,9 @@ FocusScope {
             viewportRect: !blurEffect.sourceNeedsLayering ? Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
                                                           : Qt.rect(0, 0, 0, 0)
 
+            backgroundColor: theme.bg.primary
+            postprocess: sourceTextureProviderObserver.hasAlphaChannel
+
             Widgets.TextureProviderItem {
                 id: textureProviderItem
 
