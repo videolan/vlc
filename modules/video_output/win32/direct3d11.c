@@ -1121,7 +1121,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &srcDesc);
 
         ID3D11DeviceContext* copyContext = sys->d3d_dev.d3dcontext;
-        ID3D11Resource* copyResource = p_sys->resource[KNOWN_DXGI_INDEX];
+        ID3D11Resource* copyResource = sys->stagingSys.resource[KNOWN_DXGI_INDEX];
         ID3D11Resource* newResource = NULL;
 
         if (is_d3d11_opaque(picture->format.i_chroma) && sys->d3d_dev.d3dcontext != p_sys->context)
