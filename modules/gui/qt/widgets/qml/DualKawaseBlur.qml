@@ -49,6 +49,7 @@ Item {
     property real tintStrength: 0.0
     property real noiseStrength: 0.0
     property real exclusionStrength: 0.0
+    property color backgroundColor: "transparent"
     /// </postprocess>
 
     // NOTE: This property is also an optimization hint. When it is false, the
@@ -64,12 +65,19 @@ Item {
     // The effective radius is always going to be a half-integer.
     property int radius: 1
 
+    // NOTE: This property concerns the blending in the scene graph, not the internal
+    //       blending used with regard to background coloring. In that case blending
+    //       is always done.
     // NOTE: It seems that if SG accumulated opacity is lower than 1.0, blending is
     //       used even if it is set false here. For that reason, it should not be
     //       necessary to check for opacity (well, accumulated opacity can not be
     //       checked directly in QML anyway).
-    property bool blending: (!sourceTextureIsValid || sourceTextureProviderObserver.hasAlphaChannel ||
-                             (postprocess && (tintStrength > 0.0 && tint.a < 1.0)))
+    property bool blending: (postprocess &&
+                             backgroundColor.a > (1.0 - Number.EPSILON)) ? false // the result is opaque, no need for sg blending
+                                                                         : _sourceIsTranslucent
+
+    // WARNING: If texture is not valid/ready, Qt generates a transparent texture to use as source.
+    readonly property bool _sourceIsTranslucent: (!sourceTextureIsValid || sourceTextureProviderObserver.hasAlphaChannel)
 
     // source must be a texture provider item. Some items such as `Image` and
     // `ShaderEffectSource` are inherently texture provider. Other items needs
@@ -432,6 +440,7 @@ Item {
         property alias tintStrength: root.tintStrength
         property alias noiseStrength: root.noiseStrength
         property alias exclusionStrength: root.exclusionStrength
+        property alias backgroundColor: root.backgroundColor
 
         fragmentShader: root.postprocess ? "qrc:///shaders/DualKawaseBlur_upsample_postprocess.frag.qsb"
                                          : "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
