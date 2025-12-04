@@ -123,7 +123,7 @@ void main()
     result = exclude(result, exclColor);
 
     // Tint:
-    result = mix(result, fromPremult(tint), tintStrength);
+    result.rgb = mix(result.rgb, fromPremult(tint).rgb, tintStrength);
 
     // Noise:
     float r = rand(qt_TexCoord0) - 0.5;
