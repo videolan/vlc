@@ -81,21 +81,16 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
         self.backgroundView = glassView;
         contentHostView = glassContentView;
         self.backgroundEdgeInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
-    }
+    } else
 #endif
-    if (self.backgroundView == nil) {
-        self.wantsLayer = YES;
-
-        if (@available(macOS 10.14, *)) {
-            NSVisualEffectView * const visualEffectView = [[NSVisualEffectView alloc] initWithFrame:self.bounds];
-            visualEffectView.translatesAutoresizingMaskIntoConstraints = NO;
-            visualEffectView.material = NSVisualEffectMaterialHeaderView;
-            visualEffectView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
-            visualEffectView.state = NSVisualEffectStateFollowsWindowActiveState;
-            self.backgroundView = visualEffectView;
-        }
-    }
-    if (self.backgroundView == nil) {
+    if (@available(macOS 10.14, *)) {
+        NSVisualEffectView * const visualEffectView = [[NSVisualEffectView alloc] initWithFrame:self.bounds];
+        visualEffectView.translatesAutoresizingMaskIntoConstraints = NO;
+        visualEffectView.wantsLayer = YES;
+        visualEffectView.material = NSVisualEffectMaterialPopover;
+        visualEffectView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+        self.backgroundView = visualEffectView;
+    } else {
         NSView * const fallbackBackgroundView = [[NSView alloc] initWithFrame:self.bounds];
         fallbackBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
         fallbackBackgroundView.wantsLayer = YES;
@@ -153,10 +148,10 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 
     if (@available(macOS 26.0, *)) {
     } else {
-        self.layer.cornerRadius = VLCLibraryUIUnits.smallSpacing;
-        self.layer.masksToBounds = YES;
-        self.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
-        [self updateAppearance];
+        self.backgroundView.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
+        self.backgroundView.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
+        self.backgroundView.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
+        self.backgroundView.layer.masksToBounds = YES;
     }
 }
 
@@ -196,30 +191,6 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     if (@available(macOS 10.14, *))
         button.contentTintColor = NSColor.VLCAccentColor;
     return button;
-}
-
-- (void)updateAppearance
-{
-    if (@available(macOS 26.0, *))
-        return;
-
-    if (@available(macOS 10.14, *)) {
-        NSAppearance *appearance = self.effectiveAppearance;
-        BOOL isDark = NO;
-        if ([appearance.name isEqualToString:NSAppearanceNameDarkAqua] ||
-            [appearance.name isEqualToString:NSAppearanceNameVibrantDark]) {
-            isDark = YES;
-        }
-        self.layer.borderColor = (isDark ? NSColor.VLCDarkSubtleBorderColor : NSColor.VLCLightSubtleBorderColor).CGColor;
-    } else {
-        self.layer.borderColor = NSColor.VLCLightSubtleBorderColor.CGColor;
-    }
-}
-
-- (void)viewDidChangeEffectiveAppearance
-{
-    [super viewDidChangeEffectiveAppearance];
-    [self updateAppearance];
 }
 
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
