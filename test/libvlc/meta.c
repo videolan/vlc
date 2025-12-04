@@ -28,46 +28,43 @@
 
 #include <vlc_modules.h>
 
-static int test_meta (const char ** argv, int argc)
+static int test_meta(const char **argv, int argc)
 {
-    libvlc_instance_t *vlc;
-    libvlc_media_t *media;
-    char * artist;
+    test_log("Testing meta\n");
 
-    test_log ("Testing meta\n");
+    libvlc_instance_t *vlc = libvlc_new(argc, argv);
+    assert(vlc != NULL);
 
-    vlc = libvlc_new (argc, argv);
-    assert (vlc != NULL);
-
+    // Skip test if TagLib module is not available
     if (!module_exists("taglib"))
         return 77;
 
-    media = libvlc_media_new_path(SRCDIR "/samples/meta.mp3");
-    assert( media );
+    libvlc_media_t *media =
+        libvlc_media_new_path(SRCDIR "/samples/meta.mp3");
+    assert(media != NULL);
 
+    // Always check return values where possible (future-proofing)
     libvlc_media_parse_sync(vlc, media, libvlc_media_parse_local, -1);
 
-    artist = libvlc_media_get_meta (media, libvlc_meta_Artist);
-
+    char *artist = libvlc_media_get_meta(media, libvlc_meta_Artist);
     const char *expected_artist = "mike";
 
-    assert (artist);
-    test_log ("+ got '%s' as Artist, expecting %s\n", artist, expected_artist);
+    assert(artist != NULL);
+    test_log("+ got '%s' as Artist, expecting '%s'\n",
+             artist, expected_artist);
 
-    int string_compare = strcmp (artist, expected_artist);
-    assert (!string_compare);
+    // Use strcmp directly in assert for cleaner code
+    assert(strcmp(artist, expected_artist) == 0);
 
-    free (artist);
-    libvlc_media_release (media);
-    libvlc_release (vlc);
+    free(artist);
+    libvlc_media_release(media);
+    libvlc_release(vlc);
 
     return 0;
 }
 
-
-int main (void)
+int main(void)
 {
     test_init();
-
-    return test_meta (test_defaults_args, test_defaults_nargs);
+    return test_meta(test_defaults_args, test_defaults_nargs);
 }
