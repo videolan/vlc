@@ -305,7 +305,7 @@ struct demux_sys
 
     vlc_tick_t clock;
     vlc_tick_t audio_pts;
-    vlc_tick_t video_pts;
+    date_t video_date;
 
     int current_title;
     vlc_tick_t chapter_gap;
@@ -469,6 +469,69 @@ CreateMeta(demux_t *demux)
     return meta;
 }
 
+static void
+SetAudioPts(demux_t *demux, vlc_tick_t pts)
+{
+    struct demux_sys *sys = demux->p_sys;
+
+    if (sys->audio_track_count == 0)
+        return;
+    assert(pts >= VLC_TICK_0);
+
+    /* Round up (ceiling) on duration (hence the VLC_TICK_0 removal) */
+    pts -= VLC_TICK_0;
+    pts = ((pts + sys->audio.sample_length - 1) / sys->audio.sample_length)
+          * sys->audio.sample_length;
+    pts += VLC_TICK_0;
+
+    sys->audio_pts = pts;
+}
+
+static void
+SetVideoPts(demux_t *demux, vlc_tick_t pts)
+{
+    struct demux_sys *sys = demux->p_sys;
+
+    if (sys->video_track_count == 0 && sys->sub_track_count == 0)
+        return;
+    assert(pts >= VLC_TICK_0);
+
+    vlc_tick_t frame_duration =
+        vlc_tick_rate_duration(sys->video.frame_rate /
+                               (float)sys->video.frame_rate_base);
+    /* Round up (ceiling) via date_Increment() */
+    pts -= VLC_TICK_0;
+    unsigned nb_frames = (pts + frame_duration - 1) / frame_duration;
+
+    date_Set(&sys->video_date, VLC_TICK_0);
+    date_Increment(&sys->video_date, nb_frames);
+}
+
+static void
+UpdateClock(demux_t *demux)
+{
+    struct demux_sys *sys = demux->p_sys;
+    if (sys->audio_track_count > 0
+     && (sys->video_track_count > 0 || sys->sub_track_count > 0))
+        sys->clock = __MIN(sys->audio_pts, date_Get(&sys->video_date));
+    else if (sys->audio_track_count > 0)
+        sys->clock = sys->audio_pts;
+    else if (sys->video_track_count > 0 || sys->sub_track_count > 0)
+        sys->clock = date_Get(&sys->video_date);
+
+    if (sys->clock > VLC_TICK_0 + sys->pts_offset + sys->length)
+        sys->clock = VLC_TICK_0 + sys->pts_offset + sys->length;
+}
+
+static void
+SetTime(demux_t *demux, vlc_tick_t time)
+{
+    assert(time >= VLC_TICK_0);
+    SetVideoPts(demux, time);
+    SetAudioPts(demux, time);
+    UpdateClock(demux);
+}
+
 static int
 Control(demux_t *demux, int query, va_list args)
 {
@@ -509,7 +572,7 @@ Control(demux_t *demux, int query, va_list args)
                 if (new_title >= sys->title_count)
                     return VLC_EGENERIC;
                 sys->current_title = new_title;
-                sys->clock = sys->audio_pts = sys->video_pts = VLC_TICK_0 + sys->pts_offset;
+                SetTime(demux, VLC_TICK_0);
                 sys->updates |= INPUT_UPDATE_TITLE;
                 return VLC_SUCCESS;
             }
@@ -520,8 +583,7 @@ Control(demux_t *demux, int query, va_list args)
                 const int seekpoint_idx = va_arg(args, int);
                 if (seekpoint_idx < sys->chapter_count)
                 {
-                    sys->clock = sys->audio_pts = sys->video_pts =
-                        (seekpoint_idx * sys->chapter_gap) + sys->pts_offset + VLC_TICK_0;
+                    SetTime(demux, seekpoint_idx * sys->chapter_gap + VLC_TICK_0);
                     sys->current_chapter = seekpoint_idx;
                     return VLC_SUCCESS;
                 }
@@ -552,11 +614,13 @@ Control(demux_t *demux, int query, va_list args)
             *va_arg(args, double *) = (sys->clock - VLC_TICK_0 - sys->pts_offset) / (double) sys->length;
             return VLC_SUCCESS;
         case DEMUX_SET_POSITION:
+        {
             if (!sys->can_seek)
                 return VLC_EGENERIC;
-            sys->clock = sys->video_pts = sys->audio_pts =
-                VLC_TICK_0 + sys->pts_offset + va_arg(args, double) * sys->length;
+            double pos = va_arg(args, double);
+            SetTime(demux, pos * sys->length + VLC_TICK_0);
             return VLC_SUCCESS;
+        }
         case DEMUX_GET_LENGTH:
             if (!sys->report_length)
                 return VLC_EGENERIC;
@@ -569,10 +633,13 @@ Control(demux_t *demux, int query, va_list args)
             *va_arg(args, vlc_tick_t *) = sys->time_offset + sys->clock - VLC_TICK_0 - sys->pts_offset;
             return VLC_SUCCESS;
         case DEMUX_SET_TIME:
+        {
             if (!sys->can_seek)
                 return VLC_EGENERIC;
-            sys->clock = sys->video_pts = sys->audio_pts = va_arg(args, vlc_tick_t) + VLC_TICK_0 + sys->time_offset;
+            vlc_tick_t time = va_arg(args, vlc_tick_t);
+            SetTime(demux, time);
             return VLC_SUCCESS;
+        }
         case DEMUX_GET_TITLE_INFO:
             if (sys->title_count > 0)
             {
@@ -708,7 +775,7 @@ video_block_free_cb(block_t *b)
 }
 
 static block_t *
-CreateVideoBlock(demux_t *demux, struct mock_track *track)
+CreateVideoBlock(demux_t *demux, struct mock_track *track, vlc_tick_t pts)
 {
     struct demux_sys *sys = demux->p_sys;
     picture_t *pic = picture_NewFromFormat(&track->fmt.video);
@@ -735,7 +802,7 @@ CreateVideoBlock(demux_t *demux, struct mock_track *track)
     for (int i = 0; i < pic->i_planes; ++i)
         block_len += pic->p[i].i_lines * pic->p[i].i_pitch;
 
-    uint8_t pixel = (sys->video_pts / VLC_TICK_FROM_MS(delay)) % range;
+    uint8_t pixel = (pts / VLC_TICK_FROM_MS(delay)) % range;
     if (sys->b_colors)
     {
         int bars = __MAX(3, pic->p[0].i_pixel_pitch);
@@ -783,11 +850,11 @@ CreateVideoBlock(demux_t *demux, struct mock_track *track)
 }
 
 static block_t *
-CreateSubBlock(demux_t *demux, struct mock_track *track)
+CreateSubBlock(demux_t *demux, struct mock_track *track, vlc_tick_t pts)
 {
-    struct demux_sys *sys = demux->p_sys;
+    (void) demux;
     char *text;
-    if (asprintf(&text, "subtitle @ %"PRId64, sys->video_pts) == -1)
+    if (asprintf(&text, "subtitle @ %"PRId64, pts) == -1)
         return NULL;
     size_t len = strlen(text) + 1;
 
@@ -1160,12 +1227,16 @@ DemuxAudio(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
 }
 
 static int
-DemuxVideo(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
+DemuxVideo(demux_t *demux, vlc_tick_t end_pts)
 {
     struct demux_sys *sys = demux->p_sys;
 
-    while (sys->video_pts < end_pts)
+    vlc_tick_t current_pts;
+    while ((current_pts = date_Get(&sys->video_date)) < end_pts)
     {
+        vlc_tick_t next_pts = date_Increment(&sys->video_date, 1);
+        vlc_tick_t frame_duration = next_pts - current_pts;
+
         struct mock_track *track;
         vlc_vector_foreach(track, &sys->tracks)
         {
@@ -1182,10 +1253,10 @@ DemuxVideo(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
                         if (track->video.image_count == 0)
                             sys->eof_requested = true;
                     }
-                    block = CreateVideoBlock(demux, track);
+                    block = CreateVideoBlock(demux, track, current_pts);
                     break;
                 case SPU_ES:
-                    block = CreateSubBlock(demux, track);
+                    block = CreateSubBlock(demux, track, current_pts);
                     break;
                 default:
                     continue;
@@ -1193,14 +1264,13 @@ DemuxVideo(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
             if (!block)
                 return VLC_EGENERIC;
 
-            block->i_length = step_length;
-            block->i_pts = block->i_dts = sys->video_pts;
+            block->i_length = frame_duration;
+            block->i_pts = block->i_dts = current_pts;
 
             int ret = es_out_Send(demux->out, track->id, block);
             if (ret != VLC_SUCCESS)
                 return ret;
         }
-        sys->video_pts += step_length;
     }
     return VLC_SUCCESS;
 }
@@ -1225,22 +1295,16 @@ Demux(demux_t *demux)
         const struct pcr_point *pt = &sys->pcr_points.data[sys->next_pcr_index];
         if (sys->clock >= pt->oldpcr)
         {
-            sys->audio_pts = sys->video_pts = sys->clock = pt->newpcr;
+            sys->audio_pts = sys->clock = pt->newpcr;
+            if (sys->video_track_count > 0 || sys->sub_track_count > 0)
+                date_Set(&sys->video_date, pt->newpcr);
+
             sys->next_pcr_index++;
         }
     }
 
     vlc_tick_t prev_pts = sys->clock;
-    if (sys->audio_track_count > 0
-     && (sys->video_track_count > 0 || sys->sub_track_count > 0))
-        sys->clock = __MIN(sys->audio_pts, sys->video_pts);
-    else if (sys->audio_track_count > 0)
-        sys->clock = sys->audio_pts;
-    else if (sys->video_track_count > 0 || sys->sub_track_count > 0)
-        sys->clock = sys->video_pts;
-
-    if (sys->clock > VLC_TICK_0 + sys->pts_offset + sys->length)
-        sys->clock = VLC_TICK_0 + sys->pts_offset + sys->length;
+    UpdateClock(demux);
 
     if (sys->chapter_gap > 0)
     {
@@ -1263,9 +1327,9 @@ Demux(demux_t *demux)
     es_out_SetPCR(demux->out, sys->clock);
 
     const vlc_tick_t video_step_length =
-        (sys->video_track_count > 0 || sys->sub_track_count > 0) ?
-         VLC_TICK_FROM_SEC(1) * sys->video.frame_rate_base
-                              / sys->video.frame_rate : 0;
+        (sys->video_track_count == 0 && sys->sub_track_count == 0) ? 0 :
+         vlc_tick_rate_duration(sys->video.frame_rate /
+                                (float) sys->video.frame_rate_base);
 
     const vlc_tick_t audio_step_length =
         sys->audio_track_count > 0 ? sys->audio.sample_length : 0;
@@ -1284,9 +1348,9 @@ Demux(demux_t *demux)
     if (ret == VLC_SUCCESS
      && (sys->video_track_count > 0 || sys->sub_track_count > 0))
     {
-        ret = DemuxVideo(demux, video_step_length,
+        ret = DemuxVideo(demux,
                          __MIN(step_length + sys->clock - VLC_TICK_0 - sys->pts_offset, sys->length));
-        if (sys->video_pts - VLC_TICK_0 - sys->pts_offset + video_step_length < sys->length)
+        if (date_Get(&sys->video_date) - VLC_TICK_0 - sys->pts_offset + video_step_length < sys->length)
             eof = false;
     }
 
@@ -1713,7 +1777,17 @@ Open(vlc_object_t *obj)
     if (CheckAndCreateTracksEs(demux, VLC_TICK_0, &created) != VLC_SUCCESS)
         goto error;
 
-    sys->clock = sys->audio_pts = sys->video_pts = VLC_TICK_0 + sys->pts_offset;
+    sys->clock = VLC_TICK_0 + sys->pts_offset;
+    SetAudioPts(demux, sys->clock);
+
+    /* Initialize video_date for proper frame duration calculation */
+    if (sys->video_track_count > 0 || sys->sub_track_count > 0)
+    {
+        date_Init(&sys->video_date, sys->video.frame_rate,
+                  sys->video.frame_rate_base);
+        SetVideoPts(demux, VLC_TICK_0 + sys->pts_offset);
+    }
+
     sys->current_title = 0;
     sys->chapter_gap = sys->chapter_count > 0 ?
                        (sys->length / sys->chapter_count) : VLC_TICK_INVALID;
