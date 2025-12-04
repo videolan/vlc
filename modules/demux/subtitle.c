@@ -1138,7 +1138,6 @@ static int subtitle_ParseSubRipTimingValue(vlc_tick_t *timing_value,
                                            const char *s, size_t length)
 {
     int h1, m1, s1, d1 = 0;
-    int64_t sec, ms, total;
 
     int count;
     if (sscanf(s, "%d:%d:%d,%d%n", &h1, &m1, &s1, &d1, &count) == 4
@@ -1157,14 +1156,8 @@ static int subtitle_ParseSubRipTimingValue(vlc_tick_t *timing_value,
     return VLC_EGENERIC;
 
 success:
-    if (ckd_mul(&sec, h1, 3600) ||
-        ckd_mul(&ms,  m1, 60) ||
-        ckd_add(&total, sec, ms) ||
-        ckd_add(&total, total, s1))
-        return VLC_EINVAL;
-
     (*timing_value) = VLC_TICK_0
-        + vlc_tick_from_sec(total)
+        + vlc_tick_from_sec(h1 * 3600 + m1 * 60 + s1)
         + VLC_TICK_FROM_MS(d1);
 
     return VLC_SUCCESS;
