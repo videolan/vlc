@@ -193,7 +193,7 @@ Help and join us!.</string>
                     <constraint firstItem="1348" firstAttribute="top" secondItem="2232" secondAttribute="bottom" constant="-18" id="GW6-JC-Ely"/>
                     <constraint firstAttribute="trailing" secondItem="1348" secondAttribute="trailing" constant="20" id="H3r-VZ-85w"/>
                     <constraint firstAttribute="bottom" secondItem="2313" secondAttribute="bottom" constant="-5" id="Ian-FJ-q76"/>
-                    <constraint firstItem="2284" firstAttribute="centerX" secondItem="1348" secondAttribute="centerX" id="JLu-H9-741"/>
+                    <constraint firstItem="2284" firstAttribute="leading" secondItem="1348" secondAttribute="leading" id="JLu-H9-741"/>
                     <constraint firstItem="2313" firstAttribute="centerX" secondItem="1344" secondAttribute="centerX" id="Kkg-4g-1ft"/>
                     <constraint firstItem="2234" firstAttribute="leading" secondItem="1348" secondAttribute="leading" id="O3r-hG-9g7"/>
                     <constraint firstItem="2233" firstAttribute="leading" secondItem="1348" secondAttribute="leading" id="R7a-c5-efq"/>
