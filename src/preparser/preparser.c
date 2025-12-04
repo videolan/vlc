@@ -474,10 +474,17 @@ ThumbnailerRun(void *userdata)
         case VLC_THUMBNAILER_SEEK_NONE:
             break;
         case VLC_THUMBNAILER_SEEK_TIME:
-            input_SetTime(input, req->thumb_arg.seek.time, fast_seek);
+            if (req->thumb_arg.seek.time >= VLC_TICK_0)
+                input_SetTime(input, req->thumb_arg.seek.time, fast_seek);
             break;
         case VLC_THUMBNAILER_SEEK_POS:
-            input_SetPosition(input, req->thumb_arg.seek.pos, fast_seek);
+            if (req->thumb_arg.seek.pos > 0)
+            {
+                float pos = req->thumb_arg.seek.pos;
+                if (pos > 1)
+                    pos = 1;
+                input_SetPosition(input, pos, fast_seek);
+            }
             break;
         default:
             vlc_assert_unreachable();
