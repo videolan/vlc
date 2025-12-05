@@ -1,0 +1,469 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later
+/*****************************************************************************
+ * tracks_ids.c: tracks IDs player test
+ *****************************************************************************
+ * Copyright (C) 2018-2025 VLC authors and VideoLAN
+ *****************************************************************************/
+
+#include "common.h"
+#include "timers.h"
+
+static void
+wait_prev_frame_status(struct ctx *ctx, size_t *pidx, size_t count,
+                       int status)
+{
+    size_t idx = *pidx;
+    vec_on_prev_frame_status *vec = &ctx->report.on_prev_frame_status;
+    while (vec->size < idx + count)
+        vlc_player_CondWait(ctx->player, &ctx->wait);
+    for (size_t i = idx; i < idx + count; ++i)
+        assert(vec->data[i] == status);
+    idx += count;
+    *pidx = idx;
+}
+
+static void
+wait_next_frame_status(struct ctx *ctx, size_t *pidx, size_t count,
+                       int status)
+{
+    size_t idx = *pidx;
+    vec_on_next_frame_status *vec = &ctx->report.on_next_frame_status;
+    while (vec->size < idx + count)
+        vlc_player_CondWait(ctx->player, &ctx->wait);
+    for (size_t i = idx; i < idx + count; ++i)
+        assert(vec->data[i] == status);
+    idx += count;
+    *pidx = idx;
+}
+
+static void
+decrease_tc(struct vlc_player_timer_smpte_timecode *tc, unsigned fps)
+{
+    if (tc->frames == 0)
+    {
+        if (tc->seconds > 0)
+        {
+            tc->seconds--;
+            tc->frames = fps - 1;
+        }
+    }
+    else
+        tc->frames--;
+}
+
+static void
+increase_tc(struct vlc_player_timer_smpte_timecode *tc, unsigned fps)
+{
+    tc->frames++;
+    if (tc->frames == fps)
+    {
+        tc->frames = 0;
+        tc->seconds++;
+    }
+}
+
+static void
+wait_type_timer(struct ctx *ctx, struct timer_state *timer, unsigned type,
+                  struct vlc_player_timer_smpte_timecode *tc)
+{
+    vlc_player_t *player = ctx->player;
+
+    /* Seek events come with 2 reports (start/end) */
+    unsigned nb_reports = type == REPORT_TIMER_SEEK ? 2 : 1;
+    player_lock_timer(player, timer);
+    for (;;)
+    {
+        struct report_timer *r = timer_state_wait_next_report(timer);
+        if (r->type == type)
+        {
+            nb_reports--;
+            if (nb_reports == 0)
+            {
+                player_unlock_timer(player, timer);
+                return;
+            }
+        }
+        if (tc != NULL && r->type == REPORT_TIMER_TC)
+            *tc = r->tc;
+
+    }
+    vlc_assert_unreachable();
+}
+
+static void
+check_resumed_timer(struct ctx *ctx, struct timer_state *timer,
+                    struct vlc_player_timer_smpte_timecode *tc)
+{
+    /* Check that the player can be resumed and paused again after
+     * next/prev frame */
+    vlc_player_t *player = ctx->player;
+    assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
+    vlc_player_Resume(player);
+    wait_state(ctx, VLC_PLAYER_STATE_PLAYING);
+
+    /* Wait that a video frame is rendered */
+    struct report_timer *r = NULL;
+    player_lock_timer(player, timer);
+    r = timer_state_wait_next_report(timer);
+    assert(r->type == REPORT_TIMER_TC);
+    *tc = r->tc;
+    player_unlock_timer(player, timer);
+
+    vlc_player_Pause(player);
+
+    wait_state(ctx, VLC_PLAYER_STATE_PAUSED);
+
+    wait_type_timer(ctx, timer, REPORT_TIMER_PAUSED, tc);
+}
+
+static void
+check_seek_timer(struct ctx *ctx, struct timer_state *timer,
+                 struct vlc_player_timer_smpte_timecode *tc)
+{
+    /* Check that the player can be resumed and paused again after
+     * next/prev frame */
+    vlc_player_t *player = ctx->player;
+    assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
+    vlc_player_SetTime(player, ctx->params.length / 2);
+    assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
+
+    /* Wait for the seek */
+    wait_type_timer(ctx, timer, REPORT_TIMER_SEEK, NULL);
+
+    /* Wait that a video frame is rendered */
+    struct report_timer *r = NULL;
+    player_lock_timer(player, timer);
+    r = timer_state_wait_next_report(timer);
+    assert(r->type == REPORT_TIMER_TC);
+    *tc = r->tc;
+    player_unlock_timer(player, timer);
+
+    assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
+}
+
+static unsigned
+get_fps(struct ctx *ctx)
+{
+    return ceil(ctx->params.video_frame_rate /
+                (float) ctx->params.video_frame_rate_base);
+}
+
+static void
+check_next_frame_timer(struct ctx *ctx, struct timer_state *timer,
+                       size_t *next_status_idx,
+                       struct vlc_player_timer_smpte_timecode *tc)
+{
+    /* Check that the player can go next frame after a prev frame */
+    vlc_player_t *player = ctx->player;
+    unsigned fps = get_fps(ctx);
+    assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
+
+    vlc_player_NextVideoFrame(player);
+    wait_next_frame_status(ctx, next_status_idx, 1, 0);
+
+    increase_tc(tc, fps);
+
+    /* Wait that a video frame is rendered */
+    struct report_timer *r = NULL;
+    player_lock_timer(player, timer);
+    r = timer_state_wait_next_report(timer);
+    assert(r->type == REPORT_TIMER_TC);
+    assert(r->tc.seconds == tc->seconds);
+    assert(r->tc.frames == tc->frames);
+    player_unlock_timer(player, timer);
+}
+
+static size_t
+get_frame_count_to_start(const struct vlc_player_timer_smpte_timecode *tc,
+                         unsigned fps)
+{
+    return tc->frames + VLC_TICK_FROM_SEC(tc->seconds)
+        / vlc_tick_rate_duration(fps);
+}
+
+static void
+go_start(struct ctx *ctx, struct timer_state *timer,
+         size_t *prev_status_idx, size_t *next_status_idx,
+         struct vlc_player_timer_smpte_timecode *tc, bool extra_checks)
+{
+    vlc_player_t *player = ctx->player;
+    struct report_timer *r = NULL;
+    unsigned fps = get_fps(ctx);
+    size_t frame_prev_count_total = get_frame_count_to_start(tc, fps);
+    unsigned burst = frame_prev_count_total > 4 ? frame_prev_count_total / 4
+                   : frame_prev_count_total;
+    if (burst > 100)
+        burst = 100;
+
+    bool check_resume, check_seek, check_next;
+    check_resume = check_seek = check_next = extra_checks;
+
+    decrease_tc(tc, fps);
+    /* Send prev-frame requests in burst until we reach start of file */
+    while (frame_prev_count_total > 0)
+    {
+        size_t frame_prev_count = frame_prev_count_total > burst ? burst
+                                : frame_prev_count_total;
+        frame_prev_count_total -= frame_prev_count;
+
+        /* Send burst */
+        for (size_t i = 0; i < frame_prev_count; ++i)
+            vlc_player_PreviousVideoFrame(player);
+
+        /* Wait for all prev-frame status */
+        wait_prev_frame_status(ctx, prev_status_idx, frame_prev_count, 0);
+
+        /* Check that all video timecodes are decreasing */
+        player_lock_timer(player, timer);
+        for (size_t i = 0; i < frame_prev_count; ++i)
+        {
+            r = timer_state_wait_next_report(timer);
+            assert(r->type == REPORT_TIMER_TC);
+            assert(r->tc.seconds == tc->seconds);
+            assert(r->tc.frames == tc->frames);
+
+            decrease_tc(tc, fps);
+        }
+        player_unlock_timer(player, timer);
+
+        /* extra checks */
+        if (check_seek)
+        {
+            /* Check seek is not broken after prev-frame */
+            check_seek_timer(ctx, timer, tc);
+            check_seek = false;
+            /* And continue prev-frame */
+            frame_prev_count_total = get_frame_count_to_start(tc, fps);
+            decrease_tc(tc, fps);
+        }
+        else if (check_resume)
+        {
+            /* Check resume is not broken after prev-frame */
+            check_resumed_timer(ctx, timer, tc);
+            check_resume = false;
+            /* And continue prev-frame */
+            frame_prev_count_total = get_frame_count_to_start(tc, fps);
+            decrease_tc(tc, fps);
+        }
+        else if (check_next)
+        {
+            /* Check next-frame is not broken after prev-frame*/
+            /* Cancel last decrease_tc() from for loop */
+            increase_tc(tc, fps);
+            check_next_frame_timer(ctx, timer, next_status_idx, tc);
+            check_next = false;
+            frame_prev_count_total = get_frame_count_to_start(tc, fps);
+            decrease_tc(tc, fps);
+        }
+    }
+    assert(!check_resume);
+    assert(!check_seek);
+    assert(!check_next);
+
+    assert(tc->seconds == 0);
+    assert(tc->frames == 0);
+
+    /* Ensure start of File is handled */
+    vlc_player_PreviousVideoFrame(player);
+    wait_prev_frame_status(ctx, prev_status_idx, 1, -EAGAIN);
+}
+
+static void
+test_prev(struct ctx *ctx, const struct media_params *params)
+{
+    test_log("prev-frame (fps: %u/%u pts-delay: %"PRId64")\n",
+             params->video_frame_rate, params->video_frame_rate_base,
+             params->pts_delay);
+    vlc_player_t *player = ctx->player;
+    size_t prev_status_idx = 0;
+    size_t next_status_idx = 0;
+
+    player_set_current_mock_media(ctx, "media1", params, false);
+
+    struct timer_state smpte_timer, *timer = &smpte_timer;
+    player_add_timer(player, timer, true, VLC_TICK_INVALID);
+
+    player_start(ctx);
+
+    /* Wait for a vout */
+    {
+        vec_on_vout_changed *vec = &ctx->report.on_vout_changed;
+        while (vec->size == 0)
+            vlc_player_CondWait(ctx->player, &ctx->wait);
+        assert(vec->data[0].action == VLC_PLAYER_VOUT_STARTED);
+    }
+
+    /* Wait for a first frame */
+    struct vlc_player_timer_smpte_timecode tc;
+    struct report_timer *r = NULL;
+    player_lock_timer(player, timer);
+    r = timer_state_wait_next_report(timer);
+    assert(r->type == REPORT_TIMER_TC);
+    tc = r->tc;
+    player_unlock_timer(player, timer);
+
+    vlc_player_SetTime(player, params->length / 2);
+
+    /* Wait for a first frame */
+    wait_type_timer(ctx, timer, REPORT_TIMER_SEEK, NULL);
+
+    /* Wait for a first fram after seek */
+    player_lock_timer(player, timer);
+    r = timer_state_wait_next_report(timer);
+    assert(r->type == REPORT_TIMER_TC);
+    tc = r->tc;
+    player_unlock_timer(player, timer);
+
+    vlc_player_PreviousVideoFrame(player);
+
+    /* First request is pausing the video */
+    wait_prev_frame_status(ctx, &prev_status_idx, 1, -EAGAIN);
+    assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
+
+    /* Also wait the timer is paused */
+    wait_type_timer(ctx, timer, REPORT_TIMER_PAUSED, &tc);
+
+    go_start(ctx, timer, &prev_status_idx, &next_status_idx, &tc, true);
+
+    /* Check start of file a second time */
+    vlc_player_PreviousVideoFrame(player);
+    wait_prev_frame_status(ctx, &prev_status_idx, 1, -EAGAIN);
+
+    /* Check playback can be resumed */
+    check_resumed_timer(ctx, timer, &tc);
+
+    /* Go back to start */
+    go_start(ctx, timer, &prev_status_idx, &next_status_idx, &tc, false);
+
+    /* Check we can seek again */
+    check_seek_timer(ctx, timer, &tc);
+
+    /* Go back to start */
+    go_start(ctx, timer, &prev_status_idx, &next_status_idx, &tc, false);
+
+    /* XXX check next-frame UNTIL EOF (currently NextFrame burst is not working) */
+
+    test_end(ctx);
+    player_remove_timer(player, timer);
+}
+
+static void
+test_fail(struct ctx *ctx, const struct media_params *params, int error)
+{
+    test_log("prev-frame fail (can_seek: %d can_pause: %d)\n",
+             params->can_seek, params->can_pause);
+
+    vlc_player_t *player = ctx->player;
+    size_t prev_status_idx = 0;
+
+    player_set_current_mock_media(ctx, "media1", params, false);
+
+    struct timer_state smpte_timer, *timer = &smpte_timer;
+    player_add_timer(player, timer, true, VLC_TICK_INVALID);
+
+    player_start(ctx);
+
+    {
+        vec_on_vout_changed *vec = &ctx->report.on_vout_changed;
+        while (vec->size == 0)
+            vlc_player_CondWait(ctx->player, &ctx->wait);
+        assert(vec->data[0].action == VLC_PLAYER_VOUT_STARTED);
+    }
+
+    struct report_timer *r = NULL;
+    player_lock_timer(player, timer);
+    r = timer_state_wait_next_report(timer);
+    assert(r->type == REPORT_TIMER_TC);
+    player_unlock_timer(player, timer);
+
+    vlc_player_PreviousVideoFrame(player);
+
+    wait_prev_frame_status(ctx, &prev_status_idx, 1, error);
+
+    test_end(ctx);
+    player_remove_timer(player, timer);
+}
+
+static void
+test_vout_fail(struct ctx *ctx, const struct media_params *params)
+{
+    test_log("prev-frame fail (no vout)\n");
+
+    vlc_player_t *player = ctx->player;
+    size_t prev_status_idx = 0;
+
+    player_set_current_mock_media(ctx, "media1", params, false);
+
+    struct timer_state timer;
+    player_add_timer(player, &timer, false, VLC_TICK_INVALID);
+
+    player_start(ctx);
+
+    struct report_timer *r = NULL;
+    player_lock_timer(player, &timer);
+    r = timer_state_wait_next_report(&timer);
+    assert(r->type == REPORT_TIMER_POINT);
+    player_unlock_timer(player, &timer);
+
+    vlc_player_PreviousVideoFrame(player);
+    wait_prev_frame_status(ctx, &prev_status_idx, 1, -EAGAIN);
+
+    vlc_player_PreviousVideoFrame(player);
+    wait_prev_frame_status(ctx, &prev_status_idx, 1, -EBUSY);
+
+    test_end(ctx);
+    player_remove_timer(player, &timer);
+}
+
+int
+main(void)
+{
+    struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(5));
+    params.track_count[VIDEO_ES] = 1;
+    params.track_count[AUDIO_ES] = 1;
+    params.track_count[SPU_ES] = 1;
+    params.video_frame_rate_base = 1;
+
+    struct ctx ctx;
+    ctx_init(&ctx, 0);
+
+    /* 25 fps + pts-delay lower than frame duration */
+    params.pts_delay = VLC_TICK_FROM_MS(20);
+    params.video_frame_rate = 25;
+    test_prev(&ctx, &params);
+    params.pts_delay = DEFAULT_PTS_DELAY;
+
+    /* 29.97fps: Playing less than a minute so no drop frames */
+    params.video_frame_rate = 30000;
+    params.video_frame_rate_base = 1001;
+    test_prev(&ctx, &params);
+    params.video_frame_rate_base = 1;
+
+    /* 60 fps */
+    params.video_frame_rate = 60;
+    test_prev(&ctx, &params);
+
+    /* 1 fps */
+    params.length = VLC_TICK_FROM_SEC(20);
+    params.video_frame_rate = 1;
+    test_prev(&ctx, &params);
+
+    /* Fail because can't seek */
+    params.can_seek = false;
+    test_fail(&ctx, &params, -ENOTSUP);
+    params.can_seek = true;
+
+    /* Fail because can't pause */
+    params.can_pause = false;
+    test_fail(&ctx, &params, -ENOTSUP);
+    params.can_pause = true;
+
+    ctx_destroy(&ctx);
+
+    /* Fail because no vout */
+    ctx_init(&ctx, DISABLE_VIDEO_OUTPUT);
+    test_vout_fail(&ctx, &params);
+    ctx_destroy(&ctx);
+
+    return 0;
+}

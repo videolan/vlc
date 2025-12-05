@@ -217,6 +217,17 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_player_next_prev',
+    'sources' : files(
+        'player/common.h',
+        'player/modules.c',
+        'player/next_prev.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
     'name' : 'test_src_player_outputs',
     'sources' : files(
         'player/common.h',
