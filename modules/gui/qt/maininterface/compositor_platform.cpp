@@ -189,6 +189,33 @@ bool CompositorPlatform::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
+void CompositorPlatform::commitSurface()
+{
+    if (!m_videoWindow)
+        return;
+
+    if (m_pendingPosition && m_pendingSize)
+    {
+        m_videoWindow->setGeometry(m_pendingPosition->x(), m_pendingPosition->y(),
+                                   m_pendingSize->width(), m_pendingSize->height());
+        m_pendingPosition.reset();
+        m_pendingSize.reset();
+    }
+    else
+    {
+        if (m_pendingSize)
+        {
+            m_videoWindow->resize(*m_pendingSize);
+            m_pendingSize.reset();
+        }
+        else if (m_pendingPosition)
+        {
+            m_videoWindow->setPosition(*m_pendingPosition);
+            m_pendingPosition.reset();
+        }
+    }
+}
+
 int CompositorPlatform::windowEnable(const vlc_window_cfg_t *)
 {
     commonWindowEnable();
@@ -203,11 +230,11 @@ void CompositorPlatform::windowDisable()
 void CompositorPlatform::onSurfacePositionChanged(const QPointF &position)
 {
     const QPointF point = position / m_videoWindow->devicePixelRatio();
-    m_videoWindow->setPosition({static_cast<int>(point.x()), static_cast<int>(point.y())});
+    m_pendingPosition = QPoint{static_cast<int>(point.x()), static_cast<int>(point.y())};
 }
 
 void CompositorPlatform::onSurfaceSizeChanged(const QSizeF &size)
 {
     const QSizeF area = (size / m_videoWindow->devicePixelRatio());
-    m_videoWindow->resize({static_cast<int>(std::ceil(area.width())), static_cast<int>(std::ceil(area.height()))});
+    m_pendingSize = QSize{static_cast<int>(std::ceil(area.width())), static_cast<int>(std::ceil(area.height()))};
 }
