@@ -129,6 +129,29 @@
     [self.trailingTimeField setAlignment: NSCenterTextAlignment];
 
     [self.thumbnailTrackingView setViewToHide:_openMainVideoViewButtonOverlay];
+
+    if (@available(macOS 10.14, *)) {
+        [NSApplication.sharedApplication addObserver:self
+                                        forKeyPath:@"effectiveAppearance"
+                                            options:NSKeyValueObservingOptionNew
+                                            context:nil];
+    }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
+                       context:(void *)context
+{
+    if (@available(macOS 26.0, *)) {
+        return;
+    } else if (@available(macOS 10.14, *)) {
+        NSAppearance * const appearance = change[NSKeyValueChangeNewKey];
+        const BOOL isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || 
+                            [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+        self.visualEffectView.layer.borderColor = isDark ?
+            NSColor.VLCDarkSubtleBorderColor.CGColor : NSColor.VLCLightSubtleBorderColor.CGColor;
+    }
 }
 
 #pragma mark -
