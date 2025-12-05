@@ -152,6 +152,31 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
         self.backgroundView.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
         self.backgroundView.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
         self.backgroundView.layer.masksToBounds = YES;
+
+        if (@available(macOS 10.14, *)) {
+            [NSApplication.sharedApplication addObserver:self
+                                            forKeyPath:@"effectiveAppearance"
+                                                options:NSKeyValueObservingOptionNew
+                                                context:nil];
+        }
+    }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
+                       context:(void *)context
+{
+    if (@available(macOS 26.0, *)) {
+        return;
+    } else if ([keyPath isEqualToString:@"effectiveAppearance"]) {
+        if (@available(macOS 10.14, *))  {
+            NSAppearance * const appearance = change[NSKeyValueChangeNewKey];
+            const BOOL isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] ||
+                                [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+            self.backgroundView.layer.borderColor = isDark ?
+                NSColor.VLCDarkSubtleBorderColor.CGColor : NSColor.VLCLightSubtleBorderColor.CGColor;
+        }
     }
 }
 
