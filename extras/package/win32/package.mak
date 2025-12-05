@@ -135,6 +135,7 @@ endif
 package-win32-src: package-win-strip
 if HAVE_MAKENSIS
 # Script installer
+	mkdir -p "$(win32_destdir)/NSIS/"
 	cp    $(top_builddir)/extras/package/win32/NSIS/vlc.win32.nsi "$(win32_destdir)/"
 	cp    $(top_builddir)/extras/package/win32/NSIS/spad.nsi      "$(win32_destdir)/"
 	cp -r $(srcdir)/extras/package/win32/NSIS/languages           "$(win32_destdir)/"
