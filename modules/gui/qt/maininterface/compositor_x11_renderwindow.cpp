@@ -520,16 +520,17 @@ void CompositorX11RenderWindow::hideEvent(QHideEvent* event)
     emit visiblityChanged(false);
 }
 
-void CompositorX11RenderWindow::setVideoPosition(const QPoint& position)
+void CompositorX11RenderWindow::setVideoPosition(const QPoint& position, bool signalChange)
 {
     if (m_videoWindow && m_videoClient)
     {
         m_videoPosition.moveTopLeft(position);
-        emit videoPositionChanged(m_videoPosition);
+        if (signalChange)
+            emit videoPositionChanged(m_videoPosition);
     }
 }
 
-void CompositorX11RenderWindow::setVideoSize(const QSize& size)
+void CompositorX11RenderWindow::setVideoSize(const QSize& size, bool signalChange)
 {
     if (m_videoWindow && m_videoClient)
     {
@@ -542,7 +543,25 @@ void CompositorX11RenderWindow::setVideoSize(const QSize& size)
             m_videoClient->getPicture();
         }
         m_videoPosition.setSize(size * devicePixelRatio());
-        emit videoPositionChanged(m_videoPosition);
+        if (signalChange)
+            emit videoPositionChanged(m_videoPosition);
+    }
+}
+
+void CompositorX11RenderWindow::setVideoGeometry(const std::optional<QPoint> &position,
+                                                 const std::optional<QSize> &size)
+{
+    if (position && size)
+    {
+        setVideoSize(*size, false);
+        setVideoPosition(*position, true);
+    }
+    else
+    {
+        if (size)
+            setVideoSize(*size);
+        else if (position)
+            setVideoPosition(*position);
     }
 }
 

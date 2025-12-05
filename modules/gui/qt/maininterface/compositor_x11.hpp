@@ -55,6 +55,10 @@ public:
 
     QQuickItem * activeFocusItem() const override;
 
+protected:
+    bool canDoCombinedSurfaceUpdates() const override { return true; };
+    void commitSurface() override;
+
 private:
     int windowEnable(const vlc_window_cfg_t *)  override;
     void windowDisable() override;
@@ -69,6 +73,9 @@ private:
     std::unique_ptr<QWidget> m_videoWidget;
     std::unique_ptr<CompositorX11UISurface> m_qmlView;
     std::unique_ptr<CompositorX11RenderWindow> m_renderWindow;
+
+    std::optional<QSize> m_pendingSize;
+    std::optional<QPoint> m_pendingPosition;
 };
 
 class DummyNativeWidget : public QWidget

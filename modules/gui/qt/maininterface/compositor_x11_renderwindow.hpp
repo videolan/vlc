@@ -163,8 +163,10 @@ public:
     bool startRendering();
     void stopRendering();
 
-    void setVideoPosition(const QPoint& position);
-    void setVideoSize(const QSize& size);
+    void setVideoPosition(const QPoint& position, bool signalChange = true);
+    void setVideoSize(const QSize& size, bool signalChange = true);
+    void setVideoGeometry(const std::optional<QPoint>& position,
+                          const std::optional<QSize>& size);
 
     inline bool hasAcrylic() const { return m_hasAcrylic; }
     void setAcrylic(bool value);
