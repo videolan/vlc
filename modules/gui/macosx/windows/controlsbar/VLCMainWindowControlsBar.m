@@ -81,6 +81,8 @@
         self.visualEffectView.wantsLayer = YES;
         self.visualEffectView.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
         self.visualEffectView.layer.masksToBounds = YES;
+        self.visualEffectView.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
+        self.visualEffectView.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
     }
 
     _playQueueController = VLCMain.sharedInstance.playQueueController;
