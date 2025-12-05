@@ -277,7 +277,9 @@ FocusScope {
                 // background image
                 Rectangle {
                     focus: false
-                    color: bgtheme.bg.primary
+                    // NOTE: Rectangle has an optimization that it does not use a scene graph node if the color is transparent.
+                    color: blurredBackground.available ? "transparent" // background coloring in blur effect is used otherwise
+                                                       : bgtheme.bg.primary
                     anchors.fill: parent
 
                     readonly property ColorContext colorContext: ColorContext {
@@ -304,6 +306,7 @@ FocusScope {
                         postprocess: true
                         tint: bgtheme.palette.isDark ? "black" : "white"
                         tintStrength: 0.5
+                        backgroundColor: bgtheme.bg.primary
 
                         // The window naturally clips the content, but having this saves some
                         // video memory, depending on the excess content in the last layer:
