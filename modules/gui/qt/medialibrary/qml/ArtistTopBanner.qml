@@ -74,66 +74,61 @@ FocusScope {
         opacity: blurEffect.visible ? 1.0 : 0.5
     }
 
-    Item {
-        anchors.fill: background
+    Widgets.DualKawaseBlur {
+        id: blurEffect
 
-        visible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) && (root.artist.id) // do not display the effect during initialization
+        anchors.verticalCenter: background.verticalCenter
+        anchors.left: background.left
+        anchors.right: background.right
 
-        // This blur effect does not create an implicit layer that is updated
-        // each time the size changes. The source texture is static, so the blur
-        // is applied only once and we adjust the viewport through the parent item
-        // with clipping.
-        Widgets.DualKawaseBlur {
-            id: blurEffect
+        visible: (available) && (root.artist.id) // do not display the effect during initialization
 
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.right: parent.right
+        // NOTE: No need to disable `live`, as this uses two pass mode so there is no video memory saving benefit.
 
-            // NOTE: No need to disable `live`, as this uses two pass mode so there is no video memory saving benefit.
+        readonly property bool sourceNeedsTiling: (background.fillMode === Image.Tile)
 
-            readonly property bool sourceNeedsTiling: (background.fillMode === Image.Tile)
+        readonly property real aspectRatio: (background.implicitHeight / background.implicitWidth)
 
-            readonly property real aspectRatio: (background.implicitHeight / background.implicitWidth)
+        height: sourceNeedsTiling ? background.height : (aspectRatio * width)
 
-            height: sourceNeedsTiling ? background.height : (aspectRatio * width)
+        source: textureProviderItem
 
-            source: textureProviderItem
+        // Instead of clipping in the parent, denote the viewport here so we both
+        // do not need to clip the excess, and also save significant video memory:
+        viewportRect: !blurEffect.sourceNeedsLayering ? Qt.rect((width - background.width) / 2,
+                                                                (height - background.height) / 2,
+                                                                background.width,
+                                                                background.height)
+                                                      : Qt.rect(0, 0, 0, 0)
 
-            // Instead of clipping in the parent, denote the viewport here so we both
-            // do not need to clip the excess, and also save significant video memory:
-            viewportRect: !blurEffect.sourceNeedsLayering ? Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
-                                                          : Qt.rect(0, 0, 0, 0)
+        backgroundColor: theme.bg.primary
+        postprocess: sourceTextureProviderObserver.hasAlphaChannel
 
-            backgroundColor: theme.bg.primary
-            postprocess: sourceTextureProviderObserver.hasAlphaChannel
+        Widgets.TextureProviderItem {
+            id: textureProviderItem
 
-            Widgets.TextureProviderItem {
-                id: textureProviderItem
+            // Like in `Player.qml`, this is used because when the source is
+            // mipmapped, sometimes it can not be sampled. This is considered
+            // a Qt bug, but `QSGTextureView` has a workaround for that. So,
+            // we can have an indirection here through `TextureProviderItem`.
+            // This is totally acceptable as there is virtually no overhead.
 
-                // Like in `Player.qml`, this is used because when the source is
-                // mipmapped, sometimes it can not be sampled. This is considered
-                // a Qt bug, but `QSGTextureView` has a workaround for that. So,
-                // we can have an indirection here through `TextureProviderItem`.
-                // This is totally acceptable as there is virtually no overhead.
+            source: background
 
-                source: background
+            detachAtlasTextures: blurEffect.sourceNeedsTiling
 
-                detachAtlasTextures: blurEffect.sourceNeedsTiling
+            horizontalWrapMode: blurEffect.sourceNeedsTiling ? Widgets.TextureProviderItem.Repeat : Widgets.TextureProviderItem.ClampToEdge
+            verticalWrapMode: blurEffect.sourceNeedsTiling ? Widgets.TextureProviderItem.Repeat : Widgets.TextureProviderItem.ClampToEdge
 
-                horizontalWrapMode: blurEffect.sourceNeedsTiling ? Widgets.TextureProviderItem.Repeat : Widgets.TextureProviderItem.ClampToEdge
-                verticalWrapMode: blurEffect.sourceNeedsTiling ? Widgets.TextureProviderItem.Repeat : Widgets.TextureProviderItem.ClampToEdge
-
-                textureSubRect: blurEffect.sourceNeedsTiling ? Qt.rect(blurEffect.width / 8,
-                                                                       blurEffect.height / 8,
-                                                                       blurEffect.width * 1.25,
-                                                                       blurEffect.height * 1.25) : undefined
-            }
-
-            // Strong blurring is not wanted here:
-            mode: Widgets.DualKawaseBlur.Mode.TwoPass
-            radius: 1
+            textureSubRect: blurEffect.sourceNeedsTiling ? Qt.rect(blurEffect.width / 8,
+                                                                   blurEffect.height / 8,
+                                                                   blurEffect.width * 1.25,
+                                                                   blurEffect.height * 1.25) : undefined
         }
+
+        // Strong blurring is not wanted here:
+        mode: Widgets.DualKawaseBlur.Mode.TwoPass
+        radius: 1
     }
 
     Rectangle {
