@@ -440,7 +440,7 @@ vlc_player_UpdateTimerSmpteSource(vlc_player_t *player, vlc_es_id_t *es_source,
                                            frame_rate_base);
         }
 
-        if (point->ts != player->timer.last_ts && source->smpte.frame_rate != 0)
+        if (source->smpte.frame_rate != 0)
         {
             vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
                                          system_date);
