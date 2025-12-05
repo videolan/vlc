@@ -63,6 +63,9 @@ public:
 protected:
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
+    bool canDoCombinedSurfaceUpdates() const override { return true; };
+    void commitSurface() override;
+
 private:
     int windowEnable(const vlc_window_cfg_t *) override;
     void windowDisable() override;
@@ -81,6 +84,8 @@ private:
     HWND m_qmlWindowHWND = nullptr;
     HWND m_videoWindowHWND = nullptr;
 
+    std::optional<QSize> m_pendingSize;
+    std::optional<QPoint> m_pendingPosition;
 };
 
 }

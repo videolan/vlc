@@ -208,6 +208,33 @@ bool CompositorWin7::eventFilter(QObject*, QEvent* ev)
     return false;
 }
 
+void CompositorWin7::commitSurface()
+{
+    if (!m_stable)
+        return;
+
+    if (m_pendingPosition && m_pendingSize)
+    {
+        m_stable->setGeometry(m_pendingPosition->x(), m_pendingPosition->y(),
+                              m_pendingSize->width(), m_pendingSize->height());
+        m_pendingPosition.reset();
+        m_pendingSize.reset();
+    }
+    else
+    {
+        if (m_pendingSize)
+        {
+            m_stable->resize(*m_pendingSize);
+            m_pendingSize.reset();
+        }
+        else if (m_pendingPosition)
+        {
+            m_stable->move(*m_pendingPosition);
+            m_pendingPosition.reset();
+        }
+    }
+}
+
 void CompositorWin7::resetVideoZOrder()
 {
     //Place the video wdiget right behind the interface
@@ -230,13 +257,13 @@ void CompositorWin7::resetVideoZOrder()
 void CompositorWin7::onSurfacePositionChanged(const QPointF& position)
 {
     const QPointF point = position / m_stable->window()->devicePixelRatioF();
-    m_stable->move({static_cast<int>(point.x()), static_cast<int>(point.y())});
+    m_pendingPosition = QPoint{static_cast<int>(point.x()), static_cast<int>(point.y())};
 }
 
 void CompositorWin7::onSurfaceSizeChanged(const QSizeF& size)
 {
     const QSizeF area = (size / m_stable->window()->devicePixelRatioF());
-    m_stable->resize({static_cast<int>(std::ceil(area.width())), static_cast<int>(std::ceil(area.height()))});
+    m_pendingSize = QSize{static_cast<int>(std::ceil(area.width())), static_cast<int>(std::ceil(area.height()))};
 }
 
 
