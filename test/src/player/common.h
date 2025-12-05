@@ -138,6 +138,8 @@ struct report_media_attachments
     X(input_item_t *, on_media_epg_changed) \
     X(struct report_media_subitems, on_media_subitems_changed) \
     X(struct report_media_attachments, on_media_attachments_added) \
+    X(int, on_next_frame_status) \
+    X(int, on_prev_frame_status)
 
 struct report_aout_first_pts
 {
@@ -587,6 +589,20 @@ player_on_media_attachments_added(vlc_player_t *player,
     for (size_t i = 0; i < count; ++i)
         report.array[i] = vlc_input_attachment_Hold(array[i]);
     VEC_PUSH(on_media_attachments_added, report);
+}
+
+static inline void
+player_on_next_frame_status(vlc_player_t *player, int status, void *data)
+{
+    struct ctx *ctx = get_ctx(player, data);
+    VEC_PUSH(on_next_frame_status, status);
+}
+
+static inline void
+player_on_prev_frame_status(vlc_player_t *player, int status, void *data)
+{
+    struct ctx *ctx = get_ctx(player, data);
+    VEC_PUSH(on_prev_frame_status, status);
 }
 
 #define VEC_LAST(vec) (vec)->data[(vec)->size - 1]
