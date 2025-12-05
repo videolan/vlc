@@ -34,6 +34,8 @@ Item {
     implicitWidth: source ? Math.min(source.paintedWidth ?? Number.MAX_VALUE, source.width) : 0
     implicitHeight: source ? Math.min(source.paintedHeight ?? Number.MAX_VALUE, source.height) : 0
 
+    readonly property bool available: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+
     enum Mode {
         FourPass, // 2 downsample + 2 upsamples (3 layers/buffers)
         TwoPass // 1 downsample + 1 upsample (1 layer/buffer)
@@ -130,7 +132,7 @@ Item {
         if (live)
             return // no-op
 
-        if (root.GraphicsInfo.shaderType !== GraphicsInfo.RhiShader)
+        if (!root.available)
             return // not applicable
 
         if (!root.sourceTextureIsValid) {
