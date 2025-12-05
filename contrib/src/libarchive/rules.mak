@@ -45,6 +45,7 @@ libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-zstd-use-GetNativeSystemInfo-to-get-the-number-of-th.patch
 	$(APPLY) $(SRC)/libarchive/0001-cmake-add-uuid-library-when-using-xmllite.patch
+	$(APPLY) $(SRC)/libarchive/38ac49553d430f1b28c7624e5e9788125fdad187.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 

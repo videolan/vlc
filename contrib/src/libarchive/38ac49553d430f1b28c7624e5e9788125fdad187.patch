@@ -1,0 +1,38 @@
+From 38ac49553d430f1b28c7624e5e9788125fdad187 Mon Sep 17 00:00:00 2001
+From: Tobias Stoeckmann <tobias@stoeckmann.org>
+Date: Fri, 23 May 2025 18:59:05 +0200
+Subject: [PATCH] Fix archive_wincrypt_version compilation
+
+Cast address of "version" to BYTE pointer for CryptGetProvParam.
+Fix "major" variable assignment for picky compilers like MSVC.
+
+The "length" variable is an in/out variable. It must be set to the size
+of available memory within "version". Right now it is undefined behavior
+and 0 would crash during runtime.
+
+Fixes https://github.com/libarchive/libarchive/issues/2628
+
+Signed-off-by: Tobias Stoeckmann <tobias@stoeckmann.org>
+---
+ libarchive/archive_version_details.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libarchive/archive_version_details.c b/libarchive/archive_version_details.c
+index 186e53e50..0bd566473 100644
+--- a/libarchive/archive_version_details.c
++++ b/libarchive/archive_version_details.c
+@@ -439,11 +439,11 @@ archive_wincrypt_version(void)
+ 		if (!CryptAcquireContext(&prov, NULL, NULL, PROV_RSA_FULL, CRYPT_NEWKEYSET))
+ 			return NULL;
+ 	}
+-	DWORD length, version;
+-	if (!CryptGetProvParam(prov, PP_VERSION, &version, &length, 0)) {
++	DWORD version, length = sizeof(version);
++	if (!CryptGetProvParam(prov, PP_VERSION, (BYTE *)&version, &length, 0)) {
+ 		return NULL;
+ 	} else {
+-		char major = version >> 8;
++		char major = (version >> 8) & 0xFF;
+ 		char minor = version & 0xFF;
+ 		static char wincrypt_version[6];
+ 		snprintf(wincrypt_version, 6, "%hhd.%hhd", major, minor);
