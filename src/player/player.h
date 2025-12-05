@@ -194,6 +194,7 @@ struct vlc_player_timer_source
     struct vlc_list listeners; /* list of struct vlc_player_timer_id */
     vlc_es_id_t *es; /* weak reference */
     struct vlc_player_timer_point point;
+    bool seeking;
     union
     {
         struct {
@@ -231,7 +232,6 @@ struct vlc_player_timer
     double seek_position;
     bool paused;
     bool stopping;
-    bool seeking;
 
     struct vlc_player_timer_source sources[VLC_PLAYER_TIMER_TYPE_COUNT];
 #define best_source sources[VLC_PLAYER_TIMER_TYPE_BEST]

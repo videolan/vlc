@@ -3525,7 +3525,7 @@ struct vlc_player_timer_smpte_cbs
 {
     /**
      * Called when a new frame is displayed
-
+     *
      * @warning The player is not locked from this callback. It is forbidden
      * to call any player functions from here.
      *
@@ -3542,6 +3542,24 @@ struct vlc_player_timer_smpte_cbs
      * @see vlc_player_timer_cbs.on_paused
      */
     void (*on_paused)(vlc_tick_t system_date, void *data);
+
+    /**
+     * Called when the player is seeking or finished seeking (can be NULL).
+     *
+     * @warning The player is not locked from this callback. It is forbidden
+     * to call any player functions from here.
+     *
+     * @warning the value is parameter is a timestamp point and not a timecode,
+     * as this is an approximation.
+     *
+     * @note on_update() can be called when seeking. It corresponds to tracks
+     * updating their points prior to receiving the asynchronous seek event.
+     * The user could discard them manually.
+     *
+     * @param value point of the seek request or NULL when seeking is finished
+     * @param data opaque pointer set by vlc_player_AddTimer()
+     */
+    void (*on_seek)(const struct vlc_player_timer_point *value, void *data);
 };
 
 /**
