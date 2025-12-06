@@ -694,6 +694,7 @@ qml_modules += {
        'player/qml/MinimalView.qml',
        'player/qml/ResumeDialog.qml',
        'player/qml/SliderBar.qml',
+       'player/qml/SubtitleDragOverlay.qml',
        'player/qml/TopBar.qml',
        'player/qml/TracksMenu.qml',
        'player/qml/TracksPage.qml',
