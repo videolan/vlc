@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.22-rc1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-09-17 13:40+0200\n"
+"POT-Creation-Date: 2025-12-08 07:33+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Maithili (https://app.transifex.com/yaron/teams/16553/mai/)\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: include/vlc_common.h:1053
+#: include/vlc_common.h:1055
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -74,7 +74,7 @@ msgstr "VLC क नियंत्रण अंतरफलक क लेल स
 msgid "Hotkeys settings"
 msgstr "हाटकी सेटिंग्स"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3160 src/libvlc-module.c:1492
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3174 src/libvlc-module.c:1492
 #: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCOutput.m:92
@@ -82,7 +82,7 @@ msgstr "हाटकी सेटिंग्स"
 #: modules/gui/macosx/VLCSimplePrefsController.m:243
 #: modules/gui/qt/components/info_panels.cpp:572
 #: modules/gui/qt/components/simple_preferences.cpp:250
-#: modules/gui/qt/qt.cpp:216 modules/services_discovery/mediadirs.c:77
+#: modules/gui/qt/qt.cpp:217 modules/services_discovery/mediadirs.c:77
 #: modules/stream_out/es.c:94 modules/stream_out/transcode/transcode.c:182
 #: share/lua/http/dialogs/create_stream.html:150
 #: modules/gui/qt/ui/profiles.h:719 modules/gui/qt/ui/profiles.h:750
@@ -138,7 +138,7 @@ msgstr "प्रकीर्ण"
 msgid "Miscellaneous audio settings and modules."
 msgstr "प्रकीर्ण आडियो सेटिंग्स आओर माड्यूल।"
 
-#: include/vlc_config_cat.h:73 src/input/es_out.c:3204 src/libvlc-module.c:142
+#: include/vlc_config_cat.h:73 src/input/es_out.c:3246 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
 #: modules/gui/macosx/VLCMainMenu.m:427 modules/gui/macosx/VLCOutput.m:82
@@ -147,7 +147,7 @@ msgstr "प्रकीर्ण आडियो सेटिंग्स आओ
 #: modules/gui/macosx/VLCSimplePrefsController.m:388
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:252
-#: modules/gui/qt/qt.cpp:216 modules/services_discovery/mediadirs.c:70
+#: modules/gui/qt/qt.cpp:217 modules/services_discovery/mediadirs.c:70
 #: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:720 modules/gui/qt/ui/profiles.h:724
@@ -565,21 +565,21 @@ msgid ""
 "charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
 "h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
 "href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
-"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
-"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
-"player</em></a>.</p><p>You will find some information on how to use the "
-"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
-"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
-"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
-"streaming tasks, you should find useful information in the <a href=\"http://"
-"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
-"a>.</p><p>If you are unsure about terminology, please consult the <a "
-"href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
+"newcomer to VLC media player, please read the<br><a href=\"http://"
+"wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC "
+"media player</em></a>.</p><p>You will find some information on how to use "
+"the player in the <br>\"<a href=\"http://wiki.videolan.org/"
+"Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></"
+"a>\" document.</p><p>For all the saving, converting, transcoding, encoding, "
+"muxing and streaming tasks, you should find useful information in the <a "
+"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
+"Documentation</a>.</p><p>If you are unsure about terminology, please consult "
+"the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</"
 "p><p>To understand the main keyboard shortcuts, read the <a href=\"http://"
 "wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before "
-"asking any question, please refer yourself to the <a href=\"http://www."
-"videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and give) "
-"help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
+"asking any question, please refer yourself to the <a href=\"http://"
+"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>You might then get (and "
+"give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a "
 "href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC "
 "channel (<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the "
 "project</h3><p>You can help the VideoLAN project giving some of your time to "
@@ -591,24 +591,25 @@ msgstr ""
 "charset=utf-8\" /></head><body><h2>VLC मीडिया प्लेयर सहायता मे अहाँक स्वागत अछि</"
 "h2><h3>दस्ताबेज</h3><p>अहाँ VLC दस्तावेदज देख सकैत अछि VideoLAN केर<a href=\"http://"
 "wiki.videolan.org\">wiki</a> वेबसाइट पर.</p><p>जँ अहाँ VLC मीडिया प्लेयर पर "
-"नवागंतुक अछि तँ , कृप्या  पढें<br><a href=\"http://wiki.videolan.org/Documentation:"
-"VLC_for_dummies\"><em>VLC मीडिया प्लेयर क परिचय</em></a>.</p><p>अहाँ पाएँगे जे VLC "
-"मीडिया प्लेयर क उपयोग कओन प्रकार करू<br>\"<a href=\"http://wiki.videolan.org/"
-"Documentation:Play_HowTo\"><em>VLC मीडिया प्लेयर मे ककरो फाइल केँ कहिना चलाउ</"
-"em></a>\" दस्ताबेज.</p><p>सभटा converting, transcoding, एन्कोडिंग, muxing आओर "
-"स्ट्रीमिंग कार्य क लेल अहाँ एतय सूचना प्राप्त कए सकैत छी <a href=\"http://wiki."
-"videolan.org/Documentation:Streaming_HowTo\">स्ट्रीमिंग दस्ताबेज</a>.</p><p>जँ अहाँ "
-"तकनीकि क संबंध मे स्योर नहि छी तँ संपर्क करू <a href=\"http://wiki.videolan.org/"
-"Knowledge_Base\">ज्ञान आघार </a>.</p><p>मुख्य कीबोर्ड शार्ट कट जानने क लेल पढ़े <a "
-"href=\"http://wiki.videolan.org/Hotkeys\">शॉटकट</a> पृष्ट.</p><h3>सहायता</"
-"h3><p>कोनो प्रशन पुछने सँ पहिने कृप्या  देख लिअ <a href=\"http://www.videolan.org/"
-"support/faq.html\">FAQ</a>.</p><p>तखन अहाँ सहायता दे अथवा ले सकैत छी <a "
-"href=\"http://forum.videolan.org\">फोरम</a>,  <a href=\"http://www.videolan."
-"org/vlc/lists.html\">mailing-lists</a> अथवा हमारा IRC चैनल (<em>#videolan</"
-"em> irc.freenode.net) पर. </p><h3>प्रोजेक्ट मे योगदान करू</h3><p>आपVideoLAN "
-"प्रोजेक्ट क सहायता कए सकैत छी समुदाय केँ किछु समय दे कए, स्कीन डिजायन कए, दस्ताबेजों क "
-"अनुवाद कए, कोड क जाँच कए. अहाँ हमारी सहायता क लेल फंड तथा सामग्री सेहो प्रदान कए सकैत "
-"अछि. आओर हँ , अहाँ VLC मीडिया केँ <b>प्रोमोट</b> कए सकैत अछि.</p></body></html>"
+"नवागंतुक अछि तँ , कृप्या  पढें<br><a href=\"http://wiki.videolan.org/"
+"Documentation:VLC_for_dummies\"><em>VLC मीडिया प्लेयर क परिचय</em></a>.</"
+"p><p>अहाँ पाएँगे जे VLC मीडिया प्लेयर क उपयोग कओन प्रकार करू<br>\"<a href=\"http://"
+"wiki.videolan.org/Documentation:Play_HowTo\"><em>VLC मीडिया प्लेयर मे ककरो फाइल "
+"केँ कहिना चलाउ</em></a>\" दस्ताबेज.</p><p>सभटा converting, transcoding, एन्कोडिंग, "
+"muxing आओर स्ट्रीमिंग कार्य क लेल अहाँ एतय सूचना प्राप्त कए सकैत छी <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">स्ट्रीमिंग दस्ताबेज</a>.</"
+"p><p>जँ अहाँ तकनीकि क संबंध मे स्योर नहि छी तँ संपर्क करू <a href=\"http://"
+"wiki.videolan.org/Knowledge_Base\">ज्ञान आघार </a>.</p><p>मुख्य कीबोर्ड शार्ट कट "
+"जानने क लेल पढ़े <a href=\"http://wiki.videolan.org/Hotkeys\">शॉटकट</a> पृष्ट.</"
+"p><h3>सहायता</h3><p>कोनो प्रशन पुछने सँ पहिने कृप्या  देख लिअ <a href=\"http://"
+"www.videolan.org/support/faq.html\">FAQ</a>.</p><p>तखन अहाँ सहायता दे अथवा ले "
+"सकैत छी <a href=\"http://forum.videolan.org\">फोरम</a>,  <a href=\"http://"
+"www.videolan.org/vlc/lists.html\">mailing-lists</a> अथवा हमारा IRC चैनल "
+"(<em>#videolan</em> irc.freenode.net) पर. </p><h3>प्रोजेक्ट मे योगदान करू</"
+"h3><p>आपVideoLAN प्रोजेक्ट क सहायता कए सकैत छी समुदाय केँ किछु समय दे कए, स्कीन डिजायन "
+"कए, दस्ताबेजों क अनुवाद कए, कोड क जाँच कए. अहाँ हमारी सहायता क लेल फंड तथा सामग्री "
+"सेहो प्रदान कए सकैत अछि. आओर हँ , अहाँ VLC मीडिया केँ <b>प्रोमोट</b> कए सकैत अछि.</"
+"p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -676,7 +677,7 @@ msgstr "डाल्बी सर्राउंड"
 msgid "Stereo"
 msgstr "स्टीरियो"
 
-#: src/audio_output/output.c:445 src/input/es_out.c:3301
+#: src/audio_output/output.c:445 src/input/es_out.c:3343
 #: src/libvlc-module.c:197 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: src/misc/actions.c:81 modules/audio_filter/channel_mixer/mono.c:89
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
@@ -973,11 +974,11 @@ msgstr ""
 msgid "Closed captions %u"
 msgstr "बन्न कैप्शन %u"
 
-#: src/input/es_out.c:3136
+#: src/input/es_out.c:3149
 msgid "Original ID"
 msgstr "मूल ID"
 
-#: src/input/es_out.c:3144 src/input/es_out.c:3147 modules/access/imem.c:67
+#: src/input/es_out.c:3156 modules/access/imem.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:162
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:173
 #: modules/gui/qt/ui/profiles.h:726 modules/gui/qt/ui/profiles.h:752
@@ -985,48 +986,21 @@ msgstr "मूल ID"
 msgid "Codec"
 msgstr "कोडेक"
 
-#: src/input/es_out.c:3151 src/input/meta.c:66 modules/access/imem.c:71
+#: src/input/es_out.c:3160 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:98
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:533
 msgid "Language"
 msgstr "भाषा"
 
-#: src/input/es_out.c:3154 src/input/meta.c:61
+#: src/input/es_out.c:3163 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:80
 #: modules/gui/macosx/VLCPlaylist.m:96 modules/gui/qt/dialogs/bookmarks.cpp:75
 #: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "विवरण"
 
-#: src/input/es_out.c:3160 src/input/es_out.c:3204 src/input/es_out.c:3394
-#: modules/gui/macosx/VLCAddonsWindowController.m:133
-#: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
-#: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1494
-msgid "Type"
-msgstr "प्रकार"
-
-#: src/input/es_out.c:3163
-#: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
-#: modules/gui/macosx/VLCOutput.m:98 modules/gui/qt/ui/profiles.h:754
-msgid "Channels"
-msgstr "चैनल"
-
-#: src/input/es_out.c:3168 modules/access/alsa.c:39 modules/access/imem.c:75
-#: modules/audio_output/amem.c:47 modules/codec/fluidsynth.c:64
-msgid "Sample rate"
-msgstr "नमूना दर"
-
-#: src/input/es_out.c:3168
-#, c-format
-msgid "%u Hz"
-msgstr "%u Hz"
-
-#: src/input/es_out.c:3178
-msgid "Bits per sample"
-msgstr "बिट्स प्रति नमूना"
-
-#: src/input/es_out.c:3183 modules/access_output/shout.c:92
+#: src/input/es_out.c:3168 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
@@ -1034,33 +1008,84 @@ msgstr "बिट्स प्रति नमूना"
 msgid "Bitrate"
 msgstr "बिटरेट"
 
-#: src/input/es_out.c:3183
+#: src/input/es_out.c:3168 src/input/es_out.c:3224
 #, c-format
 msgid "%u kb/s"
 msgstr "%u kb/s"
 
-#: src/input/es_out.c:3195
+#: src/input/es_out.c:3174 src/input/es_out.c:3246 src/input/es_out.c:3436
+#: modules/gui/macosx/VLCAddonsWindowController.m:133
+#: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
+#: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1494
+msgid "Type"
+msgstr "प्रकार"
+
+#: src/input/es_out.c:3177
+#: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
+#: modules/gui/macosx/VLCOutput.m:98 modules/gui/qt/ui/profiles.h:754
+msgid "Channels"
+msgstr "चैनल"
+
+#: src/input/es_out.c:3182 modules/access/alsa.c:39 modules/access/imem.c:75
+#: modules/audio_output/amem.c:47 modules/codec/fluidsynth.c:64
+msgid "Sample rate"
+msgstr "नमूना दर"
+
+#: src/input/es_out.c:3182 src/input/es_out.c:3212
+#, c-format
+msgid "%u Hz"
+msgstr "%u Hz"
+
+#: src/input/es_out.c:3192
+msgid "Bits per sample"
+msgstr "बिट्स प्रति नमूना"
+
+#: src/input/es_out.c:3200 src/input/es_out.c:3275
+msgid "Decoded format"
+msgstr "डीकोड प्रारूप"
+
+#: src/input/es_out.c:3207
+#, fuzzy
+msgid "Decoded channels"
+msgstr "आडियो चैनल"
+
+#: src/input/es_out.c:3212
+#, fuzzy
+msgid "Decoded sample rate"
+msgstr "आडियो नमूना दर"
+
+#: src/input/es_out.c:3219
+#, fuzzy
+msgid "Decoded bits per sample"
+msgstr "नमूना प्रति आडियो बिट्स"
+
+#: src/input/es_out.c:3224
+#, fuzzy
+msgid "Decoded Bitrate"
+msgstr "डीकोड प्रारूप"
+
+#: src/input/es_out.c:3237
 msgid "Track replay gain"
 msgstr "रिप्ले गेन केँ ट्रैक करू"
 
-#: src/input/es_out.c:3197
+#: src/input/es_out.c:3239
 msgid "Album replay gain"
 msgstr "रिप्ले गेन एलबम"
 
-#: src/input/es_out.c:3198
+#: src/input/es_out.c:3240
 #, c-format
 msgid "%.2f dB"
 msgstr "%.2f dB"
 
-#: src/input/es_out.c:3208
+#: src/input/es_out.c:3250
 msgid "Video resolution"
 msgstr ""
 
-#: src/input/es_out.c:3213
+#: src/input/es_out.c:3255
 msgid "Buffer dimensions"
 msgstr ""
 
-#: src/input/es_out.c:3223 src/input/es_out.c:3226 modules/access/imem.c:93
+#: src/input/es_out.c:3265 src/input/es_out.c:3268 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
 #: modules/access/screen/xcb.c:39 modules/access/shm.c:42
 #: modules/access/timecode.c:34 modules/access/v4l2/v4l2.c:70
@@ -1070,91 +1095,87 @@ msgstr ""
 msgid "Frame rate"
 msgstr "फ्रेम दर"
 
-#: src/input/es_out.c:3234
-msgid "Decoded format"
-msgstr "डीकोड प्रारूप"
-
-#: src/input/es_out.c:3239
+#: src/input/es_out.c:3281
 msgid "Top left"
 msgstr ""
 
-#: src/input/es_out.c:3239
+#: src/input/es_out.c:3281
 msgid "Left top"
 msgstr ""
 
-#: src/input/es_out.c:3240
+#: src/input/es_out.c:3282
 msgid "Right bottom"
 msgstr ""
 
-#: src/input/es_out.c:3240
+#: src/input/es_out.c:3282
 msgid "Top right"
 msgstr ""
 
-#: src/input/es_out.c:3241
+#: src/input/es_out.c:3283
 msgid "Bottom left"
 msgstr ""
 
-#: src/input/es_out.c:3241
+#: src/input/es_out.c:3283
 msgid "Bottom right"
 msgstr ""
 
-#: src/input/es_out.c:3242
+#: src/input/es_out.c:3284
 msgid "Left bottom"
 msgstr ""
 
-#: src/input/es_out.c:3242
+#: src/input/es_out.c:3284
 msgid "Right top"
 msgstr ""
 
-#: src/input/es_out.c:3244
+#: src/input/es_out.c:3286
 msgid "Orientation"
 msgstr ""
 
-#: src/input/es_out.c:3250 src/input/es_out.c:3268 src/input/es_out.c:3286
-#: src/input/es_out.c:3300 src/playlist/tree.c:67
+#: src/input/es_out.c:3292 src/input/es_out.c:3310 src/input/es_out.c:3328
+#: src/input/es_out.c:3342 src/playlist/tree.c:67
 #: modules/access/dtv/access.c:82 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr "अपरिभाषित"
 
-#: src/input/es_out.c:3252
+#: src/input/es_out.c:3294
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
 msgstr ""
 
-#: src/input/es_out.c:3254
+#: src/input/es_out.c:3296
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
 msgstr ""
 
-#: src/input/es_out.c:3262
+#: src/input/es_out.c:3304
 msgid "Color primaries"
 msgstr ""
 
-#: src/input/es_out.c:3269 src/libvlc-module.c:362
+#: src/input/es_out.c:3311 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Linear"
 msgstr "रैखिक"
 
-#: src/input/es_out.c:3276
+#: src/input/es_out.c:3318
 msgid "Hybrid Log-Gamma"
 msgstr ""
 
-#: src/input/es_out.c:3280
+#: src/input/es_out.c:3322
 msgid "Color transfer function"
 msgstr ""
 
-#: src/input/es_out.c:3293
+#: src/input/es_out.c:3335
 msgid "Color space"
 msgstr ""
 
-#: src/input/es_out.c:3293
+#: src/input/es_out.c:3335
 #, c-format
 msgid "%s Range"
 msgstr ""
 
-#: src/input/es_out.c:3295
+#: src/input/es_out.c:3337
 msgid "Full"
 msgstr ""
 
-#: src/input/es_out.c:3302 src/libvlc-module.c:295 src/libvlc-module.c:368
+#: src/input/es_out.c:3344 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
 #: modules/codec/subsdec.c:167 modules/codec/zvbi.c:83
@@ -1165,87 +1186,87 @@ msgstr ""
 msgid "Center"
 msgstr "मध्य"
 
-#: src/input/es_out.c:3303
+#: src/input/es_out.c:3345
 msgid "Top Left"
 msgstr ""
 
-#: src/input/es_out.c:3304
+#: src/input/es_out.c:3346
 msgid "Top Center"
 msgstr ""
 
-#: src/input/es_out.c:3305
+#: src/input/es_out.c:3347
 msgid "Bottom Left"
 msgstr ""
 
-#: src/input/es_out.c:3306
+#: src/input/es_out.c:3348
 msgid "Bottom Center"
 msgstr ""
 
-#: src/input/es_out.c:3310
+#: src/input/es_out.c:3352
 msgid "Chroma location"
 msgstr ""
 
-#: src/input/es_out.c:3319
+#: src/input/es_out.c:3361
 msgid "Rectangular"
 msgstr ""
 
-#: src/input/es_out.c:3322
+#: src/input/es_out.c:3364
 msgid "Equirectangular"
 msgstr ""
 
-#: src/input/es_out.c:3325
+#: src/input/es_out.c:3367
 msgid "Cubemap"
 msgstr ""
 
-#: src/input/es_out.c:3331
+#: src/input/es_out.c:3373
 msgid "Projection"
 msgstr ""
 
-#: src/input/es_out.c:3333
+#: src/input/es_out.c:3375
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr ""
 
-#: src/input/es_out.c:3335
+#: src/input/es_out.c:3377
 msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr ""
 
-#: src/input/es_out.c:3337
+#: src/input/es_out.c:3379
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr ""
 
-#: src/input/es_out.c:3340
+#: src/input/es_out.c:3382
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr ""
 
-#: src/input/es_out.c:3345
+#: src/input/es_out.c:3387
 msgid "Max. luminance"
 msgstr ""
 
-#: src/input/es_out.c:3350
+#: src/input/es_out.c:3392
 msgid "Min. luminance"
 msgstr ""
 
-#: src/input/es_out.c:3358
+#: src/input/es_out.c:3400
 msgid "Primary R"
 msgstr ""
 
-#: src/input/es_out.c:3365
+#: src/input/es_out.c:3407
 msgid "Primary G"
 msgstr ""
 
-#: src/input/es_out.c:3372
+#: src/input/es_out.c:3414
 msgid "Primary B"
 msgstr ""
 
-#: src/input/es_out.c:3379
+#: src/input/es_out.c:3421
 msgid "White point"
 msgstr ""
 
-#: src/input/es_out.c:3394 modules/access/imem.c:64
+#: src/input/es_out.c:3436 modules/access/imem.c:64
 msgid "Subtitle"
 msgstr "उपशीर्षक"
 
@@ -2270,8 +2291,8 @@ msgstr "स्रोत पहलू अनुपात"
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
-"when a movie does not have aspect ratio information. Accepted formats are x:"
-"y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
+"when a movie does not have aspect ratio information. Accepted formats are "
+"x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "ई स्रोत पहलू अनुपात बाध्य करैत अछि। उदाहरण क लेल, किछु डीवीडी 16:9 क दावा करैत छी "
@@ -3148,11 +3169,13 @@ msgstr "HTTP प्राक्सी"
 
 #: src/libvlc-module.c:849
 msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
+"HTTP proxy to be used It must be of the form http://"
+"[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
+"variable will be tried."
 msgstr ""
-"प्रयोग क जाएबला HTTP प्राक्सी इसा स्वरूप होनाइ चाही http://[user@]myproxy."
-"mydomain:myport/ ; जँ खाली अछि, http_proxy वातावरण चर क कोशिश करताह।"
+"प्रयोग क जाएबला HTTP प्राक्सी इसा स्वरूप होनाइ चाही http://"
+"[user@]myproxy.mydomain:myport/ ; जँ खाली अछि, http_proxy वातावरण चर क कोशिश "
+"करताह।"
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
@@ -6050,8 +6073,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input device."
-"Please check your connectors and drivers."
+"Your Mac does not seem to be equipped with a suitable audio input "
+"device.Please check your connectors and drivers."
 msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
@@ -8438,8 +8461,8 @@ msgstr ""
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (ideally a domain name using the format DOMAIN;"
-"username) and a password."
+"Please provide a username (ideally a domain name using the format "
+"DOMAIN;username) and a password."
 msgstr ""
 
 #: modules/access/srt.c:428 modules/access_output/srt.c:457
@@ -8905,9 +8928,9 @@ msgstr "v4l2 ड्राइवर नियंत्रण"
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
-"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
-"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
-"(-vv) or use the v4l2-ctl application."
+"list optionally encapsulated by curly braces (e.g.: "
+"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
+"controls, increase verbosity (-vv) or use the v4l2-ctl application."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
@@ -11438,8 +11461,8 @@ msgstr "सबपिक्चर स्थिति"
 #: modules/codec/dvbsub.c:91
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
-"2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
-"g. 6=top-right)."
+"2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+"e.g. 6=top-right)."
 msgstr ""
 "ई वीडियो पर उपछवि क स्थिति लागू कए सकैत छी (0 = केंद्र, 1 =  बम्मा, 2 = दहिन्ना, 4 = "
 "उप्पर, 8 = नीच्चाँ, अहाँ ई मूल्य क संयोजन क सेहो उपयोग कए सकैत अछि, जहिना  = उप्पर "
@@ -12173,10 +12196,10 @@ msgstr "दर नियंत्रण क सटीकता"
 
 #: modules/codec/qsv.c:128
 msgid ""
-"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
-"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
-"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
-"certained  convergence period. See the convergence parameter"
+"Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. "
+"(e.g. 10 with a bitrate of 800  kbps means the encoder tries not to  go "
+"above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
+"after a certained  convergence period. See the convergence parameter"
 msgstr ""
 
 #: modules/codec/qsv.c:134
@@ -13402,6 +13425,7 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
+#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -14209,14 +14233,14 @@ msgstr "डी बस नियंत्रण अंतरफलक"
 #: modules/gui/macosx/VLCMainWindow.m:587
 #: modules/gui/macosx/VLCMainWindow.m:1030
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
-#: modules/gui/qt/dialogs/help.cpp:100 modules/gui/qt/main_interface.cpp:1292
-#: modules/gui/qt/main_interface.cpp:1296
-#: modules/gui/qt/main_interface.cpp:1333
-#: modules/gui/qt/main_interface.cpp:1335
-#: modules/gui/qt/main_interface.cpp:1443
-#: modules/gui/qt/main_interface.cpp:1460
-#: modules/gui/qt/main_interface.cpp:1468
-#: modules/gui/qt/main_interface.cpp:1491 modules/lua/libs/httpd.c:80
+#: modules/gui/qt/dialogs/help.cpp:100 modules/gui/qt/main_interface.cpp:1302
+#: modules/gui/qt/main_interface.cpp:1306
+#: modules/gui/qt/main_interface.cpp:1343
+#: modules/gui/qt/main_interface.cpp:1345
+#: modules/gui/qt/main_interface.cpp:1453
+#: modules/gui/qt/main_interface.cpp:1470
+#: modules/gui/qt/main_interface.cpp:1478
+#: modules/gui/qt/main_interface.cpp:1501 modules/lua/libs/httpd.c:80
 #: modules/notify/osx_notifications.m:302
 #: modules/video_output/wayland/shell.c:348
 #: modules/video_output/wayland/xdg-shell.c:291
@@ -15664,8 +15688,8 @@ msgstr "बाइली PMT"
 #: modules/demux/mpeg/ts.c:86
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
-"एकटा प्रयोक्ता केँ कोनो बाइली pmt क उपयोग करबाक लेल बाध्य करू (pmt_pid=pid:"
-"stream_type[,...])."
+"एकटा प्रयोक्ता केँ कोनो बाइली pmt क उपयोग करबाक लेल बाध्य करू "
+"(pmt_pid=pid:stream_type[,...])."
 
 #: modules/demux/mpeg/ts.c:88
 msgid "Set id of ES to PID"
@@ -17343,13 +17367,13 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:220
 #: modules/gui/macosx/VLCMainWindow.m:226
-#: modules/gui/qt/components/playlist/selector.cpp:580
+#: modules/gui/qt/components/playlist/selector.cpp:593
 msgid "Subscribe"
 msgstr "सदस्यता लिअ"
 
 #: modules/gui/macosx/VLCMainWindow.m:221
 #: modules/gui/macosx/VLCMainWindow.m:232
-#: modules/gui/qt/components/playlist/selector.cpp:597
+#: modules/gui/qt/components/playlist/selector.cpp:610
 msgid "Unsubscribe"
 msgstr "सदस्यता छोड़ू"
 
@@ -17359,7 +17383,7 @@ msgid "Subscribe to a podcast"
 msgstr "पाडकास्ट क सदस्यता लिअ"
 
 #: modules/gui/macosx/VLCMainWindow.m:225
-#: modules/gui/qt/components/playlist/selector.cpp:581
+#: modules/gui/qt/components/playlist/selector.cpp:594
 msgid "Enter URL of the podcast to subscribe to:"
 msgstr "पाडकास्ट क सदस्यता क लेल पाडकास्ट क URL दर्ज करू:"
 
@@ -17798,7 +17822,7 @@ msgstr "मेटा संचित करबामे त्रुटि"
 msgid "VLC was unable to save the meta data."
 msgstr "VLC मेटाडाटा संचित करबामे असमर्थ अछि"
 
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:197
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:198
 #: modules/gui/qt/ui/sprefs_interface.h:558
 msgid "Continue playback?"
 msgstr "प्लेबैक जारी राखू?"
@@ -18097,7 +18121,7 @@ msgid "Show video within the main window"
 msgstr "मुख्य विंडो क भीतर वीडियो देखाउ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:370
-#: modules/gui/macosx/macosx.m:104 modules/gui/qt/qt.cpp:181
+#: modules/gui/macosx/macosx.m:104 modules/gui/qt/qt.cpp:182
 msgid "Pause the video playback when minimized"
 msgstr "छोट कएल गेल जाए पर वीडियो प्लेबैक रोकू"
 
@@ -18286,7 +18310,7 @@ msgid "sec."
 msgstr "सेकेंड"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1442 modules/gui/qt/qt.cpp:216
+#: modules/gui/qt/components/extended_panels.cpp:1442 modules/gui/qt/qt.cpp:217
 msgid "Audio/Video"
 msgstr "आडियो/वीडियो"
 
@@ -18735,11 +18759,11 @@ msgstr ""
 "पूर्वनिर्धारित रूप सँ, वीएलसी पछिला मैक ओएस एक्स रिलीज सँ ज्ञात फुल स्क्रीन मोड क उपयोग "
 "करैत अछि। ई मैक ओएस एक्स 10.7 आओर बाद क नेटिव फुल स्क्रीन मोड क उपयोग कए सकैत अछि।"
 
-#: modules/gui/macosx/macosx.m:98 modules/gui/qt/qt.cpp:95
+#: modules/gui/macosx/macosx.m:98 modules/gui/qt/qt.cpp:96
 msgid "Resize interface to the native video size"
 msgstr "अंतरफलक क आकार नेटिव वीडियो क आकार क कए दिअ'।"
 
-#: modules/gui/macosx/macosx.m:99 modules/gui/qt/qt.cpp:96
+#: modules/gui/macosx/macosx.m:99 modules/gui/qt/qt.cpp:97
 msgid ""
 "You have two choices:\n"
 " - The interface will resize to the native video size\n"
@@ -18751,7 +18775,7 @@ msgstr ""
 "  - वीडियो अंतरफलक आकार क लेल फिट कएल जएताह\n"
 "  पूर्वनिर्धारित रूप सँ, अंतरफलक मूल वीडियो आकार क कएल जएताह"
 
-#: modules/gui/macosx/macosx.m:105 modules/gui/qt/qt.cpp:183
+#: modules/gui/macosx/macosx.m:105 modules/gui/qt/qt.cpp:184
 msgid ""
 "With this option enabled, the playback will be automatically paused when "
 "minimizing the window."
@@ -18759,11 +18783,11 @@ msgstr ""
 "विंडो न्यूनतम करबाक दौरान एहि विकल्प केँ सक्रिय रूप सँ, प्लेबैक स्वचालित करब सँ रोक देब "
 "जएताह।"
 
-#: modules/gui/macosx/macosx.m:108 modules/gui/qt/qt.cpp:185
+#: modules/gui/macosx/macosx.m:108 modules/gui/qt/qt.cpp:186
 msgid "Allow automatic icon changes"
 msgstr "स्वचालित आइकन परिवर्तन क सुविधा दिअ'"
 
-#: modules/gui/macosx/macosx.m:109 modules/gui/qt/qt.cpp:187
+#: modules/gui/macosx/macosx.m:109 modules/gui/qt/qt.cpp:188
 msgid ""
 "This option allows the interface to change its icon on various occasions."
 msgstr "ई विकल्प अंतरफलक केँ विभिन्न अवसरों कए अपन आइकन बदलब क सुविधा देत अछि।"
@@ -18823,21 +18847,21 @@ msgstr ""
 "VLC अहाँक बजाएल अंतिम 30 टा केँ प्लैबैक स्थिति सहेजल राखत. जँ अहाँ फेर ओकरा खोलैछी, प्लैबैक "
 "जारी रहताह."
 
-#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:209
+#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:210
 msgid "Ask"
 msgstr "पूछू"
 
-#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:203
-#: modules/gui/qt/qt.cpp:209 modules/keystore/keychain.m:50
+#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:204
+#: modules/gui/qt/qt.cpp:210 modules/keystore/keychain.m:50
 msgid "Always"
 msgstr "हरदम"
 
-#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:203
-#: modules/gui/qt/qt.cpp:209 modules/gui/qt/qt.cpp:216
+#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:204
+#: modules/gui/qt/qt.cpp:210 modules/gui/qt/qt.cpp:217
 msgid "Never"
 msgstr "कखनो नहि"
 
-#: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:189
+#: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:190
 msgid "Maximum Volume displayed"
 msgstr "अधिकतम वाल्यूम प्रदर्शित कएल गेल"
 
@@ -19786,11 +19810,11 @@ msgstr "स्थानीय सँजाल"
 msgid "Internet"
 msgstr "इन्टरनेट"
 
-#: modules/gui/qt/components/playlist/selector.cpp:443
+#: modules/gui/qt/components/playlist/selector.cpp:456
 msgid "Remove this podcast subscription"
 msgstr "पाडकास्ट क सदस्यता समाप्त करू"
 
-#: modules/gui/qt/components/playlist/selector.cpp:594
+#: modules/gui/qt/components/playlist/selector.cpp:607
 msgid "Do you really want to unsubscribe from %1?"
 msgstr "अहाँ वास्तव मे% 1 क सदस्यता समाप्त कएनाइ चाहैत अछि?"
 
@@ -20976,11 +21000,11 @@ msgstr "की अहाँ प्लैबैक फेर आरंभ कर�
 msgid "&Continue"
 msgstr "जारी राखू (&C)"
 
-#: modules/gui/qt/main_interface.cpp:1444
+#: modules/gui/qt/main_interface.cpp:1454
 msgid "Control menu for the player"
 msgstr "प्लेयर क लेल नियंत्रण मेनू"
 
-#: modules/gui/qt/main_interface.cpp:1488
+#: modules/gui/qt/main_interface.cpp:1498
 msgid "Paused"
 msgstr "ठहरा"
 
@@ -21304,21 +21328,21 @@ msgstr ""
 msgid "Scanning..."
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:81
+#: modules/gui/qt/qt.cpp:82
 msgid "Show advanced preferences over simple ones"
 msgstr "सरल वरीयता क उप्पर उच्च वरीयता देखाउ"
 
-#: modules/gui/qt/qt.cpp:82
+#: modules/gui/qt/qt.cpp:83
 msgid ""
 "Show advanced preferences and not simple preferences when opening the "
 "preferences dialog."
 msgstr "वरीयता समाद खोलब पर ​​उन्नत वरीयता आओर असरल वरीयता केँ देखाउ।"
 
-#: modules/gui/qt/qt.cpp:86 modules/gui/skins2/src/skin_main.cpp:499
+#: modules/gui/qt/qt.cpp:87 modules/gui/skins2/src/skin_main.cpp:499
 msgid "Systray icon"
 msgstr "systray चिह्न"
 
-#: modules/gui/qt/qt.cpp:87
+#: modules/gui/qt/qt.cpp:88
 msgid ""
 "Show an icon in the systray allowing you to control VLC media player for "
 "basic actions."
@@ -21326,27 +21350,27 @@ msgstr ""
 "अहाँ बुनियादी कार्य क लेल वीएलसी मीडिया प्लेयर केँ नियंत्रित करबाक लेल सिस्ट्रे मे एकटा "
 "आइकन देखाउ।"
 
-#: modules/gui/qt/qt.cpp:91
+#: modules/gui/qt/qt.cpp:92
 msgid "Start VLC with only a systray icon"
 msgstr "केवल सिस्ट्रे आइकन क सँग वीएलसी प्रारंभ करू"
 
-#: modules/gui/qt/qt.cpp:92
+#: modules/gui/qt/qt.cpp:93
 msgid "VLC will start with just an icon in your taskbar."
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:101
+#: modules/gui/qt/qt.cpp:102
 msgid "Show playing item name in window title"
 msgstr "वर्तमान मे चलि रहल मद क नाम विंडो शीर्षक मे देखाउ"
 
-#: modules/gui/qt/qt.cpp:102
+#: modules/gui/qt/qt.cpp:103
 msgid "Show the name of the song or video in the controller window title."
 msgstr "नियंत्रक विंडो शीर्षक मे गीत अथवा वीडियो क नाम देखाउ।"
 
-#: modules/gui/qt/qt.cpp:105
+#: modules/gui/qt/qt.cpp:106
 msgid "Show notification popup on track change"
 msgstr "ट्रैक परिवर्तन हए पर अधिसूचना पापअप देखाउ"
 
-#: modules/gui/qt/qt.cpp:107
+#: modules/gui/qt/qt.cpp:108
 msgid ""
 "Show a notification popup with the artist and track name when the current "
 "playlist item changes, when VLC is minimized or hidden."
@@ -21354,11 +21378,11 @@ msgstr ""
 "जखन गीत सूची मद परिवर्तन हए पर कलाकार आओर ट्रैक नाम क सँग पापअप अधिसूचना देखाउ जखन "
 "वीएलसी मिनीमाइज अथवा छिपा भेलहुँ भ'।"
 
-#: modules/gui/qt/qt.cpp:110
+#: modules/gui/qt/qt.cpp:111
 msgid "Windows opacity between 0.1 and 1"
 msgstr "0.1 आओर 1 क बीच विंडोज अस्पष्टता"
 
-#: modules/gui/qt/qt.cpp:111
+#: modules/gui/qt/qt.cpp:112
 msgid ""
 "Sets the windows opacity between 0.1 and 1 for main interface, playlist and "
 "extended panel. This option only works with Windows and X11 with composite "
@@ -21367,11 +21391,11 @@ msgstr ""
 "मुख्य अंतरफलक, प्लेलिस्ट आओर विस्तारित पैनल क लेल विंडोज़ opacity केँ 0.1 आओर 1 क बीच सेट "
 "करैत अछि। ई विकल्प केवल समग्र विस्तार क सँग विंडोज आओर X11 मे काज करैत अछि।"
 
-#: modules/gui/qt/qt.cpp:116
+#: modules/gui/qt/qt.cpp:117
 msgid "Fullscreen controller opacity between 0.1 and 1"
 msgstr "0.1 आओर 1 क बीच पूर्ण स्क्रीन नियंत्रक अस्पष्टता"
 
-#: modules/gui/qt/qt.cpp:117
+#: modules/gui/qt/qt.cpp:118
 msgid ""
 "Sets the fullscreen controller opacity between 0.1 and 1 for main interface, "
 "playlist and extended panel. This option only works with Windows and X11 "
@@ -21381,55 +21405,55 @@ msgstr ""
 "आओर 1 क बीच सेट करैत अछि। ई विकल्प केवल समग्र विस्तार क सँग विंडोज आओर X11 मे काज करैत "
 "अछि।"
 
-#: modules/gui/qt/qt.cpp:122
+#: modules/gui/qt/qt.cpp:123
 msgid "Show unimportant error and warnings dialogs"
 msgstr "महत्वहीन त्रुटि आओर चेतावनी समाद देखाउ"
 
-#: modules/gui/qt/qt.cpp:124
+#: modules/gui/qt/qt.cpp:125
 msgid "Enable Dark Mode"
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:125
+#: modules/gui/qt/qt.cpp:126
 msgid "Applies a dark theme to the style."
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:127
+#: modules/gui/qt/qt.cpp:128
 msgid "Activate the updates availability notification"
 msgstr "अद्यतन उपलब्धता अधिसूचना सक्रिय करू"
 
-#: modules/gui/qt/qt.cpp:128
+#: modules/gui/qt/qt.cpp:129
 msgid ""
 "Activate the automatic notification of new versions of the software. It runs "
 "once every two weeks."
 msgstr ""
 "साफ्टवेयर क नव संस्करण क स्वत: अधिसूचना सक्रिय करू। ई हर दुइ हफ्ते पर एकटा बेर चलैत अछि।"
 
-#: modules/gui/qt/qt.cpp:131
+#: modules/gui/qt/qt.cpp:132
 msgid "Number of days between two update checks"
 msgstr "दो अपडेट जाँच क बीच दिन क अंतर"
 
-#: modules/gui/qt/qt.cpp:133
+#: modules/gui/qt/qt.cpp:134
 msgid "Ask for network policy at start"
 msgstr "शुरू मे संजाल नीति क लेल पूछू"
 
-#: modules/gui/qt/qt.cpp:135
+#: modules/gui/qt/qt.cpp:136
 msgid "Save the recently played items in the menu"
 msgstr "मेनू मे हाल  मे चलाएल गेल मद सहेजू"
 
-#: modules/gui/qt/qt.cpp:137
+#: modules/gui/qt/qt.cpp:138
 msgid "List of words separated by | to filter"
 msgstr "फिल्टर करबाक लेल | द्वारा अलग कएल गेल शब्द क सूची"
 
-#: modules/gui/qt/qt.cpp:138
+#: modules/gui/qt/qt.cpp:139
 msgid ""
 "Regular expression used to filter the recent items played in the player."
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:141
+#: modules/gui/qt/qt.cpp:142
 msgid "Define the colors of the volume slider"
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:142
+#: modules/gui/qt/qt.cpp:143
 msgid ""
 "Define the colors of the volume slider\n"
 "By specifying the 12 numbers separated by a ';'\n"
@@ -21437,11 +21461,11 @@ msgid ""
 "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255'"
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:147
+#: modules/gui/qt/qt.cpp:148
 msgid "Selection of the starting mode and look"
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:148
+#: modules/gui/qt/qt.cpp:149
 msgid ""
 "Start VLC with:\n"
 " - normal mode\n"
@@ -21453,39 +21477,39 @@ msgstr ""
 "  - एकटा क्षेत्र जे हरदम गीत, एल्बम कला क रूपेँ जानकारी देखाबै क लेल मोजुद अछि ...\n"
 "  - सीमित नियंत्रण क सँग न्यूनतम मोड"
 
-#: modules/gui/qt/qt.cpp:154
+#: modules/gui/qt/qt.cpp:155
 msgid "Show a controller in fullscreen mode"
 msgstr "फुल स्क्रीन मोड मे एकटा नियंत्रक देखाउ"
 
-#: modules/gui/qt/qt.cpp:155
+#: modules/gui/qt/qt.cpp:156
 msgid "Embed the file browser in open dialog"
 msgstr "खुलल समाद मे फाइल ब्राउजर अंतःस्थापित करू"
 
-#: modules/gui/qt/qt.cpp:157
+#: modules/gui/qt/qt.cpp:158
 msgid "Define which screen fullscreen goes"
 msgstr "निर्धारित करू जे पूर्ण स्क्रीन कओन स्क्रीन मे जाइत अछि"
 
-#: modules/gui/qt/qt.cpp:158
+#: modules/gui/qt/qt.cpp:159
 msgid "Screennumber of fullscreen, instead of same screen where interface is."
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:161
+#: modules/gui/qt/qt.cpp:162
 msgid "Load extensions on startup"
 msgstr "स्टार्टअप क समय एक्सटेंशन लोड करू"
 
-#: modules/gui/qt/qt.cpp:162
+#: modules/gui/qt/qt.cpp:163
 msgid "Automatically load the extensions module on startup."
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:165
+#: modules/gui/qt/qt.cpp:166
 msgid "Start in minimal view (without menus)"
 msgstr "मिनिमम दृश्य मोड मे प्रारंभ करू(मेनु क बिना)"
 
-#: modules/gui/qt/qt.cpp:167
+#: modules/gui/qt/qt.cpp:168
 msgid "Display background cone or art"
 msgstr "पृष्ठभूमि शंकु अथवा कला प्रदर्शित करू"
 
-#: modules/gui/qt/qt.cpp:168
+#: modules/gui/qt/qt.cpp:169
 msgid ""
 "Display background cone or current album art when not playing. Can be "
 "disabled to prevent burning screen."
@@ -21493,19 +21517,19 @@ msgstr ""
 "जखन प्ले नहि भ' रहल भ' तखन पृष्ठभूमि शंकु अथवा मोजुदा एल्बम कला प्रदर्शित करू। बर्निंग "
 "स्क्रीन केँ रोकब क लेल अक्षम कएल जाए सकैत अछि।"
 
-#: modules/gui/qt/qt.cpp:171
+#: modules/gui/qt/qt.cpp:172
 msgid "Expanding background cone or art"
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:172
+#: modules/gui/qt/qt.cpp:173
 msgid "Background art fits window's size."
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:174
+#: modules/gui/qt/qt.cpp:175
 msgid "Ignore keyboard volume buttons."
 msgstr "कीबोर्ड वाल्यूम बटन केँ अनदेख करू।"
 
-#: modules/gui/qt/qt.cpp:176
+#: modules/gui/qt/qt.cpp:177
 msgid ""
 "With this option checked, the volume up, volume down and mute buttons on "
 "your keyboard will always change your system volume. With this option "
@@ -21517,25 +21541,25 @@ msgstr ""
 "कएल जाए  पर  वीएलसी क वौल्युम बदलूगे आओर जखन वीएलसी चयनित नहि अछि तखन सिस्टम "
 "वाल्यूम बदल जएताह।"
 
-#: modules/gui/qt/qt.cpp:191
+#: modules/gui/qt/qt.cpp:192
 msgid "When to raise the interface"
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:192
+#: modules/gui/qt/qt.cpp:193
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
 msgstr ""
 
-#: modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/qt.cpp:196
 msgid "Fullscreen controller mouse sensitivity"
 msgstr "फुलस्क्रीन कंट्रोलर माउस संवेदनशीलता"
 
-#: modules/gui/qt/qt.cpp:203
+#: modules/gui/qt/qt.cpp:204
 msgid "When minimized"
 msgstr "मिनिमाइज कएल जाए पर"
 
-#: modules/gui/qt/qt.cpp:221
+#: modules/gui/qt/qt.cpp:222
 msgid "Qt interface"
 msgstr "Qt अंतरफलक"
 
@@ -21551,7 +21575,7 @@ msgstr "चेतावनी"
 msgid "debug"
 msgstr "डिबग"
 
-#: modules/gui/qt/util/searchlineedit.cpp:49
+#: modules/gui/qt/util/searchlineedit.cpp:50
 msgctxt "Tooltip|Clear"
 msgid "Clear"
 msgstr ""
