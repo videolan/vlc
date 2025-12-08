@@ -47,7 +47,9 @@ CACA_CONF += --disable-x11
 endif
 ifdef HAVE_WIN32
 CACA_CONF += --disable-ncurses \
+    ac_cv_func_sprintf=yes \
     ac_cv_func_vsnprintf_s=yes \
+    ac_cv_func_vsnprintf=yes \
     ac_cv_func_sprintf_s=yes
 endif
 ifdef HAVE_LINUX
