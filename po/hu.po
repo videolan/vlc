@@ -1,5 +1,5 @@
 # Hungarian translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2025 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -12,16 +12,16 @@
 # Balázs Meskó <meskobalazs@mailbox.org>, 2022-2025
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.22\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-12-08 07:33+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2025\n"
 "Language-Team: Hungarian (https://app.transifex.com/yaron/teams/16553/hu/)\n"
-"Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -1060,7 +1060,7 @@ msgstr "Csatornák"
 #: src/input/es_out.c:3182 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:47 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
-msgstr "Mintavételezési gyakoriság"
+msgstr "Mintavételi gyakoriság"
 
 #: src/input/es_out.c:3182 src/input/es_out.c:3212
 #, c-format
@@ -1076,24 +1076,20 @@ msgid "Decoded format"
 msgstr "Dekódolt formátum"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Hangcsatornák"
+msgstr "Dekódolt csatornák"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Hangmintavételi frekvencia"
+msgstr "Dekódolt mintavételi gyakoriság"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Hangbitek mintánként"
+msgstr "Dekódolt bitek mintánként"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Dekódolt formátum"
+msgstr "Dekódolt bitsebesség"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -4240,7 +4236,8 @@ msgstr "Következő képkocka"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
-msgstr "Válassza ki a következő képkockára lépésre használandó billentyűt."
+msgstr ""
+"Válassza ki a következő képkockára lépéshez használandó gyorsbillentyűt."
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
@@ -6441,11 +6438,11 @@ msgstr "[cdda:][eszköz][@[sáv]]"
 
 #: modules/access/cdda.c:1022
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "Musicbrainz kiszolgáló"
 
 #: modules/access/cdda.c:1023
 msgid "Address of the musicbrainz server to use."
-msgstr ""
+msgstr "A használandó musicbrainz kiszolgáló címe."
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -7778,7 +7775,7 @@ msgstr "Az elemi folyam nyelve az ISO639 által leírt formában"
 
 #: modules/access/imem.c:77
 msgid "Sample rate of an audio elementary stream"
-msgstr "Az elemi folyam mintavételezési gyakorisága"
+msgstr "Az elemi hangfolyam mintavételi gyakorisága"
 
 #: modules/access/imem.c:79 modules/audio_output/amem.c:51
 msgid "Channels count"
@@ -8725,7 +8722,7 @@ msgstr "Jelszó az adatfolyam titkosításához"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
 msgid " SRT Stream ID"
-msgstr ""
+msgstr "SRT adatfolyam-azonosító "
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9714,7 +9711,7 @@ msgstr "Az átkódolt folyam bitsebesség információi."
 
 #: modules/access_output/shout.c:96
 msgid "Samplerate information of the transcoded stream."
-msgstr "Az átkódolt folyam mintavételezési információi."
+msgstr "Az átkódolt folyam mintavételi információi."
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
@@ -9757,11 +9754,11 @@ msgstr "SRT folyamkimenet"
 
 #: modules/access_output/srt.c:471
 msgid "SRT maximum payload size (bytes)"
-msgstr ""
+msgstr "SRT maximális adattartalom-méret (bájtban)"
 
 #: modules/access_output/srt.c:475
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr ""
+msgstr "SRT maximális sávszélességplafon (bájtban)"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10474,7 +10471,7 @@ msgstr "Speex újramintavételező"
 
 #: modules/audio_filter/resampler/src.c:40
 msgid "Sample rate converter type"
-msgstr "Mintavételezési gyakoriság átalakítójának típusa"
+msgstr "Mintavételi gyakoriság átalakítójának típusa"
 
 #: modules/audio_filter/resampler/src.c:42
 msgid ""
@@ -10753,7 +10750,7 @@ msgstr "Hangmemória-kimenet"
 
 #: modules/audio_output/amem.c:44
 msgid "Sample format"
-msgstr "Mintavételezési formátum"
+msgstr "Mintavételi formátum"
 
 #: modules/audio_output/auhal.c:46
 msgid "Last audio device"
@@ -11726,11 +11723,11 @@ msgstr ""
 
 #: modules/codec/dav1d.c:56
 msgid "All Layers"
-msgstr ""
+msgstr "Összes réteg"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
-msgstr ""
+msgstr "Megjelenítse-e az összes térbeli réteget, alapértelmezetten hamis"
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
@@ -13387,7 +13384,6 @@ msgstr "Szöveg feliratdekódoló"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13839,7 +13835,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -16518,7 +16513,7 @@ msgstr "PVA szétválasztó"
 
 #: modules/demux/rawaud.c:44
 msgid "Audio sample rate in Hertz. Default is 48000 Hz."
-msgstr "Hangmintavételi frekvencia Hz-ben, alapértelmezésben 48000 Hz."
+msgstr "Hangmintavételi frekvencia Hz-ben. Alapértelmezetten 48000 Hz."
 
 #: modules/demux/rawaud.c:46 modules/stream_out/transcode/transcode.c:100
 #: share/lua/http/dialogs/create_stream.html:316
@@ -18293,7 +18288,7 @@ msgstr "Összes összecsukása"
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
 msgid "Shuffle playlist"
-msgstr ""
+msgstr "Lejátszólista keverése"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -21987,11 +21982,11 @@ msgstr "A nem fontos hiba- és figyelmeztető párbeszédablakok megjelenítése
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Enable Dark Mode"
-msgstr ""
+msgstr "Sötét mód bekapcsolása"
 
 #: modules/gui/qt/qt.cpp:126
 msgid "Applies a dark theme to the style."
-msgstr ""
+msgstr "Sötét téma alkalmazása a stílusra"
 
 #: modules/gui/qt/qt.cpp:128
 msgid "Activate the updates availability notification"
@@ -22331,15 +22326,15 @@ msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:681
 msgid "AMD VQ Enhancer"
-msgstr ""
+msgstr "AMD VQ Enhancer"
 
 #: modules/hw/d3d11/d3d11_filters.c:687
 msgid "AMD Frame Rate Doubler"
-msgstr ""
+msgstr "AMD Frame Rate Doubler"
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 msgid "Show indicator"
-msgstr ""
+msgstr "Jelző megjelenítése"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -28269,23 +28264,23 @@ msgstr "Ajánlott videokimenet a Windows 8 és újabb verziókhoz"
 
 #: modules/video_output/win32/direct3d11.c:74
 msgid "Video Upscaling Mode"
-msgstr ""
+msgstr "Videófelskálázási mód"
 
 #: modules/video_output/win32/direct3d11.c:75
 msgid "Select the upscaling mode for video."
-msgstr ""
+msgstr "Válasszon videófelskálázási módot"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Linear Sampler"
-msgstr ""
+msgstr "Lineáris mintavételező"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Point Sampler"
-msgstr ""
+msgstr "Pontszerű mintavételező"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Video Processor"
-msgstr ""
+msgstr "Videófeldolgozó"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Super Resolution"
@@ -28293,23 +28288,23 @@ msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
 msgid "HDR Output Mode"
-msgstr ""
+msgstr "HDR kimeneti mód"
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
-msgstr ""
+msgstr "HDR kimenet használata, SDR forrás esetén is."
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Never out HDR"
-msgstr ""
+msgstr "Sosem HDR kimenet"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Always output HDR"
-msgstr ""
+msgstr "Mindig HDR kimenet"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
-msgstr ""
+msgstr "HDR előállítása SDR-ből"
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
@@ -29442,19 +29437,19 @@ msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
 msgid "Audio Fingerprinting"
-msgstr ""
+msgstr "Hanglenyomat-készítés"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
-msgstr ""
+msgstr "Válasszon illeszkedő identitást"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
 msgid "No fingerprint has been found"
-msgstr ""
+msgstr "Nem található hanglenyomat"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
 msgid "Fingerprinting track..."
-msgstr ""
+msgstr "Hanglenyomat készítése…"
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -29971,7 +29966,7 @@ msgstr "A felület automatikus feldobása:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use a dark palette"
-msgstr ""
+msgstr "Sötét paletta használata"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"

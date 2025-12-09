@@ -23,16 +23,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.22\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-12-08 07:33+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Mario Siegmann <mario_siegmann@web.de>, 2025\n"
+"Last-Translator: Felix Paul Kühne <fkuehne@gmail.com>, 2025\n"
 "Language-Team: German (https://app.transifex.com/yaron/teams/16553/de/)\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -1087,24 +1087,20 @@ msgid "Decoded format"
 msgstr "Decodiertes Format"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Audiokanäle"
+msgstr "Dekodierte Kanäle"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Audio-Abtastrate"
+msgstr "Dekodierte Abtastrate"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Audiobits pro Sample"
+msgstr "Dekodierte Bits pro Sample"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Decodiertes Format"
+msgstr "Dekodierte Bitrate"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -13446,7 +13442,6 @@ msgstr "Textuntertitel-Decoder"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13893,7 +13888,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."

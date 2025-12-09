@@ -42,16 +42,16 @@
 # Wallon Wallon, 2023-2025
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.22\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-12-08 07:33+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Wallon Wallon, 2025\n"
 "Language-Team: French (https://app.transifex.com/yaron/teams/16553/fr/)\n"
-"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
 "1000000 == 0 ? 1 : 2;\n"
 
@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Ce programme est fourni SANS AUCUNE GARANTIE, tel que permis par la loi.\n"
 "Vous pouvez le redistribuer selon les termes de la Licence Publique Générale "
-"GNU ;\n"
+"GNU ;\n"
 "voir le fichier COPYING pour plus de détails.\n"
 "Écrit par l’équipe VideoLAN ; voir le fichier AUTHORS.\n"
 
@@ -226,7 +226,7 @@ msgstr "Séparateurs"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr "Les séparateurs vidéo coupent le flux en plusieurs vidéos."
+msgstr "Les séparateurs vidéo séparent le flux en plusieurs vidéos."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -259,7 +259,7 @@ msgid ""
 "input side of VLC. Use with care..."
 msgstr ""
 "Les filtres de flux permettent d’effectuer des opérations avancées au niveau "
-"de l’entrée de VLC. À utiliser avec précaution..."
+"de l’entrée de VLC. À utiliser avec précaution…"
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
@@ -296,7 +296,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
-msgstr "Paramètres généraux d’entrée. À utiliser avec précaution..."
+msgstr "Paramètres généraux d’entrée. À utiliser avec précaution…"
 
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1962
 #: modules/access/avio.h:50
@@ -397,7 +397,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "Vidéo à la demande"
+msgstr "Vidéo à la demande par VLC"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
@@ -416,9 +416,9 @@ msgid ""
 "Settings related to playlist behaviour (e.g. playback mode) and to modules "
 "that automatically add items to the playlist (\"service discovery\" modules)."
 msgstr ""
-"Paramètres liés au comportement de la liste de lecture (mode de lecture, par "
-"exemple) et aux modules qui y ajoutent automatiquement des éléments (modules "
-"de « découverte de services »)."
+"Paramètres liés au comportement de la liste de lecture (par exemple le mode "
+"de lecture) et aux modules qui y ajoutent automatiquement des éléments "
+"(modules de « découverte de services »)."
 
 #: include/vlc_config_cat.h:178
 msgid "General playlist behaviour"
@@ -456,11 +456,11 @@ msgstr "&Ouvrir un fichier…"
 
 #: include/vlc_intf_strings.h:47
 msgid "&Advanced Open..."
-msgstr "Ouvrir mode &avancé…"
+msgstr "Ouvrir en mode &avancé…"
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
-msgstr "Ouvrir un ré&pertoire"
+msgstr "Ouvrir un ré&pertoire…"
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
@@ -537,11 +537,11 @@ msgstr "Créer un dossier…"
 
 #: include/vlc_intf_strings.h:70
 msgid "Rename Directory..."
-msgstr "Renommer le répertoire..."
+msgstr "Renommer le répertoire…"
 
 #: include/vlc_intf_strings.h:71
 msgid "Rename Folder..."
-msgstr "Renommer le dossier..."
+msgstr "Renommer le dossier…"
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -987,7 +987,7 @@ msgstr "Décodeur"
 #: modules/codec/avcodec/encoder.c:394 modules/codec/avcodec/encoder.c:939
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
-msgstr "La diffusion / le transcodage a échoué"
+msgstr "La diffusion / le transcodage a échoué"
 
 #: src/input/decoder.c:1923
 #, c-format
@@ -1031,12 +1031,12 @@ msgstr "Oui"
 #: src/input/es_out.c:2159
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "Sous-titrage pour malentendants DTVCC %u"
+msgstr "Sous-titrages pour malentendants DTVCC %u"
 
 #: src/input/es_out.c:2161
 #, c-format
 msgid "Closed captions %u"
-msgstr "Sous-titrage malentendants %u"
+msgstr "Sous-titrages malentendants %u"
 
 #: src/input/es_out.c:3149
 msgid "Original ID"
@@ -1109,24 +1109,20 @@ msgid "Decoded format"
 msgstr "Format décodé"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Canaux audio"
+msgstr "Canaux décodés"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Fréquence d’échantillonnage audio"
+msgstr "Fréquence d’échantillonnage décodée"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Bits par échantillon audio"
+msgstr "Bits par échantillon décodés"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Format décodé"
+msgstr "Débit binaire (bitrate) décodé"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -1586,7 +1582,7 @@ msgid ""
 msgstr ""
 "Cette option permet de choisir les interfaces utilisées par VLC. Il est "
 "possible de sélectionner l’interface principale, les interfaces "
-"supplémentaires, et définir de multiples options s’y rapportant."
+"supplémentaires, et de définir les diverses options s’y rapportant."
 
 #: src/libvlc-module.c:68
 msgid "Interface module"
@@ -1622,7 +1618,7 @@ msgstr "Interfaces de contrôle pour VLC."
 
 #: src/libvlc-module.c:85
 msgid "Verbosity (0,1,2)"
-msgstr "Niveau de verbosité (0,1,2)"
+msgstr "Niveau de verbosité (0, 1, 2)"
 
 #: src/libvlc-module.c:87
 msgid ""
@@ -1662,7 +1658,7 @@ msgid ""
 "available options, including those that most users should never touch."
 msgstr ""
 "Affiche toutes les options disponibles dans les préférences, y compris "
-"celles auxquelles la majorité des utilisateurs ne touchent jamais."
+"celles auxquelles la majorité des utilisateurs ne devraient jamais toucher."
 
 #: src/libvlc-module.c:105
 msgid "Interface interaction"
@@ -1720,7 +1716,8 @@ msgid ""
 "not take place, thus saving some processing power."
 msgstr ""
 "Cette option désactive complètement la sortie audio. Le décodage des pistes "
-"audio ne sera alors pas réalisé, et cela économisera du temps processeur."
+"audio ne sera alors pas réalisé, et cela économisera de la puissance "
+"processeur."
 
 #: src/libvlc-module.c:142
 msgid "Music"
@@ -1914,7 +1911,7 @@ msgstr "Protection contre les pics"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr "Protection contre les coupures du son."
+msgstr "Protection contre les coupures du son"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
@@ -1981,7 +1978,7 @@ msgid ""
 "not take place, thus saving some processing power."
 msgstr ""
 "Il est possible de désactiver la sortie vidéo. Le décodage des pistes vidéo "
-"ne sera pas effectué, afin d’économiser du temps processeur."
+"ne sera pas effectué, afin d’économiser de la puissance processeur."
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
@@ -2010,7 +2007,7 @@ msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Forcer la hauteur de l’image ici. Par défaut VLC s’adaptera aux propriétés "
+"Forcer la hauteur de l’image. Par défaut (-1) VLC s’adaptera aux propriétés "
 "de la vidéo."
 
 #: src/libvlc-module.c:273
@@ -2140,7 +2137,8 @@ msgid ""
 "save some processing power."
 msgstr ""
 "Sortie vidéo en noir et blanc. L’information de couleur présente dans la "
-"vidéo ne sera pas décodée, ce qui permet d’économiser du temps processeur."
+"vidéo ne sera pas décodée, ce qui permet d’économiser de la puissance "
+"processeur."
 
 #: src/libvlc-module.c:307
 msgid "Embedded video"
@@ -2302,7 +2300,7 @@ msgstr ""
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
-msgstr "Dossier (ou nom de fichier) des captures "
+msgstr "Dossier (ou nom de fichier) des captures d’écran"
 
 #: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
@@ -2349,7 +2347,7 @@ msgid ""
 msgstr ""
 "Forcer la largeur de la capture d’écran. Par défaut, la largeur est "
 "conservée (-1). La valeur 0 redimensionnera en conservant le rapport de "
-"cadre."
+"forme."
 
 #: src/libvlc-module.c:415
 msgid "Video snapshot height"
@@ -2363,7 +2361,7 @@ msgid ""
 msgstr ""
 "Forcer la hauteur de la capture d’écran. Par défaut, la hauteur est "
 "conservée (-1). La valeur 0 redimensionnera en conservant le rapport de "
-"cadre."
+"forme."
 
 #: src/libvlc-module.c:421
 msgid "Video cropping"
@@ -2375,7 +2373,7 @@ msgid ""
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
 "Forcer un format de rognage de la vidéo. Les formats acceptés sont du type "
-"x:y (4:3, 16:9, ...) exprimant l’aspect global de l’image."
+"x:y (4:3, 16:9, …) exprimant l’aspect global de l’image."
 
 #: src/libvlc-module.c:427
 msgid "Source aspect ratio"
@@ -2654,7 +2652,7 @@ msgid ""
 "over the network (in bytes)."
 msgstr ""
 "Taille maximale (en octets) des paquets pouvant être transmis sur le réseau. "
-"En Ethernet, elle est généralement de 1500 octets."
+"Pour Ethernet, elle est généralement de 1500 octets."
 
 #: src/libvlc-module.c:549 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
@@ -2819,7 +2817,7 @@ msgstr "HD (720p)"
 
 #: src/libvlc-module.c:625
 msgid "Standard Definition (576 or 480 lines)"
-msgstr "Définition standard  (576 ou 480 lignes)"
+msgstr "Définition standard (576 ou 480 lignes)"
 
 #: src/libvlc-module.c:626
 msgid "Low Definition (360 lines)"
@@ -2913,7 +2911,7 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
-"Liste manuelle de signets pour un flux sous la forme « {name=nom-du-"
+"Liste manuelle de signets pour un flux sous la forme « {nom=nom-du-"
 "signet,time=date-facultative,bytes=position-facultative-en-octets},{…} »."
 
 #: src/libvlc-module.c:671
@@ -3742,7 +3740,7 @@ msgstr "Écris l’id du processus dans le ficher spécifié."
 
 #: src/libvlc-module.c:1074
 msgid "Allow only one running instance"
-msgstr "N’autorise qu’une seule instance"
+msgstr "N’autoriser qu’une seule instance"
 
 #: src/libvlc-module.c:1076
 msgid ""
@@ -9781,7 +9779,7 @@ msgstr "URL donnant des informations sur votre flux ou chaîne."
 
 #: modules/access_output/shout.c:93
 msgid "Bitrate information of the transcoded stream."
-msgstr "Débit cible du flux vidéo transcodé."
+msgstr "Informations sur le débit binaire (bitrate) du flux transcodé."
 
 #: modules/access_output/shout.c:96
 msgid "Samplerate information of the transcoded stream."
@@ -9990,7 +9988,7 @@ msgstr "Distance entre le haut-parleur avant-gauche et l’auditeur, en mètres.
 
 #: modules/audio_filter/channel_mixer/headphone.c:64
 msgid "Compensate delay"
-msgstr "Compenser le délai"
+msgstr "Compenser le retard"
 
 #: modules/audio_filter/channel_mixer/headphone.c:66
 msgid ""
@@ -10417,7 +10415,7 @@ msgstr "Augmenter ou réduire le gain (1.0 par défaut)."
 
 #: modules/audio_filter/gain.c:63
 msgid "Gain control filter"
-msgstr "Filtre d’ajustement du grain"
+msgstr "Filtre d’ajustement du gain"
 
 #: modules/audio_filter/karaoke.c:33 modules/demux/xiph_metadata.h:51
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:260
@@ -11464,7 +11462,7 @@ msgstr ""
 #: modules/codec/avcodec/avcodec.h:162 modules/codec/x264.c:363
 #: modules/demux/mod.c:79
 msgid "Noise reduction"
-msgstr "Résolution de bruit"
+msgstr "Réduction du bruit"
 
 #: modules/codec/avcodec/avcodec.h:163
 msgid ""
@@ -13262,7 +13260,7 @@ msgstr "Par défaut (Windows-1252)"
 
 #: modules/codec/subsdec.c:101
 msgid "System codeset"
-msgstr "Codeset système"
+msgstr "Jeu de caractères système"
 
 #: modules/codec/subsdec.c:102
 msgid "Universal (UTF-8)"
@@ -13466,7 +13464,6 @@ msgstr "Décodeur de sous-titres texte"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13916,7 +13913,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -22577,7 +22573,7 @@ msgstr "Si le désentrelacement temporel s’applique à la luminance seulement"
 
 #: modules/hw/vdpau/chroma.c:904
 msgid "Noise reduction level"
-msgstr "Niveau de résolution du bruit"
+msgstr "Niveau de réduction du bruit"
 
 #: modules/hw/vdpau/chroma.c:906
 msgid "Scaling quality"
@@ -24722,8 +24718,8 @@ msgid ""
 "simply enter its filename."
 msgstr ""
 "Chemins complets des images à utiliser. Le format est <image>[,<delay in "
-"ms>[,<alpha>]][;<image>[,<delay>[,<alpha>]]][;...]. Avec une seule une "
-"image, saisir son chemin."
+"ms>[,<alpha>]][;<image>[,<delay>[,<alpha>]]][;...]. Si vous n’avez qu’un "
+"seul fichier, saisissez simplement son nom."
 
 #: modules/spu/logo.c:53
 msgid "Logo animation # of loops"

@@ -1,5 +1,5 @@
 # Romanian translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2025 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -19,18 +19,19 @@
 # eduard pintilie <eduard.pintilie@gmail.com>, 2020
 # Vadim Severin <xvadimxtm@gmail.com>, 2021
 # Simona Iacob <s@zp1.net>, 2021
+# Andrei Miloiu <miloiuandrei@gmail.com>, 2025
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.22\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-12-08 07:33+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Simona Iacob <s@zp1.net>, 2021\n"
+"Last-Translator: Andrei Miloiu <miloiuandrei@gmail.com>, 2025\n"
 "Language-Team: Romanian (https://app.transifex.com/yaron/teams/16553/ro/)\n"
-"Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ro\n"
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
 "2:1));\n"
 
@@ -1087,24 +1088,20 @@ msgid "Decoded format"
 msgstr "Format decodat"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Canale audio"
+msgstr "Canalele decodate"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Frecvența de eșantionare audio"
+msgstr "Rata de eșantionare decodată"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Biți audio per eșantion"
+msgstr "Biții decodați pe eșantion"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Format decodat"
+msgstr "Rata de biți decodată"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -6470,11 +6467,11 @@ msgstr "[cdda:][dispozitiv][@[pistă]]"
 
 #: modules/access/cdda.c:1022
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "Serverul Musicbrainz"
 
 #: modules/access/cdda.c:1023
 msgid "Address of the musicbrainz server to use."
-msgstr ""
+msgstr "Adresa serverului musicbrainz de utilizat."
 
 #: modules/access/cdda.c:1025
 msgid "CDDB Server"
@@ -8772,7 +8769,7 @@ msgstr "Parola pentru criptarea fluxului"
 
 #: modules/access/srt.c:446 modules/access_output/srt.c:480
 msgid " SRT Stream ID"
-msgstr ""
+msgstr "ID-ul fluxului SRT"
 
 #: modules/access/srt_common.c:26
 msgid "16 bytes"
@@ -9806,11 +9803,11 @@ msgstr "Flux de ieșire SRT"
 
 #: modules/access_output/srt.c:471
 msgid "SRT maximum payload size (bytes)"
-msgstr ""
+msgstr "Dimensiunea maximă a sarcinii utile SRT (bytes/octeți)"
 
 #: modules/access_output/srt.c:475
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr ""
+msgstr "Plafonul maxim al lățimii de bandă SRT (bytes/octeți)"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11780,11 +11777,11 @@ msgstr ""
 
 #: modules/codec/dav1d.c:56
 msgid "All Layers"
-msgstr ""
+msgstr "Toate straturile"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
-msgstr ""
+msgstr "Dacă se afișează sau nu toate straturile spațiale, e implicit fals"
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
@@ -13455,7 +13452,6 @@ msgstr "Decodificator de subtitrare text"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13906,7 +13902,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -18384,7 +18379,7 @@ msgstr "Restrânge totul"
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
 msgid "Shuffle playlist"
-msgstr ""
+msgstr "Redare aleatorie din playlist/lista de redare"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -22099,11 +22094,11 @@ msgstr "Afișarea dialogurilor de eroare și avertismente neimportante"
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Enable Dark Mode"
-msgstr ""
+msgstr "Afișează modul întunecat"
 
 #: modules/gui/qt/qt.cpp:126
 msgid "Applies a dark theme to the style."
-msgstr ""
+msgstr "Aplică o temă întunecată stilului."
 
 #: modules/gui/qt/qt.cpp:128
 msgid "Activate the updates availability notification"
@@ -22445,15 +22440,15 @@ msgstr "Stabiliți gama imaginii, între 0,01 și 10. Implicit este 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:681
 msgid "AMD VQ Enhancer"
-msgstr ""
+msgstr "Funcția de îmbunătățire AMD VQ Enhancer"
 
 #: modules/hw/d3d11/d3d11_filters.c:687
 msgid "AMD Frame Rate Doubler"
-msgstr ""
+msgstr "Funcția de dublare a cadrelor AMD Frame Rate Doubler"
 
 #: modules/hw/d3d11/d3d11_filters.c:690
 msgid "Show indicator"
-msgstr ""
+msgstr "Afișează indicatorul"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -28412,47 +28407,47 @@ msgstr "Ieșire video recomandată pentru Windows 8 și versiunile ulterioare"
 
 #: modules/video_output/win32/direct3d11.c:74
 msgid "Video Upscaling Mode"
-msgstr ""
+msgstr "Modul de upscaling a videoclipurilor"
 
 #: modules/video_output/win32/direct3d11.c:75
 msgid "Select the upscaling mode for video."
-msgstr ""
+msgstr "Selectează modul de upscaling a videoclipurilor."
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Linear Sampler"
-msgstr ""
+msgstr "Eșantionator liniar"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Point Sampler"
-msgstr ""
+msgstr "Eșantionator punctat"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Video Processor"
-msgstr ""
+msgstr "Procesor video"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Super Resolution"
-msgstr ""
+msgstr "Superrezoluție"
 
 #: modules/video_output/win32/direct3d11.c:82
 msgid "HDR Output Mode"
-msgstr ""
+msgstr "Modul de ieșire HDR"
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
-msgstr ""
+msgstr "Folosește ieșirea HDR chiar dacă sursa este SDR."
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Never out HDR"
-msgstr ""
+msgstr "HDR fără întreruperi"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Always output HDR"
-msgstr ""
+msgstr "Întotdeauna ieșire HDR"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
-msgstr ""
+msgstr "Generează HDR din SDR"
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
@@ -29588,19 +29583,19 @@ msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
 msgid "Audio Fingerprinting"
-msgstr ""
+msgstr "Amprentare audio"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
-msgstr ""
+msgstr "Selectează o identitate potrivită"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
 msgid "No fingerprint has been found"
-msgstr ""
+msgstr "Nu s-a găsit nicio amprentă"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
 msgid "Fingerprinting track..."
-msgstr ""
+msgstr "Urmărirea amprentelor..."
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -30117,7 +30112,7 @@ msgstr "Ridicarea automată a interfeței:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use a dark palette"
-msgstr ""
+msgstr "Folosește o paletă întunecată"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"

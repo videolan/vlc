@@ -1,21 +1,21 @@
 # Slovak translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2025 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Marián Hikaník <podnety@mojepreklady.net>, 2014-2023
+# Marián Hikaník <podnety@mojepreklady.net>, 2014-2025
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.22\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-12-08 07:33+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Marián Hikaník, 2025\n"
 "Language-Team: Slovak (https://app.transifex.com/yaron/teams/16553/sk/)\n"
-"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n "
 ">= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
 
@@ -1073,24 +1073,20 @@ msgid "Decoded format"
 msgstr "Dekódovaný formát"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Zvukové kanály"
+msgstr "Dekódované kanály"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Vzorkovacia frekvencia zvuku"
+msgstr "Dekódovaná vzorkovacia frekvencia"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Zvukové bity na vzorku"
+msgstr "Dekódované bity na vzorku"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Dekódovaný formát"
+msgstr "Dekódovaný dátový tok"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -6880,8 +6876,8 @@ msgstr "Vzorkovacia frekvencia zvuku"
 #: modules/access/dshow/dshow.cpp:203
 msgid "Select audio input format with the given sample rate (if non 0)"
 msgstr ""
-"Vyberte formát zvukového vstupu zadaním rýchlosti vzorkovania (ak sa nerovná "
-"0)"
+"Vyberte formát zvukového vstupu zadaním vzorkovacej frekvencie (ak sa "
+"nerovná 0)"
 
 #: modules/access/dshow/dshow.cpp:205
 msgid "Audio bits per sample"
@@ -13404,7 +13400,6 @@ msgstr "Dekodér textových titulkov"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13855,7 +13850,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."

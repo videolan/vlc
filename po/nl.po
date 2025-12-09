@@ -1,5 +1,5 @@
 # Dutch translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2025 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,16 +9,16 @@
 # Thomas De Rocker, 2008-2025
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.22\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2025-12-08 07:33+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Thomas De Rocker, 2025\n"
 "Language-Team: Dutch (https://app.transifex.com/yaron/teams/16553/nl/)\n"
-"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -1073,24 +1073,20 @@ msgid "Decoded format"
 msgstr "Gedecodeerd formaat"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Audiokanalen"
+msgstr "Gedecodeerde kanalen"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Audio-samplerate"
+msgstr "Gedecodeerde samplerate"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Audio bits per sample"
+msgstr "Gedecodeerde bits per sample"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Gedecodeerd formaat"
+msgstr "Gedecodeerde bitrate"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -3831,7 +3827,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:569
 msgid "Allow metadata network access"
-msgstr "Metadata-netwerktoegang toestaan"
+msgstr "Netwerktoegang voor metadata toestaan"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
@@ -13403,7 +13399,6 @@ msgstr "Tekst ondertiteldecoder"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13848,7 +13843,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy, c-format
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -20930,7 +20924,7 @@ msgid ""
 "p>\n"
 msgstr ""
 "<p>Om uw privacy te beschermen, verzamelt of verzendt <i>VLC media player</"
-"i> <b>geen</b> persoonlijke data, zelfs niet in anonieme vorm.</p>\n"
+"i> <b>geen</b> persoonlijke gegevens, zelfs niet in anonieme vorm.</p>\n"
 "<p>Desondanks kan <i>VLC</i> automatisch informatie ophalen over de media in "
 "uw afspeellijst via internetgebaseerde diensten van derden. Dat omvat "
 "albumhoezen, tracknamen, auteurs en andere metadata.</p>\n"
@@ -20945,7 +20939,7 @@ msgstr "Netwerktoegang-beleid"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
-msgstr "Regelmatig controleren op VLC-updates"
+msgstr "Regelmatig controleren op updates voor VLC"
 
 #: modules/gui/qt/dialogs/gototime.cpp:41
 msgid "Go to Time"
