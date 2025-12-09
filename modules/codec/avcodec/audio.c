@@ -273,7 +273,7 @@ int InitAudioDec( vlc_object_t *obj )
     /* XXX: Writing input format makes little sense. */
     if( avctx->profile != AVPROFILE(UNKNOWN) )
         p_dec->fmt_in.i_profile = avctx->profile;
-    if( avctx->level != FF_LEVEL_UNKNOWN )
+    if( avctx->level != AVLEVEL(UNKNOWN) )
         p_dec->fmt_in.i_level = avctx->level;
 
     return VLC_SUCCESS;

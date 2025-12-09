@@ -150,4 +150,10 @@
 # define AVPROFILE(prof) (FF_PROFILE_##prof)
 #endif
 
+#if LIBAVCODEC_VERSION_CHECK(60,26,100)
+# define AVLEVEL(prof) (AV_LEVEL_##prof)
+#else
+# define AVLEVEL(prof) (FF_LEVEL_##prof)
+#endif
+
 #endif
