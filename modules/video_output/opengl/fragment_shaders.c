@@ -633,7 +633,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
                 pl_color_space_from_video_format(&tc->fmt),
                 dst_space, NULL, false);
 
+# if PL_API_VER >= 157
+        pl_shader_obj dither_state = NULL;
+#else
         struct pl_shader_obj *dither_state = NULL;
+#endif
         int method = var_InheritInteger(tc->gl, "dither-algo");
         if (method >= 0) {
 
