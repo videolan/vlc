@@ -22,13 +22,6 @@ DEPS_png = zlib $(DEPS_zlib)
 
 PNG_CONF := -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DPNG_TOOLS=OFF -DPNG_FRAMEWORK=OFF
 
-ifdef HAVE_CLANG
-ifneq ($(filter arm aarch64, $(ARCH)),)
-# TODO this might be set globally and for all targets where intrinsincs are used
-PNG_CONF += -DCMAKE_ASM_FLAGS="$(CFLAGS)"
-endif
-endif
-
 PNG_CONF += -DPNG_DEBUG_POSTFIX:STRING=
 
 ifeq ($(ARCH),arm)
