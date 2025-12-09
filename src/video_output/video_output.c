@@ -1400,7 +1400,15 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     return VLC_SUCCESS;
 }
 
-static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
+enum render_picture_type
+{
+    RENDER_PICTURE_NORMAL,
+    RENDER_PICTURE_FORCED,
+    RENDER_PICTURE_NEXT,
+};
+
+static int RenderPicture(vout_thread_sys_t *sys,
+                         enum render_picture_type render_type)
 {
     vout_display_t *vd = sys->display;
 
@@ -1423,6 +1431,8 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         vlc_queuedmutex_unlock(&sys->display_lock);
         return ret;
     }
+
+    bool render_now = render_type != RENDER_PICTURE_NORMAL;
 
     vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t pts = todisplay->date;
@@ -1507,11 +1517,17 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         sys->displayed.date = system_now;
     }
 
+    /* Next frames should be updated as forced points */
+    if (render_type == RENDER_PICTURE_NEXT)
+        system_now = VLC_TICK_MAX;
+    else
+        system_now = vlc_tick_now();
+
     /* Display the direct buffer returned by vout_RenderPicture */
     vout_display_Display(vd, todisplay);
     vlc_clock_Lock(sys->clock);
     vlc_tick_t drift = vlc_clock_UpdateVideo(sys->clock,
-                                             vlc_tick_now(),
+                                             system_now,
                                              pts, sys->rate,
                                              frame_rate, frame_rate_base);
     vlc_clock_Unlock(sys->clock);
@@ -1563,7 +1579,7 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
     if (!next)
         return VLC_EGENERIC;
 
-    return RenderPicture(sys, true);
+    return RenderPicture(sys, RENDER_PICTURE_NEXT);
 }
 
 static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
@@ -1643,7 +1659,8 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         // display forced picture immediately
         bool render_now = sys->displayed.current->b_force;
 
-        RenderPicture(vout, render_now);
+        RenderPicture(vout, render_now ? RENDER_PICTURE_FORCED
+                                       : RENDER_PICTURE_NORMAL);
         if (!render_now)
             /* Prepare the next picture immediately without waiting */
             return VLC_TICK_INVALID;
@@ -1652,7 +1669,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     {
         sys->wait_interrupted = false;
         if (likely(sys->displayed.current != NULL))
-            RenderPicture(vout, true);
+            RenderPicture(vout, RENDER_PICTURE_FORCED);
         return VLC_TICK_INVALID;
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
@@ -1674,7 +1691,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
             vlc_tick_t max_deadline = system_now + VOUT_REDISPLAY_DELAY;
             return __MIN(date_refresh, max_deadline);
         }
-        RenderPicture(vout, true);
+        RenderPicture(vout, RENDER_PICTURE_FORCED);
     }
 
     // wait until the next deadline or a control
