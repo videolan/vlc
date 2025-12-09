@@ -351,7 +351,7 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
             msg_Warn( m_sd, "Unexpected underlying protocol, the UPNP module "
                       "fully supports HTTP and has partial support for HTTPS" );
             return false;
-        } 
+        }
 
         std::string mrl = desc->location;
 
@@ -361,7 +361,7 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
         // Forge a root object ID in the MRL, this is used in the dir access.
         if ( desc->location.find( '?' ) == std::string::npos )
             mrl += "?ObjectID=0";
-        else 
+        else
             mrl += "&ObjectID=0";
 
         p_input_item = input_item_NewDirectory( mrl.c_str(),
@@ -1333,6 +1333,8 @@ UpnpInstanceWrapper::~UpnpInstanceWrapper()
 }
 
 #ifdef _WIN32
+
+#include <iphlpapi.h> // IP_ADAPTER_ADDRESSES, IP_ADAPTER_MULTICAST_ADDRESS, etc
 
 static IP_ADAPTER_MULTICAST_ADDRESS* getMulticastAddress(IP_ADAPTER_ADDRESSES* p_adapter)
 {
