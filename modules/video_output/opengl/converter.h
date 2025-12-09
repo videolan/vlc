@@ -56,6 +56,7 @@
 # include <libplacebo/config.h>
 # if PL_API_VER >= 157
 #  include <libplacebo/log.h>
+#  include <libplacebo/shaders.h>
 # endif
 #endif
 
@@ -348,7 +349,11 @@ struct opengl_tex_converter_t
     bool yuv_color;
     GLfloat yuv_coefficients[16];
 
+# if PL_API_VER >= 157
+    pl_shader pl_sh;
+# else
     struct pl_shader *pl_sh;
+# endif
     const struct pl_shader_res *pl_sh_res;
 
     /* Private context */
