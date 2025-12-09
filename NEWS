@@ -1,3 +1,9 @@
+Changes between 3.0.22 and 3.0.23:
+----------------------------------
+
+Windows:
+ * config_GetUserDir() no longer tries to create the folder on Windows (#29488)
+
 Changes between 3.0.21 and 3.0.22:
 ----------------------------------
 
