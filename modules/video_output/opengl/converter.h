@@ -52,6 +52,13 @@
 # endif
 #endif
 
+#ifdef HAVE_LIBPLACEBO
+# include <libplacebo/config.h>
+# if PL_API_VER >= 157
+#  include <libplacebo/log.h>
+# endif
+#endif
+
 #define VLCGL_PICTURE_MAX 128
 
 #ifndef GL_TEXTURE_RECTANGLE
@@ -272,8 +279,12 @@ struct opengl_tex_converter_t
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
 
+# if PL_API_VER >= 157
+    pl_log pl_ctx;
+# else
     /* libplacebo context, created by the caller (optional) */
     struct pl_context *pl_ctx;
+#endif
 
     /* Function pointers to OpenGL functions, set by the caller */
     const opengl_vtable_t *vt;
