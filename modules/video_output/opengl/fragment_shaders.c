@@ -611,7 +611,6 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
 #ifdef HAVE_LIBPLACEBO
     if (tc->pl_sh) {
-        struct pl_shader *sh = tc->pl_sh;
         struct pl_color_map_params color_params = pl_color_map_default_params;
         color_params.intent = var_InheritInteger(tc->gl, "rendering-intent");
         color_params.tone_mapping_algo = var_InheritInteger(tc->gl, "tone-mapping");
@@ -630,7 +629,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         dst_space.primaries = var_InheritInteger(tc->gl, "target-prim");
         dst_space.transfer = var_InheritInteger(tc->gl, "target-trc");
 
-        pl_shader_color_map(sh, &color_params,
+        pl_shader_color_map(tc->pl_sh, &color_params,
                 pl_color_space_from_video_format(&tc->fmt),
                 dst_space, NULL, false);
 
@@ -657,13 +656,13 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
                 out_bits = fb_depth;
             }
 
-            pl_shader_dither(sh, out_bits, &dither_state, &(struct pl_dither_params) {
+            pl_shader_dither(tc->pl_sh, out_bits, &dither_state, &(struct pl_dither_params) {
                 .method   = method,
                 .lut_size = 4, // avoid too large values, since this gets embedded
             });
         }
 
-        const struct pl_shader_res *res = tc->pl_sh_res = pl_shader_finalize(sh);
+        const struct pl_shader_res *res = tc->pl_sh_res = pl_shader_finalize(tc->pl_sh);
         pl_shader_obj_destroy(&dither_state);
 
         FREENULL(tc->uloc.pl_vars);
