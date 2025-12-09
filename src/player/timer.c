@@ -515,7 +515,14 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
 
     vlc_tick_t system_date = point->system_date;
     if (player->timer.paused)
+    {
+        if (es_source != NULL && point->system_date == VLC_TICK_MAX)
+        {
+            /* Update was forced, probably a next/prev frame */
+            force_update = true;
+        }
         system_date = VLC_TICK_MAX;
+    }
 
     if (!player->timer.stopping)
         vlc_player_UpdateTimerBestSource(player, es_source,
