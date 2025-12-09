@@ -1,5 +1,5 @@
 # PNG
-PNG_VERSION := 1.6.50
+PNG_VERSION := 1.6.53
 PNG_URL := $(SF)/libpng/libpng16/$(PNG_VERSION)/libpng-$(PNG_VERSION).tar.xz
 
 PKGS += png
@@ -20,7 +20,7 @@ png: libpng-$(PNG_VERSION).tar.xz .sum-png
 
 DEPS_png = zlib $(DEPS_zlib)
 
-PNG_CONF := -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DPNG_EXECUTABLES=OFF
+PNG_CONF := -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DPNG_TOOLS=OFF
 
 ifdef HAVE_CLANG
 ifneq ($(filter arm aarch64, $(ARCH)),)
