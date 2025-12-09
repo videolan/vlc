@@ -115,10 +115,25 @@ wait_type_timer(struct np_ctx *np_ctx, unsigned type)
 }
 
 static void
+wait_next_tc(struct np_ctx *np_ctx)
+{
+    struct ctx *ctx = np_ctx->ctx;
+    vlc_player_t *player = ctx->player;
+    struct timer_state *timer = &np_ctx->timer;
+    struct vlc_player_timer_smpte_timecode *tc = &np_ctx->tc;
+
+    player_lock_timer(player, timer);
+    struct report_timer *r = timer_state_wait_next_report(timer);
+    assert(r->type == REPORT_TIMER_TC);
+    *tc = r->tc;
+    player_unlock_timer(player, timer);
+}
+
+
+static void
 check_resumed_timer(struct np_ctx *np_ctx)
 {
     struct ctx *ctx = np_ctx->ctx;
-    struct timer_state *timer = &np_ctx->timer;
 
     /* Check that the player can be resumed and paused again after
      * next/prev frame */
@@ -128,12 +143,7 @@ check_resumed_timer(struct np_ctx *np_ctx)
     wait_state(ctx, VLC_PLAYER_STATE_PLAYING);
 
     /* Wait that a video frame is rendered */
-    struct report_timer *r = NULL;
-    player_lock_timer(player, timer);
-    r = timer_state_wait_next_report(timer);
-    assert(r->type == REPORT_TIMER_TC);
-    np_ctx->tc = r->tc;
-    player_unlock_timer(player, timer);
+    wait_next_tc(np_ctx);
 
     vlc_player_Pause(player);
 
@@ -148,9 +158,7 @@ check_seek_timer(struct np_ctx *np_ctx)
     /* Check that the player can be resumed and paused again after
      * next/prev frame */
     struct ctx *ctx = np_ctx->ctx;
-    struct timer_state *timer = &np_ctx->timer;
     vlc_player_t *player = ctx->player;
-    struct vlc_player_timer_smpte_timecode *tc = &np_ctx->tc;
 
     assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
     vlc_player_SetTime(player, ctx->params.length / 2);
@@ -160,12 +168,7 @@ check_seek_timer(struct np_ctx *np_ctx)
     wait_type_timer(np_ctx, REPORT_TIMER_SEEK);
 
     /* Wait that a video frame is rendered */
-    struct report_timer *r = NULL;
-    player_lock_timer(player, timer);
-    r = timer_state_wait_next_report(timer);
-    assert(r->type == REPORT_TIMER_TC);
-    *tc = r->tc;
-    player_unlock_timer(player, timer);
+    wait_next_tc(np_ctx);
 
     assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
 }
@@ -310,9 +313,6 @@ test_prev(struct ctx *ctx, const struct media_params *params)
 
     player_add_timer(player, &np_ctx.timer, true, VLC_TICK_INVALID);
 
-    struct timer_state *timer = &np_ctx.timer;
-    struct vlc_player_timer_smpte_timecode *tc = &np_ctx.tc;
-
     player_start(ctx);
 
     /* Wait for a vout */
@@ -324,24 +324,15 @@ test_prev(struct ctx *ctx, const struct media_params *params)
     }
 
     /* Wait for a first frame */
-    struct report_timer *r = NULL;
-    player_lock_timer(player, timer);
-    r = timer_state_wait_next_report(timer);
-    assert(r->type == REPORT_TIMER_TC);
-    *tc = r->tc;
-    player_unlock_timer(player, timer);
+    wait_next_tc(&np_ctx);
 
     vlc_player_SetTime(player, params->length / 2);
 
     /* Wait for a first frame */
     wait_type_timer(&np_ctx, REPORT_TIMER_SEEK);
 
-    /* Wait for a first fram after seek */
-    player_lock_timer(player, timer);
-    r = timer_state_wait_next_report(timer);
-    assert(r->type == REPORT_TIMER_TC);
-    *tc = r->tc;
-    player_unlock_timer(player, timer);
+    /* Wait for a first frame after seek */
+    wait_next_tc(&np_ctx);
 
     vlc_player_PreviousVideoFrame(player);
 
