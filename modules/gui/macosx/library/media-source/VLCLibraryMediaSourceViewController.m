@@ -78,6 +78,8 @@
 
 - (void)dealloc
 {
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+    [self.browsePlaceholderLabel removeFromSuperview];
     if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         [self.pathControlGlassEffectView removeFromSuperview];
