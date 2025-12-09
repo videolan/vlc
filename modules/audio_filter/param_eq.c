@@ -147,7 +147,7 @@ static int Open( vlc_object_t *p_this )
                      i_samplerate, p_sys->coeffs+2*5);
     CalcShelfEQCoeffs(p_sys->f_lowf, 1, p_sys->f_lowgain, 0,
                       i_samplerate, p_sys->coeffs+3*5);
-    CalcShelfEQCoeffs(p_sys->f_highf, 1, p_sys->f_highgain, 0,
+    CalcShelfEQCoeffs(p_sys->f_highf, 1, p_sys->f_highgain, 1,
                       i_samplerate, p_sys->coeffs+4*5);
     p_sys->p_state = (float*)calloc( p_filter->fmt_in.audio.i_channels*5*4,
                                      sizeof(float) );
