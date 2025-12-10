@@ -396,6 +396,8 @@ static void PlaylistAddNode(intf_sys_t *sys, playlist_item_t *node,
         if (p_child->i_children <= 0)
             continue;
 
+        if (unlikely(!c)) vlc_assert_unreachable();
+
         if (*c) {
             char *tmp;
             if (asprintf(&tmp, "%s%c ", c, last ? ' ' : '|') == -1)
