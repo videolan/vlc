@@ -1926,6 +1926,17 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
 static void Decoder_VideoDrained(vlc_input_decoder_t *owner)
 {
     owner->video.drained = true;
+    if (owner->frames_countdown > 0)
+    {
+        if (unlikely(vout_IsEmpty(owner->video.vout)))
+        {
+            /* Unlikely case where all pictures are already sent to the vout
+             * next queue while draining. This could happen with a burst of
+             * next-frame request near EOF. */
+            owner->frames_countdown = 0;
+            decoder_Notify(owner, frame_next_status, -EAGAIN);
+        }
+    }
 }
 
 /**
@@ -2934,6 +2945,14 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
     if( unlikely( p_owner->frames_countdown == INT_MAX ) )
     {
         decoder_Notify( p_owner, frame_next_status, -EINVAL );
+        vlc_fifo_Unlock( p_owner->p_fifo );
+        return;
+    }
+
+    if( p_owner->video.drained && vout_IsEmpty( p_owner->video.vout ) )
+    {
+        p_owner->frames_countdown = 0;
+        decoder_Notify( p_owner, frame_next_status, -EAGAIN );
         vlc_fifo_Unlock( p_owner->p_fifo );
         return;
     }
