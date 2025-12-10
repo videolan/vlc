@@ -269,7 +269,8 @@ Item {
             id: stackView
             anchors.fill: parent
             focus: true
-            clip: _extendedFrameVisible
+            // If there is depth buffer, clipping is not necessary:
+            clip: _extendedFrameVisible && !effect.hasDepthBuffer
 
             pageModel: _pageModel
 
@@ -319,20 +320,30 @@ Item {
     Widgets.RoundedRectangleShadow {
         id: effect
         parent: g_mainInterface
-        hollow: Window.window && (Window.window.color.a < 1.0) // the interface may be translucent if the window has backdrop blur
-        blending: false // stacked below everything, no need for blending even though it is not opaque
+        hollow: (z >= 0) || (Window.window && (Window.window.color.a < 1.0)) // the interface may be translucent if the window has backdrop blur
+        // No need for blending, even if this is above everything (when there is depth buffer). This item does not need to be blended in the scene
+        // graph. The system compositor is still going to respect the transparency when compositing the window. By disabling blending, this is treated
+        // as opaque in the scene graph by the renderer, which makes it possible to not use a clip node for the content due to depth test (since
+        // this item is quasi-opaque, the content pixels obscured by the shadow pixels are not painted), and at the same time not spend effort on
+        // blending. Note that this optimization relies on hollow mode that discards the inner pixels, so the actual content area is still painted.
+        blending: false
         visible: _extendedFrameVisible && !MainCtx.platformHandlesShadowsWithCSD()
-        opacity:  0.5
+        color: Qt.rgba(0.0, 0.0, 0.0, 0.5) // sg opacity < 1.0 force enables blending, so we adjust the color instead
+
+        // If there is depth buffer, we enable hollow mode. The inner area is discarded, so we can do this:
+        z: hasDepthBuffer ? 99 : -1
+
+        readonly property bool hasDepthBuffer: (Window.window && MainCtx.windowHasDepthBuffer(Window.window))
 
         // Blur radius can not be greater than (margin / compensationFactor), as in that case it would need bigger
         // size than the window to compensate. If you want bigger blur radius, either decrease the compensation
         // factor which can lead to visible clipping, or increase the window extended margin:
-        property real activeBlurRadius: (MainCtx.windowExtendedMargin / effect.compensationFactor)
+        blurRadius: (MainCtx.windowExtendedMargin / effect.compensationFactor)
 
-        blurRadius: MainCtx.intfMainWindow.active ? activeBlurRadius
-                                                  : (activeBlurRadius / 2.0)
+        compensationFactor: MainCtx.intfMainWindow.active ? (defaultCompensationFactor)
+                                                          : (defaultCompensationFactor * 2)
 
-        Behavior on blurRadius {
+        Behavior on compensationFactor {
             // FIXME: Use UniformAnimator instead
             NumberAnimation {
                 duration: VLCStyle.duration_veryShort
