@@ -120,6 +120,7 @@ struct decoder_video
     vout_thread_t *vout;
     enum vlc_vout_order vout_order;
     bool started;
+    bool drained;
 
     /* pool to use when the decoder doesn't use its own */
     struct picture_pool_t *out_pool;
@@ -1922,6 +1923,11 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
     p_owner->error = false;
 }
 
+static void Decoder_VideoDrained(vlc_input_decoder_t *owner)
+{
+    owner->video.drained = true;
+}
+
 /**
  * The decoding main loop
  *
@@ -2025,11 +2031,22 @@ static void *DecoderThread( void *p_data )
         {
             p_owner->b_draining = false;
 
-            if( p_owner->cat == AUDIO_ES
-             && p_owner->audio.stream != NULL )
-            {   /* Draining: the decoder is drained and all decoded buffers are
-                 * queued to the output at this point. Now drain the output. */
-                vlc_aout_stream_Drain( p_owner->audio.stream );
+            switch (p_owner->cat)
+            {
+                case AUDIO_ES:
+                    if( p_owner->audio.stream != NULL )
+                    {
+                        /* Draining: the decoder is drained and all decoded
+                         * buffers are queued to the output at this point.
+                         * Now drain the output. */
+                        vlc_aout_stream_Drain( p_owner->audio.stream );
+                    }
+                    break;
+                case VIDEO_ES:
+                    Decoder_VideoDrained(p_owner);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -2176,6 +2193,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
         case VIDEO_ES:
             p_owner->video.vout = NULL;
             p_owner->video.started = false;
+            p_owner->video.drained = false;
             vlc_mutex_init( &p_owner->video.mouse_lock );
             p_owner->video.mouse_event = NULL;
             p_owner->video.mouse_opaque = NULL;
@@ -2722,6 +2740,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
     }
     else if( cat == VIDEO_ES )
     {
+        p_owner->video.drained = false;
         if( p_owner->video.vout && p_owner->video.started
          && p_owner->frames_countdown != -1 )
         {
