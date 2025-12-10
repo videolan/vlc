@@ -331,6 +331,14 @@ public:
         return 0.0;
     }
 
+    Q_INVOKABLE static bool windowHasDepthBuffer(const QWindow* window)
+    {
+        assert(window);
+        // Make sure window has been initialized before (such as `::create()` was called):
+        assert(window->handle());
+        return window->format().depthBufferSize() > 0;
+    }
+
     Q_INVOKABLE virtual bool platformHandlesResizeWithCSD() const { return false; };
     Q_INVOKABLE virtual bool platformHandlesTitleBarButtonsWithCSD() const { return false; };
     Q_INVOKABLE virtual bool platformHandlesShadowsWithCSD() const { return false; };
