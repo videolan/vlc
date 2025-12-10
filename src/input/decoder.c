@@ -1491,11 +1491,7 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
             picture_Release(p_picture);
             return ret;
         }
-
     }
-
-    if( unlikely(p_owner->paused) && likely(p_owner->frames_countdown > 0) )
-        p_owner->frames_countdown--;
 
     /* */
     if( p_vout == NULL )
@@ -1503,6 +1499,9 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
         picture_Release( p_picture );
         return VLC_EGENERIC;
     }
+
+    if( unlikely(p_owner->paused) && likely(p_owner->frames_countdown > 0) )
+        p_owner->frames_countdown--;
 
     if( p_picture->b_still )
     {
