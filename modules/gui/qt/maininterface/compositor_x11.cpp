@@ -208,6 +208,8 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx, std::function<void (QQui
     CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP | HAS_ACRYLIC;
     if (m_renderWindow->supportExtendedFrame())
         flags |= CompositorVideo::HAS_EXTENDED_FRAME;
+    assert(m_qmlView->getOffscreenWindow());
+    m_qmlView->getOffscreenWindow()->create();
     if (!commonGUICreate(m_renderWindow.get(), m_qmlView.get(), flags))
         return false;
 
