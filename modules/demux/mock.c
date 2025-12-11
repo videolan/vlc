@@ -1350,7 +1350,7 @@ Demux(demux_t *demux)
     {
         ret = DemuxVideo(demux,
                          __MIN(step_length + sys->clock - VLC_TICK_0 - sys->pts_offset, sys->length));
-        if (date_Get(&sys->video_date) - VLC_TICK_0 - sys->pts_offset + video_step_length < sys->length)
+        if (date_Get(&sys->video_date) - VLC_TICK_0 - sys->pts_offset + video_step_length <= sys->length)
             eof = false;
     }
 
@@ -1358,7 +1358,7 @@ Demux(demux_t *demux)
     if (step_length == 0)
     {
         sys->clock += sys->input_sample_length;
-        if (sys->clock - VLC_TICK_0 - sys->pts_offset + sys->input_sample_length < sys->length)
+        if (sys->clock - VLC_TICK_0 - sys->pts_offset + sys->input_sample_length <= sys->length)
             eof = false;
     }
 
