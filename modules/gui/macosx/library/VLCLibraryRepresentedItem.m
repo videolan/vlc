@@ -29,6 +29,7 @@
 #import "library/VLCLibraryModel.h"
 
 #import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
+#import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
 
 #import "main/VLCMain.h"
 
@@ -191,6 +192,11 @@
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)parentMediaArrayForItem:(const id<VLCMediaLibraryItemProtocol>)item
 {
+    if (self.parentType == VLCMediaLibraryParentGroupTypeAllFavorites) {
+        VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+        return [libraryModel listOfMediaItemsForParentType:self.parentType];
+    }
+
     const BOOL isVideo = self.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
     if (isVideo) {
         VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;

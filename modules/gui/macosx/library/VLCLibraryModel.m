@@ -963,6 +963,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(const VLCMediaLibraryParentGroupType)parentType
 {
     switch(parentType) {
+    case VLCMediaLibraryParentGroupTypeAllFavorites:
+    {
+        NSMutableArray<VLCMediaLibraryMediaItem *> *allFavorites = [NSMutableArray array];
+        [allFavorites addObjectsFromArray:self.listOfFavoriteVideoMedia];
+        [allFavorites addObjectsFromArray:self.listOfFavoriteAudioMedia];
+        return [self sortMediaItems:allFavorites];
+    }
     case VLCMediaLibraryParentGroupTypeArtist:
         return self.listOfArtists;
     case VLCMediaLibraryParentGroupTypeAlbum:
@@ -991,6 +998,75 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     return mediaItems.copy;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)sortMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)items
+{
+    if (items.count == 0) {
+        return items;
+    }
+
+    const BOOL descending = _sortDescending;
+
+    return [items sortedArrayUsingComparator:^NSComparisonResult(VLCMediaLibraryMediaItem *item1, VLCMediaLibraryMediaItem *item2) {
+        NSComparisonResult result = NSOrderedSame;
+
+        switch (self->_sortCriteria) {
+            case VLC_ML_SORTING_DEFAULT:
+            case VLC_ML_SORTING_ALPHA:
+                result = [item1.title localizedCaseInsensitiveCompare:item2.title];
+                break;
+            case VLC_ML_SORTING_DURATION:
+                result = [@(item1.duration) compare:@(item2.duration)];
+                break;
+            case VLC_ML_SORTING_INSERTIONDATE:
+            case VLC_ML_SORTING_LASTMODIFICATIONDATE:
+                result = NSOrderedSame;
+                break;
+            case VLC_ML_SORTING_RELEASEDATE:
+                result = [@(item1.year) compare:@(item2.year)];
+                break;
+            case VLC_ML_SORTING_FILESIZE:
+                result = NSOrderedSame;
+                break;
+            case VLC_ML_SORTING_ARTIST:
+            {
+                VLCMediaLibraryAlbum *album1 = [VLCMediaLibraryAlbum albumWithID:item1.albumID];
+                VLCMediaLibraryAlbum *album2 = [VLCMediaLibraryAlbum albumWithID:item2.albumID];
+                if (album1 && album2) {
+                    result = [album1.artistName localizedCaseInsensitiveCompare:album2.artistName];
+                } else {
+                    result = NSOrderedSame;
+                }
+                break;
+            }
+            case VLC_ML_SORTING_PLAYCOUNT:
+                result = [@(item1.playCount) compare:@(item2.playCount)];
+                break;
+            case VLC_ML_SORTING_ALBUM:
+            {
+                VLCMediaLibraryAlbum *album1 = [VLCMediaLibraryAlbum albumWithID:item1.albumID];
+                VLCMediaLibraryAlbum *album2 = [VLCMediaLibraryAlbum albumWithID:item2.albumID];
+                if (album1 && album2) {
+                    result = [album1.title localizedCaseInsensitiveCompare:album2.title];
+                } else {
+                    result = NSOrderedSame;
+                }
+                break;
+            }
+            case VLC_ML_SORTING_FILENAME:
+                result = [item1.title localizedCaseInsensitiveCompare:item2.title];
+                break;
+            case VLC_ML_SORTING_TRACKNUMBER:
+                result = [@(item1.trackNumber) compare:@(item2.trackNumber)];
+                break;
+            default:
+                result = NSOrderedSame;
+                break;
+        }
+
+        return descending ? -result : result;
+    }];
 }
 
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending

@@ -46,6 +46,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 @interface VLCLibraryFavoritesDataSource ()
 {
+    NSArray<VLCMediaLibraryMediaItem *> *_allFavoritesArray;
     NSArray<VLCMediaLibraryMediaItem *> *_favoriteVideoMediaArray;
     NSArray<VLCMediaLibraryMediaItem *> *_favoriteAudioMediaArray;
     NSArray<VLCMediaLibraryAlbum *> *_favoriteAlbumsArray;
@@ -73,6 +74,8 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)arrayForSection:(VLCLibraryFavoritesSection)section
 {
     switch (section) {
+        case VLCLibraryFavoritesSectionAllFavorites:
+            return _allFavoritesArray;
         case VLCLibraryFavoritesSectionVideoMedia:
             return _favoriteVideoMediaArray;
         case VLCLibraryFavoritesSectionAudioMedia:
@@ -91,6 +94,8 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 - (NSString *)titleForSection:(VLCLibraryFavoritesSection)section
 {
     switch (section) {
+        case VLCLibraryFavoritesSectionAllFavorites:
+            return _NS("All Favorites");
         case VLCLibraryFavoritesSectionVideoMedia:
             return _NS("Favorite Videos");
         case VLCLibraryFavoritesSectionAudioMedia:
@@ -109,6 +114,8 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 - (VLCMediaLibraryParentGroupType)parentTypeForSection:(VLCLibraryFavoritesSection)section
 {
     switch (section) {
+        case VLCLibraryFavoritesSectionAllFavorites:
+            return VLCMediaLibraryParentGroupTypeAllFavorites;
         case VLCLibraryFavoritesSectionVideoMedia:
             return VLCMediaLibraryParentGroupTypeVideoLibrary;
         case VLCLibraryFavoritesSectionAudioMedia:
@@ -288,6 +295,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     _favoriteAlbumsArray = [self.libraryModel listOfFavoriteAlbums];
     _favoriteArtistsArray = [self.libraryModel listOfFavoriteArtists];
     _favoriteGenresArray = [self.libraryModel listOfFavoriteGenres];
+    _allFavoritesArray = [self.libraryModel listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeAllFavorites];
 
     [self updateVisibleSectionMapping];
     
@@ -576,6 +584,11 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     }
     
     return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)allFavoritesArray
+{
+    return _allFavoritesArray;
 }
 
 @end

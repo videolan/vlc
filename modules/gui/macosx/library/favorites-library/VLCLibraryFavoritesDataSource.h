@@ -32,7 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification;
 
 typedef NS_ENUM(NSUInteger, VLCLibraryFavoritesSection) {
-    VLCLibraryFavoritesSectionVideoMedia = 0,
+    VLCLibraryFavoritesSectionAllFavorites = 0,
+    VLCLibraryFavoritesSectionVideoMedia,
     VLCLibraryFavoritesSectionAudioMedia,
     VLCLibraryFavoritesSectionAlbums,
     VLCLibraryFavoritesSectionArtists,

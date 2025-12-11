@@ -57,7 +57,8 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
     // Video library-specific entries.
     // Please define these in the order the are expected to be presented
     VLCMediaLibraryParentGroupTypeRecentVideos,
-    VLCMediaLibraryParentGroupTypeVideoLibrary, // This should be last
+    VLCMediaLibraryParentGroupTypeVideoLibrary,
+    VLCMediaLibraryParentGroupTypeAllFavorites, // This should be last
 };
 
 @interface VLCMediaLibraryFile : NSObject
