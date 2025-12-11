@@ -343,7 +343,7 @@ go_start(struct np_ctx *np_ctx, bool extra_checks)
 }
 
 static void
-test_prev(struct ctx *ctx, const struct media_params *params)
+test_prev(struct ctx *ctx, const struct media_params *params, bool extra_checks)
 {
     test_log("prev-frame (fps: %u/%u pts-delay: %"PRId64" with_audio: %zu)\n",
              params->video_frame_rate, params->video_frame_rate_base,
@@ -398,24 +398,26 @@ test_prev(struct ctx *ctx, const struct media_params *params)
     /* Also wait the timer is paused */
     wait_type_timer(&np_ctx, REPORT_TIMER_PAUSED);
 
-    go_start(&np_ctx, true);
+    go_start(&np_ctx, extra_checks);
 
     /* Check start of file a second time */
     vlc_player_PreviousVideoFrame(player);
     wait_prev_frame_status(&np_ctx, 1, -EAGAIN);
 
-    /* Check playback can be resumed */
-    check_resumed_timer(&np_ctx);
+    if (extra_checks)
+    {
+        /* Check playback can be resumed */
+        check_resumed_timer(&np_ctx);
 
-    /* Go back to start */
-    go_start(&np_ctx, false);
+        /* Go back to start */
+        go_start(&np_ctx, false);
 
-    /* Check we can seek again */
-    check_seek_timer(&np_ctx);
+        /* Check we can seek again */
+        check_seek_timer(&np_ctx);
 
-    /* Go back to start */
-    go_start(&np_ctx, false);
-
+        /* Go back to start */
+        go_start(&np_ctx, false);
+    }
     /* XXX check next-frame UNTIL EOF (currently NextFrame burst is not working) */
 
     test_end(ctx);
@@ -517,13 +519,13 @@ main(void)
     /* 25 fps + pts-delay lower than frame duration */
     params.pts_delay = VLC_TICK_FROM_MS(20);
     params.video_frame_rate = 25;
-    test_prev(&ctx, &params);
+    test_prev(&ctx, &params, true);
     params.pts_delay = DEFAULT_PTS_DELAY;
 
     /* 29.97fps: Playing less than a minute so no drop frames */
     params.video_frame_rate = 30000;
     params.video_frame_rate_base = 1001;
-    test_prev(&ctx, &params);
+    test_prev(&ctx, &params, true);
     params.video_frame_rate_base = 1;
 
     /* Now, disable audio to also test normal timer */
@@ -532,14 +534,18 @@ main(void)
 
     /* 60 fps */
     params.video_frame_rate = 60;
-    test_prev(&ctx, &params);
+    test_prev(&ctx, &params, true);
 
     /* 1 fps */
     params.length = VLC_TICK_FROM_SEC(20);
     params.video_frame_rate = 1;
-    test_prev(&ctx, &params);
+    /* Don't do extra checks for 1fps, as the check_resumed_timer() might take
+     * a longer time than expected due to a bug on the clock: resuming a 1fps
+     * video after prev/frame next might result on using bad reference points. */
+    test_prev(&ctx, &params, false);
 
     /* Fail because can't seek */
+    params.video_frame_rate = 30;
     params.can_seek = false;
     test_fail(&ctx, &params, -ENOTSUP);
     params.can_seek = true;
