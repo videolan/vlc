@@ -1881,8 +1881,15 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
                       withMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
 
+    NSString *detailString;
+    if (mediaItems.count == 1) {
+        detailString = _NS("1 item");
+    } else {
+        detailString = [NSString stringWithFormat:_NS("%lu items"), (unsigned long)mediaItems.count];
+    }
+
     self = [self initWithDisplayString:displayString
-               withPrimaryDetailString:[NSString stringWithFormat:@"%lu items", (unsigned long)mediaItems.count]
+               withPrimaryDetailString:detailString
               withSecondaryDetailString:@""];
     if (self) {
         _mediaItems = mediaItems;

@@ -31,6 +31,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryGroupHeaderDelegate.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "views/VLCImageView.h"
@@ -278,11 +279,12 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     _allFavoritesArray = [self.libraryModel listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeAllFavorites];
 
     [self updateVisibleSectionMapping];
-    
+
     [_flattenedRowMappings removeAllObjects];
 
-    const NSInteger selectedRow = self.masterTableView.selectedRow;
+    [self updateHeaderForMasterSelection];
 
+    const NSInteger selectedRow = self.masterTableView.selectedRow;
     if (self.masterTableView.dataSource == self) {
         [self.masterTableView reloadData];
         if (selectedRow != -1 && selectedRow < [self.masterTableView numberOfRows]) {
@@ -376,6 +378,55 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     }
     
     return NSNotFound;
+}
+
+- (void)updateHeaderForMasterSelection
+{
+    VLCLibraryRepresentedItem *representedItem = nil;
+    NSString *fallbackTitle = nil;
+    NSString *fallbackDetail = nil;
+
+    if (self.masterTableView.selectedRow >= 0) {
+        const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:self.masterTableView.selectedRow];
+        id<VLCMediaLibraryItemProtocol> const groupDescriptor = [self createGroupDescriptorForSection:section];
+        fallbackDetail = groupDescriptor.primaryDetailString;
+        const VLCMediaLibraryParentGroupType parentType = [self parentTypeForSection:section];
+        representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:groupDescriptor parentType:parentType];
+
+        switch (section) {
+            case VLCLibraryFavoritesSectionVideoMedia:
+                fallbackTitle = _NS("Favorite Videos");
+                break;
+            case VLCLibraryFavoritesSectionAudioMedia:
+                fallbackTitle = _NS("Favorite Audio");
+                break;
+            case VLCLibraryFavoritesSectionAlbums:
+                fallbackTitle = _NS("Favorite Albums");
+                break;
+            case VLCLibraryFavoritesSectionArtists:
+                fallbackTitle = _NS("Favorite Artists");
+                break;
+            case VLCLibraryFavoritesSectionGenres:
+                fallbackTitle = _NS("Favorite Genres");
+                break;
+            default:
+                break;
+        }
+    } else {
+        fallbackTitle = _NS("Favorites");
+        NSUInteger totalCount = 0;
+        totalCount += _favoriteVideoMediaArray.count;
+        totalCount += _favoriteAudioMediaArray.count;
+        totalCount += _favoriteAlbumsArray.count;
+        totalCount += _favoriteArtistsArray.count;
+        totalCount += _favoriteGenresArray.count;
+        fallbackDetail = [NSString stringWithFormat:@"%lu items", (unsigned long)totalCount];
+    }
+
+    [self.headerDelegate updateHeaderForTableView:self.detailTableView
+                              withRepresentedItem:representedItem
+                                    fallbackTitle:fallbackTitle
+                                   fallbackDetail:fallbackDetail];
 }
 
 - (VLCMediaLibraryParentGroupType)currentParentType

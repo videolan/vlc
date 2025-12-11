@@ -29,6 +29,7 @@
 @class VLCLibraryCollectionView;
 @class VLCLibraryWindow;
 @class VLCLibraryFavoritesDataSource;
+@class VLCLibraryAudioGroupTableHeaderView;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, strong) NSTableView *favoritesLibraryGroupsTableView;
 
 @property (readwrite, strong) VLCLibraryFavoritesDataSource *libraryFavoritesDataSource;
+@property (readwrite, strong) VLCLibraryAudioGroupTableHeaderView *favoritesHeaderView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentFavoritesView;

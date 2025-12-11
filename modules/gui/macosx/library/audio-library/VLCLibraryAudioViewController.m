@@ -587,11 +587,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     [self.libraryWindow hideLoadingOverlay];
 }
 
-- (void)audioDataSource:(VLCLibraryAudioDataSource *)dataSource
-updateHeaderForTableView:(NSTableView *)tableView
-    withRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
-          fallbackTitle:(NSString *)fallbackTitle
-         fallbackDetail:(NSString *)fallbackDetail
+- (void)updateHeaderForTableView:(NSTableView *)tableView
+            withRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
+                  fallbackTitle:(NSString *)fallbackTitle
+                 fallbackDetail:(NSString *)fallbackDetail
 {
     if (tableView != self.audioCollectionSelectionTableView &&
         tableView != self.audioGroupSelectionTableView &&

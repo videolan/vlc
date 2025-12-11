@@ -172,6 +172,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryDataTypes.m \
 	gui/macosx/library/VLCLibraryNameCache.h \
 	gui/macosx/library/VLCLibraryNameCache.m \
+	gui/macosx/library/VLCLibraryGroupHeaderDelegate.h \
 	gui/macosx/library/VLCLibraryHeroView.h \
 	gui/macosx/library/VLCLibraryHeroView.m \
 	gui/macosx/library/VLCLibraryImageCache.h \
@@ -278,7 +279,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h \
 	gui/macosx/library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioDataSource.h \
-	gui/macosx/library/audio-library/VLCLibraryAudioDataSourceHeaderDelegate.h \
 	gui/macosx/library/audio-library/VLCLibraryAudioDataSource.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupDataSource.h \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupDataSource.m \

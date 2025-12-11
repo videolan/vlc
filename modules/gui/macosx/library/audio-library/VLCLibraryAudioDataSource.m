@@ -731,11 +731,10 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         fallbackDetail = selectedItem.primaryDetailString;
     }
 
-    [self.headerDelegate audioDataSource:self
-                updateHeaderForTableView:tableView
-                     withRepresentedItem:representedItem
-                           fallbackTitle:fallbackTitle
-                          fallbackDetail:fallbackDetail];
+    [self.headerDelegate updateHeaderForTableView:tableView
+                              withRepresentedItem:representedItem
+                                    fallbackTitle:fallbackTitle
+                                   fallbackDetail:fallbackDetail];
 }
 
 - (void)tableView:(NSTableView * const)tableView selectRowIndices:(NSIndexSet * const)indices

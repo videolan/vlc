@@ -24,7 +24,7 @@
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryTableViewDataSource.h"
-#import "library/audio-library/VLCLibraryAudioDataSourceHeaderDelegate.h"
+#import "library/VLCLibraryGroupHeaderDelegate.h"
 
 #include "views/iCarousel/iCarousel.h"
 
@@ -71,7 +71,7 @@ extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotif
 @property (readwrite, weak) NSCollectionView *collectionView;
 @property (readwrite, weak) iCarousel *carouselView;
 @property (readwrite, weak) NSTableView *gridModeListTableView;
-@property (readwrite, weak, nullable) id<VLCLibraryAudioDataSourceHeaderDelegate> headerDelegate;
+@property (readwrite, weak, nullable) id<VLCLibraryGroupHeaderDelegate> headerDelegate;
 
 @property (nonatomic, readwrite, assign) VLCAudioLibrarySegment audioLibrarySegment;
 @property (readwrite, strong) VLCLibraryAudioGroupDataSource *audioGroupDataSource;

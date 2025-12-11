@@ -24,6 +24,7 @@
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryMasterDetailViewTableViewDataSource.h"
+#import "library/VLCLibraryGroupHeaderDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,9 +48,11 @@ typedef NS_ENUM(NSUInteger, VLCLibraryFavoritesSection) {
 @property (readwrite, weak) NSCollectionView *collectionView;
 @property (readwrite, weak) NSTableView *masterTableView;
 @property (readwrite, weak) NSTableView *detailTableView;
+@property (readwrite, weak, nullable) id<VLCLibraryGroupHeaderDelegate> headerDelegate;
 
 - (void)reloadData;
 - (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
+- (void)updateHeaderForMasterSelection;
 
 @end
 

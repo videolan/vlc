@@ -29,8 +29,24 @@
 #import "library/VLCLibraryTableCellViewProtocol.h"
 #import "library/VLCLibraryTableViewDataSource.h"
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
+#import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
 
 @implementation VLCLibraryFavoritesTableViewDelegate
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    [super tableViewSelectionDidChange:notification];
+
+    NSTableView * const tableView = (NSTableView *)notification.object;
+    if (![tableView.dataSource isKindOfClass:VLCLibraryFavoritesDataSource.class]) {
+        return;
+    }
+
+    VLCLibraryFavoritesDataSource * const favoritesDataSource = (VLCLibraryFavoritesDataSource *)tableView.dataSource;
+    if (tableView == favoritesDataSource.masterTableView) {
+        [favoritesDataSource updateHeaderForMasterSelection];
+    }
+}
 
 - (NSView *)tableView:(NSTableView *)tableView
    viewForTableColumn:(NSTableColumn *)tableColumn

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAudioDataSourceHeaderDelegate.h: MacOS X interface module
+ * VLCLibraryGroupHeaderDelegate.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2025 VLC authors and VideoLAN
  *
@@ -22,18 +22,16 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class VLCLibraryAudioDataSource;
 @class VLCLibraryRepresentedItem;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol VLCLibraryAudioDataSourceHeaderDelegate <NSObject>
+@protocol VLCLibraryGroupHeaderDelegate <NSObject>
 
-- (void)audioDataSource:(VLCLibraryAudioDataSource *)dataSource
-    updateHeaderForTableView:(NSTableView *)tableView
-         withRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
-               fallbackTitle:(NSString *)fallbackTitle
-              fallbackDetail:(NSString *)fallbackDetail;
+- (void)updateHeaderForTableView:(NSTableView *)tableView
+            withRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
+                  fallbackTitle:(NSString *)fallbackTitle
+                 fallbackDetail:(NSString *)fallbackDetail;
 
 @end
 
