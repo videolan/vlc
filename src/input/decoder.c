@@ -1937,6 +1937,17 @@ static void Decoder_VideoDrained(vlc_input_decoder_t *owner)
             decoder_Notify(owner, frame_next_status, -EAGAIN);
         }
     }
+    else if(owner->frames_countdown == -1)
+    {
+        /* Also check if we need to increase seek steps near EOF */
+        int seek_steps;
+        picture_t *nullpic =
+            decoder_prevframe_AddPic(&owner->video.pf, NULL,
+                                     &owner->video.pf_pts, &seek_steps);
+        assert(nullpic == NULL); (void) nullpic;
+        if (seek_steps != DEC_PF_SEEK_STEPS_NONE)
+            Decoder_SeekPreviousFrame(owner, seek_steps, true);
+    }
 }
 
 /**

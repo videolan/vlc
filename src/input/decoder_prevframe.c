@@ -76,11 +76,12 @@ decoder_prevframe_AddPic(struct decoder_prevframe *pf, picture_t *pic,
 
     if (pf->flushing)
     {
-        picture_Release(pic);
+        if (pic != NULL)
+            picture_Release(pic);
         return NULL;
     }
 
-    if (pts <= pic->date && pf->pic != NULL)
+    if (pic != NULL && pts <= pic->date && pf->pic != NULL)
     {
         /* Reached the previous frame */
         picture_t *resume_pic = pic;
@@ -105,7 +106,7 @@ decoder_prevframe_AddPic(struct decoder_prevframe *pf, picture_t *pic,
         return pic;
     }
 
-    if (pic->date >= pts)
+    if (pic == NULL || pic->date >= pts)
     {
         if (pf->pic == NULL && !pf->failed && pf->req_count > 0)
         {
@@ -116,7 +117,8 @@ decoder_prevframe_AddPic(struct decoder_prevframe *pf, picture_t *pic,
             *seek_steps = pf->seek_steps;
         }
 
-        picture_Release(pic);
+        if (pic != NULL)
+            picture_Release(pic);
         return NULL;
     }
 
