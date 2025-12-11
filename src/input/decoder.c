@@ -2036,6 +2036,13 @@ static void *DecoderThread( void *p_data )
             {   /* Wait for a block to decode (or a request to drain) */
                 p_owner->b_idle = true;
                 vlc_cond_signal( &p_owner->wait_acknowledge );
+
+                if (p_owner->frames_countdown > 0)
+                {
+                    /* next-frames are requested but the FIFO is empty, ask for
+                     * more buffering */
+                    decoder_Notify( p_owner, frame_next_need_data, true );
+                }
                 vlc_fifo_Wait( p_owner->p_fifo );
                 p_owner->b_idle = false;
                 continue;
@@ -2644,6 +2651,9 @@ void vlc_input_decoder_DecodeWithStatus(vlc_input_decoder_t *p_owner, vlc_frame_
         while( vlc_fifo_GetCount( p_owner->p_fifo ) >= 10 )
             vlc_fifo_WaitCond( p_owner->p_fifo, &p_owner->wait_fifo );
     }
+
+    if (vlc_fifo_IsEmpty(p_owner->p_fifo) && p_owner->frames_countdown > 0)
+        decoder_Notify(p_owner, frame_next_need_data, false);
 
     vlc_fifo_QueueUnlocked( p_owner->p_fifo, frame );
     if (status != NULL)

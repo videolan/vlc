@@ -54,6 +54,8 @@ struct vlc_input_decoder_callbacks {
                                unsigned lost, unsigned played, void *userdata);
     void (*frame_next_status)(vlc_input_decoder_t *decoder, int status,
                               void *userdata);
+    void (*frame_next_need_data)(vlc_input_decoder_t *decoder, bool need_data,
+                                 void *userdata);
     void (*frame_previous_status)(vlc_input_decoder_t *decoder, int status,
                                   void *userdata);
     void (*frame_previous_seek)(vlc_input_decoder_t *decoder, vlc_tick_t pts,

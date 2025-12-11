@@ -283,6 +283,7 @@ input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *p_item,
                 vlc_renderer_item_hold( cfg->renderer ) : NULL;
     priv->prev_frame.enabled = priv->prev_frame.end = false;
     priv->prev_frame.last_pts = VLC_TICK_INVALID;
+    priv->next_frame_need_data = false;
 
     priv->viewpoint_changed = false;
     /* Fetch the viewpoint from the mediaplayer or the playlist if any */
@@ -660,8 +661,12 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
          * is paused -> this may cause problem with some of them
          * The same problem can be seen when seeking while paused */
         if( b_paused )
+        {
             b_paused = !es_out_GetBuffering( input_priv(p_input)->p_es_out )
                     || input_priv(p_input)->master->b_eof;
+            if( b_paused && input_priv(p_input)->next_frame_need_data )
+                b_paused = false;
+        }
 
         if( !b_paused )
         {
@@ -751,8 +756,12 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             }
 
             /* Update the wakeup time */
-            if( i_wakeup != 0 )
+            if( input_priv(p_input)->next_frame_need_data )
+                i_wakeup = 0;
+            else if( i_wakeup != 0 )
+            {
                 i_wakeup = es_out_GetWakeup( input_priv(p_input)->p_es_out );
+            }
         }
     }
 }
@@ -2061,6 +2070,7 @@ static bool Control( input_thread_t *p_input,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
             ResetFramePrevious( p_input );
+            priv->next_frame_need_data = false;
 
             int i_ret = ControlSetPosition( p_input, param.pos.f_val,
                                             param.pos.b_fast_seek );
@@ -2084,6 +2094,7 @@ static bool Control( input_thread_t *p_input,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
             ResetFramePrevious( p_input );
+            priv->next_frame_need_data = false;
 
             int i_ret = ControlSetTime( p_input, param.time.i_val,
                                         param.time.b_fast_seek );
@@ -2103,6 +2114,7 @@ static bool Control( input_thread_t *p_input,
                     if( priv->i_state == PAUSE_S )
                     {
                         ResetFramePrevious( p_input );
+                        priv->next_frame_need_data = false;
                         ControlUnpause( p_input, i_control_date );
                         b_force_update = true;
                     }
@@ -2306,6 +2318,7 @@ static bool Control( input_thread_t *p_input,
 
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
             ResetFramePrevious( p_input );
+            priv->next_frame_need_data = false;
             demux_Control(priv->master->p_demux,
                           DEMUX_SET_TITLE, i_title);
             break;
@@ -2349,6 +2362,7 @@ static bool Control( input_thread_t *p_input,
 
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
             ResetFramePrevious( p_input );
+            priv->next_frame_need_data = false;
             demux_Control( priv->master->p_demux,
                            DEMUX_SET_SEEKPOINT, i_seekpoint );
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
@@ -2483,6 +2497,9 @@ static bool Control( input_thread_t *p_input,
                 });
             }
             b_force_update = true;
+            break;
+        case INPUT_CONTROL_NEED_DATA_FRAME_NEXT:
+            priv->next_frame_need_data = param.val.b_bool;
             break;
         case INPUT_CONTROL_SEEK_FRAME_PREVIOUS:
             SeekFramePrevious(p_input, param.frame_previous_seek.pts,

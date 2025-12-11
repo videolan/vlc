@@ -565,6 +565,8 @@ typedef struct input_thread_private_t
         bool enabled;
         bool end;
     } prev_frame;
+
+    bool next_frame_need_data;
 } input_thread_private_t;
 
 static inline input_thread_private_t *input_priv(input_thread_t *input)
@@ -627,6 +629,7 @@ enum input_control_e
 
     INPUT_CONTROL_SET_FRAME_NEXT,
     INPUT_CONTROL_SET_FRAME_PREVIOUS,
+    INPUT_CONTROL_NEED_DATA_FRAME_NEXT,
     INPUT_CONTROL_SEEK_FRAME_PREVIOUS,
 
     INPUT_CONTROL_SET_RENDERER,

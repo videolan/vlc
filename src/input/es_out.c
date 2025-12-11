@@ -527,6 +527,24 @@ decoder_frame_next_status(vlc_input_decoder_t *decoder, int status,
 }
 
 static void
+decoder_frame_next_need_data(vlc_input_decoder_t *decoder, bool need_data,
+                             void *userdata)
+{
+    (void) decoder;
+
+    es_out_id_t *id = userdata;
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
+
+    vlc_value_t val = { .b_bool = need_data };
+    input_ControlPushHelper(p_sys->p_input, INPUT_CONTROL_NEED_DATA_FRAME_NEXT,
+                            &val);
+}
+
+static void
 decoder_frame_previous_status(vlc_input_decoder_t *decoder, int status,
                               void *userdata)
 {
@@ -598,6 +616,7 @@ static const struct vlc_input_decoder_callbacks decoder_cbs = {
     .on_new_video_stats = decoder_on_new_video_stats,
     .on_new_audio_stats = decoder_on_new_audio_stats,
     .frame_next_status = decoder_frame_next_status,
+    .frame_next_need_data = decoder_frame_next_need_data,
     .frame_previous_status = decoder_frame_previous_status,
     .frame_previous_seek = decoder_frame_previous_seek,
     .get_attachments = decoder_get_attachments,
@@ -4019,15 +4038,6 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         bool *pb = va_arg( args, bool* );
         if( p_sys->b_buffering )
             *pb = true;
-        else if( p_sys->p_next_frame_es != NULL )
-        {
-            /* The input thread will continue to call demux() if this control
-             * returns true. In case of next-frame, ask the input thread to
-             * continue to demux() until the vout has a picture to display. */
-            assert( p_sys->b_paused );
-            *pb = p_sys->p_next_frame_es->p_dec != NULL
-                && vlc_input_decoder_IsEmpty( p_sys->p_next_frame_es->p_dec );
-        }
         else
             *pb = false;
         return VLC_SUCCESS;
