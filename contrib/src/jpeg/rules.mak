@@ -3,6 +3,10 @@
 JPEG_VERSION := 3.1.1
 JPEG_URL := $(GITHUB)/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/$(JPEG_VERSION).tar.gz
 
+ifdef BUILD_ENCODERS
+PKGS += jpeg
+endif
+
 $(TARBALLS)/libjpeg-turbo-$(JPEG_VERSION).tar.gz:
 	$(call download_pkg,$(JPEG_URL),jpeg)
 
