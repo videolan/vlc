@@ -1,6 +1,6 @@
 # DVDREAD
-LIBDVDREAD_VERSION := 7.0.0
-LIBDVDREAD_URL := https://code.videolan.org/videolan/libdvdread/-/archive/$(LIBDVDREAD_VERSION)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+LIBDVDREAD_VERSION := 7.0.1
+LIBDVDREAD_URL := $(VIDEOLAN)/libdvdread/$(LIBDVDREAD_VERSION)/libdvdread-$(LIBDVDREAD_VERSION).tar.xz
 LIBDVDREAD_GITURL:=https://code.videolan.org/videolan/libdvdread.git
 LIBDVDREAD_BRANCH:=master
 LIBDVDREAD_GITVERSION:=fd8a73304597dc3a4fc187d0dd0cfb50af8f0a2d
@@ -23,12 +23,12 @@ endif
 # 	$(call check_githash,$(LIBDVDREAD_GITVERSION))
 # 	touch $@
 
-$(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
+$(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.xz:
 	$(call download,$(LIBDVDREAD_URL))
 
-.sum-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+.sum-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.xz
 
-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
+dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.xz .sum-dvdread
 # dvdread: libdvdread-$(LIBDVDREAD_GITVERSION).tar.xz .sum-dvdread
 	$(UNPACK)
 	$(MOVE)
