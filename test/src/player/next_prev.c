@@ -399,6 +399,100 @@ go_eof(struct np_ctx *np_ctx)
 }
 
 static void
+resume(struct np_ctx *np_ctx)
+{
+    struct ctx *ctx = np_ctx->ctx;
+    vlc_player_t *player = ctx->player;
+
+    /* Resume player */
+    vlc_player_Resume(player);
+    wait_state(ctx, VLC_PLAYER_STATE_PLAYING);
+
+    /* Wait for the forced frame after resume and next/prev frame */
+    wait_next_tc(np_ctx);
+
+    /* Wait for the normal frame after resume */
+    wait_next_tc(np_ctx);
+}
+
+static void
+burst_unpaused(struct np_ctx *np_ctx)
+{
+    struct ctx *ctx = np_ctx->ctx;
+    vlc_player_t *player = ctx->player;
+    struct timer_state *timer = &np_ctx->timers[0];
+    struct vlc_player_timer_smpte_timecode *tc = &np_ctx->tc;
+    struct report_timer *r = NULL;
+    const unsigned burst = 6;
+
+    assert_state(ctx, VLC_PLAYER_STATE_PLAYING);
+
+    for (size_t i = 0; i < burst + 1 /* pause */; i++)
+        vlc_player_NextVideoFrame(player);
+
+    /* First request is pausing the video */
+    wait_next_frame_status(np_ctx, 1, -EAGAIN);
+    assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
+    wait_type_timer(np_ctx, REPORT_TIMER_PAUSED);
+
+    /* Wait all status events */
+    wait_next_frame_status(np_ctx, burst, 0);
+
+    /* Check updated timecodes */
+    increase_tc(np_ctx);
+    player_lock_timer(player, timer);
+    for (size_t i = 0; i < burst; ++i)
+    {
+        r = timer_state_wait_next_report(timer);
+
+        assert(r->type == REPORT_TIMER_TC);
+        assert(r->tc.seconds == tc->seconds);
+        assert(r->tc.frames == tc->frames);
+
+        increase_tc(np_ctx);
+    }
+    player_unlock_timer(player, timer);
+
+    /* Ensure the normal timer is moving */
+    check_normal_timer(np_ctx, burst, true);
+
+    /* Resume player */
+    resume(np_ctx);
+
+    for (size_t i = 0; i < burst + 1 /* pause */; i++)
+        vlc_player_PreviousVideoFrame(player);
+
+    /* First request is pausing the video */
+    wait_prev_frame_status(np_ctx, 1, -EAGAIN);
+    assert_state(ctx, VLC_PLAYER_STATE_PAUSED);
+    wait_type_timer(np_ctx, REPORT_TIMER_PAUSED);
+
+    /* Wait all status events */
+    wait_prev_frame_status(np_ctx, burst, 0);
+
+    /* Check updated timecodes */
+    decrease_tc(np_ctx);
+    player_lock_timer(player, timer);
+    for (size_t i = 0; i < burst; ++i)
+    {
+        r = timer_state_wait_next_report(timer);
+
+        assert(r->type == REPORT_TIMER_TC);
+        assert(r->tc.seconds == tc->seconds);
+        assert(r->tc.frames == tc->frames);
+
+        decrease_tc(np_ctx);
+    }
+    player_unlock_timer(player, timer);
+
+    /* Ensure the normal timer is moving */
+    check_normal_timer(np_ctx, burst, false);
+
+    /* Resume player */
+    resume(np_ctx);
+}
+
+static void
 test_prev(struct ctx *ctx, const struct media_params *params, bool extra_checks)
 {
     test_log("prev-frame (fps: %u/%u pts-delay: %"PRId64" with_audio: %zu)\n",
@@ -436,6 +530,10 @@ test_prev(struct ctx *ctx, const struct media_params *params, bool extra_checks)
 
     /* Wait for a first frame */
     wait_next_tc(&np_ctx);
+
+    /* Check that it behaves correctly when sending 1st request and next ones
+     * in a burst */
+    burst_unpaused(&np_ctx);
 
     vlc_player_SetTime(player, params->length / 2);
 
