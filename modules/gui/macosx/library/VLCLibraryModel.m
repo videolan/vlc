@@ -1107,6 +1107,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self.changeDelegate notifyChange:VLCLibraryModelGenreListReset withObject:self];
     [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaListReset withObject:self];
     [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteVideoMediaListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteAudioMediaListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteAlbumsListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteArtistsListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteGenresListReset withObject:self];
 }
 
 - (void)performActionOnMediaItemInCache:(const int64_t)libraryId 
