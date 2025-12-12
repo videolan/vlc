@@ -64,6 +64,9 @@ QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -no-dbus \
 	-no-qml-debug -no-audio-backend -no-sql-odbc -no-pch \
 	-no-compile-examples -nomake examples
+ifdef HAVE_WIN32
+QT_CONFIG += -no-xcb
+endif
 
 QT_CONFIG += -release
 
