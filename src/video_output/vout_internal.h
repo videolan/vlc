@@ -237,9 +237,13 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
                              unsigned *pi_lost, unsigned *pi_late );
 
 /**
- * This function will force to display the next picture while paused
+ * This function will force to display next pictures while paused
+ *
+ * @param request_frame_count number of pictures to display next
+ * @return Number of picture needed to fulfill the request (to send via
+ * vout_PutPicture())
  */
-void vout_NextPicture( vout_thread_t *p_vout );
+size_t vout_NextPicture( vout_thread_t *p_vout, size_t request_frame_count );
 
 /**
  * This function will ask the display of the input title

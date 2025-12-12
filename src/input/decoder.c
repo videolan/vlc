@@ -334,7 +334,7 @@ static void Decoder_DisplayPreviousFrame(vlc_input_decoder_t *owner, picture_t *
     }
 
     vout_PutPicture(owner->video.vout, pic);
-    vout_NextPicture(owner->video.vout);
+    vout_NextPicture(owner->video.vout, 1);
 
     decoder_Notify(owner, frame_previous_status, 0);
 }
@@ -2893,7 +2893,7 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
     p_owner->frames_countdown++;
     vlc_fifo_Signal( p_owner->p_fifo );
 
-    vout_NextPicture( p_owner->video.vout );
+    vout_NextPicture(p_owner->video.vout, 1);
     /* TODO: it should be notified from the vout */
     decoder_Notify( p_owner, frame_next_status, 0 );
     vlc_fifo_Unlock( p_owner->p_fifo );

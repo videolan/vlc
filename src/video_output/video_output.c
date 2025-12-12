@@ -1789,16 +1789,24 @@ vlc_tick_t vout_Flush(vout_thread_t *vout, vlc_tick_t date)
     return displayed_pts;
 }
 
-void vout_NextPicture(vout_thread_t *vout)
+size_t vout_NextPicture(vout_thread_t *vout, size_t request_frame_count)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
 
     vout_control_Hold(&sys->control);
 
-    sys->frame_next_count++;
+    sys->frame_next_count += request_frame_count;
+
+    picture_fifo_Lock(sys->decoder_fifo);
+    size_t pics_count = picture_fifo_GetCount(sys->decoder_fifo);
+    size_t needed_count = sys->frame_next_count <= pics_count ? 0
+                        : sys->frame_next_count - pics_count;
+    picture_fifo_Unlock(sys->decoder_fifo);
 
     vout_control_ReleaseAndWake(&sys->control);
+
+    return needed_count;
 }
 
 void vout_ChangeDelay(vout_thread_t *vout, vlc_tick_t delay)
