@@ -91,12 +91,4 @@ QT_CONFIG += -release
 	cd $(PREFIX)/lib/pkgconfig; sed -i -e 's/ -lQt5Gui/ -lqwindows -lQt5PlatformSupport -lQt5Gui/g' Qt5Gui.pc
 	# install qmake to build QtSvg
 	+$(MAKE) -C $< install_qmake install_mkspecs
-ifdef HAVE_CROSS_COMPILE
-	# Building Qt build tools for Xcompilation
-	cd $</include/QtCore; $(LN_S)f $(QT_VERSION)/QtCore/private private
-	cd $</src/tools; \
-	for i in bootstrap uic rcc moc; \
-		do (cd $$i; echo $$i && ../../../bin/qmake -spec $(QT_SPEC) && $(MAKE) clean && $(MAKE) CC=$(HOST)-gcc CXX=$(HOST)-g++ LINKER=$(HOST)-g++ LIB="$(HOST)-ar -rc" && $(MAKE) install); \
-	done
-endif
 	touch $@
