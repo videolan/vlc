@@ -75,6 +75,11 @@ VLC_API picture_t * picture_fifo_Pop( picture_fifo_t * ) VLC_USED;
 VLC_API bool picture_fifo_IsEmpty( picture_fifo_t * );
 
 /**
+ * It returns the number of pictures queued
+ */
+VLC_API size_t picture_fifo_GetCount( picture_fifo_t * );
+
+/**
  * It saves a picture_t into the fifo.
  */
 VLC_API void picture_fifo_Push( picture_fifo_t *, picture_t * );

@@ -40,17 +40,21 @@
 struct picture_fifo_t {
     vlc_mutex_t lock;
     vlc_picture_chain_t pics;
+    size_t count;
 };
 
 static void PictureFifoReset(picture_fifo_t *fifo)
 {
     vlc_picture_chain_Init( &fifo->pics );
+    fifo->count = 0;
 }
 static void PictureFifoPush(picture_fifo_t *fifo, picture_t *picture)
 {
     assert(!picture_HasChainedPics(picture));
     vlc_picture_chain_Append( &fifo->pics, picture );
+    fifo->count++;
 }
+
 picture_fifo_t *picture_fifo_New(void)
 {
     picture_fifo_t *fifo = malloc(sizeof(*fifo));
@@ -70,12 +74,20 @@ void picture_fifo_Push(picture_fifo_t *fifo, picture_t *picture)
 picture_t *picture_fifo_Pop(picture_fifo_t *fifo)
 {
     vlc_mutex_assert(&fifo->lock);
-    return vlc_picture_chain_PopFront( &fifo->pics );
+    picture_t *pic = vlc_picture_chain_PopFront( &fifo->pics );
+    if (pic != NULL)
+        fifo->count--;
+    return pic;
 }
 bool picture_fifo_IsEmpty(picture_fifo_t *fifo)
 {
     vlc_mutex_assert(&fifo->lock);
     return vlc_picture_chain_IsEmpty( &fifo->pics );
+}
+VLC_API size_t picture_fifo_GetCount(picture_fifo_t *fifo)
+{
+    vlc_mutex_assert(&fifo->lock);
+    return fifo->count;
 }
 void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before)
 {
@@ -85,6 +97,7 @@ void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before
     vlc_picture_chain_t flush_chain;
 
     vlc_picture_chain_Init(&flush_chain);
+    fifo->count = 0;
 
     if (date == VLC_TICK_INVALID)
         vlc_picture_chain_GetAndClear(&fifo->pics, &flush_chain);
