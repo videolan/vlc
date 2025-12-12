@@ -323,6 +323,29 @@ static void Decoder_SeekPreviousFrame(vlc_input_decoder_t *owner, int steps,
     }
 }
 
+static void Decoder_PausedForNextFrame(vlc_input_decoder_t *owner)
+{
+    vlc_fifo_Assert(owner->p_fifo);
+    assert(owner->cat == VIDEO_ES);
+    assert(owner->output_paused);
+
+    if (owner->video.vout == NULL)
+        return;
+
+    if (likely(owner->frames_countdown <= 0))
+        return;
+
+    /* Handle all next-frame requests that were sent while the video was
+    *  pausing */
+    int next_request_count = owner->frames_countdown;
+    owner->frames_countdown = vout_NextPicture(owner->video.vout, next_request_count);
+
+    assert(next_request_count >= owner->frames_countdown);
+    /* Notify for pictures that are processes by the vout */
+    for (int i = 0; i < next_request_count - owner->frames_countdown; ++i)
+        decoder_Notify(owner, frame_next_status, 0);
+}
+
 static void Decoder_DisplayPreviousFrame(vlc_input_decoder_t *owner, picture_t *pic)
 {
     vlc_fifo_Assert(owner->p_fifo);
@@ -1500,8 +1523,13 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
         return VLC_EGENERIC;
     }
 
-    if( unlikely(p_owner->paused) && likely(p_owner->frames_countdown > 0) )
+    if (unlikely(p_owner->output_paused && p_owner->frames_countdown > 0))
+    {
         p_owner->frames_countdown--;
+        vout_PutPicture(p_vout, p_picture);
+        decoder_Notify(p_owner, frame_next_status, 0);
+        return VLC_SUCCESS;
+    }
 
     if( p_picture->b_still )
     {
@@ -1944,6 +1972,9 @@ static void *DecoderThread( void *p_data )
             Decoder_ChangeOutputPause( p_owner, p_owner->paused, p_owner->pause_date );
             decoder_Notify(p_owner, on_output_paused, p_owner->paused,
                            p_owner->pause_date);
+            if (unlikely(p_owner->paused && p_owner->cat == VIDEO_ES
+                      && p_owner->frames_countdown != 0))
+                Decoder_PausedForNextFrame(p_owner);
             continue;
         }
 
@@ -2889,12 +2920,23 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
     }
 
     StopFrameNextLocked( p_owner );
-    p_owner->frames_countdown++;
-    vlc_fifo_Signal( p_owner->p_fifo );
 
-    vout_NextPicture(p_owner->video.vout, 1);
-    /* TODO: it should be notified from the vout */
-    decoder_Notify( p_owner, frame_next_status, 0 );
+    if (!p_owner->output_paused)
+    {
+        /* Request will be handled when paused, from
+         * Decoder_PausedForNextFrame() */
+        p_owner->frames_countdown++;
+        vlc_fifo_Unlock( p_owner->p_fifo );
+        return;
+    }
+
+    size_t needed_count = vout_NextPicture(p_owner->video.vout, 1);
+    assert(p_owner->frames_countdown >= 0);
+    if (needed_count > (unsigned) p_owner->frames_countdown)
+        p_owner->frames_countdown++;
+    else
+        decoder_Notify(p_owner, frame_next_status, 0);
+
     vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
