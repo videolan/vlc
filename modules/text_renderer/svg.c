@@ -243,7 +243,31 @@ static picture_t * svg_RenderPicture( filter_t *p_filter,
     }
 
     RsvgDimensionData dim;
+    #if LIBRSVG_MAJOR_VERSION > 2 || ( LIBRSVG_MAJOR_VERSION == 2 && LIBRSVG_MINOR_VERSION >= 52 )
+    gboolean has_width, has_height, has_viewbox;
+    RsvgLength width, height;
+    RsvgRectangle viewbox;
+
+    rsvg_handle_get_intrinsic_dimensions( p_handle, &has_width, &width, &has_height, &height, &has_viewbox, &viewbox );
+
+    if( has_width && has_height && width.unit == RSVG_UNIT_PX && height.unit == RSVG_UNIT_PX )
+    {
+        dim.width = (int) width.length;
+        dim.height = (int) height.length;
+    }
+    else if( has_viewbox )
+    {
+        dim.width = (int) viewbox.width;
+        dim.height = (int) viewbox.height;
+    }
+    else
+    {
+        dim.width = 0;
+        dim.height = 0;
+    }
+    #else
     rsvg_handle_get_dimensions( p_handle, &dim );
+    #endif
     float scale;
     svg_RescaletoFit( p_filter, &dim.width, &dim.height, &scale );
 
