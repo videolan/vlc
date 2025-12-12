@@ -301,8 +301,13 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     
     [_flattenedRowMappings removeAllObjects];
 
+    const NSInteger selectedRow = self.masterTableView.selectedRow;
+
     if (self.masterTableView.dataSource == self) {
         [self.masterTableView reloadData];
+        if (selectedRow != -1 && selectedRow < [self.masterTableView numberOfRows]) {
+            [self.masterTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedRow] byExtendingSelection:NO];
+        }
     }
     if (self.detailTableView.dataSource == self) {
         [self.detailTableView reloadData];
