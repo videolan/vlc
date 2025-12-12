@@ -73,12 +73,12 @@ QT_CONFIG += -release
 .qt: qt
 	cd $< && ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
 	# Make && Install libraries
-	$(MAKE) -C $<
-	$(MAKE) -C $< -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets
+	+$(MAKE) -C $< sub-src
+	+$(MAKE) -C $< -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets
 	# Install tools
-	$(MAKE) -C $< -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets
-	# Install plugins
-	$(MAKE) -C $< -C src/plugins sub-platforms-install_subtargets
+	+$(MAKE) -C $< -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets
+	# Install plugins/platforms
+	+$(MAKE) -C $< -C src -C plugins sub-platforms-install_subtargets
 	mv $(PREFIX)/plugins/platforms/libqwindows.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
 	# Move includes to match what VLC expects
 	mkdir -p $(PREFIX)/include/QtGui/qpa
