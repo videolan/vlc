@@ -46,7 +46,7 @@
 
 @interface VLCLibraryHomeViewStackViewController()
 {
-    NSArray<NSView<VLCLibraryHomeViewContainerView> *> *_containers;
+    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> *_containers;
     NSUInteger _leadingContainerCount;
 }
 @end
@@ -87,7 +87,7 @@
                                name:VLCLibraryModelRecentAudioMediaItemDeleted
                              object:nil];
 
-    _containers = @[];
+    _containers = [NSMutableArray array];
     _leadingContainerCount = 0;
     [self generateCustomContainers];
     [self generateGenericCollectionViewContainers];
@@ -125,23 +125,19 @@
 
 - (void)prependRecentItemsContainer:(NSView<VLCLibraryHomeViewContainerView> *)container
 {
-    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
     [self.collectionsStackView insertArrangedSubview:container atIndex:_leadingContainerCount];
     [self setupContainerView:container withStackView:_collectionsStackView];
-    [mutableContainers insertObject:container atIndex:0];
+    [_containers insertObject:container atIndex:0];
     ++_leadingContainerCount;
-    _containers = mutableContainers.copy;
 }
 
 - (void)removeRecentItemsContainer:(NSView<VLCLibraryHomeViewContainerView> *)container
 {
     [self.collectionsStackView removeConstraints:container.constraintsWithSuperview];
     [self.collectionsStackView removeArrangedSubview:container];
-    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
-    [mutableContainers removeObject:container];
+    [_containers removeObject:container];
     container = nil; // Important to detect whether the view is presented or not
     --_leadingContainerCount;
-    _containers = mutableContainers.copy;
 }
 
 - (void)recentsChanged:(NSNotification *)notification
@@ -178,16 +174,13 @@
 
 - (void)generateGenericCollectionViewContainers
 {
-    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
     NSUInteger i = VLCMediaLibraryParentGroupTypeRecentVideos + 1;
 
     for (; i <= VLCMediaLibraryParentGroupTypeVideoLibrary; ++i) {
         VLCLibraryHomeViewVideoGridContainerView * const containerView = [[VLCLibraryHomeViewVideoGridContainerView alloc] init];
         containerView.videoGroup = i;
-        [mutableContainers addObject:containerView];
+        [_containers addObject:containerView];
     }
-
-    _containers = mutableContainers.copy;
 }
 
 - (void)reloadData
