@@ -44,6 +44,7 @@ void acoustid_result_release( acoustid_result_t * r )
 
 static void parse_artists( const struct json_array *artists, acoustid_mb_result_t *record )
 {
+    assert( artists != NULL );
     /* take only main */
     if ( artists->size < 1)
         return;
@@ -78,7 +79,8 @@ static void parse_recordings( vlc_object_t *p_obj, const struct json_object *obj
         }
         const struct json_array *artists = json_get_array(&recordnode->object,
                                                           "artists");
-        parse_artists( artists, record );
+        if (artists != NULL)
+            parse_artists( artists, record );
         msg_Dbg( p_obj, "recording %d title %s %36s %s", i, record->psz_title,
                  record->s_musicbrainz_id, record->psz_artist );
     }
