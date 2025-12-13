@@ -162,7 +162,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 - (void)updateVisibleSectionMapping
 {
-    NSMutableArray<NSNumber *> * const visibleSections = [NSMutableArray array];
+    NSMutableArray<NSNumber *> * const visibleSections = [NSMutableArray arrayWithCapacity:VLCLibraryFavoritesSectionCount];
     for (NSUInteger i = 1; i < VLCLibraryFavoritesSectionCount; i++) {
         NSArray * const sectionArray = [self arrayForSection:i];
         if (sectionArray.count > 0) {

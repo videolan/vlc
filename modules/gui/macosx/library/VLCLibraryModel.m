@@ -1129,25 +1129,30 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         BOOL (^idCheckBlock)(VLCMediaLibraryMediaItem * const, const NSUInteger, BOOL * const) = ^BOOL(VLCMediaLibraryMediaItem * const mediaItem, const NSUInteger __unused idx, BOOL * const __unused stop) {
             NSAssert(mediaItem != nil, @"Cache list should not contain nil media items");
             return mediaItem.libraryID == libraryId;
-        };
+       };
 
-        // Recents can contain media items the other two do
-        NSMutableArray * const recentsMutable = self.cachedRecentMedia.mutableCopy;
-        const NSUInteger recentsIndex = [recentsMutable indexOfObjectPassingTest:idCheckBlock];
+        // Search immutable arrays first, only copy when modification needed
+        const NSUInteger recentsIndex = [self.cachedRecentMedia indexOfObjectPassingTest:idCheckBlock];
+        const NSUInteger videoIndex = [self.cachedVideoMedia indexOfObjectPassingTest:idCheckBlock];
 
-        NSMutableArray * const videoMutable = self.cachedVideoMedia.mutableCopy;
-        const NSUInteger videoIndex = [videoMutable indexOfObjectPassingTest:idCheckBlock];
         if (videoIndex != NSNotFound) {
-            NSMutableArray * const showsMutable = self.cachedListOfShows.mutableCopy;
+            // Found in video cache - search shows for episode match
             NSInteger showIndex = NSNotFound;
             NSInteger episodeIndex = NSNotFound;
-            for (VLCMediaLibraryShow * const show in showsMutable) {
+            NSUInteger currentShowIndex = 0;
+            for (VLCMediaLibraryShow * const show in self.cachedListOfShows) {
                 episodeIndex = [show.episodes indexOfObjectPassingTest:idCheckBlock];
-                showIndex = [showsMutable indexOfObject:show];
                 if (episodeIndex != NSNotFound) {
+                    showIndex = currentShowIndex;
                     break;
                 }
+                currentShowIndex++;
             }
+
+            // Now create mutable copies for modification
+            NSMutableArray * const recentsMutable = self.cachedRecentMedia.mutableCopy;
+            NSMutableArray * const videoMutable = self.cachedVideoMedia.mutableCopy;
+            NSMutableArray * const showsMutable = self.cachedListOfShows.mutableCopy;
 
             dispatch_sync(dispatch_get_main_queue(), ^{
                 action(videoMutable, videoIndex, recentsMutable, recentsIndex, showsMutable, showIndex, episodeIndex);
@@ -1157,20 +1162,25 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        NSMutableArray * const recentAudiosMutable = self.cachedRecentAudioMedia.mutableCopy;
-        const NSUInteger recentAudiosIndex = [recentAudiosMutable indexOfObjectPassingTest:idCheckBlock];
-
-        NSMutableArray * const audioMutable = self.cachedAudioMedia.mutableCopy;
+        // Not in video cache, check audio cache
+        const NSUInteger recentAudiosIndex = [self.cachedRecentAudioMedia indexOfObjectPassingTest:idCheckBlock];
         const NSUInteger audioIndex = [self.cachedAudioMedia indexOfObjectPassingTest:idCheckBlock];
+
         if (audioIndex != NSNotFound) {
+            // Found in audio cache - create mutable copies for modification
+            NSMutableArray * const recentsMutable = self.cachedRecentMedia.mutableCopy;
+            NSMutableArray * const recentAudiosMutable = self.cachedRecentAudioMedia.mutableCopy;
+            NSMutableArray * const audioMutable = self.cachedAudioMedia.mutableCopy;
+
             dispatch_sync(dispatch_get_main_queue(), ^{
                 action(audioMutable, audioIndex, recentAudiosMutable, recentAudiosIndex, nil, NSNotFound, NSNotFound);
                 self.cachedAudioMedia = audioMutable.copy;
-                self.cachedRecentAudioMedia = recentsMutable.copy;
+                self.cachedRecentAudioMedia = recentAudiosMutable.copy;
             });
             return;
         }
 
+        // Not found in any cache
         action(nil, NSNotFound, nil, NSNotFound, nil, NSNotFound, NSNotFound);
     });
 }
