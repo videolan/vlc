@@ -10,7 +10,7 @@
 #   - Add it to DEPS_res
 
 SUFFIXES += .ui .h .hpp .moc.cpp
-EXTRA_DIST += qt6.pro private-gui.pro
+EXTRA_DIST += gui/qt/qt6.pro gui/qt/private-gui.pro
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DQT_USE_QSTRINGBUILDER \
