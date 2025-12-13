@@ -1350,14 +1350,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
+        // Create mutable copy for modification
         NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
         [mutableAudioGroupCache replaceObjectAtIndex:audioGroupIndex withObject:audioGroupItem];
-        NSArray * const immutableCopy = [mutableAudioGroupCache copy];
 
         const IMP cacheSetterImp = [self methodForSelector:setterSelector];
         void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
-        cacheSetterFunction(self, setterSelector, immutableCopy);
+        cacheSetterFunction(self, setterSelector, mutableAudioGroupCache.copy);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
@@ -1383,13 +1382,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         const id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem = cache[audioGroupIndex];
 
+        // Create mutable copy for modification
         NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
         [mutableAudioGroupCache removeObjectAtIndex:audioGroupIndex];
-        NSArray * const immutableCopy = [mutableAudioGroupCache copy];
 
         const IMP cacheSetterImp = [self methodForSelector:setterSelector];
         void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
-        cacheSetterFunction(self, setterSelector, immutableCopy);
+        cacheSetterFunction(self, setterSelector, mutableAudioGroupCache.copy);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
@@ -1500,11 +1499,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     const int64_t itemId = p_event->modification.i_entity_id;
 
     dispatch_barrier_async(_groupCacheModificationQueue, ^{
-        NSMutableArray * const mutableGroups = self.cachedListOfGroups.mutableCopy;
+        // Search immutable array first
         const NSUInteger groupIdx =
-            [mutableGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
-                                                          const NSUInteger __unused idx,
-                                                          BOOL * const __unused stop) {
+            [self.cachedListOfGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
+                                                                    const NSUInteger __unused idx,
+                                                                    BOOL * const __unused stop) {
             return group.libraryID == itemId;
         }];
 
@@ -1513,7 +1512,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        VLCMediaLibraryGroup * const groupToDelete = mutableGroups[groupIdx];
+        VLCMediaLibraryGroup * const groupToDelete = self.cachedListOfGroups[groupIdx];
+
+        // Now create mutable copy for modification
+        NSMutableArray * const mutableGroups = self.cachedListOfGroups.mutableCopy;
         [mutableGroups removeObjectAtIndex:groupIdx];
         self.cachedListOfGroups = mutableGroups.copy;
 
