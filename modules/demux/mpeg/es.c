@@ -786,7 +786,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 free( pp_title );
                 return VLC_EGENERIC;
             }
-            (*pp_title)->seekpoint = vlc_alloc( p_sys->chapters.i_count, sizeof(seekpoint_t) );
+            (*pp_title)->seekpoint = vlc_alloc( p_sys->chapters.i_count, sizeof(seekpoint_t *) );
             if( !(*pp_title)->seekpoint )
             {
                 free( *pp_title );
