@@ -543,7 +543,7 @@ static int OpenConnection( stream_t *p_access,
     {
         msg_Err( p_access, "failed to send request" );
         vlc_tls_Close( sock );
-        stream = NULL;
+        sock = NULL;
     }
 
     p_sys->stream = sock;
