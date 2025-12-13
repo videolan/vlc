@@ -42,7 +42,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 @interface VLCLibraryPlaylistDataSource ()
 
-@property (readwrite, atomic) NSArray<VLCMediaLibraryPlaylist *> *playlists;
+@property (readwrite, atomic) NSMutableArray<VLCMediaLibraryPlaylist *> *playlists;
 
 @end
 
@@ -120,7 +120,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)reloadData
 {
-    self.playlists = [self.libraryModel listOfPlaylistsOfType:self.playlistType];
+    self.playlists = [[self.libraryModel listOfPlaylistsOfType:self.playlistType] mutableCopy];
     [self reloadViews];
 }
 
@@ -174,21 +174,18 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
             return;
         }
 
-        NSMutableArray * const mutablePlaylists = self.playlists.mutableCopy;
-
         switch (action) {
             case VLCLibraryDataSourceCacheUpdateAction:
-                [mutablePlaylists replaceObjectAtIndex:idx withObject:playlist];
+                [self.playlists replaceObjectAtIndex:idx withObject:playlist];
                 break;
             case VLCLibraryDataSourceCacheDeleteAction:
-                [mutablePlaylists removeObjectAtIndex:idx];
+                [self.playlists removeObjectAtIndex:idx];
                 break;
             default:
                 NSAssert(false, @"Invalid playlist cache action");
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.playlists = mutablePlaylists.copy;
             [self reloadViewsAtIndex:idx dueToCacheAction:action];
         });
     });
