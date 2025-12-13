@@ -438,8 +438,8 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
 
     if (vout_Request(&cfg, NULL, NULL)) {
         vout_Close(vout);
-        vout = NULL;
         vlc_clock_Delete(clock);
+        return NULL;
     }
 
     owner_sys->clock = clock;
