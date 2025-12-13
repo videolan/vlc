@@ -49,7 +49,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     VLCLibraryModel *_libraryModel;
 }
 
-@property (readwrite, atomic) NSArray *collectionArray;
+@property (readwrite, atomic) NSMutableArray *collectionArray;
 
 @end
 
@@ -60,7 +60,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     self = [super init];
     if(self) {
         _libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-        self.collectionArray = [NSArray array];
+        self.collectionArray = [NSMutableArray array];
         [self connect];
     }
     return self;
@@ -203,7 +203,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.collectionArray = newCollectionArray;
+            self.collectionArray = [newCollectionArray mutableCopy];
             [self.collectionView reloadData];
             [self.carouselView reloadData];
             [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
@@ -219,9 +219,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
         return;
     }
 
-    NSMutableArray * const mutableCollectionCopy = [self.collectionArray mutableCopy];
-    [mutableCollectionCopy replaceObjectAtIndex:mediaItemIndex withObject:mediaItem];
-    self.collectionArray = [mutableCollectionCopy copy];
+    [self.collectionArray replaceObjectAtIndex:mediaItemIndex withObject:mediaItem];
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
@@ -232,14 +230,12 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)deleteDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
 {
-    NSUInteger mediaItemIndex = [self indexOfMediaItemInCollection:mediaItem.libraryID];
+    const NSUInteger mediaItemIndex = [self indexOfMediaItemInCollection:mediaItem.libraryID];
     if (mediaItemIndex == NSNotFound) {
         return;
     }
 
-    NSMutableArray * const mutableCollectionCopy = [self.collectionArray mutableCopy];
-    [mutableCollectionCopy removeObjectAtIndex:mediaItemIndex];
-    self.collectionArray = [mutableCollectionCopy copy];
+    [self.collectionArray removeObjectAtIndex:mediaItemIndex];
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
