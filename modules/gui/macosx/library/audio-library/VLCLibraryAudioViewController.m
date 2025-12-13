@@ -201,12 +201,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionHeaderView.autoresizingMask = NSViewWidthSizable;
 
     _audioGroupSelectionTableView.headerView = self.audioCollectionHeaderView;
-    if (@available(macOS 26.0, *)) {
-        _audioGroupSelectionTableView.clipsToBounds = NO;
-        _audioGroupSelectionTableViewScrollView.clipsToBounds = NO;
-        _audioGroupSelectionTableViewScrollView.contentView.clipsToBounds = NO;
-        self.libraryWindow.contentView.clipsToBounds = NO;
-    }
     _audioGroupSelectionTableView.tableColumns.firstObject.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
 
     _audioGroupSelectionTableView.dataSource = _audioGroupDataSource;
