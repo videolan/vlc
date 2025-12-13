@@ -722,6 +722,9 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         fallbackTitle = (self.currentParentType == VLCMediaLibraryParentGroupTypeGenre)
             ? _NS("All genres")
             : _NS("All artists");
+        if (selectedItem != nil) {
+            fallbackDetail = selectedItem.primaryDetailString;
+        }
     } else if (selectedItem != nil) {
         representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:selectedItem parentType:self.currentParentType];
         fallbackTitle = selectedItem.displayString;
