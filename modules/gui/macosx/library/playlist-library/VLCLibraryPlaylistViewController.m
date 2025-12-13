@@ -22,6 +22,7 @@
 
 #import "VLCLibraryPlaylistViewController.h"
 
+#import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionView.h"
@@ -66,6 +67,7 @@
 
         [self setupPlaylistCollectionView];
         [self setupPlaylistTableView];
+        [self setupPlaylistLibraryContainerView];
         [self setupPlaylistPlaceholderView];
 
         NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
@@ -106,6 +108,7 @@
 
 - (void)setupPlaylistCollectionView
 {
+    _libraryView = [[NSView alloc] init];
     _collectionViewScrollView = 
         [[NSScrollView alloc] initWithFrame:self.libraryWindow.libraryTargetView.frame];
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
@@ -257,18 +260,30 @@
 
 - (void)presentPlaylistLibraryView
 {
+    [self.libraryWindow displayLibraryView:self.libraryView];
     const VLCLibraryViewModeSegment viewModeSegment =
         VLCLibraryWindowPersistentPreferences.sharedInstance.playlistLibraryViewMode;
-    NSView *viewToPresent = nil;
 
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
-        viewToPresent = self.collectionViewScrollView;
+        self.listViewSplitView.hidden = YES;
+        self.collectionViewScrollView.hidden = NO;
     } else {
-        viewToPresent = self.listViewSplitView;
+        self.listViewSplitView.hidden = NO;
+        self.collectionViewScrollView.hidden = YES;
         [self.splitViewDelegate resetDefaultSplitForSplitView:self.listViewSplitView];
     }
-    NSParameterAssert(viewToPresent != nil);
-    [self.libraryWindow displayLibraryView:viewToPresent];
+}
+
+- (void)setupPlaylistLibraryContainerView
+{
+    self.collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.listViewSplitView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [self.libraryView addSubview:self.collectionViewScrollView];
+    [self.libraryView addSubview:self.listViewSplitView];
+
+    [self.collectionViewScrollView applyConstraintsToFillSuperview];
+    [self.listViewSplitView applyConstraintsToFillSuperview];
 }
 
 - (void)updatePresentedView

@@ -38,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryPlaylistViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<NSSplitViewDelegate>
 
+@property (readonly) NSView *libraryView;
 @property (readonly) NSSplitView *listViewSplitView;
 @property (readonly) NSScrollView *masterTableViewScrollView;
 @property (readonly) VLCLibraryTableView *masterTableView;

@@ -22,6 +22,7 @@
 
 #import "VLCLibraryFavoritesViewController.h"
 
+#import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
@@ -75,6 +76,7 @@
         [self setupFavoritesDataSource];
         [self setupFavoritesPlaceholderView];
         [self setupFavoritesLibraryViews];
+        [self setupFavoritesLibraryContainerView];
         [self setupNotifications];
     }
     
@@ -88,6 +90,7 @@
 
 - (void)setupProperties
 {
+    _favoritesLibraryView = [[NSView alloc] init];
     _favoritesLibrarySplitView = [[NSSplitView alloc] init];
     _favoritesLibraryCollectionViewScrollView = [[NSScrollView alloc] init];
     _favoritesLibraryCollectionView = [[VLCLibraryCollectionView alloc] init];
@@ -217,6 +220,7 @@
 
 - (void)setupFavoritesLibraryViews
 {
+    self.favoritesLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
     self.favoritesLibraryGroupsTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.favoritesLibraryGroupSelectionTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.favoritesLibrarySplitView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -245,6 +249,18 @@
     self.favoritesLibrarySplitView.delegate = _splitViewDelegate;
     [self.favoritesLibrarySplitView addArrangedSubview:self.favoritesLibraryGroupsTableViewScrollView];
     [self.favoritesLibrarySplitView addArrangedSubview:self.favoritesLibraryGroupSelectionTableViewScrollView];
+}
+
+- (void)setupFavoritesLibraryContainerView
+{
+    self.favoritesLibraryCollectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.favoritesLibrarySplitView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [self.favoritesLibraryView addSubview:self.favoritesLibraryCollectionViewScrollView];
+    [self.favoritesLibraryView addSubview:self.favoritesLibrarySplitView];
+
+    [self.favoritesLibraryCollectionViewScrollView applyConstraintsToFillSuperview];
+    [self.favoritesLibrarySplitView applyConstraintsToFillSuperview];
 }
 
 - (void)setupFavoritesPlaceholderView
@@ -344,10 +360,13 @@
 
 - (void)presentFavoritesLibraryView:(VLCLibraryViewModeSegment)viewModeSegment
 {
+    [self.libraryWindow displayLibraryView:self.favoritesLibraryView];
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
-        [self.libraryWindow displayLibraryView:self.favoritesLibraryCollectionViewScrollView];
+        self.favoritesLibrarySplitView.hidden = YES;
+        self.favoritesLibraryCollectionViewScrollView.hidden = NO;
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
-        [self.libraryWindow displayLibraryView:self.favoritesLibrarySplitView];
+        self.favoritesLibrarySplitView.hidden = NO;
+        self.favoritesLibraryCollectionViewScrollView.hidden = YES;
         [_splitViewDelegate resetDefaultSplitForSplitView:self.favoritesLibrarySplitView];
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
