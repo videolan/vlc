@@ -680,9 +680,9 @@ static int ShowController(vlc_object_t * __unused p_this,
         context.duration = 1.0;
         self.loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
-        NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
-        [views removeObject:self.loadingOverlayView];
-        self.libraryTargetView.subviews = views.copy;
+        NSMutableArray * const mutableSubviews = self.libraryTargetView.subviews.mutableCopy;
+        [mutableSubviews removeObject:self.loadingOverlayView];
+        self.libraryTargetView.subviews = mutableSubviews;
         [self.loadingOverlayView.indicator stopAnimation:self];
     }];
 }
