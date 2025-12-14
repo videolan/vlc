@@ -246,8 +246,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
     }
 
     // Display as far to the right as possible, but not in front of the multifunc bar toggle button
-    NSMutableArray<NSToolbarItem *> * const currentToolbarItems =
-        [NSMutableArray arrayWithArray:self.toolbar.items];
+    NSMutableArray<NSToolbarItem *> * const currentToolbarItems = self.toolbar.items.mutableCopy;
     if (currentToolbarItems.lastObject == self.togglePlayQueueToolbarItem) {
         [currentToolbarItems removeLastObject];
     }
