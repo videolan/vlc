@@ -1,8 +1,27 @@
 Changes between 3.0.22 and 3.0.23:
 ----------------------------------
 
+Codecs:
+ * Fix WebVTT line positioning
+ * Expose additional audio codec information (notably for Flac 24bit)
+
+Demuxers:
+ * fix some JPEG files wih JFIF headers
+
 Windows:
  * config_GetUserDir() no longer tries to create the folder on Windows (#29488)
+ * Fix images display with D3D11
+ * Improve dark palette in Qt interface
+ * Fix compilation of OpenGL modules
+
+Security:
+ * Fix null deref in libass, undefined shift in theora and cc-708, integer overflow in daala,
+   Infinite loop in h264 parsing, buffer overflow in png and multiple format-overflows
+
+Misc:
+ * Prepare compatibility for taglib 2.0, Qt6, FFmpeg8, mingw-w64 v13 and newer versions of
+   libplacebo and pupnp
+
 
 Changes between 3.0.21 and 3.0.22:
 ----------------------------------
