@@ -620,7 +620,7 @@ static int DemuxStream( demux_t *p_demux )
 static int ProbeWEBVTT( demux_t *p_demux )
 {
     const uint8_t *p_peek;
-    size_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 16 );
+    ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 16 );
     if( i_peek < 16 )
         return VLC_EGENERIC;
 
