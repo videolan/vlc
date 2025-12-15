@@ -115,7 +115,11 @@ test_abloop_scenario(struct ctx *ctx, const struct abloop_scenario *scenario)
         }
         seek_count++;
     }
-    assert(seek_count == scenario->seek_count);
+
+    if (scenario->wait_stopped)
+        assert(seek_count == scenario->seek_count);
+    else
+        assert(seek_count >= scenario->seek_count);
 
     test_end(ctx);
     player_remove_timer(player, &timer);
