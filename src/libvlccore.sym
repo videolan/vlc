@@ -328,6 +328,8 @@ picture_Destroy
 picture_CopyProperties
 picture_Copy
 picture_Export
+picture_fifo_Lock
+picture_fifo_Unlock
 picture_fifo_Delete
 picture_fifo_Flush
 picture_fifo_New

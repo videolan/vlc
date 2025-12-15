@@ -292,6 +292,14 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
              (const char *)&p_enc_in->i_chroma);
 }
 
+static picture_t *picture_fifo_LockPop( picture_fifo_t *fifo )
+{
+    picture_fifo_Lock( fifo );
+    picture_t *pic = picture_fifo_Pop( fifo );
+    picture_fifo_Unlock( fifo );
+    return pic;
+}
+
 static void* EncoderThread( void *obj )
 {
     vlc_thread_set_name("vlc-encoder");
@@ -306,7 +314,7 @@ static void* EncoderThread( void *obj )
     for( ;; )
     {
         while( !p_enc->b_abort &&
-               (p_pic = picture_fifo_Pop( p_enc->pp_pics )) == NULL )
+               (p_pic = picture_fifo_LockPop( p_enc->pp_pics )) == NULL )
             vlc_cond_wait( &p_enc->cond, &p_enc->lock_out );
         vlc_sem_post( &p_enc->picture_pool_has_room );
 
@@ -326,7 +334,7 @@ static void* EncoderThread( void *obj )
     }
 
     /*Encode what we have in the buffer on closing*/
-    while( (p_pic = picture_fifo_Pop( p_enc->pp_pics )) != NULL )
+    while( (p_pic = picture_fifo_LockPop( p_enc->pp_pics )) != NULL )
     {
         vlc_sem_post( &p_enc->picture_pool_has_room );
         p_block = vlc_encoder_EncodeVideo( p_enc->p_encoder, p_pic );
@@ -435,7 +443,9 @@ block_t * transcode_encoder_video_encode( transcode_encoder_t *p_enc, picture_t 
     vlc_sem_wait( &p_enc->picture_pool_has_room );
     vlc_mutex_lock( &p_enc->lock_out );
     picture_Hold( p_pic );
+    picture_fifo_Lock( p_enc->pp_pics );
     picture_fifo_Push( p_enc->pp_pics, p_pic );
+    picture_fifo_Unlock( p_enc->pp_pics );
     vlc_cond_signal( &p_enc->cond );
     vlc_mutex_unlock( &p_enc->lock_out );
     return NULL;

@@ -285,7 +285,10 @@ bool vout_IsEmpty(vout_thread_t *vout)
     assert(!sys->dummy);
     assert(sys->decoder_fifo);
 
-    return picture_fifo_IsEmpty(sys->decoder_fifo);
+    picture_fifo_Lock(sys->decoder_fifo);
+    bool empty = picture_fifo_IsEmpty(sys->decoder_fifo);
+    picture_fifo_Unlock(sys->decoder_fifo);
+    return empty;
 }
 
 void vout_DisplayTitle(vout_thread_t *vout, const char *title)
@@ -403,7 +406,9 @@ void vout_PutPicture(vout_thread_t *vout, picture_t *picture)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
     assert( !picture_HasChainedPics( picture ) );
+    picture_fifo_Lock(sys->decoder_fifo);
     picture_fifo_Push(sys->decoder_fifo, picture);
+    picture_fifo_Unlock(sys->decoder_fifo);
     vout_control_Wake(&sys->control);
 }
 
@@ -1069,7 +1074,9 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
             if (decoded == NULL)
                 break;
         } else {
+            picture_fifo_Lock(sys->decoder_fifo);
             decoded = picture_fifo_Pop(sys->decoder_fifo);
+            picture_fifo_Unlock(sys->decoder_fifo);
             if (decoded == NULL)
                 break;
 
@@ -1608,7 +1615,9 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
      * when the clock is configured. */
     if (sys->first_picture)
     {
+        picture_fifo_Lock(sys->decoder_fifo);
         bool has_next_pic = !picture_fifo_IsEmpty(sys->decoder_fifo);
+        picture_fifo_Unlock(sys->decoder_fifo);
         if (!has_next_pic)
             return false;
 
@@ -1742,7 +1751,9 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
         }
     }
 
+    picture_fifo_Lock(sys->decoder_fifo);
     picture_fifo_Flush(sys->decoder_fifo, date, below);
+    picture_fifo_Unlock(sys->decoder_fifo);
 
     vlc_queuedmutex_lock(&sys->display_lock);
     if (sys->display != NULL)

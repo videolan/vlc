@@ -51,6 +51,7 @@ void transcode_encoder_delete( transcode_encoder_t *p_enc )
         {
             transcode_encoder_video_stop( p_enc );
             block_ChainRelease( p_enc->p_buffers );
+
             picture_fifo_Delete( p_enc->pp_pics );
         }
 

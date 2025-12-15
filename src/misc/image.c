@@ -144,7 +144,9 @@ void image_HandlerDelete( image_handler_t *p_image )
 static void ImageQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    picture_fifo_Lock( p_owner->p_image->outfifo );
     picture_fifo_Push( p_owner->p_image->outfifo, p_pic );
+    picture_fifo_Unlock( p_owner->p_image->outfifo );
 }
 
 static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
@@ -196,6 +198,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         /* Drain */
         p_image->p_dec->pf_decode( p_image->p_dec, NULL );
 
+        picture_fifo_Lock( p_image->outfifo );
         p_pic = picture_fifo_Pop( p_image->outfifo );
 
         unsigned lostcount = 0;
@@ -205,6 +208,8 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
             picture_Release( lostpic );
             lostcount++;
         }
+        picture_fifo_Unlock( p_image->outfifo );
+
         if( lostcount > 0 )
             msg_Warn( p_image->p_parent, "Image decoder output more than one "
                       "picture (%u)", lostcount );

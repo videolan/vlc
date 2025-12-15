@@ -51,11 +51,6 @@ static void PictureFifoPush(picture_fifo_t *fifo, picture_t *picture)
     assert(!picture_HasChainedPics(picture));
     vlc_picture_chain_Append( &fifo->pics, picture );
 }
-static picture_t *PictureFifoPop(picture_fifo_t *fifo)
-{
-    return vlc_picture_chain_PopFront( &fifo->pics );
-}
-
 picture_fifo_t *picture_fifo_New(void)
 {
     picture_fifo_t *fifo = malloc(sizeof(*fifo));
@@ -69,35 +64,28 @@ picture_fifo_t *picture_fifo_New(void)
 
 void picture_fifo_Push(picture_fifo_t *fifo, picture_t *picture)
 {
-    vlc_mutex_lock(&fifo->lock);
+    vlc_mutex_assert(&fifo->lock);
     PictureFifoPush(fifo, picture);
-    vlc_mutex_unlock(&fifo->lock);
 }
 picture_t *picture_fifo_Pop(picture_fifo_t *fifo)
 {
-    vlc_mutex_lock(&fifo->lock);
-    picture_t *picture = PictureFifoPop(fifo);
-    vlc_mutex_unlock(&fifo->lock);
-
-    return picture;
+    vlc_mutex_assert(&fifo->lock);
+    return vlc_picture_chain_PopFront( &fifo->pics );
 }
 bool picture_fifo_IsEmpty(picture_fifo_t *fifo)
 {
-    vlc_mutex_lock(&fifo->lock);
-    bool empty = vlc_picture_chain_IsEmpty( &fifo->pics );
-    vlc_mutex_unlock(&fifo->lock);
-
-    return empty;
+    vlc_mutex_assert(&fifo->lock);
+    return vlc_picture_chain_IsEmpty( &fifo->pics );
 }
 void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before)
 {
+    vlc_mutex_assert(&fifo->lock);
     picture_t *picture;
 
     vlc_picture_chain_t flush_chain;
 
     vlc_picture_chain_Init(&flush_chain);
 
-    vlc_mutex_lock(&fifo->lock);
     if (date == VLC_TICK_INVALID)
         vlc_picture_chain_GetAndClear(&fifo->pics, &flush_chain);
     else {
@@ -114,13 +102,24 @@ void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before
                 PictureFifoPush(fifo, picture);
         }
     }
-    vlc_mutex_unlock(&fifo->lock);
 
     while ((picture = vlc_picture_chain_PopFront(&flush_chain)) != NULL)
         picture_Release(picture);
 }
 void picture_fifo_Delete(picture_fifo_t *fifo)
 {
+    vlc_mutex_lock(&fifo->lock);
     picture_fifo_Flush(fifo, VLC_TICK_INVALID, true);
+    vlc_mutex_unlock(&fifo->lock);
     free(fifo);
+}
+
+void picture_fifo_Lock(picture_fifo_t *fifo)
+{
+    vlc_mutex_lock(&fifo->lock);
+}
+
+void picture_fifo_Unlock(picture_fifo_t *fifo)
+{
+    vlc_mutex_unlock(&fifo->lock);
 }
