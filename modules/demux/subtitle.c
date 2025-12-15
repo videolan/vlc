@@ -382,7 +382,7 @@ static int Open ( vlc_object_t *p_this )
     const uint64_t i_start_pos = vlc_stream_Tell( p_demux->s );
 #endif
 
-    size_t i_peek;
+    ssize_t i_peek;
     const uint8_t *p_peek;
     if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
     {
