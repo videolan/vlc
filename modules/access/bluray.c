@@ -617,7 +617,7 @@ static int probeStream(demux_t *p_demux)
     }
 
     /* first sector(s) should be filled with zeros */
-    size_t i_peek;
+    ssize_t i_peek;
     const uint8_t *p_peek;
     i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 2048 );
     if( i_peek != 2048 ) {
