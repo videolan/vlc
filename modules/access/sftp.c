@@ -339,7 +339,6 @@ static int Open( vlc_object_t* p_this )
                 msg_Err( p_access, "Failure reading known_hosts '%s'", psz_knownhosts_file );
             free( psz_knownhosts_file );
         }
-        free( psz_home );
     }
 
     const char *fingerprint = libssh2_session_hostkey( p_sys->ssh_session, &i_len, &i_type );
@@ -567,6 +566,7 @@ static int Open( vlc_object_t* p_this )
     i_result = VLC_SUCCESS;
 
 error:
+    free( psz_home );
     free( psz_session_username );
     free( psz_path );
     vlc_credential_clean( &credential );
