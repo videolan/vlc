@@ -2009,13 +2009,15 @@ static int BossCallback(vlc_object_t *p_this,
         return VLC_EGENERIC;
     }
 
+    // Get the current filter string
     char *psz_string = var_InheritString(p_vout, psz_filter_type);
 
-    if (state) {
-        if (psz_string == NULL) {
+    if (state) { // Enable the filter
+        if (psz_string == NULL) { // No current filters
             psz_string = strdup(nameUTF8String);
-        } else if (strstr(psz_string, nameUTF8String) == NULL) {
+        } else if (strstr(psz_string, nameUTF8String) == NULL) { // Filter not already enabled
             char *psz_tmp = NULL;
+            // Append the filter to the current filter string
             if (asprintf(&psz_tmp, "%s:%s", psz_string, nameUTF8String) == -1) {
                 free((void *)psz_string);
                 vout_Release(p_vout);
@@ -2024,26 +2026,30 @@ static int BossCallback(vlc_object_t *p_this,
             free((void *)psz_string);
             psz_string = psz_tmp;
         }
-    } else {
-        if (psz_string == NULL) {
+    } else { // Disable the filter
+        if (psz_string == NULL) { // No current filters
             vout_Release(p_vout);
             return VLC_SUCCESS;
         }
 
-        char *const psz_parser = strstr(psz_string, nameUTF8String);
-        if (psz_parser != NULL) {
+        char * const psz_parser = strstr(psz_string, nameUTF8String);
+        if (psz_parser != NULL) { // Enabled filter found
             const size_t name_len = [name lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
-            if (*(psz_parser + name_len) == ':') {
+            // Check the next character to see if it is a colon, if it is...
+            if (*(psz_parser + name_len) == ':') { // ...filter is not the last one in the list
+                // Remove the filter from the list by moving the rest of the string after the filter left
                 memmove((void *)psz_parser, psz_parser + name_len + 1,
                         strlen(psz_parser + name_len + 1) + 1);
-            } else {
+            } else { // Filter is the last one in the list
+                // Remove the filter from the list by setting the null terminator to the end of the string
                 *psz_parser = '\0';
             }
 
             if (*psz_string != '\0' && *(psz_string + strlen(psz_string) - 1) == ':') {
+                // Remove the trailing colon if it exists
                 *(psz_string + strlen(psz_string) - 1) = '\0';
             }
-        } else {
+        } else { // Filter not enabled, nothing needs doing
             free((void *)psz_string);
             vout_Release(p_vout);
             return VLC_SUCCESS;
