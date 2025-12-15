@@ -581,7 +581,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
     vlc_mutex_lock(&sys->lock);
     if (sys->acquired_device == NULL || sys->acquired_device == default_device)
     {
-        msg_Dbg(aout, "default device changed: %ls", wid);
+        msg_Dbg(aout, "default device changed: %ls", wid ? wid : L"(disabled)");
         sys->request_device_restart = true;
         aout_RestartRequest(aout, true);
     }
