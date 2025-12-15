@@ -59,9 +59,9 @@ impl<'a> AssumeValid<&'a str> for &'a std::ffi::CStr {
     /// highlight and help resolve VLC core missing checks.
     unsafe fn assume_valid(self) -> &'a str {
         if cfg!(debug_assertions) {
-            str::from_utf8(self.to_bytes()).expect("Unexpected invalid UTF8 coming from VLC")
+            std::str::from_utf8(self.to_bytes()).expect("Unexpected invalid UTF8 coming from VLC")
         } else {
-            unsafe { str::from_utf8_unchecked(self.to_bytes()) }
+            unsafe { std::str::from_utf8_unchecked(self.to_bytes()) }
         }
     }
 }
