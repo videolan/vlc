@@ -270,9 +270,9 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
     if( vlc_stream_Peek( p_demux->s, &p_peek, H26X_MIN_PEEK ) == H26X_MIN_PEEK &&
        !memcmp( p_peek, annexb_startcode, 4 ) )
     {
-        size_t i_peek = H26X_MIN_PEEK;
+        ssize_t i_peek = H26X_MIN_PEEK;
         size_t i_peek_target = H26X_MIN_PEEK;
-        size_t i_probe_offset = 4;
+        ssize_t i_probe_offset = 4;
         const uint8_t *p_probe = p_peek;
         bool b_synced = true;
         unsigned i_bitflow = 0;
@@ -303,7 +303,7 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
             if( b_synced )
             {
                 p_probe = &p_peek[i_probe_offset];
-                i_ret = pf_probe( p_probe, i_peek - i_probe_offset, p_ctx );
+                i_ret = pf_probe( p_probe, (size_t)(i_peek - i_probe_offset), p_ctx );
             }
 
             if( i_ret != 0 )
@@ -525,4 +525,3 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                        0, -1,
                                        0, 1, i_query, args );
 }
-
