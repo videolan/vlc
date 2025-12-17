@@ -1038,9 +1038,9 @@ static int OpenDecoder(vlc_object_t *p_this)
 
 error:
     CloseDecoder(p_this);
+    return VLC_EGENERIC;
 early_exit:
     free(p_dec->p_sys);
-    p_dec->p_sys = NULL;
     return VLC_EGENERIC;
 }
 
@@ -1066,7 +1066,6 @@ static void CloseDecoder(vlc_object_t *p_this)
     {
         cuvid_free_functions(&p_sys->cuvidFunctions);
         free(p_dec->p_sys);
-        p_dec->p_sys = NULL;
     }
 }
 
