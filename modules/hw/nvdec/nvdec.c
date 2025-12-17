@@ -334,7 +334,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
             goto cuda_error;
 
         ret = CALL_CUDA_DEC(cuDeviceGetAttribute, &tex_alignment, CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT, cuDev);
-        if (ret != VLC_SUCCESS || tex_alignment < 0)
+        if (ret != VLC_SUCCESS || tex_alignment <= 0)
             goto cuda_error;
 
         unsigned int bytes_per_sample = i_bpp > 8 ? 2 : 1;
