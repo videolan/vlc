@@ -919,6 +919,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     else
         hr = AUDCLNT_E_DEVICE_INVALIDATED;
 
+    sys->initialisation_status = INITIALISATION_SUCCEEDED;
     while (hr == AUDCLNT_E_DEVICE_INVALIDATED)
     {   /* Default device selected by policy and with stream routing.
          * "Do not use eMultimedia" says MSDN. */
@@ -928,6 +929,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         if (FAILED(hr))
         {
             msg_Err(aout, "cannot get default device (error 0x%lX)", hr);
+            sys->initialisation_status = INITIALISATION_FAILED;
             sys->acquired_device = NULL;
         }
         else
@@ -935,7 +937,6 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     }
 
     sys->requested_device = NULL;
-    sys->initialisation_status = INITIALISATION_SUCCEEDED;
     vlc_cond_signal(&sys->ready);
 
     if (SUCCEEDED(hr))
