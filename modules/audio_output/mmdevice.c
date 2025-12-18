@@ -48,6 +48,7 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
 #include <vlc_aout.h>
 #include <vlc_charset.h>
 #include <vlc_modules.h>
+#include <vlc_atomic.h>
 #include "mmdevice.h"
 
 DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
@@ -106,7 +107,7 @@ struct aout_sys_t
     signed char requested_mute; /**< Requested mute, negative if none */
     enum device_acquisition_status device_status;
     wchar_t *device_name; /**< device identifier to use, NULL if default */
-    bool default_device_changed;
+    atomic_bool default_device_changed;
     vlc_sem_t init_passed;
     CRITICAL_SECTION lock;
     CONDITION_VARIABLE work;
@@ -600,7 +601,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
     EnterCriticalSection(&sys->lock);
     if (sys->device_name == NULL)
     {
-        sys->default_device_changed = true;
+        atomic_store(&sys->default_device_changed, true);
         aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     }
     LeaveCriticalSection(&sys->lock);
@@ -749,7 +750,7 @@ static int DeviceRequestLocked(audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
     assert(sys->device_status == DEVICE_PENDING);
 
-    sys->default_device_changed = false;
+    atomic_store(&sys->default_device_changed, false);
 
     WakeConditionVariable(&sys->work);
     while (sys->device_status == DEVICE_PENDING)
@@ -1210,7 +1211,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     EnterMTA();
     EnterCriticalSection(&sys->lock);
 
-    if ((sys->default_device_changed && DeviceRestartLocked(aout) != 0)
+    if ((atomic_exchange(&sys->default_device_changed, false) && DeviceRestartLocked(aout) != 0)
       || sys->dev == NULL)
     {
         /* Error if the device restart failed or if a request previously
@@ -1332,7 +1333,7 @@ static int Open(vlc_object_t *obj)
     sys->gain = 1.f;
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
-    sys->default_device_changed = false;
+    atomic_init(&sys->default_device_changed, false);
 
     if (!var_CreateGetBool(aout, "volume-save"))
         VolumeSetLocked(aout, var_InheritFloat(aout, "mmdevice-volume"));
