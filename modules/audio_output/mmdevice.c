@@ -79,12 +79,6 @@ static void LeaveMTA(void)
 
 static char default_device_b[1] = "";
 
-enum initialisation_status_t {
-    INITIALISATION_PENDING,
-    INITIALISATION_FAILED,
-    INITIALISATION_SUCCEEDED,
-};
-
 enum device_acquisition_status {
     DEVICE_PENDING,
     DEVICE_ACQUISITION_FAILED,
@@ -115,7 +109,6 @@ struct aout_sys_t
     CRITICAL_SECTION lock;
     CONDITION_VARIABLE work;
     CONDITION_VARIABLE ready;
-    enum initialisation_status_t initialisation_status;
     vlc_thread_t thread; /**< Thread for audio session control */
 };
 
@@ -908,7 +901,6 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     else
         hr = AUDCLNT_E_DEVICE_INVALIDATED;
 
-    sys->initialisation_status = INITIALISATION_SUCCEEDED;
     while (hr == AUDCLNT_E_DEVICE_INVALIDATED)
     {   /* Default device selected by policy and with stream routing.
          * "Do not use eMultimedia" says MSDN. */
@@ -918,7 +910,6 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         if (FAILED(hr))
         {
             msg_Err(aout, "cannot get default device (error 0x%lX)", hr);
-            sys->initialisation_status = INITIALISATION_FAILED;
             sys->device_status = DEVICE_ACQUISITION_FAILED;
             sys->device_name = NULL;
         }
@@ -1141,7 +1132,7 @@ static void *MMThread(void *data)
 
 error:
     EnterCriticalSection(&sys->lock);
-    sys->initialisation_status = INITIALISATION_FAILED;
+    sys->device_status = DEVICE_ACQUISITION_FAILED;
     WakeConditionVariable(&sys->ready);
     LeaveCriticalSection(&sys->lock);
     return NULL;
@@ -1359,16 +1350,15 @@ static int Open(vlc_object_t *obj)
     }
     sys->device_status = DEVICE_PENDING;
 
-    sys->initialisation_status = INITIALISATION_PENDING;
     if (vlc_clone(&sys->thread, MMThread, aout, VLC_THREAD_PRIORITY_LOW))
         goto error;
 
     EnterCriticalSection(&sys->lock);
-    while (sys->initialisation_status == INITIALISATION_PENDING)
+    while (sys->device_status == DEVICE_PENDING)
         SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
     LeaveCriticalSection(&sys->lock);
 
-    if (sys->initialisation_status == INITIALISATION_FAILED)
+    if (sys->device_status == DEVICE_ACQUISITION_FAILED)
     {
         vlc_join(sys->thread, NULL);
         goto error;
