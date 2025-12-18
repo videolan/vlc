@@ -1407,9 +1407,13 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     vlc_mutex_lock(&sys->lock);
+    wchar_t *previous = sys->requested_device;
     sys->requested_device = default_device; /* break out of MMSession() loop */
     sys->it = NULL; /* break out of MMThread() loop */
     vlc_mutex_unlock(&sys->lock);
+
+    if (previous != NULL && previous != default_device)
+        free(previous);
 
     SetEvent(sys->work_event);
 
