@@ -81,6 +81,12 @@ enum initialisation_status_t {
     INITIALISATION_SUCCEEDED,
 };
 
+enum device_acquisition_status {
+    DEVICE_PENDING,
+    DEVICE_ACQUISITION_FAILED,
+    DEVICE_ACQUIRED,
+};
+
 typedef struct
 {
     struct aout_stream_owner *stream; /**< Underlying audio output stream */
@@ -96,10 +102,10 @@ typedef struct
     unsigned ducks;
     float gain; /**< Current software gain volume */
 
-    wchar_t *requested_device; /**< Requested device identifier, NULL if none */
     float requested_volume; /**< Requested volume, negative if none */
     signed char requested_mute; /**< Requested mute, negative if none */
-    wchar_t *acquired_device; /**< Acquired device identifier, NULL if none */
+    enum device_acquisition_status device_status;
+    wchar_t *device_name; /**< device identifier to use, NULL if none */
     bool request_device_restart;
     HANDLE work_event;
     enum initialisation_status_t initialisation_status;
@@ -579,7 +585,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
         return S_OK;
 
     vlc_mutex_lock(&sys->lock);
-    if (sys->acquired_device == NULL || sys->acquired_device == default_device)
+    if (sys->device_name == default_device)
     {
         msg_Dbg(aout, "default device changed: %ls", wid ? wid : L"(disabled)");
         sys->request_device_restart = true;
@@ -728,12 +734,12 @@ static HRESULT DevicesEnum(IMMDeviceEnumerator *it,
 static int DeviceRequestLocked(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
-    assert(sys->requested_device);
+    assert(sys->device_status == DEVICE_PENDING);
 
     sys->request_device_restart = false;
 
     SetEvent(sys->work_event);
-    while (sys->requested_device != NULL)
+    while (sys->device_status == DEVICE_PENDING)
         vlc_cond_wait(&sys->ready, &sys->lock);
 
     if (sys->stream != NULL && sys->dev != NULL)
@@ -745,16 +751,17 @@ static int DeviceRequestLocked(audio_output_t *aout)
 static int DeviceSelectLocked(audio_output_t *aout, const char *id)
 {
     aout_sys_t *sys = aout->sys;
-    assert(sys->requested_device == NULL);
+    assert(sys->device_status != DEVICE_PENDING);
 
+    sys->device_status = DEVICE_PENDING;
     if (id != NULL && strcmp(id, default_device_b) != 0)
     {
-        sys->requested_device = ToWide(id); /* FIXME leak */
-        if (unlikely(sys->requested_device == NULL))
+        sys->device_name = ToWide(id); /* FIXME leak */
+        if (unlikely(sys->device_name == NULL))
             return -1;
     }
     else
-        sys->requested_device = default_device;
+        sys->device_name = default_device;
 
     return DeviceRequestLocked(aout);
 }
@@ -762,9 +769,10 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
 static int DeviceRestartLocked(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
-    assert(sys->requested_device == NULL);
-    sys->requested_device = sys->acquired_device ? sys->acquired_device
-                                                 : default_device;
+    assert(sys->device_status != DEVICE_PENDING);
+    if (sys->device_name == NULL)
+        sys->device_name = default_device;
+    sys->device_status = DEVICE_PENDING;
     return DeviceRequestLocked(aout);
 }
 
@@ -790,7 +798,7 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
     bool report_volume = true;
     bool report_mute = true;
 
-    while (sys->requested_device == NULL)
+    while (sys->device_status != DEVICE_PENDING)
     {
         if (volume != NULL)
         {
@@ -866,7 +874,8 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
             if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED ||
                          hr == AUDCLNT_E_RESOURCES_INVALIDATED))
             {
-                sys->requested_device = default_device;
+                sys->device_name = default_device;
+                sys->device_status = DEVICE_PENDING;
                 /* The restart of the stream will be requested asynchronously */
             }
         }
@@ -895,26 +904,23 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     void *pv;
     HRESULT hr;
 
-    assert(sys->requested_device != NULL);
+    assert(sys->device_status == DEVICE_PENDING);
     assert(sys->dev == NULL);
 
     /* Yes, it's perfectly valid to request the same device, see Start()
      * comments. */
-    if (sys->acquired_device != sys->requested_device
-     && sys->acquired_device != default_device)
-        free(sys->acquired_device);
-    if (sys->requested_device != default_device) /* Device selected explicitly */
+    if (sys->device_name != default_device) /* Device selected explicitly */
     {
-        msg_Dbg(aout, "using selected device %ls", sys->requested_device);
-        hr = IMMDeviceEnumerator_GetDevice(it, sys->requested_device, &sys->dev);
+        msg_Dbg(aout, "using selected device %ls", sys->device_name);
+        hr = IMMDeviceEnumerator_GetDevice(it, sys->device_name, &sys->dev);
         if (FAILED(hr))
         {
             msg_Err(aout, "cannot get selected device %ls (error 0x%lX)",
-                    sys->requested_device, hr);
+                    sys->device_name, hr);
             hr = AUDCLNT_E_DEVICE_INVALIDATED;
         }
         else
-            sys->acquired_device = sys->requested_device;
+            sys->device_status = DEVICE_ACQUIRED;
     }
     else
         hr = AUDCLNT_E_DEVICE_INVALIDATED;
@@ -930,20 +936,23 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         {
             msg_Err(aout, "cannot get default device (error 0x%lX)", hr);
             sys->initialisation_status = INITIALISATION_FAILED;
-            sys->acquired_device = NULL;
+            sys->device_status = DEVICE_ACQUISITION_FAILED;
+            sys->device_name = NULL;
         }
         else
-            sys->acquired_device = default_device;
+        {
+            sys->device_status = DEVICE_ACQUIRED;
+            sys->device_name = default_device;
+        }
     }
 
-    sys->requested_device = NULL;
     vlc_cond_signal(&sys->ready);
 
     if (SUCCEEDED(hr))
     {   /* Report actual device */
         LPWSTR wdevid;
 
-        if (sys->acquired_device == default_device)
+        if (sys->device_name == default_device)
             aout_DeviceReport(aout, default_device_b);
         else
         {
@@ -1137,7 +1146,7 @@ static void *MMThread(void *data)
     vlc_mutex_lock(&sys->lock);
 
     do
-        if (sys->requested_device == NULL || FAILED(MMSession(aout, it)))
+        if (sys->device_status != DEVICE_PENDING || FAILED(MMSession(aout, it)))
         {
             vlc_mutex_unlock(&sys->lock);
             WaitForSingleObject(sys->work_event, INFINITE);
@@ -1343,7 +1352,7 @@ static int Open(vlc_object_t *obj)
     sys->gain = 1.f;
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
-    sys->acquired_device = NULL;
+    sys->device_name = NULL;
     sys->request_device_restart = false;
 
     if (!var_CreateGetBool(aout, "volume-save"))
@@ -1361,17 +1370,18 @@ static int Open(vlc_object_t *obj)
     char *saved_device_b = var_InheritString(aout, "mmdevice-audio-device");
     if (saved_device_b != NULL && strcmp(saved_device_b, default_device_b) != 0)
     {
-        sys->requested_device = ToWide(saved_device_b); /* FIXME leak */
+        sys->device_name = ToWide(saved_device_b); /* FIXME leak */
         free(saved_device_b);
 
-        if (unlikely(sys->requested_device == NULL))
+        if (unlikely(sys->device_name == NULL))
             goto error;
     }
     else
     {
         free(saved_device_b);
-        sys->requested_device = default_device;
+        sys->device_name = default_device;
     }
+    sys->device_status = DEVICE_PENDING;
 
     sys->initialisation_status = INITIALISATION_PENDING;
     if (vlc_clone(&sys->thread, MMThread, aout))
@@ -1412,8 +1422,9 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     vlc_mutex_lock(&sys->lock);
-    wchar_t *previous = sys->requested_device;
-    sys->requested_device = default_device; /* break out of MMSession() loop */
+    wchar_t *previous = sys->device_name;
+    sys->device_name = default_device;
+    sys->device_status = DEVICE_PENDING; /* break out of MMSession() loop */
     sys->it = NULL; /* break out of MMThread() loop */
     vlc_mutex_unlock(&sys->lock);
 
