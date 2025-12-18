@@ -1387,10 +1387,14 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     EnterCriticalSection(&sys->lock);
+    wchar_t *previous = sys->requested_device;
     sys->requested_device = default_device; /* break out of MMSession() loop */
     sys->it = NULL; /* break out of MMThread() loop */
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
+
+    if (previous != NULL && previous != default_device)
+        free(previous);
 
     vlc_join(sys->thread, NULL);
     DeleteCriticalSection(&sys->lock);
