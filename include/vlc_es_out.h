@@ -254,7 +254,7 @@ VLC_USED static inline int es_out_SetNextDisplayTime( es_out_t *out, vlc_tick_t 
 }
 
 /* Set global meta data (The vlc_meta_t is not modified nor released) */
-VLC_USED static inline int es_out_SetMeta( es_out_t *out, const vlc_meta_t *meta )
+static inline int es_out_SetMeta( es_out_t *out, const vlc_meta_t *meta )
 {
     return es_out_Control( out, ES_OUT_SET_META, meta );
 }
