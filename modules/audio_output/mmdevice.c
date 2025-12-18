@@ -908,9 +908,13 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         msg_Dbg(aout, "using selected device %ls", sys->requested_device);
         hr = IMMDeviceEnumerator_GetDevice(it, sys->requested_device, &sys->dev);
         if (FAILED(hr))
+        {
             msg_Err(aout, "cannot get selected device %ls (error 0x%lX)",
                     sys->requested_device, hr);
-        sys->acquired_device = sys->requested_device;
+            hr = AUDCLNT_E_DEVICE_INVALIDATED;
+        }
+        else
+            sys->acquired_device = sys->requested_device;
     }
     else
         hr = AUDCLNT_E_DEVICE_INVALIDATED;
