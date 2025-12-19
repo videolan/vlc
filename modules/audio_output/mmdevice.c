@@ -99,7 +99,7 @@ typedef struct
     float requested_volume; /**< Requested volume, negative if none */
     signed char requested_mute; /**< Requested mute, negative if none */
     enum device_acquisition_status device_status;
-    wchar_t *device_name; /**< device identifier to use, NULL if default */
+    _Atomic(wchar_t *) device_name; /**< device identifier to use, NULL if default */
     atomic_bool default_device_changed;
     HANDLE work_event;
     vlc_sem_t init_passed;
@@ -579,7 +579,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
         return S_OK;
 
     vlc_mutex_lock(&sys->lock);
-    if (sys->device_name == NULL)
+    if (atomic_load(&sys->device_name) == NULL)
     {
         atomic_store(&sys->default_device_changed, true);
         aout_RestartRequest(aout, true);
@@ -750,12 +750,13 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
     sys->device_status = DEVICE_PENDING;
     if (id != NULL && strcmp(id, default_device_b) != 0)
     {
-        sys->device_name = ToWide(id); /* FIXME leak */
-        if (unlikely(sys->device_name == NULL))
+        wchar_t *selected_device_name = ToWide(id);
+        atomic_store(&sys->device_name, selected_device_name);
+        if (unlikely(selected_device_name == NULL))
             return -1;
     }
     else
-        sys->device_name = NULL;
+        atomic_store(&sys->device_name, NULL);
 
     return DeviceRequestLocked(aout);
 }
@@ -866,7 +867,7 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
             if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED ||
                          hr == AUDCLNT_E_RESOURCES_INVALIDATED))
             {
-                sys->device_name = NULL;
+                atomic_store(&sys->device_name, NULL);
                 sys->device_status = DEVICE_PENDING;
                 /* The restart of the stream will be requested asynchronously */
             }
@@ -901,7 +902,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
 
     /* Yes, it's perfectly valid to request the same device, see Start()
      * comments. */
-    wchar_t *current = sys->device_name;
+    wchar_t *current = atomic_load(&sys->device_name);
     if (current != NULL) /* Device selected explicitly */
     {
         hr = IMMDeviceEnumerator_GetDevice(it, current, &sys->dev);
@@ -925,7 +926,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
          * "Do not use eMultimedia" says MSDN. */
         msg_Dbg(aout, "using default device");
         current = NULL;
-        sys->device_name = NULL;
+        atomic_store(&sys->device_name, NULL);
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(it, eRender,
                                                          eConsole, &sys->dev);
         if (FAILED(hr))
@@ -1344,7 +1345,6 @@ static int Open(vlc_object_t *obj)
     sys->gain = 1.f;
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
-    sys->device_name = NULL;
     atomic_init(&sys->default_device_changed, false);
 
     if (!var_CreateGetBool(aout, "volume-save"))
@@ -1360,20 +1360,21 @@ static int Open(vlc_object_t *obj)
 
     aout_HotplugReport(aout, default_device_b, _("Default"));
 
+    wchar_t *audio_device = NULL;
     char *saved_device_b = var_InheritString(aout, "mmdevice-audio-device");
     if (saved_device_b != NULL && strcmp(saved_device_b, default_device_b) != 0)
     {
-        sys->device_name = ToWide(saved_device_b); /* FIXME leak */
+        audio_device = ToWide(saved_device_b); /* FIXME leak */
         free(saved_device_b);
 
-        if (unlikely(sys->device_name == NULL))
+        if (unlikely(audio_device == NULL))
             goto error;
     }
     else
     {
         free(saved_device_b);
-        sys->device_name = NULL;
     }
+    atomic_init(&sys->device_name, audio_device);
     sys->device_status = DEVICE_PENDING;
 
     if (vlc_clone(&sys->thread, MMThread, aout))
@@ -1411,8 +1412,7 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     vlc_mutex_lock(&sys->lock);
-    wchar_t *previous = sys->device_name;
-    sys->device_name = NULL;
+    wchar_t *previous = atomic_exchange(&sys->device_name, NULL);
     sys->device_status = DEVICE_PENDING; /* break out of MMSession() loop */
     sys->it = NULL; /* break out of MMThread() loop */
     vlc_mutex_unlock(&sys->lock);
