@@ -901,7 +901,6 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
      * comments. */
     if (sys->device_name != NULL) /* Device selected explicitly */
     {
-        msg_Dbg(aout, "using selected device %ls", sys->device_name);
         hr = IMMDeviceEnumerator_GetDevice(it, sys->device_name, &sys->dev);
         if (FAILED(hr))
         {
@@ -910,7 +909,10 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             hr = AUDCLNT_E_DEVICE_INVALIDATED;
         }
         else
+        {
+            msg_Dbg(aout, "using selected device %ls", sys->device_name);
             sys->device_status = DEVICE_ACQUIRED;
+        }
     }
     else
         hr = AUDCLNT_E_DEVICE_INVALIDATED;
