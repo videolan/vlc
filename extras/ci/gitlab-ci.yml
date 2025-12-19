@@ -13,6 +13,7 @@ default:
     interruptible: true
 
 variables:
+    FF_DISABLE_UMASK_FOR_DOCKER_EXECUTOR: "true"
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32-3.0:20251208092116
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-3.0:20251208092116
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
