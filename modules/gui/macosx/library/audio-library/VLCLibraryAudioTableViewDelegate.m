@@ -28,6 +28,7 @@
 #import "VLCLibrarySongsTableViewSongPlayingTableCellView.h"
 
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryNameCache.h"
 #import "library/VLCLibraryTableCellView.h"
 
 @implementation VLCLibraryAudioTableViewDelegate
@@ -70,8 +71,10 @@
             return nil;
         }
 
-        const VLCMediaLibraryAlbum * const album = [VLCMediaLibraryAlbum albumWithID:mediaItem.albumID];
-        const VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:mediaItem.genreID];
+        VLCLibraryNameCache * const cache = VLCLibraryNameCache.sharedInstance;
+        NSString * const albumArtist = [cache albumArtistForID:mediaItem.albumID];
+        NSString * const albumTitle = [cache albumTitleForID:mediaItem.albumID];
+        NSString * const genreName = [cache genreNameForID:mediaItem.genreID];
 
         NSString *cellText = @"";
         NSString *cellIdentifier = @"";
@@ -89,13 +92,13 @@
             cellText = mediaItem.durationString;
         } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewArtistColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewArtistTableCellViewIdentifier";
-            cellText = album.artistName.length == 0 ? @"" : album.artistName;
+            cellText = albumArtist.length == 0 ? @"" : albumArtist;
         } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewAlbumColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewAlbumTableCellViewIdentifier";
-            cellText = album.title.length == 0 ? @"" : album.title;
+            cellText = albumTitle.length == 0 ? @"" : albumTitle;
         } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewGenreColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewGenreTableCellViewIdentifier";
-            cellText = genre.name.length == 0 ? @"" : genre.name;
+            cellText = genreName.length == 0 ? @"" : genreName;
         } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewPlayCountColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewPlayCountTableCellViewIdentifier";
             cellText = [@(mediaItem.playCount) stringValue];
