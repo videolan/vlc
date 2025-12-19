@@ -26,6 +26,7 @@
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryNameCache.h"
 
 #import <vlc_media_library.h>
 #import <vlc_url.h>
@@ -1355,10 +1356,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     case VLC_ML_MEDIA_SUBTYPE_MOVIE:
         return self.inputItem.director;
     case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
-    {
-        VLCMediaLibraryArtist * const artist = [VLCMediaLibraryArtist artistWithID:_artistID];
-        return artist.name;
-    }
+        return [VLCLibraryNameCache.sharedInstance artistNameForID:_artistID];
     default:
         return nil;
     }
