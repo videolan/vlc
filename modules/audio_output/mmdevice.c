@@ -598,11 +598,11 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
     EnterCriticalSection(&sys->lock);
     if (sys->device_name == NULL)
     {
-        msg_Dbg(aout, "default device changed: %ls", wid ? wid : L"(disabled)");
         sys->default_device_changed = true;
         aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     }
     LeaveCriticalSection(&sys->lock);
+    msg_Dbg(aout, "default device changed: %ls", wid ? wid : L"(disabled)");
 
     return S_OK;
 }
