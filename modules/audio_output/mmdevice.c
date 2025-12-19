@@ -105,7 +105,7 @@ struct aout_sys_t
     signed char requested_mute; /**< Requested mute, negative if none */
     enum device_acquisition_status device_status;
     wchar_t *device_name; /**< device identifier to use, NULL if default */
-    bool request_device_restart;
+    bool default_device_changed;
     CRITICAL_SECTION lock;
     CONDITION_VARIABLE work;
     CONDITION_VARIABLE ready;
@@ -599,7 +599,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
     if (sys->device_name == NULL)
     {
         msg_Dbg(aout, "default device changed: %ls", wid ? wid : L"(disabled)");
-        sys->request_device_restart = true;
+        sys->default_device_changed = true;
         aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     }
     LeaveCriticalSection(&sys->lock);
@@ -747,7 +747,7 @@ static int DeviceRequestLocked(audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
     assert(sys->device_status == DEVICE_PENDING);
 
-    sys->request_device_restart = false;
+    sys->default_device_changed = false;
 
     WakeConditionVariable(&sys->work);
     while (sys->device_status == DEVICE_PENDING)
@@ -1205,7 +1205,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     EnterMTA();
     EnterCriticalSection(&sys->lock);
 
-    if ((sys->request_device_restart && DeviceRestartLocked(aout) != 0)
+    if ((sys->default_device_changed && DeviceRestartLocked(aout) != 0)
       || sys->dev == NULL)
     {
         /* Error if the device restart failed or if a request previously
@@ -1325,7 +1325,7 @@ static int Open(vlc_object_t *obj)
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
     sys->device_name = NULL;
-    sys->request_device_restart = false;
+    sys->default_device_changed = false;
 
     if (!var_CreateGetBool(aout, "volume-save"))
         VolumeSetLocked(aout, var_InheritFloat(aout, "mmdevice-volume"));
