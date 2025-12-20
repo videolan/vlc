@@ -6,7 +6,7 @@ project('VLC', ['c', 'cpp'],
 vlc_copyright_years = '1996-2025'
 vlc_version_codename = 'Otto Chriek'
 
-# LibVLC library (ABI) version
+# Li2bVLC library (ABI) version
 # Format must be major.minor.micro
 libvlc_abi_version = '12.0.0'
 
