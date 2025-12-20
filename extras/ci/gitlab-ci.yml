@@ -203,17 +203,13 @@ nightly-win64-arm-llvm:
       - ./extras/package/win32/build.sh -r -l -i u -a $HOST_ARCH -b https://win.crashes.videolan.org $UWP_EXTRA_BUILD_FLAGS
       - (cd $CI_PROJECT_DIR && tar -cJf ${VLCARCH}/symbols-$CI_COMMIT_TAG-$VLCARCH.tar.xz ${VLCARCH}/symbols-$CI_COMMIT_TAG)
       - sha512sum $CI_PROJECT_DIR/${VLCARCH}/symbols-$CI_COMMIT_TAG-$VLCARCH.tar.xz
-      - python3 -m venv upload_symbols
-      - ./upload_symbols/bin/pip install -r ./extras/breakpad/requirements.txt
       - echo "RELEASE_TAG=$RELEASE_TAG"
       - >
-        ./upload_symbols/bin/python
         ./extras/breakpad/symb_upload.py
         --upload-url $CRASH_DRAGON_SUBMIT_URL
         -p win --version $RELEASE_TAG
         --prod VLC --log INFO
         --strip-path $CI_PROJECT_DIR $CI_PROJECT_DIR/${VLCARCH}/symbols-$RELEASE_TAG
-      - rm -rf upload_symbols
     artifacts:
       paths:
         - $CI_PROJECT_DIR/${VLCARCH}/vlc-*-*-release.7z
