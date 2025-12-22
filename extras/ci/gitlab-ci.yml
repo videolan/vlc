@@ -201,8 +201,8 @@ nightly-win64-arm-llvm:
     script:
       - export PATH=/opt/breakpad/bin:$PATH
       - ./extras/package/win32/build.sh -r -l -i u -a $HOST_ARCH -b https://win.crashes.videolan.org $UWP_EXTRA_BUILD_FLAGS
-      - (cd $CI_PROJECT_DIR && tar -cJf ${VLCARCH}/symbols-$CI_COMMIT_TAG-$VLCARCH.tar.xz ${VLCARCH}/symbols-$CI_COMMIT_TAG)
-      - sha512sum $CI_PROJECT_DIR/${VLCARCH}/symbols-$CI_COMMIT_TAG-$VLCARCH.tar.xz
+      - (cd $CI_PROJECT_DIR && tar -cJf ${VLCARCH}/symbols-$RELEASE_TAG-$VLCARCH.tar.xz ${VLCARCH}/symbols-$RELEASE_TAG)
+      - sha512sum $CI_PROJECT_DIR/${VLCARCH}/symbols-$RELEASE_TAG-$VLCARCH.tar.xz
       - echo "RELEASE_TAG=$RELEASE_TAG"
       - >
         ./extras/breakpad/symb_upload.py
