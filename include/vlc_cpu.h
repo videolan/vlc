@@ -87,8 +87,12 @@ unsigned vlc_CPU_raw(void);
 #   define vlc_CPU_ARM_NEON() ((vlc_CPU() & VLC_CPU_ARM_NEON) != 0)
 #  endif
 
-# elif defined (__mips_hard_float)
-#  define HAVE_FPU 1
+# elif defined (__mips)
+#  if defined (__mips_hard_float)
+#   define HAVE_FPU 1
+#  else
+#   define HAVE_FPU 0
+#  endif
 
 # elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
 #  define HAVE_FPU 1
