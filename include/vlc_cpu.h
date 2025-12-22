@@ -103,8 +103,10 @@ unsigned vlc_CPU_raw(void);
 #  endif
 
 # elif defined (__riscv)
-#  ifdef __riscv_flen
+#  ifdef __riscv_f
 #   define HAVE_FPU 1
+#  else
+#   define HAVE_FPU 0
 #  endif
 #  define VLC_CPU_RV_V 0x1
 #  define VLC_CPU_RV_B 0x2
