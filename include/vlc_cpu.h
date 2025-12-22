@@ -41,7 +41,91 @@ VLC_API unsigned vlc_CPU(void);
  */
 unsigned vlc_CPU_raw(void);
 
-# if defined (__i386__) || defined (__x86_64__)
+# if defined (__aarch64__)
+#  define HAVE_FPU 1
+#  define VLC_CPU_ARM_NEON 0x1
+#  define VLC_CPU_ARM_SVE  0x2
+
+#  ifdef __ARM_NEON
+#   define vlc_CPU_ARM_NEON() (1)
+#  else
+#   define vlc_CPU_ARM_NEON() ((vlc_CPU() & VLC_CPU_ARM_NEON) != 0)
+#  endif
+
+#  ifdef __ARM_FEATURE_SVE
+#   define vlc_CPU_ARM_SVE()   (1)
+#  else
+#   define vlc_CPU_ARM_SVE()   ((vlc_CPU() & VLC_CPU_ARM_SVE) != 0)
+#  endif
+
+# elif defined (__arm__)
+#  if defined (__VFP_FP__) && !defined (__SOFTFP__)
+#   define HAVE_FPU 1
+#  else
+#   define HAVE_FPU 0
+#  endif
+#  define VLC_CPU_ARMv6    4
+#  define VLC_CPU_ARM_NEON 2
+
+#  if defined (__ARM_ARCH_7A__)
+#   define VLC_CPU_ARM_ARCH 7
+#  elif defined (__ARM_ARCH_6__) || defined (__ARM_ARCH_6T2__)
+#   define VLC_CPU_ARM_ARCH 6
+#  else
+#   define VLC_CPU_ARM_ARCH 4
+#  endif
+
+#  if (VLC_CPU_ARM_ARCH >= 6)
+#   define vlc_CPU_ARMv6() (1)
+#  else
+#   define vlc_CPU_ARMv6() ((vlc_CPU() & VLC_CPU_ARMv6) != 0)
+#  endif
+
+#  ifdef __ARM_NEON__
+#   define vlc_CPU_ARM_NEON() (1)
+#  else
+#   define vlc_CPU_ARM_NEON() ((vlc_CPU() & VLC_CPU_ARM_NEON) != 0)
+#  endif
+
+# elif defined (__mips_hard_float)
+#  define HAVE_FPU 1
+
+# elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
+#  define HAVE_FPU 1
+#  define VLC_CPU_ALTIVEC 2
+
+#  ifdef ALTIVEC
+#   define vlc_CPU_ALTIVEC() (1)
+#   define VLC_ALTIVEC
+#  else
+#   define vlc_CPU_ALTIVEC() ((vlc_CPU() & VLC_CPU_ALTIVEC) != 0)
+#   define VLC_ALTIVEC __attribute__ ((__target__ ("altivec")))
+#  endif
+
+# elif defined (__riscv)
+#  ifdef __riscv_flen
+#   define HAVE_FPU 1
+#  endif
+#  define VLC_CPU_RV_V 0x1
+#  define VLC_CPU_RV_B 0x2
+
+#  ifdef __riscv_v
+#   define vlc_CPU_RV_V() (1)
+#  else
+#   define vlc_CPU_RV_V() ((vlc_CPU() & VLC_CPU_RV_V) != 0)
+#  endif
+
+#  if (defined (__riscv_b) || (defined (__riscv_zba) && defined (__riscv_zbb) \
+                            && defined (__riscv_zbs)))
+#   define vlc_CPU_RV_B() (1)
+#  else
+#   define vlc_CPU_RV_B() ((vlc_CPU() & VLC_CPU_RV_B) != 0)
+#  endif
+
+# elif defined (__sparc__)
+#  define HAVE_FPU 1
+
+# elif  defined (__x86_64__) || defined (__i386__)
 #  define HAVE_FPU 1
 #  define VLC_CPU_SSE2   0x00000080
 #  define VLC_CPU_SSE3   0x00000100
@@ -92,90 +176,6 @@ unsigned vlc_CPU_raw(void);
 #   define vlc_CPU_AVX2() (1)
 #  else
 #   define vlc_CPU_AVX2() ((vlc_CPU() & VLC_CPU_AVX2) != 0)
-#  endif
-
-# elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
-#  define HAVE_FPU 1
-#  define VLC_CPU_ALTIVEC 2
-
-#  ifdef ALTIVEC
-#   define vlc_CPU_ALTIVEC() (1)
-#   define VLC_ALTIVEC
-#  else
-#   define vlc_CPU_ALTIVEC() ((vlc_CPU() & VLC_CPU_ALTIVEC) != 0)
-#   define VLC_ALTIVEC __attribute__ ((__target__ ("altivec")))
-#  endif
-
-# elif defined (__arm__)
-#  if defined (__VFP_FP__) && !defined (__SOFTFP__)
-#   define HAVE_FPU 1
-#  else
-#   define HAVE_FPU 0
-#  endif
-#  define VLC_CPU_ARMv6    4
-#  define VLC_CPU_ARM_NEON 2
-
-#  if defined (__ARM_ARCH_7A__)
-#   define VLC_CPU_ARM_ARCH 7
-#  elif defined (__ARM_ARCH_6__) || defined (__ARM_ARCH_6T2__)
-#   define VLC_CPU_ARM_ARCH 6
-#  else
-#   define VLC_CPU_ARM_ARCH 4
-#  endif
-
-#  if (VLC_CPU_ARM_ARCH >= 6)
-#   define vlc_CPU_ARMv6() (1)
-#  else
-#   define vlc_CPU_ARMv6() ((vlc_CPU() & VLC_CPU_ARMv6) != 0)
-#  endif
-
-#  ifdef __ARM_NEON__
-#   define vlc_CPU_ARM_NEON() (1)
-#  else
-#   define vlc_CPU_ARM_NEON() ((vlc_CPU() & VLC_CPU_ARM_NEON) != 0)
-#  endif
-
-# elif defined (__aarch64__)
-#  define HAVE_FPU 1
-#  define VLC_CPU_ARM_NEON 0x1
-#  define VLC_CPU_ARM_SVE  0x2
-
-#  ifdef __ARM_NEON
-#   define vlc_CPU_ARM_NEON() (1)
-#  else
-#   define vlc_CPU_ARM_NEON() ((vlc_CPU() & VLC_CPU_ARM_NEON) != 0)
-#  endif
-
-#  ifdef __ARM_FEATURE_SVE
-#   define vlc_CPU_ARM_SVE()   (1)
-#  else
-#   define vlc_CPU_ARM_SVE()   ((vlc_CPU() & VLC_CPU_ARM_SVE) != 0)
-#  endif
-
-# elif defined (__sparc__)
-#  define HAVE_FPU 1
-
-# elif defined (__mips_hard_float)
-#  define HAVE_FPU 1
-
-# elif defined (__riscv)
-#  ifdef __riscv_flen
-#   define HAVE_FPU 1
-#  endif
-#  define VLC_CPU_RV_V 0x1
-#  define VLC_CPU_RV_B 0x2
-
-#  ifdef __riscv_v
-#   define vlc_CPU_RV_V() (1)
-#  else
-#   define vlc_CPU_RV_V() ((vlc_CPU() & VLC_CPU_RV_V) != 0)
-#  endif
-
-#  if (defined (__riscv_b) || (defined (__riscv_zba) && defined (__riscv_zbb) \
-                            && defined (__riscv_zbs)))
-#   define vlc_CPU_RV_B() (1)
-#  else
-#   define vlc_CPU_RV_B() ((vlc_CPU() & VLC_CPU_RV_B) != 0)
 #  endif
 
 # else
