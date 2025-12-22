@@ -193,7 +193,7 @@ unsigned vlc_CPU_raw(void);
  * If this preprocessor constant is zero, floating point should be avoided
  * (especially relevant for audio codecs).
  */
-#  define HAVE_FPU 0
+#  define HAVE_FPU 1
 
 # endif
 
