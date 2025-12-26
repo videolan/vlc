@@ -936,7 +936,6 @@ vlc_player_SetAtoBLoop
 vlc_player_SetAtoBLoopTime
 vlc_player_SetAtoBLoopPosition
 vlc_player_ResetAtoBLoop
-vlc_player_GetAtoBLoop
 vlc_player_SetCategoryDelay
 vlc_player_SetCurrentMedia
 vlc_player_SetNextMedia
