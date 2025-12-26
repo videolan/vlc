@@ -517,8 +517,8 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                 fmt->i_chroma = fallback[ i ];
                 break;
             }
-            free( fallback );
         }
+        free( fallback );
     }
 
     if( !b_hw_accel )
