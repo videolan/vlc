@@ -45,6 +45,9 @@ struct iovec;
 # define lseek lseek64
 #endif
 
+#ifdef __OS2__
+# include <io.h>
+#endif
 
 /**
  * \defgroup os Operating system
