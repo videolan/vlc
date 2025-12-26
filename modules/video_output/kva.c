@@ -109,7 +109,7 @@ typedef struct vout_display_sys_t
  *****************************************************************************/
 static void            Display(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int);
-static int             SetDisplaySize( vout_display_t *, unsigned width, unsigned height )
+static int             SetDisplaySize( vout_display_t *, unsigned width, unsigned height );
 
 static int  OpenDisplay ( vout_display_t *, video_format_t * );
 static void CloseDisplay( vout_display_t * );
@@ -143,7 +143,7 @@ struct open_init
 };
 
 static void Prepare(vout_display_t *vd, picture_t *pic,
-                    const vlc_render_subpicture *subpic, vlc_tick_t date)
+                    const struct vlc_render_subpicture *subpic, vlc_tick_t date)
 {
     VLC_UNUSED(subpic);
     VLC_UNUSED(date);
