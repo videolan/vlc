@@ -129,7 +129,6 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
     KAISPEC ks_wanted, ks_obtained;
     int i_nb_channels;
     int i_bytes_per_frame;
-    vlc_value_t val, text;
     audio_sample_format_t format = *fmt;
 
     if( aout_FormatNbChannels( fmt ) == 0 )
