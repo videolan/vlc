@@ -3,7 +3,7 @@ project('VLC', ['c', 'cpp'],
     default_options: ['c_std=gnu17', 'cpp_std=c++17'],
     meson_version: '>=1.1.0')
 
-vlc_copyright_years = '1996-2025'
+vlc_copyright_years = '1996-2026'
 vlc_version_codename = 'Otto Chriek'
 
 # LibVLC library (ABI) version
