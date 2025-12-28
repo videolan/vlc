@@ -49,6 +49,7 @@ Demuxer:
  * Support for DMX audio music (MUS) files
 
 Codecs:
+ * Remove schroedinger support for dirac in favor of avcodec
  * Support for experimental AV1 video encoding
  * WebVTT encoder
  * Remove iomx support for Android
