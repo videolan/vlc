@@ -5,6 +5,7 @@ Codecs:
  * Use FFmpeg 8.1 (upgraded from 4.4)
  * Support OpenAPV decoder (FFmpeg 8 and OpenAPV)
  * Support Atrac3/Atrac9 decoding
+ * Remove schroedinger support for dirac in favor of avcodec
 
 Demuxers:
  * misc. MKV logs and crash fixes
