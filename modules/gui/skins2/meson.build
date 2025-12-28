@@ -1,6 +1,6 @@
 skins2_enabled = get_option('skins2') \
-    .disable_auto_if(host_system != 'windows' and not x11_dep.found()).allowed() and \
-    freetype_dep.found() and host_system != 'darwin'
+    .disable_auto_if(host_system != 'windows' and host_system != 'darwin' and not x11_dep.found()).allowed() and \
+    freetype_dep.found()
 
 skins2_flags = []
 skins2_deps = [ freetype_dep ]
@@ -147,6 +147,21 @@ skins2_deps += [
     dependency('xinerama', required: true),
     dependency('xcursor', required: true),
     dependency('xext', required: true),
+]
+elif host_system == 'darwin' and skins2_enabled
+skins2_flags += [ '-DMACOSX_SKINS' ]
+skins2_sources += files(
+    'macosx/macosx_dragdrop.mm',
+    'macosx/macosx_factory.mm',
+    'macosx/macosx_graphics.mm',
+    'macosx/macosx_loop.mm',
+    'macosx/macosx_popup.mm',
+    'macosx/macosx_timer.mm',
+    'macosx/macosx_tooltip.mm',
+    'macosx/macosx_window.mm',
+)
+skins2_deps += [
+    dependency('appleframeworks', modules: ['Cocoa', 'Carbon', 'CoreGraphics']),
 ]
 endif
 
