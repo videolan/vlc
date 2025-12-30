@@ -41,13 +41,13 @@ FocusScope {
     readonly property int positionSliderY: controlBar.y + controlBar.sliderY
 
     readonly property string coverSource: {
-        if (MainPlaylistController.currentItem.artwork &&
-            MainPlaylistController.currentItem.artwork.toString())
-            MainPlaylistController.currentItem.artwork
+        if (Player.artwork &&
+            Player.artwork.toString())
+            return Player.artwork
         else if (Player.hasVideoOutput)
-            VLCStyle.noArtVideoCover
+            return VLCStyle.noArtVideoCover
         else
-            VLCStyle.noArtAlbumCover
+            return VLCStyle.noArtAlbumCover
     }
 
     // Private
@@ -482,7 +482,7 @@ FocusScope {
                                 value: centerContent.height > (albumLabel.y + albumLabel.height)
                             }
 
-                            text: MainPlaylistController.currentItem.album
+                            text: Player.album
                             font.pixelSize: VLCStyle.fontSize_xxlarge
                             horizontalAlignment: Text.AlignHCenter
                             color: centerTheme.fg.primary
@@ -507,7 +507,7 @@ FocusScope {
                                 value: centerContent.height > (artistLabel.y + artistLabel.height)
                             }
 
-                            text: MainPlaylistController.currentItem.artist
+                            text: Player.artist
                             font.weight: Font.Light
                             horizontalAlignment: Text.AlignHCenter
                             color: centerTheme.fg.primary
@@ -632,7 +632,7 @@ FocusScope {
                   resumeVisible)
 
         focus: true
-        title: MainPlaylistController.currentItem.title
+        title: Player.title
 
         pinControls: MainCtx.pinVideoControls
 
