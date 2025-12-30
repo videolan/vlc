@@ -39,13 +39,6 @@ Item {
     implicitWidth: shaderEffect.readyForVisibility ? shaderEffect.implicitWidth : image.implicitWidth
     implicitHeight: shaderEffect.readyForVisibility ? shaderEffect.implicitHeight : image.implicitHeight
 
-    // WARNING: We can not override QQuickItem's antialiasing
-    //          property as readonly because Qt 6.6 marks it
-    //          as `FINAL`...
-    // FIXME: The shader can be generated without
-    //        the define that enables antialiasing.
-    //        It should be done when the build system
-    //        starts supporting shader defines.
     antialiasing: true
 
     asynchronous: true
