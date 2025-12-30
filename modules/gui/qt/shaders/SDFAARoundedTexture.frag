@@ -44,6 +44,9 @@ layout(std140, binding = 0) uniform buf {
     float qt_Opacity;
     vec4 qt_SubRect_source;
     vec2 size;
+#ifdef ANTIALIASING
+    int antialiasing; // WARNING: intentionally not a boolean
+#endif
 #ifdef CROP_SUPPORT
     vec2 cropRate;
 #endif
@@ -142,30 +145,40 @@ void main()
         float borderStep = step(-borderRange, dist);
         vec4 border = borderStep * borderColor;
 #ifdef ANTIALIASING
-        // Inner AA (Outer AA is handled below, regardless of the border):
-        // This is additive, solid and AA part do not intersect:
-        border += (smoothstep(-borderRange - fwidth(dist) * 1.5, -borderRange, dist)) * (1.0 - borderStep) * borderColor;
+        if (antialiasing != 0)
+        {
+            // Inner AA (Outer AA is handled below, regardless of the border):
+            // This is additive, solid and AA part do not intersect:
+            border += (smoothstep(-borderRange - fwidth(dist) * 1.5, -borderRange, dist)) * (1.0 - borderStep) * borderColor;
+        }
 #endif
         // Source over blending (S + D * (1 - S.a)):
         texel = border + texel * (1.0 - border.a);
     }
 #endif
 
+    float factor;
 #ifdef ANTIALIASING
+    if (antialiasing != 0)
+    {
 #ifndef CUSTOM_SOFTEDGE
-    float softEdgeMax = fwidth(dist) * 0.75;
-    float softEdgeMin = -softEdgeMax;
+        float softEdgeMax = fwidth(dist) * 0.75;
+        float softEdgeMin = -softEdgeMax;
 #endif
-    // Breathing room (shrink):
-    dist += softEdgeMax;
+        // Breathing room (shrink):
+        dist += softEdgeMax;
 
-    // Soften the outline, as recommended by the Valve paper, using smoothstep:
-    // "Improved Alpha-Tested Magnification for Vector Textures and Special Effects"
-    // NOTE: The whole texel is multiplied, because of premultiplied alpha.
-    float factor = smoothstep(softEdgeMin, softEdgeMax, dist);
-#else
-    float factor = step(0.0, dist);
+        // Soften the outline, as recommended by the Valve paper, using smoothstep:
+        // "Improved Alpha-Tested Magnification for Vector Textures and Special Effects"
+        // NOTE: The whole texel is multiplied, because of premultiplied alpha.
+        factor = smoothstep(softEdgeMin, softEdgeMax, dist);
+    }
+    else
 #endif
+    {
+        factor = step(0.0, dist);
+    }
+
     texel *= 1.0 - factor;
 
     fragColor = texel * qt_Opacity;
