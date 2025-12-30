@@ -48,6 +48,8 @@ layout(std140, binding = 0) uniform buf {
     vec2 windowSize;
     float time; // seed
     vec4 color; // snowflake color
+
+    int yFlip;
 };
 
 // Inigo Quilez's voronoi (https://iquilezles.org/articles/voronoilines):
@@ -143,7 +145,7 @@ void main()
 
     vec3 col = vec3(0.0, 0.0, 0.0);
 
-    float direction = sign(qt_Matrix[3][1]);
+    float direction = sign(qt_Matrix[3][1]) * yFlip;
 
     // Multiple layers
     for (float i = 1.0; i <= LAYER_MAX; i += LAYER_INCREMENT)

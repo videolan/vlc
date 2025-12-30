@@ -37,6 +37,8 @@ ShaderEffect {
 
     property real speed: 1.2 // speed factor
 
+    readonly property int yFlip: ((GraphicsInfo.api === GraphicsInfo.Direct3D11) || (GraphicsInfo.api === GraphicsInfo.Direct3D12)) ? -1 : 1
+
     UniformAnimator on time {
         loops: Animation.Infinite
         from: 0
