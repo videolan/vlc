@@ -937,6 +937,22 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
         m_model->addToPlaylist(selected);
     });
 
+    action = menu->addAction( qtr("Information") );
+    connect(action, &QAction::triggered, [this, selected]( ) {
+        if (selected.isEmpty()) return;
+
+        QVariantList items = m_model->getItemsForIndexes(selected);
+
+        if (items.isEmpty()) return;
+
+        QVariant firstItem = items.first();
+        
+        if (firstItem.canConvert<SharedInputItem>()) {
+             SharedInputItem sii = firstItem.value<SharedInputItem>();
+             DialogsProvider::getInstance()->mediaInfoDialog(sii);
+        }
+    });
+
     bool canBeIndexed = false;
     unsigned countIndexed = 0;
     for (const QModelIndex& idx : selected)
@@ -988,6 +1004,22 @@ void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos
     action = menu->addAction( qtr("Enqueue") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addToPlaylist(selected);
+    });
+
+    action = menu->addAction( qtr("Information") );
+    connect(action, &QAction::triggered, [this, selected]( ) {
+        if (selected.isEmpty()) return;
+
+        QVariantList items = m_model->getItemsForIndexes(selected);
+
+        if (items.isEmpty()) return;
+
+        QVariant firstItem = items.first();
+        
+        if (firstItem.canConvert<SharedInputItem>()) {
+             SharedInputItem sii = firstItem.value<SharedInputItem>();
+             DialogsProvider::getInstance()->mediaInfoDialog(sii);
+        }
     });
 
     menu->popup(pos);
