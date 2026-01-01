@@ -64,6 +64,11 @@ typedef struct
     float           soft_gain;
     bool            soft_mute;
     audio_sample_format_t format;
+    vlc_tick_t      latency;
+    vlc_tick_t      first_play_date;
+    vlc_tick_t      last_timing_date;
+    vlc_tick_t      paused_date;
+    atomic_bool     draining;
 } aout_sys_t;
 
 /*****************************************************************************
@@ -74,7 +79,7 @@ static void Close   ( vlc_object_t * );
 static void Play    ( audio_output_t *_p_aout, block_t *block, vlc_tick_t );
 static void Pause   ( audio_output_t *, bool, vlc_tick_t );
 static void Flush   ( audio_output_t * );
-static int  TimeGet ( audio_output_t *, vlc_tick_t *restrict );
+static void Drain   ( audio_output_t * );
 
 static ULONG APIENTRY KaiCallback ( PVOID, PVOID, ULONG );
 
@@ -202,18 +207,29 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
     msg_Dbg( p_aout, "obtained i_bytes_per_frame = %d",
              format.i_bytes_per_frame );
 
+    /* Latency to play all buffers */
+    p_sys->latency = vlc_tick_from_samples( ks_obtained.ulBufferSize *
+                                            ks_obtained.ulNumBuffers /
+                                            format.i_bytes_per_frame,
+                                            format.i_rate );
+
     format.channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     p_sys->format = *fmt = format;
 
-    p_aout->time_get = TimeGet;
+    p_aout->time_get = NULL;
     p_aout->play     = Play;
     p_aout->pause    = Pause;
     p_aout->flush    = Flush;
+    p_aout->drain    = Drain;
 
     aout_SoftVolumeStart( p_aout );
 
     CreateBuffer( p_aout, AUDIO_BUFFER_SIZE_IN_SECONDS *
                           format.i_rate * format.i_bytes_per_frame );
+
+    p_sys->first_play_date = p_sys->last_timing_date = VLC_TICK_INVALID;
+    p_sys->paused_date = VLC_TICK_INVALID;
+    atomic_init( &p_sys->draining, false );
 
     /* Prevent SIG_FPE */
     _control87(MCW_EM, MCW_EM);
@@ -232,13 +248,39 @@ exit_kai_done :
 static void Play(audio_output_t *p_aout, block_t *block, vlc_tick_t date)
 {
     aout_sys_t *p_sys = p_aout->sys;
+    vlc_tick_t audio_pts = block->i_pts;
+    vlc_tick_t delay;
 
-    kaiPlay( p_sys->hkai );
+    vlc_mutex_lock( &p_sys->buffer->mutex );
+
+    /* This block is played after exhausting a buffer */
+    delay = vlc_tick_from_samples( p_sys->buffer->length /
+                                   p_sys->format.i_bytes_per_frame,
+                                   p_sys->format.i_rate );
+
+    vlc_mutex_unlock( &p_sys->buffer->mutex );
 
     WriteBuffer( p_aout, block->p_buffer, block->i_buffer );
 
     block_Release( block );
-    (void) date;
+
+    if( unlikely( p_sys->first_play_date == VLC_TICK_INVALID ))
+        p_sys->first_play_date = date;
+
+    vlc_tick_t system_ts = vlc_tick_now();
+
+    if( system_ts < p_sys->first_play_date )
+        return;
+
+    kaiPlay( p_sys->hkai );
+
+    if( p_sys->last_timing_date == VLC_TICK_INVALID ||
+        system_ts - p_sys->last_timing_date >= VLC_TICK_FROM_SEC( 1 ))
+    {
+        p_sys->last_timing_date = system_ts;
+        aout_TimingReport( p_aout,
+                           system_ts + p_sys->latency + delay, audio_pts );
+    }
 }
 
 /*****************************************************************************
@@ -247,6 +289,8 @@ static void Play(audio_output_t *p_aout, block_t *block, vlc_tick_t date)
 static void Stop ( audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
+
+    atomic_store_explicit( &p_sys->draining, false, memory_order_relaxed );
 
     kaiClose( p_sys->hkai );
     kaiDone();
@@ -262,11 +306,19 @@ static ULONG APIENTRY KaiCallback( PVOID p_cb_data,
                                    ULONG i_buf_size )
 {
     audio_output_t *p_aout = (audio_output_t *)p_cb_data;
+    aout_sys_t *p_sys = p_aout->sys;
     int i_len;
 
     i_len = ReadBuffer( p_aout, p_buffer, i_buf_size );
     if(( ULONG )i_len < i_buf_size )
         memset(( uint8_t * )p_buffer + i_len, 0, i_buf_size - i_len );
+
+    if( atomic_load_explicit( &p_sys->draining, memory_order_relaxed ) &&
+        i_len == 0 )
+    {
+        atomic_store_explicit( &p_sys->draining, false, memory_order_relaxed );
+        aout_DrainedReport( p_aout );
+    }
 
     return i_buf_size;
 }
@@ -301,9 +353,18 @@ static void Pause( audio_output_t *aout, bool pause, vlc_tick_t date )
     aout_sys_t *sys = aout->sys;
 
     if( pause )
+    {
         kaiPause( sys->hkai );
+
+        sys->paused_date = date;
+    }
     else
+    {
         kaiResume( sys->hkai );
+
+        sys->first_play_date -= sys->paused_date - date;
+        sys->paused_date = VLC_TICK_INVALID;
+    }
 }
 
 static void Flush( audio_output_t *aout )
@@ -311,28 +372,24 @@ static void Flush( audio_output_t *aout )
     aout_sys_t     *sys = aout->sys;
     audio_buffer_t *buffer = sys->buffer;
 
+    atomic_store_explicit( &sys->draining, false, memory_order_relaxed );
+
     vlc_mutex_lock( &buffer->mutex );
 
     buffer->read_pos = buffer->write_pos;
     buffer->length   = 0;
 
     vlc_mutex_unlock( &buffer->mutex );
+
+    sys->first_play_date = sys->last_timing_date = VLC_TICK_INVALID;
+    sys->paused_date = VLC_TICK_INVALID;
 }
 
-static int TimeGet( audio_output_t *aout, vlc_tick_t *restrict delay )
+static void Drain( audio_output_t *aout )
 {
-    aout_sys_t            *sys = aout->sys;
-    audio_sample_format_t *format = &sys->format;
-    audio_buffer_t        *buffer = sys->buffer;
+    aout_sys_t *sys = aout->sys;
 
-    vlc_mutex_lock( &buffer->mutex );
-
-    *delay = vlc_tick_from_samples( buffer->length / format->i_bytes_per_frame,
-                                    format->i_rate );
-
-    vlc_mutex_unlock( &buffer->mutex );
-
-    return 0;
+    atomic_store_explicit( &sys->draining, true, memory_order_relaxed );
 }
 
 static int CreateBuffer( audio_output_t *aout, int size )
