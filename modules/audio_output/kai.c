@@ -431,6 +431,8 @@ static int WriteBuffer( audio_output_t *aout, uint8_t *data, int size )
         {
             msg_Err( aout, "Enlarging audio buffer failed! Drop a block!");
 
+            vlc_mutex_unlock( &buffer->mutex );
+
             return 0;
         }
 
