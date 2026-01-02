@@ -52,8 +52,6 @@ enum AWindow_ID {
  */
 typedef struct
 {
-    int32_t (*winLock)(ANativeWindow*, ANativeWindow_Buffer*, ARect*);
-    void (*unlockAndPost)(ANativeWindow*);
     int32_t (*setBuffersGeometry)(ANativeWindow*, int32_t, int32_t, int32_t); /* can be NULL */
 } native_window_api_t;
 
