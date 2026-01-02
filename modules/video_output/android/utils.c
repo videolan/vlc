@@ -156,180 +156,6 @@ struct AWindowHandler
 #define JNI_STEXCALL(what, method, ...) \
     (*p_env)->what(p_env, p_awh->jobj, p_awh->jfields.AWindow.method, ##__VA_ARGS__)
 
-/*
- * Android Surface (pre android 2.3)
- */
-
-extern void *jni_AndroidJavaSurfaceToNativeSurface(jobject surf);
-#ifndef ANDROID_SYM_S_LOCK
-# define ANDROID_SYM_S_LOCK "_ZN7android7Surface4lockEPNS0_11SurfaceInfoEb"
-#endif
-#ifndef ANDROID_SYM_S_LOCK2
-# define ANDROID_SYM_S_LOCK2 "_ZN7android7Surface4lockEPNS0_11SurfaceInfoEPNS_6RegionE"
-#endif
-#ifndef ANDROID_SYM_S_UNLOCK
-# define ANDROID_SYM_S_UNLOCK "_ZN7android7Surface13unlockAndPostEv"
-#endif
-typedef void (*AndroidSurface_lock)(void *, void *, int);
-typedef void (*AndroidSurface_lock2)(void *, void *, void *);
-typedef void (*AndroidSurface_unlockAndPost)(void *);
-
-typedef struct {
-    void *p_dl_handle;
-    void *p_surface_handle;
-    AndroidSurface_lock pf_lock;
-    AndroidSurface_lock2 pf_lock2;
-    AndroidSurface_unlockAndPost pf_unlockAndPost;
-} NativeSurface;
-
-static inline void *
-NativeSurface_Load(const char *psz_lib, NativeSurface *p_ns)
-{
-    void *p_lib = dlopen(psz_lib, RTLD_NOW);
-    if (!p_lib)
-        return NULL;
-
-    p_ns->pf_lock = (AndroidSurface_lock)(dlsym(p_lib, ANDROID_SYM_S_LOCK));
-    p_ns->pf_lock2 = (AndroidSurface_lock2)(dlsym(p_lib, ANDROID_SYM_S_LOCK2));
-    p_ns->pf_unlockAndPost =
-        (AndroidSurface_unlockAndPost)(dlsym(p_lib, ANDROID_SYM_S_UNLOCK));
-
-    if ((p_ns->pf_lock || p_ns->pf_lock2) && p_ns->pf_unlockAndPost)
-        return p_lib;
-
-    dlclose(p_lib);
-    return NULL;
-}
-
-static void *
-NativeSurface_getHandle(JNIEnv *p_env, jobject jsurf)
-{
-    jclass clz;
-    jfieldID fid;
-    intptr_t p_surface_handle = 0;
-
-    clz = (*p_env)->GetObjectClass(p_env, jsurf);
-    if ((*p_env)->ExceptionCheck(p_env))
-    {
-        (*p_env)->ExceptionClear(p_env);
-        return NULL;
-    }
-    fid = (*p_env)->GetFieldID(p_env, clz, "mSurface", "I");
-    if (fid == NULL)
-    {
-        if ((*p_env)->ExceptionCheck(p_env))
-            (*p_env)->ExceptionClear(p_env);
-        fid = (*p_env)->GetFieldID(p_env, clz, "mNativeSurface", "I");
-        if (fid == NULL)
-        {
-            if ((*p_env)->ExceptionCheck(p_env))
-                (*p_env)->ExceptionClear(p_env);
-        }
-    }
-    if (fid != NULL)
-        p_surface_handle = (intptr_t)(*p_env)->GetIntField(p_env, jsurf, fid);
-    (*p_env)->DeleteLocalRef(p_env, clz);
-
-    return (void *)p_surface_handle;
-}
-
-
-static ANativeWindow*
-NativeSurface_fromSurface(JNIEnv *p_env, jobject jsurf)
-{
-    void *p_surface_handle;
-    NativeSurface *p_ns;
-
-    static const char *libs[] = {
-        "libsurfaceflinger_client.so",
-        "libgui.so",
-        "libui.so"
-    };
-    p_surface_handle = NativeSurface_getHandle(p_env, jsurf);
-    if (!p_surface_handle)
-        return NULL;
-    p_ns = malloc(sizeof(NativeSurface));
-    if (!p_ns)
-        return NULL;
-    p_ns->p_surface_handle = p_surface_handle;
-
-    for (size_t i = 0; i < ARRAY_SIZE(libs); i++)
-    {
-        void *p_dl_handle = NativeSurface_Load(libs[i], p_ns);
-        if (p_dl_handle)
-        {
-            p_ns->p_dl_handle = p_dl_handle;
-            return (ANativeWindow*)p_ns;
-        }
-    }
-    free(p_ns);
-    return NULL;
-}
-
-static void
-NativeSurface_release(ANativeWindow* p_anw)
-{
-    NativeSurface *p_ns = (NativeSurface *)p_anw;
-
-    dlclose(p_ns->p_dl_handle);
-    free(p_ns);
-}
-
-static int32_t
-NativeSurface_lock(ANativeWindow *p_anw, ANativeWindow_Buffer *p_anb,
-                   ARect *p_rect)
-{
-    (void) p_rect;
-    NativeSurface *p_ns = (NativeSurface *)p_anw;
-    struct {
-        uint32_t    w;
-        uint32_t    h;
-        uint32_t    s;
-        uint32_t    usage;
-        uint32_t    format;
-        uint32_t*   bits;
-        uint32_t    reserved[2];
-    } info = { 0 };
-
-    if (p_ns->pf_lock)
-        p_ns->pf_lock(p_ns->p_surface_handle, &info, 1);
-    else
-        p_ns->pf_lock2(p_ns->p_surface_handle, &info, NULL);
-
-    if (!info.w || !info.h) {
-        p_ns->pf_unlockAndPost(p_ns->p_surface_handle);
-        return -1;
-    }
-
-    if (p_anb) {
-        p_anb->bits = info.bits;
-        p_anb->width = info.w;
-        p_anb->height = info.h;
-        p_anb->stride = info.s;
-        p_anb->format = info.format;
-    }
-    return 0;
-}
-
-static void
-NativeSurface_unlockAndPost(ANativeWindow *p_anw)
-{
-    NativeSurface *p_ns = (NativeSurface *)p_anw;
-
-    p_ns->pf_unlockAndPost(p_ns->p_surface_handle);
-}
-
-static void
-LoadNativeSurfaceAPI(AWindowHandler *p_awh)
-{
-    p_awh->pf_winFromSurface = NativeSurface_fromSurface;
-    p_awh->pf_winAcquire = NULL;
-    p_awh->pf_winRelease = NativeSurface_release;
-    p_awh->anw_api.winLock = NativeSurface_lock;
-    p_awh->anw_api.unlockAndPost = NativeSurface_unlockAndPost;
-    p_awh->anw_api.setBuffersGeometry = NULL;
-}
-
 static int
 NDKSurfaceTexture_attachToGLContext(
         struct vlc_asurfacetexture *surface,
@@ -571,10 +397,7 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
 {
     void *p_library = dlopen("libandroid.so", RTLD_NOW);
     if (!p_library)
-    {
-        LoadNativeSurfaceAPI(p_awh);
         return;
-    }
 
     p_awh->pf_winFromSurface = dlsym(p_library, "ANativeWindow_fromSurface");
     p_awh->pf_winAcquire = dlsym(p_library, "ANativeWindow_acquire");
@@ -593,7 +416,6 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
     else
     {
         dlclose(p_library);
-        LoadNativeSurfaceAPI(p_awh);
     }
 }
 
