@@ -453,22 +453,27 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
          && sys->timing_report_last_written_bytes >= sys->timing_report_delay_bytes
          && GetFrameTimestampLocked(stream, &pos_frames, &system_ts) == VLC_SUCCESS)
         {
-            sys->timing_report_last_written_bytes = 0;
-
-            /* From now on, fetch the timestamp every 1 seconds */
-            sys->timing_report_delay_bytes =
-                TicksToBytes(sys, TIMING_REPORT_DELAY_TICKS);
 
             vlc_tick_t pos_ticks = FramesToTicks(sys, pos_frames);
             /* underrun 0s don't count in timing reports */
             vlc_tick_t underrun_ticks = BytesToTicks(sys, sys->underrun_total_bytes);
-            pos_ticks -= underrun_ticks;
 
-            /* Add the start silence to the system time and don't subtract
-             * it from pos_ticks to avoid (unlikely) negatives ts */
-            system_ts += BytesToTicks(sys, sys->start_silence_bytes);
-            aout_stream_TimingReport(stream, system_ts,
-                                     pos_ticks + sys->first_pts);
+            /* pos_frame might not have taken the last underrun update */
+            if (likely(pos_ticks > underrun_ticks))
+            {
+                pos_ticks -= underrun_ticks;
+
+                /* From now on, fetch the timestamp every 1 seconds */
+                sys->timing_report_last_written_bytes = 0;
+                sys->timing_report_delay_bytes =
+                    TicksToBytes(sys, TIMING_REPORT_DELAY_TICKS);
+
+                /* Add the start silence to the system time and don't subtract
+                 * it from pos_ticks to avoid (unlikely) negatives ts */
+                system_ts += BytesToTicks(sys, sys->start_silence_bytes);
+                aout_stream_TimingReport(stream, system_ts,
+                                         pos_ticks + sys->first_pts);
+            }
         }
 
         memcpy(data, f->p_buffer, tocopy);
