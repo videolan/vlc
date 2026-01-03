@@ -1454,6 +1454,32 @@ void PlayerController::setSubtitleFPS(float fps)
     vlc_player_SetAssociatedSubsFPS( d->m_player, fps );
 }
 
+void PlayerController::setSubtitleMargin(int margin)
+{
+    Q_D(PlayerController);
+    size_t i_vout = 0;
+    vout_thread_t **vouts = vlc_player_vout_HoldAll(d->m_player, &i_vout);
+    for (size_t i = 0; i < i_vout; i++)
+    {
+        var_SetInteger(vouts[i], "sub-margin", margin);
+        vout_Release(vouts[i]);
+    }
+    free(vouts);
+}
+
+void PlayerController::setSecondarySubtitleMargin(int margin)
+{
+    Q_D(PlayerController);
+    size_t i_vout = 0;
+    vout_thread_t **vouts = vlc_player_vout_HoldAll(d->m_player, &i_vout);
+    for (size_t i = 0; i < i_vout; i++)
+    {
+        var_SetInteger(vouts[i], "secondary-sub-margin", margin);
+        vout_Release(vouts[i]);
+    }
+    free(vouts);
+}
+
 //TITLE/CHAPTER/MENU
 
 void PlayerController::sectionPrev()
