@@ -48,7 +48,11 @@ constexpr std::size_t Max255Count = std::numeric_limits<size_t>::max() / 255 - 2
   std::size_t offset; \
   { \
     const uint8_t *old_inp = inp; \
-    while (*inp == 0) ++inp; \
+    while (inp < inp_end && *inp == 0) ++inp; \
+    if (inp >= inp_end) { \
+      dst_size = outp - dst; \
+      return EResult::InputOverrun; \
+    } \
     offset = inp - old_inp; \
     if (offset > Max255Count) { \
       dst_size = outp - dst; \
