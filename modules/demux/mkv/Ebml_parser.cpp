@@ -197,6 +197,14 @@ next:
 
     if (do_read)
     {
+        // avoid leaking previous element at the level we're reading
+        if(m_el[mi_level] != nullptr && !mb_keep)
+        {
+            assert(m_el[mi_level] == p_prev);
+            delete m_el[mi_level];
+            p_prev = nullptr;
+        }
+
         // If the parent is a segment, use the segment context when creating children
         // (to prolong their lifetime), otherwise just continue as normal
         EbmlSemanticContext e_context =
