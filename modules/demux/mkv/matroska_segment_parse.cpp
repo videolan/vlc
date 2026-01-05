@@ -2162,7 +2162,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             if( unlikely( !p_realaudio ) )
                 throw std::runtime_error ("Cook_PrivateTrackData is NULL when handling A_REAL/28_8");
 
-            if( unlikely( p_realaudio->Init() ) )
+            if( unlikely( !p_realaudio->Init() ) )
                 throw std::runtime_error ("Cook_PrivateTrackData::Init() failed when handling A_REAL/28_8");
 
             if (i_codec == VLC_CODEC_COOK || i_codec == VLC_CODEC_ATRAC3)

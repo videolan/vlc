@@ -100,7 +100,7 @@ public:
     Cook_PrivateTrackData(const uint8_t *reader, size_t reader_len):
         bytes(reader, reader_len) {}
     ~Cook_PrivateTrackData();
-    int32_t Init();
+    bool Init() override;
 
     uint32_t coded_frame_size;
     uint16_t i_sub_packet_h;

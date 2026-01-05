@@ -185,7 +185,7 @@ class PrivateTrackData
 {
 public:
     virtual ~PrivateTrackData() {}
-    virtual int32_t Init() { return 0; }
+    virtual bool Init() { return true; }
 };
 
 class mkv_track_t
