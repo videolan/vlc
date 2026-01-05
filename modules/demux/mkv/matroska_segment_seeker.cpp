@@ -497,7 +497,10 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
                     return;
                 }
                 if (!MKV_IS_ID( el, KaxCluster ))
+                {
+                    ms.cluster = nullptr; // the previous cluster found is not valid anymore
                     continue; // look for the next element
+                }
 
                 ms.cluster = static_cast<KaxCluster*>( el );
 
