@@ -1,6 +1,6 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.8.3
-LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.gz
+LIBARCHIVE_VERSION := 3.8.5
+LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.xz
 
 PKGS += libarchive
 ifeq ($(call need_pkg,"libarchive >= 3.2.0"),)
@@ -29,12 +29,12 @@ ifdef HAVE_WIN32
 LIBARCHIVE_CONF += -DENABLE_OPENSSL=OFF
 endif
 
-$(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
+$(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.xz:
 	$(call download_pkg,$(LIBARCHIVE_URL),libarchive)
 
-.sum-libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz
+.sum-libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.xz
 
-libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
+libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.xz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-zstd-use-GetNativeSystemInfo-to-get-the-number-of-th.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
