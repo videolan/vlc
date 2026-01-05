@@ -426,7 +426,7 @@ struct real_audio_private_v5
     uint16_t channels;
 };
 
-int32_t Cook_PrivateTrackData::Init()
+bool Cook_PrivateTrackData::Init()
 {
     // real_audio_private
     bytes.skip(4);                      // fourcc
@@ -445,7 +445,7 @@ int32_t Cook_PrivateTrackData::Init()
     bytes.skip(2);                      // unknown5
 
     if ( i_subpacket_size == 0 )
-        return 0;
+        return false;
 
     if( version == 4 )
     {
@@ -466,14 +466,14 @@ int32_t Cook_PrivateTrackData::Init()
         i_channels      = bytes.GetBE16(); // channels
     }
     else
-        return 0;
+        return false;
     if (bytes.hasErrors())
-        return 0;
+        return false;
 
     size_t i_subpackets = (size_t) i_sub_packet_h * (size_t) i_frame_size / (size_t) i_subpacket_size;
     p_subpackets.resize(i_subpackets);
 
-    return 0;
+    return true;
 }
 
 Cook_PrivateTrackData::~Cook_PrivateTrackData()
