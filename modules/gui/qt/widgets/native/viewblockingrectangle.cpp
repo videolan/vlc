@@ -113,8 +113,16 @@ QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNod
     assert(window());
     const bool softwareMode = (window()->rendererInterface()->graphicsApi() == QSGRendererInterface::GraphicsApi::Software);
 
-    if (Q_UNLIKELY(oldNode && ((softwareMode && !softwareRenderNode)
-                               || (!softwareMode && !rectangleNode))))
+    if (m_renderingEnabled)
+    {
+        if (Q_UNLIKELY(oldNode && ((softwareMode && !softwareRenderNode)
+                                   || (!softwareMode && !rectangleNode))))
+        {
+            delete oldNode;
+            oldNode = nullptr;
+        }
+    }
+    else if (rectangleNode || softwareRenderNode)
     {
         delete oldNode;
         oldNode = nullptr;
@@ -135,30 +143,37 @@ QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNod
         // Initial position:
         m_renderPosition = mapToScene(QPointF(0,0));
 
-        if (softwareMode)
+        if (m_renderingEnabled)
         {
-            softwareRenderNode = new SoftwareRenderNode;
-            softwareRenderNode->setWindow(window());
-            softwareRenderNode->appendChildNode(observerNode);
+            if (softwareMode)
+            {
+                softwareRenderNode = new SoftwareRenderNode;
+                softwareRenderNode->setWindow(window());
+                softwareRenderNode->appendChildNode(observerNode);
+            }
+            else
+            {
+                rectangleNode = window()->createRectangleNode();
+                assert(rectangleNode);
+                rectangleNode->appendChildNode(observerNode);
+
+                const auto material = rectangleNode->material();
+                if (!material ||
+                    material == reinterpret_cast<QSGMaterial*>(1) /* Qt may explicitly set the material pointer to 1 in OpenVG */)
+                {
+                    // Scene graph adaptation does not support shading
+                    qmlDebug(this) << "ViewBlockingRectangle is being used under an incompatible scene graph adaptation.";
+                    delete rectangleNode;
+                    setFlag(QQuickItem::ItemHasContents, false);
+                    return nullptr;
+                }
+
+                rectangleNode->material()->setFlag(QSGMaterial::Blending, false);
+            }
         }
         else
         {
-            rectangleNode = window()->createRectangleNode();
-            assert(rectangleNode);
-            rectangleNode->appendChildNode(observerNode);
-
-            const auto material = rectangleNode->material();
-            if (!material ||
-                material == reinterpret_cast<QSGMaterial*>(1) /* Qt may explicitly set the material pointer to 1 in OpenVG */)
-            {
-                // Scene graph adaptation does not support shading
-                qmlDebug(this) << "ViewBlockingRectangle is being used under an incompatible scene graph adaptation.";
-                delete rectangleNode;
-                setFlag(QQuickItem::ItemHasContents, false);
-                return nullptr;
-            }
-
-            rectangleNode->material()->setFlag(QSGMaterial::Blending, false);
+            oldNode = observerNode;
         }
     }
 
@@ -166,32 +181,39 @@ QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNod
 
     m_renderSize = rect.size();
 
-    if (softwareMode)
+    if (m_renderingEnabled)
     {
-        softwareRenderNode->setRect(rect);
-        softwareRenderNode->setColor(m_color);
-
-        if (Q_UNLIKELY(m_windowChanged))
+        if (softwareMode)
         {
-            softwareRenderNode->setWindow(window());
-            m_windowChanged = false;
-        }
+            softwareRenderNode->setRect(rect);
+            softwareRenderNode->setColor(m_color);
 
-        return softwareRenderNode;
+            if (Q_UNLIKELY(m_windowChanged))
+            {
+                softwareRenderNode->setWindow(window());
+                m_windowChanged = false;
+            }
+
+            return softwareRenderNode;
+        }
+        else
+        {
+            if (rectangleNode->rect() != rect)
+                rectangleNode->setRect(rect);
+
+            if (rectangleNode->color() != m_color)
+            {
+                rectangleNode->setColor(m_color);
+                assert(rectangleNode->material());
+                rectangleNode->material()->setFlag(QSGMaterial::Blending, false);
+            }
+
+            return rectangleNode;
+        }
     }
     else
     {
-        if (rectangleNode->rect() != rect)
-            rectangleNode->setRect(rect);
-
-        if (rectangleNode->color() != m_color)
-        {
-            rectangleNode->setColor(m_color);
-            assert(rectangleNode->material());
-            rectangleNode->material()->setFlag(QSGMaterial::Blending, false);
-        }
-
-        return rectangleNode;
+        return oldNode;
     }
 }
 
@@ -204,3 +226,17 @@ QPointF ViewBlockingRectangle::renderPosition() const
 {
     return m_renderPosition;
 }
+
+void ViewBlockingRectangle::setRenderingEnabled(bool enabled)
+{
+    if (m_renderingEnabled == enabled)
+        return;
+
+    m_renderingEnabled = enabled;
+
+    if (isVisible())
+        update();
+
+    emit renderingEnabledChanged();
+}
+
