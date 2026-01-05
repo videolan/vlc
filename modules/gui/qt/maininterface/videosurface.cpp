@@ -430,5 +430,18 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
         m_videoEnabledChanged = false;
     }
 
+    if (QThread::currentThread() == thread())
+    {
+        // As per `::synchronize()` we do not need `ViewBlockingRectangle` to provide the render position in this case:
+        setUpdateRenderPosition(false);
+        // Override `ViewBlockingRectangle`'s `ItemHasContents`, if it is unset (when both `renderEnabled` and
+        // `updateRenderPosition()` are false):
+        setFlag(ItemHasContents, true);
+    }
+    else
+    {
+        setUpdateRenderPosition(true);
+    }
+
     return ViewBlockingRectangle::updatePaintNode(node, data);
 }

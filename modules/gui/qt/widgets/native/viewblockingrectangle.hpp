@@ -79,12 +79,18 @@ protected:
     QSizeF renderSize() const;
     QPointF renderPosition() const;
     void setRenderingEnabled(bool enabled);
+    void setUpdateRenderPosition(bool update);
+    bool updateRenderPosition() const;
 
 private:
     QColor m_color;
     bool m_windowChanged = false;
 
     bool m_renderingEnabled = true;
+
+    // Updating the render position (`m_renderPosition`) requires an additional
+    // scene graph node, albeit lightweight, thus it is an opt-in feature:
+    bool m_updateRenderPosition = false;
 
     // Although these members belong to the class instance's thread, they
     // are updated in the rendering thread:
