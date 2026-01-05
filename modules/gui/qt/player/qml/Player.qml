@@ -195,6 +195,12 @@ FocusScope {
 
                     anchors.fill: parent
 
+                    // With regard to `ViewBlockingRectangle`, we
+                    // do not need to prevent painting anything
+                    // behind because there is already nothing
+                    // behind (unlike pip player):
+                    renderingEnabled: false
+
                     videoSurfaceProvider: MainCtx.videoSurfaceProvider
 
                     visible: MainCtx.hasEmbededVideo
