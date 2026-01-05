@@ -390,7 +390,7 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
     if (!p_library)
         return;
 
-    p_awh->b_has_ndk_ast_api = !LoadNDKSurfaceTextureAPI(p_awh, p_library);
+    p_awh->b_has_ndk_ast_api = LoadNDKSurfaceTextureAPI(p_awh, p_library) == VLC_SUCCESS;
     p_awh->p_anw_dl = p_library;
 }
 
