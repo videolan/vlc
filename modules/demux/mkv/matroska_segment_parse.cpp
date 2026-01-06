@@ -80,9 +80,14 @@ static inline void fill_extra_data( mkv_track_t *p_tk, unsigned int offset )
 /*****************************************************************************
  * Some functions to manipulate memory
  *****************************************************************************/
+static inline const char * ToUTF8Const( const UTFstring &u )
+{
+    return u.GetUTF8().c_str();
+}
+
 static inline char * ToUTF8( const UTFstring &u )
 {
-    return strdup( u.GetUTF8().c_str() );
+    return strdup( ToUTF8Const(u) );
 }
 
 /*****************************************************************************
