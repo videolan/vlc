@@ -690,19 +690,9 @@ GetPictureContext(decoder_t *p_dec, unsigned index)
 }
 
 static int
-CreateVideoContext(decoder_t *p_dec)
+CreateSurface(decoder_t *p_dec, AWindowHandler *awh)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
-    if (!dec_dev || dec_dev->type != VLC_DECODER_DEVICE_AWINDOW)
-    {
-        msg_Err(p_dec, "Could not find an AWINDOW decoder device");
-        return VLC_EGENERIC;
-    }
-
-    assert(dec_dev->opaque);
-    AWindowHandler *awh = dec_dev->opaque;
 
     /* Force OpenGL interop (via AWindow_SurfaceTexture) if there is a
      * projection or an orientation to handle, if the Surface owner is not able
@@ -725,7 +715,7 @@ CreateVideoContext(decoder_t *p_dec)
         if (!p_sys->video.p_surface)
         {
             msg_Err(p_dec, "Could not find a valid ANativeWindow");
-            goto error;
+            return VLC_EGENERIC;
         }
     }
 
@@ -734,9 +724,35 @@ CreateVideoContext(decoder_t *p_dec)
         p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh, false);
         assert(p_sys->video.surfacetexture);
         if (p_sys->video.surfacetexture == NULL)
-            goto error;
+            return VLC_EGENERIC;
+
         p_sys->video.p_surface = p_sys->video.surfacetexture->window;
         assert(p_sys->video.p_surface);
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int
+CreateVideoContext(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
+    if (!dec_dev || dec_dev->type != VLC_DECODER_DEVICE_AWINDOW)
+    {
+        msg_Err(p_dec, "Could not find an AWINDOW decoder device");
+        return VLC_EGENERIC;
+    }
+
+    assert(dec_dev->opaque);
+    AWindowHandler *awh = dec_dev->opaque;
+
+    int ret = CreateSurface(p_dec, awh);
+    if (ret != VLC_SUCCESS)
+    {
+        vlc_decoder_device_Release(dec_dev);
+        return ret;
     }
 
     static const struct vlc_video_context_operations ops =
@@ -772,10 +788,6 @@ CreateVideoContext(decoder_t *p_dec)
     }
 
     return VLC_SUCCESS;
-
-error:
-    vlc_decoder_device_Release(dec_dev);
-    return VLC_EGENERIC;
 }
 
 static void CleanInputVideo(decoder_t *p_dec)
