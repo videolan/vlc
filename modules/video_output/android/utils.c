@@ -138,6 +138,14 @@ struct AWindowHandler
         jfloatArray jtransform_mtx_array;
         jfloat *jtransform_mtx;
     } stex;
+
+    struct aimage_reader_api ndk_air_api;
+    void *ndk_air_lib;
+    void *ndk_sync_lib;
+    bool b_has_ndk_air_api;
+
+    struct asurface_control_api ndk_asc_api;
+    bool b_has_ndk_asc_api;
 };
 
 #define JNI_CALL(what, obj, method, ...) \
@@ -379,10 +387,101 @@ LoadNDKSurfaceTextureAPI(AWindowHandler *p_awh, void *p_library)
     return VLC_SUCCESS;
 }
 
+static int
+LoadAimageReaderAPI(AWindowHandler *p_awh, void *p_android_lib)
+{
+    /* AHardwareBuffer functions are in libandroid.so, API 31+ */
+#define LOAD(object, name) \
+    p_awh->ndk_air_api.object.name = dlsym(p_android_lib, #object "_" #name); \
+    if (p_awh->ndk_air_api.object.name == NULL) return VLC_EGENERIC
+
+    LOAD(AHardwareBuffer, getId);
+    LOAD(AHardwareBuffer, describe);
+
+#undef LOAD
+
+    void *p_library = dlopen("libmediandk.so", RTLD_NOW);
+    if (p_library == NULL)
+        return VLC_EGENERIC;
+
+#define LOAD(object, name) \
+    p_awh->ndk_air_api.object.name = dlsym(p_library, #object "_" #name); \
+    if (p_awh->ndk_air_api.object.name == NULL) goto error
+
+    /* API 29+ */
+    LOAD(AImageReader, newWithUsage);
+    LOAD(AImageReader, delete);
+    LOAD(AImageReader, getWindow);
+    LOAD(AImageReader, acquireNextImageAsync);
+    LOAD(AImageReader, setImageListener);
+
+    LOAD(AImage, deleteAsync);
+    LOAD(AImage, getHardwareBuffer);
+    LOAD(AImage, getTimestamp);
+    LOAD(AImage, getCropRect);
+    LOAD(AImage, getWidth);
+    LOAD(AImage, getHeight);
+
+#undef LOAD
+
+    /* sync_merge is in libsync.so */
+    p_awh->ndk_sync_lib = dlopen("libsync.so", RTLD_NOW);
+    if (p_awh->ndk_sync_lib != NULL)
+    {
+        p_awh->ndk_air_api.sync_merge = dlsym(p_awh->ndk_sync_lib, "sync_merge");
+        if (p_awh->ndk_air_api.sync_merge == NULL)
+        {
+            dlclose(p_awh->ndk_sync_lib);
+            p_awh->ndk_sync_lib = NULL;
+            goto error;
+        }
+    }
+
+    p_awh->ndk_air_lib = p_library;
+    return VLC_SUCCESS;
+
+error:
+    dlclose(p_library);
+    return VLC_EGENERIC;
+}
+
+static int
+LoadASurfaceControlAPI(AWindowHandler *p_awh, void *p_library)
+{
+#define LOAD(object, name) \
+    p_awh->ndk_asc_api.object.name = dlsym(p_library, #object "_" #name); \
+    if (p_awh->ndk_asc_api.object.name == NULL) return VLC_EGENERIC
+
+    /* API 31+ functions */
+    LOAD(ASurfaceTransaction, setCrop);
+    LOAD(ASurfaceTransaction, setPosition);
+    LOAD(ASurfaceTransaction, setBufferTransform);
+    LOAD(ASurfaceTransaction, setScale);
+    LOAD(ASurfaceTransactionStats, getPreviousReleaseFenceFd);
+
+    /* API 29+ functions */
+    LOAD(ASurfaceControl, createFromWindow);
+    LOAD(ASurfaceControl, release);
+    LOAD(ASurfaceTransaction, create);
+    LOAD(ASurfaceTransaction, delete);
+    LOAD(ASurfaceTransaction, apply);
+    LOAD(ASurfaceTransaction, setBuffer);
+    LOAD(ASurfaceTransaction, setVisibility);
+    LOAD(ASurfaceTransaction, setBufferTransparency);
+    LOAD(ASurfaceTransaction, setBufferDataSpace);
+    LOAD(ASurfaceTransaction, setHdrMetadata_smpte2086);
+    LOAD(ASurfaceTransaction, setHdrMetadata_cta861_3);
+    LOAD(ASurfaceTransaction, setOnComplete);
+    LOAD(ASurfaceTransaction, setDesiredPresentTime);
+
+#undef LOAD
+
+    return VLC_SUCCESS;
+}
+
 /*
  * Android NativeWindow (post android 2.3)
  */
-
 static void
 LoadNativeWindowAPI(AWindowHandler *p_awh)
 {
@@ -391,6 +490,8 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
         return;
 
     p_awh->b_has_ndk_ast_api = LoadNDKSurfaceTextureAPI(p_awh, p_library) == VLC_SUCCESS;
+    p_awh->b_has_ndk_air_api = LoadAimageReaderAPI(p_awh, p_library) == VLC_SUCCESS;
+    p_awh->b_has_ndk_asc_api = LoadASurfaceControlAPI(p_awh, p_library) == VLC_SUCCESS;
     p_awh->p_anw_dl = p_library;
 }
 
@@ -622,6 +723,9 @@ AWindowHandler_new(vlc_object_t *obj, vlc_window_t *wnd, awh_events_t *p_events)
         }
     }
     LoadNativeWindowAPI(p_awh);
+    msg_Dbg(obj, "has_anw: %d has_ast: %d has_air: %d has_asc: %d",
+            p_awh->p_anw_dl != NULL, p_awh->b_has_ndk_ast_api,
+            p_awh->b_has_ndk_air_api, p_awh->b_has_ndk_asc_api);
 
     p_awh->capabilities = 0;
 
@@ -638,7 +742,9 @@ AWindowHandler_new(vlc_object_t *obj, vlc_window_t *wnd, awh_events_t *p_events)
         if (vout_modules
          && (strncmp(vout_modules, "gles2", sizeof("gles2") - 1) == 0
           || strncmp(vout_modules, "opengles2", sizeof("opengles2") - 1) == 0))
+        {
             p_awh->capabilities &= ~AWH_CAPS_SET_VIDEO_LAYOUT;
+        }
         free(vout_modules);
     }
 
@@ -720,9 +826,27 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
         (*p_env)->DeleteGlobalRef(p_env, p_awh->stex.jtransform_mtx_array);
     }
 
+    if (p_awh->ndk_sync_lib)
+        dlclose(p_awh->ndk_sync_lib);
+    if (p_awh->ndk_air_lib)
+        dlclose(p_awh->ndk_air_lib);
     if (p_awh->p_anw_dl)
         dlclose(p_awh->p_anw_dl);
     free(p_awh);
+}
+
+struct aimage_reader_api *
+AWindowHandler_getAImageReaderApi(AWindowHandler *p_awh)
+{
+    return p_awh->b_has_ndk_air_api && p_awh->b_has_ndk_asc_api ?
+           &p_awh->ndk_air_api : NULL;
+}
+
+struct asurface_control_api *
+AWindowHandler_getASurfaceControlApi(AWindowHandler *p_awh)
+{
+    return p_awh->b_has_ndk_air_api && p_awh->b_has_ndk_asc_api ?
+           &p_awh->ndk_asc_api : NULL;
 }
 
 static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(

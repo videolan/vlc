@@ -25,10 +25,18 @@
 # include "config.h"
 #endif
 
+#include <unistd.h>
+#include <assert.h>
+
 #include <jni.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
+#include <android/hardware_buffer.h>
 #include <android/input.h>
+#include <android/surface_control.h>
+#include <android/hdr_metadata.h>
+#include <android/data_space.h>
+#include <media/NdkImageReader.h>
 
 #include <vlc_vout_display.h>
 #include <vlc_common.h>
@@ -37,6 +45,138 @@
 #define AWH_CAPS_SET_VIDEO_LAYOUT 0x1
 /* AWH backed by a Android SurfaceView */
 #define AWH_CAPS_SURFACE_VIEW 0x2
+
+/*
+ * AImageReader function pointers
+ */
+typedef int32_t (*pfn_AImageReader_newWithUsage)(
+    int32_t width, int32_t height, int32_t format, uint64_t usage,
+    int32_t maxImages, AImageReader **reader);
+typedef void (*pfn_AImageReader_delete)(AImageReader *reader);
+typedef int32_t (*pfn_AImageReader_getWindow)(
+    AImageReader *reader, ANativeWindow **window);
+typedef int32_t (*pfn_AImageReader_acquireNextImageAsync)(
+    AImageReader *reader, AImage **image, int *acquireFenceFd);
+typedef void (*pfn_AImage_deleteAsync)(AImage *image, int releaseFenceFd);
+typedef int32_t (*pfn_AImage_getHardwareBuffer)(
+    const AImage *image, struct AHardwareBuffer **buffer);
+typedef int32_t (*pfn_AImage_getTimestamp)(
+    const AImage *image, int64_t *timestampNs);
+typedef int32_t (*pfn_AImage_getCropRect)(
+    const AImage *image, AImageCropRect *rect);
+typedef int32_t (*pfn_AImage_getWidth)(
+    const AImage *image, int32_t *width);
+typedef int32_t (*pfn_AImage_getHeight)(
+    const AImage *image, int32_t *height);
+typedef int32_t (*pfn_AImageReader_setImageListener)(
+    AImageReader *reader, AImageReader_ImageListener *listener);
+typedef int (*pfn_sync_merge)(const char *name, int fd1, int fd2);
+
+typedef int32_t (*pfn_AHardwareBuffer_getId)(
+    const struct AHardwareBuffer *buffer, uint64_t *outId);
+typedef void (*pfn_AHardwareBuffer_describe)(
+    const struct AHardwareBuffer *buffer, AHardwareBuffer_Desc *outDesc);
+
+/*
+* ASurfaceControl function pointers
+*/
+typedef ASurfaceControl* (*pfn_ASurfaceControl_createFromWindow)(
+    ANativeWindow *parent, const char *debug_name);
+typedef void (*pfn_ASurfaceControl_release)(ASurfaceControl *surface_control);
+typedef ASurfaceTransaction* (*pfn_ASurfaceTransaction_create)(void);
+typedef void (*pfn_ASurfaceTransaction_delete)(ASurfaceTransaction *transaction);
+typedef void (*pfn_ASurfaceTransaction_apply)(ASurfaceTransaction *transaction);
+typedef void (*pfn_ASurfaceTransaction_setBuffer)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    struct AHardwareBuffer *buffer, int acquire_fence_fd);
+typedef void (*pfn_ASurfaceTransaction_setVisibility)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    int8_t visibility);
+typedef void (*pfn_ASurfaceTransaction_setBufferTransparency)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    int8_t transparency);
+typedef void (*pfn_ASurfaceTransaction_setBufferDataSpace)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    int32_t data_space);
+typedef void (*pfn_ASurfaceTransaction_setHdrMetadata_smpte2086)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    struct AHdrMetadata_smpte2086 *metadata);
+typedef void (*pfn_ASurfaceTransaction_setHdrMetadata_cta861_3)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    struct AHdrMetadata_cta861_3 *metadata);
+typedef void (*pfn_ASurfaceTransaction_setOnComplete)(
+    ASurfaceTransaction *transaction, void *context,
+    void (*func)(void *context, ASurfaceTransactionStats *stats));
+typedef void (*pfn_ASurfaceTransaction_setCrop)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    const ARect *crop);
+typedef void (*pfn_ASurfaceTransaction_setPosition)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    int32_t x, int32_t y);
+typedef void (*pfn_ASurfaceTransaction_setBufferTransform)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    int32_t transform);
+typedef void (*pfn_ASurfaceTransaction_setScale)(
+    ASurfaceTransaction *transaction, ASurfaceControl *surface_control,
+    float xScale, float yScale);
+typedef void (*pfn_ASurfaceTransaction_setDesiredPresentTime)(
+    ASurfaceTransaction* transaction,
+    int64_t desiredPresentTime);
+typedef int (*pfn_ASurfaceTransactionStats_getPreviousReleaseFenceFd)(
+    ASurfaceTransactionStats *stats, ASurfaceControl *surface_control);
+
+struct aimage_reader_api
+{
+    /* AImageReader, API 31+ (because AHardwareBuffer) */
+    struct {
+        pfn_AImageReader_newWithUsage newWithUsage;
+        pfn_AImageReader_delete delete;
+        pfn_AImageReader_getWindow getWindow;
+        pfn_AImageReader_acquireNextImageAsync acquireNextImageAsync;
+        pfn_AImageReader_setImageListener setImageListener;
+    } AImageReader;
+    struct {
+        pfn_AImage_deleteAsync deleteAsync;
+        pfn_AImage_getHardwareBuffer getHardwareBuffer;
+        pfn_AImage_getTimestamp getTimestamp;
+        pfn_AImage_getCropRect getCropRect;
+        pfn_AImage_getWidth getWidth;
+        pfn_AImage_getHeight getHeight;
+    } AImage;
+    pfn_sync_merge sync_merge;
+    struct {
+        pfn_AHardwareBuffer_getId getId;
+        pfn_AHardwareBuffer_describe describe;
+    } AHardwareBuffer;
+};
+
+struct asurface_control_api
+{
+    struct {
+        pfn_ASurfaceControl_createFromWindow createFromWindow;
+        pfn_ASurfaceControl_release release;
+    } ASurfaceControl;
+    struct {
+        pfn_ASurfaceTransaction_create create;
+        pfn_ASurfaceTransaction_delete delete;
+        pfn_ASurfaceTransaction_apply apply;
+        pfn_ASurfaceTransaction_setBuffer setBuffer;
+        pfn_ASurfaceTransaction_setVisibility setVisibility;
+        pfn_ASurfaceTransaction_setBufferTransparency setBufferTransparency;
+        pfn_ASurfaceTransaction_setBufferDataSpace setBufferDataSpace;
+        pfn_ASurfaceTransaction_setHdrMetadata_smpte2086 setHdrMetadata_smpte2086;
+        pfn_ASurfaceTransaction_setHdrMetadata_cta861_3 setHdrMetadata_cta861_3;
+        pfn_ASurfaceTransaction_setOnComplete setOnComplete;
+        pfn_ASurfaceTransaction_setCrop setCrop;
+        pfn_ASurfaceTransaction_setPosition setPosition;
+        pfn_ASurfaceTransaction_setBufferTransform setBufferTransform;
+        pfn_ASurfaceTransaction_setScale setScale;
+        pfn_ASurfaceTransaction_setDesiredPresentTime setDesiredPresentTime;
+    } ASurfaceTransaction;
+    struct {
+        pfn_ASurfaceTransactionStats_getPreviousReleaseFenceFd getPreviousReleaseFenceFd;
+    } ASurfaceTransactionStats;
+};
 
 typedef struct AWindowHandler AWindowHandler;
 typedef struct ASurfaceTexture ASurfaceTexture;
@@ -67,6 +207,10 @@ typedef struct android_video_context_t android_video_context_t;
 
 struct android_video_context_t
 {
+    struct aimage_reader_api *air_api;
+    struct asurface_control_api *asc_api;
+    AImageReader *air;
+
     struct vlc_asurfacetexture *texture;
     void *dec_opaque;
     bool (*render)(struct picture_context_t *ctx);
@@ -123,6 +267,12 @@ void AWindowHandler_destroy(AWindowHandler *p_awh);
 AWindowHandler *
 AWindowHandler_newFromANWs(vlc_object_t *obj, ANativeWindow *video,
                            ANativeWindow *subtitle);
+
+struct aimage_reader_api *
+AWindowHandler_getAImageReaderApi(AWindowHandler *p_awh);
+
+struct asurface_control_api *
+AWindowHandler_getASurfaceControlApi(AWindowHandler *p_awh);
 
 /**
  * Get the Video or the Subtitles ANativeWindow
