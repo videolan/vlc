@@ -715,7 +715,6 @@ libcompat_functions = [
     ['clock_getres',     '#include <time.h>'],
 
     ['inet_pton',        arpa_inet_h],
-    ['inet_ntop',        arpa_inet_h],
 ]
 
 # Linux specific functions
