@@ -61,7 +61,8 @@ static char * MP4_Time2Str( stime_t i_duration, uint32_t i_scale )
     uint64_t ms;
     if ( i_scale == 0 || ckd_mul( &ms, 1000, i_duration ) )
         ms = 0;
-    ms = (ms / i_scale) % 1000;
+    else
+        ms = (ms / i_scale) % 1000;
 
     char *out;
     if( asprintf( &out, "%u:%.2u:%.2u:%.3" PRIu64, h, m, s, ms ) < 0 )
