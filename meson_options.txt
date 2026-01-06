@@ -229,6 +229,11 @@ option('sndio',
     value : 'auto',
     description : 'Enable/disable sndio support')
 
+option('kai',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable KAI support')
+
 option('ogg',
     type : 'feature',
     value : 'auto',
@@ -790,7 +795,6 @@ option('nfs',
 # TODO: Missing mmal
 # TODO: Missing jack
 # TODO: Missing opensles
-# TODO: Missing kai
 # TODO: Missing qt-qml-cache
 # TODO: Missing qt-qml-debug
 # TODO: Missing libtar

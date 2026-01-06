@@ -147,3 +147,17 @@ vlc_modules += {
     'enabled' : have_win_desktop,
 }
 endif
+
+if host_system == 'os/2'
+    if get_option('kai').allowed()
+        kai_lib = cc.find_library('kai',
+                                  has_headers: ['kai.h'],
+                                  required: get_option('kai').enabled())
+        vlc_modules += {
+            'name' : 'kai',
+            'sources' : files('kai.c'),
+            'dependencies' : [kai_lib],
+            'enabled' : kai_lib.found(),
+        }
+    endif
+endif
