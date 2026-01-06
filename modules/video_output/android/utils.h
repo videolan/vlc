@@ -141,14 +141,6 @@ AWindowHandler_newFromANWs(vlc_object_t *obj, ANativeWindow *video,
 native_window_api_t *AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh);
 
 /**
- * Get the Video or the Subtitles Android Surface
- *
- * \return the surface in a jobject, or NULL. It should be released with
- * AWindowHandler_releaseANativeWindow() or AWindowHandler_destroy().
- */
-jobject AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id);
-
-/**
  * Get the Video or the Subtitles ANativeWindow
  *
  * \return a valid ANativeWindow or NULL.It should be released with

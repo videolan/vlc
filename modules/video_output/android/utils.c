@@ -1035,19 +1035,6 @@ AWindowHandler_getANativeWindow(AWindowHandler *p_awh, enum AWindow_ID id)
     return p_awh->views[id].p_anw;
 }
 
-jobject
-AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id)
-{
-    assert(id < AWindow_Max);
-
-    if (p_awh->views[id].jsurface)
-        return p_awh->views[id].jsurface;
-
-    AWindowHandler_getANativeWindow(p_awh, id);
-    return p_awh->views[id].jsurface;
-}
-
-
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
                                          enum AWindow_ID id)
 {
