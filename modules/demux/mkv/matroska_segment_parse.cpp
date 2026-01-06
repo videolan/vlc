@@ -1263,8 +1263,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 strftime( buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Y",
                           &tmres ) )
             {
-                vars.obj->psz_date_utc = strdup( buffer );
-                debug( vars, "Date=%s", vars.obj->psz_date_utc );
+                debug( vars, "Date=%s", buffer );
             }
         }
         E_CASE( KaxChapterTranslate, trans )
