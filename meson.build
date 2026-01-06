@@ -107,7 +107,7 @@ if host_machine.cpu_family().startswith('x86')
         vlc_nasm_args = []
         if host_machine.cpu_family() == 'x86'
             vlc_nasm_args += ['-DARCH_X86_64=0']
-            if host_system in ['darwin', 'windows']
+            if host_system in ['darwin', 'windows', 'os/2']
                 vlc_nasm_args += ['-DPREFIX']
             endif
         else
