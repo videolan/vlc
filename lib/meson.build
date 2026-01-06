@@ -18,7 +18,7 @@ libvlc_sources = [
 ]
 
 libvlc_cargs = []
-if host_system == 'windows'
+if host_system in ['windows', 'os/2']
     libvlc_cargs += ['-DLIBVLC_DLL_EXPORT']
 endif
 

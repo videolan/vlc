@@ -70,6 +70,8 @@ min_windows_version_test = '''
         libvlccore_deps += cc.find_library('synchronization')
     endif
     vlccore_cargs += ['-DVLC_DLL_EXPORT']
+elif host_system == 'os/2'
+    vlccore_cargs += ['-DVLC_DLL_EXPORT']
 endif
 
 #

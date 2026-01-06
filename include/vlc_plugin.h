@@ -272,7 +272,7 @@ enum vlc_config_subcat
 
 #define CDECL_SYMBOL
 #if defined (VLC_DYNAMIC_PLUGIN)
-# if defined (_WIN32)
+# if defined (_WIN32) || defined (__OS2__)
 #   define DLL_SYMBOL              __declspec(dllexport)
 #   undef CDECL_SYMBOL
 #   define CDECL_SYMBOL            __cdecl
