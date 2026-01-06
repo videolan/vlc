@@ -717,18 +717,16 @@ CreateSurface(decoder_t *p_dec, AWindowHandler *awh)
             msg_Err(p_dec, "Could not find a valid ANativeWindow");
             return VLC_EGENERIC;
         }
+        return VLC_SUCCESS;
     }
 
-    if (use_surfacetexture || p_sys->video.p_surface == NULL)
-    {
-        p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh, false);
-        assert(p_sys->video.surfacetexture);
-        if (p_sys->video.surfacetexture == NULL)
-            return VLC_EGENERIC;
+    p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh, false);
+    assert(p_sys->video.surfacetexture);
+    if (p_sys->video.surfacetexture == NULL)
+        return VLC_EGENERIC;
 
-        p_sys->video.p_surface = p_sys->video.surfacetexture->window;
-        assert(p_sys->video.p_surface);
-    }
+    p_sys->video.p_surface = p_sys->video.surfacetexture->window;
+    assert(p_sys->video.p_surface);
 
     return VLC_SUCCESS;
 }
