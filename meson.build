@@ -225,7 +225,7 @@ threads_dep = dependency('threads', required: true)
 
 # Check for X11
 if (get_option('x11')
-    .disable_auto_if(host_system in ['darwin', 'windows'])
+    .disable_auto_if(host_system in ['darwin', 'windows', 'os/2'])
     .allowed())
     x11_dep = dependency('x11', required: get_option('x11'))
 else
@@ -545,7 +545,7 @@ add_project_arguments(cc.first_supported_argument(['-Werror-implicit-function-de
 #
 rt_lib = []
 possible_rt_libs = ['rt']
-if host_system != 'windows'
+if host_system not in ['windows', 'os/2']
     possible_rt_libs += ['pthread']
 endif
 foreach l : possible_rt_libs
@@ -722,6 +722,14 @@ libcompat_functions = [
 if host_system == 'linux'
     libcompat_functions += [
         ['getauxval',              '#include <sys/auxv.h>'],
+    ]
+endif
+
+# OS/2 specific functions
+if host_system == 'os/2'
+    libcompat_functions += [
+        ['gai_strerror',     '#include <netdb.h>'],
+        ['freeaddrinfo',     '#include <sys/socket.h>\n#include <netdb.h>'],
     ]
 endif
 
@@ -949,7 +957,7 @@ if build_machine.endian() == 'big'
 endif
 
 # Define the shared library extension
-if host_system == 'windows'
+if host_system in ['windows', 'os/2']
     cdata.set_quoted('LIBEXT', '.dll')
 elif host_system == 'darwin'
     cdata.set_quoted('LIBEXT', '.dylib')

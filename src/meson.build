@@ -361,6 +361,18 @@ elif host_system == 'windows'
             'win32/spawn.c',
         ]
     endif
+elif host_system == 'os/2'
+    libvlccore_sources += [
+        'os2/dirs.c',
+        'darwin/error.c',
+        'os2/filesystem.c',
+        'os2/getaddrinfo.c',
+        'os2/netconf.c',
+        'os2/plugin.c',
+        'os2/specific.c',
+        'os2/rand.c',
+        'os2/thread.c',
+    ]
 else
     libvlccore_sources += [
         'posix/filesystem.c',
