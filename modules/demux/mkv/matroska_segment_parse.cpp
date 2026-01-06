@@ -361,6 +361,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxTrackName, tname )
         {
+            free(vars.tk->fmt.psz_description);
             vars.tk->fmt.psz_description = ToUTF8( UTFstring( tname ) );
             debug( vars, "Track Name=%s", vars.tk->fmt.psz_description ? vars.tk->fmt.psz_description : "(null)" );
         }
@@ -1230,11 +1231,13 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE( KaxMuxingApp, mapp )
         {
+            free(vars.obj->psz_muxing_application);
             vars.obj->psz_muxing_application = ToUTF8( UTFstring( mapp ) );
             debug( vars, "Muxing Application=%s", vars.obj->psz_muxing_application );
         }
         E_CASE( KaxWritingApp, wapp )
         {
+            free(vars.obj->psz_writing_application);
             vars.obj->psz_writing_application = ToUTF8( UTFstring( wapp ) );
             debug( vars, "Writing Application=%s", vars.obj->psz_writing_application );
         }
@@ -1244,6 +1247,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE( KaxTitle, title )
         {
+            free(vars.obj->psz_title);
             vars.obj->psz_title = ToUTF8( UTFstring( title ) );
             debug( vars, "Title=%s", vars.obj->psz_title );
         }
