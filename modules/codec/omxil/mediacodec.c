@@ -1109,11 +1109,18 @@ static void CleanDecoder(decoder_sys_t *p_sys)
     CSDFree(p_sys);
     p_sys->api.clean(&p_sys->api);
 
-    if (p_sys->video.surfacetexture)
-        vlc_asurfacetexture_Delete(p_sys->video.surfacetexture);
+    switch (p_sys->cat)
+    {
+        case VIDEO_ES:
+            if (p_sys->video.surfacetexture)
+                vlc_asurfacetexture_Delete(p_sys->video.surfacetexture);
 
-    if (p_sys->video.timestamp_fifo)
-        timestamp_FifoRelease(p_sys->video.timestamp_fifo);
+            if (p_sys->video.timestamp_fifo)
+                timestamp_FifoRelease(p_sys->video.timestamp_fifo);
+            break;
+        default:
+            break;
+    }
 
     free(p_sys);
 }
