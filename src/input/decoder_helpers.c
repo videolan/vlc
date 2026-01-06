@@ -185,6 +185,9 @@ int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
         }
     }
 
+    assert(dec->fmt_out.video.i_visible_width  + dec->fmt_out.video.i_x_offset <= dec->fmt_out.video.i_width);
+    assert(dec->fmt_out.video.i_visible_height + dec->fmt_out.video.i_y_offset <= dec->fmt_out.video.i_height);
+
     video_format_AdjustColorSpace( &dec->fmt_out.video );
 
     if (dec->cbs->video.format_update == NULL)
