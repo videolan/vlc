@@ -175,6 +175,8 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
                 term = &p_decl->expr->seq[i].term;
                 if( term->type < TYPE_STRING )
                     continue;
+                if( term->type == TYPE_HEXCOLOR && term->psz == NULL) // Handle error case: "color: #;"
+                    continue;
                 i_total += strlen( term->psz );
                 if( term->type == TYPE_STRING )
                     i_total += 2;
@@ -187,6 +189,8 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
                 {
                     term = &p_decl->expr->seq[i].term;
                     if( term->type < TYPE_STRING )
+                        continue;
+                    if( term->type == TYPE_HEXCOLOR && term->psz == NULL) // Handle error case: "color: #;"
                         continue;
                     if( i > 0 )
                         strcat( psz, ", " );
