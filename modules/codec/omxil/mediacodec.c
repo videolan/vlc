@@ -155,7 +155,6 @@ typedef struct decoder_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoderJni(vlc_object_t *);
 static int  OpenDecoderNdk(vlc_object_t *);
 static void CleanDecoder(decoder_sys_t *);
 static void CloseDecoder(vlc_object_t *);
@@ -215,15 +214,6 @@ vlc_module_begin ()
         set_capability("audio decoder", 0)
         set_callbacks(OpenDecoderNdk, CloseDecoder)
         add_shortcut("mediacodec_ndk")
-    add_submodule ()
-        set_description("Video decoder using Android MediaCodec via JNI")
-        set_capability("video decoder", 0)
-        set_callbacks(OpenDecoderJni, CloseDecoder)
-        add_shortcut("mediacodec_jni")
-    add_submodule ()
-        set_capability("audio decoder", 0)
-        set_callbacks(OpenDecoderJni, CloseDecoder)
-        add_shortcut("mediacodec_jni")
 vlc_module_end ()
 
 static void CSDFree(decoder_sys_t *p_sys)
@@ -1091,11 +1081,6 @@ bailout:
 static int OpenDecoderNdk(vlc_object_t *p_this)
 {
     return OpenDecoder(p_this, MediaCodecNdk_Init);
-}
-
-static int OpenDecoderJni(vlc_object_t *p_this)
-{
-    return OpenDecoder(p_this, MediaCodecJni_Init);
 }
 
 static void AbortDecoderLocked(decoder_sys_t *p_sys)
