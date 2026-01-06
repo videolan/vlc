@@ -8,7 +8,8 @@ include_dir = include_directories('.')
 vlc_modules += {
     'name' : 'audiobargraph_a',
     'sources' : files('audiobargraph_a.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'shortname' : 'abg_a',
 }
 
 # Chorus flanger module
@@ -65,7 +66,7 @@ scaletempo_deps = [m_lib]
 vlc_modules += {
     'name' : 'scaletempo',
     'sources' : scaletempo_sources,
-    'dependencies' : scaletempo_deps
+    'dependencies' : scaletempo_deps,
 }
 
 # Scaletempo pitch module
@@ -73,7 +74,8 @@ vlc_modules += {
     'name' : 'scaletempo_pitch',
     'sources' : scaletempo_sources,
     'dependencies' : scaletempo_deps,
-    'c_args' : ['-DPITCH_SHIFTER']
+    'c_args' : ['-DPITCH_SHIFTER'],
+    'shortname' : 'scalet_p',
 }
 
 # Stereo widen module

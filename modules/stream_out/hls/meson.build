@@ -11,4 +11,5 @@ vlc_modules += {
         'subtitles_segmenter.c'
     ),
     'link_with' : [hxxxhelper_lib],
+    'shortname' : 's_o_hls',
 }

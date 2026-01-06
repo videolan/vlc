@@ -8,7 +8,8 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'audiobargraph_v',
     'sources' : files('audiobargraph_v.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'shortname' : 'abg_v',
 }
 
 # logo

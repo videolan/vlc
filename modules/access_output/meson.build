@@ -3,19 +3,22 @@
 # Dummy
 vlc_modules += {
     'name' : 'access_output_dummy',
-    'sources' : files('dummy.c')
+    'sources' : files('dummy.c'),
+    'shortname' : 'a_o_dumm',
 }
 
 # File
 vlc_modules += {
     'name' : 'access_output_file',
-    'sources' : files('file.c')
+    'sources' : files('file.c'),
+    'shortname' : 'a_o_file',
 }
 
 # HTTP
 vlc_modules += {
     'name' : 'access_output_http',
-    'sources' : files('http.c')
+    'sources' : files('http.c'),
+    'shortname' : 'a_o_http',
 }
 
 # liveHTTP
@@ -25,6 +28,7 @@ vlc_modules += {
     'sources' : files('livehttp.c'),
     'dependencies' : [ gcrypt_dep, gpg_error_dep ],
     'enabled' : gcrypt_dep.found() and gpg_error_dep.found(),
+    'shortname' : 'a_o_live',
 }
 
 # Shout (Icecast and old Shoutcast)
@@ -33,7 +37,8 @@ if shout_dep.found()
     vlc_modules += {
         'name' : 'access_output_shout',
         'sources' : files('shout.c'),
-        'dependencies' : [shout_dep, socket_libs]
+        'dependencies' : [shout_dep, socket_libs],
+        'shortname' : 'a_o_shou',
     }
 endif
 
@@ -42,7 +47,8 @@ vlc_modules += {
     'name' : 'access_http_put',
     'sources' : files('http-put.c'),
     'include_directories' : include_directories('../access/http'),
-    'link_with' : [vlc_http_lib]
+    'link_with' : [vlc_http_lib],
+    'shortname' : 'a_http_p',
 }
 
 # SRT
@@ -52,6 +58,7 @@ if srt_dep.found()
 	'sources' : files('srt.c', '../access/srt_common.c'),
 	'include_directories' : include_directories('../access/'),
 	'dependencies' : [srt_dep],
+    'shortname' : 'a_o_srt',
     }
 endif
 
@@ -61,6 +68,7 @@ if librist_dep.found()
 	'name' : 'access_output_rist',
 	'sources' : files('rist.c'),
 	'include_directories' : include_directories('../access/'),
-	'dependencies' : [librist_dep]
+    'dependencies' : [librist_dep],
+    'shortname' : 'a_o_rist',
     }
 endif

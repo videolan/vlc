@@ -36,7 +36,7 @@ vlc_modules += {
         'i420_rgb.c',
         'i420_rgb8.c',
         'i420_rgb16.c',
-    )
+    ),
 }
 
 vlc_modules += {
@@ -47,7 +47,8 @@ vlc_modules += {
 
 vlc_modules += {
     'name' : 'i422_i420',
-    'sources' : files('i422_i420.c')
+    'sources' : files('i422_i420.c'),
+    'shortname' : 'i422_i20'
 }
 
 vlc_modules += {
@@ -57,12 +58,14 @@ vlc_modules += {
 
 vlc_modules += {
     'name' : 'yuy2_i420',
-    'sources' : files('yuy2_i420.c')
+    'sources' : files('yuy2_i420.c'),
+    'shortname' : 'yuy2_i20'
 }
 
 vlc_modules += {
     'name' : 'yuy2_i422',
-    'sources' : files('yuy2_i422.c')
+    'sources' : files('yuy2_i422.c'),
+    'shortname' : 'yuy2_i22'
 }
 
 vlc_modules += {
@@ -78,6 +81,7 @@ vlc_modules += {
     ),
     'c_args' : ['-DPLUGIN_SSE2'],
     'enabled' : have_sse2,
+    'shortname' : 'i420_r_2'
 }
 
 vlc_modules += {

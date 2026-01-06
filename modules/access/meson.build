@@ -59,7 +59,8 @@ vlc_modules += {
 # Memory input module
 vlc_modules += {
     'name' : 'access_imem',
-    'sources' : files('imem.c')
+    'sources' : files('imem.c'),
+    'shortname' : 'a_imem',
 }
 
 # Fake sdp:// scheme input module
@@ -522,14 +523,16 @@ vlc_modules += {
         'mms/buffer.c',
         'mms/asf.c',
     ),
-    'dependencies' : [socket_libs]
+    'dependencies' : [socket_libs],
+    'shortname' : 'a_mms',
 }
 
 ## Misc
 
 vlc_modules += {
     'name' : 'access_concat',
-    'sources' : files('concat.c')
+    'sources' : files('concat.c'),
+    'shortname' : 'a_concat',
 }
 
 # Media Transfer Protocol (MTP)
@@ -537,7 +540,8 @@ if mtp_dep.found()
     vlc_modules += {
         'name' : 'access_mtp',
         'sources' : files('mtp.c'),
-        'dependencies' : [mtp_dep]
+        'dependencies' : [mtp_dep],
+        'shortname' : 'a_mtp',
     }
 endif
 
@@ -546,7 +550,8 @@ if srt_dep.found()
     vlc_modules += {
         'name' : 'access_srt',
         'sources' : files('srt.c', 'srt_common.c'),
-        'dependencies' : [srt_dep]
+        'dependencies' : [srt_dep],
+        'shortname' : 'a_srt',
     }
 endif
 

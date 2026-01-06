@@ -421,6 +421,7 @@ foreach module : vlc_modules
         'nasm_args',
         'extra_files',
         'enabled',
+        'shortname',
     ]
     foreach key : module.keys()
         if key not in valid_dict_keys
@@ -448,6 +449,12 @@ foreach module : vlc_modules
         kwargs += { link_language: module.get('link_language') }
     endif
 
+    shortname = ''
+
+    if module.has_key('shortname')
+        shortname = module['shortname']
+    endif
+
     vlc_plugin = library(
         module['name'] + '_plugin',
         module['sources'],
@@ -464,7 +471,8 @@ foreach module : vlc_modules
         build_by_default: true,
         install: true,
         install_dir: get_option('libdir') / 'vlc/plugins',
-        kwargs: kwargs
+        kwargs: kwargs,
+        shortname: shortname,
     )
     vlc_plugins_targets += {
         module['name']: vlc_plugin
