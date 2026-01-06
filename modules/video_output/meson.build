@@ -182,3 +182,31 @@ if x11_dep.found() and opengl_dep.found()
         'dependencies' : [x11_dep, opengl_dep]
     }
 endif
+
+#
+# OS/2 video output
+#
+if host_system == 'os/2'
+    vlc_modules += {
+        'name' : 'drawable_os2',
+        'sources' : files('drawable_os2.c'),
+    }
+
+    vlc_modules += {
+        'name' : 'window_os2',
+        'sources' : files('window_os2.c'),
+    }
+
+    if get_option('kva').allowed()
+        kva_lib = cc.find_library('kva',
+                                   has_headers: ['kva.h'],
+                                   required: get_option('kva').enabled())
+
+        vlc_modules += {
+            'name' : 'kva',
+            'sources' : files('kva.c'),
+            'dependencies' : [kva_lib],
+            'enabled' : kva_lib.found(),
+        }
+    endif
+endif

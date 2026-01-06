@@ -724,6 +724,11 @@ option('directx',
     value: 'auto',
     description: 'DirectX support')
 
+option('kva',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable/disable KVA support')
+
 option('projectm',
     type: 'feature',
     value: 'auto',
@@ -791,7 +796,6 @@ option('nfs',
 # TODO: Missing tremor
 # TODO: Missing x26410b
 # TODO: Missing vdpau
-# TODO: Missing kva
 # TODO: Missing mmal
 # TODO: Missing jack
 # TODO: Missing opensles
