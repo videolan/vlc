@@ -731,8 +731,14 @@ struct sockaddr_in6
 static const struct in6_addr in6addr_any =
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
+static const struct in6_addr in6addr_loopback =
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } };
+
 #define IN6ADDR_ANY_INIT \
     { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } } }
+
+#define IN6ADDR_LOOPBACK_INIT \
+    { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } } }
 
 # include <errno.h>
 # ifndef EPROTO
