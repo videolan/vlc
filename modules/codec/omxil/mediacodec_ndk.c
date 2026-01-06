@@ -562,9 +562,8 @@ static int ReleaseOutputAtTime(mc_api *api, int i_index, int64_t i_ts_ns)
 /*****************************************************************************
  * SetOutputSurface
  *****************************************************************************/
-static int SetOutputSurface(mc_api *api, void *p_surface, void *p_jsurface)
+static int SetOutputSurface(mc_api *api, void *p_surface)
 {
-    (void) p_jsurface;
     assert(p_surface != NULL);
     mc_api_sys *p_sys = api->p_sys;
 

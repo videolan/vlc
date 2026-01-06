@@ -129,7 +129,7 @@ typedef struct decoder_sys_t
         {
             vlc_video_context *ctx;
             struct android_picture_ctx apic_ctxs[MAX_PIC];
-            void *p_surface, *p_jsurface;
+            void *p_surface;
             unsigned i_angle;
             unsigned i_input_offset_x, i_input_offset_y;
             unsigned i_input_width, i_input_height;
@@ -456,7 +456,6 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.video.i_angle = p_sys->video.i_angle;
 
         args.video.p_surface = p_sys->video.p_surface;
-        args.video.p_jsurface = p_sys->video.p_jsurface;
 
         switch (p_dec->fmt_out.video.color_range)
         {
@@ -722,7 +721,6 @@ CreateVideoContext(decoder_t *p_dec)
     if (!use_surfacetexture)
     {
         p_sys->video.p_surface = AWindowHandler_getANativeWindow(awh, AWindow_Video);
-        p_sys->video.p_jsurface = AWindowHandler_getSurface(awh, AWindow_Video);
         assert (p_sys->video.p_surface);
         if (!p_sys->video.p_surface)
         {
@@ -738,9 +736,7 @@ CreateVideoContext(decoder_t *p_dec)
         if (p_sys->video.surfacetexture == NULL)
             goto error;
         p_sys->video.p_surface = p_sys->video.surfacetexture->window;
-        p_sys->video.p_jsurface = p_sys->video.surfacetexture->jsurface;
         assert(p_sys->video.p_surface);
-        assert(p_sys->video.p_jsurface);
     }
 
     static const struct vlc_video_context_operations ops =

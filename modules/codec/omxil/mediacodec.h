@@ -119,7 +119,6 @@ union mc_api_args
     struct
     {
         void *p_surface;
-        void *p_jsurface;
         int i_width;
         int i_height;
         int i_angle;
@@ -189,7 +188,7 @@ struct mc_api
 
     /* Dynamically sets the output surface
      * Returns 0 on success, or MC_API_ERROR */
-    int (*set_output_surface)(mc_api*, void *p_surface, void *p_jsurface);
+    int (*set_output_surface)(mc_api*, void *p_surface);
 };
 
 #endif
