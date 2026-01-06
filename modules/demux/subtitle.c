@@ -1922,7 +1922,7 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
                     break;
 
                 sscanf( &psz_text[shift], "%d", &p_props->jss.i_time_resolution );
-                if( !p_props->jss.i_time_resolution )
+                if( !p_props->jss.i_time_resolution || p_props->jss.i_time_resolution < 0 )
                     p_props->jss.i_time_resolution = 30;
                 break;
             }
