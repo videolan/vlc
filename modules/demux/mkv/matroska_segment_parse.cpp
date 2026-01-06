@@ -1240,8 +1240,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE( KaxSegmentFilename, sfn )
         {
-            vars.obj->psz_segment_filename = ToUTF8( UTFstring( sfn ) );
-            debug( vars, "Segment Filename=%s", vars.obj->psz_segment_filename );
+            debug( vars, "Segment Filename=%s", ToUTF8Const( UTFstring( sfn ) ) );
         }
         E_CASE( KaxTitle, title )
         {

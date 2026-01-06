@@ -122,7 +122,6 @@ public:
     /* info */
     char                    *psz_muxing_application;
     char                    *psz_writing_application;
-    char                    *psz_segment_filename;
     char                    *psz_title;
 
     /* !!!!! GCC 3.3 bug on Darwin !!!!! */

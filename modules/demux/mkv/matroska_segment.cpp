@@ -56,7 +56,6 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, matroska_iostream
     ,b_cues(false)
     ,psz_muxing_application(NULL)
     ,psz_writing_application(NULL)
-    ,psz_segment_filename(NULL)
     ,psz_title(NULL)
     ,i_default_edition(0)
     ,sys(demuxer)
@@ -70,7 +69,6 @@ matroska_segment_c::~matroska_segment_c()
 {
     free( psz_writing_application );
     free( psz_muxing_application );
-    free( psz_segment_filename );
     free( psz_title );
 
     delete segment;
