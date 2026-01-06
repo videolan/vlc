@@ -395,8 +395,12 @@ static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
                         *p_header = p_prop;
                     break;
                 case ATOM_ispe:
-                    fmt->video.i_visible_width = p_prop->data.p_ispe->i_width;
-                    fmt->video.i_visible_height = p_prop->data.p_ispe->i_height;
+                    if (p_prop->data.p_ispe->i_width <= fmt->video.i_width &&
+                        p_prop->data.p_ispe->i_height <= fmt->video.i_height)
+                    {
+                        fmt->video.i_visible_width = p_prop->data.p_ispe->i_width;
+                        fmt->video.i_visible_height = p_prop->data.p_ispe->i_height;
+                    }
                     break;
                 case ATOM_clap:
                     if(p_prop->data.p_clap->i_width + p_prop->data.p_clap->i_x_offset <= fmt->video.i_width &&
