@@ -24,6 +24,7 @@
 #include <vlc_common.h>
 
 #include <vlc_block.h>
+#include <vlc_boxes.h>
 #include <vlc_configuration.h>
 #include <vlc_frame.h>
 #include <vlc_httpd.h>
@@ -612,6 +613,59 @@ static hls_block_chain_t ExtractSubtitleSegment(hls_block_chain_t *muxed_output,
     return segment;
 }
 
+/* The fragmented MP4 muxer emits bare moof+mdat fragments. To comply with
+ * CMAF, we need to prepend styp+sidx  here, once per segment, since only the
+ * segmenter knows segments boundaries. */
+static void PrependSegmentBoxes(hls_block_chain_t *segment,
+                                vlc_tick_t earliest_pts,
+                                size_t referenced_size)
+{
+    if (segment->begin == NULL)
+        return;
+
+    /* The stream output refuses overly-large segments. */
+    assert(referenced_size <= 0x7FFFFFFF);
+    assert(segment->length <= UINT32_MAX);
+
+#define HLS_STYP_SIZE 24
+    bo_t styp;
+    if (!bo_init(&styp, HLS_STYP_SIZE))
+        return;
+    bo_add_32be(&styp, HLS_STYP_SIZE);
+    bo_add_fourcc(&styp, "styp");
+    bo_add_fourcc(&styp, "msdh"); /* major brand */
+    bo_add_32be(&styp, 0);        /* minor version */
+    bo_add_fourcc(&styp, "msdh"); /* compatible brand */
+    bo_add_fourcc(&styp, "msix"); /* compatible brand */
+
+#define HLS_SIDX_SIZE 52
+    bo_t sidx;
+    if (!bo_init(&sidx, HLS_SIDX_SIZE))
+    {
+        bo_deinit(&styp);
+        return;
+    }
+    bo_add_32be(&sidx, HLS_SIDX_SIZE);
+    bo_add_fourcc(&sidx, "sidx");
+    bo_add_32be(&sidx, 1u << 24);                 /* version 1, flags 0 */
+    bo_add_32be(&sidx, 1);                        /* reference_id (first track) */
+    bo_add_32be(&sidx, CLOCK_FREQ);               /* timescale */
+    bo_add_64be(&sidx, earliest_pts);             /* earliest_presentation_time */
+    bo_add_64be(&sidx, 0);                        /* first_offset */
+    bo_add_16be(&sidx, 0);                        /* reserved */
+    bo_add_16be(&sidx, 1);                        /* reference_count */
+    bo_add_32be(&sidx, (uint32_t)referenced_size);/* reference_type(0) | referenced_size */
+    bo_add_32be(&sidx, (uint32_t)segment->length);/* subsegment_duration */
+    bo_add_32be(&sidx, 0x80000000);               /* starts_with_SAP=1, SAP_type=0 */
+
+    styp.b->i_flags |= segment->begin->i_flags &
+                       (MP4_MUX_BLOCK_FLAG_SYNC | MP4_MUX_BLOCK_FLAG_BOUNDARY);
+
+    styp.b->p_next = sidx.b;
+    sidx.b->p_next = segment->begin;
+    segment->begin = styp.b;
+}
+
 static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist)
 {
     const vlc_tick_t seglen = playlist->config->segment_length;
@@ -669,6 +723,9 @@ static int ExtractAndAddSegment(hls_playlist_t *playlist,
         block_ChainRelease(segment.begin);
         return VLC_EGENERIC;
     }
+
+    if (playlist->type == HLS_PLAYLIST_TYPE_MP4)
+        PrependSegmentBoxes(&segment, playlist->muxed_duration, segment_size);
 
     if (hls_config_IsMemStorageEnabled(&sys->config) &&
         hls_segment_queue_IsAtMaxCapacity(&playlist->segments))
