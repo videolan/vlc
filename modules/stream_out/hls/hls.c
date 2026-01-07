@@ -1316,6 +1316,7 @@ static int Open(vlc_object_t *this)
         msg_Err(stream,
                 "At least one variant mapping needs to be specified with the "
                 "\"" SOUT_CFG_PREFIX "variants\" option");
+        status = VLC_EINVAL;
         goto variant_error;
     }
     status = hls_variant_maps_Parse(variants, &sys->variant_stream_maps);
