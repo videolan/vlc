@@ -59,6 +59,22 @@ Widgets.GridItem {
 
         parent: root.mediaCover
 
+        // If the background color of the image is opaque (which should be
+        // the case by default), we can place the progress bar beneath the
+        // thumbnail and disable clipping because the top part would not be
+        // exposed. Note that the top part is still going to be painted, as
+        // long as the image is not opaque which is the expected case since
+        // SDF-based round images always have transparent parts which needs
+        // blending. If the image is not rounded and its blending is disabled,
+        // the top part of the bar is not going to be painted, thanks to depth
+        // testing. Furthermore, fragment shader may not even be executed for
+        // the top part that are obscured by the opaque image, provided that
+        // early depth test is applicable. In any case, since bottom radii
+        // are 0.0 and background color is opaque, the top part (if painted)
+        // will not be exposed to the user.
+        z: (root.mediaCover.color.a > (1.0 - Number.EPSILON)) ? -0.1 : 0.0
+        clip: (z >= 0.0)
+
         anchors {
             top: parent.bottom
             left: parent.left
