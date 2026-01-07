@@ -306,9 +306,7 @@ int D3D11_TonemapperUpdate(vlc_object_t *vd, d3d11_tonemapper *tonemapProc, d3d1
                            video_format_t *quad_fmt)
 {
     HRESULT hr;
-    ID3D11Texture2D *_texture[D3D11_MAX_SHADER_VIEW];
     ComPtr<ID3D11Texture2D> texture;
-    D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc{ };
     D3D11_VIDEO_COLOR black{};
     black.RGBA.A = 1.f;
 
