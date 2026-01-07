@@ -182,7 +182,8 @@ public:
     /// Used for Async MFTs
     HRESULT endStream()
     {
-        assert(streamStarted);
+        if(!streamStarted)
+            return S_OK;
         HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, (ULONG_PTR)0);
         if (SUCCEEDED(hr))
             streamStarted = false;
