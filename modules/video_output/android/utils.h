@@ -220,6 +220,40 @@ struct android_video_context_t
         (*get_texture)(struct picture_context_t *ctx);
 };
 
+struct android_picture_ctx
+{
+    picture_context_t s;
+    AImage *image;
+    int fence_fd;
+    int read_fence_fd;
+    vlc_atomic_rc_t rc;
+    ASurfaceControl *sc;
+};
+
+static inline int
+android_picture_ctx_get_fence_fd(struct android_picture_ctx *apctx)
+{
+    return (apctx->fence_fd >= 0) ? dup(apctx->fence_fd) : -1;
+}
+
+static inline void
+android_picture_ctx_set_read_fence(struct android_picture_ctx *apctx, int fd)
+{
+    assert(fd >= 0);
+    if (apctx->read_fence_fd < 0)
+        apctx->read_fence_fd = fd;
+    else
+    {
+        android_video_context_t *avctx =
+            vlc_video_context_GetPrivate(apctx->s.vctx, VLC_VIDEO_CONTEXT_AWINDOW);
+
+        int merged = avctx->air_api->sync_merge("vlc_read_fence", apctx->read_fence_fd, fd);
+        close(apctx->read_fence_fd);
+        close(fd);
+        apctx->read_fence_fd = merged;
+    }
+}
+
 struct vlc_asurfacetexture
 {
     struct ANativeWindow *window;
