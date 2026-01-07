@@ -1,6 +1,6 @@
 # cargo-c installation via cargo
 
-CARGOC_VERSION := 0.9.29
+CARGOC_VERSION := 0.10.9
 
 ifdef BUILD_RUST
 # PKGS_TOOLS += cargo-c
