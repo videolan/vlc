@@ -22,9 +22,28 @@
 
 enum hls_playlist_type
 {
-    HLS_PLAYLIST_TYPE_TS,
+    HLS_PLAYLIST_TYPE_TS = 0,
     HLS_PLAYLIST_TYPE_WEBVTT,
 };
+
+static const char *const HLS_PLAYLIST_TYPE_STRINGS[] = {
+    [HLS_PLAYLIST_TYPE_TS] = "ts",
+    [HLS_PLAYLIST_TYPE_WEBVTT] = "webvtt",
+};
+
+static inline int hls_playlist_type_FromString(const char *str,
+                                               enum hls_playlist_type *out)
+{
+    for (unsigned i = 0; i < ARRAY_SIZE(HLS_PLAYLIST_TYPE_STRINGS); ++i)
+    {
+        if (!strcmp(str, HLS_PLAYLIST_TYPE_STRINGS[i]))
+        {
+            *out = i;
+            return VLC_SUCCESS;
+        }
+    }
+    return -ENOENT;
+}
 
 struct hls_config
 {
@@ -34,6 +53,7 @@ struct hls_config
     bool pace;
     vlc_tick_t segment_length;
     size_t max_memory;
+    enum hls_playlist_type preferred_type;
 };
 
 #define BYTES_FROM_KB(x) ((x) * 1000)

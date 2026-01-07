@@ -892,14 +892,14 @@ Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
     {
         playlist = map->playlist_ref;
         if (playlist == NULL)
-            playlist = AddPlaylist(stream, HLS_PLAYLIST_TYPE_TS, &sys->variant_playlists);
+            playlist = AddPlaylist(stream, sys->config.preferred_type, &sys->variant_playlists);
     }
     else if (fmt->i_cat == SPU_ES)
         playlist = AddPlaylist(
             stream, HLS_PLAYLIST_TYPE_WEBVTT, &sys->media_playlists);
     else
         playlist =
-            AddPlaylist(stream, HLS_PLAYLIST_TYPE_TS, &sys->media_playlists);
+            AddPlaylist(stream, sys->config.preferred_type, &sys->media_playlists);
 
     if (playlist == NULL)
         return NULL;
@@ -1076,15 +1076,18 @@ static int Open(vlc_object_t *this)
         return VLC_ENOMEM;
     stream->p_sys = sys;
 
-    static const char *const options[] = {"base-url",
-                                          "host-http",
-                                          "max-memory",
-                                          "num-seg",
-                                          "out-dir",
-                                          "pace",
-                                          "seg-len",
-                                          "variants",
-                                          NULL};
+    static const char *const options[] = {
+        "base-url",
+        "host-http",
+        "max-memory",
+        "num-seg",
+        "out-dir",
+        "pace",
+        "seg-len",
+        "variants",
+        "seg-type",
+        NULL,
+    };
     config_ChainParse(stream, SOUT_CFG_PREFIX, options, stream->p_cfg);
 
     sys->config.base_url = var_GetString(stream, SOUT_CFG_PREFIX "base-url");
@@ -1099,6 +1102,17 @@ static int Open(vlc_object_t *this)
         BYTES_FROM_KB(var_GetInteger(stream, SOUT_CFG_PREFIX "max-memory"));
 
     int status = VLC_EINVAL;
+
+    char *seg_type = var_GetNonEmptyString(stream, SOUT_CFG_PREFIX "seg-type");
+    status = hls_playlist_type_FromString(seg_type, &sys->config.preferred_type);
+    free(seg_type);
+
+    if (status != VLC_SUCCESS || sys->config.preferred_type == HLS_PLAYLIST_TYPE_WEBVTT)
+    {
+        msg_Err(stream, "Invalid segment type");
+        status = VLC_ENOENT;
+        goto variant_error;
+    }
 
     vlc_vector_init(&sys->variant_stream_maps);
     char *variants = var_GetNonEmptyString(stream, SOUT_CFG_PREFIX "variants");
@@ -1204,6 +1218,15 @@ variant_error:
 #define SEGLEN_LONGTEXT N_("Length of segments in seconds")
 #define SEGLEN_TEXT N_("Segment length (sec)")
 
+#define SEGTYPE_LONGTEXT N_("Specifies the segments container")
+#define SEGTYPE_TEXT N_("Segment muxed format")
+static const char *const SEGMENT_TYPE_LIST[] = {
+    "ts",
+};
+static const char *const SEGMENT_TYPE_TEXT[] = {
+    "MPEG TS",
+};
+
 vlc_module_begin()
     set_shortname("HLS")
     set_description(N_("HLS stream output"))
@@ -1212,6 +1235,9 @@ vlc_module_begin()
     set_subcategory(SUBCAT_SOUT_STREAM)
 
     add_string(SOUT_CFG_PREFIX "variants", NULL, VARIANTS_TEXT, VARIANTS_LONGTEXT)
+
+    add_string(SOUT_CFG_PREFIX "seg-type", SEGMENT_TYPE_LIST[0], SEGTYPE_TEXT, SEGTYPE_LONGTEXT)
+        change_string_list( SEGMENT_TYPE_LIST, SEGMENT_TYPE_TEXT )
 
     add_string(SOUT_CFG_PREFIX "base-url", "", BASEURL_TEXT, BASEURL_TEXT)
     add_bool(SOUT_CFG_PREFIX "host-http", false, HOSTHTTP_TEXT, HOSTHTTP_LONGTEXT)
