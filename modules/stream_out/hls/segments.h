@@ -54,6 +54,7 @@ typedef struct
     httpd_callback_t httpd_callback;
 
     const char *file_extension;
+    const char *mime;
 
     const struct hls_config *hls_config;
 

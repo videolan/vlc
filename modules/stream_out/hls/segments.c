@@ -59,6 +59,20 @@ hls_segment_queue_GetFileExtension(enum hls_playlist_type type)
     }
 }
 
+static const char *hls_segment_queue_GetMIME(enum hls_playlist_type type)
+{
+    switch (type)
+    {
+        case HLS_PLAYLIST_TYPE_TS:
+            return "video/MP2T";
+        case HLS_PLAYLIST_TYPE_MP4:
+            return "video/mp4";
+        case HLS_PLAYLIST_TYPE_WEBVTT:
+            return "text/vtt";
+    }
+    vlc_assert_unreachable();
+}
+
 void hls_segment_queue_Init(hls_segment_queue_t *queue,
                             const struct hls_segment_queue_config *config,
                             const struct hls_config *hls_config)
@@ -71,6 +85,7 @@ void hls_segment_queue_Init(hls_segment_queue_t *queue,
 
     queue->file_extension =
         hls_segment_queue_GetFileExtension(config->playlist_type);
+    queue->mime = hls_segment_queue_GetMIME(config->playlist_type);
 
     queue->hls_config = hls_config;
 
@@ -114,7 +129,7 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
 
     const struct hls_storage_config storage_conf = {
         .name = segment->url + strlen(queue->hls_config->base_url) + 1,
-        .mime = "video/MP2T",
+        .mime = queue->mime,
     };
     ret = hls_storage_FromBlocks(
         content, &storage_conf, queue->hls_config, &segment->storage);
