@@ -28,6 +28,7 @@
 @interface VLCOpenWindowController : NSWindowController <NSTabViewDelegate>
 
 @property (readwrite, weak) IBOutlet NSTextField *mrlTextField;
+@property (readwrite, weak) IBOutlet NSBox *mrlBox;
 @property (readwrite, weak) IBOutlet NSButton *mrlButton;
 @property (readwrite, weak) IBOutlet NSButton *mrlButtonLabel;
 @property (readwrite, weak) IBOutlet NSTabView *tabView;

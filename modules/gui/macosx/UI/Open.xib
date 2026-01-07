@@ -82,6 +82,7 @@
                 <outlet property="fileSubtitlesFilenameLabel" destination="3334" id="e8g-Pz-arj"/>
                 <outlet property="fileSubtitlesIconWell" destination="3335" id="Ewo-mh-0b9"/>
                 <outlet property="fileTreatAsPipeButton" destination="834" id="qZ9-Ma-hdL"/>
+                <outlet property="mrlBox" destination="2838" id="tPr-0Q-gQz"/>
                 <outlet property="mrlButton" destination="2836" id="BTX-dY-2pe"/>
                 <outlet property="mrlButtonLabel" destination="kwb-cv-hMZ" id="RqG-TM-bZ0"/>
                 <outlet property="mrlTextField" destination="2840" id="YtE-PL-EEV"/>

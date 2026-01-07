@@ -135,6 +135,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
     // Auto collapse MRL field
     self.mrlViewHeightConstraint.constant = 0;
+    self.mrlBox.hidden = YES;
 
     [self updateVideoDevicesAndRepresentation];
 
@@ -501,8 +502,10 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 {
     if ([_mrlButton state] == NSOffState) {
         self.mrlViewHeightConstraint.animator.constant = 0;
+        self.mrlBox.hidden = YES;
     } else {
         self.mrlViewHeightConstraint.animator.constant = 39;
+        self.mrlBox.hidden = NO;
     }
 }
 
