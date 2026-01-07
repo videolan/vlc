@@ -32,10 +32,20 @@ ToolTipExt {
     implicitHeight: (implicitContentHeight + topPadding + bottomPadding)
 
     x: _x
-    y: pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5))
+    y: _pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5))
 
-    readonly property real _x: pos.x - (width / 2)
+    readonly property real _x: _pos.x - (width / 2)
     property point pos
+    property point _pos
+
+    // We do not want to respect `pos` until it becomes relevant:
+    onAboutToShow: {
+        _pos = Qt.binding(() => { return pointingTooltip.pos })
+    }
+
+    onAboutToHide: {
+        _pos = pos
+    }
 
     background: Rectangle {
         border.color: pointingTooltip.colorContext.border
