@@ -203,6 +203,11 @@ HRESULT d3d11_tonemapper::UpdateTexture(vlc_object_t *vd, d3d11_device_t *d3d_de
         picsys.processorOutput->Release();
         picsys.processorOutput = NULL;
     }
+    if (picsys.context)
+    {
+        picsys.context->Release();
+        picsys.context = nullptr;
+    }
     _texture[0] = texture.Get();
     _texture[1] = texture.Get();
     _texture[2] = texture.Get();
@@ -231,6 +236,8 @@ HRESULT d3d11_tonemapper::UpdateTexture(vlc_object_t *vd, d3d11_device_t *d3d_de
     picsys.texture[0] = texture.Get();
     picsys.resourceView[0] = SRV.Get();
     picsys.formatTexture = texDesc.Format;
+    picsys.context = d3d_dev->d3dcontext;
+    picsys.context->AddRef();
 
     Width  = texDesc.Width;
     Height = texDesc.Height;
