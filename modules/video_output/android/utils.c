@@ -38,10 +38,7 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
 typedef ANativeWindow* (*ptr_ANativeWindow_fromSurfaceTexture)(JNIEnv*, jobject);
-typedef void (*ptr_ANativeWindow_acquire)(ANativeWindow*);
-typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
 
 typedef void (*ptr_ASurfaceTexture_getTransformMatrix)
                                         (ASurfaceTexture *st, float mtx[16]);
@@ -130,9 +127,6 @@ struct AWindowHandler
     } views[AWindow_Max];
 
     void *p_anw_dl;
-    ptr_ANativeWindow_fromSurface pf_winFromSurface;
-    ptr_ANativeWindow_acquire pf_winAcquire;
-    ptr_ANativeWindow_release pf_winRelease;
 
     struct ASurfaceTextureAPI ndk_ast_api;
     bool b_has_ndk_ast_api;
@@ -207,7 +201,7 @@ static void NDKSurfaceTexture_destroy(
                              handle->awh->jfields.SurfaceTexture.release);
 
     if (handle->surface.window)
-        handle->awh->pf_winRelease(handle->surface.window);
+        ANativeWindow_release(handle->surface.window);
 
     if (handle->surface.jsurface)
         (*p_env)->DeleteGlobalRef(p_env, handle->surface.jsurface);
@@ -333,7 +327,7 @@ static void JNISurfaceTexture_destroy(
                              handle->awh->jfields.SurfaceTexture.release);
 
     if (handle->surface.window)
-        handle->awh->pf_winRelease(handle->surface.window);
+        ANativeWindow_release(handle->surface.window);
     if (handle->surface.jsurface)
         (*p_env)->DeleteGlobalRef(p_env, handle->surface.jsurface);
 
@@ -398,19 +392,8 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
     if (!p_library)
         return;
 
-    p_awh->pf_winFromSurface = dlsym(p_library, "ANativeWindow_fromSurface");
-    p_awh->pf_winAcquire = dlsym(p_library, "ANativeWindow_acquire");
-    p_awh->pf_winRelease = dlsym(p_library, "ANativeWindow_release");
-
-    if (p_awh->pf_winFromSurface && p_awh->pf_winAcquire && p_awh->pf_winRelease)
-    {
-        p_awh->b_has_ndk_ast_api = !LoadNDKSurfaceTextureAPI(p_awh, p_library);
-        p_awh->p_anw_dl = p_library;
-    }
-    else
-    {
-        dlclose(p_library);
-    }
+    p_awh->b_has_ndk_ast_api = !LoadNDKSurfaceTextureAPI(p_awh, p_library);
+    p_awh->p_anw_dl = p_library;
 }
 
 static void
@@ -681,19 +664,14 @@ AWindowHandler_newFromANWs(vlc_object_t *obj, ANativeWindow *video,
     awh->wnd = NULL;
 
     LoadNativeWindowAPI(awh);
-    if (awh->pf_winAcquire == NULL)
-    {
-        free(awh);
-        return NULL;
-    }
 
     awh->views[AWindow_Video].p_anw = video;
-    awh->pf_winAcquire(video);
+    ANativeWindow_acquire(video);
     awh->capabilities = 0;
 
     awh->views[AWindow_Subtitles].p_anw = subtitle;
     if (subtitle != NULL)
-        awh->pf_winAcquire(subtitle);
+        ANativeWindow_acquire(subtitle);
 
     return awh;
 }
@@ -706,7 +684,7 @@ AWindowHandler_releaseANativeWindowEnv(AWindowHandler *p_awh, JNIEnv *p_env,
 
     if (p_awh->views[id].p_anw)
     {
-        p_awh->pf_winRelease(p_awh->views[id].p_anw);
+        ANativeWindow_release(p_awh->views[id].p_anw);
         p_awh->views[id].p_anw = NULL;
     }
 
@@ -913,7 +891,7 @@ success:
             goto error;
 
         handle->surface.window =
-            p_awh->pf_winFromSurface(p_env, handle->surface.jsurface);
+            ANativeWindow_fromSurface(p_env, handle->surface.jsurface);
         handle->surface.ops = &JNISurfaceAPI;
     }
 
@@ -946,7 +924,7 @@ error:
         eglTerminate(display);
 
     if (handle->surface.window != NULL)
-        p_awh->pf_winRelease(handle->surface.window);
+        ANativeWindow_release(handle->surface.window);
 
     if (handle->surface.jsurface != NULL)
         (*p_env)->DeleteGlobalRef(p_env, handle->surface.jsurface);
@@ -1020,7 +998,7 @@ AWindowHandler_getANativeWindow(AWindowHandler *p_awh, enum AWindow_ID id)
     assert(p_awh->views[id].jsurface != NULL);
 
     if (!p_awh->views[id].p_anw)
-        p_awh->views[id].p_anw = p_awh->pf_winFromSurface(p_env,
+        p_awh->views[id].p_anw = ANativeWindow_fromSurface(p_env,
                                                     p_awh->views[id].jsurface);
 
     return p_awh->views[id].p_anw;
