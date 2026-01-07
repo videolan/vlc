@@ -50,6 +50,8 @@ hls_segment_queue_GetFileExtension(enum hls_playlist_type type)
     {
         case HLS_PLAYLIST_TYPE_TS:
             return "ts";
+        case HLS_PLAYLIST_TYPE_MP4:
+            return "m4s";
         case HLS_PLAYLIST_TYPE_WEBVTT:
             return "vtt";
         default:

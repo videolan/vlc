@@ -23,11 +23,13 @@
 enum hls_playlist_type
 {
     HLS_PLAYLIST_TYPE_TS = 0,
+    HLS_PLAYLIST_TYPE_MP4,
     HLS_PLAYLIST_TYPE_WEBVTT,
 };
 
 static const char *const HLS_PLAYLIST_TYPE_STRINGS[] = {
     [HLS_PLAYLIST_TYPE_TS] = "ts",
+    [HLS_PLAYLIST_TYPE_MP4] = "fmp4",
     [HLS_PLAYLIST_TYPE_WEBVTT] = "webvtt",
 };
 
