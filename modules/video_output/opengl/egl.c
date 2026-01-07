@@ -527,9 +527,7 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
     int awh_caps = AWindowHandler_getCapabilities(gl->surface->display.anativewindow);
     if ((awh_caps & AWH_CAPS_SURFACE_VIEW) == 0)
     {
-        native_window_api_t *api =
-            AWindowHandler_getANativeWindowAPI(gl->surface->display.anativewindow);
-        api->setBuffersGeometry(anw, width, height, AHARDWAREBUFFER_FORMAT_BLOB);
+        ANativeWindow_setBuffersGeometry(anw, width, height, AHARDWAREBUFFER_FORMAT_BLOB);
     }
 
     return eglCreateWindowSurface(dpy, config, anw, NULL);

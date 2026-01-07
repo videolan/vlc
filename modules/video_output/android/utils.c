@@ -402,10 +402,8 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
     p_awh->pf_winFromSurface = dlsym(p_library, "ANativeWindow_fromSurface");
     p_awh->pf_winAcquire = dlsym(p_library, "ANativeWindow_acquire");
     p_awh->pf_winRelease = dlsym(p_library, "ANativeWindow_release");
-    p_awh->anw_api.setBuffersGeometry = dlsym(p_library, "ANativeWindow_setBuffersGeometry");
 
-    if (p_awh->pf_winFromSurface && p_awh->pf_winAcquire && p_awh->pf_winRelease
-     && p_awh->anw_api.setBuffersGeometry)
+    if (p_awh->pf_winFromSurface && p_awh->pf_winAcquire && p_awh->pf_winRelease)
     {
         p_awh->b_has_ndk_ast_api = !LoadNDKSurfaceTextureAPI(p_awh, p_library);
         p_awh->p_anw_dl = p_library;

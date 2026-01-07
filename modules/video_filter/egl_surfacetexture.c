@@ -133,9 +133,7 @@ static picture_context_t *CreatePictureContext(vlc_gl_t *gl)
         goto error;
 
     struct ANativeWindow *window = ctx->texture->window;
-    native_window_api_t *api =
-        AWindowHandler_getANativeWindowAPI(gl->device->opaque);
-    api->setBuffersGeometry(window, sys->fmt_out.i_width, sys->fmt_out.i_height,
+    ANativeWindow_setBuffersGeometry(window, sys->fmt_out.i_width, sys->fmt_out.i_height,
                             AHARDWAREBUFFER_FORMAT_BLOB);
 
     /* Create a drawing surface */
