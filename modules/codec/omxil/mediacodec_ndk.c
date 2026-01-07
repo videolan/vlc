@@ -55,67 +55,6 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, vlc_fourcc_t codec,
  * buffers and not via "csd-*" buffers from AMediaFormat */
 #define AMEDIACODEC_FLAG_CODEC_CONFIG 2
 
-/*****************************************************************************
- * Ndk symbols
- *****************************************************************************/
-
-struct syms
-{
-};
-static struct syms syms;
-
-struct members
-{
-    const char *name;
-    int offset;
-    bool critical;
-};
-static struct members members[] =
-{
-    { NULL, 0, false }
-};
-
-/* Initialize all symbols.
- * Done only one time during the first initialisation */
-static bool
-InitSymbols(mc_api *api)
-{
-    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
-    static int i_init_state = -1;
-    bool ret;
-
-    vlc_mutex_lock(&lock);
-
-    if (i_init_state != -1)
-        goto end;
-
-    i_init_state = 0;
-
-    void *ndk_handle = dlopen("libmediandk.so", RTLD_NOW);
-    if (!ndk_handle)
-        goto end;
-
-    for (int i = 0; members[i].name; i++)
-    {
-        void *sym = dlsym(ndk_handle, members[i].name);
-        if (!sym && members[i].critical)
-        {
-            dlclose(ndk_handle);
-            goto end;
-        }
-        *(void **)((uint8_t*)&syms + members[i].offset) = sym;
-    }
-
-    i_init_state = 1;
-end:
-    ret = i_init_state == 1;
-    if (!ret)
-        msg_Err(api->p_obj, "MediaCodec NDK init failed");
-
-    vlc_mutex_unlock(&lock);
-    return ret;
-}
-
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
@@ -478,9 +417,6 @@ static int Prepare(mc_api * api, int i_profile)
  *****************************************************************************/
 int MediaCodecNdk_Init(mc_api *api)
 {
-    if (!InitSymbols(api))
-        return MC_API_ERROR;
-
     api->p_sys = calloc(1, sizeof(mc_api_sys));
     if (!api->p_sys)
         return MC_API_ERROR;
