@@ -47,6 +47,30 @@ Widgets.GridItem {
     pictureWidth: VLCStyle.gridCover_video_width
     pictureHeight: VLCStyle.gridCover_video_height
 
+    // Bottom rounding is provided by the progress bar if it is visible:
+    mediaCover.radiusBottomLeft: progressBar.visible ? 0.0 : mediaCover.radius
+    mediaCover.radiusBottomRight: progressBar.visible ? 0.0 : mediaCover.radius
+
+    selectedShadow.height: selectedShadow.implicitHeight + (progressBar.visible ? progressBar.height : 0.0)
+    unselectedShadow.height: unselectedShadow.implicitHeight + (progressBar.visible ? progressBar.height : 0.0)
+
+    Widgets.VideoProgressBar {
+        id: progressBar
+
+        parent: root.mediaCover
+
+        anchors {
+            top: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+
+        visible: (model.progress > 0)
+
+        radius: root.pictureRadius
+        value: Helpers.clamp(model.progress !== undefined ? model.progress : 0, 0, 1)
+    }
+
     pictureOverlay: Item {
         implicitWidth: root.pictureWidth
         implicitHeight: root.pictureHeight
@@ -75,21 +99,6 @@ Widgets.GridItem {
             }
 
             labels: root.labels
-        }
-
-        Widgets.VideoProgressBar {
-            id: progressBar
-
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-                right: parent.right
-            }
-
-            visible: (model.progress > 0)
-
-            radius: root.pictureRadius
-            value: Helpers.clamp(model.progress !== undefined ? model.progress : 0, 0, 1)
         }
     }
 
