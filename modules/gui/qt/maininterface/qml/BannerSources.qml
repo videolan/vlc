@@ -411,7 +411,12 @@ T.ToolBar {
 
                             font.pixelSize: VLCStyle.icon_banner
                             text: VLCIcons.playlist
-                            description: qsTr("Playlist")
+                            description: {
+                                const count = MainPlaylistController.count
+                                return (count > 0) ? qsTr("Playlist (%1 item)", "Playlist (%1 items)", count).arg(count)
+                                                   : qsTr("Playlist")
+                            }
+
                             width: VLCStyle.bannerButton_width
                             height: VLCStyle.bannerButton_height
                             highlighted: MainCtx.playlistVisible
