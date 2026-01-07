@@ -133,7 +133,6 @@ struct AWindowHandler
     ptr_ANativeWindow_fromSurface pf_winFromSurface;
     ptr_ANativeWindow_acquire pf_winAcquire;
     ptr_ANativeWindow_release pf_winRelease;
-    native_window_api_t anw_api;
 
     struct ASurfaceTextureAPI ndk_ast_api;
     bool b_has_ndk_ast_api;
@@ -748,12 +747,6 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
     if (p_awh->p_anw_dl)
         dlclose(p_awh->p_anw_dl);
     free(p_awh);
-}
-
-native_window_api_t *
-AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh)
-{
-    return &p_awh->anw_api;
 }
 
 static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
