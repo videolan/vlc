@@ -109,18 +109,6 @@ typedef media_status_t (*pf_AMediaCodec_releaseOutputBuffer)(AMediaCodec*,
 typedef media_status_t (*pf_AMediaCodec_releaseOutputBufferAtTime)(AMediaCodec*,
         size_t idx, int64_t timestampNs);
 
-typedef AMediaFormat *(*pf_AMediaFormat_new)();
-typedef media_status_t (*pf_AMediaFormat_delete)(AMediaFormat*);
-
-typedef void (*pf_AMediaFormat_setString)(AMediaFormat*,
-        const char* name, const char* value);
-
-typedef void (*pf_AMediaFormat_setInt32)(AMediaFormat*,
-        const char* name, int32_t value);
-
-typedef bool (*pf_AMediaFormat_getInt32)(AMediaFormat*,
-        const char *name, int32_t *out);
-
 struct syms
 {
     struct {
@@ -139,13 +127,6 @@ struct syms
         pf_AMediaCodec_releaseOutputBuffer releaseOutputBuffer;
         pf_AMediaCodec_releaseOutputBufferAtTime releaseOutputBufferAtTime;
     } AMediaCodec;
-    struct {
-        pf_AMediaFormat_new new;
-        pf_AMediaFormat_delete delete;
-        pf_AMediaFormat_setString setString;
-        pf_AMediaFormat_setInt32 setInt32;
-        pf_AMediaFormat_getInt32 getInt32;
-    } AMediaFormat;
 };
 static struct syms syms;
 
@@ -172,13 +153,6 @@ static struct members members[] =
     { "AMediaCodec_getOutputBuffer", OFF(getOutputBuffer), true },
     { "AMediaCodec_releaseOutputBuffer", OFF(releaseOutputBuffer), true },
     { "AMediaCodec_releaseOutputBufferAtTime", OFF(releaseOutputBufferAtTime), true },
-#undef OFF
-#define OFF(x) offsetof(struct syms, AMediaFormat.x)
-    { "AMediaFormat_new", OFF(new), true },
-    { "AMediaFormat_delete", OFF(delete), true },
-    { "AMediaFormat_setString", OFF(setString), true },
-    { "AMediaFormat_setInt32", OFF(setInt32), true },
-    { "AMediaFormat_getInt32", OFF(getInt32), true },
 #undef OFF
     { NULL, 0, false }
 };
@@ -253,7 +227,7 @@ static int ConfigureDecoder(mc_api *api, union mc_api_args *p_args)
         return MC_API_ERROR;
     }
 
-    p_sys->p_format = syms.AMediaFormat.new();
+    p_sys->p_format = AMediaFormat_new();
     if (!p_sys->p_format)
     {
         msg_Err(api->p_obj, "AMediaFormat.new failed");
@@ -261,36 +235,36 @@ static int ConfigureDecoder(mc_api *api, union mc_api_args *p_args)
     }
 
     if (p_args->video.b_low_latency)
-        syms.AMediaFormat.setInt32(p_sys->p_format, "low-latency", 1);
-    syms.AMediaFormat.setInt32(p_sys->p_format, "encoder", 0);
-    syms.AMediaFormat.setString(p_sys->p_format, "mime", api->psz_mime);
+        AMediaFormat_setInt32(p_sys->p_format, "low-latency", 1);
+    AMediaFormat_setInt32(p_sys->p_format, "encoder", 0);
+    AMediaFormat_setString(p_sys->p_format, "mime", api->psz_mime);
     /* No limits for input size */
-    syms.AMediaFormat.setInt32(p_sys->p_format, "max-input-size", 0);
+    AMediaFormat_setInt32(p_sys->p_format, "max-input-size", 0);
     if (api->i_cat == VIDEO_ES)
     {
-        syms.AMediaFormat.setInt32(p_sys->p_format, "width", p_args->video.i_width);
-        syms.AMediaFormat.setInt32(p_sys->p_format, "height", p_args->video.i_height);
-        syms.AMediaFormat.setInt32(p_sys->p_format, "rotation-degrees", p_args->video.i_angle);
+        AMediaFormat_setInt32(p_sys->p_format, "width", p_args->video.i_width);
+        AMediaFormat_setInt32(p_sys->p_format, "height", p_args->video.i_height);
+        AMediaFormat_setInt32(p_sys->p_format, "rotation-degrees", p_args->video.i_angle);
 
-        syms.AMediaFormat.setInt32(p_sys->p_format, "color-range", p_args->video.color_range);
-        syms.AMediaFormat.setInt32(p_sys->p_format, "color-standard", p_args->video.color_standard);
-        syms.AMediaFormat.setInt32(p_sys->p_format, "color-transfer", p_args->video.color_transfer);
+        AMediaFormat_setInt32(p_sys->p_format, "color-range", p_args->video.color_range);
+        AMediaFormat_setInt32(p_sys->p_format, "color-standard", p_args->video.color_standard);
+        AMediaFormat_setInt32(p_sys->p_format, "color-transfer", p_args->video.color_transfer);
 
         if (p_args->video.p_surface)
         {
             p_anw = p_args->video.p_surface;
             if (p_args->video.b_tunneled_playback)
-                syms.AMediaFormat.setInt32(p_sys->p_format,
+                AMediaFormat_setInt32(p_sys->p_format,
                                            "feature-tunneled-playback", 1);
             if (p_args->video.b_adaptive_playback)
-                syms.AMediaFormat.setInt32(p_sys->p_format,
+                AMediaFormat_setInt32(p_sys->p_format,
                                            "feature-adaptive-playback", 1);
         }
     }
     else
     {
-        syms.AMediaFormat.setInt32(p_sys->p_format, "sample-rate", p_args->audio.i_sample_rate);
-        syms.AMediaFormat.setInt32(p_sys->p_format, "channel-count", p_args->audio.i_channel_count);
+        AMediaFormat_setInt32(p_sys->p_format, "sample-rate", p_args->audio.i_sample_rate);
+        AMediaFormat_setInt32(p_sys->p_format, "channel-count", p_args->audio.i_channel_count);
     }
 
     if (syms.AMediaCodec.configure(p_sys->p_codec, p_sys->p_format,
@@ -326,7 +300,7 @@ static int Stop(mc_api *api)
     }
     if (p_sys->p_format)
     {
-        syms.AMediaFormat.delete(p_sys->p_format);
+        AMediaFormat_delete(p_sys->p_format);
         p_sys->p_format = NULL;
     }
 
@@ -427,7 +401,7 @@ static int QueueInput(mc_api *api, int i_index, const void *p_buf,
 static int32_t GetFormatInteger(AMediaFormat *p_format, const char *psz_name)
 {
     int32_t i_out = 0;
-    syms.AMediaFormat.getInt32(p_format, psz_name, &i_out);
+    AMediaFormat_getInt32(p_format, psz_name, &i_out);
     return i_out;
 }
 
@@ -517,7 +491,7 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
             p_out->conf.audio.channel_mask  = GetFormatInteger(format, "channel-mask");
             p_out->conf.audio.sample_rate   = GetFormatInteger(format, "sample-rate");
         }
-        syms.AMediaFormat.delete(format);
+        AMediaFormat_delete(format);
         return 1;
     }
     return 0;
