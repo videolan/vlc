@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <unistd.h>
+
 #include <vlc_common.h>
 #include <vlc_threads.h>
 #include <vlc_plugin.h>
@@ -39,6 +41,67 @@
 #include "utils.h"
 #include "../opengl/gl_api.h"
 #include "../opengl/sub_renderer.h"
+
+static int32_t video_format_to_adataspace(const video_format_t *fmt)
+{
+    int32_t standard, transfer, range;
+
+    switch (fmt->primaries) {
+        case COLOR_PRIMARIES_BT709:
+            standard = ADATASPACE_STANDARD_BT709;
+            break;
+        case COLOR_PRIMARIES_BT601_625:
+            standard = ADATASPACE_STANDARD_BT601_625;
+            break;
+        case COLOR_PRIMARIES_BT601_525:
+            standard = ADATASPACE_STANDARD_BT601_525;
+            break;
+        case COLOR_PRIMARIES_BT2020:
+            standard = ADATASPACE_STANDARD_BT2020;
+            break;
+        case COLOR_PRIMARIES_DCI_P3:
+            standard = ADATASPACE_STANDARD_DCI_P3;
+            break;
+        default:
+            standard = ADATASPACE_STANDARD_UNSPECIFIED;
+            break;
+    }
+
+    switch (fmt->transfer) {
+        case TRANSFER_FUNC_LINEAR:
+            transfer = ADATASPACE_TRANSFER_LINEAR;
+            break;
+        case TRANSFER_FUNC_SRGB:
+            transfer = ADATASPACE_TRANSFER_SRGB;
+            break;
+        case TRANSFER_FUNC_BT709:
+            transfer = ADATASPACE_TRANSFER_SMPTE_170M;
+            break;
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            transfer = ADATASPACE_TRANSFER_ST2084;
+            break;
+        case TRANSFER_FUNC_HLG:
+            transfer = ADATASPACE_TRANSFER_HLG;
+            break;
+        default:
+            transfer = ADATASPACE_TRANSFER_UNSPECIFIED;
+            break;
+    }
+
+    switch (fmt->color_range) {
+        case COLOR_RANGE_FULL:
+            range = ADATASPACE_RANGE_FULL;
+            break;
+        case COLOR_RANGE_LIMITED:
+            range = ADATASPACE_RANGE_LIMITED;
+            break;
+        default:
+            range = ADATASPACE_RANGE_UNSPECIFIED;
+            break;
+    }
+
+    return standard | transfer | range;
+}
 
 struct subpicture
 {
@@ -65,6 +128,11 @@ struct sys
     bool can_set_video_layout;
     android_video_context_t *avctx;
     struct subpicture sub;
+
+    struct {
+        ASurfaceControl *sc;
+        picture_t *previous_picture;
+    } asc;
 };
 
 static void subpicture_SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
@@ -365,12 +433,91 @@ delete_win:
     return -1;
 }
 
+static void ASC_OnComplete(void *context, ASurfaceTransactionStats *stats)
+{
+    picture_t *pic = context;
+    struct android_picture_ctx *apctx =
+        container_of(pic->context, struct android_picture_ctx, s);
+    vlc_video_context *vctx = picture_GetVideoContext(pic);
+    assert(vctx != NULL);
+    android_video_context_t *avctx =
+        vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_AWINDOW);
+
+    /* See ASurfaceTransactionStats_getPreviousReleaseFenceFd documentation.
+     * When buffer n is displayed, this callback is called with the n-1
+     * picture, update the read fence fd from the previous transaction
+     * (if valid = buffer not yet released) and release the VLC picture. */
+    int release_fd =
+        avctx->asc_api->ASurfaceTransactionStats.getPreviousReleaseFenceFd(stats, apctx->sc);
+    if (release_fd >= 0)
+        android_picture_ctx_set_read_fence(apctx, release_fd);
+    picture_Release(pic);
+}
+
+static void PrepareWithASC(vout_display_t *vd, picture_t *pic,
+                           const vlc_render_subpicture *subpicture, vlc_tick_t date)
+{
+    struct sys *sys = vd->sys;
+    assert(sys->asc.sc != NULL);
+    assert(pic->context != NULL);
+    struct aimage_reader_api *air_api = sys->avctx->air_api;
+
+    picture_context_t *ctx = pic->context;
+    struct android_picture_ctx *apctx = container_of(ctx, struct android_picture_ctx, s);
+    apctx->sc = sys->asc.sc;
+
+    AHardwareBuffer *buffer = NULL;
+    int32_t status = air_api->AImage.getHardwareBuffer(apctx->image, &buffer);
+    if (status != 0)
+    {
+        msg_Warn(vd, "PrepareWithASC: AImage_getHardwareBuffer failed: %d", status);
+        return;
+    }
+    assert(buffer != NULL);
+
+    struct asurface_control_api *asc_api = sys->avctx->asc_api;
+    ASurfaceTransaction *txn = asc_api->ASurfaceTransaction.create();
+    if (txn == NULL)
+        return;
+
+    if (sys->asc.previous_picture != NULL)
+    {
+        asc_api->ASurfaceTransaction.setOnComplete(txn, sys->asc.previous_picture,
+                                                   ASC_OnComplete);
+        sys->asc.previous_picture = NULL;
+    }
+
+    int fence_fd = android_picture_ctx_get_fence_fd(apctx);
+
+    asc_api->ASurfaceTransaction.setBuffer(txn, sys->asc.sc, buffer, fence_fd);
+    asc_api->ASurfaceTransaction.setDesiredPresentTime(txn, NS_FROM_VLC_TICK(date));
+    asc_api->ASurfaceTransaction.apply(txn);
+    asc_api->ASurfaceTransaction.delete(txn);
+
+    sys->asc.previous_picture = picture_Hold(pic);
+
+    if (sys->sub.window != NULL)
+        subpicture_Prepare(vd, subpicture);
+}
+
+static void DisplayWithASC(vout_display_t *vd, picture_t *picture)
+{
+    struct sys *sys = vd->sys;
+    assert(picture->context);
+    assert(sys->asc.sc != NULL);
+    /* Nothing to do for ASC (the display date was set in the transaction) */
+
+    if (sys->sub.window != NULL)
+        subpicture_Display(vd);
+}
+
 static void Prepare(vout_display_t *vd, picture_t *picture,
                     const vlc_render_subpicture *subpicture, vlc_tick_t date)
 {
     struct sys *sys = vd->sys;
 
     assert(picture->context);
+    assert(sys->asc.sc == NULL);
     if (sys->avctx->render_ts != NULL)
         sys->avctx->render_ts(picture->context, date);
 
@@ -382,6 +529,8 @@ static void Display(vout_display_t *vd, picture_t *picture)
 {
     struct sys *sys = vd->sys;
     assert(picture->context);
+    assert(sys->asc.sc == NULL);
+
     sys->avctx->render(picture->context);
 
     if (sys->sub.window != NULL)
@@ -402,6 +551,35 @@ static void SetVideoLayout(vout_display_t *vd)
                                   rot_fmt.i_sar_num, rot_fmt.i_sar_den);
 }
 
+static void UpdateASCGeometry(vout_display_t *vd)
+{
+    struct sys *sys = vd->sys;
+    assert(sys->asc.sc != NULL);
+
+    struct asurface_control_api *asc_api = sys->avctx->asc_api;
+    ASurfaceTransaction *txn = asc_api->ASurfaceTransaction.create();
+    if (txn == NULL)
+        return;
+
+    const ARect crop = {
+        .left   = vd->source->i_x_offset,
+        .top    = vd->source->i_y_offset,
+        .right  = vd->source->i_x_offset + vd->source->i_visible_width,
+        .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
+    };
+    asc_api->ASurfaceTransaction.setCrop(txn, sys->asc.sc, &crop);
+
+    asc_api->ASurfaceTransaction.setPosition(txn, sys->asc.sc,
+                                             vd->place->x, vd->place->y);
+
+    float x_scale = vd->place->width / (float) vd->source->i_visible_width;
+    float y_scale = vd->place->height / (float) vd->source->i_visible_height;
+    asc_api->ASurfaceTransaction.setScale(txn, sys->asc.sc, x_scale, y_scale);
+
+    asc_api->ASurfaceTransaction.apply(txn);
+    asc_api->ASurfaceTransaction.delete(txn);
+}
+
 static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
 {
     struct sys *sys = vd->sys;
@@ -409,6 +587,8 @@ static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
         subpicture_SetDisplaySize(vd, width, height);
 
     msg_Dbg(vd, "change display size: %dx%d", width, height);
+    if (sys->asc.sc != NULL)
+        UpdateASCGeometry(vd);
     return VLC_SUCCESS;
 }
 
@@ -429,11 +609,18 @@ static int Control(vout_display_t *vd, int query)
                 vd->source->i_visible_height,
                 vd->source->i_sar_num,
                 vd->source->i_sar_den);
-
-        SetVideoLayout(vd);
+        if (sys->asc.sc != NULL)
+            UpdateASCGeometry(vd);
+        else
+            SetVideoLayout(vd);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
+        msg_Dbg(vd, "change source place: %dx%d @ %ux%u",
+                vd->place->x, vd->place->y,
+                vd->place->width, vd->place->height);
+        if (sys->asc.sc != NULL)
+            UpdateASCGeometry(vd);
         return VLC_SUCCESS;
     default:
         msg_Warn(vd, "Unknown request in android-display: %d", query);
@@ -448,10 +635,62 @@ static void Close(vout_display_t *vd)
     if (sys->can_set_video_layout)
         AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0, 0, 0);
 
+    if (sys->asc.sc != NULL)
+    {
+        struct asurface_control_api *asc_api = sys->avctx->asc_api;
+
+        if (sys->asc.previous_picture != NULL)
+            picture_Release(sys->asc.previous_picture);
+        asc_api->ASurfaceControl.release(sys->asc.sc);
+    }
+
     if (sys->sub.window != NULL)
         subpicture_CloseDisplay(vd);
 
     free(sys);
+}
+
+static int CreateSurfaceControl(vout_display_t *vd)
+{
+    struct sys *sys = vd->sys;
+    struct asurface_control_api *asc_api = sys->avctx->asc_api;
+    assert(asc_api != NULL); /* If AIR is used, then ASC must be avalaible */
+
+    /* Connect to the SurfaceView */
+    ANativeWindow *video = AWindowHandler_getANativeWindow(sys->awh, AWindow_Video);
+    if (video == NULL)
+        return VLC_EGENERIC;
+
+    ASurfaceControl *sc =
+        asc_api->ASurfaceControl.createFromWindow(video, "vlc_video_control");
+
+    if (sc == NULL)
+        return VLC_EGENERIC;
+
+    ASurfaceTransaction *txn = asc_api->ASurfaceTransaction.create();
+    if (txn == NULL)
+    {
+        asc_api->ASurfaceControl.release(sc);
+        return VLC_EGENERIC;
+    }
+
+    asc_api->ASurfaceTransaction.setVisibility(txn, sc,
+                    ASURFACE_TRANSACTION_VISIBILITY_SHOW);
+    asc_api->ASurfaceTransaction.setBufferTransparency(txn, sc,
+                    ASURFACE_TRANSACTION_TRANSPARENCY_OPAQUE);
+
+    /* Set colorspace */
+    int32_t dataspace = video_format_to_adataspace(vd->source);
+    if (dataspace != ADATASPACE_UNKNOWN)
+        asc_api->ASurfaceTransaction.setBufferDataSpace(txn, sc, dataspace);
+
+    asc_api->ASurfaceTransaction.apply(txn);
+    asc_api->ASurfaceTransaction.delete(txn);
+
+    sys->asc.sc = sc;
+    sys->asc.previous_picture = NULL;
+
+    return VLC_SUCCESS;
 }
 
 static int Open(vout_display_t *vd,
@@ -482,13 +721,26 @@ static int Open(vout_display_t *vd,
 
     sys->awh = awh;
     sys->can_set_video_layout = can_set_video_layout;
+    sys->asc.sc = NULL;
     sys->avctx = vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_AWINDOW);
     assert(sys->avctx);
+
     if (sys->avctx->texture != NULL)
     {
         /* video context configured for opengl */
         free(sys);
         return VLC_EGENERIC;
+    }
+
+    if (sys->avctx->air != NULL)
+    {
+        int ret = CreateSurfaceControl(vd);
+        if (ret == VLC_EGENERIC)
+        {
+            free(sys);
+            return VLC_EGENERIC;
+        }
+        msg_Dbg(vd, "Using new ASurfaceControl");
     }
 
     const bool has_subtitle_surface =
@@ -510,18 +762,33 @@ static int Open(vout_display_t *vd,
         sys->sub.window = NULL;
     }
 
-    SetVideoLayout(vd);
+    if (sys->asc.sc != NULL)
+        UpdateASCGeometry(vd);
+    else
+        SetVideoLayout(vd);
 
-    static const struct vlc_display_operations ops = {
-        .close = Close,
-        .prepare = Prepare,
-        .display = Display,
-        .set_display_size = SetDisplaySize,
-        .control = Control,
-        .set_viewpoint = NULL,
-    };
-
-    vd->ops = &ops;
+    if (sys->asc.sc != NULL)
+    {
+        static const struct vlc_display_operations ops = {
+            .close = Close,
+            .prepare = PrepareWithASC,
+            .display = DisplayWithASC,
+            .set_display_size = SetDisplaySize,
+            .control = Control,
+        };
+        vd->ops = &ops;
+    }
+    else
+    {
+        static const struct vlc_display_operations ops = {
+            .close = Close,
+            .prepare = Prepare,
+            .display = Display,
+            .set_display_size = SetDisplaySize,
+            .control = Control,
+        };
+        vd->ops = &ops;
+    }
 
     return VLC_SUCCESS;
 }
