@@ -38,8 +38,6 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-typedef ANativeWindow* (*ptr_ANativeWindow_fromSurfaceTexture)(JNIEnv*, jobject);
-
 typedef void (*ptr_ASurfaceTexture_getTransformMatrix)
                                         (ASurfaceTexture *st, float mtx[16]);
 typedef ASurfaceTexture* (*ptr_ASurfaceTexture_fromSurfaceTexture)
