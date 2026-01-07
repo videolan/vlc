@@ -1278,10 +1278,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     return VLC_SUCCESS;
 }
 
-static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_format_t *fmt, vlc_video_context *vctx,
-                                              bool allow_processor)
+static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_format_t *fmt, vlc_video_context *vctx)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+    bool allow_processor = false;
 
     const d3d_format_t *res = nullptr;
 
@@ -1493,7 +1493,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
         }
     }
     else
-        sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, quad_fmt, vctx, false);
+        sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, quad_fmt, vctx);
     if ( !sys->picQuad.generic.textureFormat )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
