@@ -49,6 +49,8 @@ T.ItemDelegate {
 
     // Aliases
 
+    property alias mediaCover: picture
+
     property alias image: picture.source
     property alias cacheImage: picture.cacheImage
     property alias fallbackImage: picture.fallbackImageSource
