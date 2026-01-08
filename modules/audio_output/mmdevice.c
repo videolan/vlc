@@ -1331,6 +1331,7 @@ static void Close(vlc_object_t *);
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
+    wchar_t *audio_device = NULL;
 
     aout_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -1365,7 +1366,6 @@ static int Open(vlc_object_t *obj)
 
     aout_HotplugReport(aout, default_device_b, _("Default"));
 
-    wchar_t *audio_device = NULL;
     char *saved_device_b = var_InheritString(aout, "mmdevice-audio-device");
     if (saved_device_b != NULL && strcmp(saved_device_b, default_device_b) != 0)
     {
@@ -1405,6 +1405,7 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
+    free(audio_device);
     if (sys->work_event != NULL)
         CloseHandle(sys->work_event);
     free(sys);
