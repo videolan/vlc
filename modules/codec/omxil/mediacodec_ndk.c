@@ -109,9 +109,6 @@ typedef media_status_t (*pf_AMediaCodec_releaseOutputBuffer)(AMediaCodec*,
 typedef media_status_t (*pf_AMediaCodec_releaseOutputBufferAtTime)(AMediaCodec*,
         size_t idx, int64_t timestampNs);
 
-typedef media_status_t (*pf_AMediaCodec_setOutputSurface)(AMediaCodec*,
-        ANativeWindow *surface);
-
 typedef AMediaFormat *(*pf_AMediaFormat_new)();
 typedef media_status_t (*pf_AMediaFormat_delete)(AMediaFormat*);
 
@@ -141,7 +138,6 @@ struct syms
         pf_AMediaCodec_getOutputBuffer getOutputBuffer;
         pf_AMediaCodec_releaseOutputBuffer releaseOutputBuffer;
         pf_AMediaCodec_releaseOutputBufferAtTime releaseOutputBufferAtTime;
-        pf_AMediaCodec_setOutputSurface setOutputSurface;
     } AMediaCodec;
     struct {
         pf_AMediaFormat_new new;
@@ -176,7 +172,6 @@ static struct members members[] =
     { "AMediaCodec_getOutputBuffer", OFF(getOutputBuffer), true },
     { "AMediaCodec_releaseOutputBuffer", OFF(releaseOutputBuffer), true },
     { "AMediaCodec_releaseOutputBufferAtTime", OFF(releaseOutputBufferAtTime), true },
-    { "AMediaCodec_setOutputSurface", OFF(setOutputSurface), false },
 #undef OFF
 #define OFF(x) offsetof(struct syms, AMediaFormat.x)
     { "AMediaFormat_new", OFF(new), true },
@@ -560,19 +555,6 @@ static int ReleaseOutputAtTime(mc_api *api, int i_index, int64_t i_ts_ns)
 }
 
 /*****************************************************************************
- * SetOutputSurface
- *****************************************************************************/
-static int SetOutputSurface(mc_api *api, void *p_surface)
-{
-    assert(p_surface != NULL);
-    mc_api_sys *p_sys = api->p_sys;
-
-    return syms.AMediaCodec.setOutputSurface != NULL
-        && syms.AMediaCodec.setOutputSurface(p_sys->p_codec, p_surface)
-        == AMEDIA_OK ? 0 : MC_API_ERROR;
-}
-
-/*****************************************************************************
  * Clean
  *****************************************************************************/
 static void Clean(mc_api *api)
@@ -624,7 +606,6 @@ int MediaCodecNdk_Init(mc_api *api)
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
     api->release_out_ts = ReleaseOutputAtTime;
-    api->set_output_surface = SetOutputSurface;
 
     api->b_support_rotation = true;
     return 0;

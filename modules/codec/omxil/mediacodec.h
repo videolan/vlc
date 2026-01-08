@@ -185,10 +185,6 @@ struct mc_api
 
     /* render a buffer at a specified ts */
     int (*release_out_ts)(mc_api *, int i_index, int64_t i_ts_ns);
-
-    /* Dynamically sets the output surface
-     * Returns 0 on success, or MC_API_ERROR */
-    int (*set_output_surface)(mc_api*, void *p_surface);
 };
 
 #endif
