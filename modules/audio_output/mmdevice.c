@@ -1332,6 +1332,7 @@ static void Close(vlc_object_t *);
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
+    wchar_t *audio_device = NULL;
 
     aout_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -1351,7 +1352,6 @@ static int Open(vlc_object_t *obj)
     sys->gain = 1.f;
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
-    sys->device_name = NULL;
     sys->default_device_changed = false;
 
     if (!var_CreateGetBool(aout, "volume-save"))
@@ -1370,17 +1370,17 @@ static int Open(vlc_object_t *obj)
     char *saved_device_b = var_InheritString(aout, "mmdevice-audio-device");
     if (saved_device_b != NULL && strcmp(saved_device_b, default_device_b) != 0)
     {
-        sys->device_name = ToWide(saved_device_b);
+        audio_device = ToWide(saved_device_b);
         free(saved_device_b);
 
-        if (unlikely(sys->device_name == NULL))
+        if (unlikely(audio_device == NULL))
             goto error;
     }
     else
     {
         free(saved_device_b);
-        sys->device_name = NULL;
     }
+    sys->device_name = audio_device;
     sys->device_status = DEVICE_PENDING;
 
     if (vlc_clone(&sys->thread, MMThread, aout))
@@ -1406,6 +1406,7 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
+    free(audio_device);
     if (sys->work_event != NULL)
         CloseHandle(sys->work_event);
     free(sys);
