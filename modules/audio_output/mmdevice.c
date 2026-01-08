@@ -748,14 +748,18 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
     assert(sys->device_status != DEVICE_PENDING);
 
     sys->device_status = DEVICE_PENDING;
+    wchar_t *selected_device_name = NULL;
+    bool new_string = false;
     if (id != NULL && strcmp(id, default_device_b) != 0)
     {
-        sys->device_name = ToWide(id); /* FIXME leak */
-        if (unlikely(sys->device_name == NULL))
-            return -1;
+        new_string = true;
+        selected_device_name = ToWide(id);
     }
-    else
-        sys->device_name = NULL;
+    wchar_t *previous = sys->device_name;
+    sys->device_name = selected_device_name;
+    free(previous);
+    if (unlikely(selected_device_name == NULL && new_string))
+        return -1;
 
     return DeviceRequestLocked(aout);
 }
@@ -866,7 +870,9 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
             if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED ||
                          hr == AUDCLNT_E_RESOURCES_INVALIDATED))
             {
+                wchar_t *previous = sys->device_name;
                 sys->device_name = NULL;
+                free(previous);
                 sys->device_status = DEVICE_PENDING;
                 /* The restart of the stream will be requested asynchronously */
             }
@@ -925,6 +931,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
          * "Do not use eMultimedia" says MSDN. */
         msg_Dbg(aout, "using default device");
         sys->device_name = NULL;
+        free(current);
         current = NULL;
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(it, eRender,
                                                          eConsole, &sys->dev);
@@ -1363,7 +1370,7 @@ static int Open(vlc_object_t *obj)
     char *saved_device_b = var_InheritString(aout, "mmdevice-audio-device");
     if (saved_device_b != NULL && strcmp(saved_device_b, default_device_b) != 0)
     {
-        sys->device_name = ToWide(saved_device_b); /* FIXME leak */
+        sys->device_name = ToWide(saved_device_b);
         free(saved_device_b);
 
         if (unlikely(sys->device_name == NULL))
