@@ -748,15 +748,20 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
     assert(sys->device_status != DEVICE_PENDING);
 
     sys->device_status = DEVICE_PENDING;
+    wchar_t *previous;
     if (id != NULL && strcmp(id, default_device_b) != 0)
     {
         wchar_t *selected_device_name = ToWide(id);
-        atomic_store(&sys->device_name, selected_device_name);
+        previous = atomic_exchange(&sys->device_name, selected_device_name);
         if (unlikely(selected_device_name == NULL))
+        {
+            free(previous);
             return -1;
+        }
     }
     else
-        atomic_store(&sys->device_name, NULL);
+        previous = atomic_exchange(&sys->device_name, NULL);
+    free(previous);
 
     return DeviceRequestLocked(aout);
 }
@@ -867,7 +872,8 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
             if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED ||
                          hr == AUDCLNT_E_RESOURCES_INVALIDATED))
             {
-                atomic_store(&sys->device_name, NULL);
+                wchar_t *previous = atomic_exchange(&sys->device_name, NULL);
+                free(previous);
                 sys->device_status = DEVICE_PENDING;
                 /* The restart of the stream will be requested asynchronously */
             }
@@ -925,6 +931,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     {   /* Default device selected by policy and with stream routing.
          * "Do not use eMultimedia" says MSDN. */
         msg_Dbg(aout, "using default device");
+        free(current);
         current = NULL;
         atomic_store(&sys->device_name, NULL);
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(it, eRender,
