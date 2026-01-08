@@ -901,18 +901,19 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
 
     /* Yes, it's perfectly valid to request the same device, see Start()
      * comments. */
-    if (sys->device_name != NULL) /* Device selected explicitly */
+    wchar_t *current = sys->device_name;
+    if (current != NULL) /* Device selected explicitly */
     {
-        hr = IMMDeviceEnumerator_GetDevice(it, sys->device_name, &sys->dev);
+        hr = IMMDeviceEnumerator_GetDevice(it, current, &sys->dev);
         if (FAILED(hr))
         {
             msg_Err(aout, "cannot get selected device %ls (error 0x%lX)",
-                    sys->device_name, hr);
+                    current, hr);
             hr = AUDCLNT_E_DEVICE_INVALIDATED;
         }
         else
         {
-            msg_Dbg(aout, "using selected device %ls", sys->device_name);
+            msg_Dbg(aout, "using selected device %ls", current);
             sys->device_status = DEVICE_ACQUIRED;
         }
     }
@@ -923,18 +924,18 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     {   /* Default device selected by policy and with stream routing.
          * "Do not use eMultimedia" says MSDN. */
         msg_Dbg(aout, "using default device");
+        current = NULL;
+        sys->device_name = NULL;
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(it, eRender,
                                                          eConsole, &sys->dev);
         if (FAILED(hr))
         {
             msg_Err(aout, "cannot get default device (error 0x%lX)", hr);
             sys->device_status = DEVICE_ACQUISITION_FAILED;
-            sys->device_name = NULL;
         }
         else
         {
             sys->device_status = DEVICE_ACQUIRED;
-            sys->device_name = NULL;
         }
     }
 
@@ -948,7 +949,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     }
 
     /* Report actual device */
-    if (sys->device_name == NULL)
+    if (current == NULL)
         aout_DeviceReport(aout, default_device_b);
     else
     {
