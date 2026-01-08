@@ -389,26 +389,6 @@ static bool HasX11( vlc_object_t *obj )
 }
 #endif
 
-#ifdef QT5_HAS_WAYLAND
-# include <wayland-client.h>
-
-static void *ThreadWayland( void *data )
-{
-    char platform_name[] = "wayland";
-    return ThreadPlatform( data, platform_name );
-}
-
-static bool HasWayland( void )
-{
-    struct wl_display *dpy = wl_display_connect( NULL );
-    if( dpy == NULL )
-        return false;
-
-    wl_display_disconnect( dpy );
-    return true;
-}
-#endif
-
 bool isDarkPaletteEnabled(intf_thread_t *p_intf) {
     static const bool darkPalette = var_InheritBool( p_intf, "qt-dark-palette" );
     return darkPalette;
@@ -477,13 +457,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     if( HasX11( p_this ) )
         thread = ThreadXCB;
     else
-#endif
-#ifdef QT5_HAS_WAYLAND
-    if( HasWayland() )
-        thread = ThreadWayland;
-    else
-#endif
-#if defined (QT5_HAS_X11) || defined (QT5_HAS_WAYLAND)
         return VLC_EGENERIC;
 #endif
 

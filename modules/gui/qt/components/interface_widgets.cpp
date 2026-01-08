@@ -59,10 +59,6 @@ static inline int qrand() {
 #  include <xcb/xproto.h>
 # endif
 #endif
-#ifdef QT5_HAS_WAYLAND
-# include QPNI_HEADER
-# include <QWindow>
-#endif
 
 #if defined(_WIN32)
 #include <QWindow>
@@ -164,27 +160,6 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
         case VOUT_WINDOW_TYPE_NSOBJECT:
             p_wnd->handle.nsobject = (void *)stable->winId();
             break;
-#ifdef QT5_HAS_WAYLAND
-        case VOUT_WINDOW_TYPE_WAYLAND:
-        {
-            /* Ensure only the video widget is native (needed for Wayland) */
-            stable->setAttribute( Qt::WA_DontCreateNativeAncestors, true);
-
-            QWindow *window = stable->windowHandle();
-            assert(window != NULL);
-            window->create();
-
-            QPlatformNativeInterface *qni = qApp->platformNativeInterface();
-            assert(qni != NULL);
-
-            p_wnd->handle.wl = static_cast<wl_surface*>(
-                qni->nativeResourceForWindow(QByteArrayLiteral("surface"),
-                                             window));
-            p_wnd->display.wl = static_cast<wl_display*>(
-                qni->nativeResourceForIntegration(QByteArrayLiteral("wl_display")));
-            break;
-        }
-#endif
         default:
             vlc_assert_unreachable();
     }
