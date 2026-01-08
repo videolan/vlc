@@ -182,7 +182,6 @@ static struct members members[] =
 #undef OFF
     { NULL, 0, false }
 };
-#undef OFF
 
 /* Initialize all symbols.
  * Done only one time during the first initialisation */
