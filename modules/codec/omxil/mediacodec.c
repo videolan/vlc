@@ -72,7 +72,7 @@ typedef void (*dec_on_flush_cb)(struct decoder_sys_t *);
 typedef int (*dec_process_output_cb)(decoder_t *, mc_api_out *, picture_t **,
                                      block_t **);
 
-struct android_picture_ctx
+struct asurface_picture_ctx
 {
     picture_context_t s;
     atomic_uint refs;
@@ -128,7 +128,7 @@ typedef struct decoder_sys_t
         struct
         {
             vlc_video_context *ctx;
-            struct android_picture_ctx apic_ctxs[MAX_PIC];
+            struct asurface_picture_ctx apic_ctxs[MAX_PIC];
             void *p_surface;
             unsigned i_angle;
             unsigned i_input_offset_x, i_input_offset_y;
@@ -544,7 +544,7 @@ static void StopMediaCodec(decoder_sys_t *p_sys)
     p_sys->api.stop(&p_sys->api);
 }
 
-static bool AndroidPictureContextRelease(struct android_picture_ctx *apctx,
+static bool AndroidPictureContextRelease(struct asurface_picture_ctx *apctx,
                                          bool render)
 {
     int index = atomic_exchange(&apctx->index, -1);
@@ -562,8 +562,8 @@ static bool AndroidPictureContextRelease(struct android_picture_ctx *apctx,
 
 static bool PictureContextRenderPic(struct picture_context_t *ctx)
 {
-    struct android_picture_ctx *apctx =
-        container_of(ctx, struct android_picture_ctx, s);
+    struct asurface_picture_ctx *apctx =
+        container_of(ctx, struct asurface_picture_ctx, s);
 
     return AndroidPictureContextRelease(apctx, true);
 }
@@ -571,8 +571,8 @@ static bool PictureContextRenderPic(struct picture_context_t *ctx)
 static bool PictureContextRenderPicTs(struct picture_context_t *ctx,
                                       vlc_tick_t ts)
 {
-    struct android_picture_ctx *apctx =
-        container_of(ctx, struct android_picture_ctx, s);
+    struct asurface_picture_ctx *apctx =
+        container_of(ctx, struct asurface_picture_ctx, s);
 
     int index = atomic_exchange(&apctx->index, -1);
     if (index >= 0)
@@ -597,19 +597,19 @@ PictureContextGetTexture(picture_context_t *context)
     return p_sys->video.surfacetexture;
 }
 
-static void PictureContextDestroy(struct picture_context_t *ctx)
+static void ASurfacePictureContextDestroy(struct picture_context_t *ctx)
 {
-    struct android_picture_ctx *apctx =
-        container_of(ctx, struct android_picture_ctx, s);
+    struct asurface_picture_ctx *apctx =
+        container_of(ctx, struct asurface_picture_ctx, s);
 
     if (atomic_fetch_sub_explicit(&apctx->refs, 1, memory_order_acq_rel) == 1)
         AndroidPictureContextRelease(apctx, false);
 }
 
-static struct picture_context_t *PictureContextCopy(struct picture_context_t *ctx)
+static struct picture_context_t *ASurfacePictureContextCopy(struct picture_context_t *ctx)
 {
-    struct android_picture_ctx *apctx =
-        container_of(ctx, struct android_picture_ctx, s);
+    struct asurface_picture_ctx *apctx =
+        container_of(ctx, struct asurface_picture_ctx, s);
 
     atomic_fetch_add_explicit(&apctx->refs, 1, memory_order_relaxed);
     vlc_video_context_Hold(ctx->vctx);
@@ -617,7 +617,7 @@ static struct picture_context_t *PictureContextCopy(struct picture_context_t *ct
 }
 
 static void AbortDecoderLocked(decoder_sys_t *p_dec);
-static void CleanFromVideoContext(void *priv)
+static void CleanFromLegacyVideoContext(void *priv)
 {
     android_video_context_t *avctx = priv;
     decoder_sys_t *p_sys = avctx->dec_opaque;
@@ -642,7 +642,7 @@ static void ReleaseAllPictureContexts(decoder_sys_t *p_sys)
 
     for (size_t i = 0; i < ARRAY_SIZE(p_sys->video.apic_ctxs); ++i)
     {
-        struct android_picture_ctx *apctx = &p_sys->video.apic_ctxs[i];
+        struct asurface_picture_ctx *apctx = &p_sys->video.apic_ctxs[i];
 
         /* Don't decrement apctx->refs, the picture_context should stay valid
          * even if the underlying buffer is released since it might still be
@@ -651,7 +651,7 @@ static void ReleaseAllPictureContexts(decoder_sys_t *p_sys)
     }
 }
 
-static struct android_picture_ctx *
+static struct asurface_picture_ctx *
 GetPictureContext(decoder_t *p_dec, unsigned index)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -661,7 +661,7 @@ GetPictureContext(decoder_t *p_dec, unsigned index)
     {
         for (size_t i = 0; i < ARRAY_SIZE(p_sys->video.apic_ctxs); ++i)
         {
-            struct android_picture_ctx *apctx = &p_sys->video.apic_ctxs[i];
+            struct asurface_picture_ctx *apctx = &p_sys->video.apic_ctxs[i];
             /* Find an available picture context (ie. refs == 0) */
             unsigned expected_refs = 0;
             if (atomic_compare_exchange_strong(&apctx->refs, &expected_refs, 1))
@@ -674,7 +674,7 @@ GetPictureContext(decoder_t *p_dec, unsigned index)
 
                 /* Unlikely: Restore the ref count and try a next one, since
                  * this picture context is being released. Cf.
-                 * PictureContextDestroy(), this function first decrement the
+                 * ASurfacePictureContextDestroy(), this function first decrement the
                  * ref count before releasing the index.  */
                 atomic_store(&apctx->refs, 0);
             }
@@ -697,7 +697,7 @@ CreateSurface(decoder_t *p_dec, vlc_decoder_device *dec_dev,
 
     static const struct vlc_video_context_operations ops =
     {
-        .destroy = CleanFromVideoContext,
+        .destroy = CleanFromLegacyVideoContext,
     };
     p_sys->video.ctx =
         vlc_video_context_Create(dec_dev, VLC_VIDEO_CONTEXT_AWINDOW,
@@ -739,10 +739,10 @@ end:
 
     for (size_t i = 0; i < ARRAY_SIZE(p_sys->video.apic_ctxs); ++i)
     {
-        struct android_picture_ctx *apctx = &p_sys->video.apic_ctxs[i];
+        struct asurface_picture_ctx *apctx = &p_sys->video.apic_ctxs[i];
 
         apctx->s = (picture_context_t) {
-            PictureContextDestroy, PictureContextCopy,
+            ASurfacePictureContextDestroy, ASurfacePictureContextCopy,
             p_sys->video.ctx,
         };
         atomic_init(&apctx->index, -1);
@@ -1208,7 +1208,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
         if (p_sys->api.b_direct_rendering)
         {
-            struct android_picture_ctx *apctx =
+            struct asurface_picture_ctx *apctx =
                 GetPictureContext(p_dec,p_out->buf.i_index);
             assert(apctx);
             assert(apctx->s.vctx);
