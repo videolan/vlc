@@ -158,10 +158,14 @@ int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
     {
         for( unsigned int i = 0; dsc && i < dsc->plane_count; i++ )
         {
-            while( dec->fmt_out.video.i_width % dsc->p[i].w.den )
-                dec->fmt_out.video.i_width++;
-            while( dec->fmt_out.video.i_height % dsc->p[i].h.den )
-                dec->fmt_out.video.i_height++;
+            unsigned int extra_padding;
+            extra_padding = dec->fmt_out.video.i_width % dsc->p[i].w.den;
+            if (extra_padding != 0)
+                dec->fmt_out.video.i_width += dsc->p[i].w.den - extra_padding;
+
+            extra_padding = dec->fmt_out.video.i_height % dsc->p[i].h.den;
+            if (extra_padding != 0)
+                dec->fmt_out.video.i_height += dsc->p[i].h.den - extra_padding;
         }
     }
 
