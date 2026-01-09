@@ -62,13 +62,19 @@ class TextureProviderObserver : public QObject
     Q_PROPERTY(bool hasMipmaps READ hasMipmaps NOTIFY hasMipmapsChanged FINAL)
     Q_PROPERTY(bool isAtlasTexture READ isAtlasTexture NOTIFY isAtlasTextureChanged FINAL)
     Q_PROPERTY(bool isValid READ isValid NOTIFY isValidChanged FINAL) // whether a texture is provided or not
+    Q_PROPERTY(qint64 comparisonKey READ comparisonKey NOTIFY comparisonKeyChanged FINAL)
 
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
 
     void setSource(const QQuickItem* source, bool enforce = false);
+
+    // The following are likely called in the QML/GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
     QSize textureSize() const;
     QSize nativeTextureSize() const;
+    qint64 comparisonKey() const;
     bool hasAlphaChannel() const;
     bool hasMipmaps() const;
     bool isAtlasTexture() const;
@@ -80,6 +86,7 @@ signals:
     void hasMipmapsChanged(bool);
     void isAtlasTextureChanged(bool);
     void isValidChanged(bool);
+    void comparisonKeyChanged(qint64);
 
 private slots:
     void updateProperties();
@@ -99,6 +106,7 @@ private:
 
     std::atomic<QSize> m_textureSize {{}}; // invalid by default
     std::atomic<QSize> m_nativeTextureSize {{}}; // invalid by default
+    std::atomic<qint64> m_comparisonKey {-1};
 
     std::atomic<bool> m_hasAlphaChannel = false;
     std::atomic<bool> m_hasMipmaps = false;

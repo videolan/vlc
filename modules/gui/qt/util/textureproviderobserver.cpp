@@ -121,42 +121,32 @@ QSize TextureProviderObserver::textureSize() const
 
 QSize TextureProviderObserver::nativeTextureSize() const
 {
-    // This is likely called in the QML/GUI thread.
-    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
-    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
     return m_nativeTextureSize.load(std::memory_order_acquire);
 }
 
 bool TextureProviderObserver::hasAlphaChannel() const
 {
-    // This is likely called in the QML/GUI thread.
-    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
-    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
     return m_hasAlphaChannel.load(std::memory_order_acquire);
 }
 
 bool TextureProviderObserver::hasMipmaps() const
 {
-    // This is likely called in the QML/GUI thread.
-    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
-    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
     return m_hasMipmaps.load(std::memory_order_acquire);
 }
 
 bool TextureProviderObserver::isAtlasTexture() const
 {
-    // This is likely called in the QML/GUI thread.
-    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
-    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
     return m_isAtlasTexture.load(std::memory_order_acquire);
 }
 
 bool TextureProviderObserver::isValid() const
 {
-    // This is likely called in the QML/GUI thread.
-    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
-    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
     return m_isValid.load(std::memory_order_acquire);
+}
+
+qint64 TextureProviderObserver::comparisonKey() const
+{
+    return m_comparisonKey.load(std::memory_order_acquire);
 }
 
 void TextureProviderObserver::updateProperties()
@@ -228,6 +218,14 @@ void TextureProviderObserver::updateProperties()
             if (!m_isValid.exchange(true, memoryOrder))
                 emit isValidChanged(true);
 
+            {
+                // Comparison key
+                const qint64 comparisonKey = texture->comparisonKey();
+
+                if (m_comparisonKey.exchange(comparisonKey, memoryOrder) != comparisonKey)
+                    emit comparisonKeyChanged(comparisonKey);
+            }
+
             return;
         }
     }
@@ -246,4 +244,7 @@ void TextureProviderObserver::updateProperties()
 
     if (m_isValid.exchange(false, memoryOrder))
         emit isValidChanged(false);
+
+    if (m_comparisonKey.exchange(-1, memoryOrder) != -1)
+        emit comparisonKeyChanged(-1);
 }
