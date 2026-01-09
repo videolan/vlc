@@ -74,10 +74,12 @@ Item {
     //          a source url, or the source url may also be lost and not tracked anymore).
     property Item textureProviderItem: sourceTextureProviderItem
 
+    readonly property Item effectiveTextureProviderItem: shaderEffect.source
+
     // NOTE:    If the texture provider used does not require `ImageExt` to load the image, this
     //          should be disabled.
     // WARNING: In non-RHI mode, this setting is not respected.
-    property bool loadImages: (shaderEffect.source === image)
+    property bool loadImages: (effectiveTextureProviderItem === image)
 
     // Padding represents how much the content is shrunk. For now this is a readonly property.
     // Currently it only takes the `softEdgeMax` into calculation, as that's what the shader
