@@ -115,11 +115,7 @@ Item {
         if (root.sourceTextureIsValid) {
             if (root._queuedScheduledUpdate) {
                 root._queuedScheduledUpdate = false
-
-                // Normally it should be fine to call `scheduleUpdate()` directly for
-                // the initial layer, even though the subsequent layers must be chained
-                // for update scheduling regardless, but old Qt seems to want it:
-                root.scheduleUpdate(true)
+                root.scheduleUpdate()
             }
         }
     }
@@ -128,7 +124,23 @@ Item {
 
     property bool _queuedScheduledUpdate: false
 
-    function scheduleUpdate(onNextAfterAnimating /* : bool */ = false) {
+    // WARNING: The QML property type is not `int` because the target property type is `qint64`.
+    readonly property var _comparisonKey: sourceTextureProviderObserver.comparisonKey
+    property var _oldComparisonKey
+
+    on_ComparisonKeyChanged: {
+        if (_comparisonKey >= 0) {
+            if (_oldComparisonKey !== undefined && _oldComparisonKey !== _comparisonKey) {
+                _oldComparisonKey = undefined
+                // If source texture is not valid, update will be requeued in `scheduleUpdate()`.
+                // That being said, a non-valid source texture should have (-1) as comparison key,
+                // which we already checked here.
+                root.scheduleUpdate()
+            }
+        }
+    }
+
+    function scheduleUpdate(onNextTextureChange /* : bool */ = false) {
         if (live)
             return // no-op
 
@@ -137,6 +149,11 @@ Item {
 
         if (!root.sourceTextureIsValid) {
             root._queuedScheduledUpdate = true // if source texture is not valid, delay the update until valid
+            return
+        }
+
+        if (onNextTextureChange) {
+            root._oldComparisonKey = root._comparisonKey
             return
         }
 
@@ -150,11 +167,7 @@ Item {
         }
 
         root._window = root.Window.window
-        if (onNextAfterAnimating) {
-            root._window.afterAnimating.connect(ds1layer, ds1layer.scheduleChainedUpdate)
-        } else {
-            ds1layer.scheduleChainedUpdate()
-        }
+        ds1layer.scheduleChainedUpdate()
     }
 
     onLiveChanged: {
@@ -162,7 +175,7 @@ Item {
             ds1layer.parent = root
             ds2layer.inhibitParent = false
         } else {
-            root.scheduleUpdate(false) // this triggers releasing intermediate layers (when applicable)
+            root.scheduleUpdate() // this triggers releasing intermediate layers (when applicable)
         }
     }
 
@@ -304,8 +317,6 @@ Item {
             ds1layer.scheduleUpdate()
 
             if (root._window) {
-                root._window.afterAnimating.disconnect(ds1layer, ds1layer.scheduleChainedUpdate)
-
                 // In four pass mode, we can release the two intermediate layers:
                 if (root.mode === DualKawaseBlur.Mode.FourPass) {
                     // Scheduling update must be done sequentially for each layer in
@@ -421,7 +432,7 @@ Item {
             if (root._queuedScheduledUpdate) {
                 // Tried calling `scheduleUpdate()` before the ongoing chained updates completed.
                 root._queuedScheduledUpdate = false
-                root.scheduleUpdate(false)
+                root.scheduleUpdate()
             }
         }
     }

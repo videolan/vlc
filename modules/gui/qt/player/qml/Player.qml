@@ -424,19 +424,12 @@ FocusScope {
                                     cover.source = targetSource
                                 }
 
+                                onSourceChanged: {
+                                    blurredBackground.scheduleUpdate(true) // onNextTextureChange
+                                }
+
                                 onStatusChanged: {
-                                    if (status === Image.Ready) {
-                                        // This also covers source (and other parameters) change and not only initial loading
-                                        if (blurredBackground.sourceTextureIsValid) {
-                                            // Possible image switch and stale texture (especially old Qt without patch c871a52), we
-                                            // should wait one frame for the texture to be updated to avoid applying blur on stale one.
-                                            blurredBackground.scheduleUpdate(true)
-                                        } else {
-                                            // If not valid, the blur effect is going to wait appropriately until valid itself:
-                                            // Initial case (such as switching to player page), or switching images with recent Qt.
-                                            blurredBackground.scheduleUpdate(false)
-                                        }
-                                    } else if (status === Image.Error) {
+                                    if (status === Image.Error) {
                                         cover.source = VLCStyle.noArtAlbumCover
                                     }
                                 }
