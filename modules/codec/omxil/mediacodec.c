@@ -689,6 +689,30 @@ GetPictureContext(decoder_t *p_dec, unsigned index)
     }
 }
 
+static picture_t*
+NewPicture(decoder_t *p_dec, vlc_tick_t ts)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* If the oldest input block had no PTS, the timestamp of
+     * the frame returned by MediaCodec might be wrong so we
+     * overwrite it with the corresponding dts. Call FifoGet
+     * first in order to avoid a gap if buffers are released
+     * due to an invalid format or a preroll */
+    vlc_tick_t forced_ts = timestamp_FifoGet(p_sys->video.timestamp_fifo);
+
+    picture_t *p_pic = decoder_NewPicture(p_dec);
+    if (p_pic == NULL)
+        return NULL;
+
+    if (forced_ts == VLC_TICK_INVALID)
+        p_pic->date = ts;
+    else
+        p_pic->date = forced_ts;
+    p_pic->b_progressive = true;
+    return p_pic;
+}
+
 static int
 CreateSurface(decoder_t *p_dec, vlc_decoder_device *dec_dev,
               AWindowHandler *awh, bool use_surfacetexture)
@@ -1170,41 +1194,31 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
     if (p_out->type == MC_OUT_TYPE_BUF)
     {
-        picture_t *p_pic = NULL;
-
-        /* If the oldest input block had no PTS, the timestamp of
-         * the frame returned by MediaCodec might be wrong so we
-         * overwrite it with the corresponding dts. Call FifoGet
-         * first in order to avoid a gap if buffers are released
-         * due to an invalid format or a preroll */
-        int64_t forced_ts = timestamp_FifoGet(p_sys->video.timestamp_fifo);
-
         if (!p_sys->b_has_format) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
+            timestamp_FifoGet(p_sys->video.timestamp_fifo); /* Remove timestamp */
             return p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
         }
 
         if (p_out->buf.i_ts <= p_sys->i_preroll_end)
+        {
+            timestamp_FifoGet(p_sys->video.timestamp_fifo); /* Remove timestamp */
             return p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
+        }
 
         if (!p_sys->api.b_direct_rendering && p_out->buf.p_ptr == NULL)
         {
             /* This can happen when receiving an EOS buffer */
             msg_Warn(p_dec, "Invalid buffer, dropping frame");
+            timestamp_FifoGet(p_sys->video.timestamp_fifo); /* Remove timestamp */
             return p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
         }
 
-        p_pic = decoder_NewPicture(p_dec);
+        picture_t *p_pic = NewPicture(p_dec, p_out->buf.i_ts);
         if (!p_pic) {
             msg_Warn(p_dec, "NewPicture failed");
             return p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
         }
-
-        if (forced_ts == VLC_TICK_INVALID)
-            p_pic->date = p_out->buf.i_ts;
-        else
-            p_pic->date = forced_ts;
-        p_pic->b_progressive = true;
 
         if (p_sys->api.b_direct_rendering)
         {
