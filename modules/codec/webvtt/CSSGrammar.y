@@ -86,6 +86,7 @@ static void yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
 
 %token WHITESPACE SGML_CD
 %token TOKEN_EOF 0
+%token MEMERROR
 
 %token INCLUDES
 %token DASHMATCH
@@ -178,6 +179,9 @@ static void yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
 
 stylesheet:
     maybe_space maybe_charset maybe_sgml rule_list
+    | MEMERROR { // catch alloc failures from lexer
+        YYNOMEM;
+    }
   ;
 
 maybe_space:
