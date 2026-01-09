@@ -71,9 +71,9 @@ range		\?{1,6}|{h}(\?{0,5}|{h}(\?{0,4}|{h}(\?{0,3}|{h}(\?{0,2}|{h}(\??|{h})))))
 "$="			{return ENDSWITH;}
 "*="			{return CONTAINS;}
 
-{string}		{ yylval->string = vlc_css_unquotedunescaped(yytext); return STRING;}
+{string}		{ return (yylval->string = vlc_css_unquotedunescaped(yytext)) ? STRING : MEMERROR; }
 
-{ident}			{ yylval->string = vlc_css_unescaped(yytext); return IDENT;}
+{ident}			{ return (yylval->string = vlc_css_unquotedunescaped(yytext)) ? IDENT : MEMERROR; }
 
 "@font-face"		{return FONT_FACE_SYM;}
 
@@ -98,13 +98,13 @@ range		\?{1,6}|{h}(\?{0,5}|{h}(\?{0,4}|{h}(\?{0,3}|{h}(\?{0,2}|{h}(\??|{h})))))
 {num}%			{ VAL( atoi(yytext), PERCENT ); return PERCENTAGE;}
 {num}			{ VAL( vlc_strtof_c(yytext, &d), NONE ); return NUMBER;}
 
-"url("{w}{string}{w}")"	{ yylval->string = vlc_css_unquotedunescaped(yytext); return URI;}
-"url("{w}{url}{w}")"	{ yylval->string = vlc_css_unquotedunescaped(yytext); return URI;}
-{ident}"("		{ yylval->string = vlc_css_unescaped(yytext); return FUNCTION;}
-"#"{ident}      {yylval->string = vlc_css_unescaped(yytext); return IDSEL;}
-"#"{name}       {yylval->string = vlc_css_unescaped(yytext); return HASH;}
+"url("{w}{string}{w}")"	{ return (yylval->string = vlc_css_unquotedunescaped(yytext)) ? URI : MEMERROR; }
+"url("{w}{url}{w}")"	{ return (yylval->string = vlc_css_unquotedunescaped(yytext)) ? URI : MEMERROR; }
+{ident}"("		{ return (yylval->string = vlc_css_unquotedunescaped(yytext)) ? FUNCTION : MEMERROR; }
+"#"{ident}      { return (yylval->string = vlc_css_unquotedunescaped(yytext)) ? IDSEL : MEMERROR; }
+"#"{name}       { return (yylval->string = vlc_css_unquotedunescaped(yytext)) ? HASH : MEMERROR; }
 
-U\+{range}		{ yylval->string = strdup(yytext); return UNICODERANGE;}
-U\+{h}{1,6}-{h}{1,6}	{ yylval->string = strdup(yytext); return UNICODERANGE;}
+U\+{range}		{ return (yylval->string = strdup(yytext)) ? UNICODERANGE : MEMERROR; }
+U\+{h}{1,6}-{h}{1,6}	{ return (yylval->string = strdup(yytext)) ? UNICODERANGE : MEMERROR; }
 
 .			{return *yytext;}
