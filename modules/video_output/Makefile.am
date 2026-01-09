@@ -357,10 +357,17 @@ libglinterop_asurface_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
 libglinterop_asurface_plugin_la_LIBADD = libandroid_env.la libandroid_utils.la \
 	$(EGL_LIBS) $(GLES2_LIBS)
 
+libglinterop_aimage_plugin_la_SOURCES = video_output/opengl/interop_aimage.c \
+	video_output/opengl/interop.h
+libglinterop_aimage_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
+libglinterop_aimage_plugin_la_LIBADD = libandroid_utils.la \
+	$(EGL_LIBS) $(GLES2_LIBS)
+
 if HAVE_ANDROID
 vout_LTLIBRARIES += libandroid_window_plugin.la libandroid_display_plugin.la
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_android_plugin.la libglinterop_asurface_plugin.la
+vout_LTLIBRARIES += libegl_android_plugin.la libglinterop_asurface_plugin.la \
+	libglinterop_aimage_plugin.la
 endif
 endif
 
