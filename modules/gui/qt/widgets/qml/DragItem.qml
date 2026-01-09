@@ -613,7 +613,26 @@ Item {
         x: dragItem.coversXPos(_displayedCoversCount - 1) + dragItem.coverSize + VLCStyle.margin_small
 
         visible: text && text !== ""
-        text: qsTr("%1 selected").arg(dragItem._indexesSize)
+        text: {
+            const data = dragItem._data[0]
+            const title = data?.title
+            if (dragItem._indexesSize === 1) {
+                const extra = (data?.nb_tracks > 0) ? qsTr("\n%1 track(s)").arg(data.nb_tracks)
+                                                    : ((data?.count > 0) ? qsTr("\n%1 item(s)").arg(data.count)
+                                                                         : "")
+                if (title && title.length > 0) {
+                    return title + extra
+                } else {
+                    const name = dragItem._data[0]?.name
+                    if (name && name.length > 0)
+                        return name + extra
+                    else
+                        return qsTr("1 selected")
+                }
+            } else {
+                return qsTr("%1 selected").arg(dragItem._indexesSize)
+            }
+        }
         color: theme.fg.secondary
     }
 
