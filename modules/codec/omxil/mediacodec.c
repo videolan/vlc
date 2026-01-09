@@ -1214,12 +1214,6 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             return p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
         }
 
-        picture_t *p_pic = NewPicture(p_dec, p_out->buf.i_ts);
-        if (!p_pic) {
-            msg_Warn(p_dec, "NewPicture failed");
-            return p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
-        }
-
         if (p_sys->api.b_direct_rendering)
         {
             struct asurface_picture_ctx *apctx =
@@ -1228,7 +1222,14 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             assert(apctx->s.vctx);
             vlc_video_context_Hold(apctx->s.vctx);
             p_pic->context = &apctx->s;
+            *pp_out_pic = p_pic;
         } else {
+            picture_t *p_pic = NewPicture(p_dec, p_out->buf.i_ts);
+            if (!p_pic) {
+                msg_Warn(p_dec, "NewPicture failed");
+                return p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
+            }
+
             unsigned int chroma_div;
             GetVlcChromaSizes(p_dec->fmt_out.i_codec,
                               p_dec->fmt_out.video.i_width,
@@ -1243,9 +1244,8 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
                 picture_Release(p_pic);
                 return -1;
             }
+            *pp_out_pic = p_pic;
         }
-        assert(!(*pp_out_pic));
-        *pp_out_pic = p_pic;
         return 1;
     } else {
         assert(p_out->type == MC_OUT_TYPE_CONF);
