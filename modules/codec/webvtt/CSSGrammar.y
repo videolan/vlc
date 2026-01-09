@@ -776,7 +776,7 @@ term:
   | UNICODERANGE maybe_space { $$.type = TYPE_UNICODERANGE; $$.psz = $1; }
   | IDSEL maybe_space { $$.type = TYPE_HEXCOLOR; $$.psz = $1; }
   | HASH maybe_space { $$.type = TYPE_HEXCOLOR; $$.psz = $1; }
-  | '#' maybe_space { $$.type = TYPE_HEXCOLOR; $$.psz = NULL; } /* Handle error case: "color: #;" */
+  | '#' maybe_space { $$.type = TYPE_INVALID; } /* Handle error case: "color: #;" */
   /* FIXME: according to the specs a function can have a unary_operator in front. I know no case where this makes sense */
   | function {
       $$ = $1;

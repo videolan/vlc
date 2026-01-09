@@ -37,6 +37,7 @@ typedef struct
     vlc_css_expr_t *function;
     enum
     {
+        TYPE_INVALID,
         TYPE_NONE = 0,
         TYPE_EMS,
         TYPE_EXS,
