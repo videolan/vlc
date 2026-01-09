@@ -521,7 +521,12 @@ Item {
                     }
                 }
 
-                readonly property var _combinedStatus: [status, shaderStatus]
+                TextureProviderObserver {
+                    id: tpObserver
+                    source: artworkCover.effectiveTextureProviderItem
+                }
+
+                readonly property var _combinedStatus: [status, shaderStatus, tpObserver.isValid]
 
                 on_CombinedStatusChanged: {
                     // Qt `ShaderEffect` documentation states:
@@ -543,7 +548,7 @@ Item {
                         } else {
                             source = fallbackSource
                         }
-                    } else if (status === Image.Ready /* && shaderStatus === ShaderEffect.Compiled */) {
+                    } else if (status === Image.Ready && tpObserver.isValid /* && shaderStatus === ShaderEffect.Compiled */) {
                         // FIXME: When Qt starts to report `ShaderEffect.Compiled` properly, start using it.
                         _triggerReadiness = true // Only in this case the image is loaded and shown.
                     }
