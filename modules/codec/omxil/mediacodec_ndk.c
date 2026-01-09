@@ -103,9 +103,9 @@ static int ConfigureDecoder(mc_api *api, union mc_api_args *p_args)
         AMediaFormat_setInt32(p_sys->p_format, "height", p_args->video.i_height);
         AMediaFormat_setInt32(p_sys->p_format, "rotation-degrees", p_args->video.i_angle);
 
-        AMediaFormat_setInt32(p_sys->p_format, "color-range", p_args->video.color_range);
-        AMediaFormat_setInt32(p_sys->p_format, "color-standard", p_args->video.color_standard);
-        AMediaFormat_setInt32(p_sys->p_format, "color-transfer", p_args->video.color_transfer);
+        AMediaFormat_setInt32(p_sys->p_format, "color-range", p_args->video.color.range);
+        AMediaFormat_setInt32(p_sys->p_format, "color-standard", p_args->video.color.standard);
+        AMediaFormat_setInt32(p_sys->p_format, "color-transfer", p_args->video.color.transfer);
 
         if (p_args->video.p_surface)
         {
