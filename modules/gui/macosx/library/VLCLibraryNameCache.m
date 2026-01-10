@@ -28,6 +28,8 @@
 
 #include <vlc_media_library.h>
 
+const NSUInteger kVLCMaximumLibraryNameCacheSize = 1024 * 1024 * 1; // 1MB
+
 @implementation VLCLibraryNameCache {
     NSCache<NSNumber *, NSString *> *_albumTitleCache;
     NSCache<NSNumber *, NSString *> *_albumArtistCache;
@@ -53,6 +55,11 @@
         _albumArtistCache = [NSCache new];
         _artistNameCache = [NSCache new];
         _genreNameCache = [NSCache new];
+
+        _albumTitleCache.totalCostLimit = kVLCMaximumLibraryNameCacheSize;
+        _albumArtistCache.totalCostLimit = kVLCMaximumLibraryNameCacheSize;
+        _artistNameCache.totalCostLimit = kVLCMaximumLibraryNameCacheSize;
+        _genreNameCache.totalCostLimit = kVLCMaximumLibraryNameCacheSize;
 
         NSNotificationCenter * const center = NSNotificationCenter.defaultCenter;
         [center addObserver:self
