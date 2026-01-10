@@ -108,6 +108,13 @@ vlc_modules += {
     'dependencies' : [m_lib]
 }
 
+# Intro skip detector module
+vlc_modules += {
+    'name' : 'introskip',
+    'sources' : files('introskip.c'),
+    'dependencies' : [m_lib]
+}
+
 
 ## Channel mixer
 
