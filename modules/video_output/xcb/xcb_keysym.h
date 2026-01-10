@@ -44,7 +44,7 @@
         { XK_KP_Add,        '+', },
         { XK_KP_Separator,  ',', },
         { XK_KP_Subtract,   '-', },
-        { XK_KP_Decimal,    ',', }, /* FIXME: I don't know that key */
+        { XK_KP_Decimal,    '.', }, /* Numeric keypad decimal point */
         { XK_KP_Divide,     '/', },
         { XK_KP_0,          '0', },
         { XK_KP_1,          '1', },

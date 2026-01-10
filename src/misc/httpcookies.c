@@ -106,7 +106,9 @@ static char *cookie_get_domain( const char *cookie )
 static bool cookie_domain_matches( const http_cookie_t *cookie,
                                    const char *host )
 {
-    // TODO: should convert domain names to punycode before comparing
+    /* TODO: should convert domain names to punycode (RFC 3492) before comparing
+     * for proper Internationalized Domain Names (IDN) support.
+     * See: libidn2 or ICU library for implementation. */
 
     if (host == NULL)
         return false;
@@ -369,7 +371,7 @@ char *vlc_http_cookies_fetch(vlc_http_cookie_jar_t *p_jar, bool secure,
                           cookie->psz_name ? cookie->psz_name : "",
                           cookie->psz_value ? cookie->psz_value : "") == -1 )
             {
-                // TODO: report error
+                msg_Err( p_jar->p_parent, "Failed to allocate memory for cookie string" );
                 free( psz_cookiebuf );
                 vlc_mutex_unlock( &p_jar->lock );
                 return NULL;

@@ -272,7 +272,7 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
                 }
 
                 const type_t t_scale = pt_scale[(i_line<<y_factor)*(i_in_pitch<<x_factor)+(i_col<<x_factor)];
-                p_out[i_line * p_outpic->p[i_plane].i_pitch + i_col] = (uint8_t)(t_value / t_scale); // FIXME wouldn't it be better to round instead of trunc ?
+                p_out[i_line * p_outpic->p[i_plane].i_pitch + i_col] = (uint8_t)((t_value + t_scale / 2) / t_scale); /* Round to nearest */
             }
         }
     }
