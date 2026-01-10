@@ -33,7 +33,6 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
-#include <vlc_player.h>
 
 /*****************************************************************************
  * Local prototypes
