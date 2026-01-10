@@ -177,6 +177,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 
     _mediaSources = mediaSources;
     [self.collectionView reloadData];
+    [self.tableView reloadData];
 }
 
 - (void)setMediaSourceMode:(VLCMediaSourceMode)mediaSourceMode
