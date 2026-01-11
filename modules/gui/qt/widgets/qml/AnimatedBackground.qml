@@ -45,14 +45,8 @@ Rectangle {
     // Animations
     //---------------------------------------------------------------------------------------------
 
-    Behavior on border.color {
-        Binding on enabled {
-            // this is delayed because we don't want the animations to run as soon
-            // as root is enabled, as the colors often adjusted depending on enabled,
-            // and to have debouncing.
-            delayed: true
-            value: root.enabled
-        }
+    VLCStyle.DelayedBehavior on border.color {
+        delayedEnabled: root.enabled
 
         ColorAnimation {
             id: borderAnimation
@@ -61,14 +55,8 @@ Rectangle {
         }
     }
 
-    Behavior on color {
-        Binding on enabled {
-            // this is delayed because we don't want the animations to run as soon
-            // as root is enabled, as the colors often adjusted depending on enabled,
-            // and to have debouncing.
-            delayed: true
-            value: root.enabled
-        }
+    VLCStyle.DelayedBehavior on color {
+        delayedEnabled: root.enabled
 
         ColorAnimation {
             id: bgAnimation
