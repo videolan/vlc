@@ -95,7 +95,10 @@ on_preparse_ended(vlc_preparser_req *req, int status, void *userdata)
     vlc_playlist_t *playlist = userdata;
 
     if (status != VLC_SUCCESS)
+    {
+        vlc_preparser_req_Release(req);
         return;
+    }
 
     vlc_playlist_Lock(playlist);
     ssize_t index = vlc_playlist_IndexOfMedia(playlist, media);
