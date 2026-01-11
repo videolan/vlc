@@ -24,6 +24,7 @@ import QtQuick.Layouts
 import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 T.TabButton {
     id: control
@@ -157,8 +158,8 @@ T.TabButton {
             Layout.maximumWidth: implicitWidth + 1
             Layout.leftMargin: iconLabel.visible ? VLCStyle.margin_xsmall : 0
 
-            Behavior on color {
-                enabled: theme.initialized
+            DelayedBehavior on color {
+                delayedEnabled: theme.initialized
 
                 ColorAnimation {
                     duration: VLCStyle.duration_short
