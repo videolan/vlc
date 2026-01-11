@@ -22,6 +22,7 @@ import QtQuick.Templates as T
 import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Network
+import VLC.Util
 
 T.AbstractButton {
     id: button
@@ -93,8 +94,9 @@ T.AbstractButton {
 
             font.pixelSize: button.font.pixelSize
 
-            Behavior on color {
-                enabled: theme.initialized
+            DelayedBehavior on color {
+                delayedEnabled: theme.initialized
+
                 ColorAnimation {
                     duration: VLCStyle.duration_long
                 }
