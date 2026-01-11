@@ -273,7 +273,7 @@ if get_option('vcd_module')
     endif
 
     if (needed_vcd_unix_headers_present or
-        host_system in ['windows'] or have_osx)
+        host_system in ['windows', 'os/2'] or have_osx)
 
         vcd_cdda_darwin_deps = []
         if host_system == 'darwin'
