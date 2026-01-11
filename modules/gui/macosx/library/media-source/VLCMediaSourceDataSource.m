@@ -111,9 +111,11 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
             [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
                                                                   withUrl:nodeUrl];
         if (error) {
-            NSAlert * const alert = [NSAlert alertWithError:error];
-            alert.alertStyle = NSAlertStyleCritical;
-            [alert runModal];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSAlert * const alert = [NSAlert alertWithError:error];
+                alert.alertStyle = NSAlertStyleCritical;
+                [alert runModal];
+            });
             return;
         }
 
