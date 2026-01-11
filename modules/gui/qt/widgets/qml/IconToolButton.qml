@@ -23,6 +23,7 @@ import QtQuick.Templates as T
 import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 T.ToolButton {
     id: control
@@ -105,8 +106,9 @@ T.ToolButton {
 
         color: control.color
 
-        Behavior on color {
-            enabled: theme.initialized
+        DelayedBehavior on color {
+            delayedEnabled: theme.initialized
+
             ColorAnimation {
                 duration: VLCStyle.duration_long
             }
