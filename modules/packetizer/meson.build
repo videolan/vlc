@@ -48,6 +48,11 @@ vlc_modules += {
 }
 
 # H.264 packetizer
+packetizer_h264_c_args = []
+if host_system == 'os/2'
+    packetizer_h264_c_args += '-mstackrealign'
+endif
+
 vlc_modules += {
     'name' : 'packetizer_h264',
     'sources' : files(
@@ -57,6 +62,7 @@ vlc_modules += {
         'hxxx_sei.c',
         'hxxx_common.c'
     ),
+    'c_args' : packetizer_h264_c_args,
     'shortname' : 'p_h264',
 }
 
