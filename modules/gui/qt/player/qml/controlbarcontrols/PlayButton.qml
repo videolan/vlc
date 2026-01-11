@@ -228,8 +228,9 @@ T.Control {
 
         Accessible.ignored: true
 
-        Behavior on color {
-            enabled: theme.initialized
+        DelayedBehavior on color {
+            delayedEnabled: theme.initialized
+
             ColorAnimation {
                 duration: VLCStyle.duration_veryShort
                 easing.type: Easing.InOutSine
