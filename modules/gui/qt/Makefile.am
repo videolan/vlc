@@ -1208,7 +1208,8 @@ libqml_module_util_a_QML = \
 	util/qml/NativeMenu.qml \
 	util/qml/MLContextMenu.qml \
 	util/qml/FadeControllerStateGroup.qml \
-	util/qml/GridSizeHelper.qml
+	util/qml/GridSizeHelper.qml \
+	util/qml/DelayedBehavior.qml
 libqml_module_util_a_Singleton_QML = \
 	util/qml/Helpers.qml
 nodist_libqml_module_util_a_SOURCES = util_qmlassets.cpp
