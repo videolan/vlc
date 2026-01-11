@@ -103,7 +103,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
     (void)p_pict;
     block_t * p_block = block_Alloc( kBufferSize );
-
+    if (unlikely(!p_block))
+      return NULL;
     vlc_tick_t now = vlc_tick_now();
     memcpy(p_block->p_buffer, &now, sizeof(vlc_tick_t));
     p_block->i_buffer = kBufferSize;
