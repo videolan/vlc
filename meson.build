@@ -102,6 +102,10 @@ if host_system == 'darwin'
     add_languages('objc', native: false)
 endif
 
+if host_system == 'os/2'
+    add_project_link_arguments('-Zbin-files', '-Zargs-wild', '-Zhigh-mem', language: ['c', 'cpp'])
+endif
+
 if host_machine.cpu_family().startswith('x86')
     if add_languages('nasm', native: false, required: false)
         vlc_nasm_args = []
