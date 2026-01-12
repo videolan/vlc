@@ -411,13 +411,17 @@ static void iTUNTripletCallback( const char *psz_key,
     {
         struct qt_itunes_triplet_data data = {.type = iTunEncodingParams,
                                                .EncodingParams = { 0 } };
-        for( size_t i=0; i<p_data->i_blob; i += 8 )
+        const uint8_t *p_blob = p_data->p_blob;
+        size_t i_blob = p_data->i_blob;
+        while( i_blob >= 8 )
         {
-            const char *id = (const char*) &p_data->p_blob[i];
+            const char *id = (const char*) &p_blob[0];
+            const uint8_t *val = &p_blob[4];
             if( !strncmp(id, "brat", 4) )
-                data.EncodingParams.target_bitrate = GetDWBE(&p_data->p_blob[i+4]);
+                data.EncodingParams.target_bitrate = GetDWBE(val);
             else if( !strncmp(id, "vbrq", 4) )
-                data.EncodingParams.target_quality = GetDWBE(&p_data->p_blob[i+4]);
+                data.EncodingParams.target_quality = GetDWBE(val);
+            p_blob += 8; i_blob -= 8;
         }
         ctx->ituncb( &data, ctx->priv );
     }
