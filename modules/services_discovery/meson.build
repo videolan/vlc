@@ -111,6 +111,14 @@ if host_system == 'windows' and have_win_desktop
     }
 endif
 
+# OS/2 drive discovery
+if host_system == 'os/2'
+    vlc_modules += {
+        'name' : 'os2drive',
+        'sources' : files('os2drive.c')
+    }
+endif
+
 # mDNS using libmicrodns
 microdns_dep = dependency('microdns', required: get_option('microdns'))
 if microdns_dep.found()
