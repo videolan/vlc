@@ -1326,6 +1326,10 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         p_soun->i_compressionid = 0xFFFE;
     }
 
+    /* Sanity check for raw audio */
+    if( aout_BitsPerSample(p_track->fmt.i_codec) && p_soun->i_channelcount == 0 )
+        return 0;
+
     return 1;
 }
 
