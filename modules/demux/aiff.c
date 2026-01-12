@@ -209,7 +209,7 @@ static int Open( vlc_object_t *p_this )
         if( !memcmp( p_peek, "COMM", 4 ) )
         {
             if( vlc_stream_Peek( p_demux->s, &p_peek, 18+8 ) < 18+8 )
-                return VLC_EGENERIC;
+                goto error;
 
             p_sys->fmt.audio.i_channels = GetWBE( &p_peek[8] );
             p_sys->fmt.audio.i_bitspersample = GetWBE( &p_peek[14] );
@@ -222,7 +222,7 @@ static int Open( vlc_object_t *p_this )
         else if( !memcmp( p_peek, "SSND", 4 ) )
         {
             if( vlc_stream_Peek( p_demux->s, &p_peek, 8+8 ) < 8+8 )
-                return VLC_EGENERIC;
+                goto error;
 
             p_sys->i_ssnd_pos = vlc_stream_Tell( p_demux->s );
             p_sys->i_ssnd_size = i_data_size;
@@ -236,7 +236,7 @@ static int Open( vlc_object_t *p_this )
         {
             ssize_t ret = vlc_stream_Peek( p_demux->s, &p_peek, i_chunk_size );
             if( ret == -1 || (size_t) ret != i_chunk_size )
-                return VLC_EGENERIC;
+                goto error;
 
             struct CoreAudio_layout_s layout;
             layout.i_channels_layout_tag = GetDWBE( &p_peek[8] );
@@ -255,7 +255,7 @@ static int Open( vlc_object_t *p_this )
             int i_ret = ReadTextChunk( p_demux, i_chunk_size, i_data_size );
 
             if( unlikely(i_ret == VLC_ENOMEM) )
-                return VLC_ENOMEM;
+                goto error;
         }
 
         /* consume chunk data */
@@ -269,7 +269,7 @@ static int Open( vlc_object_t *p_this )
             if( vlc_stream_Read( p_demux->s, NULL, i_req ) != i_req )
             {
                 msg_Warn( p_demux, "incomplete file" );
-                return VLC_EGENERIC;
+                goto error;
             }
         }
     }
@@ -296,7 +296,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_ssnd_fsize <= 0 || p_sys->fmt.audio.i_rate == 0 || p_sys->i_ssnd_pos < 12 )
     {
         msg_Err( p_demux, "invalid audio parameters" );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if( p_sys->i_ssnd_size <= 0 )
@@ -309,19 +309,23 @@ static int Open( vlc_object_t *p_this )
     if( vlc_stream_Seek( p_demux->s, p_sys->i_ssnd_start ) )
     {
         msg_Err( p_demux, "cannot seek to data chunk" );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* */
     p_sys->fmt.i_id = 0;
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
     if( unlikely(p_sys->es == NULL) )
-        return VLC_ENOMEM;
+        goto error;
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 
     return VLC_SUCCESS;
+
+error:
+    Close( p_this );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
