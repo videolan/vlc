@@ -272,7 +272,11 @@ enum vlc_config_subcat
 
 #define CDECL_SYMBOL
 #if defined (VLC_DYNAMIC_PLUGIN)
-# if defined (_WIN32) || defined (__OS2__)
+/* Libtool exports symbols with .def file. If exporting those symbols with
+ * __declspec(dllexport), a linker complains about it. So do not export
+ * symbols with the modifier when using libtool on OS/2.
+ * DLL_EXPORT is defined by libtool. */
+# if defined (_WIN32) || (defined (__OS2__) && !defined (DLL_EXPORT))
 #   define DLL_SYMBOL              __declspec(dllexport)
 #   undef CDECL_SYMBOL
 #   define CDECL_SYMBOL            __cdecl
