@@ -455,6 +455,9 @@ endif
 ifdef HAVE_WIN32
 CMAKE += -DCMAKE_DEBUG_POSTFIX:STRING=
 endif
+ifdef HAVE_DARWIN_OS
+CMAKE += -DCMAKE_REQUIRED_FLAGS="-Werror=partial-availability"
+endif
 ifdef HAVE_ANDROID
 CMAKE += -DANDROID:BOOL=ON
 endif
