@@ -867,9 +867,11 @@ if cc.has_type('struct timespec', prefix: '#include <time.h>')
 endif
 
 # Add -fvisibility=hidden if compiler supports those
-add_project_arguments(
-    cc.get_supported_arguments('-fvisibility=hidden'),
-    language: ['c'])
+if host_system != 'os/2'
+    add_project_arguments(
+        cc.get_supported_arguments('-fvisibility=hidden'),
+        language: ['c'])
+endif
 
 # Stack smashing protection (default enabled for optimized builds)
 if (get_option('ssp')
