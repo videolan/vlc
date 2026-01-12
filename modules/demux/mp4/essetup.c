@@ -1369,6 +1369,10 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
     if (p_SA3D && BOXDATA(p_SA3D))
         p_fmt->audio.channel_type = AUDIO_CHANNEL_TYPE_AMBISONICS;
 
+    /* Sanity check for raw audio */
+    if( aout_BitsPerSample(p_fmt->i_codec) && p_soun->i_channelcount == 0 )
+        return 0;
+
     return 1;
 }
 
