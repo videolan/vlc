@@ -1,7 +1,7 @@
 # libxml2
 
-LIBXML2_VERSION := 2.11.4
-LIBXML2_URL := https://download.gnome.org/sources/libxml2/2.11/libxml2-$(LIBXML2_VERSION).tar.xz
+LIBXML2_VERSION := 2.15.1
+LIBXML2_URL := https://download.gnome.org/sources/libxml2/2.15/libxml2-$(LIBXML2_VERSION).tar.xz
 
 PKGS += libxml2
 ifeq ($(call need_pkg,"libxml-2.0"),)
@@ -24,14 +24,9 @@ LIBXML2_CONF = \
         -DLIBXML2_WITH_XPATH=OFF \
         -DLIBXML2_WITH_XPTR=OFF \
         -DLIBXML2_WITH_MODULES=OFF \
-        -DLIBXML2_WITH_LEGACY=OFF \
         -DLIBXML2_WITH_ZLIB=OFF    \
         -DLIBXML2_WITH_ICONV=OFF   \
-        -DLIBXML2_WITH_HTTP=OFF    \
-        -DLIBXML2_WITH_FTP=OFF     \
         -DLIBXML2_WITH_REGEXPS=OFF \
-        -DLIBXML2_WITH_PYTHON=OFF \
-        -DLIBXML2_WITH_LZMA=OFF \
         -DLIBXML2_WITH_TESTS=OFF \
         -DLIBXML2_WITH_PROGRAMS=OFF
 
