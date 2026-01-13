@@ -18,6 +18,7 @@ chromaprint: chromaprint-$(CHROMAPRINT_VERSION).tar.gz .sum-chromaprint
 	$(APPLY) $(SRC)/chromaprint/0001-add-the-C-runtime-to-the-packages-to-link-to.patch
 	$(APPLY) $(SRC)/chromaprint/0002-add-required-FFmpeg-libraries-to-the-generated-pkg-c.patch
 	$(APPLY) $(SRC)/chromaprint/0003-chromaprint-add-ability-to-link-with-VDSP-Accelerate.patch
+	$(APPLY) $(SRC)/chromaprint/0001-Fix-support-for-FFMpeg-4.2-to-5.0.patch
 	$(call pkg_static,"libchromaprint.pc.cmake")
 	$(MOVE)
 

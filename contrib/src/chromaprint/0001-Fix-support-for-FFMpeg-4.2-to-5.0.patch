@@ -1,0 +1,58 @@
+From 6f7e4e846f17543c6a9234fa2c4e9bc0cc419dd1 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 13 Jan 2026 11:36:36 +0100
+Subject: [PATCH] Fix support for FFMpeg 4.2 to 5.0
+
+In these versions tx.h exists but not AV_TX_FLOAT_RDFT which was added in FFMpeg 5.1.
+---
+ CMakeLists.txt                 |  4 ++--
+ cmake/modules/FindFFmpeg.cmake | 11 +++++++++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 01b7df7..c519bef 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -106,7 +106,7 @@ set(USE_KISSFFT OFF)
+ if(NOT FFT_LIB)
+   if(APPLE AND ACCELERATE_LIBRARIES)
+     set(FFT_LIB "vdsp")
+-  elseif(FFMPEG_LIBAVUTIL_TX_FOUND)
++  elseif(HAVE_FFMPEG_TX_RDFT)
+     set(FFT_LIB "avtx")
+   elseif(FFMPEG_LIBAVCODEC_FFT_FOUND)
+     set(FFT_LIB "avfft")
+@@ -126,7 +126,7 @@ if(FFT_LIB STREQUAL "vdsp")
+     message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+   endif()
+ elseif(FFT_LIB STREQUAL "avtx")
+-  if(FFMPEG_LIBAVUTIL_TX_FOUND)
++  if(HAVE_FFMPEG_TX_RDFT)
+     set(USE_AVTX ON)
+   else()
+     message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+diff --git a/cmake/modules/FindFFmpeg.cmake b/cmake/modules/FindFFmpeg.cmake
+index 3653a96..5012cbb 100644
+--- a/cmake/modules/FindFFmpeg.cmake
++++ b/cmake/modules/FindFFmpeg.cmake
+@@ -123,6 +123,17 @@ IF   (FFMPEG_LIBAVFORMAT_FOUND AND FFMPEG_LIBAVCODEC_FOUND AND FFMPEG_LIBAVUTIL_
+         ${FFMPEG_LIBAVCODEC_LIBRARIES}
+         ${FFMPEG_LIBAVUTIL_LIBRARIES})
+ 
++    IF(FFMPEG_LIBAVUTIL_TX_FOUND)
++        include(CheckCSourceCompiles)
++
++        cmake_push_check_state()
++        list(APPEND CMAKE_REQUIRED_INCLUDES ${FFMPEG_LIBAVUTIL_TX_INCLUDE_DIRS})
++        check_c_source_compiles("#include <libavutil/tx.h>
++            static int test = AV_TX_FLOAT_RDFT;
++            int main(void) { return 0; }" HAVE_FFMPEG_TX_RDFT)
++        cmake_pop_check_state()
++    ENDIF()
++
+ ELSE ()
+ 
+    MESSAGE(STATUS "Could not find FFMPEG")
+-- 
+2.52.0.windows.1
+
