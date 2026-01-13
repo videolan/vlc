@@ -1,7 +1,7 @@
 # jpeg
 
-JPEG_VERSION := 3.1.1
-JPEG_URL := $(GITHUB)/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/$(JPEG_VERSION).tar.gz
+JPEG_VERSION := 3.1.3
+JPEG_URL := $(GITHUB)/libjpeg-turbo/libjpeg-turbo/releases/download/$(JPEG_VERSION)/libjpeg-turbo-$(JPEG_VERSION).tar.gz
 
 ifdef BUILD_ENCODERS
 PKGS += jpeg
