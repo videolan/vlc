@@ -1,0 +1,220 @@
+From 391d64e9c559bfd3a9542931902dc40ee775c8d8 Mon Sep 17 00:00:00 2001
+From: Anton Kudryavtsev <a.kudryavtsev@netris.ru>
+Date: Tue, 19 Apr 2016 10:04:12 +0300
+Subject: [PATCH 21/23] Moc: use QStringBuilder more
+
+Adding strings in a single expression gets mediated
+efficiently by QStringBuilder, where using += repeatedly
+forces premature consolidation.
+
+Change-Id: I6c1abb9c9801a016ce6c151cffdf8c7ac9502f4e
+Reviewed-by: Edward Welbourne <edward.welbourne@theqtcompany.com>
+Reviewed-by: Marc Mutz <marc.mutz@kdab.com>
+Backport-Of: bafe205d6a87c0672e1e6142160a60415c7f4533 (v5.7.0)
+---
+ src/tools/moc/generator.cpp    |  4 +-
+ src/tools/moc/moc.cpp          | 84 +++++++++++++++-------------------
+ src/tools/moc/preprocessor.cpp | 14 +++---
+ 3 files changed, 44 insertions(+), 58 deletions(-)
+
+diff --git a/src/tools/moc/generator.cpp b/src/tools/moc/generator.cpp
+index dcb7de00bcf..2055a1be1bb 100644
+--- a/src/tools/moc/generator.cpp
++++ b/src/tools/moc/generator.cpp
+@@ -1461,9 +1461,7 @@ void Generator::generateSignal(FunctionDef *def,int index)
+     const char *constQualifier = "";
+ 
+     if (def->isConst) {
+-        thisPtr = "const_cast< ";
+-        thisPtr += cdef->qualified;
+-        thisPtr += " *>(this)";
++        thisPtr = "const_cast< " + cdef->qualified + " *>(this)";
+         constQualifier = "const";
+     }
+ 
+diff --git a/src/tools/moc/moc.cpp b/src/tools/moc/moc.cpp
+index f7a2a07df70..1f7efc3d1fe 100644
+--- a/src/tools/moc/moc.cpp
++++ b/src/tools/moc/moc.cpp
+@@ -463,9 +463,8 @@ bool Moc::parseFunction(FunctionDef *def, bool inMacro)
+     }
+ 
+     if (scopedFunctionName) {
+-        QByteArray msg("Function declaration ");
+-        msg += def->name;
+-        msg += " contains extra qualification. Ignoring as signal or slot.";
++        const QByteArray msg = "Function declaration " + def->name
++                + " contains extra qualification. Ignoring as signal or slot.";
+         warning(msg.constData());
+         return false;
+     }
+@@ -536,9 +535,8 @@ bool Moc::parseMaybeFunction(const ClassDef *cdef, FunctionDef *def)
+     def->isConst = test(CONST);
+     if (scopedFunctionName
+         && (def->isSignal || def->isSlot || def->isInvokable)) {
+-        QByteArray msg("parsemaybe: Function declaration ");
+-        msg += def->name;
+-        msg += " contains extra qualification. Ignoring as signal or slot.";
++        const QByteArray msg = "parsemaybe: Function declaration " + def->name
++                + " contains extra qualification. Ignoring as signal or slot.";
+         warning(msg.constData());
+         return false;
+     }
+@@ -1126,25 +1124,19 @@ void Moc::createPropertyDef(PropertyDef &propDef)
+         }
+     }
+     if (propDef.read.isNull() && propDef.member.isNull()) {
+-        QByteArray msg;
+-        msg += "Property declaration ";
+-        msg += propDef.name;
+-        msg += " has no READ accessor function or associated MEMBER variable. The property will be invalid.";
++        const QByteArray msg = "Property declaration " + propDef.name
++                + " has no READ accessor function or associated MEMBER variable. The property will be invalid.";
+         warning(msg.constData());
+     }
+     if (propDef.constant && !propDef.write.isNull()) {
+-        QByteArray msg;
+-        msg += "Property declaration ";
+-        msg += propDef.name;
+-        msg += " is both WRITEable and CONSTANT. CONSTANT will be ignored.";
++        const QByteArray msg = "Property declaration " + propDef.name
++                + " is both WRITEable and CONSTANT. CONSTANT will be ignored.";
+         propDef.constant = false;
+         warning(msg.constData());
+     }
+     if (propDef.constant && !propDef.notify.isNull()) {
+-        QByteArray msg;
+-        msg += "Property declaration ";
+-        msg += propDef.name;
+-        msg += " is both NOTIFYable and CONSTANT. CONSTANT will be ignored.";
++        const QByteArray msg = "Property declaration " + propDef.name
++                + " is both NOTIFYable and CONSTANT. CONSTANT will be ignored.";
+         propDef.constant = false;
+         warning(msg.constData());
+     }
+@@ -1190,10 +1182,8 @@ void Moc::parsePluginData(ClassDef *def)
+                 }
+             }
+             if (!fi.exists()) {
+-                QByteArray msg;
+-                msg += "Plugin Metadata file ";
+-                msg += lexem();
+-                msg += " does not exist. Declaration will be ignored";
++                const QByteArray msg = "Plugin Metadata file " + lexem()
++                        + " does not exist. Declaration will be ignored";
+                 error(msg.constData());
+                 return;
+             }
+@@ -1206,10 +1196,8 @@ void Moc::parsePluginData(ClassDef *def)
+     if (!metaData.isEmpty()) {
+         def->pluginData.metaData = QJsonDocument::fromJson(metaData);
+         if (!def->pluginData.metaData.isObject()) {
+-            QByteArray msg;
+-            msg += "Plugin Metadata file ";
+-            msg += lexem();
+-            msg += " does not contain a valid JSON object. Declaration will be ignored";
++            const QByteArray msg = "Plugin Metadata file " + lexem()
++                    + " does not contain a valid JSON object. Declaration will be ignored";
+             warning(msg.constData());
+             def->pluginData.iid = QByteArray();
+             return;
+@@ -1506,12 +1494,12 @@ void Moc::checkSuperClasses(ClassDef *def)
+     if (!knownQObjectClasses.contains(firstSuperclass)) {
+         // enable once we /require/ include paths
+ #if 0
+-        QByteArray msg;
+-        msg += "Class ";
+-        msg += def->className;
+-        msg += " contains the Q_OBJECT macro and inherits from ";
+-        msg += def->superclassList.value(0);
+-        msg += " but that is not a known QObject subclass. You may get compilation errors.";
++        const QByteArray msg
++                = "Class "
++                + def->className
++                + " contains the Q_OBJECT macro and inherits from "
++                + def->superclassList.value(0)
++                + " but that is not a known QObject subclass. You may get compilation errors.";
+         warning(msg.constData());
+ #endif
+         return;
+@@ -1519,14 +1507,14 @@ void Moc::checkSuperClasses(ClassDef *def)
+     for (int i = 1; i < def->superclassList.count(); ++i) {
+         const QByteArray superClass = def->superclassList.at(i).first;
+         if (knownQObjectClasses.contains(superClass)) {
+-            QByteArray msg;
+-            msg += "Class ";
+-            msg += def->classname;
+-            msg += " inherits from two QObject subclasses ";
+-            msg += firstSuperclass;
+-            msg += " and ";
+-            msg += superClass;
+-            msg += ". This is not supported!";
++            const QByteArray msg
++                    = "Class "
++                    + def->classname
++                    + " inherits from two QObject subclasses "
++                    + firstSuperclass
++                    + " and "
++                    + superClass
++                    + ". This is not supported!";
+             warning(msg.constData());
+         }
+ 
+@@ -1539,14 +1527,14 @@ void Moc::checkSuperClasses(ClassDef *def)
+                 }
+ 
+             if (!registeredInterface) {
+-                QByteArray msg;
+-                msg += "Class ";
+-                msg += def->classname;
+-                msg += " implements the interface ";
+-                msg += superClass;
+-                msg += " but does not list it in Q_INTERFACES. qobject_cast to ";
+-                msg += superClass;
+-                msg += " will not work!";
++                const QByteArray msg
++                        = "Class "
++                        + def->classname
++                        + " implements the interface "
++                        + superClass
++                        + " but does not list it in Q_INTERFACES. qobject_cast to "
++                        + superClass
++                        + " will not work!";
+                 warning(msg.constData());
+             }
+         }
+diff --git a/src/tools/moc/preprocessor.cpp b/src/tools/moc/preprocessor.cpp
+index 9388992de2d..a79eb3706bf 100644
+--- a/src/tools/moc/preprocessor.cpp
++++ b/src/tools/moc/preprocessor.cpp
+@@ -210,10 +210,11 @@ Symbols Preprocessor::tokenize(const QByteArray& input, int lineNum, Preprocesso
+                         && !symbols.isEmpty()
+                         && symbols.constLast().token == STRING_LITERAL) {
+ 
+-                        QByteArray newString = symbols.constLast().unquotedLexem();
+-                        newString += input.mid(lexem - begin + 1, data - lexem - 2);
+-                        newString.prepend('\"');
+-                        newString.append('\"');
++                        const QByteArray newString
++                                = '\"'
++                                + symbols.constLast().unquotedLexem()
++                                + input.mid(lexem - begin + 1, data - lexem - 2)
++                                + '\"';
+                         symbols.last() = Symbol(symbols.constLast().lineNum,
+                                                 STRING_LITERAL,
+                                                 newString);
+@@ -1037,9 +1038,8 @@ void Preprocessor::preprocess(const QByteArray &filename, Symbols &preprocessed)
+                     const int slashPos = include.indexOf('/');
+                     if (slashPos == -1)
+                         continue;
+-                    QByteArray frameworkCandidate = include.left(slashPos);
+-                    frameworkCandidate.append(".framework/Headers/");
+-                    fi.setFile(QString::fromLocal8Bit(QByteArray(p.path + '/' + frameworkCandidate).constData()), QString::fromLocal8Bit(include.mid(slashPos + 1).constData()));
++                    fi.setFile(QString::fromLocal8Bit(p.path + '/' + include.left(slashPos) + ".framework/Headers/"),
++                               QString::fromLocal8Bit(include.mid(slashPos + 1).constData()));
+                 } else {
+                     fi.setFile(QString::fromLocal8Bit(p.path.constData()), QString::fromLocal8Bit(include.constData()));
+                 }
+-- 
+2.43.0
+

@@ -1,0 +1,359 @@
+From 89074d0a7e4a038edef8aa0d05609ac33e83d32b Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Fri, 21 Aug 2015 17:08:19 -0700
+Subject: [PATCH 23/23] moc: get the system #defines from the compiler itself
+
+In order for moc to properly parse #ifdefs and family, we've had
+QMAKE_COMPILER_DEFINES as a list of pre-defined macros from the
+compiler. That list is woefully incomplete.
+
+Instead, let's simply ask the compiler for the list. With GCC and
+family, we use the -dM flag while preprocessing. With ICC on Windows,
+the flag gains an extra "Q" but is otherwise the same. For MSVC, it
+requires using some undocumented switches and parsing environment
+variables (I've tested MSVC 2012, 2013 and 2015).
+
+The new moc option is called --include to be similar to GCC's -include
+option. It does more than just parse a list of pre-defined macros and
+can be used to insert any sort of code that moc needs to parse prior to
+the main file.
+
+Change-Id: I7de033f80b0e4431b7f1ffff13fca02dbb60a0a6
+Reviewed-by: Olivier Goffart (Woboq GmbH) <ogoffart@woboq.com>
+Backport-Of: 36d524e6a3b64a8c35805c1b868d6d67ccae765c (v5.8.0)
+---
+ mkspecs/features/moc.prf                   | 29 +++++++++--
+ qmake/main.cpp                             | 37 ++++++++++++++
+ src/tools/moc/main.cpp                     | 17 ++++++-
+ src/tools/moc/preprocessor.cpp             | 58 ++++++++++++----------
+ src/tools/moc/preprocessor.h               |  1 +
+ tests/auto/tools/moc/subdir/extradefines.h |  1 +
+ tests/auto/tools/moc/tst_moc.cpp           | 42 ++++++++++++++++
+ 7 files changed, 155 insertions(+), 30 deletions(-)
+ create mode 100644 tests/auto/tools/moc/subdir/extradefines.h
+
+diff --git a/mkspecs/features/moc.prf b/mkspecs/features/moc.prf
+index 9cc2bf3b76d..75eafc2a01b 100644
+--- a/mkspecs/features/moc.prf
++++ b/mkspecs/features/moc.prf
+@@ -24,8 +24,23 @@ win32:count(MOC_INCLUDEPATH, 40, >) {
+     write_file($$absolute_path($$WIN_INCLUDETEMP, $$OUT_PWD), WIN_INCLUDETEMP_CONT)|error("Aborting.")
+ }
+ 
++# QNX's compiler sets "gcc" config, but does not support the -dM option;
++# iOS builds are multi-arch, so this feature cannot possibly work.
++if(gcc|intel_icl|msvc):!rim_qcc:!ios {
++    moc_predefs.CONFIG = no_link
++    gcc:            moc_predefs.commands = $$QMAKE_CXX $$QMAKE_CXXFLAGS -dM -E -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_IN}
++    else:intel_icl: moc_predefs.commands = $$QMAKE_CXX $$QMAKE_CXXFLAGS -QdM -P -Fi${QMAKE_FILE_OUT} ${QMAKE_FILE_IN}
++    else:msvc {
++        moc_predefs.commands += $$QMAKE_CXX -Bx$$shell_path($$[QT_INSTALL_BINS/get]/qmake) $$QMAKE_CXXFLAGS -E ${QMAKE_FILE_IN} 2>NUL >${QMAKE_FILE_OUT}
++    } else:         error("Oops, I messed up")
++    moc_predefs.output = $$MOC_DIR/moc_predefs.h
++    moc_predefs.input = MOC_PREDEF_FILE
++    silent: moc_predefs.commands = @echo generating $$moc_predefs.output$$escape_expand(\n\t)@$$moc_predefs.commands
++    QMAKE_EXTRA_COMPILERS += moc_predefs
++    MOC_PREDEF_FILE = $$[QT_HOST_DATA/src]/mkspecs/features/data/dummy.cpp
++}
++
+ defineReplace(mocCmdBase) {
+-    RET =
+     !isEmpty(WIN_INCLUDETEMP) {
+         incvar = @$$WIN_INCLUDETEMP
+     } else {
+@@ -34,7 +49,13 @@ defineReplace(mocCmdBase) {
+             incvar += -I$$shell_quote($$inc)
+         incvar += $$QMAKE_FRAMEWORKPATH_FLAGS
+     }
+-    RET += $$QMAKE_MOC $(DEFINES) $$join(QMAKE_COMPILER_DEFINES, " -D", -D) $$incvar $$QMAKE_MOC_OPTIONS
++
++    RET = $$QMAKE_MOC $(DEFINES)
++
++    isEmpty(MOC_PREDEF_FILE): RET += $$join(QMAKE_COMPILER_DEFINES, " -D", -D)
++    else: RET += --include $$moc_predefs.output
++
++    RET += $$incvar $$QMAKE_MOC_OPTIONS
+     return($$RET)
+ }
+ 
+@@ -46,7 +67,7 @@ moc_header.output = $$MOC_DIR/$${QMAKE_H_MOD_MOC}${QMAKE_FILE_BASE}$${first(QMAK
+ moc_header.input = HEADERS
+ moc_header.variable_out = SOURCES
+ moc_header.name = MOC ${QMAKE_FILE_IN}
+-moc_header.depends += $$WIN_INCLUDETEMP
++moc_header.depends += $$WIN_INCLUDETEMP $$moc_predefs.output
+ silent:moc_header.commands = @echo moc ${QMAKE_FILE_IN} && $$moc_header.commands
+ QMAKE_EXTRA_COMPILERS += moc_header
+ INCREDIBUILD_XGE += moc_header
+@@ -58,7 +79,7 @@ moc_source.commands = ${QMAKE_FUNC_mocCmdBase} ${QMAKE_FILE_IN} -o ${QMAKE_FILE_
+ moc_source.output = $$MOC_DIR/$${QMAKE_CPP_MOD_MOC}${QMAKE_FILE_BASE}$${QMAKE_EXT_CPP_MOC}
+ moc_source.input = SOURCES
+ moc_source.name = MOC ${QMAKE_FILE_IN}
+-moc_source.depends += $$WIN_INCLUDETEMP
++moc_source.depends += $$WIN_INCLUDETEMP $$moc_predefs.output
+ silent:moc_source.commands = @echo moc ${QMAKE_FILE_IN} && $$moc_source.commands
+ QMAKE_EXTRA_COMPILERS += moc_source
+ INCREDIBUILD_XGE += moc_source
+diff --git a/qmake/main.cpp b/qmake/main.cpp
+index 96cb758e262..5ac513a43bc 100644
+--- a/qmake/main.cpp
++++ b/qmake/main.cpp
+@@ -47,6 +47,10 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ 
++#ifdef Q_OS_WIN
++#  include <qt_windows.h>
++#endif
++
+ QT_BEGIN_NAMESPACE
+ 
+ #ifdef Q_OS_WIN
+@@ -246,6 +250,30 @@ static int doInstall(int argc, char **argv)
+     return 3;
+ }
+ 
++static int dumpMacros(const wchar_t *cmdline)
++{
++    // from http://stackoverflow.com/questions/3665537/how-to-find-out-cl-exes-built-in-macros
++    int argc;
++    wchar_t **argv = CommandLineToArgvW(cmdline, &argc);
++    if (!argv)
++        return 2;
++    for (int i = 0; i < argc; ++i) {
++        if (argv[i][0] != L'-' || argv[i][1] != 'D')
++            continue;
++
++        wchar_t *value = wcschr(argv[i], L'=');
++        if (value) {
++            *value = 0;
++            ++value;
++        } else {
++            // point to the NUL at the end, so we don't print anything
++            value = argv[i] + wcslen(argv[i]);
++        }
++        wprintf(L"#define %Ls %Ls\n", argv[i] + 2, value);
++    }
++    return 0;
++}
++
+ #endif // Q_OS_WIN
+ 
+ /* This is to work around lame implementation on Darwin. It has been noted that the getpwd(3) function
+@@ -280,6 +308,15 @@ int runQMake(int argc, char **argv)
+     // Workaround for inferior/missing command line tools on Windows: make our own!
+     if (argc >= 2 && !strcmp(argv[1], "-install"))
+         return doInstall(argc - 2, argv + 2);
++
++    {
++        // Support running as Visual C++'s compiler
++        const wchar_t *cmdline = _wgetenv(L"MSC_CMD_FLAGS");
++        if (!cmdline || !*cmdline)
++            cmdline = _wgetenv(L"MSC_IDE_FLAGS");
++        if (cmdline && *cmdline)
++            return dumpMacros(cmdline);
++    }
+ #endif
+ 
+     QMakeVfs vfs;
+diff --git a/src/tools/moc/main.cpp b/src/tools/moc/main.cpp
+index 9292a6cf748..1c20fd41df7 100644
+--- a/src/tools/moc/main.cpp
++++ b/src/tools/moc/main.cpp
+@@ -259,6 +259,11 @@ int runMoc(int argc, char **argv)
+     prependIncludeOption.setValueName(QStringLiteral("file"));
+     parser.addOption(prependIncludeOption);
+ 
++    QCommandLineOption includeOption(QStringLiteral("include"));
++    includeOption.setDescription(QStringLiteral("Parse <file> as an #include before the main source(s)."));
++    includeOption.setValueName(QStringLiteral("file"));
++    parser.addOption(includeOption);
++
+     QCommandLineOption noNotesWarningsCompatOption(QStringLiteral("n"));
+     noNotesWarningsCompatOption.setDescription(QStringLiteral("Do not display notes (-nn) or warnings (-nw). Compatibility option."));
+     noNotesWarningsCompatOption.setValueName(QStringLiteral("which"));
+@@ -408,7 +413,17 @@ int runMoc(int argc, char **argv)
+     moc.includes = pp.includes;
+ 
+     // 1. preprocess
+-    moc.symbols = pp.preprocessed(moc.filename, &in);
++    const auto includeFiles = parser.values(includeOption);
++    for (const QString &includeName : includeFiles) {
++        QByteArray rawName = pp.resolveInclude(QFile::encodeName(includeName), moc.filename);
++        QFile f(QFile::decodeName(rawName));
++        if (f.open(QIODevice::ReadOnly)) {
++            moc.symbols += Symbol(0, MOC_INCLUDE_BEGIN, rawName);
++            moc.symbols += pp.preprocessed(rawName, &f);
++            moc.symbols += Symbol(0, MOC_INCLUDE_END, rawName);
++        }
++    }
++    moc.symbols += pp.preprocessed(moc.filename, &in);
+ 
+     if (!pp.preprocessOnly) {
+         // 2. parse
+diff --git a/src/tools/moc/preprocessor.cpp b/src/tools/moc/preprocessor.cpp
+index 43f165112fb..43ea6c485bc 100644
+--- a/src/tools/moc/preprocessor.cpp
++++ b/src/tools/moc/preprocessor.cpp
+@@ -1005,6 +1005,36 @@ static void mergeStringLiterals(Symbols *_symbols)
+     }
+ }
+ 
++QByteArray Preprocessor::resolveInclude(const QByteArray &include, const QByteArray &relativeTo)
++{
++    // #### stringery
++    QFileInfo fi;
++    if (!relativeTo.isEmpty())
++        fi.setFile(QFileInfo(QString::fromLocal8Bit(relativeTo.constData())).dir(), QString::fromLocal8Bit(include.constData()));
++    for (int j = 0; j < Preprocessor::includes.size() && !fi.exists(); ++j) {
++        const IncludePath &p = Preprocessor::includes.at(j);
++        if (p.isFrameworkPath) {
++            const int slashPos = include.indexOf('/');
++            if (slashPos == -1)
++                continue;
++            fi.setFile(QString::fromLocal8Bit(p.path + '/' + include.left(slashPos) + ".framework/Headers/"),
++                       QString::fromLocal8Bit(include.mid(slashPos + 1).constData()));
++        } else {
++            fi.setFile(QString::fromLocal8Bit(p.path.constData()), QString::fromLocal8Bit(include.constData()));
++        }
++        // try again, maybe there's a file later in the include paths with the same name
++        // (186067)
++        if (fi.isDir()) {
++            fi = QFileInfo();
++            continue;
++        }
++    }
++
++    if (!fi.exists() || fi.isDir())
++        return QByteArray();
++    return fi.canonicalFilePath().toLocal8Bit();
++}
++
+ void Preprocessor::preprocess(const QByteArray &filename, Symbols &preprocessed)
+ {
+     currentFilenames.push(filename);
+@@ -1025,32 +1055,9 @@ void Preprocessor::preprocess(const QByteArray &filename, Symbols &preprocessed)
+                 continue;
+             until(PP_NEWLINE);
+ 
+-            // #### stringery
+-            QFileInfo fi;
+-            if (local)
+-                fi.setFile(QFileInfo(QString::fromLocal8Bit(filename.constData())).dir(), QString::fromLocal8Bit(include.constData()));
+-            for (int j = 0; j < Preprocessor::includes.size() && !fi.exists(); ++j) {
+-                const IncludePath &p = Preprocessor::includes.at(j);
+-                if (p.isFrameworkPath) {
+-                    const int slashPos = include.indexOf('/');
+-                    if (slashPos == -1)
+-                        continue;
+-                    fi.setFile(QString::fromLocal8Bit(p.path + '/' + include.left(slashPos) + ".framework/Headers/"),
+-                               QString::fromLocal8Bit(include.mid(slashPos + 1).constData()));
+-                } else {
+-                    fi.setFile(QString::fromLocal8Bit(p.path.constData()), QString::fromLocal8Bit(include.constData()));
+-                }
+-                // try again, maybe there's a file later in the include paths with the same name
+-                // (186067)
+-                if (fi.isDir()) {
+-                    fi = QFileInfo();
+-                    continue;
+-                }
+-            }
+-
+-            if (!fi.exists() || fi.isDir())
++            include = resolveInclude(include, local ? filename : QByteArray());
++            if (include.isNull())
+                 continue;
+-            include = fi.canonicalFilePath().toLocal8Bit();
+ 
+             if (Preprocessor::preprocessedIncludes.contains(include))
+                 continue;
+@@ -1205,6 +1212,7 @@ Symbols Preprocessor::preprocessed(const QByteArray &filename, QFile *file)
+     input = cleaned(input);
+ 
+     // phase 2: tokenize for the preprocessor
++    index = 0;
+     symbols = tokenize(input);
+ 
+ #if 0
+diff --git a/src/tools/moc/preprocessor.h b/src/tools/moc/preprocessor.h
+index 9c81f86f9c4..d876caf7297 100644
+--- a/src/tools/moc/preprocessor.h
++++ b/src/tools/moc/preprocessor.h
+@@ -67,6 +67,7 @@ public:
+     QList<QByteArray> frameworks;
+     QSet<QByteArray> preprocessedIncludes;
+     Macros macros;
++    QByteArray resolveInclude(const QByteArray &filename, const QByteArray &relativeTo);
+     Symbols preprocessed(const QByteArray &filename, QFile *device);
+ 
+     void parseDefineArguments(Macro *m);
+diff --git a/tests/auto/tools/moc/subdir/extradefines.h b/tests/auto/tools/moc/subdir/extradefines.h
+new file mode 100644
+index 00000000000..e7888ce80de
+--- /dev/null
++++ b/tests/auto/tools/moc/subdir/extradefines.h
+@@ -0,0 +1 @@
++#define FOO     1
+diff --git a/tests/auto/tools/moc/tst_moc.cpp b/tests/auto/tools/moc/tst_moc.cpp
+index d00a86a9e5a..e2c87e923a4 100644
+--- a/tests/auto/tools/moc/tst_moc.cpp
++++ b/tests/auto/tools/moc/tst_moc.cpp
+@@ -587,6 +587,8 @@ private slots:
+     void frameworkSearchPath();
+     void cstyleEnums();
+     void defineMacroViaCmdline();
++    void defineMacroViaForcedInclude();
++    void defineMacroViaForcedIncludeRelative();
+     void specifyMetaTagsFromCmdline();
+     void invokable();
+     void singleFunctionKeywordSignalAndSlot();
+@@ -1264,6 +1266,46 @@ void tst_Moc::defineMacroViaCmdline()
+ #endif
+ }
+ 
++void tst_Moc::defineMacroViaForcedInclude()
++{
++#if defined(Q_OS_LINUX) && defined(Q_CC_GNU) && !defined(QT_NO_PROCESS)
++    QProcess proc;
++
++    QStringList args;
++    args << "--include" << m_sourceDirectory + QLatin1String("/subdir/extradefines.h");
++    args << m_sourceDirectory + QStringLiteral("/macro-on-cmdline.h");
++
++    proc.start(m_moc, args);
++    QVERIFY(proc.waitForFinished());
++    QCOMPARE(proc.exitCode(), 0);
++    QCOMPARE(proc.readAllStandardError(), QByteArray());
++    QByteArray mocOut = proc.readAllStandardOutput();
++    QVERIFY(!mocOut.isEmpty());
++#else
++    QSKIP("Only tested on linux/gcc");
++#endif
++}
++
++void tst_Moc::defineMacroViaForcedIncludeRelative()
++{
++#if defined(Q_OS_LINUX) && defined(Q_CC_GNU) && !defined(QT_NO_PROCESS)
++    QProcess proc;
++
++    QStringList args;
++    args << "--include" << QStringLiteral("extradefines.h") << "-I" + m_sourceDirectory + "/subdir";
++    args << m_sourceDirectory + QStringLiteral("/macro-on-cmdline.h");
++
++    proc.start(m_moc, args);
++    QVERIFY(proc.waitForFinished());
++    QCOMPARE(proc.exitCode(), 0);
++    QCOMPARE(proc.readAllStandardError(), QByteArray());
++    QByteArray mocOut = proc.readAllStandardOutput();
++    QVERIFY(!mocOut.isEmpty());
++#else
++    QSKIP("Only tested on linux/gcc");
++#endif
++}
++
+ // tst_Moc::specifyMetaTagsFromCmdline()
+ // plugin_metadata.h contains a plugin which we register here. Since we're not building this
+ // application as a plugin, we need top copy some of the initializer code found in qplugin.h:
+-- 
+2.43.0
+

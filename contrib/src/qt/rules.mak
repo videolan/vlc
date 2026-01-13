@@ -41,6 +41,10 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0017-Rename-QtPrivate-is_-un-signed-to-QtPrivate-Is-Un-si.patch
 	$(APPLY) $(SRC)/qt/0018-Remove-qtypetraits.h-s-contents-altogether.patch
 	$(APPLY) $(SRC)/qt/0019-QFileSystemEngine-only-define-FILE_ID_INFO-for-build.patch
+	$(APPLY) $(SRC)/qt/0020-Moc-use-const-and-const-APIs-more.patch
+	$(APPLY) $(SRC)/qt/0021-Moc-use-QStringBuilder-more.patch
+	$(APPLY) $(SRC)/qt/0022-Don-t-error-out-on-preprocessor-concatenation-of-two.patch
+	$(APPLY) $(SRC)/qt/0023-moc-get-the-system-defines-from-the-compiler-itself.patch
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
 	# fix forcing the WINVER/_WIN32_WINNT version without NTDDI_VERSION
 	sed -i.orig -e "s/DEFINES += WINVER/DEFINES += NTDDI_VERSION=0x06000000 WINVER/" "$(UNPACK_DIR)/src/network/kernel/kernel.pri"

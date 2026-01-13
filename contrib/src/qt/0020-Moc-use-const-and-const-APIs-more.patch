@@ -1,0 +1,234 @@
+From 5478583eeac83bd67cb0bc93258f9c1c1fb5b673 Mon Sep 17 00:00:00 2001
+From: Anton Kudryavtsev <a.kudryavtsev@netris.ru>
+Date: Thu, 14 Apr 2016 09:23:41 +0300
+Subject: [PATCH 20/23] Moc: use const (and const APIs) more
+
+For CoW types, prefer const methods to avoid needless detach()ing.
+
+Change-Id: Iefc33552d826aa30320e52acd2d421c9bdae127e
+Reviewed-by: Edward Welbourne <edward.welbourne@theqtcompany.com>
+Reviewed-by: Marc Mutz <marc.mutz@kdab.com>
+Backport-Of: 777d46b40360c302a49fc5b789cee6d0d05f840a (v5.7.0)
+---
+ src/tools/moc/generator.cpp    |  2 +-
+ src/tools/moc/main.cpp         |  2 +-
+ src/tools/moc/moc.cpp          | 28 ++++++++++++++--------------
+ src/tools/moc/preprocessor.cpp | 18 +++++++++---------
+ 4 files changed, 25 insertions(+), 25 deletions(-)
+
+diff --git a/src/tools/moc/generator.cpp b/src/tools/moc/generator.cpp
+index 8cbeb4ce788..dcb7de00bcf 100644
+--- a/src/tools/moc/generator.cpp
++++ b/src/tools/moc/generator.cpp
+@@ -84,7 +84,7 @@ Generator::Generator(ClassDef *classDef, const QList<QByteArray> &metaTypes, con
+     , knownGadgets(knownGadgets)
+ {
+     if (cdef->superclassList.size())
+-        purestSuperClass = cdef->superclassList.first().first;
++        purestSuperClass = cdef->superclassList.constFirst().first;
+ }
+ 
+ static inline int lengthOfEscapeSequence(const QByteArray &s, int i)
+diff --git a/src/tools/moc/main.cpp b/src/tools/moc/main.cpp
+index 18fbc977abf..9292a6cf748 100644
+--- a/src/tools/moc/main.cpp
++++ b/src/tools/moc/main.cpp
+@@ -359,7 +359,7 @@ int runMoc(int argc, char **argv)
+         int spos = filename.lastIndexOf(QDir::separator());
+         int ppos = filename.lastIndexOf(QLatin1Char('.'));
+         // spos >= -1 && ppos > spos => ppos >= 0
+-        moc.noInclude = (ppos > spos && filename[ppos + 1].toLower() != QLatin1Char('h'));
++        moc.noInclude = (ppos > spos && filename.at(ppos + 1).toLower() != QLatin1Char('h'));
+     }
+     if (defaultInclude) {
+         if (moc.includePath.isEmpty()) {
+diff --git a/src/tools/moc/moc.cpp b/src/tools/moc/moc.cpp
+index 5534cdd6b85..f7a2a07df70 100644
+--- a/src/tools/moc/moc.cpp
++++ b/src/tools/moc/moc.cpp
+@@ -142,7 +142,7 @@ bool Moc::parseClassHead(ClassDef *def)
+         } while (test(COMMA));
+ 
+         if (!def->superclassList.isEmpty()
+-            && knownGadgets.contains(def->superclassList.first().first)) {
++            && knownGadgets.contains(def->superclassList.constFirst().first)) {
+             // Q_GADGET subclasses are treated as Q_GADGETs
+             knownGadgets.insert(def->classname, def->qualified);
+             knownGadgets.insert(def->qualified, def->qualified);
+@@ -322,7 +322,7 @@ void Moc::parseFunctionArguments(FunctionDef *def)
+     }
+ 
+     if (!def->arguments.isEmpty()
+-        && def->arguments.last().normalizedType == "QPrivateSignal") {
++        && def->arguments.constLast().normalizedType == "QPrivateSignal") {
+         def->arguments.removeLast();
+         def->isPrivateSignal = true;
+     }
+@@ -740,7 +740,7 @@ void Moc::parse()
+                         if (funcDef.isConstructor) {
+                             if ((access == FunctionDef::Public) && funcDef.isInvokable) {
+                                 def.constructorList += funcDef;
+-                                while (funcDef.arguments.size() > 0 && funcDef.arguments.last().isDefault) {
++                                while (funcDef.arguments.size() > 0 && funcDef.arguments.constLast().isDefault) {
+                                     funcDef.wasCloned = true;
+                                     funcDef.arguments.removeLast();
+                                     def.constructorList += funcDef;
+@@ -753,7 +753,7 @@ void Moc::parse()
+                                 def.publicList += funcDef;
+                             if (funcDef.isSlot) {
+                                 def.slotList += funcDef;
+-                                while (funcDef.arguments.size() > 0 && funcDef.arguments.last().isDefault) {
++                                while (funcDef.arguments.size() > 0 && funcDef.arguments.constLast().isDefault) {
+                                     funcDef.wasCloned = true;
+                                     funcDef.arguments.removeLast();
+                                     def.slotList += funcDef;
+@@ -762,7 +762,7 @@ void Moc::parse()
+                                     ++def.revisionedMethods;
+                             } else if (funcDef.isSignal) {
+                                 def.signalList += funcDef;
+-                                while (funcDef.arguments.size() > 0 && funcDef.arguments.last().isDefault) {
++                                while (funcDef.arguments.size() > 0 && funcDef.arguments.constLast().isDefault) {
+                                     funcDef.wasCloned = true;
+                                     funcDef.arguments.removeLast();
+                                     def.signalList += funcDef;
+@@ -771,7 +771,7 @@ void Moc::parse()
+                                     ++def.revisionedMethods;
+                             } else if (funcDef.isInvokable) {
+                                 def.methodList += funcDef;
+-                                while (funcDef.arguments.size() > 0 && funcDef.arguments.last().isDefault) {
++                                while (funcDef.arguments.size() > 0 && funcDef.arguments.constLast().isDefault) {
+                                     funcDef.wasCloned = true;
+                                     funcDef.arguments.removeLast();
+                                     def.methodList += funcDef;
+@@ -847,7 +847,7 @@ void Moc::generate(FILE *out)
+ {
+     QByteArray fn = filename;
+     int i = filename.length()-1;
+-    while (i>0 && filename[i-1] != '/' && filename[i-1] != '\\')
++    while (i > 0 && filename.at(i - 1) != '/' && filename.at(i - 1) != '\\')
+         --i;                                // skip path
+     if (i >= 0)
+         fn = filename.mid(i);
+@@ -863,7 +863,7 @@ void Moc::generate(FILE *out)
+             includePath += '/';
+         for (int i = 0; i < includeFiles.size(); ++i) {
+             QByteArray inc = includeFiles.at(i);
+-            if (inc[0] != '<' && inc[0] != '"') {
++            if (inc.at(0) != '<' && inc.at(0) != '"') {
+                 if (includePath.size() && includePath != "./")
+                     inc.prepend(includePath);
+                 inc = '\"' + inc + '\"';
+@@ -871,7 +871,7 @@ void Moc::generate(FILE *out)
+             fprintf(out, "#include %s\n", inc.constData());
+         }
+     }
+-    if (classList.size() && classList.first().classname == "Qt")
++    if (classList.size() && classList.constFirst().classname == "Qt")
+         fprintf(out, "#include <QtCore/qobject.h>\n");
+ 
+     fprintf(out, "#include <QtCore/qbytearray.h>\n"); // For QByteArrayData
+@@ -959,7 +959,7 @@ void Moc::parseSlots(ClassDef *def, FunctionDef::Access access)
+             ++def->revisionedMethods;
+         }
+         def->slotList += funcDef;
+-        while (funcDef.arguments.size() > 0 && funcDef.arguments.last().isDefault) {
++        while (funcDef.arguments.size() > 0 && funcDef.arguments.constLast().isDefault) {
+             funcDef.wasCloned = true;
+             funcDef.arguments.removeLast();
+             def->slotList += funcDef;
+@@ -1015,7 +1015,7 @@ void Moc::parseSignals(ClassDef *def)
+             ++def->revisionedMethods;
+         }
+         def->signalList += funcDef;
+-        while (funcDef.arguments.size() > 0 && funcDef.arguments.last().isDefault) {
++        while (funcDef.arguments.size() > 0 && funcDef.arguments.constLast().isDefault) {
+             funcDef.wasCloned = true;
+             funcDef.arguments.removeLast();
+             def->signalList += funcDef;
+@@ -1053,7 +1053,7 @@ void Moc::createPropertyDef(PropertyDef &propDef)
+     next();
+     propDef.name = lexem();
+     while (test(IDENTIFIER)) {
+-        QByteArray l = lexem();
++        const QByteArray l = lexem();
+         if (l[0] == 'C' && l == "CONSTANT") {
+             propDef.constant = true;
+             continue;
+@@ -1389,7 +1389,7 @@ void Moc::parseSlotInPrivate(ClassDef *def, FunctionDef::Access access)
+     funcDef.access = access;
+     parseFunction(&funcDef, true);
+     def->slotList += funcDef;
+-    while (funcDef.arguments.size() > 0 && funcDef.arguments.last().isDefault) {
++    while (funcDef.arguments.size() > 0 && funcDef.arguments.constLast().isDefault) {
+         funcDef.wasCloned = true;
+         funcDef.arguments.removeLast();
+         def->slotList += funcDef;
+@@ -1533,7 +1533,7 @@ void Moc::checkSuperClasses(ClassDef *def)
+         if (interface2IdMap.contains(superClass)) {
+             bool registeredInterface = false;
+             for (int i = 0; i < def->interfaceList.count(); ++i)
+-                if (def->interfaceList.at(i).first().className == superClass) {
++                if (def->interfaceList.at(i).constFirst().className == superClass) {
+                     registeredInterface = true;
+                     break;
+                 }
+diff --git a/src/tools/moc/preprocessor.cpp b/src/tools/moc/preprocessor.cpp
+index 2b04b678fa4..9388992de2d 100644
+--- a/src/tools/moc/preprocessor.cpp
++++ b/src/tools/moc/preprocessor.cpp
+@@ -208,13 +208,13 @@ Symbols Preprocessor::tokenize(const QByteArray& input, int lineNum, Preprocesso
+                     // STRING_LITERAL handling in moc
+                     if (!Preprocessor::preprocessOnly
+                         && !symbols.isEmpty()
+-                        && symbols.last().token == STRING_LITERAL) {
++                        && symbols.constLast().token == STRING_LITERAL) {
+ 
+-                        QByteArray newString = symbols.last().unquotedLexem();
++                        QByteArray newString = symbols.constLast().unquotedLexem();
+                         newString += input.mid(lexem - begin + 1, data - lexem - 2);
+                         newString.prepend('\"');
+                         newString.append('\"');
+-                        symbols.last() = Symbol(symbols.last().lineNum,
++                        symbols.last() = Symbol(symbols.constLast().lineNum,
+                                                 STRING_LITERAL,
+                                                 newString);
+                         continue;
+@@ -682,7 +682,7 @@ Symbols Preprocessor::macroExpandIdentifier(Preprocessor *that, SymbolStack &sym
+                 if (s.token == WHITESPACE)
+                     continue;
+ 
+-                while (expansion.size() && expansion.last().token == PP_WHITESPACE)
++                while (expansion.size() && expansion.constLast().token == PP_WHITESPACE)
+                     expansion.pop_back();
+ 
+                 Symbol next = s;
+@@ -695,8 +695,8 @@ Symbols Preprocessor::macroExpandIdentifier(Preprocessor *that, SymbolStack &sym
+                     next = arg.at(0);
+                 }
+ 
+-                if (!expansion.isEmpty() && expansion.last().token == s.token) {
+-                    Symbol last = expansion.last();
++                if (!expansion.isEmpty() && expansion.constLast().token == s.token) {
++                    Symbol last = expansion.constLast();
+                     expansion.pop_back();
+ 
+                     if (last.token == STRING_LITERAL || s.token == STRING_LITERAL)
+@@ -1130,12 +1130,12 @@ void Preprocessor::preprocess(const QByteArray &filename, Symbols &preprocessed)
+             }
+             // remove trailing whitespace
+             while (!macro.symbols.isEmpty() &&
+-                   (macro.symbols.last().token == PP_WHITESPACE || macro.symbols.last().token == WHITESPACE))
++                   (macro.symbols.constLast().token == PP_WHITESPACE || macro.symbols.constLast().token == WHITESPACE))
+                 macro.symbols.pop_back();
+ 
+             if (!macro.symbols.isEmpty()) {
+-                if (macro.symbols.first().token == PP_HASHHASH ||
+-                    macro.symbols.last().token == PP_HASHHASH) {
++                if (macro.symbols.constFirst().token == PP_HASHHASH ||
++                    macro.symbols.constLast().token == PP_HASHHASH) {
+                     error("'##' cannot appear at either end of a macro expansion");
+                 }
+             }
+-- 
+2.43.0
+

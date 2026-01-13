@@ -1,0 +1,62 @@
+From 9cd7d7132615002135fc5de0771f28373d41d10f Mon Sep 17 00:00:00 2001
+From: Lars Knoll <lars.knoll@qt.io>
+Date: Tue, 5 Jul 2016 11:06:55 +0200
+Subject: [PATCH 22/23] Don't error out on preprocessor concatenation of two
+ strings
+
+"foo" ## "bar" doesn't make a lot of sense, but MSVC allows them
+(although gcc errors out on them). Simply ignore the ## in this case
+instead of aborting with an error.
+
+Fixes parsing of the Windows winsock2.h header.
+
+Task-number: QTBUG-54560
+Change-Id: I84cd5fbb56a006cf379430708c955cf0da475cff
+Reviewed-by: Olivier Goffart (Woboq GmbH) <ogoffart@woboq.com>
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+Backport-Of: c32ef0a725c7ac9d8a9ab053407389ef2fddc64e (v5.8.0)
+---
+ src/tools/moc/preprocessor.cpp   | 7 ++-----
+ tests/auto/tools/moc/tst_moc.cpp | 6 ++++++
+ 2 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/src/tools/moc/preprocessor.cpp b/src/tools/moc/preprocessor.cpp
+index a79eb3706bf..43f165112fb 100644
+--- a/src/tools/moc/preprocessor.cpp
++++ b/src/tools/moc/preprocessor.cpp
+@@ -696,13 +696,10 @@ Symbols Preprocessor::macroExpandIdentifier(Preprocessor *that, SymbolStack &sym
+                     next = arg.at(0);
+                 }
+ 
+-                if (!expansion.isEmpty() && expansion.constLast().token == s.token) {
+-                    Symbol last = expansion.constLast();
++                Symbol last = expansion.constLast();
++                if (!expansion.isEmpty() && last.token == s.token && last.token != STRING_LITERAL) {
+                     expansion.pop_back();
+ 
+-                    if (last.token == STRING_LITERAL || s.token == STRING_LITERAL)
+-                        that->error("Can't concatenate non identifier tokens");
+-
+                     QByteArray lexem = last.lexem() + next.lexem();
+                     expansion += Symbol(lineNum, last.token, lexem);
+                 } else {
+diff --git a/tests/auto/tools/moc/tst_moc.cpp b/tests/auto/tools/moc/tst_moc.cpp
+index 7f73e8f23d7..d00a86a9e5a 100644
+--- a/tests/auto/tools/moc/tst_moc.cpp
++++ b/tests/auto/tools/moc/tst_moc.cpp
+@@ -75,6 +75,12 @@
+ #include "non-gadget-parent-class.h"
+ #include "grand-parent-gadget-class.h"
+ 
++#ifdef Q_MOC_RUN
++// check that moc can parse these constructs, they are being used in Windows winsock2.h header
++#define STRING_HASH_HASH(x) ("foo" ## x ## "bar")
++const char *string_hash_hash = STRING_HASH_HASH("baz");
++#endif
++
+ Q_DECLARE_METATYPE(const QMetaObject*);
+ 
+ 
+-- 
+2.43.0
+
