@@ -32,6 +32,8 @@ endif
 	$(APPLY) $(SRC)/projectM/clang6.patch
 	$(APPLY) $(SRC)/projectM/missing-includes.patch
 	$(APPLY) $(SRC)/projectM/projectm-cmake-install.patch
+	# remove enforced CMP0005 incompatible with recent CMake
+	sed -i.orig 's,cmake_policy(,# cmake_policy(,' "$(UNPACK_DIR)/CMakeLists.txt"
 	$(MOVE)
 
 PROJECTM_CONF := \
