@@ -1,0 +1,51 @@
+From 08f8cb25a6029220f4dda8b7e8761c7962c0ae17 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 14 Jan 2026 13:45:01 +0100
+Subject: [PATCH 3/5] CMake: don't add -pthread for Windows builds
+
+It can generate some warnings or compilations errors.
+
+The official CMake way of picking the thread library [^1] should probably be used for non-Windows targets.
+
+[^1]: https://cmake.org/cmake/help/latest/module/FindThreads.html
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ CMakeLists.txt     | 5 ++++-
+ src/CMakeLists.txt | 3 +++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 14035ce..52bf365 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -121,8 +121,11 @@ elseif(UNIX OR MINGW)
+         set(OPT_DBG "-DNDEBUG") # disable assert
+     endif()
+ 
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPT_DBG} -${OPT_LV} -fomit-frame-pointer -pthread -std=c99")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPT_DBG} -${OPT_LV} -fomit-frame-pointer -std=c99")
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused-function -Wno-pointer-sign -Wno-pointer-to-int-cast")
++    if(NOT WIN32)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
++    endif()
+     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lm")
+ else()
+     message("Unknown compiler")
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index d690068..29143cf 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -182,6 +182,9 @@ if(NOT MSVC)
+         set(EXTRA_CFLAGS "-DOAPV_STATIC_DEFINE")
+         set(EXTRA_CFLAGS_PRIVATE "")
+     endif()
++    if(NOT WIN32)
++        set(EXTRA_CFLAGS_PRIVATE "${EXTRA_CFLAGS_PRIVATE} -pthread")
++    endif()
+     configure_file(
+       "${CMAKE_SOURCE_DIR}/pkgconfig/${LIB_NAME_BASE}.pc.in"
+       "${CMAKE_BINARY_DIR}/${LIB_NAME_BASE}.pc" @ONLY)
+-- 
+2.52.0.windows.1
+

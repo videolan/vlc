@@ -1,0 +1,65 @@
+From 93b6064273ea4add336936698dfdb84d93f72c58 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 14 Jan 2026 14:16:08 +0100
+Subject: [PATCH 5/5] CMake: check _mm256_setr_m128i is supported
+
+Some older AVX2 compilers don't have it, but it's possible to use a macro instead [^1].
+
+[^1]: https://stackoverflow.com/a/32630658/1266123
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ src/CMakeLists.txt    | 19 +++++++++++++++++++
+ src/avx/oapv_tq_avx.c |  6 ++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index e442e7f..35dfb89 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -120,6 +120,25 @@ elseif(UNIX OR MINGW)
+     endif()
+     if(HAS_AVX2)
+       set_property(SOURCE ${AVX} APPEND PROPERTY COMPILE_FLAGS "-mavx2")
++      # check _mm256_setr_m128i is supported
++      include(CheckCSourceCompiles)
++      include(CMakePushCheckState)
++
++      cmake_push_check_state(RESET)
++      set(CMAKE_REQUIRED_FLAGS "-mavx2")
++      check_c_source_compiles("
++      #include <immintrin.h>
++      int main(void)
++      {
++        __m128i a, b;
++        _mm256_setr_m128i(a, b);
++        return 0;
++      }
++      " HAVE_MM256_SETR)
++      cmake_pop_check_state()
++      if(HAVE_MM256_SETR)
++        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHAVE_MM256_SETR")
++      endif(HAVE_MM256_SETR)
+     endif()
+   endif()
+ 
+diff --git a/src/avx/oapv_tq_avx.c b/src/avx/oapv_tq_avx.c
+index 5939986..4332783 100644
+--- a/src/avx/oapv_tq_avx.c
++++ b/src/avx/oapv_tq_avx.c
+@@ -32,6 +32,12 @@
+ #include "oapv_def.h"
+ #include "oapv_tq_avx.h"
+ 
++#ifndef HAVE_MM256_SETR
++#define _mm256_set_m128i(v0, v1)  _mm256_insertf128_si256(_mm256_castsi128_si256(v1), (v0), 1)
++#define _mm256_setr_m128i(v0, v1) _mm256_set_m128i((v1), (v0))
++#endif
++
++
+ #if X86_SSE
+ #ifndef _mm256_set_m128i
+ #define _mm256_set_m128i(/* __m128i */ hi, /* __m128i */ lo) \
+-- 
+2.52.0.windows.1
+

@@ -1,0 +1,60 @@
+From f2448bb52b35f6b8305afc2a40c166890c11d442 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 14 Jan 2026 13:38:01 +0100
+Subject: [PATCH 1/5] detect Windows builds with _WIN32
+
+It's set by all Windows compilers, including x86_64 and arm64.
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ src/oapv_port.c  | 4 ++--
+ src/oapv_tpool.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/oapv_port.c b/src/oapv_port.c
+index 24d60f0..cc33a03 100644
+--- a/src/oapv_port.c
++++ b/src/oapv_port.c
+@@ -89,7 +89,7 @@ void oapv_trace_line(char *pre)
+     printf("%s\n", str);
+ }
+ 
+-#if defined(WIN32) || defined(WIN64) || defined(_WIN32)
++#if defined(_WIN32)
+ #include <windows.h>
+ #include <sysinfoapi.h>
+ #else /* LINUX, MACOS, Android */
+@@ -99,7 +99,7 @@ void oapv_trace_line(char *pre)
+ int oapv_get_num_cpu_cores(void)
+ {
+     int num_cores = 1; // default
+-#if defined(WIN32) || defined(WIN64) || defined(_WIN32)
++#if defined(_WIN32)
+     {
+         SYSTEM_INFO si;
+         GetNativeSystemInfo(&si);
+diff --git a/src/oapv_tpool.c b/src/oapv_tpool.c
+index 8be0740..349bf9d 100644
+--- a/src/oapv_tpool.c
++++ b/src/oapv_tpool.c
+@@ -32,7 +32,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include "oapv_tpool.h"
+-#if defined(WIN32) || defined(WIN64)
++#if defined(_WIN32)
+ #include <windows.h>
+ #include <process.h>
+ #else
+@@ -41,7 +41,7 @@
+ 
+ #define WINDOWS_MUTEX_SYNC 0
+ 
+-#if !defined(WIN32) && !defined(WIN64)
++#if !defined(_WIN32)
+ 
+ typedef struct thread_ctx {
+     // synchronization members
+-- 
+2.52.0.windows.1
+

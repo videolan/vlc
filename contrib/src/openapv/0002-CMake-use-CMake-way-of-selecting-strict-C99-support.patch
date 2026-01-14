@@ -1,0 +1,28 @@
+From 33243bab9848c6a06d12696bc34a0254d52a4db2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 14 Jan 2026 13:41:39 +0100
+Subject: [PATCH 2/5] CMake: use CMake way of selecting strict C99 support
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1ac32b0..14035ce 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -100,6 +100,10 @@ endif()
+ # Compilation flags
+ ########################################
+ 
++set(CMAKE_C_STANDARD 99)
++set(CMAKE_C_STANDARD_REQUIRED ON)
++set(CMAKE_C_EXTENSIONS OFF)
++
+ # Set compiler flags and options.
+ if(MSVC)
+   message("Not supported yet!")
+-- 
+2.52.0.windows.1
+
