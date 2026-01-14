@@ -318,7 +318,7 @@ if [ -n "$BUILD_UCRT" ]; then
 
         if [ -n "$WINSTORE" ]; then
             # trick to provide these libraries instead of -ladvapi32 -lshell32 -luser32 -lkernel32
-            sed -i -e "s/-ladvapi32/-lwindowsapp -lwindowsappcompat/" $NEWSPECFILE
+            sed -i -e "s/-ladvapi32/-lwindowsapp/" $NEWSPECFILE
             sed -i -e "s/-lshell32//" $NEWSPECFILE
             sed -i -e "s/-luser32//" $NEWSPECFILE
             sed -i -e "s/-lkernel32//" $NEWSPECFILE

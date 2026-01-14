@@ -462,8 +462,6 @@ ucrt_version_test = '''
     # Check if we are building for Windows Store
     if get_option('winstore_app')
         have_win_store = true
-        windowsappcompat_lib = cc.find_library('windowsappcompat')
-        add_project_dependencies(windowsappcompat_lib, language: ['c', 'cpp'])
     else
         have_win_desktop = true
     endif

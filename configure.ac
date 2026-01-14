@@ -480,7 +480,6 @@ AS_IF([test "${SYS}" = "mingw32"],[
   AS_IF([test "${enable_winstore_app}" = "yes"], [
     vlc_winstore_app=1
     LIBCOM="-loleaut32"
-    LDFLAGS="${LDFLAGS} -lwindowsappcompat"
     VLC_ADD_LIBS([libvlccore], [-lruntimeobject])
     AC_LIBOBJ([gai_strerror])
   ],[])
