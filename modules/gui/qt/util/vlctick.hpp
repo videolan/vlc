@@ -94,7 +94,7 @@ protected:
     vlc_tick_t m_ticks;
 };
 
-class VLCDuration : public VLCTick
+class VLCDuration final : public VLCTick
 {
     Q_GADGET
     QML_VALUE_TYPE(vlcDuration)
@@ -125,7 +125,7 @@ private:
     bool m_valid;
 };
 
-class VLCTime : public VLCTick
+class VLCTime final : public VLCTick
 {
     Q_GADGET
     QML_VALUE_TYPE(vlcTime)
