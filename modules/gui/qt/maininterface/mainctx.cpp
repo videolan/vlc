@@ -28,6 +28,9 @@
 
 #include "qt.hpp"
 
+#include <QQmlEngine>
+#include <QJSEngine>
+
 #include "mainctx.hpp"
 #include "mainctx_submodels.hpp"
 #include "medialibrary/mlhelper.hpp"
