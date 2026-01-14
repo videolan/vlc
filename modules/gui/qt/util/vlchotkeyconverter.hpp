@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QPoint>
-#include <QQmlEngine>
+#include <QtQml/qqmlregistration.h>
 
 /* VLC Key/Wheel hotkeys interactions */
 

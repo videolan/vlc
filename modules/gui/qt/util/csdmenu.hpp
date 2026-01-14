@@ -18,7 +18,7 @@
 #ifndef CSDMENU_HPP
 #define CSDMENU_HPP
 
-#include <QQmlEngine>
+#include <QtQml/qqmlregistration.h>
 #include <QMenu>
 
 Q_MOC_INCLUDE("maininterface/mainctx.hpp")
