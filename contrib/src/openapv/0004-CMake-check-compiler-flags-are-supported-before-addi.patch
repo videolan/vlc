@@ -1,0 +1,94 @@
+From ad8d7eab09773ee6e8684919f85acadf9bf56e25 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 14 Jan 2026 13:45:35 +0100
+Subject: [PATCH 4/5] CMake: check compiler flags are supported before adding
+ them
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ CMakeLists.txt     | 25 +++++++++++++++++++++++--
+ src/CMakeLists.txt | 18 ++++++++++++++----
+ 2 files changed, 37 insertions(+), 6 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 52bf365..8366800 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -104,6 +104,8 @@ set(CMAKE_C_STANDARD 99)
+ set(CMAKE_C_STANDARD_REQUIRED ON)
+ set(CMAKE_C_EXTENSIONS OFF)
+ 
++include(CheckCCompilerFlag)
++
+ # Set compiler flags and options.
+ if(MSVC)
+   message("Not supported yet!")
+@@ -121,8 +123,27 @@ elseif(UNIX OR MINGW)
+         set(OPT_DBG "-DNDEBUG") # disable assert
+     endif()
+ 
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPT_DBG} -${OPT_LV} -fomit-frame-pointer -std=c99")
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused-function -Wno-pointer-sign -Wno-pointer-to-int-cast")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPT_DBG} -${OPT_LV}")
++    check_c_compiler_flag("-fomit-frame-pointer" HAS_FLAG_OMIT_FRAME_POINTER)
++    if(HAS_FLAG_OMIT_FRAME_POINTER)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fomit-frame-pointer")
++    endif()
++    check_c_compiler_flag("-Wall" HAS_FLAG_WARNING_ALL)
++    if(HAS_FLAG_WARNING_ALL)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
++    endif()
++    check_c_compiler_flag("-Wno-unused-function" HAS_FLAG_NO_UNUSED_FUNCTION)
++    if(HAS_FLAG_NO_UNUSED_FUNCTION)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-function")
++    endif()
++    check_c_compiler_flag("-Wno-pointer-sign" HAS_FLAG_NO_POINTER_SIGN)
++    if(HAS_FLAG_NO_POINTER_SIGN)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-sign")
++    endif()
++    check_c_compiler_flag("-Wno-pointer-to-int-cast" HAS_FLAG_NO_POINTER_INT_CAST)
++    if(HAS_FLAG_NO_POINTER_INT_CAST)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-to-int-cast")
++    endif()
+     if(NOT WIN32)
+       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+     endif()
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 29143cf..e442e7f 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -14,6 +14,10 @@ file(GLOB LIB_AVX_INC "../src/avx/oapv_*.h" )
+ include(GenerateExportHeader)
+ include_directories("${CMAKE_BINARY_DIR}/include")
+ 
++include(CheckCCompilerFlag)
++check_c_compiler_flag("-flax-vector-conversions" HAS_ARM_VECTOR_CONVERSION)
++check_c_compiler_flag("-msse4.1" HAS_SSE41)
++check_c_compiler_flag("-mavx2" HAS_AVX2)
+ 
+ message("SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
+ 
+@@ -107,10 +111,16 @@ if(MSVC)
+   endif()
+ elseif(UNIX OR MINGW)
+   if (ARM)
+-    set_property(SOURCE ${NEON} APPEND PROPERTY COMPILE_FLAGS "-flax-vector-conversions")
+-elseif (X86 OR UNIVERSAL)
+-    set_property(SOURCE ${SSE} APPEND PROPERTY COMPILE_FLAGS "-msse4.1")
+-    set_property(SOURCE ${AVX} APPEND PROPERTY COMPILE_FLAGS " -mavx2")
++    if(HAS_ARM_VECTOR_CONVERSION)
++      set_property(SOURCE ${NEON} APPEND PROPERTY COMPILE_FLAGS "-flax-vector-conversions")
++    endif()
++  elseif (X86 OR UNIVERSAL)
++    if(HAS_SSE41)
++      set_property(SOURCE ${SSE} APPEND PROPERTY COMPILE_FLAGS "-msse4.1")
++    endif()
++    if(HAS_AVX2)
++      set_property(SOURCE ${AVX} APPEND PROPERTY COMPILE_FLAGS "-mavx2")
++    endif()
+   endif()
+ 
+   if(OAPV_BUILD_SHARED_LIB)
+-- 
+2.52.0.windows.1
+
