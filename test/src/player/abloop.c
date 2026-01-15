@@ -193,12 +193,166 @@ test_abloop(struct ctx *ctx)
     }
 }
 
+struct abloop_initial_position_scenario
+{
+    const char* title;
+    bool can_seek;
+    bool nolength_report;
+    vlc_tick_t initial_time;
+    vlc_tick_t expected_initial_time;
+    vlc_tick_t length;
+    vlc_tick_t a_time;
+    vlc_tick_t b_time;
+    double initial_pos;
+    double expected_initial_pos;
+    double a_pos;
+    double b_pos;
+
+};
+
+static void
+test_abloop_initial_position_scenario(struct ctx *ctx, const struct abloop_initial_position_scenario *scenario)
+{
+    vlc_player_t *player = ctx->player;
+
+    struct media_params params = DEFAULT_MEDIA_PARAMS(scenario->length);
+    params.can_seek = scenario->can_seek;
+    params.track_count[AUDIO_ES] = 1;
+    params.track_count[VIDEO_ES] = 0;
+    params.track_count[SPU_ES] = 0;
+    params.report_length = !scenario->nolength_report;
+    player_set_next_mock_media(ctx, "media1", &params);
+
+    player_start(ctx);
+
+    while (get_buffering_count(ctx) < 1)
+        vlc_player_CondWait(player, &ctx->wait);
+
+    if (scenario->initial_time != VLC_TICK_INVALID)
+    {
+        vlc_player_SetTime(player, scenario->initial_time);
+
+        vec_on_position_changed *vec = &ctx->report.on_position_changed;
+        while (vec->size == 0)
+            vlc_player_CondWait(player, &ctx->wait);
+
+        vlc_tick_t current_time = VEC_LAST(vec).time;
+
+        assert(current_time >= scenario->initial_time);
+        assert(current_time - scenario->initial_time < VLC_TICK_FROM_MS(1000));
+
+        assert(scenario->b_time != VLC_TICK_INVALID);
+        int ret = vlc_player_SetAtoBLoopTime(player, scenario->a_time,
+                                             scenario->b_time);
+        assert(ret == VLC_SUCCESS);
+
+
+        //wait for the next position report
+        while (vec->size == 1)
+            vlc_player_CondWait(player, &ctx->wait);
+
+
+        current_time = VEC_LAST(vec).time;
+
+        assert(current_time >= scenario->expected_initial_time);
+        assert(current_time - scenario->expected_initial_time < VLC_TICK_FROM_MS(1000));
+    }
+    else
+    {
+        vlc_player_SetPosition(player, scenario->initial_pos);
+
+        vec_on_position_changed *vec = &ctx->report.on_position_changed;
+        while (vec->size == 0)
+            vlc_player_CondWait(player, &ctx->wait);
+
+        double current_pos = VEC_LAST(vec).pos;
+
+        assert(current_pos >= scenario->initial_pos);
+        assert((current_pos - scenario->initial_pos) < 0.1);
+
+        int ret = vlc_player_SetAtoBLoopPosition(player, scenario->a_pos,
+                                                 scenario->b_pos);
+        assert(ret == VLC_SUCCESS);
+
+
+        //wait for the next position report
+        while (vec->size == 1)
+            vlc_player_CondWait(player, &ctx->wait);
+
+
+        current_pos = VEC_LAST(vec).pos;
+
+        assert(current_pos >= scenario->expected_initial_pos);
+        assert((current_pos - scenario->expected_initial_pos) < 0.1);
+    }
+
+    test_end(ctx);
+}
+
+static void
+test_abloop_initial_position(struct ctx *ctx)
+{
+    const struct abloop_initial_position_scenario scenarios[] =
+    {
+        {
+            .title = "Current time before the interval should seek to beginning",
+            .can_seek = true,
+            .length = VLC_TICK_FROM_MS(30000),
+            .initial_time = VLC_TICK_FROM_MS(5000), .expected_initial_time = VLC_TICK_FROM_MS(10000),
+            .a_time = VLC_TICK_FROM_MS(10000), .b_time = VLC_TICK_FROM_MS(20000),
+        },
+        {
+            .title = "Current time in the interval should not seek",
+            .can_seek = true,
+            .length = VLC_TICK_FROM_MS(30000),
+            .initial_time = VLC_TICK_FROM_MS(15000), .expected_initial_time = VLC_TICK_FROM_MS(15000),
+            .a_time = VLC_TICK_FROM_MS(10000), .b_time = VLC_TICK_FROM_MS(20000),
+        },
+        {
+            .title = "Current time after the interval should seek to beginning",
+            .can_seek = true,
+            .length = VLC_TICK_FROM_MS(30000),
+            .initial_time = VLC_TICK_FROM_MS(25000), .expected_initial_time = VLC_TICK_FROM_MS(10000),
+            .a_time = VLC_TICK_FROM_MS(10000), .b_time = VLC_TICK_FROM_MS(20000),
+        },
+        {
+            .title = "Current pos before the interval should seek to beginning",
+            .can_seek = true,
+            .length = VLC_TICK_FROM_MS(30000),
+            .initial_pos = 0.1, .expected_initial_pos = 0.3,
+            .a_pos = 0.3, .b_pos = 0.6,
+        },
+        {
+            .title = "Current pos in the interval should not seek",
+            .can_seek = true,
+            .length = VLC_TICK_FROM_MS(30000),
+            .initial_pos = 0.4, .expected_initial_pos = 0.4,
+            .a_pos = 0.3, .b_pos = 0.6,
+        },
+        {
+            .title = "Current pos after the interval should seek to beginning",
+            .can_seek = true,
+            .length = VLC_TICK_FROM_MS(30000),
+            .initial_pos = 0.8, .expected_initial_pos = 0.3,
+            .a_pos = 0.3, .b_pos = 0.6,
+        },
+
+    };
+
+    for (size_t i = 0; i < ARRAY_SIZE(scenarios); ++i)
+    {
+        test_log("abloop_initial_position[%zu]: %s\n", i, scenarios[i].title);
+        test_abloop_initial_position_scenario(ctx, &scenarios[i]);
+    }
+}
+
 int
 main(void)
 {
     struct ctx ctx;
     ctx_init(&ctx, 0);
     test_abloop(&ctx);
+    test_abloop_initial_position(&ctx);
     ctx_destroy(&ctx);
     return 0;
 }
