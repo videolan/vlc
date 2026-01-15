@@ -150,16 +150,19 @@ _Noreturn void vlc_control_cancel (vlc_cleanup_t *cleaner)
 
 #if !defined(_WIN32)
 # define HAVE_WEAK_SPAWN
+# define HAVE_WEAK_SPAWNP
 #else
 # if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-#  define HAVE_WEAK_SPAWN
+#  define HAVE_WEAK_SPAWNP
 # endif
 #endif
 
-#ifdef HAVE_WEAK_SPAWN
+#if defined(HAVE_WEAK_SPAWN) || defined(HAVE_WEAK_SPAWNP)
 #include <errno.h>
 #include <vlc_spawn.h>
+#endif
 
+#if defined(HAVE_WEAK_SPAWNP)
 VLC_WEAK
 int vlc_spawn(pid_t *pid, const char *file, const int *fds,
               const char *const *args)
@@ -182,7 +185,9 @@ int vlc_waitpid(pid_t pid)
     (void) pid;
     vlc_assert_unreachable();
 }
+#endif
 
+#if defined(HAVE_WEAK_SPAWN)
 VLC_WEAK struct vlc_process *
 vlc_process_Spawn(const char *path, int argc, const char *const *argv)
 {
