@@ -121,7 +121,7 @@ Item {
     readonly property color effectiveBackgroundColor: shaderEffect.readyForVisibility ? backgroundColor : "transparent"
 
     property alias blending: shaderEffect.blending
-    blending: true
+    blending: (effectiveRadius > 0.0) || (effectiveBackgroundColor.a < 1.0)
 
     // Border:
     // NOTE: The border is an overlay for the texture (the
