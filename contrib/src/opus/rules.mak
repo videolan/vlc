@@ -1,6 +1,6 @@
 # opus
 
-OPUS_VERSION := 1.6
+OPUS_VERSION := 1.6.1
 
 OPUS_URL := $(XIPH)/opus/opus-$(OPUS_VERSION).tar.gz
 
