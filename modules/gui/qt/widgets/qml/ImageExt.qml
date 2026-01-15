@@ -115,9 +115,9 @@ Item {
     property real radiusTopLeft: radius
     property real radiusBottomRight: radius
     property real radiusBottomLeft: radius
-
-    property alias backgroundColor: shaderEffect.backgroundColor
     readonly property real effectiveRadius: shaderEffect.readyForVisibility ? Math.max(radiusTopRight, radiusTopLeft, radiusBottomRight, radiusBottomLeft) : 0.0
+
+    property color backgroundColor: "transparent"
     readonly property color effectiveBackgroundColor: shaderEffect.readyForVisibility ? backgroundColor : "transparent"
 
     property alias blending: shaderEffect.blending
@@ -179,7 +179,7 @@ Item {
         readonly property real radiusTopLeft: normalizeRadius(root.radiusTopLeft)
         readonly property real radiusBottomLeft: normalizeRadius(root.radiusBottomLeft)
 
-        property color backgroundColor: "transparent"
+        property alias backgroundColor: root.backgroundColor
 
         readonly property size size: Qt.size(width, height)
 
