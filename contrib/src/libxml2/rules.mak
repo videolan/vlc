@@ -36,6 +36,8 @@ endif
 
 libxml2: libxml2-$(LIBXML2_VERSION).tar.xz .sum-libxml2
 	$(UNPACK)
+	$(APPLY) $(SRC)/libxml2/0001-threads-don-t-force-_WIN32_WINNT-to-Vista-if-it-s-se.patch
+	$(APPLY) $(SRC)/libxml2/0002-globals-don-t-use-destructor-in-UWP-builds.patch
 	$(call pkg_static,"libxml-2.0.pc.in")
 	$(MOVE)
 
