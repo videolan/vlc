@@ -346,6 +346,7 @@ elif host_system == 'windows'
         'win32/rand.c',
         'win32/specific.c',
         'win32/thread.c',
+        'win32/process.c',
     ]
 
     if have_win_store
@@ -358,7 +359,6 @@ elif host_system == 'windows'
             'win32/timer.c',
             'win32/dirs.c',
             'win32/spawn.c',
-            'win32/process.c',
         ]
     endif
 else
