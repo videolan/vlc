@@ -86,16 +86,27 @@ float sdRoundBox( in vec2 p, in vec2 b, in vec4 r )
 
 void main()
 {
-    // The signed distance function works when the primitive is centered.
-    // If the texture is in the atlas, this condition is not satisfied.
-    // Therefore, we have to normalize the coordinate for the distance
-    // function to [0, 1]:
-    vec2 normalCoord = vec2(1.0, 1.0) / (qt_SubRect_source.zw) * (qt_TexCoord0 - (qt_SubRect_source.zw + qt_SubRect_source.xy)) + vec2(1.0, 1.0);
-    normalCoord.y = (1.0 - normalCoord.y); // invert y-axis because texture coordinates have origin at the top
+    // Depends on uniform values, this is considered acceptable:
+    bool rounding = (radiusTopLeft > 0.0 || radiusTopRight > 0.0 || radiusBottomLeft > 0.0 || radiusBottomRight > 0.0);
 
-    vec2 p = (size.xy * ((2.0 * normalCoord) - 1)) / size.y;
-    // Signed distance:
-    float dist = sdRoundBox(p, vec2(size.x / size.y, 1.0), vec4(radiusTopRight, radiusBottomRight, radiusTopLeft, radiusBottomLeft));
+    float dist;
+#ifdef BORDER_SUPPORT
+    if (rounding || borderRange > 0.0) // border requires sdf, even if there is no rounding wanted for the texture
+#else
+    if (rounding)
+#endif
+    {
+        // The signed distance function works when the primitive is centered.
+        // If the texture is in the atlas, this condition is not satisfied.
+        // Therefore, we have to normalize the coordinate for the distance
+        // function to [0, 1]:
+        vec2 normalCoord = vec2(1.0, 1.0) / (qt_SubRect_source.zw) * (qt_TexCoord0 - (qt_SubRect_source.zw + qt_SubRect_source.xy)) + vec2(1.0, 1.0);
+        normalCoord.y = (1.0 - normalCoord.y); // invert y-axis because texture coordinates have origin at the top
+
+        vec2 p = (size.xy * ((2.0 * normalCoord) - 1)) / size.y;
+        // Signed distance:
+        dist = sdRoundBox(p, vec2(size.x / size.y, 1.0), vec4(radiusTopRight, radiusBottomRight, radiusTopLeft, radiusBottomLeft));
+    }
 
 #ifdef CROP_SUPPORT
     vec2 texCoord;
@@ -157,29 +168,32 @@ void main()
     }
 #endif
 
-    float factor;
+    if (rounding)
+    {
+        float factor;
 #ifdef ANTIALIASING
-    if (antialiasing != 0)
-    {
+        if (antialiasing != 0)
+        {
 #ifndef CUSTOM_SOFTEDGE
-        float softEdgeMax = fwidth(dist) * 0.75;
-        float softEdgeMin = -softEdgeMax;
+            float softEdgeMax = fwidth(dist) * 0.75;
+            float softEdgeMin = -softEdgeMax;
 #endif
-        // Breathing room (shrink):
-        dist += softEdgeMax;
+            // Breathing room (shrink):
+            dist += softEdgeMax;
 
-        // Soften the outline, as recommended by the Valve paper, using smoothstep:
-        // "Improved Alpha-Tested Magnification for Vector Textures and Special Effects"
-        // NOTE: The whole texel is multiplied, because of premultiplied alpha.
-        factor = smoothstep(softEdgeMin, softEdgeMax, dist);
-    }
-    else
+            // Soften the outline, as recommended by the Valve paper, using smoothstep:
+            // "Improved Alpha-Tested Magnification for Vector Textures and Special Effects"
+            // NOTE: The whole texel is multiplied, because of premultiplied alpha.
+            factor = smoothstep(softEdgeMin, softEdgeMax, dist);
+        }
+        else
 #endif
-    {
-        factor = step(0.0, dist);
-    }
+        {
+            factor = step(0.0, dist);
+        }
 
-    texel *= 1.0 - factor;
+        texel *= 1.0 - factor;
+    }
 
     fragColor = texel * qt_Opacity;
 }
