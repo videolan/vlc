@@ -120,6 +120,9 @@ Item {
     readonly property real effectiveRadius: shaderEffect.readyForVisibility ? Math.max(radiusTopRight, radiusTopLeft, radiusBottomRight, radiusBottomLeft) : 0.0
     readonly property color effectiveBackgroundColor: shaderEffect.readyForVisibility ? backgroundColor : "transparent"
 
+    property alias blending: shaderEffect.blending
+    blending: true
+
     // Border:
     // NOTE: The border is an overlay for the texture (the
     //       texture does not shrink).
@@ -162,8 +165,6 @@ Item {
         smooth: root.smooth
 
         supportsAtlasTextures: true
-
-        blending: true
 
         antialiasing: root.antialiasing
 
