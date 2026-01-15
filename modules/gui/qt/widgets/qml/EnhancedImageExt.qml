@@ -45,6 +45,22 @@ ImageExt {
     // No need to load images in this case:
     loadImages: (targetTextureProvider === root.sourceTextureProviderItem)
 
+    blending: {
+        if (effectiveRadius > 0.0)
+            return true // Outside the radius is always transparent, need blending
+
+        if (effectiveBackgroundColor.a > (1.0 - Number.EPSILON))
+            return false // If background color is opaque, no need for blending
+
+        if (textureProviderItem === textureProvider) {
+            console.assert(observer.source === textureProvider)
+            if (!observer.hasAlphaChannel)
+                return false // If the texture is opaque, no need for blending
+        }
+
+        return true
+    }
+
     TextureProviderItem {
         id: textureProvider
 
