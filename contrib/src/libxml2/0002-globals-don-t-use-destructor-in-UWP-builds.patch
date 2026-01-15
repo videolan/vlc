@@ -1,0 +1,27 @@
+From 96a8448b7916707ab85279ee5b3529237569d4be Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 15 Jan 2026 13:36:39 +0100
+Subject: [PATCH 2/2] globals: don't use destructor in UWP builds
+
+RegisterWaitForSingleObject() and UnregisterWait() are not available in UWP builds.
+---
+ globals.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/globals.c b/globals.c
+index 8306f94e..d2467760 100644
+--- a/globals.c
++++ b/globals.c
+@@ -80,7 +80,9 @@ static int lineNumbersDefaultValue = 1;
+ 
+ #ifdef HAVE_WIN32_THREADS
+   #if defined(LIBXML_STATIC) && !defined(LIBXML_STATIC_FOR_DLL)
++   #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+     #define USE_WAIT_DTOR
++   #endif
+   #else
+     #define USE_DLL_MAIN
+   #endif
+-- 
+2.52.0.windows.1
+
