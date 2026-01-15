@@ -624,7 +624,11 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     }
 
     JSAMPIMAGE p_row_pointers = NULL;
+#if JPEG_LIB_VERSION_MAJOR > 9 || (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4)
+    size_t size = p_block->i_buffer;
+#else
     unsigned long size = p_block->i_buffer;
+#endif
 
     /* libjpeg longjmp's there in case of error */
     if (setjmp(p_sys->setjmp_buffer))
