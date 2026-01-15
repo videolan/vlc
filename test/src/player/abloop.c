@@ -10,6 +10,7 @@
 
 struct abloop_scenario
 {
+    const char* title;
     bool can_seek;
     bool after_1st_buferring;
     bool nolength_report;
@@ -131,7 +132,7 @@ test_abloop(struct ctx *ctx)
     const struct abloop_scenario scenarios[] =
     {
         {
-            /* Check that b_time past length is handled */
+            .title = "Check that b_time past length is handled",
             .can_seek = true, .after_1st_buferring = false,
             .check_prev_ts = true,
             .length = VLC_TICK_FROM_MS(20000),
@@ -139,7 +140,7 @@ test_abloop(struct ctx *ctx)
             .seek_count = 2,
         },
         {
-            /* Check we have the same result if called after buffering */
+            .title  = "Check we have the same result if called after buffering",
             .can_seek = true, .after_1st_buferring = true,
             .check_prev_ts = true,
             .length = VLC_TICK_FROM_MS(20000),
@@ -147,28 +148,28 @@ test_abloop(struct ctx *ctx)
             .seek_count = 2,
         },
         {
-            /* Check small A->B loop values */
+            .title = "Check small A->B loop values",
             .can_seek = true, .after_1st_buferring = true,
             .length = VLC_TICK_FROM_MS(3000),
             .a_time = VLC_TICK_FROM_MS(1), .b_time = VLC_TICK_FROM_MS(2),
             .seek_count = 4,
         },
         {
-            /* Check with positions */
+            .title = "Check with positions",
             .can_seek = true, .after_1st_buferring = true,
             .length = VLC_TICK_FROM_MS(3000),
             .a_pos = 0.9, .b_pos = 1.0f,
             .seek_count = 1,
         },
         {
-            /* Check we have the same result if called after buffering */
+            .title = "Check we have the same result if called after buffering",
             .can_seek = true, .after_1st_buferring = false,
             .length = VLC_TICK_FROM_MS(3000),
             .a_pos = 0.9, .b_pos = 1.0f,
             .seek_count = 2,
         },
         {
-            /* Check that seek is triggered by EOF (no reported length) */
+            .title = "Check that seek is triggered by EOF (no reported length)",
             .can_seek = true, .after_1st_buferring = false,
             .nolength_report = true,
             .length = VLC_TICK_FROM_MS(1000),
@@ -176,7 +177,7 @@ test_abloop(struct ctx *ctx)
             .seek_count = 2,
         },
         {
-            /* Check that A->B loop is not triggered */
+            .title= "Check that A->B loop is not triggered",
             .can_seek = false, .after_1st_buferring = false,
             .nolength_report = true, .wait_stopped = true,
             .length = VLC_TICK_FROM_MS(100),
@@ -187,7 +188,7 @@ test_abloop(struct ctx *ctx)
 
     for (size_t i = 0; i < ARRAY_SIZE(scenarios); ++i)
     {
-        test_log("abloop[%zu]\n", i);
+        test_log("abloop[%zu]: %s\n", i, scenarios[i].title);
         test_abloop_scenario(ctx, &scenarios[i]);
     }
 }
