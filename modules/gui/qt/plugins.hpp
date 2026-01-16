@@ -80,5 +80,7 @@
     Q_IMPORT_PLUGIN(QXdgDesktopPortalThemePlugin)
 #elif defined(__EMSCRIPTEN__)
     Q_IMPORT_PLUGIN(QWasmIntegrationPlugin)
+#elif defined(Q_OS_IOS)
+    Q_IMPORT_PLUGIN(QIOSIntegrationPlugin)
 #endif
 #endif
