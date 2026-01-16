@@ -56,7 +56,7 @@ libqt_plugin_la_CXXFLAGS += -DQT_HAS_LIBATOMIC
 libqt_plugin_la_LIBADD += -latomic
 endif
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS)
-if HAVE_DARWIN
+if HAVE_OSX
 libqt_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
 endif
 
