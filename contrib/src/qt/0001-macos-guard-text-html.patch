@@ -1,0 +1,16 @@
+--- a/src/plugins/platforms/cocoa/qcocoamessagedialog.mm	2026-01-17 00:40:51
++++ b/src/plugins/platforms/cocoa/qcocoamessagedialog.mm	2026-01-17 00:43:14
+@@ -42,9 +42,13 @@
+     if (!Qt::mightBeRichText(text))
+         return text;
+ 
++#ifndef QT_NO_TEXTHTMLPARSER
+     QTextDocument textDocument;
+     textDocument.setHtml(text);
+     return textDocument.toPlainText();
++#else
++    return "";
++#endif
+ }
+ 
+ static NSControlStateValue controlStateFor(Qt::CheckState state)

@@ -55,6 +55,7 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0001-Use-DirectWrite-font-database-only-with-Windows-10-a.patch
 	$(APPLY) $(SRC)/qt/0003-Do-not-link-D3D9.patch
 	$(APPLY) $(SRC)/qt/0001-WIP-Core-Add-operator-to-our-bidirectional-meta-iter.patch
+	$(APPLY) $(SRC)/qt/0001-macos-guard-text-html.patch
 	$(MOVE)
 
 ifdef HAVE_WIN32
