@@ -55,7 +55,7 @@ bool CompositorPlatform::init()
 #endif
 
 #ifdef __APPLE__
-    if (platformName == QLatin1String("cocoa"))
+    if (platformName == QLatin1String("cocoa") || platformName == QLatin1String("ios"))
         return true;
 #endif
 
