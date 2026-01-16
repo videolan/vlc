@@ -404,6 +404,7 @@ vlc_player_UpdateTimerBestSource(vlc_player_t *player, vlc_es_id_t *es_source,
         {
             vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
                                          system_date);
+            player->timer.last_ts = point->ts;
 
             /* It is possible to receive valid points while seeking. These
              * points could be updated when the input thread didn't yet process
@@ -442,7 +443,6 @@ vlc_player_UpdateTimerSmpteSource(vlc_player_t *player, vlc_es_id_t *es_source,
          || frame_rate_base != source->smpte.frame_rate_base))
         {
             assert(frame_rate_base != 0);
-            player->timer.last_ts = VLC_TICK_INVALID;
             vlc_player_UpdateSmpteTimerFPS(player, source, frame_rate,
                                            frame_rate_base);
         }
@@ -530,8 +530,6 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
 
     vlc_player_UpdateTimerSmpteSource(player, es_source, point, system_date,
                                       frame_rate, frame_rate_base);
-
-    player->timer.last_ts = point->ts;
 
     vlc_mutex_unlock(&player->timer.lock);
 }
