@@ -31,9 +31,6 @@ readonly VLC_SCRIPT_DIR="$(cd "${BASH_SOURCE%/*}"; pwd)"
 # Include vlc env script
 . "$VLC_SCRIPT_DIR/../macosx/env.build.sh" "none"
 
-# Include build config file
-. "$VLC_SCRIPT_DIR/build.conf"
-
 ##########################################################
 #                    Global variables                    #
 ##########################################################
@@ -46,6 +43,8 @@ readonly VLC_SRC_DIR=$(vlcGetRootDir)
 readonly VLC_BUILD_DIR=$(pwd)
 # Whether verbose output is enabled or not
 VLC_SCRIPT_VERBOSE=0
+# Path to build configuration file
+: "${VLC_BUILD_CONF_PATH:="$VLC_SCRIPT_DIR/build.conf"}"
 # Architecture of the host (OS that the result will run on)
 VLC_HOST_ARCH="x86_64"
 # Host platform information
@@ -120,6 +119,8 @@ usage()
     echo " --arch=ARCH      Architecture to build for"
     echo "                   (i386|x86_64|armv7|arm64)"
     echo " --sdk=SDK        Name of the SDK to build with (see 'xcodebuild -showsdks')"
+    echo " --config=FILE    Path to build configuration file"
+    echo "                   (default: ./build.conf)"
     echo " --enable-bitcode        Enable bitcode for compilation, same as with =full"
     echo " --enable-bitcode=marker Enable bitcode marker for compilation"
     echo " --disable-debug  Disable libvlc debug mode (for release)"
@@ -166,6 +167,26 @@ check_tool()
     command -v "$1" >/dev/null 2>&1 || {
         abort_err "This script requires '$1' but it was not found"
     }
+}
+
+# Validate and set the build config file path
+# Globals:
+#   VLC_BUILD_CONF_PATH
+# Arguments:
+#   Optional config file path
+validate_build_conf()
+{
+    local conf_path="$1"
+
+    # Expand relative paths to absolute paths
+    conf_path="$(cd "$(dirname "$conf_path")" 2>/dev/null && pwd)/$(basename "$conf_path")"
+
+    if [ ! -f "$conf_path" ] || [ ! -r "$conf_path" ]; then
+        abort_err "Build config file not found or not readable: $conf_path"
+    fi
+
+    VLC_BUILD_CONF_PATH="$conf_path"
+    verbose_msg "Using build config: $conf_path"
 }
 
 # Set the VLC_DEPLOYMENT_TARGET* flag options correctly
@@ -502,6 +523,9 @@ do
         --enable-extra-checks)
             VLC_BUILD_EXTRA_CHECKS=1
             ;;
+        --config=*)
+            VLC_BUILD_CONF_PATH="${1#--config=}"
+            ;;
         VLC_PREBUILT_CONTRIBS_URL=*)
             VLC_PREBUILT_CONTRIBS_URL="${1#VLC_PREBUILT_CONTRIBS_URL=}"
             ;;
@@ -516,6 +540,9 @@ do
     esac
     shift
 done
+
+validate_build_conf "${VLC_BUILD_CONF_PATH}"
+. "${VLC_BUILD_CONF_PATH}" || abort_err "Failed to source build config: ${VLC_BUILD_CONF_PATH}"
 
 export MAKEFLAGS="-j${VLC_USE_NUMBER_OF_CORES} ${MAKEFLAGS}"
 if [ "${VLC_REQUESTED_CORE_COUNT}" != "0" ]; then
