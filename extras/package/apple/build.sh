@@ -386,7 +386,7 @@ ac_var_to_export_ac_var()
 write_config_mak()
 {
     # Flags to be used for C-like compilers (C, C++, Obj-C)
-    local clike_flags="$VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
+    local clike_flags="\$(VLC_DEPLOYMENT_TARGET_CFLAG) -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
 
     local vlc_cppflags="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
     local vlc_cflags="$clike_flags"
@@ -394,7 +394,7 @@ write_config_mak()
     local vlc_objcflags="$clike_flags"
 
     # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
-    local vlc_ldflags="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG  -arch $VLC_HOST_ARCH"
+    local vlc_ldflags="\$(VLC_DEPLOYMENT_TARGET_LDFLAG) \$(VLC_DEPLOYMENT_TARGET_CFLAG) -arch $VLC_HOST_ARCH"
 
     echo "Creating makefile..."
     test -e config.mak && unlink config.mak
