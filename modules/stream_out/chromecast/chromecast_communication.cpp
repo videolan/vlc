@@ -34,6 +34,8 @@
 
 #include <iomanip>
 
+#include <vlc_url.h>
+
 ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module,
     std::string serverPath, unsigned int serverPort, const char* targetIP, unsigned int devicePort )
     : m_module( p_module )
@@ -283,6 +285,23 @@ static std::string meta_get_escaped(const vlc_meta_t *p_meta, vlc_meta_type_t ty
     return escape_json(std::string(psz));
 }
 
+std::string ChromecastCommunication::getServerBaseURL() const
+{
+
+    vlc_url_t url_comps{};
+    url_comps.psz_protocol = (char*)"http";
+    url_comps.psz_host = (char*)m_serverIp.c_str();
+    url_comps.i_port = m_serverPort;
+
+    char *url = vlc_uri_compose(&url_comps);
+    if (!url)
+        throw std::bad_alloc();
+    std::string url_str = url;
+    std::free(url);
+
+    return url_str;
+}
+
 std::string ChromecastCommunication::GetMedia( const std::string& mime,
                                                const vlc_meta_t *p_meta,
                                                vlc_tick_t input_length )
@@ -345,12 +364,11 @@ std::string ChromecastCommunication::GetMedia( const std::string& mime,
         }
     }
 
-    std::stringstream chromecast_url;
-    chromecast_url << "http://" << m_serverIp << ":" << m_serverPort << m_serverPath;
+    const std::string chromecast_url = getServerBaseURL() + m_serverPath;
 
-    msg_Dbg( m_module, "s_chromecast_url: %s", chromecast_url.str().c_str());
+    msg_Dbg( m_module, "s_chromecast_url: %s", chromecast_url.c_str());
 
-    ss << "\"contentId\":\"" << chromecast_url.str() << "\""
+    ss << "\"contentId\":\"" << chromecast_url << "\""
        << ",\"streamType\":\"" << ( input_length > VLC_TICK_0 ? "BUFFERED" : "LIVE" ) << "\""
        << ",\"contentType\":\"" << mime << "\"";
        

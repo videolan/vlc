@@ -172,9 +172,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     if( unlikely(m_ctl_thread_interrupt == NULL) )
         throw std::runtime_error( "error creating interrupt context" );
 
-    std::stringstream ss;
-    ss << "http://" << m_communication->getServerIp() << ":" << port;
-    m_art_http_ip = ss.str();
+    m_art_http_ip = m_communication->getServerBaseURL();
 
     char *device_name = var_GetString(p_this, "sout-chromecast-device-name");
     if (device_name)
