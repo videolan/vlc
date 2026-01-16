@@ -64,6 +64,8 @@ else
 QTBASE_CONFIG += -DFEATURE_freetype=ON -DFEATURE_system_freetype=ON
 endif
 
+QTBASE_CONFIG += -DFEATURE_framework=OFF
+
 ifdef HAVE_CROSS_COMPILE
 # This is necessary to make use of qmake
 QTBASE_CONFIG += -DQT_QMAKE_DEVICE_OPTIONS:STRING=CROSS_COMPILE=$(HOST)-
