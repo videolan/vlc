@@ -276,7 +276,7 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
 
         case VLC_PLAYER_TIMER_EVENT_PLAYING:
             assert(!player->timer.stopping);
-            player->timer.update_state = UPDATE_STATE_RESUMED;
+            player->timer.update_state = UPDATE_STATE_RESUMING;
             break;
 
         case VLC_PLAYER_TIMER_EVENT_STOPPING:
@@ -420,6 +420,9 @@ vlc_player_UpdateTimerBestSource(vlc_player_t *player, vlc_es_id_t *es_source,
             if (!vlc_list_is_empty(&source->listeners))
                 vlc_player_SendTimerSourceUpdates(player, source, force_update,
                                                   &source->point);
+
+            if (player->timer.update_state == UPDATE_STATE_RESUMING)
+                player->timer.update_state = UPDATE_STATE_RESUMED;
         }
     }
 }

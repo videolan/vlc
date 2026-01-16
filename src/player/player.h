@@ -234,6 +234,7 @@ struct vlc_player_timer
     {
         UPDATE_STATE_RESUMED,
         UPDATE_STATE_PAUSED,
+        UPDATE_STATE_RESUMING,
     } update_state;
     bool stopping;
 
