@@ -5714,42 +5714,29 @@ static bool get_token( const char **ppsz_path, char **ppsz_token, unsigned *pi_n
 static void MP4_BoxGet_Path( const MP4_Box_t **pp_result, const MP4_Box_t *p_box,
                              const char *psz_path)
 {
-    char *psz_token = NULL;
-
-    if( !p_box )
-    {
-        *pp_result = NULL;
-        return;
-    }
-
     assert( psz_path && psz_path[0] );
 
 //    fprintf( stderr, "path:'%s'\n", psz_path );
-    for( ; ; )
+    for( ; p_box ; )
     {
         unsigned i_number;
+        char *psz_token = NULL;
 
         if( !get_token( &psz_path, &psz_token, &i_number ) )
-            goto error_box;
+        {
+            p_box = NULL;
+            break;
+        }
 //        fprintf( stderr, "path:'%s', token:'%s' n:%d\n",
 //                 psz_path,psz_token,i_number );
         if( !psz_token )
-        {
-            *pp_result = p_box;
-            return;
-        }
-        else
+            break;
+
         if( !strcmp( psz_token, "/" ) )
         {
             /* Find root box */
             while( p_box && p_box->i_type != ATOM_root )
-            {
                 p_box = p_box->p_father;
-            }
-            if( !p_box )
-            {
-                goto error_box;
-            }
         }
         else
         if( !strcmp( psz_token, "." ) )
@@ -5760,68 +5747,37 @@ static void MP4_BoxGet_Path( const MP4_Box_t **pp_result, const MP4_Box_t *p_box
         if( !strcmp( psz_token, ".." ) )
         {
             p_box = p_box->p_father;
-            if( !p_box )
-            {
-                goto error_box;
-            }
-        }
-        else
-        if( strlen( psz_token ) == 4 )
-        {
-            uint32_t i_fourcc;
-            i_fourcc = VLC_FOURCC( psz_token[0], psz_token[1],
-                                   psz_token[2], psz_token[3] );
-            p_box = p_box->p_first;
-            for( ; ; )
-            {
-                if( !p_box )
-                {
-                    goto error_box;
-                }
-                if( p_box->i_type == i_fourcc )
-                {
-                    if( !i_number )
-                    {
-                        break;
-                    }
-                    i_number--;
-                }
-                p_box = p_box->p_next;
-            }
-        }
-        else
-        if( *psz_token == '\0' )
-        {
-            p_box = p_box->p_first;
-            for( ; ; )
-            {
-                if( !p_box )
-                {
-                    goto error_box;
-                }
-                if( !i_number )
-                {
-                    break;
-                }
-                i_number--;
-                p_box = p_box->p_next;
-            }
         }
         else
         {
+            size_t len = strlen( psz_token );
+            if( len != 0 && len != 4 )
+            {
 //            fprintf( stderr, "Argg malformed token \"%s\"",psz_token );
-            goto error_box;
+              free( psz_token );
+              p_box = NULL;
+              break;
+            }
+
+            uint32_t i_fourcc = 0 ;
+            if( len == 4 )
+                i_fourcc = VLC_FOURCC( psz_token[0], psz_token[1],
+                                       psz_token[2], psz_token[3] );
+
+            for( p_box = p_box->p_first; p_box; p_box = p_box->p_next )
+            {
+                if( i_fourcc && p_box->i_type != i_fourcc )
+                    continue;
+                if( i_number == 0 )
+                    break;
+                i_number--;
+            }
         }
 
         free( psz_token );
     }
 
-    return;
-
-error_box:
-    free( psz_token );
-    *pp_result = NULL;
-    return;
+    *pp_result = p_box;
 }
 
 static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p_box,
