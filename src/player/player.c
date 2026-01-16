@@ -195,7 +195,7 @@ vlc_player_GetAtoBLoopDeadline(vlc_player_t *player)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
-    if (!input || !input->abloop_state[0].set || !input->abloop_state[1].set)
+    if (!input || input->pause_date != VLC_TICK_INVALID || !input->abloop_state[0].set || !input->abloop_state[1].set)
         return VLC_TICK_MIN;
 
     vlc_tick_t now = vlc_tick_now();

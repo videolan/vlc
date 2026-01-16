@@ -296,6 +296,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             break;
         case VLC_PLAYER_STATE_PLAYING:
             input->pause_date = VLC_TICK_INVALID;
+            vlc_player_SignalAtoBLoop(player);
             vlc_player_UpdateTimerEvent(player, NULL,
                                         VLC_PLAYER_TIMER_EVENT_PLAYING,
                                         input->pause_date);
@@ -311,6 +312,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             assert(state_date != VLC_TICK_INVALID);
             input->pause_date = state_date;
 
+            vlc_player_SignalAtoBLoop(player);
             vlc_player_UpdateTimerEvent(player, NULL,
                                         VLC_PLAYER_TIMER_EVENT_PAUSED,
                                         input->pause_date);
