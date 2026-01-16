@@ -8,7 +8,7 @@
 #include "common.h"
 #include "timers.h"
 
-static struct report_timer *
+static struct report_timer
 wait_timer_report(vlc_player_t *player, struct timer_state *timer,
                   unsigned type)
 {
@@ -24,15 +24,16 @@ wait_timer_report(vlc_player_t *player, struct timer_state *timer,
         }
     }
     assert(r_found != NULL);
+    struct report_timer ret_timer = *r_found;
     player_unlock_timer(player, timer);
-    return r_found;
+    return ret_timer;
 }
 
-static struct report_timer *
+static struct report_timer
 get_timer_report(vlc_player_t *player, struct timer_state *timer)
 {
     player_lock_timer(player, timer);
-    struct report_timer *r = &timer->vec.data[timer->vec.size -1];
+    struct report_timer r = timer->vec.data[timer->vec.size -1];
     player_unlock_timer(player, timer);
     return r;
 }
@@ -85,17 +86,16 @@ test_pause(struct ctx *ctx)
     wait_state(ctx, VLC_PLAYER_STATE_PAUSED);
 
     /* Ensure all timers are paused */
-    struct report_timer *r_video_paused, *r_paused;
-    r_video_paused = wait_timer_report(player, &video_timer, REPORT_TIMER_PAUSED);
-    r_paused = wait_timer_report(player, &timer, REPORT_TIMER_PAUSED);
+    wait_timer_report(player, &video_timer, REPORT_TIMER_PAUSED);
+    wait_timer_report(player, &timer, REPORT_TIMER_PAUSED);
 
     /* Ensure we stay paused */
     vlc_tick_sleep(VLC_TICK_FROM_MS(100));
 
     /* Ensure the last video timer report is the paused one (and that no ouput
      * are updated after) */
-    assert(get_timer_report(player, &video_timer) == r_video_paused);
-    assert(get_timer_report(player, &timer) == r_paused);
+    assert(get_timer_report(player, &video_timer).type == REPORT_TIMER_PAUSED);
+    assert(get_timer_report(player, &timer).type == REPORT_TIMER_PAUSED);
 
     test_end(ctx);
     player_remove_timer(player, &video_timer);
