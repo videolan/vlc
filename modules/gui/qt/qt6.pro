@@ -25,6 +25,11 @@ macx {
 QTPLUGIN += qcocoa qmacstyle
 }
 
+ios {
+QTPLUGIN += qios
+CONFIG += no_framework
+}
+
 emscripten {
 QTPLUGIN += qwasm
 }
