@@ -400,8 +400,7 @@ vlc_player_UpdateTimerBestSource(vlc_player_t *player, vlc_es_id_t *es_source,
          * time from the video source, only send it if different in that case.
          */
         if (point->ts != player->timer.last_ts
-          || source->point.system_date != system_date
-          || system_date != VLC_TICK_MAX)
+          || (source->point.system_date != system_date && system_date != VLC_TICK_MAX))
         {
             vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
                                          system_date);
