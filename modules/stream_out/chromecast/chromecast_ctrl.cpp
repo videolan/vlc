@@ -131,9 +131,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     vlc_cond_init( &m_stateChangedCond );
     vlc_cond_init( &m_pace_cond );
 
-    std::stringstream ss;
-    ss << "http://" << m_communication->getServerIp() << ":" << port;
-    m_art_http_ip = ss.str();
+    m_art_http_ip = m_communication->getServerBaseURL();
 
     char *device_name = var_GetString(p_this, "sout-chromecast-device-name");
     if (device_name)
