@@ -29,6 +29,7 @@ x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(APPLY) $(SRC)/x265/0004-Fix-for-CMake-Build-Errors-in-MacOS.patch
 	$(APPLY) $(SRC)/x265/0001-use-OpenFileMappingW-instead-of-OpenFileMappingA.patch
 	$(APPLY) $(SRC)/x265/0001-Fix-libunwind-static-linking-on-Android-toolchains.patch
+	$(APPLY) $(SRC)/x265/0001-CMake-verify-the-Neon-SVE-compiler-flags-can-be-used.patch
 	$(call pkg_static,"source/x265.pc.in")
 	$(MOVE)
 
