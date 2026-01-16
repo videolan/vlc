@@ -5667,7 +5667,7 @@ void MP4_BoxDumpStructure( stream_t *s, const MP4_Box_t *p_box )
  **
  *****************************************************************************
  *****************************************************************************/
-static bool get_token( const char **ppsz_path, char **ppsz_token, int *pi_number )
+static bool get_token( const char **ppsz_path, char **ppsz_token, unsigned *pi_number )
 {
     size_t i_len ;
     if( !*ppsz_path[0] )
@@ -5691,15 +5691,11 @@ static bool get_token( const char **ppsz_path, char **ppsz_token, int *pi_number
     if( **ppsz_path == '[' )
     {
         (*ppsz_path)++;
-        *pi_number = strtol( *ppsz_path, NULL, 10 );
-        while( **ppsz_path && **ppsz_path != ']' )
-        {
-            (*ppsz_path)++;
-        }
-        if( **ppsz_path == ']' )
-        {
-            (*ppsz_path)++;
-        }
+        char *endptr = NULL;
+        *pi_number = strtoul( *ppsz_path, &endptr, 10 );
+        if( endptr == *ppsz_path || *endptr != ']' )
+            return false;
+        *ppsz_path = endptr + 1;
     }
     else
     {
@@ -5731,7 +5727,7 @@ static void MP4_BoxGet_Path( const MP4_Box_t **pp_result, const MP4_Box_t *p_box
 //    fprintf( stderr, "path:'%s'\n", psz_path );
     for( ; ; )
     {
-        int i_number;
+        unsigned i_number;
 
         if( !get_token( &psz_path, &psz_token, &i_number ) )
             goto error_box;
