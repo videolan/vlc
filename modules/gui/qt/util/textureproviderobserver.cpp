@@ -23,6 +23,9 @@
 #if __has_include(<rhi/qrhi.h>) // RHI is semi-public since Qt 6.6
 #define RHI_HEADER_AVAILABLE
 #include <rhi/qrhi.h>
+#elif __has_include(<QtGui/private/qrhi_p.h>)
+#define RHI_HEADER_AVAILABLE
+#include <QtGui/private/qrhi_p.h>
 #endif
 
 TextureProviderObserver::TextureProviderObserver(QObject *parent)
