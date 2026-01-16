@@ -1,0 +1,42 @@
+From bd0dd2ba4a6494e27e00633494cea50defffcca0 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 16 Jan 2026 13:19:05 +0100
+Subject: [PATCH 2/2] CMake: don't force _WIN32_WINNT values
+
+Let the toolchain/environment decide.
+---
+ source/CMakeLists.txt | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index a14a7277d..c42abece8 100755
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -639,15 +639,15 @@ if(WIN32)
+         list(APPEND PLATFORM_LIBS ${VLD_LIBRARIES})
+         link_directories(${VLD_LIBRARY_DIRS})
+     endif()
+-    option(WINXP_SUPPORT "Make binaries compatible with Windows XP and Vista" OFF)
+-    if(WINXP_SUPPORT)
+-        # force use of workarounds for CONDITION_VARIABLE and atomic
+-        # intrinsics introduced after XP
+-        add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WINXP -D_WIN32_WINNT_WIN7=0x0601)
+-    else(WINXP_SUPPORT)
+-        # default to targeting Windows 7 for the NUMA APIs
+-        add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WIN7)
+-    endif(WINXP_SUPPORT)
++    # option(WINXP_SUPPORT "Make binaries compatible with Windows XP and Vista" OFF)
++    # if(WINXP_SUPPORT)
++    #     # force use of workarounds for CONDITION_VARIABLE and atomic
++    #     # intrinsics introduced after XP
++    #     add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WINXP -D_WIN32_WINNT_WIN7=0x0601)
++    # else(WINXP_SUPPORT)
++    #     # default to targeting Windows 7 for the NUMA APIs
++    #     add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WIN7)
++    # endif(WINXP_SUPPORT)
+ endif()
+ 
+ if(POWER)
+-- 
+2.52.0.windows.1
+
