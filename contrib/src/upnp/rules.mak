@@ -42,6 +42,7 @@ endif
 ifdef HAVE_IOS
 	$(APPLY) $(SRC)/upnp/fix-reuseaddr-option.patch
 endif
+	$(APPLY) $(SRC)/upnp/0001-cmake-add-missing-file-in-Windows-compilation.patch
 	$(MOVE)
 
 .upnp: upnp toolchain.cmake

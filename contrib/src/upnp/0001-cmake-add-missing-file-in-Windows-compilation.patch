@@ -1,0 +1,31 @@
+From 1ddb73d9366d51ebc5fd38345de705cbb944393a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 16 Jan 2026 10:24:58 +0100
+Subject: [PATCH] cmake: add missing file in Windows compilation
+
+It's compiled with the autotools build but not CMake.
+This is only useful when compiling for older targets than Windows Vista.
+---
+ upnp/CMakeLists.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/upnp/CMakeLists.txt b/upnp/CMakeLists.txt
+index 594aaffa..6fae57b7 100644
+--- a/upnp/CMakeLists.txt
++++ b/upnp/CMakeLists.txt
+@@ -43,6 +43,12 @@ set (UPNP_SOURCES
+ 	src/urlconfig/urlconfig.c
+ )
+ 
++if(WIN32)
++	list (APPEND UPNP_SOURCES
++		src/inet_pton.c
++	)
++endif()
++
+ if (UPNP_ENABLE_GENA)
+ 	list (APPEND UPNP_SOURCES
+ 		src/gena/gena_device.c
+-- 
+2.52.0.windows.1
+
