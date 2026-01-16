@@ -38,6 +38,7 @@ x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(APPLY) $(SRC)/x265/0001-threadpool-disable-group-affinity-in-UWP-builds.patch
 	$(APPLY) $(SRC)/x265/0001-Fix-libunwind-static-linking-on-Android-toolchains.patch
 	$(APPLY) $(SRC)/x265/0001-CMake-verify-the-Neon-SVE-compiler-flags-can-be-used.patch
+	$(APPLY) $(SRC)/x265/0002-CMake-don-t-force-_WIN32_WINNT-values.patch
 	$(call pkg_static,"source/x265.pc.in")
 	$(MOVE)
 
