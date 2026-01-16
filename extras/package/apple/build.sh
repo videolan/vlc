@@ -401,6 +401,10 @@ write_config_mak()
     exec 3>config.mak || return $?
 
     printf '# This file was automatically generated!\n\n' >&3
+    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET" "${VLC_DEPLOYMENT_TARGET}" >&3
+    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET_CFLAG" "${VLC_DEPLOYMENT_TARGET_CFLAG}" >&3
+    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET_LDFLAG" "${VLC_DEPLOYMENT_TARGET_LDFLAG}" >&3
+
     printf '%s := %s\n' "CPPFLAGS" "${vlc_cppflags}" >&3
     printf '%s := %s\n' "CFLAGS" "${vlc_cflags}" >&3
     printf '%s := %s\n' "CXXFLAGS" "${vlc_cxxflags}" >&3
@@ -415,10 +419,6 @@ write_config_mak()
     printf '%s := %s\n' "STRIP" "${VLC_HOST_STRIP}" >&3
     printf '%s := %s\n' "RANLIB" "${VLC_HOST_RANLIB}" >&3
     printf '%s := %s\n' "NM" "${VLC_HOST_NM}" >&3
-
-    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET" "${VLC_DEPLOYMENT_TARGET}" >&3
-    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET_CFLAG" "${VLC_DEPLOYMENT_TARGET_CFLAG}" >&3
-    printf '%s := %s\n' "VLC_DEPLOYMENT_TARGET_LDFLAG" "${VLC_DEPLOYMENT_TARGET_LDFLAG}" >&3
 
     # Add the ac_cv_ var exports in the config.mak for the contribs
     echo "Appending ac_cv_ vars to config.mak"
