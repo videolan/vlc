@@ -52,15 +52,8 @@ test_pause(struct ctx *ctx)
     /* Start paused */
     vlc_player_SetStartPaused(player, true);
     player_start(ctx);
-    {
-        vec_on_state_changed *vec = &ctx->report.on_state_changed;
-        while (vec->size == 0 || VEC_LAST(vec) != VLC_PLAYER_STATE_PAUSED)
-            vlc_player_CondWait(player, &ctx->wait);
-        assert(vec->size == 3);
-        assert(vec->data[0] == VLC_PLAYER_STATE_STARTED);
-        assert(vec->data[1] == VLC_PLAYER_STATE_PLAYING);
-        assert(vec->data[2] == VLC_PLAYER_STATE_PAUSED);
-    }
+
+    wait_state(ctx, VLC_PLAYER_STATE_PAUSED);
 
     {
         vec_on_position_changed *vec = &ctx->report.on_position_changed;
@@ -74,12 +67,7 @@ test_pause(struct ctx *ctx)
     /* Resume */
     vlc_player_Resume(player);
 
-    {
-        vec_on_state_changed *vec = &ctx->report.on_state_changed;
-        while (VEC_LAST(vec) != VLC_PLAYER_STATE_PLAYING)
-            vlc_player_CondWait(player, &ctx->wait);
-        assert(vec->size == 4);
-    }
+    wait_state(ctx, VLC_PLAYER_STATE_PLAYING);
 
     {
         vec_on_position_changed *vec = &ctx->report.on_position_changed;
@@ -94,12 +82,7 @@ test_pause(struct ctx *ctx)
     /* Pause again (while playing) */
     vlc_player_Pause(player);
 
-    {
-        vec_on_state_changed *vec = &ctx->report.on_state_changed;
-        while (VEC_LAST(vec) != VLC_PLAYER_STATE_PAUSED)
-            vlc_player_CondWait(player, &ctx->wait);
-        assert(vec->size == 5);
-    }
+    wait_state(ctx, VLC_PLAYER_STATE_PAUSED);
 
     /* Ensure all timers are paused */
     struct report_timer *r_video_paused, *r_paused;
