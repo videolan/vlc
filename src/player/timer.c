@@ -40,7 +40,7 @@ vlc_player_ResetTimer(vlc_player_t *player)
     player->timer.smpte_source.smpte.last_framenum = ULONG_MAX;
     player->timer.seek_ts = VLC_TICK_INVALID;
     player->timer.seek_position = -1;
-    player->timer.paused = false;
+    player->timer.update_state = UPDATE_STATE_RESUMED;
     player->timer.stopping = false;
 
     vlc_mutex_unlock(&player->timer.lock);
@@ -261,7 +261,7 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
 
         case VLC_PLAYER_TIMER_EVENT_PAUSED:
             assert(system_date != VLC_TICK_INVALID);
-            player->timer.paused = true;
+            player->timer.update_state = UPDATE_STATE_PAUSED;
 
             for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
             {
@@ -276,7 +276,7 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
 
         case VLC_PLAYER_TIMER_EVENT_PLAYING:
             assert(!player->timer.stopping);
-            player->timer.paused = false;
+            player->timer.update_state = UPDATE_STATE_RESUMED;
             break;
 
         case VLC_PLAYER_TIMER_EVENT_STOPPING:
@@ -513,7 +513,7 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
     assert(point->ts != VLC_TICK_INVALID);
 
     vlc_tick_t system_date = point->system_date;
-    if (player->timer.paused)
+    if (player->timer.update_state == UPDATE_STATE_PAUSED)
     {
         if (es_source != NULL && point->system_date == VLC_TICK_MAX)
         {
@@ -596,7 +596,8 @@ vlc_player_GetTimerPoint(vlc_player_t *player, bool *seeking,
     if (player->timer.best_source.point.system_date == VLC_TICK_INVALID)
         goto end;
 
-    if (system_now != VLC_TICK_INVALID && !player->timer.paused)
+    if (system_now != VLC_TICK_INVALID
+     && player->timer.update_state == UPDATE_STATE_RESUMED)
         ret = vlc_player_timer_point_Interpolate(&player->timer.best_source.point,
                                                  system_now, out_ts, out_pos);
     else

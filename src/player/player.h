@@ -230,7 +230,11 @@ struct vlc_player_timer
 
     vlc_tick_t seek_ts;
     double seek_position;
-    bool paused;
+    enum
+    {
+        UPDATE_STATE_RESUMED,
+        UPDATE_STATE_PAUSED,
+    } update_state;
     bool stopping;
 
     struct vlc_player_timer_source sources[VLC_PLAYER_TIMER_TYPE_COUNT];
