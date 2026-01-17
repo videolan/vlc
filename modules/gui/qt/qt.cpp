@@ -557,8 +557,9 @@ static int OpenInternal( qt_intf_t *p_intf )
         return VLC_EGENERIC;
 #endif
 
-#if (_POSIX_SPAWN >= 0)
+#if (_POSIX_SPAWN >= 0) && !defined(TARGET_OS_IPHONE)
     /* Check if QApplication works */
+    /* Note: Disabled on iOS/tvOS/visionOS as process spawning is not allowed */
     char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, "vlc-qt-check");
     if (unlikely(path == NULL))
         return VLC_ENOMEM;
