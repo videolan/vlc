@@ -58,6 +58,24 @@
 }
 @end
 
+static void vlc_terminate(void *data)
+{
+    AppDelegate *d = (__bridge AppDelegate *)data;
+
+    __block bool quitting = false;
+    static dispatch_once_t quitToken = 0;
+    dispatch_once(&quitToken, ^{
+        quitting = true;
+    });
+
+    if (!quitting)
+        return;
+
+    dispatch_async(d->_intfQueue, ^{
+        libvlc_release(d->_libvlc);
+        d->_libvlc = NULL;
+    });
+}
 
 @implementation AppDelegate
 #if !TARGET_OS_TV
@@ -127,6 +145,9 @@
             NSLog(@"Failed to initialize libVLC");
             return;
         }
+
+        libvlc_SetExitHandler(self->_libvlc->p_libvlc_int, vlc_terminate,
+                              (__bridge void *)self);
 
         dispatch_async(self->_intfQueue, ^{
             @autoreleasepool {
