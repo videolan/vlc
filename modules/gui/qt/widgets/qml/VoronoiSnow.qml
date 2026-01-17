@@ -37,6 +37,7 @@ ShaderEffect {
 
     property real speed: 1.2 // speed factor
 
+    // TODO: Qt 6.6: use `QRhi::isYUpInNDC()` instead of manually probing the matrix and graphics api to decide the direction:
     readonly property int yFlip: ((GraphicsInfo.api === GraphicsInfo.Direct3D11) || (GraphicsInfo.api === GraphicsInfo.Direct3D12)) ? -1 : 1
 
     UniformAnimator on time {
