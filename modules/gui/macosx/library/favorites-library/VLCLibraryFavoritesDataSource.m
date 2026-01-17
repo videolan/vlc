@@ -222,27 +222,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 #pragma mark - Notification handlers
 
-- (void)libraryModelFavoriteVideoMediaListReset:(NSNotification * const)notification
-{
-    [self reloadData];
-}
-
-- (void)libraryModelFavoriteAudioMediaListReset:(NSNotification * const)notification
-{
-    [self reloadData];
-}
-
-- (void)libraryModelFavoriteAlbumsListReset:(NSNotification * const)notification
-{
-    [self reloadData];
-}
-
-- (void)libraryModelFavoriteArtistsListReset:(NSNotification * const)notification
-{
-    [self reloadData];
-}
-
-- (void)libraryModelFavoriteGenresListReset:(NSNotification * const)notification
+- (void)libraryModelFavoriteListReset:(NSNotification * const)notification
 {
     [self reloadData];
 }
@@ -254,23 +234,23 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
 
     [notificationCenter addObserver:self
-                           selector:@selector(libraryModelFavoriteVideoMediaListReset:)
+                           selector:@selector(libraryModelFavoriteListReset:)
                                name:VLCLibraryModelFavoriteVideoMediaListReset
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(libraryModelFavoriteAudioMediaListReset:)
+                           selector:@selector(libraryModelFavoriteListReset:)
                                name:VLCLibraryModelFavoriteAudioMediaListReset
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(libraryModelFavoriteAlbumsListReset:)
+                           selector:@selector(libraryModelFavoriteListReset:)
                                name:VLCLibraryModelFavoriteAlbumsListReset
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(libraryModelFavoriteArtistsListReset:)
+                           selector:@selector(libraryModelFavoriteListReset:)
                                name:VLCLibraryModelFavoriteArtistsListReset
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(libraryModelFavoriteGenresListReset:)
+                           selector:@selector(libraryModelFavoriteListReset:)
                                name:VLCLibraryModelFavoriteGenresListReset
                              object:nil];
 
