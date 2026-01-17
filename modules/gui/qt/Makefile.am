@@ -1587,11 +1587,15 @@ gui_LTLIBRARIES += libqt_plugin.la
 BUILT_SOURCES += $(nodist_libqt_plugin_la_SOURCES)
 if !HAVE_WIN32
 if !HAVE_OS2
+if !HAVE_IOS_OR_TVOS
+if !HAVE_XROS
 pkglibexec_PROGRAMS = vlc-qt-check
 all-local: $(builddir)/../../vlc-qt-check
 
 $(builddir)/../../vlc-qt-check: vlc-qt-check
 	$(AM_V_GEN)cd ../../ && $(LN_S) -f gui/qt/vlc-qt-check . && chmod +x vlc-qt-check
+endif
+endif
 endif
 endif
 
