@@ -107,7 +107,7 @@ QTBASE_CONFIG += $(QTBASE_COMMON_CONFIG) \
 	-DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) $(QT_HOST_PATH)
 
 QTBASE_NATIVE_CONFIG := $(QTBASE_COMMON_CONFIG) -DQT_BUILD_TESTS=FALSE \
-	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF -DFEATURE_testlib=OFF \
+	-DFEATURE_accessibility=ON -DFEATURE_widgets=OFF -DFEATURE_testlib=OFF \
 	-DFEATURE_vnc=OFF -DFEATURE_linuxfb=OFF -DFEATURE_xlib=OFF \
 	-DFEATURE_vulkan=OFF -DFEATURE_imageformatplugin=OFF \
 	-DFEATURE_xkbcommon=OFF -DFEATURE_evdev=OFF -DFEATURE_sessionmanager=OFF -DFEATURE_png=OFF \
