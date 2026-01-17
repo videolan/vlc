@@ -22,7 +22,7 @@ QVariant NetworkBaseModel::basedata(const NetworkBaseItem& item, int role) const
     switch (role)
     {
     case NETWORK_BASE_NAME:
-        return item.name;
+        return item.name.trimmed();
     case NETWORK_BASE_MRL:
         return item.mainMrl;
     case NETWORK_BASE_TYPE:
