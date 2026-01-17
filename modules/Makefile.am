@@ -135,13 +135,13 @@ SUFFIXES += -client-protocol.h -protocol.c .xml
 ALL_TARGETS_PLUGIN_RENAMED := $(LTLIBRARIES:lib%_plugin.la=%_plugin)
 PLUGINS_NAMES := $(ALL_TARGETS_PLUGIN_RENAMED:%.la=)
 
-# Generate a list containing the name of every plugin being built
-# Note that it cannot include plugins from recursive makefiles,
-# like the Qt plugin.
+# Generate a list containing the name and path of every plugin being built
+# Format: plugin_name: relative/path/to/plugin.dylib
+# This allows plugins from SUBDIRS (like Qt) to specify their actual location
 vlc_modules_list: Makefile
 	$(AM_V_GEN)rm -f $@.tmp; for plugin in $(PLUGINS_NAMES); do \
-		printf "$${plugin}\n" >> $@.tmp; done && \
-		mv $@.tmp $@
+	printf "$${plugin}: $(subdir)/.libs/lib$${plugin}.dylib\n" >> $@.tmp; done
+	mv $@.tmp $@
 
 BUILT_SOURCES += vlc_modules_list
 CLEANFILES += vlc_modules_list

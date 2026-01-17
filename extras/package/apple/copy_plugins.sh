@@ -25,21 +25,34 @@ function generate_info_plist()
     echo '</plist>'
 }
 
-PLUGINS=()
+# Parse vlc_modules_list with format: plugin_name: relative/path/to/plugin.dylib
+PLUGIN_ENTRIES=()
 for arch in ${ARCHS}; do
-  while read -r plugin; do
-    if [[ ! " ${PLUGINS[*]} " =~ "[[:space:]]${plugin}[[:space:]]" ]]; then
-      PLUGINS+=( "${plugin}" )
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    # Check if entry already exists (by plugin name)
+    plugin="${line%%: *}"
+    found=0
+    for entry in "${PLUGIN_ENTRIES[@]}"; do
+      if [ "${entry%%: *}" = "$plugin" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ $found -eq 0 ]; then
+      PLUGIN_ENTRIES+=( "$line" )
     fi
   done < "${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/modules/vlc_modules_list"
 done
 
-for plugin in "${PLUGINS[@]}"; do
+for entry in "${PLUGIN_ENTRIES[@]}"; do
+    plugin="${entry%%: *}"
+    plugin_path="${entry#*: }"
     echo "Copying plugin $plugin for platform ${PLATFORM_NAME}"
 
     INPUT_FILES=()
     for arch in ${ARCHS}; do
-        input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/modules/.libs/lib${plugin}.dylib"
+        input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/${plugin_path}"
         if [ ! -f "${input_file}" ]; then
             continue
         fi
