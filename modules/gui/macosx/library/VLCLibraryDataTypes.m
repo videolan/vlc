@@ -1317,7 +1317,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
             break;
 
         default:
-            return _NS("Unknown");
+            return _NS("Unknown Media Type");
             break;
     }
 }
@@ -1338,7 +1338,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
             break;
 
         default:
-            return _NS("Unknown");
+            return _NS("Unknown Media Type");
             break;
     }
 }
