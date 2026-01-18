@@ -39,6 +39,16 @@
 
 @implementation VLCLibraryHomeViewActionButtonCell
 
+- (NSRect)titleRectForBounds:(NSRect)bounds
+{
+    return bounds;
+}
+
+- (NSRect)imageRectForBounds:(NSRect)bounds
+{
+    return bounds;
+}
+
 - (NSDictionary<NSAttributedStringKey, id> *)titleAttributes
 {
     if (_cachedTitleAttributes) {
@@ -146,13 +156,6 @@
     separatorPath.lineWidth = VLCLibraryUIUnits.borderThickness;
     [separatorPath stroke];
     [separatorPath fill];
-}
-
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
-    [self drawBezelWithFrame:cellFrame inView:controlView];
-    [self drawTitle:self.attributedTitle withFrame:cellFrame inView:controlView];
-    [self drawImage:self.image withFrame:cellFrame inView:controlView];
 }
 
 @end
