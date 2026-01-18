@@ -134,19 +134,23 @@
     return titleRect;
 }
 
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+- (void)drawBezelWithFrame:(NSRect)frame inView:(NSView *)controlView
 {
     [NSColor.VLCSubtleBorderColor setStroke];
     [NSColor.windowBackgroundColor setFill];
 
     NSBezierPath * const separatorPath =
-        [NSBezierPath bezierPathWithRoundedRect:cellFrame
+        [NSBezierPath bezierPathWithRoundedRect:frame
                                         xRadius:VLCLibraryUIUnits.cornerRadius
                                         yRadius:VLCLibraryUIUnits.cornerRadius];
     separatorPath.lineWidth = VLCLibraryUIUnits.borderThickness;
     [separatorPath stroke];
     [separatorPath fill];
+}
 
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+    [self drawBezelWithFrame:cellFrame inView:controlView];
     [self drawTitle:self.attributedTitle withFrame:cellFrame inView:controlView];
     [self drawImage:self.image withFrame:cellFrame inView:controlView];
 }
