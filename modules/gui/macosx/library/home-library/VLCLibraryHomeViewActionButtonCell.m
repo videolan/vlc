@@ -64,41 +64,18 @@
     return _cachedTitleHeight;
 }
 
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+- (void)drawImage:(NSImage *)image withFrame:(NSRect)frame inView:(NSView *)controlView
 {
-    [NSColor.VLCSubtleBorderColor setStroke];
-    [NSColor.windowBackgroundColor setFill];
-
-    const CGFloat cellMinX = NSMinX(cellFrame);
-    const CGFloat cellMinY = NSMinY(cellFrame);
-    const CGFloat cellMaxX = NSMaxX(cellFrame);
-    const CGFloat cellMaxY = NSMaxY(cellFrame);
-
-    NSBezierPath * const separatorPath =
-        [NSBezierPath bezierPathWithRoundedRect:cellFrame
-                                        xRadius:VLCLibraryUIUnits.cornerRadius
-                                        yRadius:VLCLibraryUIUnits.cornerRadius];
-    separatorPath.lineWidth = VLCLibraryUIUnits.borderThickness;
-    [separatorPath stroke];
-    [separatorPath fill];
-
-    const CGSize cellSize = cellFrame.size;
+    const CGSize cellSize = frame.size;
     const CGFloat cellWidth = cellSize.width;
     const CGFloat cellHeight = cellSize.height;
-
-    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = [self titleAttributes];
-    const CGFloat titleHeight = [self titleHeightWithAttributes:titleAttributes];
-    [self.title drawInRect:CGRectMake(cellMinX + VLCLibraryUIUnits.smallSpacing,
-                                      cellMaxY - titleHeight,
-                                      cellWidth - VLCLibraryUIUnits.smallSpacing * 2,
-                                      titleHeight)
-            withAttributes:titleAttributes];
+    const CGFloat titleHeight = [self titleHeightWithAttributes:[self titleAttributes]];
 
     const CGSize imageSize = self.image.size;
 
     if (self.cachedImage != self.image ||
         self.prevIsHighlighted != self.isHighlighted ||
-        !NSEqualRects(self.prevFrame, cellFrame)) {
+        !NSEqualRects(self.prevFrame, frame)) {
 
         self.cachedImage = [NSImage imageWithSize:imageSize
                                           flipped:NO
@@ -115,7 +92,7 @@
         }];
 
         self.prevIsHighlighted = self.isHighlighted;
-        self.prevFrame = cellFrame;
+        self.prevFrame = frame;
     } 
 
     const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
@@ -132,12 +109,42 @@
         imageHeight = imageWidth / originalImageAspectRatio;
     }
 
-    const CGPoint cellOrigin = cellFrame.origin;
+    const CGPoint cellOrigin = frame.origin;
     const NSRect imageRect = NSMakeRect(cellOrigin.x + (cellWidth - imageWidth) / 2,
                                         cellOrigin.y + (cellHeight - imageHeight) / 2,
                                         imageWidth,
                                         imageHeight);
     [self.cachedImage drawInRect:imageRect];
+}
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+    [NSColor.VLCSubtleBorderColor setStroke];
+    [NSColor.windowBackgroundColor setFill];
+
+    const CGFloat cellMinX = NSMinX(cellFrame);
+    const CGFloat cellMaxY = NSMaxY(cellFrame);
+
+    NSBezierPath * const separatorPath =
+        [NSBezierPath bezierPathWithRoundedRect:cellFrame
+                                        xRadius:VLCLibraryUIUnits.cornerRadius
+                                        yRadius:VLCLibraryUIUnits.cornerRadius];
+    separatorPath.lineWidth = VLCLibraryUIUnits.borderThickness;
+    [separatorPath stroke];
+    [separatorPath fill];
+
+    const CGSize cellSize = cellFrame.size;
+    const CGFloat cellWidth = cellSize.width;
+
+    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = [self titleAttributes];
+    const CGFloat titleHeight = [self titleHeightWithAttributes:titleAttributes];
+    [self.title drawInRect:CGRectMake(cellMinX + VLCLibraryUIUnits.smallSpacing,
+                                      cellMaxY - titleHeight,
+                                      cellWidth - VLCLibraryUIUnits.smallSpacing * 2,
+                                      titleHeight)
+            withAttributes:titleAttributes];
+
+    [self drawImage:self.image withFrame:cellFrame inView:controlView];
 }
 
 @end
