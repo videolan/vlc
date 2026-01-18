@@ -32,9 +32,37 @@
 @property BOOL prevIsHighlighted;
 @property NSRect prevFrame;
 
+@property (readonly) NSDictionary<NSAttributedStringKey, id> *cachedTitleAttributes;
+@property (readonly) CGFloat cachedTitleHeight;
+
 @end
 
 @implementation VLCLibraryHomeViewActionButtonCell
+
+- (NSDictionary<NSAttributedStringKey, id> *)titleAttributes
+{
+    if (_cachedTitleAttributes) {
+        return _cachedTitleAttributes;
+    }
+    NSMutableParagraphStyle * const titleParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+    titleParagraphStyle.alignment = NSTextAlignmentCenter;
+    _cachedTitleAttributes = @{
+        NSForegroundColorAttributeName: NSColor.controlTextColor,
+        NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont,
+        NSParagraphStyleAttributeName: titleParagraphStyle
+    };
+    return _cachedTitleAttributes;
+}
+
+- (CGFloat)titleHeightWithAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes
+{
+    if (_cachedTitleHeight) {
+        return _cachedTitleHeight;
+    }
+    const NSSize titleSize = [self.title sizeWithAttributes:attributes];
+    _cachedTitleHeight = titleSize.height + VLCLibraryUIUnits.smallSpacing;
+    return _cachedTitleHeight;
+}
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
@@ -58,15 +86,8 @@
     const CGFloat cellWidth = cellSize.width;
     const CGFloat cellHeight = cellSize.height;
 
-    NSMutableParagraphStyle * const titleParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    titleParagraphStyle.alignment = NSTextAlignmentCenter;
-    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = @{
-        NSForegroundColorAttributeName: NSColor.controlTextColor,
-        NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont,
-        NSParagraphStyleAttributeName: titleParagraphStyle
-    };
-    const NSSize titleSize = [self.title sizeWithAttributes:titleAttributes];
-    const CGFloat titleHeight = titleSize.height + VLCLibraryUIUnits.smallSpacing;
+    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = [self titleAttributes];
+    const CGFloat titleHeight = [self titleHeightWithAttributes:titleAttributes];
     [self.title drawInRect:CGRectMake(cellMinX + VLCLibraryUIUnits.smallSpacing,
                                       cellMaxY - titleHeight,
                                       cellWidth - VLCLibraryUIUnits.smallSpacing * 2,
