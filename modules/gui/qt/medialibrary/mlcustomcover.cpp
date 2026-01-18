@@ -201,12 +201,33 @@ public:
         return QStringLiteral("");
     }
 
+public Q_SLOTS:
+    void cancel() override
+    {
+        if (m_taskId1)
+        {
+            ml->cancelMLTask(this, m_taskId1);
+            m_taskId1 = 0;
+        }
+
+        if (m_taskId2)
+        {
+            ml->cancelMLTask(this, m_taskId2);
+            m_taskId2 = 0;
+        }
+
+        emit finished();
+    }
+
 private:
     void start()
     {
         const int thumbnailCount = data.countX * data.countY;
 
-        ml->runOnMLThread<ThumbnailList>(this,
+        if (m_taskId1)
+            ml->cancelMLTask(this, m_taskId1);
+
+        m_taskId1 = ml->runOnMLThread<ThumbnailList>(this,
             //ML thread (get child thumbnails or ids)
             [itemId = data.id, thumbnailCount](vlc_medialibrary_t *p_ml, ThumbnailList &ctx)
             {
@@ -243,7 +264,10 @@ private:
     {
         struct Context { QImage img; };
 
-        ml->runOnMLThread<Context>(this,
+        if (m_taskId2)
+            ml->cancelMLTask(this, m_taskId2);
+
+        m_taskId2 = ml->runOnMLThread<Context>(this,
             //ML thread
             [data = this->data, thumbnails]
             (vlc_medialibrary_t * , Context & ctx)
@@ -278,6 +302,7 @@ private:
     MediaLib *ml;
     CoverData data;
     QImage image;
+    quint64 m_taskId1 = 0, m_taskId2 = 0;
 };
 
 
