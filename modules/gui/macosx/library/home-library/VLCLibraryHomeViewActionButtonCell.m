@@ -79,7 +79,7 @@
 
         self.cachedImage = [NSImage imageWithSize:imageSize
                                           flipped:NO
-                                   drawingHandler:^BOOL(NSRect dstRect) {
+                                   drawingHandler:^BOOL(NSRect __unused dstRect) {
             if (self.isHighlighted) {
                 [NSColor.VLCSubtleBorderColor set];
             } else {
@@ -117,13 +117,27 @@
     [self.cachedImage drawInRect:imageRect];
 }
 
+- (NSRect)drawTitle:(NSAttributedString *)title withFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+    const CGFloat cellMinX = NSMinX(cellFrame);
+    const CGFloat cellMaxY = NSMaxY(cellFrame);
+    const CGSize cellSize = cellFrame.size;
+    const CGFloat cellWidth = cellSize.width;
+
+    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = [self titleAttributes];
+    const CGFloat titleHeight = [self titleHeightWithAttributes:titleAttributes];
+    const NSRect titleRect = CGRectMake(cellMinX + VLCLibraryUIUnits.smallSpacing,
+                                      cellMaxY - titleHeight,
+                                      cellWidth - VLCLibraryUIUnits.smallSpacing * 2,
+                                      titleHeight);
+    [self.title drawInRect:titleRect withAttributes:titleAttributes];
+    return titleRect;
+}
+
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
     [NSColor.VLCSubtleBorderColor setStroke];
     [NSColor.windowBackgroundColor setFill];
-
-    const CGFloat cellMinX = NSMinX(cellFrame);
-    const CGFloat cellMaxY = NSMaxY(cellFrame);
 
     NSBezierPath * const separatorPath =
         [NSBezierPath bezierPathWithRoundedRect:cellFrame
@@ -133,17 +147,7 @@
     [separatorPath stroke];
     [separatorPath fill];
 
-    const CGSize cellSize = cellFrame.size;
-    const CGFloat cellWidth = cellSize.width;
-
-    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = [self titleAttributes];
-    const CGFloat titleHeight = [self titleHeightWithAttributes:titleAttributes];
-    [self.title drawInRect:CGRectMake(cellMinX + VLCLibraryUIUnits.smallSpacing,
-                                      cellMaxY - titleHeight,
-                                      cellWidth - VLCLibraryUIUnits.smallSpacing * 2,
-                                      titleHeight)
-            withAttributes:titleAttributes];
-
+    [self drawTitle:self.attributedTitle withFrame:cellFrame inView:controlView];
     [self drawImage:self.image withFrame:cellFrame inView:controlView];
 }
 
