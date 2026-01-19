@@ -5779,16 +5779,13 @@ static const MP4_Box_t * MP4_BoxGet_Path( const MP4_Box_t *p_box, const char *ps
     return p_box;
 }
 
-static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p_box,
+static const MP4_Box_t * MP4_BoxGet_Internal( const MP4_Box_t *p_box,
                                  const char *psz_fmt, va_list args)
 {
     char *psz_path;
 
     if( !p_box )
-    {
-        *pp_result = NULL;
-        return;
-    }
+        return NULL;
 
     if( vasprintf( &psz_path, psz_fmt, args ) == -1 )
         psz_path = NULL;
@@ -5796,13 +5793,12 @@ static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p
     if( !psz_path || !psz_path[0] )
     {
         free( psz_path );
-        *pp_result = NULL;
-        return;
+        return NULL;
     }
 
-    *pp_result = MP4_BoxGet_Path( p_box, psz_path );
-
+    const MP4_Box_t *p_result = MP4_BoxGet_Path( p_box, psz_path );
     free( psz_path );
+    return p_result;
 }
 
 /*****************************************************************************
@@ -5820,7 +5816,7 @@ MP4_Box_t *MP4_BoxGetVa( const MP4_Box_t *p_box, const char *psz_fmt, ... )
     const MP4_Box_t *p_result;
 
     va_start( args, psz_fmt );
-    MP4_BoxGet_Internal( &p_result, p_box, psz_fmt, args );
+    p_result = MP4_BoxGet_Internal( p_box, psz_fmt, args );
     va_end( args );
 
     return( (MP4_Box_t *) p_result );
@@ -5847,7 +5843,7 @@ unsigned MP4_BoxCountVa( const MP4_Box_t *p_box, const char *psz_fmt, ... )
     const MP4_Box_t *p_result, *p_next;
 
     va_start( args, psz_fmt );
-    MP4_BoxGet_Internal( &p_result, p_box, psz_fmt, args );
+    p_result = MP4_BoxGet_Internal( p_box, psz_fmt, args );
     va_end( args );
     if( !p_result )
     {
