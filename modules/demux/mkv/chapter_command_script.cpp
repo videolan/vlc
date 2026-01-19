@@ -57,7 +57,14 @@ bool matroska_script_interpretor_c::Interpret( MatroskaChapterProcessTime time, 
             vlc_debug( l, "Chapter %" PRId64 " not found", i_chapter_uid);
         else
         {
-            if ( !p_vchapter->EnterAndLeave( vm.GetCurrentVSegment()->CurrentChapter(), false ) )
+            auto current_chapter = vm.GetCurrentVSegment()->CurrentChapter();
+            if ( p_vchapter == current_chapter) {
+                if ( time == MATROSKA_CHAPPROCESSTIME_BEFORE )
+                    // the enter command is enter itself, avoid infinite loop
+                    return false;
+                vm.JumpTo( *p_vsegment, *p_vchapter );
+            }
+            else if ( !p_vchapter->EnterAndLeave( current_chapter, false ) )
                 vm.JumpTo( *p_vsegment, *p_vchapter );
             b_result = true;
         }
