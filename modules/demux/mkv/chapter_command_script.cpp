@@ -31,11 +31,14 @@ bool matroska_script_interpretor_c::Interpret( MatroskaChapterProcessTime time, 
         // find the (
         for ( i=CMD_MS_GOTO_AND_PLAY.size(); i<sz_command.size(); i++)
         {
+            if ( sz_command[i] == ' ' )
+                continue;
             if ( sz_command[i] == '(' )
             {
                 i++;
                 break;
             }
+            return false; // extra characters between command and ( is not supported
         }
         // find the )
         for ( j=i; j<sz_command.size(); j++)
