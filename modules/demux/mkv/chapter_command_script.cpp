@@ -48,7 +48,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         }
 
         std::string st = sz_command.substr( i+1, j-i-1 );
-        chapter_uid i_chapter_uid = std::stoul( st );
+        chapter_uid i_chapter_uid = std::stoull( st );
 
         virtual_segment_c *p_vsegment;
         virtual_chapter_c *p_vchapter = vm.FindVChapter( i_chapter_uid, p_vsegment );
