@@ -16,6 +16,10 @@ CLEANFILES =
 include ../../common.am
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
+
+# Generate vlc_modules_list for Qt plugins
+include ../../modulelist.mk
+
 SUFFIXES += .ui .h .hpp .moc.cpp .qml .js .mjs .moc
 TEST_EXTENSIONS = .qml
 EXTRA_DIST = qt6.pro qtest.pro quicktest.pro scripts
