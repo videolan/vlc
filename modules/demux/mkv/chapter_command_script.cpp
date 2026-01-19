@@ -50,26 +50,29 @@ bool matroska_script_interpretor_c::Interpret( MatroskaChapterProcessTime time, 
             }
         }
 
-        std::string st = sz_command.substr( i+1, j-i-1 );
-        chapter_uid i_chapter_uid = std::stoull( st );
-
-        virtual_segment_c *p_vsegment;
-        virtual_chapter_c *p_vchapter = vm.FindVChapter( i_chapter_uid, p_vsegment );
-
-        if ( p_vchapter == NULL )
-            vlc_debug( l, "Chapter %" PRId64 " not found", i_chapter_uid);
-        else
+        if(i+1 < j-i-1)
         {
-            auto current_chapter = vm.GetCurrentVSegment()->CurrentChapter();
-            if ( p_vchapter == current_chapter) {
-                if ( time == MATROSKA_CHAPPROCESSTIME_BEFORE )
-                    // the enter command is enter itself, avoid infinite loop
-                    return false;
-                vm.JumpTo( *p_vsegment, *p_vchapter );
+            std::string st = sz_command.substr( i+1, j-i-1 );
+            chapter_uid i_chapter_uid = std::stoull( st );
+
+            virtual_segment_c *p_vsegment;
+            virtual_chapter_c *p_vchapter = vm.FindVChapter( i_chapter_uid, p_vsegment );
+
+            if ( p_vchapter == NULL )
+                vlc_debug( l, "Chapter %" PRId64 " not found", i_chapter_uid);
+            else
+            {
+                auto current_chapter = vm.GetCurrentVSegment()->CurrentChapter();
+                if ( p_vchapter == current_chapter) {
+                    if ( time == MATROSKA_CHAPPROCESSTIME_BEFORE )
+                        // the enter command is enter itself, avoid infinite loop
+                        return false;
+                    vm.JumpTo( *p_vsegment, *p_vchapter );
+                }
+                else if ( !p_vchapter->EnterAndLeave( current_chapter, false ) )
+                    vm.JumpTo( *p_vsegment, *p_vchapter );
+                b_result = true;
             }
-            else if ( !p_vchapter->EnterAndLeave( current_chapter, false ) )
-                vm.JumpTo( *p_vsegment, *p_vchapter );
-            b_result = true;
         }
     }
 
