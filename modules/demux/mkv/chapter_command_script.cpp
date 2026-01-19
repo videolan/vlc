@@ -11,6 +11,7 @@
 
 namespace mkv {
 
+#define M_MS_MAX_DEPTH 8
 //Matroska Script
 const std::string matroska_script_interpretor_c::CMD_MS_GOTO_AND_PLAY = "GotoAndPlay";
 
@@ -18,6 +19,11 @@ const std::string matroska_script_interpretor_c::CMD_MS_GOTO_AND_PLAY = "GotoAnd
 //  for a description of existing commands
 bool matroska_script_interpretor_c::Interpret( MatroskaChapterProcessTime time, const binary * p_command, size_t i_size )
 {
+    static thread_local int n_call = 0;
+    if( n_call > M_MS_MAX_DEPTH )
+      return false;
+    n_call++;
+
     bool b_result = false;
 
     std::string sz_command( reinterpret_cast<const char*> (p_command), i_size );
@@ -76,6 +82,7 @@ bool matroska_script_interpretor_c::Interpret( MatroskaChapterProcessTime time, 
         }
     }
 
+    n_call--;
     return b_result;
 }
 
