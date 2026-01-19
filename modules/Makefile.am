@@ -127,22 +127,6 @@ SUFFIXES += -client-protocol.h -protocol.c .xml
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code < "$^" > "$@.tmp"
 	$(AM_V_at)mv -f -- "$@.tmp" "$@"
 
-# Remove the non-plugins, it needs intermediate steps because
-# we can only replace and not match inverse. Instead we;
-#  1/ replace plugins .la targets by plugins names
-#  2/ remove every word which is a .la target (ie. non-plugins)
-#  3/ rename every plugin name back into the target name
-ALL_TARGETS_PLUGIN_RENAMED := $(LTLIBRARIES:lib%_plugin.la=%_plugin)
-PLUGINS_NAMES := $(ALL_TARGETS_PLUGIN_RENAMED:%.la=)
-
-# Generate a list containing the name and path of every plugin being built
-# Format: plugin_name: relative/path/to/plugin.dylib
-# This allows plugins from SUBDIRS (like Qt) to specify their actual location
-vlc_modules_list: Makefile
-	$(AM_V_GEN)rm -f $@.tmp; for plugin in $(PLUGINS_NAMES); do \
-	printf "$${plugin}: $(subdir)/.libs/lib$${plugin}.dylib\n" >> $@.tmp; done
-	mv $@.tmp $@
-
-BUILT_SOURCES += vlc_modules_list
-CLEANFILES += vlc_modules_list
+# Generate vlc_modules_list (local plugins + SUBDIRS)
+include modulelist.mk
 SUBDIRS += .
