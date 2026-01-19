@@ -23,7 +23,7 @@ public:
     virtual ~matroska_script_interpreter_common_c() = default;
 
     // DVD command IDs
-    virtual bool Interpret( const binary * p_command, size_t i_size ) = 0;
+    virtual bool Interpret( MatroskaChapterProcessTime time, const binary * p_command, size_t i_size ) = 0;
 
 protected:
     struct vlc_logger *l;

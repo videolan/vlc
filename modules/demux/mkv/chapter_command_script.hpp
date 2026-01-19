@@ -19,7 +19,7 @@ public:
     :matroska_script_interpreter_common_c(log, vm_)
     {}
 
-    bool Interpret( const binary * p_command, size_t i_size ) override;
+    bool Interpret( MatroskaChapterProcessTime, const binary * p_command, size_t i_size ) override;
 
     // Matroska Script commands
     static const std::string CMD_MS_GOTO_AND_PLAY;

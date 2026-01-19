@@ -16,7 +16,7 @@ const std::string matroska_script_interpretor_c::CMD_MS_GOTO_AND_PLAY = "GotoAnd
 
 // see http://www.matroska.org/technical/specs/chapters/index.html#mscript
 //  for a description of existing commands
-bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t i_size )
+bool matroska_script_interpretor_c::Interpret( MatroskaChapterProcessTime time, const binary * p_command, size_t i_size )
 {
     bool b_result = false;
 

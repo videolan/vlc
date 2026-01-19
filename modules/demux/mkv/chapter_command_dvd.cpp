@@ -36,15 +36,15 @@ int16_t dvd_chapter_codec_c::GetTitleNumber() const
 
 bool dvd_chapter_codec_c::Enter()
 {
-    return EnterLeaveHelper( "Matroska DVD enter command", enter_cmds );
+    return EnterLeaveHelper( "Matroska DVD enter command", enter_cmds, MATROSKA_CHAPPROCESSTIME_BEFORE );
 }
 
 bool dvd_chapter_codec_c::Leave()
 {
-    return EnterLeaveHelper( "Matroska DVD leave command", leave_cmds );
+    return EnterLeaveHelper( "Matroska DVD leave command", leave_cmds, MATROSKA_CHAPPROCESSTIME_AFTER );
 }
 
-bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, ChapterProcess & p_container )
+bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, ChapterProcess & p_container, MatroskaChapterProcessTime process_time )
 {
     bool f_result = false;
     ChapterProcess::iterator it = p_container.begin ();
@@ -57,7 +57,7 @@ bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, ChapterProces
             for( ; i_size > 0; i_size -=1, p_data += 8 )
             {
                 vlc_debug( l, "%s", str_diag);
-                f_result |= intepretor.Interpret( p_data );
+                f_result |= intepretor.Interpret( process_time, p_data, 8 );
             }
         }
         ++it;
@@ -108,7 +108,7 @@ std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
 }
 
 // see http://www.dvd-replica.com/DVD/vmcmdset.php for a description of DVD commands
-bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_size )
+bool dvd_command_interpretor_c::Interpret( MatroskaChapterProcessTime, const binary * p_command, size_t i_size )
 {
     if ( i_size != 8 )
         return false;
@@ -582,7 +582,7 @@ bool dvd_command_interpretor_c::ProcessNavAction( uint16_t button )
     if ( button_ptr.auto_action_mode )
     {
         // process the button action
-        return Interpret( button_ptr.cmd.bytes, 8 );
+        return Interpret( MATROSKA_CHAPPROCESSTIME_DURING, button_ptr.cmd.bytes, 8 );
     }
     return false;
 }
@@ -605,7 +605,7 @@ bool dvd_command_interpretor_c::HandleKeyEvent( NavivationKey key )
     case DOWN:  return ProcessNavAction( button_ptr.down );
     case OK:
         // process the button action
-        return Interpret( button_ptr.cmd.bytes, 8 );
+        return Interpret( MATROSKA_CHAPPROCESSTIME_DURING, button_ptr.cmd.bytes, 8 );
     case MENU:
     case POPUP:
         return false;
@@ -657,7 +657,7 @@ void dvd_command_interpretor_c::HandleMousePressed( unsigned x, unsigned y )
 
     // process the button action
     SetSPRM( 0x88, best );
-    Interpret( button_ptr.cmd.bytes, 8 );
+    Interpret( MATROSKA_CHAPPROCESSTIME_DURING, button_ptr.cmd.bytes, 8 );
 
     vlc_debug( l, "Processed button %d", best );
 

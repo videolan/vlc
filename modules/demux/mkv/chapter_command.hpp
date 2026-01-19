@@ -30,6 +30,15 @@
 
 struct vlc_spu_highlight_t;
 
+#if LIBMATROSKA_VERSION < 0x010700
+typedef enum {
+  MATROSKA_CHAPPROCESSTIME_DURING           = 0,
+  MATROSKA_CHAPPROCESSTIME_BEFORE           = 1,
+  MATROSKA_CHAPPROCESSTIME_AFTER            = 2,
+} MatroskaChapterProcessTime;
+#endif
+
+
 namespace mkv {
 
 class virtual_chapter_c;

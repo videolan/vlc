@@ -25,14 +25,6 @@
 
 #include <vlc_arrays.h>
 
-#if LIBMATROSKA_VERSION < 0x010700
-typedef enum {
-  MATROSKA_CHAPPROCESSTIME_DURING           = 0,
-  MATROSKA_CHAPPROCESSTIME_BEFORE           = 1,
-  MATROSKA_CHAPPROCESSTIME_AFTER            = 2,
-} MatroskaChapterProcessTime;
-#endif
-
 namespace mkv {
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )

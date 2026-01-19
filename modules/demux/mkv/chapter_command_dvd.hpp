@@ -33,7 +33,7 @@ public:
         p_PRMs[ 0x80 + 18 ] = 0xFFFFu;
     }
 
-    bool Interpret( const binary * p_command, size_t i_size = 8 );
+    bool Interpret( MatroskaChapterProcessTime, const binary * p_command, size_t i_size );
 
     bool HandleKeyEvent( NavivationKey );
     void HandleMousePressed( unsigned x, unsigned y );
@@ -201,7 +201,7 @@ public:
     int16_t GetTitleNumber() const override;
 
 protected:
-    bool EnterLeaveHelper( char const*, ChapterProcess & );
+    bool EnterLeaveHelper( char const*, ChapterProcess &, MatroskaChapterProcessTime );
     dvd_command_interpretor_c & intepretor;
 };
 
