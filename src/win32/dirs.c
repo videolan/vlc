@@ -63,6 +63,22 @@ error:
     abort ();
 }
 
+static char *config_GetLibexecDir (void)
+{
+    wchar_t wpath[MAX_PATH];
+    if (!GetModuleFileNameW (NULL, wpath, MAX_PATH))
+        goto error;
+
+    wchar_t *file = wcsrchr (wpath, L'\\');
+    if (file == NULL)
+        goto error;
+    *file = L'\0';
+
+    return FromWide (wpath);
+error:
+    abort ();
+}
+
 static char *config_GetDataDir(void)
 {
     const char *path = getenv ("VLC_DATA_PATH");
@@ -82,9 +98,10 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
             dir = getenv ("VLC_LIB_PATH");
             if (dir)
                 return strdup( dir );
-            /* fallthrough */
-        case VLC_PKG_LIBEXEC_DIR:
             dir = config_GetLibDir();
+            break;
+        case VLC_PKG_LIBEXEC_DIR:
+            dir = config_GetLibexecDir();
             break;
         case VLC_SYSDATA_DIR:
             break;
