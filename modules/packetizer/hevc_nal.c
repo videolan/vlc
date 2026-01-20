@@ -759,7 +759,10 @@ static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned stRpsIdx,
     {
         nal_ue_t num_negative_pics = bs_read_ue( p_bs );
         nal_ue_t num_positive_pics = bs_read_ue( p_bs );
-        if( bs_remain( p_bs ) < ((int64_t)num_negative_pics + num_positive_pics) * 2 )
+        // A.4.2 total to (MaxDpbSize -1) with MaxDpbSize capped either at 16 or 7
+        if( num_negative_pics >= 16 || num_positive_pics >= 16 ||
+            num_negative_pics + num_positive_pics >= 16 ||
+            bs_remain( p_bs ) < ((int64_t)num_negative_pics + num_positive_pics) * 2 )
             return false;
         for(unsigned int i=0; i<num_negative_pics; i++)
         {
