@@ -240,7 +240,7 @@ pub struct Trace(NonNull<sys::vlc_tracer_trace>);
 
 impl Trace {
     /// Get an iterator over the trace entries.
-    pub fn entries(&self) -> TraceIterator {
+    pub fn entries(&self) -> TraceIterator<'_> {
         self.into_iter()
     }
 }
