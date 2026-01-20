@@ -260,6 +260,8 @@ test -z "$AD_CLAUSES" || add_make_enabled "AD_CLAUSES"
 test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
 test -z "$ENABLE_PDB" || add_make_enabled "ENABLE_PDB"
 
+LN_S="ln -s"
+
 #
 # Checks
 #
@@ -350,6 +352,7 @@ case "${OS}" in
 				add_make_enabled "HAVE_ARMV7A"
 				;;
 		esac
+		LN_S="cp -R"
 		;;
 	*solaris*)
 		add_make_enabled "HAVE_SOLARIS"
@@ -379,6 +382,6 @@ add_make "-include config.mak"
 add_make 'include $(TOPSRC)/src/main.mak'
 mkdir -p "$BOOTSTRAP_PATH/tarballs" || exit $?
 test -e rust-toolchain.toml && unlink rust-toolchain.toml
-ln -s "$(dirname "$0")/src/rust-toolchain.toml" rust-toolchain.toml
+${LN_S} "$(dirname "$0")/src/rust-toolchain.toml" rust-toolchain.toml
 echo "Bootstrap completed."
 ${MAKE} help
