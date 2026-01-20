@@ -63,7 +63,7 @@ bool AtomsReader::parseBlock(block_t *p_block)
         if ( MP4_ReadBoxContainerChildren( stream, rootbox, nullptr ) == 1 )
         {
 #ifndef NDEBUG
-            MP4_BoxDumpStructure(stream, rootbox);
+            MP4_BoxDumpStructure(object, rootbox);
 #endif
         }
         vlc_stream_Delete(stream);
