@@ -1956,7 +1956,7 @@ void MP4_BoxFree( MP4_Box_t *p_box );
  *****************************************************************************
  * Useful while debugging
  *****************************************************************************/
-void MP4_BoxDumpStructure( stream_t *p_input, const MP4_Box_t *p_box );
+void MP4_BoxDumpStructure( vlc_object_t *, const MP4_Box_t *p_box );
 
 /*****************************************************************************
  * MP4_BoxGetVa: find a box given a path relative to p_box

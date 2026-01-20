@@ -855,7 +855,7 @@ int OpenHEIF( vlc_object_t * p_this )
     if( !p_root )
         return VLC_EGENERIC;
 
-    MP4_BoxDumpStructure( p_demux->s, p_root );
+    MP4_BoxDumpStructure( VLC_OBJECT(p_demux), p_root );
 
     struct heif_private_t *p_sys = calloc( 1, sizeof(*p_sys) );
     p_demux->p_sys = (void *) p_sys;

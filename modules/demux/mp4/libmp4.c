@@ -5616,7 +5616,7 @@ error:
 }
 
 
-static void MP4_BoxDumpStructure_Internal( stream_t *s, const MP4_Box_t *p_box,
+static void MP4_BoxDumpStructure_Internal( vlc_object_t *obj, const MP4_Box_t *p_box,
                                            unsigned int i_level )
 {
     const MP4_Box_t *p_child;
@@ -5625,7 +5625,7 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s, const MP4_Box_t *p_box,
 
     if( !i_level )
     {
-        msg_Dbg( s, "dumping root Box \"%4.4s\"",
+        msg_Dbg( obj, "dumping root Box \"%4.4s\"",
                           (char*)&i_displayedtype );
     }
     else
@@ -5644,19 +5644,19 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s, const MP4_Box_t *p_box,
                   "+ %4.4s size %"PRIu64" offset %"PRIu64"%s",
                   (char *)&i_displayedtype, p_box->i_size, p_box->i_pos,
                   p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
-        msg_Dbg( s, "%s", str );
+        msg_Dbg( obj, "%s", str );
     }
     p_child = p_box->p_first;
     while( p_child )
     {
-        MP4_BoxDumpStructure_Internal( s, p_child, i_level + 1 );
+        MP4_BoxDumpStructure_Internal( obj, p_child, i_level + 1 );
         p_child = p_child->p_next;
     }
 }
 
-void MP4_BoxDumpStructure( stream_t *s, const MP4_Box_t *p_box )
+void MP4_BoxDumpStructure( vlc_object_t *obj, const MP4_Box_t *p_box )
 {
-    MP4_BoxDumpStructure_Internal( s, p_box, 0 );
+    MP4_BoxDumpStructure_Internal( obj, p_box, 0 );
 }
 
 

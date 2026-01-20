@@ -1058,7 +1058,7 @@ static int Open( vlc_object_t * p_this )
     if( LoadInitFrag( p_demux ) != VLC_SUCCESS )
         goto error;
 
-    MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
+    MP4_BoxDumpStructure( VLC_OBJECT(p_demux), p_sys->p_root );
 
     if( ( p_ftyp = MP4_BoxGet( p_sys->p_root, "/ftyp" ) ) )
     {
