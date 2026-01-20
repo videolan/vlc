@@ -21,6 +21,7 @@
 import QtQuick
 
 import VLC.Style
+import VLC.Util
 
 Rectangle {
     id: root
@@ -45,7 +46,7 @@ Rectangle {
     // Animations
     //---------------------------------------------------------------------------------------------
 
-    VLCStyle.DelayedBehavior on border.color {
+    DelayedBehavior on border.color {
         delayedEnabled: root.enabled
 
         ColorAnimation {
@@ -55,7 +56,7 @@ Rectangle {
         }
     }
 
-    VLCStyle.DelayedBehavior on color {
+    DelayedBehavior on color {
         delayedEnabled: root.enabled
 
         ColorAnimation {
