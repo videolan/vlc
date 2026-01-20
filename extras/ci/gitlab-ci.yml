@@ -21,14 +21,14 @@ default:
 variables:
     VLC_TEST_TIMEOUT: 60
     FF_DISABLE_UMASK_FOR_DOCKER_EXECUTOR: "true"
-    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20241118101328
-    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20251223015425
-    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20251223015425
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20260127163923
+    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20260121170706
+    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20260121170706
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20260121072258
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20260120134731
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-snap:20251117145936
-    VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20240806085528
-    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20250905104736
+    VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20260120134731
+    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20260120134731
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
