@@ -107,6 +107,7 @@ struct aout_sys_t
     enum device_acquisition_status device_status;
     wchar_t *device_name; /**< device identifier to use, NULL if default */
     bool default_device_changed;
+    vlc_sem_t init_passed;
     CRITICAL_SECTION lock;
     CONDITION_VARIABLE work;
     CONDITION_VARIABLE ready;
@@ -924,6 +925,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     }
 
     WakeConditionVariable(&sys->ready);
+    vlc_sem_post(&sys->init_passed);
 
     if (FAILED(hr))
     {
@@ -1132,10 +1134,8 @@ static void *MMThread(void *data)
     return NULL;
 
 error:
-    EnterCriticalSection(&sys->lock);
     sys->device_status = DEVICE_INITIALISATION_FAILED;
-    WakeConditionVariable(&sys->ready);
-    LeaveCriticalSection(&sys->lock);
+    vlc_sem_post(&sys->init_passed);
     return NULL;
 }
 
@@ -1331,6 +1331,7 @@ static int Open(vlc_object_t *obj)
     if (!var_CreateGetBool(aout, "volume-save"))
         VolumeSetLocked(aout, var_InheritFloat(aout, "mmdevice-volume"));
 
+    vlc_sem_init(&sys->init_passed, 0);
     InitializeCriticalSection(&sys->lock);
     InitializeConditionVariable(&sys->work);
     InitializeConditionVariable(&sys->ready);
@@ -1356,19 +1357,13 @@ static int Open(vlc_object_t *obj)
     if (vlc_clone(&sys->thread, MMThread, aout, VLC_THREAD_PRIORITY_LOW))
         goto error;
 
-    EnterCriticalSection(&sys->lock);
-    while (sys->device_status == DEVICE_PENDING)
-    {
-        SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
+    vlc_sem_wait(&sys->init_passed);
 
-        if (sys->device_status == DEVICE_INITIALISATION_FAILED)
-        {
-            LeaveCriticalSection(&sys->lock);
-            Close(obj);
-            return VLC_EGENERIC;
-        }
+    if (sys->device_status == DEVICE_INITIALISATION_FAILED)
+    {
+        Close(obj);
+        return VLC_EGENERIC;
     }
-    LeaveCriticalSection(&sys->lock);
 
     aout->start = Start;
     aout->stop = Stop;
