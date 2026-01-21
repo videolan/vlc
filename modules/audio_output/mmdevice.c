@@ -938,31 +938,29 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
 
     vlc_cond_signal(&sys->ready);
 
-    if (SUCCEEDED(hr))
-    {   /* Report actual device */
-        LPWSTR wdevid;
-
-        if (sys->device_name == NULL)
-            aout_DeviceReport(aout, default_device_b);
-        else
-        {
-            hr = IMMDevice_GetId(sys->dev, &wdevid);
-            if (SUCCEEDED(hr))
-            {
-                char *id = FromWide(wdevid);
-                CoTaskMemFree(wdevid);
-                if (likely(id != NULL))
-                {
-                    aout_DeviceReport(aout, id);
-                    free(id);
-                }
-            }
-        }
-    }
-    else
+    if (FAILED(hr))
     {
         msg_Err(aout, "cannot get device identifier (error 0x%lX)", hr);
         return hr;
+    }
+
+    /* Report actual device */
+    if (sys->device_name == NULL)
+        aout_DeviceReport(aout, default_device_b);
+    else
+    {
+        LPWSTR wdevid;
+        hr = IMMDevice_GetId(sys->dev, &wdevid);
+        if (SUCCEEDED(hr))
+        {
+            char *id = FromWide(wdevid);
+            CoTaskMemFree(wdevid);
+            if (likely(id != NULL))
+            {
+                aout_DeviceReport(aout, id);
+                free(id);
+            }
+        }
     }
 
     /* Create session manager (for controls even w/o active audio client) */
