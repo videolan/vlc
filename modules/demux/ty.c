@@ -1642,6 +1642,7 @@ static int parse_master(demux_t *p_demux)
 
     /* clear the SEQ table */
     free(p_sys->seq_table);
+    p_sys->seq_table = NULL;
 
     /* parse header info */
     if( vlc_stream_Read(p_demux->s, mst_buf, 32) != 32 )
@@ -1654,10 +1655,7 @@ static int parse_master(demux_t *p_demux)
     p_sys->i_seq_table_size = i / (8 + i_map_size);
 
     if(p_sys->i_seq_table_size == 0)
-    {
-        p_sys->seq_table = NULL;
         return VLC_SUCCESS;
-    }
 
 #if (UINT32_MAX > SSIZE_MAX)
     if (i_map_size > SSIZE_MAX)
