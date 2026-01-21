@@ -102,6 +102,7 @@ typedef struct
     wchar_t *device_name; /**< device identifier to use, NULL if default */
     bool default_device_changed;
     HANDLE work_event;
+    vlc_sem_t init_passed;
     vlc_mutex_t lock;
     vlc_cond_t ready;
     vlc_thread_t thread; /**< Thread for audio session control */
@@ -938,6 +939,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     }
 
     vlc_cond_signal(&sys->ready);
+    vlc_sem_post(&sys->init_passed);
 
     if (FAILED(hr))
     {
@@ -1152,10 +1154,8 @@ static void *MMThread(void *data)
     return NULL;
 
 error:
-    vlc_mutex_lock(&sys->lock);
     sys->device_status = DEVICE_INITIALISATION_FAILED;
-    vlc_cond_signal(&sys->ready);
-    vlc_mutex_unlock(&sys->lock);
+    vlc_sem_post(&sys->init_passed);
     return NULL;
 }
 
@@ -1349,6 +1349,7 @@ static int Open(vlc_object_t *obj)
     if (!var_CreateGetBool(aout, "volume-save"))
         VolumeSetLocked(aout, var_InheritFloat(aout, "mmdevice-volume"));
 
+    vlc_sem_init(&sys->init_passed, 0);
     vlc_mutex_init(&sys->lock);
     vlc_cond_init(&sys->ready);
 
@@ -1377,19 +1378,13 @@ static int Open(vlc_object_t *obj)
     if (vlc_clone(&sys->thread, MMThread, aout))
         goto error;
 
-    vlc_mutex_lock(&sys->lock);
-    while (sys->device_status == DEVICE_PENDING)
-    {
-        vlc_cond_wait(&sys->ready, &sys->lock);
+    vlc_sem_wait(&sys->init_passed);
 
-        if (sys->device_status == DEVICE_INITIALISATION_FAILED)
-        {
-            vlc_mutex_unlock(&sys->lock);
-            Close(obj);
-            return VLC_EGENERIC;
-        }
+    if (sys->device_status == DEVICE_INITIALISATION_FAILED)
+    {
+        Close(obj);
+        return VLC_EGENERIC;
     }
-    vlc_mutex_unlock(&sys->lock);
 
     aout->start = Start;
     aout->stop = Stop;
