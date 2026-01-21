@@ -117,3 +117,14 @@ vlc_modules += {
     'link_with' : [ d3d9_common_lib ],
     'enabled' : have_win_desktop and opengl32_lib.found() and dxva2_dep.found() and not missing_win_glew,
 }
+
+# glinterop_vaapi - VAAPI (E)GL interop
+vlc_modules += {
+    'name' : 'glinterop_vaapi',
+    'sources' : files(
+        'interop_vaapi.c',
+        '../../hw/vaapi/vlc_vaapi.c',
+    ),
+    'dependencies' : [gl_common_dep, libva_dep, egl_dep],
+    'enabled' : opengl_dep.found() and egl_dep.found() and libva_dep.found(),
+}
