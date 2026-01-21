@@ -116,15 +116,22 @@ static void exit_timeout (int signum)
  *****************************************************************************/
 int main(int argc, const char *argv[])
 {
-    /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
-     * if it is blocked in all thread.
-     * Note: this is NOT an excuse for not protecting against SIGPIPE. If
-     * LibVLC runs outside of VLC, we cannot rely on this code snippet. */
-    signal (SIGPIPE, SIG_IGN);
-    /* Restore SIGCHLD in case our parent process ignores it. */
+    /*
+     * Contrary to popular belief, `execl()`, `execv()` et al. do **not** reset
+     * signal handling to `SIG_DFL` default from `SIG_IGN`. So we restore the
+     * `SIGCHLD` handler to `SIG_DFL` here in the unlikely case that the parent
+     * had it set to `SIG_IGN`. Otherwise `waitpid()` will not work properly.
+     * NOTE WELL: This is a documented requirement of `libvlc_new()`.
+     */
     signal (SIGCHLD, SIG_DFL);
-
-#ifndef NDEBUG
+#ifdef NDEBUG
+    /*
+     * Writing to a pipe with no open read end will raise `SIGPIPE` and kill
+     * the process *unless* proper care is taken. In principles, our code does
+     * take said care, but we are better safe than sorry in non-debug builds.
+     */
+    signal (SIGPIPE, SIG_IGN);
+#else
     /* Activate malloc checking routines to detect heap corruptions. */
     setenv ("MALLOC_CHECK_", "2", 1);
 
