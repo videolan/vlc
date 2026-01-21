@@ -193,10 +193,15 @@ bool VLCTestingEnv::init()
 {
     //see test/libvlc/test.h
     QByteArray alarm_timeout = qgetenv("VLC_TEST_TIMEOUT");
-    if (alarm_timeout.isEmpty())
+    bool has_timeout;
+    auto vlc_timeout = alarm_timeout.toLongLong(&has_timeout);
+    if (!has_timeout)
         qputenv("QTEST_FUNCTION_TIMEOUT", "5000");
     else
+    {
+        alarm_timeout.setNum(vlc_timeout * 1000);
         qputenv("QTEST_FUNCTION_TIMEOUT", alarm_timeout);
+    }
 
     setenv("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
     setenv("VLC_LIB_PATH", TOP_BUILDDIR"/modules", 1);
@@ -212,5 +217,3 @@ bool VLCTestingEnv::init()
 
     return true;
 }
-
-
