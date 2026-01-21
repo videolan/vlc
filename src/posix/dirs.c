@@ -50,7 +50,7 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
     static const char env_vars[][16] = {
         [VLC_PKG_DATA_DIR] = "VLC_DATA_PATH",
         [VLC_PKG_LIB_DIR] = "VLC_LIB_PATH",
-        [VLC_PKG_LIBEXEC_DIR] = "VLC_LIB_PATH",
+        [VLC_PKG_LIBEXEC_DIR] = "VLC_LIBEXEC_PATH",
     };
 
     if (type < ARRAY_SIZE(env_vars)) {
