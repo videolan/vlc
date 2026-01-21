@@ -108,7 +108,6 @@ vlc_tests += {
     'module_depends' : vlc_plugins_targets.keys()
 }
 
-if opengl_dep.found()
 vlc_tests += {
     'name' : 'test_modules_video_output_opengl_filters',
     'sources' : files(
@@ -125,11 +124,10 @@ vlc_tests += {
     'suite' : ['modules', 'test_modules'],
     'link_with' : [libvlc, libvlccore],
     'c_args' : ['-DVLC_TEST_OPENGL_API=VLC_OPENGL'],
-    'module_depends' : vlc_plugins_targets.keys()
+    'module_depends' : vlc_plugins_targets.keys(),
+    'enabled' : opengl_dep.found(),
 }
-endif
 
-if opengles2_dep.found()
 vlc_tests += {
     'name' : 'test_modules_video_output_opengl_es2_filters',
     'sources' : files(
@@ -146,9 +144,9 @@ vlc_tests += {
     'suite' : ['modules', 'test_modules'],
     'link_with' : [libvlc, libvlccore],
     'c_args' : ['-DVLC_TEST_OPENGL_API=VLC_OPENGL_ES2'],
-    'module_depends' : vlc_plugins_targets.keys()
+    'module_depends' : vlc_plugins_targets.keys(),
+    'enabled' : opengles2_dep.found(),
 }
-endif
 
 vlc_tests += {
     'name' : 'test_modules_stream_out_transcode',
