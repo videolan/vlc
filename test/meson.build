@@ -27,6 +27,7 @@ foreach vlc_test: vlc_tests
         'include_directories',
         'env',
         'enabled',
+        'wrapper',
     ]
 
     foreach key : vlc_test.keys()
@@ -78,22 +79,41 @@ foreach vlc_test: vlc_tests
             dependencies: qt6_dep)
     endif
 
-    test(vlc_test['name'],
-        executable(vlc_test['name'], vlc_test['sources'], moc_sources,
-            build_by_default: false,
-            link_with: [vlc_test.get('link_with', []),
-                vlc_libcompat],
-            link_args: [vlc_test.get('link_args', [])],
-            include_directories: [vlc_test.get('include_directories', []),
-                vlc_include_dirs],
-            dependencies: [vlc_test.get('dependencies', []),
-                libvlccore_deps, opengl_dep],
-            c_args: [vlc_test.get('c_args', []), common_args],
-            cpp_args: [vlc_test.get('cpp_args', []), common_args],
-            objc_args: [vlc_test.get('objc_args', []), common_args]),
+    test_exe = executable(vlc_test['name'], vlc_test['sources'], moc_sources,
+        build_by_default: false,
+        link_with: [vlc_test.get('link_with', []),
+            vlc_libcompat],
+        link_args: [vlc_test.get('link_args', [])],
+        include_directories: [vlc_test.get('include_directories', []),
+            vlc_include_dirs],
+        dependencies: [vlc_test.get('dependencies', []),
+            libvlccore_deps, opengl_dep],
+        c_args: [vlc_test.get('c_args', []), common_args],
+        cpp_args: [vlc_test.get('cpp_args', []), common_args],
+        objc_args: [vlc_test.get('objc_args', []), common_args])
+
+    # Handle optional test wrapper (e.g., xvfb-run for X11 tests)
+    # The wrapper must be a program object
+    if vlc_test.has_key('wrapper')
+        test_wrapper = vlc_test['wrapper']
+        if test_wrapper.found()
+            test(vlc_test['name'],
+                test_wrapper,
+                args: [test_exe],
+                env: vlc_test.get('env', []),
+                suite: [vlc_test.get('suite', []), 'test'],
+                depends: [test_modules_deps])
+        else
+            warning('Test \'@0@\' skipped: wrapper not found'.format(
+                vlc_test['name']))
+        endif
+    else
+        test(vlc_test['name'],
+            test_exe,
             env: vlc_test.get('env', []),
-        suite: [vlc_test.get('suite', []), 'test'],
-        depends: [test_modules_deps])
+            suite: [vlc_test.get('suite', []), 'test'],
+            depends: [test_modules_deps])
+    endif
 endforeach
 
 libvlc_demux_defines = []
