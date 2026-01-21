@@ -26,6 +26,7 @@ foreach vlc_test: vlc_tests
         'objc_args',
         'include_directories',
         'env',
+        'enabled',
     ]
 
     foreach key : vlc_test.keys()
@@ -34,6 +35,11 @@ foreach vlc_test: vlc_tests
                 .format(key, vlc_test['name']))
         endif
     endforeach
+
+    # Skip disabled tests
+    if not vlc_test.get('enabled', true)
+        continue
+    endif
 
     common_args = [
         '-DSRCDIR="@0@"'.format(vlc_src_root + '/test/'),
