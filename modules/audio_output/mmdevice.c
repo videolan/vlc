@@ -1302,6 +1302,8 @@ static void Stop(audio_output_t *aout)
     sys->stream = NULL;
 }
 
+static void Close(vlc_object_t *);
+
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -1357,14 +1359,17 @@ static int Open(vlc_object_t *obj)
 
     EnterCriticalSection(&sys->lock);
     while (sys->device_status == DEVICE_PENDING)
-        SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
-    LeaveCriticalSection(&sys->lock);
-
-    if (sys->device_status == DEVICE_ACQUISITION_FAILED)
     {
-        vlc_join(sys->thread, NULL);
-        goto error;
+        SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
+
+        if (sys->device_status == DEVICE_ACQUISITION_FAILED)
+        {
+            LeaveCriticalSection(&sys->lock);
+            Close(obj);
+            return VLC_EGENERIC;
+        }
     }
+    LeaveCriticalSection(&sys->lock);
 
     aout->start = Start;
     aout->stop = Stop;
