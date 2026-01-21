@@ -20,6 +20,7 @@ else
     opengl_dep = dependency('gl', required: false)
 endif
 opengles2_dep = dependency('glesv2', required: get_option('gles2'))
+egl_dep = dependency('egl', required: false)
 
 if host_system == 'darwin'
     subdir('apple')
@@ -163,8 +164,6 @@ if xcb_dep.found()
         }
     endif
 endif
-
-egl_dep = dependency('egl', required: false)
 
 if x11_dep.found() and egl_dep.found()
     vlc_modules += {
