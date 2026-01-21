@@ -76,6 +76,7 @@ static char default_device_b[1] = "";
 
 enum device_acquisition_status {
     DEVICE_PENDING,
+    DEVICE_INITIALISATION_FAILED,
     DEVICE_ACQUISITION_FAILED,
     DEVICE_ACQUIRED,
 };
@@ -1152,7 +1153,7 @@ static void *MMThread(void *data)
 
 error:
     vlc_mutex_lock(&sys->lock);
-    sys->device_status = DEVICE_ACQUISITION_FAILED;
+    sys->device_status = DEVICE_INITIALISATION_FAILED;
     vlc_cond_signal(&sys->ready);
     vlc_mutex_unlock(&sys->lock);
     return NULL;
@@ -1381,7 +1382,7 @@ static int Open(vlc_object_t *obj)
     {
         vlc_cond_wait(&sys->ready, &sys->lock);
 
-        if (sys->device_status == DEVICE_ACQUISITION_FAILED)
+        if (sys->device_status == DEVICE_INITIALISATION_FAILED)
         {
             vlc_mutex_unlock(&sys->lock);
             Close(obj);
