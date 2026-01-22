@@ -441,6 +441,56 @@ static int ParseExtra(decoder_t *p_dec)
         return VLC_SUCCESS;
 }
 
+static enum mc_media_format_color_range_t
+vlc_to_mc_color_range(video_color_range_t vlc_range)
+{
+    switch (vlc_range)
+    {
+        case COLOR_RANGE_FULL:
+            return MC_COLOR_RANGE_FULL;
+        case COLOR_RANGE_LIMITED:
+            return MC_COLOR_RANGE_LIMITED;
+        default:
+            return MC_COLOR_RANGE_UNSPECIFIED;
+    }
+}
+
+static enum mc_media_format_color_standard_t
+vlc_to_mc_color_standard(video_color_primaries_t vlc_primaries)
+{
+    switch (vlc_primaries)
+    {
+        case COLOR_PRIMARIES_BT601_525:
+            return MC_COLOR_STANDARD_BT601_NTSC;
+        case COLOR_PRIMARIES_BT601_625:
+            return MC_COLOR_STANDARD_BT601_PAL;
+        case COLOR_PRIMARIES_BT709:
+            return MC_COLOR_STANDARD_BT709;
+        case COLOR_PRIMARIES_BT2020:
+            return MC_COLOR_STANDARD_BT2020;
+        default:
+            return MC_COLOR_STANDARD_UNSPECIFIED;
+    }
+}
+
+static enum mc_media_format_color_transfer_t
+vlc_to_mc_color_transfer(video_transfer_func_t vlc_transfer)
+{
+    switch (vlc_transfer)
+    {
+        case TRANSFER_FUNC_LINEAR:
+            return MC_COLOR_TRANSFER_LINEAR;
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            return MC_COLOR_TRANSFER_ST2084;
+        case TRANSFER_FUNC_HLG:
+            return MC_COLOR_TRANSFER_HLG;
+        case TRANSFER_FUNC_BT709:
+            return MC_COLOR_TRANSFER_SDR_VIDEO;
+        default:
+            return MC_COLOR_TRANSFER_UNSPECIFIED;
+    }
+}
+
 /*****************************************************************************
  * StartMediaCodec: Create the mediacodec instance
  *****************************************************************************/
@@ -457,56 +507,10 @@ static int StartMediaCodec(decoder_t *p_dec)
 
         args.video.p_surface = p_sys->video.p_surface;
 
-        switch (p_dec->fmt_out.video.color_range)
-        {
-            case COLOR_RANGE_FULL:
-                args.video.color.range = MC_COLOR_RANGE_FULL;
-                break;
-            case COLOR_RANGE_LIMITED:
-                args.video.color.range = MC_COLOR_RANGE_LIMITED;
-                break;
-            default:
-                args.video.color.range = MC_COLOR_RANGE_UNSPECIFIED;
-                break;
-        }
+        args.video.color.range = vlc_to_mc_color_range(p_dec->fmt_out.video.color_range);
+        args.video.color.standard = vlc_to_mc_color_standard(p_dec->fmt_out.video.primaries);
+        args.video.color.transfer = vlc_to_mc_color_transfer(p_dec->fmt_out.video.transfer);
 
-        switch (p_dec->fmt_out.video.primaries)
-        {
-            case COLOR_PRIMARIES_BT601_525:
-                args.video.color.standard = MC_COLOR_STANDARD_BT601_NTSC;
-                break;
-            case COLOR_PRIMARIES_BT601_625:
-                args.video.color.standard = MC_COLOR_STANDARD_BT601_PAL;
-                break;
-            case COLOR_PRIMARIES_BT709:
-                args.video.color.standard = MC_COLOR_STANDARD_BT709;
-                break;
-            case COLOR_PRIMARIES_BT2020:
-                args.video.color.standard = MC_COLOR_STANDARD_BT2020;
-                break;
-            default:
-                args.video.color.standard = MC_COLOR_STANDARD_UNSPECIFIED;
-                break;
-        }
-
-        switch (p_dec->fmt_out.video.transfer)
-        {
-            case TRANSFER_FUNC_LINEAR:
-                args.video.color.transfer = MC_COLOR_TRANSFER_LINEAR;
-                break;
-            case TRANSFER_FUNC_SMPTE_ST2084:
-                args.video.color.transfer = MC_COLOR_TRANSFER_ST2084;
-                break;
-            case TRANSFER_FUNC_HLG:
-                args.video.color.transfer = MC_COLOR_TRANSFER_HLG;
-                break;
-            case TRANSFER_FUNC_BT709:
-                args.video.color.transfer = MC_COLOR_TRANSFER_SDR_VIDEO;
-                break;
-            default:
-                args.video.color.transfer = MC_COLOR_TRANSFER_UNSPECIFIED;
-                break;
-        }
 
         args.video.b_tunneled_playback = args.video.p_surface ?
                 var_InheritBool(p_dec, CFG_PREFIX "tunneled-playback") : false;
