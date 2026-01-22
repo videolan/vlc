@@ -81,6 +81,14 @@ vlc_modules += {
     'enabled' : opengles2_dep.found(),
 }
 
+# glfilter_draw
+vlc_modules += {
+    'name' : 'glfilter_draw',
+    'sources' : files('filter_draw.c'),
+    'dependencies' : [gl_common_dep, gl_vout_dep, m_lib],
+    'enabled' : gl_vout_dep.found(),
+}
+
 # interop_sw
 interop_sw_deps = [gl_common_dep, m_lib]
 interop_sw_libs = []
