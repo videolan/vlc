@@ -140,6 +140,9 @@ typedef struct decoder_sys_t
             timestamp_fifo_t *timestamp_fifo;
             int i_mpeg_dar_num, i_mpeg_dar_den;
             struct vlc_asurfacetexture *surfacetexture;
+            bool use_air;
+            vlc_cond_t air_cond;
+            unsigned air_waiting_count;
         } video;
         struct {
             date_t i_end_date;
@@ -692,6 +695,8 @@ static void CleanFromLegacyVideoContext(void *priv)
     android_video_context_t *avctx = priv;
     decoder_sys_t *p_sys = avctx->dec_opaque;
 
+    assert(!p_sys->video.use_air);
+
     vlc_mutex_lock(&p_sys->lock);
     /* Unblock output thread waiting in dequeue_out */
     DecodeFlushLocked(p_sys);
@@ -706,8 +711,8 @@ static void CleanFromLegacyVideoContext(void *priv)
 
 static void ReleaseAllPictureContexts(decoder_sys_t *p_sys)
 {
-    /* No picture context if no direct rendering. */
-    if (p_sys->video.ctx == NULL)
+    /* No picture context if no direct rendering or using air. */
+    if (p_sys->video.ctx == NULL || p_sys->video.use_air)
         return;
 
     for (size_t i = 0; i < ARRAY_SIZE(p_sys->video.apic_ctxs); ++i)
@@ -783,6 +788,199 @@ NewPicture(decoder_t *p_dec, vlc_tick_t ts)
     return p_pic;
 }
 
+static void CleanFromVideoContext(void *priv)
+{
+    android_video_context_t *avctx = priv;
+    assert(avctx->dec_opaque == NULL);
+    assert(avctx->air != NULL);
+    avctx->air_api->AImageReader.delete(avctx->air);
+}
+
+static void
+android_picture_ctx_destroy(picture_context_t *context)
+{
+    struct android_picture_ctx *apctx = container_of(context, struct android_picture_ctx, s);
+
+    if (!vlc_atomic_rc_dec(&apctx->rc))
+        return;
+
+    android_video_context_t *avctx =
+        vlc_video_context_GetPrivate(apctx->s.vctx, VLC_VIDEO_CONTEXT_AWINDOW);
+
+    if (apctx->fence_fd >= 0)
+        close(apctx->fence_fd);
+
+    avctx->air_api->AImage.deleteAsync(apctx->image, apctx->read_fence_fd);
+
+    free(apctx);
+}
+
+static picture_context_t *
+android_picture_ctx_copy(picture_context_t *src)
+{
+    struct android_picture_ctx *src_ctx = container_of(src, struct android_picture_ctx, s);
+    vlc_atomic_rc_inc(&src_ctx->rc);
+    return &src_ctx->s;
+}
+
+static int
+QueueAImagePicture(decoder_t *p_dec, android_video_context_t *avctx,
+                   AImage *image, int fence_fd)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* same value than p_out->buf.i_ts (propagated from MediaCodec input to
+     * output to AImageReader */
+    int64_t timestamp;
+    int32_t status = avctx->air_api->AImage.getTimestamp(image, &timestamp);
+
+    vlc_tick_t date = status == 0 ? VLC_TICK_FROM_NS(timestamp) : 0;
+
+    picture_t *p_pic = NewPicture(p_dec, date);
+    if (p_pic == NULL)
+        goto error;
+
+    if (p_pic->date == VLC_TICK_INVALID)
+    {
+        msg_Warn(p_dec, "invalid ts from AImageReader");
+        goto error;
+    }
+
+    struct android_picture_ctx *apctx = malloc(sizeof(*apctx));
+    if (apctx == NULL)
+        goto error;
+
+    apctx->image = image;
+    apctx->fence_fd = fence_fd;
+    apctx->read_fence_fd = -1;
+    apctx->sc = NULL;
+    vlc_atomic_rc_init(&apctx->rc);
+
+    apctx->s = (picture_context_t) {
+        android_picture_ctx_destroy, android_picture_ctx_copy, p_sys->video.ctx,
+    };
+    p_pic->context = &apctx->s;
+    vlc_video_context_Hold(apctx->s.vctx);
+    decoder_QueueVideo(p_dec, p_pic);
+
+    return VLC_SUCCESS;
+
+error:
+    if (p_pic != NULL)
+        picture_Release(p_pic);
+    if (fence_fd > 0)
+        close(fence_fd);
+    avctx->air_api->AImage.deleteAsync(image, -1);
+    return VLC_EGENERIC;
+}
+
+static void
+AImageReader_OnImageAvailable(void *context, AImageReader *reader)
+{
+    decoder_t *p_dec = context;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    assert(p_sys->video.use_air);
+    android_video_context_t *avctx =
+        vlc_video_context_GetPrivate(p_sys->video.ctx, VLC_VIDEO_CONTEXT_AWINDOW);
+    assert(avctx->air != NULL);
+    assert(reader == avctx->air); (void) reader;
+
+    AImage *image = NULL;
+    int fence_fd = -1;
+    int32_t status =
+        avctx->air_api->AImageReader.acquireNextImageAsync(avctx->air, &image,
+                                                           &fence_fd);
+    if (status != 0)
+    {
+        msg_Warn(p_dec, "AImageReader_acquireNextImageAsync failed: %d",
+                    status);
+        return;
+    }
+    vlc_mutex_lock(&p_sys->lock);
+    assert(p_sys->video.air_waiting_count > 0);
+    p_sys->video.air_waiting_count--;
+    vlc_cond_signal(&p_sys->video.air_cond);
+    QueueAImagePicture(p_dec, avctx, image, fence_fd);
+    vlc_mutex_unlock(&p_sys->lock);
+}
+
+static int
+CreateSurfaceFromAImageReader(decoder_t *p_dec, vlc_decoder_device *dec_dev,
+                              AWindowHandler *awh, bool need_gpu)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct aimage_reader_api *air_api = AWindowHandler_getAImageReaderApi(awh);
+    struct asurface_control_api *asc_api = AWindowHandler_getASurfaceControlApi(awh);
+    if (air_api == NULL || asc_api == NULL)
+        return VLC_EGENERIC;
+
+    int32_t width = 1, height = 1; /* Ignored by MediaCodec */
+    int32_t format = AIMAGE_FORMAT_PRIVATE;
+    uint64_t usage = 0;
+    int32_t max_images = 32;
+
+    if (need_gpu)
+        usage |= AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE;
+
+    AImageReader *reader;
+    int32_t status = air_api->AImageReader.newWithUsage(width, height, format,
+                                                        usage, max_images,
+                                                        &reader);
+
+    if (status != 0)
+    {
+        msg_Warn(p_dec, "AImageReader_newWithUsage failed: %d", status);
+        return VLC_EGENERIC;
+    }
+
+    ANativeWindow *window;
+    status = air_api->AImageReader.getWindow(reader, &window);
+
+    if (status != 0)
+    {
+        air_api->AImageReader.delete(reader);
+        msg_Warn(p_dec, "AImageReader_getWindow failed: %d", status);
+        return VLC_EGENERIC;
+    }
+
+    struct AImageReader_ImageListener listener = {
+        .context = p_dec,
+        .onImageAvailable = AImageReader_OnImageAvailable,
+    };
+
+    air_api->AImageReader.setImageListener(reader, &listener);
+
+    static const struct vlc_video_context_operations ops =
+    {
+        .destroy = CleanFromVideoContext,
+    };
+    p_sys->video.ctx =
+        vlc_video_context_Create(dec_dev, VLC_VIDEO_CONTEXT_AWINDOW,
+                                 sizeof(android_video_context_t), &ops);
+
+    if (!p_sys->video.ctx)
+    {
+        air_api->AImageReader.delete(reader);
+        return VLC_EGENERIC;
+    }
+
+    android_video_context_t *avctx =
+        vlc_video_context_GetPrivate(p_sys->video.ctx, VLC_VIDEO_CONTEXT_AWINDOW);
+    avctx->dec_opaque = NULL;
+    avctx->air_api = air_api;
+    avctx->asc_api = asc_api;
+    avctx->air = reader;
+    avctx->render = NULL;
+    avctx->render_ts = NULL;
+    avctx->get_texture = NULL;
+    avctx->texture = NULL;
+    p_sys->video.p_surface = window;
+    p_sys->video.use_air = true;
+    p_sys->video.air_waiting_count = 0;
+    assert(window != NULL);
+    return VLC_SUCCESS;
+}
+
 static int
 CreateSurface(decoder_t *p_dec, vlc_decoder_device *dec_dev,
               AWindowHandler *awh, bool use_surfacetexture)
@@ -825,7 +1023,8 @@ CreateSurface(decoder_t *p_dec, vlc_decoder_device *dec_dev,
 
 end:
     avctx->dec_opaque = p_dec->p_sys;
-
+    avctx->air_api = NULL;
+    avctx->air = NULL;
     avctx->render = PictureContextRenderPic;
     avctx->render_ts = p_sys->api.release_out_ts ? PictureContextRenderPicTs : NULL;
     avctx->get_texture = p_sys->video.surfacetexture ? PictureContextGetTexture : NULL;
@@ -878,9 +1077,18 @@ CreateVideoContext(decoder_t *p_dec)
         p_dec->fmt_out.video.projection_mode != PROJECTION_MODE_RECTANGULAR
         || (!p_sys->api.b_support_rotation && p_dec->fmt_out.video.orientation != ORIENT_NORMAL)
         || !can_set_video_layout;
+
     bool use_surfacetexture = need_gpu_transform && can_use_surfacetexture;
 
-    int ret = CreateSurface(p_dec, dec_dev, awh, use_surfacetexture);
+    int ret = CreateSurfaceFromAImageReader(p_dec, dec_dev, awh,
+                                            need_gpu_transform);
+    if (ret == VLC_SUCCESS)
+    {
+        vlc_decoder_device_Release(dec_dev);
+        return VLC_SUCCESS;
+    }
+
+    ret = CreateSurface(p_dec, dec_dev, awh, use_surfacetexture);
     vlc_decoder_device_Release(dec_dev);
 
     return ret;
@@ -1048,6 +1256,10 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
+        vlc_cond_init(&p_sys->video.air_cond);
+        p_sys->video.use_air = false;
+        p_sys->video.air_waiting_count = 0;
+
         switch (p_dec->fmt_in->i_codec)
         {
         case VLC_CODEC_H264:
@@ -1193,6 +1405,8 @@ static void AbortDecoderLocked(decoder_sys_t *p_sys)
     {
         p_sys->b_aborted = true;
         vlc_cond_broadcast(&p_sys->cond);
+        if (p_sys->cat == VIDEO_ES && p_sys->video.use_air)
+            vlc_cond_signal(&p_sys->video.air_cond);
     }
 }
 
@@ -1231,15 +1445,22 @@ static void CloseDecoder(vlc_object_t *p_this)
     p_sys->b_decoder_dead = true;
     vlc_mutex_unlock(&p_sys->lock);
 
-    if (p_sys->video.ctx)
+    if (p_sys->cat == VIDEO_ES && p_sys->video.ctx)
     {
-        /* If we have a video context, we're using Surface with inflight
-         * pictures, which might already have been queued, and flushing
-         * them would make them invalid, breaking mechanism like waiting
-         * on OnFrameAvailableListener.*/
+        if (!p_sys->video.use_air)
+        {
+            vlc_video_context_Release(p_sys->video.ctx);
+            /* If we have a video context, we're using Surface with inflight
+            * pictures, which might already have been queued, and flushing
+            * them would make them invalid, breaking mechanism like waiting
+            * on OnFrameAvailableListener.*/
+            CleanInputVideo(p_dec);
+            return;
+        }
+        android_video_context_t *avctx =
+            vlc_video_context_GetPrivate(p_sys->video.ctx, VLC_VIDEO_CONTEXT_AWINDOW);
+        avctx->air_api->AImageReader.setImageListener(avctx->air, NULL);
         vlc_video_context_Release(p_sys->video.ctx);
-        CleanInputVideo(p_dec);
-        return;
     }
 
     vlc_mutex_lock(&p_sys->lock);
@@ -1286,13 +1507,35 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
         if (p_sys->api.b_direct_rendering)
         {
-            struct asurface_picture_ctx *apctx =
-                GetPictureContext(p_dec,p_out->buf.i_index);
-            assert(apctx);
-            assert(apctx->s.vctx);
-            vlc_video_context_Hold(apctx->s.vctx);
-            p_pic->context = &apctx->s;
-            *pp_out_pic = p_pic;
+            if (p_sys->video.use_air)
+            {
+                /* We need to wait for AImageReader. Otherwise, we might
+                 * overwrite a picture (even when using acquireNextImageAsync) */
+                while (p_sys->video.air_waiting_count != 0 && !p_sys->b_aborted)
+                    vlc_cond_wait(&p_sys->video.air_cond, &p_sys->lock);
+                p_sys->video.air_waiting_count++;
+
+                p_sys->api.release_out(&p_sys->api, p_out->buf.i_index,
+                                       !p_sys->b_aborted);
+                /* picture will be wrapped from AImageReader callback */
+                assert(*pp_out_pic  == NULL);
+            }
+            else
+            {
+                picture_t *p_pic = NewPicture(p_dec, p_out->buf.i_ts);
+                if (!p_pic) {
+                    msg_Warn(p_dec, "NewPicture failed");
+                    return p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
+                }
+
+                struct asurface_picture_ctx *apctx =
+                    GetPictureContext(p_dec,p_out->buf.i_index);
+                assert(apctx);
+                assert(apctx->s.vctx);
+                vlc_video_context_Hold(apctx->s.vctx);
+                p_pic->context = &apctx->s;
+                *pp_out_pic = p_pic;
+            }
         } else {
             picture_t *p_pic = NewPicture(p_dec, p_out->buf.i_ts);
             if (!p_pic) {
