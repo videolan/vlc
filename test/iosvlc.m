@@ -114,27 +114,6 @@
     if (_libvlc == NULL)
         return NO;
 
-    /* Initialize main window */
-#if TARGET_OS_VISION
-    /* UIScreen is unavailable so we need create a size on our own */
-    window = [[UIWindow alloc] initWithFrame:CGRectMake(0., 0., 1200., 800.)];
-#else
-    window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-#endif
-    window.rootViewController = [[UIViewController alloc] init];
-    window.backgroundColor = [UIColor whiteColor];
-
-    subview = [[UIView alloc] initWithFrame:window.bounds];
-    subview.backgroundColor = [UIColor blueColor];
-    [window addSubview:subview];
-    [window makeKeyAndVisible];
-
-#if !TARGET_OS_TV
-    _pinchRecognizer = [[UIPinchGestureRecognizer alloc]
-        initWithTarget:self action:@selector(pinchRecognized:)];
-    [window addGestureRecognizer:_pinchRecognizer];
-#endif
-
     _intfQueue = dispatch_queue_create("org.videolan.vlc.ios.intf",
                                        DISPATCH_QUEUE_SERIAL);
     dispatch_async(_intfQueue, ^{
@@ -158,7 +137,36 @@ int main(int argc, char * argv[]) {
 static int Open(vlc_object_t *obj)
 {
     AppDelegate *d = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    assert(d != nil && d->subview != nil);
+    if( d == nil )
+        return VLC_EGENERIC;
+
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        if (d->window != nil && d->subview != nil)
+            return;
+
+        /* Initialize main window */
+#if TARGET_OS_VISION
+        /* UIScreen is unavailable so we need create a size on our own */
+        d->window = [[UIWindow alloc] initWithFrame:CGRectMake(0., 0., 1200., 800.)];
+#else
+        d->window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+#endif
+        d->window.rootViewController = [[UIViewController alloc] init];
+        d->window.backgroundColor = [UIColor whiteColor];
+
+        d->subview = [[UIView alloc] initWithFrame:d->window.bounds];
+        d->subview.backgroundColor = [UIColor blueColor];
+        [d->window addSubview:d->subview];
+        [d->window makeKeyAndVisible];
+
+#if !TARGET_OS_TV
+        d->_pinchRecognizer = [[UIPinchGestureRecognizer alloc]
+            initWithTarget:d action:@selector(pinchRecognized:)];
+        [d->window addGestureRecognizer:d->_pinchRecognizer];
+#endif
+    } );
+
+    assert(d->subview != nil);
     var_SetAddress(vlc_object_instance(obj), "drawable-nsobject",
                    (__bridge void *)d->subview);
 
