@@ -37,12 +37,14 @@
 #include <vlc_plugin.h>
 
 #include <TargetConditionals.h>
+#include <dispatch/dispatch.h>
 
 #include "../lib/libvlc_internal.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate> {
     @public
     libvlc_instance_t *_libvlc;
+    dispatch_queue_t _intfQueue;
     UIWindow *window;
     UIView *subview;
 
@@ -133,12 +135,14 @@
     [window addGestureRecognizer:_pinchRecognizer];
 #endif
 
-    /* Start glue interface, see code below */
-
-    libvlc_InternalAddIntf(_libvlc->p_libvlc_int, "ios_interface,none");
-
-    /* Start parsing arguments and eventual playback */
-    libvlc_InternalPlay(_libvlc->p_libvlc_int);
+    _intfQueue = dispatch_queue_create("org.videolan.vlc.ios.intf",
+                                       DISPATCH_QUEUE_SERIAL);
+    dispatch_async(_intfQueue, ^{
+        @autoreleasepool {
+            libvlc_InternalAddIntf(_libvlc->p_libvlc_int, "ios_interface,none");
+            libvlc_InternalPlay(_libvlc->p_libvlc_int);
+        }
+    });
 
     return YES;
 }
