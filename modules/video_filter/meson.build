@@ -62,6 +62,15 @@ vlc_modules += {
     'enabled' : opengl_dep.found() and host_system == 'windows'
 }
 
+# pl_scale - libplacebo scale filter
+vlc_modules += {
+    'name' : 'pl_scale',
+    'sources' : files('../video_output/opengl/pl_scale.c'),
+    'dependencies' : [gl_common_dep, gl_vout_dep, libplacebo_dep],
+    'link_with' : [libplacebo_utils],
+    'enabled' : libplacebo_dep.found() and gl_vout_dep.found(),
+}
+
 if host_system == 'windows'
     vlc_modules += {
         'name' : 'amf_frc',
