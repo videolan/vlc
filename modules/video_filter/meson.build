@@ -82,6 +82,16 @@ vlc_modules += {
     'enabled' : egl_dep.found() and gl_vout_dep.found() and host_system != 'emscripten',
 }
 
+# egl_surfacetexture (Android only)
+vlc_modules += {
+    'name' : 'egl_surfacetexture',
+    'sources' : files('egl_surfacetexture.c'),
+    'dependencies' : [egl_dep, opengles2_dep],
+    'c_args' : ['-DUSE_OPENGL_ES2'],
+    'link_with' : [libandroid_env, libandroid_utils, libvlc_opengles],
+    'enabled' : host_system == 'android' and egl_dep.found(),
+}
+
 if host_system == 'windows'
     vlc_modules += {
         'name' : 'amf_frc',
