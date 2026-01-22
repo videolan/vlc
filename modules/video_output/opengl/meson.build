@@ -52,6 +52,35 @@ if opengles2_dep.found()
                                      c_args: '-DUSE_OPENGL_ES2')
 endif
 
+# Unified dependency for modules that work with either OpenGL or OpenGL ES
+# NOTE: This does not provide linkage, but only headers for access to the
+#       common OpenGL/OpenGLES definitions for modules using the dynamic
+#       loading of symbols from the OpenGL provider.
+gl_vout_dep = disabler()
+if opengl_dep.found() and not (have_ios or have_tvos or host_system == 'android')
+    gl_vout_dep = declare_dependency(
+        link_with: libvlc_opengl,
+    )
+elif opengles2_dep.found() or have_ios or have_tvos or host_system == 'android'
+    gl_vout_dep = declare_dependency(
+        link_with: libvlc_opengles,
+        compile_args: ['-DUSE_OPENGL_ES2'],
+    )
+endif
+
+# gles2 vout display module
+vlc_modules += {
+    'name' : 'gles2',
+    'sources' : [
+            files('display.c'),
+            opengl_vout_commonsources
+        ],
+    'link_with' : [libvlc_opengles],
+    'dependencies' : [gl_common_dep, m_lib],
+    'c_args' : ['-DUSE_OPENGL_ES2'],
+    'enabled' : opengles2_dep.found(),
+}
+
 # interop_sw
 interop_sw_deps = [gl_common_dep, m_lib]
 interop_sw_libs = []
