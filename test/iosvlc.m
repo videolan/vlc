@@ -157,9 +157,9 @@ static int Open(vlc_object_t *obj)
         d->window.rootViewController = [[UIViewController alloc] init];
         d->window.backgroundColor = [UIColor whiteColor];
 
-        d->subview = [[UIView alloc] initWithFrame:d->window.bounds];
-        d->subview.backgroundColor = [UIColor blueColor];
-        [d->window addSubview:d->subview];
+        d->subview = d->window.rootViewController.view;
+        d->subview.frame = d->window.bounds;
+        d->subview.backgroundColor = [UIColor clearColor];
         [d->window makeKeyAndVisible];
 
 #if !TARGET_OS_TV
