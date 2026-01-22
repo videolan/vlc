@@ -152,3 +152,20 @@ vlc_modules += {
     'dependencies' : [egl_dep],
     'enabled' : egl_dep.found(),
 }
+
+# egl_display_gbm
+gbm_dep = dependency('gbm', required: false)
+egl_display_gbm_cargs = []
+egl_display_gbm_deps = [egl_dep, gbm_dep]
+if drm_dep.found()
+    egl_display_gbm_cargs += '-DHAVE_KMS=1'
+    egl_display_gbm_deps += drm_dep
+endif
+
+vlc_modules += {
+    'name' : 'egl_display_gbm',
+    'sources' : files('egl_display_gbm.c'),
+    'dependencies' : egl_display_gbm_deps,
+    'c_args' : egl_display_gbm_cargs,
+    'enabled' : egl_dep.found() and gbm_dep.found(),
+}
