@@ -22,6 +22,9 @@ endif
 opengles2_dep = dependency('glesv2', required: get_option('gles2'))
 egl_dep = dependency('egl', required: false)
 
+# Declared here so it's available in opengl subdir for egl_display_gbm
+drm_dep = dependency('libdrm', version: '>= 2.4.83', required: get_option('drm'))
+
 if host_system == 'darwin'
     subdir('apple')
 endif
@@ -99,7 +102,6 @@ vlc_modules += {
 }
 
 # Kernel Mode Setting
-drm_dep = dependency('libdrm', version: '>= 2.4.83', required: get_option('drm'))
 if drm_dep.found()
     vlc_modules += {
         'name' : 'kms',
