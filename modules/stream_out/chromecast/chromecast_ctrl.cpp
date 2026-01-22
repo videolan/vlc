@@ -130,6 +130,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  : m_module(p_this)
  , m_device_port(device_port)
  , m_device_addr(device_addr)
+ , m_device_name(_("Unknown"))
  , m_last_request_id( 0 )
  , m_mediaSessionId( 0 )
  , m_on_input_event( NULL )
@@ -154,7 +155,6 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_cc_time_date( VLC_TICK_INVALID )
  , m_cc_time( VLC_TICK_INVALID )
  , m_pingRetriesLeft( PING_WAIT_RETRIES )
- , m_device_name(_("Unknown"))
 {
     m_communication = new ChromecastCommunication( p_this,
         getHttpStreamPath(), getHttpStreamPort(),
