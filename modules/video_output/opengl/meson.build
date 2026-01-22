@@ -89,6 +89,14 @@ vlc_modules += {
     'enabled' : gl_vout_dep.found(),
 }
 
+# glfilter_mock (test module)
+vlc_modules += {
+    'name' : 'glfilter_mock',
+    'sources' : files('filter_mock.c'),
+    'dependencies' : [gl_common_dep, gl_vout_dep, m_lib],
+    'enabled' : gl_vout_dep.found(),
+}
+
 # interop_sw
 interop_sw_deps = [gl_common_dep, m_lib]
 interop_sw_libs = []
