@@ -98,28 +98,11 @@ vlc_modules += {
 }
 
 # interop_sw
-interop_sw_deps = [gl_common_dep, m_lib]
-interop_sw_libs = []
-interop_sw_cargs = []
-if host_system in ['darwin', 'android'] or opengl_dep.found() or opengles2_dep.found()
-    if have_osx and opengl_dep.found()
-        interop_sw_libs += libvlc_opengl
-    elif host_system in ['darwin', 'android'] and opengles2_dep.found()
-        interop_sw_libs += libvlc_opengles
-    endif
-
-    if opengles2_dep.found() or host_system == 'android'
-        interop_sw_cargs += '-DUSE_OPENGL_ES2'
-    endif
-endif
-
 vlc_modules += {
     'name' : 'glinterop_sw',
     'sources' : files('interop_sw.c'),
-    'dependencies' : interop_sw_deps,
-    'c_args' : interop_sw_cargs,
-    'link_with' : interop_sw_libs,
-    'enabled' : host_system in ['darwin', 'android'] or opengl_dep.found() or opengles2_dep.found(),
+    'dependencies' : [gl_common_dep, gl_vout_dep, m_lib],
+    'enabled' : gl_vout_dep.found(),
 }
 
 # interop_dxva2
