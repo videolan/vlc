@@ -71,6 +71,17 @@ vlc_modules += {
     'enabled' : libplacebo_dep.found() and gl_vout_dep.found(),
 }
 
+# egl_pbuffer_filter
+vlc_modules += {
+    'name' : 'egl_pbuffer_filter',
+    'sources' : files(
+        'egl_pbuffer.c',
+        '../video_output/opengl/egl_display.c',
+    ),
+    'dependencies' : [gl_common_dep, gl_vout_dep, egl_dep],
+    'enabled' : egl_dep.found() and gl_vout_dep.found() and host_system != 'emscripten',
+}
+
 if host_system == 'windows'
     vlc_modules += {
         'name' : 'amf_frc',
