@@ -110,6 +110,7 @@ struct mc_api_out
                 int crop_top;
                 int crop_right;
                 int crop_bottom;
+                struct mc_video_color_info color;
             } video;
             struct
             {

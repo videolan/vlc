@@ -341,6 +341,11 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
             p_out->conf.video.crop_top      = GetFormatInteger(format, "crop-top");
             p_out->conf.video.crop_right    = GetFormatInteger(format, "crop-right");
             p_out->conf.video.crop_bottom   = GetFormatInteger(format, "crop-bottom");
+
+            /* Extract color info from output format (API 28+) */
+            p_out->conf.video.color.range = GetFormatInteger(format, "color-range");
+            p_out->conf.video.color.standard = GetFormatInteger(format, "color-standard");
+            p_out->conf.video.color.transfer = GetFormatInteger(format, "color-transfer");
         }
         else
         {
