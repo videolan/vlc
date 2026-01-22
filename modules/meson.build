@@ -57,6 +57,7 @@ if (host_system != 'darwin' and host_system != 'windows') or get_option('xcb').e
     endif
 else
     have_wayland = false
+    wayland_deps = [disabler()]
 endif
 
 # PipeWire
