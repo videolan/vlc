@@ -42,3 +42,16 @@ vlc_modules += {
     'dependencies' : [libva_dep, libva_wayland_dep] + wayland_deps,
     'enabled' : libva_dep.found() and libva_wayland_dep.found() and have_wayland,
 }
+
+# VAAPI filters plugin
+vlc_modules += {
+    'name' : 'vaapi_filters',
+    'sources' : files(
+        'filters.c',
+        'vlc_vaapi.c',
+        'chroma.c',
+    ),
+    'dependencies' : [libva_dep],
+    'link_with' : [chroma_copy_lib],
+    'enabled' : libva_dep.found(),
+}
