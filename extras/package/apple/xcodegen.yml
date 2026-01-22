@@ -47,6 +47,18 @@ targets:
       - script: ${VLC_SRC_DIR}/extras/package/apple/copy_plugins.sh
         name: "Copy VLC plugins"
 
+      - name: Install VLC share data
+        shell: /bin/bash
+        script: |
+            set -e
+            archs=(${ARCHS})
+            arch="${archs[0]}"
+            build_root="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/build"
+            make -C "${build_root}/share" install-data \
+                DESTDIR="${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}" \
+                prefix=/ \
+                datadir=/share
+
       - name: Copy vlccoreios binary
         shell: /bin/bash
         script: |
