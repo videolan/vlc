@@ -144,3 +144,11 @@ vlc_modules += {
     'dependencies' : [gl_common_dep, libva_dep, egl_dep],
     'enabled' : opengl_dep.found() and egl_dep.found() and libva_dep.found(),
 }
+
+# egl_display_generic
+vlc_modules += {
+    'name' : 'egl_display_generic',
+    'sources' : files('egl_display_generic.c'),
+    'dependencies' : [egl_dep],
+    'enabled' : egl_dep.found(),
+}
