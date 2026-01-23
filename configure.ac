@@ -704,7 +704,7 @@ dnl Check for broken versions of mingw-runtime compatibility library
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <_mingw.h>
 #if defined(__MINGW64_VERSION_MAJOR)
-# if __MINGW64_VERSION_MAJOR < 6
+# if __MINGW64_VERSION_MAJOR < 8
 #  error Update your mingw-w64! This one is too old.
 # endif
 #else
