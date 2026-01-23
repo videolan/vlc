@@ -604,12 +604,11 @@ static int find_es_header( const uint8_t *header,
  *    -1 partial PES hdr found, no audio data found
  *     0 otherwise (complete PES found, pts extracted, pts set, buffer adjusted) */
 /* TODO: HD support -- nothing known about those streams */
-static int check_sync_pes( demux_t *p_demux, block_t *p_block,
-                           int32_t offset, int32_t rec_len )
+static int check_sync_pes( demux_t *p_demux, block_t *p_block, int32_t offset )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if ( offset < 0 || offset + p_sys->i_Pes_Length > rec_len )
+    if ( offset < 0 || (unsigned)offset + p_sys->i_Pes_Length > p_block->i_buffer )
     {
         /* entire PES header not present */
         msg_Dbg( p_demux, "PES header at %d not complete in record. storing.",
@@ -620,20 +619,20 @@ static int check_sync_pes( demux_t *p_demux, block_t *p_block,
             /* no header found, fake some 00's (this works, believe me) */
             memset( p_sys->pes_buffer, 0, 4 );
             p_sys->i_pes_buf_cnt = 4;
-            if( rec_len > 4 )
-                msg_Err( p_demux, "PES header not found in record of %d bytes!",
-                         rec_len );
+            if( p_block->i_buffer > 4 )
+                msg_Err( p_demux, "PES header not found in record of %zu bytes!",
+                         p_block->i_buffer );
             return -1;
         }
         /* copy the partial pes header we found */
+        p_sys->i_pes_buf_cnt = p_block->i_buffer - offset;
         memcpy( p_sys->pes_buffer, p_block->p_buffer + offset,
-                rec_len - offset );
-        p_sys->i_pes_buf_cnt = rec_len - offset;
+                p_sys->i_pes_buf_cnt );
 
         if( offset > 0 )
         {
             /* PES Header was found, but not complete, so trim the end of this record */
-            p_block->i_buffer -= rec_len - offset;
+            p_block->i_buffer = (unsigned) offset;
             return 1;
         }
         return -1;    /* partial PES, no audio data */
@@ -645,7 +644,7 @@ static int check_sync_pes( demux_t *p_demux, block_t *p_block,
     /*msg_Dbg(p_demux, "Audio PTS %"PRId64, p_sys->lastAudioPTS );*/
     /* adjust audio record to remove PES header */
     memmove(p_block->p_buffer + offset, p_block->p_buffer + offset +
-            p_sys->i_Pes_Length, rec_len - p_sys->i_Pes_Length);
+            p_sys->i_Pes_Length, p_block->i_buffer - p_sys->i_Pes_Length);
     p_block->i_buffer -= p_sys->i_Pes_Length;
 #if 0
     msg_Dbg(p_demux, "pes hdr removed; buffer len=%d and has "
@@ -667,7 +666,6 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const int subrec_type = rec_hdr->subrec_type;
-    const long l_rec_size = rec_hdr->l_rec_size;    // p_block_in->i_buffer might be better
     int esOffset1;
     int i;
 
@@ -690,12 +688,12 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 #endif
     //if( subrec_type == 0x06 || subrec_type == 0x07 )
     if( subrec_type != 0x02 && subrec_type != 0x0c &&
-        subrec_type != 0x08 && l_rec_size > 4 )
+        subrec_type != 0x08 && p_block_in->i_buffer > 4 )
     {
         /* get the PTS from this packet if it has one.
          * on S1, only 0x06 has PES.  On S2, however, most all do.
          * Do NOT Pass the PES Header to the MPEG2 codec */
-        size_t search_len = __MIN(l_rec_size - sizeof(ty_VideoPacket), 5);
+        size_t search_len = __MIN(p_block_in->i_buffer - sizeof(ty_VideoPacket), 5);
         esOffset1 = find_es_header( ty_VideoPacket, p_block_in->p_buffer, p_block_in->i_buffer, search_len );
         if( esOffset1 != -1 )
         {
@@ -709,12 +707,12 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
                 /* if we found a PES, and it's not type 6, then we're S2 */
                 /* The packet will have video data (& other headers) so we
                  * chop out the PES header and send the rest */
-                if (l_rec_size >= VIDEO_PES_LENGTH) {
+                if (p_block_in->i_buffer >= VIDEO_PES_LENGTH) {
                     p_block_in->p_buffer += VIDEO_PES_LENGTH + esOffset1;
                     p_block_in->i_buffer -= VIDEO_PES_LENGTH + esOffset1;
                 } else {
                     msg_Dbg(p_demux, "video rec type 0x%02x has short PES"
-                        " (%ld bytes)", subrec_type, l_rec_size);
+                        " (%zu bytes)", subrec_type, p_block_in->i_buffer);
                     /* nuke this block; it's too short, but has PES marker */
                     p_block_in->i_buffer = 0;
                 }
@@ -740,7 +738,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
          * (if we have enough data) */
         /* Some ty files don't have this bit set
          * and it causes problems */
-        if (subrec_type == 0x0c && l_rec_size >= 6)
+        if (subrec_type == 0x0c && p_block_in->i_buffer >= 6)
             p_block_in->p_buffer[5] |= 0x08;
         /* store the TY PTS if there is one */
         if (subrec_type == 0x07) {
@@ -829,7 +827,6 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const int subrec_type = rec_hdr->subrec_type;
-    const long l_rec_size = rec_hdr->l_rec_size;
     int esOffset1;
 
     assert( rec_hdr->rec_type == 0xc0 );
@@ -856,12 +853,12 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
             msg_Dbg(p_demux, "continuing PES header");
             /* do we have enough data to complete? */
-            if (i_need >= l_rec_size)
+            if (i_need >= p_block_in->i_buffer)
             {
                 /* don't have complete PES hdr; save what we have and return */
                 memcpy(&p_sys->pes_buffer[p_sys->i_pes_buf_cnt],
-                        p_block_in->p_buffer, l_rec_size);
-                p_sys->i_pes_buf_cnt += l_rec_size;
+                        p_block_in->p_buffer, p_block_in->i_buffer);
+                p_sys->i_pes_buf_cnt += p_block_in->i_buffer;
                 /* */
                 block_Release(p_block_in);
                 return 0;
@@ -924,7 +921,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
         /* SA PES Header, No Audio Data                     */
         /* ================================================ */
-        if ( ( esOffset1 == 0 ) && ( l_rec_size == REC_SIZE ) )
+        if ( ( esOffset1 == 0 ) && ( p_block_in->i_buffer == REC_SIZE ) )
         {
             p_sys->lastAudioPTS = VLC_TICK_0 + get_pts( &p_block_in->p_buffer[
                         SA_PTS_OFFSET ] );
@@ -937,8 +934,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         /* ================================================ */
 
         /* Check for complete PES */
-        if (check_sync_pes(p_demux, p_block_in, esOffset1,
-                            l_rec_size) == -1)
+        if (check_sync_pes(p_demux, p_block_in, esOffset1) == -1)
         {
             /* partial PES header found, nothing else.
              * we're done. */
@@ -992,8 +988,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 #endif
 
         /* Check for complete PES */
-        if (check_sync_pes(p_demux, p_block_in, esOffset1,
-                            l_rec_size) == -1)
+        if (check_sync_pes(p_demux, p_block_in, esOffset1) == -1)
         {
             /* partial PES header found, nothing else.  we're done. */
             block_Release(p_block_in);
