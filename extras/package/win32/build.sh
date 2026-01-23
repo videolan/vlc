@@ -124,6 +124,10 @@ case $ARCH in
         exit 1
 esac
 
+if [ -n "$DISABLEGUI" ]; then
+    INSTALLER=""
+fi
+
 #####
 
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
