@@ -277,8 +277,11 @@ void CSDMenu::popup(const QPoint &pos)
         assert(d->m_systemMenu);
 
         qreal qtDpr = window->devicePixelRatio();
-        QPlatformWindow* nativeWindow = window->handle();
-        qreal nativeDpr = nativeWindow->devicePixelRatio();
+        qreal nativeDpr = qtDpr;
+#ifdef QT_GUI_PRIVATE
+        if (QPlatformWindow* nativeWindow = window->handle())
+            nativeDpr = nativeWindow->devicePixelRatio();
+#endif
 
         qt_csd_menu_event event = {};
         event.platform = QT_CSD_PLATFORM_UNKNOWN;
