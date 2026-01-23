@@ -237,10 +237,10 @@ struct demux_sys_t
   tivo_type_t     tivo_type;          /* tivo type (SA / DTiVo) */
   tivo_series_t   tivo_series;        /* Series1 or Series2 */
   tivo_audio_t    audio_type;         /* AC3 or MPEG */
-  int             i_Pes_Length;       /* Length of Audio PES header */
-  int             i_Pts_Offset;       /* offset into audio PES of PTS */
+  unsigned        i_Pes_Length;       /* Length of Audio PES header */
+  unsigned        i_Pts_Offset;       /* offset into audio PES of PTS */
   uint8_t         pes_buffer[20];     /* holds incomplete pes headers */
-  int             i_pes_buf_cnt;      /* how many bytes in our buffer */
+  unsigned        i_pes_buf_cnt;      /* how many bytes in our buffer */
   size_t          l_ac3_pkt_size;     /* len of ac3 pkt we've seen so far */
   uint64_t        l_last_ty_pts;      /* last TY timestamp we've seen */
   //vlc_tick_t      l_last_ty_pts_sync; /* audio PTS at time of last TY PTS */
@@ -851,7 +851,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         /* continue PES if previous was incomplete */
         if (p_sys->i_pes_buf_cnt > 0)
         {
-            const int i_need = p_sys->i_Pes_Length - p_sys->i_pes_buf_cnt;
+            const unsigned i_need = p_sys->i_Pes_Length - p_sys->i_pes_buf_cnt;
 
             msg_Dbg(p_demux, "continuing PES header");
             /* do we have enough data to complete? */
