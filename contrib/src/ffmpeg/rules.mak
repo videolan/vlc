@@ -169,7 +169,7 @@ endif
 # Windows
 ifdef HAVE_WIN32
 ifndef HAVE_VISUALSTUDIO
-DEPS_ffmpeg += wine-headers $(DEPS_wine-headers) mingw12-fixes $(DEPS_mingw12-fixes) d3d12 $(DEPS_d3d12)
+DEPS_ffmpeg += mingw12-fixes $(DEPS_mingw12-fixes) d3d12 $(DEPS_d3d12)
 endif
 FFMPEGCONF += --target-os=mingw32
 FFMPEGCONF += --enable-w32threads
