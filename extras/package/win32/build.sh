@@ -273,7 +273,6 @@ VLC_LDFLAGS="$LDFLAGS"
 unset LDFLAGS
 
 if [ -n "$BUILD_UCRT" ]; then
-    WIDL=${TRIPLET}-widl
     VLC_CPPFLAGS="$VLC_CPPFLAGS -D__MSVCRT_VERSION__=0xE00 -D_UCRT"
 
     if [ -n "$WINSTORE" ]; then
