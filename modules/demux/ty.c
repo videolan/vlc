@@ -637,6 +637,10 @@ static int check_sync_pes( demux_t *p_demux, block_t *p_block, int32_t offset )
         }
         return -1;    /* partial PES, no audio data */
     }
+
+    if( p_block->i_buffer < (unsigned)offset + p_sys->i_Pts_Offset + 5 )
+        return -1;
+
     /* full PES header present, extract PTS */
     p_sys->lastAudioPTS = VLC_TICK_0 + get_pts( &p_block->p_buffer[ offset +
                                    p_sys->i_Pts_Offset ] );
@@ -644,7 +648,7 @@ static int check_sync_pes( demux_t *p_demux, block_t *p_block, int32_t offset )
     /*msg_Dbg(p_demux, "Audio PTS %"PRId64, p_sys->lastAudioPTS );*/
     /* adjust audio record to remove PES header */
     memmove(p_block->p_buffer + offset, p_block->p_buffer + offset +
-            p_sys->i_Pes_Length, p_block->i_buffer - p_sys->i_Pes_Length);
+            p_sys->i_Pes_Length, p_block->i_buffer - offset - p_sys->i_Pes_Length);
     p_block->i_buffer -= p_sys->i_Pes_Length;
 #if 0
     msg_Dbg(p_demux, "pes hdr removed; buffer len=%d and has "
@@ -699,6 +703,11 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         {
             //msg_Dbg(p_demux, "Video PES hdr in pkt type 0x%02x at offset %d",
                 //subrec_type, esOffset1);
+            if(p_block_in->i_buffer < (unsigned)esOffset1 + VIDEO_PTS_OFFSET + 5)
+            {
+                block_Release(p_block_in);
+                return -1;
+            }
             p_sys->lastVideoPTS = VLC_TICK_0 + get_pts(
                     &p_block_in->p_buffer[ esOffset1 + VIDEO_PTS_OFFSET ] );
             /*msg_Dbg(p_demux, "Video rec %d PTS %"PRId64, p_sys->i_cur_rec,
@@ -707,7 +716,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
                 /* if we found a PES, and it's not type 6, then we're S2 */
                 /* The packet will have video data (& other headers) so we
                  * chop out the PES header and send the rest */
-                if (p_block_in->i_buffer >= VIDEO_PES_LENGTH) {
+                if (p_block_in->i_buffer >= VIDEO_PES_LENGTH + (unsigned) esOffset1) {
                     p_block_in->p_buffer += VIDEO_PES_LENGTH + esOffset1;
                     p_block_in->i_buffer -= VIDEO_PES_LENGTH + esOffset1;
                 } else {
