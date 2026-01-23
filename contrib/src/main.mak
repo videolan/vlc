@@ -93,7 +93,6 @@ else
 RANLIB ?= $(MAYBEHOST)ranlib
 endif
 STRIP ?= $(MAYBEHOST)strip
-WIDL ?= $(MAYBEHOST)widl
 WINDRES ?= $(MAYBEHOST)windres
 
 ifdef HAVE_ANDROID
