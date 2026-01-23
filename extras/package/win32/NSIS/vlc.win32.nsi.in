@@ -307,6 +307,7 @@ skip_uninstall32_cleanup:
   ; VLC.exe, libvlc.dll
   !insertmacro InstallFile vlc.exe
   !insertmacro InstallFile vlc-cache-gen.exe
+  !insertmacro InstallFile vlc-preparser.exe
 
   ; All dlls
   !insertmacro InstallFile *.dll
