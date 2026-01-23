@@ -141,6 +141,7 @@ esac
 
 if [ -n "$DISABLEGUI" ]; then
     INSTALLER=""
+    I18N=""
 fi
 
 #####
