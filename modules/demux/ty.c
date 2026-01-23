@@ -856,7 +856,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
          */
 
         /* continue PES if previous was incomplete */
-        if (p_sys->i_pes_buf_cnt > 0)
+        if (p_sys->i_pes_buf_cnt > 0 && p_sys->i_Pes_Length >= p_sys->i_pes_buf_cnt)
         {
             const unsigned i_need = p_sys->i_Pes_Length - p_sys->i_pes_buf_cnt;
 
