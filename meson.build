@@ -401,10 +401,9 @@ windows_version_test = '''
 
         have_mingw = true
 
-        mingw_version_minor = cc.get_define('__MINGW64_VERSION_MINOR',
+        mingw_version = cc.get_define('__MINGW64_VERSION_STR',
             prefix: '#include <_mingw.h>')
 
-        mingw_version = '@0@.@1@'.format(mingw_version_major, mingw_version_minor)
         message('Using MinGW-w64 ' + mingw_version)
 
         # Defines needed for MinGW
