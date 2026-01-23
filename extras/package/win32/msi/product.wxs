@@ -141,6 +141,10 @@
                             <File Id='vlc_cache_gen.exe' Name='vlc-cache-gen.exe' KeyPath='yes' DiskId='1' />
                         </Component>
 
+                        <Component Id='CompPreparserExe' Guid='83ff6660-bf97-4c6e-a6eb-123df8ec9cb1' Win64="$(var.Win64)">
+                            <File Id='vlc_preparser.exe' Name='vlc-preparser.exe' KeyPath='yes' DiskId='1' />
+                        </Component>
+
                         <Component Id='CompIcon' Guid='8707410c-55fe-4c38-924e-438762b8b82e' Win64="$(var.Win64)">
                             <File Id='vlc.ico' Name='vlc.ico' KeyPath='yes' DiskId='1' />
                         </Component>
@@ -289,6 +293,7 @@
             <ComponentRef Id='CompLibvlccore' />
             <ComponentRef Id='CompLibvlc' />
             <ComponentRef Id='CompCacheGen' />
+            <ComponentRef Id='CompPreparserExe' />
             <ComponentRef Id='CompIcon' />
             <ComponentRef Id='CompTXT' />
             <ComponentRef Id='CompPluginsCache' />
