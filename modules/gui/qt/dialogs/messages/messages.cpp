@@ -100,9 +100,7 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     changeVerbosity( i_verbosity );
     ui.verbosityBox->setValue( qMin( i_verbosity, 2 ) );
 
-    getSettings()->beginGroup( "Messages" );
-    ui.filterEdit->setText( getSettings()->value( "messages-filter" ).toString() );
-    getSettings()->endGroup();
+    ui.filterEdit->setText( getSettings()->value( "Messages/messages-filter" ).toString() );
 
     updateButton = new QToolButton;
     updateButton->setIcon( QIcon(":/menu/update.svg") );
@@ -165,9 +163,7 @@ void MessagesDialog::changeVerbosity( int i_verbosity )
 
 void MessagesDialog::updateConfig()
 {
-    getSettings()->beginGroup( "Messages" );
-    getSettings()->setValue( "messages-filter", ui.filterEdit->text() );
-    getSettings()->endGroup();
+    getSettings()->setValue( "Messages/messages-filter", ui.filterEdit->text() );
 }
 
 void MessagesDialog::addError(int row){
