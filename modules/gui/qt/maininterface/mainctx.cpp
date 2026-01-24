@@ -196,7 +196,8 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     /* Controlbar Profile Model Creation */
     m_controlbarProfileModel = new ControlbarProfileModel(p_intf->mainSettings, this);
 
-    m_dialogFilepath = getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
+    const QUrl homeUrl = QUrl::fromLocalFile(QVLCUserDir( VLC_HOME_DIR ));
+    m_dialogFilepath = getSettings()->value( "filedialog-path", homeUrl ).toUrl();
 
     QString platformName = QGuiApplication::platformName();
 
