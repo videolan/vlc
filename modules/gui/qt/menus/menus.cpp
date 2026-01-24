@@ -675,7 +675,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
 #endif
 
     action = menu->addAction( qfut( I_MENU_GOTOTIME ), THEDP, &DialogsProvider::gotoTimeDialog );
-    action->setShortcut( qtr( "Ctrl+T" ) );
+    action->setShortcut( QKeySequence( "Ctrl+T" ) );
 
     menu->addSeparator();
 }

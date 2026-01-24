@@ -604,9 +604,7 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
     // Bookmarks
     if (m_ctx->hasMediaLibrary())
     {
-        // FIXME: Do we really need a translation call for the string shortcut ?
-        m_menu->addAction(qtr("&Manage"), THEDP, &DialogsProvider::bookmarksDialog )->setShortcut( qtr("Ctrl+B"));
-
+	m_menu->addAction(qtr("&Manage"), THEDP, &DialogsProvider::bookmarksDialog )->setShortcut(QKeySequence("Ctrl+B"));
         m_menu->addSeparator();
 
         MLBookmarkModel * bookmarks = new MLBookmarkModel(m_menu.get());
