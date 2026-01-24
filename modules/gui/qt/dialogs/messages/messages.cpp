@@ -100,7 +100,7 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     changeVerbosity( i_verbosity );
     ui.verbosityBox->setValue( qMin( i_verbosity, 2 ) );
 
-    getSettings()->beginGroup( qtr("Messages") );
+    getSettings()->beginGroup( "Messages" );
     ui.filterEdit->setText( getSettings()->value( "messages-filter" ).toString() );
     getSettings()->endGroup();
 
