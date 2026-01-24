@@ -150,7 +150,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
 
 ExtendedDialog::~ExtendedDialog()
 {
-    getSettings()->setValue("Epanel/geometry", saveGeometry());
+    getSettings()->setValue("EPanel/geometry", saveGeometry());
 }
 
 void ExtendedDialog::showTab( int i )
