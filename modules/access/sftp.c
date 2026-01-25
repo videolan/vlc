@@ -441,7 +441,11 @@ static int Open( vlc_object_t* p_this )
             b_publickey_tried = true;
             if( AuthKeyAgent( p_access, credential.psz_username ) == VLC_SUCCESS
              || AuthPublicKey( p_access, psz_home, credential.psz_username ) == VLC_SUCCESS )
+            {
+                /* Password validity is unknown with the pubkey, but keep the username. */
+                vlc_credential_store( &credential, p_access );
                 break;
+            }
         }
 
         if( strstr( psz_userauthlist, "password" ) != NULL
