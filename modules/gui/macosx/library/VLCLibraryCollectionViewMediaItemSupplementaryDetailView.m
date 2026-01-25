@@ -94,7 +94,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
     VLCInputItem * const inputItem = actualItem.inputItem;
     NSString * const discNumber = inputItem.discNumber;
-    if (![discNumber isEqualToString:@""]) {
+    if (![discNumber isEqualToString:@""] && ![discNumber isEqualToString:@"0"]) {
         [strings addObject:[NSString stringWithFormat:@"%@ %@", _NS("Disc"), discNumber]];
     }
 
