@@ -1433,7 +1433,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 - (id<VLCMediaLibraryItemProtocol>)primaryActionableDetailLibraryItem
 {
     if (_primaryActionableDetailLibraryItem == nil && self.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK) {
-        _primaryActionableDetailLibraryItem = [VLCMediaLibraryAlbum albumWithID:self.albumID];
+        _primaryActionableDetailLibraryItem = [VLCMediaLibraryArtist artistWithID:self.artistID];
     }
 
     return _primaryActionableDetailLibraryItem;
