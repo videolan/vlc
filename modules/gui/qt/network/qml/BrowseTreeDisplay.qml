@@ -115,7 +115,13 @@ MainViewLoader {
             return {
                 artwork: data.artwork,
                 fallback: fallbackImage,
-                textureProvider: root.currentItem.itemAtIndex(index)?.artworkTextureProvider
+                // FIXME: `call(null, index)` is to prevent the following warning in list view mode
+                //        where the view is a C++ type:
+                //         > Calling C++ methods with 'this' objects different from the one they
+                //         > were retrieved from is broken, due to historical reasons. The original
+                //         > object is used as 'this' object. You can allow the given 'this' object
+                //         > to be used by setting 'pragma NativeMethodBehavior: AcceptThisObject'
+                textureProvider: root.currentItem?.itemAtIndex.call(null, index)?.artworkTextureProvider ?? null
             }
         }
 
