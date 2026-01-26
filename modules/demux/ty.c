@@ -365,11 +365,13 @@ static int Open(vlc_object_t *p_this)
         es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_A52 );
     }
     fmt.i_group = TY_ES_GROUP;
+    fmt.b_packetized = false;
     p_sys->p_audio = es_out_Add( p_demux->out, &fmt );
 
     /* register the video stream */
     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_MPGV );
     fmt.i_group = TY_ES_GROUP;
+    fmt.b_packetized = false;
     p_sys->p_video = es_out_Add( p_demux->out, &fmt );
 
     /* */
