@@ -819,7 +819,10 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
     //msg_Dbg(p_demux, "sending rec %d as video type 0x%02x",
             //p_sys->i_cur_rec, subrec_type);
-    es_out_Send(p_demux->out, p_sys->p_video, p_block_in);
+    if( likely(p_sys->p_video) )
+        es_out_Send(p_demux->out, p_sys->p_video, p_block_in);
+    else
+        block_Release( p_block_in );
     return 0;
 }
 static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
@@ -1018,7 +1021,10 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         es_out_SetPCR( p_demux->out, p_block_in->i_pts );
 
     /* Send data */
-    es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );
+    if( likely(p_sys->p_audio) )
+        es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );
+    else
+        block_Release( p_block_in );
     return 0;
 }
 
