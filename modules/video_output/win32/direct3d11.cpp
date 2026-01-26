@@ -1080,8 +1080,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
             hdr10.WhitePoint[0]   = picture->format.mastering.white_point[0];
             hdr10.WhitePoint[1]   = picture->format.mastering.white_point[1];
-            hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
             hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
+            hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
             hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
             hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
 

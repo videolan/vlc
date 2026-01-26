@@ -381,8 +381,8 @@ void DXGI_LocalSwapchainSetMetadata( dxgi_swapchain *display, libvlc_video_metad
         hdr10.RedPrimary[1] = p_hdr10->RedPrimary[1];
         hdr10.WhitePoint[0] = p_hdr10->WhitePoint[0];
         hdr10.WhitePoint[1] = p_hdr10->WhitePoint[1];
+        hdr10.MaxMasteringLuminance = p_hdr10->MaxMasteringLuminance / 10000;
         hdr10.MinMasteringLuminance = p_hdr10->MinMasteringLuminance;
-        hdr10.MaxMasteringLuminance = p_hdr10->MaxMasteringLuminance;
         hdr10.MaxContentLightLevel = p_hdr10->MaxContentLightLevel;
         hdr10.MaxFrameAverageLightLevel = p_hdr10->MaxFrameAverageLightLevel;
         if (memcmp(&display->hdr10, &hdr10, sizeof(hdr10)))
