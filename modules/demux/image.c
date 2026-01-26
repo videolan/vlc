@@ -741,16 +741,22 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
     }
 
+    date_Init(&sys->pts, fmt.video.i_frame_rate, fmt.video.i_frame_rate_base);
+    date_Set(&sys->pts, 0);
+    sys->es = es_out_Add(demux->out, &fmt);
+    es_format_Clean(&fmt);
+    if(unlikely(!sys->es))
+    {
+        if (data)
+            block_Release(data);
+        free(sys);
+        return VLC_EGENERIC;
+    }
     sys->data        = data;
-    sys->es          = es_out_Add(demux->out, &fmt);
     sys->duration    = CLOCK_FREQ * var_InheritFloat(demux, "image-duration");
     sys->is_realtime = var_InheritBool(demux, "image-realtime");
     sys->pts_origin  = sys->is_realtime ? mdate() : 0;
     sys->pts_next    = VLC_TICK_INVALID;
-    date_Init(&sys->pts, fmt.video.i_frame_rate, fmt.video.i_frame_rate_base);
-    date_Set(&sys->pts, 0);
-
-    es_format_Clean(&fmt);
 
     demux->pf_demux   = Demux;
     demux->pf_control = Control;
