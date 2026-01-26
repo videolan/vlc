@@ -284,7 +284,7 @@ static const muxer_properties_t p_muxers[] = {
     //M( "avformat{mux=flac}", "flac", 1, VLC_CODEC_FLAC ), BROKEN
 
     M( "ogg", "ogg", INT_MAX,   VLC_CODEC_VORBIS, VLC_CODEC_SPEEX,  VLC_CODEC_FLAC,
-                                VLC_CODEC_SUBT,   VLC_CODEC_THEORA, VLC_CODEC_DIRAC,
+                                VLC_CODEC_SUBT,   VLC_CODEC_THEORA,
                                 VLC_CODEC_OPUS ),
 
     M( "asf", "asf", 127,       VLC_CODEC_WMA1, VLC_CODEC_WMA2, VLC_CODEC_WMAP, VLC_CODEC_WMAL, VLC_CODEC_WMAS,
