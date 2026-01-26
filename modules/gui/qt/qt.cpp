@@ -672,8 +672,9 @@ static void *ThreadPlatform( void *obj, char *platform_name )
     app.setQuitOnLastWindowClosed( false );
 
     /* Retrieve last known path used in file browsing */
+    const QUrl homeUrl = QUrl::fromLocalFile(QVLCUserDir( VLC_HOME_DIR ));
     p_sys->filepath =
-         getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
+         getSettings()->value( "filedialog-path", homeUrl ).toUrl();
 
     /* Loads and tries to apply the preferred QStyle */
     QString s_style = getSettings()->value( "MainWindow/QtStyle", "" ).toString();
