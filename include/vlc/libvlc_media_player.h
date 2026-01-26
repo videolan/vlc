@@ -717,15 +717,15 @@ typedef void* (*libvlc_video_getProcAddress_cb)(void* opaque, const char* fct_na
 
 typedef struct libvlc_video_frame_hdr10_metadata_t
 {
-    /* similar to SMPTE ST 2086 mastering display color volume */
-    uint16_t RedPrimary[2];
-    uint16_t GreenPrimary[2];
-    uint16_t BluePrimary[2];
-    uint16_t WhitePoint[2];
-    unsigned int MaxMasteringLuminance;
-    unsigned int MinMasteringLuminance;
-    uint16_t MaxContentLightLevel;
-    uint16_t MaxFrameAverageLightLevel;
+    /* similar to CTA-861-G with ranges from H265, based on SMPTE ST 2086 mastering display color volume */
+    uint16_t RedPrimary[2];   /**< [5,37 000] normalized x / [5,42 000] y chromacity in increments of 0.00002, 0=unknown */
+    uint16_t GreenPrimary[2]; /**< [5,37 000] normalized x / [5,42 000] y chromacity in increments of 0.00002, 0=unknown */
+    uint16_t BluePrimary[2];  /**< [5,37 000] normalized x / [5,42 000] y chromacity in increments of 0.00002, 0=unknown */
+    uint16_t WhitePoint[2];   /**< [5,37 000] normalized x / [5,42 000] y white point in increments of 0.00002, 0=unknown */
+    unsigned int MaxMasteringLuminance; /**< [50 000, 100 000 000] maximum luminance in 0.0001 cd/m², 0=unknown */
+    unsigned int MinMasteringLuminance; /**< [1, 50 000] minimum luminance in 0.0001 cd/m², 0=unknown */
+    uint16_t MaxContentLightLevel;      /**< [1, 50 000] Maximum Content Light Level in cd/m², 0=unknown */
+    uint16_t MaxFrameAverageLightLevel; /**< [1, 50 000] Maximum Frame-Average Light Level in cd/m², 0=unknown */
 } libvlc_video_frame_hdr10_metadata_t;
 
 typedef enum libvlc_video_metadata_type_t {
@@ -905,7 +905,7 @@ typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane
  * NULL when using \ref libvlc_video_engine_anw)
  * \param makeCurrent_cb callback called to enter/leave the rendering context
  * (can only be NULL when using \ref libvlc_video_engine_anw)
- * \param getProcAddress_cb opengl function loading callback (cannot be NULL 
+ * \param getProcAddress_cb opengl function loading callback (cannot be NULL
  * for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param metadata_cb callback to provide frame metadata (D3D11 only)
  * \param select_plane_cb callback to select different D3D11 rendering targets
@@ -965,10 +965,10 @@ libvlc_video_set_anw_callbacks( libvlc_media_player_t *mp,
  * class.
  * VLCDrawable protocol conformance isn't mandatory but a drawable must respond
  * to both `addSubview:` and `bounds` selectors.
- * 
+ *
  * Additionally, a drawable can also conform to the `VLCPictureInPictureDrawable`
  * protocol to allow picture in picture support :
- * 
+ *
  * @code{.m}
  * @protocol VLCPictureInPictureMediaControlling <NSObject>
  * - (void)play;
@@ -979,23 +979,23 @@ libvlc_video_set_anw_callbacks( libvlc_media_player_t *mp,
  * - (BOOL)isMediaSeekable;
  * - (BOOL)isMediaPlaying;
  * @end
- * 
+ *
  * @protocol VLCPictureInPictureWindowControlling <NSObject>
  * - (void)startPictureInPicture;
  * - (void)stopPictureInPicture;
  * - (void)invalidatePlaybackState;
  * @end
- * 
+ *
  * @protocol VLCPictureInPictureDrawable <NSObject>
  * - (id<VLCPictureInPictureMediaControlling>) mediaController;
  * - (void (^)(id<VLCPictureInPictureWindowControlling>)) pictureInPictureReady;
  * @end
  * @endcode
- * 
+ *
  * Be aware that full `VLCPictureInPictureDrawable` conformance is mandatory to
  * enable picture in picture support and that time values in
  * `VLCPictureInPictureMediaControlling` methods are expressed in milliseconds.
- * 
+ *
  * If you want to use it along with Qt see the QMacCocoaViewContainer. Then
  * the following code should work:
  * @code{.mm}
@@ -1010,7 +1010,7 @@ libvlc_video_set_anw_callbacks( libvlc_media_player_t *mp,
  * You can find a live example in VLCVideoView in VLCKit.framework.
  *
  * \param p_mi the Media Player
- * \param drawable the drawable that is either an NSView, a UIView or any 
+ * \param drawable the drawable that is either an NSView, a UIView or any
  * NSObject responding to `addSubview:` and `bounds` selectors
  */
 LIBVLC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, void * drawable );
