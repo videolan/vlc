@@ -1,0 +1,43 @@
+From b4c4a7ef50b3bb8cac30975437c89a377240ef6f Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 28 Apr 2026 11:30:11 +0200
+Subject: [PATCH 2/2] KaxBlock: throw when the EBML length difference gives a
+ negative frame length
+
+---
+ src/KaxBlock.cpp | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/KaxBlock.cpp b/src/KaxBlock.cpp
+index 5fab622..ddf8b14 100644
+--- a/src/KaxBlock.cpp
++++ b/src/KaxBlock.cpp
+@@ -533,7 +533,11 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+             for (Index=1; Index<FrameNum; Index++) {
+               // get the size of the frame
+               SizeRead = LastBufferSize;
+-              FrameSize += ReadCodedSizeSignedValue(BufferStart + Mem.GetPosition(), SizeRead, SizeUnknown);
++              auto FrameSizeDiff = ReadCodedSizeSignedValue(BufferStart + Mem.GetPosition(), SizeRead, SizeUnknown);
++              if (FrameSizeDiff < 0 && FrameSize <= -FrameSizeDiff)
++                // invalid negative or 0 frame size
++                throw SafeReadIOCallback::EndOfStreamX(SizeRead);
++              FrameSize += FrameSizeDiff;
+               if (!FrameSize || (static_cast<uint32>(FrameSize + SizeRead) > LastBufferSize))
+                 throw SafeReadIOCallback::EndOfStreamX(SizeRead);
+               SizeList[Index] = FrameSize;
+@@ -707,7 +711,11 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+               if (SizeRead > 1 && input.read(&length_buf[1], SizeRead - 1) != SizeRead - 1)
+                 throw SafeReadIOCallback::EndOfStreamX(0);
+ 
+-              FrameSize += ReadCodedSizeSignedValue(length_buf, SizeRead, SizeUnknown);
++              auto FrameSizeDiff = ReadCodedSizeSignedValue(length_buf, SizeRead, SizeUnknown);
++              if (FrameSizeDiff < 0 && FrameSize <= -FrameSizeDiff)
++                // invalid negative or 0 frame size
++                throw SafeReadIOCallback::EndOfStreamX(0);
++              FrameSize += FrameSizeDiff;
+               if (FrameSize > TotalLacedSize)
+                 throw SafeReadIOCallback::EndOfStreamX(0);
+ 
+-- 
+2.52.0.windows.1
+
