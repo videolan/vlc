@@ -35,8 +35,6 @@ Widgets.TableRowDelegate {
                                            && (rowModel.type !== NetworkMediaModel.TYPE_NODE)
                                            && (rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
 
-    readonly property bool _showCustomCover: (!artworkSource) || (artwork.status !== Image.Ready)
-
     signal playClicked(int index)
 
     // Functions
@@ -72,48 +70,51 @@ Widgets.TableRowDelegate {
         anchors.fill: parent
         spacing: VLCStyle.margin_normal
 
-        Item {
-            id: itemCover
+        Widgets.MediaCover {
+            id: cover
 
             anchors.verticalCenter: parent.verticalCenter
 
-            width: artwork.width
-            height: artwork.height
+            width: VLCStyle.listAlbumCover_width
+            height: VLCStyle.listAlbumCover_height
 
-            //FIXME: implement fillMode in RoundImage and use MediaCover here instead
-            //or directly TableCollumns.titleHeaderDelegate in place of NetworkThumbnailItem
-            NetworkCustomCover {
-                id: artwork
+            pictureWidth: 0 // preserve aspect ratio
+            pictureHeight: height
 
-                width: VLCStyle.listAlbumCover_width
-                height: VLCStyle.listAlbumCover_height
+            fillMode: Image.PreserveAspectFit
 
-                // artworks can have anysize, we try to fit it using PreserveAspectFit
-                // in the provided size and place it in the center of itemCover
-                fillMode: Image.PreserveAspectFit
-                horizontalAlignment: Image.AlignHCenter
-                verticalAlignment: Image.AlignVCenter
+            source: {
+                if (root.rowModel?.artwork && root.rowModel.artwork.length > 0)
+                    return VLCAccessImage.uri(root.rowModel.artwork)
 
-                networkModel: root.rowModel
+                return ""
+            }
 
-                bgColor: root.colorContext.bg.secondary
-                color1: root.colorContext.fg.primary
-                accent: root.colorContext.accent
+            fallbackImageSource: {
+                if (!root.rowModel)
+                    return ""
 
-                Widgets.DefaultShadow {
+                let img = SVGColorImage.colorize(root.rowModel.artworkFallback)
+                                       .color1(root.colorContext.fg.primary)
+                                       .accent(root.colorContext.accent)
 
-                }
+                if (GraphicsInfo.shaderType !== GraphicsInfo.RhiShader)
+                    img = img.background(cover.color)
 
-                Widgets.PlayCover {
-                    x: Math.round((artwork.width - width) / 2)
-                    y: Math.round((artwork.height - height) / 2)
+                return img.uri()
+            }
 
-                    width: VLCStyle.play_cover_small
+            color: root.colorContext.bg.secondary
 
-                    visible: root._showPlayCover
+            playCoverVisible: root._showPlayCover
+            playIconSize: VLCStyle.play_cover_small
 
-                    onTapped: playClicked(root.index)
-                }
+            onPlayIconClicked: () => {
+                root.playClicked(root.index)
+            }
+
+            Widgets.DefaultShadow {
+
             }
         }
 
