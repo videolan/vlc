@@ -223,7 +223,12 @@ static int Demux( demux_t *p_demux )
 
                     p_frame = block_ChainGather( p_frame );
                     if( likely(p_frame) )
-                        es_out_Send( p_demux->out, p_sys->p_video, p_frame );
+                    {
+                        if( likely(p_sys->p_video) )
+                            es_out_Send( p_demux->out, p_sys->p_video, p_frame );
+                        else
+                            block_Release( p_frame );
+                    }
 
                     p_sys->p_es = NULL;
                 }
@@ -455,5 +460,8 @@ static void ParsePES( demux_t *p_demux )
         es_out_SetPCR( p_demux->out, p_pes->i_pts);
         p_sys->b_pcr_audio = true;
     }
-    es_out_Send( p_demux->out, p_sys->p_audio, p_pes );
+    if( likely(p_sys->p_audio) )
+        es_out_Send( p_demux->out, p_sys->p_audio, p_pes );
+    else
+        block_Release( p_pes );
 }
