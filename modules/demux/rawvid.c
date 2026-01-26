@@ -360,6 +360,8 @@ valid:
         p_sys->frame_size += pitch * lines;
     }
     p_sys->p_es_video = es_out_Add( p_demux->out, &p_sys->fmt_video );
+    if( unlikely(!p_sys->p_es_video) )
+        goto error;
 
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
