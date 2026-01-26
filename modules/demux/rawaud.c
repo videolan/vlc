@@ -187,6 +187,12 @@ static int Open( vlc_object_t * p_this )
     /* add the es */
     p_sys->fmt.i_id = 0;
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
+    if( unlikely(!p_sys->p_es) )
+    {
+        es_format_Clean( &p_sys->fmt );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     msg_Dbg( p_demux, "elementary stream added");
 
     /* initialize timing */
