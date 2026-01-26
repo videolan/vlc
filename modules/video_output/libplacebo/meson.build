@@ -5,6 +5,7 @@ libplacebo_dep = dependency('libplacebo',
                             required: get_option('libplacebo'))
 
 if not libplacebo_dep.found()
+    libplacebo_utils = disabler()
     subdir_done()
 endif
 libplacebo_utils = static_library('vlc_libplacebo_utils',
