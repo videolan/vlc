@@ -1,14 +1,14 @@
-From 9070393b99a801251ea55125c5236b5600a37eb9 Mon Sep 17 00:00:00 2001
+From 6d2ad6dfb9d16a7747cc8395b022fc20eb91d3ec Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <slhomme@matroska.org>
 Date: Fri, 24 Oct 2025 11:18:54 +0200
-Subject: [PATCH] KaxBlock: fix leak when reading EBML lace is aborted
+Subject: [PATCH 1/2] KaxBlock: fix leak when reading EBML lace is aborted
 
 ---
  src/KaxBlock.cpp | 11 +++++++----
  1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/src/KaxBlock.cpp b/src/KaxBlock.cpp
-index fd37ad5..29073b5 100644
+index 62b0947..6a61b73 100644
 --- a/src/KaxBlock.cpp
 +++ b/src/KaxBlock.cpp
 @@ -44,6 +44,8 @@
@@ -35,7 +35,7 @@ index fd37ad5..29073b5 100644
 +          {
              SizeRead = LastBufferSize;
 -            cursor = _tmpBuf = new binary[FrameNum*4]; /// \warning assume the mean size will be coded in less than 4 bytes
-+            auto _tmpBuf = std::make_unique<binary[]>(FrameNum*4); /// \warning assume the mean size will be coded in less than 4 bytes
++            auto _tmpBuf = std::make_unique<binary>(FrameNum*4); /// \warning assume the mean size will be coded in less than 4 bytes
 +            cursor = _tmpBuf.get();
              Result += input.read(cursor, FrameNum*4);
              FrameSize = ReadCodedSizeValue(cursor, SizeRead, SizeUnknown);
@@ -55,5 +55,5 @@ index fd37ad5..29073b5 100644
              for (Index=0; Index<=FrameNum; Index++) {
                // get the size of the frame
 -- 
-2.50.1 (Apple Git-155)
+2.52.0.windows.1
 
