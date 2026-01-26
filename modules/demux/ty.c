@@ -1480,7 +1480,7 @@ static int ty_stream_seek_time(demux_t *p_demux, uint64_t l_seek_time)
     unsigned i_seq_entry = 0;
     unsigned i;
     int i_skip_cnt;
-    int64_t l_cur_pos = vlc_stream_Tell(p_demux->s);
+    uint64_t l_cur_pos = vlc_stream_Tell(p_demux->s);
     unsigned i_cur_part = l_cur_pos / TIVO_PART_LENGTH;
     uint64_t l_seek_secs = l_seek_time / 1000000000;
     uint64_t l_fwd_stamp = 1;
@@ -1631,7 +1631,7 @@ static int parse_master(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t mst_buf[32];
-    int64_t i_save_pos = vlc_stream_Tell(p_demux->s);
+    uint64_t i_save_pos = vlc_stream_Tell(p_demux->s);
     int64_t i_pts_secs;
 
     /* Note that the entries in the SEQ table in the stream may have
