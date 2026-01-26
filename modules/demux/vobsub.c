@@ -249,10 +249,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_TIME:
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                bool b_selected;
+                bool b_selected = false;
                 /* Check the ES is selected */
-                es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                                p_sys->track[i].p_es, &b_selected );
+                if( likely(p_sys->track[i].p_es) )
+                    es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                                    p_sys->track[i].p_es, &b_selected );
                 if( b_selected ) break;
             }
             if( i < p_sys->i_tracks && p_sys->track[i].i_current_subtitle < p_sys->track[i].i_subtitles )
@@ -282,10 +283,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pf = va_arg( args, double * );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                bool b_selected;
+                bool b_selected = false;
                 /* Check the ES is selected */
-                es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                                p_sys->track[i].p_es, &b_selected );
+                if( likely(p_sys->track[i].p_es) )
+                    es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                                    p_sys->track[i].p_es, &b_selected );
                 if( b_selected ) break;
             }
             if (i >= p_sys->i_tracks) {
