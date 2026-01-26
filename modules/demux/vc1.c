@@ -173,7 +173,13 @@ static int Demux( demux_t *p_demux)
             p_block_out->i_dts = VLC_TICK_0 + p_sys->i_dts;
             p_block_out->i_pts = VLC_TICK_0 + p_sys->i_dts;
 
-            es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+            if( likely(p_sys->p_es) )
+                es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+            else
+            {
+                block_Release( p_block_out );
+                b_eof = true;
+            }
 
             p_block_out = p_next;
 
