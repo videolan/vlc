@@ -167,6 +167,8 @@ static int Open (vlc_object_t *obj)
     fmt.i_bitrate = fmt.audio.i_rate * fmt.audio.i_bytes_per_frame;
 
     sys->es = es_out_Add (demux->out, &fmt);
+    if( unlikely(!sys->es) )
+        goto error;
 
     date_Init (&sys->pts, fmt.audio.i_rate, 1);
     date_Set(&sys->pts, VLC_TICK_0);
