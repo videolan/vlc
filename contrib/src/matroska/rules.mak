@@ -21,7 +21,8 @@ matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(call pkg_static,"libmatroska.pc.in")
 	$(APPLY) $(SRC)/matroska/0001-KaxDefines-do-not-allow-infinite-sizes-on-all-Master.patch
 	$(APPLY) $(SRC)/matroska/0001-KaxBlock-release-read-buffers-on-EndOfStream-error.patch
-	$(APPLY) $(SRC)/matroska/0001-KaxBlock-fix-leak-when-reading-EBML-lace-is-aborted.patch
+	$(APPLY) $(SRC)/matroska/0001-KaxBlock-rework-EBML-lacing-sizes-in-SCOPE_PARTIAL_D.patch
+	$(APPLY) $(SRC)/matroska/0002-KaxBlock-throw-when-the-EBML-length-difference-gives.patch
 	$(MOVE)
 
 .matroska: matroska toolchain.cmake
