@@ -60,44 +60,48 @@ static void FillYUVAPicture( picture_t *p_picture,
 }
 
 DECL_PIXEL_BLENDER(YUVA, 0, 0, 0, 0, A_PLANE, Y_PLANE, U_PLANE, V_PLANE);
+DECL_PIXEL_BLENDER_KNOCKOUT(YUVA, 0, 0, 0, 0, A_PLANE, Y_PLANE, U_PLANE, V_PLANE);
 
-static void BlendGlyphToYUVA( picture_t *p_picture,
-                              int i_picture_x, int i_picture_y,
-                              int i_a, int i_x, int i_y, int i_z,
-                              FT_BitmapGlyph p_glyph )
-{
-    const uint8_t *srcrow = p_glyph->bitmap.buffer;
-    int i_pitch_src = p_glyph->bitmap.pitch;
-
-    uint8_t *dstrows[4];
-    dstrows[0] = &p_picture->p[0].p_pixels[i_picture_y * p_picture->p[0].i_pitch +
-                                           i_picture_x * p_picture->p[0].i_pixel_pitch];
-    dstrows[1] = &p_picture->p[1].p_pixels[i_picture_y * p_picture->p[1].i_pitch +
-                                           i_picture_x * p_picture->p[1].i_pixel_pitch];
-    dstrows[2] = &p_picture->p[2].p_pixels[i_picture_y * p_picture->p[2].i_pitch +
-                                           i_picture_x * p_picture->p[2].i_pixel_pitch];
-    dstrows[3] = &p_picture->p[3].p_pixels[i_picture_y * p_picture->p[3].i_pitch +
-                                           i_picture_x * p_picture->p[3].i_pixel_pitch];
-
-    for( unsigned int dy = 0; dy < p_glyph->bitmap.rows; dy++ )
-    {
-        const uint8_t *src = srcrow;
-
-        uint8_t *dst[4];
-        memcpy(dst, dstrows, 4 * sizeof(dst[0]));
-        for( unsigned int dx = 0; dx < p_glyph->bitmap.width; dx++ )
-        {
-            BlendYUVAPixel( dst, i_a, i_x, i_y, i_z, *src++ );
-            dst[0] += p_picture->p[0].i_pixel_pitch;
-            dst[1] += p_picture->p[1].i_pixel_pitch;
-            dst[2] += p_picture->p[2].i_pixel_pitch;
-            dst[3] += p_picture->p[3].i_pixel_pitch;
-        }
-
-        srcrow += i_pitch_src;
-        dstrows[0] += p_picture->p[0].i_pitch;
-        dstrows[1] += p_picture->p[1].i_pitch;
-        dstrows[2] += p_picture->p[2].i_pitch;
-        dstrows[3] += p_picture->p[3].i_pitch;
-    }
+#define DECL_BLEND_GLYPH_TO_YUVA(name, BlendFunc) \
+static void BlendGlyphTo##name( picture_t *p_picture, \
+                                int i_picture_x, int i_picture_y, \
+                                int i_a, int i_x, int i_y, int i_z, \
+                                FT_BitmapGlyph p_glyph ) \
+{\
+    const uint8_t *srcrow = p_glyph->bitmap.buffer;\
+    int i_pitch_src = p_glyph->bitmap.pitch;\
+\
+    uint8_t *dstrows[4];\
+    dstrows[0] = &p_picture->p[0].p_pixels[i_picture_y * p_picture->p[0].i_pitch +  \
+                                           i_picture_x * p_picture->p[0].i_pixel_pitch];\
+    dstrows[1] = &p_picture->p[1].p_pixels[i_picture_y * p_picture->p[1].i_pitch +\
+                                           i_picture_x * p_picture->p[1].i_pixel_pitch];\
+    dstrows[2] = &p_picture->p[2].p_pixels[i_picture_y * p_picture->p[2].i_pitch +\
+                                           i_picture_x * p_picture->p[2].i_pixel_pitch];\
+    dstrows[3] = &p_picture->p[3].p_pixels[i_picture_y * p_picture->p[3].i_pitch +\
+                                           i_picture_x * p_picture->p[3].i_pixel_pitch];\
+\
+    for( unsigned int dy = 0; dy < p_glyph->bitmap.rows; dy++ )\
+    {\
+        const uint8_t *src = srcrow;\
+\
+        uint8_t *dst[4];\
+        memcpy(dst, dstrows, 4 * sizeof(dst[0]));\
+        for( unsigned int dx = 0; dx < p_glyph->bitmap.width; dx++ )\
+        {\
+            BlendFunc( dst, i_a, i_x, i_y, i_z, *src++ );\
+            dst[0] += p_picture->p[0].i_pixel_pitch;\
+            dst[1] += p_picture->p[1].i_pixel_pitch;\
+            dst[2] += p_picture->p[2].i_pixel_pitch;\
+            dst[3] += p_picture->p[3].i_pixel_pitch;\
+        }\
+\
+        srcrow += i_pitch_src;\
+        dstrows[0] += p_picture->p[0].i_pitch;\
+        dstrows[1] += p_picture->p[1].i_pitch;\
+        dstrows[2] += p_picture->p[2].i_pitch;\
+        dstrows[3] += p_picture->p[3].i_pitch;\
+    }\
 }
+DECL_BLEND_GLYPH_TO_YUVA(YUVA, BlendYUVAPixel)
+DECL_BLEND_GLYPH_TO_YUVA(YUVAKnockout, BlendYUVAPixelKnockout)

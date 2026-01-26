@@ -63,6 +63,26 @@ static inline void Blend##name##Pixel( uint8_t **dst, int a, int x, int y, int z
     }\
 }
 
+#define DECL_PIXEL_BLENDER_KNOCKOUT( name, APOS, XPOS, YPOS, ZPOS, APLANE, XPLANE, YPLANE, ZPLANE ) \
+static inline void Blend##name##PixelKnockout( uint8_t **dst, int a, int x, int y, int z, int glyph_a )\
+{\
+    if( glyph_a == 0 )\
+        return;\
+\
+    int i_ao = dst[APLANE][APOS];\
+    /* Knockout Mode: Interpolate between Source and Dest based on glyph shape */ \
+    /* Result = (Dest * (255 - Glyph) + Src * Glyph) / 255 */ \
+    int i_an = (i_ao * (255 - glyph_a) + a * glyph_a) / 255; \
+    dst[APLANE][APOS] = i_an; \
+\
+    if (i_an > 0)\
+    {\
+        dst[XPLANE][XPOS] = ( dst[XPLANE][XPOS] * (255 - glyph_a) + x * glyph_a ) / 255;\
+        dst[YPLANE][YPOS] = ( dst[YPLANE][YPOS] * (255 - glyph_a) + y * glyph_a ) / 255;\
+        dst[ZPLANE][ZPOS] = ( dst[ZPLANE][ZPOS] * (255 - glyph_a) + z * glyph_a ) / 255;\
+    }\
+}
+
 static void BlendAXYZLine( picture_t *p_picture,
                            int i_picture_x, int i_picture_y,
                            int i_a, int i_x, int i_y, int i_z,
