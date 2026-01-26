@@ -460,6 +460,8 @@ static int Open(vlc_object_t *obj)
     fmt.audio.i_channels = 2;
     fmt.audio.i_rate = 44100;
     sys->es = es_out_Add(demux->out, &fmt);
+    if(unlikely(!sys->es))
+        return VLC_EGENERIC;
 
     date_Init(&sys->pts, MUS_FREQ, 1);
     date_Set(&sys->pts, VLC_TICK_0);
