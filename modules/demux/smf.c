@@ -708,6 +708,8 @@ static int Open (vlc_object_t *obj)
     fmt.audio.i_rate = 44100; /* dummy value */
     fmt.i_id = 0;
     sys->es = es_out_Add (demux->out, &fmt);
+    if( unlikely(!sys->es) )
+        goto error;
 
     demux->pf_demux = Demux;
     demux->pf_control = Control;
