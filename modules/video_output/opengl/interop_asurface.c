@@ -1,5 +1,5 @@
 /*****************************************************************************
- * converter_android.c: OpenGL Android opaque converter
+ * interop_asurface.c: OpenGL Android Surface interop
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  *
