@@ -593,7 +593,10 @@ static int Demux( demux_t *p_demux )
 
 
         p_block_out->p_next = NULL;
-        es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+        if( likely(p_sys->p_es) )
+            es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+        else
+            block_Release( p_block_out );
 
         p_block_out = p_next;
     }
