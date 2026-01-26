@@ -245,7 +245,6 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     block_t     *p_block;
-    bool  b_audio = false;
 
     if( p_sys->b_hurry_up )
     {
@@ -259,23 +258,26 @@ static int Demux( demux_t *p_demux )
     if( p_block == NULL )
         return VLC_DEMUXER_EOF;
 
-    if( p_sys->p_es_audio )
-    {
-        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                        p_sys->p_es_audio, &b_audio );
-    }
-
     p_block->i_dts =
     p_block->i_pts = VLC_TICK_0 + p_sys->i_pcr;
 
-    if( b_audio )
+    if( likely(p_sys->p_es_audio) )
     {
-        block_t *p_audio_block = dv_extract_audio( p_block );
-        if( p_audio_block )
-            es_out_Send( p_demux->out, p_sys->p_es_audio, p_audio_block );
+        bool b_audio = false;
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                        p_sys->p_es_audio, &b_audio );
+        if( b_audio )
+        {
+            block_t *p_audio_block = dv_extract_audio( p_block );
+            if( p_audio_block )
+                es_out_Send( p_demux->out, p_sys->p_es_audio, p_audio_block );
+        }
     }
 
-    es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
+    if( likely(p_sys->p_es_video) )
+        es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
+    else
+        block_Release( p_block );
 
     if( !p_sys->b_hurry_up )
     {
