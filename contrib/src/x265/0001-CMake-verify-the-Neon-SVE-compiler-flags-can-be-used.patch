@@ -1,22 +1,21 @@
-From 5001bc0a608277eba834541e1fef872bce5ef1f2 Mon Sep 17 00:00:00 2001
+From 6948a010ef1110584498549789bceccd01a89de3 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 15 Jan 2026 16:12:02 +0100
 Subject: [PATCH 1/2] CMake: verify the Neon/SVE compiler flags can be used
 
 Otherwise we can't compile the matching files.
 ---
- source/CMakeLists.txt | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ source/CMakeLists.txt | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
-index b83955e9c..a14a7277d 100755
+index b83955e9c..41118fc49 100755
 --- a/source/CMakeLists.txt
 +++ b/source/CMakeLists.txt
-@@ -289,12 +289,20 @@ if(GCC)
+@@ -289,12 +289,19 @@ if(GCC)
              message(STATUS "Configuring build for run-time CPU feature detection")
          endif()
  
-+        include(CheckCCompilerFlag)
 +        include(CMakePushCheckState)
          if(AARCH64_RUNTIME_CPU_DETECT OR CROSS_COMPILE_ARM64)
 +            cmake_push_check_state(RESET)
@@ -26,13 +25,13 @@ index b83955e9c..a14a7277d 100755
 -            set(CPU_HAS_NEON_I8MM 1)
 -            set(CPU_HAS_SVE 1)
 -            set(CPU_HAS_SVE2 1)
-+            check_c_compiler_flag(${AARCH64_NEON_DOTPROD_FLAG} CPU_HAS_NEON_DOTPROD)
++            check_cxx_compiler_flag(${AARCH64_NEON_DOTPROD_FLAG} CPU_HAS_NEON_DOTPROD)
 +            cmake_pop_check_state()
-+            check_c_compiler_flag(${AARCH64_NEON_I8MM_FLAG} CPU_HAS_NEON_I8MM)
++            check_cxx_compiler_flag(${AARCH64_NEON_I8MM_FLAG} CPU_HAS_NEON_I8MM)
 +            cmake_pop_check_state()
-+            check_c_compiler_flag(${AARCH64_SVE_FLAG} CPU_HAS_SVE)
++            check_cxx_compiler_flag(${AARCH64_SVE_FLAG} CPU_HAS_SVE)
 +            cmake_pop_check_state()
-+            check_c_compiler_flag(${AARCH64_SVE2_FLAG} CPU_HAS_SVE2)
++            check_cxx_compiler_flag(${AARCH64_SVE2_FLAG} CPU_HAS_SVE2)
 +            cmake_pop_check_state()
          else()
              if(CMAKE_SYSTEM_NAME MATCHES "Linux|Darwin")
