@@ -72,6 +72,13 @@ typedef struct
         STYLE_WRAP_CHAR,          /**< Breaks at character level only */
         STYLE_WRAP_NONE,          /**< No line breaks (except explicit ones) */
     } e_wrapinfo;
+
+    /*blending style*/
+    enum
+    {
+       STYLE_BLENDING_DEFAULT = 0,      /**< Overlay blending style>**/
+       STYLE_BLENDING_TRANSPARENT,      /**< Knockout blending style>**/
+    } e_blending_mode;
 } text_style_t;
 
 #define STYLE_ALPHA_OPAQUE      0xFF
@@ -90,6 +97,7 @@ typedef struct
 #define STYLE_HAS_BACKGROUND_COLOR      (1 << 7)
 #define STYLE_HAS_BACKGROUND_ALPHA      (1 << 8)
 #define STYLE_HAS_WRAP_INFO             (1 << 9)
+#define STYLE_HAS_BLENDING_MODE         (1 << 10)
 
 /* Style flags for \ref text_style_t */
 #define STYLE_BOLD              (1 << 0)
