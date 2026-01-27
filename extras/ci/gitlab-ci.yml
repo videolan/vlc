@@ -290,21 +290,11 @@ debian-contrib:
         # Build contribs
         mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
         ../bootstrap --enable-x262
-        if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-            echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-            make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}" || PREBUILT_FAILED=yes
-        else
-            PREBUILT_FAILED=yes
-        fi
-        if [ -n "$PREBUILT_FAILED" ]; then
-            make list
-            make -j$NCPU --output-sync=recurse fetch
-            make -j$NCPU --output-sync=recurse
-            if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
-                make package
-            fi
-        else
-            make -j$NCPU --output-sync=recurse tools
+        make list
+        make -j$NCPU --output-sync=recurse fetch
+        make -j$NCPU --output-sync=recurse
+        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
+            make package
         fi
     allow_failure: true
     variables:
