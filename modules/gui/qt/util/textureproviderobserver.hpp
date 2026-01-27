@@ -54,6 +54,7 @@ class TextureProviderObserver : public QObject
     //       away from event based approach in favor of sampling based approach here.
     Q_PROPERTY(QSize textureSize READ textureSize FINAL) // Scene graph texture size
     Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
+    Q_PROPERTY(QRectF normalizedTextureSubRect READ normalizedTextureSubRect FINAL)
 
     // NOTE: Since it is not expected that these properties change rapidly, they have notify signals.
     //       These signals may be emitted in the rendering thread, thus if the connection is auto
@@ -75,6 +76,7 @@ public:
     QSize textureSize() const;
     QSize nativeTextureSize() const;
     qint64 comparisonKey() const;
+    QRectF normalizedTextureSubRect() const;
     bool hasAlphaChannel() const;
     bool hasMipmaps() const;
     bool isAtlasTexture() const;
@@ -108,6 +110,7 @@ private:
     std::atomic<QSize> m_textureSize {{}}; // invalid by default
     std::atomic<QSize> m_nativeTextureSize {{}}; // invalid by default
     std::atomic<qint64> m_comparisonKey {-1};
+    std::atomic<QRectF> m_normalizedTextureSubRect {{}}; // invalid by default
 
     std::atomic<bool> m_hasAlphaChannel = false;
     std::atomic<bool> m_hasMipmaps = false;

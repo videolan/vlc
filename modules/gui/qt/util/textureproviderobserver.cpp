@@ -157,6 +157,11 @@ qint64 TextureProviderObserver::comparisonKey() const
     return m_comparisonKey.load(std::memory_order_acquire);
 }
 
+QRectF TextureProviderObserver::normalizedTextureSubRect() const
+{
+    return m_normalizedTextureSubRect.load(std::memory_order_acquire);
+}
+
 void TextureProviderObserver::updateProperties()
 {
     // This is likely called in the rendering thread.
@@ -197,6 +202,13 @@ void TextureProviderObserver::updateProperties()
                     legacyUpdateNativeTextureSize();
 #endif
                 }
+            }
+
+            {
+                // Normal rect
+                const QRectF& normalizedTextureSubRect = texture->normalizedTextureSubRect();
+
+                m_normalizedTextureSubRect.store(normalizedTextureSubRect, memoryOrder);
             }
 
             {
@@ -245,6 +257,7 @@ void TextureProviderObserver::resetProperties(std::memory_order memoryOrder)
 {
     m_textureSize.store({}, memoryOrder);
     m_nativeTextureSize.store({}, memoryOrder);
+    m_normalizedTextureSubRect.store({}, memoryOrder);
 
     if (m_hasAlphaChannel.exchange(false, memoryOrder))
         emit hasAlphaChannelChanged(false);
