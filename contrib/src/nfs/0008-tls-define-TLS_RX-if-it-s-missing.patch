@@ -1,0 +1,27 @@
+From 2904ad8fb49c070b8350f7b2dfad36f25b35609b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 27 Jan 2026 10:32:36 +0100
+Subject: [PATCH 8/8] tls: define TLS_RX if it's missing
+
+---
+ tls/ktls.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tls/ktls.c b/tls/ktls.c
+index eeba9d0..cb88a78 100644
+--- a/tls/ktls.c
++++ b/tls/ktls.c
+@@ -93,6 +93,10 @@ static bool tls_is_ktls_enabled(gnutls_session_t session _U_, bool read _U_)
+ }
+ #endif
+ 
++#ifndef TLS_RX
++#define TLS_RX 2
++#endif
++
+ static int ktls_setsockopt(int sock, bool read, const void *info, socklen_t infolen)
+ {
+ 	const int ret = setsockopt(sock, SOL_TLS, read ? TLS_RX : TLS_TX, info, infolen);
+-- 
+2.52.0.windows.1
+

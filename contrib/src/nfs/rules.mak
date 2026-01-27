@@ -27,6 +27,8 @@ nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(APPLY) $(SRC)/nfs/0004-win32-fix-build-with-MSVC.patch
 	$(APPLY) $(SRC)/nfs/0005-win32-don-t-use-pthread-on-Windows.patch
 	$(APPLY) $(SRC)/nfs/0001-cmake-export-the-necessary-library-in-the-pkg-config.patch
+	$(APPLY) $(SRC)/nfs/0007-tls-add-support-for-kernel-without-TLS_1_3_VERSION.patch
+	$(APPLY) $(SRC)/nfs/0008-tls-define-TLS_RX-if-it-s-missing.patch
 	$(MOVE)
 
 .nfs: nfs toolchain.cmake

@@ -1,0 +1,50 @@
+From 10a4fe89df7d2780a2e8711d908568f34b5e7d50 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 16 Jan 2026 11:55:17 +0100
+Subject: [PATCH 7/8] tls: add support for kernel without TLS_1_3_VERSION
+
+810ef615eac7b5e8c8da9619016e0d8cc18c81ea assumed Kernel 5.10+ would be used.
+---
+ tls/ktls.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/tls/ktls.c b/tls/ktls.c
+index ae277d7..eeba9d0 100644
+--- a/tls/ktls.c
++++ b/tls/ktls.c
+@@ -125,16 +125,28 @@ static int ktls_setsockopt(int sock, bool read, const void *info, socklen_t info
+ #define tls12_crypto_info_AES_CCM_128 		tls12_crypto_info_aes_ccm_128
+ #define tls12_crypto_info_CHACHA20_POLY1305	tls12_crypto_info_chacha20_poly1305
+ 
+-#define GENERATE_SET_CRYPTO_INFO(CIPHER) 				\
+-static int ktls_set_##CIPHER##_info(gnutls_session_t session) 		\
+-{ 									\
++#ifdef TLS_1_3_VERSION
++#define GENERATE_TLS_INFO(CIPHER) 				\
+ 	const bool is_tls12 = 						\
+ 		(gnutls_protocol_get_version(session) == GNUTLS_TLS1_2);\
+ 	struct tls12_crypto_info_##CIPHER info = { 			\
+ 		.info.version           = (is_tls12 ? TLS_1_2_VERSION	\
+ 						    : TLS_1_3_VERSION), \
+ 		.info.cipher_type       = TLS_CIPHER_##CIPHER, 		\
+-	}; 								\
++	};
++#else /* !TLS_1_3_VERSION */
++#define GENERATE_TLS_INFO(CIPHER) 				\
++	const bool is_tls12 =  1;\
++	struct tls12_crypto_info_##CIPHER info = { 			\
++		.info.version           = TLS_1_2_VERSION, \
++		.info.cipher_type       = TLS_CIPHER_##CIPHER, 		\
++	};
++#endif /* !TLS_1_3_VERSION */
++
++#define GENERATE_SET_CRYPTO_INFO(CIPHER) 				\
++static int ktls_set_##CIPHER##_info(gnutls_session_t session) 		\
++{ 									\
++	GENERATE_TLS_INFO(CIPHER) \	
+ 	unsigned char seq_number[12]; 					\
+ 	gnutls_datum_t cipher_key; 					\
+ 	gnutls_datum_t mac_key; 					\
+-- 
+2.52.0.windows.1
+
