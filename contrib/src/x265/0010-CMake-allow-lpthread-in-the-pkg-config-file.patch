@@ -1,0 +1,31 @@
+From f046444cb59518400902ef0bf89e386623f92f30 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 27 Jan 2026 15:36:18 +0100
+Subject: [PATCH 10/10] CMake: allow -lpthread in the pkg-config file
+
+If it was used with -lpthread (instead of a -pthread flag for example) it should be
+in the pkg-config file.
+
+The cleaner way to use  threading library should be with CMake's FindThread [^1] anyway.
+
+[^1]: https://cmake.org/cmake/help/latest/module/FindThreads.html
+---
+ source/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index a6ffcc6fd..7a47a7bef 100755
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -957,7 +957,7 @@ if(X265_LATEST_TAG OR NOT GIT_FOUND)
+     endforeach()
+     if(PLIBLIST)
+         # blacklist of libraries that should not be in Libs.private
+-        list(REMOVE_ITEM PLIBLIST "-lc" "-lpthread" "-lmingwex" "-lmingwthrd"
++        list(REMOVE_ITEM PLIBLIST "-lc" "-lmingwex" "-lmingwthrd"
+             "-lmingw32" "-lmoldname" "-lmsvcrt" "-ladvapi32" "-lshell32"
+             "-luser32" "-lkernel32")
+         string(REPLACE ";" " " PRIVATE_LIBS "${PLIBLIST}")
+-- 
+2.52.0.windows.1
+
