@@ -293,9 +293,6 @@ debian-contrib:
         make list
         make -j$NCPU --output-sync=recurse fetch
         make -j$NCPU --output-sync=recurse
-        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
-            make package
-        fi
     allow_failure: true
     variables:
         <<: *variables-debian
