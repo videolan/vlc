@@ -292,6 +292,14 @@ debian-contrib:
         ../bootstrap --enable-x262
         make list
         make -j$NCPU --output-sync=recurse
+        cd ../..
+
+        # Build VLC
+        # Qt is not build in contribs so don't build the code either
+        ./bootstrap
+        ./configure --disable-nls --disable-qt --disable-skins2 --enable-extra-checks
+        make -j$NCPU
+
     allow_failure: true
     variables:
         <<: *variables-debian
