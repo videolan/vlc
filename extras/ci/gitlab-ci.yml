@@ -287,9 +287,15 @@ debian-contrib:
         ( cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse )
         export PATH="$(pwd)/extras/tools/build/bin:$PATH"
 
+        # don't use system packages
+        export PKG_CONFIG_LIBDIR=""
+        export PKG_CONFIG_PATH=""
+
         # Build contribs
         mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
-        ../bootstrap --enable-x262
+        # x262 is not built by default
+        # libplacebo needs vulkan-loader which needs the x11 system package
+        ../bootstrap --enable-x262 --disable-libplacebo
         make list
         make -j$NCPU --output-sync=recurse
         cd ../..
