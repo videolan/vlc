@@ -108,6 +108,7 @@ Item {
                                                                                                      : Qt.rect(0, 0, 0, 0)
 
     property alias sourceTextureProviderObserver: ds1.tpObserver // for accessory
+    sourceTextureProviderObserver.notifyAllChanges: !live
 
     readonly property bool sourceTextureIsValid: sourceTextureProviderObserver.isValid
 
@@ -125,7 +126,7 @@ Item {
     property bool _queuedScheduledUpdate: false
 
     readonly property var _comparisonVar: ({key: sourceTextureProviderObserver.comparisonKey,
-                                            subRect: Qt.rect(0, 0, 0, 0)})
+                                            subRect: sourceTextureProviderObserver.normalizedTextureSubRect})
     property var _oldComparisonVar
 
     on_ComparisonVarChanged: {
@@ -180,16 +181,6 @@ Item {
             ds2layer.inhibitParent = false
         } else {
             root.scheduleUpdate() // this triggers releasing intermediate layers (when applicable)
-        }
-    }
-
-    Connections {
-        target: root.Window.window
-        enabled: root.visible && (root._oldComparisonVar !== undefined)
-
-        function onAfterAnimating() {
-            // Change signal will be emitted only if it actually changes.
-            root._comparisonVar.subRect = ds1.tpObserver.normalizedTextureSubRect
         }
     }
 
