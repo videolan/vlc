@@ -173,6 +173,8 @@ void TextureProviderObserver::updateProperties()
 
     if (m_provider)
     {
+        const bool notifyAllChanges = m_notifyAllChanges.load(memoryOrder);
+
         if (const auto texture = m_provider->texture())
         {
             {
@@ -180,24 +182,54 @@ void TextureProviderObserver::updateProperties()
 
                 // SG texture size:
                 const auto textureSize = texture->textureSize();
-                m_textureSize.store(textureSize, memoryOrder);
+                if (notifyAllChanges)
+                {
+                    if (m_textureSize.exchange(textureSize, memoryOrder) != textureSize)
+                        emit textureSizeChanged(textureSize);
+                }
+                else
+                {
+                    m_textureSize.store(textureSize, memoryOrder);
+                }
 
                 {
                     // Native texture size
 
                     const auto legacyUpdateNativeTextureSize = [&]() {
                         const auto ntsr = texture->normalizedTextureSubRect();
-                        m_nativeTextureSize.store({static_cast<int>(textureSize.width() / ntsr.width()),
-                                                   static_cast<int>(textureSize.height() / ntsr.height())},
-                                                  memoryOrder);
+                        const QSize size = {static_cast<int>(textureSize.width() / ntsr.width()),
+                                            static_cast<int>(textureSize.height() / ntsr.height())};
+
+                        if (notifyAllChanges)
+                        {
+                            if (m_nativeTextureSize.exchange(size, memoryOrder) != size)
+                                emit nativeTextureSizeChanged(size);
+                        }
+                        else
+                        {
+                            m_nativeTextureSize.store(size, memoryOrder);
+                        }
                     };
 
 #ifdef RHI_HEADER_AVAILABLE
                     const QRhiTexture* const rhiTexture = texture->rhiTexture();
                     if (Q_LIKELY(rhiTexture))
-                        m_nativeTextureSize.store(rhiTexture->pixelSize(), memoryOrder);
+                    {
+                        const QSize size = rhiTexture->pixelSize();
+                        if (notifyAllChanges)
+                        {
+                            if (m_nativeTextureSize.exchange(size, memoryOrder) != size)
+                                emit nativeTextureSizeChanged(size);
+                        }
+                        else
+                        {
+                            m_nativeTextureSize.store(size, memoryOrder);
+                        }
+                    }
                     else
+                    {
                         legacyUpdateNativeTextureSize();
+                    }
 #else
                     legacyUpdateNativeTextureSize();
 #endif
@@ -208,7 +240,15 @@ void TextureProviderObserver::updateProperties()
                 // Normal rect
                 const QRectF& normalizedTextureSubRect = texture->normalizedTextureSubRect();
 
-                m_normalizedTextureSubRect.store(normalizedTextureSubRect, memoryOrder);
+                if (notifyAllChanges)
+                {
+                    if (m_normalizedTextureSubRect.exchange(normalizedTextureSubRect, memoryOrder) != normalizedTextureSubRect)
+                        emit normalizedTextureSubRectChanged(normalizedTextureSubRect);
+                }
+                else
+                {
+                    m_normalizedTextureSubRect.store(normalizedTextureSubRect, memoryOrder);
+                }
             }
 
             {
@@ -255,9 +295,14 @@ void TextureProviderObserver::updateProperties()
 
 void TextureProviderObserver::resetProperties(std::memory_order memoryOrder)
 {
-    m_textureSize.store({}, memoryOrder);
-    m_nativeTextureSize.store({}, memoryOrder);
-    m_normalizedTextureSubRect.store({}, memoryOrder);
+    if (m_textureSize.exchange({}, memoryOrder) != QSize())
+        emit textureSizeChanged({});
+
+    if (m_nativeTextureSize.exchange({}, memoryOrder) != QSize())
+        emit nativeTextureSizeChanged({});
+
+    if (m_normalizedTextureSubRect.exchange({}, memoryOrder) != QRectF())
+        emit normalizedTextureSubRectChanged({});
 
     if (m_hasAlphaChannel.exchange(false, memoryOrder))
         emit hasAlphaChannelChanged(false);

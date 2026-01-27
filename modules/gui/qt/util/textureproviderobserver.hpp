@@ -47,14 +47,15 @@ class TextureProviderObserver : public QObject
     //          to not conflict with the updates, if the properties must reflect the immediately up-to-date
     //          texture and the properties change each frame, as otherwise it might end up in a
     //          "forever chase"), so by the time the sampling is done the properties should be consistent.
-    // NOTE: These properties do not provide notify signal, dynamic textures such as layer may
+    // NOTE: By default these properties are not notified, as dynamic textures such as layer may
     //       change rapidly (even though throttled by v-sync in the rendering thread), and if
     //       such signal is connected to a receiver that lives in the GUI thread, the queued
     //       invocations can easily backlog. Similar to the high precision timer, we moved
     //       away from event based approach in favor of sampling based approach here.
-    Q_PROPERTY(QSize textureSize READ textureSize FINAL) // Scene graph texture size
-    Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
-    Q_PROPERTY(QRectF normalizedTextureSubRect READ normalizedTextureSubRect FINAL)
+    Q_PROPERTY(bool notifyAllChanges MEMBER m_notifyAllChanges NOTIFY notifyAllChangesChanged FINAL)
+    Q_PROPERTY(QSize textureSize READ textureSize NOTIFY textureSizeChanged FINAL) // Scene graph texture size
+    Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize NOTIFY nativeTextureSizeChanged FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
+    Q_PROPERTY(QRectF normalizedTextureSubRect READ normalizedTextureSubRect NOTIFY normalizedTextureSubRectChanged FINAL)
 
     // NOTE: Since it is not expected that these properties change rapidly, they have notify signals.
     //       These signals may be emitted in the rendering thread, thus if the connection is auto
@@ -83,7 +84,11 @@ public:
     bool isValid() const;
 
 signals:
+    void notifyAllChangesChanged();
     void sourceChanged();
+    void textureSizeChanged(const QSize&);
+    void nativeTextureSizeChanged(const QSize&);
+    void normalizedTextureSubRectChanged(const QRectF&);
     void hasAlphaChannelChanged(bool);
     void hasMipmapsChanged(bool);
     void isAtlasTextureChanged(bool);
@@ -107,6 +112,7 @@ private:
     // where the SG synchronization would not be blocking the (GUI) thread where this
     // observer lives.
 
+    std::atomic<bool> m_notifyAllChanges = false;
     std::atomic<QSize> m_textureSize {{}}; // invalid by default
     std::atomic<QSize> m_nativeTextureSize {{}}; // invalid by default
     std::atomic<qint64> m_comparisonKey {-1};
