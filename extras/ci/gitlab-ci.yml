@@ -291,7 +291,6 @@ debian-contrib:
         mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
         ../bootstrap --enable-x262
         make list
-        make -j$NCPU --output-sync=recurse fetch
         make -j$NCPU --output-sync=recurse
     allow_failure: true
     variables:
