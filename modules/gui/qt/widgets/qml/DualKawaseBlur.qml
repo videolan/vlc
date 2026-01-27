@@ -124,14 +124,15 @@ Item {
 
     property bool _queuedScheduledUpdate: false
 
-    // WARNING: The QML property type is not `int` because the target property type is `qint64`.
-    readonly property var _comparisonKey: sourceTextureProviderObserver.comparisonKey
-    property var _oldComparisonKey
+    readonly property var _comparisonVar: ({key: sourceTextureProviderObserver.comparisonKey,
+                                            subRect: Qt.rect(0, 0, 0, 0)})
+    property var _oldComparisonVar
 
-    on_ComparisonKeyChanged: {
-        if (_comparisonKey >= 0) {
-            if (_oldComparisonKey !== undefined && _oldComparisonKey !== _comparisonKey) {
-                _oldComparisonKey = undefined
+    on_ComparisonVarChanged: {
+        if (_comparisonVar.key >= 0) {
+            if (_oldComparisonVar !== undefined && _oldComparisonVar !== _comparisonVar) {
+                _oldComparisonVar = undefined
+
                 // If source texture is not valid, update will be requeued in `scheduleUpdate()`.
                 // That being said, a non-valid source texture should have (-1) as comparison key,
                 // which we already checked here.
@@ -140,7 +141,10 @@ Item {
         }
     }
 
-    function scheduleUpdate(onNextTextureChange /* : bool */ = false) {
+    // When `onNextEffectiveTextureChange` is set, the update is scheduled automatically when the effective
+    // texture changes, which is when the texture itself changes or the texture remains the same but
+    // the sub-rect changes (such as, the new texture is a different part of the same atlas texture).
+    function scheduleUpdate(onNextEffectiveTextureChange /* : bool */ = false) {
         if (live)
             return // no-op
 
@@ -152,8 +156,8 @@ Item {
             return
         }
 
-        if (onNextTextureChange) {
-            root._oldComparisonKey = root._comparisonKey
+        if (onNextEffectiveTextureChange) {
+            root._oldComparisonVar = root._comparisonVar
             return
         }
 
@@ -176,6 +180,16 @@ Item {
             ds2layer.inhibitParent = false
         } else {
             root.scheduleUpdate() // this triggers releasing intermediate layers (when applicable)
+        }
+    }
+
+    Connections {
+        target: root.Window.window
+        enabled: root.visible && (root._oldComparisonVar !== undefined)
+
+        function onAfterAnimating() {
+            // Change signal will be emitted only if it actually changes.
+            root._comparisonVar.subRect = ds1.tpObserver.normalizedTextureSubRect
         }
     }
 
