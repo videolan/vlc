@@ -56,6 +56,7 @@ class TextureProviderObserver : public QObject
     Q_PROPERTY(QSize textureSize READ textureSize NOTIFY textureSizeChanged FINAL) // Scene graph texture size
     Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize NOTIFY nativeTextureSizeChanged FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
     Q_PROPERTY(QRectF normalizedTextureSubRect READ normalizedTextureSubRect NOTIFY normalizedTextureSubRectChanged FINAL)
+    Q_PROPERTY(qint64 comparisonKey READ comparisonKey NOTIFY comparisonKeyChanged FINAL)
 
     // NOTE: Since it is not expected that these properties change rapidly, they have notify signals.
     //       These signals may be emitted in the rendering thread, thus if the connection is auto
@@ -64,7 +65,6 @@ class TextureProviderObserver : public QObject
     Q_PROPERTY(bool hasMipmaps READ hasMipmaps NOTIFY hasMipmapsChanged FINAL)
     Q_PROPERTY(bool isAtlasTexture READ isAtlasTexture NOTIFY isAtlasTextureChanged FINAL)
     Q_PROPERTY(bool isValid READ isValid NOTIFY isValidChanged FINAL) // whether a texture is provided or not
-    Q_PROPERTY(qint64 comparisonKey READ comparisonKey NOTIFY comparisonKeyChanged FINAL)
 
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);

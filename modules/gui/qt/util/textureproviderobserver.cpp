@@ -282,8 +282,16 @@ void TextureProviderObserver::updateProperties()
                 // Comparison key
                 const qint64 comparisonKey = texture->comparisonKey();
 
-                if (m_comparisonKey.exchange(comparisonKey, memoryOrder) != comparisonKey)
-                    emit comparisonKeyChanged(comparisonKey);
+                if (notifyAllChanges)
+                {
+                    if (m_comparisonKey.exchange(comparisonKey, memoryOrder) != comparisonKey) {
+                        emit comparisonKeyChanged(comparisonKey);
+                    }
+                }
+                else
+                {
+                    m_comparisonKey.store(comparisonKey, memoryOrder);
+                }
             }
 
             return;
