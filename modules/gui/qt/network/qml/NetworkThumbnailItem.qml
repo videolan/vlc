@@ -35,6 +35,8 @@ Widgets.TableRowDelegate {
                                            && (rowModel.type !== NetworkMediaModel.TYPE_NODE)
                                            && (rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
 
+    property alias artworkTextureProvider: cover.textureProvider
+
     signal playClicked(int index)
 
     // Functions
