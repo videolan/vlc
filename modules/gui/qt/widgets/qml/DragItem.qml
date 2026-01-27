@@ -506,7 +506,7 @@ Item {
                 width: coverSize
                 height: coverSize
                 radius: coverRepeater.count > 1 ? dragItem.coverSize : 0.0
-                source: modelData.artwork ?? ""
+                source: modelData.artwork ?? modelData.fallback ?? ""
                 sourceSize: dragItem.imageSourceSize ?? Qt.size(width * eDPR, height * eDPR)
                 textureProviderItem: modelData?.textureProvider ?? null
 
