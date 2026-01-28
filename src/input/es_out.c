@@ -2208,8 +2208,8 @@ static void EsOutFillEsFmt(es_out_sys_t *p_sys, es_format_t *fmt)
 
         if( !fmt->video.i_visible_width || !fmt->video.i_visible_height )
         {
-            fmt->video.i_visible_width = fmt->video.i_width;
-            fmt->video.i_visible_height = fmt->video.i_height;
+            fmt->video.i_visible_width = fmt->video.i_width - fmt->video.i_x_offset;
+            fmt->video.i_visible_height = fmt->video.i_height - fmt->video.i_y_offset;
         }
 
         if( fmt->video.i_frame_rate && fmt->video.i_frame_rate_base )
