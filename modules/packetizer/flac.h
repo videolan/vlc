@@ -125,6 +125,9 @@ static inline int FLAC_CheckFrameInfo(const struct flac_stream_info *stream_info
              h->i_frame_length < stream_info->min_blocksize) ||
             h->i_frame_length > stream_info->max_blocksize)
             return 0;
+        if(stream_info->max_framesize &&
+           stream_info->min_framesize > stream_info->max_framesize)
+            return 0;
         if (h->i_bits_per_sample != stream_info->bits_per_sample)
             return 0;
         if (h->i_rate != stream_info->sample_rate)
