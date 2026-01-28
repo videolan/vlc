@@ -96,9 +96,9 @@ static int OpenCommon( decoder_t *p_dec )
     es_format_Copy( &p_dec->fmt_out, p_dec->fmt_in );
 
     if( !p_dec->fmt_out.video.i_visible_width )
-        p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+        p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width - p_dec->fmt_out.video.i_x_offset;
     if( !p_dec->fmt_out.video.i_visible_height )
-        p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
+        p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height - p_dec->fmt_out.video.i_y_offset;
 
     if( p_dec->fmt_in->i_codec == VLC_CODEC_YUV2 )
     {
