@@ -357,11 +357,6 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
         if (segment.segmentType == VLCLibraryHeaderSegmentType) {
             return NSIndexSet.indexSet;
-        } else if (segment.segmentType == VLCLibraryMusicSegmentType) {
-            [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
-            NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegmentType];
-            const NSInteger artistsIndex = [self.outlineView rowForItem:artistsNode];
-            return [NSIndexSet indexSetWithIndex:artistsIndex];
         }
     }
 
@@ -380,7 +375,14 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     NSObject * const representedObject = segment.representedObject;
     NSParameterAssert(representedObject != nil);
 
-    if ([representedObject isKindOfClass:NSNumber.class]) {
+    if (segment.segmentType == VLCLibraryMusicSegmentType) {
+        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
+        NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegmentType];
+        const NSInteger artistsIndex = [self.outlineView rowForItem:artistsNode];
+        [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:artistsIndex]
+                      byExtendingSelection:NO];
+        return;
+    } else if ([representedObject isKindOfClass:NSNumber.class]) {
         self.libraryWindow.librarySegmentType = segment.segmentType;
     } else if ([representedObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
         VLCLibrarySegmentBookmarkedLocation * const bookmarkedLocation =
