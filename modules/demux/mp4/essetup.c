@@ -798,6 +798,8 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                 p_fmt->video.i_visible_width = p_fmt->video.i_width;
                 p_fmt->video.i_height = BOXDATA(p_strf)->bmiHeader.biHeight;
                 p_fmt->video.i_visible_height =p_fmt->video.i_height;
+                p_fmt->video.i_x_offset = 0;
+                p_fmt->video.i_y_offset = 0;
                 CopyExtradata( BOXDATA(p_strf)->p_extra,
                                BOXDATA(p_strf)->i_extra,
                                p_fmt );
