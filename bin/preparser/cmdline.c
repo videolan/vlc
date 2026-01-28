@@ -180,7 +180,7 @@ opt_set_SeekPos(struct preparser_args *args, const char *arg)
         fprintf(stderr, "Error: Seek pos should be greater than 0\n");
         return false;
     }
-    args->seek.pos = VLC_THUMBNAILER_SEEK_POS;
+    args->seek.type = VLC_THUMBNAILER_SEEK_POS;
     return true;
 }
 
@@ -487,4 +487,3 @@ preparser_cmdline_Parse(int argc, char *const *argv,
 
     return 1;
 }
-

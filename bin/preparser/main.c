@@ -316,7 +316,7 @@ preparser_args_Preparse(vlc_preparser_t *preparser,
         pp->req_msg.req.arg.seek.type = args->seek.type;
         if (args->seek.type == VLC_THUMBNAILER_SEEK_TIME) {
             pp->req_msg.req.arg.seek.time = args->seek.time;
-        } else if (args->seek.pos == VLC_THUMBNAILER_SEEK_POS) {
+        } else if (args->seek.type == VLC_THUMBNAILER_SEEK_POS) {
             pp->req_msg.req.arg.seek.pos = args->seek.pos;
         }
         pp->req_msg.req.arg.seek.speed = args->seek.speed;
@@ -337,7 +337,7 @@ preparser_args_Preparse(vlc_preparser_t *preparser,
         pp->req_msg.req.arg.seek.type = args->seek.type;
         if (args->seek.type == VLC_THUMBNAILER_SEEK_TIME) {
             pp->req_msg.req.arg.seek.time = args->seek.time;
-        } else if (args->seek.pos == VLC_THUMBNAILER_SEEK_POS) {
+        } else if (args->seek.type == VLC_THUMBNAILER_SEEK_POS) {
             pp->req_msg.req.arg.seek.pos = args->seek.pos;
         }
         pp->req_msg.req.arg.seek.speed = args->seek.speed;
