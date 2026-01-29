@@ -94,10 +94,17 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
                     return;
                 }
 
-                assert(!m_provider);
+                const auto provider = m_source->textureProvider(); // This can only be called in the rendering thread.
+                assert(provider);
 
-                m_provider = m_source->textureProvider(); // This can only be called in the rendering thread.
-                assert(m_provider);
+                assert(!m_provider || (provider == m_provider)); // If providers are different, source must be different too (which is handled above).
+                if (Q_UNLIKELY(provider == m_provider)) // Unlikely, source set to something else (such as null), and then set back to its original value really fast.
+                {
+                    updateProperties(); // Not sure if really necessary, but we do not lose anything.
+                    return;
+                }
+
+                m_provider = provider;
 
                 connect(m_provider, &QSGTextureProvider::textureChanged, this, &TextureProviderObserver::updateProperties, Qt::DirectConnection);
 
