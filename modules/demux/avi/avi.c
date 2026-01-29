@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
+#include <stdint.h>
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
@@ -1216,7 +1217,7 @@ static int Demux_Seekable( demux_t *p_demux )
     {
         bool b_done = true;
         block_t         *p_frame;
-        int64_t i_pos = -1;
+        int64_t i_pos = INT64_MAX;
         unsigned int i_track = 0;
 
         /* search for first chunk to be read */
@@ -1236,7 +1237,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
                 if( tk->demuxctx.i_posf > 0 )
                 {
-                    if( i_pos == -1 || i_pos > tk->demuxctx.i_posf )
+                    if( i_pos > tk->demuxctx.i_posf )
                     {
                         i_track = i;
                         i_pos = tk->demuxctx.i_posf;
@@ -1257,7 +1258,7 @@ static int Demux_Seekable( demux_t *p_demux )
             return VLC_DEMUXER_EOF;
         }
 
-        if( i_pos == -1 )
+        if( i_pos == INT64_MAX )
         {
             unsigned short i_loop_count = 0;
 
