@@ -39,21 +39,23 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
     if (!enforce && (m_source == source))
         return;
 
+    if (m_source)
     {
-        m_textureSize = QSize{}; // memory order does not matter, `setSource()` is not called frequently.
-
-        if (m_source)
+        if (Q_LIKELY(m_provider))
         {
-            if (Q_LIKELY(m_provider))
-            {
-                disconnect(m_provider, nullptr, this, nullptr);
-                m_provider = nullptr;
-            }
-            else
-            {
-                // source changed before we got its `QSGTextureProvider`
-                disconnect(m_source, nullptr, this, nullptr);
-            }
+            disconnect(m_provider, nullptr, this, nullptr);
+            m_provider = nullptr;
+
+            // We would like to reset the properties in these conditions:
+            // - There is a new valid source. We want to reset because updating the properties is
+            //   asynchronous. Even if update occurs, it may take a while, and it may never happen.
+            // - There is no more source.
+            resetProperties(); // memory order does not matter, `setSource()` is not called frequently.
+        }
+        else
+        {
+            // source changed before we got its `QSGTextureProvider`
+            disconnect(m_source, nullptr, this, nullptr);
         }
     }
 
@@ -230,6 +232,11 @@ void TextureProviderObserver::updateProperties()
         }
     }
 
+    resetProperties(memoryOrder);
+}
+
+void TextureProviderObserver::resetProperties(std::memory_order memoryOrder)
+{
     m_textureSize.store({}, memoryOrder);
     m_nativeTextureSize.store({}, memoryOrder);
 

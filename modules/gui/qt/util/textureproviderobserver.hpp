@@ -90,6 +90,7 @@ signals:
 
 private slots:
     void updateProperties();
+    void resetProperties(std::memory_order memoryOrder = std::memory_order_seq_cst);
 
 private:
     QPointer<const QQuickItem> m_source;
