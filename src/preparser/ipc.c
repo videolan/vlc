@@ -97,6 +97,7 @@ vlc_preparser_msg_Init(struct vlc_preparser_msg *msg, int msg_type,
         msg->res.pic = NULL;
         vlc_vector_init(&msg->res.result);
         msg->res.status = -1;
+        msg->res.item = NULL;
     }
 }
 
