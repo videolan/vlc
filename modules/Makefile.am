@@ -5,11 +5,11 @@ pkglib_LTLIBRARIES =
 noinst_HEADERS =
 check_PROGRAMS =
 pkglibexec_PROGRAMS =
-EXTRA_DIST =
+EXTRA_DIST = check_vlc_modules_list.sh
 CLEANFILES =
 
 SUBDIRS =
-TESTS =
+TESTS = check_vlc_modules_list.sh
 
 dist_noinst_SCRIPTS = module.rc.in
 EXTRA_LTLIBRARIES =
