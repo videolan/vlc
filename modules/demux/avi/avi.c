@@ -1268,7 +1268,8 @@ static int Demux_Seekable( demux_t *p_demux )
 
                 if( AVI_PacketNext( p_demux ) )
                 {
-                    return( AVI_TrackStopFinishedStreams( p_demux ) ? 0 : 1 );
+                    return( AVI_TrackStopFinishedStreams( p_demux ) ?
+                            VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS );
                 }
             }
             else
@@ -1285,7 +1286,8 @@ static int Demux_Seekable( demux_t *p_demux )
                 {
                     msg_Warn( p_demux,
                              "cannot get packet header, track disabled" );
-                    return( AVI_TrackStopFinishedStreams( p_demux ) ? 0 : 1 );
+                    return( AVI_TrackStopFinishedStreams( p_demux ) ?
+                            VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS );
                 }
                 if( avi_pk.i_stream >= p_sys->i_track ||
                     ( avi_pk.i_cat != AUDIO_ES && avi_pk.i_cat != VIDEO_ES ) )
@@ -1294,7 +1296,8 @@ static int Demux_Seekable( demux_t *p_demux )
                     {
                         msg_Warn( p_demux,
                                   "cannot skip packet, track disabled" );
-                        return( AVI_TrackStopFinishedStreams( p_demux ) ? 0 : 1 );
+                        return( AVI_TrackStopFinishedStreams( p_demux ) ?
+                                VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS );
                     }
 
                     if( !++i_loop_count )
@@ -1328,7 +1331,8 @@ static int Demux_Seekable( demux_t *p_demux )
                         {
                             msg_Warn( p_demux,
                                       "cannot skip packet, track disabled" );
-                            return( AVI_TrackStopFinishedStreams( p_demux ) ? 0 : 1 );
+                            return( AVI_TrackStopFinishedStreams( p_demux ) ?
+                                    VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS );
                         }
                     }
                 }
@@ -1527,11 +1531,13 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 case AVIFOURCC_JUNK:
                 case AVIFOURCC_LIST:
                 case AVIFOURCC_RIFF:
-                    return( !AVI_PacketNext( p_demux ) ? 1 : 0 );
+                    return( !AVI_PacketNext( p_demux ) ?
+                            VLC_DEMUXER_SUCCESS : VLC_DEMUXER_EOF );
                 case AVIFOURCC_idx1:
                     if( p_sys->b_odml )
                     {
-                        return( !AVI_PacketNext( p_demux ) ? 1 : 0 );
+                        return( !AVI_PacketNext( p_demux ) ?
+                                VLC_DEMUXER_SUCCESS : VLC_DEMUXER_EOF );
                     }
                     return VLC_DEMUXER_EOF;
                 default:
