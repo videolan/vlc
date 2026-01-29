@@ -61,6 +61,26 @@ FocusScope {
         source: root.artist.id ? (root.artist.cover || VLCStyle.noArtArtist) : "" // do not load the fallback image during initialization
         sourceSize: artist.cover ? Qt.size(Helpers.alignUp(Screen.desktopAvailableWidth / 2, 32), 0)
                                  : undefined
+
+        onSourceChanged: {
+            // FIXME: Why are we doing this? Because Image texture provider
+            //        does not appear to invalidate its texture when source
+            //        changes in between, even though `retainWhileLoading`
+            //        is not used (not to mention it is debatable whether
+            //        it would be effective with regard to the texture
+            //        provider's texture).
+
+            // FIXME: I am not happy about breaking a potential binding,
+            //        when we could instead use `Binding` as an inhibitor.
+            //        Unfortunately `Binding` is broken in this case with
+            //        certain Qt versions (including 6.10.1), possibly the
+            //        same bug as described in QTBUG-140858.
+
+            const blurEffectSource = blurEffect.source
+            blurEffect.source = null
+            blurEffect.source = blurEffectSource
+        }
+
         mipmap: !!artist.cover
 
         fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
