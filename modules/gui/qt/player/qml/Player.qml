@@ -281,81 +281,73 @@ FocusScope {
                 property real bottomPadding: playerSpecializationLoader.bottomPadding
 
                 // background image
-                Rectangle {
-                    focus: false
-                    // NOTE: Rectangle has an optimization that it does not use a scene graph node if the color is transparent.
-                    color: blurredBackground.available ? "transparent" // background coloring in blur effect is used otherwise
-                                                       : bgtheme.bg.primary
-                    anchors.fill: parent
+                Widgets.DualKawaseBlur {
+                    id: blurredBackground
+
+                    radius: 3
+
+                    live: false
+
+                    //destination aspect ratio
+                    readonly property real dar: parent.width / parent.height
+
+                    anchors.centerIn: parent
+                    width: (cover.sar < dar) ? parent.width :  parent.height * cover.sar
+                    height: (cover.sar < dar) ? parent.width / cover.sar :  parent.height
+
+                    source: textureProviderItem
+
+                    postprocess: true
+                    tint: bgtheme.palette.isDark ? "black" : "white"
+                    tintStrength: 0.5
+                    backgroundColor: bgtheme.bg.primary
 
                     readonly property ColorContext colorContext: ColorContext {
                         id: bgtheme
                         colorSet: ColorContext.View
                     }
 
-                    Widgets.DualKawaseBlur {
-                        id: blurredBackground
+                    // The window naturally clips the content, but having this saves some
+                    // video memory, depending on the excess content in the last layer:
+                    viewportRect: Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
 
-                        radius: 3
+                    Widgets.TextureProviderItem {
+                        id: textureProviderItem
 
-                        live: false
-                        
-                        //destination aspect ratio
-                        readonly property real dar: parent.width / parent.height
+                        // This should not be necessary anymore since `DualKawaseBlur`
+                        // does not create layer for the source implicitly as `MultiEffect`
+                        // or `FastBlur` does as they deem necessary (in this case, it
+                        // is not necessary). But due to a Qt bug when `mipmap: true` is
+                        // used where texture sampling becomes broken, we need this as
+                        // `QSGTextureView` has a workaround for that bug. This is totally
+                        // acceptable as there is virtually no overhead.
+                        source: cover
+                    }
 
-                        anchors.centerIn: parent
-                        width: (cover.sar < dar) ? parent.width :  parent.height * cover.sar
-                        height: (cover.sar < dar) ? parent.width / cover.sar :  parent.height
+                    Component.onCompleted: {
+                        // Blur layers are effect-size dependent, so once the user starts resizing the window (hence the effect),
+                        // we should either momentarily turn on live, or repeatedly call `scheduleUpdate()`. Due to the optimization,
+                        // calling `scheduleUpdate()` would continuously create and release intermediate layers, which would be a
+                        // really bad idea. So instead, we turn on live and after some time passes turn it off again.
+                        widthChanged.connect(liveTimer, liveTimer.transientTurnOnLive)
+                        heightChanged.connect(liveTimer, liveTimer.transientTurnOnLive)
+                    }
 
-                        source: textureProviderItem
+                    Timer {
+                        id: liveTimer
 
-                        postprocess: true
-                        tint: bgtheme.palette.isDark ? "black" : "white"
-                        tintStrength: 0.5
-                        backgroundColor: bgtheme.bg.primary
+                        repeat: false
+                        interval: VLCStyle.duration_humanMoment
 
-                        // The window naturally clips the content, but having this saves some
-                        // video memory, depending on the excess content in the last layer:
-                        viewportRect: Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
-
-                        Widgets.TextureProviderItem {
-                            id: textureProviderItem
-
-                            // This should not be necessary anymore since `DualKawaseBlur`
-                            // does not create layer for the source implicitly as `MultiEffect`
-                            // or `FastBlur` does as they deem necessary (in this case, it
-                            // is not necessary). But due to a Qt bug when `mipmap: true` is
-                            // used where texture sampling becomes broken, we need this as
-                            // `QSGTextureView` has a workaround for that bug. This is totally
-                            // acceptable as there is virtually no overhead.
-                            source: cover
+                        function transientTurnOnLive() {
+                            if (!blurredBackground.sourceTextureIsValid)
+                                return
+                            blurredBackground.live = true
+                            liveTimer.restart()
                         }
 
-                        Component.onCompleted: {
-                            // Blur layers are effect-size dependent, so once the user starts resizing the window (hence the effect),
-                            // we should either momentarily turn on live, or repeatedly call `scheduleUpdate()`. Due to the optimization,
-                            // calling `scheduleUpdate()` would continuously create and release intermediate layers, which would be a
-                            // really bad idea. So instead, we turn on live and after some time passes turn it off again.
-                            widthChanged.connect(liveTimer, liveTimer.transientTurnOnLive)
-                            heightChanged.connect(liveTimer, liveTimer.transientTurnOnLive)
-                        }
-
-                        Timer {
-                            id: liveTimer
-
-                            repeat: false
-                            interval: VLCStyle.duration_humanMoment
-
-                            function transientTurnOnLive() {
-                                if (!blurredBackground.sourceTextureIsValid)
-                                    return
-                                blurredBackground.live = true
-                                liveTimer.restart()
-                            }
-
-                            onTriggered: {
-                                blurredBackground.live = false
-                            }
+                        onTriggered: {
+                            blurredBackground.live = false
                         }
                     }
                 }
