@@ -1235,13 +1235,10 @@ static int Demux_Seekable( demux_t *p_demux )
             {
                 b_done = false; /* not yet finished */
 
-                if( tk->demuxctx.i_posf > 0 )
+                if( tk->demuxctx.i_posf >= 0 && i_pos > tk->demuxctx.i_posf )
                 {
-                    if( i_pos > tk->demuxctx.i_posf )
-                    {
-                        i_track = i;
-                        i_pos = tk->demuxctx.i_posf;
-                    }
+                    i_track = i;
+                    i_pos = tk->demuxctx.i_posf;
                 }
             }
         }
