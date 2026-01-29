@@ -437,6 +437,16 @@ Item {
         }
     }
 
+    // This rectangle is going to be visible until the blur effect is ready, so that
+    // we don't expose what is beneath meanwhile.
+    Rectangle {
+        anchors.fill: us2
+
+        visible: !us2.visible && root.postprocess && (root.backgroundColor.a > 0.0)
+
+        color: root.backgroundColor
+    }
+
     UpsamplerShaderEffect {
         id: us2
 
