@@ -455,7 +455,7 @@ Item {
         width: (root.viewportRect.width > 0) ? root.viewportRect.width : parent.width
         height: (root.viewportRect.height > 0) ? root.viewportRect.height : parent.height
 
-        visible: tpObserver.isValid
+        visible: tpObserver.isValid && root.available
 
         source: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
 
