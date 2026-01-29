@@ -60,6 +60,7 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
     }
 
     m_source = source;
+    emit sourceChanged();
 
     if (m_source)
     {
@@ -109,8 +110,6 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
         else
             connect(m_source, &QQuickItem::windowChanged, this, init, Qt::SingleShotConnection);
     }
-
-    emit sourceChanged();
 }
 
 QSize TextureProviderObserver::textureSize() const
