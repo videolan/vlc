@@ -253,7 +253,7 @@ static void AVI_MetaLoad( demux_t *, avi_chunk_list_t *p_riff, avi_chunk_avih_t 
  * Stream management
  *****************************************************************************/
 static int        AVI_TrackSeek  ( demux_t *, int, vlc_tick_t );
-static int        AVI_TrackStopFinishedStreams( demux_t *);
+static bool       AVI_TrackStopFinishedStreams( demux_t *);
 
 /* Remarks:
  - For VBR mp3 stream:
@@ -3232,11 +3232,11 @@ static int AVI_SeekSubtitleTrack( demux_sys_t *p_sys, avi_track_t *tk )
 /*****************************************************************************
  * Stream management
  *****************************************************************************/
-static int AVI_TrackStopFinishedStreams( demux_t *p_demux )
+static bool AVI_TrackStopFinishedStreams( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i;
-    int b_end = true;
+    bool b_end = true;
 
     for( i = 0; i < p_sys->i_track; i++ )
     {
