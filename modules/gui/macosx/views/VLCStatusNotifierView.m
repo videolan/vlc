@@ -59,6 +59,7 @@ NSString * const VLCMessageTimeoutTimerUserInfoMessageKey = @"VLCMessageTimeoutT
     _libraryItemsLoadedMessage = _NS("Library items loaded");
     _discoveringMediaMessage = _NS("Discovering media");
     _discoveryCompletedMessage = _NS("Media discovery completed");
+    _discoveryFailedMessage = _NS("Media discovery failed");
     _activeTimers = NSMutableDictionary.dictionary;
 
     self.label.stringValue = _NS("Idle");
