@@ -22,6 +22,7 @@
 #include <windows.h>
 #include <psapi.h>
 #include "pluginapi.h"
+#include <stdlib.h>
 
 /* Defines */
 #define NSIS_MAX_STRLEN 1024
