@@ -1816,6 +1816,8 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                         default:
                             break;
                     }
+                    if (remain < 1 + 1 + length)
+                        break;
                     VP9CodecFeatures += 1 + 1 + length;
                     remain -= 1 + 1 + length;
                 }
