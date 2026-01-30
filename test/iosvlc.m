@@ -97,34 +97,45 @@
 /* Called after application launch */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    /* Store startup arguments to forward them to libvlc */
-    NSArray *arguments = [[NSProcessInfo processInfo] arguments];
-    unsigned vlc_argc = [arguments count] - 1;
-    const char *intf_arg = "--intf=" MODULE_STRING;
-    unsigned vlc_argc_with_args = vlc_argc + 1;
-    const char **vlc_argv = malloc(vlc_argc_with_args * sizeof *vlc_argv);
-    if (vlc_argv == NULL)
-        return NO;
-
-    vlc_argv[0] = intf_arg;
-    for (unsigned i = 0; i < vlc_argc; i++)
-        vlc_argv[i + 1] = [[arguments objectAtIndex:i + 1] UTF8String];
-
-    /* Initialize libVLC */
-    _libvlc = libvlc_new(vlc_argc_with_args, (const char * const*)vlc_argv);
-    free(vlc_argv);
-
-    if (_libvlc == NULL)
-        return NO;
-
     _intfQueue = dispatch_queue_create("org.videolan.vlc.ios.intf",
                                        DISPATCH_QUEUE_SERIAL);
-    dispatch_async(_intfQueue, ^{
-        @autoreleasepool {
-            libvlc_InternalAddIntf(_libvlc->p_libvlc_int, NULL);
-            libvlc_InternalPlay(_libvlc->p_libvlc_int);
+
+    /* Defer libVLC initialization until the main run loop is active.
+     * This prevents interfaces created via libvlc_InternalAddIntf from
+     * creating and owning the eventloop themselves at plugin loading
+     * time (which Qt qios platform does). We don't need those plugins
+     * before the interface is ready to load with an eventloop anyway. */
+    CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopDefaultMode, ^{
+        /* Store startup arguments to forward them to libvlc */
+        NSArray *arguments = [[NSProcessInfo processInfo] arguments];
+        unsigned vlc_argc = [arguments count] - 1;
+        const char *intf_arg = "--intf=" MODULE_STRING;
+        unsigned vlc_argc_with_args = vlc_argc + 1;
+        const char **vlc_argv = malloc(vlc_argc_with_args * sizeof *vlc_argv);
+        if (vlc_argv == NULL)
+            return;
+
+        vlc_argv[0] = intf_arg;
+        for (unsigned i = 0; i < vlc_argc; i++)
+            vlc_argv[i + 1] = [[arguments objectAtIndex:i + 1] UTF8String];
+
+        /* Initialize libVLC */
+        self->_libvlc = libvlc_new(vlc_argc_with_args, (const char * const*)vlc_argv);
+        free(vlc_argv);
+
+        if (self->_libvlc == NULL) {
+            NSLog(@"Failed to initialize libVLC");
+            return;
         }
+
+        dispatch_async(self->_intfQueue, ^{
+            @autoreleasepool {
+                libvlc_InternalAddIntf(self->_libvlc->p_libvlc_int, NULL);
+                libvlc_InternalPlay(self->_libvlc->p_libvlc_int);
+            }
+        });
     });
+    CFRunLoopWakeUp(CFRunLoopGetMain());
 
     return YES;
 }
