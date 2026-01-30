@@ -477,7 +477,6 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
 
     if ( fpos != std::numeric_limits<SegmentSeeker::fptr_t>::max() )
     {
-        ms.cluster = NULL;
         if ( !_cluster_positions.empty() )
         {
             cluster_positions_t::iterator cluster_it = greatest_lower_bound(
@@ -488,9 +487,9 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
             ms.ep.reconstruct( &ms.es, ms.segment, &ms.sys.demuxer );
         }
 
-        while( ms.cluster == NULL || (
-              ms.cluster->IsFiniteSize() && ms.cluster->GetEndPosition() < fpos ) )
+        for(;;)
         {
+            ms.cluster = NULL;
             EbmlElement *el = ms.ep.Get();
             if( el == nullptr )
             {
@@ -507,6 +506,9 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
             add_cluster_position( i_cluster_pos );
 
             mark_range_as_searched( Range( i_cluster_pos, ms.es.I_O().getFilePointer() ) );
+
+            if ( !ms.cluster->IsFiniteSize() || ms.cluster->GetEndPosition() >= fpos)
+                break;
         }
     }
     else if (ms.cluster != NULL)
