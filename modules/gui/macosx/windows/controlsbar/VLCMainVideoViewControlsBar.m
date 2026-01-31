@@ -165,7 +165,10 @@
     const bool floatOnTopEnabled = var_GetBool(voutThread, "video-on-top");
     vout_Release(voutThread);
 
-    if (@available(macOS 10.14, *)) {
+    if (@available(macOS 26.0, *)) {
+        self.floatOnTopButton.bezelColor =
+            floatOnTopEnabled ? NSColor.controlAccentColor : nil;
+    } else if (@available(macOS 10.14, *)) {
         self.floatOnTopButton.contentTintColor =
             floatOnTopEnabled ? NSColor.controlAccentColor : nil;
     }
