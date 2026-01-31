@@ -866,13 +866,41 @@ QVariantList NetworkMediaModel::getItemsForIndexes(const QModelIndexList & index
     Q_D(const NetworkMediaModel);
     QVariantList items;
 
+    bool allInCache = true;
+    for (const QModelIndex & modelIndex : indexes)
+    {
+        const NetworkMediaItem* item = d->getItemForRow(modelIndex.row());
+        if (!item)
+        {
+            allInCache = false;
+            break;
+        }
+
+        const NetworkTreeItem & tree = item->tree;
+        items.append(QVariant::fromValue(SharedInputItem(tree.media.get(), true)));
+    }
+
+    if (allInCache)
+        return items;
+
+    // Sometimes if there are many items selected, some are not in cache so we need to rebuild the list
+    items.clear();
+    std::vector<NetworkMediaItemPtr> modelData = d->getModelData(d->m_searchPattern);
+
+    auto sortFunc = d->getSortFunction();
+    if (sortFunc)
+        std::sort(modelData.begin(), modelData.end(), sortFunc);
+
     for (const QModelIndex & modelIndex : indexes)
     {
         int index = modelIndex.row();
 
-        const NetworkMediaItem* item = d->getItemForRow(index);
+        if (index < 0 || index >= static_cast<int>(modelData.size()))
+            continue;
+
+        const NetworkMediaItemPtr& item = modelData[index];
         if (!item)
-            return {};
+            continue;
 
         const NetworkTreeItem & tree = item->tree;
 
