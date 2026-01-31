@@ -145,7 +145,7 @@ vlc_module_begin ()
         change_string_list( ts_standards_list, ts_standards_list_text )
 
     add_string( "ts-extra-pmt", NULL, PMT_TEXT, PMT_LONGTEXT )
-    add_bool( "ts-trust-pcr", true, PCR_TEXT, PCR_LONGTEXT )
+    add_bool( "ts-trust-pcr", false, PCR_TEXT, PCR_LONGTEXT )
         change_safe()
     add_bool( "ts-es-id-pid", true, PID_TEXT, PID_LONGTEXT )
         change_safe()
@@ -158,7 +158,7 @@ vlc_module_begin ()
 
     add_bool( "ts-split-es", true, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT )
     add_bool( "ts-seek-percent", false, SEEK_PERCENT_TEXT, SEEK_PERCENT_LONGTEXT )
-    add_bool( "ts-cc-check", true, CC_CHECK_TEXT, CC_CHECK_LONGTEXT )
+    add_bool( "ts-cc-check", false, CC_CHECK_TEXT, CC_CHECK_LONGTEXT )
     add_bool( "ts-pmtfix-waitdata", true, TS_SKIP_GHOST_PROGRAM_TEXT, NULL )
     add_bool( "ts-patfix", true, TS_PATFIX_TEXT, NULL )
     add_bool( "ts-pcr-offsetfix", true, TS_OFFSETFIX_TEXT, NULL )
@@ -195,7 +195,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, ts_90khz_t );
 static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 
-#define PROBE_CHUNK_COUNT 500
+#define PROBE_CHUNK_COUNT 2500
 #define PROBE_MAX         (PROBE_CHUNK_COUNT * 10)
 
 static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_offset )
@@ -394,7 +394,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_packet_size = i_packet_size;
     p_sys->i_packet_header_size = i_packet_header_size;
-    p_sys->i_ts_read = 50;
+    p_sys->i_ts_read = 500;
     p_sys->csa = NULL;
     p_sys->b_start_record = false;
     p_sys->record_dir_path = NULL;
@@ -2044,7 +2044,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, vlc_tick_t i_see
                 vlc_tick_t i_diff = i_seektime - TimeStampWrapAround( p_pmt->pcr.i_first, FROM_SCALE(i_pktpcr) );
                 if ( i_diff < 0 )
                     i_tail_pos = (i_splitpos >= p_sys->i_packet_size) ? i_splitpos - p_sys->i_packet_size : 0;
-                else if( i_diff < VLC_TICK_FROM_MS(500) )
+                else if( i_diff < VLC_TICK_FROM_MS(2000) )
                     b_found = true;
                 else
                     i_head_pos = i_pos;
