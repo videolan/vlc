@@ -127,6 +127,15 @@ static void Close ( vlc_object_t * );
 #define PCR_TEXT N_("Trust in-stream PCR")
 #define PCR_LONGTEXT N_("Use the stream PCR as a reference.")
 
+#define SEEK_TOLERANCE_TEXT N_("Seek tolerance in ms")
+#define SEEK_TOLERANCE_LONGTEXT N_("Tolerance in ms when seeking to a specific time position.")
+
+#define READ_BUFFER_SIZE_TEXT N_("Read buffer size in packets")
+#define READ_BUFFER_SIZE_LONGTEXT N_("Number of TS packets to read at once. Higher values improve throughput for local files.")
+
+#define PROBE_DEPTH_TEXT N_("Probe depth (chunks)")
+#define PROBE_DEPTH_LONGTEXT N_("Number of chunks to probe when detecting stream format.")
+
 static const char *const ts_standards_list[] =
     { "auto", "mpeg", "dvb", "arib", "atsc", "tdmb" };
 static const char *const ts_standards_list_text[] =
@@ -145,7 +154,7 @@ vlc_module_begin ()
         change_string_list( ts_standards_list, ts_standards_list_text )
 
     add_string( "ts-extra-pmt", NULL, PMT_TEXT, PMT_LONGTEXT )
-    add_bool( "ts-trust-pcr", true, PCR_TEXT, PCR_LONGTEXT )
+    add_bool( "ts-trust-pcr", false, PCR_TEXT, PCR_LONGTEXT )
         change_safe()
     add_bool( "ts-es-id-pid", true, PID_TEXT, PID_LONGTEXT )
         change_safe()
@@ -158,12 +167,18 @@ vlc_module_begin ()
 
     add_bool( "ts-split-es", true, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT )
     add_bool( "ts-seek-percent", false, SEEK_PERCENT_TEXT, SEEK_PERCENT_LONGTEXT )
-    add_bool( "ts-cc-check", true, CC_CHECK_TEXT, CC_CHECK_LONGTEXT )
+    add_bool( "ts-cc-check", false, CC_CHECK_TEXT, CC_CHECK_LONGTEXT )
     add_bool( "ts-pmtfix-waitdata", true, TS_SKIP_GHOST_PROGRAM_TEXT, NULL )
     add_bool( "ts-patfix", true, TS_PATFIX_TEXT, NULL )
     add_bool( "ts-pcr-offsetfix", true, TS_OFFSETFIX_TEXT, NULL )
     add_integer_with_range( "ts-generated-pcr-offset", 120, 0, 500,
                             TS_GENERATED_PCR_OFFSET_TEXT, NULL )
+    add_integer_with_range( "ts-seek-tolerance", 2000, 0, 10000,
+                            SEEK_TOLERANCE_TEXT, SEEK_TOLERANCE_LONGTEXT )
+    add_integer_with_range( "ts-read-buffer-size", 500, 10, 5000,
+                            READ_BUFFER_SIZE_TEXT, READ_BUFFER_SIZE_LONGTEXT )
+    add_integer_with_range( "ts-probe-depth", 2500, 500, 10000,
+                            PROBE_DEPTH_TEXT, PROBE_DEPTH_LONGTEXT )
 
     set_capability( "demux", 10 )
     set_callbacks( Open, Close )
@@ -394,7 +409,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_packet_size = i_packet_size;
     p_sys->i_packet_header_size = i_packet_header_size;
-    p_sys->i_ts_read = 50;
+    p_sys->i_ts_read = var_InheritInteger( p_demux, "ts-read-buffer-size" );
     p_sys->csa = NULL;
     p_sys->b_start_record = false;
     p_sys->record_dir_path = NULL;
@@ -1969,6 +1984,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
 static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, vlc_tick_t i_seektime )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    vlc_tick_t i_tolerance = VLC_TICK_FROM_MS( var_InheritInteger( p_demux, "ts-seek-tolerance" ) );
 
     /* Deal with common but worst binary search case */
     if( p_pmt->pcr.i_first == i_seektime && p_sys->b_canseek )
@@ -2044,7 +2060,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, vlc_tick_t i_see
                 vlc_tick_t i_diff = i_seektime - TimeStampWrapAround( p_pmt->pcr.i_first, FROM_SCALE(i_pktpcr) );
                 if ( i_diff < 0 )
                     i_tail_pos = (i_splitpos >= p_sys->i_packet_size) ? i_splitpos - p_sys->i_packet_size : 0;
-                else if( i_diff < VLC_TICK_FROM_MS(500) )
+                else if( i_diff < i_tolerance )
                     b_found = true;
                 else
                     i_head_pos = i_pos;
@@ -2066,7 +2082,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, vlc_tick_t i_see
     return VLC_SUCCESS;
 }
 
-static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, bool *pb_found )
+static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, bool *pb_found, int i_max_probe )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_count = 0;
@@ -2076,7 +2092,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, bool *pb_fou
     {
         ts_90khz_t i_pcr = TS_90KHZ_INVALID;
 
-        if( i_count++ > PROBE_CHUNK_COUNT || !( p_pkt = ReadTSPacket( p_demux ) ) )
+        if( i_count++ > i_max_probe || !( p_pkt = ReadTSPacket( p_demux ) ) )
         {
             break;
         }
@@ -2166,6 +2182,8 @@ int ProbeStart( demux_t *p_demux, int i_program )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
+    int i_probe_depth = var_InheritInteger( p_demux, "ts-probe-depth" );
+    int i_probe_max = i_probe_depth * 10;
     uint64_t i_stream_size;
     if( vlc_stream_GetSize( p_sys->stream, &i_stream_size ) != VLC_SUCCESS )
       return VLC_EGENERIC;
@@ -2186,14 +2204,14 @@ int ProbeStart( demux_t *p_demux, int i_program )
         if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
 
-        int i_count =  ProbeChunk( p_demux, i_program, false, &b_found );
-        if( i_count < PROBE_CHUNK_COUNT )
+        int i_count =  ProbeChunk( p_demux, i_program, false, &b_found, i_probe_depth );
+        if( i_count < i_probe_depth )
             break;
 
         /* Go ahead one more chunk if end of file contained only stuffing packets */
         i_probe_count += i_count;
     } while( i_pos < i_stream_size && !b_found &&
-             i_probe_count < PROBE_MAX );
+             i_probe_count < i_probe_max );
 
     if( vlc_stream_Seek( p_sys->stream, i_initial_pos ) )
         return VLC_EGENERIC;
@@ -2205,11 +2223,13 @@ int ProbeEnd( demux_t *p_demux, int i_program )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
+    int i_probe_depth = var_InheritInteger( p_demux, "ts-probe-depth" );
+    int i_probe_max = i_probe_depth * 10;
     uint64_t i_stream_size;
     if( vlc_stream_GetSize( p_sys->stream, &i_stream_size ) != VLC_SUCCESS )
       return VLC_EGENERIC;
 
-    unsigned i_probe_count = PROBE_CHUNK_COUNT;
+    unsigned i_probe_count = i_probe_depth;
     uint64_t i_pos;
     bool b_found = false;
     const uint64_t i_sync_align_offset = i_initial_pos % p_sys->i_packet_size;
@@ -2229,14 +2249,14 @@ int ProbeEnd( demux_t *p_demux, int i_program )
         if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
 
-        int i_count = ProbeChunk( p_demux, i_program, true, &b_found );
-        if( i_count < PROBE_CHUNK_COUNT )
+        int i_count = ProbeChunk( p_demux, i_program, true, &b_found, i_probe_depth );
+        if( i_count < i_probe_depth )
             break;
 
         /* Go ahead one more chunk if end of file contained only stuffing packets */
         i_probe_count += i_count;
     } while( i_pos > 0 && !b_found &&
-             i_probe_count < PROBE_MAX );
+             i_probe_count < i_probe_max );
 
     if( vlc_stream_Seek( p_sys->stream, i_initial_pos ) )
         return VLC_EGENERIC;
