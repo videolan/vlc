@@ -604,9 +604,38 @@ QVariantList NetworkDeviceModel::getItemsForIndexes(const QModelIndexList & inde
     Q_D(const NetworkDeviceModel);
     QVariantList items;
 
+    bool allInCache = true;
     for (const QModelIndex & modelIndex : indexes)
     {
         const NetworkDeviceItem* item = d->getItemForRow(modelIndex.row());
+        if (!item)
+        {
+            allInCache = false;
+            break;
+        }
+
+        items.append(QVariant::fromValue(SharedInputItem(item->getInputItem().get(), true)));
+    }
+
+    if (allInCache)
+        return items;
+
+    // Sometimes if there are many items selected, some are not in cache so we need to rebuild the list
+    items.clear();
+    std::vector<NetworkDeviceItemPtr> modelData = d->getModelData(d->m_searchPattern);
+
+    auto sortFunc = d->getSortFunction();
+    if (sortFunc)
+        std::sort(modelData.begin(), modelData.end(), sortFunc);
+
+    for (const QModelIndex & modelIndex : indexes)
+    {
+        int index = modelIndex.row();
+
+        if (index < 0 || index >= static_cast<int>(modelData.size()))
+            continue;
+
+        const NetworkDeviceItemPtr& item = modelData[index];
         if (!item)
             continue;
 
