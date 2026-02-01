@@ -13,7 +13,7 @@ gui/macosx/Resources/Assets.car: gui/macosx/Resources/Assets.xcassets $(ASSET_CA
 	$(AM_V_at)$(MKDIR_P) "gui/macosx/Resources"
 	$(actool_verbose)$(ACTOOL) --errors --warnings --notices \
 	  --platform macosx --target-device mac --skip-app-store-deployment \
-	  --minimum-deployment-target 10.11 --output-format human-readable-text \
+	  --minimum-deployment-target 10.13 --output-format human-readable-text \
 	  --compile $(@D) $<
 
 if ENABLE_MACOSX_UI
@@ -33,7 +33,7 @@ xib_verbose__0 = $(xib_verbose_0)
 	$(AM_V_at)$(MKDIR_P) "gui/macosx/UI"
 	$(xib_verbose)$(XIB) --errors --warnings --notices \
 	  --module VLC --auto-activate-custom-fonts --target-device mac \
-	  --minimum-deployment-target 10.11 --output-format human-readable-text \
+	  --minimum-deployment-target 10.13 --output-format human-readable-text \
 	  --compile $@ $<
 
 if ENABLE_MACOSX_UI_SHADERS
