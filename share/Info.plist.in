@@ -61,6 +61,8 @@
 	<string>https://update.videolan.org/vlc/sparkle/vlc-intel64.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>SUPublicEDKey</key>
+	<string>rfrJyjRvcZoQ+3xo9Qf4jtSMsMFpiQQsiVhtKaOQCNI=</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright (c) @COPYRIGHT_YEARS@ VLC authors and VideoLAN</string>
 	<key>NSCameraUsageDescription</key>
