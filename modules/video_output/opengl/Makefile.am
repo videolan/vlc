@@ -82,7 +82,6 @@ endif
 if HAVE_ANDROID
 libglinterop_sw_plugin_la_LIBADD = libvlc_opengles.la
 libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
-vout_LTLIBRARIES += libglinterop_sw_plugin.la
 endif
 
 ### OpenGL ###
