@@ -110,9 +110,9 @@ find VLC.app/Contents/Frameworks -type f -name "*.txt" -exec rm '{}' \;
 
 info "Signing frameworks"
 
-sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/fileop"
-sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app"
-sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A"
+sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate"
+sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app"
+sign "VLC.app/Contents/Frameworks/Sparkle.framework/"
 
 if [ -e "VLC.app/Contents/Frameworks/Breakpad.framework" ]; then
     sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/breakpadUtilities.dylib"
@@ -161,7 +161,7 @@ fi
 codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework
 
 info "Validating autoupdate app"
-codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Resources/Autoupdate.app
+codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
 
 info "Validating complete bundle"
 codesign --verify --deep --strict --verbose=4 VLC.app
