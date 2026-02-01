@@ -1,0 +1,12 @@
+--- sparkle/Autoupdate/SUCodeSigningVerifierOrig.m	2025-11-15 05:59:21
++++ sparkle/Autoupdate/SUCodeSigningVerifier.m	2026-02-01 16:56:08
+@@ -19,6 +19,9 @@
+ 
+ @property (nonatomic, readonly) audit_token_t auditToken;
+ 
++// Only defined starting SDK 13.0
++- (void)setCodeSigningRequirement:(NSString *)requirement API_AVAILABLE(macos(13.0)) API_UNAVAILABLE(ios, tvos, watchos);
++
+ @end
+ 
+ @implementation SUCodeSigningVerifier
