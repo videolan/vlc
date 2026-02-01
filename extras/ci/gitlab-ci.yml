@@ -524,7 +524,7 @@ macos-x86_64:
 macos-arm64:
     extends: .macos-common
     tags:
-        - macos-xcode15
+        - macos-xcode26
     variables: *variables-macos-arm64
 
 .nightly-macos-common:
@@ -549,7 +549,7 @@ nightly-macos-x86_64:
 nightly-macos-arm64:
     extends: .nightly-macos-common
     tags:
-        - macos-xcode15
+        - macos-xcode26
     variables: *variables-macos-arm64
 
 #
@@ -572,7 +572,7 @@ nightly-macos-arm64:
 ios-arm64:
     extends: .apple-os-common
     tags:
-        - macos-xcode15
+        - macos-xcode26
     variables: *variables-ios-arm64
 
 ios-armv7:
@@ -584,13 +584,13 @@ ios-armv7:
 ios-simulator-x86_64:
     extends: .apple-os-common
     tags:
-        - macos-xcode15
+        - macos-xcode26
     variables: *variables-ios-simulator-x86_64
 
 tvos-arm64:
     extends: .apple-os-common
     tags:
-        - macos-xcode15
+        - macos-xcode26
     variables:
         <<: *variables-tvos-arm64
         EXTRA_TARGET_FLAGS: --enable-shared
@@ -598,13 +598,13 @@ tvos-arm64:
 watchos-arm64_32:
     extends: .apple-os-common
     tags:
-        - macos-xcode15
+        - macos-xcode26
     variables: *variables-watchos-arm64_32
 
 xros-arm64:
     extends: .apple-os-common
     tags:
-        - macos-xcode15
+        - macos-xcode26
     variables: *variables-xros-arm64
 
 #
