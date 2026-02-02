@@ -64,7 +64,6 @@ test_titles(struct ctx *ctx, bool null_names)
         assert(VEC_LAST(vec).title_idx == 4);
     }
 
-    test_prestop(ctx);
     wait_state(ctx, VLC_PLAYER_STATE_STOPPED);
     assert_normal_state(ctx);
     test_end(ctx);
