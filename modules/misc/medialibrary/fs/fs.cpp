@@ -22,6 +22,10 @@
 # include "config.h"
 #endif
 
+#ifdef __APPLE__
+# include <TargetConditionals.h>
+#endif
+
 #include <algorithm>
 #include <vlc_services_discovery.h>
 #include <medialibrary/IDeviceLister.h>
@@ -48,7 +52,11 @@ SDFileSystemFactory::SDFileSystemFactory(vlc_object_t *parent,
         .max_parser_threads = 1,
         .max_thumbnailer_threads = 0,
         .timeout = VLC_TICK_FROM_SEC(15),
+#if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IPHONE)
+        .external_process = false,
+#else
         .external_process = true,
+#endif
     })
 {
     m_isNetwork = strncasecmp( m_scheme.c_str(), "file://",
