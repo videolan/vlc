@@ -1,5 +1,5 @@
 # GCRYPT
-GCRYPT_VERSION := 1.10.1
+GCRYPT_VERSION := 1.12.0
 GCRYPT_URL := $(GNUGPG)/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 PKGS += gcrypt
@@ -21,25 +21,18 @@ gcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(call pkg_static,"src/libgcrypt.pc.in")
 	# $(call update_autoconfig,build-aux)
 	$(APPLY) $(SRC)/gcrypt/disable-tests-compilation.patch
-	$(APPLY) $(SRC)/gcrypt/fix-pthread-detection.patch
-	$(APPLY) $(SRC)/gcrypt/0001-compat-provide-a-getpid-replacement-that-works-on-Wi.patch
 	$(APPLY) $(SRC)/gcrypt/0007-random-don-t-use-API-s-that-are-forbidden-in-UWP-app.patch
 	$(APPLY) $(SRC)/gcrypt/0008-random-only-use-wincrypt-in-UWP-builds-if-WINSTORECO.patch
 
 	# don't use getpid in UWP as it's not actually available
 	$(APPLY) $(SRC)/gcrypt/gcrypt-uwp-getpid.patch
-ifdef HAVE_CROSS_COMPILE
-	# disable cross-compiled command line tools that can't be run
-	sed -i.orig -e 's,^bin_PROGRAMS ,bin_PROGRAMS_disabled ,g' $(UNPACK_DIR)/src/Makefile.am
-endif
-
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error $(DEPS_gpg-error)
 
 GCRYPT_CONF = \
 	--enable-ciphers=aes,des,rfc2268,arcfour,chacha20 \
-	--enable-digests=sha1,md5,rmd160,sha256,sha512,blake2 \
+	--enable-digests=sha1,md5,rmd160,sha256,sha512,blake2,sha3 \
 	--enable-pubkey-ciphers=dsa,rsa,ecc \
 	--disable-doc
 
@@ -71,6 +64,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(GCRYPT_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+	+$(MAKEBUILD) bin_PROGRAMS=
+	+$(MAKEBUILD) bin_PROGRAMS= install
 	touch $@
