@@ -1,16 +1,31 @@
---- gcrypt/compat/libcompat.h.orig	2019-06-23 17:35:08.000000000 +0200
-+++ gcrypt/compat/libcompat.h	2023-05-23 14:09:47.426668700 +0200
-@@ -26,6 +26,13 @@ const char *_gcry_compat_identification
- #ifndef HAVE_GETPID
- pid_t _gcry_getpid (void);
- #define getpid() _gcry_getpid ()
-+#elif defined(_WIN32)
+From 7e079a2afe445eb629157a89ab2a75c104cbe151 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 23 May 2023 14:32:17 +0200
+Subject: [PATCH 4/4] void getpid calls on Windows
+
+It's not available in UWP.
+---
+ compat/libcompat.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/compat/libcompat.h b/compat/libcompat.h
+index 411a27be..90f937c6 100644
+--- a/compat/libcompat.h
++++ b/compat/libcompat.h
+@@ -22,4 +22,13 @@
+ 
+ const char *_gcry_compat_identification (void);
+ 
++#if defined(_WIN32)
 +#include <winapifamily.h>
 +# if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 +# include <windows.h>
 +   /* getpid is incorrectly detected, it's not available in this case */
 +#  define getpid() GetCurrentProcessId ()
 +# endif
- #endif
- 
- #ifndef HAVE_CLOCK
++#endif
++
+ #endif /*GCRY_LIBCOMPAT_H*/
+-- 
+2.52.0.windows.1
+
