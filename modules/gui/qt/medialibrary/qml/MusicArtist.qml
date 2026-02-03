@@ -291,36 +291,36 @@ FocusScope {
                             showText: !_contentItem.compactButtons
 
                             Navigation.parentItem: pinnedMusicAlbumSection
-                            Navigation.rightItem: previousSectionButton
+                            // Navigation.rightItem: previousSectionButton
                             Navigation.leftItem: playButton
                         }
 
-                        MusicAlbumSectionDelegate.PreviousSectionButton {
-                            id: previousSectionButton
+                        // MusicAlbumSectionDelegate.PreviousSectionButton {
+                        //     id: previousSectionButton
 
-                            delegate: pinnedMusicAlbumSection
+                        //     delegate: pinnedMusicAlbumSection
 
-                            visible: _contentItem.displayPositioningButtons
+                        //     visible: _contentItem.displayPositioningButtons
 
-                            showText: !_contentItem.compactButtons
+                        //     showText: !_contentItem.compactButtons
 
-                            Navigation.parentItem: pinnedMusicAlbumSection
-                            Navigation.rightItem: nextSectionButton
-                            Navigation.leftItem: enqueueButton
-                        }
+                        //     Navigation.parentItem: pinnedMusicAlbumSection
+                        //     Navigation.rightItem: nextSectionButton
+                        //     Navigation.leftItem: enqueueButton
+                        // }
 
-                        MusicAlbumSectionDelegate.NextSectionButton {
-                            id: nextSectionButton
+                        // MusicAlbumSectionDelegate.NextSectionButton {
+                        //     id: nextSectionButton
 
-                            delegate: pinnedMusicAlbumSection
+                        //     delegate: pinnedMusicAlbumSection
 
-                            visible: _contentItem.displayPositioningButtons
+                        //     visible: _contentItem.displayPositioningButtons
 
-                            showText: !_contentItem.compactButtons
+                        //     showText: !_contentItem.compactButtons
 
-                            Navigation.parentItem: pinnedMusicAlbumSection
-                            Navigation.leftItem: previousSectionButton
-                        }
+                        //     Navigation.parentItem: pinnedMusicAlbumSection
+                        //     Navigation.leftItem: previousSectionButton
+                        // }
                     }
 
                     Navigation.parentItem: root

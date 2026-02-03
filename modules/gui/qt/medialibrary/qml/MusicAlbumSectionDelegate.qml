@@ -355,45 +355,45 @@ T.Pane {
                     showText: !_contentItem.compactDownButtons
 
                     Navigation.parentItem: root
-                    Navigation.rightItem: previousSectionButton.enabled ? previousSectionButton
-                                                                        : nextSectionButton
+                    // Navigation.rightItem: previousSectionButton.enabled ? previousSectionButton
+                    //                                                     : nextSectionButton
                     Navigation.leftItem: playButton
                 }
             }
         }
 
-        Column {
-            Layout.alignment: Qt.AlignVCenter
+        // Column {
+        //     Layout.alignment: Qt.AlignVCenter
 
-            spacing: VLCStyle.margin_small
+        //     spacing: VLCStyle.margin_small
 
-            PreviousSectionButton {
-                id: previousSectionButton
+        //     PreviousSectionButton {
+        //         id: previousSectionButton
 
-                delegate: root
+        //         delegate: root
 
-                activeFocusOnTab: false
+        //         activeFocusOnTab: false
 
-                showText: !_contentItem.compactRightButtons
+        //         showText: !_contentItem.compactRightButtons
 
-                Navigation.parentItem: root
-                Navigation.downItem: nextSectionButton
-                Navigation.leftItem: enqueueButton
-            }
+        //         Navigation.parentItem: root
+        //         Navigation.downItem: nextSectionButton
+        //         Navigation.leftItem: enqueueButton
+        //     }
 
-            NextSectionButton {
-                id: nextSectionButton
+        //     NextSectionButton {
+        //         id: nextSectionButton
 
-                delegate: root
+        //         delegate: root
 
-                activeFocusOnTab: false
+        //         activeFocusOnTab: false
 
-                showText: !_contentItem.compactRightButtons
+        //         showText: !_contentItem.compactRightButtons
 
-                Navigation.parentItem: root
-                Navigation.upItem: previousSectionButton
-                Navigation.leftItem: enqueueButton
-            }
-        }
+        //         Navigation.parentItem: root
+        //         Navigation.upItem: previousSectionButton
+        //         Navigation.leftItem: enqueueButton
+        //     }
+        // }
     }
 }
