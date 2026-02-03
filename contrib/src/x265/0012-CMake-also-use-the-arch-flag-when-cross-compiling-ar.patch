@@ -1,0 +1,29 @@
+From e315733100aa08951d859e0ab16e66c1fc6c36be Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Tue, 3 Feb 2026 14:06:23 +0100
+Subject: [PATCH 12/12] CMake: also use the -arch flag when cross-compiling
+ arm64 for Apple
+
+Missing from 2bb9b9f83ac7d0daa919bbe73159d57a7d5a1a52.
+It's possible to cross-compile from x86_64 to arm64.
+---
+ source/CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index a8e6b143b..a84df13bd 100755
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -735,6 +735,9 @@ if((MSVC_IDE OR XCODE OR GCC) AND ENABLE_ASSEMBLY)
+ 	elseif(ARM64 OR CROSS_COMPILE_ARM64)
+     # compile ARM64 arch asm files here
+         enable_language(ASM)
++        if(APPLE)
++            set(ARM_ARGS ${ARM_ARGS} -arch ${CMAKE_OSX_ARCHITECTURES})
++        endif()
+         foreach(ASM ${ARM_ASMS})
+             set(ASM_SRC ${CMAKE_CURRENT_SOURCE_DIR}/common/aarch64/${ASM})
+             list(APPEND ASM_SRCS ${ASM_SRC})
+-- 
+2.50.1 (Apple Git-155)
+
