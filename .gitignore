@@ -57,6 +57,7 @@ target*/
 contrib-*
 install-*
 xcodeproj/
+static-lib/
 !buildsystem/
 !build.rs
 !extras/package/apple/build.sh
