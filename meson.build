@@ -520,11 +520,13 @@ if get_option('extra_checks')
         '-Werror=implicit-int',
         '-Werror=declaration-missing-parameter-type',
         '-Werror=excess-initializers',
+        '-Werror=unterminated-string-initialization',
     ]), language: ['c'])
     add_project_arguments(cpp.get_supported_arguments([
         '-Werror=missing-field-initializers',
         '-Werror=format',
         '-Werror=excess-initializers',
+        '-Werror=unterminated-string-initialization',
     ]), language: ['cpp'])
 endif
 
