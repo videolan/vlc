@@ -676,6 +676,9 @@ else
 	echo "set(CMAKE_OSX_ARCHITECTURES \"$(ARCH)\" CACHE STRING \"\")" >> $@
 endif
 endif
+ifdef VLC_DEPLOYMENT_TARGET
+	echo "set(CMAKE_OSX_DEPLOYMENT_TARGET \"$(VLC_DEPLOYMENT_TARGET)\" CACHE STRING \"\")" >> $@
+endif
 ifdef HAVE_IOS
 	echo "set(CMAKE_OSX_SYSROOT $(IOS_SDK))" >> $@
 else
