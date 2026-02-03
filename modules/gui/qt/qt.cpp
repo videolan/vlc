@@ -47,6 +47,10 @@ QT_END_NAMESPACE
 extern "C" char **environ;
 #endif
 
+#ifdef __APPLE__
+# include <TargetConditionals.h>
+#endif
+
 #include <QApplication>
 #include <QDate>
 #include <QMutex>
@@ -557,7 +561,7 @@ static int OpenInternal( qt_intf_t *p_intf )
         return VLC_EGENERIC;
 #endif
 
-#if (_POSIX_SPAWN >= 0) && !defined(TARGET_OS_IPHONE)
+#if (_POSIX_SPAWN >= 0) && (!defined(__APPLE__) || TARGET_OS_OSX)
     /* Check if QApplication works */
     /* Note: Disabled on iOS/tvOS/visionOS as process spawning is not allowed */
     char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, "vlc-qt-check");
