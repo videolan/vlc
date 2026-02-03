@@ -667,6 +667,15 @@ ifdef HAVE_DARWIN_OS
 	echo "set(CMAKE_CXX_FLAGS \"$(CXXFLAGS)\")" >> $@
 	echo "set(CMAKE_LD_FLAGS \"$(LDFLAGS)\")" >> $@
 	echo "set(CMAKE_AR ar CACHE FILEPATH \"Archiver\")" >> $@
+ifeq ($(ARCH),aarch64)
+	echo "set(CMAKE_OSX_ARCHITECTURES \"arm64\" CACHE STRING \"\")" >> $@
+else
+ifeq ($(ARCH),arm)
+	echo "set(CMAKE_OSX_ARCHITECTURES \"armv7\" CACHE STRING \"\")" >> $@
+else
+	echo "set(CMAKE_OSX_ARCHITECTURES \"$(ARCH)\" CACHE STRING \"\")" >> $@
+endif
+endif
 ifdef HAVE_IOS
 	echo "set(CMAKE_OSX_SYSROOT $(IOS_SDK))" >> $@
 else
