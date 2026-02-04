@@ -957,7 +957,7 @@ mkv_track_t::mkv_track_t(enum es_format_category_e es_cat) :
             /* fall through */
         case VIDEO_ES:
         case SPU_ES:
-            fmt.psz_language = strdup("English");
+            fmt.psz_language = strdup("eng");
             break;
         default:
             // no language needed
