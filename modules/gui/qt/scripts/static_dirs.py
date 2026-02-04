@@ -105,6 +105,8 @@ if __name__ == "__main__":
                 for lib in l:
                     if lib == '':
                         continue
+                    if lib == '$(SUBLIBS)':
+                        continue
                     if lib.startswith('-l'):
                         result += ' ' + lib
                     elif lib.endswith('.so') or lib.endswith('.a'):
