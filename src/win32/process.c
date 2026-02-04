@@ -12,6 +12,7 @@
 #endif
 
 #include <windows.h>
+#include <io.h>
 
 #include <vlc_common.h>
 #include <vlc_process.h>
@@ -122,8 +123,14 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv)
         errno = EINVAL;
         goto end;
     }
+    
+    int stderr_fd = -1;
+    intptr_t h_err = _get_osfhandle(STDERR_FILENO);
+    if (h_err != -1 && h_err != -2) {
+        stderr_fd = STDERR_FILENO;
+    }
 
-    int process_fds[4] = {extfd_in, extfd_out, STDERR_FILENO, -1};
+    int process_fds[4] = {extfd_in, extfd_out, stderr_fd, -1};
 
     /* `argc + 2`, 1 for the process->path and the last to be NULL */
     args = malloc((argc + 2) * sizeof(*args));
