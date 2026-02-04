@@ -1090,11 +1090,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 
     MetaDataHandlers::Dispatcher().iterate ( m->begin(), m->end(), &metadata_payload );
 
-    vlc_viewpoint_from_euler( &p_track->fmt.video.pose,
-                              metadata_payload.pose.yaw,
-                              metadata_payload.pose.pitch,
-                              metadata_payload.pose.roll);
-
     if( p_track->i_number == 0 )
     {
         msg_Warn( &sys.demuxer, "Missing KaxTrackNumber, discarding track!" );
@@ -1108,6 +1103,11 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         if (iso_lang != nullptr)
             msg_Dbg( &sys.demuxer, "Unknown language %s!", metadata_payload.lang.c_str() );
         p_track->fmt.psz_language = strdup(metadata_payload.lang.c_str());
+
+        vlc_viewpoint_from_euler( &p_track->fmt.video.pose,
+                                  metadata_payload.pose.yaw,
+                                  metadata_payload.pose.pitch,
+                                  metadata_payload.pose.roll);
 
 #ifdef HAVE_ZLIB
         if( p_track->i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
