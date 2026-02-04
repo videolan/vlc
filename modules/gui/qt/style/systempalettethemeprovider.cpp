@@ -226,7 +226,16 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setQtColorSetBg(obj, CS, VQTC_NAME_PRIMARY, QPalette::Window);
         setQtColorSetFg(obj, CS, VQTC_NAME_PRIMARY, QPalette::WindowText);
 
+        QColor hightlightPressed = sys->m_isDark ? hightlight.lighter(120) : hightlight.darker(110);
+
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_NORMAL, Qt::transparent);
+        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_HOVERED, hightlight);
+        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_FOCUSED, hightlight);
+        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_PRESSED, hightlightPressed);
+
+        setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_PRIMARY, VQTC_STATE_HOVERED, textOnHightlight);
+        setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_PRIMARY, VQTC_STATE_FOCUSED, textOnHightlight);
+        setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_PRIMARY, VQTC_STATE_PRESSED, textOnHightlight);
     }
 
     //tool button
