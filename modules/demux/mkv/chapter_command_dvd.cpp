@@ -69,7 +69,7 @@ bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, ChapterProces
 std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
 {
     std::string result;
-    if ( p_private_data->GetSize() >= 3)
+    if ( p_private_data && p_private_data->GetSize() >= 3)
     {
         const binary* p_data = p_private_data->GetBuffer();
 /*        if ( p_data[0] == MATROSKA_DVD_LEVEL_TT )
