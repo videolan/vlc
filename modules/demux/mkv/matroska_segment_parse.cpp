@@ -249,6 +249,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
       demux_t            * p_demuxer;
       bool&                bSupported;
       int                  level;
+      std::string          lang;
+      bool                 lang_is_ietf;
       struct {
         unsigned int i_crop_right;
         unsigned int i_crop_left;
@@ -269,7 +271,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
       } pose;
 
     } metadata_payload = {
-      this, p_track, &sys.demuxer, bSupported, 3, { }, { }
+      this, p_track, &sys.demuxer, bSupported, 3, "eng", false, { }, { }
     };
 
     MKV_SWITCH_CREATE( EbmlTypeDispatcher, MetaDataHandlers, MetaDataCapture )
@@ -367,12 +369,25 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxTrackLanguage, lang )
         {
-            free( vars.tk->fmt.psz_language );
             const std::string slang ( lang );
             size_t pos = slang.find_first_of( '-' );
-            vars.tk->fmt.psz_language = pos != std::string::npos ? strndup( slang.c_str (), pos ) : strdup( slang.c_str() );
-            debug( vars, "Track Language=`%s'", vars.tk->fmt.psz_language ? vars.tk->fmt.psz_language : "(null)" );
+            const std::string l = std::string::npos ? slang.substr(0, pos) : slang;
+            debug( vars, "Track Language=`%s'", !l.empty() ? l.c_str() : "(null)" );
+            if (!vars.lang_is_ietf)
+            {
+                vars.lang = l;
+            }
         }
+#if LIBMATROSKA_VERSION >= 0x010406
+        E_CASE( KaxLanguageIETF, lang )
+        {
+            vars.lang_is_ietf = true;
+            const std::string slang ( lang );
+            size_t pos = slang.find_first_of( '-' );
+            vars.lang = pos != std::string::npos ? slang.substr(0, pos) : slang;
+            debug( vars, "IETF Track Language=`%s'", !vars.lang.empty() ? vars.lang.c_str() : "(null)" );
+        }
+#endif
         E_CASE( KaxCodecID, codecid )
         {
             vars.tk->codec = std::string( codecid );
@@ -1088,6 +1103,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 
     if ( bSupported )
     {
+        p_track->fmt.psz_language = strdup(metadata_payload.lang.c_str());
+
 #ifdef HAVE_ZLIB
         if( p_track->i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
             p_track->i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
