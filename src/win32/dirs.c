@@ -79,6 +79,10 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
             dir = config_GetDataDir();
             break;
         case VLC_PKG_LIB_DIR:
+            dir = getenv ("VLC_LIB_PATH");
+            if (dir)
+                return strdup( dir );
+            /* fallthrough */
         case VLC_PKG_LIBEXEC_DIR:
             dir = config_GetLibDir();
             break;
