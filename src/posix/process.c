@@ -15,6 +15,7 @@
 # include <poll.h>
 #endif
 
+#include <assert.h>
 #include <signal.h>
 #include <sys/poll.h>
 
@@ -39,7 +40,7 @@ struct vlc_process*
 vlc_process_Spawn(const char *path, int argc, const char *const *argv)
 {
     assert(path != NULL);
-    assert(argc > 0); 
+    assert(argc > 0);
     assert(argv != NULL);
     assert(argv[0] != NULL);
 
