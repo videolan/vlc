@@ -132,9 +132,7 @@ MainViewLoader {
         }
 
         onRequestInputItems: (indexes, data, resolve, reject) => {
-            resolve(
-                model.getItemsForIndexes(indexes)
-            )
+            model.getItemsForIndexes(indexes, resolve)
         }
     }
 

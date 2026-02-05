@@ -781,7 +781,7 @@ void QmlAudioContextMenu::popup(const QPoint & position)
     qt_intf_t* p_intf = m_ctx->getIntf();
     if (!p_intf)
         return;
-    
+
     m_menu.reset(PopupMenu(p_intf, false));
     if (m_menu)
         m_menu->popup(position);
@@ -939,16 +939,16 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
     connect(action, &QAction::triggered, [this, selected]( ) {
         if (selected.isEmpty()) return;
 
-        QVariantList items = m_model->getItemsForIndexes(selected);
+        m_model->getItemsForIndexes(selected, [](const QVariantList& items) {
+            if (items.isEmpty()) return;
 
-        if (items.isEmpty()) return;
+            QVariant firstItem = items.first();
 
-        QVariant firstItem = items.first();
-        
-        if (firstItem.canConvert<SharedInputItem>()) {
-             SharedInputItem sii = firstItem.value<SharedInputItem>();
-             DialogsProvider::getInstance()->mediaInfoDialog(sii);
-        }
+            if (firstItem.canConvert<SharedInputItem>()) {
+                 SharedInputItem sii = firstItem.value<SharedInputItem>();
+                 DialogsProvider::getInstance()->mediaInfoDialog(sii);
+            }
+        });
     });
 
     bool canBeIndexed = false;
@@ -1008,16 +1008,16 @@ void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos
     connect(action, &QAction::triggered, [this, selected]( ) {
         if (selected.isEmpty()) return;
 
-        QVariantList items = m_model->getItemsForIndexes(selected);
+        m_model->getItemsForIndexes(selected, [](const QVariantList& items) {
+            if (items.isEmpty()) return;
 
-        if (items.isEmpty()) return;
+            QVariant firstItem = items.first();
 
-        QVariant firstItem = items.first();
-        
-        if (firstItem.canConvert<SharedInputItem>()) {
-             SharedInputItem sii = firstItem.value<SharedInputItem>();
-             DialogsProvider::getInstance()->mediaInfoDialog(sii);
-        }
+            if (firstItem.canConvert<SharedInputItem>()) {
+                 SharedInputItem sii = firstItem.value<SharedInputItem>();
+                 DialogsProvider::getInstance()->mediaInfoDialog(sii);
+            }
+        });
     });
 
     menu->popup(pos);
