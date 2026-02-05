@@ -149,7 +149,6 @@ _Noreturn void vlc_control_cancel (vlc_cleanup_t *cleaner)
 #endif
 
 #if !defined(_WIN32)
-# define HAVE_WEAK_SPAWN
 # define HAVE_WEAK_SPAWNP
 #else
 # if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -157,7 +156,7 @@ _Noreturn void vlc_control_cancel (vlc_cleanup_t *cleaner)
 # endif
 #endif
 
-#if defined(HAVE_WEAK_SPAWN) || defined(HAVE_WEAK_SPAWNP)
+#if !defined(HAVE_VLC_PROCESS_SPAWN) || defined(HAVE_WEAK_SPAWNP)
 #include <errno.h>
 #include <vlc_spawn.h>
 #endif
@@ -187,8 +186,8 @@ int vlc_waitpid(pid_t pid)
 }
 #endif
 
-#if defined(HAVE_WEAK_SPAWN)
-VLC_WEAK struct vlc_process *
+#if !defined(HAVE_VLC_PROCESS_SPAWN)
+struct vlc_process *
 vlc_process_Spawn(const char *path, int argc, const char *const *argv)
 {
     VLC_UNUSED(path);
@@ -197,7 +196,7 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv)
     return NULL;
 }
 
-VLC_WEAK int
+int
 vlc_process_Terminate(struct vlc_process *process, bool kill_process)
 {
     VLC_UNUSED(process);
@@ -206,7 +205,7 @@ vlc_process_Terminate(struct vlc_process *process, bool kill_process)
     return -1;
 }
 
-VLC_WEAK ssize_t
+ssize_t
 vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
                     vlc_tick_t timeout_ms)
 {
@@ -218,7 +217,7 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
     return -1;
 }
 
-VLC_WEAK ssize_t
+ssize_t
 vlc_process_fd_Write(struct vlc_process *process, const uint8_t *buf, size_t size,
                      vlc_tick_t timeout_ms)
 {
