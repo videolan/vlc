@@ -2966,6 +2966,15 @@ dnl  Ambisonic channel mixer and binauralizer plugin
 dnl
 PKG_ENABLE_MODULES_VLC([SPATIALAUDIO], [], [spatialaudio], [Ambisonic channel mixer and binauralizer], [auto])
 
+AS_IF([test -n ${SPATIALAUDIO_CFLAGS+set}], [
+    VLC_SAVE_FLAGS
+    AX_APPEND_FLAG([$SPATIALAUDIO_CFLAGS], [CFLAGS])
+    AC_CHECK_HEADER([spatialaudio/SpatialaudioVersion.h], [
+        AX_APPEND_FLAG([-DHAVE_SPATIALAUDIOVERSION_H=1], [SPATIALAUDIO_CFLAGS])
+    ])
+    VLC_RESTORE_FLAGS
+])
+
 dnl
 dnl  theora decoder plugin
 dnl

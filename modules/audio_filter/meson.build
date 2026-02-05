@@ -157,10 +157,16 @@ vlc_modules += {
 # Spatial audio (ambisonics/binaural) mixer
 spatial_dep = dependency('spatialaudio', required: get_option('spatialaudio'))
 if spatial_dep.found()
+    spatial_extra_cflags = []
+    if (spatial_dep.version().version_compare('>= 0.4.0'))
+        spatial_extra_cflags += ['-DHAVE_SPATIALAUDIOVERSION_H=1']
+    endif
+
     vlc_modules += {
         'name' : 'spatialaudio',
         'sources' : files('channel_mixer/spatialaudio.cpp'),
-        'dependencies' : [spatial_dep]
+        'dependencies' : [spatial_dep],
+        'c_args' : spatial_extra_cflags
     }
 endif
 
@@ -242,4 +248,3 @@ if rnnoise_dep.found()
 	'dependencies' : [m_lib, rnnoise_dep]
     }
 endif
-
