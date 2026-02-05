@@ -107,7 +107,6 @@ private:
     vlc::threads::condition_variable m_cond;
     vlc::threads::mutex m_mutex;
     ParseContext* m_currentCtx;
-    vlc_object_t* m_obj;
     LazyPreparser m_parser;
 };
 

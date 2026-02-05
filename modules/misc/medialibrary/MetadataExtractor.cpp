@@ -92,7 +92,6 @@ std::string EmbeddedThumbnail::extension() const
 
 MetadataExtractor::MetadataExtractor( vlc_object_t* parent )
     : m_currentCtx( nullptr )
-    , m_obj( parent )
     , m_parser(parent, {
         .types = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_OPTION_SUBITEMS,
         .max_parser_threads = 1,
