@@ -34,6 +34,8 @@
 #include <QSemaphore>
 #include <QDateTime>
 #include <QTimeZone>
+#include <QJSValue>
+#include <QQmlEngine>
 
 
 namespace {
@@ -861,53 +863,66 @@ bool NetworkMediaModel::addAndPlay(const QModelIndexList& itemIdList)
 }
 
 /* Q_INVOKABLE */
-QVariantList NetworkMediaModel::getItemsForIndexes(const QModelIndexList & indexes) const
+void NetworkMediaModel::getItemsForIndexes(const QModelIndexList & indexes, QJSValue callback)
 {
-    Q_D(const NetworkMediaModel);
-    QVariantList items;
+    if (!callback.isCallable())
+        return;
 
-    bool allInCache = true;
+    getItemsForIndexes(indexes, [this, callback](const QVariantList& items) mutable {
+        auto engine = qjsEngine(this);
+        if (engine)
+            callback.call({engine->toScriptValue(items)});
+    });
+}
+
+void NetworkMediaModel::getItemsForIndexes(const QModelIndexList & indexes, std::function<void(const QVariantList&)> callback)
+{
+    Q_D(NetworkMediaModel);
+
+    if (!callback)
+        return;
+
+    if (indexes.isEmpty())
+    {
+        callback(QVariantList());
+        return;
+    }
+
+    int maxIndex = 0;
     for (const QModelIndex & modelIndex : indexes)
     {
-        const NetworkMediaItem* item = d->getItemForRow(modelIndex.row());
-        if (!item)
+        if (modelIndex.row() > maxIndex)
+            maxIndex = modelIndex.row();
+    }
+
+    // check if we have loaded all items we need in the cache
+    unsigned int loaded = getLoadedCount();
+    unsigned int maximum = getMaximumCount();
+    unsigned int needed = static_cast<unsigned int>(maxIndex) + 1;
+
+    if (loaded >= needed || loaded >= maximum)
+    {
+        QVariantList items;
+        for (const QModelIndex & modelIndex : indexes)
         {
-            allInCache = false;
-            break;
+            const NetworkMediaItem* item = d->getItemForRow(modelIndex.row());
+            if (!item)
+                continue;
+
+            const NetworkTreeItem & tree = item->tree;
+            items.append(QVariant::fromValue(SharedInputItem(tree.media.get(), true)));
         }
 
-        const NetworkTreeItem & tree = item->tree;
-        items.append(QVariant::fromValue(SharedInputItem(tree.media.get(), true)));
+        callback(items);
+        return;
     }
 
-    if (allInCache)
-        return items;
+    // item() internally calls refer() to trigger cache loading for all items till the max index
+    d->item(maxIndex);
 
-    // Sometimes if there are many items selected, some are not in cache so we need to rebuild the list
-    items.clear();
-    std::vector<NetworkMediaItemPtr> modelData = d->getModelData(d->m_searchPattern);
-
-    auto sortFunc = d->getSortFunction();
-    if (sortFunc)
-        std::sort(modelData.begin(), modelData.end(), sortFunc);
-
-    for (const QModelIndex & modelIndex : indexes)
-    {
-        int index = modelIndex.row();
-
-        if (index < 0 || index >= static_cast<int>(modelData.size()))
-            continue;
-
-        const NetworkMediaItemPtr& item = modelData[index];
-        if (!item)
-            continue;
-
-        const NetworkTreeItem & tree = item->tree;
-
-        items.append(QVariant::fromValue(SharedInputItem(tree.media.get(), true)));
-    }
-
-    return items;
+    connect(this, &NetworkMediaModel::dataChanged, this, [this, indexes, callback]() {
+        getItemsForIndexes(indexes, callback);
+    }, Qt::SingleShotConnection);
 }
 
 MainCtx* NetworkMediaModel::getCtx() const {

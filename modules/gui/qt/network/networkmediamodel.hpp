@@ -29,9 +29,11 @@
 #include "networkbasemodel.hpp"
 
 #include <memory>
+#include <functional>
 
 Q_MOC_INCLUDE( "maininterface/mainctx.hpp" )
 
+class QJSValue;
 class MainCtx;
 
 class NetworkTreeItem
@@ -164,7 +166,8 @@ public:
     Q_INVOKABLE bool addAndPlay(const QVariantList& itemIdList);
     Q_INVOKABLE bool addAndPlay(const QModelIndexList& itemIdList);
 
-    Q_INVOKABLE QVariantList getItemsForIndexes(const QModelIndexList & indexes) const;
+    Q_INVOKABLE void getItemsForIndexes(const QModelIndexList & indexes, QJSValue callback);
+    void getItemsForIndexes(const QModelIndexList & indexes, std::function<void(const QVariantList&)> callback);
 
 signals:
     void nameChanged();
