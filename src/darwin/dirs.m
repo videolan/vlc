@@ -68,6 +68,25 @@ static char *config_getLibraryDirReal(const char *fallback)
     return NULL;
 }
 
+// Gets absolute path to auxiliary executable dir
+// Usually stored alongside main executables in appleOS bundles
+static char *config_getLibExecDir(const char *fallback)
+{
+    if (config_isBundle()) {
+        NSBundle *bundle = [NSBundle mainBundle];
+        NSString *path = [bundle pathForAuxiliaryExecutable: @""];
+        if (!path)
+            return NULL;
+
+        return strdup(path.UTF8String);
+    }
+
+    if (fallback)
+        return strdup(fallback);
+
+    return NULL;
+}
+
 static char *config_getDataDirReal(const char *fallback)
 {
     const char *dir = getenv("VLC_DATA_PATH");
@@ -119,12 +138,11 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
             dir = config_getLibraryDirReal(LIBDIR);
             break;
 
-
         case VLC_PKG_LIBEXEC_DIR:
-            dir = config_getLibraryDirReal(PKGLIBEXECDIR);
+            dir = config_getLibExecDir(PKGLIBEXECDIR);
             break;
         case VLC_LIBEXEC_DIR:
-            dir = config_getLibraryDirReal(LIBEXECDIR);
+            dir = config_getLibExecDir(LIBEXECDIR);
             break;
 
         case VLC_LOCALE_DIR:
