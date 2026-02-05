@@ -91,9 +91,19 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
                     return;
                 }
 
-                assert(!m_provider);
+                // Clear any existing provider before setting the new one
+                if (m_provider)
+                {
+                    disconnect(m_provider, nullptr, this, nullptr);
+                    m_provider = nullptr;
+                }
 
                 m_provider = m_source->textureProvider(); // This can only be called in the rendering thread.
+                if (!m_provider)
+                {
+                    qmlWarning(this) << "Failed to get texture provider from source";
+                    return;
+                }
                 assert(m_provider);
 
                 connect(m_provider, &QSGTextureProvider::textureChanged, this, &TextureProviderObserver::updateProperties, Qt::DirectConnection);
