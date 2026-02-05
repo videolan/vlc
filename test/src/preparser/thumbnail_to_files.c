@@ -372,11 +372,13 @@ int main(int argc, const char *argv[])
     if (ret != 0) {
         goto end;
     }
+#if !defined(HAVE_VLC_PROCESS_SPAWN)
     fprintf(stderr, "Run with external preparser...\n");
     ret = run_test(vlc, true);
     if (ret != 0) {
         goto end;
     }
+#endif
 
 end:
     libvlc_release(vlc);
