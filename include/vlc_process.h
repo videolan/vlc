@@ -10,13 +10,8 @@
 #ifndef VLC_PROCESS_H
 #define VLC_PROCESS_H
 
-#include <stdatomic.h>
-
 #include <vlc_common.h>
-#include <vlc_vector.h>
 #include <vlc_tick.h>
-#include <vlc_threads.h>
-#include <vlc_stream.h>
 
 /**
  * @ingroup misc
