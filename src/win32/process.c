@@ -13,6 +13,7 @@
 
 #include <windows.h>
 #include <io.h>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_process.h>
@@ -123,7 +124,7 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv)
         errno = EINVAL;
         goto end;
     }
-    
+
     int stderr_fd = -1;
     intptr_t h_err = _get_osfhandle(STDERR_FILENO);
     if (h_err != -1 && h_err != -2) {
