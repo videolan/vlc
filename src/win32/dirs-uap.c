@@ -28,11 +28,7 @@
 #define COBJMACROS
 #define INITGUID
 
-#ifndef UNICODE
-#define UNICODE
-#endif
 #include <vlc_common.h>
-#include <vlc_configuration.h>
 #include "../config/configuration.h"
 
 #include <vlc_charset.h>
@@ -151,92 +147,6 @@ end_other:
         return NULL;
 
     return GetFolderName(folder);
-}
-
-char *config_GetLibDir (void)
-{
-    /* Get our full path */
-    MEMORY_BASIC_INFORMATION mbi;
-    if (!VirtualQuery (config_GetLibDir, &mbi, sizeof(mbi)))
-        goto error;
-
-    wchar_t wpath[MAX_PATH];
-    if (!GetModuleFileNameW ((HMODULE) mbi.AllocationBase, wpath, MAX_PATH))
-        goto error;
-
-    wchar_t *file = wcsrchr (wpath, L'\\');
-    if (file == NULL)
-        goto error;
-    *file = L'\0';
-
-    return FromWide (wpath);
-error:
-    abort ();
-}
-
-static char *config_GetLibexecDir (void)
-{
-    wchar_t wpath[MAX_PATH];
-    if (!GetModuleFileNameW (NULL, wpath, MAX_PATH))
-        goto error;
-
-    wchar_t *file = wcsrchr (wpath, L'\\');
-    if (file == NULL)
-        goto error;
-    *file = L'\0';
-
-    return FromWide (wpath);
-error:
-    abort ();
-}
-
-static char *config_GetDataDir(void)
-{
-    const char *path = getenv ("VLC_DATA_PATH");
-    return (path != NULL) ? strdup (path) : config_GetLibDir ();
-}
-
-char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
-{
-    char *dir = NULL;
-
-    switch (type)
-    {
-        case VLC_PKG_DATA_DIR:
-            dir = config_GetDataDir();
-            break;
-        case VLC_PKG_LIB_DIR:
-            dir = getenv ("VLC_LIB_PATH");
-            if (dir)
-                return strdup( dir );
-            dir = config_GetLibDir();
-            break;
-        case VLC_PKG_LIBEXEC_DIR:
-            dir = getenv ("VLC_LIBEXEC_PATH");
-            if (dir)
-                return strdup( dir );
-            dir = config_GetLibexecDir();
-            break;
-        case VLC_SYSDATA_DIR:
-            return NULL;
-        case VLC_LOCALE_DIR:
-            dir = config_GetSysPath(VLC_PKG_DATA_DIR, "locale");
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
-
-    if (unlikely(dir == NULL))
-        return NULL;
-
-    if (filename == NULL)
-        return dir;
-
-    char *path;
-    if (unlikely(asprintf(&path, "%s\\%s", dir, filename) == -1))
-        path = NULL;
-    free(dir);
-    return path;
 }
 
 static char *config_GetAppDir (void)

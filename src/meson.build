@@ -341,6 +341,7 @@ if host_system == 'darwin'
     endif
 elif host_system == 'windows'
     libvlccore_sources += [
+        'win32/dirs-common.c',
         'win32/error.c',
         'win32/filesystem.c',
         'win32/netconf.c',

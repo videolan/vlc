@@ -448,6 +448,7 @@ libvlccore_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_libvlccore)
 
 if HAVE_WIN32
 libvlccore_la_SOURCES += \
+	win32/dirs-common.c \
 	win32/error.c \
 	win32/filesystem.c \
 	win32/netconf.c \
