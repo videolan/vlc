@@ -40,7 +40,17 @@ vlc_preparser_t *vlc_preparser_New(vlc_object_t *obj,
     if (preparser == NULL) {
         return NULL;
     }
+#if defined(HAVE_VLC_PROCESS_SPAWN)
+    const bool external_process = cfg->external_process;
+#else
     if (cfg->external_process) {
+        assert(!cfg->external_process);
+        msg_Err(obj, "external preparser requested on unsupported platform");
+        return NULL;
+    }
+    const bool external_process = false;
+#endif
+    if (external_process) {
         preparser->sys = vlc_preparser_external_New(preparser, obj, cfg);
     } else {
         preparser->sys = vlc_preparser_internal_New(preparser, obj, cfg);
