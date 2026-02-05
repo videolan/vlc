@@ -1555,7 +1555,7 @@ void KeySelectorControl::tableContextMenuEvent( QWidget *widget, QContextMenuEve
     {
         case ACTION_COL:
             empty = (item->normal.keys.isEmpty() && item->global.keys.isEmpty());
-            matches_default = (item->normal.matches_default && item->normal.matches_default);
+            matches_default = (item->normal.matches_default && item->global.matches_default);
             break;
         case HOTKEY_COL:
             empty = item->normal.keys.isEmpty();
