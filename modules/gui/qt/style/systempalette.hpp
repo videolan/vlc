@@ -130,6 +130,7 @@ public:
     COLOR_DEFINITION(lightGrey400, "#EDEDED");
     COLOR_DEFINITION(lightGrey500, "#E9E9E9");
     COLOR_DEFINITION(lightGrey600, "#E5E5E5");
+    COLOR_DEFINITION(lightGrey700, "#E0E0E0");
 
     COLOR_DEFINITION(red500, "#FF0000");
 

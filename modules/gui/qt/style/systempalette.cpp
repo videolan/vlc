@@ -531,8 +531,8 @@ void SystemPalette::makeLightPalette()
     {
         C::ColorSet CS = C::MenuBar;
         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(lightGrey300, 0.0));
-        setColor(CS, C::Bg, C::Primary, C::Focused, lightGrey300);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, lightGrey300);
+        setColor(CS, C::Bg, C::Primary, C::Focused, lightGrey700);
+        setColor(CS, C::Bg, C::Primary, C::Hovered, lightGrey700);
         setColor(CS, C::Fg, C::Primary, C::Normal, Qt::black);
         setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::black, 0.2));
     }
