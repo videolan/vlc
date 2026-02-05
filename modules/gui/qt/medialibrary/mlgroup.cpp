@@ -33,7 +33,7 @@ MLGroup::MLGroup(const vlc_ml_group_t * data)
     : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
     , m_title(qfu(data->psz_name))
     , m_duration(data->i_duration)
-    , m_date(data->i_creation_date)
+    , m_date(QDateTime::fromSecsSinceEpoch(data->i_creation_date))
     , m_count(data->i_nb_total_media)
 {
     assert(data);
@@ -55,7 +55,7 @@ VLCDuration MLGroup::getDuration() const
     return VLCDuration::fromMS(m_duration);
 }
 
-unsigned int MLGroup::getDate() const
+QDateTime MLGroup::getDate() const
 {
     return m_date;
 }

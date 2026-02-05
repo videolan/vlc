@@ -28,6 +28,8 @@
 // MediaLibrary includes
 #include "mlqmltypes.hpp"
 
+#include <QDateTime>
+
 class VLCDuration;
 
 class MLGroup : public MLItem
@@ -40,7 +42,7 @@ public: // Interface
 
     VLCDuration getDuration() const;
 
-    unsigned int getDate() const;
+    QDateTime getDate() const;
 
     unsigned int getCount() const;
 
@@ -49,7 +51,7 @@ private:
 
     int64_t m_duration;
 
-    unsigned int m_date;
+    QDateTime m_date;
 
     unsigned int m_count;
 };
