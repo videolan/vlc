@@ -68,9 +68,6 @@ EXTRA_DIST += \
 	extras/tools/libtool-2.5.4-clang-libs.patch \
 	extras/tools/libtool-2.4.7-lpthread.patch \
 	extras/tools/libtool-2.5.4-embed-bitcode.patch \
-	extras/tools/ninja-1.11.1-replace-pipes-quote-with-shlex-quote.patch \
-	extras/tools/0001-CanonicalizePath-Remove-kMaxComponents-limit.patch \
-	extras/tools/0002-CanonicalizePath-fix-a-b-._foo-a-replacement.patch \
 	extras/tools/pkg-config-stdc23-port.patch
 
 ###############################################################################
