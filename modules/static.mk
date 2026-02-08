@@ -26,10 +26,12 @@ PARTIAL_PLUGINS = $(PLUGINS:_plugin.la=_plugin.partial.la)
 	static_dependencies=`$(top_srcdir)/buildsystem/dependencies.sh static $<`; \
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) \
 		-r -o $@ -fPIC \
+		$(FORCE_GROUP_ALLOCATION_LDFLAGS) \
 		-Wl,-u,$${vlc_entrypoint} \
 		".libs/$${libpath}" \
 		$${static_dependencies}
-	@# Localize ALL symbols except VLC entry points
+	@# Resolve COMDAT groups so they don't cause cross-plugin dedup at final link
+	@# Then localize ALL symbols except VLC entry points
 	$(AM_V_at)$(OBJCOPY) --wildcard \
 		-G 'vlc_entry*' \
 		$@ || rm -f $@
