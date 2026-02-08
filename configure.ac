@@ -1054,6 +1054,32 @@ AS_IF([test "${enable_partial_linking}" = "yes" -a "${have_dynamic_objects}" = "
 
 AM_CONDITIONAL([HAVE_PARTIAL_LINKING], [test "${have_partial_linking}" = "yes"])
 
+dnl Check if the linker supports --force-group-allocation.
+dnl This flag resolves COMDAT section groups during partial linking, which are
+dnl generated when building C++ plugins. It proceed with intra-plugin
+dnl deduplication but will prevent cross-plugin deduplication since we don't
+dnl want the non-module ABI to be exposed out of the plugin object.
+FORCE_GROUP_ALLOCATION_LDFLAGS=""
+AS_IF([test "${have_partial_linking}" = "yes"], [
+    AC_CACHE_CHECK([whether the linker supports --force-group-allocation],
+        [vlc_cv_ld_force_group_allocation], [
+        VLC_SAVE_FLAGS
+        LDFLAGS="${LDFLAGS} -Wl,--force-group-allocation"
+        AC_LINK_IFELSE([AC_LANG_PROGRAM()],
+            [vlc_cv_ld_force_group_allocation=yes],
+            [vlc_cv_ld_force_group_allocation=no])
+        VLC_RESTORE_FLAGS
+    ])
+    AS_IF([test "${vlc_cv_ld_force_group_allocation}" != "yes"], [
+        AS_IF([test "${have_dynamic_objects}" = "no" -a "${SYS}" != "darwin"], [
+            AC_MSG_ERROR([Linker does not support --force-group-allocation, required for static module partial linking (binutils >= 2.24).])
+        ])
+    ], [
+        FORCE_GROUP_ALLOCATION_LDFLAGS="-Wl,--force-group-allocation"
+    ])
+])
+AC_SUBST([FORCE_GROUP_ALLOCATION_LDFLAGS])
+
 AC_SUBST([LIBDL])
 
 AS_IF([test "${SYS}" != "mingw32"], [
