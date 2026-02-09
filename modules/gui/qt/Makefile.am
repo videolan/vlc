@@ -1347,25 +1347,29 @@ libqt_plugin_la_ALL_QML = \
 	$(libqml_module_widgets_a_QML)
 
 # Shaders:
-libqt_plugin_la_SHADER := shaders/FadingEdge.frag \
-                          shaders/FadingEdgeX.vert \
-                          shaders/FadingEdgeY.vert \
-                          shaders/Noise.frag \
-                          shaders/RectFilter.frag \
-                          shaders/SubTexture.vert \
-                          shaders/SDFAARoundedTexture.frag \
-                          shaders/SDFAARoundedTexture_cropsupport_bordersupport.frag \
-                          shaders/DitheredTexture.frag \
-                          shaders/FastBlend.frag \
-                          shaders/FastBlend_additive.frag \
-                          shaders/FastBlend_multiply.frag \
-                          shaders/FastBlend_screen.frag \
-                          shaders/RoundedRectangleShadow.frag \
-                          shaders/RoundedRectangleShadow_hollow.frag \
-                          shaders/VoronoiSnow.frag \
-                          shaders/DualKawaseBlur_upsample.frag \
-                          shaders/DualKawaseBlur_downsample.frag \
-                          shaders/DualKawaseBlur_upsample_postprocess.frag
+libqt_plugin_la_SHADER_FRAG = shaders/FadingEdge.frag \
+                              shaders/Noise.frag \
+                              shaders/RectFilter.frag \
+                              shaders/SDFAARoundedTexture.frag \
+                              shaders/SDFAARoundedTexture_cropsupport_bordersupport.frag \
+                              shaders/DitheredTexture.frag \
+                              shaders/FastBlend.frag \
+                              shaders/FastBlend_additive.frag \
+                              shaders/FastBlend_multiply.frag \
+                              shaders/FastBlend_screen.frag \
+                              shaders/RoundedRectangleShadow.frag \
+                              shaders/RoundedRectangleShadow_hollow.frag \
+                              shaders/VoronoiSnow.frag \
+                              shaders/DualKawaseBlur_upsample.frag \
+                              shaders/DualKawaseBlur_downsample.frag \
+                              shaders/DualKawaseBlur_upsample_postprocess.frag
+
+libqt_plugin_la_SHADER_VERT = shaders/FadingEdgeX.vert \
+                              shaders/FadingEdgeY.vert \
+                              shaders/SubTexture.vert
+
+libqt_plugin_la_SHADER = $(libqt_plugin_la_SHADER_FRAG) $(libqt_plugin_la_SHADER_VERT)
+
 if ENABLE_QT
 
 libqt_plugin_la_LIBADD += libqml_module_dialogs.a \
@@ -1393,8 +1397,8 @@ noinst_LIBRARIES = libqml_module_dialogs.a \
 	libqml_module_widgets.a
 
 BUILT_SOURCES += \
-    $(libqt_plugin_la_SHADER:.frag=.frag.qsb) \
-    $(libqt_plugin_la_SHADER:.vert=.vert.qsb)
+    $(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb) \
+    $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb)
 
 QSB_PARAMS = --glsl="100 es,120,150" --batchable -O
 if HAVE_WIN32
@@ -1427,12 +1431,12 @@ EXTRA_DIST += shaders/Common.glsl
 %.vert.qsb: %.vert shaders/Common.glsl
 	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $<
 
-shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER:.frag=.frag.qsb) $(libqt_plugin_la_SHADER:.vert=.vert.qsb)
+shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb) $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb)
 	$(AM_V_GEN) cp -f $(filter %.qrc, $^) $(builddir)/shaders/shaders.qrc || true
 	$(AM_V_GEN) $(RCC) $(RCC_EXTRA_PARAMS) --name shaders -o $@ $(builddir)/shaders/$(notdir $(filter %.qrc, $^))
 
 libqt_plugin_la_SOURCES += shaders/shaders.qrc $(libqt_plugin_la_SHADER)
-BUILT_SOURCES += shaders/shaders.qrc
+CLEANFILES += shaders/shaders.qrc
 
 lib_qt_plugin_la_QRC = assets.qrc
 
