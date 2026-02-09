@@ -908,6 +908,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 
     if ( bSupported )
     {
+        free(p_track->fmt.psz_language);
         p_track->fmt.psz_language = strdup(metadata_payload.lang.c_str());
 
 #ifdef HAVE_ZLIB_H
