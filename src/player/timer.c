@@ -41,6 +41,7 @@ vlc_player_ResetTimer(vlc_player_t *player)
     player->timer.seek_ts = VLC_TICK_INVALID;
     player->timer.seek_position = -1;
     player->timer.update_state = UPDATE_STATE_RESUMED;
+    player->timer.pause_date = VLC_TICK_INVALID;
     player->timer.stopping = false;
 
     vlc_mutex_unlock(&player->timer.lock);
@@ -262,6 +263,7 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
         case VLC_PLAYER_TIMER_EVENT_PAUSED:
             assert(system_date != VLC_TICK_INVALID);
             player->timer.update_state = UPDATE_STATE_PAUSED;
+            player->timer.pause_date = system_date;
 
             for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
             {
@@ -422,7 +424,10 @@ vlc_player_UpdateTimerBestSource(vlc_player_t *player, vlc_es_id_t *es_source,
                                                   &source->point);
 
             if (player->timer.update_state == UPDATE_STATE_RESUMING)
+            {
                 player->timer.update_state = UPDATE_STATE_RESUMED;
+                player->timer.pause_date = VLC_TICK_INVALID;
+            }
         }
     }
 }
@@ -599,10 +604,14 @@ vlc_player_GetTimerPoint(vlc_player_t *player, bool *seeking,
     if (player->timer.best_source.point.system_date == VLC_TICK_INVALID)
         goto end;
 
-    if (system_now != VLC_TICK_INVALID
-     && player->timer.update_state == UPDATE_STATE_RESUMED)
+    if (system_now != VLC_TICK_INVALID) /* interpolate */
+    {
+        /* If paused, force interpolation to the paused date */
+        if (player->timer.pause_date != VLC_TICK_INVALID)
+            system_now = player->timer.pause_date;
         ret = vlc_player_timer_point_Interpolate(&player->timer.best_source.point,
                                                  system_now, out_ts, out_pos);
+    }
     else
     {
         const struct vlc_player_timer_point *point =

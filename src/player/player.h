@@ -236,6 +236,7 @@ struct vlc_player_timer
         UPDATE_STATE_PAUSED,
         UPDATE_STATE_RESUMING,
     } update_state;
+    vlc_tick_t pause_date;
     bool stopping;
 
     struct vlc_player_timer_source sources[VLC_PLAYER_TIMER_TYPE_COUNT];
