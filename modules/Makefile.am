@@ -8,7 +8,7 @@ pkglibexec_PROGRAMS =
 EXTRA_DIST =
 CLEANFILES =
 
-SUBDIRS = .
+SUBDIRS =
 TESTS =
 
 dist_noinst_SCRIPTS = module.rc.in
@@ -145,3 +145,4 @@ vlc_modules_list: Makefile
 
 BUILT_SOURCES += vlc_modules_list
 CLEANFILES += vlc_modules_list
+SUBDIRS += .
