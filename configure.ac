@@ -9,6 +9,23 @@ VERSION_REVISION=0
 VERSION_EXTRA=0
 VERSION_DEV=dev
 
+VERSION_DATE=$(
+    VERSION_PATTERN='^v?([[0-9]]+\.?)+(-[[0-9]]+)?$'
+    VERSION_TAG=$(git tag --points-at HEAD --sort=-version:refname 2>/dev/null | grep -E "$VERSION_PATTERN" | head -n 1)
+    if test -n "$VERSION_TAG"; then
+        DATE=$(git for-each-ref --format='%(taggerdate:short)' "refs/tags/${VERSION_TAG}" 2>/dev/null)
+        if test -n "$TAG" && test -z "$DATE"; then
+            AC_MSG_ERROR([Building with TAG envvar set but no date found on the tag, please check that your git tag is annotated])
+            exit 1
+        fi
+        echo "$DATE"
+    else
+        date '+%Y-%m-%d'
+    fi
+) || exit $?
+
+AC_SUBST([VERSION_DATE])
+
 # libvlc .so version values
 LIBVLC_ABI_MAJOR=12
 LIBVLC_ABI_MINOR=0

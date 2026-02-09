@@ -18,7 +18,7 @@
     <url type="bugtracker">https://trac.videolan.org/vlc/</url>
     <url type="donation">https://www.videolan.org/contribute.html</url>
     <releases>
-        <release version="@VERSION@" />
+        <release version="@VERSION@" date="@VERSION_DATE@" />
     </releases>
     <provides>
         <library>libvlc.so.5</library>

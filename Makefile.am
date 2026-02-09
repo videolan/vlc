@@ -216,3 +216,15 @@ update-po:
 include extras/package/macosx/package.mak
 include extras/package/win32/package.mak
 include extras/package/win32/msi.mak
+
+dist-hook:
+	chmod u+w "$(distdir)/configure" "$(distdir)/configure.ac"
+	mtime_ref=$(mktemp)
+#	We keep a copy to have a reference timestamp and restore it,
+#	to avoid triggering automake again
+	cp -p "$(distdir)/configure.ac" "$mtime_ref"
+	sed -i '/^VERSION_DATE=\$$(/,/^)/c\VERSION_DATE='$(VERSION_DATE) \
+		"$(distdir)/configure" "$(distdir)/configure.ac"
+	touch -r "$mtime_ref" "$(distdir)/configure.ac"
+	rm "$mtime_ref"
+
