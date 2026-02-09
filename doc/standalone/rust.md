@@ -121,8 +121,8 @@ libmynewmodule_rs_plugin_la_SOURCES = \
 libmynewmodule_rs_plugin_la_LIBADD = libmynewmodule_rs.la
 
 if HAVE_RUST
-moduledir_LTLIBRARIES += libmynewmodule_rs_plugin.la
-# Example: video_filter_LTLIBRARIES += libmynewfilter_rs_plugin.la
+moduledir_PLUGINS += libmynewmodule_rs_plugin.la
+# Example: video_filter_PLUGINS += libmynewfilter_rs_plugin.la
 endif
 ```
 
