@@ -1102,6 +1102,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         auto *iso_lang = vlc_find_iso639(metadata_payload.lang.c_str(), false);
         if (iso_lang != nullptr)
             msg_Dbg( &sys.demuxer, "Unknown language %s!", metadata_payload.lang.c_str() );
+        free(p_track->fmt.psz_language);
         p_track->fmt.psz_language = strdup(metadata_payload.lang.c_str());
 
         vlc_viewpoint_from_euler( &p_track->fmt.video.pose,
