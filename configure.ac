@@ -2774,36 +2774,6 @@ AC_CHECK_HEADERS([dxgidebug.h])
 AC_CHECK_HEADERS([d3dx9effect.h])
 
 dnl
-dnl IStorageFolder
-dnl
-AS_IF([test "$vlc_winstore_app" = "1"],
-[
-    AC_MSG_CHECKING([for proper __x_ABI_CWindows_CStorage_CIStorageFolder definition])
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-#include <windows.storage.h>
-__x_ABI_CWindows_CStorage_CIStorageFolder *toto;
-    ]])], [
-        AC_MSG_RESULT([yes])
-    ], [
-        AC_MSG_RESULT([no])
-        AC_MSG_ERROR([IStorageFolder not properly defined, use mingw-w64 8.0.1 or higher])
-    ])
-
-    AC_MSG_CHECKING([for proper __x_ABI_CWindows_CStorage_CIApplicationData2 definition])
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-#include <windows.storage.h>
-__x_ABI_CWindows_CStorage_CIApplicationData2 *toto;
-    ]])], [
-        AC_MSG_RESULT([yes])
-        have_iapplication_data2="yes"
-    ], [
-        AC_MSG_RESULT([no])
-    ])
-])
-
-AM_CONDITIONAL([HAVE_WINDOWS_STORAGE], [test "${have_iapplication_data2}" = "yes"])
-
-dnl
 dnl  avformat demuxer/muxer plugin
 dnl
 

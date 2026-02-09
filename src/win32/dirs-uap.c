@@ -209,7 +209,6 @@ end_appdata:
     return psz_dir;
 }
 
-#ifdef HAVE___X_ABI_CWINDOWS_CSTORAGE_CIAPPLICATIONDATA2
 static char *config_GetCacheDir (void)
 {
     HRESULT hr;
@@ -270,12 +269,6 @@ end_appdata:
 
     return GetFolderName(folder);
 }
-#else
-static inline char *config_GetCacheDir(void)
-{
-    return config_GetAppDir();
-}
-#endif // HAVE___X_ABI_CWINDOWS_CSTORAGE_CIAPPLICATIONDATA2
 
 char *platform_GetUserDir (vlc_userdir_t type)
 {
