@@ -1343,7 +1343,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         }
 
         /* Backup the ogg packet (likely an header packet) */
-        if( !b_xiph && p_stream->i_headers )
+        if( !b_xiph && (p_stream->i_headers + p_oggpacket->bytes) )
         {
             uint8_t *p_realloc = realloc( p_stream->p_headers, p_stream->i_headers + p_oggpacket->bytes );
             if( p_realloc )
