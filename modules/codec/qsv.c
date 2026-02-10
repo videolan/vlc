@@ -37,6 +37,9 @@
 
 
 #include <vpl/mfxvideo.h>
+#if MFX_VERSION_MAJOR > 1
+# include <vpl/mfxdispatcher.h>
+#endif
 #include "../demux/mpeg/timestamps.h"
 
 #define SOUT_CFG_PREFIX     "sout-qsv-"
@@ -279,6 +282,9 @@ typedef struct async_task_t
 
 typedef struct
 {
+#if MFX_VERSION_MAJOR > 1
+    mfxLoader        loader;
+#endif
     mfxSession       session;             // Intel Media SDK Session.
     mfxVideoParam    params;              // Encoding parameters.
     QSVFrame         *work_frames;        // IntelMediaSDK's frame pool.
@@ -368,6 +374,9 @@ static void delete_sys(encoder_sys_t *sys)
 {
     MFXVideoENCODE_Close(sys->session);
     MFXClose(sys->session);
+#if MFX_VERSION_MAJOR > 1
+    MFXUnload(sys->loader);
+#endif
 
     assert(vlc_list_is_empty(&sys->packets));
 
@@ -412,7 +421,6 @@ static int Open(vlc_object_t *this)
         (mfxExtBuffer*)&co2,
 #endif
     };
-    mfxVersion    ver = { { 1, 1 } };
     mfxIMPL       impl;
     mfxVideoParam param_out = { 0 };
 
@@ -435,13 +443,28 @@ static int Open(vlc_object_t *this)
         return VLC_ENOMEM;
 
     /* Initialize dispatcher, it will loads the actual SW/HW Implementation */
+#if MFX_VERSION_MAJOR > 1
+    sys->loader = MFXLoad();
+    if (sys->loader == NULL) {
+        msg_Err(enc, "Unable to find an Intel Media SDK implementation.");
+        free(sys);
+        return VLC_EGENERIC;
+    }
+
+    sts = MFXCreateSession(sys->loader, 0, &sys->session);
+#else
+    mfxVersion    ver = { { 1, 1 } };
     sts = MFXInit(MFX_IMPL_AUTO_ANY, &ver, &sys->session);
+#endif
 
     if (sts != MFX_ERR_NONE) {
         if (sts == MFX_ERR_UNSUPPORTED)
             msg_Err(enc, "Intel Media SDK implementation not supported, is your card plugged?");
         else
             msg_Err(enc, "Unable to find an Intel Media SDK implementation (%d).", sts);
+#if MFX_VERSION_MAJOR > 1
+        MFXUnload(sys->loader);
+#endif
         free(sys);
         return VLC_EGENERIC;
     }
