@@ -471,7 +471,7 @@ foreach module : vlc_modules
         extra_files: module.get('extra_files', []),
         build_by_default: true,
         install: true,
-        install_dir: get_option('libdir') / 'vlc/plugins',
+        install_dir: pkglibdir_path / 'plugins',
         kwargs: kwargs,
         shortname: shortname,
     )
