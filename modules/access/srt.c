@@ -108,9 +108,7 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
         .streamid = NULL,
         .mode = SRT_DEFAULT_MODE, /* default = caller */
     };
-    struct addrinfo hints = {
-        .ai_socktype = SOCK_DGRAM,
-    }, *res = NULL;
+    struct addrinfo *res = NULL;
 
     stream_sys_t *p_sys = p_stream->p_sys;
     bool failed = false;
@@ -141,6 +139,9 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
 
     if (params.mode != SRT_MODE_LISTENER)
     {
+        struct addrinfo hints = {
+            .ai_socktype = SOCK_DGRAM,
+        };
         stat = vlc_getaddrinfo( p_sys->psz_host, p_sys->i_port, &hints, &res);
         if ( stat )
         {
