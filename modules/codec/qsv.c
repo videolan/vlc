@@ -451,6 +451,22 @@ static int Open(vlc_object_t *this)
         return VLC_EGENERIC;
     }
 
+    mfxConfig cfg = NULL;
+    if (!var_InheritBool(enc, SOUT_CFG_PREFIX "software"))
+    {
+        cfg = MFXCreateConfig(sys->loader);
+        if (unlikely(cfg == NULL)) {
+            msg_Err(enc, "Unable to create hardware-only implementation.");
+            MFXUnload(sys->loader);
+            free(sys);
+            return VLC_EGENERIC;
+        }
+        mfxVariant implValue;
+        implValue.Type     = MFX_VARIANT_TYPE_U32;
+        implValue.Data.U32 = MFX_IMPL_TYPE_HARDWARE;
+        MFXSetConfigFilterProperty(cfg, (mfxU8 *)"mfxImplDescription.Impl", implValue);
+    }
+
     sts = MFXCreateSession(sys->loader, 0, &sys->session);
 #else
     mfxVersion    ver = { { 1, 1 } };
@@ -475,10 +491,12 @@ static int Open(vlc_object_t *this)
 
     /* Checking if we are on software and are allowing it */
     MFXQueryIMPL(sys->session, &impl);
+#if MFX_VERSION_MAJOR < 1
     if (!var_InheritBool(enc, SOUT_CFG_PREFIX "software") && (impl & MFX_IMPL_SOFTWARE)) {
         msg_Err(enc, "No hardware implementation found and software mode disabled");
         goto error;
     }
+#endif
 
     msg_Dbg(enc, "Using Intel QuickSync Video %s implementation",
         impl & MFX_IMPL_HARDWARE ? "hardware" : "software");
