@@ -450,7 +450,7 @@ static int Open(vlc_object_t *obj)
         sys->length = VLC_TICK_INVALID;
         offset -= hdrlen;
 
-        if (vlc_stream_Read(stream, NULL, offset) != offset)
+        if ((size_t)vlc_stream_Read(stream, NULL, offset) != offset)
             return VLC_EGENERIC;
     }
 
