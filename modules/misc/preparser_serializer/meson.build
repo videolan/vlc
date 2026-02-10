@@ -3,7 +3,7 @@
 #
 
 vlc_modules += {
-    'name' : 'preparser_serializer_json',
+    'name' : 'preparserserializer_json',
     'sources' : files(
         'json/serializer.c',
         'json/serializer.h',
