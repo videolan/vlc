@@ -169,6 +169,8 @@ if pipewire_dep.found()
         include_directories: [include_directories('audio_output'), vlc_include_dirs],
         dependencies: [libvlccore_dep, pipewire_dep],
         link_with: [vlc_libcompat],
+        install: true,
+        install_dir: libdir_path,
     )
 else
     libvlc_pipewire = disabler()
@@ -181,6 +183,8 @@ if pulse_dep.found()
         include_directories: [include_directories('audio_output'), vlc_include_dirs],
         dependencies: [libvlccore_dep, pulse_dep],
         link_with: [vlc_libcompat],
+        install: true,
+        install_dir: libdir_path,
     )
 else
     libvlc_pulse = disabler()
