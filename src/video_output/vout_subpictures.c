@@ -1038,15 +1038,15 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
         restrained.y -= y_margin;
 
     SpuAreaMoveInside(&restrained,
-                      apply_scale ? (output_x + output_width ) : spu_invscale_w(output_x + output_width, scale_size),
-                      apply_scale ? (output_y + output_height) : spu_invscale_h(output_y + output_height, scale_size));
+                      apply_scale ? (output_x + output_width ) : (unsigned)spu_invscale_w(output_x + output_width, scale_size),
+                      apply_scale ? (output_y + output_height) : (unsigned)spu_invscale_h(output_y + output_height, scale_size));
 
     /* Fix the position for the current scale_size */
     x_offset = spu_scale_w(restrained.x, restrained.scale);
     y_offset = spu_scale_h(restrained.y, restrained.scale);
 
-    const unsigned dst_width  = apply_scale ? spu_scale_w(region->fmt.i_visible_width,  scale_size) : region->fmt.i_visible_width;
-    const unsigned dst_height = apply_scale ? spu_scale_h(region->fmt.i_visible_height, scale_size) : region->fmt.i_visible_height;
+    const unsigned dst_width  = apply_scale ? (unsigned)spu_scale_w(region->fmt.i_visible_width,  scale_size) : region->fmt.i_visible_width;
+    const unsigned dst_height = apply_scale ? (unsigned)spu_scale_h(region->fmt.i_visible_height, scale_size) : region->fmt.i_visible_height;
 
     if (unlikely(dst_width == 0 || dst_height == 0))
         return NULL;
