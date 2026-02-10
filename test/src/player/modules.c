@@ -51,6 +51,13 @@ static void aout_Flush(audio_output_t *aout)
     sys->first_pts = sys->first_play_date = VLC_TICK_INVALID;
 }
 
+static void aout_Pause(audio_output_t *aout, bool pause, vlc_tick_t date)
+{
+    (void) date;
+    if (pause)
+        aout_Flush(aout);
+}
+
 static void aout_InstantDrain(audio_output_t *aout)
 {
     aout_DrainedReport(aout);
@@ -75,7 +82,7 @@ static int aout_Open(vlc_object_t *obj)
 
     aout->start = aout_Start;
     aout->play = aout_Play;
-    aout->pause = NULL;
+    aout->pause = aout_Pause;
     aout->flush = aout_Flush;
     aout->stop = aout_Flush;
     aout->volume_set = NULL;
