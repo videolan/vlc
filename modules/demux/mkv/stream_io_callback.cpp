@@ -36,11 +36,13 @@ vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_, bool b_owner_ )
 
 uint32 vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
 {
-    if( i_size <= 0 || mb_eof )
+    assert( i_size <= std::numeric_limits<uint32>::max() );
+
+    if( i_size == 0 || mb_eof )
         return 0;
 
-    int i_ret = vlc_stream_Read( s, p_buffer, i_size );
-    return i_ret < 0 || i_ret < i_size ? 0 : i_ret;
+    ssize_t i_ret = vlc_stream_Read( s, p_buffer, i_size );
+    return i_ret < 0 || static_cast<size_t>(i_ret) < i_size ? 0 : static_cast<uint32>(i_ret);
 }
 
 void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
