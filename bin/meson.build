@@ -47,6 +47,8 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         ['cachegen.c'],
         link_with: [vlc_libcompat, libvlc],
         include_directories: [vlc_include_dirs],
+        install: true,
+        install_dir: pkglibexecdir_path,
     )
 
     plugins_dat  = custom_target('plugins.dat',
@@ -73,7 +75,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         include_directories: [vlc_include_dirs],
         dependencies: vlc_deps,
         install: true,
-        install_dir: get_option('libexecdir'),
+        install_dir: pkglibexecdir_path,
         win_subsystem: 'windows'
     )
 
@@ -84,7 +86,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         dependencies: vlc_deps,
         c_args: [vlc_top_builddir_def, vlc_top_srcdir_def],
         objc_args: [vlc_top_builddir_def, vlc_top_srcdir_def],
-        install_dir: get_option('libexecdir'),
+        install_dir: pkglibexecdir_path,
         win_subsystem: 'windows'
     )
 

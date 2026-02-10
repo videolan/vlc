@@ -380,7 +380,7 @@ if qt6_dep.found()
         include_directories: [vlc_include_dirs],
         build_by_default: true,
         install: true,
-        install_dir: get_option('libexecdir'),
+        install_dir: pkglibexecdir_path,
         c_args : qt_extra_flags,
         cpp_args : qt_extra_flags,
         link_args : qt_link_args,
