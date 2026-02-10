@@ -442,6 +442,7 @@ static void registry_global(void *data, uint32_t id, uint32_t perms,
                             const char *type, uint32_t version,
                             const struct spa_dict *props)
 {
+    (void) id; (void) perms; (void) version;
     demux_t *demux = data;
     struct demux_sys_t *sys = demux->p_sys;
 
