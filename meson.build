@@ -332,12 +332,23 @@ if host_system == 'darwin'
     have_tvos = cc.get_define('TARGET_OS_TV',
         prefix: '#include <TargetConditionals.h>') == '1'
 
-    # If none of the above, assume compiling for macOS
-    have_osx = not have_ios and not have_tvos
+    # Check if compiling for watchOS
+    have_watchos = cc.get_define('TARGET_OS_WATCH',
+        prefix: '#include <TargetConditionals.h>') == '1'
+
+    # Check if compiling for visionOS
+    have_xros = cc.get_define('TARGET_OS_VISION',
+        prefix: '#include <TargetConditionals.h>') == '1'
+
+    # Check if compiling for macOS
+    have_osx = cc.get_define('TARGET_OS_OSX',
+        prefix: '#include <TargetConditionals.h>') == '1'
 
 else
     have_ios = false
     have_tvos = false
+    have_watchos = false
+    have_xros = false
     have_osx = false
 endif
 
