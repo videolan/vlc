@@ -1417,7 +1417,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         E_CASE( KaxChapterTimeEnd, end )
         {
             vars.chapters.i_end_time = VLC_TICK_FROM_NS(static_cast<uint64_t>( end ));
-            debug( vars, "ChapterTimeEnd=%" PRId64, vars.chapters.i_end_time );
+            debug( vars, "ChapterTimeEnd=%" PRId64, *vars.chapters.i_end_time );
         }
         E_CASE( KaxChapterDisplay, chapter_display )
         {
