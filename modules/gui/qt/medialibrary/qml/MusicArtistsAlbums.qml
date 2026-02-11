@@ -36,9 +36,14 @@ FocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
 
-    property var sortModel: [
-        { text: qsTr("Alphabetic"),  criteria: "title" },
-        { text: qsTr("Release Year"),  criteria: "release_year" }
+    property var sortModel: MainCtx.gridView ? [
+        { text: qsTr("Title"), criteria: "title" },
+        { text: qsTr("Release Year"), criteria: "release_year" },
+    ] : [
+        { text: qsTr("Title"), criteria: "title" },
+        { text: qsTr("Release Year"), criteria: "release_year" },
+        { text: qsTr("Album Title"), criteria: "album_title" },
+        { text: qsTr("Duration"), criteria: "duration" }
     ]
 
     property SortMenuAlbums sortMenu: SortMenuAlbums {

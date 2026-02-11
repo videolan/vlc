@@ -52,9 +52,46 @@ FocusScope {
 
     property bool isSearchable: true
 
-    property alias searchPattern: albumModel.searchPattern
-    property alias sortOrder: albumModel.sortOrder
-    property alias sortCriteria: albumModel.sortCriteria
+    property string searchPattern
+    property int sortOrder
+    property string sortCriteria
+
+    readonly property MLBaseModel _effectiveModel: MainCtx.gridView ? albumModel : trackModel
+
+    onSearchPatternChanged: {
+        _effectiveModel.searchPattern = root.searchPattern
+    }
+
+    onSortOrderChanged: {
+        _effectiveModel.sortOrder = root.sortOrder
+    }
+
+    onSortCriteriaChanged: {
+        // FIXME: Criteria is set to empty for a brief period during initialization,
+        //        call later prevents setting the criteria empty.
+        Qt.callLater(() => {
+            _effectiveModel.sortCriteria = root.sortCriteria
+        })
+    }
+
+    Connections {
+        target: root._effectiveModel
+
+        function onSearchPatternChanged() {
+            if (root.searchPattern !== root._effectiveModel.searchPattern)
+                root.searchPattern = root._effectiveModel.searchPattern
+        }
+
+        function onSortOrderChanged() {
+            if (root.sortOrder !== root._effectiveModel.sortOrder)
+                root.sortOrder = root._effectiveModel.sortOrder
+        }
+
+        function onSortCriteriaChanged() {
+            if (root.sortCriteria !== root._effectiveModel.sortCriteria)
+                root.sortCriteria = root._effectiveModel.sortCriteria
+        }
+    }
 
     // current index of album model
     readonly property int currentIndex: {
