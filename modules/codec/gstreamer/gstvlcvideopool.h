@@ -26,9 +26,6 @@
 #ifndef VLC_GST_VIDEO_POOL_H
 #define VLC_GST_VIDEO_POOL_H
 
-#include <gst/gstbufferpool.h>
-#include <gst/video/gstvideopool.h>
-
 #include "gstvlcpictureplaneallocator.h"
 
 typedef struct _GstVlcVideoPool GstVlcVideoPool;
