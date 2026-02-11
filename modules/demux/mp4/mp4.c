@@ -1782,6 +1782,7 @@ static int DemuxMoov( demux_t *p_demux )
     {
         mp4_track_t *tk = NULL;
         i_status = VLC_DEMUXER_EOS;
+        vlc_tick_t i_minnzdts = VLC_TICK_MAX;
 
         /* First pass, find any track within our target increment, ordered by position */
         for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
@@ -1795,11 +1796,13 @@ static int DemuxMoov( demux_t *p_demux )
             /* At least still have data to demux on this or next turns */
             i_status = VLC_DEMUXER_SUCCESS;
 
-            if ( MP4_TrackGetDTSPTS( p_demux, tk_tmp, NULL ) <= i_nztime + DEMUX_INCREMENT )
+            vlc_tick_t i_nzdts = MP4_TrackGetDTSPTS( p_demux, tk_tmp, NULL );
+            if ( i_nzdts <= i_nztime + DEMUX_INCREMENT )
             {
                 if( tk == NULL || MP4_TrackGetPos( tk_tmp ) < MP4_TrackGetPos( tk ) )
                     tk = tk_tmp;
             }
+            i_minnzdts = __MIN(i_minnzdts, i_nzdts);
         }
 
         if( tk )
@@ -1833,12 +1836,18 @@ static int DemuxMoov( demux_t *p_demux )
                 i_status = VLC_DEMUXER_SUCCESS;
         }
 
+        if( i_minnzdts != VLC_TICK_MAX && VLC_TICK_0 + i_minnzdts > p_sys->i_pcr )
+        {
+            p_sys->i_pcr = VLC_TICK_0 + i_minnzdts;
+            es_out_SetPCR( p_demux->out, p_sys->i_pcr );
+        }
+
         if( i_status != VLC_DEMUXER_SUCCESS || !tk )
             break;
     }
 
     p_sys->i_nztime += DEMUX_INCREMENT;
-    if( p_sys->i_pcr != VLC_TICK_INVALID )
+    if( p_sys->i_pcr != VLC_TICK_INVALID && VLC_TICK_0 + p_sys->i_nztime > p_sys->i_pcr )
     {
         p_sys->i_pcr = VLC_TICK_0 + p_sys->i_nztime;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );
@@ -5089,6 +5098,7 @@ static int DemuxMoof( demux_t *p_demux )
     {
         mp4_track_t *tk = NULL;
         i_status = VLC_DEMUXER_EOS;
+        vlc_tick_t i_minnzdts = VLC_TICK_MAX;
 
         /* First pass, find any track within our target increment, ordered by position */
         for( unsigned i = 0; i < p_sys->i_tracks; i++ )
@@ -5104,11 +5114,13 @@ static int DemuxMoof( demux_t *p_demux )
             /* At least still have data to demux on this or next turns */
             i_status = VLC_DEMUXER_SUCCESS;
 
-            if( MP4_rescale_mtime( tk_tmp->i_time, tk_tmp->i_timescale ) <= i_nztime + DEMUX_INCREMENT )
+            vlc_tick_t i_nzdts = MP4_rescale_mtime( tk_tmp->i_time, tk_tmp->i_timescale );
+            if( i_nzdts <= i_nztime + DEMUX_INCREMENT )
             {
                 if( tk == NULL || tk_tmp->context.i_trun_sample_pos < tk->context.i_trun_sample_pos )
                     tk = tk_tmp;
             }
+            i_minnzdts = __MIN(i_minnzdts, i_nzdts);
         }
 
         if( tk )
@@ -5145,6 +5157,12 @@ static int DemuxMoof( demux_t *p_demux )
                 i_status = VLC_DEMUXER_EOF;
         }
 
+        if( i_minnzdts != VLC_TICK_MAX && VLC_TICK_0 + i_minnzdts > p_sys->i_pcr )
+        {
+            p_sys->i_pcr = VLC_TICK_0 + i_minnzdts;
+            es_out_SetPCR( p_demux->out, p_sys->i_pcr );
+        }
+
         if( i_status != VLC_DEMUXER_SUCCESS || !tk )
             break;
     }
@@ -5152,7 +5170,8 @@ static int DemuxMoof( demux_t *p_demux )
     if( i_status != VLC_DEMUXER_EOS )
     {
         p_sys->i_nztime += DEMUX_INCREMENT;
-        p_sys->i_pcr = VLC_TICK_0 + p_sys->i_nztime;
+        if ( VLC_TICK_0 + p_sys->i_nztime > p_sys->i_pcr )
+            p_sys->i_pcr = VLC_TICK_0 + p_sys->i_nztime;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );
     }
     else
