@@ -11,7 +11,7 @@ info()
 SCRIPTDIR=$(dirname "$0")
 source "$SCRIPTDIR/env.build.sh" "none"
 
-SDKROOT=$(xcrun --show-sdk-path)
+SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 VLCBUILDDIR=""
 
 CORE_COUNT=`getconf NPROCESSORS_ONLN 2>&1`
