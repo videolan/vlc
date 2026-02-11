@@ -266,9 +266,11 @@ set_host_triplet()
 #   None
 set_build_triplet()
 {
-    local build_arch="$(uname -m | cut -d. -f1)"
-    VLC_BUILD_TRIPLET="$(${VLC_HOST_CC} -arch "${build_arch}" -dumpmachine)"
-    VLC_BUILD_TRIPLET="${VLC_BUILD_TRIPLET/arm64/aarch64}"
+    if [ "$(uname -s)" = "Darwin" ]; then
+        local build_arch="$(uname -m | cut -d. -f1)"
+        VLC_BUILD_TRIPLET="$(${VLC_HOST_CC} -arch "${build_arch}" -dumpmachine)"
+        VLC_BUILD_TRIPLET="${VLC_BUILD_TRIPLET/arm64/aarch64}"
+    fi
 }
 
 # Take SDK name, verify it exists and populate
@@ -694,7 +696,7 @@ fi
 # Bootstrap contribs
 ../bootstrap \
     --host="$VLC_HOST_TRIPLET" \
-    --build="$VLC_BUILD_TRIPLET" \
+    ${VLC_BUILD_TRIPLET:+--build="$VLC_BUILD_TRIPLET"} \
     --prefix="$VLC_CONTRIB_INSTALL_DIR" \
     "${VLC_CONTRIB_OPTIONS[@]}" \
 || abort_err "Bootstrapping contribs failed"
@@ -788,7 +790,7 @@ mkdir -p "$VLC_INSTALL_DIR"
 vlcSetSymbolEnvironment \
 hostenv "${VLC_SRC_DIR}/configure" \
     --host="$VLC_HOST_TRIPLET" \
-    --build="$VLC_BUILD_TRIPLET" \
+    ${VLC_BUILD_TRIPLET:+--build="$VLC_BUILD_TRIPLET"} \
     --prefix="$VLC_INSTALL_DIR" \
     --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
     "${VLC_CONFIG_OPTIONS[@]}" \
