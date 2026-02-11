@@ -96,6 +96,8 @@ VLC_BITCODE_FLAG="-fembed-bitcode"
 VLC_BUILD_DYNAMIC=0
 # Add extra checks when compiling
 VLC_BUILD_EXTRA_CHECKS=0
+# --with-contrib option forwarded to configure
+VLC_WITH_CONTRIB=
 
 # Tools to be used
 VLC_HOST_CC="$(xcrun --find clang)"
@@ -131,6 +133,8 @@ usage()
     echo " --package-contribs        Create a prebuilt contrib package"
     echo " --with-prebuilt-contribs  Use prebuilt contribs instead of building"
     echo "                           them from source"
+    echo " --with-contrib[=DIR]      Use contribs from DIR (default: build and auto-detect)"
+    echo " --without-contrib         Disable contribs entirely (--with-contrib=no)"
     echo " --enable-shared           Build dynamic libraries and plugins"
     echo " --enable-extra-checks     Add extra checks when compiling"
     echo "Environment variables:"
@@ -525,6 +529,15 @@ do
         --enable-extra-checks)
             VLC_BUILD_EXTRA_CHECKS=1
             ;;
+        --with-contrib=*)
+            VLC_WITH_CONTRIB="${1#--with-contrib=}"
+            ;;
+        --with-contrib)
+            VLC_WITH_CONTRIB=yes
+            ;;
+        --without-contrib)
+            VLC_WITH_CONTRIB=no
+            ;;
         --config=*)
             VLC_BUILD_CONF_PATH="${1#--config=}"
             ;;
@@ -662,6 +675,9 @@ echo ""
 ##########################################################
 #                     Contribs build                     #
 ##########################################################
+if [ "$VLC_WITH_CONTRIB" = "no" ] || { [ -n "$VLC_WITH_CONTRIB" ] && [ "$VLC_WITH_CONTRIB" != "yes" ]; }; then
+    echo "Skipping contribs build"
+else
 # Combine settings from config file
 VLC_CONTRIB_OPTIONS=( "${VLC_CONTRIB_OPTIONS_BASE[@]}" )
 
@@ -731,6 +747,7 @@ if [ -n "$PREBUILT_FAILED" ]; then
 else
     $MAKE tools
 fi
+fi # VLC_WITH_CONTRIB
 
 echo ""
 
@@ -787,12 +804,21 @@ cd "${VLC_BUILD_DIR}/build" || abort_err "Failed cd to VLC build dir"
 mkdir -p "$VLC_INSTALL_DIR"
 
 
+# Determine how to configure the contribs
+if [ "$VLC_WITH_CONTRIB" = "no" ]; then
+    VLC_CONTRIB_CONFIGURE_ARG="--without-contrib"
+elif [ -n "$VLC_WITH_CONTRIB" ] && [ "$VLC_WITH_CONTRIB" != "yes" ]; then
+    VLC_CONTRIB_CONFIGURE_ARG="--with-contrib=$VLC_WITH_CONTRIB"
+else
+    VLC_CONTRIB_CONFIGURE_ARG="--with-contrib=$VLC_CONTRIB_INSTALL_DIR"
+fi
+
 vlcSetSymbolEnvironment \
 hostenv "${VLC_SRC_DIR}/configure" \
     --host="$VLC_HOST_TRIPLET" \
     ${VLC_BUILD_TRIPLET:+--build="$VLC_BUILD_TRIPLET"} \
     --prefix="$VLC_INSTALL_DIR" \
-    --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
+    "$VLC_CONTRIB_CONFIGURE_ARG" \
     "${VLC_CONFIG_OPTIONS[@]}" \
     CFLAGS="${CFLAGS}" \
     OBJCFLAGS="${OBJCFLAGS}" \
