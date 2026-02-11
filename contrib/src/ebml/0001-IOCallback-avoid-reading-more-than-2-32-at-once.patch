@@ -1,0 +1,51 @@
+From 1a8c6d1e2518fe19d1d1d206b6df03470abb8e09 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Sun, 2 Oct 2022 09:24:27 +0200
+Subject: [PATCH] IOCallback: avoid reading more than 2^32 at once
+
+In practice it should never happen as 2^32+1 buffers are not possible on any
+known platform. But better safe than sorry. Or memory mapped files could reach
+this code ?
+
+(cherry picked from commit 40b4797829f6a35c1ea0a160ba7feed7443acb7d)
+---
+ src/IOCallback.cpp | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/src/IOCallback.cpp b/src/IOCallback.cpp
+index 13ed635..4fbaeee 100644
+--- a/src/IOCallback.cpp
++++ b/src/IOCallback.cpp
+@@ -33,6 +33,7 @@
+   \author Moritz Bunkus <moritz @ bunkus.org>
+ */
+ 
++#include <limits>
+ #include <sstream>
+ #include <stdexcept>
+ 
+@@ -64,10 +65,17 @@ void IOCallback::readFully(void*Buffer,size_t Size)
+   if(Buffer == nullptr)
+     throw;
+ 
+-  if(read(Buffer,Size) != Size) {
+-    stringstream Msg;
+-    Msg<<"EOF in readFully("<<Buffer<<","<<Size<<")";
+-    throw runtime_error(Msg.str());
++  char *readBuf = static_cast<char *>(Buffer);
++  uint32_t readSize = static_cast<uint32_t>(std::min<size_t>(std::numeric_limits<uint32>::max(), Size));
++  while (readSize != 0) {
++    if(read(readBuf,readSize) != readSize) {
++      stringstream Msg;
++      Msg<<"EOF in readFully("<<Buffer<<","<<Size<<")";
++      throw runtime_error(Msg.str());
++    }
++    Size -= readSize;
++    readBuf += readSize;
++    readSize = static_cast<uint32_t>(std::min<size_t>(std::numeric_limits<uint32>::max(), Size));
+   }
+ }
+ 
+-- 
+2.52.0.windows.1
+
