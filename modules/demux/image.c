@@ -737,7 +737,7 @@ static int parse_farbfeld_header(vlc_object_t *object, es_format_t *fmt)
     fmt->video.i_height = height;
     fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGBA64;
 
-    vlc_stream_Read(demux->s, NULL, 16);
+    (void) vlc_stream_Read(demux->s, NULL, 16);
 
     return VLC_SUCCESS;
 }
