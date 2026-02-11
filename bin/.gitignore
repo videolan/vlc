@@ -4,6 +4,8 @@ vlc-static
 vlc-wrapper
 vlc-osx
 vlc-osx-static
+vlc-preparser
+vlc-preparser-static
 Contents/*
 vlc
 *.exe
