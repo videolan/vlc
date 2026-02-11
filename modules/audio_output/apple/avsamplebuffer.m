@@ -507,7 +507,13 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
         goto error;
     }
 
-    _sync.delaysRateChangeUntilHasSufficientMediaData = NO;
+#if (TARGET_OS_OSX   && defined(__MAC_11_3)     && MAC_OS_X_VERSION_MAX_ALLOWED    >= __MAC_11_3) || \
+    (TARGET_OS_IOS   && defined(__IPHONE_14_5)  && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_14_5) || \
+    (TARGET_OS_TV    && defined(__TVOS_14_5)     && __TV_OS_VERSION_MAX_ALLOWED     >= __TVOS_14_5) || \
+    (TARGET_OS_WATCH && defined(__WATCHOS_7_4)   && __WATCH_OS_VERSION_MAX_ALLOWED  >= __WATCHOS_7_4)
+    if (@available(macOS 11.3, iOS 14.5, tvOS 14.5, watchOS 7.4, *))
+        _sync.delaysRateChangeUntilHasSufficientMediaData = NO;
+#endif
     [_sync addRenderer:_renderer];
 
     _stopped = NO;
@@ -523,6 +529,10 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
                     selector:@selector(flushedAutomatically:)
                         name:AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification
                       object:nil];
+#if (TARGET_OS_OSX   && defined(__MAC_12_0)    && MAC_OS_X_VERSION_MAX_ALLOWED    >= __MAC_12_0) || \
+    (TARGET_OS_IOS   && defined(__IPHONE_15_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_15_0) || \
+    (TARGET_OS_TV    && defined(__TVOS_15_0)   && __TV_OS_VERSION_MAX_ALLOWED     >= __TVOS_15_0) || \
+    (TARGET_OS_WATCH && defined(__WATCHOS_8_0) && __WATCH_OS_VERSION_MAX_ALLOWED  >= __WATCHOS_8_0)
     if (@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *))
     {
         [notifCenter addObserver:self
@@ -530,6 +540,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
                             name:AVSampleBufferAudioRendererOutputConfigurationDidChangeNotification
                           object:nil];
     }
+#endif
 
     return YES;
 error:
