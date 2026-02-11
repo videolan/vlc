@@ -360,11 +360,16 @@ static inline bool json_object_to_boolean(const struct json_object *obj,
  * Macro definition
  */
 
+struct json_array_iter {
+    size_t i;
+    const struct json_array *a;
+};
+
 /* Get the array with `name` as a key, if there is not array with this key set
  * `error` to true and don't start the loop, else iterate over the array and
  * set `item` to the current value each round. */
 #define json_array_foreach_ref(obj, name, item, error) \
-    for (struct { size_t i; const struct json_array *a; } \
+    for (struct json_array_iter \
             idx_##item = { 0, json_get_array(obj, name) }; \
             ((idx_##item.a != NULL || (*(error) = true, false)) && \
             idx_##item.i < idx_##item.a->size && \
