@@ -74,6 +74,9 @@ avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
 
     if (spatial_audio)
     {
+#if (TARGET_OS_IOS   && defined(__IPHONE_15_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_15_0) || \
+    (TARGET_OS_TV    && defined(__TVOS_15_0)   && __TV_OS_VERSION_MAX_ALLOWED     >= __TVOS_15_0) || \
+    (TARGET_OS_WATCH && defined(__WATCHOS_8_0) && __WATCH_OS_VERSION_MAX_ALLOWED  >= __WATCHOS_8_0)
         if (@available(iOS 15.0, watchOS 8.0, tvOS 15.0, *))
         {
             /* Not mandatory, SpatialAudio can work without it. It just signals to
@@ -81,6 +84,7 @@ avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
             [instance setSupportsMultichannelContent:aout_FormatNbChannels(fmt) > 2
                                                error:nil];
         }
+#endif
     }
     else if (channel_count == 2 && aout_FormatNbChannels(fmt) > 2)
     {
