@@ -1386,7 +1386,10 @@ static int ASF_ReadObject_marker(stream_t *s, asf_object_t *p_obj)
         p_mk->marker = calloc( p_mk->i_count,
                               sizeof( asf_marker_t ) );
         if( !p_mk->marker )
+        {
+            free( p_mk->name );
             return VLC_ENOMEM;
+        }
 
         for( uint32_t i = 0; i < p_mk->i_count; i++ )
         {
