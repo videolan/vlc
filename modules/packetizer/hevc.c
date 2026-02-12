@@ -260,8 +260,13 @@ static int Open(vlc_object_t *p_this)
         p_dec->fmt_out.p_extra =
                 hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra,
                                         &i_new_extra, &p_sys->i_nal_length_size);
-        if(p_dec->fmt_out.p_extra)
-            p_dec->fmt_out.i_extra = i_new_extra;
+        if(!p_dec->fmt_out.p_extra)
+        {
+            msg_Err( p_dec, "Invalid HVCC extradata");
+            Close( VLC_OBJECT(p_dec) );
+            return VLC_EGENERIC;
+        }
+        p_dec->fmt_out.i_extra = i_new_extra;
     }
     else
     {
