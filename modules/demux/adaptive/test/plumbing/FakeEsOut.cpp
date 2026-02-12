@@ -365,16 +365,16 @@ static int check0(es_out_t *out, struct context *, FakeESOut *fakees)
 int FakeEsOut_test()
 {
     struct context ctx = {VLC_TICK_INVALID,VLC_TICK_INVALID,VLC_TICK_INVALID};
-    struct dropesout dummy = {
-            .ctx = &ctx,
-            .esout = {
+    struct dropesout dummy = {};
+    dummy.ctx = &ctx;
+    dummy.esout = {
                 .pf_add = dummy_callback_add,
                 .pf_send = dummy_callback_send,
                 .pf_del = dummy_callback_del,
                 .pf_control = dummy_callback_control,
                 .pf_destroy = dummy_callback_destroy,
                 .p_sys = nullptr,
-    } };
+    };
 
     int(* const tests[3])(es_out_t *, struct context *, FakeESOut *)
             = { check0, check1, check2 };
