@@ -627,10 +627,9 @@ static int check0(es_out_t *out, DummyEsOut *, FakeESOut *fakees)
 int FakeEsOut_test()
 {
     DummyEsOut dummyEsOut;
-    struct dropesout dummy = {
-            .dummyesout = &dummyEsOut,
-            .esout = { .cbs = &dummycbs }
-    };
+    struct dropesout dummy = {};
+    dummy.dummyesout = &dummyEsOut;
+    dummy.esout.cbs = &dummycbs;
 
     int(* const tests[4])(es_out_t *, DummyEsOut *, FakeESOut *)
             = { check0, check1, check2, check3 };
