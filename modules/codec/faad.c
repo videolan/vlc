@@ -45,15 +45,11 @@
 
 #include <faad.h>
 #if !defined(FAAD2_VERSION) // FAAD2_VERSION added in 2.10.1
-# define FAAD2_VERSION_OLDER_THAN_2101
+# define PATCH_PCA
 #endif
 
 #include <neaacdec.h>
 #include "../packetizer/mpeg4audio.h"
-
-#if defined(FAAD2_VERSION_OLDER_THAN_2101) && !defined(FAAD2_VIDEOLAN_PATCHED)
-# define PATCH_PCA
-#endif
 
 /*****************************************************************************
  * Module descriptor
