@@ -1085,27 +1085,6 @@ static size_t preparser_Cancel(void *opaque, struct vlc_preparser_req *req)
 }
 
 /**
- * Preparser SetTimeout operation.
- * (see `vlc_preparser_SetTimeout`)
- */
-static void preparser_SetTimeout(void *opaque, vlc_tick_t timeout)
-{
-    struct preparser_sys *sys = opaque;
-    assert(sys != NULL);
-
-    if (sys->pool_preparser != NULL) {
-        vlc_mutex_lock(&sys->pool_preparser->lock);
-        sys->pool_preparser->timeout = timeout;
-        vlc_mutex_unlock(&sys->pool_preparser->lock);
-    }
-    if (sys->pool_thumbnailer != NULL) {
-        vlc_mutex_lock(&sys->pool_thumbnailer->lock);
-        sys->pool_thumbnailer->timeout = timeout;
-        vlc_mutex_unlock(&sys->pool_thumbnailer->lock);
-    }
-}
-
-/**
  * Preparser Delete operation.
  * (see `vlc_preparser_Delete`)
  */
@@ -1186,7 +1165,6 @@ void *vlc_preparser_external_New(vlc_preparser_t *owner, vlc_object_t *parent,
         .generate_thumbnail_to_files = preparser_GenerateThumbnailToFiles,
         .cancel = preparser_Cancel,
         .delete = preparser_Delete,
-        .set_timeout = preparser_SetTimeout,
     };
     owner->ops = &ops;
 

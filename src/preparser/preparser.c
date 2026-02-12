@@ -127,14 +127,6 @@ void vlc_preparser_Delete(vlc_preparser_t *preparser)
     free(preparser);
 }
 
-void vlc_preparser_SetTimeout(vlc_preparser_t *preparser, vlc_tick_t timeout)
-{
-    assert(preparser != NULL);
-    assert(preparser->ops != NULL);
-    assert(preparser->ops->set_timeout != NULL);
-    preparser->ops->set_timeout(preparser->sys, timeout);
-}
-
 input_item_t *vlc_preparser_req_GetItem(struct vlc_preparser_req *req)
 {
     assert(req != NULL);

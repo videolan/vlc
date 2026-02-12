@@ -45,9 +45,6 @@ struct vlc_preparser_operations {
 
     /** Called by `vlc_preparser_Delete`. */
     void (*delete)(void *opaque);
-
-    /** Called by `vlc_preparser_SetTimeout`. */
-    void (*set_timeout)(void *opaque, vlc_tick_t timeout);
 };
 
 struct vlc_preparser_t {

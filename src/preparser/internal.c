@@ -933,14 +933,6 @@ static size_t preparser_Cancel( void *opaque, vlc_preparser_req *req )
     return count;
 }
 
-static void preparser_SetTimeout(void *opaque, vlc_tick_t timeout)
-{
-    assert(opaque != NULL);
-    struct preparser_sys *preparser = opaque;
-
-    preparser->timeout = timeout;
-}
-
 static void preparser_Delete(void *opaque)
 {
     assert(opaque != NULL);
@@ -1034,7 +1026,6 @@ vlc_preparser_internal_New(vlc_preparser_t *owner, vlc_object_t *parent,
         .generate_thumbnail_to_files = preparser_GenerateThumbnailToFiles,
         .cancel = preparser_Cancel,
         .delete = preparser_Delete,
-        .set_timeout = preparser_SetTimeout,
     };
     assert(owner != NULL);
     owner->ops = &ops;
