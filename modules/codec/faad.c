@@ -43,8 +43,17 @@
 #include <vlc_cpu.h>
 #include <vlc_aout.h>
 
+#include <faad.h>
+#if !defined(FAAD2_VERSION) // FAAD2_VERSION added in 2.10.1
+# define FAAD2_VERSION_OLDER_THAN_2101
+#endif
+
 #include <neaacdec.h>
 #include "../packetizer/mpeg4audio.h"
+
+#if defined(FAAD2_VERSION_OLDER_THAN_2101) && !defined(FAAD2_VIDEOLAN_PATCHED)
+# define PATCH_PCA
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -454,7 +463,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             p_sys->b_ps = frame.ps;
         }
 
-#ifndef FAAD2_VIDEOLAN_PATCHED
+#ifdef PATCH_PCA
         /* PS Enabled FAAD PCA bug hotfix (contribs has patch) */
         if( frame.channels == 8 )
         {
@@ -650,4 +659,3 @@ static void DoReordering( uint32_t *p_out, uint32_t *p_in, int i_samples,
         }
     }
 }
-
