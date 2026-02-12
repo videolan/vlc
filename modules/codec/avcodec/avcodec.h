@@ -66,19 +66,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
     "this can produce a lot of errors.\n" \
     "Valid values range from 0 to 4 (0 disables all errors resilience).")
 
-#define BUGS_TEXT N_("Workaround bugs")
-#define BUGS_LONGTEXT N_( \
-    "Try to fix some bugs:\n" \
-    "1  autodetect\n" \
-    "2  old msmpeg4\n" \
-    "4  xvid interlaced\n" \
-    "8  ump4 \n" \
-    "16 no padding\n" \
-    "32 ac vlc\n" \
-    "64 Qpel chroma.\n" \
-    "This must be the sum of the values. For example, to fix \"ac vlc\" and " \
-    "\"ump4\", enter 40.")
-
 #define HURRYUP_TEXT N_("Hurry up")
 #define HURRYUP_LONGTEXT N_( \
     "The decoder can partially decode or skip frame(s) " \

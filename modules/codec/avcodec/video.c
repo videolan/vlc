@@ -549,8 +549,6 @@ static int InitVideoDecCommon( decoder_t *p_dec )
                                 p_dec->fmt_in->i_original_fourcc : p_dec->fmt_in->i_codec );
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
-    p_context->workaround_bugs =
-        var_InheritInteger( p_dec, "avcodec-workaround-bugs" );
     p_context->err_recognition =
         var_InheritInteger( p_dec, "avcodec-error-resilience" );
 
