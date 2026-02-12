@@ -849,18 +849,21 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner)
     decoder_t *p_dec = &p_owner->dec;
     assert( p_owner->cat == VIDEO_ES );
     bool need_vout = false;
+    bool need_pool = false;
 
     vlc_fifo_Lock(p_owner->p_fifo);
     if( p_owner->video.vout == NULL )
     {
         msg_Dbg(p_dec, "vout: none found");
         need_vout = true;
+        need_pool = true;
     }
     if( p_dec->fmt_out.video.i_width != p_owner->fmt.video.i_width
              || p_dec->fmt_out.video.i_height != p_owner->fmt.video.i_height )
     {
         msg_Dbg(p_dec, "vout change: decoder size");
         need_vout = true;
+        need_pool = true;
     }
     if( p_dec->fmt_out.video.i_visible_width != p_owner->fmt.video.i_visible_width
              || p_dec->fmt_out.video.i_visible_height != p_owner->fmt.video.i_visible_height
@@ -869,30 +872,35 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner)
     {
         msg_Dbg(p_dec, "vout change: visible size");
         need_vout = true;
+        need_pool = true;
     }
     if( p_dec->fmt_out.i_codec != p_owner->fmt.video.i_chroma )
     {
         msg_Dbg(p_dec, "vout change: chroma");
         need_vout = true;
+        need_pool = true;
     }
     if( (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->fmt.video.i_sar_den !=
              (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->fmt.video.i_sar_num )
     {
         msg_Dbg(p_dec, "vout change: SAR");
         need_vout = true;
+        need_pool = true;
     }
     if( p_dec->fmt_out.video.orientation != p_owner->fmt.video.orientation )
     {
         msg_Dbg(p_dec, "vout change: orientation");
         need_vout = true;
+        need_pool = true;
     }
     if( p_dec->fmt_out.video.multiview_mode != p_owner->fmt.video.multiview_mode )
     {
         msg_Dbg(p_dec, "vout change: multiview");
         need_vout = true;
+        need_pool = true;
     }
 
-    if( !need_vout )
+    if( !need_vout && !need_pool )
     {
         vlc_fifo_Unlock(p_owner->p_fifo);
         return 0; // vout unchanged
@@ -913,8 +921,12 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner)
 
     DecoderUpdateFormatLocked( p_owner );
     p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
-    picture_pool_t *pool = p_owner->video.out_pool;
-    p_owner->video.out_pool = NULL;
+    picture_pool_t *pool = NULL;
+    if ( need_pool )
+    {
+        pool = p_owner->video.out_pool;
+        p_owner->video.out_pool = NULL;
+    }
     vlc_fifo_Unlock( p_owner->p_fifo );
 
      if ( pool != NULL )
