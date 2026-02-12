@@ -113,6 +113,8 @@ HAVE_IOS_OR_TVOS="0"
 HAVE_XROS="0"
 HAVE_WATCHOS="0"
 
+HAVE_PROCESS_SPAWN="1"
+
 dnl  Set x86 asm flags and defines
 X86ASMFLAGS=""
 case "${host_cpu}" in
@@ -220,6 +222,7 @@ int foo() { return my_array[0]; }
              #endif],
              [HAVE_IOS="1"
              HAVE_IOS_OR_TVOS="1"
+             HAVE_PROCESS_SPAWN="0"
              ac_cv_func_wordexp=no],
              [HAVE_OSX="1"])
 
@@ -233,6 +236,7 @@ int foo() { return my_array[0]; }
              HAVE_IOS="0"
              HAVE_OSX="0"
              HAVE_XROS="0"
+             HAVE_PROCESS_SPAWN="0"
              ac_cv_func_fork=no
              ],)
 
@@ -246,6 +250,7 @@ int foo() { return my_array[0]; }
              HAVE_OSX="0"
              HAVE_TVOS="0"
              HAVE_IOS_OR_TVOS="0"
+             HAVE_PROCESS_SPAWN="0"
              ac_cv_func_fork=no
              ],)
 
@@ -259,6 +264,7 @@ int foo() { return my_array[0]; }
              HAVE_OSX="0"
              HAVE_TVOS="0"
              HAVE_IOS_OR_TVOS="0"
+             HAVE_PROCESS_SPAWN="0"
              ac_cv_func_fork=no
              ],)
 
@@ -419,6 +425,7 @@ int foo() { return my_array[0]; }
     AC_CHECK_FUNCS([if_nametoindex])
     X86ASMFLAGS="-f aout"
     X86ASMDEFS="-DARCH_X86_64=0 -DPREFIX"
+    HAVE_PROCESS_SPAWN="0"
     ;;
   *emscripten*)
     SYS=emscripten
@@ -427,6 +434,7 @@ int foo() { return my_array[0]; }
     CXXFLAGS="${CXXFLAGS} -pthread"
     ac_cv_func_if_nameindex=yes
     ac_cv_header_sys_shm_h=no
+    HAVE_PROCESS_SPAWN="0"
     ;;
   *)
     SYS="${host_os}"
@@ -441,6 +449,7 @@ case "${host_os}" in
     AC_MSG_CHECKING([Check Android API version])
     ANDROID_API="`echo ${host_os} | tr -c -d '[[:digit:]]'`"
     AC_MSG_RESULT([${ANDROID_API}])
+    HAVE_PROCESS_SPAWN="0"
 
     dnl GLESv2 and EGL are provided by android NDK without .pc files
     GLES2_LIBS="-lGLESv2"
@@ -515,6 +524,8 @@ AM_CONDITIONAL([HAVE_XROS],    [test "${HAVE_XROS}" = "1"])
 AM_CONDITIONAL([HAVE_WATCHOS],    [test "${HAVE_WATCHOS}" = "1"])
 
 AM_CONDITIONAL([HAVE_LIBANL],  [test "${HAVE_LIBANL}" = "1"])
+
+AM_CONDITIONAL([HAVE_PROCESS_SPAWN],  [test "${HAVE_PROCESS_SPAWN}" = "1"])
 
 AM_CONDITIONAL([HAVE_WIN32],   [test "${SYS}" = "mingw32"])
 AM_CONDITIONAL([HAVE_WIN64],   [test "${HAVE_WIN64}" = "1"]) dnl Only used for the packaging

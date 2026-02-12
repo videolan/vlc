@@ -530,6 +530,9 @@ endif
 endif
 
 if !HAVE_WIN32
+if HAVE_PROCESS_SPAWN
+libvlccore_la_SOURCES += posix/process.c
+endif
 if !HAVE_OS2
 libvlccore_la_SOURCES += \
 	posix/filesystem.c \
@@ -548,8 +551,7 @@ libvlccore_la_SOURCES += \
 libvlccore_la_LIBADD += $(LIBEXECINFO)
 if HAVE_OSX
 libvlccore_la_SOURCES += \
-	posix/spawn.c \
-	posix/process.c
+	posix/spawn.c
 endif
 if !HAVE_DARWIN
 if !HAVE_EMSCRIPTEN
@@ -560,8 +562,7 @@ libvlccore_la_SOURCES += \
 	posix/error.c \
 	posix/picture.c \
 	posix/spawn.c \
-	posix/specific.c \
-	posix/process.c
+	posix/specific.c
 if HAVE_LIBANL
 libvlccore_la_SOURCES += \
 	linux/getaddrinfo.c
