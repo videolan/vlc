@@ -864,16 +864,55 @@ FocusScope {
                 model: {
                     criteria: "title",
 
-                    subCriterias: [ "duration", "album_title" ],
+                    subCriterias: MainCtx.albumSections ? ["track_number", "duration"]
+                                                        : ["duration", "album_title"],
 
                     text: qsTr("Title"),
 
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate
+                    headerDelegate: MainCtx.albumSections ? tableColumns.titleTextHeaderDelegate
+                                                          : tableColumns.titleHeaderDelegate,
+                    colDelegate: MainCtx.albumSections ? tableColumns.titleTextDelegate
+                                                       : tableColumns.titleDelegate
                 }
             }]
 
-            property var _modelMedium: [{
+            property var _modelMedium: MainCtx.albumSections ? [{
+                size: .2,
+
+                model: {
+                    criteria: "track_number",
+
+                    text: qsTr("#"),
+
+                    showSection: "",
+
+                    hCenterText: true
+                }
+            }, {
+                weight: 1,
+
+                model: {
+                    criteria: "title",
+
+                    text: qsTr("Title"),
+
+                    headerDelegate: tableColumns.titleTextHeaderDelegate,
+                    colDelegate: tableColumns.titleTextDelegate
+                }
+            }, {
+                size: 1,
+
+                model: {
+                    criteria: "duration",
+
+                    text: qsTr("Duration"),
+
+                    showSection: "",
+
+                    headerDelegate: tableColumns.timeHeaderDelegate,
+                    colDelegate: tableColumns.timeColDelegate
+                }
+            }] : [{
                 weight: 1,
 
                 model: {
