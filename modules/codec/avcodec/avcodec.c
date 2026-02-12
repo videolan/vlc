@@ -106,8 +106,7 @@ vlc_module_begin ()
 
     add_bool( "avcodec-dr", true, DR_TEXT, NULL )
     add_bool( "avcodec-corrupted", true, CORRUPTED_TEXT, CORRUPTED_LONGTEXT )
-    add_integer ( "avcodec-error-resilience", 1, ERROR_TEXT,
-        ERROR_LONGTEXT )
+    add_obsolete_integer ( "avcodec-error-resilience" ) /* removed since 4.0.0 */
     add_obsolete_integer ( "avcodec-workaround-bugs" ) /* removed since 4.0.0 */
     add_bool( "avcodec-hurry-up", true, HURRYUP_TEXT, HURRYUP_LONGTEXT )
     add_integer( "avcodec-skip-frame", 0, SKIP_FRAME_TEXT,

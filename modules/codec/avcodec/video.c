@@ -549,9 +549,6 @@ static int InitVideoDecCommon( decoder_t *p_dec )
                                 p_dec->fmt_in->i_original_fourcc : p_dec->fmt_in->i_codec );
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
-    p_context->err_recognition =
-        var_InheritInteger( p_dec, "avcodec-error-resilience" );
-
     if( var_CreateGetBool( p_dec, "grayscale" ) )
         p_context->flags |= AV_CODEC_FLAG_GRAY;
 

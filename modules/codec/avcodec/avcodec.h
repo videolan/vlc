@@ -59,13 +59,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
 #define CORRUPTED_TEXT N_("Show corrupted frames")
 #define CORRUPTED_LONGTEXT N_("Prefer visual artifacts instead of missing frames")
 
-#define ERROR_TEXT N_("Error resilience")
-#define ERROR_LONGTEXT N_( \
-    "libavcodec can do error resilience.\n" \
-    "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) " \
-    "this can produce a lot of errors.\n" \
-    "Valid values range from 0 to 4 (0 disables all errors resilience).")
-
 #define HURRYUP_TEXT N_("Hurry up")
 #define HURRYUP_LONGTEXT N_( \
     "The decoder can partially decode or skip frame(s) " \
