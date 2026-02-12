@@ -897,7 +897,7 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner)
     {
         msg_Dbg(p_dec, "vout change: multiview");
         need_vout = true;
-        need_pool = true;
+        // no need for a new pool if only this field changed
     }
 
     if( !need_vout && !need_pool )
@@ -996,7 +996,10 @@ static picture_t *ModuleThread_NewVideoBuffer( decoder_t *p_dec )
     picture_t *pic = picture_pool_Wait( p_owner->video.out_pool );
 
     if (pic)
+    {
         picture_Reset( pic );
+        pic->format.multiview_mode = p_dec->fmt_out.video.multiview_mode;
+    }
     return pic;
 }
 
