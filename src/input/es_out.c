@@ -2206,6 +2206,27 @@ static void EsOutFillEsFmt(es_out_sys_t *p_sys, es_format_t *fmt)
     case VIDEO_ES:
         fmt->i_codec = vlc_fourcc_GetCodec( fmt->i_cat, fmt->i_codec );
 
+        // first sanitize some values
+        if( fmt->video.i_visible_width )
+        {
+            if( fmt->video.i_visible_width > fmt->video.i_width )
+                fmt->video.i_visible_width = fmt->video.i_width;
+            if( fmt->video.i_x_offset > fmt->video.i_width - fmt->video.i_visible_width )
+                fmt->video.i_x_offset = fmt->video.i_width - fmt->video.i_visible_width;
+        } else if( fmt->video.i_x_offset > fmt->video.i_width ) {
+            fmt->video.i_x_offset = fmt->video.i_width;
+        }
+
+        if( fmt->video.i_visible_height )
+        {
+            if( fmt->video.i_visible_height > fmt->video.i_height )
+                fmt->video.i_visible_height = fmt->video.i_height;
+            if( fmt->video.i_y_offset > fmt->video.i_height - fmt->video.i_visible_height )
+                fmt->video.i_y_offset = fmt->video.i_height - fmt->video.i_visible_height;
+        } else if( fmt->video.i_y_offset > fmt->video.i_height ) {
+            fmt->video.i_y_offset = fmt->video.i_height;
+        }
+
         if( !fmt->video.i_visible_width || !fmt->video.i_visible_height )
         {
             fmt->video.i_visible_width = fmt->video.i_width - fmt->video.i_x_offset;
