@@ -745,7 +745,13 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
                     vlc_ancillary_CreateWithFreeCb(alpha_data, VLC_ANCILLARY_ID_VPX_ALPHA,
                                                    ReleaseVpxAlpha);
                 if (likely(alpha != NULL))
-                    vlc_frame_AttachAncillary(p_block, alpha);
+                {
+                    if(vlc_frame_AttachAncillary(p_block, alpha) != VLC_SUCCESS){
+                        vlc_ancillary_Release(alpha);
+                        block_Release(p_block);
+                        return;
+                    }
+                }
                 else
                 {
                     ReleaseVpxAlpha(alpha_data);
