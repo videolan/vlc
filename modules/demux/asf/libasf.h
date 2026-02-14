@@ -252,6 +252,28 @@ typedef struct
     } bitrate[ASF_MAX_STREAMNUMBER + 1];
 } asf_object_stream_bitrate_properties_t;
 
+typedef struct
+{
+    uint32_t i_packet_number;
+    uint32_t i_timecode; /* presentation time in milliseconds */
+} asf_timecode_entry_t;
+
+typedef struct
+{
+    ASF_OBJECT_COMMON
+    uint32_t    i_index_entry_time_interval;
+    uint32_t    i_max_packet_count;
+    uint32_t    i_index_entry_count;
+    asf_timecode_entry_t *timecode_entry;
+} asf_object_timecode_index_t;
+
+typedef struct
+{
+    ASF_OBJECT_COMMON
+    uint32_t    i_index_entry_time_interval;
+    uint32_t    i_max_packet_count;
+    uint32_t    i_index_entry_count;
+} asf_object_timecode_index_parameters_t;
 
 typedef struct
 {
@@ -353,10 +375,11 @@ typedef struct
 
     /* from asf_object_header_t */
     asf_object_file_properties_t *p_fp;
-
+    asf_object_header_extension_t *p_he;
     /* from asf_object_header_extension_t */
     asf_object_metadata_t *p_metadata;
-
+    asf_object_timecode_index_t *p_timecode_index;
+    asf_object_timecode_index_parameters_t *p_timecode_index_parameters;
 } asf_object_root_t;
 
 /****************************************************************************
@@ -383,7 +406,8 @@ typedef union asf_object_u
     asf_object_stream_prioritization_t stream_prioritization;
     asf_object_bitrate_mutual_exclusion_t bitrate_mutual_exclusion;
     asf_object_extended_content_description_t extended_content_description;
-
+    asf_object_timecode_index_t     timecode_index;
+    asf_object_timecode_index_parameters_t timecode_index_parameters;
 } asf_object_t;
 
 asf_object_root_t *ASF_ReadObjectRoot( stream_t *, int b_seekable );

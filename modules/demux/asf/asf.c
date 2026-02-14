@@ -35,12 +35,14 @@
 #include <vlc_dialog.h>
 
 #include <vlc_meta.h>                  /* vlc_meta_Set*, vlc_meta_New */
+#include <vlc_input.h>                 /* seekpoint_t, vlc_seekpoint_New */
 #include <vlc_access.h>                /* GET_PRIVATE_ID_STATE */
 #include <vlc_codecs.h>                /* VLC_BITMAPINFOHEADER, WAVEFORMATEX */
 #include <vlc_vout.h>
 
 #include <limits.h>
 #include <stdckdint.h>
+#include <stdlib.h>
 
 #include "asfpacket.h"
 #include "libasf.h"
@@ -140,6 +142,10 @@ typedef struct
     asf_packet_sys_t    packet_sys;
 
     vlc_meta_t          *meta;
+
+    /* timecode seekpoints built from WM TC index */
+    seekpoint_t        **pp_seekpoints;
+    int                  i_seekpoints;
 } demux_sys_t;
 
 static int      DemuxInit( demux_t * );
@@ -559,6 +565,76 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         vlc_meta_Merge( p_meta, p_sys->meta );
         return VLC_SUCCESS;
 
+    case DEMUX_GET_TITLE_INFO:
+    {
+        input_title_t ***ppp_title = va_arg( args, input_title_t *** );
+        int *pi_int             = va_arg( args, int * );
+        int *pi_title_offset    = va_arg( args, int * );
+        int *pi_seekpoint_offset = va_arg( args, int * );
+
+        if( p_sys->i_seekpoints == 0 )
+            return VLC_EGENERIC;
+
+        *pi_int = 1;
+        *ppp_title = malloc( sizeof(input_title_t *) );
+        if( !*ppp_title )
+            return VLC_ENOMEM;
+
+        input_title_t *p_title = (*ppp_title)[0] = vlc_input_title_New();
+        if( !p_title )
+        {
+            free( *ppp_title );
+            return VLC_ENOMEM;
+        }
+
+        for( int i = 0; i < p_sys->i_seekpoints; i++ )
+        {
+            seekpoint_t *p_sp = vlc_seekpoint_Duplicate( p_sys->pp_seekpoints[i] );
+            if( unlikely(!p_sp) )
+                break;
+            TAB_APPEND( p_title->i_seekpoint, p_title->seekpoint, p_sp );
+        }
+
+        *pi_title_offset    = 0;
+        *pi_seekpoint_offset = 0;
+        return VLC_SUCCESS;
+    }
+
+    case DEMUX_SET_TITLE:
+        /* only one title */
+        if( va_arg( args, int ) != 0 )
+            return VLC_EGENERIC;
+        return VLC_SUCCESS;
+
+    case DEMUX_SET_SEEKPOINT:
+    {
+        const int i_seekpoint = va_arg( args, int );
+        if( i_seekpoint < 0 || i_seekpoint >= p_sys->i_seekpoints )
+            return VLC_EGENERIC;
+
+        const seekpoint_t *p_sp = p_sys->pp_seekpoints[i_seekpoint];
+        if( p_sp->i_time_offset == VLC_TICK_INVALID )
+            return VLC_EGENERIC;
+
+        SeekPrepare( p_demux );
+
+        if( p_sys->b_index && p_sys->i_length != 0 )
+        {
+            if( !SeekIndex( p_demux, p_sp->i_time_offset, -1 ) )
+                return VLC_SUCCESS;
+        }
+        /* fallback: proportional seek by time offset */
+        if( p_sys->i_length > 0 )
+        {
+            double f_pos = (double)p_sp->i_time_offset / p_sys->i_length;
+            WaitKeyframe( p_demux );
+            return vlc_stream_Seek( p_demux->s,
+                p_sys->i_data_begin + (uint64_t)( f_pos *
+                    (double)( p_sys->i_data_end - p_sys->i_data_begin ) ) );
+        }
+        return VLC_EGENERIC;
+    }
+
     case DEMUX_CAN_SEEK:
         if ( !p_sys->p_fp ||
              ( !( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) && !p_sys->b_index ) )
@@ -816,6 +892,8 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->i_data_end   = 0;
     p_sys->i_preroll_start = 0;
     p_sys->meta         = NULL;
+    p_sys->pp_seekpoints = NULL;
+    p_sys->i_seekpoints  = 0;
 
     /* Now load all object ( except raw data ) */
     vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK,
@@ -1365,6 +1443,39 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->packet_sys.pi_preroll_start = &p_sys->i_preroll_start;
     p_sys->packet_sys.b_can_hold_multiple_packets = false;
 
+    /* Build seekpoints from the WM TC index.
+     * Each entry's i_timecode is a presentation time in milliseconds.
+     * The first two entries are header/metadata entries and are skipped. */
+    if( p_sys->p_root && p_sys->p_root->p_timecode_index )
+    {
+        const asf_object_timecode_index_t *p_tc =
+                p_sys->p_root->p_timecode_index;
+
+        msg_Dbg( p_demux, "timecode index: %u entries", p_tc->i_index_entry_count );
+
+        for( uint32_t i = 2; i < p_tc->i_index_entry_count; i++ )
+        {
+            const uint32_t i_tc_ms = p_tc->timecode_entry[i].i_timecode;
+
+            seekpoint_t *p_sp = vlc_seekpoint_New();
+            if( unlikely(!p_sp) )
+                break;
+
+            p_sp->i_time_offset = VLC_TICK_FROM_MS( i_tc_ms );
+
+            if( asprintf( &p_sp->psz_name, "%u:%02u:%02u",
+                          i_tc_ms / 3600000,
+                          (i_tc_ms % 3600000) / 60000,
+                          (i_tc_ms % 60000) / 1000 ) < 0 )
+            {
+                vlc_seekpoint_Delete( p_sp );
+                break;
+            }
+
+            TAB_APPEND( p_sys->i_seekpoints, p_sys->pp_seekpoints, p_sp );
+        }
+    }
+
     return VLC_SUCCESS;
 
 error:
@@ -1418,6 +1529,10 @@ static void DemuxEnd( demux_t *p_demux )
         vlc_meta_Delete( p_sys->meta );
         p_sys->meta = NULL;
     }
+
+    for( int i = 0; i < p_sys->i_seekpoints; i++ )
+        vlc_seekpoint_Delete( p_sys->pp_seekpoints[i] );
+    TAB_CLEAN( p_sys->i_seekpoints, p_sys->pp_seekpoints );
 
     FlushQueues( p_demux );
 

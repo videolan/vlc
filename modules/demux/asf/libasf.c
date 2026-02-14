@@ -1430,6 +1430,99 @@ static void ASF_FreeObject_marker( asf_object_t *p_obj)
     FREENULL( p_mk->name );
 }
 
+static int ASF_ReadObject_timecode_index(stream_t *s, asf_object_t *p_obj)
+{
+    asf_object_timecode_index_t *p_tc_index = &p_obj->timecode_index;
+    const uint8_t      *p_peek;
+
+    /* minimum: 24 common + 24 specific header = 48 bytes */
+    if( p_tc_index->i_object_size < 48
+     || p_tc_index->i_object_size > INT32_MAX
+     || vlc_stream_Peek( s, &p_peek, p_tc_index->i_object_size )
+        < (int64_t)p_tc_index->i_object_size )
+        return VLC_SUCCESS;
+
+    /* specific header fields at offset 24 (after common GUID+size):
+     *   +0  DWORD index_entry_count (meaning unclear, not entry count)
+     *   +4  DWORD index_entry_time_interval
+     *   +8  DWORD max_packet_count
+     *   +12 WORD  index_specifiers_count
+     *   +14 ...   index specifiers (4 bytes each)
+     * entries start at offset 48 (24 common + 24 specific header)
+     * each entry: 4 bytes timecode_ms + 4 bytes packet_number = 8 bytes
+     */
+    p_tc_index->i_index_entry_time_interval = GetDWLE( p_peek + 28 );
+    p_tc_index->i_max_packet_count = GetDWLE( p_peek + 32 );
+    p_tc_index->i_index_entry_count = (p_tc_index->i_object_size - 48) / 8;
+    p_tc_index->timecode_entry = NULL;
+
+#ifdef ASF_DEBUG
+    msg_Dbg( s,
+            "read \"timecode index object\""
+            " index_entry_time_interval:%u max_packet_count:%u"
+            " index_entry_count:%u",
+            p_tc_index->i_index_entry_time_interval,
+            p_tc_index->i_max_packet_count,
+            p_tc_index->i_index_entry_count );
+#endif
+
+    if( !p_tc_index->i_index_entry_count )
+        return VLC_SUCCESS;
+
+    p_tc_index->timecode_entry = calloc( p_tc_index->i_index_entry_count,
+                                         sizeof(asf_timecode_entry_t) );
+    if( !p_tc_index->timecode_entry )
+    {
+        p_tc_index->i_index_entry_count = 0;
+        return VLC_ENOMEM;
+    }
+
+    const uint8_t *p_data = p_peek + 48;
+    for( uint32_t i = 0; i < p_tc_index->i_index_entry_count; i++, p_data += 8 )
+    {
+        /* on-disk layout: timecode_ms(4LE) then packet_number(4LE) */
+        p_tc_index->timecode_entry[i].i_timecode = GetDWLE( p_data );
+        p_tc_index->timecode_entry[i].i_packet_number = GetDWLE( p_data + 4 );
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int ASF_ReadObject_timecode_index_parameters(stream_t *s, asf_object_t *p_obj)
+{
+    asf_object_timecode_index_parameters_t *p_tc_params = &p_obj->timecode_index_parameters;
+    const uint8_t      *p_peek;
+
+    if( p_tc_params->i_object_size < 40
+     || p_tc_params->i_object_size > INT32_MAX
+     || vlc_stream_Peek( s, &p_peek, p_tc_params->i_object_size )
+        < (int64_t)p_tc_params->i_object_size )
+        return VLC_SUCCESS;
+
+    p_tc_params->i_index_entry_time_interval = GetDWLE( p_peek + ASF_OBJECT_COMMON_SIZE );
+    p_tc_params->i_max_packet_count = GetDWLE( p_peek + ASF_OBJECT_COMMON_SIZE + 8 );
+    p_tc_params->i_index_entry_count = GetDWLE( p_peek + ASF_OBJECT_COMMON_SIZE + 12 );
+
+#ifdef ASF_DEBUG
+    msg_Dbg( s,
+            "read \"timecode index parameters object\" "
+            "index_entry_time_interval:%u max_packet_count:%u "
+            "index_entry_count:%u",
+            p_tc_params->i_index_entry_time_interval,
+            p_tc_params->i_max_packet_count,
+            p_tc_params->i_index_entry_count );
+#endif
+
+    return VLC_SUCCESS;
+}
+
+static void ASF_FreeObject_timecode_index( asf_object_t *p_obj )
+{
+    asf_object_timecode_index_t *p_tc_index = &p_obj->timecode_index;
+
+    FREENULL( p_tc_index->timecode_entry );
+}
+
 static int ASF_ReadObject_Raw(stream_t *s, asf_object_t *p_obj)
 {
     VLC_UNUSED(s);
@@ -1489,6 +1582,10 @@ static const struct ASF_Object_Function_entry
     { &asf_object_extended_content_description, ASF_OBJECT_OTHER,
       ASF_ReadObject_extended_content_description,
       ASF_FreeObject_extended_content_description },
+    { &asf_object_timecode_index_guid, ASF_OBJECT_TIMECODE_INDEX,
+      ASF_ReadObject_timecode_index, ASF_FreeObject_timecode_index },
+    { &asf_object_timecode_index_parameters_guid, ASF_OBJECT_TIMECODE_INDEX_PARAMETERS,
+      ASF_ReadObject_timecode_index_parameters, ASF_FreeObject_Null },
     { &asf_object_content_encryption_guid, ASF_OBJECT_OTHER,
       ASF_ReadObject_Raw, ASF_FreeObject_Null },
     { &asf_object_advanced_content_encryption_guid, ASF_OBJECT_OTHER,
@@ -1639,6 +1736,8 @@ static const struct
     { &asf_object_stream_prioritization, "Stream Prioritization" },
     { &asf_object_bitrate_mutual_exclusion_guid, "Bitrate Mutual Exclusion" },
     { &asf_object_extended_content_description, "Extended content description"},
+    { &asf_object_timecode_index_guid, "Timecode Index"},
+    { &asf_object_timecode_index_parameters_guid, "Timecode Index Parameters"},
     { &asf_object_content_encryption_guid, "Content Encryption"},
     { &asf_object_advanced_content_encryption_guid, "Advanced Content Encryption"},
     { &asf_object_extended_content_encryption_guid, "Extended Content Encryption"},
@@ -1721,7 +1820,10 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
     p_root->p_data  = NULL;
     p_root->p_fp    = NULL;
     p_root->p_index = NULL;
+    p_root->p_he    = NULL;
     p_root->p_metadata = NULL;
+    p_root->p_timecode_index = NULL;
+    p_root->p_timecode_index_parameters = NULL;
 
     for( ; ; )
     {
@@ -1745,6 +1847,10 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
             case( ASF_OBJECT_INDEX ):
                 if ( p_root->p_index ) break;
                 p_root->p_index = (asf_object_index_t*)p_obj;
+                break;
+            case( ASF_OBJECT_TIMECODE_INDEX ):
+                if ( p_root->p_timecode_index ) break;
+                p_root->p_timecode_index = (asf_object_timecode_index_t*)p_obj;
                 break;
             default:
                 msg_Warn( s, "unknown top-level object found: " GUID_FMT,
@@ -1786,9 +1892,13 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
                                 &asf_object_header_extension_guid, 0 );
             if( p_hdr_ext )
             {
+                p_root->p_he = (asf_object_header_extension_t *)p_hdr_ext;
                 p_root->p_metadata =
                     ASF_FindObject( p_hdr_ext,
                                     &asf_object_metadata_guid, 0 );
+                p_root->p_timecode_index_parameters =
+                    ASF_FindObject( p_hdr_ext,
+                                    &asf_object_timecode_index_parameters_guid, 0 );
             }
 
             ASF_ObjectDumpDebug( VLC_OBJECT(s),
