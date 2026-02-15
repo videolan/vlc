@@ -743,6 +743,11 @@ static int Open( vlc_object_t * p_this )
                     tk->fmt.i_original_fourcc = VLC_FOURCC('a','v','c','1');
                 }
 
+                /* Store original fourcc for SpeedHQ variants so decoder can distinguish between them */
+                if( tk->fmt.i_codec == VLC_CODEC_SPEEDHQ && tk->fmt.i_original_fourcc == 0 )
+                {
+                    tk->fmt.i_original_fourcc = p_bih->biCompression;
+                }
                 tk->i_samplesize = 0;
 
                 tk->fmt.video.i_visible_width =
