@@ -158,6 +158,7 @@ private:
     bool b_recentList;
 public slots:
     void updateMRL() override;
+    void clearHistory();
 };
 
 class DiscOpenPanel: public OpenPanel
