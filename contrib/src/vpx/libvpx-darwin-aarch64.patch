@@ -1,6 +1,17 @@
---- libvpx/build/make/configure.sh	2025-04-16 15:30:51.431710564 -0400
-+++ libvpx-new/build/make/configure.sh	2025-04-16 15:36:35.935402419 -0400
-@@ -1183,7 +1183,7 @@
+From db37f83129cd777b588f28a50223d5158e50446e Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Mon, 10 Aug 2020 16:01:05 +0200
+Subject: [PATCH 5/6] add patch to use macOS SDK on macOS aarch64
+
+---
+ build/make/configure.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index 5638e3367..e7d57f342 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -1176,7 +1176,7 @@ EOF
  
          darwin)
            if ! enabled external_build; then
@@ -9,12 +20,6 @@
              CXX="$(${XCRUN_FIND} clang++)"
              CC="$(${XCRUN_FIND} clang)"
              AR="$(${XCRUN_FIND} ar)"
-@@ -1200,7 +1200,7 @@
-             add_cflags -arch ${tgt_isa}
-             add_ldflags -arch ${tgt_isa}
- 
--            alt_libc="$(show_darwin_sdk_path iphoneos)"
-+            alt_libc="$(show_darwin_sdk_path macosx)"
-             if [ -d "${alt_libc}" ]; then
-               add_cflags -isysroot ${alt_libc}
-             fi
+-- 
+2.52.0.windows.1
+

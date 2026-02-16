@@ -1,11 +1,28 @@
---- libvpx/build/make/configure.sh	2025-01-10 14:30:59.000000000 -0500
-+++ libvpx-new/build/make/configure.sh	2025-04-16 16:13:01.119638658 -0400
-@@ -1228,12 +1228,6 @@
+From 705e989af0ebc6600c5d30eccdebbd65c648f8fe Mon Sep 17 00:00:00 2001
+From: Alexandre Janniaux <ajanni@videolabs.io>
+Date: Wed, 29 Apr 2020 18:25:05 +0200
+Subject: [PATCH 6/6] allow compiling without bitcode
+
+As vpx buildsystem adds -fembed-bitcode as long as iphone target is > 8
+it makes the build fails on compilers not supporting bitcode embedding.
+
+In any case, we enable bitcode embedding ourselves by adding it to the
+contribs CFLAGS, which ends up in --extra-cflags in vpx.
+---
+ build/make/configure.sh | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index e7d57f342..cf8c6beb1 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -1223,13 +1223,6 @@ fi
                  fi
                  ;;
              esac
 -
--            if [ "$(show_darwin_sdk_major_version iphoneos)" -gt 8 ]; then
+-            if [ "$(show_darwin_sdk_major_version iphoneos)" -gt 8 ] \
+-               && [ "$(show_xcode_version | cut -d. -f1)" -lt 16 ]; then
 -              check_add_cflags -fembed-bitcode
 -              check_add_asflags -fembed-bitcode
 -              check_add_ldflags -fembed-bitcode
@@ -13,3 +30,6 @@
            fi
  
            asm_conversion_cmd="${source_path_mk}/build/make/ads2gas_apple.pl"
+-- 
+2.52.0.windows.1
+

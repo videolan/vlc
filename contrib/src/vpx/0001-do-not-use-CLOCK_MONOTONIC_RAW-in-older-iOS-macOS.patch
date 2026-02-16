@@ -1,0 +1,37 @@
+From ab64c7071007922e50c8b8e74fd1598b34c746bb Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 26 Jun 2026 13:58:07 +0200
+Subject: [PATCH] do not use CLOCK_MONOTONIC_RAW in older iOS/macOS
+
+../vpx_ports/vpx_timer.h:72:17: error: '_CLOCK_MONOTONIC_RAW' is only available on iOS 10.0 or newer [-Werror,-Wunguarded-availability]
+   72 |   clock_gettime(CLOCK_MONOTONIC_RAW, &t->end);
+      |                 ^~~~~~~~~~~~~~~~~~~
+---
+ vpx_ports/vpx_timer.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/vpx_ports/vpx_timer.h b/vpx_ports/vpx_timer.h
+index 55e7891e1..60141077a 100644
+--- a/vpx_ports/vpx_timer.h
++++ b/vpx_ports/vpx_timer.h
+@@ -15,6 +15,17 @@
+ 
+ #include "vpx/vpx_integer.h"
+ 
++#if __APPLE__
++# include <TargetConditionals.h>
++# if (TARGET_OS_OSX && defined(__MAC_10_12) && __MAC_OS_X_VERSION_MIN_REQUIRED  < __MAC_10_12) || \
++     (TARGET_OS_IPHONE && defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_10_0) 
++   // CLOCK_MONOTONIC_RAW | CLOCK_MONOTONIC require macOS 10.12
++   // CLOCK_MONOTONIC_RAW | CLOCK_MONOTONIC require iOS 10
++#  undef CONFIG_OS_SUPPORT
++#  define CONFIG_OS_SUPPORT 0
++# endif
++#endif
++
+ #if CONFIG_OS_SUPPORT
+ 
+ #if defined(_WIN32)
+-- 
+2.52.0.windows.1
+
