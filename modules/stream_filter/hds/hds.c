@@ -550,6 +550,11 @@ static void parse_BootstrapData( vlc_object_t* p_this,
     data_p += 8;
 
     s->movie_id = strndup( (char*)data_p, data_end - data_p );
+    if( ! s->movie_id )
+    {
+        msg_Err( p_this, "Couldn't allocate movie_id" );
+        return;
+    }
     data_p += ( strlen( s->movie_id ) + 1 );
 
     if( data_end - data_p < 4 ) {
@@ -566,8 +571,14 @@ static void parse_BootstrapData( vlc_object_t* p_this,
     {
         if( s->server_entry_count < MAX_HDS_SERVERS )
         {
-            s->server_entries[s->server_entry_count++] = strndup( (char*)data_p,
-                                                                  data_end - data_p );
+            s->server_entries[s->server_entry_count] = strndup( (char*)data_p,
+                                                                 data_end - data_p );
+            if( ! s->server_entries[s->server_entry_count] )
+            {
+                msg_Err( p_this, "Couldn't allocate server entry" );
+                return;
+            }
+            s->server_entry_count++;
             data_p += strlen( s->server_entries[s->server_entry_count-1] ) + 1;
         }
         else
@@ -611,6 +622,11 @@ static void parse_BootstrapData( vlc_object_t* p_this,
         if( s->quality_segment_modifier )
         {
             s->quality_segment_modifier = strndup( (char*)data_p, data_end - data_p );
+            if( ! s->quality_segment_modifier )
+            {
+                msg_Err( p_this, "Couldn't allocate quality_segment_modifier" );
+                return;
+            }
         }
         data_p += strnlen( (char*)data_p, data_end - data_p ) + 1;
     }
