@@ -460,6 +460,8 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         i_column = SORT_DESCRIPTION;
     else if ([o_column isEqualToString:URI_COLUMN])
         i_column = SORT_URI;
+    else if ([o_column isEqualToString:FILESIZE_COLUMN])
+        i_column = SORT_FILE_SIZE;
     else
         return;
 
