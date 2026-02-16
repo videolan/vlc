@@ -1,0 +1,50 @@
+From c66c94588057ab8fd0790bd6c774a777b10ffe17 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 26 Jun 2026 11:28:21 +0200
+Subject: [PATCH 1/6] Disable forcing flags for Apple targets
+
+Some platforms are not supported and forcing
+miphoneos on all arm Darwin is just plain wrong.
+---
+ build/make/configure.sh | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index 21407f3d8..eb479ddec 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -912,6 +912,7 @@ process_common_toolchain() {
+ #endif
+ EOF
+ 
++if [ 0 -eq 1 ]; then
+   # Minimum iOS version for all target platforms (darwin and iphonesimulator).
+   # Shared library framework builds are only possible on iOS 8 and later.
+   if enabled shared; then
+@@ -1005,6 +1006,7 @@ EOF
+       fi
+       ;;
+   esac
++fi
+ 
+   # Handle Solaris variants. Solaris 10 needs -lposix4
+   case ${toolchain} in
+@@ -1200,6 +1202,7 @@ EOF
+             add_cflags -arch ${tgt_isa}
+             add_ldflags -arch ${tgt_isa}
+ 
++if [ 0 -eq 1 ]; then
+             alt_libc="$(show_darwin_sdk_path iphoneos)"
+             if [ -d "${alt_libc}" ]; then
+               add_cflags -isysroot ${alt_libc}
+@@ -1215,6 +1218,7 @@ EOF
+               try_dir="${alt_libc}/${d}"
+               [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
+             done
++fi
+ 
+             case ${tgt_isa} in
+               armv7|armv7s|armv8|arm64)
+-- 
+2.52.0.windows.1
+

@@ -1,6 +1,17 @@
---- libvpx/build/make/configure.sh	2025-01-10 14:30:59.000000000 -0500
-+++ libvpx-new/build/make/configure.sh	2025-04-16 16:06:21.962173179 -0400
-@@ -903,109 +903,6 @@
+From e9920a2862dd75b153a5be6318c8f478971089a2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Felix=20Paul=20K=C3=BChne?= <fkuehne@videolan.org>
+Date: Wed, 5 Nov 2014 21:02:13 +0100
+Subject: [PATCH 2/6] fix compilation for iOS
+
+---
+ build/make/configure.sh | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index eb479ddec..2b5075c23 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -903,15 +903,6 @@ process_common_toolchain() {
        ;;
    esac
  
@@ -13,113 +24,9 @@
 -#endif
 -EOF
 -
--  # Minimum iOS version for all target platforms (darwin and iphonesimulator).
--  # Shared library framework builds are only possible on iOS 8 and later.
--  if enabled shared; then
--    IOS_VERSION_OPTIONS="--enable-shared"
--    IOS_VERSION_MIN="8.0"
--  else
--    IOS_VERSION_OPTIONS=""
--    IOS_VERSION_MIN="7.0"
--  fi
--
--  # Handle darwin variants. Newer SDKs allow targeting older
--  # platforms, so use the newest one available.
--  case ${toolchain} in
--    arm*-darwin-*)
--      add_cflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
--      iphoneos_sdk_dir="$(show_darwin_sdk_path iphoneos)"
--      if [ -d "${iphoneos_sdk_dir}" ]; then
--        add_cflags  "-isysroot ${iphoneos_sdk_dir}"
--        add_ldflags "-isysroot ${iphoneos_sdk_dir}"
--      fi
--      ;;
--    *-darwin*)
--      osx_sdk_dir="$(show_darwin_sdk_path macosx)"
--      if [ -d "${osx_sdk_dir}" ]; then
--        add_cflags  "-isysroot ${osx_sdk_dir}"
--        add_ldflags "-isysroot ${osx_sdk_dir}"
--      fi
--      ;;
--  esac
--
--  case ${toolchain} in
--    *-darwin8-*)
--      add_cflags  "-mmacosx-version-min=10.4"
--      add_ldflags "-mmacosx-version-min=10.4"
--      ;;
--    *-darwin9-*)
--      add_cflags  "-mmacosx-version-min=10.5"
--      add_ldflags "-mmacosx-version-min=10.5"
--      ;;
--    *-darwin10-*)
--      add_cflags  "-mmacosx-version-min=10.6"
--      add_ldflags "-mmacosx-version-min=10.6"
--      ;;
--    *-darwin11-*)
--      add_cflags  "-mmacosx-version-min=10.7"
--      add_ldflags "-mmacosx-version-min=10.7"
--      ;;
--    *-darwin12-*)
--      add_cflags  "-mmacosx-version-min=10.8"
--      add_ldflags "-mmacosx-version-min=10.8"
--      ;;
--    *-darwin13-*)
--      add_cflags  "-mmacosx-version-min=10.9"
--      add_ldflags "-mmacosx-version-min=10.9"
--      ;;
--    *-darwin14-*)
--      add_cflags  "-mmacosx-version-min=10.10"
--      add_ldflags "-mmacosx-version-min=10.10"
--      ;;
--    *-darwin15-*)
--      add_cflags  "-mmacosx-version-min=10.11"
--      add_ldflags "-mmacosx-version-min=10.11"
--      ;;
--    *-darwin16-*)
--      add_cflags  "-mmacosx-version-min=10.12"
--      add_ldflags "-mmacosx-version-min=10.12"
--      ;;
--    *-darwin17-*)
--      add_cflags  "-mmacosx-version-min=10.13"
--      add_ldflags "-mmacosx-version-min=10.13"
--      ;;
--    *-darwin18-*)
--      add_cflags  "-mmacosx-version-min=10.14"
--      add_ldflags "-mmacosx-version-min=10.14"
--      ;;
--    *-darwin19-*)
--      add_cflags  "-mmacosx-version-min=10.15"
--      add_ldflags "-mmacosx-version-min=10.15"
--      ;;
--    *-darwin2[0-4]-*)
--      add_cflags  "-arch ${toolchain%%-*}"
--      add_ldflags "-arch ${toolchain%%-*}"
--      ;;
--    *-iphonesimulator-*)
--      add_cflags  "-miphoneos-version-min=${IOS_VERSION_MIN}"
--      add_ldflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
--      iossim_sdk_dir="$(show_darwin_sdk_path iphonesimulator)"
--      if [ -d "${iossim_sdk_dir}" ]; then
--        add_cflags  "-isysroot ${iossim_sdk_dir}"
--        add_ldflags "-isysroot ${iossim_sdk_dir}"
--      fi
--      ;;
--  esac
--
-   # Handle Solaris variants. Solaris 10 needs -lposix4
-   case ${toolchain} in
-     sparc-solaris-*)
-@@ -1205,12 +1102,6 @@
-               add_cflags -isysroot ${alt_libc}
-             fi
- 
--            if [ "${LD}" = "${CXX}" ]; then
--              add_ldflags -miphoneos-version-min="${IOS_VERSION_MIN}"
--            else
--              add_ldflags -ios_version_min "${IOS_VERSION_MIN}"
--            fi
--
-             for d in lib usr/lib usr/lib/system; do
-               try_dir="${alt_libc}/${d}"
-               [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
+ if [ 0 -eq 1 ]; then
+   # Minimum iOS version for all target platforms (darwin and iphonesimulator).
+   # Shared library framework builds are only possible on iOS 8 and later.
+-- 
+2.52.0.windows.1
+

@@ -1,0 +1,24 @@
+From 541f8fd6430a3f8444e01e370eae41df7a8579c2 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Fri, 20 May 2016 11:58:48 +0200
+Subject: [PATCH 4/6] fix android build
+
+---
+ vpx_ports/vpx_ports.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/vpx_ports/vpx_ports.mk b/vpx_ports/vpx_ports.mk
+index b0ad210f6..b27eedb52 100644
+--- a/vpx_ports/vpx_ports.mk
++++ b/vpx_ports/vpx_ports.mk
+@@ -41,6 +41,7 @@ else
+ PORTS_SRCS-$(VPX_ARCH_ARM) += aarch32_cpudetect.c
+ endif
+ PORTS_SRCS-$(VPX_ARCH_ARM) += arm_cpudetect.h
++PORTS_SRCS-$(VPX_ARCH_ARM) += cpu-features.c
+ PORTS_SRCS-$(VPX_ARCH_ARM) += arm.h
+ 
+ PORTS_SRCS-$(VPX_ARCH_PPC) += ppc_cpudetect.c
+-- 
+2.52.0.windows.1
+

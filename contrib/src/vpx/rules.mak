@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := 1.15.2
+VPX_VERSION := 1.16.0
 VPX_URL := $(GITHUB)/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
 ifneq ($(filter arm aarch64 i386 loongarch64 mipsel mips64el ppc64le x86_64 wasm32, $(ARCH)),)
@@ -17,9 +17,12 @@ $(TARBALLS)/libvpx-$(VPX_VERSION).tar.gz:
 
 libvpx: libvpx-$(VPX_VERSION).tar.gz .sum-vpx
 	$(UNPACK)
+	$(APPLY) $(SRC)/vpx/0001-Disable-forcing-flags-for-Apple-targets.patch
 	$(APPLY) $(SRC)/vpx/libvpx-ios.patch
+	$(APPLY) $(SRC)/vpx/0001-do-not-use-CLOCK_MONOTONIC_RAW-in-older-iOS.patch
 ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/vpx/libvpx-android.patch
+	$(APPLY) $(SRC)/vpx/0003-fix-x86-android-build-with-encoders.patch
+	$(APPLY) $(SRC)/vpx/0004-fix-android-build.patch
 	cp "${ANDROID_NDK}"/sources/android/cpufeatures/cpu-features.c $(UNPACK_DIR)/vpx_ports
 	cp "${ANDROID_NDK}"/sources/android/cpufeatures/cpu-features.h $(UNPACK_DIR)
 endif
@@ -31,6 +34,7 @@ endif
 	# Disable automatic addition of -fembed-bitcode for iOS
 	# as it is enabled through --extra-cflags if necessary.
 	$(APPLY) $(SRC)/vpx/libvpx-remove-bitcode.patch
+	$(APPLY) $(SRC)/vpx/0001-fix-compilation-with-Apple-Clang-13.patch
 	$(MOVE)
 
 DEPS_vpx =

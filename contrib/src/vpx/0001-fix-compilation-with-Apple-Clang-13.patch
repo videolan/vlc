@@ -1,0 +1,42 @@
+From 454e68eedbd1166629660cfd0a3b269e8040cfa7 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 1 Jul 2026 14:49:32 +0200
+Subject: [PATCH] fix compilation with Apple Clang 13
+
+../vp9/ratectrl_rtc.cc:29:67: error: invalid use of member 'cpi_' in static member function
+  rc_api->cpi_ = static_cast<VP9_COMP *>(vpx_memalign(32, sizeof(*cpi_)));
+                                                                  ^~~~
+---
+ vp8/vp8_ratectrl_rtc.cc | 2 +-
+ vp9/ratectrl_rtc.cc     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/vp8/vp8_ratectrl_rtc.cc b/vp8/vp8_ratectrl_rtc.cc
+index 312092f19..0c5deabf5 100644
+--- a/vp8/vp8_ratectrl_rtc.cc
++++ b/vp8/vp8_ratectrl_rtc.cc
+@@ -61,7 +61,7 @@ std::unique_ptr<VP8RateControlRTC> VP8RateControlRTC::Create(
+   std::unique_ptr<VP8RateControlRTC> rc_api(new (std::nothrow)
+                                                 VP8RateControlRTC());
+   if (!rc_api) return nullptr;
+-  rc_api->cpi_ = static_cast<VP8_COMP *>(vpx_memalign(32, sizeof(*cpi_)));
++  rc_api->cpi_ = static_cast<VP8_COMP *>(vpx_memalign(32, sizeof(*rc_api->cpi_)));
+   if (!rc_api->cpi_) return nullptr;
+   vp8_zero(*rc_api->cpi_);
+ 
+diff --git a/vp9/ratectrl_rtc.cc b/vp9/ratectrl_rtc.cc
+index b29e1ec23..43948fb7e 100644
+--- a/vp9/ratectrl_rtc.cc
++++ b/vp9/ratectrl_rtc.cc
+@@ -26,7 +26,7 @@ std::unique_ptr<VP9RateControlRTC> VP9RateControlRTC::Create(
+   std::unique_ptr<VP9RateControlRTC> rc_api(new (std::nothrow)
+                                                 VP9RateControlRTC());
+   if (!rc_api) return nullptr;
+-  rc_api->cpi_ = static_cast<VP9_COMP *>(vpx_memalign(32, sizeof(*cpi_)));
++  rc_api->cpi_ = static_cast<VP9_COMP *>(vpx_memalign(32, sizeof(*rc_api->cpi_)));
+   if (!rc_api->cpi_) return nullptr;
+   vp9_zero(*rc_api->cpi_);
+ 
+-- 
+2.52.0.windows.1
+
