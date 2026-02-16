@@ -77,8 +77,11 @@ endif
 
 vlc_tests += {
     'name' : 'test_modules_demux_libmp4',
-    'sources' : files('demux/libmp4.c'),
+    'sources' : files(
+        'demux/libmp4.c',
+        '../../modules/demux/mp4/libmp4.c'),
     'suite' : ['modules', 'test_modules'],
+    'dependencies' : [z_dep],
     'link_with' : [libvlc, libvlccore],
 }
 
