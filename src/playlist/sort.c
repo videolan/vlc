@@ -31,6 +31,9 @@
 #define  VLC_INTERNAL_PLAYLIST_SORT_FUNCTIONS
 #include "vlc_playlist.h"
 #include "playlist_internal.h"
+#include <vlc_url.h>
+#include <vlc_fs.h>
+#include <sys/stat.h>
 
 
 /* General comparison functions */
@@ -345,6 +348,64 @@ SORTFN( SORT_URI, first, second )
     free( psz_first );
     free( psz_second );
     return i_ret;
+}
+
+
+SORTFN( SORT_FILE_SIZE, first, second )
+{
+    input_item_t *p_input1 = first->p_input;
+    input_item_t *p_input2 = second->p_input;
+    int64_t i_size1 = 0;
+    int64_t i_size2 = 0;
+    /* we get the file size from metadata. If not present (first time added to playlist) then we store it*/
+    char *psz_size1 = input_item_GetInfo( p_input1, ".stat", "size" );
+    if( psz_size1 && *psz_size1 )
+    {
+        i_size1 = atoll( psz_size1 );
+        free( psz_size1 );
+    }
+    else
+    {
+        free( psz_size1 );
+        char *psz_url = input_item_GetURI( p_input1 );
+        char *psz_path = psz_url ? vlc_uri2path( psz_url ) : NULL;
+        struct stat result;
+        if( psz_path && vlc_stat( psz_path, &result ) == 0 )
+        {
+            i_size1 = result.st_size;
+            input_item_AddInfo( p_input1, ".stat", "size", "%lld", (long long)i_size1 );
+        }
+        free( psz_path );
+        free( psz_url );
+    }
+
+    char *psz_size2 = input_item_GetInfo( p_input2, ".stat", "size" );
+    if( psz_size2 && *psz_size2 )
+    {
+        i_size2 = atoll( psz_size2 );
+        free( psz_size2 );
+    }
+    else
+    {
+        free( psz_size2 );
+        char *psz_url = input_item_GetURI( p_input2 );
+        char *psz_path = psz_url ? vlc_uri2path( psz_url ) : NULL;
+        struct stat result;
+        if( psz_path && vlc_stat( psz_path, &result ) == 0 )
+        {
+            i_size2 = result.st_size;
+            input_item_AddInfo( p_input2, ".stat", "size", "%lld", (long long)i_size2 );
+        }
+        free( psz_path );
+        free( psz_url );
+    }
+
+    if( i_size1 > i_size2 )
+        return 1;
+    else if( i_size1 < i_size2 )
+        return -1;
+    else
+        return 0;
 }
 
 #undef  SORTFN
