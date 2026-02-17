@@ -1145,7 +1145,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 - (IBAction)screenChanged:(id)sender
 {
     NSInteger selected_index = [_screenPopup indexOfSelectedItem];
-    if (selected_index >= [_displayInfos count])
+    if (selected_index < 0 || (unsigned)selected_index >= [_displayInfos count])
         return;
 
     VLCOpenDisplayInformation *displayInformation = [_displayInfos objectAtIndex:selected_index];
@@ -1179,7 +1179,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 - (IBAction)qtkChanged:(id)sender
 {
     NSInteger selectedDevice = [_qtkVideoDevicePopup indexOfSelectedItem];
-    if (selectedDevice >= _avvideoDevices.count)
+    if (selectedDevice < 0 || (unsigned)selectedDevice >= _avvideoDevices.count)
         return;
 
     _avCurrentDeviceUID = [[(AVCaptureDevice *)[_avvideoDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -1189,7 +1189,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 - (IBAction)qtkAudioChanged:(id)sender
 {
     NSInteger selectedDevice = [_qtkAudioDevicePopup indexOfSelectedItem];
-    if (selectedDevice >= _avaudioDevices.count)
+    if (selectedDevice < 0 || (unsigned)selectedDevice >= _avaudioDevices.count)
         return;
 
     _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)[_avaudioDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -1299,7 +1299,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
                                    stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
         NSUInteger deviceCount = _avvideoDevices.count;
-        for (int ivideo = 0; ivideo < deviceCount; ivideo++) {
+        for (NSUInteger ivideo = 0; ivideo < deviceCount; ivideo++) {
             AVCaptureDevice *avDevice = [_avvideoDevices objectAtIndex:ivideo];
             // allow same name for multiple times
             [[_qtkVideoDevicePopup menu] addItemWithTitle:[avDevice localizedName] action:nil keyEquivalent:@""];
@@ -1327,7 +1327,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
                                         stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
         NSUInteger deviceCount = _avaudioDevices.count;
-        for (int iaudio = 0; iaudio < deviceCount; iaudio++) {
+        for (NSUInteger iaudio = 0; iaudio < deviceCount; iaudio++) {
             AVCaptureDevice *avAudioDevice = [_avaudioDevices objectAtIndex:iaudio];
 
             // allow same name for multiple times
