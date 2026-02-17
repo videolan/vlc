@@ -628,7 +628,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [openPanel setTitle: _NS("Open File")];
     [openPanel setPrompt: _NS("Open")];
     [openPanel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
-        if (returnCode == NSFileHandlingPanelOKButton) {
+        if (returnCode == NSModalResponseOK) {
             self->_filePath = [[[openPanel URLs] firstObject] path];
             [self openFilePathChanged: nil];
         }
