@@ -538,7 +538,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [self openTarget: VLCOpenCaptureTabViewId];
 }
 
-- (void)openFileWithAction:(void (^)(NSArray *files))action;
+- (void)openFileWithAction:(void (^)(NSArray *files))action
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setAllowsMultipleSelection: YES];
