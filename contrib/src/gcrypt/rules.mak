@@ -23,6 +23,7 @@ gcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(APPLY) $(SRC)/gcrypt/disable-tests-compilation.patch
 	$(APPLY) $(SRC)/gcrypt/0007-random-don-t-use-API-s-that-are-forbidden-in-UWP-app.patch
 	$(APPLY) $(SRC)/gcrypt/0008-random-only-use-wincrypt-in-UWP-builds-if-WINSTORECO.patch
+	$(APPLY) $(SRC)/gcrypt/0001-hwfeatures-call-SHGetFolderPathA-directly.patch
 
 	# don't use getpid in UWP as it's not actually available
 	$(APPLY) $(SRC)/gcrypt/gcrypt-uwp-getpid.patch
