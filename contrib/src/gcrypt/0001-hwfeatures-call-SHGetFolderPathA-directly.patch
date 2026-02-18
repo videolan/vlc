@@ -1,0 +1,50 @@
+From 5b428fd55e846f3a6c22ab33af5bdc0edcd4ea8b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 18 Feb 2026 16:47:26 +0100
+Subject: [PATCH] hwfeatures: call SHGetFolderPathA directly
+
+This will avoid unloading "shell32.dll" from a random thread. It crashes if
+it was automatically loaded from a loaded DLL.
+The API available since Windows XP [^1] but not in UWP where we should
+not read files from the system anyway.
+
+[^1] https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpatha
+---
+ src/hwfeatures.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/src/hwfeatures.c b/src/hwfeatures.c
+index 1b107e63..697bd7ed 100644
+--- a/src/hwfeatures.c
++++ b/src/hwfeatures.c
+@@ -320,24 +320,18 @@ _gcry_get_sysconfdir (void)
+ 
+   if (!appdata)
+     {
+-      HRESULT (WINAPI *func)(HWND,int,HANDLE,DWORD,LPSTR);
+-      void *handle;
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+       char *buf;
+ 
+-      handle = LoadLibraryEx ("shell32.dll", NULL, 0);
+-      if (handle)
+-        {
+           buf = xmalloc (MAX_PATH+17+1); /* Space for "/GNU/etc/gcrypt/" */
+-          func = (void *)GetProcAddress (handle, "SHGetFolderPathA");
+-          if (func && func (NULL, CSIDL_COMMON_APPDATA, NULL, 0, buf) >= 0)
++          if (SHGetFolderPathA (NULL, CSIDL_COMMON_APPDATA, NULL, 0, buf) >= 0)
+             {
+               appdata = xmalloc (strlen (buf) + 17 + 1);
+               strcpy (appdata, buf);
+               strcat (appdata, "/GNU/etc/gcrypt/");
+             }
+           xfree (buf);
+-          CloseHandle (handle);
+-        }
++#endif
+       if (!appdata)
+         appdata = xstrdup ("c:/ProgramData/GNU/etc/gcrypt/");
+     }
+-- 
+2.52.0.windows.1
+
