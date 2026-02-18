@@ -21,13 +21,22 @@ ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
 	$(call pkg_static,"libssh2.pc.in")
 	$(MOVE)
 
-DEPS_ssh2 = gcrypt $(DEPS_gcrypt)
+DEPS_ssh2 =
+ifndef HAVE_WIN32
+DEPS_ssh2 += gcrypt $(DEPS_gcrypt)
+else
 ifdef HAVE_WINSTORE
 # uses SecureZeroMemory
 DEPS_ssh2 += alloweduwp $(DEPS_alloweduwp)
 endif
+endif
 
-SSH2_CONF := --disable-examples-build --disable-tests --with-crypto=libgcrypt
+SSH2_CONF := --disable-examples-build --disable-tests
+ifndef HAVE_WIN32
+SSH2_CONF += --with-crypto=libgcrypt
+else
+SSH2_CONF += --with-crypto=wincng
+endif
 
 .ssh2: ssh2
 	$(MAKEBUILDDIR)
