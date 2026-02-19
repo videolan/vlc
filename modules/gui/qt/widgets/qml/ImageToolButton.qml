@@ -29,6 +29,8 @@ T.ToolButton {
 
     property url imageSource: ""
 
+    property string description
+
     property bool paintOnly: false
 
     property size sourceSize: Qt.size(VLCStyle.icon_normal, VLCStyle.icon_normal)
@@ -47,6 +49,12 @@ T.ToolButton {
 
     //Accessible
     Accessible.onPressAction: control.clicked()
+    Accessible.name: description
+
+    // Tooltip
+    T.ToolTip.visible: (hovered || visualFocus)
+    T.ToolTip.delay: VLCStyle.delayToolTipAppear
+    T.ToolTip.text: description
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme

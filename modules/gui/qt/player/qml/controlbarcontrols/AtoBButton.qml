@@ -26,12 +26,14 @@ import VLC.Util
 Widgets.ImageToolButton {
     id: control
 
-    text: qsTr("A to B")
+    text: qsTr("A to B Loop")
 
     sourceSize: Qt.size(VLCStyle.icon_toolbar, VLCStyle.icon_toolbar)
 
     checked: Player.ABloopState !== Player.ABLOOP_STATE_NONE
     onClicked: Player.toggleABloopState()
+
+    description: text
 
     //imageSource: "qrc:///icons/atob.svg"
     imageSource: {
