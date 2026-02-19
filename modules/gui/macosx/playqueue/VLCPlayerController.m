@@ -475,6 +475,7 @@ static void cb_player_timer_updated(const struct vlc_player_timer_point * const 
                     if (interval < POSITION_MIN_UPDATE_INTERVAL)
                         interval = POSITION_MIN_UPDATE_INTERVAL;
 
+                    [playerController.positionTimer invalidate];
                     playerController.positionTimer =
                     [NSTimer scheduledTimerWithTimeInterval:SEC_FROM_VLC_TICK(interval)
                                                      target:playerController
@@ -1129,6 +1130,7 @@ static int BossCallback(vlc_object_t *p_this,
             // seconds.
             static const double imprecisionDelaySec = 0.03;
 
+            [self.timeTimer invalidate];
             self.timeTimer = [NSTimer timerWithTimeInterval:SEC_FROM_VLC_TICK(nextUpdateInterval) + imprecisionDelaySec
                                                      target:self
                                                    selector:@selector(updateTimeWithTimer:)
