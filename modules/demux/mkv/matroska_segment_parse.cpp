@@ -1130,6 +1130,14 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             delete p_track;
             return;
         }
+        if( p_track->i_compression_type == MATROSKA_COMPRESSION_HEADER &&
+            p_track->p_compression_data == NULL )
+        {
+            msg_Err(&sys.demuxer, "Track %u header compression missing header data", p_track->i_number );
+            delete p_track;
+            return;
+        }
+
         if( !TrackInit( p_track ) )
         {
             msg_Err(&sys.demuxer, "Couldn't init track %u", p_track->i_number );
