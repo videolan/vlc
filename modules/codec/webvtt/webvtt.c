@@ -90,16 +90,16 @@ struct webvtt_text_parser_t
     webvtt_cue_t *p_cue;
 };
 
-static vlc_tick_t MakeTime( int t[4] )
+static vlc_tick_t MakeTime( int32_t t[4] )
 {
-    return vlc_tick_from_sec( t[0] * 3600 + t[1] * 60 + t[2] ) +
+    return vlc_tick_from_sec( (int64_t)t[0] * 3600 + t[1] * 60 + t[2] ) +
            VLC_TICK_FROM_MS(t[3]);
 }
 
 bool webvtt_scan_time( const char *psz, vlc_tick_t *p_time )
 {
-    int t[4];
-    if( sscanf( psz, "%2d:%2d.%3d",
+    int32_t t[4];
+    if( sscanf( psz, "%2" SCNd32 ":%2" SCNd32 ".%3" SCNd32,
                       &t[1], &t[2], &t[3] ) == 3 )
     {
         t[0] = 0;
@@ -109,7 +109,7 @@ bool webvtt_scan_time( const char *psz, vlc_tick_t *p_time )
         *p_time = MakeTime( t );
         return true;
     }
-    else if( sscanf( psz, "%d:%2d:%2d.%3d",
+    else if( sscanf( psz, "%" SCNd32 ":%2" SCNd32 ":%2" SCNd32 ".%3" SCNd32,
                           &t[0], &t[1], &t[2], &t[3] ) == 4 )
     {
         if( t[0] < 0 || t[1] < 0 || t[2] < 0 || t[3] < 0 )
