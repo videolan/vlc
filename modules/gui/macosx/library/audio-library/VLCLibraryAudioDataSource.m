@@ -870,7 +870,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         albumSupplementaryDetailView.representedItem = representedItem;
         albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
-        albumSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
         VLCLibraryCollectionViewFlowLayout *flowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;

@@ -313,15 +313,7 @@
 - (void)setCollectionsStackViewScrollView:(NSScrollView *)newScrollView
 {
     NSParameterAssert(newScrollView);
-
     _collectionsStackViewScrollView = newScrollView;
-
-    for (NSView<VLCLibraryHomeViewContainerView> * const containerView in _containers) {
-        if ([containerView isKindOfClass:VLCLibraryHomeViewVideoGridContainerView.class]) {
-            VLCLibraryHomeViewVideoGridContainerView * const collectionViewContainerView = (VLCLibraryHomeViewVideoGridContainerView *)containerView;
-            collectionViewContainerView.scrollView.parentScrollView = _collectionsStackViewScrollView;
-        }
-    }
 }
 
 - (void)setCollectionViewItemSize:(NSSize)collectionViewItemSize

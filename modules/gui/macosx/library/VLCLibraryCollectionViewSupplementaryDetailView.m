@@ -135,25 +135,6 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     [backgroundPath stroke];
 }
 
-- (NSScrollView *)parentScrollView
-{
-    if(_internalScrollView == nil) {
-        return nil;
-    }
-
-    return _internalScrollView.parentScrollView;
-}
-
-- (void)setParentScrollView:(NSScrollView *)parentScrollView
-{
-    if(_internalScrollView == nil) {
-        NSLog(@"Library collection view supplementary view has no internal scroll view -- cannot set parent scrollview.");
-        return;
-    }
-
-    _internalScrollView.parentScrollView = parentScrollView;
-}
-
 - (BOOL)validConstraintProps
 {
     return _contentViewTopConstraint != nil &&
