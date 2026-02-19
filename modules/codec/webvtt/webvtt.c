@@ -103,12 +103,18 @@ bool webvtt_scan_time( const char *psz, vlc_tick_t *p_time )
                       &t[1], &t[2], &t[3] ) == 3 )
     {
         t[0] = 0;
+        if( t[1] < 0 || t[2] < 0 || t[3] < 0 )
+            return false;
+
         *p_time = MakeTime( t );
         return true;
     }
     else if( sscanf( psz, "%d:%2d:%2d.%3d",
                           &t[0], &t[1], &t[2], &t[3] ) == 4 )
     {
+        if( t[0] < 0 || t[1] < 0 || t[2] < 0 || t[3] < 0 )
+            return false;
+
         *p_time = MakeTime( t );
         return true;
     }
