@@ -141,34 +141,29 @@
 
 - (void)floatOnTopChanged:(NSNotification *)notification
 {
-    VLCVideoWindowCommon * const videoWindow = (VLCVideoWindowCommon *)notification.object;
-    NSAssert(videoWindow != nil, @"Received video window should not be nil!");
-    VLCVideoWindowCommon * const selfVideoWindow =
-        (VLCVideoWindowCommon *)self.floatOnTopButton.window;
-
-    if (videoWindow != selfVideoWindow) {
-        return;
-    }
-
     [self updateFloatOnTopButton];
+}
+
+- (vout_thread_t *)windowVoutThread
+{
+    NSWindow * const window = self.floatOnTopButton.window;
+    if ([window isKindOfClass:VLCVideoWindowCommon.class]) {
+        vout_thread_t * const p_vout =
+            ((VLCVideoWindowCommon *)window).videoViewController.voutView.voutThread;
+        if (p_vout) return p_vout;
+    }
+    return _playerController.mainVideoOutputThread;
 }
 
 - (void)updateFloatOnTopButton
 {
-    VLCVideoWindowCommon * const videoWindow = (VLCVideoWindowCommon *)self.floatOnTopButton.window;
-    if (videoWindow == nil) {
-        return;
-    }
-
-    VLCVoutView * const voutView = videoWindow.videoViewController.voutView;
-    NSAssert(voutView != nil, @"Vout view should not be nil!");
-    vout_thread_t * const voutThread = voutView.voutThread;
-
+    vout_thread_t * const voutThread = [self windowVoutThread];
     if (voutThread == NULL) {
         return;
     }
 
     const bool floatOnTopEnabled = var_GetBool(voutThread, "video-on-top");
+    vout_Release(voutThread);
 
     if (@available(macOS 10.14, *)) {
         self.floatOnTopButton.contentTintColor =
@@ -259,11 +254,7 @@
 
 - (IBAction)toggleFloatOnTop:(id)sender
 {
-    VLCVideoWindowCommon * const window = (VLCVideoWindowCommon *)self.floatOnTopButton.window;
-    if (window == nil) {
-        return;
-    }
-    vout_thread_t * const p_vout = window.videoViewController.voutView.voutThread;
+    vout_thread_t * const p_vout = [self windowVoutThread];
     if (!p_vout) {
         return;
     }
