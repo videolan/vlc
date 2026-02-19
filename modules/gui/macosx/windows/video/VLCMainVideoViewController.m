@@ -605,6 +605,12 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         return;
     }
 
+    VLCVideoWindowCommon * const videoWindow =
+        [VLCMain.sharedInstance.voutProvider videoWindowForVoutView:self.voutView];
+    if (videoWindow.fullscreen && !videoWindow.isInNativeFullscreen) {
+        [videoWindow leaveFullscreenWithAnimation:NO];
+    }
+
     NSWindow * const window = self.view.window;
     [window orderOut:window];
     self.retainedWindow = window;
