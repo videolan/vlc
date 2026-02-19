@@ -400,7 +400,11 @@ int posix_memalign(void **, size_t, size_t);
 #endif
 
 #ifndef HAVE_ALIGNED_ALLOC
+#ifdef __cplusplus
+void *aligned_alloc(size_t, size_t) noexcept;
+#else
 void *aligned_alloc(size_t, size_t);
+#endif
 #endif
 
 #ifdef __cplusplus

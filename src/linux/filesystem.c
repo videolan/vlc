@@ -44,10 +44,12 @@ int vlc_memfd(void)
         return fd;
 #endif
 
+#ifdef O_TMPFILE
     /* Fallback to open with O_TMPFILE, */
     fd = open("/tmp", O_RDWR | O_CLOEXEC | O_TMPFILE, S_IRUSR | S_IWUSR);
     if (fd != -1 || (errno != EISDIR && errno != EOPNOTSUPP))
         return fd;
+#endif
 
     /* Fallback to POSIX implementation if O_TMPFILE is not supported (errno is
      * EISDIR, or EOPNOTSUPP, cf. man open(2). */

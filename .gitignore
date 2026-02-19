@@ -52,7 +52,13 @@ share/macosx/Info.plist
 Frameworks
 
 # Ignore build dirs
+po/
+vlc-webos-deploy-x86_64/
 build*/
+vlc-webos-build/
+vlc-webos-deploy/
+vlc-webos-deps/
+vlc_build/
 target*/
 contrib-*
 install-*
@@ -61,3 +67,5 @@ static-lib/
 !buildsystem/
 !build.rs
 !extras/package/apple/build.sh
+po/**/*.pot
+po/**/*.po
