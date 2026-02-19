@@ -146,6 +146,15 @@ EbmlElement *EbmlParser::Get( bool allow_overshoot )
         EbmlElement *ret = m_got;
         m_got = NULL;
 
+        if( mi_level > 0 && m_el[mi_level-1]->IsFiniteSize() && ret->IsFiniteSize() &&
+            ret->GetEndPosition() > m_el[mi_level-1]->GetEndPosition() )
+        {
+            msg_Err( p_demux, "EBML element at %" PRIu64 " extends beyond parent boundary (%" PRIu64 " beyond %" PRIu64 ")",
+                m_el[mi_level]->GetElementPosition(), m_el[mi_level]->GetEndPosition(), m_el[mi_level-1]->GetEndPosition() );
+            delete ret;
+            m_el[mi_level] = NULL;
+            return NULL;
+        }
         return ret;
     }
 
