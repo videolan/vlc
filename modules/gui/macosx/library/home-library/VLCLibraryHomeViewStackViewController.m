@@ -310,12 +310,6 @@
     }
 }
 
-- (void)setCollectionsStackViewScrollView:(NSScrollView *)newScrollView
-{
-    NSParameterAssert(newScrollView);
-    _collectionsStackViewScrollView = newScrollView;
-}
-
 - (void)setCollectionViewItemSize:(NSSize)collectionViewItemSize
 {
     _collectionViewItemSize = collectionViewItemSize;

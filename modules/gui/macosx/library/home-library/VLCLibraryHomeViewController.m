@@ -109,7 +109,6 @@
 - (void)setupGridViewController
 {
     _stackViewController = [[VLCLibraryHomeViewStackViewController alloc] init];
-    self.stackViewController.collectionsStackViewScrollView = _homeLibraryStackViewScrollView;
     self.stackViewController.collectionsStackView = _homeLibraryStackView;
 }
 
