@@ -108,6 +108,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     const video_format_t *fmt_dst = cfg->current.video_dst;
     substext_updater_region_t *p_updtregion = &sys->region;
     video_format_t render_fmt = *fmt_dst;
+    video_format_t prev_render_fmt = *cfg->previous.video_dst;
 
     if (p_updtregion->b_in_window)
     {
@@ -115,10 +116,14 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         render_fmt.i_width  = render_fmt.i_visible_width  = cfg->current.display_width;
         render_fmt.i_height = render_fmt.i_visible_height = cfg->current.display_height;
         render_fmt.i_sar_num = render_fmt.i_sar_den = 1;
+        prev_render_fmt.i_x_offset = prev_render_fmt.i_y_offset = 0;
+        prev_render_fmt.i_width  = prev_render_fmt.i_visible_width  = cfg->previous.display_width;
+        prev_render_fmt.i_height = prev_render_fmt.i_visible_height = cfg->previous.display_height;
+        prev_render_fmt.i_sar_num = prev_render_fmt.i_sar_den = 1;
     }
 
-    if (fmt_src->i_visible_width == cfg->previous.video_src->i_visible_width &&
-        fmt_src->i_visible_height == cfg->previous.video_src->i_visible_height &&
+    if (render_fmt.i_visible_width == prev_render_fmt.i_visible_width &&
+        render_fmt.i_visible_height == prev_render_fmt.i_visible_height &&
         video_format_IsSimilar(cfg->previous.video_dst, fmt_dst) &&
         (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > cfg->pts))
         return;
