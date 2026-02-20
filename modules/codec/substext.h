@@ -106,6 +106,15 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     subtext_updater_sys_t *sys = subpic->updater.sys;
     const video_format_t *fmt_src = cfg->current.video_src;
     const video_format_t *fmt_dst = cfg->current.video_dst;
+    substext_updater_region_t *p_updtregion = &sys->region;
+    video_format_t render_fmt = *fmt_dst;
+
+    if (p_updtregion->b_in_window)
+    {
+        render_fmt.i_x_offset = render_fmt.i_y_offset = 0;
+        render_fmt.i_width  = render_fmt.i_visible_width  = cfg->current.display_width;
+        render_fmt.i_height = render_fmt.i_visible_height = cfg->current.display_height;
+    }
 
     if (fmt_src->i_visible_width == cfg->previous.video_src->i_visible_width &&
         fmt_src->i_visible_height == cfg->previous.video_src->i_visible_height &&
@@ -113,7 +122,6 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > cfg->pts))
         return;
 
-    substext_updater_region_t *p_updtregion = &sys->region;
 
     if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE) &&
         p_updtregion->b_absolute && !vlc_spu_regions_is_empty(&subpic->regions) &&
@@ -164,29 +172,21 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
     if ( p_updtregion->b_in_window )
     {
-        subpic->i_original_picture_width  = cfg->current.display_width;
-        subpic->i_original_picture_height = cfg->current.display_height;
+        subpic->i_original_picture_width  = render_fmt.i_width;
+        subpic->i_original_picture_height = render_fmt.i_height;
     }
     else if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
     {
-        subpic->i_original_picture_width  = fmt_dst->i_visible_height * sar.num / sar.den;
-        subpic->i_original_picture_height = fmt_dst->i_visible_height;
+        subpic->i_original_picture_width  = render_fmt.i_height * sar.num / sar.den;
+        subpic->i_original_picture_height = render_fmt.i_height;
     }
     else
     {
-        subpic->i_original_picture_width  = fmt_dst->i_visible_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
-        subpic->i_original_picture_height = fmt_dst->i_visible_height;
+        subpic->i_original_picture_width  = render_fmt.i_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
+        subpic->i_original_picture_height = render_fmt.i_height;
     }
 
     bool b_schedule_blink_update = false;
-
-    video_format_t render_fmt = *fmt_dst;
-    if (p_updtregion->b_in_window)
-    {
-        render_fmt.i_x_offset = render_fmt.i_y_offset = 0;
-        render_fmt.i_width  = render_fmt.i_visible_width  = cfg->current.display_width;
-        render_fmt.i_height = render_fmt.i_visible_height = cfg->current.display_height;
-    }
 
     for( substext_updater_region_t *update_region = &sys->region;
                                     update_region; update_region = update_region->p_next )
