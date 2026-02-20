@@ -265,12 +265,12 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
 
     vlc_spu_regions_Clear( &subpic->regions );
 
-    subpic->i_original_picture_width  = cfg->display_width;
-    subpic->i_original_picture_height = cfg->display_height;
+    subpic->i_original_picture_width  = cfg->current.display_width;
+    subpic->i_original_picture_height = cfg->current.display_height;
     if (sys->type == OSD_HOR_SLIDER || sys->type == OSD_VERT_SLIDER)
-        p_region = OSDSlider(sys->type, sys->value, cfg->display_width, cfg->display_height);
+        p_region = OSDSlider(sys->type, sys->value, cfg->current.display_width, cfg->current.display_height);
     else
-        p_region = OSDIcon(sys->type, cfg->display_width, cfg->display_height);
+        p_region = OSDIcon(sys->type, cfg->current.display_width, cfg->current.display_height);
     if (p_region)
     {
         p_region->b_absolute = true;

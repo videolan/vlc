@@ -501,9 +501,9 @@ static void OSDEpgUpdate(subpicture_t *subpic,
                          const struct vlc_spu_updater_configuration *cfg)
 {
     epg_spu_updater_sys_t *sys = subpic->updater.sys;
-    const video_format_t *fmt_dst = cfg->video_dst;
+    const video_format_t *fmt_dst = cfg->current.video_dst;
 
-    if (video_format_IsSimilar(cfg->prev_dst, fmt_dst))
+    if (video_format_IsSimilar(cfg->previous.video_dst, fmt_dst))
         return;
 
     vlc_spu_regions_Clear( &subpic->regions );

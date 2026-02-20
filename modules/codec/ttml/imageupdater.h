@@ -77,10 +77,10 @@ static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
                                 const struct vlc_spu_updater_configuration *cfg)
 {
     ttml_image_updater_sys_t *p_sys = p_spu->updater.sys;
-    const video_format_t *p_fmt_dst = cfg->video_dst;
+    const video_format_t *p_fmt_dst = cfg->current.video_dst;
 
-    if (p_fmt_dst->i_visible_width  == cfg->prev_dst->i_visible_width &&
-        p_fmt_dst->i_visible_height == cfg->prev_dst->i_visible_height)
+    if (p_fmt_dst->i_visible_width  == cfg->previous.video_dst->i_visible_width &&
+        p_fmt_dst->i_visible_height == cfg->previous.video_dst->i_visible_height)
         return;
 
     vlc_spu_regions_Clear( &p_spu->regions );

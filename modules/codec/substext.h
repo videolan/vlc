@@ -103,11 +103,12 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                                  const struct vlc_spu_updater_configuration *cfg)
 {
     subtext_updater_sys_t *sys = subpic->updater.sys;
-    const video_format_t *fmt_src = cfg->video_src;
-    const video_format_t *fmt_dst = cfg->video_dst;
+    const video_format_t *fmt_src = cfg->current.video_src;
+    const video_format_t *fmt_dst = cfg->current.video_dst;
 
-    if (fmt_src->i_visible_height == cfg->prev_src->i_visible_height &&
-        video_format_IsSimilar(cfg->prev_dst, fmt_dst) &&
+    if (fmt_src->i_visible_width == cfg->previous.video_src->i_visible_width &&
+        fmt_src->i_visible_height == cfg->previous.video_src->i_visible_height &&
+        video_format_IsSimilar(cfg->previous.video_dst, fmt_dst) &&
         (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > cfg->pts))
         return;
 
@@ -154,8 +155,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
     if ( p_updtregion->b_in_window )
     {
-        subpic->i_original_picture_width  = cfg->display_width;
-        subpic->i_original_picture_height = cfg->display_height;
+        subpic->i_original_picture_width  = cfg->current.display_width;
+        subpic->i_original_picture_height = cfg->current.display_height;
     }
     else if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
     {
@@ -174,8 +175,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     if (p_updtregion->b_in_window)
     {
         render_fmt.i_x_offset = render_fmt.i_y_offset = 0;
-        render_fmt.i_width  = render_fmt.i_visible_width  = cfg->display_width;
-        render_fmt.i_height = render_fmt.i_visible_height = cfg->display_height;
+        render_fmt.i_width  = render_fmt.i_visible_width  = cfg->current.display_width;
+        render_fmt.i_height = render_fmt.i_visible_height = cfg->current.display_height;
     }
 
     for( substext_updater_region_t *update_region = &sys->region;

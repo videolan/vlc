@@ -804,15 +804,15 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
 {
     kate_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
-    const video_format_t *p_fmt_src = cfg->video_src;
-    const video_format_t *p_fmt_dst = cfg->video_dst;
+    const video_format_t *p_fmt_src = cfg->current.video_src;
+    const video_format_t *p_fmt_dst = cfg->current.video_dst;
     plane_t *p_plane;
     /* time in seconds from the start of the stream */
     kate_float t = secf_from_vlc_tick( p_spusys->i_start + cfg->pts - p_subpic->i_start );
 
     bool new_regions = false;
-    if( !video_format_IsSimilar(cfg->prev_src, p_fmt_src) ||
-        !video_format_IsSimilar(cfg->prev_dst, p_fmt_dst) )
+    if( !video_format_IsSimilar(cfg->previous.video_src, p_fmt_src) ||
+        !video_format_IsSimilar(cfg->previous.video_dst, p_fmt_dst) )
         new_regions = true;
 
     if (!new_regions)

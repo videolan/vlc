@@ -111,12 +111,12 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
 {
     libaribcaption_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
-    const video_format_t *p_src_format = cfg->video_src;
-    const video_format_t *p_dst_format = cfg->video_dst;
+    const video_format_t *p_src_format = cfg->current.video_src;
+    const video_format_t *p_dst_format = cfg->current.video_dst;
 
-    bool b_src_changed = p_src_format->i_visible_width  != cfg->prev_src->i_visible_width ||
-                         p_src_format->i_visible_height != cfg->prev_src->i_visible_height;
-    bool b_dst_changed = !video_format_IsSimilar(cfg->prev_dst, p_dst_format);
+    bool b_src_changed = p_src_format->i_visible_width  != cfg->previous.video_src->i_visible_width ||
+                         p_src_format->i_visible_height != cfg->previous.video_src->i_visible_height;
+    bool b_dst_changed = !video_format_IsSimilar(cfg->previous.video_dst, p_dst_format);
 
     unsigned i_render_area_width  = p_dst_format->i_visible_width;
     unsigned i_render_area_height = p_src_format->i_visible_height * p_dst_format->i_visible_width /

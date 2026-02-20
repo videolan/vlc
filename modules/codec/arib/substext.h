@@ -50,7 +50,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                                  const struct vlc_spu_updater_configuration *cfg)
 {
     arib_spu_updater_sys_t *sys = subpic->updater.sys;
-    const video_format_t *fmt_dst = cfg->video_dst;
+    const video_format_t *fmt_dst = cfg->current.video_dst;
 
     if ( !sys->first )
         return;

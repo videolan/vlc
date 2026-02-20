@@ -417,12 +417,12 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
 {
     libass_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
-    const video_format_t *p_fmt_src = cfg->video_src;
-    const video_format_t *p_fmt_dst = cfg->video_dst;
+    const video_format_t *p_fmt_src = cfg->current.video_src;
+    const video_format_t *p_fmt_dst = cfg->current.video_dst;
 
-    bool b_fmt_src = p_fmt_src->i_visible_width  != cfg->prev_src->i_visible_width ||
-                     p_fmt_src->i_visible_height != cfg->prev_src->i_visible_height;
-    bool b_fmt_dst = !video_format_IsSimilar(cfg->prev_dst, p_fmt_dst);
+    bool b_fmt_src = p_fmt_src->i_visible_width  != cfg->previous.video_src->i_visible_width ||
+                     p_fmt_src->i_visible_height != cfg->previous.video_src->i_visible_height;
+    bool b_fmt_dst = !video_format_IsSimilar(cfg->previous.video_dst, p_fmt_dst);
 
     vlc_mutex_lock( &p_sys->lock );
 

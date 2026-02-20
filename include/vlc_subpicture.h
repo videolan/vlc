@@ -169,17 +169,15 @@ VLC_API void vlc_spu_regions_Clear( vlc_spu_regions * );
 
 struct vlc_spu_updater_configuration
 {
-    // source video format of the video under the SPU
-    const video_format_t *video_src;
-    // scaled video format of the video under the SPU
-    const video_format_t *video_dst;
-    unsigned  display_width;
-    unsigned  display_height;
-
-    // source video format of the previous vlc_spu_updater_ops.update call
-    const video_format_t *prev_src;
-    // scaled video format of the previous vlc_spu_updater_ops.update call
-    const video_format_t *prev_dst;
+    struct
+    {
+        // source video format of the video under the SPU
+        const video_format_t *video_src;
+        // scaled video format of the video under the SPU
+        const video_format_t *video_dst;
+        unsigned  display_width;
+        unsigned  display_height;
+    } current, previous; // the previous vlc_spu_updater_ops.update call
 
     // timestamp when the SPU will be displayed, between i_start and i_stop
     // for subtitles

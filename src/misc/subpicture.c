@@ -40,6 +40,8 @@ struct subpicture_private_t
 {
     video_format_t src;
     video_format_t dst;
+    unsigned display_width;
+    unsigned display_height;
 };
 
 subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
@@ -64,6 +66,8 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
         }
         video_format_Init( &p_private->src, 0 );
         video_format_Init( &p_private->dst, 0 );
+        p_private->display_width = 0;
+        p_private->display_height = 0;
 
         p_subpic->updater   = *p_upd;
         p_subpic->p_private = p_private;
@@ -185,12 +189,18 @@ void subpicture_Update( subpicture_t *p_subpicture,
         return;
 
     struct vlc_spu_updater_configuration cfg = {
-        .prev_src  = &p_private->src,
-        .prev_dst  = &p_private->dst,
-        .display_width  = display_width,
-        .display_height = display_height,
-        .video_src = p_fmt_src,
-        .video_dst = p_fmt_dst,
+        .current = {
+                .display_width  = display_width,
+                .display_height = display_height,
+                .video_src = p_fmt_src,
+                .video_dst = p_fmt_dst,
+            },
+        .previous = {
+                .display_width  = p_private->display_width,
+                .display_height = p_private->display_height,
+                .video_src = &p_private->src,
+                .video_dst = &p_private->dst,
+            },
         .pts       = i_ts,
     };
     p_upd->ops->update( p_subpicture, &cfg );

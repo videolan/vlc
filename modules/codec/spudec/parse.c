@@ -190,8 +190,8 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
 static void UpdateDvdSpu(subpicture_t * p_spu,
                          const struct vlc_spu_updater_configuration * cfg)
 {
-    p_spu->i_original_picture_width  = cfg->video_src->i_visible_width;
-    p_spu->i_original_picture_height = cfg->video_src->i_visible_height;
+    p_spu->i_original_picture_width  = cfg->current.video_src->i_visible_width;
+    p_spu->i_original_picture_height = cfg->current.video_src->i_visible_height;
 }
 
 /*****************************************************************************
