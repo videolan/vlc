@@ -174,8 +174,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     }
     else
     {
-        subpic->i_original_picture_width  = fmt_dst->i_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
-        subpic->i_original_picture_height = fmt_dst->i_height;
+        subpic->i_original_picture_width  = fmt_dst->i_visible_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
+        subpic->i_original_picture_height = fmt_dst->i_visible_height;
     }
 
     bool b_schedule_blink_update = false;
