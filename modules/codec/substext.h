@@ -114,6 +114,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         render_fmt.i_x_offset = render_fmt.i_y_offset = 0;
         render_fmt.i_width  = render_fmt.i_visible_width  = cfg->current.display_width;
         render_fmt.i_height = render_fmt.i_visible_height = cfg->current.display_height;
+        render_fmt.i_sar_num = render_fmt.i_sar_den = 1;
     }
 
     if (fmt_src->i_visible_width == cfg->previous.video_src->i_visible_width &&
@@ -140,7 +141,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     }
     vlc_spu_regions_Clear( &subpic->regions );
 
-    assert(fmt_dst->i_sar_num && fmt_dst->i_sar_den);
+    assert(render_fmt.i_sar_num && render_fmt.i_sar_den);
 
     vlc_rational_t sar;
 
@@ -170,19 +171,14 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         sar.den = 1;
     }
 
-    if ( p_updtregion->b_in_window )
-    {
-        subpic->i_original_picture_width  = render_fmt.i_width;
-        subpic->i_original_picture_height = render_fmt.i_height;
-    }
-    else if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
+    if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
     {
         subpic->i_original_picture_width  = render_fmt.i_height * sar.num / sar.den;
         subpic->i_original_picture_height = render_fmt.i_height;
     }
     else
     {
-        subpic->i_original_picture_width  = render_fmt.i_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
+        subpic->i_original_picture_width  = render_fmt.i_width * render_fmt.i_sar_num / render_fmt.i_sar_den;
         subpic->i_original_picture_height = render_fmt.i_height;
     }
 
