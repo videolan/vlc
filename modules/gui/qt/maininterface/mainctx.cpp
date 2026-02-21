@@ -307,27 +307,33 @@ MainCtx::~MainCtx()
 
     m_threadRunner->destroy();
 
-    settings->beginGroup("MainWindow");
-    settings->setValue( "pl-dock-status", b_playlistDocked );
-    settings->setValue( "ShowRemainingTime", m_showRemainingTime );
-    settings->setValue( "interface-scale", QString::number( m_intfUserScaleFactor ) );
+    if ( !p_intf->preferencesResetPending)
+    {
+        settings->beginGroup("MainWindow");
+        settings->setValue( "pl-dock-status", b_playlistDocked );
+        settings->setValue( "ShowRemainingTime", m_showRemainingTime );
+        settings->setValue( "interface-scale", QString::number( m_intfUserScaleFactor ) );
+    
+        /* Save playlist state */
+        settings->setValue( "playlist-visible", m_playlistVisible );
+        settings->setValue( "playlist-width-factor", QString::number( m_playlistWidthFactor ) );
+        settings->setValue( "player-playlist-width-factor", QString::number( m_playerPlaylistWidthFactor ) );
+    
+        settings->setValue( "artist-albums-width-factor", QString::number( m_artistAlbumsWidthFactor ) );
+    
+        settings->setValue( "grid-view", m_gridView );
+        settings->setValue( "grouping", m_grouping );
+    
+        settings->setValue( "color-scheme-index", m_colorScheme->currentIndex() );
+        /* Save the stackCentralW sizes */
+        settings->endGroup();
+    }
+    else
+    {
+        settings->remove("MainWindow");
+    }
 
-    /* Save playlist state */
-    settings->setValue( "playlist-visible", m_playlistVisible );
-    settings->setValue( "playlist-width-factor", QString::number( m_playlistWidthFactor ) );
-    settings->setValue( "player-playlist-width-factor", QString::number( m_playerPlaylistWidthFactor ) );
-
-    settings->setValue( "artist-albums-width-factor", QString::number( m_artistAlbumsWidthFactor ) );
-
-    settings->setValue( "grid-view", m_gridView );
-    settings->setValue( "grouping", m_grouping );
-    settings->setValue( "album-sections", m_albumSections );
-
-    settings->setValue( "color-scheme-index", m_colorScheme->currentIndex() );
-    /* Save the stackCentralW sizes */
-    settings->endGroup();
-
-    if( var_InheritBool( p_intf, "save-recentplay" ) )
+    if( !p_intf->preferencesResetPending && var_InheritBool( p_intf, "save-recentplay" ) )
         getSettings()->setValue( "filedialog-path", m_dialogFilepath );
     else
         getSettings()->remove( "filedialog-path" );

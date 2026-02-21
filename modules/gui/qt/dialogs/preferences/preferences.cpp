@@ -372,15 +372,43 @@ void PrefsDialog::save()
         p_intf->p_mi->reloadPrefs();
     accept();
 
-    QVLCTools::saveWidgetPosition( p_intf, "Preferences", this );
+    // Don't save widget position if reset is pending
+    if( !p_intf->preferencesResetPending )
+        QVLCTools::saveWidgetPosition( p_intf, "Preferences", this );
+
+    if( p_intf->preferencesResetPending )
+    {
+        int restart = QMessageBox::question(
+                          nullptr,
+                          qtr( "Restart Required" ),
+                          qtr( "VLC needs to be restarted for the reset to take full effect.\n\nRestart now?" ),
+                          QMessageBox::Yes | QMessageBox::No,
+                          QMessageBox::Yes);
+        
+        if( restart == QMessageBox::Yes )
+        {
+            // Quit VLC
+            emit p_intf->p_mi->askToQuit();
+        }
+        else
+        {
+            // User chose not to restart - clear the flag
+            p_intf->preferencesResetPending = false;
+        }
+    }
 
 }
 
 /* Clean the preferences, dunno if it does something really */
 void PrefsDialog::cancel()
 {
-    QVLCTools::saveWidgetPosition( p_intf, "Preferences", this );
-
+    bool wasResetting = p_intf->preferencesResetPending;
+    
+    // Clear the reset flag
+    p_intf->preferencesResetPending = false;
+    
+    if( !wasResetting )
+        QVLCTools::saveWidgetPosition( p_intf, "Preferences", this );
     reject();
 }
 
@@ -399,6 +427,7 @@ void PrefsDialog::reset()
         config_ResetAll();
         config_SaveConfigFile( p_intf );
         getSettings()->clear();
+        p_intf->preferencesResetPending = true;
         p_intf->p_mi->reloadPrefs();
         p_intf->p_mi->reloadFromSettings();
 
@@ -406,7 +435,6 @@ void PrefsDialog::reset()
         simple_panels[0]->cleanLang();
 #endif
 
-        accept();
     }
 }
 
