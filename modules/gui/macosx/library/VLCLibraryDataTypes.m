@@ -1112,6 +1112,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize favorited = _favorited;
 @synthesize isFileBacked = _isFileBacked;
 
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
 #pragma mark - initialization
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID

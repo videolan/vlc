@@ -137,58 +137,72 @@ static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
         return YES;
     }
 
-    /* check whether the receive data is a library item from the left-hand side */
-    NSData *data = [info.draggingPasteboard dataForType:VLCMediaLibraryMediaItemPasteboardType];
-    if (!data) {
-        data = [info.draggingPasteboard dataForType:VLCMediaLibraryMediaItemUTI];
+    /* Collect library media items from all pasteboard items.
+     * Table view drags create one NSPasteboardItem per selected row, so we
+     * must iterate all of them to capture every dragged item. */
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const allMediaItems = [NSMutableArray array];
+
+    for (NSPasteboardItem * const pboardItem in info.draggingPasteboard.pasteboardItems) {
+        NSData *itemData = [pboardItem dataForType:VLCMediaLibraryMediaItemPasteboardType];
+        if (!itemData) {
+            itemData = [pboardItem dataForType:VLCMediaLibraryMediaItemUTI];
+        }
+        if (!itemData) {
+            continue;
+        }
+
+        /* It is a media library item, so unarchive it and add it to the playlist */
+        NSError *unarchiveError = nil;
+        NSArray<VLCMediaLibraryMediaItem *> * const items =
+            [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSArray class], [VLCMediaLibraryMediaItem class], nil]
+                                                fromData:itemData
+                                                   error:&unarchiveError];
+        if (unarchiveError != nil) {
+            msg_Err(getIntf(), "Failed to unarchive MediaLibrary Item: %s",
+                    unarchiveError.localizedDescription.UTF8String);
+            continue;
+        }
+
+        if (items) {
+            [allMediaItems addObjectsFromArray:items];
+        }
     }
 
-    if (!data) {
-        /* it's not, so check if it is a file handle from the Finder */
-        id propertyList = [info.draggingPasteboard propertyListForType:NSFilenamesPboardType];
-        if (propertyList == nil) {
-            return NO;
+    if (allMediaItems.count > 0) {
+        NSInteger insertionIndex = (NSInteger)row;
+        for (VLCMediaLibraryMediaItem * const mediaItem in allMediaItems) {
+            [_playQueueController addInputItem:mediaItem.inputItem.vlcInputItem
+                                    atPosition:insertionIndex
+                                 startPlayback:NO];
+            insertionIndex++;
         }
+        return YES;
+    }
 
-        NSArray *mediaPaths = [propertyList sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-        NSUInteger mediaCount = [mediaPaths count];
-        if (mediaCount > 0) {
-            NSMutableArray *metadataArray = [NSMutableArray arrayWithCapacity:mediaCount];
-            for (NSString *mediaPath in mediaPaths) {
-                VLCOpenInputMetadata *inputMetadata;
-                NSURL *url = [NSURL fileURLWithPath:mediaPath isDirectory:NO];
-                if (!url) {
-                    continue;
-                }
-                inputMetadata = [[VLCOpenInputMetadata alloc] init];
-                inputMetadata.MRLString = url.absoluteString;
-                [metadataArray addObject:inputMetadata];
-            }
-            [_playQueueController addPlayQueueItems:metadataArray];
-
-            return YES;
-        }
+    /* Not a library item — check if it is a file handle from the Finder */
+    const id propertyList = [info.draggingPasteboard propertyListForType:NSFilenamesPboardType];
+    if (propertyList == nil) {
         return NO;
     }
 
-    /* it is a media library item, so unarchive it and add it to the playlist */
-    NSArray *array = nil;
-    @try {
-        array = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    } @catch (NSException *exception) {
-        if ([exception.name isEqualToString:NSInvalidArgumentException]) {
-            msg_Err(getIntf(), "Failed to unarchive MediaLibrary Item: %s",
-                    [[exception reason] UTF8String]);
-            return NO;
+    const NSUInteger mediaCount = [propertyList count];
+    if (mediaCount > 0) {
+        NSMutableArray * const metadataArray = [NSMutableArray arrayWithCapacity:mediaCount];
+        for (NSString * const mediaPath in propertyList) {
+            VLCOpenInputMetadata *inputMetadata;
+            NSURL * const url = [NSURL fileURLWithPath:mediaPath isDirectory:NO];
+            if (!url) {
+                continue;
+            }
+            inputMetadata = [[VLCOpenInputMetadata alloc] init];
+            inputMetadata.MRLString = url.absoluteString;
+            [metadataArray addObject:inputMetadata];
         }
-        @throw;
-    }
+        [_playQueueController addPlayQueueItems:metadataArray];
 
-    for (VLCMediaLibraryMediaItem *mediaItem in array) {
-        [_playQueueController addInputItem:mediaItem.inputItem.vlcInputItem atPosition:row startPlayback:NO];
+        return YES;
     }
-
-    return YES;
+    return NO;
 }
 
 - (NSArray<NSTableViewRowAction *> *)tableView:(NSTableView *)tableView

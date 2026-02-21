@@ -35,7 +35,14 @@
         [encodedLibraryItemsArray addObject:mediaItem];
     }];
 
-    NSData * const data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray];
+    NSError *archiveError = nil;
+    NSData * const data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray
+                                                requiringSecureCoding:YES
+                                                                error:&archiveError];
+    if (data == nil) {
+        NSLog(@"Failed to archive MediaLibrary Item drag payload: %@", archiveError);
+        return nil;
+    }
     [pboardItem setData:data forType:VLCMediaLibraryMediaItemUTI];
     return pboardItem;
 }

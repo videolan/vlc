@@ -140,7 +140,14 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
         }];
     }
 
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray];
+    NSError *archiveError = nil;
+    NSData * const data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray
+                                                requiringSecureCoding:YES
+                                                                error:&archiveError];
+    if (data == nil) {
+        NSLog(@"Failed to archive MediaLibrary Item drag payload: %@", archiveError);
+        return NO;
+    }
     [pasteboard declareTypes:@[VLCMediaLibraryMediaItemPasteboardType, NSFilenamesPboardType] owner:self];
     [pasteboard setPropertyList:filePathsArray forType:NSFilenamesPboardType];
     [pasteboard setData:data forType:VLCMediaLibraryMediaItemPasteboardType];
