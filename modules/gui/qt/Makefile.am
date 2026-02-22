@@ -958,6 +958,7 @@ libqt_plugin_la_RES = \
 	pixmaps/sd/pictures.svg \
 	pixmaps/sd/playlist.svg \
 	pixmaps/sd/podcast.svg \
+	pixmaps/sd/radio.svg \
 	pixmaps/sd/screen.svg \
 	pixmaps/sd/stream.svg \
 	pixmaps/sd/unknown.svg

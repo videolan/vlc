@@ -50,6 +50,10 @@ struct SourceItem
         {
             artworkUrl = QUrl("qrc:///sd/podcast.svg");
         }
+        else if ( name.startsWith( "radio" ) )
+        {
+            artworkUrl = QUrl("qrc:///sd/radio.svg");
+        }
         else if ( name.startsWith("lua{") )
         {
             int i_head = name.indexOf( "sd='" ) + 4;
