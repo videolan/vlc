@@ -1,0 +1,12 @@
+diff --git a/share/org.videolan.vlc.appdata.xml.in.in b/share/org.videolan.vlc.appdata.xml.in.in
+index 62bd7ee443..28fc24fd94 100644
+--- a/share/org.videolan.vlc.appdata.xml.in.in
++++ b/share/org.videolan.vlc.appdata.xml.in.in
+@@ -39,4 +39,7 @@
+         </screenshot>
+     </screenshots>
+     <content_rating type="oars-1.1" />
++    <custom>
++        <value key="flathub::manifest">https://code.videolan.org/videolan/vlc/-/blob/@GIT_HASH@/extras/package/flatpak/org.videolan.VLC.yaml</value>
++    </custom>
+ </component>

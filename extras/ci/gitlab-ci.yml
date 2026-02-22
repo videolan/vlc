@@ -1,5 +1,6 @@
 stages:
     - build
+    - repo
 
 default:
     before_script:
@@ -22,6 +23,8 @@ variables:
     VLC_DEBIAN_QT6_IMAGE: registry.videolan.org/vlc-debian-unstable:20260121072258
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20260504124015
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
+    VLC_FLATPAK_IMAGE: registry.videolan.org/vlc-flatpak:20260516184439
+    VLC_FLATPAK_AARCH64_IMAGE: registry.videolan.org/vlc-flatpak-aarch64:20260520052237
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
@@ -340,6 +343,93 @@ nightly-debian:
     except:
     after_script:
     artifacts:
+
+.flatpak-common:
+    extends: .docker-template
+    variables:
+        FLATPAK_BRANCH: 3.0.x
+        MANIFEST_PATH: extras/package/flatpak/org.videolan.VLC.yaml
+    script:
+        - flatpak-builder-lint --exceptions manifest ${MANIFEST_PATH}
+        - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        - flatpak-builder --default-branch ${FLATPAK_BRANCH} --user --install-deps-from=flathub --disable-rofiles-fuse --disable-updates --force-clean --ccache --mirror-screenshots-url=https://dl.flathub.org/media/ build-${HOST_ARCH} ${MANIFEST_PATH}
+    cache:
+        key: flatpak-ccache-${HOST_ARCH}
+        paths:
+            - .flatpak-builder/ccache/
+    artifacts:
+        paths:
+            - build-${HOST_ARCH}
+        expire_in: 1 day
+
+flatpak-x86_64:
+    extends: .flatpak-common
+    image:
+        name: $VLC_FLATPAK_IMAGE
+        entrypoint: [""]
+    variables:
+        HOST_ARCH: x86_64
+    tags:
+      - dind-amd64
+
+flatpak-aarch64:
+    extends: .flatpak-common
+    image:
+        name: $VLC_FLATPAK_AARCH64_IMAGE
+        entrypoint: [""]
+    variables:
+        HOST_ARCH: aarch64
+    tags:
+      - dind-aarch64
+
+.release-flatpak:
+    extends: .flatpak-common
+    only:
+        - tags
+    variables:
+        FLATPAK_BRANCH: stable
+
+release-flatpak-x86_64:
+    extends: .release-flatpak
+    image:
+        name: $VLC_FLATPAK_IMAGE
+        entrypoint: [""]
+    variables:
+        HOST_ARCH: x86_64
+    tags:
+      - dind-amd64
+
+release-flatpak-aarch64:
+    extends: .release-flatpak
+    image:
+        name: $VLC_FLATPAK_AARCH64_IMAGE
+        entrypoint: [""]
+    variables:
+        HOST_ARCH: aarch64
+    tags:
+      - dind-aarch64
+
+flatpak-repo:
+    stage: repo
+    extends: .docker-template
+    image:
+        name: $VLC_FLATPAK_IMAGE
+        entrypoint: [""]
+    script:
+        - flatpak build-export --exclude=/lib/debug/* --include=/lib/debug/app repo build-x86_64
+        - flatpak build-export --metadata=metadata.debuginfo --files=files/lib/debug repo build-x86_64
+        - flatpak build-export --exclude=/lib/debug/* --include=/lib/debug/app repo build-aarch64
+        - flatpak build-export --metadata=metadata.debuginfo --files=files/lib/debug repo build-aarch64
+        - ostree commit --repo=repo --canonical-permissions --branch=screenshots/x86_64 build-x86_64/files/share/app-info/media
+        - ostree commit --repo=repo --canonical-permissions --branch=screenshots/aarch64 build-aarch64/files/share/app-info/media
+        - flatpak-builder-lint --exceptions repo repo || true
+    artifacts:
+        paths:
+          - repo
+        expire_in: 1 week
+    dependencies:
+      - flatpak-x86_64
+      - flatpak-aarch64
 
 #
 # macOS
