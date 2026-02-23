@@ -42,6 +42,9 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 @property NSButton *playButton;
 @property NSButton *queueButton;
 
+@property CGFloat backgroundTopInset;
+@property CGFloat backgroundBottomInset;
+
 @end
 
 @implementation VLCLibraryAudioGroupTableHeaderView
@@ -68,8 +71,8 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 - (void)commonInit
 {
     NSView *contentHostView = self;
-    const CGFloat backgroundTopInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing;
-    CGFloat backgroundBottomInset = 0.f;
+    self.backgroundTopInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing;
+    self.backgroundBottomInset = 0.f;
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
     if (@available(macOS 26.0, *)) {
@@ -80,7 +83,7 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
         glassView.contentView = glassContentView;
         self.backgroundView = glassView;
         contentHostView = glassContentView;
-        backgroundBottomInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
+        self.backgroundBottomInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
     } else
 #endif
     if (@available(macOS 10.14, *)) {
@@ -135,16 +138,13 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     const CGFloat horizontalContentInset = VLCLibraryUIUnits.mediumSpacing;
 
     [NSLayoutConstraint activateConstraints:@[
-        [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor constant:backgroundTopInset],
-        [self.backgroundView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
-        [self.backgroundView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
-        [self.backgroundView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-backgroundBottomInset],
         [labelsStack.leadingAnchor constraintEqualToAnchor:contentHostView.leadingAnchor constant:horizontalContentInset],
         [labelsStack.centerYAnchor constraintEqualToAnchor:contentHostView.centerYAnchor],
         [contentHostView.trailingAnchor constraintEqualToAnchor:buttonsStack.trailingAnchor constant:horizontalContentInset],
         [buttonsStack.centerYAnchor constraintEqualToAnchor:contentHostView.centerYAnchor],
         [buttonsStack.leadingAnchor constraintGreaterThanOrEqualToAnchor:labelsStack.trailingAnchor constant:VLCLibraryUIUnits.largeSpacing],
     ]];
+    [self updateBackgroundConstraints];
 
     if (@available(macOS 26.0, *)) {
     } else {
@@ -162,6 +162,15 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     }
 }
 
+- (void)updateBackgroundConstraints
+{
+    [NSLayoutConstraint activateConstraints:@[
+        [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor constant:self.backgroundTopInset],
+        [self.backgroundView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [self.backgroundView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [self.backgroundView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-self.backgroundBottomInset],
+    ]];
+}
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary<NSKeyValueChangeKey,id> *)change
