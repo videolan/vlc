@@ -45,15 +45,18 @@ vlc_playlist_New(vlc_object_t *parent, enum vlc_playlist_preparsing rec,
 
     if (rec != VLC_PLAYLIST_PREPARSING_DISABLED)
     {
+        bool use_external_preparser = true;
+    #if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IPHONE)
+        use_external_preparser = false;
+    #endif
+        if (getenv("VLC_FORCE_INTERNAL_PREPARSER") != NULL)
+            use_external_preparser = false;
+
         const struct vlc_preparser_cfg cfg = {
             .types = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL,
             .max_parser_threads = preparse_max_threads,
             .timeout = preparse_timeout,
-#if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IPHONE)
-            .external_process = false,
-#else
-            .external_process = true,
-#endif
+            .external_process = use_external_preparser,
         };
         playlist->parser = vlc_preparser_New(parent, &cfg);
         if (playlist->parser == NULL)
