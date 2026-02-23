@@ -282,8 +282,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/audio-library/VLCLibraryAudioDataSource.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupDataSource.h \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupDataSource.m \
-	gui/macosx/library/audio-library/VLCLibraryAudioGroupHeaderView.h \
-	gui/macosx/library/audio-library/VLCLibraryAudioGroupHeaderView.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupTableHeaderCell.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioGroupTableHeaderView.h \
@@ -552,7 +550,6 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCCustomCropARPanel.xib \
 	gui/macosx/UI/VLCDetachedAudioWindow.xib \
 	gui/macosx/UI/VLCLibraryAlbumTableCellView.xib \
-	gui/macosx/UI/VLCLibraryAudioGroupHeaderView.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/VLCLibraryWindowChaptersView.xib \
 	gui/macosx/UI/VLCLibraryWindowNavigationSidebarView.xib \
