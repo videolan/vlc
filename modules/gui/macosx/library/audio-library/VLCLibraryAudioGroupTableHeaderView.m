@@ -156,6 +156,9 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     ]];
     [self updateBackgroundConstraints];
 
+    self.layer = [CALayer new];
+    self.layer.backgroundColor = NSColor.clearColor.CGColor;
+
     if (@available(macOS 26.0, *)) {
     } else {
         self.backgroundView.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
