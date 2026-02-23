@@ -197,7 +197,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                           0.f,
                                           _audioGroupSelectionTableView.bounds.size.width,
                                           headerHeight);
-    _audioCollectionHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame];
+    _audioCollectionHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
     _audioCollectionHeaderView.autoresizingMask = NSViewWidthSizable;
 
     _audioGroupSelectionTableView.headerView = self.audioCollectionHeaderView;

@@ -68,6 +68,15 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     return self;
 }
 
+- (instancetype)initWithFrame:(NSRect)frameRect withInternalPaddingAddedForContentView:(BOOL)internalPaddingAddedForContentView
+{
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        _internalPaddingAddedForContentView = internalPaddingAddedForContentView;
+        [self commonInit];
+    }
+    return self;
+}
 
 - (void)commonInit
 {
