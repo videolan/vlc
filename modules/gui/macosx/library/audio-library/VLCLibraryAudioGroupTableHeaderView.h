@@ -27,6 +27,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight;
+extern NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier;
 
 @interface VLCLibraryAudioGroupTableHeaderView : NSTableHeaderView
 

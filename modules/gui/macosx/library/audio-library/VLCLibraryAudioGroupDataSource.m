@@ -36,7 +36,7 @@
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
-#import "library/audio-library/VLCLibraryAudioGroupHeaderView.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 
 #import "views/VLCSubScrollView.h"
 
@@ -54,11 +54,9 @@
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView
 {
-    NSNib * const audioGroupHeaderView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryAudioGroupHeaderView"
-                                                                  bundle:nil];
-    [collectionView registerNib:audioGroupHeaderView
-     forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
-                 withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier];
+    [collectionView registerClass:VLCLibraryAudioGroupTableHeaderView.class
+       forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                   withIdentifier:VLCLibraryAudioGroupTableHeaderViewIdentifier];
 }
 
 - (instancetype)init
@@ -391,7 +389,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         return albumSupplementaryDetailView;
 
     } else if ([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
-        VLCLibraryAudioGroupHeaderView * const headerView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier forIndexPath:indexPath];
+        VLCLibraryAudioGroupTableHeaderView * const headerView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryAudioGroupTableHeaderViewIdentifier forIndexPath:indexPath];
 
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:_representedAudioGroup parentType:_currentParentType];
         headerView.representedItem = representedItem;
