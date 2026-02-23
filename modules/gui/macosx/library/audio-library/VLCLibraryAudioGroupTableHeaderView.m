@@ -28,6 +28,7 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 
@@ -164,6 +165,10 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 
 - (void)updateBackgroundConstraints
 {
+    if (!self.internalPaddingAddedForContentView) {
+        [self.backgroundView applyConstraintsToFillSuperview];
+        return;
+    }
     [NSLayoutConstraint activateConstraints:@[
         [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor constant:self.backgroundTopInset],
         [self.backgroundView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
@@ -171,6 +176,14 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
         [self.backgroundView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-self.backgroundBottomInset],
     ]];
 }
+
+- (void)setInternalPaddingAddedForContentView:(BOOL)internalPaddingAddedForContentView
+{
+    if (_internalPaddingAddedForContentView == internalPaddingAddedForContentView) return;
+    _internalPaddingAddedForContentView = internalPaddingAddedForContentView;
+    [self updateBackgroundConstraints];
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary<NSKeyValueChangeKey,id> *)change
