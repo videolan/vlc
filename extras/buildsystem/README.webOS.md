@@ -30,7 +30,7 @@ After extracting this archive, import/attach the provided disk image in your VM 
 
 ## 2) Build VLC (core/libs/plugins)
 
-You can use the new webOS package lane from this repo.
+Use the repository helper script for an end-to-end ARM build + install tree.
 
 ### 2.1 Configure environment
 
@@ -40,33 +40,41 @@ cd /home/alien/code/vlc
 export WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot"
 export WEBOS_HOST=arm-webos-linux-gnueabi
 export WEBOS_PKG_CONFIG_PATH="$WEBOS_TOOLCHAIN/sysroot/usr/lib/pkgconfig:$WEBOS_TOOLCHAIN/sysroot/usr/share/pkgconfig"
+
+# Recommended for packaging into vlc-webos-app:
+export PREFIX=/
+export DEPLOY_DIR=/home/alien/code/vlc/vlc-webos-deploy
 ```
 
-### 2.2 One-command build lane
+### 2.2 Build + install in one command
 
 ```bash
 cd /home/alien/code/vlc
-make webos-all
+WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" PREFIX=/ DEPLOY_DIR=/home/alien/code/vlc/vlc-webos-deploy ./build-webos.sh all
 ```
 
-This runs:
-- `webos-contrib` (dependencies)
-- `webos-configure`
-- `webos-build`
+This performs:
+- contrib deps build
+- VLC configure
+- VLC compile
+- install into `DEPLOY_DIR`
 
 If needed, run steps separately:
 
 ```bash
-make webos-contrib
-make webos-configure
-make webos-build
+WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" ./build-webos.sh deps
+WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" PREFIX=/ ./build-webos.sh configure
+WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" ./build-webos.sh build
+WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" DEPLOY_DIR=/home/alien/code/vlc/vlc-webos-deploy ./build-webos.sh install
 ```
 
-### 2.3 Install into a deploy root
+### 2.3 Alternate make-target lane (optional)
 
 ```bash
 cd /home/alien/code/vlc
-make -C build-webos install DESTDIR="$HOME/vlc-webos-deploy-root"
+make webos-contrib
+make webos-configure
+make webos-build
 ```
 
 For packaging scripts, the deploy path typically points to:
@@ -74,7 +82,7 @@ For packaging scripts, the deploy path typically points to:
 - ARM TV target: `$HOME/vlc-webos-deploy`
 - x86_64 simulator target: `$HOME/vlc/vlc-webos-deploy-x86_64`
 
-Use whichever path contains `lib`, `plugins`, and (optionally) `bin/vlc` for your target.
+`vlc-webos-app/package.sh` now auto-detects either a flat deploy tree or a nested tree under install prefix.
 
 ## 3) Build webOS app wrapper and create IPK
 
@@ -98,13 +106,13 @@ TARGET_ARCH=arm VLC_DEPLOY_PATH=$HOME/vlc-webos-deploy ./build.sh
 
 ```bash
 cd /home/alien/code/vlc-webos-app
-TARGET_ARCH=x86_64 VLC_DEPLOY_PATH=/home/alien/code/vlc/vlc-webos-deploy-x86_64 ./package.sh
+TARGET_ARCH=arm VLC_DEPLOY_PATH=/home/alien/code/vlc/vlc-webos-deploy ./package.sh
 ```
 
 Result:
 
+- `org.videolan.vlc.webos_1.0.0_arm.ipk` (TV)
 - `org.videolan.vlc.webos_1.0.0_x86_64.ipk` (simulator)
-- or ARM variant for TV builds
 
 ## 4) Install and launch
 

@@ -8,6 +8,7 @@ APP_ID="${APP_ID:-org.videolan.vlc}"
 PREFIX="${PREFIX:-/media/developer/apps/usr/palm/applications/${APP_ID}}"
 BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build}"
 DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps}"
+DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy}"
 JOBS="${JOBS:-$(nproc)}"
 
 has_sysroot_runtime() {
@@ -40,13 +41,14 @@ fi
 
 usage() {
     cat <<EOF
-Usage: $0 [deps|configure|all]
+Usage: $0 [deps|configure|build|install|all]
 
 Environment variables:
   WEBOS_TOOLCHAIN   Path to webOS ARM SDK/toolchain root (required if not auto-detected)
   TARGET            Target triplet (default: arm-webos-linux-gnueabi)
   BUILD_DIR         Out-of-tree VLC build directory (default: ~/vlc-webos-build)
   DEPS_PREFIX       Contrib install prefix (default: ~/vlc-webos-deps)
+    DEPLOY_DIR        Install DESTDIR for packaged runtime tree (default: <vlc-src>/vlc-webos-deploy)
   PREFIX            VLC install prefix inside webOS app sandbox
   APP_ID            webOS app id (default: org.videolan.vlc)
   JOBS              Parallel jobs (default: nproc)
@@ -54,13 +56,16 @@ Environment variables:
 Examples:
   WEBOS_TOOLCHAIN=/opt/ndk $0 deps
   WEBOS_TOOLCHAIN=/opt/ndk $0 configure
+    WEBOS_TOOLCHAIN=/opt/ndk $0 build
+    WEBOS_TOOLCHAIN=/opt/ndk $0 install
+    WEBOS_TOOLCHAIN=/opt/ndk PREFIX=/ $0 all
     make -C ~/vlc-webos-build -j$(nproc)
 EOF
 }
 
 MODE="${1:-all}"
 case "$MODE" in
-    deps|configure|all)
+        deps|configure|build|install|all)
         ;;
     -h|--help|help)
         usage
@@ -150,4 +155,22 @@ if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
     echo "webOS configure complete in ${BUILD_DIR}"
     echo "If linking fails with libvlccore/libglibc_polyfills issues, adjust bin/Makefile and LIBS as described in extras/buildsystem/README.webOS.md."
     echo "Next: make -C ${BUILD_DIR} -j${JOBS}"
+fi
+
+if [ "$MODE" = "build" ] || [ "$MODE" = "all" ]; then
+    if [ ! -f "${BUILD_DIR}/Makefile" ]; then
+        echo "Missing ${BUILD_DIR}/Makefile. Run '$0 configure' first."
+        exit 1
+    fi
+    make -C "${BUILD_DIR}" -j"${JOBS}"
+fi
+
+if [ "$MODE" = "install" ] || [ "$MODE" = "all" ]; then
+    if [ ! -f "${BUILD_DIR}/Makefile" ]; then
+        echo "Missing ${BUILD_DIR}/Makefile. Run '$0 configure' first."
+        exit 1
+    fi
+    mkdir -p "${DEPLOY_DIR}"
+    make -C "${BUILD_DIR}" install DESTDIR="${DEPLOY_DIR}"
+    echo "Installed runtime tree to ${DEPLOY_DIR}"
 fi
