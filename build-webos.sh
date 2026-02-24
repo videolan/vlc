@@ -148,6 +148,6 @@ if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
     fi
 
     echo "webOS configure complete in ${BUILD_DIR}"
-    echo "If linking fails with libvlccore/libglibc_polyfills issues, adjust bin/Makefile and LIBS as described in README.webOS.md."
+    echo "If linking fails with libvlccore/libglibc_polyfills issues, adjust bin/Makefile and LIBS as described in extras/buildsystem/README.webOS.md."
     echo "Next: make -C ${BUILD_DIR} -j${JOBS}"
 fi
