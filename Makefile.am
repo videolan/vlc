@@ -15,6 +15,7 @@ EXTRA_DIST = \
 	extras/include/x86/x86inc.asm \
 	extras/include/x86/x86util.asm \
 	extras/package/macosx/package.mak \
+	extras/package/webos/package.mak \
 	extras/package/win32/package.mak \
 	extras/package/npapi.am
 
@@ -217,6 +218,7 @@ update-po:
 # OS Packaging rules
 ###############################################################################
 include extras/package/macosx/package.mak
+include extras/package/webos/package.mak
 include extras/package/win32/package.mak
 include extras/package/win32/msi.mak
 
