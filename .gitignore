@@ -52,6 +52,7 @@ share/macosx/Info.plist
 Frameworks
 
 # Ignore build dirs
+webos-package/
 po/
 vlc-webos-deploy-x86_64/
 vlc-webos-deploy-qt-x86_64/
@@ -60,6 +61,7 @@ vlc-webos-build/
 vlc-webos-deploy/
 vlc-webos-deps/
 vlc_build/
+org.videolan.vlc.webos_*.ipk
 target*/
 contrib-*
 install-*

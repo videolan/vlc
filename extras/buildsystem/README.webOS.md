@@ -1,6 +1,6 @@
 # VLC webOS Build and Packaging Guide
 
-This guide describes a full path from VLC source to a webOS IPK package.
+This guide describes a full in-repository path from VLC source to a webOS IPK package.
 
 ## 1) Prerequisites
 
@@ -8,7 +8,7 @@ This guide describes a full path from VLC source to a webOS IPK package.
 - webOS toolchain (`arm-webos-linux-gnueabi`)
 - `ares-cli` installed and emulator/device configured
 - VLC source at this repository root
-- App wrapper repo available at `/home/alien/code/vlc-webos-app`
+- `ares-cli` tools (`ares-package`, `ares-install`, `ares-launch`) available in `PATH`
 
 Toolchain sources:
 
@@ -31,6 +31,26 @@ After extracting this archive, import/attach the provided disk image in your VM 
 ## 2) Build VLC (core/libs/plugins)
 
 Use the repository helper script for an end-to-end ARM build + install tree.
+
+### 2.0 SDK bootstrap (optional, automated)
+
+If the SDK/toolchain is not installed yet, `build-webos.sh` can download/extract it first:
+
+```bash
+cd /home/alien/code/vlc
+WEBOS_SDK_URL="<sdk-archive-url>" ./build-webos.sh sdk
+```
+
+You can also point to a local SDK archive:
+
+```bash
+cd /home/alien/code/vlc
+WEBOS_SDK_ARCHIVE="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz" ./build-webos.sh sdk
+```
+
+Defaults:
+- extraction directory: `~/kodi-dev` (override with `SDK_DOWNLOAD_DIR`)
+- auto-download behavior in normal modes: enabled (`AUTO_SDK_DOWNLOAD=1`)
 
 ### 2.1 Configure environment
 
@@ -59,6 +79,26 @@ This performs:
 - VLC compile
 - install into `DEPLOY_DIR`
 
+### 2.3 Build and package IPK from this repository
+
+```bash
+cd /home/alien/code/vlc
+make webos-ipk
+```
+
+This target:
+- installs runtime files to `vlc-webos-deploy`
+- stages a webOS package payload
+- runs `ares-package`
+- emits `org.videolan.vlc.webos_1.0.0_arm.ipk` in `webos-package/`
+
+One-command full flow (deps + build + IPK):
+
+```bash
+cd /home/alien/code/vlc
+make webos-all-ipk
+```
+
 If needed, run steps separately:
 
 ```bash
@@ -68,70 +108,51 @@ WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" ./build-w
 WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" DEPLOY_DIR=/home/alien/code/vlc/vlc-webos-deploy ./build-webos.sh install
 ```
 
-### 2.3 Alternate make-target lane (optional)
+### 2.4 Alternate make-target lane (manual steps)
 
 ```bash
 cd /home/alien/code/vlc
 make webos-contrib
 make webos-configure
 make webos-build
+make webos-install
+make webos-ipk
 ```
 
-For packaging scripts, the deploy path typically points to:
+For deploy/install paths, typical locations are:
 
 - ARM TV target: `$HOME/vlc-webos-deploy`
 - x86_64 simulator target: `$HOME/vlc/vlc-webos-deploy-x86_64`
 
-`vlc-webos-app/package.sh` now auto-detects either a flat deploy tree or a nested tree under install prefix.
+The in-repo packager (`extras/package/webos/package.sh`) auto-detects either a flat deploy tree or a nested tree under install prefix.
 
-## 3) Build webOS app wrapper and create IPK
-
-The app wrapper repository provides the native webOS app shell and IPK generation.
-
-### 3.1 Build wrapper binary
-
-```bash
-cd /home/alien/code/vlc-webos-app
-TARGET_ARCH=x86_64 VLC_DEPLOY_PATH=/home/alien/code/vlc/vlc-webos-deploy-x86_64 ./build.sh
-```
-
-For TV/ARM package:
-
-```bash
-cd /home/alien/code/vlc-webos-app
-TARGET_ARCH=arm VLC_DEPLOY_PATH=$HOME/vlc-webos-deploy ./build.sh
-```
-
-### 3.2 Package IPK
-
-```bash
-cd /home/alien/code/vlc-webos-app
-TARGET_ARCH=arm VLC_DEPLOY_PATH=/home/alien/code/vlc/vlc-webos-deploy ./package.sh
-```
-
-Result:
-
-- `org.videolan.vlc.webos_1.0.0_arm.ipk` (TV)
-- `org.videolan.vlc.webos_1.0.0_x86_64.ipk` (simulator)
-
-## 4) Install and launch
-
-### Emulator
-
-```bash
-cd /home/alien/code/vlc-webos-app
-ares-install --device emulator --remove org.videolan.vlc.webos || true
-ares-install --device emulator org.videolan.vlc.webos_1.0.0_x86_64.ipk
-ares-launch --device emulator org.videolan.vlc.webos
-```
+## 3) Install and launch
 
 ### TV
 
 ```bash
-cd /home/alien/code/vlc-webos-app
+cd /home/alien/code/vlc
 ares-install --device tv --remove org.videolan.vlc.webos || true
-ares-install --device tv org.videolan.vlc.webos_1.0.0_arm.ipk
+ares-install --device tv webos-package/org.videolan.vlc.webos_1.0.0_arm.ipk
 ares-launch --device tv org.videolan.vlc.webos
+```
+
+### Emulator
+
+```bash
+cd /home/alien/code/vlc
+ares-install --device emulator --remove org.videolan.vlc.webos || true
+ares-install --device emulator webos-package/org.videolan.vlc.webos_1.0.0_arm.ipk
+ares-launch --device emulator org.videolan.vlc.webos
+```
+
+## 4) Legacy external wrapper flow (optional)
+
+If you still want to use the older external wrapper repository:
+
+```bash
+cd /home/alien/code/vlc-webos-app
+TARGET_ARCH=arm VLC_DEPLOY_PATH=/home/alien/code/vlc/vlc-webos-deploy ./package.sh
 ```
 
 ## 5) Troubleshooting quick checks
@@ -154,7 +175,7 @@ ssh -p 6622 root@127.0.0.1 'sed -n "1,140p" /media/developer/apps/usr/palm/appli
 
 - Android app build files are in a separate project: `vlc-android`.
 - macOS packaging is under `extras/package/macosx` and `extras/package/apple`.
-- webOS lane in this repo is intentionally minimal (KISS/YAGNI): build contribs, configure, build, then package via `vlc-webos-app`.
+- webOS lane in this repo is intentionally minimal (KISS/YAGNI): build contribs, configure, build, install, then package with `extras/package/webos/package.sh`.
 
 ## Appendix A) VM settings used (validated session)
 

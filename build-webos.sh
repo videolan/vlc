@@ -10,52 +10,34 @@ BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build}"
 DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps}"
 DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy}"
 JOBS="${JOBS:-$(nproc)}"
-
-has_sysroot_runtime() {
-    local toolchain="$1"
-    local sysroot="${toolchain}/${TARGET}/sysroot"
-    [ -f "${sysroot}/usr/lib/crt1.o" ] && [ -f "${sysroot}/usr/lib/libc.so" ]
-}
-
-if [ -z "${WEBOS_TOOLCHAIN:-}" ]; then
-    for candidate in \
-        "$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" \
-        "$HOME/buildroot-nc4/output/host"; do
-        if [ -d "$candidate" ] && has_sysroot_runtime "$candidate"; then
-            WEBOS_TOOLCHAIN="$candidate"
-            break
-        fi
-    done
-fi
-
-if [ -z "${WEBOS_TOOLCHAIN:-}" ]; then
-    echo "WEBOS_TOOLCHAIN is not set and no usable SDK was found."
-    echo "Set WEBOS_TOOLCHAIN to a toolchain containing ${TARGET}/sysroot/usr/lib/crt1.o."
-    exit 1
-fi
-
-if ! has_sysroot_runtime "${WEBOS_TOOLCHAIN}"; then
-    echo "Toolchain is missing runtime sysroot files (crt1.o/libc.so): ${WEBOS_TOOLCHAIN}"
-    exit 1
-fi
+MODE="${1:-all}"
+SDK_DOWNLOAD_DIR="${SDK_DOWNLOAD_DIR:-$HOME/kodi-dev}"
+SDK_ARCHIVE="${WEBOS_SDK_ARCHIVE:-}"
+SDK_URL="${WEBOS_SDK_URL:-}"
+AUTO_SDK_DOWNLOAD="${AUTO_SDK_DOWNLOAD:-1}"
 
 usage() {
-    cat <<EOF
-Usage: $0 [deps|configure|build|install|all]
+        cat <<EOF
+Usage: $0 [sdk|deps|configure|build|install|all]
 
 Environment variables:
-  WEBOS_TOOLCHAIN   Path to webOS ARM SDK/toolchain root (required if not auto-detected)
-  TARGET            Target triplet (default: arm-webos-linux-gnueabi)
-  BUILD_DIR         Out-of-tree VLC build directory (default: ~/vlc-webos-build)
-  DEPS_PREFIX       Contrib install prefix (default: ~/vlc-webos-deps)
+    WEBOS_TOOLCHAIN   Path to webOS ARM SDK/toolchain root (required if not auto-detected)
+    TARGET            Target triplet (default: arm-webos-linux-gnueabi)
+    BUILD_DIR         Out-of-tree VLC build directory (default: ~/vlc-webos-build)
+    DEPS_PREFIX       Contrib install prefix (default: ~/vlc-webos-deps)
     DEPLOY_DIR        Install DESTDIR for packaged runtime tree (default: <vlc-src>/vlc-webos-deploy)
-  PREFIX            VLC install prefix inside webOS app sandbox
-  APP_ID            webOS app id (default: org.videolan.vlc)
-  JOBS              Parallel jobs (default: nproc)
+    PREFIX            VLC install prefix inside webOS app sandbox
+    APP_ID            webOS app id (default: org.videolan.vlc)
+    JOBS              Parallel jobs (default: nproc)
+    SDK_DOWNLOAD_DIR  Directory for downloaded/extracted SDK (default: ~/kodi-dev)
+    WEBOS_SDK_ARCHIVE Local SDK tarball path (optional)
+    WEBOS_SDK_URL     SDK tarball URL to download if SDK missing (optional)
+    AUTO_SDK_DOWNLOAD Auto-download SDK when missing in configure/build/install/all (default: 1)
 
 Examples:
-  WEBOS_TOOLCHAIN=/opt/ndk $0 deps
-  WEBOS_TOOLCHAIN=/opt/ndk $0 configure
+    WEBOS_SDK_URL=https://example/arm-webos-linux-gnueabi_sdk-buildroot.tar.gz $0 sdk
+    WEBOS_TOOLCHAIN=/opt/ndk $0 deps
+    WEBOS_TOOLCHAIN=/opt/ndk $0 configure
     WEBOS_TOOLCHAIN=/opt/ndk $0 build
     WEBOS_TOOLCHAIN=/opt/ndk $0 install
     WEBOS_TOOLCHAIN=/opt/ndk PREFIX=/ $0 all
@@ -63,19 +45,110 @@ Examples:
 EOF
 }
 
-MODE="${1:-all}"
 case "$MODE" in
-        deps|configure|build|install|all)
-        ;;
-    -h|--help|help)
-        usage
-        exit 0
-        ;;
-    *)
-        usage
-        exit 1
-        ;;
+    sdk|deps|configure|build|install|all)
+                ;;
+        -h|--help|help)
+                usage
+                exit 0
+                ;;
+        *)
+                usage
+                exit 1
+                ;;
 esac
+
+has_sysroot_runtime() {
+    local toolchain="$1"
+    local sysroot="${toolchain}/${TARGET}/sysroot"
+    [ -f "${sysroot}/usr/lib/crt1.o" ] && [ -f "${sysroot}/usr/lib/libc.so" ]
+}
+
+download_file() {
+    local url="$1"
+    local out="$2"
+
+    if command -v curl >/dev/null 2>&1; then
+        curl -fL "$url" -o "$out"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "$out" "$url"
+    else
+        echo "Neither curl nor wget is available for SDK download."
+        exit 1
+    fi
+}
+
+detect_toolchain() {
+    local candidate
+
+    if [ -n "${WEBOS_TOOLCHAIN:-}" ] && [ -d "${WEBOS_TOOLCHAIN}" ] && has_sysroot_runtime "${WEBOS_TOOLCHAIN}"; then
+        return 0
+    fi
+
+    WEBOS_TOOLCHAIN=""
+    for candidate in \
+        "$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" \
+        "$HOME/buildroot-nc4/output/host" \
+        "$SDK_DOWNLOAD_DIR/arm-webos-linux-gnueabi_sdk-buildroot"; do
+        if [ -d "$candidate" ] && has_sysroot_runtime "$candidate"; then
+            WEBOS_TOOLCHAIN="$candidate"
+            return 0
+        fi
+    done
+
+    candidate="$(find "$SDK_DOWNLOAD_DIR" -maxdepth 1 -type d -name 'arm-webos-linux-gnueabi_sdk-buildroot*' 2>/dev/null | head -n 1)"
+    if [ -n "$candidate" ] && has_sysroot_runtime "$candidate"; then
+        WEBOS_TOOLCHAIN="$candidate"
+        return 0
+    fi
+
+    return 1
+}
+
+install_sdk_if_needed() {
+    local archive_path=""
+    local archive_name=""
+
+    mkdir -p "$SDK_DOWNLOAD_DIR"
+
+    if [ -n "$SDK_ARCHIVE" ] && [ -f "$SDK_ARCHIVE" ]; then
+        archive_path="$SDK_ARCHIVE"
+    elif [ -n "$SDK_URL" ]; then
+        archive_name="$(basename "$SDK_URL")"
+        archive_path="$SDK_DOWNLOAD_DIR/$archive_name"
+        if [ ! -f "$archive_path" ]; then
+            echo "Downloading webOS SDK: $SDK_URL"
+            download_file "$SDK_URL" "$archive_path"
+        else
+            echo "Using existing SDK archive: $archive_path"
+        fi
+    else
+        echo "SDK is missing and no download source was provided."
+        echo "Set WEBOS_SDK_URL or WEBOS_SDK_ARCHIVE, or export WEBOS_TOOLCHAIN manually."
+        exit 1
+    fi
+
+    echo "Extracting SDK archive to $SDK_DOWNLOAD_DIR"
+    tar -xf "$archive_path" -C "$SDK_DOWNLOAD_DIR"
+}
+
+if ! detect_toolchain; then
+    if [ "$MODE" = "sdk" ] || [ "$AUTO_SDK_DOWNLOAD" = "1" ]; then
+        install_sdk_if_needed
+    fi
+fi
+
+if ! detect_toolchain; then
+    echo "WEBOS_TOOLCHAIN is not set and no usable SDK was found."
+    echo "Set WEBOS_TOOLCHAIN to a toolchain containing ${TARGET}/sysroot/usr/lib/crt1.o."
+    echo "Or run: WEBOS_SDK_URL=<sdk-archive-url> $0 sdk"
+    exit 1
+fi
+
+if [ "$MODE" = "sdk" ]; then
+    echo "SDK ready: ${WEBOS_TOOLCHAIN}"
+    exit 0
+fi
 
 export PATH="/usr/bin:${WEBOS_TOOLCHAIN}/bin:${PATH}"
 SYSROOT="${WEBOS_TOOLCHAIN}/${TARGET}/sysroot"
