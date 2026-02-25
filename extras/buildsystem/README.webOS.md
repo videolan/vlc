@@ -32,6 +32,8 @@ After extracting this archive, import/attach the provided disk image in your VM 
 
 Use the repository helper script for an end-to-end ARM build + install tree.
 
+Default behavior is now "maximum modules possible": the script avoids hard-disabling optional codec/features unless required by explicit flags.
+
 ### 2.0 SDK bootstrap (optional, automated)
 
 If the SDK/toolchain is not installed yet, `build-webos.sh` can download/extract it first:
@@ -51,6 +53,8 @@ WEBOS_SDK_ARCHIVE="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.t
 Defaults:
 - extraction directory: `~/kodi-dev` (override with `SDK_DOWNLOAD_DIR`)
 - auto-download behavior in normal modes: enabled (`AUTO_SDK_DOWNLOAD=1`)
+- contrib bootstrap extra flags: none (override with `WEBOS_CONTRIB_BOOTSTRAP_FLAGS`)
+- configure extra flags: none (override with `WEBOS_CONFIGURE_EXTRA_FLAGS`)
 
 ### 2.1 Configure environment
 

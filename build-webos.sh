@@ -15,6 +15,8 @@ SDK_DOWNLOAD_DIR="${SDK_DOWNLOAD_DIR:-$HOME/kodi-dev}"
 SDK_ARCHIVE="${WEBOS_SDK_ARCHIVE:-}"
 SDK_URL="${WEBOS_SDK_URL:-}"
 AUTO_SDK_DOWNLOAD="${AUTO_SDK_DOWNLOAD:-1}"
+WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-}"
+WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-}"
 
 usage() {
         cat <<EOF
@@ -33,6 +35,8 @@ Environment variables:
     WEBOS_SDK_ARCHIVE Local SDK tarball path (optional)
     WEBOS_SDK_URL     SDK tarball URL to download if SDK missing (optional)
     AUTO_SDK_DOWNLOAD Auto-download SDK when missing in configure/build/install/all (default: 1)
+    WEBOS_CONTRIB_BOOTSTRAP_FLAGS Extra flags passed to contrib/bootstrap (default: none)
+    WEBOS_CONFIGURE_EXTRA_FLAGS   Extra flags appended to VLC configure invocation
 
 Examples:
     WEBOS_SDK_URL=https://example/arm-webos-linux-gnueabi_sdk-buildroot.tar.gz $0 sdk
@@ -169,7 +173,9 @@ if [ "$MODE" = "deps" ] || [ "$MODE" = "all" ]; then
     cd "${SRC_DIR}/contrib/${TARGET}"
 
     if [ ! -f Makefile ]; then
-        ../bootstrap --host="${TARGET}" --prefix="${DEPS_PREFIX}" --disable-disc --disable-sout
+        # Default to maximum contrib coverage; caller can still pass disable flags.
+        # shellcheck disable=SC2086
+        ../bootstrap --host="${TARGET}" --prefix="${DEPS_PREFIX}" ${WEBOS_CONTRIB_BOOTSTRAP_FLAGS}
     fi
 
     make fetch
@@ -180,29 +186,17 @@ if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
     mkdir -p "${BUILD_DIR}"
     cd "${BUILD_DIR}"
 
+    # Keep defaults broad and rely on auto-detection whenever possible.
+    # shellcheck disable=SC2086
     "${SRC_DIR}/configure" \
         --host="${TARGET}" \
         --prefix="${PREFIX}" \
         --disable-debug \
         --disable-dbus \
         --disable-xcb \
-        --disable-wayland \
-        --disable-libdrm \
-        --disable-egl \
-        --disable-gles2 \
-        --disable-vdpau \
-        --disable-gst-decode \
-        --disable-aribsub \
-        --disable-aribcaption \
-        --disable-lua \
-        --disable-freetype \
-        --disable-libass \
-        --disable-qt \
-        --disable-skins2 \
-        --disable-udev \
-        --disable-avahi \
         --without-x \
-        --enable-run-as-root
+        --enable-run-as-root \
+        ${WEBOS_CONFIGURE_EXTRA_FLAGS}
 
     if [ -f Makefile ]; then
         sed -i '/^LIBS = /{ /-ldl/! s/$/ -ldl/; }' Makefile || true
@@ -210,8 +204,6 @@ if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
 
     if [ -f modules/Makefile ]; then
         sed -i '/^LIBS = /{ /-ldl/! s/$/ -ldl/; }' modules/Makefile || true
-        sed -i 's/^am__append_351 = libdrm_display_plugin.la/#&/' modules/Makefile || true
-        sed -i 's/^am__append_207 = libfreetype_plugin.la/#&/' modules/Makefile || true
     fi
 
     if [ -f bin/Makefile ]; then
