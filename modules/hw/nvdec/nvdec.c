@@ -773,9 +773,35 @@ static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *) p_this;
     int result;
+
+    /* Check early if has nvdec support */
+    vlc_decoder_device *dec_device = NULL;
+    decoder_device_nvdec_t *devsys = NULL;
+    switch (p_dec->fmt_in->i_codec) {
+        case VLC_CODEC_H264:
+        case VLC_CODEC_HEVC:
+        case VLC_CODEC_VC1:
+        case VLC_CODEC_WMV3:
+        case VLC_CODEC_MP1V:
+        case VLC_CODEC_MP2V:
+        case VLC_CODEC_MPGV:
+        case VLC_CODEC_MP4V:
+        case VLC_CODEC_VP8:
+        case VLC_CODEC_VP9:
+            dec_device = decoder_GetDecoderDevice( p_dec );
+            if (dec_device != NULL)
+                devsys = GetNVDECOpaqueDevice(dec_device);
+            break;
+    }
+    if (devsys == NULL)
+    {
+        msg_Dbg(p_this, "Missing decoder device");
+        return VLC_EGENERIC;
+    }
+
     nvdec_ctx_t *p_sys = calloc(1, sizeof(*p_sys));
     if (unlikely(!p_sys))
-        return VLC_ENOMEM;
+        goto early_exit;
 
     p_dec->p_sys = p_sys;
 
@@ -838,23 +864,10 @@ static int OpenDecoder(vlc_object_t *p_this)
             goto early_exit;
     }
 
-    vlc_decoder_device *dec_device = decoder_GetDecoderDevice( p_dec );
-    if (dec_device == NULL) {
-        if (p_sys->b_is_hxxx)
-            hxxx_helper_clean(&p_sys->hh);
-        msg_Dbg(p_this, "Missing decoder device");
-        goto early_exit;
-    }
-    p_sys->devsys = GetNVDECOpaqueDevice(dec_device);
-    if (p_sys->devsys == NULL)
-    {
-        vlc_decoder_device_Release(dec_device);
-        if (p_sys->b_is_hxxx)
-            hxxx_helper_clean(&p_sys->hh);
-        goto early_exit;
-    }
+    p_sys->devsys = devsys;
     p_sys->vctx_out = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_NVDEC, 0, NULL );
     vlc_decoder_device_Release(dec_device);
+    dec_device = NULL;
     if (unlikely(p_sys->vctx_out == NULL))
     {
         msg_Err(p_dec, "failed to create a video context");
@@ -1044,7 +1057,9 @@ error:
     CloseDecoder(p_this);
     return VLC_EGENERIC;
 early_exit:
-    free(p_dec->p_sys);
+    if (dec_device != NULL)
+        vlc_decoder_device_Release(dec_device);
+    free(p_sys);
     return VLC_EGENERIC;
 }
 
