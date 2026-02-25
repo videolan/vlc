@@ -39,6 +39,14 @@
 # define CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT 14
 #endif
 
+/* Higher than avcodec:
+ *  - On Linux, OpenDecoder() will fail if not using a nvidia GPU and fallback
+ *    to avcodec with vaapi/other hw decoder
+ *  - On Windows, d3d11 dec-dev has a higher priority by default, so nvdec
+ *    decoder will fail in favor of avcodec with d3d11 hw decoder
+ */
+#define NVDEC_PRIORITY 71
+
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 static int DecoderContextOpen(vlc_decoder_device *, vlc_window_t *);
@@ -60,7 +68,7 @@ static const int ppsi_deinterlace_type[] = {
 vlc_module_begin ()
     set_description(N_("NVDEC video decoder"))
     set_shortname("nvdec")
-    set_capability("video decoder", 60)
+    set_capability("video decoder", NVDEC_PRIORITY)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     add_integer( "nvdec-deint", cudaVideoDeinterlaceMode_Bob,
                  DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT )
