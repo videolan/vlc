@@ -249,15 +249,15 @@ Open(vlc_decoder_device *device, vlc_window_t *window)
 }
 
 #if defined (HAVE_VA_X11)
-# define PRIORITY 2
+# define PRIORITY 5
 # define SHORTCUT "vaapi_x11"
 # define DESCRIPTION_SUFFIX "X11"
 #elif defined(HAVE_VA_WL)
-# define PRIORITY 2
+# define PRIORITY 5
 # define SHORTCUT "vaapi_wl"
 # define DESCRIPTION_SUFFIX "Wayland"
 #elif defined (HAVE_VA_DRM)
-# define PRIORITY 1
+# define PRIORITY 4
 # define SHORTCUT "vaapi_drm"
 # define DESCRIPTION_SUFFIX "DRM"
 #endif
