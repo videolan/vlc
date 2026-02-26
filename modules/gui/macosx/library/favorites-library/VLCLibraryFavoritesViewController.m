@@ -115,7 +115,7 @@
                                           0.f,
                                           self.favoritesLibraryGroupSelectionTableView.bounds.size.width,
                                           headerHeight);
-    _favoritesHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame];
+    _favoritesHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
     _favoritesHeaderView.autoresizingMask = NSViewWidthSizable;
 
     _favoritesLibraryTableViewDelegate.detailTableHeaderView = self.favoritesHeaderView;
