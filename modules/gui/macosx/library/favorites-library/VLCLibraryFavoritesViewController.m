@@ -145,6 +145,7 @@
                                                 forIdentifier:VLCAudioLibraryCellIdentifier];
     
     self.favoritesLibraryGroupsTableView.headerView = nil;
+    self.favoritesLibraryGroupsTableView.allowsEmptySelection = NO;
     
     self.favoritesLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.favoritesLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
