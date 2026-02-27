@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <windows.h>
+
 #include <initguid.h>
 #define COBJMACROS
 
@@ -34,7 +36,6 @@
 #define _DECL_DLLMAIN
 #include <process.h>
 #include <vlc_common.h>
-#include <windows.h>
 #include <vlc_aout.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
@@ -75,7 +76,7 @@ static msftime_t GetQPC_100ns(void)
 
 static msftime_t (*get_qpc)(void);
 
-int __stdcall DllMain(void *dll, unsigned long reason, void *reserved)
+int __stdcall DllMain(void *dll, DWORD reason, void *reserved)
 {
     (void) dll;
     (void) reserved;
