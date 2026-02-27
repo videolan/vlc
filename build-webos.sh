@@ -71,6 +71,31 @@ has_sysroot_runtime() {
     [ -f "${sysroot}/usr/lib/crt1.o" ] && [ -f "${sysroot}/usr/lib/libc.so" ]
 }
 
+normalize_sysroot_libtool_archives() {
+    local la
+    while IFS= read -r -d '' la; do
+        sed -i \
+            -e "s|^libdir='/.*sysroot/usr/lib'|libdir='${SYSROOT}/usr/lib'|" \
+            -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/${TARGET}/sysroot/usr/lib|${SYSROOT}/usr/lib|g" \
+            -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/bin/../${TARGET}/sysroot/usr/lib|${SYSROOT}/usr/lib|g" \
+            -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/${TARGET}/sysroot/usr/include|${SYSROOT}/usr/include|g" \
+            -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/${TARGET}/lib|${WEBOS_TOOLCHAIN}/${TARGET}/lib|g" \
+            -e "s|${WEBOS_TOOLCHAIN}/lib|${WEBOS_TOOLCHAIN}/${TARGET}/lib|g" \
+            "$la" || true
+    done < <(find "${SYSROOT}/usr/lib" "${DEPS_PREFIX}/lib" -maxdepth 1 -type f -name '*.la' -print0 2>/dev/null)
+}
+
+sanitize_makefile_paths() {
+    local makefile="$1"
+    [ -f "$makefile" ] || return 0
+    sed -i \
+        -e "s|-I/usr/include/libpng16|-I${SYSROOT}/usr/include/libpng16|g" \
+        -e "s|-I/usr/include/freetype2|-I${SYSROOT}/usr/include/freetype2|g" \
+        -e "s|-I/usr/include/libxml2|-I${SYSROOT}/usr/include/libxml2|g" \
+        -e "s|-L/usr/lib\\>|-L${SYSROOT}/usr/lib|g" \
+        "$makefile" || true
+}
+
 download_file() {
     local url="$1"
     local out="$2"
@@ -158,13 +183,15 @@ fi
 
 export PATH="/usr/bin:${WEBOS_TOOLCHAIN}/bin:${PATH}"
 SYSROOT="${WEBOS_TOOLCHAIN}/${TARGET}/sysroot"
-export PKG_CONFIG_SYSROOT_DIR="${SYSROOT}"
+export PKG_CONFIG_SYSROOT_DIR=""
 export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
 export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig"
 export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include"
 export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
 export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
 export LDFLAGS="${LDFLAGS:-} -L${DEPS_PREFIX}/lib -L${SYSROOT}/usr/lib"
+
+normalize_sysroot_libtool_archives
 
 if ! command -v "${TARGET}-gcc" >/dev/null 2>&1; then
     echo "${TARGET}-gcc was not found in PATH."
@@ -204,16 +231,21 @@ if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
 
     if [ -f Makefile ]; then
         sed -i '/^LIBS = /{ /-ldl/! s/$/ -ldl/; }' Makefile || true
+        sanitize_makefile_paths Makefile
     fi
 
     if [ -f modules/Makefile ]; then
         sed -i '/^LIBS = /{ /-ldl/! s/$/ -ldl/; }' modules/Makefile || true
+        sed -i '/^LIBS_fluidsynth = /{ / -lm/! s/$/ -lm/; }' modules/Makefile || true
         sed -i 's/^am__append_351 = libdrm_display_plugin.la/# am__append_351 = libdrm_display_plugin.la/' modules/Makefile || true
+        sed -i 's/^am__append_284 = libegl_display_generic_plugin.la/# am__append_284 = libegl_display_generic_plugin.la/' modules/Makefile || true
         sed -i 's/^am__append_120 = libgstdecode_plugin.la/# am__append_120 = libgstdecode_plugin.la/' modules/Makefile || true
         sed -i 's/^am__append_212 = libgst_mem_plugin.la/# am__append_212 = libgst_mem_plugin.la/' modules/Makefile || true
+        sanitize_makefile_paths modules/Makefile
     fi
 
     if [ -f bin/Makefile ]; then
+        sanitize_makefile_paths bin/Makefile
         if ! grep -q 'rpath-link,\$(abs_top_builddir)/src/.libs' bin/Makefile; then
             sed -i '/^vlc_CPPFLAGS =/a vlc_LDFLAGS = $(LDFLAGS_vlc) -Wl,-rpath-link,$(abs_top_builddir)/src/.libs -Wl,-rpath-link,$(abs_top_builddir)/lib/.libs' bin/Makefile || true
         fi
