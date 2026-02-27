@@ -46,9 +46,14 @@ ifdef HAVE_LINUX
 FLUIDCONF += -Denable-openmp=0
 endif
 
+ifeq ($(HOST),arm-webos-linux-gnueabi)
+.fluid:
+	touch $@
+else
 .fluid: fluidsynth toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) $(FLUIDCONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
+endif

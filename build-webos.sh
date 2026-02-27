@@ -11,12 +11,15 @@ DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps}"
 DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy}"
 JOBS="${JOBS:-$(nproc)}"
 MODE="${1:-all}"
-SDK_DOWNLOAD_DIR="${SDK_DOWNLOAD_DIR:-$HOME/kodi-dev}"
+SDK_DOWNLOAD_DIR="${SDK_DOWNLOAD_DIR:-$BUILD_DIR/sdk}"
 SDK_ARCHIVE="${WEBOS_SDK_ARCHIVE:-}"
-SDK_URL="${WEBOS_SDK_URL:-}"
+DEFAULT_WEBOS_SDK_URL="https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz"
+SDK_URL="${WEBOS_SDK_URL:-$DEFAULT_WEBOS_SDK_URL}"
 AUTO_SDK_DOWNLOAD="${AUTO_SDK_DOWNLOAD:-1}"
-WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-}"
-WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-}"
+DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-vorbis --disable-fluid --disable-libaribcaption --disable-ass --disable-live555 --disable-harfbuzz --disable-vulkan-loader --disable-sidplay2 --disable-vncclient"
+DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-libdrm --disable-qt --disable-vpx --disable-aom --disable-fluidsynth --disable-openapv"
+WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-$DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS}"
+WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-$DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS}"
 
 usage() {
         cat <<EOF
@@ -31,15 +34,15 @@ Environment variables:
     PREFIX            VLC install prefix inside webOS app sandbox
     APP_ID            webOS app id (default: org.videolan.vlc)
     JOBS              Parallel jobs (default: nproc)
-    SDK_DOWNLOAD_DIR  Directory for downloaded/extracted SDK (default: ~/kodi-dev)
+    SDK_DOWNLOAD_DIR  Directory for downloaded/extracted SDK (default: <BUILD_DIR>/sdk)
     WEBOS_SDK_ARCHIVE Local SDK tarball path (optional)
-    WEBOS_SDK_URL     SDK tarball URL to download if SDK missing (optional)
+    WEBOS_SDK_URL     SDK tarball URL to download if SDK missing (default: openlgtv buildroot-nc4 webOS release)
     AUTO_SDK_DOWNLOAD Auto-download SDK when missing in configure/build/install/all (default: 1)
-    WEBOS_CONTRIB_BOOTSTRAP_FLAGS Extra flags passed to contrib/bootstrap (default: none)
-    WEBOS_CONFIGURE_EXTRA_FLAGS   Extra flags appended to VLC configure invocation
+    WEBOS_CONTRIB_BOOTSTRAP_FLAGS Extra flags passed to contrib/bootstrap (default: reproducible webOS profile)
+    WEBOS_CONFIGURE_EXTRA_FLAGS   Extra flags appended to VLC configure invocation (default: reproducible webOS profile)
 
 Examples:
-    WEBOS_SDK_URL=https://example/arm-webos-linux-gnueabi_sdk-buildroot.tar.gz $0 sdk
+    WEBOS_SDK_URL=https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz $0 sdk
     WEBOS_TOOLCHAIN=/opt/ndk $0 deps
     WEBOS_TOOLCHAIN=/opt/ndk $0 configure
     WEBOS_TOOLCHAIN=/opt/ndk $0 build
@@ -91,9 +94,8 @@ detect_toolchain() {
 
     WEBOS_TOOLCHAIN=""
     for candidate in \
-        "$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" \
-        "$HOME/buildroot-nc4/output/host" \
-        "$SDK_DOWNLOAD_DIR/arm-webos-linux-gnueabi_sdk-buildroot"; do
+        "$SDK_DOWNLOAD_DIR/arm-webos-linux-gnueabi_sdk-buildroot" \
+        "$SDK_DOWNLOAD_DIR/arm-webos-linux-gnueabi_sdk-buildroot-x86_64"; do
         if [ -d "$candidate" ] && has_sysroot_runtime "$candidate"; then
             WEBOS_TOOLCHAIN="$candidate"
             return 0
@@ -156,11 +158,13 @@ fi
 
 export PATH="/usr/bin:${WEBOS_TOOLCHAIN}/bin:${PATH}"
 SYSROOT="${WEBOS_TOOLCHAIN}/${TARGET}/sysroot"
-unset PKG_CONFIG_SYSROOT_DIR
+export PKG_CONFIG_SYSROOT_DIR="${SYSROOT}"
 export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
 export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig"
-export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon"
-export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon"
+export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include"
+export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
+export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
+export LDFLAGS="${LDFLAGS:-} -L${DEPS_PREFIX}/lib -L${SYSROOT}/usr/lib"
 
 if ! command -v "${TARGET}-gcc" >/dev/null 2>&1; then
     echo "${TARGET}-gcc was not found in PATH."
@@ -204,6 +208,9 @@ if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
 
     if [ -f modules/Makefile ]; then
         sed -i '/^LIBS = /{ /-ldl/! s/$/ -ldl/; }' modules/Makefile || true
+        sed -i 's/^am__append_351 = libdrm_display_plugin.la/# am__append_351 = libdrm_display_plugin.la/' modules/Makefile || true
+        sed -i 's/^am__append_120 = libgstdecode_plugin.la/# am__append_120 = libgstdecode_plugin.la/' modules/Makefile || true
+        sed -i 's/^am__append_212 = libgst_mem_plugin.la/# am__append_212 = libgst_mem_plugin.la/' modules/Makefile || true
     fi
 
     if [ -f bin/Makefile ]; then
