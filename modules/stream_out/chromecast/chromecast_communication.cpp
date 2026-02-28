@@ -327,13 +327,13 @@ std::string ChromecastCommunication::GetMedia( const std::string& mime,
             {
                 if( !artist.empty() )
                     ss << ",\"artist\":\"" << artist << "\"";
-                if( album.empty() )
+                if( !album.empty() )
                     ss << ",\"album\":\"" << album << "\"";
-                if( albumartist.empty() )
+                if( !albumartist.empty() )
                     ss << ",\"albumArtist\":\"" << albumartist << "\"";
-                if( tracknumber.empty() )
+                if( !tracknumber.empty() )
                     ss << ",\"trackNumber\":\"" << tracknumber << "\"";
-                if( discnumber.empty() )
+                if( !discnumber.empty() )
                     ss << ",\"discNumber\":\"" << discnumber << "\"";
             }
 
