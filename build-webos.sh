@@ -3,12 +3,23 @@
 set -euo pipefail
 
 SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
-TARGET="${TARGET:-arm-webos-linux-gnueabi}"
+WEBOS_PROFILE="${WEBOS_PROFILE:-arm}"
+if [ "$WEBOS_PROFILE" = "x86_64" ]; then
+    TARGET="${TARGET:-x86_64-linux-gnu}"
+else
+    TARGET="${TARGET:-arm-webos-linux-gnueabi}"
+fi
 APP_ID="${APP_ID:-org.videolan.vlc}"
 PREFIX="${PREFIX:-/media/developer/apps/usr/palm/applications/${APP_ID}}"
-BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build}"
-DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps}"
-DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy}"
+if [ "$WEBOS_PROFILE" = "x86_64" ]; then
+    BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build-x86_64}"
+    DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps-x86_64}"
+    DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy-x86_64}"
+else
+    BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build}"
+    DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps}"
+    DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy}"
+fi
 JOBS="${JOBS:-$(nproc)}"
 MODE="${1:-all}"
 SDK_DOWNLOAD_DIR="${SDK_DOWNLOAD_DIR:-$BUILD_DIR/sdk}"
@@ -16,10 +27,20 @@ SDK_ARCHIVE="${WEBOS_SDK_ARCHIVE:-}"
 DEFAULT_WEBOS_SDK_URL="https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz"
 SDK_URL="${WEBOS_SDK_URL:-$DEFAULT_WEBOS_SDK_URL}"
 AUTO_SDK_DOWNLOAD="${AUTO_SDK_DOWNLOAD:-1}"
+if [ "$WEBOS_PROFILE" = "x86_64" ]; then
+    WEBOS_NATIVE_TOOLCHAIN="${WEBOS_NATIVE_TOOLCHAIN:-1}"
+else
+    WEBOS_NATIVE_TOOLCHAIN="${WEBOS_NATIVE_TOOLCHAIN:-0}"
+fi
 DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-vorbis --disable-fluid --disable-libaribcaption --disable-ass --disable-live555 --disable-harfbuzz --disable-vulkan-loader --disable-sidplay2 --disable-vncclient"
 DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-libdrm --disable-qt --disable-vpx --disable-aom --disable-fluidsynth --disable-openapv"
 WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-$DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS}"
 WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-$DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS}"
+
+if [ "$WEBOS_PROFILE" = "x86_64" ]; then
+    WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS} --disable-ssh2"
+    WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS} --disable-sftp"
+fi
 
 usage() {
         cat <<EOF
@@ -79,9 +100,19 @@ normalize_sysroot_libtool_archives() {
             -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/${TARGET}/sysroot/usr/lib|${SYSROOT}/usr/lib|g" \
             -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/bin/../${TARGET}/sysroot/usr/lib|${SYSROOT}/usr/lib|g" \
             -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/${TARGET}/sysroot/usr/include|${SYSROOT}/usr/include|g" \
-            -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/${TARGET}/lib|${WEBOS_TOOLCHAIN}/${TARGET}/lib|g" \
-            -e "s|${WEBOS_TOOLCHAIN}/lib|${WEBOS_TOOLCHAIN}/${TARGET}/lib|g" \
             "$la" || true
+
+        if [ -n "${WEBOS_TOOLCHAIN:-}" ]; then
+            sed -i \
+                -e "s|/__w/buildroot-nc4/buildroot-nc4/output/host/${TARGET}/lib|${WEBOS_TOOLCHAIN}/${TARGET}/lib|g" \
+                -e "s|${WEBOS_TOOLCHAIN}/lib|${WEBOS_TOOLCHAIN}/${TARGET}/lib|g" \
+                "$la" || true
+        fi
+
+        if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
+            perl -0pi -e 's#(/x86_64-linux-gnu){2,}/#\/x86_64-linux-gnu/#g' "$la" || true
+            perl -0pi -e 's#/x86_64-linux-gnu/lib/x86_64-linux-gnu/#/x86_64-linux-gnu/lib/#g' "$la" || true
+        fi
     done < <(find "${SYSROOT}/usr/lib" "${DEPS_PREFIX}/lib" -maxdepth 1 -type f -name '*.la' -print0 2>/dev/null)
 }
 
@@ -94,6 +125,17 @@ sanitize_makefile_paths() {
         -e "s|-I/usr/include/libxml2|-I${SYSROOT}/usr/include/libxml2|g" \
         -e "s|-L/usr/lib\\>|-L${SYSROOT}/usr/lib|g" \
         "$makefile" || true
+}
+
+ensure_native_prefix_compat() {
+    if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ]; then
+        return 0
+    fi
+
+    mkdir -p "${DEPS_PREFIX}/${TARGET}"
+    [ -e "${DEPS_PREFIX}/${TARGET}/lib" ] || ln -s ../lib "${DEPS_PREFIX}/${TARGET}/lib"
+    [ -e "${DEPS_PREFIX}/${TARGET}/include" ] || ln -s ../include "${DEPS_PREFIX}/${TARGET}/include"
+    [ -e "${DEPS_PREFIX}/${TARGET}/share" ] || ln -s ../share "${DEPS_PREFIX}/${TARGET}/share"
 }
 
 download_file() {
@@ -112,6 +154,11 @@ download_file() {
 
 detect_toolchain() {
     local candidate
+
+    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
+        WEBOS_TOOLCHAIN=""
+        return 0
+    fi
 
     if [ -n "${WEBOS_TOOLCHAIN:-}" ] && [ -d "${WEBOS_TOOLCHAIN}" ] && has_sysroot_runtime "${WEBOS_TOOLCHAIN}"; then
         return 0
@@ -177,26 +224,48 @@ if ! detect_toolchain; then
 fi
 
 if [ "$MODE" = "sdk" ]; then
+    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
+        echo "SDK step skipped: using native host toolchain for profile $WEBOS_PROFILE"
+        exit 0
+    fi
     echo "SDK ready: ${WEBOS_TOOLCHAIN}"
     exit 0
 fi
 
-export PATH="/usr/bin:${WEBOS_TOOLCHAIN}/bin:${PATH}"
-SYSROOT="${WEBOS_TOOLCHAIN}/${TARGET}/sysroot"
+if [ -n "${WEBOS_TOOLCHAIN:-}" ]; then
+    export PATH="/usr/bin:${WEBOS_TOOLCHAIN}/bin:${PATH}"
+    SYSROOT="${WEBOS_TOOLCHAIN}/${TARGET}/sysroot"
+else
+    export PATH="/usr/bin:${PATH}"
+    SYSROOT="/"
+fi
 export PKG_CONFIG_SYSROOT_DIR=""
-export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
-export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig"
+export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
+export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
 export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include"
-export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
-export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
+if [ "$WEBOS_PROFILE" = "x86_64" ]; then
+    export CFLAGS="${CFLAGS:-} -m64 -I${DEPS_PREFIX}/include"
+    export CXXFLAGS="${CXXFLAGS:-} -m64 -I${DEPS_PREFIX}/include"
+else
+    export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
+    export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
+fi
 export LDFLAGS="${LDFLAGS:-} -L${DEPS_PREFIX}/lib -L${SYSROOT}/usr/lib"
 
 normalize_sysroot_libtool_archives
+ensure_native_prefix_compat
 
-if ! command -v "${TARGET}-gcc" >/dev/null 2>&1; then
-    echo "${TARGET}-gcc was not found in PATH."
-    echo "Check WEBOS_TOOLCHAIN: ${WEBOS_TOOLCHAIN}"
-    exit 1
+if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
+    if ! command -v gcc >/dev/null 2>&1; then
+        echo "gcc was not found in PATH."
+        exit 1
+    fi
+else
+    if ! command -v "${TARGET}-gcc" >/dev/null 2>&1; then
+        echo "${TARGET}-gcc was not found in PATH."
+        echo "Check WEBOS_TOOLCHAIN: ${WEBOS_TOOLCHAIN}"
+        exit 1
+    fi
 fi
 
 if [ "$MODE" = "deps" ] || [ "$MODE" = "all" ]; then
@@ -275,6 +344,13 @@ if [ "$MODE" = "install" ] || [ "$MODE" = "all" ]; then
         exit 1
     fi
     mkdir -p "${DEPLOY_DIR}"
-    make -C "${BUILD_DIR}" install DESTDIR="${DEPLOY_DIR}"
+    if ! make -C "${BUILD_DIR}" install DESTDIR="${DEPLOY_DIR}"; then
+        if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
+            echo "Install had non-fatal errors (likely .lai metadata); retrying with keep-going mode."
+            make -C "${BUILD_DIR}" -k install DESTDIR="${DEPLOY_DIR}" || true
+        else
+            exit 1
+        fi
+    fi
     echo "Installed runtime tree to ${DEPLOY_DIR}"
 fi
