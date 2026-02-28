@@ -25,6 +25,8 @@ import VLC.Util
 import VLC.MainInterface
 import VLC.Style
 import VLC.Network
+import VLC.Dialogs
+import VLC.Menus
 
 Widgets.ExpandGridItemView {
     id: root
@@ -60,6 +62,7 @@ Widgets.ExpandGridItemView {
         property var model: ({})
         property int index: -1
         readonly property bool is_dummy: model.type === NetworkSourcesModel.TYPE_DUMMY
+        readonly property bool is_podcast: !is_dummy && model.name && model.name.startsWith("podcast")
 
         width: root.cellWidth;
         height: root.cellHeight;
@@ -111,6 +114,12 @@ Widgets.ExpandGridItemView {
             root.currentIndex = index
             root.forceActiveFocus()
         }
+
+        onContextMenuButtonClicked: (menuParent, globalMousePos) => {
+            if (is_podcast) {
+                serviceContextMenu.popup(globalMousePos, [qsTr("Configure...")])
+            }
+        }
     }
 
     onActionAtIndex: (index) => {
@@ -134,5 +143,17 @@ Widgets.ExpandGridItemView {
         searchPattern: MainCtx.search.pattern
         sortOrder: MainCtx.sort.order
         sortCriteria: MainCtx.sort.criteria
+    }
+
+    StringListMenu {
+        id: serviceContextMenu
+
+        ctx: MainCtx
+
+        onSelected: (index, modelData) => {
+            if (index === 0) {
+                DialogsProvider.podcastConfigureDialog()
+            }
+        }
     }
 }
