@@ -712,17 +712,17 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     NSString *fallbackTitle = nil;
     NSString *fallbackDetail = nil;
 
-    if (self.displayAllArtistsGenresTableEntry && selectedRow == 0) {
-        fallbackTitle = (self.currentParentType == VLCMediaLibraryParentGroupTypeGenre)
-            ? _NS("All genres")
-            : _NS("All artists");
-        if (selectedItem != nil) {
-            fallbackDetail = selectedItem.primaryDetailString;
-        }
-    } else if (selectedItem != nil) {
+    if (selectedItem != nil) {
         representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:selectedItem parentType:self.currentParentType];
-        fallbackTitle = selectedItem.displayString;
         fallbackDetail = selectedItem.primaryDetailString;
+
+        if (self.displayAllArtistsGenresTableEntry && selectedRow == 0) {
+            fallbackTitle = (self.currentParentType == VLCMediaLibraryParentGroupTypeGenre)
+                ? _NS("All genres")
+                : _NS("All artists");
+        } else {
+            fallbackTitle = selectedItem.displayString;
+        }
     }
 
     [self.headerDelegate updateHeaderForTableView:tableView
