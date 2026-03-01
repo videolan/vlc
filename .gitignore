@@ -53,6 +53,7 @@ Frameworks
 
 # Ignore build dirs
 webos-package/
+webos-package-x86_64/
 po/
 vlc-webos-deploy-x86_64/
 vlc-webos-deploy-qt-x86_64/

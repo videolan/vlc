@@ -33,13 +33,13 @@ else
     WEBOS_NATIVE_TOOLCHAIN="${WEBOS_NATIVE_TOOLCHAIN:-0}"
 fi
 DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-vorbis --disable-fluid --disable-libaribcaption --disable-ass --disable-live555 --disable-harfbuzz --disable-vulkan-loader --disable-sidplay2 --disable-vncclient"
-DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-libdrm --disable-qt --disable-vpx --disable-aom --disable-fluidsynth --disable-openapv"
+DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-libdrm --disable-vpx --disable-aom --disable-fluidsynth --disable-openapv --disable-vdpau --disable-caca"
 WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-$DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS}"
 WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-$DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS}"
 
 if [ "$WEBOS_PROFILE" = "x86_64" ]; then
     WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS} --disable-ssh2"
-    WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS} --disable-sftp"
+    WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS} --disable-sftp --enable-qt"
 fi
 
 usage() {
@@ -240,8 +240,18 @@ else
     SYSROOT="/"
 fi
 export PKG_CONFIG_SYSROOT_DIR=""
-export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
-export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
+    HOST_MULTIARCH=""
+    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ] && command -v gcc >/dev/null 2>&1; then
+        HOST_MULTIARCH="$(gcc -print-multiarch 2>/dev/null || true)"
+    fi
+
+    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ] && [ -n "$HOST_MULTIARCH" ]; then
+        export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/${HOST_MULTIARCH}/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
+        export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/${HOST_MULTIARCH}/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
+    else
+        export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
+        export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
+    fi
 export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include"
 if [ "$WEBOS_PROFILE" = "x86_64" ]; then
     export CFLAGS="${CFLAGS:-} -m64 -I${DEPS_PREFIX}/include"
