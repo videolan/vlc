@@ -972,9 +972,17 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
         if( !p_pps->uniform_spacing_flag )
         {
             for( unsigned i=0; i< p_pps->num_tile_columns_minus1; i++ )
+            {
                 (void) bs_read_ue( p_bs );
+                if( bs_error( p_bs ) )
+                    return false;
+            }
             for( unsigned i=0; i< p_pps->num_tile_rows_minus1; i++ )
+            {
                 (void) bs_read_ue( p_bs );
+                if( bs_error( p_bs ) )
+                    return false;
+            }
         }
         p_pps->loop_filter_across_tiles_enabled_flag = bs_read1( p_bs );
         if( bs_error( p_bs ) )
