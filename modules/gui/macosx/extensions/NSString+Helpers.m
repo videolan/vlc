@@ -550,13 +550,13 @@ unsigned int VLCModifiersToCocoa(char *theChar)
     unsigned int new = 0;
 
     if (strstr(theChar, "Command") != NULL)
-        new |= NSCommandKeyMask;
+        new |= NSEventModifierFlagCommand;
     if (strstr(theChar, "Alt") != NULL)
-        new |= NSAlternateKeyMask;
+        new |= NSEventModifierFlagOption;
     if (strstr(theChar, "Shift") != NULL)
-        new |= NSShiftKeyMask;
+        new |= NSEventModifierFlagShift;
     if (strstr(theChar, "Ctrl") != NULL)
-        new |= NSControlKeyMask;
+        new |= NSEventModifierFlagControl;
 
     return new;
 }

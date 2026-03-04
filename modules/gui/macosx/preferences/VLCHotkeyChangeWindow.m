@@ -51,13 +51,13 @@
     NSUInteger i_modifiers = [theEvent modifierFlags];
 
     /* modifiers */
-    if (i_modifiers & NSCommandKeyMask)
+    if (i_modifiers & NSEventModifierFlagCommand)
         [tempString appendString:@"Command-"];
-    if (i_modifiers & NSControlKeyMask)
+    if (i_modifiers & NSEventModifierFlagControl)
         [tempString appendString:@"Ctrl-"];
-    if (i_modifiers & NSShiftKeyMask)
+    if (i_modifiers & NSEventModifierFlagShift)
         [tempString appendString:@"Shift-"];
-    if (i_modifiers & NSAlternateKeyMask)
+    if (i_modifiers & NSEventModifierFlagOption)
         [tempString appendString:@"Alt-"];
 
     /* non character keys */

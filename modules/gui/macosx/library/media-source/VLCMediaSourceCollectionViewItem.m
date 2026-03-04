@@ -230,9 +230,9 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
 - (void)mouseDown:(NSEvent *)event
 {
-    if (event.modifierFlags & NSControlKeyMask) {
+    if (event.modifierFlags & NSEventModifierFlagControl) {
         [self openContextMenu:event];
-    } else if (event.modifierFlags & (NSShiftKeyMask | NSCommandKeyMask)) {
+    } else if (event.modifierFlags & (NSEventModifierFlagShift | NSEventModifierFlagCommand)) {
         self.selected = !self.selected;
     } else {
         [super mouseDown:event];

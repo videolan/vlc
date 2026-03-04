@@ -162,7 +162,7 @@
 
 - (void)mouseDown:(NSEvent *)o_event
 {
-    if (([o_event type] == NSEventTypeLeftMouseDown) && (! ([o_event modifierFlags] &  NSControlKeyMask))) {
+    if (([o_event type] == NSEventTypeLeftMouseDown) && (! ([o_event modifierFlags] &  NSEventModifierFlagControl))) {
         if (o_event.clickCount == 1) {
             vlc_mutex_lock(&_mutex);
             if (_wnd) {
@@ -174,7 +174,7 @@
         }
     } else if (([o_event type] == NSEventTypeRightMouseDown) ||
                (([o_event type] == NSEventTypeLeftMouseDown) &&
-               ([o_event modifierFlags] &  NSControlKeyMask))) {
+               ([o_event modifierFlags] &  NSEventModifierFlagControl))) {
         [NSMenu popUpContextMenu: VLCMain.sharedInstance.mainMenu.voutMenu withEvent: o_event forView: self];
     }
 

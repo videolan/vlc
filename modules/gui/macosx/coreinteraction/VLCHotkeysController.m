@@ -87,13 +87,13 @@
 
     i_pressed_modifiers = [anEvent modifierFlags];
 
-    if (i_pressed_modifiers & NSShiftKeyMask)
+    if (i_pressed_modifiers & NSEventModifierFlagShift)
         val.i_int |= KEY_MODIFIER_SHIFT;
-    if (i_pressed_modifiers & NSControlKeyMask)
+    if (i_pressed_modifiers & NSEventModifierFlagControl)
         val.i_int |= KEY_MODIFIER_CTRL;
-    if (i_pressed_modifiers & NSAlternateKeyMask)
+    if (i_pressed_modifiers & NSEventModifierFlagOption)
         val.i_int |= KEY_MODIFIER_ALT;
-    if (i_pressed_modifiers & NSCommandKeyMask)
+    if (i_pressed_modifiers & NSEventModifierFlagCommand)
         val.i_int |= KEY_MODIFIER_COMMAND;
 
     NSString *characters = [anEvent charactersIgnoringModifiers];
@@ -108,7 +108,7 @@
                 }
             }
             /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
-            else if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask) {
+            else if (key == 'f' && i_pressed_modifiers & NSEventModifierFlagControl && i_pressed_modifiers & NSEventModifierFlagCommand) {
                 [playerController toggleFullscreen];
             } else if (p_vout) {
                 val.i_int |= (int)CocoaKeyToVLC(key);
@@ -157,10 +157,10 @@
     NSString *characters = [anEvent charactersIgnoringModifiers];
     if ([characters length] > 0) {
         return [[characters lowercaseString] isEqualToString: vlcKeyString] &&
-        (keyModifiers & NSShiftKeyMask)     == ([anEvent modifierFlags] & NSShiftKeyMask) &&
-        (keyModifiers & NSControlKeyMask)   == ([anEvent modifierFlags] & NSControlKeyMask) &&
-        (keyModifiers & NSAlternateKeyMask) == ([anEvent modifierFlags] & NSAlternateKeyMask) &&
-        (keyModifiers & NSCommandKeyMask)   == ([anEvent modifierFlags] & NSCommandKeyMask);
+        (keyModifiers & NSEventModifierFlagShift)     == ([anEvent modifierFlags] & NSEventModifierFlagShift) &&
+        (keyModifiers & NSEventModifierFlagControl)   == ([anEvent modifierFlags] & NSEventModifierFlagControl) &&
+        (keyModifiers & NSEventModifierFlagOption) == ([anEvent modifierFlags] & NSEventModifierFlagOption) &&
+        (keyModifiers & NSEventModifierFlagCommand)   == ([anEvent modifierFlags] & NSEventModifierFlagCommand);
     }
     return NO;
 }
@@ -203,16 +203,16 @@
     val.i_int = 0;
     i_pressed_modifiers = [o_event modifierFlags];
 
-    if (i_pressed_modifiers & NSControlKeyMask)
+    if (i_pressed_modifiers & NSEventModifierFlagControl)
         val.i_int |= KEY_MODIFIER_CTRL;
 
-    if (i_pressed_modifiers & NSAlternateKeyMask)
+    if (i_pressed_modifiers & NSEventModifierFlagOption)
         val.i_int |= KEY_MODIFIER_ALT;
 
-    if (i_pressed_modifiers & NSShiftKeyMask)
+    if (i_pressed_modifiers & NSEventModifierFlagShift)
         val.i_int |= KEY_MODIFIER_SHIFT;
 
-    if (i_pressed_modifiers & NSCommandKeyMask)
+    if (i_pressed_modifiers & NSEventModifierFlagCommand)
         val.i_int |= KEY_MODIFIER_COMMAND;
 
     NSString * characters = [o_event charactersIgnoringModifiers];
@@ -220,7 +220,7 @@
         key = [[characters lowercaseString] characterAtIndex: 0];
 
         /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
-        if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask) {
+        if (key == 'f' && i_pressed_modifiers & NSEventModifierFlagControl && i_pressed_modifiers & NSEventModifierFlagCommand) {
             [VLCMain.sharedInstance.playQueueController.playerController toggleFullscreen];
             return YES;
         }
@@ -248,10 +248,10 @@
             unsigned int i_keyModifiers = VLCModifiersToCocoa((char *)str);
 
             if ([[characters lowercaseString] isEqualToString:VLCKeyToString((char *)str)] &&
-                (i_keyModifiers & NSShiftKeyMask)     == (i_pressed_modifiers & NSShiftKeyMask) &&
-                (i_keyModifiers & NSControlKeyMask)   == (i_pressed_modifiers & NSControlKeyMask) &&
-                (i_keyModifiers & NSAlternateKeyMask) == (i_pressed_modifiers & NSAlternateKeyMask) &&
-                (i_keyModifiers & NSCommandKeyMask)   == (i_pressed_modifiers & NSCommandKeyMask)) {
+                (i_keyModifiers & NSEventModifierFlagShift)     == (i_pressed_modifiers & NSEventModifierFlagShift) &&
+                (i_keyModifiers & NSEventModifierFlagControl)   == (i_pressed_modifiers & NSEventModifierFlagControl) &&
+                (i_keyModifiers & NSEventModifierFlagOption) == (i_pressed_modifiers & NSEventModifierFlagOption) &&
+                (i_keyModifiers & NSEventModifierFlagCommand)   == (i_pressed_modifiers & NSEventModifierFlagCommand)) {
                 b_found_key = YES;
                 break;
             }

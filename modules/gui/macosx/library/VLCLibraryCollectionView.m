@@ -44,7 +44,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentSmaller = @"VLCLibraryCol
 {
     if (![self.collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class] ||
         ![self.delegate isKindOfClass:VLCLibraryCollectionViewDelegate.class] ||
-        !(event.modifierFlags & NSCommandKeyMask)) {
+        !(event.modifierFlags & NSEventModifierFlagCommand)) {
         return;
     }
 

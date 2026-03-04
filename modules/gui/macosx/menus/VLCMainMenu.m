@@ -995,7 +995,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)selectTrack:(NSMenuItem *)sender
 {
     NSEvent *currentEvent = [NSApp currentEvent];
-    [_playerController selectTrack:[sender representedObject] exclusively:!(currentEvent.modifierFlags & NSAlternateKeyMask)];
+    [_playerController selectTrack:[sender representedObject] exclusively:!(currentEvent.modifierFlags & NSEventModifierFlagOption)];
 }
 
 - (void)unselectTrackCategory:(NSMenuItem *)sender

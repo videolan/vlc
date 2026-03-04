@@ -492,7 +492,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     @synchronized(self) {
         if (event.type == NSEventTypeLeftMouseDown &&
-            !(event.modifierFlags & NSControlKeyMask) &&
+            !(event.modifierFlags & NSEventModifierFlagControl) &&
             event.clickCount == 1) {
             [_moduleDelegate reportMousePressed:MOUSE_BUTTON_LEFT];
         }
