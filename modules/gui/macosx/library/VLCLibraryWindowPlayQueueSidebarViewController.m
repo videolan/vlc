@@ -177,8 +177,18 @@
         footerBlurView.material = NSVisualEffectMaterialHeaderView;
         footerBlurView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
 
+        NSMutableArray<NSLayoutConstraint *> * const constraintsToDeactivate = [NSMutableArray array];
+        for (NSLayoutConstraint * const constraint in self.footerContainerView.constraints) {
+            if (constraint.firstItem == self.buttonStack || constraint.secondItem == self.buttonStack) {
+                [constraintsToDeactivate addObject:constraint];
+            }
+        }
+        [NSLayoutConstraint deactivateConstraints:constraintsToDeactivate];
+
         [self.footerContainerView addSubview:footerBlurView];
         [footerBlurView applyConstraintsToFillSuperview];
+        [footerBlurView addSubview:self.buttonStack];
+        [self.buttonStack applyConstraintsToFillSuperview];
 
         self.scrollViewDefaultBottomConstraint.active = NO;
 
