@@ -36,6 +36,16 @@
 
 #import "screen.h"
 
+/* CGDisplayCreateImageForRect is marked obsoleted=15.0 via the
+ * SCREEN_CAPTURE_OBSOLETE macro (defined in CGWindow.h), which
+ * prevents compilation on macOS 15+ SDKs. Override the macro to
+ * drop the obsoleted attribute while keeping introduced/deprecated,
+ * so the module still compiles as a plugin and loads at runtime. */
+#include <CoreGraphics/CGWindow.h>
+#undef SCREEN_CAPTURE_OBSOLETE
+#define SCREEN_CAPTURE_OBSOLETE(x,y,z) \
+    __attribute__((availability(macos,introduced=x,deprecated=y)));
+#include <CoreGraphics/CGDirectDisplay.h>
 #import <ApplicationServices/ApplicationServices.h>
 #import <QuartzCore/QuartzCore.h>
 
