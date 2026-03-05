@@ -133,45 +133,7 @@
     const CGFloat footerHeight = self.footerContainerView.frame.size.height;
     [self setupScrollViewGradientMask];
 
-    if (@available(macOS 26.0, *)) {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
-        [self.bottomButtonsSeparator removeFromSuperview];
-
-        NSGlassEffectView * const glassFooterView = [[NSGlassEffectView alloc] init];
-        glassFooterView.translatesAutoresizingMaskIntoConstraints = NO;
-        glassFooterView.contentView = self.buttonStack;
-        glassFooterView.cornerRadius = CGFLOAT_MAX;
-
-        self.footerContainerView.subviews = @[glassFooterView];
-        self.footerContainerView.clipsToBounds = NO;
-        [glassFooterView applyConstraintsToFillSuperview];
-
-        self.buttonStack.edgeInsets = NSEdgeInsetsMake(
-            VLCLibraryUIUnits.mediumSpacing,
-            VLCLibraryUIUnits.largeSpacing,
-            VLCLibraryUIUnits.mediumSpacing,
-            VLCLibraryUIUnits.largeSpacing
-        );
-
-        self.scrollViewDefaultBottomConstraint.active = NO;
-        self.footerContainerViewDefaultBottomConstraint.active = NO;
-        self.footerContainerViewLeadingConstraint.constant = VLCLibraryUIUnits.largeSpacing;
-        self.footerContainerViewTrailingConstraint.constant = VLCLibraryUIUnits.largeSpacing;
-
-        NSLayoutConstraint * const footerBottomConstraint =
-            [self.buttonStack.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor
-                                                          constant:-VLCLibraryUIUnits.largeSpacing];
-
-        [NSLayoutConstraint activateConstraints:@[
-            [self.scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-            footerBottomConstraint
-        ]];
-
-        const CGFloat footerTopLine = footerHeight + -footerBottomConstraint.constant + VLCLibraryUIUnits.smallSpacing;
-        self.scrollView.automaticallyAdjustsContentInsets = NO;
-        self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerTopLine, 0);
-#endif
-    } else if (@available(macOS 10.14, *)) {
+    if (@available(macOS 10.14, *)) {
         NSVisualEffectView * const footerBlurView = [[NSVisualEffectView alloc] initWithFrame:self.footerContainerView.bounds];
         footerBlurView.translatesAutoresizingMaskIntoConstraints = NO;
         footerBlurView.material = NSVisualEffectMaterialHeaderView;
@@ -189,6 +151,13 @@
         [footerBlurView applyConstraintsToFillSuperview];
         [footerBlurView addSubview:self.buttonStack];
         [self.buttonStack applyConstraintsToFillSuperview];
+
+        self.buttonStack.edgeInsets = NSEdgeInsetsMake(
+            VLCLibraryUIUnits.mediumSpacing,
+            VLCLibraryUIUnits.largeSpacing,
+            VLCLibraryUIUnits.mediumSpacing,
+            VLCLibraryUIUnits.largeSpacing
+        );
 
         self.scrollViewDefaultBottomConstraint.active = NO;
 
