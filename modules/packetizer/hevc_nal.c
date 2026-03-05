@@ -460,6 +460,9 @@ static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p
     {
         p_vui->chroma.sample_loc_type_top_field = bs_read_ue( p_bs );
         p_vui->chroma.sample_loc_type_bottom_field = bs_read_ue( p_bs );
+        if( p_vui->chroma.sample_loc_type_top_field > 5 ||
+            p_vui->chroma.sample_loc_type_bottom_field > 5 )
+            return false;
     }
 
     p_vui->neutral_chroma_indication_flag = bs_read1( p_bs );
@@ -652,6 +655,8 @@ static bool hevc_parse_video_parameter_set_rbsp( bs_t *p_bs,
 
     p_vps->vps_max_layer_id = bs_read( p_bs, 6 );
     p_vps->vps_num_layer_set_minus1 = bs_read_ue( p_bs );
+    if( p_vps->vps_num_layer_set_minus1 > 1023 )
+        return false;
     // layer_id_included_flag; read but discarded
     bs_skip( p_bs, p_vps->vps_num_layer_set_minus1 * (p_vps->vps_max_layer_id + 1) );
 
@@ -933,6 +938,9 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
 
     p_pps->num_ref_idx_l0_default_active_minus1 = bs_read_ue( p_bs );
     p_pps->num_ref_idx_l1_default_active_minus1 = bs_read_ue( p_bs );
+    if( p_pps->num_ref_idx_l0_default_active_minus1 > 14 ||
+        p_pps->num_ref_idx_l1_default_active_minus1 > 14 )
+        return false;
 
     p_pps->init_qp_minus26 = bs_read_se( p_bs );
     p_pps->constrained_intra_pred_flag = bs_read1( p_bs );
@@ -946,6 +954,9 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
 
     p_pps->pps_cb_qp_offset = bs_read_se( p_bs );
     p_pps->pps_cr_qp_offset = bs_read_se( p_bs );
+    if( p_pps->pps_cb_qp_offset > 12 || p_pps->pps_cb_qp_offset < -12 ||
+        p_pps->pps_cr_qp_offset > 12 || p_pps->pps_cr_qp_offset < -12 )
+        return false;
     p_pps->pic_slice_level_chroma_qp_offsets_present_flag = bs_read1( p_bs );
     p_pps->weighted_pred_flag = bs_read1( p_bs );
     p_pps->weighted_bipred_flag = bs_read1( p_bs );
@@ -955,8 +966,8 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
 
     if( p_pps->tiles_enabled_flag )
     {
-        p_pps->num_tile_columns_minus1 = bs_read_ue( p_bs ); /* TODO: validate max col/row values */
-        p_pps->num_tile_rows_minus1 = bs_read_ue( p_bs );    /*       against sps PicWidthInCtbsY */
+        p_pps->num_tile_columns_minus1 = bs_read_ue( p_bs ); /* should validate max col/row values */
+        p_pps->num_tile_rows_minus1 = bs_read_ue( p_bs );    /* against PicWidthInCtbsY but we don't want to depend on SPS */
         p_pps->uniform_spacing_flag = bs_read1( p_bs );
         if( !p_pps->uniform_spacing_flag )
         {
@@ -980,6 +991,9 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
         {
             p_pps->pps_beta_offset_div2 = bs_read_se( p_bs );
             p_pps->pps_tc_offset_div2 = bs_read_se( p_bs );
+            if( p_pps->pps_beta_offset_div2 > 6 || p_pps->pps_beta_offset_div2 < -6 ||
+                p_pps->pps_tc_offset_div2 > 6 || p_pps->pps_tc_offset_div2 < -6 )
+                return false;
         }
     }
 
