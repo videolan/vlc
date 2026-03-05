@@ -47,7 +47,7 @@ vlc_modules += {
 
 libvlc_opengles = []
 if opengles2_dep.found()
-    libvlc_opengles = static_library('libvlc_opengles',
+    libvlc_opengles = static_library('vlc_opengles',
                                      dependencies: [gl_common_dep, m_lib],
                                      c_args: '-DUSE_OPENGL_ES2')
 endif
