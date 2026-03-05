@@ -231,8 +231,8 @@ MainViewLoader {
                     requestArtistAlbumView(Qt.TabFocusReason)
             }
 
-            sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                  : _modelMedium
+            sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                                   : _modelMedium
 
             onItemDoubleClicked: function(index, model) {
                 root.requestArtistAlbumView(Qt.MouseFocusReason, model.id)

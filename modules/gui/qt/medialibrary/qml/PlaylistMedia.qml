@@ -98,8 +98,8 @@ Widgets.TableViewExt {
 
     rowHeight: VLCStyle.tableCoverRow_height
 
-    sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                          : _modelMedium
+    sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                           : _modelMedium
 
 
     listView.acceptDropFunc: function(index, drop) {

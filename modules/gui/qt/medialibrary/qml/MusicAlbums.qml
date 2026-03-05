@@ -255,8 +255,8 @@ MainViewLoader {
 
             rowContextMenu: contextMenu
 
-            sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                  : _modelMedium
+            sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                                   : _modelMedium
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd

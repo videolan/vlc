@@ -280,7 +280,7 @@ MainViewLoader {
 
             selectionModel: root.selectionModel
 
-            sortModel: availableRowWidth >= VLCStyle.colWidth(4) ? _sortModelLarge : _sortModelSmall
+            sortModel: _availableRowWidth >= VLCStyle.colWidth(4) ? _sortModelLarge : _sortModelSmall
 
             header: headerComponent
 

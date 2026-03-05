@@ -105,7 +105,7 @@ FocusScope {
          return count
       }
 
-    readonly property int _availableSpaceForWeightedColumns: (availableRowWidth - ( _totalSpacerSize + _fixedColumnSize))
+    readonly property int _availableSpaceForWeightedColumns: (_availableRowWidth - ( _totalSpacerSize + _fixedColumnSize))
     readonly property int _weightedColumnsSize: _availableSpaceForWeightedColumns / _totalColumnWeights
 
     readonly property int _totalSpacerSize: VLCStyle.column_spacing * sortModel.length
@@ -126,11 +126,16 @@ FocusScope {
 
     property real rowHeight: VLCStyle.tableRow_height
 
-    property real availableRowWidth: 0
+    property real _availableRowWidth: 0
+
+    // FIXME: Layouting should not be done asynchronously, investigate if getting rid of this is feasible.
+    Binding on _availableRowWidth {
+        when: root._ready
+        delayed: true
+        value: root._currentAvailableRowWidth
+    }
 
     property Widgets.DragItem dragItem: null
-
-    // Private
 
     property bool _ready: false
 
@@ -208,11 +213,7 @@ FocusScope {
 
     Component.onCompleted: {
         _ready = true
-
-        availableRowWidthUpdater.enqueueUpdate()
     }
-
-    on_CurrentAvailableRowWidthChanged: if (_ready) availableRowWidthUpdater.enqueueUpdate()
 
     // Functions
 
@@ -244,35 +245,6 @@ FocusScope {
     // Private
 
     // Childs
-
-    Timer {
-        id: availableRowWidthUpdater
-
-        interval: 100
-        triggeredOnStart: false
-        repeat: false
-        onTriggered: {
-            _update()
-        }
-
-        function _update() {
-            root.availableRowWidth = root._currentAvailableRowWidth
-            root._availabeRowWidthLastUpdateTime = Date.now()
-        }
-
-        function enqueueUpdate() {
-            // updating availableRowWidth is expensive because of property bindings in sortModel
-            // and availableRowWidth is dependent on root.width which can update in a burst
-            // so try to maintain a minimum time gap between subsequent availableRowWidth updates
-            const sinceLastUpdate = Date.now() - root._availabeRowWidthLastUpdateTime
-            if ((root.availableRowWidth === 0) || (sinceLastUpdate > 128 && !availableRowWidthUpdater.running)) {
-                _update()
-            } else if (!availableRowWidthUpdater.running) {
-                availableRowWidthUpdater.interval = Math.max(128 - sinceLastUpdate, 32)
-                availableRowWidthUpdater.start()
-            }
-        }
-    }
 
     ListViewExt {
         id: view

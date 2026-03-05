@@ -163,9 +163,9 @@ Widgets.TableViewExt {
     // Settings
 
     sortModel: {
-        if (availableRowWidth < VLCStyle.colWidth(4))
+        if (_availableRowWidth < VLCStyle.colWidth(4))
             return _modelSmall
-        else if (availableRowWidth < VLCStyle.colWidth(9))
+        else if (_availableRowWidth < VLCStyle.colWidth(9))
             return _modelMedium
         else
             return _modelLarge

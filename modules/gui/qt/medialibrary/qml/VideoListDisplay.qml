@@ -93,8 +93,8 @@ Widgets.TableViewExt {
 
     // Settings
 
-    sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                          : _modelMedium
+    sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                           : _modelMedium
 
     section.property: "title_first_symbol"
 

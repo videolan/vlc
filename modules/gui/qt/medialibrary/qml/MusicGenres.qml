@@ -264,8 +264,8 @@ MainViewLoader {
 
             model: genreModel
 
-            sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                  : _modelMedium
+            sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                                   : _modelMedium
 
             selectionModel: root.selectionModel
             focus: true
