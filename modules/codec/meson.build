@@ -524,7 +524,7 @@ vlc_modules += {
 # TODO: Set proper flags for minimum iOS/tvOS versions
 if host_system == 'darwin'
 
-    libvlc_vtutils = static_library('libvlc_vtutils',
+    libvlc_vtutils = static_library('vlc_vtutils',
         files('vt_utils.c', 'vt_utils.h'),
         include_directories : vlc_include_dirs,
         dependencies : [corevideo_dep])
