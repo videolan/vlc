@@ -319,8 +319,12 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
             p_sps->b_separate_colour_planes_flag = 0;
         /* bit_depth_luma_minus8 */
         p_sps->i_bit_depth_luma = bs_read_ue( p_bs ) + 8;
+        if( p_sps->i_bit_depth_luma > 6 + 8 )
+            return false;
         /* bit_depth_chroma_minus8 */
         p_sps->i_bit_depth_chroma = bs_read_ue( p_bs ) + 8;
+        if( p_sps->i_bit_depth_chroma > 6 + 8 )
+            return false;
         /* qpprime_y_zero_transform_bypass_flag */
         bs_skip( p_bs, 1 );
         /* seq_scaling_matrix_present_flag */
@@ -368,6 +372,8 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
 
     /* Read poc_type */
     p_sps->i_pic_order_cnt_type = bs_read_ue( p_bs );
+    if( p_sps->i_pic_order_cnt_type > 2 )
+        return false;
     if( p_sps->i_pic_order_cnt_type == 0 )
     {
         /* skip i_log2_max_poc_lsb */
@@ -386,8 +392,9 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         for( int i=0; i<p_sps->i_num_ref_frames_in_pic_order_cnt_cycle; i++ )
             p_sps->offset_for_ref_frame[i] = bs_read_se( p_bs );
     }
-    /* i_num_ref_frames */
-    bs_read_ue( p_bs );
+    /* max_num_ref_frames */
+    if( bs_read_ue( p_bs ) > 16 )
+        return false;
     /* b_gaps_in_frame_num_value_allowed */
     bs_skip( p_bs, 1 );
 
