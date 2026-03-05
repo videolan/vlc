@@ -17,6 +17,7 @@ else
 fi
 OUT_DIR="${WEBOS_OUTPUT_DIR:-$TOP_DIR/webos-package}"
 PKG_WORK_DIR="${WEBOS_PACKAGE_DIR:-$TOP_DIR/webos-package/stage}"
+WEBOS_QT_RUNTIME_DIR="${WEBOS_QT_RUNTIME_DIR:-}"
 
 if [ ! -d "$DEPLOY_DIR" ]; then
     echo "Missing deploy directory: $DEPLOY_DIR"
@@ -304,6 +305,23 @@ if [ "$TARGET_ARCH" = "x86_64" ]; then
     fi
 
     rm -f "$PKG_WORK_DIR/vlc/lib/libEGL.so"*
+elif [ "$TARGET_ARCH" = "arm" ] && [ -n "$WEBOS_QT_RUNTIME_DIR" ]; then
+    if [ ! -d "$WEBOS_QT_RUNTIME_DIR" ]; then
+        echo "WEBOS_QT_RUNTIME_DIR does not exist: $WEBOS_QT_RUNTIME_DIR"
+        exit 1
+    fi
+
+    mkdir -p "$PKG_WORK_DIR/qt6"
+    if [ -d "$WEBOS_QT_RUNTIME_DIR/plugins" ]; then
+        cp -a "$WEBOS_QT_RUNTIME_DIR/plugins" "$PKG_WORK_DIR/qt6/"
+    fi
+    if [ -d "$WEBOS_QT_RUNTIME_DIR/qml" ]; then
+        cp -a "$WEBOS_QT_RUNTIME_DIR/qml" "$PKG_WORK_DIR/qt6/"
+    fi
+
+    if [ -d "$WEBOS_QT_RUNTIME_DIR/lib" ]; then
+        find "$WEBOS_QT_RUNTIME_DIR/lib" -maxdepth 1 -type f \( -name 'libQt6*.so*' -o -name 'libicu*.so*' -o -name 'libxkbcommon*.so*' -o -name 'libdouble-conversion*.so*' -o -name 'libpcre2-*.so*' -o -name 'libzstd*.so*' \) -exec cp -a {} "$PKG_WORK_DIR/vlc/lib/" \;
+    fi
 fi
 
 cat > "$PKG_WORK_DIR/bin/qt.conf" <<'EOF'
@@ -326,16 +344,20 @@ export LD_LIBRARY_PATH="${APP_DIR}/vlc/lib:${SYS_LIB_PATH}:${LD_LIBRARY_PATH}"
 export VLC_PLUGIN_PATH="${APP_DIR}/vlc/plugins"
 export VLC_LIBEXEC_PATH="${APP_DIR}/libexec/vlc"
 export VLC_DATA_PATH="${APP_DIR}/share/vlc"
-export QT_PLUGIN_PATH="${APP_DIR}/qt6/plugins"
-export QT_QPA_PLATFORM_PLUGIN_PATH="${APP_DIR}/qt6/plugins/platforms"
-export QML2_IMPORT_PATH="${APP_DIR}/qt6/qml"
-export QT_QUICK_CONTROLS_STYLE=Basic
-export QT_NO_SETLOCALE=1
-export LANG=C.UTF-8
-export LC_ALL=C.UTF-8
-export QT_WAYLAND_SHELL_INTEGRATION=xdg-shell
-export VLC_QT_SKIP_CHECK=1
-export VLC_VOUT="${VLC_VOUT:-wl_shm,wl_shell,xdg_shell,gles2,gl,any}"
+VLC_INTF="${VLC_INTF:-qt}"
+if [ -d "${APP_DIR}/qt6/plugins" ]; then
+    export QT_PLUGIN_PATH="${APP_DIR}/qt6/plugins"
+    export QT_QPA_PLATFORM_PLUGIN_PATH="${APP_DIR}/qt6/plugins/platforms"
+    export QML2_IMPORT_PATH="${APP_DIR}/qt6/qml"
+    export QT_QUICK_CONTROLS_STYLE=Basic
+    export QT_NO_SETLOCALE=1
+    export LANG=C.UTF-8
+    export LC_ALL=C.UTF-8
+    export QT_WAYLAND_SHELL_INTEGRATION=xdg-shell
+    export VLC_QT_SKIP_CHECK=1
+    export QT_QPA_PLATFORM=wayland
+    export VLC_VOUT="${VLC_VOUT:-wl_shm,wl_shell,xdg_shell,gles2,gl,any}"
+fi
 
 if [ -d /tmp/xdg ]; then
     export XDG_RUNTIME_DIR=/tmp/xdg
@@ -344,8 +366,6 @@ fi
 if [ -S "${XDG_RUNTIME_DIR}/wayland-0" ]; then
     export WAYLAND_DISPLAY=wayland-0
 fi
-
-export QT_QPA_PLATFORM=wayland
 
 cd "$APP_DIR"
 
@@ -388,10 +408,10 @@ HELPER_EOF
 ARG1="${1:-}"
 case "$ARG1" in
     ""|\{*\})
-        run_vlc --intf=qt --no-video-title-show --no-playlist-autostart --vout="$VLC_VOUT"
+        run_vlc --intf="$VLC_INTF" --no-video-title-show --no-playlist-autostart ${VLC_VOUT:+--vout="$VLC_VOUT"}
         ;;
     *)
-        run_vlc --intf=qt --no-video-title-show --no-playlist-autostart --vout="$VLC_VOUT" "$ARG1"
+        run_vlc --intf="$VLC_INTF" --no-video-title-show --no-playlist-autostart ${VLC_VOUT:+--vout="$VLC_VOUT"} "$ARG1"
         ;;
 esac
 EOF

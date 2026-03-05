@@ -27,6 +27,19 @@ SDK_ARCHIVE="${WEBOS_SDK_ARCHIVE:-}"
 DEFAULT_WEBOS_SDK_URL="https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz"
 SDK_URL="${WEBOS_SDK_URL:-$DEFAULT_WEBOS_SDK_URL}"
 AUTO_SDK_DOWNLOAD="${AUTO_SDK_DOWNLOAD:-1}"
+WEBOS_QT6_ROOT="${WEBOS_QT6_ROOT:-}"
+WEBOS_QT6_HOST_TOOLS="${WEBOS_QT6_HOST_TOOLS:-}"
+WEBOS_QT6_TARGET_PREFIX="${WEBOS_QT6_TARGET_PREFIX:-}"
+WEBOS_QT6_VERSION="${WEBOS_QT6_VERSION:-6.8.3}"
+WEBOS_QT6_AUTO_DOWNLOAD="${WEBOS_QT6_AUTO_DOWNLOAD:-1}"
+WEBOS_QT6_SRC_DIR="${WEBOS_QT6_SRC_DIR:-$HOME/qt6-webos-src-$WEBOS_QT6_VERSION}"
+WEBOS_QT6_BUILD_DIR="${WEBOS_QT6_BUILD_DIR:-$HOME/qt6-webos-build-host-$WEBOS_QT6_VERSION}"
+WEBOS_QT6_HOST_PREFIX="${WEBOS_QT6_HOST_PREFIX:-$HOME/qt6-webos/host}"
+WEBOS_QT6_CMAKE_GENERATOR="${WEBOS_QT6_CMAKE_GENERATOR:-Ninja}"
+WEBOS_QT6_HOST_MODULES="${WEBOS_QT6_HOST_MODULES:-qtdeclarative,qtshadertools,qttools}"
+WEBOS_QT6_TARGET_BUILD_DIR="${WEBOS_QT6_TARGET_BUILD_DIR:-$HOME/qt6-webos-build-target-$WEBOS_QT6_VERSION}"
+WEBOS_QT6_TARGET_MODULES="${WEBOS_QT6_TARGET_MODULES:-qtshadertools,qtdeclarative,qtwayland}"
+WEBOS_QT6_TARGET_TOOLCHAIN_FILE="${WEBOS_QT6_TARGET_TOOLCHAIN_FILE:-}"
 if [ "$WEBOS_PROFILE" = "x86_64" ]; then
     WEBOS_NATIVE_TOOLCHAIN="${WEBOS_NATIVE_TOOLCHAIN:-1}"
 else
@@ -37,14 +50,23 @@ DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-libdrm --disable
 WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-$DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS}"
 WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-$DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS}"
 
+if ! printf '%s' "$WEBOS_CONFIGURE_EXTRA_FLAGS" | grep -Eq '(^|[[:space:]])--(enable|disable)-qt($|[[:space:]])'; then
+    WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS} --enable-qt"
+fi
+
+QT_ENABLED=1
+if printf '%s' "$WEBOS_CONFIGURE_EXTRA_FLAGS" | grep -Eq '(^|[[:space:]])--disable-qt($|[[:space:]])'; then
+    QT_ENABLED=0
+fi
+
 if [ "$WEBOS_PROFILE" = "x86_64" ]; then
     WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS} --disable-ssh2"
-    WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS} --disable-sftp --enable-qt"
+    WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS} --disable-sftp"
 fi
 
 usage() {
         cat <<EOF
-Usage: $0 [sdk|deps|configure|build|install|all]
+Usage: $0 [qt6|qt6-host-tools|qt6-target-arm|sdk|deps|configure|build|install|all]
 
 Environment variables:
     WEBOS_TOOLCHAIN   Path to webOS ARM SDK/toolchain root (required if not auto-detected)
@@ -61,11 +83,29 @@ Environment variables:
     AUTO_SDK_DOWNLOAD Auto-download SDK when missing in configure/build/install/all (default: 1)
     WEBOS_CONTRIB_BOOTSTRAP_FLAGS Extra flags passed to contrib/bootstrap (default: reproducible webOS profile)
     WEBOS_CONFIGURE_EXTRA_FLAGS   Extra flags appended to VLC configure invocation (default: reproducible webOS profile)
+    WEBOS_QT6_ROOT                Optional external Qt6 SDK root for cross builds.
+    WEBOS_QT6_HOST_TOOLS          Optional path to host Qt6 tools dir containing qmake6/moc/rcc/uic/qsb/qmlcachegen.
+    WEBOS_QT6_TARGET_PREFIX       Optional target Qt6 prefix (contains lib/pkgconfig, include, qml, plugins).
+    WEBOS_QT6_VERSION             Qt6 version used for source download bootstrap (default: 6.8.3).
+    WEBOS_QT6_AUTO_DOWNLOAD       Auto-download Qt6 sources when ARM Qt is enabled but qmake6 is missing (default: 1).
+    WEBOS_QT6_SRC_DIR             Directory used by the Qt6 downloader (default: ~/qt6-webos-src-<version>).
+    WEBOS_QT6_BUILD_DIR           Host Qt6 tools build directory (default: ~/qt6-webos-build-host-<version>).
+    WEBOS_QT6_HOST_PREFIX         Install prefix for host Qt6 tools (default: ~/qt6-webos/host).
+    WEBOS_QT6_CMAKE_GENERATOR     CMake generator for Qt host tools build (default: Ninja).
+    WEBOS_QT6_HOST_MODULES        Extra Qt6 host modules to build (comma-separated; default: qtdeclarative,qtshadertools,qttools).
+    WEBOS_QT6_TARGET_BUILD_DIR    ARM Qt6 target build directory (default: ~/qt6-webos-build-target-<version>).
+    WEBOS_QT6_TARGET_MODULES      ARM Qt6 target modules to build (comma-separated; default: qtshadertools,qtdeclarative,qtwayland).
+    WEBOS_QT6_TARGET_TOOLCHAIN_FILE Optional CMake toolchain file for ARM Qt6 target build.
 
 Examples:
     WEBOS_SDK_URL=https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz $0 sdk
     WEBOS_TOOLCHAIN=/opt/ndk $0 deps
     WEBOS_TOOLCHAIN=/opt/ndk $0 configure
+    WEBOS_QT6_VERSION=6.8.3 $0 qt6
+    WEBOS_QT6_VERSION=6.8.3 $0 qt6-host-tools
+    WEBOS_PROFILE=arm WEBOS_QT6_VERSION=6.8.3 $0 qt6-target-arm
+    WEBOS_TOOLCHAIN=/opt/ndk WEBOS_QT6_ROOT=$HOME/qt6-webos $0 configure
+    WEBOS_TOOLCHAIN=/opt/ndk WEBOS_QT6_HOST_TOOLS=$HOME/qt6-webos/host/bin WEBOS_QT6_TARGET_PREFIX=$HOME/qt6-webos/target/usr $0 configure
     WEBOS_TOOLCHAIN=/opt/ndk $0 build
     WEBOS_TOOLCHAIN=/opt/ndk $0 install
     WEBOS_TOOLCHAIN=/opt/ndk PREFIX=/ $0 all
@@ -73,8 +113,406 @@ Examples:
 EOF
 }
 
+download_qt6_sources() {
+    local downloader="$SRC_DIR/extras/buildsystem/download-qt6-webos.sh"
+
+    if [ ! -x "$downloader" ]; then
+        echo "Missing downloader script: $downloader"
+        echo "Expected at: extras/buildsystem/download-qt6-webos.sh"
+        exit 1
+    fi
+
+    QT_VERSION="$WEBOS_QT6_VERSION" OUT_DIR="$WEBOS_QT6_SRC_DIR" "$downloader"
+}
+
+extract_qt6_module() {
+    local module="$1"
+    local archive="$WEBOS_QT6_SRC_DIR/${module}-everywhere-src-${WEBOS_QT6_VERSION}.tar.xz"
+    local extracted="$WEBOS_QT6_SRC_DIR/${module}-everywhere-src-${WEBOS_QT6_VERSION}"
+
+    if [ -d "$extracted" ]; then
+        printf '%s\n' "$extracted"
+        return 0
+    fi
+
+    if [ ! -f "$archive" ]; then
+        echo "Missing archive: $archive"
+        echo "Run: $0 qt6"
+        exit 1
+    fi
+
+    tar -xf "$archive" -C "$WEBOS_QT6_SRC_DIR"
+    printf '%s\n' "$extracted"
+}
+
+apply_qt6_webos_compat_patches() {
+    local qtbase_src="$1"
+    local file="$qtbase_src/src/corelib/io/qstorageinfo_linux.cpp"
+    local elf_file="$qtbase_src/src/corelib/plugin/qelfparser_p.cpp"
+
+    [ -f "$file" ] || return 0
+
+    python3 - "$file" <<'PY'
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+
+changed = False
+
+if "#include <sys/statvfs.h>" not in text and "#include <sys/statfs.h>" in text:
+    text = text.replace("#include <sys/statfs.h>\n", "#include <sys/statfs.h>\n#include <sys/statvfs.h>\n", 1)
+    changed = True
+
+old = "        readOnly = (statfs_buf.f_flags & ST_RDONLY) != 0;\n"
+new = (
+    "        struct statvfs statvfs_buf;\n"
+    "        if (statvfs(QFile::encodeName(rootPath).constData(), &statvfs_buf) == 0)\n"
+    "            readOnly = (statvfs_buf.f_flag & ST_RDONLY) != 0;\n"
+    "        else\n"
+    "            readOnly = false;\n"
+)
+
+if old in text and "statvfs_buf.f_flag" not in text:
+    text = text.replace(old, new, 1)
+    changed = True
+
+if changed:
+    path.write_text(text, encoding="utf-8")
+PY
+
+    [ -f "$elf_file" ] || return 0
+
+    python3 - "$elf_file" <<'PY'
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+
+old = "    case EM_AARCH64:    d << \", AArch64\"; break;\n"
+new = (
+    "#ifdef EM_AARCH64\n"
+    "    case EM_AARCH64:    d << \", AArch64\"; break;\n"
+    "#endif\n"
+)
+
+if old in text and "#ifdef EM_AARCH64" not in text:
+    text = text.replace(old, new, 1)
+    path.write_text(text, encoding="utf-8")
+PY
+}
+
+apply_qt6_qtdeclarative_compat_patches() {
+    local qtdeclarative_src="$1"
+    local file="$qtdeclarative_src/src/CMakeLists.txt"
+
+    [ -f "$file" ] || return 0
+
+    python3 - "$file" <<'PY'
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+
+marker = "if(TARGET Qt::Gui AND TARGET Qt::qsb AND QT_FEATURE_qml_animation)"
+inject = (
+    "find_package(Qt6 ${PROJECT_VERSION} QUIET CONFIG OPTIONAL_COMPONENTS Gui)\n"
+    "\n"
+    "if(NOT TARGET Qt::qsb AND DEFINED ENV{QSB} AND EXISTS \"$ENV{QSB}\")\n"
+    "    add_executable(Qt::qsb IMPORTED GLOBAL)\n"
+    "    set_target_properties(Qt::qsb PROPERTIES IMPORTED_LOCATION \"$ENV{QSB}\")\n"
+    "endif()\n\n"
+)
+
+if marker in text and inject not in text:
+    text = text.replace(marker, inject + marker, 1)
+    path.write_text(text, encoding="utf-8")
+PY
+}
+
+build_qt6_host_tools() {
+    if ! command -v cmake >/dev/null 2>&1; then
+        echo "cmake was not found in PATH."
+        exit 1
+    fi
+
+    if [ "$WEBOS_QT6_CMAKE_GENERATOR" = "Ninja" ] && ! command -v ninja >/dev/null 2>&1; then
+        echo "ninja was not found in PATH (required for WEBOS_QT6_CMAKE_GENERATOR=Ninja)."
+        exit 1
+    fi
+
+    [ -d "$WEBOS_QT6_SRC_DIR" ] || mkdir -p "$WEBOS_QT6_SRC_DIR"
+    download_qt6_sources
+
+    local qtbase_src
+    qtbase_src="$(extract_qt6_module qtbase)"
+
+    mkdir -p "$WEBOS_QT6_BUILD_DIR" "$WEBOS_QT6_HOST_PREFIX"
+
+    cmake -S "$qtbase_src" -B "$WEBOS_QT6_BUILD_DIR" \
+        -G "$WEBOS_QT6_CMAKE_GENERATOR" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="$WEBOS_QT6_HOST_PREFIX" \
+        -DQT_BUILD_EXAMPLES=OFF \
+        -DQT_BUILD_TESTS=OFF \
+        -DBUILD_SHARED_LIBS=ON
+
+    cmake --build "$WEBOS_QT6_BUILD_DIR" --parallel "$JOBS" --target qmake moc rcc uic
+
+    if ! cmake --install "$WEBOS_QT6_BUILD_DIR"; then
+        echo "cmake --install failed after partial host-tools build; using manual tool staging fallback."
+
+        mkdir -p "$WEBOS_QT6_HOST_PREFIX/bin" "$WEBOS_QT6_HOST_PREFIX/lib" "$WEBOS_QT6_HOST_PREFIX/libexec"
+
+        stage_tool() {
+            local tool_name="$1"
+            local src_path
+
+            if [ -e "$WEBOS_QT6_HOST_PREFIX/bin/$tool_name" ]; then
+                return 0
+            fi
+
+            src_path="$(find "$WEBOS_QT6_BUILD_DIR" -maxdepth 6 -type f -name "$tool_name" -perm -111 2>/dev/null | head -n 1)"
+            if [ -n "$src_path" ]; then
+                cp -a "$src_path" "$WEBOS_QT6_HOST_PREFIX/bin/$tool_name"
+                return 0
+            fi
+            return 1
+        }
+
+        stage_tool qmake || true
+        stage_tool moc || true
+        stage_tool rcc || true
+        stage_tool uic || true
+
+        if [ -x "$WEBOS_QT6_HOST_PREFIX/bin/qmake" ] && [ ! -e "$WEBOS_QT6_HOST_PREFIX/bin/qmake6" ]; then
+            ln -s qmake "$WEBOS_QT6_HOST_PREFIX/bin/qmake6"
+        fi
+
+        find "$WEBOS_QT6_BUILD_DIR" -maxdepth 4 -type f \( -name 'libQt6*.so*' -o -name 'libicu*.so*' -o -name 'libdouble-conversion*.so*' -o -name 'libzstd*.so*' -o -name 'libpcre2-*.so*' \) -print0 2>/dev/null | while IFS= read -r -d '' lib; do
+            cp -a "$lib" "$WEBOS_QT6_HOST_PREFIX/lib/" || true
+        done
+
+        if [ -d "$WEBOS_QT6_BUILD_DIR/lib/cmake" ]; then
+            mkdir -p "$WEBOS_QT6_HOST_PREFIX/lib/cmake"
+            [ -d "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6HostInfo" ] && cp -a "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6HostInfo" "$WEBOS_QT6_HOST_PREFIX/lib/cmake/" || true
+            [ -d "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6" ] && cp -a "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6" "$WEBOS_QT6_HOST_PREFIX/lib/cmake/" || true
+        fi
+    fi
+
+    if [ ! -x "$WEBOS_QT6_HOST_PREFIX/bin/qmake6" ] && [ ! -x "$WEBOS_QT6_HOST_PREFIX/bin/qmake" ]; then
+        echo "Failed to stage qmake/qmake6 into $WEBOS_QT6_HOST_PREFIX/bin"
+        exit 1
+    fi
+
+    if [ -x "$WEBOS_QT6_HOST_PREFIX/bin/qt-configure-module" ] && [ -n "$WEBOS_QT6_HOST_MODULES" ]; then
+        IFS=',' read -r -a qt_host_modules <<< "$WEBOS_QT6_HOST_MODULES"
+        for module in "${qt_host_modules[@]}"; do
+            module="$(echo "$module" | xargs)"
+            [ -n "$module" ] || continue
+
+            module_src="$(extract_qt6_module "$module")"
+            module_build_dir="$WEBOS_QT6_BUILD_DIR-$module"
+
+            "$WEBOS_QT6_HOST_PREFIX/bin/qt-configure-module" "$module_src" -- \
+                -G "$WEBOS_QT6_CMAKE_GENERATOR" \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_INSTALL_PREFIX="$WEBOS_QT6_HOST_PREFIX" \
+                -DQT_BUILD_EXAMPLES=OFF \
+                -DQT_BUILD_TESTS=OFF \
+                -B "$module_build_dir"
+
+            cmake --build "$module_build_dir" --parallel "$JOBS"
+            cmake --install "$module_build_dir"
+        done
+    fi
+
+    echo ""
+    echo "Qt6 host tools installed to: $WEBOS_QT6_HOST_PREFIX"
+    echo "Use for ARM configure:" 
+    echo "  WEBOS_QT6_HOST_TOOLS=$WEBOS_QT6_HOST_PREFIX/bin ./build-webos.sh configure"
+}
+
+write_qt6_arm_toolchain_file() {
+    local out_file="$1"
+
+    cat > "$out_file" <<EOF
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+set(CMAKE_SYSROOT "$SYSROOT")
+
+set(CMAKE_C_COMPILER "${TARGET}-gcc")
+set(CMAKE_CXX_COMPILER "${TARGET}-g++")
+set(CMAKE_ASM_COMPILER "${TARGET}-gcc")
+
+set(CMAKE_C_FLAGS_INIT "-march=armv7-a -mfloat-abi=softfp -mfpu=neon")
+set(CMAKE_CXX_FLAGS_INIT "-march=armv7-a -mfloat-abi=softfp -mfpu=neon")
+
+set(CMAKE_FIND_ROOT_PATH "$SYSROOT")
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+set(PKG_CONFIG_SYSROOT_DIR "$SYSROOT")
+set(PKG_CONFIG_LIBDIR "$SYSROOT/usr/lib/pkgconfig:$SYSROOT/usr/share/pkgconfig")
+EOF
+}
+
+build_qt6_target_arm() {
+    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
+        echo "qt6-target-arm requires WEBOS_PROFILE=arm."
+        exit 1
+    fi
+
+    if [ -z "$WEBOS_QT6_TARGET_PREFIX" ]; then
+        WEBOS_QT6_TARGET_PREFIX="$HOME/qt6-webos/target/usr"
+    fi
+
+    if [ ! -x "$WEBOS_QT6_HOST_PREFIX/bin/qmake6" ] && [ ! -x "$WEBOS_QT6_HOST_PREFIX/bin/qmake" ]; then
+        echo "Qt6 host tools missing in $WEBOS_QT6_HOST_PREFIX/bin; building host tools first..."
+        build_qt6_host_tools
+    fi
+
+    if [ ! -x "$WEBOS_QT6_HOST_PREFIX/bin/qt-configure-module" ]; then
+        echo "Missing qt-configure-module in $WEBOS_QT6_HOST_PREFIX/bin."
+        echo "Run: $0 qt6-host-tools"
+        exit 1
+    fi
+
+    if ! command -v cmake >/dev/null 2>&1; then
+        echo "cmake was not found in PATH."
+        exit 1
+    fi
+
+    if [ "$WEBOS_QT6_CMAKE_GENERATOR" = "Ninja" ] && ! command -v ninja >/dev/null 2>&1; then
+        echo "ninja was not found in PATH (required for WEBOS_QT6_CMAKE_GENERATOR=Ninja)."
+        exit 1
+    fi
+
+    download_qt6_sources
+    mkdir -p "$WEBOS_QT6_TARGET_BUILD_DIR" "$WEBOS_QT6_TARGET_PREFIX"
+
+    local toolchain_file
+    if [ -n "$WEBOS_QT6_TARGET_TOOLCHAIN_FILE" ]; then
+        toolchain_file="$WEBOS_QT6_TARGET_TOOLCHAIN_FILE"
+    else
+        toolchain_file="$WEBOS_QT6_TARGET_BUILD_DIR/qt6-arm-toolchain.cmake"
+        write_qt6_arm_toolchain_file "$toolchain_file"
+    fi
+
+    if [ ! -f "$toolchain_file" ]; then
+        echo "Qt6 ARM toolchain file not found: $toolchain_file"
+        exit 1
+    fi
+
+    local qt_host_path
+    qt_host_path="$WEBOS_QT6_HOST_PREFIX"
+    if [ ! -f "$qt_host_path/lib/cmake/Qt6HostInfo/Qt6HostInfoConfig.cmake" ] && \
+       [ -f "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6HostInfo/Qt6HostInfoConfig.cmake" ]; then
+        qt_host_path="$WEBOS_QT6_BUILD_DIR"
+    fi
+
+    export PATH="$WEBOS_QT6_HOST_PREFIX/bin:$PATH"
+    local qt_host_qmake
+    if [ -x "$WEBOS_QT6_HOST_PREFIX/bin/qmake6" ]; then
+        qt_host_qmake="$WEBOS_QT6_HOST_PREFIX/bin/qmake6"
+    else
+        qt_host_qmake="$WEBOS_QT6_HOST_PREFIX/bin/qmake"
+    fi
+    export QMAKE6="$qt_host_qmake"
+    [ -x "$WEBOS_QT6_HOST_PREFIX/bin/moc" ] && export MOC="$WEBOS_QT6_HOST_PREFIX/bin/moc"
+    [ -x "$WEBOS_QT6_HOST_PREFIX/bin/rcc" ] && export RCC="$WEBOS_QT6_HOST_PREFIX/bin/rcc"
+    [ -x "$WEBOS_QT6_HOST_PREFIX/bin/uic" ] && export UIC="$WEBOS_QT6_HOST_PREFIX/bin/uic"
+    [ -x "$WEBOS_QT6_HOST_PREFIX/bin/qsb" ] && export QSB="$WEBOS_QT6_HOST_PREFIX/bin/qsb"
+    [ -x "$WEBOS_QT6_HOST_PREFIX/bin/qmlcachegen" ] && export QMLCACHEGEN="$WEBOS_QT6_HOST_PREFIX/bin/qmlcachegen"
+
+    local qtbase_src
+    qtbase_src="$(extract_qt6_module qtbase)"
+    apply_qt6_webos_compat_patches "$qtbase_src"
+    local qtbase_build_dir="$WEBOS_QT6_TARGET_BUILD_DIR/qtbase"
+
+    cmake -S "$qtbase_src" -B "$qtbase_build_dir" \
+        -G "$WEBOS_QT6_CMAKE_GENERATOR" \
+        -DCMAKE_TOOLCHAIN_FILE="$toolchain_file" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="$WEBOS_QT6_TARGET_PREFIX" \
+        -DQT_HOST_PATH="$qt_host_path" \
+        -DQT_BUILD_EXAMPLES=OFF \
+        -DQT_BUILD_TESTS=OFF \
+        -DFEATURE_gui=ON \
+        -DFEATURE_widgets=ON
+
+    cmake --build "$qtbase_build_dir" --parallel "$JOBS"
+    cmake --install "$qtbase_build_dir"
+
+    if [ -n "$WEBOS_QT6_TARGET_MODULES" ]; then
+        IFS=',' read -r -a qt_target_modules <<< "$WEBOS_QT6_TARGET_MODULES"
+        for module in "${qt_target_modules[@]}"; do
+            module="$(echo "$module" | xargs)"
+            [ -n "$module" ] || continue
+
+            module_src="$(extract_qt6_module "$module")"
+            module_build_dir="$WEBOS_QT6_TARGET_BUILD_DIR/$module"
+
+            if [ "$module" = "qtdeclarative" ]; then
+                apply_qt6_qtdeclarative_compat_patches "$module_src"
+            fi
+
+            local -a module_cmake_args
+            module_cmake_args=(
+                -G "$WEBOS_QT6_CMAKE_GENERATOR"
+                -DCMAKE_TOOLCHAIN_FILE="$toolchain_file"
+                -DCMAKE_BUILD_TYPE=Release
+                -DCMAKE_INSTALL_PREFIX="$WEBOS_QT6_TARGET_PREFIX"
+                -DCMAKE_PREFIX_PATH="$WEBOS_QT6_TARGET_PREFIX"
+                -DQt6_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6"
+                -DQt6Core_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6Core"
+                -DQt6DBus_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6DBus"
+                -DQt6Gui_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6Gui"
+                -DQt6Network_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6Network"
+                -DQt6OpenGL_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6OpenGL"
+                -DQt6Widgets_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6Widgets"
+                -DQt6BuildInternals_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6BuildInternals"
+                -DQT_HOST_PATH="$qt_host_path"
+                -DQT_BUILD_EXAMPLES=OFF
+                -DQT_BUILD_TESTS=OFF
+            )
+
+            if [ "$module" = "qtdeclarative" ]; then
+                module_cmake_args+=(
+                    -DFEATURE_qml_network=OFF
+                    -DINPUT_qml_network=no
+                    -DINPUT_qml_ssl=no
+                    -DQT_FEATURE_ssl=OFF
+                    -DQt6QmlTools_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake/Qt6QmlTools"
+                    -DQt6ShaderTools_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6ShaderTools"
+                    -DQt6ShaderToolsTools_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake/Qt6ShaderToolsTools"
+                    -DQT_HOST_PATH_CMAKE_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake"
+                )
+            fi
+
+            module_cmake_args+=( -B "$module_build_dir" )
+
+            "$WEBOS_QT6_HOST_PREFIX/bin/qt-configure-module" "$module_src" -- "${module_cmake_args[@]}"
+
+            cmake --build "$module_build_dir" --parallel "$JOBS"
+            cmake --install "$module_build_dir"
+        done
+    fi
+
+    echo ""
+    echo "Qt6 ARM target runtime installed to: $WEBOS_QT6_TARGET_PREFIX"
+    echo "Use with VLC build/package:"
+    echo "  WEBOS_QT6_HOST_TOOLS=$WEBOS_QT6_HOST_PREFIX/bin WEBOS_QT6_TARGET_PREFIX=$WEBOS_QT6_TARGET_PREFIX ./build-webos.sh configure"
+    echo "  WEBOS_QT_RUNTIME_DIR=$WEBOS_QT6_TARGET_PREFIX extras/package/webos/package.sh"
+}
+
 case "$MODE" in
-    sdk|deps|configure|build|install|all)
+    qt6|qt6-host-tools|qt6-target-arm|sdk|deps|configure|build|install|all)
                 ;;
         -h|--help|help)
                 usage
@@ -85,6 +523,16 @@ case "$MODE" in
                 exit 1
                 ;;
 esac
+
+if [ "$MODE" = "qt6" ]; then
+    download_qt6_sources
+    exit 0
+fi
+
+if [ "$MODE" = "qt6-host-tools" ]; then
+    build_qt6_host_tools
+    exit 0
+fi
 
 has_sysroot_runtime() {
     local toolchain="$1"
@@ -239,6 +687,90 @@ else
     export PATH="/usr/bin:${PATH}"
     SYSROOT="/"
 fi
+
+if [ -n "$WEBOS_QT6_ROOT" ]; then
+    if [ -z "$WEBOS_QT6_HOST_TOOLS" ] && [ -d "$WEBOS_QT6_ROOT/host/bin" ]; then
+        WEBOS_QT6_HOST_TOOLS="$WEBOS_QT6_ROOT/host/bin"
+    fi
+
+    if [ -z "$WEBOS_QT6_TARGET_PREFIX" ]; then
+        if [ -d "$WEBOS_QT6_ROOT/target/usr" ]; then
+            WEBOS_QT6_TARGET_PREFIX="$WEBOS_QT6_ROOT/target/usr"
+        elif [ -d "$WEBOS_QT6_ROOT/target" ]; then
+            WEBOS_QT6_TARGET_PREFIX="$WEBOS_QT6_ROOT/target"
+        fi
+    fi
+fi
+
+if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ -n "${WEBOS_TOOLCHAIN:-}" ] && [ -x "${WEBOS_TOOLCHAIN}/bin/qmake" ]; then
+    export QMAKE="${WEBOS_TOOLCHAIN}/bin/qmake"
+fi
+
+if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ "$QT_ENABLED" = "1" ]; then
+    qt6_tools_dir=""
+
+    if [ -n "$WEBOS_QT6_HOST_TOOLS" ] && [ -x "$WEBOS_QT6_HOST_TOOLS/qmake6" ]; then
+        qt6_tools_dir="$WEBOS_QT6_HOST_TOOLS"
+    elif [ -n "${WEBOS_TOOLCHAIN:-}" ] && [ -x "${WEBOS_TOOLCHAIN}/bin/qmake6" ]; then
+        qt6_tools_dir="${WEBOS_TOOLCHAIN}/bin"
+    fi
+
+    if [ -z "$qt6_tools_dir" ] && [ "$WEBOS_QT6_AUTO_DOWNLOAD" = "1" ]; then
+        echo "Qt6 host tools not found. Downloading Qt6 sources first..."
+        download_qt6_sources
+    fi
+
+    if [ -z "$qt6_tools_dir" ]; then
+        echo "Qt is enabled, but the cross toolchain does not provide qmake6."
+        echo "Current toolchain: ${WEBOS_TOOLCHAIN:-<unset>}"
+        echo "Qt6 sources directory: ${WEBOS_QT6_SRC_DIR}"
+        echo "Set WEBOS_QT6_HOST_TOOLS to external Qt6 host tools, or install an ARM Qt6-capable toolchain."
+        echo "Example: WEBOS_QT6_HOST_TOOLS=/opt/qt6-webos/host/bin ./build-webos.sh configure"
+        echo "Otherwise disable Qt explicitly:"
+        echo "  WEBOS_CONFIGURE_EXTRA_FLAGS=\"--disable-qt\" ./build-webos.sh configure"
+        exit 1
+    fi
+
+    if [ -n "$WEBOS_QT6_TARGET_PREFIX" ]; then
+        qt_target_conf="$WEBOS_QT6_TARGET_PREFIX/bin/target_qt.conf"
+        if [ -f "$qt_target_conf" ]; then
+            sed -i \
+                -e 's/^SysrootifyPrefix=.*/SysrootifyPrefix=false/' \
+                -e "s|^Sysroot=.*|Sysroot=${SYSROOT}|" \
+                "$qt_target_conf"
+        fi
+    fi
+
+    export PATH="$qt6_tools_dir:$PATH"
+    if [ -n "$WEBOS_QT6_TARGET_PREFIX" ] && [ -x "$WEBOS_QT6_TARGET_PREFIX/bin/qmake6" ]; then
+        export QMAKE6="$WEBOS_QT6_TARGET_PREFIX/bin/qmake6"
+    else
+        export QMAKE6="$qt6_tools_dir/qmake6"
+    fi
+    export QMAKE="$QMAKE6"
+    [ -x "$qt6_tools_dir/moc" ] && export MOC="$qt6_tools_dir/moc"
+    [ -x "$qt6_tools_dir/rcc" ] && export RCC="$qt6_tools_dir/rcc"
+    [ -x "$qt6_tools_dir/uic" ] && export UIC="$qt6_tools_dir/uic"
+    [ -x "$qt6_tools_dir/qsb" ] && export QSB="$qt6_tools_dir/qsb"
+    [ -x "$qt6_tools_dir/qmlcachegen" ] && export QMLCACHEGEN="$qt6_tools_dir/qmlcachegen"
+
+    qtbase_src_dir="$WEBOS_QT6_SRC_DIR/qtbase-everywhere-src-$WEBOS_QT6_VERSION"
+    if [ -d "$qtbase_src_dir/mkspecs" ]; then
+        qmake_host_data="$("$QMAKE6" -query QT_HOST_DATA 2>/dev/null || true)"
+        if [ -n "$qmake_host_data" ] && [ ! -d "$qmake_host_data/mkspecs/linux-g++" ]; then
+            mkdir -p "$qmake_host_data"
+            if [ ! -e "$qmake_host_data/mkspecs" ]; then
+                ln -s "$qtbase_src_dir/mkspecs" "$qmake_host_data/mkspecs" || true
+            else
+                cp -a "$qtbase_src_dir/mkspecs/." "$qmake_host_data/mkspecs/" 2>/dev/null || true
+            fi
+        fi
+
+        export QMAKEPATH="$qtbase_src_dir/mkspecs${QMAKEPATH:+:$QMAKEPATH}"
+        export QMAKESPEC="${QMAKESPEC:-linux-g++}"
+    fi
+fi
+
 export PKG_CONFIG_SYSROOT_DIR=""
     HOST_MULTIARCH=""
     if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ] && command -v gcc >/dev/null 2>&1; then
@@ -249,9 +781,20 @@ export PKG_CONFIG_SYSROOT_DIR=""
         export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/${HOST_MULTIARCH}/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
         export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/${HOST_MULTIARCH}/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
     else
-        export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
-        export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
+        export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
+        export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig"
     fi
+
+if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ "$QT_ENABLED" = "1" ] && [ -n "$WEBOS_QT6_TARGET_PREFIX" ]; then
+    if [ -d "$WEBOS_QT6_TARGET_PREFIX/lib/pkgconfig" ]; then
+        export PKG_CONFIG_LIBDIR="$WEBOS_QT6_TARGET_PREFIX/lib/pkgconfig:$PKG_CONFIG_LIBDIR"
+        export PKG_CONFIG_PATH="$WEBOS_QT6_TARGET_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+    fi
+    if [ -d "$WEBOS_QT6_TARGET_PREFIX/share/pkgconfig" ]; then
+        export PKG_CONFIG_LIBDIR="$WEBOS_QT6_TARGET_PREFIX/share/pkgconfig:$PKG_CONFIG_LIBDIR"
+        export PKG_CONFIG_PATH="$WEBOS_QT6_TARGET_PREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
+    fi
+fi
 export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include"
 if [ "$WEBOS_PROFILE" = "x86_64" ]; then
     export CFLAGS="${CFLAGS:-} -m64 -I${DEPS_PREFIX}/include"
@@ -276,6 +819,11 @@ else
         echo "Check WEBOS_TOOLCHAIN: ${WEBOS_TOOLCHAIN}"
         exit 1
     fi
+fi
+
+if [ "$MODE" = "qt6-target-arm" ]; then
+    build_qt6_target_arm
+    exit 0
 fi
 
 if [ "$MODE" = "deps" ] || [ "$MODE" = "all" ]; then
