@@ -18,6 +18,7 @@ fi
 OUT_DIR="${WEBOS_OUTPUT_DIR:-$TOP_DIR/webos-package}"
 PKG_WORK_DIR="${WEBOS_PACKAGE_DIR:-$TOP_DIR/webos-package/stage}"
 WEBOS_QT_RUNTIME_DIR="${WEBOS_QT_RUNTIME_DIR:-}"
+WEBOS_PACKAGE_PROFILE="${WEBOS_PACKAGE_PROFILE:-full}"
 
 if [ ! -d "$DEPLOY_DIR" ]; then
     echo "Missing deploy directory: $DEPLOY_DIR"
@@ -127,7 +128,7 @@ if [ -d "$TOP_DIR/share/lua" ]; then
     cp -a "$TOP_DIR/share/lua" "$PKG_WORK_DIR/share/vlc/lua"
 fi
 
-if [ "$TARGET_ARCH" = "x86_64" ] && [ "${WEBOS_PACKAGE_PROFILE:-minimal}" != "full" ]; then
+if [ "$TARGET_ARCH" = "x86_64" ] && [ "$WEBOS_PACKAGE_PROFILE" = "minimal" ]; then
     rm -rf \
         "$PKG_WORK_DIR/vlc/plugins/access_output" \
         "$PKG_WORK_DIR/vlc/plugins/audio_filter" \
@@ -246,13 +247,7 @@ if [ "$TARGET_ARCH" = "x86_64" ]; then
     fi
     if [ -d "/usr/lib/${HOST_MULTIARCH}/qt6/qml" ]; then
         cp -a "/usr/lib/${HOST_MULTIARCH}/qt6/qml" "$PKG_WORK_DIR/qt6/"
-        rm -rf "$PKG_WORK_DIR/qt6/qml/QtTest"
     fi
-
-    rm -f \
-        "$PKG_WORK_DIR/qt6/plugins/imageformats/libqjpeg.so" \
-        "$PKG_WORK_DIR/qt6/plugins/imageformats/libqtiff.so" \
-        "$PKG_WORK_DIR/qt6/plugins/imageformats/libqmng.so"
 
     QT_INPUTS=""
     for candidate in \
@@ -304,7 +299,6 @@ if [ "$TARGET_ARCH" = "x86_64" ]; then
         bundle_runtime_closure $QT_INPUTS
     fi
 
-    rm -f "$PKG_WORK_DIR/vlc/lib/libEGL.so"*
 elif [ "$TARGET_ARCH" = "arm" ] && [ -n "$WEBOS_QT_RUNTIME_DIR" ]; then
     if [ ! -d "$WEBOS_QT_RUNTIME_DIR" ]; then
         echo "WEBOS_QT_RUNTIME_DIR does not exist: $WEBOS_QT_RUNTIME_DIR"

@@ -59,11 +59,6 @@ if printf '%s' "$WEBOS_CONFIGURE_EXTRA_FLAGS" | grep -Eq '(^|[[:space:]])--disab
     QT_ENABLED=0
 fi
 
-if [ "$WEBOS_PROFILE" = "x86_64" ]; then
-    WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS} --disable-ssh2"
-    WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS} --disable-sftp"
-fi
-
 usage() {
         cat <<EOF
 Usage: $0 [qt6|qt6-host-tools|qt6-target-arm|sdk|deps|configure|build|install|all]
