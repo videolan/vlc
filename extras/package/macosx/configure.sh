@@ -23,7 +23,7 @@ OPTIONS="
         --disable-pulse
         --disable-sdl-image
         --disable-vnc
-        --with-macosx-version-min=$MINIMAL_OSX_VERSION
+        --with-macosx-version-min=10.7
 "
 
 export CFLAGS
