@@ -278,7 +278,7 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     _favoriteAlbumsArray = [self.libraryModel listOfFavoriteAlbums];
     _favoriteArtistsArray = [self.libraryModel listOfFavoriteArtists];
     _favoriteGenresArray = [self.libraryModel listOfFavoriteGenres];
-    _allFavoritesArray = [self.libraryModel listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeAllFavorites];
+    _allFavoritesArray = [self.libraryModel listOfMediaItemsForParentType:VLCMediaLibraryParentGroupTypeAllFavorites];
 
     [self updateVisibleSectionMapping];
 
