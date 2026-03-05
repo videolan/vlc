@@ -30,6 +30,7 @@ public:
 
 private:
     void registerQMLTypes();
+    /*static*/ void clearQMLTypes();
     static QObject* getMainCtxInstance(QQmlEngine *, QJSEngine *);
 
     qt_intf_t* m_intf = nullptr;
@@ -38,6 +39,8 @@ private:
 
     QQmlComponent* m_component = nullptr;
     QQuickItem* m_rootItem = nullptr;
+
+    QPointer<QQmlEngine> m_engineBound;
 };
 
 #endif // MAINUI_HPP

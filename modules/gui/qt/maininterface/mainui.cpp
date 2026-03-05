@@ -82,6 +82,8 @@
 
 #include <QScreen>
 
+static bool g_qmlTypesAreRegistered = false;
+
 using  namespace vlc::playlist;
 
 MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  QObject *parent)
@@ -119,11 +121,25 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
 
 MainUI::~MainUI()
 {
-    qmlClearTypeRegistrations();
+    if (!m_engineBound)
+    {
+        // If the global engine is dead, we assume no other QML engine exists hence can clear the
+        // types. Note that there may be multiple QML engines co-existing, but the global engine
+        // is expected to outlive the others.
+        clearQMLTypes();
+    }
+    else
+    {
+        // `QObject::destroyed()` is signalled just before the object dies, but subclass `QQmlEngine`
+        // itself should be dead at that point anyway. This should prevent undefined behavior.
+        connect(m_engineBound, &QObject::destroyed, this, &MainUI::clearQMLTypes, Qt::UniqueConnection);
+    }
 }
 
 bool MainUI::setup(QQmlEngine* engine)
 {
+    m_engineBound = engine;
+
     if (m_mainCtx->hasMediaLibrary())
     {
         engine->addImageProvider(MLCustomCover::providerId, new MLCustomCover(m_mainCtx->getMediaLibrary()));
@@ -186,6 +202,8 @@ QQuickItem* MainUI::createRootItem()
 
 void MainUI::registerQMLTypes()
 {
+    assert(!g_qmlTypesAreRegistered);
+
     {
         const char* uri = "VLC.MainInterface";
         const int versionMajor = 1;
@@ -436,4 +454,12 @@ void MainUI::registerQMLTypes()
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }
+
+    g_qmlTypesAreRegistered = true;
+}
+
+void MainUI::clearQMLTypes()
+{
+    qmlClearTypeRegistrations();
+    g_qmlTypesAreRegistered = false;
 }
