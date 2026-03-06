@@ -90,7 +90,7 @@ static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
         struct md5_s md5;
         InitMD5( &md5 );
         AddMD5( &md5, psz_arturl, strlen( psz_arturl ) );
-        if( !strncmp( psz_arturl, "attachment://", 13 ) )
+        if( !strncmp( psz_arturl, "attachment://", 13 ) && psz_title != NULL )
             AddMD5( &md5, psz_title, strlen( psz_title ) );
         EndMD5( &md5 );
         char * psz_arturl_sanitized = psz_md5_hash( &md5 );
