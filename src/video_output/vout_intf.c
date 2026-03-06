@@ -43,6 +43,7 @@
 #include <vlc_charset.h>
 #include <vlc_spu.h>
 #include <vlc_subpicture.h>
+#include <vlc_clipboard.h>
 #include "vout_internal.h"
 #include "snapshot.h"
 
@@ -70,6 +71,8 @@ static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int SnapshotCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
+static int SnapshotClipboardCallback( vlc_object_t *, char const *,
+                                      vlc_value_t, vlc_value_t, void * );
 static int VideoFilterCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
 static int SubSourceCallback( vlc_object_t *, char const *,
@@ -324,6 +327,11 @@ void vout_CreateVars( vout_thread_t *p_vout )
     var_Create( p_vout, "video-snapshot", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_Change( p_vout, "video-snapshot", VLC_VAR_SETTEXT, _("Snapshot") );
 
+    /* Add snapshot to clipboard variable */
+    var_Create( p_vout, "video-snapshot-clipboard", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_Change( p_vout, "video-snapshot-clipboard", VLC_VAR_SETTEXT,
+                _("Copy snapshot to clipboard") );
+
     /* Add a video-filter variable */
     var_Create( p_vout, "video-filter",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
@@ -381,6 +389,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "video-wallpaper", WallPaperCallback, NULL );
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
     var_AddCallback( p_vout, "video-snapshot", SnapshotCallback, NULL );
+    var_AddCallback( p_vout, "video-snapshot-clipboard", SnapshotClipboardCallback, NULL );
     var_AddCallback( p_vout, "video-filter", VideoFilterCallback, NULL );
     var_AddCallback( p_vout, "sub-source", SubSourceCallback, NULL );
     var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
@@ -416,6 +425,7 @@ void vout_IntfDeinit(vlc_object_t *obj)
     var_DelCallback(obj, "sub-filter", SubFilterCallback, NULL);
     var_DelCallback(obj, "sub-source", SubSourceCallback, NULL);
     var_DelCallback(obj, "video-filter", VideoFilterCallback, NULL);
+    var_DelCallback(obj, "video-snapshot-clipboard", SnapshotClipboardCallback, NULL);
     var_DelCallback(obj, "video-snapshot", SnapshotCallback, NULL);
     var_DelCallback(obj, "fullscreen", FullscreenCallback, NULL);
     var_DelCallback(obj, "video-wallpaper", WallPaperCallback, NULL);
@@ -477,6 +487,49 @@ static void VoutOsdSnapshot( vout_thread_t *p_vout, picture_t *p_pic, const char
         if( VoutSnapshotPip( p_vout, p_pic ) )
             msg_Warn( p_vout, "Failed to display snapshot" );
     }
+}
+
+/**
+ * Copy current video frame to system clipboard and show OSD feedback.
+ */
+static void VoutSnapshotToClipboard( vout_thread_t *p_vout )
+{
+    picture_t *p_picture = NULL;
+    block_t *p_image = NULL;
+
+    if (vout_GetSnapshot( p_vout, &p_image, &p_picture, NULL, "png",
+                          VLC_TICK_FROM_MS(500) ))
+        goto exit;
+
+    if (!p_image || p_image->i_buffer == 0) {
+        msg_Err( p_vout, "No image data for clipboard" );
+        goto exit;
+    }
+
+    if (vlc_clipboard_CopyImage( VLC_OBJECT(p_vout), p_image, "image/png" ) == VLC_SUCCESS)
+        vout_OSDMessage( p_vout, VOUT_SPU_CHANNEL_OSD, "%s",
+                         _("Snapshot copied to clipboard") );
+    else
+        msg_Err( p_vout, "Failed to copy snapshot to clipboard" );
+
+exit:
+    if (p_image)
+        block_Release( p_image );
+    if (p_picture)
+        picture_Release( p_picture );
+}
+
+static int SnapshotClipboardCallback( vlc_object_t *p_this, char const *psz_cmd,
+                                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    VLC_UNUSED(psz_cmd);
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(newval);
+    VLC_UNUSED(p_data);
+
+    VoutSnapshotToClipboard( p_vout );
+    return VLC_SUCCESS;
 }
 
 /**
