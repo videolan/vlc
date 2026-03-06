@@ -318,6 +318,10 @@ elif [ "$TARGET_ARCH" = "arm" ] && [ -n "$WEBOS_QT_RUNTIME_DIR" ]; then
     fi
 fi
 
+if [ -d "$PKG_WORK_DIR/qt6/qml/QtTest" ]; then
+    rm -rf "$PKG_WORK_DIR/qt6/qml/QtTest"
+fi
+
 cat > "$PKG_WORK_DIR/bin/qt.conf" <<'EOF'
 [Paths]
 Prefix=..

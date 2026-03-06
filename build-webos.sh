@@ -255,7 +255,7 @@ build_qt6_host_tools() {
         -DQT_BUILD_TESTS=OFF \
         -DBUILD_SHARED_LIBS=ON
 
-    cmake --build "$WEBOS_QT6_BUILD_DIR" --parallel "$JOBS" --target qmake moc rcc uic
+    cmake --build "$WEBOS_QT6_BUILD_DIR" --parallel "$JOBS"
 
     if ! cmake --install "$WEBOS_QT6_BUILD_DIR"; then
         echo "cmake --install failed after partial host-tools build; using manual tool staging fallback."
@@ -282,6 +282,7 @@ build_qt6_host_tools() {
         stage_tool moc || true
         stage_tool rcc || true
         stage_tool uic || true
+        stage_tool qt-configure-module || true
 
         if [ -x "$WEBOS_QT6_HOST_PREFIX/bin/qmake" ] && [ ! -e "$WEBOS_QT6_HOST_PREFIX/bin/qmake6" ]; then
             ln -s qmake "$WEBOS_QT6_HOST_PREFIX/bin/qmake6"
@@ -293,8 +294,7 @@ build_qt6_host_tools() {
 
         if [ -d "$WEBOS_QT6_BUILD_DIR/lib/cmake" ]; then
             mkdir -p "$WEBOS_QT6_HOST_PREFIX/lib/cmake"
-            [ -d "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6HostInfo" ] && cp -a "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6HostInfo" "$WEBOS_QT6_HOST_PREFIX/lib/cmake/" || true
-            [ -d "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6" ] && cp -a "$WEBOS_QT6_BUILD_DIR/lib/cmake/Qt6" "$WEBOS_QT6_HOST_PREFIX/lib/cmake/" || true
+            find "$WEBOS_QT6_BUILD_DIR/lib/cmake" -maxdepth 1 -mindepth 1 -type d -name 'Qt6*' -exec cp -a {} "$WEBOS_QT6_HOST_PREFIX/lib/cmake/" \; || true
         fi
     fi
 
@@ -483,11 +483,18 @@ build_qt6_target_arm() {
                     -DINPUT_qml_network=no
                     -DINPUT_qml_ssl=no
                     -DQT_FEATURE_ssl=OFF
-                    -DQt6QmlTools_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake/Qt6QmlTools"
                     -DQt6ShaderTools_DIR="$WEBOS_QT6_TARGET_PREFIX/lib/cmake/Qt6ShaderTools"
-                    -DQt6ShaderToolsTools_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake/Qt6ShaderToolsTools"
-                    -DQT_HOST_PATH_CMAKE_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake"
                 )
+
+                if [ -d "$WEBOS_QT6_HOST_PREFIX/lib/cmake/Qt6QmlTools" ]; then
+                    module_cmake_args+=( -DQt6QmlTools_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake/Qt6QmlTools" )
+                fi
+                if [ -d "$WEBOS_QT6_HOST_PREFIX/lib/cmake/Qt6ShaderToolsTools" ]; then
+                    module_cmake_args+=( -DQt6ShaderToolsTools_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake/Qt6ShaderToolsTools" )
+                fi
+                if [ -d "$WEBOS_QT6_HOST_PREFIX/lib/cmake" ]; then
+                    module_cmake_args+=( -DQT_HOST_PATH_CMAKE_DIR="$WEBOS_QT6_HOST_PREFIX/lib/cmake" )
+                fi
             fi
 
             module_cmake_args+=( -B "$module_build_dir" )
