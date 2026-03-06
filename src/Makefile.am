@@ -429,6 +429,7 @@ libvlccore_la_SOURCES = \
 	misc/variables.c \
 	misc/xml.c \
 	misc/addons.c \
+	misc/clipboard.c \
 	misc/filter.c \
 	misc/filter_chain.c \
 	misc/httpcookies.c \
@@ -448,6 +449,7 @@ libvlccore_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_libvlccore)
 
 if HAVE_WIN32
 libvlccore_la_SOURCES += \
+	win32/clipboard.c \
 	win32/dirs-common.c \
 	win32/error.c \
 	win32/filesystem.c \
@@ -491,6 +493,7 @@ libvlccore_la_SOURCES += \
 	darwin/specific.c \
 	darwin/thread.c
 libvlccore_objc_la_SOURCES = \
+	darwin/clipboard.m \
 	darwin/dirs.m \
 	darwin/netconf.m
 noinst_LTLIBRARIES = libvlccore_objc.la
@@ -614,7 +617,7 @@ if HAVE_DARWIN
 libvlccore_objc_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libvlccore_objc_la_LDFLAGS = -static
 libvlccore_la_LIBADD += libvlccore_objc.la
-libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib
+libvlccore_la_LDFLAGS += -Wl,-framework,Foundation -Wl,-framework,AppKit -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib
 endif
 
 # iOS and tvOS applications cannot install global shared libraries and
