@@ -431,6 +431,11 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
                                    fallbackDetail:fallbackDetail];
 }
 
+- (void)updateHeaderInTableView:(NSTableView *)detailTableView forMasterSelection:(NSTableView *)masterTableView
+{
+    [self updateHeaderForMasterSelection];
+}
+
 - (VLCMediaLibraryParentGroupType)currentParentType
 {
     if (self.masterTableView.selectedRow > -1) {
