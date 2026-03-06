@@ -63,6 +63,7 @@ vlc_frame_Release
 vlc_frame_TryRealloc
 vlc_chroma_conv_Probe
 vlc_chroma_conv_result_ToString
+vlc_clipboard_CopyImage
 config_AddIntf
 config_ChainCreate
 config_ChainDestroy

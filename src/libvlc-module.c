@@ -1514,6 +1514,8 @@ static const char *const mouse_wheel_texts[] = {
 #define INTF_POPUP_MENU_KEY_LONGTEXT N_("Show the contextual popup menu.")
 #define SNAP_KEY_TEXT N_("Take video snapshot")
 #define SNAP_KEY_LONGTEXT N_("Takes a video snapshot and writes it to disk.")
+#define SNAP_CLIPBOARD_KEY_TEXT N_("Take video snapshot to clipboard")
+#define SNAP_CLIPBOARD_KEY_LONGTEXT N_("Takes a video snapshot and writes it to the system clipboard.")
 
 #define RECORD_KEY_TEXT N_("Record")
 #define RECORD_KEY_LONGTEXT N_("Record access filter start/stop.")
@@ -2370,6 +2372,7 @@ vlc_module_begin ()
 #   define KEY_CHAPTER_PREV       "Ctrl+u"
 #   define KEY_CHAPTER_NEXT       "Ctrl+d"
 #   define KEY_SNAPSHOT           "Command+Alt+s"
+#   define KEY_SNAPSHOT_CLIPBOARD "Alt+Shift+s"
 #   define KEY_ZOOM               "z"
 #   define KEY_UNZOOM             "Shift+z"
 #   define KEY_RANDOM             "Command+z"
@@ -2516,6 +2519,7 @@ vlc_module_begin ()
 #   define KEY_CHAPTER_PREV       "Shift+p"
 #   define KEY_CHAPTER_NEXT       "Shift+n"
 #   define KEY_SNAPSHOT           "Shift+s"
+#   define KEY_SNAPSHOT_CLIPBOARD "Alt+Shift+s"
 
 #   define KEY_ZOOM               "z"
 #   define KEY_UNZOOM             "Shift+z"
@@ -2697,6 +2701,8 @@ vlc_module_begin ()
     add_key("key-intf-popup-menu", KEY_INTF_POPUP_MENU,
             INTF_POPUP_MENU_KEY_TEXT, INTF_POPUP_MENU_KEY_LONGTEXT)
     add_key("key-snapshot", KEY_SNAPSHOT, SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT)
+    add_key("key-snapshot-clipboard", KEY_SNAPSHOT_CLIPBOARD,
+            SNAP_CLIPBOARD_KEY_TEXT, SNAP_CLIPBOARD_KEY_LONGTEXT)
     add_key("key-record", KEY_RECORD, RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT)
     add_key("key-zoom", KEY_ZOOM, ZOOM_KEY_TEXT, ZOOM_KEY_LONGTEXT)
     add_key("key-unzoom", KEY_UNZOOM, UNZOOM_KEY_TEXT, UNZOOM_KEY_LONGTEXT)

@@ -698,6 +698,16 @@ static void RunSnapshot(void *userdata)
     free(task);
 }
 
+static void RunSnapshotClipboard(void *userdata)
+{
+    struct snapshot_task *task = userdata;
+
+    var_TriggerCallback(task->vout, "video-snapshot-clipboard");
+
+    vout_Release(task->vout);
+    free(task);
+}
+
 static void TakeSnapshotAsync(struct intf_sys_t *sys, vlc_player_t *player)
 {
     if (!sys->executor)
@@ -718,6 +728,25 @@ static void TakeSnapshotAsync(struct intf_sys_t *sys, vlc_player_t *player)
     vlc_executor_Submit(sys->executor, &task->runnable);
 }
 
+static void TakeSnapshotClipboardAsync(struct intf_sys_t *sys, vlc_player_t *player)
+{
+    if (!sys->executor)
+    {
+        sys->executor = vlc_executor_New(1);
+        if (!sys->executor)
+            return;
+    }
+
+    struct snapshot_task *task = malloc(sizeof(*task));
+    if (!task)
+        return;
+
+    task->vout = vlc_player_vout_Hold(player);
+    task->runnable.run = RunSnapshotClipboard;
+    task->runnable.userdata = task;
+    vlc_executor_Submit(sys->executor, &task->runnable);
+}
+
 PLAYER_ACTION_HANDLER(Vouts)
 {
     VLC_UNUSED(intf);
@@ -731,6 +760,9 @@ PLAYER_ACTION_HANDLER(Vouts)
             break;
         case ACTIONID_SNAPSHOT:
             TakeSnapshotAsync(intf->p_sys, player);
+            break;
+        case ACTIONID_SNAPSHOT_CLIPBOARD:
+            TakeSnapshotClipboardAsync(intf->p_sys, player);
             break;
         case ACTIONID_WALLPAPER:
             vlc_player_vout_ToggleWallpaperMode(player);
