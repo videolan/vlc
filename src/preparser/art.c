@@ -101,7 +101,7 @@ static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
         vlc_hash_md5_t md5;
         vlc_hash_md5_Init( &md5 );
         vlc_hash_md5_Update( &md5, psz_arturl, strlen( psz_arturl ) );
-        if( !strncmp( psz_arturl, "attachment://", 13 ) )
+        if( !strncmp( psz_arturl, "attachment://", 13 ) && psz_title != NULL )
             vlc_hash_md5_Update( &md5, psz_title, strlen( psz_title ) );
         vlc_hash_FinishHex( &md5, psz_arturl_sanitized );
         if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "arturl" DIR_SEP
