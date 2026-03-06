@@ -1161,6 +1161,44 @@ static const struct filter_video_callbacks vout_video_cbs = {
     NULL, VoutHoldDecoderDevice,
 };
 
+/**
+ * Convert a hardware-backed picture to RGBA so the image handler can export it.
+ * Returns a new picture (caller must release) or NULL on failure.
+ * If the picture has no video context, returns picture_Hold(pic).
+ */
+static picture_t *ConvertPictureToExportable(vout_thread_sys_t *sys, picture_t *pic)
+{
+    if (picture_GetVideoContext(pic) == NULL)
+        return picture_Hold(pic);
+
+    /* No owner: chain allocates buffers internally (vout_video_cbs.buffer_new is NULL) */
+    filter_owner_t owner = { 0 };
+    filter_chain_t *filterc = filter_chain_NewVideo(&sys->obj, false, &owner);
+    if (!filterc)
+        return NULL;
+
+    es_format_t src, dst;
+    es_format_InitFromVideo(&src, &pic->format);
+    es_format_InitFromVideo(&dst, &pic->format);
+    dst.video.i_chroma = VLC_CODEC_RGBA;
+
+    filter_chain_Reset(filterc, &src, picture_GetVideoContext(pic), &dst);
+    if (filter_chain_AppendConverter(filterc, &dst) != VLC_SUCCESS)
+    {
+        es_format_Clean(&src);
+        es_format_Clean(&dst);
+        filter_chain_Delete(filterc);
+        return NULL;
+    }
+
+    picture_Hold(pic);
+    picture_t *out = filter_chain_VideoFilter(filterc, pic);
+    es_format_Clean(&src);
+    es_format_Clean(&dst);
+    filter_chain_Delete(filterc);
+    return out;
+}
+
 static picture_t *ConvertRGBAAndBlend(vout_thread_sys_t *vout, picture_t *pic,
                                       vlc_render_subpicture *subpic)
 {
@@ -1371,6 +1409,18 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     if (do_snapshot)
     {
         assert(snap_pic);
+        picture_t *snap_export = snap_pic;
+        if (picture_GetVideoContext(snap_pic) != NULL)
+        {
+            /* Hardware-backed format; convert to RGBA so image handler can export */
+            snap_export = ConvertPictureToExportable(sys, snap_pic);
+            if (snap_export != NULL && snap_export != snap_pic)
+            {
+                if (snap_pic != todisplay)
+                    picture_Release(snap_pic);
+                snap_pic = snap_export;
+            }
+        }
         vout_snapshot_Set(sys->snapshot, vd->source, snap_pic);
         if (snap_pic != todisplay)
             picture_Release(snap_pic);
