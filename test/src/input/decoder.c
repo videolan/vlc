@@ -231,6 +231,8 @@ int test_decoder_process(decoder_t *decoder, block_t *p_block)
             decoder_Clean(decoder);
             if (decoder_load(decoder, false, &packetizer->fmt_out) != VLC_SUCCESS)
             {
+                if (p_block != NULL)
+                    block_Release(p_block);
                 block_ChainRelease(p_packetized_block);
                 return VLC_EGENERIC;
             }
@@ -254,6 +256,8 @@ int test_decoder_process(decoder_t *decoder, block_t *p_block)
 
             if (ret == VLCDEC_ECRITICAL)
             {
+                if (p_block != NULL)
+                    block_Release(p_block);
                 block_ChainRelease(p_next);
                 return VLC_EGENERIC;
             }
