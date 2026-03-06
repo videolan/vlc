@@ -314,6 +314,7 @@ static block_t *ParseOBUBlock(decoder_t *p_dec, block_t *p_obu)
                         }
                         p_sys->p_sequence_header = new_seq_header;
                     }
+                    else AV1_release_sequence_header(new_seq_header);
                 }
             }
             PUSHQ(tu.pre, p_obu);
