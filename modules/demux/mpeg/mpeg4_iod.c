@@ -188,6 +188,7 @@ static bool OD_DecSpecificDesc_Read( vlc_object_t *p_object, unsigned i_data, co
         p_dec_config->i_extra = i_data;
         memcpy( p_dec_config->p_extra, p_data, p_dec_config->i_extra );
     }
+    else p_dec_config->i_extra = 0;
 
     return !!p_dec_config->i_extra;
 }
