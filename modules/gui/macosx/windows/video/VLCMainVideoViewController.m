@@ -644,23 +644,27 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     _pipViewController.title = window.title;
     
     __weak typeof(self) weakSelf = self;
-    
-    if (controller.currentMediaIsAudioOnly) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            typeof(self) strongSelf = weakSelf;
-            if (strongSelf && strongSelf->_voutViewController.presentingViewController == nil) {
-                [strongSelf->_pipViewController presentViewControllerAsPictureInPicture:strongSelf->_voutViewController];
-            }
-        });
-    } else {
-        _voutViewController.boundsChangeHandler = ^{
-            typeof(self) strongSelf = weakSelf;
-            if (strongSelf && strongSelf->_voutViewController.presentingViewController == nil) {
-                [strongSelf->_pipViewController presentViewControllerAsPictureInPicture:strongSelf->_voutViewController];
-            }
-        };
+
+    void (^presentVcAsPip)(void) = ^() {
+        typeof(self) strongSelf = weakSelf;
+        if (strongSelf && strongSelf->_voutViewController.presentingViewController == nil) {
+            [strongSelf->_pipViewController presentViewControllerAsPictureInPicture:strongSelf->_voutViewController];
+        }
+    };
+
+    if (!controller.currentMediaIsAudioOnly) {
+        _voutViewController.boundsChangeHandler = presentVcAsPip;
     }
-    
+
+    // Present PiP asynchronously. Previously the video path waited for
+    // PIPVoutViewController's viewDidLayout to fire via boundsChangeHandler, but
+    // on macOS 26 Tahoe the detached view never receives a layout pass, so the
+    // handler never fired. The acquired view already has valid bounds so we can
+    // present immediately on the next run-loop cycle for both paths.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        presentVcAsPip();
+    });
+
     if ([window isKindOfClass:VLCLibraryWindow.class]) {
         [self returnToLibrary:self];
     }
