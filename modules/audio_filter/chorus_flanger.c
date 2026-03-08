@@ -394,7 +394,7 @@ static int reallocate_buffer( filter_t *p_filter,  filter_sys_t *p_sys )
     p_sys->i_bufferLength = p_sys->i_channels * ( (int)( ( p_sys->f_delayTime
            + p_sys->f_sweepDepth ) * p_filter->fmt_in.audio.i_rate/1000 ) + 1 );
 
-    float *temp = realloc( p_sys->p_delayLineStart, p_sys->i_bufferLength );
+    float *temp = vlc_reallocarray( p_sys->p_delayLineStart, p_sys->i_bufferLength, sizeof( float ) );
     if( unlikely( !temp ) )
     {
         msg_Err( p_filter, "Couldn't reallocate buffer for new delay." );
