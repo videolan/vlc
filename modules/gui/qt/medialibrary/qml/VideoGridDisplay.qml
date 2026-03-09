@@ -127,7 +127,11 @@ Widgets.ExpandGridItemView {
 
         // Animations
 
-        Behavior on opacity { NumberAnimation { duration: VLCStyle.duration_short } }
+        Behavior on opacity {
+            OpacityAnimator {
+                duration: VLCStyle.duration_short
+            }
+        }
     }
 
     expandDelegate: VideoInfoExpandPanel {
