@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick
 
+import VLC.MainInterface
 import VLC.Style
 import VLC.Util
 
@@ -85,13 +86,11 @@ Item {
             }
         }
 
-        // This is used to prevent animating at initialization.
-        Timer {
-            interval: 50
-            running: true
-            onTriggered: {
+        Component.onCompleted: {
+            // This is used to prevent animating at initialization:
+            MainCtx.setTimeout(() => {
                 opacityBehavior.enabled = true
-            }
+            }, 50, [], fadingEdgeRectangle)
         }
 
         required property color colorStop0
