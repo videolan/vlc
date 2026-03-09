@@ -350,7 +350,11 @@ MainViewLoader {
                 //---------------------------------------------------------------------------------
                 // Animations
 
-                Behavior on opacity { NumberAnimation { duration: VLCStyle.duration_short } }
+                Behavior on opacity {
+                    OpacityAnimator {
+                        duration: VLCStyle.duration_short
+                    }
+                }
 
                 DropArea {
                     anchors.fill: parent
