@@ -139,7 +139,7 @@ MainViewLoader {
                 }
 
                 Behavior on opacity {
-                    NumberAnimation {
+                    OpacityAnimator {
                         duration: VLCStyle.duration_short
                     }
                 }
