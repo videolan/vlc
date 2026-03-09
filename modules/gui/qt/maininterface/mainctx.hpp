@@ -29,6 +29,7 @@
 #include <QtQuick/QQuickView>
 #include <QApplication>
 #include <QQuickItem>
+#include <QTimer>
 
 Q_MOC_INCLUDE( "dialogs/toolbar/controlbar_profile_model.hpp" )
 Q_MOC_INCLUDE( "util/csdbuttonmodel.hpp" )
@@ -339,6 +340,16 @@ public:
         // Make sure window has been initialized before (such as `::create()` was called):
         assert(window->handle());
         return window->format().depthBufferSize() > 0;
+    }
+
+    // TODO: This functions is akin to Window Web API's `setTimeout()`. Get rid of this once
+    //       once Qt implements it.
+    Q_INVOKABLE static void setTimeout(const QJSValue& func, const int delay, const QJSValueList& params = {}, const QObject* context = nullptr)
+    {
+        assert(func.isCallable());
+        QTimer::singleShot(delay, context, [func, params]() {
+            func.call(params);
+        });
     }
 
     Q_INVOKABLE virtual bool platformHandlesResizeWithCSD() const { return false; };
