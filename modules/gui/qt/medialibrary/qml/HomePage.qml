@@ -98,15 +98,6 @@ T.Page {
 
         property bool _hasMedias: true
 
-        Timer {
-            interval: 50
-            running: true
-
-            onTriggered: {
-                flickable._hasMedias = Qt.binding(() => { return continueWatchingRow.visible || favoritesRow.visible || newMediaRow.visible } )
-            }
-        }
-
         ScrollBar.vertical: Widgets.ScrollBarExt {}
 
         // This behavior allows to have similar "smooth" animation
@@ -131,6 +122,10 @@ T.Page {
             // feature for non-touch cases, so disable it here and enable
             // it if touch is detected through the hover handler:
             MainCtx.setFiltersChildMouseEvents(this, false)
+
+            MainCtx.setTimeout(() => {
+                flickable._hasMedias = Qt.binding(() => { return continueWatchingRow.visible || favoritesRow.visible || newMediaRow.visible } )
+            }, 50, [], flickable)
         }
 
         HoverHandler {
