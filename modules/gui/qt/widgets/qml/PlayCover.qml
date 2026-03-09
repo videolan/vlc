@@ -35,8 +35,6 @@ Item {
     //       Maybe we could crank this to 1.1.
     scale: (hoverHandler.hovered && !tapHandler.pressed) ? 1.05 : 1.0
 
-    opacity: (visible) ? 1.0 : 0.0
-
     activeFocusOnTab: false
 
     signal tapped(var point)
@@ -56,14 +54,6 @@ Item {
             duration: VLCStyle.duration_short
 
             easing.type: Easing.OutQuad
-        }
-    }
-
-    Behavior on opacity {
-        OpacityAnimator {
-            duration: VLCStyle.duration_short
-
-            easing.type: Easing.InOutSine
         }
     }
 

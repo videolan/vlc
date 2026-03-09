@@ -121,8 +121,7 @@ T.ItemDelegate {
 
             PropertyChanges {
                 target: picture
-                playCoverVisible: true
-                playCoverOpacity: 1.0
+                playCoverShowPlay: true
             }
 
         }
@@ -137,11 +136,11 @@ T.ItemDelegate {
             SequentialAnimation {
                 PropertyAction {
                     target: picture
-                    properties: "playCoverVisible"
+                    properties: "playCoverShowPlay"
                 }
 
                 NumberAnimation {
-                    properties: "opacity, playCoverOpacity"
+                    properties: "opacity"
                     duration: VLCStyle.duration_long
                     easing.type: Easing.InSine
                 }
@@ -155,11 +154,11 @@ T.ItemDelegate {
             SequentialAnimation {
                 PropertyAction {
                     target: picture
-                    property: "playCoverVisible"
+                    property: "playCoverShowPlay"
                 }
 
                 NumberAnimation {
-                    properties: "opacity, playCoverOpacity"
+                    properties: "opacity"
                     duration: VLCStyle.duration_long
                     easing.type: Easing.OutSine
                 }
@@ -285,8 +284,7 @@ T.ItemDelegate {
         Widgets.MediaCover {
             id: picture
 
-            playCoverVisible: false
-            playCoverOpacity: 0
+            playCoverShowPlay: false
             radius: VLCStyle.gridCover_radius
             color: theme.bg.secondary
 

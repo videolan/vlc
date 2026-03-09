@@ -108,7 +108,7 @@ Widgets.TableRowDelegate {
 
             color: root.colorContext.bg.secondary
 
-            playCoverVisible: root._showPlayCover
+            playCoverShowPlay: root._showPlayCover
             playIconSize: VLCStyle.play_cover_small
 
             onPlayIconClicked: () => {

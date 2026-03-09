@@ -61,7 +61,6 @@ Item {
     property alias imageOverlay: overlay.sourceComponent
 
     property alias playCoverVisible: playCoverLoader.visible
-    property alias playCoverOpacity: playCoverLoader.opacity
 
     required property int pictureWidth
     required property int pictureHeight
@@ -178,9 +177,14 @@ Item {
 
         anchors.centerIn: parent
 
-        visible: false
+        // `OpacityAnimator` updates the property once it finishes the animation:
+        visible: (opacity > 0.0 || requestVisible)
+
+        opacity: (requestVisible && status === Loader.Ready) ? 1.0 : 0.0
 
         active: false
+
+        property alias requestVisible: root.playCoverShowPlay
 
         sourceComponent: Widgets.PlayCover {
             width: playIconSize
@@ -190,10 +194,18 @@ Item {
             }
         }
 
+        Behavior on opacity {
+            OpacityAnimator {
+                duration: VLCStyle.duration_short
+
+                easing.type: Easing.InOutSine
+            }
+        }
+
         asynchronous: true
 
         // NOTE: We are lazy loading the component when this gets visible and it stays loaded.
         //       We could consider unloading it when visible goes to false.
-        onVisibleChanged: if (playCoverShowPlay && visible) active = true
+        onRequestVisibleChanged: if (requestVisible) active = true
     }
 }

@@ -114,7 +114,7 @@ Item {
 
                 fillMode: root.fillMode
 
-                playCoverVisible: (titleDel.currentlyFocused || titleDel.containsMouse)
+                playCoverShowPlay: (titleDel.currentlyFocused || titleDel.containsMouse)
                 playIconSize: VLCStyle.play_cover_small
                 radius: root.titleCover_radius
                 color: titleDel.colorContext.bg.secondary
