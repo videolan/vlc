@@ -89,32 +89,28 @@ T.Popup {
         }
 
         pushEnter: Transition {
-            PropertyAnimation {
-                property: "opacity"
+            OpacityAnimator {
                 from: 0
                 to: 1
                 duration: VLCStyle.duration_long
             }
         }
         pushExit: Transition {
-            PropertyAnimation {
-                property: "opacity"
+            OpacityAnimator {
                 from: 1
                 to: 0
                 duration: VLCStyle.duration_long
             }
         }
         popEnter: Transition {
-            PropertyAnimation {
-                property: "opacity"
+            OpacityAnimator {
                 from: 0
                 to: 1
                 duration: VLCStyle.duration_long
             }
         }
         popExit: Transition {
-            PropertyAnimation {
-                property: "opacity"
+            OpacityAnimator {
                 from: 1
                 to: 0
                 duration: VLCStyle.duration_long
