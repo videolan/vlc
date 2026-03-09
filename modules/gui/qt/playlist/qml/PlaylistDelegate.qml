@@ -179,6 +179,14 @@ T.Control {
                 source: defaultSource
                 visible: !statusIcon.visible
                 asynchronous: true
+                opacity: (status === Image.Ready ? 1.0 : 0.0)
+
+                Behavior on opacity {
+                    OpacityAnimator {
+                        duration: VLCStyle.duration_short
+                        easing.type: Easing.InSine
+                    }
+                }
 
                 readonly property url targetSource: (delegate?.artwork.toString()) ? VLCAccessImage.uri(delegate.artwork) : VLCStyle.noArtAlbumCover
                 readonly property url defaultSource: delegate.preparsed ? targetSource : ""
