@@ -90,9 +90,9 @@ Dialog {
     }
 
     exit: Transition {
-        NumberAnimation { property: "opacity"; from: 1.0; to: 0.0 }
+        OpacityAnimator { from: 1.0; to: 0.0 }
     }
     enter: Transition {
-        NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
+        OpacityAnimator { from: 0.0; to: 1.0 }
     }
 }
