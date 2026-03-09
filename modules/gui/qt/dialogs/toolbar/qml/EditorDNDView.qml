@@ -46,8 +46,9 @@ ListView {
     }
 
     remove: Transition {
-        NumberAnimation {
-            property: "opacity"; from: 1.0; to: 0
+        OpacityAnimator {
+            from: 1.0
+            to: 0.0
 
             duration: VLCStyle.duration_long
         }
