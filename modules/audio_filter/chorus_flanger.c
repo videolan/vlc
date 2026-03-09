@@ -391,6 +391,7 @@ static int paramCallback( vlc_object_t *p_this, char const *psz_var,
 
 static int reallocate_buffer( filter_t *p_filter,  filter_sys_t *p_sys )
 {
+    int i_old_length = p_sys->i_bufferLength;
     p_sys->i_bufferLength = p_sys->i_channels * ( (int)( ( p_sys->f_delayTime
            + p_sys->f_sweepDepth ) * p_filter->fmt_in.audio.i_rate/1000 ) + 1 );
 
@@ -402,5 +403,8 @@ static int reallocate_buffer( filter_t *p_filter,  filter_sys_t *p_sys )
     }
     p_sys->p_delayLineStart = temp;
     p_sys->p_delayLineEnd = p_sys->p_delayLineStart + p_sys->i_bufferLength;
+    if( p_sys->i_bufferLength > i_old_length )
+        memset( p_sys->p_delayLineStart + i_old_length, 0,
+                ( p_sys->i_bufferLength - i_old_length ) * sizeof( float ) );
     return 1;
 }
