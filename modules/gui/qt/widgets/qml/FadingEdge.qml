@@ -70,7 +70,8 @@ Item {
         implicitHeight: root.fadeSize
         implicitWidth: root.fadeSize
 
-        visible: (opacity > 0.0) && (root.backgroundColor.a > (1.0 - Number.EPSILON))
+        // NOTE: `OpacityAnimator` updates the opacity once the animation finishes.
+        visible: (opacity > 0.0 || enabled) && (root.backgroundColor.a > (1.0 - Number.EPSILON))
 
         opacity: enabled ? 1.0 : 0.0
 
@@ -80,7 +81,7 @@ Item {
 
             enabled: false
 
-            NumberAnimation {
+            OpacityAnimator {
                 duration: VLCStyle.duration_short
                 easing.type: Easing.InOutSine
             }
