@@ -32,7 +32,7 @@ Item {
 
     property real playIconSize: VLCStyle.play_cover_normal
 
-    property bool playCoverShowPlay: true
+    property bool playCoverShowPlay: false
 
     readonly property real effectiveRadius: fallbackImage.visible ? fallbackImage.effectiveRadius
                                                                   : (image.visible ? image.effectiveRadius
@@ -60,7 +60,7 @@ Item {
 
     property alias imageOverlay: overlay.sourceComponent
 
-    property alias playCoverVisible: playCoverLoader.visible
+    readonly property bool playCoverVisible: (_playCoverItem && _playCoverItem.visible)
 
     required property int pictureWidth
     required property int pictureHeight
@@ -172,40 +172,39 @@ Item {
         height: root.paintedHeight
     }
 
-    Loader {
-        id: playCoverLoader
+    Component {
+        id: playCoverComponent
 
-        anchors.centerIn: parent
-
-        // `OpacityAnimator` updates the property once it finishes the animation:
-        visible: (opacity > 0.0 || requestVisible)
-
-        opacity: (requestVisible && status === Loader.Ready) ? 1.0 : 0.0
-
-        active: false
-
-        property alias requestVisible: root.playCoverShowPlay
-
-        sourceComponent: Widgets.PlayCover {
+        Widgets.PlayCover {
+            anchors.centerIn: parent
             width: playIconSize
+
+            // `OpacityAnimator` updates the property once it finishes the animation:
+            visible: (opacity > 0.0 || root.playCoverShowPlay)
+
+            opacity: 0.0
+
+            Behavior on opacity {
+                OpacityAnimator {
+                    duration: VLCStyle.duration_short
+
+                    easing.type: Easing.InOutSine
+                }
+            }
 
             Component.onCompleted: {
                 tapped.connect(root.playIconClicked)
+                opacity = Qt.binding(() => { return (root.playCoverShowPlay ? 1.0 : 0.0) })
             }
         }
+    }
 
-        Behavior on opacity {
-            OpacityAnimator {
-                duration: VLCStyle.duration_short
+    property Widgets.PlayCover _playCoverItem
 
-                easing.type: Easing.InOutSine
-            }
-        }
-
-        asynchronous: true
-
+    onPlayCoverShowPlayChanged: {
         // NOTE: We are lazy loading the component when this gets visible and it stays loaded.
         //       We could consider unloading it when visible goes to false.
-        onRequestVisibleChanged: if (requestVisible) active = true
+        if (playCoverShowPlay && !_playCoverItem)
+            _playCoverItem = playCoverComponent.createObject(root)
     }
 }
