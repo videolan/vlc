@@ -63,7 +63,7 @@ Item {
         NumberAnimation {
             duration: VLCStyle.duration_short
 
-            easing.type: Easing.OutQuad
+            easing.type: Easing.InOutSine
         }
     }
 
