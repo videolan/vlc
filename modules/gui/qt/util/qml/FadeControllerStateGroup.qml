@@ -37,7 +37,6 @@ StateGroup {
                 target: root.target
 
                 visible: false
-                opacity: 0.0
             }
         },
         State {
@@ -47,7 +46,6 @@ StateGroup {
                 target: root.target
 
                 visible: true
-                opacity: 1.0
             }
         }
     ]
@@ -57,11 +55,11 @@ StateGroup {
             to: "hidden"
 
             SequentialAnimation {
-                NumberAnimation {
-                    property: "opacity"
-
+                OpacityAnimator {
                     duration: VLCStyle.duration_long
                     easing.type: Easing.InSine
+                    from: 1.0 // QTBUG-66475
+                    to: 0.0
                 }
 
                 PropertyAction {
@@ -77,11 +75,11 @@ StateGroup {
                     property: "visible"
                 }
 
-                NumberAnimation {
-                    property: "opacity"
-
+                OpacityAnimator {
                     duration: VLCStyle.duration_long
                     easing.type: Easing.OutSine
+                    from: 0.0 // QTBUG-66475
+                    to: 1.0
                 }
             }
         }
