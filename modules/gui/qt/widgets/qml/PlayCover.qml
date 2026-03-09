@@ -60,7 +60,7 @@ Item {
     }
 
     Behavior on opacity {
-        NumberAnimation {
+        OpacityAnimator {
             duration: VLCStyle.duration_short
 
             easing.type: Easing.InOutSine
