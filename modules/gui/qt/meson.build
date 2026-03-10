@@ -188,6 +188,10 @@ if (x11_dep.found() and
     )
 endif
 
+if have_wayland and cpp.has_header('qpa/qplatformnativeinterface.h', dependencies: qt6_dep)
+    moc_headers += files('maininterface/compositor_wayland.hpp')
+endif
+
 qt_plugin_sources = files(
     'qt.cpp',
     'qt.hpp',
@@ -548,6 +552,12 @@ if (x11_dep.found() and
         'maininterface/compositor_x11_renderwindow.cpp',
         'maininterface/compositor_x11_uisurface.cpp',
         'maininterface/compositor_x11_utils.cpp',
+    )
+endif
+
+if have_wayland and cpp.has_header('qpa/qplatformnativeinterface.h', dependencies: qt6_dep)
+    qt_plugin_sources += files(
+        'maininterface/compositor_wayland.cpp',
     )
 endif
 
@@ -1092,6 +1102,70 @@ if qt6_dep.found()
 
     if cpp.has_header('qpa/qplatformnativeinterface.h', dependencies: qt6_dep)
         qt_extra_flags += '-DQT_GUI_PRIVATE'
+    endif
+
+    qt_wayland_gui_private = cpp.has_header(
+        'qpa/qplatformnativeinterface.h', dependencies: qt6_dep)
+
+    if have_wayland and qt_wayland_gui_private
+        qt_extra_flags += '-DQT_HAS_WAYLAND_COMPOSITOR'
+        qt_extra_deps += wayland_deps[0]
+
+        qt_wl_xdg_shell_xml = wayland_protocols_dir / 'stable/xdg-shell/xdg-shell.xml'
+
+        qt_wl_xdg_shell_hdr = custom_target(
+            'qt-wayland-xdg-shell-client-header',
+            output: 'xdg-shell-client-protocol.h',
+            input: qt_wl_xdg_shell_xml,
+            command: [wayland_scanner, 'client-header', '@INPUT@', '@OUTPUT@'],
+        )
+        qt_wl_xdg_shell_code = custom_target(
+            'qt-wayland-xdg-shell-code',
+            output: 'xdg-shell-protocol.c',
+            input: qt_wl_xdg_shell_xml,
+            command: [wayland_scanner, 'private-code', '@INPUT@', '@OUTPUT@'],
+        )
+
+        qt_wayland_sources = [
+            files(
+                'maininterface/qt_wayland_plugin.c',
+                'maininterface/compositor_wayland_module.c',
+                'maininterface/compositor_wayland_module.h',
+                'util/csdmenu_wayland.c',
+                'util/csdmenu_wayland.h',
+                'util/csdmenu_module.h',
+            ),
+            qt_wl_xdg_shell_hdr,
+            qt_wl_xdg_shell_code,
+        ]
+
+        qt_wayland_cargs = ['-DQT_HAS_WAYLAND_PROTOCOLS']
+
+        if qt6_dep.version().version_compare('>= 6.5')
+            qt_wayland_cargs += '-DQT_HAS_WAYLAND_FRACTIONAL_SCALING'
+            qt_wl_viewporter_xml = wayland_protocols_dir / 'stable/viewporter/viewporter.xml'
+            qt_wl_viewporter_hdr = custom_target(
+                'qt-wayland-viewporter-client-header',
+                output: 'viewporter-client-protocol.h',
+                input: qt_wl_viewporter_xml,
+                command: [wayland_scanner, 'client-header', '@INPUT@', '@OUTPUT@'],
+            )
+            qt_wl_viewporter_code = custom_target(
+                'qt-wayland-viewporter-code',
+                output: 'viewporter-protocol.c',
+                input: qt_wl_viewporter_xml,
+                command: [wayland_scanner, 'private-code', '@INPUT@', '@OUTPUT@'],
+            )
+            qt_wayland_sources += [qt_wl_viewporter_hdr, qt_wl_viewporter_code]
+        endif
+
+        vlc_modules += {
+            'name': 'qt_wayland',
+            'sources': qt_wayland_sources,
+            'c_args': qt_wayland_cargs,
+            'include_directories': [qt_include_dir],
+            'dependencies': [wayland_deps[0], m_lib],
+        }
     endif
 
     if host_system == 'windows'

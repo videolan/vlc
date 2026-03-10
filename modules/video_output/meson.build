@@ -40,6 +40,10 @@ endif
 subdir('libplacebo')
 subdir('opengl')
 
+if have_wayland
+    subdir('wayland')
+endif
+
 if host_system == 'windows'
     subdir('win32')
 endif
