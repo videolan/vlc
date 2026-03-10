@@ -278,7 +278,8 @@ next:
             p_prev && p_prev->IsFiniteSize() &&
             p_prev->GetEndPosition() != m_el[mi_level]->GetElementPosition() )
         {
-            msg_Err( p_demux, "Dummy Element at unexpected position... corrupted file?" );
+            msg_Err( p_demux, "Dummy Element at unexpected position (%" PRIu64 " instead of %" PRIu64 ")... corrupted file?",
+                        m_el[mi_level]->GetElementPosition(), p_prev->GetEndPosition() );
             b_bad_position = true;
         }
 
