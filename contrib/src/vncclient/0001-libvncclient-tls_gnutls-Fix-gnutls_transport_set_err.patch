@@ -1,0 +1,66 @@
+From 53b76ce9c8224b9dc9b566c018a07e9e96f2ce4c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 10 Mar 2026 18:47:46 +0200
+Subject: [PATCH 1/2] libvncclient: tls_gnutls: Fix gnutls_transport_set_errno
+ on Windows
+
+gnutls_transport_set_errno takes a plain "gnutls_session_t", not
+a "gnutls_session_t *".
+
+This fixes build errors if building with a recent version of Clang
+targeting Windows:
+
+    libvncserver/src/libvncclient/tls_gnutls.c:161:32: error: incompatible pointer types passing 'gnutls_session_t *' (aka 'struct gnutls_session_int **') to parameter of type 'gnutls_session_t' (aka 'struct gnutls_session_int *'); dereference with * [-Wincompatible-pointer-types]
+      161 |     gnutls_transport_set_errno(session, EAGAIN);
+          |                                ^~~~~~~
+          |                                *
+    x86_64-w64-mingw32/include/gnutls/gnutls.h:2429:50: note: passing argument to parameter 'session' here
+     2429 | void gnutls_transport_set_errno(gnutls_session_t session, int err);
+          |                                                  ^
+---
+ src/libvncclient/tls_gnutls.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/libvncclient/tls_gnutls.c b/src/libvncclient/tls_gnutls.c
+index fe11c529..6e46029a 100644
+--- a/src/libvncclient/tls_gnutls.c
++++ b/src/libvncclient/tls_gnutls.c
+@@ -253,7 +253,7 @@ InitializeTLS(void)
+  * libvncclient are linked to different versions of msvcrt.dll.
+  */
+ #ifdef WIN32
+-static void WSAtoTLSErrno(gnutls_session_t* session)
++static void WSAtoTLSErrno(gnutls_session_t session)
+ {
+   switch(WSAGetLastError()) {
+ #if (GNUTLS_VERSION_NUMBER >= 0x029901)
+@@ -293,7 +293,7 @@ PushTLS(gnutls_transport_ptr_t transport, const void *data, size_t len)
+     if (ret < 0)
+     {
+ #ifdef WIN32
+-      WSAtoTLSErrno((gnutls_session_t*)&client->tlsSession);
++      WSAtoTLSErrno((gnutls_session_t)client->tlsSession);
+ #endif
+       if (errno == EINTR) continue;
+       return -1;
+@@ -315,7 +315,7 @@ PullTLS(gnutls_transport_ptr_t transport, void *data, size_t len)
+     if (ret < 0)
+     {
+ #ifdef WIN32
+-      WSAtoTLSErrno((gnutls_session_t*)&client->tlsSession);
++      WSAtoTLSErrno((gnutls_session_t)client->tlsSession);
+ #endif
+       if (errno == EINTR) continue;
+       return -1;
+@@ -337,7 +337,7 @@ PullTimeout(gnutls_transport_ptr_t transport, unsigned int timeout)
+     if (ret < 0)
+     {
+ #ifdef WIN32
+-      WSAtoTLSErrno((gnutls_session_t*)&client->tlsSession);
++      WSAtoTLSErrno((gnutls_session_t)client->tlsSession);
+ #endif
+       if (errno == EINTR) continue;
+     }
+-- 
+2.43.0
+
