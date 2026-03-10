@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
+SRC_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
 TARGET="${TARGET:-arm-webos-linux-gnueabi}"
 APP_ID="${APP_ID:-org.videolan.vlc}"
 PREFIX="${PREFIX:-/media/developer/apps/usr/palm/applications/${APP_ID}}"
