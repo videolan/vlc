@@ -51,7 +51,7 @@ EbmlParser::~EbmlParser( void )
         return;
     }
 
-    for( int i = 1; i <= mi_level; i++ )
+    for( size_t i = 1; i <= mi_level; i++ )
     {
         if( !mb_keep )
         {
@@ -75,6 +75,7 @@ void EbmlParser::Up( void )
         msg_Warn( p_demux, "MKV/Ebml Parser: Up cannot escape itself" );
     }
 
+    assert(mi_user_level != 0);
     mi_user_level--;
 }
 
@@ -348,7 +349,7 @@ next:
 
 bool EbmlParser::IsTopPresent( EbmlElement *el ) const
 {
-    for( int i = 0; i < mi_level; i++ )
+    for( size_t i = 0; i < mi_level; i++ )
     {
         if( m_el[i] && m_el[i] == el )
             return true;
