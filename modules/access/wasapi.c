@@ -256,6 +256,9 @@ static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client, bool loop,
     /* Request at least thrice the PTS delay */
     REFERENCE_TIME bufsize = caching * INT64_C(10) * 3;
 
+    if (flags == AUDCLNT_STREAMFLAGS_EVENTCALLBACK)
+        bufsize = 0;
+
     hr = IAudioClient_Initialize(client, AUDCLNT_SHAREMODE_SHARED, flags,
                                  bufsize, 0, pwf, NULL);
     CoTaskMemFree(pwf);
