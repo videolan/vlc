@@ -23,6 +23,8 @@ vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz .sum-vncclient
 	$(APPLY) $(SRC)/vncclient/vnc-gnutls-anon.patch
 	$(APPLY) $(SRC)/vncclient/build-add-install-components-for-client-server.patch
 	$(APPLY) $(SRC)/vncclient/CMake-use-Requires-for-.pc-generation-don-t-parse-li.patch
+	$(APPLY) $(SRC)/vncclient/0001-libvncclient-tls_gnutls-Fix-gnutls_transport_set_err.patch
+	$(APPLY) $(SRC)/vncclient/0002-CMake-Fix-the-include-guards-in-rfbconfig.h.patch
 	$(call pkg_static,"src/libvncclient/libvncclient.pc.cmakein")
 	$(MOVE)
 

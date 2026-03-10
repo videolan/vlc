@@ -1,0 +1,40 @@
+From 9c68402d000486b7dee76b104fbb0109836c94f3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 10 Mar 2026 22:16:40 +0200
+Subject: [PATCH 2/2] CMake: Fix the include guards in rfbconfig.h
+
+The include guard shouldn't be a cmakedefine - this is not a 0/1
+define that we expect cmake to configure, it should always be
+defined here.
+
+This avoids warnings like this (when building with Clang, targeting
+Windows), due to rfbconfig.h being included multiple times, when
+building with CMake:
+
+    libvncserver/build/include/rfb/rfbconfig.h:197:13: warning: redefinition of typedef 'socklen_t' is a C11 feature [-Wtypedef-redefinition]
+      197 | typedef int socklen_t;
+          |             ^
+    libvncserver/include/rfb/rfbproto.h:70:10: note: 'libvncserver/build/include/rfb/rfbconfig.h' included multiple times, additional include site here
+       70 | #include <rfb/rfbconfig.h>
+          |          ^
+    libvncserver/include/rfb/threading.h:25:10: note: 'libvncserver/build/include/rfb/rfbconfig.h' included multiple times, additional include site here
+       25 | #include <rfb/rfbconfig.h>
+          |          ^
+---
+ include/rfb/rfbconfig.h.cmakein | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/rfb/rfbconfig.h.cmakein b/include/rfb/rfbconfig.h.cmakein
+index d50c3c96..1256429a 100644
+--- a/include/rfb/rfbconfig.h.cmakein
++++ b/include/rfb/rfbconfig.h.cmakein
+@@ -1,5 +1,5 @@
+ #ifndef _RFB_RFBCONFIG_H
+-#cmakedefine _RFB_RFBCONFIG_H 1
++#define _RFB_RFBCONFIG_H
+  
+ /* rfb/rfbconfig.h. Generated automatically by cmake. */
+ 
+-- 
+2.43.0
+
