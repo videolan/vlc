@@ -30,6 +30,8 @@ WEBOS_QT6_TARGET_BUILD_DIR="${WEBOS_QT6_TARGET_BUILD_DIR:-$HOME/qt6-webos-build-
 WEBOS_QT6_TARGET_MODULES="${WEBOS_QT6_TARGET_MODULES:-qtshadertools,qtdeclarative,qtwayland}"
 WEBOS_QT6_TARGET_TOOLCHAIN_FILE="${WEBOS_QT6_TARGET_TOOLCHAIN_FILE:-}"
 WEBOS_DISABLE_FREETYPE_ON_MISSING_HB="${WEBOS_DISABLE_FREETYPE_ON_MISSING_HB:-1}"
+WEBOS_WAYLAND_WEBOS_PREFIX="${WEBOS_WAYLAND_WEBOS_PREFIX:-}"
+WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR="${WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR:-}"
 
 DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-libaribcaption --disable-ass --disable-vulkan-loader --disable-sidplay2 --disable-vncclient --enable-fluidlite --enable-live555"
 DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-vpx --disable-aom --enable-fluidsynth --disable-openapv --disable-vdpau --disable-caca"
@@ -78,6 +80,8 @@ Environment variables:
     WEBOS_QT6_TARGET_MODULES      ARM Qt6 target modules to build (comma-separated; default: qtshadertools,qtdeclarative,qtwayland).
     WEBOS_QT6_TARGET_TOOLCHAIN_FILE Optional CMake toolchain file for ARM Qt6 target build.
     WEBOS_DISABLE_FREETYPE_ON_MISSING_HB Disable freetype plugin in generated modules/Makefile when hb-ft.h is missing (default: 1).
+    WEBOS_WAYLAND_WEBOS_PREFIX     Optional prefix containing webOS Wayland extension pkgconfig/protocol files.
+    WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR Optional directory containing webOS protocol XMLs (e.g. webos-shell.xml).
 
 Examples:
     WEBOS_SDK_URL=https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz $0 sdk
@@ -611,6 +615,38 @@ prepare_webos_include_flags() {
     done
 }
 
+detect_webos_wayland_extensions() {
+    WEBOS_WAYLAND_WEBOS_FOUND=0
+
+    if [ -n "$WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR" ] && [ -f "$WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR/webos-shell.xml" ]; then
+        WEBOS_WAYLAND_WEBOS_FOUND=1
+        return 0
+    fi
+
+    local candidate
+    for candidate in \
+        "${WEBOS_WAYLAND_WEBOS_PREFIX:+$WEBOS_WAYLAND_WEBOS_PREFIX/share/wayland-webos}" \
+        "$DEPS_PREFIX/share/wayland-webos" \
+        "$SYSROOT/usr/share/wayland-webos"; do
+        [ -n "$candidate" ] || continue
+        if [ -f "$candidate/webos-shell.xml" ]; then
+            WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR="$candidate"
+            WEBOS_WAYLAND_WEBOS_FOUND=1
+            return 0
+        fi
+    done
+
+    if pkg-config --exists wayland-webos-client >/dev/null 2>&1; then
+        local pc_prefix
+        pc_prefix="$(pkg-config --variable=prefix wayland-webos-client 2>/dev/null || true)"
+        if [ -n "$pc_prefix" ] && [ -f "$pc_prefix/share/wayland-webos/webos-shell.xml" ]; then
+            WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR="$pc_prefix/share/wayland-webos"
+            WEBOS_WAYLAND_WEBOS_FOUND=1
+            return 0
+        fi
+    fi
+}
+
 have_cross_pkg() {
     local pkg="$1"
     PKG_CONFIG_SYSROOT_DIR="${PKG_CONFIG_SYSROOT_DIR:-}" \
@@ -829,6 +865,27 @@ if [ "$QT_ENABLED" = "1" ] && [ -n "$WEBOS_QT6_TARGET_PREFIX" ]; then
         export PKG_CONFIG_PATH="$WEBOS_QT6_TARGET_PREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
     fi
 fi
+
+if [ -n "$WEBOS_WAYLAND_WEBOS_PREFIX" ]; then
+    if [ -d "$WEBOS_WAYLAND_WEBOS_PREFIX/lib/pkgconfig" ]; then
+        export PKG_CONFIG_LIBDIR="$WEBOS_WAYLAND_WEBOS_PREFIX/lib/pkgconfig:$PKG_CONFIG_LIBDIR"
+        export PKG_CONFIG_PATH="$WEBOS_WAYLAND_WEBOS_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+    fi
+    if [ -d "$WEBOS_WAYLAND_WEBOS_PREFIX/share/pkgconfig" ]; then
+        export PKG_CONFIG_LIBDIR="$WEBOS_WAYLAND_WEBOS_PREFIX/share/pkgconfig:$PKG_CONFIG_LIBDIR"
+        export PKG_CONFIG_PATH="$WEBOS_WAYLAND_WEBOS_PREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
+    fi
+fi
+
+detect_webos_wayland_extensions
+
+if [ "$WEBOS_WAYLAND_WEBOS_FOUND" = "1" ]; then
+    echo "Detected webOS Wayland extension protocols: $WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR"
+else
+    echo "webOS Wayland extension protocols were not found (optional for current Qt path)."
+    echo "Set WEBOS_WAYLAND_WEBOS_PREFIX or WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR when integrating native webOS compositor protocols."
+fi
+
 export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include${WEBOS_EXTRA_INCLUDE_FLAGS}"
 export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include${WEBOS_EXTRA_INCLUDE_FLAGS}"
 export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include${WEBOS_EXTRA_INCLUDE_FLAGS}"

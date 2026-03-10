@@ -92,3 +92,22 @@ ssh root@<tv-ip> 'cat /media/developer/apps/usr/palm/applications/org.videolan.v
 - Android app build files are in a separate project: `vlc-android`.
 - macOS packaging is under `extras/package/macosx` and `extras/package/apple`.
 - webOS lane in this repo: build contribs, configure, build, install, package with `extras/package/webos/package.sh`.
+
+## 6) "Kodi way" compositor notes (Qt UI + webOS Wayland)
+
+VLC on webOS keeps the Qt UI path, while display integration follows the compositor/Wayland model.
+
+- UI remains in `modules/gui/qt`.
+- Display should prefer Wayland/webOS compositor integration over DRM/KMS assumptions.
+- `extras/package/webos/build-webos.sh` now probes for webOS Wayland extension protocol XMLs (`webos-shell.xml`) in:
+	- `WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR`
+	- `WEBOS_WAYLAND_WEBOS_PREFIX/share/wayland-webos`
+	- `${DEPS_PREFIX}/share/wayland-webos`
+	- `${SYSROOT}/usr/share/wayland-webos`
+
+Optional environment variables:
+
+- `WEBOS_WAYLAND_WEBOS_PREFIX`: prefix containing webOS wayland extension pkgconfig/protocol files.
+- `WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR`: direct path to protocol XML directory.
+
+The probe is informational for now (non-fatal) so existing Qt + Wayland builds remain unchanged, while preparing for native webOS protocol integration in future video/window modules.
