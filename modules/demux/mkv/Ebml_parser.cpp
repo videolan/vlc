@@ -257,7 +257,7 @@ next:
         }
         return NULL;
     }
-    else if( m_el[mi_level] == NULL )
+    if( m_el[mi_level] == NULL )
     {
         msg_Dbg( p_demux,"MKV/Ebml Parser: m_el[mi_level] == NULL" );
         /* go back to the end of the parent */
