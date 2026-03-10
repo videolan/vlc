@@ -51,8 +51,6 @@ Item {
         { name: "minimal", url:"qrc:///qt/qml/VLC/Player/MinimalView.qml" },
     ]
 
-    property var _oldHistoryPath: ([])
-
     function setInitialView() {
         //set the initial view
         if (!MainPlaylistController.empty)
@@ -62,16 +60,25 @@ Item {
     }
 
     function loadCurrentHistoryView(focusReason) {
-        contextSaver.save(_oldHistoryPath)
-
         stackView.loadView(History.viewPath, History.viewProp, focusReason)
 
         contextSaver.restore(History.viewPath)
-        _oldHistoryPath = History.viewPath
     }
 
     ModelSortSettingHandler {
         id: contextSaver
+    }
+
+    Connections {
+        target: MainCtx.sort
+
+        function onCriteriaChanged(criteria) {
+            contextSaver.save(History.viewPath)
+        }
+
+        function onOrderChanged(order) {
+            contextSaver.save(History.viewPath)
+        }
     }
 
     Item {

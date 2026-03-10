@@ -28,8 +28,12 @@ QtObject {
 
     readonly property string _sortCriteriaKey: "sortCriteria"
     readonly property string _sortOrderKey: "sortOrder"
+    property bool _restoring: false
 
     function save(path) {
+        if (_restoring)
+            return
+
         const orderKey = [_sortOrderKey, ...path].join("/")
         const critKey = [_sortCriteriaKey, ...path].join("/")
         if (MainCtx.sort.available) {
@@ -42,6 +46,8 @@ QtObject {
         const orderKey = [_sortOrderKey, ...path].join("/")
         const critKey = [_sortCriteriaKey, ...path].join("/")
 
+        _restoring = true
+
         const criteria = MainCtx.settingValue(critKey, undefined)
         if (criteria !== undefined)
             MainCtx.sort.criteria = criteria
@@ -49,5 +55,8 @@ QtObject {
         const order = MainCtx.settingValue(orderKey, undefined)
         if (order !== undefined)
             MainCtx.sort.order = parseInt(order)
+
+        _restoring = false
     }
+
 }
