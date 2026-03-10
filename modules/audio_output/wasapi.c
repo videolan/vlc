@@ -896,7 +896,9 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     hr = IAudioClient_Initialize(sys->client, shared_mode,
                                  AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
-                                 buffer_duration, 0, pwf, sid);
+                                 buffer_duration,
+                                 shared_mode == AUDCLNT_SHAREMODE_EXCLUSIVE ? buffer_duration : 0,
+                                 pwf, sid);
     CoTaskMemFree(pwf_closest);
     if (FAILED(hr))
     {
