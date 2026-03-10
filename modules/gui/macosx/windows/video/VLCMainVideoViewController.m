@@ -430,6 +430,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
         [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:0.0f];
+        [self->_floatOnTopIndicatorImageView.animator setAlphaValue:0.0f];
     } completionHandler:nil];
 }
 
@@ -477,6 +478,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         self->_isFadingIn = YES;
         [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:1.0f];
+        [self->_floatOnTopIndicatorImageView.animator setAlphaValue:1.0f];
     } completionHandler:^{
         self->_isFadingIn = NO;
         [self startAutohideTimer];
@@ -603,6 +605,12 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 {
     if (self.pipIsActive) {
         return;
+    }
+
+    VLCVideoWindowCommon * const videoWindow =
+        [VLCMain.sharedInstance.voutProvider videoWindowForVoutView:self.voutView];
+    if (videoWindow.fullscreen && !videoWindow.isInNativeFullscreen) {
+        [videoWindow leaveFullscreenWithAnimation:NO];
     }
 
     NSWindow * const window = self.view.window;

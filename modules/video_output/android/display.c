@@ -543,12 +543,8 @@ static void SetVideoLayout(vout_display_t *vd)
     if (!sys->can_set_video_layout)
         return;
 
-    video_format_t rot_fmt;
-    video_format_ApplyRotation(&rot_fmt, vd->source);
-    AWindowHandler_setVideoLayout(sys->awh, rot_fmt.i_width, rot_fmt.i_height,
-                                  rot_fmt.i_visible_width,
-                                  rot_fmt.i_visible_height,
-                                  rot_fmt.i_sar_num, rot_fmt.i_sar_den);
+    AWindowHandler_setVideoLayout(sys->awh, vd->cfg->display.width, vd->cfg->display.height,
+                                  vd->place);
 }
 
 static void UpdateASCGeometry(vout_display_t *vd)
@@ -602,26 +598,25 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
     {
-        msg_Dbg(vd, "change source crop: %ux%u @ %ux%u aspect: %u/%u",
-                vd->source->i_x_offset, vd->source->i_y_offset,
-                vd->source->i_visible_width,
-                vd->source->i_visible_height,
-                vd->source->i_sar_num,
-                vd->source->i_sar_den);
+        if (query == VOUT_DISPLAY_CHANGE_SOURCE_PLACE)
+            msg_Dbg(vd, "change source place: %dx%d @ %ux%u",
+                    vd->place->x, vd->place->y,
+                    vd->place->width, vd->place->height);
+        else
+            msg_Dbg(vd, "change source crop: %ux%u @ %ux%u aspect: %u/%u",
+                    vd->source->i_x_offset, vd->source->i_y_offset,
+                    vd->source->i_visible_width,
+                    vd->source->i_visible_height,
+                    vd->source->i_sar_num,
+                    vd->source->i_sar_den);
         if (sys->asc.sc != NULL)
             UpdateASCGeometry(vd);
         else
             SetVideoLayout(vd);
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        msg_Dbg(vd, "change source place: %dx%d @ %ux%u",
-                vd->place->x, vd->place->y,
-                vd->place->width, vd->place->height);
-        if (sys->asc.sc != NULL)
-            UpdateASCGeometry(vd);
-        return VLC_SUCCESS;
     default:
         msg_Warn(vd, "Unknown request in android-display: %d", query);
         return VLC_EGENERIC;
@@ -633,7 +628,7 @@ static void Close(vout_display_t *vd)
     struct sys *sys = vd->sys;
 
     if (sys->can_set_video_layout)
-        AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0, 0, 0);
+        AWindowHandler_setVideoLayout(sys->awh, 0, 0, vd->place);
 
     if (sys->asc.sc != NULL)
     {

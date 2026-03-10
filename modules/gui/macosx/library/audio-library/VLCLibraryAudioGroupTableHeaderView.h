@@ -27,11 +27,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight;
+extern NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier;
 
 @interface VLCLibraryAudioGroupTableHeaderView : NSTableHeaderView
 
 @property (nullable, nonatomic) VLCLibraryRepresentedItem *representedItem;
+@property (readwrite, nonatomic) BOOL internalPaddingAddedForContentView;
 
+- (instancetype)initWithFrame:(NSRect)frameRect withInternalPaddingAddedForContentView:(BOOL)internalPaddingAddedForContentView;
 - (void)updateWithRepresentedItem:(nullable VLCLibraryRepresentedItem *)representedItem
                     fallbackTitle:(nullable NSString *)fallbackTitle
                    fallbackDetail:(nullable NSString *)fallbackDetail;

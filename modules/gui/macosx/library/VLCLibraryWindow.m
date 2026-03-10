@@ -97,6 +97,7 @@
 #import <vlc_media_library.h>
 #import <vlc_url.h>
 
+const NSUInteger VLCLibrarySearchMaxMatchingTitles = 5;
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
@@ -680,9 +681,9 @@ static int ShowController(vlc_object_t * __unused p_this,
         context.duration = 1.0;
         self.loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
-        NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
-        [views removeObject:self.loadingOverlayView];
-        self.libraryTargetView.subviews = views.copy;
+        NSMutableArray * const mutableSubviews = self.libraryTargetView.subviews.mutableCopy;
+        [mutableSubviews removeObject:self.loadingOverlayView];
+        self.libraryTargetView.subviews = mutableSubviews;
         [self.loadingOverlayView.indicator stopAnimation:self];
     }];
 }
@@ -726,7 +727,7 @@ static int ShowController(vlc_object_t * __unused p_this,
     }
     
     NSArray<NSString *> * const allTitles = libraryModel.listOfMediaTitles;
-    NSMutableArray<NSString *> * const matchingTitles = [NSMutableArray array];
+    NSMutableArray<NSString *> * const matchingTitles = [NSMutableArray arrayWithCapacity:VLCLibrarySearchMaxMatchingTitles];
     
     // Filter titles that match the partial word
     for (NSString * const title in allTitles) {
@@ -734,7 +735,7 @@ static int ShowController(vlc_object_t * __unused p_this,
             continue;
         }
         [matchingTitles addObject:title];
-        if (matchingTitles.count >= 5) {
+        if (matchingTitles.count >= VLCLibrarySearchMaxMatchingTitles) {
             break;
         }
     }

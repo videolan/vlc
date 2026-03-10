@@ -30,6 +30,7 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
@@ -42,11 +43,13 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 @interface VLCLibraryPlaylistDataSource ()
 
-@property (readwrite, atomic) NSArray<VLCMediaLibraryPlaylist *> *playlists;
+@property (readwrite, atomic) NSMutableArray<VLCMediaLibraryPlaylist *> *playlists;
 
 @end
 
 @implementation VLCLibraryPlaylistDataSource
+
+@synthesize headerDelegate;
 
 - (instancetype)init
 {
@@ -120,8 +123,9 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)reloadData
 {
-    self.playlists = [self.libraryModel listOfPlaylistsOfType:self.playlistType];
+    self.playlists = [[self.libraryModel listOfPlaylistsOfType:self.playlistType] mutableCopy];
     [self reloadViews];
+    [self updateHeaderInTableView:self.detailTableView forMasterSelection:self.masterTableView];
 }
 
 - (void)reloadViews
@@ -174,21 +178,18 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
             return;
         }
 
-        NSMutableArray * const mutablePlaylists = self.playlists.mutableCopy;
-
         switch (action) {
             case VLCLibraryDataSourceCacheUpdateAction:
-                [mutablePlaylists replaceObjectAtIndex:idx withObject:playlist];
+                [self.playlists replaceObjectAtIndex:idx withObject:playlist];
                 break;
             case VLCLibraryDataSourceCacheDeleteAction:
-                [mutablePlaylists removeObjectAtIndex:idx];
+                [self.playlists removeObjectAtIndex:idx];
                 break;
             default:
                 NSAssert(false, @"Invalid playlist cache action");
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.playlists = mutablePlaylists.copy;
             [self reloadViewsAtIndex:idx dueToCacheAction:action];
         });
     });
@@ -380,6 +381,32 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
     _playlistType = playlistType;
     [self reloadData];
+}
+
+- (void)updateHeaderInTableView:(NSTableView *)detailTableView forMasterSelection:(NSTableView *)masterTableView
+{
+    if (self.headerDelegate == nil) {
+        return;
+    }
+
+    const NSInteger selectedRow = masterTableView.selectedRow;
+    if (selectedRow < 0 || selectedRow >= self.playlists.count) {
+        [self.headerDelegate updateHeaderForTableView:detailTableView
+                                  withRepresentedItem:nil
+                                        fallbackTitle:_NS("Playlists")
+                                       fallbackDetail:_NS("Select a playlist")];
+        return;
+    }
+
+    const VLCMediaLibraryPlaylist * const playlist = self.playlists[selectedRow];
+    VLCLibraryRepresentedItem * const representedItem =
+        [[VLCLibraryRepresentedItem alloc] initWithItem:playlist
+                                             parentType:self.currentParentType];
+
+    [self.headerDelegate updateHeaderForTableView:detailTableView
+                              withRepresentedItem:representedItem
+                                    fallbackTitle:playlist.primaryDetailString
+                                   fallbackDetail:playlist.secondaryDetailString];
 }
 
 @end

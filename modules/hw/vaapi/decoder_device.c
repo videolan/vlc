@@ -72,6 +72,14 @@ vaapi_InitializeInstance(vlc_object_t *o, VADisplay dpy,
         msg_Err(o, "vaInitialize: %s", vaErrorStr(s));
         goto error;
     }
+
+    const char *vendor = vaQueryVendorString(dpy);
+    if (vendor != NULL && strstr(vendor, "NVDEC") != NULL)
+    {
+        msg_Err(o, "Rejecting VA-API NVDEC driver: %s", vendor);
+        goto error;
+    }
+
     struct vaapi_instance *inst = malloc(sizeof(*inst));
 
     if (unlikely(inst == NULL))
@@ -249,15 +257,15 @@ Open(vlc_decoder_device *device, vlc_window_t *window)
 }
 
 #if defined (HAVE_VA_X11)
-# define PRIORITY 2
+# define PRIORITY 5
 # define SHORTCUT "vaapi_x11"
 # define DESCRIPTION_SUFFIX "X11"
 #elif defined(HAVE_VA_WL)
-# define PRIORITY 2
+# define PRIORITY 5
 # define SHORTCUT "vaapi_wl"
 # define DESCRIPTION_SUFFIX "Wayland"
 #elif defined (HAVE_VA_DRM)
-# define PRIORITY 1
+# define PRIORITY 4
 # define SHORTCUT "vaapi_drm"
 # define DESCRIPTION_SUFFIX "DRM"
 #endif

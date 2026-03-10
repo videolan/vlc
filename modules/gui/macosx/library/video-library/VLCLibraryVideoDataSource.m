@@ -44,8 +44,8 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
 @interface VLCLibraryVideoDataSource ()
 {
-    NSArray *_recentsArray;
-    NSArray *_libraryArray;
+    NSMutableArray *_recentsArray;
+    NSMutableArray *_libraryArray;
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     NSUInteger _priorNumVideoSections;
 }
@@ -170,8 +170,8 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
     [_collectionViewFlowLayout resetLayout];
 
-    self->_recentsArray = [self.libraryModel listOfRecentMedia];
-    self->_libraryArray = [self.libraryModel listOfVideoMedia];
+    self->_recentsArray = [[self.libraryModel listOfRecentMedia] mutableCopy];
+    self->_libraryArray = [[self.libraryModel listOfVideoMedia] mutableCopy];
 
     if (self.masterTableView.dataSource == self) {
         [self.masterTableView reloadData];
@@ -192,34 +192,24 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                         arrayOperation:(void(^)(const NSMutableArray*, const NSUInteger))arrayOperation
                      completionHandler:(void(^)(const NSIndexSet*))completionHandler
 {
-    NSMutableArray *groupMutableCopyArray;
+    NSMutableArray *groupArray;
     switch(group) {
         case VLCMediaLibraryParentGroupTypeVideoLibrary:
-            groupMutableCopyArray = [_libraryArray mutableCopy];
+            groupArray = _libraryArray;
             break;
         case VLCMediaLibraryParentGroupTypeRecentVideos:
-            groupMutableCopyArray = [_recentsArray mutableCopy];
+            groupArray = _recentsArray;
             break;
         default:
             return;
     }
 
-    NSUInteger mediaItemIndex = [self indexOfMediaItem:mediaItem.libraryID inArray:groupMutableCopyArray];
+    const NSUInteger mediaItemIndex = [self indexOfMediaItem:mediaItem.libraryID inArray:groupArray];
     if (mediaItemIndex == NSNotFound) {
         return;
     }
 
-    arrayOperation(groupMutableCopyArray, mediaItemIndex);
-    switch(group) {
-        case VLCMediaLibraryParentGroupTypeVideoLibrary:
-            _libraryArray = [groupMutableCopyArray copy];
-            break;
-        case VLCMediaLibraryParentGroupTypeRecentVideos:
-            _recentsArray = [groupMutableCopyArray copy];
-            break;
-        default:
-            return;
-    }
+    arrayOperation(groupArray, mediaItemIndex);
 
     NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:mediaItemIndex];
     completionHandler(rowIndexSet);

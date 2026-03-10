@@ -188,7 +188,7 @@ void FirstRunWizard::MLaddNewFolder()
     QUrl newEntryPoint = QFileDialog::getExistingDirectoryUrl( this, qtr("Choose a folder to add to the Media Library"),
                                                                QUrl( QDir::homePath() ));
 
-    if( !newEntryPoint.isEmpty() )
+    if( !newEntryPoint.isEmpty() && !mlFoldersEditor->contains( newEntryPoint ) )
         mlFoldersEditor->add( newEntryPoint );
 }
 
@@ -311,7 +311,6 @@ void FirstRunWizard::initializePage( int id )
  * Processes the default options on rejection of the FirstRun Wizard.
  * The default options are:
  * - Yes to metadata
- * - Default folders in the Media Library
  * - System/Auto colour scheme
  * - Modern VLC layout
  */
@@ -329,13 +328,6 @@ void FirstRunWizard::reject()
     config_PutInt( "qt-menubar", 0 );
     config_PutInt( "qt-titlebar", 0 );
     p_intf->p_mi->setPinVideoControls( 0 );
-
-    /* Folders Page settings */
-    if ( mlFoldersEditor )
-    {
-        addDefaults();
-        mlFoldersEditor->commit();
-    }
 
     if( p_intf->p_mi->getMediaLibrary() )
         p_intf->p_mi->getMediaLibrary()->reload();
@@ -362,7 +354,8 @@ void FirstRunWizard::addDefaults()
         if( folder == nullptr )
             continue;
         auto folderMrl = vlc::wrap_cptr( vlc_path2uri( folder.get(), nullptr ) );
-        mlFoldersEditor->add( QUrl( folderMrl.get() ) );
+        if ( !mlFoldersEditor->contains( QUrl( folderMrl.get() ) ) )
+            mlFoldersEditor->add( QUrl( folderMrl.get() ) );
     }
 
     mlDefaults = true;

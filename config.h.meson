@@ -443,6 +443,9 @@
 /* Define to 1 if you have the `vasprintf' function. */
 #mesondefine HAVE_VASPRINTF
 
+/* Define to 1 if vlc_process_Spawn() is usable. */
+#mesondefine HAVE_VLC_PROCESS_SPAWN
+
 /* Define to 1 if you have the `vmsplice' function. */
 #mesondefine HAVE_VMSPLICE
 

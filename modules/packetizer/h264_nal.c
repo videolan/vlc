@@ -154,10 +154,11 @@ bool h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
     /* Read infos in first 6 bytes */
     const uint8_t i_nal_length_size = (p_buf[4] & 0x03) + 1;
 
+    uint8_t *p_ret = NULL;
     uint8_t *p_out_buf = NULL;
     if( i_result > 0 )
     {
-        p_out_buf = malloc( i_result );
+        p_ret = p_out_buf = malloc( i_result );
         if( !p_out_buf )
             return false;
 
@@ -183,7 +184,7 @@ bool h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
         }
     }
 
-    *pp_result = p_out_buf;
+    *pp_result = p_ret;
     *pi_result = i_result;
 
     if ( pi_nal_length_size )

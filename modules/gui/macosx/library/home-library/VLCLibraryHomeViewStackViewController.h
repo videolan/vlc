@@ -40,7 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign, nonatomic) NSEdgeInsets collectionViewSectionInset;
 
 @property (readwrite, weak, nonatomic) NSStackView *collectionsStackView;
-@property (readwrite, weak, nonatomic) NSScrollView *collectionsStackViewScrollView;
 
 @property (readonly) VLCLibraryHomeViewActionsView *actionsView;
 @property (readonly) VLCLibraryHeroView *heroView;

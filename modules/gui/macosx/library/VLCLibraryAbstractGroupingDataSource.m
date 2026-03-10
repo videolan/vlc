@@ -51,6 +51,7 @@
     [self.masterTableView reloadData];
     [self.detailTableView reloadData];
     [self.collectionView reloadData];
+    [self updateHeaderInTableView:self.detailTableView forMasterSelection:self.masterTableView];
 }
 
 - (NSUInteger)indexOfMediaItem:(const int64_t)libraryId inArray:(NSArray const *)array
@@ -103,6 +104,30 @@
     }
 
     return nil;
+}
+
+- (void)updateHeaderInTableView:(NSTableView *)detailTableView forMasterSelection:(NSTableView *)masterTableView
+{
+    if (self.headerDelegate == nil) {
+        return;
+    }
+
+    VLCLibraryRepresentedItem *representedItem = nil;
+    NSString *fallbackTitle = nil;
+    NSString *fallbackDetail = nil;
+
+    const NSInteger selectedRow = masterTableView.selectedRow;
+    if (selectedRow != -1) {
+        const id<VLCMediaLibraryItemProtocol> selectedItem = [self libraryItemAtRow:selectedRow forTableView:masterTableView];
+        representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:selectedItem parentType:self.currentParentType];
+        fallbackTitle = selectedItem.displayString;
+        fallbackDetail = selectedItem.primaryDetailString;
+    }
+
+    [self.headerDelegate updateHeaderForTableView:detailTableView
+                              withRepresentedItem:representedItem
+                                    fallbackTitle:fallbackTitle
+                                   fallbackDetail:fallbackDetail];
 }
 
 - (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem

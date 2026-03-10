@@ -40,6 +40,9 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
+
 #import "library/groups-library/VLCLibraryGroupsDataSource.h"
 
 #import "main/VLCMain.h"
@@ -140,6 +143,8 @@
     _selectedGroupTableView = [[VLCLibraryTableView alloc] init];
     _listViewSplitView = [[NSSplitView alloc] init];
 
+    self.dataSource.headerDelegate = self.tableViewDelegate;
+
     self.groupsTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.selectedGroupTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.listViewSplitView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -185,8 +190,24 @@
     [self.selectedGroupTableView registerNib:tableCellViewNib
                                forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
 
+    CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderViewHeight;
+    if (@available(macOS 26.0, *)) {
+        headerHeight += VLCLibraryUIUnits.largeSpacing * 2;
+    }
+
+    const NSRect headerFrame = NSMakeRect(0.f,
+                                          0.f,
+                                          self.groupsTableView.bounds.size.width,
+                                          headerHeight);
+    _selectedGroupTableHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
+    self.selectedGroupTableHeaderView.autoresizingMask = NSViewWidthSizable;
+
+    self.tableViewDelegate.detailTableHeaderView = self.selectedGroupTableHeaderView;
+
     self.groupsTableView.headerView = nil;
-    self.selectedGroupTableView.headerView = nil;
+    self.selectedGroupTableView.headerView = self.selectedGroupTableHeaderView;
+
+    selectedGroupColumn.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
 
     self.groupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.selectedGroupTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;

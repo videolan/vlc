@@ -23,6 +23,9 @@
 #import "VLCLibraryMasterDetailViewTableViewDelegate.h"
 
 #import "library/VLCLibraryMasterDetailViewTableViewDataSource.h"
+#import "library/VLCLibraryRepresentedItem.h"
+
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 
 @implementation VLCLibraryMasterDetailViewTableViewDelegate
 
@@ -31,7 +34,6 @@
     NSParameterAssert(notification);
     NSTableView * const tableView = (NSTableView *)notification.object;
     NSAssert(tableView, @"Must be a valid table view");
-    const NSInteger selectedRow = tableView.selectedRow;
 
     if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryMasterDetailViewTableViewDataSource)]) {
         return;
@@ -42,7 +44,32 @@
 
     if (tableView == masterDetailViewDataSource.masterTableView) {
         [masterDetailViewDataSource.detailTableView reloadData];
+        [masterDetailViewDataSource updateHeaderInTableView:masterDetailViewDataSource.detailTableView forMasterSelection:tableView];
     }
 }
+
+#pragma mark - VLCLibraryGroupHeaderDelegate
+
+- (void)updateHeaderForTableView:(NSTableView *)tableView
+             withRepresentedItem:(nullable VLCLibraryRepresentedItem *)representedItem
+                   fallbackTitle:(NSString *)fallbackTitle
+                  fallbackDetail:(NSString *)fallbackDetail
+{
+    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryMasterDetailViewTableViewDataSource)]) {
+        return;
+    }
+
+    NSObject<VLCLibraryMasterDetailViewTableViewDataSource> * const masterDetailViewDataSource =
+        (NSObject<VLCLibraryMasterDetailViewTableViewDataSource> *)tableView.dataSource;
+
+    if (tableView != masterDetailViewDataSource.detailTableView) {
+        return;
+    }
+
+    [self.detailTableHeaderView updateWithRepresentedItem:representedItem
+                                            fallbackTitle:fallbackTitle
+                                           fallbackDetail:fallbackDetail];
+}
+
 
 @end

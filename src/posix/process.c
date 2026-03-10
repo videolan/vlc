@@ -27,6 +27,8 @@
 #include <vlc_fs.h>
 #include <vlc_network.h>
 
+static_assert(HAVE_VLC_PROCESS_SPAWN == 1, "mismatching HAVE_VLC_PROCESS_SPAWN declaration");
+
 struct vlc_process {
 
     /* Pid of the linked process */

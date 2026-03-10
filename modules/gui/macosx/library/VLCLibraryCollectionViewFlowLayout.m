@@ -99,10 +99,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 {
     self = [super init];
     if (self) {
-        _mediumHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight]];
-        _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight]];
-        _mediumWidthAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewWidth]];
-        _largeWidthAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewWidth]];
+        _mediumHeightAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight];
+        _largeHeightAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight];
+        _mediumWidthAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewWidth];
+        _largeWidthAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewWidth];
         
         _animationType = VLCExpandAnimationTypeVerticalMedium;
         _prevProvidedAnimationStep = 0;
@@ -126,7 +126,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         generatedAnimationSteps[i] = @(dimension * (progress * progress * progress + 1) + kDetailViewCollapsedHeight);
     }
 
-    return [generatedAnimationSteps copy];
+    return generatedAnimationSteps;
 }
 
 - (CGFloat)currentAnimationStep

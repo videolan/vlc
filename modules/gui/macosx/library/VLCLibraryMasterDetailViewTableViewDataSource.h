@@ -24,12 +24,20 @@
 
 #import "library/VLCLibraryTableViewDataSource.h"
 
+@protocol VLCLibraryGroupHeaderDelegate;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibraryMasterDetailViewTableViewDataSource <VLCLibraryTableViewDataSource>
 
 @property (readwrite, weak) NSTableView *masterTableView;
 @property (readwrite, weak) NSTableView *detailTableView;
+
+@optional
+
+@property (readwrite, weak, nullable) id<VLCLibraryGroupHeaderDelegate> headerDelegate;
+
+- (void)updateHeaderInTableView:(NSTableView *)detailTableView forMasterSelection:(NSTableView *)masterTableView;
 
 @end
 

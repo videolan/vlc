@@ -41,6 +41,8 @@
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "library/playlist-library/VLCLibraryPlaylistDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
@@ -138,6 +140,8 @@
     _detailTableView = [[VLCLibraryTableView alloc] init];
     _listViewSplitView = [[NSSplitView alloc] init];
 
+    self.dataSource.headerDelegate = _tableViewDelegate;
+
     self.masterTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.detailTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.listViewSplitView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -183,8 +187,24 @@
     [self.detailTableView registerNib:tableCellViewNib
                         forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
 
+    CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderViewHeight;
+    if (@available(macOS 26.0, *)) {
+        headerHeight += VLCLibraryUIUnits.largeSpacing * 2;
+    }
+
+    const NSRect headerFrame = NSMakeRect(0.f,
+                                          0.f,
+                                          self.masterTableView.bounds.size.width,
+                                          headerHeight);
+    _detailTableHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
+    self.detailTableHeaderView.autoresizingMask = NSViewWidthSizable;
+
+    self.tableViewDelegate.detailTableHeaderView = self.detailTableHeaderView;
+
     self.masterTableView.headerView = nil;
-    self.detailTableView.headerView = nil;
+    self.detailTableView.headerView = self.detailTableHeaderView;
+
+    detailColumn.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
 
     self.masterTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.detailTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;

@@ -26,6 +26,7 @@ import VLC.MediaLibrary
 import VLC.Util
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Menus
 
 FocusScope {
     id: root
@@ -35,10 +36,21 @@ FocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
 
-    property var sortModel: [
-        { text: qsTr("Alphabetic"),  criteria: "title" },
-        { text: qsTr("Release Year"),  criteria: "release_year" }
+    property var sortModel: MainCtx.gridView ? [
+        { text: qsTr("Title"), criteria: "title" },
+        { text: qsTr("Release Year"), criteria: "release_year" },
+    ] : [
+        { text: qsTr("Title"), criteria: "title" },
+        { text: qsTr("Release Year"), criteria: "release_year" },
+        { text: qsTr("Album Title"), criteria: "album_title" },
+        { text: qsTr("Duration"), criteria: "duration" }
     ]
+
+    property SortMenuAlbums sortMenu: SortMenuAlbums {
+        ctx: MainCtx
+
+        sectionsVisible: !MainCtx.gridView
+    }
 
     property int initialIndex: 0
     property int initialAlbumIndex: 0

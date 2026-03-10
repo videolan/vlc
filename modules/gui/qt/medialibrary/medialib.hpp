@@ -46,6 +46,8 @@ public:
     MediaLib(qt_intf_t* _intf, vlc::playlist::PlaylistController* playlistController, QObject* _parent = nullptr );
     ~MediaLib();
 
+    Q_INVOKABLE static MLItemId deserializeMlItemIdFromString(const QString& serialized_id);
+
     Q_INVOKABLE void addToPlaylist(const MLItemId &itemId, const QStringList &options = {});
     Q_INVOKABLE void addToPlaylist(const QString& mrl, const QStringList &options = {});
     Q_INVOKABLE void addToPlaylist(const QUrl& mrl, const QStringList &options = {});

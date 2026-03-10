@@ -21,6 +21,8 @@
 #include <vlc_spawn.h>
 #include <vlc_fs.h>
 
+static_assert(HAVE_VLC_PROCESS_SPAWN == 1, "mismatching HAVE_VLC_PROCESS_SPAWN declaration");
+
 static void CALLBACK
 vlc_process_WindowsPoll_i11e_wake_self(ULONG_PTR data)
 {

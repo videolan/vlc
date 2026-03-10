@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCSubScrollView : NSScrollView
 
-@property (readwrite, weak) NSScrollView *parentScrollView;
 @property (readwrite, assign) BOOL scrollParentY;
 @property (readwrite, assign) BOOL scrollParentX;
 @property (readwrite, assign) BOOL scrollSelf;

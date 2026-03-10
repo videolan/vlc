@@ -77,7 +77,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 @interface VLCLibraryAudioDataSource ()
 
-@property (readwrite, atomic) NSArray *displayedCollection;
+@property (readwrite, atomic) NSMutableArray *displayedCollection;
 @property (readonly) BOOL displayAllArtistsGenresTableEntry;
 
 @end
@@ -531,10 +531,9 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     _displayedCollectionUpdating = YES;
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.displayedCollection = [self collectionToDisplay];
+        self.displayedCollection = [[self collectionToDisplay] mutableCopy];
 
         if (self.displayAllArtistsGenresTableEntry) {
-            NSMutableArray * const mutableCollectionCopy = self.displayedCollection.mutableCopy;
             VLCLibraryAllAudioGroupsMediaLibraryItem *group;
 
             if (self->_currentParentType == VLCMediaLibraryParentGroupTypeGenre) {
@@ -544,8 +543,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
             }
 
             NSAssert(group != nil, @"All items group should not be nil");
-            [mutableCollectionCopy insertObject:group atIndex:0];
-            self.displayedCollection = mutableCollectionCopy;
+            [self.displayedCollection insertObject:group atIndex:0];
         }
 
         self->_displayedCollectionUpdating = NO;
@@ -578,9 +576,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
             return;
         }
 
-        NSMutableArray * const mutableCollectionCopy = [self.displayedCollection mutableCopy];
-        [mutableCollectionCopy replaceObjectAtIndex:index withObject:item];
-        self.displayedCollection = [mutableCollectionCopy copy];
+        [self.displayedCollection replaceObjectAtIndex:index withObject:item];
 
         NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
         NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
@@ -606,9 +602,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
             return;
         }
 
-        NSMutableArray * const mutableCollectionCopy = [self.displayedCollection mutableCopy];
-        [mutableCollectionCopy removeObjectAtIndex:index];
-        self.displayedCollection = [mutableCollectionCopy copy];
+        [self.displayedCollection removeObjectAtIndex:index];
 
         NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
         NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
@@ -718,17 +712,17 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     NSString *fallbackTitle = nil;
     NSString *fallbackDetail = nil;
 
-    if (self.displayAllArtistsGenresTableEntry && selectedRow == 0) {
-        fallbackTitle = (self.currentParentType == VLCMediaLibraryParentGroupTypeGenre)
-            ? _NS("All genres")
-            : _NS("All artists");
-        if (selectedItem != nil) {
-            fallbackDetail = selectedItem.primaryDetailString;
-        }
-    } else if (selectedItem != nil) {
+    if (selectedItem != nil) {
         representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:selectedItem parentType:self.currentParentType];
-        fallbackTitle = selectedItem.displayString;
         fallbackDetail = selectedItem.primaryDetailString;
+
+        if (self.displayAllArtistsGenresTableEntry && selectedRow == 0) {
+            fallbackTitle = (self.currentParentType == VLCMediaLibraryParentGroupTypeGenre)
+                ? _NS("All genres")
+                : _NS("All artists");
+        } else {
+            fallbackTitle = selectedItem.displayString;
+        }
     }
 
     [self.headerDelegate updateHeaderForTableView:tableView
@@ -870,7 +864,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         albumSupplementaryDetailView.representedItem = representedItem;
         albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
-        albumSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
         VLCLibraryCollectionViewFlowLayout *flowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;

@@ -54,6 +54,7 @@
 #include <QMimeData>
 #include <QDropEvent>
 #include <QRegularExpression>
+#include <QPushButton>
 
 #define I_DEVICE_TOOLTIP \
     I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
@@ -686,6 +687,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
 {
     ui.setupUi( this );
     connect( ui.urlComboBox, &QComboBox::editTextChanged, this, &NetOpenPanel::updateMRL );
+    connect( ui.clearHistoryButton, &QPushButton::clicked, this, &NetOpenPanel::clearHistory );
 
     /* */
     if( var_InheritBool( p_intf, "save-recentplay" ) )
@@ -696,7 +698,10 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
         ui.urlComboBox->setMaxCount( 10 );
     }
     else
+    {
         b_recentList = false;
+        ui.clearHistoryButton->setEnabled( false );
+    }
 
     QFont smallFont = QApplication::font();
     smallFont.setPointSize( smallFont.pointSize() - 1 );
@@ -766,6 +771,17 @@ void NetOpenPanel::updateMRL()
 
     qsl << url;
     emit mrlUpdated( qsl, "" );
+}
+
+void NetOpenPanel::clearHistory()
+{
+    if( !b_recentList ) return;
+    
+    // Clear the combobox contents
+    ui.urlComboBox->clear();
+    
+    // Clear the stored history
+    getSettings()->remove( "OpenDialog/netMRL" );
 }
 
 /**************************************************************************

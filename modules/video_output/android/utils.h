@@ -331,9 +331,8 @@ int AWindowHandler_getCapabilities(AWindowHandler *p_awh);
  * Should be called only if AWindowHandler_getCapabilities() has AWH_CAPS_SET_VIDEO_LAYOUT
  */
 int AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
-                                  int i_width, int i_height,
-                                  int i_visible_width, int i_visible_height,
-                                  int i_sar_num, int i_sar_den);
+                                  int i_display_width, int i_display_height,
+                                  const vout_display_place_t *);
 
 /**
  * Attach a SurfaceTexture to the OpenGL ES context that is current on the

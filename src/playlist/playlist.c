@@ -22,10 +22,6 @@
 # include "config.h"
 #endif
 
-#ifdef __APPLE__
-# include <TargetConditionals.h>
-#endif
-
 #include "playlist.h"
 
 #include <vlc_common.h>
@@ -56,7 +52,11 @@ vlc_playlist_New(vlc_object_t *parent, enum vlc_playlist_preparsing rec,
             .types = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL,
             .max_parser_threads = preparse_max_threads,
             .timeout = preparse_timeout,
+#if !defined(HAVE_VLC_PROCESS_SPAWN)
+            .external_process = false,
+#else
             .external_process = use_external_preparser,
+#endif
         };
         playlist->parser = vlc_preparser_New(parent, &cfg);
         if (playlist->parser == NULL)

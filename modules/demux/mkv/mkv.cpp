@@ -601,7 +601,6 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
         size_t extra_data = track.fmt.i_codec == VLC_CODEC_PRORES ? 8 : 0;
 
         if( track.i_compression_type == MATROSKA_COMPRESSION_HEADER &&
-            track.p_compression_data != NULL &&
             track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
             p_block = MemToBlock( data->Buffer(), data->Size(), track.p_compression_data->GetSize() + extra_data );
         else if( unlikely( track.fmt.i_codec == VLC_CODEC_WAVPACK ) )
@@ -745,7 +744,13 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
                     vlc_ancillary_CreateWithFreeCb(alpha_data, VLC_ANCILLARY_ID_VPX_ALPHA,
                                                    ReleaseVpxAlpha);
                 if (likely(alpha != NULL))
-                    vlc_frame_AttachAncillary(p_block, alpha);
+                {
+                    if(vlc_frame_AttachAncillary(p_block, alpha) != VLC_SUCCESS){
+                        vlc_ancillary_Release(alpha);
+                        block_Release(p_block);
+                        return;
+                    }
+                }
                 else
                 {
                     ReleaseVpxAlpha(alpha_data);

@@ -66,6 +66,21 @@ void MLFoldersEditor::add(const QUrl &mrl)
     newRow(mrl);
 }
 
+bool MLFoldersEditor::contains(const QUrl &url)
+{
+    for ( const auto &newEntry : m_newEntries )
+    {
+        if ( newEntry.isLocalFile() && url.isLocalFile() )
+        {
+            if ( newEntry.matches( url, QUrl::StripTrailingSlash | QUrl::NormalizePathSegments ))
+                return true;
+        }
+        else if ( newEntry.matches( url, QUrl::NormalizePathSegments ))
+            return true;
+    }
+    return false;
+}
+
 void MLFoldersEditor::commit()
 {
     for ( const auto &removeEntry : m_removeEntries )

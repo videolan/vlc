@@ -39,7 +39,7 @@
 
     [self.inputNodePathControlItems setObject:inputNodePathControlItem forKey:inputNodePathControlItem.image.accessibilityDescription];
 
-    NSMutableArray * const pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    NSMutableArray * const pathItems = self.pathItems.mutableCopy;
     [pathItems addObject:inputNodePathControlItem];
     self.pathItems = pathItems;
 }
@@ -51,7 +51,7 @@
         return;
     }
 
-    NSMutableArray * const pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    NSMutableArray * const pathItems = self.pathItems.mutableCopy;
     NSPathControlItem * const lastItem = pathItems.lastObject;
 
     [pathItems removeLastObject];
@@ -79,7 +79,7 @@
         return;
     }
 
-    NSMutableArray<NSPathControlItem *> * const pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    NSMutableArray<NSPathControlItem *> * const pathItems = self.pathItems.mutableCopy;
     NSArray<NSPathControlItem *> * const itemsToRemove = [pathItems subarrayWithRange:NSMakeRange(indexOfItem + 1, pathItems.count - indexOfItem - 1)];
     NSMutableArray<NSString *> * const itemIdsToRemove = [NSMutableArray arrayWithCapacity:itemsToRemove.count];
 

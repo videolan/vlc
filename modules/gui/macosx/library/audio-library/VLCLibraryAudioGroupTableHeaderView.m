@@ -28,8 +28,10 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
+NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAudioGroupTableHeaderView";
 
 @interface VLCLibraryAudioGroupTableHeaderView ()
 
@@ -41,6 +43,9 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
 @property NSTextField *detailField;
 @property NSButton *playButton;
 @property NSButton *queueButton;
+
+@property CGFloat backgroundTopInset;
+@property CGFloat backgroundBottomInset;
 
 @end
 
@@ -64,12 +69,21 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     return self;
 }
 
+- (instancetype)initWithFrame:(NSRect)frameRect withInternalPaddingAddedForContentView:(BOOL)internalPaddingAddedForContentView
+{
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        _internalPaddingAddedForContentView = internalPaddingAddedForContentView;
+        [self commonInit];
+    }
+    return self;
+}
 
 - (void)commonInit
 {
     NSView *contentHostView = self;
-    const CGFloat backgroundTopInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing;
-    CGFloat backgroundBottomInset = 0.f;
+    self.backgroundTopInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing;
+    self.backgroundBottomInset = 0.f;
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
     if (@available(macOS 26.0, *)) {
@@ -80,7 +94,7 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
         glassView.contentView = glassContentView;
         self.backgroundView = glassView;
         contentHostView = glassContentView;
-        backgroundBottomInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
+        self.backgroundBottomInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
     } else
 #endif
     if (@available(macOS 10.14, *)) {
@@ -135,16 +149,16 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
     const CGFloat horizontalContentInset = VLCLibraryUIUnits.mediumSpacing;
 
     [NSLayoutConstraint activateConstraints:@[
-        [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor constant:backgroundTopInset],
-        [self.backgroundView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
-        [self.backgroundView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
-        [self.backgroundView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-backgroundBottomInset],
         [labelsStack.leadingAnchor constraintEqualToAnchor:contentHostView.leadingAnchor constant:horizontalContentInset],
         [labelsStack.centerYAnchor constraintEqualToAnchor:contentHostView.centerYAnchor],
         [contentHostView.trailingAnchor constraintEqualToAnchor:buttonsStack.trailingAnchor constant:horizontalContentInset],
         [buttonsStack.centerYAnchor constraintEqualToAnchor:contentHostView.centerYAnchor],
         [buttonsStack.leadingAnchor constraintGreaterThanOrEqualToAnchor:labelsStack.trailingAnchor constant:VLCLibraryUIUnits.largeSpacing],
     ]];
+    [self updateBackgroundConstraints];
+
+    self.layer = [CALayer new];
+    self.layer.backgroundColor = NSColor.clearColor.CGColor;
 
     if (@available(macOS 26.0, *)) {
     } else {
@@ -160,6 +174,27 @@ const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
                                                 context:nil];
         }
     }
+}
+
+- (void)updateBackgroundConstraints
+{
+    if (!self.internalPaddingAddedForContentView) {
+        [self.backgroundView applyConstraintsToFillSuperview];
+        return;
+    }
+    [NSLayoutConstraint activateConstraints:@[
+        [self.backgroundView.topAnchor constraintEqualToAnchor:self.topAnchor constant:self.backgroundTopInset],
+        [self.backgroundView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [self.backgroundView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [self.backgroundView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-self.backgroundBottomInset],
+    ]];
+}
+
+- (void)setInternalPaddingAddedForContentView:(BOOL)internalPaddingAddedForContentView
+{
+    if (_internalPaddingAddedForContentView == internalPaddingAddedForContentView) return;
+    _internalPaddingAddedForContentView = internalPaddingAddedForContentView;
+    [self updateBackgroundConstraints];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath

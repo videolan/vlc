@@ -47,6 +47,8 @@ typedef struct {
     CUgraphicsResource cu_res[PICTURE_PLANE_MAX]; // Y, UV for NV12/P010
     CUarray mappedArray[PICTURE_PLANE_MAX];
 
+    unsigned pixel_size;
+
     struct {
         PFNGLBINDTEXTUREPROC BindTexture;
         PFNGLGETERRORPROC GetError;
@@ -122,11 +124,9 @@ tc_nvdec_gl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
             .srcY           = srcY,
             .dstMemoryType = CU_MEMORYTYPE_ARRAY,
             .dstArray = p_sys->mappedArray[i],
-            .WidthInBytes = tex_widths[0],
+            .WidthInBytes = tex_widths[0] * p_sys->pixel_size,
             .Height = tex_heights[i],
         };
-        if (interop->fmt_in.i_chroma != VLC_CODEC_NVDEC_OPAQUE && interop->fmt_in.i_chroma != VLC_CODEC_NVDEC_OPAQUE_444)
-            cu_cpy.WidthInBytes *= 2;
         result = CALL_CUDA(cuMemcpy2DAsync, &cu_cpy, 0);
         if (result != VLC_SUCCESS)
             goto error;
@@ -207,6 +207,13 @@ static int Open(struct vlc_gl_interop *interop)
     video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
     vlc_fourcc_t render_chroma = NVDECToVlcChroma(interop->fmt_in.i_chroma);
+    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(render_chroma);
+    if (desc == NULL)
+    {
+        vlc_decoder_device_Release(device);
+        return VLC_EGENERIC;
+    }
+    p_sys->pixel_size = desc->pixel_size;
     switch (render_chroma)
     {
         case VLC_CODEC_P010:

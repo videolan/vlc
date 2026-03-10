@@ -51,30 +51,33 @@
 - (void)scrollWheel:(NSEvent *)event
 {
     if (!_scrollSelf) {
-        [_parentScrollView scrollWheel:event];
+        [self.nextResponder scrollWheel:event];
         return;
     }
 
-    [super scrollWheel:event];
-
-    if(_parentScrollView == nil || (!_scrollParentX && !_scrollParentY)) {
+    if (!_scrollParentX && !_scrollParentY) {
+        [super scrollWheel:event];
         return;
     }
 
-    // Sometimes scroll views initialise with the Y value being almost 0, but not quite (e.g. 0.000824)
-    const BOOL isViewAtYStartAndScrollUp = self.verticalScroller.floatValue <= 0.01 && event.deltaY > 0;
-    const BOOL isViewAtYEndAndScrollDown = self.verticalScroller.floatValue >= 0.99 && event.deltaY < 0;
-    const BOOL isViewAtXStartAndScrollLeft = self.horizontalScroller.floatValue <= 0.01 && event.deltaX > 0;
-    const BOOL isViewAtXEndAndScrollRight = self.horizontalScroller.floatValue >= 0.99 && event.deltaX < 0;
+    const NSRect documentVisibleRect = self.documentVisibleRect;
+    const NSRect documentFrame = self.documentView.frame;
 
-    const BOOL isSubScrollViewScrollableY = self.documentView.frame.size.height > self.documentVisibleRect.size.height;
-    const BOOL isSubScrollViewScrollableX = self.documentView.frame.size.width > self.documentVisibleRect.size.width;
+    const BOOL isViewAtYStartAndScrollUp = NSMinY(documentVisibleRect) <= NSMinY(documentFrame) + 1.0 && event.deltaY > 0;
+    const BOOL isViewAtYEndAndScrollDown = NSMaxY(documentVisibleRect) >= NSMaxY(documentFrame) - 1.0 && event.deltaY < 0;
+    const BOOL isViewAtXStartAndScrollLeft = NSMinX(documentVisibleRect) <= NSMinX(documentFrame) + 1.0 && event.deltaX > 0;
+    const BOOL isViewAtXEndAndScrollRight = NSMaxX(documentVisibleRect) >= NSMaxX(documentFrame) - 1.0 && event.deltaX < 0;
+
+    const BOOL isSubScrollViewScrollableY = NSHeight(documentFrame) > NSHeight(documentVisibleRect);
+    const BOOL isSubScrollViewScrollableX = NSWidth(documentFrame) > NSWidth(documentVisibleRect);
 
     const BOOL shouldScrollParentY = _scrollParentY && (!isSubScrollViewScrollableY || isViewAtYStartAndScrollUp || isViewAtYEndAndScrollDown);
     const BOOL shouldScrollParentX = _scrollParentX && (!isSubScrollViewScrollableX || isViewAtXStartAndScrollLeft || isViewAtXEndAndScrollRight);
 
-    if(shouldScrollParentY || shouldScrollParentX) {
-        [_parentScrollView scrollWheel:event];
+    if (shouldScrollParentY || shouldScrollParentX) {
+        [self.nextResponder scrollWheel:event];
+    } else {
+        [super scrollWheel:event];
     }
 }
 

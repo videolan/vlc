@@ -140,6 +140,9 @@ FocusScope {
                                                       // contextButton is implemented as fixed column
                                                       - VLCStyle.contextButton_width - (VLCStyle.contextButton_margin * 2)
 
+    property bool sortingFromHeader: true
+    property bool useCurrentSectionLabel: true
+
     // Aliases
 
     property alias topMargin: view.topMargin
@@ -151,6 +154,8 @@ FocusScope {
     property alias selectionModel: view.selectionModel
 
     property alias delegate: view.delegate
+
+    property alias contentItem: view.contentItem
 
     property alias contentY     : view.contentY
     property alias contentHeight: view.contentHeight
@@ -189,6 +194,8 @@ FocusScope {
     property alias reuseItems: view.reuseItems
 
     readonly property var itemAtIndex: view.itemAtIndex
+
+    property alias currentSection: view.currentSection
 
     // Signals
 
@@ -310,7 +317,8 @@ FocusScope {
 
                 text: view.currentSection
                 color: view.colorContext.accent
-                visible: view.headerPositioning === ListView.OverlayHeader
+                visible: root.useCurrentSectionLabel
+                         && view.headerPositioning === ListView.OverlayHeader
                          && text !== ""
                          && view.contentY > (row.height - col.height - row.topPadding)
                          && row.visible
@@ -398,6 +406,8 @@ FocusScope {
 
                             TapHandler {
                                 onTapped: (eventPoint, button) => {
+                                    if (!root.sortingFromHeader)
+                                        return
                                     if (!(modelData.model.isSortable ?? true))
                                         return
                                     else if (root.model.sortCriteria !== modelData.model.criteria)

@@ -249,9 +249,11 @@ int main( void )
     test_thumbnails( vlc, false );
     test_cancel_thumbnail( vlc, false );
 
+#if !defined(HAVE_VLC_PROCESS_SPAWN)
     fprintf(stderr, "Run with external preparser...\n");
     test_thumbnails( vlc, true );
     test_cancel_thumbnail( vlc, true );
+#endif
 
 
     libvlc_release( vlc );

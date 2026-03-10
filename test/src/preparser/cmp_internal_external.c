@@ -254,6 +254,9 @@ static void test_preparser_cmp(vlc_object_t *obj, int i)
 
 int main( void )
 {
+#if !defined(HAVE_VLC_PROCESS_SPAWN)
+    return 77;
+#else
     test_init();
 
     static const char * argv[] = {
@@ -268,4 +271,5 @@ int main( void )
     }
 
     libvlc_release( vlc );
+#endif
 }

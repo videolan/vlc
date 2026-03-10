@@ -215,6 +215,25 @@ void SortMenuVideo::onPopup(QMenu * menu) /* override */
     }
 }
 
+void SortMenuAlbums::onPopup(QMenu *menu)
+{
+    if (!m_sectionsVisible)
+        return;
+
+    assert(m_ctx);
+    assert(menu);
+
+    menu->addSeparator();
+
+    QAction *action = menu->addAction(qtr("Album sections"));
+    action->setCheckable(true);
+    action->setChecked(m_ctx->albumSections());
+    connect(action, &QAction::toggled, this, [this] (bool enabled) {
+        if (Q_LIKELY(m_ctx))
+            m_ctx->setAlbumSections(enabled);
+    });
+}
+
 QmlGlobalMenu::QmlGlobalMenu(QObject *parent)
     : VLCMenuBar(parent)
 {

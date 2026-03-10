@@ -321,6 +321,7 @@ MainCtx::~MainCtx()
 
     settings->setValue( "grid-view", m_gridView );
     settings->setValue( "grouping", m_grouping );
+    settings->setValue( "album-sections", m_albumSections );
 
     settings->setValue( "color-scheme-index", m_colorScheme->currentIndex() );
     /* Save the stackCentralW sizes */
@@ -467,6 +468,8 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
     loadFromSettings(m_grouping, "MainWindow/grouping", GROUPING_NONE, &MainCtx::groupingChanged);
 
     loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainCtx::showRemainingTimeChanged);
+
+    loadFromSettings(m_albumSections, "MainWindow/album-sections", true, &MainCtx::albumSectionsChanged);
 
     const auto colorSchemeIndex = getSettings()->value( "MainWindow/color-scheme-index", 0 ).toInt();
     m_colorScheme->setCurrentIndex(colorSchemeIndex);
@@ -713,6 +716,15 @@ void MainCtx::setGrouping(Grouping grouping)
     m_grouping = grouping;
 
     emit groupingChanged(grouping);
+}
+
+void MainCtx::setAlbumSections(bool enabled)
+{
+    if (m_albumSections == enabled)
+        return;
+
+    m_albumSections = enabled;
+    emit albumSectionsChanged(enabled);
 }
 
 void MainCtx::setInterfaceAlwaysOnTop( bool on_top )

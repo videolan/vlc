@@ -958,6 +958,7 @@ libqt_plugin_la_RES = \
 	pixmaps/sd/pictures.svg \
 	pixmaps/sd/playlist.svg \
 	pixmaps/sd/podcast.svg \
+	pixmaps/sd/radio.svg \
 	pixmaps/sd/screen.svg \
 	pixmaps/sd/stream.svg \
 	pixmaps/sd/unknown.svg
@@ -1043,7 +1044,8 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/VideoGridItem.qml \
 	medialibrary/qml/VideoInfoExpandPanel.qml \
 	medialibrary/qml/VideoListDisplay.qml \
-	medialibrary/qml/VideoGridDisplay.qml
+	medialibrary/qml/VideoGridDisplay.qml \
+	medialibrary/qml/MusicAlbumSectionDelegate.qml
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary_qmlassets.cpp
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : $(builddir)/medialibrary/res.qrc
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/medialibrary/res.qrc

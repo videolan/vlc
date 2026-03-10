@@ -1168,17 +1168,20 @@ AWindowHandler_getCapabilities(AWindowHandler *p_awh)
 
 int
 AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
-                              int i_width, int i_height,
-                              int i_visible_width, int i_visible_height,
-                              int i_sar_num, int i_sar_den)
+                              int i_display_width, int i_display_height,
+                              const vout_display_place_t *place)
 {
     assert(p_awh->capabilities & AWH_CAPS_SET_VIDEO_LAYOUT);
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
     if (!p_env)
         return VLC_EGENERIC;
 
-    JNI_ANWCALL(CallVoidMethod, setVideoLayout, i_width, i_height,
-                i_visible_width,i_visible_height, i_sar_num, i_sar_den);
+    vout_display_place_t zero = {0};
+    if (place == NULL)
+        place = &zero;
+
+    JNI_ANWCALL(CallVoidMethod, setVideoLayout, i_display_width, i_display_height,
+                (int)place->width, (int)place->height, place->x, place->y);
     return VLC_SUCCESS;
 }
 

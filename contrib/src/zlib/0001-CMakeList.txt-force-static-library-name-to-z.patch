@@ -1,34 +1,32 @@
-From 32e97d1efafa48d81c3d019d7d5fe7083a812768 Mon Sep 17 00:00:00 2001
+From 2a425593750d2056fb45ee452835cbebb0c060a9 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 12 Feb 2024 20:39:05 +0100
 Subject: [PATCH] CMakeList.txt: force static library name to `z`
 
-They build code in a UNIX like environment but CMake doesn't set UNIX
-for it.
-
-In contribs, we can always enforce this value.
-
-Co-authored-by: Alexandre Janniaux <ajanni@videolabs.io>
+Otherwise it doesn't match the name in the pkg-config file.
 ---
- CMakeLists.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ CMakeLists.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 15ceebe..c952cde 100644
+index e103c40..438ec64 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -167,9 +167,9 @@ if(NOT CYGWIN)
-     set_target_properties(zlib PROPERTIES VERSION ${ZLIB_FULL_VERSION})
- endif()
+@@ -149,10 +149,10 @@ set(ZLIB_SRCS
+     uncompr.c
+     zutil.c)
  
-+# On unix-like platforms the library is almost always called libz
-+set_target_properties(zlib zlibstatic PROPERTIES OUTPUT_NAME z)
- if(UNIX)
--    # On unix-like platforms the library is almost always called libz
--   set_target_properties(zlib zlibstatic PROPERTIES OUTPUT_NAME z)
-    if(NOT APPLE AND NOT(CMAKE_SYSTEM_NAME STREQUAL AIX))
-      set_target_properties(zlib PROPERTIES LINK_FLAGS "-Wl,--version-script,\"${CMAKE_CURRENT_SOURCE_DIR}/zlib.map\"")
-    endif()
+-if(WIN32)
+-    set(zlib_static_suffix "s")
+-    set(CMAKE_DEBUG_POSTFIX "d")
+-endif(WIN32)
++# if(WIN32)
++#     set(zlib_static_suffix "s")
++#     set(CMAKE_DEBUG_POSTFIX "d")
++# endif(WIN32)
+ 
+ if(ZLIB_BUILD_SHARED)
+     add_library(
 -- 
-2.43.0
+2.52.0.windows.1
 

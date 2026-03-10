@@ -257,14 +257,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
         VLCLibraryTableCellView * const cellView =
             [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
-        [VLCLibraryImageCache thumbnailForInputItem:inputNode.inputItem
-                                     withCompletion:^(NSImage * _Nullable image) {
-            cellView.representedImageView.image = image;
-        }];
+        cellView.representedInputItem = inputNode.inputItem;
         cellView.primaryTitleTextField.hidden = YES;
         cellView.secondaryTitleTextField.hidden = YES;
-        cellView.singlePrimaryTitleTextField.hidden = NO;
-        cellView.singlePrimaryTitleTextField.stringValue = inputNode.inputItem.name;
         return cellView;
     }
 

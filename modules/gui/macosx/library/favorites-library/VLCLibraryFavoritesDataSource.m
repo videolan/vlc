@@ -162,15 +162,17 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 
 - (void)updateVisibleSectionMapping
 {
-    NSMutableArray<NSNumber *> * const visibleSections = [NSMutableArray array];
-    
-    for (NSUInteger i = 0; i < VLCLibraryFavoritesSectionCount; i++) {
+    NSMutableArray<NSNumber *> * const visibleSections = [NSMutableArray arrayWithCapacity:VLCLibraryFavoritesSectionCount];
+    for (NSUInteger i = 1; i < VLCLibraryFavoritesSectionCount; i++) {
         NSArray * const sectionArray = [self arrayForSection:i];
         if (sectionArray.count > 0) {
             [visibleSections addObject:@(i)];
         }
     }
-    
+    if (visibleSections.count > 1) {
+        [visibleSections insertObject:@(VLCLibraryFavoritesSectionAllFavorites) atIndex:0];
+    }
+
     _visibleSectionMapping = [visibleSections copy];
 }
 

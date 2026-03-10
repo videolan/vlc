@@ -45,12 +45,11 @@
 #import "library/favorites-library/VLCLibraryFavoritesTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
-#import "library/VLCLibraryGroupHeaderDelegate.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
 #import "main/VLCMain.h"
 
-@interface VLCLibraryFavoritesViewController () <VLCLibraryGroupHeaderDelegate>
+@interface VLCLibraryFavoritesViewController ()
 {
     VLCLibraryFavoritesTableViewDelegate *_favoritesLibraryTableViewDelegate;
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
@@ -119,6 +118,7 @@
     _favoritesHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame];
     _favoritesHeaderView.autoresizingMask = NSViewWidthSizable;
 
+    _favoritesLibraryTableViewDelegate.detailTableHeaderView = self.favoritesHeaderView;
     self.favoritesLibraryGroupSelectionTableView.headerView = self.favoritesHeaderView;
 
     NSTableColumn * const groupsColumn = [[NSTableColumn alloc] initWithIdentifier:@"groups"];
@@ -145,6 +145,7 @@
                                                 forIdentifier:VLCAudioLibraryCellIdentifier];
     
     self.favoritesLibraryGroupsTableView.headerView = nil;
+    self.favoritesLibraryGroupsTableView.allowsEmptySelection = NO;
     
     self.favoritesLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.favoritesLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
@@ -224,7 +225,7 @@
     self.libraryFavoritesDataSource.collectionView = self.favoritesLibraryCollectionView;
     self.libraryFavoritesDataSource.masterTableView = self.favoritesLibraryGroupsTableView;
     self.libraryFavoritesDataSource.detailTableView = self.favoritesLibraryGroupSelectionTableView;
-    self.libraryFavoritesDataSource.headerDelegate = self;
+    self.libraryFavoritesDataSource.headerDelegate = _favoritesLibraryTableViewDelegate;
     
     self.favoritesLibraryCollectionView.dataSource = self.libraryFavoritesDataSource;
     
@@ -450,22 +451,6 @@
     if (self.libraryWindow.librarySegmentType == VLCLibraryFavoritesSegmentType) {
         [self updatePresentedFavoritesView];
     }
-}
-
-#pragma mark - VLCLibraryGroupHeaderDelegate
-
-- (void)updateHeaderForTableView:(NSTableView *)tableView
-            withRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
-                  fallbackTitle:(NSString *)fallbackTitle
-                 fallbackDetail:(NSString *)fallbackDetail
-{
-    if (tableView != self.favoritesLibraryGroupSelectionTableView) {
-        return;
-    }
-
-    [self.favoritesHeaderView updateWithRepresentedItem:representedItem
-                                          fallbackTitle:fallbackTitle
-                                         fallbackDetail:fallbackDetail];
 }
 
 @end

@@ -30,6 +30,7 @@
 #endif
 
 #define _DECL_DLLMAIN
+#include <windows.h>
 #include <process.h>
 #include <vlc_common.h>
 #include <vlc_threads.h>
@@ -685,7 +686,7 @@ void vlc_threads_setup(libvlc_int_t *vlc)
 
 #define LOOKUP(s) (((s##_) = (s##_ptr)GetProcAddress(h, #s)) != NULL)
 
-int __stdcall DllMain (void *hinstDll, unsigned long fdwReason, void *lpvReserved)
+int __stdcall DllMain (void *hinstDll, DWORD fdwReason, void *lpvReserved)
 {
     (void) hinstDll;
     (void) lpvReserved;

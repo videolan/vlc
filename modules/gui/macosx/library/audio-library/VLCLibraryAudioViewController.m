@@ -41,7 +41,6 @@
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
-#import "library/audio-library/VLCLibraryAudioGroupHeaderView.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
@@ -197,7 +196,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                           0.f,
                                           _audioGroupSelectionTableView.bounds.size.width,
                                           headerHeight);
-    _audioCollectionHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame];
+    _audioCollectionHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
     _audioCollectionHeaderView.autoresizingMask = NSViewWidthSizable;
 
     _audioGroupSelectionTableView.headerView = self.audioCollectionHeaderView;
@@ -233,7 +232,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryCollectionViewFlowLayout * const audioLibraryGridModeListSelectionCollectionViewLayout =
         VLCLibraryCollectionViewFlowLayout.standardLayout;
     _audioLibraryGridModeSplitViewListSelectionCollectionView.collectionViewLayout = audioLibraryGridModeListSelectionCollectionViewLayout;
-    audioLibraryGridModeListSelectionCollectionViewLayout.headerReferenceSize = VLCLibraryAudioGroupHeaderView.defaultHeaderSize;
+    audioLibraryGridModeListSelectionCollectionViewLayout.headerReferenceSize =
+        NSMakeSize(self.audioCollectionViewScrollView.documentView.frame.size.width, VLCLibraryAudioGroupTableHeaderViewHeight);
 
     if (@available(macOS 10.12, *)) {
         audioLibraryGridModeListSelectionCollectionViewLayout.sectionHeadersPinToVisibleBounds = YES;
@@ -588,9 +588,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 }
 
 - (void)updateHeaderForTableView:(NSTableView *)tableView
-            withRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
-                  fallbackTitle:(NSString *)fallbackTitle
-                 fallbackDetail:(NSString *)fallbackDetail
+             withRepresentedItem:(nullable VLCLibraryRepresentedItem *)representedItem
+                   fallbackTitle:(NSString *)fallbackTitle
+                  fallbackDetail:(NSString *)fallbackDetail
 {
     if (tableView != self.audioCollectionSelectionTableView &&
         tableView != self.audioGroupSelectionTableView &&

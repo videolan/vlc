@@ -354,9 +354,10 @@ bool hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
 
     const uint8_t i_nal_length_size = hevc_getNALLengthSize( p_buf );
     uint8_t *p_out_buf = NULL;
+    uint8_t *p_ret = NULL;
     if( i_result > 0 )
     {
-        p_out_buf = malloc( i_result );
+        p_ret = p_out_buf = malloc( i_result );
         if( !p_out_buf )
             return false;
 
@@ -381,7 +382,7 @@ bool hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
         }
     }
 
-    *pp_result = p_out_buf;
+    *pp_result = p_ret;
     *pi_result = i_result;
     if( pi_nal_length_size )
         *pi_nal_length_size = i_nal_length_size;

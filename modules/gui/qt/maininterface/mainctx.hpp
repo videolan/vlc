@@ -129,6 +129,7 @@ class MainCtx : public QObject
     Q_PROPERTY(float safeArea READ safeArea NOTIFY safeAreaChanged FINAL)
     Q_PROPERTY(VideoSurfaceProvider* videoSurfaceProvider READ getVideoSurfaceProvider WRITE setVideoSurfaceProvider NOTIFY hasEmbededVideoChanged FINAL)
     Q_PROPERTY(int mouseHideTimeout READ mouseHideTimeout NOTIFY mouseHideTimeoutChanged FINAL)
+    Q_PROPERTY(bool albumSections READ albumSections WRITE setAlbumSections NOTIFY albumSectionsChanged FINAL)
 
     Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
 
@@ -219,6 +220,7 @@ public:
     inline MediaLib* getMediaLibrary() const { return m_medialib; }
     inline bool hasGridView() const { return m_gridView; }
     inline Grouping grouping() const { return m_grouping; }
+    inline bool albumSections() const { return m_albumSections; }
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
     bool hasVLM() const;
     bool useClientSideDecoration() const;
@@ -450,6 +452,8 @@ protected:
 
     int m_mouseHideTimeout = 1000;
 
+    bool m_albumSections = true;
+
     OsType m_osName;
     int m_osVersion;
 
@@ -480,6 +484,7 @@ public slots:
     void setShowRemainingTime( bool );
     void setGridView( bool );
     void setGrouping( Grouping );
+    void setAlbumSections( bool );
     void incrementIntfUserScaleFactor( bool increment);
     void setIntfUserScaleFactor( double );
     void setHasToolbarMenu( bool );
@@ -530,6 +535,7 @@ signals:
     void gridViewChanged( bool );
     void hasGridListModeChanged( bool );
     void groupingChanged( Grouping );
+    void albumSectionsChanged( bool );
     void colorSchemeChanged( QString );
     void useClientSideDecorationChanged();
     void hasToolbarMenuChanged();

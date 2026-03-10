@@ -39,7 +39,9 @@ public:
         AUDIO_ARTIST_FIRST_SYMBOL,
         AUDIO_ALBUM,
         AUDIO_ALBUM_FIRST_SYMBOL,
-    };
+        AUDIO_ALBUM_ID,
+    }
+    ;
 
 public:
     explicit MLAudioModel(QObject *parent = nullptr);

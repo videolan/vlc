@@ -334,12 +334,14 @@ if host_system == 'darwin'
         'posix/wait.c',
     ]
     if have_osx
+        cdata.set('HAVE_VLC_PROCESS_SPAWN', 1)
         libvlccore_sources += [
             'posix/spawn.c',
             'posix/process.c',
         ]
     endif
 elif host_system == 'windows'
+    cdata.set('HAVE_VLC_PROCESS_SPAWN', 1)
     libvlccore_sources += [
         'win32/dirs-common.c',
         'win32/error.c',
@@ -385,6 +387,7 @@ else
     ]
 
     if host_system != 'android'
+        cdata.set('HAVE_VLC_PROCESS_SPAWN', 1)
         libvlccore_sources += [
             'posix/dirs.c',
             'posix/error.c',

@@ -174,15 +174,22 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
     NSParameterAssert(items != nil);
     NSParameterAssert(toolbarItem.itemIdentifier.length > 0);
 
-    const NSInteger toolbarItemIndex = [self.toolbar.items indexOfObject:toolbarItem];
-    if (toolbarItemIndex != NSNotFound) {
+    // Build toolbar item index map once to avoid double iteration
+    NSArray<NSToolbarItem *> * const toolbarItems = self.toolbar.items;
+    NSMapTable * const itemIndexMap = [NSMapTable strongToStrongObjectsMapTable];
+    for (NSUInteger i = 0; i < toolbarItems.count; i++) {
+        [itemIndexMap setObject:@(i) forKey:toolbarItems[i]];
+    }
+
+    NSNumber * const toolbarItemIndexNumber = [itemIndexMap objectForKey:toolbarItem];
+    if (toolbarItemIndexNumber != nil) {
         return;
     }
 
     for (NSToolbarItem * const item in items) {
-        const NSInteger itemIndex = [self.toolbar.items indexOfObject:item];
-
-        if (itemIndex != NSNotFound) {
+        NSNumber * const itemIndexNumber = [itemIndexMap objectForKey:item];
+        if (itemIndexNumber != nil) {
+            const NSInteger itemIndex = itemIndexNumber.integerValue;
             [self.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier
                                                atIndex:itemIndex + 1];
             return;
@@ -239,8 +246,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
     }
 
     // Display as far to the right as possible, but not in front of the multifunc bar toggle button
-    NSMutableArray<NSToolbarItem *> * const currentToolbarItems =
-        [NSMutableArray arrayWithArray:self.toolbar.items];
+    NSMutableArray<NSToolbarItem *> * const currentToolbarItems = self.toolbar.items.mutableCopy;
     if (currentToolbarItems.lastObject == self.togglePlayQueueToolbarItem) {
         [currentToolbarItems removeLastObject];
     }
