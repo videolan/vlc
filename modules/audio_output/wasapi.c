@@ -894,6 +894,9 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     if (sys->s24s32)
         msg_Dbg(s, "audio device configured as s24");
 
+    if (shared_mode == AUDCLNT_SHAREMODE_SHARED)
+        buffer_duration = 0;
+
     hr = IAudioClient_Initialize(sys->client, shared_mode,
                                  AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
                                  buffer_duration,
