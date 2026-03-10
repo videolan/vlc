@@ -3,23 +3,12 @@
 set -euo pipefail
 
 SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
-WEBOS_PROFILE="${WEBOS_PROFILE:-arm}"
-if [ "$WEBOS_PROFILE" = "x86_64" ]; then
-    TARGET="${TARGET:-x86_64-linux-gnu}"
-else
-    TARGET="${TARGET:-arm-webos-linux-gnueabi}"
-fi
+TARGET="${TARGET:-arm-webos-linux-gnueabi}"
 APP_ID="${APP_ID:-org.videolan.vlc}"
 PREFIX="${PREFIX:-/media/developer/apps/usr/palm/applications/${APP_ID}}"
-if [ "$WEBOS_PROFILE" = "x86_64" ]; then
-    BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build-x86_64}"
-    DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps-x86_64}"
-    DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy-x86_64}"
-else
-    BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build}"
-    DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps}"
-    DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy}"
-fi
+BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build}"
+DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps}"
+DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy}"
 JOBS="${JOBS:-$(nproc)}"
 MODE="${1:-all}"
 SDK_DOWNLOAD_DIR="${SDK_DOWNLOAD_DIR:-$BUILD_DIR/sdk}"
@@ -40,11 +29,7 @@ WEBOS_QT6_HOST_MODULES="${WEBOS_QT6_HOST_MODULES:-qtdeclarative,qtshadertools,qt
 WEBOS_QT6_TARGET_BUILD_DIR="${WEBOS_QT6_TARGET_BUILD_DIR:-$HOME/qt6-webos-build-target-$WEBOS_QT6_VERSION}"
 WEBOS_QT6_TARGET_MODULES="${WEBOS_QT6_TARGET_MODULES:-qtshadertools,qtdeclarative,qtwayland}"
 WEBOS_QT6_TARGET_TOOLCHAIN_FILE="${WEBOS_QT6_TARGET_TOOLCHAIN_FILE:-}"
-if [ "$WEBOS_PROFILE" = "x86_64" ]; then
-    WEBOS_NATIVE_TOOLCHAIN="${WEBOS_NATIVE_TOOLCHAIN:-1}"
-else
-    WEBOS_NATIVE_TOOLCHAIN="${WEBOS_NATIVE_TOOLCHAIN:-0}"
-fi
+
 DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-vorbis --disable-fluid --disable-libaribcaption --disable-ass --disable-live555 --disable-harfbuzz --disable-vulkan-loader --disable-sidplay2 --disable-vncclient"
 DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-libdrm --disable-vpx --disable-aom --disable-fluidsynth --disable-openapv --disable-vdpau --disable-caca"
 WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-$DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS}"
@@ -98,7 +83,7 @@ Examples:
     WEBOS_TOOLCHAIN=/opt/ndk $0 configure
     WEBOS_QT6_VERSION=6.8.3 $0 qt6
     WEBOS_QT6_VERSION=6.8.3 $0 qt6-host-tools
-    WEBOS_PROFILE=arm WEBOS_QT6_VERSION=6.8.3 $0 qt6-target-arm
+    WEBOS_QT6_VERSION=6.8.3 $0 qt6-target-arm
     WEBOS_TOOLCHAIN=/opt/ndk WEBOS_QT6_ROOT=$HOME/qt6-webos $0 configure
     WEBOS_TOOLCHAIN=/opt/ndk WEBOS_QT6_HOST_TOOLS=$HOME/qt6-webos/host/bin WEBOS_QT6_TARGET_PREFIX=$HOME/qt6-webos/target/usr $0 configure
     WEBOS_TOOLCHAIN=/opt/ndk $0 build
@@ -224,6 +209,35 @@ inject = (
 
 if marker in text and inject not in text:
     text = text.replace(marker, inject + marker, 1)
+    path.write_text(text, encoding="utf-8")
+PY
+
+    # Patch tools/CMakeLists.txt: skip host-only tools (qmltime, qml2puppet, etc.)
+    # that require matching host binaries which may not be present in a minimal
+    # qt6-host-tools build done via qt-configure-module.
+    local tools_cmake="$qtdeclarative_src/tools/CMakeLists.txt"
+    [ -f "$tools_cmake" ] || return 0
+
+    python3 - "$tools_cmake" <<'PY'
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+
+# Tools whose host counterpart is not built by the minimal qt6-host-tools phase.
+# They are only needed for development/testing on desktop - not for ARM target libs.
+skip_tools = ["qmltime", "qml2puppet", "qmlprofiler", "qmlplugindump"]
+
+changed = False
+for tool in skip_tools:
+    old = "add_subdirectory({tool})\n".format(tool=tool)
+    new = "# add_subdirectory({tool})  # patched: host tool not in minimal qt6-host-tools build\n".format(tool=tool)
+    if old in text and new not in text:
+        text = text.replace(old, new, 1)
+        changed = True
+
+if changed:
     path.write_text(text, encoding="utf-8")
 PY
 }
@@ -358,11 +372,6 @@ EOF
 }
 
 build_qt6_target_arm() {
-    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
-        echo "qt6-target-arm requires WEBOS_PROFILE=arm."
-        exit 1
-    fi
-
     if [ -z "$WEBOS_QT6_TARGET_PREFIX" ]; then
         WEBOS_QT6_TARGET_PREFIX="$HOME/qt6-webos/target/usr"
     fi
@@ -559,10 +568,6 @@ normalize_sysroot_libtool_archives() {
                 "$la" || true
         fi
 
-        if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
-            perl -0pi -e 's#(/x86_64-linux-gnu){2,}/#\/x86_64-linux-gnu/#g' "$la" || true
-            perl -0pi -e 's#/x86_64-linux-gnu/lib/x86_64-linux-gnu/#/x86_64-linux-gnu/lib/#g' "$la" || true
-        fi
     done < <(find "${SYSROOT}/usr/lib" "${DEPS_PREFIX}/lib" -maxdepth 1 -type f -name '*.la' -print0 2>/dev/null)
 }
 
@@ -575,17 +580,6 @@ sanitize_makefile_paths() {
         -e "s|-I/usr/include/libxml2|-I${SYSROOT}/usr/include/libxml2|g" \
         -e "s|-L/usr/lib\\>|-L${SYSROOT}/usr/lib|g" \
         "$makefile" || true
-}
-
-ensure_native_prefix_compat() {
-    if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ]; then
-        return 0
-    fi
-
-    mkdir -p "${DEPS_PREFIX}/${TARGET}"
-    [ -e "${DEPS_PREFIX}/${TARGET}/lib" ] || ln -s ../lib "${DEPS_PREFIX}/${TARGET}/lib"
-    [ -e "${DEPS_PREFIX}/${TARGET}/include" ] || ln -s ../include "${DEPS_PREFIX}/${TARGET}/include"
-    [ -e "${DEPS_PREFIX}/${TARGET}/share" ] || ln -s ../share "${DEPS_PREFIX}/${TARGET}/share"
 }
 
 download_file() {
@@ -604,11 +598,6 @@ download_file() {
 
 detect_toolchain() {
     local candidate
-
-    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
-        WEBOS_TOOLCHAIN=""
-        return 0
-    fi
 
     if [ -n "${WEBOS_TOOLCHAIN:-}" ] && [ -d "${WEBOS_TOOLCHAIN}" ] && has_sysroot_runtime "${WEBOS_TOOLCHAIN}"; then
         return 0
@@ -674,21 +663,12 @@ if ! detect_toolchain; then
 fi
 
 if [ "$MODE" = "sdk" ]; then
-    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
-        echo "SDK step skipped: using native host toolchain for profile $WEBOS_PROFILE"
-        exit 0
-    fi
     echo "SDK ready: ${WEBOS_TOOLCHAIN}"
     exit 0
 fi
 
-if [ -n "${WEBOS_TOOLCHAIN:-}" ]; then
-    export PATH="/usr/bin:${WEBOS_TOOLCHAIN}/bin:${PATH}"
-    SYSROOT="${WEBOS_TOOLCHAIN}/${TARGET}/sysroot"
-else
-    export PATH="/usr/bin:${PATH}"
-    SYSROOT="/"
-fi
+export PATH="/usr/bin:${WEBOS_TOOLCHAIN}/bin:${PATH}"
+SYSROOT="${WEBOS_TOOLCHAIN}/${TARGET}/sysroot"
 
 if [ -n "$WEBOS_QT6_ROOT" ]; then
     if [ -z "$WEBOS_QT6_HOST_TOOLS" ] && [ -d "$WEBOS_QT6_ROOT/host/bin" ]; then
@@ -704,11 +684,11 @@ if [ -n "$WEBOS_QT6_ROOT" ]; then
     fi
 fi
 
-if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ -n "${WEBOS_TOOLCHAIN:-}" ] && [ -x "${WEBOS_TOOLCHAIN}/bin/qmake" ]; then
+if [ -n "${WEBOS_TOOLCHAIN:-}" ] && [ -x "${WEBOS_TOOLCHAIN}/bin/qmake" ]; then
     export QMAKE="${WEBOS_TOOLCHAIN}/bin/qmake"
 fi
 
-if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ "$QT_ENABLED" = "1" ]; then
+if [ "$QT_ENABLED" = "1" ]; then
     qt6_tools_dir=""
 
     if [ -n "$WEBOS_QT6_HOST_TOOLS" ] && [ -x "$WEBOS_QT6_HOST_TOOLS/qmake6" ]; then
@@ -717,7 +697,7 @@ if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ "$QT_ENABLED" = "1" ]; then
         qt6_tools_dir="${WEBOS_TOOLCHAIN}/bin"
     fi
 
-    if [ -z "$qt6_tools_dir" ] && [ "$WEBOS_QT6_AUTO_DOWNLOAD" = "1" ]; then
+    if [ -z "$qt6_tools_dir" ] && [ "${WEBOS_QT6_AUTO_DOWNLOAD:-1}" = "1" ]; then
         echo "Qt6 host tools not found. Downloading Qt6 sources first..."
         download_qt6_sources
     fi
@@ -774,20 +754,10 @@ if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ "$QT_ENABLED" = "1" ]; then
 fi
 
 export PKG_CONFIG_SYSROOT_DIR=""
-    HOST_MULTIARCH=""
-    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ] && command -v gcc >/dev/null 2>&1; then
-        HOST_MULTIARCH="$(gcc -print-multiarch 2>/dev/null || true)"
-    fi
+export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
+export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig"
 
-    if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ] && [ -n "$HOST_MULTIARCH" ]; then
-        export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/${HOST_MULTIARCH}/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
-        export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:/usr/lib/${HOST_MULTIARCH}/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
-    else
-        export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
-        export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig"
-    fi
-
-if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ "$QT_ENABLED" = "1" ] && [ -n "$WEBOS_QT6_TARGET_PREFIX" ]; then
+if [ "$QT_ENABLED" = "1" ] && [ -n "$WEBOS_QT6_TARGET_PREFIX" ]; then
     if [ -d "$WEBOS_QT6_TARGET_PREFIX/lib/pkgconfig" ]; then
         export PKG_CONFIG_LIBDIR="$WEBOS_QT6_TARGET_PREFIX/lib/pkgconfig:$PKG_CONFIG_LIBDIR"
         export PKG_CONFIG_PATH="$WEBOS_QT6_TARGET_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
@@ -798,35 +768,23 @@ if [ "$WEBOS_NATIVE_TOOLCHAIN" != "1" ] && [ "$QT_ENABLED" = "1" ] && [ -n "$WEB
     fi
 fi
 export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include"
-if [ "$WEBOS_PROFILE" = "x86_64" ]; then
-    export CFLAGS="${CFLAGS:-} -m64 -I${DEPS_PREFIX}/include"
-    export CXXFLAGS="${CXXFLAGS:-} -m64 -I${DEPS_PREFIX}/include"
-else
-    export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
-    export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
-fi
+export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
+export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
 export LDFLAGS="${LDFLAGS:-} -L${DEPS_PREFIX}/lib -L${SYSROOT}/usr/lib"
 
 normalize_sysroot_libtool_archives
-ensure_native_prefix_compat
 
-if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
-    if ! command -v gcc >/dev/null 2>&1; then
-        echo "gcc was not found in PATH."
-        exit 1
-    fi
-else
-    if ! command -v "${TARGET}-gcc" >/dev/null 2>&1; then
-        echo "${TARGET}-gcc was not found in PATH."
-        echo "Check WEBOS_TOOLCHAIN: ${WEBOS_TOOLCHAIN}"
-        exit 1
-    fi
+if ! command -v "${TARGET}-gcc" >/dev/null 2>&1; then
+    echo "${TARGET}-gcc was not found in PATH."
+    echo "Check WEBOS_TOOLCHAIN: ${WEBOS_TOOLCHAIN}"
+    exit 1
 fi
 
 if [ "$MODE" = "qt6-target-arm" ]; then
     build_qt6_target_arm
     exit 0
 fi
+
 
 if [ "$MODE" = "deps" ] || [ "$MODE" = "all" ]; then
     mkdir -p "${SRC_DIR}/contrib/${TARGET}"
@@ -896,6 +854,39 @@ if [ "$MODE" = "build" ] || [ "$MODE" = "all" ]; then
         exit 1
     fi
     make -C "${BUILD_DIR}" -j"${JOBS}"
+
+    # Post-build fixups required for the Qt GUI plugin on webOS:
+    #
+    # 1. patch-qt-makefile.py  — creates libtool .la stubs for all
+    #    libqml_module_*.a convenience archives and adds them to
+    #    libqt_plugin_la_LIBADD so the linker wraps them in --whole-archive.
+    #    Without this, Qt's constructor-based QML module registration is
+    #    silently dropped as dead code.
+    #
+    # 2. embed-qml-sources.py  — embeds all 241 .qml source files as Qt
+    #    resources inside the plugin.  The *_qmlassets.cpp generated by the
+    #    build system only embeds the qmldir descriptor; Qt needs the source
+    #    files present in the resource system before it will invoke the
+    #    pre-compiled bytecode cache hook from *_qmlcache_loader.cpp.
+    #
+    # Both scripts then force a relink of libqt_plugin.so by removing the
+    # stale .so/.la and re-running make on that single target.
+    _QT_PLUGIN_BUILD_DIR="${BUILD_DIR}/modules/gui/qt"
+    if [ -f "${_QT_PLUGIN_BUILD_DIR}/Makefile" ] && [ -x "${WEBOS_TOOLCHAIN}/bin/${TARGET}-g++" ]; then
+        echo "=== Applying Qt plugin post-build fixups ==="
+        python3 "${SRC_DIR}/extras/buildsystem/patch-qt-makefile.py" \
+            --build-dir "${_QT_PLUGIN_BUILD_DIR}" \
+            --src-dir   "${SRC_DIR}"
+        python3 "${SRC_DIR}/extras/buildsystem/embed-qml-sources.py" \
+            --build-dir "${_QT_PLUGIN_BUILD_DIR}" \
+            --src-dir   "${SRC_DIR}" \
+            --toolchain "${WEBOS_TOOLCHAIN}" \
+            --target    "${TARGET}"
+        rm -f "${_QT_PLUGIN_BUILD_DIR}/.libs/libqt_plugin.so" \
+              "${_QT_PLUGIN_BUILD_DIR}/libqt_plugin.la"
+        make -C "${_QT_PLUGIN_BUILD_DIR}" libqt_plugin.la
+        echo "=== Qt plugin fixup complete ==="
+    fi
 fi
 
 if [ "$MODE" = "install" ] || [ "$MODE" = "all" ]; then
@@ -904,13 +895,6 @@ if [ "$MODE" = "install" ] || [ "$MODE" = "all" ]; then
         exit 1
     fi
     mkdir -p "${DEPLOY_DIR}"
-    if ! make -C "${BUILD_DIR}" install DESTDIR="${DEPLOY_DIR}"; then
-        if [ "$WEBOS_NATIVE_TOOLCHAIN" = "1" ]; then
-            echo "Install had non-fatal errors (likely .lai metadata); retrying with keep-going mode."
-            make -C "${BUILD_DIR}" -k install DESTDIR="${DEPLOY_DIR}" || true
-        else
-            exit 1
-        fi
-    fi
+    make -C "${BUILD_DIR}" install DESTDIR="${DEPLOY_DIR}"
     echo "Installed runtime tree to ${DEPLOY_DIR}"
 fi
