@@ -29,9 +29,10 @@ WEBOS_QT6_HOST_MODULES="${WEBOS_QT6_HOST_MODULES:-qtdeclarative,qtshadertools,qt
 WEBOS_QT6_TARGET_BUILD_DIR="${WEBOS_QT6_TARGET_BUILD_DIR:-$HOME/qt6-webos-build-target-$WEBOS_QT6_VERSION}"
 WEBOS_QT6_TARGET_MODULES="${WEBOS_QT6_TARGET_MODULES:-qtshadertools,qtdeclarative,qtwayland}"
 WEBOS_QT6_TARGET_TOOLCHAIN_FILE="${WEBOS_QT6_TARGET_TOOLCHAIN_FILE:-}"
+WEBOS_DISABLE_FREETYPE_ON_MISSING_HB="${WEBOS_DISABLE_FREETYPE_ON_MISSING_HB:-1}"
 
 DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-libaribcaption --disable-ass --disable-vulkan-loader --disable-sidplay2 --disable-vncclient --enable-fluidlite --enable-live555"
-DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-libdrm --disable-vpx --disable-aom --enable-fluidsynth --disable-openapv --disable-vdpau --disable-caca"
+DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-vpx --disable-aom --enable-fluidsynth --disable-openapv --disable-vdpau --disable-caca"
 WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-$DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS}"
 WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-$DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS}"
 
@@ -76,6 +77,7 @@ Environment variables:
     WEBOS_QT6_TARGET_BUILD_DIR    ARM Qt6 target build directory (default: ~/qt6-webos-build-target-<version>).
     WEBOS_QT6_TARGET_MODULES      ARM Qt6 target modules to build (comma-separated; default: qtshadertools,qtdeclarative,qtwayland).
     WEBOS_QT6_TARGET_TOOLCHAIN_FILE Optional CMake toolchain file for ARM Qt6 target build.
+    WEBOS_DISABLE_FREETYPE_ON_MISSING_HB Disable freetype plugin in generated modules/Makefile when hb-ft.h is missing (default: 1).
 
 Examples:
     WEBOS_SDK_URL=https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz $0 sdk
@@ -574,12 +576,68 @@ normalize_sysroot_libtool_archives() {
 sanitize_makefile_paths() {
     local makefile="$1"
     [ -f "$makefile" ] || return 0
-    sed -i \
+    sed -E -i \
         -e "s|-I/usr/include/libpng16|-I${SYSROOT}/usr/include/libpng16|g" \
         -e "s|-I/usr/include/freetype2|-I${SYSROOT}/usr/include/freetype2|g" \
+        -e "s|-I/usr/include/harfbuzz|-I${SYSROOT}/usr/include/harfbuzz|g" \
         -e "s|-I/usr/include/libxml2|-I${SYSROOT}/usr/include/libxml2|g" \
+        -e "s|-I/usr/lib/(libffi[^[:space:]]*/include)|-I${SYSROOT}/usr/lib/\1|g" \
         -e "s|-L/usr/lib\\>|-L${SYSROOT}/usr/lib|g" \
         "$makefile" || true
+}
+
+append_include_flag_if_exists() {
+    local dir="$1"
+    [ -d "$dir" ] || return 0
+
+    case " ${WEBOS_EXTRA_INCLUDE_FLAGS:-} " in
+        *" -I${dir} "*) return 0 ;;
+    esac
+
+    WEBOS_EXTRA_INCLUDE_FLAGS="${WEBOS_EXTRA_INCLUDE_FLAGS:-} -I${dir}"
+}
+
+prepare_webos_include_flags() {
+    WEBOS_EXTRA_INCLUDE_FLAGS=""
+
+    append_include_flag_if_exists "${DEPS_PREFIX}/include/harfbuzz"
+    append_include_flag_if_exists "${SYSROOT}/usr/include/harfbuzz"
+    append_include_flag_if_exists "${SYSROOT}/usr/lib/libffi/include"
+    append_include_flag_if_exists "${DEPS_PREFIX}/lib/libffi/include"
+
+    local dir
+    for dir in "${SYSROOT}"/usr/lib/libffi*/include "${DEPS_PREFIX}"/lib/libffi*/include; do
+        append_include_flag_if_exists "$dir"
+    done
+}
+
+have_cross_pkg() {
+    local pkg="$1"
+    PKG_CONFIG_SYSROOT_DIR="${PKG_CONFIG_SYSROOT_DIR:-}" \
+    PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR:-}" \
+    PKG_CONFIG_PATH="${PKG_CONFIG_PATH:-}" \
+    pkg-config --exists "$pkg" >/dev/null 2>&1
+}
+
+have_header_in_cross_paths() {
+    local rel="$1"
+    [ -f "${DEPS_PREFIX}/include/${rel}" ] || [ -f "${SYSROOT}/usr/include/${rel}" ]
+}
+
+resolve_qmake_binary() {
+    local tool_dir="$1"
+
+    if [ -x "$tool_dir/qmake6" ]; then
+        printf '%s\n' "$tool_dir/qmake6"
+        return 0
+    fi
+
+    if [ -x "$tool_dir/qmake" ]; then
+        printf '%s\n' "$tool_dir/qmake"
+        return 0
+    fi
+
+    return 1
 }
 
 download_file() {
@@ -690,10 +748,11 @@ fi
 
 if [ "$QT_ENABLED" = "1" ]; then
     qt6_tools_dir=""
+    qt_qmake_bin=""
 
-    if [ -n "$WEBOS_QT6_HOST_TOOLS" ] && [ -x "$WEBOS_QT6_HOST_TOOLS/qmake6" ]; then
+    if [ -n "$WEBOS_QT6_HOST_TOOLS" ] && qt_qmake_bin="$(resolve_qmake_binary "$WEBOS_QT6_HOST_TOOLS")"; then
         qt6_tools_dir="$WEBOS_QT6_HOST_TOOLS"
-    elif [ -n "${WEBOS_TOOLCHAIN:-}" ] && [ -x "${WEBOS_TOOLCHAIN}/bin/qmake6" ]; then
+    elif [ -n "${WEBOS_TOOLCHAIN:-}" ] && qt_qmake_bin="$(resolve_qmake_binary "${WEBOS_TOOLCHAIN}/bin")"; then
         qt6_tools_dir="${WEBOS_TOOLCHAIN}/bin"
     fi
 
@@ -703,7 +762,7 @@ if [ "$QT_ENABLED" = "1" ]; then
     fi
 
     if [ -z "$qt6_tools_dir" ]; then
-        echo "Qt is enabled, but the cross toolchain does not provide qmake6."
+        echo "Qt is enabled, but the cross toolchain does not provide qmake/qmake6."
         echo "Current toolchain: ${WEBOS_TOOLCHAIN:-<unset>}"
         echo "Qt6 sources directory: ${WEBOS_QT6_SRC_DIR}"
         echo "Set WEBOS_QT6_HOST_TOOLS to external Qt6 host tools, or install an ARM Qt6-capable toolchain."
@@ -726,8 +785,10 @@ if [ "$QT_ENABLED" = "1" ]; then
     export PATH="$qt6_tools_dir:$PATH"
     if [ -n "$WEBOS_QT6_TARGET_PREFIX" ] && [ -x "$WEBOS_QT6_TARGET_PREFIX/bin/qmake6" ]; then
         export QMAKE6="$WEBOS_QT6_TARGET_PREFIX/bin/qmake6"
+    elif [ -n "$WEBOS_QT6_TARGET_PREFIX" ] && [ -x "$WEBOS_QT6_TARGET_PREFIX/bin/qmake" ]; then
+        export QMAKE6="$WEBOS_QT6_TARGET_PREFIX/bin/qmake"
     else
-        export QMAKE6="$qt6_tools_dir/qmake6"
+        export QMAKE6="$qt_qmake_bin"
     fi
     export QMAKE="$QMAKE6"
     [ -x "$qt6_tools_dir/moc" ] && export MOC="$qt6_tools_dir/moc"
@@ -756,6 +817,7 @@ fi
 export PKG_CONFIG_SYSROOT_DIR=""
 export PKG_CONFIG_LIBDIR="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig:${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
 export PKG_CONFIG_PATH="${DEPS_PREFIX}/lib/pkgconfig:${DEPS_PREFIX}/share/pkgconfig"
+prepare_webos_include_flags
 
 if [ "$QT_ENABLED" = "1" ] && [ -n "$WEBOS_QT6_TARGET_PREFIX" ]; then
     if [ -d "$WEBOS_QT6_TARGET_PREFIX/lib/pkgconfig" ]; then
@@ -767,9 +829,9 @@ if [ "$QT_ENABLED" = "1" ] && [ -n "$WEBOS_QT6_TARGET_PREFIX" ]; then
         export PKG_CONFIG_PATH="$WEBOS_QT6_TARGET_PREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
     fi
 fi
-export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include"
-export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
-export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include"
+export CPPFLAGS="${CPPFLAGS:-} -I${DEPS_PREFIX}/include -I${SYSROOT}/usr/include${WEBOS_EXTRA_INCLUDE_FLAGS}"
+export CFLAGS="${CFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include${WEBOS_EXTRA_INCLUDE_FLAGS}"
+export CXXFLAGS="${CXXFLAGS:-} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -I${DEPS_PREFIX}/include${WEBOS_EXTRA_INCLUDE_FLAGS}"
 export LDFLAGS="${LDFLAGS:-} -L${DEPS_PREFIX}/lib -L${SYSROOT}/usr/lib"
 
 normalize_sysroot_libtool_archives
@@ -824,10 +886,33 @@ if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
     if [ -f modules/Makefile ]; then
         sed -i '/^LIBS = /{ /-ldl/! s/$/ -ldl/; }' modules/Makefile || true
         sed -i '/^LIBS_fluidsynth = /{ / -lm/! s/$/ -lm/; }' modules/Makefile || true
-        sed -i 's/^am__append_351 = libdrm_display_plugin.la/# am__append_351 = libdrm_display_plugin.la/' modules/Makefile || true
-        sed -i 's/^am__append_284 = libegl_display_generic_plugin.la/# am__append_284 = libegl_display_generic_plugin.la/' modules/Makefile || true
-        sed -i 's/^am__append_120 = libgstdecode_plugin.la/# am__append_120 = libgstdecode_plugin.la/' modules/Makefile || true
-        sed -i 's/^am__append_212 = libgst_mem_plugin.la/# am__append_212 = libgst_mem_plugin.la/' modules/Makefile || true
+
+        if ! have_cross_pkg libdrm || ! have_header_in_cross_paths drm/drm_fourcc.h; then
+            echo "libdrm not available in cross sysroot; disabling DRM display plugin for this build."
+            sed -E -i 's/^(am__append_[0-9]+ = libdrm_display_plugin\.la)$/# \1/' modules/Makefile || true
+        fi
+
+        if ! have_cross_pkg egl || ! have_header_in_cross_paths EGL/egl.h; then
+            echo "EGL headers/libs not available in cross sysroot; disabling generic EGL display plugin for this build."
+            sed -E -i 's/^(am__append_[0-9]+ = libegl_display_generic_plugin\.la)$/# \1/' modules/Makefile || true
+        fi
+
+        if ! have_cross_pkg gstreamer-app-1.0 || ! have_cross_pkg gstreamer-video-1.0 || ! have_cross_pkg gstreamer-allocators-1.0 ||
+           ! { have_header_in_cross_paths gst/gst.h || have_header_in_cross_paths gstreamer-1.0/gst/gst.h; }; then
+            echo "GStreamer development files not available in cross sysroot; disabling gstdecode/gst_mem plugins for this build."
+            sed -E -i 's/^(am__append_[0-9]+ = libgstdecode_plugin\.la)$/# \1/' modules/Makefile || true
+            sed -E -i 's/^(am__append_[0-9]+ = libgst_mem_plugin\.la)$/# \1/' modules/Makefile || true
+        fi
+
+        if [ "$WEBOS_DISABLE_FREETYPE_ON_MISSING_HB" = "1" ] &&
+           [ ! -f "${DEPS_PREFIX}/include/harfbuzz/hb-ft.h" ] &&
+           [ ! -f "${SYSROOT}/usr/include/harfbuzz/hb-ft.h" ] &&
+           [ ! -f "${DEPS_PREFIX}/include/hb-ft.h" ] &&
+           [ ! -f "${SYSROOT}/usr/include/hb-ft.h" ]; then
+            echo "Harfbuzz hb-ft.h not found in deps/sysroot; disabling freetype text renderer plugin for this build."
+            sed -E -i 's/^(am__append_[0-9]+ = libfreetype_plugin\.la)$/# \1/' modules/Makefile || true
+        fi
+
         sanitize_makefile_paths modules/Makefile
     fi
 

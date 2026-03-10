@@ -17,8 +17,8 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(MOVE)
 
 ifeq ($(HOST),arm-webos-linux-gnueabi)
-DEPS_harfbuzz =
-HARFBUZZ_CONF := -Dfreetype=disabled \
+DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
+HARFBUZZ_CONF := -Dfreetype=enabled \
 	-Dglib=disabled \
 	-Dgobject=disabled \
 	-Ddocs=disabled \
