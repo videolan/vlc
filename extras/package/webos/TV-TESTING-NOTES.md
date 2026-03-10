@@ -106,7 +106,7 @@ rebuild. To make the fix automatic, `build-webos.sh` calls both scripts as a
 post-build step immediately after `make` completes, then re-runs just the plugin
 link. A scratch build therefore goes through:
 ```
-./build-webos.sh all
+extras/package/webos/build-webos.sh all
   └── make (compiles everything, links libqt_plugin.so without the fix)
   └── patch-qt-makefile.py --build-dir <build>/modules/gui/qt ...
   └── embed-qml-sources.py --build-dir <build>/modules/gui/qt ...
@@ -213,7 +213,7 @@ export VLC_QT_SKIP_CHECK=1
 
 ## Build Artefacts Required for Full Qt GUI
 
-`build-webos.sh build` (or `build-webos.sh all`) applies both fixups automatically
+`build-webos.sh build` (or `extras/package/webos/build-webos.sh all`) applies both fixups automatically
 after `make` completes.  No manual steps are needed on a scratch build.
 
 If you need to re-apply them manually to an existing build directory (e.g. after

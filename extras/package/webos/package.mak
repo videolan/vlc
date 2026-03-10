@@ -1,22 +1,30 @@
-WEBOS_BUILDDIR ?= $(top_builddir)/build-webos
-WEBOS_CONTRIB_BUILDDIR ?= $(abs_top_srcdir)/contrib/contrib-webos
-WEBOS_HOST ?= arm-webos-linux-gnueabi
-WEBOS_CONTRIB_BOOTSTRAP_FLAGS ?=
+# webOS build targets — delegates to build-webos.sh at the repository root.
+# Usage: make -f extras/package/webos/package.mak webos
+
 WEBOS_DEPLOY_DIR ?= $(abs_top_srcdir)/vlc-webos-deploy
-WEBOS_APP_ID ?= org.videolan.vlc.webos
+WEBOS_APP_ID ?= org.videolan.vlc
 WEBOS_APP_VERSION ?= 1.0.0
 WEBOS_TARGET_ARCH ?= arm
 WEBOS_OUTPUT_DIR ?= $(abs_top_srcdir)/webos-package
 
-webos-contrib:
-	$(MKDIR_P) "$(WEBOS_CONTRIB_BUILDDIR)"
-	cd "$(WEBOS_CONTRIB_BUILDDIR)" && ../bootstrap --host="$(WEBOS_HOST)" $(WEBOS_CONTRIB_BOOTSTRAP_FLAGS)
-	$(MAKE) -C "$(WEBOS_CONTRIB_BUILDDIR)" fetch
-	$(MAKE) -C "$(WEBOS_CONTRIB_BUILDDIR)"
+webos-deps:
+	"$(abs_top_srcdir)/build-webos.sh" deps
 
 webos-configure:
-	$(MKDIR_P) "$(WEBOS_BUILDDIR)"
-	cd "$(WEBOS_BUILDDIR)" && "$(abs_top_srcdir)/extras/package/webos/configure.sh"
+	"$(abs_top_srcdir)/build-webos.sh" configure
+
+webos-build:
+	"$(abs_top_srcdir)/build-webos.sh" build
+
+webos-install:
+	"$(abs_top_srcdir)/build-webos.sh" install
+
+webos-package:
+	"$(abs_top_srcdir)/extras/package/webos/package.sh"
+
+webos: webos-deps webos-configure webos-build webos-install webos-package
+
+.PHONY: webos webos-deps webos-configure webos-build webos-install webos-package
 
 webos-build: webos-configure
 	$(MAKE) -C "$(WEBOS_BUILDDIR)"

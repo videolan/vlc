@@ -35,7 +35,7 @@ JOBS="${JOBS:-$(nproc)}"
 WEBOS_QT6_VERSION="${WEBOS_QT6_VERSION:-6.8.3}"
 WEBOS_QT6_HOST_PREFIX="${WEBOS_QT6_HOST_PREFIX:-$HOME/qt6-webos/host}"
 WEBOS_QT6_TARGET_PREFIX="${WEBOS_QT6_TARGET_PREFIX:-$HOME/qt6-webos/target/usr}"
-BUILD_WEBOS="$REPO_ROOT/build-webos.sh"
+BUILD_WEBOS="$REPO_ROOT/extras/package/webos/build-webos.sh"
 
 # ---------------------------------------------------------------------------
 # Helpers

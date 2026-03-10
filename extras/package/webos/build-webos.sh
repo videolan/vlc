@@ -30,7 +30,7 @@ WEBOS_QT6_TARGET_BUILD_DIR="${WEBOS_QT6_TARGET_BUILD_DIR:-$HOME/qt6-webos-build-
 WEBOS_QT6_TARGET_MODULES="${WEBOS_QT6_TARGET_MODULES:-qtshadertools,qtdeclarative,qtwayland}"
 WEBOS_QT6_TARGET_TOOLCHAIN_FILE="${WEBOS_QT6_TARGET_TOOLCHAIN_FILE:-}"
 
-DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-vorbis --disable-fluid --disable-libaribcaption --disable-ass --disable-live555 --disable-harfbuzz --disable-vulkan-loader --disable-sidplay2 --disable-vncclient --enable-fluidlite"
+DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-libaribcaption --disable-ass --disable-vulkan-loader --disable-sidplay2 --disable-vncclient --enable-fluidlite --enable-live555"
 DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-libdrm --disable-vpx --disable-aom --enable-fluidsynth --disable-openapv --disable-vdpau --disable-caca"
 WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-$DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS}"
 WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-$DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS}"

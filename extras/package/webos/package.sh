@@ -40,7 +40,7 @@ fi
 
 if [ ! -d "$DEPLOY_DIR" ]; then
     echo "Missing deploy directory: $DEPLOY_DIR"
-    echo "Run: WEBOS_TOOLCHAIN=... PREFIX=/ DEPLOY_DIR=$DEPLOY_DIR ./build-webos.sh all"
+    echo "Run: WEBOS_TOOLCHAIN=... PREFIX=/ DEPLOY_DIR=$DEPLOY_DIR extras/package/webos/build-webos.sh all"
     exit 1
 fi
 

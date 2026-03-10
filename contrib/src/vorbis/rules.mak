@@ -35,14 +35,9 @@ libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 
 DEPS_vorbis = ogg $(DEPS_ogg)
 
-ifeq ($(HOST),arm-webos-linux-gnueabi)
-.vorbis:
-	touch $@
-else
 .vorbis: libvorbis toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
-endif
