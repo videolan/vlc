@@ -21,10 +21,6 @@ $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.xz:
 
 ssh2: libssh2-$(LIBSSH2_VERSION).tar.xz .sum-ssh2
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
-	# Require gcrypt
-	sed -i.orig 's/@LIBSREQUIRED@/@LIBSREQUIRED@ libgcrypt/' $(UNPACK_DIR)/libssh2.pc.in
-	$(call pkg_static,"libssh2.pc.in")
 	$(MOVE)
 
 DEPS_ssh2 = gcrypt $(DEPS_gcrypt)
@@ -33,11 +29,11 @@ ifdef HAVE_WINSTORE
 DEPS_ssh2 += alloweduwp $(DEPS_alloweduwp)
 endif
 
-SSH2_CONF := --disable-examples-build --disable-tests --with-crypto=libgcrypt $(BROKEN_GCC_CFLAGS)
+SSH2_CONF := -DBUILD_EXAMPLES=OFF -DLIBSSH2_BUILD_DOCS=OFF -DCRYPTO_BACKEND:STRING=Libgcrypt $(BROKEN_GCC_CFLAGS)
 
-.ssh2: ssh2
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(SSH2_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+.ssh2: ssh2 toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(SSH2_CONF)
+	+$(CMAKEBUILD)
+	$(CMAKEINSTALL)
 	touch $@
