@@ -36,8 +36,8 @@ Item {
     // Implicit size used to be overridden as readonly, but that needed
     // binding width/height to the new properties which in turn caused
     // problems with layouts.
-    implicitWidth: shaderEffect.readyForVisibility ? shaderEffect.implicitWidth : image.implicitWidth
-    implicitHeight: shaderEffect.readyForVisibility ? shaderEffect.implicitHeight : image.implicitHeight
+    implicitWidth: shaderEffect.visible ? shaderEffect.implicitWidth : image.implicitWidth
+    implicitHeight: shaderEffect.visible ? shaderEffect.implicitHeight : image.implicitHeight
 
     antialiasing: true
 
@@ -86,13 +86,13 @@ Item {
     // uses to shrink to prevent "hard edges". Note that padding can only be calculated properly
     // when the shader has custom softedge support (`CUSTOM_SOFTEDGE`), currently it is used
     // at all times.
-    readonly property real padding: (shaderEffect.readyForVisibility && antialiasing) ? (Math.max(shaderEffect.width, shaderEffect.height) / 4 * shaderEffect.softEdgeMax)
-                                                                                      : 0.0
+    readonly property real padding: (shaderEffect.visible && antialiasing) ? (Math.max(shaderEffect.width, shaderEffect.height) / 4 * shaderEffect.softEdgeMax)
+                                                                           : 0.0
 
-    readonly property real paintedWidth: (shaderEffect.readyForVisibility) ? shaderEffect.width
-                                                                           : (image.clip ? image.width : image.paintedWidth)
-    readonly property real paintedHeight: (shaderEffect.readyForVisibility) ? shaderEffect.height
-                                                                            : (image.clip ? image.height : image.paintedHeight)
+    readonly property real paintedWidth: (shaderEffect.visible) ? shaderEffect.width
+                                                                : (image.clip ? image.width : image.paintedWidth)
+    readonly property real paintedHeight: (shaderEffect.visible) ? shaderEffect.height
+                                                                 : (image.clip ? image.height : image.paintedHeight)
 
     // NOTE: ImageExt calculates the painted size at all times,
     //       regardless of whether a foreign texture provider
@@ -117,10 +117,10 @@ Item {
     property real radiusTopLeft: radius
     property real radiusBottomRight: radius
     property real radiusBottomLeft: radius
-    readonly property real effectiveRadius: shaderEffect.readyForVisibility ? Math.max(radiusTopRight, radiusTopLeft, radiusBottomRight, radiusBottomLeft) : 0.0
+    readonly property real effectiveRadius: shaderEffect.visible ? Math.max(radiusTopRight, radiusTopLeft, radiusBottomRight, radiusBottomLeft) : 0.0
 
     property color backgroundColor: "transparent"
-    readonly property color effectiveBackgroundColor: shaderEffect.readyForVisibility ? backgroundColor : "transparent"
+    readonly property color effectiveBackgroundColor: shaderEffect.visible ? backgroundColor : "transparent"
 
     property alias blending: shaderEffect.blending
     blending: (effectiveRadius > 0.0) || (effectiveBackgroundColor.a < 1.0)
@@ -134,7 +134,7 @@ Item {
     //       recommended to do only relative adjustments.
     property color borderColor: "black"
     property int borderWidth: 0
-    readonly property int effectiveBorderWidth: shaderEffect.readyForVisibility ? borderWidth : 0
+    readonly property int effectiveBorderWidth: shaderEffect.visible ? borderWidth : 0
 
     // NOTE: Note the distinction between ShaderEffect and
     //       ShaderEffectSource. ShaderEffect is no different
@@ -154,15 +154,13 @@ Item {
         width: paintedSize.width
         height: paintedSize.height
 
-        visible: readyForVisibility
-
-        readonly property bool readyForVisibility: (source.status === Image.Ready) &&
-                                                   (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
-                                                   (root.radius > 0.0 ||
-                                                    root.borderWidth > 0 ||
-                                                    backgroundColor.a > 0.0 ||
-                                                    source !== image ||
-                                                    root.fillMode === Image.PreserveAspectCrop)
+        visible: (source.status === Image.Ready) &&
+                 (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
+                 (root.radius > 0.0 ||
+                  root.borderWidth > 0 ||
+                  backgroundColor.a > 0.0 ||
+                  source !== image ||
+                  root.fillMode === Image.PreserveAspectCrop)
 
         smooth: root.smooth
 
@@ -284,7 +282,7 @@ Item {
         // because the root item may be invisible (`grabToImage()` call on an invisible
         // item case). In that case, shader effect would report invisible although it
         // would appear in the grabbed image.
-        visible: (status === Image.Ready) && !shaderEffect.readyForVisibility
+        visible: (status === Image.Ready) && !shaderEffect.visible
 
         // Clipping is not a big concern for rendering performance
         // with the software or openvg scene graph adaptations.
