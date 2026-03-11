@@ -4435,7 +4435,7 @@ then
 
   AS_IF([test ! "${XCRUN}" = "no"], [
     AC_MSG_CHECKING([for metal (using xcrun)])
-    METAL="$(eval $XCRUN -f metal 2>/dev/null || echo no)"
+    METAL="$(eval $XCRUN --toolchain metal -f metal 2>/dev/null || eval $XCRUN -f metal 2>/dev/null || echo no)"
     AC_MSG_RESULT([${METAL}])
   ], [
     AC_MSG_WARN([Looking for tools without using xcrun])
@@ -4454,7 +4454,7 @@ then
 
   AS_IF([test ! "${XCRUN}" = "no"], [
     AC_MSG_CHECKING([for metallib (using xcrun)])
-    METALLIB="$(eval $XCRUN -f metallib 2>/dev/null || echo no)"
+    METALLIB="$(eval $XCRUN --toolchain metal -f metallib 2>/dev/null || eval $XCRUN -f metallib 2>/dev/null || echo no)"
     AC_MSG_RESULT([${METALLIB}])
   ], [
     AC_MSG_WARN([Looking for tools without using xcrun])
