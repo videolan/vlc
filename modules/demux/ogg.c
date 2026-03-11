@@ -1706,6 +1706,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 
                     es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_FLAC );
                     oggpacket.packet += 13; oggpacket.bytes -= 13; /* Point to the streaminfo */
+                    p_stream->fmt.b_packetized = false;
                     if ( !Ogg_ReadFlacStreamInfo( p_demux, p_stream, &oggpacket ) )
                     {
                         msg_Dbg( p_demux, "found invalid Flac header" );
@@ -1713,7 +1714,6 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream = NULL;
                         p_ogg->i_streams--;
                     }
-                    p_stream->fmt.b_packetized = false;
                 }
                 /* Check for Theora header */
                 else if( oggpacket.bytes >= 7 &&
