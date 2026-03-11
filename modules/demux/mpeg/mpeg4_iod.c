@@ -127,13 +127,25 @@ static bool OD_SLDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8
         sl_descr->i_timestamp_resolution = ODGetBytes( &i_data, &p_data, 4 );
         sl_descr->i_OCR_resolution = ODGetBytes( &i_data, &p_data, 4 );
         sl_descr->i_timestamp_length = ODGetBytes( &i_data, &p_data, 1 );
+        if( sl_descr->i_timestamp_length > 64 )
+            return false;
         sl_descr->i_OCR_length = ODGetBytes( &i_data, &p_data, 1 );
+        if( sl_descr->i_OCR_length > 32 )
+            return false;
         sl_descr->i_AU_length = ODGetBytes( &i_data, &p_data, 1 );
+        if( sl_descr->i_AU_length > 32 )
+            return false;
         sl_descr->i_instant_bitrate_length = ODGetBytes( &i_data, &p_data, 1 );
+        if( sl_descr->i_instant_bitrate_length > 64 )
+            return false;
         uint16_t i16 = ODGetBytes( &i_data, &p_data, 2 );
         sl_descr->i_degradation_priority_length = i16 >> 12;
         sl_descr->i_AU_seqnum_length = (i16 >> 7) & 0x1f;
+        if( sl_descr->i_AU_seqnum_length > 16 )
+            return false;
         sl_descr->i_packet_seqnum_length = (i16 >> 2) & 0x1f;
+        if( sl_descr->i_packet_seqnum_length > 16 )
+            return false;
         break;
     case SL_Predefined_NULL:
         memset( sl_descr, 0, sizeof(*sl_descr) );
