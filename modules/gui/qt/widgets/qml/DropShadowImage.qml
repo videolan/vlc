@@ -55,7 +55,7 @@ Item {
         cache: true
         asynchronous: true
 
-        visible: !visualDelegate.readyForVisibility
+        visible: !visualDelegate.visible
 
         fillMode: Image.Stretch
 
@@ -96,9 +96,7 @@ Item {
         width: image.paintedWidth
         height: image.paintedHeight
 
-        visible: readyForVisibility
-
-        readonly property bool readyForVisibility: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+        visible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
         supportsAtlasTextures: true
         blending: true
