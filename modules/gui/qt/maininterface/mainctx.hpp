@@ -260,22 +260,6 @@ public:
     void setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider);
 
     int mouseHideTimeout() const { return m_mouseHideTimeout; }
-
-    Q_INVOKABLE static inline bool useTopLevelWindowForToolTip() {
-        assert(qGuiApp);
-        if constexpr (QT_VERSION < QT_VERSION_CHECK(6, 8, 0))
-            return false; // Feature is not available
-#ifndef QT_STATIC // We have patched contrib Qt to fix both of the spotted Qt bugs
-        if constexpr (QT_VERSION < QT_VERSION_CHECK(6, 8, 2))
-            return false; // This feature was not tested properly upstream, and often causes crashes (QTBUG-131898, #28919).
-#endif
-        if constexpr (QT_VERSION < QT_VERSION_CHECK(6, 9, 2))
-        {
-            static const bool isWayland = qGuiApp->platformName().startsWith(QLatin1String("wayland"));
-            return !isWayland; // QTBUG-135158
-        }
-        return true;
-    }
     
     Q_INVOKABLE bool backdropBlurRequested() const { return var_InheritBool(p_intf, "qt-backdrop-blur"); }
 

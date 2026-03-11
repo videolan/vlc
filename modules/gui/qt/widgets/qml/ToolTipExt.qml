@@ -41,7 +41,7 @@ T.ToolTip {
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutsideParent | T.Popup.CloseOnReleaseOutsideParent
 
     Component.onCompleted: {
-        if (MainCtx.useTopLevelWindowForToolTip()) {
+        if (control.popupType !== undefined) {
             console.assert(typeof control.popupType === "number")
             control.popupType = 1 // Popup.Window
         }
