@@ -17,8 +17,6 @@ $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.xz:
 
 ssh2: libssh2-$(LIBSSH2_VERSION).tar.xz .sum-ssh2
 	$(UNPACK)
-	$(call update_autoconfig,.)
-	$(call pkg_static,"libssh2.pc.in")
 	$(MOVE)
 
 DEPS_ssh2 =
@@ -31,16 +29,16 @@ DEPS_ssh2 += alloweduwp $(DEPS_alloweduwp)
 endif
 endif
 
-SSH2_CONF := --disable-examples-build --disable-tests
+SSH2_CONF := -DBUILD_EXAMPLES=OFF -DLIBSSH2_BUILD_DOCS=OFF
 ifndef HAVE_WIN32
-SSH2_CONF += --with-crypto=libgcrypt
+SSH2_CONF += -DCRYPTO_BACKEND:STRING=Libgcrypt
 else
-SSH2_CONF += --with-crypto=wincng
+SSH2_CONF += -DCRYPTO_BACKEND:STRING=WinCNG
 endif
 
-.ssh2: ssh2
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(SSH2_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+.ssh2: ssh2 toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(SSH2_CONF)
+	+$(CMAKEBUILD)
+	$(CMAKEINSTALL)
 	touch $@
