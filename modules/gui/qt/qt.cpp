@@ -889,7 +889,7 @@ static void *Thread( void *obj )
 
     /* Start the QApplication here */
     QApplication app( argc, argv );
-    app.setProperty("initialStyle", app.style()->objectName());
+    app.setProperty("initialStyle", app.style()->name());
 
     {
         // Install custom translator:
