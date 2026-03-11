@@ -1,7 +1,7 @@
 # ssh2
 
-LIBSSH2_VERSION := 1.11.0
-LIBSSH2_URL := https://www.libssh2.org/download/libssh2-$(LIBSSH2_VERSION).tar.gz
+LIBSSH2_VERSION := 1.11.1
+LIBSSH2_URL := https://www.libssh2.org/download/libssh2-$(LIBSSH2_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
 PKGS += ssh2
@@ -10,12 +10,12 @@ ifeq ($(call need_pkg,"libssh2"),)
 PKGS_FOUND += ssh2
 endif
 
-$(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.gz:
+$(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.xz:
 	$(call download_pkg,$(LIBSSH2_URL),ssh2)
 
-.sum-ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz
+.sum-ssh2: libssh2-$(LIBSSH2_VERSION).tar.xz
 
-ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
+ssh2: libssh2-$(LIBSSH2_VERSION).tar.xz .sum-ssh2
 	$(UNPACK)
 	$(call update_autoconfig,.)
 	$(call pkg_static,"libssh2.pc.in")
