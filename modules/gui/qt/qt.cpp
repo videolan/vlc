@@ -533,9 +533,10 @@ public:
                       int n = -1) const override
     {
         Q_UNUSED(context);
-        Q_UNUSED(disambiguation);
-        Q_UNUSED(n);
-        const char* const text = vlc_gettext(sourceText);
+
+        const char* text = (n >= 0 && disambiguation != nullptr) ? vlc_ngettext(sourceText, disambiguation, n)
+                                                                 : vlc_gettext(sourceText);
+
         assert(text);
         return QString::fromUtf8(text);
     }
