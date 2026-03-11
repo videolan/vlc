@@ -141,7 +141,7 @@ MainViewLoader {
                 fallbackImage: VLCStyle.noArtArtistSmall
 
                 title: model.name || qsTr("Unknown artist")
-                subtitle: model.nb_tracks > 1 ? qsTr("%1 songs").arg(model.nb_tracks) : qsTr("%1 song").arg(model.nb_tracks)
+                subtitle: qsTr("%1 song", "%1 songs", model.nb_tracks).arg(model.nb_tracks)
                 titleTopMargin: artistGrid.titleTopMargin
                 playIconSize: VLCStyle.play_cover_small
                 textAlignHCenter: true

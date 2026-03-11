@@ -81,7 +81,7 @@ Item {
                 string += value.formatShort()
             } else if (criteria === "nb_tracks") {
 
-                string += qsTr("%1 tracks").arg(value)
+                string += qsTr("%1 track", "%1 tracks", value).arg(value)
             } else {
                 string += value
             }

@@ -202,8 +202,10 @@ MainViewLoader {
                 items.push(root.model.data(i, MLPlaylistListModel.PLAYLIST_ID))
             }
             console.assert(items.length > 0)
-            if (DialogsProvider.questionDialog(qsTr("Do you really want to delete the selected playlist(s)?"),
-                                               qsTr("Delete playlist(s)")))
+            if (DialogsProvider.questionDialog(qsTr("Do you really want to delete the selected playlist?",
+                                                    "Do you really want to delete the selected playlists?",
+                                                    items.length),
+                                               qsTr("Delete playlist", "Delete playlists", items.length)))
                 root.model.deletePlaylists(items)
         } else {
             console.warn(root, ": Nothing to delete")
@@ -325,8 +327,7 @@ MainViewLoader {
                 title: (model.name) ? model.name
                                     : qsTr("Unknown title")
 
-                labels: (model.count > 1) ? [ qsTr("%1 Tracks").arg(_getCount(model)) ]
-                                          : [ qsTr("%1 Track") .arg(_getCount(model)) ]
+                labels: [ qsTr("%1 Track", "%1 Tracks", _getCount(model)).arg(_getCount(model)) ]
 
                 dragItem: dragItemPlaylist
 

@@ -189,7 +189,7 @@ T.Pane {
                 parts.push(year)
 
             const count = _albumData.nb_tracks ?? 0
-            parts.push(qsTr("%1 track(s)").arg(count))
+            parts.push(qsTr("%1 track", "%1 tracks", count).arg(count))
 
             const duration = _albumData.duration?.formatHMS()
             if (duration)

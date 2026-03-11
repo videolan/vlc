@@ -68,10 +68,7 @@ FocusScope {
     function _getStringTrack() {
         const count = model?.nb_tracks ?? 0;
 
-        if (count < 2)
-            return qsTr("%1 track").arg(count);
-        else
-            return qsTr("%1 tracks").arg(count);
+        return qsTr("%1 track", "%1 tracks", count).arg(count);
     }
 
     readonly property ColorContext colorContext: ColorContext {

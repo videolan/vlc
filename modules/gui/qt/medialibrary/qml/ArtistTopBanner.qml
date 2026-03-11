@@ -212,7 +212,7 @@ FocusScope {
 
                 Layout.topMargin: VLCStyle.margin_xxxsmall
 
-                text: qsTr("%1 Songs").arg(artist.nb_tracks)
+                text: qsTr("%1 Song", "%1 Songs", Number(artist.nb_tracks)).arg(artist.nb_tracks)
                 color: theme.fg.secondary
             }
 

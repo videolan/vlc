@@ -201,7 +201,7 @@ MainViewLoader {
 
                         Widgets.CaptionLabel {
                             width: overlay.width
-                            text: model.nb_tracks > 1 ? qsTr("%1 Tracks").arg(model.nb_tracks) : qsTr("%1 Track").arg(model.nb_tracks)
+                            text: qsTr("%1 Track", "%1 Tracks", model.nb_tracks).arg(model.nb_tracks)
                             opacity: .7
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
