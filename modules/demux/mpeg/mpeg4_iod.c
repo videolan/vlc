@@ -510,7 +510,7 @@ void ODFree( od_descriptor_t *p_iod )
         return;
     }
 
-    for( int i = 0; i < 255; i++ )
+    for( size_t i = 0; i < ES_DESCRIPTOR_COUNT; i++ )
     {
 #define es_descr p_iod->es_descr[i]
         if( es_descr.b_ok )
