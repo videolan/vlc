@@ -45,6 +45,7 @@ apps:
       - removable-media
       - screen-inhibit-control
       - pipewire
+      - udisks2
     slots:
       - mpris
 parts:
