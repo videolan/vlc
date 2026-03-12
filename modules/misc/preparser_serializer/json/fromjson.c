@@ -912,6 +912,9 @@ static void fromJSON_meta(struct serdes_sys *sys,
         free(key);
         free(value);
     }
+    int status = 0;
+    json_object_to_int(obj, "i_status", &status, &err);
+    vlc_meta_SetStatus(meta, status);
 
     *error |= err;
 }

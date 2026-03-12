@@ -828,12 +828,10 @@ static void toJSON_meta(struct serdes_sys *sys, const vlc_meta_t *meta,
         }
         free(keys);
     }
-    if (serdes_buf_putc(sys, ']') < 0) {
+    if (serdes_buf_puts(sys, "], ") < 0) {
         return;
     }
-    if (serdes_buf_putc(sys, '}') < 0) {
-        return;
-    }
+    json_stringify_last(number, sys, "i_status", vlc_meta_GetStatus(meta));
 }
 
 static void toJSON_input_item_es(struct serdes_sys *sys,
