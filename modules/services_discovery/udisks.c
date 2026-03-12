@@ -474,13 +474,13 @@ static int Open(vlc_object_t *p_obj)
 
     int r;
 
+    sd_bus_error err = SD_BUS_ERROR_NULL;
     /* connect to the session bus */
     r =  sd_bus_open_system(&p_sys->bus);
     if(r < 0)
         goto error;
    sd_bus *bus = p_sys->bus;
    sd_bus_message *reply = NULL;
-   sd_bus_error err = SD_BUS_ERROR_NULL;
    r = sd_bus_call_method(bus, DBUS_INTERFACE_UDISKS2, DBUS_PATH_UDISKS2_MANAGER,
                           DBUS_INTERFACE_UDISKS2_MANAGER, "GetBlockDevices",
                           &err, &reply, "a{sv}", NULL);
