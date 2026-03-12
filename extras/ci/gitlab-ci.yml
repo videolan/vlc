@@ -423,6 +423,7 @@ debian-meson:
         name: $VLC_SNAP_IMAGE
         entrypoint: [""]
     script:
+        - git config --global --add safe.directory ${CI_PROJECT_DIR}/.git
         - extras/package/snap/build.sh -p
     allow_failure: true
     variables: *variables-snap
