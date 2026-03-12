@@ -185,7 +185,17 @@ Open(struct vlc_gl_interop *interop)
     SAFE_GPA(VDPAUUnmapSurfacesNV);
 #undef SAFE_GPA
 
-    INTEROP_CALL(sys, VDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
+    sys->gl.VDPAUInitNV((void *)(uintptr_t)device, vdp_gpa);
+    {
+        GLenum ret = (sys)->gl.GetError();
+        if (ret != GL_NO_ERROR)
+        {
+            msg_Err(interop->gl, "VDPAUInitNV failed: 0x%x", ret);
+            vlc_decoder_device_Release(dec_device);
+            free(sys);
+            return VLC_EGENERIC;
+        }
+    }
 
     /* The pictures are uploaded upside-down */
     video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
