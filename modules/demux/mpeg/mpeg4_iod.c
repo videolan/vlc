@@ -385,7 +385,10 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
                 /* od_descriptor_t *p_iod = (od_descriptor_t *) param; */
                 if ( !ODObjectDescriptorRead( p_object, i_descriptor_data,
                                                p_descriptor_data, childparams ) )
-                {};
+                {
+                    free( p_od );
+                    return i_read_count;
+                };
                 break;
             }
 
@@ -399,7 +402,10 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
                 /* od_descriptor_t *p_iod = (od_descriptor_t *) param; */
                 if ( !OD_InitialObjectDesc_Read( p_object, i_descriptor_data,
                                                   p_descriptor_data, childparams ) )
-                {};
+                {
+                    free( p_iod );
+                    return i_read_count;
+                };
                 break;
             }
 
@@ -410,7 +416,7 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
                 childparams.es_descr = &p_iod->es_descr[i_read_count];
                 if ( !OD_ESDesc_Read( p_object, i_descriptor_data,
                                        p_descriptor_data, childparams ) )
-                {};
+                    return i_read_count;
                 break;
             }
 
@@ -418,7 +424,7 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
             {
                 if ( !OD_DecConfigDesc_Read( p_object, i_descriptor_data,
                                               p_descriptor_data, params ) )
-                {};
+                    return i_read_count;
                 break;
             }
 
@@ -426,7 +432,7 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
             {
                 if ( !OD_DecSpecificDesc_Read( p_object, i_descriptor_data,
                                                 p_descriptor_data, params ) )
-                {};
+                    return i_read_count;
                 break;
             }
 
@@ -434,7 +440,7 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
             {
                 if ( !OD_SLDesc_Read( p_object, i_descriptor_data,
                                        p_descriptor_data, params ) )
-                {};
+                    return i_read_count;
                 break;
             }
 
