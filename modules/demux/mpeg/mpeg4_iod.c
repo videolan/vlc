@@ -32,6 +32,7 @@
 #include "mpeg4_iod.h"
 
 #include <stdlib.h>
+#include <assert.h>
 
 //#define OD_DEBUG 1
 static void od_debug( vlc_object_t *p_object, const char *format, ... )
@@ -438,8 +439,9 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
             }
 
             default:
-                od_debug( p_object, "trying to read unsupported descriptor" );
-                break;
+                /* invalid i_target_tag from caller */
+                vlc_assert_unreachable();
+                return 0;
         }
 
         *pp_data += i_length;
