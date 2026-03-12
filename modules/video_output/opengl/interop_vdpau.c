@@ -117,6 +117,7 @@ Close(struct vlc_gl_interop *interop)
     assert(sys->gl.GetError() == GL_NO_ERROR);
     vlc_decoder_device *dec_device = sys->dec_device;
     vlc_decoder_device_Release(dec_device);
+    free(sys);
 }
 
 static int
@@ -137,7 +138,7 @@ Open(struct vlc_gl_interop *interop)
         return VLC_EGENERIC;
     }
 
-    converter_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(interop), sizeof(*sys));
+    converter_sys_t *sys = malloc(sizeof(*sys));
     if (unlikely(sys == NULL))
     {
         vlc_decoder_device_Release(dec_device);
@@ -161,6 +162,7 @@ Open(struct vlc_gl_interop *interop)
         != VDP_STATUS_OK)
     {
         vlc_decoder_device_Release(dec_device);
+        free(sys);
         return VLC_EGENERIC;
     }
 
@@ -169,6 +171,7 @@ Open(struct vlc_gl_interop *interop)
     if (sys->gl.fct == NULL) \
     { \
         vlc_decoder_device_Release(dec_device); \
+        free(sys); \
         return VLC_EGENERIC; \
     }
     SAFE_GPA(VDPAUInitNV);
