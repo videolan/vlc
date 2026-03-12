@@ -30,8 +30,9 @@
  *
  * @param [in]  path    Path to the executable to run. Must not be NULL.
  * @param [in]  argc    Number of arguments passed to the process (must be
- *                      greater than 0).
- * @param [in]  argv    Array of argument strings (argv[0] must not be NULL).
+ *                      greater than or equal to 0).
+ * @param [in]  argv    Array of argument strings. May be NULL if argc is 0;
+ *                      otherwise argv[0] must not be NULL.
  *
  * @return      A pointer to the newly created vlc_process structure on
  *              success, or NULL on failure.

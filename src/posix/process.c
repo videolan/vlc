@@ -42,9 +42,10 @@ struct vlc_process*
 vlc_process_Spawn(const char *path, int argc, const char *const *argv)
 {
     assert(path != NULL);
-    assert(argc > 0);
-    assert(argv != NULL);
-    assert(argv[0] != NULL);
+    if (argc > 0) {
+        assert(argv != NULL);
+        assert(argv[0] != NULL);
+    }
 
     int ret = VLC_EGENERIC;
     int fds[2] = { -1, -1 };
