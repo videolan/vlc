@@ -53,7 +53,7 @@ FirstRunWizard::FirstRunWizard( qt_intf_t *_p_intf, QWidget *parent)
         "not even in anonymized form, to anyone."
         "</p>\n"
         "<p>Nevertheless, <i>VLC</i> is able to automatically retrieve "
-        "information about the media in your playlist from third party "
+        "information about the media in your play queue from third party "
         "Internet-based services. This includes cover art, track names, "
         "artist names and other meta-data."
         "</p>\n"

@@ -62,7 +62,7 @@
 
 /*************** Playlist *************/
 
-#define I_PL_SAVE       N_("Save Playlist to &File...")
+#define I_PL_SAVE       N_("Save Play Queue to &File...")
 
 #define I_PL_SEARCH     N_("Search")
 

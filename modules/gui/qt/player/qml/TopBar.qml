@@ -482,7 +482,7 @@ FocusScope{
             objectName: ControlListModel.PLAYLIST_BUTTON
             font.pixelSize: VLCStyle.icon_banner
             text: VLCIcons.playlist
-            description: qsTr("Playlist")
+            description: qsTr("Play Queue")
 
             AccessibleCompat.id: "topBarPlayqueueButton"
 

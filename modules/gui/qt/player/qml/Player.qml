@@ -1289,7 +1289,7 @@ FocusScope {
                       ? ControlBar.TimeTextPosition.LeftRightSlider
                       : ControlBar.TimeTextPosition.AboveSlider
 
-        // hide right text so that it won't overlap with playlist
+        // hide right text so that it won't overlap with play queue
         showRemainingTime: (textPosition !== ControlBar.TimeTextPosition.AboveSlider)
                            || !playlistVisibility.isPlaylistVisible
 

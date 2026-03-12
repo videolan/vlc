@@ -175,7 +175,7 @@ T.Pane {
             spacing: VLCStyle.margin_large
 
             Widgets.IconLabel {
-                // playlist cover column
+                // play queue cover column
                 Layout.preferredWidth: VLCStyle.icon_playlistArt
 
                 horizontalAlignment: Text.AlignHCenter

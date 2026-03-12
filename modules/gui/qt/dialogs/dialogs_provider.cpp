@@ -835,7 +835,7 @@ void DialogsProvider::savePlayingToPlaylist()
 
     QString selected;
     QString file = getSaveFileName( NULL,
-                                    qtr( "Save playlist as..." ),
+                                    qtr( "Save play queue as..." ),
                                     p_intf->p_mi->getDialogFilePath(), filters.join( ";;" ),
                                     &selected );
     const char *psz_selected_module = NULL;

@@ -215,7 +215,7 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
         ":/menu/stream.svg", &DialogsProvider::openAndStreamingDialogs, "Ctrl+S" );
     menu->addSeparator();
 
-    action = menu->addAction( qtr( "Quit at the end of playlist" ), [playlist = THEMPL](bool checked){
+    action = menu->addAction( qtr( "Quit at the end of play queue" ), [playlist = THEMPL](bool checked){
         if (checked)
             playlist->setMediaStopAction(PlaylistController::MEDIA_STOPPED_EXIT);
         else
@@ -303,14 +303,14 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu)
 #ifndef __APPLE__
             ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_playlist.svg", menu ),
 #endif
-            qtr( "Play&list" ));
+            qtr( "Play &Queue" ));
     action->setShortcut(QString( "Ctrl+L" ));
     action->setCheckable( true );
     connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &SidePanelCtx::setVisible );
     action->setChecked( mi->getPlayqueuePanel()->isVisible() );
 
-    /* Docked Playlist */
-    action = menu->addAction( qtr( "Docked Playlist" ) );
+    /* Docked Play Queue */
+    action = menu->addAction( qtr( "Docked Play Queue" ) );
     action->setCheckable( true );
     connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &SidePanelCtx::setDocked );
     action->setChecked( mi->getPlayqueuePanel()->isDocked() );

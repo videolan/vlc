@@ -43,7 +43,7 @@ using SharedPlaylistItem = ::vlc::vlc_shared_data_ptr<vlc_playlist_item_t,
 /**
  * Playlist item wrapper.
  *
- * It contains both the SharedPlaylistItem and cached data saved while the playlist
+ * It contains both the SharedPlaylistItem and cached data saved while the play queue
  * is locked, so that the fields may be read without synchronization or race
  * conditions.
  */

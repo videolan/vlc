@@ -155,17 +155,17 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define NOTIFICATION_TEXT N_( "Show notification popup on track change" )
 #define NOTIFICATION_LONGTEXT N_( \
     "Show a notification popup with the artist and track name when " \
-    "the current playlist item changes, when VLC is minimized or hidden." )
+    "the current play queue item changes, when VLC is minimized or hidden." )
 
 #define OPACITY_TEXT N_( "Windows opacity between 0.1 and 1" )
 #define OPACITY_LONGTEXT N_( "Sets the windows opacity between 0.1 and 1 " \
-                             "for main interface, playlist and extended panel."\
+                             "for main interface, play queue and extended panel."\
                              " This option only works with Windows and " \
                              "X11 with composite extensions." )
 
 #define OPACITY_FS_TEXT N_( "Fullscreen controller opacity between 0.1 and 1" )
 #define OPACITY_FS_LONGTEXT N_( "Sets the fullscreen controller opacity between 0.1 and 1 " \
-                             "for main interface, playlist and extended panel."\
+                             "for main interface, play queue and extended panel."\
                              " This option only works with Windows and " \
                              "X11 with composite extensions." )
 
@@ -256,7 +256,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_COMPOSITOR_LONGTEXT N_("Select Qt video integration backend. Use with care, the interface may not start if an incompatible compositor is selected")
 
 #define SMOOTH_SCROLLING_TEXT N_( "Use smooth scrolling in Flickable based views" )
-#define SMOOTH_SCROLLING_LONGTEXT N_( "Deactivating this option will disable smooth scrolling in Flickable based views (such as the Playqueue). " \
+#define SMOOTH_SCROLLING_LONGTEXT N_( "Deactivating this option will disable smooth scrolling in Flickable based views (such as the Play Queue). " \
                                       "This option is only respected with a scroll handler, see option `qt-use-scroll-handler`." )
 
 #define SCROLL_HANDLER_TEXT N_( "Use Kirigami scroll handler for Flickable based views" )

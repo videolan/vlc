@@ -368,14 +368,14 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
                        " internet streams or extract meta data." ),
                   AddonsModel::Type::TYPE_PLAYLIST_PARSER );
     addCategory( qtr("Service Discovery"),
-                  qtr( "Service discoveries adds new sources to your playlist"
+                  qtr( "Service discoveries adds new sources to your play queue"
                        " such as web radios, video websites, ..." ),
                   AddonsModel::Type::TYPE_SERVICE_DISCOVERY );
     addCategory( qtr("Interfaces"),
                   "",
                   AddonsModel::Type::TYPE_INTERFACE );
     addCategory( qtr("Art and meta fetchers"),
-                  qtr( "Retrieves extra info and art for playlist items" ),
+                  qtr( "Retrieves extra info and art for play queue items" ),
                   AddonsModel::Type::TYPE_META );
     addCategory( qtr("Extensions"),
                   qtr( "Extensions brings various enhancements."
