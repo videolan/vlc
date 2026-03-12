@@ -296,8 +296,23 @@ static inline bool json_object_to_uint_sized(const struct json_object *obj,
     json_object_to_number(obj, name, number, error, -DBL_MAX, DBL_MAX)
 
 /* Ensure that the returned number is a float. */
-#define json_object_to_float(obj, name, number, error) \
-    json_object_to_number(obj, name, (double *)(number), error, -FLT_MAX, FLT_MAX)
+static inline bool json_object_to_float(const struct json_object *obj,
+                                        const char *name, float *number,
+                                        bool *error)
+{
+
+    assert(obj != NULL);
+    assert(name != NULL);
+    assert(number != NULL);
+    assert(error != NULL);
+
+    double n = NAN;
+    json_object_to_number(obj, name, &n, error, -FLT_MAX, FLT_MAX);
+    if (!*error) {
+        *number = (float)n;
+    }
+    return *error;
+}
 
 /* Get value in `obj` with the key `name` and check if it's a string or null.
  */
@@ -1455,7 +1470,6 @@ fromJSON_vlc_preparser_msg(struct serdes_sys *sys,
 #undef json_array_integer_load
 #undef json_array_boolean_load
 #undef json_array_foreach_ref
-#undef json_object_to_float
 #undef json_object_to_double
 #undef json_object_to_int
 #undef json_object_to_uint
