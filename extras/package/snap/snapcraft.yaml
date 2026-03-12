@@ -105,6 +105,7 @@ parts:
          --prefix=/usr \
          --enable-merge-ffmpeg \
          --enable-extra-checks \
+         --disable-qt-qml-cache \
          --disable-pipewire
 
       make -j ${CRAFT_PARALLEL_BUILD_COUNT}
