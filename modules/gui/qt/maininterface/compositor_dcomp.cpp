@@ -138,7 +138,7 @@ bool CompositorDirectComposition::init()
         return false;
     }
 
-    const QString& sceneGraphBackend = qEnvironmentVariable("QT_QUICK_BACKEND");
+    QString sceneGraphBackend = qEnvironmentVariable("QT_QUICK_BACKEND");
     if (!sceneGraphBackend.isEmpty() /* if empty, RHI is used */ &&
         sceneGraphBackend != QLatin1String("rhi"))
     {
@@ -152,6 +152,16 @@ bool CompositorDirectComposition::init()
         // of using `QQuickWindow::sceneGraphBackend()`, simply probe
         // the environment variable.
         return false;
+    }
+    else
+    {
+        // If `QQuickWindow::setGraphicsApi()` is used with a non-RHI
+        // mode such as `software`, Qt at the moment adjusts the scene
+        // graph backend but not the `QQuickWindow::graphicsApi()`.
+        // Until Qt does that, we need to check it here additionally:
+        sceneGraphBackend = QQuickWindow::sceneGraphBackend();
+        if (!sceneGraphBackend.isEmpty() && sceneGraphBackend != QLatin1String("rhi"))
+            return false;
     }
 
     const auto graphicsApi = QQuickWindow::graphicsApi();
