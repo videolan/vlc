@@ -1093,6 +1093,8 @@ static int WidiHeader( unsigned *pi_rate,
         *pi_bits = 16;
 
     *pi_channels = (p_header[3] & 0x7) + 1;
+    if( *pi_channels != 2 )
+        return -1;
 
     *pi_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
 
