@@ -96,11 +96,27 @@ bool CompositorX11::init()
         return false;
     }
 
-    if (QQuickWindow::graphicsApi() != QSGRendererInterface::OpenGL)
+    const QString& sceneGraphBackend = qEnvironmentVariable("QT_QUICK_BACKEND");
+    if (!sceneGraphBackend.isEmpty() /* if empty, RHI is used */ &&
+        sceneGraphBackend != QLatin1String("rhi") &&
+        sceneGraphBackend != QLatin1String("software"))
     {
-        msg_Warn(m_intf, "Running on X11, but graphics api is not OpenGL." \
-                         "CompositorX11 only supports OpenGL for now.\n" \
-                         "FIXME: Support vulkan as well.");
+        // No RHI means no OpenGL, the graphics API check below is
+        // only relevant when RHI is in use. If QT_QUICK_BACKEND is
+        // set to software or openvg, then `QQuickWindow::graphicsApi()`
+        // might still report OpenGL until the scene graph is initialized.
+        // Unlike `QQuickWindow::graphicsApi()`, `sceneGraphBackend()`
+        // is only valid after the window is constructed, so instead
+        // of using `QQuickWindow::sceneGraphBackend()`, simply probe
+        // the environment variable.
+        return false;
+    }
+
+    const auto graphicsApi = QQuickWindow::graphicsApi();
+    if (graphicsApi != QSGRendererInterface::OpenGL &&
+        graphicsApi != QSGRendererInterface::Software)
+    {
+        msg_Warn(m_intf, "CompositorX11: Only software mode and rhi opengl are supported!");
         return false;
     }
 
