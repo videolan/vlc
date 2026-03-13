@@ -6,9 +6,10 @@ SRC_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
 TARGET="${TARGET:-arm-webos-linux-gnueabi}"
 APP_ID="${APP_ID:-org.videolan.vlc}"
 PREFIX="${PREFIX:-/media/developer/apps/usr/palm/applications/${APP_ID}}"
-BUILD_DIR="${BUILD_DIR:-$HOME/vlc-webos-build}"
-DEPS_PREFIX="${DEPS_PREFIX:-$HOME/vlc-webos-deps}"
-DEPLOY_DIR="${DEPLOY_DIR:-$SRC_DIR/vlc-webos-deploy}"
+WEBOS_WORK_ROOT="${WEBOS_WORK_ROOT:-$SRC_DIR/.webos}"
+BUILD_DIR="${BUILD_DIR:-$WEBOS_WORK_ROOT/build}"
+DEPS_PREFIX="${DEPS_PREFIX:-$WEBOS_WORK_ROOT/deps}"
+DEPLOY_DIR="${DEPLOY_DIR:-$WEBOS_WORK_ROOT/deploy}"
 JOBS="${JOBS:-$(nproc)}"
 MODE="${1:-all}"
 SDK_DOWNLOAD_DIR="${SDK_DOWNLOAD_DIR:-$BUILD_DIR/sdk}"
@@ -16,25 +17,33 @@ SDK_ARCHIVE="${WEBOS_SDK_ARCHIVE:-}"
 DEFAULT_WEBOS_SDK_URL="https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz"
 SDK_URL="${WEBOS_SDK_URL:-$DEFAULT_WEBOS_SDK_URL}"
 AUTO_SDK_DOWNLOAD="${AUTO_SDK_DOWNLOAD:-1}"
-WEBOS_QT6_ROOT="${WEBOS_QT6_ROOT:-}"
+WEBOS_QT6_ROOT="${WEBOS_QT6_ROOT:-$WEBOS_WORK_ROOT/qt6}"
 WEBOS_QT6_HOST_TOOLS="${WEBOS_QT6_HOST_TOOLS:-}"
 WEBOS_QT6_TARGET_PREFIX="${WEBOS_QT6_TARGET_PREFIX:-}"
 WEBOS_QT6_VERSION="${WEBOS_QT6_VERSION:-6.8.3}"
 WEBOS_QT6_AUTO_DOWNLOAD="${WEBOS_QT6_AUTO_DOWNLOAD:-1}"
-WEBOS_QT6_SRC_DIR="${WEBOS_QT6_SRC_DIR:-$HOME/qt6-webos-src-$WEBOS_QT6_VERSION}"
-WEBOS_QT6_BUILD_DIR="${WEBOS_QT6_BUILD_DIR:-$HOME/qt6-webos-build-host-$WEBOS_QT6_VERSION}"
-WEBOS_QT6_HOST_PREFIX="${WEBOS_QT6_HOST_PREFIX:-$HOME/qt6-webos/host}"
+WEBOS_QT6_SRC_DIR="${WEBOS_QT6_SRC_DIR:-$WEBOS_WORK_ROOT/qt6/src-$WEBOS_QT6_VERSION}"
+WEBOS_QT6_BUILD_DIR="${WEBOS_QT6_BUILD_DIR:-$WEBOS_WORK_ROOT/qt6/build-host-$WEBOS_QT6_VERSION}"
+WEBOS_QT6_HOST_PREFIX="${WEBOS_QT6_HOST_PREFIX:-$WEBOS_QT6_ROOT/host}"
 WEBOS_QT6_CMAKE_GENERATOR="${WEBOS_QT6_CMAKE_GENERATOR:-Ninja}"
 WEBOS_QT6_HOST_MODULES="${WEBOS_QT6_HOST_MODULES:-qtdeclarative,qtshadertools,qttools}"
-WEBOS_QT6_TARGET_BUILD_DIR="${WEBOS_QT6_TARGET_BUILD_DIR:-$HOME/qt6-webos-build-target-$WEBOS_QT6_VERSION}"
+WEBOS_QT6_TARGET_BUILD_DIR="${WEBOS_QT6_TARGET_BUILD_DIR:-$WEBOS_WORK_ROOT/qt6/build-target-$WEBOS_QT6_VERSION}"
 WEBOS_QT6_TARGET_MODULES="${WEBOS_QT6_TARGET_MODULES:-qtshadertools,qtdeclarative,qtwayland}"
 WEBOS_QT6_TARGET_TOOLCHAIN_FILE="${WEBOS_QT6_TARGET_TOOLCHAIN_FILE:-}"
 WEBOS_DISABLE_FREETYPE_ON_MISSING_HB="${WEBOS_DISABLE_FREETYPE_ON_MISSING_HB:-1}"
+WEBOS_AUTO_DISABLE_MISSING_FEATURES="${WEBOS_AUTO_DISABLE_MISSING_FEATURES:-0}"
 WEBOS_WAYLAND_WEBOS_PREFIX="${WEBOS_WAYLAND_WEBOS_PREFIX:-}"
 WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR="${WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR:-}"
+WEBOS_REQUIRED_CONTRIB_TARGETS="${WEBOS_REQUIRED_CONTRIB_TARGETS:-.lua .zlib .openjpeg .lame .gsm .ffmpeg}"
+WEBOS_FULL_CONTRIB_BUILD="${WEBOS_FULL_CONTRIB_BUILD:-0}"
 
-DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS="--disable-disc --disable-sout --disable-basu --disable-flac --disable-libaribcaption --disable-ass --disable-vulkan-loader --disable-sidplay2 --disable-vncclient --enable-fluidlite --enable-live555"
-DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS="--disable-libass --disable-vpx --disable-aom --enable-fluidsynth --disable-openapv --disable-vdpau --disable-caca"
+DEFAULT_QT6_ROOT_CANDIDATES=(
+    "$WEBOS_WORK_ROOT/qt6"
+    "$HOME/qt6-webos"
+)
+
+DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS=""
+DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS=""
 WEBOS_CONTRIB_BOOTSTRAP_FLAGS="${WEBOS_CONTRIB_BOOTSTRAP_FLAGS:-$DEFAULT_WEBOS_CONTRIB_BOOTSTRAP_FLAGS}"
 WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS:-$DEFAULT_WEBOS_CONFIGURE_EXTRA_FLAGS}"
 
@@ -49,14 +58,15 @@ fi
 
 usage() {
         cat <<EOF
-Usage: $0 [qt6|qt6-host-tools|qt6-target-arm|sdk|deps|configure|build|install|all]
+Usage: $0 [install-dev-env|qt6|qt6-host-tools|qt6-target-arm|sdk|deps|configure|build|install|all]
 
 Environment variables:
     WEBOS_TOOLCHAIN   Path to webOS ARM SDK/toolchain root (required if not auto-detected)
     TARGET            Target triplet (default: arm-webos-linux-gnueabi)
-    BUILD_DIR         Out-of-tree VLC build directory (default: ~/vlc-webos-build)
-    DEPS_PREFIX       Contrib install prefix (default: ~/vlc-webos-deps)
-    DEPLOY_DIR        Install DESTDIR for packaged runtime tree (default: <vlc-src>/vlc-webos-deploy)
+    WEBOS_WORK_ROOT   Root directory for all local webOS artifacts (default: <vlc-src>/.webos)
+    BUILD_DIR         Out-of-tree VLC build directory (default: <WEBOS_WORK_ROOT>/build)
+    DEPS_PREFIX       Contrib install prefix (default: <WEBOS_WORK_ROOT>/deps)
+    DEPLOY_DIR        Install DESTDIR for packaged runtime tree (default: <WEBOS_WORK_ROOT>/deploy)
     PREFIX            VLC install prefix inside webOS app sandbox
     APP_ID            webOS app id (default: org.videolan.vlc)
     JOBS              Parallel jobs (default: nproc)
@@ -64,19 +74,22 @@ Environment variables:
     WEBOS_SDK_ARCHIVE Local SDK tarball path (optional)
     WEBOS_SDK_URL     SDK tarball URL to download if SDK missing (default: openlgtv buildroot-nc4 webOS release)
     AUTO_SDK_DOWNLOAD Auto-download SDK when missing in configure/build/install/all (default: 1)
-    WEBOS_CONTRIB_BOOTSTRAP_FLAGS Extra flags passed to contrib/bootstrap (default: reproducible webOS profile)
-    WEBOS_CONFIGURE_EXTRA_FLAGS   Extra flags appended to VLC configure invocation (default: reproducible webOS profile)
-    WEBOS_QT6_ROOT                Optional external Qt6 SDK root for cross builds.
-    WEBOS_QT6_HOST_TOOLS          Optional path to host Qt6 tools dir containing qmake6/moc/rcc/uic/qsb/qmlcachegen.
-    WEBOS_QT6_TARGET_PREFIX       Optional target Qt6 prefix (contains lib/pkgconfig, include, qml, plugins).
+    WEBOS_CONTRIB_BOOTSTRAP_FLAGS Extra flags passed to contrib/bootstrap (default: none; build as much as possible)
+    WEBOS_CONFIGURE_EXTRA_FLAGS   Extra flags appended to VLC configure invocation (default: none; build as much as possible)
+    WEBOS_AUTO_DISABLE_MISSING_FEATURES Automatically disable missing optional features (lua/drm/egl/gstreamer/freetype) instead of failing later (default: 0)
+    WEBOS_REQUIRED_CONTRIB_TARGETS      Space-separated contrib targets built after deps fallback (default: .lua .zlib .openjpeg .lame .gsm .ffmpeg)
+    WEBOS_FULL_CONTRIB_BUILD            Build full contrib set before required targets (1=yes, 0=no; default: 0)
+    WEBOS_QT6_ROOT                Optional external Qt6 SDK root for cross builds (default: <WEBOS_WORK_ROOT>/qt6). Auto-detected from ~/qt6-webos when present.
+    WEBOS_QT6_HOST_TOOLS          Optional path to host Qt6 tools dir containing qmake6/moc/rcc/uic/qsb/qmlcachegen. Auto-detected from <WEBOS_QT6_ROOT>/host/bin.
+    WEBOS_QT6_TARGET_PREFIX       Optional target Qt6 prefix (contains lib/pkgconfig, include, qml, plugins). Auto-detected from <WEBOS_QT6_ROOT>/target/usr.
     WEBOS_QT6_VERSION             Qt6 version used for source download bootstrap (default: 6.8.3).
     WEBOS_QT6_AUTO_DOWNLOAD       Auto-download Qt6 sources when ARM Qt is enabled but qmake6 is missing (default: 1).
-    WEBOS_QT6_SRC_DIR             Directory used by the Qt6 downloader (default: ~/qt6-webos-src-<version>).
-    WEBOS_QT6_BUILD_DIR           Host Qt6 tools build directory (default: ~/qt6-webos-build-host-<version>).
-    WEBOS_QT6_HOST_PREFIX         Install prefix for host Qt6 tools (default: ~/qt6-webos/host).
+    WEBOS_QT6_SRC_DIR             Directory used by the Qt6 downloader (default: <WEBOS_WORK_ROOT>/qt6/src-<version>).
+    WEBOS_QT6_BUILD_DIR           Host Qt6 tools build directory (default: <WEBOS_WORK_ROOT>/qt6/build-host-<version>).
+    WEBOS_QT6_HOST_PREFIX         Install prefix for host Qt6 tools (default: <WEBOS_QT6_ROOT>/host).
     WEBOS_QT6_CMAKE_GENERATOR     CMake generator for Qt host tools build (default: Ninja).
     WEBOS_QT6_HOST_MODULES        Extra Qt6 host modules to build (comma-separated; default: qtdeclarative,qtshadertools,qttools).
-    WEBOS_QT6_TARGET_BUILD_DIR    ARM Qt6 target build directory (default: ~/qt6-webos-build-target-<version>).
+    WEBOS_QT6_TARGET_BUILD_DIR    ARM Qt6 target build directory (default: <WEBOS_WORK_ROOT>/qt6/build-target-<version>).
     WEBOS_QT6_TARGET_MODULES      ARM Qt6 target modules to build (comma-separated; default: qtshadertools,qtdeclarative,qtwayland).
     WEBOS_QT6_TARGET_TOOLCHAIN_FILE Optional CMake toolchain file for ARM Qt6 target build.
     WEBOS_DISABLE_FREETYPE_ON_MISSING_HB Disable freetype plugin in generated modules/Makefile when hb-ft.h is missing (default: 1).
@@ -84,6 +97,11 @@ Environment variables:
     WEBOS_WAYLAND_WEBOS_PROTOCOLS_DIR Optional directory containing webOS protocol XMLs (e.g. webos-shell.xml).
 
 Examples:
+    $0 install-dev-env
+    $0 deps
+    $0 configure
+    $0 build
+    $0 all
     WEBOS_SDK_URL=https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz $0 sdk
     WEBOS_TOOLCHAIN=/opt/ndk $0 deps
     WEBOS_TOOLCHAIN=/opt/ndk $0 configure
@@ -97,6 +115,59 @@ Examples:
     WEBOS_TOOLCHAIN=/opt/ndk PREFIX=/ $0 all
     make -C ~/vlc-webos-build -j$(nproc)
 EOF
+}
+
+install_dev_env() {
+    if ! command -v apt >/dev/null 2>&1; then
+        echo "install-dev-env currently supports Debian/Ubuntu hosts only (apt not found)."
+        exit 1
+    fi
+
+    if ! command -v sudo >/dev/null 2>&1; then
+        echo "sudo is required to install build dependencies."
+        exit 1
+    fi
+
+    sudo apt update
+    sudo apt install -y \
+            ca-certificates \
+      build-essential pkg-config autoconf automake libtool flex bison \
+    cmake ninja-build meson gettext python3-pip python3-venv gawk nasm yasm m4 \
+    libglib2.0-dev \
+    lua5.4 \
+      xz-utils unzip rsync file
+
+        # Ensure curl/openssl trust store is initialized after fresh WSL installs.
+        sudo update-ca-certificates
+}
+
+detect_qt6_layout() {
+    local candidate
+
+    if [ -z "$WEBOS_QT6_ROOT" ]; then
+        for candidate in "${DEFAULT_QT6_ROOT_CANDIDATES[@]}"; do
+            if [ -d "$candidate" ]; then
+                WEBOS_QT6_ROOT="$candidate"
+                break
+            fi
+        done
+    fi
+
+    if [ -z "$WEBOS_QT6_HOST_TOOLS" ]; then
+        if [ -n "$WEBOS_QT6_ROOT" ] && resolve_qmake_binary "$WEBOS_QT6_ROOT/host/bin" >/dev/null 2>&1; then
+            WEBOS_QT6_HOST_TOOLS="$WEBOS_QT6_ROOT/host/bin"
+        elif resolve_qmake_binary "$WEBOS_QT6_HOST_PREFIX/bin" >/dev/null 2>&1; then
+            WEBOS_QT6_HOST_TOOLS="$WEBOS_QT6_HOST_PREFIX/bin"
+        fi
+    fi
+
+    if [ -z "$WEBOS_QT6_TARGET_PREFIX" ] && [ -n "$WEBOS_QT6_ROOT" ]; then
+        if [ -d "$WEBOS_QT6_ROOT/target/usr" ]; then
+            WEBOS_QT6_TARGET_PREFIX="$WEBOS_QT6_ROOT/target/usr"
+        elif [ -d "$WEBOS_QT6_ROOT/target" ]; then
+            WEBOS_QT6_TARGET_PREFIX="$WEBOS_QT6_ROOT/target"
+        fi
+    fi
 }
 
 download_qt6_sources() {
@@ -529,7 +600,7 @@ build_qt6_target_arm() {
 }
 
 case "$MODE" in
-    qt6|qt6-host-tools|qt6-target-arm|sdk|deps|configure|build|install|all)
+    install-dev-env|qt6|qt6-host-tools|qt6-target-arm|sdk|deps|configure|build|install|all)
                 ;;
         -h|--help|help)
                 usage
@@ -540,6 +611,11 @@ case "$MODE" in
                 exit 1
                 ;;
 esac
+
+if [ "$MODE" = "install-dev-env" ]; then
+    install_dev_env
+    exit 0
+fi
 
 if [ "$MODE" = "qt6" ]; then
     download_qt6_sources
@@ -660,6 +736,114 @@ have_header_in_cross_paths() {
     [ -f "${DEPS_PREFIX}/include/${rel}" ] || [ -f "${SYSROOT}/usr/include/${rel}" ]
 }
 
+normalize_lua_pkgconfig_metadata() {
+    local lua_ver=""
+    local lua_h="${DEPS_PREFIX}/include/lua5.4/lua.h"
+    local pc
+
+    if [ -f "$lua_h" ]; then
+        lua_ver="$(sed -n 's/^#define LUA_RELEASE[[:space:]]\+"Lua \([0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?\)"$/\1/p' "$lua_h" | head -n 1)"
+    fi
+
+    if [ -z "$lua_ver" ]; then
+        lua_ver="5.4"
+    fi
+
+    for pc in "${DEPS_PREFIX}/lib/pkgconfig/lua.pc" "${DEPS_PREFIX}/lib/pkgconfig/lua5.4.pc"; do
+        [ -f "$pc" ] || continue
+
+        # Some cross Lua builds generate Version: 1.4 in lua.pc; normalize to real Lua 5.x.
+        if grep -q '^Version:[[:space:]]*1\.4$' "$pc" || grep -q '^version=1\.4$' "$pc"; then
+            sed -i \
+                -e "s/^Version:[[:space:]]*1\\.4$/Version: ${lua_ver}/" \
+                -e "s/^version=1\\.4$/version=${lua_ver}/" \
+                "$pc"
+        fi
+    done
+}
+
+ensure_gsm_pkgconfig_metadata() {
+    local pc="${DEPS_PREFIX}/lib/pkgconfig/gsm.pc"
+
+    if [ -f "$pc" ]; then
+        return 0
+    fi
+
+    if [ ! -f "${DEPS_PREFIX}/lib/libgsm.a" ] || [ ! -f "${DEPS_PREFIX}/include/gsm/gsm.h" ]; then
+        return 0
+    fi
+
+    mkdir -p "${DEPS_PREFIX}/lib/pkgconfig"
+    cat > "$pc" <<EOF
+prefix=${DEPS_PREFIX}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include/gsm
+
+Name: gsm
+Description: GSM 06.10 lossy speech compression library
+Version: 1.0.22
+Libs: -L\${libdir} -lgsm
+Cflags: -I\${includedir}
+EOF
+
+    # Some consumers probe for 'libgsm' rather than 'gsm'.
+    cp -f "$pc" "${DEPS_PREFIX}/lib/pkgconfig/libgsm.pc"
+}
+
+ensure_gsm_headers_compat() {
+    local h_dir="${DEPS_PREFIX}/include"
+
+    if [ -f "${h_dir}/gsm/gsm.h" ] && [ ! -f "${h_dir}/gsm.h" ]; then
+        cat > "${h_dir}/gsm.h" <<'EOF'
+#include <gsm/gsm.h>
+EOF
+    fi
+}
+
+ensure_gsm_artifacts() {
+    local stamp=".gsm"
+
+    if [ ! -f "${DEPS_PREFIX}/lib/libgsm.a" ] || [ ! -f "${DEPS_PREFIX}/include/gsm/gsm.h" ]; then
+        echo "GSM artifacts missing; rebuilding ${stamp}."
+        rm -f "$stamp"
+        make "$stamp" -j"${JOBS}"
+    fi
+
+    ensure_gsm_headers_compat
+    ensure_gsm_pkgconfig_metadata
+}
+
+ensure_ffmpeg_artifacts() {
+    local stamp=".ffmpeg"
+
+    if [ ! -f "${DEPS_PREFIX}/lib/pkgconfig/libavcodec.pc" ] || [ ! -f "${DEPS_PREFIX}/lib/pkgconfig/libavutil.pc" ]; then
+        echo "FFmpeg artifacts missing; rebuilding ${stamp}."
+        rm -f "$stamp"
+        make "$stamp" -j"${JOBS}"
+    fi
+}
+
+build_required_contrib_targets() {
+    local target
+    for target in $WEBOS_REQUIRED_CONTRIB_TARGETS; do
+        echo "Building required contrib target: $target"
+
+        # Recover from stale stamp files left by interrupted builds.
+        if [ "$target" = ".gsm" ] || [ "$target" = ".ffmpeg" ]; then
+            rm -f "$target"
+        fi
+
+        make "$target" -j"${JOBS}"
+
+        if [ "$target" = ".gsm" ]; then
+            ensure_gsm_artifacts
+        elif [ "$target" = ".ffmpeg" ]; then
+            ensure_ffmpeg_artifacts
+        fi
+    done
+}
+
 resolve_qmake_binary() {
     local tool_dir="$1"
 
@@ -764,6 +948,26 @@ fi
 export PATH="/usr/bin:${WEBOS_TOOLCHAIN}/bin:${PATH}"
 SYSROOT="${WEBOS_TOOLCHAIN}/${TARGET}/sysroot"
 
+# Always prefer host build tools; some SDK-hosted wrappers are linked against
+# incompatible host runtimes (e.g. libssl1.1) or carry stale Perl paths.
+HOST_CMAKE="${HOST_CMAKE:-/usr/bin/cmake}"
+HOST_AUTORECONF="${HOST_AUTORECONF:-/usr/bin/autoreconf}"
+HOST_AUTOCONF="${HOST_AUTOCONF:-/usr/bin/autoconf}"
+HOST_AUTOHEADER="${HOST_AUTOHEADER:-/usr/bin/autoheader}"
+HOST_AUTOMAKE="${HOST_AUTOMAKE:-/usr/bin/automake}"
+HOST_ACLOCAL="${HOST_ACLOCAL:-/usr/bin/aclocal}"
+HOST_LIBTOOLIZE="${HOST_LIBTOOLIZE:-/usr/bin/libtoolize}"
+
+[ -x "$HOST_CMAKE" ] && export CMAKE="$HOST_CMAKE"
+[ -x "$HOST_AUTORECONF" ] && export AUTORECONF="$HOST_AUTORECONF"
+[ -x "$HOST_AUTOCONF" ] && export AUTOCONF="$HOST_AUTOCONF"
+[ -x "$HOST_AUTOHEADER" ] && export AUTOHEADER="$HOST_AUTOHEADER"
+[ -x "$HOST_AUTOMAKE" ] && export AUTOMAKE="$HOST_AUTOMAKE"
+[ -x "$HOST_ACLOCAL" ] && export ACLOCAL="$HOST_ACLOCAL"
+[ -x "$HOST_LIBTOOLIZE" ] && export LIBTOOLIZE="$HOST_LIBTOOLIZE"
+
+detect_qt6_layout
+
 if [ -n "$WEBOS_QT6_ROOT" ]; then
     if [ -z "$WEBOS_QT6_HOST_TOOLS" ] && [ -d "$WEBOS_QT6_ROOT/host/bin" ]; then
         WEBOS_QT6_HOST_TOOLS="$WEBOS_QT6_ROOT/host/bin"
@@ -818,7 +1022,11 @@ if [ "$QT_ENABLED" = "1" ]; then
         fi
     fi
 
-    export PATH="$qt6_tools_dir:$PATH"
+    # Keep host build tools first when Qt tools are taken from the SDK bin dir.
+    # Otherwise meson/cmake/pkg-config/python may be replaced by SDK wrappers.
+    if [ "$qt6_tools_dir" != "${WEBOS_TOOLCHAIN}/bin" ]; then
+        export PATH="$qt6_tools_dir:$PATH"
+    fi
     if [ -n "$WEBOS_QT6_TARGET_PREFIX" ] && [ -x "$WEBOS_QT6_TARGET_PREFIX/bin/qmake6" ]; then
         export QMAKE6="$WEBOS_QT6_TARGET_PREFIX/bin/qmake6"
     elif [ -n "$WEBOS_QT6_TARGET_PREFIX" ] && [ -x "$WEBOS_QT6_TARGET_PREFIX/bin/qmake" ]; then
@@ -916,12 +1124,47 @@ if [ "$MODE" = "deps" ] || [ "$MODE" = "all" ]; then
     fi
 
     make fetch
-    make -j"${JOBS}"
+    if [ "$WEBOS_FULL_CONTRIB_BUILD" = "1" ]; then
+        if ! make -j"${JOBS}"; then
+            echo "Full contrib build reported errors."
+            echo "Continuing with required target subset: ${WEBOS_REQUIRED_CONTRIB_TARGETS}"
+        fi
+    else
+        echo "Skipping full contrib build for reliability on Ubuntu."
+        echo "Building required subset only: ${WEBOS_REQUIRED_CONTRIB_TARGETS}"
+    fi
+
+    build_required_contrib_targets
+
+    normalize_lua_pkgconfig_metadata
+    ensure_gsm_artifacts
+    ensure_ffmpeg_artifacts
+
+    if [ ! -f "${DEPS_PREFIX}/lib/pkgconfig/libavcodec.pc" ] || [ ! -f "${DEPS_PREFIX}/lib/pkgconfig/libavutil.pc" ]; then
+        echo "Required FFmpeg pkg-config files are still missing in ${DEPS_PREFIX}/lib/pkgconfig."
+        echo "Missing: libavcodec.pc and/or libavutil.pc"
+        exit 1
+    fi
 fi
 
 if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
+    normalize_lua_pkgconfig_metadata
+    ensure_gsm_pkgconfig_metadata
+
     mkdir -p "${BUILD_DIR}"
     cd "${BUILD_DIR}"
+
+    if ! printf '%s' "$WEBOS_CONFIGURE_EXTRA_FLAGS" | grep -Eq '(^|[[:space:]])--(enable|disable)-lua($|[[:space:]])'; then
+        if ! have_cross_pkg lua5.2 && ! have_cross_pkg lua5.1 && ! have_cross_pkg lua; then
+            if [ "$WEBOS_AUTO_DISABLE_MISSING_FEATURES" = "1" ]; then
+                echo "Cross Lua was not found in deps/sysroot; appending --disable-lua for this configure run."
+                WEBOS_CONFIGURE_EXTRA_FLAGS="${WEBOS_CONFIGURE_EXTRA_FLAGS} --disable-lua"
+            else
+                echo "Cross Lua was not found in deps/sysroot; keeping Lua enabled (strict mode)."
+                echo "Install cross Lua in deps/sysroot, pass --disable-lua explicitly, or set WEBOS_AUTO_DISABLE_MISSING_FEATURES=1."
+            fi
+        fi
+    fi
 
     # Keep defaults broad and rely on auto-detection whenever possible.
     # shellcheck disable=SC2086
@@ -944,24 +1187,32 @@ if [ "$MODE" = "configure" ] || [ "$MODE" = "all" ]; then
         sed -i '/^LIBS = /{ /-ldl/! s/$/ -ldl/; }' modules/Makefile || true
         sed -i '/^LIBS_fluidsynth = /{ / -lm/! s/$/ -lm/; }' modules/Makefile || true
 
-        if ! have_cross_pkg libdrm || ! have_header_in_cross_paths drm/drm_fourcc.h; then
-            echo "libdrm not available in cross sysroot; disabling DRM display plugin for this build."
-            sed -E -i 's/^(am__append_[0-9]+ = libdrm_display_plugin\.la)$/# \1/' modules/Makefile || true
+        if [ "$WEBOS_AUTO_DISABLE_MISSING_FEATURES" = "1" ]; then
+            if ! have_cross_pkg libdrm || ! have_header_in_cross_paths drm/drm_fourcc.h; then
+                echo "libdrm not available in cross sysroot; disabling DRM display plugin for this build."
+                sed -E -i 's/^(am__append_[0-9]+ = libdrm_display_plugin\.la)$/# \1/' modules/Makefile || true
+            fi
+
+            if ! have_cross_pkg egl || ! have_header_in_cross_paths EGL/egl.h; then
+                echo "EGL headers/libs not available in cross sysroot; disabling generic EGL display plugin for this build."
+                sed -E -i 's/^(am__append_[0-9]+ = libegl_display_generic_plugin\.la)$/# \1/' modules/Makefile || true
+            fi
+
+            if ! have_cross_pkg gstreamer-app-1.0 || ! have_cross_pkg gstreamer-video-1.0 || ! have_cross_pkg gstreamer-allocators-1.0 ||
+               ! { have_header_in_cross_paths gst/gst.h || have_header_in_cross_paths gstreamer-1.0/gst/gst.h; }; then
+                echo "GStreamer development files not available in cross sysroot; disabling gstdecode/gst_mem plugins for this build."
+                sed -E -i 's/^(am__append_[0-9]+ = libgstdecode_plugin\.la)$/# \1/' modules/Makefile || true
+                sed -E -i 's/^(am__append_[0-9]+ = libgst_mem_plugin\.la)$/# \1/' modules/Makefile || true
+            fi
         fi
 
-        if ! have_cross_pkg egl || ! have_header_in_cross_paths EGL/egl.h; then
-            echo "EGL headers/libs not available in cross sysroot; disabling generic EGL display plugin for this build."
-            sed -E -i 's/^(am__append_[0-9]+ = libegl_display_generic_plugin\.la)$/# \1/' modules/Makefile || true
-        fi
-
-        if ! have_cross_pkg gstreamer-app-1.0 || ! have_cross_pkg gstreamer-video-1.0 || ! have_cross_pkg gstreamer-allocators-1.0 ||
-           ! { have_header_in_cross_paths gst/gst.h || have_header_in_cross_paths gstreamer-1.0/gst/gst.h; }; then
-            echo "GStreamer development files not available in cross sysroot; disabling gstdecode/gst_mem plugins for this build."
+        if [ "$WEBOS_AUTO_DISABLE_MISSING_FEATURES" = "1" ] && grep -Eq '(^|[[:space:]])-I/usr/include/gstreamer-1\.0([[:space:]]|$)' modules/Makefile; then
+            echo "Detected host GStreamer include paths in modules/Makefile; disabling gstdecode/gst_mem plugins for cross safety."
             sed -E -i 's/^(am__append_[0-9]+ = libgstdecode_plugin\.la)$/# \1/' modules/Makefile || true
             sed -E -i 's/^(am__append_[0-9]+ = libgst_mem_plugin\.la)$/# \1/' modules/Makefile || true
         fi
 
-        if [ "$WEBOS_DISABLE_FREETYPE_ON_MISSING_HB" = "1" ] &&
+        if [ "$WEBOS_AUTO_DISABLE_MISSING_FEATURES" = "1" ] && [ "$WEBOS_DISABLE_FREETYPE_ON_MISSING_HB" = "1" ] &&
            [ ! -f "${DEPS_PREFIX}/include/harfbuzz/hb-ft.h" ] &&
            [ ! -f "${SYSROOT}/usr/include/harfbuzz/hb-ft.h" ] &&
            [ ! -f "${DEPS_PREFIX}/include/hb-ft.h" ] &&

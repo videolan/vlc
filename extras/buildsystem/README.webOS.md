@@ -8,6 +8,27 @@ This guide describes a full in-repository path from VLC source to a webOS IPK pa
 - webOS toolchain (`arm-webos-linux-gnueabi`)
 - `ares-cli` tools (`ares-package`, `ares-install`, `ares-launch`) available in `PATH`
 
+### 1.1 Install development environment
+
+Use the helper mode to install host build dependencies on Ubuntu/Debian:
+
+```bash
+cd /vlc
+extras/package/webos/build-webos.sh install-dev-env
+```
+
+Equivalent commands:
+
+```bash
+sudo apt update
+sudo apt install -y \
+	ca-certificates \
+	build-essential pkg-config autoconf automake libtool flex bison \
+	cmake ninja-build meson gettext python3-pip gawk nasm yasm m4 \
+	xz-utils unzip rsync file
+sudo update-ca-certificates
+```
+
 Toolchain sources:
 
 - buildroot-nc4 (recommended): `https://github.com/openlgtv/buildroot-nc4`
@@ -19,19 +40,30 @@ Toolchain sources:
 
 Use the repository helper script for an end-to-end ARM build + install tree.
 
+By default, all generated artifacts are now stored under a single in-repo directory:
+
+- `<vlc-src>/.webos/build` (BUILD_DIR)
+- `<vlc-src>/.webos/deps` (DEPS_PREFIX)
+- `<vlc-src>/.webos/build/sdk` (SDK download/extract)
+- `<vlc-src>/.webos/qt6` (Qt host/target trees)
+- `<vlc-src>/.webos/deploy` (install DESTDIR)
+- `<vlc-src>/.webos/package` (IPK output + staging)
+
+Override all of these at once with `WEBOS_WORK_ROOT=/custom/path`.
+
 ### 2.0 SDK bootstrap (optional, automated)
 
 If the SDK/toolchain is not installed yet, `build-webos.sh` can download/extract it first:
 
 ```bash
-cd /home/alien/code/vlc
+cd /vlc
 WEBOS_SDK_URL="<sdk-archive-url>" extras/package/webos/build-webos.sh sdk
 ```
 
 You can also point to a local SDK archive:
 
 ```bash
-cd /home/alien/code/vlc
+cd /vlc
 WEBOS_SDK_ARCHIVE="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz" extras/package/webos/build-webos.sh sdk
 ```
 
@@ -39,14 +71,19 @@ WEBOS_SDK_ARCHIVE="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.t
 
 ```bash
 cd /home/alien/code/vlc
-WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" PREFIX=/ DEPLOY_DIR=/home/alien/code/vlc/vlc-webos-deploy extras/package/webos/build-webos.sh all
+extras/package/webos/build-webos.sh all
 ```
 
 This performs:
 - contrib deps build
 - VLC configure
 - VLC compile
-- install into `DEPLOY_DIR`
+- install into `<vlc-src>/.webos/deploy`
+
+Notes:
+- `WEBOS_TOOLCHAIN` is auto-detected from `<vlc-src>/.webos/build/sdk` when available.
+- Qt6 host/target paths are auto-detected from `<vlc-src>/.webos/qt6` (or `~/qt6-webos` fallback).
+- Keep `PREFIX` default unless you have a custom app sandbox path.
 
 ### 2.2 Build and package IPK
 
@@ -60,21 +97,21 @@ make webos-all-ipk
 Or run steps separately:
 
 ```bash
-WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" extras/package/webos/build-webos.sh deps
-WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" PREFIX=/ extras/package/webos/build-webos.sh configure
-WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" extras/package/webos/build-webos.sh build
-WEBOS_TOOLCHAIN="$HOME/kodi-dev/arm-webos-linux-gnueabi_sdk-buildroot" DEPLOY_DIR=/home/alien/code/vlc/vlc-webos-deploy extras/package/webos/build-webos.sh install
+extras/package/webos/build-webos.sh deps
+extras/package/webos/build-webos.sh configure
+extras/package/webos/build-webos.sh build
+extras/package/webos/build-webos.sh install
 make webos-ipk
 ```
 
-The IPK is emitted as `webos-package/org.videolan.vlc.webos_1.0.0_arm.ipk`.
+The IPK is emitted as `.webos/package/org.videolan.vlc.webos_1.0.0_arm.ipk`.
 
 ## 3) Install and launch
 
 ```bash
 cd /home/alien/code/vlc
 ares-install --device tv --remove org.videolan.vlc.webos || true
-ares-install --device tv webos-package/org.videolan.vlc.webos_1.0.0_arm.ipk
+ares-install --device tv .webos/package/org.videolan.vlc.webos_1.0.0_arm.ipk
 ares-launch --device tv org.videolan.vlc.webos
 ```
 
