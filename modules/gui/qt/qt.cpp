@@ -961,36 +961,80 @@ static void *Thread( void *obj )
     // NOTE: Qt Quick does not have a cross-API RHI fallback procedure (as of Qt 6.7.1).
     //       We have to manually pick a graphics api here, since the default graphics
     //       api (Direct3D 11.2) may not be supported.
-    static const auto probeRhi = []() -> QSGRendererInterface::GraphicsApi {
-        QSGRendererInterface::GraphicsApi graphicsApi = QSGRendererInterface::OpenGL;
-        // TODO: Probe D3D12 when it becomes the default.
-        QRhiD3D11InitParams params;
-        if (QRhi::probe(QRhi::D3D11, &params))
-            graphicsApi = QSGRendererInterface::Direct3D11;
-        else
+    static const auto probeRhi = []() -> QPair<QSGRendererInterface::GraphicsApi,
+                                               bool /* software through rhi, such as d3d warp */> {
+
+        // TODO: Investigate if we should use D3D12. Currently it is not the default by
+        //       Qt (as of Qt 6.8), and is not as battle tested as the default D3D11.
+
         {
-            QRhiGles2InitParams params1;
-            params1.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
-            if (!QRhi::probe(QRhi::OpenGLES2, &params1))
-                graphicsApi = QSGRendererInterface::Software;
-            delete params1.fallbackSurface;
+            QRhiD3D11InitParams params;
+            if (QRhi::probe(QRhi::D3D11, &params))
+            {
+                return {QSGRendererInterface::Direct3D11, false};
+            }
         }
-        return graphicsApi;
+
+        {
+            QRhiGles2InitParams params;
+            params.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
+            if (QRhi::probe(QRhi::OpenGLES2, &params))
+            {
+                delete params.fallbackSurface;
+                return {QSGRendererInterface::OpenGL, false};
+            }
+            delete params.fallbackSurface;
+        }
+
+        // TODO: Investigate if using Vulkan makes sense on Windows.
+        // TODO: Investigate if it makes sense to try D3D12 when probing D3D11 failed.
+
+        {
+            // D3D11 Warp:
+
+            // `QRhi::probe()` does not accept rhi flags, but we can use `QRhi::create()`
+            // to see if DirectX Warp would be functional. This is essentially the same
+            // as what `::probe()` does, at least for DirectX:
+            QRhiD3D11InitParams params;
+            QRhi *rhi = QRhi::create(QRhi::D3D11, &params, QRhi::PreferSoftwareRenderer);
+            if (rhi)
+            {
+                delete rhi;
+                return {QSGRendererInterface::Direct3D11, true};
+            }
+        }
+
+        // Qt's own software renderer, it can not display shader effects and is very
+        // primitive. Used as last resort:
+        return {QSGRendererInterface::Software, false};
     };
 
     static const char* const asyncRhiProbeCompletedProperty = "asyncRhiProbeCompleted";
     // NOTE: `QSettings` accepts `QAnyStringView` starting from Qt 6.4, use `QLatin1String(View)`:
     static constexpr QLatin1String graphicsApiKey {"graphics-api"};
+    static constexpr QLatin1String graphicsApiRhiSoftwareKey {"graphics-api-rhi-software"};
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") &&
         qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND") &&
         (QT_VERSION < QT_VERSION_CHECK(6, 4, 0) || !uint(qEnvironmentVariableIntValue("QSG_RHI_PREFER_SOFTWARE_RENDERER"))))
     {
+        const auto enableRhiSoftwareRenderer = []() {
+            // We could use `QQuickGraphicsConfiguration::setPreferSoftwareDevice()`, but this
+            // is more convenient. We do not need to check if it is already explicitly set by
+            // the user, because that is already done above.
+            qWarning() << "Qt RHI can not use hardware acceleration, software renderer (such "
+                          "as D3D Warp) through rhi is going to be used.";
+            qputenv("QSG_RHI_PREFER_SOFTWARE_RENDERER", QByteArrayLiteral("1"));
+        };
+
         const QVariant graphicsApiValue = p_intf->mainSettings->value(graphicsApiKey);
         // settings value can be string (ini file), do not use `typeId()`:
         if (graphicsApiValue.isValid() && Q_LIKELY(graphicsApiValue.canConvert<int>()))
         {
             // A cached (by then) valid graphics api is found, use it:
             QQuickWindow::setGraphicsApi(static_cast<QSGRendererInterface::GraphicsApi>(graphicsApiValue.value<int>()));
+            if (p_intf->mainSettings->value(graphicsApiRhiSoftwareKey).value<bool>())
+                enableRhiSoftwareRenderer();
+
             // Asynchronous re-probe to see if the cached graphics api is still applicable.
             // If not, QQuickWindow is going to emit scene graph error, and the application is
             // likely going to terminate. However, when the user starts the application again
@@ -1007,14 +1051,20 @@ static void *Thread( void *obj )
                 // startup will use the refreshed value. That's the best we can do here
                 // without forcing QQuickWindow to wait (hence delaying startup).
                 assert(settings);
-                settings->setValue(graphicsApiKey, static_cast<int>(probeRhi()));
+                const auto rhiResult = probeRhi();
+                settings->setValue(graphicsApiKey, static_cast<int>(rhiResult.first));
+                settings->setValue(graphicsApiRhiSoftwareKey, rhiResult.second);
                 settings->sync();
                 app.setProperty(asyncRhiProbeCompletedProperty, true);
             }, Qt::QueuedConnection); // Asynchronous, so probing here does not cause start-up slowdown.
         }
         else
         {
-            const QSGRendererInterface::GraphicsApi graphicsApi = probeRhi();
+            const auto rhiResult = probeRhi();
+            if (rhiResult.second)
+                enableRhiSoftwareRenderer();
+
+            const QSGRendererInterface::GraphicsApi graphicsApi = rhiResult.first;
             QQuickWindow::setGraphicsApi(graphicsApi);
             p_intf->mainSettings->setValue(graphicsApiKey, static_cast<int>(graphicsApi));
             p_intf->mainSettings->sync();
