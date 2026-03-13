@@ -202,8 +202,7 @@ FocusScope {
             model: g_mainDisplay.tabModel
 
             playlistPane: playlistLoader.active ? playlistLoader.item
-                                                : (playlistWindowLoader.status === Loader.Ready ? playlistWindowLoader.item.playlistView
-                                                                                                : null)
+                                                : (playlistWindowLoader.item?.playlistView ?? null)
 
             onItemClicked: (index) => {
                 const name = g_mainDisplay.tabModel.get(index).name
@@ -251,7 +250,7 @@ FocusScope {
 
                 layer.enabled: MainCtx.backdropBlurRequested() &&
                                (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
-                               (miniPlayer.visible || (loaderProgress.active && loaderProgress.item.visible))
+                               (miniPlayer.visible || !!loaderProgress.item?.visible)
 
                 // Blurring requires to access neighbour pixels, thus the source texture should be bigger than
                 // the effect so that the effect have access to the neighbor pixels for the pixels near the
@@ -408,7 +407,7 @@ FocusScope {
 
                 state: ((status === Loader.Ready) && MainCtx.playlistVisible) ? "expanded" : ""
 
-                readonly property bool shown: (status === Loader.Ready) && item.visible
+                readonly property bool shown: !!item?.visible
 
                 onVisibleChanged: {
                     if (!visible) {
