@@ -1063,7 +1063,7 @@ static const char* const ppsz_restore_playback_desc[] = {
 #define SOUT_KEEP_TEXT N_("Keep stream output open" )
 #define SOUT_KEEP_LONGTEXT N_( \
     "This allows you to keep an unique stream output instance across " \
-    "multiple playlist item." )
+    "multiple play queue items." )
 
 #define SOUT_MUX_CACHING_TEXT N_("Stream output muxer caching (ms)")
 #define SOUT_MUX_CACHING_LONGTEXT N_( \
@@ -1176,9 +1176,9 @@ static const char *const clock_sources_text[] = {
 #endif
 
 #define PLAYLISTENQUEUE_TEXT N_( \
-    "Enqueue items into playlist in one instance mode")
+    "Enqueue items into play queue in one instance mode")
 #define PLAYLISTENQUEUE_LONGTEXT N_( \
-    "When using the one instance only option, enqueue items to playlist " \
+    "When using the one instance only option, enqueue items to play queue " \
     "and keep playing current item.")
 
 #define DBUS_TEXT N_("Expose media player via D-Bus")
@@ -1186,17 +1186,17 @@ static const char *const clock_sources_text[] = {
     "using the D-Bus MPRIS protocol.")
 
 /*****************************************************************************
- * Playlist
+ * Play Queue
  ****************************************************************************/
 
 // DEPRECATED
 #define PLAYLIST_CAT_LONGTEXT N_( \
-     "These options define the behavior of the playlist. Some " \
-     "of them can be overridden in the playlist dialog box." )
+     "These options define the behavior of the play queue. Some " \
+     "of them can be overridden in the play queue dialog box." )
 
 #define PREPARSE_TEXT N_( "Automatically preparse items")
 #define PREPARSE_LONGTEXT N_( \
-    "Automatically preparse items added to the playlist " \
+    "Automatically preparse items added to the play queue " \
     "(to retrieve some metadata)." )
 
 #define PREPARSE_TIMEOUT_TEXT N_( "Preparsing timeout" )
@@ -1221,13 +1221,13 @@ static const char *const psz_recursive_list_text[] = {
 #define RECURSIVE_TEXT N_("Subdirectory behavior")
 #define RECURSIVE_LONGTEXT N_( \
         "Select whether subdirectories must be expanded.\n" \
-        "none: subdirectories do not appear in the playlist.\n" \
+        "none: subdirectories do not appear in the play queue.\n" \
         "collapse: subdirectories appear but are expanded on first play.\n" \
         "expand: all subdirectories are expanded.\n" )
 
 #define IGNORE_TEXT N_("Ignored extensions")
 #define IGNORE_LONGTEXT N_( \
-        "Files with these extensions will not be added to playlist when " \
+        "Files with these extensions will not be added to play queue when " \
         "opening a directory.\n" \
         "This is useful if you add directories that contain playlist files " \
         "for instance. Use a comma-separated list of extensions." )
@@ -1245,34 +1245,34 @@ static const char *const psz_recursive_list_text[] = {
 
 #define RANDOM_TEXT N_("Play files randomly forever")
 #define RANDOM_LONGTEXT N_( \
-    "VLC will randomly play files in the playlist until interrupted.")
+    "VLC will randomly play files in the play queue until interrupted.")
 
 #define LOOP_TEXT N_("Repeat all")
 #define LOOP_LONGTEXT N_( \
-    "VLC will keep playing the playlist indefinitely." )
+    "VLC will keep playing the play queue indefinitely." )
 
 #define REPEAT_TEXT N_("Repeat current item")
 #define REPEAT_LONGTEXT N_( \
-    "VLC will keep playing the current playlist item." )
+    "VLC will keep playing the current play queue item." )
 
 #define PAS_TEXT N_("Play and stop")
 #define PAS_LONGTEXT N_( \
-    "Stop the playlist after each played playlist item." )
+    "Stop playback after each item in the play queue." )
 
 #define PAE_TEXT N_("Play and exit")
 #define PAE_LONGTEXT N_( \
-    "Exit if there are no more items in the playlist." )
+    "Exit if there are no more items in the play queue." )
 
 #define PAP_TEXT N_("Play and pause")
 #define PAP_LONGTEXT N_( \
-    "Pause each item in the playlist on the last frame." )
+    "Pause each item in the play queue on the last frame." )
 
 #define SP_TEXT N_("Start paused")
 #define SP_LONGTEXT N_( \
-    "Pause each item in the playlist on the first frame." )
+    "Pause each item in the play queue on the first frame." )
 
 #define AUTOSTART_TEXT N_( "Auto start" )
-#define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
+#define AUTOSTART_LONGTEXT N_( "Automatically start playing the play queue " \
                 "content once it's loaded." )
 
 #define CORK_TEXT N_("Pause on audio communication")
@@ -1285,22 +1285,22 @@ static const char *const psz_recursive_list_text[] = {
     "The media library is automatically saved and reloaded each time you " \
     "start VLC." )
 
-#define PLTREE_TEXT N_("Display playlist tree")
+#define PLTREE_TEXT N_("Display play queue tree")
 #define PLTREE_LONGTEXT N_( \
-    "The playlist can use a tree to categorize some items, like the " \
+    "The play queue can use a tree to categorize some items, like the " \
     "contents of a directory." )
 
-#define BOOKMARK1_TEXT N_("Playlist bookmark 1")
-#define BOOKMARK2_TEXT N_("Playlist bookmark 2")
-#define BOOKMARK3_TEXT N_("Playlist bookmark 3")
-#define BOOKMARK4_TEXT N_("Playlist bookmark 4")
-#define BOOKMARK5_TEXT N_("Playlist bookmark 5")
-#define BOOKMARK6_TEXT N_("Playlist bookmark 6")
-#define BOOKMARK7_TEXT N_("Playlist bookmark 7")
-#define BOOKMARK8_TEXT N_("Playlist bookmark 8")
-#define BOOKMARK9_TEXT N_("Playlist bookmark 9")
-#define BOOKMARK10_TEXT N_("Playlist bookmark 10")
-#define BOOKMARK_LONGTEXT N_("This allows you to define playlist bookmarks.")
+#define BOOKMARK1_TEXT N_("Play queue bookmark 1")
+#define BOOKMARK2_TEXT N_("Play queue bookmark 2")
+#define BOOKMARK3_TEXT N_("Play queue bookmark 3")
+#define BOOKMARK4_TEXT N_("Play queue bookmark 4")
+#define BOOKMARK5_TEXT N_("Play queue bookmark 5")
+#define BOOKMARK6_TEXT N_("Play queue bookmark 6")
+#define BOOKMARK7_TEXT N_("Play queue bookmark 7")
+#define BOOKMARK8_TEXT N_("Play queue bookmark 8")
+#define BOOKMARK9_TEXT N_("Play queue bookmark 9")
+#define BOOKMARK10_TEXT N_("Play queue bookmark 10")
+#define BOOKMARK_LONGTEXT N_("This allows you to define play queue bookmarks.")
 
 /*****************************************************************************
  * Hotkeys
@@ -1345,9 +1345,9 @@ static const char *const mouse_wheel_texts[] = {
 #define RATE_SLOWER_FINE_KEY_TEXT N_("Slower (fine)")
 #define RATE_SLOWER_FINE_KEY_LONGTEXT N_("Select the hotkey to use for slow motion playback.")
 #define NEXT_KEY_TEXT N_("Next")
-#define NEXT_KEY_LONGTEXT N_("Select the hotkey to use to skip to the next item in the playlist.")
+#define NEXT_KEY_LONGTEXT N_("Select the hotkey to use to skip to the next item in the play queue.")
 #define PREV_KEY_TEXT N_("Previous")
-#define PREV_KEY_LONGTEXT N_("Select the hotkey to use to skip to the previous item in the playlist.")
+#define PREV_KEY_LONGTEXT N_("Select the hotkey to use to skip to the previous item in the play queue.")
 #define STOP_KEY_TEXT N_("Stop")
 #define STOP_KEY_LONGTEXT N_("Select the hotkey to stop playback.")
 #define POSITION_KEY_TEXT N_("Position")
@@ -1453,30 +1453,30 @@ static const char *const mouse_wheel_texts[] = {
 #define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
 #define ZOOM_LEVEL_KEY_LONGTEXT N_("Select the hotkey to use to zoom to the corresponding level.")
 
-#define PLAY_BOOKMARK1_KEY_TEXT N_("Play playlist bookmark 1")
-#define PLAY_BOOKMARK2_KEY_TEXT N_("Play playlist bookmark 2")
-#define PLAY_BOOKMARK3_KEY_TEXT N_("Play playlist bookmark 3")
-#define PLAY_BOOKMARK4_KEY_TEXT N_("Play playlist bookmark 4")
-#define PLAY_BOOKMARK5_KEY_TEXT N_("Play playlist bookmark 5")
-#define PLAY_BOOKMARK6_KEY_TEXT N_("Play playlist bookmark 6")
-#define PLAY_BOOKMARK7_KEY_TEXT N_("Play playlist bookmark 7")
-#define PLAY_BOOKMARK8_KEY_TEXT N_("Play playlist bookmark 8")
-#define PLAY_BOOKMARK9_KEY_TEXT N_("Play playlist bookmark 9")
-#define PLAY_BOOKMARK10_KEY_TEXT N_("Play playlist bookmark 10")
+#define PLAY_BOOKMARK1_KEY_TEXT N_("Play play queue bookmark 1")
+#define PLAY_BOOKMARK2_KEY_TEXT N_("Play play queue bookmark 2")
+#define PLAY_BOOKMARK3_KEY_TEXT N_("Play play queue bookmark 3")
+#define PLAY_BOOKMARK4_KEY_TEXT N_("Play play queue bookmark 4")
+#define PLAY_BOOKMARK5_KEY_TEXT N_("Play play queue bookmark 5")
+#define PLAY_BOOKMARK6_KEY_TEXT N_("Play play queue bookmark 6")
+#define PLAY_BOOKMARK7_KEY_TEXT N_("Play play queue bookmark 7")
+#define PLAY_BOOKMARK8_KEY_TEXT N_("Play play queue bookmark 8")
+#define PLAY_BOOKMARK9_KEY_TEXT N_("Play play queue bookmark 9")
+#define PLAY_BOOKMARK10_KEY_TEXT N_("Play play queue bookmark 10")
 #define PLAY_BOOKMARK_KEY_LONGTEXT N_("Select the key to play this bookmark.")
-#define SET_BOOKMARK1_KEY_TEXT N_("Set playlist bookmark 1")
-#define SET_BOOKMARK2_KEY_TEXT N_("Set playlist bookmark 2")
-#define SET_BOOKMARK3_KEY_TEXT N_("Set playlist bookmark 3")
-#define SET_BOOKMARK4_KEY_TEXT N_("Set playlist bookmark 4")
-#define SET_BOOKMARK5_KEY_TEXT N_("Set playlist bookmark 5")
-#define SET_BOOKMARK6_KEY_TEXT N_("Set playlist bookmark 6")
-#define SET_BOOKMARK7_KEY_TEXT N_("Set playlist bookmark 7")
-#define SET_BOOKMARK8_KEY_TEXT N_("Set playlist bookmark 8")
-#define SET_BOOKMARK9_KEY_TEXT N_("Set playlist bookmark 9")
-#define SET_BOOKMARK10_KEY_TEXT N_("Set playlist bookmark 10")
-#define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark.")
-#define PLAY_CLEAR_KEY_TEXT N_("Clear the playlist")
-#define PLAY_CLEAR_KEY_LONGTEXT N_("Select the key to clear the current playlist.")
+#define SET_BOOKMARK1_KEY_TEXT N_("Set play queue bookmark 1")
+#define SET_BOOKMARK2_KEY_TEXT N_("Set play queue bookmark 2")
+#define SET_BOOKMARK3_KEY_TEXT N_("Set play queue bookmark 3")
+#define SET_BOOKMARK4_KEY_TEXT N_("Set play queue bookmark 4")
+#define SET_BOOKMARK5_KEY_TEXT N_("Set play queue bookmark 5")
+#define SET_BOOKMARK6_KEY_TEXT N_("Set play queue bookmark 6")
+#define SET_BOOKMARK7_KEY_TEXT N_("Set play queue bookmark 7")
+#define SET_BOOKMARK8_KEY_TEXT N_("Set play queue bookmark 8")
+#define SET_BOOKMARK9_KEY_TEXT N_("Set play queue bookmark 9")
+#define SET_BOOKMARK10_KEY_TEXT N_("Set play queue bookmark 10")
+#define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this play queue bookmark.")
+#define PLAY_CLEAR_KEY_TEXT N_("Clear the play queue")
+#define PLAY_CLEAR_KEY_LONGTEXT N_("Select the key to clear the current play queue.")
 
 #define AUDIO_TRACK_KEY_TEXT N_("Cycle audio track")
 #define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages).")
@@ -1519,10 +1519,10 @@ static const char *const mouse_wheel_texts[] = {
 #define RECORD_KEY_LONGTEXT N_("Record access filter start/stop.")
 
 #define LOOP_KEY_TEXT N_("Normal/Loop/Repeat")
-#define LOOP_KEY_LONGTEXT N_("Toggle Normal/Loop/Repeat playlist modes")
+#define LOOP_KEY_LONGTEXT N_("Toggle Normal/Loop/Repeat play queue modes")
 
 #define RANDOM_KEY_TEXT N_("Random")
-#define RANDOM_KEY_LONGTEXT N_("Toggle random playlist playback")
+#define RANDOM_KEY_LONGTEXT N_("Toggle random play queue playback")
 
 #define ZOOM_KEY_TEXT N_("Zoom")
 #define ZOOM_KEY_LONGTEXT N_("Zoom")
@@ -2127,9 +2127,9 @@ vlc_module_begin ()
         change_string_list( clock_sources, clock_sources_text )
 #endif
 
-/* Playlist options */
+/* Play Queue options */
     set_subcategory( SUBCAT_PLAYLIST_GENERAL )
-    add_category_hint(N_("Playlist"), PLAYLIST_CAT_LONGTEXT)
+    add_category_hint(N_("Play Queue"), PLAYLIST_CAT_LONGTEXT)
     add_bool( "random", false, RANDOM_TEXT, RANDOM_LONGTEXT )
         change_short('Z')
         change_safe()
@@ -2567,7 +2567,7 @@ vlc_module_begin ()
 #   define KEY_PLAY_BOOKMARK9     "F9"
 #   define KEY_PLAY_BOOKMARK10    "F10"
 
-/* Playlist clear */
+/* Play Queue clear */
 #   define KEY_PLAY_CLEAR         "Ctrl+w"
 #endif
 

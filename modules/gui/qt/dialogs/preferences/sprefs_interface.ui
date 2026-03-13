@@ -78,7 +78,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../../vlc.qrc">
+              <iconset>
                <normaloff>:/prefsmenu/sample_skins.png</normaloff>:/prefsmenu/sample_skins.png</iconset>
              </property>
              <property name="iconSize">
@@ -117,7 +117,7 @@ with client-side decoration.</string>
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../../vlc.qrc">
+              <iconset>
                <normaloff>:/prefsmenu/sample_minimal.png</normaloff>:/prefsmenu/sample_minimal.png</iconset>
              </property>
              <property name="iconSize">
@@ -161,7 +161,7 @@ with no client-side decoration.</string>
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../../vlc.qrc">
+              <iconset>
                <normaloff>:/prefsmenu/sample_complete.png</normaloff>:/prefsmenu/sample_complete.png</iconset>
              </property>
              <property name="iconSize">
@@ -537,7 +537,7 @@ with no client-side decoration.</string>
    <item>
     <widget class="QGroupBox" name="PlaylistAndInstancesBox">
      <property name="title">
-      <string>Playlist and Instances</string>
+      <string>Play Queue and Instances</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="4" column="1">
@@ -550,7 +550,7 @@ with no client-side decoration.</string>
       <item row="2" column="0">
        <widget class="QCheckBox" name="treePlaylist">
         <property name="text">
-         <string>Display playlist tree</string>
+         <string>Display play queue tree</string>
         </property>
        </widget>
       </item>
@@ -571,7 +571,7 @@ with no client-side decoration.</string>
       <item row="0" column="1">
        <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
         <property name="text">
-         <string>Enqueue items into playlist in one instance mode</string>
+         <string>Enqueue items into play queue in one instance mode</string>
         </property>
        </widget>
       </item>
@@ -775,8 +775,6 @@ with no client-side decoration.</string>
   <tabstop>MetadataNetworkAccessMode</tabstop>
   <tabstop>assoButton</tabstop>
  </tabstops>
- <resources>
-  <include location="../../vlc.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

@@ -40,7 +40,7 @@
 #define VIDEO_TITLE     N_( "Video" )
 #define INPUT_TITLE     N_( "Input / Codecs" )
 #define SOUT_TITLE      N_( "Stream output" )
-#define PLAYLIST_TITLE  N_( "Playlist" )
+#define PLAYLIST_TITLE  N_( "Play Queue" )
 #define AADVANCED_TITLE N_( "Advanced" )
 #define SUBPIC_TITLE    N_( "Subtitles / OSD" )
 #define HOTKEYS_TITLE   N_( "Hotkeys" )
@@ -134,13 +134,13 @@
                 "each sout stream module here.")
 #define SOUT_VOD_HELP N_( "VLC's implementation of Video On Demand" )
 
-/* Playlist */
-#define PLAYLIST_HELP N_( "Settings related to playlist behaviour " \
+/* Play Queue */
+#define PLAYLIST_HELP N_( "Settings related to play queue behaviour " \
         "(e.g. playback mode) and to modules that automatically add "\
-        "items to the playlist (\"service discovery\" modules).")
-#define PGENERAL_HELP N_( "General playlist behaviour")
+        "items to the play queue (\"service discovery\" modules).")
+#define PGENERAL_HELP N_( "General play queue behaviour")
 #define SD_HELP N_("Services discovery modules are facilities "\
-        "that automatically add items to playlist.")
+        "that automatically add items to play queue.")
 #define PEXPORT_HELP N_( "Settings relating to exporting playlists." )
 
 /* Advanced */
