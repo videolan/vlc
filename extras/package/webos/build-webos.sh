@@ -791,6 +791,40 @@ EOF
     cp -f "$pc" "${DEPS_PREFIX}/lib/pkgconfig/libgsm.pc"
 }
 
+ensure_lame_pkgconfig_metadata() {
+    local pc="${DEPS_PREFIX}/lib/pkgconfig/libmp3lame.pc"
+    local include_dir="${DEPS_PREFIX}/include"
+
+    if [ -f "$pc" ]; then
+        return 0
+    fi
+
+    if [ -f "${DEPS_PREFIX}/include/lame/lame.h" ]; then
+        include_dir="${DEPS_PREFIX}/include/lame"
+    fi
+
+    if [ ! -f "${DEPS_PREFIX}/lib/libmp3lame.a" ] || { [ ! -f "${DEPS_PREFIX}/include/lame/lame.h" ] && [ ! -f "${DEPS_PREFIX}/include/lame.h" ]; }; then
+        return 0
+    fi
+
+    mkdir -p "${DEPS_PREFIX}/lib/pkgconfig"
+    cat > "$pc" <<EOF
+prefix=${DEPS_PREFIX}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=${include_dir}
+
+Name: libmp3lame
+Description: LAME MP3 encoder library
+Version: 3.100
+Libs: -L\${libdir} -lmp3lame
+Cflags: -I\${includedir}
+EOF
+
+    # Some consumers probe for 'lame' instead of 'libmp3lame'.
+    cp -f "$pc" "${DEPS_PREFIX}/lib/pkgconfig/lame.pc"
+}
+
 ensure_gsm_headers_compat() {
     local h_dir="${DEPS_PREFIX}/include"
 
@@ -799,6 +833,60 @@ ensure_gsm_headers_compat() {
 #include <gsm/gsm.h>
 EOF
     fi
+}
+
+ensure_lame_headers_compat() {
+    local h_dir="${DEPS_PREFIX}/include"
+
+    if [ -f "${h_dir}/lame.h" ] && [ ! -f "${h_dir}/lame/lame.h" ]; then
+        mkdir -p "${h_dir}/lame"
+        cat > "${h_dir}/lame/lame.h" <<'EOF'
+#include <lame.h>
+EOF
+    fi
+}
+
+ensure_lua_artifacts() {
+    local stamp=".lua"
+
+    if [ ! -f "${DEPS_PREFIX}/include/lua5.4/lua.h" ] || [ ! -f "${DEPS_PREFIX}/lib/pkgconfig/lua.pc" ]; then
+        echo "Lua artifacts missing; rebuilding ${stamp}."
+        rm -f "$stamp"
+        make "$stamp" -j"${JOBS}"
+    fi
+}
+
+ensure_zlib_artifacts() {
+    local stamp=".zlib"
+
+    if [ ! -f "${DEPS_PREFIX}/lib/libz.a" ] || [ ! -f "${DEPS_PREFIX}/include/zlib.h" ]; then
+        echo "zlib artifacts missing; rebuilding ${stamp}."
+        rm -f "$stamp"
+        make "$stamp" -j"${JOBS}"
+    fi
+}
+
+ensure_openjpeg_artifacts() {
+    local stamp=".openjpeg"
+
+    if [ ! -f "${DEPS_PREFIX}/lib/libopenjp2.a" ] || [ ! -f "${DEPS_PREFIX}/lib/pkgconfig/libopenjp2.pc" ]; then
+        echo "OpenJPEG artifacts missing; rebuilding ${stamp}."
+        rm -f "$stamp"
+        make "$stamp" -j"${JOBS}"
+    fi
+}
+
+ensure_lame_artifacts() {
+    local stamp=".lame"
+
+    if [ ! -f "${DEPS_PREFIX}/lib/libmp3lame.a" ] || { [ ! -f "${DEPS_PREFIX}/include/lame/lame.h" ] && [ ! -f "${DEPS_PREFIX}/include/lame.h" ]; }; then
+        echo "LAME artifacts missing; rebuilding ${stamp}."
+        rm -f "$stamp"
+        make "$stamp" -j"${JOBS}"
+    fi
+
+    ensure_lame_headers_compat
+    ensure_lame_pkgconfig_metadata
 }
 
 ensure_gsm_artifacts() {
@@ -830,17 +918,54 @@ build_required_contrib_targets() {
         echo "Building required contrib target: $target"
 
         # Recover from stale stamp files left by interrupted builds.
-        if [ "$target" = ".gsm" ] || [ "$target" = ".ffmpeg" ]; then
-            rm -f "$target"
-        fi
+        case "$target" in
+            .lua)
+                if [ ! -f "${DEPS_PREFIX}/include/lua5.4/lua.h" ] || [ ! -f "${DEPS_PREFIX}/lib/pkgconfig/lua.pc" ]; then
+                    rm -f "$target"
+                fi
+                ;;
+            .zlib)
+                if [ ! -f "${DEPS_PREFIX}/lib/libz.a" ] || [ ! -f "${DEPS_PREFIX}/include/zlib.h" ]; then
+                    rm -f "$target"
+                fi
+                ;;
+            .openjpeg)
+                if [ ! -f "${DEPS_PREFIX}/lib/libopenjp2.a" ] || [ ! -f "${DEPS_PREFIX}/lib/pkgconfig/libopenjp2.pc" ]; then
+                    rm -f "$target"
+                fi
+                ;;
+            .lame)
+                if [ ! -f "${DEPS_PREFIX}/lib/libmp3lame.a" ] || { [ ! -f "${DEPS_PREFIX}/include/lame/lame.h" ] && [ ! -f "${DEPS_PREFIX}/include/lame.h" ]; }; then
+                    rm -f "$target"
+                fi
+                ;;
+            .gsm|.ffmpeg)
+                rm -f "$target"
+                ;;
+        esac
 
         make "$target" -j"${JOBS}"
 
-        if [ "$target" = ".gsm" ]; then
-            ensure_gsm_artifacts
-        elif [ "$target" = ".ffmpeg" ]; then
-            ensure_ffmpeg_artifacts
-        fi
+        case "$target" in
+            .lua)
+                ensure_lua_artifacts
+                ;;
+            .zlib)
+                ensure_zlib_artifacts
+                ;;
+            .openjpeg)
+                ensure_openjpeg_artifacts
+                ;;
+            .lame)
+                ensure_lame_artifacts
+                ;;
+            .gsm)
+                ensure_gsm_artifacts
+                ;;
+            .ffmpeg)
+                ensure_ffmpeg_artifacts
+                ;;
+        esac
     done
 }
 
@@ -1136,6 +1261,10 @@ if [ "$MODE" = "deps" ] || [ "$MODE" = "all" ]; then
 
     build_required_contrib_targets
 
+    ensure_lua_artifacts
+    ensure_zlib_artifacts
+    ensure_openjpeg_artifacts
+    ensure_lame_artifacts
     normalize_lua_pkgconfig_metadata
     ensure_gsm_artifacts
     ensure_ffmpeg_artifacts
