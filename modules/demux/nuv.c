@@ -746,42 +746,45 @@ static int ExtendedHeaderLoad( demux_t *p_demux, extended_header_t *h )
 static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 {
     frame_header_t fh;
-    int64_t i_original_pos;
+    uint64_t i_original_pos;
     int64_t i_time, i_offset;
     int keyframe, last_keyframe = 0, frame = 0, kfa_entry_id = 0;
+    int ret = VLC_EGENERIC;
 
     if( p_sys->exh.i_seektable_offset <= 0 )
         return VLC_SUCCESS;
 
-    /* Save current position */
-    i_original_pos = vlc_stream_Tell( p_demux->s );
+    i_original_pos = vlc_stream_Tell( p_demux->s ); /* Save current position */
 #if 0
-    msg_Dbg( p_demux, "current offset %"PRIi64, i_original_pos );
+    msg_Dbg( p_demux, "current offset %"PRIu64, i_original_pos );
 
     msg_Dbg( p_demux, "seeking in stream to %"PRIi64, p_sys->exh.i_seektable_offset );
 #endif
     if( vlc_stream_Seek( p_demux->s, p_sys->exh.i_seektable_offset ) )
-        return VLC_EGENERIC;
+        goto restore;
 
     if( FrameHeaderLoad( p_demux, &fh ) )
-        return VLC_EGENERIC;
+        goto restore;
 
     if( fh.i_type != 'Q' )
     {
         msg_Warn( p_demux, "invalid seektable, frame type=%c", fh.i_type );
-        return VLC_EGENERIC;
+        goto restore;
     }
 
     /* */
     uint8_t *p_seek_table = malloc( fh.i_length );
     if( p_seek_table == NULL )
-        return VLC_ENOMEM;
+    {
+        ret = VLC_ENOMEM;
+        goto restore;
+    }
 
     if( vlc_stream_Read( p_demux->s, p_seek_table,
                          fh.i_length ) != fh.i_length )
     {
         free( p_seek_table );
-        return VLC_EGENERIC;
+        goto restore;
     }
     const int32_t i_seek_elements = fh.i_length / 12;
 
@@ -795,13 +798,13 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
         if( vlc_stream_Seek( p_demux->s, p_sys->exh.i_keyframe_adjust_offset ) )
         {
             free( p_seek_table );
-            return VLC_EGENERIC;
+            goto restore;
         }
 
         if( FrameHeaderLoad( p_demux, &fh ) )
         {
             free( p_seek_table );
-            return VLC_EGENERIC;
+            goto restore;
         }
 
         if( fh.i_type == 'K' && fh.i_length >= 8 )
@@ -811,7 +814,8 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
             if( p_kfa_table == NULL )
             {
                 free( p_seek_table );
-                return VLC_ENOMEM;
+                ret = VLC_ENOMEM;
+                goto restore;
             }
 
             if( vlc_stream_Read( p_demux->s, p_kfa_table,
@@ -819,7 +823,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
             {
                 free( p_seek_table );
                 free( p_kfa_table );
-                return VLC_EGENERIC;
+                goto restore;
             }
 
             i_kfa_elements = fh.i_length / 8;
@@ -877,12 +881,14 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
     free ( p_seek_table );
 
+    ret = VLC_SUCCESS;
+
+restore:
     /* Restore stream position */
     if( vlc_stream_Seek( p_demux->s, i_original_pos ) )
         return VLC_EGENERIC;
 
-    return VLC_SUCCESS;
-
+    return ret;
 }
 
 /*****************************************************************************/
