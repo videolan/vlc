@@ -133,8 +133,8 @@
     const CGFloat footerHeight = self.footerContainerView.frame.size.height;
     [self setupScrollViewGradientMask];
 
-    if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+    if (@available(macOS 26.0, *)) {
         [self.bottomButtonsSeparator removeFromSuperview];
 
         NSGlassEffectView * const glassFooterView = [[NSGlassEffectView alloc] init];
@@ -170,8 +170,9 @@
         const CGFloat footerTopLine = footerHeight + -footerBottomConstraint.constant + VLCLibraryUIUnits.smallSpacing;
         self.scrollView.automaticallyAdjustsContentInsets = NO;
         self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerTopLine, 0);
+    } else 
 #endif
-    } else if (@available(macOS 10.14, *)) {
+    if (@available(macOS 10.14, *)) {
         NSVisualEffectView * const footerBlurView = [[NSVisualEffectView alloc] initWithFrame:self.footerContainerView.bounds];
         footerBlurView.translatesAutoresizingMaskIntoConstraints = NO;
         footerBlurView.material = NSVisualEffectMaterialHeaderView;
