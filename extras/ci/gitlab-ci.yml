@@ -671,12 +671,23 @@ nightly-docs:
     stage: build
     image:
         name: $VLC_DEBIAN_IMAGE
+    before_script:
+        - git fetch --all
     script:
-        - ./bootstrap
-        - ./configure
-        - make doc
-        - mv doc/doxygen/html public
+        - mkdir public
+        - |
+            for branch in "$CI_DEFAULT_BRANCH" '3.0.x' ; do
+              echo -e "\e[0Ksection_start:$(date +%s):nightly_docs_build_${branch}\r\e[0KBuilding docs for ${branch}"
+              git switch --detach "origin/$branch"
+              ./bootstrap
+              ./configure
+              make doc
+              mv doc/doxygen/html "public/$branch"
+              make distclean
+              echo -e "\e[0Ksection_end:$(date +%s):nightly_docs_build_${branch}\r\e[0K"
+            done
+        - echo "/vlc /vlc/$CI_DEFAULT_BRANCH 302" > 'public/_redirects'
     pages:
         publish: public
     rules:
-        - if: '$CI_PIPELINE_SOURCE == "schedule"'
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
