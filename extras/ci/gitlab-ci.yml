@@ -668,7 +668,7 @@ wasm32-emscripten-build :
 # VLC Documentation
 #
 pages:
-    extends: .base-template
+    stage: build
     image:
         name: $VLC_DEBIAN_IMAGE
     script:
