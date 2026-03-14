@@ -667,7 +667,7 @@ wasm32-emscripten-build :
 #
 # VLC Documentation
 #
-pages:
+nightly-docs:
     stage: build
     image:
         name: $VLC_DEBIAN_IMAGE
@@ -676,8 +676,7 @@ pages:
         - ./configure
         - make doc
         - mv doc/doxygen/html public
-    artifacts:
-        paths:
-            - public
+    pages:
+        publish: public
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule"'
