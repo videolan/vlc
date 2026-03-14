@@ -30,6 +30,8 @@ vlc_LDADD = ../lib/libvlc.la ../src/libvlccore.la
 vlc_CPPFLAGS = $(AM_CPPFLAGS)
 if !HAVE_WIN32
 vlc_SOURCES = vlc.c override.c
+vlc_LDFLAGS = $(LDFLAGS_vlc)
+vlc_LDFLAGS += -Wl,-rpath-link,$(abs_top_builddir)/src/.libs -Wl,-rpath-link,$(abs_top_builddir)/lib/.libs
 vlc_LDADD += $(LIBDL)
 else
 vlc_SOURCES = winvlc.c
@@ -118,7 +120,8 @@ vlc_cache_gen_SOURCES = cachegen.c
 vlc_cache_gen_LDADD = \
 	$(GNUGETOPT_LIBS) \
 	../compat/libcompat.la \
-	../lib/libvlc.la
+	../lib/libvlc.la \
+	../src/libvlccore.la
 if HAVE_WIN32
 vlc_cache_gen_LDADD += vlc_win32_rc.$(OBJEXT)
 vlc_cache_gen_LDFLAGS = -Wc,-static

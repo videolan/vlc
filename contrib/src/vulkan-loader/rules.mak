@@ -13,6 +13,10 @@ ifeq ($(call need_pkg,"vulkan"),)
 PKGS_FOUND += vulkan-loader
 endif
 
+ifeq ($(HOST),arm-webos-linux-gnueabi)
+PKGS_FOUND += vulkan-loader
+endif
+
 # On Android, vulkan-loader is available on the system itself.
 ifdef HAVE_ANDROID
 PKGS_FOUND += vulkan-loader

@@ -52,6 +52,7 @@ share/macosx/Info.plist
 Frameworks
 
 # Ignore build dirs
+.webos/
 build*/
 target*/
 contrib-*
