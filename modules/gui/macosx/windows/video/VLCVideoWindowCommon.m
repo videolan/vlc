@@ -138,8 +138,8 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     if (b_nativeFullscreenMode) {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
     } else {
-        // Native fullscreen seems to be default on El Capitan, this disables it explicitly
-        [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+        // Disable native fullscreen entirely when non-native fullscreen mode is active
+        [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenNone];
     }
 }
 
