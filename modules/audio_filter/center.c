@@ -45,8 +45,7 @@ static block_t *Process ( filter_t *filter, block_t *in_buf )
     out_buf->i_nb_samples = i_nb_samples;
     out_buf->i_dts        = in_buf->i_dts;
     out_buf->i_pts        = in_buf->i_pts;
-    out_buf->i_length     = vlc_tick_from_samples( i_nb_samples,
-                                                   filter->fmt_in.audio.i_rate );
+    out_buf->i_length     = in_buf->i_length;
     const float factor = .70710678;
     for ( size_t i = 0 ; i < i_nb_samples ; ++i)
     {
