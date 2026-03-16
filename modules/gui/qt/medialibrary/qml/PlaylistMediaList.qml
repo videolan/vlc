@@ -445,7 +445,7 @@ MainViewLoader {
                 model: {
                     criteria: "count",
 
-                    text: qsTr("Tracks"),
+                    text: qsTr("Items"),
 
                     isSortable: false
                 }
@@ -525,7 +525,7 @@ MainViewLoader {
 
                 // NOTE: This makes sure we display the playlist count on the item.
                 function titlecoverLabels(model) {
-                    return [ _getCount(model) ];
+                    return [];
                 }
             }
         }
