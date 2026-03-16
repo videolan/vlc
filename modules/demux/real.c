@@ -697,7 +697,7 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_
     }
     else
     {
-        const int y = tk->i_subpacket_h > 0 ?
+        const int y = tk->i_subpacket_h > 1 ?
                       tk->i_subpacket / (tk->i_subpacket_h / 2) : 0;
         assert( tk->fmt.i_codec == VLC_CODEC_RA_288 );
 
