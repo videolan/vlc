@@ -1,6 +1,6 @@
 # AMF
 
-AMF_VERSION := 1.4.36
+AMF_VERSION := 1.5.0
 AMF_URL := $(GITHUB)/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v$(AMF_VERSION)/AMF-headers-v$(AMF_VERSION).tar.gz
 AMF_GITURL := $(GITHUB)/GPUOpen-LibrariesAndSDKs/AMF.git
 AMF_BRANCH := v$(AMF_VERSION)
