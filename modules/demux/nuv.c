@@ -769,7 +769,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
     if( FrameHeaderLoad( p_demux, &fh ) )
         goto restore;
 
-    if( fh.i_type != 'Q' )
+    if( fh.i_type != 'Q' || fh.i_length < 12 )
     {
         msg_Warn( p_demux, "invalid seektable, frame type=%c", fh.i_type );
         goto restore;
