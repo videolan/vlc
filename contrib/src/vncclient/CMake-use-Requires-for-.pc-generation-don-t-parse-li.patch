@@ -1,4 +1,4 @@
-From ed84d209bae973cd29b94f111749b1c003e05601 Mon Sep 17 00:00:00 2001
+From 22a60f904c5fd821c2cf46155ae36876fe99b5dc Mon Sep 17 00:00:00 2001
 From: Johannes Kauffmann <johanneskauffmann@hotmail.com>
 Date: Sat, 21 Feb 2026 15:17:26 +0100
 Subject: [PATCH] CMake: use Requires: for .pc generation (don't parse link
@@ -16,90 +16,100 @@ When sasl and zlib are found, Rfb public headers also include headers
 from these libraries so they are the only ones listed in "Requires".
 The others can be in "Requires.private".
 
+libsystemd and libpng are exclusively libvncserver dependencies, while
+sasl is exclusively a libvncclient dependency. The rest of the libraries
+are common dependencies to both.
+
 Signed-off-by: Johannes Kauffmann <johanneskauffmann@hotmail.com>
 ---
- CMakeLists.txt                           | 36 ++++++++----------------
+ CMakeLists.txt                           | 44 ++++++++++--------------
  src/libvncclient/libvncclient.pc.cmakein |  6 ++--
- src/libvncserver/libvncserver.pc.cmakein |  5 ++--
- 3 files changed, 15 insertions(+), 32 deletions(-)
+ src/libvncserver/libvncserver.pc.cmakein |  5 ++-
+ 3 files changed, 23 insertions(+), 32 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d9cbfda7..c86fb6fa 100644
+index 205f3928..d49b2a72 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -281,6 +281,7 @@ if(SYSTEMD_FOUND)
+@@ -279,6 +279,7 @@ if(SYSTEMD_FOUND)
    add_definitions(-DLIBVNCSERVER_WITH_SYSTEMD)
    include_directories(${SYSTEMD_INCLUDE_DIRS})
    set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${SYSTEMD_LIBRARIES})
-+  list(APPEND LIBVNC_REQUIRES_PRIVATE libsystemd)
++  list(APPEND LIBVNCSERVER_REQUIRES_PRIVATE libsystemd)
  endif(SYSTEMD_FOUND)
  
  # common crypto used by both libvncserver and libvncclient
-@@ -288,6 +289,7 @@ if(WITH_GCRYPT AND LIBGCRYPT_LIBRARIES)
+@@ -286,6 +287,8 @@ if(WITH_GCRYPT AND LIBGCRYPT_LIBRARIES)
    message(STATUS "Building crypto with Libgcrypt")
    set(CRYPTO_LIBRARIES ${LIBGCRYPT_LIBRARIES})
    set(CRYPTO_SOURCES ${COMMON_DIR}/crypto_libgcrypt.c)
-+  list(APPEND LIBVNC_REQUIRES_PRIVATE libgcrypt)
++  list(APPEND LIBVNCCLIENT_REQUIRES_PRIVATE libgcrypt)
++  list(APPEND LIBVNCSERVER_REQUIRES_PRIVATE libgcrypt)
  elseif(OPENSSL_FOUND)
    message(STATUS "Building crypto with OpenSSL")
    set(CRYPTO_LIBRARIES ${OPENSSL_LIBRARIES})
-@@ -378,6 +380,7 @@ if(WITH_SASL AND LIBSASL2_LIBRARIES AND SASL2_INCLUDE_DIR)
+@@ -376,6 +379,7 @@ if(WITH_SASL AND LIBSASL2_LIBRARIES AND SASL2_INCLUDE_DIR)
    set(LIBVNCSERVER_HAVE_SASL 1)
    set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${LIBSASL2_LIBRARIES})
    include_directories(${SASL2_INCLUDE_DIR})
-+  list(APPEND LIBVNC_REQUIRES sasl)
++  list(APPEND LIBVNCCLIENT_REQUIRES sasl)
  endif(WITH_SASL AND LIBSASL2_LIBRARIES AND SASL2_INCLUDE_DIR)
  
  # TODO:
-@@ -439,6 +442,7 @@ if(GNUTLS_FOUND)
+@@ -437,6 +441,8 @@ if(GNUTLS_FOUND)
      ${LIBVNCSERVER_DIR}/rfbssl_gnutls.c
      )
    include_directories(${GNUTLS_INCLUDE_DIR})
-+  list(APPEND LIBVNC_REQUIRES_PRIVATE gnutls)
++  list(APPEND LIBVNCCLIENT_REQUIRES_PRIVATE gnutls)
++  list(APPEND LIBVNCSERVER_REQUIRES_PRIVATE gnutls)
  elseif(OPENSSL_FOUND)
    message(STATUS "Building TLS with OpenSSL")
    set(LIBVNCCLIENT_SOURCES
-@@ -450,6 +454,7 @@ elseif(OPENSSL_FOUND)
+@@ -448,6 +454,8 @@ elseif(OPENSSL_FOUND)
      ${LIBVNCSERVER_DIR}/rfbssl_openssl.c
    )
    include_directories(${OPENSSL_INCLUDE_DIR})
-+  list(APPEND LIBVNC_REQUIRES_PRIVATE openssl)
++  list(APPEND LIBVNCCLIENT_REQUIRES_PRIVATE openssl)
++  list(APPEND LIBVNCSERVER_REQUIRES_PRIVATE openssl)
  else()
    message(STATUS "Building without TLS")
    set(LIBVNCCLIENT_SOURCES
-@@ -472,6 +477,7 @@ endif()
+@@ -470,6 +478,8 @@ endif()
  if(ZLIB_FOUND)
    add_definitions(-DLIBVNCSERVER_HAVE_LIBZ)
    include_directories(${ZLIB_INCLUDE_DIR})
-+  list(APPEND LIBVNC_REQUIRES zlib)
++  list(APPEND LIBVNCCLIENT_REQUIRES zlib)
++  list(APPEND LIBVNCSERVER_REQUIRES zlib)
    set(LIBVNCSERVER_SOURCES
      ${LIBVNCSERVER_SOURCES}
      ${LIBVNCSERVER_DIR}/zlib.c
-@@ -484,6 +490,7 @@ endif(ZLIB_FOUND)
+@@ -482,6 +492,8 @@ endif(ZLIB_FOUND)
  if(LZO_FOUND)
    add_definitions(-DLIBVNCSERVER_HAVE_LZO)
    include_directories(${LZO_INCLUDE_DIR})
-+  list(APPEND LIBVNC_REQUIRES_PRIVATE lzo2)
++  list(APPEND LIBVNCCLIENT_REQUIRES_PRIVATE lzo2)
++  list(APPEND LIBVNCSERVER_REQUIRES_PRIVATE lzo2)
  else()
    set(LIBVNCSERVER_SOURCES
      ${LIBVNCSERVER_SOURCES}
-@@ -498,6 +505,7 @@ endif()
+@@ -496,6 +508,8 @@ endif()
  if(JPEG_FOUND)
    add_definitions(-DLIBVNCSERVER_HAVE_LIBJPEG)
    include_directories(${JPEG_INCLUDE_DIR})
-+  list(APPEND LIBVNC_REQUIRES_PRIVATE libjpeg)
++  list(APPEND LIBVNCCLIENT_REQUIRES_PRIVATE libjpeg)
++  list(APPEND LIBVNCSERVER_REQUIRES_PRIVATE libjpeg)
    if(PNG_FOUND OR ZLIB_FOUND)
      set(TIGHT_C ${LIBVNCSERVER_DIR}/tight.c ${COMMON_DIR}/turbojpeg.c)
    endif(PNG_FOUND OR ZLIB_FOUND)
-@@ -506,6 +514,7 @@ endif(JPEG_FOUND)
+@@ -504,6 +518,7 @@ endif(JPEG_FOUND)
  if(PNG_FOUND)
    add_definitions(-DLIBVNCSERVER_HAVE_LIBPNG)
    include_directories(${PNG_INCLUDE_DIR})
-+  list(APPEND LIBVNC_REQUIRES_PRIVATE libpng)
++  list(APPEND LIBVNCSERVER_REQUIRES_PRIVATE libpng)
  endif(PNG_FOUND)
  
  set(LIBVNCSERVER_SOURCES
-@@ -768,32 +777,9 @@ endif(LIBVNCSERVER_WITH_WEBSOCKETS)
+@@ -766,32 +781,11 @@ endif(LIBVNCSERVER_WITH_WEBSOCKETS)
  
  endif(WITH_TESTS)
  
@@ -127,15 +137,17 @@ index d9cbfda7..c86fb6fa 100644
 -endfunction()
 -
 -get_link_libraries(PRIVATE_LIBS vncserver)
-+string(REPLACE ";" " " LIBVNC_REQUIRES "${LIBVNC_REQUIRES}")
-+string(REPLACE ";" " " LIBVNC_REQUIRES_PRIVATE "${LIBVNC_REQUIRES_PRIVATE}")
++string(REPLACE ";" " " LIBVNCCLIENT_REQUIRES "${LIBVNCCLIENT_REQUIRES}")
++string(REPLACE ";" " " LIBVNCCLIENT_REQUIRES_PRIVATE "${LIBVNCCLIENT_REQUIRES_PRIVATE}")
++string(REPLACE ";" " " LIBVNCSERVER_REQUIRES "${LIBVNCSERVER_REQUIRES}")
++string(REPLACE ";" " " LIBVNCSERVER_REQUIRES_PRIVATE "${LIBVNCSERVER_REQUIRES_PRIVATE}")
  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libvncserver/libvncserver.pc.cmakein ${CMAKE_CURRENT_BINARY_DIR}/libvncserver.pc @ONLY)
 -get_link_libraries(PRIVATE_LIBS vncclient)
  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libvncclient/libvncclient.pc.cmakein ${CMAKE_CURRENT_BINARY_DIR}/libvncclient.pc @ONLY)
  
  if(LIBVNCSERVER_INSTALL)
 diff --git a/src/libvncclient/libvncclient.pc.cmakein b/src/libvncclient/libvncclient.pc.cmakein
-index ceeda39d..3f121d71 100644
+index ceeda39d..c41de238 100644
 --- a/src/libvncclient/libvncclient.pc.cmakein
 +++ b/src/libvncclient/libvncclient.pc.cmakein
 @@ -6,9 +6,7 @@ includedir=@CMAKE_INSTALL_PREFIX@/include
@@ -144,14 +156,14 @@ index ceeda39d..3f121d71 100644
  Version: @LibVNCServer_VERSION@
 -Requires:
 -Requires.private:
-+Requires: @LIBVNC_REQUIRES@
-+Requires.private: @LIBVNC_REQUIRES_PRIVATE@
++Requires: @LIBVNCCLIENT_REQUIRES@
++Requires.private: @LIBVNCCLIENT_REQUIRES_PRIVATE@
  Libs: -L${libdir} -lvncclient
 -Libs.private: @PRIVATE_LIBS@
  Cflags: -I${includedir}
 -
 diff --git a/src/libvncserver/libvncserver.pc.cmakein b/src/libvncserver/libvncserver.pc.cmakein
-index 33ec6685..b491240f 100644
+index 33ec6685..3a44f1a6 100644
 --- a/src/libvncserver/libvncserver.pc.cmakein
 +++ b/src/libvncserver/libvncserver.pc.cmakein
 @@ -6,8 +6,7 @@ includedir=@CMAKE_INSTALL_PREFIX@/include
@@ -160,8 +172,8 @@ index 33ec6685..b491240f 100644
  Version: @LibVNCServer_VERSION@
 -Requires:
 -Requires.private:
-+Requires: @LIBVNC_REQUIRES@
-+Requires.private: @LIBVNC_REQUIRES_PRIVATE@
++Requires: @LIBVNCSERVER_REQUIRES@
++Requires.private: @LIBVNCSERVER_REQUIRES_PRIVATE@
  Libs: -L${libdir} -lvncserver
 -Libs.private: @PRIVATE_LIBS@
  Cflags: -I${includedir}
