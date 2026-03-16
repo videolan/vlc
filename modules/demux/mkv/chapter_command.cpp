@@ -55,7 +55,7 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
 
 int16 dvd_chapter_codec_c::GetTitleNumber()
 {
-    if ( p_private_data != nullptr && p_private_data->GetSize() >= 3)
+    if ( p_private_data != nullptr && p_private_data->GetSize() > 3)
     {
         const binary* p_data = p_private_data->GetBuffer();
         if ( p_data[0] == MATROSKA_DVD_LEVEL_SS )
