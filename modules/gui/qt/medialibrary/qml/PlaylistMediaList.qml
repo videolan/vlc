@@ -327,7 +327,10 @@ MainViewLoader {
                 title: (model.name) ? model.name
                                     : qsTr("Unknown title")
 
-                labels: [ qsTr("%1 Track", "%1 Tracks", _getCount(model)).arg(_getCount(model)) ]
+                labels: [
+                    isMusic ? qsTr("%1 Track", "%1 Tracks", model.count).arg(_getCount(model))
+                            : qsTr("%1 Video", "%1 Videos", model.count).arg(_getCount(model))
+                ]
 
                 dragItem: dragItemPlaylist
 
