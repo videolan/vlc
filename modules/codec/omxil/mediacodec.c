@@ -473,23 +473,37 @@ mc_to_vlc_color_range(enum mc_media_format_color_range_t mc_range)
 }
 
 static enum mc_media_format_color_standard_t
-vlc_to_mc_color_standard(video_color_primaries_t vlc_primaries)
+vlc_to_mc_color_standard(video_color_primaries_t vlc_primaries, video_color_space_t vlc_colorspace)
 {
     switch (vlc_primaries)
     {
         case COLOR_PRIMARIES_BT601_525:
-            return MC_COLOR_STANDARD_BT601_525;
+            if (vlc_colorspace == COLOR_SPACE_BT601)
+                return MC_COLOR_STANDARD_BT601_525;
+            if (vlc_colorspace == COLOR_SPACE_SMPTE_240)
+                return MC_COLOR_STANDARD_BT601_525_240M;
+            break;
         case COLOR_PRIMARIES_BT601_625:
-            return MC_COLOR_STANDARD_BT601_625;
+            if (vlc_colorspace == COLOR_SPACE_BT601)
+                return MC_COLOR_STANDARD_BT601_625;
+            // return MC_COLOR_STANDARD_BT601_625_UNADJUSTED;
+            break;
         case COLOR_PRIMARIES_BT709:
-            return MC_COLOR_STANDARD_BT709;
+            if (vlc_colorspace == COLOR_SPACE_BT709)
+                return MC_COLOR_STANDARD_BT709;
+            break;
         case COLOR_PRIMARIES_BT2020:
-            return MC_COLOR_STANDARD_BT2020;
+            if (vlc_colorspace == COLOR_SPACE_BT2020)
+                return MC_COLOR_STANDARD_BT2020;
+            break;
         case COLOR_PRIMARIES_BT470_M:
+            // return MC_COLOR_STANDARD_BT470M;
         case COLOR_PRIMARIES_DCI_P3:
+            // return MC_COLOR_STANDARD_FILM;
         default:
-            return MC_COLOR_STANDARD_UNSPECIFIED;
+            break;
     }
+    return MC_COLOR_STANDARD_UNSPECIFIED;
 }
 
 static video_color_primaries_t
@@ -595,7 +609,7 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.video.p_surface = p_sys->video.p_surface;
 
         args.video.color.range = vlc_to_mc_color_range(p_dec->fmt_out.video.color_range);
-        args.video.color.standard = vlc_to_mc_color_standard(p_dec->fmt_out.video.primaries);
+        args.video.color.standard = vlc_to_mc_color_standard(p_dec->fmt_out.video.primaries, p_dec->fmt_out.video.space);
         args.video.color.transfer = vlc_to_mc_color_transfer(p_dec->fmt_out.video.transfer);
 
 
