@@ -55,7 +55,7 @@ error:
 # endif // !WINAPI_PARTITION_DESKTOP
 
 #else
-    return NULL; // TODO
+# error AMF not handled on this OS
 #endif
 }
 
