@@ -611,8 +611,11 @@ void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_ml
  **************************************************************************/
 libvlc_media_player_t * libvlc_media_list_player_get_media_player(libvlc_media_list_player_t * p_mlp)
 {
-    libvlc_media_player_retain(p_mlp->p_mi);
-    return p_mlp->p_mi;
+    lock(p_mlp);
+    libvlc_media_player_t *p_mi = p_mlp->p_mi;
+    libvlc_media_player_retain(p_mi);
+    unlock(p_mlp);
+    return p_mi;
 }
 
 /**************************************************************************
