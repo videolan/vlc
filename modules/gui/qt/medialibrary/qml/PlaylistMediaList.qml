@@ -143,15 +143,6 @@ MainViewLoader {
         }
     }
 
-    function _getCount(model) {
-        const count = model.count;
-
-        if (count < 100)
-            return count;
-        else
-            return qsTr("99+");
-    }
-
     function _adjustDragAccepted(drag) {
         if (!root.model || root.model.transactionPending)
         {
