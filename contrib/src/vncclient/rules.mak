@@ -28,7 +28,7 @@ vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz .sum-vncclient
 	$(call pkg_static,"src/libvncclient/libvncclient.pc.cmakein")
 	$(MOVE)
 
-DEPS_vncclient = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png) gnutls $(DEPS_gnutls)
+DEPS_vncclient = gcrypt $(DEPS_gcrypt) zlib $(DEPS_zlib) jpeg $(DEPS_jpeg) gnutls $(DEPS_gnutls)
 
 VNCCLIENT_CONF := \
 	-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
@@ -36,7 +36,7 @@ VNCCLIENT_CONF := \
 	-DWITH_GCRYPT:BOOL=ON \
 	-DWITH_ZLIB:BOOL=ON \
 	-DWITH_JPEG:BOOL=ON \
-	-DWITH_PNG:BOOL=ON \
+	-DWITH_PNG:BOOL=OFF \
 	-DWITH_SDL:BOOL=OFF \
 	-DWITH_GTK:BOOL=OFF \
 	-DWITH_LIBSSHTUNNEL:BOOL=OFF \
