@@ -60,11 +60,16 @@ enum mc_media_format_color_range_t
 
 enum mc_media_format_color_standard_t
 {
-    MC_COLOR_STANDARD_UNSPECIFIED  = 0x0,
-    MC_COLOR_STANDARD_BT709        = 0x1,
-    MC_COLOR_STANDARD_BT601_PAL    = 0x2,
-    MC_COLOR_STANDARD_BT601_NTSC   = 0x4,
-    MC_COLOR_STANDARD_BT2020       = 0x6,
+    MC_COLOR_STANDARD_UNSPECIFIED          = 0x0,
+    MC_COLOR_STANDARD_BT709                = 0x1,
+    MC_COLOR_STANDARD_BT601_625            = 0x2,
+    MC_COLOR_STANDARD_BT601_625_UNADJUSTED = 0x3,
+    MC_COLOR_STANDARD_BT601_525            = 0x4,
+    MC_COLOR_STANDARD_BT601_525_240M       = 0x5,
+    MC_COLOR_STANDARD_BT2020_NC            = 0x6,
+    MC_COLOR_STANDARD_BT2020               = 0x7,
+    MC_COLOR_STANDARD_BT470M               = 0x8,
+    MC_COLOR_STANDARD_FILM                 = 0x9,
 };
 
 enum mc_media_format_color_transfer_t

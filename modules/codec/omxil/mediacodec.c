@@ -478,13 +478,15 @@ vlc_to_mc_color_standard(video_color_primaries_t vlc_primaries)
     switch (vlc_primaries)
     {
         case COLOR_PRIMARIES_BT601_525:
-            return MC_COLOR_STANDARD_BT601_NTSC;
+            return MC_COLOR_STANDARD_BT601_525;
         case COLOR_PRIMARIES_BT601_625:
-            return MC_COLOR_STANDARD_BT601_PAL;
+            return MC_COLOR_STANDARD_BT601_625;
         case COLOR_PRIMARIES_BT709:
             return MC_COLOR_STANDARD_BT709;
         case COLOR_PRIMARIES_BT2020:
             return MC_COLOR_STANDARD_BT2020;
+        case COLOR_PRIMARIES_BT470_M:
+        case COLOR_PRIMARIES_DCI_P3:
         default:
             return MC_COLOR_STANDARD_UNSPECIFIED;
     }
@@ -497,11 +499,18 @@ mc_to_vlc_primaries(enum mc_media_format_color_standard_t mc_standard)
     {
         case MC_COLOR_STANDARD_BT709:
             return COLOR_PRIMARIES_BT709;
-        case MC_COLOR_STANDARD_BT601_PAL:
-        case MC_COLOR_STANDARD_BT601_NTSC:
+        case MC_COLOR_STANDARD_BT601_625:
+        case MC_COLOR_STANDARD_BT601_625_UNADJUSTED:
+            return COLOR_PRIMARIES_BT601_625;
+        case MC_COLOR_STANDARD_BT601_525:
+        case MC_COLOR_STANDARD_BT601_525_240M:
             return COLOR_PRIMARIES_BT601_525;
         case MC_COLOR_STANDARD_BT2020:
             return COLOR_PRIMARIES_BT2020;
+        case MC_COLOR_STANDARD_BT470M:
+            return COLOR_PRIMARIES_BT470_M;
+        case MC_COLOR_STANDARD_FILM:
+            return COLOR_PRIMARIES_DCI_P3;
         default:
             return COLOR_PRIMARIES_UNDEF;
     }
@@ -514,11 +523,16 @@ mc_to_vlc_color_space(enum mc_media_format_color_standard_t mc_standard)
     {
         case MC_COLOR_STANDARD_BT709:
             return COLOR_SPACE_BT709;
-        case MC_COLOR_STANDARD_BT601_PAL:
-        case MC_COLOR_STANDARD_BT601_NTSC:
+        case MC_COLOR_STANDARD_BT601_625:
+        case MC_COLOR_STANDARD_BT601_525:
             return COLOR_SPACE_BT601;
+        case MC_COLOR_STANDARD_BT601_525_240M:
+            return COLOR_SPACE_SMPTE_240;
         case MC_COLOR_STANDARD_BT2020:
             return COLOR_SPACE_BT2020;
+        case MC_COLOR_STANDARD_BT601_625_UNADJUSTED:
+        case MC_COLOR_STANDARD_BT470M:
+        case MC_COLOR_STANDARD_FILM:
         default:
             return COLOR_SPACE_UNDEF;
     }
