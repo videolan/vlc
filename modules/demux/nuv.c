@@ -898,13 +898,13 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
         int64_t i_offset = GetQWLE( p_seek_entry );
 
         if( i_offset == 0 && frame != 0 )
-            msg_Dbg( p_demux, "invalid file offset %d %"PRIi64, keyframe, i_offset );
+            msg_Dbg( p_demux, "invalid file offset %"PRIi32" %"PRIi64, keyframe, i_offset );
         else
         {
             vlc_tick_t i_time = (double)( (vlc_tick_t)frame * CLOCK_FREQ ) / p_sys->hdr.d_fps;
             demux_IndexAppend( &p_sys->idx, i_time , i_offset );
 #if 0
-            msg_Dbg( p_demux, "adding entry position %d %"PRIi64 " file offset %"PRIi64, keyframe, i_time, i_offset );
+            msg_Dbg( p_demux, "adding entry position %"PRIi32" %"PRIi64 " file offset %"PRIi64, keyframe, i_time, i_offset );
 #endif
         }
 
@@ -915,7 +915,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
     p_sys->i_total_length = (frame + INT64_C(1)) * CLOCK_FREQ / p_sys->hdr.d_fps;
 
-    msg_Dbg( p_demux, "index table loaded (%d elements)", i_seek_elements );
+    msg_Dbg( p_demux, "index table loaded (%"PRIi32" elements)", i_seek_elements );
 
     ret = VLC_SUCCESS;
 
