@@ -325,6 +325,8 @@ MainViewLoader {
                             labels.push(qsTr("%1 Track", "%1 Tracks", model.nb_audio).arg(model.nb_audio))
                         if (model.nb_video > 0)
                             labels.push(qsTr("%1 Video", "%1 Videos", model.nb_video).arg(model.nb_video))
+                        if (model.nb_unknown > 0)
+                            labels.push(qsTr("%1 Other", "%1 Other", model.nb_unknown).arg(model.nb_unknown))
 
                         return labels.join("\n")
                     })()

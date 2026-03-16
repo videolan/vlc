@@ -274,7 +274,8 @@ QHash<int, QByteArray> MLPlaylistListModel::roleNames() const /* override */
         { PLAYLIST_DURATION,  "duration"  },
         { PLAYLIST_COUNT,     "count"     },
         { PLAYLIST_NB_AUDIO,  "nb_audio"  },
-        { PLAYLIST_NB_VIDEO,  "nb_video"  }
+        { PLAYLIST_NB_VIDEO,  "nb_video"  },
+        { PLAYLIST_NB_UNKNOWN,"nb_unknown"}
     };
 }
 
@@ -304,6 +305,8 @@ QVariant MLPlaylistListModel::itemRoleData(const MLItem *item, int role) const /
             return QVariant::fromValue(playlist->getNbAudio());
         case PLAYLIST_NB_VIDEO:
             return QVariant::fromValue(playlist->getNbVideo());
+        case PLAYLIST_NB_UNKNOWN:
+            return QVariant::fromValue(playlist->getNbUnknown());
         default:
             return QVariant();
     }

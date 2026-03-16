@@ -42,6 +42,7 @@ public: // Interface
     unsigned int getCount() const;
     unsigned int getNbAudio() const;
     unsigned int getNbVideo() const;
+    unsigned int getNbUnknown() const;
 
 private:
     QString m_name;
@@ -51,6 +52,7 @@ private:
     unsigned int m_count;
     unsigned int m_nbAudio;
     unsigned int m_nbVideo;
+    unsigned int m_nbUnknown;
 };
 
 #endif

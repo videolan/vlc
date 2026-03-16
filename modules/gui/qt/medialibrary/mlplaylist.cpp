@@ -33,6 +33,7 @@ MLPlaylist::MLPlaylist(const vlc_ml_playlist_t * data)
     , m_count(data->i_nb_media)
     , m_nbAudio(data->i_nb_audio)
     , m_nbVideo(data->i_nb_video)
+    , m_nbUnknown(data->i_nb_unknown)
 {
     assert(data);
 }
@@ -71,4 +72,9 @@ unsigned int MLPlaylist::getNbAudio() const
 unsigned int MLPlaylist::getNbVideo() const
 {
     return m_nbVideo;
+}
+
+unsigned int MLPlaylist::getNbUnknown() const
+{
+    return m_nbUnknown;
 }
