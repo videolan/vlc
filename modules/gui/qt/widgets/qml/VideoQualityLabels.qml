@@ -52,6 +52,8 @@ Row {
 
             font.pixelSize: VLCStyle.fontSize_normal
 
+            horizontalAlignment: Text.AlignRight
+
             color: theme.fg.primary
 
             background: Rectangle {
