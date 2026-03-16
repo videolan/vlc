@@ -54,5 +54,5 @@ amf: AMF-$(AMF_VERSION).tar.gz .sum-amf
 .amf: amf
 	$(RM) -Rf $(PREFIX)/include/AMF
 	mkdir -p $(PREFIX)/include/AMF
-	cp -R $</* $(PREFIX)/include/AMF
+	cp -R $</* $(PREFIX)/include
 	touch $@
