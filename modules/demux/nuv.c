@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <limits.h>
+#include <stdckdint.h>
 
 /* TODO:
  *  - test
@@ -750,8 +751,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 {
     frame_header_t fh;
     uint64_t i_original_pos;
-    int64_t i_time, i_offset;
-    int keyframe, last_keyframe = 0, frame = 0, kfa_entry_id = 0;
+    int32_t last_keyframe = 0, frame = 0, kfa_entry_id = 0;
     int ret = VLC_EGENERIC;
 
     if( p_sys->exh.i_seektable_offset <= 0 )
@@ -792,6 +792,12 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
     const int32_t i_seek_elements = fh.i_length / 12;
 
     /* Get keyframe adjust offsets */
+    /*  typedef struct kfatable_entry
+        {
+            int adjust;
+            int keyframe_number;
+        }
+       https://github.com/MythTV/mythtv/blob/fixes/0.22/mythtv/libs/libmythtv/format.h */
     int32_t i_kfa_elements = 0;
     uint8_t *p_kfa_table = NULL;
 
@@ -824,9 +830,8 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
             if( vlc_stream_Read( p_demux->s, p_kfa_table,
                                  fh.i_length ) != fh.i_length )
             {
-                free( p_seek_table );
-                free( p_kfa_table );
-                goto restore;
+                ret = VLC_EGENERIC;
+                goto cleanup;
             }
 
             i_kfa_elements = fh.i_length / 8;
@@ -838,30 +843,65 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
     for( int32_t j = 0; j < i_seek_elements; j++)
     {
+        const uint8_t *p_seek_entry = p_seek_table + j * 12;
 #if 0
-        uint8_t* p = p_seek_table + j * 12;
+        const uint8_t* p = p_seek_entry;
         msg_Dbg( p_demux, "%x %x %x %x %x %x %x %x %x %x %x %x",
         p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11]);
 #endif
-        keyframe = GetDWLE( p_seek_table + j * 12 + 8 );
+        int32_t keyframe = GetDWLE( p_seek_entry + 8 );
+        int32_t keyframe_delta;
+        int32_t frame_delta;
+        int32_t next_frame;
 
-        frame += (keyframe - last_keyframe) * p_sys->hdr.i_keyframe_distance;
-
-        if( kfa_entry_id < i_kfa_elements && *(int32_t*)(p_kfa_table + kfa_entry_id * 12 + 4) == j )
+        if( keyframe < 0 || keyframe < last_keyframe ||
+            ckd_sub( &keyframe_delta, keyframe, last_keyframe ) ||
+            ckd_mul( &frame_delta, keyframe_delta,
+                     p_sys->hdr.i_keyframe_distance ) ||
+            ckd_add( &next_frame, frame, frame_delta ) )
         {
-            frame -= *(int32_t*)(p_kfa_table + kfa_entry_id * 12);
-            msg_Dbg( p_demux, "corrected keyframe %d with current frame number %d (corrected with %d)",
-                        keyframe, frame, *(int32_t*)(p_kfa_table + kfa_entry_id * 12) );
-            kfa_entry_id++;
+            msg_Warn( p_demux, "broken index with keyframe value %"PRIi32, keyframe );
+            ret = VLC_EGENERIC;
+            goto cleanup;
         }
 
-        i_offset = GetQWLE( p_seek_table + j * 12 );
+        frame = next_frame;
+
+        if( kfa_entry_id < i_kfa_elements )
+        {
+            const uint8_t *p_kfa_entry = &p_kfa_table[kfa_entry_id * 8];
+            int32_t i_kfa_adjust = GetDWLE(p_kfa_entry + 0);
+            int32_t i_kfa_keyframe = GetDWLE(p_kfa_entry + 4);
+            if( i_kfa_keyframe == j )
+            {
+                if( i_kfa_adjust < frame )
+                {
+                    int32_t corrected_frame;
+
+                    if( ckd_sub( &corrected_frame, frame, i_kfa_adjust ) )
+                    {
+                        msg_Warn( p_demux, "broken keyframe adjustment" );
+                        ret = VLC_EGENERIC;
+                        goto cleanup;
+                    }
+
+                    frame = corrected_frame;
+                }
+                else
+                    frame = 0;
+                msg_Dbg( p_demux, "corrected keyframe %"PRIi32" with current frame number %"PRIi32" (corrected with %"PRIi32")",
+                         keyframe, frame, i_kfa_adjust );
+                kfa_entry_id++;
+            }
+        }
+
+        int64_t i_offset = GetQWLE( p_seek_entry );
 
         if( i_offset == 0 && frame != 0 )
             msg_Dbg( p_demux, "invalid file offset %d %"PRIi64, keyframe, i_offset );
         else
         {
-            i_time = (double)( (vlc_tick_t)frame * CLOCK_FREQ ) / p_sys->hdr.d_fps;
+            vlc_tick_t i_time = (double)( (vlc_tick_t)frame * CLOCK_FREQ ) / p_sys->hdr.d_fps;
             demux_IndexAppend( &p_sys->idx, i_time , i_offset );
 #if 0
             msg_Dbg( p_demux, "adding entry position %d %"PRIi64 " file offset %"PRIi64, keyframe, i_time, i_offset );
@@ -877,12 +917,11 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
     msg_Dbg( p_demux, "index table loaded (%d elements)", i_seek_elements );
 
-    if( i_kfa_elements )
-        free ( p_kfa_table );
-
-    free ( p_seek_table );
-
     ret = VLC_SUCCESS;
+
+cleanup:
+    free ( p_kfa_table );
+    free ( p_seek_table );
 
 restore:
     /* Restore stream position */
@@ -906,7 +945,7 @@ static void demux_IndexClean( demux_index_t *p_idx )
     p_idx->idx = NULL;
 }
 static void demux_IndexAppend( demux_index_t *p_idx,
-                               int64_t i_time, int64_t i_offset )
+                               vlc_tick_t i_time, int64_t i_offset )
 {
     /* Be sure to append new entry (we don't insert point) */
     if( p_idx->i_idx > 0 && p_idx->idx[p_idx->i_idx-1].i_time >= i_time )
