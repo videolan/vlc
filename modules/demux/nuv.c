@@ -188,7 +188,6 @@ typedef struct
     bool b_seekable;
     /* frameheader buffer */
     uint8_t fh_buffer[NUV_FH_SIZE];
-    int64_t i_total_frames;
     vlc_tick_t i_total_length;
     /* first frame position (used for calculating size without seektable) */
     uint64_t i_first_frame_offset;
@@ -225,7 +224,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_extra_f = NULL;
     p_sys->i_pcr = -1;
     p_sys->b_index = false;
-    p_sys->i_total_frames = -1;
     p_sys->i_total_length = -1;
     demux_IndexInit( &p_sys->idx );
 
@@ -873,11 +871,9 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
         last_keyframe = keyframe;
     }
 
-    p_sys->i_total_frames = (int64_t)frame;
-
     p_sys->b_index = true;
 
-    p_sys->i_total_length = p_sys->i_total_frames * CLOCK_FREQ / p_sys->hdr.d_fps;
+    p_sys->i_total_length = (frame + INT64_C(1)) * CLOCK_FREQ / p_sys->hdr.d_fps;
 
     msg_Dbg( p_demux, "index table loaded (%d elements)", i_seek_elements );
 
