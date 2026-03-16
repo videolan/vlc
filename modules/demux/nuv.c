@@ -897,7 +897,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
         int64_t i_offset = GetQWLE( p_seek_entry );
 
-        if( i_offset == 0 && frame != 0 )
+        if( ( i_offset == 0 && frame != 0 ) || i_offset < 0 )
             msg_Dbg( p_demux, "invalid file offset %"PRIi32" %"PRIi64, keyframe, i_offset );
         else
         {
@@ -911,7 +911,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
         last_keyframe = keyframe;
     }
 
-    p_sys->b_index = true;
+    p_sys->b_index = p_sys->idx.i_idx > 0;
 
     p_sys->i_total_length = (frame + INT64_C(1)) * CLOCK_FREQ / p_sys->hdr.d_fps;
 
