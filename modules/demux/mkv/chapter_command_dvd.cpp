@@ -94,7 +94,7 @@ std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
                 result = "First Played";
             else if ( p_data[1] == 0xC0 )
                 result = "Video Manager";
-            else if ( p_data[1] == 0x80 )
+            else if ( p_data[1] == 0x80 && p_private_data->GetSize() > 3)
             {
                 uint16_t i_title = (p_data[2] << 8) + p_data[3];
                 char psz_str[20];
