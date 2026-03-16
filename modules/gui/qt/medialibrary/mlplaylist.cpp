@@ -31,6 +31,8 @@ MLPlaylist::MLPlaylist(const vlc_ml_playlist_t * data)
     , m_name(qfu(data->psz_name))
     , m_duration(data->i_duration)
     , m_count(data->i_nb_media)
+    , m_nbAudio(data->i_nb_audio)
+    , m_nbVideo(data->i_nb_video)
 {
     assert(data);
 }
@@ -59,4 +61,14 @@ VLCDuration MLPlaylist::getDuration() const
 unsigned int MLPlaylist::getCount() const
 {
     return m_count;
+}
+
+unsigned int MLPlaylist::getNbAudio() const
+{
+    return m_nbAudio;
+}
+
+unsigned int MLPlaylist::getNbVideo() const
+{
+    return m_nbVideo;
 }

@@ -40,6 +40,8 @@ public: // Interface
     VLCDuration getDuration() const;
 
     unsigned int getCount() const;
+    unsigned int getNbAudio() const;
+    unsigned int getNbVideo() const;
 
 private:
     QString m_name;
@@ -47,6 +49,8 @@ private:
     int64_t m_duration;
 
     unsigned int m_count;
+    unsigned int m_nbAudio;
+    unsigned int m_nbVideo;
 };
 
 #endif

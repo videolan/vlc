@@ -328,8 +328,15 @@ MainViewLoader {
                                     : qsTr("Unknown title")
 
                 labels: [
-                    isMusic ? qsTr("%1 Track", "%1 Tracks", model.count).arg(_getCount(model))
-                            : qsTr("%1 Video", "%1 Videos", model.count).arg(_getCount(model))
+                    (function () {
+                        const labels = []
+                        if (model.nb_audio > 0)
+                            labels.push(qsTr("%1 Track", "%1 Tracks", model.nb_audio).arg(model.nb_audio))
+                        if (model.nb_video > 0)
+                            labels.push(qsTr("%1 Video", "%1 Videos", model.nb_video).arg(model.nb_video))
+
+                        return labels.join("\n")
+                    })()
                 ]
 
                 dragItem: dragItemPlaylist
