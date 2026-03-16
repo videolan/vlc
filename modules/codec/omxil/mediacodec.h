@@ -49,7 +49,8 @@ int MediaCodecNdk_Init(mc_api*);
 #define MC_API_VIDEO_QUIRKS_IGNORE_SIZE 0x2000
 
 /* cf. https://github.com/FFmpeg/FFmpeg/blob/00f5a34c9a5f0adee28aca11971918d6aca48745/libavcodec/mediacodec_wrapper.h#L348
- * cf. https://developer.android.com/reference/android/media/MediaFormat#constants_1*/
+ * cf. https://developer.android.com/reference/android/media/MediaFormat#constants_1
+ * cf. https://github.com/AOSPA/android_frameworks_native/blob/vauxite/headers/media_plugin/media/hardware/VideoAPI.h*/
 enum mc_media_format_color_range_t
 {
     MC_COLOR_RANGE_UNSPECIFIED = 0x0,
@@ -70,7 +71,10 @@ enum mc_media_format_color_transfer_t
 {
     MC_COLOR_TRANSFER_UNSPECIFIED = 0x0,
     MC_COLOR_TRANSFER_LINEAR      = 0x1,
-    MC_COLOR_TRANSFER_SDR_VIDEO   = 0x3,
+    MC_COLOR_TRANSFER_SRGB        = 0x2,
+    MC_COLOR_TRANSFER_BT709       = 0x3,
+    MC_COLOR_TRANSFER_GAMMA22     = 0x4,
+    MC_COLOR_TRANSFER_GAMMA28     = 0x5,
     MC_COLOR_TRANSFER_ST2084      = 0x6,
     MC_COLOR_TRANSFER_HLG         = 0x7,
 };

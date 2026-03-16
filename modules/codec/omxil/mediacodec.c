@@ -536,7 +536,9 @@ vlc_to_mc_color_transfer(video_transfer_func_t vlc_transfer)
         case TRANSFER_FUNC_HLG:
             return MC_COLOR_TRANSFER_HLG;
         case TRANSFER_FUNC_BT709:
-            return MC_COLOR_TRANSFER_SDR_VIDEO;
+            return MC_COLOR_TRANSFER_BT709;
+        case TRANSFER_FUNC_SRGB:
+            return MC_COLOR_TRANSFER_SRGB;
         default:
             return MC_COLOR_TRANSFER_UNSPECIFIED;
     }
@@ -549,7 +551,9 @@ mc_to_vlc_color_transfer(enum mc_media_format_color_transfer_t mc_transfer)
     {
         case MC_COLOR_TRANSFER_LINEAR:
             return TRANSFER_FUNC_LINEAR;
-        case MC_COLOR_TRANSFER_SDR_VIDEO:
+        case MC_COLOR_TRANSFER_SRGB:
+            return TRANSFER_FUNC_SRGB;
+        case MC_COLOR_TRANSFER_BT709:
             return TRANSFER_FUNC_BT709;
         case MC_COLOR_TRANSFER_ST2084:
             return TRANSFER_FUNC_SMPTE_ST2084;
