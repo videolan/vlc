@@ -86,8 +86,8 @@ fn test_module_load_common_activate() {
     };
     let ret = common::load_manifest(&mut context, vlc_entry);
     assert_eq!(ret, 0);
-    assert_ne!(context.open_cb, None);
-    assert_ne!(context.close_cb, None);
+    assert!(context.open_cb.is_some());
+    assert!(context.close_cb.is_some());
 
     unsafe {
         context.open_cb.unwrap()(std::ptr::null_mut());

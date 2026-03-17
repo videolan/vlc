@@ -154,7 +154,7 @@ fn test_module_manifest_multiple_capabilities() {
     };
     let ret = common::load_manifest(&mut context, vlc_entry);
     assert_eq!(ret, 0);
-    assert_ne!(context.open_cb, None);
+    assert!(context.open_cb.is_some());
 
     let mut valid = false;
     unsafe {
