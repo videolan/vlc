@@ -948,7 +948,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
             return -1;
         }
 
-        if <#loader as ModuleProtocol<#type_>>::deactivate_function() != None {
+        if <#loader as ModuleProtocol<#type_>>::deactivate_function().is_some() {
             if unsafe {
                 vlc_set(
                     opaque,
