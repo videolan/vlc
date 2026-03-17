@@ -20,6 +20,12 @@
 #include "config.h"
 #endif
 
+#include <QColor>
+#include <QPalette>
+#include <QApplication>
+
+#undef signals
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include "../qtthemeprovider.hpp"
@@ -188,10 +194,35 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
     bool isDark = isThemeDark(obj);
 
     GdkRGBA accent;
-    if (isDark)
-        gdk_rgba_parse(&accent, "#FF8800");
-    else
-        gdk_rgba_parse(&accent, "#FF610A");
+
+    {
+        QColor qcAccent;
+
+        char* accentColor = var_InheritString(obj, "qt-accent-color");
+        assert(accentColor);
+
+        if (!strcmp(accentColor, "default"))
+        {
+            qcAccent = QColor( isDark ? "#FF8800" : "#FF610A" );
+        }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+        else if (!strcmp(accentColor, "system"))
+        {
+            assert(qApp);
+            const auto palette = qApp->palette();
+            qcAccent = palette.color(QPalette::Normal, QPalette::Accent);
+        }
+#endif
+        else
+        {
+            qcAccent = QColor(accentColor);
+        }
+
+        free(accentColor);
+
+        gdk_rgba_parse(&accent, qcAccent.name(QColor::HexRgb).toLatin1().constData());
+    }
+
 
     //IDK how to retreive the shadow color from GTK, using a black like in our theme is good enough
     GdkRGBA shadow;
