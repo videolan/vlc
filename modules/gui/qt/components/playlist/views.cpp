@@ -555,7 +555,7 @@ void PicFlowView::setSelection(const QRect &, QFlags<QItemSelectionModel::Select
     // No selection possible
 }
 
-void PicFlowView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
+void PicFlowView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> & )
 {
     int currentIndex = picFlow->centerIndex();
     for(int i = topLeft.row(); i<=bottomRight.row(); i++ )
