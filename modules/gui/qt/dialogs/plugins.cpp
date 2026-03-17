@@ -261,7 +261,6 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
     buttonsBox->addButton( butMoreInfo, QDialogButtonBox::ActionRole );
 
     // Reload button
-    ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
     QPushButton *reload = new QPushButton( QIcon( ":/update.svg" ),
                                            qtr( "Reload extensions" ),
                                            this );
