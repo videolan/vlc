@@ -299,6 +299,39 @@ void ExternalPaletteImpl::updateMetrics(vlc_qt_theme_image_type type)
 SystemPalette::SystemPalette(QObject* parent)
     : QObject(parent)
 {
+
+}
+
+void SystemPalette::componentComplete()
+{
+    {
+        assert(m_ctx);
+        char* accentColor = var_InheritString(m_ctx->getIntf(), "qt-accent-color");
+        assert(accentColor);
+
+        if (!strcmp(accentColor, "default"))
+        {
+            // Use default
+        }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+        else if (!strcmp(accentColor, "system"))
+        {
+            assert(qApp);
+            const auto palette = qApp->palette();
+
+            orange500 = palette.color(QPalette::Normal, QPalette::Accent);
+            orange800 = orange500.lighter(150);
+        }
+#endif
+        else
+        {
+            orange500 = QColor(accentColor);
+            orange800 = orange500.lighter(150);
+        }
+
+        free(accentColor);
+    }
+
     updatePalette();
 }
 

@@ -99,9 +99,10 @@ private: \
 
 
 
-class SystemPalette : public QObject
+class SystemPalette : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
 public:
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
     Q_PROPERTY(ColorSchemeModel::ColorScheme  source READ source WRITE setSource NOTIFY sourceChanged FINAL)
@@ -148,6 +149,9 @@ public:
                   ColorContext::ColorName name, ColorContext::ColorState state, QColor color);
     QColor getColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,
                     ColorContext::ColorName name, ColorContext::ColorState state) const;
+
+    void classBegin() override { }
+    void componentComplete() override;
 
 public slots:
     void setSource(ColorSchemeModel::ColorScheme source);
