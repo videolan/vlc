@@ -242,6 +242,8 @@ static void Close( vlc_object_t * p_this )
 #ifdef HAVE_MPC_MPCDEC_H
     if( p_sys->p_demux )
         mpc_demux_exit( p_sys->p_demux );
+#else
+    mpc_decoder_destroy( &p_sys->decoder );
 #endif
     free( p_sys );
 }
