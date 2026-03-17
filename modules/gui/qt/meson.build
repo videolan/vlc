@@ -1117,7 +1117,7 @@ if qt6_dep.found()
             'style/gtkthemeprovider/nav_button_provider_gtk.h',
             'style/gtkthemeprovider/scoped_gobject.h'
         ),
-        'dependencies' : [gtk_dep],
+        'dependencies' : [gtk_dep, qt6_dep],
         'enabled' : gtk_dep.found()
     }
 

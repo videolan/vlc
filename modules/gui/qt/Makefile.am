@@ -1591,10 +1591,10 @@ assets.cpp: assets.qrc
 
 
 if HAVE_QT_GTK
-libqt_gtktheme_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(GTK3_CFLAGS)
+libqt_gtktheme_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(GTK3_CFLAGS) $(QT_CFLAGS)
 libqt_gtktheme_CPPFLAGS = $(AM_CPPFLAGS)
 libqt_gtktheme_plugin_la_LDFLAGS = $(AM_LDFLAGS)
-libqt_gtktheme_plugin_la_LIBADD = $(GTK3_LIBS)
+libqt_gtktheme_plugin_la_LIBADD = $(GTK3_LIBS) $(QT_LIBS)
 libqt_gtktheme_plugin_la_SOURCES = \
 	style/gtkthemeprovider/gtk_compat.cpp \
 	style/gtkthemeprovider/gtk_compat.h \
