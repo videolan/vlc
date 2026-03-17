@@ -433,7 +433,7 @@ PLSelItem * PLSelector::addItem (
       updateStyle();
 //same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
 #if !HAS_QT57
-      connect(qApp, &QApplication::paletteChanged, selItem, [selItem, updateStyle](){
+      connect(qApp, &QApplication::paletteChanged, selItem, [updateStyle](){
           updateStyle();
       });
 #endif

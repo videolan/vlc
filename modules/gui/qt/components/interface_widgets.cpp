@@ -973,7 +973,7 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
 
 //same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
 #if !HAS_QT57
-    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+    connect(qApp, &QApplication::paletteChanged, this, [updateStyle](){
         updateStyle();
     });
 #endif

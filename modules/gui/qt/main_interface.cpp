@@ -581,7 +581,7 @@ inline void MainInterface::createStatusBar()
     updateStyle();
 //same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
 #if !HAS_QT57
-    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+    connect(qApp, &QApplication::paletteChanged, this, [updateStyle](){
         updateStyle();
     });
 #endif
