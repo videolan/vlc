@@ -22,6 +22,7 @@
 
 #include <QGuiApplication>
 #include <QPalette>
+#include <QColor>
 
 namespace {
 
@@ -136,8 +137,33 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
 
     QPalette& palette = sys->m_palette;
 
-    QColor accent = QColor( sys->m_isDark ? "#FF8800" : "#FF610A" );
-    QColor accentPressed = QColor( sys->m_isDark ? "#e67a30" : "#e65609" );
+    QColor accent;
+    QColor accentPressed;
+    {
+        char* accentColor = var_InheritString(obj, "qt-accent-color");
+        assert(accentColor);
+
+        if (!strcmp(accentColor, "default"))
+        {
+            accent = QColor( sys->m_isDark ? "#FF8800" : "#FF610A" );
+            accentPressed = QColor( sys->m_isDark ? "#e67a30" : "#e65609" );
+        }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+        else if (!strcmp(accentColor, "system"))
+        {
+            accent = palette.color(QPalette::Normal, QPalette::Accent);
+            accentPressed = accent.lighter(150);
+        }
+#endif
+        else
+        {
+            accent = QColor(accentColor);
+            accentPressed = accent.lighter(150);
+        }
+
+        free(accentColor);
+    }
+
     QColor textOnAccent = Qt::white;
     QColor visualFocus =  sys->m_isDark ? Qt::white : Qt::black;
     QColor shadow = palette.color(QPalette::Normal, QPalette::Shadow);
