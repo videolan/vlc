@@ -68,25 +68,23 @@ static bool IsMxpeg(stream_t *s)
 
     if ( !(header[position] == 0xFF && header[position+1] == 0xFE) )
         return false;
-    position += 2;
-    header_size = GetWBE (&header[position]);
+
+    header_size = GetWBE (&header[position+2]);
 
     /* Check if this is a MXF header. We may have a jpeg comment first */
-    if (!memcmp (&header[position+2], "MXF\0", 4) )
+    if (!memcmp (&header[position+4], "MXF\0", 4) )
         return true;
 
     /* Skip the jpeg comment and find the MXF header after that */
-    size = position + header_size + 8; //8 = FF FE 00 00 M X F 00
+    size = position + 2 + header_size + 8; //8 = FF FE 00 00 M X F 00
     if (vlc_stream_Peek(s, &header, size ) < size)
         return false;
 
-    position += header_size;
+    position += 2 + header_size;
     if ( !(header[position] == 0xFF && header[position+1] == 0xFE) )
         return false;
 
-    position += 4;
-
-    if (memcmp (&header[position], "MXF\0", 4) )
+    if (memcmp (&header[position + 4], "MXF\0", 4) )
         return false;
 
     return true;
