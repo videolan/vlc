@@ -40,7 +40,7 @@ pub fn load_manifest<Activate, Deactivate>(
         let opcode = opcode.unwrap();
         assert!((*context).command_cursor < (*context).commands.len());
 
-        assert_eq!((*context).commands[(*context).command_cursor], opcode);
+        assert_eq!((&(*context).commands)[(*context).command_cursor], opcode);
         (*context).command_cursor += 1;
 
         if opcode == ModuleProperties::MODULE_CB_OPEN {
