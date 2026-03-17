@@ -82,7 +82,7 @@ struct demux_sys_t
 #ifndef HAVE_MPC_MPCDEC_H
     mpc_decoder    decoder;
 #else
-    mpc_demux     *decoder;
+    mpc_demux     *p_demux;
 #endif
     mpc_reader     reader;
     mpc_streaminfo info;
@@ -165,11 +165,11 @@ static int Open( vlc_object_t * p_this )
     if( !mpc_decoder_initialize( &p_sys->decoder, &p_sys->info ) )
         goto error;
 #else
-    p_sys->decoder = mpc_demux_init( &p_sys->reader );
-    if( !p_sys->decoder )
+    p_sys->p_demux = mpc_demux_init( &p_sys->reader );
+    if( !p_sys->p_demux )
         goto error;
 
-    mpc_demux_get_info( p_sys->decoder, &p_sys->info );
+    mpc_demux_get_info( p_sys->p_demux, &p_sys->info );
 #endif
 
     /* Fill p_demux fields */
@@ -240,8 +240,8 @@ static void Close( vlc_object_t * p_this )
     demux_sys_t    *p_sys = p_demux->p_sys;
 
 #ifdef HAVE_MPC_MPCDEC_H
-    if( p_sys->decoder )
-    mpc_demux_exit( p_sys->decoder );
+    if( p_sys->p_demux )
+        mpc_demux_exit( p_sys->p_demux );
 #endif
     free( p_sys );
 }
@@ -275,7 +275,7 @@ static int Demux( demux_t *p_demux )
     }
 #else
     frame.buffer = (MPC_SAMPLE_FORMAT*)p_data->p_buffer;
-    err = mpc_demux_decode( p_sys->decoder, &frame );
+    err = mpc_demux_decode( p_sys->p_demux, &frame );
     if( err != MPC_STATUS_OK )
     {
         block_Release( p_data );
@@ -366,7 +366,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #else
             i64 = (int64_t)(f * (p_sys->info.samples -
                                  p_sys->info.beg_silence));
-            if( mpc_demux_seek_sample( p_sys->decoder, i64 ) == MPC_STATUS_OK )
+            if( mpc_demux_seek_sample( p_sys->p_demux, i64 ) == MPC_STATUS_OK )
 #endif
             {
                 p_sys->i_position = i64;
@@ -379,7 +379,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #ifndef HAVE_MPC_MPCDEC_H
             if( mpc_decoder_seek_sample( &p_sys->decoder, i64 ) )
 #else
-             if( mpc_demux_seek_sample( p_sys->decoder, i64 ) == MPC_STATUS_OK )
+             if( mpc_demux_seek_sample( p_sys->p_demux, i64 ) == MPC_STATUS_OK )
 #endif
             {
                 p_sys->i_position = i64;
