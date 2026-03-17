@@ -59,9 +59,9 @@ static bool IsMxpeg(stream_t *s)
     position += header_size;
 
     /* Get enough data to analyse the next header */
-    if (position + 6 > size)
+    if (position + 8 > size)
     {
-        size = position + 6;
+        size = position + 8;
         if( vlc_stream_Peek (s, &header, size) < size )
             return false;
     }
