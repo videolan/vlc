@@ -43,6 +43,8 @@ static bool IsMxpeg(stream_t *s)
 {
     const uint8_t *header;
     int size = vlc_stream_Peek(s, &header, 256);
+    if(unlikely(size < 8))
+        return false;
     int position = 0;
 
     if (find_jpeg_marker(&position, header, size) != 0xd8 || position > size-2)
