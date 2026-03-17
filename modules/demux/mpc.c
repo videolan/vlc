@@ -227,7 +227,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    free( p_sys );
+    Close( p_this );
     return VLC_EGENERIC;
 }
 
