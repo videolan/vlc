@@ -77,11 +77,11 @@ Item {
             const value = rowModel[criteria]
 
             if (value.formatShort) {
-
                 string += value.formatShort()
             } else if (criteria === "nb_tracks") {
-
                 string += qsTr("%1 track", "%1 tracks", value).arg(value)
+            } else if (criteria === "nb_videos") {
+                string += qsTr("%1 video", "%1 videos", value).arg(value)
             } else {
                 string += value
             }

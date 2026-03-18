@@ -49,7 +49,8 @@ Widgets.TableViewExt {
         model: ({
             criteria: mainCriteria,
 
-            subCriterias: [ "duration" ],
+            subCriterias: showGroupCountColumn ? [ "nb_videos", "duration" ]
+                                               : [ "duration" ],
 
             showSection: "title",
 
@@ -84,7 +85,7 @@ Widgets.TableViewExt {
             medium.push({
                 size: 0.5,
                 model: ({
-                    criteria: "count",
+                    criteria: "nb_videos",
                     text: qsTr("Videos"),
                     isSortable: false
                 })
