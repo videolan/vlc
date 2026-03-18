@@ -568,6 +568,10 @@ MESON = env -i PATH="$(PATH)" \
 else
 MESON = $(HOSTTOOLS) meson setup $(MESONFLAGS)
 endif
+MESON_NATIVE = $(BUILDTOOLS) meson setup $(BUILD_DIR) $< --prefix "$(BUILDPREFIX)" \
+	--backend ninja -Dlibdir=lib -Dcmake_prefix_path="$(BUILDPREFIX)" \
+	-Dc_args="$(BUILDCFLAGS)" -Dc_link_args="$(BUILDLDFLAGS)" -Dcpp_args="$(BUILDCXXFLAGS)" -Dcpp_link_args="$(BUILDLDFLAGS)"
+
 MESONCLEAN = rm -rf $(BUILD_DIR)/meson-private
 MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) $(MESONCOMPILEFLAGS) && meson install -C $(BUILD_DIR)
 
