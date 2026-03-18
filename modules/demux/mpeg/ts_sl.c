@@ -32,7 +32,7 @@
 
 const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const ts_pmt_t *pmt, uint16_t i_es_id )
 {
-    for( int i = 0; i < ES_DESCRIPTOR_COUNT; i++ )
+    for( int i = 0; pmt->iod && i < ES_DESCRIPTOR_COUNT; i++ )
     {
         const es_mpeg4_descriptor_t *es_descr = &pmt->iod->es_descr[i];
         if( es_descr->i_es_id == i_es_id && es_descr->b_ok )
