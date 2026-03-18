@@ -499,7 +499,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
             /* Payload length */
             for (uint8_t i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
                 for (uint8_t i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
-                    MPEG4_audio_stream_t *st = &p_sys->latm.stream[p_sys->latm.pi_stream[i_program][i_layer]];
+                    const MPEG4_audio_stream_t *st = &p_sys->latm.stream[p_sys->latm.pi_stream[i_program][i_layer]];
                     if (st->i_frame_length_type == 0) {
                         unsigned i_payload = 0;
                         for (;;) {
@@ -553,7 +553,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
 
             for (int i_chunk = 0; i_chunk < i_chunks; i_chunk++) {
                 const int streamIndex = bs_read(&s, 4);
-                MPEG4_audio_stream_t *st = &p_sys->latm.stream[streamIndex];
+                const MPEG4_audio_stream_t *st = &p_sys->latm.stream[streamIndex];
                 const int i_program = st->i_program;
                 const int i_layer = st->i_layer;
 
