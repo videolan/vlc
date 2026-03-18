@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include "textureprovideritem.hpp"
+#include "textureproviderindirection.hpp"
 
 #include <QSGTextureProvider>
 #include <QRunnable>
@@ -36,7 +36,7 @@ private:
     const QPointer<QSGTextureProvider> m_textureProvider;
 };
 
-TextureProviderItem::~TextureProviderItem()
+TextureProviderIndirection::~TextureProviderIndirection()
 {
     {
         if (m_textureProvider)
@@ -53,12 +53,12 @@ TextureProviderItem::~TextureProviderItem()
     }
 }
 
-bool TextureProviderItem::isTextureProvider() const
+bool TextureProviderIndirection::isTextureProvider() const
 {
     return true;
 }
 
-QSGTextureProvider *TextureProviderItem::textureProvider() const
+QSGTextureProvider *TextureProviderIndirection::textureProvider() const
 {
     // This method is called from the rendering thread.
 
@@ -70,8 +70,8 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
             if (source)
             {
                 assert(source->isTextureProvider() &&
-                       "TextureProviderItem: " \
-                       "TextureProviderItem's source item is not a texture provider. " \
+                       "TextureProviderIndirection: " \
+                       "TextureProviderIndirection's source item is not a texture provider. " \
                        "Layering can be enabled for the source item in order to make " \
                        "it a texture provider.");
 
@@ -98,16 +98,16 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
         };
 
         // These are going to be queued when necessary:
-        connect(this, &TextureProviderItem::sourceChanged, m_textureProvider, adjustSource);
-        connect(this, &TextureProviderItem::rectChanged, m_textureProvider, &QSGTextureViewProvider::setRect, Qt::DirectConnection);
+        connect(this, &TextureProviderIndirection::sourceChanged, m_textureProvider, adjustSource);
+        connect(this, &TextureProviderIndirection::rectChanged, m_textureProvider, &QSGTextureViewProvider::setRect, Qt::DirectConnection);
 
-        connect(this, &TextureProviderItem::filteringChanged, m_textureProvider, &QSGTextureViewProvider::setFiltering);
-        connect(this, &TextureProviderItem::mipmapFilteringChanged, m_textureProvider, &QSGTextureViewProvider::setMipmapFiltering);
-        connect(this, &TextureProviderItem::anisotropyLevelChanged, m_textureProvider, &QSGTextureViewProvider::setAnisotropyLevel);
-        connect(this, &TextureProviderItem::horizontalWrapModeChanged, m_textureProvider, &QSGTextureViewProvider::setHorizontalWrapMode);
-        connect(this, &TextureProviderItem::verticalWrapModeChanged, m_textureProvider, &QSGTextureViewProvider::setVerticalWrapMode);
+        connect(this, &TextureProviderIndirection::filteringChanged, m_textureProvider, &QSGTextureViewProvider::setFiltering);
+        connect(this, &TextureProviderIndirection::mipmapFilteringChanged, m_textureProvider, &QSGTextureViewProvider::setMipmapFiltering);
+        connect(this, &TextureProviderIndirection::anisotropyLevelChanged, m_textureProvider, &QSGTextureViewProvider::setAnisotropyLevel);
+        connect(this, &TextureProviderIndirection::horizontalWrapModeChanged, m_textureProvider, &QSGTextureViewProvider::setHorizontalWrapMode);
+        connect(this, &TextureProviderIndirection::verticalWrapModeChanged, m_textureProvider, &QSGTextureViewProvider::setVerticalWrapMode);
 
-        connect(this, &TextureProviderItem::detachAtlasTexturesChanged, m_textureProvider, [provider = m_textureProvider](bool detach) {
+        connect(this, &TextureProviderIndirection::detachAtlasTexturesChanged, m_textureProvider, [provider = m_textureProvider](bool detach) {
             if (detach)
                 provider->requestDetachFromAtlas();
         });
@@ -124,13 +124,13 @@ QSGTextureProvider *TextureProviderItem::textureProvider() const
     return m_textureProvider;
 }
 
-void TextureProviderItem::resetTextureSubRect()
+void TextureProviderIndirection::resetTextureSubRect()
 {
     m_rect = {};
     emit rectChanged({});
 }
 
-void TextureProviderItem::invalidateSceneGraph()
+void TextureProviderIndirection::invalidateSceneGraph()
 {
     // https://doc.qt.io/qt-6/qquickitem.html#graphics-resource-handling
 
@@ -143,7 +143,7 @@ void TextureProviderItem::invalidateSceneGraph()
     }
 }
 
-void TextureProviderItem::releaseResources()
+void TextureProviderIndirection::releaseResources()
 {
     // https://doc.qt.io/qt-6/qquickitem.html#graphics-resource-handling
 

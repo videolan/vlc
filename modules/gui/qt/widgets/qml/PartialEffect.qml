@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Window
 
 import VLC.MainInterface
-import VLC.Widgets as Widgets
+import VLC.Util
 
 // This item can be used as a layer effect.
 // The purpose of this item is to apply an effect to a partial
@@ -36,10 +36,10 @@ Item {
     // a texture provider without creating an extra layer.
     // Make sure that the sampler name is set to "source" (default) if
     // this is used as a layer effect.
-    property alias source: textureProviderItem.source
+    property alias source: textureProviderIndirection.source
 
     // Rectangular area where the effect should be applied:
-    property alias effectRect: textureProviderItem.effectRect
+    property alias effectRect: textureProviderIndirection.effectRect
 
     // Not mandatory to provide, but when feasible (such as, effect is not
     // an isolated inner area), provide it for optimization. When not provided,
@@ -71,14 +71,14 @@ Item {
 
         blending: false
 
-        readonly property Item source: useSubTexture ? sourceVisualTextureProviderItem : root.source
+        readonly property Item source: useSubTexture ? sourceVisualTextureProviderIndirection : root.source
 
         readonly property rect discardRect: {
             if (blending && !useSubTexture)
-                return Qt.rect(textureProviderItem.x / root.width,
-                               textureProviderItem.y / root.height,
-                               (textureProviderItem.x + textureProviderItem.width) / root.width,
-                               (textureProviderItem.y + textureProviderItem.height) / root.height)
+                return Qt.rect(textureProviderIndirection.x / root.width,
+                               textureProviderIndirection.y / root.height,
+                               (textureProviderIndirection.x + textureProviderIndirection.width) / root.width,
+                               (textureProviderIndirection.y + textureProviderIndirection.height) / root.height)
             else // If blending is not enabled, no need to make the normalization calculations
                 return Qt.rect(0, 0, 0, 0)
         }
@@ -91,16 +91,16 @@ Item {
 
         fragmentShader: (discardRect.width > 0.0 && discardRect.height > 0.0) ? "qrc:///shaders/RectFilter.frag.qsb" : ""
 
-        Widgets.TextureProviderItem {
-            id: sourceVisualTextureProviderItem
+        TextureProviderIndirection {
+            id: sourceVisualTextureProviderIndirection
             source: root.source
 
             // If the effect is in a isolated inner area, filtering is necessary. Otherwise, we can simply
             // use sub-texturing for the source itself as well (we already use sub-texture for the effect area).
-            textureSubRect: (sourceProxy.useSubTexture) ? Qt.rect(root.sourceVisualRect.x * textureProviderItem.eDPR,
-                                                                  root.sourceVisualRect.y * textureProviderItem.eDPR,
-                                                                  root.sourceVisualRect.width * textureProviderItem.eDPR,
-                                                                  root.sourceVisualRect.height * textureProviderItem.eDPR) : undefined
+            textureSubRect: (sourceProxy.useSubTexture) ? Qt.rect(root.sourceVisualRect.x * textureProviderIndirection.eDPR,
+                                                                  root.sourceVisualRect.y * textureProviderIndirection.eDPR,
+                                                                  root.sourceVisualRect.width * textureProviderIndirection.eDPR,
+                                                                  root.sourceVisualRect.height * textureProviderIndirection.eDPR) : undefined
         }
     }
 
@@ -109,8 +109,8 @@ Item {
     // covers a certain area in the source texture.
     // This way, we don't need to have another layer just
     // to clip the source texture.
-    Widgets.TextureProviderItem {
-        id: textureProviderItem
+    TextureProviderIndirection {
+        id: textureProviderIndirection
 
         x: effectRect.x
         y: effectRect.y
@@ -123,16 +123,16 @@ Item {
 
         property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
-        textureSubRect: Qt.rect(effectRect.x * textureProviderItem.eDPR,
-                                effectRect.y * textureProviderItem.eDPR,
-                                effectRect.width * textureProviderItem.eDPR,
-                                effectRect.height * textureProviderItem.eDPR)
+        textureSubRect: Qt.rect(effectRect.x * textureProviderIndirection.eDPR,
+                                effectRect.y * textureProviderIndirection.eDPR,
+                                effectRect.width * textureProviderIndirection.eDPR,
+                                effectRect.height * textureProviderIndirection.eDPR)
 
         Connections {
             target: MainCtx
 
             function onIntfDevicePixelRatioChanged() {
-                textureProviderItem.eDPR = MainCtx.effectiveDevicePixelRatio(textureProviderItem.Window.window)
+                textureProviderIndirection.eDPR = MainCtx.effectiveDevicePixelRatio(textureProviderIndirection.Window.window)
             }
         }
 
@@ -140,7 +140,7 @@ Item {
         Binding {
             target: root.effect
             property: root.samplerName
-            value: textureProviderItem
+            value: textureProviderIndirection
         }
 
         // Adjust the blending. Currently MultiEffect/FastBlur does not
@@ -162,7 +162,7 @@ Item {
         Binding {
             target: root.effect
             property: "anchors.fill"
-            value: textureProviderItem
+            value: textureProviderIndirection
         }
     }
 }

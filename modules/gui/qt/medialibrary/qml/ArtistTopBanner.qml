@@ -111,7 +111,7 @@ FocusScope {
 
         height: sourceNeedsTiling ? background.height : (aspectRatio * width)
 
-        source: textureProviderItem
+        source: textureProviderIndirection
 
         // Instead of clipping in the parent, denote the viewport here so we both
         // do not need to clip the excess, and also save significant video memory:
@@ -124,21 +124,21 @@ FocusScope {
         backgroundColor: theme.bg.primary
         postprocess: sourceTextureProviderObserver.hasAlphaChannel
 
-        Widgets.TextureProviderItem {
-            id: textureProviderItem
+        TextureProviderIndirection {
+            id: textureProviderIndirection
 
             // Like in `Player.qml`, this is used because when the source is
             // mipmapped, sometimes it can not be sampled. This is considered
             // a Qt bug, but `QSGTextureView` has a workaround for that. So,
-            // we can have an indirection here through `TextureProviderItem`.
+            // we can have an indirection here through `TextureProviderIndirection`.
             // This is totally acceptable as there is virtually no overhead.
 
             source: background
 
             detachAtlasTextures: blurEffect.sourceNeedsTiling
 
-            horizontalWrapMode: blurEffect.sourceNeedsTiling ? Widgets.TextureProviderItem.Repeat : Widgets.TextureProviderItem.ClampToEdge
-            verticalWrapMode: blurEffect.sourceNeedsTiling ? Widgets.TextureProviderItem.Repeat : Widgets.TextureProviderItem.ClampToEdge
+            horizontalWrapMode: blurEffect.sourceNeedsTiling ? TextureProviderIndirection.Repeat : TextureProviderIndirection.ClampToEdge
+            verticalWrapMode: blurEffect.sourceNeedsTiling ? TextureProviderIndirection.Repeat : TextureProviderIndirection.ClampToEdge
 
             textureSubRect: blurEffect.sourceNeedsTiling ? Qt.rect(blurEffect.width / 8,
                                                                    blurEffect.height / 8,

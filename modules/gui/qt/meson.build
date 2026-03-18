@@ -154,6 +154,7 @@ moc_headers = files(
     'util/qsgtextureview.hpp',
     'util/textureproviderobserver.hpp',
     'util/kirigamiwheelhandler.hpp',
+    'util/textureproviderindirection.hpp',
     'widgets/native/animators.hpp',
     'widgets/native/csdthemeimage.hpp',
     'widgets/native/customwidgets.hpp',
@@ -162,7 +163,6 @@ moc_headers = files(
     'widgets/native/mlfolderseditor.hpp',
     'widgets/native/searchlineedit.hpp',
     'widgets/native/viewblockingrectangle.hpp',
-    'widgets/native/textureprovideritem.hpp',
 )
 
 if host_system == 'windows'
@@ -498,6 +498,8 @@ qt_plugin_sources = files(
     'util/colorizedsvgicon.hpp',
     'util/kirigamiwheelhandler.cpp',
     'util/kirigamiwheelhandler.hpp',
+    'util/textureproviderindirection.cpp',
+    'util/textureproviderindirection.hpp',
     'widgets/native/animators.cpp',
     'widgets/native/animators.hpp',
     'widgets/native/customwidgets.cpp',
@@ -517,8 +519,6 @@ qt_plugin_sources = files(
     'widgets/native/viewblockingrectangle.cpp',
     'widgets/native/viewblockingrectangle.hpp',
     'widgets/native/doubleclickignoringitem.hpp',
-    'widgets/native/textureprovideritem.cpp',
-    'widgets/native/textureprovideritem.hpp',
 )
 
 if host_system == 'windows'

@@ -50,6 +50,7 @@
 #include "util/list_selection_model.hpp"
 #include "util/ui_notifier.hpp"
 #include "util/textureproviderobserver.hpp"
+#include "util/textureproviderindirection.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -64,7 +65,6 @@
 
 #include "menus/qml_menu_wrapper.hpp"
 
-#include "widgets/native/textureprovideritem.hpp"
 #include "widgets/native/csdthemeimage.hpp"
 #include "widgets/native/navigation_attached.hpp"
 #include "widgets/native/viewblockingrectangle.hpp"
@@ -396,6 +396,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ListSelectionModel>( uri, versionMajor, versionMinor, "ListSelectionModel" );
         qmlRegisterType<DoubleClickIgnoringItem>( uri, versionMajor, versionMinor, "DoubleClickIgnoringItem" );
         qmlRegisterType<TextureProviderObserver>( uri, versionMajor, versionMinor, "TextureProviderObserver" );
+        qmlRegisterType<TextureProviderIndirection>( uri, versionMajor, versionMinor, "TextureProviderIndirection" );
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
@@ -409,7 +410,6 @@ void MainUI::registerQMLTypes()
         // @uri VLC.Widgets
         qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
         qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
-        qmlRegisterType<TextureProviderItem>( uri, versionMajor, versionMinor, "TextureProviderItem" );
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);

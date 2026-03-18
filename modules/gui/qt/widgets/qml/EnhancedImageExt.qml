@@ -34,12 +34,12 @@ ImageExt {
     // WARNING: Using this property may be incompatible with certain filling modes.
     property alias textureSubRect: textureProvider.textureSubRect
 
-    property alias textureProvider: textureProvider
+    property alias textureProvider: textureProviderIndirection
 
     // NOTE: Target is by default the texture provider `ImageExt` provides, but it can be
     //       set to any texture provider. For example, `ShaderEffectSource` can be displayed
     //       rounded this way.
-    property alias targetTextureProvider: textureProvider.source
+    property alias targetTextureProvider: textureProviderIndirection.source
     targetTextureProvider: sourceTextureProviderItem
 
     // No need to load images in this case:
@@ -52,8 +52,8 @@ ImageExt {
         if (effectiveBackgroundColor.a > (1.0 - Number.EPSILON))
             return false // If background color is opaque, no need for blending
 
-        if (textureProviderItem === textureProvider) {
-            console.assert(observer.source === textureProvider)
+        if (textureProviderItem === textureProviderIndirection) {
+            console.assert(observer.source === textureProviderIndirection)
             if (!observer.hasAlphaChannel)
                 return false // If the texture is opaque, no need for blending
         }
@@ -61,8 +61,8 @@ ImageExt {
         return true
     }
 
-    TextureProviderItem {
-        id: textureProvider
+    TextureProviderIndirection {
+        id: textureProviderIndirection
 
         // `Image` interface, as `ImageExt` needs it:
         readonly property int status: (source instanceof Image ? ((source.status === Image.Ready && observer.isValid) ? Image.Ready : Image.Loading)
@@ -86,16 +86,16 @@ ImageExt {
 
         Connections {
             target: root.Window.window
-            enabled: root.visible && textureProvider.source && !(textureProvider.source instanceof Image)
+            enabled: root.visible && textureProviderIndirection.source && !(textureProviderIndirection.source instanceof Image)
 
             function onAfterAnimating() {
-                textureProvider.textureSize = observer.textureSize
+                textureProviderIndirection.textureSize = observer.textureSize
             }
         }
 
         TextureProviderObserver {
             id: observer
-            source: textureProvider
+            source: textureProviderIndirection
         }
     }
 }

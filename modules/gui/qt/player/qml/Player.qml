@@ -295,7 +295,7 @@ FocusScope {
                     width: (cover.sar < dar) ? parent.width :  parent.height * cover.sar
                     height: (cover.sar < dar) ? parent.width / cover.sar :  parent.height
 
-                    source: textureProviderItem
+                    source: textureProviderIndirection
 
                     postprocess: true
                     tint: bgtheme.palette.isDark ? "black" : "white"
@@ -311,8 +311,8 @@ FocusScope {
                     // video memory, depending on the excess content in the last layer:
                     viewportRect: Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
 
-                    Widgets.TextureProviderItem {
-                        id: textureProviderItem
+                    TextureProviderIndirection {
+                        id: textureProviderIndirection
 
                         // This should not be necessary anymore since `DualKawaseBlur`
                         // does not create layer for the source implicitly as `MultiEffect`

@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef TEXTUREPROVIDERITEM_HPP
-#define TEXTUREPROVIDERITEM_HPP
+#ifndef TEXTUREPROVIDERINDIRECTION_HPP
+#define TEXTUREPROVIDERINDIRECTION_HPP
 
 #include <QQuickItem>
 #include <QSGTextureProvider>
@@ -53,7 +53,7 @@ public:
     void requestDetachFromAtlas();
 };
 
-class TextureProviderItem : public QQuickItem
+class TextureProviderIndirection : public QQuickItem
 {
     Q_OBJECT
 
@@ -78,8 +78,8 @@ class TextureProviderItem : public QQuickItem
 
     QML_ELEMENT
 public:
-    TextureProviderItem() = default;
-    virtual ~TextureProviderItem();
+    TextureProviderIndirection() = default;
+    virtual ~TextureProviderIndirection();
 
     // These enumerations must be in sync with `QSGTexture`:
     // It appears that MOC is not clever enough to consider foreign enumerations with `Q_ENUM` (I tried)...
@@ -146,4 +146,4 @@ private:
     std::atomic<bool> m_detachAtlasTextures = false;
 };
 
-#endif // TEXTUREPROVIDERITEM_HPP
+#endif // TEXTUREPROVIDERINDIRECTION_HPP
