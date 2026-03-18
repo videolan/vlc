@@ -262,7 +262,15 @@ FocusScope {
                 // so the effect here can sample the top edge neighbour pixels, but for the bottom edge we
                 // need to configure the layer:
                 readonly property int bottomExtension: 16
-                layer.sourceRect: Qt.rect(0, 0, width, height + bottomExtension)
+                // The layer width is smaller than the item width, this is intentional because we do not want
+                // to include the area that playqueue occupies in the layer since it is empty. Note that we
+                // still want to do layering here, because even though the layer is smaller than the item
+                // size, what we display is covered by the item size. The effect, which needs to cover the
+                // item width is going to respect the empty area due to clamp to edge behavior, so we don't
+                // need to use background coloring. It is currently a todo to further reduce video memory
+                // consumption by covering the effect for only the area of interest, currently the blur
+                // effect does not support having an extension area for postprocessing.
+                layer.sourceRect: Qt.rect(0, 0, stackView.width, height + bottomExtension)
 
                 Rectangle {
                     // Extension of parent rectangle for the bottom extension.
@@ -291,7 +299,14 @@ FocusScope {
                                         width,
                                         loaderProgress.height + miniPlayer.height + 2 * stackViewParent.bottomExtension)
 
-                    sourceVisualRect: blending ? Qt.rect(0, 0, width, effectRect.y) : Qt.rect(0, 0, 0, 0)
+                    // Bottom extension is not necessary here, but it is provided to prevent stretching glitch at
+                    // initialization. Currently this is not a problem because the effect is opaque since the
+                    // background is opaque, and effect visual has higher z than the source visual.
+                    sourceVisualRect: ((stackView.width < stackViewParent.width) || blending) ?
+                                      Qt.rect(0, 0,
+                                              stackView.width,
+                                              stackView.height + (frostedGlassEffect.blending ? 0 : stackViewParent.bottomExtension)) :
+                                      Qt.rect(0, 0, 0, 0)
 
                     effect: frostedGlassEffect
 
