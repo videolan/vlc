@@ -551,9 +551,6 @@ static int Control(vout_display_t *vd, int query)
 {
     switch (query)
     {
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        return VLC_SUCCESS;
-
     default:
         msg_Err (vd, "Unknown request %d", query);
     }

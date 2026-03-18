@@ -142,17 +142,7 @@ typedef struct {
  * Control query for vout_display_t
  */
 enum vout_display_query {
-    /**
-     * Notifies a change of the source cropping.
-     *
-     * The cropping requested is stored by source \ref video_format_t `i_x`/`y_offset`
-     * and `i_visible_width`/`height`
-     *
-     * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
-     *         request is necessary
-     */
-    VOUT_DISPLAY_CHANGE_SOURCE_CROP,
+    placeholder, // FIXME remove
 };
 
 /**
@@ -276,7 +266,7 @@ struct vlc_display_operations
      * Reset the picture format handled by the module.
      * This occurs after an error in \ref vlc_display_operations::set_display_size,
      * \ref vlc_display_operations::set_source_aspect,
-     * \ref VOUT_DISPLAY_CHANGE_SOURCE_CROP or
+     * \ref vlc_display_operations::set_source_crop or
      * \ref vlc_display_operations::video_place_changed
      * control query returns an error.
      *
@@ -363,6 +353,22 @@ struct vlc_display_operations
      * When the callback is NULL, it is considered as returning VLC_SUCCESS.
      */
     int (*set_source_aspect)(vout_display_t *, const video_format_t *);
+
+    /**
+     * Notifies a change of the video crop values.
+     *
+     * The cropping requested is stored by source \ref video_format_t `i_x`/`y_offset`
+     * and `i_visible_width`/`height`
+     *
+     * May be NULL.
+     *
+     * \return VLC_SUCCESS on success, another value on error
+     * \return VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
+     *         request is necessary
+     *
+     * When the callback is NULL, it is considered as returning VLC_SUCCESS.
+     */
+    int (*set_source_crop)(vout_display_t *, const video_format_t *);
 };
 
 /**

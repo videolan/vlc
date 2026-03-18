@@ -232,9 +232,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
 static int Control(vout_display_t *vd, int query)
 {
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        return VLC_SUCCESS;
-
     default:
         msg_Err(vd, "Unsupported query in vout display flaschen");
         return VLC_EGENERIC;

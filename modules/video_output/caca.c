@@ -211,9 +211,6 @@ static int Control(vout_display_t *vd, int query)
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        return CropChanged(vd, vd->source);
-
     default:
         msg_Err(vd, "Unsupported query in vout display caca");
         return VLC_EGENERIC;
@@ -403,6 +400,7 @@ static const struct vlc_display_operations ops = {
     .display = PictureDisplay,
     .control = Control,
     .video_place_changed = PlacementChanged,
+    .set_source_crop = CropChanged,
 };
 
 /**

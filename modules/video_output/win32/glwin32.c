@@ -103,8 +103,6 @@ static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        break;
     default:
         break;
     }

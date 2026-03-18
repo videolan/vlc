@@ -462,8 +462,6 @@ static int Control (vout_display_t *vd, int query)
 
     switch (query)
     {
-        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            return AspectChanged(vd, vd->source);
         default:
             msg_Err (vd, "Unhandled request %d", query);
             return VLC_EGENERIC;
@@ -593,6 +591,7 @@ static int Open (vout_display_t *vd,
             .change_source_projection = ChangeSourceProjection,
             .video_place_changed = PlacementChanged,
             .set_source_aspect = AspectChanged,
+            .set_source_crop = AspectChanged,
         };
         vd->ops = &ops;
 

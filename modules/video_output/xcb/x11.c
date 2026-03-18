@@ -224,8 +224,6 @@ static int AspectChanged(vout_display_t *vd, const video_format_t *source)
 static int Control(vout_display_t *vd, int query)
 {
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        return AspectChanged(vd, vd->source);
     default:
         msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;
@@ -318,6 +316,7 @@ static const struct vlc_display_operations ops = {
     .reset_pictures = ResetPictures,
     .video_place_changed = PlacementChanged,
     .set_source_aspect = AspectChanged,
+    .set_source_crop = AspectChanged,
 };
 
 /**

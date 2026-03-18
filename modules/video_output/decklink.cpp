@@ -764,8 +764,6 @@ static int ControlVideo(vout_display_t *vd, int query)
     (void) vd;
 
     switch (query) {
-        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            return VLC_SUCCESS;
         default:
             break;
     }

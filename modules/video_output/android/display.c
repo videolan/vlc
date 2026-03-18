@@ -161,8 +161,6 @@ static int subpicture_Control(vout_display_t *vd, int query)
 
     switch (query)
     {
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        return VLC_SUCCESS;
     default:
         break;
     }
@@ -630,8 +628,6 @@ static int Control(vout_display_t *vd, int query)
         subpicture_Control(vd, query);
 
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        return AspectChanged(vd, vd->source);
     default:
         msg_Warn(vd, "Unknown request in android-display: %d", query);
         return VLC_EGENERIC;
@@ -787,6 +783,7 @@ static int Open(vout_display_t *vd,
             .control = Control,
             .video_place_changed = PlacementChanged,
             .set_source_aspect = AspectChanged,
+            .set_source_crop = AspectChanged,
         };
         vd->ops = &ops;
     }
@@ -800,6 +797,7 @@ static int Open(vout_display_t *vd,
             .control = Control,
             .video_place_changed = PlacementChanged,
             .set_source_aspect = AspectChanged,
+            .set_source_crop = AspectChanged,
         };
         vd->ops = &ops;
     }

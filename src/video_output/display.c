@@ -513,9 +513,12 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
 
     bool place_changed = PlaceVideoInDisplay(osys);
 
-    err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
-    if (err2 != VLC_SUCCESS)
-        err1 = err2;
+    if (vd->ops->set_source_crop != NULL)
+    {
+        err2 = vd->ops->set_source_crop(vd, vd->source);
+        if (err2 != VLC_SUCCESS)
+            err1 = err2;
+    }
 
     if (place_changed && vd->ops->video_place_changed != NULL)
     {

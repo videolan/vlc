@@ -216,8 +216,6 @@ static int Control(vout_display_t *vd, int query)
 
     switch (query)
     {
-        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            return AspectChanged(vd, vd->source);
         default:
              msg_Err(vd, "unknown request %d", query);
              return VLC_EGENERIC;
@@ -279,6 +277,7 @@ static const struct vlc_display_operations ops = {
     .reset_pictures = ResetPictures,
     .video_place_changed = PlacementChanged,
     .set_source_aspect = AspectChanged,
+    .set_source_crop = AspectChanged,
 };
 
 static int Open(vout_display_t *vd,

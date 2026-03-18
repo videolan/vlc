@@ -578,6 +578,7 @@ static constexpr const auto ops = []{
     ops.change_source_projection = ChangeSourceProjection;
     ops.video_place_changed = PlacementChanged;
     ops.set_source_aspect = AspectChanged;
+    ops.set_source_crop = AspectChanged;
     return ops;
 }();
 
@@ -829,8 +830,6 @@ static int UpdateSource(vout_display_t *vd, bool force_placement)
 static int Control(vout_display_t *vd, int query)
 {
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        return AspectChanged(vd, vd->source);
     default:
         return VLC_EGENERIC;
     }
