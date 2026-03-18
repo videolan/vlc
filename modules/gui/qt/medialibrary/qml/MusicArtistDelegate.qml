@@ -207,7 +207,7 @@ T.ItemDelegate {
         Widgets.TextAutoScroller {
             label: artistName
 
-            forceScroll: root.isCurrent || root.visualFocus
+            forceScroll: root.visualFocus
             clip: scrolling
 
             implicitHeight: artistName.implicitHeight
