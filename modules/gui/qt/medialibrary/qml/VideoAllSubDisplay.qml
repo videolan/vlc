@@ -188,7 +188,7 @@ VideoAll {
             }
 
             property var listLabels: function (model) {
-                return root.getLabelGroup(model, qsTr("%1"))
+                return root.getLabel(model)
             }
 
             property bool showGroupCountColumn: true
@@ -251,7 +251,7 @@ VideoAll {
             }
 
             property var listLabels: function (model) {
-                return root.getLabelGroup(model, qsTr("%1"))
+                return root.getLabel(model)
             }
 
             property bool showGroupCountColumn: true
