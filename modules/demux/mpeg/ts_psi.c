@@ -288,8 +288,11 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
             case 0x09:
             {
                 dvbpsi_ca_dr_t *p_cadr = dvbpsi_DecodeCADr( (dvbpsi_descriptor_t *) p_dr );
-                msg_Dbg( p_demux, PMT_DESC_INDENT "CA System ID 0x%x", p_cadr->i_ca_system_id );
-                i_arib_score_flags |= (p_cadr->i_ca_system_id == 0x05);
+                if( p_cadr )
+                {
+                    msg_Dbg( p_demux, PMT_DESC_INDENT "CA System ID 0x%x", p_cadr->i_ca_system_id );
+                    i_arib_score_flags |= (p_cadr->i_ca_system_id == 0x05);
+                }
             }
             break;
 
@@ -1400,8 +1403,8 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
     {
         dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x52 );
         dvbpsi_stream_identifier_dr_t *p_si = dvbpsi_DecodeStreamIdentifierDr( p_dr );
-
-        msg_Dbg( p_demux, "    * Stream Component Identifier: %d", p_si->i_component_tag );
+        if( p_si )
+            msg_Dbg( p_demux, "    * Stream Component Identifier: %d", p_si->i_component_tag );
     }
 }
 
