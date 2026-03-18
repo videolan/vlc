@@ -57,6 +57,7 @@ QHash<int, QByteArray> MLVideoFoldersModel::roleNames() const /* override */
         { FOLDER_THUMBNAIL, "thumbnail" },
         { FOLDER_DURATION, "duration" },
         { FOLDER_COUNT, "count" },
+        { FOLDER_NB_VIDEOS, "nb_videos" },
     };
 }
 
@@ -90,6 +91,7 @@ QVariant MLVideoFoldersModel::itemRoleData(const MLItem * item, const int role) 
         case FOLDER_DURATION:
             return QVariant::fromValue(folder->getDuration());
         case FOLDER_COUNT:
+        case FOLDER_NB_VIDEOS:
             return QVariant::fromValue(folder->getVideoCount());
         default:
             return QVariant();

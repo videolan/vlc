@@ -39,7 +39,8 @@ public:
         FOLDER_TITLE_FIRST_SYMBOL,
         FOLDER_THUMBNAIL,
         FOLDER_DURATION,
-        FOLDER_COUNT
+        FOLDER_COUNT,
+        FOLDER_NB_VIDEOS
     };
 
 public:

@@ -64,6 +64,7 @@ QHash<int, QByteArray> MLVideoGroupsModel::roleNames() const /* override */
         {GROUP_TITLE_FIRST_SYMBOL, "group_title_first_symbol"},
         {GROUP_DATE, "date"},
         {GROUP_COUNT, "count"},
+        {GROUP_NB_VIDEOS, "nb_videos"},
     };
 
     hash.insert(groupRoles);
@@ -109,6 +110,7 @@ QVariant MLVideoGroupsModel::itemRoleData(const MLItem * item, const int role) c
             case GROUP_DATE:
                 return QVariant::fromValue(group->getDate());
             case GROUP_COUNT:
+            case GROUP_NB_VIDEOS:
                 return QVariant::fromValue(group->getCount());
             default:
                 return QVariant();
@@ -131,6 +133,7 @@ QVariant MLVideoGroupsModel::itemRoleData(const MLItem * item, const int role) c
             case GROUP_DATE:
                 return QVariant();
             case GROUP_COUNT:
+            case GROUP_NB_VIDEOS:
                 return 1;
             // NOTE: Media specific.
             default:

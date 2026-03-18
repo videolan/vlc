@@ -38,7 +38,8 @@ public:
         GROUP_IS_VIDEO = MLVideoModel::VIDEO_ROLES_COUNT,
         GROUP_TITLE_FIRST_SYMBOL,
         GROUP_DATE,
-        GROUP_COUNT
+        GROUP_COUNT,
+        GROUP_NB_VIDEOS
     };
 
 public:
