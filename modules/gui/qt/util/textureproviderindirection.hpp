@@ -79,7 +79,7 @@ class TextureProviderIndirection : public QQuickItem
     QML_ELEMENT
 public:
     TextureProviderIndirection() = default;
-    virtual ~TextureProviderIndirection();
+    ~TextureProviderIndirection();
 
     // These enumerations must be in sync with `QSGTexture`:
     // It appears that MOC is not clever enough to consider foreign enumerations with `Q_ENUM` (I tried)...
