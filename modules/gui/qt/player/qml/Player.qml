@@ -232,7 +232,19 @@ FocusScope {
                     }
                 }
 
-                Rectangle {
+                component FadeRectangle : Rectangle {
+                    implicitHeight: VLCStyle.dp(206, VLCStyle.scale)
+
+                    SGManipulator {
+                        // The rectangle is the bottom-most item in the interface,
+                        // it does not need blending even though it is not opaque.
+                        // Since `Rectangle` does not provide explicit control over
+                        // blending, we are using `SGManipulator`:
+                        blending: false
+                    }
+                }
+
+                FadeRectangle {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -248,7 +260,7 @@ FocusScope {
                     }
                 }
 
-                Rectangle {
+                FadeRectangle {
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
