@@ -62,6 +62,7 @@
 #endif
 
 #include <assert.h>
+#include <limits.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -1277,11 +1278,16 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
         buf += 2;
 
         unsigned au_size = 0;
-        while (len--) {
+        for (;len;len--) {
             int c = *buf++;
             au_size += c;
             if (c != 0xff)
                 break;
+            if (au_size > UINT_MAX/2)
+            {
+                len = 0;
+                break;
+            }
         }
 
         if (start_trim_flag) {
