@@ -532,10 +532,13 @@ ListView {
             }
         }
 
-        // these events are matched on release
-        if (event.matches(StandardKey.SelectAll) || KeyHelper.matchOk(event)) {
+        if (event.matches(StandardKey.SelectAll)) {
             event.accepted = true
-
+            if (selectionModel)
+                selectionModel.selectAll()
+        } else if (KeyHelper.matchOk(event)) {
+            // Keep activation handling on release to avoid double interpretation.
+            event.accepted = true
             _keyPressed = true
         }
 
@@ -584,11 +587,7 @@ ListView {
 
         _keyPressed = false
 
-        if (event.matches(StandardKey.SelectAll)) {
-            event.accepted = true
-            if (selectionModel)
-                selectionModel.selectAll()
-        } else if (KeyHelper.matchOk(event)) { //enter/return/space
+        if (KeyHelper.matchOk(event)) { //enter/return/space
             event.accepted = true
             actionAtIndex(currentIndex)
         }

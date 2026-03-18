@@ -250,12 +250,14 @@ FocusScope {
             }
         } else if (KeyHelper.matchPageUp(event)) {
             newIndex = Math.max(0, currentIndex - nbItemPerRow * 5)
-        } else if (KeyHelper.matchOk(event) || event.matches(StandardKey.SelectAll) ) {
-            //these events are matched on release
+        } else if (event.matches(StandardKey.SelectAll)) {
             event.accepted = true
+            selectionModel.selectAll()
         }
 
-        if (event.matches(StandardKey.SelectAll) || KeyHelper.matchOk(event)) {
+        if (KeyHelper.matchOk(event)) {
+            // Keep activation handling on release to avoid double interpretation.
+            event.accepted = true
             _releaseActionButtonPressed = true
         } else {
             _releaseActionButtonPressed = false
@@ -284,10 +286,7 @@ FocusScope {
         if (!_releaseActionButtonPressed)
             return
 
-        if (event.matches(StandardKey.SelectAll)) {
-            event.accepted = true
-            selectionModel.selectAll()
-        } else if ( KeyHelper.matchOk(event) ) {
+        if ( KeyHelper.matchOk(event) ) {
             event.accepted = true
             actionAtIndex(currentIndex)
         }
