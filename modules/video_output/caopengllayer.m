@@ -462,7 +462,6 @@ static int Control (vout_display_t *vd, int query)
 
     switch (query)
     {
-        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             return AspectChanged(vd, vd->source);
         default:
@@ -593,6 +592,7 @@ static int Open (vout_display_t *vd,
             .set_viewpoint = SetViewpoint,
             .change_source_projection = ChangeSourceProjection,
             .video_place_changed = PlacementChanged,
+            .set_source_aspect = AspectChanged,
         };
         vd->ops = &ops;
 

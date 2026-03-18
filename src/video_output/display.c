@@ -542,9 +542,12 @@ static int vout_SetSourceAspect(vout_display_t *vd,
 
     bool place_changed = PlaceVideoInDisplay(osys);
 
-    err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
-    if (err2 != VLC_SUCCESS)
-        err1 = err2;
+    if (vd->ops->set_source_aspect != NULL)
+    {
+        err2 = vd->ops->set_source_aspect(vd, vd->source);
+        if (err2 != VLC_SUCCESS)
+            err1 = err2;
+    }
 
     /* If a crop ratio is requested, recompute the parameters */
     if (osys->crop.mode != VOUT_CROP_NONE)

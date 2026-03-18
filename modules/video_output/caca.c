@@ -213,8 +213,6 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         return CropChanged(vd, vd->source);
-    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-        return VLC_SUCCESS;
 
     default:
         msg_Err(vd, "Unsupported query in vout display caca");

@@ -171,6 +171,7 @@ static const struct vlc_display_operations ops = {
     .control = Control,
     .set_viewpoint = SetViewpoint,
     .video_place_changed = PlacementChanged,
+    .set_source_aspect = AspectChanged,
 };
 
 static int Open (vout_display_t *vd,
@@ -379,7 +380,6 @@ static int Control (vout_display_t *vd, int query)
 
         switch (query)
         {
-            case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
             case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
                 return AspectChanged(vd, vd->source);
 

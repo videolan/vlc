@@ -430,7 +430,6 @@ static int AspectChanged(vout_display_t *vd, const video_format_t *source)
 static int Control(vout_display_t *vd, int query)
 {
     switch (query) {
-        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             return AspectChanged(vd, vd->source);
 
@@ -616,6 +615,7 @@ static const struct vlc_display_operations ops = {
     .set_display_size = SetDisplaySize,
     .control = Control,
     .video_place_changed = PlacementChanged,
+    .set_source_aspect = AspectChanged,
 };
 
 /**
