@@ -4677,7 +4677,7 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
             (i_trun_count + p_track->context.runs.i_count) * sizeof(mp4_run_t));
         if(!p_track->context.runs.p_array)
             continue;
-        memset(&p_track->context.runs.p_array[i_trun_count], 0, p_track->context.runs.i_count * sizeof(mp4_run_t));
+        memset(&p_track->context.runs.p_array[p_track->context.runs.i_count], 0, i_trun_count * sizeof(mp4_run_t));
         i_trun_count += p_track->context.runs.i_count;
 
         /* Get defaults for this/these RUN */
