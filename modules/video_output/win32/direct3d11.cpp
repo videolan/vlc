@@ -752,7 +752,7 @@ static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
     return VLC_SUCCESS;
 }
 
-static int Control(vout_display_t *vd, int query)
+static int UpdateSource(vout_display_t *vd, bool force_placement)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
@@ -790,12 +790,9 @@ static int Control(vout_display_t *vd, int query)
         sys->picQuad.quad_fmt.i_visible_height = vd->source->i_visible_height;
     }
 
-    switch (query) {
-    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
+    if (force_placement)
         sys->place_changed = true;
-        // fallthrough
-    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+
     if (use_scaler)
     {
         vout_display_place_t before_place = sys->scalePlace;
@@ -804,8 +801,6 @@ static int Control(vout_display_t *vd, int query)
         sys->scalePlace.width = sys->picQuad.quad_fmt.i_width;
         sys->scalePlace.height = sys->picQuad.quad_fmt.i_height;
         sys->place_changed |= !vout_display_PlaceEquals(&before_place, &sys->scalePlace);
-        break;
-    }
     }
 
     if ( sys->place_changed )
@@ -814,6 +809,19 @@ static int Control(vout_display_t *vd, int query)
     }
 
     return VLC_SUCCESS;
+}
+
+static int Control(vout_display_t *vd, int query)
+{
+    switch (query) {
+    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
+        return UpdateSource(vd, true);
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        return UpdateSource(vd, false);
+    default:
+        return VLC_EGENERIC;
+    }
 }
 
 static bool SelectRenderPlane(void *opaque, size_t plane, ID3D11RenderTargetView **targetView)
