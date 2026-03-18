@@ -78,7 +78,7 @@ class TextureProviderIndirection : public QQuickItem
 
     QML_ELEMENT
 public:
-    TextureProviderIndirection() = default;
+    explicit TextureProviderIndirection(QQuickItem *parent = nullptr);
     ~TextureProviderIndirection();
 
     // These enumerations must be in sync with `QSGTexture`:

@@ -36,6 +36,12 @@ private:
     const QPointer<QSGTextureProvider> m_textureProvider;
 };
 
+TextureProviderIndirection::TextureProviderIndirection(QQuickItem *parent)
+    : QQuickItem(parent)
+{
+
+}
+
 TextureProviderIndirection::~TextureProviderIndirection()
 {
     {
