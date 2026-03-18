@@ -228,6 +228,7 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     vt->GenBuffers(sr->buffer_object_count, sr->buffer_objects);
 
+    free(glsl_version);
     return sr;
 
 error_2:
