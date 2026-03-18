@@ -663,8 +663,6 @@ static int vd_control(vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             return vd_aspect_changed(vd, vd->source);
-        case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            return configure_display(vd, vd->place);
 
         default:
             msg_Warn(vd, "Unknown control query %d", query);
@@ -1001,6 +999,7 @@ static const struct vlc_display_operations ops = {
     .set_display_size = SetDisplaySize,
     .control = vd_control,
     .reset_pictures = vd_reset_pictures,
+    .video_place_changed = vd_video_place_changed,
 };
 
 static int OpenMmalVout(vout_display_t *vd,

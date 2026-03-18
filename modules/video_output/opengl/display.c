@@ -218,6 +218,7 @@ static const struct vlc_display_operations ops = {
     .update_format = UpdateFormat,
     .change_source_projection = ChangeSourceProjection,
     .set_stereo = SetStereoMode,
+    .video_place_changed = PlacementChanged,
 };
 
 /**
@@ -388,8 +389,6 @@ static int Control (vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             return AspectChanged(vd, vd->source);
-        case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            return PlacementChanged(vd, vd->place);
 
         default:
             msg_Err (vd, "Unknown request %d", query);

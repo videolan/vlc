@@ -1671,8 +1671,6 @@ static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        return PlacementChanged(vd, vd->place);
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         break;
@@ -1754,6 +1752,7 @@ static const struct vlc_display_operations ops = {
     .display = Display,
     .set_display_size = SetDisplaySize,
     .control = Control,
+    .video_place_changed = PlacementChanged,
 };
 
 /**

@@ -219,8 +219,6 @@ static int Control(vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             return AspectChanged(vd, vd->source);
-        case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            return PlacementChanged(vd, vd->place);
         default:
              msg_Err(vd, "unknown request %d", query);
              return VLC_EGENERIC;
@@ -280,6 +278,7 @@ static const struct vlc_display_operations ops = {
     .set_display_size = SetDisplaySize,
     .control = Control,
     .reset_pictures = ResetPictures,
+    .video_place_changed = PlacementChanged,
 };
 
 static int Open(vout_display_t *vd,

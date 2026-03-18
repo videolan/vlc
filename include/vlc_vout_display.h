@@ -162,15 +162,6 @@ enum vout_display_query {
      *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,
-
-    /**
-     * Notified when the source placement in the display has changed
-     *
-     * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
-     *         request is necessary
-     */
-    VOUT_DISPLAY_CHANGE_SOURCE_PLACE,
 };
 
 /**
@@ -214,6 +205,8 @@ typedef int (*vout_display_open_cb)(vout_display_t *vd,
         set_callback(activate) \
     } \
     set_capability( "vout display", priority )
+
+struct vout_display_place_t;
 
 struct vlc_display_operations
 {
@@ -293,7 +286,7 @@ struct vlc_display_operations
      * This occurs after an error in \ref vlc_display_operations::set_display_size,
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_CROP or
-     * \ref VOUT_DISPLAY_CHANGE_SOURCE_PLACE
+     * \ref vlc_display_operations::video_place_changed
      * control query returns an error.
      *
      * \param ftmp video format that the module expects as input
@@ -351,6 +344,21 @@ struct vlc_display_operations
      * \retval VLC_EGENERIC if the display handled the change was not handled
      */
     int        (*set_stereo)(vout_display_t *, vlc_stereoscopic_mode_t);
+
+    /**
+     * Let the display module know the placement of the video in the display changed.
+     *
+     * May be NULL.
+     *
+     * This is always called from the same thread as prepare/display.
+     *
+     * \return VLC_SUCCESS if the placement change is accepted.
+     * \return an error if the placement is not accepted and
+     * \ref vlc_display_operations::reset_pictures "reset_pictures" needs to be called.
+     *
+     * When the callback is NULL, it is considered as returning VLC_SUCCESS.
+     */
+    int (*video_place_changed)(vout_display_t *, const struct vout_display_place_t *);
 };
 
 /**

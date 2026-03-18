@@ -517,9 +517,9 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
     if (err2 != VLC_SUCCESS)
         err1 = err2;
 
-    if (place_changed)
+    if (place_changed && vd->ops->video_place_changed != NULL)
     {
-        err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        err2 = vd->ops->video_place_changed(vd, vd->place);
         if (err2 != VLC_SUCCESS)
             err1 = err2;
     }
@@ -554,9 +554,9 @@ static int vout_SetSourceAspect(vout_display_t *vd,
             err1 = err2;
     }
 
-    if (place_changed)
+    if (place_changed && vd->ops->video_place_changed != NULL)
     {
-        err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        err2 = vd->ops->video_place_changed(vd, vd->place);
         if (err2 != VLC_SUCCESS)
             err1 = err2;
     }
@@ -619,9 +619,9 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
     if (err2 != VLC_SUCCESS)
         err1 = err2;
 
-    if (place_changed)
+    if (place_changed && vd->ops->video_place_changed != NULL)
     {
-        err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        err2 = vd->ops->video_place_changed(vd, vd->place);
         if (err2 != VLC_SUCCESS)
             err1 = err2;
     }
@@ -640,9 +640,9 @@ void vout_SetDisplayFitting(vout_display_t *vd, enum vlc_video_fitting fit)
     osys->cfg.display.fitting = fit;
 
     bool place_changed = PlaceVideoInDisplay(osys);
-    if (place_changed)
+    if (place_changed && vd->ops->video_place_changed != NULL)
     {
-        int err1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        int err1 = vd->ops->video_place_changed(vd, vd->place);
         if (err1 != VLC_SUCCESS)
             vout_display_Reset(vd);
     }
@@ -663,9 +663,9 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
         return; /* zoom has not changed */
 
     bool place_changed = PlaceVideoInDisplay(osys);
-    if (place_changed)
+    if (place_changed && vd->ops->video_place_changed != NULL)
     {
-        int err1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        int err1 = vd->ops->video_place_changed(vd, vd->place);
         if (err1 != VLC_SUCCESS)
             vout_display_Reset(vd);
     }

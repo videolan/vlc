@@ -192,6 +192,7 @@ static const struct vlc_display_operations ops = {
     .display = Display,
     .set_display_size = SetDisplaySize,
     .control = Control,
+    .video_place_changed = PlacementChanged,
 };
 
 static void PMThread( void *arg )
@@ -442,8 +443,6 @@ static int Control( vout_display_t *vd, int query )
     {
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         return AspectChanged(vd, vd->source);
-    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        return PlacementChanged(vd, vd->source);
 
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         return CropChanged(vd, vd->source);

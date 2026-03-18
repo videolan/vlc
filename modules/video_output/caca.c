@@ -213,8 +213,6 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         return CropChanged(vd, vd->source);
-    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        return PlacementChanged(vd, vd->place);
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         return VLC_SUCCESS;
 
@@ -406,6 +404,7 @@ static const struct vlc_display_operations ops = {
     .prepare = Prepare,
     .display = PictureDisplay,
     .control = Control,
+    .video_place_changed = PlacementChanged,
 };
 
 /**

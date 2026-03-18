@@ -465,8 +465,6 @@ static int Control (vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             return AspectChanged(vd, vd->source);
-        case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            return PlacementChanged(vd, vd->place);
         default:
             msg_Err (vd, "Unhandled request %d", query);
             return VLC_EGENERIC;
@@ -594,6 +592,7 @@ static int Open (vout_display_t *vd,
             .control = Control,
             .set_viewpoint = SetViewpoint,
             .change_source_projection = ChangeSourceProjection,
+            .video_place_changed = PlacementChanged,
         };
         vd->ops = &ops;
 
