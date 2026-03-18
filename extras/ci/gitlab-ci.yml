@@ -477,22 +477,3 @@ android-x86_64:
     image:
         name: $VLC_ANDROID4_IMAGE
     variables: *variables-android-x86_64
-
-#
-# VLC Documentation
-#
-pages:
-    extends: .docker-template
-    image:
-        name: $VLC_DEBIAN_IMAGE
-    script:
-        - ./bootstrap
-        - ./configure
-        - make doc
-        - mv doc/doxygen/html public
-    artifacts:
-        paths:
-            - public
-    only:
-        - schedules
-    except:
