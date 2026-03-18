@@ -69,6 +69,8 @@ MainViewLoader {
     property var gridLabels: getLabel
     property var listLabels: getLabel
 
+    property bool showGroupCountColumn: false
+
     // Aliases
 
     property alias dragItem: dragItem
@@ -236,6 +238,8 @@ MainViewLoader {
             }
 
             coverLabels: root.listLabels
+
+            showGroupCountColumn: root.showGroupCountColumn
         }
     }
 

@@ -38,6 +38,8 @@ Widgets.TableViewExt {
 
     property var coverLabels
 
+    property bool showGroupCountColumn: false
+
     //---------------------------------------------------------------------------------------------
     // Private
 
@@ -60,36 +62,53 @@ Widgets.TableViewExt {
         })
     }]
 
-    property var _modelMedium: [{
-        weight: 1,
+    property var _modelMedium: (function(){
+        const medium = [{
+            weight: 1,
 
-        model: ({
-            criteria: mainCriteria,
+            model: ({
+                criteria: mainCriteria,
 
-            showSection: "title",
+                showSection: "title",
 
-            text: qsTr("Title"),
+                text: qsTr("Title"),
 
-            headerDelegate: tableColumns.titleHeaderDelegate,
-            colDelegate   : tableColumns.titleDelegate,
+                headerDelegate: tableColumns.titleHeaderDelegate,
+                colDelegate   : tableColumns.titleDelegate,
 
-            placeHolder: VLCStyle.noArtVideoCover
+                placeHolder: VLCStyle.noArtVideoCover
+            })
+        }]
+
+        if (showGroupCountColumn) {
+            medium.push({
+                size: 0.5,
+                model: ({
+                    criteria: "count",
+                    text: qsTr("Videos"),
+                    isSortable: false
+                })
+            })
+        }
+
+        medium.push({
+            size: 0.5,
+
+            model: ({
+                criteria: "duration",
+
+                text: qsTr("Duration"),
+
+                showSection: "",
+                showContextButton: true,
+
+                headerDelegate: tableColumns.timeHeaderDelegate,
+                colDelegate   : tableColumns.timeColDelegate
+            })
         })
-    }, {
-        size: 1,
 
-        model: ({
-            criteria: "duration",
-
-            text: qsTr("Duration"),
-
-            showSection: "",
-            showContextButton: true,
-
-            headerDelegate: tableColumns.timeHeaderDelegate,
-            colDelegate   : tableColumns.timeColDelegate
-        })
-    }]
+        return medium
+    })()
 
     // Settings
 

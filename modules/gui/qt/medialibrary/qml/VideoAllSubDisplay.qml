@@ -82,6 +82,8 @@ VideoAll {
 
     sectionProperty: _meta?.sectionProperty ?? ""
 
+    showGroupCountColumn: _meta?.showGroupCountColumn ?? false
+
     header: Widgets.ViewHeader {
         view: root
 
@@ -189,6 +191,8 @@ VideoAll {
                 return root.getLabelGroup(model, qsTr("%1"))
             }
 
+            property bool showGroupCountColumn: true
+
             function onAction(indexes) {
                 const index = indexes[0]
 
@@ -249,6 +253,8 @@ VideoAll {
             property var listLabels: function (model) {
                 return root.getLabelGroup(model, qsTr("%1"))
             }
+
+            property bool showGroupCountColumn: true
 
             function onAction(indexes) {
                 const index = indexes[0]
