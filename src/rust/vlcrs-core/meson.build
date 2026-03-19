@@ -4,6 +4,7 @@ vlcrs_core = custom_target('vlcrs_core-cargo',
     build_by_default: true,
     input: files(
         'Cargo.toml',
+        'build.rs',
         'src/object/mod.rs',
         'src/object/sys.rs',
         'src/plugin/mod.rs',
