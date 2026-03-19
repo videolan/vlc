@@ -190,6 +190,24 @@ static int SetStereoMode(vout_display_t *vd, vlc_stereoscopic_mode_t mode)
     return VLC_SUCCESS;
 }
 
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(place);
+
+    PlacePicture(vd, &sys->place, vd->cfg->display);
+    return VLC_SUCCESS;
+}
+
+static int AspectChanged(vout_display_t *vd, const video_format_t *source)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(source);
+
+    PlacePicture(vd, &sys->place, vd->cfg->display);
+    return VLC_SUCCESS;
+}
+
 static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = PictureRender,
@@ -369,9 +387,9 @@ static int Control (vout_display_t *vd, int query)
     {
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            return AspectChanged(vd, vd->source);
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            PlacePicture(vd, &sys->place, vd->cfg->display);
-            return VLC_SUCCESS;
+            return PlacementChanged(vd, vd->place);
 
         default:
             msg_Err (vd, "Unknown request %d", query);
