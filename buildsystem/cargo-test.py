@@ -18,6 +18,7 @@ parser.add_argument('--trs-file')
 parser.add_argument('--color-tests')
 parser.add_argument('--expect-failure')
 parser.add_argument('--enable-hard-errors')
+parser.add_argument('--host', required=True)
 parser.add_argument('--working-directory', default=os.getcwd())
 
 args = []
@@ -40,8 +41,16 @@ if test_name.endswith('.cargo'):
 # test_name = "::".join(args.test_name.split('.')[1:-1])
 
 import subprocess, os
-cmd = ['cargo', 'test', 
+
+lib_dir = os.environ['top_builddir'] + '/src/.libs'
+
+rust_triple = args.host
+
+cmd = ['cargo', 'test',
        '--offline', '--locked',
+       '--config', f'target.{rust_triple}.vlccore.rustc-link-lib=["vlccore"]',
+       '--config', f'target.{rust_triple}.vlccore.rustc-link-search=["{lib_dir}"]',
+       '--config', f'target.{rust_triple}.vlccore.rustc-link-arg=["-Wl,rpath,{lib_dir}"]',
        '--color', 'always' if args.color_tests == 'yes' else 'never',
        '--package', test_name,
        '--',
@@ -55,8 +64,8 @@ out = subprocess.run(
     text=True,
     close_fds=False, # Necessary for jobserver
     env=os.environ | {
-        'DYLD_LIBRARY_PATH': os.environ['top_builddir'] + '/src/.libs',
-        'LD_LIBRARY_PATH': os.environ['top_builddir'] + '/src/.libs',
+        'DYLD_LIBRARY_PATH': lib_dir,
+        'LD_LIBRARY_PATH': lib_dir,
         }
     )
 
