@@ -200,11 +200,8 @@ static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *plac
 
 static int AspectChanged(vout_display_t *vd, const video_format_t *source)
 {
-    vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(source);
-
-    PlacePicture(vd, &sys->place, vd->cfg->display);
-    return VLC_SUCCESS;
+    return PlacementChanged(vd, NULL);
 }
 
 static const struct vlc_display_operations ops = {

@@ -197,10 +197,8 @@ static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *plac
 
 static int CropChanged(vout_display_t *vd, const video_format_t *source)
 {
-    vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(source);
-    sys->update_dither = true;
-    return VLC_SUCCESS;
+    return PlacementChanged(vd, NULL);
 }
 
 /* */

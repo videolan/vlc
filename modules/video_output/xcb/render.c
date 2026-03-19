@@ -424,7 +424,7 @@ static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *plac
 static int AspectChanged(vout_display_t *vd, const video_format_t *source)
 {
     VLC_UNUSED(source);
-    return UpdateOutput(vd);
+    return PlacementChanged(vd, NULL);
 }
 
 /**

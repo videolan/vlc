@@ -207,7 +207,7 @@ static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *plac
 static int AspectChanged(vout_display_t *vd, const video_format_t *source)
 {
     VLC_UNUSED(source);
-    return UpdateViewport(vd);
+    return PlacementChanged(vd, NULL);
 }
 
 static void shm_format_cb(void *data, struct wl_shm *shm, uint32_t format)

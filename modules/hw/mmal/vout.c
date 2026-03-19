@@ -654,7 +654,7 @@ static int vd_video_place_changed(vout_display_t *vd, const vout_display_place_t
 static int vd_aspect_changed(vout_display_t *vd, const video_format_t *source)
 {
     VLC_UNUSED(source);
-    return configure_display(vd);
+    return vd_video_place_changed(vd, NULL);
 }
 
 static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const sys,
