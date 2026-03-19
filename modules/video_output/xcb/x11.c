@@ -201,20 +201,34 @@ static int ResetPictures(vout_display_t *vd, video_format_t *restrict f)
     return VLC_SUCCESS;
 }
 
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
+{
+    VLC_UNUSED(place);
+    if (place->width  != vd->fmt->i_visible_width
+     || place->height != vd->fmt->i_visible_height)
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
+static int AspectChanged(vout_display_t *vd, const video_format_t *source)
+{
+    VLC_UNUSED(source);
+    if (vd->place->width  != vd->fmt->i_visible_width
+     || vd->place->height != vd->fmt->i_visible_height)
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        return AspectChanged(vd, vd->source);
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-    {
-        if (vd->place->width  != vd->fmt->i_visible_width
-         || vd->place->height != vd->fmt->i_visible_height)
-            return VLC_EGENERIC;
-
-        return VLC_SUCCESS;
-    }
-
+        return PlacementChanged(vd, vd->place);
     default:
         msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;
