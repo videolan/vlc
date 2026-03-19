@@ -1726,7 +1726,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
 
             p_block->i_length = MP4_GetSamplesDuration( tk, i_nb_samples );
 
-            if ( tk->fmt.i_codec == VLC_CODEC_APV )
+            if ( tk->fmt.i_codec == VLC_CODEC_APV && p_block->i_buffer > 3 )
             {
                 // the APU are preceeded by 4 bytes containing the size of the data
                 // this is not used by decoder like libavcodec or openapv.
