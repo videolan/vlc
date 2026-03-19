@@ -12,6 +12,13 @@
 //! If you need a vlc core C API that is not ported or wrapped yet here,
 //! then do so first instead of bypassing this crate.
 
+#[cfg(all(test, vlccore_not_linked))]
+compile_error!(
+    "vlccore is not configured for linking. \
+     Set up .cargo/config.toml with a [target.<triple>.vlccore] override or run through make check / meson test. \
+     See https://doc.rust-lang.org/cargo/reference/build-scripts.html#overriding-build-scripts."
+);
+
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2024 Alexandre Janniaux <ajanni@videolabs.io>
 //
