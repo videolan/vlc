@@ -645,13 +645,26 @@ static int vd_reset_pictures(vout_display_t *vd, video_format_t *fmt)
     return VLC_SUCCESS;
 }
 
+static int vd_video_place_changed(vout_display_t *vd, const vout_display_place_t *place)
+{
+    VLC_UNUSED(place);
+    return configure_display(vd);
+}
+
+static int vd_aspect_changed(vout_display_t *vd, const video_format_t *source)
+{
+    VLC_UNUSED(source);
+    return configure_display(vd);
+}
+
 static int vd_control(vout_display_t *vd, int query)
 {
     switch (query) {
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            return vd_aspect_changed(vd, vd->source);
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            return configure_display(vd);
+            return configure_display(vd, vd->place);
 
         default:
             msg_Warn(vd, "Unknown control query %d", query);
