@@ -187,6 +187,22 @@ static void PictureDisplay(vout_display_t *vd, picture_t *picture)
     VLC_UNUSED(picture);
 }
 
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(place);
+    sys->update_dither = true;
+    return VLC_SUCCESS;
+}
+
+static int CropChanged(vout_display_t *vd, const video_format_t *source)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(source);
+    sys->update_dither = true;
+    return VLC_SUCCESS;
+}
+
 /**
  * Control for vout display
  */
@@ -196,9 +212,9 @@ static int Control(vout_display_t *vd, int query)
 
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        return CropChanged(vd, vd->source);
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        sys->update_dither = true;
-        return VLC_SUCCESS;
+        return PlacementChanged(vd, vd->place);
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         return VLC_SUCCESS;
 
