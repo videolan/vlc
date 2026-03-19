@@ -197,6 +197,7 @@ static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, const vlc_render_subpicture *);
 
 static int Control(vout_display_t *, int);
+static int UpdateSource(vout_display_t *, bool force_placement);
 static int SetDisplaySize(vout_display_t *, unsigned width, unsigned height);
 
 static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
@@ -553,6 +554,18 @@ error:
     return err;
 }
 
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
+{
+    VLC_UNUSED(place);
+    return UpdateSource(vd, true);
+}
+
+static int AspectChanged(vout_display_t *vd, const video_format_t *source)
+{
+    VLC_UNUSED(source);
+    return UpdateSource(vd, false);
+}
+
 static constexpr const auto ops = []{
     struct vlc_display_operations ops {};
     ops.close = Close;
@@ -815,10 +828,10 @@ static int Control(vout_display_t *vd, int query)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        return UpdateSource(vd, true);
+        return PlacementChanged(vd, vd->place);
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        return UpdateSource(vd, false);
+        return AspectChanged(vd, vd->source);
     default:
         return VLC_EGENERIC;
     }
