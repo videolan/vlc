@@ -198,6 +198,18 @@ static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
     return UpdateViewport(vd);
 }
 
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
+{
+    VLC_UNUSED(place);
+    return UpdateViewport(vd);
+}
+
+static int AspectChanged(vout_display_t *vd, const video_format_t *source)
+{
+    VLC_UNUSED(source);
+    return UpdateViewport(vd);
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -206,8 +218,9 @@ static int Control(vout_display_t *vd, int query)
     {
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            return AspectChanged(vd, vd->source);
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            return UpdateViewport(vd);
+            return PlacementChanged(vd, vd->place);
         default:
              msg_Err(vd, "unknown request %d", query);
              return VLC_EGENERIC;
