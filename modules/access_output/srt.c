@@ -121,7 +121,7 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
         srt_close( p_sys->sock );
     }
 
-    p_sys->sock = srt_socket( res->ai_family, SOCK_DGRAM, 0 );
+    p_sys->sock = srt_create_socket( );
     if ( p_sys->sock == SRT_INVALID_SOCK )
     {
         msg_Err( p_access, "Failed to open socket." );
