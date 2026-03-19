@@ -60,6 +60,7 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, const vlc_render_
                            vlc_tick_t date);
 static void PictureDisplay (vout_display_t *vd, picture_t *pic);
 static int Control (vout_display_t *vd, int query);
+static void UpdatePlace (vout_display_t *vd, const vout_display_cfg_t *cfg);
 
 static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
@@ -132,6 +133,35 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 {
     vout_display_sys_t *sys = vd->sys;
     return vout_display_opengl_SetViewpoint (sys->vgl, vp);
+}
+
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(place);
+
+    if (!sys)
+        return VLC_EGENERIC;
+
+    @autoreleasepool {
+        @synchronized(sys->glView) {
+            vout_display_cfg_t cfg;
+            cfg = *vd->cfg;
+            cfg.display.width = sys->cfg.display.width;
+            cfg.display.height = sys->cfg.display.height;
+            sys->cfg = cfg;
+            UpdatePlace(vd, &cfg);
+        }
+        return VLC_SUCCESS;
+    }
+}
+
+static int AspectChanged(vout_display_t *vd, const video_format_t *source)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(source);
+
+    return PlacementChanged(vd, NULL);
 }
 
 static const struct vlc_display_operations ops = {
@@ -346,32 +376,18 @@ static int Control (vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!vd->sys)
-        return VLC_EGENERIC;
-
-    @autoreleasepool {
         switch (query)
         {
             case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
             case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+                return AspectChanged(vd, vd->source);
             case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            {
-                @synchronized(sys->glView) {
-                    vout_display_cfg_t cfg;
-                    cfg = *vd->cfg;
-                    cfg.display.width = sys->cfg.display.width;
-                    cfg.display.height = sys->cfg.display.height;
-                    sys->cfg = cfg;
-                    UpdatePlace(vd, &cfg);
-                }
-                return VLC_SUCCESS;
-            }
+                return PlacementChanged(vd, vd->place);
 
             default:
                 msg_Err (vd, "Unknown request in Mac OS X vout display");
                 return VLC_EGENERIC;
         }
-    }
 }
 
 /*****************************************************************************
