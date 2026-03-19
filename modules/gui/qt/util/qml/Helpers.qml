@@ -71,11 +71,11 @@ QtObject {
         return (Math.abs(a - b) < Number.EPSILON)
     }
 
-    function alignUp(a, b) {
+    function alignUp(a, b : int) {
         return Math.ceil(a / b) * b
     }
 
-    function alignDown(a, b) {
+    function alignDown(a, b : int) {
         return Math.floor(a / b) * b
     }
 
