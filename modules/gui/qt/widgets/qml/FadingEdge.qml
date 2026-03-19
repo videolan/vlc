@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Window
 
 import VLC.MainInterface
 import VLC.Style
@@ -45,6 +46,17 @@ Item {
     property bool enableEndFade: true
 
     property real fadeSize: VLCStyle.margin_normal
+
+    // Display scale may be a fractional size, but textures can not. Pixel aligned
+    // aligns the visual size to the nearest multiple of number, depending on
+    // the window/screen fraction, so that the layer texture can be displayed
+    // without stretching. For example, if the display scale is 1.25, the
+    // visual size would be aligned up to the nearest multiple of 4. Note that
+    // using this property is going to make the visual to deviate from the
+    // size intended, which may increase greatly depending on the fraction
+    // of the display scale. Also note that if the QML item size is fractional
+    // itself, it is ceiled regardless of the display scale or this property.
+    property bool pixelAlignedForDPR: true
 
     readonly property bool effectCompatible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
@@ -159,13 +171,24 @@ Item {
             topMargin: (root.orientation === Qt.Vertical ? -root.beginningMargin : 0)
         }
 
-        implicitWidth: Math.ceil(parent.width + (root.orientation === Qt.Horizontal ? (root.beginningMargin + root.endMargin) : 0))
-        implicitHeight: Math.ceil(parent.height + (root.orientation === Qt.Vertical ? (root.beginningMargin + root.endMargin) : 0))
+        property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window) || 1.0
+        readonly property int alignNumber: pixelAlignedForDPR ? Helpers.denominatorForFloat(eDPR) : 1
+
+        Connections {
+            target: MainCtx
+
+            function onIntfDevicePixelRatioChanged() {
+                shaderEffectSource.eDPR = MainCtx.effectiveDevicePixelRatio(shaderEffectSource.Window.window) || 1.0
+            }
+        }
+
+        implicitWidth: Helpers.alignUp((parent.width + (root.orientation === Qt.Horizontal ? (root.beginningMargin + root.endMargin) : 0)), alignNumber)
+        implicitHeight: Helpers.alignUp((parent.height + (root.orientation === Qt.Vertical ? (root.beginningMargin + root.endMargin) : 0)), alignNumber)
 
         sourceRect: Qt.rect(root.sourceX - (root.orientation === Qt.Horizontal ? root.beginningMargin : 0),
                             root.sourceY - (root.orientation === Qt.Vertical ? root.beginningMargin : 0),
-                            width,
-                            height)
+                            width, // Texture width is (width * dpr)
+                            height) // Texture height is (height * dpr)
 
         // Make sure sourceItem is not rendered twice:
         hideSource: visible
