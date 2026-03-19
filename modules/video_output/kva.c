@@ -447,6 +447,9 @@ static int Control( vout_display_t *vd, int query )
 
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         return CropChanged(vd, vd->source);
+
+    default:
+        break;
     }
 
     msg_Err(vd, "Unsupported query(=%d) in vout display KVA", query);

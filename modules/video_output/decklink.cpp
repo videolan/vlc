@@ -768,6 +768,8 @@ static int ControlVideo(vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
             return VLC_SUCCESS;
+        default:
+            break;
     }
     return VLC_EGENERIC;
 }
