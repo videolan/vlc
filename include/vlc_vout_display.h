@@ -139,13 +139,6 @@ typedef struct {
 } vout_display_info_t;
 
 /**
- * Control query for vout_display_t
- */
-enum vout_display_query {
-    placeholder, // FIXME remove
-};
-
-/**
  * Vout owner structures
  */
 struct vout_display_owner_t {
