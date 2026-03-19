@@ -415,13 +415,26 @@ static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
     return VLC_SUCCESS;
 }
 
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
+{
+    VLC_UNUSED(place);
+    return UpdateOutput(vd);
+}
+
+static int AspectChanged(vout_display_t *vd, const video_format_t *source)
+{
+    VLC_UNUSED(source);
+    return UpdateOutput(vd);
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     switch (query) {
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            return AspectChanged(vd, vd->source);
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-            return UpdateOutput(vd);
+            return PlacementChanged(vd, vd->place);
 
         default:
             msg_Err(vd, "Unknown request in XCB RENDER display");
