@@ -45,11 +45,6 @@
 
 static int UpdateSourceSAR(vout_display_t *, const video_format_t *);
 
-static int vout_display_Control(vout_display_t *vd, int query)
-{
-    return vd->ops->control(vd, query);
-}
-
 /*****************************************************************************
  *
  *****************************************************************************/

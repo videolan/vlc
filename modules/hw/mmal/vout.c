@@ -657,17 +657,6 @@ static int vd_aspect_changed(vout_display_t *vd, const video_format_t *source)
     return configure_display(vd);
 }
 
-static int vd_control(vout_display_t *vd, int query)
-{
-    switch (query) {
-        default:
-            msg_Warn(vd, "Unknown control query %d", query);
-            break;
-    }
-
-    return VLC_EGENERIC;
-}
-
 static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const sys,
                           const vlc_render_subpicture * const spic)
 {
@@ -993,7 +982,6 @@ static const struct vlc_display_operations ops = {
     .prepare = vd_prepare,
     .display = vd_display,
     .set_display_size = SetDisplaySize,
-    .control = vd_control,
     .reset_pictures = vd_reset_pictures,
     .video_place_changed = vd_video_place_changed,
     .set_source_aspect = vd_aspect_changed,

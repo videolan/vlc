@@ -210,19 +210,6 @@ static int AspectChanged(vout_display_t *vd, const video_format_t *source)
     return UpdateViewport(vd);
 }
 
-static int Control(vout_display_t *vd, int query)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    switch (query)
-    {
-        default:
-             msg_Err(vd, "unknown request %d", query);
-             return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
 static void shm_format_cb(void *data, struct wl_shm *shm, uint32_t format)
 {
     vout_display_t *vd = data;
@@ -273,7 +260,6 @@ static const struct vlc_display_operations ops = {
     .prepare = Prepare,
     .display = Display,
     .set_display_size = SetDisplaySize,
-    .control = Control,
     .reset_pictures = ResetPictures,
     .video_place_changed = PlacementChanged,
     .set_source_aspect = AspectChanged,

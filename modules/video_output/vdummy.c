@@ -92,7 +92,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
 static const struct vlc_display_operations ops_dummy = {
     .display = Display,
-    .control = Control,
 };
 
 static int OpenDummy(vout_display_t *vd,
@@ -106,7 +105,6 @@ static int OpenDummy(vout_display_t *vd,
 
 static const struct vlc_display_operations ops_stats = {
     .display = DisplayStat,
-    .control = Control,
 };
 
 static int OpenStats(vout_display_t *vd,
@@ -131,15 +129,4 @@ static void DisplayStat(vout_display_t *vd, picture_t *picture)
         msg_Dbg(vd, "VOUT got %"PRIu64" ms offset",
                 MS_FROM_VLC_TICK(vlc_tick_now() - date));
     }
-}
-
-static int Control(vout_display_t *vd, int query)
-{
-    (void) vd;
-
-    switch (query) {
-        default:
-            break;
-    }
-    return VLC_SUCCESS;
 }

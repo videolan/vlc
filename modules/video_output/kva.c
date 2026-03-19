@@ -108,7 +108,6 @@ typedef struct vout_display_sys_t
  * Local prototypes
  *****************************************************************************/
 static void            Display(vout_display_t *, picture_t *);
-static int             Control(vout_display_t *, int);
 static int             SetDisplaySize( vout_display_t *, unsigned width, unsigned height );
 
 static int  OpenDisplay ( vout_display_t *, video_format_t * );
@@ -191,7 +190,6 @@ static const struct vlc_display_operations ops = {
     .prepare = Prepare,
     .display = Display,
     .set_display_size = SetDisplaySize,
-    .control = Control,
     .video_place_changed = PlacementChanged,
     .set_source_aspect = AspectChanged,
     .set_source_crop = CropChanged,
@@ -432,23 +430,6 @@ static int SetDisplaySize( vout_display_t *vd, unsigned width, unsigned height )
                 MPFROMLONG( width ),
                 MPFROMLONG( height ));
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Control: control facility for the vout
- *****************************************************************************/
-static int Control( vout_display_t *vd, int query )
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    switch (query)
-    {
-    default:
-        break;
-    }
-
-    msg_Err(vd, "Unsupported query(=%d) in vout display KVA", query);
-    return VLC_EGENERIC;
 }
 
 /* following functions are local */

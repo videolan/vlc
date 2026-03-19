@@ -221,15 +221,6 @@ static int AspectChanged(vout_display_t *vd, const video_format_t *source)
     return VLC_SUCCESS;
 }
 
-static int Control(vout_display_t *vd, int query)
-{
-    switch (query) {
-    default:
-        msg_Err (vd, "Unknown request in XCB vout display");
-        return VLC_EGENERIC;
-    }
-}
-
 static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -312,7 +303,6 @@ static const struct vlc_display_operations ops = {
     .prepare = Prepare,
     .display = Display,
     .set_display_size = SetDisplaySize,
-    .control = Control,
     .reset_pictures = ResetPictures,
     .video_place_changed = PlacementChanged,
     .set_source_aspect = AspectChanged,

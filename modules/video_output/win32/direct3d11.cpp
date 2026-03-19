@@ -196,7 +196,6 @@ static void Direct3D11DestroyResources(vout_display_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, const vlc_render_subpicture *);
 
-static int Control(vout_display_t *, int);
 static int UpdateSource(vout_display_t *, bool force_placement);
 static int SetDisplaySize(vout_display_t *, unsigned width, unsigned height);
 
@@ -572,7 +571,6 @@ static constexpr const auto ops = []{
     ops.prepare = Prepare;
     ops.display = Display;
     ops.set_display_size = SetDisplaySize;
-    ops.control = Control;
     ops.update_format = UpdateFormat;
     ops.set_viewpoint = SetViewpoint;
     ops.change_source_projection = ChangeSourceProjection;
@@ -825,14 +823,6 @@ static int UpdateSource(vout_display_t *vd, bool force_placement)
     }
 
     return VLC_SUCCESS;
-}
-
-static int Control(vout_display_t *vd, int query)
-{
-    switch (query) {
-    default:
-        return VLC_EGENERIC;
-    }
 }
 
 static bool SelectRenderPlane(void *opaque, size_t plane, ID3D11RenderTargetView **targetView)

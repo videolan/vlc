@@ -456,20 +456,6 @@ static int AspectChanged(vout_display_t *vd, const video_format_t *source)
     return VLC_SUCCESS;
 }
 
-static int Control (vout_display_t *vd, int query)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    switch (query)
-    {
-        default:
-            msg_Err (vd, "Unhandled request %d", query);
-            return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
-}
-
 /*****************************************************************************
  * Open: This function allocates and initializes the OpenGL vout method.
  *****************************************************************************/
@@ -586,7 +572,6 @@ static int Open (vout_display_t *vd,
             .close = Close,
             .prepare = PictureRender,
             .display = PictureDisplay,
-            .control = Control,
             .set_viewpoint = SetViewpoint,
             .change_source_projection = ChangeSourceProjection,
             .video_place_changed = PlacementChanged,

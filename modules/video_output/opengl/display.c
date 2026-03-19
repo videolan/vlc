@@ -94,7 +94,6 @@ typedef struct vout_display_sys_t
 /* Display callbacks */
 static void PictureRender (vout_display_t *, picture_t *, const vlc_render_subpicture *, vlc_tick_t);
 static void PictureDisplay (vout_display_t *, picture_t *);
-static int Control (vout_display_t *, int);
 
 static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 {
@@ -213,7 +212,6 @@ static const struct vlc_display_operations ops = {
     .prepare = PictureRender,
     .display = PictureDisplay,
     .set_display_size = SetDisplaySize,
-    .control = Control,
     .set_viewpoint = SetViewpoint,
     .update_format = UpdateFormat,
     .change_source_projection = ChangeSourceProjection,
@@ -380,16 +378,4 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
     /* Present on screen */
     if (sys->is_dirty)
         vlc_gl_Swap(sys->gl);
-}
-
-static int Control (vout_display_t *vd, int query)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    switch (query)
-    {
-        default:
-            msg_Err (vd, "Unknown request %d", query);
-    }
-    return VLC_EGENERIC;
 }

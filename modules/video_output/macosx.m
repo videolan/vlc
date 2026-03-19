@@ -59,7 +59,6 @@ static void Close(vout_display_t *vd);
 static void PictureRender (vout_display_t *vd, picture_t *pic, const vlc_render_subpicture *subpicture,
                            vlc_tick_t date);
 static void PictureDisplay (vout_display_t *vd, picture_t *pic);
-static int Control (vout_display_t *vd, int query);
 static void UpdatePlace (vout_display_t *vd, const vout_display_cfg_t *cfg);
 
 static void *OurGetProcAddress(vlc_gl_t *, const char *);
@@ -168,7 +167,6 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = PictureRender,
     .display = PictureDisplay,
-    .control = Control,
     .set_viewpoint = SetViewpoint,
     .video_place_changed = PlacementChanged,
     .set_source_aspect = AspectChanged,
@@ -373,18 +371,6 @@ static void UpdatePlace (vout_display_t *vd, const vout_display_cfg_t *cfg)
     /* Reverse vertical alignment as the GL tex are Y inverted */
     place.y = cfg->display.height - (place.y + place.height);
     sys->place = place;
-}
-
-static int Control (vout_display_t *vd, int query)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-        switch (query)
-        {
-            default:
-                msg_Err (vd, "Unknown request in Mac OS X vout display");
-                return VLC_EGENERIC;
-        }
 }
 
 /*****************************************************************************

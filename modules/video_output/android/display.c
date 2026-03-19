@@ -620,20 +620,6 @@ static int AspectChanged(vout_display_t *vd, const video_format_t *source)
     return VLC_SUCCESS;
 }
 
-static int Control(vout_display_t *vd, int query)
-{
-    struct sys *sys = vd->sys;
-
-    if (sys->sub.window != NULL)
-        subpicture_Control(vd, query);
-
-    switch (query) {
-    default:
-        msg_Warn(vd, "Unknown request in android-display: %d", query);
-        return VLC_EGENERIC;
-    }
-}
-
 static void Close(vout_display_t *vd)
 {
     struct sys *sys = vd->sys;
@@ -780,7 +766,6 @@ static int Open(vout_display_t *vd,
             .prepare = PrepareWithASC,
             .display = DisplayWithASC,
             .set_display_size = SetDisplaySize,
-            .control = Control,
             .video_place_changed = PlacementChanged,
             .set_source_aspect = AspectChanged,
             .set_source_crop = AspectChanged,
@@ -794,7 +779,6 @@ static int Open(vout_display_t *vd,
             .prepare = Prepare,
             .display = Display,
             .set_display_size = SetDisplaySize,
-            .control = Control,
             .video_place_changed = PlacementChanged,
             .set_source_aspect = AspectChanged,
             .set_source_crop = AspectChanged,

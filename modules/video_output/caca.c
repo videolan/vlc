@@ -203,20 +203,6 @@ static int CropChanged(vout_display_t *vd, const video_format_t *source)
     return VLC_SUCCESS;
 }
 
-/**
- * Control for vout display
- */
-static int Control(vout_display_t *vd, int query)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    switch (query) {
-    default:
-        msg_Err(vd, "Unsupported query in vout display caca");
-        return VLC_EGENERIC;
-    }
-}
-
 /* */
 static const struct {
     int caca;
@@ -398,7 +384,6 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = Prepare,
     .display = PictureDisplay,
-    .control = Control,
     .video_place_changed = PlacementChanged,
     .set_source_crop = CropChanged,
 };

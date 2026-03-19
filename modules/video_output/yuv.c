@@ -74,7 +74,6 @@ vlc_module_end()
 
 /* */
 static void           Display(vout_display_t *, picture_t *);
-static int            Control(vout_display_t *, int);
 
 /*****************************************************************************
  * vout_display_sys_t: video output descriptor
@@ -88,7 +87,6 @@ typedef struct vout_display_sys_t {
 static const struct vlc_display_operations ops = {
     .close = Close,
     .display = Display,
-    .control = Control,
 };
 
 /* */
@@ -245,15 +243,4 @@ static void Display(vout_display_t *vd, picture_t *picture)
         }
     }
     fflush(sys->f);
-}
-
-static int Control(vout_display_t *vd, int query)
-{
-    (void) vd;
-
-    switch (query) {
-        default:
-            break;
-    }
-    return VLC_EGENERIC;
 }

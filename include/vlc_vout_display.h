@@ -247,21 +247,12 @@ struct vlc_display_operations
     int (*set_display_size)(vout_display_t *, unsigned width, unsigned height);
 
     /**
-     * Performs a control request (mandatory).
-     *
-     * \param query request type
-     *
-     * See \ref vout_display_query for the list of request types.
-     */
-    int        (*control)(vout_display_t *, int query);
-
-    /**
      * Reset the picture format handled by the module.
      * This occurs after an error in \ref vlc_display_operations::set_display_size,
      * \ref vlc_display_operations::set_source_aspect,
      * \ref vlc_display_operations::set_source_crop or
      * \ref vlc_display_operations::video_place_changed
-     * control query returns an error.
+     * calls returns an error.
      *
      * \param ftmp video format that the module expects as input
      */

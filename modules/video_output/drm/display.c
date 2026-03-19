@@ -71,17 +71,6 @@ typedef struct vout_display_sys_t {
     uint32_t        plane_id;
 } vout_display_sys_t;
 
-static int Control(vout_display_t *vd, int query)
-{
-    (void) vd;
-
-    switch (query) {
-        default:
-            break;
-    }
-    return VLC_EGENERIC;
-}
-
 static void Prepare(vout_display_t *vd, picture_t *pic,
                     const struct vlc_render_subpicture *subpic,
                     vlc_tick_t date)
@@ -140,7 +129,6 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = Prepare,
     .display = Display,
-    .control = Control,
 };
 
 /**

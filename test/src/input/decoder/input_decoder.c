@@ -224,12 +224,6 @@ static void DisplayPrepare(vout_display_t *vd, picture_t *picture,
     scenario->display_prepare(vd, picture);
 }
 
-static int DisplayControl(vout_display_t *vd, int query)
-{
-    (void)vd; (void)query;
-    return VLC_SUCCESS;
-}
-
 static int OpenDisplay(vout_display_t *vd, video_format_t *fmtp, vlc_video_context *context)
 {
     (void)fmtp; (void)context;
@@ -237,7 +231,6 @@ static int OpenDisplay(vout_display_t *vd, video_format_t *fmtp, vlc_video_conte
     struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
     static const struct vlc_display_operations ops = {
         .prepare = DisplayPrepare,
-        .control = DisplayControl,
     };
     vd->ops = &ops;
 

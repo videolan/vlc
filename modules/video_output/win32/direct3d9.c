@@ -1667,16 +1667,6 @@ static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *plac
     return VLC_SUCCESS;
 }
 
-static int Control(vout_display_t *vd, int query)
-{
-    vout_display_sys_t *sys = vd->sys;
-    switch (query) {
-    default:
-        break;
-    }
-    return VLC_SUCCESS;
-}
-
 typedef struct
 {
     char **values;
@@ -1748,7 +1738,6 @@ static const struct vlc_display_operations ops = {
     .prepare = Prepare,
     .display = Display,
     .set_display_size = SetDisplaySize,
-    .control = Control,
     .video_place_changed = PlacementChanged,
 };
 

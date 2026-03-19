@@ -427,15 +427,6 @@ static int AspectChanged(vout_display_t *vd, const video_format_t *source)
     return UpdateOutput(vd);
 }
 
-static int Control(vout_display_t *vd, int query)
-{
-    switch (query) {
-        default:
-            msg_Err(vd, "Unknown request in XCB RENDER display");
-            return VLC_EGENERIC;
-    }
-}
-
 /**
  * Check that the X server supports the RENDER extension.
  */
@@ -610,7 +601,6 @@ static const struct vlc_display_operations ops = {
     .prepare = Prepare,
     .display = Display,
     .set_display_size = SetDisplaySize,
-    .control = Control,
     .video_place_changed = PlacementChanged,
     .set_source_aspect = AspectChanged,
     .set_source_crop = AspectChanged,

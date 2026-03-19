@@ -99,13 +99,11 @@ typedef unsigned (*vlc_format_cb)(void **, char *, unsigned *, unsigned *,
 
 static void           Prepare(vout_display_t *, picture_t *, const struct vlc_render_subpicture *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *);
-static int            Control(vout_display_t *, int);
 
 static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = Prepare,
     .display = Display,
-    .control = Control,
 };
 
 /*****************************************************************************
@@ -244,15 +242,4 @@ static void Display(vout_display_t *vd, picture_t *pic)
 
     if (sys->display != NULL)
         sys->display(sys->opaque, sys->pic_opaque);
-}
-
-static int Control(vout_display_t *vd, int query)
-{
-    (void) vd;
-
-    switch (query) {
-        default:
-            break;
-    }
-    return VLC_EGENERIC;
 }

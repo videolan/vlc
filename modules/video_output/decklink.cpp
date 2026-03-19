@@ -759,22 +759,10 @@ end:
         pDLVideoFrame->Release();
 }
 
-static int ControlVideo(vout_display_t *vd, int query)
-{
-    (void) vd;
-
-    switch (query) {
-        default:
-            break;
-    }
-    return VLC_EGENERIC;
-}
-
 static const auto ops = []{
     struct vlc_display_operations ops {};
     ops.close = CloseVideo;
     ops.prepare = PrepareVideo;
-    ops.control = ControlVideo;
     return ops;
 }();
 

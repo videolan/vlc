@@ -90,12 +90,10 @@ typedef struct vout_display_sys_t {
     int             fd;
 } vout_display_sys_t;
 static void            Display(vout_display_t *, picture_t *);
-static int             Control(vout_display_t *, int);
 
 static const struct vlc_display_operations ops = {
     .close = Close,
     .display = Display,
-    .control = Control,
 };
 
 /*****************************************************************************
@@ -224,16 +222,4 @@ static void Display(vout_display_t *vd, picture_t *picture)
     else if (result < (int)(header_len + fmt->i_width * fmt->i_height * 3))
         msg_Err(vd, "sendmsg only sent %d bytes in vout display flaschen", result);
         /* we might want to drop some frames? */
-}
-
-/**
- * Control for vout display
- */
-static int Control(vout_display_t *vd, int query)
-{
-    switch (query) {
-    default:
-        msg_Err(vd, "Unsupported query in vout display flaschen");
-        return VLC_EGENERIC;
-    }
 }
