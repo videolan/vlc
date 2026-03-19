@@ -697,6 +697,18 @@ static block_t * MP4_Block_Convert( demux_t *p_demux, const mp4_track_t *p_track
     {
         p_block = MP4_RTPHint_Convert( p_demux, p_block, p_track->fmt.i_codec );
     }
+    else if ( p_track->fmt.i_codec == VLC_CODEC_APV )
+    {
+        // the APU are preceeded by 4 bytes containing the size of the data
+        // this is not used by decoder like libavcodec or openapv.
+        if( p_block->i_buffer < 4 )
+        {
+            block_Release( p_block );
+            return NULL;
+        }
+        p_block->p_buffer += 4;
+        p_block->i_buffer -= 4;
+    }
 
     return p_block;
 }
@@ -1410,14 +1422,6 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
                 p_block->i_pts = VLC_TICK_INVALID;
 
             p_block->i_length = MP4_GetSamplesDuration( p_demux, tk, i_nb_samples );
-
-            if ( tk->fmt.i_codec == VLC_CODEC_APV && p_block->i_buffer > 3 )
-            {
-                // the APU are preceeded by 4 bytes containing the size of the data
-                // this is not used by decoder like libavcodec or openapv.
-                p_block->p_buffer += 4;
-                p_block->i_buffer -= 4;
-            }
 
             MP4_Block_Send( p_demux, tk, p_block );
         }
