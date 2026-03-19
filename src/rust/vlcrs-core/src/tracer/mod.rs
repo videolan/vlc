@@ -226,8 +226,12 @@ macro_rules! trace {
 /// # Examples
 ///
 /// ```
-/// impl TracerCapability for T {
-///     fn trace(&self, trace: &Trace) {
+/// # use vlcrs_core::tracer::*;
+/// # use vlcrs_core::object::Object;
+/// # struct MyTracer {}
+/// impl TracerCapability for MyTracer {
+///     # fn open(_: &mut Object) -> Option<impl TracerCapability> { Some(MyTracer{}) }
+///     fn trace(&self, _: Tick, trace: &Trace) {
 ///         for entry in trace.entries() {
 ///             println!("{}", entry.key);
 ///         }
