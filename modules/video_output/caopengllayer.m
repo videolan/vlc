@@ -393,43 +393,80 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
     [layer displayFromVout];
 }
 
-static int Control (vout_display_t *vd, int query)
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
 {
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(place);
 
-    if (!vd->sys)
+    if (!sys)
         return VLC_EGENERIC;
 
     VLCVideoLayerView *view = (__bridge VLCVideoLayerView *)sys->gl->sys;
     VLCCAOpenGLLayer *layer = (VLCCAOpenGLLayer *)[view layer];
 
+    @synchronized(layer)
+    {
+        vout_display_cfg_t cfg = *vd->cfg;
+        cfg.display.width = sys->cfg.display.width;
+        cfg.display.height = sys->cfg.display.height;
+
+        sys->cfg = cfg;
+
+        vout_display_PlacePicture(&sys->place, vd->source, &cfg.display);
+        // Reverse vertical alignment as the GL tex are Y inverted
+        sys->place.y = cfg.display.height - (sys->place.y + sys->place.height);
+    }
+
+    // Note!
+    // No viewport or aspect ratio is set here, as that needs to be set
+    // when rendering. The viewport is always set to match the layer
+    // size by the OS right before the OpenGL render callback, so
+    // setting it here has no effect.
+    return VLC_SUCCESS;
+}
+
+static int AspectChanged(vout_display_t *vd, const video_format_t *source)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (!sys)
+        return VLC_EGENERIC;
+
+    VLCVideoLayerView *view = (__bridge VLCVideoLayerView *)sys->gl->sys;
+    VLCCAOpenGLLayer *layer = (VLCCAOpenGLLayer *)[view layer];
+
+    @synchronized(layer)
+    {
+        vout_display_cfg_t cfg = *vd->cfg;
+        cfg.display.width = sys->cfg.display.width;
+        cfg.display.height = sys->cfg.display.height;
+
+        sys->cfg = cfg;
+
+        vout_display_PlacePicture(&sys->place, source, &cfg.display);
+        // Reverse vertical alignment as the GL tex are Y inverted
+        sys->place.y = cfg.display.height - (sys->place.y + sys->place.height);
+    }
+
+    // Note!
+    // No viewport or aspect ratio is set here, as that needs to be set
+    // when rendering. The viewport is always set to match the layer
+    // size by the OS right before the OpenGL render callback, so
+    // setting it here has no effect.
+    return VLC_SUCCESS;
+}
+
+static int Control (vout_display_t *vd, int query)
+{
+    vout_display_sys_t *sys = vd->sys;
+
     switch (query)
     {
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            return AspectChanged(vd, vd->source);
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        {
-            @synchronized(layer)
-            {
-                vout_display_cfg_t cfg = *vd->cfg;
-                cfg.display.width = sys->cfg.display.width;
-                cfg.display.height = sys->cfg.display.height;
-
-                sys->cfg = cfg;
-
-                vout_display_PlacePicture(&sys->place, vd->source, &cfg.display);
-                // Reverse vertical alignment as the GL tex are Y inverted
-                sys->place.y = cfg.display.height - (sys->place.y + sys->place.height);
-            }
-
-            // Note!
-            // No viewport or aspect ratio is set here, as that needs to be set
-            // when rendering. The viewport is always set to match the layer
-            // size by the OS right before the OpenGL render callback, so
-            // setting it here has no effect.
-            return VLC_SUCCESS;
-        }
-
+            return PlacementChanged(vd, vd->place);
         default:
             msg_Err (vd, "Unhandled request %d", query);
             return VLC_EGENERIC;
