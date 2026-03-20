@@ -74,6 +74,8 @@ VLC_APPLE_SDK_PATH=
 # SDK version
 # Set in the validate_sdk_name function
 VLC_APPLE_SDK_VERSION=
+# XCode version used to build
+VLC_APPLE_XCODE_VERSION=
 # Indicated if prebuilt contribs package
 # should be created
 VLC_MAKE_PREBUILT_CONTRIBS=0
@@ -295,6 +297,7 @@ validate_sdk_name()
 
     VLC_APPLE_SDK_PATH="$(xcrun --sdk "$1" --show-sdk-path)"
     VLC_APPLE_SDK_VERSION="$(xcrun --sdk "$1" --show-sdk-version)"
+    VLC_APPLE_XCODE_VERSION="$(xcodebuild -version)"
     if [ ! -d "$VLC_APPLE_SDK_PATH" ]; then
         abort_err "SDK at '$VLC_APPLE_SDK_PATH' does not exist"
     fi
@@ -597,6 +600,7 @@ echo "Build configuration"
 echo "  Platform:         $VLC_HOST_PLATFORM"
 echo "  Architecture:     $VLC_HOST_ARCH"
 echo "  SDK Version:      $VLC_APPLE_SDK_VERSION"
+echo "  Xcode Version:    $VLC_APPLE_XCODE_VERSION"
 echo "  Number of Cores:  $VLC_USE_NUMBER_OF_CORES"
 if [ "$VLC_USE_BITCODE" -gt 0 ]; then
 echo "  Bitcode:          enabled"
