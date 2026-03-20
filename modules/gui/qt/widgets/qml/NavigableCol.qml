@@ -142,7 +142,10 @@ T.Container {
             onItemAdded: (index, item) => {
                 if (item.enabled) root._countEnabled += 1;
 
-                item.onEnabledChanged.connect(() => { root._countEnabled += (item.enabled ? 1 : -1) });
+                item.onEnabledChanged.connect(() => {
+                    if (root && item)
+                        root._countEnabled += (item.enabled ? 1 : -1);
+                });
 
                 item.Navigation.upAction = function() {
                     let i = index;
