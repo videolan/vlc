@@ -524,19 +524,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)durationString
 {
-    NSString *countMetadataString;
-    if (_numberOfAlbums > 1) {
-        countMetadataString = [NSString stringWithFormat:_NS("%u albums"), _numberOfAlbums];
-    } else {
-        countMetadataString = _NS("1 album");
-    }
-    if (_numberOfTracks > 1) {
-        countMetadataString = [countMetadataString stringByAppendingFormat:@", %@", [NSString stringWithFormat:_NS("%u songs"), _numberOfTracks]];
-    } else {
-        countMetadataString = [countMetadataString stringByAppendingFormat:@", %@", _NS("1 song")];
-    }
-
-    return countMetadataString;
+    NSString * const albumString =
+        [NSString stringWithFormat:toNSStr(vlc_ngettext("%u album", "%u albums", _numberOfAlbums)), _numberOfAlbums];
+    NSString * const songString =
+        [NSString stringWithFormat:toNSStr(vlc_ngettext("%u song", "%u songs", _numberOfTracks)), _numberOfTracks];
+    return [NSString stringWithFormat:@"%@, %@", albumString, songString];
 }
 
 - (NSString *)genreString
@@ -766,11 +758,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)durationString
 {
-    if (_numberOfTracks > 1) {
-        return [NSString stringWithFormat:_NS("%u songs"), _numberOfTracks];
-    } else {
-        return _NS("1 song");
-    }
+    return [NSString stringWithFormat:toNSStr(vlc_ngettext("%u song", "%u songs", _numberOfTracks)), _numberOfTracks];
 }
 
 - (NSArray<VLCMediaLibraryAlbum *> *)albums
@@ -1766,8 +1754,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.smallArtworkMRL = p_show->psz_artwork_mrl ? toNSStr(p_show->psz_artwork_mrl) : @"";
         self.smallArtworkGenerated = self.smallArtworkMRL.length > 0;
         self.displayString = self.name;
-        self.primaryDetailString = 
-            [NSString stringWithFormat:_NS("%u seasons, %u episodes"), _seasonCount, _episodeCount];
+        NSString * const seasonString =
+            [NSString stringWithFormat:toNSStr(vlc_ngettext("%u season", "%u seasons", _seasonCount)), _seasonCount];
+        NSString * const episodeString =
+            [NSString stringWithFormat:toNSStr(vlc_ngettext("%u episode", "%u episodes", _episodeCount)), _episodeCount];
+        self.primaryDetailString = [NSString stringWithFormat:@"%@, %@", seasonString, episodeString];
         self.secondaryDetailString = [NSString stringWithFormat:_NS("Released in %u"), _releaseYear];
         self.durationString = self.secondaryDetailString;
     }
@@ -1896,12 +1887,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
                       withMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
 
-    NSString *detailString;
-    if (mediaItems.count == 1) {
-        detailString = _NS("1 item");
-    } else {
-        detailString = [NSString stringWithFormat:_NS("%lu items"), (unsigned long)mediaItems.count];
-    }
+    NSString * const detailString =
+        [NSString stringWithFormat:toNSStr(vlc_ngettext("%lu item", "%lu items", mediaItems.count)), (unsigned long)mediaItems.count];
 
     self = [self initWithDisplayString:displayString
                withPrimaryDetailString:detailString
