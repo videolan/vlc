@@ -1,7 +1,9 @@
 root { 
     display: block;
 }
-body{
+body {
+    background-color: #111;
+    color: #fff;
 }
 #mainContainer{
 	text-align: center;
@@ -163,8 +165,7 @@ body{
 	background-repeat: no-repeat;
 }
 .button48:hover{
-	filter: alpha(opacity:0.5);
-	-ms-filter: "alpha(opacity=50)";
+	opacity: 0.5;
 	-khtml-opacity: 0.50;
 	-moz-opacity: 0.5;
 	filter: alpha(opacity=50);
