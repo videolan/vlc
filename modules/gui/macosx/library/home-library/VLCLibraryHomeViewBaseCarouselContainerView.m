@@ -114,7 +114,6 @@
     _leftButton = [[NSButton alloc] initWithFrame:NSZeroRect];
     self.leftButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.leftButton.image = leftImage;
-    self.leftButton.bezelStyle = NSBezelStyleCircular;
     self.leftButton.target = self;
     self.leftButton.action = @selector(scrollLeft:);
     [self addSubview:self.leftButton];
@@ -127,7 +126,6 @@
     _rightButton = [[NSButton alloc] initWithFrame:NSZeroRect];
     self.rightButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.rightButton.image = rightImage;
-    self.rightButton.bezelStyle = NSBezelStyleCircular;
     self.rightButton.target = self;
     self.rightButton.action = @selector(scrollRight:);
     [self addSubview:self.rightButton];
@@ -135,6 +133,14 @@
         [self.rightButton.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
         [self.rightButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
     ]];
+
+    if (@available(macOS 26.0, *)) {
+        self.leftButton.bezelStyle = NSBezelStyleGlass;
+        self.rightButton.bezelStyle = NSBezelStyleGlass;
+    } else {
+        self.leftButton.bezelStyle = NSBezelStyleCircular;
+        self.rightButton.bezelStyle = NSBezelStyleCircular;
+    }
 
     _itemHeight = VLCLibraryUIUnits.carouselViewItemViewHeight;
 
