@@ -558,7 +558,7 @@ int InitVideoEnc( vlc_object_t *p_this )
         if( p_sys->i_key_int > 0 )
             p_context->gop_size = p_sys->i_key_int;
         p_context->max_b_frames =
-            VLC_CLIP( p_sys->i_b_frames, 0, FF_MAX_B_FRAMES );
+            __MAX( p_sys->i_b_frames, 0 );
         if( !p_context->max_b_frames  &&
             (  p_enc->fmt_out.i_codec == VLC_CODEC_MPGV ||
                p_enc->fmt_out.i_codec == VLC_CODEC_MP2V ) )

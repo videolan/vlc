@@ -69,9 +69,7 @@
 #ifndef AV_CODEC_CAP_SMALL_LAST_FRAME
 # define AV_CODEC_CAP_SMALL_LAST_FRAME CODEC_CAP_SMALL_LAST_FRAME
 #endif
-#ifndef  FF_MAX_B_FRAMES
-# define  FF_MAX_B_FRAMES 16 // FIXME: remove this
-#endif
+
 #ifndef FF_API_AVIO_WRITE_NONCONST // removed in ffmpeg 7
 # define FF_API_AVIO_WRITE_NONCONST (LIBAVFORMAT_VERSION_MAJOR < 61)
 #endif
