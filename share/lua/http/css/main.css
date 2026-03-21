@@ -70,12 +70,8 @@ body{
 	height: 150px;
 }
 #controlButtons{
-	position: absolute;
-	top: 80px;
-	left: 10px;
-	padding: 0;
-	margin: 0;
-	text-align: left;
+	text-align: center;
+	margin-top: 20px;
 }
 
 .buttonszone{
@@ -152,23 +148,19 @@ body{
 .button48{
 	width: 48px;
 	height: 48px;
-	margin: 5px 0px 5px 2px;
-	background: none;
-	border: none;
+	margin: 5px;
 	display: inline-block;
 	list-style: none;
 	float:left;
 	cursor: pointer;
 	background-image: url("../images/buttons.png");
 	background-repeat: no-repeat;
+	border-radius: 8px;
+
 }
 .button48:hover{
-	filter: alpha(opacity:0.5);
-	-ms-filter: "alpha(opacity=50)";
-	-khtml-opacity: 0.50;
-	-moz-opacity: 0.5;
-	filter: alpha(opacity=50);
-	opacity: 0.5;
+	opacity: 0.7;
+	transition: 0.2s;
 }
 
 .button{
