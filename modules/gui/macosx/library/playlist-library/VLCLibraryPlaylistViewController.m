@@ -292,6 +292,8 @@
         self.listViewSplitView.hidden = NO;
         self.collectionViewScrollView.hidden = YES;
         [self.splitViewDelegate resetDefaultSplitForSplitView:self.listViewSplitView];
+        [self.dataSource updateHeaderInTableView:self.detailTableView
+                              forMasterSelection:self.masterTableView];
     }
 }
 
