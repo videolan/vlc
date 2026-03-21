@@ -271,6 +271,8 @@
         } else {
             [self.libraryWindow displayLibraryView:self.listViewSplitView];
             [self.splitViewDelegate resetDefaultSplitForSplitView:self.listViewSplitView];
+            [self.dataSource updateHeaderInTableView:self.selectedGroupTableView
+                                  forMasterSelection:self.groupsTableView];
         }
     } else if (self.dataSource.libraryModel.filterString.length > 0) {
         [self.libraryWindow displayNoResultsMessage];
