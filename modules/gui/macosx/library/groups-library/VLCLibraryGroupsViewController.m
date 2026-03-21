@@ -205,6 +205,7 @@
     self.tableViewDelegate.detailTableHeaderView = self.selectedGroupTableHeaderView;
 
     self.groupsTableView.headerView = nil;
+    self.groupsTableView.allowsEmptySelection = NO;
     self.selectedGroupTableView.headerView = self.selectedGroupTableHeaderView;
 
     selectedGroupColumn.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
