@@ -136,13 +136,21 @@
         [self.rightButton.heightAnchor constraintEqualToConstant:buttonSize],
     ]];
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
     if (@available(macOS 26.0, *)) {
+        self.leftButton.bordered = YES;
         self.leftButton.bezelStyle = NSBezelStyleGlass;
+        self.leftButton.borderShape = NSControlBorderShapeCircle;
+        self.rightButton.bordered = YES;
         self.rightButton.bezelStyle = NSBezelStyleGlass;
+        self.rightButton.borderShape = NSControlBorderShapeCircle;
     } else {
+#endif
         self.leftButton.bezelStyle = NSBezelStyleCircular;
         self.rightButton.bezelStyle = NSBezelStyleCircular;
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
     }
+#endif
 
     _itemHeight = VLCLibraryUIUnits.carouselViewItemViewHeight;
 
