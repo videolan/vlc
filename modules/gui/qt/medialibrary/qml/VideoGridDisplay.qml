@@ -52,7 +52,7 @@ Widgets.ExpandGridItemView {
 
     // reimplement function to show "Info Panel" in grid view for the model index data
     function isInfoExpandPanelAvailable(modelIndexData) {
-        return false
+        return true
     }
 
     // Events
