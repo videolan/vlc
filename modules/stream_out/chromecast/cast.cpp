@@ -1063,7 +1063,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         {
             int res = vlc_dialog_wait_question( p_stream,
                           VLC_DIALOG_QUESTION_WARNING,
-                         _("Cancel"), _("OK"), _("Ok, Don't warn me again"),
+                         _("Cancel"), _("OK"), _("OK, don't warn me again"),
                          _("Performance warning"),
                          _("Casting this video requires conversion. "
                            "This conversion can use all the available power and "
