@@ -391,7 +391,6 @@ unsigned ChromecastCommunication::msgPlayerLoad( const std::string& destinationI
     std::stringstream ss;
     ss << "{\"type\":\"LOAD\","
        <<  "\"media\":{" << GetMedia( mime, p_meta, input_length ) << "},"
-       <<  "\"autoplay\":\"false\","
        <<  "\"requestId\":" << id
        << "}";
 
