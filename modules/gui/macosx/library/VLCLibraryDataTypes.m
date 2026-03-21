@@ -887,6 +887,21 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.name.length == 0 ? _NS("Unknown Group") : self.name;
 }
 
+- (NSString *)primaryDetailString
+{
+    return [NSString stringWithFormat:toNSStr(vlc_ngettext("%lu item", "%lu items", _numberOfTotalItems)), _numberOfTotalItems];
+}
+
+- (NSString *)secondaryDetailString
+{
+    return [self durationString];
+}
+
+- (NSString *)durationString
+{
+    return [NSString stringWithTime:_duration / VLCMediaLibraryMediaItemDurationDenominator];
+}
+
 - (VLCMediaLibraryMediaItem *)firstMediaItem
 {
     return self.mediaItems.firstObject;
