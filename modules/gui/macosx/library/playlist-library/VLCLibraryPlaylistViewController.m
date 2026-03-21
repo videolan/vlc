@@ -202,6 +202,7 @@
     self.tableViewDelegate.detailTableHeaderView = self.detailTableHeaderView;
 
     self.masterTableView.headerView = nil;
+    self.masterTableView.allowsEmptySelection = NO;
     self.detailTableView.headerView = self.detailTableHeaderView;
 
     detailColumn.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
