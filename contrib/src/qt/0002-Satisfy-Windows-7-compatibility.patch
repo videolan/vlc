@@ -1,17 +1,19 @@
-From 5ceab2c7433f7c9aff207b1e7d2f1a4fc9680a0d Mon Sep 17 00:00:00 2001
+From 9f5b42f8ea864239d6c2c70643acb7f0a5ab65cb Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Mon, 22 Jan 2024 21:37:39 +0200
 Subject: [PATCH] Satisfy Windows 7 compatibility
 
 ---
  cmake/QtBaseConfigureTests.cmake              |  10 +-
- src/corelib/CMakeLists.txt                    |  20 +--
+ src/corelib/CMakeLists.txt                    |  22 ++--
  src/corelib/global/qt_windows.h               |   6 +-
  src/corelib/io/qfilesystemengine_win.cpp      |   5 +
  src/corelib/kernel/qeventdispatcher_win.cpp   |  10 +-
  src/corelib/kernel/qfunctions_win.cpp         |  13 +-
  src/corelib/thread/qfutex_win_p.h             |  42 +++++-
- src/corelib/thread/qmutex_win.cpp             |   4 +-
+ src/corelib/thread/qmutex.cpp                 |   4 +-
+ src/corelib/thread/qmutex_p.h                 |   2 +
+ src/corelib/thread/qmutex_win.cpp             |  30 +++++
  src/corelib/thread/qthread_win.cpp            |  25 ++--
  src/gui/CMakeLists.txt                        |   1 -
  src/gui/rhi/qrhid3d11.cpp                     |   5 +-
@@ -32,7 +34,8 @@ Subject: [PATCH] Satisfy Windows 7 compatibility
  .../platforms/windows/qwindowstheme.cpp       |   6 +-
  .../platforms/windows/qwindowswindow.cpp      |  48 +++++--
  src/widgets/styles/qwindowsstyle.cpp          |  26 +++-
- 28 files changed, 535 insertions(+), 114 deletions(-)
+ 30 files changed, 570 insertions(+), 113 deletions(-)
+ create mode 100644 src/corelib/thread/qmutex_win.cpp
 
 diff --git a/cmake/QtBaseConfigureTests.cmake b/cmake/QtBaseConfigureTests.cmake
 index d41fac2e18e..9490de8fa12 100644
@@ -61,10 +64,10 @@ index d41fac2e18e..9490de8fa12 100644
              CACHE STRING "Qt platform specific pre-processor defines" FORCE)
      endif()
 diff --git a/src/corelib/CMakeLists.txt b/src/corelib/CMakeLists.txt
-index e8158f73950..d7432c35e3c 100644
+index b6be7a8d49d..db57eed2b05 100644
 --- a/src/corelib/CMakeLists.txt
 +++ b/src/corelib/CMakeLists.txt
-@@ -536,17 +536,17 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_animation
+@@ -538,16 +538,17 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_animation
          animation/qvariantanimation.cpp animation/qvariantanimation.h animation/qvariantanimation_p.h
  )
  
@@ -79,7 +82,7 @@ index e8158f73950..d7432c35e3c 100644
  qt_internal_extend_target(Core CONDITION QT_FEATURE_thread AND WIN32
      SOURCES
          thread/qfutex_win_p.h
-         thread/qmutex_win.cpp
++        thread/qmutex_win.cpp
          thread/qwaitcondition_win.cpp
 -    LIBRARIES
 -        synchronization
@@ -88,7 +91,7 @@ index e8158f73950..d7432c35e3c 100644
  )
  
  qt_internal_extend_target(Core CONDITION WIN32
-@@ -860,10 +860,10 @@ qt_internal_extend_target(Core CONDITION WASM
+@@ -866,10 +867,10 @@ qt_internal_extend_target(Core CONDITION WASM
  )
  
  # On MS-Win, clang has two flavors, one of which immitates MSVC (so claims to be it)
@@ -103,6 +106,14 @@ index e8158f73950..d7432c35e3c 100644
  
  qt_internal_extend_target(Core CONDITION QT_FEATURE_icu
      SOURCES
+@@ -1426,6 +1427,7 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_ctf
+ set_source_files_properties(
+     thread/qmutex_mac.cpp
+     thread/qmutex_unix.cpp
++    thread/qmutex_win.cpp
+     PROPERTIES HEADER_FILE_ONLY ON)
+ 
+ # Remove QT_NO_CAST_TO_ASCII to ensure that the symbols are included in the library.
 diff --git a/src/corelib/global/qt_windows.h b/src/corelib/global/qt_windows.h
 index 5586d0b9272..eb0264b4ee2 100644
 --- a/src/corelib/global/qt_windows.h
@@ -272,22 +283,73 @@ index 75a12bd82c1..3d2aa021db6 100644
  }
  } // namespace QtWindowsFutex
  namespace QtFutex = QtWindowsFutex;
+diff --git a/src/corelib/thread/qmutex.cpp b/src/corelib/thread/qmutex.cpp
+index 1b8f76f1230..0659d4dc068 100644
+--- a/src/corelib/thread/qmutex.cpp
++++ b/src/corelib/thread/qmutex.cpp
+@@ -911,10 +911,12 @@ void QMutexPrivate::derefWaiters(int value) noexcept
+ 
+ QT_END_NAMESPACE
+ 
+-#if defined(QT_ALWAYS_USE_FUTEX)
++#if defined(Q_OS_LINUX) && defined(QT_ALWAYS_USE_FUTEX)
+ // nothing
+ #elif defined(Q_OS_DARWIN)
+ #  include "qmutex_mac.cpp"
++#elif defined(Q_OS_WIN)
++#  include "qmutex_win.cpp"
+ #else
+ #  include "qmutex_unix.cpp"
+ #endif
+diff --git a/src/corelib/thread/qmutex_p.h b/src/corelib/thread/qmutex_p.h
+index aabb66fa550..a16d5082154 100644
+--- a/src/corelib/thread/qmutex_p.h
++++ b/src/corelib/thread/qmutex_p.h
+@@ -86,6 +86,8 @@ public:
+     semaphore_t mach_semaphore;
+ #elif defined(Q_OS_UNIX)
+     sem_t semaphore;
++#elif defined(Q_OS_WIN)
++    Qt::HANDLE event;
+ #endif
+ };
+ 
 diff --git a/src/corelib/thread/qmutex_win.cpp b/src/corelib/thread/qmutex_win.cpp
-index 8c7741c1131..ce3586a90b7 100644
---- a/src/corelib/thread/qmutex_win.cpp
+new file mode 100644
+index 00000000000..ce3586a90b7
+--- /dev/null
 +++ b/src/corelib/thread/qmutex_win.cpp
-@@ -19,9 +19,9 @@ QMutexPrivate::QMutexPrivate()
- QMutexPrivate::~QMutexPrivate()
- { CloseHandle(event); }
- 
--bool QMutexPrivate::wait(int timeout)
+@@ -0,0 +1,30 @@
++// Copyright (C) 2016 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++#include "qmutex.h"
++#include <qatomic.h>
++#include "qmutex_p.h"
++#include <qt_windows.h>
++
++QT_BEGIN_NAMESPACE
++
++QMutexPrivate::QMutexPrivate()
++{
++    event = CreateEvent(0, FALSE, FALSE, 0);
++
++    if (!event)
++        qWarning("QMutexPrivate::QMutexPrivate: Cannot create event");
++}
++
++QMutexPrivate::~QMutexPrivate()
++{ CloseHandle(event); }
++
 +bool QMutexPrivate::wait(QDeadlineTimer timeout)
- {
--    return (WaitForSingleObjectEx(event, timeout < 0 ? INFINITE : timeout, FALSE) == WAIT_OBJECT_0);
++{
 +    return (WaitForSingleObjectEx(event, timeout.isForever() ? INFINITE : timeout.remainingTime(), FALSE) == WAIT_OBJECT_0);
- }
- 
- void QMutexPrivate::wakeUp() noexcept
++}
++
++void QMutexPrivate::wakeUp() noexcept
++{ SetEvent(event); }
++
++QT_END_NAMESPACE
 diff --git a/src/corelib/thread/qthread_win.cpp b/src/corelib/thread/qthread_win.cpp
 index 88ba6dc8f62..2d17f1b4dee 100644
 --- a/src/corelib/thread/qthread_win.cpp
@@ -351,7 +413,7 @@ index 2cc72625131..16c8086decc 100644
          ../3rdparty/D3D12MemoryAllocator
  )
 diff --git a/src/gui/rhi/qrhid3d11.cpp b/src/gui/rhi/qrhid3d11.cpp
-index 3faae39a42a..336b8fbe059 100644
+index 9e2e0c4e81c..9a0b5721abc 100644
 --- a/src/gui/rhi/qrhid3d11.cpp
 +++ b/src/gui/rhi/qrhid3d11.cpp
 @@ -8,6 +8,7 @@
@@ -375,7 +437,7 @@ index 3faae39a42a..336b8fbe059 100644
          result = nullptr;
      }
 diff --git a/src/gui/rhi/qrhid3d12.cpp b/src/gui/rhi/qrhid3d12.cpp
-index 3ce8b967e0f..cae5c0e9ebe 100644
+index f663c006346..e82b82bcbb8 100644
 --- a/src/gui/rhi/qrhid3d12.cpp
 +++ b/src/gui/rhi/qrhid3d12.cpp
 @@ -5,6 +5,7 @@
@@ -490,7 +552,7 @@ index 3ce8b967e0f..cae5c0e9ebe 100644
                                 minimumFeatureLevel,
                                 __uuidof(ID3D12Device2),
                                 reinterpret_cast<void **>(&dev));
-@@ -2818,7 +2866,12 @@ bool QD3D12MipmapGenerator::create(QRhiD3D12 *rhiD)
+@@ -2819,7 +2867,12 @@ bool QD3D12MipmapGenerator::create(QRhiD3D12 *rhiD)
      rsDesc.Desc_1_1.pStaticSamplers = &samplerDesc;
  
      ID3DBlob *signature = nullptr;
@@ -504,7 +566,7 @@ index 3ce8b967e0f..cae5c0e9ebe 100644
      if (FAILED(hr)) {
          qWarning("Failed to serialize root signature: %s", qPrintable(QSystemError::windowsComString(hr)));
          return false;
-@@ -5095,7 +5148,11 @@ QD3D12ObjectHandle QD3D12ShaderResourceBindings::createRootSignature(const QD3D1
+@@ -5096,7 +5149,11 @@ QD3D12ObjectHandle QD3D12ShaderResourceBindings::createRootSignature(const QD3D1
      rsDesc.Desc_1_1.Flags = D3D12_ROOT_SIGNATURE_FLAGS(rsFlags);
  
      ID3DBlob *signature = nullptr;
@@ -1193,10 +1255,10 @@ index 6c86c47caac..14d10bef072 100644
          case ORIENTATION_PREFERENCE_NONE:
              break;
 diff --git a/src/plugins/platforms/windows/qwindowstheme.cpp b/src/plugins/platforms/windows/qwindowstheme.cpp
-index 35445c7a3c9..2d5a20134e4 100644
+index 97b2dd339be..72f78c114fa 100644
 --- a/src/plugins/platforms/windows/qwindowstheme.cpp
 +++ b/src/plugins/platforms/windows/qwindowstheme.cpp
-@@ -737,7 +737,11 @@ void QWindowsTheme::refreshFonts()
+@@ -738,7 +738,11 @@ void QWindowsTheme::refreshFonts()
      fixedFont.setStyleHint(QFont::TypeWriter);
  
      LOGFONT lfIconTitleFont;
@@ -1322,7 +1384,7 @@ index f44a28f5636..06d7c7c5ad0 100644
      setSavedDpi(dpi);
  
 diff --git a/src/widgets/styles/qwindowsstyle.cpp b/src/widgets/styles/qwindowsstyle.cpp
-index bae182b4676..ab4793007c8 100644
+index a8407add019..11a6dd0ea1d 100644
 --- a/src/widgets/styles/qwindowsstyle.cpp
 +++ b/src/widgets/styles/qwindowsstyle.cpp
 @@ -62,6 +62,7 @@
@@ -1383,5 +1445,5 @@ index bae182b4676..ab4793007c8 100644
      default:
          break;
 -- 
-2.47.1
+2.53.0
 

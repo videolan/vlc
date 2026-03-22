@@ -46,7 +46,6 @@ $(TARBALLS)/qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz:
 qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
 	$(APPLY) $(SRC)/qt/0001-Windows-QPA-Disable-systray-notification-sounds.patch
-	$(APPLY) $(SRC)/qt/0001-Revert-QMutex-remove-qmutex_win.cpp.patch
 	$(APPLY) $(SRC)/qt/0001-Expose-QRhiImplementation-in-QRhi.patch
 	$(APPLY) $(SRC)/qt/0001-Do-not-include-D3D12MemAlloc.h-in-header-file.patch
 	$(APPLY) $(SRC)/qt/0001-Try-DCompositionCreateDevice3-first-if-available.patch
