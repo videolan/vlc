@@ -144,6 +144,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_request_stop( false )
  , m_request_load( false )
  , m_paused( false )
+ , m_input_length( VLC_TICK_INVALID )
  , m_input_eof( false )
  , m_cc_eof( false )
  , m_pace( false )
@@ -182,6 +183,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     m_common.pf_send_input_event = send_input_event;
     m_common.pf_set_pause_state  = set_pause_state;
     m_common.pf_set_meta         = set_meta;
+    m_common.pf_set_input_length = set_input_length;
 
     assert( var_Type( vlc_object_parent(vlc_object_parent(m_module)), CC_SHARED_VAR_NAME) == 0 );
     if (var_Create( vlc_object_parent(vlc_object_parent(m_module)), CC_SHARED_VAR_NAME, VLC_VAR_ADDRESS ) == VLC_SUCCESS )
@@ -406,7 +408,7 @@ void intf_sys_t::tryLoad()
     // Reset the mediaSessionID to allow the new session to become the current one.
     // we cannot start a new load when the last one is still processing
     m_last_request_id =
-        m_communication->msgPlayerLoad( m_appTransportId, m_mime, m_meta );
+        m_communication->msgPlayerLoad( m_appTransportId, m_mime, m_meta, m_input_length );
     if( m_last_request_id != ChromecastCommunication::kInvalidId )
         m_state = Loading;
 }
@@ -1232,6 +1234,12 @@ void intf_sys_t::setMeta(vlc_meta_t *p_meta)
     m_meta = p_meta;
 }
 
+void intf_sys_t::setInputLength(vlc_tick_t length)
+{
+    vlc::threads::mutex_locker lock( m_lock );
+    m_input_length = length;
+}
+
 vlc_tick_t intf_sys_t::getPlaybackTimestamp()
 {
     vlc::threads::mutex_locker lock( m_lock );
@@ -1328,4 +1336,10 @@ void intf_sys_t::set_meta(void *pt, vlc_meta_t *p_meta)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->setMeta( p_meta );
+}
+
+void intf_sys_t::set_input_length(void *pt, vlc_tick_t length)
+{
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
+    p_this->setInputLength( length );
 }

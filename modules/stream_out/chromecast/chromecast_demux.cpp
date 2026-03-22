@@ -91,6 +91,7 @@ struct demux_cc
             m_can_seek = false;
         if (demux_Control( p_demux->s, DEMUX_GET_LENGTH, &m_length ) != VLC_SUCCESS)
             m_length = -1;
+        p_renderer->pf_set_input_length( p_renderer->p_opaque, m_length );
 
         int i_current_title;
         if( demux_Control( p_demux->s, DEMUX_GET_TITLE,
@@ -141,6 +142,7 @@ struct demux_cc
     {
         assert(p_renderer);
         p_renderer->pf_set_meta( p_renderer->p_opaque, NULL );
+        p_renderer->pf_set_input_length( p_renderer->p_opaque, VLC_TICK_INVALID );
         p_renderer->pf_set_demux_enabled(p_renderer->p_opaque, false, NULL, NULL);
     }
 

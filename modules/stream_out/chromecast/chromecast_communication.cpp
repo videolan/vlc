@@ -284,7 +284,8 @@ static std::string meta_get_escaped(const vlc_meta_t *p_meta, vlc_meta_type_t ty
 }
 
 std::string ChromecastCommunication::GetMedia( const std::string& mime,
-                                               const vlc_meta_t *p_meta )
+                                               const vlc_meta_t *p_meta,
+                                               vlc_tick_t input_length )
 {
     std::stringstream ss;
 
@@ -350,19 +351,28 @@ std::string ChromecastCommunication::GetMedia( const std::string& mime,
     msg_Dbg( m_module, "s_chromecast_url: %s", chromecast_url.str().c_str());
 
     ss << "\"contentId\":\"" << chromecast_url.str() << "\""
-       << ",\"streamType\":\"LIVE\""
+       << ",\"streamType\":\"" << ( input_length > VLC_TICK_0 ? "BUFFERED" : "LIVE" ) << "\""
        << ",\"contentType\":\"" << mime << "\"";
+       
+
+    if( input_length > VLC_TICK_0 )
+    {
+        std::stringstream duration;
+        duration.setf( std::ios_base::fixed, std::ios_base::floatfield );
+        duration << std::setprecision(6) << secf_from_vlc_tick(input_length);
+        ss << ",\"duration\":" << duration.str();
+    }
 
     return ss.str();
 }
 
 unsigned ChromecastCommunication::msgPlayerLoad( const std::string& destinationId,
-                                             const std::string& mime, const vlc_meta_t *p_meta )
+                                             const std::string& mime, const vlc_meta_t *p_meta, vlc_tick_t input_length )
 {
     unsigned id = getNextRequestId();
     std::stringstream ss;
     ss << "{\"type\":\"LOAD\","
-       <<  "\"media\":{" << GetMedia( mime, p_meta ) << "},"
+       <<  "\"media\":{" << GetMedia( mime, p_meta, input_length ) << "},"
        <<  "\"autoplay\":\"false\","
        <<  "\"requestId\":" << id
        << "}";

@@ -70,6 +70,8 @@ typedef struct
 
     void (*pf_set_meta)(void*, vlc_meta_t *p_meta);
 
+    void (*pf_set_input_length)(void*, vlc_tick_t length);
+
 } chromecast_common;
 
 # ifdef __cplusplus
