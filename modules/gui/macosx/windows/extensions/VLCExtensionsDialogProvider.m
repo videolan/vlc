@@ -386,10 +386,14 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     VLCDialogWindow *window = sender;
     extension_dialog_t *dialog = [window dialog];
     extension_DialogClosed(dialog);
+    
+    vlc_mutex_lock(&dialog->lock);
     if (dialog->p_sys_intf) {
         CFRelease(dialog->p_sys_intf);
         dialog->p_sys_intf = NULL;
     }
+    vlc_mutex_unlock(&dialog->lock);
+    
     return YES;
 }
 
