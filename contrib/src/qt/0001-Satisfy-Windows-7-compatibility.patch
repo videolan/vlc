@@ -1,4 +1,4 @@
-From 9f5b42f8ea864239d6c2c70643acb7f0a5ab65cb Mon Sep 17 00:00:00 2001
+From f59945015c99cb02260553676c036c90ba48ea05 Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Mon, 22 Jan 2024 21:37:39 +0200
 Subject: [PATCH] Satisfy Windows 7 compatibility
@@ -437,7 +437,7 @@ index 9e2e0c4e81c..9a0b5721abc 100644
          result = nullptr;
      }
 diff --git a/src/gui/rhi/qrhid3d12.cpp b/src/gui/rhi/qrhid3d12.cpp
-index f663c006346..e82b82bcbb8 100644
+index f663c006346..2e8578d055d 100644
 --- a/src/gui/rhi/qrhid3d12.cpp
 +++ b/src/gui/rhi/qrhid3d12.cpp
 @@ -5,6 +5,7 @@
@@ -448,9 +448,9 @@ index f663c006346..e82b82bcbb8 100644
  #include <comdef.h>
  #include "qrhid3dhelpers_p.h"
  #include "cs_mipmap_p.h"
-@@ -153,6 +154,17 @@ QT_BEGIN_NAMESPACE
- // https://learn.microsoft.com/en-us/windows/win32/direct3d12/hardware-feature-levels
- static const D3D_FEATURE_LEVEL MIN_FEATURE_LEVEL = D3D_FEATURE_LEVEL_11_0;
+@@ -150,6 +151,17 @@ QT_BEGIN_NAMESPACE
+     \variable QRhiD3D12CommandBufferNativeHandles::commandList
+ */
  
 +typedef HRESULT (*D3D12SerializeVersionedRootSignatureFunc)(
 +              const D3D12_VERSIONED_ROOT_SIGNATURE_DESC *pRootSignature,
@@ -463,9 +463,9 @@ index f663c006346..e82b82bcbb8 100644
 +        return reinterpret_cast<D3D12SerializeVersionedRootSignatureFunc>(d3d12lib.resolve("D3D12SerializeVersionedRootSignature"));
 +}();
 +
- void QD3D12Resource::releaseResources()
- {
-     if (owns) {
+ // https://learn.microsoft.com/en-us/windows/win32/direct3d12/hardware-feature-levels
+ static const D3D_FEATURE_LEVEL MIN_FEATURE_LEVEL = D3D_FEATURE_LEVEL_11_0;
+ 
 @@ -219,20 +231,30 @@ bool QRhiD3D12::create(QRhi::Flags flags)
      UINT factoryFlags = 0;
      if (debugLayer)

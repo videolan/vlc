@@ -49,10 +49,10 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0001-Expose-QRhiImplementation-in-QRhi.patch
 	$(APPLY) $(SRC)/qt/0001-Do-not-include-D3D12MemAlloc.h-in-header-file.patch
 	$(APPLY) $(SRC)/qt/0001-Try-DCompositionCreateDevice3-first-if-available.patch
-	$(APPLY) $(SRC)/qt/0002-Satisfy-Windows-7-compatibility.patch
+	$(APPLY) $(SRC)/qt/0001-Satisfy-Windows-7-compatibility.patch
+	$(APPLY) $(SRC)/qt/0002-Do-not-link-D3D9.patch
 	$(APPLY) $(SRC)/qt/0001-disable-precompiled-headers-when-forcing-WINVER-inte.patch
 	$(APPLY) $(SRC)/qt/0001-Use-DirectWrite-font-database-only-with-Windows-10-a.patch
-	$(APPLY) $(SRC)/qt/0003-Do-not-link-D3D9.patch
 	$(APPLY) $(SRC)/qt/0001-WIP-Core-Add-operator-to-our-bidirectional-meta-iter.patch
 	$(APPLY) $(SRC)/qt/0001-macos-guard-text-html.patch
 	$(MOVE)
