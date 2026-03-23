@@ -264,12 +264,13 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
 {
     const enum es_format_category_e cat = libvlc_track_type_to_escat( type );
 
-    size_t count = vlc_player_GetTrackCount( player, cat );
+    const size_t total_count = vlc_player_GetTrackCount( player, cat );
+    size_t count = total_count;
 
     if( selected )
     {
         size_t selected_count = 0;
-        for( size_t i = 0; i < count; ++i )
+        for( size_t i = 0; i < total_count; ++i )
         {
             const struct vlc_player_track *track =
                 vlc_player_GetTrackAt( player, cat, i );
@@ -285,7 +286,7 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
     if( count == 0 || list == NULL )
         return list;
 
-    for( size_t i = 0; i < count; ++i )
+    for( size_t i = 0; i < total_count; ++i )
     {
         const struct vlc_player_track *track =
             vlc_player_GetTrackAt( player, cat, i );
