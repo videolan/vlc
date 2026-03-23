@@ -856,6 +856,7 @@ libvlc_media_player_new_from_media( libvlc_instance_t *inst,
     {
         libvlc_media_release(p_md);
         p_mi->p_md = NULL;
+        libvlc_media_player_release(p_mi);
         return NULL;
     }
 
