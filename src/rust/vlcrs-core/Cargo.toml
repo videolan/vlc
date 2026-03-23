@@ -8,6 +8,8 @@ links = "vlccore"
 [dependencies]
 vlcrs-messages = { path = "../vlcrs-messages" }
 
+libc = "0.2.184"
+
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(vlccore_not_linked)'] }
 

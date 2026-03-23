@@ -43,3 +43,6 @@ pub mod object;
 pub mod tracer;
 
 pub(crate) mod convert;
+
+mod error;
+pub use error::Error;
