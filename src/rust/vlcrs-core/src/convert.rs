@@ -34,7 +34,7 @@
 /// VLC manipulate already checked UTF8 strings. This lift the bindings from the obligation to
 /// perform UTF8 validity verifications:
 ///
-/// ```
+/// ```ignore
 /// extern "C" fn tracer_trace(trace: *const std::ffi::c_char) {
 ///     // `trace` is from VLC and is assumed to be valid UTF8.
 ///     let trace: &str = unsafe { std::ffi::CStr::from_ptr(trace).assume_valid() };
