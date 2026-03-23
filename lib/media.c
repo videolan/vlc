@@ -527,7 +527,10 @@ libvlc_media_duplicate( libvlc_media_t *p_md_orig )
     input_item_t *dup = input_item_Copy( p_md_orig->p_input_item );
     if( dup == NULL )
         return NULL;
-    return libvlc_media_new_from_input_item( dup );
+    libvlc_media_t *p_md = libvlc_media_new_from_input_item( dup );
+    input_item_Release( dup );
+
+    return p_md;
 }
 
 // Get mrl from a media descriptor object
