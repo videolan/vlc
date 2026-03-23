@@ -32,7 +32,7 @@ pub struct Tick(pub i64);
 /// Trait representing the module capability for implementing tracers.
 ///
 /// A type implementing the [TracerCapability] trait can be exposed to
-/// a [vlcrs_macros::module!] manifest using the
+/// a `vlcrs_macros::module!` manifest using the
 /// [TracerModuleLoader] type loader, which will expose it as a "tracer"
 /// capability for VLC core.
 ///
@@ -135,7 +135,7 @@ extern "C" fn activate_tracer<T: TracerCapability>(
 ///
 /// This is an implementation of the [ModuleProtocol] type for the
 /// [TracerCapability] trait, exposing modules from the declaration
-/// ([`vlcrs_macros::module!`]) of the manifest as a "tracer"
+/// (`vlcrs_macros::module!`) of the manifest as a "tracer"
 /// capability for VLC core.
 ///
 /// ```
@@ -200,7 +200,7 @@ impl Tracer {
     }
 
     ///
-    /// Register the new point at time [tick] with the metadata [entries].
+    /// Register the new point at time `tick` with the metadata `entries:.
     ///
     pub fn trace(&self, tick: Tick, trace: Trace) {
         unsafe {
