@@ -81,8 +81,8 @@ static inline void libvlc_media_list_path_append( libvlc_media_list_path_t * p_p
 {
     int old_depth = libvlc_media_list_path_depth( *p_path );
     *p_path = xrealloc( *p_path, sizeof(int)*(old_depth+2));
-    *p_path[old_depth] = index;
-    *p_path[old_depth+1] = -1;
+    (*p_path)[old_depth] = index;
+    (*p_path)[old_depth+1] = -1;
 }
 
 /**************************************************************************
