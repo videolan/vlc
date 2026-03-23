@@ -1140,7 +1140,7 @@ static void libvlc_media_player_detach_output_callbacks(libvlc_media_player_t *p
     var_SetString(player, "dec-dev", player->vout.default_dec_dev);
     var_SetString(player, "vout", player->vout.default_vout);
     var_SetString(player, "gl", player->vout.default_gl);
-    var_SetString(player, "gles", player->vout.default_gles2);
+    var_SetString(player, "gles2", player->vout.default_gles2);
     var_SetString(player, "window", "any");
 
     var_SetInteger(player, "vout-cb-type", libvlc_video_engine_disable);
