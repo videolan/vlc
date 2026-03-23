@@ -1068,9 +1068,9 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                          _("Casting this video requires conversion. "
                            "This conversion can use all the available power and "
                            "could quickly drain your battery." ) );
+            perf_warning_shown = true;
             if ( res <= 0 )
                  return false;
-            perf_warning_shown = true;
             if ( res == 2 )
                 config_PutInt(RENDERER_CFG_PREFIX "show-perf-warning", 0 );
         }
