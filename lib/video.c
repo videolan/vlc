@@ -422,7 +422,7 @@ void libvlc_video_set_crop_window(libvlc_media_player_t *mp,
     char geometry[4 * (3 * sizeof (unsigned) + 1)];
 
     assert(width != 0 && height != 0);
-    snprintf(geometry, ARRAY_SIZE(geometry), "%ux%u+%u+%u", x, y, width, height);
+    snprintf(geometry, ARRAY_SIZE(geometry), "%ux%u+%u+%u", width, height, x, y);
     libvlc_video_set_crop(mp, geometry);
 }
 
