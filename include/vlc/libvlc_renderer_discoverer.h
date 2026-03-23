@@ -205,7 +205,7 @@ libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_rd );
  * internal usage.
  *
  * \see libvlc_event_t.u.renderer_discoverer_item_added.item
- * \see libvlc_event_t.u.renderer_discoverer_item_removed.item
+ * \see libvlc_event_t.u.renderer_discoverer_item_deleted.item
  *
  * \version LibVLC 3.0.0 or later
  *
