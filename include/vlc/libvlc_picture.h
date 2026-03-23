@@ -94,7 +94,8 @@ libvlc_picture_type( const libvlc_picture_t* pic );
 
 /**
  * Returns the image stride, ie. the number of bytes per line.
- * This can only be called on images of type libvlc_picture_Argb
+ * This can only be called on images of type libvlc_picture_Argb or
+ * libvlc_picture_Rgba
  *
  * \param pic A picture object
  */
