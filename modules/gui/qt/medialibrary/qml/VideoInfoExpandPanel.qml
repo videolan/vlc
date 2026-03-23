@@ -32,6 +32,8 @@ FocusScope {
     id: root
 
     property var model : ({})
+    property int index: -1
+    property Item view // can not use `ItemView` because of `ExpandGridView`
     property bool _showMoreInfo: false
     signal retract()
 
