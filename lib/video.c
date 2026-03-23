@@ -460,6 +460,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
             if (!is_key)
             {
                 libvlc_printerr("Invalid key action");
+                vlc_player_Unlock(player);
                 return;
             }
         }
@@ -469,6 +470,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
     else
     {
         libvlc_printerr("Invalid page number");
+        vlc_player_Unlock(player);
         return;
     }
 
