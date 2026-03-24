@@ -24,7 +24,7 @@ import VLC.Util
 ImageExt {
     id: root
 
-    textureProviderItem: textureProvider
+    textureProviderItem: textureProviderIndirection
 
     // NOTE: Unlike `sourceClipRect`, `textureSubRect` acts as viewport for the texture,
     //       thus faster. No manipulations are done either to the image or the texture.
@@ -32,9 +32,9 @@ ImageExt {
     //       `sourceClipRect` otherwise to save system and video  memory. As a reminder,
     //       implicit size reflects the texture size.
     // WARNING: Using this property may be incompatible with certain filling modes.
-    property alias textureSubRect: textureProvider.textureSubRect
+    property alias textureSubRect: textureProviderIndirection.textureSubRect
 
-    property alias textureProvider: textureProviderIndirection
+    property alias textureProviderIndirection: textureProviderIndirection
 
     // NOTE: Target is by default the texture provider `ImageExt` provides, but it can be
     //       set to any texture provider. For example, `ShaderEffectSource` can be displayed
@@ -77,8 +77,8 @@ ImageExt {
 
         detachAtlasTextures: sourceNeedsTiling
 
-        horizontalWrapMode: sourceNeedsTiling ? TextureProviderItem.Repeat : TextureProviderItem.ClampToEdge
-        verticalWrapMode: sourceNeedsTiling ? TextureProviderItem.Repeat : TextureProviderItem.ClampToEdge
+        horizontalWrapMode: sourceNeedsTiling ? TextureProviderIndirection.Repeat : TextureProviderIndirection.ClampToEdge
+        verticalWrapMode: sourceNeedsTiling ? TextureProviderIndirection.Repeat : TextureProviderIndirection.ClampToEdge
 
         textureSubRect: sourceNeedsTiling ? Qt.rect(0, 0, root.paintedWidth, root.paintedHeight) : undefined
 
