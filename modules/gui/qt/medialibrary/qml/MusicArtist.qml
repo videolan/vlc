@@ -508,6 +508,8 @@ FocusScope {
         id: trackContextMenu
 
         model: trackModel
+
+        showPlayAsAlbumAction: MainCtx.albumSections ? false : implicitShowPlayAsAlbumAction
     }
 
     Component {
