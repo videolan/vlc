@@ -621,7 +621,7 @@ sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
     if ( b_has_padding && !i_padding ) /* all padding */
         ret.i_size =  i_data;
     else
-        ret.i_size = (bs_pos( &s ) + 7) / 8;
+        ret.i_size = i_data - bs_remain( &s ) / 8;
 
     return ret;
 }
