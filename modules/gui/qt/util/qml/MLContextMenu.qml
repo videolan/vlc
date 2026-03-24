@@ -69,6 +69,11 @@ NativeMenu {
             "text": qsTr("Enqueue"),
             "action": enqueue
         }, {
+            "text": qsTr("Enqueue as album"),
+            "action": enqueueAsAlbum,
+            "visible": root.showPlayAsAlbumAction &&
+                       (root.model instanceof MLAudioModel)
+        }, {
             "text": qsTr("Add to favorites"),
             "action": addFavorite,
             "visible": _showAddFavorite
@@ -142,6 +147,10 @@ NativeMenu {
 
     function enqueue(dataList, options, indexes) {
         model.ml.addToPlaylist(_mlIDList(dataList), _playerOptions(options))
+    }
+
+    function enqueueAsAlbum(dataList, options, indexes) {
+        model.ml.addToPlaylist(_mlIDList(dataList, root.albumIdDataRole), _playerOptions(options))
     }
 
     function addToAudioOnlyPlaylist(dataList, options, indexes) {
