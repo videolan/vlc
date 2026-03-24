@@ -110,7 +110,8 @@ T.Pane {
                         itemClicked(model.uri)
                         listView.currentIndex = index
                         listView.forceActiveFocus(focusReason)
-                        model.expanded = !model.expanded
+                        if (!model.expanded && History.match(History.viewPath, model.uri))
+                            model.expanded = true
                     }
                 }
             }

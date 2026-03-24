@@ -526,8 +526,9 @@ FocusScope {
             useAcrylic: !VLCStyle.isScreenSmall
 
             onItemClicked: (modelUri) => {
-                if (stackView.isDefaulLoadedForPath(modelUri.slice(1)))
-                    return;
+               if (stackView.isDefaulLoadedForPath(modelUri.slice(1))
+                       || (!!modelUri.length && History.match(History.viewPath, modelUri)))
+                   return
 
                 History.push(modelUri)
             }
