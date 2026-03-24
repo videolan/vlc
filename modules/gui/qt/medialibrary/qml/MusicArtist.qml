@@ -214,7 +214,7 @@ FocusScope {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                active: (root._currentView instanceof Widgets.TableViewExt)
+                active: (root._currentView instanceof Widgets.TableViewExt) && MainCtx.albumSections
                 visible: active
 
                 sourceComponent: MusicAlbumSectionDelegate {
