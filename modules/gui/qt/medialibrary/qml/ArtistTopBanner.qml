@@ -174,10 +174,15 @@ FocusScope {
             implicitHeight: VLCStyle.cover_normal
             implicitWidth: VLCStyle.cover_normal
 
-            Widgets.ImageExt {
+            // Since the source image may be mip mapped, we need to use
+            // `TextureProviderIndirection` here which contains a fixup
+            // for a Qt bug where the texture would not be sampled and
+            // appears black. `EnhancedImageExt` manages an indirection
+            // implicitly, so we can simply use it here:
+            Widgets.EnhancedImageExt {
                 id: roundImage
                 source: root.artist.id ? (root.artist.cover || VLCStyle.noArtArtist) : "" // do not load the fallback image during initialization
-                textureProviderItem: background
+                targetTextureProvider: background
                 sourceSize: Qt.size(width * eDPR, height * eDPR)
                 anchors.fill: parent
                 radius: VLCStyle.cover_normal
