@@ -56,9 +56,9 @@ Item {
         Transition {
             to: "hidden"
             SequentialAnimation {
-                OpacityAnimator {
+                NumberAnimation{
                     target: control
-                    from: 1.0 // QTBUG-66475
+                    properties: "opacity"
                     to: 0
                     duration: VLCStyle.duration_short; easing.type: Easing.OutSine
                 }
@@ -69,9 +69,9 @@ Item {
             to: "visible"
             SequentialAnimation {
                 PropertyAction { target: control; property: "visible"; value: true; }
-                OpacityAnimator {
+                NumberAnimation{
                     target: control
-                    from: 0.0 // QTBUG-66475
+                    properties: "opacity"
                     to: 1
                     duration: VLCStyle.duration_short; easing.type: Easing.InSine
                 }
