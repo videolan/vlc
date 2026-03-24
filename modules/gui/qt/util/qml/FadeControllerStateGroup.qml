@@ -27,7 +27,7 @@ StateGroup {
 
     state: target?.state ?? ""
 
-    property Item target
+    required property Item target
 
     states: [
         State {
