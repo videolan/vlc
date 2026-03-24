@@ -632,7 +632,7 @@ FocusScope {
 
             property bool albumSections: true
 
-            section.property: "album_id"
+            section.property: "album_id_serialized"
             section.delegate: albumSections ? musicAlbumSectionDelegateComponent : null
 
             readonly property var _artistId: root.artistId
