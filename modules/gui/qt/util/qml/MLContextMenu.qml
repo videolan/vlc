@@ -33,8 +33,13 @@ NativeMenu {
     required property MLBaseModel model
 
     property string idDataRole: "id"
+    property string albumIdDataRole: "album_id"
 
     property bool showPlayAsAudioAction: false
+
+    // This is only applicable when the model is `MLAudioModel`:
+    property bool showPlayAsAlbumAction: implicitShowPlayAsAlbumAction
+    property bool implicitShowPlayAsAlbumAction: !showPlayAsAudioAction
 
     // Signals
 
@@ -55,6 +60,11 @@ NativeMenu {
             "text": qsTr("Play as audio"),
             "action": playAsAudio,
             "visible": root.showPlayAsAudioAction
+        }, {
+            "text": qsTr("Play as album"),
+            "action": playAsAlbum,
+            "visible": root.showPlayAsAlbumAction &&
+                       (root.model instanceof MLAudioModel)
         }, {
             "text": qsTr("Enqueue"),
             "action": enqueue
@@ -124,6 +134,10 @@ NativeMenu {
 
     function playAsAudio(dataList, options, indexes) {
         model.ml.addAndPlay(_mlIDList(dataList), _playerOptions(options, ":no-video"))
+    }
+
+    function playAsAlbum(dataList, options, indexes) {
+        model.ml.addAndPlay(_mlIDList(dataList, root.albumIdDataRole), _playerOptions(options))
     }
 
     function enqueue(dataList, options, indexes) {
@@ -236,10 +250,11 @@ NativeMenu {
         return playerOpts.concat(extraOptions)
     }
 
-    function _mlIDList(dataList) {
+    function _mlIDList(dataList, role = root.idDataRole) {
         const idList = []
         for (let i in dataList) {
-            idList.push(dataList[i][idDataRole])
+            console.assert(dataList[i][role] !== undefined)
+            idList.push(dataList[i][role])
         }
 
         return idList
