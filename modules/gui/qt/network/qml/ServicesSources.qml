@@ -40,7 +40,7 @@ Widgets.PageExt {
     isSearchable: true
 
     function positionContentAtBeginning() {
-        grid.positionViewAtBeginning()
+        grid.positionViewAtBeginningAnimated()
     }
 
     Widgets.ExpandGridItemView {

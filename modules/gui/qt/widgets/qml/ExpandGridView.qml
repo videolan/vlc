@@ -557,7 +557,7 @@ FocusScope {
         animateContentY.start()
     }
 
-    function positionViewAtBeginning() {
+    function positionViewAtBeginningAnimated() {
         animateFlickableContentY(0)
     }
 

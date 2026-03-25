@@ -57,7 +57,9 @@ Widgets.PageExt {
     signal seeAllButtonClicked(string name, int reason)
 
     function positionContentAtBeginning() {
+        contentYBehavior.enabled = true
         flickable.contentY = -flickable.originY
+        contentYBehavior.enabled = false
     }
 
     function setCurrentItemFocus(reason) {

@@ -70,7 +70,9 @@ Widgets.PageExt {
     focus: true
 
     function positionContentAtBeginning() {
+        contentYBehavior.enabled = true
         flickable.contentY = -flickable.originY
+        contentYBehavior.enabled = false
     }
 
     Component.onCompleted: {

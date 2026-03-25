@@ -118,6 +118,13 @@ ListView {
             dropIndicatorItem = dropIndicator.createObject(this)
     }
 
+    Binding on maximumFlickVelocity {
+        id: maximumFlickVelocitySuppressor
+
+        when: false
+        value: -1
+    }
+
     component VerticalDropAreaLayout : ColumnLayout {
         spacing: 0
 
@@ -456,6 +463,19 @@ ListView {
         horizontalPageAnimationBehavior.enabled = true
         func()
         horizontalPageAnimationBehavior.enabled = false
+    }
+
+    function positionViewAtBeginningAnimated() {
+        if (!root.flickTo) { // flickTo was added in Qt 6.11
+            positionViewAtBeginning()
+            return
+        }
+
+        // flickTo() velocity is capped by maximumFlickVelocity, meaning it won't reach
+        // the top in a big list. Suppress the cap only for the flickTo() call
+        maximumFlickVelocitySuppressor.when = true
+        root.flickTo(Qt.point(root.originX, root.originY))
+        maximumFlickVelocitySuppressor.when = false
     }
 
     function nextPage() {

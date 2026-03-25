@@ -48,7 +48,7 @@ Widgets.PageExt {
     }
 
     function positionContentAtBeginning() {
-        tracklistdisplay_id.positionViewAtBeginning()
+        tracklistdisplay_id.positionViewAtBeginningAnimated()
     }
 
     FocusScope {

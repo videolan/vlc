@@ -211,7 +211,9 @@ Loader {
     }
 
     function positionContentAtBeginning() {
-        if (currentItem?.positionViewAtBeginning)
+        if (currentItem?.positionViewAtBeginningAnimated)
+            currentItem.positionViewAtBeginningAnimated()
+        else if (currentItem?.positionViewAtBeginning)
             currentItem.positionViewAtBeginning()
     }
 
