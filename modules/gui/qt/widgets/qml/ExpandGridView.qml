@@ -557,6 +557,10 @@ FocusScope {
         animateContentY.start()
     }
 
+    function positionViewAtBeginning() {
+        animateFlickableContentY(0)
+    }
+
     // Private
 
     // returns true if this requires forceLayout

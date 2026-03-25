@@ -99,6 +99,10 @@ T.Page {
         _firstChild.Navigation.upItem = root.header
     }
 
+    function positionContentAtBeginning() {
+        _firstChild?.positionContentAtBeginning?.()
+    }
+
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,

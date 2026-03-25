@@ -47,6 +47,10 @@ Widgets.PageExt {
         tracklistdisplay_id.setCurrentItemFocus(reason);
     }
 
+    function positionContentAtBeginning() {
+        tracklistdisplay_id.positionViewAtBeginning()
+    }
+
     FocusScope {
 
         anchors.fill: parent

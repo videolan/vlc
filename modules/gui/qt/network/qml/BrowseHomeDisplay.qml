@@ -69,6 +69,10 @@ Widgets.PageExt {
 
     focus: true
 
+    function positionContentAtBeginning() {
+        flickable.contentY = -flickable.originY
+    }
+
     Component.onCompleted: {
         _initialized = true
         if (_resetFocusPendingAfterInitialization) {

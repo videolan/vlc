@@ -152,6 +152,10 @@ StackViewExt {
         return path.length === 0
     }
 
+    function positionContentAtBeginning() {
+        currentItem?.positionContentAtBeginning?.()
+    }
+
     function _getDefaultPage() {
         for (let tab = 0; tab < pageModel.length; tab++ ) {
             if (pageModel[tab].default) {

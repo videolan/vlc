@@ -39,6 +39,10 @@ Widgets.PageExt {
     hasGridListMode: false
     isSearchable: true
 
+    function positionContentAtBeginning() {
+        grid.positionViewAtBeginning()
+    }
+
     Widgets.ExpandGridItemView {
         //settings
         id: grid

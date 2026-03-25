@@ -56,6 +56,9 @@ Widgets.PageExt {
 
     signal seeAllButtonClicked(string name, int reason)
 
+    function positionContentAtBeginning() {
+        flickable.contentY = -flickable.originY
+    }
 
     function setCurrentItemFocus(reason) {
         // `focus` is checked, because that indicates the item that has the focus within the focus scope
