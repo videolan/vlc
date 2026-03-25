@@ -6,7 +6,7 @@ vlc_modules += {
       'visual/window.c', 'visual/window.h',
       'visual/window_presets.h'),
     'dependencies' : [opengl_dep, m_lib],
-    'c_args' : [ contrib_inc_args ],
+    'c_args' : [ contrib_inc_args ] + (host_system == 'darwin' ? ['-DGL_SILENCE_DEPRECATION'] : []),
     'enabled' : opengl_dep.found(),
 }
 

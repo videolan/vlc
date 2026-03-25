@@ -16,7 +16,7 @@ vlc_modules += {
         'VLCCVOpenGLProvider.m',
         '../../codec/vt_utils.c'
     ),
-    'objc_args' : ['-fobjc-arc'],
+    'objc_args' : ['-fobjc-arc', '-DGL_SILENCE_DEPRECATION'],
     'dependencies' : [
         frameworks['Foundation'],
         frameworks['CoreFoundation'],
@@ -56,7 +56,7 @@ if have_ios or have_tvos
     vlc_modules += {
         'name' : 'caeagl',
         'sources' : files('VLCOpenGLES2VideoView.m'),
-        'objc_args' : ['-fobjc-arc'],
+        'objc_args' : ['-fobjc-arc', '-DGL_SILENCE_DEPRECATION'],
         'dependencies' : [
             frameworks['Foundation'],
             frameworks['UIKit'],

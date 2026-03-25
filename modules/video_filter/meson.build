@@ -341,6 +341,7 @@ vlc_modules += {
         frameworks['CoreVideo'],
         (have_osx) ? dependency('gl', required: true) : frameworks['OpenGLES'],
     ],
+    'objc_args' : ['-DGL_SILENCE_DEPRECATION', '-DCI_SILENCE_GL_DEPRECATION'],
     'include_directories' : [include_directories('../codec')],
     'enabled' : host_system == 'darwin',
 }

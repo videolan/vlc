@@ -7,6 +7,10 @@ libglspectrum_plugin_la_SOURCES = \
 	visualization/visual/window.c visualization/visual/window.h \
 	visualization/visual/window_presets.h
 libglspectrum_plugin_la_LIBADD = $(GL_LIBS) $(LIBM)
+libglspectrum_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+if HAVE_OSX
+libglspectrum_plugin_la_CPPFLAGS += -DGL_SILENCE_DEPRECATION
+endif
 if HAVE_GL
 visu_LTLIBRARIES += libglspectrum_plugin.la
 endif

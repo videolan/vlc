@@ -2,6 +2,9 @@ opengl_headers_c_args = []
 if host_system == 'android'
     opengl_headers_c_args += ['-DUSE_OPENGL_ES2']
 endif
+if host_system == 'darwin'
+    opengl_headers_c_args += ['-DGL_SILENCE_DEPRECATION']
+endif
 
 gl_common_dep = declare_dependency(
     sources: files(
