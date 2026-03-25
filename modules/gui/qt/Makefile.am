@@ -692,10 +692,10 @@ endif
 
 BUILT_SOURCES += $(nodist_libqt_wayland_plugin_la_SOURCES)
 
-maininterface/xdg-shell-client-protocol.h: $(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml Makefile.am
+maininterface/xdg-shell-client-protocol.h: $(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml
 	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header $< $@
 
-maininterface/xdg-shell-protocol.c: $(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml Makefile.am
+maininterface/xdg-shell-protocol.c: $(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
 #endif
