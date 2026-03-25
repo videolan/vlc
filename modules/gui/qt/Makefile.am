@@ -37,7 +37,7 @@ EXTRA_DIST = qt6.pro qtest.pro quicktest.pro scripts
 vlc_qt_libs = $(QT_LIBS)
 RCC_EXTRA_PARAMS =
 
-all-local: $(VLC_QT_CHECK_DEP)
+all-local: $(VLC_QT_CHECK_DEP) $(QML_MODULE_STAMPS)
 
 if !HAVE_QT_ZSTD
 RCC_EXTRA_PARAMS += --no-zstd
@@ -1489,15 +1489,27 @@ if ENABLE_VLM
 nodist_libqt_plugin_la_SOURCES += dialogs/vlm/vlm.moc.cpp
 endif
 
-# QRC generation depends on the list of files (defined here) but not the file contents
-%/res.qrc: Makefile
+# QRC/qmldir generation depends on the list of files (defined here) but
+# not the file contents. Use per-module stamp files so that changes to
+# one module's file list don't trigger rebuilds in other modules.
+QML_MODULE_STAMPS =
+if ENABLE_QT
+QML_MODULE_STAMPS += $(libqt_plugin_la_QML_MODULES:=/qml_modules.stamp)
+endif
+
+%/qml_modules.stamp: Makefile
+	$(AM_V_at)$(MKDIR_P) $(@D); \
+	echo '$(libqml_module_$*_a_Module) $(libqml_module_$*_a_ModulePath) $(libqml_module_$*_a_QML) $(libqml_module_$*_a_Singleton_QML)' > $@.tmp; \
+	if cmp -s $@.tmp $@; then rm -f $@.tmp; else mv $@.tmp $@; fi
+
+%/res.qrc: %/qml_modules.stamp
 	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqrc.py \
 	-o $@ \
 	-s $(srcdir) \
 	--prefix qt/qml/$(libqml_module_$*_a_ModulePath) \
 	--sources $(libqml_module_$*_a_QML) $(libqml_module_$*_a_Singleton_QML)
 
-%/qmldir: Makefile
+%/qmldir: %/qml_modules.stamp
 	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqmldir.py \
 	-o $@ \
 	--prefix qt/qml \
@@ -1508,7 +1520,7 @@ endif
 %/qmldir.qrc: %/qmldir
 	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqrc.py -o $@ --prefix qt/qml/$(libqml_module_$*_a_ModulePath) --sources $<
 
-CLEANFILES += $(libqt_plugin_la_QML_MODULES:%=%/res.qrc) $(libqt_plugin_la_QML_MODULES:%=%/qmldir) $(libqt_plugin_la_QML_MODULES:%=%/qmldir.qrc) $(libqml_module_util_a_QML:%.qml=%.cpp)
+CLEANFILES += $(QML_MODULE_STAMPS) $(libqt_plugin_la_QML_MODULES:%=%/res.qrc) $(libqt_plugin_la_QML_MODULES:%=%/qmldir) $(libqt_plugin_la_QML_MODULES:%=%/qmldir.qrc) $(libqml_module_util_a_QML:%.qml=%.cpp)
 
 if HAVE_QMLCACHEGEN
 
