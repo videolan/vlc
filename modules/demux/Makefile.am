@@ -553,7 +553,7 @@ libdemux_mock_plugin_la_SOURCES = demux/mock.c
 libdemux_mock_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libdemux_mock_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libdemux_mock_plugin_la_LIBADD = $(LIBM)
-noinst_LTLIBRARIES += libdemux_mock_plugin.la
+noinst_PLUGINS += libdemux_mock_plugin.la
 
 BUILT_SOURCES += demux/json/grammar.h
 libvlc_json_la_SOURCES = \

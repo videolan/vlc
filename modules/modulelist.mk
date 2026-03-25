@@ -9,14 +9,23 @@
 #  3/ rename every plugin name back into the target name
 VLC_PLUGINS_RENAMED = $(LTLIBRARIES:lib%_plugin.la=%_plugin)
 VLC_PLUGINS = $(VLC_PLUGINS_RENAMED:%.la=)
+VLC_PLUGINS_ALLOWLIST =
 
 # Generate a list containing the name and path of every plugin being built
 # Format: plugin_name: relative/path/to/plugin$(LIBEXT)
+#
 # This allows plugins from SUBDIRS (like Qt) to specify their actual location
 # The recipee concatenates records from local plugins and those from SUBDIRS
+# Build system users can also override VLC_PLUGINS_ALLOWLIST to add noinst
+# plugins to the module list.
 vlc_modules_list: Makefile
 	$(AM_V_GEN)rm -f $@.tmp; \
 	for plugin in $(VLC_PLUGINS); do \
+		case " $(noinst_PLUGINS) " in *" lib$${plugin}.la "*) \
+			case " $(VLC_PLUGINS_ALLOWLIST) " in *" lib$${plugin}.la "*) ;; \
+			*) continue ;; \
+			esac; \
+		esac; \
 		printf "$${plugin}: $(subdir)/.libs/lib$${plugin}$(LIBEXT)\n" >> $@.tmp; \
 	done; \
 	for subdir in $(SUBDIRS); do \

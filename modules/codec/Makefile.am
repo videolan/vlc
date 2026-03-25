@@ -675,7 +675,7 @@ noinst_LTLIBRARIES += libvlc_hxxxhelper.la
 libhxxxhelper_testdec_plugin_la_SOURCES = codec/hxxx_helper_testdec.c
 libhxxxhelper_testdec_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libhxxxhelper_testdec_plugin_la_LIBADD = libvlc_hxxxhelper.la
-noinst_LTLIBRARIES += libhxxxhelper_testdec_plugin.la
+noinst_PLUGINS += libhxxxhelper_testdec_plugin.la
 
 libvlc_vtutils_la_SOURCES = codec/vt_utils.c codec/vt_utils.h codec/vt_utils_native.m
 libvlc_vtutils_la_LDFLAGS = -static -no-undefined

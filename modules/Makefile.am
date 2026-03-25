@@ -1,5 +1,6 @@
 
 noinst_LTLIBRARIES =
+noinst_PLUGINS =
 check_LTLIBRARIES =
 pkglib_LTLIBRARIES =
 noinst_HEADERS =
@@ -126,6 +127,8 @@ SUFFIXES += -client-protocol.h -protocol.c .xml
 .xml-protocol.c:
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code < "$^" > "$@.tmp"
 	$(AM_V_at)mv -f -- "$@.tmp" "$@"
+
+noinst_LTLIBRARIES += $(noinst_PLUGINS)
 
 # Generate vlc_modules_list (local plugins + SUBDIRS)
 include modulelist.mk
