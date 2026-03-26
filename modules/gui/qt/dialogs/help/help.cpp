@@ -362,6 +362,12 @@ QString UpdateModel::getUrl() const
     return qfu( d->m_release->psz_desc );
 }
 
+double UpdateModel::getProgress() const
+{
+    // TODO: Stub
+    return 0.0;
+}
+
 
 
 /*****************************************************************************

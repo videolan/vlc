@@ -94,6 +94,7 @@ public:
     Q_PROPERTY(int extra READ getExtra NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(QString description READ getDescription NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(QString url READ getUrl NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(double progress READ getProgress NOTIFY progressChanged FINAL) // TODO
 
 public:
     explicit UpdateModel(qt_intf_t * p_intf);
@@ -113,9 +114,11 @@ public:
     int getExtra() const;
     QString getDescription() const;
     QString getUrl() const;
+    double getProgress() const;
 
 signals:
     void updateStatusChanged();
+    void progressChanged();
 
 private:
     Q_DECLARE_PRIVATE(UpdateModel)
