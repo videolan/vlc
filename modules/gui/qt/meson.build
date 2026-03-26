@@ -923,6 +923,7 @@ qml_modules += {
         'widgets/qml/VoronoiSnow.qml',
         'widgets/qml/DualKawaseBlur.qml',
         'widgets/qml/CheckBoxExt.qml',
+        'widgets/qml/ProgressBarExt.qml',
     ),
 }
 
