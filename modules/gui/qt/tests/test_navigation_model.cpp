@@ -266,8 +266,8 @@ private slots:
         COMPARE_ROW(i++, "Video", Closed);
         COMPARE_ROW(i++, "Music", Opened);
         {
-            COMPARE_ROW(i++, "Albums", Leaf);
             COMPARE_ROW(i++, "Artists", Leaf);
+            COMPARE_ROW(i++, "Albums", Leaf);
             COMPARE_ROW(i++, "Tracks", Leaf);
             COMPARE_ROW(i++, "Genres", Leaf);
             COMPARE_ROW(i++, "Playlists", Leaf);
@@ -289,8 +289,8 @@ private slots:
         COMPARE_ROW(i++, "Video", Closed);
         COMPARE_ROW(i++, "Music", Opened);
         {
-            COMPARE_ROW(i++, "Albums", Leaf);
             COMPARE_ROW(i++, "Artists", Leaf);
+            COMPARE_ROW(i++, "Albums", Leaf);
             COMPARE_ROW(i++, "Tracks", Leaf);
             COMPARE_ROW(i++, "Genres", Leaf);
             COMPARE_ROW(i++, "Playlists", Leaf);
@@ -309,8 +309,8 @@ private slots:
         COMPARE_ROW(i++, "Video", Closed);
         COMPARE_ROW(i++, "Music", Opened);
         {
-            COMPARE_ROW(i++, "Albums", Leaf);
             COMPARE_ROW(i++, "Artists", Leaf);
+            COMPARE_ROW(i++, "Albums", Leaf);
             COMPARE_ROW(i++, "Tracks", Leaf);
             COMPARE_ROW(i++, "Genres", Leaf);
             COMPARE_ROW(i++, "Playlists", Leaf);
@@ -452,8 +452,8 @@ private slots:
         COMPARE_ROW(i++, "Video", Closed);
         COMPARE_ROW(i++, "Music", Opened);
         {
-            COMPARE_ROW(i++, "Albums", Leaf);
             COMPARE_ROW(i++, "Artists", Leaf);
+            COMPARE_ROW(i++, "Albums", Leaf);
             COMPARE_ROW(i++, "Tracks", Leaf);
             COMPARE_ROW(i++, "Genres", Leaf);
             COMPARE_ROW(i++, "Playlists", Leaf);

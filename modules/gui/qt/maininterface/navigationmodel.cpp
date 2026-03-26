@@ -257,8 +257,8 @@ public:
             m_model.children.push_back(std::move(videoEntry));
 
             ModelEntry musicEntry{ qtr("Music"), "music", VLCIcons::topbar_music };
-            musicEntry.children.emplace_back(qtr("Albums"), "albums");
             musicEntry.children.emplace_back(qtr("Artists"), "artists");
+            musicEntry.children.emplace_back(qtr("Albums"), "albums");
             musicEntry.children.emplace_back(qtr("Tracks"), "tracks");
             musicEntry.children.emplace_back(qtr("Genres"), "genres");
             musicEntry.children.emplace_back(qtr("Playlists"), "playlists");
