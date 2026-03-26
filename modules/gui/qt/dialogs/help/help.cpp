@@ -310,6 +310,15 @@ bool UpdateModel::download()
     return download(dest_dir);
 }
 
+void UpdateModel::resetStatus()
+{
+    Q_D(UpdateModel);
+    if (d->m_status == Unchecked)
+        return;
+    d->m_status = Unchecked;
+    emit updateStatusChanged();
+}
+
 UpdateModel::Status UpdateModel::updateStatus() const
 {
     Q_D(const UpdateModel);

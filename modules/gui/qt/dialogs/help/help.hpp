@@ -86,7 +86,7 @@ public:
     };
     Q_ENUM(Status)
 
-    Q_PROPERTY(Status updateStatus READ updateStatus NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(Status updateStatus READ updateStatus RESET resetStatus NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(int major READ getMajor NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(int minor READ getMinor NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(int revision READ getRevision NOTIFY updateStatusChanged FINAL)
@@ -102,6 +102,8 @@ public:
 
     Q_INVOKABLE bool download(QString destDir);
     Q_INVOKABLE bool download();
+
+    Q_INVOKABLE void resetStatus();
 
     Status updateStatus() const;
     int getMajor() const;
