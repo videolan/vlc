@@ -134,6 +134,10 @@ vlc_fourcc_t GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
             else if( media_type.subtype == MEDIASUBTYPE_YVU9 )
                i_fourcc = VLC_CODEC_I410;
 
+            /* Semi-planar YUV formats */
+            else if( media_type.subtype == MEDIASUBTYPE_NV12 )
+               i_fourcc = VLC_CODEC_NV12;
+
             /* Packed YUV formats */
             else if( media_type.subtype == MEDIASUBTYPE_YVYU )
                i_fourcc = VLC_CODEC_YVYU;
