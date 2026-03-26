@@ -101,6 +101,7 @@ public:
     Q_INVOKABLE void checkUpdate();
 
     Q_INVOKABLE bool download(QString destDir);
+    Q_INVOKABLE bool download();
 
     Status updateStatus() const;
     int getMajor() const;

@@ -298,6 +298,18 @@ bool UpdateModel::download(QString destDir)
     return true;
 }
 
+bool UpdateModel::download()
+{
+    QString dest_dir = QDir::tempPath();
+    if (Q_UNLIKELY(dest_dir.isEmpty()))
+        return false;
+
+    dest_dir = toNativeSepNoSlash( std::move(dest_dir) ) + DIR_SEP;
+    qDebug() << "Downloading to folder:" << qtu( dest_dir );
+
+    return download(dest_dir);
+}
+
 UpdateModel::Status UpdateModel::updateStatus() const
 {
     Q_D(const UpdateModel);
@@ -400,15 +412,8 @@ void UpdateDialog::checkOrDownload()
     }
     case UpdateModel::NeedUpdate:
     {
-        QString dest_dir = QDir::tempPath();
-        if( !dest_dir.isEmpty() )
-        {
-            dest_dir = toNativeSepNoSlash( std::move(dest_dir) ) + DIR_SEP;
-            msg_Dbg( p_intf, "Downloading to folder: %s", qtu( dest_dir ) );
+        if (m_model->download())
             toggleVisible();
-            m_model->download(dest_dir);
-            /* FIXME: We should trigger a change to another dialog here ! */
-        }
         break;
     }
     default: // Checking
