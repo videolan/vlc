@@ -529,7 +529,7 @@ FocusScope {
                 if (stackView.isDefaulLoadedForPath(modelUri.slice(1)))
                     return
 
-                if (!!modelUri.length && History.match(History.viewPath, modelUri)) {
+                if (!!modelUri.length && History.exactMatch(History.viewPath, modelUri)) {
                     stackView.positionContentAtBeginning()
                     return
                 }
