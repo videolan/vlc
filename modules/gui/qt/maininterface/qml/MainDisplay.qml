@@ -269,7 +269,7 @@ FocusScope {
                 // need to use background coloring. It is currently a todo to further reduce video memory
                 // consumption by covering the effect for only the area of interest, currently the blur
                 // effect does not support having an extension area for postprocessing.
-                layer.sourceRect: Qt.rect(0, 0, stackView.width, height + bottomExtension)
+                layer.sourceRect: Qt.rect(0, 0, stackView.width + 1, height + bottomExtension)
 
                 Rectangle {
                     // Extension of parent rectangle for the bottom extension.
