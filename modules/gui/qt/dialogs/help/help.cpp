@@ -192,7 +192,7 @@ public:
 
     update_t* m_update = nullptr;
 
-    update_release_t* m_release = nullptr;
+    const update_release_t* m_release = nullptr;
     UpdateModel::Status m_status = UpdateModel::Unchecked;
 
     UpdateModel* q_ptr = nullptr;
