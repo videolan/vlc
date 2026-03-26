@@ -613,7 +613,7 @@ FocusScope {
 
         height: active ? implicitHeight : 0
 
-        source: "qrc:///qt/qml/VLC/Widgets/ScanProgressBar.qml"
+        source: "qrc:///qt/qml/VLC/MediaLibrary/ScanProgressBar.qml"
 
         onLoaded: {
             item.background.visible = Qt.binding(function() { return !stackViewParent.layer.enabled })

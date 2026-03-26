@@ -1067,7 +1067,8 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/Bookmarks.qml \
 	medialibrary/qml/MLContextMenu.qml \
 	medialibrary/qml/MLDragItem.qml \
-	medialibrary/qml/MLTableColumns.qml
+	medialibrary/qml/MLTableColumns.qml \
+	medialibrary/qml/ScanProgressBar.qml
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary_qmlassets.cpp
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : $(builddir)/medialibrary/res.qrc
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/medialibrary/res.qrc
@@ -1296,7 +1297,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/PlayCover.qml \
 	widgets/qml/RoundButtonExt.qml \
 	widgets/qml/ScaledImage.qml \
-	widgets/qml/ScanProgressBar.qml \
 	widgets/qml/TextAutoScroller.qml \
 	widgets/qml/SearchBox.qml \
 	widgets/qml/SliderExt.qml \

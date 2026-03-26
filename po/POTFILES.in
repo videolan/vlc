@@ -806,6 +806,7 @@ modules/gui/qt/medialibrary/qml/VideoPlaylistsDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoGridDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumSectionDelegate.qml
 modules/gui/qt/medialibrary/qml/MLContextMenu.qml
+modules/gui/qt/medialibrary/qml/ScanProgressBar.qml
 modules/gui/qt/menus/custom_menus.cpp
 modules/gui/qt/menus/custom_menus.hpp
 modules/gui/qt/menus/menus.cpp
@@ -913,7 +914,6 @@ modules/gui/qt/widgets/native/qvlcframe.hpp
 modules/gui/qt/widgets/native/searchlineedit.cpp
 modules/gui/qt/widgets/native/searchlineedit.hpp
 modules/gui/qt/widgets/qml/DragItem.qml
-modules/gui/qt/widgets/qml/ScanProgressBar.qml
 modules/gui/qt/widgets/qml/SearchBox.qml
 modules/gui/qt/widgets/qml/SortControl.qml
 modules/gui/qt/widgets/qml/TableColumns.qml

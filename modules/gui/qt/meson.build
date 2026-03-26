@@ -668,6 +668,7 @@ qml_modules += {
         'medialibrary/qml/MLContextMenu.qml',
         'medialibrary/qml/MLDragItem.qml',
         'medialibrary/qml/MLTableColumns.qml',
+        'medialibrary/qml/ScanProgressBar.qml',
     ),
 }
 
@@ -887,7 +888,6 @@ qml_modules += {
         'widgets/qml/PlayCover.qml',
         'widgets/qml/RoundButtonExt.qml',
         'widgets/qml/ScaledImage.qml',
-        'widgets/qml/ScanProgressBar.qml',
         'widgets/qml/TextAutoScroller.qml',
         'widgets/qml/SearchBox.qml',
         'widgets/qml/SliderExt.qml',
