@@ -104,7 +104,11 @@ T.Pane {
                     iconTxt: model.icon
                     text: model.title
 
-                    checked: !model.expanded && !!model.uri && History.match(History.viewPath, model.uri)
+                    Binding on highlighted {
+                        when: !!model.uri && History.match(History.viewPath, model.uri)
+                        value: true
+                    }
+                    checked: !model.expanded && highlighted
 
                     onClicked: {
                         itemClicked(model.uri)

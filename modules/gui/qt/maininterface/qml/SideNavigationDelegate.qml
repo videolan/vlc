@@ -103,9 +103,7 @@ T.ItemDelegate {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                color: (control.checked || control.activeFocus || control.hovered)
-                                    ? theme.accent
-                                    : theme.fg.primary
+                color: control.highlighted ? theme.accent : theme.fg.primary
 
                 font.pixelSize: VLCStyle.icon_banner
             }
@@ -127,10 +125,7 @@ T.ItemDelegate {
 
             font.pixelSize: VLCStyle.fontSize_normal
 
-            font.weight: (control.activeFocus ||
-                          control.hovered     ||
-                          control.checked) ? Font.DemiBold
-                                            : Font.Normal
+            font.weight: control.checked ? Font.DemiBold : Font.Normal
 
             //button text is already exposed
             Accessible.ignored: true
