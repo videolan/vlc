@@ -1791,11 +1791,12 @@ static bool CheckAndResync( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     const uint8_t *p_peek;
-    if( vlc_stream_Peek( p_sys->stream, &p_peek, 1 ) != 1 )
+    if( vlc_stream_Peek( p_sys->stream, &p_peek, 1 + p_sys->i_packet_header_size )
+            != 1 + p_sys->i_packet_header_size )
         return true;
 
     /* Check sync byte and re-sync if needed */
-    if( p_peek[0] == 0x47 )
+    if( p_peek[p_sys->i_packet_header_size] == 0x47 )
         return true;
 
     msg_Warn( p_demux, "lost synchro at %" PRIu64, vlc_stream_Tell( p_sys->stream ) );
