@@ -1019,14 +1019,9 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg , cons
 
 }
 
-void intf_sys_t::processConnectionMessage( const castchannel::CastMessage& msg , const struct json_object *entry )
+void intf_sys_t::processConnectionMessage( const castchannel::CastMessage& , const struct json_object *entry )
 {
-    const struct json_value *value = json_get(entry, msg.payload_utf8().c_str());
-    if (!value) {
-        msg_Err(m_module, "connection message: bad payload");
-        return;
-    }
-    std::string type = json_get_str(&value->object, "type");
+    std::string type = json_get_str(entry, "type");
 
     if ( type == "CLOSE" )
     {
