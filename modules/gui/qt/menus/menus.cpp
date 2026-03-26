@@ -39,6 +39,7 @@
 
 #include "maininterface/mainctx.hpp"                     /* View modifications */
 #include "dialogs/dialogs_provider.hpp"                   /* Dialogs display */
+#include "dialogs/help/help.hpp"
 #include "player/player_controller.hpp"                      /* Input Management */
 #include "playlist/playlist_controller.hpp"
 #include "dialogs/extensions/extensions_manager.hpp"                 /* Extensions menu */
@@ -548,13 +549,20 @@ void VLCMenuBar::RebuildNavigMenu( qt_intf_t *p_intf, QMenu *menu )
 /**
  * Help/About Menu
 **/
-void VLCMenuBar::HelpMenu( QMenu *menu )
+void VLCMenuBar::HelpMenu(qt_intf_t *p_intf, QMenu *menu )
 {
     addDPStaticEntry( menu, qtr( "&Help" ) ,
         ":/menu/help.svg", &DialogsProvider::helpDialog, "F1" );
 #ifdef UPDATE_CHECK
     addDPStaticEntry( menu, qtr( "Check for &Updates..." ) , "",
-                      &DialogsProvider::updateDialog);
+                     [ctx = QPointer(p_intf->p_mi)]() {
+        if (Q_LIKELY(ctx))
+        {
+            const auto updateModel = ctx->getUpdateModel();
+            assert(updateModel);
+            updateModel->checkUpdate();
+        }
+    });
 #endif
     menu->addSeparator();
     addDPStaticEntry( menu, qfut( I_MENU_ABOUT ), ":/menu/info.svg",
@@ -849,7 +857,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         menu->addSeparator();
 
         QMenu* helpmenu = new QMenu( qtr( "Help" ), menu );
-        HelpMenu( helpmenu );
+        HelpMenu( p_intf, helpmenu );
         menu->addMenu( helpmenu );
 
         addDPStaticEntry( menu, qtr( "Quit" ), ":/menu/exit.svg",

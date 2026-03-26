@@ -286,7 +286,7 @@ void QmlGlobalMenu::popup(QPoint pos)
     ViewMenu( p_intf, submenu );
 
     submenu = m_menu->addMenu(qtr( "&Help" ));
-    HelpMenu(submenu);
+    HelpMenu( p_intf, submenu );
 
     m_menu->popup(pos);
 }
@@ -410,7 +410,7 @@ void QmlMenuBar::setupMenuEntry(QMenu* menu, MenuEntry entry)
         ViewMenu( p_intf, menu );
         break;
     case HELP:
-        HelpMenu( menu );
+        HelpMenu( p_intf, menu );
         break;
     default:
         vlc_assert_unreachable();
@@ -478,8 +478,9 @@ void QmlMenuBar::popupViewMenu(QQuickItem* button )
 
 void QmlMenuBar::popupHelpMenu( QQuickItem* button )
 {
-    popupMenuCommon(button, [](QMenu* menu) {
-        HelpMenu(menu);
+    popupMenuCommon(button, [this](QMenu* menu) {
+        qt_intf_t* p_intf = m_ctx->getIntf();
+        HelpMenu( p_intf, menu );
     });
 }
 

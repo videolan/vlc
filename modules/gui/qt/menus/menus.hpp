@@ -94,7 +94,7 @@ public:
 
     static void AudioMenu( qt_intf_t *, QMenu * );
 
-    static void HelpMenu( QMenu *menu );
+    static void HelpMenu( qt_intf_t *, QMenu *menu );
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );
