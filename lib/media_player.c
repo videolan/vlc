@@ -511,6 +511,19 @@ on_vout_changed(vlc_player_t *player, enum vlc_player_vout_action action,
     mp->cbs->on_vout_changed(mp->cbs_opaque, count);
 }
 
+static void
+on_next_frame_status(vlc_player_t *player, int status, void *data)
+{
+    (void) player;
+
+    libvlc_media_player_t *mp = data;
+
+    if (mp->cbs == NULL || mp->cbs->on_next_frame_status == NULL)
+        return;
+
+    mp->cbs->on_next_frame_status(mp->cbs_opaque, status);
+}
+
 // player aout callbacks
 
 static void
@@ -574,6 +587,7 @@ static const struct vlc_player_cbs vlc_player_cbs = {
     .on_vout_changed = on_vout_changed,
     .on_recording_changed = on_recording_changed,
     .on_stopping_current_media = on_stopping_current_media,
+    .on_next_frame_status = on_next_frame_status,
 };
 
 static const struct vlc_player_aout_cbs vlc_player_aout_cbs = {

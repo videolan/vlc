@@ -523,6 +523,26 @@ struct libvlc_media_player_cbs
                                         libvlc_picture_list_t *list );
 
     /**
+     * Callback prototype that notify when the next frame, following a call to
+     * `libvlc_media_player_next_frame()`, is about to displayed.
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \see libvlc_media_player_next_frame()
+     *
+     * \note This callback is sent just before the frame is sent to the video
+     * output, use libvlc_media_player_watch_time() if you need to know exactly
+     * when the frame is displayed.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param status 0 in case of success, -EAGAIN on first call (paused),
+     * -EBUSY in case of video error, -ENOTSUP if can't pause,
+     * -EINVAL in case of invalid state
+     */
+    void (*on_next_frame_status)( void *opaque, int status );
+
+    /**
      * Callback prototype that notify when a new player vout is added or removed
      *
      * \note Optional (can be NULL),
@@ -1996,9 +2016,17 @@ LIBVLC_API bool libvlc_media_player_can_pause(libvlc_media_player_t *p_mi);
 LIBVLC_API bool libvlc_media_player_program_scrambled( libvlc_media_player_t *p_mi );
 
 /**
- * Display the next frame (if supported)
+ * Pause and display the next video frame.
+ *
+ * \note The player must be playing or paused. If playing, the player will be
+ * paused first.
+ *
+ * \note The user should listen to the
+ * libvlc_media_player_cbs.on_next_frame_status callback, to be notified when
+ * the next frame is displayed.
  *
  * \param p_mi the media player
+ * \version LibVLC 1.1.1 or later
  */
 LIBVLC_API void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi );
 
