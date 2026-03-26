@@ -20,133 +20,32 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Templates as T
 
+import VLC.Widgets
 import VLC.MediaLibrary
-
 import VLC.Style
 
-T.ProgressBar {
+ProgressBarExt {
     id: control
-
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            implicitContentWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             implicitContentHeight + topPadding + bottomPadding)
-
-    horizontalPadding: VLCStyle.margin_large
-    verticalPadding: VLCStyle.margin_small
-
-    from: 0
-    to: 100
 
     value: MediaLib.parsingProgress
 
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.Window
-    }
-
     indeterminate: MediaLib.discoveryPending
 
-    background: Rectangle {
-        color: theme.bg.primary
-    }
+    SubtitleLabel {
+        parent: control.contentItem
 
-    contentItem: Column {
+        anchors.left: parent.left
+        anchors.right: parent.right
 
-        spacing: VLCStyle.margin_small
+        text: (MediaLib.discoveryPending) ? qsTr("Scanning %1")
+                                            .arg(MediaLib.discoveryEntryPoint)
+                                          : qsTr("Indexing Medias (%1%)")
+                                            .arg(MediaLib.parsingProgress)
 
-        Item {
-            anchors.left: parent.left
-            anchors.right: parent.right
+        elide: Text.ElideMiddle
 
-            implicitHeight: VLCStyle.heightBar_xxsmall
-            implicitWidth: 200
-
-            ColorContext {
-                id: progressBarTheme
-                colorSet: ColorContext.Slider
-            }
-
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-
-                implicitHeight: VLCStyle.heightBar_xxxsmall
-
-                color: progressBarTheme.bg.primary
-            }
-
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-
-                implicitWidth: parent.width * control.visualPosition
-                implicitHeight: VLCStyle.heightBar_xxsmall
-
-                // NOTE: We want round corners.
-                radius: height / 2
-
-                visible: !control.indeterminate
-
-
-                color: progressBarTheme.accent
-            }
-
-            Rectangle {
-                property real position: 0
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                // NOTE: Why 0.24 though ?
-                implicitWidth: parent.width * 0.24
-                implicitHeight: VLCStyle.heightBar_xxsmall
-
-                x: Math.round((parent.width - width) * position)
-
-                // NOTE: We want round corners.
-                radius: height / 2
-                visible: control.indeterminate
-
-                color: progressBarTheme.accent
-
-                SequentialAnimation on position {
-                    loops: Animation.Infinite
-
-                    running: visible
-
-                    NumberAnimation {
-                        from: 0
-                        to: 1.0
-
-                        duration: VLCStyle.durationSliderBouncing
-                        easing.type: Easing.OutBounce
-                    }
-
-                    NumberAnimation {
-                        from: 1.0
-                        to: 0
-
-                        duration: VLCStyle.durationSliderBouncing
-                        easing.type: Easing.OutBounce
-                    }
-                }
-            }
-        }
-
-        SubtitleLabel {
-            anchors.left: parent.left
-            anchors.right: parent.right
-
-            text: (MediaLib.discoveryPending) ? qsTr("Scanning %1")
-                                                .arg(MediaLib.discoveryEntryPoint)
-                                              : qsTr("Indexing Medias (%1%)")
-                                                .arg(MediaLib.parsingProgress)
-
-            elide: Text.ElideMiddle
-
-            font.pixelSize: VLCStyle.fontSize_large
-            font.weight: Font.Normal
-            color: theme.fg.primary
-        }
+        font.pixelSize: VLCStyle.fontSize_large
+        font.weight: Font.Normal
+        color: theme.fg.primary
     }
 }
