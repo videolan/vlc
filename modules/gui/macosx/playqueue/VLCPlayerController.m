@@ -510,11 +510,20 @@ static void cb_player_timer_paused(const vlc_tick_t system_date, void * const p_
     });
 }
 
-static void cb_player_timer_seeked(const struct vlc_player_timer_point * const __unused p_value, void * const p_data)
+static void cb_player_timer_seeked(const struct vlc_player_timer_point * const p_value, void * const p_data)
 {
+    if (p_value == NULL) {
+        return; // NULL means seeking just finished; nothing to update here
+    }
     VLCPlayerController * const playerController = (__bridge VLCPlayerController *)p_data;
+    const struct vlc_player_timer_point value_copy = *p_value;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [playerController updatePosition];
+        playerController.playerTime = value_copy;
+        const vlc_tick_t system_now = vlc_tick_now();
+        if ([playerController interpolateTime:system_now] == VLC_SUCCESS) {
+            [playerController updatePosition];
+            [playerController updateTime:system_now forceUpdate:NO];
+        }
     });
 }
 
