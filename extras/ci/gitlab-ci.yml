@@ -362,9 +362,6 @@ nightly-debian:
     allow_failure: true
     variables: *variables-snap
 
-snap:
-    extends: .snap-common
-
 nightly-snap:
     extends: .snap-common
     only:
