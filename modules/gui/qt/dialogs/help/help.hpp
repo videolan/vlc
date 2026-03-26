@@ -82,7 +82,8 @@ public:
         Checking,
         UpToDate,
         NeedUpdate,
-        CheckFailed
+        CheckFailed,
+        Downloading // TODO
     };
     Q_ENUM(Status)
 
