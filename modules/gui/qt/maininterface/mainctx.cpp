@@ -284,7 +284,36 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
                     break;
                 case UpdateModel::NeedUpdate:
                     qWarning() << "Need Udpate";
-                    THEDP->updateDialog();
+
+                    // No-op, modern update pane opens itself automatically when status changes.
+                    // However, the old update dialog is used as fallback in case for any reason
+                    // the modern pane is not available.
+
+                    {
+                        // Fallback:
+
+                        if (Q_LIKELY(p_intf &&
+                                     p_intf->p_compositor &&
+                                     p_intf->p_compositor->quickWindow() &&
+                                     p_intf->p_compositor->quickWindow()->contentItem()))
+                        {
+                            const auto target = p_intf->p_compositor->quickWindow()->contentItem();
+                            QMetaObject::invokeMethod(target, [target]() {
+                                const auto updatePaneLoader = target->findChild<QQuickItem*>(QStringLiteral("updatePaneLoader"));
+                                if (!updatePaneLoader || (updatePaneLoader->property("status").toInt() != 1 /* Loader.Ready */))
+                                {
+                                    qDebug("No acknowledgement from the modern update loader, falling back to the old update dialog.");
+                                    THEDP->updateDialog();
+                                }
+                            }, Qt::QueuedConnection);
+                        }
+                        else
+                        {
+                            qDebug("Compositor is not available, falling back to the old update dialog.");
+                            THEDP->updateDialog();
+                        }
+                    }
+
                     [[fallthrough]];
                 case UpdateModel::UpToDate:
                 case UpdateModel::CheckFailed:
