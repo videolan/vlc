@@ -46,6 +46,12 @@
 
 #include <cassert>
 
+#ifndef NDEBUG
+// Uncomment the following line to make use a mock update for debugging purposes,
+// it is only applicable when there is no new release found:
+// #define UPDATE_MOCK
+#endif
+
 HelpDialog::HelpDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
 
 {
@@ -212,8 +218,42 @@ static void UpdateCallback(void *data, bool b_ret)
             bool needUpdate = update_NeedUpgrade( that->m_update );
             if (!needUpdate)
             {
-                that->m_status = UpdateModel::UpToDate;
-                that->m_release = nullptr;
+#if defined(UPDATE_MOCK) && !defined(NDEBUG)
+               static const update_release_t updateReleaseMock = {
+                   9,
+                   0,
+                   99,
+                   999,
+                   "",
+                   // Lorem ipsum with some "Security" to see if red coloring works:
+                   "Lorem ipsum dolor sit amet, security consectetur adipiscing elit. Sed vitae ante lobortis," \
+                   "condimentum sem et, auctor libero. Aliquam eget mi justo. <br /> <br /> Class aptent taciti sociosqu" \
+                   "ad litora Security torquent per conubia nostra, per inceptos himenaeos. Nulla id pretium ante. Nam" \
+                   "eu blandit lacus. Proin faucibus in risus quis condimentum. <br /> <br /> Pellentesque a tellus vitae" \
+                   "massa tristique cursus. Phasellus fermentum euismod mauris, at ultricies ipsum volutpat eu." \
+                   "Praesent arcu lacus, laoreet at lacinia quis, rhoncus at lectus. " \
+                   // Repeat:
+                   "Lorem ipsum dolor sit amet, security consectetur adipiscing elit. Sed vitae ante lobortis," \
+                   "condimentum sem et, auctor libero. Aliquam eget mi justo. <br /> <br /> Class aptent taciti sociosqu" \
+                   "ad litora Security torquent per conubia nostra, per inceptos himenaeos. Nulla id pretium ante. Nam" \
+                   "eu blandit lacus. Proin faucibus in risus quis condimentum. <br /> <br /> Pellentesque a tellus vitae" \
+                   "massa tristique cursus. Phasellus fermentum euismod mauris, at ultricies ipsum volutpat eu." \
+                   "Praesent arcu lacus, laoreet at lacinia quis, rhoncus at lectus. " \
+                   // Repeat:
+                   "Lorem ipsum dolor sit amet, security consectetur adipiscing elit. Sed vitae ante lobortis," \
+                   "condimentum sem et, auctor libero. Aliquam eget mi justo. <br /> <br /> Class aptent taciti sociosqu" \
+                   "ad litora Security torquent per conubia nostra, per inceptos himenaeos. Nulla id pretium ante. Nam" \
+                   "eu blandit lacus. Proin faucibus in risus quis condimentum. <br /> <br /> Pellentesque a tellus vitae" \
+                   "massa tristique cursus. Phasellus fermentum euismod mauris, at ultricies ipsum volutpat eu." \
+                   "Praesent arcu lacus, laoreet at lacinia quis, rhoncus at lectus. " \
+               };
+
+               that->m_release = &updateReleaseMock;
+               that->m_status = UpdateModel::NeedUpdate;
+#else
+               that->m_status = UpdateModel::UpToDate;
+               that->m_release = nullptr;
+#endif
             }
             else
             {
