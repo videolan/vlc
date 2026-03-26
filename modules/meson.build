@@ -377,7 +377,7 @@ endif
 # This has to be declared here as it needs to end up
 # in the modules folder, not in gui/qt/ subfolder as
 # vlc-static would not find it there.
-if qt6_dep.found()
+if get_option('qt').allowed() and qt6_dep.found()
     executable('vlc-qt-check',
         files('gui/qt/vlc-qt-check.cpp'),
         dependencies: [qt6_dep, qt_extra_deps],
