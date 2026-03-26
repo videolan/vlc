@@ -1022,6 +1022,11 @@ libqml_module_maininterface_a_QML = \
 	maininterface/qml/MainViewLoader.qml \
 	maininterface/qml/MainDisplay.qml \
 	maininterface/qml/NoMedialibHome.qml
+
+if UPDATE_CHECK
+libqml_module_maininterface_a_QML += maininterface/qml/UpdatePane.qml
+endif
+
 nodist_libqml_module_maininterface_a_SOURCES = maininterface_qmlassets.cpp
 $(libqml_module_maininterface_a_QML:.qml=.cpp) : $(builddir)/maininterface/res.qrc
 $(libqml_module_maininterface_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/maininterface/res.qrc

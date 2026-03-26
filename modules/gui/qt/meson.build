@@ -612,6 +612,13 @@ qml_modules += {
     ),
 }
 
+qml_maininterface_extra_files = []
+
+if get_option('update-check').allowed() and gcrypt_dep.found()
+    qt_extra_flags += '-DUPDATE_CHECK'
+    qml_maininterface_extra_files += 'maininterface/qml/UpdatePane.qml'
+endif
+
 qml_modules += {
     'name' : 'VLC.MainInterface',
     'target' : 'maininterface',
@@ -621,7 +628,8 @@ qml_modules += {
         'maininterface/qml/MainInterface.qml',
         'maininterface/qml/MainViewLoader.qml',
         'maininterface/qml/MainDisplay.qml',
-        'maininterface/qml/NoMedialibHome.qml'
+        'maininterface/qml/NoMedialibHome.qml',
+        qml_maininterface_extra_files,
     ),
 }
 qml_modules += {
@@ -1218,11 +1226,6 @@ if qt6_dep.found()
             }
         endif
     endif
-
-    if get_option('update-check').allowed() and gcrypt_dep.found()
-        qt_extra_flags += '-DUPDATE_CHECK'
-    endif
-
 
     vlc_modules += {
         'name' : 'qt_x11',
