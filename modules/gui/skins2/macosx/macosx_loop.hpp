@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,11 +50,7 @@ private:
     MacOSXLoop( intf_thread_t *pIntf );
     virtual ~MacOSXLoop();
 
-    /// Flag to exit the loop
     bool m_exit;
-
-    /// Screen height for coordinate conversion
-    int m_screenHeight;
 
     /// Date and position of the last left-click
     vlc_tick_t m_lastClickTime;

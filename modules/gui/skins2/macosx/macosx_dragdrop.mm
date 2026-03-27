@@ -84,17 +84,19 @@
 
         // Convert to C strings
         int count = (int)[paths count];
-        const char **files = (const char **)malloc( count * sizeof(char*) );
+        char **files = (char **)malloc( count * sizeof(char*) );
         for( int i = 0; i < count; i++ )
         {
-            files[i] = [[paths objectAtIndex:i] UTF8String];
+            files[i] = strdup( [[paths objectAtIndex:i] UTF8String] );
         }
 
         if( m_pHandler )
         {
-            m_pHandler->handleDrop( files, count );
+            m_pHandler->handleDrop( (const char **)files, count );
         }
 
+        for( int i = 0; i < count; i++ )
+            free( files[i] );
         free( files );
         return YES;
     }
@@ -104,18 +106,20 @@
     if( urls && [urls count] > 0 )
     {
         int count = (int)[urls count];
-        const char **files = (const char **)malloc( count * sizeof(char*) );
+        char **files = (char **)malloc( count * sizeof(char*) );
         for( int i = 0; i < count; i++ )
         {
             NSURL *url = [urls objectAtIndex:i];
-            files[i] = [[url absoluteString] UTF8String];
+            files[i] = strdup( [[url absoluteString] UTF8String] );
         }
 
         if( m_pHandler )
         {
-            m_pHandler->handleDrop( files, count );
+            m_pHandler->handleDrop( (const char **)files, count );
         }
 
+        for( int i = 0; i < count; i++ )
+            free( files[i] );
         free( files );
         return YES;
     }

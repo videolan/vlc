@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,15 +28,42 @@
 #import <Cocoa/Cocoa.h>
 
 #include "macosx_popup.hpp"
+#include "macosx_factory.hpp"
+#include "../events/evt_menu.hpp"
+#include "../src/os_factory.hpp"
+#include "../src/generic_window.hpp"
+
+@interface VLCPopupMenuTarget : NSObject
+{
+    int m_selectedTag;
+}
+@property (nonatomic) int selectedTag;
+- (void)menuItemSelected:(id)sender;
+@end
+
+@implementation VLCPopupMenuTarget
+@synthesize selectedTag = m_selectedTag;
+
+- (instancetype)init
+{
+    self = [super init];
+    if( self )
+        m_selectedTag = -1;
+    return self;
+}
+
+- (void)menuItemSelected:(id)sender
+{
+    m_selectedTag = [sender tag];
+}
+
+@end
 
 
 MacOSXPopup::MacOSXPopup( intf_thread_t *pIntf ):
     OSPopup( pIntf ), m_pMenu( nil )
 {
     @autoreleasepool {
-        NSScreen *mainScreen = [NSScreen mainScreen];
-        m_screenHeight = (int)[mainScreen frame].size.height;
-
         // Create the menu
         m_pMenu = [[NSMenu alloc] initWithTitle:@""];
         [m_pMenu setAutoenablesItems:NO];
@@ -58,7 +86,7 @@ void MacOSXPopup::show( int xPos, int yPos )
             return;
 
         // Convert coordinates
-        int y = m_screenHeight - yPos;
+        int y = [NSScreen mainScreen].frame.size.height - yPos;
 
         // Show the popup menu
         NSPoint location = NSMakePoint( xPos, y );

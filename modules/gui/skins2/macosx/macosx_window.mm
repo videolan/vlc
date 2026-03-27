@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +30,9 @@
 #include "macosx_window.hpp"
 #include "macosx_dragdrop.hpp"
 #include "macosx_factory.hpp"
+#include "macosx_graphics.hpp"
 #include "../src/os_factory.hpp"
+#include "../events/evt_focus.hpp"
 
 // Forward declaration of the window delegate protocol handler
 @class VLCSkinsWindowDelegate;
@@ -39,6 +42,7 @@
 {
     MacOSXWindow *m_pOwner;
     VLCSkinsWindowDelegate *m_delegate;
+    const MacOSXGraphics *m_pHitTestGraphics;
 }
 - (instancetype)initWithOwner:(MacOSXWindow *)owner
                   contentRect:(NSRect)contentRect
@@ -46,6 +50,7 @@
                       backing:(NSBackingStoreType)backingStoreType
                         defer:(BOOL)flag;
 - (MacOSXWindow *)owner;
+- (void)setHitTestGraphics:(const MacOSXGraphics *)pGraphics;
 @end
 
 @interface VLCSkinsWindowDelegate : NSObject <NSWindowDelegate>
@@ -53,6 +58,52 @@
     MacOSXWindow *m_pOwner;
 }
 - (instancetype)initWithOwner:(MacOSXWindow *)owner;
+@end
+
+@interface VLCSkinsContentView : NSImageView
+{
+    const MacOSXGraphics *m_pGraphics;
+    NSTrackingArea *m_trackingArea;
+}
+- (void)setHitTestGraphics:(const MacOSXGraphics *)pGraphics;
+@end
+
+@implementation VLCSkinsContentView
+
+- (void)setHitTestGraphics:(const MacOSXGraphics *)pGraphics
+{
+    m_pGraphics = pGraphics;
+}
+
+- (void)updateTrackingAreas
+{
+    [super updateTrackingAreas];
+    if( m_trackingArea )
+        [self removeTrackingArea:m_trackingArea];
+
+    m_trackingArea = [[NSTrackingArea alloc]
+        initWithRect:[self bounds]
+             options:NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved |
+                     NSTrackingActiveAlways | NSTrackingInVisibleRect
+               owner:[self window]
+            userInfo:nil];
+    [self addTrackingArea:m_trackingArea];
+}
+
+- (NSView *)hitTest:(NSPoint)point
+{
+    if( m_pGraphics )
+    {
+        NSPoint local = [self convertPoint:point fromView:[self superview]];
+        int x = local.x;
+        int y = [self bounds].size.height - local.y;
+
+        if( !m_pGraphics->hit( x, y ) )
+            return nil;
+    }
+    return [super hitTest:point];
+}
+
 @end
 
 @implementation VLCSkinsWindowDelegate
@@ -69,12 +120,20 @@
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
 {
-    // Window became active
+    if( m_pOwner )
+    {
+        EvtFocus evt( m_pOwner->getIntf(), true );
+        m_pOwner->getGenericWindow().processEvent( evt );
+    }
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
 {
-    // Window became inactive
+    if( m_pOwner )
+    {
+        EvtFocus evt( m_pOwner->getIntf(), false );
+        m_pOwner->getGenericWindow().processEvent( evt );
+    }
 }
 
 - (BOOL)windowShouldClose:(NSWindow *)sender
@@ -107,13 +166,14 @@
         [self setOpaque:NO];
         [self setBackgroundColor:[NSColor clearColor]];
         [self setHasShadow:YES];
-        [self setMovableByWindowBackground:YES];
         [self setAcceptsMouseMovedEvents:YES];
 
         // Create content view
-        NSImageView *imageView = [[NSImageView alloc] initWithFrame:contentRect];
-        [imageView setImageScaling:NSImageScaleNone];
-        [self setContentView:imageView];
+        NSRect bounds = NSMakeRect( 0, 0, contentRect.size.width, contentRect.size.height );
+        VLCSkinsContentView *contentView = [[VLCSkinsContentView alloc] initWithFrame:bounds];
+        [contentView setImageScaling:NSImageScaleNone];
+        [self setContentView:contentView];
+        m_pHitTestGraphics = NULL;
     }
     return self;
 }
@@ -121,6 +181,13 @@
 - (MacOSXWindow *)owner
 {
     return m_pOwner;
+}
+
+- (void)setHitTestGraphics:(const MacOSXGraphics *)pGraphics
+{
+    m_pHitTestGraphics = pGraphics;
+    VLCSkinsContentView *view = (VLCSkinsContentView *)[self contentView];
+    [view setHitTestGraphics:pGraphics];
 }
 
 - (BOOL)canBecomeKeyWindow
@@ -150,10 +217,6 @@ MacOSXWindow::MacOSXWindow( intf_thread_t *pIntf, GenericWindow &rWindow,
     m_pParent( pParentWindow ), m_type( type ), m_pDropTarget( NULL )
 {
     @autoreleasepool {
-        // Get screen height for coordinate conversion
-        NSScreen *mainScreen = [NSScreen mainScreen];
-        m_screenHeight = (int)[mainScreen frame].size.height;
-
         // Determine window style
         NSWindowStyleMask styleMask;
         NSRect contentRect = NSMakeRect( 0, 0, 100, 100 );
@@ -272,7 +335,7 @@ void MacOSXWindow::moveResize( int left, int top, int width, int height ) const
         {
             // Convert from skins coordinates (origin top-left)
             // to Cocoa coordinates (origin bottom-left)
-            NSRect frame = NSMakeRect( left, m_screenHeight - top - height,
+            NSRect frame = NSMakeRect( left, [NSScreen mainScreen].frame.size.height - top - height,
                                        width, height );
             [m_pWindow setFrame:frame display:YES];
         }

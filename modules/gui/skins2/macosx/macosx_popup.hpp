@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,8 +61,6 @@ private:
     NSMenu *m_pMenu;
     /// Map of item IDs to positions
     std::map<int, int> m_idPosMap;
-    /// Screen height for coordinate conversion
-    int m_screenHeight;
 };
 
 #endif

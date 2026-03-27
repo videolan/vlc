@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,12 +81,6 @@ MacOSXFactory::~MacOSXFactory()
 bool MacOSXFactory::init()
 {
     @autoreleasepool {
-        // Get screen dimensions
-        NSScreen *mainScreen = [NSScreen mainScreen];
-        NSRect frame = [mainScreen frame];
-        m_screenWidth = (int)frame.size.width;
-        m_screenHeight = (int)frame.size.height;
-
         // Create timer loop
         m_pTimerLoop = new MacOSXTimerLoop( getIntf() );
 
@@ -202,13 +197,17 @@ OSPopup *MacOSXFactory::createOSPopup()
 
 int MacOSXFactory::getScreenWidth() const
 {
-    return m_screenWidth;
+    @autoreleasepool {
+        return [NSScreen mainScreen].frame.size.width;
+    }
 }
 
 
 int MacOSXFactory::getScreenHeight() const
 {
-    return m_screenHeight;
+    @autoreleasepool {
+        return [NSScreen mainScreen].frame.size.height;
+    }
 }
 
 
@@ -225,10 +224,10 @@ void MacOSXFactory::getMonitorInfo( OSWindow *pWindow,
             screen = [NSScreen mainScreen];
 
         NSRect frame = [screen frame];
-        *x = (int)frame.origin.x;
-        *y = (int)(m_screenHeight - frame.origin.y - frame.size.height);
-        *width = (int)frame.size.width;
-        *height = (int)frame.size.height;
+        *x = frame.origin.x;
+        *y = [NSScreen mainScreen].frame.size.height - frame.origin.y - frame.size.height;
+        *width = frame.size.width;
+        *height = frame.size.height;
     }
 }
 
@@ -247,10 +246,10 @@ void MacOSXFactory::getMonitorInfo( int numScreen,
             screen = [NSScreen mainScreen];
 
         NSRect frame = [screen frame];
-        *x = (int)frame.origin.x;
-        *y = (int)(m_screenHeight - frame.origin.y - frame.size.height);
-        *width = (int)frame.size.width;
-        *height = (int)frame.size.height;
+        *x = frame.origin.x;
+        *y = [NSScreen mainScreen].frame.size.height - frame.origin.y - frame.size.height;
+        *width = frame.size.width;
+        *height = frame.size.height;
     }
 }
 
@@ -264,10 +263,10 @@ SkinsRect MacOSXFactory::getWorkArea() const
 
         // Convert from Cocoa coordinates (origin at bottom-left)
         // to skin coordinates (origin at top-left)
-        int x = (int)visibleFrame.origin.x;
-        int y = (int)(fullFrame.size.height - visibleFrame.origin.y - visibleFrame.size.height);
-        int w = (int)visibleFrame.size.width;
-        int h = (int)visibleFrame.size.height;
+        int x = visibleFrame.origin.x;
+        int y = fullFrame.size.height - visibleFrame.origin.y - visibleFrame.size.height;
+        int w = visibleFrame.size.width;
+        int h = visibleFrame.size.height;
 
         return SkinsRect( x, y, x + w, y + h );
     }
@@ -278,9 +277,9 @@ void MacOSXFactory::getMousePos( int &rXPos, int &rYPos ) const
 {
     @autoreleasepool {
         NSPoint mouseLocation = [NSEvent mouseLocation];
-        rXPos = (int)mouseLocation.x;
+        rXPos = mouseLocation.x;
         // Convert from Cocoa coordinates
-        rYPos = (int)(m_screenHeight - mouseLocation.y);
+        rYPos = [NSScreen mainScreen].frame.size.height - mouseLocation.y;
     }
 }
 
@@ -288,6 +287,7 @@ void MacOSXFactory::getMousePos( int &rXPos, int &rYPos ) const
 void MacOSXFactory::changeCursor( CursorType_t type ) const
 {
     @autoreleasepool {
+        static bool cursorHidden = false;
         NSCursor *cursor = nil;
 
         switch( type )
@@ -309,14 +309,22 @@ void MacOSXFactory::changeCursor( CursorType_t type ) const
                 cursor = [NSCursor crosshairCursor];
                 break;
             case kNoCursor:
-                [NSCursor hide];
+                if( !cursorHidden )
+                {
+                    [NSCursor hide];
+                    cursorHidden = true;
+                }
                 return;
             default:
                 cursor = [NSCursor arrowCursor];
                 break;
         }
 
-        [NSCursor unhide];
+        if( cursorHidden )
+        {
+            [NSCursor unhide];
+            cursorHidden = false;
+        }
         [cursor set];
     }
 }

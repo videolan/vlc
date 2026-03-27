@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +44,6 @@ public:
 private:
     /// Tooltip window
     NSWindow *m_pWindow;
-    /// Screen height for coordinate conversion
-    int m_screenHeight;
 };
 
 #endif

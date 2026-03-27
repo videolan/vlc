@@ -34,6 +34,11 @@
 
 #include <cstring>
 
+@class VLCSkinsWindow;
+@interface VLCSkinsWindow (HitTest)
+- (void)setHitTestGraphics:(const MacOSXGraphics *)pGraphics;
+@end
+
 
 MacOSXGraphics::MacOSXGraphics( intf_thread_t *pIntf, int width, int height ):
     OSGraphics( pIntf ), m_width( width ), m_height( height )
@@ -314,9 +319,14 @@ void MacOSXGraphics::drawRect( int left, int top, int width, int height,
 
 void MacOSXGraphics::applyMaskToWindow( OSWindow &rWindow )
 {
-    // macOS handles transparency through the alpha channel directly
-    // The window's opaque property should be set to NO
-    // This is handled in copyToWindow
+    @autoreleasepool {
+        MacOSXWindow &rMacWindow = static_cast<MacOSXWindow&>(rWindow);
+        NSWindow *nsWindow = rMacWindow.getNSWindow();
+        if( nsWindow && [nsWindow respondsToSelector:@selector(setHitTestGraphics:)] )
+        {
+            [(VLCSkinsWindow *)nsWindow setHitTestGraphics:this];
+        }
+    }
 }
 
 

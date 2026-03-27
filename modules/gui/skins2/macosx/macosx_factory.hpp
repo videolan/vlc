@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,8 +126,6 @@ private:
     const std::string m_dirSep;
     /// Resource path
     std::list<std::string> m_resourcePath;
-    /// Screen dimensions
-    int m_screenWidth, m_screenHeight;
 };
 
 #endif

@@ -35,9 +35,6 @@ MacOSXTooltip::MacOSXTooltip( intf_thread_t *pIntf ):
     OSTooltip( pIntf ), m_pWindow( nil )
 {
     @autoreleasepool {
-        NSScreen *mainScreen = [NSScreen mainScreen];
-        m_screenHeight = (int)[mainScreen frame].size.height;
-
         // Create a tooltip window
         m_pWindow = [[NSWindow alloc]
             initWithContentRect:NSMakeRect( 0, 0, 1, 1 )
@@ -82,7 +79,7 @@ void MacOSXTooltip::show( int left, int top, OSGraphics &rText )
         int height = rGraphics.getHeight();
 
         // Convert coordinates
-        int y = m_screenHeight - top - height;
+        int y = [NSScreen mainScreen].frame.size.height - top - height;
 
         // Resize and position the window
         NSRect frame = NSMakeRect( left, y, width, height );

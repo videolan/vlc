@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,10 +52,6 @@ MacOSXLoop::MacOSXLoop( intf_thread_t *pIntf ):
     OSLoop( pIntf ), m_exit( false ),
     m_lastClickTime( 0 ), m_lastClickPosX( 0 ), m_lastClickPosY( 0 )
 {
-    @autoreleasepool {
-        NSScreen *mainScreen = [NSScreen mainScreen];
-        m_screenHeight = (int)[mainScreen frame].size.height;
-    }
 }
 
 
@@ -145,8 +142,8 @@ void MacOSXLoop::handleEvent( void *pEvent )
         NSRect bounds = [contentView bounds];
 
         // Convert to skins coordinates (origin top-left)
-        int x = (int)locationInWindow.x;
-        int y = (int)(bounds.size.height - locationInWindow.y);
+        int x = locationInWindow.x;
+        int y = bounds.size.height - locationInWindow.y;
 
         // Handle the event
         NSEventType eventType = [event type];
