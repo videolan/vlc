@@ -624,6 +624,8 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_
             if( p_fmt->i_extra > 0 )
             {
                 char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
+                if( !p_hexa )
+                    break;
                 sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
                 if( asprintf( &p_es->psz_fmtp,
                               "profile-level-id=3; config=%s;", p_hexa ) == -1 )
@@ -637,6 +639,8 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_
             if( p_fmt->i_extra > 0 )
             {
                 char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
+                if( !p_hexa )
+                    break;
                 sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
                 if( asprintf( &p_es->psz_fmtp,
                               "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
