@@ -546,12 +546,10 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_
                     int i_offset    = 0;
                     int i_size      = 0;
 
-                    while( p_buffer[0] != 0 || p_buffer[1] != 0 ||
-                           p_buffer[2] != 1 )
+                    while( i_buffer > 2 && memcmp(p_buffer, "\x00\x00\x01", 3 ) )
                     {
                         p_buffer++;
                         i_buffer--;
-                        if( i_buffer == 0 ) break;
                     }
 
                     if( i_buffer < 4 || memcmp(p_buffer, "\x00\x00\x01", 3 ) )
@@ -583,11 +581,10 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_
                         continue;
                     }
 
-                    if( i_nal_type == 7 )
+                    if( i_nal_type == 7 && i_size > 3 )
                     {
                         free( p_64_sps );
                         p_64_sps = vlc_b64_encode_binary( p_buffer, i_size );
-                        /* XXX: nothing ensures that i_size >= 4 ?? */
                         sprintf_hexa( hexa, &p_buffer[1], 3 );
                     }
                     else if( i_nal_type == 8 )
