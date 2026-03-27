@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +37,7 @@
 /// NSView subclass that handles drag and drop
 @interface VLCDropView : NSView
 {
-    MacOSXDragDrop *m_pHandler;
+    @public MacOSXDragDrop *m_pHandler;
 }
 - (instancetype)initWithFrame:(NSRect)frame handler:(MacOSXDragDrop *)handler;
 @end
@@ -150,6 +151,7 @@ MacOSXDragDrop::~MacOSXDragDrop()
     @autoreleasepool {
         if( m_pDropView )
         {
+            m_pDropView->m_pHandler = nil;
             [m_pDropView removeFromSuperview];
             m_pDropView = nil;
         }
