@@ -565,7 +565,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_
                     const int i_nal_type = p_buffer[0]&0x1f;
 
                     i_size = i_buffer;
-                    for( i_offset = 0; i_offset+2 < i_buffer ; i_offset++)
+                    for( i_offset = 1; i_offset+2 < i_buffer ; i_offset++)
                     {
                         if( !memcmp(p_buffer + i_offset, "\x00\x00\x01", 3 ) )
                         {
