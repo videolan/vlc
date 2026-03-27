@@ -215,8 +215,8 @@ typedef struct
 static vod_media_t *MediaNew( vod_t *, const char *, input_item_t * );
 static void         MediaDel( vod_t *, vod_media_t * );
 static void         MediaAskDel ( vod_t *, vod_media_t * );
-static int          MediaAddES( vod_t *, vod_media_t *, es_format_t * );
-static void         MediaDelES( vod_t *, vod_media_t *, es_format_t * );
+static int          MediaAddES( vod_t *, vod_media_t *, const es_format_t * );
+static void         MediaDelES( vod_t *, vod_media_t *, const es_format_t * );
 
 static void* CommandThread( void * );
 static void  CommandPush( vod_t *, rtsp_cmd_type_t, vod_media_t *,
@@ -234,7 +234,7 @@ static int RtspCallbackES( httpd_callback_sys_t *, httpd_client_t *,
 
 static char *SDPGenerate( const vod_media_t *, httpd_client_t *cl );
 
-static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
+static void sprintf_hexa( char *s, const uint8_t *p_data, int i_data )
 {
     static const char hex[16] = "0123456789abcdef";
 
@@ -468,7 +468,7 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     free( p_media );
 }
 
-static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
+static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_fmt )
 {
     char *psz_urlc;
 
@@ -710,7 +710,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     return VLC_SUCCESS;
 }
 
-static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
+static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_fmt)
 {
     media_es_t *p_es = NULL;
 
