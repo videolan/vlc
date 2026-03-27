@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,11 +42,13 @@ MacOSXGraphics::MacOSXGraphics( intf_thread_t *pIntf, int width, int height ):
     m_bytesPerRow = width * 4;
     m_pData = new uint8_t[m_bytesPerRow * height];
     memset( m_pData, 0, m_bytesPerRow * height );
+    m_colorSpace = CGColorSpaceCreateDeviceRGB();
 }
 
 
 MacOSXGraphics::~MacOSXGraphics()
 {
+    CGColorSpaceRelease( m_colorSpace );
     delete[] m_pData;
 }
 
@@ -328,22 +331,19 @@ void MacOSXGraphics::copyToWindow( OSWindow &rWindow, int xSrc, int ySrc,
         if( !nsWindow )
             return;
 
-        // Create CGImage from our pixel data
-        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        CGContextRef context = CGBitmapContextCreate(
-            m_pData,
-            m_width,
-            m_height,
-            8,
-            m_bytesPerRow,
-            colorSpace,
-            kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little
-        );
+        // Create CGImage from our pixel data (non-premultiplied alpha)
+        CGDataProviderRef provider = CGDataProviderCreateWithData(
+            NULL, m_pData, m_bytesPerRow * m_height, NULL );
 
-        if( context )
+        CGImageRef image = CGImageCreate(
+            m_width, m_height, 8, 32, m_bytesPerRow, m_colorSpace,
+            kCGImageAlphaFirst | kCGBitmapByteOrder32Little,
+            provider, NULL, false, kCGRenderingIntentDefault );
+
+        CGDataProviderRelease( provider );
+
+        if( image )
         {
-            CGImageRef image = CGBitmapContextCreateImage( context );
-            if( image )
             {
                 // Create subimage if needed
                 CGImageRef subImage = image;
@@ -371,11 +371,9 @@ void MacOSXGraphics::copyToWindow( OSWindow &rWindow, int xSrc, int ySrc,
 
                 if( subImage != image )
                     CGImageRelease( subImage );
-                CGImageRelease( image );
             }
-            CGContextRelease( context );
+            CGImageRelease( image );
         }
-        CGColorSpaceRelease( colorSpace );
     }
 }
 
@@ -391,34 +389,25 @@ bool MacOSXGraphics::hit( int x, int y ) const
 }
 
 
-void *MacOSXGraphics::getImage() const
+CGImageRef MacOSXGraphics::getImage() const
 {
     @autoreleasepool {
-        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        CGContextRef context = CGBitmapContextCreate(
-            const_cast<uint8_t*>(m_pData),
-            m_width,
-            m_height,
-            8,
-            m_bytesPerRow,
-            colorSpace,
-            kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little
-        );
+        CGDataProviderRef provider = CGDataProviderCreateWithData(
+            NULL, m_pData, m_bytesPerRow * m_height, NULL );
 
-        CGImageRef image = NULL;
-        if( context )
-        {
-            image = CGBitmapContextCreateImage( context );
-            CGContextRelease( context );
-        }
-        CGColorSpaceRelease( colorSpace );
+        CGImageRef image = CGImageCreate(
+            m_width, m_height, 8, 32, m_bytesPerRow, m_colorSpace,
+            kCGImageAlphaFirst | kCGBitmapByteOrder32Little,
+            provider, NULL, false, kCGRenderingIntentDefault );
+
+        CGDataProviderRelease( provider );
 
         return image;
     }
 }
 
 
-bool MacOSXGraphics::checkBoundaries( int x_src, int y_src, int w_src, int h_src,
+bool MacOSXGraphics::checkBoundaries( int& x_src, int& y_src, int w_src, int h_src,
                                        int& x_target, int& y_target,
                                        int& w_target, int& h_target )
 {
@@ -432,15 +421,17 @@ bool MacOSXGraphics::checkBoundaries( int x_src, int y_src, int w_src, int h_src
     if( y_src + h_target > h_src )
         h_target = h_src - y_src;
 
-    // Adjust for negative destination
+    // Adjust for negative destination (advance source accordingly)
     if( x_target < 0 )
     {
         w_target += x_target;
+        x_src -= x_target;
         x_target = 0;
     }
     if( y_target < 0 )
     {
         h_target += y_target;
+        y_src -= y_target;
         y_target = 0;
     }
 

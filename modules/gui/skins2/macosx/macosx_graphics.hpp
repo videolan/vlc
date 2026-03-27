@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@
 
 #include "../src/os_graphics.hpp"
 
+#include <CoreGraphics/CGImage.h>
 #include <vector>
 
 class GenericBitmap;
@@ -77,8 +79,8 @@ public:
     /// Get the raw pixel data
     const uint8_t *getData() const { return m_pData; }
 
-    /// Get the image (for internal use)
-    void *getImage() const;
+    /// Get the image (for internal use, caller must CGImageRelease)
+    CGImageRef getImage() const;
 
 private:
     /// Width and height of the graphics
@@ -87,9 +89,11 @@ private:
     uint8_t *m_pData;
     /// Bytes per row
     int m_bytesPerRow;
+    /// Cached color space
+    CGColorSpaceRef m_colorSpace;
 
     /// Check and adjust boundaries
-    bool checkBoundaries( int x_src, int y_src, int w_src, int h_src,
+    bool checkBoundaries( int& x_src, int& y_src, int w_src, int h_src,
                           int& x_target, int& y_target,
                           int& w_target, int& h_target );
 };

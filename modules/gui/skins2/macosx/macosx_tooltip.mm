@@ -4,6 +4,7 @@
  * Copyright (C) 2026 the VideoLAN team
  *
  * Authors: Fletcher Holt <fletcherholt649@gmail.com>
+ *          Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,7 +89,7 @@ void MacOSXTooltip::show( int left, int top, OSGraphics &rText )
         [m_pWindow setFrame:frame display:NO];
 
         // Create image from graphics
-        CGImageRef cgImage = (CGImageRef)rGraphics.getImage();
+        CGImageRef cgImage = rGraphics.getImage();
         if( cgImage )
         {
             NSImage *nsImage = [[NSImage alloc] initWithCGImage:cgImage
