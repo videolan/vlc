@@ -227,7 +227,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 - (void)window:window startCustomAnimationToEnterFullScreenWithDuration:(NSTimeInterval)duration
 {
-    [window setStyleMask:([window styleMask] | NSFullScreenWindowMask)];
+    [window setStyleMask:([window styleMask] | NSWindowStyleMaskFullScreen)];
 
     NSScreen *screen = [window screen];
     NSRect screenFrame = [screen frame];
@@ -240,7 +240,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 - (void)window:window startCustomAnimationToExitFullScreenWithDuration:(NSTimeInterval)duration
 {
-    [window setStyleMask:([window styleMask] & ~NSFullScreenWindowMask)];
+    [window setStyleMask:([window styleMask] & ~NSWindowStyleMaskFullScreen)];
     [[window animator] setFrame:_frameBeforeLionFullscreen display:YES animate:YES];
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
@@ -367,7 +367,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         rect = [[_videoViewController.view superview] convertRect: [_videoViewController.view frame] toView: nil]; /* Convert to Window base coord */
         rect.origin.x += [self frame].origin.x;
         rect.origin.y += [self frame].origin.y;
-        o_fullscreen_window = [[VLCWindow alloc] initWithContentRect:rect styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+        o_fullscreen_window = [[VLCWindow alloc] initWithContentRect:rect styleMask: NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered defer:YES];
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
         [o_fullscreen_window setCanBecomeMainWindow: YES];

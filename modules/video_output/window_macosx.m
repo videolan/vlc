@@ -359,7 +359,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isWindowFullscreen
 {
-    return ((self.window.styleMask & NSFullScreenWindowMask) == NSFullScreenWindowMask);
+    return ((self.window.styleMask & NSWindowStyleMaskFullScreen) == NSWindowStyleMaskFullScreen);
 }
 
 #pragma mark Module interactions

@@ -259,7 +259,7 @@ static int WindowFloatOnTop(vlc_object_t *obj,
     }
 
     NSRect window_rect = asVideoWallpaper ? screen.frame : mainInstance.libraryWindow.frame;
-    NSUInteger mask = withWindowDecorations ? NSBorderlessWindowMask | NSResizableWindowMask : NSBorderlessWindowMask;
+    NSUInteger mask = withWindowDecorations ? NSWindowStyleMaskBorderless | NSWindowStyleMaskResizable : NSWindowStyleMaskBorderless;
 
     VLCVideoWindowCommon *newVideoWindow = [[VLCVideoWindowCommon alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
     newVideoWindow.delegate = newVideoWindow;

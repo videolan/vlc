@@ -471,7 +471,7 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     if (!shouldDestroy) {
         NSRect content = NSMakeRect(0, 0, 1, 1);
         dialogWindow = [[VLCDialogWindow alloc] initWithContentRect:content
-                                                          styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask
+                                                          styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable
                                                             backing:NSBackingStoreBuffered
                                                               defer:NO];
         [dialogWindow setReleasedWhenClosed:NO];

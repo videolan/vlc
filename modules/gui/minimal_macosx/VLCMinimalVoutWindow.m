@@ -34,7 +34,7 @@
 - (id)initWithContentRect:(NSRect)contentRect
 {
     if( self = [super initWithContentRect:contentRect
-                                styleMask:NSBorderlessWindowMask
+                                styleMask:NSWindowStyleMaskBorderless
                                   backing:NSBackingStoreBuffered
                                     defer:NO])
     {

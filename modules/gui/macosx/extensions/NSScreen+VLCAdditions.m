@@ -97,7 +97,7 @@ static NSMutableArray *blackoutWindows = NULL;
          - The NSMutableArray blackoutWindows has the blackoutWindow references
          - blackoutOtherDisplays is responsible for alloc/releasing its Windows
          */
-        blackoutWindow = [[VLCWindow alloc] initWithContentRect: screen_rect styleMask: NSBorderlessWindowMask
+        blackoutWindow = [[VLCWindow alloc] initWithContentRect: screen_rect styleMask: NSWindowStyleMaskBorderless
                                                         backing: NSBackingStoreBuffered defer: NO screen: screen];
         [blackoutWindow setBackgroundColor:[NSColor blackColor]];
         [blackoutWindow setLevel: NSFloatingWindowLevel]; /* Disappear when Expose is triggered */

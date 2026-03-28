@@ -239,7 +239,7 @@
 - (void)updateTopConstraints
 {
     CGFloat internalTopConstraintConstant = VLCLibraryUIUnits.smallSpacing;
-    if (!self.mainVideoModeEnabled && self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
+    if (!self.mainVideoModeEnabled && self.libraryWindow.styleMask & NSWindowStyleMaskFullSizeContentView) {
         // Compensate for full content view window's titlebar height, prevent top being cut off
         internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
     }
