@@ -137,7 +137,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     if ([NSLocale characterDirectionForLanguage:preferredLanguage] == NSLocaleLanguageDirectionRightToLeft) {
         msg_Dbg(getIntf(), "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
-        [_rateTextField setAlignment:NSLeftTextAlignment];
+        [_rateTextField setAlignment:NSTextAlignmentLeft];
     }
 
 #ifdef HAVE_SPARKLE

@@ -125,8 +125,8 @@
     [self playbackStateChanged:nil];
     [self.stopButton setHidden:YES];
 
-    [self.timeField setAlignment: NSCenterTextAlignment];
-    [self.trailingTimeField setAlignment: NSCenterTextAlignment];
+    [self.timeField setAlignment: NSTextAlignmentCenter];
+    [self.trailingTimeField setAlignment: NSTextAlignmentCenter];
 
     [self.thumbnailTrackingView setViewToHide:_openMainVideoViewButtonOverlay];
 

@@ -1364,7 +1364,7 @@ my_width, tooltip, init_value)                                              \
         ADD_LABEL(o_textfield_min, mainFrame, 12, -30, @"-88888", @"")
         [o_textfield_min setIntegerValue: p_item->min.i];
         [o_textfield_min setAutoresizingMask:NSViewMaxXMargin ];
-        [o_textfield_min setAlignment:NSRightTextAlignment];
+        [o_textfield_min setAlignment:NSTextAlignmentRight];
         [self addSubview: o_textfield_min];
 
         /* build the maxtextfield */
@@ -1573,7 +1573,7 @@ my_width, tooltip, init_value)                                              \
         ADD_LABEL(o_textfield_min, mainFrame, 12, -30, @"-8888", @"")
         [o_textfield_min setFloatValue: p_item->min.f];
         [o_textfield_min setAutoresizingMask:NSViewMaxXMargin ];
-        [o_textfield_min setAlignment:NSRightTextAlignment];
+        [o_textfield_min setAlignment:NSTextAlignmentRight];
         [self addSubview: o_textfield_min];
 
         /* build the maxtextfield */
