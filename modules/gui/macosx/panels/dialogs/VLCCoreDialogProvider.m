@@ -291,13 +291,13 @@ static void updateProgressCallback(void *p_data,
 
     switch (questionType) {
         case VLC_DIALOG_QUESTION_WARNING:
-            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert setAlertStyle:NSAlertStyleWarning];
             break;
         case VLC_DIALOG_QUESTION_CRITICAL:
-            [alert setAlertStyle:NSCriticalAlertStyle];
+            [alert setAlertStyle:NSAlertStyleCritical];
             break;
         default:
-            [alert setAlertStyle:NSInformationalAlertStyle];
+            [alert setAlertStyle:NSAlertStyleInformational];
             break;
     }
 

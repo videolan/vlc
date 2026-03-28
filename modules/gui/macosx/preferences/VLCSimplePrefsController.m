@@ -890,7 +890,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 - (IBAction)resetPreferences:(NSControl *)sender
 {
     NSAlert *alert = [[NSAlert alloc] init];
-    [alert setAlertStyle:NSInformationalAlertStyle];
+    [alert setAlertStyle:NSAlertStyleInformational];
     [alert setMessageText:_NS("Reset Preferences")];
     [alert setInformativeText:_NS("This will reset VLC media player's preferences.\n\n"
                                   "Note that VLC will restart during the process, so your current "

@@ -822,7 +822,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
             [self->_profilePopup selectItemAtIndex:currentProfileIndex];
 
             NSAlert *alert = [[NSAlert alloc] init];
-            [alert setAlertStyle:NSCriticalAlertStyle];
+            [alert setAlertStyle:NSAlertStyleCritical];
             [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
             [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
             [alert beginSheetModalForWindow:_self.window

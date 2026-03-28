@@ -292,7 +292,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
             NSString *muxformat = [self.currentProfile firstObject];
             if ([muxformat isEqualToString:@"wav"] || [muxformat isEqualToString:@"mov"] || [muxformat isEqualToString:@"mp4"] || [muxformat isEqualToString:@"mkv"]) {
                 NSAlert *alert = [[NSAlert alloc] init];
-                [alert setAlertStyle:NSInformationalAlertStyle];
+                [alert setAlertStyle:NSAlertStyleInformational];
                 [alert setMessageText:_NS("Invalid container format for HTTP streaming")];
                 [alert setInformativeText:[NSString stringWithFormat:_NS("Media encapsulated as %@ cannot be streamed through the HTTP protocol for technical reasons."),
                                            [[self currentEncapsulationFormatAsFileExtension:YES] uppercaseString]]];
@@ -555,7 +555,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     /* catch obvious errors */
     if ([[_streamAddressField stringValue] length] == 0) {
         NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSInformationalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleInformational];
         [alert setMessageText:_NS("No Address given")];
         [alert setInformativeText:_NS("In order to stream, a valid destination address is required.")];
         [alert beginSheetModalForWindow:_streamPanel
@@ -565,7 +565,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
 
     if ([_streamSAPCheckbox state] && [[_streamChannelField stringValue] length] == 0) {
         NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSInformationalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleInformational];
         [alert setMessageText:_NS("No Channel Name given")];
         [alert setInformativeText:_NS("SAP stream announcement is enabled. However, no channel name is provided.")];
         [alert beginSheetModalForWindow:_streamPanel
@@ -575,7 +575,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
 
     if ([_streamSDPMatrix isEnabled] && [_streamSDPMatrix selectedCell] != [_streamSDPMatrix cellWithTag:0] && [[_streamSDPField stringValue] length] == 0) {
         NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSInformationalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleInformational];
         [alert setMessageText:_NS("No SDP URL given")];
         [alert setInformativeText:_NS("A SDP export is requested, but no URL is provided.")];
         [alert beginSheetModalForWindow:_streamPanel
