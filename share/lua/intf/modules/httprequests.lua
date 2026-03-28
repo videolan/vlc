@@ -27,6 +27,13 @@ local common = require ("common")
 local dkjson = require ("dkjson")
 
 
+--utility function for LUA version without math.pow()
+function math_pow(num, power)
+    if math.pow == nil then
+        return num^power
+    end
+    return math.pow(num, power)
+end
 
 --Round the number to the specified precision
 function round(what, precision)
@@ -34,7 +41,7 @@ function round(what, precision)
         what = common.us_tonumber(what)
     end
     if type(what) == "number" then
-        return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision)
+        return math.floor(what*math_pow(10,precision)+0.5) / math_pow(10,precision)
     end
     return nil
 end
