@@ -524,10 +524,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)durationString
 {
-    NSString * const albumString =
-        [NSString stringWithFormat:toNSStr(vlc_ngettext("%u album", "%u albums", _numberOfAlbums)), _numberOfAlbums];
-    NSString * const songString =
-        [NSString stringWithFormat:toNSStr(vlc_ngettext("%u song", "%u songs", _numberOfTracks)), _numberOfTracks];
+    NSString * const albumString = _NPS("%u album", "%u albums", _numberOfAlbums);
+    NSString * const songString = _NPS("%u song", "%u songs", _numberOfTracks);
     return [NSString stringWithFormat:@"%@, %@", albumString, songString];
 }
 
@@ -758,7 +756,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)durationString
 {
-    return [NSString stringWithFormat:toNSStr(vlc_ngettext("%u song", "%u songs", _numberOfTracks)), _numberOfTracks];
+    return _NPS("%u song", "%u songs", _numberOfTracks);
 }
 
 - (NSArray<VLCMediaLibraryAlbum *> *)albums
@@ -1754,10 +1752,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.smallArtworkMRL = p_show->psz_artwork_mrl ? toNSStr(p_show->psz_artwork_mrl) : @"";
         self.smallArtworkGenerated = self.smallArtworkMRL.length > 0;
         self.displayString = self.name;
-        NSString * const seasonString =
-            [NSString stringWithFormat:toNSStr(vlc_ngettext("%u season", "%u seasons", _seasonCount)), _seasonCount];
-        NSString * const episodeString =
-            [NSString stringWithFormat:toNSStr(vlc_ngettext("%u episode", "%u episodes", _episodeCount)), _episodeCount];
+        NSString * const seasonString = _NPS("%u season", "%u seasons", _seasonCount);
+        NSString * const episodeString = _NPS("%u episode", "%u episodes", _episodeCount);
         self.primaryDetailString = [NSString stringWithFormat:@"%@, %@", seasonString, episodeString];
         self.secondaryDetailString = [NSString stringWithFormat:_NS("Released in %u"), _releaseYear];
         self.durationString = self.secondaryDetailString;
@@ -1887,8 +1883,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
                       withMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
 
-    NSString * const detailString =
-        [NSString stringWithFormat:toNSStr(vlc_ngettext("%lu item", "%lu items", mediaItems.count)), (unsigned long)mediaItems.count];
+    NSString * const detailString = _NPS("%lu item", "%lu items", (unsigned long)mediaItems.count);
 
     self = [self initWithDisplayString:displayString
                withPrimaryDetailString:detailString

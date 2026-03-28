@@ -55,10 +55,8 @@
     _numberOfTracks = _mediaItems.count;
 
     const NSUInteger numberOfAlbums = libraryModel.numberOfAlbums;
-    NSString * const albumString =
-        [NSString stringWithFormat:toNSStr(vlc_ngettext("%li album", "%li albums", numberOfAlbums)), numberOfAlbums];
-    NSString * const songString =
-        [NSString stringWithFormat:toNSStr(vlc_ngettext("%li song", "%li songs", _numberOfTracks)), _numberOfTracks];
+    NSString * const albumString = _NPS("%li album", "%li albums", numberOfAlbums);
+    NSString * const songString = _NPS("%li song", "%li songs", _numberOfTracks);
     NSString * const primaryDetailString = [NSString stringWithFormat:@"%@, %@", albumString, songString];
 
     return [super initWithDisplayString:displayString

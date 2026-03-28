@@ -36,6 +36,11 @@
 #define _NS(s) NSTR(s)
 
 /**
+ * Get a pluralized translation string
+ */
+#define _NPS(s, p, n) [NSString stringWithFormat:toNSStr(vlc_ngettext(s, p, n)), (n)]
+
+/**
  * Get a contextualized translation string
  *
  * Sometimes a translations needs to be unique to a specific context
