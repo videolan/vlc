@@ -26,8 +26,10 @@
 #endif
 
 #import <Cocoa/Cocoa.h>
+#include <CoreFoundation/CoreFoundation.h>
 #include "macosx_loop.hpp"
 #include "macosx_factory.hpp"
+#include "macosx_timer.hpp"
 #include "macosx_window.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/generic_window.hpp"
@@ -40,7 +42,14 @@
 #include "../events/evt_refresh.hpp"
 
 #include <vlc_actions.h>
+#include "../src/dialogs.hpp"
+#include "../commands/cmd_dialogs.hpp"
+#include "../commands/cmd_fullscreen.hpp"
 
+static inline NSString *_NS( const char *s )
+{
+    return s ? [NSString stringWithUTF8String:vlc_gettext( s )] : @"";
+}
 
 // Double-click delay in microseconds
 int MacOSXLoop::m_dblClickDelay = 400000;
@@ -76,37 +85,132 @@ void MacOSXLoop::destroy( intf_thread_t *pIntf )
 
 void MacOSXLoop::run()
 {
-    @autoreleasepool {
-        // Main event loop
-        while( !m_exit )
-        {
-            @autoreleasepool {
-                NSEvent *event = [NSApp nextEventMatchingMask:NSEventMaskAny
-                                                    untilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]
-                                                       inMode:NSDefaultRunLoopMode
-                                                      dequeue:YES];
-                if( event )
-                {
-                    handleEvent( (__bridge void *)event );
-                    [NSApp sendEvent:event];
-                }
+    m_exitSemaphore = dispatch_semaphore_create( 0 );
 
-                // Process timers
-                MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
-                    OSFactory::instance( getIntf() ) );
-                if( pFactory && pFactory->getTimerLoop() )
-                {
-                    pFactory->getTimerLoop()->checkTimers();
+    CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopDefaultMode, ^{
+        @autoreleasepool {
+            // Monitor events to dispatch to skins
+            m_pMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskAny
+                                                              handler:^NSEvent *(NSEvent *event) {
+                handleEvent( (__bridge void *)event );
+                return event;
+            }];
+
+            // Periodically check skins timers
+            m_pTimer = [NSTimer scheduledTimerWithTimeInterval:0.01
+                                                      repeats:YES
+                                                        block:^(NSTimer *timer) {
+                @autoreleasepool {
+                    if( m_exit )
+                    {
+                        [timer invalidate];
+                        [NSEvent removeMonitor:m_pMonitor];
+                        m_pMonitor = nil;
+                        return;
+                    }
+
+                    MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
+                        OSFactory::instance( getIntf() ) );
+                    if( pFactory && pFactory->getTimerLoop() )
+                    {
+                        pFactory->getTimerLoop()->checkTimers();
+                    }
                 }
-            }
+            }];
+
+            // Set up the menu bar after finishLaunching
+            [NSApp finishLaunching];
+
+            NSMenu *menuBar = [[NSMenu alloc] init];
+
+            // Application menu
+            NSMenuItem *appMenuItem = [[NSMenuItem alloc] init];
+            NSMenu *appMenu = [[NSMenu alloc] initWithTitle:@"VLC"];
+            [appMenu addItemWithTitle:_NS("About")
+                               action:@selector(orderFrontStandardAboutPanel:)
+                        keyEquivalent:@""];
+            [appMenu addItem:[NSMenuItem separatorItem]];
+            [appMenu addItemWithTitle:_NS("Hide")
+                               action:@selector(hide:)
+                        keyEquivalent:@"h"];
+            NSMenuItem *hideOthers = [appMenu addItemWithTitle:_NS("Hide Others")
+                               action:@selector(hideOtherApplications:)
+                        keyEquivalent:@"h"];
+            [hideOthers setKeyEquivalentModifierMask:NSEventModifierFlagCommand | NSEventModifierFlagOption];
+            [appMenu addItemWithTitle:_NS("Show All")
+                               action:@selector(unhideAllApplications:)
+                        keyEquivalent:@""];
+            [appMenu addItem:[NSMenuItem separatorItem]];
+            [appMenu addItemWithTitle:_NS("Quit")
+                               action:@selector(terminate:)
+                        keyEquivalent:@"q"];
+            [appMenuItem setSubmenu:appMenu];
+            [menuBar addItem:appMenuItem];
+
+            // File menu
+            NSMenuItem *fileMenuItem = [[NSMenuItem alloc] init];
+            NSMenu *fileMenu = [[NSMenu alloc] initWithTitle:_NS("File")];
+            [fileMenu addItemWithTitle:_NS("Open File...")
+                                action:@selector(openDocument:)
+                         keyEquivalent:@"o"];
+            [fileMenuItem setSubmenu:fileMenu];
+            [menuBar addItem:fileMenuItem];
+
+            // Window menu
+            NSMenuItem *windowMenuItem = [[NSMenuItem alloc] init];
+            NSMenu *windowMenu = [[NSMenu alloc] initWithTitle:_NS("Window")];
+            [windowMenu addItemWithTitle:_NS("Minimize")
+                                  action:@selector(performMiniaturize:)
+                           keyEquivalent:@"m"];
+            [windowMenu addItemWithTitle:_NS("Close")
+                                  action:@selector(performClose:)
+                           keyEquivalent:@"w"];
+            [windowMenuItem setSubmenu:windowMenu];
+            [menuBar addItem:windowMenuItem];
+            [NSApp setWindowsMenu:windowMenu];
+
+            [NSApp setMainMenu:menuBar];
+            [NSApp activateIgnoringOtherApps:YES];
+
+            // Run the event loop (finishLaunching already called above)
+            [NSApp run];
+
+            // Clean up before signaling — the timer and monitor must
+            // be invalidated now because the skins2 thread will proceed
+            // to destroy the interface as soon as the semaphore is signaled.
+            [m_pTimer invalidate];
+            m_pTimer = nil;
+            [NSEvent removeMonitor:m_pMonitor];
+            m_pMonitor = nil;
         }
-    }
+
+        // [NSApp run] returned — signal the skins2 thread
+        dispatch_semaphore_signal( m_exitSemaphore );
+    });
+    CFRunLoopWakeUp(CFRunLoopGetMain());
+
+    // Block until [NSApp run] exits
+    dispatch_semaphore_wait( m_exitSemaphore, DISPATCH_TIME_FOREVER );
 }
 
 
 void MacOSXLoop::exit()
 {
     m_exit = true;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSApp stop:nil];
+        // Post a dummy event to ensure [NSApp run] returns
+        [NSApp postEvent:[NSEvent otherEventWithType:NSEventTypeApplicationDefined
+                                            location:NSZeroPoint
+                                       modifierFlags:0
+                                           timestamp:0
+                                        windowNumber:0
+                                             context:nil
+                                             subtype:0
+                                               data1:0
+                                               data2:0]
+                 atStart:YES];
+    });
 }
 
 
@@ -155,7 +259,7 @@ void MacOSXLoop::handleEvent( void *pEvent )
                 int yPos = y;
 
                 // Check for double-click
-                EvtMouse::ActionType action = EvtMouse::kDown;
+                EvtMouse::ActionType_t action = EvtMouse::kDown;
                 if( time - m_lastClickTime < m_dblClickDelay &&
                     xPos == m_lastClickPosX && yPos == m_lastClickPosY )
                 {
@@ -236,7 +340,7 @@ void MacOSXLoop::handleEvent( void *pEvent )
             case NSEventTypeScrollWheel:
             {
                 CGFloat deltaY = [event deltaY];
-                int direction = (deltaY > 0) ? EvtScroll::kUp : EvtScroll::kDown;
+                EvtScroll::Direction_t direction = (deltaY > 0) ? EvtScroll::kUp : EvtScroll::kDown;
                 int mod = cocoaModToMod( [event modifierFlags] );
                 EvtScroll evt( getIntf(), x, y, direction, mod );
                 pWin->processEvent( evt );
@@ -256,7 +360,7 @@ void MacOSXLoop::handleEvent( void *pEvent )
                     key = cocoaCharToVlcKey( c );
                 }
 
-                EvtKey::ActionType action = (eventType == NSEventTypeKeyDown)
+                EvtKey::ActionType_t action = (eventType == NSEventTypeKeyDown)
                     ? EvtKey::kDown : EvtKey::kUp;
                 EvtKey evt( getIntf(), key, action, mod );
                 pWin->processEvent( evt );

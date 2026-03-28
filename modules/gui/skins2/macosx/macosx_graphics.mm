@@ -34,8 +34,7 @@
 
 #include <cstring>
 
-@class VLCSkinsWindow;
-@interface VLCSkinsWindow (HitTest)
+@protocol VLCHitTestGraphics
 - (void)setHitTestGraphics:(const MacOSXGraphics *)pGraphics;
 @end
 
@@ -321,10 +320,10 @@ void MacOSXGraphics::applyMaskToWindow( OSWindow &rWindow )
 {
     @autoreleasepool {
         MacOSXWindow &rMacWindow = static_cast<MacOSXWindow&>(rWindow);
-        NSWindow *nsWindow = rMacWindow.getNSWindow();
+        NSWindow<VLCHitTestGraphics> *nsWindow = (NSWindow<VLCHitTestGraphics> *)rMacWindow.getNSWindow();
         if( nsWindow && [nsWindow respondsToSelector:@selector(setHitTestGraphics:)] )
         {
-            [(VLCSkinsWindow *)nsWindow setHitTestGraphics:this];
+            [nsWindow setHitTestGraphics:this];
         }
     }
 }
@@ -334,57 +333,53 @@ void MacOSXGraphics::copyToWindow( OSWindow &rWindow, int xSrc, int ySrc,
                                     int width, int height,
                                     int xDest, int yDest )
 {
-    @autoreleasepool {
-        MacOSXWindow &rMacWindow = static_cast<MacOSXWindow&>(rWindow);
-        NSWindow *nsWindow = rMacWindow.getNSWindow();
+    MacOSXWindow &rMacWindow = static_cast<MacOSXWindow&>(rWindow);
+    NSWindow *nsWindow = rMacWindow.getNSWindow();
 
-        if( !nsWindow )
-            return;
+    if( !nsWindow )
+        return;
 
-        // Create CGImage from our pixel data (non-premultiplied alpha)
-        CGDataProviderRef provider = CGDataProviderCreateWithData(
-            NULL, m_pData, m_bytesPerRow * m_height, NULL );
+    // Create CGImage from our pixel data (non-premultiplied alpha)
+    CGDataProviderRef provider = CGDataProviderCreateWithData(
+        NULL, m_pData, m_bytesPerRow * m_height, NULL );
 
-        CGImageRef image = CGImageCreate(
-            m_width, m_height, 8, 32, m_bytesPerRow, m_colorSpace,
-            kCGImageAlphaFirst | kCGBitmapByteOrder32Little,
-            provider, NULL, false, kCGRenderingIntentDefault );
+    CGImageRef image = CGImageCreate(
+        m_width, m_height, 8, 32, m_bytesPerRow, m_colorSpace,
+        kCGImageAlphaFirst | kCGBitmapByteOrder32Little,
+        provider, NULL, false, kCGRenderingIntentDefault );
 
-        CGDataProviderRelease( provider );
+    CGDataProviderRelease( provider );
 
-        if( image )
-        {
-            {
-                // Create subimage if needed
-                CGImageRef subImage = image;
-                if( xSrc != 0 || ySrc != 0 || width != m_width || height != m_height )
-                {
-                    CGRect subRect = CGRectMake( xSrc, ySrc, width, height );
-                    subImage = CGImageCreateWithImageInRect( image, subRect );
-                }
+    if( !image )
+        return;
 
-                // Update the window's content view
-                NSView *contentView = [nsWindow contentView];
-                if( [contentView isKindOfClass:[NSImageView class]] )
-                {
-                    NSImage *nsImage = [[NSImage alloc] initWithCGImage:
-                        (subImage ? subImage : image)
-                        size:NSMakeSize(width, height)];
-                    [(NSImageView *)contentView setImage:nsImage];
-                }
-                else
-                {
-                    // Create a layer-backed view for better performance
-                    [contentView setWantsLayer:YES];
-                    contentView.layer.contents = (__bridge id)(subImage ? subImage : image);
-                }
-
-                if( subImage != image )
-                    CGImageRelease( subImage );
-            }
-            CGImageRelease( image );
-        }
+    // Create subimage if needed
+    CGImageRef subImage = NULL;
+    if( xSrc != 0 || ySrc != 0 || width != m_width || height != m_height )
+    {
+        CGRect subRect = CGRectMake( xSrc, ySrc, width, height );
+        subImage = CGImageCreateWithImageInRect( image, subRect );
     }
+
+    CGImageRef displayImage = subImage ? subImage : image;
+    CGImageRetain( displayImage );
+
+    if( subImage )
+        CGImageRelease( subImage );
+    CGImageRelease( image );
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            NSView *contentView = [nsWindow contentView];
+            if( [contentView isKindOfClass:[NSImageView class]] )
+            {
+                NSImage *nsImage = [[NSImage alloc] initWithCGImage:displayImage
+                    size:NSMakeSize(width, height)];
+                [(NSImageView *)contentView setImage:nsImage];
+            }
+            CGImageRelease( displayImage );
+        }
+    });
 }
 
 

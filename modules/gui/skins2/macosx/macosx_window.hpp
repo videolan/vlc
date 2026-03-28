@@ -79,7 +79,7 @@ public:
     virtual bool invalidateRect( int x, int y, int w, int h ) const;
 
     /// Get the NSWindow
-    NSWindow *getNSWindow() const { return m_pWindow; }
+    NSWindow *getNSWindow() const { return (NSWindow *)m_pWindow; }
 
     /// Get the associated GenericWindow
     GenericWindow &getGenericWindow() const { return m_rWindow; }

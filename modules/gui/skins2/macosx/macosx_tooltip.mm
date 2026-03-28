@@ -34,81 +34,84 @@
 MacOSXTooltip::MacOSXTooltip( intf_thread_t *pIntf ):
     OSTooltip( pIntf ), m_pWindow( nil )
 {
-    @autoreleasepool {
-        // Create a tooltip window
-        m_pWindow = [[NSWindow alloc]
-            initWithContentRect:NSMakeRect( 0, 0, 1, 1 )
-                      styleMask:NSWindowStyleMaskBorderless
-                        backing:NSBackingStoreBuffered
-                          defer:YES];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            m_pWindow = [[NSWindow alloc]
+                initWithContentRect:NSMakeRect( 0, 0, 1, 1 )
+                          styleMask:NSWindowStyleMaskBorderless
+                            backing:NSBackingStoreBuffered
+                              defer:YES];
 
-        [m_pWindow setOpaque:NO];
-        [m_pWindow setBackgroundColor:[NSColor colorWithCalibratedWhite:0.95 alpha:0.95]];
-        [m_pWindow setLevel:NSPopUpMenuWindowLevel];
-        [m_pWindow setIgnoresMouseEvents:YES];
-        [m_pWindow setHasShadow:YES];
+            [m_pWindow setOpaque:NO];
+            [m_pWindow setBackgroundColor:[NSColor colorWithCalibratedWhite:0.95 alpha:0.95]];
+            [m_pWindow setLevel:NSPopUpMenuWindowLevel];
+            [m_pWindow setIgnoresMouseEvents:YES];
+            [m_pWindow setHasShadow:YES];
 
-        // Create an image view for the tooltip content
-        NSImageView *imageView = [[NSImageView alloc] initWithFrame:NSZeroRect];
-        [imageView setImageScaling:NSImageScaleNone];
-        [m_pWindow setContentView:imageView];
-    }
+            NSImageView *imageView = [[NSImageView alloc] initWithFrame:NSZeroRect];
+            [imageView setImageScaling:NSImageScaleNone];
+            [m_pWindow setContentView:imageView];
+        }
+    });
 }
 
 
 MacOSXTooltip::~MacOSXTooltip()
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            [m_pWindow orderOut:nil];
-            m_pWindow = nil;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
+            {
+                [m_pWindow orderOut:nil];
+                m_pWindow = nil;
+            }
         }
-    }
+    });
 }
 
 
 void MacOSXTooltip::show( int left, int top, OSGraphics &rText )
 {
-    @autoreleasepool {
-        if( !m_pWindow )
-            return;
+    const MacOSXGraphics &rGraphics = static_cast<const MacOSXGraphics&>(rText);
+    int width = rGraphics.getWidth();
+    int height = rGraphics.getHeight();
 
-        const MacOSXGraphics &rGraphics = static_cast<const MacOSXGraphics&>(rText);
-        int width = rGraphics.getWidth();
-        int height = rGraphics.getHeight();
+    CGImageRef cgImage = rGraphics.getImage();
 
-        // Convert coordinates
-        int y = [NSScreen mainScreen].frame.size.height - top - height;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( !m_pWindow )
+                return;
 
-        // Resize and position the window
-        NSRect frame = NSMakeRect( left, y, width, height );
-        [m_pWindow setFrame:frame display:NO];
+            int y = [NSScreen mainScreen].frame.size.height - top - height;
+            NSRect frame = NSMakeRect( left, y, width, height );
+            [m_pWindow setFrame:frame display:NO];
 
-        // Create image from graphics
-        CGImageRef cgImage = rGraphics.getImage();
-        if( cgImage )
-        {
-            NSImage *nsImage = [[NSImage alloc] initWithCGImage:cgImage
-                                                           size:NSMakeSize(width, height)];
-            NSImageView *imageView = (NSImageView *)[m_pWindow contentView];
-            [imageView setFrame:NSMakeRect(0, 0, width, height)];
-            [imageView setImage:nsImage];
+            if( cgImage )
+            {
+                NSImage *nsImage = [[NSImage alloc] initWithCGImage:cgImage
+                                                               size:NSMakeSize(width, height)];
+                NSImageView *imageView = (NSImageView *)[m_pWindow contentView];
+                [imageView setFrame:NSMakeRect(0, 0, width, height)];
+                [imageView setImage:nsImage];
 
-            CGImageRelease( cgImage );
+                CGImageRelease( cgImage );
+            }
+
+            [m_pWindow orderFront:nil];
         }
-
-        [m_pWindow orderFront:nil];
-    }
+    });
 }
 
 
 void MacOSXTooltip::hide()
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            [m_pWindow orderOut:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
+            {
+                [m_pWindow orderOut:nil];
+            }
         }
-    }
+    });
 }

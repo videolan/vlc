@@ -216,171 +216,178 @@ MacOSXWindow::MacOSXWindow( intf_thread_t *pIntf, GenericWindow &rWindow,
     OSWindow( pIntf ), m_rWindow( rWindow ), m_pWindow( nil ),
     m_pParent( pParentWindow ), m_type( type ), m_pDropTarget( NULL )
 {
-    @autoreleasepool {
-        // Determine window style
-        NSWindowStyleMask styleMask;
-        NSRect contentRect = NSMakeRect( 0, 0, 100, 100 );
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            // Determine window style
+            NSWindowStyleMask styleMask;
+            NSRect contentRect = NSMakeRect( 0, 0, 100, 100 );
 
-        switch( type )
-        {
-            case GenericWindow::FullscreenWindow:
-                styleMask = NSWindowStyleMaskBorderless;
-                contentRect = [mainScreen frame];
-                break;
-
-            case GenericWindow::ToolbarWindow:
-            case GenericWindow::TopWindow:
-            default:
-                styleMask = NSWindowStyleMaskBorderless;
-                break;
-        }
-
-        // Create the window
-        m_pWindow = [[VLCSkinsWindow alloc]
-            initWithOwner:this
-              contentRect:contentRect
-                styleMask:styleMask
-                  backing:NSBackingStoreBuffered
-                    defer:YES];
-
-        if( m_pWindow )
-        {
-            // Register with factory
-            MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
-                OSFactory::instance( pIntf ) );
-            if( pFactory )
+            switch( type )
             {
-                pFactory->m_windowMap[(__bridge void *)m_pWindow] = &rWindow;
+                case GenericWindow::FullscreenWindow:
+                    styleMask = NSWindowStyleMaskBorderless;
+                    contentRect = [[NSScreen mainScreen] frame];
+                    break;
+
+                case GenericWindow::TopWindow:
+                default:
+                    styleMask = NSWindowStyleMaskBorderless;
+                    break;
             }
 
-            // Set up drag & drop if requested
-            if( dragDrop )
-            {
-                m_pDropTarget = new MacOSXDragDrop( pIntf, m_pWindow, playOnDrop, &rWindow );
-            }
+            // Create the window
+            m_pWindow = [[VLCSkinsWindow alloc]
+                initWithOwner:this
+                  contentRect:contentRect
+                    styleMask:styleMask
+                      backing:NSBackingStoreBuffered
+                        defer:YES];
 
-            // Set window level based on type
-            if( type == GenericWindow::FullscreenWindow )
+            if( m_pWindow )
             {
-                [m_pWindow setLevel:NSScreenSaverWindowLevel];
-            }
-            else if( type == GenericWindow::ToolbarWindow )
-            {
-                [m_pWindow setLevel:NSFloatingWindowLevel];
-            }
+                // Register with factory
+                MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
+                    OSFactory::instance( pIntf ) );
+                if( pFactory )
+                {
+                    pFactory->m_windowMap[(__bridge void *)m_pWindow] = &rWindow;
+                }
 
-            // Set parent window
-            if( m_pParent && m_pParent->getNSWindow() )
-            {
-                [m_pParent->getNSWindow() addChildWindow:m_pWindow
-                                                 ordered:NSWindowAbove];
+                // Set up drag & drop if requested
+                if( dragDrop )
+                {
+                    m_pDropTarget = new MacOSXDragDrop( pIntf, m_pWindow, playOnDrop, &rWindow );
+                }
+
+                // Set window level based on type
+                if( type == GenericWindow::FullscreenWindow )
+                {
+                    [m_pWindow setLevel:NSScreenSaverWindowLevel];
+                }
+
+                // Set parent window
+                if( m_pParent && m_pParent->getNSWindow() )
+                {
+                    [m_pParent->getNSWindow() addChildWindow:m_pWindow
+                                                     ordered:NSWindowAbove];
+                }
             }
         }
-    }
+    });
 }
 
 
 MacOSXWindow::~MacOSXWindow()
 {
-    @autoreleasepool {
-        // Unregister from factory
-        MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
-            OSFactory::instance( getIntf() ) );
-        if( pFactory && m_pWindow )
-        {
-            pFactory->m_windowMap.erase( (__bridge void *)m_pWindow );
-        }
+    delete m_pDropTarget;
 
-        delete m_pDropTarget;
-
-        if( m_pWindow )
-        {
-            if( m_pParent && m_pParent->getNSWindow() )
-            {
-                [m_pParent->getNSWindow() removeChildWindow:m_pWindow];
-            }
-            [m_pWindow close];
-            m_pWindow = nil;
-        }
+    // Unregister from factory
+    MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
+        OSFactory::instance( getIntf() ) );
+    if( pFactory && m_pWindow )
+    {
+        pFactory->m_windowMap.erase( (__bridge void *)m_pWindow );
     }
+
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
+            {
+                if( m_pParent && m_pParent->getNSWindow() )
+                {
+                    [m_pParent->getNSWindow() removeChildWindow:m_pWindow];
+                }
+                [m_pWindow close];
+                m_pWindow = nil;
+            }
+        }
+    });
 }
 
 
 void MacOSXWindow::show() const
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            [m_pWindow makeKeyAndOrderFront:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
+            {
+                [m_pWindow makeKeyAndOrderFront:nil];
+            }
         }
-    }
+    });
 }
 
 
 void MacOSXWindow::hide() const
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            [m_pWindow orderOut:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
+            {
+                [m_pWindow orderOut:nil];
+            }
         }
-    }
+    });
 }
 
 
 void MacOSXWindow::moveResize( int left, int top, int width, int height ) const
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            // Convert from skins coordinates (origin top-left)
-            // to Cocoa coordinates (origin bottom-left)
-            NSRect frame = NSMakeRect( left, [NSScreen mainScreen].frame.size.height - top - height,
-                                       width, height );
-            [m_pWindow setFrame:frame display:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
+            {
+                // Convert from skins coordinates (origin top-left)
+                // to Cocoa coordinates (origin bottom-left)
+                NSRect frame = NSMakeRect( left, [NSScreen mainScreen].frame.size.height - top - height,
+                                           width, height );
+                [m_pWindow setFrame:frame display:YES];
+            }
         }
-    }
+    });
 }
 
 
 void MacOSXWindow::raise() const
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            [m_pWindow orderFront:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
+            {
+                [m_pWindow orderFront:nil];
+            }
         }
-    }
+    });
 }
 
 
 void MacOSXWindow::setOpacity( uint8_t value ) const
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            CGFloat alpha = (CGFloat)value / 255.0;
-            [m_pWindow setAlphaValue:alpha];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
+            {
+                CGFloat alpha = (CGFloat)value / 255.0;
+                [m_pWindow setAlphaValue:alpha];
+            }
         }
-    }
+    });
 }
 
 
 void MacOSXWindow::toggleOnTop( bool onTop ) const
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            if( onTop )
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
             {
-                [m_pWindow setLevel:NSFloatingWindowLevel];
-            }
-            else
-            {
-                [m_pWindow setLevel:NSNormalWindowLevel];
+                if( onTop )
+                    [m_pWindow setLevel:NSFloatingWindowLevel];
+                else
+                    [m_pWindow setLevel:NSNormalWindowLevel];
             }
         }
-    }
+    });
 }
 
 
@@ -397,42 +404,42 @@ void MacOSXWindow::setOSHandle( vlc_window_t *pWnd ) const
 
 void MacOSXWindow::reparent( OSWindow *pParent, int x, int y, int w, int h )
 {
-    @autoreleasepool {
-        MacOSXWindow *pMacParent = static_cast<MacOSXWindow*>(pParent);
+    MacOSXWindow *pMacParent = static_cast<MacOSXWindow*>(pParent);
+    m_pParent = pMacParent;
 
-        // Remove from old parent
-        if( m_pParent && m_pParent->getNSWindow() && m_pWindow )
-        {
-            [m_pParent->getNSWindow() removeChildWindow:m_pWindow];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pParent && m_pParent->getNSWindow() && m_pWindow )
+            {
+                [m_pParent->getNSWindow() removeChildWindow:m_pWindow];
+            }
+
+            if( m_pParent && m_pParent->getNSWindow() && m_pWindow )
+            {
+                [m_pParent->getNSWindow() addChildWindow:m_pWindow
+                                                 ordered:NSWindowAbove];
+            }
         }
+    });
 
-        m_pParent = pMacParent;
-
-        // Add to new parent
-        if( m_pParent && m_pParent->getNSWindow() && m_pWindow )
-        {
-            [m_pParent->getNSWindow() addChildWindow:m_pWindow
-                                             ordered:NSWindowAbove];
-        }
-
-        moveResize( x, y, w, h );
-    }
+    moveResize( x, y, w, h );
 }
 
 
 bool MacOSXWindow::invalidateRect( int x, int y, int w, int h ) const
 {
-    @autoreleasepool {
-        if( m_pWindow )
-        {
-            NSView *contentView = [m_pWindow contentView];
-            if( contentView )
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            if( m_pWindow )
             {
-                NSRect rect = NSMakeRect( x, [contentView bounds].size.height - y - h, w, h );
-                [contentView setNeedsDisplayInRect:rect];
-                return true;
+                NSView *contentView = [m_pWindow contentView];
+                if( contentView )
+                {
+                    NSRect rect = NSMakeRect( x, [contentView bounds].size.height - y - h, w, h );
+                    [contentView setNeedsDisplayInRect:rect];
+                }
             }
         }
-        return false;
-    }
+    });
+    return true;
 }

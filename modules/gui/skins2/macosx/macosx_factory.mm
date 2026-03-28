@@ -26,6 +26,7 @@
 #endif
 
 #import <Cocoa/Cocoa.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 #include "macosx_factory.hpp"
 #include "macosx_graphics.hpp"
@@ -83,6 +84,15 @@ bool MacOSXFactory::init()
     @autoreleasepool {
         // Create timer loop
         m_pTimerLoop = new MacOSXTimerLoop( getIntf() );
+
+        // Set activation policy on the main thread before [NSApp run]
+        __block dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+        CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopDefaultMode, ^{
+            [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+            dispatch_semaphore_signal(sem);
+        });
+        CFRunLoopWakeUp(CFRunLoopGetMain());
+        dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 
         return true;
     }

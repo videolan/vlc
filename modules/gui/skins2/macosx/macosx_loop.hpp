@@ -26,6 +26,8 @@
 
 #include "../src/os_loop.hpp"
 
+#import <Cocoa/Cocoa.h>
+#include <dispatch/dispatch.h>
 #include <map>
 
 class GenericWindow;
@@ -51,6 +53,9 @@ private:
     virtual ~MacOSXLoop();
 
     bool m_exit;
+    dispatch_semaphore_t m_exitSemaphore;
+    NSTimer *m_pTimer;
+    id m_pMonitor;
 
     /// Date and position of the last left-click
     vlc_tick_t m_lastClickTime;
