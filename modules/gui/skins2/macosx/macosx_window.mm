@@ -33,6 +33,7 @@
 #include "macosx_graphics.hpp"
 #include "../src/os_factory.hpp"
 #include "../events/evt_focus.hpp"
+#include "../events/evt_refresh.hpp"
 
 // Forward declaration of the window delegate protocol handler
 @class VLCSkinsWindowDelegate;
@@ -214,66 +215,93 @@ MacOSXWindow::MacOSXWindow( intf_thread_t *pIntf, GenericWindow &rWindow,
                             MacOSXWindow *pParentWindow,
                             GenericWindow::WindowType_t type ):
     OSWindow( pIntf ), m_rWindow( rWindow ), m_pWindow( nil ),
-    m_pParent( pParentWindow ), m_type( type ), m_pDropTarget( NULL )
+    m_pVoutView( nil ), m_pParent( pParentWindow ), m_type( type ),
+    m_pDropTarget( NULL )
 {
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    void (^createBlock)(void) = ^{
         @autoreleasepool {
-            // Determine window style
-            NSWindowStyleMask styleMask;
-            NSRect contentRect = NSMakeRect( 0, 0, 100, 100 );
-
-            switch( type )
+            if( type == GenericWindow::VoutWindow )
             {
-                case GenericWindow::FullscreenWindow:
-                    styleMask = NSWindowStyleMaskBorderless;
-                    contentRect = [[NSScreen mainScreen] frame];
-                    break;
+                // For vout windows, create an NSView embedded in the
+                // parent window's content view instead of a separate
+                // NSWindow.  The vout module adds its rendering view
+                // as a subview of this view.
+                NSRect frame = NSMakeRect( 0, 0, 100, 100 );
+                m_pVoutView = [[NSView alloc] initWithFrame:frame];
+                [m_pVoutView setAutoresizesSubviews:YES];
 
-                case GenericWindow::TopWindow:
-                default:
-                    styleMask = NSWindowStyleMaskBorderless;
-                    break;
-            }
-
-            // Create the window
-            m_pWindow = [[VLCSkinsWindow alloc]
-                initWithOwner:this
-                  contentRect:contentRect
-                    styleMask:styleMask
-                      backing:NSBackingStoreBuffered
-                        defer:YES];
-
-            if( m_pWindow )
-            {
-                // Register with factory
-                MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
-                    OSFactory::instance( pIntf ) );
-                if( pFactory )
-                {
-                    pFactory->m_windowMap[(__bridge void *)m_pWindow] = &rWindow;
-                }
-
-                // Set up drag & drop if requested
-                if( dragDrop )
-                {
-                    m_pDropTarget = new MacOSXDragDrop( pIntf, m_pWindow, playOnDrop, &rWindow );
-                }
-
-                // Set window level based on type
-                if( type == GenericWindow::FullscreenWindow )
-                {
-                    [m_pWindow setLevel:NSScreenSaverWindowLevel];
-                }
-
-                // Set parent window
                 if( m_pParent && m_pParent->getNSWindow() )
                 {
-                    [m_pParent->getNSWindow() addChildWindow:m_pWindow
-                                                     ordered:NSWindowAbove];
+                    NSView *parentContent = [m_pParent->getNSWindow() contentView];
+                    [parentContent addSubview:m_pVoutView
+                                  positioned:NSWindowBelow
+                                  relativeTo:nil];
+                }
+            }
+            else
+            {
+                // Determine window style
+                NSWindowStyleMask styleMask;
+                NSRect contentRect = NSMakeRect( 0, 0, 100, 100 );
+
+                switch( type )
+                {
+                    case GenericWindow::FullscreenWindow:
+                        styleMask = NSWindowStyleMaskBorderless;
+                        contentRect = [[NSScreen mainScreen] frame];
+                        break;
+
+                    case GenericWindow::TopWindow:
+                    default:
+                        styleMask = NSWindowStyleMaskBorderless;
+                        break;
+                }
+
+                // Create the window
+                m_pWindow = [[VLCSkinsWindow alloc]
+                    initWithOwner:this
+                      contentRect:contentRect
+                        styleMask:styleMask
+                          backing:NSBackingStoreBuffered
+                            defer:YES];
+
+                if( m_pWindow )
+                {
+                    // Register with factory
+                    MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
+                        OSFactory::instance( pIntf ) );
+                    if( pFactory )
+                    {
+                        pFactory->m_windowMap[(__bridge void *)m_pWindow] = &rWindow;
+                    }
+
+                    // Set up drag & drop if requested
+                    if( dragDrop )
+                    {
+                        m_pDropTarget = new MacOSXDragDrop( pIntf, m_pWindow, playOnDrop, &rWindow );
+                    }
+
+                    // Set window level based on type
+                    if( type == GenericWindow::FullscreenWindow )
+                    {
+                        [m_pWindow setLevel:NSScreenSaverWindowLevel];
+                    }
+
+                    // Set parent window
+                    if( m_pParent && m_pParent->getNSWindow() )
+                    {
+                        [m_pParent->getNSWindow() addChildWindow:m_pWindow
+                                                         ordered:NSWindowAbove];
+                    }
                 }
             }
         }
-    });
+    };
+
+    if( [NSThread isMainThread] )
+        createBlock();
+    else
+        dispatch_sync(dispatch_get_main_queue(), createBlock);
 }
 
 
@@ -289,9 +317,14 @@ MacOSXWindow::~MacOSXWindow()
         pFactory->m_windowMap.erase( (__bridge void *)m_pWindow );
     }
 
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    void (^destroyBlock)(void) = ^{
         @autoreleasepool {
-            if( m_pWindow )
+            if( m_pVoutView )
+            {
+                [m_pVoutView removeFromSuperview];
+                m_pVoutView = nil;
+            }
+            else if( m_pWindow )
             {
                 if( m_pParent && m_pParent->getNSWindow() )
                 {
@@ -301,7 +334,12 @@ MacOSXWindow::~MacOSXWindow()
                 m_pWindow = nil;
             }
         }
-    });
+    };
+
+    if( [NSThread isMainThread] )
+        destroyBlock();
+    else
+        dispatch_sync(dispatch_get_main_queue(), destroyBlock);
 }
 
 
@@ -309,12 +347,20 @@ void MacOSXWindow::show() const
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
-            if( m_pWindow )
+            if( m_pVoutView )
+            {
+                [m_pVoutView setHidden:NO];
+            }
+            else if( m_pWindow )
             {
                 [m_pWindow makeKeyAndOrderFront:nil];
             }
         }
     });
+
+    // Trigger a refresh so the skins engine paints the window content
+    EvtRefresh evt( getIntf(), 0, 0, m_rWindow.getWidth(), m_rWindow.getHeight() );
+    m_rWindow.processEvent( evt );
 }
 
 
@@ -322,7 +368,11 @@ void MacOSXWindow::hide() const
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
-            if( m_pWindow )
+            if( m_pVoutView )
+            {
+                [m_pVoutView setHidden:YES];
+            }
+            else if( m_pWindow )
             {
                 [m_pWindow orderOut:nil];
             }
@@ -335,7 +385,18 @@ void MacOSXWindow::moveResize( int left, int top, int width, int height ) const
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
-            if( m_pWindow )
+            if( m_pVoutView )
+            {
+                // Position within parent's content view.
+                // Skins coordinates have origin at top-left,
+                // AppKit views have origin at bottom-left.
+                NSView *parentView = [m_pVoutView superview];
+                CGFloat parentHeight = parentView ? [parentView bounds].size.height : 0;
+                NSRect frame = NSMakeRect( left, parentHeight - top - height,
+                                           width, height );
+                [m_pVoutView setFrame:frame];
+            }
+            else if( m_pWindow )
             {
                 // Convert from skins coordinates (origin top-left)
                 // to Cocoa coordinates (origin bottom-left)
@@ -352,7 +413,12 @@ void MacOSXWindow::raise() const
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
-            if( m_pWindow )
+            if( m_pVoutView )
+            {
+                // no-op: the vout view is always below the skins
+                // content view so the skin controls render on top
+            }
+            else if( m_pWindow )
             {
                 [m_pWindow orderFront:nil];
             }
@@ -365,9 +431,13 @@ void MacOSXWindow::setOpacity( uint8_t value ) const
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
-            if( m_pWindow )
+            CGFloat alpha = (CGFloat)value / 255.0;
+            if( m_pVoutView )
             {
-                CGFloat alpha = (CGFloat)value / 255.0;
+                [m_pVoutView setAlphaValue:alpha];
+            }
+            else if( m_pWindow )
+            {
                 [m_pWindow setAlphaValue:alpha];
             }
         }
@@ -393,7 +463,16 @@ void MacOSXWindow::toggleOnTop( bool onTop ) const
 
 void MacOSXWindow::setOSHandle( vlc_window_t *pWnd ) const
 {
-    if( pWnd && m_pWindow )
+    if( !pWnd )
+        return;
+
+    if( m_pVoutView )
+    {
+        pWnd->type = VLC_WINDOW_TYPE_NSOBJECT;
+        pWnd->info.has_double_click = true;
+        pWnd->handle.nsobject = (__bridge void *)m_pVoutView;
+    }
+    else if( m_pWindow )
     {
         pWnd->type = VLC_WINDOW_TYPE_NSOBJECT;
         pWnd->info.has_double_click = true;
@@ -409,15 +488,30 @@ void MacOSXWindow::reparent( OSWindow *pParent, int x, int y, int w, int h )
 
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
-            if( m_pParent && m_pParent->getNSWindow() && m_pWindow )
+            if( m_pVoutView )
             {
-                [m_pParent->getNSWindow() removeChildWindow:m_pWindow];
+                // Move the vout view to the new parent's content view
+                [m_pVoutView removeFromSuperview];
+                if( m_pParent && m_pParent->getNSWindow() )
+                {
+                    NSView *parentContent = [m_pParent->getNSWindow() contentView];
+                    [parentContent addSubview:m_pVoutView
+                                  positioned:NSWindowBelow
+                                  relativeTo:nil];
+                }
             }
-
-            if( m_pParent && m_pParent->getNSWindow() && m_pWindow )
+            else if( m_pWindow )
             {
-                [m_pParent->getNSWindow() addChildWindow:m_pWindow
-                                                 ordered:NSWindowAbove];
+                if( m_pParent && m_pParent->getNSWindow() )
+                {
+                    [m_pParent->getNSWindow() removeChildWindow:m_pWindow];
+                }
+
+                if( m_pParent && m_pParent->getNSWindow() )
+                {
+                    [m_pParent->getNSWindow() addChildWindow:m_pWindow
+                                                     ordered:NSWindowAbove];
+                }
             }
         }
     });
@@ -428,6 +522,12 @@ void MacOSXWindow::reparent( OSWindow *pParent, int x, int y, int w, int h )
 
 bool MacOSXWindow::invalidateRect( int x, int y, int w, int h ) const
 {
+    if( m_pVoutView )
+    {
+        // The vout module manages its own rendering
+        return true;
+    }
+
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
             if( m_pWindow )

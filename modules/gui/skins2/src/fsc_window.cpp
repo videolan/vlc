@@ -54,7 +54,10 @@ FscWindow::FscWindow( intf_thread_t *pIntf, int left, int top,
     rFullscreen.addObserver( this );
 
     // opacity overridden by user
-    m_opacity = 255 * var_InheritFloat( getIntf(), "qt-fs-opacity" );
+    if( config_FindConfig( "qt-fs-opacity" ) )
+        m_opacity = 255 * var_InheritFloat( getIntf(), "qt-fs-opacity" );
+    else
+        m_opacity = 255;
 
     // fullscreen-controller timeout overridden by user
     m_delay = var_InheritInteger( getIntf(), "mouse-hide-timeout" ) / FSC_COUNT;
@@ -62,7 +65,10 @@ FscWindow::FscWindow( intf_thread_t *pIntf, int left, int top,
         m_delay = FSC_DELAY;
 
     /// activation overridden by user
-    m_enabled = var_InheritBool( getIntf(), "qt-fs-controller" );
+    if( config_FindConfig( "qt-fs-controller" ) )
+        m_enabled = var_InheritBool( getIntf(), "qt-fs-controller" );
+    else
+        m_enabled = true;
 
     // register Fsc
     VoutManager::instance( getIntf())->registerFSC( this );

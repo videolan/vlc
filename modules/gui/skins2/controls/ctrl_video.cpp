@@ -42,7 +42,8 @@ CtrlVideo::CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
     rFullscreen.addObserver( this );
 
     // if global parameter set to no resize, override skins behavior
-    if( !var_InheritBool( pIntf, "qt-video-autoresize" ) )
+    if( config_FindConfig( "qt-video-autoresize" ) &&
+        !var_InheritBool( pIntf, "qt-video-autoresize" ) )
         m_bAutoResize = false;
 }
 

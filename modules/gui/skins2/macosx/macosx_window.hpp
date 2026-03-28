@@ -29,13 +29,9 @@
 
 #include <vlc_window.h>
 
-#ifdef __OBJC__
 @class NSWindow;
+@class NSView;
 @class VLCSkinsWindow;
-#else
-typedef void NSWindow;
-typedef void VLCSkinsWindow;
-#endif
 
 class MacOSXDragDrop;
 
@@ -87,8 +83,10 @@ public:
 private:
     /// Associated GenericWindow
     GenericWindow &m_rWindow;
-    /// NSWindow handle
+    /// NSWindow handle (used for TopWindow/FullscreenWindow)
     VLCSkinsWindow *m_pWindow;
+    /// NSView handle (used for VoutWindow, embedded in parent's content view)
+    NSView *m_pVoutView;
     /// Parent window
     MacOSXWindow *m_pParent;
     /// Window type

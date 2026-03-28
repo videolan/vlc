@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_player.h>

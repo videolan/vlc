@@ -44,7 +44,10 @@ WindowManager::WindowManager( intf_thread_t *pIntf ):
     m_opacityEnabled = var_InheritBool( getIntf(), "skins2-transparency" );
 
     // opacity overridden by user
-    m_opacity = 255 * var_InheritFloat( getIntf(), "qt-opacity" );
+    if( config_FindConfig( "qt-opacity" ) )
+        m_opacity = 255 * var_InheritFloat( getIntf(), "qt-opacity" );
+    else
+        m_opacity = 255;
 }
 
 WindowManager::~WindowManager() = default;

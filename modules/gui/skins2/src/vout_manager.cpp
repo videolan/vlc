@@ -323,7 +323,9 @@ void VoutManager::onUpdate( Subject<VarBool> &rVariable, void *arg )
 
 void VoutManager::configureFullscreen( VoutWindow& rWindow )
 {
-    int numScr = var_InheritInteger( getIntf(), "qt-fullscreen-screennumber" );
+    int numScr = -1;
+    if( config_FindConfig( "qt-fullscreen-screennumber" ) )
+        numScr = var_InheritInteger( getIntf(), "qt-fullscreen-screennumber" );
 
     int x, y, w, h;
     if( numScr >= 0 )
