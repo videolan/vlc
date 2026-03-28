@@ -118,7 +118,14 @@ void MacOSXLoop::run()
                 }
             }];
 
-            // Set up the menu bar after finishLaunching
+            // Set up the menu bar after finishLaunching.
+            // First, disable window restoration BEFORE finishLaunching
+            // to prevent AppKit from restoring windows belonging to a
+            // different interface (e.g. the native macOS one).
+            if( [NSApp respondsToSelector:@selector(disableRelaunchOnLogin)] )
+                [NSApp disableRelaunchOnLogin];
+            [[NSUserDefaults standardUserDefaults] setBool:NO
+                                                    forKey:@"NSQuitAlwaysKeepsWindows"];
             [NSApp finishLaunching];
 
             NSMenu *menuBar = [[NSMenu alloc] init];

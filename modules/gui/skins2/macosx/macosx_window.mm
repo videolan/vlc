@@ -253,7 +253,8 @@ MacOSXWindow::MacOSXWindow( intf_thread_t *pIntf, GenericWindow &rWindow,
 
                     case GenericWindow::TopWindow:
                     default:
-                        styleMask = NSWindowStyleMaskBorderless;
+                        styleMask = NSWindowStyleMaskBorderless
+                                  | NSWindowStyleMaskMiniaturizable;
                         break;
                 }
 

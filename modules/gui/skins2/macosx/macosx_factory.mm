@@ -129,31 +129,33 @@ void MacOSXFactory::destroyOSLoop()
 
 void MacOSXFactory::minimize()
 {
-    @autoreleasepool {
-        // Minimize all application windows
-        for( NSWindow *window in [NSApp windows] )
-        {
-            if( [window isVisible] && ![window isMiniaturized] )
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            for( NSWindow *window in [NSApp windows] )
             {
-                [window miniaturize:nil];
+                if( [window isVisible] && ![window isMiniaturized] )
+                {
+                    [window miniaturize:nil];
+                }
             }
         }
-    }
+    });
 }
 
 
 void MacOSXFactory::restore()
 {
-    @autoreleasepool {
-        // Restore all minimized windows
-        for( NSWindow *window in [NSApp windows] )
-        {
-            if( [window isMiniaturized] )
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            for( NSWindow *window in [NSApp windows] )
             {
-                [window deminiaturize:nil];
+                if( [window isMiniaturized] )
+                {
+                    [window deminiaturize:nil];
+                }
             }
         }
-    }
+    });
 }
 
 
