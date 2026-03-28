@@ -40,7 +40,7 @@ ImageExt {
     //       set to any texture provider. For example, `ShaderEffectSource` can be displayed
     //       rounded this way.
     property alias targetTextureProvider: textureProviderIndirection.source
-    targetTextureProvider: sourceTextureProviderItem
+    targetTextureProvider: unboundTextureProviderItem ?? sourceTextureProviderItem
 
     // No need to load images in this case:
     loadImages: (targetTextureProvider === root.sourceTextureProviderItem)

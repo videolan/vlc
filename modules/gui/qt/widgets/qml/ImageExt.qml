@@ -81,7 +81,12 @@ Item {
     //          `source` url if there is a possibility of `textureProviderItem` being `null`
     //          as long as it is applicable (not all texture providers may be sourced from
     //          a source url, or the source url may also be lost and not tracked anymore).
-    property Item textureProviderItem: sourceTextureProviderItem
+    property Item textureProviderItem: unboundTextureProviderItem ?? sourceTextureProviderItem
+
+    // This property is not necessary, but since `textureProviderItem` has a binding by default,
+    // `layer.samplerName` does not make Qt overwrite the property. This is considered a Qt bug. If you
+    // want to use this item as a layer effect, set the `samplerName` to `unboundTextureProviderItem`:
+    property Item unboundTextureProviderItem
 
     readonly property Item effectiveTextureProviderItem: shaderEffect.source
 
