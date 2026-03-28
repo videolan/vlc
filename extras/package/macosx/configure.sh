@@ -18,7 +18,6 @@ OPTIONS="
         --enable-twolame
         --enable-libass
         --enable-macosx-avfoundation
-        --disable-skins2
         --disable-xcb
         --disable-caca
         --disable-pulse

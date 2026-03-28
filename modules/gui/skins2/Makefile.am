@@ -236,6 +236,26 @@ libskins2_plugin_la_SOURCES += \
 	gui/skins2/os2/os2_window.hpp \
     $(NULL)
 else
+if HAVE_DARWIN
+libskins2_plugin_la_SOURCES += \
+	gui/skins2/macosx/macosx_dragdrop.mm \
+	gui/skins2/macosx/macosx_dragdrop.hpp \
+	gui/skins2/macosx/macosx_factory.mm \
+	gui/skins2/macosx/macosx_factory.hpp \
+	gui/skins2/macosx/macosx_graphics.mm \
+	gui/skins2/macosx/macosx_graphics.hpp \
+	gui/skins2/macosx/macosx_loop.mm \
+	gui/skins2/macosx/macosx_loop.hpp \
+	gui/skins2/macosx/macosx_popup.mm \
+	gui/skins2/macosx/macosx_popup.hpp \
+	gui/skins2/macosx/macosx_timer.mm \
+	gui/skins2/macosx/macosx_timer.hpp \
+	gui/skins2/macosx/macosx_tooltip.mm \
+	gui/skins2/macosx/macosx_tooltip.hpp \
+	gui/skins2/macosx/macosx_window.mm \
+	gui/skins2/macosx/macosx_window.hpp \
+    $(NULL)
+else
 libskins2_plugin_la_SOURCES += \
 	gui/skins2/x11/x11_display.cpp \
 	gui/skins2/x11/x11_display.hpp \
@@ -258,9 +278,12 @@ libskins2_plugin_la_SOURCES += \
     $(NULL)
 endif
 endif
+endif
 
 libskins2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_skins2)
 libskins2_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) -O2 -fno-rtti
+libskins2_plugin_la_OBJCXXFLAGS = $(AM_OBJCXXFLAGS) $(CPPFLAGS_skins2) -O2 -fno-rtti
+libskins2_plugin_la_LIBTOOLFLAGS = --tag=CXX
 libskins2_plugin_la_LIBADD = $(LIBS_skins2)
 
 if BUILD_SKINS

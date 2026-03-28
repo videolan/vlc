@@ -53,6 +53,7 @@ AC_DEFINE([LIBVLC_INTERNAL_],, [Define within the LibVLC source code tree.])
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_OBJC
+AC_PROG_OBJCXX
 AC_PROG_EGREP
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
@@ -76,6 +77,7 @@ AC_LANG_PUSH([C++])
 AX_CXX_COMPILE_STDCXX_17([noext], [mandatory])
 AX_CXX_TYPEOF
 AC_LANG_POP([C++])
+OBJCXXFLAGS="${OBJCXXFLAGS} -std=c++17"
 
 dnl Extend the --help string at the current spot.
 AC_DEFUN([EXTEND_HELP_STRING], [m4_divert_once([HELP_ENABLE], [$1])])
@@ -282,6 +284,7 @@ int foo() { return my_array[0]; }
         CC="${CC} -isysroot ${with_macosx_sdk}"
         CXX="${CXX} -isysroot ${with_macosx_sdk}"
         OBJC="${OBJC} -isysroot ${with_macosx_sdk}"
+        OBJCXX="${OBJCXX} -isysroot ${with_macosx_sdk}"
         CCAS="${CCAS} -isysroot ${with_macosx_sdk}"
         LD="${LD} -syslibroot ${with_macosx_sdk}"
     fi
@@ -293,6 +296,7 @@ int foo() { return my_array[0]; }
         CC="${CC} -mmacosx-version-min=${with_macosx_version_min}"
         CXX="${CXX} -mmacosx-version-min=${with_macosx_version_min}"
         OBJC="${OBJC} -mmacosx-version-min=${with_macosx_version_min}"
+        OBJCXX="${OBJCXX} -mmacosx-version-min=${with_macosx_version_min}"
         CCAS="${CCAS} -mmacosx-version-min=${with_macosx_version_min}"
         LD="${LD} -mmacosx_version_min=${with_macosx_version_min}"
     fi
@@ -4346,7 +4350,7 @@ AS_IF([test "x$KDE4_CONFIG" = "x"], [
 dnl
 dnl Simple test for skins2 dependency
 dnl
-AS_IF([test "$enable_qt" = "no"], [
+AS_IF([test "$enable_qt" = "no" -a "${SYS}" != "darwin"], [
   AS_IF([test "${enable_skins2}" = "yes"], [
     AC_MSG_ERROR([The skins2 module depends on the Qt interface. Without it you will not be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt development package or alternatively you can also configure with: --disable-qt --disable-skins2.])
   ], [
@@ -4370,6 +4374,10 @@ AS_IF([test "${enable_skins2}" != "no"], [
   dnl OS/2
   ], [test "${SYS}" = "os2"], [
     VLC_ADD_CPPFLAGS([skins2],[ -DOS2_SKINS])
+  dnl macOS
+  ], [test "${SYS}" = "darwin"], [
+    VLC_ADD_CPPFLAGS([skins2],[-DMACOSX_SKINS])
+    VLC_ADD_LIBS([skins2],[-Wl,-framework,Cocoa,-framework,Carbon,-framework,CoreGraphics])
   dnl Linux/Unix
   ], [
     PKG_CHECK_MODULES([XPM], [xpm],, [have_skins_deps="no"])
