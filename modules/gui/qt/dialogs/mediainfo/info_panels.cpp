@@ -381,6 +381,18 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
      layout->addWidget( extraMeta, 1, 0 );
 }
 
+void ExtraMetaPanel::showEvent( QShowEvent * event )
+{
+    extraMeta->resizeRowsToContents();
+    QWidget::showEvent( event );
+}
+
+void ExtraMetaPanel::resizeEvent( QResizeEvent * event )
+{
+    extraMeta->resizeRowsToContents();
+    QWidget::resizeEvent( event );
+}
+
 /**
  * Update the Extra Metadata from p_meta->i_extras
  **/

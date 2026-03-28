@@ -99,6 +99,9 @@ class ExtraMetaPanel: public QWidget
     Q_OBJECT
 public:
     ExtraMetaPanel( QWidget * );
+protected:
+    void showEvent( QShowEvent * ) override;
+    void resizeEvent( QResizeEvent * ) override;
 private:
     QTableWidget *extraMeta;
 public slots:
