@@ -70,7 +70,7 @@ public:
     }
     virtual ~VoutMainWindow() { }
 
-#if defined( _WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ ) || defined( __APPLE__ )
 
     virtual void processEvent( EvtKey &rEvtKey )
     {

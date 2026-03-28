@@ -45,6 +45,55 @@
 #include "../src/dialogs.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_fullscreen.hpp"
+#include "../commands/async_queue.hpp"
+
+/// Helper class to dispatch menu actions to skins2 commands
+@interface VLCSkinsMenuHandler : NSObject
+{
+    intf_thread_t *m_pIntf;
+}
+- (instancetype)initWithIntf:(intf_thread_t *)pIntf;
+- (void)openFile:(id)sender;
+- (void)openDirectory:(id)sender;
+- (void)toggleFullscreen:(id)sender;
+@end
+
+@implementation VLCSkinsMenuHandler
+
+- (instancetype)initWithIntf:(intf_thread_t *)pIntf
+{
+    self = [super init];
+    if( self )
+        m_pIntf = pIntf;
+    return self;
+}
+
+- (void)openFile:(id)sender
+{
+    (void)sender;
+    Dialogs *dlg = Dialogs::instance( m_pIntf );
+    if( dlg )
+        dlg->showFileSimple( true );
+}
+
+- (void)openDirectory:(id)sender
+{
+    (void)sender;
+    Dialogs *dlg = Dialogs::instance( m_pIntf );
+    if( dlg )
+        dlg->showDirectory( true );
+}
+
+- (void)toggleFullscreen:(id)sender
+{
+    (void)sender;
+    CmdFullscreen *pCmd = new CmdFullscreen( m_pIntf );
+    AsyncQueue *pQueue = AsyncQueue::instance( m_pIntf );
+    if( pQueue )
+        pQueue->push( CmdGenericPtr( pCmd ) );
+}
+
+@end
 
 static inline NSString *_NS( const char *s )
 {
@@ -128,6 +177,9 @@ void MacOSXLoop::run()
                                                     forKey:@"NSQuitAlwaysKeepsWindows"];
             [NSApp finishLaunching];
 
+            VLCSkinsMenuHandler *menuHandler =
+                [[VLCSkinsMenuHandler alloc] initWithIntf:getIntf()];
+
             NSMenu *menuBar = [[NSMenu alloc] init];
 
             // Application menu
@@ -157,9 +209,14 @@ void MacOSXLoop::run()
             // File menu
             NSMenuItem *fileMenuItem = [[NSMenuItem alloc] init];
             NSMenu *fileMenu = [[NSMenu alloc] initWithTitle:_NS("File")];
-            [fileMenu addItemWithTitle:_NS("Open File...")
-                                action:@selector(openDocument:)
+            NSMenuItem *openFile = [fileMenu addItemWithTitle:_NS("Open File...")
+                                action:@selector(openFile:)
                          keyEquivalent:@"o"];
+            [openFile setTarget:menuHandler];
+            NSMenuItem *openDir = [fileMenu addItemWithTitle:_NS("Open Folder")
+                                action:@selector(openDirectory:)
+                         keyEquivalent:@"d"];
+            [openDir setTarget:menuHandler];
             [fileMenuItem setSubmenu:fileMenu];
             [menuBar addItem:fileMenuItem];
 
@@ -172,6 +229,11 @@ void MacOSXLoop::run()
             [windowMenu addItemWithTitle:_NS("Close")
                                   action:@selector(performClose:)
                            keyEquivalent:@"w"];
+            [windowMenu addItem:[NSMenuItem separatorItem]];
+            NSMenuItem *fsItem = [windowMenu addItemWithTitle:_NS("Toggle Fullscreen mode")
+                                  action:@selector(toggleFullscreen:)
+                           keyEquivalent:@"f"];
+            [fsItem setTarget:menuHandler];
             [windowMenuItem setSubmenu:windowMenu];
             [menuBar addItem:windowMenuItem];
             [NSApp setWindowsMenu:windowMenu];

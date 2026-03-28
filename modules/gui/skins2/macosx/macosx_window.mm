@@ -228,6 +228,7 @@ MacOSXWindow::MacOSXWindow( intf_thread_t *pIntf, GenericWindow &rWindow,
                 // as a subview of this view.
                 NSRect frame = NSMakeRect( 0, 0, 100, 100 );
                 m_pVoutView = [[NSView alloc] initWithFrame:frame];
+                [m_pVoutView setHidden:YES];
                 [m_pVoutView setAutoresizesSubviews:YES];
 
                 if( m_pParent && m_pParent->getNSWindow() )
@@ -282,10 +283,13 @@ MacOSXWindow::MacOSXWindow( intf_thread_t *pIntf, GenericWindow &rWindow,
                         m_pDropTarget = new MacOSXDragDrop( pIntf, m_pWindow, playOnDrop, &rWindow );
                     }
 
-                    // Set window level based on type
+                    // Configure fullscreen window
                     if( type == GenericWindow::FullscreenWindow )
                     {
-                        [m_pWindow setLevel:NSScreenSaverWindowLevel];
+                        [m_pWindow setLevel:NSMainMenuWindowLevel + 1];
+                        [m_pWindow setBackgroundColor:[NSColor blackColor]];
+                        [m_pWindow setOpaque:YES];
+                        [m_pWindow setCollectionBehavior:NSWindowCollectionBehaviorStationary];
                     }
 
                     // Set parent window
@@ -355,6 +359,14 @@ void MacOSXWindow::show() const
             else if( m_pWindow )
             {
                 [m_pWindow makeKeyAndOrderFront:nil];
+
+                // Hide dock and menu bar for fullscreen windows
+                if( m_type == GenericWindow::FullscreenWindow )
+                {
+                    [NSApp setPresentationOptions:
+                        NSApplicationPresentationHideDock |
+                        NSApplicationPresentationHideMenuBar];
+                }
             }
         }
     });
@@ -375,6 +387,13 @@ void MacOSXWindow::hide() const
             }
             else if( m_pWindow )
             {
+                // Restore dock and menu bar when leaving fullscreen
+                if( m_type == GenericWindow::FullscreenWindow )
+                {
+                    [NSApp setPresentationOptions:
+                        NSApplicationPresentationDefault];
+                }
+
                 [m_pWindow orderOut:nil];
             }
         }
@@ -487,7 +506,9 @@ void MacOSXWindow::reparent( OSWindow *pParent, int x, int y, int w, int h )
     MacOSXWindow *pMacParent = static_cast<MacOSXWindow*>(pParent);
     m_pParent = pMacParent;
 
-    dispatch_async(dispatch_get_main_queue(), ^{
+    // Use synchronous dispatch so the view hierarchy is updated
+    // before subsequent resize/show calls execute.
+    void (^reparentBlock)(void) = ^{
         @autoreleasepool {
             if( m_pVoutView )
             {
@@ -515,7 +536,12 @@ void MacOSXWindow::reparent( OSWindow *pParent, int x, int y, int w, int h )
                 }
             }
         }
-    });
+    };
+
+    if( [NSThread isMainThread] )
+        reparentBlock();
+    else
+        dispatch_sync(dispatch_get_main_queue(), reparentBlock);
 
     moveResize( x, y, w, h );
 }

@@ -29,6 +29,8 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
+#include <vlc_input_item.h>
 
 static void ShowDialog( intf_thread_t *, int, int, intf_dialog_args_t * );
 
@@ -44,59 +46,115 @@ static void Close( vlc_object_t *p_this )
     VLC_UNUSED( p_this );
 }
 
+static void OpenFilePanel( intf_thread_t *p_intf, bool b_play,
+                           bool b_directories )
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            NSOpenPanel *panel = [NSOpenPanel openPanel];
+            [panel setAllowsMultipleSelection:YES];
+            [panel setCanChooseDirectories:b_directories];
+            [panel setCanChooseFiles:!b_directories];
+
+            if( b_directories )
+                [panel setTitle:@"Open Directory"];
+            else
+                [panel setTitle:@"Open File"];
+
+            if( [panel runModal] == NSModalResponseOK )
+            {
+                vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist( p_intf );
+                vlc_playlist_Lock( playlist );
+
+                for( NSURL *url in [panel URLs] )
+                {
+                    input_item_t *p_input = input_item_New(
+                        [[url absoluteString] UTF8String], NULL );
+                    if( p_input )
+                    {
+                        vlc_playlist_AppendOne( playlist, p_input );
+                        input_item_Release( p_input );
+                    }
+                }
+
+                if( b_play && vlc_playlist_Count( playlist ) > 0 )
+                {
+                    vlc_playlist_PlayAt( playlist,
+                        vlc_playlist_Count( playlist ) - (int)[[panel URLs] count] );
+                }
+
+                vlc_playlist_Unlock( playlist );
+            }
+        }
+    });
+}
+
 static void ShowDialog( intf_thread_t *p_intf, int i_dialog, int i_arg,
                         intf_dialog_args_t *p_arg )
 {
-    VLC_UNUSED( i_arg );
-
-    if( i_dialog == INTF_DIALOG_FILE_GENERIC && p_arg )
+    switch( i_dialog )
     {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            @autoreleasepool {
-                if( p_arg->b_save )
-                {
-                    NSSavePanel *panel = [NSSavePanel savePanel];
-                    if( p_arg->psz_title )
-                        [panel setTitle:[NSString stringWithUTF8String:p_arg->psz_title]];
+        case INTF_DIALOG_FILE_SIMPLE:
+        case INTF_DIALOG_FILE:
+            OpenFilePanel( p_intf, i_arg != 0, false );
+            break;
 
-                    if( [panel runModal] == NSModalResponseOK )
-                    {
-                        const char *path = [[[panel URL] path] UTF8String];
-                        p_arg->i_results = 1;
-                        p_arg->psz_results = (char **)malloc( sizeof(char*) );
-                        p_arg->psz_results[0] = strdup( path );
-                    }
-                }
-                else
-                {
-                    NSOpenPanel *panel = [NSOpenPanel openPanel];
-                    if( p_arg->psz_title )
-                        [panel setTitle:[NSString stringWithUTF8String:p_arg->psz_title]];
-                    [panel setAllowsMultipleSelection:p_arg->b_multiple];
-                    [panel setCanChooseDirectories:NO];
-                    [panel setCanChooseFiles:YES];
+        case INTF_DIALOG_DIRECTORY:
+            OpenFilePanel( p_intf, i_arg != 0, true );
+            break;
 
-                    if( [panel runModal] == NSModalResponseOK )
+        case INTF_DIALOG_FILE_GENERIC:
+            if( !p_arg )
+                break;
+
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                @autoreleasepool {
+                    if( p_arg->b_save )
                     {
-                        NSArray *urls = [panel URLs];
-                        int count = (int)[urls count];
-                        p_arg->i_results = count;
-                        p_arg->psz_results = (char **)malloc( count * sizeof(char*) );
-                        for( int i = 0; i < count; i++ )
+                        NSSavePanel *panel = [NSSavePanel savePanel];
+                        if( p_arg->psz_title )
+                            [panel setTitle:[NSString stringWithUTF8String:p_arg->psz_title]];
+
+                        if( [panel runModal] == NSModalResponseOK )
                         {
-                            p_arg->psz_results[i] = strdup(
-                                [[[urls objectAtIndex:i] path] UTF8String] );
+                            const char *path = [[[panel URL] path] UTF8String];
+                            p_arg->i_results = 1;
+                            p_arg->psz_results = (char **)malloc( sizeof(char*) );
+                            p_arg->psz_results[0] = strdup( path );
+                        }
+                    }
+                    else
+                    {
+                        NSOpenPanel *panel = [NSOpenPanel openPanel];
+                        if( p_arg->psz_title )
+                            [panel setTitle:[NSString stringWithUTF8String:p_arg->psz_title]];
+                        [panel setAllowsMultipleSelection:p_arg->b_multiple];
+                        [panel setCanChooseDirectories:NO];
+                        [panel setCanChooseFiles:YES];
+
+                        if( [panel runModal] == NSModalResponseOK )
+                        {
+                            NSArray *urls = [panel URLs];
+                            int count = (int)[urls count];
+                            p_arg->i_results = count;
+                            p_arg->psz_results = (char **)malloc( count * sizeof(char*) );
+                            for( int i = 0; i < count; i++ )
+                            {
+                                p_arg->psz_results[i] = strdup(
+                                    [[[urls objectAtIndex:i] path] UTF8String] );
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        if( p_arg->pf_callback )
-            p_arg->pf_callback( p_arg );
+            if( p_arg->pf_callback )
+                p_arg->pf_callback( p_arg );
+            break;
+
+        default:
+            break;
     }
-
-    (void) p_intf;
 }
 
 vlc_module_begin()
