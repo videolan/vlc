@@ -171,5 +171,6 @@ vlc_modules += {
     'dependencies' : [ skins2_deps ],
     'c_args' : skins2_flags,
     'cpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
+    'objcpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
     'enabled': skins2_enabled,
 }
