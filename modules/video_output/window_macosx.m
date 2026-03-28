@@ -491,7 +491,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mouseDown:(NSEvent *)event
 {
     @synchronized(self) {
-        if (event.type == NSLeftMouseDown &&
+        if (event.type == NSEventTypeLeftMouseDown &&
             !(event.modifierFlags & NSControlKeyMask) &&
             event.clickCount == 1) {
             [_moduleDelegate reportMousePressed:MOUSE_BUTTON_LEFT];
@@ -505,7 +505,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mouseUp:(NSEvent *)event
 {
     @synchronized(self) {
-        if (event.type == NSLeftMouseUp) {
+        if (event.type == NSEventTypeLeftMouseUp) {
             [_moduleDelegate reportMouseReleased:MOUSE_BUTTON_LEFT];
         }
     }

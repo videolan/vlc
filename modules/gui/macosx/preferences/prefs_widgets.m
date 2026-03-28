@@ -167,8 +167,8 @@ my_width, tooltip, init_value)                                              \
     [o_stepper setMinValue: lower];                                         \
     [o_stepper setTarget: self];                                            \
     [o_stepper setAction: @selector(stepperChanged:)];                      \
-    [o_stepper sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |       \
-        NSLeftMouseDraggedMask];                                            \
+    [o_stepper sendActionOn:NSEventMaskLeftMouseUp                          \
+        | NSEventMaskLeftMouseDown | NSEventMaskLeftMouseDragged];          \
     [o_stepper sizeToFit];                                                  \
 }
 
@@ -1387,8 +1387,8 @@ my_width, tooltip, init_value)                                              \
         [o_slider setAutoresizingMask:NSViewWidthSizable ];
         [o_slider setTarget: self];
         [o_slider setAction: @selector(sliderChanged:)];
-        [o_slider sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |
-         NSLeftMouseDraggedMask];
+        [o_slider sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskLeftMouseDown |
+         NSEventMaskLeftMouseDragged];
         [self addSubview: o_slider];
 
     }
@@ -1594,8 +1594,8 @@ my_width, tooltip, init_value)                                              \
         [o_slider setAutoresizingMask:NSViewWidthSizable ];
         [o_slider setTarget: self];
         [o_slider setAction: @selector(sliderChanged:)];
-        [o_slider sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |
-         NSLeftMouseDraggedMask];
+        [o_slider sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskLeftMouseDown |
+         NSEventMaskLeftMouseDragged];
         [self addSubview: o_slider];
 
     }
@@ -1835,8 +1835,8 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     [o_tableview setDataSource:self];
     [o_tableview setTarget: self];
     [o_tableview setAction: @selector(tableChanged:)];
-    [o_tableview sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |
-     NSLeftMouseDraggedMask];
+    [o_tableview sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskLeftMouseDown |
+     NSEventMaskLeftMouseDragged];
 
     [o_tableview reloadData];
     [o_tableview setAutoresizingMask: NSViewWidthSizable];

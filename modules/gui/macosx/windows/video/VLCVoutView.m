@@ -162,7 +162,7 @@
 
 - (void)mouseDown:(NSEvent *)o_event
 {
-    if (([o_event type] == NSLeftMouseDown) && (! ([o_event modifierFlags] &  NSControlKeyMask))) {
+    if (([o_event type] == NSEventTypeLeftMouseDown) && (! ([o_event modifierFlags] &  NSControlKeyMask))) {
         if (o_event.clickCount == 1) {
             vlc_mutex_lock(&_mutex);
             if (_wnd) {
@@ -173,7 +173,7 @@
             [_playerController toggleFullscreen];
         }
     } else if (([o_event type] == NSEventTypeRightMouseDown) ||
-               (([o_event type] == NSLeftMouseDown) &&
+               (([o_event type] == NSEventTypeLeftMouseDown) &&
                ([o_event modifierFlags] &  NSControlKeyMask))) {
         [NSMenu popUpContextMenu: VLCMain.sharedInstance.mainMenu.voutMenu withEvent: o_event forView: self];
     }
@@ -183,7 +183,7 @@
 
 - (void)mouseUp:(NSEvent *)event
 {
-    if (event.type == NSLeftMouseUp) {
+    if (event.type == NSEventTypeLeftMouseUp) {
         vlc_mutex_lock(&_mutex);
         if (_wnd) {
             vlc_window_ReportMouseReleased(_wnd, MOUSE_BUTTON_LEFT);
@@ -256,7 +256,7 @@
 
     // A mouse scroll wheel has lower sensitivity. We want to scroll at least
     // with every event here.
-    BOOL isMouseScrollWheel = ([theEvent subtype] == NSMouseEventSubtype);
+    BOOL isMouseScrollWheel = ([theEvent subtype] == NSEventSubtypeMouseEvent);
     if (isMouseScrollWheel && f_deltaYAbs < f_yThreshold)
         f_deltaY = f_deltaY > 0. ? f_yThreshold : -f_yThreshold;
 
