@@ -37,6 +37,8 @@
 #include "macosx_popup.hpp"
 #include "../src/generic_window.hpp"
 
+#include <vlc_configuration.h>
+
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -46,17 +48,25 @@ MacOSXFactory::MacOSXFactory( intf_thread_t *pIntf ):
     OSFactory( pIntf ), m_pTimerLoop( NULL ), m_dirSep( "/" )
 {
     // Initialize the resource path
+    // Relative path for development builds (CWD is the build directory)
     m_resourcePath.push_back( "share/skins2" );
 
-    // Get user's home directory for skins
-    const char *home = getenv( "HOME" );
-    if( home )
+    char *datadir = config_GetUserDir( VLC_USERDATA_DIR );
+    if( datadir )
     {
-        std::string userSkins = std::string(home) + "/Library/Application Support/org.videolan.vlc/skins2";
-        m_resourcePath.push_back( userSkins );
+        m_resourcePath.push_back( std::string(datadir) + "/skins" );
+        m_resourcePath.push_back( std::string(datadir) + "/skins2" );
+        free( datadir );
+    }
+    datadir = config_GetSysPath( VLC_PKG_DATA_DIR, NULL );
+    if( datadir )
+    {
+        m_resourcePath.push_back( std::string(datadir) + "/skins" );
+        m_resourcePath.push_back( std::string(datadir) + "/skins2" );
+        free( datadir );
     }
 
-    // Add application bundle resource path
+    // Add the app bundle resource path (for packaged .app bundles)
     @autoreleasepool {
         NSBundle *mainBundle = [NSBundle mainBundle];
         if( mainBundle )
@@ -65,8 +75,8 @@ MacOSXFactory::MacOSXFactory( intf_thread_t *pIntf ):
             if( resourcePath )
             {
                 std::string bundlePath = [resourcePath UTF8String];
-                bundlePath += "/share/skins2";
-                m_resourcePath.push_back( bundlePath );
+                m_resourcePath.push_back( bundlePath + "/share/skins" );
+                m_resourcePath.push_back( bundlePath + "/share/skins2" );
             }
         }
     }
