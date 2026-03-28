@@ -145,10 +145,13 @@ void MacOSXLoop::run()
                 return event;
             }];
 
-            // Periodically check skins timers
-            m_pTimer = [NSTimer scheduledTimerWithTimeInterval:0.01
-                                                      repeats:YES
-                                                        block:^(NSTimer *timer) {
+            // Periodically check skins timers.
+            // Use NSRunLoopCommonModes so the timer also fires during
+            // mouse drags (NSEventTrackingRunLoopMode), which is needed
+            // for the AsyncQueue to flush resize commands while dragging.
+            m_pTimer = [NSTimer timerWithTimeInterval:0.01
+                                              repeats:YES
+                                                block:^(NSTimer *timer) {
                 @autoreleasepool {
                     if( m_exit )
                     {
@@ -166,6 +169,8 @@ void MacOSXLoop::run()
                     }
                 }
             }];
+            [[NSRunLoop currentRunLoop] addTimer:m_pTimer
+                                         forMode:NSRunLoopCommonModes];
 
             // Set up the menu bar after finishLaunching.
             // First, disable window restoration BEFORE finishLaunching
@@ -307,14 +312,24 @@ void MacOSXLoop::handleEvent( void *pEvent )
         if( !pWin )
             return;
 
-        // Get mouse position in window coordinates
+        // Compute both window-relative and screen-absolute positions.
+        // EvtMouse uses window-relative coords (for hit testing),
+        // EvtMotion uses screen-absolute coords (for window dragging),
+        // matching the X11 and Win32 conventions.
         NSPoint locationInWindow = [event locationInWindow];
         NSView *contentView = [nsWindow contentView];
         NSRect bounds = [contentView bounds];
 
-        // Convert to skins coordinates (origin top-left)
         int x = locationInWindow.x;
         int y = bounds.size.height - locationInWindow.y;
+
+        // Use the global mouse position for screen-absolute coords,
+        // like X11's getMousePos().  This avoids depending on the
+        // NSWindow frame which may lag behind after async moveResize.
+        NSPoint mouseLocation = [NSEvent mouseLocation];
+        CGFloat screenHeight = [NSScreen mainScreen].frame.size.height;
+        int xAbs = mouseLocation.x;
+        int yAbs = screenHeight - mouseLocation.y;
 
         // Handle the event
         NSEventType eventType = [event type];
@@ -387,14 +402,14 @@ void MacOSXLoop::handleEvent( void *pEvent )
             case NSEventTypeRightMouseDragged:
             case NSEventTypeOtherMouseDragged:
             {
-                EvtMotion evt( getIntf(), x, y );
+                EvtMotion evt( getIntf(), xAbs, yAbs );
                 pWin->processEvent( evt );
                 break;
             }
 
             case NSEventTypeMouseEntered:
             {
-                EvtMotion evt( getIntf(), x, y );
+                EvtMotion evt( getIntf(), xAbs, yAbs );
                 pWin->processEvent( evt );
                 break;
             }

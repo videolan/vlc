@@ -169,10 +169,12 @@
         [self setHasShadow:YES];
         [self setAcceptsMouseMovedEvents:YES];
 
-        // Create content view
+        // Create layer-backed content view for smooth compositing
         NSRect bounds = NSMakeRect( 0, 0, contentRect.size.width, contentRect.size.height );
         VLCSkinsContentView *contentView = [[VLCSkinsContentView alloc] initWithFrame:bounds];
         [contentView setImageScaling:NSImageScaleNone];
+        [contentView setImageAlignment:NSImageAlignTopLeft];
+        [contentView setWantsLayer:YES];
         [self setContentView:contentView];
         m_pHitTestGraphics = NULL;
     }
@@ -555,7 +557,7 @@ bool MacOSXWindow::invalidateRect( int x, int y, int w, int h ) const
         return true;
     }
 
-    dispatch_async(dispatch_get_main_queue(), ^{
+    void (^invalidateBlock)(void) = ^{
         @autoreleasepool {
             if( m_pWindow )
             {
@@ -564,9 +566,16 @@ bool MacOSXWindow::invalidateRect( int x, int y, int w, int h ) const
                 {
                     NSRect rect = NSMakeRect( x, [contentView bounds].size.height - y - h, w, h );
                     [contentView setNeedsDisplayInRect:rect];
+                    [contentView displayIfNeeded];
                 }
             }
         }
-    });
+    };
+
+    if( [NSThread isMainThread] )
+        invalidateBlock();
+    else
+        dispatch_async(dispatch_get_main_queue(), invalidateBlock);
+
     return true;
 }

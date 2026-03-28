@@ -368,7 +368,7 @@ void MacOSXGraphics::copyToWindow( OSWindow &rWindow, int xSrc, int ySrc,
         CGImageRelease( subImage );
     CGImageRelease( image );
 
-    dispatch_async(dispatch_get_main_queue(), ^{
+    void (^updateBlock)(void) = ^{
         @autoreleasepool {
             NSView *contentView = [nsWindow contentView];
             if( [contentView isKindOfClass:[NSImageView class]] )
@@ -376,10 +376,16 @@ void MacOSXGraphics::copyToWindow( OSWindow &rWindow, int xSrc, int ySrc,
                 NSImage *nsImage = [[NSImage alloc] initWithCGImage:displayImage
                     size:NSMakeSize(width, height)];
                 [(NSImageView *)contentView setImage:nsImage];
+                [contentView displayIfNeeded];
             }
             CGImageRelease( displayImage );
         }
-    });
+    };
+
+    if( [NSThread isMainThread] )
+        updateBlock();
+    else
+        dispatch_async(dispatch_get_main_queue(), updateBlock);
 }
 
 
