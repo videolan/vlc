@@ -288,4 +288,11 @@ libskins2_plugin_la_LIBADD = $(LIBS_skins2)
 
 if BUILD_SKINS
 gui_LTLIBRARIES += libskins2_plugin.la
+if HAVE_DARWIN
+gui_LTLIBRARIES += libmacosx_dialogs_plugin.la
 endif
+endif
+
+libmacosx_dialogs_plugin_la_SOURCES = gui/skins2/macosx/macosx_dialogs.m
+libmacosx_dialogs_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS)
+libmacosx_dialogs_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,Cocoa

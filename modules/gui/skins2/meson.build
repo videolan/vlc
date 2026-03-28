@@ -174,3 +174,13 @@ vlc_modules += {
     'objcpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
     'enabled': skins2_enabled,
 }
+
+if host_system == 'darwin' and skins2_enabled
+    vlc_modules += {
+        'name' : 'macosx_dialogs',
+        'sources' : files('macosx/macosx_dialogs.m'),
+        'dependencies' : [
+            dependency('appleframeworks', modules: ['Cocoa']),
+        ],
+    }
+endif
