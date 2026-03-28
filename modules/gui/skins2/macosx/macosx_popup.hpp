@@ -28,11 +28,8 @@
 
 #include <map>
 
-#ifdef __OBJC__
 @class NSMenu;
-#else
-typedef void NSMenu;
-#endif
+@class VLCPopupMenuTarget;
 
 /// macOS implementation of OSPopup
 class MacOSXPopup: public OSPopup
@@ -59,6 +56,7 @@ public:
 private:
     /// The popup menu
     NSMenu *m_pMenu;
+    VLCPopupMenuTarget *m_pTarget;
     /// Map of item IDs to positions
     std::map<int, int> m_idPosMap;
 };

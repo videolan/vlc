@@ -26,8 +26,6 @@
 #endif
 
 #import <Cocoa/Cocoa.h>
-#import <Carbon/Carbon.h>
-
 #include "macosx_loop.hpp"
 #include "macosx_factory.hpp"
 #include "macosx_window.hpp"
@@ -246,42 +244,21 @@ void MacOSXLoop::handleEvent( void *pEvent )
             }
 
             case NSEventTypeKeyDown:
-            {
-                int mod = cocoaModToMod( [event modifierFlags] );
-                int key = cocoaKeyToVlcKey( [event keyCode], [event modifierFlags] );
-
-                // Also handle character input
-                NSString *chars = [event charactersIgnoringModifiers];
-                if( [chars length] > 0 )
-                {
-                    unichar c = [chars characterAtIndex:0];
-                    if( c >= 32 && c < 127 )
-                    {
-                        key = c;
-                    }
-                }
-
-                EvtKey evt( getIntf(), key, EvtKey::kDown, mod );
-                pWin->processEvent( evt );
-                break;
-            }
-
             case NSEventTypeKeyUp:
             {
                 int mod = cocoaModToMod( [event modifierFlags] );
-                int key = cocoaKeyToVlcKey( [event keyCode], [event modifierFlags] );
+                int key = 0;
 
                 NSString *chars = [event charactersIgnoringModifiers];
                 if( [chars length] > 0 )
                 {
                     unichar c = [chars characterAtIndex:0];
-                    if( c >= 32 && c < 127 )
-                    {
-                        key = c;
-                    }
+                    key = cocoaCharToVlcKey( c );
                 }
 
-                EvtKey evt( getIntf(), key, EvtKey::kUp, mod );
+                EvtKey::ActionType action = (eventType == NSEventTypeKeyDown)
+                    ? EvtKey::kDown : EvtKey::kUp;
+                EvtKey evt( getIntf(), key, action, mod );
                 pWin->processEvent( evt );
                 break;
             }
@@ -310,41 +287,46 @@ int MacOSXLoop::cocoaModToMod( unsigned int flags )
 }
 
 
-int MacOSXLoop::cocoaKeyToVlcKey( unsigned short keyCode, unsigned int flags )
+// Mirrors CocoaKeyToVLC() in modules/gui/macosx/extensions/NSString+Helpers.m
+int MacOSXLoop::cocoaCharToVlcKey( unichar c )
 {
-    // Map macOS key codes to VLC key codes
-    switch( keyCode )
+    if( c >= 32 && c < 127 )
+        return c;
+
+    switch( c )
     {
-        case kVK_Return:        return KEY_ENTER;
-        case kVK_Tab:           return KEY_TAB;
-        case kVK_Delete:        return KEY_BACKSPACE;
-        case kVK_ForwardDelete: return KEY_DELETE;
-        case kVK_Escape:        return KEY_ESC;
-        case kVK_Space:         return ' ';
+        case NSCarriageReturnCharacter: return KEY_ENTER;
+        case NSEnterCharacter:          return KEY_ENTER;
+        case NSTabCharacter:            return KEY_TAB;
+        case NSBackspaceCharacter:      return KEY_BACKSPACE;
+        case NSDeleteCharacter:         return KEY_DELETE;
+        case 0x1B:                      return KEY_ESC;
 
-        case kVK_UpArrow:       return KEY_UP;
-        case kVK_DownArrow:     return KEY_DOWN;
-        case kVK_LeftArrow:     return KEY_LEFT;
-        case kVK_RightArrow:    return KEY_RIGHT;
+        case NSUpArrowFunctionKey:      return KEY_UP;
+        case NSDownArrowFunctionKey:    return KEY_DOWN;
+        case NSLeftArrowFunctionKey:    return KEY_LEFT;
+        case NSRightArrowFunctionKey:   return KEY_RIGHT;
 
-        case kVK_Home:          return KEY_HOME;
-        case kVK_End:           return KEY_END;
-        case kVK_PageUp:        return KEY_PAGEUP;
-        case kVK_PageDown:      return KEY_PAGEDOWN;
+        case NSHomeFunctionKey:         return KEY_HOME;
+        case NSEndFunctionKey:          return KEY_END;
+        case NSPageUpFunctionKey:       return KEY_PAGEUP;
+        case NSPageDownFunctionKey:     return KEY_PAGEDOWN;
+        case NSInsertFunctionKey:       return KEY_INSERT;
+        case NSMenuFunctionKey:         return KEY_MENU;
 
-        case kVK_F1:            return KEY_F1;
-        case kVK_F2:            return KEY_F2;
-        case kVK_F3:            return KEY_F3;
-        case kVK_F4:            return KEY_F4;
-        case kVK_F5:            return KEY_F5;
-        case kVK_F6:            return KEY_F6;
-        case kVK_F7:            return KEY_F7;
-        case kVK_F8:            return KEY_F8;
-        case kVK_F9:            return KEY_F9;
-        case kVK_F10:           return KEY_F10;
-        case kVK_F11:           return KEY_F11;
-        case kVK_F12:           return KEY_F12;
+        case NSF1FunctionKey:           return KEY_F1;
+        case NSF2FunctionKey:           return KEY_F2;
+        case NSF3FunctionKey:           return KEY_F3;
+        case NSF4FunctionKey:           return KEY_F4;
+        case NSF5FunctionKey:           return KEY_F5;
+        case NSF6FunctionKey:           return KEY_F6;
+        case NSF7FunctionKey:           return KEY_F7;
+        case NSF8FunctionKey:           return KEY_F8;
+        case NSF9FunctionKey:           return KEY_F9;
+        case NSF10FunctionKey:          return KEY_F10;
+        case NSF11FunctionKey:          return KEY_F11;
+        case NSF12FunctionKey:          return KEY_F12;
 
-        default:                return 0;
+        default:                        return 0;
     }
 }

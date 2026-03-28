@@ -65,8 +65,8 @@ private:
     /// Convert NSEvent modifiers to VLC key modifiers
     static int cocoaModToMod( unsigned int flags );
 
-    /// Convert NSEvent key code to VLC key code
-    static int cocoaKeyToVlcKey( unsigned short keyCode, unsigned int flags );
+    /// Convert a unicode character to VLC key code
+    static int cocoaCharToVlcKey( unichar c );
 };
 
 #endif

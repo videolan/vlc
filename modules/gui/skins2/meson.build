@@ -161,7 +161,7 @@ skins2_sources += files(
     'macosx/macosx_window.mm',
 )
 skins2_deps += [
-    dependency('appleframeworks', modules: ['Cocoa', 'Carbon', 'CoreGraphics']),
+    dependency('appleframeworks', modules: ['Cocoa', 'CoreGraphics']),
 ]
 endif
 

@@ -61,12 +61,13 @@
 
 
 MacOSXPopup::MacOSXPopup( intf_thread_t *pIntf ):
-    OSPopup( pIntf ), m_pMenu( nil )
+    OSPopup( pIntf ), m_pMenu( nil ), m_pTarget( nil )
 {
     @autoreleasepool {
         // Create the menu
         m_pMenu = [[NSMenu alloc] initWithTitle:@""];
         [m_pMenu setAutoenablesItems:NO];
+        m_pTarget = [[VLCPopupMenuTarget alloc] init];
     }
 }
 
@@ -75,6 +76,7 @@ MacOSXPopup::~MacOSXPopup()
 {
     @autoreleasepool {
         m_pMenu = nil;
+        m_pTarget = nil;
     }
 }
 
@@ -85,6 +87,9 @@ void MacOSXPopup::show( int xPos, int yPos )
         if( !m_pMenu )
             return;
 
+        // Reset selected tag
+        [(VLCPopupMenuTarget *)m_pTarget setSelectedTag:-1];
+
         // Convert coordinates
         int y = [NSScreen mainScreen].frame.size.height - yPos;
 
@@ -93,6 +98,24 @@ void MacOSXPopup::show( int xPos, int yPos )
         [m_pMenu popUpMenuPositioningItem:nil
                                atLocation:location
                                    inView:nil];
+
+        // After menu dismissal, dispatch EvtMenu if an item was selected
+        int selectedTag = [(VLCPopupMenuTarget *)m_pTarget selectedTag];
+        if( selectedTag >= 0 )
+        {
+            MacOSXFactory *pFactory = static_cast<MacOSXFactory*>(
+                OSFactory::instance( getIntf() ) );
+            NSWindow *keyWindow = [NSApp keyWindow];
+            if( pFactory && keyWindow )
+            {
+                auto it = pFactory->m_windowMap.find( (__bridge void *)keyWindow );
+                if( it != pFactory->m_windowMap.end() && it->second )
+                {
+                    EvtMenu evt( getIntf(), selectedTag );
+                    it->second->processEvent( evt );
+                }
+            }
+        }
     }
 }
 
@@ -116,8 +139,9 @@ void MacOSXPopup::addItem( const std::string &rLabel, int pos )
 
         NSString *title = [NSString stringWithUTF8String:rLabel.c_str()];
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title
-                                                      action:nil
+                                                      action:@selector(menuItemSelected:)
                                                keyEquivalent:@""];
+        [item setTarget:m_pTarget];
         [item setTag:pos];
         [item setEnabled:YES];
 
