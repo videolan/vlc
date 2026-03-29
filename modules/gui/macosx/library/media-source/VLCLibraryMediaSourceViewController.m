@@ -203,7 +203,7 @@
 
 - (void)updatePlaceholderLabel:(NSNotification *)notification
 {
-    self.browsePlaceholderLabel.hidden = self.mediaSourceTableView.numberOfRows > 0;
+    self.browsePlaceholderLabel.hidden = self.baseDataSource.hasDisplayedItems;
 }
 
 - (NSView *)pathControlContainerView

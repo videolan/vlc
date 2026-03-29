@@ -52,6 +52,7 @@ extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 @property (readwrite, weak) NSView *pathControlContainerView;
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
 @property (readwrite, nonatomic) VLCMediaSourceDataSource *childDataSource;
+@property (readonly, nonatomic) BOOL hasDisplayedItems;
 
 @property (readwrite, weak) VLCLibraryMediaSourceViewNavigationStack *navigationStack;
 

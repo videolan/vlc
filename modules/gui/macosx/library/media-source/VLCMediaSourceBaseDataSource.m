@@ -201,8 +201,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 
     _mediaSources = mediaSources;
     _lanDeviceSnapshot = self.mediaSourceMode == VLCMediaSourceModeLAN ? [self buildLANDeviceSnapshot] : @[];
-    [self.collectionView reloadData];
-    [self.tableView reloadData];
+    [self reloadData];
 }
 
 - (void)setMediaSourceMode:(VLCMediaSourceMode)mediaSourceMode
@@ -213,6 +212,19 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     _mediaSourceMode = mediaSourceMode;
     [self loadMediaSources];
     [self returnHome];
+}
+
+- (BOOL)hasDisplayedItems
+{
+    if (_childDataSource != nil) {
+        return _childDataSource.nodeToDisplay.numberOfChildren > 0;
+    }
+
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        return _lanDeviceSnapshot.count > 0;
+    }
+
+    return _mediaSources.count > 0;
 }
 
 #pragma mark - collection view data source
