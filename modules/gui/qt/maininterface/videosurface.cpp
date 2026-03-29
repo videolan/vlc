@@ -203,10 +203,29 @@ void VideoSurface::mouseDoubleClickEvent(QMouseEvent* event)
         event->ignore();
 }
 
+static float prev_rate = 1.0;
+static bool isBoosting = false;
+static int triggerKey = Qt::Key_Shift;
+static float boostRate = 2.0;
+
 void VideoSurface::keyPressEvent(QKeyEvent* event)
 {
-    emit keyPressed(event->key(), event->modifiers());
-    event->ignore();
+
+    if (!isBoosting && event->key() == triggerKey) {
+        prev_rate = this->p_intf->p_playerController->getRate();
+        this->p_intf->p_playerController->setRate(boostRate);
+        isBoosting = true;
+    }
+    QWidget::keyPressEvent(event);
+}
+
+void VideoSurface::keyReleaseEvent(QKeyEvent *event)
+{
+    if (isBoosting && event->key() == triggerKey) {
+        this->p_intf->p_playerController->setRate(prev_rate);
+        isBoosting = false;
+    }
+    QWidget::keyReleaseEvent(event);
 }
 
 #if QT_CONFIG(wheelevent)
