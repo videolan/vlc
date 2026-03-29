@@ -30,7 +30,7 @@ public:
 
 private:
     void registerQMLTypes();
-    /*static*/ void clearQMLTypes();
+    static void clearQMLTypes();
     static QObject* getMainCtxInstance(QQmlEngine *, QJSEngine *);
 
     qt_intf_t* m_intf = nullptr;

@@ -133,7 +133,7 @@ MainUI::~MainUI()
     {
         // `QObject::destroyed()` is signalled just before the object dies, but subclass `QQmlEngine`
         // itself should be dead at that point anyway. This should prevent undefined behavior.
-        connect(m_engineBound, &QObject::destroyed, this, &MainUI::clearQMLTypes, Qt::UniqueConnection);
+        connect(m_engineBound, &QObject::destroyed, &MainUI::clearQMLTypes);
     }
 }
 
