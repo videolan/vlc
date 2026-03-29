@@ -378,6 +378,7 @@ set_host_envvars()
     export CFLAGS="$clike_flags"
     export CXXFLAGS="$clike_flags"
     export OBJCFLAGS="$clike_flags"
+    export OBJCXXFLAGS="$clike_flags"
 
     # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
     export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH ${bitcode_flag}"
@@ -419,6 +420,7 @@ write_config_mak()
     local vlc_cflags="$clike_flags"
     local vlc_cxxflags="$clike_flags"
     local vlc_objcflags="$clike_flags"
+    local vlc_objcxxflags="$clike_flags"
 
     # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
     local vlc_ldflags="\$(VLC_DEPLOYMENT_TARGET_LDFLAG) \$(VLC_DEPLOYMENT_TARGET_CFLAG) -arch $VLC_HOST_ARCH"
@@ -436,6 +438,7 @@ write_config_mak()
     printf '%s := %s\n' "CFLAGS" "${vlc_cflags}" >&3
     printf '%s := %s\n' "CXXFLAGS" "${vlc_cxxflags}" >&3
     printf '%s := %s\n' "OBJCFLAGS" "${vlc_objcflags}" >&3
+    printf '%s := %s\n' "OBJCXXFLAGS" "${vlc_objcxxflags}" >&3
     printf '%s := %s\n' "LDFLAGS" "${vlc_ldflags}" >&3
     printf '%s := %s\n' "CC" "${VLC_HOST_CC}" >&3
     printf '%s := %s\n' "CPP" "${VLC_HOST_CPP}" >&3
@@ -823,6 +826,7 @@ hostenv "${VLC_SRC_DIR}/configure" \
     CFLAGS="${CFLAGS}" \
     OBJCFLAGS="${OBJCFLAGS}" \
     CXXFLAGS="${CXXFLAGS}" \
+    OBJCXXFLAGS="${OBJCXXFLAGS}" \
  || abort_err "Configuring VLC failed"
 
 $MAKE || abort_err "Building VLC failed"
