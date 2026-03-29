@@ -318,6 +318,7 @@ FocusScope {
                             colorSet: ColorContext.Window
                         }
 
+                        backgroundColor: (ready ? "transparent" : stackViewParent.color)
                         tint: frostedTheme.bg.secondary
 
                         // Prevent overdraw (the extension margin should not be painted):
