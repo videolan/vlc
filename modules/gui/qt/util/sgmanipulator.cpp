@@ -94,7 +94,9 @@ QSGNode *SGManipulator::updatePaintNode(QSGNode *, UpdatePaintNodeData *data)
         {
             bool materialChangeMade = false;
 
-            if (const auto material = targetGeometryNode->material())
+            const auto material = targetGeometryNode->material();
+            // WARNING: Qt explicitly sets the material pointer to 1 with software and OpenVG modes:
+            if (material && material != reinterpret_cast<QSGMaterial*>(1))
             {
                 if (m_blending)
                 {
