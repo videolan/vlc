@@ -389,6 +389,14 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     extension_dialog_t *dialog = [window dialog];
     extension_DialogClosed(dialog);
     dialog->p_sys_intf = NULL;
+
+    vlc_mutex_lock(&dialog->lock);
+    if (dialog->p_sys_intf) {
+        CFRelease(dialog->p_sys_intf);
+        dialog->p_sys_intf = NULL;
+    }
+    vlc_mutex_unlock(&dialog->lock);
+
     return YES;
 }
 
@@ -470,6 +478,7 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
                                                           styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask
                                                             backing:NSBackingStoreBuffered
                                                               defer:NO];
+        [dialogWindow setReleasedWhenClosed:NO];
         [dialogWindow setDelegate:self];
         [dialogWindow setDialog:p_dialog];
         [dialogWindow setTitle:toNSStr(p_dialog->psz_title)];
@@ -499,9 +508,6 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
 {
     assert(p_dialog);
 
-    /* FIXME: Creating the dialog, we CFBridgingRetain p_sys_intf but we can't
-     *        just CFBridgingRelease it here, as that causes a crash.
-     */
     VLCDialogWindow *dialogWindow = (__bridge VLCDialogWindow*)p_dialog->p_sys_intf;
     if (!dialogWindow) {
         msg_Warn(getIntf(), "dialog window not found");
@@ -512,6 +518,13 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     [dialogWindow close];
     dialogWindow = nil;
 
+    /* Release the reference retained by CFBridgingRetain in
+     * createExtensionDialog. We use CFRelease rather than
+     * CFBridgingRelease to avoid transferring ownership back
+     * to ARC, which would crash as the pointer is still live
+     * on the call stack.
+     */
+    CFRelease(p_dialog->p_sys_intf);
     p_dialog->p_sys_intf = NULL;
     vlc_cond_signal(&p_dialog->cond);
     return VLC_SUCCESS;
