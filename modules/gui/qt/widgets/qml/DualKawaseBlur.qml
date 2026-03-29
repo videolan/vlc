@@ -36,6 +36,8 @@ Item {
 
     readonly property bool available: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
+    readonly property bool ready: us2.visible
+
     enum Mode {
         FourPass, // 2 downsample + 2 upsamples (3 layers/buffers)
         TwoPass // 1 downsample + 1 upsample (1 layer/buffer)
