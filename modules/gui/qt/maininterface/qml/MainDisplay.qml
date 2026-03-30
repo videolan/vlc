@@ -845,13 +845,8 @@ FocusScope {
         function onIsScreenSmallChanged() {
             //when screen becomes small hide side panels
             if (VLCStyle.isScreenSmall) {
-
                 pannelVisiblity.showNavigation = false
-
-                if (MainCtx.playqueuePanel.docked)
-                    pannelVisiblity.showPlayqueue = false
-                else
-                    pannelVisiblity.showPlayqueue = MainCtx.playqueuePanel.visible
+                pannelVisiblity.showPlayqueue = MainCtx.playqueuePanel.visible
             } else {
                 //reshow the navigation panels to original state
                 pannelVisiblity.showNavigation = MainCtx.navigationPanel.visible
