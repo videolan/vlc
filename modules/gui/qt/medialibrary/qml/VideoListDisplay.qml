@@ -97,7 +97,7 @@ Widgets.TableViewExt {
         }
 
         medium.push({
-            size: 0.5,
+            size: showGroupCountColumn ? 0.5 : 1,
 
             model: ({
                 criteria: "duration",
