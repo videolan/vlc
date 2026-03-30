@@ -185,7 +185,7 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
         {
             pid->probed.i_fourcc = VLC_CODEC_H264;
         }
-        else if( !memcmp( p_data, "\x00\x00\x01", 4 ) )
+        else if( !memcmp( p_data, "\x00\x00\x01", 3 ) )
         {
             pid->probed.i_fourcc = VLC_CODEC_MPGV;
         }
