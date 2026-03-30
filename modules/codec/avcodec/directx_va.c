@@ -279,14 +279,12 @@ static const directx_va_mode_t DXVA_MODES[] = {
     // Intel specific GUID support
     DEF_DXVA_MODE_420_8B( "HEVC Main profile (Intel)",                                      &DXVA_ModeHEVC_VLD_Main_Intel,           AV_CODEC_ID_HEVC, PROF_HEVC_MAIN ),
     DEF_DXVA_MODE_420_10B( "HEVC Main 10 profile (Intel)",                                  &DXVA_ModeHEVC_VLD_Main10_Intel,         AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10 ),
-#ifdef FF_DXVA2_WORKAROUND_HEVC_REXT
-    DEF_DXVA_MODE( "HEVC Main profile 4:2:2 Range Extension (Intel)",                       &DXVA_ModeHEVC_VLD_Main12_Intel,         8, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
-    DEF_DXVA_MODE( "HEVC Main 10 profile 4:2:2 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main422_10_Intel,    10, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
-    DEF_DXVA_MODE( "HEVC Main 12 profile 4:2:2 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main422_12_Intel,    12, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
-    DEF_DXVA_MODE( "HEVC Main profile 4:4:4 Range Extension (Intel)",                       &DXVA_ModeHEVC_VLD_Main444_Intel,        8, 0, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
-    DEF_DXVA_MODE( "HEVC Main 10 profile 4:4:4 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main444_10_Intel,    10, 0, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
-    DEF_DXVA_MODE( "HEVC Main 12 profile 4:4:4 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main444_12_Intel,    12, 0, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
-#endif
+    DEF_DXVA_MODE( "HEVC Main profile 4:2:2 Range Extension (Intel)",                       &DXVA_ModeHEVC_VLD_Main12_Intel,         8, 1, 0, AV_CODEC_ID_HEVC, NULL, 0 ),
+    DEF_DXVA_MODE( "HEVC Main 10 profile 4:2:2 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main422_10_Intel,    10, 1, 0, AV_CODEC_ID_HEVC, NULL, 0 ),
+    DEF_DXVA_MODE( "HEVC Main 12 profile 4:2:2 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main422_12_Intel,    12, 1, 0, AV_CODEC_ID_HEVC, NULL, 0 ),
+    DEF_DXVA_MODE( "HEVC Main profile 4:4:4 Range Extension (Intel)",                       &DXVA_ModeHEVC_VLD_Main444_Intel,        8, 0, 0, AV_CODEC_ID_HEVC, NULL, 0 ),
+    DEF_DXVA_MODE( "HEVC Main 10 profile 4:4:4 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main444_10_Intel,    10, 0, 0, AV_CODEC_ID_HEVC, NULL, 0 ),
+    DEF_DXVA_MODE( "HEVC Main 12 profile 4:4:4 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main444_12_Intel,    12, 0, 0, AV_CODEC_ID_HEVC, NULL, 0 ),
     DEF_DXVA_MODE_420_8B( "HEVC Main profile",                                              &DXVA_ModeHEVC_VLD_Main,                AV_CODEC_ID_HEVC, PROF_HEVC_MAIN ),
     DEF_DXVA_MODE_420_10B( "HEVC Main 10 profile",                                          &DXVA_ModeHEVC_VLD_Main10,              AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10 ),
     DEF_DXVA_MODE( "HEVC Main profile 4:2:2 Range Extension",                               &DXVA_ModeHEVC_VLD_Main12,      8, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, 0 ),
