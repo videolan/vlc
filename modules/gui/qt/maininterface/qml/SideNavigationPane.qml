@@ -178,7 +178,7 @@ T.Pane {
                 iconTxt: VLCIcons.settings
                 text: qsTr("Preferences")
 
-                checked: activeFocus || DialogsProvider.prefsDialogVisible
+                checked: DialogsProvider.prefsDialogVisible
 
                 onClicked: DialogsProvider.prefsDialog()
 

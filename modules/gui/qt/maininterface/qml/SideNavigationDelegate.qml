@@ -103,7 +103,7 @@ T.ItemDelegate {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                color: control.highlighted ? theme.accent : theme.fg.primary
+                color: (control.highlighted || control.checked) ? theme.accent : theme.fg.primary
 
                 font.pixelSize: VLCStyle.icon_banner
             }
