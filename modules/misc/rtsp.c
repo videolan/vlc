@@ -941,7 +941,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     const char *psz_playnow = NULL; /* support option: x-playNow */
     const char *psz_session = NULL;
     const char *psz_cseq = NULL;
-    rtsp_client_t *p_rtsp;
+    rtsp_client_t *p_rtsp = NULL;
     int i_cseq = 0;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
@@ -970,7 +970,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( strstr( psz_transport, "unicast" ) &&
                 strstr( psz_transport, "client_port=" ) )
             {
-                rtsp_client_t *p_rtsp = NULL;
                 char ip[NI_MAXNUMERICHOST];
                 int i_port = atoi( strstr( psz_transport, "client_port=" ) +
                                    strlen("client_port=") );
@@ -1302,7 +1301,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( strstr( psz_transport, "unicast" ) &&
                 strstr( psz_transport, "client_port=" ) )
             {
-                rtsp_client_t *p_rtsp = NULL;
                 rtsp_client_es_t *p_rtsp_es = NULL;
                 char ip[NI_MAXNUMERICHOST];
                 int i_port = atoi( strstr( psz_transport, "client_port=" ) +
