@@ -1036,9 +1036,6 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - vtsN=%d", event->new_vtsN );
         msg_Dbg( p_demux, "     - domain=%d", event->new_domain );
 
-        /* reset PCR */
-        es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
-
         for( int i = 0; i < PS_TK_COUNT; i++ )
         {
             ps_track_t *tk = &p_sys->tk[i];
@@ -1060,6 +1057,9 @@ static int Demux( demux_t *p_demux )
             }
             tk->b_configured = false;
         }
+
+        /* reset PCR */
+        es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
 
         uint32_t i_width, i_height;
         if( dvdnav_get_video_resolution( p_sys->dvdnav,
