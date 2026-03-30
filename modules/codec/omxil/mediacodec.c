@@ -932,8 +932,11 @@ AImageReader_OnImageAvailable(void *context, AImageReader *reader)
     vlc_mutex_lock(&p_sys->lock);
     assert(p_sys->video.air_waiting_count > 0);
     p_sys->video.air_waiting_count--;
-    vlc_cond_signal(&p_sys->video.air_cond);
-    QueueAImagePicture(p_dec, avctx, image, fence_fd);
+    vlc_cond_broadcast(&p_sys->video.air_cond);
+    if (p_sys->b_flush_out)
+        avctx->air_api->AImage.deleteAsync(image, fence_fd);
+    else
+        QueueAImagePicture(p_dec, avctx, image, fence_fd);
     vlc_mutex_unlock(&p_sys->lock);
 }
 
@@ -1544,8 +1547,17 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             {
                 /* We need to wait for AImageReader. Otherwise, we might
                  * overwrite a picture (even when using acquireNextImageAsync) */
-                while (p_sys->video.air_waiting_count != 0 && !p_sys->b_aborted)
+                while (p_sys->video.air_waiting_count != 0
+                       && !p_sys->b_aborted && !p_sys->b_flush_out)
                     vlc_cond_wait(&p_sys->video.air_cond, &p_sys->lock);
+
+                if (p_sys->b_flush_out)
+                {
+                    /* Drop this buffer so OutThread can acknowledge the flush. */
+                    p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
+                    return 0;
+                }
+
                 p_sys->video.air_waiting_count++;
 
                 p_sys->api.release_out(&p_sys->api, p_out->buf.i_index,
@@ -2313,6 +2325,14 @@ static void Video_OnFlush(decoder_sys_t *p_sys)
      * since flushing make all previous indices returned by
      * MediaCodec invalid. */
     ReleaseAllPictureContexts(p_sys);
+
+    if (p_sys->video.use_air)
+    {
+        /* Drain AImageReader callbacks before AMediaCodec_flush() invalidates
+         * output buffer indices, or air_waiting_count may stay stuck. */
+        while (p_sys->video.air_waiting_count != 0 && !p_sys->b_aborted)
+            vlc_cond_wait(&p_sys->video.air_cond, &p_sys->lock);
+    }
 }
 
 static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
