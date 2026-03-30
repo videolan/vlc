@@ -584,7 +584,8 @@ static void SendtoFIFO( sout_access_out_t *p_access, block_t *buffer )
     rist_rtp_set_timestamp(bufhdr, pkt_ts);
 
     block_t *pkt = block_Duplicate(buffer);
-    block_FifoPut( p_sys->p_fifo, pkt );
+    if ( pkt )
+        block_FifoPut( p_sys->p_fifo, pkt );
 }
 
 static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
