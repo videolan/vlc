@@ -43,6 +43,10 @@ T.Page {
 
     readonly property bool isSearchable: true
 
+    property real listCoverHeight: VLCStyle.listAlbumCover_height
+    property real listCoverWidth: VLCStyle.listAlbumCover_width
+    property real listCoverRadius: VLCStyle.listAlbumCover_radius
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.View
@@ -232,6 +236,10 @@ T.Page {
                 //        is true and items provided by the model change (#29084).
                 reuseItems: !MainCtx.gridView
 
+                listCoverWidth: root.listCoverWidth
+                listCoverHeight: root.listCoverHeight
+                listCoverRadius: root.listCoverRadius
+
                 Navigation.parentItem: mediaRows
                 Navigation.downAction: function() {
                     if (favoritesRow.visible)
@@ -323,6 +331,10 @@ T.Page {
                 //        is true and items provided by the model change (#29084).
                 reuseItems: !MainCtx.gridView
 
+                listCoverWidth: root.listCoverWidth
+                listCoverHeight: root.listCoverHeight
+                listCoverRadius: root.listCoverRadius
+
                 Navigation.parentItem: mediaRows
                 Navigation.upAction: function() {
                     if (continueWatchingRow.visible)
@@ -399,6 +411,10 @@ T.Page {
                 // FIXME: `ExpandGridView` causes extreme performance degradation when `reuseItems`
                 //        is true and items provided by the model change (#29084).
                 reuseItems: !MainCtx.gridView
+
+                listCoverWidth: root.listCoverWidth
+                listCoverHeight: root.listCoverHeight
+                listCoverRadius: root.listCoverRadius
 
                 Navigation.parentItem: mediaRows
                 Navigation.upAction: function() {
