@@ -90,6 +90,7 @@
         {"key":"window_minimize", "path": "./icons/window_minimize.svg" },
         {"key":"window_restore", "path": "./icons/window_restore.svg" },
         {"key":"ic_fluent_document_add_24_regular", "path": "./icons/ic_fluent_document_add_24_regular.svg"},
-        {"key":"ic_fluent_document_copy_24_regular", "path": "./icons/ic_fluent_document_copy_24_regular.svg"}
+        {"key":"ic_fluent_document_copy_24_regular", "path": "./icons/ic_fluent_document_copy_24_regular.svg"},
+        {"key":"ic_fluent_arrow_download_24_regular", "path": "./icons/ic_fluent_arrow_download_24_regular.svg"}
     ]
 }
