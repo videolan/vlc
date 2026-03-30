@@ -347,8 +347,8 @@ Item {
         // factor which can lead to visible clipping, or increase the window extended margin:
         blurRadius: (MainCtx.windowExtendedMargin / effect.compensationFactor)
 
-        compensationFactor: MainCtx.intfMainWindow.active ? (defaultCompensationFactor)
-                                                          : (defaultCompensationFactor * 2)
+        compensationFactor: MainCtx.intfMainWindow.active ? (implicitCompensationFactor)
+                                                          : (implicitCompensationFactor * 2)
 
         Behavior on compensationFactor {
             // FIXME: Use UniformAnimator instead
