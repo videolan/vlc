@@ -64,10 +64,8 @@ static const int PROF_HEVC_MAIN10[]  = { AVPROFILE(HEVC_MAIN),
                                          AVPROFILE(HEVC_MAIN_10),
                                          AVPROFILE(UNKNOWN) };
 
-#ifdef FF_DXVA2_WORKAROUND_HEVC_REXT
 static const int PROF_HEVC_MAIN_REXT[]  = { AVPROFILE(HEVC_REXT),
                                             AVPROFILE(UNKNOWN) };
-#endif
 
 static const int PROF_VP9_MAIN[]    = { AVPROFILE(VP9_0), AVPROFILE(UNKNOWN) };
 static const int PROF_VP9_10[]      = { AVPROFILE(VP9_2), AVPROFILE(UNKNOWN) };
@@ -76,6 +74,16 @@ static const int PROF_AV1_MAIN[]    = { AVPROFILE(AV1_MAIN), AVPROFILE(UNKNOWN) 
 static const int PROF_AV1_HIGH[]    = { AVPROFILE(AV1_HIGH), AVPROFILE(AV1_MAIN), AVPROFILE(UNKNOWN) };
 
 #if defined(__MINGW64_VERSION_MAJOR) // mingw-w64 doesn't have all the standard GUIDs
+
+#if __MINGW64_VERSION_MAJOR < 13
+// define missing GUIDs added in mingw-w64 v13 and not mapped to other guids
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main12,        0x1a72925f, 0x0c2c, 0x4f15, 0x96, 0xfb, 0xb1, 0x7d, 0x14, 0x73, 0x60, 0x3f);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main10_422,    0x0bac4fe5, 0x1532, 0x4429, 0xa8, 0x54, 0xf8, 0x4d, 0xe0, 0x49, 0x53, 0xdb);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main12_422,    0x55bcac81, 0xf311, 0x4093, 0xa7, 0xd0, 0x1c, 0xbc, 0x0b, 0x84, 0x9b, 0xee);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main_444,      0x4008018f, 0xf537, 0x4b36, 0x98, 0xcf, 0x61, 0xaf, 0x8a, 0x2c, 0x1a, 0x33);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main10_444,    0x0dabeffa, 0x4458, 0x4602, 0xbc, 0x03, 0x07, 0x95, 0x65, 0x9d, 0x61, 0x7c);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main12_444,    0x9798634d, 0xfe9d, 0x48e5, 0xb4, 0xda, 0xdb, 0xec, 0x45, 0xb3, 0xdf, 0x01);
+#endif
 
 # if defined(HAVE_LIBAVCODEC_DXVA2_H)
 // do nothing, we have redirected DXVA_xxx to DXVA2_xxx
@@ -281,6 +289,12 @@ static const directx_va_mode_t DXVA_MODES[] = {
 #endif
     DEF_DXVA_MODE_420_8B( "HEVC Main profile",                                              &DXVA_ModeHEVC_VLD_Main,                AV_CODEC_ID_HEVC, PROF_HEVC_MAIN ),
     DEF_DXVA_MODE_420_10B( "HEVC Main 10 profile",                                          &DXVA_ModeHEVC_VLD_Main10,              AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10 ),
+    DEF_DXVA_MODE( "HEVC Main profile 4:2:2 Range Extension",                               &DXVA_ModeHEVC_VLD_Main12,      8, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, 0 ),
+    DEF_DXVA_MODE( "HEVC Main 10 profile 4:2:2 Range Extension",                            &DXVA_ModeHEVC_VLD_Main10_422, 10, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, 0 ),
+    DEF_DXVA_MODE( "HEVC Main 12 profile 4:2:2 Range Extension",                            &DXVA_ModeHEVC_VLD_Main12_422, 12, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, 0 ),
+    DEF_DXVA_MODE( "HEVC Main profile 4:4:4 Range Extension",                               &DXVA_ModeHEVC_VLD_Main_444,    8, 0, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, 0 ),
+    DEF_DXVA_MODE( "HEVC Main 10 profile 4:4:4 Range Extension",                            &DXVA_ModeHEVC_VLD_Main10_444, 10, 0, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, 0 ),
+    DEF_DXVA_MODE( "HEVC Main 12 profile 4:4:4 Range Extension",                            &DXVA_ModeHEVC_VLD_Main12_444, 12, 0, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, 0 ),
 
     /* H.261 */
     DEF_DXVA_MODE_420_8B_UNSUPPORTED( "H.261 decoder, restricted profile A",                &DXVA_ModeH261_A ),
