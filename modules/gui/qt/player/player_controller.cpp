@@ -300,6 +300,7 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
         PlayerController* q = that->q_func();
         that->UpdateArt( newMediaPtr.get() );
         that->UpdateMeta( newMediaPtr.get() );
+        that->UpdateInfo( newMediaPtr.get() );
         that->UpdateName( newMediaPtr.get() );
         that->m_url = vlc::wrap_cptr( input_item_GetURI( newMediaPtr.get() ) ).get();
 
@@ -772,6 +773,7 @@ static void on_player_media_meta_changed(vlc_player_t *, input_item_t *media, vo
         that->UpdateName(mediaPtr.get());
         that->UpdateArt(mediaPtr.get());
         that->UpdateMeta(mediaPtr.get());
+        that->UpdateInfo(mediaPtr.get());
     });
 }
 
