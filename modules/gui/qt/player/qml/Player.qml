@@ -233,7 +233,6 @@ FocusScope {
                 }
 
                 component FadeRectangle : Rectangle {
-                    z: -99
                     implicitHeight: VLCStyle.dp(206, VLCStyle.scale)
 
                     SGManipulator {
@@ -246,14 +245,13 @@ FocusScope {
                 }
 
                 FadeRectangle {
-                    parent: topBar
-
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
 
                     implicitHeight: VLCStyle.dp(206, VLCStyle.scale)
 
+                    opacity: topBar.opacity
                     visible: !topBarAcrylicBg.visible
 
                     gradient: Gradient {
@@ -263,13 +261,13 @@ FocusScope {
                 }
 
                 FadeRectangle {
-                    parent: controlBar
-
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
 
                     implicitHeight: VLCStyle.dp(206, VLCStyle.scale)
+
+                    opacity: controlBar.opacity
 
                     gradient: Gradient {
                         GradientStop { position: 0; color: "transparent" }
