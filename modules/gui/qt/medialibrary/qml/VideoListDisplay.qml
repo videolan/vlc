@@ -40,6 +40,10 @@ Widgets.TableViewExt {
 
     property bool showGroupCountColumn: false
 
+    property real coverHeight: VLCStyle.listAlbumCover_height
+    property real coverWidth: VLCStyle.listAlbumCover_width
+    property real coverRadius: VLCStyle.listAlbumCover_radius
+
     //---------------------------------------------------------------------------------------------
     // Private
 
@@ -131,9 +135,9 @@ Widgets.TableViewExt {
 
         criteriaCover: "thumbnail"
 
-        titleCover_height: VLCStyle.listAlbumCover_height
-        titleCover_width: VLCStyle.listAlbumCover_width
-        titleCover_radius: VLCStyle.listAlbumCover_radius
+        titleCover_height: listView_id.coverHeight
+        titleCover_width: listView_id.coverWidth
+        titleCover_radius: listView_id.coverRadius
 
         titlecoverLabels: listView_id.coverLabels
     }
