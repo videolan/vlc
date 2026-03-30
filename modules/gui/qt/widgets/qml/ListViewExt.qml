@@ -30,9 +30,6 @@ ListView {
 
     // Properties
 
-    // NOTE: We want buttons to be centered vertically but configurable.
-    property int buttonMargin: height / 2 - buttonLeft.height / 2
-
     property ListSelectionModel selectionModel: ListSelectionModel {
         model: root.model
     }
@@ -60,11 +57,6 @@ ListView {
     property alias fadingEdge: fadingEdge
 
     property alias autoScrollDirection: viewDragAutoScrollHandlerLoader.scrollingDirection
-
-    //forward view properties
-
-    property alias buttonLeft: buttonLeft
-    property alias buttonRight: buttonRight
 
     // Signals
     signal actionAtIndex(int index)
@@ -741,43 +733,4 @@ ListView {
     }
 
     property Item dropIndicatorItem
-
-    // FIXME: We probably need to upgrade these RoundButton(s) eventually. And we probably need
-    //        to have some kind of animation when switching pages.
-
-    RoundButtonExt {
-        id: buttonLeft
-
-        anchors.left: parent.left
-        anchors.top: parent.top
-
-        anchors.topMargin: buttonMargin
-
-        text: '<'
-
-        visible: (root.orientation === ListView.Horizontal && !(root.atXBeginning))
-
-        onClicked: {
-            root.animatePage(root.prevPage)
-        }
-
-        activeFocusOnTab: false
-    }
-
-    RoundButtonExt {
-        id: buttonRight
-
-        anchors.right: parent.right
-        anchors.top: buttonLeft.top
-
-        text: '>'
-
-        visible: (root.orientation === ListView.Horizontal && !(root.atXEnd))
-
-        onClicked: {
-            root.animatePage(root.nextPage)
-        }
-
-        activeFocusOnTab: false
-    }
 }
