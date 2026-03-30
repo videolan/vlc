@@ -1015,7 +1015,6 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
          * Destroy obsolete ES by reinitializing program 0
          * and find all ES in title with ifo data
          */
-        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
         for( int i = 0; i < PS_TK_COUNT; i++ )
         {
@@ -1027,6 +1026,8 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
             }
             tk->b_configured = false;
         }
+
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
         if( p_sys->cur_title != i_title )
         {
@@ -1303,7 +1304,6 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
          * Destroy obsolete ES by reinitializing program 0
          * and find all ES in title with ifo data
          */
-        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
         for( int i = 0; i < PS_TK_COUNT; i++ )
         {
@@ -1315,6 +1315,8 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
             }
             tk->b_configured = false;
         }
+
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
         if( p_sys->cur_title != i_title)
         {
