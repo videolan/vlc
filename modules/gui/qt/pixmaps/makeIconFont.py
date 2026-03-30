@@ -3,7 +3,6 @@
 import sys
 import json
 import fontforge
-import six
 from jinja2 import Template
 
 DOC= """
