@@ -507,7 +507,7 @@ static const directx_va_mode_t * FindVideoServiceConversion(vlc_va_t *va, const 
                desc->log2_chroma_h != mode->log2_chroma_h ) )
         {
             char *psz_name = directx_va_GetDecoderName(mode->guid);
-            msg_Warn( va, "Unsupported chroma subsampling 4:%d:%d for %s ",
+            msg_Warn( va, "Unsupported %s chroma subsampling 4:%d:%d for %s ", desc->name,
                     (2-desc->log2_chroma_w)*2, (2-desc->log2_chroma_w-desc->log2_chroma_h)*2, psz_name );
             free( psz_name );
             continue;
