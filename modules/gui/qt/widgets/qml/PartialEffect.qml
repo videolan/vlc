@@ -139,11 +139,24 @@ Item {
             }
         }
 
-        // Effect's source is sub-texture through the texture provider:
+        readonly property bool effectAcceptsSourceRect: (typeof root.effect?.sourceRect !== "undefined") // typeof `rect` is "object"
+
+        // Effect's source is sub-texture through the texture provider, as long as the effect does not accept setting `sourceRect`.
+        // Unlike Qt's own effects, our `DualKawaseBlur` supports that. Note that we are not using a `Loader` to not load the
+        // indirection in case it is accepted by the effect, since its overhead is minimal. Also note that the texture provider
+        // is only created when `textureProvider()` is called, such that when this indirection is actually used (for example as
+        // a shader effect source).
         Binding {
             target: root.effect
             property: root.samplerName
-            value: textureProviderIndirection
+            value: textureProviderIndirection.effectAcceptsSourceRect ? root.source : textureProviderIndirection
+        }
+
+        Binding {
+            target: root.effect
+            property: "sourceRect"
+            when: textureProviderIndirection.effectAcceptsSourceRect
+            value: textureProviderIndirection.textureSubRect
         }
 
         // Adjust the blending. Currently MultiEffect/FastBlur does not
