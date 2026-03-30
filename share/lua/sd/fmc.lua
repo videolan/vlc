@@ -32,7 +32,7 @@ function main()
         if tonumber( show_node.children_map["songcount"][1].children[1] ) > 0 then
             local songs_node = node:add_node( {title="Songs"} )
             for _, song_node in ipairs( show_node.children_map["songs"][1].children ) do
-                _, _, artist, title = string.find( song_node.children_map["name"][1].children[1], "(.+)%s*-%s*(.+)" )
+                __, __, artist, title = string.find( song_node.children_map["name"][1].children[1], "(.+)%s*-%s*(.+)" )
                 local rank = song_node.children_map["rank"][1].children[1]
                 if rank ~= nil then
                     rank = "Rank: " .. rank
