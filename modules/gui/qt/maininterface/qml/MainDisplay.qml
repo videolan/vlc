@@ -514,7 +514,7 @@ FocusScope {
 
             height: parent.height - g_mainDisplay.displayMargin
 
-            property int maximumWidth: (g_mainDisplay.width + sidebarResizeHandle.width) / 3
+            property int maximumWidth: Math.max(minimumWidth, (g_mainDisplay.width + sidebarResizeHandle.width) / 3)
 
             topPadding: 0
             leftPadding: 0
@@ -535,9 +535,7 @@ FocusScope {
                 History.push(modelUri)
             }
 
-            implicitWidth: Math.round(VLCStyle.isScreenSmall
-                           ? g_mainDisplay.width * 0.8
-                           : Helpers.clamp(MainCtx.navigationPanel.width, minimumWidth, maximumWidth))
+            implicitWidth: Math.round(Helpers.clamp(MainCtx.navigationPanel.width, minimumWidth, maximumWidth))
 
             Navigation.parentItem: g_mainDisplay
             Navigation.upItem: localTopbar
@@ -664,11 +662,10 @@ FocusScope {
             sourceComponent: PlaylistPane {
                 id: playlist
 
-                implicitWidth: Math.round(VLCStyle.isScreenSmall
-                               ? g_mainDisplay.width * 0.8
-                               : MainCtx.playqueuePanel.width)
+                property int maximumWidth: Math.max(minimumWidth, (g_mainDisplay.width + playqueueResizeHandle.width)
+                                                    / (pannelVisiblity.showNavigation ? 3 : 2))
 
-                property int maximumWidth: (g_mainDisplay.width + playqueueResizeHandle.width ) / 3
+                implicitWidth: Math.round(Helpers.clamp(MainCtx.playqueuePanel.width, minimumWidth, maximumWidth))
 
                 focus: true
 
