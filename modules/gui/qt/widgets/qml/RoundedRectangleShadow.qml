@@ -60,7 +60,7 @@ ShaderEffect {
     // Increase the compensation factor if clipping occurs, but make it as small as possible
     // to prevent overlapping shadows (breaks batching) and to decrease the shader coverage:
     property real compensationFactor: implicitCompensationFactor
-    readonly property real implicitCompensationFactor: 2.0
+    property real implicitCompensationFactor: 2.0
 
     // Do not paint in the non-compensated inner area - only makes sense if there is compensation:
     property bool hollow: false
