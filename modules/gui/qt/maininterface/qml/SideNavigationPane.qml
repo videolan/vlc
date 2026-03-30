@@ -60,6 +60,29 @@ T.Pane {
         hasMedialib: MainCtx.mediaLibraryAvailable
     }
 
+    Connections {
+        target: History
+
+        // NOTE: handles cases where the path changes not by clicking in the sidebar
+        function onViewPathChanged(viewPath) {
+            for (let i = 0; i < listView.count; ++i) {
+                const rowIndex = navigationModel.index(i, 0)
+                const uri = navigationModel.data(rowIndex, NavigationModel.URI)
+
+                if (uri && History.match(viewPath, uri)) {
+                    // handle back button
+                    listView.currentIndex = i
+
+                    // handle keyboard navigation
+                    if (!navigationModel.data(rowIndex, NavigationModel.EXPANDED))
+                        navigationModel.setData(rowIndex, true, NavigationModel.EXPANDED)
+
+                    return
+                }
+            }
+        }
+    }
+
     background: Widgets.AcrylicBackground {
         enabled: root.useAcrylic
         tintColor: theme.bg.primary
@@ -90,6 +113,14 @@ T.Pane {
                 fadingEdge.backgroundColor:  (root.background && (root.background.color.a >= 1.0)) ? root.background.color
                                                                                                    : "transparent"
 
+                onCurrentIndexChanged: {
+                    const rowIndex = navigationModel.index(currentIndex, 0)
+
+                    if (rowIndex.valid && !navigationModel.data(rowIndex, NavigationModel.EXPANDED)
+                            && History.match(History.viewPath, navigationModel.data(rowIndex, NavigationModel.URI)))
+                        navigationModel.setData(rowIndex, true, NavigationModel.EXPANDED)
+                }
+
                 Navigation.parentItem: root
                 Navigation.downItem: preferenceButton
 
@@ -114,8 +145,6 @@ T.Pane {
                         itemClicked(model.uri)
                         listView.currentIndex = index
                         listView.forceActiveFocus(focusReason)
-                        if (!model.expanded && History.match(History.viewPath, model.uri))
-                            model.expanded = true
                     }
                 }
             }
