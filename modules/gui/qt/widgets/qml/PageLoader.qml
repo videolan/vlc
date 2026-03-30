@@ -46,6 +46,8 @@ StackViewExt {
         if (currentItem && typeof currentItem.dismiss === "function")
             currentItem.dismiss()
 
+        path = (path ?? []).slice(0)
+
         if (path.length === 0) {
             const defaultPage = _getDefaultPage()
             if (defaultPage === undefined) {
