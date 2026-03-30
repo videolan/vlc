@@ -1,0 +1,555 @@
+From 148c133ace31e8c8ff12db101ff052c7569b926d Mon Sep 17 00:00:00 2001
+From: Cameron Gutman <aicommander@gmail.com>
+Date: Sun, 24 Aug 2025 21:23:34 -0500
+Subject: [PATCH] avcodec/dxva2: add support for HEVC RExt DXVA profiles
+
+Microsoft has formally standardized DXVA GUIDs for HEVC Range Extension
+profiles in the Windows 11 24H2 SDK. They are supported by Intel GPUs
+starting with Tiger Lake.
+
+Like VDPAU and VAAPI, DXVA has separate GUIDs for each RExt profile, so
+we must parse the SPS like those hwaccels do to figure out which one to
+use when creating our decoder.
+
+The new RExt profiles are supported with DXVA2 and D3D11VA (depending on
+driver support).
+
+Signed-off-by: Cameron Gutman <aicommander@gmail.com>
+---
+ libavcodec/Makefile         |   6 +-
+ libavcodec/d3d12va_hevc.c   |  11 +++-
+ libavcodec/dxva2.c          |  77 +++++++++++++++++++++---
+ libavcodec/dxva2_hevc.c     | 115 ++++++++++++++++++++++++++++++++++--
+ libavcodec/dxva2_internal.h |  47 ++++++++++++++-
+ libavcodec/hevc/hevcdec.c   |  40 +++++++++++++
+ 6 files changed, 276 insertions(+), 20 deletions(-)
+
+diff --git a/libavcodec/Makefile b/libavcodec/Makefile
+index 12a8265025..363119f38f 100644
+--- a/libavcodec/Makefile
++++ b/libavcodec/Makefile
+@@ -1067,9 +1067,9 @@ OBJS-$(CONFIG_H264_VAAPI_HWACCEL)         += vaapi_h264.o
+ OBJS-$(CONFIG_H264_VDPAU_HWACCEL)         += vdpau_h264.o
+ OBJS-$(CONFIG_H264_VIDEOTOOLBOX_HWACCEL)  += videotoolbox.o
+ OBJS-$(CONFIG_H264_VULKAN_HWACCEL)        += vulkan_decode.o vulkan_h264.o
+-OBJS-$(CONFIG_HEVC_D3D11VA_HWACCEL)       += dxva2_hevc.o
+-OBJS-$(CONFIG_HEVC_DXVA2_HWACCEL)         += dxva2_hevc.o
+-OBJS-$(CONFIG_HEVC_D3D12VA_HWACCEL)       += dxva2_hevc.o d3d12va_hevc.o
++OBJS-$(CONFIG_HEVC_D3D11VA_HWACCEL)       += dxva2_hevc.o h265_profile_level.o
++OBJS-$(CONFIG_HEVC_DXVA2_HWACCEL)         += dxva2_hevc.o h265_profile_level.o
++OBJS-$(CONFIG_HEVC_D3D12VA_HWACCEL)       += dxva2_hevc.o d3d12va_hevc.o h265_profile_level.o
+ OBJS-$(CONFIG_HEVC_NVDEC_HWACCEL)         += nvdec_hevc.o
+ OBJS-$(CONFIG_HEVC_QSV_HWACCEL)           += qsvdec.o
+ OBJS-$(CONFIG_HEVC_VAAPI_HWACCEL)         += vaapi_hevc.o h265_profile_level.o
+diff --git a/libavcodec/d3d12va_hevc.c b/libavcodec/d3d12va_hevc.c
+index e72d49b7d9..13adc5f443 100644
+--- a/libavcodec/d3d12va_hevc.c
++++ b/libavcodec/d3d12va_hevc.c
+@@ -33,7 +33,10 @@
+ #define MAX_SLICES 256
+ 
+ typedef struct HEVCDecodePictureContext {
+-    DXVA_PicParams_HEVC    pp;
++    union {
++        DXVA_PicParams_HEVC             pp;
++        ff_DXVA_PicParams_HEVC_RangeExt ppext;
++    };
+     DXVA_Qmatrix_HEVC      qm;
+     unsigned               slice_count;
+     DXVA_Slice_HEVC_Short  slice_short[MAX_SLICES];
+@@ -65,7 +68,7 @@ static int d3d12va_hevc_start_frame(AVCodecContext *avctx,
+ 
+     ctx->used_mask = 0;
+ 
+-    ff_dxva2_hevc_fill_picture_parameters(avctx, (AVDXVAContext *)ctx, &ctx_pic->pp);
++    ff_dxva2_hevc_fill_picture_parameters(avctx, (AVDXVAContext *)ctx, &ctx_pic->ppext);
+ 
+     ff_dxva2_hevc_fill_scaling_lists(avctx, (AVDXVAContext *)ctx, &ctx_pic->qm);
+ 
+@@ -155,11 +158,13 @@ static int d3d12va_hevc_end_frame(AVCodecContext *avctx)
+     HEVCDecodePictureContext *ctx_pic = h->cur_frame->hwaccel_picture_private;
+ 
+     int scale = ctx_pic->pp.dwCodingParamToolFlags & 1;
++    int rext  = avctx->profile == AV_PROFILE_HEVC_REXT;
+ 
+     if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
+         return -1;
+ 
+-    return ff_d3d12va_common_end_frame(avctx, h->cur_frame->f, &ctx_pic->pp, sizeof(ctx_pic->pp),
++    return ff_d3d12va_common_end_frame(avctx, h->cur_frame->f, &ctx_pic->pp,
++               rext ? sizeof(ctx_pic->ppext) : sizeof(ctx_pic->pp),
+                scale ? &ctx_pic->qm : NULL, scale ? sizeof(ctx_pic->qm) : 0, update_input_arguments);
+ }
+ 
+diff --git a/libavcodec/dxva2.c b/libavcodec/dxva2.c
+index a282e6c0c7..217d63dce1 100644
+--- a/libavcodec/dxva2.c
++++ b/libavcodec/dxva2.c
+@@ -48,7 +48,6 @@ DEFINE_GUID(ff_DXVA2_ModeVP9_VLD_Profile0,0x463707f8,0xa1d0,0x4585,0x87,0x6d,0x8
+ DEFINE_GUID(ff_DXVA2_ModeVP9_VLD_10bit_Profile2,0xa4c749ef,0x6ecf,0x48aa,0x84,0x48,0x50,0xa7,0xa1,0x16,0x5f,0xf7);
+ DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_Profile0,0xb8be4ccb,0xcf53,0x46ba,0x8d,0x59,0xd6,0xb8,0xa6,0xda,0x5d,0x2a);
+ DEFINE_GUID(ff_DXVA2_NoEncrypt,          0x1b81beD0, 0xa0c7,0x11d3,0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5);
+-DEFINE_GUID(ff_GUID_NULL,                0x00000000, 0x0000,0x0000,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+ DEFINE_GUID(ff_IID_IDirectXVideoDecoderService, 0xfc51a551,0xd5e7,0x11d9,0xaf,0x55,0x00,0x05,0x4e,0x43,0xff,0x02);
+ 
+ typedef struct dxva_mode {
+@@ -70,6 +69,8 @@ static const int prof_hevc_main[]    = {AV_PROFILE_HEVC_MAIN,
+                                         AV_PROFILE_UNKNOWN};
+ static const int prof_hevc_main10[]  = {AV_PROFILE_HEVC_MAIN_10,
+                                         AV_PROFILE_UNKNOWN};
++static const int prof_hevc_rext[]    = {AV_PROFILE_HEVC_REXT,
++                                        AV_PROFILE_UNKNOWN};
+ static const int prof_vp9_profile0[] = {AV_PROFILE_VP9_0,
+                                         AV_PROFILE_UNKNOWN};
+ static const int prof_vp9_profile2[] = {AV_PROFILE_VP9_2,
+@@ -95,8 +96,14 @@ static const dxva_mode dxva_modes[] = {
+     { &ff_DXVA2_ModeVC1_D,           AV_CODEC_ID_WMV3 },
+ 
+     /* HEVC/H.265 */
+-    { &ff_DXVA2_ModeHEVC_VLD_Main10, AV_CODEC_ID_HEVC, prof_hevc_main10 },
+-    { &ff_DXVA2_ModeHEVC_VLD_Main,   AV_CODEC_ID_HEVC, prof_hevc_main },
++    { &ff_DXVA2_ModeHEVC_VLD_Main10,     AV_CODEC_ID_HEVC, prof_hevc_main10 },
++    { &ff_DXVA2_ModeHEVC_VLD_Main,       AV_CODEC_ID_HEVC, prof_hevc_main },
++    { &ff_DXVA2_ModeHEVC_VLD_Main12,     AV_CODEC_ID_HEVC, prof_hevc_rext },
++    { &ff_DXVA2_ModeHEVC_VLD_Main10_422, AV_CODEC_ID_HEVC, prof_hevc_rext },
++    { &ff_DXVA2_ModeHEVC_VLD_Main12_422, AV_CODEC_ID_HEVC, prof_hevc_rext },
++    { &ff_DXVA2_ModeHEVC_VLD_Main_444,   AV_CODEC_ID_HEVC, prof_hevc_rext },
++    { &ff_DXVA2_ModeHEVC_VLD_Main10_444, AV_CODEC_ID_HEVC, prof_hevc_rext },
++    { &ff_DXVA2_ModeHEVC_VLD_Main12_444, AV_CODEC_ID_HEVC, prof_hevc_rext },
+ 
+     /* VP8/9 */
+     { &ff_DXVA2_ModeVP9_VLD_Profile0,       AV_CODEC_ID_VP9, prof_vp9_profile0 },
+@@ -208,6 +215,8 @@ static int dxva_check_codec_compatibility(AVCodecContext *avctx, const dxva_mode
+         }
+         if (!found)
+             return 0;
++        if (avctx->codec_id == AV_CODEC_ID_HEVC && avctx->profile == AV_PROFILE_HEVC_REXT)
++            return IsEqualGUID(ff_dxva2_hevc_parse_rext_profile(avctx), mode->guid);
+     }
+ 
+     return 1;
+@@ -246,7 +255,16 @@ static void dxva_list_guids_debug(AVCodecContext *avctx, void *service,
+ #if CONFIG_DXVA2
+         if (sctx->pix_fmt == AV_PIX_FMT_DXVA2_VLD) {
+             const D3DFORMAT formats[] = {MKTAG('N', 'V', '1', '2'),
+-                                         MKTAG('P', '0', '1', '0')};
++                                         MKTAG('A', 'Y', 'U', 'V'),
++                                         MKTAG('Y', 'U', 'Y', '2'),
++                                         MKTAG('P', '0', '1', '0'),
++                                         MKTAG('P', '0', '1', '6'),
++                                         MKTAG('P', '2', '1', '0'),
++                                         MKTAG('P', '2', '1', '6'),
++                                         MKTAG('Y', '2', '1', '0'),
++                                         MKTAG('Y', '2', '1', '6'),
++                                         MKTAG('Y', '4', '1', '0'),
++                                         MKTAG('Y', '4', '1', '6'),};
+             int i;
+             for (i = 0; i < FF_ARRAY_ELEMS(formats); i++) {
+                 if (dxva2_validate_output(service, *guid, &formats[i]))
+@@ -315,6 +333,22 @@ static AVBufferRef *bufref_wrap_interface(IUnknown *iface)
+     return av_buffer_create((uint8_t*)iface, 1, bufref_free_interface, iface, 0);
+ }
+ 
++static enum AVPixelFormat dxva_map_sw_to_hw_frames_format(enum AVPixelFormat pix_fmt)
++{
++    switch (pix_fmt) {
++    case AV_PIX_FMT_YUV420P:   return AV_PIX_FMT_NV12;
++    case AV_PIX_FMT_YUV420P10: return AV_PIX_FMT_P010;
++    case AV_PIX_FMT_YUV420P12: return AV_PIX_FMT_P012;
++    case AV_PIX_FMT_YUV422P:   return AV_PIX_FMT_YUYV422;
++    case AV_PIX_FMT_YUV422P10: return AV_PIX_FMT_Y210;
++    case AV_PIX_FMT_YUV422P12: return AV_PIX_FMT_Y212;
++    case AV_PIX_FMT_YUV444P:   return AV_PIX_FMT_VUYX;
++    case AV_PIX_FMT_YUV444P10: return AV_PIX_FMT_XV30;
++    case AV_PIX_FMT_YUV444P12: return AV_PIX_FMT_XV36;
++    default:                   return AV_PIX_FMT_NONE;
++    }
++}
++
+ #if CONFIG_DXVA2
+ 
+ static int dxva2_get_decoder_configuration(AVCodecContext *avctx, const GUID *device_guid,
+@@ -340,14 +374,31 @@ static int dxva2_get_decoder_configuration(AVCodecContext *avctx, const GUID *de
+     return ret;
+ }
+ 
++static D3DFORMAT dxva2_map_sw_to_hw_format(enum AVPixelFormat pix_fmt)
++{
++    switch (pix_fmt) {
++    case AV_PIX_FMT_NV12:    return MKTAG('N', 'V', '1', '2');
++    case AV_PIX_FMT_P010:    return MKTAG('P', '0', '1', '0');
++    case AV_PIX_FMT_P012:    return MKTAG('P', '0', '1', '6');
++    case AV_PIX_FMT_P016:    return MKTAG('P', '0', '1', '6');
++    case AV_PIX_FMT_YUYV422: return MKTAG('Y', 'U', 'Y', '2');
++    case AV_PIX_FMT_Y210:    return MKTAG('Y', '2', '1', '0');
++    case AV_PIX_FMT_Y212:    return MKTAG('Y', '2', '1', '6');
++    case AV_PIX_FMT_Y216:    return MKTAG('Y', '2', '1', '6');
++    case AV_PIX_FMT_VUYX:    return MKTAG('A', 'Y', 'U', 'V');
++    case AV_PIX_FMT_XV30:    return MKTAG('Y', '4', '1', '0');
++    case AV_PIX_FMT_XV36:    return MKTAG('Y', '4', '1', '6');
++    case AV_PIX_FMT_XV48:    return MKTAG('Y', '4', '1', '6');
++    default:                 return D3DFMT_UNKNOWN;
++    }
++}
++
+ static int dxva2_create_decoder(AVCodecContext *avctx)
+ {
+     FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
+     GUID *guid_list;
+     unsigned guid_count;
+     GUID device_guid;
+-    D3DFORMAT surface_format = avctx->sw_pix_fmt == AV_PIX_FMT_YUV420P10 ?
+-                               MKTAG('P', '0', '1', '0') : MKTAG('N', 'V', '1', '2');
+     DXVA2_VideoDesc desc = { 0 };
+     DXVA2_ConfigPictureDecode config;
+     HRESULT hr;
+@@ -356,6 +407,7 @@ static int dxva2_create_decoder(AVCodecContext *avctx)
+     AVHWFramesContext *frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
+     AVDXVA2FramesContext *frames_hwctx = frames_ctx->hwctx;
+     AVDXVA2DeviceContext *device_hwctx = frames_ctx->device_ctx->hwctx;
++    D3DFORMAT surface_format = dxva2_map_sw_to_hw_format(frames_ctx->sw_format);
+ 
+     hr = IDirect3DDeviceManager9_OpenDeviceHandle(device_hwctx->devmgr,
+                                                   &device_handle);
+@@ -459,6 +511,16 @@ static DXGI_FORMAT d3d11va_map_sw_to_hw_format(enum AVPixelFormat pix_fmt)
+     case AV_PIX_FMT_NV12:       return DXGI_FORMAT_NV12;
+     case AV_PIX_FMT_P010:       return DXGI_FORMAT_P010;
+     case AV_PIX_FMT_YUV420P:    return DXGI_FORMAT_420_OPAQUE;
++    case AV_PIX_FMT_VUYX:       return DXGI_FORMAT_AYUV;
++    case AV_PIX_FMT_YUYV422:    return DXGI_FORMAT_YUY2;
++    case AV_PIX_FMT_Y210:       return DXGI_FORMAT_Y210;
++    case AV_PIX_FMT_XV30:       return DXGI_FORMAT_Y410;
++    case AV_PIX_FMT_P012:       return DXGI_FORMAT_P016;
++    case AV_PIX_FMT_P016:       return DXGI_FORMAT_P016;
++    case AV_PIX_FMT_Y212:       return DXGI_FORMAT_Y216;
++    case AV_PIX_FMT_Y216:       return DXGI_FORMAT_Y216;
++    case AV_PIX_FMT_XV36:       return DXGI_FORMAT_Y416;
++    case AV_PIX_FMT_XV48:       return DXGI_FORMAT_Y416;
+     default:                    return DXGI_FORMAT_UNKNOWN;
+     }
+ }
+@@ -627,8 +689,7 @@ int ff_dxva2_common_frame_params(AVCodecContext *avctx,
+     else
+         num_surfaces += 2;
+ 
+-    frames_ctx->sw_format = avctx->sw_pix_fmt == AV_PIX_FMT_YUV420P10 ?
+-                            AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
++    frames_ctx->sw_format = dxva_map_sw_to_hw_frames_format(avctx->sw_pix_fmt);
+     frames_ctx->width = FFALIGN(avctx->coded_width, surface_alignment);
+     frames_ctx->height = FFALIGN(avctx->coded_height, surface_alignment);
+     frames_ctx->initial_pool_size = num_surfaces;
+diff --git a/libavcodec/dxva2_hevc.c b/libavcodec/dxva2_hevc.c
+index 85698dfcce..cc6cabfb72 100644
+--- a/libavcodec/dxva2_hevc.c
++++ b/libavcodec/dxva2_hevc.c
+@@ -28,11 +28,15 @@
+ #include "hevc/data.h"
+ #include "hevc/hevcdec.h"
+ #include "hwaccel_internal.h"
++#include "h265_profile_level.h"
+ 
+ #define MAX_SLICES 256
+ 
+ struct hevc_dxva2_picture_context {
+-    DXVA_PicParams_HEVC   pp;
++    union {
++        DXVA_PicParams_HEVC             pp;
++        ff_DXVA_PicParams_HEVC_RangeExt ppext;
++    };
+     DXVA_Qmatrix_HEVC     qm;
+     unsigned              slice_count;
+     DXVA_Slice_HEVC_Short slice_short[MAX_SLICES];
+@@ -57,9 +61,82 @@ static int get_refpic_index(const DXVA_PicParams_HEVC *pp, int surface_index)
+     return 0xff;
+ }
+ 
++static int ptl_convert(const PTLCommon *general_ptl, H265RawProfileTierLevel *h265_raw_ptl)
++{
++    h265_raw_ptl->general_profile_space = general_ptl->profile_space;
++    h265_raw_ptl->general_tier_flag     = general_ptl->tier_flag;
++    h265_raw_ptl->general_profile_idc   = general_ptl->profile_idc;
++
++    memcpy(h265_raw_ptl->general_profile_compatibility_flag,
++                                  general_ptl->profile_compatibility_flag, 32 * sizeof(uint8_t));
++
++#define copy_field(name) h265_raw_ptl->general_ ## name = general_ptl->name
++    copy_field(progressive_source_flag);
++    copy_field(interlaced_source_flag);
++    copy_field(non_packed_constraint_flag);
++    copy_field(frame_only_constraint_flag);
++    copy_field(max_12bit_constraint_flag);
++    copy_field(max_10bit_constraint_flag);
++    copy_field(max_8bit_constraint_flag);
++    copy_field(max_422chroma_constraint_flag);
++    copy_field(max_420chroma_constraint_flag);
++    copy_field(max_monochrome_constraint_flag);
++    copy_field(intra_constraint_flag);
++    copy_field(one_picture_only_constraint_flag);
++    copy_field(lower_bit_rate_constraint_flag);
++    copy_field(max_14bit_constraint_flag);
++    copy_field(inbld_flag);
++    copy_field(level_idc);
++#undef copy_field
++
++    return 0;
++}
++
++const GUID *ff_dxva2_hevc_parse_rext_profile(AVCodecContext *avctx)
++{
++    const HEVCContext *h = avctx->priv_data;
++    const HEVCSPS *sps = h->pps->sps;
++    const PTL *ptl = &sps->ptl;
++    const PTLCommon *general_ptl = &ptl->general_ptl;
++    const H265ProfileDescriptor *profile;
++    H265RawProfileTierLevel h265_raw_ptl = {0};
++
++    /* convert PTLCommon to H265RawProfileTierLevel */
++    ptl_convert(general_ptl, &h265_raw_ptl);
++
++    profile = ff_h265_get_profile(&h265_raw_ptl);
++    if (!profile) {
++        av_log(avctx, AV_LOG_ERROR, "HEVC profile is not found.\n");
++        return &ff_GUID_NULL;
++    }
++
++    if (!strcmp(profile->name, "Main 12") ||
++        !strcmp(profile->name, "Main 12 Intra"))
++        return &ff_DXVA2_ModeHEVC_VLD_Main12;
++    else if (!strcmp(profile->name, "Main 4:2:2 10") ||
++             !strcmp(profile->name, "Main 4:2:2 10 Intra"))
++        return &ff_DXVA2_ModeHEVC_VLD_Main10_422;
++    else if (!strcmp(profile->name, "Main 4:2:2 12") ||
++             !strcmp(profile->name, "Main 4:2:2 12 Intra"))
++        return &ff_DXVA2_ModeHEVC_VLD_Main12_422;
++    else if (!strcmp(profile->name, "Main 4:4:4") ||
++             !strcmp(profile->name, "Main 4:4:4 Intra"))
++        return &ff_DXVA2_ModeHEVC_VLD_Main_444;
++    else if (!strcmp(profile->name, "Main 4:4:4 10") ||
++             !strcmp(profile->name, "Main 4:4:4 10 Intra"))
++        return &ff_DXVA2_ModeHEVC_VLD_Main10_444;
++    else if (!strcmp(profile->name, "Main 4:4:4 12") ||
++             !strcmp(profile->name, "Main 4:4:4 12 Intra"))
++        return &ff_DXVA2_ModeHEVC_VLD_Main12_444;
++
++    av_log(avctx, AV_LOG_ERROR, "Unsupported HEVC RExt profile: %s\n", profile->name);
++    return &ff_GUID_NULL;
++}
++
+ void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx,
+-                                    DXVA_PicParams_HEVC *pp)
++                                           ff_DXVA_PicParams_HEVC_RangeExt *ppext)
+ {
++    DXVA_PicParams_HEVC *pp = &ppext->params;
+     const HEVCContext *h = avctx->priv_data;
+     const HEVCLayerContext *l = &h->layers[h->cur_layer];
+     const HEVCFrame *current_picture = h->cur_frame;
+@@ -67,7 +144,7 @@ void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
+     const HEVCSPS *sps = pps->sps;
+     int i, j;
+ 
+-    memset(pp, 0, sizeof(*pp));
++    memset(ppext, 0, sizeof(*ppext));
+ 
+     pp->PicWidthInMinCbsY  = sps->min_cb_width;
+     pp->PicHeightInMinCbsY = sps->min_cb_height;
+@@ -200,6 +277,32 @@ void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
+     DO_REF_LIST(LT_CURR, RefPicSetLtCurr);
+ 
+     pp->StatusReportFeedbackNumber = 1 + DXVA_CONTEXT_REPORT_ID(avctx, ctx)++;
++
++    if (sps->range_extension) {
++        ppext->transform_skip_rotation_enabled_flag    = sps->transform_skip_rotation_enabled;
++        ppext->transform_skip_context_enabled_flag     = sps->transform_skip_context_enabled;
++        ppext->implicit_rdpcm_enabled_flag             = sps->implicit_rdpcm_enabled;
++        ppext->explicit_rdpcm_enabled_flag             = sps->explicit_rdpcm_enabled;
++        ppext->extended_precision_processing_flag      = sps->extended_precision_processing;
++        ppext->intra_smoothing_disabled_flag           = sps->intra_smoothing_disabled;
++        ppext->persistent_rice_adaptation_enabled_flag = sps->persistent_rice_adaptation_enabled;
++        ppext->high_precision_offsets_enabled_flag     = sps->high_precision_offsets_enabled;
++        ppext->cabac_bypass_alignment_enabled_flag     = sps->cabac_bypass_alignment_enabled;
++    }
++    if (pps->pps_range_extensions_flag) {
++        ppext->cross_component_prediction_enabled_flag = pps->cross_component_prediction_enabled_flag;
++        ppext->chroma_qp_offset_list_enabled_flag      = pps->chroma_qp_offset_list_enabled_flag;
++
++        ppext->diff_cu_chroma_qp_offset_depth            = pps->diff_cu_chroma_qp_offset_depth;
++        ppext->log2_sao_offset_scale_luma                = pps->log2_sao_offset_scale_luma;
++        ppext->log2_sao_offset_scale_chroma              = pps->log2_sao_offset_scale_chroma;
++        ppext->log2_max_transform_skip_block_size_minus2 = pps->log2_max_transform_skip_block_size - 2;
++        ppext->chroma_qp_offset_list_len_minus1          = pps->chroma_qp_offset_list_len_minus1;
++        for (i = 0; i <= pps->chroma_qp_offset_list_len_minus1; i++) {
++            ppext->cb_qp_offset_list[i] = pps->cb_qp_offset_list[i];
++            ppext->cr_qp_offset_list[i] = pps->cr_qp_offset_list[i];
++        }
++    }
+ }
+ 
+ void ff_dxva2_hevc_fill_scaling_lists(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_Qmatrix_HEVC *qm)
+@@ -376,7 +479,7 @@ static int dxva2_hevc_start_frame(AVCodecContext *avctx,
+     av_assert0(ctx_pic);
+ 
+     /* Fill up DXVA_PicParams_HEVC */
+-    ff_dxva2_hevc_fill_picture_parameters(avctx, ctx, &ctx_pic->pp);
++    ff_dxva2_hevc_fill_picture_parameters(avctx, ctx, &ctx_pic->ppext);
+ 
+     /* Fill up DXVA_Qmatrix_HEVC */
+     ff_dxva2_hevc_fill_scaling_lists(avctx, ctx, &ctx_pic->qm);
+@@ -415,13 +518,15 @@ static int dxva2_hevc_end_frame(AVCodecContext *avctx)
+     HEVCContext *h = avctx->priv_data;
+     struct hevc_dxva2_picture_context *ctx_pic = h->cur_frame->hwaccel_picture_private;
+     int scale = ctx_pic->pp.dwCodingParamToolFlags & 1;
++    int rext = avctx->profile == AV_PROFILE_HEVC_REXT;
+     int ret;
+ 
+     if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
+         return -1;
+ 
+     ret = ff_dxva2_common_end_frame(avctx, h->cur_frame->f,
+-                                    &ctx_pic->pp, sizeof(ctx_pic->pp),
++                                    &ctx_pic->pp,
++                                    rext ? sizeof(ctx_pic->ppext) : sizeof(ctx_pic->pp),
+                                     scale ? &ctx_pic->qm : NULL, scale ? sizeof(ctx_pic->qm) : 0,
+                                     commit_bitstream_and_slice_buffer);
+     return ret;
+diff --git a/libavcodec/dxva2_internal.h b/libavcodec/dxva2_internal.h
+index 6cbd0e42d7..4d5656e09b 100644
+--- a/libavcodec/dxva2_internal.h
++++ b/libavcodec/dxva2_internal.h
+@@ -69,6 +69,49 @@
+ #include "avcodec.h"
+ #include "internal.h"
+ 
++DEFINE_GUID(ff_GUID_NULL,                     0x00000000, 0x0000,0x0000,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
++DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main12,     0x1a72925f, 0x0c2c,0x4f15,0x96,0xfb,0xb1,0x7d,0x14,0x73,0x60,0x3f);
++DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main10_422, 0x0bac4fe5, 0x1532,0x4429,0xa8,0x54,0xf8,0x4d,0xe0,0x49,0x53,0xdb);
++DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main12_422, 0x55bcac81, 0xf311,0x4093,0xa7,0xd0,0x1c,0xbc,0x0b,0x84,0x9b,0xee);
++DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main_444,   0x4008018f, 0xf537,0x4b36,0x98,0xcf,0x61,0xaf,0x8a,0x2c,0x1a,0x33);
++DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main10_444, 0x0dabeffa, 0x4458,0x4602,0xbc,0x03,0x07,0x95,0x65,0x9d,0x61,0x7c);
++DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main12_444, 0x9798634d, 0xfe9d,0x48e5,0xb4,0xda,0xdb,0xec,0x45,0xb3,0xdf,0x01);
++
++/* This is only defined starting in the Windows 11 24H2 SDK */
++#pragma pack(push,1)
++typedef struct ff_DXVA_PicParams_HEVC_RangeExt {
++    DXVA_PicParams_HEVC params;
++
++    union {
++        struct {
++            USHORT transform_skip_rotation_enabled_flag    : 1;
++            USHORT transform_skip_context_enabled_flag     : 1;
++            USHORT implicit_rdpcm_enabled_flag             : 1;
++            USHORT explicit_rdpcm_enabled_flag             : 1;
++            USHORT extended_precision_processing_flag      : 1;
++            USHORT intra_smoothing_disabled_flag           : 1;
++            USHORT persistent_rice_adaptation_enabled_flag : 1;
++            USHORT high_precision_offsets_enabled_flag     : 1;
++            USHORT cabac_bypass_alignment_enabled_flag     : 1;
++            USHORT cross_component_prediction_enabled_flag : 1;
++            USHORT chroma_qp_offset_list_enabled_flag      : 1;
++            USHORT ReservedBits8                           : 5;
++        };
++        USHORT dwRangeExtensionFlags;
++    };
++
++    UCHAR diff_cu_chroma_qp_offset_depth;
++    UCHAR log2_sao_offset_scale_luma;
++    UCHAR log2_sao_offset_scale_chroma;
++    UCHAR log2_max_transform_skip_block_size_minus2;
++    CHAR cb_qp_offset_list[6];
++    CHAR cr_qp_offset_list[6];
++    UCHAR chroma_qp_offset_list_len_minus1;
++    USHORT ReservedBits9;
++
++} ff_DXVA_PicParams_HEVC_RangeExt;
++#pragma pack(pop)
++
+ typedef void DECODER_BUFFER_DESC;
+ 
+ typedef union {
+@@ -172,9 +215,11 @@ void ff_dxva2_h264_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
+ void ff_dxva2_h264_fill_scaling_lists(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_Qmatrix_H264 *qm);
+ 
+ #if CONFIG_HEVC_D3D12VA_HWACCEL || CONFIG_HEVC_D3D11VA_HWACCEL || CONFIG_HEVC_D3D11VA2_HWACCEL || CONFIG_HEVC_DXVA2_HWACCEL
+-void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_PicParams_HEVC *pp);
++void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx, ff_DXVA_PicParams_HEVC_RangeExt *ppext);
+ 
+ void ff_dxva2_hevc_fill_scaling_lists(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_Qmatrix_HEVC *qm);
++
++const GUID *ff_dxva2_hevc_parse_rext_profile(AVCodecContext *avctx);
+ #endif
+ 
+ #if CONFIG_VP9_D3D12VA_HWACCEL || CONFIG_VP9_D3D11VA_HWACCEL || CONFIG_VP9_D3D11VA2_HWACCEL || CONFIG_VP9_DXVA2_HWACCEL
+diff --git a/libavcodec/hevc/hevcdec.c b/libavcodec/hevc/hevcdec.c
+index ae5f0fe69d..b20be7588f 100644
+--- a/libavcodec/hevc/hevcdec.c
++++ b/libavcodec/hevc/hevcdec.c
+@@ -648,6 +648,16 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+ #endif
+         break;
+     case AV_PIX_FMT_YUV444P:
++#if CONFIG_HEVC_DXVA2_HWACCEL
++        *fmt++ = AV_PIX_FMT_DXVA2_VLD;
++#endif
++#if CONFIG_HEVC_D3D11VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmt++ = AV_PIX_FMT_D3D11;
++#endif
++#if CONFIG_HEVC_D3D12VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D12;
++#endif
+ #if CONFIG_HEVC_VAAPI_HWACCEL
+         *fmt++ = AV_PIX_FMT_VAAPI;
+ #endif
+@@ -666,6 +676,16 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+         break;
+     case AV_PIX_FMT_YUV422P:
+     case AV_PIX_FMT_YUV422P10LE:
++#if CONFIG_HEVC_DXVA2_HWACCEL
++        *fmt++ = AV_PIX_FMT_DXVA2_VLD;
++#endif
++#if CONFIG_HEVC_D3D11VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmt++ = AV_PIX_FMT_D3D11;
++#endif
++#if CONFIG_HEVC_D3D12VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D12;
++#endif
+ #if CONFIG_HEVC_VAAPI_HWACCEL
+        *fmt++ = AV_PIX_FMT_VAAPI;
+ #endif
+@@ -686,6 +706,16 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+     /* NOTE: fallthrough */
+     case AV_PIX_FMT_YUV420P12:
+     case AV_PIX_FMT_YUV444P12:
++#if CONFIG_HEVC_DXVA2_HWACCEL
++        *fmt++ = AV_PIX_FMT_DXVA2_VLD;
++#endif
++#if CONFIG_HEVC_D3D11VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmt++ = AV_PIX_FMT_D3D11;
++#endif
++#if CONFIG_HEVC_D3D12VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D12;
++#endif
+ #if CONFIG_HEVC_VAAPI_HWACCEL
+        *fmt++ = AV_PIX_FMT_VAAPI;
+ #endif
+@@ -700,6 +730,16 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+ #endif
+         break;
+     case AV_PIX_FMT_YUV422P12:
++#if CONFIG_HEVC_DXVA2_HWACCEL
++        *fmt++ = AV_PIX_FMT_DXVA2_VLD;
++#endif
++#if CONFIG_HEVC_D3D11VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmt++ = AV_PIX_FMT_D3D11;
++#endif
++#if CONFIG_HEVC_D3D12VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D12;
++#endif
+ #if CONFIG_HEVC_VAAPI_HWACCEL
+        *fmt++ = AV_PIX_FMT_VAAPI;
+ #endif
+-- 
+2.52.0.windows.1
+
