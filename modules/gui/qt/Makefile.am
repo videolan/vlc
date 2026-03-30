@@ -880,6 +880,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/window_minimize.svg \
 	pixmaps/icons/window_restore.svg \
 	pixmaps/icons/ic_fluent_arrow_download_24_regular.svg \
+	pixmaps/icons/ic_fluent_arrow_sync_24_regular.svg \
 	pixmaps/menu/add.svg \
 	pixmaps/menu/capture-card.svg \
 	pixmaps/menu/clear.svg \
