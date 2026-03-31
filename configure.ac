@@ -732,7 +732,7 @@ dnl Check for broken versions of mingw-runtime compatibility library
         AC_MSG_RESULT([ok])
     ], [
         AC_MSG_RESULT([present])
-        AC_MSG_ERROR([LibVLC requires Mingw-w64 version 6.0 or higher!])
+        AC_MSG_ERROR([LibVLC requires Mingw-w64 version 8.0 or higher!])
     ])
 
     AS_IF([test "${win_ucrt_build}" = "no"], [
