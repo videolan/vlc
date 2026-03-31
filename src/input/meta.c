@@ -262,6 +262,7 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
         free( ppsz_all_keys[i] );
     }
     free( ppsz_all_keys );
+    dst->i_status |= src->i_status;
 }
 
 
