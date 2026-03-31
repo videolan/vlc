@@ -362,7 +362,7 @@ static void rist_rtcp_send(sout_access_out_t *p_access)
     struct timeval tv;
     int r;
     uint64_t fractions;
-    uint16_t namelen = strlen(flow->cname) + 1;
+    uint16_t namelen = strlen(flow->cname);
     gettimeofday(&tv, NULL);
 
     /* Populate SR for sender report */

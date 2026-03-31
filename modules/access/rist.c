@@ -226,7 +226,7 @@ static int is_index_in_range(struct rist_flow *flow, uint16_t idx)
 static void send_rtcp_feedback(stream_t *p_access, struct rist_flow *flow)
 {
     stream_sys_t *p_sys = p_access->p_sys;
-    int namelen = strlen(flow->cname) + 1;
+    size_t namelen = strlen(flow->cname);
 
     /* we need to make sure it is a multiple of 4, pad if necessary */
     if ((namelen - 2) & 0x3)
