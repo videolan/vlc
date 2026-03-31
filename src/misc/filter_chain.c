@@ -36,16 +36,13 @@
 module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
                                 const char *name, bool strict)
 {
-    const bool b_force_backup = p_filter->obj.force; /* FIXME: remove this */
-
     if (name == NULL || name[0] == '\0')
         name = "any";
 
     /* Find matching modules */
     module_t **mods;
-    size_t strict_total;
     ssize_t total = vlc_module_match(capability, name, strict,
-                                     &mods, &strict_total);
+                                     &mods, NULL);
 
     if (unlikely(total < 0))
         return NULL;
@@ -65,7 +62,6 @@ module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
             continue;
 
         p_filter->p_module = cand;
-        p_filter->obj.force = i < strict_total;
         ret = cb(p_filter);
         if (ret == VLC_SUCCESS)
         {
@@ -96,7 +92,6 @@ module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
         var_SetString(p_filter, "module-name", module_get_object(p_filter->p_module));
     }
 
-    p_filter->obj.force = b_force_backup;
     return p_filter->p_module;
 }
 
