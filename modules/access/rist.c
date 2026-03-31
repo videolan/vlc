@@ -259,7 +259,6 @@ static void send_rtcp_feedback(stream_t *p_access, struct rist_flow *flow)
     rist_WriteTo_i11e_Locked(p_sys->lock, flow->fd_nack, buf, rtcp_feedback_size,
         (struct sockaddr *)&flow->peer_sockaddr, flow->peer_socklen);
     free(buf);
-    buf = NULL;
 }
 
 static void send_bbnack(stream_t *p_access, int fd_nack, block_t *pkt_nacks, uint16_t nack_count)
@@ -298,7 +297,6 @@ static void send_bbnack(stream_t *p_access, int fd_nack, block_t *pkt_nacks, uin
         rist_WriteTo_i11e_Locked(p_sys->lock, fd_nack, buf, len,
             (struct sockaddr *)&flow->peer_sockaddr, flow->peer_socklen);
     free(buf);
-    buf = NULL;
 }
 
 static void send_rbnack(stream_t *p_access, int fd_nack, block_t *pkt_nacks, uint16_t nack_count)
@@ -338,7 +336,6 @@ static void send_rbnack(stream_t *p_access, int fd_nack, block_t *pkt_nacks, uin
         rist_WriteTo_i11e_Locked(p_sys->lock, fd_nack, buf, len,
             (struct sockaddr *)&flow->peer_sockaddr, flow->peer_socklen);
     free(buf);
-    buf = NULL;
 }
 
 static void send_nacks(stream_t *p_access, struct rist_flow *flow)
@@ -658,10 +655,7 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     struct rtp_pkt *pkt;
     pkt = &(flow->buffer[idx]);
     if (pkt->buffer && pkt->buffer->i_buffer > 0)
-    {
         block_Release(pkt->buffer);
-        pkt->buffer = NULL;
-    }
     pkt->buffer = block_Alloc(len);
     if (!pkt->buffer)
         return false;
@@ -912,7 +906,6 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
         }
 
         free(buf);
-        buf = NULL;
     }
 
     now = mdate();
@@ -1023,10 +1016,8 @@ static void Clean( stream_t *p_access )
             net_Close (p_sys->flow->fd_rtcp_m);
         for (int i=0; i<RIST_QUEUE_SIZE; i++) {
             struct rtp_pkt *pkt = &(p_sys->flow->buffer[i]);
-            if (pkt->buffer && pkt->buffer->i_buffer > 0) {
+            if (pkt->buffer && pkt->buffer->i_buffer > 0)
                 block_Release(pkt->buffer);
-                pkt->buffer = NULL;
-            }
         }
         free(p_sys->flow->buffer);
         free(p_sys->flow);

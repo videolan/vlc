@@ -523,10 +523,7 @@ static void* ThreadSend( void *data )
         struct rtp_pkt *pkt;
         pkt = &(flow->buffer[seq]);
         if (pkt->buffer)
-        {
             block_Release(pkt->buffer);
-            pkt->buffer = NULL;
-        }
         pkt->rtp_ts = pkt_ts;
         pkt->buffer = out;
 
@@ -698,10 +695,7 @@ static void Clean( sout_access_out_t *p_access )
         for (int i=0; i<RIST_QUEUE_SIZE; i++) {
             struct rtp_pkt *pkt = &(p_sys->flow->buffer[i]);
             if (pkt->buffer)
-            {
                 block_Release(pkt->buffer);
-                pkt->buffer = NULL;
-            }
         }
         free(p_sys->flow->buffer);
         free(p_sys->flow);
