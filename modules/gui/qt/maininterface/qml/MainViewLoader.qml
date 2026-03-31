@@ -63,6 +63,9 @@ Loader {
 
     readonly property bool isLoading: model.loading
 
+    property real leftPadding
+    property real rightPadding
+
     onIsLoadingChanged: {
         // Adjust the cursor. Unless the loaded item (view) sets a cursor
         // globally or for itself, this is going to be respected. It should
@@ -147,6 +150,25 @@ Loader {
     onModelChanged: resetFocus()
 
     onInitialIndexChanged: resetFocus()
+
+    onLoaded: {
+        // Padding is supposed to be the margins of the content,
+        // propagating padding is not conventional. But we have
+        // to do this because that is what `PageLoader` through
+        // `StackViewExt` does.
+
+        if (item.leftPadding !== undefined) {
+            item.leftPadding = Qt.binding(function() {
+                return root.leftPadding
+            })
+        }
+
+        if (item.rightPadding !== undefined) {
+            item.rightPadding = Qt.binding(function() {
+                return root.rightPadding
+            })
+        }
+    }
 
     Connections {
         target: model
