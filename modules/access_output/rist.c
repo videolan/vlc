@@ -460,7 +460,7 @@ static void *rist_thread(void *data)
 
         /* And, in any case: */
         now = mdate();
-        if ((now - p_sys->last_rtcp_tx) > RIST_TICK_FROM_MS(RTCP_INTERVAL))
+        if ((now - p_sys->last_rtcp_tx) > VLC_TICK_FROM_MS(RTCP_INTERVAL))
         {
             rist_rtcp_send(p_access);
             p_sys->last_rtcp_tx = now;
@@ -544,7 +544,7 @@ static void* ThreadSend( void *data )
         /* We print out the stats once per second */
         uint64_t now = mdate();
         uint64_t interval = (now - p_sys->i_last_stat);
-        if ( interval > RIST_TICK_FROM_MS(STATS_INTERVAL) )
+        if ( interval > VLC_TICK_FROM_MS(STATS_INTERVAL) )
         {
             if (p_sys->i_retransmit_packets > 0)
             {
@@ -769,7 +769,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->flow = flow;
     flow->latency = var_InheritInteger(p_access, SOUT_CFG_PREFIX "buffer-size");
-    flow->rtp_latency = rtp_get_ts(RIST_TICK_FROM_MS(flow->latency));
+    flow->rtp_latency = rtp_get_ts(VLC_TICK_FROM_MS(flow->latency));
     p_sys->ssrc = var_InheritInteger(p_access, SOUT_CFG_PREFIX "ssrc");
     if (p_sys->ssrc == 0) {
         vlc_rand_bytes(&p_sys->ssrc, 4);
@@ -778,7 +778,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->ssrc &= ~(1 << 0);
 
     msg_Info(p_access, "SSRC: 0x%08X", p_sys->ssrc);
-    p_sys->i_ticks_caching = RIST_TICK_FROM_MS(var_InheritInteger( p_access,
+    p_sys->i_ticks_caching = VLC_TICK_FROM_MS(var_InheritInteger( p_access,
         SOUT_CFG_PREFIX "caching"));
     p_sys->i_packet_size = var_InheritInteger(p_access, SOUT_CFG_PREFIX "packet-size" );
     p_sys->p_fifo = block_FifoNew();

@@ -63,8 +63,6 @@
 
 #define RTCP_PT_RTPFR             204
 
-#define RIST_TICK_FROM_MS(ms) ((CLOCK_FREQ / INT64_C(1000)) * (ms))
-
 struct rtp_pkt {
     uint32_t rtp_ts;
     struct block_t *buffer;

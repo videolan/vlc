@@ -115,7 +115,7 @@ static int Control(stream_t *p_access, int i_query, va_list args)
             break;
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg( args, int64_t * ) = RIST_TICK_FROM_MS(
+            *va_arg( args, int64_t * ) = VLC_TICK_FROM_MS(
                    var_InheritInteger(p_access, "network-caching") );
             break;
 
@@ -913,7 +913,7 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     /* Process stats and print them out */
     /* We need to measure some items every 70ms */
     uint64_t interval = (now - flow->feedback_time);
-    if ( interval > RIST_TICK_FROM_MS(RTCP_INTERVAL) )
+    if ( interval > VLC_TICK_FROM_MS(RTCP_INTERVAL) )
     {
         if (p_sys->i_poll_timeout_nonzero_count > 0)
         {
@@ -932,7 +932,7 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     }
     /* We print out the stats once per second */
     interval = (now - p_sys->i_last_stat);
-    if ( interval >  RIST_TICK_FROM_MS(STATS_INTERVAL) )
+    if ( interval >  VLC_TICK_FROM_MS(STATS_INTERVAL) )
     {
         if ( p_sys->i_lost_packets > 0)
             msg_Err(p_access, "We have %d lost packets", p_sys->i_lost_packets);
@@ -960,17 +960,17 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
 
     /* Send rtcp feedback every RTCP_INTERVAL */
     interval = (now - flow->feedback_time);
-    if ( interval > RIST_TICK_FROM_MS(RTCP_INTERVAL) )
+    if ( interval > VLC_TICK_FROM_MS(RTCP_INTERVAL) )
     {
         /* msg_Dbg(p_access, "Calling RTCP Feedback %lu<%d ms using timer", interval,
-        RIST_TICK_FROM_MS(RTCP_INTERVAL)); */
+        VLC_TICK_FROM_MS(RTCP_INTERVAL)); */
         send_rtcp_feedback(p_access, flow);
         flow->feedback_time = now;
     }
 
     /* Send nacks every NACK_INTERVAL (only the ones that have matured, if any) */
     interval = (now - p_sys->last_nack_tx);
-    if ( interval > RIST_TICK_FROM_MS(NACK_INTERVAL) )
+    if ( interval > VLC_TICK_FROM_MS(NACK_INTERVAL) )
     {
         send_nacks(p_access, p_sys->flow);
         p_sys->last_nack_tx = now;
@@ -978,8 +978,8 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
 
     /* Safety check for when the input stream stalls */
     if ( p_sys->last_data_rx > 0 && now > p_sys->last_data_rx &&
-        (uint64_t)(now - p_sys->last_data_rx) >  (uint64_t)RIST_TICK_FROM_MS(flow->latency) &&
-        (uint64_t)(now - p_sys->last_reset) > (uint64_t)RIST_TICK_FROM_MS(flow->latency) )
+        (uint64_t)(now - p_sys->last_data_rx) >  (uint64_t)VLC_TICK_FROM_MS(flow->latency) &&
+        (uint64_t)(now - p_sys->last_reset) > (uint64_t)VLC_TICK_FROM_MS(flow->latency) )
     {
         msg_Err(p_access, "No data received for %"PRId64" ms, resetting buffers",
             (int64_t)(now - p_sys->last_data_rx)/1000);
@@ -1087,9 +1087,9 @@ static int Open(vlc_object_t *p_this)
     msg_Info(p_access, "Setting queue latency to %d ms", p_sys->flow->latency);
 
     /* Convert to rtp times */
-    p_sys->flow->rtp_latency = rtp_get_ts(RIST_TICK_FROM_MS(p_sys->flow->latency));
-    p_sys->flow->retry_interval = rtp_get_ts(RIST_TICK_FROM_MS(p_sys->flow->retry_interval));
-    p_sys->flow->reorder_buffer = rtp_get_ts(RIST_TICK_FROM_MS(p_sys->flow->reorder_buffer));
+    p_sys->flow->rtp_latency = rtp_get_ts(VLC_TICK_FROM_MS(p_sys->flow->latency));
+    p_sys->flow->retry_interval = rtp_get_ts(VLC_TICK_FROM_MS(p_sys->flow->retry_interval));
+    p_sys->flow->reorder_buffer = rtp_get_ts(VLC_TICK_FROM_MS(p_sys->flow->reorder_buffer));
 
     p_sys->p_fifo = block_FifoNew();
     if( unlikely(p_sys->p_fifo == NULL) )
