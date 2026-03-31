@@ -178,7 +178,6 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
     rist_destroy(p_sys->sender_ctx);
-    p_sys->sender_ctx = NULL;
 }
 
 static int Open( vlc_object_t *p_this )
@@ -261,7 +260,6 @@ static int Open( vlc_object_t *p_this )
 
 failed:
     rist_destroy(p_sys->sender_ctx);
-    p_sys->sender_ctx = NULL;
     return VLC_EGENERIC;
 }
 
