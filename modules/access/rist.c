@@ -654,7 +654,7 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     /* Always replace the existing one with the new one */
     struct rtp_pkt *pkt;
     pkt = &(flow->buffer[idx]);
-    if (pkt->buffer && pkt->buffer->i_buffer > 0)
+    if (pkt->buffer)
         block_Release(pkt->buffer);
     pkt->buffer = block_Alloc(len);
     if (!pkt->buffer)
@@ -1016,7 +1016,7 @@ static void Clean( stream_t *p_access )
             net_Close (p_sys->flow->fd_rtcp_m);
         for (int i=0; i<RIST_QUEUE_SIZE; i++) {
             struct rtp_pkt *pkt = &(p_sys->flow->buffer[i]);
-            if (pkt->buffer && pkt->buffer->i_buffer > 0)
+            if (pkt->buffer)
                 block_Release(pkt->buffer);
         }
         free(p_sys->flow->buffer);
