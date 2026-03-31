@@ -482,7 +482,7 @@ FocusScope {
             z: 2
 
             anchors.fill: parent
-            visible: VLCStyle.isScreenSmall && (playlistLoader.shown || sidebar.visible)
+            visible: VLCStyle.isScreenSmall && (playlistLoader.shown || (pannelVisiblity.showNavigation && sidebar.visible))
             color: "black"
             opacity: 0.4
 
