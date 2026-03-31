@@ -57,6 +57,8 @@ Item {
 
     // Enable blending if source or the effect is not opaque.
     // This comes with a performance penalty.
+    blending: false
+
     property alias blending: sourceProxy.blending
 
     // Display scale may be a fractional size, but textures can not. Pixel aligned
@@ -93,8 +95,6 @@ Item {
         y: root.sourceVisualRect.y
         width: useSubTexture ? Helpers.alignUp(root.sourceVisualRect.width, root._alignNumber) : parent.width
         height: useSubTexture ? Helpers.alignUp(root.sourceVisualRect.height, root._alignNumber) : parent.height
-
-        blending: false
 
         smooth: false
 
