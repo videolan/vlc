@@ -113,9 +113,9 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
         .name = segment->url + strlen(queue->hls_config->base_url) + 1,
         .mime = "video/MP2T",
     };
-    segment->storage =
-        hls_storage_FromBlocks(content, &storage_conf, queue->hls_config);
-    if (unlikely(segment->storage == NULL))
+    const int ret = hls_storage_FromBlocks(
+        content, &storage_conf, queue->hls_config, &segment->storage);
+    if (unlikely(ret != 0))
         goto nomem;
 
     if (queue->httpd_ref != NULL)

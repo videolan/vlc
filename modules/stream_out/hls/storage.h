@@ -39,7 +39,7 @@ typedef struct hls_storage
      *
      * \param[out] dest Pointer on a byte buffer, will be freshly allocated by
      * the function call. \return Byte count of the byte buffer. \retval -1 On
-     * allocation error.
+     * error.
      */
     ssize_t (*get_content)(const struct hls_storage *, uint8_t **dest);
 } hls_storage_t;
@@ -52,13 +52,15 @@ typedef struct hls_storage
  * \param content The block chain.
  * \param hls_storage_config The storage specific config.
  * \param hls_config The global hls config.
+ * \param[out] out The new storage on success.
  *
- * \return An opaque pointer on the HLS storage.
- * \retval NULL on allocation error.
+ * \retval 0 on success.
+ * \retval -errno on error.
  */
-hls_storage_t *hls_storage_FromBlocks(block_t *content,
-                                      const struct hls_storage_config *,
-                                      const struct hls_config *) VLC_USED;
+int hls_storage_FromBlocks(block_t *content,
+                           const struct hls_storage_config *,
+                           const struct hls_config *,
+                           hls_storage_t **out) VLC_USED;
 
 /**
  * Create an HLS opaque storage from a byte buffer.
@@ -69,14 +71,16 @@ hls_storage_t *hls_storage_FromBlocks(block_t *content,
  * \param size Byte size of the buffer.
  * \param hls_storage_config The storage specific config.
  * \param hls_config The global hls config.
+ * \param[out] out The new storage on success.
  *
- * \return An opaque pointer on the HLS storage.
- * \retval NULL on allocation error.
+ * \retval 0 on success.
+ * \retval -errno on error.
  */
-hls_storage_t *hls_storage_FromBytes(void *data,
-                                     size_t size,
-                                     const struct hls_storage_config *,
-                                     const struct hls_config *) VLC_USED;
+int hls_storage_FromBytes(void *data,
+                          size_t size,
+                          const struct hls_storage_config *,
+                          const struct hls_config *,
+                          hls_storage_t **out) VLC_USED;
 
 size_t hls_storage_GetSize(const hls_storage_t *);
 

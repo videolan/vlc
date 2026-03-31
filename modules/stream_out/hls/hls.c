@@ -386,12 +386,14 @@ static struct hls_storage *GenerateMainManifest(const sout_stream_sys_t *sys)
     if (vlc_memstream_close(&out) != 0)
         return NULL;
 
+    struct hls_storage *storage_out;
     const struct hls_storage_config storage_conf = {
         .name = "index.m3u8",
         .mime = "application/vnd.apple.mpegurl",
     };
-    return hls_storage_FromBytes(
-        out.ptr, out.length, &storage_conf, &sys->config);
+    const int status = hls_storage_FromBytes(
+        out.ptr, out.length, &storage_conf, &sys->config, &storage_out);
+    return status != 0 ? NULL : storage_out;
 error:
     if (vlc_memstream_close(&out) != 0)
         return NULL;
@@ -444,10 +446,12 @@ GeneratePlaylistManifest(const hls_playlist_t *playlist)
     if (vlc_memstream_close(&out) != 0)
         return NULL;
 
+    struct hls_storage *storage_out;
     const struct hls_storage_config storage_config = {
         .name = playlist->name, .mime = "application/vnd.apple.mpegurl"};
-    return hls_storage_FromBytes(
-        out.ptr, out.length, &storage_config, playlist->config);
+    const int status = hls_storage_FromBytes(out.ptr, out.length, &storage_config,
+                                 playlist->config, &storage_out);
+    return status != 0 ? NULL : storage_out;
 error:
     if (vlc_memstream_close(&out) != 0)
         return NULL;

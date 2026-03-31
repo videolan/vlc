@@ -79,37 +79,39 @@ static ssize_t mem_storage_GetContent(const hls_storage_t *storage,
     return priv->size;
 }
 
-static hls_storage_t *mem_storage_FromBlock(block_t *content)
+static int mem_storage_FromBlock(block_t *content, hls_storage_t **out)
 {
     struct storage_priv *priv = malloc(sizeof(*priv));
     if (unlikely(priv == NULL))
-        return NULL;
+        return -ENOMEM;
 
     priv->storage.get_content = mem_storage_GetContent;
     priv->destroy = mem_storage_Destroy;
     priv->mem.content = content;
     block_ChainProperties(content, NULL, &priv->size, NULL);
-    return &priv->storage;
+    *out = &priv->storage;
+    return 0;
 }
 
-static hls_storage_t *mem_storage_FromBytes(void *bytes, size_t size)
+static int mem_storage_FromBytes(void *bytes, size_t size, hls_storage_t **out)
 {
     struct storage_priv *priv = malloc(sizeof(*priv));
     if (unlikely(priv == NULL))
-        return NULL;
+        return -ENOMEM;
 
     block_t *content = block_heap_Alloc(bytes, size);
     if (unlikely(content == NULL))
     {
         free(priv);
-        return NULL;
+        return -ENOMEM;
     }
 
     priv->storage.get_content = mem_storage_GetContent;
     priv->destroy = mem_storage_Destroy;
     priv->size = size;
     priv->mem.content = content;
-    return &priv->storage;
+    *out = &priv->storage;
+    return 0;
 }
 
 static ssize_t fs_storage_Read(int fd, uint8_t buf[], size_t len)
@@ -139,7 +141,6 @@ static ssize_t fs_storage_GetContent(const hls_storage_t *storage,
         container_of(storage, struct storage_priv, storage);
 
     const int fd = vlc_open(priv->fs.path, O_RDONLY);
-
     if (fd == -1)
         return -1;
 
@@ -169,12 +170,12 @@ static int fs_storage_Write(int fd, const uint8_t *data, size_t len)
         {
             if (errno == EINTR || errno == EAGAIN)
                 continue;
-            return VLC_EGENERIC;
+            return -errno;
         }
 
         written += n;
     }
-    return VLC_SUCCESS;
+    return 0;
 }
 
 static void fs_storage_Destroy(struct storage_priv *priv)
@@ -193,28 +194,40 @@ static inline char *fs_storage_CreatePath(const char *outdir,
     return ret;
 }
 
-static hls_storage_t *
+static int
 fs_storage_FromBlock(block_t *content,
                      const struct hls_storage_config *config,
-                     const struct hls_config *hls_config)
+                     const struct hls_config *hls_config,
+                     hls_storage_t **out)
 {
+    int ret;
+
     struct storage_priv *priv = malloc(sizeof(*priv));
     if (unlikely(priv == NULL))
-        goto err;
+    {
+        block_ChainRelease(content);
+        return -ENOMEM;
+    }
 
     priv->fs.path = fs_storage_CreatePath(hls_config->outdir, config->name);
     if (unlikely(priv->fs.path == NULL))
+    {
+        ret = -ENOMEM;
         goto err;
+    }
 
     const int fd = vlc_open(priv->fs.path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (fd == -1)
+    {
+        ret = -errno;
         goto err;
+    }
 
     size_t size = 0;
     for (const block_t *it = content; it != NULL; it = it->p_next)
     {
-        const int status = fs_storage_Write(fd, it->p_buffer, it->i_buffer);
-        if (status != VLC_SUCCESS)
+        ret = fs_storage_Write(fd, it->p_buffer, it->i_buffer);
+        if (ret != 0)
         {
             close(fd);
             goto err;
@@ -229,37 +242,49 @@ fs_storage_FromBlock(block_t *content,
     priv->size = size;
     priv->destroy = fs_storage_Destroy;
 
-    return &priv->storage;
+    *out = &priv->storage;
+    return 0;
 err:
     block_ChainRelease(content);
-    if (priv != NULL)
-        free(priv->fs.path);
+    free(priv->fs.path);
     free(priv);
-    return NULL;
+    return ret;
 }
 
-static hls_storage_t *
+static int
 fs_storage_FromBytes(void *bytes,
                      size_t size,
                      const struct hls_storage_config *config,
-                     const struct hls_config *hls_config)
+                     const struct hls_config *hls_config,
+                     hls_storage_t **out)
 {
+    int ret;
+
     struct storage_priv *priv = malloc(sizeof(*priv));
     if (unlikely(priv == NULL))
-        return NULL;
+    {
+        free(bytes);
+        return -ENOMEM;
+    }
 
     priv->fs.path = fs_storage_CreatePath(hls_config->outdir, config->name);
     if (unlikely(priv->fs.path == NULL))
+    {
+        ret = -ENOMEM;
         goto err;
+    }
 
     const int fd = vlc_open(priv->fs.path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (fd == -1)
+    {
+        ret = -errno;
         goto err;
+    }
 
-    const int status = fs_storage_Write(fd, bytes, size);
+    ret = fs_storage_Write(fd, bytes, size);
     close(fd);
 
-    if (unlikely(status != VLC_SUCCESS))
+    if (unlikely(ret != 0))
         goto err;
 
     priv->storage.get_content = fs_storage_GetContent;
@@ -267,44 +292,46 @@ fs_storage_FromBytes(void *bytes,
     priv->destroy = fs_storage_Destroy;
 
     free(bytes);
-    return &priv->storage;
+    *out = &priv->storage;
+    return 0;
 err:
     free(bytes);
-    if (priv != NULL)
-        free(priv->fs.path);
+    free(priv->fs.path);
     free(priv);
-    return NULL;
+    return ret;
 }
 
-hls_storage_t *hls_storage_FromBlocks(block_t *content,
-                                      const struct hls_storage_config *config,
-                                      const struct hls_config *hls_config)
+int hls_storage_FromBlocks(block_t *content,
+                           const struct hls_storage_config *config,
+                           const struct hls_config *hls_config,
+                           hls_storage_t **out)
 {
-    hls_storage_t *storage;
+    int ret;
     if (hls_config_IsMemStorageEnabled(hls_config))
-        storage = mem_storage_FromBlock(content);
+        ret = mem_storage_FromBlock(content, out);
     else
-        storage = fs_storage_FromBlock(content, config, hls_config);
+        ret = fs_storage_FromBlock(content, config, hls_config, out);
 
-    if (storage != NULL)
-        storage->mime = config->mime;
-    return storage;
+    if (ret == 0)
+        (*out)->mime = config->mime;
+    return ret;
 }
 
-hls_storage_t *hls_storage_FromBytes(void *data,
-                                     size_t size,
-                                     const struct hls_storage_config *config,
-                                     const struct hls_config *hls_config)
+int hls_storage_FromBytes(void *data,
+                          size_t size,
+                          const struct hls_storage_config *config,
+                          const struct hls_config *hls_config,
+                          hls_storage_t **out)
 {
-    hls_storage_t *storage;
+    int ret;
     if (hls_config_IsMemStorageEnabled(hls_config))
-        storage = mem_storage_FromBytes(data, size);
+        ret = mem_storage_FromBytes(data, size, out);
     else
-        storage = fs_storage_FromBytes(data, size, config, hls_config);
+        ret = fs_storage_FromBytes(data, size, config, hls_config, out);
 
-    if (storage != NULL)
-        storage->mime = config->mime;
-    return storage;
+    if (ret == 0)
+        (*out)->mime = config->mime;
+    return ret;
 }
 
 size_t hls_storage_GetSize(const hls_storage_t *storage)
