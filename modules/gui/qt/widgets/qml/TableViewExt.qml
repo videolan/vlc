@@ -108,7 +108,7 @@ FocusScope {
     readonly property int _availableSpaceForWeightedColumns: (_availableRowWidth - ( _totalSpacerSize + _fixedColumnSize))
     readonly property int _weightedColumnsSize: _availableSpaceForWeightedColumns / _totalColumnWeights
 
-    readonly property int _totalSpacerSize: VLCStyle.column_spacing * sortModel.length
+    readonly property int _totalSpacerSize: VLCStyle.column_spacing * Math.max(0, (sortModel.length - 1))
 
     property Component header: null
     property Item headerItem: view.headerItem?.loadedHeader ?? null
