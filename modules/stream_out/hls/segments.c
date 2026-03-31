@@ -94,6 +94,8 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
 
     segment->id = queue->total_segments;
     segment->length = length;
+    segment->storage = NULL;
+    segment->http_url = NULL;
 
     if (asprintf(&segment->url,
                  "%s/playlist-%u-%u.%s",
@@ -128,8 +130,6 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
                        queue->httpd_callback,
                        (httpd_callback_sys_t *)segment->storage);
     }
-    else
-        segment->http_url = NULL;
 
     if (hls_segment_queue_IsAtMaxCapacity(queue))
     {
