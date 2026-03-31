@@ -25,6 +25,7 @@
 
 #include <vlc_common.h>
 
+#include <vlc_block.h>
 #include <vlc_httpd.h>
 #include <vlc_list.h>
 #include <vlc_tick.h>
@@ -86,7 +87,10 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
 {
     hls_segment_t *segment = malloc(sizeof(*segment));
     if (unlikely(segment == NULL))
+    {
+        block_ChainRelease(content);
         return VLC_ENOMEM;
+    }
 
     segment->id = queue->total_segments;
     segment->length = length;
@@ -99,6 +103,7 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
                  queue->file_extension) == -1)
     {
         segment->url = NULL;
+        block_ChainRelease(content);
         goto nomem;
     }
 
