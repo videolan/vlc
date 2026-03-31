@@ -23,8 +23,8 @@ variables:
     VLC_TEST_TIMEOUT: 60
     FF_DISABLE_UMASK_FOR_DOCKER_EXECUTOR: "true"
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20260127163923
-    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20260121170706
-    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20260121170706
+    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20260331112916
+    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20260331112916
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20260121072258
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20260120134731
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-snap:20260312133043
