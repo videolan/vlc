@@ -420,7 +420,7 @@ FocusScope {
 
             fadingEdge.backgroundColor: background.color
 
-            header: Loader {
+            preferredHeader: Loader {
                 sourceComponent: VLCStyle.isScreenSmall
                                  ? header_small
                                  : header_common

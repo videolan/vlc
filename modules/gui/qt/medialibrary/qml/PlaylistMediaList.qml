@@ -458,7 +458,7 @@ MainViewLoader {
 
             dragItem: dragItemPlaylist
 
-            header: root.header
+            preferredHeader: root.header
 
             rowContextMenu: contextMenu
 
@@ -468,16 +468,16 @@ MainViewLoader {
             fadingEdge.enableBeginningFade: root.enableBeginningFade
             fadingEdge.enableEndFade: root.enableEndFade
 
-            listView.isDropAcceptableFunc: function(drag, index) {
+            isDropAcceptableFunc: function(drag, index) {
                 root._adjustDragAccepted(drag)
                 return drag.accepted
             }
 
-            listView.acceptDropFunc: function(index, drop) {
+            acceptDropFunc: function(index, drop) {
                 return root._dropAction(drop, listView.itemContainsDrag?.index)
             }
 
-            listView.dropIndicator: null
+            dropIndicator: null
 
             Navigation.parentItem: root
 

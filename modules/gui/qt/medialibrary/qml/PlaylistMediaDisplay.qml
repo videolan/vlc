@@ -219,7 +219,7 @@ FocusScope {
 
         isMusic: root.isMusic
 
-        header: Widgets.ViewHeader {
+        preferredHeader: Widgets.ViewHeader {
             view: root.playlistView
 
             visible: view.count > 0

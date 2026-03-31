@@ -25,11 +25,8 @@ import VLC.Util
 import VLC.Widgets as Widgets
 import VLC.Style
 
-// FIXME: Maybe we could inherit from KeyNavigableListView directly.
-FocusScope {
+ListViewExt {
     id: root
-
-    // Properties
 
     property var sortModel: []
 
@@ -74,17 +71,22 @@ FocusScope {
     // NOTE: We want edge to edge backgrounds in our delegate and header, so we implement our own
     //       margins implementation like in ExpandGridView. The default values should be the same
     //       than ExpandGridView to respect the grid parti pris.
-    property int leftMargin: VLCStyle.layout_left_margin + leftPadding
-    property int rightMargin: VLCStyle.layout_right_margin + rightPadding
 
     property int leftPadding: 0
     property int rightPadding: 0
 
-    readonly property int extraMargin: VLCStyle.dynamicAppMargins(width)
+    readonly property real _extraPadding: VLCStyle.dynamicAppMargins(width)
+    property real contentLeftPadding: _extraPadding + leftPadding + VLCStyle.layout_left_margin
+    property real contentRightPadding: _extraPadding + rightPadding + VLCStyle.layout_right_margin
 
+    // These are "extra" margins because `ListView`'s own `margins` is also considered for the header.
+    property real defaultHeaderExtraLeftMargin: contentLeftPadding
+    property real defaultHeaderExtraRightMargin: contentRightPadding
+
+    // FIXME: Get rid of `contentLeftMargin` and `contentRightMargin`:
     // NOTE: The list margins for the item(s) horizontal positioning.
-    readonly property int contentLeftMargin: extraMargin + leftMargin
-    readonly property int contentRightMargin: extraMargin + rightMargin
+    readonly property int contentLeftMargin: contentLeftPadding
+    readonly property int contentRightMargin: contentRightPadding
 
     property real baseColumnWidth: VLCStyle.column_width
 
@@ -110,8 +112,9 @@ FocusScope {
 
     readonly property int _totalSpacerSize: VLCStyle.column_spacing * Math.max(0, (sortModel.length - 1))
 
-    property Component header: null
-    property Item headerItem: view.headerItem?.loadedHeader ?? null
+    property Component preferredHeader
+    readonly property Item preferredHeaderItem: headerItem?.loadedHeader ?? null
+
     // NOTE: Clipping is not used, so if header is not inline, it should have background to not expose the content.
     // TODO: Investigate using clipping here, which makes more sense in general for views. Not using clipping
     //       makes this view not suitable for using it in auxiliary places (non-main, which is not naturally
@@ -123,347 +126,263 @@ FocusScope {
     property color headerColor: (interactive && (headerPositioning !== ListView.InlineHeader)) ? colorContext.bg.primary : "transparent"
     property int headerTopPadding: 0
 
-
     property real rowHeight: VLCStyle.tableRow_height
 
     property real _availableRowWidth: 0
 
     // FIXME: Layouting should not be done asynchronously, investigate if getting rid of this is feasible.
     Binding on _availableRowWidth {
-        when: root._ready
         delayed: true
         value: root._currentAvailableRowWidth
     }
 
     property Widgets.DragItem dragItem: null
 
-    property bool _ready: false
-
-    property real _availabeRowWidthLastUpdateTime: Date.now()
-
-    readonly property real _currentAvailableRowWidth: width - leftMargin - rightMargin
+    readonly property real _currentAvailableRowWidth: width - leftMargin - contentLeftPadding - rightMargin - contentRightPadding
                                                       // contextButton is implemented as fixed column
                                                       - VLCStyle.contextButton_width - (VLCStyle.contextButton_margin * 2)
 
     property bool sortingFromHeader: true
     property bool useCurrentSectionLabel: true
 
-    // Aliases
-
-    property alias topMargin: view.topMargin
-    property alias bottomMargin: view.bottomMargin
-
-    property alias spacing: view.spacing
-
-    property alias model: view.model
-    property alias selectionModel: view.selectionModel
-
-    property alias delegate: view.delegate
-
-    property alias contentItem: view.contentItem
-
-    property alias contentY     : view.contentY
-    property alias contentHeight: view.contentHeight
-
-    property alias originX: view.originX
-    property alias originY: view.originY
-
-    property alias interactive: view.interactive
-
-    property alias section: view.section
-
-    property alias currentIndex: view.currentIndex
-    property alias currentItem: view.currentItem
-
-    property alias headerPositioning: view.headerPositioning
-
-    property alias tableHeaderItem: view.headerItem
-
-    property alias footerItem: view.footerItem
-    property alias footer: view.footer
-
-    property alias fadingEdge: view.fadingEdge
-
-    property alias add:       view.add
-    property alias displaced: view.displaced
-
-    property alias listView: view
-
-    property alias displayMarginBeginning: view.displayMarginBeginning
-    property alias displayMarginEnd: view.displayMarginEnd
-
-    property alias count: view.count
-
-    property alias colorContext: view.colorContext
-
-    property alias reuseItems: view.reuseItems
-
-    readonly property var itemAtIndex: view.itemAtIndex
-
-    property alias currentSection: view.currentSection
-
-    // Signals
-
-    //forwarded from subview
     signal actionForSelection( var selection )
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
 
-    // Events
-
     Component.onCompleted: {
-        _ready = true
-    }
-
-    // Functions
-
-    function setCurrentItem(index) {
-        view.setCurrentItem(index)
-    }
-
-    function setCurrentItemFocus(reason) {
-        view.setCurrentItemFocus(reason);
-    }
-
-    function positionViewAtIndex(index, mode) {
-        view.positionViewAtIndex(index, mode)
-    }
-
-    function positionViewAtBeginning() {
-        view.positionViewAtBeginning()
+        // This is a remnant from the time `TableViewExt` derived from `FocusScope`:
+        MainCtx.setItemFlag(this, Item.ItemIsFocusScope)
     }
 
     function getItemY(index) {
         let size = index * rowHeight + topMargin
 
-        if (tableHeaderItem)
-            size += tableHeaderItem.height
+        if (headerItem)
+            size += headerItem.height
 
         return size
     }
 
-    // Private
+    headerPositioning: ListView.OverlayHeader
 
-    // Childs
+    flickableDirection: Flickable.AutoFlickDirection
 
-    ListViewExt {
-        id: view
+    Navigation.parentItem: root
 
-        anchors.fill: parent
-        focus: true
+    onActionAtIndex: (index) => { root.actionForSelection( selectionModel.selectedIndexes ) }
 
-        headerPositioning: ListView.OverlayHeader
+    onShowContextMenu: (globalPos) => {
+        if (selectionModel.hasSelection)
+            root.rightClick(null, null, globalPos);
+    }
 
-        flickableDirection: Flickable.AutoFlickDirection
+    header: Rectangle {
+        property alias loadedHeader: headerLoader.item
+
+        width: root.width
+        height: col.height
+        z: 3
+        color: root.headerColor
+
+        // with inline header positioning and for `root.header` which changes it's height after loading,
+        // in such cases after `root.header` completes, the ListView will try to maintain the relative contentY,
+        // and hide the completed `root.header`, try to show the `root.header` in such cases by manually
+        // positiing view at beginning
+        onHeightChanged: if (root.contentY < 0) root.positionViewAtBeginning()
 
         Navigation.parentItem: root
+        Navigation.upItem: loadedHeader
+        Navigation.downItem: loadedHeader
+        Navigation.leftItem: loadedHeader
+        Navigation.rightItem: loadedHeader
+        Navigation.navigable: false
 
-        onActionAtIndex: (index) => { root.actionForSelection( selectionModel.selectedIndexes ) }
+        readonly property var setCurrentItemFocus: loadedHeader?.setCurrentItemFocus
 
-        onShowContextMenu: (globalPos) => {
-            if (selectionModel.hasSelection)
-                root.rightClick(null, null, globalPos);
+        Widgets.ListLabel {
+            // NOTE: We want the section label to be slightly shifted to the left.
+            x: row.x - VLCStyle.margin_small
+            y: row.y + root.headerTopPadding
+
+            height: VLCStyle.tableHeaderText_height
+            verticalAlignment: Text.AlignVCenter
+
+            text: root.currentSection
+            color: root.colorContext.accent
+            visible: root.useCurrentSectionLabel
+                     && root.headerPositioning === ListView.OverlayHeader
+                     && text !== ""
+                     && root.contentY > (row.height - col.height - row.topPadding)
+                     && row.visible
         }
 
-        header: Rectangle {
-            property alias loadedHeader: headerLoader.item
+        Column {
+            id: col
 
-            width: view.width
-            height: col.height
-            z: 3
-            color: root.headerColor
+            anchors.left: parent.left
+            anchors.right: parent.right
 
-            // with inline header positioning and for `root.header` which changes it's height after loading,
-            // in such cases after `root.header` completes, the ListView will try to maintain the relative contentY,
-            // and hide the completed `root.header`, try to show the `root.header` in such cases by manually
-            // positiing view at beginning
-            onHeightChanged: if (root.contentY < 0) root.positionViewAtBeginning()
+            Loader {
+                id: headerLoader
 
-            Widgets.ListLabel {
-                // NOTE: We want the section label to be slightly shifted to the left.
-                x: row.x - VLCStyle.margin_small
-                y: row.y + root.headerTopPadding
-
-                height: VLCStyle.tableHeaderText_height
-                verticalAlignment: Text.AlignVCenter
-
-                text: view.currentSection
-                color: view.colorContext.accent
-                visible: root.useCurrentSectionLabel
-                         && view.headerPositioning === ListView.OverlayHeader
-                         && text !== ""
-                         && view.contentY > (row.height - col.height - row.topPadding)
-                         && row.visible
+                sourceComponent: root.preferredHeader
             }
 
-            Column {
-                id: col
+            Row {
+                id: row
 
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                Loader {
-                    id: headerLoader
+                anchors.leftMargin: root.defaultHeaderExtraLeftMargin
+                anchors.rightMargin: root.defaultHeaderExtraRightMargin
 
-                    sourceComponent: root.header
-                }
+                topPadding: root.headerTopPadding
+                bottomPadding: VLCStyle.margin_xsmall
 
-                Row {
-                    id: row
+                spacing: VLCStyle.column_spacing
 
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                // If there is a specific header, obey to its visibility otherwise hide the header if model is empty:
+                visible: headerLoader.item ? headerLoader.item.visible : (root.count > 0)
 
-                    anchors.leftMargin: root.contentLeftMargin
-                    anchors.rightMargin: root.contentRightMargin
+                Repeater {
+                    model: sortModel
+                    Item {
+                        id: headerCell
 
-                    topPadding: root.headerTopPadding
-                    bottomPadding: VLCStyle.margin_xsmall
+                        required property var modelData
+                        property TableHeaderDelegate _item: null
 
-                    spacing: VLCStyle.column_spacing
+                        TableHeaderDelegate.CellModel {
+                            id: cellModel
+                            colorContext:  root.colorContext
+                            colModel: modelData.model
+                        }
 
-                    // If there is a specific header, obey to its visibility otherwise hide the header if model is empty:
-                    visible: headerLoader.item ? headerLoader.item.visible : (view.count > 0)
+                        height: VLCStyle.tableHeaderText_height
+                        width: {
+                            if (!!modelData.size)
+                                return modelData.size * root.baseColumnWidth
+                            else if (!!modelData.weight)
+                                return modelData.weight * root._weightedColumnsSize
+                            else
+                                return 0
+                        }
+                        Accessible.role: Accessible.ColumnHeader
+                        Accessible.name: modelData.model.text
 
-                    Repeater {
-                        model: sortModel
-                        Item {
-                            id: headerCell
+                        //Using a Loader is unable to pass the initial/required properties
+                        Component.onCompleted: {
+                            const comp = modelData.model.headerDelegate || root.tableHeaderDelegate
+                            headerCell._item = comp.createObject(headerCell, {
+                                width:  Qt.binding(() => headerCell.width),
+                                height:  Qt.binding(() => headerCell.height),
+                                cellModel: cellModel,
+                            })
+                        }
 
-                            required property var modelData
-                            property TableHeaderDelegate _item: null
+                        Text {
+                            text: (root.model.sortOrder === Qt.AscendingOrder) ? "▼" : "▲"
+                            visible: root.model.sortCriteria === modelData.model.criteria
+                            font.pixelSize: VLCStyle.fontSize_normal
+                            color: root.colorContext.accent
 
-                            TableHeaderDelegate.CellModel {
-                                id: cellModel
-                                colorContext:  view.colorContext
-                                colModel: modelData.model
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                right: parent.right
+                                leftMargin: VLCStyle.margin_xsmall
+                                rightMargin: VLCStyle.margin_xsmall
                             }
+                        }
 
-                            height: VLCStyle.tableHeaderText_height
-                            width: {
-                                if (!!modelData.size)
-                                    return modelData.size * root.baseColumnWidth
-                                else if (!!modelData.weight)
-                                    return modelData.weight * root._weightedColumnsSize
+                        TapHandler {
+                            onTapped: (eventPoint, button) => {
+                                if (!root.sortingFromHeader)
+                                    return
+                                if (!(modelData.model.isSortable ?? true))
+                                    return
+                                else if (root.model.sortCriteria !== modelData.model.criteria)
+                                    root.model.sortCriteria = modelData.model.criteria
                                 else
-                                    return 0
-                            }
-                            Accessible.role: Accessible.ColumnHeader
-                            Accessible.name: modelData.model.text
-
-                            //Using a Loader is unable to pass the initial/required properties
-                            Component.onCompleted: {
-                                const comp = modelData.model.headerDelegate || root.tableHeaderDelegate
-                                headerCell._item = comp.createObject(headerCell, {
-                                    width:  Qt.binding(() => headerCell.width),
-                                    height:  Qt.binding(() => headerCell.height),
-                                    cellModel: cellModel,
-                                })
-                            }
-
-                            Text {
-                                text: (root.model.sortOrder === Qt.AscendingOrder) ? "▼" : "▲"
-                                visible: root.model.sortCriteria === modelData.model.criteria
-                                font.pixelSize: VLCStyle.fontSize_normal
-                                color: root.colorContext.accent
-
-                                anchors {
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                    right: parent.right
-                                    leftMargin: VLCStyle.margin_xsmall
-                                    rightMargin: VLCStyle.margin_xsmall
-                                }
-                            }
-
-                            TapHandler {
-                                onTapped: (eventPoint, button) => {
-                                    if (!root.sortingFromHeader)
-                                        return
-                                    if (!(modelData.model.isSortable ?? true))
-                                        return
-                                    else if (root.model.sortCriteria !== modelData.model.criteria)
-                                        root.model.sortCriteria = modelData.model.criteria
-                                    else
-                                        root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
-                                }
+                                    root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
                             }
                         }
                     }
+                }
 
-                    Item {
-                        // placeholder for context button
+                Item {
+                    // placeholder for context button
 
-                        width: VLCStyle.icon_normal
+                    width: VLCStyle.icon_normal
 
-                        height: 1
-                    }
+                    height: 1
                 }
             }
         }
+    }
 
-        section.delegate: Widgets.ListLabel {
-            // NOTE: We want the section label to be slightly shifted to the left.
-            leftPadding: root.contentLeftMargin - VLCStyle.margin_small
+    section.delegate: Widgets.ListLabel {
+        // NOTE: We want the section label to be slightly shifted to the left.
+        leftPadding: root.contentLeftPadding - VLCStyle.margin_small
 
-            topPadding: VLCStyle.margin_xsmall
+        topPadding: VLCStyle.margin_xsmall
 
-            text: section
-            color: root.colorContext.accent
+        text: section
+        color: root.colorContext.accent
+    }
+
+    delegate: Widgets.TableViewDelegateExt {
+        id: tableDelegate
+
+        required property var model
+
+        width: root.width
+        height: Math.round(root.rowHeight)
+
+        fixedColumnWidth: root.baseColumnWidth
+        weightedColumnWidth: root._weightedColumnsSize
+
+        leftPadding: root.contentLeftPadding
+        rightPadding: root.contentRightPadding
+
+        dragItem: root.dragItem
+
+        contextMenu: root.rowContextMenu
+
+        rowModel: model
+        sortModel: root.sortModel
+
+        selected: selectionModel.selectedIndexesFlat.includes(index)
+
+        onRightClick: (menuParent, menuModel, globalMousePos) => {
+            root.rightClick(menuParent, menuModel, globalMousePos)
+        }
+        onItemDoubleClicked: (index, model) => {
+            root.itemDoubleClicked(index, model)
         }
 
-        delegate: Widgets.TableViewDelegateExt {
-            id: tableDelegate
+        isDropAcceptable: root.isDropAcceptableFunc
+        acceptDrop: root.acceptDropFunc
 
-            required property var model
+        onSelectAndFocus: (modifiers, focusReason) => {
+            selectionModel.updateSelection(modifiers, root.currentIndex, index)
 
-            width: view.width
-            height: Math.round(root.rowHeight)
+            root.currentIndex = index
+            root.positionViewAtIndex(index, ListView.Contain)
 
-            fixedColumnWidth: root.baseColumnWidth
-            weightedColumnWidth: root._weightedColumnsSize
+            tableDelegate.forceActiveFocus(focusReason)
+        }
 
-            leftPadding: root.contentLeftMargin
-            rightPadding: root.contentRightMargin
+        onContainsDragChanged: root.updateItemContainsDrag(this, containsDrag)
 
-            dragItem: root.dragItem
+        Connections {
+            target: selectionModel
 
-            contextMenu: root.rowContextMenu
-
-            rowModel: model
-            sortModel: root.sortModel
-
-            selected: selectionModel.selectedIndexesFlat.includes(index)
-
-            onRightClick: (menuParent, menuModel, globalMousePos) => {
-                root.rightClick(menuParent, menuModel, globalMousePos)
-            }
-            onItemDoubleClicked: (index, model) => {
-                root.itemDoubleClicked(index, model)
-            }
-
-            isDropAcceptable: view.isDropAcceptableFunc
-            acceptDrop: view.acceptDropFunc
-
-            onSelectAndFocus: (modifiers, focusReason) => {
-                selectionModel.updateSelection(modifiers, view.currentIndex, index)
-
-                view.currentIndex = index
-                view.positionViewAtIndex(index, ListView.Contain)
-
-                tableDelegate.forceActiveFocus(focusReason)
-            }
-
-            onContainsDragChanged: view.updateItemContainsDrag(this, containsDrag)
-
-            Connections {
-                target: selectionModel
-
-                function onSelectionChanged() {
-                    tableDelegate.selected = Qt.binding(function() {
-                      return root.selectionModel.selectedIndexesFlat.includes(index)
-                    })
-                }
+            function onSelectionChanged() {
+                tableDelegate.selected = Qt.binding(function() {
+                  return root.selectionModel.selectedIndexesFlat.includes(index)
+                })
             }
         }
     }

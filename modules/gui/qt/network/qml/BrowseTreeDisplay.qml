@@ -299,7 +299,7 @@ MainViewLoader {
             fadingEdge.enableBeginningFade: root.enableBeginningFade
             fadingEdge.enableEndFade: root.enableEndFade
 
-            header: BrowseTreeHeader {
+            preferredHeader: BrowseTreeHeader {
                 providerModel: root.model
 
                 leftPadding: root.headerLeftPadding

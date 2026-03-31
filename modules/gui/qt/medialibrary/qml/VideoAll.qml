@@ -201,7 +201,7 @@ MainViewLoader {
 
             dragItem: root.dragItem
 
-            header: root.header
+            preferredHeader: root.header
 
             headerPositioning: root.headerPositioning
 

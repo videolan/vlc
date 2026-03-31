@@ -249,7 +249,7 @@ MainViewLoader {
             onActionForSelection: (selection) => _actionAtIndex(selection[0])
             Navigation.parentItem: root
             section.property: "title_first_symbol"
-            header: root.header
+            preferredHeader: root.header
             dragItem: albumDragItem
             rowHeight: VLCStyle.tableCoverRow_height
 

@@ -282,7 +282,7 @@ MainViewLoader {
 
             sortModel: _availableRowWidth >= VLCStyle.colWidth(4) ? _sortModelLarge : _sortModelSmall
 
-            header: headerComponent
+            preferredHeader: headerComponent
 
             headerPositioning: root.listHeaderPositioning
 

@@ -308,7 +308,7 @@ FocusScope {
             sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                    : _modelMedium
 
-            header: root.header
+            preferredHeader: root.header
 
             selectionModel: modelSelect
 

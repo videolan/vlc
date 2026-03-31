@@ -280,7 +280,7 @@ MainViewLoader {
             fadingEdge.enableBeginningFade: root.enableBeginningFade
             fadingEdge.enableEndFade: root.enableEndFade
 
-            header: root.header
+            preferredHeader: root.header
 
             rowContextMenu: contextMenu
 

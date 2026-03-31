@@ -222,7 +222,7 @@ MainViewLoader {
             fadingEdge.enableBeginningFade: root.enableBeginningFade
             fadingEdge.enableEndFade: root.enableEndFade
 
-            header: root.header
+            preferredHeader: root.header
             Navigation.parentItem: root
 
             onActionForSelection: (selection) => {

@@ -68,7 +68,7 @@ FocusScope {
         visible: model.count > 0
         focus: model.count > 0
 
-        header: Widgets.ViewHeader {
+        preferredHeader: Widgets.ViewHeader {
             view: tracklistdisplay_id
 
             visible: view.count > 0

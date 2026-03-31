@@ -102,7 +102,7 @@ Widgets.TableViewExt {
                                                            : _modelMedium
 
 
-    listView.acceptDropFunc: function(index, drop) {
+    acceptDropFunc: function(index, drop) {
         // FIXME: The DnD API seems quite poorly designed in this file.
         //        Why does it ask for both index and "before"
         //        When index + 1 is essentially the same as
@@ -124,7 +124,7 @@ Widgets.TableViewExt {
     //---------------------------------------------------------------------------------------------
     // Drop interface
 
-    listView.isDropAcceptableFunc: function(drop, index) {
+    isDropAcceptableFunc: function(drop, index) {
         if (drop.source === dragItem) {
             return Helpers.itemsMovable(selectionModel.sortedSelectedIndexesFlat, index)
         } else if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)) {
@@ -137,7 +137,7 @@ Widgets.TableViewExt {
     }
 
     function applyDrop(drop, index, delegate, before) {
-        if (listView.isDropAcceptableFunc(drop, index + (before ? 0 : 1)) === false) {
+        if (isDropAcceptableFunc(drop, index + (before ? 0 : 1)) === false) {
             drop.accepted = false
             return Promise.resolve()
         }
