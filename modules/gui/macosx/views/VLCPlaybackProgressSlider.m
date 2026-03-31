@@ -37,11 +37,22 @@
     self = [super initWithCoder:coder];
 
     if (self) {
-        NSAssert([self.cell isKindOfClass:[VLCPlaybackProgressSlider cellClass]], 
+        NSAssert([self.cell isKindOfClass:[VLCPlaybackProgressSlider cellClass]],
                  @"VLCPlaybackProgressSlider cell is not a VLCPlaybackProgressSliderCell");
         self.scrollable = YES;
         if (@available(macOS 10.14, *)) {
             [self viewDidChangeEffectiveAppearance];
+
+            if (@available(macOS 13, *)) {
+                // Apple's documentation says the clipping default changed in macOS 13.
+                // Use a dynamic call so this still builds with SDKs that don't declare the selector.
+                SEL clipsToBoundsSelector = NSSelectorFromString(@"setClipsToBounds:");
+                if ([self respondsToSelector:clipsToBoundsSelector]) {
+                    void (*setClipsToBoundsImp)(id, SEL, BOOL) =
+                        (void (*)(id, SEL, BOOL))[self methodForSelector:clipsToBoundsSelector];
+                    setClipsToBoundsImp(self, clipsToBoundsSelector, YES);
+                }
+            }
         } else {
             [(VLCPlaybackProgressSliderCell*)self.cell setSliderStyleLight];
         }
