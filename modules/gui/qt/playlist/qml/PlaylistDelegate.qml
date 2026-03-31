@@ -182,7 +182,8 @@ T.Control {
                 opacity: (status === Image.Ready ? 1.0 : 0.0)
 
                 Behavior on opacity {
-                    OpacityAnimator {
+                    // WARNING: OpacityAnimator is not used because `visible` is not immediately respected in that case.
+                    NumberAnimation {
                         duration: VLCStyle.duration_short
                         easing.type: Easing.InSine
                     }
