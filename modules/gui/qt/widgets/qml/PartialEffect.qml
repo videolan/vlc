@@ -96,6 +96,8 @@ Item {
 
         blending: false
 
+        smooth: false
+
         // WARNING: Switching the source should be fine, but old Qt (Qt 6.2.13) seems to break the interface
         //          in this case. The indirection does not use sub-rect if it is not relevant, so in this
         //          case it would act as a dummy indirection to prevent the Qt bug.
