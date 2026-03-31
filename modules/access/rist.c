@@ -660,7 +660,6 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     if (!pkt->buffer)
         return false;
 
-    pkt->buffer->i_buffer = len;
     memcpy(pkt->buffer->p_buffer, buf, len);
     pkt->rtp_ts = pkt_ts;
     p_sys->last_data_rx = mdate();
@@ -734,7 +733,6 @@ static block_t *rist_dequeue(stream_t *p_access, struct rist_flow *flow)
             pktout = block_Alloc(newSize);
             if (pktout)
             {
-                pktout->i_buffer = newSize;
                 memcpy(pktout->p_buffer, pkt->buffer->p_buffer + RIST_RTP_HEADER_SIZE, newSize);
                 /* free the buffer and increase the read index */
                 flow->ri = idx;
