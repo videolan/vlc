@@ -290,6 +290,12 @@ public:
         item->setFiltersChildMouseEvents(enable);
     }
 
+    Q_INVOKABLE static void setItemFlag(QQuickItem *item, QQuickItem::Flag flag, bool enabled = true)
+    {
+        assert(item);
+        item->setFlag(flag, enabled);
+    }
+
     Q_INVOKABLE qreal effectiveDevicePixelRatio(const QQuickWindow* window) {
         if (window)
             return window->effectiveDevicePixelRatio();
