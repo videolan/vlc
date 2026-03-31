@@ -552,7 +552,7 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
                     if (memcmp(new_sender_name, p_sys->sender_name, name_length) != 0)
                     {
                         peer_name_changed = true;
-                        if (strcmp(p_sys->sender_name, "") == 0)
+                        if (!p_sys->sender_name[0])
                             msg_Info(p_access, "Peer Name: %s", new_sender_name);
                         else
                             msg_Info(p_access, "Peer Name change detected: old Name: %s, new " \
