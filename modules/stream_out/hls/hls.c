@@ -277,7 +277,8 @@ error:
     return NULL;
 }
 
-static struct hls_storage *GenerateMainManifest(const sout_stream_sys_t *sys)
+static int GenerateMainManifest(const sout_stream_sys_t *sys,
+                                struct hls_storage **storage_out)
 {
     struct vlc_memstream out;
     vlc_memstream_open(&out);
@@ -384,25 +385,23 @@ static struct hls_storage *GenerateMainManifest(const sout_stream_sys_t *sys)
 #undef MANIFEST_END_TAG
 
     if (vlc_memstream_close(&out) != 0)
-        return NULL;
+        return -ENOMEM;
 
-    struct hls_storage *storage_out;
     const struct hls_storage_config storage_conf = {
         .name = "index.m3u8",
         .mime = "application/vnd.apple.mpegurl",
     };
-    const int status = hls_storage_FromBytes(
-        out.ptr, out.length, &storage_conf, &sys->config, &storage_out);
-    return status != 0 ? NULL : storage_out;
+    return hls_storage_FromBytes(
+        out.ptr, out.length, &storage_conf, &sys->config, storage_out);
 error:
-    if (vlc_memstream_close(&out) != 0)
-        return NULL;
-    free(out.ptr);
-    return NULL;
+    if (vlc_memstream_close(&out) == 0)
+        free(out.ptr);
+    return -ENOMEM;
 }
 
-static struct hls_storage *
-GeneratePlaylistManifest(const hls_playlist_t *playlist)
+static int
+GeneratePlaylistManifest(const hls_playlist_t *playlist,
+                         struct hls_storage **storage_out)
 {
     struct vlc_memstream out;
     vlc_memstream_open(&out);
@@ -444,26 +443,28 @@ GeneratePlaylistManifest(const hls_playlist_t *playlist)
 #undef MANIFEST_ADD_TAG
 
     if (vlc_memstream_close(&out) != 0)
-        return NULL;
+        return -ENOMEM;
 
-    struct hls_storage *storage_out;
     const struct hls_storage_config storage_config = {
         .name = playlist->name, .mime = "application/vnd.apple.mpegurl"};
-    const int status = hls_storage_FromBytes(out.ptr, out.length, &storage_config,
-                                 playlist->config, &storage_out);
-    return status != 0 ? NULL : storage_out;
+    return hls_storage_FromBytes(
+        out.ptr, out.length, &storage_config, playlist->config, storage_out);
 error:
-    if (vlc_memstream_close(&out) != 0)
-        return NULL;
-    free(out.ptr);
-    return NULL;
+    if (vlc_memstream_close(&out) == 0)
+        free(out.ptr);
+    return -ENOMEM;
 }
 
 static int UpdatePlaylistManifest(hls_playlist_t *playlist)
 {
-    struct hls_storage *new_manifest = GeneratePlaylistManifest(playlist);
-    if (unlikely(new_manifest == NULL))
-        return VLC_EGENERIC;
+    struct hls_storage *new_manifest;
+    const int ret = GeneratePlaylistManifest(playlist, &new_manifest);
+    if (unlikely(ret != VLC_SUCCESS))
+    {
+        vlc_error(playlist->logger, "Failed to update playlist manifest: %s",
+                  vlc_strerror(-ret));
+        return ret;
+    }
 
     if (playlist->http_manifest != NULL)
     {
@@ -583,8 +584,9 @@ static int ExtractAndAddSegment(hls_playlist_t *playlist,
     if (unlikely(status != VLC_SUCCESS))
     {
         vlc_error(playlist->logger,
-                  "Segment '%u' creation failed",
-                  playlist->segments.total_segments + 1);
+                  "Segment '%u' creation failed: %s",
+                  playlist->segments.total_segments + 1,
+                  vlc_strerror(-status));
         return status;
     }
     playlist->muxed_duration += length;
@@ -897,9 +899,12 @@ Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
 
     vlc_list_append(&track->node, &playlist->tracks);
 
-    struct hls_storage *new_manifest = GenerateMainManifest(sys);
-    if (unlikely(new_manifest == NULL))
+    struct hls_storage *new_manifest;
+    const int manifest_ret = GenerateMainManifest(sys, &new_manifest);
+    if (unlikely(manifest_ret != VLC_SUCCESS))
     {
+        msg_Err(stream, "Failed to generate main manifest: %s",
+                vlc_strerror(-manifest_ret));
         vlc_list_remove(&track->node);
         free(track);
         goto error;
