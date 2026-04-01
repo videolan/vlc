@@ -429,6 +429,10 @@ static int Open( vlc_object_t *p_this )
 {
     if( OpenCommon( p_this, DVD_V ) != VLC_SUCCESS )
     {
+        msg_Dbg( p_this, "Trying DVD-Video Recording as a fallback" );
+        if( OpenCommon( p_this, DVD_VR ) == VLC_SUCCESS )
+            return VLC_SUCCESS;
+
         msg_Dbg( p_this, "Trying DVD-Audio as a fallback" );
         return OpenCommon( p_this, DVD_A );
     }
