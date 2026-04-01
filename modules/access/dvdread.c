@@ -369,10 +369,11 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
                 msg_Err( p_demux, "Invalid UDF DVD. (Found ISO9660 '%s')", rgsz_volid );
             }
         }
-        msg_Warn( p_demux, "cannot open %cMG info", ( type == DVD_V ? 'V' : 'A' ) );
+        msg_Warn( p_demux, "cannot open %s info", ( type == DVD_V ? "VMG" : type == DVD_VR ? "RTAV_VMGI" : "AMG" ) );
+        DVDClose( p_dvdread );
         return VLC_EGENERIC;
     }
-    msg_Dbg( p_demux, "%cMG opened", ( type == DVD_V ? 'V' : 'A' ) );
+    msg_Dbg( p_demux, "%s opened", ( type == DVD_V ? "VMG" : type == DVD_VR ? "RTAV_VMGI" : "AMG" ) );
 
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
