@@ -425,7 +425,7 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
             i_index += 4;
         }
 
-        i_command = p_sys->buffer[i_index];
+        i_command = i_index < p_sys->buffer_size ? p_sys->buffer[i_index] : (SPU_CMD_END - 1);
 
         switch( i_command )
         {
