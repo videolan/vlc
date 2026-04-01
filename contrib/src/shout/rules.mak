@@ -33,6 +33,9 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	# don't use getpid in UWP as it's not actually available
 	$(APPLY) $(SRC)/shout/0001-Favor-GetCurrentProcessId-on-Windows.patch
 
+	# cast setsockopt
+	$(APPLY) $(SRC)/shout/0001-Add-cast-on-setsockopt-call.patch
+
 	$(call pkg_static,"shout.pc.in")
 	$(MOVE)
 
