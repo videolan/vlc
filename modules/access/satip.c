@@ -493,7 +493,7 @@ static void *satip_thread(void *data) {
             block_t *block = input_blocks[i];
 
             len = msgs[i].msg_len;
-            if (check_rtp_seq(access, block))
+            if (len < RTP_HEADER_SIZE || check_rtp_seq(access, block))
                 continue;
 
             block->p_buffer += RTP_HEADER_SIZE;
