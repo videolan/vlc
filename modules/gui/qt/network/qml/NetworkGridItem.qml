@@ -33,9 +33,15 @@ Widgets.GridItem {
     pictureWidth: VLCStyle.gridCover_network_width
     pictureHeight: VLCStyle.gridCover_network_height
 
-    playCoverShowPlay: (model.type !== NetworkMediaModel.TYPE_NODE
-                        &&
-                        model.type !== NetworkMediaModel.TYPE_DIRECTORY)
+    playCoverShowPlay: {
+        switch (model.type) {
+            case NetworkMediaModel.TYPE_NODE:
+            case NetworkMediaModel.TYPE_DIRECTORY:
+                return false
+            default:
+                return implicitPlayCoverShowPlay
+        }
+    }
 
     image: {
         if (model.artwork && model.artwork.toString() !== "") {
