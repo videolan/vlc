@@ -919,6 +919,9 @@ static void ParseUSFString( decoder_t *p_dec,
             psz_subtitle = psz_end - 1;
 
         psz_subtitle += strcspn( psz_subtitle, ">" );
+
+        if( *psz_subtitle == 0 )
+            break;
     }
 }
 
