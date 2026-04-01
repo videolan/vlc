@@ -75,7 +75,7 @@ Widgets.ExpandGridItemView {
         function onShowMediaInformation(index) {
             gridView.switchExpandItem(index)
 
-            if (gridView.focus)
+            if (gridView.focus && expandItem)
                 expandItem.setCurrentItemFocus(Qt.TabFocusReason)
         }
     }
@@ -138,8 +138,6 @@ Widgets.ExpandGridItemView {
         x: 0
 
         width: gridView.width
-
-        model: gridView.model
 
         Navigation.parentItem: gridView
 
