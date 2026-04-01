@@ -695,9 +695,10 @@ end:
  * Start a new thread process with its external process.
  */
 static int
-preparser_pool_SpawnThread(struct preparser_process_pool *pool)
+preparser_pool_SpawnThreadLocked(struct preparser_process_pool *pool)
 {
     assert(pool != NULL);
+    vlc_mutex_assert(&pool->lock);
     assert(pool->nthreads < pool->max_threads);
 
     struct preparser_process_thread *thread = malloc(sizeof(*thread));
@@ -718,10 +719,8 @@ preparser_pool_SpawnThread(struct preparser_process_pool *pool)
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_lock(&pool->lock);
     if (preparser_pool_SpawnProcess(thread) != VLC_SUCCESS) {
         msg_Err(pool->parent, "Fail to create Process in process_pool");
-        vlc_mutex_unlock(&pool->lock);
         vlc_preparser_msg_serdes_Delete(thread->serdes);
         free(thread);
         return VLC_EGENERIC;
@@ -730,7 +729,6 @@ preparser_pool_SpawnThread(struct preparser_process_pool *pool)
 
     int ret = vlc_clone(&thread->thread, preparser_pool_Run, thread);
     if (ret != 0) {
-        vlc_mutex_unlock(&pool->lock);
         vlc_process_Terminate(thread->process, false);
         vlc_preparser_msg_serdes_Delete(thread->serdes);
         free(thread);
@@ -738,9 +736,20 @@ preparser_pool_SpawnThread(struct preparser_process_pool *pool)
     }
     pool->nthreads++;
     vlc_list_append(&thread->node, &pool->threads);
-    vlc_mutex_unlock(&pool->lock);
 
     return VLC_SUCCESS;
+}
+
+static int
+preparser_pool_SpawnThread(struct preparser_process_pool *pool)
+{
+    assert(pool != NULL);
+
+    vlc_mutex_lock(&pool->lock);
+    int ret = preparser_pool_SpawnThreadLocked(pool);
+    vlc_mutex_unlock(&pool->lock);
+
+    return ret;
 }
 
 /**
@@ -765,7 +774,7 @@ preparser_pool_Submit(struct preparser_process_pool *pool,
                            pool->nthreads < pool->max_threads;
     if (need_new_thread) {
         /* If it fails, this is not an error, there is at least one thread */
-        preparser_pool_SpawnThread(pool);
+        preparser_pool_SpawnThreadLocked(pool);
     }
 
     vlc_mutex_unlock(&pool->lock);
