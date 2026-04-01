@@ -31,6 +31,7 @@
 
 #include <jpeglib.h>
 #include <setjmp.h>
+#include <stdckdint.h>
 
 /* JPEG_SYS_COMMON_MEMBERS:
  * members common to encoder and decoder descriptors
@@ -87,7 +88,7 @@ struct encoder_sys_t
 
     struct jpeg_compress_struct p_jpeg;
 
-    int i_blocksize;
+    size_t i_blocksize;
     int i_quality;
 };
 
@@ -598,7 +599,13 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_sys->err.output_message = user_error_message;
 
     p_sys->i_quality = var_GetInteger(p_enc, ENC_CFG_PREFIX "quality");
-    p_sys->i_blocksize = 3 * p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height;
+
+    if( ckd_mul( &p_sys->i_blocksize, 3, p_enc->fmt_in.video.i_visible_width ) ||
+        ckd_mul( &p_sys->i_blocksize, p_sys->i_blocksize, p_enc->fmt_in.video.i_visible_height ) )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     p_enc->fmt_in.i_codec = VLC_CODEC_J420;
     p_enc->pf_encode_video = EncodeBlock;
