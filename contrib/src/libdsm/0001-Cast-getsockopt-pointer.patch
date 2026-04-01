@@ -1,0 +1,26 @@
+From 782ab6c5a1bc0d5c2232eb61b4425713566cadf3 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 1 Apr 2026 08:43:48 +0200
+Subject: [PATCH] Cast getsockopt pointer
+
+So it can match POSIX and Win32 signatures.
+---
+ src/netbios_session.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/netbios_session.c b/src/netbios_session.c
+index 9aabf12..124eb21 100644
+--- a/src/netbios_session.c
++++ b/src/netbios_session.c
+@@ -123,7 +123,7 @@ static int open_socket_and_connect(netbios_session *s)
+ 
+             if (FD_ISSET(s->socket, &write_fds))
+             {
+-                if (getsockopt(s->socket, SOL_SOCKET, SO_ERROR, &ret,
++                if (getsockopt(s->socket, SOL_SOCKET, SO_ERROR, (void*) &ret,
+                                &(socklen_t){ sizeof (ret) }) || ret)
+                 {
+                     errno = ret;
+-- 
+2.52.0.windows.1
+
