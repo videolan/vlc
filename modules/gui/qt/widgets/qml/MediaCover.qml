@@ -32,7 +32,8 @@ Item {
 
     property real playIconSize: VLCStyle.play_cover_normal
 
-    property bool playCoverShowPlay: false
+    property bool playCoverShowPlay: implicitPlayCoverShowPlay
+    property bool implicitPlayCoverShowPlay: false
 
     readonly property real effectiveRadius: fallbackImage.visible ? fallbackImage.effectiveRadius
                                                                   : (image.visible ? image.effectiveRadius
