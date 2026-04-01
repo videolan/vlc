@@ -154,7 +154,7 @@ static ssize_t fs_storage_GetContent(const hls_storage_t *storage,
     close(fd);
     return read;
 err:
-    free(dest);
+    free(*dest);
     close(fd);
     return -1;
 }
