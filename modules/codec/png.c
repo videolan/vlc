@@ -33,6 +33,7 @@
 #include <vlc_rand.h>
 #include <vlc_ancillary.h>
 #include <png.h>
+#include <stdckdint.h>
 
 /* PNG_SYS_COMMON_MEMBERS:
  * members common to encoder and decoder descriptors
@@ -74,7 +75,7 @@ static int DecodeBlock  ( decoder_t *, block_t * );
 typedef struct
 {
     PNG_SYS_COMMON_MEMBERS
-    int i_blocksize;
+    size_t i_blocksize;
 } encoder_sys_t;
 
 static int  OpenEncoder(vlc_object_t *);
@@ -428,8 +429,9 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     p_sys->p_obj = p_this;
 
-    p_sys->i_blocksize = 3 * p_enc->fmt_in.video.i_visible_width *
-        p_enc->fmt_in.video.i_visible_height;
+    if( ckd_mul( &p_sys->i_blocksize, 3, p_enc->fmt_in.video.i_visible_width ) ||
+        ckd_mul( &p_sys->i_blocksize, p_sys->i_blocksize, p_enc->fmt_in.video.i_visible_height ) )
+        return VLC_EGENERIC;
 
     p_enc->fmt_in.i_codec =
     p_enc->fmt_in.video.i_chroma = VLC_CODEC_RGB24;
