@@ -1,0 +1,26 @@
+From 19502f905828e21d90bb80e45d8a7546bdd0c2fb Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 1 Apr 2026 08:07:28 +0200
+Subject: [PATCH] Add cast on setsockopt() call
+
+So it can match POSIX and Win32 signatures. This is the same cast done a few lines above.
+---
+ src/common/net/sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/common/net/sock.c b/src/common/net/sock.c
+index b11bc0d..aa7aa47 100644
+--- a/src/common/net/sock.c
++++ b/src/common/net/sock.c
+@@ -743,7 +743,7 @@ sock_t sock_get_server_socket (int port, const char *sinterface)
+         setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&on, sizeof(on));
+         on = 0;
+ #ifdef IPV6_V6ONLY
+-        setsockopt (sock, IPPROTO_IPV6, IPV6_V6ONLY, &on, sizeof on);
++        setsockopt (sock, IPPROTO_IPV6, IPV6_V6ONLY, (const void *)&on, sizeof on);
+ #endif
+ 
+         if (bind (sock, ai->ai_addr, ai->ai_addrlen) < 0)
+-- 
+2.52.0.windows.1
+
