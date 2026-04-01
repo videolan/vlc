@@ -61,6 +61,7 @@ T.ItemDelegate {
     property alias subtitle: subtitleTxt.text
     property alias subtitleVisible: subtitleTxt.visible
     property alias playCoverShowPlay: picture.playCoverShowPlay
+    property alias implicitPlayCoverShowPlay: picture.implicitPlayCoverShowPlay
     property alias playIconSize: picture.playIconSize
     property alias pictureRadius: picture.radius
     property alias effectiveRadius: picture.effectiveRadius
@@ -121,7 +122,7 @@ T.ItemDelegate {
 
             PropertyChanges {
                 target: picture
-                playCoverShowPlay: true
+                implicitPlayCoverShowPlay: true
             }
 
         }
@@ -136,7 +137,7 @@ T.ItemDelegate {
             SequentialAnimation {
                 PropertyAction {
                     target: picture
-                    properties: "playCoverShowPlay"
+                    property: "implicitPlayCoverShowPlay"
                 }
 
                 NumberAnimation {
@@ -154,7 +155,7 @@ T.ItemDelegate {
             SequentialAnimation {
                 PropertyAction {
                     target: picture
-                    property: "playCoverShowPlay"
+                    property: "implicitPlayCoverShowPlay"
                 }
 
                 NumberAnimation {
@@ -284,7 +285,7 @@ T.ItemDelegate {
         Widgets.MediaCover {
             id: picture
 
-            playCoverShowPlay: false
+            implicitPlayCoverShowPlay: false
             radius: VLCStyle.gridCover_radius
             color: theme.bg.secondary
 
