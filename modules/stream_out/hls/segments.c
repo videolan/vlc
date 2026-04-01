@@ -89,13 +89,14 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
     if (unlikely(segment == NULL))
     {
         block_ChainRelease(content);
-        return VLC_ENOMEM;
+        return -ENOMEM;
     }
 
     segment->id = queue->total_segments;
     segment->length = length;
     segment->storage = NULL;
     segment->http_url = NULL;
+    int ret = -ENOMEM;
 
     if (asprintf(&segment->url,
                  "%s/playlist-%u-%u.%s",
@@ -113,10 +114,10 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
         .name = segment->url + strlen(queue->hls_config->base_url) + 1,
         .mime = "video/MP2T",
     };
-    const int ret = hls_storage_FromBlocks(
+    ret = hls_storage_FromBlocks(
         content, &storage_conf, queue->hls_config, &segment->storage);
     if (unlikely(ret != 0))
-        goto nomem;
+        goto err;
 
     if (queue->httpd_ref != NULL)
     {
@@ -143,9 +144,11 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
     vlc_list_append(&segment->priv_node, &queue->segments);
     return VLC_SUCCESS;
 nomem:
+    ret = -ENOMEM;
+err:
     if (segment->storage != NULL)
         hls_storage_Destroy(segment->storage);
     free(segment->url);
     free(segment);
-    return VLC_ENOMEM;
+    return ret;
 }

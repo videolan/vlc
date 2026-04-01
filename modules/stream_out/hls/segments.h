@@ -82,7 +82,7 @@ void hls_segment_queue_Clear(hls_segment_queue_t *);
  * \param length The media time size of the segment.
  *
  * \retval VLC_SUCCESS on success.
- * \retval VLC_ENOMEM on internal allocation failure.
+ * \retval -errno on error.
  */
 int hls_segment_queue_NewSegment(hls_segment_queue_t *,
                                  block_t *content,
