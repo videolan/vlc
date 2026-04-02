@@ -13,10 +13,19 @@ module_cargo_depends = []
 rust_common_link_args = []
 rust_target = []
 
+rust_triplet = ''
 if get_option('rust').enabled()
     if meson.is_cross_build()
-        rust_target = ['--target=' + meson.get_external_property('rust_triplet')]
+        rust_triplet = meson.get_external_property('rust_triplet')
+        rust_target = ['--target=' + rust_triplet]
         extra_cargo_args += rust_target
+    else
+        rustc_version = run_command('rustc', '-vV', check: true, capture: true)
+        foreach line : rustc_version.stdout().split('\n')
+            if line.startswith('host:')
+                rust_triplet = line.split('host:')[1].strip()
+            endif
+        endforeach
     endif
 
     print_static_libs_rustc = run_command(cargo_rustc_static_libs, rust_target, cargo_bin,
