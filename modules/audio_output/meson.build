@@ -1,5 +1,7 @@
 # Audio output modules
 
+subdir('android')
+
 # Dummy audio output
 vlc_modules += {
     'name' : 'adummy',
