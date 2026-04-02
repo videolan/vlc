@@ -323,7 +323,7 @@
                                                     <constraint firstAttribute="trailing" secondItem="75c-FF-mgb" secondAttribute="trailing" id="TKa-Ng-Pti"/>
                                                     <constraint firstItem="IAy-58-UPp" firstAttribute="leading" secondItem="i42-vp-ih7" secondAttribute="leading" id="g8p-sN-yd5"/>
                                                     <constraint firstItem="noz-yJ-oH4" firstAttribute="centerY" secondItem="i42-vp-ih7" secondAttribute="centerY" id="jfV-of-CoU"/>
-                                                    <constraint firstItem="IAy-58-UPp" firstAttribute="trailing" secondItem="noz-yJ-oH4" secondAttribute="leading" constant="4" id="nMU-2d-pO9"/>
+                                                    <constraint firstItem="IAy-58-UPp" firstAttribute="trailing" secondItem="noz-yJ-oH4" secondAttribute="leading" constant="-4" id="nMU-2d-pO9"/>
                                                 </constraints>
                                             </customView>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="dwM-Uz-pAw" userLabel="Full Screen Button">
