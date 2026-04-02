@@ -32,7 +32,7 @@ OPTIONS:
    -D <win_path> Create PDB files during the build, map the VLC sources to <win_path>
                  e.g.: -D c:/sources/vlc
    -x            Add extra checks when compiling
-   -S <sdkver>   Use maximum Windows API version (0x0601000 by default)
+   -S <sdkver>   Use maximum Windows API version (0x06010000 Windows 7 by default)
    -u            Use the Universal C Runtime (instead of msvcrt)
    -w            Restrict to Windows Store APIs
    -z            Build without GUI (libvlc only)
