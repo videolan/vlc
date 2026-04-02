@@ -293,7 +293,7 @@ static int demux_process_stream(const struct vlc_run_args *args, stream_t *s)
     if (s == NULL)
         return -1;
 
-    es_out_t *out = test_es_out_create(VLC_OBJECT(s));
+    es_out_t *out = test_es_out_create(vlc_object_parent(s));
     if (out == NULL)
         return -1;
 
