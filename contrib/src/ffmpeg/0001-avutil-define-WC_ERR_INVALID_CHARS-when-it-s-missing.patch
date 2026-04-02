@@ -1,0 +1,29 @@
+From ccb6db0f7bb417ec35894ab5a0c0fe0b9e613e3b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 2 Apr 2026 11:40:13 +0200
+Subject: [PATCH] avutil: define WC_ERR_INVALID_CHARS when it's missing
+
+It's not defined when targeting Windows XP. It should be ignored by XP and not
+return an error on invalid chars.
+---
+ libavutil/wchar_filename.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/libavutil/wchar_filename.h b/libavutil/wchar_filename.h
+index 1370a084c9..a5d0c18031 100644
+--- a/libavutil/wchar_filename.h
++++ b/libavutil/wchar_filename.h
+@@ -26,6 +26,10 @@
+ #include <windows.h>
+ #include "mem.h"
+ 
++#ifndef WC_ERR_INVALID_CHARS
++#define WC_ERR_INVALID_CHARS      0x00000080  // error for invalid chars
++#endif
++
+ av_warn_unused_result
+ static inline int utf8towchar(const char *filename_utf8, wchar_t **filename_w)
+ {
+-- 
+2.52.0.windows.1
+
