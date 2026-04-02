@@ -208,11 +208,12 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
             def->format.video.eColorFormat = OMX_COLOR_FormatCbYCrY;
             GetVlcChromaFormat( def->format.video.eColorFormat,
                                 &p_fmt->i_codec, 0 );
-            GetVlcChromaSizes( p_fmt->i_codec,
+            if( !GetVlcChromaSizes( p_fmt->i_codec,
                                def->format.video.nFrameWidth,
                                def->format.video.nFrameHeight,
                                &p_port->i_frame_size, &p_port->i_frame_stride,
-                               &p_port->i_frame_stride_chroma_div );
+                               &p_port->i_frame_stride_chroma_div ))
+                return OMX_ErrorBadParameter;
             def->format.video.nStride = p_port->i_frame_stride;
             def->nBufferSize = p_port->i_frame_size;
         }
@@ -293,11 +294,15 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                     CHECK_ERROR(omx_error, "codec %4.4s doesn't match any OMX format",
                                 (char *)&p_fmt->i_codec );
                 }
-                GetVlcChromaSizes( p_fmt->i_codec,
+                if( !GetVlcChromaSizes( p_fmt->i_codec,
                                    def->format.video.nFrameWidth,
                                    def->format.video.nFrameHeight,
                                    &p_port->i_frame_size, &p_port->i_frame_stride,
-                                   &p_port->i_frame_stride_chroma_div );
+                                   &p_port->i_frame_stride_chroma_div ) )
+                {
+                    omx_error = OMX_ErrorBadParameter;
+                    goto error;
+                }
                 def->format.video.nStride = p_port->i_frame_stride;
                 def->nBufferSize = p_port->i_frame_size;
             }
@@ -317,11 +322,15 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                 CHECK_ERROR(omx_error, "OMX color format %i not supported",
                             (int)def->format.video.eColorFormat );
             }
-            GetVlcChromaSizes( p_fmt->i_codec,
+            if( !GetVlcChromaSizes( p_fmt->i_codec,
                                def->format.video.nFrameWidth,
                                def->format.video.nFrameHeight,
                                &p_port->i_frame_size, &p_port->i_frame_stride,
-                               &p_port->i_frame_stride_chroma_div );
+                               &p_port->i_frame_stride_chroma_div ) )
+            {
+                omx_error = OMX_ErrorBadParameter;
+                goto error;
+            }
             def->format.video.nStride = p_port->i_frame_stride;
             if (p_port->i_frame_size > def->nBufferSize)
                 def->nBufferSize = p_port->i_frame_size;
@@ -660,11 +669,15 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                 CHECK_ERROR(omx_error, "OMX color format %i not supported",
                             (int)def->format.video.eColorFormat );
             }
-            GetVlcChromaSizes( p_fmt->i_codec,
+            if( !GetVlcChromaSizes( p_fmt->i_codec,
                                def->format.video.nFrameWidth,
                                def->format.video.nFrameHeight,
                                &p_port->i_frame_size, &p_port->i_frame_stride,
-                               &p_port->i_frame_stride_chroma_div );
+                               &p_port->i_frame_stride_chroma_div ) )
+            {
+                omx_error = OMX_ErrorBadParameter;
+                goto error;
+            }
         }
         if(p_port->i_frame_size > def->nBufferSize)
             def->nBufferSize = p_port->i_frame_size;
