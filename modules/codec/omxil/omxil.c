@@ -1040,8 +1040,9 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             h264_isavcC(p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra) )
         {
             size_t i_filled_len = 0;
+            uint8_t *p_buf;
             if( !h264_avcC_to_AnnexB_NAL( p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra,
-                                          &p_buf, &i_filled_len, NULL )
+                                          &p_buf, &i_filled_len, NULL ) )
             {
                 msg_Dbg(p_dec, "h264_avcC_to_AnnexB_NAL() failed");
                 goto error;
@@ -1062,9 +1063,10 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         else if( p_dec->fmt_in->i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
         {
             size_t i_filled_len;
+            uint8_t *p_buf;
             if( !hevc_hvcC_to_AnnexB_NAL( p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra,
                                          &p_buf, &i_filled_len,
-                                         &p_sys->i_nal_size_length )
+                                         &p_sys->i_nal_size_length ) )
             {
                 msg_Dbg(p_dec, "hevc_hvcC_to_AnnexB_NAL() failed");
                 goto error;
