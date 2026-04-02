@@ -1589,10 +1589,14 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             }
 
             unsigned int chroma_div;
-            GetVlcChromaSizes(p_dec->fmt_out.i_codec,
+            if( !GetVlcChromaSizes(p_dec->fmt_out.i_codec,
                               p_dec->fmt_out.video.i_width,
                               p_dec->fmt_out.video.i_height,
-                              NULL, NULL, &chroma_div);
+                              NULL, NULL, &chroma_div) )
+            {
+                picture_Release(p_pic);
+                return -1;
+            }
             CopyOmxPicture(p_sys->video.i_pixel_format, p_pic,
                            p_sys->video.i_slice_height, p_sys->video.i_stride,
                            (uint8_t *)p_out->buf.p_ptr, chroma_div);
