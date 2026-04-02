@@ -3,9 +3,13 @@ name = "vlcrs-core"
 edition = "2021"
 version.workspace = true
 license.workspace = true
+links = "vlccore"
 
 [dependencies]
 vlcrs-messages = { path = "../vlcrs-messages" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(vlccore_not_linked)'] }
 
 [dev-dependencies]
 vlcrs-macros.workspace = true
