@@ -731,6 +731,28 @@ vlc_modules += {
     'enabled' : get_option('omxil'),
 }
 
+# Android MediaCodec video/audio decoder
+mediandk_lib = cc.find_library('mediandk', required: false)
+vlc_modules += {
+    'name' : 'mediacodec',
+    'sources' : files(
+            'omxil/mediacodec.c',
+            'omxil/mediacodec_ndk.c',
+            'omxil/mediacodec_jni.c',
+            'omxil/utils.c',
+            'omxil/qcom.c',
+        ),
+    'include_directories' : [include_directories('.'), include_directories('omxil')],
+    'link_with' : [hxxxhelper_lib, chroma_copy_lib, libandroid_utils, libandroid_env],
+    'dependencies' : [
+        mediandk_lib,
+        cc.find_library('android', required: host_system == 'android'),
+        cc.find_library('EGL', required: host_system == 'android'),
+        cc.find_library('GLESv2', required: host_system == 'android'),
+    ],
+    'enabled' : host_system == 'android' and mediandk_lib.found(),
+}
+
 ## x26X encoders
 
 # x265 encoder
