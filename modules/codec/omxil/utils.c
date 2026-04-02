@@ -39,6 +39,8 @@
 #include "../../video_chroma/copy.h"
 #include "../../packetizer/h264_nal.h"
 
+#include <stdckdint.h>
+
 /*****************************************************************************
  * Events utility functions
  *****************************************************************************/
@@ -775,11 +777,24 @@ int GetVlcChromaSizes( vlc_fourcc_t i_fourcc,
         if( chroma_format_table[i].i_fourcc == i_fourcc ) break;
 
     /* Align on macroblock boundary */
-    width = (width + 15) & ~0xF;
-    height = (height + 15) & ~0xF;
+    if( ckd_add( &width, width, 15 ) ||
+        ckd_add( &height, height, 15 ) )
+        return 0;
+    width &= ~0xF;
+    height &= ~0xF;
 
-    if( size ) *size = width * height * chroma_format_table[i].i_size_mul / 2;
-    if( pitch ) *pitch = width * chroma_format_table[i].i_line_mul;
+    if( size )
+    {
+        if( ckd_mul( size, width, height ) ||
+            ckd_mul( size, *size, chroma_format_table[i].i_size_mul ) )
+            return 0;
+        *size /= 2;
+    }
+    if( pitch )
+    {
+        if( ckd_mul( pitch, width, chroma_format_table[i].i_line_mul ) )
+            return 0;
+    }
     if( chroma_pitch_div )
         *chroma_pitch_div = chroma_format_table[i].i_line_chroma_div;
     return !!chroma_format_table[i].i_codec;
