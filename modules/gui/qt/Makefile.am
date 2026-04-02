@@ -37,6 +37,8 @@ EXTRA_DIST = qt6.pro qtest.pro quicktest.pro scripts
 vlc_qt_libs = $(QT_LIBS)
 RCC_EXTRA_PARAMS =
 
+all-local: $(VLC_QT_CHECK_DEP)
+
 if !HAVE_QT_ZSTD
 RCC_EXTRA_PARAMS += --no-zstd
 endif
@@ -1626,7 +1628,7 @@ if !HAVE_OS2
 if !HAVE_IOS_OR_TVOS
 if !HAVE_XROS
 pkglibexec_PROGRAMS = vlc-qt-check
-all-local: $(builddir)/../../vlc-qt-check
+VLC_QT_CHECK_DEP = $(builddir)/../../vlc-qt-check
 
 $(builddir)/../../vlc-qt-check: vlc-qt-check
 	$(AM_V_GEN)cd ../../ && $(LN_S) -f gui/qt/vlc-qt-check . && chmod +x vlc-qt-check
