@@ -968,7 +968,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     OMX_FIFO_INIT (&p_sys->in.fifo, pOutputPortPrivate );
     p_sys->in.b_direct = false;
     p_sys->in.b_flushed = true;
-    p_sys->in.p_fmt = &p_dec->fmt_in;
+    p_sys->in.p_fmt = p_dec->fmt_in;
     OMX_FIFO_INIT (&p_sys->out.fifo, pInputPortPrivate );
     p_sys->out.b_direct = false;
     p_sys->out.b_flushed = true;
