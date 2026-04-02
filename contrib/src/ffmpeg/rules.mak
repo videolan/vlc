@@ -257,6 +257,8 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-mpeg12dec-don-t-call-hw-end_frame-when-start.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-fix-MediaFoundation-compilation-if-WINVER-was-forced.patch
+	# replace Vista checks with XP SP1 checks so we don't actually change _WIN32_WINNT
+	sed -i.orig 's,< 0x0600,< 0x0501,g' $(UNPACK_DIR)/configure
 	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-vp9-Do-not-destroy-uninitialized-mutexes-con.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-dxva2_hevc-don-t-use-frames-as-reference-if-they-are.patch

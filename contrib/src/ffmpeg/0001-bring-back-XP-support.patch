@@ -19,37 +19,6 @@ diff --git a/configure b/configure
 index d7a3f507e8..589338f59b 100755
 --- a/configure
 +++ b/configure
-@@ -5632,8 +5632,8 @@ probe_libc(){
-         add_${pfx}cppflags -U__STRICT_ANSI__ -D__USE_MINGW_ANSI_STDIO=1
-         eval test \$${pfx_no_}cc_type = "gcc" &&
-             add_${pfx}cppflags -D__printf__=__gnu_printf__
--        test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600" &&
--            add_${pfx}cppflags -D_WIN32_WINNT=0x0600
-+        test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0501" &&
-+            add_${pfx}cppflags -D_WIN32_WINNT=0x0501
-         add_${pfx}cppflags -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
-     elif test_${pfx}cpp_condition _mingw.h "defined __MINGW_VERSION"  ||
-          test_${pfx}cpp_condition _mingw.h "defined __MINGW32_VERSION"; then
-@@ -5644,8 +5644,8 @@ probe_libc(){
-         add_${pfx}cppflags -U__STRICT_ANSI__ -D__USE_MINGW_ANSI_STDIO=1
-         test_${pfx}cpp_condition _mingw.h "__MSVCRT_VERSION__ < 0x0700" &&
-             add_${pfx}cppflags -D__MSVCRT_VERSION__=0x0700
--        test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600" &&
--            add_${pfx}cppflags -D_WIN32_WINNT=0x0600
-+        test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0501" &&
-+            add_${pfx}cppflags -D_WIN32_WINNT=0x0501
-         eval test \$${pfx_no_}cc_type = "gcc" &&
-             add_${pfx}cppflags -D__printf__=__gnu_printf__
-         add_${pfx}cppflags -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
-@@ -5673,7 +5673,7 @@ probe_libc(){
-         # found in the SDK headers by default. (Alternatively, we could force
-         # _WIN32_WINNT to 0x0602 in that case.)
-         test_${pfx}cpp_condition stdlib.h "defined(_WIN32_WINNT)" ||
--            { test_${pfx}cpp <<EOF && add_${pfx}cppflags -D_WIN32_WINNT=0x0600; }
-+            { test_${pfx}cpp <<EOF && add_${pfx}cppflags -D_WIN32_WINNT=0x0501; }
- #ifdef WINAPI_FAMILY
- #include <winapifamily.h>
- #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 @@ -6188,7 +6188,7 @@ check_headers asm/types.h
  check_builtin stdatomic stdatomic.h "atomic_int foo, bar = ATOMIC_VAR_INIT(-1); atomic_store(&foo, 0); foo += bar"
  
