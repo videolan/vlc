@@ -27,7 +27,7 @@ ifeq ($(call mingw_at_least, 12), true)
 PKGS_FOUND += mingw11-fixes
 endif # MINGW 12
 ifeq ($(call mingw_at_least, 13), true)
-PKGS_FOUND += mingw12-fixes dxvahd
+PKGS_FOUND += mingw12-fixes dxvahd alloweduwp
 ifeq ($(ARCH),i386)
 PKGS_FOUND += dxva_x86
 endif
