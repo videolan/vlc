@@ -125,6 +125,9 @@ struct preparser_process_thread {
     struct vlc_process *process;
     bool process_running;
 
+    /* Status of the current thread */
+    bool stopped;
+
     /* The current task */
     struct preparser_task *task;
 
@@ -475,11 +478,14 @@ struct preparser_process_pool {
     /** Maximum number of threads to run the tasks */
     unsigned max_threads;
 
-    /** List of active vlc_process_executor_thread */
+    /** List of active preparser_process_thread */
     struct vlc_list threads;
 
     /** Number of running thread */
     size_t nthreads;
+
+    /** Number of stopped thread */
+    size_t nthreads_stopped;
 
     /** Unfinished task */
     size_t unfinished;
@@ -633,8 +639,6 @@ preparser_pool_Run(void *data)
     assert(thread->owner != NULL);
     assert(thread->process != NULL);
 
-    //struct preparser_process_pool *pool = thread->owner;
-
     vlc_thread_set_name("vlc-pool-runner");
 
 
@@ -676,17 +680,15 @@ preparser_pool_Run(void *data)
          * until it succeeds or the pool is shutting down. */
         vlc_process_Terminate(thread->process, true);
         thread->process_running = false;
-        while (preparser_pool_SpawnProcess(thread) != VLC_SUCCESS) {
-            vlc_mutex_unlock(&thread->owner->lock);
-            sleep(1);
-            vlc_mutex_lock(&thread->owner->lock);
-            if (thread->owner->closing) {
-                goto end;
-            }
+        if (preparser_pool_SpawnProcess(thread) != VLC_SUCCESS) {
+            goto end;
         }
         thread->process_running = true;
     }
 end:
+    thread->owner->nthreads--;
+    thread->owner->nthreads_stopped++;
+    thread->stopped = true;
     vlc_mutex_unlock(&thread->owner->lock);
     return NULL;
 }
@@ -708,6 +710,7 @@ preparser_pool_SpawnThreadLocked(struct preparser_process_pool *pool)
 
     thread->owner = pool;
     thread->task = NULL;
+    thread->stopped = false;
 
     static struct vlc_preparser_msg_serdes_cbs cbs = {
         .write = write_cbs,
@@ -753,11 +756,49 @@ preparser_pool_SpawnThread(struct preparser_process_pool *pool)
 }
 
 /**
+ * Join and free all stopped threads in the pool.
+ * Must be called with pool->lock held. Collects stopped threads under the lock,
+ * then releases it once to join them all, and re-acquires it before returning.
+ */
+static void
+preparser_pool_JoinStoppedThreadsLocked(struct preparser_process_pool *pool)
+{
+    vlc_mutex_assert(&pool->lock);
+
+    assert(pool->nthreads_stopped == 0);
+
+    /* Move all stopped threads to a local list while holding the lock */
+    struct vlc_list to_join;
+    vlc_list_init(&to_join);
+
+    struct preparser_process_thread *t;
+    vlc_list_foreach(t, &pool->threads, node) {
+        if (t->stopped) {
+            vlc_list_remove(&t->node);
+            vlc_list_append(&t->node, &to_join);
+            pool->nthreads_stopped--;
+        }
+    }
+
+    vlc_mutex_unlock(&pool->lock);
+    vlc_list_foreach(t, &to_join, node) {
+        vlc_join(t->thread, NULL);
+        if (t->process != NULL)
+            vlc_process_Terminate(t->process, false);
+        vlc_preparser_msg_serdes_Delete(t->serdes);
+        free(t);
+    }
+    vlc_mutex_lock(&pool->lock);
+}
+
+/**
  * Push a new task in the queue and check if a new process thread can be spawn.
  * If there is more unfinished task than spawned process thread and that the
  * max number of process thread is not reached, then a new thread is spwaned.
+ * Return a held reference to the task request, or NULL if no thread is
+ * available and a new one could not be spawned (task is deleted in that case).
  */
-static void
+static struct vlc_preparser_req *
 preparser_pool_Submit(struct preparser_process_pool *pool,
                       struct preparser_task *task)
 {
@@ -768,16 +809,31 @@ preparser_pool_Submit(struct preparser_process_pool *pool,
 
     assert(!pool->closing);
 
-    preparser_pool_QueuePush(pool, task);
-
-    bool need_new_thread = ++pool->unfinished > pool->nthreads &&
-                           pool->nthreads < pool->max_threads;
-    if (need_new_thread) {
-        /* If it fails, this is not an error, there is at least one thread */
-        preparser_pool_SpawnThreadLocked(pool);
+    if (pool->nthreads_stopped != 0) {
+        preparser_pool_JoinStoppedThreadsLocked(pool);
     }
 
+    if (pool->nthreads == 0) {
+        if (preparser_pool_SpawnThreadLocked(pool) != VLC_SUCCESS) {
+            vlc_mutex_unlock(&pool->lock);
+            preparser_task_Delete(task);
+            return NULL;
+        }
+    }
+
+    struct vlc_preparser_req *req = preparser_task_req_Hold(&task->req);
+
+    preparser_pool_QueuePush(pool, task);
+    ++pool->unfinished;
+
+    /* Opportunistically spawn an extra thread if tasks outnumber threads */
+    if (pool->unfinished > pool->nthreads &&
+        pool->nthreads < pool->max_threads)
+        /* If it fails, this is not an error, there is at least one thread */
+        preparser_pool_SpawnThreadLocked(pool);
+
     vlc_mutex_unlock(&pool->lock);
+    return req;
 }
 
 /**
@@ -883,6 +939,7 @@ preparser_pool_New(vlc_object_t *obj, size_t max, vlc_tick_t timeout,
 
     pool->max_threads = max;
     pool->nthreads = 0;
+    pool->nthreads_stopped = 0;
     pool->unfinished = 0;
     pool->timeout = timeout;
     pool->types = types;
@@ -937,9 +994,7 @@ preparser_Push(void *opaque, input_item_t *item, int options,
     }
     preparser_task_InitPush(task, options, &task_cbs, cbs_userdata);
 
-    struct vlc_preparser_req *req = preparser_task_req_Hold(&task->req);
-    preparser_pool_Submit(sys->pool_preparser, task);
-    return req;
+    return preparser_pool_Submit(sys->pool_preparser, task);
 }
 
 /**
@@ -970,9 +1025,7 @@ preparser_GenerateThumbnail(void *opaque, input_item_t *item,
     }
     preparser_task_InitThumbnail(task, thumb_arg, &task_cbs, cbs_userdata);
 
-    struct vlc_preparser_req *req = preparser_task_req_Hold(&task->req);
-    preparser_pool_Submit(sys->pool_thumbnailer, task);
-    return req;
+    return preparser_pool_Submit(sys->pool_thumbnailer, task);
 }
 
 /**
@@ -1007,9 +1060,7 @@ preparser_GenerateThumbnailToFiles(void *opaque, input_item_t *item,
     preparser_task_InitThumbnailToFile(task, thumb_arg, outputs, output_count,
                                        &task_cbs, cbs_userdata);
 
-    struct vlc_preparser_req *req = preparser_task_req_Hold(&task->req);
-    preparser_pool_Submit(sys->pool_thumbnailer, task);
-    return req;
+    return preparser_pool_Submit(sys->pool_thumbnailer, task);
 }
 
 /**
