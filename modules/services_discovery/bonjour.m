@@ -356,7 +356,10 @@ static NSString * ipAddressAsStringForData(NSData * data)
 {
     vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)_p_this;
 
-    NSString *uri = [NSString stringWithFormat:@"%@://%@:%ld", protocol, netService.hostName, netService.port];
+    NSString *host = netService.hostName;
+    if( [host rangeOfString:@":"].location != NSNotFound )
+        host = [NSString stringWithFormat:@"[%@]", host];
+    NSString *uri = [NSString stringWithFormat:@"%@://%@:%ld", protocol, host, (long)netService.port];
     NSDictionary *txtDict = [NSNetService dictionaryFromTXTRecordData:[netService TXTRecordData]];
     NSString *displayName = netService.name;
     int rendererFlags = 0;
@@ -419,7 +422,10 @@ static NSString * ipAddressAsStringForData(NSData * data)
     if ([protocol isEqualToString:@"smb"]) {
         host = ipAddressAsStringForData(netService.addresses.firstObject);
     }
-    NSString *uri = [NSString stringWithFormat:@"%@://%@:%ld", protocol, host, netService.port];
+
+    if( [host rangeOfString:@":"].location != NSNotFound )
+        host = [NSString stringWithFormat:@"[%@]", host];
+    NSString *uri = [NSString stringWithFormat:@"%@://%@:%ld", protocol, host, (long)netService.port];
 
     input_item_t *p_input_item = input_item_NewDirectory([uri UTF8String], [netService.name UTF8String], ITEM_NET );
     if (p_input_item != NULL) {
