@@ -95,7 +95,7 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'egl_surfacetexture',
     'sources' : files('egl_surfacetexture.c'),
-    'dependencies' : [egl_dep, opengles2_dep],
+    'dependencies' : [android_lib, egl_dep, opengles2_dep],
     'c_args' : ['-DUSE_OPENGL_ES2'],
     'link_with' : [libandroid_env, libandroid_utils, libvlc_opengles],
     'enabled' : host_system == 'android' and egl_dep.found(),

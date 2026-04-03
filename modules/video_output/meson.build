@@ -48,6 +48,72 @@ vlc_modules += {
     'sources' : files('wdummy.c')
 }
 
+android_lib = []
+
+# Android window provider (vout window + AWINDOW decoder device)
+if host_system == 'android'
+    android_lib = cc.find_library('android')
+    egl_lib = cc.find_library('EGL')
+    glesv2_lib = cc.find_library('GLESv2')
+    vlc_modules += {
+        'name' : 'android_window',
+        'sources' : files('android/window.c'),
+        'link_with' : [libandroid_utils, libandroid_env],
+        'dependencies' : [android_lib, egl_lib, glesv2_lib],
+    }
+    # gl_common_dep pulls in desktop OpenGL (-lGL) which doesn't exist on Android.
+    # Build the android display module with its own copy of the opengl sources,
+    # using OpenGL ES 2 headers/libs instead.
+    android_gl_sources = files(
+        'opengl/filter.c',
+        'opengl/filters.c',
+        'opengl/gl_api.c',
+        'opengl/gl_util.c',
+        'opengl/importer.c',
+        'opengl/interop.c',
+        'opengl/picture.c',
+        'opengl/sampler.c',
+        'opengl/sub_renderer.c',
+        'opengl/renderer.c',
+        'opengl/vout_helper.c',
+    )
+    vlc_modules += {
+        'name' : 'android_display',
+        'sources' : [files('android/display.c'), android_gl_sources],
+        'c_args' : ['-DUSE_OPENGL_ES2'],
+        'include_directories' : [vlc_include_dirs],
+        'link_with' : [libandroid_utils, libandroid_env],
+        'dependencies' : [android_lib, egl_lib, glesv2_lib, m_lib],
+    }
+
+    # EGL display module for Android
+    vlc_modules += {
+        'name' : 'egl_android',
+        'sources' : files('opengl/egl.c'),
+        'c_args' : ['-DUSE_PLATFORM_ANDROID=1'],
+        'link_with' : [libandroid_utils, libandroid_env],
+        'dependencies' : [android_lib, egl_lib, glesv2_lib],
+    }
+
+    # OpenGL ES 2 interop for Android Surface (SurfaceTexture / ANativeWindow)
+    vlc_modules += {
+        'name' : 'glinterop_asurface',
+        'sources' : files('opengl/interop_asurface.c'),
+        'c_args' : ['-DUSE_OPENGL_ES2'],
+        'link_with' : [libandroid_utils, libandroid_env],
+        'dependencies' : [android_lib, egl_lib, glesv2_lib],
+    }
+
+    # OpenGL ES 2 interop for Android Image (AImageReader)
+    vlc_modules += {
+        'name' : 'glinterop_aimage',
+        'sources' : files('opengl/interop_aimage.c'),
+        'c_args' : ['-DUSE_OPENGL_ES2'],
+        'link_with' : [libandroid_utils],
+        'dependencies' : [android_lib, egl_lib, glesv2_lib],
+    }
+endif
+
 # Video splitter
 vlc_modules += {
     'name' : 'video_splitter',
