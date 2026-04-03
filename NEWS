@@ -2,6 +2,7 @@ Changes between 3.0.23 and 3.0.24:
 ----------------------------------
 
 Codecs:
+ * Use FFmpeg 8.1 (upgraded from 4.4)
  * Support OpenAPV decoder (FFmpeg 8 and OpenAPV)
 
 
