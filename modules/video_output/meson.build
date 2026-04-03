@@ -27,6 +27,15 @@ drm_dep = dependency('libdrm', version: '>= 2.4.83', required: get_option('drm')
 
 if host_system == 'darwin'
     subdir('apple')
+
+    vlc_modules += {
+        'name' : 'window_macosx',
+        'sources' : files('window_macosx.m'),
+        'objc_args' : ['-fobjc-arc', '-fobjc-exceptions'],
+        'dependencies' : [
+            frameworks['Cocoa'],
+        ],
+    }
 endif
 
 subdir('libplacebo')
