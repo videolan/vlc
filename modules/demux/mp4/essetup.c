@@ -895,7 +895,7 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
     if( p_soun->i_qt_version == 0 ) /* otherwise defaults to meaningless 16 */
     {
         p_fmt->audio.i_bitspersample = p_soun->i_samplesize;
-        p_fmt->i_bitrate = p_soun->i_channelcount * p_soun->i_sampleratehi *
+        p_fmt->i_bitrate = (unsigned) p_soun->i_channelcount * p_soun->i_sampleratehi *
                            p_soun->i_samplesize;
     }
 
