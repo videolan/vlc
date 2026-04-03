@@ -1,0 +1,25 @@
+From 02acac67f21aa16d5f7223703c5aef5596ee2389 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 3 Apr 2026 13:31:37 +0200
+Subject: [PATCH] Disable CreateHardLinkW usage on old UWP targets
+
+---
+ libarchive/archive_write_disk_windows.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libarchive/archive_write_disk_windows.c b/libarchive/archive_write_disk_windows.c
+index c9f10a8a..61931a29 100644
+--- a/libarchive/archive_write_disk_windows.c
++++ b/libarchive/archive_write_disk_windows.c
+@@ -606,6 +606,8 @@ la_CreateHardLinkW(wchar_t *linkname, wchar_t *target)
+ 		set = 1;
+ 		f = la_GetFunctionKernel32("CreateHardLinkW");
+ 	}
++#elif defined(WINAPI_FAMILY_PARTITION) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && NTDDI_VERSION < NTDDI_WIN10_19H1
++	f = NULL;
+ #else
+ 	f = CreateHardLinkW;
+ #endif
+-- 
+2.52.0.windows.1
+
