@@ -79,6 +79,24 @@ QtObject {
         return Math.floor(a / b) * b
     }
 
+    // Currently only supports .25, .5, .75
+    function denominatorForFloat(number) : int {
+        const fraction = number % 1
+
+        if (fraction === 0)
+            return 1
+        else if (compareFloat(fraction, 0.25))
+            return 4
+        else if (compareFloat(fraction, 0.50))
+            return 2
+        else if (compareFloat(fraction, 0.75))
+            return 4
+        else {
+            console.error("Can not find denominator for number", number, "!")
+            return 1
+        }
+    }
+
     function isSortedIntegerArrayConsecutive(array) {
         for (let i = 1; i < array.length; ++i) {
             if ((array[i] - array[i - 1]) !== 1)
