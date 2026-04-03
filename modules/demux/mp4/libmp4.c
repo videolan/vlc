@@ -4570,8 +4570,7 @@ static int MP4_ReadBox_Reference( stream_t *p_stream, MP4_Box_t *p_box )
             p_data->i_reference_count )
         MP4_READBOX_EXIT( 0 );
 
-    p_data->p_references = malloc( sizeof(*p_data->p_references) *
-                                   p_data->i_reference_count );
+    p_data->p_references = vlc_alloc( p_data->i_reference_count, sizeof(*p_data->p_references) );
     if( !p_data->p_references )
         MP4_READBOX_EXIT( 0 );
     for( uint16_t i=0; i<p_data->i_reference_count; i++ )
@@ -4669,7 +4668,7 @@ static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
     if( i_read / 6 < p_data->i_item_count )
         MP4_READBOX_EXIT( 0 );
 
-    p_data->p_items = malloc( p_data->i_item_count * sizeof(p_data->p_items[0]) );
+    p_data->p_items = vlc_alloc( p_data->i_item_count, sizeof(p_data->p_items[0]) );
     if( !p_data->p_items )
         MP4_READBOX_EXIT( 0 );
 
@@ -4712,7 +4711,7 @@ static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
             MP4_READBOX_EXIT( 0 );
         }
 
-        p_data->p_items[i].p_extents = malloc( p_data->p_items[i].i_extent_count *
+        p_data->p_items[i].p_extents = vlc_alloc( p_data->p_items[i].i_extent_count,
                                                sizeof(p_data->p_items[i].p_extents[0]) );
         if(!p_data->p_items[i].p_extents)
         {
@@ -4915,7 +4914,7 @@ static int MP4_ReadBox_ipma( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
     }
 
-    p_data->p_entries = malloc( sizeof(p_data->p_entries[0]) * p_data->i_entry_count );
+    p_data->p_entries = vlc_alloc( p_data->i_entry_count, sizeof(p_data->p_entries[0]) );
     if( !p_data->p_entries )
     {
         p_data->i_entry_count = 0;
@@ -4943,8 +4942,8 @@ static int MP4_ReadBox_ipma( stream_t *p_stream, MP4_Box_t *p_box )
         }
 
         p_data->p_entries[i].p_assocs =
-                malloc( sizeof(p_data->p_entries[i].p_assocs[0]) *
-                        p_data->p_entries[i].i_association_count );
+                vlc_alloc( p_data->p_entries[i].i_association_count,
+                           sizeof(p_data->p_entries[i].p_assocs[0]) );
         if( !p_data->p_entries[i].p_assocs )
         {
             p_data->p_entries[i].i_association_count = 0;
