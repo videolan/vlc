@@ -302,9 +302,9 @@ int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
 
 #define AVI_READCHUNK_ENTER \
     int64_t i_read = __EVEN(p_chk->common.i_chunk_size ) + 8; \
-    if( i_read > 100000000 ) \
+    if( i_read > 100000000 || i_read < 0 ) \
     { \
-        msg_Err( s, "Big chunk ignored" ); \
+        msg_Err( s, "Invalid chunk size ignored" ); \
         return VLC_EGENERIC; \
     } \
     uint8_t  *p_read, *p_buff;    \
