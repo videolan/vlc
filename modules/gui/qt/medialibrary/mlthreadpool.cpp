@@ -19,10 +19,11 @@
 #include "mlthreadpool.hpp"
 
 #include <QMutexLocker>
+#include <QThread>
 
 ThreadRunner::ThreadRunner()
 {
-    m_threadPool.setMaxThreadCount(4);
+    m_threadPool.setMaxThreadCount(std::clamp(QThread::idealThreadCount() - 1, 1, 4));
 }
 
 ThreadRunner::~ThreadRunner()
