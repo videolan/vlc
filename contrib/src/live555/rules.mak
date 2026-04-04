@@ -63,6 +63,8 @@ live555: $(LIVE555_FILE) .sum-live555
 	# Add the Extra_CFLAGS to all config files
 	cd live && sed -i.orig \
 		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" config.*
+	# Avoid host include leakage with cross-toolchain wrappers
+	cd live && sed -i.orig -e 's% -I/usr/local/include%%g' config.*
 	# We want 64bits offsets and PIC on Linux
 	cd live && sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
 	# Disable Locale for Solaris

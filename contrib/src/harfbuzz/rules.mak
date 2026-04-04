@@ -16,6 +16,14 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(UNPACK)
 	$(MOVE)
 
+ifeq ($(HOST),arm-webos-linux-gnueabi)
+DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
+HARFBUZZ_CONF := -Dfreetype=enabled \
+	-Dglib=disabled \
+	-Dgobject=disabled \
+	-Ddocs=disabled \
+	-Dtests=disabled
+else
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
 
 HARFBUZZ_CONF := -Dfreetype=enabled \
@@ -23,6 +31,7 @@ HARFBUZZ_CONF := -Dfreetype=enabled \
 	-Dgobject=disabled \
 	-Ddocs=disabled \
 	-Dtests=disabled
+endif
 
 ifdef HAVE_DARWIN_OS
 HARFBUZZ_CONF += -Dcoretext=enabled

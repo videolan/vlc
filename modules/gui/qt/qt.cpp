@@ -36,6 +36,7 @@ QT_END_NAMESPACE
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #ifndef _POSIX_SPAWN
 # define _POSIX_SPAWN (-1)
@@ -563,33 +564,41 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason );
 /* Open Interface */
 static int OpenInternal( qt_intf_t *p_intf )
 {
+    bool skipXlibInit = false;
 #ifndef X_DISPLAY_MISSING
-    if (!vlc_xlib_init(&p_intf->obj))
+    const char *qtPlatform = getenv("QT_QPA_PLATFORM");
+    skipXlibInit = qtPlatform != nullptr
+        && (strstr(qtPlatform, "wayland") != nullptr
+            || strcmp(qtPlatform, "offscreen") == 0);
+    if (!skipXlibInit && !vlc_xlib_init(&p_intf->obj))
         return VLC_EGENERIC;
 #endif
 
 #if (_POSIX_SPAWN >= 0) && (!defined(__APPLE__) || TARGET_OS_OSX)
     /* Check if QApplication works */
     /* Note: Disabled on iOS/tvOS/visionOS as process spawning is not allowed */
-    char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, "vlc-qt-check");
-    if (unlikely(path == NULL))
-        return VLC_ENOMEM;
-
-    char *argv[] = { path, NULL };
-    pid_t pid;
-
-    int val = posix_spawn(&pid, path, NULL, NULL, argv, environ);
-    free(path);
-    if (val)
-        return VLC_ENOMEM;
-
-    int status;
-    while (waitpid(pid, &status, 0) == -1);
-
-    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+    if (!skipXlibInit)
     {
-        msg_Dbg(p_intf, "Qt check failed (%d). Skipping.", status);
-        return VLC_EGENERIC;
+        char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, "vlc-qt-check");
+        if (unlikely(path == NULL))
+            return VLC_ENOMEM;
+
+        char *argv[] = { path, NULL };
+        pid_t pid;
+
+        int val = posix_spawn(&pid, path, NULL, NULL, argv, environ);
+        free(path);
+        if (val)
+            return VLC_ENOMEM;
+
+        int status;
+        while (waitpid(pid, &status, 0) == -1);
+
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+        {
+            msg_Dbg(p_intf, "Qt check failed (%d). Skipping.", status);
+            return VLC_EGENERIC;
+        }
     }
 #endif
 

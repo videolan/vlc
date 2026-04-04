@@ -1,0 +1,14 @@
+
+--
+-G
+Ninja
+-DCMAKE_BUILD_TYPE=Release
+-DCMAKE_INSTALL_PREFIX=/home/gabor/qt6-webos/target/usr
+-DCMAKE_PREFIX_PATH=/home/gabor/qt6-webos/target/usr
+-DQT_HOST_PATH=/home/gabor/qt6-webos/host
+-DQT_BUILD_EXAMPLES=OFF
+-DQT_BUILD_TESTS=OFF
+-DPKG_CONFIG_EXECUTABLE=/tmp/arm-pkg-config
+-DWAYLAND_SCANNER_EXECUTABLE=/usr/bin/wayland-scanner
+-B
+/home/gabor/qt6-webos-build-target-6.8.3/qtwayland-fresh3
