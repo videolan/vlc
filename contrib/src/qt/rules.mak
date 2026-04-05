@@ -57,6 +57,7 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0001-WIP-Core-Add-operator-to-our-bidirectional-meta-iter.patch
 	$(APPLY) $(SRC)/qt/0001-macos-guard-text-html.patch
 	$(APPLY) $(SRC)/qt/0001-QEventDispatcherWin32-treat-posted-events-fairly.patch
+	$(APPLY) $(SRC)/qt/0001-rhi-d3d11-Use-DXGI_SWAP_EFFECT_FLIP_DISCARD-only-on-.patch
 	$(MOVE)
 
 ifdef HAVE_WIN32

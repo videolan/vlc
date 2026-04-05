@@ -1,0 +1,44 @@
+From 9084d185fa110b17633e520fbb90906a3bdbf0ee Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Sun, 5 Apr 2026 19:05:07 +0300
+Subject: [PATCH] rhi: d3d11: Use `DXGI_SWAP_EFFECT_FLIP_DISCARD` only on
+ Windows 10 and above
+
+According to Microsoft's documentation [1], flip discard is only
+available starting with Windows 10. However, we can simply use
+flip sequential instead.
+
+The difference is explained that the back buffer would be discarded
+when present is called, while with sequential it is preserved.
+
+[1] https://learn.microsoft.com/en-us/windows/win32/api/dxgi/ne-dxgi-dxgi_swap_effect
+---
+ src/gui/rhi/qrhid3d11.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/rhi/qrhid3d11.cpp b/src/gui/rhi/qrhid3d11.cpp
+index 9a0b5721abc..5053559959f 100644
+--- a/src/gui/rhi/qrhid3d11.cpp
++++ b/src/gui/rhi/qrhid3d11.cpp
+@@ -7,6 +7,7 @@
+ #include <QWindow>
+ #include <qmath.h>
+ #include <QtCore/qcryptographichash.h>
++#include <QtCore/qoperatingsystemversion.h>
+ #include <QtCore/private/qsystemerror_p.h>
+ #include <QtCore/private/qsystemlibrary_p.h>
+ #include "qrhid3dhelpers_p.h"
+@@ -5219,7 +5220,9 @@ bool QD3D11SwapChain::createOrResize()
+         desc.BufferCount = BUFFER_COUNT;
+         desc.Flags = swapChainFlags;
+         desc.Scaling = rhiD->useLegacySwapchainModel ? DXGI_SCALING_STRETCH : DXGI_SCALING_NONE;
+-        desc.SwapEffect = rhiD->useLegacySwapchainModel ? DXGI_SWAP_EFFECT_DISCARD : DXGI_SWAP_EFFECT_FLIP_DISCARD;
++        desc.SwapEffect = rhiD->useLegacySwapchainModel ? DXGI_SWAP_EFFECT_DISCARD
++                                                        : ((QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) ? DXGI_SWAP_EFFECT_FLIP_DISCARD
++                                                                                                                                      : DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL);
+         desc.Stereo = stereo;
+ 
+         if (dcompVisual) {
+-- 
+2.53.0
+
