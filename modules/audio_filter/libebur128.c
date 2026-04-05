@@ -151,6 +151,8 @@ Process(filter_t *filter, block_t *block)
     {
         case VLC_CODEC_U8:
         {
+            if (unlikely(block->i_buffer > SIZE_MAX / 2))
+                return out;
             /* Convert to S16N */
             short *data_s16 = malloc(block->i_buffer * 2);
             if (unlikely(data_s16 == NULL))
