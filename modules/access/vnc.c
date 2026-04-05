@@ -375,7 +375,8 @@ static void *DemuxThread( void *p_data )
             if ( ! i_status )
             {
                 msg_Warn( p_demux, "Cannot get announced data. Server closed ?" );
-                es_out_Del( p_demux->out, p_sys->es );
+                if ( p_sys->es )
+                    es_out_Del( p_demux->out, p_sys->es );
                 p_sys->es = NULL;
                 return NULL;
             }
@@ -386,7 +387,10 @@ static void *DemuxThread( void *p_data )
                 {
                     p_sys->p_block->i_dts = p_sys->p_block->i_pts = vlc_tick_now();
                     es_out_SetPCR( p_demux->out, p_sys->p_block->i_pts );
-                    es_out_Send( p_demux->out, p_sys->es, p_sys->p_block );
+                    if ( p_sys->es )
+                        es_out_Send( p_demux->out, p_sys->es, p_sys->p_block );
+                    else
+                        block_Release( p_sys->p_block );
                     p_sys->p_block = p_block;
                 }
             }
