@@ -286,22 +286,15 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx, std::funct
         //   does not have anything in the window to clear, so clear color can be transparent which means that the UI can be transparent and expose the window
         //   for the window to provide the (native) backdrop acrylic effect.
 
-        // WS_EX_NOREDIRECTIONBITMAP is only compatible with the flip swapchain model and D3D backend.
-        // In CompositorDirectComposition::init(), we already ensure that D3D is used (no OpenGL or Vulkan).
-        // Flip model is supported since Windows 8 and Qt does not use it only if the following environment
-        // variable is set. Since it targets Windows 10+, it does *not* check if flip model is supported and
-        // use the legacy swapchain model. For D3D12, flip model is always used.
-        const bool legacySwapchainModelIsExplicitlyWanted = qEnvironmentVariableIntValue("QT_D3D_NO_FLIP");
-
         const char* const envDisableRedirectionSurface = "QT_QPA_DISABLE_REDIRECTION_SURFACE";
         const bool redirectionSurfaceIsExplicitlyWanted = !qEnvironmentVariableIsEmpty(envDisableRedirectionSurface) && !qEnvironmentVariableIntValue(envDisableRedirectionSurface);
 
-        if (!legacySwapchainModelIsExplicitlyWanted && !redirectionSurfaceIsExplicitlyWanted)
+        if (!redirectionSurfaceIsExplicitlyWanted)
             qputenv(envDisableRedirectionSurface, "1"); // TODO: Other QQuickWindow (toolbar editor, independent popups)
 
         m_quickView->create();
 
-        if (!legacySwapchainModelIsExplicitlyWanted && !redirectionSurfaceIsExplicitlyWanted)
+        if (!redirectionSurfaceIsExplicitlyWanted)
             qunsetenv(envDisableRedirectionSurface); // NOTE: We need to disable it, otherwise regular QWidget windows would have issues
     }
 
