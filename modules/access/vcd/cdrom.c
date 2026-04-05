@@ -871,7 +871,16 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
                         }
                         strncpy( psz_vcdfile, psz_cuefile, (p_pos - psz_cuefile + 1) );
                         strcpy( psz_vcdfile + (p_pos - psz_cuefile + 1), filename );
-                    } else psz_vcdfile = strdup( filename );
+                    }
+                    else
+                    {
+                        psz_vcdfile = strdup( filename );
+                        if( psz_vcdfile == NULL )
+                        {
+                            i_ret = VLC_ENOMEM;
+                            goto error;
+                        }
+                    }
                     msg_Dbg( p_this,"using vcd image file: %s", psz_vcdfile );
                     p_vcddev->i_vcdimage_handle = vlc_open( psz_vcdfile,
                                         O_RDONLY | O_NONBLOCK | O_BINARY );
