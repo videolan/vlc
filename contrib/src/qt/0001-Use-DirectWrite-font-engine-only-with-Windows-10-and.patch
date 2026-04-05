@@ -1,0 +1,55 @@
+From 60125a69d18b31f4104fb11c759cabf19e4c391c Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Sun, 5 Apr 2026 18:52:16 +0300
+Subject: [PATCH] Use DirectWrite font engine only with Windows 10 and above
+
+DirectWrite font engine uses features not available on
+up-to-date Windows 8.1. This causes glyphs not being
+rendered in Qt Widgets on Windows 8, with the following
+message being spammed by Qt:
+
+imageForGlyph: CreateGlyphRunAnalysis failed (The
+parameter is incorrect.)
+
+Interestingly we do not need this patch for Windows 7.
+This is *probably* not because DirectWrite font engine
+can be used on Windows 7, but not on Windows 8 but
+rather the code that decides what engine to use, for
+some reason, decides to use DirectWrite font engine
+on Windows 8 and not on Windows 7. Since Qt 6.8 only
+supports Windows 10, it is likely they will get rid
+these checks in the future.
+
+Note that this should not be confused with the font
+database engine, where DirectWrite font database
+engine is only functional on Windows 10, because
+the features used by Qt 6.8 are only available on
+Windows 10.
+---
+ src/gui/text/windows/qwindowsfontdatabase.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/text/windows/qwindowsfontdatabase.cpp b/src/gui/text/windows/qwindowsfontdatabase.cpp
+index 772620d65af..af34aba72c9 100644
+--- a/src/gui/text/windows/qwindowsfontdatabase.cpp
++++ b/src/gui/text/windows/qwindowsfontdatabase.cpp
+@@ -19,6 +19,7 @@
+ #include <QtCore/QStandardPaths>
+ #include <QtCore/private/qduplicatetracker_p.h>
+ #include <QtCore/private/qwinregistry_p.h>
++#include <QtCore/qoperatingsystemversion.h>
+ 
+ #include <wchar.h>
+ 
+@@ -1204,7 +1205,7 @@ QFontEngine *QWindowsFontDatabase::createEngine(const QFontDef &request, const Q
+     }
+ 
+ #if QT_CONFIG(directwrite) && QT_CONFIG(direct2d)
+-    if (data->directWriteFactory != nullptr) {
++    if ((QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) && (data->directWriteFactory != nullptr)) {
+         const QString fam = QString::fromWCharArray(lf.lfFaceName);
+         const QString nameSubstitute = QWindowsFontEngineDirectWrite::fontNameSubstitute(fam);
+         if (nameSubstitute != fam) {
+-- 
+2.53.0
+
