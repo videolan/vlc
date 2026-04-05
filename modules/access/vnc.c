@@ -154,8 +154,8 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
         assert(p_client->height <= UINT16_MAX); // fits in 16 bits
         return FALSE;
     }
-    uint16_t i_width = p_client->width;
-    uint16_t i_height = p_client->height;
+    unsigned int i_width = p_client->width;
+    unsigned int i_height = p_client->height;
 
     if (p_client->format.depth <= 8 &&
             !strstr(p_client->appData.encodingsString, "tight")) // libvnc does not support tight at 8 bpp
@@ -201,7 +201,8 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     }
 
     /* Set up framebuffer */
-    if (mul_overflow(i_width, i_height * (p_client->format.bitsPerPixel / 8), &p_sys->i_framebuffersize)) {
+    if (mul_overflow(i_height, p_client->format.bitsPerPixel / 8, &p_sys->i_framebuffersize) ||
+        mul_overflow(i_width, p_sys->i_framebuffersize, &p_sys->i_framebuffersize)) {
         msg_Err(p_demux, "VNC framebuffersize overflow");
         return FALSE;
     }
