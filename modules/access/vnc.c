@@ -34,6 +34,7 @@
 # include "config.h"
 #endif
 #include <assert.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -144,10 +145,13 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
         p_sys->es = NULL;
     }
 
-    assert(!(p_client->width & ~0xffff)); // fits in 16 bits
+    if ( p_client->width > UINT16_MAX || p_client->height > UINT16_MAX )
+    {
+        assert(p_client->width <= UINT16_MAX); // fits in 16 bits
+        assert(p_client->height <= UINT16_MAX); // fits in 16 bits
+        return FALSE;
+    }
     uint16_t i_width = p_client->width;
-
-    assert(!(p_client->height & ~0xffff)); // fits in 16 bits
     uint16_t i_height = p_client->height;
 
     uint8_t i_bits_per_pixel = p_client->format.bitsPerPixel;
