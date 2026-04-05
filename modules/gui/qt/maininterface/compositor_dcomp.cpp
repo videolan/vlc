@@ -169,6 +169,12 @@ bool CompositorDirectComposition::init()
         graphicsApi != QSGRendererInterface::Direct3D12)
         return false;
 
+    if (Q_UNLIKELY(qEnvironmentVariableIntValue("QT_D3D_NO_FLIP")))
+    {
+        // Qt does not use Direct Composition with the legacy swapchain model.
+        return false;
+    }
+
     return true;
 }
 
