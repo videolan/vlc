@@ -151,8 +151,8 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
         assert(p_client->height <= UINT16_MAX); // fits in 16 bits
         return FALSE;
     }
-    uint16_t i_width = p_client->width;
-    uint16_t i_height = p_client->height;
+    unsigned int i_width = p_client->width;
+    unsigned int i_height = p_client->height;
 
     uint8_t i_bits_per_pixel = p_client->format.bitsPerPixel;
     assert((i_bits_per_pixel & 0x7) == 0); // multiple of 8
@@ -190,7 +190,8 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     }
 
     /* Set up framebuffer */
-    if (mul_overflow(i_width, i_height * (i_bits_per_pixel / 8), &p_sys->i_framebuffersize)) {
+    if (mul_overflow(i_height, i_bits_per_pixel / 8, &p_sys->i_framebuffersize) ||
+        mul_overflow(i_width, p_sys->i_framebuffersize, &p_sys->i_framebuffersize)) {
         msg_Err(p_demux, "VNC framebuffersize overflow");
         return FALSE;
     }
