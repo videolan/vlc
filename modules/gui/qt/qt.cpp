@@ -981,6 +981,9 @@ static void *Thread( void *obj )
 
         {
             QRhiD3D11InitParams params;
+#ifndef NDEBUG
+            params.enableDebugLayer = true;
+#endif
             if (QRhi::probe(QRhi::D3D11, &params))
             {
                 return {QSGRendererInterface::Direct3D11, false};
@@ -1008,6 +1011,9 @@ static void *Thread( void *obj )
             // to see if DirectX Warp would be functional. This is essentially the same
             // as what `::probe()` does, at least for DirectX:
             QRhiD3D11InitParams params;
+#ifndef NDEBUG
+            params.enableDebugLayer = true;
+#endif
             QRhi *rhi = QRhi::create(QRhi::D3D11, &params, QRhi::PreferSoftwareRenderer);
             if (rhi)
             {
