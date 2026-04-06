@@ -49,7 +49,17 @@ Item {
     property url source
     property alias sourceSize: image.sourceSize
     property alias sourceClipRect: image.sourceClipRect
-    readonly property int status: shaderEffect.source.status
+    readonly property int status: {
+        if (effectiveTextureProviderItem instanceof Image) {
+            return effectiveTextureProviderItem.status
+        } else {
+            if (tpObserver.isValid)
+                return Image.Ready
+            else
+                return Image.Null
+        }
+    }
+
     property alias shaderStatus: shaderEffect.status
     property alias cache: image.cache
 
@@ -67,8 +77,8 @@ Item {
     readonly property Item sourceTextureProviderItem: image
     // NOTE:    It is allowed to adjust this property to use an external texture provider, where
     //          in that case the texture provider item should provide a subset of `Image`'s
-    //          interface, that is, provide `status` and `implicitWidth`/`implicitHeight` that
-    //          reflect the texture size.
+    //          interface, that is, provide and `implicitWidth`/`implicitHeight` that reflect
+    //          the texture size.
     // NOTE:    If `textureProviderItem` is set to `null`, the default `Image` is going to be
     //          used as fallback. For that reason, it is recommended to keep providing the
     //          `source` url if there is a possibility of `textureProviderItem` being `null`
@@ -161,13 +171,13 @@ Item {
         anchors.alignWhenCentered: true
         anchors.centerIn: parent
 
-        implicitWidth: (source.status === Image.Ready) ? source.implicitWidth : 64
-        implicitHeight: (source.status === Image.Ready) ? source.implicitHeight : 64
+        implicitWidth: (root.status === Image.Ready) ? source.implicitWidth : 64
+        implicitHeight: (root.status === Image.Ready) ? source.implicitHeight : 64
 
         width: paintedSize.width
         height: paintedSize.height
 
-        visible: (source.status === Image.Ready) &&
+        visible: (root.status === Image.Ready) &&
                  (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
                  (root.radius > 0.0 ||
                   root.borderWidth > 0 ||
@@ -219,7 +229,7 @@ Item {
             let ret = Qt.size(0.0, 0.0)
 
             // No need to calculate if the texture is not ready:
-            if (source.status !== Image.Ready)
+            if (root.status !== Image.Ready)
                 return ret
 
             // NOTE: Calculations are based on `QQuickImage`,
@@ -262,7 +272,7 @@ Item {
         }
 
         // (2 / width) seems to be a good coefficient to make it similar to `Rectangle.border`:
-        readonly property double borderRange: (source.status === Image.Ready) ? (root.borderWidth / width * 2.) : 0.0 // no need for outlining if there is no image (nothing to outline)
+        readonly property double borderRange: (root.status === Image.Ready) ? (root.borderWidth / width * 2.) : 0.0 // no need for outlining if there is no image (nothing to outline)
         readonly property color borderColor: root.borderColor
 
         // QQuickImage as texture provider, no need for ShaderEffectSource.
@@ -276,7 +286,7 @@ Item {
         TextureProviderObserver {
             id: tpObserver
 
-            source: shaderEffect.visible ? shaderEffect.source : null
+            source: shaderEffect.source
             notifyAllChanges: shaderEffect.visible
         }
     }
