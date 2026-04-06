@@ -206,12 +206,14 @@
 
     self.groupsTableView.headerView = nil;
     self.groupsTableView.allowsEmptySelection = NO;
+    self.groupsTableView.allowsMultipleSelection = YES;
     self.selectedGroupTableView.headerView = self.selectedGroupTableHeaderView;
 
     selectedGroupColumn.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
 
     self.groupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.selectedGroupTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.selectedGroupTableView.allowsMultipleSelection = YES;
 
     self.groupsTableView.delegate = self.tableViewDelegate;
     self.selectedGroupTableView.delegate = self.tableViewDelegate;
