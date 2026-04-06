@@ -175,7 +175,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryCollectionView.delegate = _audioLibraryCollectionViewDelegate;
 
     _audioLibraryCollectionView.selectable = YES;
-    _audioLibraryCollectionView.allowsMultipleSelection = NO;
+    _audioLibraryCollectionView.allowsMultipleSelection = YES;
     _audioLibraryCollectionView.allowsEmptySelection = YES;
     _audioLibraryCollectionView.collectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
 }
@@ -226,7 +226,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionView.delegate = _audioLibraryCollectionViewDelegate;
 
     _audioLibraryGridModeSplitViewListSelectionCollectionView.selectable = YES;
-    _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsMultipleSelection = NO;
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsMultipleSelection = YES;
     _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsEmptySelection = YES;
 
     VLCLibraryCollectionViewFlowLayout * const audioLibraryGridModeListSelectionCollectionViewLayout =
