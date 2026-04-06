@@ -125,7 +125,7 @@
     _collectionView.delegate = _collectionViewDelegate;
     _collectionView.collectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
     _collectionView.selectable = YES;
-    _collectionView.allowsMultipleSelection = NO;
+    _collectionView.allowsMultipleSelection = YES;
     _collectionView.allowsEmptySelection = YES;
 
     self.dataSource.collectionViews = @[self.collectionView];
