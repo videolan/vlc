@@ -1097,8 +1097,7 @@ static int Control( stream_t *p_access, int i_query, va_list args )
             break;
 
         case STREAM_SET_PAUSE_STATE:
-            pb_bool = va_arg( args, bool * );
-            if ( !pb_bool )
+            if ( !va_arg( args, int ) )
                  return Seek( p_access, sys->offset );
             break;
 
