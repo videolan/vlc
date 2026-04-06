@@ -1,4 +1,4 @@
-From c60305a7564c63c9e175ba65e721df1db6855251 Mon Sep 17 00:00:00 2001
+From a3dc9de7966221e1bae1246fbb0a67bf7a5d2a34 Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Tue, 18 Feb 2025 23:29:57 +0200
 Subject: [PATCH] QEventDispatcherWin32: treat posted events fairly
@@ -6,19 +6,19 @@ Subject: [PATCH] QEventDispatcherWin32: treat posted events fairly
 By processing at least a batch of posted events
 while prioritizing other message types.
 ---
- src/corelib/kernel/qcoreapplication.cpp             | 10 ++++++++--
- src/corelib/kernel/qcoreapplication_p.h             |  2 +-
- src/corelib/kernel/qeventdispatcher_win.cpp         | 13 +++++++++++--
- src/corelib/kernel/qeventdispatcher_win_p.h         |  2 +-
- .../platform/windows/qwindowsguieventdispatcher.cpp |  4 ++--
- .../platform/windows/qwindowsguieventdispatcher_p.h |  2 +-
- 6 files changed, 24 insertions(+), 9 deletions(-)
+ src/corelib/kernel/qcoreapplication.cpp       | 10 ++++-
+ src/corelib/kernel/qcoreapplication_p.h       |  2 +-
+ src/corelib/kernel/qeventdispatcher_win.cpp   | 43 ++++++++++++++++---
+ src/corelib/kernel/qeventdispatcher_win_p.h   |  2 +-
+ .../windows/qwindowsguieventdispatcher.cpp    |  4 +-
+ .../windows/qwindowsguieventdispatcher_p.h    |  2 +-
+ 6 files changed, 49 insertions(+), 14 deletions(-)
 
 diff --git a/src/corelib/kernel/qcoreapplication.cpp b/src/corelib/kernel/qcoreapplication.cpp
-index 48c75973f7f..83ed71c23e9 100644
+index 0aa120ee1be..d557025399e 100644
 --- a/src/corelib/kernel/qcoreapplication.cpp
 +++ b/src/corelib/kernel/qcoreapplication.cpp
-@@ -1801,7 +1801,7 @@ void QCoreApplication::sendPostedEvents(QObject *receiver, int event_type)
+@@ -1806,7 +1806,7 @@ void QCoreApplication::sendPostedEvents(QObject *receiver, int event_type)
  }
  
  void QCoreApplicationPrivate::sendPostedEvents(QObject *receiver, int event_type,
@@ -27,7 +27,7 @@ index 48c75973f7f..83ed71c23e9 100644
  {
      if (event_type == -1) {
          // we were called by an obsolete event dispatcher.
-@@ -1873,7 +1873,13 @@ void QCoreApplicationPrivate::sendPostedEvents(QObject *receiver, int event_type
+@@ -1878,7 +1878,13 @@ void QCoreApplicationPrivate::sendPostedEvents(QObject *receiver, int event_type
      };
      CleanUp cleanup(receiver, event_type, data);
  
@@ -43,10 +43,10 @@ index 48c75973f7f..83ed71c23e9 100644
          if (i >= data->postEventList.insertionOffset)
              break;
 diff --git a/src/corelib/kernel/qcoreapplication_p.h b/src/corelib/kernel/qcoreapplication_p.h
-index 0a51a0b5de8..dd85bb59d2c 100644
+index ad99e2d5e0e..54282696b9c 100644
 --- a/src/corelib/kernel/qcoreapplication_p.h
 +++ b/src/corelib/kernel/qcoreapplication_p.h
-@@ -107,7 +107,7 @@ public:
+@@ -108,7 +108,7 @@ public:
      static QThread *mainThread();
      static bool threadRequiresCoreApplication();
  
@@ -56,10 +56,19 @@ index 0a51a0b5de8..dd85bb59d2c 100644
      static void checkReceiverThread(QObject *receiver);
      void cleanupThreadData();
 diff --git a/src/corelib/kernel/qeventdispatcher_win.cpp b/src/corelib/kernel/qeventdispatcher_win.cpp
-index 78ad3d3edeb..7c247724d09 100644
+index 78ad3d3edeb..1f9a04baea3 100644
 --- a/src/corelib/kernel/qeventdispatcher_win.cpp
 +++ b/src/corelib/kernel/qeventdispatcher_win.cpp
-@@ -37,6 +37,8 @@ QT_BEGIN_NAMESPACE
+@@ -4,6 +4,8 @@
+ 
+ #include "qeventdispatcher_win_p.h"
+ 
++#include <QtCore/qtenvironmentvariables.h>
++#include <optional>
+ #include "qcoreapplication.h"
+ #include <private/qsystemlibrary_p.h>
+ #include "qoperatingsystemversion.h"
+@@ -37,6 +39,8 @@ QT_BEGIN_NAMESPACE
  #endif
  #endif // QT_NO_GESTURES
  
@@ -68,14 +77,29 @@ index 78ad3d3edeb..7c247724d09 100644
  enum {
      WM_QT_SOCKETNOTIFIER = WM_USER,
      WM_QT_SENDPOSTEDEVENTS = WM_USER + 1,
-@@ -204,7 +206,14 @@ LRESULT QT_WIN_CALLBACK qt_internal_proc(HWND hwnd, UINT message, WPARAM wp, LPA
+@@ -204,7 +208,29 @@ LRESULT QT_WIN_CALLBACK qt_internal_proc(HWND hwnd, UINT message, WPARAM wp, LPA
          if (HIWORD(GetQueueStatus(mask)) == 0)
              q->sendPostedEvents();
          else
 +        {
 +            // Fair treatment for posted events,
 +            // at least process some of the pending events:
-+            q->sendPostedEvents(POSTEDEVENTS_BATCH);
++            static const auto postedEventsBatch = []() -> std::optional<int> {
++                bool ok;
++                const int batch = qEnvironmentVariableIntValue("QT_POSTEDEVENTS_BATCH", &ok);
++                if (ok) {
++                    if (batch >= 0)
++                        return batch;
++                    else
++                        return std::nullopt;
++                } else {
++                    return POSTEDEVENTS_BATCH;
++                }
++            }();
++
++            if (postedEventsBatch)
++                q->sendPostedEvents(*postedEventsBatch);
++
 +            // We still need this, because there can be more than
 +            // POSTEDEVENTS_BATCH posted events waiting to be processed:
              d->startPostedEventsTimer();
@@ -83,7 +107,7 @@ index 78ad3d3edeb..7c247724d09 100644
          return 0;
      } // switch (message)
  
-@@ -893,7 +902,7 @@ bool QEventDispatcherWin32::event(QEvent *e)
+@@ -893,18 +919,21 @@ bool QEventDispatcherWin32::event(QEvent *e)
      return QAbstractEventDispatcher::event(e);
  }
  
@@ -92,9 +116,20 @@ index 78ad3d3edeb..7c247724d09 100644
  {
      Q_D(QEventDispatcherWin32);
  
-@@ -904,7 +913,7 @@ void QEventDispatcherWin32::sendPostedEvents()
-     // Allow posting WM_QT_SENDPOSTEDEVENTS message.
-     d->wakeUps.storeRelaxed(0);
+-    if (d->sendPostedEventsTimerId != 0)
+-        KillTimer(d->internalHwnd, d->sendPostedEventsTimerId);
+-    d->sendPostedEventsTimerId = 0;
++    if (count == 0)
++    {
++        if (d->sendPostedEventsTimerId != 0)
++            KillTimer(d->internalHwnd, d->sendPostedEventsTimerId);
++        d->sendPostedEventsTimerId = 0;
+ 
+-    // Allow posting WM_QT_SENDPOSTEDEVENTS message.
+-    d->wakeUps.storeRelaxed(0);
++        // Allow posting WM_QT_SENDPOSTEDEVENTS message.
++        d->wakeUps.storeRelaxed(0);
++    }
  
 -    QCoreApplicationPrivate::sendPostedEvents(0, 0, d->threadData.loadRelaxed());
 +    QCoreApplicationPrivate::sendPostedEvents(0, 0, d->threadData.loadRelaxed(), count);
@@ -144,5 +179,5 @@ index 7d326c07808..d7ee009f1a0 100644
  private:
      QEventLoop::ProcessEventsFlags m_flags;
 -- 
-2.48.1
+2.53.0
 
