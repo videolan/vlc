@@ -48,7 +48,8 @@ layout(std140, binding = 0) uniform buf {
     int antialiasing; // WARNING: intentionally not a boolean
 #endif
 #ifdef CROP_SUPPORT
-    vec2 cropRate;
+    int shouldCrop; // WARNING: intentionally not a boolean
+    vec2 sourceTextureSize; // TODO: Ditch targeting GLSL 1.20/ESSL 1.0, and use `textureSize()` instead.
 #endif
 #ifdef BACKGROUND_SUPPORT
     vec4 backgroundColor;
@@ -108,41 +109,53 @@ void main()
         dist = sdRoundBox(p, vec2(size.x / size.y, 1.0), vec4(radiusTopRight, radiusBottomRight, radiusTopLeft, radiusBottomLeft));
     }
 
+    vec4 texel;
+
 #ifdef CROP_SUPPORT
-    vec2 texCoord;
-
-    if (cropRate.x > 0.0)
+    if (shouldCrop != 0)
     {
-        float normalCropRate = qt_SubRect_source.z * cropRate.x;
+        vec2 texCoord;
 
-        float k = qt_SubRect_source.z + qt_SubRect_source.x - normalCropRate;
-        float l = qt_SubRect_source.x + normalCropRate;
+        vec2 denormalSubTextureSize = vec2(sourceTextureSize.x * qt_SubRect_source.z, sourceTextureSize.y * qt_SubRect_source.w);
 
-        texCoord.x = (k - l) / (qt_SubRect_source.z) * (qt_TexCoord0.x - qt_SubRect_source.x) + l;
+        float implicitRatio = denormalSubTextureSize.x / denormalSubTextureSize.y;
+        float ratio = size.x / size.y;
+
+        if ((implicitRatio > 1.0) && (ratio < implicitRatio))
+        {
+            float cropRate = (denormalSubTextureSize.x - denormalSubTextureSize.y) / 2 / denormalSubTextureSize.x;
+            float normalCropRate = qt_SubRect_source.z * cropRate;
+
+            float k = qt_SubRect_source.z + qt_SubRect_source.x - normalCropRate;
+            float l = qt_SubRect_source.x + normalCropRate;
+
+            texCoord.x = (k - l) / (qt_SubRect_source.z) * (qt_TexCoord0.x - qt_SubRect_source.x) + l;
+            texCoord.y = qt_TexCoord0.y;
+        }
+        else if ((implicitRatio < 1.0) && (ratio > implicitRatio))
+        {
+            float cropRate = (denormalSubTextureSize.y - denormalSubTextureSize.x) / 2 / denormalSubTextureSize.y;
+            float normalCropRate = qt_SubRect_source.w * cropRate;
+
+            float k = qt_SubRect_source.w + qt_SubRect_source.y - normalCropRate;
+            float l = qt_SubRect_source.y + normalCropRate;
+
+            texCoord.y = (k - l) / (qt_SubRect_source.w) * (qt_TexCoord0.y - qt_SubRect_source.y) + l;
+            texCoord.x = qt_TexCoord0.x;
+        }
+        else
+        {
+            texCoord.x = qt_TexCoord0.x;
+            texCoord.y = qt_TexCoord0.y;
+        }
+
+        texel = texture(source, texCoord);
     }
     else
-    {
-        texCoord.x = qt_TexCoord0.x;
-    }
-
-    if (cropRate.y > 0.0)
-    {
-        float normalCropRate = qt_SubRect_source.w * cropRate.y;
-
-        float k = qt_SubRect_source.w + qt_SubRect_source.y - normalCropRate;
-        float l = qt_SubRect_source.y + normalCropRate;
-
-        texCoord.y = (k - l) / (qt_SubRect_source.w) * (qt_TexCoord0.y - qt_SubRect_source.y) + l;
-    }
-    else
-    {
-        texCoord.y = qt_TexCoord0.y;
-    }
-
-    vec4 texel = texture(source, texCoord);
-#else
-    vec4 texel = texture(source, qt_TexCoord0);
 #endif
+    {
+        texel = texture(source, qt_TexCoord0);
+    }
 
 #ifdef BACKGROUND_SUPPORT
     // Source over blending (S + D * (1 - S.a)):

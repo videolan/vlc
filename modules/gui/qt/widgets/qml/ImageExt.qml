@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick
 
+import VLC.Util
+
 // NOTE: ImageExt behaves exactly like Image, except when at least one of these features are used:
 //       - `PreserveAspectCrop` fill mode without requiring a clip node.
 //       - Rounded rectangular shaping.
@@ -186,28 +188,22 @@ Item {
         readonly property double softEdgeMin: -1. / Math.min(width, height)
         readonly property double softEdgeMax: -softEdgeMin
 
-        readonly property size cropRate: {
-            let ret = Qt.size(0.0, 0.0)
+        // Previously we were calculating the crop rate here based on the sub-texture
+        // size (implicit size), but that was breaking batch rendering. So instead,
+        // we now calculate the crop rate in fragment shader. We can not do that in
+        // the vertex shader either because having a custom vertex shader also breaks
+        // batch rendering in `ShaderEffect`.
+        readonly property bool shouldCrop: (root.fillMode === Image.PreserveAspectCrop)
 
-            // No need to calculate if PreserveAspectCrop is not used
-            if (root.fillMode !== Image.PreserveAspectCrop)
-                return ret
+        // Native texture size (atlas size if texture is in the atlas):
+        // TODO: We could use `textureSize()` and get rid of this, but we
+        //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
+        //       though the shader is written in GLSL 4.40.
+        readonly property size sourceTextureSize: tpObserver.nativeTextureSize
 
-            // No need to calculate if image is not ready
-            if (source.status !== Image.Ready)
-                return ret
-
-            const implicitRatio = implicitWidth / implicitHeight
-            const ratio = width / height
-
-            if (ratio > implicitRatio)
-                ret.height = (implicitHeight - implicitWidth) / 2 / implicitHeight
-            else if (ratio < implicitRatio)
-                ret.width = (implicitWidth - implicitHeight) / 2 / implicitWidth
-
-            return ret
-        }
-
+        // WARNING: Do not put this into the uniform block of the shader,
+        //          since it depends on the implicit size, it would break
+        //          batch rendering. This is a concern for delegates.
         readonly property size paintedSize: {
             let ret = Qt.size(0.0, 0.0)
 
@@ -216,7 +212,7 @@ Item {
                 return ret
 
             // NOTE: Calculations are based on `QQuickImage`,
-            //       except preserve aspect crop (see `cropRate`).
+            //       except preserve aspect crop.
             if (root.fillMode === Image.PreserveAspectCrop) {
                 return Qt.size(root.width, root.height)
             } else if (root.fillMode === Image.PreserveAspectFit) {
@@ -263,9 +259,15 @@ Item {
         // so that we can make use of our custom shader.
         readonly property Item source: root.textureProviderItem ?? image
 
-        fragmentShader: (cropRate.width > 0.0 || cropRate.height > 0.0) || (root.borderWidth > 0) ? "qrc:///shaders/SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb"
-                                                                                                  : "qrc:///shaders/SDFAARoundedTexture.frag.qsb"
+        fragmentShader: (shouldCrop || (borderRange > 0)) ? "qrc:///shaders/SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb"
+                                                          : "qrc:///shaders/SDFAARoundedTexture.frag.qsb"
 
+        TextureProviderObserver {
+            id: tpObserver
+
+            source: shaderEffect.visible ? shaderEffect.source : null
+            notifyAllChanges: shaderEffect.visible
+        }
     }
 
     Image {
