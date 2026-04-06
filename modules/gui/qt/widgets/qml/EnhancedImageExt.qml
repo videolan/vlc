@@ -61,9 +61,6 @@ ImageExt {
     TextureProviderIndirection {
         id: textureProviderIndirection
 
-        implicitWidth: (source instanceof Image) ? source.implicitWidth : textureSize.width
-        implicitHeight: (source instanceof Image) ? source.implicitHeight : textureSize.height
-
         readonly property bool sourceNeedsTiling: (root.fillMode === Image.Tile ||
                                                    root.fillMode === Image.TileVertically ||
                                                    root.fillMode === Image.TileHorizontally)
@@ -74,13 +71,5 @@ ImageExt {
         verticalWrapMode: sourceNeedsTiling ? TextureProviderIndirection.Repeat : TextureProviderIndirection.ClampToEdge
 
         textureSubRect: sourceNeedsTiling ? Qt.rect(0, 0, root.paintedWidth, root.paintedHeight) : undefined
-
-        readonly property size textureSize: observer.textureSize
-
-        TextureProviderObserver {
-            id: observer
-            source: textureProviderIndirection
-            notifyAllChanges: (root.visible && textureProviderIndirection.source)
-        }
     }
 }
