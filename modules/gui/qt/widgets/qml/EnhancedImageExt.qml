@@ -45,22 +45,6 @@ ImageExt {
     // No need to load images in this case:
     loadImages: (targetTextureProvider === root.sourceTextureProviderItem)
 
-    blending: {
-        if (effectiveRadius > 0.0)
-            return true // Outside the radius is always transparent, need blending
-
-        if (effectiveBackgroundColor.a > (1.0 - Number.EPSILON))
-            return false // If background color is opaque, no need for blending
-
-        if (textureProviderItem === textureProviderIndirection) {
-            console.assert(observer.source === textureProviderIndirection)
-            if (!observer.hasAlphaChannel)
-                return false // If the texture is opaque, no need for blending
-        }
-
-        return true
-    }
-
     /// <debug>
     readonly property QtObject _sourceWindow: (targetTextureProvider?.Window.window ?? null)
     function _onWindowChanged() {
