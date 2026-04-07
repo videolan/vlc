@@ -76,6 +76,30 @@
     self.openMediaButton.title = _NS("Open media...");
     self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
 
+    // Allow the drop zone image to shrink when the sidebar is contracted
+    for (NSView * const subview in self.dragDropView.subviews) {
+        if ([subview isKindOfClass:[VLCDropDisabledImageView class]]) {
+            for (NSLayoutConstraint * const constraint in subview.constraints) {
+                if (constraint.firstAttribute == NSLayoutAttributeWidth ||
+                    constraint.firstAttribute == NSLayoutAttributeHeight) {
+                    constraint.priority = NSLayoutPriorityDefaultLow;
+                }
+            }
+            [subview.widthAnchor constraintEqualToAnchor:subview.heightAnchor].active = YES;
+            [subview setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow
+                                             forOrientation:NSLayoutConstraintOrientationHorizontal];
+            [subview setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow
+                                             forOrientation:NSLayoutConstraintOrientationVertical];
+            break;
+        }
+    }
+    [self.dragDropImageBackgroundBox.topAnchor
+        constraintGreaterThanOrEqualToAnchor:self.dragDropView.topAnchor
+                                    constant:VLCLibraryUIUnits.smallSpacing].active = YES;
+    [self.dragDropView.bottomAnchor
+        constraintGreaterThanOrEqualToAnchor:self.openMediaButton.bottomAnchor
+                                    constant:VLCLibraryUIUnits.smallSpacing].active = YES;
+
     self.shuffleButton.toolTip = _NS("Shuffle");
     self.repeatButton.toolTip = _NS("Repeat");
     self.sortButton.toolTip = _NS("Sort Play Queue");
@@ -162,13 +186,15 @@
             [self.buttonStack.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor
                                                           constant:-VLCLibraryUIUnits.largeSpacing];
 
+        const CGFloat footerTopLine = footerHeight + -footerBottomConstraint.constant + VLCLibraryUIUnits.smallSpacing;
+
         [NSLayoutConstraint activateConstraints:@[
             [self.scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-            [self.dragDropView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+            [self.dragDropView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor
+                                                           constant:-footerTopLine],
             footerBottomConstraint
         ]];
 
-        const CGFloat footerTopLine = footerHeight + -footerBottomConstraint.constant + VLCLibraryUIUnits.smallSpacing;
         self.scrollView.automaticallyAdjustsContentInsets = NO;
         self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, footerTopLine, 0);
     } else 

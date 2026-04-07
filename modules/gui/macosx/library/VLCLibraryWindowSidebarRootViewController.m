@@ -173,7 +173,7 @@
     self.topInternalConstraint.active = !self.viewSelector.hidden;
 
     const NSLayoutPriority playQueueCompressionPriority =
-        self.viewSelector.hidden ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
+        self.viewSelector.hidden ? NSLayoutPriorityDefaultHigh : NSLayoutPriorityRequired;
     self.playQueueHeaderLabel.hidden = chaptersEnabled;
     [self.playQueueHeaderLabel setContentCompressionResistancePriority:playQueueCompressionPriority
                                                         forOrientation:NSLayoutConstraintOrientationVertical];
