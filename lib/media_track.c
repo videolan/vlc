@@ -265,7 +265,7 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
     const enum es_format_category_e cat = libvlc_track_type_to_escat( type );
 
     const size_t total_count = vlc_player_GetTrackCount( player, cat );
-    size_t count = total_count;
+    size_t count = 0;
 
     if( selected )
     {
@@ -280,6 +280,8 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
         }
         count = selected_count;
     }
+    else
+        count = total_count;
 
     libvlc_media_tracklist_t *list = libvlc_media_tracklist_alloc( count );
 
