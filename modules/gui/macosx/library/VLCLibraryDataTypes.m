@@ -1771,6 +1771,13 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.episodes;
 }
 
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
+{
+    for (VLCMediaLibraryMediaItem * const item in self.mediaItems) {
+        mediaItemBlock(item);
+    }
+}
+
 @end
 
 @implementation VLCMediaLibraryMovie
