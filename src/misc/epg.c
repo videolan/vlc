@@ -86,8 +86,8 @@ vlc_epg_event_t * vlc_epg_event_Duplicate( const vlc_epg_event_t *p_src )
             p_evt->psz_short_description = strdup( p_src->psz_short_description );
         if( p_src->i_description_items )
         {
-            p_evt->description_items = malloc( sizeof(*p_evt->description_items) *
-                                               p_src->i_description_items );
+            p_evt->description_items = vlc_alloc( p_src->i_description_items,
+                                                  sizeof(*p_evt->description_items ) );
             if( p_evt->description_items )
             {
                 for( int i=0; i<p_src->i_description_items; i++ )
