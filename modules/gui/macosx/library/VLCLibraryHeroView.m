@@ -55,6 +55,10 @@
 - (void)awakeFromNib
 {
     self.largeImageView.contentGravity = VLCImageViewContentGravityResizeAspectFill;
+    self.playButton.bezelColor = NSColor.VLCAccentColor;
+    if (@available(macOS 10.14, *)) {
+        self.playButton.contentTintColor = NSColor.VLCAccentColor;
+    }
     self.titleTextField.maximumNumberOfLines = 3;
     self.detailTextField.maximumNumberOfLines = 1;
     [self connectItemUpdaters];
