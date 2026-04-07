@@ -115,6 +115,8 @@ vlc_module_end()
  *****************************************************************************/
 static int Open( filter_t *p_filter )
 {
+    if( p_filter->fmt_in.video.i_width > SIZE_MAX / 3 * 2 )
+        return VLC_EGENERIC;
 
     filter_sys_t *p_sys = malloc( sizeof( filter_sys_t ) );
     if ( !p_sys )
@@ -266,7 +268,7 @@ static int Open( filter_t *p_filter )
 
     // allocate dither buffers
     const unsigned int i_width = p_filter->fmt_in.video.i_width;
-    const size_t i_single_in_px = i_width * 3 * 2;
+    const size_t i_single_in_px = (size_t)i_width * 3 * 2;
     int *p_all = vlc_alloc( i_single_in_px, 3 * sizeof( int ) );
     if (!p_all) {
         free(p_sys->p_palette);
