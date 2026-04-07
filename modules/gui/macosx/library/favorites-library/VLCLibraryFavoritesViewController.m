@@ -149,7 +149,9 @@
     
     self.favoritesLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.favoritesLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
-                                                
+
+    self.favoritesLibraryGroupsTableView.allowsMultipleSelection = YES;
+    self.favoritesLibraryGroupSelectionTableView.allowsMultipleSelection = YES;
 }
 
 - (void)setupCollectionView
