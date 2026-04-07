@@ -22,6 +22,7 @@
 
 #import "VLCLibraryHeroView.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 

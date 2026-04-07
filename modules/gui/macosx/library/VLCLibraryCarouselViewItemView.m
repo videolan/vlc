@@ -87,6 +87,7 @@
 
 - (void)setup
 {
+    self.highlightBox.borderColor = NSColor.VLCAccentColor;
     self.titleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
     self.detailTextField.font = NSFont.VLCLibrarySubsectionSubheaderFont;
     self.annotationTextField.font = NSFont.VLCLibraryItemAnnotationFont;
