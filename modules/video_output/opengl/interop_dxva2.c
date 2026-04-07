@@ -304,7 +304,7 @@ static int InitRangeProcessor(struct vlc_gl_interop *interop, IDirect3DDevice9Ex
         goto error;
     }
 
-    formatsList = malloc(devcaps.InputFormatCount * sizeof(*formatsList));
+    formatsList = vlc_alloc(devcaps.InputFormatCount, sizeof(*formatsList));
     if (unlikely(formatsList == NULL))
     {
         msg_Dbg(interop, "Failed to allocate %u input formats", devcaps.InputFormatCount);
@@ -325,7 +325,7 @@ static int InitRangeProcessor(struct vlc_gl_interop *interop, IDirect3DDevice9Ex
     }
 
     free(formatsList);
-    formatsList = malloc(devcaps.OutputFormatCount * sizeof(*formatsList));
+    formatsList = vlc_alloc(devcaps.OutputFormatCount, sizeof(*formatsList));
     if (unlikely(formatsList == NULL))
     {
         msg_Dbg(interop, "Failed to allocate %u output formats", devcaps.OutputFormatCount);
@@ -344,7 +344,7 @@ static int InitRangeProcessor(struct vlc_gl_interop *interop, IDirect3DDevice9Ex
         goto error;
     }
 
-    capsList = malloc(devcaps.VideoProcessorCount * sizeof(*capsList));
+    capsList = vlc_alloc(devcaps.VideoProcessorCount, sizeof(*capsList));
     if (unlikely(capsList == NULL))
     {
         msg_Dbg(interop, "Failed to allocate %u video processors", devcaps.VideoProcessorCount);
