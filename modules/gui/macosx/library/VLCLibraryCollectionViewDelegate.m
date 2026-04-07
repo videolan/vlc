@@ -47,6 +47,10 @@
         return;
     }
 
+    if (collectionView.selectionIndexPaths.count != 1) {
+        return;
+    }
+
     VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
     if(collectionViewFlowLayout) {
         [collectionViewFlowLayout expandDetailSectionAtIndex:indexPath];
@@ -55,6 +59,10 @@
 
 - (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
+    if (collectionView.selectionIndexPaths.count > 0) {
+        return;
+    }
+
     VLCLibraryCollectionViewFlowLayout * const collectionViewFlowLayout = 
         (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
 
