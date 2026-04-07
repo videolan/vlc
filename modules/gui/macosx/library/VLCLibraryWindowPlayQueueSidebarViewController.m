@@ -164,6 +164,7 @@
 
         [NSLayoutConstraint activateConstraints:@[
             [self.scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+            [self.dragDropView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
             footerBottomConstraint
         ]];
 
