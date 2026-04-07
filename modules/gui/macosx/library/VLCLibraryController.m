@@ -56,8 +56,32 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
         _p_libraryInstance = vlc_ml_instance_get(getIntf());
         if (!_p_libraryInstance) {
             msg_Info(getIntf(), "VLC runs without media library support");
+
+            NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
+            NSString * const suppressKey = @"VLCSuppressMediaLibraryFailedAlert";
+            if (![defaults boolForKey:suppressKey]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSAlert * const alert = [[NSAlert alloc] init];
+                    alert.messageText = _NS("Media Library Unavailable");
+                    alert.informativeText = _NS("The media library module could not be loaded. "
+                                                "Library features such as browsing your media "
+                                                "collection will not be available.");
+                    alert.alertStyle = NSAlertStyleWarning;
+                    [alert addButtonWithTitle:_NS("OK")];
+                    alert.showsSuppressionButton = YES;
+                    alert.suppressionButton.title = _NS("Do not show this message again");
+                    [alert runModal];
+                    if (alert.suppressionButton.state == NSControlStateValueOn) {
+                        [defaults setBool:YES forKey:suppressKey];
+                    }
+                });
+            }
+
             return self;
         }
+
+        // Reset suppression so the alert reappears if a future load fails.
+        [NSUserDefaults.standardUserDefaults removeObjectForKey:@"VLCSuppressMediaLibraryFailedAlert"];
         _libraryModel = [[VLCLibraryModel alloc] initWithLibrary:_p_libraryInstance];
         _unsorted = YES;
 
