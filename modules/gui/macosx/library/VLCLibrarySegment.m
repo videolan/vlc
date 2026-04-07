@@ -100,6 +100,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @property (nullable) void (^internalSaveViewModePreference)(NSInteger);
 @property (nullable) NSInteger (^internalGetViewModePreference)(void);
 @property VLCLibraryWindowToolbarDisplayFlags internalToolbarDisplayFlags;
+@property BOOL internalMediaLibraryRequired;
 
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
 
@@ -146,6 +147,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"bw-home"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryHomeViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -184,6 +186,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"bw-home"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryFavoritesViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryFavoritesViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -226,6 +229,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-movie"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryVideoViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -260,6 +264,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-movie"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryVideoViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -298,6 +303,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-movie"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryVideoViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -342,6 +348,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-music"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -380,6 +387,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-music"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -418,6 +426,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-music"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -456,6 +465,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-music"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -494,6 +504,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-music"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -534,6 +545,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-music"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -572,6 +584,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"sidebar-movie"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -610,6 +623,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"NSListViewTemplate"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -657,6 +671,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"NSTouchBarTagIcon"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryGroupsViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -695,6 +710,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageNamed:@"NSTouchBarTagIcon"];
             self.internalDisplayImage.template = YES;
         }
+        self.internalMediaLibraryRequired = YES;
         self.internalLibraryViewControllerClass = VLCLibraryGroupsViewController.class;
         self.internalLibraryViewControllerCreator = ^{
             return [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
@@ -1054,6 +1070,11 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 - (NSUInteger)toolbarDisplayFlags
 {
     return self.internalToolbarDisplayFlags;
+}
+
+- (BOOL)mediaLibraryRequired
+{
+    return self.internalMediaLibraryRequired;
 }
 
 @end
