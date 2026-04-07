@@ -437,6 +437,7 @@ static const MP4_Box_data_sbgp_entry_t *
         return p_sampleentry;
 
     /* Lookup designated group description */
+    *pp_descentry = NULL;
     const MP4_Box_t *p_sgpd = MP4_GroupDescriptionByType( p_node, i_grouping_type );
     if( p_sgpd )
     {
@@ -456,6 +457,10 @@ static const MP4_Box_data_sbgp_entry_t *
                 p_entries[p_descdata->i_default_sample_description_index - 1];
         }
     }
+
+    /* If caller requested a description but we couldn't find one, report no match */
+    if( *pp_descentry == NULL )
+        return NULL;
 
     return p_sampleentry;
 }
