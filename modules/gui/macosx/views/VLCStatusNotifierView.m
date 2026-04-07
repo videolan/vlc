@@ -65,6 +65,8 @@ NSString * const VLCMessageTimeoutTimerUserInfoMessageKey = @"VLCMessageTimeoutT
     self.label.stringValue = _NS("Idle");
     self.progressIndicator.hidden = YES;
     self.infoImageView.hidden = NO;
+    self.hidden = YES;
+    self.alphaValue = 0;
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
     [defaultCenter addObserver:self selector:@selector(updateStatus:) name:nil object:nil];
