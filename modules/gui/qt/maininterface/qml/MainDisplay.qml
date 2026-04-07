@@ -260,7 +260,7 @@ FocusScope {
                 // since 03b0de26, already provides the effect the whole source texture with a proper sub-rect,
                 // so the effect here can sample the top edge neighbour pixels, but for the bottom edge we
                 // need to configure the layer:
-                readonly property int bottomExtension: 16
+                readonly property int edgeExtension: 16
                 // The layer width is smaller than the item width, this is intentional because we do not want
                 // to include the area that playqueue occupies in the layer since it is empty. Note that we
                 // still want to do layering here, because even though the layer is smaller than the item
@@ -269,14 +269,14 @@ FocusScope {
                 // need to use background coloring. It is currently a todo to further reduce video memory
                 // consumption by covering the effect for only the area of interest, currently the blur
                 // effect does not support having an extension area for postprocessing.
-                layer.sourceRect: Qt.rect(0, 0, stackView.width + 1, height + bottomExtension)
+                layer.sourceRect: Qt.rect(0, 0, Math.min(stackView.width + edgeExtension, stackViewParent.width), height + edgeExtension)
 
                 Rectangle {
                     // Extension of parent rectangle for the bottom extension.
                     anchors.top: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: stackViewParent.bottomExtension
+                    height: stackViewParent.edgeExtension
                     visible: stackViewParent.layer.enabled && (height > 0)
                     color: parent.color
                 }
@@ -286,7 +286,7 @@ FocusScope {
 
                     // Setting `height` does not seem to work here. Anchoring the effect is not very nice, but it works:
                     anchors.fill: stackViewParent // WARNING: layered item is not necessarily the visual parent of its layer effect.
-                    anchors.bottomMargin: -stackViewParent.bottomExtension
+                    anchors.bottomMargin: -stackViewParent.edgeExtension
 
                     blending: stackViewParent.color.a < (1.0 - Number.EPSILON)
 
@@ -294,17 +294,17 @@ FocusScope {
                     // above, making all the borders problematic, to a less considerable extent. For that reason,
                     // we extend both the top and the bottom edges and use viewport to prevent overdraw:
                     effectRect: Qt.rect(0,
-                                        stackView.height - stackViewParent.bottomExtension,
+                                        stackView.height - stackViewParent.edgeExtension,
                                         width,
-                                        loaderProgress.height + miniPlayer.height + 2 * stackViewParent.bottomExtension)
+                                        loaderProgress.height + miniPlayer.height + 2 * stackViewParent.edgeExtension)
 
                     // Bottom extension is not necessary here, but it is provided to prevent stretching glitch at
                     // initialization. Currently this is not a problem because the effect is opaque since the
                     // background is opaque, and effect visual has higher z than the source visual.
                     sourceVisualRect: ((stackView.width < stackViewParent.width) || blending) ?
                                       Qt.rect(0, 0,
-                                              stackView.width,
-                                              stackView.height + (frostedGlassEffect.blending ? 0 : stackViewParent.bottomExtension)) :
+                                              stackViewParent.layer.sourceRect.width,
+                                              stackView.height + (frostedGlassEffect.blending ? 0 : stackViewParent.edgeExtension)) :
                                       Qt.rect(0, 0, 0, 0)
 
                     effect: frostedGlassEffect
@@ -321,11 +321,18 @@ FocusScope {
                         backgroundColor: (ready ? "transparent" : stackViewParent.color)
                         tint: frostedTheme.bg.secondary
 
-                        // Prevent overdraw (the extension margin should not be painted):
+                        // Prevent overdraw (the extension margin should not be painted).
+                        // This also saves video memory compared to solely using visual rect.
                         viewportRect: Qt.rect(0,
-                                              stackViewParent.bottomExtension,
-                                              width,
-                                              height - (2 * stackViewParent.bottomExtension))
+                                              stackViewParent.edgeExtension,
+                                              Math.min(stackView.width + stackViewParent.edgeExtension, stackViewParent.width),
+                                              height - (2 * stackViewParent.edgeExtension))
+
+                        visualRect: (stackView.width < stackViewParent.width) ? Qt.rect(viewportRect.x,
+                                                                                        viewportRect.y,
+                                                                                        width,
+                                                                                        viewportRect.height)
+                                                                              : Qt.rect(0, 0, 0, 0)
                     }
                 }
 
