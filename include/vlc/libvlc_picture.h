@@ -133,6 +133,10 @@ LIBVLC_API size_t libvlc_picture_list_count( const libvlc_picture_list_t* list )
 /**
  * Returns the picture at the provided index.
  *
+ * The returned picture is owned by the list and remains valid as long as the
+ * list is not destroyed. Use libvlc_picture_retain() if you need to keep a
+ * reference beyond the list's lifetime.
+ *
  * If the index is out of bound, the result is undefined.
  */
 LIBVLC_API libvlc_picture_t* libvlc_picture_list_at( const libvlc_picture_list_t* list,

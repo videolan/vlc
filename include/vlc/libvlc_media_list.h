@@ -80,7 +80,8 @@ libvlc_media_list_set_media( libvlc_media_list_t *p_ml, libvlc_media_t *p_md );
  * The libvlc_media_list_lock should NOT be held upon entering this function.
  *
  * \param p_ml a media list instance
- * \return media instance
+ * \return media instance, or NULL if none. The caller must release the
+ *         returned media with libvlc_media_release().
  */
 LIBVLC_API libvlc_media_t *
     libvlc_media_list_media( libvlc_media_list_t *p_ml );
@@ -138,7 +139,8 @@ LIBVLC_API int
  * \param i_pos position in array where to insert
  * \return media instance at position i_pos, or NULL if not found.
  * In case of success, libvlc_media_retain() is called to increase the refcount
- * on the media.
+ * on the media. The caller must release the returned media with
+ * libvlc_media_release().
  */
 LIBVLC_API libvlc_media_t *
     libvlc_media_list_item_at_index( libvlc_media_list_t *p_ml, int i_pos );
@@ -183,7 +185,10 @@ LIBVLC_API void
 
 /**
  * Get libvlc_event_manager from this media list instance.
- * The p_event_manager is immutable, so you don't have to hold the lock
+ * The p_event_manager is immutable, so you don't have to hold the lock.
+ *
+ * \note The returned event manager is owned by the media list and valid
+ * for the media list's lifetime.
  *
  * \param p_ml a media list instance
  * \return libvlc_event_manager

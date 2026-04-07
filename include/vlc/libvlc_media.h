@@ -434,7 +434,9 @@ LIBVLC_API void libvlc_media_release( libvlc_media_t *p_md );
  * Get the media resource locator (mrl) from a media descriptor object
  *
  * \param p_md a media descriptor object
- * \return string with mrl of media descriptor object
+ * \return string with mrl of media descriptor object.
+ *         The caller is responsible for freeing the returned string
+ *         with libvlc_free().
  */
 LIBVLC_API char *libvlc_media_get_mrl( libvlc_media_t *p_md );
 
@@ -445,6 +447,8 @@ LIBVLC_API char *libvlc_media_get_mrl( libvlc_media_t *p_md );
  * original one.
  *
  * \param p_md a media descriptor object.
+ * \return a new media descriptor object, or NULL on error.
+ *         The caller must release it with libvlc_media_release().
  */
 LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
 
@@ -459,7 +463,9 @@ LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
  *
  * \param p_md the media descriptor
  * \param e_meta the meta to read
- * \return the media's meta
+ * \return the media's meta, or NULL if unset or on error.
+ *         The caller is responsible for freeing the returned string
+ *         with libvlc_free().
  */
 LIBVLC_API char *libvlc_media_get_meta( libvlc_media_t *p_md,
                                              libvlc_meta_t e_meta );
@@ -486,7 +492,9 @@ LIBVLC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
  *
  * \param p_md the media descriptor
  * \param psz_name the meta extra to read (nonnullable)
- * \return the media's meta extra or NULL
+ * \return the media's meta extra or NULL.
+ *         The caller is responsible for freeing the returned string
+ *         with libvlc_free().
  */
 LIBVLC_API char *libvlc_media_get_meta_extra( libvlc_media_t *p_md,
                                               const char *psz_name );
@@ -563,7 +571,9 @@ libvlc_media_subitems( libvlc_media_t *p_md );
 
 /**
  * Get event manager from media descriptor object.
- * NOTE: this function doesn't increment reference counting.
+ *
+ * \note This function does not increment reference counting. The returned
+ * event manager is owned by the media and valid for the media's lifetime.
  *
  * \param p_md a media descriptor object
  * \return event manager object
@@ -667,7 +677,9 @@ LIBVLC_API libvlc_media_parsed_status_t
 /**
  * Sets media descriptor's user_data. user_data is specialized data
  * accessed by the host application, VLC.framework uses it as a pointer to
- * an native object that references a libvlc_media_t pointer
+ * a native object that references a libvlc_media_t pointer.
+ *
+ * \note LibVLC does not manage the lifetime of user_data.
  *
  * \param p_md media descriptor object
  * \param p_new_user_data pointer to user data
@@ -678,11 +690,12 @@ LIBVLC_API void
 /**
  * Get media descriptor's user_data. user_data is specialized data
  * accessed by the host application, VLC.framework uses it as a pointer to
- * an native object that references a libvlc_media_t pointer
+ * a native object that references a libvlc_media_t pointer.
  *
  * \see libvlc_media_set_user_data
  *
  * \param p_md media descriptor object
+ * \return the user_data pointer previously set, or NULL
  */
 LIBVLC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
 
@@ -721,7 +734,8 @@ libvlc_media_get_tracklist( libvlc_media_t *p_md, libvlc_track_type_t type );
  * \param i_type i_type from libvlc_media_track_t
  * \param i_codec i_codec or i_original_fourcc from libvlc_media_track_t
  *
- * \return codec description
+ * \return codec description. The returned string must not be freed
+ *         by the caller.
  */
 LIBVLC_API
 const char *libvlc_media_get_codec_description( libvlc_track_type_t i_type,

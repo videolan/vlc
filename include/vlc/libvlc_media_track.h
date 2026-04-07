@@ -153,7 +153,10 @@ libvlc_media_tracklist_count( const libvlc_media_tracklist_t *list );
  * \param index valid index in the range [0; count[
  *
  * \return a valid track (can't be NULL if libvlc_media_tracklist_count()
- * returned a valid count)
+ * returned a valid count). The returned track is owned by the tracklist and
+ * remains valid as long as the tracklist is not deleted. Use
+ * libvlc_media_track_hold() if you need to keep a reference beyond the
+ * tracklist's lifetime.
  */
 LIBVLC_API libvlc_media_track_t *
 libvlc_media_tracklist_at( libvlc_media_tracklist_t *list, size_t index );

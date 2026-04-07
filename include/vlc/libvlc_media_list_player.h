@@ -94,6 +94,9 @@ LIBVLC_API libvlc_media_list_player_t *
 /**
  * Return the event manager of this media_list_player.
  *
+ * \note The returned event manager is owned by the media list player and
+ * valid for the media list player's lifetime.
+ *
  * \param p_mlp media list player instance
  * \return the event manager
  */

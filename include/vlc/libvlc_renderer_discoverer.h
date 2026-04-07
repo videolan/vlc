@@ -94,7 +94,9 @@ libvlc_renderer_item_release(libvlc_renderer_item_t *p_item);
  *
  * \version LibVLC 3.0.0 or later
  *
- * \return the name of the item (can't be NULL, must *not* be freed)
+ * \return the name of the item (can't be NULL). The returned string is
+ *         owned by the item and valid as long as it is held. It must *not*
+ *         be freed by the caller.
  */
 LIBVLC_API const char *
 libvlc_renderer_item_name(const libvlc_renderer_item_t *p_item);
@@ -105,7 +107,9 @@ libvlc_renderer_item_name(const libvlc_renderer_item_t *p_item);
  *
  * \version LibVLC 3.0.0 or later
  *
- * \return the type of the item (can't be NULL, must *not* be freed)
+ * \return the type of the item (can't be NULL). The returned string is
+ *         owned by the item and valid as long as it is held. It must *not*
+ *         be freed by the caller.
  */
 LIBVLC_API const char *
 libvlc_renderer_item_type(const libvlc_renderer_item_t *p_item);
@@ -115,7 +119,9 @@ libvlc_renderer_item_type(const libvlc_renderer_item_t *p_item);
  *
  * \version LibVLC 3.0.0 or later
  *
- * \return the uri of the item's icon (can be NULL, must *not* be freed)
+ * \return the uri of the item's icon (can be NULL). The returned string is
+ *         owned by the item and valid as long as it is held. It must *not*
+ *         be freed by the caller.
  */
 LIBVLC_API const char *
 libvlc_renderer_item_icon_uri(const libvlc_renderer_item_t *p_item);

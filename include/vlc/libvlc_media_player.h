@@ -254,12 +254,16 @@ LIBVLC_API void libvlc_media_player_set_media( libvlc_media_player_t *p_mi,
  *
  * \param p_mi the Media Player
  * \return the media associated with p_mi, or NULL if no
- *         media is associated
+ *         media is associated. The caller must release the returned media
+ *         with libvlc_media_release().
  */
 LIBVLC_API libvlc_media_t * libvlc_media_player_get_media( libvlc_media_player_t *p_mi );
 
 /**
  * Get the Event Manager from which the media player send event.
+ *
+ * \note The returned event manager is owned by the media player and valid
+ * for the media player's lifetime.
  *
  * \param p_mi the Media Player
  * \return the event manager associated with p_mi
@@ -2045,8 +2049,9 @@ LIBVLC_API void libvlc_video_set_scale( libvlc_media_player_t *p_mi, float f_fac
  * Get current video aspect ratio.
  *
  * \param p_mi the media player
- * \return the video aspect ratio or NULL if unspecified
- * (the result must be released with free() or libvlc_free()).
+ * \return the video aspect ratio or NULL if unspecified.
+ *         The caller is responsible for freeing the returned string
+ *         with libvlc_free().
  */
 LIBVLC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi );
 

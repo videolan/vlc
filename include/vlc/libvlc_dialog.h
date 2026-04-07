@@ -188,15 +188,25 @@ libvlc_dialog_set_error_callback(libvlc_instance_t *p_instance,
 /**
  * Associate an opaque pointer with the dialog id
  *
+ * \note LibVLC does not manage the lifetime of the context pointer.
+ *
  * @version LibVLC 3.0.0 and later.
+ *
+ * @param p_id id of the dialog
+ * @param p_context opaque pointer to associate with the dialog
  */
 LIBVLC_API void
 libvlc_dialog_set_context(libvlc_dialog_id *p_id, void *p_context);
 
 /**
  * Return the opaque pointer associated with the dialog id
+ *
  * \see libvlc_dialog_set_context
+ *
  * @version LibVLC 3.0.0 and later.
+ *
+ * @param p_id id of the dialog
+ * @return the opaque pointer previously set, or NULL
  */
 LIBVLC_API void *
 libvlc_dialog_get_context(libvlc_dialog_id *p_id);
