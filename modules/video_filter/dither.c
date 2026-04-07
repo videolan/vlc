@@ -195,7 +195,7 @@ static int Open( filter_t *p_filter )
     }
 
     // parse colors
-    p_sys->p_palette = malloc( i_num_colors * sizeof( int ) );
+    p_sys->p_palette = vlc_alloc( i_num_colors, sizeof( int ) );
     if ( !p_sys->p_palette )
     {
         msg_Err( p_filter, "Failed to allocate memory for palette" );
@@ -266,16 +266,16 @@ static int Open( filter_t *p_filter )
 
     // allocate dither buffers
     const unsigned int i_width = p_filter->fmt_in.video.i_width;
-    const size_t i_single = i_width * 3 * 2 * sizeof( int );
-    int *p_all = malloc( 3 * i_single );
+    const size_t i_single_in_px = i_width * 3 * 2;
+    int *p_all = vlc_alloc( i_single_in_px, 3 * sizeof( int ) );
     if (!p_all) {
         free(p_sys->p_palette);
         free(p_sys);
         return VLC_ENOMEM;
     }
     p_sys->p_dither_buffer[0] = p_all;
-    p_sys->p_dither_buffer[1] = p_all + ( i_single / sizeof ( int ) );
-    p_sys->p_dither_buffer[2] = p_all + ( i_single / sizeof ( int ) ) * 2;
+    p_sys->p_dither_buffer[1] = p_all + i_single_in_px;
+    p_sys->p_dither_buffer[2] = p_all + i_single_in_px * 2;
 
     p_filter->ops = &filter_ops;
 
