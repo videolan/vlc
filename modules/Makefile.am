@@ -53,7 +53,7 @@ mostlyclean-local: mostlyclean-local-rust
 mostlyclean-local-rust:
 	rm -rf $(CARGO_DEPS) ${CARGO_PLUGINS:%_plugin.la=%.la}
 	$(CARGO) clean \
-		--manifest-path "${srcdir}/Cargo.toml" \
+		--manifest-path "$(top_srcdir)/Cargo.toml" \
 		--target "@RUST_TARGET@" \
 		--target-dir "target-rust"
 endif
