@@ -315,6 +315,12 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         return;
     }
 
+    VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
+    if (segment.mediaLibraryRequired &&
+        VLCMain.sharedInstance.libraryController.libraryModel == nil) {
+        segmentType = VLCLibraryBrowseSegmentType;
+    }
+
     self.libraryWindow.librarySegmentType = segmentType;
 
     if (segmentType == VLCLibraryMusicSegmentType) {
