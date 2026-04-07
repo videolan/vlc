@@ -29,6 +29,10 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowNavigationSidebarOutlineView.h"
 
+#import "library/VLCLibraryController.h"
+
+#import "main/VLCMain.h"
+
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -344,6 +348,18 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         cellView.imageView.contentTintColor = NSColor.VLCAccentColor;
     }
 
+    NSTreeNode * const treeNode = (NSTreeNode *)item;
+    VLCLibrarySegment * const segment = (VLCLibrarySegment *)treeNode.representedObject;
+    const BOOL mediaLibraryUnavailable =
+        segment.mediaLibraryRequired &&
+        VLCMain.sharedInstance.libraryController.libraryModel == nil;
+    if (mediaLibraryUnavailable) {
+        cellView.textField.textColor = NSColor.tertiaryLabelColor;
+        if (@available(macOS 10.14, *)) {
+            cellView.imageView.contentTintColor = NSColor.tertiaryLabelColor;
+        }
+    }
+
     return cellView;
 }
 
@@ -357,6 +373,13 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
         if (segment.segmentType == VLCLibraryHeaderSegmentType) {
             return NSIndexSet.indexSet;
+        }
+
+        const BOOL mediaLibraryUnavailable =
+            segment.mediaLibraryRequired &&
+            VLCMain.sharedInstance.libraryController.libraryModel == nil;
+        if (mediaLibraryUnavailable) {
+            return [outlineView selectedRowIndexes];
         }
     }
 
