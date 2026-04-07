@@ -18,6 +18,7 @@
 import QtQuick
 import QtQuick.Window
 
+import VLC.MainInterface
 import VLC.Util
 
 // This item provides the novel "Dual Kawase" effect [1], which offers a very ideal
@@ -101,6 +102,23 @@ Item {
     // Since the discard occurs at layer level, using this saves video memory.
     property rect viewportRect
 
+    // Visual rect allows to extend the visual (us2) in effect's local coordinates.
+    // Unlike viewport rect, visual rect is not relevant to the layers hence will
+    // not allow saving video memory. The reason for this to exist is that when
+    // viewport rect is used to save video memory, the effect may still need to
+    // cover a certain area without stretching the blurred result and to keep
+    // the postprocess coverage available beyond the blurred result but within
+    // the effect area. A particular use case is when blurred content has large
+    // margins that are empty, where in this case visual rect with clamp to edge
+    // wrap mode would make the effect look as if the whole source was blurred,
+    // but with the benefit of saving video memory, provided that the viewport
+    // rect is set to discard the empty margins. Another use case is freely
+    // adjusting the position of the visual when viewport rect is smaller than
+    // the effect size, since with only viewport rect the visual is always
+    // centered in the parent (effect).
+    property rect visualRect
+    property int visualWrapMode: TextureProviderIndirection.ClampToEdge
+
     // Local viewport rect is viewport rect divided by two, because it is used as the source
     // rect of last layer, which is 2x upsampled by the painter delegate (us2):
     readonly property rect _localViewportRect: ((viewportRect.width > 0 && viewportRect.height > 0)) ? Qt.rect(viewportRect.x / 2,
@@ -108,6 +126,13 @@ Item {
                                                                                                                viewportRect.width / 2,
                                                                                                                viewportRect.height / 2)
                                                                                                      : Qt.rect(0, 0, 0, 0)
+
+    // This is only supposed to be used in visual delegate (us2), maybe we move it there?
+    readonly property rect _localVisualRect: ((visualRect.width > 0 && visualRect.height > 0)) ? Qt.rect(visualRect.x / 2,
+                                                                                                         visualRect.y / 2,
+                                                                                                         visualRect.width / 2,
+                                                                                                         visualRect.height / 2)
+                                                                                               : Qt.rect(0, 0, 0, 0)
 
     property alias sourceTextureProviderObserver: ds1.tpObserver // for accessory
     sourceTextureProviderObserver.notifyAllChanges: !live
@@ -457,14 +482,39 @@ Item {
     UpsamplerShaderEffect {
         id: us2
 
-        // {us1/ds1}.size * 2
-        anchors.centerIn: parent
-        width: (root.viewportRect.width > 0) ? root.viewportRect.width : parent.width
-        height: (root.viewportRect.height > 0) ? root.viewportRect.height : parent.height
+        // {us1/ds1}.size * 2, unless visual rect is used
+        anchors.centerIn: useIndirection ? undefined : parent
+
+        x: useIndirection ? root.visualRect.x : 0
+        y: useIndirection ? root.visualRect.y : 0
+
+        width: {
+            if (useIndirection)
+                return root.visualRect.width
+
+            if (root.viewportRect.width > 0)
+                return root.viewportRect.width
+
+            return parent.width
+        }
+
+        height: {
+            if (useIndirection)
+                return root.visualRect.height
+
+            if (root.viewportRect.height > 0)
+                return root.viewportRect.height
+
+            return parent.height
+        }
+
+        readonly property bool useIndirection: (root.visualRect.width > 0 && root.visualRect.height > 0)
 
         visible: tpObserver.isValid && root.available
 
-        source: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
+        source: useIndirection ? textureProviderIndirection : targetSource
+
+        readonly property Item targetSource: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
 
         property alias tint: root.tint
         property alias tintStrength: root.tintStrength
@@ -474,5 +524,29 @@ Item {
 
         fragmentShader: root.postprocess ? "qrc:///shaders/DualKawaseBlur_upsample_postprocess.frag.qsb"
                                          : "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
+
+        property real _eDPR: MainCtx.effectiveDevicePixelRatio(Window.window) || 1.0
+
+        Connections {
+            target: MainCtx
+
+            function onIntfDevicePixelRatioChanged() {
+                us2._eDPR = MainCtx.effectiveDevicePixelRatio(us2.Window.window) || 1.0
+            }
+        }
+
+        TextureProviderIndirection {
+            id: textureProviderIndirection
+
+            source: us2.targetSource
+
+            textureSubRect: Qt.rect(0,
+                                    0,
+                                    root._localVisualRect.width * us2._eDPR,
+                                    root._localVisualRect.height * us2._eDPR)
+
+            horizontalWrapMode: root.visualWrapMode
+            verticalWrapMode: root.visualWrapMode
+        }
     }
 }
