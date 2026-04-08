@@ -352,7 +352,16 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
     if( p_sys->i_angle <= 0 ) p_sys->i_angle = 1;
 
     /* store type state internally */
-    p_sys->type = type;
+    /* if open2 is called, in 7.1.0 dvd may force the type */
+    switch (p_sys->p_vmg_file->ifo_format)
+    {
+    case IFO_AUDIO:
+        p_sys->type = DVD_A;
+        break;
+    default:
+        p_sys->type = type;
+        break;
+    }
 
     DemuxTitles( p_demux, &p_sys->i_angle );
     if( SET_AREA( p_demux, 0, 0, p_sys->i_angle ) != VLC_SUCCESS )
