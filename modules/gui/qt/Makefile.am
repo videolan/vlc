@@ -1062,7 +1062,8 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/VideoInfoExpandPanel.qml \
 	medialibrary/qml/VideoListDisplay.qml \
 	medialibrary/qml/VideoGridDisplay.qml \
-	medialibrary/qml/MusicAlbumSectionDelegate.qml
+	medialibrary/qml/MusicAlbumSectionDelegate.qml \
+	medialibrary/qml/MLGlobalShortcuts.qml
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary_qmlassets.cpp
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : $(builddir)/medialibrary/res.qrc
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/medialibrary/res.qrc
@@ -1073,7 +1074,6 @@ libqml_module_menus_a_CXXFLAGS = $(libqt_plugin_la_CXXFLAGS)
 libqml_module_menus_a_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS)
 libqml_module_menus_a_QML = \
 	menus/qml/GlobalShortcuts.qml \
-	menus/qml/GlobalShortcutsMedialib.qml \
 	menus/qml/Menubar.qml \
 	menus/qml/ShortcutExt.qml
 nodist_libqml_module_menus_a_SOURCES = menus_qmlassets.cpp

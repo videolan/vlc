@@ -19,6 +19,7 @@ import QtQuick
 
 import VLC.MediaLibrary
 import VLC.Dialogs
+import VLC.Menus
 
 Item {
     ShortcutExt{ sequence:"Ctrl+B"; onActivated: DialogsProvider.bookmarksDialog() }

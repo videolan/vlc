@@ -653,6 +653,7 @@ qml_modules += {
         'medialibrary/qml/VideoListDisplay.qml',
         'medialibrary/qml/VideoGridDisplay.qml',
         'medialibrary/qml/MusicAlbumSectionDelegate.qml',
+        'medialibrary/qml/MLGlobalShortcuts.qml',
     ),
 }
 
@@ -662,7 +663,6 @@ qml_modules += {
     'outdir' : 'VLC/Menus',
     'sources': files(
         'menus/qml/GlobalShortcuts.qml',
-        'menus/qml/GlobalShortcutsMedialib.qml',
         'menus/qml/Menubar.qml',
         'menus/qml/ShortcutExt.qml'
     ),
