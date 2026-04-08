@@ -689,7 +689,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         for( unsigned i = 0; pi_channels_map[i][0]
          && i_channels_src < channel_count; i++ )
         {
-            if( channel_layout_mask & pi_channels_map[i][0] )
+            if( (channel_layout_mask & pi_channels_map[i][0]) && pi_channels_map[i][1] )
                 pi_order_src[i_channels_src++] = pi_channels_map[i][1];
         }
 
