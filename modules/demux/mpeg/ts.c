@@ -1560,12 +1560,12 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
             ( dcd->p_extra[1]&0x10 ) )
         {
             /* display length */
-            if( p_pes->i_buffer + 2 <= i_skip )
+            if( p_pes->i_buffer >= i_skip + 2 )
                 i_length = GetWBE( &p_pes->p_buffer[i_skip] );
 
             i_skip += 2;
         }
-        if( p_pes->i_buffer + 2 <= i_skip )
+        if( p_pes->i_buffer >= i_skip + 2 )
             i_pes_size = GetWBE( &p_pes->p_buffer[i_skip] );
         /* */
         i_skip += 2;
