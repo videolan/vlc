@@ -16,8 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-// NOTE: All imports used throughout the interface
-//       must be imported here as well:
+// NOTE: All available modules used throughout the interface, at least the ones
+//       that are unconditionally available, must be imported here as well, so
+//       that if they can not be imported the interface can close gracefully:
 import QtQml
 import QtQml.Models
 import QtQuick
@@ -32,6 +33,11 @@ import VLC.Style
 import VLC.Util
 import VLC.Playlist
 import VLC.Player
+import VLC.Dialogs
+// import VLC.MediaLibrary
+import VLC.Menus
+import VLC.Network
+import VLC.PlayerControls
 
 Item {
     id: root
