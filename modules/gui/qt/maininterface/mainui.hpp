@@ -37,7 +37,7 @@ private:
     MainCtx* m_mainCtx = nullptr;
     QWindow*       m_interfaceWindow = nullptr;
 
-    QQmlComponent* m_component = nullptr;
+    QPointer<QQmlComponent> m_component;
     QQuickItem* m_rootItem = nullptr;
 
     QPointer<QQmlEngine> m_engineBound;

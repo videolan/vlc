@@ -177,27 +177,34 @@ bool MainUI::setup(QQmlEngine* engine)
 
 QQuickItem* MainUI::createRootItem()
 {
+    if (m_rootItem)
+        return m_rootItem;
+
+    assert(m_component);
+
     QObject* rootObject = m_component->create();
 
     if (m_component->isError())
     {
         for(auto& error: m_component->errors())
             msg_Err(m_intf, "qml loading %s %s:%u", qtu(error.description()), qtu(error.url().toString()), error.line());
-        return nullptr;
+        goto end;
     }
 
     if (rootObject == nullptr)
     {
         msg_Err(m_intf, "unable to create main interface, no root item");
-        return nullptr;
+        goto end;
     }
     m_rootItem = qobject_cast<QQuickItem*>(rootObject);
     if (!m_rootItem)
     {
         msg_Err(m_intf, "unexpected type of qml root item");
-        return nullptr;
+        goto end;
     }
 
+end:
+    delete m_component; // No need to have the component around anymore.
     return m_rootItem;
 }
 
