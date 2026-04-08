@@ -63,6 +63,11 @@ NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAud
     return topInset + bottomInset;
 }
 
++ (CGFloat)paddedHeaderViewHeight
+{
+    return VLCLibraryAudioGroupTableHeaderViewHeight + self.internalPaddingHeight;
+}
+
 - (instancetype)initWithFrame:(NSRect)frameRect
 {
     self = [super initWithFrame:frameRect];
