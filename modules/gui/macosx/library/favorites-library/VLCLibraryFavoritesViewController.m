@@ -106,14 +106,7 @@
 {
     self.favoritesLibrarySplitView.delegate = _splitViewDelegate;
 
-    const CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderView.paddedHeaderViewHeight;
-
-    const NSRect headerFrame = NSMakeRect(0.f,
-                                          0.f,
-                                          self.favoritesLibraryGroupSelectionTableView.bounds.size.width,
-                                          headerHeight);
-    _favoritesHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
-    _favoritesHeaderView.autoresizingMask = NSViewWidthSizable;
+    _favoritesHeaderView = [VLCLibraryAudioGroupTableHeaderView paddedHeaderView];
 
     _favoritesLibraryTableViewDelegate.detailTableHeaderView = self.favoritesHeaderView;
     self.favoritesLibraryGroupSelectionTableView.headerView = self.favoritesHeaderView;

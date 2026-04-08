@@ -190,14 +190,7 @@
     [self.selectedGroupTableView registerNib:tableCellViewNib
                                forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
 
-    const CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderView.paddedHeaderViewHeight;
-
-    const NSRect headerFrame = NSMakeRect(0.f,
-                                          0.f,
-                                          self.groupsTableView.bounds.size.width,
-                                          headerHeight);
-    _selectedGroupTableHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
-    self.selectedGroupTableHeaderView.autoresizingMask = NSViewWidthSizable;
+    _selectedGroupTableHeaderView = [VLCLibraryAudioGroupTableHeaderView paddedHeaderView];
 
     self.tableViewDelegate.detailTableHeaderView = self.selectedGroupTableHeaderView;
 

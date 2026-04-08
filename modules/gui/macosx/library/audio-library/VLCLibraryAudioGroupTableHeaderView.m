@@ -68,6 +68,15 @@ NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAud
     return VLCLibraryAudioGroupTableHeaderViewHeight + self.internalPaddingHeight;
 }
 
++ (instancetype)paddedHeaderView
+{
+    const NSRect headerFrame = NSMakeRect(0.f, 0.f, 0.f, self.paddedHeaderViewHeight);
+    VLCLibraryAudioGroupTableHeaderView * const headerView =
+        [[self alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
+    headerView.autoresizingMask = NSViewWidthSizable;
+    return headerView;
+}
+
 - (instancetype)initWithFrame:(NSRect)frameRect
 {
     self = [super initWithFrame:frameRect];

@@ -187,15 +187,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
-    const CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderView.paddedHeaderViewHeight;
-
-    const NSRect headerFrame = NSMakeRect(0.f,
-                                          0.f,
-                                          _audioGroupSelectionTableView.bounds.size.width,
-                                          headerHeight);
-    _audioCollectionHeaderView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
-    _audioCollectionHeaderView.autoresizingMask = NSViewWidthSizable;
-
+    _audioCollectionHeaderView = [VLCLibraryAudioGroupTableHeaderView paddedHeaderView];
     _audioGroupSelectionTableView.headerView = self.audioCollectionHeaderView;
     _audioGroupSelectionTableView.tableColumns.firstObject.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
 
