@@ -22,6 +22,7 @@ import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Player
 
 Item {
     id: control

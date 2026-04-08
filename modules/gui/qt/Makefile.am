@@ -1063,7 +1063,8 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/VideoListDisplay.qml \
 	medialibrary/qml/VideoGridDisplay.qml \
 	medialibrary/qml/MusicAlbumSectionDelegate.qml \
-	medialibrary/qml/MLGlobalShortcuts.qml
+	medialibrary/qml/MLGlobalShortcuts.qml \
+	medialibrary/qml/Bookmarks.qml
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary_qmlassets.cpp
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : $(builddir)/medialibrary/res.qrc
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/medialibrary/res.qrc
@@ -1108,7 +1109,6 @@ libqml_module_player_a_ModulePath = VLC/Player
 libqml_module_player_a_CXXFLAGS = $(libqt_plugin_la_CXXFLAGS)
 libqml_module_player_a_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS)
 libqml_module_player_a_QML = \
-	player/qml/Bookmarks.qml \
 	player/qml/ControlBar.qml \
 	player/qml/PlaybackSpeed.qml \
 	player/qml/MiniPlayer.qml \

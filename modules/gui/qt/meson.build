@@ -654,6 +654,7 @@ qml_modules += {
         'medialibrary/qml/VideoGridDisplay.qml',
         'medialibrary/qml/MusicAlbumSectionDelegate.qml',
         'medialibrary/qml/MLGlobalShortcuts.qml',
+        'medialibrary/qml/Bookmarks.qml',
     ),
 }
 
@@ -695,7 +696,6 @@ qml_modules += {
    'target' : 'player',
    'outdir' : 'VLC/Player',
    'sources': files(
-       'player/qml/Bookmarks.qml',
        'player/qml/ControlBar.qml',
        'player/qml/PlaybackSpeed.qml',
        'player/qml/MiniPlayer.qml',
