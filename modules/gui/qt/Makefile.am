@@ -1064,7 +1064,8 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/VideoGridDisplay.qml \
 	medialibrary/qml/MusicAlbumSectionDelegate.qml \
 	medialibrary/qml/MLGlobalShortcuts.qml \
-	medialibrary/qml/Bookmarks.qml
+	medialibrary/qml/Bookmarks.qml \
+	medialibrary/qml/MLContextMenu.qml
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary_qmlassets.cpp
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : $(builddir)/medialibrary/res.qrc
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/medialibrary/res.qrc
@@ -1228,7 +1229,6 @@ libqml_module_util_a_QML = \
 	util/qml/FSM.qml \
 	util/qml/FSMState.qml \
 	util/qml/NativeMenu.qml \
-	util/qml/MLContextMenu.qml \
 	util/qml/FadeControllerStateGroup.qml \
 	util/qml/GridSizeHelper.qml \
 	util/qml/DelayedBehavior.qml

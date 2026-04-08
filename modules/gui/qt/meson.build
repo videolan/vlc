@@ -655,6 +655,7 @@ qml_modules += {
         'medialibrary/qml/MusicAlbumSectionDelegate.qml',
         'medialibrary/qml/MLGlobalShortcuts.qml',
         'medialibrary/qml/Bookmarks.qml',
+        'medialibrary/qml/MLContextMenu.qml',
     ),
 }
 
@@ -810,7 +811,6 @@ qml_modules += {
         'util/qml/FSMState.qml',
         'util/qml/GridSizeHelper.qml',
         'util/qml/NativeMenu.qml',
-        'util/qml/MLContextMenu.qml',
         'util/qml/FadeControllerStateGroup.qml',
         'util/qml/DelayedBehavior.qml'
     ),
