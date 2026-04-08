@@ -1092,6 +1092,8 @@ endif
 flex = find_program('flex', required: false)
 bison = find_program('bison', required: false)
 
+bison_gen = disabler()
+flex_gen = disabler()
 if flex.found() and bison.found()
     bison_gen = generator(bison,
         output: ['@BASENAME@.c', '@BASENAME@.h'],
