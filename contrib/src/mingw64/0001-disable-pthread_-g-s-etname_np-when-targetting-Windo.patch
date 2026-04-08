@@ -1,0 +1,46 @@
+From 2d69bdbd1c1e5ccbbf45b4295f077c99dd025c73 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 8 Apr 2026 08:52:53 +0200
+Subject: [PATCH] disable pthread_[g|s]etname_np when targetting Windows XP
+
+It crashes on an Atom N450 in libavcodec.
+---
+ mingw-w64-libraries/winpthreads/include/pthread.h | 2 ++
+ mingw-w64-libraries/winpthreads/src/thread.c      | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/mingw-w64-libraries/winpthreads/include/pthread.h b/mingw-w64-libraries/winpthreads/include/pthread.h
+index 3ab5db741..cf480a983 100644
+--- a/mingw-w64-libraries/winpthreads/include/pthread.h
++++ b/mingw-w64-libraries/winpthreads/include/pthread.h
+@@ -275,8 +275,10 @@ WINPTHREAD_API unsigned  __stdcall pthread_create_wrapper(void *args);
+ WINPTHREAD_API int       pthread_create(pthread_t *th, const pthread_attr_t *attr, void *(* func)(void *), void *arg);
+ WINPTHREAD_API int       pthread_join(pthread_t t, void **res);
+ WINPTHREAD_API int       pthread_detach(pthread_t t);
++#if 0
+ WINPTHREAD_API int       pthread_setname_np(pthread_t thread, const char *name);
+ WINPTHREAD_API int       pthread_getname_np(pthread_t thread, char *name, size_t len);
++#endif
+ 
+ WINPTHREAD_API int pthread_rwlock_init(pthread_rwlock_t *rwlock_, const pthread_rwlockattr_t *attr);
+ WINPTHREAD_API int pthread_rwlock_wrlock(pthread_rwlock_t *l);
+diff --git a/mingw-w64-libraries/winpthreads/src/thread.c b/mingw-w64-libraries/winpthreads/src/thread.c
+index a13d3df55..7a76137a8 100644
+--- a/mingw-w64-libraries/winpthreads/src/thread.c
++++ b/mingw-w64-libraries/winpthreads/src/thread.c
+@@ -1855,6 +1855,7 @@ pthread_setconcurrency (int new_level)
+   return 0;
+ }
+ 
++#if 0
+ int
+ pthread_setname_np (pthread_t thread, const char *name)
+ {
+@@ -1927,3 +1928,4 @@ pthread_getname_np (pthread_t thread, char *name, size_t len)
+   memcpy (name, tv->thread_name, thread_name_len + 1);
+   return 0;
+ }
++#endif /* _WIN32_WINNT_WINXP */
+-- 
+2.52.0.windows.1
+

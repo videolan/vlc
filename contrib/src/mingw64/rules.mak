@@ -57,6 +57,7 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
+	$(APPLY) $(SRC)/mingw64/0001-disable-pthread_-g-s-etname_np-when-targetting-Windo.patch
 	$(MOVE)
 
 .mingw64: mingw64
