@@ -58,20 +58,15 @@ static void Flush(decoder_t *dec)
     date_Set(&sys->end_date, VLC_TICK_INVALID);
 }
 
-static block_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
+static block_t *DecodeBlock(decoder_t *dec, block_t *block)
 {
     decoder_sys_t *sys  = dec->p_sys;
+    block_t *output = NULL;
 
-    if (!*block_ptr)
-        return NULL;
-
-    block_t *block = *block_ptr;
     if (block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
         Flush(dec);
         if (block->i_flags & BLOCK_FLAG_CORRUPTED) {
-            block_Release(block);
-            *block_ptr = NULL;
-            return NULL;
+            goto done;
         }
     }
 
@@ -81,8 +76,7 @@ static block_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
     block->i_pts = VLC_TICK_INVALID;
     if (date_Get(&sys->end_date) == VLC_TICK_INVALID) {
         /* We've just started the stream, wait for the first PTS. */
-        block_Release(block);
-        return NULL;
+        goto done;
     }
 
     const unsigned int block_size = sys->is_pal ? 8640 : 7200;
@@ -95,10 +89,10 @@ static block_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
         int sample_count = dv_get_audio_sample_count(&src[244], sys->is_pal);
 
         if( decoder_UpdateAudioFormat(dec))
-            return NULL;
-        block_t *output = decoder_NewAudioBuffer(dec, sample_count);
+            goto done;
+        output = decoder_NewAudioBuffer(dec, sample_count);
         if (!output)
-            return NULL;
+            goto done;
         output->i_pts    = date_Get(&sys->end_date);
         output->i_length = date_Increment(&sys->end_date, sample_count) - output->i_pts;
 
@@ -113,10 +107,10 @@ static block_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
               *dst++ = GetWBE(&v[sys->is_pal ? 4320 : 3600]);
           }
         }
-        return output;
     }
+done:
     block_Release(block);
-    return NULL;
+    return output;
 }
 
 static int DecodeAudio(decoder_t *dec, block_t *block)
@@ -124,8 +118,8 @@ static int DecodeAudio(decoder_t *dec, block_t *block)
     if (block == NULL) /* No Drain */
         return VLCDEC_SUCCESS;
 
-    block_t **block_ptr = &block, *out;
-    while ((out = DecodeBlock(dec, block_ptr)) != NULL)
+    block_t *out;
+    while ((out = DecodeBlock(dec, block)) != NULL)
         decoder_QueueAudio(dec,out);
     return VLCDEC_SUCCESS;
 }
