@@ -259,7 +259,7 @@ static void resolve_callback(
     }
     else if( event == AVAHI_RESOLVER_FOUND )
     {
-        char a[128];
+        char a[AVAHI_ADDRESS_STR_MAX];
         char *psz_uri = NULL;
         char *psz_addr = NULL;
         AvahiStringList *asl = NULL;
