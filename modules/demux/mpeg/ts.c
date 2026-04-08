@@ -1961,7 +1961,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, vlc_tick_t i_see
                     }
                 }
 
-                if( i_pktpcr == TS_90KHZ_INVALID && p_pid->type == TYPE_STREAM &&
+                if( p_pkt->i_buffer > i_skip && i_pktpcr == TS_90KHZ_INVALID && p_pid->type == TYPE_STREAM &&
                     ts_stream_Find_es( p_pid->u.p_stream, p_pmt ) &&
                    (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
                    (p_pkt->p_buffer[3] & 0xD0) == 0x10    /* Has payload but is not encrypted */
@@ -2057,6 +2057,8 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, ts_90khz_t *
                 if ( b_adaptfield ) // adaptation field
                     i_skip += 1 + __MIN(p_pkt->p_buffer[4], 182);
 
+                if (p_pkt->i_buffer > i_skip)
+                {
                 if ( VLC_SUCCESS == ParsePESHeader( VLC_OBJECT(p_demux), &p_pkt->p_buffer[i_skip],
                                                     p_pkt->i_buffer - i_skip, &i_skip,
                                                     &i_dts, &i_pts, &i_stream_id, NULL ) )
@@ -2065,6 +2067,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, ts_90khz_t *
                         *pi_pcr = i_dts;
                     else if( i_pts != TS_90KHZ_INVALID )
                         *pi_pcr = i_pts;
+                }
                 }
             }
 
