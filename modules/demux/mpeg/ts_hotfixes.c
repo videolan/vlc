@@ -53,6 +53,8 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const block_t *p_pkt )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     unsigned i_skip = PKTHeaderAndAFSize( p_pkt );
+    if ( p_pkt->i_buffer < i_skip )
+        return;
     ts_90khz_t pktpcr = GetPCR( p_pkt );
 
     if( pktpcr != TS_90KHZ_INVALID )
