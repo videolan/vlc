@@ -30,7 +30,7 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
-const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 86.f;
+const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 66.f;
 NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAudioGroupTableHeaderView";
 
 @interface VLCLibraryAudioGroupTableHeaderView ()
