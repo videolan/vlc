@@ -107,9 +107,7 @@
     self.favoritesLibrarySplitView.delegate = _splitViewDelegate;
 
     CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderViewHeight;
-    if (@available(macOS 26.0, *)) {
-        headerHeight += VLCLibraryUIUnits.largeSpacing * 2.f;
-    }
+    headerHeight += VLCLibraryAudioGroupTableHeaderView.internalPaddingHeight;
 
     const NSRect headerFrame = NSMakeRect(0.f,
                                           0.f,

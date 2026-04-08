@@ -51,6 +51,18 @@ NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAud
 
 @implementation VLCLibraryAudioGroupTableHeaderView
 
++ (CGFloat)internalPaddingHeight
+{
+    const CGFloat topInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing;
+    CGFloat bottomInset = 0.f;
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+    if (@available(macOS 26.0, *)) {
+        bottomInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
+    }
+#endif
+    return topInset + bottomInset;
+}
+
 - (instancetype)initWithFrame:(NSRect)frameRect
 {
     self = [super initWithFrame:frameRect];

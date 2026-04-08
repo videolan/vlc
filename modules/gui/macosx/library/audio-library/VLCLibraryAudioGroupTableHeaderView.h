@@ -31,6 +31,7 @@ extern NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier;
 
 @interface VLCLibraryAudioGroupTableHeaderView : NSTableHeaderView
 
+@property (class, readonly) CGFloat internalPaddingHeight;
 @property (nullable, nonatomic) VLCLibraryRepresentedItem *representedItem;
 @property (readwrite, nonatomic) BOOL internalPaddingAddedForContentView;
 

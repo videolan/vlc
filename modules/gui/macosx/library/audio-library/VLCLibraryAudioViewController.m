@@ -188,9 +188,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
     CGFloat headerHeight = VLCLibraryAudioGroupTableHeaderViewHeight;
-    if (@available(macOS 26.0, *)) {
-        headerHeight += VLCLibraryUIUnits.largeSpacing * 2;
-    }
+    headerHeight += VLCLibraryAudioGroupTableHeaderView.internalPaddingHeight;
 
     const NSRect headerFrame = NSMakeRect(0.f,
                                           0.f,
