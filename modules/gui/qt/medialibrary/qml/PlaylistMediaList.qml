@@ -242,7 +242,7 @@ MainViewLoader {
         }
     }
 
-    Widgets.MLDragItem {
+    MLDragItem {
         id: dragItemPlaylist
 
         objectName: "PlaylistMediaListDragItem"

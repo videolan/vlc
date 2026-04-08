@@ -175,7 +175,7 @@ FocusScope {
         }
     }
 
-    Widgets.MLDragItem {
+    MLDragItem {
         id: dragItem
 
         view: view

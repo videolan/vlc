@@ -33,7 +33,7 @@ Widgets.ExpandGridItemView {
 
     // Properties
 
-    property Widgets.MLDragItem dragItem
+    property MLDragItem dragItem
     property MLContextMenu contextMenu
     property var labels
 

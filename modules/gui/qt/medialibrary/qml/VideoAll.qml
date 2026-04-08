@@ -128,7 +128,7 @@ MainViewLoader {
     }
 
 
-    Widgets.MLDragItem {
+    MLDragItem {
         id: dragItem
 
         view: root.currentItem

@@ -480,7 +480,7 @@ FocusScope {
         model: albumModel
     }
 
-    Widgets.MLDragItem {
+    MLDragItem {
         id: albumDragItem
 
         view: (root._currentView instanceof Widgets.TableViewExt) ? (root._currentView?.preferredHeaderItem?.albumsListView ?? null)
@@ -981,7 +981,7 @@ FocusScope {
                 }
             }
 
-            Widgets.MLDragItem {
+            MLDragItem {
                 id: tableDragItem
 
                 view: tableView_id

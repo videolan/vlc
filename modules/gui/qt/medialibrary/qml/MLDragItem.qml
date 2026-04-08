@@ -22,9 +22,10 @@
 import QtQuick
 
 import VLC.MainInterface
+import VLC.Widgets as Widgets
 import VLC.MediaLibrary
 
-DragItem {
+Widgets.DragItem {
     id: root
 
     // string => role for medialib id, data[id] will be pass to Medialib::mlInputItem for SharedInputItem

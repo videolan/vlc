@@ -188,7 +188,7 @@ Widgets.TableViewExt {
         contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
     }
 
-    Widgets.MLDragItem {
+    MLDragItem {
         id: tableDragItem
 
         indexes: indexesFlat ? root.selectionModel.selectedIndexesFlat

@@ -88,7 +88,7 @@ MainViewLoader {
         model: artistModel
     }
 
-    Widgets.MLDragItem {
+    MLDragItem {
         id: artistsDragItem
 
         view: root.currentItem

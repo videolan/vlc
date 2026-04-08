@@ -1065,7 +1065,8 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/MusicAlbumSectionDelegate.qml \
 	medialibrary/qml/MLGlobalShortcuts.qml \
 	medialibrary/qml/Bookmarks.qml \
-	medialibrary/qml/MLContextMenu.qml
+	medialibrary/qml/MLContextMenu.qml \
+	medialibrary/qml/MLDragItem.qml
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary_qmlassets.cpp
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : $(builddir)/medialibrary/res.qrc
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/medialibrary/res.qrc
@@ -1289,7 +1290,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/SubtitleLabel.qml \
 	widgets/qml/MenuCaption.qml \
 	widgets/qml/MenuLabel.qml \
-	widgets/qml/MLDragItem.qml \
 	widgets/qml/NavigableCol.qml \
 	widgets/qml/NavigableRow.qml \
 	widgets/qml/PlayCover.qml \

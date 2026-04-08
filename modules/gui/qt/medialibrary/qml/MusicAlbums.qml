@@ -79,7 +79,7 @@ MainViewLoader {
         ml: MediaLib
     }
 
-    Widgets.MLDragItem {
+    MLDragItem {
         id: albumDragItem
 
         view: root.currentItem

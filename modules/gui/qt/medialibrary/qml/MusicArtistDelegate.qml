@@ -45,7 +45,7 @@ T.ItemDelegate {
 
     property bool selected: false
 
-    required  property Widgets.MLDragItem dragTarget
+    required  property MLDragItem dragTarget
 
     // Aliases
     // Private

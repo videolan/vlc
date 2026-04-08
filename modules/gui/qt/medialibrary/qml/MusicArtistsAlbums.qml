@@ -299,7 +299,7 @@ FocusScope {
                 text: qsTr("Artists")
             }
 
-            Widgets.MLDragItem {
+            MLDragItem {
                 id: musicArtistDragItem
 
                 view: artistList

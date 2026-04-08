@@ -88,7 +88,7 @@ MainViewLoader {
         }
     }
 
-    Widgets.MLDragItem {
+    MLDragItem {
         id: genreDragItem
 
         view: root.currentItem
