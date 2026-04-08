@@ -34,9 +34,12 @@ endif
 endif # MINGW 13
 endif # !HAVE_VISUALSTUDIO
 
+ifdef HAVE_WINSTORE
+# force rebuild of winpthread as pthread_setname_np may be broken, it's OK to use when targeting UWP (Win10)
 HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
 ifeq ($(HAVE_WINPTHREAD),)
 PKGS_FOUND += winpthreads
+endif
 endif
 
 endif # HAVE_WIN32
