@@ -429,6 +429,7 @@ vlc_modules += {
     'name' : 'webvtt',
     'sources' : webvtt_sources,
     'include_directories' : include_directories('webvtt'),
+    'enabled': get_option('css_engine').require(flex.found() and bison.found()).allowed()
 }
 
 ## Xiph.org codecs
