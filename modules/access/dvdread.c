@@ -73,12 +73,25 @@
 #define ANGLE_LONGTEXT N_( \
     "Default DVD angle." )
 
+
+/*****************************************************************************
+ * DVDRead Version Compatibility
+ *****************************************************************************/
+#if DVDREAD_VERSION > DVDREAD_VERSION_CODE(7, 0, 1)
+#define DVDREAD_HAS_DVDVIDEORECORDING 1
+#endif
+
 #if DVDREAD_VERSION >= DVDREAD_VERSION_CODE(7, 0, 0)
 #define DVDREAD_HAS_DVDAUDIO 1
 #endif
 
-#ifdef DVDREAD_HAS_DVDAUDIO
-#define SET_AREA( p_demux, title, chapter, angle  ) \
+#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
+#define SET_AREA( p_demux, title, chapter, angle ) \
+    (((p_sys->type) == DVD_VR ? DvdVRReadSetArea : \
+      (p_sys->type) == DVD_A  ? DvdAudioReadSetArea : \
+                               DvdReadSetArea)( p_demux, title, chapter, -1 ))
+#elif defined(DVDREAD_HAS_DVDAUDIO)
+#define SET_AREA( p_demux, title, chapter, angle ) \
     (((p_sys->type) == DVD_A ? DvdAudioReadSetArea : DvdReadSetArea)( p_demux, title, chapter, -1 ))
 #else
 #define SET_AREA( p_demux, title, chapter, angle ) \
@@ -90,10 +103,14 @@ typedef enum
 {
     DVD_V = 0,
     DVD_A= 1,
+    DVD_VR = 2,
 } dvd_type_t;
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
+
+/* DVD-VideoRecording Optional force method */
+static int OpenVideoRecording( vlc_object_t *p_this );
 
 /* Sets DVD-audio behavior for Open function*/
 static int  OpenAudio ( vlc_object_t * );
@@ -113,6 +130,10 @@ vlc_module_begin ()
         set_capability( "access", 1 )
         add_shortcut( "dvda", "dvd" )
         set_callbacks( OpenAudio, Close )
+    add_submodule()
+        set_capability( "access", 1 )
+        add_shortcut( "dvdvr", "dvd" )
+        set_callbacks( OpenVideoRecording, Close )
 vlc_module_end ()
 
 /* how many blocks DVDRead will read in each loop */
@@ -153,6 +174,20 @@ typedef struct
         struct
         {
             atsi_title_record_t *p_title_table;
+        };
+#endif
+
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+        /* VideoRecording tables */
+        struct
+        {
+          /* address map of recordings */
+          pgc_gi_t    *pgc_gi;
+          /* titles, labels for recordings */
+          ud_pgcit_t  *ud_pgcit;
+          /* keep track of vobu index */
+          /* pointer to current program */
+          pgi_t *p_cur_pgi;
         };
 #endif
 
@@ -201,6 +236,12 @@ static void ESNew( demux_t *, int, int );
 
 static int  DvdReadSetArea  ( demux_t *, int, int, int );
 static int  DvdReadSeek     ( demux_t *, uint32_t );
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+static int  DvdVRReadSetArea  ( demux_t *, int, int, int );
+static int  DvdVRReadSeek( demux_t *, uint32_t );
+static vlc_tick_t DVDVRGetTitleLength( pgc_gi_t *pgc_gi, ud_pgcit_t *ud_pgcit, int program);
+static void DvdVRFindCell( demux_t *p_demux );
+#endif
 #ifdef DVDREAD_HAS_DVDAUDIO
 static int  DvdAudioReadSetArea  ( demux_t *, int, int, int );
 static int  DvdAudioReadSeek( demux_t *, uint32_t );
@@ -281,7 +322,8 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
     dvd_reader_t *p_dvdread;
     switch (type) {
         case DVD_A:
-            msg_Err( p_demux, "Version of libdvdread does not support DVD-audio" );
+        case DVD_VR:
+            msg_Err( p_demux, "Version of libdvdread does not support this DVD-VideoRecording" );
             free( psz_file );
             return VLC_EGENERIC;
         default:
@@ -291,7 +333,8 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
 #else
     switch (type) {
         case DVD_A:
-            msg_Err( p_demux, "Version of libdvdread does not support DVD-audio" );
+        case DVD_VR:
+            msg_Err( p_demux, "Version of libdvdread does not support this DVD-Audio" );
             free( psz_file );
             return VLC_EGENERIC;
         default:
@@ -355,6 +398,13 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
     /* if open2 is called, in 7.1.0 dvd may force the type */
     switch (p_sys->p_vmg_file->ifo_format)
     {
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+   case IFO_VIDEO_RECORDING:
+        p_sys->type = DVD_VR;
+        p_sys->ud_pgcit = p_sys->p_vmg_file->ud_pgcit;
+        p_sys->pgc_gi = p_sys->p_vmg_file->pgc_gi;
+        break;
+#endif
     case IFO_AUDIO:
         p_sys->type = DVD_A;
         break;
@@ -389,6 +439,13 @@ static int OpenAudio( vlc_object_t *p_this )
 {
     return OpenCommon( p_this, DVD_A );
 }
+
+/* should not need a specific callback if libdvdread picks up the type */
+static int OpenVideoRecording( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, DVD_VR );
+}
+
 /*****************************************************************************
  * Close:
  *****************************************************************************/
@@ -460,7 +517,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int *pi_int;
     int i;
 
-    if(unlikely(!p_sys->p_vts_file))
+    /* dvd-vr does not have vts */
+    if(unlikely(!p_sys->p_vts_file && p_sys->type != DVD_VR))
         return VLC_EGENERIC;
 
     switch( i_query )
@@ -480,10 +538,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             f = va_arg( args, double );
 
-#ifdef DVDREAD_HAS_DVDAUDIO
+#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
+            if ( p_sys->type == DVD_VR )
+                return DvdVRReadSeek( p_demux, f * p_sys->i_title_blocks );
+#endif
+#if defined(DVDREAD_HAS_DVDAUDIO)
             if ( p_sys->type == DVD_A )
                 return DvdAudioReadSeek( p_demux, f * p_sys->i_title_blocks );
-            else
 #endif
             return DvdReadSeek( p_demux, f * p_sys->i_title_blocks );
         }
@@ -491,7 +552,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )
             {
                 vlc_tick_t length;
-#ifdef DVDREAD_HAS_DVDAUDIO
+#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
+                if (p_sys->type == DVD_VR )
+                    length = p_sys->titles[p_sys->cur_title]->i_length;
+                else
+#endif
+#if defined(DVDREAD_HAS_DVDAUDIO)
                 if (p_sys->type == DVD_A )
                         length = FROM_SCALE_NZ( ( uint64_t ) p_sys->p_title_table->length_pts );
                 else
@@ -509,7 +575,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )
             {
                 vlc_tick_t length;
-#ifdef DVDREAD_HAS_DVDAUDIO
+#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
+                if (p_sys->type == DVD_VR )
+                    length = p_sys->titles[p_sys->cur_title]->i_length;
+                else
+#endif
+#if defined(DVDREAD_HAS_DVDAUDIO)
                 if ( p_sys->type == DVD_A )
                     length = FROM_SCALE_NZ( ( uint64_t ) p_sys->p_title_table->length_pts );
                 else
@@ -617,20 +688,22 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     dvd_type_t type = p_sys->type;
 
-    if(unlikely(!p_sys->p_vts_file))
+    if(unlikely(!p_sys->p_vts_file && p_sys->type != DVD_VR))
         return VLC_DEMUXER_EOF;
 
     uint8_t p_buffer[DVD_VIDEO_LB_LEN * DVD_BLOCK_READ_ONCE];
     int i_blocks_once, i_read;
 
-#ifdef DVDREAD_HAS_DVDAUDIO
     bool at_end_of_title =
         (type == DVD_V && p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells)
-        || (type == DVD_A && p_sys->i_cur_block>= p_sys->i_title_end_block);
-#else
-    bool at_end_of_title =
-        (type == DVD_V && p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells);
+#if defined(DVDREAD_HAS_DVDAUDIO)
+        || (type == DVD_A && p_sys->i_cur_block >= p_sys->i_title_end_block)
 #endif
+#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
+        || (type == DVD_VR && p_sys->i_cur_cell >= p_sys->i_title_end_cell
+            && !p_sys->i_pack_len)
+#endif
+        ;
 
     /*
      * Playback by cell in this pgc, starting at the cell for our chapter.
@@ -642,6 +715,66 @@ static int Demux( demux_t *p_demux )
     /*
      * Check end of pack, and select the following one
      */
+#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
+    if( !p_sys->i_pack_len && type == DVD_VR
+        && p_sys->i_cur_cell < p_sys->i_title_end_cell )
+    {
+        uint16_t srpn = p_sys->ud_pgcit->m_c_gi[p_sys->i_cur_cell].m_vobi_srpn;
+        if( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs )
+        {
+            msg_Err( p_demux, "invalid m_vobi_srpn %u", srpn );
+            return VLC_EGENERIC;
+        }
+
+        vobu_map_t *map = &p_sys->pgc_gi->pgi[srpn - 1].map;
+
+        p_sys->i_cur_block = map->vob_offset;
+
+        if( map->nr_of_time_info >= 2 )
+        {
+            uint32_t last_adr = map->time_infos[map->nr_of_time_info - 1].vobu_adr;
+            uint32_t last_entn = map->time_infos[map->nr_of_time_info - 1].vobu_entn;
+            if( last_entn > 1 )
+                p_sys->i_pack_len = (uint32_t)( (uint64_t)last_adr
+                    * map->nr_of_vobu_info / ( last_entn - 1 ) );
+            else
+                p_sys->i_pack_len = map->nr_of_vobu_info * (DVD_VIDEO_LB_LEN / 4);
+        }
+        else
+        {
+            uint32_t sects_per_vobu = 0;
+            for( int p = 0; p < p_sys->pgc_gi->nr_of_programs; p++ )
+            {
+                vobu_map_t *m = &p_sys->pgc_gi->pgi[p].map;
+                if( m->nr_of_time_info >= 2
+                    && m->time_infos[m->nr_of_time_info - 1].vobu_entn > 1 )
+                {
+                    sects_per_vobu = m->time_infos[m->nr_of_time_info - 1].vobu_adr
+                                   / ( m->time_infos[m->nr_of_time_info - 1].vobu_entn - 1 );
+                    break;
+                }
+            }
+            if( !sects_per_vobu )
+                sects_per_vobu = DVD_VIDEO_LB_LEN / 4; /* safe overestimate */
+            p_sys->i_pack_len = map->nr_of_vobu_info * sects_per_vobu;
+        }
+
+        p_sys->i_title_offset += map->nr_of_vobu_info;
+
+        p_sys->i_cur_cell++;
+        DvdVRFindCell( p_demux );
+    }
+    else
+#endif
+#if defined(DVDREAD_HAS_DVDAUDIO)
+    if( !p_sys->i_pack_len && type == DVD_A )
+    {
+        p_sys->i_pack_len = p_sys->i_title_blocks;
+        p_sys->i_cur_block = p_sys->p_title_table->atsi_track_pointer_rows[p_sys->i_chapter].start_sector;
+
+    }
+    else
+#endif
     if( !p_sys->i_pack_len && type == DVD_V )
     {
         /* Read NAV packet */
@@ -674,14 +807,6 @@ static int Demux( demux_t *p_demux )
         p_sys->i_title_offset++;
     }
 
-#ifdef DVDREAD_HAS_DVDAUDIO
-    else if( !p_sys->i_pack_len && type == DVD_A )
-    {
-        p_sys->i_pack_len = p_sys->i_title_blocks;
-        p_sys->i_cur_block = p_sys->p_title_table->atsi_track_pointer_rows[p_sys->i_chapter].start_sector;
-
-    }
-#endif
     if( at_end_of_title )
     {
         int k = p_sys->i_title;
@@ -716,7 +841,8 @@ static int Demux( demux_t *p_demux )
     }
 
     p_sys->i_cur_block += i_read;
-    p_sys->i_title_offset += i_read;
+    if( type != DVD_VR )
+        p_sys->i_title_offset += i_read;
 
 #if 0
     msg_Dbg( p_demux, "i_blocks: %d len: %d current: 0x%02x",
@@ -1372,6 +1498,256 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
 }
 #endif
 
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
+                             int i_angle )
+{
+    VLC_UNUSED( i_angle );
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    /* user made title selection */
+    if( i_title >= 0 && i_title < p_sys->i_titles &&
+        i_title != p_sys->i_title )
+    {
+        int i_start_cell, i_end_cell;
+
+        if( p_sys->p_title != NULL )
+            DVDCloseFile( p_sys->p_title );
+        if( !( p_sys->p_title = DVDOpenFile( p_sys->p_dvdread, 0, DVD_READ_TITLE_VOBS ) ) )
+        {
+            msg_Err( p_demux, "cannot open VR_MOVIE.VRO");
+            return VLC_EGENERIC;
+        }
+
+        uint16_t fpid = p_sys->ud_pgcit->ud_pgci_items[i_title].first_prog_id;
+        if( fpid == 0 || fpid == 0xFFFF
+            || fpid > p_sys->pgc_gi->nr_of_programs )
+        {
+            msg_Warn( p_demux, "invalid first_prog_id %u for title %d",
+                      fpid, i_title );
+            return VLC_EGENERIC;
+        }
+        i_start_cell = p_sys->i_title_start_cell = fpid - 1;
+
+        p_sys->i_cur_cell = i_start_cell;
+        i_end_cell = p_sys->i_title_end_cell = p_sys->ud_pgcit->ud_pgci_items[i_title].first_prog_id - 1 +
+           p_sys->ud_pgcit->ud_pgci_items[i_title].nr_of_programs;
+
+        p_sys->i_chapters = 0;
+        for (int c = i_start_cell; c < i_end_cell; c++)
+        {
+            m_c_gi_t *cell = &p_sys->ud_pgcit->m_c_gi[c];
+            p_sys->i_chapters += cell->c_epi_n ? cell->c_epi_n : 1;
+        }
+
+        /* which program we should search for our timestamp */
+        uint16_t m_vobi_srpn =  p_sys->ud_pgcit->m_c_gi[i_start_cell].m_vobi_srpn;
+
+        /* find the corresponding address */
+        p_sys->p_cur_pgi = &p_sys->pgc_gi->pgi[m_vobi_srpn - 1];
+
+        uint32_t vob_offset = p_sys->p_cur_pgi->map.vob_offset;
+
+        p_sys->i_cur_block = vob_offset;
+
+        p_sys->i_title_blocks = 0;
+        for( int c = i_start_cell; c < i_end_cell; c++ )
+        {
+            uint16_t srpn = p_sys->ud_pgcit->m_c_gi[c].m_vobi_srpn;
+            p_sys->i_title_blocks += p_sys->pgc_gi->pgi[srpn - 1].map.nr_of_vobu_info;
+        }
+        p_sys->i_title_offset = 0;
+        p_sys->i_pack_len = 0;
+
+        p_sys->i_title = i_title;
+
+        /*
+         * Destroy obsolete ES by reinitializing program 0
+         * and find all ES in title with ifo data
+         */
+
+        for( int i = 0; i < PS_TK_COUNT; i++ )
+        {
+            ps_track_t *tk = &p_sys->tk[i];
+            if( tk->b_configured )
+            {
+                es_format_Clean( &tk->fmt );
+                if( tk->es ) es_out_Del( p_demux->out, tk->es );
+            }
+            tk->b_configured = false;
+        }
+
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+
+        if( p_sys->cur_title != i_title)
+        {
+            p_sys->updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            p_sys->cur_title = i_title;
+            p_sys->cur_chapter = 0;
+        }
+
+    }
+    else if( i_title != -1 && i_title != p_sys->i_title )
+    {
+        return VLC_EGENERIC; /* Couldn't set title */
+    }
+
+    /* Search for chapter */
+    if( i_chapter >= 0 && i_chapter < p_sys->i_chapters )
+    {
+        int i, j;
+        int accum_chapter = 0;
+        uint32_t chapter_ptm;
+        uint32_t chapter_program;
+        int found = 0;
+
+        /* find the correct entry point */
+        for (i = p_sys->i_title_start_cell;
+            i < p_sys->i_title_end_cell && !found; i++)
+        {
+            int n_ep = p_sys->ud_pgcit->m_c_gi[i].c_epi_n;
+            if( n_ep == 0 )
+            {
+                /* cell has no explicit entry points — treat as one chapter */
+                if( accum_chapter == i_chapter )
+                {
+                    chapter_ptm = p_sys->ud_pgcit->m_c_gi[i].c_v_s_ptm.ptm;
+                    chapter_program = p_sys->ud_pgcit->m_c_gi[i].m_vobi_srpn;
+                    found = 1;
+                    break;
+                }
+                accum_chapter++;
+            }
+            else
+            {
+                for (j = 0; j < n_ep; j++)
+                {
+                    if (accum_chapter == i_chapter)
+                    {
+                        chapter_ptm = p_sys->ud_pgcit->m_c_gi[i].m_c_epi[j].ep_ptm.ptm;
+                        chapter_program = p_sys->ud_pgcit->m_c_gi[i].m_vobi_srpn;
+                        found = 1;
+                        break;
+                    }
+                    accum_chapter++;
+                }
+            }
+        }
+        if (!found)
+            return VLC_EGENERIC;
+
+        /* search map for the address */
+        vobu_map_t map = p_sys->pgc_gi->pgi[chapter_program - 1].map;
+
+        /* find a vobu index to search for */
+        uint32_t relative_ptm = chapter_ptm
+            - p_sys->pgc_gi->pgi[chapter_program - 1].header.vob_v_s_ptm.ptm;
+
+        uint32_t total_pts = p_sys->pgc_gi->pgi[chapter_program - 1].header.vob_v_e_ptm.ptm
+            - p_sys->pgc_gi->pgi[chapter_program - 1].header.vob_v_s_ptm.ptm;
+
+        uint32_t estimated_vobu = 0;
+        if( total_pts > 0 && map.nr_of_vobu_info > 0 )
+            estimated_vobu = (uint32_t)( (uint64_t)relative_ptm
+                * map.nr_of_vobu_info / total_pts );
+
+        int time_offset_i = 0;
+        while ( time_offset_i < map.nr_of_time_info - 1
+            && map.time_infos[time_offset_i + 1].vobu_entn <= estimated_vobu )
+            time_offset_i++;
+
+        uint32_t chapter_offset = map.time_infos[time_offset_i].vobu_adr + map.vob_offset;
+        p_sys->i_cur_block = chapter_offset;
+        p_sys->i_pack_len = 0;
+        p_sys->i_chapter = i_chapter;
+        p_sys->cur_chapter = i_chapter;
+
+        for( int ci = p_sys->i_title_start_cell;
+             ci < p_sys->i_title_end_cell; ci++ )
+        {
+            if( p_sys->ud_pgcit->m_c_gi[ci].m_vobi_srpn == chapter_program )
+            {
+                p_sys->i_cur_cell = ci;
+                break;
+            }
+        }
+
+        p_sys->i_title_offset = 0;
+        for( int ci = p_sys->i_title_start_cell;
+             ci < p_sys->i_cur_cell; ci++ )
+        {
+            uint16_t s = p_sys->ud_pgcit->m_c_gi[ci].m_vobi_srpn;
+            p_sys->i_title_offset += p_sys->pgc_gi->pgi[s - 1].map.nr_of_vobu_info;
+        }
+
+        return VLC_SUCCESS;
+    }
+    else if( i_chapter != -1 )
+    {
+        return VLC_EGENERIC; /* Couln't set chapter */
+    }
+
+    return VLC_SUCCESS;
+}
+
+static void DvdVRFindCell( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->i_next_cell = p_sys->i_cur_cell + 1;
+
+    if( p_sys->i_cur_cell >= p_sys->i_title_end_cell )
+        return;
+
+    /* labelled as entry point in dvd-vr */
+    int chapter = 0;
+
+    /* see if we've reached the next entry point */
+    ud_pgci_t *psi = &p_sys->ud_pgcit->ud_pgci_items[p_sys->i_title];
+    int cell_base = psi->first_prog_id - 1;
+
+    for( int i = 0; i < psi->nr_of_programs; i++ )
+    {
+        int cell_idx = cell_base + i;
+        m_c_gi_t *cell = &p_sys->ud_pgcit->m_c_gi[cell_idx];
+
+        if ( cell_idx == p_sys->i_cur_cell )
+            break;
+
+        /* entry points are chapters, count cell as 1 if no entry points */
+        chapter += cell->c_epi_n ? cell->c_epi_n : 1;
+
+    }
+
+    if( chapter >= p_sys->i_chapters )
+        chapter = p_sys->i_chapters > 0 ? p_sys->i_chapters - 1 : 0;
+
+    if( chapter != p_sys->i_chapter )
+    {
+        p_sys->i_chapter = chapter;
+        if( p_sys->cur_chapter != chapter )
+        {
+            p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
+            p_sys->cur_chapter = chapter;
+        }
+    }
+
+}
+
+static vlc_tick_t DVDVRGetTitleLength( pgc_gi_t *pgc_gi, ud_pgcit_t *ud_pgcit, int program)
+{
+    uint64_t length_ptm = 0;
+    uint16_t first_prog_id = ud_pgcit->ud_pgci_items[program].first_prog_id;
+    uint16_t nr_of_programs = ud_pgcit->ud_pgci_items[program].nr_of_programs;
+
+    for ( int i = 0; i < nr_of_programs; i++ )
+        length_ptm += pgc_gi->pgi[first_prog_id -1 + i].header.vob_v_e_ptm.ptm
+            - pgc_gi->pgi[first_prog_id -1 + i].header.vob_v_s_ptm.ptm;
+
+    return FROM_SCALE_NZ( length_ptm );
+}
+#endif
+
 /*****************************************************************************
  * DvdReadSeek : Goes to a given position on the stream.
  *****************************************************************************
@@ -1506,6 +1882,48 @@ static int DvdAudioReadSeek( demux_t *p_demux, uint32_t i_block_offset ){
     p_sys->i_cur_block = p_sys->p_title_table->atsi_track_pointer_rows[i_chapter].start_sector;
     p_sys->i_pack_len = 4;
     p_sys->i_title_offset = i_block_offset;
+    p_sys->i_chapter = i_chapter;
+
+    return VLC_SUCCESS;
+}
+#endif
+
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+static int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i_chapter = 0;
+    uint32_t vobu_accum = 0;
+
+    int cell_base = p_sys->ud_pgcit->ud_pgci_items[p_sys->i_title].first_prog_id - 1;
+    int nr = p_sys->ud_pgcit->ud_pgci_items[p_sys->i_title].nr_of_programs;
+
+    for( int c = 0; c < nr; c++ )
+    {
+        int cell_idx = cell_base + c;
+        uint16_t srpn = p_sys->ud_pgcit->m_c_gi[cell_idx].m_vobi_srpn;
+        uint16_t cell_vobus = p_sys->pgc_gi->pgi[srpn - 1].map.nr_of_vobu_info;
+
+        if( i_block_offset < vobu_accum + cell_vobus )
+        {
+            p_sys->i_cur_cell = cell_idx;
+            break;
+        }
+        vobu_accum += cell_vobus;
+
+        i_chapter += p_sys->ud_pgcit->m_c_gi[cell_idx].c_epi_n
+                   ? p_sys->ud_pgcit->m_c_gi[cell_idx].c_epi_n : 1;
+    }
+
+    if( i_chapter < p_sys->i_chapters &&
+        p_sys->cur_chapter != i_chapter )
+    {
+        p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
+        p_sys->cur_chapter = i_chapter;
+    }
+
+    p_sys->i_pack_len = 0;
+    p_sys->i_title_offset = vobu_accum;
     p_sys->i_chapter = i_chapter;
 
     return VLC_SUCCESS;
@@ -1684,6 +2102,24 @@ static void DvdReadFindCell( demux_t *p_demux )
     }
 }
 
+static const char* ParseTxtEncoding( uint8_t txt_encoding )
+{
+    const char* charset = "Unknown";
+
+    switch (txt_encoding) {
+    case 0x00: charset = "ASCII"; break;
+    case 0x01: charset = "ISO646-JP"; break;
+    case 0x10: charset = "JIS_C6220-1969-RO"; break;
+    case 0x11: charset = "ISO_8859-1"; break;
+    case 0x12: charset = "SHIFT_JIS"; break;
+    default:
+        charset = "ISO_8859-15";
+        break;
+    }
+
+    return charset;
+}
+
 /*****************************************************************************
  * DemuxTitles: get the titles/chapters or group/tracks structure
  *****************************************************************************/
@@ -1697,6 +2133,13 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
 
     /* Find out number of titles/chapters */
     int32_t i_titles;
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+    const char* disc_charset = NULL;
+    if ( p_sys->type == DVD_VR ) {
+        disc_charset = ParseTxtEncoding( p_sys->p_vmg_file->rtav_vmgi->txt_encoding );
+        i_titles = p_sys->ud_pgcit->nr_of_pgci;
+    } else 
+#endif
 #ifdef DVDREAD_HAS_DVDAUDIO
     if ( p_sys->type == DVD_A )
         i_titles = p_sys->p_vmg_file->info_table_second_sector->nr_of_titles;
@@ -1712,7 +2155,24 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
     {
         int32_t i_chapters = 0;
         int j;
-
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+        if ( p_sys->type == DVD_VR )
+        {
+            /* chapters are entry points across all cells */
+            uint16_t fpid = p_sys->ud_pgcit->ud_pgci_items[i].first_prog_id;
+            if( fpid == 0 || fpid == 0xFFFF
+                || fpid > p_sys->pgc_gi->nr_of_programs )
+                continue; /* invalid PSI, skip this title */
+            int cell_base = fpid - 1;
+            int nr = p_sys->ud_pgcit->ud_pgci_items[i].nr_of_programs;
+            for( int c = 0; c < nr; c++ )
+            {
+                m_c_gi_t *cell = &p_sys->ud_pgcit->m_c_gi[cell_base + c];
+                i_chapters += cell->c_epi_n ? cell->c_epi_n : 1;
+            }
+        }
+        else
+#endif
 #ifdef DVDREAD_HAS_DVDAUDIO
         if ( p_sys->type == DVD_A )
             i_chapters = p_sys->p_vmg_file->info_table_second_sector->tracks_info[i].nr_chapters_in_title;
@@ -1723,19 +2183,75 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
         msg_Dbg( p_demux, "title %d has %d chapters", i, i_chapters );
 
         t = vlc_input_title_New();
+        if ( unlikely( !t ) )
+            return;
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+        if ( p_sys->type == DVD_VR ) {
+            char* converted_title = FromCharset(
+                disc_charset,
+                p_sys->ud_pgcit->ud_pgci_items[i].title,
+                strnlen( p_sys->ud_pgcit->ud_pgci_items[i].title,
+                         sizeof(p_sys->ud_pgcit->ud_pgci_items[i].title) )
+            );
+            if ( converted_title && *converted_title )
+                t->psz_name = converted_title;
+            else {
+                free(converted_title);
+                t->psz_name = strndup(p_sys->ud_pgcit->ud_pgci_items[i].label,
+                                      sizeof(p_sys->ud_pgcit->ud_pgci_items[i].label) );
+            }
+            t->i_length = DVDVRGetTitleLength( p_sys->pgc_gi, p_sys->ud_pgcit, i );
 
-#ifdef DVDREAD_HAS_DVDAUDIO
-        if ( p_sys->type == DVD_A )
-            t->i_length = FROM_SCALE_NZ( p_sys->p_vmg_file->
-                                        info_table_second_sector->tracks_info[i].len_audio_zone_pts );
-#endif
+            /* create one seekpoint per entry point */
+            int cell_base = p_sys->ud_pgcit->ud_pgci_items[i].first_prog_id - 1;
+            int nr = p_sys->ud_pgcit->ud_pgci_items[i].nr_of_programs;
+            for( int c = 0; c < nr; c++ )
+            {
+                m_c_gi_t *cell = &p_sys->ud_pgcit->m_c_gi[cell_base + c];
+                if( cell->c_epi_n > 0 )
+                {
+                    for( int ep = 0; ep < cell->c_epi_n; ep++ )
+                    {
+                        s = vlc_seekpoint_New();
+                        if ( unlikely( !s ) )
+                            goto fail;
 
-        for( j = 0; j < __MAX( i_chapters, 1 ); j++ )
-        {
-            s = vlc_seekpoint_New();
-            TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+                        s->i_time_offset = FROM_SCALE_NZ( (uint64_t)cell->m_c_epi[ep].ep_ptm.ptm );
+                        TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+                    }
+                }
+                else
+                {
+                    s = vlc_seekpoint_New();
+                    if ( unlikely( !s ) )
+                        goto fail;
+
+                    s->i_time_offset = FROM_SCALE_NZ( (uint64_t)cell->c_v_s_ptm.ptm );
+                    TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+                }
+            }
+
         }
-
+        else
+#endif
+        {
+#ifdef DVDREAD_HAS_DVDAUDIO
+            if ( p_sys->type == DVD_A )
+                t->i_length = FROM_SCALE_NZ( p_sys->p_vmg_file->
+                                            info_table_second_sector->tracks_info[i].len_audio_zone_pts );
+#endif
+            for( j = 0; j < __MAX( i_chapters, 1 ); j++ )
+            {
+                s = vlc_seekpoint_New();
+                TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+            }
+        }
         TAB_APPEND( p_sys->i_titles, p_sys->titles, t );
     }
+    return;
+
+fail:
+    vlc_input_title_Delete( t );
+    return;
+
 }
