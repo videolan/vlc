@@ -4134,6 +4134,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 
       AC_MSG_RESULT([yes])
       QT_LIBS=${QT_PKG_ERRORS}
+      QT_PKG_ERRORS=""
       QT_CFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
         --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
         --pro ${srcdir_abs}/modules/gui/qt/qt6.pro \
@@ -4190,7 +4191,7 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_MSG_RESULT([yes])
       ],[
         AC_MSG_RESULT([no])
-        AC_MSG_WARN([qt runtime dependencies are missing, disabling qt interface])
+        QT_PKG_ERRORS="qt runtime dependencies are missing, disabling qt interface"
         have_qt="no"
       ])
 
