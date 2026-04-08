@@ -38,6 +38,8 @@
 #include "avcodec.h"
 #include "../../demux/xiph.h"
 
+#include <stdbit.h>
+
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 
@@ -672,7 +674,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     if( channel_layout_mask )
     {
         uint32_t* pi_order_src = calloc(channel_count,sizeof(uint32_t));
-        
+
         if( unlikely(pi_order_src == NULL) )
         {
             p_dec->fmt_out.audio.i_physical_channels = 0;
@@ -681,6 +683,8 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
             aout_FormatPrepare(&p_dec->fmt_out.audio);
             return;
         }
+
+        assert(stdc_count_ones(channel_layout_mask) == (unsigned)channel_count);
 
         for( unsigned i = 0; pi_channels_map[i][0]
          && i_channels_src < channel_count; i++ )
@@ -727,4 +731,3 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 }
-
