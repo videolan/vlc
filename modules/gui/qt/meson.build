@@ -657,6 +657,7 @@ qml_modules += {
         'medialibrary/qml/Bookmarks.qml',
         'medialibrary/qml/MLContextMenu.qml',
         'medialibrary/qml/MLDragItem.qml',
+        'medialibrary/qml/MLTableColumns.qml',
     ),
 }
 
@@ -871,7 +872,6 @@ qml_modules += {
         'widgets/qml/SubtitleLabel.qml',
         'widgets/qml/MenuCaption.qml',
         'widgets/qml/MenuLabel.qml',
-        'widgets/qml/MLTableColumns.qml',
         'widgets/qml/NavigableCol.qml',
         'widgets/qml/NavigableRow.qml',
         'widgets/qml/PlayCover.qml',

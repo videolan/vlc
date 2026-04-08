@@ -104,7 +104,7 @@ Widgets.TableViewExt {
     }
 
 
-    Widgets.MLTableColumns {
+    MLTableColumns {
         id: tableColumns
     }
 }

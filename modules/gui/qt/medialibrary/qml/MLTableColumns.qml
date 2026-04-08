@@ -19,9 +19,9 @@
 
 import VLC.MainInterface
 import VLC.MediaLibrary
+import VLC.Widgets as Widgets
 
-
-TableColumns {
+Widgets.TableColumns {
 
     onPlayClicked: function (model) {
         MediaLib.addAndPlay(model.id)

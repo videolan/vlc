@@ -318,7 +318,7 @@ MainViewLoader {
             onActionForSelection: root._onActionAtIndex()
 
 
-            Widgets.MLTableColumns {
+            MLTableColumns {
                 id: tableColumns
 
                 fillMode: root.fillMode

@@ -292,7 +292,7 @@ MainViewLoader {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             }
 
-            Widgets.MLTableColumns {
+            MLTableColumns {
                 id: tableColumns
 
                 showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)

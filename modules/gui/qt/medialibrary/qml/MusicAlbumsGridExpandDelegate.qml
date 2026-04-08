@@ -452,7 +452,7 @@ FocusScope {
             Navigation.upItem: headerItem
 
 
-            Widgets.MLTableColumns {
+            MLTableColumns {
                 id: tableColumns
 
                 showCriterias: VLCStyle.isScreenSmall

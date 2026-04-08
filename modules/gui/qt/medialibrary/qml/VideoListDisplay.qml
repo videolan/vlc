@@ -128,7 +128,7 @@ Widgets.TableViewExt {
     // Childs
     //---------------------------------------------------------------------------------------------
 
-    Widgets.MLTableColumns {
+    MLTableColumns {
         id: tableColumns
 
         showCriterias: (listView_id.sortModel === listView_id._modelSmall)

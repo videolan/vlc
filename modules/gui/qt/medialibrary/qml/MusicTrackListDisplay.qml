@@ -198,7 +198,7 @@ Widgets.TableViewExt {
         view: root
     }
 
-    Widgets.MLTableColumns {
+    MLTableColumns {
         id: tableColumns
 
         showCriterias: (root.sortModel === root._modelSmall)

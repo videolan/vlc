@@ -174,7 +174,7 @@ Widgets.TableViewExt {
     // Childs
     //---------------------------------------------------------------------------------------------
 
-    Widgets.MLTableColumns {
+    MLTableColumns {
         id: table
 
         titleCover_width: isMusic ? VLCStyle.trackListAlbumCover_width

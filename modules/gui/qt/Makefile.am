@@ -1066,7 +1066,8 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/MLGlobalShortcuts.qml \
 	medialibrary/qml/Bookmarks.qml \
 	medialibrary/qml/MLContextMenu.qml \
-	medialibrary/qml/MLDragItem.qml
+	medialibrary/qml/MLDragItem.qml \
+	medialibrary/qml/MLTableColumns.qml
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary_qmlassets.cpp
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : $(builddir)/medialibrary/res.qrc
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/medialibrary/res.qrc
@@ -1305,7 +1306,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/PageLoader.qml \
 	widgets/qml/ButtonExt.qml \
 	widgets/qml/TableColumns.qml \
-	widgets/qml/MLTableColumns.qml \
 	widgets/qml/TextFieldExt.qml \
 	widgets/qml/TextToolButton.qml \
 	widgets/qml/TrackDelayButton.qml \
