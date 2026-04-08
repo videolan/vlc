@@ -268,7 +268,7 @@ static void resolve_callback(
         msg_Dbg( p_sys->parent, "service '%s' of type '%s' in domain '%s' port %i",
                  name, type, domain, port );
 
-        avahi_address_snprint(a, sizeof(a)-1, address);
+        avahi_address_snprint(a, sizeof(a), address);
         if( protocol == AVAHI_PROTO_INET6 )
             if( asprintf( &psz_addr, "[%s]", a ) == -1 )
             {
