@@ -102,7 +102,7 @@
 typedef enum
 {
     DVD_V = 0,
-    DVD_A= 1,
+    DVD_A = 1,
     DVD_VR = 2,
 } dvd_type_t;
 
@@ -564,7 +564,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #endif
 #if defined(DVDREAD_HAS_DVDAUDIO)
                 if (p_sys->type == DVD_A )
-                        length = FROM_SCALE_NZ( ( uint64_t ) p_sys->p_title_table->length_pts );
+                    length = FROM_SCALE_NZ( ( uint64_t ) p_sys->p_title_table->length_pts );
                 else
 #endif
                 length = dvdtime_to_time( &p_sys->p_cur_pgc->playback_time );
