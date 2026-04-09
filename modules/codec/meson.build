@@ -526,9 +526,14 @@ vlc_modules += {
 if host_system == 'darwin'
 
     libvlc_vtutils = static_library('vlc_vtutils',
-        files('vt_utils.c', 'vt_utils.h'),
+        files('vt_utils.c', 'vt_utils.h', 'vt_utils_native.m'),
         include_directories : vlc_include_dirs,
-        dependencies : [corevideo_dep])
+        dependencies : [
+            corevideo_dep,
+            frameworks['Metal'],
+            frameworks['Foundation']
+        ]
+    )
 
     vlc_modules += {
         'name' : 'videotoolbox',

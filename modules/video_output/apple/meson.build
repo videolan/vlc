@@ -48,6 +48,7 @@ vlc_modules += {
         frameworks['QuartzCore'],
         frameworks['CoreVideo'],
         frameworks['CoreGraphics'],
+        frameworks['CoreImage'],
         frameworks['VideoToolbox'],
     ],
 }
@@ -72,6 +73,7 @@ if have_ios or have_tvos
         'dependencies' : [
             frameworks['Foundation'],
             frameworks['UIKit'],
+            frameworks['CoreGraphics'],
         ],
     }
 endif

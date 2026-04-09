@@ -44,7 +44,7 @@ if upnp_dep.found()
 
     upnp_darwin_deps = []
     if host_system == 'darwin'
-        systemconfiguration_dep = dependency('SystemConfiguration', required: true)
+        systemconfiguration_dep = dependency('appleframeworks', modules: 'SystemConfiguration', required: true)
         upnp_darwin_deps = [corefoundation_dep, systemconfiguration_dep]
     endif
 

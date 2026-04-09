@@ -41,7 +41,7 @@ libvlccore_link_args = []
 if host_system == 'darwin'
     libvlccore_deps += foundation_dep
     libvlccore_deps += corefoundation_dep
-    libvlccore_deps += dependency('CFNetwork', required: true)
+    libvlccore_deps += declare_dependency(link_args: ['-framework', 'CFNetwork'])
     libvlccore_link_args += [
         '-Wl,-U,_vlc_static_modules',
         '-Wl,-undefined,dynamic_lookup',

@@ -91,6 +91,10 @@ endif
 cc = meson.get_compiler('c')
 cpp = meson.get_compiler('cpp')
 host_system = host_machine.system()
+# VLC uses 'darwin' for all Apple platforms; remap 'ios'/'tvos'/'visionos' accordingly.
+if host_system in ['ios', 'tvos', 'visionos']
+    host_system = 'darwin'
+endif
 
 list_inc_dirs = ['.', 'include']
 if cc.get_id() == 'msvc' or cc.get_id() == 'clang-cl'
@@ -204,8 +208,8 @@ if iconv_dep.found()
 endif
 
 if host_system == 'darwin'
-    corefoundation_dep = dependency('CoreFoundation', required: true)
-    foundation_dep = dependency('Foundation', required: true)
+    corefoundation_dep = declare_dependency(link_args: ['-framework', 'CoreFoundation'])
+    foundation_dep = declare_dependency(link_args: ['-framework', 'Foundation'])
 else
     corefoundation_dep = []
     foundation_dep = []

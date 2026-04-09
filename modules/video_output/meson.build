@@ -13,8 +13,7 @@ else
     missing_win_glew = false
 endif
 
-if missing_win_glew
-    # Our OpenGL code requires glew.h to be present
+if missing_win_glew or have_ios
     opengl_dep = disabler()
 else
     opengl_dep = dependency('gl', required: false)
