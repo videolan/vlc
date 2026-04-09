@@ -1332,10 +1332,7 @@ static int Open(vlc_object_t *obj)
 
     sys->initialisation_status = INITIALISATION_PENDING;
     if (vlc_clone(&sys->thread, MMThread, aout, VLC_THREAD_PRIORITY_LOW))
-    {
-        IMMDeviceEnumerator_Release(sys->it);
         goto error;
-    }
 
     EnterCriticalSection(&sys->lock);
     while (sys->initialisation_status == INITIALISATION_PENDING)
