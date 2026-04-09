@@ -590,6 +590,18 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
         free(role);
     }
 
+    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+    {
+        fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+
+        /* Setup low latency in order to quickly react to ambisonics
+         * filters viewpoint changes. */
+        pw_properties_setf(props, PW_KEY_NODE_LATENCY, "%"PRId64"/%u",
+                           samples_from_vlc_tick(3 * AOUT_MIN_PREPARE_TIME,
+                                                 fmt->i_rate),
+                           fmt->i_rate);
+    }
+
     /* Create the stream */
     struct vlc_pw_stream *s = malloc(sizeof (*s));
     if (unlikely(s == NULL)) {
