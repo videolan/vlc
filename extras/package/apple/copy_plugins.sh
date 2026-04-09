@@ -74,7 +74,9 @@ for entry in "${PLUGIN_ENTRIES[@]}"; do
             "${FRAMEWORK_BIN_PATH}"
         dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
         generate_info_plist "${plugin}" > "${FRAMEWORK_DIR}/Info.plist"
-        codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" "${FRAMEWORK_DIR}"
+        if [ -n "${EXPANDED_CODE_SIGN_IDENTITY}" ]; then
+            codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" "${FRAMEWORK_DIR}"
+        fi
         break
     done
 done
