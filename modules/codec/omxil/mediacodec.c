@@ -852,6 +852,7 @@ android_picture_ctx_copy(picture_context_t *src)
 {
     struct android_picture_ctx *src_ctx = container_of(src, struct android_picture_ctx, s);
     vlc_atomic_rc_inc(&src_ctx->rc);
+    vlc_video_context_Hold(src_ctx->s.vctx);
     return &src_ctx->s;
 }
 
