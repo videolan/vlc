@@ -53,7 +53,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  OpenForce( vlc_object_t * );
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
@@ -61,19 +60,13 @@ vlc_module_begin ()
     set_description( N_("MPEG-PS demuxer") )
     set_shortname( N_("PS") )
     set_subcategory( SUBCAT_INPUT_DEMUX )
-    set_capability( "demux", 1 )
-    set_callbacks( OpenForce, Close )
+    set_capability( "demux", 9 )
+    set_callbacks( Open, Close )
     add_shortcut( "ps" )
 
     add_bool( "ps-trust-timestamps", true, TIME_TEXT,
                  TIME_LONGTEXT )
         change_safe ()
-
-    add_submodule ()
-    set_description( N_("MPEG-PS demuxer") )
-    set_capability( "demux", 9 )
-    set_callbacks( Open, Close )
-    add_shortcut( "ps" )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -144,7 +137,7 @@ static void CreateOrUpdateES( demux_t*p_demux )
 /*****************************************************************************
  * Open
  *****************************************************************************/
-static int OpenCommon( vlc_object_t *p_this, bool b_force )
+static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
@@ -189,12 +182,6 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
         i_skip = CDXA_HEADER_SIZE;
         msg_Info( p_demux, "Detected CDXA-PS" );
         /* FIXME: have a proper way to decap CD sectors or make an access stream filter */
-    }
-    else if( b_force )
-    {
-        msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
-                  "continuing anyway" );
-        i_max_packets = 0;
     }
 
     for( unsigned i=0; i<i_max_packets; i++ )
@@ -275,16 +262,6 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     /* TODO prescanning of ES */
 
     return VLC_SUCCESS;
-}
-
-static int OpenForce( vlc_object_t *p_this )
-{
-    return OpenCommon( p_this, true );
-}
-
-static int Open( vlc_object_t *p_this )
-{
-    return OpenCommon( p_this, p_this->force );
 }
 
 /*****************************************************************************
