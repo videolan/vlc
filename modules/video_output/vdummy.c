@@ -64,7 +64,6 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static void            DisplayStat(vout_display_t *, picture_t *);
-static int             Control(vout_display_t *, int);
 
 /*****************************************************************************
  * OpenVideo: activates dummy vout display method
