@@ -923,18 +923,17 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     {   /* Default device selected by policy and with stream routing.
          * "Do not use eMultimedia" says MSDN. */
         msg_Dbg(aout, "using default device");
+        sys->device_name = NULL;
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(it, eRender,
                                                          eConsole, &sys->dev);
         if (FAILED(hr))
         {
             msg_Err(aout, "cannot get default device (error 0x%lX)", hr);
             sys->device_status = DEVICE_ACQUISITION_FAILED;
-            sys->device_name = NULL;
         }
         else
         {
             sys->device_status = DEVICE_ACQUIRED;
-            sys->device_name = NULL;
         }
     }
 
