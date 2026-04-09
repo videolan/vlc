@@ -1,6 +1,7 @@
 skins2_enabled = get_option('skins2') \
-    .disable_auto_if(host_system != 'windows' and host_system != 'darwin' and not x11_dep.found()).allowed() and \
-    freetype_dep.found()
+    .disable_auto_if(host_system != 'windows' and host_system != 'darwin' and not x11_dep.found()) \
+    .require(freetype_dep.found(), error_message: 'Freetype is not available') \
+    .allowed()
 
 skins2_flags = []
 skins2_deps = [ freetype_dep ]
