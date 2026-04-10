@@ -1,6 +1,6 @@
 # Mysofa
 
-MYSOFA_VERSION := 0.5
+MYSOFA_VERSION := 0.8
 MYSOFA_URL = $(GITHUB)/hoene/libmysofa/archive/v$(MYSOFA_VERSION).tar.gz
 
 PKGS += mysofa
@@ -21,6 +21,9 @@ $(TARBALLS)/libmysofa-$(MYSOFA_VERSION).tar.gz:
 
 mysofa: libmysofa-$(MYSOFA_VERSION).tar.gz .sum-mysofa
 	$(UNPACK)
+	$(APPLY) $(SRC)/mysofa/0001-Only-link-with-MATH-library-if-it-s-found.patch
+	$(APPLY) $(SRC)/mysofa/0002-Only-link-with-ZLib-library-if-it-s-found.patch
+	$(call pkg_static,"libmysofa.pc.cmake")
 	$(MOVE)
 
 MYSOFA_CONF := -DBUILD_TESTS=OFF \
@@ -32,4 +35,3 @@ MYSOFA_CONF := -DBUILD_TESTS=OFF \
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
-

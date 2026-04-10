@@ -1,0 +1,69 @@
+From 08f7ea36809aa3d156a118e6a6a0c2f03f4ce3d8 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 10 Apr 2026 14:12:37 +0200
+Subject: [PATCH 1/2] Only link with MATH library if it's found
+
+If it's not found it may not be required (or linking will fail).
+---
+ src/CMakeLists.txt | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index ec4de1d..9c3cd5e 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -15,12 +15,9 @@ configure_file (config.h.in ${PROJECT_SOURCE_DIR}/src/config.h)
+ if(NOT MSVC)
+   if(NOT WIN32)
+     find_library(MATH m)
+-  else()
+-    set(MATH "")
+   endif()
+   include(FindZLIB)
+ else()
+-  set(MATH "")
+   find_program(NUGET nuget)
+   if (NUGET)
+     execute_process(COMMAND ${NUGET} install zlib)
+@@ -35,15 +32,12 @@ endif()
+ if(NOT MSVC)
+   if(NOT WIN32)
+     find_library(MATH m)
+-  else()
+-    set(MATH "")
+   endif()
+   include(FindZLIB)
+   include_directories(${ZLIB_INCLUDE_DIRS})
+   SET(PKG_CONFIG_PRIVATELIBS "-lm ${PKG_CONFIG_PRIVATELIBS}")
+   SET(PKG_CONFIG_PRIVATELIBS "-lz ${PKG_CONFIG_PRIVATELIBS}")
+ else()
+-    set(MATH "")
+     find_program(NUGET nuget)
+     if (NOT NUGET)
+        message(FATAL "Cannot find nuget command line tool.\nInstall it with e.g. choco install nuget.commandline")
+@@ -58,14 +52,20 @@ set(libsrc hrtf/reader.c hdf/superblock.c hdf/dataobject.c hdf/btree.c hdf/fract
+   hrtf/lookup.c hrtf/tools.c hrtf/kdtree.c hrtf/neighbors.c hrtf/interpolate.c hrtf/resample.c hrtf/loudness.c hrtf/minphase.c hrtf/easy.c hrtf/cache.c 
+   resampler/speex_resampler.c)
+ add_library(mysofa-static STATIC ${libsrc})
+-target_link_libraries (mysofa-static ${MATH} ${ZLIB_LIBRARIES})
++if(MATH)
++    target_link_libraries (mysofa-static ${MATH})
++endif()
++target_link_libraries (mysofa-static ${ZLIB_LIBRARIES})
+ SET_TARGET_PROPERTIES(mysofa-static PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1 POSITION_INDEPENDENT_CODE ON)
+ install(TARGETS mysofa-static
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+ if(BUILD_SHARED_LIBS)
+   add_library(mysofa-shared SHARED ${libsrc})
+-  target_link_libraries (mysofa-shared ${MATH} ${ZLIB_LIBRARIES})
++  if(MATH)
++    target_link_libraries (mysofa-shared ${MATH})
++  endif()
++  target_link_libraries (mysofa-shared ${ZLIB_LIBRARIES})
+   SET_TARGET_PROPERTIES(mysofa-shared PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1)
+   set_property(TARGET mysofa-shared PROPERTY VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+   set_property(TARGET mysofa-shared PROPERTY SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR} )
+-- 
+2.52.0.windows.1
+
