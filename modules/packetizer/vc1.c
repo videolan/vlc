@@ -608,12 +608,14 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
                 if( i_fps_num != 0 && i_fps_den != 0 &&
                    (p_dec->fmt_in->video.i_frame_rate == 0 ||
                     p_dec->fmt_in->video.i_frame_rate_base == 0) )
+                {
                     vlc_ureduce( &p_es->video.i_frame_rate, &p_es->video.i_frame_rate_base, i_fps_num, i_fps_den, 0 );
 
                 if( !p_sys->b_sequence_header )
                 {
                     msg_Dbg( p_dec, "frame rate %d/%d", p_es->video.i_frame_rate, p_es->video.i_frame_rate_base );
                     date_Change( &p_sys->dts, p_es->video.i_frame_rate * 2, p_es->video.i_frame_rate_base );
+                }
                 }
             }
             if( bs_read1( &s ) && /* Color Format */
