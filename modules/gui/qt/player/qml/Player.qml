@@ -323,6 +323,8 @@ FocusScope {
                     // video memory, depending on the excess content in the last layer:
                     viewportRect: Qt.rect((width - parent.width) / 2, (height - parent.height) / 2, parent.width, parent.height)
 
+                    funcOnNextEffectureTextureChange: liveTimer.transientTurnOnLive
+
                     TextureProviderIndirection {
                         id: textureProviderIndirection
 
