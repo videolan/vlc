@@ -164,14 +164,23 @@ Item {
                 // If source texture is not valid, update will be requeued in `scheduleUpdate()`.
                 // That being said, a non-valid source texture should have (-1) as comparison key,
                 // which we already checked here.
-                root.scheduleUpdate()
+
+                if (root.funcOnNextEffectureTextureChange) {
+                    root.funcOnNextEffectureTextureChange()
+                }
             }
         }
+    }
+
+    // This is not respected when `live` is true, it is only for the `scheduleUpdate(true)` calls.
+    property var funcOnNextEffectureTextureChange: function() {
+        root.scheduleUpdate()
     }
 
     // When `onNextEffectiveTextureChange` is set, the update is scheduled automatically when the effective
     // texture changes, which is when the texture itself changes or the texture remains the same but
     // the sub-rect changes (such as, the new texture is a different part of the same atlas texture).
+    // This behavior can be fine-tuned with the property `funcOnNextEffectureTextureChange`.
     function scheduleUpdate(onNextEffectiveTextureChange /* : bool */ = false) {
         if (live)
             return // no-op
