@@ -41,8 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, weak) NSView *videoLibraryView;
 @property (readonly, weak) NSScrollView *videoLibraryCollectionViewScrollView;
 @property (readonly, weak) VLCLibraryCollectionView *videoLibraryCollectionView;
-@property (readonly, weak) NSScrollView *videoLibraryTableViewScrollView;
-@property (readonly, weak) NSTableView *videoLibraryTableView;
+@property (readonly, weak) NSSplitView *videoLibrarySplitView;
+@property (readonly, weak) NSScrollView *videoLibraryGroupsTableViewScrollView;
+@property (readonly, weak) NSTableView *videoLibraryGroupsTableView;
+@property (readonly, weak) NSScrollView *videoLibraryGroupSelectionTableViewScrollView;
+@property (readonly, weak) NSTableView *videoLibraryGroupSelectionTableView;
 
 @property (readonly, nullable) VLCLibraryVideoDataSource *libraryVideoDataSource;
 @property (readonly, nullable) VLCLibraryShowsDataSource *libraryShowsDataSource;

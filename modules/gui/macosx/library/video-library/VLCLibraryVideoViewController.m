@@ -123,20 +123,11 @@
     _videoLibraryView = libraryWindow.videoLibraryView;
     _videoLibraryCollectionViewScrollView = libraryWindow.videoLibraryCollectionViewScrollView;
     _videoLibraryCollectionView = libraryWindow.videoLibraryCollectionView;
-
-    _videoLibraryTableViewScrollView = libraryWindow.videoLibraryGroupSelectionTableViewScrollView;
-    libraryWindow.videoLibrarySplitView.hidden = YES;
-    libraryWindow.videoLibraryGroupsTableViewScrollView.hidden = YES;
-
-    [_videoLibraryTableViewScrollView removeFromSuperview];
-    _videoLibraryTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_videoLibraryView addSubview:_videoLibraryTableViewScrollView];
-    [NSLayoutConstraint activateConstraints:@[
-        [_videoLibraryTableViewScrollView.topAnchor constraintEqualToAnchor:_videoLibraryView.topAnchor],
-        [_videoLibraryTableViewScrollView.leadingAnchor constraintEqualToAnchor:_videoLibraryView.leadingAnchor],
-        [_videoLibraryTableViewScrollView.trailingAnchor constraintEqualToAnchor:_videoLibraryView.trailingAnchor],
-        [_videoLibraryTableViewScrollView.bottomAnchor constraintEqualToAnchor:_videoLibraryView.bottomAnchor],
-    ]];
+    _videoLibrarySplitView = libraryWindow.videoLibrarySplitView;
+    _videoLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
+    _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
+    _videoLibraryGroupSelectionTableViewScrollView = libraryWindow.videoLibraryGroupSelectionTableViewScrollView;
+    _videoLibraryGroupSelectionTableView = libraryWindow.videoLibraryGroupSelectionTableView;
 }
 
 - (void)setupTableView
@@ -144,15 +135,15 @@
     NSNib * const tableCellViewNib =
         [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
                                  bundle:nil];
-    [self.videoLibraryTableView registerNib:tableCellViewNib
-                              forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
+    [self.videoLibraryGroupSelectionTableView registerNib:tableCellViewNib
+                                           forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
 }
 
 - (void)setupVideoDataSource
 {
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
     self.libraryVideoDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    self.libraryVideoDataSource.tableView = self.videoLibraryTableView;
+    self.libraryVideoDataSource.tableView = self.videoLibraryGroupSelectionTableView;
     self.libraryVideoDataSource.collectionView = self.videoLibraryCollectionView;
 }
 
@@ -162,7 +153,8 @@
     self.libraryShowsDataSource.libraryModel =
         VLCMain.sharedInstance.libraryController.libraryModel;
     self.libraryShowsDataSource.collectionView = self.videoLibraryCollectionView;
-    self.libraryShowsDataSource.detailTableView = self.videoLibraryTableView;
+    self.libraryShowsDataSource.masterTableView = self.videoLibraryGroupsTableView;
+    self.libraryShowsDataSource.detailTableView = self.videoLibraryGroupSelectionTableView;
 }
 
 - (void)setupMoviesDataSource
@@ -170,7 +162,7 @@
     _libraryMoviesDataSource = [[VLCLibraryMoviesDataSource alloc] init];
     self.libraryMoviesDataSource.libraryModel =
         VLCMain.sharedInstance.libraryController.libraryModel;
-    self.libraryMoviesDataSource.tableView = self.videoLibraryTableView;
+    self.libraryMoviesDataSource.tableView = self.videoLibraryGroupSelectionTableView;
     self.libraryMoviesDataSource.collectionView = self.videoLibraryCollectionView;
 }
 
@@ -232,7 +224,7 @@
 
 - (void)setupVideoLibraryViews
 {
-    _videoLibraryTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
 
     const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
     const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
@@ -241,9 +233,9 @@
     _videoLibraryCollectionViewScrollView.contentInsets = defaultInsets;
     _videoLibraryCollectionViewScrollView.scrollerInsets = scrollerInsets;
 
-    _videoLibraryTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _videoLibraryTableViewScrollView.contentInsets = defaultInsets;
-    _videoLibraryTableViewScrollView.scrollerInsets = scrollerInsets;
+    _videoLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _videoLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
+    _videoLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
 }
 
 #pragma mark - Show the video library view
@@ -274,9 +266,9 @@
     [self setupVideoDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
 
-    self.videoLibraryTableView.dataSource = self.libraryVideoDataSource;
-    self.videoLibraryTableView.target = self.libraryVideoDataSource;
-    self.videoLibraryTableView.delegate = _videoLibraryTableViewDelegate;
+    self.videoLibraryGroupSelectionTableView.dataSource = self.libraryVideoDataSource;
+    self.videoLibraryGroupSelectionTableView.target = self.libraryVideoDataSource;
+    self.videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
 
     [self.libraryVideoDataSource reloadData];
 
@@ -298,9 +290,8 @@
     [self setupShowsDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryShowsDataSource;
 
-    self.videoLibraryTableView.dataSource = self.libraryShowsDataSource;
-    self.videoLibraryTableView.target = self.libraryShowsDataSource;
-    self.videoLibraryTableView.delegate = _videoLibraryTableViewDelegate;
+    // Shows uses the master/detail split view, not the single sectioned table.
+    // The master and detail table views are wired in setupShowsDataSource.
 
     [self.libraryShowsDataSource reloadData];
 
@@ -327,9 +318,9 @@
     [self setupMoviesDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryMoviesDataSource;
 
-    self.videoLibraryTableView.dataSource = self.libraryMoviesDataSource;
-    self.videoLibraryTableView.target = self.libraryMoviesDataSource;
-    self.videoLibraryTableView.delegate = _videoLibraryTableViewDelegate;
+    self.videoLibraryGroupSelectionTableView.dataSource = self.libraryMoviesDataSource;
+    self.videoLibraryGroupSelectionTableView.target = self.libraryMoviesDataSource;
+    self.videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
 
     [self.libraryMoviesDataSource reloadData];
 
@@ -363,13 +354,25 @@
 
 - (void)presentVideoLibraryView:(VLCLibraryViewModeSegment)viewModeSegment
 {
+    const NSInteger librarySegmentType = self.libraryWindow.librarySegmentType;
+    const BOOL isShowsSegment = (librarySegmentType == VLCLibraryShowsVideoSubSegmentType);
+
     [self.libraryWindow displayLibraryView:self.videoLibraryView];
+
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
-        self.videoLibraryTableViewScrollView.hidden = YES;
+        self.videoLibrarySplitView.hidden = YES;
         self.videoLibraryCollectionViewScrollView.hidden = NO;
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
-        self.videoLibraryTableViewScrollView.hidden = NO;
         self.videoLibraryCollectionViewScrollView.hidden = YES;
+        if (isShowsSegment) {
+            // Shows uses the master/detail split view
+            self.videoLibrarySplitView.hidden = NO;
+            self.videoLibraryGroupsTableViewScrollView.hidden = NO;
+        } else {
+            // Videos and Movies use the single sectioned table
+            self.videoLibrarySplitView.hidden = NO;
+            self.videoLibraryGroupsTableViewScrollView.hidden = YES;
+        }
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
@@ -428,8 +431,8 @@
     const NSInteger rowForLibraryItem = [self.libraryVideoDataSource rowForLibraryItem:_awaitingPresentingLibraryItem];
     if (rowForLibraryItem != NSNotFound) {
         NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:rowForLibraryItem];
-        [self.videoLibraryTableView selectRowIndexes:indexSet byExtendingSelection:NO];
-        [self.videoLibraryTableView scrollRowToVisible:rowForLibraryItem];
+        [self.videoLibraryGroupSelectionTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+        [self.videoLibraryGroupSelectionTableView scrollRowToVisible:rowForLibraryItem];
     }
 
     _awaitingPresentingLibraryItem = nil;
