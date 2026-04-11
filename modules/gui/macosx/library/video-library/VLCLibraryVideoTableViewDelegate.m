@@ -22,13 +22,14 @@
 
 #import "VLCLibraryVideoTableViewDelegate.h"
 
-#import "VLCLibraryVideoDataSource.h"
-
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibrarySectionedTableViewDataSource.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryUIUnits.h"
 
-#import "library/groups-library/VLCLibraryGroupsDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 
 @implementation VLCLibraryVideoTableViewDelegate
 
@@ -42,26 +43,69 @@
     return self;
 }
 
-- (NSView *)tableView:(NSTableView *)tableView 
-   viewForTableColumn:(NSTableColumn *)tableColumn
-                  row:(NSInteger)row
-{
-    VLCLibraryTableCellView * const cellView =
-        (VLCLibraryTableCellView *)[super tableView:tableView
-                                 viewForTableColumn:tableColumn
-                                                row:row];
-    NSParameterAssert(cellView != nil);
+#pragma mark - NSTableViewDelegate
 
-    if ([tableView.dataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
-        VLCLibraryVideoDataSource * const videoTableViewDataSource =
-            (VLCLibraryVideoDataSource *)tableView.dataSource;
-        NSParameterAssert(videoTableViewDataSource != nil);
-        if (tableView == videoTableViewDataSource.masterTableView) {
-            cellView.representedVideoLibrarySection = row;
+- (NSView *)tableView:(NSTableView *)tableView
+    viewForTableColumn:(NSTableColumn *)tableColumn
+                   row:(NSInteger)row
+{
+    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
+        return [super tableView:tableView viewForTableColumn:tableColumn row:row];
+    }
+
+    NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
+        (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
+
+    if ([sectionedDataSource isHeaderRow:row]) {
+        VLCLibraryAudioGroupTableHeaderView *headerView =
+            (VLCLibraryAudioGroupTableHeaderView *)[tableView makeViewWithIdentifier:VLCLibraryAudioGroupTableHeaderViewIdentifier
+                                                                               owner:self];
+        if (headerView == nil) {
+            headerView = [[VLCLibraryAudioGroupTableHeaderView alloc] initWithFrame:NSZeroRect];
+            headerView.identifier = VLCLibraryAudioGroupTableHeaderViewIdentifier;
+        }
+
+        NSString * const title = [sectionedDataSource titleForRow:row];
+        [headerView updateWithRepresentedItem:nil
+                                fallbackTitle:title
+                               fallbackDetail:nil];
+        return headerView;
+    }
+
+    return [super tableView:tableView viewForTableColumn:tableColumn row:row];
+}
+
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
+{
+    if ([tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
+        NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
+            (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
+        if ([sectionedDataSource isHeaderRow:row]) {
+            return VLCLibraryAudioGroupTableHeaderViewHeight;
         }
     }
 
-    return cellView;
+    return VLCLibraryUIUnits.mediumTableViewRowHeight;
+}
+
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
+{
+    if ([tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
+        NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
+            (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
+        return ![sectionedDataSource isHeaderRow:row];
+    }
+    return YES;
+}
+
+- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
+{
+    if ([tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
+        NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
+            (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
+        return [sectionedDataSource isHeaderRow:row];
+    }
+    return NO;
 }
 
 @end
