@@ -37,6 +37,7 @@ extern NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotif
 @property (readwrite, weak) NSCollectionView *collectionView;
 @property (readwrite, weak) NSTableView *masterTableView;
 @property (readwrite, weak) NSTableView *detailTableView;
+@property (readwrite, weak) NSTableView *tableView;
 
 - (void)reloadData;
 
