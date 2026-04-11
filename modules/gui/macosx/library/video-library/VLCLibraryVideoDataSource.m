@@ -42,6 +42,40 @@
 
 NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification";
 
+/**
+ * Represents one row in the flattened table view model.
+ * A row is either a section header or a media item within a section.
+ */
+@interface VLCLibraryVideoFlattenedRow : NSObject
+@property (readonly) BOOL isHeader;
+@property (readonly) VLCMediaLibraryParentGroupType parentType;
+@property (readonly) NSInteger itemIndex; // -1 for header rows
++ (instancetype)headerForGroup:(VLCMediaLibraryParentGroupType)group;
++ (instancetype)itemAtIndex:(NSInteger)index inGroup:(VLCMediaLibraryParentGroupType)group;
+@end
+
+@implementation VLCLibraryVideoFlattenedRow
+
++ (instancetype)headerForGroup:(VLCMediaLibraryParentGroupType)group
+{
+    VLCLibraryVideoFlattenedRow * const row = [VLCLibraryVideoFlattenedRow new];
+    row->_isHeader = YES;
+    row->_parentType = group;
+    row->_itemIndex = -1;
+    return row;
+}
+
++ (instancetype)itemAtIndex:(NSInteger)index inGroup:(VLCMediaLibraryParentGroupType)group
+{
+    VLCLibraryVideoFlattenedRow * const row = [VLCLibraryVideoFlattenedRow new];
+    row->_isHeader = NO;
+    row->_parentType = group;
+    row->_itemIndex = index;
+    return row;
+}
+
+@end
+
 @interface VLCLibraryVideoDataSource ()
 {
     NSMutableArray *_recentsArray;
