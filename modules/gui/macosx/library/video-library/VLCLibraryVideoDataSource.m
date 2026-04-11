@@ -369,6 +369,25 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
     return [self titleForVideoGroup:[self parentTypeForRow:row]];
 }
 
+- (VLCLibraryRepresentedItem *)representedItemForHeaderRow:(NSInteger)row
+{
+    if (![self isHeaderRow:row]) {
+        return nil;
+    }
+
+    const VLCMediaLibraryParentGroupType parentType = [self parentTypeForRow:row];
+    NSArray * const groupArray = [self arrayForGroup:parentType];
+    if (groupArray.count == 0) {
+        return nil;
+    }
+
+    NSString * const title = [self titleForVideoGroup:parentType];
+    VLCMediaLibraryDummyItem * const groupItem =
+        [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:title
+                                                 withMediaItems:groupArray];
+    return [[VLCLibraryRepresentedItem alloc] initWithItem:groupItem parentType:parentType];
+}
+
 #pragma mark - Table view data source (sectioned flat table)
 
 - (BOOL)recentItemsPresent

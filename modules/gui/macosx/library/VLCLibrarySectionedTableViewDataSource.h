@@ -24,12 +24,17 @@
 
 #import "library/VLCLibraryTableViewDataSource.h"
 
+@class VLCLibraryRepresentedItem;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibrarySectionedTableViewDataSource <VLCLibraryTableViewDataSource>
 
 - (BOOL)isHeaderRow:(NSInteger)row;
 - (NSString *)titleForRow:(NSInteger)row;
+
+@optional
+- (nullable VLCLibraryRepresentedItem *)representedItemForHeaderRow:(NSInteger)row;
 
 @end
 

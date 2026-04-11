@@ -66,7 +66,11 @@
         }
 
         NSString * const title = [sectionedDataSource titleForRow:row];
-        [headerView updateWithRepresentedItem:nil
+        VLCLibraryRepresentedItem *representedItem = nil;
+        if ([sectionedDataSource respondsToSelector:@selector(representedItemForHeaderRow:)]) {
+            representedItem = [sectionedDataSource representedItemForHeaderRow:row];
+        }
+        [headerView updateWithRepresentedItem:representedItem
                                 fallbackTitle:title
                                fallbackDetail:nil];
         return headerView;
