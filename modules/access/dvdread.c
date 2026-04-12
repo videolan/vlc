@@ -312,6 +312,12 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
         case DVD_A:
             p_dvdread = DVDOpenAudio( p_demux, &cbs, psz_path );
             break;
+#ifndef DVDREAD_HAS_DVDVIDEORECORDING
+        case DVD_VR:
+            msg_Err( p_demux, "Version of libdvdread does not support DVD-VideoRecording" );
+            free( psz_file );
+            return VLC_EGENERIC;
+#endif
         default:
             p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
             break;
@@ -320,27 +326,23 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
     dvd_logger_cb cbs = { .pf_log = DvdReadLog };
 
     dvd_reader_t *p_dvdread;
-    switch (type) {
-        case DVD_A:
-        case DVD_VR:
-            msg_Err( p_demux, "Version of libdvdread does not support this DVD-VideoRecording" );
-            free( psz_file );
-            return VLC_EGENERIC;
-        default:
-            p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
-            break;
+    if ( type == DVD_A || type == DVD_VR )
+    {
+        msg_Err( p_demux, "Version of libdvdread does not support %s",
+                 type == DVD_A ? "DVD-Audio" : "DVD-VideoRecording" );
+        free( psz_file );
+        return VLC_EGENERIC;
     }
+    p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
 #else
-    switch (type) {
-        case DVD_A:
-        case DVD_VR:
-            msg_Err( p_demux, "Version of libdvdread does not support this DVD-Audio" );
-            free( psz_file );
-            return VLC_EGENERIC;
-        default:
-            dvd_reader_t *p_dvdread = DVDOpen( psz_path );
-            break;
+    if ( type == DVD_A || type == DVD_VR )
+    {
+        msg_Err( p_demux, "Version of libdvdread does not support %s",
+                 type == DVD_A ? "DVD-Audio" : "DVD-VideoRecording" );
+        free( psz_file );
+        return VLC_EGENERIC;
     }
+    dvd_reader_t *p_dvdread = DVDOpen( psz_path );
 #endif
 #if DVDREAD_VERSION < DVDREAD_VERSION_CODE(6, 1, 2)
     LocaleFree( psz_path );
