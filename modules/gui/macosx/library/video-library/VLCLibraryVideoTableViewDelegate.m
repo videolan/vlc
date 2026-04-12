@@ -31,6 +31,9 @@
 
 #import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
 
+@interface VLCLibraryVideoHeaderRowView : NSTableRowView
+@end
+
 @implementation VLCLibraryVideoTableViewDelegate
 
 - (instancetype)init
@@ -110,6 +113,33 @@
         return [sectionedDataSource isHeaderRow:row];
     }
     return NO;
+}
+
+- (NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row
+{
+    if ([tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
+        NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
+            (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
+        if ([sectionedDataSource isHeaderRow:row]) {
+            VLCLibraryVideoHeaderRowView * const rowView = [[VLCLibraryVideoHeaderRowView alloc] init];
+            return rowView;
+        }
+    }
+    return nil;
+}
+
+@end
+
+@implementation VLCLibraryVideoHeaderRowView
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.wantsLayer = YES;
+        self.layer.masksToBounds = NO;
+    }
+    return self;
 }
 
 @end

@@ -185,6 +185,7 @@ NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAud
 
     self.layer = [CALayer new];
     self.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.layer.masksToBounds = NO;
 
     if (@available(macOS 26.0, *)) {
     } else {

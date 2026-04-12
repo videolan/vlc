@@ -137,6 +137,8 @@
                                  bundle:nil];
     [self.videoLibraryGroupSelectionTableView registerNib:tableCellViewNib
                                            forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
+    
+    self.videoLibraryGroupSelectionTableView.floatsGroupRows = NO;
 }
 
 - (void)setupVideoDataSource
