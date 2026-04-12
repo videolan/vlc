@@ -325,17 +325,16 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
 #elif DVDREAD_VERSION >= DVDREAD_VERSION_CODE(6, 1, 0)
     dvd_logger_cb cbs = { .pf_log = DvdReadLog };
 
-    dvd_reader_t *p_dvdread;
-    if ( type == DVD_A || type == DVD_VR )
+    if ( type != DVD_V )
     {
         msg_Err( p_demux, "Version of libdvdread does not support %s",
                  type == DVD_A ? "DVD-Audio" : "DVD-VideoRecording" );
         free( psz_file );
         return VLC_EGENERIC;
     }
-    p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
+    dvd_reader_t *p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
 #else
-    if ( type == DVD_A || type == DVD_VR )
+    if ( type != DVD_V )
     {
         msg_Err( p_demux, "Version of libdvdread does not support %s",
                  type == DVD_A ? "DVD-Audio" : "DVD-VideoRecording" );
@@ -399,6 +398,7 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
 
     /* store type state internally */
     /* if open2 is called, in 7.1.0 dvd may force the type */
+#if defined(DVDREAD_HAS_DVDAUDIO) || defined(DVDREAD_HAS_DVDVIDEORECORDING)
     switch (p_sys->p_vmg_file->ifo_format)
     {
 #ifdef DVDREAD_HAS_DVDVIDEORECORDING
@@ -408,13 +408,18 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
         p_sys->pgc_gi = p_sys->p_vmg_file->pgc_gi;
         break;
 #endif
+#ifdef DVDREAD_HAS_DVDAUDIO
     case IFO_AUDIO:
         p_sys->type = DVD_A;
         break;
+#endif
     default:
         p_sys->type = type;
         break;
     }
+#else
+    p_sys->type = type;
+#endif
 
     DemuxTitles( p_demux, &p_sys->i_angle );
     if( SET_AREA( p_demux, 0, 0, p_sys->i_angle ) != VLC_SUCCESS )
