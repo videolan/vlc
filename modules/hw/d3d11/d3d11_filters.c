@@ -243,6 +243,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     {
         /* the output filter configuration may have changed since the filter
          * was opened */
+        picture_Release( p_outpic );
         picture_Release( p_pic );
         return NULL;
     }
