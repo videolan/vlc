@@ -1,0 +1,28 @@
+From d00fede91911ed2a302ff707ce1259c837d036d7 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 13 Apr 2026 13:23:32 +0200
+Subject: [PATCH 3/3] Use VirtualAllocFromApp for old UWP targets
+
+---
+ libarchive/archive_read_disk_windows.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/libarchive/archive_read_disk_windows.c b/libarchive/archive_read_disk_windows.c
+index 117ca505..f2f5d402 100644
+--- a/libarchive/archive_read_disk_windows.c
++++ b/libarchive/archive_read_disk_windows.c
+@@ -725,7 +725,11 @@ start_next_async_read(struct archive_read_disk *a, struct tree *t)
+ 	if (olp->buff == NULL) {
+ 		void *p;
+ 		size_t s = (size_t)align_num_per_sector(t, READ_BUFFER_SIZE);
++#if defined(WINAPI_FAMILY_PARTITION) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && NTDDI_VERSION < NTDDI_WIN10_19H1
++		p = VirtualAllocFromApp(NULL, s, MEM_COMMIT, PAGE_READWRITE);
++#else
+ 		p = VirtualAlloc(NULL, s, MEM_COMMIT, PAGE_READWRITE);
++#endif
+ 		if (p == NULL) {
+ 			archive_set_error(&a->archive, ENOMEM,
+ 			    "Couldn't allocate memory");
+-- 
+2.52.0.windows.1
+
