@@ -818,6 +818,7 @@ int D3D11OpenCPUConverter( filter_t *p_filter )
         vlc_assert_unreachable();
     }
     p_filter->vctx_out = D3D11CreateVideoContext(dec_device, vctx_fmt, DXGI_FORMAT_UNKNOWN);
+    vlc_decoder_device_Release(dec_device);
     if ( p_filter->vctx_out == NULL )
     {
         msg_Dbg(p_filter, "no video context");
