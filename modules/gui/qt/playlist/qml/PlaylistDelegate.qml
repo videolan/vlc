@@ -181,6 +181,7 @@ T.Control {
                 asynchronous: true
                 opacity: (status === Image.Ready ? 1.0 : 0.0)
                 radius: VLCStyle.listAlbumCover_radius
+                backgroundColor: theme.bg.primary
 
                 sourceSize: Qt.size(width * eDPR, height * eDPR)
 
@@ -229,23 +230,6 @@ T.Control {
                         // Remove the preparse guard, enough time has passed:
                         artwork.source = Qt.binding(() => { return artwork.targetSource; })
                     }
-                }
-
-                Rectangle {
-                    // NOTE: If the image is opaque and if there is depth buffer, this rectangle
-                    //       is not going to be painted by the graphics backend. Though, it will
-                    //       still have its own scene graph node, as well as QML item.
-                    // TODO: Investigate if using `ImageExt` just for its built-in background
-                    //       coloring is worth it.
-                    anchors.centerIn: parent
-                    anchors.alignWhenCentered: false
-                    width: parent.paintedWidth
-                    height: parent.paintedHeight
-                    z: -1
-
-                    color: theme.bg.primary
-
-                    visible: (artwork.status === Image.Ready)
                 }
 
                 Widgets.DefaultShadow {
