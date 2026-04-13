@@ -34,7 +34,11 @@
 #include <vlc_filter.h>
 #include <vlc_rand.h>
 
-#include <libprojectM/projectM.hpp>
+#ifdef HAVE_PROJECTM4
+# include <projectM-4/projectM.h>
+#else
+# include <libprojectM/projectM.hpp>
+#endif
 
 #ifndef _WIN32
 # include <locale.h>
@@ -282,7 +286,13 @@ static void *Thread( void *p_data )
     locale_t loc;
     locale_t oldloc;
 
+#ifdef HAVE_PROJECTM4
+    projectm_handle p_projectm; 
+#else
     projectM *p_projectm;
+#endif
+
+#ifndef HAVE_PROJECTM4
 #ifndef HAVE_PROJECTM2
     char *psz_config;
 #else
@@ -290,6 +300,7 @@ static void *Thread( void *p_data )
     char *psz_title_font;
     char *psz_menu_font;
     projectM::Settings settings;
+#endif
 #endif
 
     if( vlc_gl_MakeCurrent( gl ) != VLC_SUCCESS )
@@ -303,17 +314,23 @@ static void *Thread( void *p_data )
     oldloc = uselocale (loc);
 
     /* Create the projectM object */
+#ifdef HAVE_PROJECTM4
+    p_projectm = projectm_create();
+    projectm_set_window_size(p_projectm, 
+                             var_InheritInteger( p_filter, "projectm-width" ), 
+                             var_CreateGetInteger( p_filter, "projectm-height" ));
+#else
 #ifndef HAVE_PROJECTM2
     psz_config = var_InheritString( p_filter, "projectm-config" );
     p_projectm = new projectM( psz_config );
     free( psz_config );
 #else
     psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
+
 #ifdef _WIN32
     if ( psz_preset_path == NULL )
         psz_preset_path = config_GetSysPath(VLC_PKG_DATA_DIR, "visualization");
 #endif
-
     psz_title_font                = var_InheritString( p_filter, "projectm-title-font" );
     psz_menu_font                 = var_InheritString( p_filter, "projectm-menu-font" );
 
@@ -340,14 +357,23 @@ static void *Thread( void *p_data )
     free( psz_title_font );
     free( psz_preset_path );
 #endif /* HAVE_PROJECTM2 */
+#endif /* HAVE_PROJECTM4 */
 
+#ifdef HAVE_PROJECTM4
+    p_sys->i_buffer_size = projectm_pcm_get_max_samples();
+
+#else
     p_sys->i_buffer_size = p_projectm->pcm()->maxsamples;
+
+#endif
     p_sys->p_buffer = (float*)calloc( p_sys->i_buffer_size,
                                       sizeof( float ) );
 
     /* Choose a preset randomly or projectM will always show the first one */
+#ifndef HAVE_PROJECTM4 
     if ( p_projectm->getPlaylistSize() > 0 )
         p_projectm->selectPreset( (unsigned)vlc_mrand48() % p_projectm->getPlaylistSize() );
+#endif
 
     /* */
     for( ;; )
@@ -359,14 +385,28 @@ static void *Thread( void *p_data )
         bool quit;
 
         if( vlc_gl_surface_CheckSize( gl, &width, &height ) )
+        {
+#ifdef HAVE_PROJECTM4
+            projectm_set_window_size( p_projectm, width, height );
+
+#else
             p_projectm->projectM_resetGL( width, height );
+
+#endif
+        }
 
         /* Render the image and swap the buffers */
         vlc_mutex_lock( &p_sys->lock );
         if( p_sys->i_nb_samples > 0 )
         {
+#ifdef HAVE_PROJECTM4
+            projectm_pcm_add_float( p_projectm, p_sys->p_buffer, p_sys->i_nb_samples, (projectm_channels)1 );
+        
+#else
             p_projectm->pcm()->addPCMfloat( p_sys->p_buffer,
                                             p_sys->i_nb_samples );
+                
+#endif
             p_sys->i_nb_samples = 0;
         }
         quit = p_sys->b_quit;
@@ -375,7 +415,13 @@ static void *Thread( void *p_data )
         if( quit )
             break;
 
+#ifdef HAVE_PROJECTM4
+        projectm_opengl_render_frame( p_projectm );
+
+#else
         p_projectm->renderFrame();
+
+#endif
 
         /* */
         vlc_tick_wait( i_deadline );
@@ -383,7 +429,13 @@ static void *Thread( void *p_data )
         vlc_gl_Swap( gl );
     }
 
+#ifdef HAVE_PROJECTM4
+    projectm_destroy( p_projectm );
+
+#else
     delete p_projectm;
+
+#endif
 
     if (loc != (locale_t)0)
     {
