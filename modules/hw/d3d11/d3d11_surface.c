@@ -255,6 +255,11 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
                 else
                 {
                     msg_Dbg(p_filter, "can't create intermediate texture (hr=0x%lX)", hr);
+                    if (sys->procOutTexture)
+                    {
+                        ID3D11Texture2D_Release(sys->procOutTexture);
+                        sys->procOutTexture = NULL;
+                    }
                     ID3D11Texture2D_Release(sys->staging);
                     sys->staging = NULL;
                 }
