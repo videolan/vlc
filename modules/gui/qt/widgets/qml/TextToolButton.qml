@@ -34,6 +34,8 @@ T.ToolButton {
 
     padding: VLCStyle.margin_xxsmall
 
+    property real radius: VLCStyle.button_radius
+
     // Keys
 
     Keys.priority: Keys.AfterItem
@@ -69,5 +71,6 @@ T.ToolButton {
         enabled: theme.initialized
         color: theme.bg.primary
         border.color: visualFocus ? theme.visualFocus : "transparent"
+        radius: control.radius
     }
 }
