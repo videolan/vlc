@@ -1,0 +1,42 @@
+From 679d5b7775386a8dc4d0fffe792dac3a00e5fe41 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Mon, 13 Apr 2026 20:47:25 +0300
+Subject: [PATCH] Don't assume strndup to be missing on Windows
+
+Recent (git) versions of mingw-w64 have started providing the
+strndup function (because it is part of C23).
+
+The configure check for HAVE_STRNDUP does detect this correctly,
+thus just rely on that check instead of hardcoding extra
+conditions on top of it.
+
+This fixes building with such versions of mingw-w64.
+---
+ upnp/src/api/UpnpString.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/upnp/src/api/UpnpString.c b/upnp/src/api/UpnpString.c
+index a554a423..9e0dfd5a 100644
+--- a/upnp/src/api/UpnpString.c
++++ b/upnp/src/api/UpnpString.c
+@@ -42,7 +42,7 @@ static size_t strnlen(const char *s, size_t n)
+ #endif		       /* _WIN32 */
+ 
+ /* strndup() is a GNU extension. */
+-#if !HAVE_STRNDUP || defined(_WIN32)
++#if !HAVE_STRNDUP
+ static char *strndup(const char *__string, size_t __n)
+ {
+ 	size_t strsize = strnlen(__string, __n);
+@@ -55,7 +55,7 @@ static char *strndup(const char *__string, size_t __n)
+ 
+ 	return newstr;
+ }
+-#endif /* HAVE_STRNDUP && !defined(_WIN32) */
++#endif /* !HAVE_STRNDUP */
+ 
+ /*!
+  * \brief Internal implementation of the class UpnpString.
+-- 
+2.43.0
+
