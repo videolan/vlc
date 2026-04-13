@@ -30,6 +30,9 @@ T.Button {
     property color color: "white"
     property string description
 
+    property int textStyle: Text.Normal
+    property color textStyleColor: "black"
+
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
@@ -53,6 +56,8 @@ T.Button {
         font: control.font
         color: control.color
         text: control.text
+        style: control.textStyle
+        styleColor: control.textStyleColor
     }
 
     background: Item {
