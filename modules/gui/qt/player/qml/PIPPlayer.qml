@@ -37,6 +37,8 @@ T.Control {
     property real dragYMin: undefined
     property real dragYMax: undefined
 
+    property int textStyle: Text.Outline
+
     Accessible.role: Accessible.Graphic
     Accessible.focusable: false
     Accessible.name: qsTr("video content")
@@ -129,6 +131,8 @@ T.Control {
                   ? VLCIcons.pause_filled
                   : VLCIcons.play_filled
 
+            textStyle: root.textStyle
+
             onClicked: MainPlaylistController.togglePlayPause()
         }
 
@@ -145,6 +149,8 @@ T.Control {
             font.pixelSize: VLCStyle.icon_PIP
             description: qsTr("close video")
             text: VLCIcons.close
+
+            textStyle: root.textStyle
 
             onClicked: MainPlaylistController.stop()
         }
@@ -163,6 +169,8 @@ T.Control {
 
             description: qsTr("maximize player")
             text: VLCIcons.fullscreen
+
+            textStyle: root.textStyle
 
             onClicked: MainCtx.requestShowPlayerView()
         }
