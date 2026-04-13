@@ -1869,7 +1869,8 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
 
 
 #ifdef DVDREAD_HAS_DVDAUDIO
-static int DvdAudioReadSeek( demux_t *p_demux, uint32_t i_block_offset ){
+static int DvdAudioReadSeek( demux_t *p_demux, uint32_t i_block_offset )
+{
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_chapter;
     uint32_t i_seek_blocks = 0;
