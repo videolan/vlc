@@ -38,6 +38,8 @@ T.ToolButton {
 
     property color backgroundColor: theme.bg.primary
 
+    property real radius: VLCStyle.button_radius
+
     // Settings
 
     padding: 0
@@ -99,6 +101,8 @@ T.ToolButton {
         color: control.backgroundColor
 
         border.color: visualFocus ? theme.visualFocus : theme.border
+
+        radius: control.radius
     }
 
     contentItem: Widgets.IconLabel {
