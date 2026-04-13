@@ -727,6 +727,7 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_t
         if (D3D11_AllocateShaderView(vd, scaleProc->d3d_dev->d3ddevice, scaleProc->d3d_fmt,
                                     _upscaled, 0, scaleProc->SRVs) != VLC_SUCCESS)
         {
+            amfOutput->Release();
             return (-ENOTSUP);
         }
 
