@@ -148,6 +148,8 @@ FocusScope {
             leftPadding: padding + VLCStyle.dp(4)
             rightPadding: (textField.width - clearButton.x)
 
+            radius: clearButton.radius
+
             selectByMouse: true
 
             placeholderText: qsTr("filter")
