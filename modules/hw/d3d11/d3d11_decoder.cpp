@@ -280,14 +280,13 @@ int D3D11OpenBlockDecoder( vlc_object_t *obj )
             D3D11CreateVideoContext(p_sys->dec_dev, p_sys->output_format->formatTexture, p_sys->output_format->alphaTexture);
         if (!p_sys->vctx)
         {
-            vlc_decoder_device_Release(dec_dev);
+            delete p_sys;
             return VLC_EGENERIC;
         }
 
         if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) )
         {
-            vlc_video_context_Release(p_sys->vctx);
-            vlc_decoder_device_Release(dec_dev);
+            delete p_sys;
             return VLC_EGENERIC;
         }
     }
