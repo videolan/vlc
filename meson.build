@@ -160,10 +160,12 @@ subdir('buildsystem/simd_checks')
 #   named `name_dep`
 #
 
-# zlib library
+# zlib library: meson has specific handling for the library and would
+# fallback to pkgconfig for the contrib
 z_dep = dependency('zlib', required: false)
 if z_dep.found()
     cdata.set('HAVE_ZLIB', 1)
+    cdata.set('HAVE_ZLIB_H', 1)
 endif
 
 # Math library
@@ -271,7 +273,6 @@ check_c_headers = [
     ['valgrind/valgrind.h'],
     ['X11/Xlib.h'],
     ['xlocale.h'],
-    ['zlib.h', { 'args' : [contrib_inc_args] }],
     ['wordexp.h'],
     ['dxgidebug.h'],
     ['d3dx9effect.h'],
