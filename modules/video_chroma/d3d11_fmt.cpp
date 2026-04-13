@@ -179,6 +179,9 @@ static LARGE_INTEGER D3D11_GetSystemDriver(vlc_object_t *obj, d3d11_device_t *d3
     if (FAILED(hr))
     {
         msg_Dbg(obj, "Unable to initialize COM library");
+        SysFreeString(bRootNamespace);
+        SysFreeString(bWQL);
+        SysFreeString(bVideoController);
         return {};
     }
 
