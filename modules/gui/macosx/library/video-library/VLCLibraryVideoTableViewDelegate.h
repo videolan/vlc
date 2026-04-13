@@ -24,9 +24,13 @@
 
 #import "library/VLCLibraryTableViewDelegate.h"
 
+@class VLCLibraryHomeViewVideoCarouselContainerView;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryVideoTableViewDelegate : VLCLibraryTableViewDelegate
+
+@property (readwrite, weak, nullable) VLCLibraryHomeViewVideoCarouselContainerView *recentsCarouselView;
 
 @end
 

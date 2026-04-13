@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)titleForRow:(NSInteger)row;
 
 @optional
+- (BOOL)isCarouselRow:(NSInteger)row;
 - (nullable VLCLibraryRepresentedItem *)representedItemForHeaderRow:(NSInteger)row;
 
 @end
