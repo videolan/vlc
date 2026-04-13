@@ -98,6 +98,11 @@ T.Control {
         id: videoSurface
         videoSurfaceProvider: MainCtx.videoSurfaceProvider
 
+        color: (hoverHandler.hovered ||
+                playButton?.hovered ||
+                closeButton?.hovered ||
+                fullscreenButton?.hovered) ? "#10000000" : "transparent"
+
         // It is acceptable for effects to exceed the boundaries of the
         // parent. They are an exception to the "hypothetical clip test".
         Widgets.DefaultShadow {
@@ -105,8 +110,7 @@ T.Control {
         }
     }
 
-    contentItem: Rectangle {
-        color: "#10000000"
+    contentItem: Item {
         visible: hoverHandler.hovered ||
                  playButton.hovered ||
                  closeButton.hovered ||
