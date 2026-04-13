@@ -22,7 +22,7 @@ import QtQuick.Templates as T
 import QtQuick.Layouts
 import QtQml.Models
 
-// import VLC.MainInterface // TODO: for vlcTick, not used for now due to Qt 6.2
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Playlist
@@ -48,7 +48,7 @@ T.Control {
                                                       dropAreaLayout.dragPosition.x,
                                                       dropAreaLayout.dragPosition.y)
 
-    readonly property Image artworkTextureProvider: contentItem?.artworkTextureProvider ?? null
+    readonly property Item artworkTextureProvider: contentItem?.artworkTextureProvider ?? null
 
     // Model roles:
     required property int index
@@ -150,7 +150,7 @@ T.Control {
     contentItem: RowLayout {
         spacing: 0
 
-        property alias artworkTextureProvider: artwork
+        property alias artworkTextureProvider: artwork.effectiveTextureProviderItem
 
         Item {
             id: artworkItem
@@ -171,7 +171,7 @@ T.Control {
                 return qsTr("Media cover")
             }
 
-            Widgets.ScaledImage {
+            Widgets.ImageExt {
                 id: artwork
 
                 anchors.fill: parent
@@ -180,6 +180,14 @@ T.Control {
                 visible: !statusIcon.visible
                 asynchronous: true
                 opacity: (status === Image.Ready ? 1.0 : 0.0)
+                radius: VLCStyle.listAlbumCover_radius
+
+                sourceSize: Qt.size(width * eDPR, height * eDPR)
+
+                // We do not want to update the DPR when it is updated, as that means reading
+                // the image from disk again. Wayland provides ceiled value initially, we keep
+                // using that and downsample using gpu in fractional scale case:
+                readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
                 Behavior on opacity {
                     // WARNING: OpacityAnimator is not used because `visible` is not immediately respected in that case.
