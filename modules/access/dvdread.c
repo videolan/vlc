@@ -1550,6 +1550,12 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
 
         /* which program we should search for our timestamp */
         uint16_t m_vobi_srpn =  p_sys->ud_pgcit->m_c_gi[i_start_cell].m_vobi_srpn;
+        if( m_vobi_srpn == 0 || m_vobi_srpn > p_sys->pgc_gi->nr_of_programs )
+        {
+            msg_Err( p_demux, "invalid m_vobi_srpn %u for cell %d",
+                     m_vobi_srpn, i_start_cell );
+            return VLC_EGENERIC;
+        }
 
         /* find the corresponding address */
         p_sys->p_cur_pgi = &p_sys->pgc_gi->pgi[m_vobi_srpn - 1];
@@ -1562,6 +1568,8 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         for( int c = i_start_cell; c < i_end_cell; c++ )
         {
             uint16_t srpn = p_sys->ud_pgcit->m_c_gi[c].m_vobi_srpn;
+            if( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs )
+                continue;
             p_sys->i_title_blocks += p_sys->pgc_gi->pgi[srpn - 1].map.nr_of_vobu_info;
         }
         p_sys->i_title_offset = 0;
@@ -1906,21 +1914,31 @@ static int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
     int cell_base = p_sys->ud_pgcit->ud_pgci_items[p_sys->i_title].first_prog_id - 1;
     int nr = p_sys->ud_pgcit->ud_pgci_items[p_sys->i_title].nr_of_programs;
 
+    int found = 0;
     for( int c = 0; c < nr; c++ )
     {
         int cell_idx = cell_base + c;
         uint16_t srpn = p_sys->ud_pgcit->m_c_gi[cell_idx].m_vobi_srpn;
+        if( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs )
+            continue;
         uint16_t cell_vobus = p_sys->pgc_gi->pgi[srpn - 1].map.nr_of_vobu_info;
 
         if( i_block_offset < vobu_accum + cell_vobus )
         {
             p_sys->i_cur_cell = cell_idx;
+            found = 1;
             break;
         }
         vobu_accum += cell_vobus;
 
         i_chapter += p_sys->ud_pgcit->m_c_gi[cell_idx].c_epi_n
                    ? p_sys->ud_pgcit->m_c_gi[cell_idx].c_epi_n : 1;
+    }
+
+    if( !found )
+    {
+        msg_Err( p_demux, "couldn't find cell for block offset %u", i_block_offset );
+        return VLC_EGENERIC;
     }
 
     if( i_chapter < p_sys->i_chapters &&
