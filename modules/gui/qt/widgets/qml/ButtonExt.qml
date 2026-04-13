@@ -45,6 +45,8 @@ T.Button {
     property color color: theme.fg.primary
     property color colorFocus: theme.visualFocus
 
+    property int radius: VLCStyle.button_radius
+
     //set to true when user animates the background manually
     property bool extBackgroundAnimation: false
 
@@ -102,6 +104,8 @@ T.Button {
         border.color: control.visualFocus ? control.colorFocus
                                           : (theme.border.a > 0.0 ? theme.border : color)
 
+        radius: control.radius
+
         Rectangle {
             anchors {
                 bottom: parent.bottom
@@ -113,6 +117,8 @@ T.Button {
             implicitHeight: VLCStyle.heightBar_xxxsmall
 
             width: control.contentItem?.implicitWidth ?? implicitWidth
+
+            radius: parent.radius
 
             visible: (width > 0 && control.checked)
         }
