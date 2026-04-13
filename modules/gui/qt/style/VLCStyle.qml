@@ -93,7 +93,7 @@ QtObject {
     readonly property int listAlbumCover_radius: MainCtx.dp(3, scale)
     readonly property int trackListAlbumCover_width: MainCtx.dp(32, scale)
     readonly property int trackListAlbumCover_heigth: MainCtx.dp(32, scale)
-    readonly property int trackListAlbumCover_radius: MainCtx.dp(2, scale)
+    readonly property int trackListAlbumCover_radius: MainCtx.dp(3, scale)
 
     readonly property int tableCoverRow_height: Math.max(listAlbumCover_height, fontHeight_normal) + margin_xsmall * 2
     readonly property int tableRow_height: fontHeight_normal + margin_small * 2
