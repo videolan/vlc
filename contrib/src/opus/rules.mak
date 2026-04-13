@@ -19,22 +19,23 @@ opus: opus-$(OPUS_VERSION).tar.gz .sum-opus
 	$(APPLY) $(SRC)/opus/0001-dnn-vec_neon-avoid-redefinition-of-vcvtnq_s32_f32.patch
 	$(MOVE)
 
-OPUS_CONF=  -D extra-programs=disabled -D tests=disabled -D docs=disabled
+OPUS_CONF= --disable-extra-programs --disable-doc
 ifndef HAVE_FPU
-OPUS_CONF += -D fixed-point=true
+OPUS_CONF += --enable-fixed-point
 endif
 
 # disable rtcd on aarch64-windows
 ifeq ($(ARCH)-$(HAVE_WIN32),aarch64-1)
-OPUS_CONF += -D rtcd=disabled
+OPUS_CONF += --disable-rtcd
 endif
 # disable rtcd on armv7-windows
 ifeq ($(ARCH)-$(HAVE_WIN32),arm-1)
-OPUS_CONF += -D rtcd=disabled
+OPUS_CONF += --disable-rtcd
 endif
 
-.opus: opus crossfile.meson
-	$(MESONCLEAN)
-	$(HOSTVARS_MESON) $(MESON) $(OPUS_CONF)
-	+$(MESONBUILD)
+.opus: opus
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(OPUS_CONF)
+	+$(MAKEBUILD)
+	+$(MAKEBUILD) install
 	touch $@
