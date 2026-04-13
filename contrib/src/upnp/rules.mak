@@ -43,6 +43,7 @@ ifdef HAVE_IOS
 	$(APPLY) $(SRC)/upnp/fix-reuseaddr-option.patch
 endif
 	$(APPLY) $(SRC)/upnp/0001-cmake-add-missing-file-in-Windows-compilation.patch
+	$(APPLY) $(SRC)/upnp/0001-Don-t-assume-strndup-to-be-missing-on-Windows.patch
 	$(MOVE)
 
 .upnp: upnp toolchain.cmake
