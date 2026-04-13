@@ -810,6 +810,7 @@ static int Open(vlc_object_t *object)
     {
         if (data)
             block_Release(data);
+        free(sys);
         return VLC_EGENERIC;
     }
     sys->data        = data;
