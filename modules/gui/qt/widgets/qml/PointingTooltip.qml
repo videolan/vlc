@@ -25,6 +25,7 @@ ToolTipExt {
 
     margins: 0
     padding: VLCStyle.margin_xxsmall
+    radius: VLCStyle.dp(6, VLCStyle.scale)
 
     height: implicitHeight + background.arrowHeight
     bottomInset: height - implicitHeight
@@ -50,7 +51,7 @@ ToolTipExt {
     background: Rectangle {
         border.color: pointingTooltip.colorContext.border
         color: pointingTooltip.colorContext.bg.primary
-        radius: VLCStyle.dp(6, VLCStyle.scale)
+        radius: pointingTooltip.radius
 
         readonly property real arrowHeight: arrow.implicitHeight + border.width
 
