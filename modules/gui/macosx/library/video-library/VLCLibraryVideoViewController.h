@@ -26,6 +26,7 @@
 #import "library/VLCLibraryItemPresentingCapable.h"
 
 @class VLCLibraryCollectionView;
+@class VLCLibraryHomeViewVideoCarouselContainerView;
 @class VLCLibraryWindow;
 @class VLCLibraryVideoDataSource;
 @class VLCLibraryShowsDataSource;
@@ -50,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) VLCLibraryVideoDataSource *libraryVideoDataSource;
 @property (readonly, nullable) VLCLibraryShowsDataSource *libraryShowsDataSource;
 @property (readonly, nullable) VLCLibraryMoviesDataSource *libraryMoviesDataSource;
+@property (readonly, nullable) VLCLibraryHomeViewVideoCarouselContainerView *recentsCarouselView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentVideoView;
