@@ -267,6 +267,7 @@ FocusScope {
 
                             fillMode: Image.PreserveAspectFit
 
+                            radius: VLCStyle.listAlbumCover_radius
                             asynchronous: true
                             cache: true
 
