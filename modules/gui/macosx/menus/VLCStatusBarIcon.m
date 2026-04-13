@@ -377,7 +377,7 @@
     if ([itemURI.scheme isEqualToString:@"file"]) {
         [pathActionItem setTitle:_NS("Reveal in Finder")];
     } else {
-        [pathActionItem setTitle:_NS("Copy URL to clipboard")];
+        [pathActionItem setTitle:_NS("Copy URL to Clipboard")];
     }
 }
 
