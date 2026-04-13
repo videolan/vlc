@@ -213,17 +213,19 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 {
     NSMutableArray<VLCLibraryVideoFlattenedRow *> * const rows = [NSMutableArray array];
 
-    if (_recentsArray.count > 0) {
+    const NSUInteger recentsCount = _recentsArray.count;
+    if (recentsCount > 0) {
         [rows addObject:[VLCLibraryVideoFlattenedRow headerForGroup:VLCMediaLibraryParentGroupTypeRecentVideos]];
-        for (NSUInteger i = 0; i < _recentsArray.count; i++) {
+        for (NSUInteger i = 0; i < recentsCount; i++) {
             [rows addObject:[VLCLibraryVideoFlattenedRow itemAtIndex:i
                                                              inGroup:VLCMediaLibraryParentGroupTypeRecentVideos]];
         }
     }
 
-    if (_libraryArray.count > 0) {
+    const NSUInteger libraryCount = _libraryArray.count;
+    if (libraryCount > 0) {
         [rows addObject:[VLCLibraryVideoFlattenedRow headerForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary]];
-        for (NSUInteger i = 0; i < _libraryArray.count; i++) {
+        for (NSUInteger i = 0; i < libraryCount; i++) {
             [rows addObject:[VLCLibraryVideoFlattenedRow itemAtIndex:i
                                                              inGroup:VLCMediaLibraryParentGroupTypeVideoLibrary]];
         }
@@ -259,7 +261,8 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 - (NSInteger)flattenedRowIndexForItemIndex:(NSUInteger)itemIndex
                                    inGroup:(VLCMediaLibraryParentGroupType)group
 {
-    for (NSUInteger i = 0; i < _flattenedRows.count; i++) {
+    const NSUInteger rowCount = _flattenedRows.count;
+    for (NSUInteger i = 0; i < rowCount; i++) {
         VLCLibraryVideoFlattenedRow * const flatRow = _flattenedRows[i];
         if (!flatRow.isHeader &&
             flatRow.parentType == group &&
@@ -453,7 +456,8 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
         return NSNotFound;
     }
 
-    for (NSUInteger i = 0; i < _flattenedRows.count; i++) {
+    const NSUInteger rowCount = _flattenedRows.count;
+    for (NSUInteger i = 0; i < rowCount; i++) {
         VLCLibraryVideoFlattenedRow * const flatRow = _flattenedRows[i];
         if (flatRow.isHeader) {
             continue;
