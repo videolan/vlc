@@ -304,10 +304,11 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
 #else
     const char *psz_path = psz_file;
 #endif
-#ifdef DVDREAD_HAS_DVDAUDIO
+#if DVDREAD_VERSION >= DVDREAD_VERSION_CODE(6, 1, 0)
     dvd_logger_cb cbs = { .pf_log = DvdReadLog };
-
+#endif
     dvd_reader_t *p_dvdread;
+#ifdef DVDREAD_HAS_DVDAUDIO
     switch (type) {
         case DVD_A:
             p_dvdread = DVDOpenAudio( p_demux, &cbs, psz_path );
@@ -323,8 +324,6 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
             break;
     }
 #elif DVDREAD_VERSION >= DVDREAD_VERSION_CODE(6, 1, 0)
-    dvd_logger_cb cbs = { .pf_log = DvdReadLog };
-
     if ( type != DVD_V )
     {
         msg_Err( p_demux, "Version of libdvdread does not support %s",
@@ -332,7 +331,7 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
         free( psz_file );
         return VLC_EGENERIC;
     }
-    dvd_reader_t *p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
+    p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
 #else
     if ( type != DVD_V )
     {
@@ -341,7 +340,7 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
         free( psz_file );
         return VLC_EGENERIC;
     }
-    dvd_reader_t *p_dvdread = DVDOpen( psz_path );
+    p_dvdread = DVDOpen( psz_path );
 #endif
 #if DVDREAD_VERSION < DVDREAD_VERSION_CODE(6, 1, 2)
     LocaleFree( psz_path );
@@ -398,7 +397,7 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
 
     /* store type state internally */
     /* if open2 is called, in 7.1.0 dvd may force the type */
-#if defined(DVDREAD_HAS_DVDAUDIO) || defined(DVDREAD_HAS_DVDVIDEORECORDING)
+#if defined(DVDREAD_HAS_DVDAUDIO)
     switch (p_sys->p_vmg_file->ifo_format)
     {
 #ifdef DVDREAD_HAS_DVDVIDEORECORDING
@@ -408,11 +407,9 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
         p_sys->pgc_gi = p_sys->p_vmg_file->pgc_gi;
         break;
 #endif
-#ifdef DVDREAD_HAS_DVDAUDIO
     case IFO_AUDIO:
         p_sys->type = DVD_A;
         break;
-#endif
     default:
         p_sys->type = type;
         break;
@@ -707,15 +704,14 @@ static int Demux( demux_t *p_demux )
     int i_blocks_once, i_read;
 
     bool at_end_of_title =
-        (type == DVD_V && p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells)
-#if defined(DVDREAD_HAS_DVDAUDIO)
-        || (type == DVD_A && p_sys->i_cur_block >= p_sys->i_title_end_block)
-#endif
 #if defined(DVDREAD_HAS_DVDVIDEORECORDING)
-        || (type == DVD_VR && p_sys->i_cur_cell >= p_sys->i_title_end_cell
-            && !p_sys->i_pack_len)
+        (type == DVD_VR && p_sys->i_cur_cell >= p_sys->i_title_end_cell
+            && !p_sys->i_pack_len) ||
 #endif
-        ;
+#if defined(DVDREAD_HAS_DVDAUDIO)
+        (type == DVD_A && p_sys->i_cur_block >= p_sys->i_title_end_block) ||
+#endif
+        (type == DVD_V && p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells);
 
     /*
      * Playback by cell in this pgc, starting at the cell for our chapter.
