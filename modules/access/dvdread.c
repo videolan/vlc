@@ -1889,8 +1889,12 @@ static int DvdAudioReadSeek( demux_t *p_demux, uint32_t i_block_offset )
 
         i_seek_blocks += chapter_len;
     }
-    if( i_chapter < p_sys->i_chapters &&
-        p_sys->cur_chapter != i_chapter )
+
+    /* exit if i_chapter is invalid */
+    if( i_chapter >= p_sys->i_chapters )
+        return VLC_EGENERIC;
+
+    if( p_sys->cur_chapter != i_chapter )
     {
         p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
         p_sys->cur_chapter = i_chapter;
