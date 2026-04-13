@@ -505,7 +505,7 @@ Item {
                 anchors.centerIn: parent
                 width: coverSize
                 height: coverSize
-                radius: coverRepeater.count > 1 ? dragItem.coverSize : VLCStyle.dp(2, VLCStyle.scale)
+                radius: coverRepeater.count > 1 ? dragItem.coverSize : VLCStyle.dp(3, VLCStyle.scale)
                 source: modelData.artwork ?? modelData.fallback ?? dragItem.defaultCover
                 sourceSize: dragItem.imageSourceSize ?? Qt.size(width * eDPR, height * eDPR)
                 textureProviderItem: modelData?.textureProvider ?? null
