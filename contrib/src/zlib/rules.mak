@@ -25,14 +25,6 @@ zlib: zlib-$(ZLIB_VERSION).tar.xz .sum-zlib
 
 ZLIB_CONF = -DINSTALL_PKGCONFIG_DIR:STRING=$(PREFIX)/lib/pkgconfig -DZLIB_BUILD_EXAMPLES=OFF
 
-# ASM is disabled as the necessary source files are not in the tarball nor the git
-# ifeq ($(ARCH),i386)
-# ZLIB_CONF += -DASM686=ON
-# endif
-# ifeq ($(ARCH),x86_64)
-# ZLIB_CONF += -DAMD64=ON
-# endif
-
 .zlib: zlib toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) $(ZLIB_CONF)
