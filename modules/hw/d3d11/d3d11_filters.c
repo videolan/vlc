@@ -533,6 +533,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->out[1].texture );
     if (FAILED(hr)) {
         ID3D11Texture2D_Release(sys->out[0].texture);
+        sys->out[0].texture = NULL;
         msg_Err(filter, "CreateTexture2D failed. (hr=0x%lX)", hr);
         goto error;
     }
