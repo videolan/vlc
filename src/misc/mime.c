@@ -92,9 +92,7 @@ static const struct
 const char *vlc_mime_Ext2Mime( const char *psz_url )
 {
 
-    char *psz_ext;
-
-    psz_ext = strrchr( psz_url, '.' );
+    const char *psz_ext = strrchr(psz_url, '.');
     if( psz_ext )
     {
         int i;
