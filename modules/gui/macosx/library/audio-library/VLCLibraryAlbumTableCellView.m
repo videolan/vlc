@@ -92,6 +92,32 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     return VLCLibraryAlbumTableCellViewDefaultHeight;
 }
 
++ (CGFloat)heightForAlbum:(VLCMediaLibraryAlbum *)album
+{
+    static CGFloat albumNameHeight;
+    static CGFloat artistNameHeight;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        VLCLibraryAlbumTableCellView *prototype = [VLCLibraryAlbumTableCellView fromNibWithOwner:NSNull.null];
+        albumNameHeight = prototype.albumNameTextField.intrinsicContentSize.height;
+        artistNameHeight = prototype.artistNameTextButton.intrinsicContentSize.height;
+    });
+
+    const NSUInteger numberOfTracks = album.numberOfTracks;
+    const CGFloat intercellSpacing = numberOfTracks > 1 ? (numberOfTracks - 1) * 1. : 0;
+    const CGFloat tracksHeight = numberOfTracks * VLCLibraryInternalMediaItemRowHeight + intercellSpacing + VLCLibraryUIUnits.mediumSpacing;
+
+    const CGFloat titleAndTableViewHeight = VLCLibraryUIUnits.largeSpacing +
+                                            albumNameHeight +
+                                            VLCLibraryUIUnits.smallSpacing +
+                                            artistNameHeight +
+                                            VLCLibraryUIUnits.smallSpacing +
+                                            tracksHeight +
+                                            VLCLibraryUIUnits.largeSpacing;
+
+    return MAX(titleAndTableViewHeight, VLCLibraryAlbumTableCellViewDefaultHeight);
+}
+
 - (CGFloat)height
 {
     if (self.representedItem == nil) {

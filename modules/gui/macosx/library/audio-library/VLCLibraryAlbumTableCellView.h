@@ -27,6 +27,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
+@class VLCMediaLibraryAlbum;
 @class VLCTrackingView;
 @class VLCLibraryRepresentedItem;
 
@@ -38,6 +39,7 @@ extern NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier;
 @property (class, readonly) CGFloat defaultHeight;
 
 + (instancetype)fromNibWithOwner:(id)owner;
++ (CGFloat)heightForAlbum:(VLCMediaLibraryAlbum *)album;
 
 @property (readwrite, weak) IBOutlet VLCTrackingView *trackingView;
 @property (readwrite, weak) IBOutlet VLCImageView *representedImageView;

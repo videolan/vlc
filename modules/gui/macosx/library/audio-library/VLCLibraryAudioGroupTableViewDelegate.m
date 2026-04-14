@@ -25,6 +25,7 @@
 #import "VLCLibraryAlbumTableCellView.h"
 #import "VLCLibraryAudioDataSource.h"
 
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 
 @implementation VLCLibraryAudioGroupTableViewDelegate
@@ -48,11 +49,13 @@
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
 {
-    NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier];
-    VLCLibraryAlbumTableCellView *cellView = (VLCLibraryAlbumTableCellView *)[self tableView:tableView
-                                                                          viewForTableColumn:column
-                                                                                         row:row];
-    return cellView == nil ? -1 : cellView.height;
+    id dataSource = tableView.dataSource;
+    id libraryItem = [dataSource libraryItemAtRow:row forTableView:tableView];
+
+    if ([libraryItem isKindOfClass:[VLCMediaLibraryAlbum class]]) {
+        return [VLCLibraryAlbumTableCellView heightForAlbum:libraryItem];
+    }
+    return VLCLibraryAlbumTableCellView.defaultHeight;
 }
 
 @end
