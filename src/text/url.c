@@ -270,21 +270,24 @@ char *vlc_path2uri (const char *path, const char *scheme)
 char *vlc_uri2path (const char *url)
 {
     char *ret = NULL;
-    char *end;
+    char *path = NULL;
+    size_t schemelen = 0;
 
-    char *path = strstr (url, "://");
-    if (path == NULL)
-        return NULL; /* unsupported scheme or invalid syntax */
+    {
+        const char *start = strstr (url, "://");
+        if (start == NULL)
+            return NULL; /* unsupported scheme or invalid syntax */
 
-    end = memchr (url, '/', path - url);
-    size_t schemelen = ((end != NULL) ? end : path) - url;
-    path += 3; /* skip "://" */
+        const char *end = memchr (url, '/', start - url);
+        schemelen = ((end != NULL) ? end : start) - url;
+        start += 3; /* skip "://" */
 
-    /* Remove request parameters and/or HTML anchor if present */
-    end = path + strcspn (path, "?#");
-    path = strndup (path, end - path);
-    if (unlikely(path == NULL))
-        return NULL; /* boom! */
+        /* Remove request parameters and/or HTML anchor if present */
+        end = start + strcspn (start, "?#");
+        path = strndup (start, end - start);
+        if (unlikely(path == NULL))
+            return NULL; /* boom! */
+    }
 
     /* Decode path */
     vlc_uri_decode (path);
@@ -320,9 +323,10 @@ char *vlc_uri2path (const char *url)
     else
     if (schemelen == 2 && !strncasecmp (url, "fd", 2))
     {
-        long fd = strtol(path, &end, 0);
+        char *leftover;
+        long fd = strtol(path, &leftover, 0);
 
-        if (*end || ((unsigned long)fd) > INT_MAX)
+        if (*leftover != '\0' || ((unsigned long)fd) > INT_MAX)
             goto out;
 
 #if !defined( _WIN32 ) && !defined( __OS2__ )
