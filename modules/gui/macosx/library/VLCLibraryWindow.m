@@ -618,8 +618,8 @@ static int ShowController(vlc_object_t * __unused p_this,
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     self.alphaValue = 1.0;
-    [self setViewForSelectedSegment];
     [self disableVideoTitleBarMode];
+    [self setViewForSelectedSegment];
     [self showControlsBarImmediately];
     [self updateArtworkButtonEnabledState];
 
