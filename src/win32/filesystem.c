@@ -107,7 +107,7 @@ int vlc_open (const char *filename, int flags, ...)
         dwCreationDisposition = OPEN_EXISTING;
     }
 
-    dwFlagsAndAttributes = FILE_FLAG_RANDOM_ACCESS | SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION;
+    dwFlagsAndAttributes = SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION;
 
     // if (flags & O_NONBLOCK)
     //     dwFlagsAndAttributes |= FILE_FLAG_OVERLAPPED;
