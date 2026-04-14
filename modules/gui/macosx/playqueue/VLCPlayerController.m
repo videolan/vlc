@@ -2019,11 +2019,11 @@ static int BossCallback(vlc_object_t *p_this,
             char *psz_tmp = NULL;
             // Append the filter to the current filter string
             if (asprintf(&psz_tmp, "%s:%s", psz_string, nameUTF8String) == -1) {
-                free((void *)psz_string);
+                free(psz_string);
                 vout_Release(p_vout);
                 return VLC_ENOMEM;
             }
-            free((void *)psz_string);
+            free(psz_string);
             psz_string = psz_tmp;
         }
     } else { // Disable the filter
@@ -2038,7 +2038,7 @@ static int BossCallback(vlc_object_t *p_this,
             // Check the next character to see if it is a colon, if it is...
             if (*(psz_parser + name_len) == ':') { // ...filter is not the last one in the list
                 // Remove the filter from the list by moving the rest of the string after the filter left
-                memmove((void *)psz_parser, psz_parser + name_len + 1,
+                memmove(psz_parser, psz_parser + name_len + 1,
                         strlen(psz_parser + name_len + 1) + 1);
             } else { // Filter is the last one in the list
                 // Remove the filter from the list by setting the null terminator to the end of the string
@@ -2050,14 +2050,14 @@ static int BossCallback(vlc_object_t *p_this,
                 *(psz_string + strlen(psz_string) - 1) = '\0';
             }
         } else { // Filter not enabled, nothing needs doing
-            free((void *)psz_string);
+            free(psz_string);
             vout_Release(p_vout);
             return VLC_SUCCESS;
         }
     }
 
     var_SetString(p_vout, psz_filter_type, psz_string);
-    free((void *)psz_string);
+    free(psz_string);
     vout_Release(p_vout);
     return VLC_SUCCESS;
 }
