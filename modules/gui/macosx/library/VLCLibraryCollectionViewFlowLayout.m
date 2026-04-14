@@ -71,6 +71,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     CGFloat _prevProvidedAnimationStep;
 
     BOOL _invalidateAll;
+    CGFloat _previousWidth;
 }
 
 @property (nonatomic, readwrite) BOOL detailViewIsAnimating;
@@ -256,9 +257,16 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(NSRect)newBounds
 {
-    [super shouldInvalidateLayoutForBoundsChange:newBounds];
-    _invalidateAll = YES;
-    return YES;
+    const BOOL superResult = [super shouldInvalidateLayoutForBoundsChange:newBounds];
+    const CGFloat newWidth = newBounds.size.width;
+
+    if (newWidth != _previousWidth) {
+        _invalidateAll = YES;
+        _previousWidth = newWidth;
+        return YES;
+    }
+
+    return superResult || _selectedIndexPath != nil;
 }
 
 - (void)invalidateLayoutWithContext:(NSCollectionViewLayoutInvalidationContext *)context
