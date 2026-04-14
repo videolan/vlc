@@ -2034,7 +2034,7 @@ static int BossCallback(vlc_object_t *p_this,
 
         char * const psz_parser = strstr(psz_string, nameUTF8String);
         if (psz_parser != NULL) { // Enabled filter found
-            const size_t name_len = [name lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+            const size_t name_len = strlen(nameUTF8String);
             // Check the next character to see if it is a colon, if it is...
             if (*(psz_parser + name_len) == ':') { // ...filter is not the last one in the list
                 // Remove the filter from the list by moving the rest of the string after the filter left
