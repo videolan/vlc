@@ -258,9 +258,15 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
             VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
             [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth
                                       andHeight:videoTrack.videoHeight];
-            _videoImageViewAspectRatioConstraint.active = YES;
+            if (!_videoImageViewAspectRatioConstraint.active) {
+                self.imageViewAspectRatioConstraint.active = NO;
+                _videoImageViewAspectRatioConstraint.active = YES;
+            }
         } else {
-            _videoImageViewAspectRatioConstraint.active = NO;
+            if (_videoImageViewAspectRatioConstraint.active) {
+                _videoImageViewAspectRatioConstraint.active = NO;
+                self.imageViewAspectRatioConstraint.active = YES;
+            }
         }
 
         const CGFloat position = mediaItem.progress;
@@ -275,7 +281,10 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         }
     } else {
         self.progressIndicator.hidden = YES;
-        _videoImageViewAspectRatioConstraint.active = NO;
+        if (_videoImageViewAspectRatioConstraint.active) {
+            _videoImageViewAspectRatioConstraint.active = NO;
+            self.imageViewAspectRatioConstraint.active = YES;
+        }
     }
 }
 
@@ -292,14 +301,14 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (void)setUnplayedIndicatorHidden:(BOOL)indicatorHidden
 {
+    if (_unplayedIndicatorTextField.hidden == indicatorHidden) {
+        return;
+    }
+
     _unplayedIndicatorTextField.hidden = indicatorHidden;
 
-    // Set priority of constraints for secondary info label, which is alongside unplayed indicator
-    const NSLayoutPriority superViewConstraintPriority = indicatorHidden ? NSLayoutPriorityRequired : NSLayoutPriorityDefaultLow;
-    const NSLayoutPriority unplayedIndicatorConstraintPriority = indicatorHidden ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
-
-    _trailingSecondaryTextToTrailingSuperviewConstraint.priority = superViewConstraintPriority;
-    _trailingSecondaryTextToLeadingUnplayedIndicatorConstraint.priority = unplayedIndicatorConstraintPriority;
+    _trailingSecondaryTextToLeadingUnplayedIndicatorConstraint.active = !indicatorHidden;
+    _trailingSecondaryTextToTrailingSuperviewConstraint.active = indicatorHidden;
 }
 
 #pragma mark - actions
