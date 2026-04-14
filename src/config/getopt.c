@@ -333,7 +333,7 @@ int vlc_getopt_long(int argc, char *const *argv,
 
     {
         char c = *(state->nextchar)++;
-        char *temp = strchr(optstring, c);
+        const char *temp = strchr(optstring, c);
 
         /* Increment `optind' when we start to process its last character.  */
         if (*state->nextchar == '\0')
