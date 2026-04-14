@@ -319,7 +319,15 @@ getinfo_cb(const char *url, UpnpFileInfo *info, intf_thread_t *intf, FileHandler
     UpnpFileInfo_set_IsReadable(info, true);
     UpnpFileInfo_set_IsDirectory(info, false);
 
-    auto file_handler = parse_url(url, intf->p_sys->p_ml);
+    std::unique_ptr<FileHandler> file_handler;
+    try
+    {
+        file_handler = parse_url(url, intf->p_sys->p_ml);
+    }
+    catch (const std::exception &)
+    {
+        return UPNP_E_FILE_NOT_FOUND;
+    }
 
     if (file_handler == nullptr)
         return UPNP_E_FILE_NOT_FOUND;
@@ -339,7 +347,16 @@ open_cb(const char *url, enum UpnpOpenFileMode, intf_thread_t *intf, FileHandler
 
     FileHandler *ret = file_handler;
     if (!ret)
-        ret = parse_url(url, intf->p_sys->p_ml).release();
+    {
+        try
+        {
+            ret = parse_url(url, intf->p_sys->p_ml).release();
+        }
+        catch (const std::exception &)
+        {
+            return nullptr;
+        }
+    }
 
     if (ret == nullptr)
         return nullptr;
