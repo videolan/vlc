@@ -165,6 +165,10 @@
                            selector:@selector(newVideosAvailable:)
                                name:VLCLibraryModelRecentsMediaListReset
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(newVideosAvailable:)
+                               name:VLCLibraryModelAllCachesDropped
+                             object:nil];
 }
 
 - (void)disconnectForNewVideo
@@ -172,6 +176,7 @@
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter removeObserver:self name:VLCLibraryModelVideoMediaListReset object:nil];
     [notificationCenter removeObserver:self name:VLCLibraryModelRecentsMediaListReset object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelAllCachesDropped object:nil];
 }
 
 - (void)newVideosAvailable:(NSNotification *)notification

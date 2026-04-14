@@ -88,6 +88,10 @@
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelAllCachesDropped
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelVideoMediaItemDeleted
                                  object:nil];
 

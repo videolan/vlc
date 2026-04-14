@@ -36,6 +36,7 @@ NSString * const VLCLibraryModelGenreListReset = @"VLCLibraryModelGenreListReset
 NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated = @"VLCLibraryModelListOfMonitoredFoldersUpdated";
 NSString * const VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelMediaItemThumbnailGenerated";
 
+NSString * const VLCLibraryModelAllCachesDropped = @"VLCLibraryModelAllCachesDropped";
 NSString * const VLCLibraryModelAudioMediaListReset = @"VLCLibraryModelAudioMediaListReset";
 NSString * const VLCLibraryModelVideoMediaListReset = @"VLCLibraryModelVideoMediaListReset";
 NSString * const VLCLibraryModelFavoriteAudioMediaListReset = @"VLCLibraryModelFavoriteAudioMediaListReset";
@@ -1035,18 +1036,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     _cachedRecentMedia = nil;
     _cachedRecentAudioMedia = nil;
 
-    [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelAlbumListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelArtistListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelGenreListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteVideoMediaListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteAudioMediaListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteAlbumsListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteArtistsListReset withObject:self];
-    [self.changeDelegate notifyChange:VLCLibraryModelFavoriteGenresListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelAllCachesDropped withObject:self];
 }
 
 - (void)performActionOnMediaItemInCache:(const int64_t)libraryId 

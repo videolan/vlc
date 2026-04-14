@@ -72,6 +72,7 @@
             VLCLibraryModelAudioMediaListReset,
             VLCLibraryModelVideoMediaItemDeleted,
             VLCLibraryModelAudioMediaItemDeleted,
+            VLCLibraryModelAllCachesDropped,
         };
 
         for (size_t i = 0; i < ARRAY_SIZE(notificationNames); ++i) @autoreleasepool

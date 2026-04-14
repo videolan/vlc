@@ -34,6 +34,7 @@ extern NSString * const VLCLibraryModelPlaylistAdded;
 extern NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated;
 extern NSString * const VLCLibraryModelMediaItemThumbnailGenerated;
 
+extern NSString * const VLCLibraryModelAllCachesDropped;
 extern NSString * const VLCLibraryModelAudioMediaListReset;
 extern NSString * const VLCLibraryModelVideoMediaListReset;
 extern NSString * const VLCLibraryModelFavoriteAudioMediaListReset;

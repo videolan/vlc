@@ -242,6 +242,10 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(libraryModelFavoriteListReset:)
+                               name:VLCLibraryModelAllCachesDropped
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelFavoriteListReset:)
                                name:VLCLibraryModelFavoriteAudioMediaListReset
                              object:nil];
     [notificationCenter addObserver:self

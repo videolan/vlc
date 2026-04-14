@@ -102,6 +102,10 @@
                                name:VLCLibraryModelAudioMediaListReset
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAudioMediaItemsReset:)
+                               name:VLCLibraryModelAllCachesDropped
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(libraryModelAudioMediaItemUpdated:)
                                name:VLCLibraryModelAudioMediaItemUpdated
                              object:nil];
@@ -252,7 +256,9 @@
 {
     NSArray<NSTableView *> * const tableViews = self.tableViews;
     for (NSTableView * const tableView in tableViews) {
-        [tableView reloadData];
+        if (tableView.dataSource == self) {
+            [tableView reloadData];
+        }
     }
 }
 
@@ -260,6 +266,9 @@
 {
     NSArray<NSCollectionView *> * const collectionViews = self.collectionViews;
     for (NSCollectionView * const collectionView in collectionViews) {
+        if (collectionView.dataSource != self) {
+            continue;
+        }
         NSCollectionViewLayout * const collectionViewLayout = collectionView.collectionViewLayout;
         if ([collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class]) {
             [(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout resetLayout];

@@ -166,6 +166,10 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                name:VLCLibraryModelVideoMediaListReset
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(libraryModelVideoListReset:)
+                               name:VLCLibraryModelAllCachesDropped
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(libraryModelVideoItemUpdated:)
                                name:VLCLibraryModelVideoMediaItemUpdated
                              object:nil];

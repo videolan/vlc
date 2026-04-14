@@ -343,6 +343,10 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
                                name:VLCLibraryModelAudioMediaListReset
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(libraryModelReset:)
+                               name:VLCLibraryModelAllCachesDropped
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(libraryModelAudioMediaItemUpdated:)
                                name:VLCLibraryModelAudioMediaItemUpdated
                              object:nil];
@@ -549,11 +553,21 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         self->_displayedCollectionUpdating = NO;
 
         [self resetLayoutsForOperation:^{
-            [self.collectionView reloadData];
-            [self.gridModeListTableView reloadData];
-            [self.collectionSelectionTableView reloadData];
-            [self.songsTableView reloadData];
-            [self.carouselView reloadData];
+            if (self.collectionView.dataSource == self) {
+                [self.collectionView reloadData];
+            }
+            if (self.gridModeListTableView.dataSource == self) {
+                [self.gridModeListTableView reloadData];
+            }
+            if (self.collectionSelectionTableView.dataSource == self) {
+                [self.collectionSelectionTableView reloadData];
+            }
+            if (self.songsTableView.dataSource == self) {
+                [self.songsTableView reloadData];
+            }
+            if (self.carouselView.dataSource == self) {
+                [self.carouselView reloadData];
+            }
         }];
 
         [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification object:self];

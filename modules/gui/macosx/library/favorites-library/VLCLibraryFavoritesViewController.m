@@ -304,6 +304,10 @@
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(libraryModelUpdated:)
+                               name:VLCLibraryModelAllCachesDropped
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelUpdated:)
                                name:VLCLibraryModelFavoriteAudioMediaListReset
                              object:nil];
     [notificationCenter addObserver:self

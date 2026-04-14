@@ -76,6 +76,10 @@
                                 object:nil];
     [notificationCenter addObserver:self
                             selector:@selector(recentsChanged:)
+                                name:VLCLibraryModelAllCachesDropped
+                                object:nil];
+    [notificationCenter addObserver:self
+                            selector:@selector(recentsChanged:)
                                 name:VLCLibraryModelRecentsMediaItemDeleted
                                 object:nil];
     [notificationCenter addObserver:self
