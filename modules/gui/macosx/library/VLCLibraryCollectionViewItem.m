@@ -107,9 +107,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
-    if (@available(macOS 10.14, *)) {
-        [NSApplication.sharedApplication removeObserver:self forKeyPath:@"effectiveAppearance"];
-    }
 }
 
 - (void)awakeFromNib
@@ -157,28 +154,15 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     self.highlightBox.borderColor = NSColor.VLCAccentColor;
     self.unplayedIndicatorTextField.textColor = NSColor.VLCAccentColor;
 
-    if (@available(macOS 10.14, *)) {
-        [NSApplication.sharedApplication addObserver:self
-                                            forKeyPath:@"effectiveAppearance"
-                                               options:NSKeyValueObservingOptionNew
-                                               context:nil];
-    }
-
     [self updateColoredAppearance:self.view.effectiveAppearance];
     [self prepareForReuse];
 }
 
 #pragma mark - dynamic appearance
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
-                       context:(void *)context
+- (void)viewDidChangeEffectiveAppearance
 {
-    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
-        NSAppearance *effectiveAppearance = change[NSKeyValueChangeNewKey];
-        [self updateColoredAppearance:effectiveAppearance];
-    }
+    [self updateColoredAppearance:self.view.effectiveAppearance];
 }
 
 - (void)updateColoredAppearance:(NSAppearance*)appearance
