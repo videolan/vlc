@@ -409,6 +409,11 @@ option('upnp',
     value : 'auto',
     description : 'Enable/disable UPnP plugin (Intel SDK)')
 
+option('upnp_server',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable UPnP server')
+
 option('libxml2',
     type : 'feature',
     value : 'auto',

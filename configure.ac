@@ -4725,6 +4725,17 @@ dnl
 PKG_ENABLE_MODULES_VLC([UPNP], [upnp], [libupnp >= 1.8.3], [Intel UPNP SDK],[auto])
 
 dnl
+dnl UPnP Server
+dnl
+AC_ARG_ENABLE([upnp-server],
+  AS_HELP_STRING([--disable-upnp-server],
+    [disable the UPnP server (default enabled)]))
+AM_CONDITIONAL([ENABLE_UPNP_SERVER], [test "${enable_upnp_server}" != "no"])
+AS_IF([test "${enable_upnp_server}" != "no"], [
+  AC_DEFINE([ENABLE_UPNP_SERVER], [1], [Define if the UPnP server is enabled])
+])
+
+dnl
 dnl mDNS using libmicrodns
 dnl
 PKG_ENABLE_MODULES_VLC([MICRODNS], [], [microdns >= 0.1.2], [mDNS services discovery], [auto])

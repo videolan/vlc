@@ -1031,6 +1031,11 @@ if get_option('stream_outputs')
     cdata.set('ENABLE_SOUT', 1)
 endif
 
+# Enable UPnP server
+if not get_option('upnp_server').disabled()
+    cdata.set('ENABLE_UPNP_SERVER', 1)
+endif
+
 # Enable VLM
 if get_option('videolan_manager')
     if not get_option('stream_outputs')

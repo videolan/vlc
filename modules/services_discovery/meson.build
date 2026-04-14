@@ -48,33 +48,40 @@ if upnp_dep.found()
         upnp_darwin_deps = [corefoundation_dep, systemconfiguration_dep]
     endif
 
+    upnp_sources = files(
+        'upnp.cpp',
+        'upnp-wrapper.cpp',
+        '../stream_out/renderer_common.cpp',
+        '../stream_out/dlna/dlna.cpp',
+    )
+
+    if not get_option('upnp_server').disabled()
+        upnp_sources += files(
+            '../control/upnp_server/cds/Object.hpp',
+            '../control/upnp_server/cds/Container.hpp',
+            '../control/upnp_server/cds/FixedContainer.cpp',
+            '../control/upnp_server/cds/FixedContainer.hpp',
+            '../control/upnp_server/cds/Item.cpp',
+            '../control/upnp_server/cds/Item.hpp',
+            '../control/upnp_server/cds/MLContainer.hpp',
+            '../control/upnp_server/cds/MLFolderContainer.hpp',
+            '../control/upnp_server/cds/cds.cpp',
+            '../control/upnp_server/cds/cds.hpp',
+            '../control/upnp_server/ml.hpp',
+            '../control/upnp_server/xml_wrapper.hpp',
+            '../control/upnp_server/upnp_server.hpp',
+            '../control/upnp_server/utils.cpp',
+            '../control/upnp_server/utils.hpp',
+            '../control/upnp_server/FileHandler.cpp',
+            '../control/upnp_server/FileHandler.hpp',
+            '../control/upnp_server/upnp_server.cpp',
+        )
+    endif
+
     vlc_modules += {
         'name' : 'upnp',
-        'sources' : files(
-            'upnp.cpp',
-            'upnp-wrapper.cpp',
-            '../stream_out/renderer_common.cpp',
-            '../stream_out/dlna/dlna.cpp',
-	        '../control/upnp_server/cds/Object.hpp',
-	        '../control/upnp_server/cds/Container.hpp',
-	        '../control/upnp_server/cds/FixedContainer.cpp',
-	        '../control/upnp_server/cds/FixedContainer.hpp',
-	        '../control/upnp_server/cds/Item.cpp',
-	        '../control/upnp_server/cds/Item.hpp',
-	        '../control/upnp_server/cds/MLContainer.hpp',
-	        '../control/upnp_server/cds/MLFolderContainer.hpp',
-	        '../control/upnp_server/cds/cds.cpp',
-	        '../control/upnp_server/cds/cds.hpp',
-	        '../control/upnp_server/ml.hpp',
-	        '../control/upnp_server/xml_wrapper.hpp',
-	        '../control/upnp_server/upnp_server.hpp',
-	        '../control/upnp_server/utils.cpp',
-	        '../control/upnp_server/utils.hpp',
-	        '../control/upnp_server/FileHandler.cpp',
-	        '../control/upnp_server/FileHandler.hpp',
-	        '../control/upnp_server/upnp_server.cpp',
-            ),
-        'dependencies' : [contrib_dep, upnp_dep, upnp_darwin_deps]
+        'sources' : upnp_sources,
+        'dependencies' : [contrib_dep, upnp_dep, upnp_darwin_deps],
     }
 endif
 

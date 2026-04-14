@@ -42,7 +42,9 @@ libupnp_plugin_la_SOURCES = services_discovery/upnp.cpp services_discovery/upnp.
 	stream_out/dlna/profile_names.hpp \
 	stream_out/dlna/dlna_common.hpp \
 	stream_out/dlna/dlna.hpp \
-	stream_out/dlna/dlna.cpp \
+	stream_out/dlna/dlna.cpp
+if ENABLE_UPNP_SERVER
+libupnp_plugin_la_SOURCES += \
 	control/upnp_server/cds/Object.hpp \
 	control/upnp_server/cds/Container.hpp \
 	control/upnp_server/cds/FixedContainer.cpp \
@@ -61,9 +63,11 @@ libupnp_plugin_la_SOURCES = services_discovery/upnp.cpp services_discovery/upnp.
 	control/upnp_server/FileHandler.cpp \
 	control/upnp_server/FileHandler.hpp \
 	control/upnp_server/upnp_server.cpp
+endif
 libupnp_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(UPNP_CFLAGS)
 libupnp_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)
 libupnp_plugin_la_LIBADD = $(UPNP_LIBS)
+if ENABLE_UPNP_SERVER
 libupnp_plugin_la_RES = ../share/upnp_server/ContentDirectory.xml \
 	../share/upnp_server/ConnectionManager.xml \
 	../share/upnp_server/X_MS_MediaReceiverRegistrar.xml \
@@ -71,6 +75,7 @@ libupnp_plugin_la_RES = ../share/upnp_server/ContentDirectory.xml \
 	../share/upnp_server/vlc512x512.png
 dist_libupnp_plugin_la_DATA = $(libupnp_plugin_la_RES)
 libupnp_plugin_ladir = $(prefix)/share/vlc/upnp_server
+endif
 EXTRA_LTLIBRARIES += libupnp_plugin.la
 sd_PLUGINS += $(LTLIBupnp)
 if HAVE_OSX
