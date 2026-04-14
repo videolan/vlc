@@ -54,12 +54,22 @@ function parse()
             local line = metadata:readline() -- data is on one line only
 
             -- TODO: fetch "title" and resolve \u escape sequences
-            -- FIXME: use "screenname" instead and resolve \u escape sequences
-            artist = string.match( line, '"username":"([^"]+)"' )
-
-            local poster = string.match( line, '"poster_url":"([^"]+)"' )
-            if poster then
-                arturl = string.gsub( poster, "\\/", "/")
+            -- handled via JSON instead of HTML fields
+             local name_json = string.match(line, '"title":"(.-)"')
+            if name_json then
+                name_json = string.gsub(name_json, '\\"', '"')
+                name = name_json
+            end
+            -- Artist (handled via JSON instead of HTML)
+            artist = string.match( line, '"screenname":"([^"]+)"' )
+                    or string.match(line, '"username":"([^"]+)"')
+                
+            -- Thumbnail  parsed from JSON metadata
+           local thumb = string.match(line, '"thumbnails":{.-"1080":"([^"]+)"') or
+             string.match(line, '"thumbnails":{.-"720":"([^"]+)"')              or
+            string.match(line, '"thumbnails":{.-"480":"([^"]+)"')
+            if thumb then
+                arturl = string.gsub(thumb, "\\/", "/")
             end
 
             local streams = string.match( line, "\"qualities\":{(.-%])}" )
