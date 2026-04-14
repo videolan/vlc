@@ -1981,84 +1981,84 @@ static int BossCallback(vlc_object_t *p_this,
         return VLC_EINVAL;
     }
 
-    vout_thread_t * const p_vout = [self mainVideoOutputThread];
-    if (p_vout == NULL) {
+    vout_thread_t * const vout = [self mainVideoOutputThread];
+    if (vout == NULL) {
         return VLC_EGENERIC;
     }
 
     const char * const nameUTF8String = name.UTF8String;
-    module_t * const p_obj = module_find(nameUTF8String);
-    if (p_obj == NULL) {
-        vout_Release(p_vout);
+    module_t * const module_obj = module_find(nameUTF8String);
+    if (module_obj == NULL) {
+        vout_Release(vout);
         return VLC_EGENERIC;
     }
 
-    const char *psz_filter_type = NULL;
-    if (module_provides(p_obj, "video splitter")) {
-        psz_filter_type = "video-splitter";
-    } else if (module_provides(p_obj, "video filter")) {
-        psz_filter_type = "video-filter";
-    } else if (module_provides(p_obj, "sub source")) {
-        psz_filter_type = "sub-source";
-    } else if (module_provides(p_obj, "sub filter")) {
-        psz_filter_type = "sub-filter";
+    const char *filter_type = NULL;
+    if (module_provides(module_obj, "video splitter")) {
+        filter_type = "video-splitter";
+    } else if (module_provides(module_obj, "video filter")) {
+        filter_type = "video-filter";
+    } else if (module_provides(module_obj, "sub source")) {
+        filter_type = "sub-source";
+    } else if (module_provides(module_obj, "sub filter")) {
+        filter_type = "sub-filter";
     }
 
-    if (psz_filter_type == NULL) {
-        vout_Release(p_vout);
+    if (filter_type == NULL) {
+        vout_Release(vout);
         return VLC_EGENERIC;
     }
 
     // Get the current filter string
-    char *psz_string = var_InheritString(p_vout, psz_filter_type);
+    char *modules_string = var_InheritString(vout, filter_type);
 
     if (state) { // Enable the filter
-        if (psz_string == NULL) { // No current filters
-            psz_string = strdup(nameUTF8String);
-        } else if (strstr(psz_string, nameUTF8String) == NULL) { // Filter not already enabled
+        if (modules_string == NULL) { // No current filters
+            modules_string = strdup(nameUTF8String);
+        } else if (strstr(modules_string, nameUTF8String) == NULL) { // Filter not already enabled
             char *psz_tmp = NULL;
             // Append the filter to the current filter string
-            if (asprintf(&psz_tmp, "%s:%s", psz_string, nameUTF8String) == -1) {
-                free(psz_string);
-                vout_Release(p_vout);
+            if (asprintf(&psz_tmp, "%s:%s", modules_string, nameUTF8String) == -1) {
+                free(modules_string);
+                vout_Release(vout);
                 return VLC_ENOMEM;
             }
-            free(psz_string);
-            psz_string = psz_tmp;
+            free(modules_string);
+            modules_string = psz_tmp;
         }
     } else { // Disable the filter
-        if (psz_string == NULL) { // No current filters
-            vout_Release(p_vout);
+        if (modules_string == NULL) { // No current filters
+            vout_Release(vout);
             return VLC_SUCCESS;
         }
 
-        char * const psz_parser = strstr(psz_string, nameUTF8String);
-        if (psz_parser != NULL) { // Enabled filter found
+        char * const parser = strstr(modules_string, nameUTF8String);
+        if (parser != NULL) { // Enabled filter found
             const size_t name_len = strlen(nameUTF8String);
             // Check the next character to see if it is a colon, if it is...
-            if (*(psz_parser + name_len) == ':') { // ...filter is not the last one in the list
+            if (parser[name_len] == ':') { // ...filter is not the last one in the list
                 // Remove the filter from the list by moving the rest of the string after the filter left
-                memmove(psz_parser, psz_parser + name_len + 1,
-                        strlen(psz_parser + name_len + 1) + 1);
+                memmove(parser, parser + name_len + 1,
+                        strlen(parser + name_len + 1) + 1);
             } else { // Filter is the last one in the list
                 // Remove the filter from the list by setting the null terminator to the end of the string
-                *psz_parser = '\0';
+                *parser = '\0';
             }
 
-            if (*psz_string != '\0' && *(psz_string + strlen(psz_string) - 1) == ':') {
+            if (modules_string[0] != '\0' && modules_string[strlen(modules_string) - 1] == ':') {
                 // Remove the trailing colon if it exists
-                *(psz_string + strlen(psz_string) - 1) = '\0';
+                modules_string[strlen(modules_string) - 1] = '\0';
             }
         } else { // Filter not enabled, nothing needs doing
-            free(psz_string);
-            vout_Release(p_vout);
+            free(modules_string);
+            vout_Release(vout);
             return VLC_SUCCESS;
         }
     }
 
-    var_SetString(p_vout, psz_filter_type, psz_string);
-    free(psz_string);
-    vout_Release(p_vout);
+    var_SetString(vout, filter_type, modules_string);
+    free(modules_string);
+    vout_Release(vout);
     return VLC_SUCCESS;
 }
 
@@ -2068,20 +2068,20 @@ static int BossCallback(vlc_object_t *p_this,
         return VLC_EINVAL;
     }
 
-    vout_thread_t * const p_vout = [self mainVideoOutputThread];
-    if (p_vout == NULL) {
+    vout_thread_t * const vout = [self mainVideoOutputThread];
+    if (vout == NULL) {
         return VLC_EGENERIC;
     }
 
     const char * const propertyUTF8String = property.UTF8String;
-    int i_type = var_Type(p_vout, propertyUTF8String);
+    int i_type = var_Type(vout, propertyUTF8String);
     if (i_type == 0) {
         i_type = config_GetType(propertyUTF8String);
     }
 
     i_type &= VLC_VAR_CLASS;
-    var_SetChecked(p_vout, propertyUTF8String, i_type, value);
-    vout_Release(p_vout);
+    var_SetChecked(vout, propertyUTF8String, i_type, value);
+    vout_Release(vout);
     return VLC_SUCCESS;
 }
 
