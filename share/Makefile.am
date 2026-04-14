@@ -23,7 +23,6 @@ LUA_MODULES = \
 	lua/modules/simplexml.lua \
 	lua/playlist/anevia_streams.lua \
 	lua/playlist/anevia_xml.lua \
-	lua/playlist/appletrailers.lua \
 	lua/playlist/bbc_co_uk.lua \
 	lua/playlist/break.lua \
 	lua/playlist/cue.lua \
