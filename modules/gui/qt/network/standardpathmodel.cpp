@@ -116,15 +116,38 @@ public:
     bool initializeModel() override
     {
         Q_Q(StandardPathModel);
+
+        using UserPath = std::pair<QString, QString>;
+        std::list<UserPath> paths;
+
         assert(m_qmlInitializing == false);
+        QString homePath = QVLCUserDir(VLC_HOME_DIR);
+        //QVLCUserDir defaults to HomePath, make sure we only add it once
+        bool homeAdded = false;
+        auto addFilterHome = [&](const QString& path, const QString& label) {
+            if (path == homePath ) {
+                if (homeAdded) {
+                    return;
+                } else {
+                    addItem(homePath, qtr("Home"), {});
+                    homeAdded = true;
+                }
+            } else {
+                addItem(path, label, {});
+            }
+
+        };
+
 #ifdef Q_OS_UNIX
-        addItem(QVLCUserDir(VLC_HOME_DIR), qtr("Home"), {});
+        addItem(homePath, qtr("Home"), {});
+        homeAdded = true;
 #endif
-        addItem(QVLCUserDir(VLC_DESKTOP_DIR), qtr("Desktop"), {});
-        addItem(QVLCUserDir(VLC_DOCUMENTS_DIR), qtr("Documents"), {});
-        addItem(QVLCUserDir(VLC_MUSIC_DIR), qtr("Music"), {});
-        addItem(QVLCUserDir(VLC_VIDEOS_DIR), qtr("Videos"), {});
-        addItem(QVLCUserDir(VLC_DOWNLOAD_DIR), qtr("Download"), {});
+        addFilterHome(QVLCUserDir(VLC_DESKTOP_DIR), qtr("Desktop"));
+        addFilterHome(QVLCUserDir(VLC_DOCUMENTS_DIR), qtr("Documents"));
+        addFilterHome(QVLCUserDir(VLC_MUSIC_DIR), qtr("Music"));
+        addFilterHome(QVLCUserDir(VLC_VIDEOS_DIR), qtr("Videos"));
+        addFilterHome(QVLCUserDir(VLC_DOWNLOAD_DIR), qtr("Download"));
+
         //model is never updated, but this is still needed to fit the LocalListBaseModelPrivate requirements
         ++m_revision;
         m_loading = false;
