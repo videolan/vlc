@@ -45,7 +45,7 @@ vlc_playlist_New(vlc_object_t *parent, enum vlc_playlist_preparsing rec,
             .types = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL,
             .max_parser_threads = preparse_max_threads,
             .timeout = preparse_timeout,
-#if !defined(HAVE_VLC_PROCESS_SPAWN)
+#if !defined(HAVE_VLC_EXTERNAL_PREPARSER)
         .external_process = false,
 #else
         .external_process = true,

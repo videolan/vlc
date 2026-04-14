@@ -93,7 +93,7 @@ MetadataExtractor::MetadataExtractor( vlc_object_t* parent )
         .max_parser_threads = 1,
         .max_thumbnailer_threads = 0,
         .timeout = VLC_TICK_FROM_SEC(5),
-#if !defined(HAVE_VLC_PROCESS_SPAWN)
+#if !defined(HAVE_VLC_EXTERNAL_PREPARSER)
         .external_process = false,
 #else
         .external_process = true,

@@ -335,6 +335,7 @@ if host_system == 'darwin'
     ]
     if have_osx
         cdata.set('HAVE_VLC_PROCESS_SPAWN', 1)
+        cdata.set('HAVE_VLC_EXTERNAL_PREPARSER', 1)
         libvlccore_sources += [
             'posix/spawn.c',
             'posix/process.c',
@@ -342,6 +343,7 @@ if host_system == 'darwin'
     endif
 elif host_system == 'windows'
     cdata.set('HAVE_VLC_PROCESS_SPAWN', 1)
+    cdata.set('HAVE_VLC_EXTERNAL_PREPARSER', 1)
     libvlccore_sources += [
         'win32/dirs-common.c',
         'win32/error.c',
@@ -388,6 +390,7 @@ else
 
     if host_system != 'android'
         cdata.set('HAVE_VLC_PROCESS_SPAWN', 1)
+        cdata.set('HAVE_VLC_EXTERNAL_PREPARSER', 1)
         libvlccore_sources += [
             'posix/dirs.c',
             'posix/error.c',

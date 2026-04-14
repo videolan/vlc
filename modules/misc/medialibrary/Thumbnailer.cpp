@@ -40,7 +40,7 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
         .max_parser_threads = 0,
         .max_thumbnailer_threads = 1,
         .timeout = VLC_TICK_FROM_SEC( 3 ),
-#if !defined(HAVE_VLC_PROCESS_SPAWN)
+#if !defined(HAVE_VLC_EXTERNAL_PREPARSER)
         .external_process = false,
 #else
         .external_process = true,

@@ -551,6 +551,16 @@ AM_COND_IF([HAVE_PROCESS_SPAWN], [
   AC_DEFINE([HAVE_VLC_PROCESS_SPAWN], [1], [Define to 1 if vlc_process_Spawn() is usable.])
 ])
 
+dnl External (out-of-process) preparser requires both process spawn support
+dnl and dynamic linking: in static builds libvlc.a and the preparser binary
+dnl both define vlc_module_name, causing a multiple-definition link error.
+AM_CONDITIONAL([HAVE_EXTERNAL_PREPARSER],
+    [test "${HAVE_PROCESS_SPAWN}" = "1" -a "${enable_shared}" != "no"])
+AM_COND_IF([HAVE_EXTERNAL_PREPARSER], [
+  AC_DEFINE([HAVE_VLC_EXTERNAL_PREPARSER], [1],
+            [Define to 1 if the out-of-process preparser is supported.])
+])
+
 AM_CONDITIONAL([HAVE_WIN32],   [test "${SYS}" = "mingw32"])
 AM_CONDITIONAL([HAVE_WIN64],   [test "${HAVE_WIN64}" = "1"]) dnl Only used for the packaging
 AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])

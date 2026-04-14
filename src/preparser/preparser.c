@@ -40,7 +40,7 @@ vlc_preparser_t *vlc_preparser_New(vlc_object_t *obj,
     if (preparser == NULL) {
         return NULL;
     }
-#if defined(HAVE_VLC_PROCESS_SPAWN)
+#if defined(HAVE_VLC_EXTERNAL_PREPARSER)
     /* Must reflect cfg->external_process: forcing this to true would cause
      * vlc-preparser child processes to spawn further children, resulting in
      * an infinite fork bomb. */

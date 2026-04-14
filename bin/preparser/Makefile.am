@@ -4,12 +4,14 @@ AUTOMAKE_OPTIONS = subdir-objects
 # Preparser executable
 #
 if BUILD_VLC
+if HAVE_EXTERNAL_PREPARSER
 if HAVE_DYNAMIC_PLUGINS
 pkglibexec_PROGRAMS += vlc-preparser
 else
 pkglibexec_PROGRAMS = vlc-preparser
 endif
 noinst_PROGRAMS += vlc-preparser-static
+endif
 endif
 
 vlc_preparser_SOURCES = \
