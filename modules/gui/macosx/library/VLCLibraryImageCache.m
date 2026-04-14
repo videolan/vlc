@@ -31,7 +31,9 @@
 
 #import "playqueue/VLCPlayQueueItem.h"
 
-NSUInteger kVLCMaximumLibraryImageCacheSize = 50;
+NSUInteger kVLCMaximumLibraryImageCacheSize = 500;
+/* 256 MB cost limit based on estimated pixel data size per image */
+static const NSUInteger kVLCLibraryImageCacheCostLimit = 256 * 1024 * 1024;
 uint32_t kVLCDesiredThumbnailWidth = 512;
 uint32_t kVLCDesiredThumbnailHeight = 512;
 float kVLCDefaultThumbnailPosition = .15;
@@ -48,12 +50,28 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
 
 @implementation VLCLibraryImageCache
 
++ (NSUInteger)costForImage:(NSImage *)image
+{
+    NSBitmapImageRep *bitmapRep = nil;
+    for (NSImageRep *rep in image.representations) {
+        if ([rep isKindOfClass:[NSBitmapImageRep class]]) {
+            bitmapRep = (NSBitmapImageRep *)rep;
+            break;
+        }
+    }
+    if (bitmapRep) {
+        return bitmapRep.pixelsWide * bitmapRep.pixelsHigh * bitmapRep.bitsPerPixel / 8;
+    }
+    return (NSUInteger)(image.size.width * image.size.height * 4);
+}
+
 - (instancetype)init
 {
     self = [super init];
     if (self) {
         _imageCache = [[NSCache alloc] init];
         _imageCache.countLimit = kVLCMaximumLibraryImageCacheSize;
+        _imageCache.totalCostLimit = kVLCLibraryImageCacheCostLimit;
     }
     return self;
 }
@@ -98,7 +116,8 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     }
 
     if (image) {
-        [_imageCache setObject:image forKey:artworkMRL];
+        const NSUInteger cost = [VLCLibraryImageCache costForImage:image];
+        [_imageCache setObject:image forKey:artworkMRL cost:cost];
     } else { // If nothing so far worked, then fall back on default image
         image = [NSImage imageNamed:@"noart.png"];
     }
@@ -148,13 +167,15 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         dispatch_async(dispatch_get_main_queue(), ^{
             if (image) {
                 image.size = imageSize;
-                [self->_imageCache setObject:image forKey:inputItem.MRL];
+                const NSUInteger cost = [VLCLibraryImageCache costForImage:image];
+                [self->_imageCache setObject:image forKey:inputItem.MRL cost:cost];
                 completionHandler(image);
             } else {
                 [inputItem thumbnailWithSize:imageSize completionHandler:^(NSImage * const image) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         if (image) {
-                            [self->_imageCache setObject:image forKey:inputItem.MRL];
+                            const NSUInteger cost = [VLCLibraryImageCache costForImage:image];
+                            [self->_imageCache setObject:image forKey:inputItem.MRL cost:cost];
                             completionHandler(image);
                         } else {
                             NSLog(@"Failed to generate thumbnail for input item %@", inputItem.MRL);
