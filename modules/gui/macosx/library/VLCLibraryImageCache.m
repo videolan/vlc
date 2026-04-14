@@ -271,12 +271,4 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     }
 }
 
-+ (NSImage *)thumbnailAtMrl:(NSString *)smallArtworkMRL
-{
-    NSImage * const cachedImage = 
-        [VLCLibraryImageCache.sharedImageCache->_imageCache objectForKey:smallArtworkMRL];
-    return cachedImage ?
-        cachedImage : [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:smallArtworkMRL]];
-}
-
 @end

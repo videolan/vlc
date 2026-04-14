@@ -36,7 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
                withCompletion:(void(^)(const NSImage *))completionHandler;
 + (void)thumbnailForPlayQueueItem:(VLCPlayQueueItem *)playlistItem
                    withCompletion:(void(^)(const NSImage *))completionHandler;
-+ (NSImage *)thumbnailAtMrl:(NSString *)smallArtworkMRL;
 
 @end
 
