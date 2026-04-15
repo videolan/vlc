@@ -235,6 +235,7 @@ class mkv_track_t
         es_format_t fmt;
         float       f_fps;
         es_out_id_t *p_es;
+        vlc_fourcc_t uncompressed_fourcc = 0;
 
         /* audio */
         unsigned int i_original_rate;
