@@ -567,7 +567,7 @@ index 074bdfb..0000000
 -                if test -f "$openssl_include_dir/openssl/opensslv.h"; then
 -
 -                    OPENSSL_VERSION=`grep OPENSSL_VERSION_TEXT $openssl_include_dir/openssl/opensslv.h \
--                                    | grep -v fips | grep -v PTEXT | sed -e 's/[ ][ ][ ]*/\t/g' | cut -f 2 | tr -d \"`
+-                                    | grep -v fips | grep -v PTEXT | sed -e 's/^.*OPENSSL_VERSION_TEXT[ ]*\"[ ]*OpenSSL[ ]*//' -e 's/[ ].*//'`
 -                    AC_SUBST([OPENSSL_VERSION])
 -
 -                    dnl Decompose required version string and calculate numerical representation

@@ -1,0 +1,24 @@
+From 2bf3c0ba6f42bd3b44915d4b03518fed1097cbf0 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 16 Apr 2026 12:54:02 +0200
+Subject: [PATCH 5/5] Include <cstdint> where int64_t is needed
+
+---
+ src/KM_fileio.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/KM_fileio.h b/src/KM_fileio.h
+index 8d07429..e66b0bf 100755
+--- a/src/KM_fileio.h
++++ b/src/KM_fileio.h
+@@ -34,6 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ #include <KM_util.h>
+ #include <string>
++#include <cstdint>
+ 
+ #ifdef KM_WIN32
+ # include <io.h>
+-- 
+2.52.0.windows.1
+
