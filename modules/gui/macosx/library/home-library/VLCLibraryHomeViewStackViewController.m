@@ -64,7 +64,7 @@
 
 - (void)dealloc
 {
-    self.collectionsStackView.subviews = @[];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)setup
@@ -73,6 +73,10 @@
     [notificationCenter addObserver:self
                             selector:@selector(recentsChanged:)
                                 name:VLCLibraryModelRecentsMediaListReset
+                                object:nil];
+    [notificationCenter addObserver:self
+                            selector:@selector(recentsChanged:)
+                                name:VLCLibraryModelAllCachesDropped
                                 object:nil];
     [notificationCenter addObserver:self
                             selector:@selector(recentsChanged:)
