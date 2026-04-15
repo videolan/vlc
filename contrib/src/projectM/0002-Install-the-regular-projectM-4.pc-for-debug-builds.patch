@@ -1,0 +1,24 @@
+From bea63f445fbe7e9c4ddd3d6a9f47ecf6a3a2cbf1 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 15 Apr 2026 08:06:57 +0200
+Subject: [PATCH 2/4] Install the regular projectM-4.pc for debug builds
+
+---
+ cmake/GeneratePkgConfigFiles.cmake | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/cmake/GeneratePkgConfigFiles.cmake b/cmake/GeneratePkgConfigFiles.cmake
+index 1bb9b5aab..ba3efc8fb 100644
+--- a/cmake/GeneratePkgConfigFiles.cmake
++++ b/cmake/GeneratePkgConfigFiles.cmake
+@@ -32,7 +32,6 @@ macro(GENERATE_PKG_CONFIG_FILES target package_name)
+         set(PKGCONFIG_PACKAGE_REQUIREMENTS "${PKGCONFIG_PACKAGE_REQUIREMENTS_ALL} ${PKGCONFIG_PACKAGE_REQUIREMENTS_RELEASE}")
+         configure_file(${PROJECTM_SOURCE_DIR}/cmake/pkgconfig-file.in "${CMAKE_CURRENT_BINARY_DIR}/${package_name}.pc" @ONLY)
+         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${package_name}.pc"
+-                CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel
+                 DESTINATION "${PROJECTM_LIB_DIR}/pkgconfig"
+                 COMPONENT Devel
+                 )
+-- 
+2.52.0.windows.1
+

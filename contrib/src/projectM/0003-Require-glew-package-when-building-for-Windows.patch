@@ -1,0 +1,30 @@
+From b8ac3c3770497781f9ac993c25e2e1e1af31575c Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 15 Apr 2026 08:20:52 +0200
+Subject: [PATCH 3/4] Require glew package when building for Windows
+
+This is the same condition as in the main CMakeLists.txt.
+---
+ src/libprojectM/CMakeLists.txt | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/libprojectM/CMakeLists.txt b/src/libprojectM/CMakeLists.txt
+index ce4b5623e..de0088b49 100644
+--- a/src/libprojectM/CMakeLists.txt
++++ b/src/libprojectM/CMakeLists.txt
+@@ -212,7 +212,11 @@ if(ENABLE_INSTALL)
+ 
+         set(PKGCONFIG_PACKAGE_NAME "${PROJECTM_LIBRARY_BASE_OUTPUT_NAME}")
+         set(PKGCONFIG_PACKAGE_DESCRIPTION "projectM Music Visualizer")
+-        set(PKGCONFIG_PACKAGE_REQUIREMENTS_ALL "opengl")
++        if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
++                set(PKGCONFIG_PACKAGE_REQUIREMENTS_ALL "glew")
++        else()
++                set(PKGCONFIG_PACKAGE_REQUIREMENTS_ALL "opengl")
++        endif()
+ 
+         generate_pkg_config_files(projectM ${PROJECTM_LIBRARY_BASE_OUTPUT_NAME})
+ 
+-- 
+2.52.0.windows.1
+

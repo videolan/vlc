@@ -1,6 +1,6 @@
 # PROJECTM
-PROJECTM_VERSION := 2.0.1
-PROJECTM_URL := $(SF)/projectm/$(PROJECTM_VERSION)/projectM-$(PROJECTM_VERSION)-Source.tar.gz
+PROJECTM_VERSION := 4.1.6
+PROJECTM_URL := $(GITHUB)/projectM-visualizer/projectm/releases/download/v$(PROJECTM_VERSION)/libprojectM-$(PROJECTM_VERSION).tar.gz
 
 ifdef HAVE_WIN32
 ifneq ($(ARCH),arm)
@@ -11,39 +11,28 @@ endif
 endif
 endif
 endif
-ifeq ($(call need_pkg,"libprojectM"),)
+ifeq ($(call need_pkg,"projectM-4"),)
 PKGS_FOUND += projectM
 endif
 
 DEPS_projectM = glew $(DEPS_glew)
 
-$(TARBALLS)/projectM-$(PROJECTM_VERSION)-Source.tar.gz:
+$(TARBALLS)/libprojectM-$(PROJECTM_VERSION).tar.gz:
 	$(call download_pkg,$(PROJECTM_URL),projectM)
 
-.sum-projectM: projectM-$(PROJECTM_VERSION)-Source.tar.gz
+.sum-projectM: libprojectM-$(PROJECTM_VERSION).tar.gz
 
-projectM: projectM-$(PROJECTM_VERSION)-Source.tar.gz .sum-projectM
+projectM: libprojectM-$(PROJECTM_VERSION).tar.gz .sum-projectM
 	$(UNPACK)
-ifdef HAVE_WIN64
-	$(APPLY) $(SRC)/projectM/win64.patch
-endif
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/projectM/win32.patch
-endif
-	$(APPLY) $(SRC)/projectM/gcc6.patch
-	$(APPLY) $(SRC)/projectM/clang6.patch
-	$(APPLY) $(SRC)/projectM/missing-includes.patch
-	$(APPLY) $(SRC)/projectM/projectm-cmake-install.patch
-	# remove enforced CMP0005 incompatible with recent CMake
-	sed -i.orig 's,cmake_policy(,# cmake_policy(,' "$(UNPACK_DIR)/CMakeLists.txt"
+	$(APPLY) $(SRC)/projectM/0001-Always-generate-pkg-config-files.patch
+	$(APPLY) $(SRC)/projectM/0002-Install-the-regular-projectM-4.pc-for-debug-builds.patch
+	$(APPLY) $(SRC)/projectM/0003-Require-glew-package-when-building-for-Windows.patch
+	$(APPLY) $(SRC)/projectM/0004-Do-not-use-the-l-form-of-link-flags.patch
 	$(MOVE)
 
 PROJECTM_CONF := \
-		-DCMAKE_CXX_STANDARD=98 \
-		-DDISABLE_NATIVE_PRESETS:BOOL=ON \
-		-DUSE_FTGL:BOOL=OFF \
-		-DBUILD_PROJECTM_STATIC:BOOL=ON \
-		-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+		-DENABLE_DEBUG_POSTFIX:BOOL=OFF \
+		-DENABLE_PLAYLIST:BOOL=OFF
 
 .projectM: projectM toolchain.cmake
 	$(CMAKECLEAN)

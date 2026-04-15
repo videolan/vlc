@@ -1,0 +1,23 @@
+From 46d9c5d5f9bac205a80389a4bcd9fb5879ed4e17 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 15 Apr 2026 08:35:04 +0200
+Subject: [PATCH 4/4] Do not use the -l: form of link flags
+
+---
+ cmake/pkgconfig-file.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/pkgconfig-file.in b/cmake/pkgconfig-file.in
+index fc27c9e17..8a2b9c8b0 100644
+--- a/cmake/pkgconfig-file.in
++++ b/cmake/pkgconfig-file.in
+@@ -9,5 +9,5 @@ Name: @PKGCONFIG_PACKAGE_NAME@
+ Version: @PROJECT_VERSION@
+ Description: @PKGCONFIG_PACKAGE_DESCRIPTION@
+ Requires: @PKGCONFIG_PACKAGE_REQUIREMENTS@
+-Libs: -L${libdir} -l:@PKGCONFIG_PROJECTM_LIBRARY@ @PKGCONFIG_LIBS@
++Libs: -L${libdir} -l@PKGCONFIG_PROJECTM_LIBRARY@ @PKGCONFIG_LIBS@
+ Cflags: -I${includedir} @PKGCONFIG_FLAGS@
+-- 
+2.52.0.windows.1
+

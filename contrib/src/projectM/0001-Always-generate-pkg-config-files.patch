@@ -1,0 +1,56 @@
+From a45445c0db5fd48638e04cc17d639996d5b169f2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 15 Apr 2026 07:59:45 +0200
+Subject: [PATCH 1/4] Always generate pkg-config files
+
+They can also be used in Windows environments using UNIX toolchains (msys2, WSL cross-compilation, etc).
+---
+ cmake/GeneratePkgConfigFiles.cmake | 4 ++--
+ src/libprojectM/CMakeLists.txt     | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/GeneratePkgConfigFiles.cmake b/cmake/GeneratePkgConfigFiles.cmake
+index 640c595ac..1bb9b5aab 100644
+--- a/cmake/GeneratePkgConfigFiles.cmake
++++ b/cmake/GeneratePkgConfigFiles.cmake
+@@ -1,6 +1,6 @@
+ macro(GENERATE_PKG_CONFIG_FILES target package_name)
+ 
+-    if(UNIX)
++    # if(UNIX)
+         macro(set_pkg_config_path varname path)
+             if(IS_ABSOLUTE "${path}")
+                 set(${varname} "${path}")
+@@ -49,6 +49,6 @@ macro(GENERATE_PKG_CONFIG_FILES target package_name)
+         unset(_lib_name)
+         unset(_output_name)
+         unset(_exported_defines)
+-    endif()
++    # endif()
+ 
+ endmacro()
+\ No newline at end of file
+diff --git a/src/libprojectM/CMakeLists.txt b/src/libprojectM/CMakeLists.txt
+index 134850496..ce4b5623e 100644
+--- a/src/libprojectM/CMakeLists.txt
++++ b/src/libprojectM/CMakeLists.txt
+@@ -198,7 +198,7 @@ if(ENABLE_INSTALL)
+             )
+ 
+     # pkg-config export, only supported on UNIX systems.
+-    if(UNIX)
++#     if(UNIX)
+         include(GeneratePkgConfigFiles)
+ 
+         if(ENABLE_BOOST_FILESYSTEM)
+@@ -216,6 +216,6 @@ if(ENABLE_INSTALL)
+ 
+         generate_pkg_config_files(projectM ${PROJECTM_LIBRARY_BASE_OUTPUT_NAME})
+ 
+-    endif()
++#     endif()
+ 
+ endif()
+-- 
+2.52.0.windows.1
+
