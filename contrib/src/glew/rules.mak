@@ -1,6 +1,6 @@
 # GLEW
 GLEW_VERSION := 2.1.0
-GLEW_URL := $(SF)/glew/glew/$(GLEW_VERSION)/glew-$(GLEW_VERSION).tgz
+GLEW_URL := $(GITHUB)/nigels-com/glew/releases/download/glew-$(GLEW_VERSION)/glew-$(GLEW_VERSION).tgz
 
 ifeq ($(call need_pkg,"glew"),)
 PKGS_FOUND += glew
