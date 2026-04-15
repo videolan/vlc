@@ -230,13 +230,9 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 {
     NSMutableArray<VLCLibraryVideoFlattenedRow *> * const rows = [NSMutableArray array];
 
-    const NSUInteger recentsCount = _recentsArray.count;
-    if (recentsCount > 0) {
-        [rows addObject:[VLCLibraryVideoFlattenedRow headerForGroup:VLCMediaLibraryParentGroupTypeRecentVideos]];
-        for (NSUInteger i = 0; i < recentsCount; i++) {
-            [rows addObject:[VLCLibraryVideoFlattenedRow itemAtIndex:i
-                                                             inGroup:VLCMediaLibraryParentGroupTypeRecentVideos]];
-        }
+    // Recents are shown as a carousel row at the top of the table.
+    if (_recentsArray.count > 0) {
+        [rows addObject:[VLCLibraryVideoFlattenedRow carouselRow]];
     }
 
     const NSUInteger libraryCount = _libraryArray.count;
@@ -368,6 +364,14 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
 #pragma mark - Public query methods
 
+- (BOOL)isCarouselRow:(NSInteger)row
+{
+    if (row < 0 || (NSUInteger)row >= _flattenedRows.count) {
+        return NO;
+    }
+    return _flattenedRows[row].isCarousel;
+}
+
 - (BOOL)isHeaderRow:(NSInteger)row
 {
     if (row < 0 || (NSUInteger)row >= _flattenedRows.count) {
@@ -439,7 +443,7 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
 - (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
-    if ([self isHeaderRow:row]) {
+    if ([self isHeaderRow:row] || [self isCarouselRow:row]) {
         return nil;
     }
     const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
@@ -455,7 +459,7 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
     VLCLibraryVideoFlattenedRow * const flatRow = _flattenedRows[row];
 
-    if (flatRow.isHeader) {
+    if (flatRow.isHeader || flatRow.isCarousel) {
         return nil;
     }
 
@@ -476,7 +480,7 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
     const NSUInteger rowCount = _flattenedRows.count;
     for (NSUInteger i = 0; i < rowCount; i++) {
         VLCLibraryVideoFlattenedRow * const flatRow = _flattenedRows[i];
-        if (flatRow.isHeader) {
+        if (flatRow.isHeader || flatRow.isCarousel) {
             continue;
         }
 
