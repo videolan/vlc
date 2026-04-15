@@ -287,7 +287,7 @@ static void *Thread( void *p_data )
     locale_t oldloc;
 
 #ifdef HAVE_PROJECTM4
-    projectm_handle p_projectm; 
+    projectm_handle p_projectm;
 #else
     projectM *p_projectm;
 #endif
@@ -316,8 +316,8 @@ static void *Thread( void *p_data )
     /* Create the projectM object */
 #ifdef HAVE_PROJECTM4
     p_projectm = projectm_create();
-    projectm_set_window_size(p_projectm, 
-                             var_InheritInteger( p_filter, "projectm-width" ), 
+    projectm_set_window_size(p_projectm,
+                             var_InheritInteger( p_filter, "projectm-width" ),
                              var_CreateGetInteger( p_filter, "projectm-height" ));
 #else
 #ifndef HAVE_PROJECTM2
@@ -370,7 +370,7 @@ static void *Thread( void *p_data )
                                       sizeof( float ) );
 
     /* Choose a preset randomly or projectM will always show the first one */
-#ifndef HAVE_PROJECTM4 
+#ifndef HAVE_PROJECTM4
     if ( p_projectm->getPlaylistSize() > 0 )
         p_projectm->selectPreset( (unsigned)vlc_mrand48() % p_projectm->getPlaylistSize() );
 #endif
@@ -401,11 +401,11 @@ static void *Thread( void *p_data )
         {
 #ifdef HAVE_PROJECTM4
             projectm_pcm_add_float( p_projectm, p_sys->p_buffer, p_sys->i_nb_samples, (projectm_channels)1 );
-        
+
 #else
             p_projectm->pcm()->addPCMfloat( p_sys->p_buffer,
                                             p_sys->i_nb_samples );
-                
+
 #endif
             p_sys->i_nb_samples = 0;
         }
