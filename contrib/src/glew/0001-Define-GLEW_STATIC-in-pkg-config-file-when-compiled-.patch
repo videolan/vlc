@@ -1,0 +1,30 @@
+From ff48c25db79dcaaf1b9ec89af9f085b2541cba57 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 15 Apr 2026 13:47:23 +0200
+Subject: [PATCH 1/4] Define GLEW_STATIC in pkg-config file when compiled
+ statically
+
+---
+ build/cmake/CMakeLists.txt | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/build/cmake/CMakeLists.txt b/build/cmake/CMakeLists.txt
+index 7b7f8b4..d4eb8a5 100644
+--- a/build/cmake/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -219,7 +219,11 @@ set (libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+ set (includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+ set (version ${GLEW_VERSION})
+ set (libname ${GLEW_LIB_NAME})
+-set (cflags)
++if(BUILD_SHARED_LIBS)
++  set (cflags)
++else()
++  set (cflags -DGLEW_STATIC)
++endif ()
+ set (requireslib glu)
+ 
+ #  Mac OSX has no glu.pc unless optional X11/GLX is installed
+-- 
+2.52.0.windows.1
+

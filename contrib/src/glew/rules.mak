@@ -1,5 +1,5 @@
 # GLEW
-GLEW_VERSION := 2.1.0
+GLEW_VERSION := 2.3.1
 GLEW_URL := $(GITHUB)/nigels-com/glew/releases/download/glew-$(GLEW_VERSION)/glew-$(GLEW_VERSION).tgz
 
 ifeq ($(call need_pkg,"glew"),)
@@ -13,12 +13,17 @@ $(TARBALLS)/glew-$(GLEW_VERSION).tgz:
 
 glew: glew-$(GLEW_VERSION).tgz .sum-glew
 	$(UNPACK)
-	$(APPLY) $(SRC)/glew/glew-drop-debug-postfix.patch
+	$(APPLY) $(SRC)/glew/0001-Define-GLEW_STATIC-in-pkg-config-file-when-compiled-.patch
+	$(APPLY) $(SRC)/glew/0002-Link-with-opengl32-on-Windows.patch
+	$(APPLY) $(SRC)/glew/0003-Link-directly-with-glu32-on-Windows.patch
+	$(APPLY) $(SRC)/glew/0004-Allow-disabling-the-CMAKE_DEBUG_POSTFIX.patch
 	$(MOVE)
+
+GLEW_CONF := -DBUILD_UTILS=OFF
 
 .glew: glew toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE) -S $</build/cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+	$(HOSTVARS_CMAKE) $(CMAKE) -S $</build/cmake $(GLEW_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

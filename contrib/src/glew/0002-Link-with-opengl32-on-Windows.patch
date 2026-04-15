@@ -1,0 +1,26 @@
+From 0f272be0aaf41e7225188ff44750399bbf5c78d9 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 15 Apr 2026 13:54:45 +0200
+Subject: [PATCH 2/4] Link with opengl32 on Windows
+
+---
+ build/cmake/CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/build/cmake/CMakeLists.txt b/build/cmake/CMakeLists.txt
+index d4eb8a5..6c83c50 100644
+--- a/build/cmake/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -224,6 +224,9 @@ if(BUILD_SHARED_LIBS)
+ else()
+   set (cflags -DGLEW_STATIC)
+ endif ()
++if (WIN32)
++  set (libgl -lopengl32)
++endif ()
+ set (requireslib glu)
+ 
+ #  Mac OSX has no glu.pc unless optional X11/GLX is installed
+-- 
+2.52.0.windows.1
+

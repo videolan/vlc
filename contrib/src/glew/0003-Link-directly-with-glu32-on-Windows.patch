@@ -1,0 +1,28 @@
+From a4f97da1d0753ba570db3265077f100c3306f137 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 15 Apr 2026 13:44:24 +0200
+Subject: [PATCH 3/4] Link directly with glu32 on Windows
+
+---
+ build/cmake/CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/build/cmake/CMakeLists.txt b/build/cmake/CMakeLists.txt
+index 6c83c50..8bcd803 100644
+--- a/build/cmake/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -233,6 +233,11 @@ set (requireslib glu)
+ if (APPLE)
+   set (requireslib)
+ endif ()
++if (WIN32)
++  # Windows/mingw-w64 doesn't have a glu.pc but has libglu32.a
++  set (requireslib)
++  set (libgl "${libgl} -lglu32")
++endif()
+ 
+ configure_file (${GLEW_DIR}/glew.pc.in ${CMAKE_CURRENT_BINARY_DIR}/glew.pc @ONLY)
+ 
+-- 
+2.52.0.windows.1
+
