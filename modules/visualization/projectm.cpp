@@ -47,6 +47,13 @@
 # include <xlocale.h>
 #endif
 
+#ifdef HAVE_PROJECTM4
+# ifdef _WIN32
+#  include <windows.h>
+#  include <GL/glew.h>
+# endif
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -308,6 +315,16 @@ static void *Thread( void *p_data )
         msg_Err( p_filter, "Can't attach gl context" );
         return NULL;
     }
+
+#ifdef HAVE_PROJECTM4
+#ifdef _WIN32
+    if (glewInit() != GLEW_OK)
+    {
+        vlc_gl_ReleaseCurrent( gl );
+        return NULL;
+    }
+#endif
+#endif
 
     /* Work-around the projectM locale bug */
     loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
