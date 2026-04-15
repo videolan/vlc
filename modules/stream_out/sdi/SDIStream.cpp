@@ -251,7 +251,6 @@ void AbstractDecodedStream::deinit()
 
 bool AbstractDecodedStream::init(const es_format_t *p_fmt)
 {
-    const char *category;
     if(p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES)
         return false;
 
@@ -274,7 +273,7 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
 
     if(!p_decoder->p_module)
     {
-        msg_Err(p_stream, "cannot find %s for %4.4s", category, (char *)&p_fmt->i_codec);
+        msg_Err(p_stream, "cannot find decoder for %4.4s", (char *)&p_fmt->i_codec);
         ReleaseDecoder();
         return false;
     }
