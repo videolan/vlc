@@ -531,6 +531,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         goto error;
     }
 
+    p_pic->b_progressive = true;
+
     /* Read ICC profile */
 #if defined(LIBJPEG_TURBO_VERSION_NUMBER) && LIBJPEG_TURBO_VERSION_NUMBER >= 1005090
     JOCTET *p_icc;
