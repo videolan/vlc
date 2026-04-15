@@ -192,10 +192,11 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     const NSSize imageSize = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-        NSImage * const image = [[NSImage alloc] initWithContentsOfURL:artworkURL];
+        NSImage * const image = artworkURL ?
+            [VLCLibraryImageCache downsampledImageFromURL:artworkURL
+                                            maxPixelSize:kVLCDesiredThumbnailWidth] : nil;
 
         if (image) {
-            image.size = imageSize;
             const NSUInteger cost = [VLCLibraryImageCache costForImage:image];
             [self->_imageCache setObject:image forKey:inputItem.MRL cost:cost];
             dispatch_async(dispatch_get_main_queue(), ^{
