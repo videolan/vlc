@@ -176,7 +176,6 @@ static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
      const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
 {
-    (void) config;
     (void) size_out;
 
     filter->config.filter_planes = false;
@@ -406,9 +405,12 @@ error:
 #define GAMMA_TEXT N_("Image gamma (0-10)")
 #define GAMMA_LONGTEXT N_("Set the image gamma, between 0.01 and 10. Defaults to 1.")
 
-static int OpenVideoFilter(vlc_object_t *obj)
+static int OpenVideoFilter(filter_t *filter)
 {
-    filter_t *filter = (filter_t*)obj;
+    /* For SW chromas, only use the OpenGL filter if explicitly requested */
+    if (filter->vctx_in == NULL
+     && !var_InheritBool(filter, "video-filter-opengl"))
+        return VLC_EGENERIC;
 
     module_t *module = vlc_gl_WrapOpenGLFilter(filter, "gladjust");
     return module ? VLC_SUCCESS : VLC_EGENERIC;
@@ -418,15 +420,18 @@ vlc_module_begin()
     set_shortname("gladjust")
     set_description("OpenGL Adjust Filter")
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_capability("video filter", 0)
+    set_capability("video filter", 1)
     add_float_with_range( "contrast", 1.0, 0.0, 2.0, CONT_TEXT, CONT_LONGTEXT )
     add_float_with_range( "brightness", 1.0, 0.0, 2.0, LUM_TEXT, LUM_LONGTEXT )
     add_float_with_range( "hue", 0, -180., +180., HUE_TEXT, HUE_LONGTEXT )
     add_float_with_range( "saturation", 1.0, 0.0, 3.0, SAT_TEXT, SAT_LONGTEXT )
     add_float_with_range( "gamma", 1.0, 0.01, 10.0, GAMMA_TEXT, GAMMA_LONGTEXT )
     add_bool( "brightness-threshold", false, THRES_TEXT, THRES_LONGTEXT )
-    set_callback(OpenVideoFilter)
-    add_shortcut("gladjust")
+    add_bool( "video-filter-opengl", true,
+              N_("Use OpenGL video filters"),
+              N_("Use OpenGL accelerated video filters for software chromas.") )
+    set_callback_video_filter(OpenVideoFilter)
+    add_shortcut("adjust")
 
     add_submodule()
         set_capability("opengl filter", 0)
