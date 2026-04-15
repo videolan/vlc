@@ -356,6 +356,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     p_pic = decoder_NewPicture( p_dec );
     if( !p_pic ) goto error;
 
+    p_pic->b_progressive = true;
     /* Decode ICC profile */
 #ifdef PNG_iCCP_SUPPORTED
     if (png_get_valid( p_png, p_info, PNG_INFO_iCCP ))
