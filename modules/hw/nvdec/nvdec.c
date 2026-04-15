@@ -778,6 +778,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (devsys == NULL)
     {
         msg_Dbg(p_this, "Missing decoder device");
+        if (dec_device != NULL)
+            vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
     }
 
