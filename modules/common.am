@@ -27,6 +27,10 @@ endif
 AM_CFLAGS =
 AM_CXXFLAGS =
 AM_OBJCFLAGS =
+if HAVE_PARTIAL_LINKING
+AM_CPPFLAGS += -DVLC_PARTIAL_LINKING
+AM_CXXFLAGS += $(NO_GNU_UNIQUE_CXXFLAGS)
+endif
 AM_LDFLAGS = \
 	-avoid-version -module \
 	-export-symbols-regex ^vlc_entry \
