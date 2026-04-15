@@ -56,7 +56,7 @@ if upnp_dep.found()
             '../stream_out/renderer_common.cpp',
             '../stream_out/dlna/dlna.cpp',
             ),
-        'dependencies' : [upnp_dep, upnp_darwin_deps]
+        'dependencies' : [contrib_dep, upnp_dep, upnp_darwin_deps]
     }
 endif
 
