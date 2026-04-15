@@ -20,9 +20,17 @@ vlc_modules += {
 }
 
 # projectM visualization plugin
-projectm_dep = dependency('libprojectM', required: get_option('projectm'))
-if projectm_dep.found() and projectm_dep.version().version_compare('>= 2.0.0')
-    cdata.set('HAVE_PROJECTM2',1)
+projectm_dep = disabler()
+if get_option('projectm').allowed()
+    projectm_dep = dependency('projectM-4', required: false)
+    if (projectm_dep.found())
+        cdata.set('HAVE_PROJECTM4',1)
+    else
+        projectm_dep = dependency('libprojectM', required: get_option('projectm'))
+        if projectm_dep.found() and projectm_dep.version().version_compare('>= 2.0.0')
+            cdata.set('HAVE_PROJECTM2',1)
+        endif
+    endif
 endif
 
 vlc_modules += {

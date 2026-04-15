@@ -299,6 +299,9 @@
 /* Define to 1 if using libprojectM 2.x */
 #mesondefine HAVE_PROJECTM2
 
+/* Define to 1 if using libprojectM 4.x */
+#mesondefine HAVE_PROJECTM4
+
 /* Define to 1 if you have the <pthread.h> header file. */
 #mesondefine HAVE_PTHREAD_H
 
