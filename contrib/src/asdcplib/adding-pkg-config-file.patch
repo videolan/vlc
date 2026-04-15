@@ -39,10 +39,10 @@ index b107364..bb8c729 100644
 +CLEANFILES = asdcplib.pc
 diff --git a/asdcplib.pc.in b/asdcplib.pc.in
 new file mode 100644
-index 0000000..8d86dc2
+index 0000000..c498e88
 --- /dev/null
 +++ b/asdcplib.pc.in
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,11 @@
 +prefix=@CMAKE_INSTALL_PREFIX@
 +exec_prefix=${prefix}
 +includedir=${prefix}/include
@@ -52,7 +52,8 @@ index 0000000..8d86dc2
 +Description: @CPACK_PACKAGE_DESCRIPTION_SUMMARY@
 +Version: @VERSION_STRING@
 +Cflags: -I${includedir}
-+Libs: -L${libdir} -lasdcp -lkumu -lnettle -lgmp
++Libs: -L${libdir} -lasdcp -lkumu
++Requires: nettle, gmp
 diff --git a/configure.ac b/configure.ac
 index c26f4d1..325faee 100644
 --- a/configure.ac
