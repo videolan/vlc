@@ -1126,6 +1126,20 @@ AS_IF([test "${have_partial_linking}" = "yes" -a "${SYS}" != "darwin" -a "$OBJCO
 ])
 AC_SUBST([FORCE_GROUP_ALLOCATION_LDFLAGS])
 
+dnl Check if the C++ compiler supports -fno-gnu-unique. GCC emits STB_GNU_UNIQUE
+dnl binding for some C++ symbols, which objcopy -G cannot localize. Emitting
+dnl WEAK instead lets partial-linked static module objects be combined without
+dnl multiple-definition errors and is also clang behavior.
+NO_GNU_UNIQUE_CXXFLAGS=""
+AS_IF([test "${have_partial_linking}" = "yes"], [
+    AC_LANG_PUSH([C++])
+    AX_CHECK_COMPILE_FLAG([-fno-gnu-unique], [
+        NO_GNU_UNIQUE_CXXFLAGS="-fno-gnu-unique"
+    ], [], [-Werror])
+    AC_LANG_POP([C++])
+])
+AC_SUBST([NO_GNU_UNIQUE_CXXFLAGS])
+
 AC_SUBST([LIBDL])
 
 AS_IF([test "${SYS}" != "mingw32"], [
