@@ -4674,14 +4674,14 @@ AS_IF([test "${enable_projectm}" != "no"],
     PKG_CHECK_MODULES(PROJECTM, [projectM-4],
     [
       VLC_ADD_PLUGIN([projectm])
-      AC_DEFINE([HAVE_PROJECTM4], 1, [Define to 1 if using libprojectM 4.x])
+      VLC_ADD_CPPFLAGS([projectm],[-DHAVE_PROJECTM4])
     ],
     [
       PKG_CHECK_MODULES(PROJECTM, [libprojectM],
       [
         VLC_ADD_PLUGIN([projectm])
         PKG_CHECK_EXISTS([libprojectM >= 2.0.0],
-          [ AC_DEFINE([HAVE_PROJECTM2], 1, [Define to 1 if using libprojectM 2.x]) ],
+          [ VLC_ADD_CPPFLAGS([projectm],[-DHAVE_PROJECTM2 -std=gnu++14]) ],
           [ AC_MSG_WARN( [Using libprojectM version 1] ) ]
         )
       ],
