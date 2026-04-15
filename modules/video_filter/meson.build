@@ -55,6 +55,15 @@ vlc_modules += {
     'enabled' : opengl_filter_dep.found()
 }
 
+# OpenGL adjust filter
+vlc_modules += {
+    'name' : 'gladjust',
+    'sources' : files('gladjust.c'),
+    'dependencies' : [gl_common_dep, opengl_filter_dep],
+    'c_args' : opengl_filter_cargs,
+    'enabled' : opengl_filter_dep.found(),
+}
+
 vlc_modules += {
     'name' : 'opengl_win_offscreen',
     'sources' : files('opengl_win_offscreen.c'),
