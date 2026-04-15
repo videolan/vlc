@@ -223,6 +223,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( !p_pic )
         goto done;
 
+    p_pic->b_progressive = true;
+
     /* NOTE: Do not use the stride calculation from cairo, because it is wrong:
      * stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, dim.width);
      * Use the stride from VLC its picture_t::p[0].i_pitch, which is correct.
