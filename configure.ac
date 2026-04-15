@@ -2874,7 +2874,7 @@ PKG_WITH_MODULES([FAAD],[faad2],
                    ],[], [$LIBM])
     ])
     AS_IF([test "${found_faad}" != "yes"],
-        AS_IF([test "${enable_faad}" == "yes"],
+        AS_IF([test "${enable_faad}" = "yes"],
             AC_MSG_ERROR([${FAAD_PKG_ERRORS}.]),
             AC_MSG_WARN([${FAAD_PKG_ERRORS}.]))
     )
@@ -4095,7 +4095,7 @@ AS_IF([test "${enable_qt}" != "no"], [
   AC_MSG_NOTICE([using ${QT_PATHS}])
 
   AC_CHECK_PROGS(PYTHON3, [python3], [no])
-  AS_IF([test "$PYTHON3" == "no"], [
+  AS_IF([test "$PYTHON3" = "no"], [
     AC_MSG_WARN([python is required to detect Qt libraries/flags])
     have_qt="no"
   ],[
