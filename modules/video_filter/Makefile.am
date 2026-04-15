@@ -267,6 +267,8 @@ libgladjust_plugin_la_LIBADD = libvlc_opengl.la
 video_filter_LTLIBRARIES += libgladjust_plugin.la
 endif
 if HAVE_DARWIN
+if !HAVE_WATCHOS
+if !HAVE_XROS
 if HAVE_OSX
 libgladjust_plugin_la_LIBADD = libvlc_opengl.la
 else
@@ -274,6 +276,8 @@ libgladjust_plugin_la_LIBADD = libvlc_opengles.la
 libgladjust_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
 endif
 video_filter_LTLIBRARIES += libgladjust_plugin.la
+endif
+endif
 endif
 if HAVE_ANDROID
 libgladjust_plugin_la_LIBADD = libvlc_opengles.la
