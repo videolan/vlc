@@ -782,8 +782,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             ONLY_FMT(VIDEO);
             if ( colourspace.ValidateSize() )
             {
-                vars.tk->fmt.i_codec = GetFOURCC( colourspace.GetBuffer() );
-                debug( vars, "Colour Space=%4.4s", (const char*)&vars.tk->fmt.i_codec );
+                vars.tk->uncompressed_fourcc = GetFOURCC( colourspace.GetBuffer() );
+                debug( vars, "Colour Space=%4.4s", (const char*)&vars.tk->uncompressed_fourcc );
             }
         }
 #if LIBMATROSKA_VERSION >= 0x010405
@@ -1918,7 +1918,21 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             vars.p_tk->b_pts_only = true;
         }
         S_CASE("V_UNCOMPRESSED") {
-            msg_Dbg( vars.p_demuxer, "uncompressed format detected");
+            if (vars.p_tk->uncompressed_fourcc == 0)
+                msg_Dbg( vars.p_demuxer, "uncompressed format with no FourCC");
+            else
+            {
+                const char *desc = vlc_fourcc_GetDescription(VIDEO_ES, vars.p_tk->uncompressed_fourcc);
+                if (desc[0])
+                {
+                    vars.p_fmt->i_codec = vars.p_tk->uncompressed_fourcc;
+                    msg_Dbg( vars.p_demuxer, "uncompressed format codec=%4.4s", (const char*)&vars.p_tk->uncompressed_fourcc );
+                }
+                else
+                {
+                    msg_Dbg( vars.p_demuxer, "uncompressed format unknown video codec=%4.4s", (const char*)&vars.p_tk->uncompressed_fourcc );
+                }
+            }
         }
         S_CASE("V_FFV1") {
             vars.p_fmt->i_codec = VLC_CODEC_FFV1;
