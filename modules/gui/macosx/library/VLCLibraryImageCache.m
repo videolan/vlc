@@ -26,6 +26,7 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryModel.h"
 
 #import "main/VLCMain.h"
 
@@ -104,8 +105,27 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         _imageCache.countLimit = kVLCMaximumLibraryImageCacheSize;
         _imageCache.totalCostLimit = kVLCLibraryImageCacheCostLimit;
         _noArtImage = [NSImage imageNamed:@"noart.png"];
+
+        NSNotificationCenter * const notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaItemThumbnailGenerated:)
+                                   name:VLCLibraryModelMediaItemThumbnailGenerated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaItemUpdated:)
+                                   name:VLCLibraryModelAudioMediaItemUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaItemUpdated:)
+                                   name:VLCLibraryModelVideoMediaItemUpdated
+                                 object:nil];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 + (instancetype)sharedImageCache
@@ -116,6 +136,26 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         sharedImageCache = [[VLCLibraryImageCache alloc] init];
     });
     return sharedImageCache;
+}
+
+- (void)mediaItemThumbnailGenerated:(NSNotification *)aNotification
+{
+    VLCMediaLibraryMediaItem * const mediaItem = aNotification.object;
+    NSString * const artworkMRL = mediaItem.smallArtworkMRL;
+    if (mediaItem == nil || artworkMRL == nil) {
+        return;
+    }
+    [_imageCache removeObjectForKey:artworkMRL];
+}
+
+- (void)mediaItemUpdated:(NSNotification *)aNotification
+{
+    VLCMediaLibraryMediaItem * const mediaItem = aNotification.object;
+    NSString * const artworkMRL = mediaItem.smallArtworkMRL;
+    if (mediaItem == nil || artworkMRL == nil) {
+        return;
+    }
+    [_imageCache removeObjectForKey:artworkMRL];
 }
 
 - (void)imageForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
@@ -279,6 +319,5 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         [cache imageForLibraryItem:libraryItem withCompletion:completionHandler];
     }
 }
-
 
 @end
