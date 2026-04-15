@@ -762,6 +762,8 @@ static const staticentry_t p_list_video[] = {
         A("Hap1"),
         E("Hap5", "Vidvox Hap Alpha"),
         E("HapY", "Vidvox Hap Q"),
+        E("HapA", "Vidvox Hap Alpha-Only"),
+        E("HapM", "Vidvox Hap Q Alpha"),
 
     B(VLC_CODEC_DXV, "Resolume DXV"),
         A("DXDI"),
