@@ -40,11 +40,13 @@
 # include <libprojectM/projectM.hpp>
 #endif
 
-#ifndef _WIN32
-# include <locale.h>
-#endif
-#ifdef HAVE_XLOCALE_H
-# include <xlocale.h>
+#ifndef HAVE_PROJECTM4
+# ifndef _WIN32
+#  include <locale.h>
+# endif
+# ifdef HAVE_XLOCALE_H
+#  include <xlocale.h>
+# endif
 #endif
 
 #ifdef HAVE_PROJECTM4
@@ -290,8 +292,6 @@ static void *Thread( void *p_data )
     filter_t  *p_filter = (filter_t*)p_data;
     filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
     vlc_gl_t *gl = p_sys->gl;
-    locale_t loc;
-    locale_t oldloc;
 
 #ifdef HAVE_PROJECTM4
     projectm_handle p_projectm;
@@ -326,9 +326,11 @@ static void *Thread( void *p_data )
 #endif
 #endif
 
+#ifndef HAVE_PROJECTM4
     /* Work-around the projectM locale bug */
-    loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
-    oldloc = uselocale (loc);
+    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    locale_t oldloc = uselocale (loc);
+#endif
 
     /* Create the projectM object */
 #ifdef HAVE_PROJECTM4
@@ -454,11 +456,13 @@ static void *Thread( void *p_data )
 
 #endif
 
+#ifndef HAVE_PROJECTM4
     if (loc != (locale_t)0)
     {
         uselocale (oldloc);
         freelocale (loc);
     }
+#endif
 
     vlc_gl_ReleaseCurrent( gl );
     return NULL;
