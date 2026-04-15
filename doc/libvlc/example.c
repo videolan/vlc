@@ -33,14 +33,14 @@ int main(int argc, char* argv[])
     while (libvlc_media_player_is_playing(mp))
     {
         sleep (1);
-        int64_t milliseconds = libvlc_media_player_get_time(mp);
-        int64_t seconds = milliseconds / 1000;
+        int64_t microseconds = libvlc_media_player_get_time(mp);
+        int64_t seconds = microseconds / 1000000;
         int64_t minutes = seconds / 60;
-        milliseconds -= seconds * 1000;
+        microseconds -= seconds * 1000000;
         seconds -= minutes * 60;
 
         printf("Current time: %" PRId64 ":%" PRId64 ":%" PRId64 "\n",
-               minutes, seconds, milliseconds);
+               minutes, seconds, microseconds);
     }
 
     /* Stop playing */

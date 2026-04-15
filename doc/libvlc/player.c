@@ -435,7 +435,7 @@ mainloop_handle_command(struct context *ctx, const char *command, size_t len)
         else
             return 0;
 
-        int seek_jump = 1000; /* 1 second jump */
+        libvlc_time_t seek_jump = 1000000; /* 1 second jump (in us) */
         int vol_jump = 5; /* 5% jump */
         if (ctrol_pressed)
         {

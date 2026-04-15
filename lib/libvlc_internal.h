@@ -121,12 +121,12 @@ void libvlc_threads_deinit (void);
 
 static inline libvlc_time_t libvlc_time_from_vlc_tick(vlc_tick_t time)
 {
-    return MS_FROM_VLC_TICK(time + VLC_TICK_FROM_US(500));
+    return US_FROM_VLC_TICK(time);
 }
 
 static inline vlc_tick_t vlc_tick_from_libvlc_time(libvlc_time_t time)
 {
-    return VLC_TICK_FROM_MS(time);
+    return VLC_TICK_FROM_US(time);
 }
 
 #endif

@@ -526,7 +526,7 @@ bool libvlc_media_get_stats(libvlc_media_t *p_md,
     return true;
 }
 
-// Get duration of media object (in ms)
+// Get duration of media object (in us)
 libvlc_time_t
 libvlc_media_get_duration( libvlc_media_t * p_md )
 {

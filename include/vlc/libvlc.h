@@ -75,6 +75,7 @@ extern "C" {
 /** This structure is opaque. It represents a libvlc instance */
 typedef struct libvlc_instance_t libvlc_instance_t;
 
+/** Represents a time value in microseconds */
 typedef int64_t libvlc_time_t;
 
 /** \defgroup libvlc_error LibVLC error handling
@@ -463,7 +464,7 @@ libvlc_module_description_t *libvlc_video_filter_list_get( libvlc_instance_t *p_
  * \note On systems that support it, the POSIX monotonic clock is used.
  */
 LIBVLC_API
-int64_t libvlc_clock(void);
+libvlc_time_t libvlc_clock(void);
 
 /**
  * Return the delay (in microseconds) until a certain timestamp.
@@ -471,7 +472,7 @@ int64_t libvlc_clock(void);
  * \return negative if timestamp is in the past,
  * positive if it is in the future
  */
-static inline int64_t libvlc_delay(int64_t pts)
+static inline libvlc_time_t libvlc_delay(libvlc_time_t pts)
 {
     return pts - libvlc_clock();
 }

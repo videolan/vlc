@@ -524,7 +524,7 @@ LIBVLC_API VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t *)
 libvlc_media_subitems( libvlc_media_t *p_md );
 
 /**
- * Get duration (in ms) of media descriptor object item.
+ * Get duration (in us) of media descriptor object item.
  *
  * Note, you need to parse using libvlc_parser_queue() or play the media
  * at least once before calling this function.

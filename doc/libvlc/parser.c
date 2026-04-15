@@ -28,7 +28,7 @@
 
 #include <vlc/vlc.h>
 
-#define VLC_PARSER_TIMEOUT   5000 /* 5 secs */
+#define VLC_PARSER_TIMEOUT   5000000 /* 5 secs */
 
 static const char *
 status_to_string(libvlc_parser_status_t status)

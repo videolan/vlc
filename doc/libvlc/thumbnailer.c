@@ -133,7 +133,7 @@ static void snapshot(libvlc_instance_t *vlc, libvlc_media_t *m,
     const struct libvlc_parser_cfg cfg = {
         .version = 0,
         .max_thumbnailer_threads = 1,
-        .timeout = VLC_THUMBNAIL_TIMEOUT * 1000,
+        .timeout = VLC_THUMBNAIL_TIMEOUT * 1000000,
     };
 
     libvlc_parser_t *parser = libvlc_parser_new(vlc, &cfg);

@@ -374,7 +374,7 @@ struct libvlc_parser_cfg
     uint32_t max_thumbnailer_threads;
 
     /**
-     * Timeout of the parser in ms, 0 for no limits, or -1 to inherit the value of preparse-timeout
+     * Timeout of the parser in us, 0 for no limits, or -1 to inherit the value of preparse-timeout
      *
      * \note Optional (can be 0),
      * available since version 0
