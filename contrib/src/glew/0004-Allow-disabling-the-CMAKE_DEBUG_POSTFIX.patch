@@ -1,0 +1,25 @@
+From e19b0eb3bad3305586a21eeeb8f1f3d99c09c8af Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 15 Apr 2026 13:58:45 +0200
+Subject: [PATCH 4/4] Allow disabling the CMAKE_DEBUG_POSTFIX
+
+---
+ build/cmake/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/cmake/CMakeLists.txt b/build/cmake/CMakeLists.txt
+index 8bcd803..4970272 100644
+--- a/build/cmake/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -7,7 +7,7 @@ endif ()
+ 
+ include(GNUInstallDirs)
+ 
+-set(CMAKE_DEBUG_POSTFIX d)
++set(CMAKE_DEBUG_POSTFIX d CACHE STRING "")
+ 
+ option (BUILD_UTILS "utilities" ON)
+ option (GLEW_REGAL "Regal mode" OFF)
+-- 
+2.52.0.windows.1
+
