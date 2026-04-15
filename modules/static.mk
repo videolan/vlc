@@ -120,3 +120,23 @@ CLEANFILES += \
 	$(PARTIAL_PLUGINS:=.symbollist) \
 	vlc_modules_manifest.h
 endif
+
+# Static modules bundle gathering all plugins into a single
+# non-installed archive library, that can be used by downstream projects
+# or executables in the project to link against the static module bank.
+libvlc_static_modules_la_SOURCES =
+libvlc_static_modules_la_LDFLAGS = \
+	-static -export-symbols-regex ^vlc_entry \
+	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
+libvlc_static_modules_la_LIBADD = $(PARTIAL_PLUGINS)
+
+# NOTE: It's easier to define libvlc_static_modules_la_DEPENDENCIES since
+# dependencies on POSIX2024 Make percent substitution is not properly
+# parsed by automake, and it would then depends upon pkglib_LTLIBRARIES,
+# which creates a circular dependency.
+libvlc_static_modules_la_DEPENDENCIES = $(PARTIAL_PLUGINS)
+EXTRA_libvlc_static_modules_la_DEPENDENCIES = vlc_modules_manifest.h
+
+if HAVE_PARTIAL_LINKING
+pkglib_LTLIBRARIES += libvlc_static_modules.la
+endif
