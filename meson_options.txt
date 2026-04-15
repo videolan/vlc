@@ -784,6 +784,11 @@ option('nfs',
     value: 'auto',
     description: 'support nfs protocol via libnfs')
 
+option('asdcplib',
+    type: 'feature',
+    value: 'auto',
+    description: 'support DCP reading via asdcplib')
+
 # TODO: Missing v4l2
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
@@ -803,5 +808,4 @@ option('nfs',
 # TODO: Missing vsxu
 # TODO: Missing kwallet
 # TODO: Missing osx_notifications
-# TODO: Missing asdcplib
 # TODO: Missing chromecast

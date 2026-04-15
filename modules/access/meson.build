@@ -564,5 +564,14 @@ if librist_dep.found()
     }
 endif
 
+# DCP
+asdcp_dep = dependency('asdcplib', required: get_option('asdcplib'))
+vlc_modules += {
+    'name' : 'dcp',
+    'sources' : files('dcp/dcp.cpp', 'dcp/dcpparser.cpp', 'dcp/dcpdecrypt.cpp'),
+    'dependencies' : [asdcp_dep, gcrypt_dep],
+    'enabled' : asdcp_dep.found() and gcrypt_dep.found(),
+}
+
 # RTP
 subdir('rtp')
