@@ -137,6 +137,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         goto error;
     }
 
+    p_pic->b_progressive = true;
+
     const int img_height = img_info.height;
     for (int i = 0; i < img_height; i++)
     {
