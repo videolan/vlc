@@ -296,6 +296,9 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
 - (void)applyAudioDecorativeViewForegroundCoverArtViewConstraints
 {
+    if (self.classic) {
+        return;
+    }
     if (![self.view.subviews containsObject:self.voutContainingView] ||
         ![self.voutContainingView.subviews containsObject:self.audioDecorativeView]) {
         return;
