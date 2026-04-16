@@ -661,7 +661,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
         if ([diskType isEqualToString: kVLCMediaDVD])
             uri = [NSString stringWithFormat: @"dvdnav://%@", getBSDNodeFromMountPath(path)];
         else if ([diskType isEqualToString: kVLCMediaAudioDVD])
-            uri = [NSString stringWithFormat: @"dvda://@", getBSDNodeFromMountPath(path)];
+            uri = [NSString stringWithFormat: @"dvda://%@", getBSDNodeFromMountPath(path)];
         else if ([diskType isEqualToString: kVLCMediaVideoTSFolder])
             uri = [NSString stringWithFormat: @"dvdnav://%@", path];
         else if ([diskType isEqualToString: kVLCMediaAudioCD])
