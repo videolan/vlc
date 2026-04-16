@@ -4,6 +4,16 @@
 PLUGINS = $(VLC_PLUGINS:%=lib%.la)
 PARTIAL_PLUGINS = $(PLUGINS:_plugin.la=_plugin.partial.la)
 
+# With Mach-O, ld64's -exported_symbol promotes the listed pattern to
+# the only globally visible symbols in the relocatable output and
+# demotes everything else. On ELF this is handled by the
+# `objcopy -G 'vlc_entry*'` step below because it only works at the
+# final link otherwise.
+PARTIAL_LINK_EXPORT_FLAGS =
+if HAVE_DARWIN
+PARTIAL_LINK_EXPORT_FLAGS += -Wl,-exported_symbol,_vlc_entry*
+endif
+
 .PRECIOUS: $(PARTIAL_PLUGINS) $(PLUGINS:.la=.la.symbollist) $(PARTIAL_PLUGINS:=.symbollist) \
 	$(PARTIAL_PLUGINS:%.partial.la=.deps/%.partial.la.o)
 
@@ -27,14 +37,18 @@ PARTIAL_PLUGINS = $(PLUGINS:_plugin.la=_plugin.partial.la)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) \
 		-r -o $@ -fPIC \
 		$(FORCE_GROUP_ALLOCATION_LDFLAGS) \
+		$(PARTIAL_LINK_EXPORT_FLAGS) \
 		-Wl,-u,$${vlc_entrypoint} \
 		".libs/$${libpath}" \
 		$${static_dependencies}
 	@# Resolve COMDAT groups so they don't cause cross-plugin dedup at final link
-	@# Then localize ALL symbols except VLC entry points
+	@# Then localize ALL symbols except VLC entry points.
+	@# On Darwin, ld64 -exported_symbol already handles this (see PARTIAL_LINK_EXPORT_FLAGS).
+if !HAVE_DARWIN
 	$(AM_V_at)$(OBJCOPY) --wildcard \
 		-G 'vlc_entry*' \
 		$@ || rm -f $@
+endif
 # Unfortunately libtool checks that the following comment is there to check that
 # libtool object is correct, so provide it
 	$(AM_V_at)echo "# .deps/$*_plugin.partial.la.lo - a libtool object file" > $*_plugin.partial.la.lo
