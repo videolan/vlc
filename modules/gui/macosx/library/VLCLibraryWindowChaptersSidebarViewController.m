@@ -131,13 +131,13 @@
 
 - (IBAction)tableViewAction:(id)sender
 {
-    VLCPlayerChapter * const selectedChapter =
-        self.chaptersArrayController.selectedObjects.firstObject;
-    if (selectedChapter == nil) {
+    const NSUInteger selectedIndex = self.chaptersArrayController.selectionIndex;
+    if (selectedIndex == NSNotFound) {
         return;
     }
 
-    [VLCMain.sharedInstance.playQueueController.playerController setTimeFast:selectedChapter.time];
+    VLCMain.sharedInstance.playQueueController.playerController.selectedChapterIndex =
+        selectedIndex;
 }
 
 - (void)chapterSelectionChanged:(NSNotification *)notification
