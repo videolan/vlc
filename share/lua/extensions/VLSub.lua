@@ -446,7 +446,7 @@ function interface_main()
   dlg:add_button(
     lang["int_dowload_sel"], download_subtitles, 3, 7, 1, 1)
   dlg:add_button(
-    lang["int_close"], deactivate, 4, 7, 1, 1)
+    lang["int_close"], close, 4, 7, 1, 1)
 
   assoc_select_conf(
     'language',
