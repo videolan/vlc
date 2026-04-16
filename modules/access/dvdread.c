@@ -2133,6 +2133,7 @@ static void DvdReadFindCell( demux_t *p_demux )
     }
 }
 
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
 static const char* ParseTxtEncoding( uint8_t txt_encoding )
 {
     const char* charset = "Unknown";
@@ -2150,6 +2151,7 @@ static const char* ParseTxtEncoding( uint8_t txt_encoding )
 
     return charset;
 }
+#endif
 
 /*****************************************************************************
  * DemuxTitles: get the titles/chapters or group/tracks structure
@@ -2306,8 +2308,9 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
     }
     return;
 
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
 fail:
     vlc_input_title_Delete( t );
     return;
-
+#endif
 }
