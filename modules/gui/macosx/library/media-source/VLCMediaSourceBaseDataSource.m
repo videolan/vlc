@@ -49,10 +49,33 @@
 
 NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseDataSourceNodeChanged";
 
+@interface VLCLANDeviceRecord : NSObject
+@property (readonly) VLCMediaSource *mediaSource;
+@property (readonly) VLCInputNode *inputNode;
+
+- (instancetype)initWithMediaSource:(VLCMediaSource *)mediaSource
+                          inputNode:(VLCInputNode *)inputNode;
+@end
+
+@implementation VLCLANDeviceRecord
+
+- (instancetype)initWithMediaSource:(VLCMediaSource *)mediaSource
+                          inputNode:(VLCInputNode *)inputNode
+{
+    self = [super init];
+    if (self) {
+        _mediaSource = mediaSource;
+        _inputNode = inputNode;
+    }
+    return self;
+}
+
+@end
+
 @interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 {
     NSArray<VLCMediaSource *> *_mediaSources;
-    NSArray<VLCInputNode *> *_discoveredLANdevices;
+    NSArray<VLCLANDeviceRecord *> *_lanDeviceSnapshot;
 }
 @end
 
@@ -63,7 +86,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     self = [super init];
     if (self) {
         _mediaSources = @[];
-        _discoveredLANdevices = @[];
+        _lanDeviceSnapshot = @[];
         _mediaSourceMode = VLCMediaSourceModeLAN;
         NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
@@ -176,6 +199,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     }
 
     _mediaSources = mediaSources;
+    _lanDeviceSnapshot = self.mediaSourceMode == VLCMediaSourceModeLAN ? [self buildLANDeviceSnapshot] : @[];
     [self.collectionView reloadData];
     [self.tableView reloadData];
 }
@@ -351,26 +375,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-        /* for LAN, we don't show the root items but the top items, which may change any time through a callback
-         * so we don't run into conflicts, we compile a list of the currently known here and propose that
-         * as the truth to the table view. For collection view, we use sections which can be reloaded individually,
-         * so the problem is well hidden and does not need this work-around */
-        _discoveredLANdevices = nil;
-
-        NSMutableArray<VLCInputNode *> *currentDevices;
-        @synchronized (_mediaSources) {
-            const NSInteger mediaSourceCount = _mediaSources.count;
-            currentDevices = [[NSMutableArray alloc] initWithCapacity:mediaSourceCount];
-
-            for (VLCMediaSource * const mediaSource in _mediaSources) {
-                VLCInputNode * const rootNode = mediaSource.rootNode;
-                [currentDevices addObjectsFromArray:rootNode.children];
-            }
-        }
-
-        NSAssert(currentDevices != nil, @"Current devices should not be nil");
-        _discoveredLANdevices = [currentDevices copy];
-        return _discoveredLANdevices.count;
+        return _lanDeviceSnapshot.count;
     }
 
     return _mediaSources.count;
@@ -385,7 +390,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
             [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
 
         if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-            VLCInputItem * const currentNodeInput = _discoveredLANdevices[row].inputItem;
+            VLCInputItem * const currentNodeInput = _lanDeviceSnapshot[row].inputNode.inputItem;
             NSURL * const artworkURL = currentNodeInput.artworkURL;
             NSImage * const placeholder = [NSImage imageNamed:@"NXdefaultappicon"];
             if (artworkURL) {
@@ -398,7 +403,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
         }
 
         NSString * const name = _mediaSourceMode == VLCMediaSourceModeLAN
-            ? _discoveredLANdevices[row].inputItem.name
+            ? _lanDeviceSnapshot[row].inputNode.inputItem.name
             : _mediaSources[row].mediaSourceDescription;
 
         cellView.primaryTitleTextField.hidden = YES;
@@ -417,7 +422,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
         NSAssert(cellView, @"Cell view should not be nil");
 
         if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-            VLCInputItem * const currentNodeInput = _discoveredLANdevices[row].inputItem;
+            VLCInputItem * const currentNodeInput = _lanDeviceSnapshot[row].inputNode.inputItem;
             if (currentNodeInput.inputType == ITEM_TYPE_DIRECTORY) {
                 cellView.textField.stringValue = _NS("Directory");
             }
@@ -453,14 +458,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
     VLCMediaSource *mediaSource = nil;
     VLCInputNode *childNode = nil;
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-        NSUInteger currentIter = 0;
-        NSInteger remainingRow = selectedRow;
-        while (currentIter < _mediaSources.count && remainingRow >= _mediaSources[currentIter].rootNode.numberOfChildren) {
-            remainingRow -= _mediaSources[currentIter].rootNode.numberOfChildren;
-            currentIter++;
-        }
-        mediaSource = _mediaSources[currentIter];
-        childNode = _discoveredLANdevices[selectedRow];
+        VLCLANDeviceRecord * const record = _lanDeviceSnapshot[selectedRow];
+        mediaSource = record.mediaSource;
+        childNode = record.inputNode;
     } else {
         mediaSource = _mediaSources[selectedRow];
         childNode = mediaSource.rootNode;
@@ -470,6 +470,26 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
     [self reloadData];
+}
+
+#pragma mark - LAN device snapshot
+
+- (NSArray<VLCLANDeviceRecord *> *)buildLANDeviceSnapshot
+{
+    NSMutableArray<VLCLANDeviceRecord *> *records;
+    @synchronized (_mediaSources) {
+        records = [[NSMutableArray alloc] initWithCapacity:_mediaSources.count];
+        for (VLCMediaSource * const mediaSource in _mediaSources) {
+            VLCInputNode * const rootNode = mediaSource.rootNode;
+            for (VLCInputNode * const child in rootNode.children) {
+                VLCLANDeviceRecord * const record =
+                    [[VLCLANDeviceRecord alloc] initWithMediaSource:mediaSource
+                                                          inputNode:child];
+                [records addObject:record];
+            }
+        }
+    }
+    return [records copy];
 }
 
 #pragma mark - glue code
@@ -625,6 +645,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)reloadDataForNotification:(NSNotification *)aNotification
 {
+    if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
+        _lanDeviceSnapshot = [self buildLANDeviceSnapshot];
+    }
     if (self.viewMode == VLCLibraryGridViewModeSegment) {
         if (self.collectionView.dataSource == self) {
             const NSInteger index = [_mediaSources indexOfObject:aNotification.object];
