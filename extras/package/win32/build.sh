@@ -369,6 +369,9 @@ if [ -n "$WITH_PDB" ]; then
         VLC_CXXFLAGS="$VLC_CXXFLAGS --end-no-unused-arguments"
         VLC_LDFLAGS="$VLC_LDFLAGS --end-no-unused-arguments"
     fi
+else
+    VLC_CFLAGS="$VLC_CFLAGS -g"
+    VLC_CXXFLAGS="$VLC_CXXFLAGS -g"
 fi
 if [ -n "$BREAKPAD" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --enable-breakpad"
