@@ -1094,20 +1094,25 @@ static int Demux( demux_t *p_demux )
         return -1;
     }
 
-    p_sys->i_cur_block += i_read;
-    if( type != DVD_VR )
-        p_sys->i_title_offset += i_read;
+    const uint32_t i_block_start = p_sys->i_cur_block;
+    const int i_title_offset_start = p_sys->i_title_offset;
 
 #if 0
     msg_Dbg( p_demux, "i_blocks: %d len: %d current: 0x%02x",
-             i_read, p_sys->i_pack_len, p_sys->i_cur_block );
+             i_read, p_sys->i_pack_len, i_block_start );
 #endif
 
     for( int i = 0; i < i_read; i++ )
     {
+        p_sys->i_cur_block = i_block_start + i;
+
         DemuxBlock( p_demux, p_buffer + i * DVD_VIDEO_LB_LEN,
                     DVD_VIDEO_LB_LEN );
     }
+
+    p_sys->i_cur_block = i_block_start + i_read;
+    if( type != DVD_VR )
+        p_sys->i_title_offset = i_title_offset_start + i_read;
 
     return 1;
 }
@@ -1158,7 +1163,26 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
             if( !ps_pkt_parse_pack( p_pkt->p_buffer, p_pkt->i_buffer,
                                     &i_scr, &i_mux_rate ) )
             {
-                es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_scr );
+                if( p_sys->cell_ts.dvd == VLC_TICK_INVALID ||
+                    p_sys->cell_ts.ps == VLC_TICK_INVALID )
+                {
+                    vlc_tick_t base;
+                    if( DvdReadGetTimelineBase( p_sys, &base ) )
+                    {
+                        p_sys->cell_ts.dvd = base;
+                        p_sys->cell_ts.ps = i_scr;
+                    }
+                }
+
+                vlc_tick_t shift;
+                if( DvdReadCellTsShift( p_sys, &shift ) )
+                    es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_scr + shift );
+                else
+                {
+                    if( p_sys->cell_ts.dvd != VLC_TICK_INVALID )
+                        msg_Dbg( p_demux, "segment timestamp anchor not initialized yet" );
+                    es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_scr );
+                }
                 if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
             }
             block_Release( p_pkt );
@@ -1178,6 +1202,22 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
                 if( tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
                 {
+                    if( p_sys->cell_ts.dvd != VLC_TICK_INVALID &&
+                        p_sys->cell_ts.ps == VLC_TICK_INVALID )
+                    {
+                        if( p_pkt->i_dts != VLC_TICK_INVALID )
+                            p_sys->cell_ts.ps = p_pkt->i_dts;
+                        else if( p_pkt->i_pts != VLC_TICK_INVALID )
+                            p_sys->cell_ts.ps = p_pkt->i_pts;
+                    }
+                    vlc_tick_t shift;
+                    if( DvdReadCellTsShift( p_sys, &shift ) )
+                    {
+                        if( p_pkt->i_dts != VLC_TICK_INVALID )
+                            p_pkt->i_dts += shift;
+                        if( p_pkt->i_pts != VLC_TICK_INVALID )
+                            p_pkt->i_pts += shift;
+                    }
                     es_out_Send( p_demux->out, tk->es, p_pkt );
                 }
                 else
@@ -2295,6 +2335,8 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
     else if( p_sys->dsi_pack.vobu_sri.next_vobu == SRI_END_OF_CELL )
     {
         p_sys->i_cur_cell = p_sys->i_next_cell;
+
+        DvdReadResetCellTs( p_sys );
 
         /* End of title */
         if( p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells ) return;
