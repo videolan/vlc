@@ -233,7 +233,6 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
     if( owner != NULL && owner->video != NULL )
     {
         // keep this to get pictures for the last filter in the chain
-        assert( owner->video->buffer_new != NULL );
         chain->parent_video_owner = *owner;
     }
     else
