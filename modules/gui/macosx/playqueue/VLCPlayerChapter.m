@@ -27,12 +27,17 @@
 @implementation VLCPlayerChapter
 
 - (instancetype)initWithChapter:(const struct vlc_player_chapter *)p_chapter
+                       duration:(vlc_tick_t)duration
 {
     self = [super init];
     if (self && p_chapter != NULL) {
         _name = toNSStr(p_chapter->name);
         _time = p_chapter->time;
         _timeString = [NSString stringWithTimeFromTicks:_time];
+        _duration = duration;
+        _durationString = duration > 0
+            ? [NSString stringWithTimeFromTicks:duration]
+            : @"--:--";
     }
     return self;
 }

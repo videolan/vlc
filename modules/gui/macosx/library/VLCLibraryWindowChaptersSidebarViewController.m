@@ -117,7 +117,12 @@
     NSMutableArray * const chapters = [NSMutableArray arrayWithCapacity:chapterCount];
     for (size_t i = 0; i < chapterCount; i++) {
         struct vlc_player_chapter p_chapter = pp_chapters[i];
-        VLCPlayerChapter * const chapter = [[VLCPlayerChapter alloc] initWithChapter:&p_chapter];
+        const vlc_tick_t nextTime = (i + 1 < chapterCount)
+            ? pp_chapters[i + 1].time
+            : title->length;
+        const vlc_tick_t duration = nextTime - p_chapter.time;
+        VLCPlayerChapter * const chapter =
+            [[VLCPlayerChapter alloc] initWithChapter:&p_chapter duration:duration];
         [chapters addObject:chapter];
     }
     self.chaptersArrayController.content = chapters.copy;
@@ -169,7 +174,7 @@
                                         owner:self];
         [cellView.textField bind:NSValueBinding
                             toObject:cellView
-                         withKeyPath:@"objectValue.timeString"
+                         withKeyPath:@"objectValue.durationString"
                              options:nil];
         return cellView;
     }

@@ -39,9 +39,14 @@
         _chapterCount = p_title->chapter_count;
 
         NSMutableArray * const chapters = [NSMutableArray arrayWithCapacity:self.chapterCount];
-        for (int i = 0; i < self.chapterCount; i++) {
+        for (NSUInteger i = 0; i < self.chapterCount; i++) {
+            const vlc_tick_t nextTime = (i + 1 < self.chapterCount)
+                ? p_title->chapters[i + 1].time
+                : p_title->length;
+            const vlc_tick_t duration = nextTime - p_title->chapters[i].time;
             VLCPlayerChapter * const chapter =
-                [[VLCPlayerChapter alloc] initWithChapter:&p_title->chapters[i]];
+                [[VLCPlayerChapter alloc] initWithChapter:&p_title->chapters[i]
+                                                 duration:duration];
             [chapters addObject:chapter];
         }
         _chapters = chapters.copy;

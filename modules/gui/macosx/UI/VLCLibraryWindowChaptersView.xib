@@ -67,7 +67,7 @@
                                         </prototypeCellViews>
                                     </tableColumn>
                                     <tableColumn identifier="VLCLibraryWindowChaptersTableViewTimeColumnIdentifier" editable="NO" width="64" minWidth="64" maxWidth="100" id="KEN-Nu-Iyj">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Time">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Duration">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </tableHeaderCell>
