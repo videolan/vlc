@@ -2267,15 +2267,40 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
 #endif
         {
 #ifdef DVDREAD_HAS_DVDAUDIO
-            if ( p_sys->type == DVD_A )
-                t->i_length = FROM_SCALE_NZ( p_sys->p_vmg_file->
-                                            info_table_second_sector->tracks_info[i].len_audio_zone_pts );
+            ifo_handle_t *p_ats_ifo = NULL;
+            const atsi_track_timestamp_t *p_track_ts = NULL;
+            uint8_t i_track_ts = 0;
+
+            if ( p_sys->type == DVD_A ) {
+                const track_info_t * const p_track_info =
+                    &p_sys->p_vmg_file->info_table_second_sector->tracks_info[i];
+                t->i_length = FROM_SCALE_NZ( p_track_info->len_audio_zone_pts );
+
+                p_ats_ifo = ifoOpen( p_sys->p_dvdread, p_track_info->group_property );
+                if ( p_ats_ifo != NULL && p_ats_ifo->atsi_title_table != NULL
+                     && p_track_info->title_property > 0
+                     && p_track_info->title_property <= p_ats_ifo->atsi_title_table->nr_titles ) {
+                    const atsi_title_record_t * const p_title_rec =
+                        &p_ats_ifo->atsi_title_table->atsi_title_row_tables[p_track_info->title_property - 1];
+                    p_track_ts = p_title_rec->atsi_track_timestamp_rows;
+                    i_track_ts = p_title_rec->nr_tracks;
+                }
+            }
 #endif
             for( j = 0; j < __MAX( i_chapters, 1 ); j++ )
             {
                 s = vlc_seekpoint_New();
+#ifdef DVDREAD_HAS_DVDAUDIO
+                if ( p_track_ts != NULL && j < i_track_ts )
+                    s->i_time_offset =
+                        FROM_SCALE_NZ( (uint64_t)p_track_ts[j].first_pts_of_track );
+#endif
                 TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
             }
+#ifdef DVDREAD_HAS_DVDAUDIO
+            if ( p_ats_ifo != NULL )
+                ifoClose( p_ats_ifo );
+#endif
         }
         TAB_APPEND( p_sys->i_titles, p_sys->titles, t );
     }
