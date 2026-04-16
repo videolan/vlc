@@ -1056,6 +1056,9 @@ AS_IF([test "${enable_partial_linking}" = "yes" -a "${have_dynamic_objects}" = "
 ])
 
 AM_CONDITIONAL([HAVE_PARTIAL_LINKING], [test "${have_partial_linking}" = "yes"])
+AS_IF([test "${have_partial_linking}" = "yes"], [
+    AC_DEFINE([HAVE_PARTIAL_LINKING], 1, [Define if static plugins use partial linking])
+])
 
 dnl Check if the linker supports --force-group-allocation.
 dnl This flag resolves COMDAT section groups during partial linking, which are
