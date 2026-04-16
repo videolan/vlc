@@ -1634,14 +1634,34 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             p_dec->fmt_out.video.color_range =
                 mc_to_vlc_color_range(p_out->conf.video.color.range);
 
-        int i_width  = p_out->conf.video.crop_right + 1
+        bool valid_crop =
+            p_out->conf.video.crop_left >= 0 &&
+            p_out->conf.video.crop_top >= 0 &&
+            p_out->conf.video.crop_right >= p_out->conf.video.crop_left &&
+            p_out->conf.video.crop_bottom >= p_out->conf.video.crop_top &&
+            p_out->conf.video.crop_right < INT_MAX &&
+            p_out->conf.video.crop_bottom < INT_MAX &&
+            (unsigned)p_out->conf.video.crop_right < p_out->conf.video.width &&
+            (unsigned)p_out->conf.video.crop_bottom < p_out->conf.video.height;
+
+        int i_width, i_height;
+        if (valid_crop)
+        {
+            i_width  = p_out->conf.video.crop_right + 1
                      - p_out->conf.video.crop_left;
-        int i_height = p_out->conf.video.crop_bottom + 1
+            i_height = p_out->conf.video.crop_bottom + 1
                      - p_out->conf.video.crop_top;
+        }
+        else
+        {
+            i_width = p_out->conf.video.width;
+            i_height = p_out->conf.video.height;
+        }
         if (i_width <= 1 || i_height <= 1)
         {
             i_width = p_out->conf.video.width;
             i_height = p_out->conf.video.height;
+            valid_crop = false;
         }
 
         if (!(p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_IGNORE_SIZE))
@@ -1650,8 +1670,8 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             p_dec->fmt_out.video.i_width = i_width;
             p_dec->fmt_out.video.i_visible_height =
             p_dec->fmt_out.video.i_height = i_height;
-            p_dec->fmt_out.video.i_x_offset = p_out->conf.video.crop_left;
-            p_dec->fmt_out.video.i_y_offset = p_out->conf.video.crop_top;
+            p_dec->fmt_out.video.i_x_offset = valid_crop ? p_out->conf.video.crop_left : 0;
+            p_dec->fmt_out.video.i_y_offset = valid_crop ? p_out->conf.video.crop_top : 0;
         }
         else
         {
@@ -1669,8 +1689,13 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         if (p_sys->video.i_slice_height <= 0)
             p_sys->video.i_slice_height = p_out->conf.video.height;
 
-        if (p_sys->video.i_pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
-            p_sys->video.i_slice_height -= p_out->conf.video.crop_top/2;
+        if (p_sys->video.i_pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar
+            && valid_crop)
+        {
+            unsigned int crop_adj = p_out->conf.video.crop_top / 2;
+            if (crop_adj < p_sys->video.i_slice_height)
+                p_sys->video.i_slice_height -= crop_adj;
+        }
         if ((p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_IGNORE_PADDING))
         {
             p_sys->video.i_slice_height = 0;
