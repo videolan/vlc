@@ -131,6 +131,12 @@ FillPictureFromVAImage(picture_t *dest,
                 vlc_assert_unreachable();
         }
         break;
+    case VA_FOURCC_XYUV:
+    case VA_FOURCC_Y410:
+    case VA_FOURCC_Y412:
+        CopyPacked(dest, src_planes[0], src_pitches[0], src_img->height,
+                   cache);
+        break;
     default:
         vlc_assert_unreachable();
         break;
@@ -250,6 +256,12 @@ FillVAImageFromPicture(VAImage *dest_img, uint8_t *dest_buf,
                          src->format.i_height, cache);
         break;
     }
+    case VLC_CODEC_VUYX:
+    case VLC_CODEC_Y410:
+    case VLC_CODEC_Y412:
+        CopyPacked(dest_pic, src_planes[0], src_pitches[0],
+                   src->format.i_height, cache);
+        break;
     default:
         vlc_assert_unreachable();
     }
@@ -348,6 +360,27 @@ static int CheckFmt(const video_format_t *in, const video_format_t *out,
                 return VLC_SUCCESS;
             }
             break;
+        case VLC_CODEC_VAAPI_444:
+            if (out->i_chroma == VLC_CODEC_VUYX)
+            {
+                *pixel_bytes = 4;
+                return VLC_SUCCESS;
+            }
+            break;
+        case VLC_CODEC_VAAPI_444_10BPP:
+            if (out->i_chroma == VLC_CODEC_Y410)
+            {
+                *pixel_bytes = 4;
+                return VLC_SUCCESS;
+            }
+            break;
+        case VLC_CODEC_VAAPI_444_12BPP:
+            if (out->i_chroma == VLC_CODEC_Y412)
+            {
+                *pixel_bytes = 8;
+                return VLC_SUCCESS;
+            }
+            break;
     }
 
     *upload = true;
@@ -370,6 +403,27 @@ static int CheckFmt(const video_format_t *in, const video_format_t *out,
              || in->i_chroma == VLC_CODEC_I420_12L)
             {
                 *pixel_bytes = 2;
+                return VLC_SUCCESS;
+            }
+            break;
+        case VLC_CODEC_VAAPI_444:
+            if (in->i_chroma == VLC_CODEC_VUYX)
+            {
+                *pixel_bytes = 4;
+                return VLC_SUCCESS;
+            }
+            break;
+        case VLC_CODEC_VAAPI_444_10BPP:
+            if (in->i_chroma == VLC_CODEC_Y410)
+            {
+                *pixel_bytes = 4;
+                return VLC_SUCCESS;
+            }
+            break;
+        case VLC_CODEC_VAAPI_444_12BPP:
+            if (in->i_chroma == VLC_CODEC_Y412)
+            {
+                *pixel_bytes = 8;
                 return VLC_SUCCESS;
             }
             break;
