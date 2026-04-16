@@ -119,6 +119,11 @@ static const struct vlc_chroma_ffmpeg chroma_table[] =
 
 #if LIBAVUTIL_VERSION_CHECK(57, 34, 100)
     {VLC_CODEC_VUYA, AV_PIX_FMT_VUYX,     COLOR_RANGE_UNDEF },
+    {VLC_CODEC_VUYX, AV_PIX_FMT_VUYX,     COLOR_RANGE_UNDEF },
+#endif
+#if LIBAVUTIL_VERSION_CHECK(57, 36, 100)
+    {VLC_CODEC_Y410, AV_PIX_FMT_XV30LE,   COLOR_RANGE_UNDEF },
+    {VLC_CODEC_Y412, AV_PIX_FMT_XV36LE,   COLOR_RANGE_UNDEF },
 #endif
 
     /* Packed RGB formats */
