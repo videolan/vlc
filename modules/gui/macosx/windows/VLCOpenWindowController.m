@@ -94,6 +94,8 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
     BOOL b_autoplay;
     BOOL b_nodvdmenus;
+    BOOL b_currentDiscIsDVDA;
+    BOOL b_dvdaPlayingAsVideo;
     NSView *_currentOpticalMediaView;
     NSImageView *_currentOpticalMediaIconView;
     NSMutableArray <VLCOpenBlockDeviceDescription *>*_allMediaDevices;
@@ -712,6 +714,11 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     NSImage *mediaIcon = deviceDescription.mediaIcon;
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
+    b_currentDiscIsDVDA = [diskType isEqualToString:kVLCMediaAudioDVD];
+    b_dvdaPlayingAsVideo = NO;
+    if (!b_currentDiscIsDVDA)
+        [_discDVDDisableMenusButton setTitle:_NS("Disable DVD menus")];
+
     if ([diskType isEqualToString: kVLCMediaDVD] || [diskType isEqualToString: kVLCMediaVideoTSFolder]) {
         [_discDVDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:opticalDevicePath]];
         [_discDVDwomenusLabel setStringValue: [_discDVDLabel stringValue]];
@@ -724,10 +731,10 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
             [self showOpticalMediaView: _discDVDwomenusView withIcon:mediaIcon];
         }
     } else if ([diskType isEqualToString: kVLCMediaAudioDVD]) {
-        [_discAudioCDLabel setStringValue: [fileManager displayNameAtPath: opticalDevicePath]];
-        [_discAudioCDTrackCountLabel setStringValue: @""];
-        [self showOpticalMediaView: _discAudioCDView withIcon: mediaIcon];
-        [self setMRL: [NSString stringWithFormat: @"dvda://%@", devicePath]];
+        [_discDVDLabel setStringValue: [fileManager displayNameAtPath:opticalDevicePath]];
+        [_discDVDDisableMenusButton setTitle:_NS("Play as DVD-Video")];
+        [self setMRL:[NSString stringWithFormat:@"dvda://%@", devicePath]];
+        [self showOpticalMediaView:_discDVDView withIcon:mediaIcon];
     } else if ([diskType isEqualToString: kVLCMediaAudioCD]) {
         [_discAudioCDLabel setStringValue: [fileManager displayNameAtPath: opticalDevicePath]];
         [_discAudioCDTrackCountLabel setStringValue: [NSString stringWithFormat:_NS("%i tracks"), [[fileManager subpathsOfDirectoryAtPath: opticalDevicePath error:NULL] count] - 1]]; // minus .TOC.plist
@@ -896,6 +903,18 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 - (IBAction)dvdreadOptionChanged:(id)sender
 {
     NSString *devicePath = [[_allMediaDevices objectAtIndex:[_discSelectorPopup indexOfSelectedItem]] devicePath];
+
+    if (sender == _discDVDDisableMenusButton && b_currentDiscIsDVDA) {
+        b_dvdaPlayingAsVideo = !b_dvdaPlayingAsVideo;
+        if (b_dvdaPlayingAsVideo) {
+            [_discDVDDisableMenusButton setTitle:_NS("Play as DVD-Audio")];
+            [self setMRL:[NSString stringWithFormat:@"dvdnav://%@", devicePath]];
+        } else {
+            [_discDVDDisableMenusButton setTitle:_NS("Play as DVD-Video")];
+            [self setMRL:[NSString stringWithFormat:@"dvda://%@", devicePath]];
+        }
+        return;
+    }
 
     if (sender == _discDVDwomenusEnableMenusButton) {
         b_nodvdmenus = NO;
