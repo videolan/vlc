@@ -285,6 +285,14 @@ enum vlc_config_subcat
 # else
 #  define DLL_SYMBOL
 # endif
+#elif defined (VLC_PARTIAL_LINKING) && defined (__GNUC__)
+/* Static / partial-linking build: the entry symbols are still part of the
+ * plugin/host export interface (they are resolved by the host at static
+ * link time via per-module suffixed names). Under -fvisibility=hidden they
+ * would otherwise be emitted as private_external and subsequently demoted
+ * to local by `ld -r` during partial linking on Mach-O, breaking the final
+ * link. */
+# define DLL_SYMBOL                __attribute__((visibility("default")))
 #else
 # define DLL_SYMBOL
 #endif
