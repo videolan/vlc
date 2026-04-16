@@ -771,7 +771,7 @@ VLC_API vlc_fourcc_t vlc_fourcc_GetCodecFromString( int i_cat, const char * );
 VLC_API vlc_fourcc_t vlc_fourcc_GetCodecAudio( vlc_fourcc_t i_fourcc, int i_bits );
 
 /**
- * It returns the description of the given fourcc or NULL if not found.
+ * It returns the description of the given fourcc or an empty string.
  *
  * You may use UNKNOWN_ES for the ES category if you don't have the information.
  */
@@ -892,4 +892,3 @@ static inline unsigned vlc_fourcc_GetChromaBPP( vlc_fourcc_t fourcc )
 }
 
 #endif /* _VLC_FOURCC_H */
-
