@@ -1205,7 +1205,13 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
 
                 vlc_tick_t shift;
                 if( DvdReadCellTsShift( p_sys, &shift ) )
-                    es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_scr + shift );
+                {
+                    vlc_tick_t pcr = VLC_TICK_0 + i_scr + shift;
+                    /* negative shift when cell time precedes first scr */
+                    if( pcr < VLC_TICK_0 )
+                        pcr = VLC_TICK_0;
+                    es_out_SetPCR( p_demux->out, pcr );
+                }
                 else
                 {
                     if( p_sys->cell_ts.dvd != VLC_TICK_INVALID )
@@ -1231,21 +1237,40 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
                 if( tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
                 {
-                    if( p_sys->cell_ts.dvd != VLC_TICK_INVALID &&
-                        p_sys->cell_ts.ps == VLC_TICK_INVALID )
+                    /* for vr anchor to earliest pts/dts seen,
+                     * reduces underflow risk in rebased timestamps */
+                    if( p_sys->type == DVD_VR &&
+                        p_sys->cell_ts.dvd != VLC_TICK_INVALID &&
+                        p_sys->cell_ts.ps != VLC_TICK_INVALID )
                     {
-                        if( p_pkt->i_dts != VLC_TICK_INVALID )
-                            p_sys->cell_ts.ps = p_pkt->i_dts;
-                        else if( p_pkt->i_pts != VLC_TICK_INVALID )
-                            p_sys->cell_ts.ps = p_pkt->i_pts;
+                        vlc_tick_t anchor = p_sys->cell_ts.ps;
+                        if( p_pkt->i_dts != VLC_TICK_INVALID && p_pkt->i_dts < anchor )
+                            anchor = p_pkt->i_dts;
+                        if( p_pkt->i_pts != VLC_TICK_INVALID && p_pkt->i_pts < anchor )
+                            anchor = p_pkt->i_pts;
+                        if( anchor < p_sys->cell_ts.ps )
+                            p_sys->cell_ts.ps = anchor;
                     }
                     vlc_tick_t shift;
                     if( DvdReadCellTsShift( p_sys, &shift ) )
                     {
+                        /* shared lift keeps dts and pts both >= VLC_TICK_0
+                         * while preserving the original dts/pts delta */
+                        vlc_tick_t lift = 0;
                         if( p_pkt->i_dts != VLC_TICK_INVALID )
-                            p_pkt->i_dts += shift;
+                        {
+                            vlc_tick_t need = VLC_TICK_0 - ( p_pkt->i_dts + shift );
+                            if( need > lift ) lift = need;
+                        }
                         if( p_pkt->i_pts != VLC_TICK_INVALID )
-                            p_pkt->i_pts += shift;
+                        {
+                            vlc_tick_t need = VLC_TICK_0 - ( p_pkt->i_pts + shift );
+                            if( need > lift ) lift = need;
+                        }
+                        if( p_pkt->i_dts != VLC_TICK_INVALID )
+                            p_pkt->i_dts += shift + lift;
+                        if( p_pkt->i_pts != VLC_TICK_INVALID )
+                            p_pkt->i_pts += shift + lift;
                     }
                     es_out_Send( p_demux->out, tk->es, p_pkt );
                 }
