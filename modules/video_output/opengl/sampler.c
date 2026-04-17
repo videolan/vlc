@@ -789,6 +789,9 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         chroma == VLC_CODEC_XYZ_12B)
         return xyz12_shader_init(sampler);
 
+    const bool is_y21x_packed = chroma == VLC_CODEC_Y210
+                             || chroma == VLC_CODEC_Y212;
+
     if (is_yuv)
     {
         ret = sampler_yuv_base_init(sampler, desc, yuv_space);
@@ -797,11 +800,14 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
             msg_Dbg(priv->gl, "opengl sampler: could not initialize YUV shaders for %4.4s", (const char *)&chroma);
             return ret;
         }
-        ret = opengl_init_swizzle(sampler, swizzle_per_tex, desc);
-        if (ret != VLC_SUCCESS)
+        if (!is_y21x_packed)
         {
-            msg_Dbg(priv->gl, "opengl sampler: could not determine swizzle for %4.4s", (const char *)&chroma);
-            return ret;
+            ret = opengl_init_swizzle(sampler, swizzle_per_tex, desc);
+            if (ret != VLC_SUCCESS)
+            {
+                msg_Dbg(priv->gl, "opengl sampler: could not determine swizzle for %4.4s", (const char *)&chroma);
+                return ret;
+            }
         }
     }
 
@@ -932,8 +938,25 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     ADD("vec4 vlc_texture(vec2 tex_coords) {\n");
 
     unsigned color_count;
-    if (is_yuv) {
-
+    if (is_y21x_packed)
+    {
+        assert(is_yuv);
+        assert(tex_count == 1);
+        /* Y210/Y212: packed 4:2:2, each 8-byte texel holds 2 pixels:
+         * [Y0:16][U:16][Y1:16][V:16] -> sampled as (R=Y0, G=U, B=Y1, A=V)
+         * A simple swizzle can't select the correct luma, so bypass the
+         * generic path and use texelFetch to pick Y0 or Y1 by pixel parity. */
+        ADD(" ivec2 _ts = textureSize(Textures[0], 0);\n"
+            " int _px = int(tex_coords.x * float(_ts.x) * 2.0);\n"
+            " int _py = int(tex_coords.y * float(_ts.y));\n"
+            " vec4 _t = texelFetch(Textures[0], ivec2(_px >> 1, _py), 0);\n"
+            " float _Y = ((_px & 1) == 0) ? _t.r : _t.b;\n"
+            " vec4 pixel = vec4(_Y, _t.g, _t.a, 1.0);\n"
+            " vec4 result = ConvMatrix * pixel;\n");
+        color_count = 3;
+    }
+    else if (is_yuv)
+    {
         if (priv->unsigned_sampler)
         {
             /* One extra integer -> float step will be needed */
