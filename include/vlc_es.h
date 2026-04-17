@@ -580,6 +580,9 @@ struct subs_format_t
         /* Reorder depth of transport video, -1 for no reordering */
         int i_reorder_depth;
     } cc;
+
+    /* track marked as forced */
+    bool b_forced;
 };
 
 /**
