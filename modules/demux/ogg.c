@@ -2032,7 +2032,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         unsigned num, den;
                         vlc_ureduce( &num, &den,
                                      st->samples_per_unit * OGGDS_RESOLUTION,
-                                     st->time_unit > 0 ? st->time_unit : OGGDS_RESOLUTION,
+                                     st->time_unit,
                                      OGGDS_RESOLUTION );
                         date_Init( &p_stream->dts, num, den );
                         p_stream->fmt.video.i_frame_rate = num;
