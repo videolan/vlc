@@ -487,7 +487,7 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static vlc_tick_t dvdtime_to_time( dvd_time_t *dtime )
+static vlc_tick_t dvdtime_to_time( const dvd_time_t *dtime )
 {
 /* Macro to convert Binary Coded Decimal to Decimal */
 #define BCD2D(__x__) (((__x__ & 0xf0) >> 4) * 10 + (__x__ & 0x0f))
