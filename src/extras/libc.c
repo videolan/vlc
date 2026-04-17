@@ -516,7 +516,7 @@ bool vlc_ureduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
     i_nom /= i_gcd;
     i_den /= i_gcd;
 
-    if( i_max == 0 ) i_max = INT64_C(0xFFFFFFFF);
+    if( i_max == 0 ) i_max = UINT_MAX;
 
     if( i_nom > i_max || i_den > i_max )
     {
