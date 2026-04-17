@@ -2813,6 +2813,14 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
             return;
 #ifdef DVDREAD_HAS_DVDVIDEORECORDING
         if ( p_sys->type == DVD_VR ) {
+            /* ep_ptm disc-global, subtract title start for relative offset */
+            vlc_tick_t title_base = 0;
+            int cell_base = p_sys->ud_pgcit->ud_pgci_items[i].first_prog_id - 1;
+            int nr = p_sys->ud_pgcit->ud_pgci_items[i].nr_of_programs;
+            if( nr > 0 )
+                title_base = FROM_SCALE_NZ(
+                    p_sys->ud_pgcit->m_c_gi[cell_base].c_v_s_ptm.ptm );
+
             char* converted_title = FromCharset(
                 disc_charset,
                 p_sys->ud_pgcit->ud_pgci_items[i].title,
@@ -2829,8 +2837,6 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
             t->i_length = DVDVRGetTitleLength( p_sys->pgc_gi, p_sys->ud_pgcit, i );
 
             /* create one seekpoint per entry point */
-            int cell_base = p_sys->ud_pgcit->ud_pgci_items[i].first_prog_id - 1;
-            int nr = p_sys->ud_pgcit->ud_pgci_items[i].nr_of_programs;
             for( int c = 0; c < nr; c++ )
             {
                 m_c_gi_t *cell = &p_sys->ud_pgcit->m_c_gi[cell_base + c];
@@ -2842,7 +2848,9 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
                         if ( unlikely( !s ) )
                             goto fail;
 
-                        s->i_time_offset = FROM_SCALE_NZ( (uint64_t)cell->m_c_epi[ep].ep_ptm.ptm );
+                        vlc_tick_t ep_time =
+                            FROM_SCALE_NZ( cell->m_c_epi[ep].ep_ptm.ptm ) - title_base;
+                        s->i_time_offset = ep_time > 0 ? ep_time : 0;
                         TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
                     }
                 }
@@ -2852,7 +2860,9 @@ static void DemuxTitles( demux_t *p_demux, int *pi_angle )
                     if ( unlikely( !s ) )
                         goto fail;
 
-                    s->i_time_offset = FROM_SCALE_NZ( (uint64_t)cell->c_v_s_ptm.ptm );
+                    vlc_tick_t cell_time =
+                        FROM_SCALE_NZ( cell->c_v_s_ptm.ptm ) - title_base;
+                    s->i_time_offset = cell_time > 0 ? cell_time : 0;
                     TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
                 }
             }
