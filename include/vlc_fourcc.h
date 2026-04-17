@@ -464,6 +464,8 @@
 #define VLC_CODEC_VAAPI_420 VLC_FOURCC('V','A','O','P') /* 4:2:0  8 bpc */
 #define VLC_CODEC_VAAPI_420_10BPP VLC_FOURCC('V','A','O','0') /* 4:2:0 10 bpc */
 #define VLC_CODEC_VAAPI_420_12BPP VLC_FOURCC('V','A','O','2') /* 4:2:0 12 bpc */
+#define VLC_CODEC_VAAPI_422_10BPP VLC_FOURCC('V','A','2','0') /* 4:2:2 10 bpc */
+#define VLC_CODEC_VAAPI_422_12BPP VLC_FOURCC('V','A','2','2') /* 4:2:2 12 bpc */
 #define VLC_CODEC_VAAPI_444       VLC_FOURCC('V','A','4','P') /* 4:4:4 8 bpc */
 #define VLC_CODEC_VAAPI_444_10BPP VLC_FOURCC('V','A','4','0') /* 4:4:4 10 bpc */
 #define VLC_CODEC_VAAPI_444_12BPP VLC_FOURCC('V','A','4','2') /* 4:4:4 12 bpc */
