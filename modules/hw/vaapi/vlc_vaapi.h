@@ -198,6 +198,8 @@ vlc_vaapi_IsChromaOpaque(int i_vlc_chroma)
         case VLC_CODEC_VAAPI_420:
         case VLC_CODEC_VAAPI_420_10BPP:
         case VLC_CODEC_VAAPI_420_12BPP:
+        case VLC_CODEC_VAAPI_422_10BPP:
+        case VLC_CODEC_VAAPI_422_12BPP:
         case VLC_CODEC_VAAPI_444:
         case VLC_CODEC_VAAPI_444_10BPP:
         case VLC_CODEC_VAAPI_444_12BPP:
