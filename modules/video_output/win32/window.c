@@ -312,7 +312,8 @@ static void MonitorChanged(vlc_window_t *wnd, HMONITOR monitor)
         return;
 
     wchar_t iccw[MAX_PATH];
-    if (GetICMProfileW(ic, &(DWORD){ sizeof(iccw) }, iccw)) {
+    DWORD iccw_len = ARRAY_SIZE(iccw);
+    if (GetICMProfileW(ic, &iccw_len, iccw)) {
         UpdateICCProfile(wnd, iccw);
     } else {
         UpdateICCProfile(wnd, NULL);
