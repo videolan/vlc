@@ -12,6 +12,7 @@ Contrib:
  * Update faad to 2.11.2
  * Update FFmpeg to 8.1
  * Update libxml2 to 2.15.1
+ * Update png to 1.6.53
  * Update opus to 1.6.1
  * Update zlib to 1.3.2
 
