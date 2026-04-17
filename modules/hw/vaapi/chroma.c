@@ -131,6 +131,8 @@ FillPictureFromVAImage(picture_t *dest,
                 vlc_assert_unreachable();
         }
         break;
+    case VA_FOURCC_Y210:
+    case VA_FOURCC_Y212:
     case VA_FOURCC_XYUV:
     case VA_FOURCC_Y410:
     case VA_FOURCC_Y412:
@@ -360,6 +362,20 @@ static int CheckFmt(const video_format_t *in, const video_format_t *out,
                 return VLC_SUCCESS;
             }
             break;
+        case VLC_CODEC_VAAPI_422_10BPP:
+            if (out->i_chroma == VLC_CODEC_Y210)
+            {
+                *pixel_bytes = 4;
+                return VLC_SUCCESS;
+            }
+            break;
+        case VLC_CODEC_VAAPI_422_12BPP:
+            if (out->i_chroma == VLC_CODEC_Y212)
+            {
+                *pixel_bytes = 4;
+                return VLC_SUCCESS;
+            }
+            break;
         case VLC_CODEC_VAAPI_444:
             if (out->i_chroma == VLC_CODEC_VUYX)
             {
@@ -403,6 +419,20 @@ static int CheckFmt(const video_format_t *in, const video_format_t *out,
              || in->i_chroma == VLC_CODEC_I420_12L)
             {
                 *pixel_bytes = 2;
+                return VLC_SUCCESS;
+            }
+            break;
+        case VLC_CODEC_VAAPI_422_10BPP:
+            if (in->i_chroma == VLC_CODEC_Y210)
+            {
+                *pixel_bytes = 4;
+                return VLC_SUCCESS;
+            }
+            break;
+        case VLC_CODEC_VAAPI_422_12BPP:
+            if (in->i_chroma == VLC_CODEC_Y212)
+            {
+                *pixel_bytes = 4;
                 return VLC_SUCCESS;
             }
             break;
