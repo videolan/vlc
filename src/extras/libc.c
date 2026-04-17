@@ -27,6 +27,8 @@
 #include <vlc_charset.h>
 
 #include <errno.h>
+#include <assert.h>
+#include <limits.h>
 
 #undef iconv_t
 #undef iconv_open
@@ -539,6 +541,9 @@ bool vlc_ureduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
         i_nom = i_a1_num;
         i_den = i_a1_den;
     }
+
+    assert(i_nom <= UINT_MAX);
+    assert(i_den <= UINT_MAX);
 
     *pi_dst_nom = i_nom;
     *pi_dst_den = i_den;
