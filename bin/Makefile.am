@@ -35,7 +35,7 @@ else
 vlc_SOURCES = winvlc.c
 EXTRA_vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
 vlc_LDFLAGS = -mwindows -Wc,-static
-vlc_LDADD += vlc_win32_rc.$(OBJEXT)
+vlc_LDADD += -lole32 vlc_win32_rc.$(OBJEXT)
 libbreakpad_wrapper_la_SOURCES = breakpad.cpp
 libbreakpad_wrapper_la_LIBADD = $(BREAKPAD_LIBS)
 libbreakpad_wrapper_la_LDFLAGS = -static

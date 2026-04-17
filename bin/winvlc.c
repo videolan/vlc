@@ -162,14 +162,22 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     void* eh = NULL;
     if(crash_handling)
     {
-        wchar_t path[MAX_PATH];
-        if( S_OK != SHGetFolderPathW( NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                    NULL, SHGFP_TYPE_CURRENT, path ) )
+        PWSTR copath;
+        if( S_OK != SHGetKnownFolderPath(&FOLDERID_RoamingAppData, KF_FLAG_CREATE, 0, &copath) )
             fprintf( stderr, "Can't open the vlc conf PATH\n" );
-        else if ( !wcscat_s( path, MAX_PATH, L"\\vlc\\crashdump" ) )
+        else
         {
-            CheckCrashDump( path );
-            eh = InstallCrashHandler( path );
+            const size_t pathlen = wcslen( copath );
+            wchar_t *path = malloc( ( pathlen + wcslen(L"\\vlc\\crashdump") + 1 ) * sizeof(*path) );
+            if ( path != NULL)
+            {
+                memcpy( path, copath, pathlen * sizeof(*path) );
+                memcpy( &path[pathlen], L"\\vlc\\crashdump", (wcslen(L"\\vlc\\crashdump") + 1)  * sizeof(*path) );
+                CheckCrashDump( path );
+                eh = InstallCrashHandler( path );
+                free( path );
+            }
+            CoTaskMemFree( copath );
         }
     }
 #else

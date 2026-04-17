@@ -14,6 +14,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         endif
     elif host_system == 'windows'
         vlc_sources += ['winvlc.c']
+        vlc_deps += cc.find_library('ole32', required: true)
     else
         vlc_sources += ['vlc.c', 'override.c']
         if x11_dep.found()
