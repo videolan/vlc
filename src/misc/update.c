@@ -47,6 +47,7 @@
 #include <vlc_fs.h>
 #include <vlc_dialog.h>
 #include <vlc_interface.h>
+#include <vlc_charset.h>
 
 #include <gcrypt.h>
 #include <vlc_gcrypt.h>
@@ -738,10 +739,13 @@ static void* update_DownloadReal( void *obj )
     if(answer == 1)
     {
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-        wchar_t psz_wdestfile[MAX_PATH];
-        MultiByteToWideChar( CP_UTF8, 0, psz_destfile, -1, psz_wdestfile, MAX_PATH );
-        if((intptr_t)(void*)ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW) > 32)
-            libvlc_Quit(vlc_object_instance(p_udt));
+        wchar_t *psz_wdestfile = ToWide( psz_destfile );
+        if (likely(psz_wdestfile != NULL))
+        {
+            if((intptr_t)(void*)ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW) > 32)
+                libvlc_Quit(vlc_object_instance(p_udt));
+            free(psz_wdestfile);
+        }
 #endif
     }
 #endif
