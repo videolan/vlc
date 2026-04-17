@@ -160,17 +160,26 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
         goto error;
 
     if (search) {
+        wchar_t short_path[MAX_PATH];
         if (!SetSearchPathMode(BASE_SEARCH_PATH_ENABLE_SAFE_SEARCHMODE))
             goto error;
 
-        application_name = malloc(MAX_PATH * sizeof(*application_name));
-        if (unlikely(!application_name))
+        DWORD path_size = SearchPathW(NULL, wide_path, NULL, ARRAY_SIZE(short_path), short_path, NULL);
+        if (path_size == 0)
             goto error;
+        if (path_size <= ARRAY_SIZE(short_path)) {
+            application_name = _wcsdup(short_path);
+            if (unlikely(!application_name))
+                goto error;
+        } else {
+            application_name = malloc(path_size * sizeof(*application_name));
+            if (unlikely(!application_name))
+                goto error;
 
-        if (!SearchPathW(NULL, wide_path, NULL, MAX_PATH, application_name, NULL)) {
-            goto error;
+            DWORD full_path_size = SearchPathW(NULL, wide_path, NULL, path_size, application_name, NULL);
+            if (unlikely(path_size < full_path_size))
+                goto error;
         }
-
     } else {
         application_name = wide_path;
     }
