@@ -31,6 +31,7 @@
 #include <vlc_image.h>
 #include <assert.h>
 #include <limits.h>
+#include <stdckdint.h>
 
 #include "libmp4.h"
 #include "heif.h"
@@ -674,8 +675,16 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
     if( !handler )
         return VLC_EGENERIC;
 
-    block_t *p_block = block_Alloc( derivation_data.ImageGrid.output_width *
-                                    derivation_data.ImageGrid.output_height * 4 );
+    size_t alloc_size;
+    if( ckd_mul( &alloc_size, derivation_data.ImageGrid.output_width,
+                   derivation_data.ImageGrid.output_height ) ||
+        ckd_mul( &alloc_size, alloc_size, 4 ) )
+    {
+        image_HandlerDelete( handler );
+        return VLC_EGENERIC;
+    }
+
+    block_t *p_block = block_Alloc( alloc_size );
     if( !p_block )
     {
         image_HandlerDelete( handler );
