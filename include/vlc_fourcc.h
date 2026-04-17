@@ -330,6 +330,8 @@
 #define VLC_CODEC_R420            VLC_FOURCC('r','4','2','0')
 /* Packed YUV 4:2:2 10-bit V10:U10:Y10:A2 */
 #define VLC_CODEC_Y210            VLC_FOURCC('Y','2','1','0')
+/* Packed YUV 4:2:2 12-bit V12:U12:Y12:A2 */
+#define VLC_CODEC_Y212            VLC_FOURCC('Y','2','1','2')
 /* Packed YUV 4:4:4 10-bit V10:U10:Y10:A2 */
 #define VLC_CODEC_Y410            VLC_FOURCC('Y','4','1','0')
 /* Packed YUV 4:4:4 12-bit V12:U12:Y12:A2 */
