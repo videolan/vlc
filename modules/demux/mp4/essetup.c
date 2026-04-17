@@ -1417,7 +1417,8 @@ int SetupSpuES( demux_t *p_demux, const mp4_track_t *p_track,
             if( p_text->i_data > 4 && GetDWBE(p_text->p_data) & 0xC0000000 )
             {
                 p_fmt->i_priority = ES_PRIORITY_SELECTABLE_MIN + 1;
-                p_cfg->b_forced_spu = true;
+                p_fmt->subs.b_forced = true;
+                p_fmt->psz_description = strdup( _("Forced caption") );
             }
 
             CopyExtradata( p_text->p_data, p_text->i_data, p_fmt );

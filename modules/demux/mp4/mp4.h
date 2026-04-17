@@ -90,7 +90,6 @@ typedef struct
     uint8_t     rgi_chans_reordering[AOUT_CHAN_MAX];
     uint8_t     i_chans_to_reorder;
 
-    bool b_forced_spu; /* forced track selection (never done by default/priority) */
     bool b_ignore_implicit_pts;
 
     uint32_t    i_block_flags;
@@ -106,7 +105,6 @@ typedef struct
     bool b_selected;  /* is the trak being played */
     int i_use_flags;  /* !=0 Set when track is referenced by specific reference types.
                          You'll need to lookup other tracks tref to know the ref source */
-    bool b_forced_spu; /* forced track selection (never done by default/priority) */
     uint32_t i_switch_group;
 
     bool b_mac_encoding;

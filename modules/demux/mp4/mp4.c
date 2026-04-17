@@ -465,12 +465,11 @@ static const MP4_Box_data_sbgp_entry_t *
     return p_sampleentry;
 }
 
-static es_out_id_t * MP4_CreateES( es_out_t *out, const es_format_t *p_fmt,
-                                   bool b_forced_spu )
+static es_out_id_t * MP4_CreateES( es_out_t *out, const es_format_t *p_fmt )
 {
     es_out_id_t *p_es = es_out_Add( out, p_fmt );
     /* Force SPU which isn't selected/defaulted */
-    if( p_fmt->i_cat == SPU_ES && p_es && b_forced_spu )
+    if( p_fmt->i_cat == SPU_ES && p_es && p_fmt->subs.b_forced )
         es_out_Control( out, ES_OUT_SET_ES_DEFAULT, p_es );
 
     return p_es;
@@ -3196,7 +3195,6 @@ static void TrackConfigApply( const track_config_t *p_cfg,
      memcpy( p_track->rgi_chans_reordering, p_cfg->rgi_chans_reordering,
              AOUT_CHAN_MAX * sizeof(p_cfg->rgi_chans_reordering[0]) );
      p_track->i_chans_to_reorder = p_cfg->i_chans_to_reorder;
-     p_track->b_forced_spu = p_cfg->b_forced_spu;
      p_track->i_block_flags = p_cfg->i_block_flags;
      p_track->b_ignore_implicit_pts = p_cfg->b_ignore_implicit_pts;
 }
@@ -3406,7 +3404,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     p_track->p_sample = p_sample;
 
     if( pp_es )
-        *pp_es = MP4_CreateES( p_demux->out, p_fmt, p_track->b_forced_spu );
+        *pp_es = MP4_CreateES( p_demux->out, p_fmt );
 
     return ( !pp_es || *pp_es ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -3724,7 +3722,7 @@ static int TrackUpdateFormat( demux_t *p_demux, mp4_track_t *p_track,
 
             es_out_Del( p_demux->out, p_track->p_es );
 
-            p_track->p_es = MP4_CreateES( p_demux->out, &tmpfmt, cfg.b_forced_spu );
+            p_track->p_es = MP4_CreateES( p_demux->out, &tmpfmt );
             if( !p_track->p_es )
             {
                 msg_Err( p_demux, "cannot create es for track[Id 0x%x]",
