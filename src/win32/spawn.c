@@ -30,6 +30,7 @@
 #include <vlc_fs.h>
 #include <vlc_spawn.h>
 #include <vlc_memstream.h>
+#include <vlc_charset.h>
 
 static LPPROC_THREAD_ATTRIBUTE_LIST allow_hstd_inherit(HANDLE *handles)
 {
@@ -102,7 +103,7 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
     int nulfd = -1;
     HANDLE nul_handle = INVALID_HANDLE_VALUE;
     PROCESS_INFORMATION pi = {0};
-    STARTUPINFOEXA siEx = {
+    STARTUPINFOEXW siEx = {
         .StartupInfo = {
             .cb         = sizeof(siEx),
             .hStdInput  = INVALID_HANDLE_VALUE,
@@ -112,8 +113,11 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
         }
     };
 
-    const char *application_name = NULL;
-    char *cmdline = NULL;
+    wchar_t *application_name = NULL;
+    wchar_t *wide_path = ToWide(path);
+    if (unlikely(wide_path == NULL))
+        return ret;
+    wchar_t *cmdline = NULL;
 
     if (fdv[0] == -1 || fdv[1] == -1) {
         nulfd = _open("\\\\.\\NUL", O_RDWR);
@@ -159,19 +163,16 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
         if (!SetSearchPathMode(BASE_SEARCH_PATH_ENABLE_SAFE_SEARCHMODE))
             goto error;
 
-        char *const application_path = malloc(MAX_PATH);
-        if (unlikely(!application_path))
+        application_name = malloc(MAX_PATH * sizeof(*application_name));
+        if (unlikely(!application_name))
             goto error;
 
-        if (!SearchPathA(NULL, path, NULL, MAX_PATH, application_path, NULL)) {
-            free(application_path);
+        if (!SearchPathW(NULL, wide_path, NULL, MAX_PATH, application_name, NULL)) {
             goto error;
         }
 
-        application_name = application_path;
-
     } else {
-        application_name = path;
+        application_name = wide_path;
     }
 
     if (likely(argv[0])) {
@@ -183,10 +184,13 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
             vlc_memstream_printf(&cmdline_s, " %s", argv[argc]);
         if (vlc_memstream_close(&cmdline_s) != 0)
             goto error;
-        cmdline = cmdline_s.ptr;
+        cmdline = ToWide(cmdline_s.ptr);
+        free(cmdline_s.ptr);
+        if (unlikely(cmdline == NULL))
+            goto error;
     }
 
-    BOOL bSuccess = CreateProcessA(application_name, cmdline, NULL,
+    BOOL bSuccess = CreateProcessW(application_name, cmdline, NULL,
                                    NULL, TRUE, EXTENDED_STARTUPINFO_PRESENT,
                                    NULL, NULL, &siEx.StartupInfo, &pi);
     if (!bSuccess)
@@ -220,8 +224,9 @@ error:
         free(siEx.lpAttributeList);
     }
 
-    if (application_name != path)
-        free((char*)application_name);
+    if (application_name != wide_path)
+        free(application_name);
+    free(wide_path);
     free(cmdline);
 
     return ret;
