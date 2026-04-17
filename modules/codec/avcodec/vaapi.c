@@ -375,6 +375,14 @@ static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
             case AV_PIX_FMT_P012BE:
                 vlc_chroma = VLC_CODEC_VAAPI_420_12BPP;
                 break;
+            case AV_PIX_FMT_Y210BE:
+            case AV_PIX_FMT_Y210LE:
+                vlc_chroma = VLC_CODEC_VAAPI_422_10BPP;
+                break;
+            case AV_PIX_FMT_Y212BE:
+            case AV_PIX_FMT_Y212LE:
+                vlc_chroma = VLC_CODEC_VAAPI_422_12BPP;
+                break;
             case AV_PIX_FMT_XV30BE:
             case AV_PIX_FMT_XV30LE:
                 vlc_chroma = VLC_CODEC_VAAPI_444_10BPP;
