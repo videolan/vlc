@@ -763,10 +763,8 @@ static bool DvdReadGetTimelineBase( const demux_sys_t *p_sys, vlc_tick_t *base )
 
 static vlc_tick_t DvdReadGetControlLength( const demux_sys_t *p_sys )
 {
-#ifdef DVDREAD_HAS_DVDVIDEORECORDING
     if( p_sys->type == DVD_VR && p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )
         return p_sys->titles[p_sys->cur_title]->i_length;
-#endif
 #ifdef DVDREAD_HAS_DVDAUDIO
     if( p_sys->type == DVD_A )
         return FROM_SCALE_NZ( p_sys->p_title_table->length_pts );
@@ -796,6 +794,20 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pf = va_arg( args, double * );
 
+            /* vr i_title_offset is vobu count, block ratio wrong */
+            if( p_sys->type == DVD_VR && p_sys->cur_title >= 0 &&
+                p_sys->cur_title < p_sys->i_titles )
+            {
+                const vlc_tick_t length = p_sys->titles[p_sys->cur_title]->i_length;
+                vlc_tick_t time = 0;
+                if( length > 0 && DvdReadGetTimelineBase( p_sys, &time ) )
+                {
+                    if( time < 0 ) time = 0;
+                    if( time > length ) time = length;
+                    *pf = (double)time / length;
+                    return VLC_SUCCESS;
+                }
+            }
             if( p_sys->i_title_blocks )
                 *pf = (double)p_sys->i_title_offset / p_sys->i_title_blocks;
             else
@@ -826,6 +838,18 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return VLC_EGENERIC;
                 }
                 const vlc_tick_t length = DvdReadGetControlLength( p_sys );
+
+                if( p_sys->type == DVD_VR )
+                {
+                    vlc_tick_t time = 0;
+                    if( length > 0 && DvdReadGetTimelineBase( p_sys, &time ) )
+                    {
+                        if( time < 0 ) time = 0;
+                        if( time > length ) time = length;
+                        *va_arg( args, vlc_tick_t * ) = time;
+                        return VLC_SUCCESS;
+                    }
+                }
                 *va_arg( args, vlc_tick_t * ) = p_sys->i_title_offset * length
                     / p_sys->i_title_blocks;
                 return VLC_SUCCESS;
