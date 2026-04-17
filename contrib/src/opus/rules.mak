@@ -27,9 +27,9 @@ endif
 ifeq ($(ARCH)-$(HAVE_WIN32),aarch64-1)
 OPUS_CONF += --disable-rtcd
 endif
-# disable rtcd on armv7-windows
+# disable asm and rtcd on armv7-windows
 ifeq ($(ARCH)-$(HAVE_WIN32),arm-1)
-OPUS_CONF += --disable-rtcd
+OPUS_CONF += --disable-rtcd --disable-asm
 endif
 
 .opus: opus
