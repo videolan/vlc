@@ -761,6 +761,19 @@ static bool DvdReadGetTimelineBase( const demux_sys_t *p_sys, vlc_tick_t *base )
     }
 }
 
+static vlc_tick_t DvdReadGetControlLength( const demux_sys_t *p_sys )
+{
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+    if( p_sys->type == DVD_VR && p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )
+        return p_sys->titles[p_sys->cur_title]->i_length;
+#endif
+#ifdef DVDREAD_HAS_DVDAUDIO
+    if( p_sys->type == DVD_A )
+        return FROM_SCALE_NZ( p_sys->p_title_table->length_pts );
+#endif
+    return DvdReadGetTitleDuration( p_sys );
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -807,18 +820,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_TIME:
             if( p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )
             {
-                vlc_tick_t length;
-#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
-                if (p_sys->type == DVD_VR )
-                    length = p_sys->titles[p_sys->cur_title]->i_length;
-                else
-#endif
-#if defined(DVDREAD_HAS_DVDAUDIO)
-                if (p_sys->type == DVD_A )
-                    length = FROM_SCALE_NZ( ( uint64_t ) p_sys->p_title_table->length_pts );
-                else
-#endif
-                length = dvdtime_to_time( &p_sys->p_cur_pgc->playback_time );
+                if( unlikely( p_sys->i_title_blocks == 0 ) )
+                {
+                    *va_arg( args, vlc_tick_t * ) = 0;
+                    return VLC_EGENERIC;
+                }
+                const vlc_tick_t length = DvdReadGetControlLength( p_sys );
                 *va_arg( args, vlc_tick_t * ) = p_sys->i_title_offset * length
                     / p_sys->i_title_blocks;
                 return VLC_SUCCESS;
@@ -826,21 +833,44 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *va_arg( args, vlc_tick_t * ) = 0;
             return VLC_EGENERIC;
 
+        case DEMUX_SET_TIME:
+        {
+            const vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+            if( p_sys->cur_title < 0 || p_sys->cur_title >= p_sys->i_titles ||
+                p_sys->i_title_blocks == 0 )
+                return VLC_EGENERIC;
+
+            const vlc_tick_t length = DvdReadGetControlLength( p_sys );
+
+            if( length <= 0 )
+                return VLC_EGENERIC;
+
+            vlc_tick_t t = i_time;
+            if( t < 0 ) t = 0;
+            if( t > length ) t = length;
+
+            const uint32_t i_block_offset =
+                (uint32_t)( t * p_sys->i_title_blocks / length );
+
+#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
+            if ( p_sys->type == DVD_VR )
+            {
+                const uint32_t vr_vobu =
+                    DvdVRReadTimeToVobuOffset( p_sys, t );
+                return DvdVRReadSeek( p_demux, vr_vobu );
+            }
+#endif
+#if defined(DVDREAD_HAS_DVDAUDIO)
+            if ( p_sys->type == DVD_A )
+                return DvdAudioReadSeek( p_demux, i_block_offset );
+#endif
+            return DvdReadSeek( p_demux, i_block_offset );
+        }
+
         case DEMUX_GET_LENGTH:
             if( p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )
             {
-                vlc_tick_t length;
-#if defined(DVDREAD_HAS_DVDVIDEORECORDING)
-                if (p_sys->type == DVD_VR )
-                    length = p_sys->titles[p_sys->cur_title]->i_length;
-                else
-#endif
-#if defined(DVDREAD_HAS_DVDAUDIO)
-                if ( p_sys->type == DVD_A )
-                    length = FROM_SCALE_NZ( ( uint64_t ) p_sys->p_title_table->length_pts );
-                else
-#endif
-                length = dvdtime_to_time( &p_sys->p_cur_pgc->playback_time );
+                const vlc_tick_t length = DvdReadGetControlLength( p_sys );
 
                 *va_arg( args, vlc_tick_t * ) = length;
                 return VLC_SUCCESS;
