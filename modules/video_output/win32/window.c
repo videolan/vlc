@@ -315,6 +315,13 @@ static void MonitorChanged(vlc_window_t *wnd, HMONITOR monitor)
     DWORD iccw_len = ARRAY_SIZE(iccw);
     if (GetICMProfileW(ic, &iccw_len, iccw)) {
         UpdateICCProfile(wnd, iccw);
+    } else if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+        wchar_t *piccw = malloc( iccw_len * sizeof(*piccw) );
+        if (piccw != NULL && GetICMProfileW(ic, &iccw_len, piccw))
+            UpdateICCProfile(wnd, piccw);
+        else
+            UpdateICCProfile(wnd, NULL);
+        free(piccw);
     } else {
         UpdateICCProfile(wnd, NULL);
     }
