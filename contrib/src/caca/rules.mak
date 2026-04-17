@@ -24,7 +24,6 @@ caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(APPLY) $(SRC)/caca/caca-fix-pkgconfig.patch
 	$(call pkg_static,"caca/caca.pc.in")
 	$(MOVE)
-	mv caca/config.sub caca/config.guess caca/.auto
 
 CACA_CONF := \
 	--disable-gl \
