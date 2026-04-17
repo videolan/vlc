@@ -2198,7 +2198,7 @@ static int DvdAudioReadSeek( demux_t *p_demux, uint32_t i_block_offset )
     for ( i_chapter = 0 ; i_chapter < p_sys->i_chapters; i_chapter++ ) {
         uint32_t start = p_sys->p_title_table->atsi_track_pointer_rows[i_chapter].start_sector;
         uint32_t end = p_sys->p_title_table->atsi_track_pointer_rows[i_chapter].end_sector;
-        uint32_t chapter_len= end-start;
+        uint32_t chapter_len = end - start + 1;
 
         if ( i_block_offset < i_seek_blocks + chapter_len )
             break;
