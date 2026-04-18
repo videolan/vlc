@@ -216,7 +216,7 @@ void CloseIntf (vlc_object_t *p_this)
         }
         vlc_preparser_Delete(p_network_preparser);
         [NSApp stop:nil];
-        NSEvent* event = [NSEvent otherEventWithType:NSApplicationDefined
+        NSEvent* event = [NSEvent otherEventWithType:NSEventTypeApplicationDefined
             location:NSMakePoint(0,0)
             modifierFlags:0
             timestamp:0.0

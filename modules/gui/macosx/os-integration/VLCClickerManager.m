@@ -167,7 +167,7 @@
 - (void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event
 {
     if (b_mediaKeySupport) {
-        assert([event type] == NSSystemDefined && [event subtype] == SPSystemDefinedEventMediaKeys);
+        assert([event type] == NSEventTypeSystemDefined && [event subtype] == SPSystemDefinedEventMediaKeys);
 
         int keyCode = (([event data1] & 0xFFFF0000) >> 16);
         int keyFlags = ([event data1] & 0x0000FFFF);
