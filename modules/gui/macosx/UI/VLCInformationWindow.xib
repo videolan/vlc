@@ -34,13 +34,13 @@
                 <outlet property="demuxReadBytesTextField" destination="542" id="9eB-eE-XTP"/>
                 <outlet property="demuxReadPacketsLabel" destination="Hnb-RD-RvP" id="6Xi-zs-S8Q"/>
                 <outlet property="demuxReadPacketsTextField" destination="7Q8-ZO-4ZM" id="gWq-ZN-quj"/>
-                <outlet property="descriptionLabel" destination="498" id="679"/>
+                <outlet property="contentDescriptionLabel" destination="498" id="679"/>
                 <outlet property="directorLabel" destination="cXh-Kb-cBh" id="6ZF-wX-Xh2"/>
                 <outlet property="directorTextField" destination="KiB-XA-gnh" id="ERL-sw-M61"/>
                 <outlet property="displayedLabel" destination="557" id="712"/>
                 <outlet property="displayedTextField" destination="558" id="713"/>
                 <outlet property="encodedByTextField" destination="504" id="BOa-Pb-f9Z"/>
-                <outlet property="encodedbyLabel" destination="505" id="660"/>
+                <outlet property="encodedByLabel" destination="505" id="660"/>
                 <outlet property="episodeLabel" destination="32r-kK-YIK" id="yix-cN-AcT"/>
                 <outlet property="episodeTextField" destination="D3W-el-Mmk" id="FS0-bE-baK"/>
                 <outlet property="genreLabel" destination="462" id="662"/>
@@ -79,7 +79,7 @@
                 <outlet property="trackNumberTextField" destination="441" id="v8g-zz-lrZ"/>
                 <outlet property="trackTotalLabel" destination="cIj-bq-nFH" id="DTy-a5-z5z"/>
                 <outlet property="trackTotalTextField" destination="Ken-fu-rsj" id="5tM-3S-iBE"/>
-                <outlet property="uriLabel" destination="510" id="677"/>
+                <outlet property="decodedMRLLabel" destination="510" id="677"/>
                 <outlet property="videoDecodedLabel" destination="555" id="727"/>
                 <outlet property="videoDecodedTextField" destination="556" id="728"/>
                 <outlet property="videoLabel" destination="553" id="711"/>
