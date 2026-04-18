@@ -23,7 +23,7 @@ sudo apt-get install -qqy \
     git wget bzip2 file libwine-dev unzip libtool libtool-bin libltdl-dev pkg-config ant \
     build-essential automake texinfo yasm p7zip-full autopoint \
     gettext cmake zip wine nsis g++-mingw-w64-i686 curl gperf flex bison \
-    libcurl4-gnutls-dev python3 python3-setuptools python3-mako python3-requests \
+    libcurl4-gnutls-dev python3 python3-setuptools python3-mako python3-requests python3-venv \
     gcc make procps ca-certificates \
     openjdk-11-jdk-headless nasm jq gnupg \
     meson autoconf
