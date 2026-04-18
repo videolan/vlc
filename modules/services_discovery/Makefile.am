@@ -74,7 +74,7 @@ libupnp_plugin_la_RES = ../share/upnp_server/ContentDirectory.xml \
 	../share/upnp_server/vlc.png \
 	../share/upnp_server/vlc512x512.png
 dist_libupnp_plugin_la_DATA = $(libupnp_plugin_la_RES)
-libupnp_plugin_ladir = $(prefix)/share/vlc/upnp_server
+libupnp_plugin_ladir = $(pkgdatadir)/upnp_server
 endif
 EXTRA_LTLIBRARIES += libupnp_plugin.la
 sd_PLUGINS += $(LTLIBupnp)
