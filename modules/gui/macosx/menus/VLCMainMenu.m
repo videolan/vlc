@@ -1363,7 +1363,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [savePanel setAllowedFileTypes:allowedFileTypes];
     [savePanel setCanSelectHiddenExtension:YES];
 
-    if ([savePanel runModal] == NSFileHandlingPanelOKButton) {
+    if ([savePanel runModal] == NSModalResponseOK) {
         NSString *filename = [[savePanel URL] path];
         VLCPlaylistExportModuleDescription *exportModule = availableExportModules[[_playlistSaveAccessoryPopup indexOfSelectedItem]];
 

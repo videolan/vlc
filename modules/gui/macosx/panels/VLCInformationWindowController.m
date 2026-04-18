@@ -695,7 +695,7 @@ SET_INPUTITEM_PROP(field, field)                \
     [panel setAllowsOtherFileTypes:NO];
     [panel setPrompt:_NS("Choose")];
     [panel beginSheetModalForWindow:self.window completionHandler:^(const NSInteger result) {
-        if (result != NSFileHandlingPanelOKButton) {
+        if (result != NSModalResponseOK) {
             return;
         }
 

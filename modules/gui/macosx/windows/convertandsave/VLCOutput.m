@@ -416,7 +416,7 @@
     [save_panel setPrompt: _NS("Save")];
     [save_panel setNameFieldStringValue: name];
 
-    if ([save_panel runModal] == NSFileHandlingPanelOKButton) {
+    if ([save_panel runModal] == NSModalResponseOK) {
         [self.fileTextField setStringValue: [[save_panel URL] path]];
         [self outputInfoChanged: nil];
     }
