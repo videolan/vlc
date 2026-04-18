@@ -86,12 +86,12 @@ endif
 if BUILD_LUA
 	mkdir -p $(win32_destdir)/lua/
 	cp -r $(pkglibexecdir)/lua/* $(win32_destdir)/lua/
-	cp -r $(prefix)/share/vlc/lua/* $(win32_destdir)/lua/
+	cp -r $(pkgdatadir)/lua/* $(win32_destdir)/lua/
 endif
 
 if BUILD_SKINS
 	rm -fr $(win32_destdir)/skins
-	cp -r $(prefix)/share/vlc/skins2 $(win32_destdir)/skins
+	cp -r $(pkgdatadir)/skins2 $(win32_destdir)/skins
 endif
 
 # HRTF
