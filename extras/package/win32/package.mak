@@ -32,9 +32,9 @@ package-win-install:
 if ENABLE_PDB
 	cp lib/.libs/libvlc.pdb '$(DESTDIR)$(bindir)'
 	cp src/.libs/libvlccore.pdb '$(DESTDIR)$(bindir)'
-	find '$(DESTDIR)$(libdir)/vlc/plugins' -name "*.dll" -exec sh -c "echo {} | sed -e 's@$(DESTDIR)$(libdir)/vlc/plugins/\(.*\)/\(.*\).dll@modules/.libs/\2.pdb $(DESTDIR)$(libdir)/vlc/plugins/\1@' | xargs -t cp " \;
+	find '$(DESTDIR)$(pkglibdir)/plugins' -name "*.dll" -exec sh -c "echo {} | sed -e 's@$(DESTDIR)$(pkglibdir)/plugins/\(.*\)/\(.*\).dll@modules/.libs/\2.pdb $(DESTDIR)$(pkglibdir)/plugins/\1@' | xargs -t cp " \;
 if ENABLE_QT
-	find modules/gui/qt/.libs/ -name "*.pdb" -exec cp {} '$(DESTDIR)$(libdir)/vlc/plugins/gui/' \;
+	find modules/gui/qt/.libs/ -name "*.pdb" -exec cp {} '$(DESTDIR)$(pkglibdir)/plugins/gui/' \;
 endif
 endif
 	touch $@
@@ -67,13 +67,13 @@ endif
 	cp "$(srcdir)/README.md" "$(win32_destdir)/README.txt"
 
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)
-	for plugindir in $(prefix)/lib/vlc/plugins/*/; do \
+	for plugindir in $(pkglibdir)/plugins/*/; do \
 		plugin_destdir="$(win32_destdir)/plugins/`basename $$plugindir`"; \
 		mkdir -p "$$plugin_destdir"; \
 		find "$$plugindir" -type f \( -not -name '*.la' -and -not -name '*.a' \) -exec cp -v "{}" "$$plugin_destdir" \; ;\
 	done
 if ENABLE_PDB
-	for plugindir in $(prefix)/lib/vlc/plugins/*/; do \
+	for plugindir in $(pkglibdir)/plugins/*/; do \
 		plugin_destdir="$(win32_destdir)/plugins/`basename $$plugindir`"; \
 		for plugin in $$(find "$$plugindir" -type f \( -not -name '*.la' -and -not -name '*.a' \)); do cp modules/.libs/$$(basename "$$plugin" | sed s/dll/pdb/) "$$plugin_destdir"; done; \
 	done
