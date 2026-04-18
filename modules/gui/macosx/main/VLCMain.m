@@ -504,6 +504,11 @@ static VLCMain *sharedInstance = nil;
     return YES;
 }
 
+- (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)app
+{
+    return YES;
+}
+
 #pragma mark -
 #pragma mark Other objects getters
 
