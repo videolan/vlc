@@ -36,20 +36,28 @@
 
 static libvlc_instance_t *libvlc;
 
+struct cea708_test_owner {
+    decoder_t dec;
+    es_format_t fmt_in;
+};
+
 static decoder_t *create_cea708_decoder_test(const char *video_dimensions)
 {
     vlc_object_t *obj = VLC_OBJECT(libvlc->p_libvlc_int);
-    decoder_t *dec = vlc_object_create(obj, sizeof(*dec));
-    if (!dec)
+    struct cea708_test_owner *owner = vlc_object_create(obj, sizeof(*owner));
+    if (!owner)
         return NULL;
+    decoder_t *dec = &owner->dec;
 
-    es_format_t fmt_in;
-    es_format_Init(&fmt_in, SPU_ES, VLC_CODEC_CEA708);
-    fmt_in.subs.cc.i_channel = 1;
-    fmt_in.subs.cc.i_reorder_depth = 4;
+    es_format_t fmt;
+    es_format_Init(&fmt, SPU_ES, VLC_CODEC_CEA708);
+    fmt.subs.cc.i_channel = 1;
+    fmt.subs.cc.i_reorder_depth = 4;
 
-    dec->fmt_in = &fmt_in;
-    es_format_Init(&dec->fmt_out, SPU_ES, VLC_CODEC_TEXT);
+    decoder_Init(dec, &owner->fmt_in, &fmt);
+    es_format_Clean(&fmt);
+
+    dec->fmt_out.i_codec = VLC_CODEC_TEXT;
 
     /* Set up video format for aspect ratio testing */
     if (strcmp(video_dimensions, "4:3") == 0) {
@@ -82,8 +90,10 @@ static decoder_t *create_cea708_decoder_test(const char *video_dimensions)
 
 static void destroy_cea708_decoder_test(decoder_t *dec)
 {
-    if (dec->p_module)
-        module_unneed(dec, dec->p_module);
+    struct cea708_test_owner *owner =
+        container_of(dec, struct cea708_test_owner, dec);
+    decoder_Clean(dec);
+    es_format_Clean(&owner->fmt_in);
     vlc_object_delete(dec);
 }
 
@@ -253,15 +263,17 @@ static void test_end_to_end_aspect_ratio_flow(void)
 
         /* Step 1: Create decoder with specific video format */
         vlc_object_t *obj = VLC_OBJECT(libvlc->p_libvlc_int);
-        decoder_t *dec = vlc_object_create(obj, sizeof(*dec));
-        assert(dec != NULL);
+        struct cea708_test_owner *owner = vlc_object_create(obj, sizeof(*owner));
+        assert(owner != NULL);
+        decoder_t *dec = &owner->dec;
 
         /* Step 2: Set up video format for DAR calculation */
-        es_format_t fmt_in;
-        es_format_Init(&fmt_in, SPU_ES, VLC_CODEC_CEA708);
-        dec->fmt_in = &fmt_in;
-        es_format_Init(&dec->fmt_out, SPU_ES, VLC_CODEC_TEXT);
+        es_format_t fmt;
+        es_format_Init(&fmt, SPU_ES, VLC_CODEC_CEA708);
+        decoder_Init(dec, &owner->fmt_in, &fmt);
+        es_format_Clean(&fmt);
 
+        dec->fmt_out.i_codec = VLC_CODEC_TEXT;
         dec->fmt_out.video.i_visible_width = integration_tests[i].width;
         dec->fmt_out.video.i_visible_height = integration_tests[i].height;
         dec->fmt_out.video.i_sar_num = integration_tests[i].sar_num;
@@ -324,7 +336,8 @@ static void test_end_to_end_aspect_ratio_flow(void)
         test_log("✓ End-to-end flow verified for %s\n", integration_tests[i].scenario);
 
         /* Cleanup */
-        module_unneed(dec, dec->p_module);
+        decoder_Clean(dec);
+        es_format_Clean(&owner->fmt_in);
         vlc_object_delete(dec);
     }
 
