@@ -375,15 +375,5 @@ ListViewExt {
         }
 
         onContainsDragChanged: root.updateItemContainsDrag(this, containsDrag)
-
-        Connections {
-            target: selectionModel
-
-            function onSelectionChanged() {
-                tableDelegate.selected = Qt.binding(function() {
-                  return root.selectionModel.selectedIndexesFlat.includes(index)
-                })
-            }
-        }
     }
 }
