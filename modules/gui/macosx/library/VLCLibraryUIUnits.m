@@ -225,6 +225,28 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                             VLCLibraryUIUnits.mediumSpacing);
 }
 
++ (const NSEdgeInsets)libraryViewScrollViewDetailListContentInsets
+{
+    static NSEdgeInsets contentInsets;
+    static dispatch_once_t dispatchOnceToken;
+    dispatch_once(&dispatchOnceToken, ^{
+        contentInsets = [self libraryViewScrollViewContentInsets];
+        contentInsets.top -= VLCLibraryUIUnits.largeSpacing;
+    });
+    return contentInsets;
+}
+
++ (const NSEdgeInsets)libraryViewScrollViewDetailGridContentInsets
+{
+    static NSEdgeInsets contentInsets;
+    static dispatch_once_t dispatchOnceToken;
+    dispatch_once(&dispatchOnceToken, ^{
+        contentInsets = [self libraryViewScrollViewContentInsets];
+        contentInsets.top += VLCLibraryUIUnits.mediumSpacing;
+    });
+    return contentInsets;
+}
+
 + (const NSEdgeInsets)libraryViewScrollViewScrollerInsets
 {
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;

@@ -277,9 +277,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableViewScrollView.contentInsets = audioScrollViewContentInsets;
     _audioCollectionSelectionTableViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
     _audioGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    NSEdgeInsets adjustedDetailInsets = audioScrollViewContentInsets;
-    adjustedDetailInsets.top -= VLCLibraryUIUnits.largeSpacing;
-    _audioGroupSelectionTableViewScrollView.contentInsets = adjustedDetailInsets;
+    _audioGroupSelectionTableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewDetailListContentInsets;
     _audioGroupSelectionTableViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
 
     _audioLibraryGridModeSplitViewListTableViewScrollView.automaticallyAdjustsContentInsets = NO;
@@ -287,9 +285,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListTableViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
 
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    NSEdgeInsets adjustedGridDetailInsets = audioScrollViewContentInsets;
-    adjustedGridDetailInsets.top += VLCLibraryUIUnits.mediumSpacing;
-    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.contentInsets = adjustedGridDetailInsets;
+    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewDetailGridContentInsets;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
 
     // Songs table view needs bottom padding for controls bar
