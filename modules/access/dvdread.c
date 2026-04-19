@@ -62,6 +62,7 @@
 #include <dvdread/nav_print.h>
 
 #include <assert.h>
+#include <stdckdint.h>
 #include <limits.h>
 
 #include "disc_helper.h"
@@ -213,6 +214,16 @@ typedef struct
     int i_cur_cell;
     int i_next_cell;
 
+    /* ps/dvd anchor pair for rebasing ps scr/pts onto the disc timeline
+     * dvd is accumulated cell playback time from title start
+     * ps is the matching scr from the first ps pack of that cell
+     * both are VLC_TICK_INVALID until the first pack of a cell is seen */
+    struct
+    {
+        vlc_tick_t dvd;
+        vlc_tick_t ps;
+    } cell_ts;
+
     /* Track */
     ps_track_t    tk[PS_TK_COUNT];
 
@@ -230,6 +241,12 @@ typedef struct
 static int Control   ( demux_t *, int, va_list );
 static int Demux     ( demux_t * );
 static int DemuxBlock( demux_t *, const uint8_t *, int );
+
+static inline void DvdReadResetCellTs( demux_sys_t *p_sys )
+{
+    p_sys->cell_ts.dvd = VLC_TICK_INVALID;
+    p_sys->cell_ts.ps = VLC_TICK_INVALID;
+}
 
 static void DemuxTitles( demux_t *, int * );
 static void ESNew( demux_t *, int, int );
@@ -392,6 +409,9 @@ static int OpenCommon( vlc_object_t *p_this , dvd_type_t type )
     p_sys->cur_title = p_sys->cur_chapter = 0;
     p_sys->i_mux_rate = 0;
 
+    /* reset anchors so the first cell seen after open captures fresh timestamps */
+    DvdReadResetCellTs( p_sys );
+
     p_sys->i_angle = var_CreateGetInteger( p_demux, "dvdread-angle" );
     if( p_sys->i_angle <= 0 ) p_sys->i_angle = 1;
 
@@ -514,6 +534,233 @@ static vlc_tick_t dvdtime_to_time( const dvd_time_t *dtime )
     return vlc_tick_from_sec(sec) + VLC_TICK_FROM_MS(f_ms);
 }
 
+/* total playback duration of the current title in vlc_tick_t
+ * for dvd-video sums per-cell playback_time across the active cell range
+ * so angle-restricted titles report the correct length
+ * falls back to pgc playback_time for other disc types */
+static vlc_tick_t DvdReadGetTitleDuration( const demux_sys_t *p_sys )
+{
+    if( p_sys->type == DVD_V && p_sys->p_cur_pgc && p_sys->p_cur_pgc->cell_playback &&
+        p_sys->i_title_start_cell >= 0 &&
+        p_sys->i_title_start_cell < p_sys->i_title_end_cell )
+    {
+        vlc_tick_t dur = 0;
+        for( int ci = p_sys->i_title_start_cell; ci <= p_sys->i_title_end_cell; ci++ )
+        {
+            dur += dvdtime_to_time( &p_sys->p_cur_pgc->cell_playback[ci].playback_time );
+        }
+        return dur;
+    }
+
+    if( p_sys->p_cur_pgc )
+        return dvdtime_to_time( &p_sys->p_cur_pgc->playback_time );
+    return 0;
+}
+
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+#define DVDVR_FALLBACK_SECTORS_PER_VOBU 512
+
+/* estimated sector span of a vr program's vobu map
+ * dvd-vr has no flat vobu address map like VOBU_ADMAP in dvd-video
+ * instead time_info entries store vobu_adr as sector offset and vobu_entn
+ * as vobu index so the last entry gives a sectors-per-vobu ratio
+ * falls back to a per-program or constant ratio when no usable entries exist
+ * returns 0 when the map has no VOBUs */
+static uint32_t DvdVRGetProgramSectorSpan( const demux_sys_t *p_sys,
+                                           const vobu_map_t *map )
+{
+    if( map->nr_of_time_info > 0 )
+    {
+        const uint32_t last_adr = map->time_infos[map->nr_of_time_info - 1].vobu_adr;
+        const uint32_t last_entn = map->time_infos[map->nr_of_time_info - 1].vobu_entn;
+        if( last_entn > 1 )
+            return (uint32_t)( (uint64_t)last_adr * map->nr_of_vobu_info /
+                               ( last_entn - 1 ) );
+    }
+
+    uint32_t sects_per_vobu = DVDVR_FALLBACK_SECTORS_PER_VOBU;
+    for( int p = 0; p < p_sys->pgc_gi->nr_of_programs; p++ )
+    {
+        const vobu_map_t *m = &p_sys->pgc_gi->pgi[p].map;
+        if( m->nr_of_time_info > 0 &&
+            m->time_infos[m->nr_of_time_info - 1].vobu_entn > 1 )
+        {
+            sects_per_vobu = m->time_infos[m->nr_of_time_info - 1].vobu_adr /
+                             ( m->time_infos[m->nr_of_time_info - 1].vobu_entn - 1 );
+            break;
+        }
+    }
+
+    return map->nr_of_vobu_info * sects_per_vobu;
+}
+
+static vlc_tick_t DvdVRProgramDuration( const pgi_t *pgi )
+{
+    if( pgi->header.vob_v_e_ptm.ptm <= pgi->header.vob_v_s_ptm.ptm )
+        return 0;
+
+    const uint32_t delta_ptm =
+        pgi->header.vob_v_e_ptm.ptm - pgi->header.vob_v_s_ptm.ptm;
+    return FROM_SCALE_NZ( delta_ptm );
+}
+
+static uint32_t DvdVRReadTimeToVobuOffset( const demux_sys_t *p_sys, vlc_tick_t t )
+{
+    if( p_sys->type != DVD_VR || !p_sys->pgc_gi || !p_sys->ud_pgcit ||
+        p_sys->i_title_start_cell < 0 || p_sys->i_title_end_cell <= p_sys->i_title_start_cell )
+        return 0;
+
+    vlc_tick_t acc = 0;
+    uint32_t vobu_acc = 0;
+
+    for( int ci = p_sys->i_title_start_cell; ci < p_sys->i_title_end_cell; ci++ )
+    {
+        uint16_t srpn = p_sys->ud_pgcit->m_c_gi[ci].m_vobi_srpn;
+        if( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs )
+            return vobu_acc;
+
+        const pgi_t *pgi = &p_sys->pgc_gi->pgi[srpn - 1];
+        const uint32_t vobus = pgi->map.nr_of_vobu_info;
+        if( vobus == 0 )
+            continue;
+
+        const vlc_tick_t dur = DvdVRProgramDuration( pgi );
+        if( dur == 0 )
+            continue;
+        if( acc + dur > t )
+        {
+            const vlc_tick_t within = t - acc;
+            const uint32_t within_vobu = (uint32_t)(within * vobus / dur);
+            return vobu_acc + within_vobu;
+        }
+
+        acc += dur;
+        vobu_acc += vobus;
+    }
+
+    return p_sys->i_title_blocks > 0 ? p_sys->i_title_blocks - 1 : 0;
+}
+
+#endif
+
+static bool DvdReadCellTsShift( const demux_sys_t *p_sys, vlc_tick_t *shift )
+{
+    if( p_sys->cell_ts.dvd == VLC_TICK_INVALID ||
+        p_sys->cell_ts.ps == VLC_TICK_INVALID )
+        return false;
+    *shift = p_sys->cell_ts.dvd - p_sys->cell_ts.ps;
+    return true;
+}
+
+static bool DvdReadGetTimelineBase( const demux_sys_t *p_sys, vlc_tick_t *base )
+{
+    switch( p_sys->type )
+    {
+        case DVD_V:
+        {
+            const pgc_t *p_pgc = p_sys->p_cur_pgc;
+            if( !p_pgc || !p_pgc->cell_playback ||
+                p_sys->i_title_start_cell < 0 || p_sys->i_cur_cell < 0 ||
+                p_sys->i_title_start_cell >= p_pgc->nr_of_cells ||
+                p_sys->i_cur_cell >= p_pgc->nr_of_cells ||
+                p_sys->i_title_start_cell > p_sys->i_cur_cell )
+                return false;
+
+            vlc_tick_t cell_dvd_time = 0;
+            for( int i = p_sys->i_title_start_cell; i < p_sys->i_cur_cell; i++ )
+                cell_dvd_time += dvdtime_to_time( &p_pgc->cell_playback[i].playback_time );
+
+            const cell_playback_t *p_cell = &p_pgc->cell_playback[p_sys->i_cur_cell];
+            vlc_tick_t cell_duration = dvdtime_to_time( &p_cell->playback_time );
+            const uint32_t cell_sectors = p_cell->last_sector - p_cell->first_sector + 1;
+
+            if( cell_duration > 0 && cell_sectors > 0 )
+            {
+                int64_t within_sectors = p_sys->i_cur_block - (int64_t)p_cell->first_sector;
+
+                if( within_sectors < 0 )
+                    within_sectors = 0;
+                else if( within_sectors >= (int64_t)cell_sectors )
+                    within_sectors = (int64_t)cell_sectors - 1;
+
+                vlc_tick_t scaled;
+                if( !ckd_mul( &scaled, within_sectors, cell_duration ) )
+                    cell_dvd_time += scaled / cell_sectors;
+            }
+
+            *base = cell_dvd_time;
+            return true;
+        }
+#ifdef DVDREAD_HAS_DVDAUDIO
+        case DVD_A:
+        {
+            if( !p_sys->p_title_table || p_sys->i_title_blocks == 0 )
+                return false;
+
+            const uint32_t first_sector =
+                p_sys->p_title_table->atsi_track_pointer_rows[0].start_sector;
+            const uint32_t current_sector = p_sys->i_cur_block > 0 ? (uint32_t)p_sys->i_cur_block : 0;
+            const uint32_t current_offset = current_sector > first_sector ? current_sector - first_sector : 0;
+            const vlc_tick_t title_length =
+                FROM_SCALE_NZ( p_sys->p_title_table->length_pts );
+            *base = (vlc_tick_t)( current_offset * title_length
+                                  / p_sys->i_title_blocks );
+            return true;
+        }
+#endif
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+        case DVD_VR:
+        {
+            if( p_sys->i_title_start_cell < 0 || p_sys->i_cur_cell < 0 ||
+                p_sys->i_title_start_cell > p_sys->i_cur_cell ||
+                p_sys->i_cur_cell >= p_sys->i_title_end_cell )
+                return false;
+
+            vlc_tick_t cell_dvd_time = 0;
+            for( int ci = p_sys->i_title_start_cell;
+                 ci < p_sys->i_cur_cell && ci < p_sys->i_title_end_cell; ci++ )
+            {
+                uint16_t srpn = p_sys->ud_pgcit->m_c_gi[ci].m_vobi_srpn;
+                if( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs )
+                    return false;
+                const pgi_t *scan_pgi = &p_sys->pgc_gi->pgi[srpn - 1];
+                const vlc_tick_t scan_dur = DvdVRProgramDuration( scan_pgi );
+                if( scan_dur <= 0 )
+                    return false;
+                cell_dvd_time += scan_dur;
+            }
+
+            uint16_t srpn = p_sys->ud_pgcit->m_c_gi[p_sys->i_cur_cell].m_vobi_srpn;
+            if( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs )
+                return false;
+
+            const pgi_t *pgi = &p_sys->pgc_gi->pgi[srpn - 1];
+            const vlc_tick_t program_duration = DvdVRProgramDuration( pgi );
+            if( program_duration <= 0 )
+                return false;
+            const uint32_t total_sectors = DvdVRGetProgramSectorSpan( p_sys, &pgi->map );
+            if( total_sectors > 0 )
+            {
+                int64_t within_sectors = (int64_t)p_sys->i_cur_block - pgi->map.vob_offset;
+                if( within_sectors < 0 )
+                    within_sectors = 0;
+                else if( within_sectors >= (int64_t)total_sectors )
+                    within_sectors = (int64_t)total_sectors - 1;
+
+                vlc_tick_t scaled;
+                if( !ckd_mul( &scaled, within_sectors, program_duration ) )
+                    cell_dvd_time += scaled / total_sectors;
+            }
+
+            *base = cell_dvd_time;
+            return true;
+        }
+#endif
+        default:
+            return false;
+    }
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -572,7 +819,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 else
 #endif
                 length = dvdtime_to_time( &p_sys->p_cur_pgc->playback_time );
-
                 *va_arg( args, vlc_tick_t * ) = p_sys->i_title_offset * length
                     / p_sys->i_title_blocks;
                 return VLC_SUCCESS;
