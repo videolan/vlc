@@ -2218,10 +2218,16 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
 
     /* Find vobu */
     /* see ifo_read.c / ifoRead_VOBU_ADMAP_internal for index count */
+    if( unlikely( p_vts->vts_vobu_admap == NULL ||
+                  p_vts->vts_vobu_admap->last_byte < VOBU_ADMAP_SIZE ) )
+        return VLC_EGENERIC;
+
     int i_vobu = 1;
     const size_t i_vobu_sect_index_count =
             (p_vts->vts_vobu_admap->last_byte + 1 - VOBU_ADMAP_SIZE) /
             sizeof(*p_vts->vts_vobu_admap->vobu_start_sectors);
+    if( unlikely( i_vobu_sect_index_count == 0 ) )
+        return VLC_EGENERIC;
     for( size_t i=0; i<i_vobu_sect_index_count; i++ )
     {
         if( p_vts->vts_vobu_admap->vobu_start_sectors[i] > i_block )
@@ -2242,23 +2248,31 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
            i_sub_cell = i + 1;
     }
 
+    /* i_vobu reaches count when no entry exceeds i_block, guard the debug peek */
+    const size_t i_vobu_dbg_next = (size_t)i_vobu < i_vobu_sect_index_count
+        ? (size_t)i_vobu : i_vobu_sect_index_count - 1;
     msg_Dbg( p_demux, "cell %d i_sub_cell %d chapter %d vobu %d "
              "cell_sector %d vobu_sector %d sub_cell_sector %d",
              i_cell, i_sub_cell, i_chapter, i_vobu,
              p_sys->p_cur_pgc->cell_playback[i_cell].first_sector,
-             p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu],
+             p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu_dbg_next],
              p_vts->vts_c_adt->cell_adr_table[i_sub_cell - 1].start_sector);
 #endif
 
-    p_sys->i_cur_block = i_block;
-    if(likely( (size_t)i_vobu < i_vobu_sect_index_count ))
-        p_sys->i_next_vobu = p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu];
-    else
-        p_sys->i_next_vobu = i_block;
-    p_sys->i_pack_len = p_sys->i_next_vobu - i_block;
+    /* snap to vobu start, nav packet only at vobu head */
+    const uint32_t vobu_start_sector_snap =
+        p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu - 1];
+
+    p_sys->i_cur_block = vobu_start_sector_snap;
+    p_sys->i_next_vobu = vobu_start_sector_snap;
+    /* len set by DvdReadHandleDSI from dsi */
+    p_sys->i_pack_len = 0;
     p_sys->i_cur_cell = i_cell;
     p_sys->i_chapter = i_chapter;
     DvdReadFindCell( p_demux );
+
+    DvdReadResetCellTs( p_sys );
+    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
     return VLC_SUCCESS;
 }
@@ -2296,10 +2310,19 @@ static int DvdAudioReadSeek( demux_t *p_demux, uint32_t i_block_offset )
         p_sys->cur_chapter = i_chapter;
     }
 
-    p_sys->i_cur_block = p_sys->p_title_table->atsi_track_pointer_rows[i_chapter].start_sector;
-    p_sys->i_pack_len = 4;
+    const uint32_t start_sector =
+        p_sys->p_title_table->atsi_track_pointer_rows[i_chapter].start_sector;
+    /* i_block_offset title-relative, i_seek_blocks is chapter start */
+    const uint32_t within_chapter = i_block_offset - i_seek_blocks;
+    p_sys->i_cur_block = start_sector + within_chapter;
+
+    if( p_sys->i_cur_block <= p_sys->i_title_end_block )
+        p_sys->i_pack_len = p_sys->i_title_end_block - p_sys->i_cur_block + 1;
+    else
+        p_sys->i_pack_len = 0;
     p_sys->i_title_offset = i_block_offset;
     p_sys->i_chapter = i_chapter;
+    DvdReadResetCellTs( p_sys );
 
     return VLC_SUCCESS;
 }
