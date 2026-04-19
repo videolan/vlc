@@ -353,8 +353,6 @@ ListViewExt {
         rowModel: model
         sortModel: root.sortModel
 
-        selected: selectionModel.selectedIndexesFlat.includes(index)
-
         onRightClick: (menuParent, menuModel, globalMousePos) => {
             root.rightClick(menuParent, menuModel, globalMousePos)
         }

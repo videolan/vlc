@@ -32,10 +32,11 @@ T.Control {
     required property int index
     required property var rowModel
     required property var sortModel
-    required property bool selected
     required property Widgets.DragItem dragItem
 
     required property var contextMenu
+
+    readonly property bool selected: (selectionModel?.selectedIndexesFlat.includes(index) ?? false)
 
     readonly property bool topContainsDrag: dropAreaLayout.higherDropArea.containsDrag
     readonly property bool bottomContainsDrag: dropAreaLayout.lowerDropArea.containsDrag
