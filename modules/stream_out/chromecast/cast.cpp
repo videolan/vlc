@@ -63,6 +63,7 @@ struct sout_access_out_sys_t
     void prepare(sout_stream_t *p_stream, const std::string &mime);
     int url_cb(httpd_client_t *cl, httpd_message_t *answer, const httpd_message_t *query);
     void fifo_put_back(block_t *);
+    bool waitForClient(vlc_tick_t timeout, bool drained = false);
     ssize_t write(sout_access_out_t *p_access, block_t *p_block);
     void close();
 
@@ -562,6 +563,23 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
     return VLC_SUCCESS;
 }
 
+bool sout_access_out_sys_t::waitForClient(vlc_tick_t timeout, bool drained)
+{
+    const vlc_tick_t deadline = vlc_tick_now() + timeout;
+    while (vlc_tick_now() < deadline)
+    {
+        vlc_fifo_Lock(m_fifo);
+        const bool has_client = m_client != NULL && (!drained || vlc_fifo_GetBytes(m_fifo) == 0);
+        vlc_fifo_Unlock(m_fifo);
+
+        if (has_client)
+            return true;
+
+        vlc_tick_sleep(VLC_TICK_FROM_MS(100));
+    }
+    return false;
+}
+
 ssize_t sout_access_out_sys_t::write(sout_access_out_t *p_access, block_t *p_block)
 {
     size_t i_len = p_block->i_buffer;
@@ -733,6 +751,11 @@ static void DelInternal(sout_stream_t *p_stream, void *_id, bool reset_config)
 
     if ( p_sys->out_streams.empty() )
     {
+        if (p_sys->access_out_live.waitForClient(VLC_TICK_FROM_SEC(20)))
+        {
+            p_sys->access_out_live.waitForClient(VLC_TICK_FROM_SEC(20), true);
+            p_sys->p_intf->preservePlaybackOnTeardown();
+        }
         p_sys->stopSoutChain(p_stream);
         p_sys->p_intf->requestPlayerStop();
         p_sys->access_out_live.clear();

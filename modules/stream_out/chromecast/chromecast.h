@@ -193,6 +193,7 @@ struct intf_sys_t
 
     int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, size_t *pi_data );
     void interrupt_wake_up();
+    void preservePlaybackOnTeardown();
 private:
     void reinit();
     bool handleMessages();

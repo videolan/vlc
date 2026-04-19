@@ -251,6 +251,12 @@ intf_sys_t::~intf_sys_t()
     free( m_art_url );
 }
 
+void intf_sys_t::preservePlaybackOnTeardown()
+{
+    vlc::threads::mutex_locker locker( m_lock );
+    m_state = TakenOver;
+}
+
 void intf_sys_t::reinit()
 {
     assert( m_state == Dead );
