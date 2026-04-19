@@ -163,7 +163,7 @@
     self.selectedGroupTableViewScrollView.hasHorizontalScroller = NO;
     self.selectedGroupTableViewScrollView.borderType = NSNoBorder;
     self.selectedGroupTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.selectedGroupTableViewScrollView.contentInsets = defaultInsets;
+    self.selectedGroupTableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewDetailListContentInsets;
     self.selectedGroupTableViewScrollView.scrollerInsets = scrollerInsets;
 
     self.groupsTableViewScrollView.documentView = self.groupsTableView;

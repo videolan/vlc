@@ -249,7 +249,7 @@
     self.favoritesLibraryGroupSelectionTableViewScrollView.hasHorizontalScroller = NO;
     self.favoritesLibraryGroupSelectionTableViewScrollView.borderType = NSNoBorder;
     self.favoritesLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.favoritesLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
+    self.favoritesLibraryGroupSelectionTableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewDetailListContentInsets;
     self.favoritesLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
     self.favoritesLibraryGroupSelectionTableViewScrollView.hasHorizontalScroller = NO;
 

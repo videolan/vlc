@@ -160,7 +160,7 @@
     self.detailTableViewScrollView.hasHorizontalScroller = NO;
     self.detailTableViewScrollView.borderType = NSNoBorder;
     self.detailTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.detailTableViewScrollView.contentInsets = defaultInsets;
+    self.detailTableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewDetailListContentInsets;
     self.detailTableViewScrollView.scrollerInsets = scrollerInsets;
 
     self.masterTableViewScrollView.documentView = self.masterTableView;
