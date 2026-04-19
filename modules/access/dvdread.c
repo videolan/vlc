@@ -559,6 +559,7 @@ static vlc_tick_t DvdReadGetTitleDuration( const demux_sys_t *p_sys )
 
 #ifdef DVDREAD_HAS_DVDVIDEORECORDING
 #define DVDVR_FALLBACK_SECTORS_PER_VOBU 512
+#define DVDVR_EARLY_SNAP_VOBU_WINDOW 4
 
 /* estimated sector span of a vr program's vobu map
  * dvd-vr has no flat vobu address map like VOBU_ADMAP in dvd-video
@@ -602,6 +603,25 @@ static vlc_tick_t DvdVRProgramDuration( const pgi_t *pgi )
     const uint32_t delta_ptm =
         pgi->header.vob_v_e_ptm.ptm - pgi->header.vob_v_s_ptm.ptm;
     return FROM_SCALE_NZ( delta_ptm );
+}
+
+/* vobu_adr walked in order by callers, must be monotone */
+static bool DvdVRTimeInfosSane( const vobu_map_t *map, uint32_t total_sectors )
+{
+    if( map->nr_of_time_info == 0 || total_sectors == 0 )
+        return false;
+
+    uint32_t prev = 0;
+    for( int i = 0; i < map->nr_of_time_info; i++ )
+    {
+        const uint32_t adr = map->time_infos[i].vobu_adr;
+        if( adr >= total_sectors )
+            return false;
+        if( adr < prev )
+            return false;
+        prev = adr;
+    }
+    return true;
 }
 
 static uint32_t DvdVRReadTimeToVobuOffset( const demux_sys_t *p_sys, vlc_tick_t t )
@@ -1967,6 +1987,9 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
     VLC_UNUSED( i_angle );
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    if( i_title >= 0 && (unsigned)i_title >= p_sys->ud_pgcit->nr_of_pgci )
+        return VLC_EGENERIC;
+
     /* user made title selection */
     if( i_title >= 0 && i_title < p_sys->i_titles &&
         i_title != p_sys->i_title )
@@ -1994,6 +2017,13 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         p_sys->i_cur_cell = i_start_cell;
         i_end_cell = p_sys->i_title_end_cell = p_sys->ud_pgcit->ud_pgci_items[i_title].first_prog_id - 1 +
            p_sys->ud_pgcit->ud_pgci_items[i_title].nr_of_programs;
+
+        if( i_end_cell > p_sys->pgc_gi->nr_of_programs )
+        {
+            msg_Warn( p_demux, "invalid end cell %d for title %d",
+                      i_end_cell, i_title );
+            return VLC_EGENERIC;
+        }
 
         p_sys->i_chapters = 0;
         for (int c = i_start_cell; c < i_end_cell; c++)
@@ -2023,11 +2053,16 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         {
             uint16_t srpn = p_sys->ud_pgcit->m_c_gi[c].m_vobi_srpn;
             if( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs )
-                continue;
+            {
+                msg_Warn( p_demux, "invalid m_vobi_srpn %" PRIu16 " in title %d",
+                          srpn, i_title );
+                return VLC_EGENERIC;
+            }
             p_sys->i_title_blocks += p_sys->pgc_gi->pgi[srpn - 1].map.nr_of_vobu_info;
         }
         p_sys->i_title_offset = 0;
         p_sys->i_pack_len = 0;
+        DvdReadResetCellTs( p_sys );
 
         p_sys->i_title = i_title;
 
@@ -2106,32 +2141,49 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         if (!found)
             return VLC_EGENERIC;
 
-        /* search map for the address */
-        vobu_map_t map = p_sys->pgc_gi->pgi[chapter_program - 1].map;
+        if( chapter_program == 0 || chapter_program > p_sys->pgc_gi->nr_of_programs )
+            return VLC_EGENERIC;
 
-        /* find a vobu index to search for */
-        uint32_t relative_ptm = chapter_ptm
-            - p_sys->pgc_gi->pgi[chapter_program - 1].header.vob_v_s_ptm.ptm;
+        const pgi_t *chapter_pgi = &p_sys->pgc_gi->pgi[chapter_program - 1];
+        const vobu_map_t *map = &chapter_pgi->map;
 
-        uint32_t total_pts = p_sys->pgc_gi->pgi[chapter_program - 1].header.vob_v_e_ptm.ptm
-            - p_sys->pgc_gi->pgi[chapter_program - 1].header.vob_v_s_ptm.ptm;
+        const int64_t relative_ptm = (int64_t)chapter_ptm -
+            (int64_t)chapter_pgi->header.vob_v_s_ptm.ptm;
+        const int64_t total_pts = (int64_t)chapter_pgi->header.vob_v_e_ptm.ptm -
+            (int64_t)chapter_pgi->header.vob_v_s_ptm.ptm;
+        const uint32_t total_sectors = DvdVRGetProgramSectorSpan( p_sys, map );
 
-        uint32_t estimated_vobu = 0;
-        if( total_pts > 0 && map.nr_of_vobu_info > 0 )
-            estimated_vobu = (uint32_t)( (uint64_t)relative_ptm
-                * map.nr_of_vobu_info / total_pts );
+        uint32_t within_vobu = 0;
+        if( total_pts > 0 && relative_ptm >= 0 && total_sectors > 0 )
+        {
+            if( map->nr_of_vobu_info > 0 )
+                within_vobu = (uint32_t)( relative_ptm *
+                              map->nr_of_vobu_info / total_pts );
+        }
+        if( map->nr_of_vobu_info > 0 && within_vobu >= map->nr_of_vobu_info )
+            within_vobu = map->nr_of_vobu_info - 1;
 
-        int time_offset_i = 0;
-        while ( time_offset_i < map.nr_of_time_info - 1
-            && map.time_infos[time_offset_i + 1].vobu_entn <= estimated_vobu )
-            time_offset_i++;
+        /* time_infos sparse, snap to entry only near program start */
+        uint32_t snap_sector = 0;
+        if( within_vobu < DVDVR_EARLY_SNAP_VOBU_WINDOW &&
+            DvdVRTimeInfosSane( map, total_sectors ) )
+        {
+            int idx = 0;
+            while( idx + 1 < map->nr_of_time_info &&
+                   map->time_infos[idx + 1].vobu_entn <= within_vobu )
+                idx++;
+            snap_sector = map->time_infos[idx].vobu_adr;
+        }
 
-        uint32_t chapter_offset = map.time_infos[time_offset_i].vobu_adr + map.vob_offset;
+        const uint32_t chapter_offset = map->vob_offset + snap_sector;
         p_sys->i_cur_block = chapter_offset;
-        p_sys->i_pack_len = 0;
+        p_sys->i_pack_len = total_sectors > snap_sector ? total_sectors - snap_sector : 1;
         p_sys->i_chapter = i_chapter;
         p_sys->cur_chapter = i_chapter;
+        DvdReadResetCellTs( p_sys );
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
+        p_sys->i_cur_cell = -1;
         for( int ci = p_sys->i_title_start_cell;
              ci < p_sys->i_title_end_cell; ci++ )
         {
@@ -2141,6 +2193,8 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                 break;
             }
         }
+        if( p_sys->i_cur_cell < p_sys->i_title_start_cell )
+            return VLC_EGENERIC;
 
         p_sys->i_title_offset = 0;
         for( int ci = p_sys->i_title_start_cell;
@@ -2149,6 +2203,8 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
             uint16_t s = p_sys->ud_pgcit->m_c_gi[ci].m_vobi_srpn;
             p_sys->i_title_offset += p_sys->pgc_gi->pgi[s - 1].map.nr_of_vobu_info;
         }
+        /* add within-program vobu offset for position accuracy */
+        p_sys->i_title_offset += within_vobu;
 
         return VLC_SUCCESS;
     }
@@ -2206,9 +2262,17 @@ static void DvdVRFindCell( demux_t *p_demux )
 
 static vlc_tick_t DVDVRGetTitleLength( pgc_gi_t *pgc_gi, ud_pgcit_t *ud_pgcit, int program)
 {
+    if( program < 0 || (unsigned)program >= ud_pgcit->nr_of_pgci )
+        return 0;
+
     uint64_t length_ptm = 0;
     uint16_t first_prog_id = ud_pgcit->ud_pgci_items[program].first_prog_id;
     uint16_t nr_of_programs = ud_pgcit->ud_pgci_items[program].nr_of_programs;
+
+    if( first_prog_id == 0 || first_prog_id > pgc_gi->nr_of_programs ||
+        nr_of_programs == 0 ||
+        first_prog_id - 1 + nr_of_programs > pgc_gi->nr_of_programs )
+        return 0;
 
     for ( int i = 0; i < nr_of_programs; i++ )
         length_ptm += pgc_gi->pgi[first_prog_id -1 + i].header.vob_v_e_ptm.ptm
@@ -2392,23 +2456,23 @@ static int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_chapter = 0;
     uint32_t vobu_accum = 0;
+    bool found_cell = false;
 
     int cell_base = p_sys->ud_pgcit->ud_pgci_items[p_sys->i_title].first_prog_id - 1;
     int nr = p_sys->ud_pgcit->ud_pgci_items[p_sys->i_title].nr_of_programs;
 
-    int found = 0;
     for( int c = 0; c < nr; c++ )
     {
         int cell_idx = cell_base + c;
         uint16_t srpn = p_sys->ud_pgcit->m_c_gi[cell_idx].m_vobi_srpn;
         if( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs )
-            continue;
+            return VLC_EGENERIC;
         uint16_t cell_vobus = p_sys->pgc_gi->pgi[srpn - 1].map.nr_of_vobu_info;
 
         if( i_block_offset < vobu_accum + cell_vobus )
         {
             p_sys->i_cur_cell = cell_idx;
-            found = 1;
+            found_cell = true;
             break;
         }
         vobu_accum += cell_vobus;
@@ -2417,10 +2481,20 @@ static int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
                    ? p_sys->ud_pgcit->m_c_gi[cell_idx].c_epi_n : 1;
     }
 
-    if( !found )
+    /* seek past title end: snap to last cell */
+    if( !found_cell && nr > 0 )
     {
-        msg_Err( p_demux, "couldn't find cell for block offset %u", i_block_offset );
-        return VLC_EGENERIC;
+        const int last_cell_idx = cell_base + nr - 1;
+        uint16_t srpn = p_sys->ud_pgcit->m_c_gi[last_cell_idx].m_vobi_srpn;
+        if( unlikely( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs ) )
+            return VLC_EGENERIC;
+
+        const uint16_t last_vobus = p_sys->pgc_gi->pgi[srpn - 1].map.nr_of_vobu_info;
+        p_sys->i_cur_cell = last_cell_idx;
+        if( last_vobus > 0 && vobu_accum >= last_vobus )
+            vobu_accum -= last_vobus;
+        else
+            vobu_accum = 0;
     }
 
     if( i_chapter < p_sys->i_chapters &&
@@ -2430,9 +2504,49 @@ static int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
         p_sys->cur_chapter = i_chapter;
     }
 
-    p_sys->i_pack_len = 0;
-    p_sys->i_title_offset = vobu_accum;
+    if( p_sys->i_cur_cell < cell_base || p_sys->i_cur_cell >= cell_base + nr )
+        return VLC_EGENERIC;
+
+    uint16_t cur_srpn = p_sys->ud_pgcit->m_c_gi[p_sys->i_cur_cell].m_vobi_srpn;
+    if( unlikely( cur_srpn == 0 || cur_srpn > p_sys->pgc_gi->nr_of_programs ) )
+        return VLC_EGENERIC;
+
+    const vobu_map_t *map = &p_sys->pgc_gi->pgi[cur_srpn - 1].map;
+    uint32_t within_program = i_block_offset - vobu_accum;
+    const uint32_t total_sectors = DvdVRGetProgramSectorSpan( p_sys, map );
+    if( map->nr_of_vobu_info > 0 && within_program >= map->nr_of_vobu_info )
+        within_program = map->nr_of_vobu_info - 1;
+
+    uint32_t raw_sector = 0;
+    if( total_sectors > 0 && map->nr_of_vobu_info > 0 )
+    {
+        uint64_t scaled_sector = 0;
+        if( !ckd_mul( &scaled_sector, (uint64_t)within_program,
+                      (uint64_t)total_sectors ) )
+            raw_sector = (uint32_t)( scaled_sector / map->nr_of_vobu_info );
+    }
+
+    /* time_infos sparse, snap to entry only near program start */
+    uint32_t sector = raw_sector;
+    if( within_program < DVDVR_EARLY_SNAP_VOBU_WINDOW &&
+        DvdVRTimeInfosSane( map, total_sectors ) )
+    {
+        int idx = 0;
+        while( idx + 1 < map->nr_of_time_info &&
+               map->time_infos[idx + 1].vobu_adr <= raw_sector )
+            idx++;
+        sector = map->time_infos[idx].vobu_adr;
+    }
+
+    if( sector >= total_sectors )
+        sector = total_sectors > 0 ? total_sectors - 1 : 0;
+
+    p_sys->i_cur_block = map->vob_offset + sector;
+    p_sys->i_pack_len = total_sectors > sector ? total_sectors - sector : 1;
+    p_sys->i_title_offset = i_block_offset;
     p_sys->i_chapter = i_chapter;
+    DvdReadResetCellTs( p_sys );
+    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
     return VLC_SUCCESS;
 }
