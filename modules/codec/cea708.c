@@ -1015,7 +1015,7 @@ static text_segment_t * CEA708RowToSegments( const cea708_text_row_t *p_row,
 
 static void CEA708SpuConvert( const cea708_window_t *p_w,
                               substext_updater_region_t *p_region,
-                              decoder_t *p_dec )
+                              const video_format_t *p_fmt )
 {
     if( !p_w->b_visible || CEA708_Window_RowCount( p_w ) == 0 )
         return;
@@ -1084,10 +1084,10 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
     else
     {
         int i_grid_cols;
-        if( p_dec->fmt_out.video.i_visible_width > 0 && p_dec->fmt_out.video.i_visible_height > 0 )
+        if( p_fmt->i_visible_width > 0 && p_fmt->i_visible_height > 0 )
         {
-            unsigned dar_num = p_dec->fmt_out.video.i_visible_width * p_dec->fmt_out.video.i_sar_num;
-            unsigned dar_den = p_dec->fmt_out.video.i_visible_height * p_dec->fmt_out.video.i_sar_den;
+            unsigned dar_num = p_fmt->i_visible_width * p_fmt->i_sar_num;
+            unsigned dar_den = p_fmt->i_visible_height * p_fmt->i_sar_den;
             if( dar_num * 3 < dar_den * 5 )
             {
                 i_grid_cols = CEA708_SCREEN_COLS_43;
@@ -1165,7 +1165,7 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
             first = false;
 
             /* Fill region */
-            CEA708SpuConvert( p_w, p_region, p_cea708->p_dec );
+            CEA708SpuConvert( p_w, p_region, &p_cea708->p_dec->fmt_out.video );
         }
     }
 
