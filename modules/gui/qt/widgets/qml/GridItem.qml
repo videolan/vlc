@@ -95,7 +95,7 @@ T.ItemDelegate {
     Accessible.selected: root.selected
     Accessible.onPressAction: root.playClicked()
 
-    Keys.onMenuPressed: root.contextMenuButtonClicked(picture, root.mapToGlobal(0,0))
+    Keys.onMenuPressed: root.contextMenuButtonClicked(picture, root.mapToGlobal(0, root.height))
 
     Component.onCompleted: {
         // Qt Quick AbstractButton sets a cursor for itself, unset it so that if the view has
