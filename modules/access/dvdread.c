@@ -1053,9 +1053,8 @@ static int Demux( demux_t *p_demux )
 #if defined(DVDREAD_HAS_DVDAUDIO)
     if( !p_sys->i_pack_len && type == DVD_A )
     {
-        p_sys->i_pack_len = p_sys->i_title_blocks;
-        p_sys->i_cur_block = p_sys->p_title_table->atsi_track_pointer_rows[p_sys->i_chapter].start_sector;
-
+        if( p_sys->i_cur_block <= p_sys->i_title_end_block )
+            p_sys->i_pack_len = p_sys->i_title_end_block - p_sys->i_cur_block + 1;
     }
     else
 #endif
@@ -1447,6 +1446,50 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
             p_sys->i_cur_cell = p_pgc->program_map[pgn - 1] - 1;
         DvdReadFindCell( p_demux );
 
+        /* walk ptts accumulating per-cell durations to set each seekpoint's i_time_offset */
+        if( p_sys->i_chapters > 0 )
+        {
+            input_title_t *p_title = p_sys->titles[i_title];
+            if( p_title->seekpoint )
+            {
+                const int max_sp = __MIN( p_title->i_seekpoint,
+                                            p_sys->i_chapters );
+                const int max_ptt = p_vts->vts_ptt_srpt->title[p_sys->i_ttn - 1].nr_of_ptts;
+                const pgc_t *p_pgc_seek = p_sys->p_cur_pgc;
+                int cell = p_sys->i_title_start_cell;
+                vlc_tick_t t = 0;
+                for( int sj = 0; sj < max_sp && sj < max_ptt; sj++ )
+                {
+                    const uint16_t sj_pgc_id =
+                        p_vts->vts_ptt_srpt->title[p_sys->i_ttn - 1]
+                                             .ptt[sj].pgcn;
+                    const uint16_t sj_pgn =
+                        p_vts->vts_ptt_srpt->title[p_sys->i_ttn - 1]
+                                             .ptt[sj].pgn;
+
+                    /* cells are pgc-local, stop on pgc mismatch */
+                    if( sj_pgc_id != pgc_id || sj_pgn == 0 )
+                        break;
+                    if( sj_pgn > p_pgc_seek->nr_of_programs )
+                        break;
+
+                    const int chapter_cell =
+                        p_pgc_seek->program_map[sj_pgn - 1] - 1;
+                    while( cell < chapter_cell &&
+                           cell <= p_sys->i_title_end_cell )
+                    {
+                        t += dvdtime_to_time( &p_pgc_seek->cell_playback[cell]
+                                                  .playback_time );
+                        cell++;
+                    }
+                    p_title->seekpoint[sj]->i_time_offset = t;
+                }
+                p_title->i_length = DvdReadGetTitleDuration( p_sys );
+            }
+        }
+
+        DvdReadResetCellTs( p_sys );
+
         p_sys->i_next_vobu = p_sys->i_cur_block =
             p_pgc->cell_playback[p_sys->i_cur_cell].first_sector;
 
@@ -1694,6 +1737,7 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
             p_sys->p_title = NULL;
         }
         p_sys->i_title = i_title;
+        DvdReadResetCellTs( p_sys );
 
         /* reusing p_vmg variable for p_amg */
         const ifo_handle_t *p_vmg = p_sys->p_vmg_file;
@@ -1736,6 +1780,41 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
                  i_title, p_sys->i_ttn,
                  p_sys->i_title_start_block, p_sys->i_title_end_block,
                  p_sys->i_title_blocks );
+
+        if( p_sys->i_chapters > 0 )
+        {
+            input_title_t *p_title = p_sys->titles[i_title];
+            if( p_title->seekpoint && p_sys->i_title_blocks > 0 )
+            {
+                const vlc_tick_t title_length = FROM_SCALE_NZ(
+                    p_sys->p_title_table->length_pts );
+                const uint32_t first_sector =
+                    p_sys->p_title_table->atsi_track_pointer_rows[0].start_sector;
+
+                p_title->i_length = title_length;
+
+                const int max_sp = __MIN( p_title->i_seekpoint,
+                                            p_sys->i_chapters );
+                /* offset relative to title start */
+                for( int sj = 0; sj < max_sp; sj++ )
+                {
+                    const uint32_t sj_sector =
+                        p_sys->p_title_table->atsi_track_pointer_rows[sj].start_sector;
+                    const uint32_t offset = sj_sector > first_sector
+                        ? sj_sector - first_sector : 0;
+                    if( title_length > 0 &&
+                        offset > UINT64_MAX / (uint64_t)title_length )
+                    {
+                        msg_Err( p_demux, "chapter offset multiply overflow" );
+                        return VLC_EGENERIC;
+                    }
+                    /* widen for the multiply, product fits uint64_t */
+                    p_title->seekpoint[sj]->i_time_offset =
+                        (vlc_tick_t)( (uint64_t)offset * title_length /
+                                      p_sys->i_title_blocks );
+                }
+            }
+        }
 
         /* The structure of DVD-A discs seems to be the following
          * each ATS IFO-> is a GROUP -> Contains multiple titles, Span across one or more AOBs -> each title contains multiple tracks or "Trackpoints",
@@ -1805,6 +1884,7 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
         p_sys->i_pack_len = 0;
         /* current block relative to start of title*/
         p_sys->i_cur_block=p_sys->p_title_table->atsi_track_pointer_rows[i_track].start_sector;
+        DvdReadResetCellTs( p_sys );
 
         if( p_sys->cur_chapter != i_track)
         {
