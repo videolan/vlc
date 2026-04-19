@@ -474,7 +474,7 @@ MainViewLoader {
             }
 
             acceptDropFunc: function(index, drop) {
-                return root._dropAction(drop, listView.itemContainsDrag?.index)
+                return root._dropAction(drop, tableView.itemContainsDrag?.index)
             }
 
             dropIndicator: null
