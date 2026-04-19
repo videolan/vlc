@@ -34,6 +34,7 @@
 
 #include <iomanip>
 
+#include <vlc_input_item.h>
 #include <vlc_url.h>
 
 ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module,
@@ -368,12 +369,20 @@ std::string ChromecastCommunication::GetMedia( const std::string& mime,
 
     msg_Dbg( m_module, "s_chromecast_url: %s", chromecast_url.c_str());
 
+    const bool is_buffered = input_length > VLC_TICK_0;
+    const char *stream_type;
+    if (is_buffered)
+        stream_type = "BUFFERED";
+    else if (input_length == INPUT_DURATION_INDEFINITE)
+        stream_type = "LIVE";
+    else
+        stream_type = "NONE";
+
     ss << "\"contentId\":\"" << chromecast_url << "\""
-       << ",\"streamType\":\"" << ( input_length > VLC_TICK_0 ? "BUFFERED" : "LIVE" ) << "\""
+       << ",\"streamType\":\"" << stream_type << "\""
        << ",\"contentType\":\"" << mime << "\"";
        
-
-    if( input_length > VLC_TICK_0 )
+    if( is_buffered )
     {
         std::stringstream duration;
         duration.setf( std::ios_base::fixed, std::ios_base::floatfield );
