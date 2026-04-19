@@ -105,6 +105,12 @@ T.Control {
 
     // Events
 
+    Keys.onMenuPressed: {
+        if (contextMenu) {
+            contextMenu.popup(index, delegate.mapToGlobal(0, delegate.height))
+        }
+    }
+
     // Functions
 
     // Childs
