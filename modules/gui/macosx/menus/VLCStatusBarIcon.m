@@ -23,6 +23,7 @@
 
 #import "VLCStatusBarIcon.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
@@ -138,7 +139,7 @@
 
     [self inputItemChanged:nil];
 
-    [self setMetadataTitle:_NS("VLC media player") artist:_NS("Nothing playing") album:nil andCover:[NSImage imageNamed:@"noart.png"]];
+    [self setMetadataTitle:_NS("VLC media player") artist:_NS("Nothing playing") album:nil andCover:NSImage.VLCNoArtImage];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -177,7 +178,7 @@
         [self.statusItem setEnabled:YES];
 
         // Set the status item image
-        NSImage *menuIcon = [NSImage imageNamed:@"VLCStatusBarIcon"];
+        NSImage *menuIcon = NSImage.VLCStatusBarIconImage;
         [menuIcon setTemplate:YES];
         [self.statusItem setImage:menuIcon];
 
@@ -351,7 +352,7 @@
 
     // Set fallback coverart
     if (!coverArtImage) {
-        coverArtImage = [NSImage imageNamed:@"noart.png"];
+        coverArtImage = NSImage.VLCNoArtImage;
     }
 
     // Hack to show now playing for streams (ICY)

@@ -22,6 +22,7 @@
 
 #import "VLCLibraryGroupsViewController.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionView.h"
@@ -247,7 +248,7 @@
 
 - (void)presentPlaceholderGroupsView
 {
-    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:NSImage.VLCPlaceholderVideoImage
                                               usingConstraints:self.placeholderImageViewSizeConstraints
                                              displayingMessage:_NS("Your media groups will appear here.")];
 }

@@ -22,6 +22,7 @@
 
 #import "VLCMediaSourceBaseDataSource.h"
 #include <AppKit/AppKit.h>
+#import "extensions/NSImage+VLCAdditions.h"
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSourceProvider.h"
@@ -261,25 +262,25 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 
         NSImage *placeholder;
         if (mediaSource.category == SD_CAT_LAN) {
-            placeholder = [NSImage imageNamed:@"bw-Music"];
+            placeholder = NSImage.VLCBWMusicImage;
         } else {
             switch (inputType) {
                 case ITEM_TYPE_DIRECTORY:
                     if ([childRootInput.name containsString:@"home"]) {
-                        placeholder = [NSImage imageNamed:@"bw-home"];
+                        placeholder = NSImage.VLCBWHomeImage;
                     } else {
-                        placeholder = indexPath.item % 2 ? [NSImage imageNamed:@"bw-Server1"] : [NSImage imageNamed:@"bw-server2"];
+                        placeholder = indexPath.item % 2 ? NSImage.VLCBWServer1Image : NSImage.VLCBWServer2Image;
                     }
                     break;
                 case ITEM_TYPE_DISC:
                     if (isStream) {
-                        placeholder = indexPath.item % 2 ? [NSImage imageNamed:@"bw-Server1"] : [NSImage imageNamed:@"bw-server2"];
+                        placeholder = indexPath.item % 2 ? NSImage.VLCBWServer1Image : NSImage.VLCBWServer2Image;
                     } else {
-                        placeholder = indexPath.item % 2 ? [NSImage imageNamed:@"bw-usb1"] : [NSImage imageNamed:@"bw-usb2"];;
+                        placeholder = indexPath.item % 2 ? NSImage.VLCBWUsb1Image : NSImage.VLCBWUsb2Image;;
                     }
                     break;
                 default:
-                    placeholder = [NSImage imageNamed:@"bw-Music"];
+                    placeholder = NSImage.VLCBWMusicImage;
                     break;
             }
         }
@@ -293,7 +294,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     } else {
         VLCMediaSource * const mediaSource = _mediaSources[indexPath.item];
         viewItem.titleTextField.stringValue = mediaSource.mediaSourceDescription;
-        viewItem.mediaImageView.image = [NSImage imageNamed:@"bw-Music"];
+        viewItem.mediaImageView.image = NSImage.VLCBWMusicImage;
     }
 
     return viewItem;
@@ -392,14 +393,14 @@ referenceSizeForHeaderInSection:(NSInteger)section
         if (_mediaSourceMode == VLCMediaSourceModeLAN) {
             VLCInputItem * const currentNodeInput = _lanDeviceSnapshot[row].inputNode.inputItem;
             NSURL * const artworkURL = currentNodeInput.artworkURL;
-            NSImage * const placeholder = [NSImage imageNamed:@"NXdefaultappicon"];
+            NSImage * const placeholder = NSImage.VLCDefaultAppIconImage;
             if (artworkURL) {
                 [cellView.representedImageView setImageURL:artworkURL placeholderImage:placeholder];
             } else {
                 cellView.representedImageView.image = placeholder;
             }
         } else {
-            cellView.representedImageView.image = [NSImage imageNamed:@"NXFollow"];
+            cellView.representedImageView.image = NSImage.VLCFollowImage;
         }
 
         NSString * const name = _mediaSourceMode == VLCMediaSourceModeLAN

@@ -23,6 +23,7 @@
 
 #import "VLCRendererMenuController.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "main/VLCMain.h"
 #import "menus/renderers/VLCRendererItem.h"
 #import "playqueue/VLCPlayQueueController.h"
@@ -115,9 +116,9 @@
     menuItem.action = @selector(selectRenderer:);
     menuItem.keyEquivalent = @"";
     if (item.capabilityFlags & VLC_RENDERER_CAN_VIDEO)
-        menuItem.image = [NSImage imageNamed:@"sidebar-movie"];
+        menuItem.image = NSImage.VLCSidebarMovieImage;
     else
-        menuItem.image = [NSImage imageNamed:@"sidebar-music"];
+        menuItem.image = NSImage.VLCSidebarMusicImage;
     menuItem.representedObject = item;
 
     NSString *unformattedTitle = [NSString stringWithFormat:@"%@ %@", item.name, item.userReadableType];

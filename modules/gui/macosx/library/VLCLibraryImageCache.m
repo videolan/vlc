@@ -104,7 +104,7 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         _imageCache = [[NSCache alloc] init];
         _imageCache.countLimit = kVLCMaximumLibraryImageCacheSize;
         _imageCache.totalCostLimit = kVLCLibraryImageCacheCostLimit;
-        _noArtImage = [NSImage imageNamed:@"noart.png"];
+        _noArtImage = NSImage.VLCNoArtImage;
 
         NSNotificationCenter * const notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self

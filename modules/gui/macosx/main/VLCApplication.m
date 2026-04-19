@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #import "VLCApplication.h"
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import <vlc_configuration.h>
@@ -99,11 +100,11 @@
          * wearing a Father Xmas hat.
          * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
          */
-        _vlcAppIconImage = [NSImage imageNamed:@"VLC-Xmas"];
+        _vlcAppIconImage = NSImage.VLCXmasAppIconImage;
     }
 
     if (_vlcAppIconImage == nil)
-        _vlcAppIconImage = [NSImage imageNamed:@"VLC"];
+        _vlcAppIconImage = NSImage.VLCAppIconImage;
 
     return _vlcAppIconImage;
 }

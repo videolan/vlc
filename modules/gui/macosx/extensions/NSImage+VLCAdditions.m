@@ -27,6 +27,121 @@
 
 @implementation NSImage(VLCAdditions)
 
++ (NSImage *)VLCAppIconImage
+{
+    return [NSImage imageNamed:@"VLC"];
+}
+
++ (NSImage *)VLCXmasAppIconImage
+{
+    return [NSImage imageNamed:@"VLC-Xmas"];
+}
+
++ (NSImage *)VLCStatusBarIconImage
+{
+    return [NSImage imageNamed:@"VLCStatusBarIcon"];
+}
+
++ (NSImage *)VLCSidebarMovieImage
+{
+    return [NSImage imageNamed:@"sidebar-movie"];
+}
+
++ (NSImage *)VLCSidebarMusicImage
+{
+    return [NSImage imageNamed:@"sidebar-music"];
+}
+
++ (NSImage *)VLCBWHomeImage
+{
+    return [NSImage imageNamed:@"bw-home"];
+}
+
++ (NSImage *)VLCBWMusicImage
+{
+    return [NSImage imageNamed:@"bw-Music"];
+}
+
++ (NSImage *)VLCBWServer1Image
+{
+    return [NSImage imageNamed:@"bw-Server1"];
+}
+
++ (NSImage *)VLCBWServer2Image
+{
+    return [NSImage imageNamed:@"bw-server2"];
+}
+
++ (NSImage *)VLCBWUsb1Image
+{
+    return [NSImage imageNamed:@"bw-usb1"];
+}
+
++ (NSImage *)VLCBWUsb2Image
+{
+    return [NSImage imageNamed:@"bw-usb2"];
+}
+
++ (NSImage *)VLCDefaultAppIconImage
+{
+    return [NSImage imageNamed:@"NXdefaultappicon"];
+}
+
++ (NSImage *)VLCFollowImage
+{
+    return [NSImage imageNamed:@"NXFollow"];
+}
+
++ (NSImage *)VLCNoArtImage
+{
+    return [NSImage imageNamed:@"noart.png"];
+}
+
++ (NSImage *)VLCPlaceholderVideoImage
+{
+    return [NSImage imageNamed:@"placeholder-video"];
+}
+
++ (NSImage *)VLCPlaceholderGroupImage
+{
+    return [NSImage imageNamed:@"placeholder-group2"];
+}
+
++ (NSImage *)VLCGenericImage
+{
+    return [NSImage imageNamed:@"generic"];
+}
+
++ (NSImage *)VLCVolumeOffTemplateImage
+{
+    return [NSImage imageNamed:@"VLCVolumeOffTemplate"];
+}
+
++ (NSImage *)VLCShuffleOffImage
+{
+    return [NSImage imageNamed:@"shuffleOff"];
+}
+
++ (NSImage *)VLCShuffleOnImage
+{
+    return [NSImage imageNamed:@"shuffleOn"];
+}
+
++ (NSImage *)VLCRepeatAllImage
+{
+    return [NSImage imageNamed:@"repeatAll"];
+}
+
++ (NSImage *)VLCRepeatOneImage
+{
+    return [NSImage imageNamed:@"repeatOne"];
+}
+
++ (NSImage *)VLCRepeatOffImage
+{
+    return [NSImage imageNamed:@"repeatOff"];
+}
+
 + (void)quickLookPreviewForLocalPath:(NSString *)path 
                             withSize:(NSSize)size 
                    completionHandler:(void (^)(NSImage *))completionHandler

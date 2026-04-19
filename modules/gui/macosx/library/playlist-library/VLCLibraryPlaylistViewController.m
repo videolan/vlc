@@ -22,6 +22,7 @@
 
 #import "VLCLibraryPlaylistViewController.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -264,7 +265,7 @@
             break;
     }
 
-    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-group2"]
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:NSImage.VLCPlaceholderGroupImage
                                               usingConstraints:self.placeholderImageViewSizeConstraints
                                              displayingMessage:placeholderPlaylistsString];
 }

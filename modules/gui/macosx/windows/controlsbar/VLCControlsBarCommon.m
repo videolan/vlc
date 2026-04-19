@@ -24,6 +24,7 @@
 
 #import "VLCControlsBarCommon.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
@@ -252,7 +253,7 @@
     [self.backwardButton setAction:@selector(bwd:)];
 
     self.artworkImageView.cropsImagesToRoundedCorners = YES;
-    self.artworkImageView.image = [NSImage imageNamed:@"noart"];
+    self.artworkImageView.image = NSImage.VLCNoArtImage;
     self.artworkImageView.contentGravity = VLCImageViewContentGravityResize;
 
     if (!NSClassFromString(@"PIPViewController")) {
@@ -501,7 +502,7 @@
     self.detailLabel.stringValue = mediaItem.primaryDetailString ?: @"";
 
     NSURL * const artworkURL = inputItem.artworkURL;
-    NSImage * const placeholderImage = [NSImage imageNamed:@"noart"];
+    NSImage * const placeholderImage = NSImage.VLCNoArtImage;
     if (artworkURL) {
         [self.artworkImageView setImageURL:inputItem.artworkURL placeholderImage:placeholderImage];
     } else {

@@ -316,8 +316,8 @@
     } else {
         self.shuffleButton.image =
             self.playQueueController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
-                [NSImage imageNamed:@"shuffleOff"] :
-                [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:NSColor.VLCAccentColor];
+                NSImage.VLCShuffleOffImage :
+                [NSImage.VLCShuffleOnImage imageTintedWithColor:NSColor.VLCAccentColor];
     }
 }
 
@@ -363,14 +363,14 @@
         switch (repeatState) {
             case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
                 self.repeatButton.image =
-                    [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:NSColor.VLCAccentColor];
+                    [NSImage.VLCRepeatAllImage imageTintedWithColor:NSColor.VLCAccentColor];
                 break;
             case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
                 self.repeatButton.image =
-                    [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:NSColor.VLCAccentColor];
+                    [NSImage.VLCRepeatOneImage imageTintedWithColor:NSColor.VLCAccentColor];
                 break;
             default:
-                self.repeatButton.image = [NSImage imageNamed:@"repeatOff"];
+                self.repeatButton.image = NSImage.VLCRepeatOffImage;
                 break;
         }
     }

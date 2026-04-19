@@ -22,6 +22,7 @@
 
 #import "VLCLibraryVideoViewController.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionView.h"
@@ -353,7 +354,7 @@
 
 - (void)presentPlaceholderVideoLibraryView
 {
-    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:NSImage.VLCPlaceholderVideoImage
                                               usingConstraints:self.placeholderImageViewSizeConstraints
                                              displayingMessage:_NS("Your videos will appear here.\nGo to the Browse section to add videos you love.")];
 }

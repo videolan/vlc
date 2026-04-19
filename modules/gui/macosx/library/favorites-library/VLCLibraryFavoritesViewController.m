@@ -22,6 +22,7 @@
 
 #import "VLCLibraryFavoritesViewController.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryCollectionView.h"
@@ -369,7 +370,7 @@
 
 - (void)presentPlaceholderFavoritesView
 {
-    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:NSImage.VLCPlaceholderVideoImage
                                               usingConstraints:self.placeholderImageViewSizeConstraints
                                              displayingMessage:_NS("Your favorite media will appear here.\nMark media items as favorites to see them in this view.")];
 }

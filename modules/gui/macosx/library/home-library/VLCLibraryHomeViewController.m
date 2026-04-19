@@ -22,6 +22,7 @@
 
 #import "VLCLibraryHomeViewController.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryController.h"
@@ -166,7 +167,7 @@
 
 - (void)presentPlaceholderHomeLibraryView
 {
-    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:NSImage.VLCPlaceholderVideoImage
                                               usingConstraints:self.placeholderImageViewSizeConstraints
                                              displayingMessage:_NS("Your media will appear here.\nGo to the Browse section to add media you love.")];
 }

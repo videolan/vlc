@@ -26,7 +26,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSImage (VLCAdditions)
 
-+ (void)quickLookPreviewForLocalPath:(NSString *)path 
+// App images
+@property (class, readonly) NSImage *VLCAppIconImage;
+@property (class, readonly) NSImage *VLCXmasAppIconImage;
+@property (class, readonly) NSImage *VLCStatusBarIconImage;
+
+// Sidebar images
+@property (class, readonly) NSImage *VLCSidebarMovieImage;
+@property (class, readonly) NSImage *VLCSidebarMusicImage;
+
+// B&W media source images
+@property (class, readonly) NSImage *VLCBWHomeImage;
+@property (class, readonly) NSImage *VLCBWMusicImage;
+@property (class, readonly) NSImage *VLCBWServer1Image;
+@property (class, readonly) NSImage *VLCBWServer2Image;
+@property (class, readonly) NSImage *VLCBWUsb1Image;
+@property (class, readonly) NSImage *VLCBWUsb2Image;
+@property (class, readonly) NSImage *VLCDefaultAppIconImage;
+@property (class, readonly) NSImage *VLCFollowImage;
+
+// Placeholder images
+@property (class, readonly) NSImage *VLCNoArtImage;
+@property (class, readonly) NSImage *VLCPlaceholderVideoImage;
+@property (class, readonly) NSImage *VLCPlaceholderGroupImage;
+@property (class, readonly) NSImage *VLCGenericImage;
+
+// Playback control images
+@property (class, readonly) NSImage *VLCVolumeOffTemplateImage;
+@property (class, readonly) NSImage *VLCShuffleOffImage;
+@property (class, readonly) NSImage *VLCShuffleOnImage;
+@property (class, readonly) NSImage *VLCRepeatAllImage;
+@property (class, readonly) NSImage *VLCRepeatOneImage;
+@property (class, readonly) NSImage *VLCRepeatOffImage;
+
++ (void)quickLookPreviewForLocalPath:(NSString *)path
                             withSize:(NSSize)size 
                    completionHandler:(void (^)(NSImage * _Nullable))completionHandler;
 + (void)quickLookPreviewForLocalURL:(NSURL *)url 

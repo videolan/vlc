@@ -27,6 +27,7 @@
 #import "VLCOpenWindowController.h"
 
 #import <Cocoa/Cocoa.h>
+#import "extensions/NSImage+VLCAdditions.h"
 #import <AVFoundation/AVFoundation.h>
 
 #import <vlc_common.h>
@@ -207,7 +208,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [[_tabView tabViewItemAtIndex: 3] setLabel: _NS("Capture")];
     [_fileNameLabel setStringValue: @""];
     [_fileNameStubLabel setStringValue: _NS("Choose a file")];
-    [_fileIconWell setImage: [NSImage imageNamed:@"generic"]];
+    [_fileIconWell setImage: NSImage.VLCGenericImage];
     [_fileBrowseButton setTitle: _NS("Browse...")];
     _fileBrowseButton.accessibilityLabel = _NS("Select a file for playback");
     [_fileTreatAsPipeButton setTitle: _NS("Treat as a pipe rather than as a file")];
@@ -617,7 +618,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         [_fileNameLabel setStringValue: @""];
         [_fileNameStubLabel setHidden: NO];
         [_fileTreatAsPipeButton setHidden: YES];
-        [_fileIconWell setImage: [NSImage imageNamed:@"generic"]];
+        [_fileIconWell setImage: NSImage.VLCGenericImage];
         [self setMRL: @""];
     }
 }

@@ -348,7 +348,7 @@ _##field##TextField.delegate = self
 
         if (artworkImages.count == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                _artwork = [NSImage imageNamed:@"noart.png"];
+                _artwork = NSImage.VLCNoArtImage;
                 [self updateRepresentation];
             });
             return;
@@ -409,7 +409,7 @@ _##field##TextField.delegate = self
 
         if (artworkImages.count == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                _artwork = [NSImage imageNamed:@"noart.png"];
+                _artwork = NSImage.VLCNoArtImage;
                 [self updateRepresentation];
             });
             return;
@@ -544,7 +544,7 @@ _##field##TextField.originalStateString = @"";
         PERFORM_ACTION_ALL_TEXTFIELDS(CLEAR_TEXT);
 
 #undef CLEAR_TEXT
-        _artworkImageButton.image = [NSImage imageNamed:@"noart.png"];
+        _artworkImageButton.image = NSImage.VLCNoArtImage;
     } else if (_representedInputItems.count == 1) {
         [self fillWindowWithInputItemData:_representedInputItems.firstObject];
     } else if (_representedInputItems.count > 1) {
