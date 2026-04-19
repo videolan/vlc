@@ -164,7 +164,6 @@ void CEA708_DTVCC_Demuxer_Push( cea708_demux_t *h, vlc_tick_t i_start, const uin
                                         CEA708_WINDOW_MAX_ROWS)
 #define CEA708_FONT_TO_LINE_HEIGHT_RATIO 1.06
 
-#define CEA708_REL_POS_MAX              99.0f
 #define CEA708_CENTER_ANCHOR_START      0.25f
 #define CEA708_CENTER_ANCHOR_RANGE      0.5f
 
@@ -1056,19 +1055,19 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
 
     if( p_w->b_relative )
     {
-        /* CEA-708 relative positioning uses 0-99% range */
-        p_region->origin.x = p_w->i_anchor_offset_h / CEA708_REL_POS_MAX;
+        /* CEA-708-E Section 8.4: anchor_horizontal/vertical are percentages (0-99) */
+        p_region->origin.x = p_w->i_anchor_offset_h / 100.0f;
 
         switch (p_w->anchor_point) {
         case CEA708_ANCHOR_TOP_LEFT:
         case CEA708_ANCHOR_TOP_CENTER:
         case CEA708_ANCHOR_TOP_RIGHT:
-            p_region->origin.y = p_w->i_anchor_offset_v / CEA708_REL_POS_MAX;
+            p_region->origin.y = p_w->i_anchor_offset_v / 100.0f;
             break;
         case CEA708_ANCHOR_BOTTOM_LEFT:
         case CEA708_ANCHOR_BOTTOM_CENTER:
         case CEA708_ANCHOR_BOTTOM_RIGHT:
-            p_region->origin.y = 1.0f - ( p_w->i_anchor_offset_v / CEA708_REL_POS_MAX );
+            p_region->origin.y = 1.0f - ( p_w->i_anchor_offset_v / 100.0f );
             break;
         case CEA708_ANCHOR_CENTER_LEFT:
         case CEA708_ANCHOR_CENTER_CENTER:
@@ -1076,7 +1075,7 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
         default:
         {
             /* Center anchors use middle 50% of screen */
-            float f_center_offset = p_w->i_anchor_offset_v / CEA708_REL_POS_MAX;
+            float f_center_offset = p_w->i_anchor_offset_v / 100.0f;
             p_region->origin.y = CEA708_CENTER_ANCHOR_START + ( f_center_offset * CEA708_CENTER_ANCHOR_RANGE );
             break;
         }
@@ -1114,6 +1113,7 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
     if( p_w->i_firstrow <= p_w->i_lastrow )
     {
         p_region->origin.y += p_w->i_firstrow * CEA708_ROW_HEIGHT_STANDARD;
+        /* TODO: offset origin.x by first non-empty column (CEA708_Window_MinCol) */
     }
 
     if( p_w->anchor_point <= CEA708_ANCHOR_BOTTOM_RIGHT )
