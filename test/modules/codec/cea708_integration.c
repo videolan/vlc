@@ -118,7 +118,7 @@ static void test_cea708_decoder_with_different_formats(void)
 
     const char *formats[] = {"4:3", "16:9", "anamorphic_4:3", "anamorphic_16:9"};
 
-    for (size_t i = 0; i < sizeof(formats) / sizeof(formats[0]); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(formats); i++) {
         test_log("Testing with format: %s\n", formats[i]);
 
         decoder_t *dec = create_cea708_decoder_test(formats[i]);
@@ -149,15 +149,13 @@ static void test_cea708_subtitle_text_output(void)
     };
 
     vlc_frame_t *frame = vlc_frame_Alloc(sizeof(test_data));
-    if (frame) {
-        memcpy(frame->p_buffer, test_data, sizeof(test_data));
-        frame->i_buffer = sizeof(test_data);
+    assert(frame != NULL);
+    memcpy(frame->p_buffer, test_data, sizeof(test_data));
 
-        if (dec->pf_decode) {
-            int result = dec->pf_decode(dec, frame);
-            test_log("CEA-708 decode result: %d\n", result);
-        }
-    }
+    assert(dec->pf_decode != NULL);
+    int result = dec->pf_decode(dec, frame);
+    test_log("CEA-708 decode result: %d\n", result);
+    assert(result == VLCDEC_SUCCESS);
 
     destroy_cea708_decoder_test(dec);
 }
@@ -173,20 +171,20 @@ static void test_substext_infrastructure_with_aspect_ratio_positioning(void)
     assert(UPDT_REGION_USES_GRID_COORDINATES == (1 << 5));
     assert(UPDT_REGION_USES_16_9_GRID == (1 << 6));
 
-    test_log("✓ UPDT_REGION_USES_GRID_COORDINATES exists (0x%02x)\n",
+    test_log("UPDT_REGION_USES_GRID_COORDINATES exists (0x%02x)\n",
              UPDT_REGION_USES_GRID_COORDINATES);
-    test_log("✓ UPDT_REGION_USES_16_9_GRID is available (0x%02x)\n",
+    test_log("UPDT_REGION_USES_16_9_GRID is available (0x%02x)\n",
              UPDT_REGION_USES_16_9_GRID);
 
-    test_log("✓ Available: UPDT_REGION_USES_16_9_GRID flag infrastructure\n");
+    test_log("Available: UPDT_REGION_USES_16_9_GRID flag infrastructure\n");
     test_log("  This flag enables dynamic SAR selection per CEA-708-E Section 8.2\n");
 
     test_log("Aspect ratio aware positioning (CEA-708-E Section 8.2 compliance):\n");
-    test_log("✓ CEA-708 decoder now uses dynamic grid selection\n");
-    test_log("✓ 4:3 content uses 160-column grid (CEA708_SCREEN_COLS_43)\n");
-    test_log("✓ 16:9 content uses 210-column grid (CEA708_SCREEN_COLS_169)\n");
-    test_log("✓ UPDT_REGION_USES_16_9_GRID flag properly set based on DAR\n");
-    test_log("✓ Positioning accuracy fixed for all aspect ratios\n");
+    test_log("CEA-708 decoder now uses dynamic grid selection\n");
+    test_log("4:3 content uses 160-column grid (CEA708_SCREEN_COLS_43)\n");
+    test_log("16:9 content uses 210-column grid (CEA708_SCREEN_COLS_169)\n");
+    test_log("UPDT_REGION_USES_16_9_GRID flag properly set based on DAR\n");
+    test_log("Positioning accuracy fixed for all aspect ratios\n");
 }
 
 /* Test CEA-708 with positioning data (will expose positioning issues) */
@@ -208,23 +206,21 @@ static void test_cea708_real_positioning_data(void)
     assert(dec->p_module != NULL);
 
     vlc_frame_t *frame = vlc_frame_Alloc(sizeof(cea708_window_positioning_data));
-    if (frame) {
-        memcpy(frame->p_buffer, cea708_window_positioning_data, sizeof(cea708_window_positioning_data));
-        frame->i_buffer = sizeof(cea708_window_positioning_data);
-        frame->i_pts = VLC_TICK_0;
-        frame->i_dts = VLC_TICK_0;
+    assert(frame != NULL);
+    memcpy(frame->p_buffer, cea708_window_positioning_data, sizeof(cea708_window_positioning_data));
+    frame->i_pts = VLC_TICK_0;
+    frame->i_dts = VLC_TICK_0;
 
-        if (dec->pf_decode) {
-            int result = dec->pf_decode(dec, frame);
-            test_log("CEA-708 positioning data decode result: %d\n", result);
-        }
-    }
+    assert(dec->pf_decode != NULL);
+    int result = dec->pf_decode(dec, frame);
+    test_log("CEA-708 positioning data decode result: %d\n", result);
+    assert(result == VLCDEC_SUCCESS);
 
     test_log("Positioning data processed (complies with CEA-708-E Section 8.2)\n");
     destroy_cea708_decoder_test(dec);
 }
 
-/* Test end-to-end flow: Video format → DAR → Grid selection → Flag setting → Positioning
+/* Test end-to-end flow: Video format -> DAR -> Grid selection -> Flag setting -> Positioning
  * Per CEA-708-E Section 8.2: Complete integration validation */
 static void test_end_to_end_aspect_ratio_flow(void)
 {
@@ -258,7 +254,7 @@ static void test_end_to_end_aspect_ratio_flow(void)
         {"ultra_wide", 3440, 1440, 1, 1, 210, true, 105.0f, 0.5f, "Ultra-wide monitor center"},
     };
 
-    for (size_t i = 0; i < sizeof(integration_tests) / sizeof(integration_tests[0]); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(integration_tests); i++) {
         test_log("\n--- Testing %s ---\n", integration_tests[i].scenario);
 
         /* Step 1: Create decoder with specific video format */
@@ -313,15 +309,15 @@ static void test_end_to_end_aspect_ratio_flow(void)
 
         /* Step 6: Decode the positioning command */
         vlc_frame_t *frame = vlc_frame_Alloc(sizeof(cea708_positioning_data));
-        if (frame) {
-            memcpy(frame->p_buffer, cea708_positioning_data, sizeof(cea708_positioning_data));
-            frame->i_buffer = sizeof(cea708_positioning_data);
-            frame->i_pts = VLC_TICK_0;
-            frame->i_dts = VLC_TICK_0;
+        assert(frame != NULL);
+        memcpy(frame->p_buffer, cea708_positioning_data, sizeof(cea708_positioning_data));
+        frame->i_pts = VLC_TICK_0;
+        frame->i_dts = VLC_TICK_0;
 
-            int decode_result = dec->pf_decode(dec, frame);
-            test_log("Decode result: %d (0=success)\n", decode_result);
-        }
+        assert(dec->pf_decode != NULL);
+        int decode_result = dec->pf_decode(dec, frame);
+        test_log("Decode result: %d (0=success)\n", decode_result);
+        assert(decode_result == VLCDEC_SUCCESS);
 
         /* Step 7: Verify grid selection matches expectations */
         assert(expected_grid == integration_tests[i].expected_grid_cols);
@@ -333,7 +329,7 @@ static void test_end_to_end_aspect_ratio_flow(void)
                 calculated_ratio, integration_tests[i].expected_position_ratio);
         assert(fabs(calculated_ratio - integration_tests[i].expected_position_ratio) < 0.0001f);
 
-        test_log("✓ End-to-end flow verified for %s\n", integration_tests[i].scenario);
+        test_log("End-to-end flow verified for %s\n", integration_tests[i].scenario);
 
         /* Cleanup */
         decoder_Clean(dec);
@@ -341,8 +337,8 @@ static void test_end_to_end_aspect_ratio_flow(void)
         vlc_object_delete(dec);
     }
 
-    test_log("\n✓ All end-to-end integration tests passed\n");
-    test_log("✓ Video format → DAR → Grid selection → Flag setting → Positioning flow validated\n");
+    test_log("\nAll end-to-end integration tests passed\n");
+    test_log("Video format -> DAR -> Grid selection -> Flag setting -> Positioning flow validated\n");
 }
 
 int main(void)

@@ -55,18 +55,18 @@ static void test_aspect_ratio_calculation(void)
         bool expected_is_169;
         const char *description;
     } test_cases[] = {
-        {640, 480, 1, 1, false, "4:3 square pixels"},
-        {1920, 1080, 1, 1, true, "16:9 square pixels"},
-        {720, 480, 8, 9, false, "DVD 4:3 anamorphic"},
-        {720, 480, 32, 27, true, "DVD 16:9 anamorphic"},
-        {1280, 720, 1, 1, true, "HD 720p"},
-        {1440, 1080, 4, 3, true, "HDV 1080i"},
-        {0, 0, 1, 1, true, "Invalid dimensions (fallback to 16:9)"},
-        {720, 576, 12, 11, false, "PAL 4:3"},
-        {720, 576, 16, 11, true, "PAL 16:9"},
+        {  640,  480,  1,  1, false, "4:3 square pixels"                    },
+        { 1920, 1080,  1,  1, true,  "16:9 square pixels"                   },
+        {  720,  480,  8,  9, false, "DVD 4:3 anamorphic"                   },
+        {  720,  480, 32, 27, true,  "DVD 16:9 anamorphic"                  },
+        { 1280,  720,  1,  1, true,  "HD 720p"                              },
+        { 1440, 1080,  4,  3, true,  "HDV 1080i"                            },
+        {    0,    0,  1,  1, true,  "Invalid dimensions (fallback to 16:9)"},
+        {  720,  576, 12, 11, false, "PAL 4:3"                              },
+        {  720,  576, 16, 11, true,  "PAL 16:9"                             },
     };
 
-    for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(test_cases); i++) {
         unsigned dar_num = test_cases[i].width * test_cases[i].sar_num;
         unsigned dar_den = test_cases[i].height * test_cases[i].sar_den;
 
@@ -97,27 +97,21 @@ static void test_positioning_accuracy(void)
 {
     test_log("Testing CEA-708 positioning coordinate accuracy\n");
 
-    struct {
-        int grid_cols;
-        float anchor_h;
-        float expected_ratio;
-        const char *description;
-    } test_cases[] = {
-        {160, 80.0f, 0.5f, "4:3 grid center"},
-        {210, 105.0f, 0.5f, "16:9 grid center"},
-        {160, 0.0f, 0.0f, "4:3 grid left edge"},
-        {210, 0.0f, 0.0f, "16:9 grid left edge"},
-        {160, 159.0f, 0.99375f, "4:3 grid right edge"},
-        {210, 209.0f, 0.995238f, "16:9 grid right edge"},
-    };
+    /* CEA-708-E Section 8.2: 160 cols for 4:3, 210 cols for 16:9 */
+    const int grid_cols[] = { 160, 210 };
 
-    for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
-        float calculated_ratio = test_cases[i].anchor_h / test_cases[i].grid_cols;
+    for (size_t i = 0; i < ARRAY_SIZE(grid_cols); i++) {
+        const int cols = grid_cols[i];
+        const float left   = 0.0f;
+        const float center = cols / 2.0f;
+        const float right  = cols - 1.0f;
 
-        test_log("Test case: %s -> ratio %.6f (expected %.6f)\n",
-                test_cases[i].description, calculated_ratio, test_cases[i].expected_ratio);
+        test_log("Grid %d cols: left=%.6f center=%.6f right=%.6f\n",
+                cols, left / cols, center / cols, right / cols);
 
-        assert(fabs(calculated_ratio - test_cases[i].expected_ratio) < 0.0001f);
+        assert(left / cols == 0.0f);
+        assert(fabs(center / cols - 0.5f) < 0.0001f);
+        assert(right / cols < 1.0f && right / cols > 0.99f);
     }
 }
 
@@ -130,12 +124,12 @@ static void test_current_positioning_issues(void)
     test_log("Checking substext flag infrastructure:\n");
     assert(UPDT_REGION_USES_GRID_COORDINATES == (1 << 5));
     assert(UPDT_REGION_USES_16_9_GRID == (1 << 6));
-    test_log("✓ UPDT_REGION_USES_16_9_GRID flag is available (bit 6)\n");
+    test_log("UPDT_REGION_USES_16_9_GRID flag is available (bit 6)\n");
 
     /* Test that SAR selection logic exists in substext.h
      * Per CEA-708-E Section 8.2: Screen coordinates must match display aspect ratio for correct positioning */
     test_log("Checking SAR selection logic implementation:\n");
-    test_log("✓ SubpictureTextUpdate() has dynamic SAR selection infrastructure\n");
+    test_log("SubpictureTextUpdate() has dynamic SAR selection infrastructure\n");
     test_log("  - 4:3 SAR (4:3) for UPDT_REGION_USES_GRID_COORDINATES without 16:9 flag\n");
     test_log("  - 16:9 SAR (16:9) for UPDT_REGION_USES_16_9_GRID flag\n");
 
@@ -162,7 +156,7 @@ static void test_current_positioning_issues(void)
              fabsf(ratio_169_fixed - 0.5f),
              100.0f * fabsf(ratio_169_fixed - 0.5f));
 
-    test_log("\n✓ POSITIONING FIXED: CEA-708 now uses aspect ratio aware positioning\n");
+    test_log("\nPOSITIONING FIXED: CEA-708 now uses aspect ratio aware positioning\n");
     test_log("  CEA-708 decoder now uses correct grid based on video aspect ratio\n");
     test_log("  Root cause fixed: cea708.c now calculates DAR and selects proper grid\n");
     test_log("  Complies with: CEA-708-E Section 8.2 screen coordinate specification\n");
@@ -183,7 +177,7 @@ static void test_current_positioning_issues(void)
     assert(fabs(center_43_correct - 0.5f) < 0.001f);  /* 4:3 center is truly centered */
     assert(fabs(center_169_correct - 0.5f) < 0.001f); /* 16:9 center is truly centered */
 
-    test_log("✓ Positioning accuracy verified: Both 4:3 and 16:9 content properly centered\n");
+    test_log("Positioning accuracy verified: Both 4:3 and 16:9 content properly centered\n");
 }
 
 /* Test negative cases and edge scenarios for robustness
@@ -229,7 +223,7 @@ static void test_edge_cases_and_negative_scenarios(void)
         {640, 480, 1, UINT32_MAX, false, "SAR overflow denominator"},
     };
 
-    for (size_t i = 0; i < sizeof(edge_cases) / sizeof(edge_cases[0]); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(edge_cases); i++) {
         unsigned dar_num = edge_cases[i].width * edge_cases[i].sar_num;
         unsigned dar_den = edge_cases[i].height * edge_cases[i].sar_den;
 
@@ -261,7 +255,7 @@ static void test_edge_cases_and_negative_scenarios(void)
         assert(calculated_is_169 == edge_cases[i].expected_is_169);
     }
 
-    test_log("✓ All edge cases handled correctly with proper fallbacks\n");
+    test_log("All edge cases handled correctly with proper fallbacks\n");
 }
 
 int main(void)
