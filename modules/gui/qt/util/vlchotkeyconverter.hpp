@@ -64,6 +64,12 @@ public slots:
      */
     void qmlWheelEvent(const QObject* wheelEvent);
 
+    void customWheelEvent(const QPoint& pixelDelta,
+                          const QPoint& angleDelta,
+                          const Qt::MouseButtons buttons = {},
+                          const Qt::KeyboardModifiers modifiers = {},
+                          const bool inverted = false);
+
 private:
     QPoint m_scrollAmount = {};
     Qt::KeyboardModifiers m_modifiers = {};

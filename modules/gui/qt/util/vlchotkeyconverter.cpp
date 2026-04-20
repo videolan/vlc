@@ -329,6 +329,16 @@ void WheelToVLCConverter::qmlWheelEvent( const QObject* e )
     wheelEvent(&event);
 }
 
+void WheelToVLCConverter::customWheelEvent(const QPoint& pixelDelta,
+                                           const QPoint& angleDelta,
+                                           const Qt::MouseButtons buttons,
+                                           const Qt::KeyboardModifiers modifiers,
+                                           const bool inverted)
+{
+    QWheelEvent event({}, {}, pixelDelta, angleDelta, buttons, modifiers, Qt::ScrollPhase::NoScrollPhase, inverted);
+    wheelEvent(&event);
+}
+
 QString VLCKeyToString( unsigned val, bool locale )
 {
     char *base = vlc_keycode2str (val, locale);
