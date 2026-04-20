@@ -61,6 +61,8 @@ QtObject {
 
     readonly property real resizeHandleWidth: (scrollBarInteractingSize / 2)
 
+    readonly property real touchHandlerMargin: margin_large
+
     // Borders
     readonly property int border: MainCtx.dp(1, scale)
     readonly property int focus_border: border
