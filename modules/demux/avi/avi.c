@@ -3154,7 +3154,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
         p[4] != 0x00 || GetWLE( &p[5] ) != 0x2 )
         goto exit;
     const unsigned i_name = GetDWLE( &p[7] );
-    if( INT64_C(11) + i_name >= i_size )
+    if( i_size - 11 < i_name )
         goto exit;
     if( i_name > 0 )
         psz_description = FromCharset( "UTF-16LE", &p[11], i_name );
