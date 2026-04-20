@@ -3084,71 +3084,75 @@ static bool Ogg_ReadVP8Header( demux_t *p_demux, logical_stream_t *p_stream,
     }
 }
 
-static void Ogg_ApplyContentType( logical_stream_t *p_stream, const char* psz_value,
+#define CMPVALUE(str) \
+    (bytes >= (sizeof(str)-1) && !strncmp((const char *)p_value, str, sizeof(str)-1))
+
+static void Ogg_ApplyContentType( logical_stream_t *p_stream,
+                                  const uint8_t *p_value, size_t bytes,
                                   bool *b_force_backup )
 {
-    if( p_stream->fmt.i_cat != UNKNOWN_ES )
+    if( p_stream->fmt.i_cat != UNKNOWN_ES || bytes == 0 )
         return;
 
-    if( !strncmp(psz_value, "audio/x-wav", 11) )
+    if( CMPVALUE("audio/x-wav") )
     {
         /* n.b. WAVs are unsupported right now */
         es_format_Change( &p_stream->fmt, UNKNOWN_ES, 0 );
         free( p_stream->fmt.psz_description );
         p_stream->fmt.psz_description = strdup("WAV Audio (Unsupported)");
     }
-    else if( !strncmp(psz_value, "audio/x-vorbis", 14) ||
-             !strncmp(psz_value, "audio/vorbis", 12) )
+    else if( CMPVALUE("audio/x-vorbis") ||
+             CMPVALUE("audio/vorbis") )
     {
         es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_VORBIS );
 
         *b_force_backup = true;
     }
-    else if( !strncmp(psz_value, "audio/x-speex", 13) ||
-             !strncmp(psz_value, "audio/speex", 11) )
+    else if( CMPVALUE("audio/x-speex") ||
+             CMPVALUE("audio/speex") )
     {
         es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_SPEEX );
 
         *b_force_backup = true;
     }
-    else if( !strncmp(psz_value, "audio/flac", 10) )
+    else if( CMPVALUE("audio/flac") )
     {
         es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_FLAC );
 
         *b_force_backup = true;
     }
-    else if( !strncmp(psz_value, "video/x-theora", 14) ||
-             !strncmp(psz_value, "video/theora", 12) )
+    else if( CMPVALUE("video/x-theora") ||
+             CMPVALUE("video/theora") )
     {
         es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_THEORA );
 
         *b_force_backup = true;
     }
-    else if( !strncmp(psz_value, "video/x-daala", 13) ||
-             !strncmp(psz_value, "video/daala", 11) )
+    else if( CMPVALUE("video/x-daala") ||
+             CMPVALUE("video/daala") )
     {
         es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_DAALA );
 
         *b_force_backup = true;
     }
-    else if( !strncmp(psz_value, "video/x-xvid", 12) )
+    else if( CMPVALUE("video/x-xvid") )
     {
         es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_FOURCC( 'x','v','i','d' ) );
 
         *b_force_backup = true;
     }
-    else if( !strncmp(psz_value, "video/mpeg", 10) )
+    else if( CMPVALUE("video/mpeg") )
     {
         /* n.b. MPEG streams are unsupported right now */
         es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_MPGV );
     }
-    else if( !strncmp(psz_value, "application/kate", 16) )
+    else if( CMPVALUE("application/kate") )
     {
         /* ??? */
         es_format_Change( &p_stream->fmt, UNKNOWN_ES, 0 );
         p_stream->fmt.psz_description = strdup("OGG Kate Overlay (Unsupported)");
     }
-    else if( !strncmp(psz_value, "video/x-vp8", 11) )
+    else if( CMPVALUE("video/x-vp8") )
     {
         es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_VP8 );
     }
@@ -3187,7 +3191,6 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
     {
         uint64_t granule_rate_numerator;
         uint64_t granule_rate_denominator;
-        char content_type_string[1024];
 
         /* Read in Annodex header fields */
 
@@ -3198,27 +3201,25 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
 
         /* we are guaranteed that the first header field will be
          * the content-type (by the Annodex standard) */
-        content_type_string[0] = '\0';
+        long value_size = 0;
         if( !strncasecmp( (char*)(&p_oggpacket->packet[28]), "Content-Type: ", 14 ) )
         {
             uint8_t *p = memchr( &p_oggpacket->packet[42], '\r',
                                  p_oggpacket->bytes - 1 );
-            if( p && p[0] == '\r' && p[1] == '\n' )
-                sscanf( (char*)(&p_oggpacket->packet[42]), "%1023s\r\n",
-                        content_type_string );
+            value_size = p ? p - &p_oggpacket->packet[42] : p_oggpacket->bytes - 42;
         }
 
+        char debug_string[32] = {0};
+        strncpy(debug_string, &p_oggpacket->packet[42], __MIN(value_size, 31));
         msg_Dbg( p_demux, "AnxData packet info: %"PRId64" / %"PRId64", %d, ``%s''",
                  granule_rate_numerator, granule_rate_denominator,
-                 p_stream->i_secondary_header_packets, content_type_string );
+                 p_stream->i_secondary_header_packets, debug_string );
 
         if( granule_rate_numerator && granule_rate_denominator )
             date_Init( &p_stream->dts, granule_rate_numerator, granule_rate_denominator );
 
-        /* What type of file do we have?
-         * strcmp is safe to use here because we've extracted
-         * content_type_string from the stream manually */
-        Ogg_ApplyContentType( p_stream, content_type_string,
+        /* What type of file do we have? */
+        Ogg_ApplyContentType( p_stream, &p_oggpacket->packet[42], value_size,
                               &p_stream->b_force_backup );
     }
 }
@@ -3388,7 +3389,9 @@ static void Ogg_ApplySkeleton( logical_stream_t *p_stream )
         else if ( ! strncmp("Content-Type: ", psz_message, 14 ) )
         {
             bool b_foo;
-            Ogg_ApplyContentType( p_stream, psz_message + 14, &b_foo );
+            psz_message += 14;
+            Ogg_ApplyContentType( p_stream, (const uint8_t *)psz_message,
+                                  strlen(psz_message), &b_foo );
         }
     }
 }
