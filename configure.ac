@@ -2464,19 +2464,23 @@ AM_CONDITIONAL([HAVE_AVFOUNDATION], [test "${have_avfoundation}" != "no"])
 dnl
 dnl  DCP plugin (using asdcplib)
 dnl
-PKG_WITH_MODULES([ASDCP], [asdcplib], [
-    have_asdcp="yes"
-
-    dnl asdcplib doesn't provide a version define
+ASDCPLIB_FACTORY=0
+PKG_WITH_MODULES([ASDCP], [asdcplib])
+AS_IF([test "${enable_asdcp}" = "yes"],[
+    dnl asdcplib does not provide a version define
     dnl check the factory necessary API from the package version
-    PKG_WITH_MODULES([ASDCP], [asdcplib >= 2.12.2], [
+    AC_MSG_CHECKING([asdcplib API version])
+    ($PKG_CONFIG --print-errors "asdcplib >= 2.12.2") 2>&1
+    ac_status=$?
+    AS_IF([test $ac_status = 0],[
         ASDCPLIB_FACTORY=1
+        AC_MSG_RESULT([2.12.2 API])
     ],[
-        ASDCPLIB_FACTORY=0
+        AC_MSG_RESULT([old API])
     ])
 ])
 AC_SUBST([ASDCPLIB_FACTORY])
-AM_CONDITIONAL([HAVE_ASDCP], [test "${have_asdcp}" = "yes"])
+AM_CONDITIONAL([HAVE_ASDCP], [test "${enable_asdcp}" = "yes"])
 
 dnl
 dnl  Demux plugins
