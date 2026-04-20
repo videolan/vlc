@@ -23,7 +23,7 @@ qt6_dep = dependency('qt6',
 
 # Qt module doesn't provide the framework path to moc executable, so we
 # need to help moc find them. It's needed for QtQml/ module registration.
-if host_machine.system() == 'darwin'
+if host_machine.system() == 'darwin' and qt6_dep.found()
     qt_libdir = qt6_dep.get_variable(pkgconfig: 'libdir', configtool: '-query QT_INSTALL_LIBS')
     qt_extra_flags += '-F' + qt_libdir
 endif
