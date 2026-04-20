@@ -745,11 +745,10 @@ error:
     return VLC_EGENERIC;
 }
 
-static inline char *get_wstring( const uint8_t *p_data, size_t i_size )
+static inline char *get_wstring( const uint8_t **pp_data, size_t i_size )
 {
-    char *psz_str = FromCharset( "UTF-16LE", p_data, i_size );
-    if( psz_str )
-        p_data += i_size;
+    char *psz_str = FromCharset( "UTF-16LE", *pp_data, i_size );
+    *pp_data += i_size;
     return psz_str;
 }
 
@@ -779,11 +778,11 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     if( !ASF_HAVE( i_title+i_artist+i_copyright+i_description+i_rating ) )
         return VLC_EGENERIC;
 
-    p_cd->psz_title = get_wstring( p_data, i_title );
-    p_cd->psz_artist = get_wstring( p_data, i_artist );
-    p_cd->psz_copyright = get_wstring( p_data, i_copyright );
-    p_cd->psz_description = get_wstring( p_data, i_description );
-    p_cd->psz_rating = get_wstring( p_data, i_rating );
+    p_cd->psz_title = get_wstring( &p_data, i_title );
+    p_cd->psz_artist = get_wstring( &p_data, i_artist );
+    p_cd->psz_copyright = get_wstring( &p_data, i_copyright );
+    p_cd->psz_description = get_wstring( &p_data, i_description );
+    p_cd->psz_rating = get_wstring( &p_data, i_rating );
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
