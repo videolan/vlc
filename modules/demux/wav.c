@@ -574,6 +574,7 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
     case VLC_CODEC_TRUESPEECH:
     case VLC_CODEC_ATRAC3P:
     case VLC_CODEC_ATRAC3:
+    case VLC_CODEC_DFPWM:
     case VLC_CODEC_G723_1:
     case VLC_CODEC_WMA2:
         if( FrameInfo_MSGSM( &p_sys->i_frame_size, &p_sys->i_frame_samples,

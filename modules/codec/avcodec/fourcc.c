@@ -499,6 +499,9 @@ static const struct vlc_avcodec_fourcc audio_codecs[] =
     { VLC_CODEC_METASOUND, AV_CODEC_ID_METASOUND },
     /* AV_CODEC_ID_PAF_AUDIO */
     { VLC_CODEC_ON2AVC, AV_CODEC_ID_ON2AVC },
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 59, 23, 100 )
+    { VLC_CODEC_DFPWM, AV_CODEC_ID_DFPWM },
+#endif
 
     /* DSD */
     { VLC_CODEC_DSD_LSBF, AV_CODEC_ID_DSD_LSBF },

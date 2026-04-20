@@ -284,6 +284,7 @@ VLC_CHECK_WAV_FORMAT(WAVE_FORMAT_OPUS, 0x704f)
 #define VLC_WAVEFORMATEX_GUIDBASE        {0x00000000, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}} /* Generated from Wave Format */
 #define VLC_AMBISONIC_SUBTYPE_PCM        {0x00000001, 0x0721, 0x11D3, {0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00}} /* AMBISONIC_B_FORMAT_PCM */
 #define VLC_AMBISONIC_SUBTYPE_IEEE_FLOAT {0x00000003, 0x0721, 0x11D3, {0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00}} /* AMBISONIC_B_FORMAT_IEEE_FLOAT */
+#define VLC_DFPWM_SUBTYPE                {0x38FAC13A, 0x1D81, 0x6143, {0xA4, 0x0D, 0xCE, 0x53, 0xCA, 0x60, 0x7C, 0xD1}} /* from libavformat */
 
 /* Microsoft speaker definitions */
 #define WAVE_SPEAKER_FRONT_LEFT             0x1
@@ -427,6 +428,7 @@ sub_format_tag_to_fourcc[] =
     { VLC_AMBISONIC_SUBTYPE_PCM,        VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Ambisonic B format (PCM)" },
     { VLC_AMBISONIC_SUBTYPE_IEEE_FLOAT, VLC_FOURCC( 'a', 'f', 'l', 't' ), "Ambisonic B format (IEEE float)" },
     { VLC_KSDATAFORMAT_SUBTYPE_ATRAC3P, VLC_CODEC_ATRAC3P,                "Sony Atrac3+" },
+    { VLC_DFPWM_SUBTYPE,                VLC_CODEC_DFPWM,                  "DFPWMa" },
     { VLC_KSDATAFORMAT_SUBTYPE_UNKNOWN, VLC_CODEC_UNKNOWN,      "Unknown" }
 };
 

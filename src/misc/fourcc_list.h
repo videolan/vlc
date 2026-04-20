@@ -1762,6 +1762,8 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_DSD_LSBF_PLANAR, "DSD (Direct Stream Digital) LSB first, planar"),
 
     B(VLC_CODEC_DSD_MSBF_PLANAR, "DSD (Direct Stream Digital) MSB first, planar"),
+
+    B(VLC_CODEC_DFPWM, "DFPWM1a audio"),
 };
 
 static const staticentry_t p_list_spu[] = {

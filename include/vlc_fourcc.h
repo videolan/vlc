@@ -651,6 +651,7 @@
 #define VLC_CODEC_DSD_LSBF_PLANAR            VLC_FOURCC('D','S','F','l')
 #define VLC_CODEC_DSD_MSBF                   VLC_FOURCC('D','S','D',' ')
 #define VLC_CODEC_DSD_MSBF_PLANAR            VLC_FOURCC('D','S','F','m')
+#define VLC_CODEC_DFPWM                      VLC_FOURCC('D','F','P','W')
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')
