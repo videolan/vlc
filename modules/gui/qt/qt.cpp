@@ -1155,6 +1155,52 @@ static void *Thread( void *obj )
 
     if( !p_intf->b_isDialogProvider )
     {
+        class TouchObserver : public QObject
+        {
+            const QPointer<MainCtx> m_mainCtx;
+            const bool m_persistent;
+
+        public:
+            TouchObserver(MainCtx *mainCtx, bool persistent = true)
+                : QObject(mainCtx)
+                , m_mainCtx(mainCtx)
+                , m_persistent(persistent)
+            {
+                // Touch events can not be filtered through QQuickWindow,
+                // that is why the filter is installed on the application
+                // instead:
+                assert(qApp);
+                qApp->installEventFilter(this);
+            }
+
+        protected:
+            bool eventFilter(QObject*, QEvent* event) override
+            {
+                if (event->type() == QEvent::TouchBegin)
+                {
+                    assert(m_mainCtx);
+
+                    m_mainCtx->setUsingTouch(true);
+
+                    if (m_persistent)
+                        deleteLater(); // There will be no more use, we can delete it.
+                }
+                else if (!m_persistent)
+                {
+                    if (event->type() == QEvent::TouchEnd)
+                    {
+                        assert(m_mainCtx);
+
+                        m_mainCtx->setUsingTouch(false);
+                    }
+                }
+
+                return false;
+            }
+        };
+
+        new TouchObserver(p_intf->p_mi);
+
         static const auto gracefulExitHandler = [&app, mainCtx = QPointer(p_intf->p_mi), settings = QPointer(p_intf->mainSettings)](QQuickWindow *window) {
             // Graceful exit on error, as if this signal is not connected
             // Qt uses `qFatal()`. With `MainCtx::askToQuit()`, the event loop
