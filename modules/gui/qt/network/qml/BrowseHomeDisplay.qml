@@ -169,22 +169,23 @@ FocusScope {
         Navigation.parentItem: root
 
         Component.onCompleted: {
-            // Flickable filters child mouse events for flicking (even when
-            // the delegate is grabbed). However, this is not a useful
-            // feature for non-touch cases, so disable it here and enable
-            // it if touch is detected through the hover handler:
-            MainCtx.setFiltersChildMouseEvents(this, false)
+            if (!usingTouch) {
+                // Flickable filters child mouse events for flicking (even when
+                // the delegate is grabbed). However, this is not a useful
+                // feature for non-touch cases, so disable it here and enable
+                // it if touch is detected through the hover handler:
+                MainCtx.setFiltersChildMouseEvents(flickable, false)
+            }
         }
 
-        HoverHandler {
-            acceptedDevices: PointerDevice.TouchScreen
+        readonly property bool usingTouch: MainCtx.usingTouch
 
-            onHoveredChanged: {
-                if (hovered)
-                    MainCtx.setFiltersChildMouseEvents(flickable, true)
-                else
-                    MainCtx.setFiltersChildMouseEvents(flickable, false)
-            }
+        onUsingTouchChanged: {
+            if (usingTouch)
+                MainCtx.setFiltersChildMouseEvents(flickable, true)
+            // We do not disable filtering child mouse events
+            // because Qt currently has a bug that the flickable
+            // jumps when it is enabled again later on.
         }
 
         Widgets.NavigableCol {
