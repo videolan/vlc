@@ -81,7 +81,9 @@ Item {
         }
 
         Component.onDestruction: {
-            VLCDialogModel.provider = null
+            // Only clear the provider if we are still the current one.
+            if (VLCDialogModel.provider === vlcDialog)
+                VLCDialogModel.provider = null
         }
 
         onLogin: (dialogId, title, text, defaultUsername, askStore) => {
