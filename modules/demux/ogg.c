@@ -1397,19 +1397,15 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         /* Backup the ogg packet (likely an header packet) */
         if( !b_xiph && (p_stream->i_headers + p_oggpacket->bytes) )
         {
-            uint8_t *p_realloc = realloc( p_stream->p_headers, p_stream->i_headers + p_oggpacket->bytes );
-            if( p_realloc )
+            p_stream->p_headers = realloc_or_free( p_stream->p_headers,
+                                                   p_stream->i_headers + p_oggpacket->bytes );
+            if( p_stream->p_headers )
             {
-                memcpy( &p_realloc[p_stream->i_headers], p_oggpacket->packet, p_oggpacket->bytes );
+                memcpy( &p_stream->p_headers[p_stream->i_headers], p_oggpacket->packet, p_oggpacket->bytes );
                 p_stream->i_headers += p_oggpacket->bytes;
-                p_stream->p_headers = p_realloc;
             }
             else
-            {
-                free( p_stream->p_headers );
                 p_stream->i_headers = 0;
-                p_stream->p_headers = NULL;
-            }
         }
         else if( xiph_AppendHeaders( &p_stream->i_headers, &p_stream->p_headers,
                                      p_oggpacket->bytes, p_oggpacket->packet ) )
