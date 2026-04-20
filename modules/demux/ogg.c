@@ -1425,11 +1425,13 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 /* Last header received, commit changes */
                 free( p_stream->fmt.p_extra );
 
-                p_stream->fmt.i_extra = p_stream->i_headers;
                 p_stream->fmt.p_extra = malloc( p_stream->i_headers );
                 if( p_stream->fmt.p_extra )
+                {
                     memcpy( p_stream->fmt.p_extra, p_stream->p_headers,
                             p_stream->i_headers );
+                    p_stream->fmt.i_extra = p_stream->i_headers;
+                }
                 else
                     p_stream->fmt.i_extra = 0;
 
@@ -1943,13 +1945,13 @@ static int Ogg_ConfigureStream( demux_t *p_demux, ogg_packet oggpacket, logical_
                         i_extra_size = GetWLE((oggpacket.packet+140));
                         if( i_extra_size > 0 && i_extra_size < oggpacket.bytes - 142 )
                         {
-                            p_stream->fmt.i_extra = i_extra_size;
                             p_stream->fmt.p_extra = malloc( i_extra_size );
                             if( p_stream->fmt.p_extra )
+                            {
                                 memcpy( p_stream->fmt.p_extra,
                                         oggpacket.packet + 142, i_extra_size );
-                            else
-                                p_stream->fmt.i_extra = 0;
+                                p_stream->fmt.i_extra = i_extra_size;
+                            }
                         }
 
                         i_format_tag = GetWLE((oggpacket.packet+124));
@@ -2085,13 +2087,12 @@ static int Ogg_ConfigureStream( demux_t *p_demux, ogg_packet oggpacket, logical_
                         if( i_extra_size > 0 &&
                             i_extra_size < oggpacket.bytes - 1 - 56 )
                         {
-                            p_stream->fmt.i_extra = i_extra_size;
-                            p_stream->fmt.p_extra = malloc( p_stream->fmt.i_extra );
+                            p_stream->fmt.p_extra = malloc( i_extra_size );
                             if( p_stream->fmt.p_extra )
-                                memcpy( p_stream->fmt.p_extra, oggpacket.packet + 57,
-                                        p_stream->fmt.i_extra );
-                            else
-                                p_stream->fmt.i_extra = 0;
+                            {
+                                memcpy( p_stream->fmt.p_extra, oggpacket.packet + 57, i_extra_size );
+                                p_stream->fmt.i_extra = i_extra_size;
+                            }
                         }
 
                         memcpy( p_buffer, st->subtype, 4 );
