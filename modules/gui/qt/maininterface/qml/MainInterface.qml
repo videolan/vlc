@@ -79,6 +79,124 @@ Item {
             }
         }
 
+        DragHandler {
+            id: historyDragHandler
+
+            acceptedDevices: PointerDevice.TouchScreen | PointerDevice.TouchPad
+
+            target: null
+
+            minimumPointCount: 2
+            maximumPointCount: 2
+
+            grabPermissions: PointerHandler.CanTakeOverFromAnything
+
+            yAxis.enabled: false
+
+            // Qt version check in disguise, only available starting with 6.5:
+            enabled: !!xAxis?.activeValueChanged
+
+            property double accumulatedDelta: 0.0
+
+            readonly property real threshold: 80.0
+
+            function onXAxisActiveValueChanged(delta) {
+                // We do not want to set enabled based on history condition, because the gesture should be captured
+                // regardless to prevent confusion:
+                if (History.previousEmpty && (MainCtx.effectiveMainInterfaceMode === MainCtx.MAININTERFACE_MODE_MAINDISPLAY))
+                    return
+
+                historyDragHandler.accumulatedDelta = Math.min(threshold, historyDragHandler.accumulatedDelta + delta)
+            }
+
+            Component.onCompleted: {
+                if (historyDragHandler?.xAxis?.activeValueChanged) {
+                    xAxis.activeValueChanged.connect(historyDragHandler, onXAxisActiveValueChanged)
+                }
+            }
+
+            onActiveChanged: {
+                if (!active) {
+                    if (historyDragHandler.accumulatedDelta >= threshold) {
+                        if (MainCtx.playerView)
+                            MainCtx.playerView = false
+                        else if (MainCtx.minimalView)
+                            MainCtx.minimalView = false
+                        else
+                            History.previous()
+                    }
+
+                    historyDragHandler.accumulatedDelta = 0.0
+                    accumulatedDelta = 0.0
+                }
+            }
+        }
+
+        // Going back indicator:
+        Rectangle {
+            id: goingBackIndicator
+
+            z: 100
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            visible: (historyDragHandler.accumulatedDelta > 0.0)
+
+            scale: Math.min(Math.max(historyDragHandler.accumulatedDelta / historyDragHandler.threshold, 0.2), 1.0)
+
+            readonly property real margin: VLCStyle.dp(128, VLCStyle.scale)
+
+            x: (historyDragHandler.accumulatedDelta / historyDragHandler.threshold * margin)
+
+            implicitWidth: implicitHeight
+            implicitHeight: backArrowText.implicitHeight + VLCStyle.margin_small
+            radius: (width / 2)
+
+            border.width: 1
+            border.color: theme.accent
+
+            color: (historyDragHandler.accumulatedDelta >= historyDragHandler.threshold) ? theme.accent
+                                                                                         : theme.bg.primary
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: VLCStyle.duration_short
+                }
+            }
+
+            Widgets.IconLabel {
+                id: backArrowText
+
+                anchors.centerIn: parent
+
+                text: VLCIcons.back
+
+                font.pixelSize: VLCStyle.fontSize_xxxlarge * 1.2
+
+                color: (historyDragHandler.accumulatedDelta >= historyDragHandler.threshold) ? theme.bg.primary
+                                                                                             : theme.accent
+            }
+
+            Widgets.RoundedRectangleShadow {
+                opacity: (historyDragHandler.accumulatedDelta >= historyDragHandler.threshold) ? 1.0
+                                                                                               : 0.0
+
+                color: theme.accent
+
+                blurRadius: VLCStyle.dp(8, VLCStyle.scale)
+
+                compensationFactor: 3.0
+
+                visible: (opacity > 0.0)
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: VLCStyle.duration_short
+                    }
+                }
+            }
+        }
+
         ColorContext {
             id: theme
             palette: VLCStyle.palette
