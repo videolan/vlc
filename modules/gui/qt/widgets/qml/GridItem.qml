@@ -219,7 +219,7 @@ T.ItemDelegate {
                 // FIXME: The signals are messed up in this item.
                 //        Right click does not fire itemClicked?
                 if (button === Qt.RightButton)
-                    contextMenuButtonClicked(picture, parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y));
+                    contextMenuButtonClicked(picture, eventPoint.globalPosition);
                 else
                     root.itemClicked(point.modifiers);
             }

@@ -174,7 +174,7 @@ T.Control {
                 }
 
                 if (button === Qt.RightButton)
-                    delegate.rightClick(delegate, delegate.rowModel, parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y))
+                    delegate.rightClick(delegate, delegate.rowModel, eventPoint.globalPosition)
             }
 
             onDoubleTapped: (point, button) => {

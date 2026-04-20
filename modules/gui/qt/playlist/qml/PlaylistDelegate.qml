@@ -322,7 +322,7 @@ T.Control {
                 }
 
                 if (contextMenu && button === Qt.RightButton)
-                    contextMenu.popup(index, parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y))
+                    contextMenu.popup(index, eventPoint.globalPosition)
             }
 
             onDoubleTapped: (eventPoint, button) => {

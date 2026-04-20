@@ -698,7 +698,7 @@ ListView {
             initialAction()
 
             if (button === Qt.RightButton) {
-                root.showContextMenu(parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y))
+                root.showContextMenu(eventPoint.globalPosition)
             }
         }
 
