@@ -366,18 +366,20 @@ T.Control {
             }
         }
 
-        TapHandler {
-            acceptedDevices: PointerDevice.TouchScreen
+        DelegateTouchTapHandler {
+            delegate: delegate
 
-            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
-            onTapped: (eventPoint, button) => {
-                MainPlaylistController.goTo(index, true)
+            onSingleTapped: (eventPoint, button) => {
+                // initial action is handled in `DelegateTouchTapHandler`
+                MainPlaylistController.goTo(delegate.index, true)
             }
 
-            onLongPressed: (eventPoint, button) => {
-                if (contextMenu)
-                    contextMenu.popup(index, point.scenePosition)
+            onDoubleTapped: (eventPoint, button) => {
+                MainCtx.requestShowPlayerView()
+            }
+
+            onContextMenuRequested: (index, globalPoint) => {
+                delegate.contextMenu.popup(index, globalPoint)
             }
         }
     }

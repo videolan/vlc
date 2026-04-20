@@ -242,18 +242,21 @@ T.ItemDelegate {
             }
         }
 
-        TapHandler {
-            acceptedDevices: PointerDevice.TouchScreen
+        DelegateTouchTapHandler {
+            delegate: root
 
-            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
-            onTapped: (eventPoint, button) => {
+            onSingleTapped: (eventPoint, button) => {
+                // initial action is handled in `DelegateTouchTapHandler`
                 root.itemClicked(Qt.NoModifier, false)
                 root.itemDoubleClicked(Qt.NoModifier)
             }
 
-            onLongPressed: {
-                contextMenuButtonClicked(picture, parent.mapToGlobal(point.position.x, point.position.y));
+            onDoubleTapped: (eventPoint, button) => {
+                root.playClicked()
+            }
+
+            onContextMenuRequested: (index, globalPoint) => {
+                root.contextMenuButtonClicked(picture ?? null, globalPoint)
             }
         }
     }
