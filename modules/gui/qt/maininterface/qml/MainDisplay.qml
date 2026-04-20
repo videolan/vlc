@@ -156,6 +156,55 @@ FocusScope {
         }
     ]
 
+    PinchHandler {
+        id: interfaceScalePinchHandler
+
+        acceptedDevices: PointerDevice.TouchScreen | PointerDevice.TouchPad
+
+        minimumPointCount: 2
+        maximumPointCount: 2
+
+        target: null
+
+        // Qt version check in disguise, only available starting with 6.5:
+        enabled: !!scaleAxis?.activeValueChanged
+
+        // Default in QPlatformTheme::defaultThemeHint is 10
+        dragThreshold: ((Application.styleHints?.startDragDistance ?? 10) * 4)
+
+        property double accumulatedDelta: 0.0
+
+        function adjustScaleFactor() {
+            // We don't want too fine change, since changing it requires reloading
+            // all images from disk:
+            if (accumulatedDelta >= 0.5) {
+                MainCtx.setIntfUserScaleFactor(+((MainCtx.getIntfUserScaleFactor() * accumulatedDelta).toFixed(2)))
+                accumulatedDelta = 0.0
+            }
+        }
+
+        Component.onCompleted: {
+            if (interfaceScalePinchHandler?.scaleAxis?.activeValueChanged) {
+                scaleAxis.activeValueChanged.connect(interfaceScalePinchHandler, onScaleAxisActiveValueChanged)
+            }
+        }
+
+        function onScaleAxisActiveValueChanged(delta) {
+            if (delta < 0.25)
+                return
+
+            accumulatedDelta += delta
+
+            // Naive compression:
+            Qt.callLater(interfaceScalePinchHandler.adjustScaleFactor)
+        }
+
+        onActiveChanged: {
+            if (!active) {
+                accumulatedDelta = 0.0
+            }
+        }
+    }
 
     property ListModel tabModel: ListModel {
         id: tabModelid
