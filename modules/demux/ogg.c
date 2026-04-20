@@ -1395,7 +1395,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         }
 
         /* Backup the ogg packet (likely an header packet) */
-        if( !b_xiph && p_oggpacket->bytes )
+        if( !b_xiph && p_oggpacket->bytes &&
+            p_oggpacket->bytes < SIZE_MAX - p_stream->i_headers )
         {
             p_stream->p_headers = realloc_or_free( p_stream->p_headers,
                                                    p_stream->i_headers + p_oggpacket->bytes );
