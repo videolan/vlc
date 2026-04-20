@@ -397,6 +397,8 @@ typedef struct
         sylt_track_t *p_track;
         bool b_meta_sent; /* true once sylt-data extra meta has been emitted */
     } sylt;
+
+    vlc_meta_t *p_meta;
 } demux_sys_t;
 
 static int MpgaProbe( demux_t *p_demux, uint64_t *pi_offset );
@@ -758,6 +760,8 @@ static void Close( vlc_object_t * p_this )
     TAB_CLEAN( p_sys->sylt.i_count, p_sys->sylt.p_track );
     if( p_sys->mllt.p_bits )
         free( p_sys->mllt.p_bits );
+    if( p_sys->p_meta )
+        vlc_meta_Delete( p_sys->p_meta );
     demux_PacketizerDestroy( p_sys->p_packetizer );
     free( p_sys );
 }
@@ -817,6 +821,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_HAS_UNSUPPORTED_META:
             pb_bool = va_arg( args, bool * );
             *pb_bool = true;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_META:
+            if( p_sys->p_meta == NULL )
+                return VLC_EGENERIC;
+            vlc_meta_Merge( va_arg( args, vlc_meta_t * ), p_sys->p_meta );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
@@ -1392,6 +1402,15 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
     demux_t *p_demux = (demux_t *) p_priv;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    if( p_sys->p_meta == NULL )
+        p_sys->p_meta = vlc_meta_New();
+    if( p_sys->p_meta != NULL )
+    {
+        ID3HandleTag( p_payload, i_payload, i_tag, p_sys->p_meta, NULL );
+        if( i_tag == VLC_FOURCC('T', 'X', 'X', 'X') )
+            vlc_replay_gain_CopyFromMeta( &p_sys->audio_replay_gain, p_sys->p_meta );
+    }
+
     if( i_tag == VLC_FOURCC('M', 'L', 'L', 'T') )
     {
         if( i_payload > 20 )
@@ -1416,19 +1435,6 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
             }
         }
         return VLC_SUCCESS;
-    }
-    else if( i_tag == VLC_FOURCC('T', 'X', 'X', 'X') )
-    {
-        vlc_meta_t *p_meta = vlc_meta_New();
-        if( p_meta )
-        {
-            bool b_updated;
-            if( ID3HandleTag( p_payload, i_payload, i_tag, p_meta, &b_updated ) )
-            {
-                vlc_replay_gain_CopyFromMeta( &p_sys->audio_replay_gain, p_meta );
-            }
-            vlc_meta_Delete( p_meta );
-        }
     }
     else if ( i_tag == VLC_FOURCC('C', 'H', 'A', 'P') && i_payload >= 17 )
     {
