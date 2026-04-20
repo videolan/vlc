@@ -111,7 +111,7 @@ Widgets.ExpandGridItemView {
 
         // Events
 
-        onItemClicked: (modifier) => { gridView.leftClickOnItem(modifier, index) }
+        onItemClicked: (modifier, select) => { gridView.leftClickOnItem(modifier, index, select) }
 
         onItemDoubleClicked: gridView.itemDoubleClicked(model)
 

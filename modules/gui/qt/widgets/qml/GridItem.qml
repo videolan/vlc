@@ -78,7 +78,7 @@ T.ItemDelegate {
 
     signal playClicked
     signal addToPlaylistClicked
-    signal itemClicked(int modifier)
+    signal itemClicked(int modifier, bool select)
     signal itemDoubleClicked(int modifier)
     signal contextMenuButtonClicked(Item menuParent, point globalMousePos)
 
@@ -195,7 +195,7 @@ T.ItemDelegate {
             onActiveChanged: {
                 if (dragItem) {
                     if (active && !selected) {
-                        root.itemClicked(root._modifiersOnLastPress)
+                        root.itemClicked(root._modifiersOnLastPress, true)
                     }
 
                     if (active)
@@ -223,7 +223,7 @@ T.ItemDelegate {
                 if (button === Qt.RightButton)
                     contextMenuButtonClicked(picture, eventPoint.globalPosition);
                 else
-                    root.itemClicked(point.modifiers);
+                    root.itemClicked(point.modifiers, true);
             }
 
             onDoubleTapped: (eventPoint, button) => {
@@ -248,7 +248,7 @@ T.ItemDelegate {
             grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
 
             onTapped: (eventPoint, button) => {
-                root.itemClicked(Qt.NoModifier)
+                root.itemClicked(Qt.NoModifier, false)
                 root.itemDoubleClicked(Qt.NoModifier)
             }
 
@@ -301,7 +301,7 @@ T.ItemDelegate {
             onPlayIconClicked: (point) => {
                 // emulate a mouse click before delivering the play signal as to select the item
                 // this helps in updating the selection and restore of initial index in the parent views
-                root.itemClicked(point.modifiers)
+                root.itemClicked(point.modifiers, true)
                 root.playClicked()
             }
 

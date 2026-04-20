@@ -148,10 +148,13 @@ FocusScope {
             playAt(index);
     }
 
-    function onClicked(model, index, modifier) {
-        modelSelect.updateSelection(modifier, model.currentIndex, index)
+    function onClicked(model, index, modifier, select) {
+        if (select)
+            modelSelect.updateSelection(modifier, model.currentIndex, index)
 
         _currentView.currentIndex = index
+
+        _currentView.currentItem.forceActiveFocus(Qt.MouseFocusReason)
     }
 
     function onDoubleClicked(model, index) {
@@ -224,7 +227,7 @@ FocusScope {
                 pictureWidth: gridView.maxPictureWidth
                 pictureHeight: gridView.maxPictureHeight
 
-                onItemClicked: (modifier) => { root.onClicked(model, index, modifier) }
+                onItemClicked: (modifier, select) => { root.onClicked(model, index, modifier, select) }
 
                 onItemDoubleClicked: root.onDoubleClicked(model, index)
 

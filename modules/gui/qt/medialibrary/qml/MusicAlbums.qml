@@ -125,7 +125,7 @@ MainViewLoader {
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
                 dragItem: albumDragItem
-                onItemClicked : (modifier) => { gridView_id.leftClickOnItem(modifier, index) }
+                onItemClicked : (modifier, select) => { gridView_id.leftClickOnItem(modifier, index, select) }
 
                 onItemDoubleClicked: {
                     gridView_id.switchExpandItem(index)

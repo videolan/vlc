@@ -338,7 +338,7 @@ MainViewLoader {
                 //---------------------------------------------------------------------------------
                 // Events
 
-                onItemClicked: (modifier) => { gridView.leftClickOnItem(modifier, index) }
+                onItemClicked: (modifier, select) => { gridView.leftClickOnItem(modifier, index, select) }
 
                 onItemDoubleClicked: showList(model, Qt.MouseFocusReason)
 

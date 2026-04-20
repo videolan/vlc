@@ -210,8 +210,8 @@ MainViewLoader {
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
 
-                onItemClicked: (modifier) => {
-                    gridView.leftClickOnItem(modifier, index)
+                onItemClicked: (modifier, select) => {
+                    gridView.leftClickOnItem(modifier, index, select)
                 }
 
                 Behavior on opacity {

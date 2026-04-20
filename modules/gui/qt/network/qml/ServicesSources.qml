@@ -109,10 +109,11 @@ Widgets.ExpandGridItemView {
                 root.browseSourceRoot(model.name, Qt.TabFocusReason)
         }
 
-        onItemClicked : (modifier) => {
-            root.selectionModel.updateSelection(modifier, root.currentIndex, index)
+        onItemClicked : (modifier, select) => {
+            if (select)
+                root.selectionModel.updateSelection(modifier, root.currentIndex, index)
             root.currentIndex = index
-            root.forceActiveFocus()
+            root.currentItem.forceActiveFocus(Qt.MouseFocusReason)
         }
 
         onContextMenuButtonClicked: (menuParent, globalMousePos) => {

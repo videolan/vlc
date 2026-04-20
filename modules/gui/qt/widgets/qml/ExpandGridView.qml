@@ -529,18 +529,15 @@ FocusScope {
             animateFlickableContentY(newContentY)
     }
 
-    function leftClickOnItem(modifier, index) {
-        selectionModel.updateSelection(modifier, currentIndex, index)
-        if (selectionModel.isSelected(index))
-            currentIndex = index
-        else if (currentIndex === index) {
-            if (_containsItem(currentIndex))
-                _getItem(currentIndex).focus = false
-            currentIndex = -1
-        }
+    function leftClickOnItem(modifier, index, select) {
+        if (select)
+            selectionModel.updateSelection(modifier, currentIndex, index)
+
+        currentIndex = index
 
         // NOTE: We make sure to clear the keyboard focus.
-        flickable.forceActiveFocus();
+        if (currentItem)
+            currentItem.forceActiveFocus(Qt.MouseFocusReason);
     }
 
     function rightClickOnItem(index) {
