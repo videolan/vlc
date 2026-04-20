@@ -43,6 +43,7 @@ T.ProgressBar {
     property real _tooltipPosition: timeTooltip.pos.x / width
 
     property color backgroundColor: theme.bg.primary
+    property real touchHandlerMargin: VLCStyle.touchHandlerMargin
 
     Keys.onRightPressed: Player.jumpFwd()
     Keys.onLeftPressed: Player.jumpBwd()
@@ -232,6 +233,9 @@ T.ProgressBar {
 
             gesturePolicy: TapHandler.WithinBounds
 
+            // Make it easier to tap with touch screen:
+            margin: MainCtx.usingTouch ? control.touchHandlerMargin : 0.0
+
             onPressedChanged: {
                 if (pressed) {
                     fsm.pressControl(point.position.x / control.width, point.modifiers === Qt.ShiftModifier)
@@ -245,6 +249,9 @@ T.ProgressBar {
         DragHandler {
             id: dragHandler
             acceptedButtons: Qt.LeftButton
+
+            // Make it easier to drag with touch screen:
+            margin: MainCtx.usingTouch ? control.touchHandlerMargin : 0
 
             target: null
             dragThreshold: 0
