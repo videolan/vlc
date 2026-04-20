@@ -32,12 +32,14 @@
 
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioToolbox.h>
+#include <libkern/OSByteOrder.h>
 #include <os/lock.h>
 #include <mach/mach_time.h>
 
 #define STREAM_FORMAT_MSG(pre, sfm) \
     pre "[%f][%4.4s][%u][%u][%u][%u][%u][%u]", \
-    sfm.mSampleRate, (char *)&sfm.mFormatID, \
+    sfm.mSampleRate, \
+    (char *)&(UInt32){ OSSwapInt32(sfm.mFormatID) }, \
     (unsigned int)sfm.mFormatFlags, (unsigned int)sfm.mBytesPerPacket, \
     (unsigned int)sfm.mFramesPerPacket, (unsigned int)sfm.mBytesPerFrame, \
     (unsigned int)sfm.mChannelsPerFrame, (unsigned int)sfm.mBitsPerChannel
