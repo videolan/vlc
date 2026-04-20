@@ -31,6 +31,8 @@ T.ItemDelegate {
 
     // Properties
 
+    required property Item view
+
     property real pictureWidth: VLCStyle.colWidth(1)
     property real pictureHeight: pictureWidth
     property int titleTopMargin: VLCStyle.gridItemTitle_topMargin

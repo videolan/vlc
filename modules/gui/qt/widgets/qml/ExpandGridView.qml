@@ -670,6 +670,7 @@ FocusScope {
 
     function _createItem(id, x, y) {
         const item = delegate.createObject( flickable.contentItem, {
+                        view: root,
                         selected: selectionModel.isSelected(id),
                         index: id,
                         model: model.getDataAt(id),
