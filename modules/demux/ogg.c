@@ -35,6 +35,7 @@
 #include <vlc_demux.h>
 #include <vlc_meta.h>
 #include <vlc_input.h>
+#include <vlc_memory.h>
 
 #include <ogg/ogg.h>
 
@@ -1346,19 +1347,15 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         if( !b_xiph && p_oggpacket->bytes > 0 &&
             (size_t)p_oggpacket->bytes < SIZE_MAX - p_stream->i_headers )
         {
-            uint8_t *p_realloc = realloc( p_stream->p_headers, p_stream->i_headers + p_oggpacket->bytes );
-            if( p_realloc )
+            p_stream->p_headers = realloc_or_free( p_stream->p_headers,
+                                                   p_stream->i_headers + p_oggpacket->bytes );
+            if( p_stream->p_headers )
             {
-                memcpy( &p_realloc[p_stream->i_headers], p_oggpacket->packet, p_oggpacket->bytes );
+                memcpy( &p_stream->p_headers[p_stream->i_headers], p_oggpacket->packet, p_oggpacket->bytes );
                 p_stream->i_headers += p_oggpacket->bytes;
-                p_stream->p_headers = p_realloc;
             }
             else
-            {
-                free( p_stream->p_headers );
                 p_stream->i_headers = 0;
-                p_stream->p_headers = NULL;
-            }
         }
         else if( b_xiph &&
                  xiph_AppendHeaders( &p_stream->i_headers, &p_stream->p_headers,
