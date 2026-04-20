@@ -132,6 +132,7 @@ class MainCtx : public QObject
     Q_PROPERTY(int mouseHideTimeout READ mouseHideTimeout NOTIFY mouseHideTimeoutChanged FINAL)
     Q_PROPERTY(bool albumSections READ albumSections WRITE setAlbumSections NOTIFY albumSectionsChanged FINAL)
     Q_PROPERTY(bool lyricsMode READ lyricsMode WRITE setLyricsMode NOTIFY lyricsModeChanged FINAL)
+    Q_PROPERTY(bool usingTouch READ usingTouch NOTIFY usingTouchChanged FINAL)
     Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
     Q_PROPERTY(MainInterfaceModes mainInterfaceModes READ getMainInterfaceModes NOTIFY mainInterfaceModesChanged FINAL)
     Q_PROPERTY(MainInterfaceMode effectiveMainInterfaceMode READ getEffectiveMainInterfaceMode NOTIFY mainInterfaceModesChanged FINAL)
@@ -280,6 +281,8 @@ public:
 
     int mouseHideTimeout() const { return m_mouseHideTimeout; }
 
+    bool usingTouch() const { return m_usingTouch; }
+
     Q_INVOKABLE bool backdropBlurRequested() const { return var_InheritBool(p_intf, "qt-backdrop-blur"); }
 
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); }
@@ -364,6 +367,14 @@ public:
     Q_INVOKABLE virtual bool platformHandlesResizeWithCSD() const { return false; };
     Q_INVOKABLE virtual bool platformHandlesTitleBarButtonsWithCSD() const { return false; };
     Q_INVOKABLE virtual bool platformHandlesShadowsWithCSD() const { return false; };
+
+    void setUsingTouch(bool touch)
+    {
+        if (m_usingTouch == touch)
+            return;
+        m_usingTouch = touch;
+        usingTouchChanged();
+    }
 
     /**
      * @brief ask for the application to terminate
@@ -481,6 +492,8 @@ protected:
     bool m_albumSections = true;
 
     bool m_lyricsMode = true;
+
+    bool m_usingTouch = false;
 
     OsType m_osName;
     int m_osVersion;
@@ -609,6 +622,8 @@ signals:
     void artistAlbumsWidthFactorChanged( double );
 
     void mainInterfaceModesChanged(MainInterfaceModes);
+
+    void usingTouchChanged();
 
 private:
     void loadPrefs(bool callSignals);
