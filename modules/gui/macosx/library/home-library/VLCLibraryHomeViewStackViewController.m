@@ -304,6 +304,10 @@
     [_collectionsStackView setHuggingPriority:NSLayoutPriorityDefaultHigh
                                forOrientation:NSLayoutConstraintOrientationVertical];
 
+    for (NSView * const view in _collectionsStackView.arrangedSubviews.copy) {
+        [view removeFromSuperview];
+    }
+
     [self addCustomContainerViews];
 
     for (NSView<VLCLibraryHomeViewContainerView> * const containerView in _containers) {
