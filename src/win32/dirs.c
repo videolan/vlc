@@ -54,7 +54,8 @@ static char *config_GetAppDir (void)
 {
     /* if portable directory exists, use it */
     WCHAR path[MAX_PATH];
-    if (GetModuleFileNameW (NULL, path, MAX_PATH))
+    DWORD read = GetModuleFileNameW (NULL, path, ARRAY_SIZE(path));
+    if (read != 0 && read != ARRAY_SIZE(path))
     {
         WCHAR *lastDir = wcsrchr (path, L'\\');
         if (lastDir)

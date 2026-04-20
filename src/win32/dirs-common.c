@@ -41,7 +41,8 @@ char *config_GetLibDir (void)
         goto error;
 
     wchar_t wpath[MAX_PATH];
-    if (!GetModuleFileNameW ((HMODULE) mbi.AllocationBase, wpath, MAX_PATH))
+    DWORD read = GetModuleFileNameW ((HMODULE) mbi.AllocationBase, wpath, ARRAY_SIZE(wpath));
+    if (read == 0 || read == ARRAY_SIZE(wpath))
         goto error;
 
     wchar_t *file = wcsrchr (wpath, L'\\');
@@ -57,7 +58,8 @@ error:
 static char *config_GetLibexecDir (void)
 {
     wchar_t wpath[MAX_PATH];
-    if (!GetModuleFileNameW (NULL, wpath, MAX_PATH))
+    DWORD read = GetModuleFileNameW (NULL, wpath, ARRAY_SIZE(wpath));
+    if (read == 0 || read == ARRAY_SIZE(wpath))
         goto error;
 
     wchar_t *file = wcsrchr (wpath, L'\\');
