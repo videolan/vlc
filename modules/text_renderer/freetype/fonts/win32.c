@@ -176,10 +176,16 @@ static char* GetWindowsFontPath(void)
     }
     if ( unlikely( res == NULL ) )
     {
-        wchar_t wdir[MAX_PATH];
-        GetWindowsDirectoryW( wdir, MAX_PATH );
-        wcscat_s( wdir, MAX_PATH, L"\\fonts" );
-        res = FromWide( wdir );
+        wchar_t wdir;
+        DWORD path_len = GetWindowsDirectoryW( &wdir, 1 );
+        wchar_t *pwindir = NULL;
+        if (path_len != 0 && (pwindir = malloc((path_len * sizeof(*pwindir)) + sizeof(L"\\fonts") )))
+        {
+            path_len = GetWindowsDirectoryW( pwindir, path_len );
+            memcpy( &pwindir[path_len], L"\\fonts", sizeof(L"\\fonts") );
+            res = FromWide( pwindir );
+            free( pwindir );
+        }
     }
     return res;
 }
