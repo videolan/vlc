@@ -688,6 +688,8 @@ ListView {
     }
 
     TapHandler {
+        acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
+
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         grabPermissions: PointerHandler.TakeOverForbidden
@@ -715,6 +717,47 @@ ListView {
                 if (selectionModel)
                     selectionModel.clearSelection()
             }
+        }
+    }
+
+    TapHandler {
+        acceptedDevices: PointerDevice.TouchScreen
+
+        grabPermissions: PointerHandler.TakeOverForbidden
+
+        gesturePolicy: TapHandler.ReleaseWithinBounds
+
+        property bool pendingContextMenu: false
+
+        onSingleTapped: (eventPoint, button) => {
+            initialAction()
+        }
+
+        onLongPressed: {
+            initialAction()
+
+            pendingContextMenu = true
+        }
+
+        onPressedChanged: {
+            if (!pressed) {
+                if (pendingContextMenu) {
+                    root.showContextMenu(parent.mapToGlobal(point.position.x, point.position.y))
+                    pendingContextMenu = false
+                }
+            }
+        }
+
+        onCanceled: {
+            pendingContextMenu = false
+        }
+
+        function initialAction() {
+            if (root.currentItem)
+                root.currentItem.focus = false // Grab the focus from delegate
+            root.forceActiveFocus(Qt.MouseFocusReason) // Re-focus the list
+
+            root.currentIndex = -1
         }
     }
 
