@@ -187,6 +187,59 @@ FocusScope {
         property real topPadding: (anchors.top === parent.top) ? topBar.height : 0
         property real bottomPadding: (anchors.bottom === parent.bottom) ? controlBar.height : 0
 
+        component TouchDragHandler : DragHandler {
+            id: touchDragHandler
+
+            acceptedDevices: PointerDevice.TouchScreen
+
+            minimumPointCount: 1
+            maximumPointCount: 1
+
+            target: null
+
+            dragThreshold: VLCStyle.margin_normal
+
+            property vector2d lastActiveTranslation
+
+            // TODO: Use `createComponent()` and load directly from module instead, since
+            //       it is pointless to keep the `QQmlComponent` around for this object.
+            readonly property Component wheelToVLCConverterComponent: Component { WheelToVLCConverter { } }
+
+            property WheelToVLCConverter wheelToVLCConverter
+
+            // We synthesize wheel event with pixel delta. It is a to-do to handle
+            // touch properly with precision adjustment, like on Android:
+            onActiveTranslationChanged: {
+                if (active) {
+                    console.assert(wheelToVLCConverter)
+
+                    const delta = Qt.point(activeTranslation.x - lastActiveTranslation.x,
+                                           activeTranslation.y - lastActiveTranslation.y)
+
+                    // WheelToVLCConverter can not handle sole pixel delta now, so we also
+                    // use angle delta. This is similar to wheel events on some platforms:
+                    wheelToVLCConverter.customWheelEvent(delta,
+                                                         delta,
+                                                         Qt.NoButton,
+                                                         Qt.NoModifier,
+                                                         true)
+
+                    lastActiveTranslation = activeTranslation
+                }
+            }
+
+            onActiveChanged: {
+                if (active) {
+                    if (!wheelToVLCConverter) {
+                        wheelToVLCConverter = wheelToVLCConverterComponent.createObject(touchDragHandler)
+                        wheelToVLCConverter.vlcWheelKey.connect(MainCtx, MainCtx.sendVLCHotkey)
+                    }
+                } else {
+                    lastActiveTranslation = Qt.vector2d(0, 0)
+                }
+            }
+        }
+
         Component {
             id: videoComponent
 
@@ -234,6 +287,10 @@ FocusScope {
                             && !playerToolbarVisibilityFSM.isVisible
                             && !interactiveAutoHideTimer.running
                         value: Qt.BlankCursor
+                    }
+
+                    TouchDragHandler {
+
                     }
                 }
 
@@ -399,6 +456,10 @@ FocusScope {
                     onWheel: (wheel) => {
                         wheel.accepted = true
                         wheelToVlc.qmlWheelEvent(wheel)
+                    }
+
+                    TouchDragHandler {
+                        wheelToVLCConverter: wheelToVlc
                     }
 
                     WheelToVLCConverter {
