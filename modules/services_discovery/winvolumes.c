@@ -56,15 +56,15 @@ typedef struct volumes_observer_t
  */
 static input_item_t *CreateInput( const char letter )
 {
-    char mrl[12] = "file:///A:/", name[MAX_PATH] = {0};
+    char mrl[12] = "file:///A:/", name[MAX_PATH+1] = {0};
     char path[4] = "A:\\";
 
     path[0] = letter;
     mrl[8] = letter;
 
-    // ignore the error, this information is not important
-    GetVolumeInformationA(path, name, sizeof(name),
-                          NULL, NULL, NULL, NULL, 0);
+    if (GetVolumeInformationA(path, name, sizeof(name),
+                              NULL, NULL, NULL, NULL, 0) == 0)
+        return NULL;
 
     if (GetDriveTypeA (path) == DRIVE_CDROM)
         return input_item_NewDisc( mrl, name, INPUT_DURATION_INDEFINITE );
