@@ -585,7 +585,10 @@ void MainCtx::incrementIntfUserScaleFactor(bool increment)
 
 void MainCtx::setIntfUserScaleFactor(double newValue)
 {
-    m_intfUserScaleFactor = qBound(getMinIntfUserScaleFactor(), newValue, getMaxIntfUserScaleFactor());
+    const auto value = qBound(getMinIntfUserScaleFactor(), newValue, getMaxIntfUserScaleFactor());
+    if (qFuzzyCompare(value, m_intfUserScaleFactor))
+        return;
+    m_intfUserScaleFactor = value;
     updateIntfScaleFactor();
 }
 
