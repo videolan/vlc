@@ -806,8 +806,11 @@ static int Open(vlc_window_t *wnd)
     HINSTANCE hInstance = GetModuleHandle(NULL);
 
     WCHAR app_path[MAX_PATH];
-    if( GetModuleFileName( NULL, app_path, MAX_PATH ) )
-        sys->vlc_icon = ExtractIcon( hInstance, app_path    , 0 );
+    DWORD read = GetModuleFileNameW( NULL, app_path, ARRAY_SIZE(app_path) );
+    if (read != 0 && read != ARRAY_SIZE(app_path))
+        sys->vlc_icon = ExtractIconW( hInstance, app_path, 0 );
+    else
+        sys->vlc_icon = NULL;
 
     sys->button_pressed = 0;
     sys->is_cursor_hidden = false;
