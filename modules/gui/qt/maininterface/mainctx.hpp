@@ -230,7 +230,7 @@ public:
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline double getIntfScaleFactor() const { return m_intfScaleFactor; }
-    inline double getIntfUserScaleFactor() const { return m_intfUserScaleFactor; }
+    Q_INVOKABLE inline double getIntfUserScaleFactor() const { return m_intfUserScaleFactor; }
     inline int CSDBorderSize() const { return 10; }
     inline double getMinIntfUserScaleFactor() const { return MIN_INTF_USER_SCALE_FACTOR; }
     inline double getMaxIntfUserScaleFactor() const { return MAX_INTF_USER_SCALE_FACTOR; }
