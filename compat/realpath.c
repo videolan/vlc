@@ -47,7 +47,7 @@ char *realpath(const char * restrict relpath, char * restrict resolved_path)
 
     MultiByteToWideChar( CP_UTF8, 0, relpath, -1, wrelpath, len );
 
-    wchar_t *wfullpath = _wfullpath( NULL, wrelpath, _MAX_PATH );
+    wchar_t *wfullpath = _wfullpath( NULL, wrelpath, 0 );
     free(wrelpath);
     if (wfullpath != NULL)
     {
