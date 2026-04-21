@@ -38,6 +38,8 @@
 #include <assert.h>
 #include <limits.h>
 
+#define MP4_DEPTH_MAX 32
+
 /* Some assumptions:
  * The input method HAS to be seekable
  */
@@ -107,6 +109,14 @@ static char *mp4_getstringz( uint8_t **restrict in, uint64_t *restrict size )
     do \
         (p_str) = mp4_getstringz( &p_peek, &i_read ); \
     while(0)
+
+static unsigned GetDepth( const MP4_Box_t *box )
+{
+    unsigned i = 0;
+    for( ; box ; box = box->p_father )
+        i++;
+    return i;
+}
 
 static uint8_t *mp4_readbox_enter_common( stream_t *s, MP4_Box_t *box,
                                           size_t typesize,
@@ -428,6 +438,9 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         /* there is no box to load */
         return 0;
     }
+
+    if( GetDepth( p_container ) > MP4_DEPTH_MAX ) /* Prevent unbounded recursions */
+        return 1;
 
     uint64_t i_last_pos = 0; /* used to detect read failure loops */
     const uint64_t i_end = p_container->i_pos + p_container->i_size;
