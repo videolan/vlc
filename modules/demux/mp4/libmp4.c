@@ -39,6 +39,8 @@
 #include <limits.h>
 #include <stdckdint.h>
 
+#define MP4_DEPTH_MAX 32
+
 /* Some assumptions:
  * The input method HAS to be seekable
  */
@@ -191,6 +193,14 @@ static inline uint32_t Get24bBE( const uint8_t *p )
 static inline void GetUUID( UUID_t *p_uuid, const uint8_t *p_buff )
 {
     memcpy( p_uuid, p_buff, 16 );
+}
+
+static unsigned GetDepth( const MP4_Box_t *box )
+{
+    unsigned i = 0;
+    for( ; box ; box = box->p_father )
+        i++;
+    return i;
 }
 
 static video_palette_t * ReadQuicktimePalette( uint8_t **pp_peek, uint64_t *pi_read )
@@ -536,6 +546,9 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         /* there is no box to load */
         return 0;
     }
+
+    if( GetDepth( p_container ) > MP4_DEPTH_MAX ) /* Prevent unbounded recursions */
+        return 1;
 
     uint64_t i_last_pos = 0; /* used to detect read failure loops */
     const uint64_t i_end = p_container->i_pos + p_container->i_size;
