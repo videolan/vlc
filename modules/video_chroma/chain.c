@@ -282,15 +282,24 @@ static int BuildChromaResize( filter_t *p_filter )
 }
 
 static int AppendChromaChain( filter_t *p_filter, const vlc_fourcc_t *chromas,
-                              size_t chroma_count )
+                              size_t chroma_count, const es_format_t *last_fmt )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     es_format_t fmt_mid;
 
     for( size_t i = 0; i < chroma_count; ++i )
     {
-        es_format_Copy( &fmt_mid, &p_filter->fmt_in );
-        fmt_mid.i_codec = fmt_mid.video.i_chroma = chromas[i];
+
+        if( i == chroma_count - 1 && last_fmt != NULL )
+        {
+            assert( last_fmt->i_codec == chromas[i] );
+            es_format_Copy( &fmt_mid, last_fmt );
+        }
+        else
+        {
+            es_format_Copy( &fmt_mid, &p_filter->fmt_in );
+            fmt_mid.i_codec = fmt_mid.video.i_chroma = chromas[i];
+        }
 
         int i_ret = filter_chain_AppendConverter( p_sys->p_chain, &fmt_mid );
         es_format_Clean( &fmt_mid );
@@ -332,7 +341,8 @@ static int BuildChromaChain( filter_t *p_filter )
         filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in,
                             &p_filter->fmt_out );
 
-        i_ret = AppendChromaChain( p_filter, &res->chain[1], res->chain_count - 1);
+        i_ret = AppendChromaChain( p_filter, &res->chain[1], res->chain_count - 1,
+                                   NULL );
         if( i_ret == VLC_SUCCESS )
         {
             p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
@@ -415,7 +425,7 @@ static int BuildFilterChain( filter_t *p_filter )
                             &p_filter->fmt_out );
 
         i_ret = AppendChromaChain( p_filter, &res->chain[1],
-                                   res->chain_count - 1 );
+                                   res->chain_count - 1, NULL );
         if( i_ret != VLC_SUCCESS )
             continue;
 
