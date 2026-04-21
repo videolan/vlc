@@ -701,11 +701,12 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
     fmt->video.i_height =
     fmt->video.i_visible_height = derivation_data.ImageGrid.output_height;
 
-    for( uint16_t i=0; i<BOXDATA(p_refbox)->i_reference_count; i++ )
+    unsigned total_tiles = (derivation_data.ImageGrid.rows_minus_one + 1) *
+                           (derivation_data.ImageGrid.columns_minus_one + 1);
+
+    for( uint16_t i=0; i<BOXDATA(p_refbox)->i_reference_count && i < total_tiles; i++ )
     {
-        msg_Dbg( p_demux, "Loading tile %d/%d", i,
-                 (derivation_data.ImageGrid.rows_minus_one + 1) *
-                 (derivation_data.ImageGrid.columns_minus_one + 1) );
+        msg_Dbg( p_demux, "Loading tile %"PRIu16"/%u", i, total_tiles );
         LoadGridImage( p_demux, handler,
                        BOXDATA(p_refbox)->p_references[i].i_to_item_id,
                        p_block->p_buffer, i,
