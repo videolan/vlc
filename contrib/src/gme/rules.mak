@@ -1,6 +1,6 @@
 # Game Music Emu
 
-GME_VERSION := 0.6.4
+GME_VERSION := 0.6.5
 GME_URL := $(GITHUB)/libgme/game-music-emu/archive/refs/tags/$(GME_VERSION).tar.gz
 
 PKGS += gme
@@ -14,7 +14,6 @@ DEPS_gme = zlib $(DEPS_zlib)
 
 game-music-emu: game-music-emu-$(GME_VERSION).tar.gz .sum-gme
 	$(UNPACK)
-	$(APPLY) $(SRC)/gme/0001-Export-the-proper-C-runtime-library.patch
 	$(call pkg_static,"gme/libgme.pc.in")
 	$(MOVE)
 
