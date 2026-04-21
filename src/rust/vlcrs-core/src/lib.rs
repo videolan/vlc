@@ -46,3 +46,5 @@ pub(crate) mod convert;
 
 mod error;
 pub use error::Error;
+/// Type alias wrapping [VLC Errors](error::Error).
+pub type Result<T> = std::result::Result<T, error::Error>;
