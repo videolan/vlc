@@ -37,6 +37,8 @@
 #include "heif.h"
 #include "../../packetizer/iso_color_tables.h"
 
+#define MAX_ILOC_INDIRECTION 2 // reference of reference should be enough
+
 struct heif_private_t
 {
     MP4_Box_t *p_root;
@@ -231,7 +233,7 @@ static int ControlHEIF( demux_t *p_demux, int i_query, va_list args )
 //}
 
 static block_t *ReadItemExtents( demux_t *p_demux, uint32_t i_item_id,
-                                 const MP4_Box_t *p_shared_header )
+                                 const MP4_Box_t *p_shared_header, int depth )
 {
     struct heif_private_t *p_sys = (void *) p_demux->p_sys;
     block_t *p_block = NULL;
@@ -294,7 +296,8 @@ static block_t *ReadItemExtents( demux_t *p_demux, uint32_t i_item_id,
                 *pp_append = vlc_stream_Block( p_demux->s, i_length );
             }
             /* Extents are 3:iloc reference */
-            else if( BOXDATA(p_iloc)->p_items[i].i_construction_method == 2 )
+            else if( BOXDATA(p_iloc)->p_items[i].i_construction_method == 2 &&
+                     depth <= MAX_ILOC_INDIRECTION )
             {
                 /* FIXME ? That's totally untested and really complicated */
                 uint32_t i_extent_index = BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_index;
@@ -318,7 +321,7 @@ static block_t *ReadItemExtents( demux_t *p_demux, uint32_t i_item_id,
                         {
                             *pp_append = ReadItemExtents(p_demux,
                                             BOXDATA(p_refbox)->p_references[k].i_to_item_id,
-                                            NULL);
+                                            NULL, depth + 1);
                         }
                     }
 
@@ -543,7 +546,7 @@ static int ReadDerivationData( demux_t *p_demux, vlc_fourcc_t type,
                                union heif_derivation_data *d )
 {
     int i_ret = VLC_EGENERIC;
-    block_t *p_data = ReadItemExtents( p_demux, i_item_id, NULL );
+    block_t *p_data = ReadItemExtents( p_demux, i_item_id, NULL, 0 );
     if( p_data )
     {
         switch( type )
@@ -586,7 +589,7 @@ static int LoadGridImage( demux_t *p_demux,
     }
 
     block_t *p_sample = ReadItemExtents( p_demux, i_pic_item_id,
-                                         p_shared_header );
+                                         p_shared_header, 0 );
     if(!p_sample)
     {
         es_format_Clean( &fmt );
@@ -789,7 +792,7 @@ static int DemuxHEIF( demux_t *p_demux )
         }
 
         p_block = ReadItemExtents( p_demux, i_current_item_id,
-                                   p_sys->current.p_shared_header );
+                                   p_sys->current.p_shared_header, 0 );
         if( !p_block )
         {
             es_format_Clean( &fmt );
