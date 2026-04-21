@@ -54,6 +54,8 @@
 # include <xlocale.h>
 #endif
 
+#include "../packetizer/hxxx_nal.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -535,65 +537,29 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_
             /* FIXME AAAAAAAAAAAARRRRRRRRGGGG copied from stream_out/rtp.c */
             if( p_fmt->i_extra > 0 )
             {
-                uint8_t *p_buffer = p_fmt->p_extra;
-                int     i_buffer = p_fmt->i_extra;
                 char    *p_64_sps = NULL;
                 char    *p_64_pps = NULL;
                 char    hexa[6+1];
 
-                while( i_buffer > 4 )
+                hxxx_iterator_ctx_t it;
+                hxxx_iterator_init( &it, p_fmt->p_extra, p_fmt->i_extra, 0 );
+
+                const uint8_t *p_nal;
+                size_t i_nal;
+                while( hxxx_annexb_iterate_next( &it, &p_nal, &i_nal ) && i_nal > 0 )
                 {
-                    int i_offset    = 0;
-                    int i_size      = 0;
-
-                    while( i_buffer > 2 && memcmp(p_buffer, "\x00\x00\x01", 3 ) )
-                    {
-                        p_buffer++;
-                        i_buffer--;
-                    }
-
-                    if( i_buffer < 4 || memcmp(p_buffer, "\x00\x00\x01", 3 ) )
-                    {
-                        /* No startcode found.. */
-                        break;
-                    }
-                    p_buffer += 3;
-                    i_buffer -= 3;
-
-                    const int i_nal_type = p_buffer[0]&0x1f;
-
-                    i_size = i_buffer;
-                    for( i_offset = 1; i_offset+2 < i_buffer ; i_offset++)
-                    {
-                        if( !memcmp(p_buffer + i_offset, "\x00\x00\x01", 3 ) )
-                        {
-                            /* we found another startcode */
-                            while( i_offset > 0 && 0 == p_buffer[ i_offset - 1 ] )
-                                i_offset--;
-                            i_size = i_offset;
-                            break;
-                        }
-                    }
-
-                    if( i_size == 0 )
-                    {
-                        /* No-info found in nal */
-                        continue;
-                    }
-
-                    if( i_nal_type == 7 && i_size > 3 )
+                    const int i_nal_type = p_nal[0]&0x1f;
+                    if( i_nal_type == 7 && i_nal > 3 )
                     {
                         free( p_64_sps );
-                        p_64_sps = vlc_b64_encode_binary( p_buffer, i_size );
-                        sprintf_hexa( hexa, &p_buffer[1], 3 );
+                        p_64_sps = vlc_b64_encode_binary( p_nal, i_nal );
+                        sprintf_hexa( hexa, &p_nal[1], 3 );
                     }
                     else if( i_nal_type == 8 )
                     {
                         free( p_64_pps );
-                        p_64_pps = vlc_b64_encode_binary( p_buffer, i_size );
+                        p_64_pps = vlc_b64_encode_binary( p_nal, i_nal );
                     }
-                    i_buffer -= i_size;
-                    p_buffer += i_size;
                 }
                 /* */
                 if( p_64_sps && p_64_pps )
