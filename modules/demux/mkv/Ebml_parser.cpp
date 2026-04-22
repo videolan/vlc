@@ -314,6 +314,16 @@ next:
         }
         else
         {
+            if( p_prev )
+            {
+                if( !mb_keep )
+                {
+                    delete p_prev;
+                    p_prev = NULL;
+                }
+                mb_keep = false;
+            }
+
             /* Too large, misplaced or M_EL_MAXSIZE successive dummy elements */
             msg_Err( p_demux,
                      "Dummy element too large or misplaced at %" PRIu64 "... skipping to next upper element",
@@ -332,15 +342,6 @@ next:
                 return NULL;
             }
 
-            if( p_prev )
-            {
-                if( !mb_keep )
-                {
-                    delete p_prev;
-                    p_prev = NULL;
-                }
-                mb_keep = false;
-            }
             goto next;
         }
     }
