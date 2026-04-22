@@ -59,7 +59,7 @@ class EbmlParser
     size_t       mi_level;
     EbmlElement *m_el[M_EL_MAXSIZE];
 
-    EbmlElement *m_got;
+    bool         return_previous_parent = false;
 
     size_t       mi_user_level;
     bool         mb_keep;
