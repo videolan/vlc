@@ -311,7 +311,6 @@ next:
             msg_Warn( p_demux, "Dummy element found %" PRIu64 "... skipping it",
                       m_el[mi_level]->GetElementPosition() );
             n_call++;
-            goto next;
         }
         else
         {
@@ -332,9 +331,9 @@ next:
                 mi_level--;
                 return NULL;
             }
-
-            goto next;
         }
+
+        goto next;
     }
 
     if( p_prev )
