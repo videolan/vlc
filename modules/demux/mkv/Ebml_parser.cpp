@@ -319,8 +319,7 @@ next:
                      "Dummy element too large or misplaced at %" PRIu64 "... skipping to next upper element",
                      m_el[mi_level]->GetElementPosition() );
 
-            if( mi_level >= 1 &&
-                m_el[mi_level]->IsFiniteSize() && m_el[mi_level-1]->IsFiniteSize() &&
+            if( m_el[mi_level]->IsFiniteSize() && m_el[mi_level-1]->IsFiniteSize() &&
                 m_el[mi_level]->GetElementPosition() >= m_el[mi_level-1]->GetEndPosition() )
             {
                 msg_Err(p_demux, "This element is outside its known parent... upping level");
