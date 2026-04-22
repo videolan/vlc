@@ -19,6 +19,7 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.xz:
 matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(UNPACK)
 	$(call pkg_static,"libmatroska.pc.in")
+	$(APPLY) $(SRC)/matroska/0001-KaxBlock-release-read-buffers-on-EndOfStream-error.patch
 	$(APPLY) $(SRC)/matroska/0001-KaxBlock-fix-leak-when-reading-EBML-lace-is-aborted.patch
 	$(MOVE)
 
