@@ -293,6 +293,16 @@ next:
             b_bad_position = true;
         }
 
+        if( p_prev )
+        {
+            if( !mb_keep )
+            {
+                delete p_prev;
+                p_prev = NULL;
+            }
+            mb_keep = false;
+        }
+
         if( n_call < M_EL_MAXSIZE && !b_bad_position && m_el[mi_level]->IsFiniteSize() &&
             ( !m_el[mi_level-1]->IsFiniteSize() ||
               m_el[mi_level]->GetEndPosition() <= m_el[mi_level-1]->GetEndPosition() ) )
@@ -300,30 +310,11 @@ next:
             /* The element fits inside its upper element */
             msg_Warn( p_demux, "Dummy element found %" PRIu64 "... skipping it",
                       m_el[mi_level]->GetElementPosition() );
-            if( p_prev )
-            {
-                if( !mb_keep )
-                {
-                    delete p_prev;
-                    p_prev = NULL;
-                }
-                mb_keep = false;
-            }
             n_call++;
             goto next;
         }
         else
         {
-            if( p_prev )
-            {
-                if( !mb_keep )
-                {
-                    delete p_prev;
-                    p_prev = NULL;
-                }
-                mb_keep = false;
-            }
-
             /* Too large, misplaced or M_EL_MAXSIZE successive dummy elements */
             msg_Err( p_demux,
                      "Dummy element too large or misplaced at %" PRIu64 "... skipping to next upper element",
