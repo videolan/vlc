@@ -1,0 +1,24 @@
+From b0220cd5dde77970452a74dd9046b17617d3c7b8 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 22 Apr 2026 07:50:09 +0200
+Subject: [PATCH] KaxBlock: release read buffers on EndOfStream error
+
+---
+ src/KaxBlock.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/KaxBlock.cpp b/src/KaxBlock.cpp
+index 1fae7e4..1522799 100644
+--- a/src/KaxBlock.cpp
++++ b/src/KaxBlock.cpp
+@@ -708,6 +708,7 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+   } catch (SafeReadIOCallback::EndOfStreamX &) {
+     SetValueIsSet(false);
+ 
++    ReleaseFrames();
+     myBuffers.clear();
+     SizeList.clear();
+     Timecode           = 0;
+-- 
+2.52.0.windows.1
+
