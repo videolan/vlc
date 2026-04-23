@@ -1,0 +1,35 @@
+From 3c177d011684fce294edce5ea93f27d3453e6830 Mon Sep 17 00:00:00 2001
+From: Matt Oliver <protogonoi@gmail.com>
+Date: Tue, 8 Sep 2020 21:12:54 +1000
+Subject: [PATCH] Fix pkgconfig creation with cmake.
+
+The cmake build script was not setting a VORBIS_LIBS variable
+that is used to update pkg-config files. This results in linking
+errors in downstream projects due to missing dependencies
+(in this case libm).
+
+This patch just updates the cmake script to behave the same
+as configure does currently.
+
+Signed-off-by: evpobr <evpobr@gmail.com>
+---
+ CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bb99e2cf..c42f6a5b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -60,6 +60,9 @@ message(STATUS "Configuring ${PROJECT_NAME} ${PROJECT_VERSION}")
+ # Find math library
+ 
+ check_library_exists(m floor "" HAVE_LIBM)
++if(HAVE_LIBM)
++    set(VORBIS_LIBS "-lm")
++endif()
+ 
+ # Find ogg dependency
+ if(NOT TARGET Ogg::ogg)
+-- 
+2.52.0.windows.1
+

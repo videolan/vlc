@@ -27,7 +27,7 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 	$(UNPACK)
-	$(APPLY) $(SRC)/vorbis/0001-CMake-add-missing-libm-in-.pc-file-when-it-s-used.patch
+	$(APPLY) $(SRC)/vorbis/0001-Fix-pkgconfig-creation-with-cmake.patch
 	$(call pkg_static,"vorbis.pc.in")
 	$(call pkg_static,"vorbisenc.pc.in")
 	$(call pkg_static,"vorbisfile.pc.in")
