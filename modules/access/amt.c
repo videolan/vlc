@@ -660,7 +660,7 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
 {
     access_sys_t *sys = p_access->p_sys;
     ssize_t len = 0, shift = 0;
-    int tunnel = UDP_HDR_LEN + AMT_HDR_LEN + (sys->mcastGroupAddr.sin.sin_family == AF_INET ? IP_HDR_LEN : IPv6_FIXED_HDR_LEN );
+    const int tunnel = UDP_HDR_LEN + AMT_HDR_LEN + (sys->mcastGroupAddr.sin.sin_family == AF_INET ? IP_HDR_LEN : IPv6_FIXED_HDR_LEN );
 
     /* Allocate anticipated MTU buffer for holding the UDP packet suitable for native or AMT tunneled multicast */
     block_t *pkt = block_Alloc( sys->mtu + tunnel );
