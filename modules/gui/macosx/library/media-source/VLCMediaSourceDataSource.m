@@ -65,9 +65,41 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 - (instancetype)initWithParentBaseDataSource:(VLCMediaSourceBaseDataSource *)parentBaseDataSource
 {
     self = [super init];
-    if (self)
+    if (self) {
         self.parentBaseDataSource = parentBaseDataSource;
+        NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaSourceChildrenChanged:)
+                                   name:VLCMediaSourceChildrenReset
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaSourceChildrenChanged:)
+                                   name:VLCMediaSourceChildrenAdded
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaSourceChildrenChanged:)
+                                   name:VLCMediaSourceChildrenRemoved
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaSourceChildrenChanged:)
+                                   name:VLCMediaSourcePreparsingEnded
+                                 object:nil];
+    }
     return self;
+}
+
+- (void)dealloc
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)mediaSourceChildrenChanged:(NSNotification *)notification
+{
+    if (notification.object != self.displayedMediaSource)
+        return;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadData];
+    });
 }
 
 - (dispatch_source_t)observeLocalUrl:(NSURL *)url
@@ -107,6 +139,12 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     NSParameterAssert(self.parentBaseDataSource);
     if (self.parentBaseDataSource.mediaSourceMode == VLCMediaSourceModeLAN) {
         NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
+
+        if (!nodeUrl.isFileURL) {
+            [self reloadData];
+            return;
+        }
+
         NSError * const error =
             [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
                                                                   withUrl:nodeUrl];
@@ -121,7 +159,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
         const __weak typeof(self) weakSelf = self;
         self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
-                                                forVnodeEvents:DISPATCH_VNODE_WRITE | 
+                                                forVnodeEvents:DISPATCH_VNODE_WRITE |
                                                                DISPATCH_VNODE_DELETE |
                                                                DISPATCH_VNODE_RENAME
                                             withEventHandler:^{
