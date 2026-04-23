@@ -61,4 +61,13 @@
     return self;
 }
 
+- (NSString *)description
+{
+    if (_inputNode != nil && _inputNode.inputItem != nil) {
+        return [NSString stringWithFormat:@"path: %@", _inputNode.inputItem.path];
+    } else {
+        return @"no input node";
+    }
+}
+
 @end
