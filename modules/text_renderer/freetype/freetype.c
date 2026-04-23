@@ -122,6 +122,7 @@ static const int pi_text_direction[] = {
 static const char *const ppsz_text_direction[] = {
     N_("Left to right"), N_("Right to left"), N_("Auto"),
 };
+#endif
 
 static const int pi_blending_mode[] = {
     0, 1
@@ -130,7 +131,6 @@ static const char *const ppsz_blending_mode[] = {
     N_("Overlay"), N_("Transparent"),
 };
 
-#endif
 
 vlc_module_begin ()
     set_shortname( N_("Text renderer"))
