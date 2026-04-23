@@ -701,7 +701,7 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
     {
 
         /* AMT is a wrapper for UDP streams, so recv is used. */
-        len = recv( sys->sAMT, pkt->p_buffer, sys->mtu + tunnel, 0 );
+        len = recv( sys->sAMT, pkt->p_buffer, pkt->i_buffer, 0 );
 
         /* Check for the integrity of the received AMT packet */
         if( len < tunnel || *(pkt->p_buffer) != AMT_MULT_DATA )
@@ -830,7 +830,7 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
     /* Otherwise pull native multicast */
         struct sockaddr temp;
         socklen_t temp_size = sizeof( struct sockaddr );
-        len = recvfrom( sys->fd, (char *)pkt->p_buffer, sys->mtu + tunnel, 0, &temp, &temp_size );
+        len = recvfrom( sys->fd, (char *)pkt->p_buffer, pkt->i_buffer, 0, &temp, &temp_size );
         if ( len <= 0 )
         {
             msg_Err(p_access, "recv() call failed: %zd was returned", len);
