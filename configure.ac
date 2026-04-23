@@ -2,19 +2,19 @@ dnl Autoconf settings for vlc
 
 AC_COPYRIGHT([Copyright 1999-2025 VLC authors and VideoLAN])
 
-AC_INIT(vlc, 3.0.23)
+AC_INIT(vlc, 3.0.24-beta1)
 VERSION_MAJOR=3
 VERSION_MINOR=0
-VERSION_REVISION=23
+VERSION_REVISION=24
 VERSION_EXTRA=0
-VERSION_DEV=
+VERSION_DEV=beta1
 
 PKGDIR="vlc"
 AC_SUBST(PKGDIR)
 
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Vetinari"
-COPYRIGHT_YEARS="1996-2025"
+COPYRIGHT_YEARS="1996-2026"
 
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)

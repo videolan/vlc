@@ -1,9 +1,20 @@
-Changes between 3.0.23 and 3.0.24:
+Changes between 3.0.23 and 3.0.24-beta1:
 ----------------------------------
 
 Codecs:
  * Use FFmpeg 8.1 (upgraded from 4.4)
  * Support OpenAPV decoder (FFmpeg 8 and OpenAPV)
+ * Support Atrac3/Atrac9 decoding
+
+Demuxers:
+ * misc. MKV logs and crash fixes
+
+Windows:
+ * Support NV12 DirectShow capture
+
+Misc:
+ * Fix Audio EQ filter High Frequency parameter
+ * add SFTP ED25519 hostkey support
 
 Lua:
  * Remove broken youtube.lua plugin
@@ -11,12 +22,25 @@ Lua:
 Contrib:
  * Update libarchive to 3.8.5
  * Update amf to 1.5.0
+ * Update chromaprint to 1.6.0
  * Update dav1d to 1.5.3
  * Update faad to 2.11.2
+ * Update flac to 1.4.2
  * Update FFmpeg to 8.1
+ * Update gme to 0.6.4
+ * Update jpeg to v9f
+ * Update libtasn1 to 4.19.0
  * Update libxml2 to 2.15.1
+ * Update matroska to 1.7.1
+ * Update nfs to 6.0.2
+ * Update openjpeg to 2.5.4
  * Update png to 1.6.53
+ * Update protobuf to 3.4.1
  * Update opus to 1.6.1
+ * Update shout to 2.4.6
+ * Update upnp to 1.14.20
+ * Update vorbis to 1.3.7
+ * Update x265 to 4.1
  * Update zlib to 1.3.2
 
 Changes between 3.0.22 and 3.0.23:
