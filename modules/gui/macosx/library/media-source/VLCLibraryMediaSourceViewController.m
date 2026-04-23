@@ -232,10 +232,10 @@
     [_baseDataSource reloadViews];
 }
 
-- (void)presentLocalFolderMrl:(NSString *)mrl
+- (void)browseFolderByMrl:(NSString *)mrl
 {
     [self presentBrowseView];
-    [self.baseDataSource presentLocalFolderMrl:mrl];
+    [self.baseDataSource browseFolderByMrl:mrl];
 }
 
 @end

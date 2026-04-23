@@ -344,10 +344,10 @@ static int ShowController(vlc_object_t * __unused p_this,
     }
 }
 
-- (void)goToLocalFolderMrl:(NSString *)mrl
+- (void)browseFolderByMrl:(NSString *)mrl
 {
     [self goToBrowseSection:self];
-    [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentLocalFolderMrl:mrl];
+    [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController browseFolderByMrl:mrl];
 }
 
 - (IBAction)sortLibrary:(id)sender

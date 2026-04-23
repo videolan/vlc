@@ -143,7 +143,7 @@ extern NSString * const VLCLibraryWindowEmbeddedVideoPlaybackActiveKey;
                               usingConstraints:(NSArray<NSLayoutConstraint *> *)constraints
                              displayingMessage:(NSString *)message;
 - (void)displayNoResultsMessage;
-- (void)goToLocalFolderMrl:(NSString *)mrl;
+- (void)browseFolderByMrl:(NSString *)mrl;
 
 - (IBAction)goToBrowseSection:(id)sender;
 - (IBAction)sortLibrary:(id)sender;

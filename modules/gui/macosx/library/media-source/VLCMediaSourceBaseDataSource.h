@@ -62,7 +62,7 @@ extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 - (void)homeButtonAction:(id)sender;
 - (void)pathControlAction:(id)sender;
 
-- (void)presentLocalFolderMrl:(NSString *)mrl;
+- (void)browseFolderByMrl:(NSString *)mrl;
 
 @end
 

@@ -97,6 +97,7 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
 
 static const char *const localDevicesDescription = "My Machine";
 static const char *const myFoldersDescription = "My Folders";
+static const char *const remoteBrowseDescription = "Remote Browse";
 
 #pragma mark - VLCMediaSource methods
 @implementation VLCMediaSource
@@ -215,36 +216,43 @@ static const char *const myFoldersDescription = "My Folders";
     return self;
 }
 
-- (instancetype)initWithLocalFolderMrl:(NSString *)mrl
-                          andPreparser:(vlc_preparser_t *)p_preparser
+- (instancetype)initWithFolderMrl:(NSString *)mrl
+                     andPreparser:(vlc_preparser_t *)p_preparser
 {
     self = [super init];
     if (self) {
         _p_preparser = p_preparser;
+
+        NSURL * const directoryUrl = [NSURL URLWithString:mrl];
+        const BOOL isFileUrl = directoryUrl.isFileURL;
 
          _p_mediaSource = malloc(sizeof(vlc_media_source_t));
         if (!_p_mediaSource) {
             return self;
         }
 
-        _p_mediaSource->description = myFoldersDescription;
-        _p_mediaSource->tree = calloc(1, sizeof(vlc_media_tree_t));
+        if (isFileUrl) {
+            _category = SD_CAT_MYCOMPUTER;
+            _p_mediaSource->description = myFoldersDescription;
+            _p_mediaSource->tree = calloc(1, sizeof(vlc_media_tree_t));
+
+            BOOL mrlTargetIsDirectory = NO;
+            const BOOL mrlTargetExists = [NSFileManager.defaultManager
+                                          fileExistsAtPath:directoryUrl.path
+                                               isDirectory:&mrlTargetIsDirectory];
+            if (!mrlTargetExists || !mrlTargetIsDirectory) {
+                return nil;
+            }
+        } else {
+            _category = SD_CAT_LAN;
+            _p_mediaSource->description = remoteBrowseDescription;
+            _p_mediaSource->tree = vlc_media_tree_New();
+        }
 
         if (_p_mediaSource->tree == NULL) {
             free(_p_mediaSource);
             _p_mediaSource = NULL;
             return self;
-        }
-
-        _category = SD_CAT_MYCOMPUTER;
-
-        NSFileManager * const fileManager = NSFileManager.defaultManager;
-        NSURL * const directoryUrl = [NSURL URLWithString:mrl];
-        BOOL mrlTargetIsDirectory = NO;
-        const BOOL mrlTargetExists = [fileManager fileExistsAtPath:directoryUrl.path
-                                                       isDirectory:&mrlTargetIsDirectory];
-        if (!mrlTargetExists || !mrlTargetIsDirectory) {
-            return nil;
         }
 
         const char * const directoryPath = mrl.UTF8String;
@@ -253,9 +261,20 @@ static const char *const myFoldersDescription = "My Folders";
                                                                directoryDesc,
                                                                0,
                                                                ITEM_TYPE_DIRECTORY,
-                                                               ITEM_LOCAL);
-        input_item_node_t * const directoryNode = input_item_node_Create(directoryItem);
-        _p_mediaSource->tree->root = *directoryNode;
+                                                               isFileUrl ? ITEM_LOCAL : ITEM_NET);
+
+        if (isFileUrl) {
+            input_item_node_t * const directoryNode = input_item_node_Create(directoryItem);
+            _p_mediaSource->tree->root = *directoryNode;
+        } else {
+            input_item_node_t * const directoryNode = input_item_node_Create(directoryItem);
+            input_item_node_AppendNode(&_p_mediaSource->tree->root, directoryNode);
+            input_item_Release(directoryItem);
+            _p_treeListenerID = vlc_media_tree_AddListener(_p_mediaSource->tree,
+                                                           &treeCallbacks,
+                                                           (__bridge void *)self,
+                                                           NO);
+        }
     }
     return self;
 }
@@ -280,6 +299,11 @@ static const char *const myFoldersDescription = "My Folders";
             }
 
             free(_p_mediaSource->tree);
+            free(_p_mediaSource);
+            _p_mediaSource = NULL;
+        } else if (_p_mediaSource->description == remoteBrowseDescription) {
+            _p_mediaSource->description = NULL;
+            vlc_media_tree_Release(_p_mediaSource->tree);
             free(_p_mediaSource);
             _p_mediaSource = NULL;
         } else {

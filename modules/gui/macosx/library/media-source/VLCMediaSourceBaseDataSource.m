@@ -650,13 +650,13 @@ referenceSizeForHeaderInSection:(NSInteger)section
         _lanDeviceSnapshot = [self buildLANDeviceSnapshot];
     }
     if (self.viewMode == VLCLibraryGridViewModeSegment) {
-        if (self.collectionView.dataSource == self) {
-            const NSInteger index = [_mediaSources indexOfObject:aNotification.object];
-            if (self.collectionView.numberOfSections > index) {
-                [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
-            } else {
-                [self.collectionView reloadData];
-            }
+        const NSInteger index = [_mediaSources indexOfObject:aNotification.object];
+        const BOOL inSync =
+            self.collectionView.numberOfSections == (NSInteger)_mediaSources.count;
+        if (self.collectionView.dataSource == self
+            && index != NSNotFound
+            && inSync) {
+            [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
         } else {
             [self.collectionView reloadData];
         }
@@ -680,16 +680,23 @@ referenceSizeForHeaderInSection:(NSInteger)section
                                                       object:self];
 }
 
-- (void)presentLocalFolderMrl:(NSString *)mrl
+- (void)browseFolderByMrl:(NSString *)mrl
 {
     vlc_preparser_t *p_preparser = getNetworkPreparser();
     VLCMediaSource * const mediaSource =
-        [[VLCMediaSource alloc] initWithLocalFolderMrl:mrl andPreparser:p_preparser];
+        [[VLCMediaSource alloc] initWithFolderMrl:mrl andPreparser:p_preparser];
     if (mediaSource == nil) {
         NSLog(@"Could not create valid media source for mrl: %@", mrl);
         return;
     }
-    [self configureChildDataSourceWithNode:mediaSource.rootNode andMediaSource:mediaSource];
+    VLCInputNode * const entryNode = mediaSource.category == SD_CAT_LAN
+        ? mediaSource.rootNode.children.firstObject
+        : mediaSource.rootNode;
+    if (entryNode == nil) {
+        NSLog(@"No entry node for mrl: %@", mrl);
+        return;
+    }
+    [self configureChildDataSourceWithNode:entryNode andMediaSource:mediaSource];
     [self reloadData];
 }
 

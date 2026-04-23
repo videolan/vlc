@@ -42,7 +42,7 @@ extern NSString *VLCMediaSourcePreparsingEnded;
                   andPreparser:(vlc_preparser_t *)p_preparser
                         forCategory:(enum services_discovery_category_e)category;
 - (instancetype)initMyFoldersMediaSourceWithPreparser:(vlc_preparser_t *)p_preparser;
-- (instancetype)initWithLocalFolderMrl:(NSString *)mrl
+- (instancetype)initWithFolderMrl:(NSString *)mrl
                      andPreparser:(vlc_preparser_t *)p_preparser;
 
 - (nullable NSError *)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
