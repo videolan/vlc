@@ -48,13 +48,14 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open  ( vlc_object_t * );
+static void Close ( vlc_object_t * );
 
 vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("MusePack demuxer") )
     set_capability( "demux", 145 )
 
-    set_callback( Open )
+    set_callbacks( Open, Close )
     add_shortcut( "mpc" )
     add_file_extension("mpc")
     add_file_extension("mp+")
@@ -188,6 +189,17 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close: frees unused data
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    demux_t        *p_demux = (demux_t*)p_this;
+    demux_sys_t    *p_sys = p_demux->p_sys;
+
+    mpc_demux_exit( p_sys->decoder );
 }
 
 /*****************************************************************************
@@ -330,4 +342,3 @@ mpc_bool_t ReaderCanSeek(mpc_reader *p_private)
     vlc_stream_Control( stream, STREAM_CAN_SEEK, &b_canseek );
     return b_canseek;
 }
-
