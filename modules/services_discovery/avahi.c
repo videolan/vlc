@@ -97,6 +97,8 @@ static const struct
     { "smb", "_smb._tcp", false },
     { "nfs", "_nfs._tcp", false },
     { "sftp", "_sftp-ssh._tcp", false },
+    { "webdav", "_webdav._tcp", false },
+    { "webdavs", "_webdavs._tcp", false },
     { "rtsp", "_rtsp._tcp", false },
     { "chromecast", "_googlecast._tcp", true },
 };

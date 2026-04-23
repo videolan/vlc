@@ -82,6 +82,8 @@ static const struct
     { "smb", "_smb._tcp.local", false, 0 },
     { "nfs", "_nfs._tcp.local", false, 0 },
     { "sftp", "_sftp-ssh._tcp.local", false, 0 },
+    { "webdav", "_webdav._tcp.local", false, 0 },
+    { "webdavs", "_webdavs._tcp.local", false, 0 },
     { "rtsp", "_rtsp._tcp.local", false, 0 },
     { "chromecast", "_googlecast._tcp.local", true, VLC_RENDERER_CAN_AUDIO },
 };

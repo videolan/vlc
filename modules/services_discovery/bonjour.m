@@ -201,6 +201,16 @@ static NSString * ipAddressAsStringForData(NSData * data)
                                        VLCBonjourIsRenderer         : @(NO),
                                        VLCBonjourProtocolModules     : @[@"sftp"]
                                        };
+    NSDictionary *VLCWebDavProtocol = @{ VLCBonjourProtocolName       : @"webdav",
+                                         VLCBonjourProtocolServiceName: @"_webdav._tcp.",
+                                         VLCBonjourIsRenderer         : @(NO),
+                                         VLCBonjourProtocolModules    : @[@"webdav"]
+                                         };
+    NSDictionary *VLCWebDavsProtocol = @{ VLCBonjourProtocolName       : @"webdavs",
+                                          VLCBonjourProtocolServiceName: @"_webdavs._tcp.",
+                                          VLCBonjourIsRenderer         : @(NO),
+                                          VLCBonjourProtocolModules    : @[@"webdavs"]
+                                          };
     NSDictionary *VLCCastProtocol = @{ VLCBonjourProtocolName       : @"chromecast",
                                        VLCBonjourProtocolServiceName: @"_googlecast._tcp.",
                                        VLCBonjourIsRenderer         : @(YES),
@@ -212,6 +222,8 @@ static NSString * ipAddressAsStringForData(NSData * data)
                                       VLCSmbProtocol,
                                       VLCNfsProtocol,
                                       VLCSftpProtocol,
+                                      VLCWebDavProtocol,
+                                      VLCWebDavsProtocol,
                                       VLCCastProtocol];
 
     _rawNetServices = [[NSMutableArray alloc] init];
