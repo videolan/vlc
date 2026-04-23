@@ -209,6 +209,7 @@ modules/access/vcd/vcd.c
 modules/access/vdr.c
 modules/access/vnc.c
 modules/access/wasapi.c
+modules/access/webdav.c
 modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http-put.c

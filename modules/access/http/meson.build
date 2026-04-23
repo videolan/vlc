@@ -95,3 +95,12 @@ vlc_modules += {
     'sources' : files('access.c'),
     'link_with' : [vlc_http_lib]
 }
+
+#
+# WebDAV browsing module
+#
+vlc_modules += {
+    'name' : 'webdav',
+    'sources' : files('../webdav.c'),
+    'link_with' : [vlc_http_lib]
+}
