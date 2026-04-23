@@ -1100,8 +1100,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     if ( bSupported )
     {
         auto *iso_lang = vlc_find_iso639(metadata_payload.lang.c_str(), false);
-        if (iso_lang != nullptr)
-            msg_Dbg( &sys.demuxer, "Unknown language %s!", metadata_payload.lang.c_str() );
+        if (iso_lang == nullptr)
+            msg_Dbg( &sys.demuxer, "Unknown language '%s'!", metadata_payload.lang.c_str() );
         free(p_track->fmt.psz_language);
         p_track->fmt.psz_language = strdup(metadata_payload.lang.c_str());
 
