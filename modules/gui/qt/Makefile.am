@@ -955,7 +955,6 @@ libqt_plugin_la_RES = \
 	pixmaps/prefs/spref_medialibrary.png \
 	pixmaps/prefs/spref_subtitles.png \
 	pixmaps/prefs/spref_video.png \
-	pixmaps/sd/appletrailers.svg \
 	pixmaps/sd/assembleenationale.svg \
 	pixmaps/sd/capture-card.svg \
 	pixmaps/sd/directory.svg \
