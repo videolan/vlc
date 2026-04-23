@@ -50,6 +50,7 @@
 #import "preferences/VLCSimplePrefsController.h"
 
 #import "windows/VLCAboutWindowController.h"
+#import "windows/VLCConnectToServerDialog.h"
 #import "windows/VLCDetachedAudioWindow.h"
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCErrorWindowController.h"
@@ -350,6 +351,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_open_disc setTitle: _NS("Open Disc...")];
     [_open_net setTitle: _NS("Open Stream...")];
     [_open_capture setTitle: _NS("Open Capture Device...")];
+    [_connect_to_server setTitle: _NS("Connect to Server...")];
     [_open_recent setTitle: _NS("Open Recent")];
     [_close_window setTitle: _NS("Close Window")];
     [_convertandsave setTitle: _NS("Convert / Stream...")];
@@ -1334,6 +1336,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (IBAction)intfOpenCapture:(id)sender
 {
     [[VLCMain.sharedInstance open] openCapture];
+}
+
+- (IBAction)intfConnectToServer:(id)sender
+{
+    VLCConnectToServerDialog * const dialog = [[VLCConnectToServerDialog alloc] init];
+    [dialog show];
 }
 
 - (IBAction)savePlaylist:(id)sender

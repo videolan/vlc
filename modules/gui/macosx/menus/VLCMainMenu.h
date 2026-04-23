@@ -50,6 +50,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *open_disc;
 @property (readwrite, weak) IBOutlet NSMenuItem *open_net;
 @property (readwrite, weak) IBOutlet NSMenuItem *open_capture;
+@property (readwrite, weak) IBOutlet NSMenuItem *connect_to_server;
 @property (readwrite, weak) IBOutlet NSMenuItem *open_recent;
 @property (readwrite, weak) IBOutlet NSMenuItem *close_window;
 @property (readwrite, weak) IBOutlet NSMenuItem *convertandsave;
@@ -237,6 +238,7 @@
 - (IBAction)intfOpenDisc:(id)sender;
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
+- (IBAction)intfConnectToServer:(id)sender;
 - (IBAction)savePlaylist:(id)sender;
 - (IBAction)savePlayQueueToLibrary:(id)sender;
 

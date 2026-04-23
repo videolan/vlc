@@ -77,6 +77,7 @@
                 <outlet property="next" destination="5152" id="uop-ZB-n1Q"/>
                 <outlet property="normal_window" destination="1170" id="T6u-xA-21q"/>
                 <outlet property="openSubtitleFile" destination="5515" id="XNQ-8J-eQH"/>
+                <outlet property="connect_to_server" destination="cts0" id="cts-01-out"/>
                 <outlet property="open_capture" destination="3292" id="wtp-L5-xZc"/>
                 <outlet property="open_disc" destination="413" id="ak8-1y-ze4"/>
                 <outlet property="open_file" destination="816" id="iH5-bK-QzN"/>
@@ -290,6 +291,11 @@
                             <menuItem title="Open Capture Device..." keyEquivalent="r" id="3292">
                                 <connections>
                                     <action selector="intfOpenCapture:" target="-2" id="aLY-nh-hau"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Connect to Server..." keyEquivalent="k" id="cts0">
+                                <connections>
+                                    <action selector="intfConnectToServer:" target="-2" id="cts-02-act"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="2307">

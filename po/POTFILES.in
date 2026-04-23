@@ -604,6 +604,8 @@ modules/gui/macosx/views/VLCVolumeSliderCell.h
 modules/gui/macosx/views/VLCVolumeSliderCell.m
 modules/gui/macosx/windows/VLCAboutWindowController.h
 modules/gui/macosx/windows/VLCAboutWindowController.m
+modules/gui/macosx/windows/VLCConnectToServerDialog.h
+modules/gui/macosx/windows/VLCConnectToServerDialog.m
 modules/gui/macosx/windows/VLCDetachedAudioWindow.h
 modules/gui/macosx/windows/VLCDetachedAudioWindow.m
 modules/gui/macosx/windows/VLCErrorWindowController.h

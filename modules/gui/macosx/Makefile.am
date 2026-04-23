@@ -481,6 +481,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCVolumeSliderCell.m \
 	gui/macosx/windows/VLCAboutWindowController.h \
 	gui/macosx/windows/VLCAboutWindowController.m \
+	gui/macosx/windows/VLCConnectToServerDialog.h \
+	gui/macosx/windows/VLCConnectToServerDialog.m \
 	gui/macosx/windows/VLCDetachedAudioWindow.h \
 	gui/macosx/windows/VLCDetachedAudioWindow.m \
 	gui/macosx/windows/VLCErrorWindowController.h \
