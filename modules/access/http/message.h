@@ -108,6 +108,17 @@ w* @param msg the response to get the timestamp header from
 time_t vlc_http_msg_get_time(const struct vlc_http_msg *msg, const char *name);
 
 /**
+ * Parses an HTTP-date string.
+ *
+ * Accepts the three formats defined by RFC 7231 §7.1.1.1 (IMF-fixdate,
+ * obsolete RFC 850, and ANSI C asctime()).
+ *
+ * @param str NULL-terminated date string
+ * @return a timestamp value, or -1 on error.
+ */
+time_t vlc_http_mktime(const char *str);
+
+/**
  * Adds a timestamp header field.
  *
  * @param msg the request to add the header to
