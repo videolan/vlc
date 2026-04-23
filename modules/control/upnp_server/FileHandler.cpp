@@ -44,7 +44,7 @@
 
 // static constexpr char DLNA_TRANSFER_MODE[] = "transfermode.dlna.org";
 static constexpr char DLNA_CONTENT_FEATURE[] = "contentfeatures.dlna.org";
-static constexpr char DLNA_TIME_SEEK_RANGE[] = "timeseekrange.dlna.org";
+// static constexpr char DLNA_TIME_SEEK_RANGE[] = "timeseekrange.dlna.org";
 
 /// Convenient C++ replacement of vlc_ml_file_t to not have to deal with allocations
 struct MLFile
