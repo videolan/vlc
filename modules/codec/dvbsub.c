@@ -79,6 +79,7 @@
 #include <vlc_bits.h>
 
 #include <limits.h>
+#include <stdckdint.h>
 
 /* #define DEBUG_DVBSUB 1 */
 
@@ -960,10 +961,20 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
             free( p_region->p_pixbuf );
         }
 
-        p_region->p_pixbuf = xmalloc( i_height * i_width );
-        p_region->i_depth = 0;
-        b_fill = true;
+        size_t i_alloc;
+        if( ckd_mul( &i_alloc, i_width, i_height ) )
+        {
+            p_region->p_pixbuf = NULL;
+        }
+        else
+        {
+            p_region->p_pixbuf = malloc( i_alloc );
+            p_region->i_depth = 0;
+        }
+
+        b_fill = !!p_region->p_pixbuf;
     }
+
     if( p_region->i_depth &&
         ( ( p_region->i_depth != i_depth ) ||
           ( p_region->i_level_comp != i_level_comp ) ||
@@ -977,7 +988,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
     {
         int i_background = ( i_depth == 1 ) ? i_2_bg :
             ( ( i_depth == 2 ) ? i_4_bg : i_8_bg );
-        memset( p_region->p_pixbuf, i_background, i_width * i_height );
+        memset( p_region->p_pixbuf, i_background, (size_t)i_width * i_height );
     }
 
     p_region->i_width = i_width;
@@ -1371,7 +1382,7 @@ static void dvbsub_render_pdata( decoder_t *p_dec, dvbsub_region_t *p_region,
         return;
     }
 
-    p_pixbuf = p_region->p_pixbuf + i_y * p_region->i_width;
+    p_pixbuf = p_region->p_pixbuf + (size_t)i_y * p_region->i_width;
     bs_init( &bs, p_field, i_field );
 
     while( !bs_eof( &bs ) )
@@ -1712,9 +1723,9 @@ static subpicture_t *render( decoder_t *p_dec )
         }
 #endif
 
-        if( !p_region )
+        if( !p_region || !p_region->p_pixbuf )
         {
-            msg_Dbg( p_dec, "region %i not found", p_regiondef->i_id );
+            msg_Dbg( p_dec, "region %i not found or invalid", p_regiondef->i_id );
             continue;
         }
 
