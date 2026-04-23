@@ -765,7 +765,13 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
             }
             else
             {
+            if ( payload_len < 8 )
+            {
+                msg_Err(p_access, "Received length of fragmented data %" PRIu16 " is smaller than 8",payload_len);
+                goto error;
+            }
             payload_len -= 8;
+
             if ( fragment_id != tmp )
             {
                 msg_Warn(p_access, "Received fragment id does not match last seen fragment id : 0x%x expected vs 0x%x received",fragment_id,tmp);
