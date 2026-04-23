@@ -75,6 +75,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_sout.h>
+#include <vlc_arrays.h>
 
 #include <vlc_bits.h>
 
@@ -958,17 +959,17 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
         {
             msg_Dbg( p_dec, "region size changed (%dx%d->%dx%d)",
                      p_region->i_width, p_region->i_height, i_width, i_height );
-            free( p_region->p_pixbuf );
         }
 
         size_t i_alloc;
         if( ckd_mul( &i_alloc, i_width, i_height ) )
         {
+            free( p_region->p_pixbuf );
             p_region->p_pixbuf = NULL;
         }
         else
         {
-            p_region->p_pixbuf = malloc( i_alloc );
+            p_region->p_pixbuf = realloc_or_free( p_region->p_pixbuf, i_alloc );
             p_region->i_depth = 0;
         }
 
