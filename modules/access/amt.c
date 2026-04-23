@@ -737,7 +737,9 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
                 /* we can probably survive this (provided there is no fragmentation) since we calculate the length as the difference between the length of the received data and the length listed in the ip header */
             }
 
-            if ( b_is_fragmented && len < tunnel + 8 )
+            if ( b_is_fragmented )
+            {
+            if ( len < tunnel + 8 )
             {
                 msg_Err(p_access, "Received length of data %zd is smaller than minimum length for an ip header + fragmentation header (%d)",len, tunnel + 8);
                 goto error;
@@ -745,7 +747,7 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
 
             uint32_t tmp = 0;
             memcpy(&tmp,&pkt->p_buffer[AMT_HDR_LEN + IPv6_FIXED_HDR_LEN + 4],4);
-            if ( b_is_fragmented && !fragment_id )
+            if ( !fragment_id )
             {
                 /* this is the start of a fragment, payload len in the ipv6 header will be wrong */
                 payload_len = len - (tunnel + 8);
@@ -761,24 +763,22 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
 
                 msg_Dbg(p_access, "Start of new fragment, id is 0x%x (NETWORK BYTE ORDER) , first fragment's length is %u (%zd total - %d tunnel size) (mtu is %zd)",fragment_id, payload_len,len,tunnel,sys->mtu);
             }
-            else if ( b_is_fragmented && fragment_id != tmp )
+            else if ( fragment_id != tmp )
             {
                 msg_Warn(p_access, "Received fragment id does not match last seen fragment id : 0x%x expected vs 0x%x received",fragment_id,tmp);
                 payload_len -= 8; /* still try to receive it */
             }
-            else if ( b_is_fragmented )
+            else
             {
                 /* this is a subsequent fragment, the payload len in the ipv6 header is right, just need to subtract fragmentation header length */
                 payload_len -= 8;
             }
 
-            if ( b_is_fragmented && (pkt->p_buffer[AMT_HDR_LEN + IPv6_FIXED_HDR_LEN + 3] & 1) == 0 )
+            if ( (pkt->p_buffer[AMT_HDR_LEN + IPv6_FIXED_HDR_LEN + 3] & 1) == 0 )
             {
                 fragment_id = 0; /* no more fragments */
             }
-
-
-
+            }
         }
         else
         {
