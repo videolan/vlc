@@ -798,6 +798,11 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
         /* if its fragmented, payload_len will be set correctly before we get here */
         if ( !b_is_fragmented )
         {
+            if ( payload_len < UDP_HDR_LEN )
+            {
+                msg_Err(p_access, "Non-fragmented payload too small");
+                goto error;
+            }
             payload_len -= UDP_HDR_LEN;
         }
 
