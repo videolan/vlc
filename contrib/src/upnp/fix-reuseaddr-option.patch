@@ -1,7 +1,23 @@
-diff -ru upnp/upnp/src/ssdp/ssdp_server.c upnp-fixed/upnp/src/ssdp/ssdp_server.c
---- upnp/upnp/src/ssdp/ssdp_server.c	2022-08-03 16:05:12
-+++ upnp-fixed/upnp/src/ssdp/ssdp_server.c	2023-05-11 12:13:42
-@@ -928,6 +928,7 @@
+From b835526d3306cac7fe104e8ba460a138b2afc471 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Felix=20K=C3=BChne?= <fkuehne@videolan.org>
+Date: Thu, 11 May 2023 12:35:19 +0200
+Subject: [PATCH 4/7] disable usage of reuseaddr on iOS/tvOS and fix option
+
+Use of SO_REUSEADDR leads to a busy loop within libupnp and very high
+battery usage. This disables the option and actually fixes its
+functionality by patching the library. Patch to be upstreamed.
+
+According to App Store analytics, this is the most prominent source of
+high CPU load and battery use.
+---
+ upnp/src/ssdp/ssdp_server.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/upnp/src/ssdp/ssdp_server.c b/upnp/src/ssdp/ssdp_server.c
+index 28c7b5a1..f5f60b65 100644
+--- a/upnp/src/ssdp/ssdp_server.c
++++ b/upnp/src/ssdp/ssdp_server.c
+@@ -931,6 +931,7 @@ static int create_ssdp_sock_v4(
  
  		return UPNP_E_OUTOF_SOCKET;
  	}
@@ -9,7 +25,7 @@ diff -ru upnp/upnp/src/ssdp/ssdp_server.c upnp-fixed/upnp/src/ssdp/ssdp_server.c
  	onOff = 1;
  	ret = setsockopt(*ssdpSock,
  		SOL_SOCKET,
-@@ -945,6 +946,7 @@
+@@ -948,6 +949,7 @@ static int create_ssdp_sock_v4(
  		ret = UPNP_E_SOCKET_ERROR;
  		goto error_handler;
  	}
@@ -17,7 +33,7 @@ diff -ru upnp/upnp/src/ssdp/ssdp_server.c upnp-fixed/upnp/src/ssdp/ssdp_server.c
  	#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
  	onOff = 1;
  	ret = setsockopt(*ssdpSock,
-@@ -1133,6 +1135,7 @@
+@@ -1126,6 +1128,7 @@ static int create_ssdp_sock_v6(
  		return UPNP_E_OUTOF_SOCKET;
  	}
  	onOff = 1;
@@ -25,7 +41,7 @@ diff -ru upnp/upnp/src/ssdp/ssdp_server.c upnp-fixed/upnp/src/ssdp/ssdp_server.c
  	ret = setsockopt(*ssdpSock,
  		SOL_SOCKET,
  		SO_REUSEADDR,
-@@ -1149,6 +1152,7 @@
+@@ -1142,6 +1145,7 @@ static int create_ssdp_sock_v6(
  		ret = UPNP_E_SOCKET_ERROR;
  		goto error_handler;
  	}
@@ -33,7 +49,7 @@ diff -ru upnp/upnp/src/ssdp/ssdp_server.c upnp-fixed/upnp/src/ssdp/ssdp_server.c
  		#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
  	onOff = 1;
  	ret = setsockopt(*ssdpSock,
-@@ -1313,6 +1317,7 @@
+@@ -1306,6 +1310,7 @@ static int create_ssdp_sock_v6_ula_gua(
  		return UPNP_E_OUTOF_SOCKET;
  	}
  	onOff = 1;
@@ -41,7 +57,7 @@ diff -ru upnp/upnp/src/ssdp/ssdp_server.c upnp-fixed/upnp/src/ssdp/ssdp_server.c
  	ret = setsockopt(*ssdpSock,
  		SOL_SOCKET,
  		SO_REUSEADDR,
-@@ -1329,6 +1334,7 @@
+@@ -1322,6 +1327,7 @@ static int create_ssdp_sock_v6_ula_gua(
  		ret = UPNP_E_SOCKET_ERROR;
  		goto error_handler;
  	}
@@ -49,3 +65,6 @@ diff -ru upnp/upnp/src/ssdp/ssdp_server.c upnp-fixed/upnp/src/ssdp/ssdp_server.c
  		#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
  	onOff = 1;
  	ret = setsockopt(*ssdpSock,
+-- 
+2.52.0.windows.1
+

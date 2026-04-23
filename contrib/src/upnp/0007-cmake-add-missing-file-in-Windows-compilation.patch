@@ -1,7 +1,7 @@
-From 1ddb73d9366d51ebc5fd38345de705cbb944393a Mon Sep 17 00:00:00 2001
+From 9e54cdc85fff007de22c4f9de45d01a38ed13f84 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 16 Jan 2026 10:24:58 +0100
-Subject: [PATCH] cmake: add missing file in Windows compilation
+Subject: [PATCH 7/7] cmake: add missing file in Windows compilation
 
 It's compiled with the autotools build but not CMake.
 This is only useful when compiling for older targets than Windows Vista.
