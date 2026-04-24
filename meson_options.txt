@@ -789,6 +789,16 @@ option('asdcplib',
     value: 'auto',
     description: 'support DCP reading via asdcplib')
 
+option('opencv',
+       type: 'feature',
+       value: 'auto',
+       description: 'OpenCV library')
+
+option('sam3',
+       type: 'feature',
+       value: 'auto',
+       description: 'sam3.cpp inference library')
+
 # TODO: Missing v4l2
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode

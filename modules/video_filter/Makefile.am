@@ -124,6 +124,14 @@ video_filter_PLUGINS += \
 	librotate_plugin.la \
 	libdither_plugin.la
 
+libsam3_plugin_la_SOURCES = video_filter/sam3.cpp
+libsam3_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV4_CFLAGS)
+libsam3_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) -fexceptions
+libsam3_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+libsam3_plugin_la_LIBADD = $(LIBM) $(OPENCV4_LIBS)
+EXTRA_LTLIBRARIES += libsam3_plugin.la
+video_filter_LTLIBRARIES += $(LTLIBsam3)
+
 # macOS / iOS hardware video filters
 libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c codec/vt_utils.h
 libci_filters_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -DGL_SILENCE_DEPRECATION -DCI_SILENCE_GL_DEPRECATION

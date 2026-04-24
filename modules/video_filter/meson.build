@@ -401,3 +401,24 @@ vlc_modules += {
     'sources' : files('dither.c'),
     'dependencies' : [m_lib]
 }
+
+opencv_dep = dependency('opencv4',
+                        modules: ['opencv_core', 'opencv_imgproc', 'opencv_imgcodecs'],
+                        required: false,
+                        version: '>=4.0.0')
+
+sam3_dep = dependency('sam3',
+                      required: get_option('sam3'))
+
+if opencv_dep.found() and sam3_dep.found()
+    vlc_modules += {
+        'name' : 'sam3',
+        'sources' : files('sam3.cpp'),
+        'dependencies' : [
+            m_lib,
+            opencv_dep,
+            sam3_dep,
+        ],
+        'cpp_args' : [ '-fexceptions' ]
+    }
+endif

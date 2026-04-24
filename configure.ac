@@ -2230,6 +2230,10 @@ dnl  OpenCV wrapper and example filters
 dnl
 PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv > 2.0], (OpenCV (computer vision) filter), [auto])
 
+dnl
+dnl OpenCV4 + sam3 (SAM3 segmentation filter)
+dnl
+PKG_ENABLE_MODULES_VLC([OPENCV4], [sam3], [opencv4 >= 4.0.0 sam3], (OpenCV4 with sam3.cpp (SAM3 segmentation filter)), [auto])
 
 dnl
 dnl  libsmbclient plugin
