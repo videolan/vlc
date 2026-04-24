@@ -1351,17 +1351,21 @@ static void decode_object( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length 
 
                 if( p_region->p_object_defs[i].i_id != i_id ) continue;
 
-                p_region->p_object_defs[i].psz_text =
-                    xrealloc( p_region->p_object_defs[i].psz_text,
-                             i_number_of_codes + 1 );
+                char *psz_text = p_region->p_object_defs[i].psz_text;
+
+                p_region->p_object_defs[i].psz_text = psz_text =
+                        realloc_or_free( psz_text, i_number_of_codes + 1 );
+
+                if( !psz_text )
+                    continue;
 
                 /* FIXME 16bits -> char ??? See Preamble */
                 for( j = 0; j < i_number_of_codes; j++ )
                 {
-                    p_region->p_object_defs[i].psz_text[j] = (char)(bs_read( s, 16 ) & 0xFF);
+                    psz_text[j] = (char)(bs_read( s, 16 ) & 0xFF);
                 }
                 /* Null terminate the string */
-                p_region->p_object_defs[i].psz_text[j] = 0;
+                psz_text[j] = 0;
             }
         }
     }
