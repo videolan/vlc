@@ -784,31 +784,31 @@ vlc_module_begin()
     set_description(N_("Mac OS X hardware video filters"))
 
     add_submodule()
-    set_callback_video_filter(OpenAdjust)
+    set_callback_video_filter_priority(OpenAdjust, 2)
     add_shortcut("adjust")
 
     add_submodule()
-    set_callback_video_filter(OpenInvert)
+    set_callback_video_filter_priority(OpenInvert, 2)
     add_shortcut("invert")
 
     add_submodule()
-    set_callback_video_filter(OpenPosterize)
+    set_callback_video_filter_priority(OpenPosterize, 2)
     add_shortcut("posterize")
 
     add_submodule()
-    set_callback_video_filter(OpenSepia)
+    set_callback_video_filter_priority(OpenSepia, 2)
     add_shortcut("sepia")
 
     add_submodule()
-    set_callback_video_filter(OpenSharpen)
+    set_callback_video_filter_priority(OpenSharpen, 2)
     add_shortcut("sharpen")
 
     add_submodule()
-    set_callback_video_filter(OpenPsychedelic)
+    set_callback_video_filter_priority(OpenPsychedelic, 2)
     add_shortcut("psychedelic")
 
     add_submodule()
-    set_callback_video_filter(OpenCustom)
+    set_callback_video_filter_priority(OpenCustom, 2)
     add_shortcut("ci")
     add_string("ci-filter", "CIComicEffect", CI_CUSTOM_FILTER_TEXT, CI_CUSTOM_FILTER_LONGTEXT)
 vlc_module_end()
