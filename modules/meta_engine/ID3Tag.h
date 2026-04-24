@@ -20,6 +20,8 @@
 #ifndef ID3TAG_H
 #define ID3TAG_H
 
+#include <limits.h>
+
 static uint32_t ID3TAG_ReadSize( const uint8_t *p_buffer, bool b_syncsafe )
 {
     if( !b_syncsafe )
@@ -41,17 +43,30 @@ static bool ID3TAG_IsTag( const uint8_t *p_buffer, bool b_footer )
 static size_t ID3TAG_Parse( const uint8_t *p_peek, size_t i_peek,
                             int (*pf_callback)(uint32_t, const uint8_t *, size_t, void *), void *p_priv )
 {
-    size_t i_total_size = 0;
-    uint32_t i_ID3size = 0;
-    if( i_peek > 10 && ID3TAG_IsTag( p_peek, false ) )
+    if( i_peek < 10 )
+        return 0; /* not enough peek */
+    if( !ID3TAG_IsTag( p_peek, false ) )
+        return 0; /* not an ID3 tag */
+
+    uint32_t i_ID3size = ID3TAG_ReadSize( &p_peek[6], true );
+    if( i_ID3size > i_peek - 10 )
+        return 0; /* not enough peek */
+#if UINT32_MAX >= SIZE_MAX
+    if( i_ID3size > SIZE_MAX - 10 )
+        return 0; /* total size overflow */
+#endif
+
+    size_t i_total_size = i_ID3size + 10;
+    /* Count footer if any */
+    if( i_peek - i_total_size >= 10 &&
+        ID3TAG_IsTag( &p_peek[i_total_size], true ) )
+    {
+        i_total_size += 10;
+    }
+
     {
         const uint8_t i_ID3major = p_peek[3];
         const uint8_t i_ID3flags = p_peek[5];
-        i_ID3size = ID3TAG_ReadSize( &p_peek[6], true );
-        if( i_ID3size > i_peek - 10 )
-            return 0;
-        i_total_size = i_ID3size + 10;
-
         const uint8_t *p_frame = &p_peek[10];
 
         if( i_ID3major >= 3 && i_ID3major <= 4 && (i_ID3flags & 0x40) ) /* ext header */
@@ -87,13 +102,6 @@ static size_t ID3TAG_Parse( const uint8_t *p_peek, size_t i_peek,
             p_frame += i_framesize;
             i_ID3size -= i_framesize;
         }
-    }
-
-    /* Count footer if any */
-    if( i_total_size && i_peek - i_total_size >= 10 &&
-        ID3TAG_IsTag( &p_peek[i_total_size], true ) )
-    {
-        i_total_size += 10;
     }
 
     return i_total_size;
