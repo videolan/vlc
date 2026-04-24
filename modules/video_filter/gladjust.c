@@ -29,8 +29,6 @@
 #include <vlc_modules.h>
 #include <vlc_opengl.h>
 #include <vlc_filter.h>
-#include <vlc_configuration.h>
-
 #include <vlc_opengl_filter.h>
 #include "video_output/opengl/gl_api.h"
 #include "video_output/opengl/gl_common.h"
@@ -52,33 +50,24 @@ struct sys {
         GLint hue;
         GLint saturation;
         GLint gamma;
-        GLint brightness_threshold;
     } loc;
+
+    /* Outer filter_t where "contrast"/... live. */
+    vlc_object_t *outer;
+
     _Atomic float contrast;
     _Atomic float brightness;
     _Atomic float hue;
     _Atomic float saturation;
     _Atomic float gamma;
-    atomic_bool brightness_threshold;
-};
-
-static const char *const ppsz_filter_options[] = {
-    "contrast", "brightness", "hue", "saturation", "gamma",
-    "brightness-threshold", NULL
 };
 
 static int varFloatCallback(vlc_object_t *p_this, char const *psz_variable,
-                     vlc_value_t oldvalue, vlc_value_t newvalue, void *p_data) {
+                            vlc_value_t oldvalue, vlc_value_t newvalue,
+                            void *p_data)
+{
     _Atomic float *atom = p_data;
     atomic_store_explicit(atom, newvalue.f_float, memory_order_relaxed);
-    (void) p_this; (void) psz_variable; (void) oldvalue;
-    return VLC_SUCCESS;
-}
-
-static int varBoolCallback(vlc_object_t *p_this, char const *psz_variable,
-                    vlc_value_t oldvalue, vlc_value_t newvalue, void *p_data) {
-    atomic_bool *atom = p_data;
-    atomic_store_explicit(atom, newvalue.b_bool, memory_order_relaxed);
     (void) p_this; (void) psz_variable; (void) oldvalue;
     return VLC_SUCCESS;
 }
@@ -143,8 +132,6 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
                   atomic_load_explicit(&sys->saturation, memory_order_relaxed));
     vt->Uniform1f(sys->loc.gamma,
                   1.f / atomic_load_explicit(&sys->gamma, memory_order_relaxed));
-    vt->Uniform1i(sys->loc.brightness_threshold,
-                  atomic_load_explicit(&sys->brightness_threshold, memory_order_relaxed));
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -156,19 +143,28 @@ static void
 Close(struct vlc_gl_filter *filter) {
     struct sys *sys = filter->sys;
 
+    var_DelCallback(sys->outer, "contrast",   varFloatCallback, &sys->contrast);
+    var_DelCallback(sys->outer, "brightness", varFloatCallback, &sys->brightness);
+    var_DelCallback(sys->outer, "hue",        varFloatCallback, &sys->hue);
+    var_DelCallback(sys->outer, "saturation", varFloatCallback, &sys->saturation);
+    var_DelCallback(sys->outer, "gamma",      varFloatCallback, &sys->gamma);
+
     const opengl_vtable_t *vt = &filter->api->vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
-    var_DelCallback( filter, "contrast", varFloatCallback, &sys->contrast );
-    var_DelCallback( filter, "brightness", varFloatCallback, &sys->brightness );
-    var_DelCallback( filter, "hue", varFloatCallback, &sys->hue );
-    var_DelCallback( filter, "saturation", varFloatCallback, &sys->saturation );
-    var_DelCallback( filter, "gamma", varFloatCallback, &sys->gamma );
-    var_DelCallback( filter, "brightness-threshold", varBoolCallback,
-                     &sys->brightness_threshold );
 
     vlc_gl_sampler_Delete(sys->sampler);
     free(sys);
+}
+
+#define GLADJUST_OUTER_MARKER "gladjust-outer"
+static vlc_object_t *FindOuterFilter(struct vlc_gl_filter *filter)
+{
+    vlc_object_t *obj = VLC_OBJECT(filter);
+    while ((obj = vlc_object_parent(obj)) != NULL)
+        if (var_Type(obj, GLADJUST_OUTER_MARKER) != 0)
+            return obj;
+    return NULL;
 }
 
 static vlc_gl_filter_open_fn Open;
@@ -176,7 +172,12 @@ static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
      const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
 {
+    (void) config;
     (void) size_out;
+
+    vlc_object_t *outer = FindOuterFilter(filter);
+    if (outer == NULL)
+        return VLC_EGENERIC;
 
     filter->config.filter_planes = false;
     filter->config.blend = false;
@@ -195,32 +196,25 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     }
 
     sys->sampler = sampler;
+    sys->outer = outer;
     filter->sys = sys;
 
-    config_ChainParse(filter, "", ppsz_filter_options, config);
+    atomic_init(&sys->contrast,
+                var_CreateGetFloatCommand(outer, "contrast"));
+    atomic_init(&sys->brightness,
+                var_CreateGetFloatCommand(outer, "brightness"));
+    atomic_init(&sys->hue,
+                var_CreateGetFloatCommand(outer, "hue"));
+    atomic_init(&sys->saturation,
+                var_CreateGetFloatCommand(outer, "saturation"));
+    atomic_init(&sys->gamma,
+                var_CreateGetFloatCommand(outer, "gamma"));
 
-    atomic_init( &sys->contrast,
-                 var_CreateGetFloatCommand( filter, "contrast" ) );
-    atomic_init( &sys->brightness,
-                 var_CreateGetFloatCommand( filter, "brightness" ) );
-    atomic_init( &sys->hue, var_CreateGetFloatCommand( filter, "hue" ) );
-    atomic_init( &sys->saturation,
-                 var_CreateGetFloatCommand( filter, "saturation" ) );
-    atomic_init( &sys->gamma,
-                 var_CreateGetFloatCommand( filter, "gamma" ) );
-    atomic_init( &sys->brightness_threshold,
-                 var_CreateGetBoolCommand( filter, "brightness-threshold" ) );
-
-    var_AddCallback( filter, "contrast", varFloatCallback,
-                     &sys->contrast );
-    var_AddCallback( filter, "brightness", varFloatCallback,
-                     &sys->brightness );
-    var_AddCallback( filter, "hue", varFloatCallback, &sys->hue );
-    var_AddCallback( filter, "saturation", varFloatCallback,
-                     &sys->saturation );
-    var_AddCallback( filter, "gamma", varFloatCallback, &sys->gamma );
-    var_AddCallback( filter, "brightness-threshold", varBoolCallback,
-                     &sys->brightness_threshold );
+    var_AddCallback(outer, "contrast",   varFloatCallback, &sys->contrast);
+    var_AddCallback(outer, "brightness", varFloatCallback, &sys->brightness);
+    var_AddCallback(outer, "hue",        varFloatCallback, &sys->hue);
+    var_AddCallback(outer, "saturation", varFloatCallback, &sys->saturation);
+    var_AddCallback(outer, "gamma",      varFloatCallback, &sys->gamma);
 
     static const char *const VERTEX_SHADER =
         "attribute vec2 vertex_pos;\n"
@@ -238,7 +232,6 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "uniform float hue;\n"
         "uniform float saturation;\n"
         "uniform float gamma;\n"
-        "uniform bool brightness_threshold;\n"
         "\n"
         /* expects normalized rgb */
         "vec3 rgb_to_hsl(float r, float g, float b) {\n"
@@ -294,20 +287,14 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "\n"
         "void main() {\n"
         "  vec3 color = vlc_texture(tex_coords).rgb;\n"
-        "  if (!brightness_threshold) {\n"
-        "    color = rgb_to_hsl(color.r, color.g, color.b);\n"
-        "    color = hsl_to_rgb(\n"
-        "      mod(color.r - hue, 360.f),\n"
-        "      clamp(color.g * saturation, 0.0f, 1.f),\n"
-        "      clamp(color.b, 0.f, 1.f)\n"
-        "    );\n"
-        "    color = pow(clamp(contrast * color + brightness + 0.5f\n"
-        "                      - contrast * 0.5f, 0.f, 1.f), vec3(gamma));\n"
-        "  } else {\n"
-        "      color.r = color.r < brightness ? 0.f : 1.f;\n"
-        "      color.g = color.g < brightness ? 0.f : 1.f;\n"
-        "      color.b = color.b < brightness ? 0.f : 1.f;\n"
-        "  }\n"
+        "  color = rgb_to_hsl(color.r, color.g, color.b);\n"
+        "  color = hsl_to_rgb(\n"
+        "    mod(color.r - hue, 360.f),\n"
+        "    clamp(color.g * saturation, 0.0f, 1.f),\n"
+        "    clamp(color.b, 0.f, 1.f)\n"
+        "  );\n"
+        "  color = pow(clamp(contrast * color + brightness + 0.5f\n"
+        "                    - contrast * 0.5f, 0.f, 1.f), vec3(gamma));\n"
         "  gl_FragColor = vec4(color, 0.f);\n"
         "}\n";
 
@@ -368,9 +355,6 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     sys->loc.gamma = vt->GetUniformLocation(program_id, "gamma");
     assert(sys->loc.gamma != -1);
 
-    sys->loc.brightness_threshold = vt->GetUniformLocation(program_id, "brightness_threshold");
-    assert(sys->loc.brightness_threshold != -1);
-
     sys->loc.tex_coords_in = vt->GetAttribLocation(program_id, "tex_coords_in");
     assert(sys->loc.tex_coords_in != -1);
 
@@ -390,10 +374,6 @@ error:
 }
 
 
-#define THRES_TEXT N_("Brightness threshold")
-#define THRES_LONGTEXT N_("When this mode is enabled, pixels will be " \
-        "shown as black or white. The threshold value will be the brightness " \
-        "defined below." )
 #define CONT_TEXT N_("Image contrast (0-2)")
 #define CONT_LONGTEXT N_("Set the image contrast, between 0 and 2. Defaults to 1.")
 #define HUE_TEXT N_("Image hue (-180..180)")
@@ -412,6 +392,8 @@ static int OpenVideoFilter(filter_t *filter)
      && !var_InheritBool(filter, "video-filter-opengl"))
         return VLC_EGENERIC;
 
+    var_Create(filter, GLADJUST_OUTER_MARKER, VLC_VAR_VOID);
+
     module_t *module = vlc_gl_WrapOpenGLFilter(filter, "gladjust");
     return module ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -426,7 +408,6 @@ vlc_module_begin()
     add_float_with_range( "hue", 0, -180., +180., HUE_TEXT, HUE_LONGTEXT )
     add_float_with_range( "saturation", 1.0, 0.0, 3.0, SAT_TEXT, SAT_LONGTEXT )
     add_float_with_range( "gamma", 1.0, 0.01, 10.0, GAMMA_TEXT, GAMMA_LONGTEXT )
-    add_bool( "brightness-threshold", false, THRES_TEXT, THRES_LONGTEXT )
     add_bool( "video-filter-opengl", true,
               N_("Use OpenGL video filters"),
               N_("Use OpenGL accelerated video filters for software chromas.") )
