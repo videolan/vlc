@@ -1140,14 +1140,14 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
     add_submodule()
-    set_callback_video_filter(OpenAdjust)
+    set_callback_video_filter_priority(OpenAdjust, 2)
     add_shortcut("adjust")
 
     add_submodule()
     set_deinterlace_callback(OpenDeinterlace)
 
     add_submodule()
-    set_callback_video_filter(OpenDenoiseFilter)
+    set_callback_video_filter_priority(OpenDenoiseFilter, 2)
     /* Note: Skip label translation - too technical */
     add_float_with_range("denoise-sigma", 1.f, .0f, 2.f,
                          "Denoise strength",
@@ -1155,7 +1155,7 @@ vlc_module_begin()
     add_shortcut("denoise")
 
     add_submodule()
-    set_callback_video_filter(OpenSharpenFilter)
+    set_callback_video_filter_priority(OpenSharpenFilter, 2)
     add_shortcut("sharpen")
 
     add_submodule()
