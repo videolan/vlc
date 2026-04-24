@@ -27,6 +27,7 @@ musepack: musepack_src_r$(MUSE_REV).tar.gz .sum-mpcdec
 	$(APPLY) $(SRC)/mpcdec/0006-adapted-patch-0001-shared.patch-from-buildroot.patch
 	$(APPLY) $(SRC)/mpcdec/0007-only-build-libmpcdec.patch
 	$(APPLY) $(SRC)/mpcdec/0008-mpc_demux-avoid-using-a-shift-on-negative-value.patch
+	$(APPLY) $(SRC)/mpcdec/0009-mpc_decoder-add-sanity-checks-on-the-Cc-access.patch
 	$(MOVE)
 
 .mpcdec: musepack toolchain.cmake

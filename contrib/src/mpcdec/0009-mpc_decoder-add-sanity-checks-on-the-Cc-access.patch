@@ -1,0 +1,57 @@
+From 7141ac9dcc07ed59c663404bd8473c1ac4170a2d Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 24 Apr 2026 10:35:21 +0200
+Subject: [PATCH 9/9] mpc_decoder: add sanity checks on the Cc access
+
+Cc is __Cc shifted by one value. It has 1+18 values.
+---
+ libmpcdec/mpc_decoder.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/libmpcdec/mpc_decoder.c b/libmpcdec/mpc_decoder.c
+index 5f56c00..022062a 100644
+--- a/libmpcdec/mpc_decoder.c
++++ b/libmpcdec/mpc_decoder.c
+@@ -220,8 +220,8 @@ mpc_decoder_requantisierung(mpc_decoder *d)
+         R  = d->Q[Band].R;
+         /************************** MS-coded **************************/
+         if ( d->MS_Flag [Band] ) {
+-            if ( d->Res_L [Band] ) {
+-                if ( d->Res_R [Band] ) {    // M!=0, S!=0
++            if ( d->Res_L [Band] == -1 || ( d->Res_L [Band] > 0 && d->Res_L [Band] < 18 ) ) {
++                if ( d->Res_R [Band] == -1 || ( d->Res_R [Band] > 0 && d->Res_R [Band] < 18 ) ) {    // M!=0, S!=0
+                     facL = MPC_MULTIPLY_SCF( Cc[d->Res_L[Band]] , d->SCF_Index_L[Band][0] & 0xFF);
+ 					facR = MPC_MULTIPLY_SCF( Cc[d->Res_R[Band]] , d->SCF_Index_R[Band][0] & 0xFF);
+                     for ( n = 0; n < 12; n++, YL += 32, YR += 32 ) {
+@@ -255,7 +255,7 @@ mpc_decoder_requantisierung(mpc_decoder *d)
+                     }
+                 }
+             } else {
+-                if (d->Res_R[Band])    // M==0, S!=0
++                if ( d->Res_R[Band] == -1 || ( d->Res_R[Band] > 0 && d->Res_R[Band] < 18 ) )    // M==0, S!=0
+                 {
+ 					facR = MPC_MULTIPLY_SCF( Cc[d->Res_R[Band]] , d->SCF_Index_R[Band][0] & 0xFF);
+                     for ( n = 0; n < 12; n++, YL += 32, YR += 32 ) {
+@@ -278,8 +278,8 @@ mpc_decoder_requantisierung(mpc_decoder *d)
+         }
+         /************************** LR-coded **************************/
+         else {
+-            if ( d->Res_L [Band] ) {
+-                if ( d->Res_R [Band] ) {    // L!=0, R!=0
++            if ( d->Res_L [Band] == -1 || ( d->Res_L [Band] > 0 && d->Res_L [Band] < 18 ) ) {
++                if ( d->Res_R [Band] == -1 || ( d->Res_R [Band] > 0 && d->Res_R [Band] < 18 ) ) {    // L!=0, R!=0
+ 					facL = MPC_MULTIPLY_SCF( Cc[d->Res_L[Band]] , d->SCF_Index_L[Band][0] & 0xFF);
+ 					facR = MPC_MULTIPLY_SCF( Cc[d->Res_R[Band]] , d->SCF_Index_R[Band][0] & 0xFF);
+                     for (n = 0; n < 12; n++, YL += 32, YR += 32 ) {
+@@ -317,7 +317,7 @@ mpc_decoder_requantisierung(mpc_decoder *d)
+                 }
+             }
+             else {
+-                if ( d->Res_R [Band] ) {    // L==0, R!=0
++                if ( d->Res_R [Band] == -1 || ( d->Res_R [Band] > 0 && d->Res_R [Band] < 18 ) ) {    // L==0, R!=0
+ 					facR = MPC_MULTIPLY_SCF( Cc[d->Res_R[Band]] , d->SCF_Index_R[Band][0] & 0xFF);
+                     for ( n = 0; n < 12; n++, YL += 32, YR += 32 ) {
+                         *YL = 0;
+-- 
+2.52.0.windows.1
+
