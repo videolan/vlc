@@ -89,16 +89,16 @@ static size_t ID3TAG_Parse( const uint8_t *p_peek, size_t i_peek,
     while( frame_length > 10 )
     {
         uint32_t i_tagname = VLC_FOURCC( p_frame[0], p_frame[1], p_frame[2], p_frame[3] );
-        uint32_t i_framesize = ID3TAG_ReadSize( &p_frame[4], i_ID3major != 3 ) + 10;
-        if( i_framesize > frame_length )
+        uint32_t i_framesize = ID3TAG_ReadSize( &p_frame[4], i_ID3major != 3 );
+        if( i_framesize + 10 > frame_length )
             return 0;
 
-        if( i_framesize > 10 &&
-            pf_callback( i_tagname, &p_frame[10], i_framesize - 10, p_priv ) != VLC_SUCCESS )
+        if( i_framesize + 10 > 10 &&
+            pf_callback( i_tagname, &p_frame[10], i_framesize, p_priv ) != VLC_SUCCESS )
             break;
 
-        p_frame += i_framesize;
-        frame_length -= i_framesize;
+        p_frame += i_framesize + 10;
+        frame_length -= i_framesize + 10;
     }
 
     return i_total_size;
