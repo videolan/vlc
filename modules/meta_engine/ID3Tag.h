@@ -93,7 +93,7 @@ static size_t ID3TAG_Parse( const uint8_t *p_peek, size_t i_peek,
         if( i_framesize > frame_length - 10 )
             return 0;
 
-        if( i_framesize + 10 > 10 &&
+        if( i_framesize != 0 &&
             pf_callback( i_tagname, &p_frame[10], i_framesize, p_priv ) != VLC_SUCCESS )
             break;
 
