@@ -859,14 +859,15 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s, uint16_t i_segme
     p_sys->b_page = true;
 
     /* Number of regions */
-    p_sys->p_page->i_region_defs = (i_segment_length - 2) / 6;
+    uint16_t i_region_defs = (i_segment_length - 2) / 6;
 
-    if( p_sys->p_page->i_region_defs == 0 ) return;
+    if( i_region_defs == 0 ) return;
 
     p_sys->p_page->p_region_defs =
-        vlc_alloc( p_sys->p_page->i_region_defs, sizeof(dvbsub_regiondef_t) );
+        vlc_alloc( i_region_defs, sizeof(dvbsub_regiondef_t) );
     if( p_sys->p_page->p_region_defs )
     {
+        p_sys->p_page->i_region_defs = i_region_defs;
         for( i = 0; i < p_sys->p_page->i_region_defs; i++ )
         {
             p_sys->p_page->p_region_defs[i].i_id = bs_read( s, 8 );
