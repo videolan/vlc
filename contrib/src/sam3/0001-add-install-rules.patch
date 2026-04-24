@@ -1,0 +1,79 @@
+From ce2cf44004c579d02517fa196a592b153033e2f7 Thu Apr 23 21:48:04 2026
+From: Brandon Li <brandonli2006ma@gmail.com>
+Date: Thu, 23 Apr 2026 21:48:04 +0000
+Subject: [PATCH] Use external ggml and add install rules
+---
+ CMakeLists.txt | 25 ++++++++++++++++++-------
+ sam3.pc.in     | 11 +++++++++++
+ 2 files changed, 29 insertions(+), 7 deletions(-)
+ create mode 100644 sam3.pc.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0006638..1111111 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -9,14 +9,9 @@ if(NOT CMAKE_BUILD_TYPE)
+     set(CMAKE_BUILD_TYPE Release)
+ endif()
+
+-# ggml options — enable Metal on Apple
+ option(SAM3_METAL "Enable Metal backend" ON)
+-if(APPLE AND SAM3_METAL)
+-    set(GGML_METAL        ON CACHE BOOL "" FORCE)
+-    set(GGML_METAL_EMBED_LIBRARY ON CACHE BOOL "" FORCE)
+-endif()
+
+-add_subdirectory(ggml)
++find_package(ggml REQUIRED CONFIG)
+
+ # sam3 static library
+ add_library(sam3 STATIC sam3.cpp sam3.h)
+@@ -24,7 +19,7 @@ target_include_directories(sam3 PUBLIC
+     ${CMAKE_CURRENT_SOURCE_DIR}
+     ${CMAKE_CURRENT_SOURCE_DIR}/stb
+ )
+-target_link_libraries(sam3 PUBLIC ggml)
++target_link_libraries(sam3 PUBLIC ggml::ggml ggml::ggml-cpu ggml::ggml-base)
+ target_compile_features(sam3 PUBLIC cxx_std_14)
+
+ # Examples (only when top-level)
+@@ -38,3 +33,19 @@ option(SAM3_BUILD_TESTS "Build test executables" OFF)
+ if(SAM3_BUILD_TESTS)
+     add_subdirectory(tests)
+ endif()
++
++include(GNUInstallDirs)
++
++install(TARGETS sam3
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++)
++install(FILES sam3.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++
++configure_file(
++    ${CMAKE_CURRENT_SOURCE_DIR}/sam3.pc.in
++    ${CMAKE_CURRENT_BINARY_DIR}/sam3.pc
++    @ONLY
++)
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sam3.pc
++    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+diff --git a/sam3.pc.in b/sam3.pc.in
+new file mode 100644
+index 0000000..2222222
+--- /dev/null
++++ b/sam3.pc.in
+@@ -0,0 +1,11 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
++includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
++
++Name: sam3
++Description: Segment Anything Model 3 inference library
++Version: @PROJECT_VERSION@
++Requires: ggml
++Libs: -L${libdir} -lsam3
++Cflags: -I${includedir}
+--
+2.43.0
+
