@@ -147,7 +147,7 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
     }
 
     /* Skipped ID3 if any */
-    while(sz > 10 && ID3TAG_IsTag(data, false))
+    while(ID3TAG_IsTag(data, sz, false))
     {
         size_t tagsize = ID3TAG_Parse(data, sz, ID3Callback, this);
         if(tagsize >= sz || tagsize == 0)

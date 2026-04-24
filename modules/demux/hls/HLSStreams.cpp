@@ -112,7 +112,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 {
     if(b_first && p_block)
     {
-        while(p_block->i_buffer >= 10 && ID3TAG_IsTag(p_block->p_buffer, false))
+        while(ID3TAG_IsTag(p_block->p_buffer, p_block->i_buffer, false))
         {
             size_t i_size = ID3TAG_Parse( p_block->p_buffer, p_block->i_buffer,
                                           ID3TAG_Parse_Handler, static_cast<void *>(this) );

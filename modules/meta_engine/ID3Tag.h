@@ -32,9 +32,9 @@ static uint32_t ID3TAG_ReadSize( const uint8_t *p_buffer, bool b_syncsafe )
             (( (uint32_t)p_buffer[0] & 0x7F ) << 21);
 }
 
-static bool ID3TAG_IsTag( const uint8_t *p_buffer, bool b_footer )
+static bool ID3TAG_IsTag( const uint8_t *p_buffer, size_t buffer_len, bool b_footer )
 {
-    return( memcmp(p_buffer, (b_footer) ? "3DI" : "ID3", 3) == 0 &&
+    return( buffer_len >= 10 && memcmp(p_buffer, (b_footer) ? "3DI" : "ID3", 3) == 0 &&
             p_buffer[3] < 0xFF &&
             p_buffer[4] < 0xFF &&
            ((GetDWBE(&p_buffer[6]) & 0x80808080) == 0) );
@@ -43,9 +43,7 @@ static bool ID3TAG_IsTag( const uint8_t *p_buffer, bool b_footer )
 static size_t ID3TAG_Parse( const uint8_t *p_peek, size_t i_peek,
                             int (*pf_callback)(uint32_t, const uint8_t *, size_t, void *), void *p_priv )
 {
-    if( i_peek < 10 )
-        return 0; /* not enough peek */
-    if( !ID3TAG_IsTag( p_peek, false ) )
+    if( !ID3TAG_IsTag( p_peek, i_peek, false ) )
         return 0; /* not an ID3 tag */
 
     uint32_t i_ID3size = ID3TAG_ReadSize( &p_peek[6], true );
@@ -58,8 +56,8 @@ static size_t ID3TAG_Parse( const uint8_t *p_peek, size_t i_peek,
 
     size_t i_total_size = i_ID3size + 10;
     /* Count footer if any */
-    if( i_peek - i_total_size >= 10 &&
-        ID3TAG_IsTag( &p_peek[i_total_size], true ) )
+    if( i_peek > i_total_size &&
+        ID3TAG_IsTag( &p_peek[i_total_size], i_peek - i_total_size, true ) )
     {
         i_total_size += 10;
     }
