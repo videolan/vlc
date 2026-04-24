@@ -1001,17 +1001,25 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
 
     /* List of objects in the region */
     i_processed_length = 10;
+
+    /* Entry can be 6 or 8 bytes */
+    unsigned max_object_defs;
+    if( i_segment_length < 10 )
+        max_object_defs = 0;
+    else
+        max_object_defs = (i_segment_length - i_processed_length) / 6;
+    p_region->i_object_defs = 0;
+    p_region->p_object_defs = realloc_or_free( p_region->p_object_defs,
+                                               max_object_defs * sizeof(dvbsub_objectdef_t) );
+    if( !p_region->p_object_defs )
+        return;
+
     while( i_processed_length < i_segment_length )
     {
         dvbsub_objectdef_t *p_obj;
 
-        /* We create a new object */
-        p_region->i_object_defs++;
-        p_region->p_object_defs = xrealloc( p_region->p_object_defs,
-                     sizeof(dvbsub_objectdef_t) * p_region->i_object_defs );
-
         /* We parse object properties */
-        p_obj = &p_region->p_object_defs[p_region->i_object_defs - 1];
+        p_obj = &p_region->p_object_defs[p_region->i_object_defs++];
         p_obj->i_id         = bs_read( s, 16 );
         p_obj->i_type       = bs_read( s, 2 );
         bs_skip( s, 2 ); /* Provider */
