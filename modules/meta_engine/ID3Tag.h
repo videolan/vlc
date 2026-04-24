@@ -66,7 +66,7 @@ static size_t ID3TAG_Parse( const uint8_t *p_peek, size_t i_peek,
     const uint8_t i_ID3flags = p_peek[5];
     const uint8_t *p_frame = &p_peek[10];
 
-    if( i_ID3major >= 3 && i_ID3major <= 4 && (i_ID3flags & 0x40) ) /* ext header */
+    if( (i_ID3major == 3 || i_ID3major == 4) && (i_ID3flags & 0x40) ) /* ext header */
     {
         if( i_ID3size < 6 ) /* can't be less than 6 */
             return 0;
