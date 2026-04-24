@@ -1,0 +1,54 @@
+From b250b43cfa8ee3b7cf9bf1d7d613aa4e69b54de5 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 24 Apr 2026 09:10:11 +0200
+Subject: [PATCH 8/8] mpc_demux: avoid using a shift on negative value
+
+This is undefined behavior.
+Just use the actual value as a uint32_t constant as it's used on uint32_t values.
+---
+ libmpcdec/mpc_demux.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/libmpcdec/mpc_demux.c b/libmpcdec/mpc_demux.c
+index c28a9a0..14e312c 100644
+--- a/libmpcdec/mpc_demux.c
++++ b/libmpcdec/mpc_demux.c
+@@ -34,6 +34,7 @@
+ 
+ #include <math.h>
+ #include <string.h>
++#include <stdint.h>
+ #include <mpc/streaminfo.h>
+ #include <mpc/mpcdec.h>
+ #include <mpc/minimax.h>
+@@ -78,6 +79,7 @@ static mpc_int32_t mpc_unread_bytes_unchecked(mpc_demux * d) {
+ 	return d->bytes_total + d->buffer - d->bits_reader.buff - ((8 - d->bits_reader.count) >> 3);
+ }
+ 
++#define BUFFER_SWAP_MASK  UINT32_C(0xFFFFFFFC)
+ 
+ // Returns the number of bytes available in the buffer.
+ static mpc_uint32_t
+@@ -99,8 +101,8 @@ mpc_demux_fill(mpc_demux * d, mpc_uint32_t min_bytes, int flags)
+ 		mpc_uint32_t bytesread;
+ 
+ 		if (flags & MPC_BUFFER_SWAP) {
+-			bytes2read &= -1 << 2;
+-			offset = (unread_bytes + 3) & ( -1 << 2);
++			bytes2read &= BUFFER_SWAP_MASK;
++			offset = (unread_bytes + 3) & ( BUFFER_SWAP_MASK);
+ 			offset -= unread_bytes;
+ 		}
+ 
+@@ -152,7 +154,7 @@ mpc_demux_seek(mpc_demux * d, mpc_seek_t fpos, mpc_uint32_t min_bytes) {
+ 	} else {
+ 		mpc_seek_t next_pos = fpos >> 3;
+ 		if (d->si.stream_version == 7)
+-			next_pos = ((next_pos - d->si.header_position) & (-1 << 2)) + d->si.header_position;
++			next_pos = ((next_pos - d->si.header_position) & (BUFFER_SWAP_MASK)) + d->si.header_position;
+ 		bit_offset = (int) (fpos - (next_pos << 3));
+ 
+ 		mpc_demux_clear_buff(d);
+-- 
+2.52.0.windows.1
+

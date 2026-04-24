@@ -26,6 +26,7 @@ musepack: musepack_src_r$(MUSE_REV).tar.gz .sum-mpcdec
 	$(APPLY) $(SRC)/mpcdec/0005-If-BUILD_SHARED_LIBS-is-set-and-SHARED-undefined-the.patch
 	$(APPLY) $(SRC)/mpcdec/0006-adapted-patch-0001-shared.patch-from-buildroot.patch
 	$(APPLY) $(SRC)/mpcdec/0007-only-build-libmpcdec.patch
+	$(APPLY) $(SRC)/mpcdec/0008-mpc_demux-avoid-using-a-shift-on-negative-value.patch
 	$(MOVE)
 
 .mpcdec: musepack toolchain.cmake
