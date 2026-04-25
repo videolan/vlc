@@ -1106,6 +1106,49 @@ static int ParseListUnixEntry( char *line, int *type, long long *size,
     return 0;
 }
 
+/**
+ * Parse a DOS-style LIST entry (as emitted by Microsoft IIS in DOS mode)
+ *
+ * Example:
+ *   04-22-26  10:00AM       <DIR>          dirname
+ *   04-22-26  10:00AM                 1234 filename.ext
+ *
+ * The year may be 2 or 4 digits, and the AM/PM suffix is optional
+ * (some servers emit 24-hour time).
+ */
+static int ParseListDosEntry( char *line, int *type, long long *size,
+                              char **filename )
+{
+    unsigned mm, dd, yy, hh, mi;
+    int n = 0;
+    if( sscanf( line, "%2u-%2u-%4u %2u:%2u%n",
+                &mm, &dd, &yy, &hh, &mi, &n ) != 5 )
+        return -1;
+
+    char *p = line + n;
+    if( *p == 'A' || *p == 'P' )
+    {
+        if( p[1] != 'M' ) return -1;
+        p += 2;
+    }
+
+    while( *p == ' ' || *p == '\t' ) p++;
+
+    if( !strncmp( p, "<DIR>", 5 ) )
+        *type = ITEM_TYPE_DIRECTORY;
+    else if( isdigit( (unsigned char)*p ) && sscanf( p, "%lld", size ) == 1 )
+        *type = ITEM_TYPE_FILE;
+    else
+        return -1;
+
+    p = SkipToken( p );
+    while( *p == ' ' || *p == '\t' ) p++;
+    if( !*p ) return -1;
+
+    *filename = p;
+    return 0;
+}
+
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
@@ -1167,10 +1210,11 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         {
             long long parsed_size = 0;
             if( ParseListUnixEntry( psz_line, &type, &parsed_size,
-                                    &psz_file ) != 0 )
+                                    &psz_file ) != 0 &&
+                ParseListDosEntry( psz_line, &type, &parsed_size,
+                                   &psz_file ) != 0 )
             {
-                /* Non-Unix LIST output (e.g. DOS-style) or "total N" header:
-                 * skip silently. */
+                /* Unrecognized LIST format (or "total N" header): skip. */
                 free( psz_line );
                 continue;
             }
