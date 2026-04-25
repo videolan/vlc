@@ -79,7 +79,7 @@
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Ha-ZH-fa9">
                     <rect key="frame" x="350" y="21" width="40" height="16"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="36" id="0cB-ga-0Uw"/>
+                        <constraint firstAttribute="width" constant="50" id="0cB-ga-0Uw"/>
                     </constraints>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Label" id="N0j-xB-3t9">
                         <font key="font" usesAppearanceFont="YES"/>
