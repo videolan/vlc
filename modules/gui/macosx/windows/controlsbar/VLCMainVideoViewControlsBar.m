@@ -209,9 +209,16 @@
     const int sliderIntValue = (int)((value > 0) ? value + 0.5 : value - 0.5);
     playbackRateSlider.intValue = sliderIntValue;
 
+    const CGFloat inset = 12.;
+    const CGFloat verticalInset = inset / 2.;
+    const NSSize sliderSize = playbackRateSlider.frame.size;
+    NSView * const containerView = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, sliderSize.width + inset * 2, sliderSize.height + verticalInset * 2)];
+    playbackRateSlider.frame = NSMakeRect(inset, verticalInset, sliderSize.width, sliderSize.height);
+    [containerView addSubview:playbackRateSlider];
+
     NSMenuItem * const menuItem = [[NSMenuItem alloc] init];
     menuItem.title = _NS("Playback rate");
-    menuItem.view = playbackRateSlider;
+    menuItem.view = containerView;
 
     NSMenu * const menu = [[NSMenu alloc] initWithTitle:_NS("Playback rate")];
     [menu addItem:menuItem];
