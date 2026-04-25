@@ -128,6 +128,7 @@ typedef struct ftp_features_t
     bool b_unicode;
     bool b_authtls;
     bool b_mlst;
+    bool b_list;
 } ftp_features_t;
 
 enum tls_mode_e
@@ -1036,6 +1037,75 @@ static time_t ftp_mktime(const char *const timeval)
     return (time_t) -1;
 }
 
+/* Skip leading whitespace and the next whitespace-separated token. */
+static char *SkipToken( char *p )
+{
+    while( *p == ' ' || *p == '\t' ) p++;
+    while( *p && *p != ' ' && *p != '\t' ) p++;
+    return p;
+}
+
+/**
+ * Parse a Unix-style LIST entry (as emitted by `ls -l`)
+ *
+ * Handles the de-facto standard format used by vsftpd, proftpd,
+ * pure-ftpd and similar servers when MLST is unavailable. Example:
+ *   drwxr-xr-x  2 user group  4096 Apr 22 10:00 dirname
+ *   -rw-r--r--  1 user group  1234 Apr 22 10:00 filename
+ *   lrwxrwxrwx  1 user group    11 Apr 22 10:00 link -> target
+*/
+static int ParseListUnixEntry( char *line, int *type, long long *size,
+                               char **filename )
+{
+    if( strlen( line ) < 11 )
+        return -1;
+
+    bool is_link = false;
+    switch( line[0] )
+    {
+        case 'd': *type = ITEM_TYPE_DIRECTORY; break;
+        case '-': *type = ITEM_TYPE_FILE;      break;
+        case 'l': *type = ITEM_TYPE_UNKNOWN; is_link = true; break;
+        default:
+            return -1;
+    }
+
+    if( line[10] != ' ' && line[10] != '\t' )
+        return -1;
+
+    char *p = line + 10;
+
+    p = SkipToken( p ); /* link count */
+    p = SkipToken( p ); /* owner */
+    p = SkipToken( p ); /* group */
+
+    while( *p == ' ' || *p == '\t' ) p++;
+    if( !isdigit( (unsigned char)*p ) || sscanf( p, "%lld", size ) != 1 )
+        return -1;
+    p = SkipToken( p );
+
+    p = SkipToken( p ); /* month */
+    p = SkipToken( p ); /* day */
+    p = SkipToken( p ); /* time or year */
+
+    while( *p == ' ' || *p == '\t' ) p++;
+    if( !*p ) return -1;
+
+    *filename = p;
+
+    if( is_link )
+    {
+        char *arrow = NULL;
+        for( char *q = strstr( p, " -> " ); q != NULL;
+             q = strstr( q + 1, " -> " ) )
+            arrow = q;
+        if( arrow )
+            *arrow = '\0';
+    }
+
+    return 0;
+}
+
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
@@ -1092,6 +1162,19 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
                     mtime = ftp_mktime(val);
                 }
             }
+        }
+        else if( p_sys->features.b_list )
+        {
+            long long parsed_size = 0;
+            if( ParseListUnixEntry( psz_line, &type, &parsed_size,
+                                    &psz_file ) != 0 )
+            {
+                /* Non-Unix LIST output (e.g. DOS-style) or "total N" header:
+                 * skip silently. */
+                free( psz_line );
+                continue;
+            }
+            size = parsed_size;
         }
         else
             psz_file = psz_line;
@@ -1332,11 +1415,25 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
             msg_Dbg( p_access, "Using MLST extension to list" );
         }
         else
+        if( ftp_SendCommand( p_access, p_sys, "LIST" ) >= 0 &&
+            ftp_RecvCommandInit( p_access, p_sys ) == 1 )
+        {
+            p_sys->features.b_mlst = false;
+            p_sys->features.b_list = true;
+            msg_Dbg( p_access, "Using LIST command to list directory" );
+        }
+        else
         if( ftp_SendCommand( p_access, p_sys, "NLST" ) < 0 ||
             ftp_RecvCommandInit( p_access, p_sys ) != 1 )
         {
             msg_Err( p_access, "cannot list directory contents" );
             return VLC_EGENERIC;
+        }
+        else
+        {
+            p_sys->features.b_mlst = false;
+            p_sys->features.b_list = false;
+            msg_Dbg( p_access, "Falling back to NLST to list directory" );
         }
     }
     else
