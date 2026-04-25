@@ -163,6 +163,14 @@ typedef int (*vlc_filter_open)(filter_t *);
     }                                                      \
     set_capability( "video filter", 0 )
 
+#define set_callback_video_filter_priority( activate, priority ) \
+    {                                                            \
+        vlc_filter_open open__ = activate;                       \
+        (void) open__;                                           \
+        set_callback(activate)                                   \
+    }                                                            \
+    set_capability( "video filter", priority )
+
 #define set_callback_video_converter( activate, priority ) \
     {                                                      \
         vlc_filter_open open__ = activate;                 \
