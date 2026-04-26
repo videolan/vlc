@@ -1070,12 +1070,48 @@ AS_IF([test "${have_partial_linking}" = "yes"], [
             [vlc_cv_ld_force_group_allocation=no])
         VLC_RESTORE_FLAGS
     ])
-    AS_IF([test "${vlc_cv_ld_force_group_allocation}" != "yes"], [
-        AS_IF([test "${have_dynamic_objects}" = "no" -a "${SYS}" != "darwin"], [
-            AC_MSG_ERROR([Linker does not support --force-group-allocation, required for static module partial linking (binutils >= 2.24).])
-        ])
-    ], [
+    AS_IF([test "${vlc_cv_ld_force_group_allocation}" = "yes"], [
         FORCE_GROUP_ALLOCATION_LDFLAGS="-Wl,--force-group-allocation"
+    ])
+])
+
+dnl Test whether partial linking resolves COMDAT section groups.
+dnl C++ template instantiations produce COMDAT groups; if the linker does
+dnl not deduplicate them during -r, duplicate symbols will leak across
+dnl plugins at the final link.
+dnl
+dnl We test the behavior directly: compile two TUs with the same
+dnl template, partially link them, and check that the symbol appears
+dnl only once in the result.
+AS_IF([test "${have_partial_linking}" = "yes"], [
+    AC_CACHE_CHECK([whether partial linking resolves COMDAT groups],
+        [vlc_cv_ld_partial_link_comdat], [
+        vlc_cv_ld_partial_link_comdat=no
+        cat > conftest1.cpp <<EOF
+template<typename T> __attribute__((noinline)) T vlc_comdat_test(T x) { return x; }
+int vlc_comdat_a() { return vlc_comdat_test(1); }
+EOF
+        cat > conftest2.cpp <<EOF
+template<typename T> __attribute__((noinline)) T vlc_comdat_test(T x) { return x; }
+int vlc_comdat_b() { return vlc_comdat_test(2); }
+EOF
+        AS_IF([$CXX $CXXFLAGS $CPPFLAGS -c conftest1.cpp -o conftest1.o 2>/dev/null \
+            && $CXX $CXXFLAGS $CPPFLAGS -c conftest2.cpp -o conftest2.o 2>/dev/null \
+            && $CXX $CXXFLAGS $CPPFLAGS $LDFLAGS $FORCE_GROUP_ALLOCATION_LDFLAGS \
+                    -r -o conftest_partial.o conftest1.o conftest2.o 2>/dev/null],
+        [
+            comdat_count=`$NM conftest_partial.o 2>/dev/null \
+                | grep -c '[[TWV]].*vlc_comdat_test'`
+            AS_IF([test "$comdat_count" = "1"], [
+                vlc_cv_ld_partial_link_comdat=yes
+            ])
+        ])
+        rm -f conftest1.cpp conftest2.cpp conftest1.o conftest2.o conftest_partial.o
+    ])
+    AS_IF([test "${vlc_cv_ld_partial_link_comdat}" != "yes"], [
+        AS_IF([test "${have_dynamic_objects}" = "no" -a "${SYS}" != "darwin"], [
+            AC_MSG_ERROR([Partial linking does not resolve COMDAT groups. COMDAT deduplication is required for C++ static plugins.])
+        ])
     ])
 ])
 AC_SUBST([FORCE_GROUP_ALLOCATION_LDFLAGS])
