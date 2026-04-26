@@ -1117,6 +1117,13 @@ EOF
         ])
     ])
 ])
+dnl On ELF, objcopy is required to localize symbols after partial linking.
+dnl The early detection (above) already ensures a target-compatible objcopy:
+dnl host-prefixed GNU objcopy or llvm-objcopy when cross-compiling.
+dnl On Darwin, ld64 -exported_symbol handles visibility so objcopy is not needed.
+AS_IF([test "${have_partial_linking}" = "yes" -a "${SYS}" != "darwin" -a "$OBJCOPY" = ":"], [
+    AC_MSG_ERROR([Partial linking on ELF requires objcopy or llvm-objcopy to localize symbols.])
+])
 AC_SUBST([FORCE_GROUP_ALLOCATION_LDFLAGS])
 
 AC_SUBST([LIBDL])
