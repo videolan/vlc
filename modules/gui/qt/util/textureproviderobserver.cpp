@@ -31,13 +31,21 @@
 TextureProviderObserver::TextureProviderObserver(QObject *parent)
     : QObject{parent}
 {
-
+    connect(this, &TextureProviderObserver::notifyAllChangesChanged, this, &TextureProviderObserver::adjustSampleAndNotifyConnection);
+    connect(this, &TextureProviderObserver::isDynamicChanged, this, &TextureProviderObserver::adjustSampleAndNotifyConnection);
 }
 
 void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
 {
     if (!enforce && (m_source == source))
         return;
+
+    if (m_window)
+    {
+        disconnect(m_window, nullptr, this, nullptr);
+        m_window = nullptr;
+        m_windowSampleAndNotifyPropertiesConnection = {}; // Is this necessary?
+    }
 
     if (m_source)
     {
@@ -65,6 +73,19 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
     if (m_source)
     {
         assert(m_source->isTextureProvider());
+
+        {
+            m_window = m_source->window();
+
+            if (m_window)
+                adjustSampleAndNotifyConnection();
+
+            connect(m_source, &QQuickItem::windowChanged, this, [this]() {
+                assert(m_source);
+                m_window = m_source->window();
+                adjustSampleAndNotifyConnection();
+            });
+        }
 
         const auto init = [this, enforce]() {
             const auto window = m_source->window();
@@ -121,9 +142,6 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
 
 QSize TextureProviderObserver::textureSize() const
 {
-    // This is likely called in the QML/GUI thread.
-    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
-    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
     return m_textureSize.load(std::memory_order_acquire);
 }
 
@@ -178,20 +196,20 @@ void TextureProviderObserver::updateProperties()
 
     if (m_provider)
     {
-        const bool notifyAllChanges = m_notifyAllChanges.load(memoryOrder);
-
         if (const auto texture = m_provider->texture())
         {
             const bool textureIsDynamic = qobject_cast<QSGDynamicTexture*>(texture);
             if (m_textureIsDynamic.exchange(textureIsDynamic, memoryOrder) != textureIsDynamic)
                 emit isDynamicChanged(textureIsDynamic);
 
+            QSize textureSize;
+            QSize nativeTextureSize;
             {
                 // SG and native texture size
 
                 // SG texture size:
-                const auto textureSize = texture->textureSize();
-                if (notifyAllChanges)
+                textureSize = texture->textureSize();
+                if (!textureIsDynamic)
                 {
                     if (m_textureSize.exchange(textureSize, memoryOrder) != textureSize)
                         emit textureSizeChanged(textureSize);
@@ -209,7 +227,7 @@ void TextureProviderObserver::updateProperties()
                         const QSize size = {static_cast<int>(textureSize.width() / ntsr.width()),
                                             static_cast<int>(textureSize.height() / ntsr.height())};
 
-                        if (notifyAllChanges)
+                        if (!textureIsDynamic)
                         {
                             if (m_nativeTextureSize.exchange(size, memoryOrder) != size)
                                 emit nativeTextureSizeChanged(size);
@@ -218,38 +236,41 @@ void TextureProviderObserver::updateProperties()
                         {
                             m_nativeTextureSize.store(size, memoryOrder);
                         }
+
+                        return size;
                     };
 
 #ifdef RHI_HEADER_AVAILABLE
                     const QRhiTexture* const rhiTexture = texture->rhiTexture();
                     if (Q_LIKELY(rhiTexture))
                     {
-                        const QSize size = rhiTexture->pixelSize();
-                        if (notifyAllChanges)
+                        nativeTextureSize = rhiTexture->pixelSize();
+                        if (!textureIsDynamic)
                         {
-                            if (m_nativeTextureSize.exchange(size, memoryOrder) != size)
-                                emit nativeTextureSizeChanged(size);
+                            if (m_nativeTextureSize.exchange(nativeTextureSize, memoryOrder) != nativeTextureSize)
+                                emit nativeTextureSizeChanged(nativeTextureSize);
                         }
                         else
                         {
-                            m_nativeTextureSize.store(size, memoryOrder);
+                            m_nativeTextureSize.store(nativeTextureSize, memoryOrder);
                         }
                     }
                     else
                     {
-                        legacyUpdateNativeTextureSize();
+                        nativeTextureSize = legacyUpdateNativeTextureSize();
                     }
 #else
-                    legacyUpdateNativeTextureSize();
+                    nativeTextureSize = legacyUpdateNativeTextureSize();
 #endif
                 }
             }
 
+            QRectF normalizedTextureSubRect;
             {
                 // Normal rect
-                const QRectF& normalizedTextureSubRect = texture->normalizedTextureSubRect();
+                normalizedTextureSubRect = texture->normalizedTextureSubRect();
 
-                if (notifyAllChanges)
+                if (!textureIsDynamic)
                 {
                     if (m_normalizedTextureSubRect.exchange(normalizedTextureSubRect, memoryOrder) != normalizedTextureSubRect)
                         emit normalizedTextureSubRectChanged(normalizedTextureSubRect);
@@ -287,11 +308,12 @@ void TextureProviderObserver::updateProperties()
             if (!m_isValid.exchange(true, memoryOrder))
                 emit isValidChanged(true);
 
+            qint64 comparisonKey;
             {
                 // Comparison key
-                const qint64 comparisonKey = texture->comparisonKey();
+                comparisonKey = texture->comparisonKey();
 
-                if (notifyAllChanges)
+                if (!textureIsDynamic)
                 {
                     if (m_comparisonKey.exchange(comparisonKey, memoryOrder) != comparisonKey) {
                         emit comparisonKeyChanged(comparisonKey);
@@ -301,6 +323,14 @@ void TextureProviderObserver::updateProperties()
                 {
                     m_comparisonKey.store(comparisonKey, memoryOrder);
                 }
+            }
+
+            if (!m_notifyAllChanges.load(memoryOrder) || !textureIsDynamic)
+            {
+                m_oldTextureSize.store(textureSize, memoryOrder);
+                m_oldNativeTextureSize.store(nativeTextureSize, memoryOrder);
+                m_oldNormalizedTextureSubRect.store(normalizedTextureSubRect, memoryOrder);
+                m_oldComparisonKey.store(comparisonKey, memoryOrder);
             }
 
             return;
@@ -338,4 +368,73 @@ void TextureProviderObserver::resetProperties(std::memory_order memoryOrder)
 
     if (m_comparisonKey.exchange(-1, memoryOrder) != -1)
         emit comparisonKeyChanged(-1);
+
+    if (!m_notifyAllChanges.load(memoryOrder) || !m_textureIsDynamic.load(memoryOrder))
+    {
+        m_oldTextureSize.store({}, memoryOrder);
+        m_oldNativeTextureSize.store({}, memoryOrder);
+        m_oldNormalizedTextureSubRect.store({}, memoryOrder);
+        m_oldComparisonKey.store(-1, memoryOrder);
+    }
+}
+
+void TextureProviderObserver::adjustSampleAndNotifyConnection()
+{
+    // This is likely called in the GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
+
+    constexpr auto memoryOrder = std::memory_order_acquire;
+    if (m_notifyAllChanges.load(memoryOrder) && m_textureIsDynamic.load(memoryOrder))
+    {
+        if (disconnect(m_windowSampleAndNotifyPropertiesConnection))
+            m_windowSampleAndNotifyPropertiesConnection = {}; // Is this necessary?
+
+        if (m_window)
+        {
+            // `QQuickWindow::afterAnimating()` is signalled from the GUI thread:
+            m_windowSampleAndNotifyPropertiesConnection = connect(m_window,
+                                                                  &QQuickWindow::afterAnimating,
+                                                                  this,
+                                                                  &TextureProviderObserver::sampleAndNotifyProperties,
+                                                                  Qt::UniqueConnection);
+        }
+    }
+    else
+    {
+        if (disconnect(m_windowSampleAndNotifyPropertiesConnection))
+            m_windowSampleAndNotifyPropertiesConnection = {}; // Is this necessary?
+    }
+}
+
+void TextureProviderObserver::sampleAndNotifyProperties()
+{
+    // This is likely called in the GUI thread.
+    // QML/GUI thread can freely block the rendering thread to the extent the time is reasonable and a
+    // fraction of `1/FPS`, because it is already throttled by v-sync (so it would just throttle less).
+    constexpr auto memoryOrder = std::memory_order_acquire;
+
+    {
+        const auto textureSize = m_textureSize.load(memoryOrder);
+        if (m_oldTextureSize.exchange(textureSize, memoryOrder) != textureSize)
+            emit textureSizeChanged(textureSize);
+    }
+
+    {
+        const auto nativeTextureSize = m_nativeTextureSize.load(memoryOrder);
+        if (m_oldNativeTextureSize.exchange(nativeTextureSize, memoryOrder) != nativeTextureSize)
+            emit nativeTextureSizeChanged(nativeTextureSize);
+    }
+
+    {
+        const auto comparisonKey = m_comparisonKey.load(memoryOrder);
+        if (m_oldComparisonKey.exchange(comparisonKey, memoryOrder) != comparisonKey)
+            emit comparisonKeyChanged(comparisonKey);
+    }
+
+    {
+        const auto normalizedTextureSubRect = m_normalizedTextureSubRect.load(memoryOrder);
+        if (m_oldNormalizedTextureSubRect.exchange(normalizedTextureSubRect, memoryOrder) != normalizedTextureSubRect)
+            emit normalizedTextureSubRectChanged(normalizedTextureSubRect);
+    }
 }

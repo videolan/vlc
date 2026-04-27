@@ -47,11 +47,24 @@ class TextureProviderObserver : public QObject
     //          to not conflict with the updates, if the properties must reflect the immediately up-to-date
     //          texture and the properties change each frame, as otherwise it might end up in a
     //          "forever chase"), so by the time the sampling is done the properties should be consistent.
-    // NOTE: By default these properties are not notified, as dynamic textures such as layer may
-    //       change rapidly (even though throttled by v-sync in the rendering thread), and if
-    //       such signal is connected to a receiver that lives in the GUI thread, the queued
-    //       invocations can easily backlog. Similar to the high precision timer, we moved
-    //       away from event based approach in favor of sampling based approach here.
+    // NOTE: If the source texture is a dynamic texture (such as an item layer), these properties are
+    //       notified at most per frame, provided that `notifyAllChanges` is set. This is done to prevent
+    //       event backlogging. If the source texture is not a dynamic texture, these are notified as soon
+    //       as applicable, where in that case `notifyAllChanges` is not required to be set. The method
+    //       `::sampleAndNotifyProperties()` may also be called to notify changes at an arbitrary time.
+    //       It is guaranteed that notifications are emitted from the GUI thread, unless an arbitrary
+    //       `sampleAndNotifyProperties()` call was made in a different thread. Note that if the texture
+    //       is a dynamic texture and `notifyAllChanges` is set, the notifications will be signalled from
+    //       the thread of the window of the source texture provider item, particularly during
+    //       `QQuickWindow::afterAnimating()`, which is guaranteed to be GUI thread but not necessarily
+    //       the thread of the items that use this observer. For that reason it is not recommended to
+    //       use the observer for an item that belongs to the same window of the source texture provider
+    //       item in such a case (texture is dynamic and `notifyAllChanges` is set). Also note that if
+    //       the source texture is of `QSGDynamicTexture` type but is not meant to be dynamic (such as
+    //       an item layer with `live: false`), it should ideally be provided as a hint to the observer
+    //       observer by unsetting `notifyAllChanges`, so that it does not do sampling per frame. That
+    //       being said, since event backlogging is still not possible, such benefit is minimal and
+    //       should only be done if it does not hinder maintenance.
     Q_PROPERTY(bool notifyAllChanges MEMBER m_notifyAllChanges NOTIFY notifyAllChangesChanged FINAL)
     Q_PROPERTY(QSize textureSize READ textureSize NOTIFY textureSizeChanged FINAL) // Scene graph texture size
     Q_PROPERTY(QSize nativeTextureSize READ nativeTextureSize NOTIFY nativeTextureSizeChanged FINAL) // Native texture size (e.g. for atlas textures, the atlas size)
@@ -85,6 +98,11 @@ public:
     bool isValid() const;
     bool isDynamic() const;
 
+public slots:
+    // This is mostly relevant for dynamic textures, since for static textures
+    // notification is done regardless of sampling. This method is thread-safe.
+    void sampleAndNotifyProperties();
+
 signals:
     void notifyAllChangesChanged();
     void sourceChanged();
@@ -101,11 +119,14 @@ signals:
 private slots:
     void updateProperties();
     void resetProperties(std::memory_order memoryOrder = std::memory_order_seq_cst);
+    // This must be called from the same thread the source item lives:
+    void adjustSampleAndNotifyConnection();
 
 private:
     QPointer<const QQuickItem> m_source;
     QPointer<QSGTextureProvider> m_provider;
-
+    QPointer<QQuickWindow> m_window;
+    QMetaObject::Connection m_windowSampleAndNotifyPropertiesConnection;
     // It is not clear when `QSGTextureProvider::textureChanged()` can be signalled.
     // If it is only signalled during SG synchronization where Qt blocks the GUI thread,
     // we do not need explicit synchronization (with atomic, or mutex) here. If it can be
@@ -116,11 +137,15 @@ private:
     // observer lives.
 
     std::atomic<bool> m_textureIsDynamic = false;
-    std::atomic<bool> m_notifyAllChanges = false;
+    std::atomic<bool> m_notifyAllChanges = true;
     std::atomic<QSize> m_textureSize {{}}; // invalid by default
+    std::atomic<QSize> m_oldTextureSize {{}}; // invalid by default
     std::atomic<QSize> m_nativeTextureSize {{}}; // invalid by default
+    std::atomic<QSize> m_oldNativeTextureSize {{}}; // invalid by default
     std::atomic<qint64> m_comparisonKey {-1};
+    std::atomic<qint64> m_oldComparisonKey {-1};
     std::atomic<QRectF> m_normalizedTextureSubRect {{}}; // invalid by default
+    std::atomic<QRectF> m_oldNormalizedTextureSubRect {{}}; // invalid by default
 
     std::atomic<bool> m_hasAlphaChannel = false;
     std::atomic<bool> m_hasMipmaps = false;
