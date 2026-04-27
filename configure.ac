@@ -2595,21 +2595,6 @@ if test "${enable_mod}" != "no" ; then
 fi
 
 dnl
-dnl  mpc demux plugin
-dnl
-AC_ARG_ENABLE([mpc],
-  AS_HELP_STRING([--disable-mpc], [do not use libmpcdec (default auto)]))
-if test "${enable_mpc}" != "no"
-then
-    AC_CHECK_HEADERS([mpc/mpcdec.h], [
-      AC_CHECK_LIB([mpcdec], [mpc_demux_init], [
-        VLC_ADD_PLUGIN([mpc])
-        VLC_ADD_LIBS([mpc],[-lmpcdec])
-      ],, [$LIBM])
-    ])
-fi
-
-dnl
 dnl  Codec plugins
 dnl
 

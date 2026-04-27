@@ -108,12 +108,6 @@ libnuv_plugin_la_SOURCES = demux/nuv.c
 libnuv_plugin_la_LIBADD = $(LIBM)
 demux_PLUGINS += libnuv_plugin.la
 
-libmpc_plugin_la_SOURCES = demux/mpc.c
-libmpc_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
-libmpc_plugin_la_LIBADD = $(LIBS_mpc) $(LIBM)
-EXTRA_LTLIBRARIES += libmpc_plugin.la
-demux_PLUGINS += $(LTLIBmpc)
-
 libtta_plugin_la_SOURCES = demux/tta.c
 demux_PLUGINS += libtta_plugin.la
 

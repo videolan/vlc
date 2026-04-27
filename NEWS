@@ -47,6 +47,7 @@ Demuxer:
  * Improved Bluray menus, clips and stream selection
  * Support chapters in mp3 files
  * Support for DMX audio music (MUS) files
+ * Removed Musepack demuxer in favor of libavformat+libavcodec
 
 Codecs:
  * Remove schroedinger support for dirac in favor of avcodec

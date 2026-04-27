@@ -410,27 +410,6 @@ vlc_modules += {
     'enabled': gme_dep.found(),
 }
 
-# mpc
-mpc_dep = disabler()
-if get_option('mpc').allowed()
-if cc.check_header('mpc/mpcdec.h')
-    mpc_dep = cc.find_library('mpcdec')
-    cdata.set('HAVE_MPC_MPCDEC_H', 1)
-elif cc.check_header('mpc/mpcdec.h', dependencies: contrib_dep )
-    if cc.find_library('mpcdec', dirs: contrib_libdir).found()
-        mpc_dep = declare_dependency(
-            dependencies: [cc.find_library('mpcdec', dirs: contrib_libdir), contrib_dep])
-        cdata.set('HAVE_MPC_MPCDEC_H', 1)
-    endif
-endif
-endif
-vlc_modules += {
-    'name' : 'mpc',
-    'sources' : files('mpc.c'),
-    'dependencies' : [mpc_dep, m_lib],
-    'enabled' : mpc_dep.found(),
-}
-
 # sid
 sid_dep = dependency('libsidplay2', required: get_option('sid'))
 if cpp.check_header('sidplay/builders/resid.h', dependencies: sid_dep)

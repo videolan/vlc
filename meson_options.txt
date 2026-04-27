@@ -764,11 +764,6 @@ option('gme',
     value: 'auto',
     description: 'Game Music Emu support')
 
-option('mpc',
-    type: 'feature',
-    value: 'auto',
-    description: 'libmpcdec support')
-
 option('sid',
     type: 'feature',
     value: 'auto',
