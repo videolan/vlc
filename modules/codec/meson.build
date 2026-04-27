@@ -275,7 +275,7 @@ vlc_modules += {
     'name' : 'aribsub',
     'sources' : files('arib/aribsub.c'),
     'dependencies' : [aribb24_dep],
-    'cpp_args' : ['-DHAVE_ARIBB24'],
+    'c_args' : ['-DHAVE_ARIBB24'],
     'enabled' : aribb24_dep.found()
 }
 
@@ -448,12 +448,12 @@ vlc_modules += {
 # Kate codec
 kate_dep = dependency('kate', version: '>= 0.3.0', required: get_option('kate'))
 kate_deps = [kate_dep, m_lib]
-kate_cpp_args = []
+kate_c_args = []
 if kate_dep.found()
   tiger_dep = dependency('tiger', version: '>= 0.3.1', required: get_option('tiger'))
 
   if tiger_dep.found()
-    kate_cpp_args += ['-DHAVE_TIGER=1']
+    kate_c_args += ['-DHAVE_TIGER=1']
     kate_deps += tiger_dep
   endif
 endif
@@ -461,7 +461,7 @@ vlc_modules += {
     'name' : 'kate',
     'sources' : files('kate.c'),
     'dependencies' : kate_deps,
-    'cpp_args' : kate_cpp_args,
+    'c_args' : kate_c_args,
     'enabled' : kate_dep.found(),
 }
 
