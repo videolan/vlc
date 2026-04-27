@@ -604,7 +604,8 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                       unsigned pool_size, ID3D11Texture2D *textures[] )
 {
     plane_t planes[PICTURE_PLANE_MAX];
-    int plane, plane_count;
+    int plane = 0, plane_count;
+    unsigned picture_count = 0;
     HRESULT hr;
     ID3D11Texture2D *slicedTexture = NULL;
     D3D11_TEXTURE2D_DESC texDesc;
@@ -666,7 +667,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
         }
     }
 
-    for (unsigned picture_count = 0; picture_count < pool_size; picture_count++) {
+    for (picture_count = 0; picture_count < pool_size; picture_count++) {
         for (plane = 0; plane < plane_count; plane++)
         {
             if (slicedTexture) {
@@ -699,6 +700,19 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
 error:
     if (slicedTexture)
         ID3D11Texture2D_Release(slicedTexture);
+    for (unsigned p = 0; p < picture_count; p++)
+        for (unsigned i = 0; i < D3D11_MAX_SHADER_VIEW; i++)
+            if (textures[p * D3D11_MAX_SHADER_VIEW + i])
+            {
+                ID3D11Texture2D_Release(textures[p * D3D11_MAX_SHADER_VIEW + i]);
+                textures[p * D3D11_MAX_SHADER_VIEW + i] = NULL;
+            }
+    for (int i = 0; i < plane; i++)
+        if (textures[picture_count * D3D11_MAX_SHADER_VIEW + i])
+        {
+            ID3D11Texture2D_Release(textures[picture_count * D3D11_MAX_SHADER_VIEW + i]);
+            textures[picture_count * D3D11_MAX_SHADER_VIEW + i] = NULL;
+        }
     return VLC_EGENERIC;
 }
 
