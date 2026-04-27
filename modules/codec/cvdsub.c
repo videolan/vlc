@@ -254,6 +254,8 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
 
     block_ChainAppend( &p_sys->p_spu, p_block );
     p_sys->p_spu = block_ChainGather( p_sys->p_spu );
+    if( !p_sys->p_spu )
+        return NULL;
 
     if( p_sys->p_spu->i_buffer >= p_sys->i_spu_size )
     {
