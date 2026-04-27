@@ -643,8 +643,6 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     }
 #endif
 
-    uint32_t pi_order_src[AOUT_CHAN_MAX] = { 0 };
-
     int i_channels_src = 0;
 #if API_CHANNEL_LAYOUT_STRUCT
     uint64_t channel_layout_mask = p_sys->p_context->ch_layout.u.mask;
@@ -658,6 +656,17 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
     if( channel_layout_mask )
     {
+        uint32_t* pi_order_src = calloc(channel_count,sizeof(uint32_t));
+        
+        if( unlikely(pi_order_src == NULL) )
+        {
+            p_dec->fmt_out.audio.i_physical_channels = 0;
+            p_dec->fmt_out.audio.i_channels = channel_count;
+
+            aout_FormatPrepare(&p_dec->fmt_out.audio);
+            return;
+        }
+
         for( unsigned i = 0; pi_channels_map[i][0]
          && i_channels_src < channel_count; i++ )
         {
@@ -692,6 +701,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
             p_sys->b_extract = false;
 
         p_dec->fmt_out.audio.i_physical_channels = i_layout_dst;
+        free(pi_order_src);
     }
     else
     {
