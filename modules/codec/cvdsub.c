@@ -75,8 +75,6 @@ static void RenderImage( decoder_t *, block_t *, picture_t * );
 
 typedef struct
 {
-  int      b_packetizer;
-
   int      i_state;    /* data-gathering state for this subtitle */
 
   block_t  *p_spu;   /* Bytes of the packet. */
@@ -113,8 +111,6 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-
-    p_sys->b_packetizer  = b_packetizer;
 
     p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
     p_sys->p_spu   = NULL;
