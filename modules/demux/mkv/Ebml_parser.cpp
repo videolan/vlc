@@ -172,7 +172,7 @@ EbmlElement *EbmlParser::Get( bool allow_overshoot )
 
 next:
     p_prev = m_el[mi_level];
-    if( p_prev )
+    if( p_prev && p_prev->IsFiniteSize() )
         p_prev->SkipData( *m_es, EBML_CONTEXT(p_prev) );
 
     uint64_t i_max_read;
@@ -281,7 +281,7 @@ next:
     {
         msg_Dbg( p_demux,"MKV/Ebml Parser: m_el[mi_level] == NULL" );
         /* go back to the end of the parent */
-        if( p_prev )
+        if( p_prev && p_prev->IsFiniteSize() )
             p_prev->SkipData( *m_es, EBML_CONTEXT(p_prev) );
     }
     else if( m_el[mi_level]->IsDummy() && !mb_dummy )
