@@ -1,0 +1,28 @@
+From 4ad8d9335f593d767f319b61ba5dc531fb2c3e52 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 25 Jul 2025 14:37:18 +0200
+Subject: [PATCH] EbmlHead: do not allow to have an infinite/unknown size
+
+It does not have [^1]  unknownsizeallowed set to true (default to false)
+
+[^1]: https://www.rfc-editor.org/rfc/rfc8794.html#section-11.2.1
+---
+ ebml/EbmlHead.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/ebml/EbmlHead.h b/ebml/EbmlHead.h
+index b575b79..9768b5f 100644
+--- a/ebml/EbmlHead.h
++++ b/ebml/EbmlHead.h
+@@ -46,6 +46,8 @@ DECLARE_EBML_MASTER(EbmlHead)
+     EbmlHead(const EbmlHead & ElementToClone)  = default;
+ 
+         EBML_CONCRETE_CLASS(EbmlHead)
++
++    bool SetSizeInfinite(bool finite = true) override { return !finite; }
+ };
+ 
+ } // namespace libebml
+-- 
+2.52.0.windows.1
+
