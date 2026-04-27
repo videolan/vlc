@@ -147,14 +147,25 @@ EbmlElement *EbmlParser::Get( bool allow_overshoot )
         EbmlElement *ret = m_el[mi_level];
         return_previous_parent = false;
 
-        if( mi_level > 0 && m_el[mi_level-1]->IsFiniteSize() && ret->IsFiniteSize() &&
-            ret->GetEndPosition() > m_el[mi_level-1]->GetEndPosition() )
+        if( mi_level > 0 && m_el[mi_level-1]->IsFiniteSize() )
         {
-            msg_Err( p_demux, "EBML element at %" PRIu64 " extends beyond parent boundary (%" PRIu64 " beyond %" PRIu64 ")",
-                m_el[mi_level]->GetElementPosition(), m_el[mi_level]->GetEndPosition(), m_el[mi_level-1]->GetEndPosition() );
-            delete ret;
-            m_el[mi_level] = NULL;
-            return NULL;
+            if( ret->IsFiniteSize() &&
+                ret->GetEndPosition() > m_el[mi_level-1]->GetEndPosition() )
+            {
+                msg_Err( p_demux, "EBML element at %" PRIu64 " extends beyond parent boundary (%" PRIu64 " beyond %" PRIu64 ")",
+                         ret->GetElementPosition(), ret->GetEndPosition(), m_el[mi_level-1]->GetEndPosition() );
+                delete ret;
+                m_el[mi_level] = NULL;
+                return NULL;
+            }
+            if( !ret->IsFiniteSize() )
+            {
+                msg_Err( p_demux, "Infinite EBML element %s at %" PRIu64 " inside finite parent",
+                         EBML_NAME(ret), ret->GetElementPosition() );
+                delete ret;
+                m_el[mi_level] = NULL;
+                return NULL;
+            }
         }
         return ret;
     }
