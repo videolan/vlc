@@ -94,6 +94,19 @@ Item {
     // it is wanted or necessary anyway.
     property Item source
 
+    /// <debug>
+    readonly property QtObject _sourceWindow: (source?.Window.window ?? null)
+    function _onWindowChanged() {
+        console.assert((_sourceWindow && root.Window.window) ? (_sourceWindow === root.Window.window) : true)
+    }
+    on_SourceWindowChanged: {
+        _onWindowChanged()
+    }
+    Window.onWindowChanged: {
+        _onWindowChanged()
+    }
+    /// </debug>
+
     // Arbitrary sub-texturing (no need to be set for atlas textures):
     // `QSGTextureView` can also be used instead of sub-texturing here.
     property rect sourceRect
@@ -135,7 +148,6 @@ Item {
                                                                                                : Qt.rect(0, 0, 0, 0)
 
     property alias sourceTextureProviderObserver: ds1.tpObserver // for accessory
-    sourceTextureProviderObserver.notifyAllChanges: !live
 
     readonly property bool sourceTextureIsValid: sourceTextureProviderObserver.isValid
 
@@ -220,62 +232,23 @@ Item {
         }
     }
 
-    // TODO: We could use `textureSize()` and get rid of this, but we
-    //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
-    //       though the shader is written in GLSL 4.40.
-    Connections {
-        target: root.Window.window
-        enabled: root.visible && root.live
-
-        function onAfterAnimating() {
-            // Sampling point for getting the native texture sizes:
-            // This is emitted from the GUI thread.
-
-            // Unlike high resolution timer widget, we should not
-            // need to explicitly schedule update here, because if
-            // an update is necessary, it should have been scheduled
-            // implicitly (due to source texture provider's signal
-            // `textureChanged()`).
-
-            ds1.sourceTextureSize = ds1.tpObserver.nativeTextureSize
-            if (root.mode === DualKawaseBlur.Mode.FourPass) {
-                ds2.sourceTextureSize = ds2.tpObserver.nativeTextureSize
-                us1.sourceTextureSize = us1.tpObserver.nativeTextureSize
-            }
-            us2.sourceTextureSize = us2.tpObserver.nativeTextureSize
-
-            // It is not clear if `ShaderEffect` updates the uniform
-            // buffer after `afterAnimating()` signal but before the
-            // next frame. This is important because if `ShaderEffect`
-            // updates the uniform buffer during item polish, we already
-            // missed it here (`afterAnimating()` is signalled afterward).
-            // However, we can call `ensurePolished()` slot to ask for
-            // re-polish, which in case the `ShaderEffect` should now
-            // consider the new values. If it does not exist (Qt 6.2),
-            // we will rely on the next frame in worst case, which
-            // should be fine as long as the size does not constantly
-            // change in each frame.
-            if (ds1.ensurePolished)
-            {
-                // No need to check for if such slot exists for each,
-                // this is basically Qt version check in disguise.
-                ds1.ensurePolished()
-                if (root.mode === DualKawaseBlur.Mode.FourPass) {
-                    ds2.ensurePolished()
-                    us1.ensurePolished()
-                }
-                us2.ensurePolished()
-            }
-        }
-    }
-
     component DefaultShaderEffect : ShaderEffect {
         id: shaderEffect
 
         required property Item source
         readonly property int radius: root.radius
 
+        // TODO: We could use `textureSize()` and get rid of this, but we
+        //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
+        //       though the shader is written in GLSL 4.40:
         property size sourceTextureSize
+
+        Binding on sourceTextureSize {
+            when: root.live
+            value: textureProviderObserver.nativeTextureSize
+            restoreMode: Binding.RestoreNone // No need to restore
+        }
+
         property rect normalRect // may not be necessary, but still needed to prevent warning
 
         property alias tpObserver: textureProviderObserver
@@ -295,6 +268,7 @@ Item {
         TextureProviderObserver {
             id: textureProviderObserver
             source: shaderEffect.source
+            notifyAllChanges: (root.visible && root.live)
         }
     }
 
@@ -379,6 +353,11 @@ Item {
         width: ds1.width / 2
         height: ds1.height / 2
 
+        Binding on tpObserver.notifyAllChanges {
+            when: (root.mode !== DualKawaseBlur.Mode.FourPass)
+            value: false
+        }
+
         // Qt uses reference counting, otherwise ds1layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
         source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds1layer.parent) ? null : ds1layer
     }
@@ -418,6 +397,11 @@ Item {
 
         width: ds2.width * 2
         height: ds2.height * 2
+
+        Binding on tpObserver.notifyAllChanges {
+            when: (root.mode !== DualKawaseBlur.Mode.FourPass)
+            value: false
+        }
 
         // Qt uses reference counting, otherwise ds2layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
         source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds2layer.parent) ? null : ds2layer
