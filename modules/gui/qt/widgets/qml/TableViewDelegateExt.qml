@@ -251,15 +251,26 @@ T.Control {
 
                 Component.onCompleted: {
                     const del = modelData.model.colDelegate || delegate.defaultDelegate
-                    item = del.createObject(loader, {
+                    // https://doc.qt.io/qt-6/qqmlincubator.html#details
+                    const incubator = del.incubateObject(loader, {
                             cellModel: cellModel,
                             width: Qt.binding(() => loader.width),
                             height: Qt.binding(() => loader.height),
-                        }
+                        }, 1 /* QQmlIncubator::AsynchronousIfNested */
                     )
-                    if (item.artworkTextureProvider) {
-                        delegate.artworkTextureProvider = Qt.binding(() => item.artworkTextureProvider)
+
+                    // https://doc.qt.io/qt-6/qml-qtqml-component.html#incubateObject-method
+                    if (incubator.status !== Component.Ready) {
+                        incubator.onStatusChanged = function(status) {
+                            if (status === Component.Ready) {
+                                loader.item = incubator.object
+                            }
+                        }
+                    } else {
+                        loader.item = incubator.object
                     }
+
+                    delegate.artworkTextureProvider = Qt.binding(() => loader?.item?.artworkTextureProvider ?? null)
                 }
                 Component.onDestruction: {
                     item?.destroy()

@@ -202,10 +202,30 @@ Item {
 
     property Widgets.PlayCover _playCoverItem
 
+    property var _playCoverItemIncubator
+
     onPlayCoverShowPlayChanged: {
         // NOTE: We are lazy loading the component when this gets visible and it stays loaded.
         //       We could consider unloading it when visible goes to false.
-        if (playCoverShowPlay && !_playCoverItem)
-            _playCoverItem = playCoverComponent.createObject(root)
+        if (playCoverShowPlay && !_playCoverItem && !_playCoverItemIncubator) {
+            // https://doc.qt.io/qt-6/qqmlincubator.html#details
+            const incubator = playCoverComponent.incubateObject(root, {}, 1 /* QQmlIncubator::AsynchronousIfNested */)
+            _playCoverItemIncubator = incubator
+
+            // https://doc.qt.io/qt-6/qml-qtqml-component.html#incubateObject-method
+            if (incubator.status !== Component.Ready) {
+                incubator.onStatusChanged = function(status) {
+                    if (status === Component.Ready) {
+                        root._playCoverItem = incubator.object
+                        // Incubator should be garbage collected, we don't need it anymore:
+                        root._playCoverItemIncubator = null
+                    }
+                }
+            } else {
+                root._playCoverItem = incubator.object
+                // Incubator should be garbage collected, we don't need it anymore:
+                root._playCoverItemIncubator = null
+            }
+        }
     }
 }
