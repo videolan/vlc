@@ -66,7 +66,7 @@ static block_t *Reassemble ( decoder_t *, block_t * );
 static void ParseMetaInfo  ( decoder_t *, block_t * );
 static int  ParseHeader    ( decoder_t *, block_t * );
 static subpicture_t *DecodePacket( decoder_t *, block_t * );
-static void RenderImage( decoder_t *, block_t *, subpicture_region_t * );
+static int RenderImage( decoder_t *, block_t *, subpicture_region_t * );
 
 #define SUBTITLE_BLOCK_EMPTY 0
 #define SUBTITLE_BLOCK_PARTIAL 1
@@ -560,7 +560,12 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     p_region->i_x = p_region->i_x * 3 / 4; /* FIXME: use aspect ratio for x? */
     p_region->i_y = p_sys->i_y_start;
 
-    RenderImage( p_dec, p_data, p_region );
+    if( RenderImage( p_dec, p_data, p_region ) != VLC_SUCCESS )
+    {
+        msg_Err( p_dec, "cannot render SPU region" );
+        subpicture_Delete( p_spu );
+        return NULL;
+    }
 
     return p_spu;
 }
@@ -588,7 +593,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
  a 4-bit alpha (filling 8 bits), and 8-bit y, u, and v entry.
 
  *****************************************************************************/
-static void RenderImage( decoder_t *p_dec, block_t *p_data,
+static int RenderImage( decoder_t *p_dec, block_t *p_data,
                          subpicture_region_t *p_region )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -596,6 +601,9 @@ static void RenderImage( decoder_t *p_dec, block_t *p_data,
     int i_field;            /* The subtitles are interlaced */
     size_t i_row, i_column; /* scanline row/column number */
     bs_t bs;
+
+    if( p_data->i_buffer <= p_sys->i_image_offset )
+        return VLC_EGENERIC;
 
     bs_init( &bs, p_data->p_buffer + p_sys->i_image_offset,
              p_data->i_buffer - p_sys->i_image_offset );
@@ -633,4 +641,5 @@ static void RenderImage( decoder_t *p_dec, block_t *p_data,
             bs_align( &bs );
         }
     }
+    return VLC_SUCCESS;
 }
