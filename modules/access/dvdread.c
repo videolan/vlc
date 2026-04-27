@@ -2222,7 +2222,7 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
                   p_vts->vts_vobu_admap->last_byte < VOBU_ADMAP_SIZE ) )
         return VLC_EGENERIC;
 
-    int i_vobu = 1;
+    size_t i_vobu = 1;
     const size_t i_vobu_sect_index_count =
             (p_vts->vts_vobu_admap->last_byte + 1 - VOBU_ADMAP_SIZE) /
             sizeof(*p_vts->vts_vobu_admap->vobu_start_sectors);
@@ -2249,9 +2249,9 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
     }
 
     /* i_vobu reaches count when no entry exceeds i_block, guard the debug peek */
-    const size_t i_vobu_dbg_next = (size_t)i_vobu < i_vobu_sect_index_count
-        ? (size_t)i_vobu : i_vobu_sect_index_count - 1;
-    msg_Dbg( p_demux, "cell %d i_sub_cell %d chapter %d vobu %d "
+    const size_t i_vobu_dbg_next = i_vobu < i_vobu_sect_index_count
+        ? i_vobu : i_vobu_sect_index_count - 1;
+    msg_Dbg( p_demux, "cell %d i_sub_cell %d chapter %d vobu %zu "
              "cell_sector %d vobu_sector %d sub_cell_sector %d",
              i_cell, i_sub_cell, i_chapter, i_vobu,
              p_sys->p_cur_pgc->cell_playback[i_cell].first_sector,
