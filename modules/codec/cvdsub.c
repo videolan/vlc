@@ -202,7 +202,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     if( !(p_spu = Reassemble( p_dec, p_block )) ) return NULL;
 
     p_spu->i_dts = p_spu->i_pts;
-    p_spu->i_length = VLC_TICK_INVALID;
+    p_spu->i_length = 0;
 
     return p_spu;
 }
