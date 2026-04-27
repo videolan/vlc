@@ -61,6 +61,19 @@ ImageExt {
         return true
     }
 
+    /// <debug>
+    readonly property QtObject _sourceWindow: (targetTextureProvider?.Window.window ?? null)
+    function _onWindowChanged() {
+        console.assert((_sourceWindow && root.Window.window) ? (_sourceWindow === root.Window.window) : true)
+    }
+    on_SourceWindowChanged: {
+        _onWindowChanged()
+    }
+    Window.onWindowChanged: {
+        _onWindowChanged()
+    }
+    /// </debug>
+
     TextureProviderIndirection {
         id: textureProviderIndirection
 
@@ -82,20 +95,12 @@ ImageExt {
 
         textureSubRect: sourceNeedsTiling ? Qt.rect(0, 0, root.paintedWidth, root.paintedHeight) : undefined
 
-        property size textureSize
-
-        Connections {
-            target: root.Window.window
-            enabled: root.visible && textureProviderIndirection.source && !(textureProviderIndirection.source instanceof Image)
-
-            function onAfterAnimating() {
-                textureProviderIndirection.textureSize = observer.textureSize
-            }
-        }
+        readonly property size textureSize: observer.textureSize
 
         TextureProviderObserver {
             id: observer
             source: textureProviderIndirection
+            notifyAllChanges: (root.visible && textureProviderIndirection.source)
         }
     }
 }
