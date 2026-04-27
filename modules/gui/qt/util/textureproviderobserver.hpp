@@ -65,6 +65,7 @@ class TextureProviderObserver : public QObject
     Q_PROPERTY(bool hasMipmaps READ hasMipmaps NOTIFY hasMipmapsChanged FINAL)
     Q_PROPERTY(bool isAtlasTexture READ isAtlasTexture NOTIFY isAtlasTextureChanged FINAL)
     Q_PROPERTY(bool isValid READ isValid NOTIFY isValidChanged FINAL) // whether a texture is provided or not
+    Q_PROPERTY(bool isDynamic READ isDynamic NOTIFY isDynamicChanged FINAL) // whether the texture is `QSGDynamicTexture`
 
 public:
     explicit TextureProviderObserver(QObject *parent = nullptr);
@@ -82,6 +83,7 @@ public:
     bool hasMipmaps() const;
     bool isAtlasTexture() const;
     bool isValid() const;
+    bool isDynamic() const;
 
 signals:
     void notifyAllChangesChanged();
@@ -93,6 +95,7 @@ signals:
     void hasMipmapsChanged(bool);
     void isAtlasTextureChanged(bool);
     void isValidChanged(bool);
+    void isDynamicChanged(bool);
     void comparisonKeyChanged(qint64);
 
 private slots:
@@ -112,6 +115,7 @@ private:
     // where the SG synchronization would not be blocking the (GUI) thread where this
     // observer lives.
 
+    std::atomic<bool> m_textureIsDynamic = false;
     std::atomic<bool> m_notifyAllChanges = false;
     std::atomic<QSize> m_textureSize {{}}; // invalid by default
     std::atomic<QSize> m_nativeTextureSize {{}}; // invalid by default

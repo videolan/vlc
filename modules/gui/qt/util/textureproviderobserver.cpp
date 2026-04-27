@@ -152,6 +152,11 @@ bool TextureProviderObserver::isValid() const
     return m_isValid.load(std::memory_order_acquire);
 }
 
+bool TextureProviderObserver::isDynamic() const
+{
+    return m_textureIsDynamic.load(std::memory_order_acquire);
+}
+
 qint64 TextureProviderObserver::comparisonKey() const
 {
     return m_comparisonKey.load(std::memory_order_acquire);
@@ -177,6 +182,10 @@ void TextureProviderObserver::updateProperties()
 
         if (const auto texture = m_provider->texture())
         {
+            const bool textureIsDynamic = qobject_cast<QSGDynamicTexture*>(texture);
+            if (m_textureIsDynamic.exchange(textureIsDynamic, memoryOrder) != textureIsDynamic)
+                emit isDynamicChanged(textureIsDynamic);
+
             {
                 // SG and native texture size
 
@@ -303,6 +312,9 @@ void TextureProviderObserver::updateProperties()
 
 void TextureProviderObserver::resetProperties(std::memory_order memoryOrder)
 {
+    if (m_textureIsDynamic.exchange(false, memoryOrder))
+        emit isDynamicChanged(false);
+
     if (m_textureSize.exchange({}, memoryOrder) != QSize())
         emit textureSizeChanged({});
 
