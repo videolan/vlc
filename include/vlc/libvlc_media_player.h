@@ -255,6 +255,8 @@ LIBVLC_API void libvlc_media_player_set_media( libvlc_media_player_t *p_mi,
  * \param p_mi the Media Player
  * \return the media associated with p_mi, or NULL if no
  *         media is associated
+ * \note the caller is responsible for releasing the returned media
+ *       with libvlc_media_release().
  */
 LIBVLC_API libvlc_media_t * libvlc_media_player_get_media( libvlc_media_player_t *p_mi );
 
