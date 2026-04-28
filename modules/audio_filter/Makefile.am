@@ -26,6 +26,9 @@ libcompressor_plugin_la_LIBADD = libdynamics_common.la $(LIBM)
 libexpander_plugin_la_SOURCES = audio_filter/expander.c \
 	audio_filter/dynamics.h
 libexpander_plugin_la_LIBADD = libdynamics_common.la $(LIBM)
+liblimiter_plugin_la_SOURCES = audio_filter/limiter.c \
+	audio_filter/dynamics.h
+liblimiter_plugin_la_LIBADD = libdynamics_common.la $(LIBM)
 libequalizer_plugin_la_SOURCES = audio_filter/equalizer.c \
 	audio_filter/equalizer_presets.h
 libequalizer_plugin_la_LIBADD = $(LIBM)
@@ -65,6 +68,7 @@ audio_filter_PLUGINS += \
 	libchorus_flanger_plugin.la \
 	libcompressor_plugin.la \
 	libexpander_plugin.la \
+	liblimiter_plugin.la \
 	libequalizer_plugin.la \
 	libgate_plugin.la \
 	libkaraoke_plugin.la \

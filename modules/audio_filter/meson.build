@@ -43,6 +43,14 @@ vlc_modules += {
     'link_with' : [libdynamics],
 }
 
+# Limiter module
+vlc_modules += {
+    'name' : 'limiter',
+    'sources' : files('limiter.c'),
+    'dependencies' : [m_lib],
+    'link_with' : [libdynamics],
+}
+
 # Equalizer filter module
 vlc_modules += {
     'name' : 'equalizer',
