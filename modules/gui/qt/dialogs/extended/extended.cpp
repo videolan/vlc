@@ -75,6 +75,10 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
     connect( expand, &AudioFilterControlWidget::configChanged, this, &ExtendedDialog::putAudioConfig );
     audioTab->addTab( expand, qtr( "Expander" ) );
 
+    Limiter *limit = new Limiter( p_intf, audioTab );
+    connect( limit, &AudioFilterControlWidget::configChanged, this, &ExtendedDialog::putAudioConfig );
+    audioTab->addTab( limit, qtr( "Limiter" ) );
+
     Spatializer *spatial = new Spatializer( p_intf, audioTab );
     connect( spatial, &AudioFilterControlWidget::configChanged, this, &ExtendedDialog::putAudioConfig );
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
