@@ -52,6 +52,8 @@
 #include "ogg_granule.h"
 #include "opus.h"
 
+#include <limits.h>
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -3230,13 +3232,26 @@ static void Ogg_ReadSkeletonHeader( demux_t *p_demux, logical_stream_t *p_stream
                                     ogg_packet *p_oggpacket )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    if( p_oggpacket->bytes < 12 )
+    if( p_oggpacket->bytes < 24 )
         return;
 
     p_sys->p_skelstream = p_stream;
     /* There can be only 1 skeleton for streams */
     p_sys->skeleton.major = GetWLE( &p_oggpacket->packet[8] );
     p_sys->skeleton.minor = GetWLE( &p_oggpacket->packet[10] );
+    uint64_t presentationtime_num = GetQWLE( &p_oggpacket->packet[12] );
+    uint64_t presentationtime_den = GetQWLE( &p_oggpacket->packet[20] );
+    if ( presentationtime_num != 0 && presentationtime_den != 0 )
+    {
+        int64_t presentationtime_gcd = GCD(presentationtime_num, presentationtime_den);
+        if ( presentationtime_gcd > 1 )
+        {
+            presentationtime_num = presentationtime_num / presentationtime_gcd;
+            presentationtime_den = presentationtime_den / presentationtime_gcd;
+        }
+        if ( presentationtime_num <= UINT32_MAX && presentationtime_den <= UINT32_MAX )
+            date_Init( &p_stream->dts, presentationtime_num, presentationtime_den );
+    }
     if ( asprintf( & p_stream->fmt.psz_description,
                    "OGG Skeleton version %" PRIu16 ".%" PRIu16,
                    p_sys->skeleton.major, p_sys->skeleton.minor ) < 0 )
