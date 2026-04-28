@@ -172,6 +172,8 @@ vlc_tick_t Ogg_SampleToTime( const logical_stream_t *p_stream, int64_t i_sample,
         return VLC_TICK_INVALID;
 
     date_t d = p_stream->dts;
+    if ( d.i_divider_num == 0 )
+        return VLC_TICK_INVALID;
     date_Set(&d, VLC_TICK_0);
     return date_Increment( &d, i_sample );
 }
