@@ -57,6 +57,8 @@ class TextureProviderIndirection : public QQuickItem
 {
     Q_OBJECT
 
+    // NOTE: source must be a texture provider item.
+    // NOTE: If source's texture provider changes, it is required to re-set the property.
     Q_PROPERTY(const QQuickItem* source MEMBER m_source NOTIFY sourceChanged FINAL)
     // NOTE: Although this is named as `textureSubRect`, it is allowed to provide a larger size than
     //       the texture size. In that case, the texture's wrap mode is going to be relevant, provided
