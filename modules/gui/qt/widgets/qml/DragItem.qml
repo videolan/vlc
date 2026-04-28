@@ -90,9 +90,11 @@ Item {
     }
 
     /**
+      * This function must be called when dragging is active.
       * @return {Promise} Promise object of the input items
       */
     function getSelectedInputItem() {
+        console.assert(dragItem.Drag.active)
         if (_inputItems)
             return Promise.resolve(dragItem._inputItems)
         else if (dragItem._dropPromise)
@@ -304,6 +306,7 @@ Item {
 
                 _covers = []
                 _data = []
+                dragItem._inputItems = undefined
             }
 
             transitions: ({
