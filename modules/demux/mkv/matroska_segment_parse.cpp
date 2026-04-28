@@ -1184,6 +1184,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         }
         E_CASE( KaxChapterSegmentUID, uid )
         {
+            delete vars.chapters.p_segment_uid;
             vars.chapters.p_segment_uid = new KaxChapterSegmentUID( uid );
             vars.obj->b_ref_external_segments = true;
 
