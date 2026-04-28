@@ -1041,7 +1041,11 @@ AC_ARG_ENABLE([partial-linking],
   AS_HELP_STRING([--enable-partial-linking],
     [use partial linking for static plugin builds (default disabled)]))
 
+dnl Partial linking is only supported on ELF platforms and Apple platforms
 have_partial_linking_support=no
+AS_IF([test "${SYS}" = "linux" -o "${VENDOR}" = "android" -o "${SYS}" = "darwin"], [
+    have_partial_linking_support=yes
+])
 
 AS_IF([test "${enable_partial_linking}" = "yes" -a "${have_partial_linking_support}" != "yes"], [
     AC_MSG_ERROR([Partial linking is not supported on this platform.])
