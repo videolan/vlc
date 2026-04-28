@@ -200,6 +200,14 @@ public:
     Compressor( qt_intf_t *, QWidget * );
 };
 
+class Expander: public AudioFilterControlWidget
+{
+    Q_OBJECT
+
+public:
+    Expander( qt_intf_t *, QWidget * );
+};
+
 class Spatializer: public AudioFilterControlWidget
 {
     Q_OBJECT

@@ -71,6 +71,10 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
     connect( compres, &AudioFilterControlWidget::configChanged, this, &ExtendedDialog::putAudioConfig );
     audioTab->addTab( compres, qtr( "Compressor" ) );
 
+    Expander *expand = new Expander( p_intf, audioTab );
+    connect( expand, &AudioFilterControlWidget::configChanged, this, &ExtendedDialog::putAudioConfig );
+    audioTab->addTab( expand, qtr( "Expander" ) );
+
     Spatializer *spatial = new Spatializer( p_intf, audioTab );
     connect( spatial, &AudioFilterControlWidget::configChanged, this, &ExtendedDialog::putAudioConfig );
     audioTab->addTab( spatial, qtr( "Spatializer" ) );

@@ -1257,6 +1257,28 @@ Compressor::Compressor( qt_intf_t *p_intf, QWidget *parent )
 }
 
 /**********************************************************************
+ * Dynamic range expander
+ **********************************************************************/
+
+Expander::Expander( qt_intf_t *p_intf, QWidget *parent )
+    : AudioFilterControlWidget( p_intf, parent, "expander" )
+{
+    i_smallfont = -2;
+    const FilterSliderData::slider_data_t a[7] =
+    {
+        { "expander-rms-peak",    qtr("RMS/peak"),         "",       0.0f,   1.0f,   0.20f, 0.001f, 1.0 },
+        { "expander-attack",      qtr("Attack"),       qtr("ms"),   1.5f, 400.0f,  25.00f, 0.100f, 1.0 },
+        { "expander-release",     qtr("Release"),      qtr("ms"),   2.0f, 800.0f, 100.00f, 0.100f, 1.0 },
+        { "expander-threshold",   qtr("Threshold"),    qtr("dB"), -60.0f,   0.0f, -25.00f, 0.010f, 1.0 },
+        { "expander-ratio",       qtr("Ratio"),            ":1",     1.0f,  20.0f,   2.00f, 0.010f, 1.0 },
+        { "expander-knee",        qtr("Knee\nradius"), qtr("dB"),   1.0f,  10.0f,   5.00f, 0.010f, 1.0 },
+        { "expander-makeup-gain", qtr("Makeup\ngain"), qtr("dB"),   0.0f,  24.0f,   0.00f, 0.010f, 1.0 },
+    };
+    for( int i=0; i<7 ;i++ ) controls.append( a[i] );
+    build();
+}
+
+/**********************************************************************
  * Spatializer
  **********************************************************************/
 
