@@ -8,31 +8,31 @@ Subject: [PATCH 2/2] Only link with ZLib library if it's found
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 9c3cd5e..e8d913b 100644
+index 9c8b8ac..ba45468 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -55,7 +55,9 @@ add_library(mysofa-static STATIC ${libsrc})
+@@ -74,7 +74,9 @@ add_library(mysofa-static STATIC ${libsrc})
  if(MATH)
-     target_link_libraries (mysofa-static ${MATH})
+     target_link_libraries(mysofa-static LINK_PRIVATE ${MATH})
  endif()
--target_link_libraries (mysofa-static ${ZLIB_LIBRARIES})
+-target_link_libraries(mysofa-static LINK_PRIVATE ${ZLIB_LIBRARIES})
 +if(ZLIB_LIBRARIES)
-+    target_link_libraries (mysofa-static ${ZLIB_LIBRARIES})
++    target_link_libraries(mysofa-static LINK_PRIVATE ${ZLIB_LIBRARIES})
 +endif()
- SET_TARGET_PROPERTIES(mysofa-static PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1 POSITION_INDEPENDENT_CODE ON)
- install(TARGETS mysofa-static
-   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-@@ -65,7 +67,9 @@ if(BUILD_SHARED_LIBS)
+ set_target_properties(
+   mysofa-static
+   PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1 POSITION_INDEPENDENT_CODE
+@@ -99,7 +101,9 @@ if(BUILD_SHARED_LIBS)
    if(MATH)
-     target_link_libraries (mysofa-shared ${MATH})
+     target_link_libraries(mysofa-shared PRIVATE ${MATH})
    endif()
--  target_link_libraries (mysofa-shared ${ZLIB_LIBRARIES})
+-  target_link_libraries(mysofa-shared PRIVATE ${ZLIB_LIBRARIES})
 +  if(ZLIB_LIBRARIES)
-+    target_link_libraries (mysofa-shared ${ZLIB_LIBRARIES})
++    target_link_libraries(mysofa-shared PRIVATE ${ZLIB_LIBRARIES})
 +  endif()
-   SET_TARGET_PROPERTIES(mysofa-shared PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1)
-   set_property(TARGET mysofa-shared PROPERTY VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-   set_property(TARGET mysofa-shared PROPERTY SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR} )
+   set_target_properties(mysofa-shared
+                         PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1)
+   set_property(
 -- 
-2.52.0.windows.1
+2.43.0
 
