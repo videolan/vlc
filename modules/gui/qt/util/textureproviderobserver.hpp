@@ -33,6 +33,7 @@ class TextureProviderObserver : public QObject
     Q_OBJECT
 
     // NOTE: source must be a texture provider item.
+    // NOTE: If source's texture provider changes, it is required to re-set the property.
     Q_PROPERTY(const QQuickItem* source MEMBER m_source WRITE setSource NOTIFY sourceChanged FINAL)
 
     // WARNING: Texture properties are updated in the rendering thread.

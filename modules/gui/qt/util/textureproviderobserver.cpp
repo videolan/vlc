@@ -129,6 +129,14 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
 
                 connect(m_provider, &QSGTextureProvider::textureChanged, this, &TextureProviderObserver::updateProperties, Qt::DirectConnection);
 
+                // `QQuickItem` does not signal if it would have a new texture provider, so we simply set the source to null instead.
+                // We probably don't need to do the same for `m_source`, because if it is destroyed, the property should be updated
+                // instead, which in QML side is assumed to be done implicitly. Note that this is unlikely and no item does that,
+                // but it is still better to have this:
+                connect(m_provider, &QObject::destroyed, this, [this]() {
+                    setSource(nullptr); // This also implicitly calls `resetProperties()`.
+                });
+
                 updateProperties();
             }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
         };
