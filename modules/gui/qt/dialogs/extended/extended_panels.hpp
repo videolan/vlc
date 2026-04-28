@@ -120,6 +120,7 @@ protected:
     QLabel *nameLabel;
     const slider_data_t *p_data;
     qt_intf_t *p_intf;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 public slots:
     virtual void onValueChanged( int i );
@@ -168,6 +169,7 @@ protected:
     int index;
     QStringList getBandsFromAout() const;
     void writeToConfig() override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 public slots:
     void onValueChanged( int i ) override;

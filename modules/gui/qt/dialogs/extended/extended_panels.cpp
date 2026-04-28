@@ -819,6 +819,7 @@ void ExtV4l2::ValueChange( int value )
 FilterSliderData::FilterSliderData( QObject *parent, QSlider *_slider ) :
     QObject( parent ), slider( _slider )
 {
+    slider->installEventFilter(this);
 }
 
 FilterSliderData::FilterSliderData( QObject *parent,
@@ -838,6 +839,8 @@ FilterSliderData::FilterSliderData( QObject *parent,
     if ( slider->value() == slider->maximum() ||
          slider->value() == slider->minimum() )
         updateText( slider->value() );
+    
+    slider->installEventFilter(this);
     connect( slider, &QSlider::valueChanged, this, &FilterSliderData::onValueChanged );
 }
 
@@ -887,6 +890,16 @@ void FilterSliderData::writeToConfig()
 {
     float f = ((float) slider->value()) * p_data->f_resolution;
     emit configChanged( p_data->name, QVariant( f ) );
+}
+
+bool FilterSliderData::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonDblClick)
+    {
+        setValue(p_data->f_value);
+        return true;
+    }
+    return false;
 }
 
 AudioFilterControlWidget::AudioFilterControlWidget
@@ -1052,6 +1065,38 @@ void EqualizerSliderData::writeToConfig()
         bands[ index ] = QLocale( QLocale::C ).toString( f );
         emit configChanged( p_data->name, QVariant( bands.join( " " ) ) );
     }
+}
+
+bool EqualizerSliderData::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonDblClick)
+    {    
+        SharedAOut p_aout = THEMIM->getAout();
+        if (p_aout)
+        {
+            char *psz_preset = var_GetString(p_aout.get(), "equalizer-preset");
+            if (psz_preset)
+            {
+                int j = -1;
+                for (int i = 0; i < NB_PRESETS; ++i)
+                {
+                    if (!strcmp(psz_preset, preset_list[i]))
+                    {
+                        j = i;
+                        break;
+                    }
+                }
+                free(psz_preset);
+
+                if (j >= 0 && index < eqz_preset_10b[j].i_band)
+                {
+                    setValue(eqz_preset_10b[j].f_amp[index]);
+                    return true;
+                }
+            }
+        }
+    }
+    return FilterSliderData::eventFilter(watched, event);
 }
 
 Equalizer::Equalizer( qt_intf_t *p_intf, QWidget *parent )
