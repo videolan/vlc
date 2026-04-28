@@ -35,6 +35,14 @@ vlc_modules += {
     'link_with' : [libdynamics],
 }
 
+# Expander module
+vlc_modules += {
+    'name' : 'expander',
+    'sources' : files('expander.c'),
+    'dependencies' : [m_lib],
+    'link_with' : [libdynamics],
+}
+
 # Equalizer filter module
 vlc_modules += {
     'name' : 'equalizer',
