@@ -1,6 +1,6 @@
 # Mysofa
 
-MYSOFA_VERSION := 0.8
+MYSOFA_VERSION := 1.2.1
 MYSOFA_URL = $(GITHUB)/hoene/libmysofa/archive/v$(MYSOFA_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"libmysofa"),)

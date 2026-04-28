@@ -9,10 +9,10 @@ If it's not found it may not be required (or linking will fail).
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index ec4de1d..9c3cd5e 100644
+index f330262..9c8b8ac 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -15,12 +15,9 @@ configure_file (config.h.in ${PROJECT_SOURCE_DIR}/src/config.h)
+@@ -15,12 +15,9 @@ configure_file(config.h.in ${PROJECT_SOURCE_DIR}/src/config.h)
  if(NOT MSVC)
    if(NOT WIN32)
      find_library(MATH m)
@@ -23,9 +23,9 @@ index ec4de1d..9c3cd5e 100644
  else()
 -  set(MATH "")
    find_program(NUGET nuget)
-   if (NUGET)
+   if(NUGET)
      execute_process(COMMAND ${NUGET} install zlib)
-@@ -35,15 +32,12 @@ endif()
+@@ -32,15 +29,12 @@ endif()
  if(NOT MSVC)
    if(NOT WIN32)
      find_library(MATH m)
@@ -34,36 +34,37 @@ index ec4de1d..9c3cd5e 100644
    endif()
    include(FindZLIB)
    include_directories(${ZLIB_INCLUDE_DIRS})
-   SET(PKG_CONFIG_PRIVATELIBS "-lm ${PKG_CONFIG_PRIVATELIBS}")
-   SET(PKG_CONFIG_PRIVATELIBS "-lz ${PKG_CONFIG_PRIVATELIBS}")
+   set(PKG_CONFIG_PRIVATELIBS "-lm ${PKG_CONFIG_PRIVATELIBS}")
+   set(PKG_CONFIG_PRIVATELIBS "-lz ${PKG_CONFIG_PRIVATELIBS}")
  else()
--    set(MATH "")
-     find_program(NUGET nuget)
-     if (NOT NUGET)
-        message(FATAL "Cannot find nuget command line tool.\nInstall it with e.g. choco install nuget.commandline")
-@@ -58,14 +52,20 @@ set(libsrc hrtf/reader.c hdf/superblock.c hdf/dataobject.c hdf/btree.c hdf/fract
-   hrtf/lookup.c hrtf/tools.c hrtf/kdtree.c hrtf/neighbors.c hrtf/interpolate.c hrtf/resample.c hrtf/loudness.c hrtf/minphase.c hrtf/easy.c hrtf/cache.c 
-   resampler/speex_resampler.c)
+-  set(MATH "")
+   find_program(NUGET nuget)
+   if(NOT NUGET)
+     message(
+@@ -77,7 +71,10 @@ set(libsrc
+     resampler/speex_resampler.c)
+ if(BUILD_STATIC_LIBS)
  add_library(mysofa-static STATIC ${libsrc})
--target_link_libraries (mysofa-static ${MATH} ${ZLIB_LIBRARIES})
+-target_link_libraries(mysofa-static LINK_PRIVATE ${MATH} ${ZLIB_LIBRARIES})
 +if(MATH)
-+    target_link_libraries (mysofa-static ${MATH})
++    target_link_libraries(mysofa-static LINK_PRIVATE ${MATH})
 +endif()
-+target_link_libraries (mysofa-static ${ZLIB_LIBRARIES})
- SET_TARGET_PROPERTIES(mysofa-static PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1 POSITION_INDEPENDENT_CODE ON)
- install(TARGETS mysofa-static
-   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
++target_link_libraries(mysofa-static LINK_PRIVATE ${ZLIB_LIBRARIES})
+ set_target_properties(
+   mysofa-static
+   PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1 POSITION_INDEPENDENT_CODE
+@@ -99,7 +96,10 @@ endif()
  
  if(BUILD_SHARED_LIBS)
    add_library(mysofa-shared SHARED ${libsrc})
--  target_link_libraries (mysofa-shared ${MATH} ${ZLIB_LIBRARIES})
+-  target_link_libraries(mysofa-shared PRIVATE ${MATH} ${ZLIB_LIBRARIES})
 +  if(MATH)
-+    target_link_libraries (mysofa-shared ${MATH})
++    target_link_libraries(mysofa-shared PRIVATE ${MATH})
 +  endif()
-+  target_link_libraries (mysofa-shared ${ZLIB_LIBRARIES})
-   SET_TARGET_PROPERTIES(mysofa-shared PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1)
-   set_property(TARGET mysofa-shared PROPERTY VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-   set_property(TARGET mysofa-shared PROPERTY SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR} )
++  target_link_libraries(mysofa-shared PRIVATE ${ZLIB_LIBRARIES})
+   set_target_properties(mysofa-shared
+                         PROPERTIES OUTPUT_NAME mysofa CLEAN_DIRECT_OUTPUT 1)
+   set_property(
 -- 
-2.52.0.windows.1
+2.43.0
 
