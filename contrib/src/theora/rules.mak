@@ -1,6 +1,6 @@
 # Theora
 
-THEORA_VERSION := 1.1.1
+THEORA_VERSION := 1.2.0
 THEORA_URL := $(XIPH)/theora/libtheora-$(THEORA_VERSION).tar.xz
 
 PKGS += theora
@@ -16,11 +16,6 @@ $(TARBALLS)/libtheora-$(THEORA_VERSION).tar.xz:
 libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UNPACK)
 	$(call update_autoconfig,.)
-	$(APPLY) $(SRC)/theora/libtheora-compiler-differentiation.patch
-	$(APPLY) $(SRC)/theora/libtheora-no-forceaddr.patch
-	# Disable the generation of documentation. In 1.2.x it can be replaced by
-	# a --disable-doc parameter.
-	sed -i.orig "/^SUBDIRS =/s/doc//g" "$(UNPACK_DIR)/Makefile.am" "$(UNPACK_DIR)/Makefile.in"
 	$(MOVE)
 
 THEORACONF := \
@@ -28,7 +23,8 @@ THEORACONF := \
 	--disable-sdltest \
 	--disable-oggtest \
 	--disable-vorbistest \
-	--disable-examples
+	--disable-examples \
+	--disable-doc
 
 ifndef BUILD_ENCODERS
 THEORACONF += --disable-encode
@@ -36,16 +32,8 @@ endif
 ifndef HAVE_FPU
 THEORACONF += --disable-float
 endif
-ifdef HAVE_MACOSX64
-THEORACONF += --disable-asm
-endif
 ifdef HAVE_IOS
 THEORACONF += --disable-asm
-endif
-ifdef HAVE_WIN32
-ifeq ($(ARCH),x86_64)
-THEORACONF += --disable-asm
-endif
 endif
 
 DEPS_theora = ogg $(DEPS_ogg)
