@@ -112,6 +112,7 @@ parts:
       make -j ${CRAFT_PARALLEL_BUILD_COUNT}
       make install DESTDIR="${CRAFT_PART_INSTALL}"
 
+      find ${CRAFT_PART_INSTALL}/usr/lib -name "*.la" -delete
 
       cp ${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/256x256/apps/vlc.png ${CRAFT_PART_INSTALL}/vlc.png
       cp ${CRAFT_PART_INSTALL}/usr/share/applications/vlc.desktop ${CRAFT_PART_INSTALL}/vlc.desktop
