@@ -264,9 +264,6 @@ parts:
       - wayland-protocols
 
     stage-packages:
-      - on amd64:
-          - i965-va-driver
-          - intel-media-va-driver
       - dbus-x11
       - fonts-freefont-ttf
       - libaacs0
@@ -290,16 +287,12 @@ parts:
       - libdvdnav4
       - libdvdread8t64
       - libebur128-1
-      #- libegl1-mesa
       - libfluidsynth3
       - libfreetype6
       - libfribidi0
       - libgcc1
       - libgcrypt20
-      #- libgl1-mesa-glx
-      - libgles2
       - libglib2.0-0
-      - libglu1-mesa
       - libgme0
       - libgtk-3-0
       - libidn12
@@ -342,24 +335,15 @@ parts:
       - libtheora0
       - libtwolame0
       - libupnp17t64
-      - libva-drm2
-      - libva-wayland2
-      - libva-x11-2
-      - libva2
-      - libvdpau1
       - libvncclient1
       - libvorbisfile3
       - libvpx9
-      - libvulkan1
-      - libx11-6
       - libx264-164
       - libx265-199
       - libxcb-composite0
       - libxcb-damage0
       - libxcb-keysyms1
       - libxcb-randr0
-      - libxcb-shm0
-      - libxcb1
       - libxcomposite1
       - libxcursor1
       - libxext6
@@ -369,12 +353,7 @@ parts:
       - libxpm4
       - libxrandr2
       - libzvbi0
-      - mesa-utils
-      - mesa-va-drivers
-      - mesa-vdpau-drivers
-      - mesa-vulkan-drivers
       - openjdk-8-jdk
-      - vdpau-driver-all
       - zlib1g
     prime:
       #excluded
@@ -396,15 +375,9 @@ parts:
     organize:
       vlc-snap-wrapper.sh: usr/bin/vlc-snap-wrapper.sh
 
-  fixup-vulkan-icd-paths:
-    plugin: nil
-    after: [wrapper]
-    override-build: |
-      sed -i -E 's,(^.+"library_path": ")/.*/,\1,' ${CRAFT_STAGE}/usr/share/vulkan/icd.d/*.json
-
   cleanup:
     after:
-      - fixup-vulkan-icd-paths
+      - wrapper
     plugin: nil
     build-snaps:
       - core24
