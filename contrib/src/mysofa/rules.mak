@@ -3,8 +3,6 @@
 MYSOFA_VERSION := 0.8
 MYSOFA_URL = $(GITHUB)/hoene/libmysofa/archive/v$(MYSOFA_VERSION).tar.gz
 
-PKGS += mysofa
-
 ifeq ($(call need_pkg,"libmysofa"),)
 PKGS_FOUND += mysofa
 endif
