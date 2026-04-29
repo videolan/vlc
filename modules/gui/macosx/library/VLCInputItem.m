@@ -63,7 +63,6 @@ static void cb_subtree_added(input_item_t *p_item, input_item_node_t *p_node, vo
         VLCInputItem *inputItem = (__bridge VLCInputItem *)p_data;
         [inputItem subTreeAdded:p_node];
     });
-    input_item_node_Delete(p_node);
 }
 
 static const struct input_item_parser_cbs_t parserCallbacks =
@@ -103,6 +102,8 @@ static const struct input_item_parser_cbs_t parserCallbacks =
         input_item_parser_id_Release(_p_parserID);
     if (_vlcInputItem)
         input_item_Release(_vlcInputItem);
+    if (_subTree)
+        input_item_node_Delete(_subTree);
 }
 
 - (NSString *)name
@@ -445,6 +446,9 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (void)subTreeAdded:(input_item_node_t *)p_node
 {
+    if (_subTree) {
+        input_item_node_Delete(_subTree);
+    }
     _subTree = p_node;
     [NSNotificationCenter.defaultCenter postNotificationName:VLCInputItemSubtreeAdded object:self];
 }
