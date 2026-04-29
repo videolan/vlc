@@ -191,6 +191,10 @@ FSM {
             askShow: {
                 target: fsmVisible
             },
+            updateVideoEmbed: {
+                guard: () => !MainCtx.hasEmbededVideo,
+                target: fsmVisible
+            },
         })
     }
  
