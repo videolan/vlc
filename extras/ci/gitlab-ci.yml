@@ -428,6 +428,14 @@ debian-meson:
     allow_failure: true
     variables: *variables-snap
 
+snap:
+  extends: .snap-common
+  when: manual # disabled
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - extras/package/snap/*
+
 nightly-snap:
     extends: .snap-common
     rules:
