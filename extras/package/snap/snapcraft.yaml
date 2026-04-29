@@ -382,12 +382,11 @@ parts:
     build-snaps:
       - core24
       - kf6-core24
-      - kde-qt6-core24
     # remove libraries already present in base snap pacakges
     # kf6-core24 already ships vlc, make sure to not delete our own files
     override-prime: |
       set -eux
-      for snap in "core24" "kf6-core24" "kde-qt6-core24"
+      for snap in "core24" "kf6-core24"
       do
         cd "/snap/$snap/current" && find . -type f,l -a ! -path "*vlc*" -exec rm -rf "{$CRAFT_PRIME}/{}" \;
       done
