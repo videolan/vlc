@@ -383,6 +383,16 @@ Item {
             if (!ds2layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
 
+            if (root._window) {
+                root._window.afterAnimating.disconnect(ds2layer, ds2layer.scheduleChainedUpdate)
+            }
+
+            // If `live` is turned on during a chained update, we do not need to continue:
+            if (root.live) {
+                root._window = null
+                return
+            }
+
             ds2.sourceTextureSize = ds2.tpObserver.nativeTextureSize
             if (ds2.ensurePolished)
                 ds2.ensurePolished()
@@ -391,7 +401,6 @@ Item {
             ds2layer.scheduleUpdate()
 
             if (root._window) {
-                root._window.afterAnimating.disconnect(ds2layer, ds2layer.scheduleChainedUpdate)
                 root._window.afterAnimating.connect(us1layer, us1layer.scheduleChainedUpdate)
             }
         }
@@ -429,6 +438,16 @@ Item {
             if (!us1layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
 
+            if (root._window) {
+                root._window.afterAnimating.disconnect(us1layer, us1layer.scheduleChainedUpdate)
+            }
+
+            // If `live` is turned on during a chained update, we do not need to continue:
+            if (root.live) {
+                root._window = null
+                return
+            }
+
             us1.sourceTextureSize = us1.tpObserver.nativeTextureSize
             if (us1.ensurePolished)
                 us1.ensurePolished()
@@ -436,7 +455,6 @@ Item {
             us1layer.scheduleUpdate()
 
             if (root._window) {
-                root._window.afterAnimating.disconnect(us1layer, us1layer.scheduleChainedUpdate)
                 root._window.afterAnimating.connect(us1layer, us1layer.releaseResourcesOfIntermediateLayers)
             }
         }
