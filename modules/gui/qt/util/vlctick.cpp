@@ -277,9 +277,7 @@ VLCTime::VLCTime(VLCDuration d)
 
 VLCDuration VLCTime::operator-(const VLCTime &rhs) const
 {
-    if(m_ticks >= rhs.m_ticks)
-        return VLCDuration(m_ticks - rhs.m_ticks);
-    return VLCDuration();
+    return VLCDuration(m_ticks - rhs.m_ticks);
 }
 
 bool VLCTime::operator<=(const VLCTime &rhs) const
