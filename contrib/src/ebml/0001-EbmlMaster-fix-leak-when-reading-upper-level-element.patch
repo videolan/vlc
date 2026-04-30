@@ -1,7 +1,7 @@
-From 3660273b4a6b71f9678da744f86a2035fd98fcc2 Mon Sep 17 00:00:00 2001
+From fd2b70256e8e4b35a62a90bfae2ca48e0996d5a2 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 25 Jul 2025 14:37:18 +0200
-Subject: [PATCH] EbmlMaster: fix leak when reading upper level elements
+Subject: [PATCH 1/2] EbmlMaster: fix leak when reading upper level elements
 
 When an element from an upper level is found we go up the caller chain,
 passing the found element but it was not actually used (added to a list or freed).
@@ -14,19 +14,15 @@ The new MaxSizeToRead is the size to read in the next inDataStream.FindNextEleme
 The old MaxSizeToRead <= 0 code seems bogus as it would exit the loop
 to find elements for that EbmlMaster even though there might still be elements to read.
 ---
- src/EbmlMaster.cpp | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ src/EbmlMaster.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/src/EbmlMaster.cpp b/src/EbmlMaster.cpp
-index 071eb5d..465560f 100644
+index faadfd0..e8a43cc 100644
 --- a/src/EbmlMaster.cpp
 +++ b/src/EbmlMaster.cpp
-@@ -455,9 +455,12 @@ void EbmlMaster::Read(EbmlStream & inDataStream, const EbmlSemanticContext & sCo
- 
-       if (UpperEltFound > 0) {
-         UpperEltFound--;
--        if (UpperEltFound > 0 || MaxSizeToRead <= 0)
-+        if (UpperEltFound > 0)
+@@ -453,6 +453,9 @@ void EbmlMaster::Read(EbmlStream & inDataStream, const EbmlSemanticContext & sCo
+         if (UpperEltFound > 0 || MaxSizeToRead == 0)
            goto processCrc;
          ElementLevelA = FoundElt;
 +        if (IsFiniteSize() && ElementLevelA->IsFiniteSize()) {
@@ -36,5 +32,5 @@ index 071eb5d..465560f 100644
        }
  
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 
