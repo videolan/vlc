@@ -440,6 +440,19 @@ Item {
             if (!ds1layer || !ds2layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
 
+            if (root._window) {
+                root._window.afterAnimating.disconnect(us1layer, us1layer.releaseResourcesOfIntermediateLayers)
+                root._window = null
+            }
+
+            // If `live` is turned on during a chained update, we should not attempt to
+            // release resources by removing layers from the scene, because turning live
+            // on already brings the layer to the scene and doing so would make the
+            // last layer (`us1layer`) being live while having a `sourceItem` that is
+            // not in the scene anymore:
+            if (root.live)
+                return
+
             us2.sourceTextureSize = us2.tpObserver.nativeTextureSize
 
             // Last layer is updated, now it is time to release the intermediate buffers:
@@ -448,11 +461,6 @@ Item {
             // https://doc.qt.io/qt-6/qquickitem.html#graphics-resource-handling
             ds1layer.parent = null
             ds2layer.inhibitParent = true
-
-            if (root._window) {
-                root._window.afterAnimating.disconnect(us1layer, us1layer.releaseResourcesOfIntermediateLayers)
-                root._window = null
-            }
 
             if (root._queuedScheduledUpdate) {
                 // Tried calling `scheduleUpdate()` before the ongoing chained updates completed.
