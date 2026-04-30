@@ -168,7 +168,7 @@ public:
         }
         try
         {
-            EbmlElement *el;
+            EbmlElement *el = nullptr;
             int i_upper_level = 0;
             m.Read( es, EBML_CONTEXT(&m), i_upper_level, el, true, scope );
             if (i_upper_level != 0)
