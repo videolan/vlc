@@ -1,6 +1,6 @@
 # librist
 
-LIBRIST_VERSION := v0.2.7
+LIBRIST_VERSION := v0.2.14
 LIBRIST_URL := https://code.videolan.org/rist/librist/-/archive/$(LIBRIST_VERSION)/librist-$(LIBRIST_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
@@ -25,6 +25,21 @@ ifdef HAVE_WIN32
 LIBRIST_CONF += -Dhave_mingw_pthreads=true
 endif
 
+# Prefer nettle+gmp+gnutls over the bundled mbedtls when the license
+# allows it. gnutls (nettle/gmp) can't be used with the LGPLv2 license.
+ifdef GPL
+LIBRIST_USE_GNUTLS = 1
+else
+ifdef GNUV3
+LIBRIST_USE_GNUTLS = 1
+endif
+endif
+
+ifeq ($(LIBRIST_USE_GNUTLS),1)
+DEPS_librist += gnutls $(DEPS_gnutls)
+LIBRIST_CONF += -Duse_nettle=true -Duse_mbedtls=false
+endif
+
 $(TARBALLS)/librist-$(LIBRIST_VERSION).tar.gz:
 	$(call download_pkg,$(LIBRIST_URL),librist)
 
@@ -32,9 +47,6 @@ $(TARBALLS)/librist-$(LIBRIST_VERSION).tar.gz:
 
 librist: librist-$(LIBRIST_VERSION).tar.gz .sum-librist
 	$(UNPACK)
-	$(APPLY) $(SRC)/librist/librist-fix-libcjson-meson.patch
-	$(APPLY) $(SRC)/librist/win32-timing.patch
-	$(APPLY) $(SRC)/librist/0001-meson-don-t-force-the-Windows-version-if-it-s-higher.patch
 	$(MOVE)
 
 .librist: librist crossfile.meson
