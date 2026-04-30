@@ -287,6 +287,12 @@ FocusScope {
                     // Setting `height` does not seem to work here. Anchoring the effect is not very nice, but it works:
                     anchors.fill: stackViewParent // WARNING: layered item is not necessarily the visual parent of its layer effect.
                     anchors.bottomMargin: -stackViewParent.edgeExtension
+                    // Layer width is limited to `stackView` width to save memory, in `PartialEffect` the source visual uses the
+                    // size of the `PartialEffect` unless `sourceVisualRect` is used, so we define the boundary in `PartialEffect`
+                    // for the source visual here. The effect rect exceeds the boundaries of `PartialEffect` due to this (see
+                    // `effectRect`), which is not particularly nice, but there is not much we can do about that here without
+                    // using `sourceVisualRect`, and saving video memory is considered more important:
+                    anchors.rightMargin: (stackViewParent.width - stackView.width) - stackViewParent.edgeExtension
 
                     blending: stackViewParent.color.a < (1.0 - Number.EPSILON)
 
@@ -295,17 +301,13 @@ FocusScope {
                     // we extend both the top and the bottom edges and use viewport to prevent overdraw:
                     effectRect: Qt.rect(0,
                                         stackView.height - stackViewParent.edgeExtension,
-                                        width,
+                                        stackViewParent.width,
                                         loaderProgress.height + miniPlayer.height + 2 * stackViewParent.edgeExtension)
 
-                    // Bottom extension is not necessary here, but it is provided to prevent stretching glitch at
-                    // initialization. Currently this is not a problem because the effect is opaque since the
-                    // background is opaque, and effect visual has higher z than the source visual.
-                    sourceVisualRect: ((stackView.width < stackViewParent.width) || blending) ?
-                                      Qt.rect(0, 0,
-                                              stackViewParent.layer.sourceRect.width,
-                                              stackView.height + (frostedGlassEffect.blending ? 0 : stackViewParent.edgeExtension)) :
-                                      Qt.rect(0, 0, 0, 0)
+                    // WARNING: We are not using `sourceVisualRect` because it is not trivial to guarantee that
+                    //          the visual (`ShaderEffect`) scene graph sizing and sub-texturing are synchronized.
+                    //          This can cause the visual to deviate from 1:1 representation of the texture
+                    //          momentarily, leading to sizing glitches during initialization and animations.
 
                     effect: frostedGlassEffect
 
