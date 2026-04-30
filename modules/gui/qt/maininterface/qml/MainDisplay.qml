@@ -284,6 +284,10 @@ FocusScope {
                 layer.effect: Widgets.PartialEffect {
                     id: stackViewParentLayerEffect
 
+                    // Setting `height` does not seem to work here. Anchoring the effect is not very nice, but it works:
+                    anchors.fill: stackViewParent // WARNING: layered item is not necessarily the visual parent of its layer effect.
+                    anchors.bottomMargin: -stackViewParent.edgeExtension
+
                     blending: stackViewParent.color.a < (1.0 - Number.EPSILON)
 
                     // Each pass of the blur effect also suffers from the border neighbour pixel issue mentioned
@@ -294,12 +298,14 @@ FocusScope {
                                         width,
                                         loaderProgress.height + miniPlayer.height + 2 * stackViewParent.edgeExtension)
 
-                    // Edge extension is not necessary here, but it is provided to prevent stretching glitch at
+                    // Bottom extension is not necessary here, but it is provided to prevent stretching glitch at
                     // initialization. Currently this is not a problem because the effect is opaque since the
                     // background is opaque, and effect visual has higher z than the source visual.
-                    sourceVisualRect: Qt.rect(0, 0,
+                    sourceVisualRect: ((stackView.width < stackViewParent.width) || blending) ?
+                                      Qt.rect(0, 0,
                                               stackViewParent.layer.sourceRect.width,
-                                              stackView.height + (frostedGlassEffect.blending ? 0 : stackViewParent.edgeExtension))
+                                              stackView.height + (frostedGlassEffect.blending ? 0 : stackViewParent.edgeExtension)) :
+                                      Qt.rect(0, 0, 0, 0)
 
                     effect: frostedGlassEffect
 
