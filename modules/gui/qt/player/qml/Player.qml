@@ -699,7 +699,7 @@ FocusScope {
 
             tintColor: windowTheme.bg.primary
 
-            visible: MainCtx.pinVideoControls || !rootPlayer.displayFadeRectangles
+            visible: MainCtx.pinVideoControls || (MainCtx.hasEmbededVideo && !rootPlayer.displayFadeRectangles)
         }
     }
 
