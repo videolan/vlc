@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 
-MIN_AUTOCONF=2.69
+MIN_AUTOCONF=2.71
 MIN_AUTOMAKE=1.15
 MIN_BISON=3.0.0
 MIN_CMAKE=3.21.0
