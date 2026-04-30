@@ -227,6 +227,11 @@ Item {
         if (live) {
             ds1layer.parent = root
             ds2layer.inhibitParent = false
+
+            if (root._queuedScheduledUpdate) {
+                console.debug(root, "scheduleUpdate(): `live` is turned on, canceling the scheduled update.")
+                root._queuedScheduledUpdate = false
+            }
         } else {
             root.scheduleUpdate() // this triggers releasing intermediate layers (when applicable)
         }
