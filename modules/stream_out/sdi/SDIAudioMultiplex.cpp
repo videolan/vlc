@@ -27,6 +27,7 @@
 #include <limits>
 #include <cstring>
 #include <algorithm>
+#include <cstdlib>
 
 using namespace sdi_sout;
 

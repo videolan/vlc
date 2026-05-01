@@ -23,6 +23,7 @@
 #endif
 
 #include <algorithm>
+#include <cstdlib>
 
 #include <vlc_common.h>
 #include <vlc_es.h>

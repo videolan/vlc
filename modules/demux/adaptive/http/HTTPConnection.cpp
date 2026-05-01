@@ -28,6 +28,7 @@
 #include "../plumbing/SourceStream.hpp"
 
 #include <optional>
+#include <cstdlib>
 
 #include <vlc_stream.h>
 #include <vlc_keystore.h>

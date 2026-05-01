@@ -23,6 +23,8 @@
 
 #include "CodecParameters.hpp"
 
+#include <cstdlib>
+
 using namespace smooth::playlist;
 
 CodecParameters::CodecParameters()

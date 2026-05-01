@@ -36,6 +36,7 @@
 #include <climits>
 #include <cstdint>
 #include <new>
+#include <cstdlib>
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
