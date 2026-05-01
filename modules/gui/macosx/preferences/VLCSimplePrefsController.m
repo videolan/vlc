@@ -352,6 +352,14 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     return [self toolbarIdentifiers];
 }
 
+- (BOOL)validateToolbarItem:(NSToolbarItem *)item
+{
+    if ([item.itemIdentifier isEqual:VLCMediaLibrarySettingToolbarIdentifier]) {
+        return VLCMain.sharedInstance.libraryController.libraryModel != nil;
+    }
+    return YES;
+}
+
 - (void)initStrings
 {
     /* audio */
