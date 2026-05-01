@@ -1,0 +1,64 @@
+From 9b4f8cd0400dff2084c9a54d6d521efb92622960 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Sat, 2 May 2026 10:20:51 +0200
+Subject: [PATCH 2/2] include new for std::nothrow
+
+---
+ src/EbmlCrc32.cpp         | 2 ++
+ src/EbmlElement.cpp       | 1 +
+ src/EbmlString.cpp        | 1 +
+ src/EbmlUnicodeString.cpp | 1 +
+ 4 files changed, 5 insertions(+)
+
+diff --git a/src/EbmlCrc32.cpp b/src/EbmlCrc32.cpp
+index 45765bf..65ee319 100644
+--- a/src/EbmlCrc32.cpp
++++ b/src/EbmlCrc32.cpp
+@@ -38,6 +38,8 @@
+ #include "ebml/EbmlContexts.h"
+ #include "ebml/MemIOCallback.h"
+ 
++#include <new>
++
+ #ifdef WORDS_BIGENDIAN
+ static constexpr uint32_t CRC32_INDEX(uint32_t c) { return c >> 24; }
+ static constexpr uint32_t CRC32_SHIFTED(uint32_t c) { return c << 8; }
+diff --git a/src/EbmlElement.cpp b/src/EbmlElement.cpp
+index 6f974c5..2bbf653 100644
+--- a/src/EbmlElement.cpp
++++ b/src/EbmlElement.cpp
+@@ -36,6 +36,7 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <iostream>
++#include <new>
+ #include <stdexcept>
+ #include <sstream>
+ 
+diff --git a/src/EbmlString.cpp b/src/EbmlString.cpp
+index 66b3338..fbfdf96 100644
+--- a/src/EbmlString.cpp
++++ b/src/EbmlString.cpp
+@@ -34,6 +34,7 @@
+   \author Steve Lhomme     <robux4 @ users.sf.net>
+ */
+ #include <cassert>
++#include <new>
+ #include <limits>
+ 
+ #include "ebml/EbmlString.h"
+diff --git a/src/EbmlUnicodeString.cpp b/src/EbmlUnicodeString.cpp
+index 481e358..dd77200 100644
+--- a/src/EbmlUnicodeString.cpp
++++ b/src/EbmlUnicodeString.cpp
+@@ -38,6 +38,7 @@
+ #include <cassert>
+ #include <iterator>
+ #include <limits>
++#include <new>
+ 
+ #include "ebml/EbmlUnicodeString.h"
+ 
+-- 
+2.43.0
+

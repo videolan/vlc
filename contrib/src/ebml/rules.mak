@@ -19,6 +19,8 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(APPLY) $(SRC)/ebml/0001-EbmlMaster-fix-leak-when-reading-upper-level-element.patch
 	$(APPLY) $(SRC)/ebml/0002-EbmlMaster-exit-reading-loop-if-upper-element-found-.patch
 	$(APPLY) $(SRC)/ebml/0001-EbmlHead-do-not-allow-to-have-an-infinite-unknown-si.patch
+	$(APPLY) $(SRC)/ebml/0001-include-iterator-for-std-back_inserter.patch
+	$(APPLY) $(SRC)/ebml/0002-include-new-for-std-nothrow.patch
 	$(MOVE)
 
 .ebml: ebml toolchain.cmake
