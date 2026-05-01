@@ -24,6 +24,7 @@ $(TARBALLS)/utfcpp-$(UTFCPP_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(UNPACK)
+	$(APPLY) $(SRC)/taglib/0001-Fix-std-ostream-not-defined-on-Android-NDK-29.0.1403.patch
 	$(MOVE)
 
 taglib/3rdparty/utfcpp: utfcpp-$(UTFCPP_VERSION).tar.gz .sum-utfcpp taglib

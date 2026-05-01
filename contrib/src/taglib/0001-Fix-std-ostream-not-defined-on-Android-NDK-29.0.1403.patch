@@ -1,0 +1,26 @@
+From 3c917caf52b6d14bfb548d4dc27d8601815edbe2 Mon Sep 17 00:00:00 2001
+From: Artem Umerov <artem1999.umerov@gmail.com>
+Date: Thu, 4 Sep 2025 09:28:25 +0300
+Subject: [PATCH] Fix std::ostream not defined on Android NDK 29.0.14033849
+
+Fix std::ostream not defined on Android NDK 29.0.14033849
+---
+ taglib/toolkit/tvariant.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/taglib/toolkit/tvariant.h b/taglib/toolkit/tvariant.h
+index a8408e54..26c67ec3 100644
+--- a/taglib/toolkit/tvariant.h
++++ b/taglib/toolkit/tvariant.h
+@@ -26,7 +26,7 @@
+ #ifndef TAGLIB_VARIANT_H
+ #define TAGLIB_VARIANT_H
+ 
+-#include <iosfwd>
++#include <sstream>
+ 
+ #include "tlist.h"
+ #include "tmap.h"
+-- 
+2.43.0
+
