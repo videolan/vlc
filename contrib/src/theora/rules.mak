@@ -46,6 +46,9 @@ endif
 ifdef HAVE_IOS
 THEORACONF += --disable-asm
 endif
+ifeq ($(ARCH)-$(HAVE_WIN32),arm-1)
+THEORACONF += --disable-asm
+endif
 
 DEPS_theora = ogg $(DEPS_ogg)
 
