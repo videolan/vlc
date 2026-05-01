@@ -54,13 +54,13 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
 {
     self = [super init];
     if (self) {
-        if (self.isMediaLibraryMeantToBeAvailable) {
+        if (self.shouldUseMediaLibrary) {
             _p_libraryInstance = vlc_ml_instance_get(getIntf());
         } else {
             return self;
         }
 
-        if (!_p_libraryInstance && self.isMediaLibraryMeantToBeAvailable) {
+        if (!_p_libraryInstance && self.shouldUseMediaLibrary) {
             msg_Info(getIntf(), "VLC runs without media library support");
 
             NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
@@ -409,7 +409,7 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
     self.libraryModel.filterString = filterString;
 }
 
-- (BOOL)isMediaLibraryMeantToBeAvailable
+- (BOOL)shouldUseMediaLibrary
 {
     return module_exists("medialibrary") && var_InheritBool(getIntf(), "media-library");
 }

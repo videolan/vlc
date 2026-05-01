@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryController : NSObject
 
-@property (readonly) BOOL isMediaLibraryMeantToBeAvailable;
+@property (readonly) BOOL shouldUseMediaLibrary;
 @property (readonly, nullable) VLCLibraryModel *libraryModel;
 
 - (int)appendItemToPlayQueue:(VLCMediaLibraryMediaItem *)mediaItem

@@ -913,7 +913,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 {
     NSMutableArray *segments = [NSMutableArray array];
 
-    if (VLCMain.sharedInstance.libraryController.isMediaLibraryMeantToBeAvailable) {
+    if (VLCMain.sharedInstance.libraryController.shouldUseMediaLibrary) {
         [segments addObjectsFromArray:@[
             [[VLCLibraryHomeSegment alloc] init],
             [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Library")],

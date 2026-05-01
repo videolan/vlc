@@ -113,7 +113,7 @@
     _playerController = _playQueueController.playerController;
 
     VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-    self.bookmarksButton.hidden = !libraryController.isMediaLibraryMeantToBeAvailable;
+    self.bookmarksButton.hidden = !libraryController.shouldUseMediaLibrary;
     self.bookmarksButton.enabled = libraryController.libraryModel != nil;
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
@@ -283,7 +283,7 @@
     self.videoButton.hidden = currentItemIsAudio;
     self.subtitlesButton.hidden = currentItemIsAudio;
 
-    if (!VLCMain.sharedInstance.libraryController.isMediaLibraryMeantToBeAvailable) {
+    if (!VLCMain.sharedInstance.libraryController.shouldUseMediaLibrary) {
         self.bookmarksButton.hidden = YES;
     }
 }
