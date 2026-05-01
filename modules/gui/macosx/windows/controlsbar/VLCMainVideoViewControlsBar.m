@@ -24,6 +24,7 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 
 #import "main/VLCMain.h"
@@ -110,6 +111,10 @@
 
     _playQueueController = VLCMain.sharedInstance.playQueueController;
     _playerController = _playQueueController.playerController;
+
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    self.bookmarksButton.hidden = !libraryController.isMediaLibraryMeantToBeAvailable;
+    self.bookmarksButton.enabled = libraryController.libraryModel != nil;
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
@@ -277,6 +282,10 @@
     const BOOL currentItemIsAudio = _playerController.currentMediaIsAudioOnly;
     self.videoButton.hidden = currentItemIsAudio;
     self.subtitlesButton.hidden = currentItemIsAudio;
+
+    if (!VLCMain.sharedInstance.libraryController.isMediaLibraryMeantToBeAvailable) {
+        self.bookmarksButton.hidden = YES;
+    }
 }
 
 - (void)playerStateUpdated:(NSNotification *)notification
