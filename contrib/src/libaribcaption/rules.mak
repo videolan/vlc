@@ -34,6 +34,7 @@ $(TARBALLS)/libaribcaption-$(LIBARIBCC_VERSION).tar.gz:
 libaribcaption: libaribcaption-$(LIBARIBCC_VERSION).tar.gz .sum-libaribcaption
 	$(UNPACK)
 	$(APPLY) $(SRC)/libaribcaption/0001-Fix-libunwind-static-linking-on-Android-toolchains.patch
+	$(APPLY) $(SRC)/libaribcaption/0001-Add-missing-includes.patch
 	$(MOVE)
 
 LIBARIBCC_CONF := \

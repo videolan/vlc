@@ -1,0 +1,35 @@
+From c09831c1ed0fd4ea91a7f1f4ec539fede507c25f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Fri, 1 May 2026 22:32:42 +0300
+Subject: [PATCH] Add missing includes
+
+This file uses std::nothrow which is declared in <new>, and
+free() which is declared in stdlib.h.
+
+Previously, these declarations have been included implicitly
+through transitive include files. However, libc++ will soon
+reduce the number of extra transitive include files [1], and when
+this happens, building fails unless <new> and <stdlib.h>
+explicitly are included here.
+
+[1] https://discourse.llvm.org/t/rfc-remove-unused-transitive-includes-from-the-libc-headers/90157
+---
+ src/common/caption_capi.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/common/caption_capi.cpp b/src/common/caption_capi.cpp
+index 7a7336c..165385f 100644
+--- a/src/common/caption_capi.cpp
++++ b/src/common/caption_capi.cpp
+@@ -19,6 +19,8 @@
+ #include <cstddef>
+ #include <cstdint>
+ #include <cstring>
++#include <new>
++#include <stdlib.h>
+ #include "aribcaption/caption.h"
+ #include "aribcaption/caption.hpp"
+ #include "base/utf_helper.hpp"
+-- 
+2.43.0
+
