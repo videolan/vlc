@@ -56,6 +56,8 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
     if (self) {
         if (self.isMediaLibraryMeantToBeAvailable) {
             _p_libraryInstance = vlc_ml_instance_get(getIntf());
+        } else {
+            return self;
         }
 
         if (!_p_libraryInstance && self.isMediaLibraryMeantToBeAvailable) {

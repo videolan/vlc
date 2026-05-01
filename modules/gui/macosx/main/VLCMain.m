@@ -550,6 +550,10 @@ static VLCMain *sharedInstance = nil;
 
 - (VLCBookmarksWindowController *)bookmarks
 {
+    if (!self.libraryController.libraryModel) {
+        return nil;
+    }
+
     if (!_bookmarks)
         _bookmarks = [[VLCBookmarksWindowController alloc] init];
 
