@@ -140,6 +140,10 @@
     _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _collectionViewScrollView.contentInsets = defaultInsets;
     _collectionViewScrollView.scrollerInsets = scrollerInsets;
+
+    _tableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _tableViewScrollView.contentInsets = NSEdgeInsetsMake(0, 0, defaultInsets.bottom, 0);
+    _tableViewScrollView.scrollerInsets = NSEdgeInsetsMake(0, 0, -defaultInsets.bottom, 0);
 }
 
 - (void)setupPlaceholderLabel
