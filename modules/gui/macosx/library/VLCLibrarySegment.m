@@ -22,6 +22,8 @@
 
 #import "VLCLibrarySegment.h"
 
+#import "main/VLCMain.h"
+
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -50,7 +52,7 @@
 
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
-#import "main/VLCMain.h"
+#import <vlc_modules.h>
 
 NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
 NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLocationsChanged";
@@ -909,18 +911,27 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 + (NSArray<VLCLibrarySegment *> *)librarySegments
 {
-    return @[
-        [[VLCLibraryHomeSegment alloc] init],
-        [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Library")],
-        [[VLCLibraryFavoritesSegment alloc] init],
-        [[VLCLibraryVideoSegment alloc] init],
-        [[VLCLibraryMusicSegment alloc] init],
-        [[VLCLibraryPlaylistSegment alloc] init],
-        [[VLCLibraryGroupSegment alloc] init],
+    NSMutableArray *segments = [NSMutableArray array];
+
+    if (VLCMain.sharedInstance.libraryController.isMediaLibraryMeantToBeAvailable) {
+        [segments addObjectsFromArray:@[
+            [[VLCLibraryHomeSegment alloc] init],
+            [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Library")],
+            [[VLCLibraryFavoritesSegment alloc] init],
+            [[VLCLibraryVideoSegment alloc] init],
+            [[VLCLibraryMusicSegment alloc] init],
+            [[VLCLibraryPlaylistSegment alloc] init],
+            [[VLCLibraryGroupSegment alloc] init]
+        ]];
+    }
+
+    [segments addObjectsFromArray:@[
         [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Explore")],
         [[VLCLibraryBrowseSegment alloc] init],
         [[VLCLibraryStreamsSegment alloc] init],
-    ];
+    ]];
+
+    return segments.copy;
 }
 
 + (instancetype)segmentWithSegmentType:(VLCLibrarySegmentType)segmentType
