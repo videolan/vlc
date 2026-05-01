@@ -287,7 +287,6 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
         nodes = nextLevelNodes.copy;
     }
-    NSAssert(NO, @"Could not find node for segment type %ld", segmentType);
     return nil;
 }
 
@@ -321,13 +320,19 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         segmentType = VLCLibraryBrowseSegmentType;
     }
 
+    NSTreeNode *targetNode = [self nodeForSegmentType:segmentType];
+    if (targetNode == nil) {
+        // Fallback to Browse if the segment is not available
+        segmentType = VLCLibraryBrowseSegmentType;
+        targetNode = [self nodeForSegmentType:segmentType];
+    }
+
     self.libraryWindow.librarySegmentType = segmentType;
 
     if (segmentType == VLCLibraryMusicSegmentType) {
         [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
     }
 
-    NSTreeNode * const targetNode = [self nodeForSegmentType:segmentType];
     const NSInteger segmentIndex = [self.outlineView rowForItem:targetNode];
     [self expandParentsOfNode:targetNode];
     [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentIndex]
