@@ -38,6 +38,7 @@
 #import "playqueue/VLCPlayQueueModel.h"
 
 #import <vlc_media_library.h>
+#import <vlc_modules.h>
 
 typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
 
@@ -401,6 +402,11 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
 - (void)filterByString:(NSString*)filterString
 {
     self.libraryModel.filterString = filterString;
+}
+
+- (BOOL)isMediaLibraryMeantToBeAvailable
+{
+    return module_exists("medialibrary") && var_InheritBool(getIntf(), "media-library");
 }
 
 @end
