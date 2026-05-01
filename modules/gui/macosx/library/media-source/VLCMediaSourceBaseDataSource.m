@@ -650,16 +650,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
         _lanDeviceSnapshot = [self buildLANDeviceSnapshot];
     }
     if (self.viewMode == VLCLibraryGridViewModeSegment) {
-        const NSInteger index = [_mediaSources indexOfObject:aNotification.object];
-        const BOOL inSync =
-            self.collectionView.numberOfSections == (NSInteger)_mediaSources.count;
-        if (self.collectionView.dataSource == self
-            && index != NSNotFound
-            && inSync) {
-            [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
-        } else {
-            [self.collectionView reloadData];
-        }
+        [self.collectionView reloadData];
     } else {
         [self.tableView reloadData];
     }
