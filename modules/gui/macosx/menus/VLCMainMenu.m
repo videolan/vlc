@@ -472,6 +472,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_videoeffects setTitle: _NS("Video Effects...")];
     [_bookmarks setTitle: _NS("Bookmarks...")];
     [_playQueue setTitle: _NS("Play Queue...")];
+
     [_detachedAudioWindow setTitle: _NS("Detached Audio Window...")];
     [_info setTitle: _NS("Media Information...")];
     [_messages setTitle: _NS("Messages...")];
@@ -891,8 +892,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)updateLibraryPlayQueueMode
 {
+    const BOOL mlAvailable = VLCMain.sharedInstance.libraryController.libraryModel != nil;
     const BOOL libraryPlayQueueMode = _playQueueController.libraryPlayQueueMode;
-    _libraryPlayQueueMode.state = libraryPlayQueueMode ? NSOnState : NSOffState;
+    _libraryPlayQueueMode.state = libraryPlayQueueMode && mlAvailable ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (IBAction)goToSpecificTime:(id)sender
@@ -1916,7 +1918,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     if (mi == nil) {
         return YES;
     } else if (mi == self.savePlayqueueToLibrary) {
-        return _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
+        return VLCMain.sharedInstance.libraryController.libraryModel != nil &&
+               _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
+    } else if (mi == self.bookmarks || mi == self.libraryPlayQueueMode) {
+        return VLCMain.sharedInstance.libraryController.libraryModel != nil;
     } else if (mi == self.play) {
         return _playerController.playerState == VLC_PLAYER_STATE_PLAYING
             ? _playerController.currentMedia != nil && _playerController.pausable
@@ -1988,6 +1993,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         return _playerController.videoTracks.count > 0;
     } else if (mi == self.voutMenuSubtitlestrack) {
         return _playerController.subtitleTracks.count > 0;
+    } else if (mi == self.libraryPlayQueueMode ||
+               mi == self.bookmarks ||
+               mi == self.savePlayqueueToLibrary) {
+        return VLCMain.sharedInstance.libraryController.libraryModel != nil;
     } else {
         NSMenuItem * const parent = mi.parentItem;
         if (parent == self.subtitle_textcolor || mi == self.subtitle_textcolor ||
