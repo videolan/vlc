@@ -257,7 +257,7 @@
     const NSUInteger startingIndex = itemIndexInParent == NSNotFound ? 0 : itemIndexInParent;
 
     for (NSUInteger i = startingIndex; i < parentItemCount; i++) {
-        const id<VLCMediaLibraryItemProtocol> mediaItem = [parentItems objectAtIndex:i];
+        VLCMediaLibraryMediaItem * const mediaItem = [parentItems objectAtIndex:i];
         [libraryController appendItemToPlayQueue:mediaItem playImmediately:startingPlayImmediately];
 
         if (startingPlayImmediately) {
@@ -267,7 +267,7 @@
 
     if (playQueueController.playbackRepeat != VLC_PLAYLIST_PLAYBACK_REPEAT_NONE) {
         for (NSUInteger i = 0; i < startingIndex; i++) {
-            const id<VLCMediaLibraryItemProtocol> mediaItem = [parentItems objectAtIndex:i];
+            VLCMediaLibraryMediaItem * const mediaItem = [parentItems objectAtIndex:i];
             [libraryController appendItemToPlayQueue:mediaItem playImmediately:NO];
         }
     }
