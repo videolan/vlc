@@ -1,0 +1,37 @@
+From 3a2ab2c706b31fea4f92cd362c93e2aa7875ccf8 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Sat, 2 May 2026 10:19:11 +0200
+Subject: [PATCH 1/2] include iterator for std::back_inserter
+
+---
+ src/EbmlMaster.cpp        | 1 +
+ src/EbmlUnicodeString.cpp | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/EbmlMaster.cpp b/src/EbmlMaster.cpp
+index 465560f..1340931 100644
+--- a/src/EbmlMaster.cpp
++++ b/src/EbmlMaster.cpp
+@@ -36,6 +36,7 @@
+ 
+ #include <cassert>
+ #include <algorithm>
++#include <iterator>
+ 
+ #include "ebml/EbmlMaster.h"
+ #include "ebml/EbmlStream.h"
+diff --git a/src/EbmlUnicodeString.cpp b/src/EbmlUnicodeString.cpp
+index 570af17..481e358 100644
+--- a/src/EbmlUnicodeString.cpp
++++ b/src/EbmlUnicodeString.cpp
+@@ -36,6 +36,7 @@
+ */
+ 
+ #include <cassert>
++#include <iterator>
+ #include <limits>
+ 
+ #include "ebml/EbmlUnicodeString.h"
+-- 
+2.43.0
+
