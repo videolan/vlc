@@ -24,7 +24,7 @@ public:
 
     [[nodiscard]] bool setup(QQmlEngine* engine);
 
-    inline QQmlComponent* getComponent() const {return m_component;}
+    QPointer<QQmlComponent> getComponent() const {return m_component;}
     VLC_USED
     QQuickItem* createRootItem();
 
