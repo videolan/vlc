@@ -298,21 +298,16 @@ int input_FindArtInCache( input_item_t *p_item )
     /* we have an input item uid set */
     bool b_done = false;
     char *psz_byuiddir = GetDirByItemUIDs( uid );
-    char *psz_byuidfile = GetFileByItemUID( psz_byuiddir, "arturl" );
+    char *psz_byuidfile = ArtCacheFilePath( psz_byuiddir, "arturl" );
     free( psz_byuiddir );
     if( psz_byuidfile )
     {
-        FILE *fd = vlc_fopen( psz_byuidfile, "rb" );
-        if ( fd )
+        char *psz_uri = ArtCacheReadUriFromFile( psz_byuidfile );
+        if( psz_uri )
         {
-            char sz_cachefile[2049];
-            /* read the cache hash url */
-            if ( fgets( sz_cachefile, 2048, fd ) != NULL )
-            {
-                input_item_SetArtURL( p_item, sz_cachefile );
-                b_done = true;
-            }
-            fclose( fd );
+            input_item_SetArtURL( p_item, psz_uri );
+            free( psz_uri );
+            b_done = true;
         }
         free( psz_byuidfile );
     }
@@ -379,26 +374,19 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
     }
 
     char *psz_byuiddir = GetDirByItemUIDs( uid );
-    char *psz_byuidfile = GetFileByItemUID( psz_byuiddir, "arturl" );
+    char *psz_byuidfile = ArtCacheFilePath( psz_byuiddir, "arturl" );
     ArtCacheCreateDir( psz_byuiddir );
     free( psz_byuiddir );
 
     if ( psz_byuidfile )
     {
-        f = vlc_fopen( psz_byuidfile, "wb" );
-        if ( f )
-        {
-            if( fputs( "file://", f ) < 0 || fputs( psz_filename, f ) < 0 )
-                msg_Err( obj, "Error writing %s: %s", psz_byuidfile,
-                         vlc_strerror_c(errno) );
-            fclose( f );
-        }
+        ArtCacheWriteUriToFile( obj, psz_byuidfile, psz_uri );
         free( psz_byuidfile );
     }
     free( uid );
     /* !save uid info */
 end:
+    free( psz_uri );
     free( psz_filename );
-    return VLC_SUCCESS;
+return VLC_SUCCESS;
 }
-
