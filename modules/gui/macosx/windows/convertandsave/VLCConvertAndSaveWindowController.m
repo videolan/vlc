@@ -328,6 +328,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     [openPanel setCanChooseDirectories:NO];
     [openPanel setResolvesAliases:YES];
     [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setAllowedFileTypes:[NSString extensionsArrayFromVLCStyleString:EXTENSIONS_MEDIA]];
     [openPanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSModalResponseOK) {
             [self setMRL: [[openPanel URL] absoluteString]];
