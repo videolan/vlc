@@ -338,6 +338,58 @@ static char *GetFileByItemUID( char *psz_dir, const char *psz_type )
     return ArtCacheNameFromDirPath( psz_dir, psz_type );
 }
 
+static char *ArtCacheGetAttachmentBlobDirPath( const void *p_data, size_t i_data )
+{
+    char *psz_cachedir = config_GetUserDir( VLC_CACHE_DIR );
+    char *psz_dir = NULL;
+
+    if( unlikely( psz_cachedir == NULL ) )
+        return NULL;
+
+    char psz_hash[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+    vlc_hash_md5_t md5;
+    vlc_hash_md5_Init( &md5 );
+    vlc_hash_md5_Update( &md5, p_data, i_data );
+    vlc_hash_FinishHex( &md5, psz_hash );
+
+    if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "artblob" DIR_SEP "%s",
+                  psz_cachedir, psz_hash ) == -1 )
+        psz_dir = NULL;
+
+    free( psz_cachedir );
+    return psz_dir;
+}
+
+static char *ArtCacheUriInPath( const char *psz_path )
+{
+    if( !psz_path )
+        return NULL;
+
+    vlc_DIR *p_dir = vlc_opendir( psz_path );
+    if( !p_dir )
+        return NULL;
+
+    char *psz_uri = NULL;
+    const char *psz_filename;
+
+    while( psz_uri == NULL && (psz_filename = vlc_readdir( p_dir )) )
+    {
+        if( strncmp( psz_filename, "art", 3 ) )
+            continue;
+
+        char *psz_file;
+        if( asprintf( &psz_file, "%s" DIR_SEP "%s",
+                      psz_path, psz_filename ) == -1 )
+            continue;
+
+        psz_uri = vlc_path2uri( psz_file, "file" );
+        free( psz_file );
+    }
+
+    vlc_closedir( p_dir );
+    return psz_uri;
+}
+
 static char * GetDirByItemUIDs( char *psz_uid )
 {
     char *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
@@ -392,18 +444,43 @@ int input_FindArtInCacheUsingItemUID( input_item_t *p_item )
 }
 
 /* */
+
 int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
                    const void *data, size_t length, const char *psz_type )
 {
+    char *psz_arturl = input_item_GetArtURL( p_item );
+    const bool b_attachment = ArtUrlIsAttachment( psz_arturl );
     int i_ret = VLC_EGENERIC;
-    char *psz_filename = ArtCacheName( p_item, psz_type );
+    char *psz_filename = NULL;
+    char *psz_uri = NULL;
+    char *psz_attachment_dir = NULL;
+    char *psz_attachment_urlfile = NULL;
+
+    if( b_attachment )
+    {
+        psz_attachment_dir = ArtCacheAttachmentPath( p_item );
+        psz_attachment_urlfile = ArtCacheFilePath( psz_attachment_dir, "arturl" );
+
+        char *psz_blob_dir = ArtCacheGetAttachmentBlobDirPath( data, length );
+        if( psz_blob_dir )
+        {
+            psz_uri = ArtCacheUriInPath( psz_blob_dir );
+            if( psz_uri )
+                psz_filename = vlc_uri2path( psz_uri );
+            else
+                psz_filename = ArtCacheNameFromDirPath( psz_blob_dir, psz_type );
+
+            free( psz_blob_dir );
+        }
+    }
+    else
+        psz_filename = ArtCacheName( p_item, psz_type );
+
+    free( psz_arturl );
 
     if( !psz_filename )
-    {
-        return VLC_EGENERIC;
-    }
+        goto end;
 
-    char *psz_uri = vlc_path2uri( psz_filename, "file" );
     if( !psz_uri )
         {
             free( psz_filename );
@@ -414,6 +491,11 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
     struct stat s;
     if( !vlc_stat( psz_filename, &s ) )
     {
+        if( b_attachment && psz_attachment_dir && psz_attachment_urlfile )
+        {
+            ArtCacheCreateDir( psz_attachment_dir );
+            ArtCacheWriteUriToFile( obj, psz_attachment_urlfile, psz_uri );
+        }
         input_item_SetArtURL( p_item, psz_uri );
         i_ret = VLC_SUCCESS;
         goto save_uid;
@@ -443,6 +525,11 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
     }
 
     msg_Dbg( obj, "album art saved to %s", psz_filename );
+    if( b_attachment && psz_attachment_dir && psz_attachment_urlfile )
+    {
+        ArtCacheCreateDir( psz_attachment_dir );
+        ArtCacheWriteUriToFile( obj, psz_attachment_urlfile, psz_uri );
+    }
     input_item_SetArtURL( p_item, psz_uri );
     i_ret = VLC_SUCCESS;
 
