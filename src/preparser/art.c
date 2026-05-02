@@ -243,7 +243,7 @@ static char *ArtCacheNameFromDirPath( const char *psz_path, const char *psz_type
     char *psz_filename = NULL;
 
     if( unlikely( !psz_path || !psz_ext ) )
-    goto end;
+        goto end;
 
     ArtCacheCreateDir( psz_path );
     filename_sanitize( psz_ext );
@@ -329,13 +329,9 @@ static int ArtCacheWriteUriToFile( vlc_object_t *obj, const char *psz_file,
         ret = VLC_EGENERIC;
     }
 
+    bool b_found = false;
     fclose( f );
     return ret;
-}
-
-static char *GetFileByItemUID( char *psz_dir, const char *psz_type )
-{
-    return ArtCacheNameFromDirPath( psz_dir, psz_type );
 }
 
 static char *ArtCacheGetAttachmentBlobDirPath( const void *p_data, size_t i_data )
@@ -371,23 +367,62 @@ static char *ArtCacheUriInPath( const char *psz_path )
 
     char *psz_uri = NULL;
     const char *psz_filename;
-
     while( psz_uri == NULL && (psz_filename = vlc_readdir( p_dir )) )
     {
-        if( strncmp( psz_filename, "art", 3 ) )
-            continue;
-
-        char *psz_file;
-        if( asprintf( &psz_file, "%s" DIR_SEP "%s",
-                      psz_path, psz_filename ) == -1 )
-            continue;
-
-        psz_uri = vlc_path2uri( psz_file, "file" );
-        free( psz_file );
+        if( !strncmp( psz_filename, "art", 3 ) )
+        {
+            char *psz_file;
+            if( asprintf( &psz_file, "%s" DIR_SEP "%s",
+                          psz_path, psz_filename ) != -1 )
+            {
+                psz_uri = vlc_path2uri( psz_file, "file" );
+                free( psz_file );
+            }
+        }
     }
 
     vlc_closedir( p_dir );
     return psz_uri;
+}
+
+static int ArtCacheFindInPath( input_item_t *p_item, char *psz_path )
+{
+    char *psz_uri = ArtCacheUriInPath( psz_path );
+    free( psz_path );
+    if( !psz_uri )
+        return VLC_EGENERIC;
+
+    input_item_SetArtURL( p_item, psz_uri );
+    free( psz_uri );
+    return VLC_SUCCESS;
+}
+
+static int ArtCacheFindAttachment( input_item_t *p_item )
+{
+    char *psz_path = ArtCacheAttachmentPath( p_item );
+    char *psz_uri = ArtCacheReadUriFromDirPath( psz_path );
+
+    if( psz_uri )
+    {
+        input_item_SetArtURL( p_item, psz_uri );
+        free( psz_uri );
+        free( psz_path );
+        return VLC_SUCCESS;
+    }
+
+    return ArtCacheFindInPath( p_item, psz_path );
+}
+
+/* */
+int input_FindArtInCache( input_item_t *p_item )
+{
+    /* Probe the item-scoped attachment cache even before metadata repopulates
+     * the current art URL. Otherwise cached embedded art is missed until a
+     * later parse re-discovers the attachment:// URL. */
+    if( ArtCacheFindAttachment( p_item ) == VLC_SUCCESS )
+        return VLC_SUCCESS;
+
+    return ArtCacheFindInPath( p_item, ArtCachePath( p_item ) );
 }
 
 static char * GetDirByItemUIDs( char *psz_uid )
@@ -407,7 +442,7 @@ static char * GetDirByItemUIDs( char *psz_uid )
     return psz_dir;
 }
 
-int input_FindArtInCache( input_item_t *p_item )
+int input_FindArtInCacheUsingItemUID( input_item_t *p_item )
 {
     char *uid = input_item_GetInfo( p_item, "uid", "md5" );
     if ( ! *uid )
@@ -438,13 +473,7 @@ int input_FindArtInCache( input_item_t *p_item )
     return VLC_EGENERIC;
 }
 
-int input_FindArtInCacheUsingItemUID( input_item_t *p_item )
-{
-    return input_FindArtInCache( p_item );
-}
-
 /* */
-
 int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
                    const void *data, size_t length, const char *psz_type )
 {
@@ -475,17 +504,26 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
     }
     else
         psz_filename = ArtCacheName( p_item, psz_type );
-
     free( psz_arturl );
 
     if( !psz_filename )
-        goto end;
+    {
+        free( psz_attachment_urlfile );
+        free( psz_attachment_dir );
+        return VLC_EGENERIC;
+    }
 
     if( !psz_uri )
+    {
+        psz_uri = vlc_path2uri( psz_filename, "file" );
+        if( !psz_uri )
         {
             free( psz_filename );
+            free( psz_attachment_urlfile );
+            free( psz_attachment_dir );
             return VLC_EGENERIC;
         }
+    }
 
     /* Check if we already dumped it */
     struct stat s;
@@ -560,5 +598,7 @@ save_uid:
 end:
     free( psz_uri );
     free( psz_filename );
-return i_ret;
+    free( psz_attachment_urlfile );
+    free( psz_attachment_dir );
+    return i_ret;
 }
