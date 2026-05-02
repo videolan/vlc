@@ -38,7 +38,7 @@
 
 #include "art.h"
 
-static void ArtCacheCreateDir( char *psz_dir )
+static void ArtCacheCreateDir( const char *psz_dir )
 {
     vlc_mkdir_parent(psz_dir, 0700);
 }
@@ -168,49 +168,105 @@ end:
     return psz_filename;
 }
 
-/* */
-int input_FindArtInCache( input_item_t *p_item )
+static char *ArtCacheNameFromDirPath( const char *psz_path, const char *psz_type )
 {
-    char *psz_path = ArtCachePath( p_item );
+    char *psz_ext = strdup( psz_type ? psz_type : "" );
+    char *psz_filename = NULL;
 
     if( !psz_path )
-        return VLC_EGENERIC;
+        goto end;
 
-    /* Check if file exists */
-    vlc_DIR *p_dir = vlc_opendir( psz_path );
-    if( !p_dir )
+    ArtCacheCreateDir( psz_path );
+    filename_sanitize( psz_ext );
+
+    if( asprintf( &psz_filename, "%s" DIR_SEP "art%s", psz_path, psz_ext ) < 0 )
+        psz_filename = NULL;
+
+end:
+    free( psz_ext );
+
+    return psz_filename;
+}
+
+static char *ArtCacheFilePath( const char *psz_dir, const char *psz_name )
+{
+    char *psz_file = NULL;
+
+    if( !psz_dir || !psz_name )
+        return NULL;
+
+    if( asprintf( &psz_file, "%s" DIR_SEP "%s", psz_dir, psz_name ) == -1 )
+        psz_file = NULL;
+
+    return psz_file;
+}
+
+static char *ArtCacheReadUriFromFile( const char *psz_file )
+{
+    if( !psz_file )
+        return NULL;
+
+    FILE *fd = vlc_fopen( psz_file, "rb" );
+    if( !fd )
+        return NULL;
+
+    char *psz_uri = NULL;
+    char sz_cachefile[2049];
+
+    if( fgets( sz_cachefile, sizeof( sz_cachefile ), fd ) != NULL )
     {
-        free( psz_path );
-        return VLC_EGENERIC;
+        size_t i_len = strlen( sz_cachefile );
+        while( i_len > 0 &&
+               ( sz_cachefile[i_len - 1] == '\n' ||
+                 sz_cachefile[i_len - 1] == '\r' ) )
+            sz_cachefile[--i_len] = '\0';
+
+        if( i_len > 0 )
+            psz_uri = strdup( sz_cachefile );
     }
 
-    bool b_found = false;
-    const char *psz_filename;
-    while( !b_found && (psz_filename = vlc_readdir( p_dir )) )
-    {
-        if( !strncmp( psz_filename, "art", 3 ) )
-        {
-            char *psz_file;
-            if( asprintf( &psz_file, "%s" DIR_SEP "%s",
-                          psz_path, psz_filename ) != -1 )
-            {
-                char *psz_uri = vlc_path2uri( psz_file, "file" );
-                if( psz_uri )
-                {
-                    input_item_SetArtURL( p_item, psz_uri );
-                    free( psz_uri );
-                }
-                free( psz_file );
-            }
+    fclose( fd );
+    return psz_uri;
+}
 
-            b_found = true;
-        }
+static char *ArtCacheReadUriFromDirPath( const char *psz_dir )
+{
+    char *psz_uri = NULL;
+    char *psz_file = ArtCacheFilePath( psz_dir, "arturl" );
+
+    if( psz_file )
+    {
+        psz_uri = ArtCacheReadUriFromFile( psz_file );
+        free( psz_file );
     }
 
-    /* */
-    vlc_closedir( p_dir );
-    free( psz_path );
-    return b_found ? VLC_SUCCESS : VLC_EGENERIC;
+    return psz_uri;
+}
+
+static int ArtCacheWriteUriToFile( vlc_object_t *obj, const char *psz_file,
+                                   const char *psz_uri )
+{
+    if( !psz_file || !psz_uri )
+        return VLC_EGENERIC;
+
+    FILE *f = vlc_fopen( psz_file, "wb" );
+    if( !f )
+        return VLC_EGENERIC;
+
+    int ret = VLC_SUCCESS;
+    if( fputs( psz_uri, f ) < 0 )
+    {
+        msg_Err( obj, "Error writing %s: %s", psz_file, vlc_strerror_c(errno) );
+        ret = VLC_EGENERIC;
+    }
+
+    fclose( f );
+    return ret;
+}
+
+static char *GetFileByItemUID( char *psz_dir, const char *psz_type )
+{
+    return ArtCacheNameFromDirPath( psz_dir, psz_type );
 }
 
 static char * GetDirByItemUIDs( char *psz_uid )
@@ -230,17 +286,7 @@ static char * GetDirByItemUIDs( char *psz_uid )
     return psz_dir;
 }
 
-static char * GetFileByItemUID( char *psz_dir, const char *psz_type )
-{
-    char *psz_file;
-    if( asprintf( &psz_file, "%s" DIR_SEP "%s", psz_dir, psz_type ) == -1 )
-    {
-        psz_file = NULL;
-    }
-    return psz_file;
-}
-
-int input_FindArtInCacheUsingItemUID( input_item_t *p_item )
+int input_FindArtInCache( input_item_t *p_item )
 {
     char *uid = input_item_GetInfo( p_item, "uid", "md5" );
     if ( ! *uid )
@@ -274,6 +320,11 @@ int input_FindArtInCacheUsingItemUID( input_item_t *p_item )
     if ( b_done ) return VLC_SUCCESS;
 
     return VLC_EGENERIC;
+}
+
+int input_FindArtInCacheUsingItemUID( input_item_t *p_item )
+{
+    return input_FindArtInCache( p_item );
 }
 
 /* */
