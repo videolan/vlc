@@ -231,6 +231,17 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     return result.copy;
 }
 
++ (NSArray<NSString *> *)extensionsArrayFromVLCStyleString:(const char *)extensionsString
+{
+    if (extensionsString == NULL) {
+        return @[];
+    }
+
+    NSString *extensions = [NSString stringWithCString:extensionsString encoding:NSUTF8StringEncoding];
+    extensions = [extensions stringByReplacingOccurrencesOfString:@"*." withString:@""];
+    return [extensions componentsSeparatedByString:@";"];
+}
+
 @end
 
 #pragma mark -

@@ -1234,10 +1234,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [openPanel setCanChooseFiles: YES];
     [openPanel setCanChooseDirectories: NO];
     [openPanel setAllowsMultipleSelection: YES];
-
-    NSMutableString *subtitleExtensionsString = [toNSStr(EXTENSIONS_SUBTITLE) mutableCopy];
-    [subtitleExtensionsString replaceOccurrencesOfString:@"*." withString:@"" options:NSLiteralSearch range:NSMakeRange(0, subtitleExtensionsString.length)];
-    [openPanel setAllowedFileTypes:[subtitleExtensionsString componentsSeparatedByString:@";"]];
+    [openPanel setAllowedFileTypes:[NSString extensionsArrayFromVLCStyleString:EXTENSIONS_SUBTITLE]];
 
     NSURL *url = _playerController.URLOfCurrentMediaItem;
     url = [url URLByDeletingLastPathComponent];

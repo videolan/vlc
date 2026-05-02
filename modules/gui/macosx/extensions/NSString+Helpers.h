@@ -163,6 +163,12 @@ NSImage *imageFromRes(NSString *name);
  */
 - (NSString *)stringWithIncrementedTrailingNumber;
 
+/**
+ * Returns an array of file extensions from a semicolon-separated string of extensions,
+ * stripping any leading "*." prefix.
+ */
++ (NSArray<NSString *> *)extensionsArrayFromVLCStyleString:(const char *)extensionsString;
+
 @end
 
 /**

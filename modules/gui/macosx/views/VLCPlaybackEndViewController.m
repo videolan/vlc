@@ -147,10 +147,7 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
         return nil;
     }
 
-    NSArray<NSString *> * const playableExtensions = [[[NSString
-        stringWithCString:EXTENSIONS_MEDIA encoding:NSUTF8StringEncoding] 
-        stringByReplacingOccurrencesOfString:@"*." withString:@""]
-        componentsSeparatedByString:@";"];
+    NSArray<NSString *> * const playableExtensions = [NSString extensionsArrayFromVLCStyleString:EXTENSIONS_MEDIA];
     NSArray<NSString *> * const itemPlayableSiblingItemPaths = [[itemSiblingItemPaths
         sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]
         filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString * const _Nonnull siblingItemPath, NSDictionary<NSString *, id> * const _Nullable __unused bindings) {
