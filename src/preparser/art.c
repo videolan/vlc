@@ -43,9 +43,69 @@ static void ArtCacheCreateDir( const char *psz_dir )
     vlc_mkdir_parent(psz_dir, 0700);
 }
 
+static bool ArtUrlIsAttachment( const char *psz_arturl )
+{
+    return psz_arturl != NULL && !strncmp( psz_arturl, "attachment://", 13 );
+}
+
+static char *ArtCacheGetAttachmentDirPath( const char *psz_title,
+                                           const char *psz_uri )
+{
+    char *psz_cachedir = config_GetUserDir( VLC_CACHE_DIR );
+    char *psz_dir = NULL;
+
+    if( unlikely( psz_cachedir == NULL ) )
+        return NULL;
+
+    if( EMPTY_STR( psz_uri ) && EMPTY_STR( psz_title ) )
+    {
+        free( psz_cachedir );
+        return NULL;
+    }
+
+    char psz_hash[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+    vlc_hash_md5_t md5;
+    vlc_hash_md5_Init( &md5 );
+    vlc_hash_md5_Update( &md5, "attachment://", 13 );
+
+    if( !EMPTY_STR( psz_uri ) )
+        vlc_hash_md5_Update( &md5, psz_uri, strlen( psz_uri ) );
+    else
+        vlc_hash_md5_Update( &md5, psz_title, strlen( psz_title ) );
+
+    vlc_hash_FinishHex( &md5, psz_hash );
+
+    if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "arturl" DIR_SEP
+                  "attachment-%s", psz_cachedir, psz_hash ) == -1 )
+        psz_dir = NULL;
+
+    free( psz_cachedir );
+    return psz_dir;
+}
+
+static char *ArtCacheAttachmentPath( input_item_t *p_item )
+{
+    char *psz_path = NULL;
+    const char *psz_title = NULL;
+    const char *psz_uri = NULL;
+
+    vlc_mutex_lock( &p_item->lock );
+
+    if( p_item->p_meta )
+        psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
+    psz_uri = p_item->psz_uri;
+    if( !psz_title )
+        psz_title = p_item->psz_name;
+
+    psz_path = ArtCacheGetAttachmentDirPath( psz_title, psz_uri );
+
+    vlc_mutex_unlock( &p_item->lock );
+    return psz_path;
+}
+
 static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
                                  const char *psz_album,  const char *psz_date,
-                                 const char *psz_title )
+                                 const char *psz_title, const char *psz_uri )
 {
     char *psz_dir;
     char *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
@@ -53,7 +113,8 @@ static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
     if (unlikely(psz_cachedir == NULL))
         return NULL;
 
-    if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
+    if( !ArtUrlIsAttachment( psz_arturl ) &&
+        !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
         char *psz_album_sanitized = strdup( psz_album );
         if (!psz_album_sanitized)
@@ -89,19 +150,24 @@ static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
     else
     {
         /* If artist or album are missing, cache by art download URL.
-         * If the URL is an attachment://, add the title to the cache name.
-         * It will be md5 hashed to form a valid cache filename.
-         * We assume that psz_arturl is always the download URL and not the
-         * already hashed filename.
-         * (We should never need to call this function if art has already been
-         * downloaded anyway).
+         *
+         * Embedded artwork ("attachment://") must stay item-specific even when
+         * metadata matches across different tracks, otherwise a previous track
+         * can populate a shared cache entry and be reused later.
          */
         char psz_arturl_sanitized[VLC_HASH_MD5_DIGEST_HEX_SIZE];
 
         vlc_hash_md5_t md5;
         vlc_hash_md5_Init( &md5 );
         vlc_hash_md5_Update( &md5, psz_arturl, strlen( psz_arturl ) );
-        if( !strncmp( psz_arturl, "attachment://", 13 ) && psz_title != NULL )
+        if( ArtUrlIsAttachment( psz_arturl ) )
+        {
+            if( !EMPTY_STR( psz_uri ) )
+                vlc_hash_md5_Update( &md5, psz_uri, strlen( psz_uri ) );
+            else if( !EMPTY_STR( psz_title ) )
+                vlc_hash_md5_Update( &md5, psz_title, strlen( psz_title ) );
+        }
+        else if( !EMPTY_STR( psz_title ) )
             vlc_hash_md5_Update( &md5, psz_title, strlen( psz_title ) );
         vlc_hash_FinishHex( &md5, psz_arturl_sanitized );
         if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "arturl" DIR_SEP
@@ -120,6 +186,7 @@ static char *ArtCachePath( input_item_t *p_item )
     const char *psz_arturl;
     const char *psz_title;
     const char *psz_date;
+    const char *psz_uri;
 
     vlc_mutex_lock( &p_item->lock );
 
@@ -133,13 +200,15 @@ static char *ArtCachePath( input_item_t *p_item )
     psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
     psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
     psz_date = vlc_meta_Get( p_item->p_meta, vlc_meta_Date );
+    psz_uri = p_item->psz_uri;
     if( !psz_title )
         psz_title = p_item->psz_name;
 
     if( (EMPTY_STR(psz_artist) || EMPTY_STR(psz_album) ) && !psz_arturl )
         goto end;
 
-    psz_path = ArtCacheGetDirPath( psz_arturl, psz_artist, psz_album, psz_date, psz_title );
+    psz_path = ArtCacheGetDirPath( psz_arturl, psz_artist, psz_album,
+                                   psz_date, psz_title, psz_uri );
 
 end:
     vlc_mutex_unlock( &p_item->lock );
