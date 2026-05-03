@@ -33,6 +33,7 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
+#import "library/VLCLibraryWindowLyricsSidebarViewController.h"
 #import "library/VLCLibraryWindowPlayQueueSidebarViewController.h"
 #import "library/VLCLibraryWindowSidebarChildViewController.h"
 #import "library/VLCLibraryWindowTitlesSidebarViewController.h"
@@ -71,6 +72,8 @@
         [[VLCLibraryWindowPlayQueueSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
+    _lyricsSidebarViewController =
+        [[VLCLibraryWindowLyricsSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _titlesSidebarViewController =
         [[VLCLibraryWindowTitlesSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
 
@@ -88,6 +91,10 @@
     [notificationCenter addObserver:self
                            selector:@selector(titleListChanged:)
                                name:VLCPlayerTitleListChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(mediaItemChanged:)
+                               name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
 }
 
@@ -114,10 +121,17 @@
 {
     self.viewSelector.segmentCount = 1;
     [self.viewSelector setLabel:self.playQueueSidebarViewController.title
-                     forSegment:self.viewSelector.segmentCount - 1];
+                     forSegment:0];
 
     VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
     VLCPlayerController * const playerController = playQueueController.playerController;
+
+    if ([self shouldShowLyrics]) {
+        self.viewSelector.segmentCount++;
+        [self.viewSelector setLabel:self.lyricsSidebarViewController.title
+                         forSegment:self.viewSelector.segmentCount - 1];
+    }
+
     if (playerController.numberOfTitlesOfCurrentMedia > 0) {
         self.viewSelector.segmentCount++; 
         [self.viewSelector setLabel:self.titlesSidebarViewController.title
@@ -128,6 +142,20 @@
         [self.viewSelector setLabel:self.chaptersSidebarViewController.title
                          forSegment:self.viewSelector.segmentCount - 1];
     }
+}
+
+- (BOOL)shouldShowLyrics
+{
+    VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
+    VLCPlayerController * const playerController = playQueueController.playerController;
+    VLCInputItem * const currentMedia = playerController.currentMedia;
+
+    if (currentMedia == nil) {
+        return NO;
+    }
+
+    // TODO: Do this properly
+    return YES;
 }
 
 - (void)setupCounterLabel
@@ -160,37 +188,44 @@
     [self updateViewSelectorState];
 }
 
+- (void)mediaItemChanged:(NSNotification *)notification
+{
+    [self updateViewSelectorState];
+}
+
 - (void)updateViewSelectorState
 {
     [self setupViewSelectorSegments];
 
-    VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
-    VLCPlayerController * const playerController = playQueueController.playerController;
-    const BOOL titlesEnabled = playerController.numberOfTitlesOfCurrentMedia > 0;
-    const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;
-    
-    self.viewSelector.hidden = !chaptersEnabled && !titlesEnabled;
-    self.topInternalConstraint.active = !self.viewSelector.hidden;
+    const BOOL showSelector = self.viewSelector.segmentCount > 1;
+    self.viewSelector.hidden = !showSelector;
+    self.topInternalConstraint.active = showSelector;
 
+    self.playQueueHeaderLabel.hidden = showSelector;
     const NSLayoutPriority playQueueCompressionPriority =
-        self.viewSelector.hidden ? NSLayoutPriorityDefaultHigh : NSLayoutPriorityRequired;
-    self.playQueueHeaderLabel.hidden = chaptersEnabled;
+        showSelector ? NSLayoutPriorityRequired : NSLayoutPriorityDefaultHigh;
     [self.playQueueHeaderLabel setContentCompressionResistancePriority:playQueueCompressionPriority
                                                         forOrientation:NSLayoutConstraintOrientationVertical];
-    self.playQueueHeaderTopConstraint.active = !self.playQueueHeaderLabel.hidden;
+    self.playQueueHeaderTopConstraint.active = !showSelector;
 
-    NSLayoutConstraint * const counterLabelConstraintToActivate = self.viewSelector.hidden
-        ? self.counterLabelInHeaderConstraint
-        : self.counterLabelInChildViewConstraint;
-    NSLayoutConstraint * const counterLabelConstraintToDeactivate = self.viewSelector.hidden
-        ? self.counterLabelInChildViewConstraint
-        : self.counterLabelInHeaderConstraint;
-    counterLabelConstraintToActivate.active = YES;
-    counterLabelConstraintToDeactivate.active = NO;
-    
+    if (showSelector) {
+        self.counterLabelInHeaderConstraint.active = NO;
+        self.counterLabelInChildViewConstraint.active = YES;
+    } else {
+        self.counterLabelInHeaderConstraint.active = YES;
+        self.counterLabelInChildViewConstraint.active = NO;
+    }
+
     NSString * const selectedSegmentLabel = [self.viewSelector labelForSegment:self.viewSelector.selectedSegment];
-    if ((!chaptersEnabled && [selectedSegmentLabel isEqualToString:self.chaptersSidebarViewController.title]) ||
-        (!titlesEnabled && [selectedSegmentLabel isEqualToString:self.titlesSidebarViewController.title])) {
+    BOOL selectedSegmentValid = NO;
+    for (NSInteger i = 0; i < self.viewSelector.segmentCount; i++) {
+        if ([[self.viewSelector labelForSegment:i] isEqualToString:selectedSegmentLabel]) {
+            selectedSegmentValid = YES;
+            break;
+        }
+    }
+
+    if (!selectedSegmentValid) {
         self.viewSelector.selectedSegment = 0;
         [self viewSelectorAction:self.viewSelector];
     }
@@ -207,6 +242,8 @@
         [self setChildViewController:self.titlesSidebarViewController];
     } else if ([selectedSegmentLabel isEqualToString:self.chaptersSidebarViewController.title]) {
         [self setChildViewController:self.chaptersSidebarViewController];
+    } else if ([selectedSegmentLabel isEqualToString:self.lyricsSidebarViewController.title]) {
+        [self setChildViewController:self.lyricsSidebarViewController];
     } else {
         NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
     }

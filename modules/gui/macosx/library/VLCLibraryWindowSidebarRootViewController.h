@@ -25,6 +25,7 @@
 @class VLCRoundedCornerTextField;
 @class VLCLibraryWindow;
 @class VLCLibraryWindowChaptersSidebarViewController;
+@class VLCLibraryWindowLyricsSidebarViewController;
 @class VLCLibraryWindowPlayQueueSidebarViewController;
 @class VLCLibraryWindowTitlesSidebarViewController;
 
@@ -52,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) VLCLibraryWindowPlayQueueSidebarViewController *playQueueSidebarViewController;
 @property (readonly) VLCLibraryWindowChaptersSidebarViewController *chaptersSidebarViewController;
+@property (readonly) VLCLibraryWindowLyricsSidebarViewController *lyricsSidebarViewController;
 @property (readonly) VLCLibraryWindowTitlesSidebarViewController *titlesSidebarViewController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
