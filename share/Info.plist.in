@@ -1166,6 +1166,20 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeIconFile</key>
+			<string>m4a.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>MPEG-4 Audiobook File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.apple.m4b-audio</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeIconFile</key>
 			<string>movie.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>3GPP File</string>
