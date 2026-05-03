@@ -231,6 +231,20 @@
     return (row == self.currentLyricIndex) ? 60.0 : 40.0;
 }
 
+- (IBAction)tableViewAction:(id)sender
+{
+    const NSInteger clickedRow = self.tableView.clickedRow;
+    if (clickedRow < 0 || clickedRow >= self.lyricsEntries.count) {
+        return;
+    }
+
+    const long long lyricTimeMs = [self.lyricsEntries[clickedRow][@"time"] longLongValue];
+    const vlc_tick_t vlcTime = VLC_TICK_FROM_MS(lyricTimeMs);
+
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playQueueController.playerController;
+    [playerController setTimePrecise:vlcTime];
+}
+
 - (NSString *)title
 {
     return _NS("Lyrics");

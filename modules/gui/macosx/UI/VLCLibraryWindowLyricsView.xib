@@ -68,6 +68,9 @@
                                         </prototypeCellViews>
                                     </tableColumn>
                                 </tableColumns>
+                                <connections>
+                                    <action selector="tableViewAction:" target="-2" id="conn-action-001"/>
+                                </connections>
                             </tableView>
                         </subviews>
                         <nil key="backgroundColor"/>
