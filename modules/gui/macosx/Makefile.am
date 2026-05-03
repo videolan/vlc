@@ -218,6 +218,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindowAbstractSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowChaptersSidebarViewController.h \
 	gui/macosx/library/VLCLibraryWindowChaptersSidebarViewController.m \
+	gui/macosx/library/VLCLibraryWindowLyricsSidebarViewController.h \
+	gui/macosx/library/VLCLibraryWindowLyricsSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowNavigationSidebarOutlineView.h \
 	gui/macosx/library/VLCLibraryWindowNavigationSidebarOutlineView.m \
 	gui/macosx/library/VLCLibraryWindowNavigationSidebarViewController.h \
@@ -555,6 +557,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryAlbumTableCellView.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/VLCLibraryWindowChaptersView.xib \
+	gui/macosx/UI/VLCLibraryWindowLyricsView.xib \
 	gui/macosx/UI/VLCLibraryWindowNavigationSidebarView.xib \
 	gui/macosx/UI/VLCLibraryWindowPlayQueueView.xib \
 	gui/macosx/UI/VLCLibraryWindowSidebarRootView.xib \
