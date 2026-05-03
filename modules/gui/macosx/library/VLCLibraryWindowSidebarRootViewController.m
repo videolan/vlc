@@ -32,6 +32,7 @@
 
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowLyricsSidebarViewController.h"
 #import "library/VLCLibraryWindowPlayQueueSidebarViewController.h"
@@ -154,8 +155,8 @@
         return NO;
     }
 
-    // TODO: Do this properly
-    return YES;
+    NSString * const syltData = [currentMedia extraMetaForKey:@"sylt-data"];
+    return syltData != nil && syltData.length > 0;
 }
 
 - (void)setupCounterLabel
