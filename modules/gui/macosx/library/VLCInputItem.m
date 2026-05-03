@@ -372,6 +372,32 @@ static const struct input_item_parser_cbs_t parserCallbacks =
     return @"";
 }
 
+- (NSArray<NSString *> *)extraMetaNames
+{
+    char **ppsz_names;
+    const unsigned i_count = input_item_GetMetaExtraNames(_vlcInputItem, &ppsz_names);
+    if (i_count == 0) {
+        return @[];
+    }
+
+    NSMutableArray * const names = [NSMutableArray arrayWithCapacity:i_count];
+    for (unsigned i = 0; i < i_count; i++) {
+        [names addObject:toNSStr(ppsz_names[i])];
+        free(ppsz_names[i]);
+    }
+    free(ppsz_names);
+
+    return [names copy];
+}
+
+- (nullable NSString *)extraMetaForKey:(NSString *)key
+{
+    char * const psz_value = input_item_GetMetaExtra(_vlcInputItem, [key UTF8String]);
+    NSString * const returnValue = toNSStr(psz_value);
+    free(psz_value);
+    return returnValue;
+}
+
 - (vlc_tick_t)duration
 {
     return _vlcInputItem->i_duration;
