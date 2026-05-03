@@ -33,7 +33,7 @@
 
 @interface VLCLibraryWindowLyricsSidebarViewController () <NSTableViewDataSource, NSTableViewDelegate>
 
-@property (readwrite) NSArray *lyricsEntries;
+@property (readwrite) NSArray<NSDictionary<NSString *, id> *> *lyricsEntries;
 @property (readwrite) NSInteger currentLyricIndex;
 
 @end
@@ -108,12 +108,12 @@
     }
 
     NSMutableArray * const entries = [NSMutableArray array];
-    NSArray * const rawEntries = [syltData componentsSeparatedByString:@"\x1E"];
+    NSArray<NSString *> * const rawEntries = [syltData componentsSeparatedByString:@"\x1E"];
     for (NSString * const rawEntry in rawEntries) {
         if (rawEntry.length == 0) continue;
-        NSArray * const parts = [rawEntry componentsSeparatedByString:@"\x1F"];
+        NSArray<NSString *> * const parts = [rawEntry componentsSeparatedByString:@"\x1F"];
         if (parts.count >= 2) {
-            NSDictionary * const entry = @{
+            NSDictionary<NSString *, id> * const entry = @{
                 @"time": @([parts[0] longLongValue]),
                 @"text": parts[1]
             };
