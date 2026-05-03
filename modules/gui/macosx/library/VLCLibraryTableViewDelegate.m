@@ -114,7 +114,7 @@
             [libraryItem setFavorite:!isFavorited];
         }];
         favoriteAction.backgroundColor =
-            isFavorited ? NSColor.systemBlueColor : NSColor.systemRedColor;
+            isFavorited ? NSColor.systemRedColor : NSColor.systemBlueColor;
         return @[favoriteAction];
     }
     return @[];
