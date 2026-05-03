@@ -137,9 +137,10 @@
     const long long currentTimeMs = MS_FROM_VLC_TICK(currentTime);
 
     // 1. Check if we are still on the same lyric (most frequent case)
-    if (self.currentLyricIndex >= 0 && self.currentLyricIndex < self.lyricsEntries.count) {
+    const NSInteger lyricCount = (NSInteger)self.lyricsEntries.count;
+    if (self.currentLyricIndex >= 0 && self.currentLyricIndex < lyricCount) {
         const long long startTime = [self.lyricsEntries[self.currentLyricIndex][@"time"] longLongValue];
-        const BOOL isLast = (self.currentLyricIndex == self.lyricsEntries.count - 1);
+        const BOOL isLast = (self.currentLyricIndex == lyricCount - 1);
         const long long nextStartTime = isLast ? LLONG_MAX : [self.lyricsEntries[self.currentLyricIndex + 1][@"time"] longLongValue];
 
         if (currentTimeMs >= startTime && currentTimeMs < nextStartTime) {
@@ -149,7 +150,7 @@
         // 2. Check if it's simply the next one (normal linear playback transition)
         if (!isLast && currentTimeMs >= nextStartTime) {
             const NSInteger nextIndex = self.currentLyricIndex + 1;
-            const BOOL isNextLast = (nextIndex == self.lyricsEntries.count - 1);
+            const BOOL isNextLast = (nextIndex == lyricCount - 1);
             const long long nextNextStartTime = isNextLast ? LLONG_MAX : [self.lyricsEntries[nextIndex + 1][@"time"] longLongValue];
 
             if (currentTimeMs < nextNextStartTime) {
@@ -161,7 +162,7 @@
 
     // 3. Fallback to search (for seeks, jumps, or initial playback)
     NSInteger foundIndex = -1;
-    for (NSInteger i = 0; i < self.lyricsEntries.count; i++) {
+    for (NSInteger i = 0; i < lyricCount; i++) {
         if ([self.lyricsEntries[i][@"time"] longLongValue] <= currentTimeMs) {
             foundIndex = i;
         } else {
@@ -176,14 +177,15 @@
 
 - (void)updateToLyricIndex:(NSInteger)newIndex
 {
+    const NSInteger lyricCount = (NSInteger)self.lyricsEntries.count;
     NSMutableIndexSet * const indicesToUpdate = [NSMutableIndexSet indexSet];
-    if (self.currentLyricIndex != -1 && self.currentLyricIndex < self.lyricsEntries.count) {
+    if (self.currentLyricIndex != -1 && self.currentLyricIndex < lyricCount) {
         [indicesToUpdate addIndex:self.currentLyricIndex];
     }
 
     self.currentLyricIndex = newIndex;
 
-    if (self.currentLyricIndex != -1 && self.currentLyricIndex < self.lyricsEntries.count) {
+    if (self.currentLyricIndex != -1 && self.currentLyricIndex < lyricCount) {
         [indicesToUpdate addIndex:self.currentLyricIndex];
     }
 
@@ -202,7 +204,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return self.lyricsEntries.count;
+    return (NSInteger)self.lyricsEntries.count;
 }
 
 #pragma mark - Table View Delegate
@@ -210,7 +212,7 @@
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     NSTableCellView * const cellView = [tableView makeViewWithIdentifier:@"LyricCellIdentifier" owner:self];
-    if (row >= self.lyricsEntries.count) return cellView;
+    if (row < 0 || row >= (NSInteger)self.lyricsEntries.count) return cellView;
 
     NSString * const text = self.lyricsEntries[row][@"text"];
     cellView.textField.stringValue = text;
@@ -234,7 +236,7 @@
 - (IBAction)tableViewAction:(id)sender
 {
     const NSInteger clickedRow = self.tableView.clickedRow;
-    if (clickedRow < 0 || clickedRow >= self.lyricsEntries.count) {
+    if (clickedRow < 0 || clickedRow >= (NSInteger)self.lyricsEntries.count) {
         return;
     }
 
