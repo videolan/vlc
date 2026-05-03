@@ -136,6 +136,30 @@
     const vlc_tick_t currentTime = playerController.time;
     const long long currentTimeMs = MS_FROM_VLC_TICK(currentTime);
 
+    // 1. Check if we are still on the same lyric (most frequent case)
+    if (self.currentLyricIndex >= 0 && self.currentLyricIndex < self.lyricsEntries.count) {
+        const long long startTime = [self.lyricsEntries[self.currentLyricIndex][@"time"] longLongValue];
+        const BOOL isLast = (self.currentLyricIndex == self.lyricsEntries.count - 1);
+        const long long nextStartTime = isLast ? LLONG_MAX : [self.lyricsEntries[self.currentLyricIndex + 1][@"time"] longLongValue];
+
+        if (currentTimeMs >= startTime && currentTimeMs < nextStartTime) {
+            return; // No change needed
+        }
+
+        // 2. Check if it's simply the next one (normal linear playback transition)
+        if (!isLast && currentTimeMs >= nextStartTime) {
+            const NSInteger nextIndex = self.currentLyricIndex + 1;
+            const BOOL isNextLast = (nextIndex == self.lyricsEntries.count - 1);
+            const long long nextNextStartTime = isNextLast ? LLONG_MAX : [self.lyricsEntries[nextIndex + 1][@"time"] longLongValue];
+
+            if (currentTimeMs < nextNextStartTime) {
+                [self updateToLyricIndex:nextIndex];
+                return;
+            }
+        }
+    }
+
+    // 3. Fallback to search (for seeks, jumps, or initial playback)
     NSInteger foundIndex = -1;
     for (NSInteger i = 0; i < self.lyricsEntries.count; i++) {
         if ([self.lyricsEntries[i][@"time"] longLongValue] <= currentTimeMs) {
@@ -144,14 +168,20 @@
             break;
         }
     }
-    if (foundIndex == self.currentLyricIndex) return;
 
+    if (foundIndex != self.currentLyricIndex) {
+        [self updateToLyricIndex:foundIndex];
+    }
+}
+
+- (void)updateToLyricIndex:(NSInteger)newIndex
+{
     NSMutableIndexSet * const indicesToUpdate = [NSMutableIndexSet indexSet];
     if (self.currentLyricIndex != -1 && self.currentLyricIndex < self.lyricsEntries.count) {
         [indicesToUpdate addIndex:self.currentLyricIndex];
     }
 
-    self.currentLyricIndex = foundIndex;
+    self.currentLyricIndex = newIndex;
 
     if (self.currentLyricIndex != -1 && self.currentLyricIndex < self.lyricsEntries.count) {
         [indicesToUpdate addIndex:self.currentLyricIndex];
@@ -160,7 +190,7 @@
     if (indicesToUpdate.count > 0) {
         [self.tableView noteHeightOfRowsWithIndexesChanged:indicesToUpdate];
         [self.tableView reloadDataForRowIndexes:indicesToUpdate
-                                    columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+                                  columnIndexes:[NSIndexSet indexSetWithIndex:0]];
     }
 
     if (self.currentLyricIndex != -1) {
