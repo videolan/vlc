@@ -33,6 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSVisualEffectView *backgroundVisualEffectView;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *foregroundViewTopConstraint;
 
+@property (readwrite, weak) IBOutlet NSScrollView *lyricsScrollView;
+@property (readwrite, weak) IBOutlet NSTableView *lyricsTableView;
+
 @end
 
 NS_ASSUME_NONNULL_END

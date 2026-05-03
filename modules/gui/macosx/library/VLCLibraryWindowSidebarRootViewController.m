@@ -34,7 +34,6 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
-#import "library/VLCLibraryWindowLyricsSidebarViewController.h"
 #import "library/VLCLibraryWindowPlayQueueSidebarViewController.h"
 #import "library/VLCLibraryWindowSidebarChildViewController.h"
 #import "library/VLCLibraryWindowTitlesSidebarViewController.h"
@@ -73,8 +72,6 @@
         [[VLCLibraryWindowPlayQueueSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
-    _lyricsSidebarViewController =
-        [[VLCLibraryWindowLyricsSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _titlesSidebarViewController =
         [[VLCLibraryWindowTitlesSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
 
@@ -127,12 +124,6 @@
     VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
     VLCPlayerController * const playerController = playQueueController.playerController;
 
-    if ([self shouldShowLyrics]) {
-        self.viewSelector.segmentCount++;
-        [self.viewSelector setLabel:self.lyricsSidebarViewController.title
-                         forSegment:self.viewSelector.segmentCount - 1];
-    }
-
     if (playerController.numberOfTitlesOfCurrentMedia > 0) {
         self.viewSelector.segmentCount++; 
         [self.viewSelector setLabel:self.titlesSidebarViewController.title
@@ -143,20 +134,6 @@
         [self.viewSelector setLabel:self.chaptersSidebarViewController.title
                          forSegment:self.viewSelector.segmentCount - 1];
     }
-}
-
-- (BOOL)shouldShowLyrics
-{
-    VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
-    VLCPlayerController * const playerController = playQueueController.playerController;
-    VLCInputItem * const currentMedia = playerController.currentMedia;
-
-    if (currentMedia == nil) {
-        return NO;
-    }
-
-    NSString * const syltData = [currentMedia extraMetaForKey:@"sylt-data"];
-    return syltData != nil && syltData.length > 0;
 }
 
 - (void)setupCounterLabel
@@ -243,8 +220,6 @@
         [self setChildViewController:self.titlesSidebarViewController];
     } else if ([selectedSegmentLabel isEqualToString:self.chaptersSidebarViewController.title]) {
         [self setChildViewController:self.chaptersSidebarViewController];
-    } else if ([selectedSegmentLabel isEqualToString:self.lyricsSidebarViewController.title]) {
-        [self setChildViewController:self.lyricsSidebarViewController];
     } else {
         NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
     }
