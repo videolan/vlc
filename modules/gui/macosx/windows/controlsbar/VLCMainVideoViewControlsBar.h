@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *subtitlesButton;
 @property (readwrite, weak) IBOutlet NSButton *audioButton;
 @property (readwrite, weak) IBOutlet NSButton *videoButton;
+@property (readwrite, weak) IBOutlet NSButton *lyricsButton;
 @property (readwrite, weak) IBOutlet NSButton *floatOnTopButton;
 @property (readwrite, weak) IBOutlet NSButton *playbackRateButton;
 
@@ -39,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)openAudioMenu:(id)sender;
 - (IBAction)openVideoMenu:(id)sender;
 - (IBAction)toggleFloatOnTop:(id)sender;
+- (IBAction)toggleLyrics:(id)sender;
 
 @end
 

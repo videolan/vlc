@@ -38,6 +38,7 @@
                 <outlet property="fullscreenButton" destination="Dka-oG-Ar0" id="nqz-qB-etE"/>
                 <outlet property="jumpBackwardButton" destination="Y6X-Qj-wAU" id="ZDb-ZR-IDF"/>
                 <outlet property="jumpForwardButton" destination="omu-it-6Lt" id="gtC-uD-Mnu"/>
+                <outlet property="lyricsButton" destination="Lyr-Ics-Btn" id="Lyr-Ics-Out"/>
                 <outlet property="muteVolumeButton" destination="x8O-Jz-KS8" id="lIH-Am-21m"/>
                 <outlet property="pipButton" destination="ha3-L8-lMU" id="nqJ-hd-8M1"/>
                 <outlet property="playButton" destination="etJ-bh-XaL" id="3LP-if-Pah"/>
@@ -299,6 +300,16 @@
                                             <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UCW-iN-Dk1">
                                                 <rect key="frame" x="874" y="5" width="148" height="28"/>
                                                 <subviews>
+                                                    <button wantsLayer="YES" horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Lyr-Ics-Btn" customClass="VLCImageButton">
+                                                        <rect key="frame" x="0.0" y="0.0" width="48" height="28"/>
+                                                        <buttonCell key="cell" type="push" bezelStyle="rounded" image="music.note.list" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Lyr-Ics-Cel">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleLyrics:" target="3" id="Lyr-Ics-Con"/>
+                                                        </connections>
+                                                    </button>
                                                     <button wantsLayer="YES" horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ha3-L8-lMU" customClass="VLCImageButton">
                                                         <rect key="frame" x="0.0" y="0.0" width="48" height="28"/>
                                                         <buttonCell key="cell" type="push" bezelStyle="rounded" image="pip.enter" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="a9e-eU-lIl">

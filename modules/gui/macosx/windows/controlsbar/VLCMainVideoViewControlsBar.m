@@ -68,6 +68,9 @@
     self.videoButton.toolTip = _NS("Video");
     self.videoButton.accessibilityLabel = self.videoButton.toolTip;
 
+    self.lyricsButton.toolTip = _NS("Lyrics");
+    self.lyricsButton.accessibilityLabel = self.lyricsButton.toolTip;
+
     self.playbackRateButton.toolTip = _NS("Playback Rate");
     self.playbackRateButton.accessibilityLabel = self.playbackRateButton.toolTip;
 
@@ -91,6 +94,7 @@
         [buttons addPointer:(__bridge void *)self.subtitlesButton];
         [buttons addPointer:(__bridge void *)self.audioButton];
         [buttons addPointer:(__bridge void *)self.videoButton];
+        [buttons addPointer:(__bridge void *)self.lyricsButton];
         [buttons addPointer:(__bridge void *)self.fullscreenButton];
         [buttons addPointer:(__bridge void *)self.floatOnTopButton];
         [buttons addPointer:(__bridge void *)self.playbackRateButton];
@@ -133,6 +137,14 @@
                            selector:@selector(updateAvailableButtons:)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateLyricsButton:)
+                               name:VLCPlayerShowLyricsChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateLyricsButton:)
+                               name:VLCPlayerLyricsAvailableChanged
+                             object:nil];
 
     [self update];
 }
@@ -142,11 +154,27 @@
     [super update];
     [self updateFloatOnTopButton];
     [self updatePlaybackRateButton];
+    [self updateLyricsButton:nil];
 }
 
 - (void)floatOnTopChanged:(NSNotification *)notification
 {
     [self updateFloatOnTopButton];
+}
+
+- (void)updateLyricsButton:(NSNotification *)notification
+{
+    const BOOL lyricsAvailable = _playerController.lyricsAvailable;
+    self.lyricsButton.enabled = lyricsAvailable;
+    self.lyricsButton.state = _playerController.showLyrics ? NSControlStateValueOn : NSControlStateValueOff;
+
+    if (@available(macOS 26.0, *)) {
+        self.lyricsButton.bezelColor =
+            _playerController.showLyrics ? NSColor.controlAccentColor : nil;
+    } else if (@available(macOS 10.14, *)) {
+        self.lyricsButton.contentTintColor =
+            _playerController.showLyrics ? NSColor.controlAccentColor : nil;
+    }
 }
 
 - (vout_thread_t *)windowVoutThread
@@ -275,6 +303,11 @@
     }
     var_ToggleBool(p_vout, "video-on-top");
     vout_Release(p_vout);
+}
+
+- (IBAction)toggleLyrics:(id)sender
+{
+    _playerController.showLyrics = !_playerController.showLyrics;
 }
 
 - (void)updateAvailableButtons:(id)sender
