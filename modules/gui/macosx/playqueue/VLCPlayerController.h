@@ -248,6 +248,12 @@ extern NSString *VLCPlayerMuteChanged;
  */
 extern NSString * const VLCPlayerLyricsAvailableChanged;
 
+/**
+ * Listen to VLCPlayerShowLyricsChanged to be notified if the show lyrics user preference changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString * const VLCPlayerShowLyricsChanged;
+
 extern const CGFloat VLCVolumeMaximum;
 extern const CGFloat VLCVolumeDefault;
 

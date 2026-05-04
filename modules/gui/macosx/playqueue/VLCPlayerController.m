@@ -83,6 +83,9 @@ NSString *VLCPlayerListOfVideoOutputThreadsChanged = @"VLCPlayerListOfVideoOutpu
 NSString *VLCPlayerVolumeChanged = @"VLCPlayerVolumeChanged";
 NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 NSString * const VLCPlayerLyricsAvailableChanged = @"VLCPlayerLyricsAvailableChanged";
+NSString * const VLCPlayerShowLyricsChanged = @"VLCPlayerShowLyricsChanged";
+
+NSString * const VLCPlayerShowLyricsKey = @"VLCPlayerShowLyricsKey";
 
 const CGFloat VLCVolumeMaximum = 2.;
 const CGFloat VLCVolumeDefault = 1.;
@@ -674,6 +677,8 @@ static int BossCallback(vlc_object_t *p_this,
 
         _playbackRate = 1.0;
 
+        _showLyrics = [NSUserDefaults.standardUserDefaults boolForKey:VLCPlayerShowLyricsKey];
+
         libvlc_int_t *libvlc = vlc_object_instance(getIntf());
         var_AddCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
     }
@@ -736,6 +741,19 @@ static int BossCallback(vlc_object_t *p_this,
 - (void)dealloc
 {
     [_defaultNotificationCenter removeObserver:self];
+}
+
+- (void)setShowLyrics:(BOOL)showLyrics
+{
+    if (_showLyrics == showLyrics) {
+        return;
+    }
+
+    _showLyrics = showLyrics;
+    [NSUserDefaults.standardUserDefaults setBool:showLyrics forKey:VLCPlayerShowLyricsKey];
+
+    [_defaultNotificationCenter postNotificationName:VLCPlayerShowLyricsChanged
+                                              object:self];
 }
 
 - (VLCInputItem *)currentMedia
