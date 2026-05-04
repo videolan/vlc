@@ -58,28 +58,21 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, vlc_fourcc_t codec,
 /*****************************************************************************
  * Ndk symbols
  *****************************************************************************/
+typedef bool (*pf_AMediaFormat_getRect)(AMediaFormat *, const char *name,
+        int32_t *left, int32_t *top, int32_t *right, int32_t *bottom);
 
 struct syms
 {
+    struct {
+        pf_AMediaFormat_getRect getRect;
+    } AMediaFormat;
 };
 static struct syms syms;
-
-struct members
-{
-    const char *name;
-    int offset;
-    bool critical;
-};
-static struct members members[] =
-{
-    { NULL, 0, false }
-};
 
 /* Initialize all symbols.
  * Done only one time during the first initialisation */
 static bool
-InitSymbols(mc_api *api)
-{
+InitSymbols(mc_api *api) {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static int i_init_state = -1;
     bool ret;
@@ -95,16 +88,17 @@ InitSymbols(mc_api *api)
     if (!ndk_handle)
         goto end;
 
-    for (int i = 0; members[i].name; i++)
-    {
-        void *sym = dlsym(ndk_handle, members[i].name);
-        if (!sym && members[i].critical)
-        {
-            dlclose(ndk_handle);
-            goto end;
-        }
-        *(void **)((uint8_t*)&syms + members[i].offset) = sym;
+#define LOAD(object, name, b_critical) \
+    syms.object.name = dlsym(ndk_handle, #object "_" #name); \
+    if (!syms.object.name && b_critical)                     \
+    {                                                        \
+        dlclose(ndk_handle);                                 \
+        goto end;                                            \
     }
+
+    LOAD(AMediaFormat, getRect, false);
+
+#undef LOAD
 
     i_init_state = 1;
 end:
@@ -402,6 +396,29 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
             p_out->conf.video.crop_top      = GetFormatInteger(format, "crop-top");
             p_out->conf.video.crop_right    = GetFormatInteger(format, "crop-right");
             p_out->conf.video.crop_bottom   = GetFormatInteger(format, "crop-bottom");
+
+            bool found = false;
+            if (syms.AMediaFormat.getRect)
+            {
+                int32_t left, top, right, bottom;
+                /* Get crop rect from output format (API 28+) */
+                found = syms.AMediaFormat.getRect(format, "crop", &left, &top, &right, &bottom);
+                if (found)
+                {
+                    p_out->conf.video.crop_left = left;
+                    p_out->conf.video.crop_top = top;
+                    p_out->conf.video.crop_right = right;
+                    p_out->conf.video.crop_bottom = bottom;
+                }
+            }
+            if (!found)
+            {
+                /* For API below 28, we have to use below keys to get crop rect */
+                p_out->conf.video.crop_left     = GetFormatInteger(format, "crop-left");
+                p_out->conf.video.crop_top      = GetFormatInteger(format, "crop-top");
+                p_out->conf.video.crop_right    = GetFormatInteger(format, "crop-right");
+                p_out->conf.video.crop_bottom   = GetFormatInteger(format, "crop-bottom");
+            }
 
             /* Extract color info from output format (API 28+) */
             p_out->conf.video.color.range = GetFormatInteger(format, "color-range");
