@@ -1304,7 +1304,18 @@ static int Open( vlc_object_t * p_this )
                 {
                     msg_Dbg( p_demux, "track 0x%x refs track 0x%x for %4.4s", i,
                              refdata->i_track_ID[j], (const char *) &p_refbox->i_type );
-                    reftk->i_use_flags |= MP4_reftypeToFlag( p_refbox->i_type );
+                    int i_flag = MP4_reftypeToFlag( p_refbox->i_type );
+                    /* chap may reference a video track holding slide artwork; such a track is not a chapter source */
+                    if( i_flag == USEAS_CHAPTERS )
+                    {
+                        const MP4_Box_t *p_hdlr = MP4_BoxGet( reftk->p_track, "mdia/hdlr" );
+                        if( p_hdlr && BOXDATA(p_hdlr) &&
+                            BOXDATA(p_hdlr)->i_handler_type == ATOM_vide )
+                        {
+                            i_flag = USEAS_NONE;
+                        }
+                    }
+                    reftk->i_use_flags |= i_flag;
                 }
             }
         }
