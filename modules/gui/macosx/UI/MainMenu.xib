@@ -70,6 +70,7 @@
                 <outlet property="jumpToTime" destination="5138" id="XK6-rV-lr9"/>
                 <outlet property="libraryPlayQueueMode" destination="Zo7-ru-vku" id="uNJ-jw-lG2"/>
                 <outlet property="license" destination="2834" id="0tU-nu-6dP"/>
+                <outlet property="lyrics" destination="Lyr-Ics-Mni" id="Lyr-Ics-Out"/>
                 <outlet property="mcopyItem" destination="197" id="aBx-7l-f4e"/>
                 <outlet property="messages" destination="1003" id="q4C-pt-kQo"/>
                 <outlet property="minimize" destination="5606" id="tN3-Ho-T0c"/>
@@ -429,6 +430,11 @@
                             <menuItem title="Jump To Time..." keyEquivalent="j" id="5138">
                                 <connections>
                                     <action selector="goToSpecificTime:" target="-2" id="maw-9c-f5Q"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Lyrics" id="Lyr-Ics-Mni">
+                                <connections>
+                                    <action selector="toggleLyrics:" target="-2" id="Lyr-Ics-Con"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="5155">

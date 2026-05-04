@@ -385,6 +385,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_random setTitle: _NS("Random")];
     [_repeat setTitle: _NS("Repeat")];
     [_AtoBloop setTitle: _NS("A→B Loop")];
+    [_lyrics setTitle: _NS("Lyrics")];
     [_libraryPlayQueueMode setTitle: _NS("Library Play Queue Mode")];
     [_sortPlayQueue setTitle: _NS("Sort Play Queue")];
     [_quitAfterPB setTitle: _NS("Quit after Playback")];
@@ -882,6 +883,11 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (IBAction)toggleAtoBloop:(id)sender
 {
     [_playerController setABLoop];
+}
+
+- (IBAction)toggleLyrics:(id)sender
+{
+    _playerController.showLyrics = !_playerController.showLyrics;
 }
 
 - (IBAction)toggleLibraryPlayQueueMode:(id)sender
@@ -1944,6 +1950,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         mi.state = state ? NSOnState : NSOffState;
     } else if (mi == self.fwd || mi == self.bwd || mi == self.jumpToTime) {
         return _playerController.currentMedia != nil && _playerController.seekable;
+    } else if (mi == self.lyrics) {
+        mi.state = _playerController.showLyrics ? NSOnState : NSOffState;
+        return _playerController.lyricsAvailable;
     } else if (mi == self.mute || mi == self.dockMenumute || mi == self.voutMenumute) {
         mi.state = _playerController.mute ? NSOnState : NSOffState;
         [self refreshAudioDeviceList];

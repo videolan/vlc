@@ -89,6 +89,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *random;
 @property (readwrite, weak) IBOutlet NSMenuItem *repeat;
 @property (readwrite, weak) IBOutlet NSMenuItem *AtoBloop;
+@property (readwrite, weak) IBOutlet NSMenuItem *lyrics;
 @property (readwrite, weak) IBOutlet NSMenuItem *libraryPlayQueueMode;
 @property (readwrite, weak) IBOutlet NSMenuItem *sortPlayQueue;
 @property (readwrite, weak) IBOutlet NSMenuItem *quitAfterPB;
