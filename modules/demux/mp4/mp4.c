@@ -2630,7 +2630,24 @@ static void LoadChapter( demux_t  *p_demux )
     MP4_Box_t *p_chpl;
     MP4_Box_t *p_hmmt;
 
-    if( ( p_chpl = MP4_BoxGet( p_sys->p_root, "/moov/udta/chpl" ) ) &&
+    /* Prefer Apple-style chap reference track: Nero chpl is limited to 255
+       chapters by its 1-byte count, so larger files carry the full list here. */
+    mp4_track_t *p_chap_track = NULL;
+    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
+    {
+        mp4_track_t *tk = &p_sys->track[i];
+        if ( tk->b_ok && (tk->i_use_flags & USEAS_CHAPTERS) && tk->fmt.i_cat == SPU_ES )
+        {
+            p_chap_track = tk;
+            break;
+        }
+    }
+
+    if( p_chap_track )
+    {
+        LoadChapterApple( p_demux, p_chap_track );
+    }
+    else if( ( p_chpl = MP4_BoxGet( p_sys->p_root, "/moov/udta/chpl" ) ) &&
           BOXDATA(p_chpl) && BOXDATA(p_chpl)->i_chapter > 0 )
     {
         LoadChapterGpac( p_demux, p_chpl );
@@ -2639,19 +2656,6 @@ static void LoadChapter( demux_t  *p_demux )
              BOXDATA(p_hmmt) && BOXDATA(p_hmmt)->pi_chapter_start && BOXDATA(p_hmmt)->i_chapter_count > 0 )
     {
         LoadChapterGoPro( p_demux, p_hmmt );
-    }
-    else
-    {
-        /* Load the first subtitle track like quicktime */
-        for( unsigned i = 0; i < p_sys->i_tracks; i++ )
-        {
-            mp4_track_t *tk = &p_sys->track[i];
-            if ( tk->b_ok && (tk->i_use_flags & USEAS_CHAPTERS) && tk->fmt.i_cat == SPU_ES )
-            {
-                LoadChapterApple( p_demux, tk );
-                break;
-            }
-        }
     }
 
     /* Add duration if titles are enabled */
