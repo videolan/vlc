@@ -14,15 +14,15 @@ default:
 
 variables:
     FF_DISABLE_UMASK_FOR_DOCKER_EXECUTOR: "true"
-    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32-3.0:20260413122439
-    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-3.0:20260413122439
+    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32-3.0:20260504124015
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-3.0:20260504124015
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20251223015425
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
     VLC_DEBIAN_QT6_IMAGE: registry.videolan.org/vlc-debian-unstable:20260121072258
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20250626142950
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20260504124015
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
-    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20250904134924
+    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20260504124015
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
