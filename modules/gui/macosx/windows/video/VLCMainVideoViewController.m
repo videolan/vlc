@@ -172,6 +172,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         // Only set up button constraints for standard layout
         _bottomButtonStackViewConstraint =
             [self.bottomBarView.topAnchor constraintEqualToAnchor:self.centralControlsStackView.bottomAnchor];
+        [self updateLyricsInsets];
     }
 
     VLCPlayerController * const controller =
@@ -219,6 +220,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     [self setupAudioDecorativeView];
     [self.controlsBar update];
     [self updateFloatOnTopIndicator];
+    [self updateLyricsInsets];
     
     // For classic layout, create constraint for video view to fill main view when controls are hidden
     if (self.classic) {
@@ -243,6 +245,17 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
             [controlsBackgroundView applyConstraintsToFillSuperview];
         }
     }
+}
+
+- (void)updateLyricsInsets
+{
+    const CGFloat topInset = self.fakeTitleBar.frame.size.height + VLCLibraryUIUnits.largeSpacing;
+    const CGFloat bottomInset = self.bottomBarView.frame.size.height + VLCLibraryUIUnits.largeSpacing;
+
+    NSScrollView * const scrollView = self.audioDecorativeView.lyricsScrollView;
+    scrollView.automaticallyAdjustsContentInsets = NO;
+    scrollView.contentInsets = NSEdgeInsetsMake(topInset, 0, bottomInset, 0);
+    scrollView.scrollerInsets = NSEdgeInsetsMake(topInset, 0, 0, 0);
 }
 
 - (BOOL)isVisualizationActive
