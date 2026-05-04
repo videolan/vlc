@@ -880,13 +880,17 @@ static int BossCallback(vlc_object_t *p_this,
         return NO;
     }
 
+    if (self.videoTracks.count > 0) {
+        return NO;
+    }
+
     VLCMediaLibraryMediaItem * const mediaItem =
         [VLCMediaLibraryMediaItem mediaItemForURL:currentItemUrl];
     if (mediaItem != nil) {
         return mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
     }
 
-    return self.videoTracks.count == 0 && self.audioTracks.count > 0;
+    return self.audioTracks.count > 0;
 }
 
 - (void)stateChanged:(enum vlc_player_state)state
