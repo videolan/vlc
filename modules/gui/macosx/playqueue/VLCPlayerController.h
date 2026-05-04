@@ -242,6 +242,12 @@ extern NSString *VLCPlayerVolumeChanged;
  */
 extern NSString *VLCPlayerMuteChanged;
 
+/**
+ * Listen to VLCPlayerLyricsAvailableChanged to be notified if the current media has synchronized lyrics available
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString * const VLCPlayerLyricsAvailableChanged;
+
 extern const CGFloat VLCVolumeMaximum;
 extern const CGFloat VLCVolumeDefault;
 
@@ -345,6 +351,16 @@ extern const CGFloat VLCVolumeDefault;
  */
 
 @property (readonly) BOOL currentMediaIsAudioOnly;
+
+/**
+ * user preference to show synchronized lyrics instead of artwork during audio playback
+ */
+@property (readwrite, nonatomic) BOOL showLyrics;
+
+/**
+ * indicates if the currently playing media has synchronized lyrics available
+ */
+@property (readonly) BOOL lyricsAvailable;
 
 /**
  * the current player state
