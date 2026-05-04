@@ -124,6 +124,12 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
+
+    {
+        // This is for initialization, they are adjusted in `::updatePaintNode()`:
+        setUpdateRenderPosition(true);
+        setFlag(ItemHasContents, false); // `setUpdateRenderPosition(true)` sets `ItemHasContents`
+    }
 }
 
 int VideoSurface::qtMouseButton2VLC( Qt::MouseButton qtButton )

@@ -329,3 +329,18 @@ bool ViewBlockingRectangle::updateRenderPosition() const
     return m_updateRenderPosition;
 }
 
+void ViewBlockingRectangle::componentComplete()
+{
+    QQuickItem::componentComplete();
+
+    if (isVisible())
+    {
+        m_renderSize = QSizeF(width(), height());
+
+        if (m_updateRenderPosition)
+        {
+            m_renderPosition = mapToScene(QPointF(0.0, 0.0));
+        }
+    }
+}
+

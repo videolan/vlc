@@ -82,6 +82,8 @@ protected:
     void setUpdateRenderPosition(bool update);
     bool updateRenderPosition() const;
 
+    void componentComplete() override;
+
 private:
     QColor m_color;
     bool m_windowChanged = false;
