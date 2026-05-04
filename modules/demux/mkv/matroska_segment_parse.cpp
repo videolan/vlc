@@ -1653,24 +1653,15 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
     if ( !ReadMaster( *cluster, read_fully ) )
         return false;
 
-    bool b_has_timecode = false;
-
-    for (auto c : *cluster)
-    {
-        if( MKV_CHECKED_PTR_DECL_CONST( p_ctc, KaxClusterTimestamp, c ) )
-        {
-            cluster->InitTimestamp( static_cast<uint64_t>( *p_ctc ), i_timescale );
-            _seeker.add_cluster( cluster );
-            b_has_timecode = true;
-            break;
-        }
-    }
-
-    if( !b_has_timecode )
+    auto *p_ctc = FindChild<KaxClusterTimestamp>(*cluster);
+    if( p_ctc == nullptr )
     {
         msg_Err( &sys.demuxer, "Detected cluster without mandatory timecode" );
         return false;
     }
+
+    cluster->InitTimestamp( static_cast<uint64_t>( *p_ctc ), i_timescale );
+    _seeker.add_cluster( cluster );
 
     if( b_update_start_time )
         i_mk_start_time = VLC_TICK_FROM_NS( cluster->GlobalTimestamp() );
