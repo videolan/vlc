@@ -22,7 +22,7 @@ variables:
     VLC_DEBIAN_QT6_IMAGE: registry.videolan.org/vlc-debian-unstable:20260121072258
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20260504124015
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
-    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20260504124015
+    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20260504131657
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
