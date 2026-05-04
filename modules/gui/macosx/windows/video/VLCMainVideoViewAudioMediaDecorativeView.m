@@ -75,6 +75,10 @@
                            selector:@selector(playerTimeChanged:)
                                name:VLCPlayerTimeAndPositionChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playerLyricsPreferenceChanged:)
+                               name:VLCPlayerShowLyricsChanged
+                             object:nil];
 
     [self updateCoverArt];
     [self updateLyricsData];
@@ -83,6 +87,11 @@
 - (void)playerMetadataChanged:(NSNotification *)notification
 {
     [self updateCoverArt];
+    [self updateLyricsData];
+}
+
+- (void)playerLyricsPreferenceChanged:(NSNotification *)notification
+{
     [self updateLyricsData];
 }
 
@@ -118,11 +127,10 @@
 {
     VLCPlayerController * const playerController =
         VLCMain.sharedInstance.playQueueController.playerController;
-    VLCInputItem * const item = playerController.currentMedia;
 
     NSString *syltData = nil;
-    if (item) {
-        syltData = [item extraMetaForKey:@"sylt-data"];
+    if (playerController.showLyrics && playerController.lyricsAvailable) {
+        syltData = [playerController.currentMedia extraMetaForKey:@"sylt-data"];
     }
 
     if (!syltData || syltData.length == 0) {
@@ -137,7 +145,9 @@
     NSMutableArray * const entries = [NSMutableArray array];
     NSArray<NSString *> * const rawEntries = [syltData componentsSeparatedByString:@"\x1E"];
     for (NSString * const rawEntry in rawEntries) {
-        if (rawEntry.length == 0) continue;
+        if (rawEntry.length == 0) {
+            continue;
+        }
         NSArray<NSString *> * const parts = [rawEntry componentsSeparatedByString:@"\x1F"];
         if (parts.count >= 2) {
             NSDictionary<NSString *, id> * const entry = @{
@@ -162,7 +172,9 @@
 - (void)updateCurrentLyric
 {
     const NSInteger lyricCount = (NSInteger)self.lyricsEntries.count;
-    if (lyricCount == 0) return;
+    if (lyricCount == 0) {
+        return;
+    }
 
     VLCPlayerController * const playerController =
         VLCMain.sharedInstance.playQueueController.playerController;
@@ -178,7 +190,9 @@
             ? LLONG_MAX
             : [self.lyricsEntries[self.currentLyricIndex + 1][@"time"] longLongValue];
 
-        if (currentTimeMs >= startTime && currentTimeMs < nextStartTime) return;
+        if (currentTimeMs >= startTime && currentTimeMs < nextStartTime) {
+            return;
+        }
 
         // 2. Check if it's simply the next one (normal linear playback transition)
         if (!isLast && currentTimeMs >= nextStartTime) {
