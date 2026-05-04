@@ -268,9 +268,27 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     const BOOL isAudioOnly = controller.currentMediaIsAudioOnly;
     const BOOL isVisualActive = [self isVisualizationActive];
     const BOOL decorativeViewVisible = isAudioOnly && !isVisualActive;
-    NSView * const targetView = decorativeViewVisible ? self.audioDecorativeView : self.voutView;
-    self.voutContainingView.subviews = @[targetView];
-    [targetView applyConstraintsToFillSuperview];
+
+    // Keep voutView mounted so the macOS vout module always finds an in-window
+    // NSView when WindowEnable runs. Otherwise an audio item that later exposes
+    // a video track (e.g. m4b chapter slides) races: WindowEnable can land
+    // before VLCPlayerTrackListChanged re-attaches voutView, and the vout
+    // module then binds its layer to a detached view.
+    if (self.voutView.superview != self.voutContainingView) {
+        [self.voutContainingView addSubview:self.voutView
+                                 positioned:NSWindowBelow
+                                 relativeTo:nil];
+        [self.voutView applyConstraintsToFillSuperview];
+    }
+
+    if (decorativeViewVisible) {
+        if (self.audioDecorativeView.superview != self.voutContainingView) {
+            [self.voutContainingView addSubview:self.audioDecorativeView];
+            [self.audioDecorativeView applyConstraintsToFillSuperview];
+        }
+    } else {
+        [self.audioDecorativeView removeFromSuperview];
+    }
 
     if (decorativeViewVisible) {
         [self setAutohideControls:NO];
