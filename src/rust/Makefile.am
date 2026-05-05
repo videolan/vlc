@@ -1,6 +1,6 @@
 TEST_EXTENSIONS += .cargo
 CARGO_LOG_DRIVER = env top_builddir="${abs_top_builddir}" \
-                   $(abs_top_srcdir)/buildsystem/cargo-test.py \
+                   python3 $(abs_top_srcdir)/buildsystem/cargo-test.py \
                    --host="@RUST_TARGET@" \
                    --working-directory="${abs_top_srcdir}/src/rust/"
 
