@@ -85,7 +85,11 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
     add_shortcut("curses")
     add_directory("browse-dir", NULL, BROWSE_TEXT, BROWSE_LONGTEXT)
-vlc_module_end ()
+
+    add_string("ncurses-colors", "", N_("ncurses colors config"), N_("configures the ncurses color palette to provided rgb values, avaiable colors: black, red, green, yellow, blue, magenta, cyan, white. Example: ncurses-colors=yellow=FF8000,cyan=00E5CC. Note: Do not use ' or \" in configuration files!"))
+    add_string("ncurses-theme", "", N_("ncurses theme config"), N_("configures what UI elements use what colors from the palette, avaiable elements: title, box, status, info, error, warning, debug, category, folder, progress. Example: ncurses-theme=title=yellow:black,box=cyan:black,playlist=cyan:black-yellow:black. Note: Do not use ' or \" in configuration files!"))
+
+vlc_module_end()
 
 #include "eject.c"
 
@@ -123,9 +127,6 @@ enum
 {
     C_DEFAULT = 0,
     C_TITLE,
-    C_PLAYLIST_1,
-    C_PLAYLIST_2,
-    C_PLAYLIST_3,
     C_BOX,
     C_STATUS,
     C_INFO,
@@ -134,37 +135,10 @@ enum
     C_DEBUG,
     C_CATEGORY,
     C_FOLDER,
+    C_PROGRESS,
     /* XXX: new elements here ! */
 
-    C_MAX
-};
-
-/* Available colors: BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE */
-static const struct { short f; short b; } color_pairs[] =
-{
-    /* element */       /* foreground*/ /* background*/
-    [C_TITLE]       = { COLOR_YELLOW,   COLOR_BLACK },
-
-    /* jamaican playlist, for rastafari sisters & brothers! */
-    [C_PLAYLIST_1]  = { COLOR_GREEN,    COLOR_BLACK },
-    [C_PLAYLIST_2]  = { COLOR_YELLOW,   COLOR_BLACK },
-    [C_PLAYLIST_3]  = { COLOR_RED,      COLOR_BLACK },
-
-    /* used in DrawBox() */
-    [C_BOX]         = { COLOR_CYAN,     COLOR_BLACK },
-    /* Source: State, Position, Volume, Chapters, etc...*/
-    [C_STATUS]      = { COLOR_BLUE,     COLOR_BLACK },
-
-    /* VLC messages, keep the order from highest priority to lowest */
-    [C_INFO]        = { COLOR_BLACK,    COLOR_WHITE },
-    [C_ERROR]       = { COLOR_RED,      COLOR_BLACK },
-    [C_WARNING]     = { COLOR_YELLOW,   COLOR_BLACK },
-    [C_DEBUG]       = { COLOR_WHITE,    COLOR_BLACK },
-
-    /* Category title: help, info, metadata */
-    [C_CATEGORY]    = { COLOR_MAGENTA,  COLOR_BLACK },
-    /* Folder (BOX_BROWSE) */
-    [C_FOLDER]      = { COLOR_RED,      COLOR_BLACK },
+    C_PLAYLIST,
 };
 
 struct dir_entry_t
@@ -175,6 +149,11 @@ struct dir_entry_t
 
 typedef struct VLC_VECTOR(char const *) pl_item_names;
 
+typedef struct short_color
+{
+    short r, g, b;
+} short_color;
+
 struct intf_sys_t
 {
     vlc_thread_t    thread;
@@ -182,10 +161,9 @@ struct intf_sys_t
 
     bool            color;
 
-    /* rgb values for the color yellow */
-    short           yellow_r;
-    short           yellow_g;
-    short           yellow_b;
+    /* rgb values for all of the colors */
+    short_color     system_colors[8];
+    size_t          playlist_colors;
 
     int             box_type;
     int             previous_box_type;
@@ -425,6 +403,222 @@ static void SearchPlaylist(intf_sys_t *sys)
 }
 
 /****************************************************************************
+ * Config
+ ****************************************************************************/
+
+static const struct { short f; short b; } default_color_pairs[] =
+{
+    /* element */       /* foreground*/ /* background*/
+    [C_TITLE]       = { COLOR_YELLOW,   COLOR_BLACK },
+
+    /* used in DrawBox() */
+    [C_BOX]         = { COLOR_CYAN,     COLOR_BLACK },
+    /* Source: State, Position, Volume, Chapters, etc...*/
+    [C_STATUS]      = { COLOR_BLUE,     COLOR_BLACK },
+
+    /* VLC messages, keep the order from highest priority to lowest */
+    [C_INFO]        = { COLOR_BLACK,    COLOR_WHITE },
+    [C_ERROR]       = { COLOR_RED,      COLOR_BLACK },
+    [C_WARNING]     = { COLOR_YELLOW,   COLOR_BLACK },
+    [C_DEBUG]       = { COLOR_WHITE,    COLOR_BLACK },
+
+    /* Category title: help, info, metadata */
+    [C_CATEGORY]    = { COLOR_MAGENTA,  COLOR_BLACK },
+    /* Folder (BOX_BROWSE) */
+    [C_FOLDER]      = { COLOR_RED,      COLOR_BLACK },
+
+    /* progress bar */
+    [C_PROGRESS]    = { COLOR_WHITE,    COLOR_WHITE},
+
+    /* jamaican playlist, for rastafari sisters & brothers! */
+    [C_PLAYLIST]    = { COLOR_GREEN,    COLOR_BLACK },
+    [C_PLAYLIST + 1]= { COLOR_YELLOW,   COLOR_BLACK },
+    [C_PLAYLIST + 2]= { COLOR_RED,      COLOR_BLACK },
+};
+
+static const char * color_names[] = {
+  "black",
+  "red",
+  "green",
+  "yellow",
+  "blue",
+  "magenta",
+  "cyan",
+  "white"
+};
+
+static int get_color_id_from_string(const char * string) {
+    if (!string) {
+        return -1;
+    }
+    for (int i = 0; i < 8; i++)
+        if (strcmp(string, color_names[i]) == 0)
+        return i;
+    return -1;
+}
+
+static const char * element_names[] = {
+  [C_TITLE] = "title",
+
+  [C_BOX] = "box",
+  [C_STATUS] = "status",
+
+  [C_INFO] = "info",
+  [C_ERROR] = "error",
+  [C_WARNING] = "warning",
+  [C_DEBUG] = "debug",
+
+  [C_CATEGORY] = "category",
+  [C_FOLDER] = "folder",
+
+  [C_PROGRESS] = "progress",
+};
+
+static int get_element_id_from_string(const char * string) {
+    if (!string) {
+        return -1;
+    }
+    for (int i = C_DEFAULT + 1; i < C_PLAYLIST; i++)
+        if (strcmp(string, element_names[i]) == 0)
+            return i;
+    return -1;
+}
+
+static void load_colors_config(intf_thread_t *intf) {
+    init_color(COLOR_YELLOW, 960, 500, 0); /* YELLOW -> ORANGE */
+    config_chain_t *p_config_chain = NULL;
+
+    char * psz_in = config_GetPsz("ncurses-colors");
+    if (!psz_in) {
+        return;
+    }
+
+    config_ChainParseOptions(&p_config_chain, psz_in);
+    config_chain_t *current = p_config_chain;
+    while (current) {
+        if (!current->psz_name) {
+            msg_Err(intf, "Couldn't load color name");
+            goto end;
+        }
+        if (!current->psz_value) {
+            msg_Err(intf, "Couldn't load color value");
+            goto end;
+        }
+        unsigned int color;
+        if (sscanf(current->psz_value, "%x", &color) != 1) {
+            msg_Err(intf, "Invalid color value %s", current->psz_value);
+            goto end;
+        }
+        int r = ((color >> 16) & 0xFF) * 1000 / 255;
+        int g = ((color >> 8) & 0xFF) * 1000 / 255;
+        int b = (color & 0xFF) * 1000 / 255;
+        int color_id = get_color_id_from_string(current->psz_name);
+        if (color_id == -1) {
+            msg_Err(intf, "Invalid color name %s", current->psz_name);
+            goto end;
+        }
+        init_color(color_id, r, g, b);
+    end:
+        current = current->p_next;
+    }
+    config_ChainDestroy(p_config_chain);
+    free(psz_in);
+}
+
+static int parse_color_pair(intf_thread_t *intf, const char *token,
+                             int *fg, int *bg)
+{
+    char fg_buf[8], bg_buf[8];
+
+    if (sscanf(token, "%7[a-z]:%7[a-z]", fg_buf, bg_buf) != 2) {
+        msg_Err(intf, "Invalid color pair '%s', expected 'fg:bg'", token);
+        return -1;
+    }
+
+    *fg = get_color_id_from_string(fg_buf);
+    if (*fg == -1) {
+        msg_Err(intf, "Unknown foreground color '%s'", fg_buf);
+        return -1;
+    }
+
+    *bg = get_color_id_from_string(bg_buf);
+    if (*bg == -1) {
+        msg_Err(intf, "Unknown background color '%s'", bg_buf);
+        return -1;
+    }
+
+    return 0;
+}
+
+static void load_pairs_config(intf_thread_t *intf) {
+    for (int i = C_DEFAULT + 1; i < (int)ARRAY_SIZE(default_color_pairs); i++) {
+        init_pair(i, default_color_pairs[i].f, default_color_pairs[i].b);
+    }
+
+    config_chain_t *p_config_chain = NULL;
+
+    char * psz_in = config_GetPsz("ncurses-theme");
+    if (!psz_in) {
+        return;
+    }
+    config_ChainParseOptions(&p_config_chain, psz_in);
+    config_chain_t *current = p_config_chain;
+    while (current) {
+        if (!current->psz_name) {
+            msg_Err(intf, "Couldn't load color name");
+            goto end_theme;
+        }
+        if (!current->psz_value) {
+            msg_Err(intf, "Couldn't load color value");
+            goto end_theme;
+        }
+
+        if (strcmp(current->psz_name, "playlist") == 0) {
+            char * safe_ptr = NULL;
+            char * current_token = strtok_r(current->psz_value, "-", &safe_ptr);
+            int playlist_id = 0;
+            while (current_token) {
+                int fg_color;
+                int bg_color;
+
+                if (parse_color_pair(intf, current_token, &fg_color, &bg_color) == -1)
+                    goto end_theme;
+                init_pair(C_PLAYLIST + playlist_id, fg_color, bg_color);
+
+                playlist_id++;
+                current_token = strtok_r(NULL, "-", &safe_ptr);
+
+                if (C_PLAYLIST + playlist_id >= COLOR_PAIRS) {
+                    msg_Err(intf, "Too many playlist colors");
+                    goto end_theme;
+                }
+            }
+            if (playlist_id != 0)
+                intf->p_sys->playlist_colors = playlist_id;
+        }
+        else {
+            int fg_color;
+            int bg_color;
+
+            if (parse_color_pair(intf, current->psz_value, &fg_color, &bg_color) == -1)
+                goto end_theme;
+
+            int element_id = get_element_id_from_string(current->psz_name);
+            if (element_id == -1) {
+                msg_Err(intf, "Invalid ui element %s", current->psz_name);
+                goto end_theme;
+            }
+
+            init_pair(element_id, fg_color, bg_color);
+        }
+    end_theme:
+        current = current->p_next;
+    }
+    config_ChainDestroy(p_config_chain);
+    free(psz_in);
+}
+
+/****************************************************************************
  * Drawing
  ****************************************************************************/
 
@@ -439,13 +633,15 @@ static void start_color_and_pairs(intf_thread_t *intf)
     }
 
     start_color();
-    for (int i = C_DEFAULT + 1; i < C_MAX; i++)
-        init_pair(i, color_pairs[i].f, color_pairs[i].b);
+    sys->playlist_colors = 3;
+    load_pairs_config(intf);
 
     /* untested, in all my terminals, !can_change_color() --funman */
     if (can_change_color()) {
-        color_content(COLOR_YELLOW, &sys->yellow_r, &sys->yellow_g, &sys->yellow_b);
-        init_color(COLOR_YELLOW, 960, 500, 0); /* YELLOW -> ORANGE */
+        for (int i = 0; i < 8 && i < COLORS; i++) {
+            color_content(i, &sys->system_colors[i].r, &sys->system_colors[i].g, &sys->system_colors[i].b);
+        }
+        load_colors_config(intf);
     }
 }
 
@@ -485,15 +681,6 @@ static void DrawEmptyLine(int y, int x, int w)
     if (w <= 0) return;
 
     mvhline(y, x, ' ', w);
-}
-
-static void DrawLine(int y, int x, int w)
-{
-    if (w <= 0) return;
-
-    attrset(A_REVERSE);
-    mvhline(y, x, ' ', w);
-    attroff(A_REVERSE);
 }
 
 static void mvnprintw(int y, int x, int w, const char *p_fmt, ...)
@@ -854,8 +1041,9 @@ static int DrawPlaylist(intf_thread_t *intf)
 
     for (size_t i = 0; i < sys->pl_item_names.size; i++)
     {
-        if (sys->color)
-            color_set(i%3 + C_PLAYLIST_1, NULL);
+        if (sys->color) {
+            color_set((sys->playlist_colors > 0 ? i%sys->playlist_colors : 1) + C_PLAYLIST, NULL);
+        }
 
         MainBoxWrite(sys, i, "%c %s",
                 (ssize_t)i == cur_idx ? '>' : ' ',
@@ -1013,7 +1201,13 @@ static int DrawStatus(intf_thread_t *intf)
     DrawBox(y++, 1, sys->color, ""); /* position slider */
     DrawEmptyLine(y, 1, COLS-2);
     if (vlc_player_IsStarted(player))
-        DrawLine(y, 1, (int)((COLS-2) * vlc_player_GetPosition(player)));
+    {
+        if (sys->color)
+            color_set(C_PROGRESS, NULL);
+        DrawEmptyLine(y, 1, (int)((COLS-2) * vlc_player_GetPosition(player)));
+        if (sys->color)
+            color_set(C_DEFAULT, NULL);
+    }
     y += 2; /* skip slider and box */
 
     vlc_playlist_Unlock(playlist);
@@ -1766,8 +1960,12 @@ static void Close(vlc_object_t *p_this)
     free(sys->current_dir);
 
     if (can_change_color())
-        /* Restore yellow to its original color */
-        init_color(COLOR_YELLOW, sys->yellow_r, sys->yellow_g, sys->yellow_b);
+    {
+        /* Restore colors to theirs original colors */
+        for (int i = 0; i < 8 && i < COLORS; i++) {
+            init_color(i, sys->system_colors[i].r, sys->system_colors[i].g, sys->system_colors[i].b);
+        }
+    }
 
     endwin();   /* Close the ncurses interface */
 
