@@ -22,6 +22,8 @@
 
 #import "VLCLibraryAudioGroupTableViewDelegate.h"
 
+#import "extensions/NSView+VLCAdditions.h"
+
 #import "VLCLibraryAlbumTableCellView.h"
 #import "VLCLibraryAudioDataSource.h"
 
@@ -35,9 +37,13 @@
     self = [super init];
     if (self) {
         self.cellViewIdentifier = VLCAudioLibraryCellIdentifier;
-        self.cellViewClass = [VLCLibraryAlbumTableCellView class];
     }
     return self;
+}
+
+- (NSView<VLCLibraryTableCellViewProtocol> *)makeCellView
+{
+    return [VLCLibraryAlbumTableCellView fromNibWithOwner:self];
 }
 
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex

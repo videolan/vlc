@@ -44,8 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) BOOL selected;
 
-+ (instancetype)fromNibWithOwner:(id)owner;
-
 - (void)playRepresentedItem;
 
 @end

@@ -22,6 +22,8 @@
 
 #import "VLCLibraryAudioDataSource.h"
 
+#import "extensions/NSView+VLCAdditions.h"
+
 #import "main/VLCMain.h"
 
 #import "library/VLCInputItem.h"

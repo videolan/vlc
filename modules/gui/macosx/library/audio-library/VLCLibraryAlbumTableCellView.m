@@ -80,13 +80,6 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
 @implementation VLCLibraryAlbumTableCellView
 
-+ (instancetype)fromNibWithOwner:(id)owner
-{
-    return (VLCLibraryAlbumTableCellView*)[NSView fromNibNamed:@"VLCLibraryAlbumTableCellView"
-                                                     withClass:[VLCLibraryAlbumTableCellView class]
-                                                     withOwner:owner];
-}
-
 + (CGFloat)defaultHeight
 {
     return VLCLibraryAlbumTableCellViewDefaultHeight;

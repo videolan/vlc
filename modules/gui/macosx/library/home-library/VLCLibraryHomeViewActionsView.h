@@ -32,8 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *openCaptureDeviceButton;
 @property (readwrite, weak) IBOutlet NSButton *openBrowseButton;
 
-+ (instancetype)fromNibWithOwner:(id)owner;
-
 - (IBAction)openFileAction:(id)sender;
 - (IBAction)openDiscAction:(id)sender;
 - (IBAction)openUrlAction:(id)sender;

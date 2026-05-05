@@ -46,13 +46,6 @@
 
 @implementation VLCLibraryCarouselViewItemView
 
-+ (instancetype)fromNibWithOwner:(id)owner
-{
-    return (VLCLibraryCarouselViewItemView *)[NSView fromNibNamed:@"VLCLibraryCarouselViewItemView"
-                                                        withClass:VLCLibraryCarouselViewItemView.class
-                                                        withOwner:owner];
-}
-
 - (instancetype)init
 {
     self = [super init];

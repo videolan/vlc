@@ -22,6 +22,8 @@
 
 #import "VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
+#import "extensions/NSView+VLCAdditions.h"
+
 #import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"

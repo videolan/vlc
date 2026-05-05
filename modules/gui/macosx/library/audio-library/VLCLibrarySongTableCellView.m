@@ -52,13 +52,6 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
 
 @implementation VLCLibrarySongTableCellView
 
-+ (instancetype)fromNibWithOwner:(id)owner
-{
-    return (VLCLibrarySongTableCellView*)[NSView fromNibNamed:@"VLCLibrarySongTableCellView"
-                                                     withClass:[VLCLibrarySongTableCellView class]
-                                                     withOwner:owner];
-}
-
 - (void)awakeFromNib
 {
     self.playInstantlyButton.target = self;

@@ -30,14 +30,6 @@
 
 @implementation VLCLibraryHomeViewActionsView
 
-+ (instancetype)fromNibWithOwner:(id)owner
-{
-    return (VLCLibraryHomeViewActionsView*)[NSView fromNibNamed:@"VLCLibraryHomeViewActionsView"
-                                                      withClass:VLCLibraryHomeViewActionsView.class
-                                                      withOwner:owner];
-}
-
-
 - (void)awakeFromNib
 {
     [super awakeFromNib];

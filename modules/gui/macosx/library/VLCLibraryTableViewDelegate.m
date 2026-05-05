@@ -23,6 +23,7 @@
 #import "VLCLibraryTableViewDelegate.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
@@ -44,9 +45,13 @@
     self = [super init];
     if (self) {
         self.cellViewIdentifier = @"VLCLibraryTableViewCellIdentifier";
-        self.cellViewClass = [VLCLibraryTableCellView class];
     }
     return self;
+}
+
+- (NSView<VLCLibraryTableCellViewProtocol> *)makeCellView
+{
+    return [VLCLibraryTableCellView fromNibWithOwner:self];
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
@@ -60,8 +65,8 @@
 
     NSView<VLCLibraryTableCellViewProtocol> * cellView = (NSView<VLCLibraryTableCellViewProtocol> *)[tableView makeViewWithIdentifier:self.cellViewIdentifier owner:self];
 
-    if (cellView == nil && [self.cellViewClass respondsToSelector:@selector(fromNibWithOwner:)]) {
-        cellView = [self.cellViewClass fromNibWithOwner:self];
+    if (cellView == nil) {
+        cellView = [self makeCellView];
         cellView.identifier = self.cellViewIdentifier;
     }
 

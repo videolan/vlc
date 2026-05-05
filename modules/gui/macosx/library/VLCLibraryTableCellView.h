@@ -36,8 +36,6 @@ extern NSString * const VLCLibraryTableCellViewIdentifier;
 
 @interface VLCLibraryTableCellView : NSTableCellView<VLCLibraryTableCellViewProtocol>
 
-+ (instancetype)fromNibWithOwner:(id)owner;
-
 @property (readwrite, weak) IBOutlet VLCTrackingView *trackingView;
 @property (readwrite, weak) IBOutlet NSTextField *singlePrimaryTitleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *secondaryTitleTextField;

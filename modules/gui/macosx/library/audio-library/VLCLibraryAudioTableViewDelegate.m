@@ -38,7 +38,6 @@
     self = [super init];
     if (self) {
         self.cellViewIdentifier = VLCAudioLibraryCellIdentifier;
-        self.cellViewClass = [VLCLibraryTableCellView class];
     }
     return self;
 }

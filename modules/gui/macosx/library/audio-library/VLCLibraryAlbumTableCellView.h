@@ -38,7 +38,6 @@ extern NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier;
 
 @property (class, readonly) CGFloat defaultHeight;
 
-+ (instancetype)fromNibWithOwner:(id)owner;
 + (CGFloat)heightForAlbum:(VLCMediaLibraryAlbum *)album;
 
 @property (readwrite, weak) IBOutlet VLCTrackingView *trackingView;

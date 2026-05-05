@@ -22,6 +22,8 @@
 
 #import "VLCLibraryAlbumTracksTableViewDelegate.h"
 
+#import "extensions/NSView+VLCAdditions.h"
+
 #import "library/audio-library/VLCLibrarySongTableCellView.h"
 
 @implementation VLCLibraryAlbumTracksTableViewDelegate
@@ -31,9 +33,13 @@
     self = [super init];
     if (self) {
         self.cellViewIdentifier = VLCAudioLibrarySongCellIdentifier;
-        self.cellViewClass = [VLCLibrarySongTableCellView class];
     }
     return self;
+}
+
+- (NSView<VLCLibraryTableCellViewProtocol> *)makeCellView
+{
+    return [VLCLibrarySongTableCellView fromNibWithOwner:self];
 }
 
 

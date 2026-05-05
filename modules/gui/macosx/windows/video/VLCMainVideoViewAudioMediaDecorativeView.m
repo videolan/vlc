@@ -44,13 +44,6 @@
 
 @implementation VLCMainVideoViewAudioMediaDecorativeView
 
-+ (instancetype)fromNibWithOwner:(id)owner
-{
-    return (VLCMainVideoViewAudioMediaDecorativeView*)[NSView fromNibNamed:@"VLCMainVideoViewAudioMediaDecorativeView"
-                                                                 withClass:[VLCMainVideoViewAudioMediaDecorativeView class]
-                                                                 withOwner:owner];
-}
-
 - (void)awakeFromNib
 {
     _lyricsEntries = @[];

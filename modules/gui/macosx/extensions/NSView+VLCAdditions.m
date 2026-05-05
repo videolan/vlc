@@ -27,6 +27,11 @@
 
 @implementation NSView (VLCAdditions)
 
++ (instancetype)fromNibWithOwner:(id)owner
+{
+    return [self fromNibNamed:NSStringFromClass(self) withClass:self withOwner:owner];
+}
+
 + (instancetype)fromNibNamed:(NSString *)nibName withClass:(Class)viewClass withOwner:(id)owner
 {
     /* the following code saves us an instance of NSViewController which we don't need */

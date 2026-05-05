@@ -23,6 +23,7 @@
 #import "VLCPlayQueueDataSource.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayQueueTableCellView.h"
@@ -72,19 +73,10 @@ static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
         [tableView makeViewWithIdentifier:VLCPlayQueueCellIdentifier owner:self];
 
     if (cellView == nil) {
-        /* the following code saves us an instance of NSViewController which we don't need */
-        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCPlayQueueTableCellView" bundle:nil];
-        NSArray *topLevelObjects;
-        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
+        cellView = [VLCPlayQueueTableCellView fromNibWithOwner:self];
+        if (cellView == nil) {
             msg_Err(getIntf(), "Failed to load nib file to show playlist items");
             return nil;
-        }
-
-        for (id topLevelObject in topLevelObjects) {
-            if ([topLevelObject isKindOfClass:[VLCPlayQueueTableCellView class]]) {
-                cellView = topLevelObject;
-                break;
-            }
         }
         cellView.identifier = VLCPlayQueueCellIdentifier;
     }

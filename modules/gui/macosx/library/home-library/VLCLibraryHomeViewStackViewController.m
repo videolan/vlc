@@ -25,6 +25,8 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "extensions/NSView+VLCAdditions.h"
+
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryHeroView.h"
 #import "library/VLCLibraryModel.h"
