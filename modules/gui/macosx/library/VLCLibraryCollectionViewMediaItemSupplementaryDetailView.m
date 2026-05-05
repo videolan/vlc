@@ -45,6 +45,18 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 @implementation VLCLibraryCollectionViewMediaItemSupplementaryDetailView
 
++ (NSDateFormatter *)lastPlayedDateFormatter
+{
+    static NSDateFormatter *formatter;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        formatter = [[NSDateFormatter alloc] init];
+        formatter.dateStyle = NSDateFormatterFullStyle;
+        formatter.timeStyle = NSDateFormatterFullStyle;
+    });
+    return formatter;
+}
+
 - (void)awakeFromNib
 {
     _mediaItemTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
@@ -152,10 +164,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     if (actualItem.lastPlayedDate > 0) {
         NSDate * const lastPlayedDate =
             [NSDate dateWithTimeIntervalSince1970:actualItem.lastPlayedDate];
-        NSDateFormatter * const formatter = [[NSDateFormatter alloc] init];
-        formatter.dateStyle = NSDateFormatterFullStyle;
-        formatter.timeStyle = NSDateFormatterFullStyle;
-        NSString * const lastPlayedString = [formatter stringFromDate:lastPlayedDate];
+        NSString * const lastPlayedString =
+            [self.class.lastPlayedDateFormatter stringFromDate:lastPlayedDate];
         self.mediaItemLastPlayedTextField.stringValue = lastPlayedString;
     }
 
