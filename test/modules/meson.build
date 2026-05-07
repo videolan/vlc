@@ -6,6 +6,14 @@ vlc_tests += {
     'module_depends' : vlc_plugins_targets.keys()
 }
 
+vlc_tests += {
+    'name' : 'test_modules_lua_playlist_parser',
+    'sources' : files('lua/playlist_parser.c'),
+    'suite' : ['modules', 'test_modules'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : ['lua'] 
+}
+
 if not (host_system == 'windows') # missing mkdtemp()
 vlc_tests += {
     'name' : 'test_modules_misc_medialibrary',
