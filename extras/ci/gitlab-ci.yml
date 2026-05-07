@@ -239,6 +239,14 @@ nightly-win64-llvm:
         <<: *variables-win64
         LIBVLC_EXTRA_BUILD_FLAGS: -D /
 
+nightly-win64-llvm-meson:
+    extends: .nightly-win-common
+    image:
+        name: $VLC_WIN_LLVM_MSVCRT_IMAGE
+    variables:
+        <<: *variables-win64
+        LIBVLC_EXTRA_BUILD_FLAGS: -D / -m
+
 nightly-win64-ucrt-llvm:
     extends: .nightly-win-common
     image:
