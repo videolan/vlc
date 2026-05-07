@@ -3,6 +3,7 @@
 SAM3_VERSION := 1.0.0
 SAM3_URL := $(GITHUB)/PABannier/sam3.cpp/archive/refs/tags/v$(SAM3_VERSION).tar.gz
 
+PKGS += sam3
 ifeq ($(call need_pkg,"sam3"),)
 PKGS_FOUND += sam3
 endif
