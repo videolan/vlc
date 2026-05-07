@@ -1013,7 +1013,11 @@ static void fromJSON_input_item(struct serdes_sys *sys,
         struct input_item_es item_es = {0};
         fromJSON_input_item_es(sys, &v->object, &item_es, &err);
         if (!err) {
-            vlc_vector_push(&i->es_vec, item_es);
+            err = !vlc_vector_push(&i->es_vec, item_es);
+        }
+
+        if (err) {
+            es_format_Clean(&item_es.es);
         }
     }
 
