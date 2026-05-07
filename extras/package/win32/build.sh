@@ -535,6 +535,7 @@ if [ -n "$BUILD_MESON" ]; then
     VLC_CXXFLAGS="$VLC_CXXFLAGS -Dalarm="
 
     mkdir -p $SHORTARCH-meson
+    echo "*" > $SHORTARCH-meson/.gitignore
     rm -rf $SHORTARCH-meson/meson-private
 
     if [ -n "$WITH_PDB" ]; then
@@ -593,6 +594,7 @@ else
     ${VLC_ROOT_PATH}/bootstrap
 
     mkdir -p $SHORTARCH
+    echo "*" > $SHORTARCH/.gitignore
     cd $SHORTARCH
 
     # set environment that will be kept in config.status
