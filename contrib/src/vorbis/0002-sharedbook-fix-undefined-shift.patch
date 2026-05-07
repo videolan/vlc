@@ -1,0 +1,21 @@
+commit bb4047de4c05712bf1fd49b9584c360b8e4e0adf
+Author: Tristan Matthews <tmatth@videolan.org>
+Date:   Fri Jun 14 11:39:26 2024 -0400
+
+    sharedbook: cast to unsigned to avoid undefined shift
+    
+    Fixes #2351
+
+diff --git a/lib/sharedbook.c b/lib/sharedbook.c
+index 444f42b5..7a98b479 100644
+--- a/lib/sharedbook.c
++++ b/lib/sharedbook.c
+@@ -422,7 +422,7 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
+         long lo=0,hi=0;
+ 
+         for(i=0;i<tabn;i++){
+-          ogg_uint32_t word=i<<(32-c->dec_firsttablen);
++          ogg_uint32_t word=((ogg_uint32_t)i<<(32-c->dec_firsttablen));
+           if(c->dec_firsttable[bitreverse(word)]==0){
+             while((lo+1)<n && c->codelist[lo+1]<=word)lo++;
+             while(    hi<n && word>=(c->codelist[hi]&mask))hi++;
