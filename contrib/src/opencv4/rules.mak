@@ -48,7 +48,8 @@ OPENCV4_CONF := \
 	-DWITH_OPENJPEG=OFF \
 	-DWITH_JASPER=OFF \
 	-DWITH_TIFF=OFF \
-	-DWITH_COCOA=OFF
+	-DWITH_COCOA=OFF \
+	-DBUILD_PROTOBUF=OFF
 
 # NEON mandatory on aarch64
 ifneq ($(findstring aarch64,$(HOST)),)
