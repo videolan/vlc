@@ -545,7 +545,7 @@ if get_option('rust').enabled()
             depfile: 'lib' + module['name'] + '.d',
             output: 'lib' + module['name'] + '.a',
             env: {
-              'RUSTFLAGS': rust_flags,
+              'RUSTFLAGS': ' '.join(rust_flags),
               'CARGO_TARGET_DIR': cargo_target_dir,
             },
             command: [cargo_output, '--output', '@OUTDIR@', '--depfile',

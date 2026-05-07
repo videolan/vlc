@@ -17,7 +17,7 @@ vlcrs_core = custom_target('vlcrs_core-cargo',
     depfile: 'libvlcrs_core.d',
     depends: module_cargo_depends,
     env: {
-      'RUSTFLAGS': rust_flags,
+      'RUSTFLAGS': ' '.join(rust_flags),
       'CARGO_TARGET_DIR': cargo_target_dir
     },
     command: [cargo_output, '--output', '@OUTDIR@', '--depfile',

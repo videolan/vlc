@@ -20,7 +20,7 @@ vlcrs_core_macros = custom_target('vlcrs_macros-cargo',
     output: 'libvlcrs_macros.@0@'.format(rust_macros_extension),
     depends: module_cargo_depends,
     env: {
-      'RUSTFLAGS': rust_flags,
+      'RUSTFLAGS': ' '.join(rust_flags),
       'CARGO_TARGET_DIR': cargo_target_dir
     },
     command: [cargo_output, '--output', '@OUTDIR@', '--depfile',
