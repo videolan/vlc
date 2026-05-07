@@ -16,6 +16,8 @@ ggml: ggml-$(GGML_VERSION).tar.gz .sum-ggml
 	$(UNPACK)
 	# fix path to install ggml.pc
 	sed -i.orig 's,DESTINATION share/pkgconfig,DESTINATION $${CMAKE_INSTALL_LIBDIR}/pkgconfig,' $(UNPACK_DIR)/CMakeLists.txt
+	# add missing libraries
+	sed -i.orig 's, -lggml$$, -lggml -lggml-base -lggml-cpu,' $(UNPACK_DIR)/ggml.pc.in
 	$(MOVE)
 
 GGML_CONF := \
