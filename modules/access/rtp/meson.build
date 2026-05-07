@@ -18,6 +18,11 @@ else
     srtp_dep = disabler()
 endif
 
+rtp_deps = [socket_libs]
+if srtp_dep.found()
+    rtp_deps += srtp_dep
+endif
+
 vlc_modules += {
     'name': 'rtp',
     'sources':
@@ -30,7 +35,7 @@ vlc_modules += {
             'rtp.c',
             'rtp.h',
         ),
-    'dependencies': [socket_libs, srtp_dep],
+    'dependencies': rtp_deps,
     'link_with': [rtp_lib],
 }
 
