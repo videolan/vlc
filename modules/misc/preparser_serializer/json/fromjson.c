@@ -794,6 +794,11 @@ static void fromJSON_es_format(struct serdes_sys *sys,
         es->i_extra_languages = el_vec.size;
         vlc_vector_init(&el_vec);
     } else {
+        extra_languages_t *el;
+        vlc_vector_foreach_ref(el, &el_vec) {
+            free(el->psz_language);
+            free(el->psz_description);
+        }
         vlc_vector_clear(&el_vec);
         err = true;
     }
