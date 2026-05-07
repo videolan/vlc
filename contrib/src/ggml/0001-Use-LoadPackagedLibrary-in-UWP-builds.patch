@@ -1,0 +1,28 @@
+From ed727ec6a420f48e44e8d91fec2889a96aa96e18 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 7 May 2026 15:02:05 +0200
+Subject: [PATCH] Use LoadPackagedLibrary() in UWP builds
+
+---
+ src/ggml-backend-dl.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/ggml-backend-dl.cpp b/src/ggml-backend-dl.cpp
+index a65cf009..fedc97f4 100644
+--- a/src/ggml-backend-dl.cpp
++++ b/src/ggml-backend-dl.cpp
+@@ -7,7 +7,11 @@ dl_handle * dl_load_library(const fs::path & path) {
+     DWORD old_mode = SetErrorMode(SEM_FAILCRITICALERRORS);
+     SetErrorMode(old_mode | SEM_FAILCRITICALERRORS);
+ 
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+     HMODULE handle = LoadLibraryW(path.wstring().c_str());
++#else
++    HMODULE handle = LoadPackagedLibrary(path.wstring().c_str(), 0);
++#endif
+ 
+     SetErrorMode(old_mode);
+ 
+-- 
+2.52.0.windows.1
+

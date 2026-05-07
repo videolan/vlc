@@ -18,6 +18,7 @@ ggml: ggml-$(GGML_VERSION).tar.gz .sum-ggml
 	sed -i.orig 's,DESTINATION share/pkgconfig,DESTINATION $${CMAKE_INSTALL_LIBDIR}/pkgconfig,' $(UNPACK_DIR)/CMakeLists.txt
 	# add missing libraries
 	sed -i.orig 's, -lggml$$, -lggml -lggml-base -lggml-cpu,' $(UNPACK_DIR)/ggml.pc.in
+	$(APPLY) $(SRC)/ggml/0001-Use-LoadPackagedLibrary-in-UWP-builds.patch
 	$(MOVE)
 
 GGML_CONF := \
