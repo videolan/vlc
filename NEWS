@@ -28,6 +28,7 @@ Contrib:
  * Update flac to 1.4.2
  * Update FFmpeg to 8.1
  * Update gme to 0.6.4
+ * Update gpg-error to 1.56
  * Update jpeg to v9f
  * Update libtasn1 to 4.19.0
  * Update libxml2 to 2.15.1
