@@ -1,6 +1,6 @@
 # ggml
 
-GGML_VERSION := 0.10.0
+GGML_VERSION := 0.11.0
 GGML_URL := $(GITHUB)/ggml-org/ggml/archive/refs/tags/v$(GGML_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"ggml"),)
