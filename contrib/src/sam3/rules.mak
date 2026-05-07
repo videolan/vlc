@@ -3,7 +3,9 @@
 SAM3_VERSION := 1.0.0
 SAM3_URL := $(GITHUB)/PABannier/sam3.cpp/archive/refs/tags/v$(SAM3_VERSION).tar.gz
 
+ifndef HAVE_IOS    # ggml missing clock_gettime() when targeting iOS 9.0
 PKGS += sam3
+endif
 ifeq ($(call need_pkg,"sam3"),)
 PKGS_FOUND += sam3
 endif
