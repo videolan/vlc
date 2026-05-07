@@ -21,6 +21,7 @@ ggml: ggml-$(GGML_VERSION).tar.gz .sum-ggml
 	$(MOVE)
 
 GGML_CONF := \
+	-DGGML_OPENMP=OFF \
 	-DGGML_BUILD_TESTS=OFF \
 	-DGGML_BUILD_EXAMPLES=OFF
 
