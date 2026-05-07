@@ -529,6 +529,12 @@ if [ -n "$INSTALL_PATH" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --with-packagedir=$INSTALL_PATH"
 fi
 
+if [ "$INSTALLER" = "n" ]; then
+    COMPILEFLAGS="$COMPILEFLAGS V=1"
+    MCOMPILEFLAGS="$MCOMPILEFLAGS --verbose"
+fi
+
+
 if [ -n "$BUILD_MESON" ]; then
     # disable alarm() calls in tests. The timeout is handled by meson
     VLC_CFLAGS="$VLC_CFLAGS -Dalarm="
@@ -587,8 +593,7 @@ if [ -n "$BUILD_MESON" ]; then
         --cross-file ${BUILD_PATH}/contrib/$CONTRIB_PREFIX/share/meson/cross/contrib.ini
 
     info "Compiling"
-    cd ${BUILD_PATH}/$SHORTARCH-meson
-    meson compile -j $JOBS
+    meson compile -j $JOBS -C ${BUILD_PATH}/$SHORTARCH-meson ${MCOMPILEFLAGS}
 else
     info "Bootstrapping"
     ${VLC_ROOT_PATH}/bootstrap
@@ -627,7 +632,7 @@ else
     ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS
 
     info "Compiling"
-    make -j$JOBS
+    make -j$JOBS ${COMPILEFLAGS}
 
     if [ "$INSTALLER" = "n" ]; then
         make package-win32-debug-7zip
