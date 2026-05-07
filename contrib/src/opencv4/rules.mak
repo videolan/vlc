@@ -69,4 +69,5 @@ endif
 	$(HOSTVARS_CMAKE) $(CMAKE) $(OPENCV4_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
+	install $(BUILD_DIR)/unix-install/opencv4.pc $(PREFIX)/lib/pkgconfig
 	touch $@
