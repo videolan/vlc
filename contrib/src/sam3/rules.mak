@@ -5,7 +5,9 @@ SAM3_URL := $(GITHUB)/PABannier/sam3.cpp/archive/refs/tags/v$(SAM3_VERSION).tar.
 
 ifndef HAVE_IOS    # ggml missing clock_gettime() when targeting iOS 9.0
 ifndef HAVE_TVOS   # ggml missing std::filesystem::path when targeting tvOS 11.0
+ifndef HAVE_MACOSX # ggml missing std::filesystem::path when targeting tvOS 10.13
 PKGS += sam3
+endif
 endif
 endif
 ifeq ($(call need_pkg,"sam3"),)
