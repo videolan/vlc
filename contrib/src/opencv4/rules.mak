@@ -10,7 +10,7 @@ PKGS_FOUND += opencv4
 endif
 endif
 
-DEPS_opencv4 = sam3 $(DEPS_sam3)
+DEPS_opencv4 = zlib $(DEPS_zlib) jpeg $(DEPS_jpeg) png $(DEPS_png)
 
 $(TARBALLS)/opencv-$(OPENCV4_VERSION).tar.gz:
 	$(call download_pkg,$(OPENCV4_URL),opencv4)
