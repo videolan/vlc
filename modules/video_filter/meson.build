@@ -407,6 +407,13 @@ opencv_dep = dependency('opencv4',
                         required: false,
                         version: '>=4.0.0')
 
+vlc_modules += {
+    'name' : 'opencv_example',
+    'sources' : files('opencv_example.cpp'),
+    'dependencies' : [m_lib, opencv_dep],
+    'enabled' : opencv_dep.found()
+}
+
 sam3_dep = dependency('sam3',
                       required: get_option('sam3'))
 
