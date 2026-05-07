@@ -28,6 +28,7 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 	$(UNPACK)
 	$(APPLY) $(SRC)/vorbis/0001-Fix-pkgconfig-creation-with-cmake.patch
+	$(APPLY) $(SRC)/vorbis/0002-sharedbook-fix-undefined-shift.patch
 	$(call pkg_static,"vorbis.pc.in")
 	$(call pkg_static,"vorbisenc.pc.in")
 	$(call pkg_static,"vorbisfile.pc.in")
