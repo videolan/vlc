@@ -555,9 +555,14 @@ static int WindowFloatOnTop(vlc_object_t *obj,
         [videoWindow toggleFullScreen:self];
     }
 
-    if (videoWindow.class == VLCLibraryWindow.class
-        && ((VLCLibraryWindow *)videoWindow).embeddedVideoPlaybackActive) {
-        [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
+    if (videoWindow.class == VLCLibraryWindow.class) {
+        // If `embeddedVideoPlaybackActive` is already `NO`, the user navigated back
+        // while playback was ongoing - `disableVideoPlaybackAppearance` was already
+        // called at that point, so nothing more to do here.
+        
+        if (((VLCLibraryWindow *)videoWindow).embeddedVideoPlaybackActive) {
+            [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
+        }
     } else {
         [videoWindow close];
     }
