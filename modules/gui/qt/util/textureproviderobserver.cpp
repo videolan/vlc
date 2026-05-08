@@ -49,6 +49,12 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
 
     if (m_source)
     {
+        // Source changed before we got its `QSGTextureProvider`, but we need
+        // to do it regardless if we already captured the texture provider
+        // because we are now listening `::windowChanged()` at all times (no
+        // longer only a single shot connection):
+        disconnect(m_source, nullptr, this, nullptr);
+
         if (Q_LIKELY(m_provider))
         {
             disconnect(m_provider, nullptr, this, nullptr);
@@ -59,11 +65,6 @@ void TextureProviderObserver::setSource(const QQuickItem *source, bool enforce)
             //   asynchronous. Even if update occurs, it may take a while, and it may never happen.
             // - There is no more source.
             resetProperties(); // memory order does not matter, `setSource()` is not called frequently.
-        }
-        else
-        {
-            // source changed before we got its `QSGTextureProvider`
-            disconnect(m_source, nullptr, this, nullptr);
         }
     }
 
