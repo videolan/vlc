@@ -272,7 +272,7 @@ static void handle_action_request(UpnpActionRequest *p_request, intf_thread_t *p
     }
 }
 
-static int Callback(Upnp_EventType event_type, const void *event, void *cookie)
+static int Callback(Upnp_EventType event_type, UpnpEventPtr event, void *cookie)
 {
     auto *intf = static_cast<intf_thread_t *>(cookie);
 

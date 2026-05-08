@@ -40,7 +40,11 @@
 #include <upnp.h>
 #include <upnptools.h>
 
+#if UPNP_VERSION_MAJOR == 17 || (UPNP_VERSION_MAJOR == 1 && (UPNP_VERSION < 11426 || (UPNP_VERSION > 11429 && UPNP_VERSION < 11800)))
 typedef const void* UpnpEventPtr;
+#else
+typedef void* UpnpEventPtr;
+#endif
 
 /**
  * libUpnp allows only one instance per process, so we create a wrapper
