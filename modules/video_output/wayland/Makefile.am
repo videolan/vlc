@@ -69,12 +69,12 @@ video_output/wayland/xdg-decoration-protocol.c: \
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
 video_output/wayland/linux-dmabuf-client-protocol.h: \
-		$(WAYLAND_PROTOCOLS)/unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml \
+		$(WAYLAND_PROTOCOLS)/stable/linux-dmabuf/linux-dmabuf-v1.xml \
 		video_output/Makefile.am
 	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header $< $@
 
 video_output/wayland/linux-dmabuf-protocol.c: \
-		$(WAYLAND_PROTOCOLS)/unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml \
+		$(WAYLAND_PROTOCOLS)/stable/linux-dmabuf/linux-dmabuf-v1.xml \
 		video_output/Makefile.am
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 

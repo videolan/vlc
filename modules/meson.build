@@ -25,10 +25,10 @@ xcb_xfixes_dep = dependency('xcb-xfixes', required: xcb_auto_option)
 
 # Check for Wayland
 if (host_system != 'darwin' and host_system != 'windows') or get_option('xcb').enabled()
-    wayland_scanner_dep = dependency('wayland-scanner', version: '>= 1.15',
+    wayland_scanner_dep = dependency('wayland-scanner', version: '>= 1.23',
         required: get_option('wayland'), native: true)
 
-    wayland_protocols_dep = dependency('wayland-protocols', version: '>= 1.15',
+    wayland_protocols_dep = dependency('wayland-protocols', version: '>= 1.33',
         required: get_option('wayland'))
 
     wayland_deps = [
