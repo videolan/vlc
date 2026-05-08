@@ -334,7 +334,7 @@ void TextureProviderObserver::updateProperties()
                 }
             }
 
-            if (!m_notifyAllChanges.load(memoryOrder) || !textureIsDynamic)
+            if (!textureIsDynamic)
             {
                 m_oldTextureSize.store(textureSize, memoryOrder);
                 m_oldNativeTextureSize.store(nativeTextureSize, memoryOrder);
@@ -378,13 +378,10 @@ void TextureProviderObserver::resetProperties(std::memory_order memoryOrder)
     if (m_comparisonKey.exchange(-1, memoryOrder) != -1)
         emit comparisonKeyChanged(-1);
 
-    if (!m_notifyAllChanges.load(memoryOrder) || !m_textureIsDynamic.load(memoryOrder))
-    {
-        m_oldTextureSize.store({}, memoryOrder);
-        m_oldNativeTextureSize.store({}, memoryOrder);
-        m_oldNormalizedTextureSubRect.store({}, memoryOrder);
-        m_oldComparisonKey.store(-1, memoryOrder);
-    }
+    m_oldTextureSize.store({}, memoryOrder);
+    m_oldNativeTextureSize.store({}, memoryOrder);
+    m_oldNormalizedTextureSubRect.store({}, memoryOrder);
+    m_oldComparisonKey.store(-1, memoryOrder);
 }
 
 void TextureProviderObserver::adjustSampleAndNotifyConnection()
