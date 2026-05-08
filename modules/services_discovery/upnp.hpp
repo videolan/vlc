@@ -35,10 +35,10 @@
 
 #include <vlc_common.h>
 
-#if UPNP_VERSION < 10800
-typedef void* UpnpEventPtr;
-#else
+#if UPNP_VERSION_MAJOR == 17 || (UPNP_VERSION_MAJOR == 1 && (UPNP_VERSION < 11426 || (UPNP_VERSION > 11429 && UPNP_VERSION < 11800)))
 typedef const void* UpnpEventPtr;
+#else
+typedef void* UpnpEventPtr;
 #endif
 
 namespace SD
