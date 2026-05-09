@@ -151,6 +151,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
                 [collectionView reloadItemsAtIndexPaths:indexPathSet];
                 break;
             case VLCLibraryDataSourceCacheDeleteAction:
+                [(VLCLibraryCollectionViewFlowLayout *)collectionView.collectionViewLayout resetLayout];
                 [collectionView deleteItemsAtIndexPaths:indexPathSet];
                 break;
             default:
