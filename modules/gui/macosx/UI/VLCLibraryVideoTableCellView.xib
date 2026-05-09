@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryVideoTableViewDelegate"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="c22-O7-iKe" customClass="VLCLibraryTableCellView">
+            <rect key="frame" x="0.0" y="0.0" width="398" height="32"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="ffE-px-l0g" customClass="VLCTrackingView">
+                    <rect key="frame" x="0.0" y="0.0" width="398" height="32"/>
+                </customView>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
+                    <rect key="frame" x="5" y="5" width="22" height="22"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="Ydb-7n-5Cd" secondAttribute="height" multiplier="1:1" id="4aB-rs-m22"/>
+                    </constraints>
+                </customView>
+                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2yt-Ph-v3B">
+                    <rect key="frame" x="37" y="0.0" width="351" height="32"/>
+                    <subviews>
+                        <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
+                            <rect key="frame" x="-2" y="8" width="273" height="16"/>
+                            <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="aCe-ia-0Ww">
+                                <font key="font" usesAppearanceFont="YES"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ohB-P0-nCv">
+                            <rect key="frame" x="274" y="8" width="37" height="16"/>
+                            <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="ZPw-XO-XD1">
+                                <font key="font" usesAppearanceFont="YES"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TPv-k2-6XS">
+                            <rect key="frame" x="314" y="8" width="39" height="16"/>
+                            <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="jZ4-pa-K3T">
+                                <font key="font" usesAppearanceFont="YES"/>
+                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NFZ-x0-t5c">
+                    <rect key="frame" x="8" y="8" width="16" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="16" id="K1a-nD-gSz"/>
+                        <constraint firstAttribute="height" constant="16" id="bai-RH-huE"/>
+                    </constraints>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="libraryPlay" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="5MR-Gt-X4p">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerX" secondItem="Ydb-7n-5Cd" secondAttribute="centerX" id="0Eb-LH-6nF"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="5" id="8hv-Qt-uAI"/>
+                <constraint firstItem="ffE-px-l0g" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="EMs-It-nUH"/>
+                <constraint firstAttribute="bottom" secondItem="ffE-px-l0g" secondAttribute="bottom" id="I7D-8N-oA1"/>
+                <constraint firstItem="ffE-px-l0g" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="M01-2i-CLZ"/>
+                <constraint firstItem="2yt-Ph-v3B" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="Xsk-fe-nEI"/>
+                <constraint firstAttribute="bottom" secondItem="2yt-Ph-v3B" secondAttribute="bottom" id="Xsk-fe-nEZ"/>
+                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="5" id="aVd-Ld-lUH"/>
+                <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="dRw-WH-Y00"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="5" id="iPZ-zR-jTv"/>
+                <constraint firstAttribute="trailing" secondItem="ffE-px-l0g" secondAttribute="trailing" id="m4c-HB-V5e"/>
+                <constraint firstItem="2yt-Ph-v3B" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="10" id="svv-3z-IWh"/>
+                <constraint firstAttribute="trailing" secondItem="2yt-Ph-v3B" secondAttribute="trailing" constant="10" id="uti-Wq-BEz"/>
+            </constraints>
+            <connections>
+                <outlet property="playInstantlyButton" destination="NFZ-x0-t5c" id="suD-1u-UrY"/>
+                <outlet property="primaryTitleTextField" destination="xJW-ps-ycn" id="5Vl-3a-J2T"/>
+                <outlet property="representedImageView" destination="Ydb-7n-5Cd" id="qBu-r5-jIY"/>
+                <outlet property="secondaryTitleTextField" destination="TPv-k2-6XS" id="rRg-vu-a7j"/>
+                <outlet property="singlePrimaryTitleTextField" destination="ohB-P0-nCv" id="gBJ-WZ-6pB"/>
+                <outlet property="trackingView" destination="ffE-px-l0g" id="Eme-n5-LGv"/>
+            </connections>
+            <point key="canvasLocation" x="98" y="50.5"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="libraryPlay" width="64" height="64"/>
+    </resources>
+</document>
