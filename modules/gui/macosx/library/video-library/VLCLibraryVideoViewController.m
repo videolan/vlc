@@ -138,7 +138,7 @@
 - (void)setupTableView
 {
     NSNib * const tableCellViewNib =
-        [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
+        [[NSNib alloc] initWithNibNamed:@"VLCLibraryVideoTableCellView"
                                  bundle:nil];
     [self.videoLibraryGroupSelectionTableView registerNib:tableCellViewNib
                                            forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
