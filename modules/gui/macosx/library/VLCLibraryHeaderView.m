@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAudioGroupTableHeaderView.m: MacOS X interface module
+ * VLCLibraryHeaderView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2025 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryAudioGroupTableHeaderView.h"
+#import "VLCLibraryHeaderView.h"
 
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryUIUnits.h"
@@ -30,10 +30,10 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
-const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight = 66.f;
-NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAudioGroupTableHeaderView";
+const CGFloat VLCLibraryHeaderViewHeight = 66.f;
+NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
 
-@interface VLCLibraryAudioGroupTableHeaderView ()
+@interface VLCLibraryHeaderView ()
 
 @property NSView *backgroundView;
 @property NSStackView *rootStackView;
@@ -49,7 +49,7 @@ NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAud
 
 @end
 
-@implementation VLCLibraryAudioGroupTableHeaderView
+@implementation VLCLibraryHeaderView
 
 + (CGFloat)internalPaddingHeight
 {
@@ -65,13 +65,13 @@ NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier = @"VLCLibraryAud
 
 + (CGFloat)paddedHeaderViewHeight
 {
-    return VLCLibraryAudioGroupTableHeaderViewHeight + self.internalPaddingHeight;
+    return VLCLibraryHeaderViewHeight + self.internalPaddingHeight;
 }
 
 + (instancetype)paddedHeaderView
 {
     const NSRect headerFrame = NSMakeRect(0.f, 0.f, 0.f, self.paddedHeaderViewHeight);
-    VLCLibraryAudioGroupTableHeaderView * const headerView =
+    VLCLibraryHeaderView * const headerView =
         [[self alloc] initWithFrame:headerFrame withInternalPaddingAddedForContentView:YES];
     headerView.autoresizingMask = NSViewWidthSizable;
     return headerView;

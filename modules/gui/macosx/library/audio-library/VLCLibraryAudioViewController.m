@@ -41,9 +41,9 @@
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
+#import "library/VLCLibraryHeaderView.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h"
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
+#import "library/VLCLibraryHeaderCell.h"
 #import "library/audio-library/VLCLibraryAudioTableViewDelegate.h"
 
 #import "library/playlist-library/VLCLibraryPlaylistViewController.h"
@@ -187,9 +187,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
-    _audioCollectionHeaderView = [VLCLibraryAudioGroupTableHeaderView paddedHeaderView];
+    _audioCollectionHeaderView = [VLCLibraryHeaderView paddedHeaderView];
     _audioGroupSelectionTableView.headerView = self.audioCollectionHeaderView;
-    _audioGroupSelectionTableView.tableColumns.firstObject.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
+    _audioGroupSelectionTableView.tableColumns.firstObject.headerCell = [VLCLibraryHeaderCell new];
 
     _audioGroupSelectionTableView.dataSource = _audioGroupDataSource;
     _audioGroupSelectionTableView.delegate = _audioGroupLibraryTableViewDelegate;
@@ -222,7 +222,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         VLCLibraryCollectionViewFlowLayout.standardLayout;
     _audioLibraryGridModeSplitViewListSelectionCollectionView.collectionViewLayout = audioLibraryGridModeListSelectionCollectionViewLayout;
     audioLibraryGridModeListSelectionCollectionViewLayout.headerReferenceSize =
-        NSMakeSize(self.audioCollectionViewScrollView.documentView.frame.size.width, VLCLibraryAudioGroupTableHeaderViewHeight);
+        NSMakeSize(self.audioCollectionViewScrollView.documentView.frame.size.width, VLCLibraryHeaderViewHeight);
 
     if (@available(macOS 10.12, *)) {
         audioLibraryGridModeListSelectionCollectionViewLayout.sectionHeadersPinToVisibleBounds = YES;

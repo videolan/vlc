@@ -42,8 +42,8 @@
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "library/playlist-library/VLCLibraryPlaylistDataSource.h"
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
+#import "library/VLCLibraryHeaderCell.h"
+#import "library/VLCLibraryHeaderView.h"
 
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
@@ -188,7 +188,7 @@
     [self.detailTableView registerNib:tableCellViewNib
                         forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
 
-    _detailTableHeaderView = [VLCLibraryAudioGroupTableHeaderView paddedHeaderView];
+    _detailTableHeaderView = [VLCLibraryHeaderView paddedHeaderView];
 
     self.tableViewDelegate.detailTableHeaderView = self.detailTableHeaderView;
 
@@ -196,7 +196,7 @@
     self.masterTableView.allowsEmptySelection = NO;
     self.detailTableView.headerView = self.detailTableHeaderView;
 
-    detailColumn.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
+    detailColumn.headerCell = [VLCLibraryHeaderCell new];
 
     self.masterTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.detailTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;

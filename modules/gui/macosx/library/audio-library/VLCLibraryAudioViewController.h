@@ -29,7 +29,7 @@
 
 @class VLCLibraryAudioDataSource;
 @class VLCLibraryAudioGroupDataSource;
-@class VLCLibraryAudioGroupTableHeaderView;
+@class VLCLibraryHeaderView;
 @class VLCLibraryCollectionView;
 @class VLCLibraryWindow;
 
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, weak) NSSplitView *audioLibrarySplitView;
 @property (readonly, weak) NSScrollView *audioCollectionSelectionTableViewScrollView;
 @property (readonly, weak) NSTableView *audioCollectionSelectionTableView;
-@property (readonly, strong) VLCLibraryAudioGroupTableHeaderView *audioCollectionHeaderView;
+@property (readonly, strong) VLCLibraryHeaderView *audioCollectionHeaderView;
 @property (readonly, weak) NSScrollView *audioGroupSelectionTableViewScrollView;
 @property (readonly, weak) NSTableView *audioGroupSelectionTableView;
 @property (readonly, weak) NSScrollView *audioSongTableViewScrollView;

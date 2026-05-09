@@ -25,13 +25,13 @@
 #import "library/VLCLibraryGroupHeaderDelegate.h"
 #import "library/VLCLibraryTableViewDelegate.h"
 
-@class VLCLibraryAudioGroupTableHeaderView;
+@class VLCLibraryHeaderView;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryMasterDetailViewTableViewDelegate : VLCLibraryTableViewDelegate<VLCLibraryGroupHeaderDelegate>
 
-@property (readwrite, weak) VLCLibraryAudioGroupTableHeaderView *detailTableHeaderView;
+@property (readwrite, weak) VLCLibraryHeaderView *detailTableHeaderView;
 
 @end
 

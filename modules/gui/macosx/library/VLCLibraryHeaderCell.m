@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAudioGroupTableHeaderView.h: MacOS X interface module
+ * VLCLibraryHeaderCell.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2025 VLC authors and VideoLAN
  *
@@ -20,26 +20,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "VLCLibraryHeaderCell.h"
 
-@class VLCLibraryRepresentedItem;
+@implementation VLCLibraryHeaderCell
 
-NS_ASSUME_NONNULL_BEGIN
-
-extern const CGFloat VLCLibraryAudioGroupTableHeaderViewHeight;
-extern NSString * const VLCLibraryAudioGroupTableHeaderViewIdentifier;
-
-@interface VLCLibraryAudioGroupTableHeaderView : NSTableHeaderView
-
-@property (nullable, nonatomic) VLCLibraryRepresentedItem *representedItem;
-@property (readwrite, nonatomic) BOOL internalPaddingAddedForContentView;
-
-+ (instancetype)paddedHeaderView;
-- (instancetype)initWithFrame:(NSRect)frameRect withInternalPaddingAddedForContentView:(BOOL)internalPaddingAddedForContentView;
-- (void)updateWithRepresentedItem:(nullable VLCLibraryRepresentedItem *)representedItem
-                    fallbackTitle:(nullable NSString *)fallbackTitle
-                   fallbackDetail:(nullable NSString *)fallbackDetail;
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+    // Intentionally do not call super to prevent AppKit from drawing its default background.
+    // The header view hosts its own background visuals (glass/effect/solid) and draws content there.
+    [NSColor.clearColor setFill];
+    NSRectFillUsingOperation(cellFrame, NSCompositingOperationClear);
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

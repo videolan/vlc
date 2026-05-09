@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAudioGroupTableHeaderCell.h: MacOS X interface module
+ * VLCLibraryHeaderView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2025 VLC authors and VideoLAN
  *
@@ -22,11 +22,24 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCLibraryRepresentedItem;
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryAudioGroupTableHeaderCell : NSTableHeaderCell
+extern const CGFloat VLCLibraryHeaderViewHeight;
+extern NSString * const VLCLibraryHeaderViewIdentifier;
+
+@interface VLCLibraryHeaderView : NSTableHeaderView
+
+@property (nullable, nonatomic) VLCLibraryRepresentedItem *representedItem;
+@property (readwrite, nonatomic) BOOL internalPaddingAddedForContentView;
+
++ (instancetype)paddedHeaderView;
+- (instancetype)initWithFrame:(NSRect)frameRect withInternalPaddingAddedForContentView:(BOOL)internalPaddingAddedForContentView;
+- (void)updateWithRepresentedItem:(nullable VLCLibraryRepresentedItem *)representedItem
+                    fallbackTitle:(nullable NSString *)fallbackTitle
+                   fallbackDetail:(nullable NSString *)fallbackDetail;
 
 @end
 
 NS_ASSUME_NONNULL_END
-

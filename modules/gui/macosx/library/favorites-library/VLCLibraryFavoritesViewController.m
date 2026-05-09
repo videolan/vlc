@@ -46,8 +46,8 @@
 #import "library/favorites-library/VLCLibraryFavoritesTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
+#import "library/VLCLibraryHeaderView.h"
+#import "library/VLCLibraryHeaderCell.h"
 #import "main/VLCMain.h"
 
 @interface VLCLibraryFavoritesViewController ()
@@ -107,7 +107,7 @@
 {
     self.favoritesLibrarySplitView.delegate = _splitViewDelegate;
 
-    _favoritesHeaderView = [VLCLibraryAudioGroupTableHeaderView paddedHeaderView];
+    _favoritesHeaderView = [VLCLibraryHeaderView paddedHeaderView];
 
     _favoritesLibraryTableViewDelegate.detailTableHeaderView = self.favoritesHeaderView;
     self.favoritesLibraryGroupSelectionTableView.headerView = self.favoritesHeaderView;
@@ -115,7 +115,7 @@
     NSTableColumn * const groupsColumn = [[NSTableColumn alloc] initWithIdentifier:@"groups"];
     NSTableColumn * const selectedGroupColumn = [[NSTableColumn alloc] initWithIdentifier:@"selectedGroup"];
     
-    selectedGroupColumn.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
+    selectedGroupColumn.headerCell = [VLCLibraryHeaderCell new];
 
     [self.favoritesLibraryGroupsTableView addTableColumn:groupsColumn];
     [self.favoritesLibraryGroupSelectionTableView addTableColumn:selectedGroupColumn];

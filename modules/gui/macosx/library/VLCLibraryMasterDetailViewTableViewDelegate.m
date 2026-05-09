@@ -25,7 +25,7 @@
 #import "library/VLCLibraryMasterDetailViewTableViewDataSource.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
+#import "library/VLCLibraryHeaderView.h"
 
 @implementation VLCLibraryMasterDetailViewTableViewDelegate
 

@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryTableView;
 @class VLCLibraryWindow;
 @class VLCLibraryTwoPaneSplitViewDelegate;
-@class VLCLibraryAudioGroupTableHeaderView;
+@class VLCLibraryHeaderView;
 
 @interface VLCLibraryGroupsViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<NSSplitViewDelegate, VLCLibraryItemPresentingCapable>
 
@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryTwoPaneSplitViewDelegate *splitViewDelegate;
 
 @property (readonly) VLCLibraryGroupsDataSource *dataSource;
-@property (readonly) VLCLibraryAudioGroupTableHeaderView *selectedGroupTableHeaderView;
+@property (readonly) VLCLibraryHeaderView *selectedGroupTableHeaderView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

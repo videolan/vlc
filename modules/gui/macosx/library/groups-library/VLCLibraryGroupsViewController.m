@@ -41,8 +41,8 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderCell.h"
-#import "library/audio-library/VLCLibraryAudioGroupTableHeaderView.h"
+#import "library/VLCLibraryHeaderCell.h"
+#import "library/VLCLibraryHeaderView.h"
 
 #import "library/groups-library/VLCLibraryGroupsDataSource.h"
 
@@ -191,7 +191,7 @@
     [self.selectedGroupTableView registerNib:tableCellViewNib
                                forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
 
-    _selectedGroupTableHeaderView = [VLCLibraryAudioGroupTableHeaderView paddedHeaderView];
+    _selectedGroupTableHeaderView = [VLCLibraryHeaderView paddedHeaderView];
 
     self.tableViewDelegate.detailTableHeaderView = self.selectedGroupTableHeaderView;
 
@@ -200,7 +200,7 @@
     self.groupsTableView.allowsMultipleSelection = YES;
     self.selectedGroupTableView.headerView = self.selectedGroupTableHeaderView;
 
-    selectedGroupColumn.headerCell = [VLCLibraryAudioGroupTableHeaderCell new];
+    selectedGroupColumn.headerCell = [VLCLibraryHeaderCell new];
 
     self.groupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.selectedGroupTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;

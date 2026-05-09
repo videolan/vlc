@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAudioGroupTableHeaderCell.m: MacOS X interface module
+ * VLCLibraryHeaderCell.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2025 VLC authors and VideoLAN
  *
@@ -20,16 +20,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryAudioGroupTableHeaderCell.h"
+#import <Cocoa/Cocoa.h>
 
-@implementation VLCLibraryAudioGroupTableHeaderCell
+NS_ASSUME_NONNULL_BEGIN
 
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
-    // Intentionally do not call super to prevent AppKit from drawing its default background.
-    // The header view hosts its own background visuals (glass/effect/solid) and draws content there.
-    [NSColor.clearColor setFill];
-    NSRectFillUsingOperation(cellFrame, NSCompositingOperationClear);
-}
+@interface VLCLibraryHeaderCell : NSTableHeaderCell
 
 @end
+
+NS_ASSUME_NONNULL_END
+
