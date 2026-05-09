@@ -142,6 +142,8 @@
                                  bundle:nil];
     [self.videoLibraryGroupSelectionTableView registerNib:tableCellViewNib
                                            forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
+    [self.videoLibraryGroupsTableView registerNib:tableCellViewNib
+                                   forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
     
     self.videoLibraryGroupSelectionTableView.floatsGroupRows = NO;
 }
@@ -296,6 +298,14 @@
     _libraryMoviesDataSource = nil;
     [self setupShowsDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryShowsDataSource;
+
+    self.videoLibraryGroupsTableView.dataSource = self.libraryShowsDataSource;
+    self.videoLibraryGroupsTableView.target = self.libraryShowsDataSource;
+    self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+
+    self.videoLibraryGroupSelectionTableView.dataSource = self.libraryShowsDataSource;
+    self.videoLibraryGroupSelectionTableView.target = self.libraryShowsDataSource;
+    self.videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
 
     // Shows uses the master/detail split view, not the single sectioned table.
     // The master and detail table views are wired in setupShowsDataSource.

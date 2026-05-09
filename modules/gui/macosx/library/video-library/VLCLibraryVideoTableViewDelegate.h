@@ -22,11 +22,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibraryTableViewDelegate.h"
+#import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoTableViewDelegate : VLCLibraryTableViewDelegate
+@interface VLCLibraryVideoTableViewDelegate : VLCLibraryMasterDetailViewTableViewDelegate
 
 @end
 
