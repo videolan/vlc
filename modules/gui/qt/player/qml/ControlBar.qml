@@ -165,6 +165,32 @@ T.Pane {
                         MainCtx.showRemainingTime = !MainCtx.showRemainingTime
                     }
                 }
+
+                HoverHandler {
+                    id: mediaRemainingTimeHover
+                }
+
+                Widgets.ToolTipExt {
+                    colorContext.palette: theme.palette
+
+                    visible: mediaRemainingTimeHover.hovered && MainCtx.showRemainingTime && Player.rate !== 1
+                    delay: VLCStyle.delayToolTipAppear
+                    text: {
+                        if (!visible)
+                            return ""
+
+                        const playbackSpeed = Math.abs(Player.rate)
+                        const adjustedRemainingTime = Player.remainingTime.scale(1 / playbackSpeed)
+                            ? Player.remainingTime.scale(1 / playbackSpeed)
+                            : Player.remainingTime
+
+                        return qsTr("%1 (%2x)")
+                            .arg(adjustedRemainingTime.formatHMS())
+                            .arg(+Player.rate.toFixed(2))
+                    }
+
+                    x: (parent.width - width) / 2
+                }
             },
             SliderBar {
                 id: trackPositionSlider
