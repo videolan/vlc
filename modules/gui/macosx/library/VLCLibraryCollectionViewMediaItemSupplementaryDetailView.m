@@ -67,7 +67,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         return @"";
     }
 
-    const VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
+    VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item.firstMediaItem;
     NSMutableArray<NSString *> * const strings = NSMutableArray.array;
 
     if (actualItem.year > 0) {
@@ -104,7 +104,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 - (void)updateRepresentation
 {
     NSAssert(self.representedItem, @"no represented item assigned for collection view item", nil);
-    VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
+    VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item.firstMediaItem;
     NSAssert(actualItem != nil, @"represented item is not a media item", nil);
 
     _mediaItemTitleTextField.stringValue = actualItem.displayString;
@@ -210,7 +210,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 - (IBAction)primaryDetailAction:(id)sender
 {
-    VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
     if (actualItem == nil || !actualItem.primaryActionableDetail) {
         return;
     }
@@ -222,7 +222,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 - (IBAction)secondaryDetailAction:(id)sender
 {
-    VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
     if (actualItem == nil || !actualItem.secondaryActionableDetail) {
         return;
     }
@@ -234,7 +234,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 - (IBAction)favoriteAction:(id)sender
 {
-    VLCMediaLibraryMediaItem * const mediaItem = self.representedItem.item;
+    const id<VLCMediaLibraryItemProtocol> mediaItem = self.representedItem.item;
     if ([mediaItem toggleFavorite] == VLC_SUCCESS) {
         VLCMediaLibraryMediaItem * const updatedItem =
             [VLCMediaLibraryMediaItem mediaItemForLibraryID:mediaItem.libraryID];
