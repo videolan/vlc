@@ -233,7 +233,7 @@
 
 - (void)setupVideoLibraryViews
 {
-    _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.videoLibraryTableViewRowHeight;
 
     const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
     const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;

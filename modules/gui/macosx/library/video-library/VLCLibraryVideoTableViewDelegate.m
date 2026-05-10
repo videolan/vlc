@@ -91,7 +91,7 @@
         }
     }
 
-    return VLCLibraryUIUnits.mediumTableViewRowHeight;
+    return VLCLibraryUIUnits.videoLibraryTableViewRowHeight;
 }
 
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row

@@ -58,7 +58,7 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const CGFloat largeTableViewRowHeight;
 @property (class, readonly) const CGFloat mediumTableViewRowHeight;
 @property (class, readonly) const CGFloat smallTableViewRowHeight;
-
+@property (class, readonly) const CGFloat videoLibraryTableViewRowHeight;
 @property (class, readonly) const CGFloat mediumDetailSupplementaryViewCollectionViewWidth;
 @property (class, readonly) const CGFloat mediumDetailSupplementaryViewCollectionViewHeight;
 @property (class, readonly) const CGFloat largeDetailSupplementaryViewCollectionViewWidth;

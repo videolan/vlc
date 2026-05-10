@@ -86,6 +86,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 25;
 }
 
++ (const CGFloat)videoLibraryTableViewRowHeight
+{
+    return 42;
+}
+
 + (const CGFloat)mediumDetailSupplementaryViewCollectionViewWidth
 {
     return 600;
