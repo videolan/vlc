@@ -72,7 +72,6 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     const NSPoint arrowTopPoint = NSMakePoint(itemCenterPoint.x, backgroundTop + kArrowHeight - 1);
     const NSPoint arrowRightPoint = NSMakePoint(itemCenterPoint.x + _arrowSize.width / 2, backgroundTop);
 
-    const NSPoint topLeftCorner = NSMakePoint(backgroundLeft, backgroundTop);
     const NSPoint topLeftCornerAfterCurve = NSMakePoint(backgroundLeft + kBackgroundCornerRadius, backgroundTop);
 
     const NSBezierPath *backgroundPath = [NSBezierPath bezierPathWithRoundedRect:backgroundRect xRadius:kBackgroundCornerRadius yRadius:kBackgroundCornerRadius];
@@ -106,7 +105,6 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     const NSPoint arrowLeftMostPoint = NSMakePoint(backgroundLeft - kArrowHeight + 1, itemCenterPoint.y);
     const NSPoint arrowTopPoint = NSMakePoint(backgroundLeft, itemCenterPoint.y - _arrowSize.width / 2);
 
-    const NSPoint bottomLeftCorner = NSMakePoint(backgroundLeft, backgroundBottom);
     const NSPoint bottomLeftCornerAfterCurve = NSMakePoint(backgroundLeft, backgroundBottom + kBackgroundCornerRadius);
 
     const NSBezierPath *backgroundPath = [NSBezierPath bezierPathWithRoundedRect:backgroundRect xRadius:kBackgroundCornerRadius yRadius:kBackgroundCornerRadius];
