@@ -381,7 +381,7 @@ bool CompositorVideo::commonGUICreate(QWindow* window, QmlUISurface* qmlSurface,
     ret = m_ui->setup(qmlSurface->engine());
     if (! ret)
         return false;
-    qmlSurface->setContent(nullptr, m_ui->createRootItem());
+    qmlSurface->setContent(m_ui->createRootItem());
     return true;
 }
 

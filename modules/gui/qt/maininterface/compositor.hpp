@@ -125,7 +125,7 @@ public:
     public:
         virtual ~QmlUISurface() = default;
         virtual QQmlEngine* engine() const = 0;
-        virtual void setContent(QQmlComponent *component, QQuickItem *item) = 0;
+        virtual void setContent(QQuickItem *item) = 0;
 
         virtual QQuickItem * activeFocusItem() const = 0;
     };

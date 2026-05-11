@@ -149,7 +149,7 @@ CompositorX11UISurface::~CompositorX11UISurface()
 }
 
 
-void CompositorX11UISurface::setContent(QQmlComponent*,  QQuickItem* rootItem)
+void CompositorX11UISurface::setContent(QQuickItem* rootItem)
 {
     assert(rootItem);
     m_rootItem = rootItem;

@@ -62,7 +62,7 @@ public:
     bool handleWindowEvent(QEvent *event);
 
     //QmlUISurface API
-    void setContent(QQmlComponent*,  QQuickItem* rootItem) override;
+    void setContent(QQuickItem* rootItem) override;
     QQmlEngine* engine() const override { return m_qmlEngine; }
 
     QQuickItem * activeFocusItem() const override;
