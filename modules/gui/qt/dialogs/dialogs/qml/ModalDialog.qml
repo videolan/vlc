@@ -69,7 +69,7 @@ Dialog {
             anchors.fill: parent
             anchors.margins: MainCtx.windowExtendedMargin
 
-            visible: MainCtx.backdropBlurRequested()
+            visible: MainCtx.backdropBlurRequested() && blur.available
 
             source: ShaderEffectSource {
                 sourceItem: blur.visible ? control.rootWindow : null
