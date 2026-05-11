@@ -2228,7 +2228,30 @@ PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 1.1.0], (libbluray f
 dnl
 dnl  OpenCV wrapper and example filters
 dnl
-PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv > 2.0], (OpenCV (computer vision) filter), [auto])
+AC_ARG_ENABLE(opencv, [AS_HELP_STRING([--enable-opencv], [OpenCV (computer vision) filter (default auto)])])
+AS_IF([test "${enable_opencv}" != "no"], [
+  have_opencv="no"
+  PKG_CHECK_MODULES([OPENCV], [opencv4], [
+    have_opencv="yes"
+  ], [
+    PKG_CHECK_MODULES([OPENCV], [opencv > 2.0], [
+      have_opencv="yes"
+    ], [
+      AS_IF([test -n "${enable_opencv}"], [
+        AC_MSG_ERROR([${OPENCV_PKG_ERRORS}.])
+      ])
+    ])
+  ])
+  AS_IF([test "${have_opencv}" != "no"], [
+    VLC_ADD_PLUGIN([opencv_example opencv_wrapper])
+    VLC_ADD_LIBS([opencv_example opencv_wrapper], [$OPENCV_LIBS])
+    VLC_ADD_CXXFLAGS([opencv_example opencv_wrapper], [$OPENCV_CFLAGS])
+  ], [
+    AC_MSG_WARN([${OPENCV_PKG_ERRORS}.])
+    enable_opencv="no"
+  ])
+])
+AM_CONDITIONAL(HAVE_OPENCV, [test "$enable_opencv" != "no"])
 
 dnl
 dnl OpenCV4 + sam3 (SAM3 segmentation filter)
