@@ -1,0 +1,43 @@
+From 66e4f59d325afc159b7a1e05683dd8b8698459ea Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 11 May 2026 09:43:20 +0200
+Subject: [PATCH 3/3] KaxBlock: fix reading EBML lacing with just one frame
+
+The spec [^1] is not clear whether when there is a single frame in the lace
+the size of the frame should be written. However it is forbidden to put
+a single frame in a lace [^2]. libmatroska doesn't support it.
+libavformat doesn't support lacing writing.
+However the last frame size is never written in any lace, so that's the
+first one when there's only one frame.
+
+[^1]: https://www.rfc-editor.org/rfc/rfc9559#section-10.3.3
+[^2]: https://www.rfc-editor.org/rfc/rfc9559#section-10.3
+---
+ src/KaxBlock.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/KaxBlock.cpp b/src/KaxBlock.cpp
+index ddf8b14..eccb4c7 100644
+--- a/src/KaxBlock.cpp
++++ b/src/KaxBlock.cpp
+@@ -683,6 +683,9 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+               throw SafeReadIOCallback::EndOfStreamX(0);
+             };
+ 
++            if (FrameNum == 0)
++              Index = 0;
++            else {
+             binary length_buf[8];
+             if (input.read(length_buf, 1) != 1)
+               throw SafeReadIOCallback::EndOfStreamX(0);
+@@ -723,6 +726,7 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+               SizeList[Index] = FrameSize;
+               LastBufferSize -= FrameSize + SizeRead;
+             }
++            }
+ 
+             SizeList[Index] = LastBufferSize;
+             break;
+-- 
+2.52.0.windows.1
+
