@@ -1,7 +1,7 @@
 From b4c4a7ef50b3bb8cac30975437c89a377240ef6f Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 28 Apr 2026 11:30:11 +0200
-Subject: [PATCH 2/2] KaxBlock: throw when the EBML length difference gives a
+Subject: [PATCH 2/3] KaxBlock: throw when the EBML length difference gives a
  negative frame length
 
 ---
