@@ -24,6 +24,7 @@ $(TARBALLS)/sam3.cpp-$(SAM3_VERSION).tar.gz:
 sam3: sam3.cpp-$(SAM3_VERSION).tar.gz .sum-sam3
 	$(UNPACK)
 	$(APPLY) $(SRC)/sam3/0001-add-install-rules.patch
+	$(APPLY) $(SRC)/sam3/0001-disable-sam3_decode_video_frame.patch
 	$(MOVE)
 
 SAM3_CONF := \

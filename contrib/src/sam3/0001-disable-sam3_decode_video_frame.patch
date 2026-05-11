@@ -1,0 +1,50 @@
+From 0ce0345a616cfca35d7ecf73b39f078a08c89ba7 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 11 May 2026 10:24:53 +0200
+Subject: [PATCH] disable sam3_decode_video_frame()
+
+It's not used in VLC and calls ffmpeg/ffprobe as a command-line.
+It doesn't build in UWP and probably other targets as well.
+---
+ sam3.cpp | 2 ++
+ sam3.h   | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/sam3.cpp b/sam3.cpp
+index 43d88a8..6605a8e 100644
+--- a/sam3.cpp
++++ b/sam3.cpp
+@@ -12285,6 +12285,7 @@ bool sam3_save_mask(const sam3_mask& mask, const std::string& path) {
+                           mask.data.data(), mask.width) != 0;
+ }
+ 
++#if 0 // unused by VLC popen not support in UWP
+ sam3_image sam3_decode_video_frame(const std::string& video_path, int frame_index) {
+     sam3_image img;
+ 
+@@ -12352,6 +12353,7 @@ sam3_video_info sam3_get_video_info(const std::string& video_path) {
+     pclose(fp);
+     return info;
+ }
++#endif
+ 
+ /*****************************************************************************
+ ** Tokenizer — standalone test API (does not require model weights)
+diff --git a/sam3.h b/sam3.h
+index 204e487..2296318 100644
+--- a/sam3.h
++++ b/sam3.h
+@@ -305,8 +305,10 @@ sam3_result sam3_propagate_frame(
+ 
+ sam3_image      sam3_load_image(const std::string & path);
+ bool            sam3_save_mask(const sam3_mask & mask, const std::string & path);
++#if 0 // unused by VLC popen not supported in UWP
+ sam3_image      sam3_decode_video_frame(const std::string & video_path, int frame_index);
+ sam3_video_info sam3_get_video_info(const std::string & video_path);
++#endif
+ 
+ /*****************************************************************************
+ ** Test and Debug API
+-- 
+2.52.0.windows.1
+
