@@ -28,6 +28,10 @@ opencv4: opencv-$(OPENCV4_VERSION).tar.gz .sum-opencv4
 	sed -i.orig 's,if(MSVC OR IOS),if(0),' $(UNPACK_DIR)/cmake/OpenCVGenPkgconfig.cmake
 	# always install pkgconfig file
 	sed -i.orig 's,if(UNIX AND NOT ANDROID),if(1),' $(UNPACK_DIR)/cmake/OpenCVGenPkgconfig.cmake
+	# fix ARM intrin.h case
+	sed -i.orig 's,Intrin.h,intrin.h,g' $(UNPACK_DIR)/modules/core/include/opencv2/core/cv_cpu_dispatch.h
+	sed -i.orig 's,Intrin.h,intrin.h,' $(UNPACK_DIR)/cmake/checks/cpu_neon.cpp
+	sed -i.orig 's,Intrin.h,intrin.h,' $(UNPACK_DIR)/modules/flann/include/opencv2/flann/dist.h
 	$(MOVE)
 
 # only enable necessary pkgs
