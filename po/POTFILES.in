@@ -1304,6 +1304,7 @@ modules/video_filter/croppadd.c
 modules/video_filter/deinterlace/algo_phosphor.h
 modules/video_filter/deinterlace/deinterlace.c
 modules/video_filter/deinterlace/deinterlace.h
+modules/video_filter/dither.c
 modules/video_filter/edgedetection.c
 modules/video_filter/erase.c
 modules/video_filter/extract.c
@@ -1329,6 +1330,7 @@ modules/video_filter/psychedelic.c
 modules/video_filter/puzzle/puzzle.c
 modules/video_filter/ripple.c
 modules/video_filter/rotate.c
+modules/video_filter/sam3.cpp
 modules/video_filter/scale.c
 modules/video_filter/scene.c
 modules/video_filter/sepia.c
