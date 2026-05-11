@@ -53,18 +53,30 @@ Dialog {
     }
 
     Overlay.modal: Item {
+        Rectangle {
+            anchors.fill: blur
+
+            visible: !blur.visible
+
+            color: theme.bg.primary
+
+            opacity: 0.6
+        }
+
         Widgets.DualKawaseBlur {
+            id: blur
+
             anchors.fill: parent
-            anchors.topMargin: MainCtx.windowExtendedMargin
-            anchors.leftMargin: MainCtx.windowExtendedMargin
-            anchors.rightMargin: MainCtx.windowExtendedMargin
-            anchors.bottomMargin: MainCtx.windowExtendedMargin
+            anchors.margins: MainCtx.windowExtendedMargin
+
+            visible: MainCtx.backdropBlurRequested()
 
             source: ShaderEffectSource {
-                sourceItem: control.rootWindow
+                sourceItem: blur.visible ? control.rootWindow : null
                 live: true
                 hideSource: true
             }
+
             radius: 3
         }
     }
