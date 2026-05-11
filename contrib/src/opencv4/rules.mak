@@ -22,6 +22,8 @@ $(TARBALLS)/opencv-$(OPENCV4_VERSION).tar.gz:
 
 opencv4: opencv-$(OPENCV4_VERSION).tar.gz .sum-opencv4
 	$(UNPACK)
+	# fix build with newer CMake
+	sed -i.orig 's,cmake_minimum_required(VERSION 2.8.12.2),cmake_minimum_required(VERSION 3.5),' $(UNPACK_DIR)/cmake/OpenCVGenPkgconfig.cmake
 	$(MOVE)
 
 # only enable necessary pkgs
