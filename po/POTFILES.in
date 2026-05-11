@@ -1323,7 +1323,7 @@ modules/video_filter/motionblur.c
 modules/video_filter/motiondetect.c
 modules/video_filter/oldmovie.c
 modules/video_filter/opencv_example.cpp
-modules/video_filter/opencv_wrapper.c
+modules/video_filter/opencv_wrapper.cpp
 modules/video_filter/posterize.c
 modules/video_filter/postproc.c
 modules/video_filter/psychedelic.c

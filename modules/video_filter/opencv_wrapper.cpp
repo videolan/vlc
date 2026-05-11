@@ -1,5 +1,5 @@
 /*****************************************************************************
- * opencv_wrapper.c : OpenCV wrapper video filter
+ * opencv_wrapper.cpp : OpenCV wrapper video filter
  *****************************************************************************
  * Copyright (C) 2006-2012 VLC authors and VideoLAN
  * Copyright (C) 2012 Edward Wang
@@ -29,6 +29,8 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <new>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -88,6 +90,8 @@ vlc_module_begin ()
 vlc_module_end ()
 
 
+namespace {
+
 /*****************************************************************************
  * wrapper_output_t: what video is output
  *****************************************************************************/
@@ -114,7 +118,7 @@ enum internal_chroma_t
  * This structure is part of the video output thread descriptor.
  * It describes the opencv_wrapper specific properties of an output thread.
  *****************************************************************************/
-typedef struct
+struct filter_sys_t
 {
     image_handler_t *p_image;
 
@@ -133,7 +137,9 @@ typedef struct
     filter_t *p_opencv;
 
     picture_t hacked_pic;
-} filter_sys_t;
+};
+
+} // namespace
 
 /*****************************************************************************
  * Create: allocates opencv_wrapper video thread output method
@@ -146,8 +152,8 @@ static int Create( filter_t* p_filter )
     char *psz_chroma, *psz_output;
 
     /* Allocate structure */
-    p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_sys == NULL )
+    p_sys = new (std::nothrow) filter_sys_t;
+    if( !p_sys )
         return VLC_ENOMEM;
 
     /* Load the internal OpenCV filter.
@@ -159,9 +165,9 @@ static int Create( filter_t* p_filter )
      * We don't need to set up video formats for this filter as it not
      * actually using a picture_t.
      */
-    p_sys->p_opencv = vlc_object_create( p_filter, sizeof(filter_t) );
+    p_sys->p_opencv = vlc_object_create<filter_t>( p_filter );
     if( !p_sys->p_opencv ) {
-        free( p_sys );
+        delete p_sys;
         return VLC_ENOMEM;
     }
 
@@ -178,7 +184,7 @@ static int Create( filter_t* p_filter )
         msg_Err( p_filter, "can't open internal opencv filter: %s", psz_inner_name );
         free( psz_inner_name );
         vlc_object_delete(p_sys->p_opencv);
-        free( p_sys );
+        delete p_sys;
 
         return VLC_ENOENT;
     }
@@ -245,11 +251,15 @@ static int Create( filter_t* p_filter )
     msg_Dbg( p_filter, "opencv_wrapper successfully started" );
 #endif
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = Filter, .close = Destroy,
-    };
-    p_filter->ops = &filter_ops;
+    static const struct FilterOperationInitializer {
+        struct vlc_filter_operations ops {};
+        FilterOperationInitializer()
+        {
+            ops.filter_video = Filter;
+            ops.close        = Destroy;
+        };
+    } filter_ops;
+    p_filter->ops = &filter_ops.ops;
     p_filter->p_sys = p_sys;
 
     return VLC_SUCCESS;
@@ -262,13 +272,13 @@ static int Create( filter_t* p_filter )
  *****************************************************************************/
 static void Destroy( filter_t* p_filter )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = static_cast<filter_sys_t *>(p_filter->p_sys);
     ReleaseImages( p_filter );
 
     // Release the internal OpenCV filter.
     vlc_filter_Delete( p_sys->p_opencv );
 
-    free( p_sys );
+    delete p_sys;
 }
 
 /*****************************************************************************
@@ -276,7 +286,7 @@ static void Destroy( filter_t* p_filter )
  *****************************************************************************/
 static void ReleaseImages( filter_t* p_filter )
 {
-    filter_sys_t* p_sys = p_filter->p_sys;
+    filter_sys_t* p_sys = static_cast<filter_sys_t *>(p_filter->p_sys);
 
     for( int i = 0; i < VOUT_MAX_PLANES; i++ )
     {
@@ -312,7 +322,7 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
     // input video size
     CvSize sz = cvSize(p_in->format.i_width, p_in->format.i_height);
     video_format_t fmt_out;
-    filter_sys_t* p_sys = p_filter->p_sys;
+    filter_sys_t* p_sys = static_cast<filter_sys_t *>(p_filter->p_sys);
 
     memset( &fmt_out, 0, sizeof(video_format_t) );
 
@@ -397,7 +407,7 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
  *****************************************************************************/
 static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = static_cast<filter_sys_t *>(p_filter->p_sys);
     picture_t* p_outpic = filter_NewPicture( p_filter );
     if( p_outpic == NULL ) {
         msg_Err( p_filter, "couldn't get a p_outpic!" );

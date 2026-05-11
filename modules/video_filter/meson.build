@@ -409,7 +409,7 @@ opencv_dep = dependency('opencv4',
 
 vlc_modules += {
     'name' : 'opencv_wrapper',
-    'sources' : files('opencv_wrapper.c'),
+    'sources' : files('opencv_wrapper.cpp'),
     'dependencies' : [m_lib, opencv_dep],
     'enabled' : opencv_dep.found()
 }
