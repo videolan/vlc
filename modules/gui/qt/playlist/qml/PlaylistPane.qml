@@ -518,6 +518,10 @@ T.Pane {
                     else if (listView.fadingEdge.excludeItem === delegate)
                         listView.fadingEdge.excludeItem = null
                 }
+
+                Component.onCompleted: {
+                    listView.delegateInstantiated(delegate)
+                }
             }
 
             Keys.onDeletePressed: {

@@ -406,5 +406,9 @@ ListViewExt {
         }
 
         onContainsDragChanged: root.updateItemContainsDrag(this, containsDrag)
+
+        Component.onCompleted: {
+            root.delegateInstantiated(tableDelegate)
+        }
     }
 }

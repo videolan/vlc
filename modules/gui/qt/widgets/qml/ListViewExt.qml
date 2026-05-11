@@ -33,6 +33,15 @@ ListView {
     // Optional
     property ListSelectionModel selectionModel
 
+    // Useful for batch rendering when the delegate draws things outside the cell, which
+    // is the case with shadow effect. Note that this change affects how the view looks,
+    // if the overlapping parts of delegate are not using commutative blending (which
+    // is the case by default with source-over blending in scene graph), but it is not
+    // really obvious with the shadows. Note that item delegate must emit view signal
+    // `onDelegateInstantiated` with a parameter of itself when instantiated for this
+    // to work.
+    property bool delegateZTiling: true
+
     // Optional property for drop indicator placement and auto scroll feature:
     property var itemContainsDrag: undefined
 
@@ -61,6 +70,43 @@ ListView {
     signal actionAtIndex(int index)
 
     signal showContextMenu(point globalPos)
+
+    signal delegateInstantiated(Item instance)
+
+    onDelegateInstantiated: (instance /*: Item*/) => {
+        console.assert(instance)
+        delegateZTilingBindingComponent.incubateObject(instance,
+                                                       {'targetItem': instance},
+                                                       1 /* QQmlIncubator::AsynchronousIfNested */)
+    }
+
+    Component {
+        id: delegateZTilingBindingComponent
+
+        Binding {
+            required property Item targetItem
+
+            when: root.delegateZTiling
+
+            target: targetItem
+
+            // We can do this, as the view we can manage the `z` of delegate.
+            property: "z"
+
+            value: {
+                if (!targetItem)
+                    return
+
+                const delegateIndex = targetItem.index
+                console.assert(Number.isInteger(delegateIndex))
+
+                // Divide by 10 to create a z group (1.0 to 1.3) for this purpose, so
+                // that non-delegate items can remain stacked properly with regard
+                // to their z. Note that `z` does not need to be integer for items:
+                return (root.move?.running || root.moveDisplaced?.running) ? 1 : ((delegateIndex % 4) / 10.0 + 1)
+            }
+        }
+    }
 
     // Private
 
