@@ -223,7 +223,7 @@ static int Decode(decoder_t *dec, block_t *block)
 
     block_Release(block);
 
-    if (err != VPX_CODEC_OK) {
+    if (err != VPX_CODEC_OK && err != VPX_CODEC_CORRUPT_FRAME) {
         free(pkt_pts);
         VPX_ERR(dec, ctx, "Failed to decode frame");
         if (err == VPX_CODEC_UNSUP_BITSTREAM)
@@ -235,6 +235,12 @@ static int Decode(decoder_t *dec, block_t *block)
     const void *iter = NULL;
     struct vpx_image *img = vpx_codec_get_frame(ctx, &iter);
     if (!img) {
+        free(pkt_pts);
+        return VLCDEC_SUCCESS;
+    }
+
+    if (err == VPX_CODEC_CORRUPT_FRAME) {
+        VPX_ERR(dec, ctx, "Failed to decode frame");
         free(pkt_pts);
         return VLCDEC_SUCCESS;
     }
