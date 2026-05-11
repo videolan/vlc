@@ -23,7 +23,7 @@ opencv4: opencv-$(OPENCV4_VERSION).tar.gz .sum-opencv4
 
 # only enable necessary pkgs
 OPENCV4_CONF := \
-	-DBUILD_LIST=core,imgproc,imgcodecs \
+	-DBUILD_LIST=core,imgproc,imgcodecs,objdetect \
 	-DOPENCV_GENERATE_PKGCONFIG=ON \
 	-DBUILD_EXAMPLES=OFF \
 	-DBUILD_TESTS=OFF \
