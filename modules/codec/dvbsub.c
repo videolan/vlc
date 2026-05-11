@@ -857,6 +857,8 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s, uint16_t i_segme
     p_sys->p_page->i_version = i_version;
     p_sys->p_page->i_timeout = i_timeout;
     p_sys->b_page = true;
+    p_sys->p_page->p_region_defs = NULL;
+    p_sys->p_page->i_region_defs = 0;
 
     /* Number of regions */
     uint16_t i_region_defs = (i_segment_length - 2) / 6;
