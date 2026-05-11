@@ -1,4 +1,4 @@
-From e78fb38d6cfef3a8bc5eb7e39f4c210d291f0787 Mon Sep 17 00:00:00 2001
+From 50fba837fa4ebdd9b3c46f71a952873ae569cd48 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 30 Apr 2026 16:28:00 +0200
 Subject: [PATCH 2/2] EbmlMaster: exit reading loop if upper element found ends
@@ -11,19 +11,19 @@ And we shouldn't use a MaxSizeToRead that would be negative.
  1 file changed, 3 insertions(+)
 
 diff --git a/src/EbmlMaster.cpp b/src/EbmlMaster.cpp
-index e8a43cc..9dc291a 100644
+index e8a43cc..6f03432 100644
 --- a/src/EbmlMaster.cpp
 +++ b/src/EbmlMaster.cpp
-@@ -453,6 +453,9 @@ void EbmlMaster::Read(EbmlStream & inDataStream, const EbmlSemanticContext & sCo
-         if (UpperEltFound > 0 || MaxSizeToRead == 0)
+@@ -454,6 +454,9 @@ void EbmlMaster::Read(EbmlStream & inDataStream, const EbmlSemanticContext & sCo
            goto processCrc;
          ElementLevelA = FoundElt;
-+        if (ElementLevelA->GetEndPosition() > GetEndPosition()) {
-+          goto processCrc; // found an upper element that ends after this, we were truncated
-+        }
          if (IsFiniteSize() && ElementLevelA->IsFiniteSize()) {
++          if (ElementLevelA->GetEndPosition() > GetEndPosition()) {
++            goto processCrc; // found an upper element that ends after this, we were truncated
++          }
            MaxSizeToRead = GetEndPosition() - ElementLevelA->GetEndPosition(); // even if it's the default value
          }
+         continue;
 -- 
 2.52.0.windows.1
 
