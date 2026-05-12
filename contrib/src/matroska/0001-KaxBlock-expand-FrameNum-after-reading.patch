@@ -1,0 +1,41 @@
+From fd4cfd9f04fa6fba4f1ac9ecc9b68930e40056ec Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 12 May 2026 07:59:51 +0200
+Subject: [PATCH] KaxBlock: expand FrameNum after reading
+
+It's read as a uint8_t. Adding 1 to 255 would end up being 0.
+---
+ src/KaxBlock.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/KaxBlock.cpp b/src/KaxBlock.cpp
+index 7bcc879..b3f2a84 100644
+--- a/src/KaxBlock.cpp
++++ b/src/KaxBlock.cpp
+@@ -496,9 +496,9 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+       } else {
+         // read the number of frames in the lace
+         uint32 LastBufferSize = GetSize() - BlockHeadSize - 1; // 1 for number of frame
+-        const uint8 FrameNum = Mem.GetUInt8(); // number of frames in the lace - 1
++        const unsigned FrameNum = Mem.GetUInt8(); // number of frames in the lace - 1
+         // read the list of frame sizes
+-        uint8 Index;
++        unsigned Index;
+         int32 FrameSize;
+         uint32 SizeRead;
+         uint64 SizeUnknown;
+@@ -628,9 +628,9 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+         // read the number of frames in the lace
+         const uint32 TotalLacedSize = GetSize() - BlockHeadSize - 1; // 1 for number of frame
+         uint32 LastBufferSize = TotalLacedSize;
+-        const uint8 FrameNum = _TempHead[0]; // number of frames in the lace - 1
++        const unsigned FrameNum = _TempHead[0]; // number of frames in the lace - 1
+         // read the list of frame sizes
+-        uint8 Index;
++        unsigned Index;
+         uint32 FrameSize;
+         uint32 SizeRead;
+         uint64 SizeUnknown;
+-- 
+2.52.0.windows.1
+
