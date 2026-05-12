@@ -22,6 +22,7 @@ opencv4: opencv-$(OPENCV4_VERSION).tar.gz .sum-opencv4
 	$(MOVE)
 
 # only enable necessary pkgs
+OPENCV4_ENV =
 OPENCV4_CONF := \
 	-DBUILD_LIST=core,imgproc,imgcodecs,objdetect \
 	-DOPENCV_GENERATE_PKGCONFIG=ON \
@@ -64,9 +65,14 @@ ifneq ($(findstring emscripten,$(HOST)),)
 OPENCV4_CONF += -DCV_ENABLE_INTRINSICS=OFF
 endif
 
+ifdef HAVE_CROSS_COMPILE
+# force detecting contribs with pkg-config
+OPENCV4_ENV += PKG_CONFIG_LIBDIR="$(PKG_CONFIG_PATH)"
+endif
+
 .opencv4: opencv4 toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE) $(OPENCV4_CONF)
+	$(HOSTVARS_CMAKE) $(OPENCV4_ENV) $(CMAKE) $(OPENCV4_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	install $(BUILD_DIR)/unix-install/opencv4.pc $(PREFIX)/lib/pkgconfig
