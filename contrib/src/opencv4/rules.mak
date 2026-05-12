@@ -4,7 +4,9 @@ OPENCV4_VERSION := 4.4.0
 OPENCV4_URL := $(GITHUB)/opencv/opencv/archive/$(OPENCV4_VERSION).tar.gz
 
 ifneq ($(findstring opencv4,$(PKGS_ENABLE)),)
+ifndef HAVE_WINSTORE # uses winrt APIs not working with mingw
 PKGS += opencv4
+endif
 ifeq ($(call need_pkg,"opencv4 >= 4.0.0"),)
 PKGS_FOUND += opencv4
 endif
