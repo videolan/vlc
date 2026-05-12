@@ -205,7 +205,7 @@ RowLayout {
                 height: tracksListContainer.height - titleHeader.height
                 leftMargin: separator.width
                 focus: true
-                clip: true
+                clip: !fadingEdge.implicitClipping
 
                 fadingEdge.backgroundColor: theme.bg.primary
 
