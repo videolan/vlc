@@ -33,6 +33,7 @@
 #include <vlc_es.h>
 #include <vlc_chroma_probe.h>
 #include <assert.h>
+#include <limits.h>
 
 #include "fourcc_tables.h"
 
@@ -132,7 +133,7 @@ vlc_fourcc_t vlc_fourcc_GetCodecFromString( int i_cat, const char *psz_fourcc )
 
 vlc_fourcc_t vlc_fourcc_GetCodecAudio( vlc_fourcc_t i_fourcc, int i_bits )
 {
-    const int i_bytes = ( i_bits + 7 ) / 8;
+    const int i_bytes = i_bits > (INT_MAX - 7) ? 0 : ( i_bits + 7 ) / 8;
 
     if( i_fourcc == VLC_FOURCC( 'a', 'f', 'l', 't' ) )
     {
