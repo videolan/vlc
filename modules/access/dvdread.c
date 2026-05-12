@@ -280,21 +280,21 @@ int OpenCommonDvdread( vlc_object_t *p_this , dvd_type_t type,
     /* store type state internally */
     /* if open2 is called, in 7.1.0 dvd may force the type */
 #if defined(DVDREAD_HAS_DVDAUDIO)
-    switch (p_sys->p_vmg_file->ifo_format)
+    switch( p_sys->p_vmg_file->ifo_format )
     {
 #ifdef DVDREAD_HAS_DVDVIDEORECORDING
-   case IFO_VIDEO_RECORDING:
-        p_sys->type = DVD_VR;
-        p_sys->ud_pgcit = p_sys->p_vmg_file->ud_pgcit;
-        p_sys->pgc_gi = p_sys->p_vmg_file->pgc_gi;
-        break;
+        case IFO_VIDEO_RECORDING:
+            p_sys->type = DVD_VR;
+            p_sys->ud_pgcit = p_sys->p_vmg_file->ud_pgcit;
+            p_sys->pgc_gi = p_sys->p_vmg_file->pgc_gi;
+            break;
 #endif
-    case IFO_AUDIO:
-        p_sys->type = DVD_A;
-        break;
-    default:
-        p_sys->type = type;
-        break;
+        case IFO_AUDIO:
+            p_sys->type = DVD_A;
+            break;
+        default:
+            p_sys->type = type;
+            break;
     }
 #else
     p_sys->type = type;
@@ -1268,7 +1268,6 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         }
 
         DvdReadResetCellTs( p_sys );
-
         p_sys->i_next_vobu = p_sys->i_cur_block =
             p_pgc->cell_playback[p_sys->i_cur_cell].first_sector;
 
@@ -1498,7 +1497,6 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
     return VLC_SUCCESS;
 }
 
-
 /*****************************************************************************
  * DvdReadSeek : Goes to a given position on the stream.
  *****************************************************************************
@@ -1615,7 +1613,6 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
 
     return VLC_SUCCESS;
 }
-
 
 
 /*****************************************************************************
@@ -1813,7 +1810,7 @@ static void DvdReadDemuxTitles( demux_t *p_demux, int *pi_angle )
         msg_Dbg( p_demux, "title %d has %d chapters", i, i_chapters );
 
         t = vlc_input_title_New();
-        if ( unlikely( !t ) )
+        if( unlikely( !t ) )
             return;
 
         for( int j = 0; j < __MAX( i_chapters, 1 ); j++ )
