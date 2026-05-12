@@ -323,7 +323,7 @@ dvdread_dep = dependency('dvdread', version: '>= 6.0.0', required: get_option('d
 if dvdread_dep.found()
     vlc_modules += {
         'name' : 'dvdread',
-        'sources' : files('dvdread.c', 'dvdread_audio.c', 'dvdread_vr.c'),
+        'sources' : files('dvdread.c', 'dvdread_video.c', 'dvdread_audio.c', 'dvdread_vr.c'),
         'dependencies' : [
             dvdread_dep,
             (host_system == 'darwin') ? [corefoundation_dep, iokit_dep] : []
