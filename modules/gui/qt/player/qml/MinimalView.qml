@@ -97,7 +97,7 @@ FocusScope {
 
             source: MainCtx.useXmasCone()
                     ? "qrc:///logo/vlc48-xmas.png"
-                    : SVGColorImage.colorize("qrc:///misc/cone.svg").accent(theme.accent).uri()
+                    : "qrc:///misc/cone.svg"
 
             anchors.centerIn: parent
             width: Math.min(parent.width / 2, sourceSize.width)
