@@ -458,7 +458,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
             {
                 if(p_dec->fmt_out.i_extra)
                     free(p_dec->fmt_out.p_extra);
-                p_dec->fmt_out.p_extra = malloc(st->i_extra);
+                p_dec->fmt_out.p_extra = st->i_extra ? malloc(st->i_extra) : NULL;
                 if(p_dec->fmt_out.p_extra)
                 {
                     p_dec->fmt_out.i_extra = st->i_extra;
