@@ -11,6 +11,9 @@ endif
 endif
 
 DEPS_opencv4 = zlib $(DEPS_zlib) jpeg $(DEPS_jpeg) png $(DEPS_png)
+ifneq ($(findstring protobuf,$(PKGS)),)
+DEPS_opencv4 = protobuf $(DEPS_protobuf)
+endif
 
 $(TARBALLS)/opencv-$(OPENCV4_VERSION).tar.gz:
 	$(call download_pkg,$(OPENCV4_URL),opencv4)
