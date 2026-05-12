@@ -1,0 +1,167 @@
+/*****************************************************************************
+ * dvdread.h : DvdRead input module for vlc - shared types and declarations
+ *****************************************************************************
+ * Copyright (C) 2001-2025 VLC authors and VideoLAN
+ *
+ * Authors: Stéphane Borel <stef@via.ecp.fr>
+ *          Gildas Bazin <gbazin@videolan.org>
+ *          Saifelden Mohamed Ismail <saifeldenmi@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifndef VLC_ACCESS_DVDREAD_H
+#define VLC_ACCESS_DVDREAD_H
+
+#include <vlc_common.h>
+#include <vlc_es.h>
+#include <vlc_tick.h>
+
+#include "../demux/mpeg/pes.h"
+#include "../demux/mpeg/ps.h"
+
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <dvdread/dvd_reader.h>
+#include <dvdread/ifo_types.h>
+#include <dvdread/ifo_read.h>
+#include <dvdread/nav_read.h>
+#include <dvdread/nav_print.h>
+
+#include <assert.h>
+#include <stdckdint.h>
+
+/*****************************************************************************
+ * DVDRead Version Compatibility
+ *****************************************************************************/
+#if DVDREAD_VERSION > DVDREAD_VERSION_CODE(7, 0, 1)
+#define DVDREAD_HAS_DVDVIDEORECORDING 1
+#endif
+
+#if DVDREAD_VERSION >= DVDREAD_VERSION_CODE(7, 0, 0)
+#define DVDREAD_HAS_DVDAUDIO 1
+#endif
+
+typedef enum
+{
+    DVD_V = 0,
+    DVD_A = 1,
+    DVD_VR = 2,
+} dvd_type_t;
+
+typedef struct input_title_t input_title_t;
+
+struct demux_sys_t
+{
+    /* DVDRead state */
+    dvd_reader_t *p_dvdread;
+    dvd_file_t   *p_title;
+
+    ifo_handle_t *p_vmg_file;
+    ifo_handle_t *p_vts_file;
+
+    unsigned updates;
+    int i_title;
+    int cur_title;
+    int i_chapter, i_chapters;
+    int cur_chapter;
+    int i_angle, i_angles;
+
+    dvd_type_t type;
+    union
+    {
+        /* Video tables */
+        struct
+        {
+            tt_srpt_t    *p_tt_srpt;
+            pgc_t        *p_cur_pgc;
+        };
+
+#ifdef DVDREAD_HAS_DVDAUDIO
+        /* Audio tables */
+        struct
+        {
+            atsi_title_record_t *p_title_table;
+        };
+#endif
+
+#ifdef DVDREAD_HAS_DVDVIDEORECORDING
+        /* VideoRecording tables */
+        struct
+        {
+          /* address map of recordings */
+          pgc_gi_t    *pgc_gi;
+          /* titles, labels for recordings */
+          ud_pgcit_t  *ud_pgcit;
+          /* keep track of vobu index */
+          /* pointer to current program */
+          pgi_t *p_cur_pgi;
+        };
+#endif
+
+    };
+
+    dsi_t        dsi_pack;
+    int          i_ttn;
+
+    int i_pack_len;
+    int i_cur_block;
+    int i_next_vobu;
+
+    int i_mux_rate;
+
+    /* Current title start/end blocks */
+    int i_title_start_block;
+    int i_title_end_block;
+    uint32_t i_title_blocks;
+    int i_title_offset;
+
+    int i_title_start_cell;
+    int i_title_end_cell;
+    int i_cur_cell;
+    int i_next_cell;
+
+    /* ps/dvd anchor pair for rebasing ps scr/pts onto the disc timeline
+     * dvd is accumulated cell playback time from title start
+     * ps is the matching scr from the first ps pack of that cell
+     * both are VLC_TICK_INVALID until the first pack of a cell is seen */
+    struct
+    {
+        vlc_tick_t dvd;
+        vlc_tick_t ps;
+    } cell_ts;
+
+    /* Track */
+    ps_track_t    tk[PS_TK_COUNT];
+
+    int           i_titles;
+    input_title_t **titles;
+
+    /* Video */
+    int i_sar_num;
+    int i_sar_den;
+
+    /* SPU */
+    uint32_t clut[VIDEO_PALETTE_CLUT_COUNT];
+};
+
+static inline void DvdReadResetCellTs( struct demux_sys_t *p_sys )
+{
+    p_sys->cell_ts.dvd = VLC_TICK_INVALID;
+    p_sys->cell_ts.ps = VLC_TICK_INVALID;
+}
+
+#endif /* VLC_ACCESS_DVDREAD_H */
