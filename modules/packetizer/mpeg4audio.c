@@ -452,7 +452,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
 
         if (p_sys->i_channels && p_sys->i_rate && p_sys->i_frame_length > 0)
         {
-            if((size_t)p_dec->fmt_out.i_extra != st->i_extra ||
+            if(p_dec->fmt_out.i_extra != st->i_extra ||
                (p_dec->fmt_out.i_extra > 0 &&
                 memcmp(p_dec->fmt_out.p_extra, st->extra, st->i_extra)) )
             {
