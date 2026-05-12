@@ -60,6 +60,8 @@ Item {
 
     readonly property bool effectCompatible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
+    readonly property bool implicitClipping: shaderEffectSource.visible
+
     Rectangle {
         id: backgroundRect
 
