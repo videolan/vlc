@@ -212,7 +212,7 @@ T.Pane {
 
             focus: true
 
-            clip: true // else out of view items will overlap with surronding items
+            clip: !fadingEdge.implicitClipping
 
             model: root.model
 
