@@ -29,6 +29,7 @@
 #endif
 #include <math.h>
 #include <limits.h>
+#include <inttypes.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -507,6 +508,11 @@ static int ReadDescChunk( demux_t *p_demux )
     if( !p_sys->fmt.audio.i_rate )
     {
         msg_Err( p_demux, "Sample rate must be non-zero" );
+        return VLC_EGENERIC;
+    }
+    if( i_channels_per_frame > AOUT_CHAN_MAX)
+    {
+        msg_Err( p_demux, "Too many channels %" PRIu32, i_channels_per_frame );
         return VLC_EGENERIC;
     }
     p_sys->fmt.audio.i_channels = i_channels_per_frame;
