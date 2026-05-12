@@ -136,7 +136,7 @@ block_t *PacketizeXXC1( void *p_private, struct vlc_logger *logger,
     for( p = p_block->p_buffer; p < &p_block->p_buffer[p_block->i_buffer]; )
     {
         bool b_dummy;
-        int i_size = 0;
+        size_t i_size = 0;
         int i;
 
         if( &p_block->p_buffer[p_block->i_buffer] - p < i_nal_length_size )
@@ -147,17 +147,17 @@ block_t *PacketizeXXC1( void *p_private, struct vlc_logger *logger,
             i_size = (i_size << 8) | (*p++);
         }
 
-        if( i_size <= 0 ||
-            i_size > ( p_block->p_buffer + p_block->i_buffer - p ) )
+        if( i_size == 0 ||
+            i_size > (size_t)( &p_block->p_buffer[p_block->i_buffer] - p ) )
         {
-            vlc_error( logger, "Broken frame : size %d is too big", i_size );
+            vlc_error( logger, "Broken frame : size %zu is too big", i_size );
             break;
         }
 
         /* Convert AVC to AnnexB */
         block_t *p_nal;
         /* If data exactly match remaining bytes (1 NAL only or trailing one) */
-        if( i_size == p_block->p_buffer + p_block->i_buffer - p )
+        if( i_size == (size_t)( &p_block->p_buffer[p_block->i_buffer] - p ) )
         {
             p_block->i_buffer = i_size;
             p_block->p_buffer = p;
