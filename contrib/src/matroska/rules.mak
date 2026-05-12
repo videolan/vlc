@@ -24,6 +24,7 @@ matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(APPLY) $(SRC)/matroska/0001-KaxBlock-rework-EBML-lacing-sizes-in-SCOPE_PARTIAL_D.patch
 	$(APPLY) $(SRC)/matroska/0002-KaxBlock-throw-when-the-EBML-length-difference-gives.patch
 	$(APPLY) $(SRC)/matroska/0003-KaxBlock-fix-reading-EBML-lacing-with-just-one-frame.patch
+	$(APPLY) $(SRC)/matroska/0001-KaxBlock-expand-FrameNum-after-reading.patch
 	$(MOVE)
 
 .matroska: matroska toolchain.cmake
