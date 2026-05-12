@@ -67,7 +67,7 @@ uint32_t DvdVRGetProgramSectorSpan( const demux_sys_t *p_sys,
     return map->nr_of_vobu_info * sects_per_vobu;
 }
 
-vlc_tick_t DvdVRProgramDuration( const pgi_t *pgi )
+static vlc_tick_t DvdVRProgramDuration( const pgi_t *pgi )
 {
     if( pgi->header.vob_v_e_ptm.ptm <= pgi->header.vob_v_s_ptm.ptm )
         return 0;
@@ -96,7 +96,7 @@ static bool DvdVRTimeInfosSane( const vobu_map_t *map, uint32_t total_sectors )
     return true;
 }
 
-uint32_t DvdVRReadTimeToVobuOffset( const demux_sys_t *p_sys, vlc_tick_t t )
+static uint32_t DvdVRReadTimeToVobuOffset( const demux_sys_t *p_sys, vlc_tick_t t )
 {
     if( p_sys->type != DVD_VR || !p_sys->pgc_gi || !p_sys->ud_pgcit ||
         p_sys->i_title_start_cell < 0 || p_sys->i_title_end_cell <= p_sys->i_title_start_cell )
@@ -133,7 +133,7 @@ uint32_t DvdVRReadTimeToVobuOffset( const demux_sys_t *p_sys, vlc_tick_t t )
     return p_sys->i_title_blocks > 0 ? p_sys->i_title_blocks - 1 : 0;
 }
 
-int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
+static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                       int i_angle )
 {
     VLC_UNUSED( i_angle );
@@ -368,7 +368,7 @@ int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
     return VLC_SUCCESS;
 }
 
-void DvdVRFindCell( demux_t *p_demux )
+static void DvdVRFindCell( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -412,7 +412,7 @@ void DvdVRFindCell( demux_t *p_demux )
 
 }
 
-vlc_tick_t DVDVRGetTitleLength( pgc_gi_t *pgc_gi, ud_pgcit_t *ud_pgcit, int program)
+static vlc_tick_t DVDVRGetTitleLength( pgc_gi_t *pgc_gi, ud_pgcit_t *ud_pgcit, int program)
 {
     if( program < 0 || (unsigned)program >= ud_pgcit->nr_of_pgci )
         return 0;
@@ -433,7 +433,7 @@ vlc_tick_t DVDVRGetTitleLength( pgc_gi_t *pgc_gi, ud_pgcit_t *ud_pgcit, int prog
     return FROM_SCALE_NZ( length_ptm );
 }
 
-int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
+static int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_chapter = 0;
@@ -533,7 +533,7 @@ int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
     return VLC_SUCCESS;
 }
 
-const char* ParseTxtEncoding( uint8_t txt_encoding )
+static const char* ParseTxtEncoding( uint8_t txt_encoding )
 {
     const char* charset = "Unknown";
 
