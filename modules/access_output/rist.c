@@ -123,7 +123,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         {
             size_t i_write = __MIN( p_buffer->i_buffer, p_sys->i_max_packet_size );
             rist_buffer.payload = p_buffer->p_buffer;
-            rist_buffer.payload_len = p_buffer->i_buffer;
+            rist_buffer.payload_len = i_write;
             rist_sender_data_write(p_sys->sender_ctx, &rist_buffer);
             p_buffer->p_buffer += i_write;
             p_buffer->i_buffer -= i_write;
