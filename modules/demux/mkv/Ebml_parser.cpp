@@ -228,7 +228,7 @@ next:
         // If the parent is a segment, use the segment context when creating children
         // (to prolong their lifetime), otherwise just continue as normal
         EbmlSemanticContext e_context =
-                EBML_CTX_MASTER( EBML_CONTEXT(m_el[mi_level - 1]) ) == EBML_CTX_MASTER( Context_KaxSegmentVLC )
+                (mi_level == 0 || EBML_CTX_MASTER( EBML_CONTEXT(m_el[mi_level - 1]) ) == EBML_CTX_MASTER( Context_KaxSegmentVLC ))
                 ? Context_KaxSegmentVLC
                 : EBML_CONTEXT(m_el[mi_level - 1]);
 
