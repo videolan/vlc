@@ -208,6 +208,16 @@ static inline bool rist_add_peers(vlc_object_t *p_this, struct rist_ctx *ctx, ch
             strlcpy(app_peer_config.cname, psz_stream_name, sizeof(app_peer_config.cname));
         }
 
+        if (psz_srp_username != NULL && psz_srp_username[0] != '\0') {
+            strlcpy(app_peer_config.srp_username, psz_srp_username,
+                    sizeof(app_peer_config.srp_username));
+        }
+
+        if (psz_srp_password != NULL && psz_srp_password[0] != '\0') {
+            strlcpy(app_peer_config.srp_password, psz_srp_password,
+                    sizeof(app_peer_config.srp_password));
+        }
+
         // URL overrides (also cleans up the URL)
         struct rist_peer_config *peer_config = &app_peer_config;
         if (rist_parse_address2(addr[i], &peer_config))
