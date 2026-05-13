@@ -454,6 +454,7 @@ preparser_cmdline_Parse(int argc, char *const *argv,
                 }
             }
             fprintf( stderr, "For more information try --help\n");
+            free(opts);
             return -1;
         }
     }
