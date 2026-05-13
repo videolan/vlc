@@ -22,13 +22,8 @@ variables:
     VLC_DEBIAN_QT6_IMAGE: registry.videolan.org/vlc-debian-unstable:20260121072258
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20260504124015
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
-    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20260504131657
 
 .variables-debian: &variables-debian
-        HOST_ARCH: x86_64
-        TRIPLET: $HOST_ARCH-linux-gnu
-
-.variables-snap: &variables-snap
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-linux-gnu
 
@@ -345,39 +340,6 @@ nightly-debian:
     except:
     after_script:
     artifacts:
-
-#
-# Snap builds
-#
-.snap-common:
-    extends: .docker-template
-    image:
-        name: $VLC_SNAP_IMAGE
-    script: |
-            cd extras/package/snap
-            make -f package.mak snap
-    after_script:
-        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
-        - mv extras/package/snap/parts/vlc/build/contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
-    allow_failure: true
-    variables: *variables-snap
-
-nightly-snap:
-    extends: .snap-common
-    only:
-        - schedules
-    except:
-    after_script:
-        - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
-        - mkdir nightlies
-        - mv extras/package/snap/vlc_*.snap nightlies/
-        - echo $SNAP_LOGIN | base64 --decode | snapcraft login --with -
-        - snapcraft push nightlies/vlc_*.snap --release beta
-        - snapcraft logout
-        - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
-    artifacts:
-        paths:
-           - nightlies/*
 
 #
 # macOS
