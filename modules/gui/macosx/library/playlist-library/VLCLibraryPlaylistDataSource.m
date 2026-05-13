@@ -142,6 +142,20 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 - (void)reloadViewsAtIndex:(NSUInteger)index
           dueToCacheAction:(VLCLibraryDataSourceCacheAction)action
 {
+    NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:index];
+    switch (action) {
+        case VLCLibraryDataSourceCacheUpdateAction:
+            [self.masterTableView reloadDataForRowIndexes:indexSet
+                                            columnIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.masterTableView.numberOfColumns)]];
+            break;
+        case VLCLibraryDataSourceCacheDeleteAction:
+            [self.masterTableView removeRowsAtIndexes:indexSet
+                                       withAnimation:NSTableViewAnimationEffectNone];
+            break;
+        default:
+            NSAssert(false, @"Invalid playlist cache action");
+    }
+
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
     NSSet<NSIndexPath *> * const indexPathSet = [NSSet setWithObject:indexPath];
 
