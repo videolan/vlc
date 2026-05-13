@@ -107,7 +107,7 @@ static void SaveUrls( services_discovery_t *p_sd );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    if( strcmp( vlc_object_typename(vlc_object_parent(p_this)), "playlist" ) )
+    if( strcmp( vlc_object_typename(vlc_object_parent(p_this)), "media-source-provider" ) )
         return VLC_EGENERIC; /* FIXME: support LibVLC SD too! */
 
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
@@ -180,8 +180,7 @@ static void *Run( void *data )
     services_discovery_t *p_sd = data;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
 
-    char *psz_urls = var_GetNonEmptyString( vlc_object_parent(p_sd),
-                                            "podcast-urls" );
+    char *psz_urls = var_InheritString( p_sd, "podcast-urls" );
     ParseUrls( p_sd, psz_urls );
     free( psz_urls );
 
@@ -251,8 +250,7 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
             TAB_APPEND( i_new_urls, ppsz_new_urls, strdup( psz_urls ) );
 
             input_item_t *p_input;
-            p_input = input_item_New( psz_urls, psz_urls );
-            input_item_AddOption( p_input, "demux=directory", VLC_INPUT_OPTION_TRUSTED );
+            p_input = input_item_NewDirectory( psz_urls, psz_urls, ITEM_NET );
 
             TAB_APPEND( i_new_items, pp_new_items, p_input );
             services_discovery_AddItem( p_sd, p_input );
@@ -315,8 +313,8 @@ static void ParseRequest( services_discovery_t *p_sd, char *psz_request )
                         strdup( psz_request ) );
 
             input_item_t *p_input;
-            p_input = input_item_New( psz_request, psz_request );
-            input_item_AddOption( p_input, "demux=directory", VLC_INPUT_OPTION_TRUSTED );
+            p_input = input_item_NewDirectory( psz_request, psz_request,
+                                               ITEM_NET );
 
             TAB_APPEND( p_sys->i_items, p_sys->pp_items, p_input );
             services_discovery_AddItem( p_sd, p_input );
