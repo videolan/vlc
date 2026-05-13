@@ -140,7 +140,6 @@ class RISTDestBox: public VirtualDestBox
         QLineEdit *RISTAddress;
         QSpinBox *RISTPort;
         QLineEdit *RISTName;
-        QString mux;
 };
 
 class RTPDestBox: public VirtualDestBox
