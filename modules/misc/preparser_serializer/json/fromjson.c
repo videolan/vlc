@@ -1136,7 +1136,7 @@ fromJSON_input_item_node(struct serdes_sys *sys,
 
     json_object_from_name(sys, obj, "p_item", &item, err, true,
                           fromJSON_input_item);
-    if (err) {
+    if (err || item == NULL) {
         *error = true;
         return;
     }
