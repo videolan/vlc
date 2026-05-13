@@ -554,6 +554,10 @@ static void fromJSON_video_palette(struct serdes_sys *sys,
         if (v->type != JSON_ARRAY) {
             continue;
         }
+        if (i >= VIDEO_PALETTE_COLORS_MAX) {
+            err = true;
+            break;
+        }
         for (size_t j = 0; j < v->array.size; j++) {
             struct json_value *subv = &v->array.entries[j];
             if (subv->type != JSON_NUMBER || subv->number < 0 ||
@@ -563,10 +567,8 @@ static void fromJSON_video_palette(struct serdes_sys *sys,
             }
             p->palette[i][j] = subv->number;
         }
-        if (err || i >= VIDEO_PALETTE_COLORS_MAX) {
-            err = true;
+        if (err)
             break;
-        }
         i++;
     }
 
