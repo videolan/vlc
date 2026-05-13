@@ -34,6 +34,7 @@ opencv4: opencv-$(OPENCV4_VERSION).tar.gz .sum-opencv4
 	sed -i.orig 's,Intrin.h,intrin.h,g' $(UNPACK_DIR)/modules/core/include/opencv2/core/cv_cpu_dispatch.h
 	sed -i.orig 's,Intrin.h,intrin.h,' $(UNPACK_DIR)/cmake/checks/cpu_neon.cpp
 	sed -i.orig 's,Intrin.h,intrin.h,' $(UNPACK_DIR)/modules/flann/include/opencv2/flann/dist.h
+	$(call pkg_static,"cmake/templates/opencv-XXX.pc.in")
 	$(MOVE)
 
 # only enable necessary pkgs
