@@ -178,8 +178,8 @@ void FileDestBox::fileBrowse()
     emit mrlUpdated();
 }
 
-RISTDestBox::RISTDestBox( QWidget *_parent, const char *_mux )
-    : VirtualDestBox( _parent ), mux( qfu(_mux) )
+RISTDestBox::RISTDestBox( QWidget *_parent, const char * )
+    : VirtualDestBox( _parent )
 {
     label->setText( qtr( "This module outputs the stream using the RIST protocol (TR06).") );
 
