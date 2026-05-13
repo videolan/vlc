@@ -107,7 +107,7 @@ static int cb_stats(void *arg, const struct rist_stats *stats_container)
 static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    int i_len = 0;
+    size_t i_len = 0;
 
     struct rist_data_block rist_buffer = { 0 };
     rist_buffer.virt_src_port = p_sys->gre_src_port;
@@ -117,14 +117,21 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     {
         block_t *p_next;
 
-        i_len += p_buffer->i_buffer;
-
         while( p_buffer->i_buffer )
         {
             size_t i_write = __MIN( p_buffer->i_buffer, p_sys->i_max_packet_size );
             rist_buffer.payload = p_buffer->p_buffer;
             rist_buffer.payload_len = i_write;
-            rist_sender_data_write(p_sys->sender_ctx, &rist_buffer);
+
+            int written = rist_sender_data_write(p_sys->sender_ctx, &rist_buffer);
+            if( written < 0 )
+            {
+                msg_Warn( p_access, "rist_sender_data_write failed (chunk=%zu)", i_write );
+                block_ChainRelease( p_buffer );
+                return -1;
+            }
+
+            i_len += (size_t)written;
             p_buffer->p_buffer += i_write;
             p_buffer->i_buffer -= i_write;
         }
@@ -132,9 +139,10 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         p_next = p_buffer->p_next;
         block_Release( p_buffer );
         p_buffer = p_next;
-
     }
-    return i_len;
+
+    /* i_len <= chain_len * RIST_MAX_PACKET_SIZE (10000); always fits in ssize_t. */
+    return (ssize_t)i_len;
 }
 
 static int Control( sout_access_out_t *p_access, int i_query, va_list args )
