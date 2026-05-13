@@ -4261,7 +4261,7 @@ PKG_ENABLE_MODULES_VLC([SRT], [access_srt access_output_srt], [srt >= 1.3.0], [S
 dnl
 dnl  libRIST plugin
 dnl
-PKG_ENABLE_MODULES_VLC([LIBRIST], [], [librist], [RIST input/output plugin (default auto)])
+PKG_ENABLE_MODULES_VLC([LIBRIST], [rist access_output_rist], [librist], [RIST input/output plugin], [auto])
 
 EXTEND_HELP_STRING([Visualisations and Video filter plugins:])
 dnl

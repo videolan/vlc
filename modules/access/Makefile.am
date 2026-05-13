@@ -440,4 +440,5 @@ librist_plugin_la_SOURCES = access/rist.c access/rist.h
 librist_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBRIST_CFLAGS)
 librist_plugin_la_LIBADD = $(LIBRIST_LIBS) $(SOCKET_LIBS) $(LIBPTHREAD)
 librist_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
-access_LTLIBRARIES += librist_plugin.la
+access_LTLIBRARIES += $(LTLIBrist)
+EXTRA_LTLIBRARIES += librist_plugin.la
