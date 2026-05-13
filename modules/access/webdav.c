@@ -275,13 +275,17 @@ static void EmitEntry(stream_t *access, struct vlc_readdir_helper *rdh,
     }
 
     free(leaf);
+    leaf = NULL;
     free(url);
+    url = NULL;
 }
 
 static void ResetEntry(struct dav_entry *e)
 {
     free(e->href);
+    e->href = NULL;
     free(e->name);
+    e->name = NULL;
     memset(e, 0, sizeof(*e));
 }
 
