@@ -140,6 +140,18 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     i_rist_items_index = i_flags = i_total_size = 0;
     int i_read_timeout_ms = p_sys->i_maximum_jitter;
 
+    /* The stats callback sets p_sys->eof when librist reports a session
+     * timeout (status == 2). Propagate it here so VLC ends the stream
+     * instead of polling forever for data that will never arrive. */
+    vlc_mutex_lock( &p_sys->lock );
+    if (p_sys->eof) {
+        vlc_mutex_unlock( &p_sys->lock );
+        msg_Err(p_access, "RIST session timed out, ending stream");
+        *eof = true;
+        return NULL;
+    }
+    vlc_mutex_unlock( &p_sys->lock );
+
     while ((ret = rist_receiver_data_read2(p_sys->receiver_ctx, &rist_buffer, i_read_timeout_ms)) > 0)
     {
         if (p_sys->gre_filter_dst_port > 0 && rist_buffer->virt_dst_port != p_sys->gre_filter_dst_port) {
