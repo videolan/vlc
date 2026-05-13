@@ -140,7 +140,9 @@ FocusScope {
 
         const type = data.type
 
-        if (type === NetworkMediaModel.TYPE_DIRECTORY || type === NetworkMediaModel.TYPE_NODE)
+        if (type === NetworkMediaModel.TYPE_DIRECTORY
+                || type === NetworkMediaModel.TYPE_NODE
+                || type === NetworkMediaModel.TYPE_PLAYLIST)
             browse(data.tree, Qt.TabFocusReason)
         else
             playAt(index);
@@ -155,7 +157,9 @@ FocusScope {
     function onDoubleClicked(model, index) {
         const type = model.type
 
-        if (type === NetworkMediaModel.TYPE_NODE || type === NetworkMediaModel.TYPE_DIRECTORY)
+        if (type === NetworkMediaModel.TYPE_NODE
+                || type === NetworkMediaModel.TYPE_DIRECTORY
+                || type === NetworkMediaModel.TYPE_PLAYLIST)
             browse(model.tree, Qt.MouseFocusReason)
         else
             playAt(index);

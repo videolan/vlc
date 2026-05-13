@@ -37,6 +37,7 @@ Widgets.GridItem {
         switch (model.type) {
             case NetworkMediaModel.TYPE_NODE:
             case NetworkMediaModel.TYPE_DIRECTORY:
+            case NetworkMediaModel.TYPE_PLAYLIST:
                 return false
             default:
                 return implicitPlayCoverShowPlay
@@ -69,7 +70,9 @@ Widgets.GridItem {
         const mrl = model.mrl?.toString() || ""
         const type = model.type
 
-        if ((type === NetworkMediaModel.TYPE_NODE || type === NetworkMediaModel.TYPE_DIRECTORY)
+        if ((type === NetworkMediaModel.TYPE_NODE
+            || type === NetworkMediaModel.TYPE_DIRECTORY
+            || type === NetworkMediaModel.TYPE_PLAYLIST)
             && (mrl === "vlc://nop"))
             return defaultTxt
 

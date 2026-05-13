@@ -90,7 +90,8 @@ MainViewLoader {
         } else {
             const data = model.getDataAt(index)
             if (data.type === NetworkMediaModel.TYPE_DIRECTORY
-                    || data.type === NetworkMediaModel.TYPE_NODE)  {
+                    || data.type === NetworkMediaModel.TYPE_NODE
+                    || data.type === NetworkMediaModel.TYPE_PLAYLIST)  {
                 browse(data.tree, Qt.TabFocusReason)
             } else {
                 playAt(index)
@@ -187,7 +188,9 @@ MainViewLoader {
                 }
 
                 onItemDoubleClicked: {
-                    if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
+                    if (model.type === NetworkMediaModel.TYPE_NODE
+                            || model.type === NetworkMediaModel.TYPE_DIRECTORY
+                            || model.type === NetworkMediaModel.TYPE_PLAYLIST)
                         browse(model.tree, Qt.MouseFocusReason)
                     else
                         playAt(index)

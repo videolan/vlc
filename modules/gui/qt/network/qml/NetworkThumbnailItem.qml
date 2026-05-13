@@ -34,6 +34,7 @@ Widgets.TableRowDelegate {
                                            && !!rowModel
                                            && (rowModel.type !== NetworkMediaModel.TYPE_NODE)
                                            && (rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
+                                           && (rowModel.type !== NetworkMediaModel.TYPE_PLAYLIST)
 
     property alias artworkTextureProvider: cover.textureProvider
 
