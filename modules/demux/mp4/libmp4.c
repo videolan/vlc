@@ -5706,7 +5706,10 @@ static bool get_token( const char **ppsz_path, char **ppsz_token, unsigned *pi_n
         char *endptr = NULL;
         *pi_number = strtoul( *ppsz_path, &endptr, 10 );
         if( endptr == *ppsz_path || *endptr != ']' )
+        {
+            free(*ppsz_token);
             return false;
+        }
         *ppsz_path = endptr + 1;
     }
     else
