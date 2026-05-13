@@ -456,7 +456,7 @@ QString RISTDestBox::getMRL( const QString& )
     m.begin( "std" );
     if( !name.isEmpty() )
     {
-        m.option( "access", "rist{stream-name=" + name + "}" );
+        m.option( "access", "rist{cname=" + name + "}" );
     }
     else
     {
