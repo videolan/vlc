@@ -55,7 +55,7 @@ static void vlc_access_Destroy(stream_t *access)
     free(access->psz_name);
 }
 
-#define MAX_REDIR 5
+#define MAX_REDIR 20
 
 static stream_t *accessNewAttachment(vlc_object_t *parent,
                                      input_thread_t *input, const char *mrl)
