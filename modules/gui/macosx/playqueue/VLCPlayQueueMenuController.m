@@ -26,6 +26,7 @@
 
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSMenu+VLCAdditions.h"
+#import "extensions/NSMenuItem+VLCAdditions.h"
 #import "library/VLCLibraryController.h"
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
@@ -94,6 +95,15 @@
     _playQueueSortingMenuController = [[VLCPlayQueueSortingMenuController alloc] init];
     _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort Play Queue") action:nil keyEquivalent:@""];
     [_sortMenuItem setSubmenu:_playQueueSortingMenuController.playQueueSortingMenu];
+
+    [_playMenuItem vlc_setActionImageWithSystemSymbolName:@"play.fill"];
+    [_removeMenuItem vlc_setActionImageWithSystemSymbolName:@"minus.circle"];
+    [_revealInFinderMenuItem vlc_setActionImageWithSystemSymbolName:@"folder"];
+    [_informationMenuItem vlc_setActionImageWithSystemSymbolName:@"info.circle"];
+    [_addFilesToPlayQueueMenuItem vlc_setActionImageWithSystemSymbolName:@"plus.circle"];
+    [_clearPlayQueueMenuItem vlc_setActionImageWithSystemSymbolName:@"xmark.circle"];
+    [_createPlaylistMenuItem vlc_setActionImageWithSystemSymbolName:@"music.note.list"];
+    [_sortMenuItem vlc_setActionImageWithSystemSymbolName:@"arrow.up.arrow.down"];
 
     self.items = @[
         _playMenuItem,

@@ -112,6 +112,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSIndexSet+VLCAdditions.m \
 	gui/macosx/extensions/NSMenu+VLCAdditions.h \
 	gui/macosx/extensions/NSMenu+VLCAdditions.m \
+	gui/macosx/extensions/NSMenuItem+VLCAdditions.h \
+	gui/macosx/extensions/NSMenuItem+VLCAdditions.m \
 	gui/macosx/extensions/NSScreen+VLCAdditions.h \
 	gui/macosx/extensions/NSScreen+VLCAdditions.m \
 	gui/macosx/extensions/NSString+Helpers.h \

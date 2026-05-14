@@ -23,6 +23,7 @@
 #import "VLCLibraryMenuController.h"
 
 #import "extensions/NSMenu+VLCAdditions.h"
+#import "extensions/NSMenuItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
@@ -108,6 +109,18 @@
     NSMenuItem *createPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Create Playlist from Selection") action:@selector(createPlaylistFromSelection:) keyEquivalent:@""];
     createPlaylistItem.target = self;
 
+    [playItem vlc_setActionImageWithSystemSymbolName:@"play.fill"];
+    [appendItem vlc_setActionImageWithSystemSymbolName:@"text.line.last.and.arrowtriangle.forward"];
+    [createPlaylistItem vlc_setActionImageWithSystemSymbolName:@"music.note.list"];
+    [self.favoriteItem vlc_setActionImageWithSystemSymbolName:@"heart"];
+    [bookmarkItem vlc_setActionImageWithSystemSymbolName:@"bookmark"];
+    [addToLibraryItem vlc_setActionImageWithSystemSymbolName:@"plus.rectangle.on.folder"];
+    [revealItem vlc_setActionImageWithSystemSymbolName:@"folder"];
+    [_deleteItem vlc_setActionImageWithSystemSymbolName:@"trash"];
+    [markUnseenItem vlc_setActionImageWithSystemSymbolName:@"eye.slash"];
+    [informationItem vlc_setActionImageWithSystemSymbolName:@"info.circle"];
+    [addItem vlc_setActionImageWithSystemSymbolName:@"folder.badge.plus"];
+
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
     [_libraryMenu addMenuItemsFromArray:@[
         playItem,
@@ -188,6 +201,7 @@
         }
         self.favoriteItem.title = anyUnfavorited ? _NS("Add to Favorites") : _NS("Remove from Favorites");
         self.favoriteItem.action = anyUnfavorited ? @selector(addFavorite:) : @selector(removeFavorite:);
+        [self.favoriteItem vlc_setActionImageWithSystemSymbolName:(anyUnfavorited ? @"heart" : @"heart.slash")];
         
         // Update delete menu item title based on whether items are file-backed
         BOOL hasFileBacked = NO;
