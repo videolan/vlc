@@ -142,8 +142,17 @@ def getDiffAddress(content, name):
     if not os.path.isfile(full_path):
         return None
 
-    cmd = "objdump -p " + full_path + " |grep ImageBase -|cut -f2-"
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True).stdout.read().strip()
+    p = None
+    args = ["objdump", "-p", full_path]
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, shell=False, universal_newlines=True)
+    for line in proc.stdout:
+        if "ImageBase" in line:
+            p = line.split()[-1]
+            break
+    proc.wait()
+
+    if p is None:
+        return None
 
     diff = int(content[begin_index:end_index], 16) - int(p, 16)
     return diff
