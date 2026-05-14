@@ -535,7 +535,6 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
             ArtCacheWriteUriToFile( obj, psz_attachment_urlfile, psz_uri );
         }
         input_item_SetArtURL( p_item, psz_uri );
-        i_ret = VLC_SUCCESS;
         goto save_uid;
     }
 
@@ -569,13 +568,9 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
         ArtCacheWriteUriToFile( obj, psz_attachment_urlfile, psz_uri );
     }
     input_item_SetArtURL( p_item, psz_uri );
-    i_ret = VLC_SUCCESS;
 
 save_uid:
-    /* save uid info */
-    if( i_ret != VLC_SUCCESS )
-        goto end;
-
+    i_ret = VLC_SUCCESS;
     char *uid = input_item_GetInfo( p_item, "uid", "md5" );
     if ( ! *uid )
     {
