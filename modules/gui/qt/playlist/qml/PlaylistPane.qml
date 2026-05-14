@@ -212,7 +212,7 @@ T.Pane {
 
             focus: true
 
-            clip: !fadingEdge.implicitClipping
+            clip: !fadingEdge.implicitClipping && (height < contentHeight)
 
             model: root.model
 
