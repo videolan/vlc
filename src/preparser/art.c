@@ -528,15 +528,7 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
     /* Check if we already dumped it */
     struct stat s;
     if( !vlc_stat( psz_filename, &s ) )
-    {
-        if( b_attachment && psz_attachment_dir && psz_attachment_urlfile )
-        {
-            ArtCacheCreateDir( psz_attachment_dir );
-            ArtCacheWriteUriToFile( obj, psz_attachment_urlfile, psz_uri );
-        }
-        input_item_SetArtURL( p_item, psz_uri );
         goto save_uid;
-    }
 
     /* Dump it otherwise */
     FILE *f = vlc_fopen( psz_filename, "wb" );
@@ -561,6 +553,7 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
         goto end;
     }
 
+save_uid:
     msg_Dbg( obj, "album art saved to %s", psz_filename );
     if( b_attachment && psz_attachment_dir && psz_attachment_urlfile )
     {
@@ -569,7 +562,6 @@ int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
     }
     input_item_SetArtURL( p_item, psz_uri );
 
-save_uid:
     i_ret = VLC_SUCCESS;
     char *uid = input_item_GetInfo( p_item, "uid", "md5" );
     if ( ! *uid )
