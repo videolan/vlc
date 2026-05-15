@@ -29,6 +29,10 @@
 #include <QEvent>
 #include <QScopedPointer>
 #include <QUrl>
+#include <QPointer>
+#include <QQuickWindow>
+#include <QQuickItem>
+#include <QQmlProperty>
 #include "player/input_models.hpp"
 #include "util/audio_device_model.hpp"
 #include "util/varchoicemodel.hpp"
@@ -487,6 +491,95 @@ signals:
 private:
     Q_DECLARE_PRIVATE(PlayerController)
     QScopedPointer<PlayerControllerPrivate> d_ptr;
+};
+
+
+// This class updates the target property per frame with the return
+// value of `PlayerController::highResolutionTime()`. In order to disable
+// updating, set `window` property to null.
+class PlayerHighResolutionTimeUpdater : public QObject, public QQmlPropertyValueSource
+{
+    Q_OBJECT
+    Q_INTERFACES(QQmlPropertyValueSource)
+
+    Q_PROPERTY(PlayerController* playerController MEMBER m_playerController NOTIFY playerControllerChanged FINAL)
+    Q_PROPERTY(QQuickWindow* window MEMBER m_window WRITE setWindow NOTIFY windowChanged FINAL)
+    Q_PROPERTY(bool constantUpdates MEMBER m_constantUpdates NOTIFY constantUpdatesChanged FINAL)
+
+    QML_ELEMENT
+
+public:
+    explicit PlayerHighResolutionTimeUpdater(QObject *parent = nullptr)
+        : QObject(parent)
+    {
+
+    }
+
+    void setWindow(QQuickWindow* window)
+    {
+        if (m_window == window)
+            return;
+
+        if (m_window)
+            disconnect(m_window, nullptr, this, nullptr);
+
+        m_window = window;
+
+        if (m_window)
+            connect(m_window, &QQuickWindow::afterAnimating, this, &PlayerHighResolutionTimeUpdater::update); // emitted from GUI thread
+
+        emit windowChanged();
+    }
+
+    void setTarget(const QQmlProperty &prop) override
+    {
+        m_item = qobject_cast<QQuickItem*>(prop.object());
+        assert(m_item);
+        m_property = prop;
+        assert(prop.isValid() && (prop.propertyType() == QMetaType::QString) && prop.isWritable());
+    }
+
+public slots:
+    bool update()
+    {
+        if (!m_item || !m_playerController)
+            return false;
+
+        // Constantly update the item, so that the window
+        // prepares new frames and we make sure that this
+        // function is also called in the very next frame.
+        // This is similar to animations:
+        if (m_constantUpdates)
+            m_item->update();
+
+        // Sample the high resolution time:
+        const QString hrt = m_playerController->highResolutionTime();
+
+        if (!m_property.write(hrt))
+            return false;
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+        // Item would like re-polishing after value change.
+        // We should have this because `afterAnimating()` is
+        // signalled after the items are polished. This may
+        // not be necessary, but it is better to have it:
+        m_item->ensurePolished();
+#endif
+
+        return true;
+    }
+
+signals:
+    void playerControllerChanged();
+    void windowChanged();
+    void constantUpdatesChanged();
+
+private:
+    QPointer<PlayerController> m_playerController;
+    QPointer<QQuickWindow> m_window;
+    QPointer<QQuickItem> m_item;
+    QQmlProperty m_property;
+    bool m_constantUpdates = true;
 };
 
 #endif
