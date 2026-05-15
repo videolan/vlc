@@ -27,6 +27,8 @@
 #include "../../adaptive/playlist/BasePlaylist.hpp"
 #include "../mp4/SmoothIndexReader.hpp"
 
+#include <new>
+
 using namespace smooth::playlist;
 using namespace smooth::mp4;
 

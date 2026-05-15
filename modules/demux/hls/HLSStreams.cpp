@@ -26,6 +26,7 @@
 #include <vlc_demux.h>
 #include <vlc_meta.h>
 #include <limits>
+#include <new>
 
 extern "C"
 {

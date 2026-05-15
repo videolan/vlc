@@ -24,6 +24,8 @@
 #include "SmoothStream.hpp"
 #include <vlc_demux.h>
 
+#include <new>
+
 using namespace smooth;
 
 SmoothStream::SmoothStream(demux_t *demux)

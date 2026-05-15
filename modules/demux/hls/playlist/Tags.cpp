@@ -25,6 +25,7 @@
 #include "../../adaptive/tools/Helper.h"
 #include <sstream>
 #include <stack>
+#include <new>
 
 #include <vlc_common.h>
 

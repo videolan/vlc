@@ -35,6 +35,8 @@
 #include <vlc_charset.h>
 #include <time.h>
 
+#include <new>
+
 using namespace adaptive;
 using namespace adaptive::logic;
 using namespace smooth;

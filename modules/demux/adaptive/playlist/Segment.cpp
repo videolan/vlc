@@ -36,6 +36,7 @@
 #include "../http/HTTPConnectionManager.h"
 #include "../http/Downloader.hpp"
 #include <cassert>
+#include <new>
 
 using namespace adaptive::http;
 using namespace adaptive::playlist;

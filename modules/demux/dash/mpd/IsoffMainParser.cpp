@@ -46,6 +46,7 @@
 #include <vlc_stream.h>
 #include <cstdio>
 #include <limits>
+#include <new>
 
 using namespace dash::mpd;
 using namespace adaptive::xml;

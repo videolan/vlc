@@ -61,6 +61,8 @@
 #include <vlc_fs.h>
 #include <vlc_image.h>
 
+#include <new>
+
 
 Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData,
                   const std::string &rPath ):

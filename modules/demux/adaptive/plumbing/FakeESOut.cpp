@@ -28,6 +28,7 @@
 #include <vlc_es_out.h>
 #include <vlc_block.h>
 #include <cassert>
+#include <new>
 
 using namespace adaptive;
 

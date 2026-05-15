@@ -28,6 +28,8 @@
 #include "../../adaptive/playlist/SegmentTimeline.h"
 #include "../../adaptive/playlist/BasePlaylist.hpp"
 
+#include <new>
+
 using namespace adaptive::mp4;
 using namespace smooth::mp4;
 

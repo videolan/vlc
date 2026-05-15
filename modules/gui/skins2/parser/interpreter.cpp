@@ -43,6 +43,8 @@
 #include "../src/var_manager.hpp"
 #include "../src/vlcproc.hpp"
 
+#include <new>
+
 
 Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
 {

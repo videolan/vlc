@@ -23,6 +23,8 @@
 
 #include "DASHStream.hpp"
 
+#include <new>
+
 using namespace dash;
 
 DASHStream::DASHStream(demux_t *demux)

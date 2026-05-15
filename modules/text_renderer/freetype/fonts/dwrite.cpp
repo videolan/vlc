@@ -34,6 +34,7 @@
 #include <vector>
 #include <stdexcept>
 #include <regex>
+#include <new>
 
 #include "../platform_fonts.h"
 

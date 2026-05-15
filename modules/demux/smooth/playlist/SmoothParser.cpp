@@ -36,6 +36,8 @@
 #include "../../adaptive/tools/Helper.h"
 #include "../../adaptive/tools/Conversions.hpp"
 
+#include <new>
+
 using namespace smooth::playlist;
 using namespace adaptive::xml;
 

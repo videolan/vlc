@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 
 #include <cstdlib>
+#include <new>
 
 extern "C"
 {

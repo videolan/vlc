@@ -44,6 +44,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <new>
 
 #include "dcpparser.h"
 

@@ -59,6 +59,7 @@
 #include <AS_DCP.h>
 
 #include <vector>
+#include <new>
 
 #include "dcpparser.h"
 

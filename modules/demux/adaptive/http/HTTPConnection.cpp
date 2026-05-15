@@ -30,6 +30,8 @@
 #include <vlc_stream.h>
 #include <vlc_keystore.h>
 
+#include <new>
+
 extern "C"
 {
     #include "../access/http/resource.h"

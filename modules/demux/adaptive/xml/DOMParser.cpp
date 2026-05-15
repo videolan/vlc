@@ -29,6 +29,7 @@
 
 #include <vector>
 #include <stack>
+#include <new>
 #include <vlc_xml.h>
 
 using namespace adaptive::xml;
