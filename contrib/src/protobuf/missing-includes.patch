@@ -1,0 +1,11 @@
+--- protobuf/src/google/protobuf/generated_message_table_driven.h.orig	2026-05-15 10:04:50.189387594 +0300
++++ protobuf/src/google/protobuf/generated_message_table_driven.h	2026-05-15 10:05:13.025497328 +0300
+@@ -38,6 +38,8 @@
+ #include <google/protobuf/wire_format_lite_inl.h>
+ 
+ #if LANG_CXX11
++#include <type_traits>
++
+ #define PROTOBUF_CONSTEXPR constexpr
+ 
+ // We require C++11 and Clang to use constexpr for variables, as GCC 4.8
