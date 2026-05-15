@@ -89,30 +89,10 @@ Control {
 
             property string timeText
 
-            Connections {
-                target: label.Window.window
-                enabled: label.visible
-
-                function onAfterAnimating() {
-                    // Sampling point
-                    // Emitted from the GUI thread
-
-                    // Constantly update the label, so that the window
-                    // prepares new frames as we don't know when the
-                    // timecode changes. This is similar to animations:
-                    label.update()
-
-                    if (label.timeText === Player.highResolutionTime)
-                        return
-
-                    label.timeText = Player.highResolutionTime
-
-                    // Text would like polishing after text change.
-                    // We need this because `afterAnimating()` is
-                    // signalled after the items are polished:
-                    if (label.ensurePolished)
-                        label.ensurePolished()
-                }
+            HighResolutionTimeUpdater on timeText {
+                window: (label.visible && Player.isStarted && !highResolutionTimeWidget.paintOnly) ? label.Window.window
+                                                                                                   : null
+                playerController: Player
             }
         }
 
