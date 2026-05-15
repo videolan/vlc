@@ -246,6 +246,8 @@ T.Control {
             anchors.fill: parent
             anchors.margins: -border.width
 
+            radius: width / 2
+
             enabled: theme.initialized
 
             border.color: root.visualFocus ? theme.visualFocus : "transparent"
