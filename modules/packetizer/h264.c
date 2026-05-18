@@ -211,13 +211,19 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
             p_dec->fmt_out.i_level = pl[1];
         }
 
-        (void) h264_get_picture_size( p_sps,
-                                      &p_dec->fmt_out.video.i_x_offset,
-                                      &p_dec->fmt_out.video.i_y_offset,
-                                      &p_dec->fmt_out.video.i_width,
-                                      &p_dec->fmt_out.video.i_height,
-                                      &p_dec->fmt_out.video.i_visible_width,
-                                      &p_dec->fmt_out.video.i_visible_height );
+        unsigned x_offset, y_offset, width, height, visible_width, visible_height;
+        if( h264_get_picture_size( p_sps,
+                                   &x_offset, &y_offset,
+                                   &width, &height,
+                                   &visible_width, &visible_height ) )
+        {
+            p_dec->fmt_out.video.i_x_offset       = x_offset;
+            p_dec->fmt_out.video.i_y_offset       = y_offset;
+            p_dec->fmt_out.video.i_width          = width;
+            p_dec->fmt_out.video.i_height         = height;
+            p_dec->fmt_out.video.i_visible_width  = visible_width;
+            p_dec->fmt_out.video.i_visible_height = visible_height;
+        }
 
         h264_get_aspect_ratio( p_sps,
                               &p_dec->fmt_out.video.i_sar_num,
@@ -1255,4 +1261,3 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
 
     return true;
 }
-
