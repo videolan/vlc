@@ -1037,7 +1037,7 @@ void matroska_segment_c::EnsureDuration()
             i_last_cluster_pos = el->GetElementPosition();
             if ( i_last_cluster_pos == cluster->GetElementPosition() )
                 // make sure our first Cluster has a timestamp
-                ParseCluster( cluster, false, SCOPE_PARTIAL_DATA );
+                ParseCluster( cluster, true, SCOPE_PARTIAL_DATA );
         }
     }
 
