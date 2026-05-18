@@ -619,19 +619,22 @@ bool matroska_segment_c::Preload( )
             msg_Dbg( &sys.demuxer, "|   + Cluster" );
 
 
-            cluster = cluster_;
-
-            // add first cluster as trusted seekpoint for all tracks
-            for( tracks_map_t::const_iterator it = tracks.begin();
-                 it != tracks.end(); ++it )
+            if (EnsureDuration(*cluster_))
             {
-                _seeker.add_seekpoint( it->first,
-                SegmentSeeker::Seekpoint( cluster->GetElementPosition(), -1,
-                                          SegmentSeeker::Seekpoint::TrustLevel::QUESTIONABLE ) );
-            }
+                cluster = cluster_;
 
-            /* stop pre-parsing the stream */
-            break;
+                // add first cluster as trusted seekpoint for all tracks
+                for( tracks_map_t::const_iterator it = tracks.begin();
+                     it != tracks.end(); ++it )
+                {
+                    _seeker.add_seekpoint( it->first,
+                    SegmentSeeker::Seekpoint( cluster->GetElementPosition(), -1,
+                                              SegmentSeeker::Seekpoint::TrustLevel::QUESTIONABLE ) );
+                }
+
+                /* stop pre-parsing the stream */
+                break;
+            }
         }
         else if( MKV_CHECKED_PTR_DECL ( ka_ptr, KaxAttachments, el ) )
         {
@@ -668,9 +671,6 @@ bool matroska_segment_c::Preload( )
     ComputeTrackPriority();
 
     b_preloaded = true;
-
-    if( cluster )
-        EnsureDuration();
 
     return true;
 }
@@ -1034,8 +1034,11 @@ bool matroska_segment_c::EnsureDuration(KaxCluster & fromCluster)
         {
             i_last_cluster_pos = el->GetElementPosition();
             if ( i_last_cluster_pos == fromCluster.GetElementPosition() )
+            {
                 // make sure our first Cluster has a timestamp
-                ParseCluster( &fromCluster, true, SCOPE_PARTIAL_DATA );
+                if (!ParseCluster( &fromCluster, true, SCOPE_PARTIAL_DATA ))
+                    return false;
+            }
         }
     }
 
