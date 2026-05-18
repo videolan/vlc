@@ -933,8 +933,8 @@ bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps,
         }
     }
 
-    *p_w = 16 * p_sps->pic_width_in_mbs_minus1 + 16;
-    *p_h = 16 * p_sps->pic_height_in_map_units_minus1 + 16;
+    *p_w = 16 * (p_sps->pic_width_in_mbs_minus1 + 1);
+    *p_h = 16 * (p_sps->pic_height_in_map_units_minus1 + 1);
     *p_h *= ( 2 - p_sps->frame_mbs_only_flag );
 
     unsigned offset_w, offset_h;
