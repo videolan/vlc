@@ -257,6 +257,18 @@ void ioctl_Close( vlc_object_t * p_this, vcddev_t *p_vcddev )
     free( p_vcddev );
 }
 
+static bool TrackNumberIsValid( int i_number )
+{
+    return (i_number >= CD_MIN_TRACK_NO && i_number <= CD_MAX_TRACK_NO);
+}
+
+static bool TracksRangeIsValid( int i_first, int i_last )
+{
+    return TrackNumberIsValid( i_first ) &&
+           TrackNumberIsValid( i_last ) &&
+           i_last >= i_first;
+}
+
 /*****************************************************************************
  * ioctl_GetTOC: Read the Table of Content, fill in the p_sectors map
  *               if b_fill_sector_info is true.
@@ -333,7 +345,7 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
             if( track == 0xA2 )
                 i_leadout = i;
 
-            if( track > CD_MAX_TRACK_NO || track < CD_MIN_TRACK_NO )
+            if( !TrackNumberIsValid( track ) )
                 continue;
 
             p_toc->p_sectors[p_toc->i_tracks].i_control = pTrackDescriptors[i].control;
@@ -365,6 +377,13 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
                              &cdrom_toc, sizeof(cdrom_toc), &dwBytesReturned, 0 ) == 0 )
         {
             msg_Err( p_this, "could not read TOCHDR" );
+            vcddev_toc_Free( p_toc );
+            return NULL;
+        }
+
+        if( !TracksRangeIsValid( cdrom_toc.FirstTrack, cdrom_toc.LastTrack ) )
+        {
+            msg_Err( p_this, "Invalid tracks range" );
             vcddev_toc_Free( p_toc );
             return NULL;
         }
@@ -408,6 +427,13 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         if( rc )
         {
             msg_Err( p_this, "could not read TOCHDR" );
+            vcddev_toc_Free( p_toc );
+            return NULL;
+        }
+
+        if( !TracksRangeIsValid( tochdr.first_track, tochdr.last_track ) )
+        {
+            msg_Err( p_this, "Invalid tracks range" );
             vcddev_toc_Free( p_toc );
             return NULL;
         }
@@ -469,6 +495,13 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
             return NULL;
         }
 
+        if( !TracksRangeIsValid( tochdr.starting_track, tochdr.ending_track ) )
+        {
+            msg_Err( p_this, "Invalid tracks range" );
+            vcddev_toc_Free( p_toc );
+            return NULL;
+        }
+
         p_toc->i_tracks = tochdr.ending_track - tochdr.starting_track + 1;
         p_toc->i_first_track = tochdr.starting_track;
         p_toc->i_last_track = tochdr.ending_track;
@@ -523,6 +556,13 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         {
             msg_Err( p_this, "could not read TOCHDR" );
             free( p_toc );
+            return NULL;
+        }
+
+        if( !TracksRangeIsValid( tochdr.cdth_trk0, tochdr.cdth_trk1 ) )
+        {
+            msg_Err( p_this, "Invalid tracks range" );
+            vcddev_toc_Free( p_toc );
             return NULL;
         }
 
@@ -1110,7 +1150,7 @@ static int darwin_getNumberOfTracks( CDTOC *pTOC, int i_descriptors,
     {
         track = pTrackDescriptors[i].point;
 
-        if( track > CD_MAX_TRACK_NO || track < CD_MIN_TRACK_NO )
+        if( !TrackNumberIsValid( track ) )
             continue;
 
         if( pTrackDescriptors[i].adr == 0x01 /* kCDSectorTypeCDDA */ )

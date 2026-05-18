@@ -55,9 +55,9 @@ struct vcddev_s
  *****************************************************************************/
 #if defined( __APPLE__ )
 #define darwin_freeTOC( p ) free( (void*)p )
+#endif
 #define CD_MIN_TRACK_NO 01
 #define CD_MAX_TRACK_NO 99
-#endif
 
 #if defined( _WIN32 )
 
