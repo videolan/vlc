@@ -990,31 +990,30 @@ void matroska_segment_c::ComputeTrackPriority()
     }
 }
 
-void matroska_segment_c::EnsureDuration()
+bool matroska_segment_c::EnsureDuration(KaxCluster & fromCluster)
 {
     if ( i_duration > 0 )
-        return;
+        return true;
 
     i_duration = -1;
 
     if( !sys.b_fastseekable )
     {
         msg_Warn( &sys.demuxer, "could not look for the segment duration" );
-        return;
+        return true;
     }
 
     uint64_t i_current_position = es.I_O().getFilePointer();
-    uint64_t i_last_cluster_pos = cluster->GetElementPosition();
+    uint64_t i_last_cluster_pos = fromCluster.GetElementPosition();
 
     // find the last Cluster from the Cues
 
     if ( b_cues && _seeker._cluster_positions.size() )
         i_last_cluster_pos = *_seeker._cluster_positions.rbegin();
-    else if( !cluster->IsFiniteSize() )
+    else if( !fromCluster.IsFiniteSize() )
     {
         // make sure our first Cluster has a timestamp
-        ParseCluster( cluster, false, SCOPE_PARTIAL_DATA );
-        return;
+        return ParseCluster( &fromCluster, false, SCOPE_PARTIAL_DATA );
     }
 
     es.I_O().setFilePointer( i_last_cluster_pos, seek_beginning );
@@ -1028,15 +1027,15 @@ void matroska_segment_c::EnsureDuration()
         if( !el->IsFiniteSize() && el->GetElementPosition() != i_last_cluster_pos )
         {
             es.I_O().setFilePointer( i_current_position, seek_beginning );
-            return;
+            return true;
         }
 
         if( MKV_IS_ID( el, KaxCluster ) )
         {
             i_last_cluster_pos = el->GetElementPosition();
-            if ( i_last_cluster_pos == cluster->GetElementPosition() )
+            if ( i_last_cluster_pos == fromCluster.GetElementPosition() )
                 // make sure our first Cluster has a timestamp
-                ParseCluster( cluster, true, SCOPE_PARTIAL_DATA );
+                ParseCluster( &fromCluster, true, SCOPE_PARTIAL_DATA );
         }
     }
 
@@ -1079,12 +1078,13 @@ void matroska_segment_c::EnsureDuration()
             }
         }
 
-        i_duration = VLC_TICK_FROM_NS( i_last_timecode - cluster->GlobalTimestamp() );
+        i_duration = VLC_TICK_FROM_NS( i_last_timecode - fromCluster.GlobalTimestamp() );
         msg_Dbg( &sys.demuxer, " extracted Duration=%" PRId64, SEC_FROM_VLC_TICK(i_duration) );
     }
 
     // get back to the reading position we were at before looking for a duration
     es.I_O().setFilePointer( i_current_position, seek_beginning );
+    return true;
 }
 
 bool matroska_segment_c::ESCreate()

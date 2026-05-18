@@ -201,7 +201,7 @@ private:
     bool ParseSimpleTags( SimpleTag* out, KaxTagSimple *tag, int level = 50 );
     bool TrackInit( mkv_track_t * p_tk );
     void ComputeTrackPriority();
-    void EnsureDuration();
+    bool EnsureDuration(KaxCluster &);
 
     SegmentSeeker _seeker;
 
