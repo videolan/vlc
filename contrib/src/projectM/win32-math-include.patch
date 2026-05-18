@@ -1,0 +1,11 @@
+diff -urN projectM-orig/Common.hpp projectM/Common.hpp
+--- projectM-orig/Common.hpp	2026-05-19 00:07:04.778116038 +0300
++++ projectM/Common.hpp	2026-05-19 00:07:18.186174101 +0300
+@@ -117,6 +117,7 @@
+ 
+ #ifdef WIN32
+ #include <float.h>
++#include <math.h>
+ #define isnan _isnan
+ #endif /** WIN32 */
+ 
