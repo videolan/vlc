@@ -32,6 +32,7 @@
 #include <vlc_boxes.h>
 #include <vlc_es.h>
 #include <limits.h>
+#include <stdckdint.h>
 
 /* H264 Level limits from Table A-1 */
 typedef struct
@@ -936,14 +937,21 @@ bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps,
     *p_h = 16 * p_sps->pic_height_in_map_units_minus1 + 16;
     *p_h *= ( 2 - p_sps->frame_mbs_only_flag );
 
-    if ( ( p_sps->frame_crop.left_offset   + p_sps->frame_crop.right_offset ) > *p_w / CropUnitX )
+    unsigned offset_w, offset_h;
+    if( ckd_add( &offset_w, p_sps->frame_crop.left_offset, p_sps->frame_crop.right_offset ) ||
+        ckd_mul( &offset_w, CropUnitX, offset_w ) ||
+        ckd_mul( p_ox,      CropUnitX, p_sps->frame_crop.left_offset ) )
         return false;
-    if ( ( p_sps->frame_crop.bottom_offset + p_sps->frame_crop.top_offset   ) > *p_h / CropUnitY )
+    if( ckd_add( &offset_h, p_sps->frame_crop.bottom_offset, p_sps->frame_crop.top_offset ) ||
+        ckd_mul( &offset_h, CropUnitY, offset_h ) ||
+        ckd_mul( p_oy,      CropUnitY, p_sps->frame_crop.top_offset ) )
         return false;
-    *p_ox = p_sps->frame_crop.left_offset * CropUnitX;
-    *p_oy = p_sps->frame_crop.top_offset * CropUnitY;
-    *p_vw = *p_w - ( p_sps->frame_crop.left_offset   + p_sps->frame_crop.right_offset ) * CropUnitX;
-    *p_vh = *p_h - ( p_sps->frame_crop.bottom_offset + p_sps->frame_crop.top_offset   ) * CropUnitY;
+    if( *p_w < offset_w )
+        return false;
+    if( *p_h < offset_h )
+        return false;
+    *p_vw = *p_w - offset_w;
+    *p_vh = *p_h - offset_h;
 
     return true;
 }
