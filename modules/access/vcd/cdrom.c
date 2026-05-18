@@ -512,6 +512,7 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
             p_toc->p_sectors[ i ].i_lba = ntohl( toc_entries.data[i].addr.lba );
 #endif
         }
+        free( toc_entries.data );
 #else
         struct cdrom_tochdr   tochdr;
         struct cdrom_tocentry tocent;
