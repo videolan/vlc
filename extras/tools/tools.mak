@@ -337,6 +337,7 @@ protobuf-$(PROTOBUF_VERSION).tar.gz:
 
 protobuf: protobuf-$(PROTOBUF_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) $(TOOLS)/protobuf-3.4.1-missing-includes.patch
 	$(MOVE)
 
 .buildprotoc: protobuf
