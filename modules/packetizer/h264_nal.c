@@ -418,6 +418,13 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         p_sps->frame_crop.top_offset = bs_read_ue( p_bs );
         p_sps->frame_crop.bottom_offset = bs_read_ue( p_bs );
     }
+    else
+    {
+        p_sps->frame_crop.left_offset = 0;
+        p_sps->frame_crop.right_offset = 0;
+        p_sps->frame_crop.top_offset = 0;
+        p_sps->frame_crop.bottom_offset = 0;
+    }
 
     /* vui */
     p_sps->vui_parameters_present_flag = bs_read( p_bs, 1 );
