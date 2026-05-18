@@ -408,7 +408,8 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         if( rc )
         {
             msg_Err( p_this, "could not read TOCHDR" );
-            return 0;
+            vcddev_toc_Free( p_toc );
+            return NULL;
         }
 
         p_toc->i_tracks = tochdr.last_track - tochdr.first_track + 1;
