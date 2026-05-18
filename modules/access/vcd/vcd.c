@@ -456,7 +456,7 @@ static int EntryPoints( stream_t *p_access )
     memcpy( &entries, sector, CD_SECTOR_SIZE );
 
     i_nb = GetWBE( &entries.i_entries_nb );
-    if( i_nb > 500 )
+    if( i_nb == 0 || i_nb > 500 /* See 6.3.2 */ )
     {
         msg_Err( p_access, "invalid entry points number" );
         return VLC_EGENERIC;
