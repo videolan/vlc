@@ -1633,7 +1633,7 @@ static void free_all( decoder_t *p_dec )
         p_reg_next = p_reg->p_next;
         for( int i = 0; i < p_reg->i_object_defs; i++ )
             free( p_reg->p_object_defs[i].psz_text );
-        if( p_reg->i_object_defs ) free( p_reg->p_object_defs );
+        free( p_reg->p_object_defs );
         free( p_reg->p_pixbuf );
         free( p_reg );
     }
