@@ -81,6 +81,7 @@ void EbmlParser::Up( void )
 
 void EbmlParser::Down( void )
 {
+    assert(m_el[mi_level] != nullptr);
     mi_user_level++;
     mi_level++;
 }
@@ -110,6 +111,7 @@ void EbmlParser::Reset( demux_t *p_demux )
     }
     this->p_demux = p_demux;
     mi_user_level = mi_level = 1;
+    return_previous_parent = false;
     // a little faster and cleaner
     m_es->I_O().setFilePointer( static_cast<EbmlMaster*>(m_el[0])->GetDataStart() );
 }
