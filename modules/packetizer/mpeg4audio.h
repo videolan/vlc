@@ -508,9 +508,10 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
     int i_mux_versionA;
 
     i_mux_version = bs_read(s, 1);
-    i_mux_versionA = 0;
     if (i_mux_version)
         i_mux_versionA = bs_read(s, 1);
+    else
+        i_mux_versionA = 0;
 
     if (i_mux_versionA != 0) /* support only A=0 */
         return -1;
@@ -614,4 +615,3 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
 
     return bs_error(s) ? -1 : 0;
 }
-
