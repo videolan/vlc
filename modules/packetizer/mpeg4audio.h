@@ -473,7 +473,7 @@ typedef struct
     uint8_t numSubFrames;
     uint8_t numProgram;
 
-    uint8_t pi_layers[MPEG4_STREAMMUX_MAX_PROGRAM];
+    uint8_t p_numLayer[MPEG4_STREAMMUX_MAX_PROGRAM];
 
     uint8_t pi_stream[MPEG4_STREAMMUX_MAX_PROGRAM][MPEG4_STREAMMUX_MAX_LAYER];
 
@@ -526,9 +526,9 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
     for (uint8_t i_program = 0; i_program <= m->numProgram; i_program++) {
         if(bs_eof(s))
             return -1;
-        m->pi_layers[i_program] = 1+bs_read(s, 3);
+        m->p_numLayer[i_program] = bs_read(s, 3);
 
-        for (uint8_t i_layer = 0; i_layer < m->pi_layers[i_program]; i_layer++) {
+        for (uint8_t i_layer = 0; i_layer <= m->p_numLayer[i_program]; i_layer++) {
             MPEG4_audio_stream_t *st = &m->stream[m->i_streams];
             bool b_previous_cfg;
 
