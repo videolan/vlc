@@ -594,10 +594,8 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
         }
     }
 
-#if 0
-    if (p_sys->latm.i_other_data > 0)
-        ; // TODO
-#endif
+
+    bs_skip(&s, p_sys->latm.otherDataLenBits);
     bs_align(&s);
 
     return i_accumulated;

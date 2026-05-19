@@ -480,7 +480,7 @@ typedef struct
     uint8_t i_streams;
     MPEG4_audio_stream_t stream[MPEG4_STREAMMUX_MAX_PROGRAM*MPEG4_STREAMMUX_MAX_LAYER];
 
-    uint32_t i_other_data;
+    uint32_t otherDataLenBits;
 } MPEG4_streammux_config_t;
 
 static inline uint32_t MPEG4_LatmGetValue(bs_t *s)
@@ -590,17 +590,19 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
         return -1;
 
     /* other data */
-    if (bs_read1(s)) {
+    if (bs_read1(s)) { // otherDataPresent
         if (audioMuxVersion)
-            m->i_other_data = MPEG4_LatmGetValue(s);
+            m->otherDataLenBits = MPEG4_LatmGetValue(s);
         else {
             bool otherDataLenEsc;
             do {
                 otherDataLenEsc = bs_read1(s);
-                m->i_other_data = (m->i_other_data << 8) + bs_read(s, 8);
+                m->otherDataLenBits = (m->otherDataLenBits << 8) + bs_read(s, 8);
             } while (otherDataLenEsc);
         }
     }
+    else
+        m->otherDataLenBits = 0;
 
     /* crc */
     if (bs_read1(s))
