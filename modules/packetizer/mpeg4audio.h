@@ -518,9 +518,8 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
 
     memset(m, 0, sizeof(*m));
 
-    if (i_mux_versionA == 0)
-        if (i_mux_version == 1)
-            MPEG4_LatmGetValue(s); /* taraBufferFullness */
+    if (i_mux_version == 1)
+        MPEG4_LatmGetValue(s); /* taraBufferFullness */
 
     if(bs_eof(s))
         return -1;
