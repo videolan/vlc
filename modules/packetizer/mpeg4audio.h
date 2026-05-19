@@ -469,7 +469,7 @@ typedef struct
 #define MPEG4_STREAMMUX_MAX_PROGRAM 16
 typedef struct
 {
-    bool b_same_time_framing;
+    bool allStreamsSameTimeFraming;
     uint8_t numSubFrames;
     uint8_t i_programs;
 
@@ -520,7 +520,7 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
     if(bs_eof(s))
         return -1;
 
-    m->b_same_time_framing = bs_read1(s);
+    m->allStreamsSameTimeFraming = bs_read1(s);
     m->numSubFrames = bs_read(s, 6);
     m->i_programs = 1 + bs_read(s, 4);
 
@@ -563,7 +563,7 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
             case 0:
             {
                 bs_skip(s, 8); /* latmBufferFullnes */
-                if (!m->b_same_time_framing)
+                if (!m->allStreamsSameTimeFraming)
                     if (st->cfg.i_object_type == MPEG4_AOT_AAC_SC ||
                         st->cfg.i_object_type == MPEG4_AOT_CELP ||
                         st->cfg.i_object_type == MPEG4_AOT_ER_AAC_SC ||

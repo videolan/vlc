@@ -498,7 +498,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
 
     for (uint8_t i_sub = 0; i_sub <= p_sys->latm.numSubFrames; i_sub++) {
         unsigned pi_payload[MPEG4_STREAMMUX_MAX_PROGRAM][MPEG4_STREAMMUX_MAX_LAYER];
-        if (p_sys->latm.b_same_time_framing) {
+        if (p_sys->latm.allStreamsSameTimeFraming) {
             /* Payload length */
             for (uint8_t i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
                 for (uint8_t i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
