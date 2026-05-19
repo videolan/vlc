@@ -595,11 +595,11 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
         if (audioMuxVersion)
             m->i_other_data = MPEG4_LatmGetValue(s);
         else {
-            int b_continue;
+            bool otherDataLenEsc;
             do {
-                b_continue = bs_read1(s);
+                otherDataLenEsc = bs_read1(s);
                 m->i_other_data = (m->i_other_data << 8) + bs_read(s, 8);
-            } while (b_continue);
+            } while (otherDataLenEsc);
         }
     }
 
