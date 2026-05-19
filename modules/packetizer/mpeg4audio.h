@@ -504,17 +504,17 @@ static inline size_t AudioSpecificConfigBitsToBytes(bs_t *s, uint32_t i_bits, ui
 
 static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t *m)
 {
-    int i_mux_version;
+    bool audioMuxVersion;
 
-    i_mux_version = bs_read(s, 1);
-    if (i_mux_version) {
+    audioMuxVersion = bs_read(s, 1);
+    if (audioMuxVersion) {
         if (bs_read(s, 1) != 0) /* support only audioMuxVersionA=0 */
             return -1;
     }
 
     memset(m, 0, sizeof(*m));
 
-    if (i_mux_version == 1)
+    if (audioMuxVersion)
         MPEG4_LatmGetValue(s); /* taraBufferFullness */
 
     if(bs_eof(s))
@@ -546,11 +546,11 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
                 st->cfg = m->stream[m->i_streams-1].cfg;
             } else {
                 uint32_t asc_size = 0;
-                if(i_mux_version > 0)
+                if(audioMuxVersion)
                     asc_size = MPEG4_LatmGetValue(s);
                 bs_t asc_bs = *s;
-                MPEG4_read_AudioSpecificConfig(&asc_bs, &st->cfg, i_mux_version > 0);
-                if (i_mux_version == 0)
+                MPEG4_read_AudioSpecificConfig(&asc_bs, &st->cfg, audioMuxVersion);
+                if (!audioMuxVersion)
                     asc_size = bs_pos(&asc_bs) - bs_pos(s);
                 asc_bs = *s;
                 st->i_extra = AudioSpecificConfigBitsToBytes(&asc_bs, asc_size, st->extra);
@@ -592,7 +592,7 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
 
     /* other data */
     if (bs_read1(s)) {
-        if (i_mux_version == 1)
+        if (audioMuxVersion)
             m->i_other_data = MPEG4_LatmGetValue(s);
         else {
             int b_continue;
