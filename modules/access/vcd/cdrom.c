@@ -966,8 +966,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     goto end;
 
 error:
-    free( p_toc->p_sectors );
-    memset( p_toc, 0, sizeof(*p_toc) );
+    vcddev_toc_Reset( p_toc );
 end:
     if( cuefile ) fclose( cuefile );
     free( psz_cuefile );
