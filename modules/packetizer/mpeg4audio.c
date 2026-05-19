@@ -493,10 +493,10 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
         goto truncated;
 
     /* FIXME do we need to split the subframe into independent packet ? */
-    if (p_sys->latm.i_sub_frames > 1)
+    if (p_sys->latm.numSubFrames != 0)
         msg_Err(p_dec, "latm sub frames not yet supported, please send a sample");
 
-    for (uint8_t i_sub = 0; i_sub < p_sys->latm.i_sub_frames; i_sub++) {
+    for (uint8_t i_sub = 0; i_sub <= p_sys->latm.numSubFrames; i_sub++) {
         unsigned pi_payload[MPEG4_STREAMMUX_MAX_PROGRAM][MPEG4_STREAMMUX_MAX_LAYER];
         if (p_sys->latm.b_same_time_framing) {
             /* Payload length */

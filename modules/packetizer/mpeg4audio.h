@@ -470,7 +470,7 @@ typedef struct
 typedef struct
 {
     bool b_same_time_framing;
-    uint8_t i_sub_frames;
+    uint8_t numSubFrames;
     uint8_t i_programs;
 
     uint8_t pi_layers[MPEG4_STREAMMUX_MAX_PROGRAM];
@@ -521,7 +521,7 @@ static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t 
         return -1;
 
     m->b_same_time_framing = bs_read1(s);
-    m->i_sub_frames = 1 + bs_read(s, 6);
+    m->numSubFrames = bs_read(s, 6);
     m->i_programs = 1 + bs_read(s, 4);
 
     for (uint8_t i_program = 0; i_program < m->i_programs; i_program++) {
