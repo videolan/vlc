@@ -187,6 +187,9 @@ static int OpenPacketizer(vlc_object_t *p_this)
     p_sys->i_aac_profile = -1;
     p_sys->b_latm_cfg = false;
     p_sys->i_warnings = 0;
+    p_sys->i_channels = 0;
+    p_sys->i_rate = 0;
+    p_sys->i_frame_length = 0;
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_CODEC_MP4A;
