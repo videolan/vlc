@@ -1373,7 +1373,7 @@ static void CdTextParsePackText( const uint8_t *p_pack,
             *pi_repeatbuffer && !*pi_textbuffer )
         {
             *pi_textbuffer = *pi_repeatbuffer;
-            textbuffer[*pi_textbuffer] = 0;
+            textbuffer[*pi_textbuffer] = '\0';
         }
         else
         {
@@ -1383,6 +1383,7 @@ static void CdTextParsePackText( const uint8_t *p_pack,
                 i_append = CDTEXT_TEXT_BUFFER - *pi_textbuffer;
             memcpy( &textbuffer[*pi_textbuffer], p_readpos, i_append );
             *pi_textbuffer += i_append;
+            textbuffer[*pi_textbuffer] = '\0';
             *pi_repeatbuffer = 0;
         }
 
@@ -1461,7 +1462,7 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
     else e_textpackcharset = CDTEXT_CHARSET_ASCII7BIT;
 
     /* capture buffer */
-    char textbuffer[CDTEXT_TEXT_BUFFER];
+    char textbuffer[CDTEXT_TEXT_BUFFER+1];
     size_t i_textbuffer = 0;
     size_t i_repeatbuffer = 0;
     cd_text_pack_type i_prev_pack_type = cd_text_meta_invalid;
