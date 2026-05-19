@@ -166,6 +166,7 @@
 {
     const BOOL lyricsAvailable = _playerController.lyricsAvailable;
     self.lyricsButton.enabled = lyricsAvailable;
+    self.lyricsButton.hidden = !_playerController.currentMediaIsAudioOnly && !lyricsAvailable;
     self.lyricsButton.state = _playerController.showLyrics ? NSControlStateValueOn : NSControlStateValueOff;
 
     if (@available(macOS 26.0, *)) {
@@ -319,6 +320,8 @@
     if (!VLCMain.sharedInstance.libraryController.shouldUseMediaLibrary) {
         self.bookmarksButton.hidden = YES;
     }
+
+    [self updateLyricsButton:nil];
 }
 
 - (void)playerStateUpdated:(NSNotification *)notification
