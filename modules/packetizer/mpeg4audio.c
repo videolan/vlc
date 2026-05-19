@@ -500,7 +500,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
         unsigned pi_payload[MPEG4_STREAMMUX_MAX_PROGRAM][MPEG4_STREAMMUX_MAX_LAYER];
         if (p_sys->latm.allStreamsSameTimeFraming) {
             /* Payload length */
-            for (uint8_t i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
+            for (uint8_t i_program = 0; i_program <= p_sys->latm.numProgram; i_program++) {
                 for (uint8_t i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
                     const MPEG4_audio_stream_t *st = &p_sys->latm.stream[p_sys->latm.pi_stream[i_program][i_layer]];
                     if (st->i_frame_length_type == 0) {
@@ -526,7 +526,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
             }
 
             /* Payload Data */
-            for (uint8_t i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
+            for (uint8_t i_program = 0; i_program <= p_sys->latm.numProgram; i_program++) {
                 for (uint8_t i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
                     /* XXX we only extract 1 stream */
                     if (i_program != 0 || i_layer != 0)
