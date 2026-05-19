@@ -325,7 +325,7 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
 
         int i, i_leadout = -1;
         CDTOCDescriptor *pTrackDescriptors;
-        u_char track;
+        u_char track, track_index;
 
         p_toc->p_sectors = calloc( p_toc->i_tracks + 1,
                                     sizeof(*p_toc->p_sectors) );
@@ -338,7 +338,7 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
 
         pTrackDescriptors = pTOC->descriptors;
 
-        for( p_toc->i_tracks = 0, i = 0; i < i_descriptors; i++ )
+        for( track_index = 0, i = 0; i < i_descriptors && track_index < p_toc->i_tracks; i++ )
         {
             track = pTrackDescriptors[i].point;
 
@@ -348,8 +348,8 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
             if( !TrackNumberIsValid( track ) )
                 continue;
 
-            p_toc->p_sectors[p_toc->i_tracks].i_control = pTrackDescriptors[i].control;
-            p_toc->p_sectors[p_toc->i_tracks++].i_lba =
+            p_toc->p_sectors[track_index].i_control = pTrackDescriptors[i].control;
+            p_toc->p_sectors[track_index++].i_lba =
                 CDConvertMSFToLBA( pTrackDescriptors[i].p );
         }
 
@@ -362,7 +362,7 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         }
 
         /* set leadout sector */
-        p_toc->p_sectors[p_toc->i_tracks].i_lba =
+        p_toc->p_sectors[track_index].i_lba =
             CDConvertMSFToLBA( pTrackDescriptors[i_leadout].p );
 
         darwin_freeTOC( pTOC );
