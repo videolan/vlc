@@ -587,8 +587,8 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             goto error;
         }
 
-        if( read( p_vcddev->i_vcdimage_handle, p_block, VCD_SECTOR_SIZE * i_nb)
-            == -1 )
+        ssize_t toread = VCD_SECTOR_SIZE * i_nb;
+        if( read( p_vcddev->i_vcdimage_handle, p_block, toread ) != toread )
         {
             msg_Err( p_this, "Could not read sector %d", i_sector );
             goto error;
@@ -724,8 +724,8 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             goto error;
         }
 
-        if( read( p_vcddev->i_device_handle,
-                  p_block, VCD_SECTOR_SIZE * i_nb ) == -1 )
+        ssize_t toread = VCD_SECTOR_SIZE * i_nb;
+        if( read( p_vcddev->i_device_handle, p_block, toread ) != toread )
         {
             msg_Err( p_this, "Could not read sector %d", i_sector );
             goto error;
