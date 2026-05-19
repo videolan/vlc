@@ -505,16 +505,12 @@ static inline size_t AudioSpecificConfigBitsToBytes(bs_t *s, uint32_t i_bits, ui
 static inline int MPEG4_parse_StreamMuxConfig(bs_t *s, MPEG4_streammux_config_t *m)
 {
     int i_mux_version;
-    int i_mux_versionA;
 
     i_mux_version = bs_read(s, 1);
     if (i_mux_version) {
-        i_mux_versionA = bs_read(s, 1);
-        if (i_mux_versionA != 0) /* support only A=0 */
+        if (bs_read(s, 1) != 0) /* support only audioMuxVersionA=0 */
             return -1;
     }
-    else
-        i_mux_versionA = 0;
 
     memset(m, 0, sizeof(*m));
 
