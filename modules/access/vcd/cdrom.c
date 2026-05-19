@@ -400,7 +400,7 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
         if( b_fill_sectorinfo )
         {
-            p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(p_toc->p_sectors) );
+            p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
             if( p_toc->p_sectors == NULL )
             {
                 vcddev_toc_Free( p_toc );
