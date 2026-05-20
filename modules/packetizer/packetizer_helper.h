@@ -106,6 +106,10 @@ static inline void packetizer_Flush( packetizer_t *p_pack )
     p_pack->pf_reset( p_pack->p_private, true );
 }
 
+/**
+ * Return a block of the data between 2 startcodes in the block stream.
+ * The block contains the startcode at the beginning.
+ */
 static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_block )
 {
     block_t *p_block = ( pp_block ) ? *pp_block : NULL;
@@ -144,6 +148,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
             if( p_pack->i_offset )
             {
+                // remove junk data before the startcode
                 block_SkipBytes( &p_pack->bytestream, p_pack->i_offset );
                 p_pack->i_offset = 0;
                 block_BytestreamFlush( &p_pack->bytestream );
