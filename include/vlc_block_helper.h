@@ -282,7 +282,7 @@ static inline int block_FindStartcodeFromOffset(
     block_startcode_helper_t p_startcode_helper,
     block_startcode_matcher_t p_startcode_matcher )
 {
-    block_t *p_block, *p_block_backup = 0;
+    block_t *p_block, *p_block_backup = NULL;
     ssize_t i_size;
     size_t i_offset, i_offset_backup = 0;
     int i_caller_offset_backup = 0;
