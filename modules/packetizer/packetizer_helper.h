@@ -25,7 +25,7 @@
 
 #include <vlc_block.h>
 
-enum
+enum vlc_packetizer_state
 {
     STATE_NOSYNC,
     STATE_SYNC,

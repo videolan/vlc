@@ -63,7 +63,7 @@ typedef struct
     /*
      * Input properties
      */
-    int i_state;
+    enum vlc_packetizer_state i_state;
     int i_type;
 
     block_bytestream_t bytestream;
@@ -857,6 +857,9 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
         p_sys->i_state = STATE_NOSYNC;
 
         return p_out_buffer;
+
+    case STATE_CUSTOM_FIRST:
+        break; // do nothing
     }
 
     return NULL;

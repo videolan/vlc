@@ -58,7 +58,7 @@ typedef struct
     /*
      * Input properties
      */
-    int i_state;
+    enum vlc_packetizer_state i_state;
 
     block_bytestream_t bytestream;
     size_t i_offset;
@@ -572,6 +572,9 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             *pp_block = block_BytestreamPop(&p_sys->bytestream);
 
         return out;
+
+    case STATE_CUSTOM_FIRST:
+        break; // do nothing
     }
 
     return NULL;
