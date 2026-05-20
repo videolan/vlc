@@ -98,6 +98,24 @@ T.ToolBar {
                 Navigation.rightItem: playqueueButtonsTop
 
                 Widgets.IconToolButton {
+                    id: navigationVisibilty
+
+                    focus: true
+
+                    text: VLCIcons.panel_left
+                    description: qsTr("Show navigation menu")
+
+                    font.pixelSize: VLCStyle.icon_banner
+                    height: VLCStyle.bannerButton_height
+                    width: VLCStyle.bannerButton_width
+
+                    onClicked: root.toggleNavigationVisibility()
+
+                    Navigation.parentItem: navigationButtons
+                    Navigation.rightItem: historyBack
+                }
+
+                Widgets.IconToolButton {
                     id: historyBack
 
                     font.pixelSize: VLCStyle.icon_banner
@@ -116,25 +134,7 @@ T.ToolBar {
                     }
 
                     Navigation.parentItem: navigationButtons
-                    Navigation.rightItem: navigationVisibilty
-                }
-
-                Widgets.IconToolButton {
-                    id: navigationVisibilty
-
-                    focus: true
-
-                    text: VLCIcons.panel_left
-                    description: qsTr("Show navigation menu")
-
-                    font.pixelSize: VLCStyle.icon_banner
-                    height: VLCStyle.bannerButton_height
-                    width: VLCStyle.bannerButton_width
-
-                    onClicked: root.toggleNavigationVisibility()
-
-                    Navigation.parentItem: navigationButtons
-                    Navigation.leftItem: historyBack
+                    Navigation.leftItem: navigationVisibilty
                     Navigation.rightItem: playlistBtn
                 }
 
