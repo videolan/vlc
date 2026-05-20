@@ -560,10 +560,9 @@ static int ProcessALACCookie( demux_t *p_demux, const uint8_t *p, uint64_t i_siz
     if( i_extra && !p_sys->fmt.p_extra )
         return VLC_ENOMEM;
 
-    uint8_t *p_extra = ( uint8_t * )p_sys->fmt.p_extra;
-
     if( i_size == kALAC_NEW_KUKI_SIZE )
     {
+        uint8_t *p_extra = ( uint8_t * )p_sys->fmt.p_extra;
         SetDWBE( p_extra, 36 );
         memcpy( p_extra + 4, "alac", 4 );
         SetDWBE( p_extra + 8, 0 );
