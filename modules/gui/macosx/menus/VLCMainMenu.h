@@ -1,7 +1,7 @@
 /*****************************************************************************
  *MainMenu.h: MacOS X interface module
  *****************************************************************************
- *Copyright (C) 2011-2018 Felix Paul Kühne
+ *Copyright (C) 2011-2026 Felix Paul Kühne
  *
  *Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
@@ -52,6 +52,8 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *open_capture;
 @property (readwrite, weak) IBOutlet NSMenuItem *connect_to_server;
 @property (readwrite, weak) IBOutlet NSMenuItem *open_recent;
+@property (readwrite, weak) IBOutlet NSMenuItem *recent_streams;
+@property (readwrite, weak) IBOutlet NSMenu *recent_streamsMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *close_window;
 @property (readwrite, weak) IBOutlet NSMenuItem *convertandsave;
 @property (readwrite, weak) IBOutlet NSMenuItem *save_playlist;

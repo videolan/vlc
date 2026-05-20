@@ -338,6 +338,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/main/macosx.m \
 	gui/macosx/menus/VLCMainMenu.h \
 	gui/macosx/menus/VLCMainMenu.m \
+	gui/macosx/menus/VLCRecentStreamsMenuController.h \
+	gui/macosx/menus/VLCRecentStreamsMenuController.m \
 	gui/macosx/menus/VLCStatusBarIcon.h \
 	gui/macosx/menus/VLCStatusBarIcon.m \
 	gui/macosx/menus/renderers/VLCRendererDiscovery.h \

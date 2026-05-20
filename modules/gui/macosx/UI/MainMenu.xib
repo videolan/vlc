@@ -85,6 +85,8 @@
                 <outlet property="open_generic" destination="72" id="HZC-SG-Njq"/>
                 <outlet property="open_net" destination="446" id="mcx-C9-l0u"/>
                 <outlet property="open_recent" destination="4815" id="Hzh-wK-cxa"/>
+                <outlet property="recent_streams" destination="rstr-mi-0001" id="rstr-ol-0001"/>
+                <outlet property="recent_streamsMenu" destination="rstr-sm-0001" id="rstr-ol-0002"/>
                 <outlet property="pasteItem" destination="203" id="H04-s9-3uF"/>
                 <outlet property="play" destination="5142" id="B2I-n1-EOc"/>
                 <outlet property="playQueue" destination="1002" id="nhI-Gw-yev"/>
@@ -313,6 +315,10 @@
                                         </menuItem>
                                     </items>
                                 </menu>
+                            </menuItem>
+                            <menuItem title="Recent Streams" id="rstr-mi-0001">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Recent Streams" id="rstr-sm-0001"/>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="3946">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>

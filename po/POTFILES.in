@@ -503,6 +503,8 @@ modules/gui/macosx/main/VLCMain.m
 modules/gui/macosx/main/macosx.m
 modules/gui/macosx/menus/VLCMainMenu.h
 modules/gui/macosx/menus/VLCMainMenu.m
+modules/gui/macosx/menus/VLCRecentStreamsMenuController.h
+modules/gui/macosx/menus/VLCRecentStreamsMenuController.m
 modules/gui/macosx/menus/VLCStatusBarIcon.h
 modules/gui/macosx/menus/VLCStatusBarIcon.m
 modules/gui/macosx/menus/renderers/VLCRendererDiscovery.h

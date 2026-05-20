@@ -221,6 +221,7 @@
 		7D66D4362200BC340040D04A /* VLCClickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D4352200BC340040D04A /* VLCClickerManager.m */; };
 		7D66D4392200C5B80040D04A /* VLCVideoFilterHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D4382200C5B80040D04A /* VLCVideoFilterHelper.m */; };
 		7D67318622C8F4060000AD40 /* VLCMediaSourceCollectionViewItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D67318422C8F4050000AD40 /* VLCMediaSourceCollectionViewItem.m */; };
+		7D6CCA6F2FBE1BA400088B47 /* VLCRecentStreamsMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D6CCA6E2FBE1BA400088B47 /* VLCRecentStreamsMenuController.m */; };
 		7D713D322201AE350042BEB7 /* VLCLibraryWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */; };
 		7D713D362201DC640042BEB7 /* VLCLibraryWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */; };
 		7D903E0E22438F8F00917358 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E331223DB3B60046F895 /* error.c */; };
@@ -829,6 +830,8 @@
 		7D67318322C8F3F60000AD40 /* VLCMediaSourceCollectionViewItem.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCMediaSourceCollectionViewItem.xib; sourceTree = "<group>"; };
 		7D67318422C8F4050000AD40 /* VLCMediaSourceCollectionViewItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMediaSourceCollectionViewItem.m; sourceTree = "<group>"; };
 		7D67318522C8F4050000AD40 /* VLCMediaSourceCollectionViewItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCMediaSourceCollectionViewItem.h; sourceTree = "<group>"; };
+		7D6CCA6D2FBE1BA400088B47 /* VLCRecentStreamsMenuController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCRecentStreamsMenuController.h; sourceTree = "<group>"; };
+		7D6CCA6E2FBE1BA400088B47 /* VLCRecentStreamsMenuController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCRecentStreamsMenuController.m; sourceTree = "<group>"; };
 		7D713D302201AE350042BEB7 /* VLCLibraryWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindow.h; sourceTree = "<group>"; };
 		7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindow.m; sourceTree = "<group>"; };
 		7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryWindow.xib; sourceTree = "<group>"; };
@@ -1312,6 +1315,8 @@
 				7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */,
 				7DB40D2C20CBCEC200F63173 /* VLCStatusBarIcon.h */,
 				7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */,
+				7D6CCA6D2FBE1BA400088B47 /* VLCRecentStreamsMenuController.h */,
+				7D6CCA6E2FBE1BA400088B47 /* VLCRecentStreamsMenuController.m */,
 			);
 			path = menus;
 			sourceTree = "<group>";
@@ -2252,7 +2257,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 1;
@@ -2402,6 +2407,7 @@
 				53903D3A29576ED500D0B308 /* VLCLibraryAudioGroupDataSource.m in Sources */,
 				1C31139A1E508C6900D4DD76 /* VLCBookmarksWindowController.m in Sources */,
 				6B0AB0F01F1AC8B3003A1B4E /* VLCPlaybackProgressSlider.m in Sources */,
+				7D6CCA6F2FBE1BA400088B47 /* VLCRecentStreamsMenuController.m in Sources */,
 				53741A5A2DCA7B4C00E112CD /* VLCSnowEffectView.m in Sources */,
 				7D28E6362275B4820098D30E /* NSColor+VLCAdditions.m in Sources */,
 				534D28B42DB2B3C0006869CD /* NSTableCellView+VLCAdditions.m in Sources */,
@@ -2954,7 +2960,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,

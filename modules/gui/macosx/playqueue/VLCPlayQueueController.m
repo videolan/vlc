@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCPlayQueueController.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019-2025 VLC authors and VideoLAN
+ * Copyright (C) 2019-2026 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
  *
@@ -692,6 +692,25 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     /* Recent documents menu */
     if (url != nil && var_InheritBool(getIntf(), "macosx-recentitems"))
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL:url];
+
+    /* Recent Streams menu */
+    if (url != nil && !url.isFileURL) {
+        vlc_medialibrary_t *ml = vlc_ml_instance_get(getIntf());
+        if (ml != NULL) {
+            const char *psz_uri = uri.UTF8String;
+            vlc_ml_media_t * ml_media = vlc_ml_get_media_by_mrl(ml, psz_uri);
+            if (ml_media == NULL) {
+                // create new entry if we don't have it yet
+                ml_media = vlc_ml_new_stream(ml, psz_uri);
+            }
+            if (ml_media != NULL) {
+                vlc_ml_media_set_played(ml, ml_media->i_id, true);
+                vlc_ml_media_release(ml_media);
+            }
+        } else {
+            msg_Dbg(p_intf, "ML unavailable, won't remember stream");
+        }
+    }
 
     return p_input;
 }

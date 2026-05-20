@@ -1,7 +1,7 @@
 /*****************************************************************************
  *MainMenu.m: MacOS X interface module
  *****************************************************************************
- *Copyright (C) 2011-2019 Felix Paul Kühne
+ *Copyright (C) 2011-2026 Felix Paul Kühne
  *
  *Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
@@ -32,6 +32,7 @@
 
 #import "main/VLCMain.h"
 
+#import "menus/VLCRecentStreamsMenuController.h"
 #import "menus/renderers/VLCRendererMenuController.h"
 
 #import "panels/VLCAudioEffectsWindowController.h"
@@ -107,6 +108,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCPlayerController *_playerController;
     VLCPlayQueueSortingMenuController *_playQueueSortingController;
     VLCInformationWindowController *_infoWindowController;
+    VLCRecentStreamsMenuController *_recentStreamsMenuController;
 
     __strong VLCTimeSelectionPanelController *_timeSelectionPanel;
     __strong VLCCustomCropArWindowController *_customARController;
@@ -158,6 +160,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     _rendererMenuController.rendererMenu = _rendererMenu;
     _playQueueSortingController = [[VLCPlayQueueSortingMenuController alloc] init];
     _sortPlayQueue.submenu = _playQueueSortingController.playQueueSortingMenu;
+    _recentStreamsMenuController =
+        [[VLCRecentStreamsMenuController alloc] initWithSubmenu:_recent_streamsMenu];
 
     [self mediaItemChanged:nil];
     [self playbackStateChanged:nil];
@@ -353,6 +357,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_open_capture setTitle: _NS("Open Capture Device...")];
     [_connect_to_server setTitle: _NS("Connect to Server...")];
     [_open_recent setTitle: _NS("Open Recent")];
+    [_recent_streams setTitle: _NS("Recent Streams")];
     [_close_window setTitle: _NS("Close Window")];
     [_convertandsave setTitle: _NS("Convert / Stream...")];
     [_save_playlist setTitle: _NS("Save Playlist...")];
