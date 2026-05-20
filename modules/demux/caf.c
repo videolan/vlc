@@ -569,7 +569,7 @@ static int ProcessALACCookie( demux_t *p_demux, const uint8_t *p, uint64_t i_siz
         SetDWBE( p_extra + 8, 0 );
         memcpy( p_extra + 12, p, 24 );
     }
-    else
+    else if (i_size != 0)
     {
         memcpy( p_sys->fmt.p_extra, p, i_size );
     }
@@ -691,8 +691,10 @@ aac_kuki_finish:
     {
         return VLC_ENOMEM;
     }
-
-    memcpy( p_sys->fmt.p_extra, p + i_offset, i_kuki_size );
+    if ( i_kuki_size )
+    {
+        memcpy( p_sys->fmt.p_extra, p + i_offset, i_kuki_size );
+    }
 
     return VLC_SUCCESS;
 }
@@ -734,7 +736,10 @@ static int ReadKukiChunk( demux_t *p_demux, uint64_t i_size )
         {
             return VLC_ENOMEM;
         }
-        memcpy( p_sys->fmt.p_extra, p_peek, p_sys->fmt.i_extra );
+        if ( i_size != 0)
+        {
+            memcpy( p_sys->fmt.p_extra, p_peek, p_sys->fmt.i_extra );
+        }
     }
 
     return VLC_SUCCESS;
