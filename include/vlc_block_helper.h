@@ -277,7 +277,7 @@ typedef const uint8_t * (*block_startcode_helper_t)( const uint8_t *, const uint
 typedef bool (*block_startcode_matcher_t)( uint8_t, size_t, const uint8_t * );
 
 static inline int block_FindStartcodeFromOffset(
-    block_bytestream_t *p_bytestream, size_t *pi_offset,
+    const block_bytestream_t *p_bytestream, size_t *pi_offset,
     const uint8_t *p_startcode, int i_startcode_length,
     block_startcode_helper_t p_startcode_helper,
     block_startcode_matcher_t p_startcode_matcher )
