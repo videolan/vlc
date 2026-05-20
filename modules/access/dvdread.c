@@ -46,6 +46,7 @@
 #include <vlc_plugin.h>
 #include <vlc_arrays.h>
 #include <vlc_input.h>
+#include <vlc_charset.h>
 #include "disc_helper.h"
 
 extern const dvdread_ops_t DvdReadVideoOps;
