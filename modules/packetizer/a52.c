@@ -188,7 +188,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                     break;
                 }
 
-                block_SkipByte( &p_sys->bytestream );
+                (void) block_SkipByte( &p_sys->bytestream );
             }
             if( p_sys->i_state != STATE_SYNC )
             {

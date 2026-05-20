@@ -703,7 +703,7 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
                 p_sys->i_type = TYPE_LOAS;
                 break;
             }
-            block_SkipByte(&p_sys->bytestream);
+            (void) block_SkipByte(&p_sys->bytestream);
         }
         if (p_sys->i_state != STATE_SYNC) {
             block_BytestreamFlush(&p_sys->bytestream);
