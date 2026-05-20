@@ -315,7 +315,7 @@ static inline int block_FindStartcodeFromOffset(
         {
             /* Use optimized helper when possible */
             if( p_startcode_helper && !i_match &&
-               (p_block->i_buffer - i_offset) > (i_startcode_length - 1) )
+               (p_block->i_buffer - i_offset + 1) > i_startcode_length )
             {
                 const uint8_t *p_res = p_startcode_helper( &p_block->p_buffer[i_offset],
                                                            &p_block->p_buffer[p_block->i_buffer] );
@@ -325,7 +325,7 @@ static inline int block_FindStartcodeFromOffset(
                     return VLC_SUCCESS;
                 }
                 /* Then parsing boundary with legacy code */
-                i_offset = p_block->i_buffer - (i_startcode_length - 1);
+                i_offset = p_block->i_buffer + 1 - i_startcode_length;
             }
 
             bool b_matched = ( p_startcode_matcher )
