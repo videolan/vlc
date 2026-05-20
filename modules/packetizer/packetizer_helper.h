@@ -43,9 +43,9 @@ typedef int (*packetizer_validate_t)( void *p_private, block_t * );
 
 typedef struct
 {
-    int i_state;
     block_bytestream_t bytestream;
     size_t i_offset;
+    bool b_synched;
 
     size_t startcode_len;
     const uint8_t *p_startcode;
@@ -75,7 +75,7 @@ static inline void packetizer_Init( packetizer_t *p_pack,
                                     packetizer_drain_t pf_drain,
                                     void *p_private )
 {
-    p_pack->i_state = STATE_NOSYNC;
+    p_pack->b_synched = false;
     block_BytestreamInit( &p_pack->bytestream );
     p_pack->i_offset = 0;
 
@@ -100,7 +100,7 @@ static inline void packetizer_Clean( packetizer_t *p_pack )
 
 static inline void packetizer_Flush( packetizer_t *p_pack )
 {
-    p_pack->i_state = STATE_NOSYNC;
+    p_pack->b_synched = false;
     block_BytestreamEmpty( &p_pack->bytestream );
     p_pack->i_offset = 0;
     p_pack->pf_reset( p_pack->p_private, true );
@@ -123,7 +123,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         if( p_drained )
             return p_drained;
 
-        p_pack->i_state = STATE_NOSYNC;
+        p_pack->b_synched = false;
         block_BytestreamEmpty( &p_pack->bytestream );
         p_pack->i_offset = 0;
         p_pack->pf_reset( p_pack->p_private, false );
@@ -137,14 +137,13 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         bool b_used_ts;
         block_t *p_pic;
 
-        switch( p_pack->i_state )
+        if( !p_pack->b_synched )
         {
-        case STATE_NOSYNC:
             /* Find a startcode */
             if( !block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
                                                 p_pack->p_startcode, p_pack->startcode_len,
                                                 p_pack->pf_startcode_helper, NULL ) )
-                p_pack->i_state = STATE_NEXT_SYNC;
+                p_pack->b_synched = true;
 
             if( p_pack->i_offset )
             {
@@ -154,13 +153,14 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                 block_BytestreamFlush( &p_pack->bytestream );
             }
 
-            if( p_pack->i_state != STATE_NEXT_SYNC )
+            if( !p_pack->b_synched )
                 return NULL; /* Need more data */
 
             p_pack->i_offset = 1; /* To find next startcode */
             /* fallthrough */
+        }
 
-        case STATE_NEXT_SYNC:
+        {
             /* Find the next startcode */
             if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
                                                p_pack->p_startcode, p_pack->startcode_len,
@@ -188,7 +188,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
             p_pic = block_Alloc( p_pack->i_offset + p_pack->i_au_prepend );
             if( p_pic == NULL )
             {
-                p_pack->i_state = STATE_NOSYNC;
+                p_pack->b_synched = false;
                 return NULL;
             }
             p_pic->i_pts = p_block_bytestream->i_pts;
@@ -226,21 +226,21 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
             if( !p_pic )
             {
-                p_pack->i_state = STATE_NOSYNC;
-                break;
+                p_pack->b_synched = false;
+                continue;
             }
             if( p_pack->pf_validate( p_pack->p_private, p_pic ) )
             {
-                p_pack->i_state = STATE_NOSYNC;
+                p_pack->b_synched = false;
                 block_Release( p_pic );
-                break;
+                continue;
             }
 
             /* So p_block doesn't get re-added several times */
             if( pp_block )
                 *pp_block = block_BytestreamPop( &p_pack->bytestream );
 
-            p_pack->i_state = STATE_NOSYNC;
+            p_pack->b_synched = false;
 
             return p_pic;
         }
@@ -280,7 +280,7 @@ static inline void packetizer_Header( packetizer_t *p_pack,
     while( ( p_pic = packetizer_Packetize( p_pack, NULL ) ) )
         block_Release( p_pic );
 
-    p_pack->i_state = STATE_NOSYNC;
+    p_pack->b_synched = false;
     block_BytestreamEmpty( &p_pack->bytestream );
     p_pack->i_offset = 0;
 }
