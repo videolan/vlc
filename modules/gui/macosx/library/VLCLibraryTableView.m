@@ -91,26 +91,32 @@
             NSMutableArray.array;
         const id<VLCLibraryTableViewDataSource> vlcLibraryDataSource = 
             (id<VLCLibraryTableViewDataSource>)dataSource;
+        const VLCMediaLibraryParentGroupType parentType =
+            vlcLibraryDataSource.currentParentType;
+        const id<VLCMediaLibraryItemProtocol> parentItem =
+            [vlcLibraryDataSource respondsToSelector:@selector(parentItemForTableView:)]
+                ? [vlcLibraryDataSource parentItemForTableView:self]
+                : nil;
 
         if ([indices containsIndex:clickedRow]) {
             [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const __unused stop) {
                 const id<VLCMediaLibraryItemProtocol> mediaItem =
                     [vlcLibraryDataSource libraryItemAtRow:index forTableView:self];
-                const VLCMediaLibraryParentGroupType parentType =
-                    vlcLibraryDataSource.currentParentType;
                 VLCLibraryRepresentedItem * const representedItem =
                     [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem
-                                                         parentType:parentType];
+                                                         parentType:parentType
+                                                         parentItem:parentItem
+                                                   positionInParent:(NSInteger)index];
                 [representedItems addObject:representedItem];
             }];
         } else {
             const id<VLCMediaLibraryItemProtocol> mediaItem = 
                 [vlcLibraryDataSource libraryItemAtRow:clickedRow forTableView:self];
-            const VLCMediaLibraryParentGroupType parentType = 
-                vlcLibraryDataSource.currentParentType;
             VLCLibraryRepresentedItem * const representedItem = 
                 [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem
-                                                     parentType:parentType];
+                                                     parentType:parentType
+                                                     parentItem:parentItem
+                                               positionInParent:clickedRow];
             [representedItems addObject:representedItem];
         }
 

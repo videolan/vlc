@@ -51,8 +51,9 @@
     NSHashTable<NSMenuItem*> *_inputItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_localInputItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_folderInputItemRequiringMenuItems;
-    
+
     NSMenuItem *_deleteItem;
+    NSMenuItem *_removeFromPlaylistItem;
 }
 
 @property (readwrite) NSMenuItem *favoriteItem;
@@ -109,9 +110,15 @@
     NSMenuItem *createPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Create Playlist from Selection") action:@selector(createPlaylistFromSelection:) keyEquivalent:@""];
     createPlaylistItem.target = self;
 
+    _removeFromPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Remove from Playlist")
+                                                         action:@selector(removeFromPlaylist:)
+                                                  keyEquivalent:@""];
+    _removeFromPlaylistItem.target = self;
+
     [playItem vlc_setActionImageWithSystemSymbolName:@"play.fill"];
     [appendItem vlc_setActionImageWithSystemSymbolName:@"text.line.last.and.arrowtriangle.forward"];
     [createPlaylistItem vlc_setActionImageWithSystemSymbolName:@"music.note.list"];
+    [_removeFromPlaylistItem vlc_setActionImageWithSystemSymbolName:@"minus.circle"];
     [self.favoriteItem vlc_setActionImageWithSystemSymbolName:@"heart"];
     [bookmarkItem vlc_setActionImageWithSystemSymbolName:@"bookmark"];
     [addToLibraryItem vlc_setActionImageWithSystemSymbolName:@"plus.rectangle.on.folder"];
@@ -130,6 +137,7 @@
         bookmarkItem,
         addToLibraryItem,
         revealItem,
+        _removeFromPlaylistItem,
         _deleteItem,
         markUnseenItem,
         informationItem,
@@ -175,11 +183,25 @@
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     NSArray<VLCMediaLibraryMediaItem *> * const recents = libraryModel.listOfRecentMedia;
 
+    _removeFromPlaylistItem.hidden = YES;
+
     if (self.representedItems != nil && self.representedItems.count > 0) {
         [self menuItems:_inputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_localInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_folderInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
+
+        BOOL allInPlaylist = YES;
+        for (VLCLibraryRepresentedItem * const item in self.representedItems) {
+            if (item.parentType != VLCMediaLibraryParentGroupTypePlaylist ||
+                ![item.item isKindOfClass:VLCMediaLibraryMediaItem.class] ||
+                item.parentItem == nil ||
+                item.positionInParent == NSNotFound) {
+                allInPlaylist = NO;
+                break;
+            }
+        }
+        _removeFromPlaylistItem.hidden = !allInPlaylist;
 
         BOOL anyNonRecent = NO;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
@@ -228,6 +250,7 @@
 
     } else if (_representedInputItems != nil && self.representedInputItems.count > 0) {
         [self menuItems:_mediaItemRequiringMenuItems setHidden:YES];
+        _removeFromPlaylistItem.hidden = YES;
         [self menuItems:_inputItemRequiringMenuItems setHidden:NO];
 
         BOOL anyStream = NO;
@@ -314,6 +337,29 @@
     if (mediaItems.count > 0) {
         [VLCMain.sharedInstance.libraryController showCreatePlaylistDialogForMediaItems:mediaItems];
     }
+}
+
+- (void)removeFromPlaylist:(id)sender
+{
+    if (self.representedItems.count == 0) {
+        return;
+    }
+
+    VLCMediaLibraryPlaylist * const playlist =
+        (VLCMediaLibraryPlaylist *)self.representedItems.firstObject.parentItem;
+    if (![playlist isKindOfClass:VLCMediaLibraryPlaylist.class]) {
+        return;
+    }
+
+    NSMutableArray<NSNumber *> * const positions =
+        [NSMutableArray arrayWithCapacity:self.representedItems.count];
+    for (VLCLibraryRepresentedItem * const repItem in self.representedItems) {
+        if (repItem.positionInParent != NSNotFound) {
+            [positions addObject:@(repItem.positionInParent)];
+        }
+    }
+
+    [playlist removeMediaItemsAtPositions:positions];
 }
 
 - (void)addMedia:(id)sender

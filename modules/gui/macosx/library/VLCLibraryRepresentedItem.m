@@ -50,10 +50,20 @@
 - (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
                   parentType:(const VLCMediaLibraryParentGroupType)parentType
 {
+    return [self initWithItem:item parentType:parentType parentItem:nil positionInParent:NSNotFound];
+}
+
+- (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
+                  parentType:(const VLCMediaLibraryParentGroupType)parentType
+                  parentItem:(nullable const id<VLCMediaLibraryItemProtocol>)parentItem
+            positionInParent:(NSInteger)positionInParent
+{
     self = [self init];
     if (self) {
         _item = item;
         _parentType = parentType;
+        _parentItem = parentItem;
+        _positionInParent = positionInParent;
         _mediaType = item.firstMediaItem.mediaType;
     }
     return self;
@@ -71,10 +81,15 @@
 - (void)setup
 {
     _itemIndexInParent = NSNotFound;
+    _positionInParent = NSNotFound;
 }
 
 - (NSInteger)itemIndexInParent
 {
+    if (_parentItem != nil && _positionInParent != NSNotFound) {
+        return _positionInParent;
+    }
+
     @synchronized(self) {
         if (_itemIndexInParent == NSNotFound) {
             _itemIndexInParent = [self findItemIndexInParent];
@@ -88,7 +103,9 @@
 {
     NSArray<VLCMediaLibraryMediaItem *> * items = nil;
 
-    if (self.parentType == VLCMediaLibraryParentGroupTypeUnknown) {
+    if (self.parentItem != nil) {
+        items = self.parentItem.mediaItems;
+    } else if (self.parentType == VLCMediaLibraryParentGroupTypeUnknown) {
         VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
         const BOOL isVideo = self.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
         items = isVideo ? libraryModel.listOfVideoMedia : libraryModel.listOfAudioMedia;
@@ -192,6 +209,10 @@
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)parentMediaArrayForItem:(const id<VLCMediaLibraryItemProtocol>)item
 {
+    if (self.parentItem != nil) {
+        return self.parentItem.mediaItems;
+    }
+
     if (self.parentType == VLCMediaLibraryParentGroupTypeAllFavorites) {
         VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
         return [libraryModel listOfMediaItemsForParentType:self.parentType];

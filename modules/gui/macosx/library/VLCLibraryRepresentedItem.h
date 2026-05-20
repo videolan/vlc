@@ -36,10 +36,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSArray<VLCMediaLibraryMediaItem *> *parentMediaArray;
 // If unknown, will always default to individual play mode
 @property (readonly) VLCMediaLibraryParentGroupType parentType;
+// Optional explicit parent (e.g. the containing playlist)
+@property (readonly, nullable) id<VLCMediaLibraryItemProtocol> parentItem;
 @property (readonly) NSInteger itemIndexInParent;
+// Required for playlists where libraryID lookup collapses duplicate items
+@property (readonly) NSInteger positionInParent;
 
 - (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
                   parentType:(const VLCMediaLibraryParentGroupType)parentType;
+- (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
+                  parentType:(const VLCMediaLibraryParentGroupType)parentType
+                  parentItem:(nullable const id<VLCMediaLibraryItemProtocol>)parentItem
+            positionInParent:(NSInteger)positionInParent;
 
 - (void)play;
 - (void)queue;

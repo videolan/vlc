@@ -99,7 +99,18 @@ const CGFloat VLCLibraryInternalMediaItemRowHeight = 40.;
 
 - (VLCMediaLibraryParentGroupType)currentParentType
 {
+    if ([self.internalItem isKindOfClass:VLCMediaLibraryPlaylist.class]) {
+        return VLCMediaLibraryParentGroupTypePlaylist;
+    }
     return VLCMediaLibraryParentGroupTypeAlbum;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)parentItemForTableView:(NSTableView *)tableView
+{
+    if ([self.internalItem isKindOfClass:VLCMediaLibraryPlaylist.class]) {
+        return self.internalItem;
+    }
+    return nil;
 }
 
 @end

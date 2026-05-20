@@ -142,18 +142,31 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 - (void)reloadViewsAtIndex:(NSUInteger)index
           dueToCacheAction:(VLCLibraryDataSourceCacheAction)action
 {
+    NSTableView * const masterTableView = self.masterTableView;
+    NSTableView * const detailTableView = self.detailTableView;
     NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:index];
+    const NSInteger selectedMasterRow = masterTableView.selectedRow;
+    const BOOL affectsSelectedDetail =
+        detailTableView != nil && (NSInteger)index == selectedMasterRow;
+
     switch (action) {
-        case VLCLibraryDataSourceCacheUpdateAction:
-            [self.masterTableView reloadDataForRowIndexes:indexSet
-                                            columnIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.masterTableView.numberOfColumns)]];
+        case VLCLibraryDataSourceCacheUpdateAction: {
+            NSIndexSet * const columnSet =
+                [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, masterTableView.numberOfColumns)];
+            [masterTableView reloadDataForRowIndexes:indexSet columnIndexes:columnSet];
             break;
+        }
         case VLCLibraryDataSourceCacheDeleteAction:
-            [self.masterTableView removeRowsAtIndexes:indexSet
-                                       withAnimation:NSTableViewAnimationEffectNone];
+            [masterTableView removeRowsAtIndexes:indexSet
+                                   withAnimation:NSTableViewAnimationEffectNone];
             break;
         default:
             NSAssert(false, @"Invalid playlist cache action");
+    }
+
+    if (affectsSelectedDetail) {
+        [detailTableView reloadData];
+        [self updateHeaderInTableView:detailTableView forMasterSelection:masterTableView];
     }
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
@@ -381,6 +394,20 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (VLCMediaLibraryParentGroupType)currentParentType
 {
     return VLCMediaLibraryParentGroupTypePlaylist;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)parentItemForTableView:(NSTableView *)tableView
+{
+    if (tableView != self.detailTableView) {
+        return nil;
+    }
+
+    const NSInteger selectedRow = self.masterTableView.selectedRow;
+    if (selectedRow < 0 || selectedRow >= self.playlists.count) {
+        return nil;
+    }
+
+    return self.playlists[selectedRow];
 }
 
 - (NSString *)supplementaryDetailViewKind
