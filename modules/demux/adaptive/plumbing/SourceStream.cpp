@@ -235,7 +235,7 @@ ssize_t BufferedChunksSourceStream::Read(uint8_t *buf, size_t i_toread)
         const size_t i_drop = i_bytestream_offset - MAX_BACKEND;
         if(i_drop >= MIN_BACKEND_CLEANUP) /* Dont flush for few bytes */
         {
-            block_GetBytes(&bs, nullptr, i_drop);
+            block_SkipBytes(&bs, i_drop);
             block_BytestreamFlush(&bs);
             i_bytestream_offset -= i_drop;
             i_global_offset += i_drop;
