@@ -555,7 +555,7 @@ static int ProcessALACCookie( demux_t *p_demux, const uint8_t *p, uint64_t i_siz
 
     free(p_sys->fmt.p_extra);
     p_sys->fmt.i_extra = i_extra;
-    p_sys->fmt.p_extra = malloc( i_extra );
+    p_sys->fmt.p_extra = i_extra == 0 ? NULL : malloc( i_extra );
 
     if( i_extra && !p_sys->fmt.p_extra )
         return VLC_ENOMEM;
@@ -685,7 +685,7 @@ aac_kuki_finish:
 
     free(p_sys->fmt.p_extra);
     p_sys->fmt.i_extra = i_kuki_size;
-    p_sys->fmt.p_extra = malloc( i_kuki_size );
+    p_sys->fmt.p_extra = i_kuki_size == 0 ? NULL : malloc( i_kuki_size );
 
     if( i_kuki_size && !p_sys->fmt.p_extra )
     {
@@ -728,7 +728,7 @@ static int ReadKukiChunk( demux_t *p_demux, uint64_t i_size )
     {
         free(p_sys->fmt.p_extra);
         p_sys->fmt.i_extra = i_size;
-        p_sys->fmt.p_extra = malloc( i_size );
+        p_sys->fmt.p_extra = i_size == 0 ? NULL : malloc( i_size );
 
         if( i_size && !p_sys->fmt.p_extra )
         {
