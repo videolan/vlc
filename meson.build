@@ -56,7 +56,7 @@ vlc_about = custom_target('vlc_about.h',
 cargo_rustc_static_libs = find_program('buildsystem/cargo-rustc-static-libs.py')
 cargo_output = find_program('buildsystem/cargo-output.py')
 
-add_project_arguments('-DHAVE_CONFIG_H=1', language: ['c', 'cpp', 'objc'])
+add_project_arguments('-DHAVE_CONFIG_H=1', language: ['c', 'cpp', 'objc', 'objcpp'])
 
 # If building with contribs, read the relevant paths from the machine file
 # to use it during checks (check_header, find_library) later.
@@ -104,6 +104,7 @@ endif
 
 if host_system == 'darwin'
     add_languages('objc', native: false)
+    add_languages('objcpp', native: false)
 endif
 
 if host_system == 'os/2'
@@ -523,7 +524,7 @@ add_project_arguments(cpp.get_supported_arguments([
     '-Wformat-security',
     '-Wduplicated-branches',
     '-Wduplicated-cond',
-]), language: ['cpp'])
+]), language: ['cpp', 'objcpp'])
 
 if get_option('extra_checks')
     add_project_arguments(cc.get_supported_arguments([
@@ -543,7 +544,7 @@ if get_option('extra_checks')
         '-Werror=format',
         '-Werror=excess-initializers',
         '-Werror=unterminated-string-initialization',
-    ]), language: ['cpp'])
+    ]), language: ['cpp', 'objcpp'])
 endif
 
 if get_option('branch_protection') \
