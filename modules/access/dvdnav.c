@@ -632,7 +632,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
 
             case DEMUX_SET_POSITION:
-                pos = va_arg( args, double ) * len;
+            {
+                const double f = va_arg( args, double );
+                if( p_sys->i_pgc_length > 0 &&
+                    dvdnav_jump_to_sector_by_time( p_sys->dvdnav,
+                        TO_SCALE_NZ((vlc_tick_t)( f * p_sys->i_pgc_length )),
+                        SEEK_SET ) == DVDNAV_STATUS_OK )
+                    return VLC_SUCCESS;
+                pos = (uint32_t)( f * len );
                 if( dvdnav_sector_search( p_sys->dvdnav, pos, SEEK_SET ) ==
                       DVDNAV_STATUS_OK )
                 {
@@ -640,6 +647,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 RandomAccessCleanup( p_sys );
                 break;
+            }
 
             case DEMUX_GET_LENGTH:
                 if( p_sys->i_pgc_length > 0 )
