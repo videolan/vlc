@@ -132,6 +132,50 @@ static uint32_t DvdReadTimeToSeekOffset( const demux_sys_t *p_sys, vlc_tick_t ti
     return i_block_offset;
 }
 
+static uint32_t DvdReadCellAwareBlock( const demux_sys_t *p_sys,
+                                       uint32_t i_block_offset )
+{
+    const pgc_t *p_pgc = p_sys->p_cur_pgc;
+    if( !p_pgc || !p_pgc->cell_playback ||
+        p_sys->i_title_start_cell > p_sys->i_title_end_cell ||
+        p_sys->i_title_blocks == 0 )
+        return i_block_offset;
+
+    const vlc_tick_t length = DvdReadVideoTitleDuration( p_sys );
+    vlc_tick_t product;
+    if( ckd_mul( &product, i_block_offset, length ) )
+        return i_block_offset;
+    const vlc_tick_t t = product / p_sys->i_title_blocks;
+
+    vlc_tick_t acc = 0;
+    uint32_t block_acc = 0;
+    for( int ci = p_sys->i_title_start_cell; ci <= p_sys->i_title_end_cell; ci++ )
+    {
+        const cell_playback_t *cell = &p_pgc->cell_playback[ci];
+        const vlc_tick_t dur = dvdtime_to_time( &cell->playback_time );
+        if( dur == 0 )
+            continue;
+        const uint32_t blocks = cell->last_sector - cell->first_sector + 1;
+
+        vlc_tick_t next_acc;
+        uint32_t next_block_acc;
+        if( ckd_add( &next_acc, acc, dur ) ||
+            ckd_add( &next_block_acc, block_acc, blocks ) )
+            return i_block_offset;
+
+        if( next_acc > t )
+        {
+            vlc_tick_t scaled;
+            if( !ckd_mul( &scaled, t - acc, blocks ) )
+                return block_acc + (uint32_t)( scaled / dur );
+            return i_block_offset;
+        }
+        acc = next_acc;
+        block_acc = next_block_acc;
+    }
+    return i_block_offset;
+}
+
 static int DvdReadPsSource( void )
 {
     return PS_SOURCE_VOB;
@@ -331,6 +375,8 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
     uint32_t i_block;
     const pgc_t *p_pgc = p_sys->p_cur_pgc;
     const ifo_handle_t *p_vts = p_sys->p_vts_file;
+
+    i_block_offset = DvdReadCellAwareBlock( p_sys, i_block_offset );
 
     /* Find cell */
     i_block = i_block_offset;
