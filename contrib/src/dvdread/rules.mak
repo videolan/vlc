@@ -1,7 +1,7 @@
 # DVDREAD
 LIBDVDREAD_VERSION := 7.0.1
 LIBDVDREAD_URL := $(VIDEOLAN)/libdvdread/$(LIBDVDREAD_VERSION)/libdvdread-$(LIBDVDREAD_VERSION).tar.xz
-LIBDVDREAD_GITURL:=https://code.videolan.org/videolan/libdvdread.git
+LIBDVDREAD_GITURL:=$(VIDEOLAN_GIT)/videolan/libdvdread.git
 LIBDVDREAD_BRANCH:=master
 LIBDVDREAD_GITVERSION:=fd8a73304597dc3a4fc187d0dd0cfb50af8f0a2d
 

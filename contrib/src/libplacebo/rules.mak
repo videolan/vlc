@@ -2,7 +2,7 @@
 
 PLACEBO_VERSION := 5.264.1
 PLACEBO_ARCHIVE = libplacebo-v$(PLACEBO_VERSION).tar.gz
-PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
+PLACEBO_URL := $(VIDEOLAN_GIT)/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
 
 PLACEBOCONF := -Dpython-path=$(PYTHON_VENV)/bin/python3 \
 	-Dglslang=enabled \

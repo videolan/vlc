@@ -2,7 +2,7 @@
 
 X264_HASH := 3a21e97bf23676a0bf4616df8bc2207c9fd7b1d3
 X264_VERSION := $(X264_HASH)
-X264_GITURL := https://code.videolan.org/videolan/x264.git
+X264_GITURL := $(VIDEOLAN_GIT)/videolan/x264.git
 
 ifdef BUILD_ENCODERS
 ifdef GPL

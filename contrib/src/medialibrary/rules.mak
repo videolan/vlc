@@ -1,5 +1,5 @@
 MEDIALIBRARY_VERSION := 0.13.2
-MEDIALIBRARY_URL := https://code.videolan.org/videolan/medialibrary/-/archive/$(MEDIALIBRARY_VERSION)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2
+MEDIALIBRARY_URL := $(VIDEOLAN_GIT)/videolan/medialibrary/-/archive/$(MEDIALIBRARY_VERSION)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2
 
 PKGS += medialibrary
 ifeq ($(call need_pkg,"medialibrary >= 0.13.0"),)
@@ -22,4 +22,3 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2 .sum-medialibrary
 	$(MESON) -Dlibvlc=disabled -Dlibtool_workaround=true
 	+$(MESONBUILD)
 	touch $@
-
