@@ -157,11 +157,9 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                 p_pack->i_offset = 0;
                 block_BytestreamFlush( &p_pack->bytestream );
             }
-
-            p_pack->i_offset = 1; /* To find next startcode */
         }
 
-        size_t block_size = p_pack->i_offset;
+        size_t block_size = p_pack->i_offset + p_pack->startcode_len;
         /* Find the next startcode */
         if( block_FindStartcodeFromOffset( &p_pack->bytestream, &block_size,
                                            p_pack->p_startcode, p_pack->startcode_len,
