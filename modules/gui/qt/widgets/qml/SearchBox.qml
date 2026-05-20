@@ -38,7 +38,6 @@ FocusScope {
 
     function expandAndFocus() {
         expandedState.state = "expanded"
-        textField.forceActiveFocus(Qt.ShortcutFocusReason)
     }
 
     StateGroup {
@@ -80,6 +79,13 @@ FocusScope {
         transitions: Transition {
             from: ""; to: "expanded"
             reversible: true
+
+            onRunningChanged: {
+                // By forcing focus at the end of the transition, we avoid showing the caret
+                // momentarily outside the text field before the text field is fully expanded
+                if (!running && expandedState.state === "expanded")
+                    textField.forceActiveFocus(Qt.ShortcutFocusReason)
+            }
 
             NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
         }
