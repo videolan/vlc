@@ -285,7 +285,8 @@ static inline int block_FindStartcodeFromOffset(
     block_t *p_block, *p_block_backup = 0;
     ssize_t i_size = 0;
     size_t i_offset, i_offset_backup = 0;
-    int i_caller_offset_backup = 0, i_match;
+    size_t i_caller_offset_backup = 0;
+    int i_match;
 
     /* Find the right place */
     i_size = *pi_offset + p_bytestream->i_block_offset;
