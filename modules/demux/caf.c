@@ -553,6 +553,7 @@ static int ProcessALACCookie( demux_t *p_demux, const uint8_t *p, uint64_t i_siz
         i_extra = i_size;
     }
 
+    free(p_sys->fmt.p_extra);
     p_sys->fmt.i_extra = i_extra;
     p_sys->fmt.p_extra = malloc( i_extra );
 
@@ -682,6 +683,7 @@ aac_kuki_finish:
         i_offset = 0;
     }
 
+    free(p_sys->fmt.p_extra);
     p_sys->fmt.i_extra = i_kuki_size;
     p_sys->fmt.p_extra = malloc( i_kuki_size );
 
@@ -724,6 +726,7 @@ static int ReadKukiChunk( demux_t *p_demux, uint64_t i_size )
     }
     else if( p_sys->fmt.i_codec != 0 )
     {
+        free(p_sys->fmt.p_extra);
         p_sys->fmt.i_extra = i_size;
         p_sys->fmt.p_extra = malloc( i_size );
 
