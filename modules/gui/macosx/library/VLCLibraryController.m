@@ -361,24 +361,20 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
     if (!_p_libraryInstance || !playlistName || playlistName.length == 0) {
         return NO;
     }
-    
+
     vlc_ml_playlist_t * const playlist = vlc_ml_playlist_create(_p_libraryInstance, playlistName.UTF8String);
     if (!playlist) {
         msg_Err(getIntf(), "Failed to create playlist with name: %s", playlistName.UTF8String);
         return NO;
     }
-    
+
     const int64_t playlistId = playlist->i_id;
     vlc_ml_playlist_release(playlist);
-    
-    for (VLCMediaLibraryMediaItem * const mediaItem in mediaItems) {
-        const int64_t mediaId = mediaItem.libraryID;
-        const int result = vlc_ml_playlist_append(_p_libraryInstance, playlistId, &mediaId, 1);
-        if (result != VLC_SUCCESS) {
-            msg_Warn(getIntf(), "Failed to add media library item %lld to playlist", mediaItem.libraryID);
-        }
-    }
-    
+
+    VLCMediaLibraryPlaylist * const mlPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlistId];
+    [mlPlaylist appendMediaItems:mediaItems];
+
     return YES;
 }
 

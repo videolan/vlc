@@ -27,6 +27,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryAddToPlaylistMenuController.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
@@ -54,6 +55,9 @@
 
     NSMenuItem *_deleteItem;
     NSMenuItem *_removeFromPlaylistItem;
+
+    VLCLibraryAddToPlaylistMenuController *_addToPlaylistMenuController;
+    NSMenuItem *_addToPlaylistItem;
 }
 
 @property (readwrite) NSMenuItem *favoriteItem;
@@ -107,8 +111,11 @@
     _favoriteItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Favorite") action:@selector(toggleFavorite:) keyEquivalent:@""];
     self.favoriteItem.target = self;
 
-    NSMenuItem *createPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Create Playlist from Selection") action:@selector(createPlaylistFromSelection:) keyEquivalent:@""];
-    createPlaylistItem.target = self;
+    _addToPlaylistMenuController = [[VLCLibraryAddToPlaylistMenuController alloc] init];
+    _addToPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Add to Playlist")
+                                                    action:nil
+                                             keyEquivalent:@""];
+    [_addToPlaylistItem setSubmenu:_addToPlaylistMenuController.addToPlaylistMenu];
 
     _removeFromPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Remove from Playlist")
                                                          action:@selector(removeFromPlaylist:)
@@ -117,7 +124,7 @@
 
     [playItem vlc_setActionImageWithSystemSymbolName:@"play.fill"];
     [appendItem vlc_setActionImageWithSystemSymbolName:@"text.line.last.and.arrowtriangle.forward"];
-    [createPlaylistItem vlc_setActionImageWithSystemSymbolName:@"music.note.list"];
+    [_addToPlaylistItem vlc_setActionImageWithSystemSymbolName:@"text.badge.plus"];
     [_removeFromPlaylistItem vlc_setActionImageWithSystemSymbolName:@"minus.circle"];
     [self.favoriteItem vlc_setActionImageWithSystemSymbolName:@"heart"];
     [bookmarkItem vlc_setActionImageWithSystemSymbolName:@"bookmark"];
@@ -132,7 +139,7 @@
     [_libraryMenu addMenuItemsFromArray:@[
         playItem,
         appendItem,
-        createPlaylistItem,
+        _addToPlaylistItem,
         self.favoriteItem,
         bookmarkItem,
         addToLibraryItem,
@@ -141,14 +148,14 @@
         _deleteItem,
         markUnseenItem,
         informationItem,
-        [NSMenuItem separatorItem], 
+        [NSMenuItem separatorItem],
         addItem
     ]];
 
     _mediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_mediaItemRequiringMenuItems addObject:playItem];
     [_mediaItemRequiringMenuItems addObject:appendItem];
-    [_mediaItemRequiringMenuItems addObject:createPlaylistItem];
+    [_mediaItemRequiringMenuItems addObject:_addToPlaylistItem];
     [_mediaItemRequiringMenuItems addObject:self.favoriteItem];
     [_mediaItemRequiringMenuItems addObject:revealItem];
     [_mediaItemRequiringMenuItems addObject:_deleteItem];
@@ -323,22 +330,6 @@
     }
 }
 
-- (void)createPlaylistFromSelection:(id)sender
-{
-    if (self.representedItems == nil || self.representedItems.count == 0) {
-        return;
-    }
-    
-    NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [NSMutableArray arrayWithCapacity:self.representedItems.count];
-    for (VLCLibraryRepresentedItem * const representedItem in self.representedItems) {
-        [mediaItems addObjectsFromArray:representedItem.item.mediaItems];
-    }
-    
-    if (mediaItems.count > 0) {
-        [VLCMain.sharedInstance.libraryController showCreatePlaylistDialogForMediaItems:mediaItems];
-    }
-}
-
 - (void)removeFromPlaylist:(id)sender
 {
     if (self.representedItems.count == 0) {
@@ -499,6 +490,7 @@
 {
     _representedItems = items;
     _representedInputItems = nil;
+    _addToPlaylistMenuController.representedItems = items;
     [self updateMenuItems];
 }
 
@@ -506,6 +498,7 @@
 {
     _representedInputItems = representedInputItems;
     _representedItems = nil;
+    _addToPlaylistMenuController.representedItems = nil;
     [self updateMenuItems];
 }
 

@@ -148,6 +148,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryAbstractMediaLibrarySegmentViewController.m \
 	gui/macosx/library/VLCLibraryAbstractSegmentViewController.h \
 	gui/macosx/library/VLCLibraryAbstractSegmentViewController.m \
+	gui/macosx/library/VLCLibraryAddToPlaylistMenuController.h \
+	gui/macosx/library/VLCLibraryAddToPlaylistMenuController.m \
 	gui/macosx/library/VLCLibraryCarouselViewItemView.h \
 	gui/macosx/library/VLCLibraryCarouselViewItemView.m \
 	gui/macosx/library/VLCLibraryCollectionView.h \

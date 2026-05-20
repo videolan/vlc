@@ -289,6 +289,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 - (instancetype)initWithPlaylist:(const struct vlc_ml_playlist_t * const)p_playlist;
 
 - (void)removeMediaItemsAtPositions:(NSArray<NSNumber *> *)positions;
+- (BOOL)appendMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems;
 
 @end
 
