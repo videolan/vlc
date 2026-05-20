@@ -47,7 +47,7 @@ typedef struct
     block_bytestream_t bytestream;
     size_t i_offset;
 
-    int i_startcode;
+    size_t startcode_len;
     const uint8_t *p_startcode;
     block_startcode_helper_t pf_startcode_helper;
 
@@ -65,7 +65,7 @@ typedef struct
 } packetizer_t;
 
 static inline void packetizer_Init( packetizer_t *p_pack,
-                                    const uint8_t *p_startcode, int i_startcode,
+                                    const uint8_t *p_startcode, size_t i_startcode,
                                     block_startcode_helper_t pf_start_helper,
                                     const uint8_t *p_au_prepend, int i_au_prepend,
                                     unsigned i_au_min_size,
@@ -83,7 +83,7 @@ static inline void packetizer_Init( packetizer_t *p_pack,
     p_pack->p_au_prepend = p_au_prepend;
     p_pack->i_au_min_size = i_au_min_size;
 
-    p_pack->i_startcode = i_startcode;
+    p_pack->startcode_len = i_startcode;
     p_pack->p_startcode = p_startcode;
     p_pack->pf_startcode_helper = pf_start_helper;
     p_pack->pf_reset = pf_reset;
@@ -142,7 +142,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         case STATE_NOSYNC:
             /* Find a startcode */
             if( !block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
-                                                p_pack->p_startcode, p_pack->i_startcode,
+                                                p_pack->p_startcode, p_pack->startcode_len,
                                                 p_pack->pf_startcode_helper, NULL ) )
                 p_pack->i_state = STATE_NEXT_SYNC;
 
@@ -163,7 +163,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         case STATE_NEXT_SYNC:
             /* Find the next startcode */
             if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
-                                               p_pack->p_startcode, p_pack->i_startcode,
+                                               p_pack->p_startcode, p_pack->startcode_len,
                                                p_pack->pf_startcode_helper, NULL ) )
             {
                 if( pp_block /* not draining */ || !p_pack->bytestream.p_chain )
@@ -175,7 +175,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                 if( p_pack->i_offset == 0 )
                     return NULL;
 
-                if( p_pack->i_offset <= (size_t)p_pack->i_startcode &&
+                if( p_pack->i_offset <= p_pack->startcode_len &&
                     (p_pack->bytestream.p_block->i_flags & BLOCK_FLAG_AU_END) == 0 )
                     return NULL;
             }
