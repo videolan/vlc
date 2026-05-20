@@ -827,10 +827,10 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
         p_buf = p_out_buffer->p_buffer;
 
         /* Skip the ADTS/LOAS header */
-        block_SkipBytes(&p_sys->bytestream, p_sys->i_header_size);
+        (void) block_SkipBytes(&p_sys->bytestream, p_sys->i_header_size);
 
         /* Copy the whole frame into the buffer */
-        block_GetBytes(&p_sys->bytestream, p_buf, p_sys->i_frame_size);
+        (void) block_GetBytes(&p_sys->bytestream, p_buf, p_sys->i_frame_size);
         if (p_sys->i_type != TYPE_ADTS) { /* parse/extract the whole frame */
             assert(p_sys->i_type == TYPE_LOAS);
             p_out_buffer->i_buffer = LOASParse(p_dec, p_buf, p_sys->i_frame_size);
