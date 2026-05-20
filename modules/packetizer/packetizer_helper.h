@@ -157,93 +157,90 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                 return NULL; /* Need more data */
 
             p_pack->i_offset = 1; /* To find next startcode */
-            /* fallthrough */
         }
 
+        /* Find the next startcode */
+        if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
+                                           p_pack->p_startcode, p_pack->startcode_len,
+                                           p_pack->pf_startcode_helper, NULL ) )
         {
-            /* Find the next startcode */
-            if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
-                                               p_pack->p_startcode, p_pack->startcode_len,
-                                               p_pack->pf_startcode_helper, NULL ) )
-            {
-                if( pp_block /* not draining */ || !p_pack->bytestream.p_chain )
-                    return NULL; /* Need more data */
+            if( pp_block /* not draining */ || !p_pack->bytestream.p_chain )
+                return NULL; /* Need more data */
 
-                /* When draining and we don't find a second startcode, suppose that
-                 * the data extend up to the end of the bytestream */
-                p_pack->i_offset = block_BytestreamRemaining(&p_pack->bytestream);
-                if( p_pack->i_offset == 0 )
-                    return NULL;
-
-                if( p_pack->i_offset <= p_pack->startcode_len &&
-                    (p_pack->bytestream.p_block->i_flags & BLOCK_FLAG_AU_END) == 0 )
-                    return NULL;
-            }
-
-            block_BytestreamFlush( &p_pack->bytestream );
-
-            /* Get the new fragment and set the pts/dts */
-            block_t *p_block_bytestream = p_pack->bytestream.p_block;
-
-            p_pic = block_Alloc( p_pack->i_offset + p_pack->i_au_prepend );
-            if( p_pic == NULL )
-            {
-                p_pack->b_synched = false;
+            /* When draining and we don't find a second startcode, suppose that
+             * the data extend up to the end of the bytestream */
+            p_pack->i_offset = block_BytestreamRemaining(&p_pack->bytestream);
+            if( p_pack->i_offset == 0 )
                 return NULL;
-            }
-            p_pic->i_pts = p_block_bytestream->i_pts;
-            p_pic->i_dts = p_block_bytestream->i_dts;
 
-            /* Do not wait for next sync code if notified block ends AU */
-            if( (p_block_bytestream->i_flags & BLOCK_FLAG_AU_END) &&
-                 p_block_bytestream->i_buffer == p_pack->i_offset )
-            {
-                p_pic->i_flags |= BLOCK_FLAG_AU_END;
-            }
-
-            block_GetBytes( &p_pack->bytestream, &p_pic->p_buffer[p_pack->i_au_prepend],
-                            p_pic->i_buffer - p_pack->i_au_prepend );
-            if( p_pack->i_au_prepend > 0 )
-                memcpy( p_pic->p_buffer, p_pack->p_au_prepend, p_pack->i_au_prepend );
-
-            p_pack->i_offset = 0;
-
-            /* Parse the NAL */
-            if( p_pic->i_buffer < p_pack->i_au_min_size )
-            {
-                block_Release( p_pic );
-                p_pic = NULL;
-            }
-            else
-            {
-                p_pic = p_pack->pf_parse( p_pack->p_private, &b_used_ts, p_pic );
-                if( b_used_ts )
-                {
-                    p_block_bytestream->i_dts = VLC_TICK_INVALID;
-                    p_block_bytestream->i_pts = VLC_TICK_INVALID;
-                }
-            }
-
-            if( !p_pic )
-            {
-                p_pack->b_synched = false;
-                continue;
-            }
-            if( p_pack->pf_validate( p_pack->p_private, p_pic ) )
-            {
-                p_pack->b_synched = false;
-                block_Release( p_pic );
-                continue;
-            }
-
-            /* So p_block doesn't get re-added several times */
-            if( pp_block )
-                *pp_block = block_BytestreamPop( &p_pack->bytestream );
-
-            p_pack->b_synched = false;
-
-            return p_pic;
+            if( p_pack->i_offset <= p_pack->startcode_len &&
+                (p_pack->bytestream.p_block->i_flags & BLOCK_FLAG_AU_END) == 0 )
+                return NULL;
         }
+
+        block_BytestreamFlush( &p_pack->bytestream );
+
+        /* Get the new fragment and set the pts/dts */
+        block_t *p_block_bytestream = p_pack->bytestream.p_block;
+
+        p_pic = block_Alloc( p_pack->i_offset + p_pack->i_au_prepend );
+        if( p_pic == NULL )
+        {
+            p_pack->b_synched = false;
+            return NULL;
+        }
+        p_pic->i_pts = p_block_bytestream->i_pts;
+        p_pic->i_dts = p_block_bytestream->i_dts;
+
+        /* Do not wait for next sync code if notified block ends AU */
+        if( (p_block_bytestream->i_flags & BLOCK_FLAG_AU_END) &&
+             p_block_bytestream->i_buffer == p_pack->i_offset )
+        {
+            p_pic->i_flags |= BLOCK_FLAG_AU_END;
+        }
+
+        block_GetBytes( &p_pack->bytestream, &p_pic->p_buffer[p_pack->i_au_prepend],
+                        p_pic->i_buffer - p_pack->i_au_prepend );
+        if( p_pack->i_au_prepend > 0 )
+            memcpy( p_pic->p_buffer, p_pack->p_au_prepend, p_pack->i_au_prepend );
+
+        p_pack->i_offset = 0;
+
+        /* Parse the NAL */
+        if( p_pic->i_buffer < p_pack->i_au_min_size )
+        {
+            block_Release( p_pic );
+            p_pic = NULL;
+        }
+        else
+        {
+            p_pic = p_pack->pf_parse( p_pack->p_private, &b_used_ts, p_pic );
+            if( b_used_ts )
+            {
+                p_block_bytestream->i_dts = VLC_TICK_INVALID;
+                p_block_bytestream->i_pts = VLC_TICK_INVALID;
+            }
+        }
+
+        if( !p_pic )
+        {
+            p_pack->b_synched = false;
+            continue;
+        }
+        if( p_pack->pf_validate( p_pack->p_private, p_pic ) )
+        {
+            p_pack->b_synched = false;
+            block_Release( p_pic );
+            continue;
+        }
+
+        /* So p_block doesn't get re-added several times */
+        if( pp_block )
+            *pp_block = block_BytestreamPop( &p_pack->bytestream );
+
+        p_pack->b_synched = false;
+
+        return p_pic;
     }
 }
 
