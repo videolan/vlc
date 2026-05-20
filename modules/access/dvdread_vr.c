@@ -119,7 +119,7 @@ static uint32_t DvdVRReadTimeToVobuOffset( const demux_sys_t *p_sys, vlc_tick_t 
         const vlc_tick_t dur = DvdVRProgramDuration( pgi );
         if( dur == 0 )
             continue;
-        if( acc + dur > t )
+        if( acc + dur >= t )
         {
             const vlc_tick_t within = t - acc;
             const uint32_t within_vobu = (uint32_t)(within * vobus / dur);
@@ -463,20 +463,15 @@ static int DvdVRReadSeek( demux_t *p_demux, uint32_t i_block_offset )
                    ? p_sys->ud_pgcit->m_c_gi[cell_idx].c_epi_n : 1;
     }
 
-    /* seek past title end: snap to last cell */
-    if( !found_cell && nr > 0 )
+    /* seek past title end: flag end so demux advances to the next title */
+    if( !found_cell )
     {
-        const int last_cell_idx = cell_base + nr - 1;
-        uint16_t srpn = p_sys->ud_pgcit->m_c_gi[last_cell_idx].m_vobi_srpn;
-        if( unlikely( srpn == 0 || srpn > p_sys->pgc_gi->nr_of_programs ) )
-            return VLC_EGENERIC;
-
-        const uint16_t last_vobus = p_sys->pgc_gi->pgi[srpn - 1].map.nr_of_vobu_info;
-        p_sys->i_cur_cell = last_cell_idx;
-        if( last_vobus > 0 && vobu_accum >= last_vobus )
-            vobu_accum -= last_vobus;
-        else
-            vobu_accum = 0;
+        p_sys->i_cur_cell = p_sys->i_title_end_cell;
+        p_sys->i_pack_len = 0;
+        p_sys->i_title_offset = p_sys->i_title_blocks;
+        DvdReadResetCellTs( p_sys );
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+        return VLC_SUCCESS;
     }
 
     if( i_chapter < p_sys->i_chapters &&
