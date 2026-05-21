@@ -38,7 +38,7 @@ NSString * const VLCRendererRemovedNotification = @"VLCRendererRemovedNotificati
 }
 
 - (void)handleItemAdded:(vlc_renderer_item_t *)item;
-- (void)handleItemRemoved:(const vlc_renderer_item_t *)item;
+- (void)handleItemRemoved:(vlc_renderer_item_t *)item;
 
 @end
 
@@ -120,32 +120,38 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
 - (void)handleItemAdded:(vlc_renderer_item_t *)base_item
 {
     VLCRendererItem *item = [[VLCRendererItem alloc] initWithRendererItem:base_item];
-    [_rendererItems addObject:item];
-    if (_delegate)
-        [_delegate addedRendererItem:item from:self];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->_rendererItems addObject:item];
+        if (self->_delegate)
+            [self->_delegate addedRendererItem:item from:self];
 
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCRendererAddedNotification
-                                                      object:item];
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCRendererAddedNotification
+                                                          object:item];
+    });
 }
 
-- (void)handleItemRemoved:(const vlc_renderer_item_t *)base_item
+- (void)handleItemRemoved:(vlc_renderer_item_t *)base_item
 {
-    VLCRendererItem *result_item = nil;
-    for (VLCRendererItem *item in _rendererItems) {
-        if (item.rendererItem == base_item) {
-            result_item = item;
-            break;
+    VLCRendererItem * const removedItem =
+        [[VLCRendererItem alloc] initWithRendererItem:base_item];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCRendererItem *result_item = nil;
+        for (VLCRendererItem *item in self->_rendererItems) {
+            if (item.rendererItem == removedItem.rendererItem) {
+                result_item = item;
+                break;
+            }
         }
-    }
-    if (result_item) {
-        if (_delegate)
-            [_delegate removedRendererItem:result_item from:self];
-        [_rendererItems removeObject:result_item];
-        [NSNotificationCenter.defaultCenter postNotificationName:VLCRendererRemovedNotification
-                                                          object:result_item];
-    } else {
-        msg_Err(p_intf, "VLCRendererDiscovery could not find item to remove!");
-    }
+        if (result_item) {
+            if (self->_delegate)
+                [self->_delegate removedRendererItem:result_item from:self];
+            [self->_rendererItems removeObject:result_item];
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCRendererRemovedNotification
+                                                              object:result_item];
+        } else {
+            msg_Err(self->p_intf, "VLCRendererDiscovery could not find item to remove!");
+        }
+    });
 }
 
 @end
