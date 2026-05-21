@@ -179,11 +179,11 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         }
 
         block_BytestreamFlush( &p_pack->bytestream );
+        p_pack->b_synched = false; // look for 2 startcodes on next call/loop
 
         if ( p_pack->i_offset + p_pack->i_au_prepend < p_pack->i_au_min_size )
         {
             p_pack->i_offset = 0;
-            p_pack->b_synched = false;
             return NULL;
         }
 
@@ -193,7 +193,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         p_pic = block_Alloc( p_pack->i_offset + p_pack->i_au_prepend );
         if( p_pic == NULL )
         {
-            p_pack->b_synched = false;
             return NULL;
         }
         p_pic->i_pts = p_block_bytestream->i_pts;
@@ -223,12 +222,10 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
         if( !p_pic )
         {
-            p_pack->b_synched = false;
             continue;
         }
         if( p_pack->pf_validate( p_pack->p_private, p_pic ) )
         {
-            p_pack->b_synched = false;
             block_Release( p_pic );
             continue;
         }
@@ -236,8 +233,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         /* So p_block doesn't get re-added several times */
         if( pp_block )
             *pp_block = block_BytestreamPop( &p_pack->bytestream );
-
-        p_pack->b_synched = false;
 
         return p_pic;
     }
