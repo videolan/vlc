@@ -44,7 +44,6 @@ typedef int (*packetizer_validate_t)( void *p_private, block_t * );
 typedef struct
 {
     block_bytestream_t bytestream;
-    size_t i_offset;
     bool b_synched;
 
     size_t startcode_len;
@@ -77,7 +76,6 @@ static inline void packetizer_Init( packetizer_t *p_pack,
 {
     p_pack->b_synched = false;
     block_BytestreamInit( &p_pack->bytestream );
-    p_pack->i_offset = 0;
 
     p_pack->i_au_prepend = i_au_prepend;
     p_pack->p_au_prepend = p_au_prepend;
@@ -102,7 +100,6 @@ static inline void packetizer_Flush( packetizer_t *p_pack )
 {
     p_pack->b_synched = false;
     block_BytestreamEmpty( &p_pack->bytestream );
-    p_pack->i_offset = 0;
     p_pack->pf_reset( p_pack->p_private, true );
 }
 
@@ -125,7 +122,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
         p_pack->b_synched = false;
         block_BytestreamEmpty( &p_pack->bytestream );
-        p_pack->i_offset = 0;
         p_pack->pf_reset( p_pack->p_private, false );
     }
 
@@ -139,7 +135,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
         if( !p_pack->b_synched )
         {
-            size_t block_startcode_offset = p_pack->i_offset;
+            size_t block_startcode_offset = 0;
             /* Find a startcode */
             if( block_FindStartcodeFromOffset( &p_pack->bytestream, &block_startcode_offset,
                                                 p_pack->p_startcode, p_pack->startcode_len,
@@ -154,12 +150,11 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
             {
                 // remove junk data before the startcode
                 block_SkipBytes( &p_pack->bytestream, block_startcode_offset );
-                p_pack->i_offset = 0;
                 block_BytestreamFlush( &p_pack->bytestream );
             }
         }
 
-        size_t block_size = p_pack->i_offset + p_pack->startcode_len;
+        size_t block_size = p_pack->startcode_len;
         /* Find the next startcode */
         if( block_FindStartcodeFromOffset( &p_pack->bytestream, &block_size,
                                            p_pack->p_startcode, p_pack->startcode_len,
@@ -172,7 +167,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
             /* When draining and we don't find a second startcode, suppose that
              * the data extend up to the end of the bytestream */
-            p_pack->i_offset = 0;
             block_size = block_BytestreamRemaining(&p_pack->bytestream);
             if( block_size == 0 )
                 return NULL;
@@ -193,7 +187,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
             // we found 2 startcodes but the amount of data between them is too
             // small, discard data until the second startcode
             block_SkipBytes( &p_pack->bytestream, block_size );
-            p_pack->i_offset = 0;
             return NULL;
         }
 
@@ -206,7 +199,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
             // we can't output this block, maybe it's too big, we should not try
             // to read it will we are fed more data
             block_SkipBytes( &p_pack->bytestream, block_size );
-            p_pack->i_offset = 0;
             return NULL;
         }
         p_pic->i_pts = p_block_bytestream->i_pts;
@@ -223,8 +215,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                         p_pic->i_buffer - p_pack->i_au_prepend );
         if( p_pack->i_au_prepend > 0 )
             memcpy( p_pic->p_buffer, p_pack->p_au_prepend, p_pack->i_au_prepend );
-
-        p_pack->i_offset = 0;
 
         /* Parse the NAL */
         p_pic = p_pack->pf_parse( p_pack->p_private, &b_used_ts, p_pic );
@@ -287,7 +277,6 @@ static inline void packetizer_Header( packetizer_t *p_pack,
 
     p_pack->b_synched = false;
     block_BytestreamEmpty( &p_pack->bytestream );
-    p_pack->i_offset = 0;
 }
 
 #endif
