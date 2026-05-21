@@ -178,7 +178,11 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
             if( block_size <= p_pack->startcode_len &&
                 (p_pack->bytestream.p_block->i_flags & BLOCK_FLAG_AU_END) == 0 )
+            {
+                block_SkipBytes( &p_pack->bytestream, block_size );
+                p_pack->i_offset = 0;
                 return NULL;
+            }
         }
         else
         {
