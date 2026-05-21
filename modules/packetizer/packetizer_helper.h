@@ -184,10 +184,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                 return NULL;
             }
         }
-        else
-        {
-            p_pack->i_offset = block_size;
-        }
 
         block_BytestreamFlush( &p_pack->bytestream );
         p_pack->b_synched = false; // look for 2 startcodes on next call/loop
