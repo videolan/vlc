@@ -39,7 +39,7 @@ extern NSString * const VLCRendererRemovedNotification;
 /**
  The delegate that is called when a \c VLCRendererItem is added or deleted
  */
-@property (assign) id<VLCRendererDiscoveryDelegate> delegate;
+@property (weak) id<VLCRendererDiscoveryDelegate> delegate;
 
 /**
  The name of the renderer discovery module
