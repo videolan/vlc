@@ -139,18 +139,22 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
         if( !p_pack->b_synched )
         {
+            size_t block_startcode_offset = p_pack->i_offset;
             /* Find a startcode */
-            if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
+            if( block_FindStartcodeFromOffset( &p_pack->bytestream, &block_startcode_offset,
                                                 p_pack->p_startcode, p_pack->startcode_len,
                                                 p_pack->pf_startcode_helper, NULL ) )
+            {
+                p_pack->i_offset = block_startcode_offset;
                 return NULL; /* Need more data */
+            }
 
             p_pack->b_synched = true;
 
-            if( p_pack->i_offset )
+            if( block_startcode_offset )
             {
                 // remove junk data before the startcode
-                block_SkipBytes( &p_pack->bytestream, p_pack->i_offset );
+                block_SkipBytes( &p_pack->bytestream, block_startcode_offset );
                 p_pack->i_offset = 0;
                 block_BytestreamFlush( &p_pack->bytestream );
             }
@@ -158,29 +162,37 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
             p_pack->i_offset = 1; /* To find next startcode */
         }
 
+        size_t block_size = p_pack->i_offset;
         /* Find the next startcode */
-        if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
+        if( block_FindStartcodeFromOffset( &p_pack->bytestream, &block_size,
                                            p_pack->p_startcode, p_pack->startcode_len,
                                            p_pack->pf_startcode_helper, NULL ) )
         {
             if( pp_block /* not draining */ || !p_pack->bytestream.p_chain )
+            {
+                p_pack->i_offset = block_size;
                 return NULL; /* Need more data */
+            }
 
             /* When draining and we don't find a second startcode, suppose that
              * the data extend up to the end of the bytestream */
-            p_pack->i_offset = block_BytestreamRemaining(&p_pack->bytestream);
-            if( p_pack->i_offset == 0 )
+            p_pack->i_offset = block_size = block_BytestreamRemaining(&p_pack->bytestream);
+            if( block_size == 0 )
                 return NULL;
 
-            if( p_pack->i_offset <= p_pack->startcode_len &&
+            if( block_size <= p_pack->startcode_len &&
                 (p_pack->bytestream.p_block->i_flags & BLOCK_FLAG_AU_END) == 0 )
                 return NULL;
+        }
+        else
+        {
+            p_pack->i_offset = block_size;
         }
 
         block_BytestreamFlush( &p_pack->bytestream );
         p_pack->b_synched = false; // look for 2 startcodes on next call/loop
 
-        if ( p_pack->i_offset + p_pack->i_au_prepend < p_pack->i_au_min_size )
+        if ( block_size + p_pack->i_au_prepend < p_pack->i_au_min_size )
         {
             p_pack->i_offset = 0;
             return NULL;
@@ -189,7 +201,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         /* Get the new fragment and set the pts/dts */
         block_t *p_block_bytestream = p_pack->bytestream.p_block;
 
-        p_pic = block_Alloc( p_pack->i_offset + p_pack->i_au_prepend );
+        p_pic = block_Alloc( block_size + p_pack->i_au_prepend );
         if( p_pic == NULL )
         {
             return NULL;
@@ -199,7 +211,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
         /* Do not wait for next sync code if notified block ends AU */
         if( (p_block_bytestream->i_flags & BLOCK_FLAG_AU_END) &&
-             p_block_bytestream->i_buffer == p_pack->i_offset )
+             p_block_bytestream->i_buffer == block_size )
         {
             p_pic->i_flags |= BLOCK_FLAG_AU_END;
         }
