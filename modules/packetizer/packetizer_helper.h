@@ -166,11 +166,11 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                                                p_pack->p_startcode, p_pack->i_startcode,
                                                p_pack->pf_startcode_helper, NULL ) )
             {
-                if( pp_block /* not flushing */ || !p_pack->bytestream.p_chain )
+                if( pp_block /* not draining */ || !p_pack->bytestream.p_chain )
                     return NULL; /* Need more data */
 
-                /* When flushing and we don't find a startcode, suppose that
-                 * the data extend up to the end */
+                /* When draining and we don't find a second startcode, suppose that
+                 * the data extend up to the end of the bytestream */
                 p_pack->i_offset = block_BytestreamRemaining(&p_pack->bytestream);
                 if( p_pack->i_offset == 0 )
                     return NULL;
@@ -286,4 +286,3 @@ static inline void packetizer_Header( packetizer_t *p_pack,
 }
 
 #endif
-
