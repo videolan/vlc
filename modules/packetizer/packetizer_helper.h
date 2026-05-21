@@ -207,6 +207,10 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         p_pic = block_Alloc( block_size + p_pack->i_au_prepend );
         if( p_pic == NULL )
         {
+            // we can't output this block, maybe it's too big, we should not try
+            // to read it will we are fed more data
+            block_SkipBytes( &p_pack->bytestream, block_size );
+            p_pack->i_offset = 0;
             return NULL;
         }
         p_pic->i_pts = p_block_bytestream->i_pts;
