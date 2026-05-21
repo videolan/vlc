@@ -180,6 +180,13 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
         block_BytestreamFlush( &p_pack->bytestream );
 
+        if ( p_pack->i_offset + p_pack->i_au_prepend < p_pack->i_au_min_size )
+        {
+            p_pack->i_offset = 0;
+            p_pack->b_synched = false;
+            return NULL;
+        }
+
         /* Get the new fragment and set the pts/dts */
         block_t *p_block_bytestream = p_pack->bytestream.p_block;
 
@@ -207,13 +214,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         p_pack->i_offset = 0;
 
         /* Parse the NAL */
-        if( p_pic->i_buffer < p_pack->i_au_min_size )
-        {
-            block_Release( p_pic );
-            p_pack->b_synched = false;
-            continue;
-        }
-
         p_pic = p_pack->pf_parse( p_pack->p_private, &b_used_ts, p_pic );
         if( b_used_ts )
         {
