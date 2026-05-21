@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibraryHomeViewContainerView <NSObject>
 
-@property (readwrite, assign) NSArray<NSLayoutConstraint *> *constraintsWithSuperview;
+@property (readwrite, strong, nonatomic) NSArray<NSLayoutConstraint *> *constraintsWithSuperview;
 
 - (void)connect;
 - (void)disconnect;
