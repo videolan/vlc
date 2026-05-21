@@ -145,7 +145,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                                                 p_pack->p_startcode, p_pack->startcode_len,
                                                 p_pack->pf_startcode_helper, NULL ) )
             {
-                p_pack->i_offset = block_startcode_offset;
                 return NULL; /* Need more data */
             }
 
