@@ -744,33 +744,31 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
     vlc_tick_t delay;
     vlc_tick_t drift;
 
+    vlc_mutex_lock(&stream->timing.lock);
+    if (stream->sync.rate != stream->timing.rate)
     {
-        vlc_mutex_lock(&stream->timing.lock);
-        if (stream->sync.rate != stream->timing.rate)
-        {
-            /* Save the first timing point seeing a rate change */
-            stream->timing.rate_system_ts = play_date;
-            stream->timing.rate_audio_ts = dec_pts;
-            stream->timing.rate = stream->sync.rate;
-        }
-
-        if (stream->timing.first_pts == VLC_TICK_INVALID)
-            stream->timing.first_pts = dec_pts;
-
-        bool is_drifting = stream->timing.last_drift != VLC_TICK_INVALID;
-        vlc_mutex_unlock(&stream->timing.lock);
-
-        if (!is_drifting)
-        {
-            /* module is using aout_TimingReport() and stream is master:
-             * nothing to do */
-            return;
-        }
-        if (stream_GetDelay(stream, &delay) != 0)
-            return; /* nothing can be done if timing is unknown */
-
-        drift = play_date - system_now - delay;
+        /* Save the first timing point seeing a rate change */
+        stream->timing.rate_system_ts = play_date;
+        stream->timing.rate_audio_ts = dec_pts;
+        stream->timing.rate = stream->sync.rate;
     }
+
+    if (stream->timing.first_pts == VLC_TICK_INVALID)
+        stream->timing.first_pts = dec_pts;
+
+    bool is_drifting = stream->timing.last_drift != VLC_TICK_INVALID;
+    vlc_mutex_unlock(&stream->timing.lock);
+
+    if (!is_drifting)
+    {
+        /* module is using aout_TimingReport() and stream is master:
+         * nothing to do */
+        return;
+    }
+    if (stream_GetDelay(stream, &delay) != 0)
+        return; /* nothing can be done if timing is unknown */
+
+    drift = play_date - system_now - delay;
 
     stream_HandleDrift(stream, drift, dec_pts);
 }
