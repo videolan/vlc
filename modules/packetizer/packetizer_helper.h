@@ -169,7 +169,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         {
             if( pp_block /* not draining */ || !p_pack->bytestream.p_chain )
             {
-                p_pack->i_offset = block_size;
                 return NULL; /* Need more data */
             }
 
