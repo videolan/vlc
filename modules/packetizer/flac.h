@@ -219,7 +219,7 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
 
     /* Find bits per sample */
     static const int8_t flac_bits_per_sample[8] = {
-        0, 8, 12, -1, 16, 20, 24, -1
+        0, 8, 12, -1, 16, 20, 24, 32
     };
     int bits_per_sample = flac_bits_per_sample[(p_buf[3] & 0x0e) >> 1];
     if (bits_per_sample == 0) {
