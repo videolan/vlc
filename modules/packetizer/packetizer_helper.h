@@ -118,7 +118,7 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
     {
         block_t *p_drained = packetizer_PacketizeBlock( p_pack, NULL );
         if( p_drained )
-            return p_drained;
+            return p_drained; // FIXME do we lose p_block ? Can we output more than one drain output ?
 
         p_pack->b_synched = false;
         block_BytestreamEmpty( &p_pack->bytestream );
