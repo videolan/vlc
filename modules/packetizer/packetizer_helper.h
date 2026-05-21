@@ -172,7 +172,8 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
             /* When draining and we don't find a second startcode, suppose that
              * the data extend up to the end of the bytestream */
-            p_pack->i_offset = block_size = block_BytestreamRemaining(&p_pack->bytestream);
+            p_pack->i_offset = 0;
+            block_size = block_BytestreamRemaining(&p_pack->bytestream);
             if( block_size == 0 )
                 return NULL;
 
@@ -180,7 +181,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                 (p_pack->bytestream.p_block->i_flags & BLOCK_FLAG_AU_END) == 0 )
             {
                 block_SkipBytes( &p_pack->bytestream, block_size );
-                p_pack->i_offset = 0;
                 return NULL;
             }
         }
