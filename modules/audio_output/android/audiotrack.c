@@ -1917,7 +1917,6 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
     stream->play = Play;
     stream->pause = Pause;
     stream->flush = Flush;
-    stream->time_get = NULL;
     stream->volume_set = VolumeSet;
     stream->mute_set = MuteSet;
 

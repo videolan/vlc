@@ -77,7 +77,6 @@ struct aout_stream
     void *sys;
 
     void (*stop)(aout_stream_t *);
-    int (*time_get)(aout_stream_t *, vlc_tick_t *);
     void (*play)(aout_stream_t *, block_t *, vlc_tick_t);
     void (*pause)(aout_stream_t *, bool, vlc_tick_t);
     void (*flush)(aout_stream_t *);
