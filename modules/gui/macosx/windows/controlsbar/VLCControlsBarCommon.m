@@ -137,9 +137,8 @@
     self.jumpForwardButton.accessibilityLabel = _NS("Jump forwards in current item");
     self.jumpForwardButton.accessibilityTitle = self.jumpForwardButton.toolTip;
 
-    self.timeSlider.toolTip = _NS("Position");
     self.timeSlider.accessibilityLabel = _NS("Playback position");
-    self.timeSlider.accessibilityTitle = self.timeSlider.toolTip;
+    self.timeSlider.accessibilityTitle = _NS("Position");
 
     self.fullscreenButton.toolTip = _NS("Enter fullscreen");
     self.fullscreenButton.accessibilityLabel = self.fullscreenButton.toolTip;
@@ -441,6 +440,7 @@
     self.timeSlider.enabled = duration >= 0 && !buffering && _playerController.seekable;
     self.timeSlider.indefinite = buffering;
     self.timeSlider.floatValue = validInputItem ? _playerController.position : 0.;
+    self.timeSlider.mediaDuration = duration;
 
     [self.timeField setTime:timeString withRemainingTime:remainingTime];
     [self.trailingTimeField setTime:timeString withRemainingTime:remainingTime];

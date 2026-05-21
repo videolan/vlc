@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import <vlc_tick.h>
+
 @interface VLCPlaybackProgressSlider : NSSlider
 
 @property (readwrite, nonatomic) BOOL indefinite;
@@ -29,5 +31,8 @@
 
 /* Indicates if the slider is scrollable with the mouse or trackpad scrollwheel. */
 @property (readwrite) BOOL scrollable;
+
+/* Duration of the current item, used to compute the time shown on hover. */
+@property (readwrite, nonatomic) vlc_tick_t mediaDuration;
 
 @end
