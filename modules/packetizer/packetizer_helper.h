@@ -192,7 +192,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
         if ( block_size + p_pack->i_au_prepend < p_pack->i_au_min_size )
         {
-            p_pack->i_offset = 0;
             return NULL;
         }
 
