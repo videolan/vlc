@@ -40,6 +40,14 @@ extern NSString *const NSCollectionViewSupplementaryElementKind;
 
 #endif
 
+#ifndef MAC_OS_VERSION_13_0
+
+enum {
+    NSWindowCollectionBehaviorCanJoinAllApplications = 1 << 18,
+};
+
+#endif
+
 NS_ASSUME_NONNULL_END
 
 #define OSX_BIGSUR_AND_HIGHER (NSAppKitVersionNumber >= 2022.00)

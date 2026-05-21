@@ -610,20 +610,35 @@ static int WindowFloatOnTop(vlc_object_t *obj,
         _statusLevelWindowCounter++;
         // window level need to stay on normal in fullscreen mode
         if (!o_window.fullscreen && !o_window.inFullscreenTransition) {
-            // make sure float on top can join all spaces, including full-screen ones
-            NSApp.activationPolicy = NSApplicationActivationPolicyAccessory;
             [self updateWindowLevelForHelperWindows:i_level];
-            o_window.collectionBehavior = NSWindowCollectionBehaviorCanJoinAllSpaces |
-                                          NSWindowCollectionBehaviorIgnoresCycle |
-                                          NSWindowCollectionBehaviorTransient |
-                                          NSWindowCollectionBehaviorFullScreenAuxiliary;
+
+            // make sure float on top can join all spaces, including full-screen ones
+            NSWindowCollectionBehavior behavior =
+                NSWindowCollectionBehaviorCanJoinAllSpaces |
+                NSWindowCollectionBehaviorIgnoresCycle |
+                NSWindowCollectionBehaviorTransient |
+                NSWindowCollectionBehaviorFullScreenAuxiliary;
+
+            if (@available(macOS 13.0, *)) {
+                behavior |= NSWindowCollectionBehaviorCanJoinAllApplications;
+            } else {
+                // Pre-Ventura: accessory policy is the only way to float over
+                // other apps' full-screen Spaces. Dock tile disappears as a
+                // side effect. #29250
+                NSApp.activationPolicy = NSApplicationActivationPolicyAccessory;
+            }
+            o_window.collectionBehavior = behavior;
         }
     } else {
         if (_statusLevelWindowCounter > 0) {
             _statusLevelWindowCounter--;
-        } 
+        }
         if (_statusLevelWindowCounter == 0) {
-            NSApp.activationPolicy = NSApplicationActivationPolicyRegular;
+            if (@available(macOS 13.0, *)) {
+                // NO-OP. Intentionally empty as negating @available is unsupported in ObjC
+            } else {
+                NSApp.activationPolicy = NSApplicationActivationPolicyRegular;
+            }
             [self updateWindowLevelForHelperWindows:i_level];
         }
         o_window.collectionBehavior = NSWindowCollectionBehaviorDefault;
