@@ -140,10 +140,12 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
         if( !p_pack->b_synched )
         {
             /* Find a startcode */
-            if( !block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
+            if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
                                                 p_pack->p_startcode, p_pack->startcode_len,
                                                 p_pack->pf_startcode_helper, NULL ) )
-                p_pack->b_synched = true;
+                return NULL; /* Need more data */
+
+            p_pack->b_synched = true;
 
             if( p_pack->i_offset )
             {
@@ -152,9 +154,6 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
                 p_pack->i_offset = 0;
                 block_BytestreamFlush( &p_pack->bytestream );
             }
-
-            if( !p_pack->b_synched )
-                return NULL; /* Need more data */
 
             p_pack->i_offset = 1; /* To find next startcode */
         }
