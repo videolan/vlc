@@ -125,12 +125,11 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block );
 static void Flush( decoder_t * );
 
 static void PacketizeReset( void *p_private, bool b_broken );
-static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
 static int PacketizeValidate( void *p_private, block_t * );
 static block_t *PacketizeDrain( void *p_private );
 
 static block_t *OutputFrame( decoder_t *p_dec );
-static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag );
+static block_t *ParseIDU( void *, bool *pb_ts_used, block_t *p_frag );
 static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t * );
 
 static const uint8_t p_vc1_startcode[3] = { 0x00, 0x00, 0x01 };
@@ -161,7 +160,7 @@ static int Open( vlc_object_t *p_this )
     packetizer_Init( &p_sys->packetizer,
                      p_vc1_startcode, sizeof(p_vc1_startcode), startcode_FindAnnexB,
                      NULL, 0, 4,
-                     PacketizeReset, PacketizeParse, PacketizeValidate, PacketizeDrain,
+                     PacketizeReset, ParseIDU, PacketizeValidate, PacketizeDrain,
                      p_dec );
 
     p_sys->b_sequence_header = false;
@@ -297,12 +296,6 @@ static void PacketizeReset( void *p_private, bool b_flush )
     p_sys->i_frame_pts = VLC_TICK_INVALID;
     date_Set( &p_sys->dts, VLC_TICK_INVALID );
 }
-static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
-{
-    decoder_t *p_dec = p_private;
-
-    return ParseIDU( p_dec, pb_ts_used, p_block );
-}
 
 static int PacketizeValidate( void *p_private, block_t *p_au )
 {
@@ -422,8 +415,9 @@ static block_t *OutputFrame( decoder_t *p_dec )
 }
 
 /* ParseIDU: parse an Independent Decoding Unit */
-static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
+static block_t *ParseIDU( void *p_private, bool *pb_ts_used, block_t *p_frag )
 {
+    decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
     const idu_type_t idu = p_frag->p_buffer[3];
