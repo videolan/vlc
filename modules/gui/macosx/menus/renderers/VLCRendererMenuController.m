@@ -49,6 +49,7 @@
     self = [super init];
     if (self) {
         _rendererDiscoveries = [NSMutableArray array];
+        _rendererItems = @[];
         _isDiscoveryEnabled = NO;
         p_intf = getIntf();
 
@@ -95,22 +96,20 @@
 - (void)addRendererItem:(VLCRendererItem *)item
 {
     NSParameterAssert(item != nil);
+
     NSMutableArray * const mutableRenderers = _rendererItems.mutableCopy;
     [mutableRenderers addObject:item];
     _rendererItems = mutableRenderers.copy;
 
     // Check if the item is already selected
-    if (_selectedItem.representedObject != nil)
-    {
+    if (_selectedItem.representedObject != nil) {
         VLCRendererItem *selected_rd_item = _selectedItem.representedObject;
-        if ([selected_rd_item.identifier isEqualToString:item.identifier])
-        {
+        if ([selected_rd_item.identifier isEqualToString:item.identifier]) {
             [_selectedItem setRepresentedObject:item];
             return;
         }
     }
 
-    // Create a menu item
     NSMenuItem *menuItem = [[NSMenuItem alloc] init];
     menuItem.target = self;
     menuItem.action = @selector(selectRenderer:);
@@ -129,31 +128,25 @@
                    range:[unformattedTitle rangeOfString:item.userReadableType options:NSBackwardsSearch]];
     menuItem.attributedTitle = title;
 
-    // The main menu must only be updated from the main thread
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [_rendererMenu insertItem:menuItem atIndex:[_rendererMenu indexOfItem:_rendererNoneItem] + 1];
-    });
+    [_rendererMenu insertItem:menuItem atIndex:[_rendererMenu indexOfItem:_rendererNoneItem] + 1];
 }
 
 - (void)removeRendererItem:(VLCRendererItem *)item
 {
     NSParameterAssert(item != nil);
 
-    // The main menu must only be updated from the main thread
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSMutableArray * const mutableRenderers = _rendererItems.mutableCopy;
-        [mutableRenderers removeObject:item];
-        _rendererItems = mutableRenderers.copy;
+    NSMutableArray * const mutableRenderers = _rendererItems.mutableCopy;
+    [mutableRenderers removeObject:item];
+    _rendererItems = mutableRenderers.copy;
 
-        const NSInteger index = [_rendererMenu indexOfItemWithRepresentedObject:item];
-        if (index >= 0) {
-            NSMenuItem * const menuItem = [_rendererMenu itemAtIndex:index];
-            // Don't remove selected item
-            if (menuItem != _selectedItem) {
-                [_rendererMenu removeItemAtIndex:index];
-            }
+    const NSInteger index = [_rendererMenu indexOfItemWithRepresentedObject:item];
+    if (index >= 0) {
+        NSMenuItem * const menuItem = [_rendererMenu itemAtIndex:index];
+        // Don't remove selected item
+        if (menuItem != _selectedItem) {
+            [_rendererMenu removeItemAtIndex:index];
         }
-    });
+    }
 }
 
 - (void)startRendererDiscoveries
