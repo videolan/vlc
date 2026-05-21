@@ -886,12 +886,6 @@ static void Drain(audio_output_t *aout)
 }
 
 
-static int TimeGet(audio_output_t *, vlc_tick_t* restrict)
-{
-    /* synchronization is handled by the card */
-    return -1;
-}
-
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     decklink_sys_t *sys = (decklink_sys_t *) aout->sys;
@@ -956,7 +950,6 @@ static int OpenAudio(vlc_object_t *p_this)
     aout->start     = Start;
     aout->flush     = Flush;
     aout->drain     = Drain;
-    aout->time_get  = TimeGet;
 
     aout->pause     = NULL;
     aout->stop      = Flush;
