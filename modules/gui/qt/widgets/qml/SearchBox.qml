@@ -43,6 +43,8 @@ FocusScope {
         value: textField.text
     }
 
+    property bool popBelow: true
+
     // public functions
 
     function expandAndFocus() {
@@ -123,7 +125,8 @@ FocusScope {
         focus: true
 
         Navigation.parentItem: root
-        Navigation.downItem: textField
+        Navigation.downItem: root.popBelow ? textField : null
+        Navigation.upItem: root.popBelow ? null : textField
 
         onClicked: {
             if (expandedState.state == "")
@@ -136,7 +139,7 @@ FocusScope {
             id: popup
 
             x: -width + parent.width
-            y: parent.height
+            y: root.popBelow ? parent.height : -height
 
             implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                                     implicitContentWidth + leftPadding + rightPadding)
@@ -178,7 +181,8 @@ FocusScope {
                 placeholderText: qsTr("filter")
 
                 Navigation.parentItem: root
-                Navigation.upItem: iconButton
+                Navigation.upItem: root.popBelow ? iconButton : null 
+                Navigation.downItem: root.popBelow ? null : iconButton
                 Navigation.rightItem: clearButton.visible ? clearButton : null
                 Navigation.cancelAction: function() {
                     expandedState.state = ""
