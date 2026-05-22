@@ -34,7 +34,14 @@ FocusScope {
     property alias popup: popup
     property real maxSearchFieldWidth: Number.MAX_VALUE
     property alias buttonWidth: iconButton.implicitWidth
-    property alias searchPattern: textField.text
+    property string searchPattern
+    property alias compressSearchPatternChanges: searchPatternBinding.delayed
+    compressSearchPatternChanges: true
+
+    Binding on searchPattern {
+        id: searchPatternBinding
+        value: textField.text
+    }
 
     // public functions
 
