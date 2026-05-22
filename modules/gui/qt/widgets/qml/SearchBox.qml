@@ -44,6 +44,7 @@ FocusScope {
     }
 
     property bool popBelow: true
+    property alias toggleButton: iconButton
 
     // public functions
 
