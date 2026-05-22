@@ -217,7 +217,15 @@ else
 endif
 
 # Gettext
-intl_dep = dependency('intl', required: get_option('nls'))
+if get_option('nls').allowed()
+    intl_dep = dependency('intl', required: false)
+    if not intl_dep.found()
+        # check in contribs
+        intl_dep = cc.find_library('intl', dirs: contrib_libdir, required: get_option('nls'))
+    endif
+else
+    intl_dep = disabler()
+endif
 if intl_dep.found()
     cdata.set('HAVE_GETTEXT', 1)
     cdata.set('ENABLE_NLS', 1)
