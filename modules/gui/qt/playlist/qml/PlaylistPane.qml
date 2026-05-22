@@ -241,7 +241,40 @@ T.Pane {
 
             clip: !fadingEdge.implicitClipping && (height < contentHeight)
 
-            model: root.model
+            model: proxyModel ?? root.model
+
+            onWidthChanged: {
+                if (toolbar.searchBox.expanded) {
+                    if (width < toolbar.searchBox.textField.width)
+                        toolbar.searchBox.retract()
+                }
+            }
+
+            property QtSortFilterProxyModel proxyModel
+
+            function adjustFiltering() {
+                // Once text changes, we switch to the proxy model.
+                // We do not switch back to the source model after that.
+                if (!proxyModel) {
+                    proxyModel = proxyModelComponent.createObject(listView)
+                }
+
+                if (toolbar.searchBox.regexButtonToggled)
+                    proxyModel.setFilterRegularExpression(toolbar.searchBox.searchPattern)
+                else
+                    proxyModel.setFilterFixedString(toolbar.searchBox.searchPattern)
+            }
+
+            Component {
+                id: proxyModelComponent
+
+                QtSortFilterProxyModel {
+                    sourceModel: root.model
+
+                    filterCaseSensitivity: toolbar.searchBox.caseSensitiveButtonToggled ? Qt.CaseSensitive
+                                                                                        : Qt.CaseInsensitive
+                }
+            }
 
             fadingEdge.backgroundColor: (root.background && (root.background.color.a >= 1.0)) ? root.background.color
                                                                                               : Qt.alpha(root.background.color, 0.0)
@@ -262,7 +295,7 @@ T.Pane {
 
                 // NOTE: Move implementation.
                 if (dragItem === item) {
-                    model.moveItemsPre(root.selectionModel.sortedSelectedIndexesFlat, index);
+                    root.model.moveItemsPre(root.selectionModel.sortedSelectedIndexesFlat, index);
                     listView.forceActiveFocus();
                 // NOTE: Dropping medialibrary content into the queue.
                 } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
@@ -326,6 +359,9 @@ T.Pane {
                         contentYBehavior.enabled = false
                     }
                 })
+
+                toolbar.searchBox.searchPatternChanged.connect(listView, listView.adjustFiltering)
+                toolbar.searchBox.regexButtonToggledChanged.connect(listView, listView.adjustFiltering)
             }
 
             Connections {
@@ -365,7 +401,23 @@ T.Pane {
                 }
             }
 
-            Keys.onDeletePressed: model.removeItems(selectionModel.selectedIndexesFlat)
+            Keys.onDeletePressed: {
+                let items
+
+                const selectedIndexes = selectionModel.selectedIndexesFlat
+                if (listView.proxyModel && listView.model === listView.proxyModel) {
+                    items = []
+                    for (let i = 0; i < selectedIndexes.length; ++i) {
+                        const mappedIndex = listView.proxyModel.mapToSource(listView.proxyModel.index(selectedIndexes[i], 0))
+                        items.push(mappedIndex.row)
+                    }
+                } else {
+                    items = selectedIndexes
+                }
+
+                if (items.length > 0)
+                    root.model.removeItems(items)
+            }
 
             Navigation.parentItem: root
 
@@ -414,7 +466,10 @@ T.Pane {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
-                    text: qsTr("No content yet")
+                    text: (listView.proxyModel &&
+                           listView.model === listView.proxyModel &&
+                           listView.count !== root.model.count) ? qsTr("No results")
+                                                                : qsTr("No content yet")
 
                     color: label.color
 
@@ -428,6 +483,8 @@ T.Pane {
                     verticalAlignment: Text.AlignVCenter
 
                     text: qsTr("Drag & Drop some content here!")
+                    visible: (listView.proxyModel && listView.model === listView.proxyModel) ? (listView.count === root.model.count)
+                                                                                             : true
 
                     color: label.color
 
@@ -444,6 +501,9 @@ T.Pane {
             Layout.fillWidth: true
             Layout.leftMargin: VLCStyle.margin_normal
             Layout.rightMargin: VLCStyle.margin_normal
+
+            searchBox.displayRegexToggleButton: true
+            searchBox.displayCaseSensitiveToggleButton: true
         }
     }
 
