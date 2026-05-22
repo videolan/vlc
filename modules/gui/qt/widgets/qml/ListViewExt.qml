@@ -310,9 +310,9 @@ ListView {
         // does not have a "target" property, and wants a valid parent.
         enabled: !!root.acceptDropFunc
 
-        OpacityAnimator {
-            from: 0.0 // QTBUG-66475
-            to: 1.0
+        // WARNING: Do not use `OpacityAnimator` here, it is bugged.
+        NumberAnimation {
+            property: "opacity"
             duration: VLCStyle.duration_long
             easing.type: Easing.OutSine
         }
