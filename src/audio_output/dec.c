@@ -130,15 +130,11 @@ static inline struct vlc_tracer *aout_stream_tracer(vlc_aout_stream *stream)
 
 static int stream_GetDelay(vlc_aout_stream *stream, vlc_tick_t *delay)
 {
-    vlc_mutex_lock(&stream->timing.lock);
+    vlc_mutex_assert(&stream->timing.lock);
     vlc_tick_t system_ts = stream->timing.system_ts;
     vlc_tick_t audio_ts = stream->timing.audio_ts;
     if (system_ts == VLC_TICK_INVALID)
-    {
-        vlc_mutex_unlock(&stream->timing.lock);
         return -1;
-    }
-    vlc_mutex_unlock(&stream->timing.lock);
 
     /* Interpolate the last updated point. */
     vlc_tick_t system_now = vlc_tick_now();
@@ -743,6 +739,7 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
      */
     vlc_tick_t delay;
     vlc_tick_t drift;
+    assert(system_now != VLC_TICK_INVALID);
 
     vlc_mutex_lock(&stream->timing.lock);
     if (stream->sync.rate != stream->timing.rate)
@@ -757,15 +754,17 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
         stream->timing.first_pts = dec_pts;
 
     bool is_drifting = stream->timing.last_drift != VLC_TICK_INVALID;
-    vlc_mutex_unlock(&stream->timing.lock);
 
     if (!is_drifting)
     {
-        /* module is using aout_TimingReport() and stream is master:
-         * nothing to do */
+        /* stream is master: nothing to do */
+        vlc_mutex_unlock(&stream->timing.lock);
         return;
     }
-    if (stream_GetDelay(stream, &delay) != 0)
+    int ret = stream_GetDelay(stream, &delay);
+    vlc_mutex_unlock(&stream->timing.lock);
+
+    if (ret != 0)
         return; /* nothing can be done if timing is unknown */
 
     drift = play_date - system_now - delay;
@@ -1076,8 +1075,11 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
         vlc_tick_t drain_deadline = vlc_tick_now();
 
         vlc_tick_t delay;
+        vlc_mutex_lock(&stream->timing.lock);
         if (stream_GetDelay(stream, &delay) == 0)
             drain_deadline += delay;
+        vlc_mutex_unlock(&stream->timing.lock);
+
         /* else the deadline is now, and vlc_aout_stream_IsDrained() will
          * return true on the first call. */
 
