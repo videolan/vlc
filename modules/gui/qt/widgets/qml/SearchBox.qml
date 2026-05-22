@@ -239,7 +239,9 @@ FocusScope {
                     anchors.right: parent.right
                     anchors.rightMargin: VLCStyle.margin_xxsmall
 
-                    font.pixelSize: VLCStyle.icon_banner
+                    // Animating font properties with native rendering is probably not a good idea:
+                    font.pixelSize: 0.6 * (contentItem.renderType === Text.QtRendering ? textField.height
+                                                                                       : textField.implicitHeight)
                     text: VLCIcons.close
 
                     description: qsTr("Clear")
