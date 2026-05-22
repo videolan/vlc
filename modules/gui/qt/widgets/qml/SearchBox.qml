@@ -35,8 +35,11 @@ FocusScope {
     property real maxSearchFieldWidth: Number.MAX_VALUE
     property alias buttonWidth: iconButton.implicitWidth
     property string searchPattern
+    property alias regexButtonToggled: regexToggleButton.checked
     property alias compressSearchPatternChanges: searchPatternBinding.delayed
     compressSearchPatternChanges: true
+    property alias displayRegexToggleButton: regexToggleButton.visible
+    displayRegexToggleButton: false
 
     Binding on searchPattern {
         id: searchPatternBinding
@@ -101,6 +104,8 @@ FocusScope {
         ]
 
         transitions: Transition {
+            id: transition
+
             from: ""; to: "expanded"
             reversible: true
 
@@ -179,7 +184,7 @@ FocusScope {
 
                 padding: VLCStyle.dp(6)
                 leftPadding: padding + VLCStyle.dp(4)
-                rightPadding: (textField.width - clearButton.x)
+                rightPadding: leftPadding + (insideRow.visible ? insideRow.width : 0.0)
 
                 radius: clearButton.radius
 
@@ -188,9 +193,9 @@ FocusScope {
                 placeholderText: qsTr("filter")
 
                 Navigation.parentItem: root
-                Navigation.upItem: root.popBelow ? iconButton : null 
+                Navigation.upItem: root.popBelow ? iconButton : null
                 Navigation.downItem: root.popBelow ? null : iconButton
-                Navigation.rightItem: clearButton.visible ? clearButton : null
+                Navigation.rightItem: regexToggleButton.visible ? regexToggleButton : (clearButton.visible ? clearButton : null)
                 Navigation.cancelAction: function() {
                     root.retract()
                     iconButton.focusReason = Qt.ShortcutFocusReason
@@ -232,32 +237,63 @@ FocusScope {
                     Navigation.defaultKeyReleaseAction(event)
                 }
 
-                Widgets.IconToolButton {
-                    id: clearButton
+                Row {
+                    id: insideRow
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: VLCStyle.margin_xxsmall
 
-                    // Animating font properties with native rendering is probably not a good idea:
-                    font.pixelSize: 0.6 * (contentItem.renderType === Text.QtRendering ? textField.height
-                                                                                       : textField.implicitHeight)
-                    text: VLCIcons.close
+                    spacing: VLCStyle.margin_xxsmall
 
-                    description: qsTr("Clear")
+                    visible: parent.height > height
 
-                    visible: (textField.text.length > 0)
+                    Widgets.IconToolButton {
+                        id: regexToggleButton
 
-                    onVisibleChanged: {
-                        if (activeFocus && !visible && parent.visible) {
-                            parent.focus = true
-                            parent.focusReason = focusReason
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        // Animating font properties with native rendering is probably not a good idea:
+                        font.pixelSize: 0.6 * (contentItem.renderType === Text.QtRendering ? textField.height
+                                                                                           : textField.implicitHeight)
+                        text: VLCIcons.regex
+
+                        description: qsTr("Use regular expression")
+
+                        onClicked: {
+                            checked = !checked
                         }
-                    }
-                    onClicked: textField.clear()
 
-                    Navigation.parentItem: textField
-                    Navigation.leftItem: textField
+                        Navigation.parentItem: textField
+                        Navigation.leftItem: caseSensitiveToggleButton
+                        Navigation.rightItem: clearButton
+                    }
+
+                    Widgets.IconToolButton {
+                        id: clearButton
+
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        // Animating font properties with native rendering is probably not a good idea:
+                        font.pixelSize: 0.6 * (contentItem.renderType === Text.QtRendering ? textField.height
+                                                                                           : textField.implicitHeight)
+                        text: VLCIcons.close
+
+                        description: qsTr("Clear")
+
+                        visible: (textField.text.length > 0)
+
+                        onVisibleChanged: {
+                            if (activeFocus && !visible && parent.visible) {
+                                textField.focus = true
+                                textField.focusReason = focusReason
+                            }
+                        }
+                        onClicked: textField.clear()
+
+                        Navigation.parentItem: textField
+                        Navigation.leftItem: regexToggleButton
+                    }
                 }
             }
         }
