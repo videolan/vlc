@@ -596,6 +596,7 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
 {
     aout_owner_t *owner = aout_stream_owner(stream);
     audio_output_t *aout = aout_stream_aout(stream);
+    assert(stream->sync.played);
 
     float rate = stream->sync.rate;
 
@@ -621,18 +622,14 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
      * is not portable, not supported by some hardware and often unsafe/buggy
      * where supported. The other alternative is to flush the buffers
      * completely. */
-    if (drift > (stream->sync.played ?
-                 lroundf(+3 * AOUT_MAX_PTS_DELAY / rate) : 0))
+    if (drift > lroundf(+3 * AOUT_MAX_PTS_DELAY / rate))
     {
         if (tracer != NULL)
             vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "late_flush");
 
-        if (stream->sync.played)
-            msg_Warn (aout, "playback way too late (%"PRId64"): "
-                      "flushing buffers", drift);
-        else
-            msg_Dbg (aout, "playback too late (%"PRId64"): "
-                     "flushing buffers", drift);
+        msg_Warn (aout, "playback way too late (%"PRId64"): "
+                    "flushing buffers", drift);
+
         vlc_aout_stream_Flush(stream);
         stream_StopResampling(stream);
 
@@ -641,17 +638,13 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
 
     /* Early audio output.
      * This is rare except at startup when the buffers are still empty. */
-    if (drift < (stream->sync.played ?
-                 lroundf(-3 * AOUT_MAX_PTS_ADVANCE / rate) : 0))
+    if (drift < lroundf(-3 * AOUT_MAX_PTS_ADVANCE / rate))
     {
-        if (stream->sync.played)
-        {
-            if (tracer != NULL)
-                vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "early_silence");
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "early_silence");
 
-            msg_Warn (aout, "playback way too early (%"PRId64"): "
-                      "playing silence", drift);
-        }
+        msg_Warn (aout, "playback way too early (%"PRId64"): "
+                 "playing silence", drift);
         stream_Silence(stream, -drift, audio_ts);
 
         stream_StopResampling(stream);
