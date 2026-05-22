@@ -372,7 +372,6 @@ static int Open (vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout->time_get = NULL;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
