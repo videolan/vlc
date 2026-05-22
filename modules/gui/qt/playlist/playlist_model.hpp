@@ -44,8 +44,8 @@ class PlaylistListModel : public QAbstractListModel
 public:
     enum Roles
     {
-        TitleRole = Qt::UserRole,
-        DurationRole,
+        TitleRole = Qt::DisplayRole,
+        DurationRole = Qt::UserRole,
         IsCurrentRole,
         ArtistRole,
         AlbumRole,
