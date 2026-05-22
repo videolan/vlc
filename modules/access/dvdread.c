@@ -88,6 +88,12 @@ vlc_module_begin ()
         set_capability( "access", 1 )
         add_shortcut( "dvdvr" )
         set_callbacks( OpenVideoRecording, Close )
+    add_submodule()
+        set_description( N_("DVDRead ISO demuxer") )
+        set_subcategory( SUBCAT_INPUT_DEMUX )
+        set_capability( "demux", 6 )
+        add_shortcut( "iso" )
+        set_callbacks( Open, Close )
 vlc_module_end ()
 
 /* how many blocks DVDRead will read in each loop */
