@@ -46,6 +46,7 @@ FocusScope {
     property bool popBelow: true
     property alias toggleButton: iconButton
     property alias textField: textField
+    readonly property bool expanded: (expandedState.state === "expanded")
 
     // public functions
 
