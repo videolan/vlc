@@ -132,7 +132,6 @@ ca_Open(audio_output_t *p_aout)
     p_aout->play = ca_Play;
     p_aout->pause = ca_Pause;
     p_aout->flush = ca_Flush;
-    p_aout->time_get = NULL;
 
     return VLC_SUCCESS;
 }
