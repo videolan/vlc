@@ -98,6 +98,8 @@
         {"key":"ic_fluent_arrow_download_24_regular", "path": "./icons/ic_fluent_arrow_download_24_regular.svg"},
         {"key":"ic_fluent_arrow_sync_24_regular", "path": "./icons/ic_fluent_arrow_sync_24_regular.svg"},
         {"key":"medialibrary_add", "path": "./icons/ic_medialibrary_add.svg"},
-        {"key":"medialibrary_remove", "path": "./icons/ic_medialibrary_remove.svg"}
+        {"key":"medialibrary_remove", "path": "./icons/ic_medialibrary_remove.svg"},
+        {"key":"regex", "path": "./icons/regex.svg"},
+        {"key":"ic_fluent_text_change_case_24_regular", "path": "./icons/ic_fluent_text_change_case_24_regular.svg"}
     ]
 }
