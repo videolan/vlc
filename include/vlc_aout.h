@@ -160,7 +160,7 @@ struct audio_output
     /**< Starts a new stream (mandatory, cannot be NULL).
       *
       * This callback changes the audio output from stopped to playing state
-      * (if successful). After the callback returns, time_get(), play(),
+      * (if successful). After the callback returns, play(),
       * pause(), flush() and eventually stop() callbacks may be called.
       *
       * \param fmt input stream sample format upon entry,
@@ -182,42 +182,12 @@ struct audio_output
       * \note This callback needs not be reentrant.
       */
 
-    int (*time_get)(audio_output_t *, vlc_tick_t * restrict delay);
-    /**< Estimates playback buffer latency (can be NULL).
-      *
-      * This callback computes an estimation of the delay until the current
-      * tail of the audio output buffer would be rendered. This is essential
-      * for (lip) synchronization and long term drift between the audio output
-      * clock and the media upstream clock (if any).
-      *
-      * If the audio output clock is exactly synchronized with the system
-      * monotonic clock (i.e. vlc_tick_now()), then this callback is not
-      * mandatory.  In that case, drain must be implemented (since the default
-      * implementation uses the delay to wait for the end of the stream).
-      *
-      * This callback is called before the first play() in order to get the
-      * initial delay (the hw latency). Most modules won't be able to know this
-      * latency before the first play. In that case, they should return -1 and
-      * handle the first play() date, cf. play() documentation.
-      *
-      * \warning It is recommended to report the audio delay via
-      * aout_TimingReport(). In that case, time_get should not be implemented.
-      *
-      * \param delay pointer to the delay until the next sample to be written
-      *              to the playback buffer is rendered [OUT]
-      * \return 0 on success, non-zero on failure or lack of data
-      *
-      * \note This callback cannot be called in stopped state.
-      */
-
     void (*play)(audio_output_t *, block_t *block, vlc_tick_t date);
     /**< Queues a block of samples for playback (mandatory, cannot be NULL).
       *
       * The first play() date (after a flush()/start()) will be most likely in
-      * the future. Modules that don't know the hw latency before a first play
-      * (when they return -1 from the first time_get()) will need to handle
-      * this. They can play a silence buffer with 'length = date - now()', or
-      * configure their render callback to start at the given date.
+      * the future. They can play a silence buffer with 'length = date - now()',
+      * or configure their render callback to start at the given date.
       *
       * \param block block of audio samples
       * \param date intended system time to render the first sample
@@ -257,8 +227,8 @@ struct audio_output
       *
       * Call aout_DrainedReport() to notify that the stream is drained.
       *
-      * If NULL, the caller will wait for the delay returned by time_get before
-      * calling stop().
+      * If NULL, the caller will wait for the delay reported by timing_report
+      * before calling stop().
       */
 
     int (*volume_set)(audio_output_t *, float volume);
@@ -270,7 +240,7 @@ struct audio_output
       *
       * \warning A stream may or may not have been started when called.
       * \warning This callback may be called concurrently with
-      * time_get(), play(), pause() or flush().
+      * play(), pause() or flush().
       * It will however be protected against concurrent calls to
       * start(), stop(), volume_set(), mute_set() or device_select().
       */
