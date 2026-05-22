@@ -342,21 +342,29 @@ ListView {
     //          remove displaced seemingly are not affected from that
     //          issue. See QTBUG-131106, QTBUG-89158, ...
 
-    moveDisplaced: Transition {
+    component DefaultDisplacedTransition : Transition {
         // Transition is relevant when drag and drop is feasible.
         // Component approach can not be used here because `Transition`
         // does not have a "target" property, and wants a valid parent.
-        enabled: !!root.acceptDropFunc
+        enabled: !!view.acceptDropFunc
+
+        required property ListViewExt view
 
         NumberAnimation {
             // TODO: Use YAnimator >= Qt 6.0 (QTBUG-66475)
-            property: (root.orientation === ListView.Vertical) ? "y" : "x"
+            property: (view.orientation === ListView.Vertical) ? "y" : "x"
             duration: VLCStyle.duration_long
             easing.type: Easing.OutSine
         }
     }
 
-    removeDisplaced: moveDisplaced
+    moveDisplaced: DefaultDisplacedTransition {
+        view: root
+    }
+
+    removeDisplaced: DefaultDisplacedTransition {
+        view: root
+    }
 
     // Events
 
