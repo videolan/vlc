@@ -241,7 +241,7 @@ ListView {
             readonly property bool bottomContainsDrag: false
 
             onContainsDragChanged: {
-                if (root.model.count > 0) {
+                if (root.count > 0) {
                     root.updateItemContainsDrag(this, containsDrag)
                 } else if (!containsDrag && root.itemContainsDrag === this) {
                     // In case model count is changed somehow while
@@ -264,7 +264,7 @@ ListView {
 
                 color: "transparent"
 
-                visible: (root.model.count === 0 && (dropArea.containsDrag || dropArea.dropOperationOngoing))
+                visible: (root.count === 0 && (dropArea.containsDrag || dropArea.dropOperationOngoing))
 
                 opacity: 0.8
 

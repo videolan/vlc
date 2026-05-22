@@ -131,8 +131,29 @@ T.Pane {
 
             Widgets.CaptionLabel {
                 color: theme.fg.secondary
-                visible: model.count !== 0
-                text: qsTr("%1 elements, %2").arg(model.count).arg(model.duration.formatLong())
+                visible: listView.count !== 0
+                text: {
+                    if (listView.count <= 0)
+                        return "" // Not visible otherwise
+
+                    let duration
+                    const model = listView.model
+                    if (model instanceof PlaylistListModel) {
+                        duration = model.duration
+                    } else {
+                        // Proxy model, we need to use `QAbstractItemModel` api:
+
+                        duration = []
+                        for (let i = 0; i < listView.count; ++i) {
+                            const itemDuration = model.data(model.index(i, 0), PlaylistListModel.DurationRole)
+                            console.assert(itemDuration !== undefined && itemDuration !== null) // typeof `vlcDuration`
+                            duration.push(itemDuration)
+                        }
+                        duration = duration[0].sum(duration)
+                    }
+
+                    return qsTr("%1 elements, %2").arg(listView.count).arg(duration.formatLong())
+                }
             }
         }
 
@@ -143,7 +164,7 @@ T.Pane {
         }
 
         RowLayout {
-            visible: model.count !== 0
+            visible: listView.count !== 0
 
             Layout.fillHeight: false
             Layout.leftMargin: VLCStyle.margin_normal
@@ -316,7 +337,7 @@ T.Pane {
                 }
 
                 function onModelReset() {
-                    if (listView.currentIndex === -1 && root.model.count > 0)
+                    if (listView.currentIndex === -1 && listView.count > 0)
                         listView.currentIndex = 0
                 }
             }
@@ -367,7 +388,7 @@ T.Pane {
 
                 Binding on visible {
                     delayed: true
-                    value: (listView.model.count === 0 && !listView.footerItem.firstItemIndicatorVisible)
+                    value: (listView.count === 0 && !listView.footerItem.firstItemIndicatorVisible)
                 }
 
                 Widgets.IconLabel {
