@@ -36,10 +36,13 @@ FocusScope {
     property alias buttonWidth: iconButton.implicitWidth
     property string searchPattern
     property alias regexButtonToggled: regexToggleButton.checked
+    property alias caseSensitiveButtonToggled: caseSensitiveToggleButton.checked
     property alias compressSearchPatternChanges: searchPatternBinding.delayed
     compressSearchPatternChanges: true
     property alias displayRegexToggleButton: regexToggleButton.visible
     displayRegexToggleButton: false
+    property alias displayCaseSensitiveToggleButton: caseSensitiveToggleButton.visible
+    displayCaseSensitiveToggleButton: false
 
     Binding on searchPattern {
         id: searchPatternBinding
@@ -195,7 +198,9 @@ FocusScope {
                 Navigation.parentItem: root
                 Navigation.upItem: root.popBelow ? iconButton : null
                 Navigation.downItem: root.popBelow ? null : iconButton
-                Navigation.rightItem: regexToggleButton.visible ? regexToggleButton : (clearButton.visible ? clearButton : null)
+                Navigation.rightItem: caseSensitiveToggleButton.visible ? caseSensitiveToggleButton
+                                                                        : (regexToggleButton.visible ? regexToggleButton
+                                                                                                     : (clearButton.visible ? clearButton : null))
                 Navigation.cancelAction: function() {
                     root.retract()
                     iconButton.focusReason = Qt.ShortcutFocusReason
@@ -247,6 +252,27 @@ FocusScope {
                     spacing: VLCStyle.margin_xxsmall
 
                     visible: parent.height > height
+
+                    Widgets.IconToolButton {
+                        id: caseSensitiveToggleButton
+
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        // Animating font properties with native rendering is probably not a good idea:
+                        font.pixelSize: 0.6 * (contentItem.renderType === Text.QtRendering ? textField.height
+                                                                                           : textField.implicitHeight)
+                        text: VLCIcons.ic_fluent_text_change_case_24_regular
+
+                        description: qsTr("Case sensitive")
+
+                        onClicked: {
+                            checked = !checked
+                        }
+
+                        Navigation.parentItem: textField
+                        Navigation.leftItem: textField
+                        Navigation.rightItem: regexToggleButton
+                    }
 
                     Widgets.IconToolButton {
                         id: regexToggleButton
