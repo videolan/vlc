@@ -11,6 +11,7 @@
 #include <QQmlEngine>
 #include <QQmlError>
 #include <QQuickItem>
+#include <QSortFilterProxyModel>
 
 class VLCVarChoiceModel;
 
@@ -41,6 +42,13 @@ private:
     QQuickItem* m_rootItem = nullptr;
 
     QPointer<QQmlEngine> m_engineBound;
+};
+
+struct QSortFilterProxyModelForeign
+{
+    Q_GADGET
+    QML_FOREIGN(QSortFilterProxyModel)
+    QML_NAMED_ELEMENT(QtSortFilterProxyModel)
 };
 
 #endif // MAINUI_HPP
