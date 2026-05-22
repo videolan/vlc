@@ -34,6 +34,8 @@ RowLayout {
 
     spacing: VLCStyle.margin_normal
 
+    property alias searchBox: searchBox
+
     Accessible.role: Accessible.ToolBar
 
     Item {
@@ -160,6 +162,29 @@ RowLayout {
 
             text: VLCIcons.playlist_clear
             onClicked: MainPlaylistController.clear()
+        }
+    }
+
+    Item {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        implicitWidth: searchBox.implicitWidth
+        implicitHeight: searchBox.implicitHeight
+
+        Widgets.SearchBox {
+            id: searchBox
+
+            anchors.centerIn: parent
+
+            enabled: MainPlaylistController.count > 1
+
+            toggleButton.font.pixelSize: VLCStyle.icon_playlist
+
+            popBelow: false
+
+            popup.width: Math.max(popup.implicitWidth, rowLayout.width * 0.6)
+            popup.bottomPadding: VLCStyle.margin_xxsmall
         }
     }
 }
