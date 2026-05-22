@@ -55,6 +55,10 @@ FocusScope {
         textField.forceActiveFocus(Qt.ShortcutFocusReason)
     }
 
+    function retract() {
+        expandedState.state = ""
+    }
+
     StateGroup {
         id: expandedState
 
@@ -135,7 +139,7 @@ FocusScope {
             if (expandedState.state == "")
                 expandAndFocus()
             else
-                expandedState.state = ""
+                root.retract()
         }
 
         T.Popup {
@@ -188,7 +192,7 @@ FocusScope {
                 Navigation.downItem: root.popBelow ? null : iconButton
                 Navigation.rightItem: clearButton.visible ? clearButton : null
                 Navigation.cancelAction: function() {
-                    expandedState.state = ""
+                    root.retract()
                     iconButton.focusReason = Qt.ShortcutFocusReason
                 }
 
