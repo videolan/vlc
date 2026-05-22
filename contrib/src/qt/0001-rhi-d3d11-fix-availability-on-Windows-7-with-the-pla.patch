@@ -1,0 +1,41 @@
+From 2c21f5de90075bb27c2c06f9887354d9df65994f Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Thu, 21 May 2026 22:23:15 +0300
+Subject: [PATCH] rhi: d3d11: fix availability on Windows 7 with the platform
+ update
+
+This patch does not guarantee that D3D11 will be supported on
+Windows 7, even with the platform update, since the driver still
+needs to support `PSSetConstantBuffers1` which appears to be
+lacking in most cases.
+
+Unlike the initial attempt during Qt 6 update on reverting
+Qt patches, we simply adjust `useLegacySwapchainModel` now.
+
+I was not able to test this on Windows 7 because VMware drivers
+do not support constant buffers, but I assume that with the
+change here if the driver has the support it should be working.
+
+With Windows 10, the legacy swapchain model is working with
+multiple buffers, so I assume it to be fine with Windows 7
+as well and not adjust the buffer count (which is 2) to 1.
+---
+ src/gui/rhi/qrhid3d11.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gui/rhi/qrhid3d11.cpp b/src/gui/rhi/qrhid3d11.cpp
+index 5053559959f..aa9332dea56 100644
+--- a/src/gui/rhi/qrhid3d11.cpp
++++ b/src/gui/rhi/qrhid3d11.cpp
+@@ -226,7 +226,7 @@ bool QRhiD3D11::create(QRhi::Flags flags)
+     // Support for flip model swapchains is required now (since we are
+     // targeting Windows 10+), but the option for using the old model is still
+     // there. (some features are not supported then, however)
+-    useLegacySwapchainModel = qEnvironmentVariableIntValue("QT_D3D_NO_FLIP");
++    useLegacySwapchainModel = qEnvironmentVariableIntValue("QT_D3D_NO_FLIP") || (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8);
+ 
+     if (!useLegacySwapchainModel) {
+         if (qEnvironmentVariableIsSet("QT_D3D_MAX_FRAME_LATENCY"))
+-- 
+2.54.0
+
