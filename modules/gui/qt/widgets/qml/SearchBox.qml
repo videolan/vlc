@@ -201,8 +201,9 @@ FocusScope {
             visible: (textField.text.length > 0)
 
             onVisibleChanged: {
-                if (!visible && parent.visible) {
+                if (activeFocus && !visible && parent.visible) {
                     parent.focus = true
+                    parent.focusReason = focusReason
                 }
             }
             onClicked: textField.clear()
