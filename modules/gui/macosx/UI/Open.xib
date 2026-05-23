@@ -1009,7 +1009,7 @@ Gw
                     </customView>
                     <button mirrorLayoutDirectionWhenInternationalizing="always" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="929">
                         <rect key="frame" x="18" y="56" width="117" height="18"/>
-                        <buttonCell key="cell" type="check" title="Stream output:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2890">
+                        <buttonCell key="cell" type="check" title="Stream output" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2890">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>

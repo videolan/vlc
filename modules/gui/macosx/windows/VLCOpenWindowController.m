@@ -198,7 +198,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [_okButton setTitle: _NS("Open")];
     [_cancelButton setTitle: _NS("Cancel")];
 
-    [_outputCheckbox setTitle:_NS("Stream output:")];
+    [_outputCheckbox setTitle:_NS("Stream output")];
     [_outputSettingsButton setTitle:_NS("Settings...")];
 
     _tabView.accessibilityLabel = _NS("Choose media input type");
@@ -317,7 +317,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
 - (void)initSubtitlesPanelStrings
 {
-    [_fileSubCheckbox setTitle: _NS("Add Subtitle File:")];
+    [_fileSubCheckbox setTitle: _NS("Add subtitle file")];
     [_fileSubPathLabel setStringValue: _NS("Choose a file")];
     [_fileSubPathLabel setHidden: NO];
     [_fileSubPathTextField setStringValue: @""];
