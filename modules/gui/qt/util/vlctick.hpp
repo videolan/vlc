@@ -103,6 +103,11 @@ public:
     VLCDuration();
     VLCDuration(vlc_tick_t);
 
+    Q_INVOKABLE static VLCDuration sum(const QList<VLCDuration>& durations)
+    {
+        return std::reduce(durations.constBegin(), durations.constEnd());
+    }
+
     VLCDuration operator*(double) const;
     VLCDuration operator+(const VLCDuration &) const;
     VLCDuration& operator+=(const VLCDuration &);
