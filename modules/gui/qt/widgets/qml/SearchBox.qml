@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQuick.Layouts
 
 
@@ -30,6 +31,7 @@ FocusScope {
     implicitWidth: iconButton.implicitWidth
     implicitHeight: iconButton.implicitHeight
 
+    property alias popup: popup
     property real maxSearchFieldWidth: Number.MAX_VALUE
     property alias buttonWidth: iconButton.implicitWidth
     property alias searchPattern: textField.text
@@ -51,8 +53,9 @@ FocusScope {
                 name: "expanded"
 
                 PropertyChanges {
-                    target: textField
-                    height:  textField.implicitHeight
+                    target: popup
+                    explicit: true
+                    height: popup.implicitHeight
                 }
 
                 PropertyChanges {
@@ -66,6 +69,10 @@ FocusScope {
                 PropertyChanges {
                     target: textField
                     text: ""
+                }
+
+                PropertyChanges {
+                    target: popup
                     height: 0.0
                 }
 
@@ -117,100 +124,122 @@ FocusScope {
             else
                 expandedState.state = ""
         }
-    }
 
-    TextFieldExt {
-        id: textField
+        T.Popup {
+            id: popup
 
-        property bool _keyPressed: false
+            x: -width + parent.width
+            y: parent.height
 
-        anchors.top: iconButton.bottom
-        anchors.right: iconButton.right
+            implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                                    implicitContentWidth + leftPadding + rightPadding)
+            implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                                     implicitContentHeight + topPadding + bottomPadding)
 
-        implicitWidth: VLCStyle.widthSearchInput
-        height: 0
+            closePolicy: Popup.NoAutoClose
 
-        visible: (height > 0)
+            height: 0
+            visible: (height > 0)
 
-        padding: VLCStyle.dp(6)
-        leftPadding: padding + VLCStyle.dp(4)
-        rightPadding: (textField.width - clearButton.x)
+            onOpened: {
+                textField.forceActiveFocus(iconButton.focusReason)
+            }
 
-        radius: clearButton.radius
+            onClosed: {
+                textField.focus = false
+                focus = false
+                iconButton.focus = true
+            }
 
-        selectByMouse: true
+            contentItem: TextFieldExt {
+                id: textField
 
-        placeholderText: qsTr("filter")
+                property bool _keyPressed: false
 
-        Navigation.parentItem: root
-        Navigation.upItem: iconButton
-        Navigation.rightItem: clearButton.visible ? clearButton : null
-        Navigation.cancelAction: function() {
-            expandedState.state = ""
-            iconButton.focusReason = Qt.ShortcutFocusReason
-        }
+                colorContext.palette: theme.palette
 
-        Accessible.searchEdit: true
+                implicitWidth: VLCStyle.widthSearchInput
 
-        //ideally we should use Keys.onShortcutOverride but it doesn't
-        //work with TextField before 5.13 see QTBUG-68711
-        onActiveFocusChanged: {
-            if (activeFocus)
-                MainCtx.useGlobalShortcuts = false
-            else
-                MainCtx.useGlobalShortcuts = true
-        }
+                padding: VLCStyle.dp(6)
+                leftPadding: padding + VLCStyle.dp(4)
+                rightPadding: (textField.width - clearButton.x)
 
-        Keys.priority: Keys.AfterItem
+                radius: clearButton.radius
 
-        Keys.onPressed: (event) => {
-            _keyPressed = true
+                selectByMouse: true
 
-            //we don't want Navigation.cancelAction to match Backspace
-            if (event.matches(StandardKey.Backspace))
-                event.accepted = true
+                placeholderText: qsTr("filter")
 
-            Navigation.defaultKeyAction(event)
-        }
+                Navigation.parentItem: root
+                Navigation.upItem: iconButton
+                Navigation.rightItem: clearButton.visible ? clearButton : null
+                Navigation.cancelAction: function() {
+                    expandedState.state = ""
+                    iconButton.focusReason = Qt.ShortcutFocusReason
+                }
 
-        Keys.onReleased: (event) => {
-            if (_keyPressed === false)
-                return
+                Accessible.searchEdit: true
 
-            _keyPressed = false
+                //ideally we should use Keys.onShortcutOverride but it doesn't
+                //work with TextField before 5.13 see QTBUG-68711
+                onActiveFocusChanged: {
+                    if (activeFocus)
+                        MainCtx.useGlobalShortcuts = false
+                    else
+                        MainCtx.useGlobalShortcuts = true
+                }
 
-            //we don't want Navigation.cancelAction to match Backspace
-            if (event.matches(StandardKey.Backspace))
-                event.accepted = true
+                Keys.priority: Keys.AfterItem
 
-            Navigation.defaultKeyReleaseAction(event)
-        }
+                Keys.onPressed: (event) => {
+                    _keyPressed = true
 
-        Widgets.IconToolButton {
-            id: clearButton
+                    //we don't want Navigation.cancelAction to match Backspace
+                    if (event.matches(StandardKey.Backspace))
+                        event.accepted = true
 
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            anchors.rightMargin: VLCStyle.margin_xxsmall
+                    Navigation.defaultKeyAction(event)
+                }
 
-            font.pixelSize: VLCStyle.icon_banner
-            text: VLCIcons.close
+                Keys.onReleased: (event) => {
+                    if (_keyPressed === false)
+                        return
 
-            description: qsTr("Clear")
+                    _keyPressed = false
 
-            visible: (textField.text.length > 0)
+                    //we don't want Navigation.cancelAction to match Backspace
+                    if (event.matches(StandardKey.Backspace))
+                        event.accepted = true
 
-            onVisibleChanged: {
-                if (activeFocus && !visible && parent.visible) {
-                    parent.focus = true
-                    parent.focusReason = focusReason
+                    Navigation.defaultKeyReleaseAction(event)
+                }
+
+                Widgets.IconToolButton {
+                    id: clearButton
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: VLCStyle.margin_xxsmall
+
+                    font.pixelSize: VLCStyle.icon_banner
+                    text: VLCIcons.close
+
+                    description: qsTr("Clear")
+
+                    visible: (textField.text.length > 0)
+
+                    onVisibleChanged: {
+                        if (activeFocus && !visible && parent.visible) {
+                            parent.focus = true
+                            parent.focusReason = focusReason
+                        }
+                    }
+                    onClicked: textField.clear()
+
+                    Navigation.parentItem: textField
+                    Navigation.leftItem: textField
                 }
             }
-            onClicked: textField.clear()
-
-            Navigation.parentItem: textField
-            Navigation.leftItem: textField
         }
     }
-
 }
