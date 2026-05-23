@@ -94,6 +94,7 @@
 
 #include <QScreen>
 #include <QAbstractProxyModel>
+#include <QMessageBox>
 
 static bool g_qmlTypesAreRegistered = false;
 
@@ -253,6 +254,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
         qmlRegisterTypesAndRevisions<AboutModel>( uri, versionMajor );
         qmlRegisterTypesAndRevisions<QSortFilterProxyModelForeign>( uri, versionMajor );
+        qmlRegisterUncreatableType<QMessageBox>( uri, versionMajor, versionMinor, "QtMessageBox", "QtMessageBox is uncreatable, use DialogsProvider instead." );
 #ifdef UPDATE_CHECK
         qmlRegisterSingletonInstance<UpdateModel>( uri, versionMajor, versionMinor, "UpdateModel", m_mainCtx->getUpdateModel() );
 #endif
