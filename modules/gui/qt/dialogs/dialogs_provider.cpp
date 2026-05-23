@@ -494,6 +494,33 @@ void DialogsProvider::mediaCodecDialog()
         m_mediaInfoDialog->hide();
 }
 
+QMessageBox::StandardButton DialogsProvider::messageDialog(const QString &text,
+                                                           const QString &title,
+                                                           const QMessageBox::StandardButtons buttons,
+                                                           const QMessageBox::StandardButton defaultButton,
+                                                           const QMessageBox::Icon icon)
+{
+    QMessageBox messageBox;
+
+    messageBox.setText(text);
+
+    if (!title.isEmpty())
+        messageBox.setWindowTitle(title);
+
+    if (icon != QMessageBox::NoIcon)
+        messageBox.setIcon(icon);
+
+    if (buttons != QMessageBox::NoButton)
+        messageBox.setStandardButtons(buttons);
+
+    if (defaultButton != QMessageBox::NoButton)
+        messageBox.setDefaultButton(defaultButton);
+
+    QVLCDialog::setWindowTransientParent(&messageBox, nullptr, p_intf);
+
+    return static_cast<QMessageBox::StandardButton>(messageBox.exec());
+}
+
 void DialogsProvider::playlistsDialog( const QVariantList & medias, MLPlaylistListModel::PlaylistType type )
 {
     const auto dialog = new PlaylistsDialog(p_intf, medias, type);

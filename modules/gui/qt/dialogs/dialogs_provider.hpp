@@ -44,6 +44,7 @@
 
 #include <QObject>
 #include <QStringList>
+#include <QMessageBox>
 
 #include <vlc_es.h>
 
@@ -209,6 +210,11 @@ public slots:
     void mediaInfoDialog( const MLItemId& itemId );
     void mediaCodecDialog();
     bool questionDialog(const QString& text, const QString& title = {}) const;
+    QMessageBox::StandardButton messageDialog(const QString& text,
+                                              const QString& title = {},
+                                              const QMessageBox::StandardButtons buttons = QMessageBox::NoButton,
+                                              const QMessageBox::StandardButton defaultButton = QMessageBox::NoButton,
+                                              const QMessageBox::Icon icon = QMessageBox::NoIcon);
     void prefsDialog();
     void firstRunDialog();
     void extendedDialog();
