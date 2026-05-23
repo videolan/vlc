@@ -53,6 +53,7 @@ public:
         UrlRole,
         PreparsedRole
     };
+    Q_ENUM(Roles);
 
     PlaylistListModel(QObject *parent = nullptr);
     PlaylistListModel(vlc_playlist_t *playlist, QObject *parent = nullptr);
