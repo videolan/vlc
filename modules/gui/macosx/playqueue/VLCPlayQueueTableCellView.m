@@ -106,6 +106,9 @@ NSString * const VLCDisplayTrackNumberPlayQueueSettingChanged = @"VLCDisplayTrac
 {
     VLCPlayQueueItem * const item = self.representedPlayQueueItem;
 
+    self.audioArtworkImageView.contentGravity = VLCImageViewContentGravityResizeAspect;
+    self.mediaImageView.contentGravity = VLCImageViewContentGravityResizeAspect;
+
     __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForPlayQueueItem:item withCompletion:^(NSImage * const thumbnail) {
         if (!weakSelf || item != weakSelf.representedPlayQueueItem) {
