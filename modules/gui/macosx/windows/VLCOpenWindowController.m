@@ -270,12 +270,12 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [_captureModePopup removeAllItems];
     [_captureModePopup addItemWithTitle: _NS("Input Devices")];
     [_captureModePopup addItemWithTitle: _NS("Screen")];
-    [_screenFPSLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Frames per Second")]];
+    [_screenFPSLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Frames per second")]];
     [_screenLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Screen")]];
     [_screenLeftLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen left")]];
     [_screenTopLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen top")]];
-    [_screenWidthLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen Width")]];
-    [_screenHeightLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen Height")]];
+    [_screenWidthLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen width")]];
+    [_screenHeightLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen height")]];
     [_screenFollowMouseCheckbox setTitle: _NS("Follow the mouse")];
     [_screenqtkAudioCheckbox setTitle: _NS("Capture Audio")];
 }
