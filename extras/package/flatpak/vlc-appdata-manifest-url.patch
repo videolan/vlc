@@ -1,3 +1,15 @@
+diff --git a/share/Makefile.am b/share/Makefile.am
+index a6c0ac1083..f06f062369 100644
+--- a/share/Makefile.am
++++ b/share/Makefile.am
+@@ -24,6 +24,7 @@ CLEANFILES += $(desktop_DATA) $(appdata_DATA)
+ 	$(AM_V_at)mv -f tmp-$@ $@
+ 
+ org.videolan.vlc.appdata.xml: org.videolan.vlc.appdata.xml.in
++	sed -i -e "s,\@GIT_HASH\@,$$(git rev-parse HEAD),g" $<
+ 	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@ || cp $< $@
+ 
+ iconsdatadir = $(datadir)/icons/hicolor
 diff --git a/share/org.videolan.vlc.appdata.xml.in.in b/share/org.videolan.vlc.appdata.xml.in.in
 index 62bd7ee443..28fc24fd94 100644
 --- a/share/org.videolan.vlc.appdata.xml.in.in

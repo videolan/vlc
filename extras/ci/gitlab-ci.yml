@@ -350,17 +350,18 @@ nightly-debian:
         FLATPAK_BRANCH: 3.0.x
         MANIFEST_PATH: extras/package/flatpak/org.videolan.VLC.yaml
     script:
-        - flatpak-builder-lint --exceptions manifest ${MANIFEST_PATH}
+        - flatpak-builder-lint --exceptions --exceptions-repo stable manifest ${MANIFEST_PATH}
         - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-        - flatpak-builder --default-branch ${FLATPAK_BRANCH} --user --install-deps-from=flathub --disable-rofiles-fuse --disable-updates --force-clean --ccache --mirror-screenshots-url=https://dl.flathub.org/media/ build-${HOST_ARCH} ${MANIFEST_PATH}
+        - flatpak-builder --default-branch ${FLATPAK_BRANCH} --install-deps-from=flathub --user --arch=${HOST_ARCH} --force-clean --disable-rofiles-fuse --ccache --mirror-screenshots-url=https://dl.flathub.org/media --compose-url-policy=full --repo=repo-${HOST_ARCH} build ${MANIFEST_PATH}
+        - flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo repo-${HOST_ARCH} org.videolan.VLC_${HOST_ARCH}.flatpak org.videolan.VLC ${FLATPAK_BRANCH}
     cache:
         key: flatpak-ccache-${HOST_ARCH}
         paths:
             - .flatpak-builder/ccache/
     artifacts:
         paths:
-            - build-${HOST_ARCH}
-        expire_in: 1 day
+            - repo-${HOST_ARCH}
+            - org.videolan.VLC_${HOST_ARCH}.flatpak
 
 flatpak-x86_64:
     extends: .flatpak-common
@@ -416,17 +417,19 @@ flatpak-repo:
         name: $VLC_FLATPAK_IMAGE
         entrypoint: [""]
     script:
-        - flatpak build-export --exclude=/lib/debug/* --include=/lib/debug/app repo build-x86_64
-        - flatpak build-export --metadata=metadata.debuginfo --files=files/lib/debug repo build-x86_64
-        - flatpak build-export --exclude=/lib/debug/* --include=/lib/debug/app repo build-aarch64
-        - flatpak build-export --metadata=metadata.debuginfo --files=files/lib/debug repo build-aarch64
-        - ostree commit --repo=repo --canonical-permissions --branch=screenshots/x86_64 build-x86_64/files/share/app-info/media
-        - ostree commit --repo=repo --canonical-permissions --branch=screenshots/aarch64 build-aarch64/files/share/app-info/media
-        - flatpak-builder-lint --exceptions repo repo || true
+        - ostree init --repo=repo --mode archive-z2
+        - for ref in $(ostree --repo=repo-x86_64 refs); do
+            flatpak build-commit-from --no-update-summary --disable-fsync --src-repo=repo-x86_64 repo "$ref";
+          done
+        - for ref in $(ostree --repo=repo-aarch64 refs); do
+            flatpak build-commit-from --no-update-summary --disable-fsync --src-repo=repo-aarch64 repo "$ref";
+          done
+        - flatpak build-update-repo --generate-static-deltas --static-delta-ignore-ref=*.Debug --static-delta-ignore-ref=*.Sources repo
+        - flatpak-builder-lint --exceptions --exceptions-repo stable repo repo
+        - tar -czf repository.tar.gz repo/
     artifacts:
         paths:
-          - repo
-        expire_in: 1 week
+          - repository.tar.gz
     dependencies:
       - flatpak-x86_64
       - flatpak-aarch64

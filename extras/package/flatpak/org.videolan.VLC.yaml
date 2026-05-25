@@ -107,7 +107,7 @@ modules:
         skip:
           - contrib
       - type: patch
-        path: vlc-fix-appdata.patch
+        path: vlc-appdata-manifest-url.patch
       - type: file
         path: vlc.sh
 
