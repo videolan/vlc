@@ -60,7 +60,7 @@ Item {
 
     readonly property bool effectCompatible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
-    readonly property bool implicitClipping: shaderEffectSource.visible
+    readonly property bool implicitClipping: effect.visible
 
     Rectangle {
         id: backgroundRect
@@ -193,96 +193,89 @@ Item {
                             height) // Texture height is (height * dpr)
 
         // Make sure sourceItem is not rendered twice:
-        hideSource: visible
+        hideSource: effect.visible
+
+        visible: false
 
         smooth: false
+    }
 
-        visible: effectCompatible &&
+    ShaderEffect {
+        // It makes sense to use the effect for only in the fading part.
+        // However, it would complicate things in the QML side. As it
+        // would require two additional items, as well as two more texture
+        // allocations.
+        // Given the shading done here is not complex, this is not done.
+        // Applying the texture and the effect is done in one step.
+
+        id: effect
+
+        anchors.fill: shaderEffectSource
+
+        readonly property Item source: shaderEffectSource
+
+        readonly property bool vertical: (root.orientation === Qt.Vertical)
+        readonly property real normalFadeSize: root.fadeSize / (vertical ? height : width)
+
+        property real beginningFadeSize: root.enableBeginningFade ? normalFadeSize : 0
+        property real endFadeSize: root.enableEndFade ? normalFadeSize : 0
+        readonly property real endFadePos: 1.0 - endFadeSize
+
+        visible: root.effectCompatible &&
                  (root.backgroundColor.a < 1.0) &&
                  ((root.enableBeginningFade || root.enableEndFade) ||
-                 ((shaderEffect) && (shaderEffect.beginningFadeSize > 0 || shaderEffect.endFadeSize > 0)))
+                  (beginningFadeSize > 0 || endFadeSize > 0))
 
-        property ShaderEffect shaderEffect
-
-        layer.enabled: true
-        layer.effect: ShaderEffect {
-            // It makes sense to use the effect for only in the fading part.
-            // However, it would complicate things in the QML side. As it
-            // would require two additional items, as well as two more texture
-            // allocations.
-            // Given the shading done here is not complex, this is not done.
-            // Applying the texture and the effect is done in one step.
-
-            id: effect
-
-            readonly property bool vertical: (root.orientation === Qt.Vertical)
-            readonly property real normalFadeSize: root.fadeSize / (vertical ? height : width)
-
-            property real beginningFadeSize: root.enableBeginningFade ? normalFadeSize : 0
-            property real endFadeSize: root.enableEndFade ? normalFadeSize : 0
-            readonly property real endFadePos: 1.0 - endFadeSize
-
-            onBeginningFadeSizeChanged: {
-                if (!beginningFadeBehavior.enabled) {
-                    Qt.callLater(effect._enableBeginningFadeBehavior)
-                }
+        onBeginningFadeSizeChanged: {
+            if (!beginningFadeBehavior.enabled) {
+                Qt.callLater(effect._enableBeginningFadeBehavior)
             }
-
-            onEndFadeSizeChanged: {
-                if (!endFadeBehavior.enabled) {
-                    Qt.callLater(effect._enableEndFadeBehavior)
-                }
-            }
-
-            function _enableBeginningFadeBehavior() {
-                beginningFadeBehavior.enabled = true
-            }
-
-            function _enableEndFadeBehavior() {
-                endFadeBehavior.enabled = true
-            }
-
-            Component.onCompleted: {
-                console.assert(shaderEffectSource.shaderEffect === null)
-                shaderEffectSource.shaderEffect = this
-            }
-
-            Component.onDestruction: {
-                console.assert(shaderEffectSource.shaderEffect === this)
-                shaderEffectSource.shaderEffect = null
-            }
-
-            component FadeBehavior : Behavior {
-                enabled: false
-
-                // Qt Bug: UniformAnimator does not work...
-                // FIXME: Is it fixed with Qt 6?
-                NumberAnimation {
-                    duration: VLCStyle.duration_veryShort
-                    easing.type: Easing.InOutSine
-                }
-            }
-
-            FadeBehavior on beginningFadeSize {
-                id: beginningFadeBehavior
-            }
-
-            FadeBehavior on endFadeSize {
-                id: endFadeBehavior
-            }
-
-            // Atlas textures can be supported
-            // but in this use case it is not
-            // necessary as the layer texture
-            // can not be placed in the atlas.
-            supportsAtlasTextures: false
-
-            // cullMode: ShaderEffect.BackFaceCulling // Does not work sometimes. Qt bug?
-
-            vertexShader: "qrc:///shaders/FadingEdge%1.vert.qsb".arg(vertical ? "Y" : "X")
-
-            // TODO: Dithering is not necessary if background color is not dark.
-            fragmentShader: "qrc:///shaders/FadingEdge.frag.qsb"
         }
+
+        onEndFadeSizeChanged: {
+            if (!endFadeBehavior.enabled) {
+                Qt.callLater(effect._enableEndFadeBehavior)
+            }
+        }
+
+        function _enableBeginningFadeBehavior() {
+            beginningFadeBehavior.enabled = true
+        }
+
+        function _enableEndFadeBehavior() {
+            endFadeBehavior.enabled = true
+        }
+
+        component FadeBehavior : Behavior {
+            enabled: false
+
+            // Qt Bug: UniformAnimator does not work...
+            // FIXME: Is it fixed with Qt 6?
+            NumberAnimation {
+                duration: VLCStyle.duration_veryShort
+                easing.type: Easing.InOutSine
+            }
+        }
+
+        FadeBehavior on beginningFadeSize {
+            id: beginningFadeBehavior
+        }
+
+        FadeBehavior on endFadeSize {
+            id: endFadeBehavior
+        }
+
+        // Atlas textures can be supported
+        // but in this use case it is not
+        // necessary as the layer texture
+        // can not be placed in the atlas.
+        supportsAtlasTextures: false
+
+        // cullMode: ShaderEffect.BackFaceCulling // Does not work sometimes. Qt bug?
+
+        vertexShader: "qrc:///shaders/FadingEdge%1.vert.qsb".arg(vertical ? "Y" : "X")
+
+        // TODO: Dithering is not necessary if background color is not dark.
+        fragmentShader: "qrc:///shaders/FadingEdge.frag.qsb"
     }
 }
