@@ -362,6 +362,9 @@ FocusScope {
 
                         onTriggered: {
                             blurredBackground.live = false
+
+                            // We still need this, because the source texture might not have been ready while `live` was on:
+                            blurredBackground.scheduleUpdate(true) // onNextTextureChange
                         }
                     }
                 }
@@ -431,7 +434,7 @@ FocusScope {
                                 }
 
                                 onSourceChanged: {
-                                    blurredBackground.scheduleUpdate(true) // onNextTextureChange
+                                    liveTimer.transientTurnOnLive()
                                 }
 
                                 onStatusChanged: {
