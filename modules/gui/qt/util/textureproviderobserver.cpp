@@ -340,6 +340,12 @@ void TextureProviderObserver::updateProperties()
                 m_oldNativeTextureSize.store(nativeTextureSize, memoryOrder);
                 m_oldNormalizedTextureSubRect.store(normalizedTextureSubRect, memoryOrder);
                 m_oldComparisonKey.store(comparisonKey, memoryOrder);
+
+                emit textureChanged();
+            }
+            else
+            {
+                m_pendingNotifyTextureChange.store(true, memoryOrder);
             }
 
             return;
@@ -382,6 +388,9 @@ void TextureProviderObserver::resetProperties(std::memory_order memoryOrder)
     m_oldNativeTextureSize.store({}, memoryOrder);
     m_oldNormalizedTextureSubRect.store({}, memoryOrder);
     m_oldComparisonKey.store(-1, memoryOrder);
+
+    m_pendingNotifyTextureChange.store(false, memoryOrder);
+    emit textureChanged();
 }
 
 void TextureProviderObserver::adjustSampleAndNotifyConnection()
@@ -443,4 +452,7 @@ void TextureProviderObserver::sampleAndNotifyProperties()
         if (m_oldNormalizedTextureSubRect.exchange(normalizedTextureSubRect, memoryOrder) != normalizedTextureSubRect)
             emit normalizedTextureSubRectChanged(normalizedTextureSubRect);
     }
+
+    if (m_pendingNotifyTextureChange.exchange(false, memoryOrder))
+        emit textureChanged();
 }

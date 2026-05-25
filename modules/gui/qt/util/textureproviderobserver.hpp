@@ -105,6 +105,14 @@ public slots:
     void sampleAndNotifyProperties();
 
 signals:
+    // Similar to property notify signals, if the texture is dynamic, this
+    // signal is compressed and emitted at once once per frame from the GUI
+    // thread. If the texture is not dynamic, it is not compressed and emitted
+    // from the sg/rendering thread. You may use auto connection to connect
+    // to this signal, because there is no risk for backlogging (static
+    // textures are not expected to change rapidly).
+    void textureChanged();
+
     void notifyAllChangesChanged();
     void sourceChanged();
     void textureSizeChanged(const QSize&);
@@ -152,6 +160,7 @@ private:
     std::atomic<bool> m_hasMipmaps = false;
     std::atomic<bool> m_isAtlasTexture = false;
     std::atomic<bool> m_isValid = false;
+    std::atomic<bool> m_pendingNotifyTextureChange = false;
 };
 
 #endif // TEXTUREPROVIDEROBSERVER_HPP
