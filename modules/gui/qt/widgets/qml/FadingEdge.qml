@@ -62,7 +62,18 @@ Item {
 
     readonly property bool implicitClipping: !!_shaderEffect?.visible
 
-    property bool useLayering: effectCompatible && (backgroundColor.a < 1.0)
+    property bool useLayering: effectCompatible && (enforceClipping || backgroundColor.a < 1.0)
+
+    // Sometimes `Item::clip` may not be suitable to use with item views,
+    // this includes, but not limited to, when display margins are set.
+    // In this case, `enforceClipping` may be set. Note that setting this
+    // property does not guarantee that clipping is done, it is advised
+    // to check `implicitClipping` to know if clipping is actually done.
+    // NOTE: `useLayering` must be set for this to be respected, by
+    //       default it is set when `enforceClipping` is set.
+    // TODO: Get rid of this once we can adjust the clip rect directly
+    //       in QML (currently requires overriding `QQuickItem::clipRect()`).
+    property bool enforceClipping: false
 
     property Item _shaderEffectSource
     property Item _shaderEffect
@@ -265,8 +276,9 @@ Item {
             readonly property real endFadePos: 1.0 - endFadeSize
 
             visible: root.useLayering &&
-                     ((root.enableBeginningFade || root.enableEndFade) ||
-                      (beginningFadeSize > 0 || endFadeSize > 0))
+                     (root.enforceClipping ||
+                      ((root.enableBeginningFade || root.enableEndFade) ||
+                       (beginningFadeSize > 0 || endFadeSize > 0)))
 
             onBeginningFadeSizeChanged: {
                 if (!beginningFadeBehavior.enabled) {
