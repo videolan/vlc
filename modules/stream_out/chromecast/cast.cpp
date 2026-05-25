@@ -53,6 +53,8 @@
 
 namespace {
 
+static constexpr vlc_tick_t CHROMECAST_HANDOFF_ATTACH_TIMEOUT = VLC_TICK_FROM_SEC(5);
+
 struct sout_access_out_sys_t
 {
     sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf);
@@ -751,9 +753,9 @@ static void DelInternal(sout_stream_t *p_stream, void *_id, bool reset_config)
 
     if ( p_sys->out_streams.empty() )
     {
-        if (p_sys->access_out_live.waitForClient(VLC_TICK_FROM_SEC(20)))
+        if (p_sys->access_out_live.waitForClient(CHROMECAST_HANDOFF_ATTACH_TIMEOUT))
         {
-            p_sys->access_out_live.waitForClient(VLC_TICK_FROM_SEC(20), true);
+            p_sys->access_out_live.waitForClient(CHROMECAST_HANDOFF_ATTACH_TIMEOUT, true);
             p_sys->p_intf->preservePlaybackOnTeardown();
         }
         p_sys->stopSoutChain(p_stream);
