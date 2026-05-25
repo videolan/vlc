@@ -656,6 +656,7 @@ Gw
                                                                     <textField focusRingType="none" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2349">
                                                                         <rect key="frame" x="140" y="134" width="43" height="19"/>
                                                                         <constraints>
+                                                                            <constraint firstAttribute="height" constant="19" id="8rV-7b-gQ1"/>
                                                                             <constraint firstAttribute="width" constant="43" id="HO8-k1-06b"/>
                                                                         </constraints>
                                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="5.0" drawsBackground="YES" id="2960">
@@ -792,14 +793,14 @@ Gw
                                                                         </connections>
                                                                     </stepper>
                                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2773">
-                                                                        <rect key="frame" x="372" y="105" width="15" height="22"/>
+                                                                        <rect key="frame" x="371" y="105" width="15" height="22"/>
                                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="59" valueWraps="YES" id="2974"/>
                                                                         <connections>
                                                                             <action selector="takeIntValueFrom:" target="2496" id="2778"/>
                                                                         </connections>
                                                                     </stepper>
                                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2774">
-                                                                        <rect key="frame" x="372" y="76" width="15" height="22"/>
+                                                                        <rect key="frame" x="371" y="76" width="15" height="22"/>
                                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="59" valueWraps="YES" id="2975"/>
                                                                         <connections>
                                                                             <action selector="takeIntValueFrom:" target="2498" id="2782"/>
@@ -880,6 +881,8 @@ Gw
                                                                     <constraint firstItem="2495" firstAttribute="leading" secondItem="2346" secondAttribute="leading" constant="17" id="1Nd-wV-crm"/>
                                                                     <constraint firstItem="2349" firstAttribute="centerY" secondItem="2351" secondAttribute="centerY" id="1Z1-6p-oH9"/>
                                                                     <constraint firstItem="2349" firstAttribute="top" secondItem="3463" secondAttribute="bottom" constant="9" id="1pe-fJ-QQf"/>
+                                                                    <constraint firstItem="2494" firstAttribute="height" constant="19" id="2Vr-Qw-L1S"/>
+                                                                    <constraint firstItem="2492" firstAttribute="height" constant="19" id="8vD-D2-J5Q"/>
                                                                     <constraint firstItem="3463" firstAttribute="centerY" secondItem="3462" secondAttribute="centerY" id="2xk-VU-l9X"/>
                                                                     <constraint firstItem="2499" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2772" secondAttribute="trailing" constant="17" id="3pS-fd-W8u"/>
                                                                     <constraint firstItem="2772" firstAttribute="leading" secondItem="2494" secondAttribute="trailing" constant="8" id="4y6-dj-Vja"/>
@@ -894,26 +897,28 @@ Gw
                                                                     <constraint firstAttribute="trailing" secondItem="3504" secondAttribute="trailing" constant="20" symbolic="YES" id="Emq-Ud-9Ys"/>
                                                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3463" secondAttribute="trailing" constant="20" symbolic="YES" id="Fbx-sH-Klc"/>
                                                                     <constraint firstItem="2496" firstAttribute="leading" secondItem="2497" secondAttribute="trailing" constant="7" id="IQy-E3-Xpy"/>
-                                                                    <constraint firstItem="3504" firstAttribute="top" secondItem="2508" secondAttribute="bottom" constant="11" id="Iyw-rN-iOe"/>
-                                                                    <constraint firstItem="2773" firstAttribute="top" secondItem="3463" secondAttribute="bottom" constant="36" id="JT0-Se-zNP"/>
-                                                                    <constraint firstItem="2773" firstAttribute="leading" secondItem="2496" secondAttribute="trailing" constant="9" id="JhF-6p-e1w"/>
+                                                                    <constraint firstItem="3504" firstAttribute="top" secondItem="2508" secondAttribute="bottom" constant="8" id="Iyw-rN-iOe"/>
+                                                                    <constraint firstItem="2773" firstAttribute="leading" secondItem="2496" secondAttribute="trailing" constant="8" id="JhF-6p-e1w"/>
                                                                     <constraint firstItem="2496" firstAttribute="centerY" secondItem="2497" secondAttribute="centerY" id="NhA-Ma-q7R"/>
                                                                     <constraint firstItem="3463" firstAttribute="leading" secondItem="3462" secondAttribute="trailing" constant="7" id="Q1m-Xf-bBA"/>
                                                                     <constraint firstItem="2494" firstAttribute="leading" secondItem="2492" secondAttribute="leading" id="RgH-8C-SBF"/>
                                                                     <constraint firstItem="2492" firstAttribute="width" secondItem="2349" secondAttribute="width" id="Rk9-Lb-HjV"/>
-                                                                    <constraint firstItem="2774" firstAttribute="top" secondItem="2773" secondAttribute="bottom" constant="10" id="S6a-3c-cmS"/>
                                                                     <constraint firstItem="2773" firstAttribute="trailing" secondItem="2774" secondAttribute="trailing" id="SRy-9D-hCh"/>
                                                                     <constraint firstItem="2771" firstAttribute="leading" secondItem="2492" secondAttribute="trailing" constant="8" id="ShI-CO-E9K"/>
+                                                                    <constraint firstItem="2498" firstAttribute="height" constant="19" id="U2d-wj-HBa"/>
                                                                     <constraint firstItem="2494" firstAttribute="width" secondItem="2492" secondAttribute="width" id="VAk-hW-dMj"/>
-                                                                    <constraint firstItem="2494" firstAttribute="top" secondItem="2492" secondAttribute="bottom" constant="10" id="YtW-Or-tdL"/>
+                                                                    <constraint firstItem="2494" firstAttribute="top" secondItem="2492" secondAttribute="bottom" constant="8" id="YtW-Or-tdL"/>
                                                                     <constraint firstItem="2349" firstAttribute="centerY" secondItem="2352" secondAttribute="centerY" id="Zsj-2f-gmZ"/>
+                                                                    <constraint firstItem="2496" firstAttribute="centerY" secondItem="2492" secondAttribute="centerY" id="aoe-6v-3Io"/>
                                                                     <constraint firstItem="2498" firstAttribute="width" secondItem="2494" secondAttribute="width" id="c2n-1M-53e"/>
                                                                     <constraint firstItem="3463" firstAttribute="top" secondItem="2346" secondAttribute="top" constant="8" id="c96-S9-8i8"/>
                                                                     <constraint firstItem="2496" firstAttribute="centerY" secondItem="2773" secondAttribute="centerY" id="c9f-2c-KFH"/>
+                                                                    <constraint firstItem="2496" firstAttribute="height" constant="19" id="ccf-6m-Lvy"/>
                                                                     <constraint firstItem="2496" firstAttribute="width" secondItem="2492" secondAttribute="width" id="cFE-py-YgF"/>
                                                                     <constraint firstItem="3506" firstAttribute="width" secondItem="3463" secondAttribute="width" id="daq-xp-Oaz"/>
                                                                     <constraint firstItem="2498" firstAttribute="centerY" secondItem="2499" secondAttribute="centerY" id="g2h-AB-FSA"/>
-                                                                    <constraint firstItem="2508" firstAttribute="top" secondItem="2494" secondAttribute="bottom" constant="7" id="gCg-wM-Ix3"/>
+                                                                    <constraint firstItem="2498" firstAttribute="centerY" secondItem="2494" secondAttribute="centerY" id="gMM-9n-Czw"/>
+                                                                    <constraint firstItem="2508" firstAttribute="top" secondItem="2494" secondAttribute="bottom" constant="4" id="gCg-wM-Ix3"/>
                                                                     <constraint firstAttribute="bottom" secondItem="3504" secondAttribute="bottom" constant="20" id="h6c-fL-TIg"/>
                                                                     <constraint firstItem="3463" firstAttribute="leading" secondItem="3506" secondAttribute="leading" id="hKN-bu-hmB"/>
                                                                     <constraint firstItem="2492" firstAttribute="centerY" secondItem="2771" secondAttribute="centerY" id="hxd-uj-ZAS"/>
@@ -926,7 +931,7 @@ Gw
                                                                     <constraint firstItem="2494" firstAttribute="centerY" secondItem="2495" secondAttribute="centerY" id="rm4-hW-AvX"/>
                                                                     <constraint firstItem="2492" firstAttribute="leading" secondItem="2349" secondAttribute="leading" id="vKT-dS-lBs"/>
                                                                     <constraint firstItem="2351" firstAttribute="leading" secondItem="2346" secondAttribute="leading" constant="17" id="vjg-4r-sXx"/>
-                                                                    <constraint firstItem="2774" firstAttribute="leading" secondItem="2498" secondAttribute="trailing" constant="9" id="yEa-Of-xMX"/>
+                                                                    <constraint firstItem="2774" firstAttribute="leading" secondItem="2498" secondAttribute="trailing" constant="8" id="yEa-Of-xMX"/>
                                                                     <constraint firstItem="2349" firstAttribute="leading" secondItem="2351" secondAttribute="trailing" constant="7" id="yG5-kn-I98"/>
                                                                     <constraint firstItem="2494" firstAttribute="centerY" secondItem="2772" secondAttribute="centerY" id="ycc-8N-GPS"/>
                                                                 </constraints>
