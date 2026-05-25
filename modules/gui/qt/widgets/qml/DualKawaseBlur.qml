@@ -164,36 +164,9 @@ Item {
 
     property bool _queuedScheduledUpdate: false
 
-    readonly property var _comparisonVar: ({key: sourceTextureProviderObserver.comparisonKey,
-                                            subRect: sourceTextureProviderObserver.normalizedTextureSubRect})
-    property var _oldComparisonVar
-
-    on_ComparisonVarChanged: {
-        if (_comparisonVar.key >= 0) {
-            if (_oldComparisonVar !== undefined && _oldComparisonVar !== _comparisonVar) {
-                _oldComparisonVar = undefined
-
-                // If source texture is not valid, update will be requeued in `scheduleUpdate()`.
-                // That being said, a non-valid source texture should have (-1) as comparison key,
-                // which we already checked here.
-
-                if (root.funcOnNextEffectureTextureChange) {
-                    root.funcOnNextEffectureTextureChange()
-                }
-            }
-        }
-    }
-
-    // This is not respected when `live` is true, it is only for the `scheduleUpdate(true)` calls.
-    property var funcOnNextEffectureTextureChange: function() {
-        root.scheduleUpdate()
-    }
-
-    // When `onNextEffectiveTextureChange` is set, the update is scheduled automatically when the effective
-    // texture changes, which is when the texture itself changes or the texture remains the same but
-    // the sub-rect changes (such as, the new texture is a different part of the same atlas texture).
-    // This behavior can be fine-tuned with the property `funcOnNextEffectureTextureChange`.
-    function scheduleUpdate(onNextEffectiveTextureChange /* : bool */ = false) {
+    // NOTE: You can use the `sourceTextureProviderObserver.textureChanged()` signal to schedule an update
+    //       on source texture change at appropriate time.
+    function scheduleUpdate() {
         if (live)
             return // no-op
 
@@ -202,11 +175,6 @@ Item {
 
         if (!root.sourceTextureIsValid) {
             root._queuedScheduledUpdate = true // if source texture is not valid, delay the update until valid
-            return
-        }
-
-        if (onNextEffectiveTextureChange) {
-            root._oldComparisonVar = root._comparisonVar
             return
         }
 
