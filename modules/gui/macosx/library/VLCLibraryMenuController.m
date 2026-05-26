@@ -192,6 +192,16 @@
 
     _removeFromPlaylistItem.hidden = YES;
 
+    /* no represented items (right-click on empty space) - media actions are disabled */
+    if (self.representedItems.count == 0 && self.representedInputItems.count == 0) {
+        [self menuItems:_inputItemRequiringMenuItems setHidden:YES];
+        [self menuItems:_localInputItemRequiringMenuItems setHidden:YES];
+        [self menuItems:_folderInputItemRequiringMenuItems setHidden:YES];
+        [self menuItems:_recentsMediaItemRequiringMenuItems setHidden:YES];
+        [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
+        return;
+    }
+
     if (self.representedItems != nil && self.representedItems.count > 0) {
         [self menuItems:_inputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_localInputItemRequiringMenuItems setHidden:YES];
@@ -275,6 +285,15 @@
         [self menuItems:_localInputItemRequiringMenuItems setHidden:anyStream];
         [self menuItems:_folderInputItemRequiringMenuItems setHidden:!bookmarkable];
    }
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    /* add media action is always available, every other action needs a represented item. */
+    if (menuItem.action == @selector(addMedia:)) {
+        return YES;
+    }
+    return self.representedItems.count > 0 || self.representedInputItems.count > 0;
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView

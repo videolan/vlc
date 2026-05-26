@@ -91,6 +91,12 @@
         return;
     }
 
+    /* right-click on empty space - no represented items, so actions are disabled */
+    if (self.clickedRow == -1) {
+        _menuController.representedItems = @[];
+        return;
+    }
+
     NSMutableIndexSet * const indices = self.selectedRowIndexes.mutableCopy;
     const NSUInteger hasSelectedIndices = indices.count > 0;
     const NSInteger clickedRow = self.clickedRow;
