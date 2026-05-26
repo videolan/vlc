@@ -701,8 +701,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     if (_playerController.currentMedia != nil) {
         [self rebuildAoutMenu];
         [self rebuildVoutMenu];
-    } else {
-        self.windowMenu.autoenablesItems = NO;
     }
 }
 
