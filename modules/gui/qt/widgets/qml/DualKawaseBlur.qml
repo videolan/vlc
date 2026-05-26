@@ -504,7 +504,9 @@ Item {
 
         visible: tpObserver.isValid && root.available
 
-        source: useIndirection ? textureProviderIndirection : targetSource
+        // WARNING: Switching source may cause twitching, we can use the indirection at all times
+        //          considering it has negligible overhead:
+        source: textureProviderIndirection
 
         readonly property Item targetSource: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
 
