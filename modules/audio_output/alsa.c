@@ -127,6 +127,14 @@ typedef struct
     vlc_frame_t *frame_chain;
     vlc_frame_t **frame_last;
     uint64_t queued_samples;
+
+    bool starting;
+    struct {
+        vlc_tick_t start_date;
+        vlc_tick_t first_pts;
+        vlc_tick_t next_update;
+        uint64_t injected_samples;
+    } time;
 } aout_sys_t;
 
 #include "audio_output/volume.h"
@@ -241,6 +249,19 @@ static void * InjectionThread(void * data)
     aout_sys_t *sys = aout->sys;
     snd_pcm_t *pcm = sys->pcm;
 
+    int64_t silence_buffer_frames =
+        samples_from_vlc_tick(AOUT_MIN_PREPARE_TIME, sys->rate);
+    size_t silence_buffer_bytes = snd_pcm_frames_to_bytes(pcm, silence_buffer_frames);
+
+    uint8_t *silence_buffer = malloc(silence_buffer_bytes);
+    if (silence_buffer == NULL)
+    {
+        sys->unrecoverable_error = true;
+        vlc_sem_post(&sys->init_sem);
+        return NULL;
+    }
+    memset(silence_buffer, 0, silence_buffer_bytes);
+
     /* We're expecting at least 2 fds:
      * - one for generic wakeup
      * - one or more for alsa
@@ -248,9 +269,10 @@ static void * InjectionThread(void * data)
     struct pollfd * pfds = calloc(2, sizeof(struct pollfd));
     if (pfds == NULL)
     {
-      sys->unrecoverable_error = true;
-      vlc_sem_post(&sys->init_sem);
-      return NULL;
+        free(silence_buffer);
+        sys->unrecoverable_error = true;
+        vlc_sem_post(&sys->init_sem);
+        return NULL;
     }
     int pfds_count = 2;
 
@@ -344,6 +366,45 @@ static void * InjectionThread(void * data)
             continue;
         }
 
+        if (sys->starting)
+        {
+            vlc_tick_t now = vlc_tick_now();
+            snd_pcm_sframes_t delay_frames;
+            int val = snd_pcm_delay(sys->pcm, &delay_frames);
+            vlc_tick_t delay_ticks =
+                (val == 0) ? vlc_tick_from_samples(delay_frames, sys->rate) : 0;
+            vlc_tick_t silence_ticks = sys->time.start_date - now - delay_ticks;
+            if (silence_ticks > 0)
+            {
+                vlc_tick_t write_silence_ticks =
+                    silence_ticks > AOUT_MIN_PREPARE_TIME ? AOUT_MIN_PREPARE_TIME
+                                                          : silence_ticks;
+                int64_t silence_frames = samples_from_vlc_tick(write_silence_ticks,
+                                                               sys->rate);
+
+                assert(silence_frames <= silence_buffer_frames);
+                snd_pcm_sframes_t frames = PcmWrite(aout, pcm, silence_buffer,
+                                                    silence_frames);
+                if (frames == -EAGAIN)
+                    continue;
+                if (frames < 0)
+                    break;
+
+                msg_Dbg(aout, "deferring start (%"PRId64" us)", silence_ticks);
+                if (write_silence_ticks == AOUT_MIN_PREPARE_TIME)
+                    continue;
+
+                sys->starting = false;
+            }
+            else
+            {
+                msg_Dbg(aout, "starting late (%"PRId64" us)", silence_ticks);
+                sys->starting = false;
+            }
+        }
+
+        assert(!sys->starting);
+
         vlc_frame_t * f = sys->frame_chain;
         snd_pcm_sframes_t frames = PcmWrite(aout, pcm, f->p_buffer, f->i_nb_samples);
         if (frames >= 0)
@@ -353,6 +414,7 @@ static void * InjectionThread(void * data)
             f->p_buffer += bytes;
             f->i_buffer -= bytes;
             sys->queued_samples -= frames;
+            sys->time.injected_samples += frames;
             // pts, length
             if (f->i_nb_samples == 0)
             {
@@ -366,8 +428,26 @@ static void * InjectionThread(void * data)
             continue;
         else
             break;
+
+        vlc_tick_t now = vlc_tick_now();
+        if (sys->time.first_pts != VLC_TICK_INVALID && now > sys->time.next_update)
+        {
+            sys->time.next_update = now + VLC_TICK_FROM_SEC(1);
+            int val = snd_pcm_delay(sys->pcm, &frames);
+            if (val != 0)
+            {
+                msg_Err(aout, "cannot estimate delay: %s", snd_strerror(val));
+                continue;
+            }
+            vlc_tick_t delay = vlc_tick_from_samples(frames, sys->rate);
+            vlc_tick_t injected_samples_ticks =
+                vlc_tick_from_samples(sys->time.injected_samples, sys->rate);
+            aout_TimingReport(aout, now + delay,
+                              sys->time.first_pts + injected_samples_ticks);
+        }
     }
     free(pfds);
+    free(silence_buffer);
     if (sys->started && !sys->unrecoverable_error)
     {
         msg_Err(aout, "Unhandled error in injection thread, requesting aout restart");
@@ -376,25 +456,6 @@ static void * InjectionThread(void * data)
     vlc_mutex_unlock(&sys->lock);
     return NULL;
 }
-
-static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
-{
-    aout_sys_t *sys = aout->sys;
-    snd_pcm_sframes_t frames;
-
-    vlc_mutex_lock(&sys->lock);
-    int val = snd_pcm_delay(sys->pcm, &frames);
-    if (val)
-    {
-        msg_Err(aout, "cannot estimate delay: %s", snd_strerror(val));
-        vlc_mutex_unlock(&sys->lock);
-        return -1;
-    }
-    *delay = vlc_tick_from_samples(frames + sys->queued_samples, sys->rate);
-    vlc_mutex_unlock(&sys->lock);
-    return 0;
-}
-
 
 /**
  * Queues one audio buffer to the hardware.
@@ -415,6 +476,15 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
         vlc_mutex_unlock(&sys->lock);
         return;
     }
+    if (sys->time.start_date == VLC_TICK_INVALID)
+    {
+        sys->starting = true;
+        sys->time.next_update = VLC_TICK_0;
+        sys->time.first_pts = block->i_pts;
+    }
+    if (sys->starting)
+        sys->time.start_date = date
+                             - vlc_tick_from_samples(sys->queued_samples, sys->rate);
     if (sys->frame_chain == NULL)
         wake_poll(sys);
     vlc_frame_ChainLastAppend(&sys->frame_last, block);
@@ -434,6 +504,11 @@ static void PauseDummy(audio_output_t *aout, bool pause, vlc_tick_t date)
     if (pause)
     {
         sys->state = PAUSED;
+        sys->starting = false;
+        sys->time.start_date = VLC_TICK_INVALID;
+        sys->time.first_pts = VLC_TICK_INVALID;
+        sys->time.next_update = VLC_TICK_0;
+        sys->time.injected_samples = 0;
         snd_pcm_drop(pcm);
     }
     else
@@ -481,6 +556,11 @@ static void Flush (audio_output_t *aout)
     sys->frame_last = &sys->frame_chain;
     sys->queued_samples = 0;
     sys->draining = false;
+    sys->starting = false;
+    sys->time.start_date = VLC_TICK_INVALID;
+    sys->time.first_pts = VLC_TICK_INVALID;
+    sys->time.next_update = VLC_TICK_0;
+    sys->time.injected_samples = 0;
 
     if (sys->state == IDLE)
         sys->state = PLAYING;
@@ -1003,6 +1083,11 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->draining = false;
     sys->state = PLAYING;
     sys->unrecoverable_error = false;
+    sys->starting = false;
+    sys->time.start_date = VLC_TICK_INVALID;
+    sys->time.first_pts = VLC_TICK_INVALID;
+    sys->time.next_update = VLC_TICK_0;
+    sys->time.injected_samples = 0;
     if (vlc_clone(&sys->thread, InjectionThread, aout))
         goto error;
 
@@ -1148,7 +1233,7 @@ static int Open(vlc_object_t *obj)
     sys->frame_last = &sys->frame_chain;
     vlc_sem_init(&sys->init_sem, 0);
 
-    aout->time_get = TimeGet;
+    aout->time_get = NULL;
     aout->play = Play;
     aout->flush = Flush;
     aout->drain = Drain;
