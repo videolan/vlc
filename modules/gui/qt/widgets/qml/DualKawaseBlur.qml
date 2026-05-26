@@ -141,7 +141,10 @@ Item {
     // rect is set to discard the empty margins. Another use case is freely
     // adjusting the position of the visual when viewport rect is smaller than
     // the effect size, since with only viewport rect the visual is always
-    // centered in the parent (effect).
+    // centered in the parent (effect). Note that the reference point used
+    // for sub-texturing is (visualRect.xy - viewportRect.xy), which makes the
+    // texture centered with `viewportRect.xy` acting as the margins, and
+    // the value can be both positive or negative.
     // NOTE: `visualRect` is expected to be in item coordinates, similar to
     //       `sourceRect`.
     property rect visualRect
@@ -536,7 +539,8 @@ Item {
 
         // NOTE: Vertex shader is set in `DefaultShaderEffect` when `normalRect` is valid.
 
-        normalRect: useSubTexture ? Qt.rect(0, 0,
+        normalRect: useSubTexture ? Qt.rect((root._localVisualRect.x - root._localViewportRect.x) * root.eDPR / sourceTextureSize.width,
+                                            (root._localVisualRect.y - root._localViewportRect.y) * root.eDPR / sourceTextureSize.height,
                                             root._localVisualRect.width * root.eDPR / sourceTextureSize.width,
                                             root._localVisualRect.height * root.eDPR / sourceTextureSize.height)
                                   : Qt.rect(0,0,0,0)
