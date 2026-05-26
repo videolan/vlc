@@ -78,7 +78,6 @@ static void WaveOutClean( aout_sys_t * p_sys );
 static void WaveOutClearBuffer( HWAVEOUT, WAVEHDR *);
 
 static uint32_t findDeviceID(char *);
-static int WaveOutTimeGet(audio_output_t * , vlc_tick_t *);
 static void WaveOutFlush( audio_output_t *);
 static void WaveOutDrain( audio_output_t *);
 static void WaveOutDrainAsync( audio_output_t *);
@@ -175,7 +174,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     if( aout_FormatNbChannels( fmt ) == 0 )
         return VLC_EGENERIC;
 
-    p_aout->time_get = WaveOutTimeGet;
     p_aout->play = Play;
     p_aout->pause = WaveOutPause;
     p_aout->flush = WaveOutFlush;
@@ -837,6 +835,8 @@ static void Close(vlc_object_t *obj)
     free(sys);
 }
 
+#if 0
+// FIXME: port to aout_TimingReport()
 static int WaveOutTimeGet(audio_output_t * p_aout, vlc_tick_t *delay)
 {
     MMTIME mmtime;
@@ -857,6 +857,7 @@ static int WaveOutTimeGet(audio_output_t * p_aout, vlc_tick_t *delay)
     *delay = sys->i_played_length - i_pos;
     return 0;
 }
+#endif
 
 static void WaveOutFlush( audio_output_t *p_aout)
 {
