@@ -130,7 +130,7 @@ Item {
     // the effect size, since with only viewport rect the visual is always
     // centered in the parent (effect).
     property rect visualRect
-    property int visualWrapMode: TextureProviderIndirection.ClampToEdge
+    property int visualWrapMode: ShaderEffectSource.ClampToEdge
 
     // Local viewport rect is viewport rect divided by two, because it is used as the source
     // rect of last layer, which is 2x upsampled by the painter delegate (us2):
@@ -292,6 +292,8 @@ Item {
         // Last layer for two pass mode, so use the viewport rect:
         sourceRect: (root.mode === DualKawaseBlur.Mode.TwoPass) ? root._localViewportRect : Qt.rect(0, 0, 0, 0)
         
+        wrapMode: (root.mode === DualKawaseBlur.Mode.TwoPass) ? root.visualWrapMode : ShaderEffectSource.ClampToEdge
+
         function scheduleChainedUpdate() {
             if (!ds1layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
@@ -402,6 +404,8 @@ Item {
         // No need to check for the mode because this layer is not used in two pass mode anyway.
         sourceRect: root._localViewportRect
 
+        wrapMode: (root.mode === DualKawaseBlur.Mode.FourPass) ? root.visualWrapMode : ShaderEffectSource.ClampToEdge
+
         function scheduleChainedUpdate() {
             if (!us1layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
@@ -475,13 +479,13 @@ Item {
         id: us2
 
         // {us1/ds1}.size * 2, unless visual rect is used
-        anchors.centerIn: useIndirection ? undefined : parent
+        anchors.centerIn: useSubTexture ? undefined : parent
 
-        x: useIndirection ? root.visualRect.x : 0
-        y: useIndirection ? root.visualRect.y : 0
+        x: useSubTexture ? root.visualRect.x : 0
+        y: useSubTexture ? root.visualRect.y : 0
 
         width: {
-            if (useIndirection)
+            if (useSubTexture)
                 return root.visualRect.width
 
             if (root.viewportRect.width > 0)
@@ -491,7 +495,7 @@ Item {
         }
 
         height: {
-            if (useIndirection)
+            if (useSubTexture)
                 return root.visualRect.height
 
             if (root.viewportRect.height > 0)
@@ -500,15 +504,11 @@ Item {
             return parent.height
         }
 
-        readonly property bool useIndirection: (root.visualRect.width > 0 && root.visualRect.height > 0)
+        readonly property bool useSubTexture: (root.visualRect.width > 0 && root.visualRect.height > 0)
 
         visible: tpObserver.isValid && root.available
 
-        // WARNING: Switching source may cause twitching, we can use the indirection at all times
-        //          considering it has negligible overhead:
-        source: textureProviderIndirection
-
-        readonly property Item targetSource: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
+        source: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
 
         property alias tint: root.tint
         property alias tintStrength: root.tintStrength
@@ -519,6 +519,13 @@ Item {
         fragmentShader: root.postprocess ? "qrc:///shaders/DualKawaseBlur_upsample_postprocess.frag.qsb"
                                          : "qrc:///shaders/DualKawaseBlur_upsample.frag.qsb"
 
+        // NOTE: Vertex shader is set in `DefaultShaderEffect` when `normalRect` is valid.
+
+        normalRect: useSubTexture ? Qt.rect(0, 0,
+                                            root._localVisualRect.width * _eDPR / sourceTextureSize.width,
+                                            root._localVisualRect.height * _eDPR / sourceTextureSize.height)
+                                  : Qt.rect(0,0,0,0)
+
         property real _eDPR: MainCtx.effectiveDevicePixelRatio(Window.window) || 1.0
 
         Connections {
@@ -527,20 +534,6 @@ Item {
             function onIntfDevicePixelRatioChanged() {
                 us2._eDPR = MainCtx.effectiveDevicePixelRatio(us2.Window.window) || 1.0
             }
-        }
-
-        TextureProviderIndirection {
-            id: textureProviderIndirection
-
-            source: us2.targetSource
-
-            textureSubRect: Qt.rect(0,
-                                    0,
-                                    root._localVisualRect.width * us2._eDPR,
-                                    root._localVisualRect.height * us2._eDPR)
-
-            horizontalWrapMode: root.visualWrapMode
-            verticalWrapMode: root.visualWrapMode
         }
     }
 }
