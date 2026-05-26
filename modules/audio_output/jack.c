@@ -75,7 +75,6 @@ static void Close        ( vlc_object_t * );
 static void Play         ( audio_output_t * p_aout, block_t *, vlc_tick_t );
 static void Pause        ( audio_output_t *aout, bool paused, vlc_tick_t date );
 static void Flush        ( audio_output_t *p_aout );
-static int  TimeGet      ( audio_output_t *, vlc_tick_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  Buffer_ch    ( jack_nframes_t nframes, void *p_arg );
 static int  GraphChange  ( void *p_arg );
@@ -161,7 +160,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->play = Play;
     p_aout->pause = Pause;
     p_aout->flush = Flush;
-    p_aout->time_get = TimeGet;
 
     p_sys->i_channels = aout_FormatNbChannels( fmt );
     aout_FormatPrepare(fmt);
@@ -373,6 +371,8 @@ static int MuteSet(audio_output_t *p_aout, bool mute)
     return 0;
 }
 
+#if 0
+// FIXME: port to aout_TimingReport()
 static int TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
 {
     aout_sys_t * p_sys = p_aout->sys;
@@ -385,6 +385,7 @@ static int TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
 
     return 0;
 }
+#endif
 
 /*****************************************************************************
  * Process: callback for JACK
