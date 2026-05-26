@@ -94,6 +94,17 @@ Item {
     // it is wanted or necessary anyway.
     property Item source
 
+    readonly property real eDPR: _eDPR
+    property real _eDPR: MainCtx.effectiveDevicePixelRatio(Window.window) || 1.0
+
+    Connections {
+        target: MainCtx
+
+        function onIntfDevicePixelRatioChanged() {
+            root._eDPR = MainCtx.effectiveDevicePixelRatio(root.Window.window) || 1.0
+        }
+    }
+
     /// <debug>
     readonly property QtObject _sourceWindow: (source?.Window.window ?? null)
     function _onWindowChanged() {
@@ -109,6 +120,8 @@ Item {
 
     // Arbitrary sub-texturing (no need to be set for atlas textures):
     // `QSGTextureView` can also be used instead of sub-texturing here.
+    // NOTE: `sourceRect` is expected to be in item coordinates, similar to
+    //       `ShaderEffectSource::sourceRect`.
     property rect sourceRect
 
     // Viewport rect allows to discard an unwanted area in effect's local coordinates.
@@ -129,6 +142,8 @@ Item {
     // adjusting the position of the visual when viewport rect is smaller than
     // the effect size, since with only viewport rect the visual is always
     // centered in the parent (effect).
+    // NOTE: `visualRect` is expected to be in item coordinates, similar to
+    //       `sourceRect`.
     property rect visualRect
     property int visualWrapMode: ShaderEffectSource.ClampToEdge
 
@@ -277,10 +292,10 @@ Item {
         //       and normalize in the vertex shader, but we can not because we are
         //       targeting GLSL 1.20/ESSL 1.0, even though the shader is written in
         //       GLSL 4.40.
-        normalRect: (root.sourceRect.width > 0.0 && root.sourceRect.height > 0.0) ? Qt.rect(root.sourceRect.x / sourceTextureSize.width,
-                                                                                            root.sourceRect.y / sourceTextureSize.height,
-                                                                                            root.sourceRect.width / sourceTextureSize.width,
-                                                                                            root.sourceRect.height / sourceTextureSize.height)
+        normalRect: (root.sourceRect.width > 0.0 && root.sourceRect.height > 0.0) ? Qt.rect(root.sourceRect.x * root.eDPR / sourceTextureSize.width,
+                                                                                            root.sourceRect.y * root.eDPR / sourceTextureSize.height,
+                                                                                            root.sourceRect.width * root.eDPR / sourceTextureSize.width,
+                                                                                            root.sourceRect.height * root.eDPR / sourceTextureSize.height)
                                                                                   : Qt.rect(0.0, 0.0, 0.0, 0.0)
     }
 
@@ -522,18 +537,8 @@ Item {
         // NOTE: Vertex shader is set in `DefaultShaderEffect` when `normalRect` is valid.
 
         normalRect: useSubTexture ? Qt.rect(0, 0,
-                                            root._localVisualRect.width * _eDPR / sourceTextureSize.width,
-                                            root._localVisualRect.height * _eDPR / sourceTextureSize.height)
+                                            root._localVisualRect.width * root.eDPR / sourceTextureSize.width,
+                                            root._localVisualRect.height * root.eDPR / sourceTextureSize.height)
                                   : Qt.rect(0,0,0,0)
-
-        property real _eDPR: MainCtx.effectiveDevicePixelRatio(Window.window) || 1.0
-
-        Connections {
-            target: MainCtx
-
-            function onIntfDevicePixelRatioChanged() {
-                us2._eDPR = MainCtx.effectiveDevicePixelRatio(us2.Window.window) || 1.0
-            }
-        }
     }
 }

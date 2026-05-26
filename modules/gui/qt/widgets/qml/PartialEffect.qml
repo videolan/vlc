@@ -173,7 +173,10 @@ Item {
             target: root.effect
             property: "sourceRect"
             when: textureProviderIndirection.effectAcceptsSourceRect
-            value: textureProviderIndirection.textureSubRect
+            value: Qt.rect(textureProviderIndirection.x,
+                           textureProviderIndirection.y,
+                           textureProviderIndirection.width,
+                           textureProviderIndirection.height)
         }
 
         // Adjust the blending. Currently MultiEffect/FastBlur does not
