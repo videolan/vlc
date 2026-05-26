@@ -28,6 +28,10 @@ import VLC.Style
 ListViewExt {
     id: root
 
+    selectionModel: ListSelectionModel {
+        model: root.model
+    }
+
     property var sortModel: []
 
     property Component tableHeaderDelegate:  TableHeaderDelegate {

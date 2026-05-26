@@ -30,9 +30,8 @@ ListView {
 
     // Properties
 
-    property ListSelectionModel selectionModel: ListSelectionModel {
-        model: root.model
-    }
+    // Optional
+    property ListSelectionModel selectionModel
 
     // Optional property for drop indicator placement and auto scroll feature:
     property var itemContainsDrag: undefined

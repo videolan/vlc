@@ -210,6 +210,10 @@ T.Pane {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            selectionModel: ListSelectionModel {
+                model: listView.model
+            }
+
             focus: true
 
             clip: !fadingEdge.implicitClipping && (height < contentHeight)
