@@ -120,6 +120,8 @@ static inline int bytesPerSample(void)
     return 2 /* S16 */ * 2 /* stereo */;
 }
 
+#if 0
+// FIXME: port to aout_TimingReport()
 static int TimeGet(audio_output_t* aout, vlc_tick_t* restrict drift)
 {
     aout_sys_t *sys = aout->sys;
@@ -146,6 +148,7 @@ static int TimeGet(audio_output_t* aout, vlc_tick_t* restrict drift)
 
     return 0;
 }
+#endif
 
 static void Flush(audio_output_t *aout)
 {
@@ -390,7 +393,6 @@ static int Open (vlc_object_t *obj)
 
     aout->start      = Start;
     aout->stop       = Stop;
-    aout->time_get   = TimeGet;
     aout->play       = Play;
     aout->pause      = Pause;
     aout->flush      = Flush;
