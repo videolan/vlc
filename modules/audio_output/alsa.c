@@ -217,6 +217,24 @@ static int fill_pfds_from_state_locked(audio_output_t *aout, struct pollfd **pfd
     return -1;
 }
 
+static snd_pcm_sframes_t PcmWrite(audio_output_t *aout, snd_pcm_t *pcm,
+                                  const void *buffer, snd_pcm_sframes_t samples)
+{
+    snd_pcm_sframes_t frames = snd_pcm_writei(pcm, buffer, samples);
+    if (frames >= 0 || frames == -EAGAIN)
+        return frames;
+    int val = snd_pcm_recover(pcm, frames, 1);
+    if (val)
+    {
+        msg_Err(aout, "cannot recover playback stream: %s",
+                snd_strerror (val));
+        DumpDeviceStatus(aout->obj.logger, pcm);
+        return frames;
+    }
+    msg_Warn(aout, "cannot write samples: %s", snd_strerror(frames));
+    return -EAGAIN;
+}
+
 static void * InjectionThread(void * data)
 {
     audio_output_t *aout = (audio_output_t *) data;
@@ -327,7 +345,7 @@ static void * InjectionThread(void * data)
         }
 
         vlc_frame_t * f = sys->frame_chain;
-        snd_pcm_sframes_t frames = snd_pcm_writei(pcm, f->p_buffer, f->i_nb_samples);
+        snd_pcm_sframes_t frames = PcmWrite(aout, pcm, f->p_buffer, f->i_nb_samples);
         if (frames >= 0)
         {
             size_t bytes = snd_pcm_frames_to_bytes(pcm, frames);
@@ -347,17 +365,7 @@ static void * InjectionThread(void * data)
         else if (frames == -EAGAIN)
             continue;
         else
-        {
-            int val = snd_pcm_recover(pcm, frames, 1);
-            if (val)
-            {
-                msg_Err(aout, "cannot recover playback stream: %s",
-                        snd_strerror (val));
-                DumpDeviceStatus(aout->obj.logger, pcm);
-                break;
-            }
-            msg_Warn(aout, "cannot write samples: %s", snd_strerror(frames));
-        }
+            break;
     }
     free(pfds);
     if (sys->started && !sys->unrecoverable_error)
