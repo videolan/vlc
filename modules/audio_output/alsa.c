@@ -1233,7 +1233,6 @@ static int Open(vlc_object_t *obj)
     sys->frame_last = &sys->frame_chain;
     vlc_sem_init(&sys->init_sem, 0);
 
-    aout->time_get = NULL;
     aout->play = Play;
     aout->flush = Flush;
     aout->drain = Drain;
