@@ -34,7 +34,9 @@
 
 #include "events.h"
 
+#ifndef HAVE_PARTIAL_LINKING
 const char vlc_module_name[] = "xcb";
+#endif
 
 #pragma GCC visibility push(default)
 

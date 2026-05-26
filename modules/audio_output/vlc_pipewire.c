@@ -34,7 +34,9 @@
 #include <vlc_tick.h>
 #include "vlc_pipewire.h"
 
+#ifndef HAVE_PARTIAL_LINKING
 const char vlc_module_name[] = "vlcpipewire";
+#endif
 
 struct vlc_pw_context {
     struct pw_thread_loop *loop;

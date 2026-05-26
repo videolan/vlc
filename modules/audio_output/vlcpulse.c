@@ -34,7 +34,9 @@
 #include <unistd.h>
 #include <pwd.h>
 
+#ifndef HAVE_PARTIAL_LINKING
 const char vlc_module_name[] = "vlcpulse";
+#endif
 
 #undef vlc_pa_error
 void vlc_pa_error (vlc_object_t *obj, const char *msg, pa_context *ctx)
