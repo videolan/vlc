@@ -217,16 +217,17 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     var_AddCallback(outer, "gamma",      varFloatCallback, &sys->gamma);
 
     static const char *const VERTEX_SHADER =
-        "attribute vec2 vertex_pos;\n"
-        "attribute vec2 tex_coords_in;\n"
-        "varying vec2 tex_coords;\n"
+        "in vec2 vertex_pos;\n"
+        "in vec2 tex_coords_in;\n"
+        "out vec2 tex_coords;\n"
         "void main() {\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
         "  tex_coords = tex_coords_in;\n"
         "}\n";
 
     static const char *const FRAGMENT_SHADER =
-        "varying vec2 tex_coords;\n"
+        "in vec2 tex_coords;\n"
+        "out vec4 fragColor;\n"
         "uniform float contrast;\n"
         "uniform float brightness;\n"
         "uniform float hue;\n"
@@ -235,52 +236,52 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "\n"
         /* expects normalized rgb */
         "vec3 rgb_to_hsl(float r, float g, float b) {\n"
-        "  float h = 0.f, s = 0.f, l = 0.f;\n"
+        "  float h = 0.0, s = 0.0, l = 0.0;\n"
         "  float cmin = min(min(r, g), b);\n"
         "  float cmax = max(max(r, g), b);\n"
-        "  l = (cmin + cmax) / 2.f;\n"
+        "  l = (cmin + cmax) / 2.0;\n"
         "  float diff = cmax - cmin;\n"
-        "  if (diff < 0.001f) {\n"
+        "  if (diff < 0.001) {\n"
         "    return vec3(h, s, l);\n"
         "  }\n"
-        "  s = diff / (1.f - abs(2.f * l - 1.f));\n"
+        "  s = diff / (1.0 - abs(2.0 * l - 1.0));\n"
         "  if (cmax == r) {\n"
-        "    h = mod((g - b) / diff, 6.f);\n"
+        "    h = mod((g - b) / diff, 6.0);\n"
         "  }\n"
         "  else if (cmax == g) {\n"
-        "    h = 2.f + (b - r) / diff;\n"
+        "    h = 2.0 + (b - r) / diff;\n"
         "  }\n"
         "  else {\n"
-        "    h = 4.f + (r - g) / diff;\n"
+        "    h = 4.0 + (r - g) / diff;\n"
         "  }\n"
-        "  h *= 60.f;\n"
+        "  h *= 60.0;\n"
         "  return vec3(h, s, l);\n"
         "}\n"
         "\n"
         "vec3 hsl_to_rgb(float h, float s, float l) {\n"
-        "  vec3 res = vec3(0.f);\n"
+        "  vec3 res = vec3(0.0);\n"
         "  \n"
-        "  float c = (1 - abs(2 * l - 1)) * s;\n"
-        "  float x = c * (1 - abs(mod(h / 60.f, 2) - 1));\n"
-        "  float m = l - c * 0.5f;\n"
+        "  float c = (1.0 - abs(2.0 * l - 1.0)) * s;\n"
+        "  float x = c * (1.0 - abs(mod(h / 60.0, 2.0) - 1.0));\n"
+        "  float m = l - c * 0.5;\n"
         "  \n"
-        "  if (h < 60.f) {\n"
-        "    res = vec3(c, x, 0);\n"
+        "  if (h < 60.0) {\n"
+        "    res = vec3(c, x, 0.0);\n"
         "  }\n"
-        "  else if (h < 120.f) {\n"
-        "    res = vec3(x, c, 0);\n"
+        "  else if (h < 120.0) {\n"
+        "    res = vec3(x, c, 0.0);\n"
         "  }\n"
-        "  else if (h < 180.f) {\n"
-        "    res = vec3(0, c, x);\n"
+        "  else if (h < 180.0) {\n"
+        "    res = vec3(0.0, c, x);\n"
         "  }\n"
-        "  else if (h < 240.f) {\n"
-        "    res = vec3(0, x, c);\n"
+        "  else if (h < 240.0) {\n"
+        "    res = vec3(0.0, x, c);\n"
         "  }\n"
-        "  else if (h < 300.f) {\n"
-        "    res = vec3(x, 0, c);\n"
+        "  else if (h < 300.0) {\n"
+        "    res = vec3(x, 0.0, c);\n"
         "  }\n"
-        "  else if (h < 360.f) {\n"
-        "    res = vec3(c, 0, x);\n"
+        "  else if (h < 360.0) {\n"
+        "    res = vec3(c, 0.0, x);\n"
         "  }\n"
         "  return res + m;\n"
         "}\n"
@@ -289,28 +290,17 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "  vec3 color = vlc_texture(tex_coords).rgb;\n"
         "  color = rgb_to_hsl(color.r, color.g, color.b);\n"
         "  color = hsl_to_rgb(\n"
-        "    mod(color.r - hue, 360.f),\n"
-        "    clamp(color.g * saturation, 0.0f, 1.f),\n"
-        "    clamp(color.b, 0.f, 1.f)\n"
+        "    mod(color.r - hue + 360.0, 360.0),\n"
+        "    clamp(color.g * saturation, 0.0, 1.0),\n"
+        "    clamp(color.b, 0.0, 1.0)\n"
         "  );\n"
-        "  color = pow(clamp(contrast * color + brightness + 0.5f\n"
-        "                    - contrast * 0.5f, 0.f, 1.f), vec3(gamma));\n"
-        "  gl_FragColor = vec4(color, 0.f);\n"
+        "  color = pow(clamp(contrast * color + brightness + 0.5\n"
+        "                    - contrast * 0.5, 0.0, 1.0), vec3(gamma));\n"
+        "  fragColor = vec4(color, 0.0);\n"
         "}\n";
 
-    const char *shader_version;
-    const char *shader_precision;
-    if (filter->api->is_gles)
-    {
-        shader_version = "#version 100\n";
-        shader_precision = "precision highp float;\n";
-    }
-    else
-    {
-        shader_version = "#version 120\n";
-        shader_precision = "";
-    }
-
+    const char *shader_version = sampler->shader.version;
+    const char *shader_precision = sampler->shader.precision;
     const char *extensions = sampler->shader.extensions
                            ? sampler->shader.extensions : "";
 
