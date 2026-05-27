@@ -518,6 +518,7 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
         ms.es.I_O().setFilePointer(ms.cluster->GetDataStart());
     }
 
+    assert(ms.ep.GetLevel() == 1);
     ms.ep.Down();
 
     /* read until cluster/timecode to initialize cluster */
