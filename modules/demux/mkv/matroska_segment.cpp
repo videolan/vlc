@@ -1230,6 +1230,12 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
         E_CASE( KaxBlockGroup, kbgroup )
         {
+            if( vars.b_cluster_timecode == false )
+            {
+                msg_Warn( vars.p_demuxer, "ignoring KaxBlockGroup prior to mandatory Timecode" );
+                return;
+            }
+
             vars.obj->i_block_pos = kbgroup.GetElementPosition();
             vars.ep->Down ();
         }
