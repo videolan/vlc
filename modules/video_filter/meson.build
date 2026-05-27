@@ -376,6 +376,14 @@ vlc_modules += {
     'link_with' : [deinterlacecommon_lib]
 }
 
+# gl blend
+vlc_modules += {
+    'name' : 'glblend',
+    'sources' : files('deinterlace/glblend.c'),
+    'dependencies' : [gl_common_dep, gl_vout_dep],
+    'enabled' : gl_vout_dep.found(),
+}
+
 # Postproc filter
 postproc_dep = dependency('libpostproc', required: get_option('postproc'))
 postproc_c_args = []
