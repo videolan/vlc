@@ -137,13 +137,13 @@ win64-arm-llvm:
     variables:
         <<: *variables-win64-arm
 
-uwp32-libvlc-llvm:
+uwp64-libvlc-llvm:
     extends: .win-common
     image:
         name: $VLC_UWP_LLVM_IMAGE
     variables:
-        <<: *variables-win32
-        VLCARCH: win32-uwp
+        <<: *variables-win64
+        VLCARCH: win64-uwp
         LIBVLC_EXTRA_BUILD_FLAGS: -z
         UWP_EXTRA_BUILD_FLAGS: -u -w
 
