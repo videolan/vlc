@@ -26,7 +26,7 @@ import VLC.Style
 ControlBar {
     id: root
 
-    visible: animation.running || (state === "inViewport")
+    visible: (-anchors.bottomMargin < height) || (state === "inViewport")
 
     anchors.bottomMargin: (state === "outViewport") ? -_delayedImplicitHeight : 0
 
