@@ -324,9 +324,16 @@ FocusScope {
                 }
 
                 Rectangle {
-                    // Extension of parent rectangle for edge extension.
+                    // Extension of parent rectangle for edge and fractional scale alignment extension.
                     anchors.fill: parent
-                    anchors.margins: -stackViewParent.edgeExtension
+                    anchors.margins: -(stackViewParent.edgeExtension + fractionalScaleExtensionSize)
+
+                    // With fractional scale, if we align up the layer size to make sure the size is
+                    // an integer, we also need to extend here because the background must cover the
+                    // extension area. 8 should be enough for the fractions that we care (.25, .5, .75).
+                    // Note that the background extension here does not consume additional video memory.
+                    readonly property real fractionalScaleExtensionSize: (stackViewParent.alignNumber > 1 ? 8.0 : 0.0)
+
                     visible: stackViewParent.layer.enabled && (height > 0 && width > 0)
                     // We can't simply adjust the color because the color might not be opaque,
                     // so we use border instead. Note that border is always placed inside the
