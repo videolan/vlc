@@ -58,6 +58,13 @@ vlc_modules += {
     'dependencies' : [m_lib]
 }
 
+# Gate filter module
+vlc_modules += {
+    'name' : 'gate',
+    'sources' : files('gate.c'),
+    'dependencies' : [m_lib]
+}
+
 # Karaoke filter module
 vlc_modules += {
     'name' : 'karaoke',
