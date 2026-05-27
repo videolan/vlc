@@ -296,7 +296,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "  );\n"
         "  color = pow(clamp(contrast * color + brightness + 0.5\n"
         "                    - contrast * 0.5, 0.0, 1.0), vec3(gamma));\n"
-        "  fragColor = vec4(color, 0.0);\n"
+        "  fragColor = vec4(color, 1.0);\n"
         "}\n";
 
     const char *shader_version = sampler->shader.version;
