@@ -889,7 +889,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             if (vars.tk->fmt.video.primaries == COLOR_PRIMARIES_UNDEF)
                 debug( vars, "Unsupported Colour Primaries=%d", static_cast<uint8_t>(primaries) );
             else if (name == nullptr)
-                debug( vars, "Colour Primaries=%s", static_cast<uint8_t>(primaries) );
+                debug( vars, "Colour Primaries=%" PRIu8, static_cast<uint8_t>(primaries) );
             else
                 debug( vars, "Colour Primaries=%s", name );
         }
