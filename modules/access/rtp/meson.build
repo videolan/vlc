@@ -50,6 +50,11 @@ vlc_modules += {
 }
 
 vlc_modules += {
+    'name': 'rtp_mpeg4',
+    'sources': files('mpeg4.c')
+}
+
+vlc_modules += {
     'name': 'rtp_pcm',
     'sources': files('pcm.c')
 }
