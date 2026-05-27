@@ -1,0 +1,50 @@
+From b2d2a1d4672dad47dc29d695b6e7b25c6371c272 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 27 May 2026 12:08:17 +0200
+Subject: [PATCH 16/16] core: disable registry access in UWP
+
+---
+ src/w32-reg.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/w32-reg.c b/src/w32-reg.c
+index 5bb8d43..29f20f3 100644
+--- a/src/w32-reg.c
++++ b/src/w32-reg.c
+@@ -46,6 +46,9 @@ char *
+ _gpgrt_w32_reg_query_string (const char *root, const char *dir,
+                              const char *name)
+ {
++#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++  return NULL;
++#else
+   HKEY root_key, key_handle;
+   DWORD n1, nbytes, type, flags;
+   char *result = NULL;
+@@ -198,6 +201,7 @@ _gpgrt_w32_reg_query_string (const char *root, const char *dir,
+  leave:
+   RegCloseKey (key_handle);
+   return result;
++#endif
+ }
+ 
+ 
+@@ -226,6 +230,9 @@ _gpgrt_w32_reg_query_string (const char *root, const char *dir,
+ char *
+ _gpgrt_w32_reg_get_string (const char *key_arg)
+ {
++#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++  return NULL;
++#else
+   char *key;
+   char *p1, *p2;
+   char *result;
+@@ -253,4 +260,5 @@ _gpgrt_w32_reg_get_string (const char *key_arg)
+   result = _gpgrt_w32_reg_query_string (*key? key : NULL, p1, p2);
+   xfree (key);
+   return result;
++#endif
+ }
+-- 
+2.52.0.windows.1
+

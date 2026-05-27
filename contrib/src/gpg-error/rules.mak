@@ -32,6 +32,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 	$(APPLY) $(SRC)/gpg-error/0013-configure-allow-building-Windows-with-disable-thread.patch
 	$(APPLY) $(SRC)/gpg-error/0014-core-disable-locking-API-with-disable-threads.patch
 	$(APPLY) $(SRC)/gpg-error/0015-core-disable-process-spawning-with-disable-threads.patch
+	$(APPLY) $(SRC)/gpg-error/0016-core-disable-registry-access-in-UWP.patch
 	# use the ANSI version of Environment API's as the rest of the code
 	sed -i.orig -e 's/ExpandEnvironmentStrings /ExpandEnvironmentStringsA /g' $(UNPACK_DIR)/src/w32-reg.c
 	sed -i.orig -e 's/SetEnvironmentVariable /SetEnvironmentVariableA /g' $(UNPACK_DIR)/src/sysutils.c
