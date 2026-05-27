@@ -279,7 +279,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     {
         MKV_SWITCH_INIT();
 
-        static void debug (MetaDataCapture const& vars, char const * fmt, ...)
+        static void debug (MetaDataCapture const& vars, char const * fmt, ...) VLC_FORMAT( 2, 3 )
         {
             va_list args; va_start( args, fmt );
             MkvTree_va( *vars.p_demuxer, vars.level, fmt, args);
@@ -1218,7 +1218,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
     {
         MKV_SWITCH_INIT();
 
-        static void debug (InfoHandlerPayload& vars, char const * fmt, ...)
+        static void debug (InfoHandlerPayload& vars, char const * fmt, ...) VLC_FORMAT( 2, 3 )
         {
             va_list args; va_start( args, fmt );
             MkvTree_va( *vars.p_demuxer, 2, fmt, args);
@@ -1382,7 +1382,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
     {
         MKV_SWITCH_INIT();
 
-        static void debug (ChapterPayload const& vars, char const * fmt, ...)
+        static void debug (ChapterPayload const& vars, char const * fmt, ...) VLC_FORMAT( 2, 3 )
         {
             va_list args; va_start( args, fmt );
             MkvTree_va( *vars.p_demuxer, vars.level, fmt, args);
