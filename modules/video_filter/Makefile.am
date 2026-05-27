@@ -151,6 +151,13 @@ endif
 
 libopengl_filter_plugin_la_SOURCES = video_filter/opengl.c
 
+if HAVE_WIN32
+libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
+if HAVE_GL
+video_filter_PLUGINS += libopengl_filter_plugin.la
+endif
+endif
+
 if HAVE_LINUX
 if HAVE_ANDROID
 libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
