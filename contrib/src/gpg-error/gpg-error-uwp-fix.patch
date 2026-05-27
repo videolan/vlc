@@ -1,37 +1,40 @@
-From 803dc7c5daecc9044483a9b0ad848b52f95e4189 Mon Sep 17 00:00:00 2001
+From d246bd0c4eba45b78f18786898ec4f8d6af86c72 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 15 May 2023 08:20:15 +0200
 Subject: [PATCH 03/15] fix UWP build
 
 ---
- src/init.c     | 8 +++++++-
- src/mkheader.c | 2 +-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ src/init.c     | 11 ++++++++++-
+ src/mkheader.c |  2 +-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/src/init.c b/src/init.c
-index 7f970d9..4fe6b90 100644
+index 7f970d9..321da10 100644
 --- a/src/init.c
 +++ b/src/init.c
-@@ -82,8 +82,9 @@ static void
+@@ -81,8 +81,9 @@ static void *(*custom_realloc)(void *a, size_t n);
+ static void
  windows_specific_init (void)
  {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
    OSVERSIONINFO osvi;
 -  HMODULE hntdll = GetModuleHandle ("ntdll.dll");
 +  HMODULE hntdll = GetModuleHandleA ("ntdll.dll");
  
-+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
    memset (&osvi,0,sizeof(osvi));
    osvi.dwOSVersionInfoSize = sizeof(osvi);
-   GetVersionEx (&osvi);
-@@ -91,6 +92,7 @@ windows_specific_init (void)
-   /* The feature of process/thread attribute is available on Vista or
-      later.  */
-   windows_features.is_vista_or_later = (osvi.dwMajorVersion >= 6);
-+#endif
+@@ -94,6 +95,10 @@ windows_specific_init (void)
  
    if (hntdll && GetProcAddress (hntdll, "wine_get_version"))
      windows_features.semihosted_by_wine = 1;
-@@ -589,7 +591,11 @@ _gpgrt_windows_feature (int k)
++#else
++  windows_features.is_vista_or_later = 1;
++  windows_features.semihosted_by_wine = 0;
++#endif
+ }
+ #endif
+ 
+@@ -589,7 +594,11 @@ _gpgrt_windows_feature (int k)
    switch (k)
      {
      case GPGRT_WINDOWS_PROC_ATTRIBUTE:
@@ -57,5 +60,5 @@ index 7c772e6..779e0ab 100644
            include_file (fname, lnr, "w32-add.h", write_line);
          }
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 
