@@ -112,7 +112,7 @@ vlc_modules += {
 opengl32_lib = cc.find_library('opengl32', required: false)
 dxva2_dep = cc.find_library('dxva2', required: false)
 vlc_modules += {
-    'name' : 'interop_dxva2',
+    'name' : 'glinterop_dxva2',
     'sources' : files('interop_dxva2.c'),
     'c_args' : [ contrib_inc_args ],
     'dependencies' : [ opengl32_lib, dxva2_dep ],
