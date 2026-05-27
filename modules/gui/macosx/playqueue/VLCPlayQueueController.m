@@ -35,6 +35,9 @@
 #import "windows/VLCOpenInputMetadata.h"
 #import "library/VLCInputItem.h"
 
+#include <sys/xattr.h>
+#include <time.h>
+
 NSString * const VLCPlaybackOrderChanged = @"VLCPlaybackOrderChanged";
 NSString * const VLCPlaybackRepeatChanged = @"VLCPlaybackRepeatChanged";
 NSString * const VLCPlaybackHasPreviousChanged = @"VLCPlaybackHasPreviousChanged";
@@ -628,6 +631,20 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 #pragma mark - helper methods
 
+- (void)updateLastOpenedDate:(NSURL *)url
+{
+    if (!url.isFileURL) {
+        return;
+    }
+
+    struct timespec ts;
+    if (clock_gettime(CLOCK_REALTIME, &ts) != 0) {
+        return;
+    }
+
+    setxattr(url.fileSystemRepresentation, "com.apple.lastuseddate#PS", &ts, sizeof(ts), 0, 0);
+}
+
 - (input_item_t *)createInputItemBasedOnMetadata:(VLCOpenInputMetadata *)itemMetadata
 {
     intf_thread_t *p_intf = getIntf();
@@ -690,8 +707,10 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     }
 
     /* Recent documents menu */
-    if (url != nil && var_InheritBool(getIntf(), "macosx-recentitems"))
+    if (url != nil && var_InheritBool(getIntf(), "macosx-recentitems")) {
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL:url];
+        [self updateLastOpenedDate:url];
+    }
 
     /* Recent Streams menu */
     if (url != nil && !url.isFileURL) {
