@@ -41,6 +41,7 @@ class EbmlParser
 
     void Up( void );
     void Down( void );
+    ///< Reset the parser to the start of the Segment
     void Reset( demux_t *p_demux );
     EbmlElement *Get( bool allow_overshoot = true );
     void        Keep( void );
