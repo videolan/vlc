@@ -23,7 +23,8 @@ ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/ssh2/no-tests.patch
-	$(APPLY) $(SRC)/ssh2/0001-fix-gcrypt-linking.patch
+	# Require gcrypt
+	sed -i.orig 's/@LIBSREQUIRED@/@LIBSREQUIRED@ libgcrypt/' $(UNPACK_DIR)/libssh2.pc.in
 	$(call pkg_static,"libssh2.pc.in")
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/ssh2/winrt-no-agent.patch
