@@ -242,7 +242,7 @@ next:
 
         if( m_el[mi_level] == NULL )
         {
-            if ( i_max_read != UINT64_MAX && !m_es->I_O().IsEOF() )
+            if ( i_max_read != UINT64_MAX )
             {
                 msg_Dbg(p_demux, "found nothing, go up");
                 i_ulev = 1;
