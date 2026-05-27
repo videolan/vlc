@@ -307,8 +307,9 @@ FocusScope {
                 // need to use background coloring. It is currently a todo to further reduce video memory
                 // consumption by covering the effect for only the area of interest, currently the blur
                 // effect does not support having an extension area for postprocessing.
-                layer.sourceRect: Qt.rect(0, 0,
-                                          Helpers.alignUp(Math.min(stackView.width + edgeExtension, stackViewParent.width), alignNumber),
+                layer.sourceRect: Qt.rect(stackView.x - edgeExtension,
+                                          0,
+                                          Helpers.alignUp(stackView.width + (2 * edgeExtension), alignNumber),
                                           Helpers.alignUp(height + edgeExtension, alignNumber))
 
                 property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window) || 1.0
@@ -323,13 +324,16 @@ FocusScope {
                 }
 
                 Rectangle {
-                    // Extension of parent rectangle for the bottom extension.
-                    anchors.top: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: stackViewParent.edgeExtension
-                    visible: stackViewParent.layer.enabled && (height > 0)
-                    color: parent.color
+                    // Extension of parent rectangle for edge extension.
+                    anchors.fill: parent
+                    anchors.margins: -stackViewParent.edgeExtension
+                    visible: stackViewParent.layer.enabled && (height > 0 && width > 0)
+                    // We can't simply adjust the color because the color might not be opaque,
+                    // so we use border instead. Note that border is always placed inside the
+                    // rectangle:
+                    border.width: -anchors.margins
+                    border.color: parent.color
+                    color: "transparent"
                 }
 
                 layer.effect: Widgets.PartialEffect {
@@ -343,16 +347,17 @@ FocusScope {
                     // for the source visual here. The effect rect exceeds the boundaries of `PartialEffect` due to this (see
                     // `effectRect`), which is not particularly nice, but there is not much we can do about that here without
                     // using `sourceVisualRect`, and saving video memory is considered more important:
-                    anchors.rightMargin: (stackViewParent.width - stackViewParent.layer.sourceRect.width)
+                    anchors.rightMargin: (stackViewParent.width - stackViewParent.layer.sourceRect.width - stackViewParent.layer.sourceRect.x)
+                    anchors.leftMargin: stackViewParent.layer.sourceRect.x
 
                     blending: stackViewParent.color.a < (1.0 - Number.EPSILON)
 
                     // Each pass of the blur effect also suffers from the border neighbour pixel issue mentioned
                     // above, making all the borders problematic, to a less considerable extent. For that reason,
                     // we extend both the top and the bottom edges and use viewport to prevent overdraw:
-                    effectRect: Qt.rect(0,
+                    effectRect: Qt.rect(-stackView.x,
                                         stackView.height - stackViewParent.edgeExtension,
-                                        stackViewParent.width,
+                                        stackViewParent.width + 2 * stackViewParent.edgeExtension,
                                         loaderProgress.height + loaderUpdatePane.height + miniPlayer.height + 2 * stackViewParent.edgeExtension)
 
                     // WARNING: We are not using `sourceVisualRect` because it is not trivial to guarantee that
@@ -376,14 +381,21 @@ FocusScope {
 
                         // Prevent overdraw (the extension margin should not be painted).
                         // This also saves video memory compared to solely using visual rect.
-                        viewportRect: Qt.rect(0,
+                        // Note that viewport rect does not cover edge extension in y-axis
+                        // but covers edge extension in x-axis because we don't want to
+                        // have artifacts with regard to clamp-to-edge texture extension
+                        // in x-axis (relevant with delegate background coloring in list
+                        // view mode). Since we don't do texture extension in y-axis, we
+                        // don't need to cover the edge extension in y-axis, which allows
+                        // us to save some video memory (as opposed to `visualRect`).
+                        viewportRect: Qt.rect(stackView.x,
                                               stackViewParent.edgeExtension,
-                                              Math.min(stackView.width + stackViewParent.edgeExtension, stackViewParent.width),
+                                              stackView.width + (2 * stackViewParent.edgeExtension),
                                               height - (2 * stackViewParent.edgeExtension))
 
-                        visualRect: (stackView.width < stackViewParent.width) ? Qt.rect(viewportRect.x,
+                        visualRect: (stackView.width < stackViewParent.width) ? Qt.rect(stackViewParent.edgeExtension,
                                                                                         viewportRect.y,
-                                                                                        width,
+                                                                                        width - (2 * stackViewParent.edgeExtension),
                                                                                         viewportRect.height)
                                                                               : Qt.rect(0, 0, 0, 0)
                     }
