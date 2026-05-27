@@ -28,7 +28,9 @@ ControlBar {
 
     visible: (-anchors.bottomMargin < height) || (state === "inViewport")
 
-    anchors.bottomMargin: (state === "outViewport") ? -_delayedImplicitHeight : 0
+    anchors.bottomMargin: (state === "outViewport") ? -height : 0
+
+    height: _delayedImplicitHeight
 
     state: Player.isStarted ? "inViewport"
                             : "outViewport"
