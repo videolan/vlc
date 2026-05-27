@@ -494,6 +494,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxContentCompSettings, kccs )
         {
+            debug( vars, "Compression Settings" );
             delete vars.tk->p_compression_data;
             vars.tk->p_compression_data = new KaxContentCompSettings( kccs );
         }
