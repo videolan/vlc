@@ -20,7 +20,7 @@ index 6b9927ec4..e316ca306 100644
        {
  # if defined _WIN32 && ! defined __CYGWIN__
          HANDLE handle = (HANDLE) _get_osfhandle (fd);
-+#  if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++#  if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1
          DWORD flags;
          if (handle == INVALID_HANDLE_VALUE
              || GetHandleInformation (handle, &flags) == 0)
