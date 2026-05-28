@@ -37,6 +37,7 @@ opencv4: opencv-$(OPENCV4_VERSION).tar.gz .sum-opencv4
 
 # only enable necessary pkgs
 OPENCV4_ENV =
+
 OPENCV4_CONF := \
 	-DBUILD_LIST=core,imgproc,imgcodecs,objdetect \
 	-DOPENCV_GENERATE_PKGCONFIG=ON \
@@ -71,7 +72,10 @@ OPENCV4_CONF := \
 	-DBUILD_ZLIB=OFF \
 	-DBUILD_PNG=OFF \
 	-DBUILD_JPEG=OFF \
-	-DBUILD_ITT=OFF
+	-DBUILD_ITT=OFF \
+	-DOPENCV_FORCE_FUNCTIONS_SECTIONS=ON
+# OpenCV's adds -ffunction-sections/-fdata-sections by default, but skips for static
+# iOS/Android builds. Force it on
 
 # NEON mandatory on aarch64
 ifneq ($(findstring aarch64,$(HOST)),)
