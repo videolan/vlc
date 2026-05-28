@@ -357,12 +357,17 @@ nightly-debian:
     extends: .docker-template
     variables:
         FLATPAK_BRANCH: 3.0.x
-        MANIFEST_PATH: extras/package/flatpak/org.videolan.VLC.yaml
     script:
-        - flatpak-builder-lint --exceptions --exceptions-repo stable manifest ${MANIFEST_PATH}
+        - flatpak-builder-lint --exceptions --exceptions-repo stable manifest extras/package/flatpak/org.videolan.VLC.yaml
         - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-        - flatpak-builder --default-branch ${FLATPAK_BRANCH} --install-deps-from=flathub --user --arch=${HOST_ARCH} --force-clean --disable-rofiles-fuse --ccache --mirror-screenshots-url=https://dl.flathub.org/media --compose-url-policy=full --repo=repo-${HOST_ARCH} build ${MANIFEST_PATH}
-        - flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo repo-${HOST_ARCH} org.videolan.VLC_${HOST_ARCH}.flatpak org.videolan.VLC ${FLATPAK_BRANCH}
+        - flatpak install --user -y flathub org.kde.Sdk//5.15-25.08
+        - flatpak run --user --command="./extras/package/flatpak/prepare-sources.sh" --filesystem=host --share=network org.kde.Sdk//5.15-25.08
+        - flatpak-builder --user --default-branch ${FLATPAK_BRANCH} --install-deps-from=flathub --arch=${HOST_ARCH} --force-clean --disable-rofiles-fuse --ccache
+            --mirror-screenshots-url=https://dl.flathub.org/media --compose-url-policy=full
+            ${BUNDLE_SOURCES:+--bundle-sources} --repo=repo-${HOST_ARCH} build extras/package/flatpak/org.videolan.VLC.yaml
+        - flatpak-builder-lint --exceptions --exceptions-repo stable repo repo-${HOST_ARCH}
+        - flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo
+            repo-${HOST_ARCH} org.videolan.VLC_${HOST_ARCH}.flatpak org.videolan.VLC ${FLATPAK_BRANCH}
     cache:
         key: flatpak-ccache-${HOST_ARCH}
         paths:
@@ -379,8 +384,10 @@ flatpak-x86_64:
         entrypoint: [""]
     variables:
         HOST_ARCH: x86_64
+        # TODO remove this after we finish the test phase, not really needed outside of releases
+        BUNDLE_SOURCES: 1
     tags:
-      - dind-amd64
+        - dind-amd64
 
 .release-flatpak:
     extends: .flatpak-common
@@ -396,12 +403,16 @@ release-flatpak-x86_64:
         entrypoint: [""]
     variables:
         HOST_ARCH: x86_64
+        BUNDLE_SOURCES: 1
     tags:
-      - dind-amd64
+        - dind-amd64
 
 flatpak-repo:
     stage: repo
     extends: .docker-template
+    # TODO only trigger this on tagging after we finish the test phase
+    #only:
+    #    - tags
     image:
         name: $VLC_FLATPAK_IMAGE
         entrypoint: [""]
@@ -412,10 +423,10 @@ flatpak-repo:
           done
         - flatpak build-update-repo --generate-static-deltas --static-delta-ignore-ref=*.Debug --static-delta-ignore-ref=*.Sources repo
         - flatpak-builder-lint --exceptions --exceptions-repo stable repo repo
-        - tar -czf repository.tar.gz repo/
+        - tar -czf repo.tar.gz repo
     artifacts:
         paths:
-          - repository.tar.gz
+            - repo.tar.gz
     dependencies:
       - flatpak-x86_64
 

@@ -54,7 +54,7 @@ cleanup-commands:
 build-options:
   env:
     JAVA_HOME: /usr/lib/sdk/openjdk17
-  prepend-path: /app/contrib/bin:/usr/lib/sdk/openjdk17/bin:/app/jre/ant/bin
+  prepend-path: /app/contrib/bin:/usr/lib/sdk/openjdk17/bin
   prepend-pkg-config-path: /app/contrib/lib/pkgconfig
   cflags: -I/app/contrib/include -L/app/contrib/lib
   cxxflags: -I/app/contrib/include -L/app/contrib/lib
@@ -62,35 +62,18 @@ modules:
   - name: openjdk
     buildsystem: simple
     build-commands:
-    - /usr/lib/sdk/openjdk17/install.sh
-  - name: ant
-    buildsystem: simple
-    build-commands:
-    - mkdir -p /app/jre/ant
-    - tar xf apache-ant-bin.tar.bz2 --strip-components=1 --directory=/app/jre/ant
-    sources:
-    - type: file
-      url: https://dlcdn.apache.org/ant/binaries/apache-ant-1.10.17-bin.tar.bz2
-      dest-filename: apache-ant-bin.tar.bz2
-      sha256: 5210fc9d77e96bf5f4639287f29826da85e54a542e0a409463b1642bc3caaee7
-  - name: contrib
-    buildsystem: simple
-    build-options:
-      build-args:
-        - --share=network
-    build-commands:
-    - mkdir -p contrib/linux
-    - cd contrib/linux && ../bootstrap --prefix=/app/contrib --enable-ffmpeg --enable-dav1d --disable-fluid --enable-fluidlite --disable-chromaprint --disable-cddb --disable-gnutls --disable-nfs --disable-sidplay2
-    - cd contrib/linux && make list
-    - cd contrib/linux && make -j $FLATPAK_BUILDER_N_JOBS
-    sources:
-      - type: dir
-        path: ../../..
-        skip:
-          - extras
+      - /usr/lib/sdk/openjdk17/install.sh
   - name: vlc
-    config-opts:
-      - BUILDCC=/usr/bin/gcc
+    buildsystem: simple
+    build-commands:
+      - tar xf tools.tar && rm tools.tar
+      - tar xf contrib.tar && rm contrib.tar
+      - cd extras/tools && ./bootstrap && make -j $FLATPAK_BUILDER_N_JOBS
+      - cd contrib/linux && PATH=$PWD/extras/tools/build/bin:$PATH ../bootstrap --prefix=/app/contrib --enable-ffmpeg --enable-dav1d --enable-fluidlite --disable-fluid --disable-chromaprint
+      - cd contrib/linux && make list
+      - cd contrib/linux && PATH=$PWD/extras/tools/build/bin:$PATH make -j $FLATPAK_BUILDER_N_JOBS
+      - PATH=$PWD/extras/tools/build/bin:$PATH BUILDCC=/usr/bin/gcc ./configure --prefix=/app --disable-wayland --enable-merge-ffmpeg
+      - PATH=$PWD/extras/tools/build/bin:$PATH make install -j $FLATPAK_BUILDER_N_JOBS
     cleanup:
       - /share/macosx
     post-install:
@@ -103,12 +86,13 @@ modules:
         /app/share/applications/org.videolan.VLC-$s.desktop; done
       - rm /app/share/icons/hicolor/16x16/apps/vlc.xpm /app/share/icons/hicolor/32x32/apps/vlc.xpm
     sources:
-      - type: dir
-        path: ../../..
-        skip:
-          - contrib
+      - type: archive
+        path: vlc.tar.xz
+      - type: file
+        path: tools.tar
+      - type: file
+        path: contrib.tar
       - type: patch
         path: vlc-appdata-manifest-url.patch
       - type: file
         path: vlc.sh
-
