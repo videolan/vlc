@@ -18,6 +18,9 @@ orc: orc-$(ORC_VERSION).tar.bz2 .sum-orc
 
 	# replace FORMAT_MESSAGE_ALLOCATE_BUFFER which may not be available in older mingw-w64 UWP
 	sed -i.orig -e s/FORMAT_MESSAGE_ALLOCATE_BUFFER/0x00000100/g $(UNPACK_DIR)/orc/orccompiler.c
+	sed -i.orig -e 's/LPTSTR/LPSTR/' $(UNPACK_DIR)/orc/orccompiler.c
+	# fix bogus pointer passed to VirtualProtectFromApp()
+	sed -i.orig -e 's/int old_protect/ULONG old_protect/' $(UNPACK_DIR)/orc/orccompiler.c
 
 	$(MOVE)
 
