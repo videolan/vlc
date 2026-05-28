@@ -80,7 +80,11 @@ FSM {
     FSMState {
         id: fsmDocked
  
-        initialState: (MainCtx.hasEmbededVideo || !MainCtx.playlistVisible )
+        initialState: (MainCtx.hasEmbededVideo || !MainCtx.playlistVisible ||
+                       // Playlist animation is only enabled if the previous effective mode is main display
+                       // mode. We currently don't care about animations when going to main display mode and back
+                       // to player mode if the initial mode is not main display mode:
+                       (MainCtx.initialEffectiveMainInterfaceMode !== MainCtx.MAININTERFACE_MODE_MAINDISPLAY))
                       ? fsmHidden : fsmVisible
  
         transitions: ({
