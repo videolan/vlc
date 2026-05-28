@@ -537,8 +537,8 @@ AS_IF([test "${SYS}" = "mingw32"],[
     vlc_winstore_app=1
     LIBCOM="-loleaut32"
     VLC_ADD_LIBS([libvlccore], [-lruntimeobject])
-    AC_LIBOBJ([gai_strerror])
   ],[])
+  AC_LIBOBJ([gai_strerror])
   AC_SUBST([LIBCOM])
   AC_SUBST([LIBCOMCXXFLAGS])
   ])

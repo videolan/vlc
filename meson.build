@@ -759,7 +759,7 @@ endif
 
 libcompat_sources = []
 
-if have_win_store
+if host_system == 'windows'
     libcompat_sources += 'gai_strerror.c'
 endif
 

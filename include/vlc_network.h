@@ -283,10 +283,9 @@ static inline int vlc_setsockopt(int s, int level, int name,
 #endif
 
 #ifdef _WIN32
-# if defined(UNICODE)
+/* undo ws2tcpip.h define and declare the signature from compat */
 #  undef gai_strerror
-#  define gai_strerror gai_strerrorA
-# endif
+const char *gai_strerror (int);
 #endif
 
 /* union of the various sockaddr structures often used together */
