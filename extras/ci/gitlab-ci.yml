@@ -147,6 +147,16 @@ uwp64-libvlc-llvm:
         LIBVLC_EXTRA_BUILD_FLAGS: -z
         UWP_EXTRA_BUILD_FLAGS: -u -w
 
+uwparm64-libvlc-llvm:
+    extends: .win-common
+    image:
+        name: $VLC_WIN_LLVM_UCRT_IMAGE
+    variables:
+        <<: *variables-win64-arm
+        VLCARCH: winarm64-uwp
+        LIBVLC_EXTRA_BUILD_FLAGS: -z
+        UWP_EXTRA_BUILD_FLAGS: -u -w
+
 .nightly-win-common:
     extends: .win-common
     only:
