@@ -104,6 +104,12 @@ static const struct
     { EAI_MEMORY,     "Memory allocation failure" },
     { EAI_OVERFLOW,   "Buffer overflow" },
     { EAI_SYSTEM,     "System error" },
+
+#ifdef _WIN32
+    { WSAEFAULT,      "Invalid memory address" },
+    { WSANOTINITIALISED, "WSAStartup not called or failed" },
+#endif
+
     { 0,              "" },
 };
 
