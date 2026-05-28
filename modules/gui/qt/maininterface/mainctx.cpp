@@ -300,6 +300,8 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 #endif
 
     m_threadRunner = new ThreadRunner();
+
+    m_initialEffectiveMainInterfaceMode = getEffectiveMainInterfaceMode();
 }
 
 MainCtx::~MainCtx()

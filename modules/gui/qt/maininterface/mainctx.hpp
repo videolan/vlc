@@ -134,6 +134,7 @@ class MainCtx : public QObject
     Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
     Q_PROPERTY(MainInterfaceModes mainInterfaceModes READ getMainInterfaceModes NOTIFY mainInterfaceModesChanged FINAL)
     Q_PROPERTY(MainInterfaceMode effectiveMainInterfaceMode READ getEffectiveMainInterfaceMode NOTIFY mainInterfaceModesChanged FINAL)
+    Q_PROPERTY(MainInterfaceMode initialEffectiveMainInterfaceMode READ getInitialEffectiveMainInterfaceMode CONSTANT FINAL)
 
     //Property to get Operating System info
     Q_PROPERTY(OsType osName READ getOSName CONSTANT)
@@ -385,6 +386,8 @@ public:
     inline MainInterfaceModes getMainInterfaceModes() const { return m_mainInterfaceModes; };
     MainInterfaceMode getEffectiveMainInterfaceMode() const;
 
+    MainInterfaceMode getInitialEffectiveMainInterfaceMode() const { return m_initialEffectiveMainInterfaceMode; }
+
     Q_INVOKABLE static double dp(const double px, const double scale);
     Q_INVOKABLE double dp(const double px) const;
 
@@ -452,6 +455,7 @@ protected:
     double               m_playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
     double               m_playerPlaylistWidthFactor = 4.;
     MainInterfaceModes   m_mainInterfaceModes = { MAININTERFACE_MODE_MAINDISPLAY };
+    MainInterfaceMode    m_initialEffectiveMainInterfaceMode = MAININTERFACE_MODE_MAINDISPLAY;
 
     double               m_artistAlbumsWidthFactor = 4.;
 
