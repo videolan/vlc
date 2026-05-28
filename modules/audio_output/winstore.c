@@ -280,6 +280,7 @@ static int VolumeSet(audio_output_t *aout, float vol)
     if( unlikely( sys->client == NULL ) )
         return VLC_EGENERIC;
     HRESULT hr;
+    void *pv = NULL;
     ISimpleAudioVolume *pc_AudioVolume = NULL;
 
     float linear_vol = vol * vol * vol; /* ISimpleAudioVolume is tapered linearly. */
@@ -294,12 +295,13 @@ static int VolumeSet(audio_output_t *aout, float vol)
 
     aout_GainRequest(aout, sys->gain);
 
-    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pv);
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot get volume service (error 0x%lX)", hr);
         goto done;
     }
+    pc_AudioVolume = pv;
 
     hr = ISimpleAudioVolume_SetMasterVolume(pc_AudioVolume, linear_vol, NULL);
     if (FAILED(hr))
@@ -323,14 +325,16 @@ static int MuteSet(audio_output_t *aout, bool mute)
     if( unlikely( sys->client == NULL ) )
         return VLC_EGENERIC;
     HRESULT hr;
+    void *pv = NULL;
     ISimpleAudioVolume *pc_AudioVolume = NULL;
 
-    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pv);
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot get volume service (error 0x%lX)", hr);
         goto done;
     }
+    pc_AudioVolume = pv;
 
     hr = ISimpleAudioVolume_SetMute(pc_AudioVolume, mute, NULL);
     if (FAILED(hr))
