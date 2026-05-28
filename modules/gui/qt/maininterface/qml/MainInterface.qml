@@ -42,44 +42,9 @@ import VLC.PlayerControls
 Item {
     id: root
 
-    property bool _interfaceReady: false
-    property bool _playlistReady: false
     property bool _extendedFrameVisible: MainCtx.windowSuportExtendedFrame
                                       && MainCtx.clientSideDecoration
                                       && (MainCtx.intfMainWindow.visibility === Window.Windowed)
-
-    property int _currentMode: MainCtx.MAININTERFACE_MODE_INVALID
-
-    function setInitialView() {
-        if (!MainCtx.minimalView && !MainPlaylistController.empty)
-            MainCtx.playerView = true
-        else
-            _loadView()
-    }
-
-    function _loadView() {
-        if (_currentMode === MainCtx.effectiveMainInterfaceMode)
-            return
-        // priority applies accross modes
-        // minimal > player > medialib
-        // MEDIALIB_MODE flag should always be set
-        switch (MainCtx.effectiveMainInterfaceMode) {
-        case MainCtx.MAININTERFACE_MODE_MINIMAL:
-            viewLoader.source = "qrc:///qt/qml/VLC/Player/MinimalView.qml"
-            break
-        case  MainCtx.MAININTERFACE_MODE_PLAYER:
-            viewLoader.source = "qrc:///qt/qml/VLC/Player/Player.qml"
-            break
-        case MainCtx.MAININTERFACE_MODE_MAINDISPLAY:
-            viewLoader.source = "qrc:///qt/qml/VLC/MainInterface/MainDisplay.qml"
-            break
-        default:
-            console.error("unexpected interface mode", MainCtx.effectiveMainInterfaceMode)
-            viewLoader.source = "qrc:///qt/qml/VLC/MainInterface/MainDisplay.qml"
-            break
-        }
-        _currentMode = MainCtx.effectiveMainInterfaceMode
-    }
 
     Item {
         id: g_mainInterface
@@ -141,39 +106,11 @@ Item {
         }
 
         Connections {
-            target: MainPlaylistController
-
-            function onInitializedChanged() {
-                console.assert(MainPlaylistController.initialized)
-                if (root._interfaceReady && !root._playlistReady) {
-                    root._playlistReady = true
-                    setInitialView()
-                }
-            }
-        }
-
-        Connections {
-            target: MainCtx
-
-            function onEffectiveMainInterfaceModeChanged() {
-                root._loadView()
-            }
-        }
-
-        Connections {
             target: Player
             function onPlayingStateChanged() {
                 if (Player.playingState === Player.PLAYING_STATE_STOPPED) {
                     MainCtx.playerView = false
                 }
-            }
-        }
-
-        Component.onCompleted: {
-            root._interfaceReady = true
-            if (!root._playlistReady && MainPlaylistController.initialized) {
-                root._playlistReady = true
-                setInitialView()
             }
         }
 
@@ -237,6 +174,23 @@ Item {
             focus: true
             // If there is depth buffer, clipping is not necessary:
             clip: _extendedFrameVisible && !effect.hasDepthBuffer
+
+            source: {
+                // priority applies accross modes
+                // minimal > player > medialib
+                // MEDIALIB_MODE flag should always be set
+
+                switch (MainCtx.effectiveMainInterfaceMode) {
+                case MainCtx.MAININTERFACE_MODE_MINIMAL:
+                    return "qrc:///qt/qml/VLC/Player/MinimalView.qml"
+                case  MainCtx.MAININTERFACE_MODE_PLAYER:
+                    return "qrc:///qt/qml/VLC/Player/Player.qml"
+                default:
+                    console.error("unexpected interface mode", MainCtx.effectiveMainInterfaceMode)
+                case MainCtx.MAININTERFACE_MODE_MAINDISPLAY:
+                    return "qrc:///qt/qml/VLC/MainInterface/MainDisplay.qml"
+                }
+            }
         }
 
         Loader {

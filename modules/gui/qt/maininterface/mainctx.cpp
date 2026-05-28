@@ -135,6 +135,24 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     : p_intf(_p_intf)
     , m_csdButtonModel {std::make_unique<CSDButtonModel>(this, this)}
 {
+    // If `playlist-autostart` is set, and there are initial files
+    // we don't bother loading main display just to unload it
+    // immediately after. Instead, we directly load the player
+    // page:
+    if (var_InheritBool(p_intf, "playlist-autostart"))
+    {
+        // We can not use `vlc_playlist_GetCurrentIndex()`, because
+        // playlist starts playing after the interface is added.
+        // We also can not use the playlist controller because it
+        // is not updated yet.
+        vlc_playlist_locker lock(p_intf->p_playlist);
+
+        if (vlc_playlist_Count(p_intf->p_playlist) > 0)
+        {
+            m_mainInterfaceModes |= MAININTERFACE_MODE_PLAYER;
+        }
+    }
+
     /**
      *  Configuration and settings
      *  Pre-building of interface
