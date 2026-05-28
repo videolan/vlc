@@ -154,7 +154,7 @@ video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.c
 libopencv_wrapper_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_wrapper_plugin_la_LIBADD = $(OPENCV_LIBS)
-libopencv_wrapper_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+libopencv_wrapper_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(GC_SECTIONS_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBopencv_wrapper)
 EXTRA_LTLIBRARIES += libopencv_wrapper_plugin.la
 
@@ -172,6 +172,6 @@ video_filter_LTLIBRARIES += libblend_plugin.la
 libopencv_example_plugin_la_SOURCES = video_filter/opencv_example.cpp video_filter/filter_event_info.h
 libopencv_example_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_example_plugin_la_LIBADD = $(OPENCV_LIBS)
-libopencv_example_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+libopencv_example_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(GC_SECTIONS_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBopencv_example)
 EXTRA_LTLIBRARIES += libopencv_example_plugin.la
