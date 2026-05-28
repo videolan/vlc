@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_block.h>
 #include <vlc_mouse.h>
 #include <vlc_fs.h>
 
@@ -143,6 +144,61 @@ vlc_module_begin( )
 vlc_module_end( )
 
 /*****************************************************************************
+* WriteMatAsImage: Encodes a Mat and writes to disk
+*****************************************************************************/
+static bool WriteMatAsImage( filter_t* p_filter, const cv::Mat& mat_bgr,
+                              const char* psz_path, vlc_fourcc_t i_codec )
+{
+    if ( mat_bgr.empty( ) || mat_bgr.type( ) != CV_8UC3 )
+    {
+        return false;
+    }
+
+    video_format_t fmt_in;
+    video_format_Init( &fmt_in, VLC_CODEC_BGR24 );
+    video_format_Setup( &fmt_in, VLC_CODEC_BGR24,
+                        mat_bgr.cols, mat_bgr.rows,
+                        mat_bgr.cols, mat_bgr.rows, 1, 1 );
+
+    picture_t* p_pic = picture_NewFromFormat( &fmt_in );
+    if ( !p_pic )
+    {
+        return false;
+    }
+
+    // copy planes
+    plane_t* p_plane = &p_pic->p[ 0 ];
+    const size_t i_row_bytes = static_cast<size_t>( mat_bgr.cols ) * 3;
+    for ( int y = 0; y < mat_bgr.rows; ++y )
+    {
+        memcpy( p_plane->p_pixels + y * p_plane->i_pitch,
+                mat_bgr.ptr( y ), i_row_bytes );
+    }
+
+    block_t* p_block = nullptr;
+    const int i_ret = picture_Export( VLC_OBJECT( p_filter ), &p_block, nullptr,
+                                       p_pic, i_codec, 0, 0, false );
+    picture_Release( p_pic );
+
+    if ( i_ret != VLC_SUCCESS || !p_block )
+    {
+        return false;
+    }
+
+    FILE* p_file = vlc_fopen( psz_path, "wb" );
+    bool b_ok = false;
+    if ( p_file )
+    {
+        const size_t i_written = fwrite( p_block->p_buffer, 1, p_block->i_buffer, p_file );
+        b_ok = ( i_written == p_block->i_buffer );
+        fclose( p_file );
+    }
+
+    block_Release( p_block );
+    return b_ok;
+}
+
+/*****************************************************************************
 * Export: Export a single mask to file
 *****************************************************************************/
 static void Export( filter_t* p_filter, const segmented_object_t& obj, const cv::Mat& mat_frame )
@@ -168,28 +224,27 @@ static void Export( filter_t* p_filter, const segmented_object_t& obj, const cv:
     cv::resize( obj.mat_mask, mat_mask_scaled, mat_frame.size( ), 0, 0, cv::INTER_LINEAR );
     cv::threshold( mat_mask_scaled, mat_mask_scaled, 128, 255, cv::THRESH_BINARY );
 
-    // create file name
-    std::string str_filename = std::string( p_sys->psz_export_path ) + "/mask_" +
+    // export the original frame as a 3-channel PNG
+    std::string frame_filename = std::string( p_sys->psz_export_path ) + "/frame_" +
         psz_timestamp + "_id" + std::to_string( obj.i_id ) + ".png";
-
-    // export mask onto Mat - optimized version
-    std::vector<cv::Mat> vec_channels;
-    cv::split( mat_frame, vec_channels );
-    vec_channels.push_back( mat_mask_scaled );
-    cv::Mat mat_export;
-    cv::merge( vec_channels, mat_export );
-
-    // write image
-    if ( !cv::imwrite( str_filename, mat_export ) )
+    if ( !WriteMatAsImage( p_filter, mat_frame, frame_filename.c_str( ), VLC_CODEC_PNG ) )
     {
-        msg_Err( p_filter, "Failed to export mask to %s", str_filename.c_str( ) );
+        msg_Err( p_filter, "Failed to export frame to %s", frame_filename.c_str( ) );
         return;
     }
-    msg_Info( p_filter, "Exported mask %d to %s", obj.i_id, str_filename.c_str( ) );
+    msg_Info( p_filter, "Exported frame %d to %s", obj.i_id, frame_filename.c_str( ) );
 
-    // create file name
-    std::string vis_filename = std::string( p_sys->psz_export_path ) + "/visualization_" +
-        psz_timestamp + "_id" + std::to_string( obj.i_id ) + ".jpg";
+    // export the binary mask as a grayscale PNG
+    cv::Mat mat_mask_bgr;
+    cv::cvtColor( mat_mask_scaled, mat_mask_bgr, cv::COLOR_GRAY2BGR );
+    std::string mask_filename = std::string( p_sys->psz_export_path ) + "/mask_" +
+        psz_timestamp + "_id" + std::to_string( obj.i_id ) + ".png";
+    if ( !WriteMatAsImage( p_filter, mat_mask_bgr, mask_filename.c_str( ), VLC_CODEC_PNG ) )
+    {
+        msg_Err( p_filter, "Failed to export mask to %s", mask_filename.c_str( ) );
+        return;
+    }
+    msg_Info( p_filter, "Exported mask %d to %s", obj.i_id, mask_filename.c_str( ) );
 
     // clone image, add mask overlay
     cv::Mat mat_visualization = mat_frame.clone( );
@@ -215,8 +270,10 @@ static void Export( filter_t* p_filter, const segmented_object_t& obj, const cv:
     }
     cv::drawContours( mat_visualization, vec_scaled_contours, -1, obj.scalar_color, 2, cv::LINE_AA );
 
-    // write image
-    if ( !cv::imwrite( vis_filename, mat_visualization ) )
+    // export the visualization as JPEG
+    std::string vis_filename = std::string( p_sys->psz_export_path ) + "/visualization_" +
+        psz_timestamp + "_id" + std::to_string( obj.i_id ) + ".jpg";
+    if ( !WriteMatAsImage( p_filter, mat_visualization, vis_filename.c_str( ), VLC_CODEC_JPEG ) )
     {
         msg_Err( p_filter, "Failed to export visualization to %s", vis_filename.c_str( ) );
         return;
