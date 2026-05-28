@@ -1003,9 +1003,14 @@ FocusScope {
         }
     }
 
-    TapHandler {
+    MouseArea {
+        anchors.fill: parent
         acceptedButtons: Qt.BackButton
-        onTapped: MainCtx.playerView = false
+        propagateComposedEvents: true
+        cursorShape: undefined
+        onClicked: {
+            MainCtx.playerView = false
+        }
     }
 
     //filter key events to keep toolbar
