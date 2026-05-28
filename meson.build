@@ -927,6 +927,15 @@ if cc.has_link_argument('-Wl,-Bsymbolic')
     symbolic_linkargs += '-Wl,-Bsymbolic'
 endif
 
+# Drops unused symbols.
+# ELF linkers use --gc-sections, while Mach-O uses -dead_strip.
+gc_sections_linkargs = []
+if cc.has_link_argument('-Wl,--gc-sections')
+    gc_sections_linkargs += '-Wl,--gc-sections'
+elif cc.has_link_argument('-Wl,-dead_strip')
+    gc_sections_linkargs += '-Wl,-dead_strip'
+endif
+
 # Check for struct sockaddr_storage type
 # Define it to `sockaddr` if missing
 sockaddr_prefix = ['#include <sys/types.h>']

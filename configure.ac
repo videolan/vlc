@@ -492,6 +492,29 @@ case "${host_os}" in
     ;;
 esac
 
+dnl
+dnl Drops unused symbols.
+dnl ELF linkers use --gc-sections, while Mach-O uses -dead_strip.
+dnl
+AC_MSG_CHECKING([for linker dead-code stripping flag])
+GC_SECTIONS_LDFLAGS=""
+VLC_SAVE_FLAGS
+AX_APPEND_FLAG([-Wl,--gc-sections], [LDFLAGS])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+    [GC_SECTIONS_LDFLAGS="-Wl,--gc-sections"], [])
+VLC_RESTORE_FLAGS
+AS_IF([test -z "${GC_SECTIONS_LDFLAGS}"], [
+    VLC_SAVE_FLAGS
+    AX_APPEND_FLAG([-Wl,-dead_strip], [LDFLAGS])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+        [GC_SECTIONS_LDFLAGS="-Wl,-dead_strip"], [])
+    VLC_RESTORE_FLAGS
+])
+AS_IF([test -n "${GC_SECTIONS_LDFLAGS}"],
+    [AC_MSG_RESULT([${GC_SECTIONS_LDFLAGS}])],
+    [AC_MSG_RESULT([none])])
+AC_SUBST([GC_SECTIONS_LDFLAGS])
+
 dnl WinRT
 AC_ARG_ENABLE([winstore_app],
      AS_HELP_STRING([--enable-winstore-app],
