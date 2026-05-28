@@ -24,6 +24,8 @@ T.Label {
     T.ToolTip.delay: VLCStyle.delayToolTipAppear
     T.ToolTip.text: text
 
+    property alias hovered: hoverHandler.hovered
+
     HoverHandler {
         id: hoverHandler
     }
