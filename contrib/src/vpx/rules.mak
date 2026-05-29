@@ -170,11 +170,6 @@ VPX_HOSTVARS += AS="$(CCAS)"
 endif
 
 endif
-
-# Depends on "arm-linux-androideabi-as" that is removed in NDK25
-ifeq ($(ARCH),arm)
-VPX_CONF += --disable-neon_asm
-endif
 endif
 
 VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
