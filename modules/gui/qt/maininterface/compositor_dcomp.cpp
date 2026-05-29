@@ -100,6 +100,8 @@ CompositorDirectComposition::CompositorDirectComposition( qt_intf_t* p_intf,  QO
 
 CompositorDirectComposition::~CompositorDirectComposition()
 {
+    cleanup();
+
     //m_acrylicSurface should be released before the RHI context is destroyed
     assert(!m_acrylicSurface);
 }
@@ -254,6 +256,31 @@ void CompositorDirectComposition::setup()
     }
 }
 
+void CompositorDirectComposition::cleanup()
+{
+    m_videoVisual.Reset();
+    m_acrylicSurface.reset();
+
+    if (m_rootVisual && m_uiVisual)
+    {
+        // Just in case root visual deletes its children
+        // when it is deleted: (Qt's UI visual should be
+        // deleted by Qt itself)
+        m_rootVisual->RemoveVisual(m_uiVisual);
+    }
+
+    m_rootVisual.Reset();
+
+    // When the window receives the event `SurfaceAboutToBeDestroyed`,
+    // the RHI and the RHI swap chain are going to be destroyed.
+    // It should be noted that event filters receive events
+    // before the watched object receives them.
+    // Since these objects belong to Qt, we should clear them
+    // in order to prevent potential dangling pointer dereference:
+    m_dcompDevice = nullptr;
+    m_uiVisual = nullptr;
+}
+
 bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx, std::function<void(QQuickWindow*)> aboutToShowQuickWindowCallback)
 {
     assert(mainCtx);
@@ -355,7 +382,18 @@ void CompositorDirectComposition::destroyMainInterface()
         msg_Err(m_intf, "video surface still active while destroying main interface");
 
     commonIntfDestroy();
+
+    // We still need to call this explicitly, as it seems Qt does not send
+    // the `QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed` event if we
+    // delete the window ourselves:
+    cleanup();
+
     m_quickView.reset();
+
+    // These can no longer be assumed to be valid anymore, since they are
+    // managed by Qt and the window is already gone:
+    assert(!m_dcompDevice);
+    assert(!m_uiVisual);
 }
 
 void CompositorDirectComposition::unloadGUI()
@@ -470,22 +508,7 @@ bool CompositorDirectComposition::eventFilter(QObject *watched, QEvent *event)
         if (watched == m_quickView.get() &&
             static_cast<QPlatformSurfaceEvent *>(event)->surfaceEventType() == QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed)
         {
-            m_videoVisual.Reset();
-            m_acrylicSurface.reset();
-            // Just in case root visual deletes its children
-            // when it is deleted: (Qt's UI visual should be
-            // deleted by Qt itself)
-            m_rootVisual->RemoveVisual(m_uiVisual);
-            m_rootVisual.Reset();
-
-            // When the window receives the event `SurfaceAboutToBeDestroyed`,
-            // the RHI and the RHI swap chain are going to be destroyed.
-            // It should be noted that event filters receive events
-            // before the watched object receives them.
-            // Since these objects belong to Qt, we should clear them
-            // in order to prevent potential dangling pointer dereference:
-            m_dcompDevice = nullptr;
-            m_uiVisual = nullptr;
+            cleanup();
         }
         break;
     default:

@@ -80,6 +80,7 @@ private slots:
     void onSurfaceSizeChanged(const QSizeF& size) override;
 
     void setup();
+    void cleanup();
 
 protected:
     int windowEnable(const vlc_window_cfg_t *) override;
