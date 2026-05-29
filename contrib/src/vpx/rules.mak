@@ -175,6 +175,12 @@ ifdef HAVE_ANDROID
 # toolchains, therefore pass the HOSTVARS directly to bypass any detection.
 ifneq ($(shell $(VPX_CROSS)gcc -v >/dev/null 2>&1 || echo FAIL),)
 VPX_HOSTVARS = $(HOSTVARS)
+
+ifeq ($(filter $(ARCH),i386 x86_64),)
+# use CCAS for platforms not using nasm/yasm
+VPX_HOSTVARS += AS="$(CCAS)"
+endif
+
 endif
 endif
 
