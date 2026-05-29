@@ -266,9 +266,6 @@
 /* Define to 1 if you have the <netinet/tcp.h> header file. */
 #mesondefine HAVE_NETINET_TCP_H
 
-/* Define to 1 if you have the <netinet/udplite.h> header file. */
-#mesondefine HAVE_NETINET_UDPLITE_H
-
 /* Define to 1 if you have the <net/if.h> header file. */
 #mesondefine HAVE_NET_IF_H
 

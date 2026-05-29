@@ -68,22 +68,8 @@
 #ifndef IPPROTO_DCCP
 # define IPPROTO_DCCP 33 /* IANA */
 #endif
-#ifndef SOL_UDPLITE
-# define SOL_UDPLITE IPPROTO_UDPLITE
-#endif
-#ifndef IPPROTO_UDPLITE
-# define IPPROTO_UDPLITE 136 /* IANA */
-#endif
 #ifndef ENOPROTOOPT
 # define ENOPROTOOPT 123
-#endif
-
-#if defined (HAVE_NETINET_UDPLITE_H)
-# include <netinet/udplite.h>
-#elif defined (__linux__)
-/* still missing from glibc 2.6 */
-# define UDPLITE_SEND_CSCOV     10
-# define UDPLITE_RECV_CSCOV     11
 #endif
 
 /* */
@@ -711,30 +697,9 @@ int net_SetCSCov (int fd, int sendcov, int recvcov)
                     &type, &(socklen_t){ sizeof (type) }))
         return VLC_EGENERIC;
 
-#if defined( UDPLITE_RECV_CSCOV ) || defined( DCCP_SOCKOPT_SEND_CSCOV )
+#ifdef DCCP_SOCKOPT_SEND_CSCOV
     switch (type)
     {
-#ifdef UDPLITE_RECV_CSCOV
-        case SOCK_DGRAM: /* UDP-Lite */
-            if (sendcov == -1)
-                sendcov = 0;
-            else
-                sendcov += 8; /* partial */
-            if (setsockopt (fd, SOL_UDPLITE, UDPLITE_SEND_CSCOV, &sendcov,
-                            sizeof (sendcov)))
-                return VLC_EGENERIC;
-
-            if (recvcov == -1)
-                recvcov = 0;
-            else
-                recvcov += 8;
-            if (setsockopt (fd, SOL_UDPLITE, UDPLITE_RECV_CSCOV,
-                            &recvcov, sizeof (recvcov)))
-                return VLC_EGENERIC;
-
-            return VLC_SUCCESS;
-#endif
-#ifdef DCCP_SOCKOPT_SEND_CSCOV
         case SOCK_DCCP: /* DCCP and its ill-named socket type */
             if ((sendcov == -1) || (sendcov > 56))
                 sendcov = 0;
@@ -753,7 +718,6 @@ int net_SetCSCov (int fd, int sendcov, int recvcov)
                 return VLC_EGENERIC;
 
             return VLC_SUCCESS;
-#endif
     }
 #else
     VLC_UNUSED(sendcov);

@@ -66,9 +66,6 @@
 #ifndef IPPROTO_DCCP
 # define IPPROTO_DCCP 33
 #endif
-#ifndef IPPROTO_UDPLITE
-# define IPPROTO_UDPLITE 136
-#endif
 
 #include <ctype.h>
 #include <errno.h>
@@ -148,11 +145,11 @@
     "This must be a 28-character-long hexadecimal string.")
 
 static const char *const ppsz_protos[] = {
-    "dccp", "sctp", "tcp", "udp", "udplite",
+    "dccp", "sctp", "tcp", "udp",
 };
 
 static const char *const ppsz_protocols[] = {
-    "DCCP", "SCTP", "TCP", "UDP", "UDP-Lite",
+    "DCCP", "SCTP", "TCP", "UDP",
 };
 
 #define RFC3016_TEXT N_("MP4A LATM")
@@ -470,8 +467,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->rtcp_mux = true; /* Force RTP/RTCP mux */
     }
 #endif
-    else if (!strcasecmp (psz, "udplite") || !strcasecmp (psz, "udp-lite"))
-        p_sys->proto = IPPROTO_UDPLITE;
     else
         msg_Warn (p_this, "unknown or unsupported transport protocol \"%s\"",
                   psz);
@@ -807,8 +802,6 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
             case IPPROTO_DCCP:
                 proto = "DCCP/RTP/AVP";
                 break;
-            case IPPROTO_UDPLITE:
-                return psz_sdp;
         }
     }
 

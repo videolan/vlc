@@ -1017,7 +1017,7 @@ static char *sout_stream_url_to_chain( bool b_sout_display,
     mrl_Parse( &mrl, psz_url );
 
     /* Check if the URLs goes to #rtp - otherwise we'll use #standard */
-    static const char rtplist[] = "dccp\0sctp\0tcp\0udplite\0";
+    static const char rtplist[] = "dccp\0sctp\0tcp\0";
     for (const char *a = rtplist; *a; a += strlen (a) + 1)
         if (strcmp (a, mrl.psz_access) == 0)
             goto rtp;

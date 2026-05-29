@@ -54,10 +54,6 @@
 # define IPPROTO_DCCP 33 /* IANA */
 #endif
 
-#ifndef IPPROTO_UDPLITE
-# define IPPROTO_UDPLITE 136 /* from IANA */
-#endif
-
 struct vlc_rtp_es_id {
     struct vlc_rtp_es es;
     es_out_t *out;
@@ -471,9 +467,6 @@ static int OpenURL(vlc_object_t *obj)
     if (!strcasecmp(demux->psz_name, "rtp"))
         tp = IPPROTO_UDP;
     else
-    if (!strcasecmp(demux->psz_name, "udplite"))
-        tp = IPPROTO_UDPLITE;
-    else
         return VLC_EGENERIC;
 
     rtp_sys_t *p_sys = vlc_obj_malloc(obj, sizeof (*p_sys));
@@ -515,7 +508,6 @@ static int OpenURL(vlc_object_t *obj)
     switch (tp)
     {
         case IPPROTO_UDP:
-        case IPPROTO_UDPLITE:
             fd = net_OpenDgram (obj, dhost, dport, shost, sport, tp);
             if (fd == -1)
                 break;
@@ -697,5 +689,5 @@ vlc_module_begin()
     add_obsolete_string("rtp-dynamic-pt") /* since 4.0.0 */
 
     /*add_shortcut ("sctp")*/
-    add_shortcut("dccp", "rtp", "udplite")
+    add_shortcut("dccp", "rtp")
 vlc_module_end()

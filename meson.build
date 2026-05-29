@@ -273,7 +273,6 @@ check_c_headers = [
     ['getopt.h'],
     ['linux/dccp.h'],
     ['linux/magic.h'],
-    ['netinet/udplite.h'],
     ['pthread.h'],
     ['poll.h'],
     ['sys/auxv.h'],
