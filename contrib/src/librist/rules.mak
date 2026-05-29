@@ -1,6 +1,6 @@
 # librist
 
-LIBRIST_VERSION := v0.2.15
+LIBRIST_VERSION := v0.2.16
 LIBRIST_URL := http://code.videolan.org/rist/librist/-/archive/$(LIBRIST_VERSION)/librist-$(LIBRIST_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
