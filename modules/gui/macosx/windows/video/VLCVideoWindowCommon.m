@@ -268,6 +268,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     if ([self hasActiveVideo]) {
         vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
         if (p_vout) {
+            var_SetBool(p_vout, "video-on-top", false);
             var_SetBool(p_vout, "fullscreen", true);
             vout_Release(p_vout);
         }
