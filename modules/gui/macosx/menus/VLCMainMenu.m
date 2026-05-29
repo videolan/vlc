@@ -2053,6 +2053,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         if (p_vout != NULL) {
             if (mi == self.floatontop) {
                 mi.state = var_GetBool(p_vout, "video-on-top") ? NSOnState : NSOffState;
+                if (_playerController.fullscreen) {
+                    vout_Release(p_vout);
+                    return NO;
+                }
             } else if (mi == self.fullscreenItem || mi == self.voutMenufullscreen) {
                 mi.state = _playerController.fullscreen ? NSOnState : NSOffState;
             }
