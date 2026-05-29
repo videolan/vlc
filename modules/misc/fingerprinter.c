@@ -188,9 +188,6 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
     p_fingerprinter->p_sys->chroma_fingerprint.psz_fingerprint = NULL;
     p_fingerprinter->p_sys->chroma_fingerprint.i_duration = fp->i_duration;
 
-    var_Create( p_fingerprinter, "fingerprint-data", VLC_VAR_ADDRESS );
-    var_SetAddress( p_fingerprinter, "fingerprint-data", &p_fingerprinter->p_sys->chroma_fingerprint );
-
     vlc_player_t *player = p_fingerprinter->p_sys->player;
     vlc_player_Lock(player);
 
@@ -279,6 +276,9 @@ static int Open(vlc_object_t *p_this)
         msg_Err( p_fingerprinter, "cannot spawn fingerprinter thread" );
         goto error;
     }
+
+    var_Create( p_fingerprinter, "fingerprint-data", VLC_VAR_ADDRESS );
+    var_SetAddress( p_fingerprinter, "fingerprint-data", &p_fingerprinter->p_sys->chroma_fingerprint );
 
     return VLC_SUCCESS;
 
