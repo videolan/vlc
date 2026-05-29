@@ -145,6 +145,10 @@
                            selector:@selector(updateLyricsButton:)
                                name:VLCPlayerLyricsAvailableChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(fullscreenChanged:)
+                               name:VLCPlayerFullscreenChanged
+                             object:nil];
 
     [self update];
 }
@@ -158,6 +162,11 @@
 }
 
 - (void)floatOnTopChanged:(NSNotification *)notification
+{
+    [self updateFloatOnTopButton];
+}
+
+- (void)fullscreenChanged:(NSNotification *)notification
 {
     [self updateFloatOnTopButton];
 }
@@ -199,12 +208,15 @@
     const bool floatOnTopEnabled = var_GetBool(voutThread, "video-on-top");
     vout_Release(voutThread);
 
+    const BOOL isFullscreen = _playerController.fullscreen;
+    self.floatOnTopButton.enabled = !isFullscreen;
+
     if (@available(macOS 26.0, *)) {
         self.floatOnTopButton.bezelColor =
-            floatOnTopEnabled ? NSColor.controlAccentColor : nil;
+            (floatOnTopEnabled && !isFullscreen) ? NSColor.controlAccentColor : nil;
     } else if (@available(macOS 10.14, *)) {
         self.floatOnTopButton.contentTintColor =
-            floatOnTopEnabled ? NSColor.controlAccentColor : nil;
+            (floatOnTopEnabled && !isFullscreen) ? NSColor.controlAccentColor : nil;
     }
 }
 
