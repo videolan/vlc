@@ -127,7 +127,10 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
                       inFrontOf:@[self.sortOrderToolbarItem,
                                   self.libraryViewModeToolbarItem,
                                   self.forwardsToolbarItem,
-                                  self.backwardsToolbarItem]];
+                                  self.backwardsToolbarItem,
+                                  self.trackingSeparatorToolbarItem,
+                                  self.toggleNavSidebarToolbarItem,
+                                  self.vlcIconToolbarItem]];
     } else if (rendererCount == 0 && rendererToolbarItemVisible) {
         [self hideToolbarItem:self.renderersToolbarItem];
     }
