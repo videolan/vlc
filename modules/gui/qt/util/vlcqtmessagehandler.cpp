@@ -91,6 +91,7 @@ void setupVlcQtMessageHandler(vlc_object_t* p_intf)
     {
         filterRules = QStringLiteral("*=true\n"
                                     "qt.*.debug=false\n" /* Qt's own debug messages are way too much verbose */
+                                    "qt.rhi.general=true\n" /* Qt RHI general messages are not verbose */
                                     "qt.widgets.painting=false\n" /* Not necessary */);
     }
 
