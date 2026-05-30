@@ -1153,7 +1153,7 @@ void PlaylistContextMenu::popup(int selectedIndex, QPoint pos )
 
     if (m_model->rowCount() > 0)
     {
-        action = m_menu->addAction( qtr("Clear the playlist") );
+        action = m_menu->addAction( qtr("Clear play queue") );
         action->setIcon(QIcon(":/menu/clear.svg"));
         connect(action, &QAction::triggered, [this]( ) {
             m_controler->clear();
