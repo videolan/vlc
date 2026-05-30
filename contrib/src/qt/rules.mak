@@ -60,6 +60,7 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0001-rhi-d3d11-Use-DXGI_SWAP_EFFECT_FLIP_DISCARD-only-on-.patch
 	$(APPLY) $(SRC)/qt/0001-qsimd.cpp-add-missing-stdlib.h-for-getenv.patch
 	$(APPLY) $(SRC)/qt/0001-rhi-d3d11-fix-availability-on-Windows-7-with-the-pla.patch
+	$(APPLY) $(SRC)/qt/0001-rhi-d3d11-emulate-constant-buffer-offsetting-if-ther.patch
 	$(MOVE)
 
 ifdef HAVE_WIN32
