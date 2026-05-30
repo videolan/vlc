@@ -431,7 +431,7 @@
                                 <constraint firstAttribute="width" constant="30" id="ann-oP-TCW"/>
                             </constraints>
                             <connections>
-                                <action selector="rendererControlAction:" target="QvC-M9-y7g" id="M1O-u2-5FO"/>
+                                <action selector="rendererControlAction:" target="xXj-E8-b8X" id="M1O-u2-5FO"/>
                             </connections>
                         </button>
                         <connections>
