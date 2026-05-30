@@ -42,7 +42,8 @@ static void vlcQtMessageHandler(QtMsgType type, const QMessageLogContext &contex
     if (g_logQtMessages
         || qstrcmp(context.category, "default") == 0
         || qstrcmp(context.category, "qml") == 0
-        || qstrcmp(context.category, "js") == 0)
+        || qstrcmp(context.category, "js") == 0
+        || qstrcmp(context.category, "qt.rhi.general") == 0)
     {
         const char *file = context.file ? context.file : "";
         const char *function = context.function ? context.function : "";
@@ -93,6 +94,10 @@ void setupVlcQtMessageHandler(vlc_object_t* p_intf)
                                     "qt.*.debug=false\n" /* Qt's own debug messages are way too much verbose */
                                     "qt.rhi.general=true\n" /* Qt RHI general messages are not verbose */
                                     "qt.widgets.painting=false\n" /* Not necessary */);
+    }
+    else
+    {
+        filterRules = QStringLiteral("qt.rhi.general=true\n");
     }
 
     QLoggingCategory::setFilterRules(filterRules);
