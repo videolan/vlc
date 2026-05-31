@@ -175,8 +175,7 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
             break;
         }
         vlc_mutex_unlock( &p_sys->lock );
-        // Make sure we never read more than our array size
-        if (i_rist_items_index == (RIST_MAX_QUEUE_BUFFERS -1))
+        if (i_rist_items_index >= RIST_MAX_QUEUE_BUFFERS)
             break;
     }
 
@@ -190,7 +189,7 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     }
 
     if (i_total_size == 0) {
-        return NULL;
+        goto failed_cleanup;
     }
 
     // Prepare one large buffer (when we are behing in reading, otherwise it is the same size as what is being read)
@@ -209,10 +208,8 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     return pktout;
 
 failed_cleanup:
-    if (i_total_size > 0) {
-        for (size_t i = 0; i < i_rist_items_index; i++) {
-            rist_receiver_data_block_free2(&p_sys->rist_items[i]);
-        }
+    for (size_t i = 0; i < i_rist_items_index; i++) {
+        rist_receiver_data_block_free2(&p_sys->rist_items[i]);
     }
     return NULL;
 }
