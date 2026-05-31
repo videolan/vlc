@@ -751,7 +751,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 free( psz_intf );
             }
 
-#if !defined( _WIN32)
             {
                 // Populate styles combobox:
                 assert(qApp->property("initialStyle").isValid());
@@ -775,10 +774,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             connect( ui.stylesCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
                      this, &SPrefsPanel::changeStyle );
-#else
-            ui.stylesCombo->hide();
-            ui.stylesLabel->hide();
-#endif
+
             radioGroup = new QButtonGroup(this);
             radioGroup->addButton( ui.modernButton, 0 );
             radioGroup->addButton( ui.classicButton, 1 );
