@@ -29,6 +29,7 @@
 
 #include <vlc_common.h>
 #include <librist/librist.h>
+#include <limits.h>
 
 /* RIST max fifo count (private RIST_DATAOUT_QUEUE_BUFFERS in librist) */
 #define RIST_MAX_QUEUE_BUFFERS (1024)
@@ -141,12 +142,37 @@ static inline int rist_get_max_packet_size(vlc_object_t *p_this)
 
 static inline bool rist_add_peers(vlc_object_t *p_this, struct rist_ctx *ctx, char *psz_url, int i_multipeer_mode, int virt_dst_port, int i_recovery_length)
 {
-
-
     int i_rist_reorder_buffer = var_InheritInteger( p_this, RIST_CFG_PREFIX RIST_URL_PARAM_REORDER_BUFFER );
     int i_rist_retry_interval = var_InheritInteger( p_this, RIST_CFG_PREFIX RIST_CFG_RETRY_INTERVAL );
     int i_rist_max_retries = var_InheritInteger( p_this, RIST_CFG_PREFIX RIST_CFG_MAX_RETRIES );
     int i_rist_max_bitrate = var_InheritInteger(p_this, RIST_CFG_PREFIX RIST_URL_PARAM_BANDWIDTH);
+
+    if (i_recovery_length < 0) {
+        msg_Warn( p_this, "ignoring negative recovery length %d", i_recovery_length );
+        i_recovery_length = 0;
+    }
+    if (i_rist_reorder_buffer < 0) {
+        msg_Warn( p_this, "ignoring negative reorder buffer %d", i_rist_reorder_buffer );
+        i_rist_reorder_buffer = 0;
+    }
+    if (i_rist_retry_interval < 0) {
+        msg_Warn( p_this, "ignoring negative retry interval %d", i_rist_retry_interval );
+        i_rist_retry_interval = 0;
+    } else if (i_rist_retry_interval > INT_MAX / 10) {
+        i_rist_retry_interval = INT_MAX / 10;
+    }
+    if (i_rist_max_retries < 0) {
+        msg_Warn( p_this, "ignoring negative max retries %d", i_rist_max_retries );
+        i_rist_max_retries = 0;
+    }
+    if (i_rist_max_bitrate < 0) {
+        msg_Warn( p_this, "ignoring negative max bitrate %d", i_rist_max_bitrate );
+        i_rist_max_bitrate = 0;
+    }
+    if (i_multipeer_mode < 0) {
+        msg_Warn( p_this, "ignoring negative multipeer mode %d", i_multipeer_mode );
+        i_multipeer_mode = 0;
+    }
 
     char *psz_stream_name = NULL;
     psz_stream_name = var_InheritString( p_this, RIST_CFG_PREFIX RIST_URL_PARAM_CNAME );
@@ -166,7 +192,7 @@ static inline bool rist_add_peers(vlc_object_t *p_this, struct rist_ctx *ctx, ch
     msg_Info( p_this, "Setting retry buffer to %d ms", i_recovery_length );
 
     char *addr[] = {
-        strdup(psz_url),
+        psz_url ? strdup(psz_url) : NULL,
         var_InheritString( p_this, RIST_CFG_PREFIX RIST_CFG_URL2 ),
         var_InheritString( p_this, RIST_CFG_PREFIX RIST_CFG_URL3 ),
         var_InheritString( p_this, RIST_CFG_PREFIX RIST_CFG_URL4 )
@@ -192,7 +218,7 @@ static inline bool rist_add_peers(vlc_object_t *p_this, struct rist_ctx *ctx, ch
             .recovery_length_max = (uint32_t)i_recovery_length,
             .recovery_reorder_buffer = (uint32_t)i_rist_reorder_buffer,
             .recovery_rtt_min = (uint32_t)i_rist_retry_interval,
-            .recovery_rtt_max = (uint32_t)10*i_rist_retry_interval,
+            .recovery_rtt_max = (uint32_t)(10 * i_rist_retry_interval),
             .weight = (uint32_t)i_multipeer_mode,
             .congestion_control_mode = RIST_CONGESTION_CONTROL_MODE_NORMAL,
             .min_retries = 6,
