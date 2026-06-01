@@ -77,7 +77,7 @@ x264 x26410b: %: x264-$(X264_VERSION).tar.xz .sum-%
 .x264: x264
 	$(REQUIRE_GPL)
 	$(MAKEBUILDDIR)
-	cd $(BUILD_DIR) && $(HOSTVARS) $(BUILD_SRC)/configure $(X264CONF)
+	cd $(BUILD_DIR) && $(HOSTVARS) $(BUILD_SRC)/configure $(X264CONF) || cat config.log
 	# make dummy dependency file
 	touch $(BUILD_DIR)/.depend
 	+$(MAKEBUILD)
