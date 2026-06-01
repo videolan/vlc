@@ -171,6 +171,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                 });
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.nodeToDisplay clearChildrenCache];
                     [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
                                                                               withUrl:nodeUrl];
                     [weakSelf reloadData];

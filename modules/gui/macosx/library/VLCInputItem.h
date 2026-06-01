@@ -102,6 +102,8 @@ NSDictionary<NSString *, id> *commonInputItemData(NSArray<VLCInputItem*> * const
 @property (readonly) int numberOfChildren;
 @property (readonly, nullable) NSArray <VLCInputNode *> *children;
 
+- (void)clearChildrenCache;
+
 @end
 
 NS_ASSUME_NONNULL_END

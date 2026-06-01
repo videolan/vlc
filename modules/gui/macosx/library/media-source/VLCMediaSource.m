@@ -331,7 +331,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         [inputNode.inputItem.MRL hasPrefix:@"file://"]) {
         input_item_node_t *vlcInputNode = inputNode.vlcInputItemNode;
         NSURL *dirUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
-
+        [inputNode clearChildrenCache];
         return [self generateChildNodesForDirectoryNode:vlcInputNode withUrl:dirUrl];
     }
 

@@ -654,6 +654,12 @@ NSString * const value_##prop =                                                 
 }
 
 
+@interface VLCInputNode ()
+{
+    NSArray<VLCInputNode *> *_cachedChildren;
+}
+@end
+
 @implementation VLCInputNode
 
 - (instancetype)initWithInputNode:(struct input_item_node_t *)p_inputNode
@@ -679,24 +685,40 @@ NSString * const value_##prop =                                                 
     return [NSString stringWithFormat:@"%@: node: %p input name: %@, number of children: %i", NSStringFromClass([self class]),_vlcInputItemNode, inputItemName, self.numberOfChildren];
 }
 
+- (void)clearChildrenCache
+{
+    _cachedChildren = nil;
+}
+
 - (int)numberOfChildren
 {
+    if (_cachedChildren) {
+        return (int)_cachedChildren.count;
+    }
     return _vlcInputItemNode ? _vlcInputItemNode->i_children : 0;
 }
 
 - (nullable NSArray<VLCInputNode *> *)children
 {
+    if (_cachedChildren) {
+        return _cachedChildren;
+    }
+
     if (_vlcInputItemNode == NULL) {
         return nil;
     }
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:_vlcInputItemNode->i_children];
     for (int i = 0; i < _vlcInputItemNode->i_children; i++) {
+        if (_vlcInputItemNode->pp_children == NULL) {
+            break;
+        }
         VLCInputNode *inputNode = [[VLCInputNode alloc] initWithInputNode:_vlcInputItemNode->pp_children[i]];
         if (inputNode) {
             [mutableArray addObject:inputNode];
         }
     }
-    return [mutableArray copy];
+    _cachedChildren = [mutableArray copy];
+    return _cachedChildren;
 }
 
 @end
