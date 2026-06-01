@@ -30,3 +30,12 @@ libvlc = library('vlc',
     dependencies: [libvlccore_dep, m_lib, threads_dep],
     install: true
 )
+
+# Publicly exported dependency object. Used when libvlc is wrapped in a meson
+# subproject.
+libvlc_dep = declare_dependency(
+    link_with: libvlc,
+    include_directories: include_directories('../include'),
+)
+
+meson.override_dependency('libvlc', libvlc_dep)
