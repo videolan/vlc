@@ -180,11 +180,24 @@ FocusScope {
 
     activeFocusOnTab: true
 
+    function _useClipRectForEventDeliveryWorkaround() {
+        if (!root.clip) {
+            // The following flag makes sure that the event delivery agent
+            // does not deliver the input events to the children of the
+            // content item that are outside of the viewport, without
+            // clipping the content with a clip node:
+            MainCtx.setItemFlag(root, Item.ItemClipsChildrenToShape)
+        }
+    }
+
     // Events
 
     Component.onCompleted: {
         if (_initialize())
             flickable.layout(true)
+
+        clipChanged.connect(root, root._useClipRectForEventDeliveryWorkaround)
+        root._useClipRectForEventDeliveryWorkaround()
     }
 
     // view needs to be relayout, since items may move
