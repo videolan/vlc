@@ -105,6 +105,11 @@ AboutDialog::AboutDialog( qt_intf_t *_p_intf)
         ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
 #endif
 
+    const QDate today = QDate::currentDate();
+    if( today.month() == 4 && today.day() == 1
+            && var_InheritBool( p_intf, "qt-icon-change" ) )
+        ui.VLCcone->setPixmap( QPixmap( ":/logo/vlc128-aprilfools.png" ) );
+
 #if 0
     ifdef UPDATE_CHECK
 #else

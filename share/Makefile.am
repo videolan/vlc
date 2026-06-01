@@ -92,10 +92,13 @@ if !HAVE_WIN32
 dist_pkgdata_DATA = icons/vlc.ico
 dist_icons16_DATA = icons/16x16/vlc.png icons/16x16/vlc.xpm
 dist_icons32_DATA = icons/32x32/vlc.png icons/32x32/vlc.xpm \
-			icons/32x32/vlc-xmas.xpm
-dist_icons48_DATA = icons/48x48/vlc.png icons/48x48/vlc-xmas.png
+			icons/32x32/vlc-xmas.xpm \
+			icons/32x32/vlc-aprilfools.xpm
+dist_icons48_DATA = icons/48x48/vlc.png icons/48x48/vlc-xmas.png \
+			icons/48x48/vlc-aprilfools.png
 dist_icons128_DATA = icons/128x128/vlc.png icons/128x128/vlc-xmas.png \
-                     icons/128x128/vlc-kb.png
+                     icons/128x128/vlc-kb.png \
+                     icons/128x128/vlc-aprilfools.png
 dist_icons256_DATA = icons/256x256/vlc.png
 
 nobase_dist_pkgdata_SCRIPTS = \
