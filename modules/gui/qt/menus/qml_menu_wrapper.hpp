@@ -34,6 +34,9 @@ Q_MOC_INCLUDE("network/networkdevicemodel.hpp")
 Q_MOC_INCLUDE("network/networkmediamodel.hpp")
 Q_MOC_INCLUDE("medialibrary/mlplaylistlistmodel.hpp")
 Q_MOC_INCLUDE("medialibrary/mlplaylistmodel.hpp")
+Q_MOC_INCLUDE(<QAbstractProxyModel>)
+
+class QAbstractProxyModel;
 
 class MediaLib;
 class MLPlaylistListModel;
@@ -463,6 +466,7 @@ public slots:
 class PlaylistContextMenu : public QObject {
     Q_OBJECT
     SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistListModel*, model, nullptr)
+    SIMPLE_MENU_PROPERTY(QAbstractProxyModel*, proxyModel, nullptr)
     SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistController*, controler, nullptr)
     SIMPLE_MENU_PROPERTY(ListSelectionModel*, selectionModel, nullptr)
     SIMPLE_MENU_PROPERTY(MainCtx *, ctx, nullptr)
@@ -471,6 +475,7 @@ public:
 
 signals:
     void jumpToCurrentPlaying();
+    void discardedFilteredOutItems();
 
 public slots:
     void popup(int currentIndex, QPoint pos );

@@ -96,6 +96,8 @@ T.Pane {
     PlaylistContextMenu {
         id: contextMenu
         model: root.model
+        proxyModel: (root.contentItem?.listView?.model instanceof QtAbstractProxyModel) ? root.contentItem.listView.model
+                                                                                        : null
         selectionModel: root.selectionModel
         controler: MainPlaylistController
         ctx: MainCtx
@@ -524,6 +526,14 @@ T.Pane {
 
             searchBox.displayRegexToggleButton: true
             searchBox.displayCaseSensitiveToggleButton: true
+
+            Connections {
+                target: contextMenu
+
+                function onDiscardedFilteredOutItems() {
+                    toolbar.searchBox.retract()
+                }
+            }
         }
     }
 
