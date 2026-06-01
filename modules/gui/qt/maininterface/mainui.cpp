@@ -93,6 +93,7 @@
 #include "mainctx_submodels.hpp"
 
 #include <QScreen>
+#include <QAbstractProxyModel>
 
 static bool g_qmlTypesAreRegistered = false;
 
@@ -240,6 +241,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonInstance<UINotifier>(uri, versionMajor, versionMinor, "UINotifier", new UINotifier(m_mainCtx, m_mainCtx));
         qmlRegisterSingletonInstance<NavigationHistory>(uri, versionMajor, versionMinor, "History", new NavigationHistory(this));
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
+        qmlRegisterUncreatableType<QAbstractProxyModel>(uri, versionMajor, versionMinor, "QtAbstractProxyModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
         qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
