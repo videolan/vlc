@@ -38,38 +38,88 @@ vlc_process_WindowsPoll_i11e_wake(void *opaque)
     QueueUserAPC(vlc_process_WindowsPoll_i11e_wake_self, th, 0);
 }
 
+/**
+ * Map the result of a failed overlapped operation to an errno-like value.
+ */
+static int
+vlc_process_WindowsMapIoResult(DWORD error, DWORD *bytes, bool is_read,
+                               int dflt)
+{
+    if (is_read) {
+        if (error == ERROR_BROKEN_PIPE || error == ERROR_HANDLE_EOF) {
+            *bytes = 0;
+            return VLC_SUCCESS;
+        }
+    } else if (error == ERROR_BROKEN_PIPE || error == ERROR_NO_DATA ||
+               error == ERROR_PIPE_NOT_CONNECTED) {
+        return EPIPE;
+    }
+    return dflt;
+}
+
+/**
+ * Cancel a pending overlapped operation and wait for its completion.
+ */
+static int vlc_process_WindowsCancelPoll(HANDLE hFd, LPOVERLAPPED lpoverlapped,
+                                         DWORD *bytes, DWORD size,
+                                         bool is_read, int cancel_err)
+{
+    CancelIoEx(hFd, lpoverlapped);
+    if (GetOverlappedResult(hFd, lpoverlapped, bytes, TRUE)) {
+        return VLC_SUCCESS;
+    }
+
+    DWORD error = GetLastError();
+    if (error == ERROR_OPERATION_ABORTED) {
+        if (*bytes > 0 && *bytes <= size) {
+            return VLC_SUCCESS;
+        }
+        *bytes = 0;
+        return cancel_err;
+    }
+    return vlc_process_WindowsMapIoResult(error, bytes, is_read, EINVAL);
+}
+
 static int
 vlc_process_WindowsPoll(HANDLE hFd, LPOVERLAPPED lpoverlapped, DWORD *bytes,
-                        vlc_tick_t timeout_ms)
+                        DWORD size, bool is_read, vlc_tick_t timeout_ms)
 {
     HANDLE th;
     if (!DuplicateHandle(GetCurrentProcess(), GetCurrentThread(),
                          GetCurrentProcess(), &th, 0, FALSE,
                          DUPLICATE_SAME_ACCESS)) {
-        return ENOMEM;
+        return vlc_process_WindowsCancelPoll(hFd, lpoverlapped, bytes, size,
+                                             is_read, ENOMEM);
     }
     vlc_interrupt_register(vlc_process_WindowsPoll_i11e_wake, th);
     DWORD waitResult = WaitForSingleObjectEx(lpoverlapped->hEvent,
                                              timeout_ms, TRUE);
-    vlc_interrupt_unregister();
+    int interrupted = vlc_interrupt_unregister();
     CloseHandle(th);
+
+    if (interrupted != 0) {
+        return vlc_process_WindowsCancelPoll(hFd, lpoverlapped, bytes, size,
+                                             is_read, EINTR);
+    }
+
     switch (waitResult) {
         case WAIT_OBJECT_0:
             if (GetOverlappedResult(hFd, lpoverlapped, bytes, FALSE)) {
                 return VLC_SUCCESS;
-            } else {
-                return EINVAL;
             }
+            return vlc_process_WindowsMapIoResult(GetLastError(), bytes,
+                                                  is_read, EINVAL);
         case WAIT_TIMEOUT:
             /* Timeout occurred */
-            CancelIo(hFd); /* Cancel the I/O operation */
-            return ETIMEDOUT;
+            return vlc_process_WindowsCancelPoll(hFd, lpoverlapped, bytes,
+                                                 size, is_read, ETIMEDOUT);
         case WAIT_IO_COMPLETION:
             /* Interrupt occurred */
-            CancelIo(hFd); /* Cancel the I/O operation */
-            return EINTR;
+            return vlc_process_WindowsCancelPoll(hFd, lpoverlapped, bytes,
+                                                 size, is_read, EINTR);
         default:
-            return EINVAL;
+            return vlc_process_WindowsCancelPoll(hFd, lpoverlapped, bytes,
+                                                 size, is_read, EINVAL);
     }
 }
 
@@ -240,15 +290,16 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
         if (GetOverlappedResult(hFd, &overlapped, &bytes, FALSE)) {
             err = VLC_SUCCESS;
         } else {
-            err = EINVAL;
+            err = vlc_process_WindowsMapIoResult(GetLastError(), &bytes, true,
+                                                 EINVAL);
         }
     } else {
         DWORD error = GetLastError();
         if (error == ERROR_IO_PENDING) {
             err = vlc_process_WindowsPoll(hFd, &overlapped, &bytes,
-                                          timeout_ms);
+                                          (DWORD)size, true, timeout_ms);
         } else {
-            err = EINVAL;
+            err = vlc_process_WindowsMapIoResult(error, &bytes, true, EINVAL);
         }
     }
 
@@ -285,15 +336,16 @@ vlc_process_fd_Write(struct vlc_process *process, const uint8_t *buf, size_t siz
         if (GetOverlappedResult(hFd, &overlapped, &bytes, FALSE)) {
             err = VLC_SUCCESS;
         } else {
-            err = EINVAL;
+            err = vlc_process_WindowsMapIoResult(GetLastError(), &bytes, false,
+                                                 EINVAL);
         }
     } else {
         DWORD error = GetLastError();
         if (error == ERROR_IO_PENDING) {
             err = vlc_process_WindowsPoll(hFd, &overlapped, &bytes,
-                                          timeout_ms);
+                                          (DWORD)size, false, timeout_ms);
         } else {
-            err = EINVAL;
+            err = vlc_process_WindowsMapIoResult(error, &bytes, false, EINVAL);
         }
     }
 

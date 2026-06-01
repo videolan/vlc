@@ -46,6 +46,12 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv);
  * Closes its file descriptors, and waits for it to exit. Optionally sends a
  * termination signal to the process,
  *
+ * @warning This must not be called concurrently with vlc_process_fd_Read() or
+ *          vlc_process_fd_Write() on the same @p process. It closes the
+ *          underlying pipe/socket and frees @p process, so the caller must
+ *          ensure that any thread performing I/O has returned first to avoid a
+ *          use-after-free.
+ *
  * @param [in]  process        Pointer to the vlc_process instance. Must not
  *                             be NULL.
  * @param [in]  kill_process   Whether to forcibly terminate the process
