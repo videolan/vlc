@@ -271,7 +271,7 @@ protocol_store_path(const vlc_url_t *p_url)
 static void
 smb_split_domain(vlc_credential *p_credential)
 {
-    char *psz_delim = strchr(p_credential->psz_username, ';');
+    const char *psz_delim = strchr(p_credential->psz_username, ';');
     if (psz_delim == NULL)
         return;
 
