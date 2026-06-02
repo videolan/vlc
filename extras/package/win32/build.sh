@@ -344,9 +344,6 @@ fi
 if [ -n "$BREAKPAD" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --enable-breakpad"
 fi
-if [ "$RELEASE" != "yes" ]; then
-     CONTRIBFLAGS="$CONTRIBFLAGS --disable-optim"
-fi
 if [ -n "$DISABLEGUI" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qtgraphicaleffects --disable-qtquickcontrols2"
 fi
