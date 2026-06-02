@@ -233,12 +233,13 @@ next:
 
         p += strspn (p, ", ");
         name = p;
+        char *begin = p;
         end = strchr (p, ',');
         if (end != NULL)
             *(end++) = '\0';
         p = end; /* next name/value pair */
 
-        end = strchr (name, '=');
+        end = strchr (begin, '=');
         if (end == NULL)
         {
             /* TODO? support button controls that way? */
