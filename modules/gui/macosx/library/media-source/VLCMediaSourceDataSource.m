@@ -159,6 +159,11 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
             }
         }
 
+        if (self.observedPathDispatchSource) {
+            dispatch_source_cancel(self.observedPathDispatchSource);
+            self.observedPathDispatchSource = nil;
+        }
+
         const __weak typeof(self) weakSelf = self;
         self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
                                                 forVnodeEvents:DISPATCH_VNODE_WRITE |
