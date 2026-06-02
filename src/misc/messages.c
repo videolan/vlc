@@ -123,7 +123,7 @@ void vlc_vaLog(struct vlc_logger *const *loggerp, int type,
         return;
 
     /* Get basename from the module filename */
-    char *p = strrchr(module, '/');
+    const char *p = strrchr(module, '/');
     if (p != NULL)
         module = p + 1;
     p = strchr(module, '.');
