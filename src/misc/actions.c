@@ -218,8 +218,8 @@ uint_fast32_t vlc_str2keycode (const char *name)
         name += len + 1;
     }
 
-    struct key_descriptor *d = bsearch (name, s_keys, ARRAY_SIZE(s_keys),
-                                        sizeof (s_keys[0]), keystrcmp);
+    const struct key_descriptor *d = bsearch(name, s_keys, ARRAY_SIZE(s_keys),
+                                             sizeof (s_keys[0]), keystrcmp);
     if (d != NULL)
         code = d->i_code;
     else if (vlc_towc (name, &code) <= 0)
