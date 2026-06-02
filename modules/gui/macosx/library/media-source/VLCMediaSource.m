@@ -289,16 +289,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         if (_p_mediaSource->description == localDevicesDescription || _p_mediaSource->description == myFoldersDescription) {
             _p_mediaSource->description = NULL;
 
-            input_item_node_t **childrenNodes = _p_mediaSource->tree->root.pp_children;
-            if (childrenNodes) {
-                for (int i = 0; i <_p_mediaSource->tree->root.i_children; ++i) {
-                    input_item_node_t *childNode = childrenNodes[i];
-                    input_item_node_RemoveNode(&(_p_mediaSource->tree->root), childNode);
-                    input_item_node_Delete(childNode);
-                }
-            }
-
-            free(_p_mediaSource->tree);
+            vlc_media_tree_Release(_p_mediaSource->tree);
             free(_p_mediaSource);
             _p_mediaSource = NULL;
         } else if (_p_mediaSource->description == remoteBrowseDescription) {
