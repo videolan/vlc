@@ -272,18 +272,18 @@ static void
 smb_split_domain(vlc_credential *p_credential)
 {
     char *psz_delim = strchr(p_credential->psz_username, ';');
-    if (psz_delim)
+    if (psz_delim == NULL)
+        return;
+
+    size_t i_len = psz_delim - p_credential->psz_username;
+    if (i_len > 0)
     {
-        size_t i_len = psz_delim - p_credential->psz_username;
-        if (i_len > 0)
-        {
-            free(p_credential->psz_split_domain);
-            p_credential->psz_split_domain =
-                strndup(p_credential->psz_username, i_len);
-            p_credential->psz_realm = p_credential->psz_split_domain;
-        }
-        p_credential->psz_username = psz_delim + 1;
+        free(p_credential->psz_split_domain);
+        p_credential->psz_split_domain =
+            strndup(p_credential->psz_username, i_len);
+        p_credential->psz_realm = p_credential->psz_split_domain;
     }
+    p_credential->psz_username = psz_delim + 1;
 }
 
 static void
