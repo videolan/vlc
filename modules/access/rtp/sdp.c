@@ -182,18 +182,19 @@ bad:
     }
 
     const char *port = media_end + 1;
-    char *port_end = memchr(port, ' ', end - port);
+    const char *port_end = memchr(port, ' ', end - port);
 
     if (port_end == NULL)
         goto bad;
 
     const char *proto = port_end + 1;
-    unsigned long port_start = strtoul(port, &port_end, 10);
+    char *port_cur;
+    unsigned long port_start = strtoul(port, &port_cur, 10);
     unsigned long port_count = 1;
 
-    if (*port_end == '/')
-        port_count = strtoul(port_end + 1, &port_end, 10);
-    if (*port_end != ' ')
+    if (*port_cur == '/')
+        port_count = strtoul(port_cur + 1, &port_cur, 10);
+    if (port_cur != port_end)
         goto bad;
 
     const char *proto_end = memchr(proto, ' ', end - proto);
