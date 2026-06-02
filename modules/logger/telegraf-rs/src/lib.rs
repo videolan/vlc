@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 
-use std::{cell::UnsafeCell, sync::Mutex};
+use std::sync::Mutex;
 use telegraf::{Client, IntoFieldData};
 use vlcrs_core::tracer::{TraceValue, TracerCapability, TracerModuleLoader};
 use vlcrs_macros::module;
@@ -34,7 +34,7 @@ impl<'a> IntoFieldData for TraceValueWrapper<'a> {
 }
 
 struct TelegrafTracer {
-    endpoint: Mutex<UnsafeCell<telegraf::Client>>,
+    endpoint: Mutex<telegraf::Client>,
 }
 
 impl TracerCapability for TelegrafTracer {
@@ -45,7 +45,6 @@ impl TracerCapability for TelegrafTracer {
         let endpoint_address =
             std::env::var("VLC_TELEGRAF_ENDPOINT").unwrap_or(String::from("tcp://localhost:8094"));
         let endpoint = Client::new(&endpoint_address)
-            .map(UnsafeCell::new)
             .map(Mutex::new)
             .unwrap();
         Some(Self { endpoint })
@@ -81,7 +80,7 @@ impl TracerCapability for TelegrafTracer {
         };
 
         let mut endpoint = self.endpoint.lock().unwrap();
-        if let Err(err) = endpoint.get_mut().write_point(&p) {
+        if let Err(err) = endpoint.write_point(&p) {
             match err {
                 telegraf::TelegrafError::IoError(e) => eprintln!("TelegrafTracer: IO Error: {}", e),
                 telegraf::TelegrafError::ConnectionError(s) => {
