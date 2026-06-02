@@ -459,6 +459,9 @@ static const char *const remoteBrowseDescription = "Remote Browse";
 
         if (error) {
             NSLog(@"Failed to get directories: %@.", error);
+            if (self.didFinishGeneratingChildNodesForNodeHandler) {
+                self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
+            }
             return error;
         }
 
