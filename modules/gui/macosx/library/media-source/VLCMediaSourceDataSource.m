@@ -145,16 +145,18 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
             return;
         }
 
-        NSError * const error =
-            [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
-                                                                  withUrl:nodeUrl];
-        if (error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSAlert * const alert = [NSAlert alertWithError:error];
-                alert.alertStyle = NSAlertStyleCritical;
-                [alert runModal];
-            });
-            return;
+        if (inputNode->i_children == 0) {
+            NSError * const error =
+                [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
+                                                                      withUrl:nodeUrl];
+            if (error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSAlert * const alert = [NSAlert alertWithError:error];
+                    alert.alertStyle = NSAlertStyleCritical;
+                    [alert runModal];
+                });
+                return;
+            }
         }
 
         const __weak typeof(self) weakSelf = self;
