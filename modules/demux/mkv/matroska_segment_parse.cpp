@@ -790,15 +790,14 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 #if LIBMATROSKA_VERSION >= 0x010405
         E_CASE( KaxVideoColour, colours)
         {
-            ONLY_FMT(VIDEO);
             debug( vars, "Video Colors");
             if (vars.tk->fmt.i_cat != VIDEO_ES ) {
                 msg_Err( vars.p_demuxer, "Video colors elements not allowed for this track" );
-            } else {
+                return;
+            }
             vars.level += 1;
             dispatcher.iterate (colours.begin (), colours.end (), &vars );
             vars.level -= 1;
-            }
         }
         E_CASE( KaxVideoColourRange, range )
         {
@@ -975,15 +974,14 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxVideoColourMasterMeta, mastering )
         {
-            ONLY_FMT(VIDEO);
             debug( vars, "Video Mastering Metadata");
             if (vars.tk->fmt.i_cat != VIDEO_ES ) {
                 msg_Err( vars.p_demuxer, "Video metadata elements not allowed for this track" );
-            } else {
+                return;
+            }
             vars.level += 1;
             dispatcher.iterate (mastering.begin (), mastering.end (), &vars );
             vars.level -= 1;
-            }
         }
         E_CASE( KaxVideoLuminanceMax, maxLum )
         {
