@@ -9,7 +9,7 @@ qt_include_dir = include_directories('.')
 qt_extra_deps = []
 qt_extra_flags = ['-DQT_STRICT_ITERATORS','-DQT_USE_QSTRINGBUILDER','-DQT_NO_CAST_TO_ASCII','-DQT_NO_CAST_FROM_BYTEARRAY']
 qt_cppargs = []
-qt_link_args = []
+qt_link_args = [gc_sections_linkargs]
 
 qt6_dep = dependency('qt6',
     # Note that Qt < 6.2.5 does not provide pc files!
