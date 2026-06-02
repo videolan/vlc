@@ -22,6 +22,7 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(APPLY) $(SRC)/ebml/0001-EbmlHead-do-not-allow-to-have-an-infinite-unknown-si.patch
 	$(APPLY) $(SRC)/ebml/0001-include-iterator-for-std-back_inserter.patch
 	$(APPLY) $(SRC)/ebml/0002-include-new-for-std-nothrow.patch
+	$(APPLY) $(SRC)/ebml/0001-EbmlMaster-fix-leak-on-upper-element-found-inside-th.patch
 	$(MOVE)
 
 .ebml: ebml toolchain.cmake
