@@ -1,0 +1,51 @@
+From 370bcc4fb22af9d07bca911457e5fe20119e3bd2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 2 Jun 2026 11:37:54 +0200
+Subject: [PATCH] EbmlMaster: fix leak on upper element found inside the last
+ element
+
+We found an upper element and there is not data to read after the current
+element within its parent. That upper element is misplaced and should be
+discarded.
+The last element is truncated and doesn't contain the rest of its data.
+---
+ src/EbmlMaster.cpp | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/src/EbmlMaster.cpp b/src/EbmlMaster.cpp
+index 4851618..d91ab06 100644
+--- a/src/EbmlMaster.cpp
++++ b/src/EbmlMaster.cpp
+@@ -445,8 +445,13 @@ void EbmlMaster::Read(EbmlStream & inDataStream, const EbmlSemanticContext & sCo
+ 
+           if (UpperEltFound) {
+             --UpperEltFound;
+-            if (UpperEltFound > 0 || MaxSizeToRead <= 0)
++            if (UpperEltFound > 0)
+               goto processCrc;
++            if (MaxSizeToRead <= 0) {
++              delete FoundElt;
++              FoundElt = nullptr;
++              goto processCrc;
++            }
+             ElementLevelA = FoundElt;
+           }
+ 
+@@ -456,8 +461,13 @@ void EbmlMaster::Read(EbmlStream & inDataStream, const EbmlSemanticContext & sCo
+ 
+       if (UpperEltFound > 0) {
+         UpperEltFound--;
+-        if (UpperEltFound > 0 || MaxSizeToRead <= 0)
++        if (UpperEltFound > 0)
++          goto processCrc;
++        if (MaxSizeToRead <= 0) {
++          delete FoundElt;
++          FoundElt = nullptr;
+           goto processCrc;
++        }
+         ElementLevelA = FoundElt;
+         if (IsFiniteSize() && ElementLevelA->IsFiniteSize()) {
+           if (ElementLevelA->GetEndPosition() > GetEndPosition()) {
+-- 
+2.52.0.windows.1
+
