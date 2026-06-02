@@ -223,14 +223,14 @@ if get_option('nls').allowed()
         # check in contribs
         intl_dep = cc.find_library('intl', dirs: contrib_libdir, required: get_option('nls'))
     endif
-else
-    intl_dep = disabler()
-endif
-if intl_dep.found()
-    cdata.set('HAVE_GETTEXT', 1)
-    cdata.set('ENABLE_NLS', 1)
+    if intl_dep.found()
+        cdata.set('HAVE_GETTEXT', 1)
+        cdata.set('ENABLE_NLS', 1)
 
-    subdir('po')
+        subdir('po')
+    endif
+else
+    intl_dep = declare_dependency()
 endif
 
 # Domain name i18n support via GNU libidn
