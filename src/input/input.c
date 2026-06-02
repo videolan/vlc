@@ -3596,18 +3596,16 @@ static char *input_SubtitleFile2Uri( input_thread_t *p_input,
     /* if we are provided a subtitle.sub file,
      * see if we don't have a subtitle.idx and use it instead */
     char *psz_idxpath = NULL;
-    char *psz_extension = strrchr( psz_subtitle, '.');
-    if( psz_extension && strcmp( psz_extension, ".sub" ) == 0 )
+    const char *extension_part = strrchr(psz_subtitle, '.');
+    if (extension_part && strcmp(extension_part, ".sub" ) == 0)
     {
         psz_idxpath = strdup( psz_subtitle );
         if (psz_idxpath == NULL)
             return NULL;
 
+        strcpy(&psz_idxpath[extension_part - psz_subtitle], ".idx");
+
         struct stat st;
-
-        psz_extension = psz_extension - psz_subtitle + psz_idxpath;
-        strcpy( psz_extension, ".idx" );
-
         if( !vlc_stat( psz_idxpath, &st ) && S_ISREG( st.st_mode ) )
         {
             msg_Dbg( p_input, "using %s as subtitle file instead of %s",
