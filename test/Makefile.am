@@ -389,10 +389,10 @@ test_modules_video_output_opengl_filters_SOURCES = \
 	../modules/video_output/opengl/interop.h \
 	../modules/video_output/opengl/importer.c \
 	../modules/video_output/opengl/importer.h
-test_modules_video_output_opengl_filters_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_video_output_opengl_filters_LDADD = $(LIBVLCCORE) $(LIBVLC) ../modules/libvlc_opengl.la
 test_modules_video_output_opengl_filters_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL
 test_modules_video_output_opengl_es2_filters_SOURCES = $(test_modules_video_output_opengl_filters_SOURCES)
-test_modules_video_output_opengl_es2_filters_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_video_output_opengl_es2_filters_LDADD = $(LIBVLCCORE) $(LIBVLC) ../modules/libvlc_opengles.la
 test_modules_video_output_opengl_es2_filters_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL_ES2
 
 test_modules_video_output_opengl_sub_renderer_SOURCES = \
@@ -406,10 +406,10 @@ test_modules_video_output_opengl_sub_renderer_SOURCES = \
 	../modules/video_output/opengl/gl_util.h \
 	../modules/video_output/opengl/interop.c \
 	../modules/video_output/opengl/interop.h
-test_modules_video_output_opengl_sub_renderer_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBPLACEBO_LIBS)
+test_modules_video_output_opengl_sub_renderer_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBPLACEBO_LIBS) ../modules/libvlc_opengl.la
 test_modules_video_output_opengl_sub_renderer_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL
 test_modules_video_output_opengl_es2_sub_renderer_SOURCES = $(test_modules_video_output_opengl_sub_renderer_SOURCES)
-test_modules_video_output_opengl_es2_sub_renderer_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBPLACEBO_LIBS)
+test_modules_video_output_opengl_es2_sub_renderer_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBPLACEBO_LIBS) ../modules/libvlc_opengles.la
 test_modules_video_output_opengl_es2_sub_renderer_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL_ES2
 
 test_modules_stream_out_transcode_SOURCES = \
