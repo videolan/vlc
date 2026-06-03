@@ -298,7 +298,7 @@ static int OpenFilter( vlc_object_t *p_this )
             assert( wg4_i < sizeof( pi_vlc_chan_order_wg4 )/sizeof( pi_vlc_chan_order_wg4[0] ) );
         }
         unsigned channel_wg4idx_len = sizeof( channel_wg4idx )/sizeof( channel_wg4idx[0] );
-        uint8_t *pi_chnidx = memchr( channel_wg4idx, wg4_i, channel_wg4idx_len );
+        const uint8_t *pi_chnidx = memchr( channel_wg4idx, wg4_i, channel_wg4idx_len );
         assert( pi_chnidx != NULL );
         uint8_t chnidx = pi_chnidx - channel_wg4idx;
         int64_t val = var_InheritInteger( p_this, channel_name[chnidx] );
