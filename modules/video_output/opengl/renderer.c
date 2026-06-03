@@ -813,8 +813,6 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     const char * const options[] = { "projection-mode", "video-stereo-mode", NULL };
     config_ChainParse(filter, "", options, config);
 
-    const opengl_vtable_t *vt = &filter->api->vt;
-
     struct vlc_gl_sampler *sampler =
         vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
     if (!sampler)
@@ -830,6 +828,14 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
         return VLC_ENOMEM;
     }
 
+    int ret = vlc_gl_api_Init(&renderer->api, filter->gl);
+    if (ret != VLC_SUCCESS)
+    {
+        vlc_gl_sampler_Delete(sampler);
+        free(renderer);
+        return VLC_EGENERIC;
+    }
+
     static const struct vlc_gl_filter_ops filter_ops = {
         .draw = Draw,
         .close = Close,
@@ -840,8 +846,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
 
     renderer->sampler = sampler;
 
-    renderer->api = filter->api;
-    renderer->vt = vt;
+    renderer->vt = &renderer->api.vt;
     renderer->dump_shaders = var_InheritInteger(filter, "verbose") >= 4;
 
     int projection_mode = var_InheritInteger(filter, "projection-mode");
@@ -883,7 +888,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
             break;
     }
 
-    int ret = opengl_link_program(filter);
+    ret = opengl_link_program(filter);
     if (ret != VLC_SUCCESS)
     {
         msg_Dbg(&filter->obj, "Could not link shaders");
@@ -895,6 +900,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
 
     getViewpointMatrixes(renderer, renderer->projection_mode);
 
+    const opengl_vtable_t *vt = renderer->vt;
     vt->GenVertexArrays(1, &renderer->vertex_array_object);
 
     vt->GenBuffers(1, &renderer->vertex_buffer_object);

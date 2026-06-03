@@ -83,6 +83,7 @@ static const char *const filter_options[] = {
 };
 
 struct sys {
+    struct vlc_gl_api api;
     struct vlc_gl_sampler *sampler;
 
     GLuint program_id;
@@ -133,7 +134,7 @@ DrawBlend(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     (void) pic;
     assert(!pic); /* A blend filter should not receive picture */
 
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
 
     vt->UseProgram(sys->program_id);
 
@@ -181,7 +182,7 @@ DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 {
     struct sys *sys = filter->sys;
 
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
 
     vt->UseProgram(sys->program_id);
 
@@ -222,7 +223,7 @@ DrawPlane(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     struct sys *sys = filter->sys;
 
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
 
     vt->UseProgram(sys->program_id);
 
@@ -282,7 +283,7 @@ Close(struct vlc_gl_filter *filter)
     if (sys->sampler)
         vlc_gl_sampler_Delete(sys->sampler);
 
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
 
@@ -293,7 +294,7 @@ static int
 InitBlend(struct vlc_gl_filter *filter)
 {
     struct sys *sys = filter->sys;
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
 
     static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
@@ -313,7 +314,7 @@ InitBlend(struct vlc_gl_filter *filter)
 
     const char *shader_version;
     const char *shader_precision;
-    if (filter->api->is_gles)
+    if (sys->api.is_gles)
     {
         shader_version = "#version 100\n";
         shader_precision = "precision highp float;\n";
@@ -382,7 +383,7 @@ static int
 InitMask(struct vlc_gl_filter *filter, const struct vlc_gl_format *glfmt)
 {
     struct sys *sys = filter->sys;
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
 
     struct vlc_gl_sampler *sampler =
         vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
@@ -473,7 +474,7 @@ static int
 InitPlane(struct vlc_gl_filter *filter, const struct vlc_gl_format *glfmt)
 {
     struct sys *sys = filter->sys;
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
 
     filter->config.filter_planes = true;
 
@@ -565,7 +566,13 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
 
     sys->sampler = NULL;
 
-    int ret;
+    int ret = vlc_gl_api_Init(&sys->api, filter->gl);
+    if (ret != VLC_SUCCESS)
+    {
+        free(sys);
+        return VLC_EGENERIC;
+    }
+
     if (plane)
         ret = InitPlane(filter, glfmt);
     else if (mask)

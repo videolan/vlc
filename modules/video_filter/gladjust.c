@@ -36,6 +36,7 @@
 #include "video_output/opengl/sampler.h"
 
 struct sys {
+    struct vlc_gl_api api;
     struct vlc_gl_sampler *sampler;
 
     GLuint program_id;
@@ -80,7 +81,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     struct sys *sys = filter->sys;
 
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
 
     vt->UseProgram(sys->program_id);
 
@@ -149,7 +150,7 @@ Close(struct vlc_gl_filter *filter) {
     var_DelCallback(sys->outer, "saturation", varFloatCallback, &sys->saturation);
     var_DelCallback(sys->outer, "gamma",      varFloatCallback, &sys->gamma);
 
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
 
@@ -198,6 +199,14 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     sys->sampler = sampler;
     sys->outer = outer;
     filter->sys = sys;
+
+    int ret = vlc_gl_api_Init(&sys->api, filter->gl);
+    if (ret != VLC_SUCCESS)
+    {
+        vlc_gl_sampler_Delete(sampler);
+        free(sys);
+        return VLC_EGENERIC;
+    }
 
     atomic_init(&sys->contrast,
                 var_CreateGetFloatCommand(outer, "contrast"));
@@ -304,7 +313,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     const char *extensions = sampler->shader.extensions
                            ? sampler->shader.extensions : "";
 
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
 
     const char *vertex_shader[] = { shader_version, VERTEX_SHADER };
     const char *fragment_shader[] = {

@@ -53,6 +53,7 @@ static const char *const filter_options[] = {
 
 struct sys
 {
+    struct vlc_gl_api api;
     GLuint id;
     GLuint vbo;
 
@@ -124,7 +125,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     (void) meta;
 
     struct sys *sys = filter->sys;
-    const opengl_vtable_t *vt = &filter->api->vt;
+    const opengl_vtable_t *vt = &sys->api.vt;
     const struct vlc_gl_format *glfmt = filter->glfmt_in;
     pl_gpu gpu = sys->pl_opengl->gpu;
     struct pl_frame *frame_in = &sys->frame_in;
@@ -278,6 +279,13 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     struct sys *sys = filter->sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_EGENERIC;
+
+    int ret = vlc_gl_api_Init(&sys->api, filter->gl);
+    if (ret != VLC_SUCCESS)
+    {
+        free(sys);
+        return VLC_EGENERIC;
+    }
 
     sys->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(filter));
 

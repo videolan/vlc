@@ -49,9 +49,8 @@ extern "C"
  */
 struct vlc_gl_renderer
 {
-    /* Set by the caller */
-    const struct vlc_gl_api *api;
-    const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
+    struct vlc_gl_api api;
+    const opengl_vtable_t *vt; /* for convenience, same as &api.vt */
 
     /* True to dump shaders */
     bool dump_shaders;
