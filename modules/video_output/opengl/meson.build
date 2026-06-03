@@ -14,7 +14,6 @@ gl_common_dep = declare_dependency(
         'gl_util.c',
         'importer.c',
         'interop.c',
-        'picture.c',
         'sampler.c',
         ),
     compile_args: opengl_headers_c_args,
