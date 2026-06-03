@@ -29,11 +29,17 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCInputNodePathControl : NSPathControl
 
 @property (readonly) NSMutableDictionary *inputNodePathControlItems;
+// The path items in display order, resolved back to their
+// VLCInputNodePathControlItem instances. Used to snapshot the full breadcrumb
+// for a navigation state so it can be restored later.
+@property (readonly) NSArray<VLCInputNodePathControlItem *> *orderedInputNodePathControlItems;
 
 - (void)appendInputNodePathControlItem:(VLCInputNodePathControlItem *)inputNodePathControlItem;
-- (void)removeLastInputNodePathControlItem;
 - (void)clearInputNodePathControlItems;
 - (void)clearPathControlItemsAheadOf:(NSPathControlItem *)item;
+// Replaces the entire breadcrumb with the given ordered items, rebuilding the
+// backing lookup table. Used when restoring a navigation state.
+- (void)setPathWithInputNodePathControlItems:(NSArray<VLCInputNodePathControlItem *> *)items;
 
 @end
 

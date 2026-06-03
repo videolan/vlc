@@ -164,10 +164,6 @@
     _currentPosition =
         [[VLCLibraryMediaSourceViewNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
 
-    VLCInputNode *node = _currentPosition.navigationState.currentNodeDisplayed;
-    VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
-    [self.libraryWindow.mediaSourcePathControl appendInputNodePathControlItem:nodePathItem];
-
     [self setMediaSourceViewToState:_currentPosition.navigationState];
 }
 
@@ -180,8 +176,6 @@
     NSUInteger newPositionIndex = _currentPosition.navigationStackIndex - 1;
     _currentPosition =
         [[VLCLibraryMediaSourceViewNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
-
-    [self.libraryWindow.mediaSourcePathControl removeLastInputNodePathControlItem];
 
     [self setMediaSourceViewToState:_currentPosition.navigationState];
 }
@@ -201,6 +195,8 @@
 
     VLCLibraryMediaSourceViewNavigationState * const navigationState =
         [[VLCLibraryMediaSourceViewNavigationState alloc] initFromMediaSourceDataSource:self.baseDataSource.childDataSource];
+    navigationState.pathControlItems =
+        self.libraryWindow.mediaSourcePathControl.orderedInputNodePathControlItems;
     _currentPosition =
         [[VLCLibraryMediaSourceViewNavigationCurrentStackPosition alloc] initWithStackIndex:_navigationStates.count andState:navigationState];
     [_navigationStates addObject:navigationState];
@@ -222,6 +218,7 @@
 {
     [self.baseDataSource setChildDataSource:state.currentMediaSource];
     [self.baseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
+    [self.libraryWindow.mediaSourcePathControl setPathWithInputNodePathControlItems:state.pathControlItems];
 
     [self updateDelegateNavigationButtons];
 }

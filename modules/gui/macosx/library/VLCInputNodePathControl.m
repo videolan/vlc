@@ -44,21 +44,6 @@
     self.pathItems = pathItems;
 }
 
-- (void)removeLastInputNodePathControlItem
-{
-    if (self.pathItems.count == 0) {
-        _inputNodePathControlItems = NSMutableDictionary.dictionary;
-        return;
-    }
-
-    NSMutableArray * const pathItems = self.pathItems.mutableCopy;
-    NSPathControlItem * const lastItem = pathItems.lastObject;
-
-    [pathItems removeLastObject];
-    self.pathItems = pathItems;
-    [self.inputNodePathControlItems removeObjectForKey:lastItem.image.accessibilityDescription];
-}
-
 - (void)clearInputNodePathControlItems
 {
     _inputNodePathControlItems = NSMutableDictionary.dictionary;
@@ -90,6 +75,28 @@
 
     self.pathItems = [pathItems subarrayWithRange:NSMakeRange(0, indexOfItem + 1)];
     [self.inputNodePathControlItems removeObjectsForKeys:itemIdsToRemove];
+}
+
+- (NSArray<VLCInputNodePathControlItem *> *)orderedInputNodePathControlItems
+{
+    NSMutableArray<VLCInputNodePathControlItem *> * const ordered =
+        [NSMutableArray arrayWithCapacity:self.pathItems.count];
+    for (NSPathControlItem * const item in self.pathItems) {
+        VLCInputNodePathControlItem * const inputNodeItem =
+            [self.inputNodePathControlItems objectForKey:item.image.accessibilityDescription];
+        if (inputNodeItem != nil) {
+            [ordered addObject:inputNodeItem];
+        }
+    }
+    return ordered.copy;
+}
+
+- (void)setPathWithInputNodePathControlItems:(NSArray<VLCInputNodePathControlItem *> *)items
+{
+    [self clearInputNodePathControlItems];
+    for (VLCInputNodePathControlItem * const item in items) {
+        [self appendInputNodePathControlItem:item];
+    }
 }
 
 @end

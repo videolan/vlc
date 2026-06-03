@@ -26,11 +26,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMediaSourceDataSource;
 @class VLCInputNode;
+@class VLCInputNodePathControlItem;
 
 @interface VLCLibraryMediaSourceViewNavigationState : NSObject
 
 @property (readonly) VLCMediaSourceDataSource *currentMediaSource;
 @property (readwrite) VLCInputNode *currentNodeDisplayed;
+// Snapshot of the full breadcrumb shown while this state was current, so the
+// path control can be rebuilt exactly when navigating back or forward to it.
+@property (readwrite, nullable) NSArray<VLCInputNodePathControlItem *> *pathControlItems;
 
 - (instancetype)initFromMediaSourceDataSource:(VLCMediaSourceDataSource *)mediaSourceDataSource;
 
