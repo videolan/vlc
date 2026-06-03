@@ -301,8 +301,6 @@ Close(struct vlc_gl_filter *filter)
     struct vlc_gl_renderer *renderer = filter->sys;
     const opengl_vtable_t *vt = renderer->vt;
 
-    vlc_gl_sampler_Delete(renderer->sampler);
-
     vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
     vt->DeleteBuffers(1, &renderer->index_buffer_object);
     vt->DeleteBuffers(1, &renderer->texture_buffer_object);
@@ -805,7 +803,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 int
 vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
                      const config_chain_t *config,
-                     const struct vlc_gl_format *glfmt,
+                     struct vlc_gl_sampler *sampler,
                      struct vlc_gl_tex_size *size_out)
 {
     (void) size_out;
@@ -813,20 +811,9 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     const char * const options[] = { "projection-mode", "video-stereo-mode", NULL };
     config_ChainParse(filter, "", options, config);
 
-    struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, glfmt, false);
-    if (!sampler)
-    {
-        msg_Dbg(&filter->obj, "Could not create sampler for renderer");
-        return VLC_EGENERIC;
-    }
-
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
-    {
-        vlc_gl_sampler_Delete(sampler);
         return VLC_ENOMEM;
-    }
 
     int ret = vlc_gl_api_Init(&renderer->api, filter->gl);
     if (ret != VLC_SUCCESS)

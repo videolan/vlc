@@ -121,8 +121,6 @@ Close(struct vlc_gl_filter *filter)
 {
     struct sys *sys = filter->sys;
 
-    vlc_gl_sampler_Delete(sys->sampler);
-
     const opengl_vtable_t *vt = &sys->api.vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
@@ -132,21 +130,13 @@ Close(struct vlc_gl_filter *filter)
 
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
-     const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
+     struct vlc_gl_sampler *sampler, struct vlc_gl_tex_size *size_out)
 {
     (void) size_out;
 
-    struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, glfmt, false);
-    if (!sampler)
-        return VLC_EGENERIC;
-
     struct sys *sys = filter->sys = malloc(sizeof(*sys));
     if (!sys)
-    {
-        vlc_gl_sampler_Delete(sampler);
         return VLC_EGENERIC;
-    }
 
     sys->sampler = sampler;
 

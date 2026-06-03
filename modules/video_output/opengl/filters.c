@@ -33,6 +33,7 @@
 
 #include "filter_priv.h"
 #include "importer_priv.h"
+#include "sampler.h"
 #include "gl_util.h"
 
 /* The filter chain contains the sequential list of filters.
@@ -260,8 +261,20 @@ vlc_gl_filters_CreateNewFilter(struct vlc_gl_filters *filters,
      * may change it during its Open(). */
     priv->size_out = size_in;
 
+    /* Create a sampler for this filter from the input format */
+    struct vlc_gl_sampler *sampler =
+        vlc_gl_sampler_New(filters->gl, glfmt, false);
+    if (!sampler)
+    {
+        msg_Err(filters->gl, "Could not create sampler for filter '%s'", name);
+        filter->ops = NULL;
+        vlc_gl_filter_Delete(filter);
+        return NULL;
+    }
+    filter->sampler = sampler;
+
     int ret = vlc_gl_filter_LoadModule(filters->gl, name, filter, config,
-                                       glfmt, &priv->size_out);
+                                       sampler, &priv->size_out);
     if (ret != VLC_SUCCESS)
     {
         /* Creation failed, do not call close() */
@@ -338,8 +351,20 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
      * may change it during its Open(). */
     priv->size_out = size_in;
 
+    /* Create a sampler for this filter from the input format */
+    struct vlc_gl_sampler *sampler =
+        vlc_gl_sampler_New(filters->gl, glfmt, false);
+    if (!sampler)
+    {
+        msg_Err(filters->gl, "Could not create sampler for filter '%s'", name);
+        filter->ops = NULL;
+        vlc_gl_filter_Delete(filter);
+        return NULL;
+    }
+    filter->sampler = sampler;
+
     int ret = vlc_gl_filter_LoadModule(filters->gl, name, filter, config,
-                                       glfmt, &priv->size_out);
+                                       sampler, &priv->size_out);
     if (ret != VLC_SUCCESS)
     {
         /* Creation failed, do not call close() */

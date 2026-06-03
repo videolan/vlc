@@ -108,15 +108,13 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     vt->VertexAttribPointer(sys->loc.tex_coords_in, 2, GL_FLOAT, GL_FALSE,
                             stride, (const void *) offset);
 
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
-
     /* If the direction matrix contains a 90° rotation, then the unit vector
      * should be divided by width rather than by height. Since up_vector is
      * always a unit vector with one of its components equal to 0, then we can
      * always divide the horizontal component by width and the vertical
      * component by height. */
-    GLsizei width = glfmt->tex_widths[meta->plane];
-    GLsizei height = glfmt->tex_heights[meta->plane];
+    GLsizei width = sampler->glfmt.tex_widths[meta->plane];
+    GLsizei height = sampler->glfmt.tex_heights[meta->plane];
     vt->Uniform2f(sys->loc.one_pixel_up, sys->up_vector[0] / width,
                                          sys->up_vector[1] / height);
 
@@ -131,8 +129,6 @@ Close(struct vlc_gl_filter *filter)
 {
     struct sys *sys = filter->sys;
 
-    vlc_gl_sampler_Delete(sys->sampler);
-
     const opengl_vtable_t *vt = &sys->api.vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
@@ -142,7 +138,7 @@ Close(struct vlc_gl_filter *filter)
 
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
-     const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
+     struct vlc_gl_sampler *sampler, struct vlc_gl_tex_size *size_out)
 {
     (void) config;
     (void) size_out;
@@ -154,17 +150,9 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     filter->ops = &ops;
     filter->config.filter_planes = true;
 
-    struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, glfmt, true);
-    if (!sampler)
-        return VLC_EGENERIC;
-
     struct sys *sys = filter->sys = malloc(sizeof(*sys));
     if (!sys)
-    {
-        vlc_gl_sampler_Delete(sampler);
         return VLC_EGENERIC;
-    }
 
     sys->sampler = sampler;
 

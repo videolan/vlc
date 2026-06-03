@@ -126,7 +126,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     struct sys *sys = filter->sys;
     const opengl_vtable_t *vt = &sys->api.vt;
-    const struct vlc_gl_format *glfmt = filter->glfmt_in;
+    const struct vlc_gl_format *glfmt = &filter->sampler->glfmt;
     pl_gpu gpu = sys->pl_opengl->gpu;
     struct pl_frame *frame_in = &sys->frame_in;
     struct pl_frame *frame_out = &sys->frame_out;
@@ -249,9 +249,10 @@ Close(struct vlc_gl_filter *filter)
 static vlc_gl_filter_open_fn Open;
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
-     const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
+     struct vlc_gl_sampler *sampler, struct vlc_gl_tex_size *size_out)
 {
     (void) config;
+    const struct vlc_gl_format *glfmt = &sampler->glfmt;
 
     /* By default, do not scale. The dimensions will be modified dynamically by
      * request_output_size(). */

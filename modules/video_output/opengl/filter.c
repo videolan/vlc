@@ -32,6 +32,7 @@
 
 #include "gl_api.h"
 #include "picture.h"
+#include "sampler.h"
 
 struct vlc_gl_filter *
 vlc_gl_filter_New(struct vlc_gl_t *gl)
@@ -66,8 +67,7 @@ vlc_gl_filter_New(struct vlc_gl_t *gl)
 
     vlc_list_init(&priv->blend_subfilters);
 
-    /* Expose a const pointer to the OpenGL format publicly */
-    filter->glfmt_in = &priv->glfmt_in;
+    filter->sampler = NULL;
 
     return filter;
 }
@@ -79,10 +79,10 @@ ActivateGLFilter(void *func, bool forced, va_list args)
     vlc_gl_filter_open_fn *activate = func;
     struct vlc_gl_filter *filter = va_arg(args, struct vlc_gl_filter *);
     const config_chain_t *config = va_arg(args, config_chain_t *);
-    const struct vlc_gl_format *glfmt = va_arg(args, struct vlc_gl_format *);
+    struct vlc_gl_sampler *sampler = va_arg(args, struct vlc_gl_sampler *);
     struct vlc_gl_tex_size *size_out = va_arg(args, struct vlc_gl_tex_size *);
 
-    return activate(filter, config, glfmt, size_out);
+    return activate(filter, config, sampler, size_out);
 }
 
 #undef vlc_gl_filter_LoadModule
@@ -90,13 +90,13 @@ int
 vlc_gl_filter_LoadModule(vlc_object_t *parent, const char *name,
                          struct vlc_gl_filter *filter,
                          const config_chain_t *config,
-                         const struct vlc_gl_format *glfmt,
+                         struct vlc_gl_sampler *sampler,
                          struct vlc_gl_tex_size *size_out)
 {
     filter->module = vlc_module_load(vlc_object_logger(parent), "opengl filter",
                                      name, true,
                                      ActivateGLFilter, filter, config,
-                                     glfmt, size_out);
+                                     sampler, size_out);
     if (!filter->module)
         return VLC_EGENERIC;
 
@@ -130,6 +130,9 @@ vlc_gl_filter_Delete(struct vlc_gl_filter *filter)
 
     if (filter->module)
         module_unneed(filter, filter->module);
+
+    if (filter->sampler)
+        vlc_gl_sampler_Delete(filter->sampler);
 
     struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
 

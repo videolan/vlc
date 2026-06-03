@@ -83,7 +83,7 @@ int
 vlc_gl_filter_LoadModule(vlc_object_t *parent, const char *name,
                          struct vlc_gl_filter *filter,
                          const config_chain_t *config,
-                         const struct vlc_gl_format *glfmt,
+                         struct vlc_gl_sampler *sampler,
                          struct vlc_gl_tex_size *size_out);
 #define vlc_gl_filter_LoadModule(o, a, b, c, d, e) \
     vlc_gl_filter_LoadModule(VLC_OBJECT(o), a, b, c, d, e)

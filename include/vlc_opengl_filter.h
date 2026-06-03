@@ -31,6 +31,7 @@
 struct vlc_gl_filter;
 struct vlc_gl_picture;
 struct vlc_gl_format;
+struct vlc_gl_sampler;
 
 #ifdef __cplusplus
 extern "C"
@@ -52,7 +53,7 @@ struct vlc_gl_input_meta {
 typedef int
 vlc_gl_filter_open_fn(struct vlc_gl_filter *filter,
                       const config_chain_t *config,
-                      const struct vlc_gl_format *glfmt,
+                      struct vlc_gl_sampler *sampler,
                       struct vlc_gl_tex_size *size_out);
 
 #define set_callback_opengl_filter(open) \
@@ -114,7 +115,7 @@ struct vlc_gl_filter {
     module_t *module;
 
     struct vlc_gl_t *gl;
-    const struct vlc_gl_format *glfmt_in;
+    struct vlc_gl_sampler *sampler;
 
     struct {
         /**

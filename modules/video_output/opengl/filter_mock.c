@@ -280,9 +280,6 @@ Close(struct vlc_gl_filter *filter)
 {
     struct sys *sys = filter->sys;
 
-    if (sys->sampler)
-        vlc_gl_sampler_Delete(sys->sampler);
-
     const opengl_vtable_t *vt = &sys->api.vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
@@ -380,15 +377,10 @@ InitBlend(struct vlc_gl_filter *filter)
 }
 
 static int
-InitMask(struct vlc_gl_filter *filter, const struct vlc_gl_format *glfmt)
+InitMask(struct vlc_gl_filter *filter, struct vlc_gl_sampler *sampler)
 {
     struct sys *sys = filter->sys;
     const opengl_vtable_t *vt = &sys->api.vt;
-
-    struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, glfmt, false);
-    if (!sampler)
-        return VLC_EGENERIC;
 
     sys->sampler = sampler;
 
@@ -471,17 +463,12 @@ InitMask(struct vlc_gl_filter *filter, const struct vlc_gl_format *glfmt)
 }
 
 static int
-InitPlane(struct vlc_gl_filter *filter, const struct vlc_gl_format *glfmt)
+InitPlane(struct vlc_gl_filter *filter, struct vlc_gl_sampler *sampler)
 {
     struct sys *sys = filter->sys;
     const opengl_vtable_t *vt = &sys->api.vt;
 
     filter->config.filter_planes = true;
-
-    struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, glfmt, true);
-    if (!sys->sampler)
-        return VLC_EGENERIC;
 
     sys->sampler = sampler;
 
@@ -550,7 +537,7 @@ InitPlane(struct vlc_gl_filter *filter, const struct vlc_gl_format *glfmt)
 
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
-     const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
+     struct vlc_gl_sampler *sampler, struct vlc_gl_tex_size *size_out)
 {
     config_ChainParse(filter, MOCK_CFG_PREFIX, filter_options, config);
 
@@ -574,9 +561,9 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     }
 
     if (plane)
-        ret = InitPlane(filter, glfmt);
+        ret = InitPlane(filter, sampler);
     else if (mask)
-        ret = InitMask(filter, glfmt);
+        ret = InitMask(filter, sampler);
     else
         ret = InitBlend(filter);
 

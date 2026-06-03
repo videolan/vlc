@@ -154,7 +154,6 @@ Close(struct vlc_gl_filter *filter) {
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
 
-    vlc_gl_sampler_Delete(sys->sampler);
     free(sys);
 }
 
@@ -171,7 +170,7 @@ static vlc_object_t *FindOuterFilter(struct vlc_gl_filter *filter)
 static vlc_gl_filter_open_fn Open;
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
-     const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
+     struct vlc_gl_sampler *sampler, struct vlc_gl_tex_size *size_out)
 {
     (void) config;
     (void) size_out;
@@ -187,14 +186,6 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     struct sys *sys = malloc(sizeof(*sys));
     if (!sys)
         return VLC_EGENERIC;
-
-    struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, glfmt, false);
-    if (!sampler)
-    {
-        free(sys);
-        return VLC_EGENERIC;
-    }
 
     sys->sampler = sampler;
     sys->outer = outer;
