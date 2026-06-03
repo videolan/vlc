@@ -63,10 +63,10 @@ bool CompositorDummy::makeMainInterface(MainCtx* mainCtx, std::function<void (QQ
     if (!ui->setup(m_qmlWidget->engine()))
         return false;
 
-    m_qmlWidget->setContent(QUrl(), ui->getComponent(), ui->createRootItem());
-
-    if (m_qmlWidget->status() != QQuickView::Ready)
+    const auto rootItem = ui->createRootItem();
+    if (!rootItem)
         return false;
+    m_qmlWidget->setContent(QUrl(), nullptr, rootItem);
 
     if (aboutToShowQuickWindowCallback)
         aboutToShowQuickWindowCallback(m_qmlWidget.get());
