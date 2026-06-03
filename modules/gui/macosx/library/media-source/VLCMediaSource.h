@@ -47,7 +47,7 @@ extern NSString *VLCMediaSourcePreparsingEnded;
 
 - (nullable NSError *)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
 - (void)clearChildNodesForNode:(input_item_node_t*)inputNode;
-- (nullable NSError *)generateChildNodesForDirectoryNode:(input_item_node_t *)directoryNode
+- (nullable NSError *)generateChildNodesForDirectoryNode:(VLCInputNode *)directoryInputNode
                                                  withUrl:(NSURL *)directoryUrl;
 
 @property (nonatomic, readonly) NSString *mediaSourceDescription;

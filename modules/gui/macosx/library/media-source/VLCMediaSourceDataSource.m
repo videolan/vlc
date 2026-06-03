@@ -178,8 +178,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                 });
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf.nodeToDisplay clearChildrenCache];
-                    [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
+                    [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:nodeToDisplay
                                                                               withUrl:nodeUrl];
                     [weakSelf reloadData];
                 });
@@ -329,9 +328,8 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
             cellView.textField.stringValue = NSTR("Loading…");
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
                 NSURL * const inputNodeUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
-                input_item_node_t * const p_inputNode = inputNode.vlcInputItemNode;
                 NSError * const error =
-                    [self.displayedMediaSource generateChildNodesForDirectoryNode:p_inputNode
+                    [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
                                                                           withUrl:inputNodeUrl];
                 if (error)
                     return;

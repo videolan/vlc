@@ -320,10 +320,8 @@ static const char *const remoteBrowseDescription = "Remote Browse";
 
     if (inputNode.inputItem.inputType == ITEM_TYPE_DIRECTORY &&
         [inputNode.inputItem.MRL hasPrefix:@"file://"]) {
-        input_item_node_t *vlcInputNode = inputNode.vlcInputItemNode;
         NSURL *dirUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
-        [inputNode clearChildrenCache];
-        return [self generateChildNodesForDirectoryNode:vlcInputNode withUrl:dirUrl];
+        return [self generateChildNodesForDirectoryNode:inputNode withUrl:dirUrl];
     }
 
     vlc_media_tree_Preparse(_p_mediaSource->tree, _p_preparser,
@@ -422,10 +420,13 @@ static const char *const remoteBrowseDescription = "Remote Browse";
     });
 }
 
-- (NSError *)generateChildNodesForDirectoryNode:(input_item_node_t *)directoryNode
+- (NSError *)generateChildNodesForDirectoryNode:(VLCInputNode *)directoryInputNode
                                         withUrl:(NSURL *)directoryUrl
 {
-    NSParameterAssert(directoryNode != NULL && directoryUrl != nil);
+    NSParameterAssert(directoryInputNode != NULL && directoryUrl != nil);
+    [directoryInputNode clearChildrenCache];
+    input_item_node_t * const directoryNode = directoryInputNode.vlcInputItemNode;
+
     @synchronized (self) {
         if (self.willStartGeneratingChildNodesForNodeHandler) {
             self.willStartGeneratingChildNodesForNodeHandler(directoryNode);
