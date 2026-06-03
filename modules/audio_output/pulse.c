@@ -877,7 +877,7 @@ static int strcmp_void(const void *a, const void *b)
 static const char *str_map(const char *key, const char *const table[][2],
                            size_t n)
 {
-     const char **r = bsearch(key, table, n, sizeof (*table), strcmp_void);
+     const char *const *r = bsearch(key, table, n, sizeof (*table), strcmp_void);
      return (r != NULL) ? r[1] : NULL;
 }
 
