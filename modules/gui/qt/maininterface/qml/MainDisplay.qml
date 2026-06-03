@@ -674,6 +674,7 @@ FocusScope {
         Navigation.parentItem: mainColumn
         Navigation.upItem: mainRow
         Navigation.downItem: miniPlayer
+        Navigation.navigable: (active && height > 0.0)
 
         onLoaded: {            
             item.background.visible = Qt.binding(function() { return !stackViewParent.layer.enabled })
