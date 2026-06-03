@@ -29,6 +29,24 @@
 
 const char *gai_strerror (int);
 
+#ifdef _WIN32
+# include <winsock2.h>
+# undef gai_strerror /* mapped to gai_strerrorA or gai_strerrorW */
+
+#ifdef _MSC_VER
+/* EAI_NODATA was removed in RFC 3493
+ * The Windows SDK defines EAI_NODATA as EAI_NONAME, aka WSAHOST_NOT_FOUND.
+ * It used to be WSANO_DATA. Remap it locally so we have strings for all the
+ * WSA errors that getaddrinfo() can return.
+ *
+ * In mingw-w64 EAI_NODATA is still mapped to WSANO_DATA.
+ */
+# undef EAI_NODATA
+# define EAI_NODATA  WSANO_DATA
+#endif
+
+#endif /* _WIN32 */
+
 /* GAI error codes. See include/vlc_network.h. */
 #ifndef EAI_BADFLAGS
 # define EAI_BADFLAGS -1
