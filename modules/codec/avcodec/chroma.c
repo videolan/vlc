@@ -204,7 +204,8 @@ int GetFfmpegChroma( int *restrict i_ffmpeg_chroma, const video_format_t *fmt )
             chroma_table[i].i_gmask  == fmt->i_gmask &&
             chroma_table[i].i_bmask  == fmt->i_bmask )
         {
-            return chroma_table[i].i_chroma_id;
+            *i_ffmpeg_chroma = chroma_table[i].i_chroma_id;
+            return VLC_SUCCESS;
         }
     }
     // try again without the mask as they may not correspond exactly
