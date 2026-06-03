@@ -27,6 +27,8 @@
 # include "config.h"
 #endif
 
+const char *gai_strerror (int);
+
 /* GAI error codes. See include/vlc_network.h. */
 #ifndef EAI_BADFLAGS
 # define EAI_BADFLAGS -1
