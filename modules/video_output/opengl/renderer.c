@@ -814,7 +814,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     config_ChainParse(filter, "", options, config);
 
     struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
+        vlc_gl_sampler_New(filter->gl, glfmt, false);
     if (!sampler)
     {
         msg_Dbg(&filter->obj, "Could not create sampler for renderer");

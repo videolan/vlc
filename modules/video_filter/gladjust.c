@@ -189,7 +189,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         return VLC_EGENERIC;
 
     struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
+        vlc_gl_sampler_New(filter->gl, glfmt, false);
     if (!sampler)
     {
         free(sys);

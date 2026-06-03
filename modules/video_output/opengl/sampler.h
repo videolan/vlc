@@ -29,7 +29,6 @@
 #include <vlc_opengl.h>
 #include <vlc_picture.h>
 
-#include "gl_api.h"
 #include "gl_common.h"
 #include "picture.h"
 
@@ -166,13 +165,12 @@ vlc_gl_sampler_Load(struct vlc_gl_sampler *sampler)
  * Create a new sampler
  *
  * \param gl the OpenGL context
- * \param api the OpenGL API
  * \param glfmt the input format
  * \param expose_planes if set, vlc_texture() exposes a single plane at a time
  *                      (selected by vlc_gl_sampler_SetCurrentPlane())
  */
 struct vlc_gl_sampler *
-vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
+vlc_gl_sampler_New(struct vlc_gl_t *gl,
                    const struct vlc_gl_format *glfmt, bool expose_planes);
 
 /**

@@ -386,7 +386,7 @@ InitMask(struct vlc_gl_filter *filter, const struct vlc_gl_format *glfmt)
     const opengl_vtable_t *vt = &sys->api.vt;
 
     struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
+        vlc_gl_sampler_New(filter->gl, glfmt, false);
     if (!sampler)
         return VLC_EGENERIC;
 
@@ -479,7 +479,7 @@ InitPlane(struct vlc_gl_filter *filter, const struct vlc_gl_format *glfmt)
     filter->config.filter_planes = true;
 
     struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, true);
+        vlc_gl_sampler_New(filter->gl, glfmt, true);
     if (!sys->sampler)
         return VLC_EGENERIC;
 

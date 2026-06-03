@@ -44,8 +44,8 @@ struct vlc_gl_sampler_priv {
     struct vlc_gl_sampler sampler;
 
     struct vlc_gl_t *gl;
-    const struct vlc_gl_api *api;
-    const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
+    struct vlc_gl_api api;
+    const opengl_vtable_t *vt; /* for convenience, same as &api.vt */
 
     struct vlc_gl_picture pic;
 
@@ -604,7 +604,7 @@ InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
             image_ext = image_external;
     }
 
-    const char *texture3D_ext = priv->api->supports_sampler3D
+    const char *texture3D_ext = priv->api.supports_sampler3D
         ? "#extension GL_OES_texture_3D : enable\n" : "";
 
     int ret = asprintf(&sampler->shader.extensions,"%s%s\n", image_ext, texture3D_ext);
@@ -1059,7 +1059,7 @@ static pl_voidfunc_t PlaceboGetProcAddr(void *opaque, const char *name)
 #endif
 
 struct vlc_gl_sampler *
-vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
+vlc_gl_sampler_New(struct vlc_gl_t *gl,
                    const struct vlc_gl_format *glfmt, bool expose_planes)
 {
     struct vlc_gl_sampler_priv *priv = calloc(1, sizeof(*priv));
@@ -1070,8 +1070,14 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     vlc_gl_LoadExtensionFunctions(gl, &priv->extension_vt);
 
     priv->gl = gl;
-    priv->api = api;
-    priv->vt = &api->vt;
+
+    int ret = vlc_gl_api_Init(&priv->api, gl);
+    if (ret != VLC_SUCCESS)
+    {
+        free(priv);
+        return NULL;
+    }
+    priv->vt = &priv->api.vt;
 
     struct vlc_gl_picture *pic = &priv->pic;
     memcpy(pic->mtx, MATRIX2x3_IDENTITY, sizeof(MATRIX2x3_IDENTITY));
@@ -1100,17 +1106,17 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     }
 
     int glsl_version;
-    if (api->is_gles) {
+    if (priv->api.is_gles) {
 
         if (asprintf(&sampler->shader.precision,
             "precision highp float;\n"
             "precision highp sampler2D;\n"
             "%s%s",
-            api->supports_sampler3D ? "precision highp sampler3D;\n" : "",
+            priv->api.supports_sampler3D ? "precision highp sampler3D;\n" : "",
             priv->unsigned_sampler ? "precision highp usampler2D;\n" : "" ) <= 0 )
             goto error;
 
-        if (api->glsl_version >= 300) {
+        if (priv->api.glsl_version >= 300) {
             sampler->shader.version = strdup("#version 300 es\n");
             glsl_version = 300;
         } else {
@@ -1125,7 +1131,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
             goto error;
         /* GLSL version 420+ breaks backwards compatibility with pre-GLSL 130
          * syntax, which we use in our vertex/fragment shaders. */
-        glsl_version = __MIN(api->glsl_version, 410);
+        glsl_version = __MIN(priv->api.glsl_version, 410);
         if (asprintf(&sampler->shader.version, "#version %d\n", glsl_version) < 0)
             goto error;
     }
@@ -1177,7 +1183,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     });
 #endif
 
-    int ret = opengl_fragment_shader_init(sampler, expose_planes);
+    ret = opengl_fragment_shader_init(sampler, expose_planes);
     if (ret != VLC_SUCCESS)
     {
         msg_Dbg(gl, "opengl sampler: could not initialize shaders");
