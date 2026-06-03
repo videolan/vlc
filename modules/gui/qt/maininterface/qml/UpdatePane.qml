@@ -173,9 +173,10 @@ T.Pane {
                 text: qsTr("Download")
                 showText: !rowLayout.collapseText
 
-                onVisibleChanged: {
-                    if (visible)
-                        focus = true // Request focus here by default
+                Binding on focus {
+                    when: downloadButton.visible
+                    delayed: true // to steal focus from dismiss button
+                    value: true
                 }
 
                 onClicked: {
@@ -206,12 +207,7 @@ T.Pane {
                 text: qsTr("Dismiss")
                 showText: false // Always collapsed
 
-                onVisibleChanged: {
-                    if (visible) {
-                        if (!downloadButton.visible || !downloadButton.focus)
-                            focus = true // Second chance for focus
-                    }
-                }
+                focus: true
 
                 Component.onCompleted: {
                     clicked.connect(root, dismissRequested)
