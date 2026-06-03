@@ -26,6 +26,34 @@ QString toValidLocalFile(const char *mrl)
     return url.isLocalFile() ? url.toLocalFile() : QString {};
 }
 
+QString channelNameFromNbChannels(unsigned nbChannels)
+{
+    if (nbChannels >= 8)
+        return QStringLiteral("7.1");
+    else if (nbChannels >= 6)
+        return QStringLiteral("5.1");
+    return {};
+}
+
+QString resolutionNameFromSize(unsigned maxWidth, unsigned maxHeight)
+{
+    if (maxWidth == 0 || maxHeight == 0)
+        return {};
+
+    const unsigned int realHeight = (maxHeight < maxWidth) ? maxHeight : maxWidth;
+    const unsigned int realWidth = (maxHeight < maxWidth) ? maxWidth : maxHeight;
+
+    if (realHeight >= 4320 || realWidth >= 4320.0 * (16.0 / 9.0))
+        return QStringLiteral("8K");
+    else if (realHeight >= 2160 || realWidth >= 2160.0 * (16.0 / 9.0))
+        return QStringLiteral("4K");
+    else if (realHeight >= 1080 || realWidth >= 1080.0 * (16.0 / 9.0))
+        return QStringLiteral("HD");
+    else if (realHeight >= 540 || realWidth >= 540.0 * (16.0 / 9.0))
+        return QStringLiteral("SD");
+    return {};
+}
+
 QString urlToDisplayString(const QUrl &url)
 {
     const QString displayString = url.toDisplayString(QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments);

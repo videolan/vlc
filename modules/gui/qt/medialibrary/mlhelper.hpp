@@ -76,6 +76,9 @@ MLListRange<T> ml_range_iterate(L& list)
 
 QString toValidLocalFile(const char *mrl);
 
+QString channelNameFromNbChannels(unsigned nbChannels);
+QString resolutionNameFromSize(unsigned maxWidth, unsigned maxHeight);
+
 template <typename T, typename O>
 void thumbnailCopy(const MLListRange<T> &list, O dst, const int max)
 {

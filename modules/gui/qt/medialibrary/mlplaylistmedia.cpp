@@ -63,23 +63,8 @@ MLPlaylistMedia::MLPlaylistMedia(const vlc_ml_media_t * data)
         }
     }
 
-    if (nbChannels >= 8)
-        m_channel = "7.1";
-    else if (nbChannels >= 6)
-        m_channel = "5.1";
-    else
-        m_channel = "";
-
-    if (width >= 7680 && height >= 4320)
-        m_resolution = "8K";
-    else if (width >= 3840 && height >= 2160)
-        m_resolution = "4K";
-    else if (width >= 1440 && height >= 1080)
-        m_resolution = "HD";
-    else if (width >= 720 && height >= 1280)
-        m_resolution = "720p";
-    else
-        m_resolution = "";
+    m_channel = channelNameFromNbChannels(nbChannels);
+    m_resolution = resolutionNameFromSize(width, height);
 }
 
 //-------------------------------------------------------------------------------------------------

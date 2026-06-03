@@ -109,27 +109,8 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
         }
     }
 
-    m_channel = "";
-    if ( numChannel >= 8 )
-        m_channel = "7.1";
-    else if ( numChannel >= 6 )
-        m_channel = "5.1";
-
-    m_resolution = "";
-    if ( maxWidth > 0 && maxHeight > 0 )
-    {
-        const unsigned int realHeight = ( maxHeight < maxWidth ) ? maxHeight : maxWidth;
-        const unsigned int realWidth = ( maxHeight < maxWidth ) ? maxWidth : maxHeight;
-
-        if ( realHeight >= 4320 || realWidth >= 4320.0 * ( 16.0 / 9.0 ) )
-            m_resolution = "8K";
-        else if ( realHeight >= 2160 || realWidth >= 2160.0 * ( 16.0 / 9.0 ) )
-            m_resolution = "4K";
-        else if ( realHeight >= 1080 || realWidth >= 1080.0 * ( 16.0 / 9.0 ) )
-            m_resolution = "HD";
-        else if ( realHeight >= 540 || realWidth >= 540.0 * ( 16.0 / 9.0 ) )
-            m_resolution = "SD";
-    }
+    m_channel = channelNameFromNbChannels(numChannel);
+    m_resolution = resolutionNameFromSize(maxWidth, maxHeight);
 }
 
 bool MLVideo::isNew() const
