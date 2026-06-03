@@ -27,10 +27,13 @@
 #include <vlc_picture.h>
 #include <vlc_opengl_filter.h>
 
+#include "gl_api.h"
 #include "picture.h"
 
 struct vlc_gl_filter_priv {
     struct vlc_gl_filter filter;
+
+    struct vlc_gl_api api;
 
     /* For a blend filter, must be the same as the size_out of the previous
      * filter */
@@ -74,7 +77,7 @@ vlc_gl_filter_PRIV(struct vlc_gl_filter *filter)
 }
 
 struct vlc_gl_filter *
-vlc_gl_filter_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api);
+vlc_gl_filter_New(struct vlc_gl_t *gl);
 
 int
 vlc_gl_filter_LoadModule(vlc_object_t *parent, const char *name,

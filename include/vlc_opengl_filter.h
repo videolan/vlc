@@ -114,7 +114,6 @@ struct vlc_gl_filter {
     module_t *module;
 
     struct vlc_gl_t *gl;
-    const struct vlc_gl_api *api;
     const struct vlc_gl_format *glfmt_in;
 
     struct {

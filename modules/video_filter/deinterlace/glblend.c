@@ -171,7 +171,6 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     int ret = vlc_gl_api_Init(&sys->api, filter->gl);
     if (ret != VLC_SUCCESS)
     {
-        vlc_gl_sampler_Delete(sampler);
         free(sys);
         return VLC_EGENERIC;
     }
