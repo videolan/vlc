@@ -134,8 +134,6 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     NSAssert(nodeToDisplay, @"Nil node to display, will not set");
     _nodeToDisplay = nodeToDisplay;
 
-    input_item_node_t * const inputNode = nodeToDisplay.vlcInputItemNode;
-
     NSParameterAssert(self.parentBaseDataSource);
     if (self.parentBaseDataSource.mediaSourceMode == VLCMediaSourceModeLAN) {
         NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
@@ -143,20 +141,6 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         if (!nodeUrl.isFileURL) {
             [self reloadData];
             return;
-        }
-
-        if (inputNode->i_children == 0) {
-            NSError * const error =
-                [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
-                                                                      withUrl:nodeUrl];
-            if (error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSAlert * const alert = [NSAlert alertWithError:error];
-                    alert.alertStyle = NSAlertStyleCritical;
-                    [alert runModal];
-                });
-                return;
-            }
         }
 
         if (self.observedPathDispatchSource) {
