@@ -1,0 +1,28 @@
+From 7bd5d32dd7f281d43837b2bc8605a4e5eb4dd9bc Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 3 Jun 2026 07:38:36 +0200
+Subject: [PATCH] disable strncpy hack
+
+strncpy() is never called in the code but the define may interfere with system headers.
+---
+ src/misc.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/misc.h b/src/misc.h
+index ff8e96a..3e4c0b4 100644
+--- a/src/misc.h
++++ b/src/misc.h
+@@ -432,8 +432,10 @@ _vbi_time_max			(void)
+ #ifndef HAVE_STRLCPY
+ #  define strlcpy _vbi_strlcpy
+ #endif
++/* strncpy is unused, don't mess with the toolchain headers
+ #undef strncpy
+ #define strncpy use_strlcpy_instead
++*/
+ 
+ extern size_t
+ _vbi_strlcpy			(char *			dst,
+-- 
+2.52.0.windows.1
+
