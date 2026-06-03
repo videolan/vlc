@@ -1102,11 +1102,14 @@ struct vlc_gl_sampler *
 vlc_gl_sampler_New(struct vlc_gl_t *gl,
                    const struct vlc_gl_format *glfmt, bool expose_planes)
 {
-    struct vlc_gl_sampler_priv *priv = calloc(1, sizeof(*priv));
+    struct vlc_gl_sampler_priv *priv = vlc_object_create(gl, sizeof(*priv));
     if (!priv)
         return NULL;
 
     struct vlc_gl_sampler *sampler = &priv->sampler;
+    sampler->gl = gl;
+    sampler->module = NULL;
+
     vlc_gl_LoadExtensionFunctions(gl, &priv->extension_vt);
 
     priv->gl = gl;
@@ -1250,10 +1253,8 @@ error:
 void
 vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-
     if (sampler->ops && sampler->ops->close)
         sampler->ops->close(sampler);
 
-    free(priv);
+    vlc_object_delete(sampler);
 }

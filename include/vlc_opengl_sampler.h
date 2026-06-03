@@ -101,8 +101,6 @@ struct vlc_gl_sampler_ops {
     void (*close)(struct vlc_gl_sampler *sampler);
 };
 
-struct vlc_gl_api;
-
 /**
  * OpenGL sampler
  *
@@ -110,6 +108,12 @@ struct vlc_gl_api;
  * conversion, transfer functions, and color space mapping.
  */
 struct vlc_gl_sampler {
+    vlc_object_t obj;
+    module_t *module;
+
+    /** OpenGL context */
+    struct vlc_gl_t *gl;
+
     /** Input video format */
     video_format_t fmt_in;
 
@@ -183,6 +187,9 @@ struct vlc_gl_sampler {
     } shader;
 
     const struct vlc_gl_sampler_ops *ops;
+
+    /** Private data for the sampler implementation */
+    void *sys;
 };
 
 static inline void
@@ -209,5 +216,26 @@ vlc_gl_sampler_SelectPlane(struct vlc_gl_sampler *sampler, unsigned plane)
 {
     sampler->ops->select_plane(sampler, plane);
 }
+
+/**
+ * Activation function for OpenGL sampler module implementations.
+ *
+ * The input format is described by the public fields of the sampler object
+ * which are populated before the module is loaded.
+ *
+ * \param sampler the sampler
+ * \param expose_planes if set, vlc_texture() exposes a single plane at a time
+ *
+ * \return VLC_SUCCESS when the module can be opened
+ */
+typedef int
+vlc_gl_sampler_open_fn(struct vlc_gl_sampler *sampler, bool expose_planes);
+
+#define set_callback_opengl_sampler(open) \
+    { \
+        vlc_gl_sampler_open_fn *fn = open; \
+        (void) fn; \
+        set_callback(fn); \
+    }
 
 #endif /* VLC_GL_SAMPLER_H */
