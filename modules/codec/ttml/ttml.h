@@ -57,7 +57,7 @@ typedef struct
 struct tt_searchkey
 {
     tt_time_t time;
-    tt_time_t *p_last;
+    const tt_time_t *p_last;
 };
 
 /* namespaces */

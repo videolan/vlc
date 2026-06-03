@@ -570,8 +570,8 @@ size_t tt_timings_FindLowerIndex( const tt_time_t *p_times, size_t i_times, tt_t
         key.time = time;
         key.p_last = NULL;
 
-        tt_time_t *lookup = bsearch( &key, p_times, i_times,
-                                     sizeof(tt_time_t), tt_bsearch_searchkey_Compare );
+        const tt_time_t *lookup = bsearch(&key, p_times, i_times,
+                                          sizeof(tt_time_t), tt_bsearch_searchkey_Compare);
         if( lookup )
             key.p_last = lookup;
         *pb_found = !!lookup;
