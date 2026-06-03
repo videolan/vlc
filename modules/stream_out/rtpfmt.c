@@ -718,10 +718,10 @@ int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
         return VLC_EGENERIC;
 
     /* extract base64 configuration from fmtp */
-    char *start = strstr(fmtp, "configuration=");
+    const char *start = strstr(fmtp, "configuration=");
     assert(start != NULL);
     start += sizeof("configuration=") - 1;
-    char *end = strchr(start, ';');
+    const char *end = strchr(start, ';');
     assert(end != NULL);
     size_t len = end - start;
 
