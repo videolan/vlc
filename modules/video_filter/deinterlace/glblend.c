@@ -113,8 +113,8 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
      * always a unit vector with one of its components equal to 0, then we can
      * always divide the horizontal component by width and the vertical
      * component by height. */
-    GLsizei width = sampler->glfmt.tex_widths[meta->plane];
-    GLsizei height = sampler->glfmt.tex_heights[meta->plane];
+    GLsizei width = sampler->tex_widths[meta->plane];
+    GLsizei height = sampler->tex_heights[meta->plane];
     vt->Uniform2f(sys->loc.one_pixel_up, sys->up_vector[0] / width,
                                          sys->up_vector[1] / height);
 

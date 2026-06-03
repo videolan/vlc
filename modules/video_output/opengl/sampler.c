@@ -1091,6 +1091,18 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl,
 
     sampler->glfmt = *glfmt;
 
+    /* Populate public fields from glfmt */
+    sampler->fmt_in = glfmt->fmt;
+    sampler->tex_count = glfmt->tex_count;
+    sampler->tex_target = glfmt->tex_target;
+    sampler->half_float = glfmt->half_float;
+    for (size_t i = 0; i < glfmt->tex_count; i++)
+    {
+        sampler->tex_widths[i] = glfmt->tex_widths[i];
+        sampler->tex_heights[i] = glfmt->tex_heights[i];
+        sampler->formats[i] = glfmt->formats[i];
+    }
+
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
 

@@ -59,6 +59,27 @@ struct vlc_gl_sampler {
     /* Input format */
     struct vlc_gl_format glfmt;
 
+    /** Input video format */
+    video_format_t fmt_in;
+
+    /** Number of texture planes */
+    unsigned tex_count;
+
+    /** Per-plane texture widths */
+    uint32_t tex_widths[PICTURE_PLANE_MAX];
+
+    /** Per-plane texture heights */
+    uint32_t tex_heights[PICTURE_PLANE_MAX];
+
+    /** GL texture target (GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE, etc) */
+    uint32_t tex_target;
+
+    /** Per-plane GL format (GLenum values) */
+    uint32_t formats[PICTURE_PLANE_MAX];
+
+    /** Whether textures use half-float storage */
+    bool half_float;
+
     /**
      * Matrix to convert from picture coordinates to texture coordinates
      *

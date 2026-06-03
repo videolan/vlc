@@ -81,7 +81,7 @@ static void getViewpointMatrixes(struct vlc_gl_renderer *renderer,
 {
     if ((projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
-        && renderer->multiview_mode == renderer->sampler->glfmt.fmt.multiview_mode)
+        && renderer->multiview_mode == renderer->sampler->fmt_in.multiview_mode)
     {
         getProjectionMatrix(renderer->f_sar, renderer->f_fovy,
                             renderer->var.ProjectionMatrix);
@@ -236,7 +236,7 @@ opengl_link_program(struct vlc_gl_filter *filter)
 
     if (renderer->dump_shaders)
     {
-        video_format_t *fmt = &sampler->glfmt.fmt;
+        video_format_t *fmt = &sampler->fmt_in;
         msg_Dbg(filter, "\n=== Vertex shader for fourcc: %4.4s ===\n",
                 (const char *) &fmt->i_chroma);
         for (unsigned i = 0; i < ARRAY_SIZE(vertex_shader); ++i)
@@ -672,14 +672,14 @@ static int SetupCoords(struct vlc_gl_renderer *renderer,
 {
     const opengl_vtable_t *vt = renderer->vt;
     struct vlc_gl_sampler *sampler = renderer->sampler;
-    const video_format_t *fmt = &sampler->glfmt.fmt;
+    const video_format_t *fmt = &sampler->fmt_in;
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
     unsigned nbVertices, nbIndices;
 
     video_projection_mode_t projection_mode = renderer->projection_mode;
-    if (renderer->multiview_mode != renderer->sampler->glfmt.fmt.multiview_mode)
+    if (renderer->multiview_mode != renderer->sampler->fmt_in.multiview_mode)
         projection_mode = PROJECTION_MODE_RECTANGULAR;
 
     int i_ret;
@@ -844,7 +844,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
             break;
         default:
         case -1:
-            renderer->projection_mode = sampler->glfmt.fmt.projection_mode;
+            renderer->projection_mode = sampler->fmt_in.projection_mode;
             break;
     }
 
@@ -852,7 +852,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     if (stereo_mode > VIDEO_STEREO_OUTPUT_AUTO && stereo_mode <= VIDEO_STEREO_OUTPUT_MAX)
         renderer->stereo_mode = stereo_mode;
 
-    if (sampler->glfmt.fmt.multiview_mode == MULTIVIEW_2D)
+    if (sampler->fmt_in.multiview_mode == MULTIVIEW_2D)
     {
         renderer->stereo_mode = VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE;
         renderer->multiview_mode = MULTIVIEW_2D;
@@ -863,7 +863,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
         case VIDEO_STEREO_OUTPUT_RIGHT_ONLY:
         case VIDEO_STEREO_OUTPUT_AUTO:
             /* multiview_mode != MULTIVIEW_2D */
-            renderer->multiview_mode = sampler->glfmt.fmt.multiview_mode;
+            renderer->multiview_mode = sampler->fmt_in.multiview_mode;
             if (stereo_mode == VIDEO_STEREO_OUTPUT_AUTO)
                 renderer->stereo_mode = VIDEO_STEREO_OUTPUT_LEFT_ONLY;
             break;
