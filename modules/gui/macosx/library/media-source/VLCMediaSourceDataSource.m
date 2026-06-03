@@ -315,8 +315,12 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                 NSError * const error =
                     [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
                                                                           withUrl:inputNodeUrl];
-                if (error)
+                if (error) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        cellView.textField.stringValue = NSTR("Unavailable");
+                    });
                     return;
+                }
 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     cellView.textField.stringValue =
