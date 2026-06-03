@@ -280,8 +280,8 @@ static char *GrabAttributeValue( const char *psz_attribute,
 {
     if( psz_attribute && psz_tag_start )
     {
-        char *psz_tag_end = strchr( psz_tag_start, '>' );
-        char *psz_found   = strcasestr( psz_tag_start, psz_attribute );
+        const char *psz_tag_end = strchr( psz_tag_start, '>' );
+        const char *psz_found   = strcasestr( psz_tag_start, psz_attribute );
 
         if( psz_found )
         {
