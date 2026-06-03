@@ -183,6 +183,12 @@ static int Open( vlc_object_t *p_this )
         msg_Info( p_demux, "Detected CDXA-PS" );
         /* FIXME: have a proper way to decap CD sectors or make an access stream filter */
     }
+    else if( p_demux->obj.force )
+    {
+        msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
+                  "continuing anyway" );
+        i_max_packets = 0;
+    }
 
     for( unsigned i=0; i<i_max_packets; i++ )
     {
