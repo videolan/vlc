@@ -81,6 +81,7 @@ install_headers(
     'vlc_opengl.h',
     'vlc_opengl_filter.h',
     'vlc_opengl_interop.h',
+    'vlc_opengl_picture.h',
     'vlc_pgpkey.h',
     'vlc_picture.h',
     'vlc_picture_fifo.h',

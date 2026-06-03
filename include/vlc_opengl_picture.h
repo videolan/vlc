@@ -1,7 +1,7 @@
 /*****************************************************************************
- * picture.h
+ * vlc_opengl_picture.h: VLC OpenGL picture API
  *****************************************************************************
- * Copyright (C) 2021 VLC authors and VideoLAN
+ * Copyright (C) 2020-2026 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -18,41 +18,29 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_GL_PICTURE_PRIV_H
-#define VLC_GL_PICTURE_PRIV_H
+#ifndef VLC_GL_PICTURE_H
+#define VLC_GL_PICTURE_H 1
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include <math.h>
 
-#include <vlc_es.h>
 #include <vlc_picture.h>
-#include "gl_common.h"
 
 /**
- * Format of an OpenGL picture
- */
-struct vlc_gl_format {
-    video_format_t fmt;
-
-    GLenum tex_target;
-
-    unsigned tex_count;
-    GLsizei tex_widths[PICTURE_PLANE_MAX];
-    GLsizei tex_heights[PICTURE_PLANE_MAX];
-
-    uint32_t formats[PICTURE_PLANE_MAX];
-    bool half_float;
-};
-
-/**
- * OpenGL picture
+ * \file
+ * This file defines the public OpenGL picture interface.
  *
- * It can only be properly used if its format, described by a vlc_gl_format, is
- * known.
+ * A vlc_gl_picture stores the OpenGL textures and transformation matrix
+ * associated with a VLC picture, as provided by the interop/importer.
+ */
+
+/**
+ * An OpenGL picture state, with textures and a coordinate transformation matrix.
  */
 struct vlc_gl_picture {
-    GLuint textures[PICTURE_PLANE_MAX];
+    /**
+     * Texture handles for each plane.
+     */
+    uint32_t textures[PICTURE_PLANE_MAX];
 
     /**
      * Matrix to convert from 2D pictures coordinates to texture coordinates
@@ -76,6 +64,7 @@ struct vlc_gl_picture {
      *
      * It is guaranteed to be true for the first picture.
      */
+
     bool mtx_has_changed;
 };
 
@@ -95,10 +84,29 @@ struct vlc_gl_picture {
  * \param tex_coords_out texture coordinates as an array of 2*coords_count
  *                       floats
  */
-void
+static inline void
 vlc_gl_picture_ToTexCoords(const struct vlc_gl_picture *pic,
-                           unsigned coords_count, const float *pic_coords,
-                           float *tex_coords_out);
+                           unsigned coords_count,
+                           const float *pic_coords,
+                           float *tex_coords_out)
+{
+    const float *mtx = pic->mtx;
+    assert(mtx);
+
+#define MTX(ROW,COL) mtx[(COL)*2+(ROW)]
+    for (unsigned i = 0; i < coords_count; ++i)
+    {
+        /* Store the coordinates, in case the transform must be applied in
+         * place (i.e. with pic_coords == tex_coords_out) */
+        float x = pic_coords[0];
+        float y = pic_coords[1];
+        tex_coords_out[0] = MTX(0,0) * x + MTX(0,1) * y + MTX(0,2);
+        tex_coords_out[1] = MTX(1,0) * x + MTX(1,1) * y + MTX(1,2);
+        pic_coords += 2;
+        tex_coords_out += 2;
+    }
+#undef MTX
+}
 
 /**
  * Return a matrix to orient texture coordinates
@@ -139,8 +147,39 @@ vlc_gl_picture_ToTexCoords(const struct vlc_gl_picture *pic,
  * by Android may change). If it has changed since the last picture, then
  * pic->mtx_has_changed is true.
  */
-void
+static inline void
 vlc_gl_picture_ComputeDirectionMatrix(const struct vlc_gl_picture *pic,
-                                      float direction[2*2]);
+                                      float direction[static 2*2])
+{
+    /**
+     * The direction matrix is extracted from pic->mtx:
+     *
+     *    mtx = / a b c \
+     *          \ d e f /
+     *
+     * The last column (the offset part of the affine transformation) is
+     * discarded, and the 2 remaining column vectors are normalized to remove
+     * any scaling:
+     *
+     *    direction = / a/unorm  b/vnorm \
+     *                \ d/unorm  e/vnorm /
+     *
+     * where unorm = norm( / a \ ) and vnorm = norm( / b \ ).
+     *                     \ d /                     \ e /
+     */
 
-#endif
+    float ux = pic->mtx[0];
+    float uy = pic->mtx[1];
+    float vx = pic->mtx[2];
+    float vy = pic->mtx[3];
+
+    float unorm = sqrt(ux * ux + uy * uy);
+    float vnorm = sqrt(vx * vx + vy * vy);
+
+    direction[0] = ux / unorm;
+    direction[1] = uy / unorm;
+    direction[2] = vx / vnorm;
+    direction[3] = vy / vnorm;
+}
+
+#endif /* VLC_GL_PICTURE_H */
