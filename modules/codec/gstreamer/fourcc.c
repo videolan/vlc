@@ -76,7 +76,7 @@ static int compare_func( const void* key, const void* ent )
 
 vlc_fourcc_t GetGstVLCFourcc( const char* gst )
 {
-    gst_vlc_rawvideo_fourcc* found = NULL;
+    const gst_vlc_rawvideo_fourcc* found = NULL;
 
     if( !gst )
     {
