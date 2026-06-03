@@ -381,7 +381,10 @@ bool CompositorVideo::commonGUICreate(QWindow* window, QmlUISurface* qmlSurface,
     ret = m_ui->setup(qmlSurface->engine());
     if (! ret)
         return false;
-    qmlSurface->setContent(m_ui->createRootItem());
+    const auto rootItem = m_ui->createRootItem();
+    if (Q_UNLIKELY(!rootItem))
+        return false;
+    qmlSurface->setContent(rootItem);
     return true;
 }
 
@@ -393,7 +396,10 @@ bool CompositorVideo::commonGUICreate(QWindow* window, QQuickView* qmlView, Comp
     ret = m_ui->setup(qmlView->engine());
     if (! ret)
         return false;
-    qmlView->setContent(QUrl(), nullptr, m_ui->createRootItem());
+    const auto rootItem = m_ui->createRootItem();
+    if (Q_UNLIKELY(!rootItem))
+        return false;
+    qmlView->setContent(QUrl(), nullptr, rootItem);
     return true;
 }
 
