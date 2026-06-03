@@ -56,9 +56,6 @@ extern "C"
  * implicitly available.
  */
 struct vlc_gl_sampler {
-    /* Input format */
-    struct vlc_gl_format glfmt;
-
     /** Input video format */
     video_format_t fmt_in;
 

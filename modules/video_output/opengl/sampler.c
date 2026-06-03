@@ -191,7 +191,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler,
      * half-float YUV planes store values in [0..1]. Multiplying by 255
      * compensates for that.
      */
-    if (sampler->glfmt.half_float)
+    if (sampler->half_float)
         for (int i = 0; i < 4*3; ++i)
             matrix[i] *= 255;
 
@@ -273,8 +273,7 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         assert(priv->uloc.ConvMatrix != -1);
     }
 
-    const struct vlc_gl_format *glfmt = &sampler->glfmt;
-    const unsigned tex_count = glfmt->tex_count;
+    const unsigned tex_count = sampler->tex_count;
     /* To guarantee variable names length, we need to fix the number
      * of texture from now on.
      * tex_count > PICTURE_PLANE_MAX (5) would overflow uloc.Textures
@@ -291,7 +290,7 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         priv->uloc.Textures[i] = vt->GetUniformLocation(program, name);
         assert(priv->uloc.Textures[i] != -1);
 
-        if (glfmt->tex_target == GL_TEXTURE_RECTANGLE)
+        if (sampler->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSizes[%1u]", i);
             priv->uloc.TexSizes[i] = vt->GetUniformLocation(program, name);
@@ -319,28 +318,27 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
     const opengl_vtable_t *vt = priv->vt;
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
     struct vlc_gl_picture *pic = &priv->pic;
 
     if (priv->yuv_color)
         vt->UniformMatrix4fv(priv->uloc.ConvMatrix, 1, GL_FALSE,
                              priv->conv_matrix);
 
-    for (unsigned i = 0; i < glfmt->tex_count; ++i)
+    for (unsigned i = 0; i < sampler->tex_count; ++i)
     {
         vt->Uniform1i(priv->uloc.Textures[i], i);
 
         assert(pic->textures[i] != 0);
         vt->ActiveTexture(GL_TEXTURE0 + i);
-        vt->BindTexture(glfmt->tex_target, pic->textures[i]);
+        vt->BindTexture(sampler->tex_target, pic->textures[i]);
 
     }
 
-    if (glfmt->tex_target == GL_TEXTURE_RECTANGLE)
+    if (sampler->tex_target == GL_TEXTURE_RECTANGLE)
     {
-        for (unsigned i = 0; i < glfmt->tex_count; ++i)
-            vt->Uniform2f(priv->uloc.TexSizes[i], glfmt->tex_widths[i],
-                          glfmt->tex_heights[i]);
+        for (unsigned i = 0; i < sampler->tex_count; ++i)
+            vt->Uniform2f(priv->uloc.TexSizes[i], sampler->tex_widths[i],
+                          sampler->tex_heights[i]);
     }
 
 #ifdef HAVE_LIBPLACEBO_GL
@@ -380,7 +378,7 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
         struct pl_shader_desc sd = res->descriptors[i];
         assert(sd.desc.type == PL_DESC_SAMPLED_TEX);
         pl_tex tex = sd.binding.object;
-        int texid = glfmt->tex_count + i; // first free texture unit
+        int texid = sampler->tex_count + i; // first free texture unit
         unsigned gltex, target;
         gltex = pl_opengl_unwrap(priv->pl_opengl->gpu, tex, &target, NULL, NULL);
         vt->Uniform1i(loc, texid);
@@ -426,14 +424,13 @@ sampler_xyz12_load(struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     const opengl_vtable_t *vt = priv->vt;
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
     struct vlc_gl_picture *pic = &priv->pic;
 
     vt->Uniform1i(priv->uloc.Textures[0], 0);
 
     assert(pic->textures[0] != 0);
     vt->ActiveTexture(GL_TEXTURE0);
-    vt->BindTexture(glfmt->tex_target, pic->textures[0]);
+    vt->BindTexture(sampler->tex_target, pic->textures[0]);
 }
 
 static int
@@ -493,7 +490,7 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
     else if (desc->plane_count == 2)
     {
         swizzle_per_tex[0] = "r";
-        if (sampler->glfmt.formats[1] == GL_RG)
+        if (sampler->formats[1] == GL_RG)
             swizzle_per_tex[1] = "rg";
         else
             swizzle_per_tex[1] = "ra";
@@ -530,7 +527,7 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
                 break;
             case VLC_CODEC_V308:
                 swizzle_per_tex[0] = "rgb";
-                assert(sampler->glfmt.tex_count == 1);
+                assert(sampler->tex_count == 1);
                 break;
             case VLC_CODEC_VUYX:
                 swizzle_per_tex[0] = "bgr";
@@ -561,7 +558,7 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
     bool has_texture_rect_func =
         (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 140);
 
-    const bool is_yuv = vlc_fourcc_IsYUV(sampler->glfmt.fmt.i_chroma);
+    const bool is_yuv = vlc_fourcc_IsYUV(sampler->fmt_in.i_chroma);
 
     switch (tex_target)
     {
@@ -586,7 +583,7 @@ static int
 InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    const bool is_yuv = vlc_fourcc_IsYUV(sampler->glfmt.fmt.i_chroma);
+    const bool is_yuv = vlc_fourcc_IsYUV(sampler->fmt_in.i_chroma);
 
     const char *image_external = priv->glsl_version >= 300
         ? "#extension GL_OES_EGL_image_external_essl3 : require\n"
@@ -624,12 +621,11 @@ sampler_planes_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
     const opengl_vtable_t *vt = priv->vt;
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
 
     priv->uloc.Textures[0] = vt->GetUniformLocation(program, "Texture");
     assert(priv->uloc.Textures[0] != -1);
 
-    if (glfmt->tex_target == GL_TEXTURE_RECTANGLE)
+    if (sampler->tex_target == GL_TEXTURE_RECTANGLE)
     {
         priv->uloc.TexSizes[0] = vt->GetUniformLocation(program, "TexSize");
         assert(priv->uloc.TexSizes[0] != -1);
@@ -643,27 +639,25 @@ sampler_planes_load(struct vlc_gl_sampler *sampler)
     unsigned plane = priv->plane;
 
     const opengl_vtable_t *vt = priv->vt;
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
     struct vlc_gl_picture *pic = &priv->pic;
 
     vt->Uniform1i(priv->uloc.Textures[0], 0);
 
     assert(pic->textures[plane] != 0);
     vt->ActiveTexture(GL_TEXTURE0);
-    vt->BindTexture(glfmt->tex_target, pic->textures[plane]);
+    vt->BindTexture(sampler->tex_target, pic->textures[plane]);
 
-    if (glfmt->tex_target == GL_TEXTURE_RECTANGLE)
+    if (sampler->tex_target == GL_TEXTURE_RECTANGLE)
     {
-        vt->Uniform2f(priv->uloc.TexSizes[0], glfmt->tex_widths[plane],
-                      glfmt->tex_heights[plane]);
+        vt->Uniform2f(priv->uloc.TexSizes[0], sampler->tex_widths[plane],
+                      sampler->tex_heights[plane]);
     }
 }
 
 static int
 sampler_planes_init(struct vlc_gl_sampler *sampler)
 {
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
-    GLenum tex_target = glfmt->tex_target;
+    GLenum tex_target = sampler->tex_target;
 
     struct vlc_memstream ms;
     if (vlc_memstream_open(&ms))
@@ -758,10 +752,9 @@ static int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
-    const video_format_t *fmt = &glfmt->fmt;
+    const video_format_t *fmt = &sampler->fmt_in;
 
-    GLenum tex_target = glfmt->tex_target;
+    GLenum tex_target = sampler->tex_target;
 
     priv->expose_planes = expose_planes;
     priv->plane = 0;
@@ -780,7 +773,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         return VLC_EGENERIC;
     }
 
-    unsigned tex_count = glfmt->tex_count;
+    unsigned tex_count = sampler->tex_count;
 
     if (expose_planes)
         return sampler_planes_init(sampler);
@@ -1089,8 +1082,6 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl,
      * video_format_t without possibility of failure. */
     assert(!glfmt->fmt.p_palette);
 
-    sampler->glfmt = *glfmt;
-
     /* Populate public fields from glfmt */
     sampler->fmt_in = glfmt->fmt;
     sampler->tex_count = glfmt->tex_count;
@@ -1106,7 +1097,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl,
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
 
-    switch (sampler->glfmt.formats[0])
+    switch (sampler->formats[0])
     {
         case GL_RED_INTEGER:
         case GL_RG_INTEGER:
