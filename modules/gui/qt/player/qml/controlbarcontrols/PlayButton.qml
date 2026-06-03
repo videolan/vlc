@@ -244,9 +244,10 @@ T.Control {
 
         Widgets.AnimatedBackground {
             anchors.fill: parent
-            anchors.margins: -border.width
+            anchors.margins: -border.width * 4
 
             radius: width / 2
+            border.pixelAligned: false
 
             enabled: theme.initialized
 
