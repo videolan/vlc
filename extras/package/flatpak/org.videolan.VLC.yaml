@@ -81,6 +81,7 @@ modules:
     build-commands:
     - mkdir -p contrib/linux
     - cd contrib/linux && ../bootstrap --prefix=/app/contrib --enable-ffmpeg --enable-dav1d --disable-fluid --enable-fluidlite --disable-chromaprint --disable-cddb --disable-gnutls --disable-nfs --disable-sidplay2
+    - cd contrib/linux && make list
     - cd contrib/linux && make -j $FLATPAK_BUILDER_N_JOBS
     sources:
       - type: dir
