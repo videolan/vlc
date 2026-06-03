@@ -30,6 +30,7 @@ ifdef HAVE_ANDROID
 endif
 	# hardcode -liconv instead of the full path
 	$(APPLY) $(SRC)/zvbi/0001-configure-hardcode-liconv-instead-of-the-full-path.patch
+	$(APPLY) $(SRC)/zvbi/0001-disable-strncpy-hack.patch
 	# check for pthread_create in pthreads as well
 	sed -i.orig "s/AC_CHECK_LIB(pthread, pthread_create,,/AC_SEARCH_LIBS([pthread_create], [pthread pthreads],,/" $(UNPACK_DIR)/configure.in
 	$(MOVE)
