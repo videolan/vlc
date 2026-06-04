@@ -22,14 +22,17 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import <vlc_media_library.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCMediaLibraryItemProtocol;
 
 extern NSString * const VLCLibrarySearchProviderResultsUpdated;
 
+// Block called on a background queue with query params containing the search pattern.
 typedef NSArray<id<VLCMediaLibraryItemProtocol>> * _Nonnull
-    (^VLCLibrarySearchProviderFetchBlock)(NSString * _Nonnull searchString);
+    (^VLCLibrarySearchProviderFetchBlock)(const vlc_ml_query_params_t * _Nonnull params);
 
 @interface VLCLibrarySearchProvider : NSObject
 
@@ -40,6 +43,8 @@ typedef NSArray<id<VLCMediaLibraryItemProtocol>> * _Nonnull
 - (instancetype)initWithDisplayTitle:(NSString *)displayTitle
                         displayImage:(NSImage *)displayImage
                           fetchBlock:(VLCLibrarySearchProviderFetchBlock)fetchBlock;
+
++ (NSArray<VLCLibrarySearchProvider *> *)defaultProviders;
 
 - (void)searchForString:(NSString *)string;
 - (void)clearSearch;
