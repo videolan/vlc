@@ -24,7 +24,6 @@ variables:
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20260504124015
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
     VLC_FLATPAK_IMAGE: registry.videolan.org/vlc-flatpak:20260516184439
-    VLC_FLATPAK_AARCH64_IMAGE: registry.videolan.org/vlc-flatpak-aarch64:20260520052237
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
@@ -373,16 +372,6 @@ flatpak-x86_64:
     tags:
       - dind-amd64
 
-flatpak-aarch64:
-    extends: .flatpak-common
-    image:
-        name: $VLC_FLATPAK_AARCH64_IMAGE
-        entrypoint: [""]
-    variables:
-        HOST_ARCH: aarch64
-    tags:
-      - dind-aarch64
-
 .release-flatpak:
     extends: .flatpak-common
     only:
@@ -400,16 +389,6 @@ release-flatpak-x86_64:
     tags:
       - dind-amd64
 
-release-flatpak-aarch64:
-    extends: .release-flatpak
-    image:
-        name: $VLC_FLATPAK_AARCH64_IMAGE
-        entrypoint: [""]
-    variables:
-        HOST_ARCH: aarch64
-    tags:
-      - dind-aarch64
-
 flatpak-repo:
     stage: repo
     extends: .docker-template
@@ -421,9 +400,6 @@ flatpak-repo:
         - for ref in $(ostree --repo=repo-x86_64 refs); do
             flatpak build-commit-from --no-update-summary --disable-fsync --src-repo=repo-x86_64 repo "$ref";
           done
-        - for ref in $(ostree --repo=repo-aarch64 refs); do
-            flatpak build-commit-from --no-update-summary --disable-fsync --src-repo=repo-aarch64 repo "$ref";
-          done
         - flatpak build-update-repo --generate-static-deltas --static-delta-ignore-ref=*.Debug --static-delta-ignore-ref=*.Sources repo
         - flatpak-builder-lint --exceptions --exceptions-repo stable repo repo
         - tar -czf repository.tar.gz repo/
@@ -432,7 +408,6 @@ flatpak-repo:
           - repository.tar.gz
     dependencies:
       - flatpak-x86_64
-      - flatpak-aarch64
 
 #
 # macOS
