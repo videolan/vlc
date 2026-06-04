@@ -14,15 +14,11 @@ OPENGL_COMMONSOURCES = \
        video_output/opengl/interop.h \
        video_output/opengl/interop.c \
        video_output/opengl/picture.h \
-       video_output/opengl/sampler.c \
+       video_output/opengl/sampler_loader.c \
        video_output/opengl/sampler.h
 
-OPENGL_COMMONCFLAGS = $(LIBPLACEBO_CFLAGS)
-OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
-
-if HAVE_LIBPLACEBO
-OPENGL_COMMONLIBS += libplacebo_utils.la
-endif
+OPENGL_COMMONCFLAGS =
+OPENGL_COMMONLIBS =
 
 OPENGL_VOUT_COMMONSOURCES = \
     video_output/opengl/gl_scale.h \
@@ -73,11 +69,11 @@ endif
 
 # glsampler_builtin
 libglsampler_builtin_plugin_la_SOURCES = video_output/opengl/sampler.c
-libglsampler_builtin_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBPLACEBO_CFLAGS) -DVLC_GL_SAMPLER_MODULE
+libglsampler_builtin_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBPLACEBO_CFLAGS)
 libglsampler_builtin_plugin_la_LIBADD = $(GL_PLUGIN_LIBADD)
 libglsampler_builtin_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_PLUGIN_CFLAGS)
 if HAVE_LIBPLACEBO_GL
-libglsampler_builtin_plugin_la_LIBADD += $(LIBPLACEBO_LIBS)
+libglsampler_builtin_plugin_la_LIBADD += $(LIBPLACEBO_LIBS) libplacebo_utils.la
 endif
 if HAVE_GL_OR_GLES2
 vout_PLUGINS += libglsampler_builtin_plugin.la
@@ -132,7 +128,7 @@ if HAVE_LIBPLACEBO_GL
 
 libpl_scale_plugin_la_SOURCES = video_output/opengl/pl_scale.c
 libpl_scale_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBPLACEBO_CFLAGS) $(GL_PLUGIN_CFLAGS)
-libpl_scale_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) $(GL_PLUGIN_LIBADD)
+libpl_scale_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) libplacebo_utils.la $(GL_PLUGIN_LIBADD)
 if HAVE_GL_OR_GLES2
 video_filter_PLUGINS += libpl_scale_plugin.la
 endif

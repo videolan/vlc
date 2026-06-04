@@ -14,7 +14,7 @@ gl_common_dep = declare_dependency(
         'gl_util.c',
         'importer.c',
         'interop.c',
-        'sampler.c',
+        'sampler_loader.c',
         ),
     compile_args: opengl_headers_c_args,
     include_directories: [vlc_include_dirs],
@@ -121,7 +121,7 @@ vlc_modules += {
 }
 
 # glsampler_builtin (GLSL core shaders for texture sampling)
-glsampler_builtin_cargs = ['-DVLC_GL_SAMPLER_MODULE']
+glsampler_builtin_cargs = []
 glsampler_builtin_deps = [gl_plugin_dep, m_lib]
 glsampler_builtin_link = []
 if libplacebo_dep.found()
