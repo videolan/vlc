@@ -331,6 +331,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/playlist-library/VLCLibraryPlaylistDataSource.m \
 	gui/macosx/library/playlist-library/VLCLibraryPlaylistViewController.h \
 	gui/macosx/library/playlist-library/VLCLibraryPlaylistViewController.m \
+	gui/macosx/library/search-library/VLCLibrarySearchProvider.h \
+	gui/macosx/library/search-library/VLCLibrarySearchProvider.m \
 	gui/macosx/library/search-library/VLCLibrarySearchViewController.h \
 	gui/macosx/library/search-library/VLCLibrarySearchViewController.m \
 	gui/macosx/main/CompatibilityFixes.h \
