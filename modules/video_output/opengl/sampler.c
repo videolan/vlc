@@ -1333,13 +1333,9 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl,
     free(sampler_name);
     if (!sampler->module)
     {
-        int ret = Open(sampler, expose_planes);
-        if (ret != VLC_SUCCESS)
-        {
-            msg_Err(gl, "Could not load OpenGL sampler module or built-in");
-            vlc_object_delete(sampler);
-            return NULL;
-        }
+        msg_Err(gl, "Could not load OpenGL sampler module");
+        vlc_object_delete(sampler);
+        return NULL;
     }
 
     return sampler;
@@ -1351,8 +1347,7 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
     if (sampler->ops && sampler->ops->close)
         sampler->ops->close(sampler);
 
-    if (sampler->module)
-        module_unneed(sampler, sampler->module);
+    module_unneed(sampler, sampler->module);
 
     free(sampler->shader.precision);
     free(sampler->shader.extensions);
