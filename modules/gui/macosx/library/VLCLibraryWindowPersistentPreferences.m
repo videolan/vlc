@@ -41,6 +41,7 @@ NSString * const VLCLibraryVideoOnlyPlaylistLibraryViewModePreferenceKey =
 NSString * const VLCLibraryBrowseLibraryViewModePreferenceKey = @"BrowseLibraryViewMode";
 NSString * const VLCLibraryStreamLibraryViewModePreferenceKey = @"StreamLibraryViewMode";
 NSString * const VLCLibraryGroupsLibraryViewModePreferenceKey = @"GroupsLibraryViewMode";
+NSString * const VLCLibrarySearchLibraryViewModePreferenceKey = @"SearchLibraryViewMode";
 
 @implementation VLCLibraryWindowPersistentPreferences
 
@@ -252,6 +253,17 @@ static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryGroupsLibraryViewModePreferenceKey
                                               value:groupsLibraryViewMode];
+}
+
+- (VLCLibraryViewModeSegment)searchLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibrarySearchLibraryViewModePreferenceKey];
+}
+
+- (void)setSearchLibraryViewMode:(VLCLibraryViewModeSegment)searchLibraryViewMode
+{
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibrarySearchLibraryViewModePreferenceKey
+                                              value:searchLibraryViewMode];
 }
 
 @end

@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment browseLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment streamLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment groupsLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment searchLibraryViewMode;
 
 @end
 
