@@ -258,13 +258,12 @@ for t in $NEEDED; do
         *$DEPS_ONLY*)
             ;; # Dependency only, not build by default
         *)
-            PACKAGES="$PACKAGES $t"
             TARGETS="$TARGETS .build$t"
             ;;
     esac
 done
 
-[ -n "$PACKAGES" ] && mkdir -p build/bin && echo "To-be-built packages: $PACKAGES"
+[ -n "$TARGETS" ] && mkdir -p build/bin && echo "To-be-built packages: $(echo $TARGETS | sed 's/.build//g')"
 
 cat > Makefile << EOF
 TOOLS = $BOOTSTRAP_PATH
