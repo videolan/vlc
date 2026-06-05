@@ -940,7 +940,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
         };
-        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
+        self.internalToolbarDisplayFlags =
+            VLCLibraryWindowToolbarDisplayFlagSortOrderButton |
+            VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton;
     }
     return self;
 }
