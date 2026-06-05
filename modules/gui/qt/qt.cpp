@@ -61,6 +61,8 @@ extern "C" char **environ;
 #include <QTranslator>
 #ifdef _WIN32
 #include <QOperatingSystemVersion>
+#include <QThreadPool>
+#include "util/asynctask.hpp"
 #if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
 #include <rhi/qrhi.h>
 #include <QOffscreenSurface>
@@ -1062,19 +1064,42 @@ static void *Thread( void *obj )
             // item. Currently the player waits for the interface, and QQuickWindow initialization
             // is therefore not enforced to be synchronous (`QWindow::setVisible(true)` which
             // initializes the scene graph thus rhi is asynchronous).
-            QMetaObject::invokeMethod(&app, [&app, settings = QPointer(p_intf->mainSettings)]() {
+
+            class RhiProbeTask : public AsyncTask<QPair<QSGRendererInterface::GraphicsApi, bool>>
+            {
+            public:
+                RhiProbeTask() = default;
+
+                QPair<QSGRendererInterface::GraphicsApi, bool> execute() override
+                {
+                    return probeRhi();
+                }
+            };
+
+            const auto rhiProbeTask = QPointer(new RhiProbeTask);
+            QObject::connect(rhiProbeTask, &BaseAsyncTask::result, qApp, [rhiProbeTask, settings = QPointer(p_intf->mainSettings)]() {
                 // We can not use `QQuickWindow::setGraphicsApi()` here, as QQuickWindow
                 // may have already tried to initialize the scene graph hence rhi. If the
                 // cached graphics api is not optimal or not available anymore, the next
                 // startup will use the refreshed value. That's the best we can do here
                 // without forcing QQuickWindow to wait (hence delaying startup).
                 assert(settings);
-                const auto rhiResult = probeRhi();
+                const QPair<QSGRendererInterface::GraphicsApi, bool> rhiResult = rhiProbeTask->takeResult();
                 settings->setValue(graphicsApiKey, static_cast<int>(rhiResult.first));
                 settings->setValue(graphicsApiRhiSoftwareKey, rhiResult.second);
                 settings->sync();
-                app.setProperty(asyncRhiProbeCompletedProperty, true);
-            }, Qt::QueuedConnection); // Asynchronous, so probing here does not cause start-up slowdown.
+                qApp->setProperty(asyncRhiProbeCompletedProperty, true);
+                qDebug() << "Asynchronous rhi re-probe completed. Graphics api (QSGRendererInterface::GraphicsApi):"
+                         << rhiResult.first
+                         << "Prefer software renderer:"
+                         << rhiResult.second;
+                rhiProbeTask->abandon();
+            }, Qt::QueuedConnection);
+
+            const auto globalThreadPool = QThreadPool::globalInstance();
+            assert(globalThreadPool);
+
+            rhiProbeTask->start(*globalThreadPool, -1);
         }
         else
         {
