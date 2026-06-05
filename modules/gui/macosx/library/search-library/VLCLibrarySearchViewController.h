@@ -22,13 +22,20 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibraryAbstractSegmentViewController.h"
+#import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 
+@class VLCLibraryCollectionView;
+@class VLCLibrarySearchDataSource;
 @class VLCLibraryWindow;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibrarySearchViewController : VLCLibraryAbstractSegmentViewController
+@interface VLCLibrarySearchViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
+
+@property (readonly) VLCLibrarySearchDataSource *dataSource;
+@property (readonly) NSSearchField *searchField;
+@property (readonly) NSScrollView *collectionViewScrollView;
+@property (readonly) VLCLibraryCollectionView *collectionView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentSearchView;

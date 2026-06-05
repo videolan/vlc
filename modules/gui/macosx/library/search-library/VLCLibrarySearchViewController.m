@@ -22,26 +22,190 @@
 
 #import "VLCLibrarySearchViewController.h"
 
+#import "VLCLibrarySearchDataSource.h"
+#import "VLCLibrarySearchProvider.h"
+
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryCollectionView.h"
+#import "library/VLCLibraryCollectionViewDelegate.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryUIUnits.h"
+
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "main/VLCMain.h"
+
+static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
+
+@interface VLCLibrarySearchViewController () <NSSearchFieldDelegate>
+
+@property (readwrite) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
+@property (readwrite) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
+@property (readwrite) NSTimer *searchDebounceTimer;
+
+@end
 
 @implementation VLCLibrarySearchViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     self = [super initWithLibraryWindow:libraryWindow];
+    if (self) {
+        _dataSource = [[VLCLibrarySearchDataSource alloc] init];
+        [self setupSearchField];
+        [self setupCollectionView];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(searchProviderResultsUpdated:)
+                                                   name:VLCLibrarySearchProviderResultsUpdated
+                                                 object:nil];
+    }
     return self;
 }
 
+#pragma mark - Setup
+
+- (void)setupSearchField
+{
+    _searchField = [[NSSearchField alloc] init];
+    self.searchField.translatesAutoresizingMaskIntoConstraints = NO;
+    self.searchField.placeholderString = _NS("Search the library");
+    self.searchField.delegate = self;
+    self.searchField.sendsSearchStringImmediately = NO;
+    self.searchField.sendsWholeSearchString = NO;
+}
+
+- (void)setupCollectionView
+{
+    _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+    self.collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
+    self.collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    self.collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    self.collectionViewLayout.sectionInset = collectionViewSectionInset;
+
+    _collectionView = [[VLCLibraryCollectionView alloc] initWithFrame:NSZeroRect];
+    self.collectionView.collectionViewLayout = self.collectionViewLayout;
+
+    _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+    self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioDefaultItem;
+    self.collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultSize;
+    self.collectionView.delegate = self.collectionViewDelegate;
+
+    [self.collectionView registerClass:VLCLibraryCollectionViewItem.class
+                 forItemWithIdentifier:VLCLibraryCellIdentifier];
+
+    [self.collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
+            forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                        withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+
+    NSString * const mediaItemDetailViewString =
+        NSStringFromClass(VLCLibraryCollectionViewMediaItemSupplementaryDetailView.class);
+    NSNib * const mediaItemDetailViewNib =
+        [[NSNib alloc] initWithNibNamed:mediaItemDetailViewString bundle:nil];
+    [self.collectionView registerNib:mediaItemDetailViewNib
+         forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                     withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
+
+    _collectionViewScrollView = [[NSScrollView alloc] init];
+    self.collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.collectionViewScrollView.hasHorizontalScroller = NO;
+    self.collectionViewScrollView.borderType = NSNoBorder;
+    self.collectionViewScrollView.documentView = self.collectionView;
+    self.collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.collectionViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    self.collectionViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+}
+
+#pragma mark - Abstract overrides
+
+- (NSArray<NSLayoutConstraint *> *)placeholderImageViewSizeConstraints
+{
+    return self.internalPlaceholderImageViewSizeConstraints;
+}
+
+- (id<VLCLibraryDataSource>)currentDataSource
+{
+    return self.dataSource;
+}
+
+#pragma mark - Presentation
+
 - (void)presentSearchView
 {
-    [self.libraryWindow displayLibraryPlaceholderViewWithImage:NSImage.VLCPlaceholderVideoImage
-                                              usingConstraints:@[]
-                                             displayingMessage:_NS("Search the library")];
+    self.dataSource.collectionView = self.collectionView;
+    self.collectionView.dataSource = self.dataSource;
+    NSView * const contentView = self.collectionViewScrollView;
+    self.libraryTargetView.subviews = @[];
+    [self.libraryTargetView addSubview:self.searchField];
+    [self.libraryTargetView addSubview:contentView];
+
+    const CGFloat spacing = VLCLibraryUIUnits.largeSpacing;
+    NSLayoutAnchor *topAnchor = self.libraryTargetView.topAnchor;
+    if (@available(macOS 11.0, *)) {
+        topAnchor = self.libraryTargetView.safeAreaLayoutGuide.topAnchor;
+    }
+    [NSLayoutConstraint activateConstraints:@[
+        [self.searchField.topAnchor constraintEqualToAnchor:topAnchor
+                                                  constant:spacing],
+        [self.searchField.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor
+                                                      constant:spacing],
+        [self.searchField.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor
+                                                       constant:-spacing],
+
+        [contentView.topAnchor constraintEqualToAnchor:self.searchField.bottomAnchor
+                                              constant:spacing],
+        [contentView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
+        [contentView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
+        [contentView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
+    ]];
+}
+
+- (BOOL)hasAnyResults
+{
+    const NSInteger sectionCount =
+        [self.dataSource numberOfSectionsInCollectionView:self.collectionView];
+    for (NSInteger i = 0; i < sectionCount; i++) {
+        if ([self.dataSource collectionView:self.collectionView numberOfItemsInSection:i] > 0) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+#pragma mark - NSSearchFieldDelegate
+
+- (void)controlTextDidChange:(NSNotification *)notification
+{
+    [self.searchDebounceTimer invalidate];
+    self.searchDebounceTimer =
+        [NSTimer scheduledTimerWithTimeInterval:VLCLibrarySearchDebounceInterval
+                                        target:self
+                                      selector:@selector(performSearch)
+                                      userInfo:nil
+                                       repeats:NO];
+}
+
+- (void)searchProviderResultsUpdated:(NSNotification *)notification
+{
+    [self.dataSource reloadData];
+}
+
+- (void)performSearch
+{
+    NSString * const searchString = self.searchField.stringValue;
+    if (searchString.length == 0) {
+        [self.dataSource clearSearch];
+        return;
+    }
+
+    [self.dataSource searchForString:searchString];
 }
 
 @end
