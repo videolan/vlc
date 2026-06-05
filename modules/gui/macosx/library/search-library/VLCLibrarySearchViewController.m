@@ -25,6 +25,7 @@
 #import "VLCLibrarySearchDataSource.h"
 #import "VLCLibrarySearchProvider.h"
 
+#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -69,6 +70,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     if (self) {
         _dataSource = [[VLCLibrarySearchDataSource alloc] init];
         [self setupSearchField];
+        [self setupStatusLabel];
         [self setupCollectionView];
         [self setupTableView];
         [self setupPlaceholderView];
@@ -91,6 +93,14 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     self.searchField.delegate = self;
     self.searchField.sendsSearchStringImmediately = NO;
     self.searchField.sendsWholeSearchString = NO;
+}
+
+- (void)setupStatusLabel
+{
+    _statusLabel = [NSTextField labelWithString:_NS("Search your library")];
+    self.statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.statusLabel.font = NSFont.VLClibrarySectionHeaderFont;
+    self.statusLabel.alignment = NSTextAlignmentCenter;
 }
 
 - (void)setupCollectionView
@@ -247,29 +257,52 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
         ? self.collectionViewScrollView
         : self.tableViewScrollView;
 
+    const BOOL hasSearchText = self.searchField.stringValue.length > 0;
+    const BOOL hasResults = hasSearchText && [self hasAnyResults];
+    const BOOL showResults = hasSearchText && hasResults;
+
+    if (!hasSearchText) {
+        self.statusLabel.stringValue = _NS("Search your library");
+    } else if (!hasResults) {
+        self.statusLabel.stringValue = _NS("No results");
+    }
+
     self.libraryTargetView.subviews = @[];
     [self.libraryTargetView addSubview:self.searchField];
-    [self.libraryTargetView addSubview:contentView];
 
     const CGFloat spacing = VLCLibraryUIUnits.largeSpacing;
     NSLayoutAnchor *topAnchor = self.libraryTargetView.topAnchor;
     if (@available(macOS 11.0, *)) {
         topAnchor = self.libraryTargetView.safeAreaLayoutGuide.topAnchor;
     }
-    [NSLayoutConstraint activateConstraints:@[
+
+    NSMutableArray<NSLayoutConstraint *> * const constraints = [NSMutableArray arrayWithArray:@[
         [self.searchField.topAnchor constraintEqualToAnchor:topAnchor
                                                   constant:spacing],
         [self.searchField.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor
                                                       constant:spacing],
         [self.searchField.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor
                                                        constant:-spacing],
-
-        [contentView.topAnchor constraintEqualToAnchor:self.searchField.bottomAnchor
-                                              constant:spacing],
-        [contentView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
-        [contentView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
-        [contentView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
     ]];
+
+    if (showResults) {
+        [self.libraryTargetView addSubview:contentView];
+        [constraints addObjectsFromArray:@[
+            [contentView.topAnchor constraintEqualToAnchor:self.searchField.bottomAnchor
+                                                  constant:spacing],
+            [contentView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
+            [contentView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
+            [contentView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
+        ]];
+    } else {
+        [self.libraryTargetView addSubview:self.statusLabel];
+        [constraints addObjectsFromArray:@[
+            [self.statusLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
+            [self.statusLabel.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor],
+        ]];
+    }
+
+    [NSLayoutConstraint activateConstraints:constraints];
 }
 
 - (BOOL)hasAnyResults
@@ -300,6 +333,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 - (void)searchProviderResultsUpdated:(NSNotification *)notification
 {
     [self.dataSource reloadData];
+    [self presentSearchView];
 }
 
 - (void)performSearch
