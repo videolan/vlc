@@ -85,6 +85,44 @@ PRIV(struct vlc_gl_sampler *sampler)
     return container_of(sampler, struct vlc_gl_sampler_priv, sampler);
 }
 
+static int
+sampler_update(struct vlc_gl_sampler *sampler,
+               const struct vlc_gl_picture *picture)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    priv->pic = *picture;
+
+    return VLC_SUCCESS;
+}
+
+static void
+sampler_select_plane(struct vlc_gl_sampler *sampler, unsigned plane)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    priv->plane = plane;
+}
+
+static void
+sampler_close(struct vlc_gl_sampler *sampler)
+{
+#ifdef HAVE_LIBPLACEBO_GL
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    FREENULL(priv->uloc.pl_vars);
+    FREENULL(priv->uloc.pl_descs);
+    pl_shader_free(&priv->pl_sh);
+    pl_shader_obj_destroy(&priv->lut_state);
+    pl_shader_obj_destroy(&priv->tone_map_state);
+    pl_shader_obj_destroy(&priv->dither_state);
+    pl_opengl_destroy(&priv->pl_opengl);
+    pl_log_destroy(&priv->pl_log);
+#endif
+
+    free(sampler->shader.precision);
+    free(sampler->shader.extensions);
+    free(sampler->shader.body);
+    free(sampler->shader.version);
+}
+
 static const float MATRIX_COLOR_RANGE_LIMITED[4*3] = {
     255.0/219,         0,         0, -255.0/219 *  16.0/255,
             0, 255.0/224,         0, -255.0/224 * 128.0/255,
@@ -261,7 +299,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler,
 }
 
 static void
-sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
+sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
@@ -410,7 +448,7 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
 }
 
 static void
-sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
+sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     const opengl_vtable_t *vt = priv->vt;
@@ -439,6 +477,9 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
     static const struct vlc_gl_sampler_ops ops = {
         .fetch_locations = sampler_xyz12_fetch_locations,
         .load = sampler_xyz12_load,
+        .update = sampler_update,
+        .select_plane = sampler_select_plane,
+        .close = sampler_close,
     };
     sampler->ops = &ops;
 
@@ -616,7 +657,7 @@ InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
 }
 
 static void
-sampler_planes_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
+sampler_planes_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
@@ -703,6 +744,9 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
     static const struct vlc_gl_sampler_ops ops = {
         .fetch_locations = sampler_planes_fetch_locations,
         .load = sampler_planes_load,
+        .update = sampler_update,
+        .select_plane = sampler_select_plane,
+        .close = sampler_close,
     };
     sampler->ops = &ops;
 
@@ -1037,6 +1081,9 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     static const struct vlc_gl_sampler_ops ops = {
         .fetch_locations = sampler_base_fetch_locations,
         .load = sampler_base_load,
+        .update = sampler_update,
+        .select_plane = sampler_select_plane,
+        .close = sampler_close,
     };
     sampler->ops = &ops;
 
@@ -1205,38 +1252,8 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
-#ifdef HAVE_LIBPLACEBO_GL
-    FREENULL(priv->uloc.pl_vars);
-    FREENULL(priv->uloc.pl_descs);
-    pl_shader_free(&priv->pl_sh);
-    pl_shader_obj_destroy(&priv->lut_state);
-    pl_shader_obj_destroy(&priv->tone_map_state);
-    pl_shader_obj_destroy(&priv->dither_state);
-    pl_opengl_destroy(&priv->pl_opengl);
-    pl_log_destroy(&priv->pl_log);
-#endif
-
-    free(sampler->shader.precision);
-    free(sampler->shader.extensions);
-    free(sampler->shader.body);
-    free(sampler->shader.version);
+    if (sampler->ops && sampler->ops->close)
+        sampler->ops->close(sampler);
 
     free(priv);
-}
-
-int
-vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler,
-                      const struct vlc_gl_picture *picture)
-{
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    priv->pic = *picture;
-
-    return VLC_SUCCESS;
-}
-
-void
-vlc_gl_sampler_SelectPlane(struct vlc_gl_sampler *sampler, unsigned plane)
-{
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    priv->plane = plane;
 }

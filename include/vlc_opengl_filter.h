@@ -29,9 +29,8 @@
 #include <vlc_es.h>
 
 struct vlc_gl_filter;
-struct vlc_gl_picture;
-struct vlc_gl_format;
 struct vlc_gl_sampler;
+struct vlc_gl_picture;
 
 #ifdef __cplusplus
 extern "C"
