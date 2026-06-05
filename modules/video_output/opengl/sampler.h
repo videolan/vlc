@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_GL_SAMPLER_H
-#define VLC_GL_SAMPLER_H
+#ifndef VLC_GL_SAMPLER_PRIV_H
+#define VLC_GL_SAMPLER_PRIV_H
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

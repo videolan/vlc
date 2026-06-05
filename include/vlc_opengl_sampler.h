@@ -1,0 +1,137 @@
+/*****************************************************************************
+ * vlc_opengl_sampler.h: VLC OpenGL sampler API
+ *****************************************************************************
+ * Copyright (C) 2020-2026 VLC authors and VideoLAN
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifndef VLC_GL_SAMPLER_H
+#define VLC_GL_SAMPLER_H 1
+
+#include <stdint.h>
+#include <vlc_es.h>
+#include <vlc_picture.h>
+#include <vlc_opengl_picture.h>
+
+/**
+ * \file
+ * This file defines the public OpenGL sampler interface.
+ *
+ * The purpose of a sampler is to provide pixel values of a VLC input picture,
+ * stored in any format.
+ *
+ * Concretely, a GLSL function:
+ *
+ *     vec4 vlc_texture(vec2 coords)
+ *
+ * returns the RGBA values for the given coordinates.
+ *
+ * Contrary to the standard GLSL function:
+ *
+ *     vec4 texture2D(sampler2D sampler, vec2 coords)
+ *
+ * it does not take a sampler2D as parameter. The role of the sampler is to
+ * abstract the input picture from the filter, so the input picture is
+ * implicitly available.
+ */
+
+struct vlc_gl_sampler;
+
+struct vlc_gl_api;
+
+/**
+ * OpenGL sampler
+ *
+ * Generates GLSL code for sampling input textures and handles chroma
+ * conversion, transfer functions, and color space mapping.
+ */
+struct vlc_gl_sampler {
+    /** Input video format */
+    video_format_t fmt_in;
+
+    /** Number of texture planes */
+    unsigned tex_count;
+
+    /** Per-plane texture widths */
+    int32_t tex_widths[PICTURE_PLANE_MAX];
+
+    /** Per-plane texture heights */
+    int32_t tex_heights[PICTURE_PLANE_MAX];
+
+    /** GL texture target (e.g. GL_TEXTURE_2D) */
+    uint32_t tex_target;
+
+    /** Per-plane GL format (GLenum values) */
+    uint32_t formats[PICTURE_PLANE_MAX];
+
+    /** Whether textures use half-float storage */
+    bool half_float;
+
+    /**
+     * Matrix to convert from picture coordinates to texture coordinates
+     *
+     * The matrix is 2x3 and is stored in column-major order:
+     *
+     *     / a b c \
+     *     \ d e f /
+     *
+     * It is stored as an array of 6 floats:
+     *
+     *     [a, d, b, e, c, f]
+     *
+     * It is NULL before the first picture is available and may theoretically
+     * change on every picture.
+     */
+    const float *pic_to_tex_matrix;
+
+    struct {
+        /**
+         * Version header appropriate for this shader.
+         */
+        char *version;
+
+        /**
+         * Precision preamble appropriate for this shader.
+         */
+        char *precision;
+
+        /**
+         * Piece of fragment shader code declaring OpenGL extensions.
+         *
+         * It is initialized by the sampler, and may be NULL if no extensions
+         * are required.
+         *
+         * If non-NULL, users of this sampler must inject this code into their
+         * fragment shader, immediately after the "version" line.
+         */
+        char *extensions;
+
+        /**
+         * Piece of fragment shader code providing the GLSL function
+         * vlc_texture(vec2 coords).
+         *
+         * It is initialized by the sampler, and is never NULL.
+         *
+         * Users of this sampler should inject this code into their fragment
+         * shader, before any call to vlc_texture().
+         */
+        char *body;
+    } shader;
+
+    const struct vlc_gl_sampler_ops *ops;
+};
+
+#endif /* VLC_GL_SAMPLER_H */

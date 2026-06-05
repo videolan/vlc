@@ -85,6 +85,7 @@ pluginsinclude_HEADERS.h = \
 	../include/vlc_opengl_interop.h \
 	../include/vlc_opengl_filter.h \
 	../include/vlc_opengl_picture.h \
+	../include/vlc_opengl_sampler.h \
 	../include/vlc_picture.h \
 	../include/vlc_picture_fifo.h \
 	../include/vlc_picture_pool.h \
