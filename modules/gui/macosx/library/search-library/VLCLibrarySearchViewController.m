@@ -164,14 +164,23 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
          forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind
                      withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
 
+    const CGFloat searchFieldAreaHeight =
+        self.searchField.intrinsicContentSize.height + VLCLibraryUIUnits.largeSpacing * 2;
+
     _collectionViewScrollView = [[NSScrollView alloc] init];
     self.collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.collectionViewScrollView.hasHorizontalScroller = NO;
     self.collectionViewScrollView.borderType = NSNoBorder;
     self.collectionViewScrollView.documentView = self.collectionView;
     self.collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.collectionViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    self.collectionViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+
+    NSEdgeInsets collectionInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    collectionInsets.top += searchFieldAreaHeight;
+    self.collectionViewScrollView.contentInsets = collectionInsets;
+
+    NSEdgeInsets collectionScrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    collectionScrollerInsets.top -= searchFieldAreaHeight;
+    self.collectionViewScrollView.scrollerInsets = collectionScrollerInsets;
 }
 
 - (void)setupTableView
@@ -201,8 +210,17 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
     self.tableViewScrollView.borderType = NSNoBorder;
     self.tableViewScrollView.documentView = self.tableView;
     self.tableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.tableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    self.tableViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+
+    const CGFloat searchFieldAreaHeight =
+        self.searchField.intrinsicContentSize.height + VLCLibraryUIUnits.largeSpacing * 2;
+
+    NSEdgeInsets tableInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    tableInsets.top += searchFieldAreaHeight;
+    self.tableViewScrollView.contentInsets = tableInsets;
+
+    NSEdgeInsets tableScrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    tableScrollerInsets.top -= searchFieldAreaHeight;
+    self.tableViewScrollView.scrollerInsets = tableScrollerInsets;
 }
 
 - (void)setupPlaceholderView
@@ -273,17 +291,17 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
 
     // Add all views once, then toggle visibility
     if (self.searchField.superview != self.libraryTargetView) {
-        self.libraryTargetView.subviews = @[];
-        [self.libraryTargetView addSubview:self.searchField];
-        [self.libraryTargetView addSubview:contentView];
-        [self.libraryTargetView addSubview:self.spinner];
-        [self.libraryTargetView addSubview:self.statusLabel];
-
         const CGFloat spacing = VLCLibraryUIUnits.largeSpacing;
         NSLayoutAnchor *topAnchor = self.libraryTargetView.topAnchor;
         if (@available(macOS 11.0, *)) {
             topAnchor = self.libraryTargetView.safeAreaLayoutGuide.topAnchor;
         }
+
+        self.libraryTargetView.subviews = @[];
+        [self.libraryTargetView addSubview:contentView];
+        [self.libraryTargetView addSubview:self.spinner];
+        [self.libraryTargetView addSubview:self.statusLabel];
+        [self.libraryTargetView addSubview:self.searchField]; // On top
 
         [NSLayoutConstraint activateConstraints:@[
             [self.searchField.topAnchor constraintEqualToAnchor:topAnchor
@@ -293,8 +311,7 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
             [self.searchField.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor
                                                            constant:-spacing],
 
-            [contentView.topAnchor constraintEqualToAnchor:self.searchField.bottomAnchor
-                                                  constant:spacing],
+            [contentView.topAnchor constraintEqualToAnchor:self.libraryTargetView.topAnchor],
             [contentView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
             [contentView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
             [contentView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
