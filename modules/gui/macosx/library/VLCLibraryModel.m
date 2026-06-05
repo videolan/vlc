@@ -910,25 +910,33 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         NSMutableArray * const mutableArray =
             [[NSMutableArray alloc] initWithCapacity:pp_entrypoints->i_nb_items];
-        NSMutableArray * const mutableObservers =
-            [[NSMutableArray alloc] initWithCapacity:pp_entrypoints->i_nb_items];
 
         for (size_t x = 0; x < pp_entrypoints->i_nb_items; x++) {
             VLCMediaLibraryEntryPoint * const entryPoint =
                 [[VLCMediaLibraryEntryPoint alloc] initWithEntryPoint:&pp_entrypoints->p_items[x]];
             if (entryPoint) {
                 [mutableArray addObject:entryPoint];
-
-                NSURL * const url = [NSURL URLWithString:entryPoint.MRL];
-                VLCMediaLibraryFolderObserver * const observer =
-                    [[VLCMediaLibraryFolderObserver alloc] initWithURL:url];
-                [mutableObservers addObject:observer];
             }
         }
 
         vlc_ml_folder_list_release(pp_entrypoints);
 
         dispatch_async(dispatch_get_main_queue(), ^{
+            // Stop old observers before creating new ones to avoid duplicate
+            // FSEvent streams for the same paths
+            self.folderObservers = nil;
+
+            NSMutableArray * const mutableObservers =
+                [[NSMutableArray alloc] initWithCapacity:mutableArray.count];
+            for (VLCMediaLibraryEntryPoint * const entryPoint in mutableArray) {
+                NSURL * const url = [NSURL URLWithString:entryPoint.MRL];
+                VLCMediaLibraryFolderObserver * const observer =
+                    [[VLCMediaLibraryFolderObserver alloc] initWithURL:url];
+                if (observer) {
+                    [mutableObservers addObject:observer];
+                }
+            }
+
             self.cachedListOfMonitoredFolders = mutableArray.copy;
             self.folderObservers = mutableObservers.copy;
             [self.changeDelegate notifyChange:VLCLibraryModelListOfMonitoredFoldersUpdated withObject:self];
