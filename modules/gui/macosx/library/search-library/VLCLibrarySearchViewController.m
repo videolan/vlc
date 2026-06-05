@@ -51,6 +51,7 @@
 #import "main/VLCMain.h"
 
 static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
+static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
 
 @interface VLCLibrarySearchViewController () <NSSearchFieldDelegate>
 
@@ -58,6 +59,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 @property (readwrite) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readwrite) VLCLibrarySectionedTableViewDelegate *tableViewDelegate;
 @property (readwrite) NSTimer *searchDebounceTimer;
+@property (readwrite) BOOL spinnerAnimating;
 @property (readwrite) NSArray<NSLayoutConstraint *> *internalPlaceholderImageViewSizeConstraints;
 
 @end
@@ -106,6 +108,8 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
     self.spinner.style = NSProgressIndicatorStyleSpinning;
     self.spinner.displayedWhenStopped = NO;
+    self.spinner.wantsLayer = YES;
+    self.spinner.alphaValue = 0.0;
 }
 
 - (void)setupCollectionView
@@ -267,54 +271,74 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     const BOOL hasResults = hasSearchText && [self hasAnyResults];
     const BOOL showResults = hasSearchText && hasResults && !isSearching;
 
-    self.libraryTargetView.subviews = @[];
-    [self.libraryTargetView addSubview:self.searchField];
-
-    const CGFloat spacing = VLCLibraryUIUnits.largeSpacing;
-    NSLayoutAnchor *topAnchor = self.libraryTargetView.topAnchor;
-    if (@available(macOS 11.0, *)) {
-        topAnchor = self.libraryTargetView.safeAreaLayoutGuide.topAnchor;
-    }
-
-    NSMutableArray<NSLayoutConstraint *> * const constraints = [NSMutableArray arrayWithArray:@[
-        [self.searchField.topAnchor constraintEqualToAnchor:topAnchor
-                                                  constant:spacing],
-        [self.searchField.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor
-                                                      constant:spacing],
-        [self.searchField.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor
-                                                       constant:-spacing],
-    ]];
-
-    if (showResults) {
-        [self.spinner stopAnimation:nil];
+    // Add all views once, then toggle visibility
+    if (self.searchField.superview != self.libraryTargetView) {
+        self.libraryTargetView.subviews = @[];
+        [self.libraryTargetView addSubview:self.searchField];
         [self.libraryTargetView addSubview:contentView];
-        [constraints addObjectsFromArray:@[
+        [self.libraryTargetView addSubview:self.spinner];
+        [self.libraryTargetView addSubview:self.statusLabel];
+
+        const CGFloat spacing = VLCLibraryUIUnits.largeSpacing;
+        NSLayoutAnchor *topAnchor = self.libraryTargetView.topAnchor;
+        if (@available(macOS 11.0, *)) {
+            topAnchor = self.libraryTargetView.safeAreaLayoutGuide.topAnchor;
+        }
+
+        [NSLayoutConstraint activateConstraints:@[
+            [self.searchField.topAnchor constraintEqualToAnchor:topAnchor
+                                                      constant:spacing],
+            [self.searchField.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor
+                                                          constant:spacing],
+            [self.searchField.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor
+                                                           constant:-spacing],
+
             [contentView.topAnchor constraintEqualToAnchor:self.searchField.bottomAnchor
                                                   constant:spacing],
             [contentView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
             [contentView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
             [contentView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
-        ]];
-    } else if (isSearching) {
-        [self.spinner startAnimation:nil];
-        [self.libraryTargetView addSubview:self.spinner];
-        [constraints addObjectsFromArray:@[
+
             [self.spinner.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
             [self.spinner.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor],
-        ]];
-    } else {
-        [self.spinner stopAnimation:nil];
-        self.statusLabel.stringValue = hasSearchText
-            ? _NS("No results")
-            : _NS("Search your library");
-        [self.libraryTargetView addSubview:self.statusLabel];
-        [constraints addObjectsFromArray:@[
+
             [self.statusLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
             [self.statusLabel.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor],
         ]];
     }
 
-    [NSLayoutConstraint activateConstraints:constraints];
+    if (self.spinnerAnimating) {
+        return;
+    }
+
+    contentView.hidden = !showResults;
+    self.statusLabel.hidden = showResults || isSearching;
+    if (!self.statusLabel.hidden) {
+        self.statusLabel.stringValue = hasSearchText
+            ? _NS("No results")
+            : _NS("Search your library");
+    }
+
+    if (isSearching && self.spinner.alphaValue == 0) {
+        self.spinnerAnimating = YES;
+        [self.spinner startAnimation:nil];
+        [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+            context.duration = VLCLibrarySearchSpinnerFade;
+            self.spinner.animator.alphaValue = 1.0;
+        } completionHandler:^{
+            self.spinnerAnimating = NO;
+            [self presentSearchView];
+        }];
+    } else if (!isSearching && self.spinner.alphaValue > 0) {
+        self.spinnerAnimating = YES;
+        [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+            context.duration = VLCLibrarySearchSpinnerFade;
+            self.spinner.animator.alphaValue = 0.0;
+        } completionHandler:^{
+            [self.spinner stopAnimation:nil];
+            self.spinnerAnimating = NO;
+        }];
+    }
 }
 
 - (BOOL)hasAnyResults
