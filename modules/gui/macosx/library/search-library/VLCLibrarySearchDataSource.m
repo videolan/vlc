@@ -29,10 +29,47 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
-#import "library/VLCLibraryTableCellView.h"
 
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+
+#pragma mark - Flattened row model
+
+/**
+ * Represents one row in the flattened table view model.
+ * A row is either a section header or a media item within a provider's results.
+ */
+@interface VLCLibrarySearchFlattenedRow : NSObject
+@property (readonly) BOOL isHeader;
+@property (readonly) NSUInteger providerIndex;
+@property (readonly) NSInteger itemIndex; // -1 for header rows
++ (instancetype)headerForProvider:(NSUInteger)providerIndex;
++ (instancetype)itemAtIndex:(NSInteger)index forProvider:(NSUInteger)providerIndex;
+@end
+
+@implementation VLCLibrarySearchFlattenedRow
+
++ (instancetype)headerForProvider:(NSUInteger)providerIndex
+{
+    VLCLibrarySearchFlattenedRow * const row = [VLCLibrarySearchFlattenedRow new];
+    row->_isHeader = YES;
+    row->_providerIndex = providerIndex;
+    row->_itemIndex = -1;
+    return row;
+}
+
++ (instancetype)itemAtIndex:(NSInteger)index forProvider:(NSUInteger)providerIndex
+{
+    VLCLibrarySearchFlattenedRow * const row = [VLCLibrarySearchFlattenedRow new];
+    row->_isHeader = NO;
+    row->_providerIndex = providerIndex;
+    row->_itemIndex = index;
+    return row;
+}
+
+@end
+
+#pragma mark - Data source
 
 @interface VLCLibrarySearchDataSource ()
 {
@@ -50,6 +87,7 @@
     if (self) {
         _providers = [VLCLibrarySearchProvider defaultProviders];
         _visibleProviderIndices = @[];
+        _flattenedRows = @[];
         [self connect];
     }
     return self;
@@ -103,10 +141,32 @@
     _visibleProviderIndices = [visible copy];
 }
 
+- (void)rebuildFlattenedRows
+{
+    NSMutableArray<VLCLibrarySearchFlattenedRow *> * const rows = [NSMutableArray array];
+
+    for (NSNumber * const indexNumber in _visibleProviderIndices) {
+        const NSUInteger providerIndex = indexNumber.unsignedIntegerValue;
+        VLCLibrarySearchProvider * const provider = _providers[providerIndex];
+        const NSUInteger resultCount = provider.results.count;
+
+        [rows addObject:[VLCLibrarySearchFlattenedRow headerForProvider:providerIndex]];
+        for (NSUInteger i = 0; i < resultCount; i++) {
+            [rows addObject:[VLCLibrarySearchFlattenedRow itemAtIndex:i forProvider:providerIndex]];
+        }
+    }
+
+    _flattenedRows = [rows copy];
+}
+
 - (void)reloadData
 {
     [self updateVisibleProviderIndices];
+    [self rebuildFlattenedRows];
 
+    if (self.tableView.dataSource == self) {
+        [self.tableView reloadData];
+    }
     if (self.collectionView.dataSource == self) {
         [self.collectionView reloadData];
     }
@@ -119,6 +179,100 @@
     return _providers[providerIndex];
 }
 
+#pragma mark - VLCLibraryTableViewDataSource
+
+- (VLCMediaLibraryParentGroupType)currentParentType
+{
+    return VLCMediaLibraryParentGroupTypeUnknown;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
+{
+    NSParameterAssert(row >= 0 && (NSUInteger)row < _flattenedRows.count);
+
+    VLCLibrarySearchFlattenedRow * const flatRow = _flattenedRows[row];
+    NSParameterAssert(!flatRow.isHeader || (flatRow.providerIndex < _providers.count));
+
+    VLCLibrarySearchProvider * const provider = _providers[flatRow.providerIndex];
+    return provider.results[flatRow.itemIndex];
+}
+
+- (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    NSParameterAssert(libraryItem != nil);
+
+    const NSUInteger rowCount = _flattenedRows.count;
+    for (NSUInteger i = 0; i < rowCount; i++) {
+        VLCLibrarySearchFlattenedRow * const flatRow = _flattenedRows[i];
+        if (flatRow.isHeader) {
+            continue;
+        }
+
+        VLCLibrarySearchProvider * const provider = _providers[flatRow.providerIndex];
+        if (flatRow.itemIndex >= 0 && (NSUInteger)flatRow.itemIndex < provider.results.count) {
+            const id<VLCMediaLibraryItemProtocol> item = provider.results[flatRow.itemIndex];
+            if (item.libraryID == libraryItem.libraryID) {
+                return i;
+            }
+        }
+    }
+
+    return NSNotFound;
+}
+
+#pragma mark - VLCLibrarySectionedTableViewDataSource
+
+- (BOOL)isHeaderRow:(NSInteger)row
+{
+    NSParameterAssert(row >= 0 && (NSUInteger)row < _flattenedRows.count);
+    return _flattenedRows[row].isHeader;
+}
+
+- (NSString *)titleForRow:(NSInteger)row
+{
+    NSParameterAssert(row >= 0 && (NSUInteger)row < _flattenedRows.count);
+    VLCLibrarySearchFlattenedRow * const flatRow = _flattenedRows[row];
+    return _providers[flatRow.providerIndex].displayTitle;
+}
+
+- (VLCLibraryRepresentedItem *)representedItemForHeaderRow:(NSInteger)row
+{
+    NSParameterAssert([self isHeaderRow:row]);
+
+    VLCLibrarySearchFlattenedRow * const flatRow = _flattenedRows[row];
+    VLCLibrarySearchProvider * const provider = _providers[flatRow.providerIndex];
+    NSParameterAssert(provider.results.count > 0);
+
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [NSMutableArray array];
+    for (id<VLCMediaLibraryItemProtocol> item in provider.results) {
+        [item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *mediaItem) {
+            [mediaItems addObject:mediaItem];
+        }];
+    }
+
+    VLCMediaLibraryDummyItem * const groupItem =
+        [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:provider.displayTitle
+                                                 withMediaItems:mediaItems];
+    return [[VLCLibraryRepresentedItem alloc] initWithItem:groupItem
+                                                parentType:VLCMediaLibraryParentGroupTypeSearchResults];
+}
+
+#pragma mark - NSTableViewDataSource
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    return _flattenedRows.count;
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    if ([self isHeaderRow:row]) {
+        return nil;
+    }
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
+}
 
 #pragma mark - NSCollectionViewDataSource
 
