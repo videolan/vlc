@@ -22,17 +22,7 @@
 
 #import "VLCLibraryVideoTableViewDelegate.h"
 
-#import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryRepresentedItem.h"
-#import "library/VLCLibrarySectionedTableViewDataSource.h"
-#import "library/VLCLibraryTableCellView.h"
-#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
-
-#import "library/VLCLibraryHeaderView.h"
-
-@interface VLCLibraryVideoHeaderRowView : NSTableRowView
-@end
 
 @implementation VLCLibraryVideoTableViewDelegate
 
@@ -41,102 +31,7 @@
     self = [super init];
     if (self) {
         self.cellViewIdentifier = @"VLCVideoLibraryTableViewCellIdentifier";
-    }
-    return self;
-}
-
-#pragma mark - NSTableViewDelegate
-
-- (NSView *)tableView:(NSTableView *)tableView
-    viewForTableColumn:(NSTableColumn *)tableColumn
-                   row:(NSInteger)row
-{
-    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
-        return [super tableView:tableView viewForTableColumn:tableColumn row:row];
-    }
-
-    NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
-        (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
-
-    if ([sectionedDataSource isHeaderRow:row]) {
-        VLCLibraryHeaderView *headerView =
-            (VLCLibraryHeaderView *)[tableView makeViewWithIdentifier:VLCLibraryHeaderViewIdentifier
-                                                                               owner:self];
-        if (headerView == nil) {
-            headerView = [[VLCLibraryHeaderView alloc] initWithFrame:NSZeroRect];
-            headerView.identifier = VLCLibraryHeaderViewIdentifier;
-        }
-
-        NSString * const title = [sectionedDataSource titleForRow:row];
-        VLCLibraryRepresentedItem *representedItem = nil;
-        if ([sectionedDataSource respondsToSelector:@selector(representedItemForHeaderRow:)]) {
-            representedItem = [sectionedDataSource representedItemForHeaderRow:row];
-        }
-        [headerView updateWithRepresentedItem:representedItem
-                                fallbackTitle:title
-                               fallbackDetail:nil];
-        return headerView;
-    }
-
-    return [super tableView:tableView viewForTableColumn:tableColumn row:row];
-}
-
-- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
-{
-    if ([tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
-        NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
-            (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
-        if ([sectionedDataSource isHeaderRow:row]) {
-            return VLCLibraryHeaderViewHeight;
-        }
-    }
-
-    return VLCLibraryUIUnits.videoLibraryTableViewRowHeight;
-}
-
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
-{
-    if ([tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
-        NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
-            (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
-        return ![sectionedDataSource isHeaderRow:row];
-    }
-    return YES;
-}
-
-- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
-{
-    if ([tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
-        NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
-            (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
-        return [sectionedDataSource isHeaderRow:row];
-    }
-    return NO;
-}
-
-- (NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row
-{
-    if ([tableView.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
-        NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
-            (NSObject<VLCLibrarySectionedTableViewDataSource> *)tableView.dataSource;
-        if ([sectionedDataSource isHeaderRow:row]) {
-            VLCLibraryVideoHeaderRowView * const rowView = [[VLCLibraryVideoHeaderRowView alloc] init];
-            return rowView;
-        }
-    }
-    return nil;
-}
-
-@end
-
-@implementation VLCLibraryVideoHeaderRowView
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        self.wantsLayer = YES;
-        self.layer.masksToBounds = NO;
+        self.rowHeight = VLCLibraryUIUnits.videoLibraryTableViewRowHeight;
     }
     return self;
 }

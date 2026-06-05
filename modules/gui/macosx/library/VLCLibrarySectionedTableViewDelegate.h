@@ -1,7 +1,7 @@
 /*****************************************************************************
- * VLCLibraryVideoTableViewDelegate.h MacOS X interface module
+ * VLCLibrarySectionedTableViewDelegate.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2023 VLC authors and VideoLAN
+ * Copyright (C) 2025 VLC authors and VideoLAN
  *
  * Authors: Claudio Cambra <developer@claudiocambra.com>
  *
@@ -22,11 +22,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibrarySectionedTableViewDelegate.h"
+#import "library/VLCLibraryTableViewDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoTableViewDelegate : VLCLibrarySectionedTableViewDelegate
+@interface VLCLibrarySectionedTableViewDelegate : VLCLibraryTableViewDelegate
+
+@property (readwrite) CGFloat rowHeight;
 
 @end
 
