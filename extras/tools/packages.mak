@@ -22,8 +22,8 @@ AUTOMAKE_URL=$(GNU)/automake/automake-$(AUTOMAKE_VERSION).tar.gz
 M4_VERSION=1.4.21
 M4_URL=$(GNU)/m4/m4-$(M4_VERSION).tar.gz
 
-PKGCFG_VERSION=0.28-1
-PKGCFG_URL=$(SF)/pkgconfiglite/$(PKGCFG_VERSION)/pkg-config-lite-$(PKGCFG_VERSION).tar.gz
+PKGCONFIG_VERSION=0.28-1
+PKGCONFIG_URL=$(SF)/pkgconfiglite/$(PKGCONFIG_VERSION)/pkg-config-lite-$(PKGCONFIG_VERSION).tar.gz
 
 TAR_VERSION=1.34
 TAR_URL=$(GNU)/tar/tar-$(TAR_VERSION).tar.bz2
