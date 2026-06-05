@@ -76,6 +76,7 @@
     NSArray<VLCLibrarySearchProvider *> *_providers;
     NSArray<NSNumber *> *_visibleProviderIndices;
     NSArray<VLCLibrarySearchFlattenedRow *> *_flattenedRows;
+    NSMutableDictionary<NSString *, VLCMediaLibraryDummyItem *> *_cachedProviderParentItems;
 }
 @end
 
@@ -88,6 +89,7 @@
         _providers = [VLCLibrarySearchProvider defaultProviders];
         _visibleProviderIndices = @[];
         _flattenedRows = @[];
+        _cachedProviderParentItems = [NSMutableDictionary dictionary];
         [self connect];
     }
     return self;
@@ -163,6 +165,7 @@
 {
     [self updateVisibleProviderIndices];
     [self rebuildFlattenedRows];
+    [_cachedProviderParentItems removeAllObjects];
 
     if (self.tableView.dataSource == self) {
         [self.tableView reloadData];
@@ -181,14 +184,21 @@
 
 - (VLCMediaLibraryDummyItem *)dummyParentItemForProvider:(VLCLibrarySearchProvider *)provider
 {
+    VLCMediaLibraryDummyItem *cached = _cachedProviderParentItems[provider.displayTitle];
+    if (cached != nil) {
+        return cached;
+    }
+
     NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [NSMutableArray array];
     for (id<VLCMediaLibraryItemProtocol> item in provider.results) {
         [item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *mediaItem) {
             [mediaItems addObject:mediaItem];
         }];
     }
-    return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:provider.displayTitle
-                                                    withMediaItems:mediaItems];
+    cached = [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:provider.displayTitle
+                                                      withMediaItems:mediaItems];
+    _cachedProviderParentItems[provider.displayTitle] = cached;
+    return cached;
 }
 
 - (NSInteger)flattenedMediaItemOffsetForResultIndex:(NSInteger)resultIndex
