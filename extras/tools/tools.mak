@@ -101,8 +101,9 @@ DISTCLEAN_PKG += cmake-$(CMAKE_VERSION).tar.gz
 help2man-$(HELP2MAN_VERSION).tar.xz:
 	$(call download_pkg,$(HELP2MAN_URL),help2man)
 
+help2man: .tar
 .gethelp2man: help2man-$(HELP2MAN_VERSION).tar.xz
-help2man: help2man-$(HELP2MAN_VERSION).tar.xz .tar
+help2man: help2man-$(HELP2MAN_VERSION).tar.xz
 	$(UNPACK)
 	$(MOVE)
 
@@ -210,8 +211,9 @@ config.sub: $(TOOLS)/config.sub-$(CONFIGSUB_VERSION)
 autoconf-$(AUTOCONF_VERSION).tar.gz:
 	$(call download_pkg,$(AUTOCONF_URL),autoconf)
 
+autoconf: .configguess
 .getautoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
-autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz .configguess
+autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
 	$(UNPACK)
 	@-cp config.guess $(UNPACK_DIR)/build-aux
 	@-cp config.sub $(UNPACK_DIR)/build-aux
@@ -232,8 +234,9 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
 automake-$(AUTOMAKE_VERSION).tar.gz:
 	$(call download_pkg,$(AUTOMAKE_URL),automake)
 
+automake: .configguess
 .getautomake: automake-$(AUTOMAKE_VERSION).tar.gz
-automake: automake-$(AUTOMAKE_VERSION).tar.gz .configguess
+automake: automake-$(AUTOMAKE_VERSION).tar.gz
 	$(UNPACK)
 	$(APPLY) $(TOOLS)/automake-disable-documentation.patch
 	$(APPLY) $(TOOLS)/automake-clang.patch
@@ -341,8 +344,9 @@ CLEAN_FILE += .buildant
 bison-$(BISON_VERSION).tar.xz:
 	$(call download_pkg,$(BISON_URL),bison)
 
+bison: .tar
 .getbison: bison-$(BISON_VERSION).tar.xz
-bison: bison-$(BISON_VERSION).tar.xz .tar
+bison: bison-$(BISON_VERSION).tar.xz
 	$(UNPACK)
 	$(MOVE)
 
