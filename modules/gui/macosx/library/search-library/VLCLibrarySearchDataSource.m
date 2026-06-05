@@ -37,6 +37,7 @@
 @interface VLCLibrarySearchDataSource ()
 {
     NSArray<VLCLibrarySearchProvider *> *_providers;
+    NSArray<NSNumber *> *_visibleProviderIndices;
     NSArray<VLCLibrarySearchFlattenedRow *> *_flattenedRows;
 }
 @end
@@ -48,6 +49,7 @@
     self = [super init];
     if (self) {
         _providers = [VLCLibrarySearchProvider defaultProviders];
+        _visibleProviderIndices = @[];
         [self connect];
     }
     return self;
@@ -90,11 +92,31 @@
 
 #pragma mark - Data management
 
+- (void)updateVisibleProviderIndices
+{
+    NSMutableArray<NSNumber *> * const visible = [NSMutableArray array];
+    for (NSUInteger i = 0; i < _providers.count; i++) {
+        if (_providers[i].results.count > 0) {
+            [visible addObject:@(i)];
+        }
+    }
+    _visibleProviderIndices = [visible copy];
+}
+
 - (void)reloadData
 {
+    [self updateVisibleProviderIndices];
+
     if (self.collectionView.dataSource == self) {
         [self.collectionView reloadData];
     }
+}
+
+- (VLCLibrarySearchProvider *)providerForVisibleSection:(NSInteger)visibleSection
+{
+    NSParameterAssert(visibleSection >= 0 && (NSUInteger)visibleSection < _visibleProviderIndices.count);
+    const NSUInteger providerIndex = _visibleProviderIndices[visibleSection].unsignedIntegerValue;
+    return _providers[providerIndex];
 }
 
 
@@ -102,13 +124,13 @@
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
 {
-    return _providers.count;
+    return _visibleProviderIndices.count;
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
-    VLCLibrarySearchProvider * const provider = _providers[section];
+    VLCLibrarySearchProvider * const provider = [self providerForVisibleSection:section];
     return provider ? provider.results.count : 0;
 }
 
@@ -135,7 +157,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
             [collectionView makeSupplementaryViewOfKind:kind
                                          withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
                                            forIndexPath:indexPath];
-        VLCLibrarySearchProvider * const provider = _providers[indexPath.section];
+        VLCLibrarySearchProvider * const provider = [self providerForVisibleSection:indexPath.section];
         sectionHeadingView.stringValue = provider.displayTitle;
         return sectionHeadingView;
 
@@ -162,24 +184,21 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
 {
-    VLCLibrarySearchProvider * const provider = _providers[indexPath.section];
-    if (provider && indexPath.item >= 0 && (NSUInteger)indexPath.item < provider.results.count) {
-        return provider.results[indexPath.item];
-    }
-    return nil;
+    VLCLibrarySearchProvider * const provider = [self providerForVisibleSection:indexPath.section];
+    NSParameterAssert(provider != nil && indexPath.item >= 0 && (NSUInteger)indexPath.item < provider.results.count);
+    return provider.results[indexPath.item];
 }
 
 - (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
-    if (libraryItem == nil) {
-        return nil;
-    }
+    NSParameterAssert(libraryItem != nil);
 
-    for (NSUInteger section = 0; section < _providers.count; section++) {
-        VLCLibrarySearchProvider * const provider = _providers[section];
+    for (NSUInteger visibleIndex = 0; visibleIndex < _visibleProviderIndices.count; visibleIndex++) {
+        const NSUInteger providerIndex = _visibleProviderIndices[visibleIndex].unsignedIntegerValue;
+        VLCLibrarySearchProvider * const provider = _providers[providerIndex];
         for (NSUInteger i = 0; i < provider.results.count; i++) {
             if (provider.results[i].libraryID == libraryItem.libraryID) {
-                return [NSIndexPath indexPathForItem:i inSection:section];
+                return [NSIndexPath indexPathForItem:i inSection:visibleIndex];
             }
         }
     }
