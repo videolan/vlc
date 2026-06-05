@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSSearchField *searchField;
 @property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) VLCLibraryCollectionView *collectionView;
+@property (readonly) NSScrollView *tableViewScrollView;
+@property (readonly) NSTableView *tableView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentSearchView;

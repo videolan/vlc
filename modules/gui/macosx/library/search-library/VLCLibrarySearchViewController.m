@@ -34,8 +34,10 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryUIUnits.h"
 
+#import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
@@ -47,6 +49,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 
 @property (readwrite) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readwrite) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
+@property (readwrite) VLCLibraryVideoTableViewDelegate *tableViewDelegate;
 @property (readwrite) NSTimer *searchDebounceTimer;
 
 @end
@@ -60,6 +63,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
         _dataSource = [[VLCLibrarySearchDataSource alloc] init];
         [self setupSearchField];
         [self setupCollectionView];
+        [self setupTableView];
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(searchProviderResultsUpdated:)
                                                    name:VLCLibrarySearchProviderResultsUpdated
@@ -123,6 +127,38 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     self.collectionViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
 }
 
+- (void)setupTableView
+{
+    _tableView = [[NSTableView alloc] init];
+    self.tableView.headerView = nil;
+    self.tableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.tableView.allowsMultipleSelection = YES;
+    self.tableView.floatsGroupRows = NO;
+
+    NSTableColumn * const column =
+        [[NSTableColumn alloc] initWithIdentifier:@"VLCSearchLibraryTableViewColumnIdentifier"];
+    column.resizingMask = NSTableColumnAutoresizingMask;
+    [self.tableView addTableColumn:column];
+
+    NSNib * const tableCellViewNib =
+        [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
+    [self.tableView registerNib:tableCellViewNib
+                  forIdentifier:VLCLibraryTableCellViewIdentifier];
+
+    _tableViewDelegate = [[VLCLibraryVideoTableViewDelegate alloc] init];
+    self.tableViewDelegate.cellViewIdentifier = VLCLibraryTableCellViewIdentifier;
+    self.tableView.delegate = self.tableViewDelegate;
+
+    _tableViewScrollView = [[NSScrollView alloc] init];
+    self.tableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.tableViewScrollView.hasHorizontalScroller = NO;
+    self.tableViewScrollView.borderType = NSNoBorder;
+    self.tableViewScrollView.documentView = self.tableView;
+    self.tableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.tableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    self.tableViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+}
+
 #pragma mark - Abstract overrides
 
 - (NSArray<NSLayoutConstraint *> *)placeholderImageViewSizeConstraints
@@ -140,8 +176,19 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 - (void)presentSearchView
 {
     self.dataSource.collectionView = self.collectionView;
+    self.dataSource.tableView = self.tableView;
+
     self.collectionView.dataSource = self.dataSource;
-    NSView * const contentView = self.collectionViewScrollView;
+    self.tableView.dataSource = self.dataSource;
+    self.tableView.delegate = self.tableViewDelegate;
+
+    const VLCLibraryViewModeSegment viewMode =
+        VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
+
+    NSView * const contentView = (viewMode == VLCLibraryGridViewModeSegment)
+        ? self.collectionViewScrollView
+        : self.tableViewScrollView;
+
     self.libraryTargetView.subviews = @[];
     [self.libraryTargetView addSubview:self.searchField];
     [self.libraryTargetView addSubview:contentView];
