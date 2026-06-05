@@ -40,9 +40,10 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
 
-#import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
+#import "library/VLCLibrarySectionedTableViewDelegate.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
@@ -54,7 +55,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 
 @property (readwrite) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readwrite) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
-@property (readwrite) VLCLibraryVideoTableViewDelegate *tableViewDelegate;
+@property (readwrite) VLCLibrarySectionedTableViewDelegate *tableViewDelegate;
 @property (readwrite) NSTimer *searchDebounceTimer;
 @property (readwrite) NSArray<NSLayoutConstraint *> *internalPlaceholderImageViewSizeConstraints;
 
@@ -156,7 +157,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 
 - (void)setupTableView
 {
-    _tableView = [[NSTableView alloc] init];
+    _tableView = [[VLCLibraryTableView alloc] init];
     self.tableView.headerView = nil;
     self.tableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.tableView.allowsMultipleSelection = YES;
@@ -172,8 +173,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     [self.tableView registerNib:tableCellViewNib
                   forIdentifier:VLCLibraryTableCellViewIdentifier];
 
-    _tableViewDelegate = [[VLCLibraryVideoTableViewDelegate alloc] init];
-    self.tableViewDelegate.cellViewIdentifier = VLCLibraryTableCellViewIdentifier;
+    _tableViewDelegate = [[VLCLibrarySectionedTableViewDelegate alloc] init];
     self.tableView.delegate = self.tableViewDelegate;
 
     _tableViewScrollView = [[NSScrollView alloc] init];
