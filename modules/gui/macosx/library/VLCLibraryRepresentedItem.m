@@ -231,7 +231,7 @@
 - (NSArray<VLCMediaLibraryMediaItem *> *)parentMediaArray
 {
     @synchronized(self) {
-        if (self.parentType != VLCMediaLibraryParentGroupTypeUnknown &&
+        if ((self.parentType != VLCMediaLibraryParentGroupTypeUnknown || self.parentItem != nil) &&
             (_parentMediaArray == nil || _parentMediaArray.count == 0)) {
             _parentMediaArray = [self parentMediaArrayForItem:self.item];
         }
@@ -297,7 +297,8 @@
 - (void)playImmediately:(BOOL)playImmediately
 {
     VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
-    if (playQueueController.libraryPlayQueueMode && self.parentType != VLCMediaLibraryParentGroupTypeUnknown) {
+    if (playQueueController.libraryPlayQueueMode &&
+        (self.parentType != VLCMediaLibraryParentGroupTypeUnknown || self.parentItem != nil)) {
         [self playLibraryModeImmediately:playImmediately];
     } else {
         [self playIndividualModeImmediately:playImmediately];

@@ -179,6 +179,42 @@
     return _providers[providerIndex];
 }
 
+- (VLCMediaLibraryDummyItem *)dummyParentItemForProvider:(VLCLibrarySearchProvider *)provider
+{
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [NSMutableArray array];
+    for (id<VLCMediaLibraryItemProtocol> item in provider.results) {
+        [item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *mediaItem) {
+            [mediaItems addObject:mediaItem];
+        }];
+    }
+    return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:provider.displayTitle
+                                                    withMediaItems:mediaItems];
+}
+
+- (NSInteger)flattenedMediaItemOffsetForResultIndex:(NSInteger)resultIndex
+                                         inProvider:(VLCLibrarySearchProvider *)provider
+{
+    NSInteger offset = 0;
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const results = provider.results;
+    for (NSInteger i = 0; i < resultIndex && (NSUInteger)i < results.count; i++) {
+        offset += results[i].mediaItems.count;
+    }
+    return offset;
+}
+
+- (VLCLibraryRepresentedItem *)representedItemForItem:(id<VLCMediaLibraryItemProtocol>)item
+                                           atPosition:(NSInteger)position
+                                         fromProvider:(VLCLibrarySearchProvider *)provider
+{
+    VLCMediaLibraryDummyItem * const parentItem = [self dummyParentItemForProvider:provider];
+    const NSInteger flattenedPosition =
+        [self flattenedMediaItemOffsetForResultIndex:position inProvider:provider];
+    return [[VLCLibraryRepresentedItem alloc] initWithItem:item
+                                               parentType:VLCMediaLibraryParentGroupTypeUnknown
+                                               parentItem:parentItem
+                                         positionInParent:flattenedPosition];
+}
+
 #pragma mark - VLCLibraryTableViewDataSource
 
 - (VLCMediaLibraryParentGroupType)currentParentType
@@ -244,18 +280,9 @@
     VLCLibrarySearchProvider * const provider = _providers[flatRow.providerIndex];
     NSParameterAssert(provider.results.count > 0);
 
-    NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [NSMutableArray array];
-    for (id<VLCMediaLibraryItemProtocol> item in provider.results) {
-        [item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *mediaItem) {
-            [mediaItems addObject:mediaItem];
-        }];
-    }
-
-    VLCMediaLibraryDummyItem * const groupItem =
-        [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:provider.displayTitle
-                                                 withMediaItems:mediaItems];
+    VLCMediaLibraryDummyItem * const groupItem = [self dummyParentItemForProvider:provider];
     return [[VLCLibraryRepresentedItem alloc] initWithItem:groupItem
-                                                parentType:VLCMediaLibraryParentGroupTypeSearchResults];
+                                                parentType:VLCMediaLibraryParentGroupTypeUnknown];
 }
 
 #pragma mark - NSTableViewDataSource
@@ -295,9 +322,9 @@
         [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> item =
         [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+    VLCLibrarySearchProvider * const provider = [self providerForVisibleSection:indexPath.section];
     VLCLibraryRepresentedItem * const representedItem =
-        [[VLCLibraryRepresentedItem alloc] initWithItem:item
-                                             parentType:VLCMediaLibraryParentGroupTypeSearchResults];
+        [self representedItemForItem:item atPosition:indexPath.item fromProvider:provider];
     viewItem.representedItem = representedItem;
     return viewItem;
 }
@@ -322,9 +349,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                                            forIndexPath:indexPath];
         const id<VLCMediaLibraryItemProtocol> item =
             [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+        VLCLibrarySearchProvider * const provider = [self providerForVisibleSection:indexPath.section];
         VLCLibraryRepresentedItem * const representedItem =
-            [[VLCLibraryRepresentedItem alloc] initWithItem:item
-                                                 parentType:VLCMediaLibraryParentGroupTypeSearchResults];
+            [self representedItemForItem:item atPosition:indexPath.item fromProvider:provider];
         detailView.representedItem = representedItem;
         detailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
         return detailView;
@@ -370,9 +397,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         const id<VLCMediaLibraryItemProtocol> libraryItem =
             [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
         if (libraryItem) {
+            VLCLibrarySearchProvider * const provider = [self providerForVisibleSection:indexPath.section];
             VLCLibraryRepresentedItem * const representedItem =
-                [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
-                                                     parentType:VLCMediaLibraryParentGroupTypeSearchResults];
+                [self representedItemForItem:libraryItem atPosition:indexPath.item fromProvider:provider];
             [representedItems addObject:representedItem];
         }
     }
