@@ -34,6 +34,8 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryUIUnits.h"
 
@@ -51,6 +53,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 @property (readwrite) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readwrite) VLCLibraryVideoTableViewDelegate *tableViewDelegate;
 @property (readwrite) NSTimer *searchDebounceTimer;
+@property (readwrite) NSArray<NSLayoutConstraint *> *internalPlaceholderImageViewSizeConstraints;
 
 @end
 
@@ -64,6 +67,8 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
         [self setupSearchField];
         [self setupCollectionView];
         [self setupTableView];
+        [self setupPlaceholderView];
+
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(searchProviderResultsUpdated:)
                                                    name:VLCLibrarySearchProviderResultsUpdated
@@ -159,6 +164,26 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     self.tableViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
 }
 
+- (void)setupPlaceholderView
+{
+    _internalPlaceholderImageViewSizeConstraints = @[
+        [NSLayoutConstraint constraintWithItem:self.placeholderImageView
+                                     attribute:NSLayoutAttributeWidth
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:182.f],
+        [NSLayoutConstraint constraintWithItem:self.placeholderImageView
+                                     attribute:NSLayoutAttributeHeight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:182.f],
+    ];
+}
+
 #pragma mark - Abstract overrides
 
 - (NSArray<NSLayoutConstraint *> *)placeholderImageViewSizeConstraints
@@ -175,6 +200,17 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 
 - (void)presentSearchView
 {
+    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    const BOOL emptyLibrary =
+        libraryModel.numberOfAudioMedia == 0 && libraryModel.numberOfVideoMedia == 0;
+
+    if (emptyLibrary) {
+        [self.libraryWindow displayLibraryPlaceholderViewWithImage:NSImage.VLCGenericImage
+                                                  usingConstraints:self.placeholderImageViewSizeConstraints
+                                                 displayingMessage:_NS("Your library is empty.\nAdd media to start searching.")];
+        return;
+    }
+
     self.dataSource.collectionView = self.collectionView;
     self.dataSource.tableView = self.tableView;
 
