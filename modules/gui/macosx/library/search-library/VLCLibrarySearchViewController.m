@@ -32,8 +32,11 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+
+#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
@@ -101,6 +104,9 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
 
     _collectionView = [[VLCLibraryCollectionView alloc] initWithFrame:NSZeroRect];
     self.collectionView.collectionViewLayout = self.collectionViewLayout;
+    self.collectionView.selectable = YES;
+    self.collectionView.allowsEmptySelection = YES;
+    self.collectionView.allowsMultipleSelection = YES;
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioDefaultItem;
@@ -121,6 +127,22 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     [self.collectionView registerNib:mediaItemDetailViewNib
          forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
                      withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
+
+    NSString * const albumDetailViewString =
+        NSStringFromClass(VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.class);
+    NSNib * const albumDetailViewNib =
+        [[NSNib alloc] initWithNibNamed:albumDetailViewString bundle:nil];
+    [self.collectionView registerNib:albumDetailViewNib
+         forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind
+                     withIdentifier:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind];
+
+    NSString * const audioGroupDetailViewString =
+        NSStringFromClass(VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.class);
+    NSNib * const audioGroupDetailViewNib =
+        [[NSNib alloc] initWithNibNamed:audioGroupDetailViewString bundle:nil];
+    [self.collectionView registerNib:audioGroupDetailViewNib
+         forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind
+                     withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
 
     _collectionViewScrollView = [[NSScrollView alloc] init];
     self.collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;

@@ -24,9 +24,15 @@
 
 #import "VLCLibrarySearchProvider.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+
+#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
+
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
@@ -352,10 +358,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         sectionHeadingView.stringValue = provider.displayTitle;
         return sectionHeadingView;
 
-    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
-        VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const detailView =
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind] ||
+               [kind isEqualToString:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind] ||
+               [kind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
+        VLCLibraryCollectionViewSupplementaryDetailView * const detailView =
+            (VLCLibraryCollectionViewSupplementaryDetailView *)
             [collectionView makeSupplementaryViewOfKind:kind
-                                         withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                                         withIdentifier:kind
                                            forIndexPath:indexPath];
         const id<VLCMediaLibraryItemProtocol> item =
             [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
@@ -371,6 +380,27 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 }
 
 #pragma mark - VLCLibraryCollectionViewDataSource
+
+- (NSString *)supplementaryDetailViewKind
+{
+    if (self.collectionView == nil) {
+        return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
+    }
+
+    NSIndexPath * const selectedIndexPath = self.collectionView.selectionIndexPaths.anyObject;
+    if (selectedIndexPath == nil) {
+        return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
+    }
+
+    const id<VLCMediaLibraryItemProtocol> item =
+        [self libraryItemAtIndexPath:selectedIndexPath forCollectionView:self.collectionView];
+    if ([item isKindOfClass:VLCMediaLibraryAlbum.class]) {
+        return VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind;
+    } else if ([item conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)]) {
+        return VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind;
+    }
+    return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
+}
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
