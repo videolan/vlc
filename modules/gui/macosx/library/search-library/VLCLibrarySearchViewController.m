@@ -279,10 +279,7 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
 
     const VLCLibraryViewModeSegment viewMode =
         VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
-
-    NSView * const contentView = (viewMode == VLCLibraryGridViewModeSegment)
-        ? self.collectionViewScrollView
-        : self.tableViewScrollView;
+    const BOOL gridMode = (viewMode == VLCLibraryGridViewModeSegment);
 
     const BOOL hasSearchText = self.searchField.stringValue.length > 0;
     const BOOL isSearching = self.dataSource.searching;
@@ -298,7 +295,8 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
         }
 
         self.libraryTargetView.subviews = @[];
-        [self.libraryTargetView addSubview:contentView];
+        [self.libraryTargetView addSubview:self.collectionViewScrollView];
+        [self.libraryTargetView addSubview:self.tableViewScrollView];
         [self.libraryTargetView addSubview:self.spinner];
         [self.libraryTargetView addSubview:self.statusLabel];
         [self.libraryTargetView addSubview:self.searchField]; // On top
@@ -311,10 +309,15 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
             [self.searchField.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor
                                                            constant:-spacing],
 
-            [contentView.topAnchor constraintEqualToAnchor:self.libraryTargetView.topAnchor],
-            [contentView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
-            [contentView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
-            [contentView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
+            [self.collectionViewScrollView.topAnchor constraintEqualToAnchor:self.libraryTargetView.topAnchor],
+            [self.collectionViewScrollView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
+            [self.collectionViewScrollView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
+            [self.collectionViewScrollView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
+
+            [self.tableViewScrollView.topAnchor constraintEqualToAnchor:self.libraryTargetView.topAnchor],
+            [self.tableViewScrollView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
+            [self.tableViewScrollView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
+            [self.tableViewScrollView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
 
             [self.spinner.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
             [self.spinner.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor],
@@ -328,7 +331,8 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
         return;
     }
 
-    contentView.hidden = !showResults;
+    self.collectionViewScrollView.hidden = !(showResults && gridMode);
+    self.tableViewScrollView.hidden = !(showResults && !gridMode);
     self.statusLabel.hidden = showResults || isSearching;
     if (!self.statusLabel.hidden) {
         self.statusLabel.stringValue = hasSearchText
