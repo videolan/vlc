@@ -272,13 +272,13 @@ DISTCLEAN_PKG += m4-$(M4_VERSION).tar.gz
 
 # pkg-config
 
-pkg-config-$(PKGCFG_VERSION).tar.gz:
-	$(call download_pkg,$(PKGCFG_URL),pkgconfiglite)
+pkg-config-$(PKGCONFIG_VERSION).tar.gz:
+	$(call download_pkg,$(PKGCONFIG_URL),pkgconfiglite)
 
 .getpkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
-pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
+pkgconfig: pkg-config-$(PKGCONFIG_VERSION).tar.gz
 	$(UNPACK)
-	mv pkg-config-lite-$(PKGCFG_VERSION) pkg-config-$(PKGCFG_VERSION)
+	mv pkg-config-lite-$(PKGCONFIG_VERSION) pkg-config-$(PKGCONFIG_VERSION)
 	$(APPLY) $(TOOLS)/pkg-config-stdc23-port.patch
 	$(MOVE)
 
@@ -290,7 +290,7 @@ pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 
 CLEAN_FILE += .buildpkg-config
 CLEAN_PKG += pkgconfig
-DISTCLEAN_PKG += pkg-config-$(PKGCFG_VERSION).tar.gz
+DISTCLEAN_PKG += pkg-config-$(PKGCONFIG_VERSION).tar.gz
 
 # gas-preprocessor
 gas-preprocessor-$(GAS_VERSION).tar.gz:
