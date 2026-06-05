@@ -285,4 +285,6 @@ all: $TARGETS
 	@echo "You are ready to build VLC and its contribs"
 
 include \$(TOOLS)/tools.mak
+
+fetch: $(echo $TARGETS | sed 's/.build/.get/g')
 EOF
