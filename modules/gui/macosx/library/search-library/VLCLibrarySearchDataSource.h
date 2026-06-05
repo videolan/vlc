@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, weak) NSCollectionView *collectionView;
 @property (readwrite, weak) NSTableView *tableView;
+@property (readonly) BOOL searching;
 
 - (void)searchForString:(NSString *)string;
 - (void)clearSearch;

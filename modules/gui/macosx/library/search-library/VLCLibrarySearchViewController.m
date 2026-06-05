@@ -101,6 +101,11 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     self.statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     self.statusLabel.font = NSFont.VLClibrarySectionHeaderFont;
     self.statusLabel.alignment = NSTextAlignmentCenter;
+
+    _spinner = [[NSProgressIndicator alloc] init];
+    self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
+    self.spinner.style = NSProgressIndicatorStyleSpinning;
+    self.spinner.displayedWhenStopped = NO;
 }
 
 - (void)setupCollectionView
@@ -258,14 +263,9 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
         : self.tableViewScrollView;
 
     const BOOL hasSearchText = self.searchField.stringValue.length > 0;
+    const BOOL isSearching = self.dataSource.searching;
     const BOOL hasResults = hasSearchText && [self hasAnyResults];
-    const BOOL showResults = hasSearchText && hasResults;
-
-    if (!hasSearchText) {
-        self.statusLabel.stringValue = _NS("Search your library");
-    } else if (!hasResults) {
-        self.statusLabel.stringValue = _NS("No results");
-    }
+    const BOOL showResults = hasSearchText && hasResults && !isSearching;
 
     self.libraryTargetView.subviews = @[];
     [self.libraryTargetView addSubview:self.searchField];
@@ -286,6 +286,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     ]];
 
     if (showResults) {
+        [self.spinner stopAnimation:nil];
         [self.libraryTargetView addSubview:contentView];
         [constraints addObjectsFromArray:@[
             [contentView.topAnchor constraintEqualToAnchor:self.searchField.bottomAnchor
@@ -294,7 +295,18 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
             [contentView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
             [contentView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
         ]];
+    } else if (isSearching) {
+        [self.spinner startAnimation:nil];
+        [self.libraryTargetView addSubview:self.spinner];
+        [constraints addObjectsFromArray:@[
+            [self.spinner.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
+            [self.spinner.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor],
+        ]];
     } else {
+        [self.spinner stopAnimation:nil];
+        self.statusLabel.stringValue = hasSearchText
+            ? _NS("No results")
+            : _NS("Search your library");
         [self.libraryTargetView addSubview:self.statusLabel];
         [constraints addObjectsFromArray:@[
             [self.statusLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
@@ -345,6 +357,7 @@ static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
     }
 
     [self.dataSource searchForString:searchString];
+    [self presentSearchView];
 }
 
 @end

@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibrarySearchDataSource *dataSource;
 @property (readonly) NSSearchField *searchField;
 @property (readonly) NSTextField *statusLabel;
+@property (readonly) NSProgressIndicator *spinner;
 @property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) VLCLibraryCollectionView *collectionView;
 @property (readonly) NSScrollView *tableViewScrollView;

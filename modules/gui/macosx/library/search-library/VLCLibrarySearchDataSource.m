@@ -83,6 +83,7 @@
     NSArray<NSNumber *> *_visibleProviderIndices;
     NSArray<VLCLibrarySearchFlattenedRow *> *_flattenedRows;
     NSMutableDictionary<NSString *, VLCMediaLibraryDummyItem *> *_cachedProviderParentItems;
+    NSUInteger _pendingProviderCount;
 }
 @end
 
@@ -116,6 +117,12 @@
 
 - (void)providerResultsUpdated:(NSNotification *)notification
 {
+    if (_pendingProviderCount > 0) {
+        _pendingProviderCount--;
+    }
+    if (_pendingProviderCount == 0) {
+        _searching = NO;
+    }
     [self reloadData];
 }
 
@@ -123,6 +130,8 @@
 
 - (void)searchForString:(NSString *)string
 {
+    _pendingProviderCount = _providers.count;
+    _searching = YES;
     for (VLCLibrarySearchProvider * const provider in _providers) {
         [provider searchForString:string];
     }
@@ -130,6 +139,8 @@
 
 - (void)clearSearch
 {
+    _pendingProviderCount = 0;
+    _searching = NO;
     for (VLCLibrarySearchProvider * const provider in _providers) {
         [provider clearSearch];
     }
