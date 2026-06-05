@@ -157,11 +157,11 @@ public:
     /**
      * Start the task on the thread pool
      */
-    void start(QThreadPool &threadPool)
+    void start(QThreadPool &threadPool, int priority = 0)
     {
         m_threadPool = &threadPool;
         m_runnable = std::make_unique<Runnable>(this);
-        threadPool.start(&*m_runnable);
+        threadPool.start(&*m_runnable, priority);
     }
 
     /**
