@@ -50,6 +50,57 @@
 
 struct vlc_gl_sampler;
 
+struct vlc_gl_sampler_ops {
+    /**
+     * Callback to fetch locations of uniform or attribute variables
+     *
+     * This function pointer cannot be NULL. This callback is called one time
+     * after the program is linked.
+     *
+     * \param sampler the sampler
+     * \param program the linked GL program handle
+     */
+    void (*fetch_locations)(struct vlc_gl_sampler *sampler, uint32_t program);
+
+    /**
+     * Callback to load sampler data
+     *
+     * This function pointer cannot be NULL. This callback can be used to
+     * specify values of uniform variables.
+     *
+     * \param sampler the sampler
+     */
+    void (*load)(struct vlc_gl_sampler *sampler);
+
+    /**
+     * Update the input picture
+     *
+     * \param sampler the sampler
+     * \param picture the OpenGL picture
+     * \return VLC_SUCCESS or a VLC error
+     */
+    int (*update)(struct vlc_gl_sampler *sampler,
+                  const struct vlc_gl_picture *picture);
+
+    /**
+     * Select the plane to expose
+     *
+     * If the sampler exposes planes separately (for plane filters), select the
+     * plane to expose via the GLSL function vlc_texture().
+     *
+     * \param sampler the sampler
+     * \param plane the plane number
+     */
+    void (*select_plane)(struct vlc_gl_sampler *sampler, unsigned plane);
+
+    /**
+     * Close the sampler, releasing resources
+     *
+     * \param sampler the sampler
+     */
+    void (*close)(struct vlc_gl_sampler *sampler);
+};
+
 struct vlc_gl_api;
 
 /**
@@ -133,5 +184,30 @@ struct vlc_gl_sampler {
 
     const struct vlc_gl_sampler_ops *ops;
 };
+
+static inline void
+vlc_gl_sampler_FetchLocations(struct vlc_gl_sampler *sampler, uint32_t program)
+{
+    sampler->ops->fetch_locations(sampler, program);
+}
+
+static inline void
+vlc_gl_sampler_Load(struct vlc_gl_sampler *sampler)
+{
+    sampler->ops->load(sampler);
+}
+
+static inline int
+vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler,
+                      const struct vlc_gl_picture *picture)
+{
+    return sampler->ops->update(sampler, picture);
+}
+
+static inline void
+vlc_gl_sampler_SelectPlane(struct vlc_gl_sampler *sampler, unsigned plane)
+{
+    sampler->ops->select_plane(sampler, plane);
+}
 
 #endif /* VLC_GL_SAMPLER_H */
