@@ -21,10 +21,6 @@ vlc_modules += {
 }
 
 ## Vulkan
-vulkan_dep = dependency('vulkan',
-                        version: '>= 1.0.26',
-                        required: get_option('vulkan'))
-
 if vulkan_dep.found()
     vlc_modules += {
         'name' : 'placebo_vk',

@@ -24,6 +24,9 @@ egl_dep = dependency('egl', required: false)
 # Declared here so it's available in opengl subdir for egl_display_gbm
 drm_dep = dependency('libdrm', version: '>= 2.4.83', required: get_option('drm'))
 
+# Declared here, as it's used by both the libplacebo and wayland subfolders
+vulkan_dep = dependency('vulkan', version: '>= 1.0.26', required: get_option('vulkan'))
+
 if host_system == 'darwin'
     subdir('apple')
 

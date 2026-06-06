@@ -144,3 +144,11 @@ if egl_dep.found()
         }
     endif
 endif
+
+vlc_modules += {
+    'name': 'vk_wl',
+    'sources': files('vulkan.c', '../vulkan/platform.h'),
+    'c_args': ['-DVK_USE_PLATFORM_WAYLAND_KHR'],
+    'dependencies': [wayland_client_dep, vulkan_dep],
+    'enabled': vulkan_dep.found(),
+}
