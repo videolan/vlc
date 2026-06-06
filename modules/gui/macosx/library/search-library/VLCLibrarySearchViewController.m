@@ -285,7 +285,7 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
     const BOOL hasSearchText = self.searchField.stringValue.length > 0;
     const BOOL isSearching = self.dataSource.searching;
     const BOOL hasResults = hasSearchText && [self hasAnyResults];
-    const BOOL showResults = hasSearchText && hasResults && !isSearching;
+    const BOOL showResults = hasResults && !isSearching;
 
     // Add all views once, then toggle visibility
     if (self.searchField.superview != self.libraryTargetView) {
