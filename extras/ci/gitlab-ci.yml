@@ -385,11 +385,12 @@ debian-meson:
             # Note: qt generated files need to be remove from the report since their
             # coverage should not be checked. It leads to gcovr having trouble
             # parsing the coverage otherwise.
-            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j$NCPU --gcov-ignore-parse-errors=negative_hits.warn_once_per_file --exclude "build-meson/modules/gui/qt/.*_qrc.cpp" --exclude "build-meson/modules/gui/qt/.*_assets.cpp"
+            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j$NCPU --merge-mode-functions=separate --gcov-ignore-parse-errors=negative_hits.warn_once_per_file --exclude "build-meson/modules/gui/qt/.*_qrc.cpp" --exclude "build-meson/modules/gui/qt/.*_assets.cpp"
 
         - mkdir html-coverage
         - >
             gcovr --add-tracefile "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json"
+            --merge-mode-functions=separate
             --xml="cobertura.xml"
             --html="html-coverage/vlc.html"
             --html-details -s -j$NCPU
