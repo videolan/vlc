@@ -345,8 +345,11 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
 
             that->m_syltRaw.reset();
             that->m_syltLyrics.reset();
+            that->m_currentLyricIndex = -1;
             emit that->q_func()->hasLyricsChanged(false);
             emit that->q_func()->syltLyricsChanged();
+            emit that->q_func()->currentLyricIndexChanged(-1);
+            emit that->q_func()->currentLyricChanged();
             emit that->q_func()->inputChanged(false);
         });
         return;
@@ -358,8 +361,11 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
 
         that->m_syltRaw.reset();
         that->m_syltLyrics.reset();
+        that->m_currentLyricIndex = -1;
         emit q->hasLyricsChanged(false);
         emit q->syltLyricsChanged();
+        emit q->currentLyricIndexChanged(-1);
+        emit q->currentLyricChanged();
 
         that->UpdateArt( newMediaPtr.get() );
         that->UpdateMeta( newMediaPtr.get() );
@@ -456,12 +462,15 @@ static void on_player_state_changed(vlc_player_t *, enum vlc_player_state state,
             emit q->infoChanged( NULL );
             emit q->currentMetaChanged( (input_item_t *)NULL );
 
-            if (that->m_syltRaw)
+            if (that->m_syltRaw || that->m_currentLyricIndex != -1)
             {
                 that->m_syltRaw.reset();
                 that->m_syltLyrics.reset();
+                that->m_currentLyricIndex = -1;
                 emit q->hasLyricsChanged( false );
                 emit q->syltLyricsChanged();
+                emit q->currentLyricIndexChanged( -1 );
+                emit q->currentLyricChanged();
             }
 
             that->m_hasPrograms =false;
@@ -1857,6 +1866,27 @@ void PlayerController::updateTime(vlc_tick_t system_now, bool forceUpdate)
         d->m_remainingTime = VLCDuration();
     emit remainingTimeChanged(d->m_remainingTime);
 
+    if (d->m_syltRaw.has_value() && d->m_time.valid())
+    {
+        const auto& lyrics = d->syltLyrics();
+        int currentIndex = -1;
+        const vlc_tick_t currentTime = d->m_time.toVLCTick();
+
+        for (int i = 0; i < lyrics.size(); ++i)
+        {
+            if (lyrics[i].time().toVLCTick() > currentTime)
+                break;
+            currentIndex = i;
+        }
+
+        if (currentIndex != d->m_currentLyricIndex)
+        {
+            d->m_currentLyricIndex = currentIndex;
+            emit currentLyricIndexChanged( currentIndex );
+            emit currentLyricChanged();
+        }
+    }
+
     if (system_now != VLC_TICK_INVALID
      && d->m_player_time.system_date != VLC_TICK_MAX
      && (forceUpdate || !d->m_time_timer.isActive()))
@@ -2242,6 +2272,17 @@ PRIMITIVETYPE_GETTER(QString, getAlbum, m_album)
 PRIMITIVETYPE_GETTER(QUrl, getArtwork, m_artwork)
 PRIMITIVETYPE_GETTER(QUrl, getUrl, m_url)
 
+TimedText PlayerController::getCurrentLyric() const
+{
+    Q_D(const PlayerController);
+    if (d->m_currentLyricIndex < 0)
+        return {};
+    const auto& lyrics = d->syltLyrics();
+    if (d->m_currentLyricIndex >= lyrics.size())
+        return {};
+    return lyrics[d->m_currentLyricIndex];
+}
+
 bool PlayerController::hasLyrics() const
 {
     Q_D(const PlayerController);
@@ -2252,6 +2293,12 @@ QList<TimedText> PlayerController::getSyltLyrics() const
 {
     Q_D(const PlayerController);
     return d->syltLyrics();
+}
+
+int PlayerController::getCurrentLyricIndex() const
+{
+    Q_D(const PlayerController);
+    return d->m_currentLyricIndex;
 }
 
 #undef PRIMITIVETYPE_GETTER

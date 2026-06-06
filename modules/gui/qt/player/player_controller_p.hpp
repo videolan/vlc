@@ -207,6 +207,7 @@ public:
 
     mutable std::optional<QPair<QByteArray, size_t>> m_syltRaw;
     mutable std::optional<QList<TimedText>> m_syltLyrics;
+    int m_currentLyricIndex = -1;
 };
 
 #endif /* QVLC_INPUT_MANAGER_P_H_ */
