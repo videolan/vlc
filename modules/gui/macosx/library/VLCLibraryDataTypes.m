@@ -34,10 +34,14 @@
 NSString * const VLCMediaLibraryMediaItemPasteboardType = @"VLCMediaLibraryMediaItemPasteboardType";
 NSString * const VLCMediaLibraryMediaItemUTI = @"org.videolan.vlc.VLCMediaLibraryMediaItem";
 
+const CGFloat VLCMediaLibrary8KWidth = 7680.;
+const CGFloat VLCMediaLibrary8KHeight = 4320.;
 const CGFloat VLCMediaLibrary4KWidth = 3840.;
 const CGFloat VLCMediaLibrary4KHeight = 2160.;
-const CGFloat VLCMediaLibrary720pWidth = 1280.;
-const CGFloat VLCMediaLibrary720pHeight = 720.;
+const CGFloat VLCMediaLibrary1080pWidth = 1920.;
+const CGFloat VLCMediaLibrary1080pHeight = 1080.;
+const CGFloat VLCMediaLibrary540pWidth = 960.;
+const CGFloat VLCMediaLibrary540pHeight = 540.;
 const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
 
 NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryID";

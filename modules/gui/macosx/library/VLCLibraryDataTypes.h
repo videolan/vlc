@@ -34,10 +34,14 @@ extern NSString * const VLCMediaLibraryMediaItemUTI;
 @class VLCMediaLibraryGenre;
 @class VLCInputItem;
 
+extern const CGFloat VLCMediaLibrary8KWidth;
+extern const CGFloat VLCMediaLibrary8KHeight;
 extern const CGFloat VLCMediaLibrary4KWidth;
 extern const CGFloat VLCMediaLibrary4KHeight;
-extern const CGFloat VLCMediaLibrary720pWidth;
-extern const CGFloat VLCMediaLibrary720pHeight;
+extern const CGFloat VLCMediaLibrary1080pWidth;
+extern const CGFloat VLCMediaLibrary1080pHeight;
+extern const CGFloat VLCMediaLibrary540pWidth;
+extern const CGFloat VLCMediaLibrary540pHeight;
 extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 vlc_medialibrary_t * _Nullable getMediaLibrary(void);
