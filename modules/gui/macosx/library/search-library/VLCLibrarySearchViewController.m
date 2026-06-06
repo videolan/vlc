@@ -27,6 +27,7 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
+#import "extensions/NSScrollView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
@@ -167,21 +168,15 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
 
     const CGFloat searchFieldAreaHeight =
         self.searchField.intrinsicContentSize.height + VLCLibraryUIUnits.largeSpacing * 2;
+    NSEdgeInsets collectionViewContentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    collectionViewContentInsets.top += searchFieldAreaHeight;
 
-    _collectionViewScrollView = [[NSScrollView alloc] init];
-    self.collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.collectionViewScrollView.hasHorizontalScroller = NO;
-    self.collectionViewScrollView.borderType = NSNoBorder;
-    self.collectionViewScrollView.documentView = self.collectionView;
-    self.collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _collectionViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.collectionView
+                                                                  contentInsets:collectionViewContentInsets];
 
-    NSEdgeInsets collectionInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    collectionInsets.top += searchFieldAreaHeight;
-    self.collectionViewScrollView.contentInsets = collectionInsets;
-
-    NSEdgeInsets collectionScrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-    collectionScrollerInsets.top -= searchFieldAreaHeight;
-    self.collectionViewScrollView.scrollerInsets = collectionScrollerInsets;
+    NSEdgeInsets collectionViewScrollerInsets = self.collectionViewScrollView.scrollerInsets;
+    collectionViewScrollerInsets.top -= searchFieldAreaHeight;
+    self.collectionViewScrollView.scrollerInsets = collectionViewScrollerInsets;
 }
 
 - (void)setupTableView
@@ -205,23 +200,17 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
     _tableViewDelegate = [[VLCLibrarySectionedTableViewDelegate alloc] init];
     self.tableView.delegate = self.tableViewDelegate;
 
-    _tableViewScrollView = [[NSScrollView alloc] init];
-    self.tableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.tableViewScrollView.hasHorizontalScroller = NO;
-    self.tableViewScrollView.borderType = NSNoBorder;
-    self.tableViewScrollView.documentView = self.tableView;
-    self.tableViewScrollView.automaticallyAdjustsContentInsets = NO;
-
     const CGFloat searchFieldAreaHeight =
         self.searchField.intrinsicContentSize.height + VLCLibraryUIUnits.largeSpacing * 2;
+    NSEdgeInsets tableViewContentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    tableViewContentInsets.top += searchFieldAreaHeight;
 
-    NSEdgeInsets tableInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    tableInsets.top += searchFieldAreaHeight;
-    self.tableViewScrollView.contentInsets = tableInsets;
+    _tableViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.tableView
+                                                             contentInsets:tableViewContentInsets];
 
-    NSEdgeInsets tableScrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-    tableScrollerInsets.top -= searchFieldAreaHeight;
-    self.tableViewScrollView.scrollerInsets = tableScrollerInsets;
+    NSEdgeInsets tableViewScrollerInsets = self.tableViewScrollView.scrollerInsets;
+    tableViewScrollerInsets.top -= searchFieldAreaHeight;
+    self.tableViewScrollView.scrollerInsets = tableViewScrollerInsets;
 }
 
 - (void)setupPlaceholderView

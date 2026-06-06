@@ -23,8 +23,9 @@
 #import "VLCLibraryPlaylistViewController.h"
 
 #import "extensions/NSImage+VLCAdditions.h"
-#import "extensions/NSView+VLCAdditions.h"
+#import "extensions/NSScrollView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
@@ -112,16 +113,10 @@
 - (void)setupPlaylistCollectionView
 {
     _libraryView = [[NSView alloc] init];
-    _collectionViewScrollView = 
-        [[NSScrollView alloc] initWithFrame:self.libraryWindow.libraryTargetView.frame];
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionView = [[VLCLibraryCollectionView alloc] init];
 
-    _collectionViewScrollView.documentView = _collectionView;
-    _collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _collectionViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    _collectionViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    _collectionViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:_collectionView];
 
     _collectionView.delegate = _collectionViewDelegate;
     _collectionView.collectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
@@ -134,8 +129,6 @@
 
 - (void)setupPlaylistTableView
 {
-    _masterTableViewScrollView = [[NSScrollView alloc] init];
-    _detailTableViewScrollView = [[NSScrollView alloc] init];
     _tableViewDelegate = [[VLCLibraryMasterDetailViewTableViewDelegate alloc] init];
     _masterTableView = [[VLCLibraryTableView alloc] init];
     _detailTableView = [[VLCLibraryTableView alloc] init];
@@ -143,29 +136,12 @@
 
     self.dataSource.headerDelegate = _tableViewDelegate;
 
-    self.masterTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.detailTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.listViewSplitView.translatesAutoresizingMaskIntoConstraints = NO;
     self.masterTableView.translatesAutoresizingMaskIntoConstraints = NO;
     self.detailTableView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-
-    self.masterTableViewScrollView.hasHorizontalScroller = NO;
-    self.masterTableViewScrollView.borderType = NSNoBorder;
-    self.masterTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.masterTableViewScrollView.contentInsets = defaultInsets;
-    self.masterTableViewScrollView.scrollerInsets = scrollerInsets;
-
-    self.detailTableViewScrollView.hasHorizontalScroller = NO;
-    self.detailTableViewScrollView.borderType = NSNoBorder;
-    self.detailTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.detailTableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewDetailListContentInsets;
-    self.detailTableViewScrollView.scrollerInsets = scrollerInsets;
-
-    self.masterTableViewScrollView.documentView = self.masterTableView;
-    self.detailTableViewScrollView.documentView = self.detailTableView;
+    _masterTableViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.masterTableView];
+    _detailTableViewScrollView = [NSScrollView libraryDetailScrollViewWithDocumentView:self.detailTableView];
 
     self.listViewSplitView.vertical = YES;
     self.listViewSplitView.dividerStyle = NSSplitViewDividerStyleThin;

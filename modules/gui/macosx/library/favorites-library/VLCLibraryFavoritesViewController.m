@@ -23,8 +23,9 @@
 #import "VLCLibraryFavoritesViewController.h"
 
 #import "extensions/NSImage+VLCAdditions.h"
-#import "extensions/NSView+VLCAdditions.h"
+#import "extensions/NSScrollView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -95,11 +96,8 @@
 {
     _favoritesLibraryView = [[NSView alloc] init];
     _favoritesLibrarySplitView = [[NSSplitView alloc] init];
-    _favoritesLibraryCollectionViewScrollView = [[NSScrollView alloc] init];
     _favoritesLibraryCollectionView = [[VLCLibraryCollectionView alloc] init];
-    _favoritesLibraryGroupSelectionTableViewScrollView = [[NSScrollView alloc] init];
     _favoritesLibraryGroupSelectionTableView = [[VLCLibraryTableView alloc] init];
-    _favoritesLibraryGroupsTableViewScrollView = [[NSScrollView alloc] init];
     _favoritesLibraryGroupsTableView = [[VLCLibraryTableView alloc] init];
 }
 
@@ -147,15 +145,9 @@
 
 - (void)setupCollectionView
 {
-    self.favoritesLibraryCollectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    _favoritesLibraryCollectionViewScrollView =
+        [NSScrollView libraryScrollViewWithDocumentView:self.favoritesLibraryCollectionView];
     self.favoritesLibraryCollectionView.translatesAutoresizingMaskIntoConstraints = NO;
-
-    self.favoritesLibraryCollectionViewScrollView.hasHorizontalScroller = NO;
-    self.favoritesLibraryCollectionViewScrollView.borderType = NSNoBorder;
-    self.favoritesLibraryCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.favoritesLibraryCollectionViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    self.favoritesLibraryCollectionViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-    self.favoritesLibraryCollectionViewScrollView.documentView = self.favoritesLibraryCollectionView;
 
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     
@@ -234,28 +226,12 @@
 - (void)setupFavoritesLibraryViews
 {
     self.favoritesLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.favoritesLibraryGroupsTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.favoritesLibraryGroupSelectionTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.favoritesLibrarySplitView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-
-    self.favoritesLibraryGroupsTableViewScrollView.hasHorizontalScroller = NO;
-    self.favoritesLibraryGroupsTableViewScrollView.borderType = NSNoBorder;
-    self.favoritesLibraryGroupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.favoritesLibraryGroupsTableViewScrollView.contentInsets = defaultInsets;
-    self.favoritesLibraryGroupsTableViewScrollView.scrollerInsets = scrollerInsets;
-
-    self.favoritesLibraryGroupSelectionTableViewScrollView.hasHorizontalScroller = NO;
-    self.favoritesLibraryGroupSelectionTableViewScrollView.borderType = NSNoBorder;
-    self.favoritesLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.favoritesLibraryGroupSelectionTableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewDetailListContentInsets;
-    self.favoritesLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
-    self.favoritesLibraryGroupSelectionTableViewScrollView.hasHorizontalScroller = NO;
-
-    self.favoritesLibraryGroupsTableViewScrollView.documentView = self.favoritesLibraryGroupsTableView;
-    self.favoritesLibraryGroupSelectionTableViewScrollView.documentView = self.favoritesLibraryGroupSelectionTableView;
+    _favoritesLibraryGroupsTableViewScrollView =
+        [NSScrollView libraryScrollViewWithDocumentView:self.favoritesLibraryGroupsTableView];
+    _favoritesLibraryGroupSelectionTableViewScrollView =
+        [NSScrollView libraryDetailScrollViewWithDocumentView:self.favoritesLibraryGroupSelectionTableView];
 
     self.favoritesLibrarySplitView.vertical = YES;
     self.favoritesLibrarySplitView.dividerStyle = NSSplitViewDividerStyleThin;
@@ -266,7 +242,6 @@
 
 - (void)setupFavoritesLibraryContainerView
 {
-    self.favoritesLibraryCollectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.favoritesLibrarySplitView.translatesAutoresizingMaskIntoConstraints = NO;
 
     [self.favoritesLibraryView addSubview:self.favoritesLibraryCollectionViewScrollView];

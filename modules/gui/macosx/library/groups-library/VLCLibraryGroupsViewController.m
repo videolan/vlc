@@ -23,6 +23,7 @@
 #import "VLCLibraryGroupsViewController.h"
 
 #import "extensions/NSImage+VLCAdditions.h"
+#import "extensions/NSScrollView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionView.h"
@@ -76,20 +77,10 @@
 
 - (void)setupGridViewModeViews
 {
-    _collectionViewScrollView = [[NSScrollView alloc] init];
     _collectionView = [[VLCLibraryCollectionView alloc] init];
-
-    self.collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.collectionView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    self.collectionViewScrollView.hasHorizontalScroller = NO;
-    self.collectionViewScrollView.borderType = NSNoBorder;
-    self.collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.collectionViewScrollView.contentInsets =
-        VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    self.collectionViewScrollView.scrollerInsets =
-        VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-    self.collectionViewScrollView.documentView = self.collectionView;
+    _collectionViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.collectionView];
 
     const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
     const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
@@ -136,8 +127,6 @@
 
 - (void)setupListViewModeViews
 {
-    _groupsTableViewScrollView = [[NSScrollView alloc] init];
-    _selectedGroupTableViewScrollView = [[NSScrollView alloc] init];
     _tableViewDelegate = [[VLCLibraryMasterDetailViewTableViewDelegate alloc] init];
     _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
     _groupsTableView = [[VLCLibraryTableView alloc] init];
@@ -146,29 +135,12 @@
 
     self.dataSource.headerDelegate = self.tableViewDelegate;
 
-    self.groupsTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.selectedGroupTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.listViewSplitView.translatesAutoresizingMaskIntoConstraints = NO;
     self.groupsTableView.translatesAutoresizingMaskIntoConstraints = NO;
     self.selectedGroupTableView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-
-    self.groupsTableViewScrollView.hasHorizontalScroller = NO;
-    self.groupsTableViewScrollView.borderType = NSNoBorder;
-    self.groupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.groupsTableViewScrollView.contentInsets = defaultInsets;
-    self.groupsTableViewScrollView.scrollerInsets = scrollerInsets;
-
-    self.selectedGroupTableViewScrollView.hasHorizontalScroller = NO;
-    self.selectedGroupTableViewScrollView.borderType = NSNoBorder;
-    self.selectedGroupTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    self.selectedGroupTableViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewDetailListContentInsets;
-    self.selectedGroupTableViewScrollView.scrollerInsets = scrollerInsets;
-
-    self.groupsTableViewScrollView.documentView = self.groupsTableView;
-    self.selectedGroupTableViewScrollView.documentView = self.selectedGroupTableView;
+    _groupsTableViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.groupsTableView];
+    _selectedGroupTableViewScrollView = [NSScrollView libraryDetailScrollViewWithDocumentView:self.selectedGroupTableView];
 
     self.listViewSplitView.vertical = YES;
     self.listViewSplitView.dividerStyle = NSSplitViewDividerStyleThin;
