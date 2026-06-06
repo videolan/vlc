@@ -115,7 +115,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         }
         
         _p_mediaSource->description = localDevicesDescription;
-        _p_mediaSource->tree = calloc(1, sizeof(vlc_media_tree_t));
+        _p_mediaSource->tree = vlc_media_tree_New();
         
         if (_p_mediaSource->tree == NULL) {
             free(_p_mediaSource);
@@ -159,7 +159,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         }
 
         _p_mediaSource->description = myFoldersDescription;
-        _p_mediaSource->tree = calloc(1, sizeof(vlc_media_tree_t));
+        _p_mediaSource->tree = vlc_media_tree_New();
 
         if (_p_mediaSource->tree == NULL) {
             free(_p_mediaSource);
@@ -234,7 +234,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         if (isFileUrl) {
             _category = SD_CAT_MYCOMPUTER;
             _p_mediaSource->description = myFoldersDescription;
-            _p_mediaSource->tree = calloc(1, sizeof(vlc_media_tree_t));
+            _p_mediaSource->tree = vlc_media_tree_New();
 
             BOOL mrlTargetIsDirectory = NO;
             const BOOL mrlTargetExists = [NSFileManager.defaultManager
@@ -264,8 +264,9 @@ static const char *const remoteBrowseDescription = "Remote Browse";
                                                                isFileUrl ? ITEM_LOCAL : ITEM_NET);
 
         if (isFileUrl) {
-            input_item_node_t * const directoryNode = input_item_node_Create(directoryItem);
-            _p_mediaSource->tree->root = *directoryNode;
+            // vlc_media_tree_New already initialised root with empty children;
+            // just set the root item directly.
+            _p_mediaSource->tree->root.p_item = directoryItem;
         } else {
             input_item_node_t * const directoryNode = input_item_node_Create(directoryItem);
             input_item_node_AppendNode(&_p_mediaSource->tree->root, directoryNode);
@@ -289,6 +290,10 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         if (_p_mediaSource->description == localDevicesDescription || _p_mediaSource->description == myFoldersDescription) {
             _p_mediaSource->description = NULL;
 
+            if (_p_mediaSource->tree->root.p_item != NULL) {
+                input_item_Release(_p_mediaSource->tree->root.p_item);
+                _p_mediaSource->tree->root.p_item = NULL;
+            }
             vlc_media_tree_Release(_p_mediaSource->tree);
             free(_p_mediaSource);
             _p_mediaSource = NULL;
