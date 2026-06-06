@@ -27,6 +27,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryRepresentedItem;
+
 @protocol VLCLibraryTableViewDataSource <NSTableViewDataSource, VLCLibraryDataSource>
 
 @property (readonly) VLCMediaLibraryParentGroupType currentParentType;
@@ -37,6 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 - (nullable id<VLCMediaLibraryItemProtocol>)parentItemForTableView:(NSTableView *)tableView;
+- (VLCLibraryRepresentedItem *)representedItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView;
+
 
 @end
 

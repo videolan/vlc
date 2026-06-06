@@ -261,6 +261,20 @@
     return provider.results[flatRow.itemIndex];
 }
 
+- (VLCLibraryRepresentedItem *)representedItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
+{
+    if ([self isHeaderRow:row]) {
+        return [self representedItemForHeaderRow:row];
+    }
+
+    VLCLibrarySearchFlattenedRow * const flatRow = _flattenedRows[row];
+    VLCLibrarySearchProvider * const provider = _providers[flatRow.providerIndex];
+    id<VLCMediaLibraryItemProtocol> const item = provider.results[flatRow.itemIndex];
+
+    return [self representedItemForItem:item atPosition:flatRow.itemIndex fromProvider:provider];
+}
+
 - (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     NSParameterAssert(libraryItem != nil);
