@@ -25,6 +25,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibrarySectionedTableViewDataSource.h"
 
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
@@ -66,6 +67,22 @@
 }
 
 #pragma mark tableview menu delegates
+
+- (NSMenu *)menuForEvent:(NSEvent *)event
+{
+    if (![self.dataSource conformsToProtocol:@protocol(VLCLibrarySectionedTableViewDataSource)]) {
+        return [super menuForEvent:event];
+    }
+
+    const NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    const NSInteger row = [self rowAtPoint:point];
+    NSObject<VLCLibrarySectionedTableViewDataSource> * const sectionedDataSource =
+        (NSObject<VLCLibrarySectionedTableViewDataSource> *)self.dataSource;
+    if (row < 0 || row >= self.numberOfRows || [sectionedDataSource isHeaderRow:row]) {
+        return nil;
+    }
+    return [super menuForEvent:event];
+}
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
