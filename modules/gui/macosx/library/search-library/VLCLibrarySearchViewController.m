@@ -28,6 +28,7 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
@@ -301,6 +302,9 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
         [self.libraryTargetView addSubview:self.statusLabel];
         [self.libraryTargetView addSubview:self.searchField]; // On top
 
+        [self.collectionViewScrollView applyConstraintsToFillSuperview];
+        [self.tableViewScrollView applyConstraintsToFillSuperview];
+
         [NSLayoutConstraint activateConstraints:@[
             [self.searchField.topAnchor constraintEqualToAnchor:topAnchor
                                                       constant:spacing],
@@ -308,16 +312,6 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
                                                           constant:spacing],
             [self.searchField.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor
                                                            constant:-spacing],
-
-            [self.collectionViewScrollView.topAnchor constraintEqualToAnchor:self.libraryTargetView.topAnchor],
-            [self.collectionViewScrollView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
-            [self.collectionViewScrollView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
-            [self.collectionViewScrollView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
-
-            [self.tableViewScrollView.topAnchor constraintEqualToAnchor:self.libraryTargetView.topAnchor],
-            [self.tableViewScrollView.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor],
-            [self.tableViewScrollView.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor],
-            [self.tableViewScrollView.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
 
             [self.spinner.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
             [self.spinner.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor],
