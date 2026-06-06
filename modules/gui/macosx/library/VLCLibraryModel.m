@@ -1093,7 +1093,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         if (audioIndex != NSNotFound) {
             // Found in audio cache - create mutable copies for modification
-            NSMutableArray * const recentsMutable = self.cachedRecentMedia.mutableCopy;
             NSMutableArray * const recentAudiosMutable = self.cachedRecentAudioMedia.mutableCopy;
             NSMutableArray * const audioMutable = self.cachedAudioMedia.mutableCopy;
 
