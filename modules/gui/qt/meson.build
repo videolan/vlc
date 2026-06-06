@@ -720,6 +720,7 @@ qml_modules += {
    'sources': files(
        'player/qml/ControlBar.qml',
        'player/qml/PlaybackSpeed.qml',
+       'player/qml/LyricsFlickable.qml',
        'player/qml/MiniPlayer.qml',
        'player/qml/PIPPlayer.qml',
        'player/qml/Player.qml',
