@@ -131,6 +131,7 @@ class MainCtx : public QObject
     Q_PROPERTY(VideoSurfaceProvider* videoSurfaceProvider READ getVideoSurfaceProvider WRITE setVideoSurfaceProvider NOTIFY hasEmbededVideoChanged FINAL)
     Q_PROPERTY(int mouseHideTimeout READ mouseHideTimeout NOTIFY mouseHideTimeoutChanged FINAL)
     Q_PROPERTY(bool albumSections READ albumSections WRITE setAlbumSections NOTIFY albumSectionsChanged FINAL)
+    Q_PROPERTY(bool lyricsMode READ lyricsMode WRITE setLyricsMode NOTIFY lyricsModeChanged FINAL)
     Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
     Q_PROPERTY(MainInterfaceModes mainInterfaceModes READ getMainInterfaceModes NOTIFY mainInterfaceModesChanged FINAL)
     Q_PROPERTY(MainInterfaceMode effectiveMainInterfaceMode READ getEffectiveMainInterfaceMode NOTIFY mainInterfaceModesChanged FINAL)
@@ -237,6 +238,7 @@ public:
     inline bool hasGridView() const { return m_gridView; }
     inline Grouping grouping() const { return m_grouping; }
     inline bool albumSections() const { return m_albumSections; }
+    inline bool lyricsMode() const { return m_lyricsMode; }
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
     bool hasVLM() const;
     bool useClientSideDecoration() const;
@@ -478,6 +480,8 @@ protected:
 
     bool m_albumSections = true;
 
+    bool m_lyricsMode = true;
+
     OsType m_osName;
     int m_osVersion;
 
@@ -509,6 +513,7 @@ public slots:
     void setGridView( bool );
     void setGrouping( Grouping );
     void setAlbumSections( bool );
+    void setLyricsMode( bool );
     void incrementIntfUserScaleFactor( bool increment);
     void setIntfUserScaleFactor( double );
     void setHasToolbarMenu( bool );
@@ -561,6 +566,7 @@ signals:
     void hasGridListModeChanged( bool );
     void groupingChanged( Grouping );
     void albumSectionsChanged( bool );
+    void lyricsModeChanged( bool );
     void colorSchemeChanged( QString );
     void useClientSideDecorationChanged();
     void hasToolbarMenuChanged();

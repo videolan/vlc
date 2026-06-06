@@ -328,6 +328,11 @@ MainCtx::~MainCtx()
         settings->setValue( "grouping", m_grouping );
     
         settings->setValue( "color-scheme-index", m_colorScheme->currentIndex() );
+
+        settings->setValue( "album-sections", m_albumSections );
+
+        settings->setValue( "lyrics-mode", m_lyricsMode );
+
         /* Save the stackCentralW sizes */
         settings->endGroup();
     }
@@ -481,6 +486,8 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
     loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainCtx::showRemainingTimeChanged);
 
     loadFromSettings(m_albumSections, "MainWindow/album-sections", true, &MainCtx::albumSectionsChanged);
+
+    loadFromSettings(m_lyricsMode, "MainWindow/lyrics-mode", true, &MainCtx::lyricsModeChanged);
 
     const auto colorSchemeIndex = getSettings()->value( "MainWindow/color-scheme-index", 0 ).toInt();
     m_colorScheme->setCurrentIndex(colorSchemeIndex);
@@ -745,6 +752,15 @@ void MainCtx::setAlbumSections(bool enabled)
 
     m_albumSections = enabled;
     emit albumSectionsChanged(enabled);
+}
+
+void MainCtx::setLyricsMode(bool enabled)
+{
+    if (m_lyricsMode == enabled)
+        return;
+
+    m_lyricsMode = enabled;
+    emit lyricsModeChanged(enabled);
 }
 
 void MainCtx::setInterfaceAlwaysOnTop( bool on_top )
