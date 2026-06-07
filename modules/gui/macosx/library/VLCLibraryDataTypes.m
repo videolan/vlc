@@ -245,6 +245,16 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _sourceAspectRatioDenominator = p_track->v.i_sarDen;
         _frameRate = p_track->v.i_fpsNum;
         _frameRateDenominator = p_track->v.i_fpsDen;
+
+        if (_videoWidth >= VLCMediaLibrary8KWidth || _videoHeight >= VLCMediaLibrary8KHeight) {
+            _resolutionLabel = _NS("8K");
+        } else if (_videoWidth >= VLCMediaLibrary4KWidth || _videoHeight >= VLCMediaLibrary4KHeight) {
+            _resolutionLabel = _NS("4K");
+        } else if (_videoWidth >= VLCMediaLibrary1080pWidth || _videoHeight >= VLCMediaLibrary1080pHeight) {
+            _resolutionLabel = _NS("HD");
+        } else if (_videoWidth >= VLCMediaLibrary540pWidth || _videoHeight >= VLCMediaLibrary540pHeight) {
+            _resolutionLabel = _NS("SD");
+        }
     }
     return self;
 }

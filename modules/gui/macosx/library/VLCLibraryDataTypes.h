@@ -34,14 +34,6 @@ extern NSString * const VLCMediaLibraryMediaItemUTI;
 @class VLCMediaLibraryGenre;
 @class VLCInputItem;
 
-extern const CGFloat VLCMediaLibrary8KWidth;
-extern const CGFloat VLCMediaLibrary8KHeight;
-extern const CGFloat VLCMediaLibrary4KWidth;
-extern const CGFloat VLCMediaLibrary4KHeight;
-extern const CGFloat VLCMediaLibrary1080pWidth;
-extern const CGFloat VLCMediaLibrary1080pHeight;
-extern const CGFloat VLCMediaLibrary540pWidth;
-extern const CGFloat VLCMediaLibrary540pHeight;
 extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 vlc_medialibrary_t * _Nullable getMediaLibrary(void);
@@ -88,6 +80,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) NSString *readableCodecName;
 @property (readonly) NSString *language;
 @property (readonly) NSString *trackDescription;
+@property (readonly, nullable) NSString *resolutionLabel;
 @property (readonly) vlc_ml_track_type_t trackType;
 @property (readonly) NSString *readableTrackType;
 @property (readonly) uint32_t bitrate;

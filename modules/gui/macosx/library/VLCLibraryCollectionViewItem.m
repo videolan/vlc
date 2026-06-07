@@ -241,8 +241,11 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO || 
             mediaItem.mediaType == VLC_ML_MEDIA_TYPE_UNKNOWN) {
             VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
-            [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth
-                                      andHeight:videoTrack.videoHeight];
+            NSString * const resolutionLabel = videoTrack.resolutionLabel;
+            if (resolutionLabel) {
+                self.annotationTextField.stringValue = resolutionLabel;
+                self.annotationTextField.hidden = NO;
+            }
             if (!_videoImageViewAspectRatioConstraint.active) {
                 self.imageViewAspectRatioConstraint.active = NO;
                 _videoImageViewAspectRatioConstraint.active = YES;
@@ -270,25 +273,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
             _videoImageViewAspectRatioConstraint.active = NO;
             self.imageViewAspectRatioConstraint.active = YES;
         }
-    }
-}
-
-- (void)showVideoSizeIfNeededForWidth:(CGFloat)width andHeight:(CGFloat)height
-{
-    if (width >= VLCMediaLibrary8KWidth || height >= VLCMediaLibrary8KHeight) {
-        _annotationTextField.stringValue = _NS("8K");
-        _annotationTextField.hidden = NO;
-    } else if (width >= VLCMediaLibrary4KWidth || height >= VLCMediaLibrary4KHeight) {
-        _annotationTextField.stringValue = _NS("4K");
-        _annotationTextField.hidden = NO;
-    } else if (width >= VLCMediaLibrary1080pWidth || height >= VLCMediaLibrary1080pHeight) {
-        _annotationTextField.stringValue = _NS("HD");
-        _annotationTextField.hidden = NO;
-    } else if (width >= VLCMediaLibrary540pWidth || height >= VLCMediaLibrary540pHeight) {
-        _annotationTextField.stringValue = _NS("SD");
-        _annotationTextField.hidden = NO;
-    } else {
-        _annotationTextField.hidden = YES;
     }
 }
 
