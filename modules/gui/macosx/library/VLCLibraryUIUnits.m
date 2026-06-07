@@ -223,7 +223,12 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     if (@available(macOS 11.0, *)) {
         return libraryWindow.contentView.safeAreaInsets.top;
     }
-    return libraryWindow.titlebarHeight;
+
+    if (libraryWindow.styleMask & NSWindowStyleMaskFullSizeContentView) {
+        return libraryWindow.contentView.frame.size.height - libraryWindow.contentLayoutRect.size.height;
+    }
+
+    return 0;
 }
 
 + (const NSEdgeInsets)libraryViewScrollViewContentInsets

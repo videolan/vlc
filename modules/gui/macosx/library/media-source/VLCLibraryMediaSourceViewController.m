@@ -175,12 +175,7 @@
         [self.mediaSourceView addSubview:self.pathControlGlassEffectView];
 
         NSLayoutYAxisAnchor *topAnchor = self.mediaSourceView.topAnchor;
-        CGFloat topConstant = self.libraryWindow.titlebarHeight;
-
-        if (@available(macOS 11.0, *)) {
-            topAnchor = self.mediaSourceView.safeAreaLayoutGuide.topAnchor;
-            topConstant = 0;
-        }
+        const CGFloat topConstant = VLCLibraryUIUnits.libraryWindowContentSafeTopInset;
 
         _pathControlViewTopConstraintToSuperview =
             [self.pathControlGlassEffectView.topAnchor constraintEqualToAnchor:topAnchor constant:topConstant];
@@ -208,12 +203,7 @@
 #endif
     } else {
         NSLayoutYAxisAnchor *topAnchor = self.mediaSourceView.topAnchor;
-        CGFloat topConstant = self.libraryWindow.titlebarHeight;
-
-        if (@available(macOS 11.0, *)) {
-            topAnchor = self.mediaSourceView.safeAreaLayoutGuide.topAnchor;
-            topConstant = 0;
-        }
+        const CGFloat topConstant = VLCLibraryUIUnits.libraryWindowContentSafeTopInset;
 
         _pathControlViewTopConstraintToSuperview =
             [self.pathControlVisualEffectView.topAnchor constraintEqualToAnchor:topAnchor constant:topConstant];

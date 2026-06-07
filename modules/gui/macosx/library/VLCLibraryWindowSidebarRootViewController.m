@@ -66,14 +66,9 @@
     [self setupPlayQueueTitle];
     [self setupCounterLabel];
 
-    if (@available(macOS 11.0, *)) {
-        NSLayoutConstraint * const newTopConstraint =
-            [self.viewSelector.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor
-                                                        constant:self.topInternalConstraint.constant];
-        newTopConstraint.active = self.topInternalConstraint.active;
-        self.topInternalConstraint.active = NO;
-        self.topInternalConstraint = newTopConstraint;
-    }
+    _topInternalConstraint =
+        [self.viewSelector.topAnchor constraintEqualToAnchor:self.view.topAnchor
+                                                    constant:VLCLibraryUIUnits.libraryWindowContentSafeTopInset + VLCLibraryUIUnits.smallSpacing];
 
     self.mainVideoModeEnabled = NO;
 
@@ -113,14 +108,9 @@
 
     [self.view addSubview:self.playQueueHeaderLabel];
 
-    NSLayoutYAxisAnchor *topAnchor = self.view.topAnchor;
-    if (@available(macOS 11.0, *)) {
-        topAnchor = self.view.safeAreaLayoutGuide.topAnchor;
-    }
-
     _playQueueHeaderTopConstraint = 
-        [self.playQueueHeaderLabel.topAnchor constraintEqualToAnchor:topAnchor
-                                                            constant:VLCLibraryUIUnits.smallSpacing];
+        [self.playQueueHeaderLabel.topAnchor constraintEqualToAnchor:self.view.topAnchor
+                                                            constant:VLCLibraryUIUnits.libraryWindowContentSafeTopInset + VLCLibraryUIUnits.smallSpacing];
     [NSLayoutConstraint activateConstraints:@[
         self.playQueueHeaderTopConstraint,
         [self.playQueueHeaderLabel.bottomAnchor constraintEqualToAnchor:self.targetView.topAnchor
@@ -266,13 +256,8 @@
 
 - (void)updateTopConstraints
 {
-    CGFloat internalTopConstraintConstant = VLCLibraryUIUnits.smallSpacing;
-    if (@available(macOS 11.0, *)) {
-        // Safe area layout guide already accounts for titlebar height
-    } else if (!self.mainVideoModeEnabled && self.libraryWindow.styleMask & NSWindowStyleMaskFullSizeContentView) {
-        // Compensate for full content view window's titlebar height, prevent top being cut off
-        internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
-    }
+    const CGFloat internalTopConstraintConstant =
+        VLCLibraryUIUnits.libraryWindowContentSafeTopInset + VLCLibraryUIUnits.smallSpacing;
     self.topInternalConstraint.constant = internalTopConstraintConstant;
     self.playQueueHeaderTopConstraint.constant = internalTopConstraintConstant;
 }
