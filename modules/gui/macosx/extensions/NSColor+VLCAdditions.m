@@ -65,7 +65,7 @@
 
 + (NSColor *)VLClibraryAnnotationBackgroundColor
 {
-    return [NSColor colorWithRed:0. green:0. blue:0. alpha:.4];
+    return [NSColor colorWithRed:0. green:0. blue:0. alpha:.2];
 }
 
 + (NSColor *)VLClibrarySeparatorLightColor

@@ -41,7 +41,10 @@
 
 + (NSFont *)VLCLibraryItemAnnotationFont
 {
-    return [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
+    if (@available(macOS 11.0, *)) {
+        return [NSFont preferredFontForTextStyle:NSFontTextStyleCaption1 options:@{}];
+    }
+    return [NSFont systemFontOfSize:10 weight:NSFontWeightRegular];
 }
 
 @end
