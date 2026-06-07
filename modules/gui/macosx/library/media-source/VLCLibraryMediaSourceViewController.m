@@ -174,8 +174,16 @@
         [self.pathControlVisualEffectView removeFromSuperview];
         [self.mediaSourceView addSubview:self.pathControlGlassEffectView];
 
+        NSLayoutYAxisAnchor *topAnchor = self.mediaSourceView.topAnchor;
+        CGFloat topConstant = self.libraryWindow.titlebarHeight;
+
+        if (@available(macOS 11.0, *)) {
+            topAnchor = self.mediaSourceView.safeAreaLayoutGuide.topAnchor;
+            topConstant = 0;
+        }
+
         _pathControlViewTopConstraintToSuperview =
-            [self.pathControlGlassEffectView.topAnchor constraintEqualToAnchor:self.mediaSourceView.topAnchor constant:self.libraryWindow.titlebarHeight];
+            [self.pathControlGlassEffectView.topAnchor constraintEqualToAnchor:topAnchor constant:topConstant];
         [NSLayoutConstraint activateConstraints:@[
             [self.pathControlGlassEffectView.leadingAnchor constraintEqualToAnchor:self.mediaSourceView.leadingAnchor constant:VLCLibraryUIUnits.smallSpacing],
             [self.pathControlGlassEffectView.trailingAnchor constraintEqualToAnchor:self.mediaSourceView.trailingAnchor constant:-VLCLibraryUIUnits.smallSpacing],
@@ -199,8 +207,16 @@
         self.pathControlGlassEffectView.contentView = pathControlContainer;
 #endif
     } else {
+        NSLayoutYAxisAnchor *topAnchor = self.mediaSourceView.topAnchor;
+        CGFloat topConstant = self.libraryWindow.titlebarHeight;
+
+        if (@available(macOS 11.0, *)) {
+            topAnchor = self.mediaSourceView.safeAreaLayoutGuide.topAnchor;
+            topConstant = 0;
+        }
+
         _pathControlViewTopConstraintToSuperview =
-            [self.pathControlVisualEffectView.topAnchor constraintEqualToAnchor:self.mediaSourceView.topAnchor constant:self.libraryWindow.titlebarHeight];
+            [self.pathControlVisualEffectView.topAnchor constraintEqualToAnchor:topAnchor constant:topConstant];
     }
     _pathControlViewTopConstraintToSuperview.active = YES;
 }

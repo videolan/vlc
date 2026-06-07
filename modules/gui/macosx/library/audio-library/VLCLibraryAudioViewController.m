@@ -292,7 +292,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     const CGFloat controlsBarHeight = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
     const CGFloat controlsBarPadding = VLCLibraryUIUnits.largeSpacing * 2;
     NSClipView * const clipView = _audioSongTableViewScrollView.contentView;
-    const CGFloat topInset = self.libraryWindow.titlebarHeight + self.audioSongTableView.headerView.frame.size.height;
+    const CGFloat topInset = VLCLibraryUIUnits.libraryWindowContentSafeTopInset + self.audioSongTableView.headerView.frame.size.height;
     clipView.automaticallyAdjustsContentInsets = NO;
     clipView.contentInsets = NSEdgeInsetsMake(topInset, 0, controlsBarHeight + controlsBarPadding, 0);
 }

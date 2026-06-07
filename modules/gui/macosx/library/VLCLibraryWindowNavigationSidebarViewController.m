@@ -30,6 +30,7 @@
 #import "library/VLCLibraryWindowNavigationSidebarOutlineView.h"
 
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "main/VLCMain.h"
 
@@ -86,7 +87,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
     const NSEdgeInsets scrollViewInsets = self.outlineViewScrollView.contentInsets;
     _scrollViewInsets =
-        NSEdgeInsetsMake(scrollViewInsets.top + self.libraryWindow.titlebarHeight,
+        NSEdgeInsetsMake(scrollViewInsets.top + VLCLibraryUIUnits.libraryWindowContentSafeTopInset,
                          scrollViewInsets.left,
                          scrollViewInsets.bottom,
                          scrollViewInsets.right);

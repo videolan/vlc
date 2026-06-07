@@ -80,6 +80,8 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const NSEdgeInsets libraryViewScrollViewDetailGridContentInsets;
 @property (class, readonly) const NSEdgeInsets libraryViewScrollViewScrollerInsets;
 
+@property (class, readonly) const CGFloat libraryWindowContentSafeTopInset;
+
 @property (class, readonly) const CGFloat controlsFadeAnimationDuration;
 
 @property (class, readonly) const CGFloat libraryWindowControlsBarHeight;

@@ -587,7 +587,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
     _collectionViewScrollView.scrollerInsets = scrollerInsets;
 
     _tableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _tableViewScrollView.contentInsets = NSEdgeInsetsMake(scrollViewsTopSpace + _tableViewScrollView.window.titlebarHeight, 0, scrollViewInsets.bottom, 0);
+    _tableViewScrollView.contentInsets = NSEdgeInsetsMake(scrollViewsTopSpace + VLCLibraryUIUnits.libraryWindowContentSafeTopInset, 0, scrollViewInsets.bottom, 0);
     _tableViewScrollView.scrollerInsets = NSEdgeInsetsMake(0, 0, -scrollViewInsets.bottom, 0);
 }
 
