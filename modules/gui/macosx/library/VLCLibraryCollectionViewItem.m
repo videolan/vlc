@@ -144,7 +144,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 #endif
     }
 
-    [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
+    [(VLCTrackingView *)self.view setViewsToHide:@[self.playInstantlyButton, self.addToPlayQueueButton]];
     self.secondaryInfoTextField.textColor = NSColor.VLClibrarySubtitleColor;
     self.annotationTextField.font = NSFont.VLCLibraryItemAnnotationFont;
     self.annotationTextField.textColor = NSColor.VLClibraryAnnotationColor;
@@ -181,7 +181,8 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)prepareForReuse
 {
     [super prepareForReuse];
-    _playInstantlyButton.hidden = YES;
+    self.playInstantlyButton.hidden = YES;
+    self.addToPlayQueueButton.hidden = YES;
     _mediaTitleTextField.stringValue = @"";
     _secondaryInfoTextField.stringValue = [NSString stringWithTime:0];
     _mediaImageView.image = nil;
