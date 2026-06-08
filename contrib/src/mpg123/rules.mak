@@ -7,27 +7,7 @@ ifeq ($(call need_pkg,"libmpg123"),)
 PKGS_FOUND += mpg123
 endif
 
-# Same forced value as in VLC
-MPG123CONF := CFLAGS="$(CFLAGS) -D_FILE_OFFSET_BITS=64"
-
-MPG123CONF =
-MPG123CONF += --with-default-audio=dummy --enable-buffer=no --enable-modules=no --disable-network
-
-ifdef HAVE_ANDROID
-ifeq ($(ANDROID_ABI), armeabi-v7a)
-MPG123CONF += --with-cpu=arm_fpu
-else ifeq ($(ANDROID_ABI), arm64-v8a)
-MPG123CONF += --with-cpu=aarch64
-else
-MPG123CONF += --with-cpu=generic_fpu
-endif
-endif
-
-ifdef HAVE_VISUALSTUDIO
-ifeq ($(ARCH), x86_64)
-MPG123CONF += --with-cpu=generic_dither
-endif
-endif
+MPG123_CONF := -DBUILD_LIBOUT123=OFF -DBUILD_PROGRAMS=OFF
 
 $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 	$(call download_pkg,$(MPG123_URL),mpg123)
@@ -36,17 +16,15 @@ $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 
 mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
-	$(call update_autoconfig,build)
 	$(call pkg_static,"libmpg123.pc.in")
-	$(call pkg_static,"libout123.pc.in")
 	$(call pkg_static,"libsyn123.pc.in")
 	# fix llvm-mingw ARM build
 	$(APPLY) $(SRC)/mpg123/getcpuflags_arm.c.patch
 	$(MOVE)
 
-.mpg123: mpg123
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(MPG123CONF)
-	+$(MAKEBUILD) bin_PROGRAMS=
-	+$(MAKEBUILD) bin_PROGRAMS= install
+.mpg123: mpg123 toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS_CMAKE) $(CMAKE) -S $</ports/cmake $(MPG123_CONF)
+	+$(CMAKEBUILD)
+	$(CMAKEINSTALL)
 	touch $@
