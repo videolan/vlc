@@ -22,6 +22,7 @@ import QtQuick.Templates as T
 import VLC.MainInterface
 import VLC.Style
 
+// NOTE: Attached tool tip must be used if the popup type is `Popup.Window`.
 T.ToolTip {
     id: control
 
