@@ -189,9 +189,6 @@ win64-arm-llvm:
         <<: *variables-win64-arm
         VLCARCH: winarm64-ucrt
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
-        # Clang <= 15 produces incorrect unwind info for code with
-        # branch protection enabled on Windows.
-        CONFIGFLAGS: --disable-branch-protection
 
 uwp32-libvlc-llvm:
     extends: .win-common
@@ -268,9 +265,6 @@ nightly-win64-arm-llvm:
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         LIBVLC_EXTRA_BUILD_FLAGS: -D /
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
-        # Clang <= 15 produces incorrect unwind info for code with
-        # branch protection enabled on Windows.
-        CONFIGFLAGS: --disable-branch-protection
 
 #
 # Debian
