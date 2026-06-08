@@ -30,10 +30,13 @@ typedef void(^EnterExitBlock)(void);
 
 @property (readwrite) BOOL enabled;
 @property (readwrite) BOOL animatesTransition;
-@property (readwrite, assign, nullable) NSView *viewToHide; // Hide when mouse out
-@property (readwrite, assign, nullable) NSView *viewToShow; // Show when mouse out
+@property (readwrite, strong, nullable) NSArray<NSView *> *viewsToHide; // Hide when mouse out
+@property (readwrite, strong, nullable) NSArray<NSView *> *viewsToShow; // Show when mouse out
 @property (readwrite, strong, nullable) EnterExitBlock mouseEnteredBlock;
 @property (readwrite, strong, nullable) EnterExitBlock mouseExitedBlock;
+
+- (void)setViewToHide:(nullable NSView *)view;
+- (void)setViewToShow:(nullable NSView *)view;
 
 @end
 

@@ -65,6 +65,16 @@
     _enabled = YES;
 }
 
+- (void)setViewToHide:(nullable NSView *)view
+{
+    self.viewsToHide = view ? @[view] : nil;
+}
+
+- (void)setViewToShow:(nullable NSView *)view
+{
+    self.viewsToShow = view ? @[view] : nil;
+}
+
 - (void)performTransition
 {
     if (self.animatesTransition) {
@@ -72,26 +82,42 @@
         const BOOL hideVTS = _mouseIn;
         const BOOL startMouseIn = _mouseIn;
 
-        __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
-        __weak typeof(self.viewToShow) weakViewToShow = self.viewToShow;
+        __weak typeof(self) weakSelf = self;
 
-        weakViewToHide.hidden = NO;
-        weakViewToShow.hidden = NO;
+        for (NSView * const view in self.viewsToHide) {
+            view.hidden = NO;
+        }
+        for (NSView * const view in self.viewsToShow) {
+            view.hidden = NO;
+        }
 
         [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context){
             NSAnimationContext.currentContext.duration = 0.3;
-            weakViewToHide.animator.alphaValue = hideVTH ? 0.0 : 1.0;
-            weakViewToShow.animator.alphaValue = hideVTS ? 0.0 : 1.0;
+            for (NSView * const view in weakSelf.viewsToHide) {
+                view.animator.alphaValue = hideVTH ? 0.0 : 1.0;
+            }
+            for (NSView * const view in weakSelf.viewsToShow) {
+                view.animator.alphaValue = hideVTS ? 0.0 : 1.0;
+            }
         } completionHandler:^{
-            if (startMouseIn != self->_mouseIn) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf || startMouseIn != strongSelf->_mouseIn) {
                 return;
             }
-            weakViewToHide.hidden = hideVTH;
-            weakViewToShow.hidden = hideVTS;
+            for (NSView * const view in strongSelf.viewsToHide) {
+                view.hidden = hideVTH;
+            }
+            for (NSView * const view in strongSelf.viewsToShow) {
+                view.hidden = hideVTS;
+            }
         }];
     } else {
-        self.viewToHide.hidden = !_mouseIn;
-        self.viewToShow.hidden = _mouseIn;
+        for (NSView * const view in self.viewsToHide) {
+            view.hidden = !_mouseIn;
+        }
+        for (NSView * const view in self.viewsToShow) {
+            view.hidden = _mouseIn;
+        }
     }
 }
 

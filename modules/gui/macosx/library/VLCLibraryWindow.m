@@ -470,7 +470,9 @@ static int ShowController(vlc_object_t * __unused p_this,
     self.artworkButton.enabled = !artworkButtonDisabled;
     self.artworkButton.hidden = artworkButtonDisabled;
     self.controlsBar.thumbnailTrackingView.enabled = !artworkButtonDisabled;
-    self.controlsBar.thumbnailTrackingView.viewToHide.hidden = artworkButtonDisabled;
+    for (NSView * const view in self.controlsBar.thumbnailTrackingView.viewsToHide) {
+        view.hidden = artworkButtonDisabled;
+    }
 }
 
 - (void)configureArtworkButtonLiveVideoView
