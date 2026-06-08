@@ -48,14 +48,6 @@
                                 <action selector="playInstantly:" target="-2" id="E2B-oj-rx3"/>
                             </connections>
                         </button>
-                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tm2-NW-WsZ" customClass="VLCRoundedCornerTextField">
-                            <rect key="frame" x="3" y="186" width="37" height="16"/>
-                            <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tyb-Ur-7J9">
-                                <font key="font" metaFont="system"/>
-                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                        </textField>
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="bottom" secondItem="dFt-oZ-h9P" secondAttribute="bottom" id="4q3-3S-7PA"/>
@@ -104,6 +96,14 @@
                         <action selector="addToPlayQueue:" target="-2" id="2C9-Rn-VAb"/>
                     </connections>
                 </button>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tm2-NW-WsZ" customClass="VLCRoundedCornerTextField">
+                    <rect key="frame" x="6" y="220" width="37" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tyb-Ur-7J9">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VAn-gF-QiZ">
                     <rect key="frame" x="-2" y="0.0" width="175" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="LSS-jh-llZ">
@@ -127,10 +127,10 @@
                 <constraint firstItem="Vwd-1n-Sbd" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" id="Yqz-VL-Ul7"/>
                 <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="5" id="ZVz-SL-rxZ"/>
                 <constraint firstAttribute="trailing" secondItem="VAn-gF-QiZ" secondAttribute="trailing" priority="750" id="Zci-25-m59"/>
-                <constraint firstItem="tm2-NW-WsZ" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="5" id="cvk-A5-enS"/>
-                <constraint firstItem="tm2-NW-WsZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="5" id="fH0-Om-7gV"/>
                 <constraint firstItem="Vwd-1n-Sbd" firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="fag-50-6qS"/>
+                <constraint firstItem="tm2-NW-WsZ" firstAttribute="centerY" secondItem="Ubz-8I-W2F" secondAttribute="centerY" id="gQI-nK-lpw"/>
                 <constraint firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="oZw-Ab-83p"/>
+                <constraint firstItem="tm2-NW-WsZ" firstAttribute="leading" secondItem="HJG-tt-Xh8" secondAttribute="leading" constant="5" id="rnK-Cu-EMG"/>
                 <constraint firstItem="Vwd-1n-Sbd" firstAttribute="bottom" secondItem="2aB-sB-hfY" secondAttribute="bottom" id="sIE-go-0nP"/>
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="t9g-tX-AQX"/>
                 <constraint firstItem="OBS-Eh-1mT" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="bottom" constant="4" id="vJy-Kf-4Jh"/>
