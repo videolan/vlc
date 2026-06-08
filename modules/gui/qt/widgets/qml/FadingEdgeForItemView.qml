@@ -23,7 +23,7 @@ import VLC.Util
 FadingEdge {
     id: root
 
-    required property ListView listView
+    required property Item itemView // TODO: Use `ItemView` type when applicable.
 
     // NOTE: In addition to the `currentItem`, `excludeItem`
     //       may be used to direct the fading edge effect to
@@ -32,39 +32,39 @@ FadingEdge {
     //       `excludeItem` is not a visual child of `sourceItem`.
     property Item excludeItem
 
-    sourceItem: listView.contentItem
+    sourceItem: itemView.contentItem
 
-    beginningMargin: listView.displayMarginBeginning
-    endMargin: listView.displayMarginEnd
-    orientation: (listView.orientation === ListView.Vertical) ? Qt.Vertical : Qt.Horizontal
+    beginningMargin: itemView.displayMarginBeginning
+    endMargin: itemView.displayMarginEnd
+    orientation: (itemView.orientation === Qt.Horizontal) ? Qt.Horizontal : Qt.Vertical
 
-    sourceX: listView.contentX
-    sourceY: listView.contentY
+    sourceX: itemView.contentX
+    sourceY: itemView.contentY
 
     fadeSize: delegateItem ? (orientation === Qt.Vertical ? delegateItem.height
                                                           : delegateItem.width) / 2
                            : (VLCStyle.margin_large * 2)
 
-    readonly property bool transitionsRunning: (listView.add?.running ||
-                                                listView.addDisplaced?.running ||
-                                                listView.displaced?.running ||
-                                                listView.move?.running ||
-                                                listView.moveDisplaced?.running ||
-                                                listView.populate?.running ||
-                                                listView.remove?.running ||
-                                                listView.removeDisplaced?.running) ?? false
+    readonly property bool transitionsRunning: (itemView.add?.running ||
+                                                itemView.addDisplaced?.running ||
+                                                itemView.displaced?.running ||
+                                                itemView.move?.running ||
+                                                itemView.moveDisplaced?.running ||
+                                                itemView.populate?.running ||
+                                                itemView.remove?.running ||
+                                                itemView.removeDisplaced?.running) ?? false
 
     // FIXME: Delegate with variable size
-    readonly property Item delegateItem: (listView.count > 0) ? listView.itemAtIndex(0) : null
+    readonly property Item delegateItem: (itemView.count > 0) ? itemView.itemAtIndex(0) : null
 
 
-    readonly property bool _fadeRectEnoughSize: (orientation === Qt.Vertical ? listView.height
-                                                                             : listView.width) > (fadeSize * 2 + VLCStyle.dp(25))
+    readonly property bool _fadeRectEnoughSize: (orientation === Qt.Vertical ? itemView.height
+                                                                             : itemView.width) > (fadeSize * 2 + VLCStyle.dp(25))
 
-    readonly property rect _currentItemMappedRect: listView.currentItem ? Qt.rect(listView.currentItem.x - sourceX,
-                                                                                  listView.currentItem.y - sourceY,
-                                                                                  listView.currentItem.width,
-                                                                                  listView.currentItem.height)
+    readonly property rect _currentItemMappedRect: itemView.currentItem ? Qt.rect(itemView.currentItem.x - sourceX,
+                                                                                  itemView.currentItem.y - sourceY,
+                                                                                  itemView.currentItem.width,
+                                                                                  itemView.currentItem.height)
                                                                         : Qt.rect(-1, -1, -1, -1)
 
     readonly property rect _excludeItemMappedRect: excludeItem ? Qt.rect(excludeItem.x - sourceX,
@@ -73,17 +73,17 @@ FadingEdge {
                                                                          excludeItem.height)
                                                                         : Qt.rect(-1, -1, -1, -1)
 
-    readonly property bool _disableBeginningFade: (!!listView.headerItem && (listView.headerPositioning !== ListView.InlineHeader)) ||
+    readonly property bool _disableBeginningFade: (!!itemView.headerItem && (itemView.headerPositioning !== undefined && itemView.headerPositioning !== ListView.InlineHeader)) ||
                                                   !_fadeRectEnoughSize ||
-                                                  (orientation === Qt.Vertical ? listView.atYBeginning
-                                                                               : listView.atXBeginning) ||
+                                                  (orientation === Qt.Vertical ? itemView.atYBeginning
+                                                                               : itemView.atXBeginning) ||
                                                   (currentItem && !Helpers.itemIntersects(beginningArea, _currentItemMappedRect)) ||
                                                   (excludeItem && !Helpers.itemIntersects(beginningArea, _excludeItemMappedRect))
 
-    readonly property bool _disableEndFade: (!!listView.footerItem && (listView.footerPositioning !== ListView.InlineFooter)) ||
+    readonly property bool _disableEndFade: (!!itemView.footerItem && (itemView.footerPositioning !== undefined && itemView.footerPositioning !== ListView.InlineFooter)) ||
                                             !_fadeRectEnoughSize ||
-                                            (orientation === Qt.Vertical ? listView.atYEnd
-                                                                         : listView.atXEnd) ||
+                                            (orientation === Qt.Vertical ? itemView.atYEnd
+                                                                         : itemView.atXEnd) ||
                                             (currentItem && !Helpers.itemIntersects(endArea, _currentItemMappedRect)) ||
                                             (excludeItem && !Helpers.itemIntersects(endArea, _excludeItemMappedRect))
 
@@ -103,7 +103,7 @@ FadingEdge {
         id: beginningArea
 
         z: 99
-        parent: root.listView
+        parent: root.itemView
 
         visible: !root._disableBeginningFade
 
@@ -132,7 +132,7 @@ FadingEdge {
         id: endArea
 
         z: 99
-        parent: root.listView
+        parent: root.itemView
 
         visible: !root._disableEndFade
 

@@ -619,12 +619,12 @@ ListView {
         colorSet: ColorContext.View
     }
 
-    FadingEdgeForListView {
+    FadingEdgeForItemView {
         id: fadingEdge
 
         anchors.fill: parent
 
-        listView: root
+        itemView: root
 
         backgroundColor: theme.bg.primary
 

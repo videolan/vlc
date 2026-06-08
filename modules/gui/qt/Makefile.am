@@ -1325,7 +1325,7 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/DropShadowImage.qml \
 	widgets/qml/DoubleShadow.qml \
 	widgets/qml/FadingEdge.qml \
-	widgets/qml/FadingEdgeForListView.qml \
+	widgets/qml/FadingEdgeForItemView.qml \
 	widgets/qml/PopupIconToolButton.qml \
 	widgets/qml/PartialEffect.qml \
 	widgets/qml/ViewHeader.qml \
