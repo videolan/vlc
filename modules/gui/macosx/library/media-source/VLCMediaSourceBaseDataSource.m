@@ -76,6 +76,8 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 @interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 {
     NSArray<VLCMediaSource *> *_mediaSources;
+    NSArray<NSString *> *_mediaSourceNotificationNames;
+    NSMapTable<VLCMediaSource *, NSArray<VLCLANDeviceRecord *> *> *_sourceRecords;
     NSArray<VLCLANDeviceRecord *> *_lanDeviceSnapshot;
 }
 @end
@@ -88,24 +90,17 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     if (self) {
         _mediaSources = @[];
         _lanDeviceSnapshot = @[];
+        _mediaSourceNotificationNames = @[
+            VLCMediaSourceChildrenReset,
+            VLCMediaSourceChildrenAdded,
+            VLCMediaSourceChildrenRemoved,
+            VLCMediaSourcePreparsingEnded
+        ];
+        _sourceRecords = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory |
+                                                           NSPointerFunctionsObjectPointerPersonality
+                                              valueOptions:NSPointerFunctionsStrongMemory |
+                                                          NSPointerFunctionsObjectPersonality];
         _mediaSourceMode = VLCMediaSourceModeLAN;
-        NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-        [notificationCenter addObserver:self
-                               selector:@selector(mediaSourceChildrenReset:)
-                                   name:VLCMediaSourceChildrenReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(mediaSourceChildrenAdded:)
-                                   name:VLCMediaSourceChildrenAdded
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(mediaSourceChildrenRemoved:)
-                                   name:VLCMediaSourceChildrenRemoved
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(mediaSourcePreparingEnded:)
-                                   name:VLCMediaSourcePreparsingEnded
-                                 object:nil];
         [self loadMediaSources];
         [self returnHome];
     }
@@ -199,9 +194,41 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
             [self.navigationStack installHandlersOnMediaSource:mediaSource];
     }
 
-    _mediaSources = mediaSources;
-    _lanDeviceSnapshot = self.mediaSourceMode == VLCMediaSourceModeLAN ? [self buildLANDeviceSnapshot] : @[];
+    [self setMediaSources:mediaSources];
+    _lanDeviceSnapshot = self.mediaSourceMode == VLCMediaSourceModeLAN ? [self buildMediaSourceSnapshot] : @[];
     [self reloadData];
+}
+
+- (void)setMediaSources:(NSArray<VLCMediaSource *> *)mediaSources
+{
+    NSNotificationCenter * const nc = NSNotificationCenter.defaultCenter;
+
+    for (VLCMediaSource * const source in _mediaSources) {
+        for (NSString * const name in _mediaSourceNotificationNames) {
+            [nc removeObserver:self name:name object:source];
+        }
+    }
+
+    _mediaSources = mediaSources;
+
+    for (VLCMediaSource * const source in _mediaSources) {
+        [nc addObserver:self
+               selector:@selector(mediaSourceChildrenReset:)
+                   name:VLCMediaSourceChildrenReset
+                 object:source];
+        [nc addObserver:self
+               selector:@selector(mediaSourceChildrenAdded:)
+                   name:VLCMediaSourceChildrenAdded
+                 object:source];
+        [nc addObserver:self
+               selector:@selector(mediaSourceChildrenRemoved:)
+                   name:VLCMediaSourceChildrenRemoved
+                 object:source];
+        [nc addObserver:self
+               selector:@selector(mediaSourcePreparingEnded:)
+                   name:VLCMediaSourcePreparsingEnded
+                 object:source];
+    }
 }
 
 - (void)setMediaSourceMode:(VLCMediaSourceMode)mediaSourceMode
@@ -487,22 +514,42 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 #pragma mark - LAN device snapshot
 
-- (NSArray<VLCLANDeviceRecord *> *)buildLANDeviceSnapshot
+- (NSArray<VLCLANDeviceRecord *> *)buildMediaSourceSnapshot
 {
-    NSMutableArray<VLCLANDeviceRecord *> *records;
-    @synchronized (_mediaSources) {
-        records = [[NSMutableArray alloc] initWithCapacity:_mediaSources.count];
-        for (VLCMediaSource * const mediaSource in _mediaSources) {
-            VLCInputNode * const rootNode = mediaSource.rootNode;
-            for (VLCInputNode * const child in rootNode.children) {
-                VLCLANDeviceRecord * const record =
-                    [[VLCLANDeviceRecord alloc] initWithMediaSource:mediaSource
-                                                          inputNode:child];
-                [records addObject:record];
-            }
+    [_sourceRecords removeAllObjects];
+    NSMutableArray<VLCLANDeviceRecord *> * const flat = [NSMutableArray array];
+    for (VLCMediaSource * const mediaSource in _mediaSources) {
+        NSMutableArray<VLCLANDeviceRecord *> * const sourceRecs = [NSMutableArray array];
+        for (VLCInputNode * const child in mediaSource.rootNode.children) {
+            VLCLANDeviceRecord * const record = [[VLCLANDeviceRecord alloc] initWithMediaSource:mediaSource
+                                                                                          inputNode:child];
+            [sourceRecs addObject:record];
+        }
+        NSArray<VLCLANDeviceRecord *> * const frozen = [sourceRecs copy];
+        [_sourceRecords setObject:frozen forKey:mediaSource];
+        [flat addObjectsFromArray:frozen];
+    }
+    return [flat copy];
+}
+
+- (NSArray<VLCLANDeviceRecord *> *)snapshotByUpdatingSource:(VLCMediaSource *)mediaSource
+{
+    NSMutableArray<VLCLANDeviceRecord *> * const sourceRecs = [NSMutableArray array];
+    for (VLCInputNode * const child in mediaSource.rootNode.children) {
+        VLCLANDeviceRecord * const record = [[VLCLANDeviceRecord alloc] initWithMediaSource:mediaSource
+                                                                                      inputNode:child];
+        [sourceRecs addObject:record];
+    }
+    [_sourceRecords setObject:[sourceRecs copy] forKey:mediaSource];
+
+    NSMutableArray<VLCLANDeviceRecord *> * const flat = [NSMutableArray array];
+    for (VLCMediaSource * const source in _mediaSources) {
+        NSArray<VLCLANDeviceRecord *> * const recs = [_sourceRecords objectForKey:source];
+        if (recs) {
+            [flat addObjectsFromArray:recs];
         }
     }
-    return [records copy];
+    return [flat copy];
 }
 
 #pragma mark - glue code
@@ -671,16 +718,14 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)reloadDataForNotification:(NSNotification *)aNotification
 {
     if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
-        _lanDeviceSnapshot = [self buildLANDeviceSnapshot];
+        VLCMediaSource * const source = aNotification.object;
+        if ([aNotification.name isEqualToString:VLCMediaSourceChildrenReset]) {
+            _lanDeviceSnapshot = [self buildMediaSourceSnapshot];
+        } else {
+            _lanDeviceSnapshot = [self snapshotByUpdatingSource:source];
+        }
     }
-    if (self.viewMode == VLCLibraryGridViewModeSegment) {
-        [self.collectionView reloadData];
-    } else {
-        [self.tableView reloadData];
-    }
-
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceBaseDataSourceNodeChanged
-                                                      object:self];
+    [self reloadData];
 }
 
 - (void)reloadData
