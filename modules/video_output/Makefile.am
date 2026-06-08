@@ -334,7 +334,7 @@ endif
 ### Android ###
 libandroid_utils_la_SOURCES = video_output/android/utils.c video_output/android/utils.h
 libandroid_utils_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) $(EGL_CFLAGS)
-libandroid_utils_la_LIBADD = $(GLES2_LIBS) $(EGL_LIBS)
+libandroid_utils_la_LIBADD = $(GLES2_LIBS) $(EGL_LIBS) -landroid libandroid_env.la
 
 libandroid_env_la_SOURCES = \
 	video_output/android/env.c \
@@ -347,23 +347,23 @@ endif
 
 libegl_android_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDROID=1
-libegl_android_plugin_la_LIBADD = libandroid_env.la $(EGL_LIBS) libandroid_utils.la
+libegl_android_plugin_la_LIBADD = $(EGL_LIBS) libandroid_utils.la
 
 libandroid_window_plugin_la_SOURCES = video_output/android/window.c \
 	video_output/wasync_resize_compressor.h
 libandroid_window_plugin_la_LIBADD = \
-	libandroid_env.la libandroid_utils.la $(LIBDL) $(EGL_LIBS) $(GLES2_LIBS)
+	libandroid_utils.la $(LIBDL) $(EGL_LIBS) $(GLES2_LIBS)
 
 libandroid_display_plugin_la_SOURCES = video_output/android/display.c \
 	video_output/opengl/sub_renderer.c \
 	video_output/opengl/sub_renderer.h
 libandroid_display_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
-libandroid_display_plugin_la_LIBADD = libvlc_opengles.la $(EGL_LIBS) $(GLES2_LIBS) libandroid_utils.la libandroid_env.la
+libandroid_display_plugin_la_LIBADD = libvlc_opengles.la $(EGL_LIBS) $(GLES2_LIBS) libandroid_utils.la
 
 libglinterop_asurface_plugin_la_SOURCES = video_output/opengl/interop_asurface.c \
 	video_output/opengl/interop.h
 libglinterop_asurface_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
-libglinterop_asurface_plugin_la_LIBADD = libandroid_env.la libandroid_utils.la \
+libglinterop_asurface_plugin_la_LIBADD = libandroid_utils.la \
 	$(EGL_LIBS) $(GLES2_LIBS)
 
 libglinterop_aimage_plugin_la_SOURCES = video_output/opengl/interop_aimage.c \
