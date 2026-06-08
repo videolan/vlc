@@ -20,6 +20,7 @@ import QtQuick.Controls
 
 import VLC.Style
 
+// NOTE: Attached pointing tool tip must be used if the popup type is `Popup.Window`.
 ToolTipExt {
     id: pointingTooltip
 
