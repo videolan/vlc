@@ -428,17 +428,6 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
                   withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 }
 
-- (void)setupTableViews
-{
-    self.collectionSelectionTableView.target = self;
-    self.collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
-
-    self.gridModeListTableView.target = self;
-    self.gridModeListTableView.doubleAction = @selector(groupSelectionDoubleClickAction:);
-
-    [self setupSongsTableView];
-}
-
 - (void)setupSongsTableView
 {
     self.songsTableView.target = self;
