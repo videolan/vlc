@@ -92,6 +92,9 @@ endif
 if HAVE_TVOS
 libvlc_la_LDFLAGS += -avoid-version
 endif
+if HAVE_ANDROID
+libvlc_la_LDFLAGS += -avoid-version
+endif
 
 pkgconfig_DATA = libvlc.pc
 
