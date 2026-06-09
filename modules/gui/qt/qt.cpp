@@ -769,6 +769,7 @@ static inline void registerMetaTypes()
 
     qRegisterMetaType<VLCTime>();
     qRegisterMetaType<VLCDuration>();
+    qRegisterMetaType<QList<TimedText>>("QList<TimedText>");
     qRegisterMetaType<SharedInputItem>();
     qRegisterMetaType<NetworkTreeItem>();
     qRegisterMetaType<Playlist>();

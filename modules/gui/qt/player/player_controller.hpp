@@ -77,6 +77,29 @@ private:
     input_item_t *p_item;
 };
 
+class TimedText
+{
+    Q_GADGET
+    QML_VALUE_TYPE(timedText)
+
+    Q_PROPERTY(QString text READ text CONSTANT FINAL)
+    Q_PROPERTY(VLCTime time READ time CONSTANT FINAL)
+
+public:
+    TimedText() = default;
+    TimedText(QString text, VLCTime time)
+        : m_text(std::move(text))
+        , m_time(time)
+    { }
+
+    QString text() const { return m_text; }
+    VLCTime time() const { return m_time; }
+
+private:
+    QString m_text;
+    VLCTime m_time;
+};
+
 class PlayerControllerPrivate;
 class PlayerController : public QObject
 {
