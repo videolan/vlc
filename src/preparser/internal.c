@@ -725,6 +725,14 @@ CheckThumbnailerFormat(enum vlc_thumbnailer_format format,
             .format = VLC_THUMBNAILER_FORMAT_JPEG, .fourcc = VLC_CODEC_JPEG,
             .module = "jpeg", .ext = "jpg",
         },
+        {
+            .format = VLC_THUMBNAILER_FORMAT_RGBA, .fourcc = VLC_CODEC_RGBA,
+            .module = "avcodec", .ext = "rgba",
+        },
+        {
+            .format = VLC_THUMBNAILER_FORMAT_ARGB, .fourcc = VLC_CODEC_ARGB,
+            .module = "avcodec", .ext = "argb",
+        },
     };
 
     for (size_t i = 0; i < ARRAY_SIZE(formats); ++i)

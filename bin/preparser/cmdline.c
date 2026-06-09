@@ -253,6 +253,10 @@ opt_set_OutputFormat(struct preparser_args *args, const char *arg)
         args->output.format = VLC_THUMBNAILER_FORMAT_JPEG;
     } else if (!strcmp(arg, "webp")) {
         args->output.format = VLC_THUMBNAILER_FORMAT_WEBP;
+    } else if (!strcmp(arg, "rgba")) {
+        args->output.format = VLC_THUMBNAILER_FORMAT_RGBA;
+    } else if (!strcmp(arg, "argb")) {
+        args->output.format = VLC_THUMBNAILER_FORMAT_ARGB;
     } else {
         fprintf(stderr, "Error: Unknown output format `%s'\n", arg);
         return false;
@@ -314,7 +318,7 @@ static const struct preparser_opt options[] = {
     opt_add_string("output-path", opt_set_OutputPath, "Path of the thumbnail"),
     opt_add_integer("output-width", opt_set_OutputWidth, "Width of the thumbnail"),
     opt_add_integer("output-height", opt_set_OutputHeight, "Height of the thumbnail"),
-    opt_add_string("output-format", opt_set_OutputFormat, "Format of the thumbnail (png/jp[e]g/webp)"),
+    opt_add_string("output-format", opt_set_OutputFormat, "Format of the thumbnail (png/jp[e]g/webp/rgba/argb)"),
     opt_add_bool("output-crop", opt_set_OutputCrop, "Crop the thumbnail"),
     opt_add_integer("verbose", opt_set_Verbose, "Verbosity (0,1,2)"),
 };
