@@ -88,6 +88,40 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 @synthesize currentParentType = _currentParentType;
 
+- (void)setCollectionView:(NSCollectionView *)collectionView
+{
+    _collectionView = collectionView;
+    if (_collectionView != nil) {
+        [VLCLibraryAudioDataSource setupCollectionView:_collectionView];
+    }
+}
+
+- (void)setSongsTableView:(NSTableView *)songsTableView
+{
+    _songsTableView = songsTableView;
+    if (_songsTableView != nil) {
+        [self setupSongsTableView];
+    }
+}
+
+- (void)setCollectionSelectionTableView:(NSTableView *)collectionSelectionTableView
+{
+    _collectionSelectionTableView = collectionSelectionTableView;
+    if (_collectionSelectionTableView != nil) {
+        _collectionSelectionTableView.target = self;
+        _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
+    }
+}
+
+- (void)setGridModeListTableView:(NSTableView *)gridModeListTableView
+{
+    _gridModeListTableView = gridModeListTableView;
+    if (_gridModeListTableView != nil) {
+        _gridModeListTableView.target = self;
+        _gridModeListTableView.doubleAction = @selector(groupSelectionDoubleClickAction:);
+    }
+}
+
 - (instancetype)init
 {
     self = [super init];
@@ -329,8 +363,6 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)setup
 {
-    [VLCLibraryAudioDataSource setupCollectionView:self.collectionView];
-    [self setupTableViews];
     // Force setAudioLibrarySegment to do something always on first try
     _audioLibrarySegment = VLCAudioLibraryUnknownSegment;
     [self connect];

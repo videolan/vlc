@@ -66,11 +66,11 @@ extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotif
 @interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource, iCarouselDataSource>
 
 @property (readwrite, weak) VLCLibraryModel *libraryModel;
-@property (readwrite, weak) NSTableView *collectionSelectionTableView;
-@property (readwrite, weak) NSTableView *songsTableView;
-@property (readwrite, weak) NSCollectionView *collectionView;
-@property (readwrite, weak) iCarousel *carouselView;
-@property (readwrite, weak) NSTableView *gridModeListTableView;
+@property (readwrite, weak, nonatomic) NSTableView *collectionSelectionTableView;
+@property (readwrite, weak, nonatomic) NSTableView *songsTableView;
+@property (readwrite, weak, nonatomic) NSCollectionView *collectionView;
+@property (readwrite, weak, nonatomic) iCarousel *carouselView;
+@property (readwrite, weak, nonatomic) NSTableView *gridModeListTableView;
 @property (readwrite, weak, nullable) id<VLCLibraryGroupHeaderDelegate> headerDelegate;
 
 @property (nonatomic, readwrite, assign) VLCAudioLibrarySegment audioLibrarySegment;
