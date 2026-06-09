@@ -28,7 +28,10 @@
 #include <vlc_modules.h>
 #include <vlc_fs.h>
 
+#include <stdint.h>
+#include <stdio.h>
 #include <errno.h>
+#include <unistd.h>
 
 #define MOCK_WIDTH 640
 #define MOCK_HEIGHT 480
@@ -349,6 +352,144 @@ skip:
     return 77;
 }
 
+struct alpha_context
+{
+    vlc_sem_t sem;
+    bool success;
+};
+
+static void alpha_on_ended(vlc_preparser_req *req, int status,
+                           const bool *result_array, size_t result_count,
+                           void *data)
+{
+    struct alpha_context *ctx = data;
+    (void) req;
+    assert(status == VLC_SUCCESS);
+    assert(result_count == 1);
+    ctx->success = result_array[0];
+    vlc_sem_post(&ctx->sem);
+}
+
+/* Regression test for:
+ *  - test_align=false: "swscale: fix OOB read when scaling a cropped alpha plane"
+ *  - test_align=true: "swscale: extract the alpha plane from the cropped origin"
+ */
+static int run_alpha_crop_test(libvlc_instance_t *vlc, bool test_align)
+{
+    /* Needs an RGBA image encoder (avcodec); skip otherwise. */
+    if (vlc_preparser_CheckThumbnailerFormat(VLC_THUMBNAILER_FORMAT_RGBA) != 0)
+    {
+        fprintf(stderr, "skip: no RGBA thumbnailer format\n");
+        return 0;
+    }
+
+    char path[] = "/tmp/libvlc_XXXXXX";
+    int fd = vlc_mkstemp(path);
+    if (fd == -1)
+    {
+        fprintf(stderr, "skip: vlc_mkstemp failed\n");
+        return 0;
+    }
+
+    /* 256x128 (2:1) from a 640x480 (4:3) source forces a non-zero centered crop
+     * (640x320, y_offset 80), which the colorbar alignment check below relies
+     * on to keep the bottom opaque band. */
+    const unsigned ow = 256, oh = 128;
+    const struct vlc_thumbnailer_output output = {
+        .format = VLC_THUMBNAILER_FORMAT_RGBA,
+        .width = ow, .height = oh, .crop = true,
+        .file_path = path, .creat_mode = 0666,
+    };
+
+    const struct vlc_preparser_cfg cfg = {
+        .types = VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES,
+        .max_parser_threads = 1,
+        .max_thumbnailer_threads = 1,
+        .timeout = 0,
+        .external_process = false,
+    };
+    vlc_preparser_t *preparser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
+                                                   &cfg);
+    assert(preparser != NULL);
+
+    struct alpha_context ctx = { .success = false };
+    vlc_sem_init(&ctx.sem, 0);
+
+    const struct vlc_thumbnailer_arg arg = {
+        .seek = { .type = VLC_THUMBNAILER_SEEK_POS, .pos = 0.2,
+                  .speed = VLC_THUMBNAILER_SEEK_FAST },
+        .hw_dec = false,
+    };
+    static const struct vlc_thumbnailer_to_files_cbs cbs = {
+        .on_ended = alpha_on_ended,
+    };
+
+    /* RGBA source so the conversion exercises swscale's alpha path. */
+    input_item_t *item = input_item_New(
+        test_align ? MOCK_URL ";video_chroma=RGBA;video_colorbar=true"
+                   : MOCK_URL ";video_chroma=RGBA", "mock");
+    assert(item != NULL);
+
+    vlc_preparser_req *req =
+        vlc_preparser_GenerateThumbnailToFiles(preparser, item, &arg, &output, 1,
+                                               &cbs, &ctx);
+    assert(req != NULL);
+    vlc_sem_wait(&ctx.sem);
+
+    vlc_preparser_req_Release(req);
+    input_item_Release(item);
+    vlc_preparser_Delete(preparser);
+
+    assert(ctx.success);
+
+
+    const size_t size = (size_t)ow * oh * 4;
+    uint8_t *buf = malloc(size);
+    assert(buf != NULL);
+    assert(lseek(fd, 0, SEEK_SET) == 0);
+    for (size_t off = 0; off < size; )
+    {
+        ssize_t r = read(fd, buf + off, size - off);
+        assert(r > 0);
+        off += r;
+    }
+    if (test_align)
+    {
+        /* With the mock colorbar, a 640x480 RGBA frame has 4 horizontal bands
+         * of 120 lines; only the bottom band (rows 360..479) is opaque (alpha
+         * 0xFF), the rest is transparent. A 2:1 output crops to 640x320
+         * centered (rows 80..399), so the cropped region includes the bottom
+         * opaque band. If the alpha is (wrongly) extracted from (0,0), it
+         * covers rows 0..319 which are fully transparent, and the output alpha
+         * is 0 everywhere. */
+        uint8_t max_alpha = 0;
+        for (size_t i = 0; i < (size_t)ow * oh; i++)
+            if (buf[i * 4 + 3] > max_alpha)
+                max_alpha = buf[i * 4 + 3];
+        /* Loose midpoint: the band is kept (alpha ~0xFF) or dropped (alpha 0).
+         * The exact scaled value is implementation-dependent. */
+        assert(max_alpha > 200
+               && "swscale alpha-crop regression: alpha extracted from wrong origin");
+    }
+    else
+    {
+        /* Read back the raw RGBA. The mock fills every byte with the same
+         * value, so R == G == B == A on input. The colour planes go through
+         * the in-bounds main rescale, the alpha through the cropped alpha
+         * path, so on a correct conversion the output alpha still equals the
+         * red channel everywhere. The out-of-bounds bug leaves the alpha
+         * garbage (it differs from red). */
+        for (size_t i = 0; i < (size_t)ow * oh; i++)
+        assert(buf[i * 4 + 3] == buf[i * 4 + 0]
+               && "swscale alpha-crop regression: alpha does not match colour");
+    }
+    free(buf);
+
+    close(fd);
+    unlink(path);
+    return 0;
+}
+
 int main(int argc, const char *argv[])
 {
     test_init();
@@ -369,6 +510,16 @@ int main(int argc, const char *argv[])
 
     fprintf(stderr, "Run with internal preparser...\n");
     ret = run_test(vlc, false);
+    if (ret != 0) {
+        goto end;
+    }
+    fprintf(stderr, "Run alpha crop test with internal preparser...\n");
+    ret = run_alpha_crop_test(vlc, false);
+    if (ret != 0) {
+        goto end;
+    }
+    fprintf(stderr, "Run alpha align test with internal preparser...\n");
+    ret = run_alpha_crop_test(vlc, true);
     if (ret != 0) {
         goto end;
     }
