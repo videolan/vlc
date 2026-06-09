@@ -72,6 +72,11 @@ static char *config_getLibraryDirReal(const char *fallback)
 // Usually stored alongside main executables in appleOS bundles
 static char *config_getLibExecDir(const char *fallback)
 {
+    const char *dir = getenv("VLC_LIBEXEC_PATH");
+    if (dir) {
+        return strdup(dir);
+    }
+
     if (config_isBundle()) {
         NSBundle *bundle = [NSBundle mainBundle];
         NSString *path = [bundle pathForAuxiliaryExecutable: @""];
