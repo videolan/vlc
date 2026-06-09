@@ -413,6 +413,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView
 {
+    NSAssert(collectionView != nil, @"Collection view must not be nil");
+
     [collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
     NSNib * const albumSupplementaryDetailView =
@@ -430,6 +432,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)setupSongsTableView
 {
+    NSAssert(self.songsTableView != nil, @"Songs table view must not be nil");
+
     self.songsTableView.target = self;
     self.songsTableView.doubleAction = @selector(songDoubleClickAction:);
 
@@ -544,21 +548,20 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         self->_displayedCollectionUpdating = NO;
 
         [self resetLayoutsForOperation:^{
-            if (self.collectionView.dataSource == self) {
-                [self.collectionView reloadData];
-            }
-            if (self.gridModeListTableView.dataSource == self) {
-                [self.gridModeListTableView reloadData];
-            }
-            if (self.collectionSelectionTableView.dataSource == self) {
-                [self.collectionSelectionTableView reloadData];
-            }
-            if (self.songsTableView.dataSource == self) {
-                [self.songsTableView reloadData];
-            }
-            if (self.carouselView.dataSource == self) {
-                [self.carouselView reloadData];
-            }
+            NSAssert(self.collectionView == nil || self.collectionView.dataSource == self, @"Cannot reload a collection view with a different data source");
+            [self.collectionView reloadData];
+
+            NSAssert(self.gridModeListTableView == nil || self.gridModeListTableView.dataSource == self, @"Cannot reload a table view with a different data source");
+            [self.gridModeListTableView reloadData];
+
+            NSAssert(self.collectionSelectionTableView == nil || self.collectionSelectionTableView.dataSource == self, @"Cannot reload a table view with a different data source");
+            [self.collectionSelectionTableView reloadData];
+
+            NSAssert(self.songsTableView == nil || self.songsTableView.dataSource == self, @"Cannot reload a table view with a different data source");
+            [self.songsTableView reloadData];
+
+            NSAssert(self.carouselView == nil || self.carouselView.dataSource == (id)self, @"Cannot reload a carousel view with a different data source");
+            [self.carouselView reloadData];
         }];
 
         [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification object:self];

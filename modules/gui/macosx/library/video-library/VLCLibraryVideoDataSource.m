@@ -251,12 +251,12 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
     [self rebuildFlattenedRows];
 
-    if (self.tableView.dataSource == self) {
-        [self.tableView reloadData];
-    }
-    if (self.collectionView.dataSource == self) {
-        [self.collectionView reloadData];
-    }
+    NSAssert(self.tableView == nil || self.tableView.dataSource == self, @"Cannot reload a table view with a different data source");
+    [self.tableView reloadData];
+
+    NSAssert(self.collectionView == nil || self.collectionView.dataSource == self, @"Cannot reload a collection view with a different data source");
+    [self.collectionView reloadData];
+
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                                       object:self
                                                     userInfo:nil];
@@ -303,7 +303,8 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
     completionHandler(rowIndexSet);
 
     // Targeted table view update using flattened row index
-    if (flatRowIndex != NSNotFound && self.tableView.dataSource == self) {
+    if (flatRowIndex != NSNotFound) {
+        NSAssert(self.tableView.dataSource == self, @"Cannot reload a table view with a different data source");
         [self.tableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:flatRowIndex]
                                   columnIndexes:[NSIndexSet indexSetWithIndex:0]];
     }
@@ -324,12 +325,11 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
     } completionHandler:^(NSIndexSet * const rowIndexSet) {
 
-        if (self.collectionView.dataSource == self) {
-            const NSInteger section = [self videoGroupToRow:group];
-            NSSet<NSIndexPath *> * const indexPathSet =
-                [rowIndexSet indexPathSetWithSection:section];
-            [self.collectionView reloadItemsAtIndexPaths:indexPathSet];
-        }
+        NSAssert(self.collectionView.dataSource == self, @"Cannot reload a collection view with a different data source");
+        const NSInteger section = [self videoGroupToRow:group];
+        NSSet<NSIndexPath *> * const indexPathSet =
+            [rowIndexSet indexPathSetWithSection:section];
+        [self.collectionView reloadItemsAtIndexPaths:indexPathSet];
     }];
 }
 
@@ -344,12 +344,11 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
     } completionHandler:^(NSIndexSet * const rowIndexSet) {
 
-        if (self.collectionView.dataSource == self) {
-            const NSInteger section = [self videoGroupToRow:group];
-            NSSet<NSIndexPath *> * const indexPathSet =
-                [rowIndexSet indexPathSetWithSection:section];
-            [self.collectionView deleteItemsAtIndexPaths:indexPathSet];
-        }
+        NSAssert(self.collectionView.dataSource == self, @"Cannot reload a collection view with a different data source");
+        const NSInteger section = [self videoGroupToRow:group];
+        NSSet<NSIndexPath *> * const indexPathSet =
+            [rowIndexSet indexPathSetWithSection:section];
+        [self.collectionView deleteItemsAtIndexPaths:indexPathSet];
     }];
 }
 

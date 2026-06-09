@@ -56,6 +56,8 @@
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView
 {
+    NSAssert(collectionView != nil, @"Collection view must not be nil");
+
     [collectionView registerClass:VLCLibraryHeaderView.class
        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                    withIdentifier:VLCLibraryHeaderViewIdentifier];
@@ -189,11 +191,13 @@
 
     NSArray<NSTableView *> * const tableViews = self.tableViews;
     for (NSTableView * const tableView in tableViews) {
+        NSAssert(tableView.dataSource == self, @"Cannot perform action on a table view with a different data source");
         tableViewAction(tableView);
     }
 
     NSArray<NSCollectionView *> * const collectionViews = self.collectionViews;
     for (NSCollectionView * const collectionView in collectionViews) {
+        NSAssert(collectionView.dataSource == self, @"Cannot perform action on a collection view with a different data source");
         collectionViewAction(collectionView);
     }
 }
@@ -256,9 +260,8 @@
 {
     NSArray<NSTableView *> * const tableViews = self.tableViews;
     for (NSTableView * const tableView in tableViews) {
-        if (tableView.dataSource == self) {
-            [tableView reloadData];
-        }
+        NSAssert(tableView == nil || tableView.dataSource == self, @"Cannot perform action on a table view with a different data source");
+        [tableView reloadData];
     }
 }
 
@@ -266,9 +269,8 @@
 {
     NSArray<NSCollectionView *> * const collectionViews = self.collectionViews;
     for (NSCollectionView * const collectionView in collectionViews) {
-        if (collectionView.dataSource != self) {
-            continue;
-        }
+        NSAssert(collectionView == nil || collectionView.dataSource == self, @"Cannot perform action on a collection view with a different data source");
+
         NSCollectionViewLayout * const collectionViewLayout = collectionView.collectionViewLayout;
         if ([collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class]) {
             [(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout resetLayout];

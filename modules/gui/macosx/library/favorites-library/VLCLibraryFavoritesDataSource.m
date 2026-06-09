@@ -291,18 +291,17 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     [self updateHeaderForMasterSelection];
 
     const NSInteger selectedRow = self.masterTableView.selectedRow;
-    if (self.masterTableView.dataSource == self) {
-        [self.masterTableView reloadData];
-        if (selectedRow != -1 && selectedRow < [self.masterTableView numberOfRows]) {
-            [self.masterTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedRow] byExtendingSelection:NO];
-        }
+    NSAssert(self.masterTableView == nil || self.masterTableView.dataSource == self, @"Cannot reload a table view with a different data source");
+    [self.masterTableView reloadData];
+    if (selectedRow != -1 && selectedRow < [self.masterTableView numberOfRows]) {
+        [self.masterTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedRow] byExtendingSelection:NO];
     }
-    if (self.detailTableView.dataSource == self) {
-        [self.detailTableView reloadData];
-    }
-    if (self.collectionView.dataSource == self) {
-        [self.collectionView reloadData];
-    }
+
+    NSAssert(self.detailTableView == nil || self.detailTableView.dataSource == self, @"Cannot reload a table view with a different data source");
+    [self.detailTableView reloadData];
+
+    NSAssert(self.collectionView == nil || self.collectionView.dataSource == self, @"Cannot reload a collection view with a different data source");
+    [self.collectionView reloadData];
     
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotification
                                                       object:self
