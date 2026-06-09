@@ -40,13 +40,19 @@
 
 - (void)connect
 {
-    [self.currentDataSource connect];
+    id<VLCLibraryDataSource> const dataSource = self.currentDataSource;
+    if ([dataSource respondsToSelector:@selector(connect)]) {
+        [dataSource connect];
+    }
     _connected = YES;
 }
 
 - (void)disconnect
 {
-    [self.currentDataSource disconnect];
+    id<VLCLibraryDataSource> const dataSource = self.currentDataSource;
+    if ([dataSource respondsToSelector:@selector(disconnect)]) {
+        [dataSource disconnect];
+    }
     _connected = NO;
 }
 
