@@ -557,6 +557,20 @@ static void FillA( plane_t *d, unsigned i_offset )
             d->p_pixels[y*d->i_pitch+x+i_offset] = 0xff;
 }
 
+static void ConvertA( struct SwsContext *ctx, plane_t *dst_plane,
+                      const plane_t *src_plane, int i_height )
+{
+    /* src/dst are GREY planes that already hold the cropped,
+     * de-offset alpha. Feed swscale their raw pixels. */
+    const uint8_t *src[4] = { src_plane->p_pixels, NULL, NULL, NULL };
+    uint8_t *dst[4] = { dst_plane->p_pixels, NULL, NULL, NULL };
+    const int src_stride[4] = { src_plane->i_pitch, 0, 0, 0 };
+    const int dst_stride[4] = { dst_plane->i_pitch, 0, 0, 0 };
+
+    sws_scale( ctx, src, src_stride, 0, i_height, dst, dst_stride );
+}
+
+
 static void CopyPad( picture_t *p_dst, const picture_t *p_src )
 {
     picture_Copy( p_dst, p_src );
@@ -679,8 +693,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
 
-        Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a,
-                 p_fmti->i_visible_height, 1, false, false );
+        ConvertA( p_sys->ctxA, &p_sys->p_dst_a->p[0], &p_sys->p_src_a->p[0],
+                  p_fmti->i_visible_height );
         if( p_fmto->i_chroma == VLC_CODEC_RGBA || p_fmto->i_chroma == VLC_CODEC_BGRA )
             InjectA( p_dst, p_sys->p_dst_a, OFFSET_A );
         else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
