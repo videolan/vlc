@@ -156,21 +156,16 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 {
     _audioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _audioDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    _audioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
-    _audioDataSource.songsTableView = _audioSongTableView;
-    _audioDataSource.collectionView = _audioLibraryCollectionView;
-    _audioDataSource.gridModeListTableView = _audioLibraryGridModeSplitViewListTableView;
     _audioDataSource.headerDelegate = self;
     [_audioDataSource setup];
 
     _audioGroupDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
-    _audioGroupDataSource.tableViews = @[_audioGroupSelectionTableView];
-    _audioGroupDataSource.collectionViews = @[_audioLibraryGridModeSplitViewListSelectionCollectionView];
     _audioDataSource.audioGroupDataSource = _audioGroupDataSource;
 }
 
 - (void)setupAudioCollectionView
 {
+    _audioDataSource.collectionView = _audioLibraryCollectionView;
     _audioLibraryCollectionView.dataSource = _audioDataSource;
     _audioLibraryCollectionView.delegate = _audioLibraryCollectionViewDelegate;
 
@@ -184,6 +179,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 {
     _audioLibrarySplitView.delegate = _splitViewDelegate;
 
+    _audioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
@@ -192,13 +188,22 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioGroupSelectionTableView.tableColumns.firstObject.headerCell = [VLCLibraryHeaderCell new];
 
     _audioGroupSelectionTableView.dataSource = _audioGroupDataSource;
+    _audioGroupDataSource.tableViews = @[_audioGroupSelectionTableView];
     _audioGroupSelectionTableView.delegate = _audioGroupLibraryTableViewDelegate;
 
     if(@available(macOS 11.0, *)) {
         _audioGroupSelectionTableView.style = NSTableViewStyleFullWidth;
     }
 
+    _audioDataSource.songsTableView = _audioSongTableView;
     _audioSongTableView.dataSource = _audioDataSource;
+
+    _audioDataSource.gridModeListTableView = _audioLibraryGridModeSplitViewListTableView;
+    _audioLibraryGridModeSplitViewListTableView.dataSource = _audioDataSource;
+
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.dataSource = _audioGroupDataSource;
+    _audioGroupDataSource.collectionViews = @[_audioLibraryGridModeSplitViewListSelectionCollectionView];
+
     _audioSongTableView.delegate = _audioLibraryTableViewDelegate;
 
     [_audioDataSource applySelectionForTableView:_audioCollectionSelectionTableView];
