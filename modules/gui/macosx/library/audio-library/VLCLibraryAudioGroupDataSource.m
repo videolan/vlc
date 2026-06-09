@@ -89,7 +89,7 @@
     }
 
     if ([keyPath isEqualToString:@"collectionViews"]) {
-        [self reloadCollectionViews];
+        [self reloadCollectionView];
     } else if ([keyPath isEqualToString:@"tableViews"]) {
         [self reloadTableViews];
     }
@@ -159,10 +159,12 @@
     NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndex:0];
     NSSet * const indexPaths = [NSSet setWithObject:[NSIndexPath indexPathForItem:row inSection:0]];
 
-    [self performActionOnTableViews:^(NSTableView * const tableView){
-        [tableView reloadDataForRowIndexes:indexSet columnIndexes:columnIndexSet];
-    } onCollectionViews:^(NSCollectionView * const collectionView){
-        [collectionView reloadItemsAtIndexPaths:indexPaths];
+    [self.collectionView performBatchUpdates:^{
+        [self.collectionView reloadItemsAtIndexPaths:indexPaths];
+    } completionHandler:^(BOOL __unused finished) {
+        [self performActionOnTableViews:^(NSTableView * const tableView){
+            [tableView reloadDataForRowIndexes:indexSet columnIndexes:columnIndexSet];
+        }];
     }];
 }
 
@@ -185,20 +187,13 @@
 }
 
 - (void)performActionOnTableViews:(void (^)(NSTableView *))tableViewAction
-                onCollectionViews:(void (^)(NSCollectionView *))collectionViewAction
 {
-    NSParameterAssert(tableViewAction != nil && collectionViewAction != nil);
+    NSParameterAssert(tableViewAction != nil);
 
     NSArray<NSTableView *> * const tableViews = self.tableViews;
     for (NSTableView * const tableView in tableViews) {
         NSAssert(tableView.dataSource == self, @"Cannot perform action on a table view with a different data source");
         tableViewAction(tableView);
-    }
-
-    NSArray<NSCollectionView *> * const collectionViews = self.collectionViews;
-    for (NSCollectionView * const collectionView in collectionViews) {
-        NSAssert(collectionView.dataSource == self, @"Cannot perform action on a collection view with a different data source");
-        collectionViewAction(collectionView);
     }
 }
 
@@ -244,15 +239,17 @@
 
     NSMutableArray * const mutableCopy = [self.representedListOfAlbums mutableCopy];
     [mutableCopy removeObjectAtIndex:row];
-    self.representedListOfAlbums = [mutableCopy copy];
 
     NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:row];
     NSSet * const indexPaths = [NSSet setWithObject:[NSIndexPath indexPathForItem:row inSection:0]];
 
-    [self performActionOnTableViews:^(NSTableView * const tableView){
-        [tableView removeRowsAtIndexes:indexSet withAnimation:NSTableViewAnimationSlideUp];
-    } onCollectionViews:^(NSCollectionView * const collectionView){
-        [collectionView deleteItemsAtIndexPaths:indexPaths];
+    [self.collectionView performBatchUpdates:^{
+        self.representedListOfAlbums = [mutableCopy copy];
+        [self.collectionView deleteItemsAtIndexPaths:indexPaths];
+    } completionHandler:^(BOOL __unused finished) {
+        [self performActionOnTableViews:^(NSTableView * const tableView){
+            [tableView removeRowsAtIndexes:indexSet withAnimation:NSTableViewAnimationSlideUp];
+        }];
     }];
 }
 
@@ -265,24 +262,22 @@
     }
 }
 
-- (void)reloadCollectionViews
+- (void)reloadCollectionView
 {
-    NSArray<NSCollectionView *> * const collectionViews = self.collectionViews;
-    for (NSCollectionView * const collectionView in collectionViews) {
-        NSAssert(collectionView == nil || collectionView.dataSource == self, @"Cannot perform action on a collection view with a different data source");
+    NSCollectionView * const collectionView = self.collectionView;
+    NSAssert(collectionView == nil || collectionView.dataSource == self, @"Cannot perform action on a collection view with a different data source");
 
-        NSCollectionViewLayout * const collectionViewLayout = collectionView.collectionViewLayout;
-        if ([collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class]) {
-            [(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout resetLayout];
-        }
-        [collectionView reloadData];
+    NSCollectionViewLayout * const collectionViewLayout = collectionView.collectionViewLayout;
+    if ([collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class]) {
+        [(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout resetLayout];
     }
+    [collectionView reloadData];
 }
 
 - (void)reloadData
 {
     [self reloadTableViews];
-    [self reloadCollectionViews];
+    [self reloadCollectionView];
 }
 
 - (void)updateRepresentedListOfAlbums

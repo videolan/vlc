@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic, retain, nullable) id<VLCMediaLibraryAudioGroupProtocol> representedAudioGroup;
 @property (readwrite, atomic, retain) NSArray <NSTableView *> *tableViews;
-@property (readwrite, atomic, retain) NSArray <NSCollectionView *> *collectionViews;
+@property (readwrite, atomic, retain) NSCollectionView *collectionView;
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView;
 

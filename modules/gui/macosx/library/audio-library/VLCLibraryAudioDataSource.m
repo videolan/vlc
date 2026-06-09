@@ -642,17 +642,16 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
             return;
         }
 
-        [self.displayedCollection removeObjectAtIndex:index];
-
         NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
         NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
 
-        [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-        [self.songsTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
-
-        // Comment in reloadDataForMediaLibraryItem will be informative
-
-        [self.carouselView reloadData];
+        [self.collectionView performBatchUpdates:^{
+            [self.displayedCollection removeObjectAtIndex:index];
+            [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+        } completionHandler:^(BOOL __unused finished) {
+            [self.songsTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
+            [self.carouselView reloadData];
+        }];
     }];
 }
 
