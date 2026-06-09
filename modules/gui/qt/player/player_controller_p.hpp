@@ -28,6 +28,10 @@
 
 #include <QTimer>
 #include <QUrl>
+#include <QByteArray>
+#include <QPair>
+
+#include <optional>
 
 #ifndef QT_HAS_LIBATOMIC
 #warning "libatomic is not available. Read write lock is going to be used instead."
@@ -58,6 +62,11 @@ public:
     void UpdateSpuOrder(vlc_es_id_t *es_id, enum vlc_vout_order spu_order);
     int interpolateTime(vlc_tick_t system_now);
     bool isCurrentItemSynced();
+
+    // Lazily reads m_syltRaw (the raw sylt-data buffer captured during
+    // UpdateMeta) into a list of TimedText entries. The cache is
+    // invalidated when m_syltRaw changes.
+    QList<TimedText> syltLyrics() const;
     void onArtFetchEnded(input_item_t *, bool fetched);
 
     // SMPTE Timer
@@ -195,6 +204,9 @@ public:
     QString m_album;
     QUrl m_artwork;
     QUrl m_url;
+
+    mutable std::optional<QPair<QByteArray, size_t>> m_syltRaw;
+    mutable std::optional<QList<TimedText>> m_syltLyrics;
 };
 
 #endif /* QVLC_INPUT_MANAGER_P_H_ */

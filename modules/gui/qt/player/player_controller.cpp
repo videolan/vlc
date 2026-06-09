@@ -197,10 +197,62 @@ void PlayerControllerPrivate::UpdateMeta( input_item_t *p_item )
             m_artist  = vlc_meta_Get(p_item->p_meta, vlc_meta_Artist);
             m_album   = vlc_meta_Get(p_item->p_meta, vlc_meta_Album);
             m_artwork = vlc_meta_Get(p_item->p_meta, vlc_meta_ArtworkURL);
+
+            /* Capture the raw sylt-data buffer; the entry list is built on
+             * first read so we don't pay for it when lyrics are never shown.
+             * Later meta refreshes may not carry sylt-data again, so keep the
+             * cached buffer until the current media changes. */
+            const char *psz_sylt_data = vlc_meta_GetExtra( p_item->p_meta, "sylt-data" );
+            if (psz_sylt_data != NULL)
+            {
+                QByteArray newRaw( psz_sylt_data );
+                const auto hash = qHash(newRaw);
+                if (!m_syltRaw || hash != m_syltRaw->second)
+                {
+                    m_syltRaw = qMakePair(std::move( newRaw ), hash);
+                    m_syltLyrics.reset();
+                }
+            }
         }
     }
 
+    if (m_syltRaw) {
+        emit q->hasLyricsChanged(true);
+        emit q->syltLyricsChanged();
+    }
+
     emit q->currentMetaChanged( p_item  );
+}
+
+QList<TimedText>
+PlayerControllerPrivate::syltLyrics() const
+{
+    if (!m_syltLyrics.has_value())
+    {
+        QList<TimedText> lyrics;
+
+        if (m_syltRaw)
+        {
+            assert(!m_syltRaw->first.isEmpty());
+            const QString sylt = QString::fromUtf8(m_syltRaw->first);
+            m_syltRaw->first.clear();
+
+            const auto entries = QStringView( sylt ).split( QChar( 0x1E ), Qt::SkipEmptyParts );
+
+            for (const QStringView &entry : entries)
+            {
+                const qsizetype sep = entry.indexOf( QChar( 0x1F ) );
+                if (sep <= 0)
+                    continue;
+
+                const vlc_tick_t time =
+                    VLC_TICK_FROM_MS( entry.first( sep ).toLongLong() );
+                lyrics.push_back( TimedText( entry.sliced( sep + 1 ).toString(), VLCTime( time ) ) );
+            }
+            m_syltLyrics = std::move( lyrics );
+        }
+    }
+    return *m_syltLyrics;
 }
 
 void PlayerControllerPrivate::UpdateInfo( input_item_t *p_item )
@@ -290,6 +342,11 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
                 vlc_player_locker lock{ that->m_player };
                 that->m_currentItem.reset(nullptr);
             }
+
+            that->m_syltRaw.reset();
+            that->m_syltLyrics.reset();
+            emit that->q_func()->hasLyricsChanged(false);
+            emit that->q_func()->syltLyricsChanged();
             emit that->q_func()->inputChanged(false);
         });
         return;
@@ -298,6 +355,12 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
     SharedInputItem newMediaPtr = SharedInputItem( new_media );
     that->callAsync([that,newMediaPtr] () {
         PlayerController* q = that->q_func();
+
+        that->m_syltRaw.reset();
+        that->m_syltLyrics.reset();
+        emit q->hasLyricsChanged(false);
+        emit q->syltLyricsChanged();
+
         that->UpdateArt( newMediaPtr.get() );
         that->UpdateMeta( newMediaPtr.get() );
         that->UpdateInfo( newMediaPtr.get() );
@@ -392,6 +455,14 @@ static void on_player_state_changed(vlc_player_t *, enum vlc_player_state state,
             emit q->artChanged( "" );
             emit q->infoChanged( NULL );
             emit q->currentMetaChanged( (input_item_t *)NULL );
+
+            if (that->m_syltRaw)
+            {
+                that->m_syltRaw.reset();
+                that->m_syltLyrics.reset();
+                emit q->hasLyricsChanged( false );
+                emit q->syltLyricsChanged();
+            }
 
             that->m_hasPrograms =false;
             emit q->hasProgramsChanged( false );
@@ -2170,5 +2241,17 @@ PRIMITIVETYPE_GETTER(QString, getArtist, m_artist)
 PRIMITIVETYPE_GETTER(QString, getAlbum, m_album)
 PRIMITIVETYPE_GETTER(QUrl, getArtwork, m_artwork)
 PRIMITIVETYPE_GETTER(QUrl, getUrl, m_url)
+
+bool PlayerController::hasLyrics() const
+{
+    Q_D(const PlayerController);
+    return d->m_syltRaw.has_value();
+}
+
+QList<TimedText> PlayerController::getSyltLyrics() const
+{
+    Q_D(const PlayerController);
+    return d->syltLyrics();
+}
 
 #undef PRIMITIVETYPE_GETTER

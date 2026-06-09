@@ -170,6 +170,8 @@ public:
     Q_PROPERTY(int subtitleDelayMS READ getSubtitleDelayMS WRITE setSubtitleDelayMS NOTIFY subtitleDelayChanged FINAL)
     Q_PROPERTY(int secondarySubtitleDelayMS READ getSecondarySubtitleDelayMS WRITE setSecondarySubtitleDelayMS NOTIFY secondarySubtitleDelayChanged FINAL)
     Q_PROPERTY(float subtitleFPS READ getSubtitleFPS WRITE setSubtitleFPS NOTIFY subtitleFPSChanged FINAL)
+    Q_PROPERTY(bool hasLyrics READ hasLyrics NOTIFY hasLyricsChanged FINAL)
+    Q_PROPERTY(QList<TimedText> syltLyrics READ getSyltLyrics NOTIFY syltLyricsChanged FINAL)
 
     //title/chapters/menu
     Q_PROPERTY(TitleListModel* titles READ getTitles CONSTANT FINAL)
@@ -424,6 +426,8 @@ public slots:
     QString getArtist() const;
     QString getAlbum() const;
     QUrl getArtwork() const;
+    bool hasLyrics() const;
+    QList<TimedText> getSyltLyrics() const;
 
     //Renderer
     RendererManager* getRendererManager();
@@ -503,6 +507,8 @@ signals:
     void statisticsUpdated( const input_stats_t& stats );
     void infoChanged( input_item_t* );
     void currentMetaChanged( input_item_t* );
+    void hasLyricsChanged( bool );
+    void syltLyricsChanged();
     void metaChanged( input_item_t *);
     void artChanged( QString ); /* current item art ( same as item == NULL ) */
     void artChanged( input_item_t * );
