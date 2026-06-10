@@ -217,6 +217,21 @@ Item {
             }
         }
 
+        Widgets.PointingTooltip {
+            parent: null
+            z: 99
+
+            colorContext.palette: parent && parent.colorContext ? parent.colorContext.palette
+                                                                : VLCStyle.palette
+
+            Widgets.PointingToolTipAttached.instance: this
+
+            Component.onDestruction: {
+                console.assert(Widgets.PointingToolTipAttached.instance === this)
+                Widgets.PointingToolTipAttached.instance = null
+            }
+        }
+
         Loader {
             id: playlistWindowLoader
             asynchronous: true
