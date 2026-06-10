@@ -560,7 +560,7 @@ void VLCMenuBar::HelpMenu(qt_intf_t *p_intf, QMenu *menu )
         {
             const auto updateModel = ctx->getUpdateModel();
             assert(updateModel);
-            updateModel->checkUpdate();
+            updateModel->checkUpdate(true);
         }
     });
 #endif

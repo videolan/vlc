@@ -205,6 +205,7 @@ public:
 
     const update_release_t* m_release = nullptr;
     UpdateModel::Status m_status = UpdateModel::Unchecked;
+    bool m_explicitCheck = false;
 
     UpdateModel* q_ptr = nullptr;
 };
@@ -283,11 +284,18 @@ UpdateModel::~UpdateModel()
     update_Delete( d->m_update );
 }
 
-void UpdateModel::checkUpdate()
+void UpdateModel::checkUpdate(bool explicitCheck)
 {
     Q_D(UpdateModel);
     if (d->m_status == Checking)
         return;
+
+    if (d->m_explicitCheck != explicitCheck)
+    {
+        d->m_explicitCheck = explicitCheck;
+        emit explicitCheckChanged();
+    }
+
     d->m_release = nullptr;
     d->m_status = Checking;
     emit updateStatusChanged();
@@ -373,6 +381,11 @@ double UpdateModel::getProgress() const
     return 0.0;
 }
 
+bool UpdateModel::explicitCheck() const
+{
+    Q_D(const UpdateModel);
+    return d->m_explicitCheck;
+}
 
 
 /*****************************************************************************

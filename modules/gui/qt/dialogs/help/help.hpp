@@ -95,12 +95,13 @@ public:
     Q_PROPERTY(QString description READ getDescription NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(QString url READ getUrl NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(double progress READ getProgress NOTIFY progressChanged FINAL) // TODO
+    Q_PROPERTY(bool explicitCheck READ explicitCheck NOTIFY explicitCheckChanged FINAL)
 
 public:
     explicit UpdateModel(qt_intf_t * p_intf);
     ~UpdateModel();
 
-    Q_INVOKABLE void checkUpdate();
+    Q_INVOKABLE void checkUpdate(bool explicitCheck = false);
 
     Q_INVOKABLE bool download(QString destDir);
     Q_INVOKABLE bool download();
@@ -115,10 +116,12 @@ public:
     QString getDescription() const;
     QString getUrl() const;
     double getProgress() const;
+    bool explicitCheck() const;
 
 signals:
     void updateStatusChanged();
     void progressChanged();
+    void explicitCheckChanged();
 
 private:
     Q_DECLARE_PRIVATE(UpdateModel)
