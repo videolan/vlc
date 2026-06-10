@@ -196,7 +196,7 @@ T.Pane {
                 function onVolumeChanged() { volControl._syncVolumeWithPlayer() }
             }
 
-            Binding on toolTip.visible {
+            Binding on Widgets.PointingToolTipAttached.visible {
                 when: sliderMouseArea.pressed
                 value: true
             }

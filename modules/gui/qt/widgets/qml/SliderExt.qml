@@ -21,7 +21,7 @@
 import QtQuick
 import QtQuick.Templates as T
 
-
+import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util
 
@@ -50,8 +50,6 @@ T.Slider {
     // when set the tooltip will follow the mouse when control is hoverred
     // else tooltip will always be shown at current value.
     property bool toolTipFollowsMouse: false
-
-    property alias toolTip: toolTip
 
     // toolTipTextProvider -> function(value)
     // arg "value" is between from and to, this is "value"
@@ -138,26 +136,17 @@ T.Slider {
         target: background
     }
 
-    PointingTooltip {
-       id: toolTip
+    Widgets.PointingToolTipAttached.pos: Qt.point(control._tooltipX, control.handle.height / 2)
+    Widgets.PointingToolTipAttached.visible: (hoverHandler.hovered || control.visualFocus || control.pressed)
+    Widgets.PointingToolTipAttached.text: {
+        if (!Widgets.PointingToolTipAttached.instance?.visible)
+            return ""
 
-       z: 1 // without this tooltips get placed below root's parent popup (if any)
-
-       pos: Qt.point(control._tooltipX, control.handle.height / 2)
-
-       visible: hoverHandler.hovered || control.visualFocus || control.pressed
-
-       text: {
-           if (!visible) return ""
-
-           // position is only measured till half of handle width
-           // pos.x may go beyond the position at the edges
-           const p = Helpers.clamp(control.positionAt(pos.x), 0.0, 1.0)
-           const v = control.valueAt(p)
-           return control.toolTipTextProvider(v)
-       }
-
-       //tooltip is a Popup, palette should be passed explicitly
-       colorContext.palette: theme.palette
+        // position is only measured till half of handle width
+        // pos.x may go beyond the position at the edges
+        const p = Helpers.clamp(control.positionAt(Widgets.PointingToolTipAttached.instance.pos.x), 0.0, 1.0)
+        const v = control.valueAt(p)
+        return control.toolTipTextProvider(v)
     }
+
 }
