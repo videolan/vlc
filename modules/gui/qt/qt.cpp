@@ -1117,6 +1117,7 @@ static void *Thread( void *obj )
 #endif
 
     app.setApplicationDisplayName( qtr("VLC media player") );
+    app.setApplicationVersion( QString::fromUtf8(VERSION_MESSAGE) );
 
     if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
         app.setWindowIcon( QIcon::fromTheme( "vlc-xmas", QIcon( ":/logo/vlc128-xmas.png" ) ) );
