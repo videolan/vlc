@@ -1246,43 +1246,54 @@ UpdateModel* MainCtx::getUpdateModel() const
         m_updateModel = std::make_unique<UpdateModel>(p_intf);
 
         connect(m_updateModel.get(), &UpdateModel::updateStatusChanged, this, [this](){
-            switch (m_updateModel->updateStatus())
-            {
-            case UpdateModel::NeedUpdate:
-                qWarning() << "Need update";
+            // No-op, modern update pane opens itself automatically when status changes.
+            // However, the old update dialog is used as fallback in case for any reason
+            // the modern pane is not available.
 
-                // No-op, modern update pane opens itself automatically when status changes.
-                // However, the old update dialog is used as fallback in case for any reason
-                // the modern pane is not available.
+            const auto openLegacyDialogIfNecessary = [&]() {
+                // Fallback:
 
+                if (Q_LIKELY(p_intf &&
+                             p_intf->p_compositor &&
+                             p_intf->p_compositor->quickWindow() &&
+                             p_intf->p_compositor->quickWindow()->contentItem()))
                 {
-                    // Fallback:
-
-                    if (Q_LIKELY(p_intf &&
-                                 p_intf->p_compositor &&
-                                 p_intf->p_compositor->quickWindow() &&
-                                 p_intf->p_compositor->quickWindow()->contentItem()))
-                    {
-                        const auto target = p_intf->p_compositor->quickWindow()->contentItem();
-                        QMetaObject::invokeMethod(target, [target]() {
-                            const auto updatePaneLoader = target->findChild<QQuickItem*>(QStringLiteral("updatePaneLoader"));
-                            if (!updatePaneLoader || (updatePaneLoader->property("status").toInt() != 1 /* Loader.Ready */))
-                            {
-                                qDebug("No acknowledgement from the modern update loader, falling back to the old update dialog.");
-                                THEDP->updateDialog();
-                            }
-                        }, Qt::QueuedConnection);
-                    }
-                    else
-                    {
-                        qDebug("Compositor is not available, falling back to the old update dialog.");
-                        THEDP->updateDialog();
-                    }
+                    const auto target = p_intf->p_compositor->quickWindow()->contentItem();
+                    QMetaObject::invokeMethod(target, [target]() {
+                        const auto updatePaneLoader = target->findChild<QQuickItem*>(QStringLiteral("updatePaneLoader"));
+                        if (!updatePaneLoader || (updatePaneLoader->property("status").toInt() != 1 /* Loader.Ready */))
+                        {
+                            qDebug("No acknowledgement from the modern update loader, falling back to the old update dialog.");
+                            THEDP->updateDialog(DialogsProvider::Show);
+                        }
+                    }, Qt::QueuedConnection);
                 }
+                else
+                {
+                    qDebug("Compositor is not available, falling back to the old update dialog.");
+                    THEDP->updateDialog();
+                }
+            };
 
-                break;
-            default:
-                break;
+            if (m_updateModel->explicitCheck())
+            {
+                if (m_updateModel->updateStatus() != UpdateModel::Unchecked)
+                    openLegacyDialogIfNecessary();
+            }
+            else
+            {
+                switch (m_updateModel->updateStatus())
+                {
+                case UpdateModel::UpToDate:
+                case UpdateModel::Unchecked:
+                case UpdateModel::Checking:
+                    break;
+                case UpdateModel::NeedUpdate:
+                    qWarning() << "Need update";
+                    [[fallthrough]];
+                default:
+                    openLegacyDialogIfNecessary();
+                }
             }
         });
     }
