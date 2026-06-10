@@ -710,13 +710,8 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
     for (size_t i = 0; i < ARRAY_SIZE(src); i++)
         csrc[i] = src[i];
 
-#if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
     sws_scale( ctx, csrc, src_stride, 0, i_height,
                dst, dst_stride );
-#else
-    sws_scale_ordered( ctx, csrc, src_stride, 0, i_height,
-                       dst, dst_stride );
-#endif
 }
 
 /****************************************************************************
