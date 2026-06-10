@@ -197,6 +197,10 @@
     NSAssert(mediaItem != nil, @"Notification should contain a media item!");
     if (mediaItem.libraryID != self.representedItem.item.libraryID) {
         return;
+    } else if (mediaItem.progress == 0 || mediaItem.progress == 100 || mediaItem.playCount == 0) {
+        // If the item is now unplayed or fully played, it is not optimal anymore
+        [self setOptimalRepresentedItem];
+        return;
     }
 
     VLCLibraryRepresentedItem * const item =
