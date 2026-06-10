@@ -480,45 +480,55 @@ static int UpdatePlaylistManifest(hls_playlist_t *playlist)
     return VLC_SUCCESS;
 }
 
-static hls_block_chain_t ExtractCommonSegment(hls_block_chain_t *muxed_output,
-                                              vlc_tick_t max_segment_length)
-{
-    hls_block_chain_t segment = {.begin = muxed_output->begin};
 
-    vlc_tick_t gop_length = 0;
+/* A point where the segment can legally end. */
+typedef struct
+{
+    block_t *last;
+    vlc_tick_t length;
+} hls_cut_t;
+
+static hls_cut_t CutTsSegment(hls_block_chain_t *muxed_output,
+                              vlc_tick_t max_length)
+{
+    hls_cut_t iframe_cut = {0};
+
     block_t *prev = NULL;
-    block_t *segment_end = NULL;
+    vlc_tick_t total = 0;
     for (block_t *it = muxed_output->begin; it != NULL; it = it->p_next)
     {
-        if (it->i_flags & BLOCK_FLAG_HEADER)
-        {
-            segment_end = prev;
-            segment.length += gop_length;
-            gop_length = 0;
-        }
-        if (segment.length + gop_length + it->i_length > max_segment_length)
-        {
-            if (segment_end == NULL)
-            {
-                segment_end = prev;
-                segment.length += gop_length;
-                gop_length = 0;
-            }
+        if (prev != NULL && (it->i_flags & BLOCK_FLAG_HEADER))
+            iframe_cut = (hls_cut_t){.last = prev, .length = total};
+
+        if (total + it->i_length > max_length)
             break;
-        }
-        gop_length += it->i_length;
+
+        total += it->i_length;
         prev = it;
     }
 
-    if (segment_end != NULL)
+    return iframe_cut.last ? iframe_cut
+                           : (hls_cut_t){.last = prev, .length = total};
+}
+
+static hls_block_chain_t ExtractAVSegment(hls_block_chain_t *muxed_output,
+                                          vlc_tick_t max_length)
+{
+    hls_block_chain_t segment = {.begin = muxed_output->begin};
+
+    const hls_cut_t cut = CutTsSegment(muxed_output, max_length);
+
+    if (cut.last != NULL)
     {
-        muxed_output->begin = segment_end->p_next;
-        segment_end->p_next = NULL;
+        segment.length = cut.length;
+        muxed_output->begin = cut.last->p_next;
+        cut.last->p_next = NULL;
         muxed_output->length -= segment.length;
     }
     else
     {
-        segment.length = gop_length;
+        /* Nothing usable to cut on: emit whatever we hold as a single segment. */
+        segment.length = cut.length;
         hls_block_chain_Reset(muxed_output);
     }
     return segment;
@@ -552,7 +562,7 @@ static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist)
     const vlc_tick_t seglen = playlist->config->segment_length;
     if (playlist->type == HLS_PLAYLIST_TYPE_WEBVTT)
         return ExtractSubtitleSegment(&playlist->muxed_output, seglen);
-    return ExtractCommonSegment(&playlist->muxed_output, seglen);
+    return ExtractAVSegment(&playlist->muxed_output, seglen);
 }
 
 static bool IsSegmentSelfDecodable(const hls_block_chain_t *segment)
