@@ -1148,19 +1148,21 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
             [recentMediaArray replaceObjectAtIndex:recentMediaIndex withObject:mediaItem];
-            switch (mediaItem.mediaType) {
-                case VLC_ML_MEDIA_TYPE_VIDEO:
-                    [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemUpdated 
-                                           withObject:mediaItem];
-                    break;
-                case VLC_ML_MEDIA_TYPE_AUDIO:
-                    [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaItemUpdated 
-                                           withObject:mediaItem];
-                    break;
-                case VLC_ML_MEDIA_TYPE_UNKNOWN:
-                    NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
-                    break;
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                switch (mediaItem.mediaType) {
+                    case VLC_ML_MEDIA_TYPE_VIDEO:
+                        [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemUpdated 
+                                            withObject:mediaItem];
+                        break;
+                    case VLC_ML_MEDIA_TYPE_AUDIO:
+                        [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaItemUpdated 
+                                            withObject:mediaItem];
+                        break;
+                    case VLC_ML_MEDIA_TYPE_UNKNOWN:
+                        NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
+                        break;
+                }
+            });
         }
 
         if (showsArray != nil && showIndex != NSNotFound) {
@@ -1168,22 +1170,26 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             VLCMediaLibraryShow * const staleShow = showsArray[showIndex];
             VLCMediaLibraryShow * const updatedShow = [VLCMediaLibraryShow showWithLibraryId:staleShow.libraryID];
             [showsArray replaceObjectAtIndex:showIndex withObject:updatedShow];
-            [self.changeDelegate notifyChange:VLCLibraryModelShowUpdated withObject:updatedShow];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.changeDelegate notifyChange:VLCLibraryModelShowUpdated withObject:updatedShow];
+            });
         }
 
-        switch (mediaItem.mediaType) {
-            case VLC_ML_MEDIA_TYPE_VIDEO:
-                [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaItemUpdated 
-                                       withObject:mediaItem];
-                break;
-            case VLC_ML_MEDIA_TYPE_AUDIO:
-                [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaItemUpdated 
-                                       withObject:mediaItem];
-                break;
-            case VLC_ML_MEDIA_TYPE_UNKNOWN:
-                NSLog(@"Unknown type of media type encountered, don't know what to do in update");
-                break;
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            switch (mediaItem.mediaType) {
+                case VLC_ML_MEDIA_TYPE_VIDEO:
+                    [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaItemUpdated 
+                                        withObject:mediaItem];
+                    break;
+                case VLC_ML_MEDIA_TYPE_AUDIO:
+                    [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaItemUpdated 
+                                        withObject:mediaItem];
+                    break;
+                case VLC_ML_MEDIA_TYPE_UNKNOWN:
+                    NSLog(@"Unknown type of media type encountered, don't know what to do in update");
+                    break;
+            }
+        });
     }];
 }
 
@@ -1214,46 +1220,58 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
             [recentMediaArray removeObjectAtIndex:recentMediaIndex];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                switch (mediaItem.mediaType) {
+                    case VLC_ML_MEDIA_TYPE_VIDEO:
+                        [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemDeleted
+                                               withObject:mediaItem];
+                        break;
+                    case VLC_ML_MEDIA_TYPE_AUDIO:
+                        [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaItemDeleted 
+                                               withObject:mediaItem];
+                        break;
+                    case VLC_ML_MEDIA_TYPE_UNKNOWN:
+                        NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
+                        break;
+                }
+            });
+        }
+
+        if (showsArray != nil && showIndex != NSNotFound) {
+            // An episode has changed. Refresh the whole show.
+            VLCMediaLibraryShow * const staleShow = showsArray[showIndex];
+            VLCMediaLibraryShow * const updatedShow =
+                [VLCMediaLibraryShow showWithLibraryId:staleShow.libraryID];
+
+            if (updatedShow == nil || updatedShow.episodeCount == 0) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.changeDelegate notifyChange:VLCLibraryModelShowDeleted
+                                           withObject:@(staleShow.libraryID)];
+                });
+            } else {
+                [showsArray replaceObjectAtIndex:showIndex withObject:updatedShow];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.changeDelegate notifyChange:VLCLibraryModelShowUpdated
+                                           withObject:updatedShow];
+                });
+            }
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
             switch (mediaItem.mediaType) {
                 case VLC_ML_MEDIA_TYPE_VIDEO:
-                    [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemDeleted
+                    [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaItemDeleted
                                            withObject:mediaItem];
                     break;
                 case VLC_ML_MEDIA_TYPE_AUDIO:
-                    [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaItemDeleted 
+                    [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaItemDeleted
                                            withObject:mediaItem];
                     break;
                 case VLC_ML_MEDIA_TYPE_UNKNOWN:
                     NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
                     break;
             }
-        }
-
-        if (showsArray != nil && showIndex != NSNotFound) {
-            // An episode has changed. Refresh the whole show.
-            VLCMediaLibraryShow * const staleShow = showsArray[showIndex];
-            VLCMediaLibraryShow * const updatedShow = [VLCMediaLibraryShow showWithLibraryId:staleShow.libraryID];
-            if (updatedShow == nil || updatedShow.episodeCount == 0) {
-                [self.changeDelegate notifyChange:VLCLibraryModelShowDeleted withObject:@(staleShow.libraryID)];
-            } else {
-                [showsArray replaceObjectAtIndex:showIndex withObject:updatedShow];
-                [self.changeDelegate notifyChange:VLCLibraryModelShowUpdated withObject:updatedShow];
-            }
-        }
-
-        switch (mediaItem.mediaType) {
-            case VLC_ML_MEDIA_TYPE_VIDEO:
-                [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaItemDeleted
-                                       withObject:mediaItem];
-                break;
-            case VLC_ML_MEDIA_TYPE_AUDIO:
-                [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaItemDeleted
-                                       withObject:mediaItem];
-                break;
-            case VLC_ML_MEDIA_TYPE_UNKNOWN:
-                NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
-                break;
-        }
+        });
     }];
 }
 
