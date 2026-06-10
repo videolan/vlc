@@ -687,7 +687,23 @@ FocusScope {
 
         focus: !!item
 
-        readonly property bool shouldShow: !!UpdateModel && (UpdateModel.updateStatus !== UpdateModel.Unchecked)
+        readonly property bool shouldShow: {
+            if (!UpdateModel)
+                return false
+
+            if (UpdateModel.explicitCheck) {
+                return (UpdateModel.updateStatus !== UpdateModel.Unchecked)
+            } else {
+                switch (UpdateModel.updateStatus) {
+                    case UpdateModel.Unchecked:
+                    case UpdateModel.Checking:
+                    case UpdateModel.UpToDate:
+                        return false
+                    default:
+                        return true
+                }
+            }
+        }
 
         // This property can be used to enable/disable the animation:
         property alias toggleAnimation: heightBehavior.enabled
