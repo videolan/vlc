@@ -365,6 +365,7 @@ libqt_plugin_la_SOURCES = \
 	util/textureproviderindirection.hpp \
 	util/sgmanipulator.cpp \
 	util/sgmanipulator.hpp \
+	util/pointingtooltipattached.hpp \
 	widgets/native/animators.cpp \
 	widgets/native/animators.hpp \
 	widgets/native/customwidgets.cpp widgets/native/customwidgets.hpp \
@@ -527,6 +528,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	util/kirigamiwheelhandler.moc.cpp \
 	util/textureproviderindirection.moc.cpp \
 	util/sgmanipulator.moc.cpp \
+	util/pointingtooltipattached.moc.cpp \
 	widgets/native/animators.moc.cpp \
 	widgets/native/csdthemeimage.moc.cpp \
 	widgets/native/customwidgets.moc.cpp \
