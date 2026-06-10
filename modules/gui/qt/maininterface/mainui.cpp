@@ -55,6 +55,7 @@
 #include "util/textureproviderobserver.hpp"
 #include "util/textureproviderindirection.hpp"
 #include "util/sgmanipulator.hpp"
+#include "util/pointingtooltipattached.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -433,6 +434,7 @@ void MainUI::registerQMLTypes()
         // @uri VLC.Widgets
         qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
         qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
+        qmlRegisterTypesAndRevisions<PointingToolTipAttached>( uri, versionMajor );
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
