@@ -42,16 +42,9 @@ Item {
     visible: false
     opacity: 0
 
-    Widgets.PointingTooltip {
-        id: timeTooltip
-
-        //tooltip is a Popup, palette should be passed explicitly
-        colorContext.palette: theme.palette
-
-        visible: control.bookmarkHovered
-        text: control.bookmarkText
-        pos: Qt.point(control.bookmarkPosition, - yShift)
-    }
+    Widgets.PointingToolTipAttached.visible: control.bookmarkHovered
+    Widgets.PointingToolTipAttached.text: control.bookmarkText
+    Widgets.PointingToolTipAttached.pos: Qt.point(control.bookmarkPosition, - yShift)
 
     transitions: [
         Transition {
