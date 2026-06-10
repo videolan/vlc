@@ -304,9 +304,23 @@ void DialogsProvider::helpDialog()
 }
 
 #ifdef UPDATE_CHECK
-void DialogsProvider::updateDialog()
+void DialogsProvider::updateDialog(Mode mode)
 {
-    toggleDialogVisible(m_updateDialog);
+    ensureDialog(m_updateDialog);
+    assert(m_updateDialog);
+
+    switch (mode)
+    {
+    case Mode::Show:
+        m_updateDialog->show();
+        break;
+    case Mode::Hide:
+        m_updateDialog->hide();
+        break;
+    case Mode::Toggle:
+    default:
+        toggleDialogVisible(m_updateDialog);
+    };
 }
 #endif
 

@@ -197,7 +197,7 @@ public slots:
 #endif
     void helpDialog();
 #if defined(UPDATE_CHECK)
-    void updateDialog();
+    void updateDialog(Mode mode = Toggle);
 #endif
     void aboutDialog();
     void gotoTimeDialog();
