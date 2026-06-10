@@ -232,7 +232,6 @@ qt_plugin_sources = files(
     'dialogs/firstrun/firstrunwizard.hpp',
     'dialogs/gototime/gototime.cpp',
     'dialogs/gototime/gototime.hpp',
-    'dialogs/help/aboutmodel.cpp',
     'dialogs/help/aboutmodel.hpp',
     'dialogs/help/help.cpp',
     'dialogs/help/help.hpp',

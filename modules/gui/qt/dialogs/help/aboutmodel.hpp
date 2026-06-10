@@ -19,6 +19,10 @@
 #define ABOUTMODEL_HPP
 
 #include <QObject>
+#include <QtQml>
+
+#include <vlc_about.h>
+#include "config.h"
 
 class AboutModel : public QObject
 {
@@ -28,13 +32,40 @@ class AboutModel : public QObject
     Q_PROPERTY(QString authors READ getAuthors CONSTANT FINAL)
     Q_PROPERTY(QString thanks  READ getThanks  CONSTANT FINAL)
     Q_PROPERTY(QString version  READ getVersion  CONSTANT FINAL)
-public:
-    explicit AboutModel(QObject *parent = nullptr);
 
-    QString getLicense() const;
-    QString getAuthors() const;
-    QString getThanks() const;
-    QString getVersion() const;
+    QML_ELEMENT
+    QML_UNCREATABLE("AboutModel is meant to be a singleton.")
+    QML_SINGLETON
+
+public:
+    explicit AboutModel(QObject *parent = nullptr)
+        : QObject(parent)
+    { }
+
+    static AboutModel *create(class QQmlEngine *, class QJSEngine *)
+    {
+        return new AboutModel;
+    }
+
+    static QString getLicense()
+    {
+        return QString::fromUtf8(psz_license);
+    }
+
+    static QString getAuthors()
+    {
+        return QString::fromUtf8(psz_authors);
+    }
+
+    static QString getThanks()
+    {
+        return QString::fromUtf8(psz_thanks);
+    }
+
+    static QString getVersion()
+    {
+        return QString::fromUtf8(VERSION_MESSAGE);
+    }
 };
 
 #endif // ABOUTMODEL_HPP

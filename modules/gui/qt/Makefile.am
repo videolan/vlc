@@ -125,7 +125,6 @@ libqt_plugin_la_SOURCES = \
 	dialogs/fingerprint/fingerprintdialog.hpp \
 	dialogs/firstrun/firstrunwizard.cpp dialogs/firstrun/firstrunwizard.hpp \
 	dialogs/gototime/gototime.cpp dialogs/gototime/gototime.hpp \
-	dialogs/help/aboutmodel.cpp \
 	dialogs/help/aboutmodel.hpp \
 	dialogs/help/help.cpp dialogs/help/help.hpp \
 	dialogs/mediainfo/info_panels.cpp dialogs/mediainfo/info_panels.hpp \
