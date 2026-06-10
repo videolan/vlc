@@ -186,16 +186,8 @@
                                name:VLCLibraryModelVideoMediaItemUpdated
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(itemUpdated:)
-                               name:VLCLibraryModelAudioMediaItemUpdated
-                             object:nil];
-    [notificationCenter addObserver:self
                            selector:@selector(itemDeleted:)
                                name:VLCLibraryModelVideoMediaItemDeleted
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(itemDeleted:)
-                               name:VLCLibraryModelAudioMediaItemDeleted
                              object:nil];
 }
 
