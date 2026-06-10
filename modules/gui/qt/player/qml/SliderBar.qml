@@ -40,7 +40,7 @@ T.ProgressBar {
     readonly property real _scaledSeekPointsRadius: _seekPointsRadius * _hoveredScalingFactor
 
     property bool _currentChapterHovered: false
-    property real _tooltipPosition: timeTooltip.pos.x / width
+    property real _tooltipPosition: (Widgets.PointingToolTipAttached.instance?.pos.x ?? 0.0) / width
 
     property color backgroundColor: theme.bg.primary
     property real touchHandlerMargin: VLCStyle.touchHandlerMargin
@@ -72,34 +72,30 @@ T.ProgressBar {
         onTriggered: control._isSeekPointsShown = false
     }
 
-    Widgets.PointingTooltip {
-        id: timeTooltip
+    Widgets.PointingToolTipAttached.visible: (hoverHandler.hovered || control.visualFocus || dragHandler.active)
 
-        //tooltip is a Popup, palette should be passed explicitly
-        colorContext.palette: theme.palette
+    Widgets.PointingToolTipAttached.text: {
+        if (!Widgets.PointingToolTipAttached.instance?.visible)
+            return ""
 
-        visible: hoverHandler.hovered || control.visualFocus || dragHandler.active
+        let _text
 
-        text: {
-            let _text
+        const length = Player.length
+        if (hoverHandler.hovered)
+            _text = length.scale(Widgets.PointingToolTipAttached.instance.pos.x / control.width)
+        else
+            _text = Player.time
 
-            const length = Player.length
-            if (hoverHandler.hovered)
-                _text = length.scale(pos.x / control.width)
-            else
-                _text = Player.time
+        _text = _text.formatHMS(length.isSubSecond() ? VLCTick.SubSecondFormattedAsMS : 0)
 
-            _text = _text.formatHMS(length.isSubSecond() ? VLCTick.SubSecondFormattedAsMS : 0)
+        if (Player.hasChapters)
+            _text += " - " + Player.chapters.getNameAtPosition(control._tooltipPosition)
 
-            if (Player.hasChapters)
-                _text += " - " + Player.chapters.getNameAtPosition(control._tooltipPosition)
-
-            return _text
-        }
-
-        pos: Qt.point(hoverHandler.hovered ? Helpers.clamp(hoverHandler.point.position.x, 0, control.availableWidth)
-                                                        : (control.visualPosition * control.width), 0)
+        return _text
     }
+
+    Widgets.PointingToolTipAttached.pos: Qt.point(hoverHandler.hovered ? Helpers.clamp(hoverHandler.point.position.x, 0, control.availableWidth)
+                                                                       : (control.visualPosition * control.width), 0)
 
     FSM {
         id: fsm
