@@ -789,7 +789,7 @@ FocusScope {
         PIPPlayer {
             id: playerPip
             anchors {
-                bottom: miniPlayer.top
+                bottom: loaderUpdatePane.top
                 left: parent.left
                 bottomMargin: VLCStyle.margin_normal
                 leftMargin: VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
@@ -804,7 +804,7 @@ FocusScope {
             dragXMin: 0
             dragXMax: g_mainDisplay.width - playerPip.width
             dragYMin: sourcesBanner.y + sourcesBanner.height
-            dragYMax: miniPlayer.y - playerPip.height
+            dragYMax: loaderUpdatePane.y - playerPip.height
 
             //keep the player visible on resize
             Connections {
