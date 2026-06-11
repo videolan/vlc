@@ -1082,7 +1082,11 @@ void MainCtx::setAttachedToolTip(QObject *toolTip)
     assert(engine->objectOwnership(toolTip) == QQmlEngine::ObjectOwnership::JavaScriptOwnership);
 
     // Dynamic internal property:
+#if QT_VERSION < QT_VERSION_CHECK(6, 12, 0)
     static const char* const name = "_q_QQuickToolTip";
+#else
+    static const char* const name = "_q_shared_QQuickToolTip";
+#endif
 
     if (const auto obj = engine->property(name).value<QObject *>())
     {
