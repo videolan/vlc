@@ -243,6 +243,7 @@ public slots:
     void jumpTime( VLCTime i_time );
     void jumpToPos( double );
     void frameNext();
+    void framePrev();
 
     //title/chapters/menu
     void sectionNext();

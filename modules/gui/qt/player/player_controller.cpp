@@ -1439,6 +1439,15 @@ void PlayerController::frameNext()
     vlc_player_NextVideoFrame( d->m_player );
 }
 
+void PlayerController::framePrev()
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if( !d->isCurrentItemSynced() )
+        return;
+    vlc_player_PreviousVideoFrame( d->m_player );
+}
+
 //TRACKS
 
 void PlayerController::setAudioDelay(VLCDuration delay)
