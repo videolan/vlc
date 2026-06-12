@@ -647,8 +647,11 @@ static void PlaylistWriteMuxedOutput(hls_playlist_t *playlist,
     block_ChainLastAppend(&playlist->muxed_output.end, blocks);
     playlist->muxed_output.length += output_duration;
 
-    if (blocks->i_flags & BLOCK_FLAG_HEADER)
-        playlist->muxed_output.last_header = blocks;
+    for (block_t *it = blocks; it != NULL; it = it->p_next)
+    {
+        if (it->i_flags & BLOCK_FLAG_HEADER)
+            playlist->muxed_output.last_header = it;
+    }
 }
 
 static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
