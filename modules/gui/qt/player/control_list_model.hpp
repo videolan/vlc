@@ -66,6 +66,7 @@ public:
         ARTWORK_INFO,
         PLAYBACK_SPEED_BUTTON,
         HIGH_RESOLUTION_TIME_WIDGET,
+        FRAME_PREV_BUTTON,
 
         SPLITTER = 0x20,
         VOLUME,
