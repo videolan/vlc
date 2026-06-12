@@ -270,6 +270,12 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
                 struct vlc_player_timer_source *source = &player->timer.sources[i];
                 if (source->es != es_source)
                     continue;
+
+                /* The input might signal paused clock and then output
+                 * would signal it. This flag filters this case here. */
+                if (source->pause_reported)
+                    continue;
+                source->pause_reported = true;
                 vlc_player_SendTimerPause(player, source, system_date,
                                           i == VLC_PLAYER_TIMER_TYPE_SMPTE);
             }
@@ -279,6 +285,8 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
         case VLC_PLAYER_TIMER_EVENT_PLAYING:
             assert(!player->timer.stopping);
             player->timer.update_state = UPDATE_STATE_RESUMING;
+            for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
+                player->timer.sources[i].pause_reported = false;
             break;
 
         case VLC_PLAYER_TIMER_EVENT_STOPPING:
@@ -755,6 +763,7 @@ vlc_player_InitTimer(vlc_player_t *player)
         player->timer.sources[i].point.system_date = VLC_TICK_INVALID;
         player->timer.sources[i].es = NULL;
         player->timer.sources[i].seeking = false;
+        player->timer.sources[i].pause_reported = false;
     }
     vlc_player_ResetTimer(player);
 }

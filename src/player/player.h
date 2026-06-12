@@ -195,6 +195,12 @@ struct vlc_player_timer_source
     vlc_es_id_t *es; /* weak reference */
     struct vlc_player_timer_point point;
     bool seeking;
+
+    /* Set once a pause has been reported to this source's listener.
+     * The input might signal paused clock and then output
+     * would signal it. This flag filters this case here. */
+    bool pause_reported;
+
     union
     {
         struct {
