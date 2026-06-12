@@ -428,7 +428,7 @@ void DXGI_LocalSwapchainCleanupDevice( dxgi_swapchain *display )
 
 void DXGI_SwapchainUpdateOutput( dxgi_swapchain *display, libvlc_video_output_cfg_t *out )
 {
-    out->dxgi_format    = display->pixelFormat->formatTexture;
+    out->u.dxgi_format    = display->pixelFormat->formatTexture;
     out->full_range     = display->colorspace->b_full_range;
     out->colorspace     = (libvlc_video_color_space_t)     display->colorspace->color;
     out->primaries      = (libvlc_video_color_primaries_t) display->colorspace->primaries;

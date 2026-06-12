@@ -100,11 +100,11 @@ typedef struct libvlc_media_track_t
     int         i_profile;
     int         i_level;
 
-    union {
+    union libvlc_media_track_data {
         libvlc_audio_track_t *audio;
         libvlc_video_track_t *video;
         libvlc_subtitle_track_t *subtitle;
-    };
+    } u;
 
     unsigned int i_bitrate;
     char *psz_language;

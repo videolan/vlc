@@ -163,14 +163,14 @@ static int OpenCallback(vlc_window_t *wnd)
         .width = 1,
         .height = 1,
     };
-    libvlc_video_output_cfg_t out = { .anw = { NULL, NULL } };
+    libvlc_video_output_cfg_t out = { .u.anw = { NULL, NULL } };
     bool success = update_cb(sys->opaque, &render_cfg, &out);
     if (!success)
         goto error;
-    assert(out.anw.video != NULL);
+    assert(out.u.anw.video != NULL);
 
     AWindowHandler *awh =
-        AWindowHandler_newFromANWs(VLC_OBJECT(wnd), out.anw.video, out.anw.subtitle);
+        AWindowHandler_newFromANWs(VLC_OBJECT(wnd), out.u.anw.video, out.u.anw.subtitle);
     if (awh == NULL)
         goto error;
 

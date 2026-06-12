@@ -1585,7 +1585,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
     if (UpdateOutput(vd, vd->source, &render_out) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
-    sys->BufferFormat = render_out.d3d9_format;
+    sys->BufferFormat = render_out.u.d3d9_format;
     const d3d9_format_t *dst_format = FindBufferFormat(sys->BufferFormat);
     if (unlikely(!dst_format))
         msg_Warn(vd, "Unknown back buffer format 0x%X", sys->BufferFormat);
@@ -1717,7 +1717,7 @@ static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_
     if (unlikely(FAILED(hr)))
         return false;
 
-    out->d3d9_format = d3ddm.Format;
+    out->u.d3d9_format = d3ddm.Format;
     out->full_range  = true;
     out->colorspace  = libvlc_video_colorspace_BT709;
     out->primaries   = libvlc_video_primaries_BT709;

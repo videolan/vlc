@@ -975,7 +975,7 @@ typedef struct libvlc_video_setup_device_cfg_t
 
 typedef struct libvlc_video_setup_device_info_t
 {
-    union {
+    union libvlc_video_setup_device_data {
         struct {
             void *device_context; /** ID3D11DeviceContext* */
             void *context_mutex; /** Windows Mutex HANDLE to protect ID3D11DeviceContext usage */
@@ -984,7 +984,7 @@ typedef struct libvlc_video_setup_device_info_t
             void *device;         /** IDirect3D9* */
             int  adapter;         /** Adapter to use with the IDirect3D9* */
         } d3d9;
-    };
+    } u;
 } libvlc_video_setup_device_info_t;
 
 /**
@@ -1009,8 +1009,8 @@ typedef struct libvlc_video_setup_device_info_t
  *
  * If the ID3D11DeviceContext is used outside of the callbacks called by libvlc, the host
  * MUST use a mutex to protect the access to the ID3D11DeviceContext of libvlc. This mutex
- * value is set on d3d11.context_mutex. If the ID3D11DeviceContext is not used outside of
- * the callbacks, the mutex d3d11.context_mutex may be NULL.
+ * value is set on u.d3d11.context_mutex. If the ID3D11DeviceContext is not used outside of
+ * the callbacks, the mutex u.d3d11.context_mutex may be NULL.
  */
 typedef bool (*libvlc_video_output_setup_cb)(void **opaque,
                                       const libvlc_video_setup_device_cfg_t *cfg,
@@ -1047,7 +1047,7 @@ typedef struct libvlc_video_render_cfg_t
 
 typedef struct libvlc_video_output_cfg_t
 {
-    union {
+    union libvlc_video_output_format {
         /** The rendering DXGI_FORMAT for \ref libvlc_video_engine_d3d11. */
         int dxgi_format;
         /** The rendering D3DFORMAT for \ref libvlc_video_engine_d3d9. */
@@ -1066,7 +1066,7 @@ typedef struct libvlc_video_output_cfg_t
              * using MediaCodec with direct hw rendering) */
             void *subtitle;
         } anw;
-    };
+    } u;
     /** Video is full range or studio/limited range. */
     bool full_range;
     /** video color space */

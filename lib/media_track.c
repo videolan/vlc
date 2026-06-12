@@ -67,44 +67,44 @@ libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
         track->i_type = libvlc_track_unknown;
         break;
     case VIDEO_ES:
-        track->video = &trackpriv->video;
+        track->u.video = &trackpriv->video;
         track->i_type = libvlc_track_video;
-        track->video->i_height = es->video.i_visible_height;
-        track->video->i_width = es->video.i_visible_width;
-        track->video->i_sar_num = es->video.i_sar_num;
-        track->video->i_sar_den = es->video.i_sar_den;
-        track->video->i_frame_rate_num = es->video.i_frame_rate;
-        track->video->i_frame_rate_den = es->video.i_frame_rate_base;
+        track->u.video->i_height = es->video.i_visible_height;
+        track->u.video->i_width = es->video.i_visible_width;
+        track->u.video->i_sar_num = es->video.i_sar_num;
+        track->u.video->i_sar_den = es->video.i_sar_den;
+        track->u.video->i_frame_rate_num = es->video.i_frame_rate;
+        track->u.video->i_frame_rate_den = es->video.i_frame_rate_base;
 
         assert( es->video.orientation >= ORIENT_TOP_LEFT &&
                 es->video.orientation <= ORIENT_RIGHT_BOTTOM );
-        track->video->i_orientation = (int) es->video.orientation;
+        track->u.video->i_orientation = (int) es->video.orientation;
 
         assert( ( es->video.projection_mode >= PROJECTION_MODE_RECTANGULAR &&
                 es->video.projection_mode <= PROJECTION_MODE_EQUIRECTANGULAR ) ||
                 ( es->video.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD ) );
-        track->video->i_projection = (int) es->video.projection_mode;
+        track->u.video->i_projection = (int) es->video.projection_mode;
 
         vlc_viewpoint_to_euler(&es->video.pose,
-                               &track->video->pose.f_yaw,
-                               &track->video->pose.f_pitch,
-                               &track->video->pose.f_roll);
-        track->video->pose.f_field_of_view = es->video.pose.fov;
+                               &track->u.video->pose.f_yaw,
+                               &track->u.video->pose.f_pitch,
+                               &track->u.video->pose.f_roll);
+        track->u.video->pose.f_field_of_view = es->video.pose.fov;
 
         assert( es->video.multiview_mode >= MULTIVIEW_2D &&
                 es->video.multiview_mode <= MULTIVIEW_STEREO_CHECKERBOARD );
-        track->video->i_multiview = (int) es->video.multiview_mode;
+        track->u.video->i_multiview = (int) es->video.multiview_mode;
         break;
     case AUDIO_ES:
-        track->audio = &trackpriv->audio;
+        track->u.audio = &trackpriv->audio;
         track->i_type = libvlc_track_audio;
-        track->audio->i_channels = es->audio.i_channels;
-        track->audio->i_rate = es->audio.i_rate;
+        track->u.audio->i_channels = es->audio.i_channels;
+        track->u.audio->i_rate = es->audio.i_rate;
         break;
     case SPU_ES:
-        track->subtitle = &trackpriv->subtitle;
+        track->u.subtitle = &trackpriv->subtitle;
         track->i_type = libvlc_track_text;
-        track->subtitle->psz_encoding = es->subs.psz_encoding != NULL ?
+        track->u.subtitle->psz_encoding = es->subs.psz_encoding != NULL ?
                                         strdup(es->subs.psz_encoding) : NULL;
         break;
     }
@@ -137,7 +137,7 @@ static void libvlc_media_track_clean( libvlc_media_track_t *track )
     case libvlc_track_video:
         break;
     case libvlc_track_text:
-        free( track->subtitle->psz_encoding );
+        free( track->u.subtitle->psz_encoding );
         break;
     case libvlc_track_unknown:
     default:

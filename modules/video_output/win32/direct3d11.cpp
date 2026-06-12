@@ -303,7 +303,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
 
     display_info_t new_display = { };
 
-    new_display.pixelFormat = D3D11_RenderFormat((DXGI_FORMAT)out.dxgi_format, DXGI_FORMAT_UNKNOWN, false);
+    new_display.pixelFormat = D3D11_RenderFormat((DXGI_FORMAT)out.u.dxgi_format, DXGI_FORMAT_UNKNOWN, false);
     if (unlikely(new_display.pixelFormat == NULL))
     {
         msg_Err(vd, "Could not find the output format.");

@@ -93,7 +93,7 @@ static int ResizeInternal(vlc_gl_t * gl, unsigned w, unsigned h)
         libvlc_video_transfer_func_SRGB, NULL,
     };
     libvlc_video_output_cfg_t render_cfg = {
-        .opengl_format = GL_RGBA,
+        .u.opengl_format = GL_RGBA,
         .full_range = true,
         .colorspace = libvlc_video_colorspace_BT709,
         .primaries = libvlc_video_primaries_BT709,
@@ -106,7 +106,7 @@ static int ResizeInternal(vlc_gl_t * gl, unsigned w, unsigned h)
     if (!ret)
         return VLC_EGENERIC;
 
-    assert(render_cfg.opengl_format == GL_RGBA);
+    assert(render_cfg.u.opengl_format == GL_RGBA);
     assert(render_cfg.full_range == true);
     assert(render_cfg.colorspace == libvlc_video_colorspace_BT709);
     assert(render_cfg.primaries  == libvlc_video_primaries_BT709);

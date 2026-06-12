@@ -136,7 +136,7 @@ static bool Resize(struct render_context *ctx, unsigned width, unsigned height,
     hr = IDirect3DDevice9_SetRenderTarget(ctx->libvlc_d3d, 0, ctx->sharedRenderSurface);
     if (FAILED(hr)) return false;
 
-    out->d3d9_format    = d3ddm.Format;
+    out->u.d3d9_format    = d3ddm.Format;
     out->full_range     = true;
     out->colorspace     = libvlc_video_colorspace_BT709;
     out->primaries      = libvlc_video_primaries_BT709;
@@ -206,8 +206,8 @@ static void release_direct3d(struct render_context *ctx)
 static bool SetupDevice_cb( void **opaque, const libvlc_video_setup_device_cfg_t *cfg, libvlc_video_setup_device_info_t *out )
 {
     struct render_context *ctx = *opaque;
-    out->d3d9.device = ctx->d3d;
-    out->d3d9.adapter = D3DADAPTER_DEFAULT;
+    out->u.d3d9.device = ctx->d3d;
+    out->u.d3d9.adapter = D3DADAPTER_DEFAULT;
     return true;
 }
 

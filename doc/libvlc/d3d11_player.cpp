@@ -432,7 +432,7 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_render_cfg_t *cfg,
 
     ctx->d3dctxVLC->OMSetRenderTargets( 1, &ctx->resized.textureRenderTarget, NULL );
 
-    out->dxgi_format    = renderFormat;
+    out->u.dxgi_format    = renderFormat;
     out->full_range     = true;
     out->colorspace     = libvlc_video_colorspace_BT709;
     out->primaries      = libvlc_video_primaries_BT709;
@@ -489,7 +489,7 @@ static bool SetupDevice_cb( void **opaque, const libvlc_video_setup_device_cfg_t
 {
     struct render_context *ctx = static_cast<struct render_context *>(*opaque);
 
-    out->d3d11.device_context = ctx->d3dctxVLC;
+    out->u.d3d11.device_context = ctx->d3dctxVLC;
     ctx->d3dctxVLC->AddRef();
     return true;
 }

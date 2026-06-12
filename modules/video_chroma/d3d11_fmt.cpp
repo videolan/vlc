@@ -585,7 +585,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
                 msg_Err(obj, "Failed to setup external D3D11 device");
                 goto error;
             }
-            hr = D3D11_CreateDeviceExternal(obj, static_cast<ID3D11DeviceContext*>(out.d3d11.device_context), out.d3d11.context_mutex,
+            hr = D3D11_CreateDeviceExternal(obj, static_cast<ID3D11DeviceContext*>(out.u.d3d11.device_context), out.u.d3d11.context_mutex,
                                             &sys->dec_device.d3d_dev);
         }
         else if ( engineType == libvlc_video_engine_disable ||

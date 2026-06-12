@@ -75,16 +75,16 @@ static void print_media(libvlc_media_t *media)
             {
             case libvlc_track_audio:
                 printf("audio: channels: %u, rate: %u\n",
-                       p_track->audio->i_channels, p_track->audio->i_rate);
+                       p_track->u.audio->i_channels, p_track->u.audio->i_rate);
                 break;
             case libvlc_track_video:
                 printf("video: %ux%u, sar: %u/%u, fps: %u/%u\n",
-                       p_track->video->i_width, p_track->video->i_height,
-                       p_track->video->i_sar_num, p_track->video->i_sar_den,
-                       p_track->video->i_frame_rate_num, p_track->video->i_frame_rate_den);
+                       p_track->u.video->i_width, p_track->u.video->i_height,
+                       p_track->u.video->i_sar_num, p_track->u.video->i_sar_den,
+                       p_track->u.video->i_frame_rate_num, p_track->u.video->i_frame_rate_den);
                 break;
             case libvlc_track_text:
-                printf("text: %s\n", p_track->subtitle->psz_encoding);
+                printf("text: %s\n", p_track->u.subtitle->psz_encoding);
                 break;
             case libvlc_track_unknown:
                 printf("unknown\n");
@@ -196,9 +196,9 @@ static void test_media_tracks(libvlc_instance_t *vlc)
     {
         libvlc_media_track_t *track = libvlc_media_tracklist_at(tracklist, i);
         assert(track->i_type == libvlc_track_video);
-        assert(track->video != NULL);
-        assert(track->video->i_width == 100);
-        assert(track->video->i_height == 50);
+        assert(track->u.video != NULL);
+        assert(track->u.video->i_width == 100);
+        assert(track->u.video->i_height == 50);
 
         sprintf(buf, "video/%zu", i);
         assert(strcmp(track->psz_id, buf) == 0);
@@ -213,9 +213,9 @@ static void test_media_tracks(libvlc_instance_t *vlc)
     {
         libvlc_media_track_t *track = libvlc_media_tracklist_at(tracklist, i);
         assert(track->i_type == libvlc_track_audio);
-        assert(track->audio != NULL);
-        assert(track->audio->i_channels == 2);
-        assert(track->audio->i_rate == 48000);
+        assert(track->u.audio != NULL);
+        assert(track->u.audio->i_channels == 2);
+        assert(track->u.audio->i_rate == 48000);
 
         sprintf(buf, "audio/%zu", i);
         assert(strcmp(track->psz_id, buf) == 0);
