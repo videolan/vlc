@@ -853,7 +853,7 @@ modules/gui/qt/player/qml/controlbarcontrols/ExpandingSpacerWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/Fallback.qml
 modules/gui/qt/player/qml/controlbarcontrols/FasterButton.qml
-modules/gui/qt/player/qml/controlbarcontrols/FrameButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/FrameNextButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/FullscreenButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/InfoButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/LangButton.qml

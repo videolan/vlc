@@ -49,7 +49,7 @@ public:
         SNAPSHOT_BUTTON,
         RECORD_BUTTON,
         ATOB_BUTTON,
-        FRAME_BUTTON,
+        FRAME_NEXT_BUTTON,
         SKIP_BACK_BUTTON,
         SKIP_FW_BUTTON,
         QUIT_BUTTON,

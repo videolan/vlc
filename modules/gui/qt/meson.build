@@ -762,7 +762,7 @@ qml_modules += {
        'player/qml/controlbarcontrols/ExpandingSpacerWidget.qml',
        'player/qml/controlbarcontrols/ExtendedSettingsButton.qml',
        'player/qml/controlbarcontrols/FasterButton.qml',
-       'player/qml/controlbarcontrols/FrameButton.qml',
+       'player/qml/controlbarcontrols/FrameNextButton.qml',
        'player/qml/controlbarcontrols/FullscreenButton.qml',
        'player/qml/controlbarcontrols/InfoButton.qml',
        'player/qml/controlbarcontrols/LangButton.qml',

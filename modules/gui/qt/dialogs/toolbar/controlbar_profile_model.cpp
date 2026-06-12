@@ -259,7 +259,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::RECORD_BUTTON,
                                     ControlListModel::SNAPSHOT_BUTTON,
                                     ControlListModel::ATOB_BUTTON,
-                                    ControlListModel::FRAME_BUTTON
+                                    ControlListModel::FRAME_NEXT_BUTTON
                                 },
                                 {},
                                 {
@@ -286,7 +286,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::RECORD_BUTTON,
                                     ControlListModel::SNAPSHOT_BUTTON,
                                     ControlListModel::ATOB_BUTTON,
-                                    ControlListModel::FRAME_BUTTON
+                                    ControlListModel::FRAME_NEXT_BUTTON
                                 },
                                 {},
                                 {
