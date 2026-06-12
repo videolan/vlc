@@ -350,16 +350,6 @@ ListView {
 
     removeDisplaced: moveDisplaced
 
-    function _useClipRectForEventDeliveryWorkaround() {
-        if (!root.clip) {
-            // The following flag makes sure that the event delivery agent
-            // does not deliver the input events to the children of the
-            // content item that are outside of the viewport, without
-            // clipping the content with a clip node:
-            MainCtx.setItemFlag(root, Item.ItemClipsChildrenToShape)
-        }
-    }
-
     // Events
 
     Component.onCompleted: {
@@ -368,9 +358,6 @@ ListView {
         // feature for non-touch cases, so disable it here and enable
         // it if touch is detected through the hover handler:
         MainCtx.setFiltersChildMouseEvents(root, false)
-
-        clipChanged.connect(root, root._useClipRectForEventDeliveryWorkaround)
-        root._useClipRectForEventDeliveryWorkaround()
     }
 
     HoverHandler {
