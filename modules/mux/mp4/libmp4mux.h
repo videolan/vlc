@@ -23,6 +23,10 @@
 #include <vlc_common.h>
 #include <vlc_es.h>
 #include <vlc_boxes.h>
+#include <vlc_block.h>
+
+#define MP4_MUX_BLOCK_FLAG_BOUNDARY (0x1 << BLOCK_FLAG_PRIVATE_SHIFT)
+#define MP4_MUX_BLOCK_FLAG_SYNC (0x2 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 typedef struct mp4mux_handle_t mp4mux_handle_t;
 typedef struct mp4mux_trackinfo_t mp4mux_trackinfo_t;
