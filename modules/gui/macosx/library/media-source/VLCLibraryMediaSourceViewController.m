@@ -29,7 +29,10 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTextField+VLCAdditions.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
+
+#import "views/VLCLoadingOverlayView.h"
 
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -43,6 +46,9 @@
 #import "main/VLCMain.h"
 
 @interface VLCLibraryMediaSourceViewController ()
+{
+    VLCLoadingOverlayView *_loadingOverlayView;
+}
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
 @property (readonly) NSGlassEffectView *pathControlGlassEffectView API_AVAILABLE(macos(26.0));
@@ -51,6 +57,17 @@
 @end
 
 @implementation VLCLibraryMediaSourceViewController
+
+// The shared mediaSourceView is the source of truth for the active overlay.
+- (nullable VLCLoadingOverlayView *)currentLoadingOverlayInMediaSourceView
+{
+    for (NSView * const subview in self.mediaSourceView.subviews) {
+        if ([subview isKindOfClass:VLCLoadingOverlayView.class]) {
+            return (VLCLoadingOverlayView *)subview;
+        }
+    }
+    return nil;
+}
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
@@ -64,13 +81,21 @@
         [self setupPlaceholderLabel];
 
         NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
-        [defaultCenter addObserver:self 
-                          selector:@selector(updatePlaceholderLabel:) 
-                              name:VLCMediaSourceBaseDataSourceNodeChanged 
+        [defaultCenter addObserver:self
+                          selector:@selector(updatePlaceholderLabel:)
+                              name:VLCMediaSourceBaseDataSourceNodeChanged
                             object:nil];
-        [defaultCenter addObserver:self 
-                          selector:@selector(updatePlaceholderLabel:) 
-                              name:VLCMediaSourceDataSourceNodeChanged 
+        [defaultCenter addObserver:self
+                          selector:@selector(updatePlaceholderLabel:)
+                              name:VLCMediaSourceDataSourceNodeChanged
+                            object:nil];
+        [defaultCenter addObserver:self
+                          selector:@selector(mediaSourceLoadingStarted:)
+                              name:VLCMediaSourceDataSourceLoadingStarted
+                            object:nil];
+        [defaultCenter addObserver:self
+                          selector:@selector(mediaSourceLoadingEnded:)
+                              name:VLCMediaSourceDataSourceLoadingEnded
                             object:nil];
     }
     return self;
@@ -213,7 +238,51 @@
 
 - (void)updatePlaceholderLabel:(NSNotification *)notification
 {
-    self.browsePlaceholderLabel.hidden = self.baseDataSource.hasDisplayedItems;
+    _loadingOverlayView = [self currentLoadingOverlayInMediaSourceView];
+    const BOOL overlayPresent = _loadingOverlayView != nil;
+    self.browsePlaceholderLabel.hidden = self.baseDataSource.hasDisplayedItems || overlayPresent;
+}
+
+- (void)prepareLoadingOverlay
+{
+    _loadingOverlayView = [self currentLoadingOverlayInMediaSourceView];
+
+    if (_loadingOverlayView != nil)
+        return;
+    if (!_loadingOverlayView)
+        _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
+    _loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
+    _loadingOverlayView.wantsLayer = YES;
+    _loadingOverlayView.alphaValue = 0.0;
+    [self.mediaSourceView addSubview:_loadingOverlayView];
+    [_loadingOverlayView applyConstraintsToFillSuperview];
+    [_loadingOverlayView.indicator startAnimation:self];
+}
+
+- (void)mediaSourceLoadingStarted:(NSNotification *)notification
+{
+    _loadingOverlayView = [self currentLoadingOverlayInMediaSourceView];
+
+    [self prepareLoadingOverlay];
+    _loadingOverlayView.alphaValue = 1.0;
+    [self updatePlaceholderLabel:nil];
+}
+
+- (void)mediaSourceLoadingEnded:(NSNotification *)notification
+{
+    _loadingOverlayView = [self currentLoadingOverlayInMediaSourceView];
+
+    if (_loadingOverlayView == nil)
+        return;
+
+    _loadingOverlayView.alphaValue = 1.0;
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+        _loadingOverlayView.animator.alphaValue = 0.0;
+    } completionHandler:^{
+        [_loadingOverlayView removeFromSuperview];
+        [_loadingOverlayView.indicator stopAnimation:self];
+        [self updatePlaceholderLabel:nil];
+    }];
 }
 
 - (NSView *)pathControlContainerView
@@ -238,7 +307,14 @@
 - (void)presentMediaSourceView:(VLCLibrarySegmentType)viewSegment
 {
     [self.libraryWindow displayLibraryView:self.mediaSourceView];
-    _baseDataSource.mediaSourceMode = viewSegment == VLCLibraryBrowseSegmentType ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
+    const BOOL isStreams = viewSegment != VLCLibraryBrowseSegmentType;
+    _loadingOverlayView = [self currentLoadingOverlayInMediaSourceView];
+
+    if (!isStreams) {
+        [self mediaSourceLoadingEnded:nil];
+    }
+
+    _baseDataSource.mediaSourceMode = isStreams ? VLCMediaSourceModeInternet : VLCMediaSourceModeLAN;
     [_baseDataSource reloadViews];
 }
 

@@ -50,6 +50,8 @@
 #import "views/VLCImageView.h"
 
 NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourceNodeChanged";
+NSString * const VLCMediaSourceDataSourceLoadingStarted = @"VLCMediaSourceDataSourceLoadingStarted";
+NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSourceLoadingEnded";
 
 @interface VLCMediaSourceDataSource()
 {
@@ -99,6 +101,12 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         return;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self reloadData];
+        if (self.hasDisplayedItems ||
+            [notification.name isEqualToString:VLCMediaSourcePreparsingEnded]) {
+            [NSNotificationCenter.defaultCenter
+                postNotificationName:VLCMediaSourceDataSourceLoadingEnded
+                              object:self];
+        }
     });
 }
 
@@ -138,39 +146,48 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     if (self.parentBaseDataSource.mediaSourceMode == VLCMediaSourceModeLAN) {
         NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
 
-        if (!nodeUrl.isFileURL) {
-            [self reloadData];
-            return;
-        }
-
-        if (self.observedPathDispatchSource) {
-            dispatch_source_cancel(self.observedPathDispatchSource);
-            self.observedPathDispatchSource = nil;
-        }
-
-        const __weak typeof(self) weakSelf = self;
-        self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
-                                                forVnodeEvents:DISPATCH_VNODE_WRITE |
-                                                               DISPATCH_VNODE_DELETE |
-                                                               DISPATCH_VNODE_RENAME
-                                            withEventHandler:^{
-            const uintptr_t eventFlags =
-                dispatch_source_get_data(weakSelf.observedPathDispatchSource);
-            if (eventFlags & DISPATCH_VNODE_DELETE || eventFlags & DISPATCH_VNODE_RENAME) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf.parentBaseDataSource homeButtonAction:weakSelf];
-                });
-            } else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:nodeToDisplay
-                                                                              withUrl:nodeUrl];
-                    [weakSelf reloadData];
-                });
+        if (nodeUrl.isFileURL) {
+            if (self.observedPathDispatchSource) {
+                dispatch_source_cancel(self.observedPathDispatchSource);
+                self.observedPathDispatchSource = nil;
             }
-        }];
+
+            const __weak typeof(self) weakSelf = self;
+            self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
+                                                    forVnodeEvents:DISPATCH_VNODE_WRITE |
+                                                                   DISPATCH_VNODE_DELETE |
+                                                                   DISPATCH_VNODE_RENAME
+                                                withEventHandler:^{
+                const uintptr_t eventFlags =
+                    dispatch_source_get_data(weakSelf.observedPathDispatchSource);
+                if (eventFlags & DISPATCH_VNODE_DELETE || eventFlags & DISPATCH_VNODE_RENAME) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [weakSelf.parentBaseDataSource homeButtonAction:weakSelf];
+                    });
+                } else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:nodeToDisplay
+                                                                                  withUrl:nodeUrl];
+                        [weakSelf reloadData];
+                    });
+                }
+            }];
+        }
     }
 
     [self reloadData];
+    if (!self.hasDisplayedItems) {
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceDataSourceLoadingStarted
+                                                          object:self];
+    } else {
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceDataSourceLoadingEnded
+                                                          object:self];
+    }
+}
+
+- (BOOL)hasDisplayedItems
+{
+    return _nodeToDisplay.numberOfChildren > 0;
 }
 
 - (void)setupViews

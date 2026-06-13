@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCMediaSourceBaseDataSource;
 
 extern NSString * const VLCMediaSourceDataSourceNodeChanged;
+extern NSString * const VLCMediaSourceDataSourceLoadingStarted;
+extern NSString * const VLCMediaSourceDataSourceLoadingEnded;
 
 @interface VLCMediaSourceDataSource : NSObject <NSCollectionViewDataSource,
                                                 NSCollectionViewDelegate,
