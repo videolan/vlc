@@ -40,6 +40,10 @@
 #import <vlc_preparser.h>
 #import <vlc_strings.h>
 
+static const NSTimeInterval kVLCRemoteArtworkRequestTimeout = 15;
+static const NSTimeInterval kVLCRemoteArtworkResourceTimeout = 30;
+static const NSInteger kVLCRemoteArtworkMaximumConnectionsPerHost = 4;
+
 NSUInteger kVLCMaximumLibraryImageCacheSize = 500;
 /* 256 MB cost limit based on estimated pixel data size per image */
 static const NSUInteger kVLCLibraryImageCacheCostLimit = 256 * 1024 * 1024;
@@ -56,6 +60,8 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     vlc_medialibrary_t *_p_libraryInstance;
     NSString *_thumbnailCacheDirectory;
     NSMutableDictionary<NSString *, VLCThumbnailRequest *> *_pendingThumbnailRequests;
+    NSMutableDictionary<NSString *, NSMutableArray<void (^)(const NSImage *)> *> *_pendingRemoteArtworkRequests;
+    NSURLSession *_remoteArtworkSession;
 }
 
 - (void)thumbnailRequest:(VLCThumbnailRequest *)request
@@ -94,13 +100,9 @@ static NSString *thumbnailHashForString(NSString *string)
 
 @implementation VLCLibraryImageCache
 
-+ (NSImage *)downsampledImageFromURL:(NSURL *)url maxPixelSize:(uint32_t)maxPixelSize
++ (NSImage *)downsampledImageFromSource:(CGImageSourceRef)imageSource
+                           maxPixelSize:(uint32_t)maxPixelSize
 {
-    CGImageSourceRef const imageSource = CGImageSourceCreateWithURL((__bridge CFURLRef)url, NULL);
-    if (!imageSource) {
-        return nil;
-    }
-
     NSDictionary * const downsampleOptions = @{
         (NSString *)kCGImageSourceCreateThumbnailFromImageAlways : @YES,
         (NSString *)kCGImageSourceCreateThumbnailWithTransform : @YES,
@@ -110,8 +112,6 @@ static NSString *thumbnailHashForString(NSString *string)
 
     CGImageRef const downsampledImage =
         CGImageSourceCreateThumbnailAtIndex(imageSource, 0, (__bridge CFDictionaryRef)downsampleOptions);
-    CFRelease(imageSource);
-
     if (!downsampledImage) {
         return nil;
     }
@@ -120,6 +120,42 @@ static NSString *thumbnailHashForString(NSString *string)
                                                         size:NSZeroSize];
     CGImageRelease(downsampledImage);
     return image;
+}
+
++ (NSImage *)downsampledImageFromURL:(NSURL *)url maxPixelSize:(uint32_t)maxPixelSize
+{
+    CGImageSourceRef const imageSource = CGImageSourceCreateWithURL((__bridge CFURLRef)url, NULL);
+    if (!imageSource) {
+        return nil;
+    }
+    NSImage * const image = [self downsampledImageFromSource:imageSource maxPixelSize:maxPixelSize];
+    CFRelease(imageSource);
+    return image;
+}
+
++ (BOOL)artworkURLRequiresRemoteFetch:(NSURL *)url
+{
+    return [url.scheme isEqualToString:@"http"] ||
+           [url.scheme isEqualToString:@"https"];
+}
+
++ (BOOL)remoteArtworkResponseCanContainImage:(NSURLResponse *)response
+{
+    if ([response isKindOfClass:NSHTTPURLResponse.class]) {
+        NSHTTPURLResponse * const httpResponse = (NSHTTPURLResponse *)response;
+        if (httpResponse.statusCode < 200 || httpResponse.statusCode >= 300) {
+            return NO;
+        }
+    }
+
+    NSString * const MIMEType = response.MIMEType.lowercaseString;
+    if (MIMEType.length > 0 &&
+        ![MIMEType hasPrefix:@"image/"] &&
+        ![MIMEType isEqualToString:@"application/octet-stream"]) {
+        return NO;
+    }
+
+    return YES;
 }
 
 + (NSUInteger)costForImage:(NSImage *)image
@@ -146,6 +182,20 @@ static NSString *thumbnailHashForString(NSString *string)
         _imageCache.totalCostLimit = kVLCLibraryImageCacheCostLimit;
         _noArtImage = NSImage.VLCNoArtImage;
         _pendingThumbnailRequests = NSMutableDictionary.dictionary;
+        _pendingRemoteArtworkRequests = NSMutableDictionary.dictionary;
+
+        NSURLSessionConfiguration * const remoteArtworkSessionConfiguration =
+            NSURLSessionConfiguration.ephemeralSessionConfiguration;
+        remoteArtworkSessionConfiguration.timeoutIntervalForRequest =
+            kVLCRemoteArtworkRequestTimeout;
+        remoteArtworkSessionConfiguration.timeoutIntervalForResource =
+            kVLCRemoteArtworkResourceTimeout;
+        remoteArtworkSessionConfiguration.requestCachePolicy =
+            NSURLRequestReloadIgnoringLocalCacheData;
+        remoteArtworkSessionConfiguration.HTTPMaximumConnectionsPerHost =
+            kVLCRemoteArtworkMaximumConnectionsPerHost;
+        _remoteArtworkSession =
+            [NSURLSession sessionWithConfiguration:remoteArtworkSessionConfiguration];
 
         char * const cacheDirectory = config_GetUserDir(VLC_CACHE_DIR);
         if (cacheDirectory != NULL) {
@@ -187,6 +237,7 @@ static NSString *thumbnailHashForString(NSString *string)
 
 - (void)dealloc
 {
+    [_remoteArtworkSession invalidateAndCancel];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -402,16 +453,70 @@ static NSString *thumbnailHashForString(NSString *string)
     });
 }
 
-- (void)imageForInputItem:(VLCInputItem *)inputItem 
+- (void)imageForInputItem:(VLCInputItem *)inputItem
            withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
-    NSString * const memoryCacheKey = inputItem.MRL;
-    NSImage * const cachedImage = [_imageCache objectForKey:memoryCacheKey];
+    NSURL * const artworkURL = inputItem.artworkURL;
+    NSString * const cacheKey = [VLCLibraryImageCache artworkURLRequiresRemoteFetch:artworkURL]
+        ? artworkURL.absoluteString
+        : inputItem.MRL;
+
+    NSImage * const cachedImage = [_imageCache objectForKey:cacheKey];
     if (cachedImage) {
         completionHandler(cachedImage);
         return;
     }
     [self generateImageForInputItem:inputItem withCompletion:completionHandler];
+}
+
+- (void)fetchRemoteArtwork:(NSURL *)url
+               forCacheKey:(NSString *)cacheKey
+            withCompletion:(void(^)(const NSImage *))completionHandler
+{
+    @synchronized (self) {
+        NSMutableArray<void (^)(const NSImage *)> * const pendingCompletions =
+            _pendingRemoteArtworkRequests[cacheKey];
+        if (pendingCompletions != nil) {
+            [pendingCompletions addObject:[completionHandler copy]];
+            return;
+        }
+
+        _pendingRemoteArtworkRequests[cacheKey] =
+            [NSMutableArray arrayWithObject:[completionHandler copy]];
+    }
+
+    [[_remoteArtworkSession dataTaskWithURL:url
+                          completionHandler:^(NSData *data,
+                                              NSURLResponse *response,
+                                              NSError *error) {
+        NSImage *image = nil;
+
+        if (!error && [VLCLibraryImageCache remoteArtworkResponseCanContainImage:response] && data) {
+            CGImageSourceRef const source = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+            if (source) {
+                image = [VLCLibraryImageCache downsampledImageFromSource:source
+                                                            maxPixelSize:kVLCDesiredThumbnailWidth];
+                CFRelease(source);
+            }
+        }
+        if (image) {
+            const NSUInteger cost = [VLCLibraryImageCache costForImage:image];
+            [self->_imageCache setObject:image forKey:cacheKey cost:cost];
+        }
+
+        NSArray<void (^)(const NSImage *)> *completionHandlers;
+        @synchronized (self) {
+            completionHandlers = [self->_pendingRemoteArtworkRequests[cacheKey] copy];
+            [self->_pendingRemoteArtworkRequests removeObjectForKey:cacheKey];
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            const NSImage * const artwork = image ?: self->_noArtImage;
+            for (void (^handler)(const NSImage *) in completionHandlers) {
+                handler(artwork);
+            }
+        });
+    }] resume];
 }
 
 - (void)generateArtworkForInputItem:(VLCInputItem *)inputItem
@@ -420,6 +525,13 @@ static NSString *thumbnailHashForString(NSString *string)
     NSURL * const artworkURL = inputItem.artworkURL;
     const NSSize imageSize = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
     NSString * const memoryCacheKey = inputItem.MRL;
+
+    if ([VLCLibraryImageCache artworkURLRequiresRemoteFetch:artworkURL]) {
+        [self fetchRemoteArtwork:artworkURL
+                     forCacheKey:artworkURL.absoluteString
+                  withCompletion:completionHandler];
+        return;
+    }
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         NSImage * const image = artworkURL
