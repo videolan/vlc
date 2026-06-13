@@ -328,11 +328,30 @@ void VLCProfileSelector::updateOptions( int i )
             HASHPICK( "acodec", "samplerate" );
             transcode.option( "samplerate", value.toInt() );
 
-            HASHPICK( "audio", "filters" );
-            if ( !value.isEmpty() )
+            /* Build audio filter chain: user-selected filters + optional gain boost */
             {
-                QStringList valuesList = QUrl::fromPercentEncoding( value.toLatin1() ).split( ";" );
-                transcode.option( "afilter", valuesList.join( ":" ) );
+                QStringList audioFilters;
+
+                HASHPICK( "audio", "filters" );
+                if ( !value.isEmpty() )
+                    audioFilters << QUrl::fromPercentEncoding( value.toLatin1() ).split( ";" );
+
+                HASHPICK( "acodec", "gain" );
+                if ( !value.isEmpty() )
+                {
+                    double gainPct = value.toDouble();
+                    if ( gainPct > 0.0 )
+                    {
+                        /* normvol peak-level multiplier: 100% = 1.0 (no change),
+                         * 200% = 2.0 (double volume), 50% = 0.5 (half volume). */
+                        double gainMult = gainPct / 100.0;
+                        audioFilters.prepend(
+                            QString("normvol{max-level=%1}").arg( gainMult, 0, 'f', 2 ) );
+                    }
+                }
+
+                if ( !audioFilters.isEmpty() )
+                    transcode.option( "afilter", audioFilters.join( ":" ) );
             }
 
         }
