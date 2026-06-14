@@ -20,6 +20,7 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(call pkg_static,"libsyn123.pc.in")
 	# fix llvm-mingw ARM build
 	$(APPLY) $(SRC)/mpg123/getcpuflags_arm.c.patch
+	$(APPLY) $(SRC)/mpg123/win_arm_asm.patch
 	$(MOVE)
 
 .mpg123: mpg123 toolchain.cmake

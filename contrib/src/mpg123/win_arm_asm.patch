@@ -1,0 +1,186 @@
+diff -urN mpg123-orig/src/libmpg123/check_neon.S mpg123/src/libmpg123/check_neon.S
+--- mpg123-orig/src/libmpg123/check_neon.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/check_neon.S	2026-06-14 15:52:42.872593755 +0300
+@@ -10,10 +10,10 @@
+ #include "mangle.h"
+ 
+ #ifndef __aarch64__
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ #endif
+diff -urN mpg123-orig/src/libmpg123/dct36_neon.S mpg123/src/libmpg123/dct36_neon.S
+--- mpg123-orig/src/libmpg123/dct36_neon.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/dct36_neon.S	2026-06-14 15:42:56.392916805 +0300
+@@ -9,10 +9,10 @@
+ 
+ #include "mangle.h"
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 	
+diff -urN mpg123-orig/src/libmpg123/dct64_neon_float.S mpg123/src/libmpg123/dct64_neon_float.S
+--- mpg123-orig/src/libmpg123/dct64_neon_float.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/dct64_neon_float.S	2026-06-14 15:43:43.392972217 +0300
+@@ -8,10 +8,10 @@
+ 
+ #include "mangle.h"
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff -urN mpg123-orig/src/libmpg123/synth_neon_accurate.S mpg123/src/libmpg123/synth_neon_accurate.S
+--- mpg123-orig/src/libmpg123/synth_neon_accurate.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/synth_neon_accurate.S	2026-06-14 15:51:51.252535246 +0300
+@@ -17,8 +17,10 @@
+ 	return value: number of clipped samples (0)
+ */
+ 
++#ifndef _WIN32
+ 	.code 32
+-#ifndef __APPLE__
++#endif
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+@@ -32,7 +34,13 @@
+ 	vpush		{q4-q7}
+ 	mov			r6, sp
+ 	sub			sp, sp, #16
++#ifdef _WIN32
++	mov			r12, sp
++	bic			r12, r12, #0xff
++	mov			sp, r12
++#else
+ 	bic			sp, #0xff
++#endif
+ 	
+ 	add			WINDOW, WINDOW, #64
+ 	sub			WINDOW, WINDOW, r3, lsl #2
+diff -urN mpg123-orig/src/libmpg123/synth_neon_float.S mpg123/src/libmpg123/synth_neon_float.S
+--- mpg123-orig/src/libmpg123/synth_neon_float.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/synth_neon_float.S	2026-06-14 15:44:00.843992734 +0300
+@@ -17,10 +17,10 @@
+ 	return value: number of clipped samples (0)
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff -urN mpg123-orig/src/libmpg123/synth_neon_s32.S mpg123/src/libmpg123/synth_neon_s32.S
+--- mpg123-orig/src/libmpg123/synth_neon_s32.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/synth_neon_s32.S	2026-06-14 15:41:45.642832738 +0300
+@@ -17,10 +17,10 @@
+ 	return value: number of clipped samples (0)
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff -urN mpg123-orig/src/libmpg123/synth_stereo_neon_accurate.S mpg123/src/libmpg123/synth_stereo_neon_accurate.S
+--- mpg123-orig/src/libmpg123/synth_stereo_neon_accurate.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/synth_stereo_neon_accurate.S	2026-06-14 15:52:13.003559926 +0300
+@@ -18,8 +18,10 @@
+ 	return value: number of clipped samples
+ */
+ 
++#ifndef _WIN32
+ 	.code 32
+-#ifndef __APPLE__
++#endif
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+@@ -34,7 +36,13 @@
+ 	ldr			r4, [sp, #84]
+ 	mov			r7, sp
+ 	sub			sp, sp, #16
++#ifdef _WIN32
++	mov			r12, sp
++	bic			r12, r12, #0xff
++	mov			sp, r12
++#else
+ 	bic			sp, #0xff
++#endif
+ 	
+ 	add			WINDOW, WINDOW, #64
+ 	sub			WINDOW, WINDOW, r4, lsl #2
+diff -urN mpg123-orig/src/libmpg123/synth_stereo_neon_float.S mpg123/src/libmpg123/synth_stereo_neon_float.S
+--- mpg123-orig/src/libmpg123/synth_stereo_neon_float.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/synth_stereo_neon_float.S	2026-06-14 15:43:22.472947600 +0300
+@@ -18,10 +18,10 @@
+ 	return value: number of clipped samples (0)
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff -urN mpg123-orig/src/libmpg123/synth_stereo_neon.S mpg123/src/libmpg123/synth_stereo_neon.S
+--- mpg123-orig/src/libmpg123/synth_stereo_neon.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/synth_stereo_neon.S	2026-06-14 15:42:10.402862256 +0300
+@@ -18,10 +18,10 @@
+ 	return value: number of clipped samples
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff -urN mpg123-orig/src/libmpg123/synth_stereo_neon_s32.S mpg123/src/libmpg123/synth_stereo_neon_s32.S
+--- mpg123-orig/src/libmpg123/synth_stereo_neon_s32.S	2026-06-06 11:39:41.000000000 +0300
++++ mpg123/src/libmpg123/synth_stereo_neon_s32.S	2026-06-14 15:42:32.055887983 +0300
+@@ -18,10 +18,10 @@
+ 	return value: number of clipped samples
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
