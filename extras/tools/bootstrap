@@ -169,24 +169,38 @@ fi
 }
 
 check_ninja() {
+# with GNU make 4.4 we should use ninja 1.13.x and above
+# otherwise we must use the patched version from kitware
+
+isgnu=$(make -v | head -1 | cut -d ' ' -f 1)
+if [ "$isgnu" = "GNU" ];
+then
+    gotver=$(make -v | head -1 | cut -d ' ' -f 3)
+    gotmajor=$(echo $gotver|cut -d. -f1)
+    gotminor=$(echo $gotver|cut -d. -f2)
+fi
+if [ 4 -lt $gotmajor ] ||
+   [ 4 -eq $gotmajor ] && [ 4 -le $gotminor ];
+then
+    # GNU Make 4.4+
+    check ninja $1
+else
+
 if ! ninja --version >/dev/null 2>&1
 then
     echo "ninja not found"
     NEEDED="$NEEDED ninja"
 else
-    jobserver=`ninja --version | head -1 | grep .jobserver`
+    jobserver=$(ninja --version | head -1 | grep .jobserver)
     if [ -z "$jobserver" ]; then
         echo "ninja missing jobserver support"
         NEEDED="$NEEDED ninja"
     else
-        # found, need to check version ?
-        if [ -z "$1" ];then
-            FOUND="$FOUND ninja"
-        else
-            gotver=`ninja --version | head -1 | sed s/'.* '//`
-            check_version ninja $gotver $1
-        fi
+        # check the known working jobserver kitware version
+        check ninja 1.11.1
     fi
+fi
+
 fi
 }
 
