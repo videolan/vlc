@@ -1,0 +1,32 @@
+From a7108558f5c05ae7fb4ac0d49f68d03ee43446f2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 15 Jun 2026 09:03:12 +0200
+Subject: [PATCH] ltmain.in: reference MAGIC_EXE in the main
+
+It fixes .exe detection with LLVM-mingw when -flto is used.
+
+"__attribute__((externally_visible)) volatile" doesn't seem to be enough.
+The symbol is stripped anyway.
+It's also stripped during linking when __attribute__((visibility("default"))) is used.
+
+Referencing the string in the main() seems to do the trick, even when compiled with -O2 or -Os.
+---
+ build-aux/ltmain.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index ffd4c716..bf927f0c 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -3994,6 +3994,8 @@ main (int argc, char *argv[])
+ 
+   int i;
+ 
++  (void) MAGIC_EXE;
++
+   program_name = (char *) xstrdup (base_name (argv[0]));
+   newargz = XMALLOC (char *, (size_t) argc + 1);
+ 
+-- 
+2.52.0.windows.1
+
