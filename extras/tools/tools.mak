@@ -132,6 +132,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) $(TOOLS)/libtool-2.5.4-embed-bitcode.patch
 
 	$(APPLY) $(TOOLS)/libtool-2.5.4-unarchive-old-libraries.patch
+	$(APPLY) $(TOOLS)/libtool-2.5.4-ltmain.in-reference-MAGIC_EXE-in-the-main.patch
 	$(MOVE)
 
 .buildlibtool: libtool .automake .help2man
