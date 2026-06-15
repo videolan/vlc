@@ -1667,6 +1667,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
         }
 
+        /* The palette can change on any frame; avcodec exposes the current one
+         * in frame->data[1]. The fmt_out palette and the chroma converter are
+         * only set up once (on the first frame above), so refresh the output
+         * picture's own palette every frame to keep the colors up-to-date. */
+        if( p_context->pix_fmt == AV_PIX_FMT_PAL8 && frame->data[1] != NULL
+         && p_pic->format.p_palette != NULL )
+            lavc_Frame8PaletteCopy( p_pic->format.p_palette, frame->data[1] );
+
         p_pic->date = i_pts;
         /* Hack to force display of still pictures */
         p_pic->b_force = p_sys->b_first_frame;
