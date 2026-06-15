@@ -245,6 +245,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 - (void)applySegmentView:(VLCLibrarySegment *)segment
 {
     [self.toolbarDelegate applyVisiblityFlags:segment.toolbarDisplayFlags];
+    self.librarySearchField.placeholderString = segment.searchFieldPlaceholder;
     if (![self.librarySegmentViewController isKindOfClass:segment.libraryViewControllerClass]) {
         _librarySegmentViewController = [segment newLibraryViewController];
     }

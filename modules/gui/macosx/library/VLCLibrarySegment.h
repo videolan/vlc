@@ -60,6 +60,7 @@ typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
 @property (class, readonly) NSArray<VLCLibrarySegment*> *librarySegments;
 @property (readonly) VLCLibrarySegmentType segmentType;
 @property (readonly) NSString *displayString;
+@property (readonly, nullable) NSString *searchFieldPlaceholder;
 @property (readonly) NSImage *displayImage;
 @property (readonly) NSInteger childCount;
 @property (readonly, nullable) Class libraryViewControllerClass;
