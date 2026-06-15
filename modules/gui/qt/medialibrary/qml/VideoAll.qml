@@ -173,8 +173,6 @@ MainViewLoader {
 
             Navigation.parentItem: root
 
-            Navigation.upItem: headerItem
-
             // Functions
 
             function isInfoExpandPanelAvailable(modelIndexData) {
@@ -226,8 +224,6 @@ MainViewLoader {
             // Navigation
 
             Navigation.parentItem: root
-
-            Navigation.upItem: headerItem
 
             // Events
 
