@@ -309,7 +309,10 @@ FocusScope {
                 Widgets.DualKawaseBlur {
                     id: blurredBackground
 
-                    radius: 3
+                    // Six pass is free here since we release the intermediate layers
+                    // through unsetting `live` (see `liveTimer`):
+                    mode: Widgets.DualKawaseBlur.Mode.SixPass
+                    radius: 2
 
                     live: false
 
