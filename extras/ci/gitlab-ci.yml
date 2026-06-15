@@ -357,8 +357,6 @@ debian-meson:
             echo -e "\e[0Ksection_start:$(date +%s):build_tools_section\r\e[0KTools build"
             # Build tools
             ( cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse )
-            # Build meson from extras/tool explicitly
-            ( cd extras/tools && make -j$NCPU .buildmeson )
             export PATH="$(pwd)/extras/tools/build/bin:$PATH"
             echo -e "\e[0Ksection_end:$(date +%s):build_tools_section\r\e[0K"
         - |
