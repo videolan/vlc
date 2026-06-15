@@ -41,7 +41,12 @@ Item {
 
     enum Mode {
         FourPass, // 2 downsample + 2 upsamples (3 layers/buffers)
-        TwoPass // 1 downsample + 1 upsample (1 layer/buffer)
+        TwoPass, // 1 downsample + 1 upsample (1 layer/buffer)
+        // NOTE: Due to high count of layers, it is recommended to use six pass only with
+        //       static sources with `live: false` to prevent consuming high video memory.
+        //       Note that in such a case, using six (or higher) passes will consume no
+        //       additional memory, which means it is effectively free:
+        SixPass // 3 downsample + 3 upsamples (5 layers/buffers)
     }
 
     property int mode: DualKawaseBlur.Mode.FourPass
@@ -213,6 +218,8 @@ Item {
         if (live) {
             ds1layer.parent = root
             ds2layer.inhibitParent = false
+            ds3layer.inhibitParent = false
+            us0layer.inhibitParent = false
 
             if (root._queuedScheduledUpdate) {
                 console.debug(root, "scheduleUpdate(): `live` is turned on, canceling the scheduled update.")
@@ -326,7 +333,7 @@ Item {
 
             if (root._window) {
                 // In four pass mode, we can release the two intermediate layers:
-                if (root.mode === DualKawaseBlur.Mode.FourPass) {
+                if (root.mode !== DualKawaseBlur.Mode.TwoPass) {
                     // Scheduling update must be done sequentially for each layer in
                     // a chain. It seems that each layer needs one frame for it to be
                     // used as a source in another layer, so we can not schedule
@@ -347,7 +354,7 @@ Item {
         height: ds1.height / 2
 
         Binding on tpObserver.notifyAllChanges {
-            when: (root.mode !== DualKawaseBlur.Mode.FourPass)
+            when: (root.mode === DualKawaseBlur.Mode.TwoPass)
             value: false
         }
 
@@ -362,7 +369,7 @@ Item {
         // This is mainly relevant for switching the mode case, as initially if this was
         // never visible and was never used as texture provider, it should have never allocated
         // resources to begin with.
-        sourceItem: (root.mode === DualKawaseBlur.Mode.FourPass) ? ds2 : null
+        sourceItem: (root.mode !== DualKawaseBlur.Mode.TwoPass) ? ds2 : null
         parent: (!inhibitParent && sourceItem) ? root : null // necessary to release resources even if `sourceItem` becomes null (non-live case)
 
         property bool inhibitParent: false
@@ -389,6 +396,118 @@ Item {
             ds2layer.scheduleUpdate()
 
             if (root._window) {
+                if (root.mode === DualKawaseBlur.Mode.FourPass)
+                    root._window.afterAnimating.connect(us1layer, us1layer.scheduleChainedUpdate)
+                else if (root.mode === DualKawaseBlur.Mode.SixPass)
+                    root._window.afterAnimating.connect(ds3layer, ds3layer.scheduleChainedUpdate)
+            }
+        }
+    }
+
+    DownsamplerShaderEffect {
+        id: ds3
+
+        // When downsampled, we can decrease the size here so that the layer occupies less VRAM:
+        width: ds2.width / 2
+        height: ds2.height / 2
+
+        Binding on tpObserver.notifyAllChanges {
+            when: (root.mode !== DualKawaseBlur.Mode.SixPass)
+            value: false
+        }
+
+        // Qt uses reference counting, otherwise ds2layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
+        source: ((root.mode !== DualKawaseBlur.Mode.SixPass) || !ds2layer.parent) ? null : ds2layer
+    }
+
+    DefaultShaderEffectSource {
+        id: ds3layer
+
+        // So that if the mode is two pass (this is not used), the buffer is released:
+        // This is mainly relevant for switching the mode case, as initially if this was
+        // never visible and was never used as texture provider, it should have never allocated
+        // resources to begin with.
+        sourceItem: (root.mode === DualKawaseBlur.Mode.SixPass) ? ds3 : null
+        parent: (!inhibitParent && sourceItem) ? root : null // necessary to release resources even if `sourceItem` becomes null (non-live case)
+
+        property bool inhibitParent: false
+
+        function scheduleChainedUpdate() {
+            if (!ds3layer) // context is lost, Qt bug (reproduced with 6.2)
+                return
+
+            if (root._window) {
+                root._window.afterAnimating.disconnect(ds3layer, ds3layer.scheduleChainedUpdate)
+            }
+
+            // If `live` is turned on during a chained update, we do not need to continue:
+            if (root.live) {
+                root._window = null
+                return
+            }
+
+            ds3.sourceTextureSize = ds3.tpObserver.nativeTextureSize
+            if (ds3.ensurePolished)
+                ds3.ensurePolished()
+
+            ds3layer.inhibitParent = false
+            ds3layer.scheduleUpdate()
+
+            if (root._window) {
+                root._window.afterAnimating.connect(us0layer, us0layer.scheduleChainedUpdate)
+            }
+        }
+    }
+
+    UpsamplerShaderEffect {
+        id: us0
+
+        width: ds3.width * 2
+        height: ds3.height * 2
+
+        Binding on tpObserver.notifyAllChanges {
+            when: (root.mode !== DualKawaseBlur.Mode.SixPass)
+            value: false
+        }
+
+        // Qt uses reference counting, otherwise ds3layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
+        source: ((root.mode !== DualKawaseBlur.Mode.SixPass) || !ds3layer.parent) ? null : ds3layer
+    }
+
+    DefaultShaderEffectSource {
+        id: us0layer
+
+        // So that if the mode is two pass (this is not used), the buffer is released:
+        // This is mainly relevant for switching the mode case, as initially if this was
+        // never visible and was never used as texture provider, it should have never allocated
+        // resources to begin with.
+        sourceItem: (root.mode === DualKawaseBlur.Mode.SixPass) ? us0 : null
+        parent: (!inhibitParent && sourceItem) ? root : null // necessary to release resources even if `sourceItem` becomes null (non-live case)
+
+        property bool inhibitParent: false
+
+        function scheduleChainedUpdate() {
+            if (!us0layer) // context is lost, Qt bug (reproduced with 6.2)
+                return
+
+            if (root._window) {
+                root._window.afterAnimating.disconnect(us0layer, us0layer.scheduleChainedUpdate)
+            }
+
+            // If `live` is turned on during a chained update, we do not need to continue:
+            if (root.live) {
+                root._window = null
+                return
+            }
+
+            us0.sourceTextureSize = us0.tpObserver.nativeTextureSize
+            if (us0.ensurePolished)
+                us0.ensurePolished()
+
+            us0layer.inhibitParent = false
+            us0layer.scheduleUpdate()
+
+            if (root._window) {
                 root._window.afterAnimating.connect(us1layer, us1layer.scheduleChainedUpdate)
             }
         }
@@ -397,16 +516,44 @@ Item {
     UpsamplerShaderEffect {
         id: us1
 
-        width: ds2.width * 2
-        height: ds2.height * 2
+        width: ((sourceShaderEffect?.width ?? 0.0) * 2)
+        height: ((sourceShaderEffect?.height ?? 0.0) * 2)
+
+        readonly property ShaderEffect sourceShaderEffect: {
+            switch (root.mode) {
+            case DualKawaseBlur.Mode.FourPass:
+                return ds2
+            case DualKawaseBlur.Mode.SixPass:
+                return us0
+            case DualKawaseBlur.Mode.TwoPass:
+            default:
+                return null
+            }
+        }
 
         Binding on tpObserver.notifyAllChanges {
-            when: (root.mode !== DualKawaseBlur.Mode.FourPass)
+            when: (root.mode === DualKawaseBlur.Mode.TwoPass)
             value: false
         }
 
         // Qt uses reference counting, otherwise ds2layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
-        source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds2layer.parent) ? null : ds2layer
+        source: {
+            switch (root.mode) {
+            case DualKawaseBlur.Mode.FourPass:
+                if (ds2layer.parent)
+                    return ds2layer
+                else
+                    return null
+            case DualKawaseBlur.Mode.SixPass:
+                if (us0layer.parent)
+                    return us0layer
+                else
+                    return null
+            case DualKawaseBlur.Mode.TwoPass:
+            default:
+                return null
+            }
+        }
     }
 
     DefaultShaderEffectSource {
@@ -416,13 +563,13 @@ Item {
         // This is mainly relevant for switching the mode case, as initially if this was
         // never visible and was never used as texture provider, it should have never allocated
         // resources to begin with.
-        sourceItem: (root.mode === DualKawaseBlur.Mode.FourPass) ? us1 : null
+        sourceItem: (root.mode !== DualKawaseBlur.Mode.TwoPass) ? us1 : null
 
         // Last layer for four pass mode, so use the viewport rect:
         // No need to check for the mode because this layer is not used in two pass mode anyway.
         sourceRect: root._localViewportRect
 
-        wrapMode: (root.mode === DualKawaseBlur.Mode.FourPass) ? root.visualWrapMode : ShaderEffectSource.ClampToEdge
+        wrapMode: (root.mode !== DualKawaseBlur.Mode.TwoPass) ? root.visualWrapMode : ShaderEffectSource.ClampToEdge
 
         function scheduleChainedUpdate() {
             if (!us1layer) // context is lost, Qt bug (reproduced with 6.2)
@@ -474,6 +621,8 @@ Item {
             // https://doc.qt.io/qt-6/qquickitem.html#graphics-resource-handling
             ds1layer.parent = null
             ds2layer.inhibitParent = true
+            ds3layer.inhibitParent = true
+            us0layer.inhibitParent = true
 
             if (root._queuedScheduledUpdate) {
                 // Tried calling `scheduleUpdate()` before the ongoing chained updates completed.
