@@ -24,6 +24,7 @@ MIN_M4=1.4.16
 MIN_MESON=0.60.0
 MIN_NASM=2.15
 MIN_PROTOC=3.4.0
+MIN_NINJA=1.13.0
 
 export LC_ALL=
 FOUND=
@@ -176,7 +177,7 @@ check flex
 check_nasm $MIN_NASM
 check help2man
 check meson $MIN_MESON
-check_ninja
+check_ninja $MIN_NINJA
 check gettext
 
 DEPS_ONLY="help2man"
