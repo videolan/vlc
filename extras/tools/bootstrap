@@ -185,22 +185,20 @@ then
     # GNU Make 4.4+
     check ninja $1
 else
-
-if ! ninja --version >/dev/null 2>&1
-then
-    echo "ninja not found"
-    NEEDED="$NEEDED ninja"
-else
-    jobserver=$(ninja --version | head -1 | grep .jobserver)
-    if [ -z "$jobserver" ]; then
-        echo "ninja missing jobserver support"
+    if ! ninja --version >/dev/null 2>&1
+    then
+        echo "ninja not found"
         NEEDED="$NEEDED ninja"
     else
-        # check the known working jobserver kitware version
-        check ninja 1.11.1
+        jobserver=$(ninja --version | head -1 | grep .jobserver)
+        if [ -z "$jobserver" ]; then
+            echo "ninja missing jobserver support"
+            NEEDED="$NEEDED ninja"
+        else
+            # check the known working jobserver kitware version
+            check ninja 1.11.1
+        fi
     fi
-fi
-
 fi
 }
 
