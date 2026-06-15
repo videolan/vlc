@@ -48,7 +48,7 @@
         {"key":"ic_fluent_chevron_left_24", "path": "./icons/ic_fluent_chevron_left_24.svg"},
         {"key":"ic_fluent_chevron_right_24", "path": "./icons/ic_fluent_chevron_right_24.svg"},
         {"key":"ic_fluent_chevron_up_24", "path": "./icons/ic_fluent_chevron_up_24.svg"},
-        {"key":"play_reverse", "path": "./icons/play_reverse.svg"},
+        {"key":"play_reverse", "path": "./icons/ic_fluent_play_reverse_filled.svg"},
         {"key":"playlist", "path": "./icons/ic_playlist.svg"},
         {"key":"playlist_clear", "path": "./icons/ic_playlist_clear.svg"},
         {"key":"previous", "path": "./icons/ic_fluent_previous.svg"},

@@ -834,7 +834,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/ic_playlist_clear.svg \
 	pixmaps/icons/ic_playlist.svg \
 	pixmaps/icons/ic_fluent_play.svg \
-	pixmaps/icons/play_reverse.svg \
+	pixmaps/icons/ic_fluent_play_reverse_filled.svg \
 	pixmaps/icons/ic_fluent_arrow_move.svg \
 	pixmaps/icons/ic_fluent_chevron_down_24.svg \
 	pixmaps/icons/ic_fluent_chevron_left_24.svg \
