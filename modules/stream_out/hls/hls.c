@@ -649,10 +649,26 @@ static bool IsSegmentSelfDecodable(const hls_block_chain_t *segment,
     vlc_assert_unreachable();
 }
 
+/* Arbitrary segment size maximum. Beyond this, we consider the sement unusable for
+ * streaming. */
+#define HLS_SEGMENT_MAX_SIZE ((size_t)1 << 30) /* 1 GiB */
+
 static int ExtractAndAddSegment(hls_playlist_t *playlist,
                                 sout_stream_sys_t *sys)
 {
     hls_block_chain_t segment = ExtractSegment(playlist);
+
+    size_t segment_size;
+    block_ChainProperties(segment.begin, NULL, &segment_size, NULL);
+    if (segment_size > HLS_SEGMENT_MAX_SIZE)
+    {
+        vlc_error(playlist->logger,
+                  "Segment too large (%zu bytes): the input bitrate is too high "
+                  "for the configured segment length",
+                  segment_size);
+        block_ChainRelease(segment.begin);
+        return VLC_EGENERIC;
+    }
 
     if (hls_config_IsMemStorageEnabled(&sys->config) &&
         hls_segment_queue_IsAtMaxCapacity(&playlist->segments))
@@ -1444,6 +1460,7 @@ vlc_module_begin()
     add_string(SOUT_CFG_PREFIX "out-dir", NULL, OUTDIR_TEXT, OUTDIR_LONGTEXT)
     add_bool(SOUT_CFG_PREFIX "pace", false, PACE_TEXT, PACE_LONGTEXT)
     add_integer(SOUT_CFG_PREFIX "seg-len", 4, SEGLEN_TEXT, SEGLEN_LONGTEXT)
+        change_integer_range(1, 60)
 
     set_callback(Open)
 vlc_module_end()
