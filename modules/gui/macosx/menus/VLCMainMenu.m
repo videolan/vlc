@@ -783,12 +783,13 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [menuItem setTarget: self];
     NSRect s_rect;
     for (NSUInteger i = 0; i < numberOfScreens; i++) {
-        s_rect = [[screens objectAtIndex:i] frame];
+        NSScreen *screen = [screens objectAtIndex:i];
+        s_rect = [screen frame];
         [submenu addItemWithTitle:[NSString stringWithFormat: @"%@ %li (%ix%i)", _NS("Screen"), i+1, (int)s_rect.size.width, (int)s_rect.size.height]
                            action:@selector(toggleFullscreenDevice:)
                     keyEquivalent:@""];
         menuItem = [submenu itemAtIndex:i+1];
-        [menuItem setTag:(int)[[screens objectAtIndex:i] displayID]];
+        [menuItem setTag:(int)[screen displayID]];
         [menuItem setEnabled: YES];
         [menuItem setTarget: self];
     }
