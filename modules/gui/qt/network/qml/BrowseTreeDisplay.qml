@@ -44,6 +44,8 @@ Widgets.PageExt {
     isSearchable: loader.isSearchable
 
     header:  BrowseTreeHeader {
+        id: browseTreeHeader
+
         path: root.headerPath
         providerModel: root.model
 
@@ -197,7 +199,7 @@ Widgets.PageExt {
                 onActionAtIndex: (index) => { _actionAtIndex(index) }
 
                 Navigation.parentItem: root
-                Navigation.upItem: gridView.headerItem
+                Navigation.upItem: browseTreeHeader.networkAddressbar
             }
         }
 
@@ -289,7 +291,7 @@ Widgets.PageExt {
                 focus: true
 
                 Navigation.parentItem: root
-                Navigation.upItem: tableView.headerItem
+                Navigation.upItem: browseTreeHeader.networkAddressbar
 
                 rowHeight: VLCStyle.tableCoverRow_height
 
@@ -345,6 +347,7 @@ Widgets.PageExt {
                 }
 
                 Navigation.parentItem: root
+                Navigation.upItem: browseTreeHeader.networkAddressbar
             }
         }
     }

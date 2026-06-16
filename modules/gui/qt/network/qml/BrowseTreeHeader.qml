@@ -63,6 +63,8 @@ T.Pane {
     focus: medialibraryBtn.visible
     Navigation.navigable: medialibraryBtn.visible
 
+    property alias networkAddressbar: networkAddressbar
+
     background: Rectangle {
         color: theme.bg.primary
     }
@@ -73,12 +75,17 @@ T.Pane {
         anchors.fill: parent
 
         NetworkAddressbar {
+            id: networkAddressbar
+
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             background: null
 
             path: root.path
+
+            Navigation.parentItem: root
+            Navigation.rightItem: medialibraryBtn
 
             onHomeButtonClicked: reason => root.homeButtonClicked(reason)
 
@@ -105,12 +112,14 @@ T.Pane {
             Layout.preferredWidth: implicitWidth
 
             Navigation.parentItem: root
+            Navigation.leftItem: networkAddressbar
             Navigation.rightItem: gridSortFilter
         }
 
         Widgets.GridSortFilterControls {
             id: gridSortFilter
 
+            Navigation.parentItem: root
             Navigation.leftItem: medialibraryBtn
         }
     }
