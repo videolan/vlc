@@ -1265,16 +1265,14 @@ static void EsOutDecodersStopBuffering(es_out_sys_t *p_sys, bool b_forced)
          * es_out before this point, and all synchronous pauses clear the
          * b_pause_after_buffering flag. */
         assert(!p_sys->b_paused);
+        assert(input_priv(p_sys->p_input)->i_state != PAUSE_S);
 
         const vlc_tick_t i_pause_date = vlc_tick_now();
         EsOutChangePause(p_sys, true, i_pause_date);
 
-        /* Update input state if not already paused */
-        if (input_priv(p_sys->p_input)->i_state != PAUSE_S)
-        {
-            input_priv(p_sys->p_input)->i_state = PAUSE_S;
-            input_SendEventState(p_sys->p_input, PAUSE_S, i_pause_date);
-        }
+         /* Update input state since pause was not yet applied. */
+        input_priv(p_sys->p_input)->i_state = PAUSE_S;
+        input_SendEventState(p_sys->p_input, PAUSE_S, i_pause_date);
     }
 
     foreach_es_then_es_slaves(p_es)
