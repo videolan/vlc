@@ -32,6 +32,7 @@
         {"key":"faster", "path": "./icons/ic_fluent_fast_forward.svg"},
         {"key":"frame_by_frame", "path": "./icons/frame-by-frame.svg"},
         {"key":"next_frame", "path": "./icons/ic_fluent_next_frame.svg"},
+        {"key":"previous_frame", "path": "./icons/ic_fluent_previous_frame.svg"},
         {"key":"fullscreen", "path": "./icons/ic_fluent_full_screen_maximize.svg"},
         {"key":"grid", "path": "./icons/ic_fluent_grid.svg"},
         {"key":"history", "path": "./icons/history.svg"},
