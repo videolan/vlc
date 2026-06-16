@@ -133,7 +133,7 @@ endif
 
 .qt: qt toolchain.cmake
 	$(CMAKECLEAN)
-	$(CMAKE) $(QTBASE_CONFIG)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(QTBASE_CONFIG)
 	+PATH="$(PATH):$(PREFIX)/bin" $(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
