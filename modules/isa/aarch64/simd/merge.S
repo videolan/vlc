@@ -43,12 +43,12 @@ function merge8_arm64
 	ld1		{v0.16b,v1.16b}, [SRC1], x10
 	ld1		{v4.16b,v5.16b}, [SRC2], x10
 	ld1		{v2.16b,v3.16b}, [x11], x10
-	uhadd		v0.16b, v0.16b, v4.16b
+	urhadd		v0.16b, v0.16b, v4.16b
 	ld1		{v6.16b,v7.16b}, [x12], x10
 	subs		x5,  x5,  #64
-	uhadd		v1.16b, v1.16b, v5.16b
-	uhadd		v2.16b, v2.16b, v6.16b
-	uhadd		v3.16b, v3.16b, v7.16b
+	urhadd		v1.16b, v1.16b, v5.16b
+	urhadd		v2.16b, v2.16b, v6.16b
+	urhadd		v3.16b, v3.16b, v7.16b
 	st1		{v0.16b,v1.16b}, [DEST], #32
 	st1		{v2.16b,v3.16b}, [DEST], #32
 	b.gt		1b
@@ -56,14 +56,14 @@ function merge8_arm64
 	tbz		SIZE, #5,  3f
 	ld1		{v0.16b,v1.16b}, [SRC1], #32
 	ld1		{v4.16b,v5.16b}, [SRC2], #32
-	uhadd		v0.16b, v0.16b, v4.16b
-	uhadd		v1.16b, v1.16b, v5.16b
+	urhadd		v0.16b, v0.16b, v4.16b
+	urhadd		v1.16b, v1.16b, v5.16b
 	st1		{v0.16b,v1.16b}, [DEST], #32
 3:
 	tbz		SIZE, #4,  4f
 	ld1		{v0.16b},  [SRC1]
 	ld1		{v4.16b},  [SRC2]
-	uhadd		v0.16b, v0.16b, v4.16b
+	urhadd		v0.16b, v0.16b, v4.16b
 	st1		{v0.16b},  [DEST]
 4:
 	ret
@@ -77,11 +77,11 @@ function merge16_arm64
 	ld1		{v0.8h,v1.8h}, [SRC1], #32
 	ld1		{v4.8h,v5.8h}, [SRC2], #32
 	ld1		{v2.8h,v3.8h}, [SRC1], #32
-	uhadd		v0.8h,  v0.8h,  v4.8h
+	urhadd		v0.8h,  v0.8h,  v4.8h
 	ld1		{v6.8h,v7.8h}, [SRC2], #32
-	uhadd		v1.8h,  v1.8h,  v5.8h
-	uhadd		v2.8h,  v2.8h,  v6.8h
-	uhadd		v3.8h,  v3.8h,  v7.8h
+	urhadd		v1.8h,  v1.8h,  v5.8h
+	urhadd		v2.8h,  v2.8h,  v6.8h
+	urhadd		v3.8h,  v3.8h,  v7.8h
 	st1		{v0.8h,v1.8h}, [DEST], #32
 	st1		{v2.8h,v3.8h}, [DEST], #32
 	subs		x5,  x5,  #64
@@ -90,14 +90,14 @@ function merge16_arm64
 	tbz		SIZE, #5, 3f
 	ld1		{v0.8h,v1.8h}, [SRC1], #32
 	ld1		{v4.8h,v5.8h}, [SRC2], #32
-	uhadd		v0.8h,  v0.8h,  v4.8h
-	uhadd		v1.8h,  v1.8h,  v5.8h
+	urhadd		v0.8h,  v0.8h,  v4.8h
+	urhadd		v1.8h,  v1.8h,  v5.8h
 	st1		{v0.8h,v1.8h}, [DEST], #32
 3:
 	tbz	        SIZE, #4,  4f
 	ld1		{v0.8h},  [SRC1]
 	ld1		{v4.8h},  [SRC2]
-	uhadd		v0.8h,  v0.8h,  v4.8h
+	urhadd		v0.8h,  v0.8h,  v4.8h
 	st1		{v0.8h},  [DEST]
 4:
 	ret
