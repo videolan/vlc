@@ -43,6 +43,7 @@ function merge8_arm_sve
 
 function merge16_arm_sve
 	bti	c
+	lsr	x3, x3, #1
 	mov	x4, #0
 	b	2f
 1:	ld1h	{z0.s}, p0/z, [x1, x4, lsl #1]
