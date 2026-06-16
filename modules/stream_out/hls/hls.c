@@ -567,12 +567,24 @@ static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist)
     return ExtractAVSegment(&playlist->muxed_output, seglen);
 }
 
-static bool IsSegmentSelfDecodable(const hls_block_chain_t *segment)
+static bool IsSegmentSelfDecodable(const hls_block_chain_t *segment,
+                                   const hls_playlist_t *playlist)
 {
     if (segment->begin == NULL)
         return false;
 
-    return segment->begin->i_flags & BLOCK_FLAG_HEADER;
+    if (playlist->video_track_count == 0)
+        return true;
+
+    const uint32_t flags = segment->begin->i_flags;
+    switch (playlist->type)
+    {
+        case HLS_PLAYLIST_TYPE_TS:
+            return (flags & BLOCK_FLAG_HEADER) != 0;
+        case HLS_PLAYLIST_TYPE_WEBVTT:
+            break; /* No video track: handled by the early return above. */
+    }
+    vlc_assert_unreachable();
 }
 
 static int ExtractAndAddSegment(hls_playlist_t *playlist,
@@ -589,7 +601,7 @@ static int ExtractAndAddSegment(hls_playlist_t *playlist,
             hls_storage_GetSize(to_be_removed->storage);
     }
 
-    const bool self_decodable = IsSegmentSelfDecodable(&segment);
+    const bool self_decodable = IsSegmentSelfDecodable(&segment, playlist);
     const vlc_tick_t length = segment.length;
     const int status = hls_segment_queue_NewSegment(
         &playlist->segments, segment.begin, segment.length);
