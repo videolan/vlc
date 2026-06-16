@@ -176,20 +176,20 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
     QColor buttonBgNormal = palette.color(QPalette::Normal, QPalette::Button);
     buttonBgNormal.setAlpha(0);
 
-    QColor negative("#C42B1C");
+    QColor negative(sys->m_isDark ? QColor(Qt::darkRed) : "#fde7e9");
     QColor negativeHover = negative.lighter(110);
     QColor negativePressed = negative.lighter(150);
-    QColor textOnNegative(Qt::white);
+    QColor textOnNegative(Qt::red);
 
-    QColor neutral("#c6bf00");
+    QColor neutral(sys->m_isDark ? QColor(Qt::darkYellow) : "#e4dab8");
     QColor neutralHover = neutral.lighter(110);
     QColor neutralPressed = neutral.lighter(150);
-    QColor textOnNeutral(Qt::white);
+    QColor textOnNeutral(sys->m_isDark ? "#FF8800" : "#FF610A");
 
-    QColor positive("#0F7B0F");
+    QColor positive(sys->m_isDark ? QColor(Qt::darkGreen) : "#dff6dd");
     QColor positiveHover = positive.lighter(110);
     QColor positivePressed = positive.lighter(150);
-    QColor textOnPositive(Qt::white);
+    QColor textOnPositive(Qt::green);
 
     QColor inputBorderNormal = blendColors(palette.color(QPalette::Normal, QPalette::Base),
                                     palette.color(QPalette::Normal, QPalette::Text));
