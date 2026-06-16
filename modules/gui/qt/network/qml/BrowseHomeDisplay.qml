@@ -199,6 +199,7 @@ Widgets.PageExt {
             bottomPadding: VLCStyle.margin_normal // topPadding taken care by ViewHeader
 
             Navigation.parentItem: root
+            Navigation.upItem: root.header
 
             HomeDeviceTitle {
                 view: foldersSection
@@ -318,19 +319,16 @@ Widgets.PageExt {
         if (!activeFocus)
             return
 
+        if (header?.activeFocus)
+            return
+
         for (let i = 0; i < column.count; ++i) {
             const widget = column.itemAt(i)
             if (widget && widget.activeFocus && widget.visible)
                 return
         }
 
-        for (let i = 0; i < column.count; ++i){
-            const widget = column.itemAt(i)
-            if (widget.visible) {
-                Helpers.transferFocus(widget, Qt.TabFocusReason)
-                break
-            }
-        }
+        setCurrentItemFocus(focusReason)
     }
 
     component HomeDeviceTitle: Widgets.ViewHeader {
@@ -360,6 +358,8 @@ Widgets.PageExt {
         visible: model.count !== 0
 
         focus: true
+
+        Navigation.parentItem: column
 
         maximumRows: root.maximumRows
 

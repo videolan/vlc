@@ -122,7 +122,14 @@ T.Page {
         sort: _sortCtx
 
         Navigation.parentItem: root
-        Navigation.downItem: root._firstChild
+        Navigation.downAction: function() {
+            if (typeof root.setCurrentItemFocus === "function")
+                root.setCurrentItemFocus(Qt.TabFocusReason)
+            else if (typeof root._firstChild?.setCurrentItemFocus === "function")
+             root._firstChild.setCurrentItemFocus(Qt.TabFocusReason)
+            else if (root._firstChild)
+                root._firstChild.forceActiveFocus(Qt.TabFocusReason)
+        }
     }
 
     component DefaultPageHeader: T.ToolBar {
