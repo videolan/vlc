@@ -72,6 +72,8 @@ typedef struct hls_playlist
     sout_mux_t *mux;
     /** Every ES muxed in this playlist. */
     struct vlc_list tracks;
+    /** Number of VIDEO_ES tracks currently muxed. */
+    unsigned video_track_count;
 
     hls_block_chain_t muxed_output;
 
@@ -781,6 +783,7 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream,
     playlist->config = &sys->config;
     playlist->ended = false;
     playlist->muxed_duration = 0;
+    playlist->video_track_count = 0;
 
     playlist->url = FormatPlaylistManifestURL(playlist);
     if (unlikely(playlist->url == NULL))
@@ -916,6 +919,9 @@ Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
     track->es_id = es_id;
     track->playlist_ref = playlist;
 
+    if (fmt->i_cat == VIDEO_ES)
+        ++playlist->video_track_count;
+
     vlc_list_append(&track->node, &playlist->tracks);
 
     struct hls_storage *new_manifest;
@@ -957,6 +963,9 @@ static void Del(sout_stream_t *stream, void *id)
 {
     sout_stream_sys_t *sys = stream->p_sys;
     hls_track_t *track = id;
+
+    if (track->input->fmt.i_cat == VIDEO_ES)
+        --track->playlist_ref->video_track_count;
 
     sout_MuxDeleteStream(track->playlist_ref->mux, track->input);
     vlc_list_remove(&track->node);
