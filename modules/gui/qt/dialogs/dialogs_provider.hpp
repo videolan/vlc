@@ -95,6 +95,14 @@ class DialogsProvider : public QObject, public Singleton<DialogsProvider>
     friend class Singleton<DialogsProvider>;
 
 public:
+    enum Mode
+    {
+        Show,
+        Hide,
+        Toggle
+    };
+    Q_ENUM(Mode)
+
     static DialogsProvider *getInstance()
     {
         const auto instance = Singleton<DialogsProvider>::getInstance<false>();
