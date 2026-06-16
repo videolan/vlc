@@ -133,6 +133,10 @@ LIBVLC_API size_t libvlc_picture_list_count( const libvlc_picture_list_t* list )
 /**
  * Returns the picture at the provided index.
  *
+ * The returned picture is a weak reference of libvlc_picture_t* owned by the
+ * list. It must not be released and remains valid only as long as the list is
+ * alive.
+ *
  * If the index is out of bound, the result is undefined.
  */
 LIBVLC_API libvlc_picture_t* libvlc_picture_list_at( const libvlc_picture_list_t* list,
