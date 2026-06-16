@@ -489,13 +489,13 @@ void SystemPalette::makeLightPalette()
         setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(Qt::black, 0.7));
 
         setColor(CS, C::Bg, C::Negative, C::Normal, QColor("#fde7e9")); //FIXME
-        setColor(CS, C::Fg, C::Negative, C::Normal, Qt::black); //FIXME
+        setColor(CS, C::Fg, C::Negative, C::Normal, Qt::red);
 
         setColor(CS, C::Bg, C::Neutral, C::Normal, QColor("#e4dab8")); //FIXME
-        setColor(CS, C::Fg, C::Neutral, C::Normal, Qt::black); //FIXME
+        setColor(CS, C::Fg, C::Neutral, C::Normal, orange800);
 
         setColor(CS, C::Bg, C::Positive, C::Normal, QColor("#dff6dd")); //FIXME
-        setColor(CS, C::Fg, C::Positive, C::Normal, Qt::black); //FIXME
+        setColor(CS, C::Fg, C::Positive, C::Normal, Qt::green);
 
         setColor(CS, C::Decoration, C::VisualFocus, C::Normal, setColorAlpha(Qt::black, 0.0) );
         setColor(CS, C::Decoration, C::VisualFocus, C::Focused, Qt::black );
@@ -701,14 +701,14 @@ void SystemPalette::makeDarkPalette()
 
         setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(Qt::white, 0.6));
 
-        setColor(CS, C::Bg, C::Negative, C::Normal, QColor("#FF99A4")); //FIXME
-        setColor(CS, C::Fg, C::Negative, C::Normal, Qt::black); //FIXME
+        setColor(CS, C::Bg, C::Negative, C::Normal, QColor(Qt::darkRed));
+        setColor(CS, C::Fg, C::Negative, C::Normal, Qt::red);
 
-        setColor(CS, C::Bg, C::Neutral, C::Normal, QColor("#FCE100")); //FIXME
-        setColor(CS, C::Fg, C::Neutral, C::Normal, Qt::black); //FIXME
+        setColor(CS, C::Bg, C::Neutral, C::Normal, QColor(Qt::darkYellow));
+        setColor(CS, C::Fg, C::Neutral, C::Normal, orange500);
 
-        setColor(CS, C::Bg, C::Positive, C::Normal, QColor("#6CCB5F")); //FIXME
-        setColor(CS, C::Fg, C::Positive, C::Normal, Qt::black); //FIXME
+        setColor(CS, C::Bg, C::Positive, C::Normal, QColor(Qt::darkGreen));
+        setColor(CS, C::Fg, C::Positive, C::Normal, Qt::green);
 
         setColor(CS, C::Decoration, C::VisualFocus, C::Normal, setColorAlpha(Qt::white, 0.0) );
         setColor(CS, C::Decoration, C::VisualFocus, C::Focused, Qt::white );
