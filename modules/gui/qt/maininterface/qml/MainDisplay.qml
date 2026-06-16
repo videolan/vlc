@@ -683,12 +683,14 @@ FocusScope {
         anchors.right: parent.right
         anchors.bottom: loaderProgress.top
 
-        active: !!UpdateModel && (shouldShow || height > 0.0)
+        readonly property bool updateModelIsAvailable: (typeof UpdateModel !== 'undefined')
+
+        active: updateModelIsAvailable && (shouldShow || height > 0.0)
 
         focus: !!item
 
         readonly property bool shouldShow: {
-            if (!UpdateModel)
+            if (!updateModelIsAvailable)
                 return false
 
             if (UpdateModel.explicitCheck) {
@@ -718,8 +720,7 @@ FocusScope {
         }
 
         onActiveChanged: {
-            console.assert(!!UpdateModel)
-            if (!active)
+            if (updateModelIsAvailable && !active)
                 UpdateModel.resetStatus()
         }
 
