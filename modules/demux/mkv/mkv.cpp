@@ -657,7 +657,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
             {
                 // TODO handle the start/stop times of this packet
                 if( p_block->i_size >= sizeof(pci_t))
-                    p_sys->p_ev->SetPci( (const pci_t *)&p_block->p_buffer[1]);
+                    p_sys->p_ev->SetPci( &p_block->p_buffer[1], p_block->i_buffer-1);
                 block_Release( p_block );
                 return;
             }
