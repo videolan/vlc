@@ -28,23 +28,6 @@
 
 namespace mkv {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#undef ATTRIBUTE_PACKED
-#undef PRAGMA_PACK_BEGIN
-#undef PRAGMA_PACK_END
-
-#if defined(__GNUC__)
-#define ATTRIBUTE_PACKED __attribute__ ((packed))
-#define PRAGMA_PACK 0
-#endif
-
-#if !defined(ATTRIBUTE_PACKED)
-#define ATTRIBUTE_PACKED
-#define PRAGMA_PACK 1
-#endif
-
-#if PRAGMA_PACK
-#pragma pack(1)
-#endif
 
 /*************************************
 *  taken from libdvdnav / libdvdread
@@ -53,21 +36,20 @@ namespace mkv {
 /**
  * DVD Time Information.
  */
-typedef struct {
+struct dvd_time_t {
   uint8_t hour;
   uint8_t minute;
   uint8_t second;
   uint8_t frame_u; /* The two high bits are the frame rate. */
-} ATTRIBUTE_PACKED dvd_time_t;
+};
 
 /**
  * User Operations.
  */
-typedef struct {
-#ifdef WORDS_BIGENDIAN
+struct user_ops_t {
   unsigned char zero                           : 7; /* 25-31 */
   unsigned char video_pres_mode_change         : 1; /* 24 */
- 
+
   unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
   unsigned char angle_change                   : 1;
   unsigned char subpic_stream_change           : 1;
@@ -76,7 +58,7 @@ typedef struct {
   unsigned char still_off                      : 1;
   unsigned char button_select_or_activate      : 1;
   unsigned char resume                         : 1; /* 16 */
- 
+
   unsigned char chapter_menu_call              : 1; /* 15 */
   unsigned char angle_menu_call                : 1;
   unsigned char audio_menu_call                : 1;
@@ -85,7 +67,7 @@ typedef struct {
   unsigned char title_menu_call                : 1;
   unsigned char backward_scan                  : 1;
   unsigned char forward_scan                   : 1; /* 8 */
- 
+
   unsigned char next_pg_search                 : 1; /* 7 */
   unsigned char prev_or_top_pg_search          : 1;
   unsigned char time_or_chapter_search         : 1;
@@ -94,68 +76,37 @@ typedef struct {
   unsigned char title_play                     : 1;
   unsigned char chapter_search_or_play         : 1;
   unsigned char title_or_time_play             : 1; /* 0 */
-#else
-  unsigned char video_pres_mode_change         : 1; /* 24 */
-  unsigned char zero                           : 7; /* 25-31 */
- 
-  unsigned char resume                         : 1; /* 16 */
-  unsigned char button_select_or_activate      : 1;
-  unsigned char still_off                      : 1;
-  unsigned char pause_on                       : 1;
-  unsigned char audio_stream_change            : 1;
-  unsigned char subpic_stream_change           : 1;
-  unsigned char angle_change                   : 1;
-  unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
- 
-  unsigned char forward_scan                   : 1; /* 8 */
-  unsigned char backward_scan                  : 1;
-  unsigned char title_menu_call                : 1;
-  unsigned char root_menu_call                 : 1;
-  unsigned char subpic_menu_call               : 1;
-  unsigned char audio_menu_call                : 1;
-  unsigned char angle_menu_call                : 1;
-  unsigned char chapter_menu_call              : 1; /* 15 */
- 
-  unsigned char title_or_time_play             : 1; /* 0 */
-  unsigned char chapter_search_or_play         : 1;
-  unsigned char title_play                     : 1;
-  unsigned char stop                           : 1;
-  unsigned char go_up                          : 1;
-  unsigned char time_or_chapter_search         : 1;
-  unsigned char prev_or_top_pg_search          : 1;
-  unsigned char next_pg_search                 : 1; /* 7 */
-#endif
-} ATTRIBUTE_PACKED user_ops_t;
+};
 
 /**
  * Type to store per-command data.
  */
-typedef struct {
+struct vm_cmd_t {
   uint8_t bytes[8];
-} ATTRIBUTE_PACKED vm_cmd_t;
+};
 #define COMMAND_DATA_SIZE 8
 
 /**
  * PCI General Information
  */
-typedef struct {
+struct pci_gi_t {
   uint32_t nv_pck_lbn;      /**< sector address of this nav pack */
   uint16_t vobu_cat;        /**< 'category' of vobu */
-  uint16_t zero1;           /**< reserved */
+  // uint16_t zero1;           /**< reserved */
   user_ops_t vobu_uop_ctl;  /**< UOP of vobu */
   uint32_t vobu_s_ptm;      /**< start presentation time of vobu */
   uint32_t vobu_e_ptm;      /**< end presentation time of vobu */
   uint32_t vobu_se_e_ptm;   /**< end ptm of sequence end in vobu */
   dvd_time_t e_eltm;        /**< Cell elapsed time */
   char vobu_isrc[32];
-} ATTRIBUTE_PACKED pci_gi_t;
+};
 
 /**
  * Non Seamless Angle Information
  */
-typedef struct {
+struct nsml_agli_t {
   uint32_t nsml_agl_dsta[9];  /**< address of destination vobu in AGL_C#n */
-} ATTRIBUTE_PACKED nsml_agli_t;
+};
 
 /**
  * Highlight General Information
@@ -166,12 +117,11 @@ typedef struct {
  * X1Xb: letterbox buttons
  * 1XXb: pan&scan buttons
  */
-typedef struct {
+struct hl_gi_t {
   uint16_t hli_ss; /**< status, only low 2 bits 0: no buttons, 1: different 2: equal 3: eual except for button cmds */
   uint32_t hli_s_ptm;              /**< start ptm of hli */
   uint32_t hli_e_ptm;              /**< end ptm of hli */
   uint32_t btn_se_e_ptm;           /**< end ptm of button select */
-#ifdef WORDS_BIGENDIAN
   unsigned char zero1 : 2;          /**< reserved */
   unsigned char btngr_ns : 2;       /**< number of button groups 1, 2 or 3 with 36/18/12 buttons */
   unsigned char zero2 : 1;          /**< reserved */
@@ -180,24 +130,13 @@ typedef struct {
   unsigned char btngr2_dsp_ty : 3;  /**< display type of subpic stream for button group 2 */
   unsigned char zero4 : 1;          /**< reserved */
   unsigned char btngr3_dsp_ty : 3;  /**< display type of subpic stream for button group 3 */
-#else
-  unsigned char btngr1_dsp_ty : 3;
-  unsigned char zero2 : 1;
-  unsigned char btngr_ns : 2;
-  unsigned char zero1 : 2;
-  unsigned char btngr3_dsp_ty : 3;
-  unsigned char zero4 : 1;
-  unsigned char btngr2_dsp_ty : 3;
-  unsigned char zero3 : 1;
-#endif
   uint8_t btn_ofn;     /**< button offset number range 0-255 */
   uint8_t btn_ns;      /**< number of valid buttons  <= 36/18/12 (low 6 bits) */
   uint8_t nsl_btn_ns;  /**< number of buttons selectable by U_BTNNi (low 6 bits)   nsl_btn_ns <= btn_ns */
-  uint8_t zero5;       /**< reserved */
+  // uint8_t zero5;       /**< reserved */
   uint8_t fosl_btnn;   /**< forcedly selected button  (low 6 bits) */
   uint8_t foac_btnn;   /**< forcedly activated button (low 6 bits) */
-} ATTRIBUTE_PACKED hl_gi_t;
-
+};
 
 /**
  * Button Color Information Table
@@ -207,9 +146,9 @@ typedef struct {
  * that the indexes reference is in the PGC.
  * \todo split the uint32_t into a struct
  */
-typedef struct {
+struct btn_colit_t {
   uint32_t btn_coli[3][2];  /**< [button color number-1][select:0/action:1] */
-} ATTRIBUTE_PACKED btn_colit_t;
+};
 
 /**
  * Button Information
@@ -218,8 +157,7 @@ typedef struct {
  * the packing to work with Sun's Forte C compiler.
  * The 4 and 7 bytes are 'rotated' was: ABC DEF GHIJ  is: ABCG DEFH IJ
  */
-typedef struct {
-#ifdef WORDS_BIGENDIAN
+struct btni_t {
   uint32_t      btn_coln         : 2;  /**< button color number */
   uint32_t      x_start          : 10; /**< x start offset within the overlay */
   uint32_t      zero1            : 2;  /**< reserved */
@@ -239,52 +177,29 @@ typedef struct {
   unsigned char left             : 6;  /**< button index when pressing left */
   unsigned char zero6            : 2;  /**< reserved */
   unsigned char right            : 6;  /**< button index when pressing right */
-#else
-  uint32_t      x_end            : 10;
-  uint32_t      zero1            : 2;
-  uint32_t      x_start          : 10;
-  uint32_t      btn_coln         : 2;
-
-  uint32_t      up               : 6;
-  uint32_t      zero3            : 2;
-
-  uint32_t      y_end            : 10;
-  uint32_t      zero2            : 2;
-  uint32_t      y_start          : 10;
-  uint32_t      auto_action_mode : 2;
-
-  uint32_t      down             : 6;
-  uint32_t      zero4            : 2;
-  unsigned char left             : 6;
-  unsigned char zero5            : 2;
-  unsigned char right            : 6;
-  unsigned char zero6            : 2;
-#endif
   vm_cmd_t cmd;
-} ATTRIBUTE_PACKED btni_t;
+};
 
 /**
  * Highlight Information
  */
-typedef struct {
+struct hli_t {
   hl_gi_t     hl_gi;
   btn_colit_t btn_colit;
   btni_t      btnit[36];
-} ATTRIBUTE_PACKED hli_t;
+};
 
 /**
  * PCI packet
  */
-typedef struct pci_t {
+struct pci_t {
   pci_gi_t    pci_gi;
   nsml_agli_t nsml_agli;
   hli_t       hli;
-  uint8_t     zero1[189];
-} ATTRIBUTE_PACKED pci_t;
+  // uint8_t     zero1[189];
+};
+#define PCI_RAW_SIZE 1051U
 
-#if PRAGMA_PACK
-#pragma pack()
-#endif
 
 } // namespace
 

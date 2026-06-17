@@ -10,6 +10,7 @@
 #include "virtual_segment.hpp"
 
 #include <vlc_subpicture.h> // vlc_spu_highlight_t
+#include <vlc_bits.h>
 
 namespace mkv {
 
@@ -803,31 +804,114 @@ bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &dat
 
 void dvd_command_interpretor_c::SetPci(const uint8_t *data, unsigned size)
 {
-    if (size < sizeof(pci_packet))
+    if (size < PCI_RAW_SIZE)
         return;
 
-    memcpy(&pci_packet, data, sizeof(pci_packet));
+    bs_t bs;
+    bs_init(&bs, data, size);
 
-#ifndef WORDS_BIGENDIAN
-    for( uint8_t button = 1; button <= pci_packet.hli.hl_gi.btn_ns &&
-            button < ARRAY_SIZE(pci_packet.hli.btnit); button++) {
-        btni_t & button_ptr = pci_packet.hli.btnit[button-1];
-        binary *p_data = (binary*) &button_ptr;
+    pci_packet.pci_gi.nv_pck_lbn = bs_read(&bs, 32);
+    pci_packet.pci_gi.vobu_cat   = bs_read(&bs, 16);
+    bs_skip(&bs, 16);
 
-        uint16_t i_x_start = ((p_data[0] & 0x3F) << 4 ) + ( p_data[1] >> 4 );
-        uint16_t i_x_end   = ((p_data[1] & 0x03) << 8 ) + p_data[2];
-        uint16_t i_y_start = ((p_data[3] & 0x3F) << 4 ) + ( p_data[4] >> 4 );
-        uint16_t i_y_end   = ((p_data[4] & 0x03) << 8 ) + p_data[5];
-        button_ptr.x_start = i_x_start;
-        button_ptr.x_end   = i_x_end;
-        button_ptr.y_start = i_y_start;
-        button_ptr.y_end   = i_y_end;
+    bs_skip(&bs, 7);
+    pci_packet.pci_gi.vobu_uop_ctl.video_pres_mode_change = bs_read1(&bs);
 
+    pci_packet.pci_gi.vobu_uop_ctl.karaoke_audio_pres_mode_change = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.angle_change           = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.subpic_stream_change   = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.audio_stream_change    = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.pause_on               = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.still_off              = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.button_select_or_activate = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.resume                 = bs_read1(&bs);
+
+    pci_packet.pci_gi.vobu_uop_ctl.chapter_menu_call      = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.angle_menu_call        = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.audio_menu_call        = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.subpic_menu_call       = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.root_menu_call         = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.title_menu_call        = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.backward_scan          = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.forward_scan           = bs_read1(&bs);
+
+    pci_packet.pci_gi.vobu_uop_ctl.next_pg_search         = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.prev_or_top_pg_search  = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.time_or_chapter_search = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.go_up                  = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.stop                   = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.title_play             = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.chapter_search_or_play = bs_read1(&bs);
+    pci_packet.pci_gi.vobu_uop_ctl.title_or_time_play     = bs_read1(&bs);
+
+    pci_packet.pci_gi.vobu_s_ptm    = bs_read(&bs, 32);
+    pci_packet.pci_gi.vobu_e_ptm    = bs_read(&bs, 32);
+    pci_packet.pci_gi.vobu_se_e_ptm = bs_read(&bs, 32);
+
+    pci_packet.pci_gi.e_eltm.hour    = bs_read(&bs, 8);
+    pci_packet.pci_gi.e_eltm.minute  = bs_read(&bs, 8);
+    pci_packet.pci_gi.e_eltm.second  = bs_read(&bs, 8);
+    pci_packet.pci_gi.e_eltm.frame_u = bs_read(&bs, 8);
+
+    // FIXME read buffer in one pass using bs_t
+    for (size_t i = 0; i < ARRAY_SIZE(pci_packet.pci_gi.vobu_isrc); i++)
+        pci_packet.pci_gi.vobu_isrc[i] = bs_read(&bs, 8);
+
+    for (size_t i = 0; i < ARRAY_SIZE(pci_packet.nsml_agli.nsml_agl_dsta); i++)
+        pci_packet.nsml_agli.nsml_agl_dsta[i] = bs_read(&bs, 32);
+
+    pci_packet.hli.hl_gi.hli_ss       = bs_read(&bs, 16);
+    pci_packet.hli.hl_gi.hli_s_ptm    = bs_read(&bs, 32);
+    pci_packet.hli.hl_gi.hli_e_ptm    = bs_read(&bs, 32);
+    pci_packet.hli.hl_gi.btn_se_e_ptm = bs_read(&bs, 32);
+    bs_skip(&bs, 2);
+    pci_packet.hli.hl_gi.btngr_ns      = bs_read(&bs, 2);
+    bs_skip(&bs, 1);
+    pci_packet.hli.hl_gi.btngr1_dsp_ty = bs_read(&bs, 3);
+    bs_skip(&bs, 1);
+    pci_packet.hli.hl_gi.btngr2_dsp_ty = bs_read(&bs, 3);
+    bs_skip(&bs, 1);
+    pci_packet.hli.hl_gi.btngr3_dsp_ty = bs_read(&bs, 3);
+    pci_packet.hli.hl_gi.btn_ofn       = bs_read(&bs, 8);
+    pci_packet.hli.hl_gi.btn_ns        = bs_read(&bs, 8);
+    pci_packet.hli.hl_gi.nsl_btn_ns    = bs_read(&bs, 8);
+    bs_skip(&bs, 8);
+    pci_packet.hli.hl_gi.fosl_btnn     = bs_read(&bs, 8);
+    pci_packet.hli.hl_gi.foac_btnn     = bs_read(&bs, 8);
+
+    for (size_t i = 0; i < 3; i++)
+        for (size_t j = 0; j < 2; j++)
+            pci_packet.hli.btn_colit.btn_coli[i][j] = bs_read(&bs, 32 );
+
+    for (size_t i = 0; i < ARRAY_SIZE(pci_packet.hli.btnit); i++)
+    {
+        auto & btn = pci_packet.hli.btnit[i];
+        btn.btn_coln = bs_read(&bs, 2);
+        btn.x_start  = bs_read(&bs, 10);
+        bs_skip(&bs, 2);
+        btn.x_end    = bs_read(&bs, 10);
+
+        bs_skip(&bs, 2);
+        btn.up = bs_read(&bs, 6);
+
+        btn.auto_action_mode = bs_read(&bs, 2);
+        btn.y_start = bs_read(&bs, 10);
+        bs_skip(&bs, 2);
+        btn.y_end   = bs_read(&bs, 10);
+
+        bs_skip(&bs, 2);
+        btn.down    = bs_read(&bs, 6);
+        bs_skip(&bs, 2);
+        btn.left    = bs_read(&bs, 6);
+        bs_skip(&bs, 2);
+        btn.right   = bs_read(&bs, 6);
+
+        // FIXME read buffer in one pass using bs_t
+        for (size_t i = 0; i < ARRAY_SIZE(btn.cmd.bytes); i++)
+            btn.cmd.bytes[i] = bs_read(&bs, 8);
     }
-    for ( uint8_t i = 0; i<3; i++ )
-        for ( uint8_t j = 0; j<2; j++ )
-            pci_packet.hli.btn_colit.btn_coli[i][j] = U32_AT( &pci_packet.hli.btn_colit.btn_coli[i][j] );
-#endif
+    bs_skip(&bs, 8*189);
+    assert(!bs_error(&bs));
 }
 
 } // namespace
