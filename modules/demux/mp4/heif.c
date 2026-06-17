@@ -620,7 +620,7 @@ static int LoadGridImage( demux_t *p_demux,
                                  p_picture->format.i_y_offset * p_picture->p[0].i_pitch +
                                  p_picture->format.i_x_offset * 4;
         unsigned tocopylines = p_picture->p[0].i_visible_lines;
-        if(offsetpxh + tocopylines >= imageheight)
+        if(offsetpxh <= imageheight  && offsetpxh + tocopylines >= imageheight)
             tocopylines = imageheight - offsetpxh;
         for(unsigned i=0; i<tocopylines; i++)
         {
