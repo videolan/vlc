@@ -575,7 +575,7 @@ bool dvd_command_interpretor_c::ProcessNavAction( uint16_t button )
 {
     const pci_t & pci = pci_packet;
 
-    if( button <= 0 || button > pci.hli.hl_gi.btn_ns )
+    if( button == 0 || button > pci.hli.hl_gi.btn_ns || button > ARRAY_SIZE(pci.hli.btnit) )
         return false;
 
     SetSPRM( 0x88, button );
@@ -593,7 +593,7 @@ bool dvd_command_interpretor_c::HandleKeyEvent( NavivationKey key )
     const pci_t & pci = pci_packet;
     uint16_t i_curr_button = GetSPRM( 0x88 );
 
-    if( i_curr_button <= 0 || i_curr_button > pci.hli.hl_gi.btn_ns )
+    if( i_curr_button == 0 || i_curr_button > pci.hli.hl_gi.btn_ns || i_curr_button > ARRAY_SIZE(pci.hli.btnit) )
         return false;
 
     const btni_t & button_ptr = pci.hli.btnit[i_curr_button-1];
