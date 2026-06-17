@@ -610,10 +610,9 @@ static int LoadGridImage( demux_t *p_demux,
 
     const unsigned tilewidth = p_picture->format.i_visible_width;
     const unsigned tileheight = p_picture->format.i_visible_height;
-    uint8_t *dstline = p_buffer;
-    dstline += (tile / gridcols) * (imagewidth * tileheight * 4);
     const unsigned offsetpxw = (tile % gridcols) * tilewidth;
     const unsigned offsetpxh = (tile / gridcols) * tileheight;
+    uint8_t *dstline = &p_buffer[offsetpxh * imagewidth * 4];
     if( offsetpxw <= imagewidth )
     {
         const uint8_t *srcline = p_picture->p[0].p_pixels +
