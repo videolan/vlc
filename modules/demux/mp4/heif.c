@@ -566,7 +566,7 @@ static int ReadDerivationData( demux_t *p_demux, vlc_fourcc_t type,
 static int LoadGridImage( demux_t *p_demux,
                           image_handler_t *handler,
                           uint32_t i_pic_item_id,
-                               uint8_t *p_buffer,
+                               uint8_t *p_buffer, size_t i_buffer,
                                unsigned tile, unsigned gridcols,
                                unsigned imagewidth, unsigned imageheight )
 {
@@ -612,6 +612,13 @@ static int LoadGridImage( demux_t *p_demux,
     const unsigned tileheight = p_picture->format.i_visible_height;
     const unsigned offsetpxw = (tile % gridcols) * tilewidth;
     const unsigned offsetpxh = (tile / gridcols) * tileheight;
+    if (i_buffer < offsetpxh * imagewidth * 4)
+    {
+        picture_Release( p_picture );
+        return VLC_EINVAL;
+    }
+
+    size_t dst_size = i_buffer - offsetpxh * imagewidth * 4;
     uint8_t *dstline = &p_buffer[offsetpxh * imagewidth * 4];
     if( offsetpxw <= imagewidth )
     {
@@ -626,8 +633,11 @@ static int LoadGridImage( demux_t *p_demux,
             size_t tocopypx = tilewidth;
             if( offsetpxw + tilewidth > imagewidth )
                 tocopypx = imagewidth - offsetpxw;
+            if (dst_size < (offsetpxw * 4 + tocopypx * 4))
+                break;
             memcpy( &dstline[offsetpxw * 4], srcline, tocopypx * 4 );
             dstline += imagewidth * 4;
+            dst_size -= imagewidth * 4;
             srcline += p_picture->p[0].i_pitch;
         }
     }
@@ -704,7 +714,7 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
         msg_Dbg( p_demux, "Loading tile %"PRIu16"/%u", i, total_tiles );
         LoadGridImage( p_demux, handler,
                        BOXDATA(p_refbox)->p_references[i].i_to_item_id,
-                       p_block->p_buffer, i,
+                       p_block->p_buffer, p_block->i_buffer, i,
                        (unsigned)derivation_data.ImageGrid.columns_minus_one + 1,
                        derivation_data.ImageGrid.output_width,
                        derivation_data.ImageGrid.output_height );
