@@ -11,13 +11,16 @@ function plist_key()
 function generate_info_plist()
 {
     EXECUTABLE_NAME="$1"
+    # CFBundleIdentifier only allows alphanumerics, '-' and '.', so the
+    # underscores found in some plugin names need to be replaced.
+    BUNDLE_ID_NAME="${EXECUTABLE_NAME//_/-}"
     echo '<?xml version="1.0" encoding="UTF-8"?>'
     echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'
     echo '<plist version="1.0">'
     echo '<dict>'
     plist_key CFBundleDevelopmentRegion "en"
     plist_key CFBundleExecutable "${EXECUTABLE_NAME}"
-    plist_key CFBundleIdentifier "org.videolan.vlc.plugins.${EXECUTABLE_NAME}.framework"
+    plist_key CFBundleIdentifier "org.videolan.vlc.plugins.${BUNDLE_ID_NAME}.framework"
     plist_key CFBundleInfoDictionaryVersion "6.0"
     plist_key CFBundlePackageType "FMWK"
     plist_key CFBundleSignature "???"
