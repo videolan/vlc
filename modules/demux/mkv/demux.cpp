@@ -297,16 +297,16 @@ void event_thread_t::EventThread()
 
             if( b_clicked )
             {
-                int32_t button;
-                int32_t best,dist,d;
+                uint16_t best;
+                uint32_t dist,d;
                 int32_t mx,my,dx,dy;
 
                 msg_Dbg( p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", x, y);
 
                 // get current button
                 best = 0;
-                dist = 0x08000000; /* >> than  (720*720)+(567*567); */
-                for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++)
+                dist = std::numeric_limits<uint32_t>::max(); /* >> than  (720*720)+(567*567); */
+                for(uint16_t button = 1; button <= std::min<uint16_t>(pci.hli.hl_gi.btn_ns, ARRAY_SIZE(pci.hli.btnit)); button++)
                 {
                     btni_t *button_ptr = &(pci->hli.btnit[button-1]);
 
@@ -334,7 +334,7 @@ void event_thread_t::EventThread()
                     btni_t button_ptr = pci->hli.btnit[best-1];
                     uint16 i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
 
-                    msg_Dbg( &p_sys->demuxer, "Clicked button %d", best );
+                    msg_Dbg( &p_sys->demuxer, "Clicked button %" PRIu16, best );
                     vlc_mutex_unlock( &lock );
                     vlc_mutex_lock( &p_sys->lock_demuxer );
 
@@ -342,7 +342,7 @@ void event_thread_t::EventThread()
                     p_sys->dvd_interpretor.SetSPRM( 0x88, best );
                     p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
 
-                    msg_Dbg( &p_sys->demuxer, "Processed button %d", best );
+                    msg_Dbg( &p_sys->demuxer, "Processed button %" PRIu16, best );
 
                     // select new button
                     if ( best != i_curr_button )
