@@ -62,3 +62,6 @@ GPERF_URL=$(GNU)/gperf/gperf-$(GPERF_VERSION).tar.gz
 CONFIGGUESS_VERSION=a2287c3041a3f2a204eb942e09c015eab00dc7dd
 CONFIGSUB_VERSION=a2287c3041a3f2a204eb942e09c015eab00dc7dd
 CONFIGGUESS_URL=
+
+ZSTD_VERSION=1.5.7
+ZSTD_URL=https://github.com/facebook/zstd/releases/download/v$(ZSTD_VERSION)/zstd-$(ZSTD_VERSION).tar.gz
