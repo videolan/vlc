@@ -612,12 +612,10 @@ static int LoadGridImage( demux_t *p_demux,
     const unsigned tileheight = p_picture->format.i_visible_height;
     uint8_t *dstline = p_buffer;
     dstline += (tile / gridcols) * (imagewidth * tileheight * 4);
-    for(;1;)
+    const unsigned offsetpxw = (tile % gridcols) * tilewidth;
+    const unsigned offsetpxh = (tile / gridcols) * tileheight;
+    if( offsetpxw <= imagewidth )
     {
-        const unsigned offsetpxw = (tile % gridcols) * tilewidth;
-        const unsigned offsetpxh = (tile / gridcols) * tileheight;
-        if( offsetpxw > imagewidth )
-            break;
         const uint8_t *srcline = p_picture->p[0].p_pixels +
                                  p_picture->format.i_y_offset * p_picture->p[0].i_pitch +
                                  p_picture->format.i_x_offset * 4;
@@ -633,8 +631,6 @@ static int LoadGridImage( demux_t *p_demux,
             dstline += imagewidth * 4;
             srcline += p_picture->p[0].i_pitch;
         }
-
-        break;
     }
 
     picture_Release( p_picture );
