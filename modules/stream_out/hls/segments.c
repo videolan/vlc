@@ -54,9 +54,8 @@ hls_segment_queue_GetFileExtension(enum hls_playlist_type type)
             return "m4s";
         case HLS_PLAYLIST_TYPE_WEBVTT:
             return "vtt";
-        default:
-            vlc_assert_unreachable();
     }
+    vlc_assert_unreachable();
 }
 
 static const char *hls_segment_queue_GetMIME(enum hls_playlist_type type)
