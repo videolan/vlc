@@ -191,6 +191,7 @@ check help2man
 check meson $MIN_MESON
 check_ninja $MIN_NINJA
 check gettext
+check zstd
 
 DEPS_ONLY="help2man"
 

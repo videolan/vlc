@@ -186,6 +186,25 @@ CLEAN_PKG += xz
 DISTCLEAN_PKG += xz-$(XZ_VERSION).tar.bz2
 CLEAN_FILE += .buildxz
 
+# zstd
+
+zstd-$(ZSTD_VERSION).tar.gz:
+	$(call download_pkg,$(ZSTD_URL),zstd)
+
+.getzstd: zstd-$(ZSTD_VERSION).tar.gz
+zstd: zstd-$(ZSTD_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.buildzstd: zstd
+	+$(MAKE) -C $</programs
+	+$(MAKE) -C $</programs install prefix=$(PREFIX)
+	touch $@
+
+CLEAN_PKG += zstd
+DISTCLEAN_PKG += zstd-$(ZSTD_VERSION).tar.gz
+CLEAN_FILE += .buildzstd
+
 # autoconf
 
 autoconf-$(AUTOCONF_VERSION).tar.gz:
