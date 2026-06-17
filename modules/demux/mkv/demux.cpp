@@ -175,10 +175,10 @@ void event_thread_t::EventThread()
             switch( i_key_action )
             {
             case ACTIONID_NAV_LEFT:
-                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                if ( i_curr_button != 0 && i_curr_button <= pci->hli.hl_gi.btn_ns && i_curr_button <= ARRAY_SIZE(pci->hli.btnit) )
                 {
                     btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
-                    if ( p_button_ptr->left > 0 && p_button_ptr->left <= pci->hli.hl_gi.btn_ns )
+                    if ( p_button_ptr->left != 0 && p_button_ptr->left <= pci->hli.hl_gi.btn_ns && p_button_ptr->left <= ARRAY_SIZE(pci->hli.btnit) )
                     {
                         i_curr_button = p_button_ptr->left;
                         p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
@@ -198,10 +198,10 @@ void event_thread_t::EventThread()
                 }
                 break;
             case ACTIONID_NAV_RIGHT:
-                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                if ( i_curr_button != 0 && i_curr_button <= pci->hli.hl_gi.btn_ns && i_curr_button <= ARRAY_SIZE(pci->hli.btnit) )
                 {
                     btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
-                    if ( p_button_ptr->right > 0 && p_button_ptr->right <= pci->hli.hl_gi.btn_ns )
+                    if ( p_button_ptr->right != 0 && p_button_ptr->right <= pci->hli.hl_gi.btn_ns && p_button_ptr->right <= ARRAY_SIZE(pci->hli.btnit) )
                     {
                         i_curr_button = p_button_ptr->right;
                         p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
@@ -221,10 +221,10 @@ void event_thread_t::EventThread()
                 }
                 break;
             case ACTIONID_NAV_UP:
-                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                if ( i_curr_button != 0 && i_curr_button <= pci->hli.hl_gi.btn_ns && i_curr_button <= ARRAY_SIZE(pci->hli.btnit) )
                 {
                     btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
-                    if ( p_button_ptr->up > 0 && p_button_ptr->up <= pci->hli.hl_gi.btn_ns )
+                    if ( p_button_ptr->up != 0 && p_button_ptr->up <= pci->hli.hl_gi.btn_ns && p_button_ptr->up <= ARRAY_SIZE(pci->hli.btnit) )
                     {
                         i_curr_button = p_button_ptr->up;
                         p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
@@ -244,10 +244,10 @@ void event_thread_t::EventThread()
                 }
                 break;
             case ACTIONID_NAV_DOWN:
-                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                if ( i_curr_button != 0 && i_curr_button <= pci->hli.hl_gi.btn_ns && i_curr_button <= ARRAY_SIZE(pci->hli.btnit) )
                 {
                     btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
-                    if ( p_button_ptr->down > 0 && p_button_ptr->down <= pci->hli.hl_gi.btn_ns )
+                    if ( p_button_ptr->down != 0 && p_button_ptr->down <= pci->hli.hl_gi.btn_ns && p_button_ptr->down <= ARRAY_SIZE(pci->hli.btnit) )
                     {
                         i_curr_button = p_button_ptr->down;
                         p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
@@ -267,7 +267,7 @@ void event_thread_t::EventThread()
                 }
                 break;
             case ACTIONID_NAV_ACTIVATE:
-                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                if ( i_curr_button != 0 && i_curr_button <= pci->hli.hl_gi.btn_ns && i_curr_button <= ARRAY_SIZE(pci->hli.btnit) )
                 {
                     btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
 
