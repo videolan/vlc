@@ -41,6 +41,9 @@ targets:
       - target: vlccore
     info:
       path: "vlccoreios/Info.plist"
+      properties:
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: org.videolan.vlc.vlccoreios
     postBuildScripts:

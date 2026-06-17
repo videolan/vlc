@@ -1,10 +1,11 @@
 /*****************************************************************************
  * iosvlc.m: iOS specific development main executable for VLC media player
  *****************************************************************************
- * Copyright (C) 2020 Videolabs
+ * Copyright (C) 2020-2026 Videolabs
  *
  * Authors: Marvin Scholz <epirat07 at gmail dot com>
  *          Alexandre Janniaux <ajanni@videolabs.io>
+ *          Felix Paul Kühne <fkuehne # videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -56,6 +57,11 @@
     CGPoint _pinchOrigin;
     CGPoint _pinchPreviousCenter;
 }
+@end
+
+API_AVAILABLE(ios(13.0), tvos(13.0))
+@interface SceneDelegate : UIResponder <UIWindowSceneDelegate>
+@property (strong, nonatomic) UIWindow *window;
 @end
 
 static void vlc_terminate(void *data)
@@ -160,6 +166,28 @@ static void vlc_terminate(void *data)
 
     return YES;
 }
+
+- (UISceneConfiguration *)application:(UIApplication *)application
+configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession
+                              options:(UISceneConnectionOptions *)options API_AVAILABLE(ios(13.0), tvos(13.0))
+{
+    UISceneConfiguration *configuration = [[UISceneConfiguration alloc] initWithName:nil
+                                                                         sessionRole:connectingSceneSession.role];
+    configuration.delegateClass = [SceneDelegate class];
+    return configuration;
+}
+@end
+
+@implementation SceneDelegate
+- (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session
+      options:(UISceneConnectionOptions *)connectionOptions
+{
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    /* The window contents are set up once the glue interface opens */
+    self.window = [[UIWindow alloc] initWithWindowScene:(UIWindowScene *)scene];
+    appDelegate->window = _window;
+}
 @end
 
 int main(int argc, char * argv[]) {
@@ -176,16 +204,15 @@ static int Open(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     dispatch_sync(dispatch_get_main_queue(), ^{
-        if (d->window != nil && d->subview != nil)
+        if (d->subview != nil)
             return;
 
-        /* Initialize main window */
-#if TARGET_OS_VISION
-        /* UIScreen is unavailable so we need create a size on our own */
-        d->window = [[UIWindow alloc] initWithFrame:CGRectMake(0., 0., 1200., 800.)];
-#else
-        d->window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+#if !TARGET_OS_VISION
+        /* Initialize main window unless the scene delegate provided one */
+        if (d->window == nil)
+            d->window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 #endif
+
         d->window.rootViewController = [[UIViewController alloc] init];
         d->window.backgroundColor = [UIColor whiteColor];
 
@@ -221,7 +248,6 @@ static int OpenAssetDemux(vlc_object_t *obj)
     /* Store startup arguments to forward them to libvlc */
     NSString *bundle_path = [[NSBundle mainBundle] resourcePath];
     const char *resource_path = [bundle_path UTF8String];
-    size_t resource_path_length = strlen(resource_path);
 
     char *url;
     if (asprintf(&url, "file://%s/%s", resource_path, access->psz_location) < 0)
