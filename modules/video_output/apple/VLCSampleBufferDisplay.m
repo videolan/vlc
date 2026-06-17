@@ -1,8 +1,8 @@
 /*****************************************************************************
  * VLCSampleBufferDisplay.m: video output display using
- * AVSampleBufferDisplayLayer on macOS
+ * AVSampleBufferDisplayLayer on all Apple platforms
  *****************************************************************************
- * Copyright (C) 2023-2024 VLC authors and VideoLAN
+ * Copyright (C) 2023-2026 VLC authors and VideoLAN
  *
  * Authors: Maxime Chapelet <umxprime at videolabs dot io>
  *
@@ -642,7 +642,6 @@ shouldInheritContentsScale:(CGFloat)newScale
 @interface VLCSampleBufferDisplay: NSObject
 {
     @public
-    vout_display_place_t place;
     filter_t *converter;
 }
     @property (nonatomic, readonly, weak) VLCView *window;
@@ -658,6 +657,7 @@ shouldInheritContentsScale:(CGFloat)newScale
     - (instancetype)init NS_UNAVAILABLE;
     + (instancetype)new NS_UNAVAILABLE;
     - (instancetype)initWithVoutDisplay:(vout_display_t *)vd;
+    - (void)placeVideo:(vout_display_place_t)newPlace;
 @end
 
 @implementation VLCSampleBufferDisplay
@@ -712,6 +712,23 @@ shouldInheritContentsScale:(CGFloat)newScale
     }
 }
 
+- (CGRect)frameForPlace:(const vout_display_place_t *)place
+{
+    VLCView *window = self.window;
+    CGRect frame = CGRectMake(place->x, place->y, place->width, place->height);
+#if TARGET_OS_OSX
+    frame = [window convertRectFromBacking:frame];
+    frame.origin.y = window.bounds.size.height - frame.origin.y - frame.size.height;
+#else
+    CGFloat scale = window.contentScaleFactor;
+    frame.origin.x /= scale;
+    frame.origin.y /= scale;
+    frame.size.width /= scale;
+    frame.size.height /= scale;
+#endif
+    return frame;
+}
+
 - (void)prepareDisplay {
     @synchronized(_displayLayer) {
         if (_displayLayer)
@@ -732,10 +749,9 @@ shouldInheritContentsScale:(CGFloat)newScale
         spuView = [VLCSampleBufferSubpictureView new];
         [window addSubview:displayView];
         [window addSubview:spuView];
-        [displayView setFrame:[window bounds]];
-        [spuView setFrame:[window bounds]];
 
-        sys->place = *sys.vd->place;
+        displayView.frame = [sys frameForPlace:sys.vd->place];
+        [spuView setFrame:[window bounds]];
 
         sys.displayView = displayView;
         sys.spuView = spuView;
@@ -744,6 +760,10 @@ shouldInheritContentsScale:(CGFloat)newScale
         }
         [sys preparePictureInPicture];
     });
+}
+
+- (void)placeVideo:(vout_display_place_t)newPlace {
+    self.displayView.frame = [self frameForPlace:&newPlace];
 }
 
 - (void)close {
@@ -1045,6 +1065,19 @@ static void Display(vout_display_t *vd, picture_t *pic)
     // kept as the core is not properly pacing the calls to Prepare without this callback
 }
 
+static int PlacementChanged(vout_display_t *vd, const vout_display_place_t *place)
+{
+    VLCSampleBufferDisplay *sys;
+    sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
+
+    vout_display_place_t newPlace = *place;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [sys placeVideo:newPlace];
+    });
+
+    return VLC_SUCCESS;
+}
+
 static pip_controller_t * CreatePipController( vout_display_t *vd, void *cbs_opaque )
 {
     pip_controller_t *pip_controller = vlc_object_create(vd, sizeof(pip_controller_t));
@@ -1136,6 +1169,7 @@ static int Open (vout_display_t *vd,
             .prepare = Prepare,
             .display = Display,
             .update_format = UpdateFormat,
+            .video_place_changed = PlacementChanged,
         };
 
         vd->ops = &ops;
