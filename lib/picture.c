@@ -77,8 +77,16 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
     };
     assert(ARRAY_SIZE(table) > type && table[type] != 0);
     vlc_fourcc_t format = table[type];
+
+    /* libvlc's API uses unsigned dimensions where both 0 means "same size as
+       the media". picture_Export expresses that with negative dimensions, so
+       translate the convention here. */
+    int export_width = width, export_height = height;
+    if ( width == 0 && height == 0 )
+        export_width = export_height = -1;
+
     if ( picture_Export( p_obj, &pic->converted, &pic->fmt,
-                         input, format, width, height, crop ) != VLC_SUCCESS )
+                         input, format, export_width, export_height, crop ) != VLC_SUCCESS )
     {
         free( pic );
         return NULL;
