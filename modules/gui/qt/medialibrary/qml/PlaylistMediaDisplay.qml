@@ -198,6 +198,8 @@ Widgets.PageExt {
 
             Navigation.parentItem: root
 
+            Navigation.upItem: root.header
+
             Navigation.cancelAction: function () {
                 if (view.currentIndex <= 0) {
                     root.Navigation.defaultNavigationCancel()

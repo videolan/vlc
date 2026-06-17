@@ -71,7 +71,7 @@ Widgets.PageExt {
         else if (newMediaRow.focus)
             newMediaRow.setCurrentItemFocus(reason)
         else
-            forceActiveFocus(reason) // this should not be necessary normally, but when there is `setCurrentItemFocus()`, it seems the root item does not get focus
+            coneNButtons.forceActiveFocus(reason)
     }
 
     contentItem: Flickable {
@@ -162,6 +162,7 @@ Widgets.PageExt {
             anchors.leftMargin: flickable._hasMedias ? newMediaRow.contentLeftMargin : 0
 
             Navigation.parentItem: root
+            Navigation.upItem: root.header
             Navigation.downItem: mediaRows
 
             onActiveFocusChanged: {

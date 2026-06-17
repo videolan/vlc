@@ -75,6 +75,8 @@ Widgets.PageExt {
             sortCriteria: root.sort.criteria
 
             Navigation.parentItem: root
+            Navigation.upItem: root.header
+
             Navigation.cancelAction: function() {
                 if (tracklistdisplay_id.currentIndex <= 0)
                     root.Navigation.defaultNavigationCancel()

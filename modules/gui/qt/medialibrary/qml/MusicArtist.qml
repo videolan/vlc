@@ -414,7 +414,7 @@ FocusScope {
                     Navigation.parentItem: root
                     Navigation.upItem: artistBanner
                     Navigation.downAction: function() {
-                        tableView.setCurrentItemFocus(Qt.TabFocusReason)
+                        root.setCurrentItemFocus(Qt.TabFocusReason)
                     }
                 }
             }
@@ -657,9 +657,7 @@ FocusScope {
 
             Navigation.parentItem: root
 
-            Navigation.upAction: function() {
-                headerItem.setCurrentItemFocus(Qt.TabFocusReason);
-            }
+            Navigation.upItem: viewHeader
 
             Navigation.cancelAction: root._onNavigationCancel
 
@@ -1013,9 +1011,7 @@ FocusScope {
 
             Navigation.parentItem: root
 
-            Navigation.upAction: function() {
-                headerItem.setCurrentItemFocus(Qt.TabFocusReason);
-            }
+            Navigation.upItem: viewHeader
 
             Navigation.cancelAction: root._onNavigationCancel
 
