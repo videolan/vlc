@@ -697,8 +697,8 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
     fmt->video.i_height =
     fmt->video.i_visible_height = derivation_data.ImageGrid.output_height;
 
-    unsigned total_tiles = (derivation_data.ImageGrid.rows_minus_one + 1) *
-                           (derivation_data.ImageGrid.columns_minus_one + 1);
+    unsigned total_tiles = ((unsigned)derivation_data.ImageGrid.rows_minus_one + 1) *
+                           ((unsigned)derivation_data.ImageGrid.columns_minus_one + 1);
 
     for( uint16_t i=0; i<BOXDATA(p_refbox)->i_reference_count && i < total_tiles; i++ )
     {
@@ -706,7 +706,7 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
         LoadGridImage( p_demux, handler,
                        BOXDATA(p_refbox)->p_references[i].i_to_item_id,
                        p_block->p_buffer, i,
-                       derivation_data.ImageGrid.columns_minus_one + 1,
+                       (unsigned)derivation_data.ImageGrid.columns_minus_one + 1,
                        derivation_data.ImageGrid.output_width,
                        derivation_data.ImageGrid.output_height );
     }
