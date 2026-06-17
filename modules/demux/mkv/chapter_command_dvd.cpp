@@ -617,14 +617,14 @@ void dvd_command_interpretor_c::HandleMousePressed( unsigned x, unsigned y )
 {
     const pci_t & pci = pci_packet;
 
-    int32_t button;
-    int32_t best,dist,d;
+    uint16_t best;
+    uint32_t dist,d;
     int32_t mx,my,dx,dy;
 
     // get current button
     best = 0;
-    dist = 0x08000000; /* >> than  (720*720)+(567*567); */
-    for(button = 1; button <= pci.hli.hl_gi.btn_ns; button++)
+    dist = std::numeric_limits<uint32_t>::max(); /* >> than  (720*720)+(567*567); */
+    for(uint16_t button = 1; button <= std::min<uint16_t>(pci.hli.hl_gi.btn_ns, ARRAY_SIZE(pci.hli.btnit)); button++)
     {
         const btni_t & button_ptr = pci.hli.btnit[button-1];
 
@@ -653,13 +653,13 @@ void dvd_command_interpretor_c::HandleMousePressed( unsigned x, unsigned y )
     const btni_t & button_ptr = pci.hli.btnit[best-1];
     uint16_t i_curr_button = GetSPRM( 0x88 );
 
-    vlc_debug( l, "Clicked button %d", best );
+    vlc_debug( l, "Clicked button %" PRIu16, best );
 
     // process the button action
     SetSPRM( 0x88, best );
     Interpret( MATROSKA_CHAPPROCESSTIME_DURING, button_ptr.cmd.bytes, 8 );
 
-    vlc_debug( l, "Processed button %d", best );
+    vlc_debug( l, "Processed button %" PRIu16, best );
 
     // select new button
     if ( best != i_curr_button )
