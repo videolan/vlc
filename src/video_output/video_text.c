@@ -50,8 +50,8 @@ static void OSDTextUpdate(subpicture_t *subpic,
 
     assert(fmt_dst->i_sar_den && fmt_dst->i_sar_num);
 
-    subpic->i_original_picture_width  = fmt_dst->i_visible_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
-    subpic->i_original_picture_height = fmt_dst->i_visible_height;
+    subpic->i_original_picture_width  = cfg->current.display_width;
+    subpic->i_original_picture_height = cfg->current.display_height;
 
     subpicture_region_t *r = subpicture_region_NewText();
     if (!r)
@@ -67,7 +67,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
     const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
 
     r->text_flags |= sys->position;
-    r->b_absolute = false; r->b_in_window = false;
+    r->b_absolute = false; r->b_in_window = true;
     r->i_align = sys->position;
     if (r->i_align & SUBPICTURE_ALIGN_LEFT)
         r->i_x = margin_h + fmt_dst->i_x_offset;
