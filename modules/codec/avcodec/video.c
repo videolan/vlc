@@ -91,6 +91,10 @@ typedef struct
     bool b_show_corrupted;
     bool b_from_preroll;
     bool b_hardware_only;
+    /* Some codecs carry their whole state (image canvas and/or palette) forward
+     * as deltas and have no recoverable keyframes. Never drop frames for those,
+     * regardless of lateness. */
+    bool b_no_frame_drop;
     enum AVDiscard i_skip_frame;
 
 #if OPAQUE_REF_ONLY
@@ -154,6 +158,23 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
     uint8_t *p = (uint8_t*)&fcc;
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+
+/* Codecs whose decoder keeps a persistent state (image canvas and/or palette)
+ * updated as deltas from one frame to the next, and which emit keyframes very
+ * rarely. Dropping a frame corrupts all subsequent output until the next
+ * keyframe.
+ */
+static bool ffmpeg_CodecForbidsFrameDrop( enum AVCodecID i_codec )
+{
+    switch( i_codec )
+    {
+        /* FIXME: add more as needed */
+        case AV_CODEC_ID_ZMBV:
+            return true;
+        default:
+            return false;
+    }
 }
 
 /*****************************************************************************
@@ -574,6 +595,10 @@ static int InitVideoDecCommon( decoder_t *p_dec )
     /* ***** libavcodec frame skipping ***** */
     p_sys->b_hurry_up = var_CreateGetBool( p_dec, "avcodec-hurry-up" );
     p_sys->b_show_corrupted = var_CreateGetBool( p_dec, "avcodec-corrupted" );
+    p_sys->b_no_frame_drop = ffmpeg_CodecForbidsFrameDrop( p_codec->id );
+    if( p_sys->b_no_frame_drop )
+        msg_Dbg( p_dec, "frame dropping disabled for this codec (stateful, "
+                        "no recoverable keyframes)" );
 
     i_val = var_CreateGetInteger( p_dec, "avcodec-skip-frame" );
     if( i_val >= 4 ) p_sys->i_skip_frame = AVDISCARD_ALL;
@@ -1380,8 +1405,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     else
         b_need_output_picture = false;
 
-    /* Change skip_frame config only if hurry_up is enabled */
-    if( p_sys->b_hurry_up )
+    /* Change skip_frame config only if hurry_up is enabled, and never drop
+     * frames for codecs that cannot recover from it. */
+    if( p_sys->b_hurry_up && !p_sys->b_no_frame_drop )
     {
         p_context->skip_frame = p_sys->i_skip_frame;
 
@@ -1391,7 +1417,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_block = filter_earlydropped_blocks( p_dec, p_block );
     }
 
-    if( !b_need_output_picture || p_sys->framedrop == FRAMEDROP_NONREF )
+    if( !p_sys->b_no_frame_drop &&
+        ( !b_need_output_picture || p_sys->framedrop == FRAMEDROP_NONREF ) )
     {
         p_context->skip_frame = __MAX( p_context->skip_frame, AVDISCARD_NONREF );
     }
