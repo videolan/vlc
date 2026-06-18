@@ -315,7 +315,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         self.jumpForwardButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
     } else {
-        [self setAutohideControls:YES];
+        [self setAutohideControls:!self.classic];
         self.bottomButtonStackViewConstraint.active = NO;
         self.centerButtonStackInViewConstraint.active = YES;
         self.prevButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
