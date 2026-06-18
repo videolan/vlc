@@ -55,6 +55,7 @@ private:
     qt_intf_t *p_intf;
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
+    void setupSliderValueLabel( QSlider *slider, QLabel *label );
     void clean();
     void setFilterOption( const char *psz_module, const char *psz_option, int,
                           double, const char * );

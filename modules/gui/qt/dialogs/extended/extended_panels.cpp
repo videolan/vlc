@@ -148,6 +148,9 @@ static inline void setup_vfilter( qt_intf_t *p_intf, const char* psz_name, QWidg
     setWidgetValue( ui.widget ); \
     connect( ui.widget, signal, this, &ExtVideo::updateFilterOptions );
 
+#define SETUP_VFILTER_VALUE_LABEL( name ) \
+    setupSliderValueLabel( ui.name##Slider, ui.name##ValueLabel );
+
 ExtVideo::ExtVideo( qt_intf_t *_p_intf, QTabWidget *_parent ) :
             QObject( _parent ), p_intf( _p_intf )
 {
@@ -160,6 +163,12 @@ ExtVideo::ExtVideo( qt_intf_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( saturationSlider, &QSlider::valueChanged )
     SETUP_VFILTER_OPTION( gammaSlider, &QSlider::valueChanged )
     SETUP_VFILTER_OPTION( brightnessThresholdCheck, &QtCheckboxChanged )
+
+    SETUP_VFILTER_VALUE_LABEL( hue )
+    SETUP_VFILTER_VALUE_LABEL( brightness )
+    SETUP_VFILTER_VALUE_LABEL( contrast )
+    SETUP_VFILTER_VALUE_LABEL( saturation )
+    SETUP_VFILTER_VALUE_LABEL( gamma )
 
     SETUP_VFILTER_gb( extract )
     SETUP_VFILTER_OPTION( extractComponentText, &QLineEdit::textChanged )
@@ -496,6 +505,16 @@ void ExtVideo::setWidgetValue( QObject *widget )
         else msg_Warn( p_intf, "Could not find the correct String widget" );
         free( val.psz_string );
     }
+}
+
+void ExtVideo::setupSliderValueLabel( QSlider *slider, QLabel *label )
+{
+    auto update = [ slider, label ]( int value ) {
+        int interval = slider->tickInterval();
+        label->setText( QString::number( value / ( double )interval, 'f', 1 ) );
+    };
+    connect( slider, &QSlider::valueChanged, label, update );
+    update( slider->value() );
 }
 
 void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
