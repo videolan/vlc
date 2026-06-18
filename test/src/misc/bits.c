@@ -46,9 +46,9 @@ enum dataset
 } ;
 
 #define bs_init(a,b,c) \
-    bs_init( a, b, c); \
-    if( callbacks ) { (a)->cb = *callbacks; \
-                      if( cb_priv ) { (a)->p_priv = cb_priv; priv_init( cb_priv ); }; }
+    if( callbacks ) { bs_init_custom( a, b, c, callbacks, cb_priv ); \
+                      if( cb_priv ) { priv_init( cb_priv ); }; } \
+    else { bs_init( a, b, c); }
 
 static int run_tests( const struct testset *p_testsets,
                       const char *psz_tag,
@@ -261,10 +261,8 @@ static int test_annexb( const char *psz_tag )
 
     bs_t bs;
     struct hxxx_bsfw_ep3b_ctx_s bsctx;
-    bs_init( &bs, &annexb, ARRAY_SIZE(annexb) );
     hxxx_bsfw_ep3b_ctx_init( &bsctx );
-    bs.cb = hxxx_bsfw_ep3b_callbacks;
-    bs.p_priv = &bsctx;
+    bs_init_custom( &bs, &annexb, ARRAY_SIZE(annexb), &hxxx_bsfw_ep3b_callbacks, &bsctx );
     for( size_t i=0; i<ARRAY_SIZE(unesc)*8; i++ )
     {
         test_assert(bs_aligned( &bs ), !!(i%8 == 0));
@@ -273,10 +271,8 @@ static int test_annexb( const char *psz_tag )
     }
     test_assert(bs_eof( &bs ), 1);
 
-    bs_init( &bs, &annexb, ARRAY_SIZE(annexb) );
     hxxx_bsfw_ep3b_ctx_init( &bsctx );
-    bs.cb = hxxx_bsfw_ep3b_callbacks;
-    bs.p_priv = &bsctx;
+    bs_init_custom( &bs, &annexb, ARRAY_SIZE(annexb), &hxxx_bsfw_ep3b_callbacks, &bsctx );
     for( size_t i=0; i<ARRAY_SIZE(unesc)*4; i++ )
     {
         test_assert(bs_pos( &bs ), i*2);
@@ -297,10 +293,8 @@ static int test_annexb( const char *psz_tag )
                                0x40, 0x01, 0x0C, 0x01, 0xFF, 0xFF, 0x01, 0x60,
                                0x00, 0x00,       0x00, 0x40, 0x00, 0x00,
                                0x00, 0x00,       0x00, 0x78, 0x10, 0x90, 0x24 };
-    bs_init( &bs, vpsnal, ARRAY_SIZE(vpsnal) );
     hxxx_bsfw_ep3b_ctx_init( &bsctx );
-    bs.cb = hxxx_bsfw_ep3b_callbacks;
-    bs.p_priv = &bsctx;
+    bs_init_custom( &bs, vpsnal, ARRAY_SIZE(vpsnal), &hxxx_bsfw_ep3b_callbacks, &bsctx );
     for(size_t i=0; i<ARRAY_SIZE(vpsnalunesc); i++)
         test_assert(bs_read(&bs, 8), vpsnalunesc[i]);
 
@@ -328,10 +322,8 @@ static int test_annexb( const char *psz_tag )
                                0x2C, 0x6D, 0xD1, 0xBF, 0x54, 0x3A, 0x1F, 0x16,
                                0x06, 0xFF, 0x04, 0x5B, 0xFF, 0xB4, 0x79, 0xFF,
                                0xE8, 0x14, 0x80 };
-    bs_init( &bs, seinal, ARRAY_SIZE(seinal) );
     hxxx_bsfw_ep3b_ctx_init( &bsctx );
-    bs.cb = hxxx_bsfw_ep3b_callbacks;
-    bs.p_priv = &bsctx;
+    bs_init_custom( &bs, seinal, ARRAY_SIZE(seinal), &hxxx_bsfw_ep3b_callbacks, &bsctx );
     for(size_t i=0; i<ARRAY_SIZE(seinalunesc); i++)
         test_assert(bs_read(&bs, 8), seinalunesc[i]);
 
