@@ -23,6 +23,7 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import "extensions/NSAnimationContext+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -461,8 +462,8 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         self.videoViewBottomToViewConstraint.active = YES;
     }
 
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
-        [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+                                                              changes:^(NSAnimationContext * const _Nonnull context) {
         [self->_mainControlsView.animator setAlphaValue:0.0f];
         [self->_floatOnTopIndicatorImageView.animator setAlphaValue:0.0f];
     } completionHandler:nil];
@@ -508,9 +509,10 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         return;
     }
 
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+                                                              changes:^(NSAnimationContext * const _Nonnull context) {
         self->_isFadingIn = YES;
-        [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:1.0f];
         [self->_floatOnTopIndicatorImageView.animator setAlphaValue:1.0f];
     } completionHandler:^{

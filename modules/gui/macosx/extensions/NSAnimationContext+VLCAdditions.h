@@ -26,12 +26,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSAnimationContext (VLCAdditions)
 
-+ (void) runAnimationRespectingPreferencesWithDuration:(NSTimeInterval) duration
-                                               changes:(void (^)(NSAnimationContext *)) changes 
-                                     completionHandler:(nullable void (^)()) completionHandler;
++ (void)runAnimationRespectingPreferencesWithDuration:(NSTimeInterval)duration
+                                              changes:(void (^)(NSAnimationContext *))changes
+                                    completionHandler:(nullable void (^)())completionHandler;
 
-+ (void) runAnimationRespectingPreferencesWithChanges: (void (^)(NSAnimationContext *)) changes 
-                                    completionHandler:(nullable void (^)()) completionHandler;
++ (void)runAnimationRespectingPreferencesWithChanges:(void (^)(NSAnimationContext *))changes
+                                   completionHandler:(nullable void (^)())completionHandler;
 
 @end
 

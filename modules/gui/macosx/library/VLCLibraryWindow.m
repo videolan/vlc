@@ -24,6 +24,7 @@
 
 #import "VLCLibraryDataTypes.h"
 
+#import "extensions/NSAnimationContext+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
@@ -554,9 +555,9 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)hideControlsBar
 {
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+                                                               changes:^(NSAnimationContext * const context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-        context.duration = VLCLibraryUIUnits.controlsFadeAnimationDuration;
         self.controlsBar.bottomBarView.animator.alphaValue = 0;
     } completionHandler:^{
         self.controlsBar.bottomBarView.hidden = self.controlsBar.bottomBarView.alphaValue == 0;
@@ -572,9 +573,10 @@ static int ShowController(vlc_object_t * __unused p_this,
 - (void)showControlsBar
 {
     self.controlsBar.bottomBarView.hidden = NO;
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+                                                              changes:^(NSAnimationContext * const context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
-        context.duration = VLCLibraryUIUnits.controlsFadeAnimationDuration;
         self.controlsBar.bottomBarView.animator.alphaValue = 1;
     } completionHandler:nil];
 }
@@ -713,10 +715,11 @@ static int ShowController(vlc_object_t * __unused p_this,
     self.libraryTargetView.subviews = views;
     [self.loadingOverlayView applyConstraintsToFillSuperview];
 
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
-        context.duration = 0.5;
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.5
+                                                              changes:^(NSAnimationContext * const context) {
         self.loadingOverlayView.animator.alphaValue = 1.0;
     } completionHandler:nil];
+
     [self.loadingOverlayView.indicator startAnimation:self];
 
 }
@@ -732,8 +735,8 @@ static int ShowController(vlc_object_t * __unused p_this,
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 1.0;
 
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
-        context.duration = 1.0;
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:1.0
+                                                              changes:^(NSAnimationContext * const context) {
         self.loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
         NSMutableArray * const mutableSubviews = self.libraryTargetView.subviews.mutableCopy;

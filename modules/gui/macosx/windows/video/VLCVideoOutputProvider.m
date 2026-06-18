@@ -23,6 +23,7 @@
 
 #import "VLCVideoOutputProvider.h"
 
+#import "extensions/NSAnimationContext+VLCAdditions.h"
 #import "extensions/NSScreen+VLCAdditions.h"
 
 #import "library/VLCLibraryDataTypes.h"
@@ -462,16 +463,14 @@ static int WindowFloatOnTop(vlc_object_t *obj,
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
 
     // Avoid flashes if video will directly start in fullscreen
-    [NSAnimationContext beginGrouping];
+    [NSAnimationContext runAnimationRespectingPreferencesWithChanges:^(NSAnimationContext * const __unused context) {
+        if (!videoWallpaper) {
+            [self setupPositionAndSizeForVideoWindow:newVideoWindow atPosition:videoViewPosition];
+        }
+        [self setupVideoOutputForVideoWindow:newVideoWindow withVlcWindow:p_wnd];
+        [self setupFullscreenStartIfNeededForVout:voutView withVlcWindow:p_wnd];
+    } completionHandler:nil];
 
-    if (!videoWallpaper) {
-        [self setupPositionAndSizeForVideoWindow:newVideoWindow atPosition:videoViewPosition];
-    }
-
-    [self setupVideoOutputForVideoWindow:newVideoWindow withVlcWindow:p_wnd];
-    [self setupFullscreenStartIfNeededForVout:voutView withVlcWindow:p_wnd];
-
-    [NSAnimationContext endGrouping];
     return voutView;
 }
 
@@ -539,34 +538,34 @@ static int WindowFloatOnTop(vlc_object_t *obj,
     }
 
     // prevent visible extra window if in fullscreen
-    [NSAnimationContext beginGrouping];
-    const BOOL b_native = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
+    [NSAnimationContext runAnimationRespectingPreferencesWithChanges:^(NSAnimationContext * const __unused context) {
+        const BOOL b_native = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
-    // close fullscreen, without changing fullscreen vars
-    if (!b_native && (videoWindow.fullscreen || videoWindow.inFullscreenTransition))
-        [videoWindow leaveFullscreenWithAnimation:NO];
+        // close fullscreen, without changing fullscreen vars
+        if (!b_native && (videoWindow.fullscreen || videoWindow.inFullscreenTransition))
+            [videoWindow leaveFullscreenWithAnimation:NO];
 
-    // native fullscreen window will not be closed if
-    // fullscreen was triggered without video
-    if (b_native
-        && videoWindow.class == VLCLibraryWindow.class
-        && videoWindow.fullscreen
-        && videoWindow.windowShouldExitFullscreenWhenFinished) {
-        [videoWindow toggleFullScreen:self];
-    }
-
-    if (videoWindow.class == VLCLibraryWindow.class) {
-        // If `embeddedVideoPlaybackActive` is already `NO`, the user navigated back
-        // while playback was ongoing - `disableVideoPlaybackAppearance` was already
-        // called at that point, so nothing more to do here.
-        
-        if (((VLCLibraryWindow *)videoWindow).embeddedVideoPlaybackActive) {
-            [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
+        // native fullscreen window will not be closed if
+        // fullscreen was triggered without video
+        if (b_native
+            && videoWindow.class == VLCLibraryWindow.class
+            && videoWindow.fullscreen
+            && videoWindow.windowShouldExitFullscreenWhenFinished) {
+            [videoWindow toggleFullScreen:self];
         }
-    } else {
-        [videoWindow close];
-    }
-    [NSAnimationContext endGrouping];
+
+        if (videoWindow.class == VLCLibraryWindow.class) {
+            // If `embeddedVideoPlaybackActive` is already `NO`, the user navigated back
+            // while playback was ongoing - `disableVideoPlaybackAppearance` was already
+            // called at that point, so nothing more to do here.
+        
+            if (((VLCLibraryWindow *)videoWindow).embeddedVideoPlaybackActive) {
+                [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
+            }
+        } else {
+            [videoWindow close];
+        }
+    } completionHandler:nil];
 
     [_voutWindows removeObjectForKey:key];
     if (_voutWindows.count == 0) {

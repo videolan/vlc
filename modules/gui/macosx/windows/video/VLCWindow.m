@@ -23,6 +23,8 @@
 
 #import "VLCWindow.h"
 
+#import "extensions/NSAnimationContext+VLCAdditions.h"
+
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "windows/video/VLCVideoWindowCommon.h"
@@ -99,8 +101,9 @@
     // Animate window alpha value
     [self setAlphaValue:1.0];
     __weak typeof(self) this = self;
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
-        [[NSAnimationContext currentContext] setDuration:0.9];
+
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.9
+                                                              changes:^(NSAnimationContext * const __unused context) {
         [[this animator] setAlphaValue:0.0];
     } completionHandler:^{
         [this close];
@@ -119,8 +122,9 @@
         return;
     }
     __weak typeof(self) this = self;
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
-        [[NSAnimationContext currentContext] setDuration:0.5];
+
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.5
+                                                              changes:^(NSAnimationContext * const __unused context) {
         [[this animator] setAlphaValue:0.0];
     } completionHandler:^{
         [this orderOut:self];
@@ -143,10 +147,10 @@
         return;
     }
 
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:0.5];
-    [[self animator] setAlphaValue:1.0];
-    [NSAnimationContext endGrouping];
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.5
+                                                              changes:^(NSAnimationContext * const __unused context) {
+        [[self animator] setAlphaValue:1.0];
+    } completionHandler:nil];
 }
 
 - (BOOL)isInNativeFullscreen

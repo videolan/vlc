@@ -22,6 +22,8 @@
 
 #import "VLCTrackingView.h"
 
+#import "extensions/NSAnimationContext+VLCAdditions.h"
+
 @interface VLCTrackingView ()
 {
     NSTrackingArea *_trackingArea;
@@ -91,8 +93,8 @@
             view.hidden = NO;
         }
 
-        [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context){
-            NSAnimationContext.currentContext.duration = 0.3;
+        [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.3
+                                                                  changes:^(NSAnimationContext * const context) {
             for (NSView * const view in weakSelf.viewsToHide) {
                 view.animator.alphaValue = hideVTH ? 0.0 : 1.0;
             }

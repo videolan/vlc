@@ -24,13 +24,13 @@
 
 @implementation NSAnimationContext (VLCAdditions)
 
-+ (void) runAnimationRespectingPreferences:(NSNumber *) duration
-                                   changes:(void (^)(NSAnimationContext *)) changes 
-                         completionHandler:(nullable void (^)()) completionHandler
++ (void)runAnimationRespectingPreferences:(NSNumber *)duration
+                                  changes:(void (^)(NSAnimationContext *))changes
+                        completionHandler:(nullable void (^)())completionHandler
 {
     const BOOL reduceMotion = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldReduceMotion;
 
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *const context){
         if (duration != nil) {
             context.duration = reduceMotion ? 0 : duration.doubleValue;
         }
@@ -38,18 +38,17 @@
     } completionHandler:completionHandler];
 }
 
-
-+ (void) runAnimationRespectingPreferencesWithDuration:(NSTimeInterval) duration
-                                               changes:(void (^)(NSAnimationContext *)) changes 
-                                     completionHandler:(nullable void (^)()) completionHandler
++ (void)runAnimationRespectingPreferencesWithDuration:(NSTimeInterval)duration
+                                              changes:(void (^)(NSAnimationContext *))changes
+                                    completionHandler:(nullable void (^)())completionHandler
 {
     [self runAnimationRespectingPreferences:@(duration)
                                     changes:changes
                           completionHandler:completionHandler];
 }
 
-+ (void) runAnimationRespectingPreferencesWithChanges:(void (^)(NSAnimationContext *)) changes 
-                                    completionHandler:(nullable void (^)()) completionHandler
++ (void)runAnimationRespectingPreferencesWithChanges:(void (^)(NSAnimationContext *))changes
+                                   completionHandler:(nullable void (^)())completionHandler
 {
     [self runAnimationRespectingPreferences:nil
                                     changes:changes

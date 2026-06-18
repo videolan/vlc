@@ -34,6 +34,7 @@
 
 #import "main/VLCMain.h"
 
+#import "extensions/NSAnimationContext+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -238,12 +239,15 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                          self.scrollViewInsets.bottom + statusNotifierHeight,
                          self.scrollViewInsets.right);
     self.statusNotifierView.hidden = NO;
-    self.statusNotifierView.animator.alphaValue = 1.0;
+
+    [NSAnimationContext runAnimationRespectingPreferencesWithChanges:^(NSAnimationContext * const __unused context) {
+        self.statusNotifierView.animator.alphaValue = 1.0;
+    } completionHandler:nil];
 }
 
 - (void)statusViewDeactivated:(NSNotification *)notification
 {
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const __unused context) {
+    [NSAnimationContext runAnimationRespectingPreferencesWithChanges:^(NSAnimationContext * const __unused context) {
         self.statusNotifierView.animator.alphaValue = 0.0;
     } completionHandler:^{
         self.statusNotifierView.hidden = YES;

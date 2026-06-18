@@ -1646,8 +1646,9 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
     UIView *containerView = [[self itemViewAtIndex:index] superview];
     if (containerView)
     {
-        if (animated)
-        {
+        const BOOL reduceMotion = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldReduceMotion;
+
+        if (animated && !reduceMotion) {
             //fade transition
             CATransition *transition = [CATransition animation];
             transition.duration = INSERT_DURATION;

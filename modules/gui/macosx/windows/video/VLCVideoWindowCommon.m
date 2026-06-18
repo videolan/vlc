@@ -23,6 +23,7 @@
 
 #import "VLCVideoWindowCommon.h"
 
+#import "extensions/NSAnimationContext+VLCAdditions.h"
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -233,8 +234,8 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     NSScreen *screen = [window screen];
     NSRect screenFrame = [screen frame];
 
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
-        [context setDuration:0.5 * duration];
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.5 * duration
+                                                              changes:^(NSAnimationContext *context) {
         [[window animator] setFrame:screenFrame display:YES];
     } completionHandler:nil];
 }
@@ -244,8 +245,8 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     [window setStyleMask:([window styleMask] & ~NSWindowStyleMaskFullScreen)];
     [[window animator] setFrame:_frameBeforeLionFullscreen display:YES animate:YES];
 
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
-        [context setDuration:0.5 * duration];
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.5 * duration
+                                                              changes:^(NSAnimationContext *context) {
         [[window animator] setFrame:self->_frameBeforeLionFullscreen display:YES animate:YES];
     } completionHandler:nil];
 }

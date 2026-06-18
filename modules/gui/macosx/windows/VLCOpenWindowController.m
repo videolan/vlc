@@ -27,6 +27,7 @@
 #import "VLCOpenWindowController.h"
 
 #import <Cocoa/Cocoa.h>
+#import "extensions/NSAnimationContext+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
 #import <AVFoundation/AVFoundation.h>
 
@@ -503,13 +504,15 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
 - (IBAction)expandMRLfieldAction:(id)sender
 {
-    if ([_mrlButton state] == NSOffState) {
-        self.mrlViewHeightConstraint.animator.constant = 0;
-        self.mrlBox.hidden = YES;
-    } else {
-        self.mrlViewHeightConstraint.animator.constant = 39;
-        self.mrlBox.hidden = NO;
-    }
+    [NSAnimationContext runAnimationRespectingPreferencesWithChanges:^(NSAnimationContext * const __unused context) {
+        if ([_mrlButton state] == NSOffState) {
+            self.mrlViewHeightConstraint.animator.constant = 0;
+            self.mrlBox.hidden = YES;
+        } else {
+            self.mrlViewHeightConstraint.animator.constant = 39;
+            self.mrlBox.hidden = NO;
+        }
+    } completionHandler: nil];
 }
 
 - (void)openFileGeneric

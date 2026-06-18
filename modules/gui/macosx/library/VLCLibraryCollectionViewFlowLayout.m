@@ -22,6 +22,8 @@
 
 #import "VLCLibraryCollectionViewFlowLayout.h"
 
+#import "extensions/NSAnimationContext+VLCAdditions.h"
+
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
@@ -192,7 +194,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
         NSRect frame = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath].frame;
         frame.size.height += [self finalExpandedHeight] + VLCLibraryUIUnits.largeSpacing;
-        [self.collectionView.animator scrollRectToVisible:frame];
+
+        [NSAnimationContext runAnimationRespectingPreferencesWithChanges:^(NSAnimationContext * const __unused context) {
+            [self.collectionView.animator scrollRectToVisible:frame];
+        } completionHandler:nil];
     } else {
         _animationIsCollapse = NO;
         
