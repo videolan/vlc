@@ -818,7 +818,6 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/expand.svg \
 	pixmaps/icons/ic_fluent_options.svg \
 	pixmaps/icons/ic_fluent_fast_forward.svg \
-	pixmaps/icons/frame-by-frame.svg \
 	pixmaps/icons/ic_fluent_next_frame.svg \
 	pixmaps/icons/ic_fluent_previous_frame.svg \
 	pixmaps/icons/ic_fluent_full_screen_maximize.svg \
