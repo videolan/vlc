@@ -138,6 +138,19 @@ static int run_tests( const struct testset *p_testsets,
     test_assert( bs_error(&bs), false );
     test_assert( bs_eof(&bs), false );
 
+    if( !callbacks )
+    {
+        bs_init( &bs, p_testsets[TESTSET2].data, p_testsets[TESTSET2].count );
+        bs_skip( &bs, p_testsets[TESTSET2].count * 8 );
+        test_assert( bs_eof(&bs), true );
+        test_assert( bs_error(&bs), false );
+
+        bs_init( &bs, p_testsets[TESTSET2].data, p_testsets[TESTSET2].count );
+        bs_skip( &bs, p_testsets[TESTSET2].count * 8 + 1 );
+        test_assert( bs_error(&bs), true );
+        test_assert( bs_eof(&bs), true );
+    }
+
     /* */
     bs_init( &bs, p_testsets[TESTSET2].data,
                   p_testsets[TESTSET2].count );
