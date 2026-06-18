@@ -153,7 +153,7 @@ static int run_tests( const struct testset *p_testsets,
 
     /* test writes */
     uint8_t buf[5] = { 0 };
-    uint8_t bufok[5] = { 0x7D, 0xF7, 0xDF, 0x7D, 0xF7 };
+    const uint8_t bufok[5] = { 0x7D, 0xF7, 0xDF, 0x7D, 0xF7 };
     bs_write_init( &bs, &buf, 5 );
     bs_write(&bs, 1, 1 );
     test_assert(buf[0], 0x80);
