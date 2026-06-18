@@ -20,7 +20,7 @@
  *****************************************************************************/
 #include <vlc_bits.h>
 
-static inline uint8_t *hxxx_ep3b_to_rbsp( uint8_t *p, uint8_t *end, unsigned *pi_prev, size_t i_count )
+static inline const uint8_t *hxxx_ep3b_to_rbsp( const uint8_t *p, const uint8_t *end, unsigned *pi_prev, size_t i_count )
 {
     for( size_t i=0; i<i_count; i++ )
     {
@@ -92,7 +92,7 @@ static size_t hxxx_bsfw_byte_forward_ep3b( bs_t *s, size_t i_count )
     if( s->p >= s->p_end )
         return 0;
 
-    s->p = hxxx_ep3b_to_rbsp( s->p, s->p_end, &ctx->i_prev, i_count );
+    s->p = (uint8_t*) hxxx_ep3b_to_rbsp( s->p, s->p_end, &ctx->i_prev, i_count );
     ctx->i_bytepos += i_count;
     return i_count;
 }
