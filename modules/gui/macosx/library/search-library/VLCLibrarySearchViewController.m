@@ -52,17 +52,15 @@
 
 #import "main/VLCMain.h"
 
-static const NSTimeInterval VLCLibrarySearchDebounceInterval = 0.3;
-static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
-
-@interface VLCLibrarySearchViewController () <NSSearchFieldDelegate>
+@interface VLCLibrarySearchViewController ()
 
 @property (readwrite) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readwrite) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readwrite) VLCLibrarySectionedTableViewDelegate *tableViewDelegate;
-@property (readwrite) NSTimer *searchDebounceTimer;
-@property (readwrite) BOOL spinnerAnimating;
 @property (readwrite) NSArray<NSLayoutConstraint *> *internalPlaceholderImageViewSizeConstraints;
+@property (readwrite, nullable) NSView *presentationContainer;
+@property (readwrite, copy, nullable) NSString *currentQuery;
+@property (readwrite) NSView *backgroundView;
 
 @end
 
@@ -78,11 +76,6 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
         [self setupCollectionView];
         [self setupTableView];
         [self setupPlaceholderView];
-
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(searchProviderResultsUpdated:)
-                                                   name:VLCLibrarySearchProviderResultsUpdated
-                                                 object:nil];
     }
     return self;
 }
@@ -105,13 +98,6 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
     self.statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     self.statusLabel.font = NSFont.VLClibrarySectionHeaderFont;
     self.statusLabel.alignment = NSTextAlignmentCenter;
-
-    _spinner = [[NSProgressIndicator alloc] init];
-    self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
-    self.spinner.style = NSProgressIndicatorStyleSpinning;
-    self.spinner.displayedWhenStopped = NO;
-    self.spinner.wantsLayer = YES;
-    self.spinner.alphaValue = 0.0;
 }
 
 - (void)setupCollectionView
@@ -164,19 +150,10 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
         [[NSNib alloc] initWithNibNamed:audioGroupDetailViewString bundle:nil];
     [self.collectionView registerNib:audioGroupDetailViewNib
          forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind
-                     withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
-
-    const CGFloat searchFieldAreaHeight =
-        self.searchField.intrinsicContentSize.height + VLCLibraryUIUnits.largeSpacing * 2;
-    NSEdgeInsets collectionViewContentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    collectionViewContentInsets.top += searchFieldAreaHeight;
+                     withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind];
 
     _collectionViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.collectionView
-                                                                  contentInsets:collectionViewContentInsets];
-
-    NSEdgeInsets collectionViewScrollerInsets = self.collectionViewScrollView.scrollerInsets;
-    collectionViewScrollerInsets.top -= searchFieldAreaHeight;
-    self.collectionViewScrollView.scrollerInsets = collectionViewScrollerInsets;
+                                                                  contentInsets:VLCLibraryUIUnits.libraryViewScrollViewContentInsets];
 }
 
 - (void)setupTableView
@@ -200,17 +177,8 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
     _tableViewDelegate = [[VLCLibrarySectionedTableViewDelegate alloc] init];
     self.tableView.delegate = self.tableViewDelegate;
 
-    const CGFloat searchFieldAreaHeight =
-        self.searchField.intrinsicContentSize.height + VLCLibraryUIUnits.largeSpacing * 2;
-    NSEdgeInsets tableViewContentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    tableViewContentInsets.top += searchFieldAreaHeight;
-
     _tableViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.tableView
-                                                             contentInsets:tableViewContentInsets];
-
-    NSEdgeInsets tableViewScrollerInsets = self.tableViewScrollView.scrollerInsets;
-    tableViewScrollerInsets.top -= searchFieldAreaHeight;
-    self.tableViewScrollView.scrollerInsets = tableViewScrollerInsets;
+                                                             contentInsets:VLCLibraryUIUnits.libraryViewScrollViewContentInsets];
 }
 
 - (void)setupPlaceholderView
@@ -247,101 +215,97 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
 
 #pragma mark - Presentation
 
-- (void)presentSearchView
+- (void)presentInContainer:(NSView *)container
 {
+    NSParameterAssert(container);
+    if (self.presentationContainer == container) {
+        return;
+    }
+
+    if (self.presentationContainer != nil) {
+        [self.collectionViewScrollView removeFromSuperview];
+        [self.tableViewScrollView removeFromSuperview];
+        [self.statusLabel removeFromSuperview];
+    }
+
+    self.dataSource.collectionView = self.collectionView;
+    self.dataSource.tableView = self.tableView;
+    self.collectionView.dataSource = self.dataSource;
+    self.tableView.dataSource = self.dataSource;
+    self.tableView.delegate = self.tableViewDelegate;
+
+    self.presentationContainer = container;
+    [container addSubview:self.collectionViewScrollView];
+    [container addSubview:self.tableViewScrollView];
+    [container addSubview:self.statusLabel];
+
+    [self.collectionViewScrollView applyConstraintsToFillSuperview];
+    [self.tableViewScrollView applyConstraintsToFillSuperview];
+
+    [NSLayoutConstraint activateConstraints:@[
+        [self.statusLabel.centerXAnchor constraintEqualToAnchor:container.centerXAnchor],
+        [self.statusLabel.centerYAnchor constraintEqualToAnchor:container.centerYAnchor],
+    ]];
+
+    // Cover the container immediately so the home view (or whatever is below) is
+    // not visible. The caller is expected to follow up with `searchForString:` or
+    // `updatePresentationForQuery:` to refine the visibility (results vs. status
+    // label text) based on the current query and data source state.
+    self.collectionViewScrollView.hidden = YES;
+    self.tableViewScrollView.hidden = YES;
+    self.statusLabel.hidden = YES;
+}
+
+- (void)dismissFromContainer
+{
+    if (self.presentationContainer == nil) {
+        return;
+    }
+    [self.collectionViewScrollView removeFromSuperview];
+    [self.tableViewScrollView removeFromSuperview];
+    [self.statusLabel removeFromSuperview];
+    self.presentationContainer = nil;
+}
+
+- (void)updatePresentationForQuery:(NSString *)query
+{
+    NSParameterAssert(query);
+
+    if (self.presentationContainer == nil) {
+        return;
+    }
+
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     const BOOL emptyLibrary =
         libraryModel.numberOfAudioMedia == 0 && libraryModel.numberOfVideoMedia == 0;
 
     if (emptyLibrary) {
-        [self.libraryWindow displayLibraryPlaceholderViewWithImage:NSImage.VLCGenericImage
-                                                  usingConstraints:self.placeholderImageViewSizeConstraints
-                                                 displayingMessage:_NS("Your library is empty.\nAdd media to start searching.")];
+        self.collectionViewScrollView.hidden = YES;
+        self.tableViewScrollView.hidden = YES;
+        self.statusLabel.hidden = NO;
+        self.statusLabel.stringValue = _NS("Your library is empty.\nAdd media to start searching.");
         return;
     }
-
-    self.dataSource.collectionView = self.collectionView;
-    self.dataSource.tableView = self.tableView;
-
-    self.collectionView.dataSource = self.dataSource;
-    self.tableView.dataSource = self.dataSource;
-    self.tableView.delegate = self.tableViewDelegate;
 
     const VLCLibraryViewModeSegment viewMode =
         VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
     const BOOL gridMode = (viewMode == VLCLibraryGridViewModeSegment);
 
-    const BOOL hasSearchText = self.searchField.stringValue.length > 0;
-    const BOOL isSearching = self.dataSource.searching;
+    const BOOL hasSearchText = query.length > 0;
     const BOOL hasResults = hasSearchText && [self hasAnyResults];
-    const BOOL showResults = hasResults && !isSearching;
 
-    // Add all views once, then toggle visibility
-    if (self.searchField.superview != self.libraryTargetView) {
-        const CGFloat spacing = VLCLibraryUIUnits.largeSpacing;
-        NSLayoutAnchor *topAnchor = self.libraryTargetView.topAnchor;
-        if (@available(macOS 11.0, *)) {
-            topAnchor = self.libraryTargetView.safeAreaLayoutGuide.topAnchor;
-        }
-
-        self.libraryTargetView.subviews = @[];
-        [self.libraryTargetView addSubview:self.collectionViewScrollView];
-        [self.libraryTargetView addSubview:self.tableViewScrollView];
-        [self.libraryTargetView addSubview:self.spinner];
-        [self.libraryTargetView addSubview:self.statusLabel];
-        [self.libraryTargetView addSubview:self.searchField]; // On top
-
-        [self.collectionViewScrollView applyConstraintsToFillSuperview];
-        [self.tableViewScrollView applyConstraintsToFillSuperview];
-
-        [NSLayoutConstraint activateConstraints:@[
-            [self.searchField.topAnchor constraintEqualToAnchor:topAnchor
-                                                      constant:spacing],
-            [self.searchField.leadingAnchor constraintEqualToAnchor:self.libraryTargetView.leadingAnchor
-                                                          constant:spacing],
-            [self.searchField.trailingAnchor constraintEqualToAnchor:self.libraryTargetView.trailingAnchor
-                                                           constant:-spacing],
-
-            [self.spinner.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
-            [self.spinner.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor],
-
-            [self.statusLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
-            [self.statusLabel.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor],
-        ]];
-    }
-
-    if (self.spinnerAnimating) {
-        return;
-    }
+    // Show results as soon as any provider has reported matches, even if more are
+    // still on the way. The status label is shown whenever there are no results to
+    // display, with the wording depending on whether the user has typed anything.
+    const BOOL showResults = hasResults;
 
     self.collectionViewScrollView.hidden = !(showResults && gridMode);
     self.tableViewScrollView.hidden = !(showResults && !gridMode);
-    self.statusLabel.hidden = showResults || isSearching;
+    self.statusLabel.hidden = showResults;
     if (!self.statusLabel.hidden) {
         self.statusLabel.stringValue = hasSearchText
             ? _NS("No results")
             : _NS("Search your library");
-    }
-
-    if (isSearching && self.spinner.alphaValue == 0) {
-        self.spinnerAnimating = YES;
-        [self.spinner startAnimation:nil];
-        [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
-            context.duration = VLCLibrarySearchSpinnerFade;
-            self.spinner.animator.alphaValue = 1.0;
-        } completionHandler:^{
-            self.spinnerAnimating = NO;
-            [self presentSearchView];
-        }];
-    } else if (!isSearching && self.spinner.alphaValue > 0) {
-        self.spinnerAnimating = YES;
-        [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
-            context.duration = VLCLibrarySearchSpinnerFade;
-            self.spinner.animator.alphaValue = 0.0;
-        } completionHandler:^{
-            [self.spinner stopAnimation:nil];
-            self.spinnerAnimating = NO;
-        }];
     }
 }
 
@@ -357,35 +321,26 @@ static const NSTimeInterval VLCLibrarySearchSpinnerFade = 0.25;
     return NO;
 }
 
-#pragma mark - NSSearchFieldDelegate
+#pragma mark - Search driving
 
-- (void)controlTextDidChange:(NSNotification *)notification
+- (void)searchForString:(NSString *)searchString
 {
-    [self.searchDebounceTimer invalidate];
-    self.searchDebounceTimer =
-        [NSTimer scheduledTimerWithTimeInterval:VLCLibrarySearchDebounceInterval
-                                        target:self
-                                      selector:@selector(performSearch)
-                                      userInfo:nil
-                                       repeats:NO];
-}
-
-- (void)searchProviderResultsUpdated:(NSNotification *)notification
-{
-    [self.dataSource reloadData];
-    [self presentSearchView];
-}
-
-- (void)performSearch
-{
-    NSString * const searchString = self.searchField.stringValue;
+    NSParameterAssert(searchString);
     if (searchString.length == 0) {
-        [self.dataSource clearSearch];
+        [self clearSearch];
         return;
     }
 
+    self.currentQuery = searchString;
     [self.dataSource searchForString:searchString];
-    [self presentSearchView];
+    [self updatePresentationForQuery:searchString];
+}
+
+- (void)clearSearch
+{
+    self.currentQuery = nil;
+    [self.dataSource clearSearch];
+    [self updatePresentationForQuery:@""];
 }
 
 @end

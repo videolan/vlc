@@ -26,6 +26,7 @@
 
 @class VLCLibraryCollectionView;
 @class VLCLibrarySearchDataSource;
+@class VLCLibraryTableView;
 @class VLCLibraryWindow;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -33,16 +34,18 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibrarySearchViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
 
 @property (readonly) VLCLibrarySearchDataSource *dataSource;
-@property (readonly) NSSearchField *searchField;
 @property (readonly) NSTextField *statusLabel;
-@property (readonly) NSProgressIndicator *spinner;
 @property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) VLCLibraryCollectionView *collectionView;
 @property (readonly) NSScrollView *tableViewScrollView;
-@property (readonly) NSTableView *tableView;
+@property (readonly) VLCLibraryTableView *tableView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
-- (void)presentSearchView;
+
+- (void)presentInContainer:(NSView *)container;
+- (void)dismissFromContainer;
+- (void)searchForString:(NSString *)searchString;
+- (void)clearSearch;
 
 @end
 
