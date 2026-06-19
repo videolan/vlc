@@ -251,6 +251,7 @@
     if (!self.isShowingSearchOverlay) {
         [searchVC presentInContainer:self.libraryTargetView];
         self.isShowingSearchOverlay = YES;
+        [self.libraryWindow updateToolbarDisplayFlags];
     }
     [searchVC searchForString:query];
 }
@@ -263,6 +264,7 @@
     [self.searchViewController clearSearch];
     [self.searchViewController dismissFromContainer];
     self.isShowingSearchOverlay = NO;
+    [self.libraryWindow updateToolbarDisplayFlags];
 
     // Re-present the home content (or placeholder) in the target view.
     [self updatePresentedView];
@@ -301,6 +303,17 @@
 - (void)disconnect
 {
     [self.stackViewController disconnectContainers];
+}
+
+#pragma mark - VLCLibraryDynamicToolbarFlagsCapable
+
+- (VLCLibraryWindowToolbarDisplayFlags)toolbarDisplayFlags
+{
+    if (self.isShowingSearchOverlay) {
+        return VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar |
+               VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton;
+    }
+    return VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar;
 }
 
 @end

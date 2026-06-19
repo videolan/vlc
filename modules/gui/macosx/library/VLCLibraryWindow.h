@@ -135,6 +135,7 @@ extern NSString * const VLCLibraryWindowEmbeddedVideoPlaybackActiveKey;
 - (void)updateGridVsListViewModeSegmentedControl;
 - (void)updateFilterString;
 - (void)clearFilterString;
+- (void)updateToolbarDisplayFlags;
 - (void)showLoadingOverlay;
 - (void)hideLoadingOverlay;
 

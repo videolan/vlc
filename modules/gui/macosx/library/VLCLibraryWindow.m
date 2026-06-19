@@ -54,6 +54,8 @@
 #import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibraryWindowToolbarDelegate.h"
 
+#import "library/VLCLibraryDynamicToolbarFlagsCapable.h"
+
 #import "library/groups-library/VLCLibraryGroupsViewController.h"
 
 #import "library/home-library/VLCLibraryHomeViewController.h"
@@ -235,6 +237,27 @@ static int ShowController(vlc_object_t * __unused p_this,
     _gridVsListSegmentedControl.selectedSegment = _currentSelectedViewModeSegment;
 }
 
+- (void)updateToolbarDisplayFlags
+{
+    NSParameterAssert([self.librarySegmentViewController conformsToProtocol:@protocol(VLCLibraryDynamicToolbarFlagsCapable)]);
+    id<VLCLibraryDynamicToolbarFlagsCapable> const capableViewController =
+        (id<VLCLibraryDynamicToolbarFlagsCapable>)self.librarySegmentViewController;
+    [self.toolbarDelegate applyVisiblityFlags:capableViewController.toolbarDisplayFlags];
+}
+
+- (void)applyToolbarDisplayFlagsForSegment:(VLCLibrarySegment *)segment
+{
+    VLCLibraryWindowToolbarDisplayFlags flags;
+    if ([self.librarySegmentViewController conformsToProtocol:@protocol(VLCLibraryDynamicToolbarFlagsCapable)]) {
+        id<VLCLibraryDynamicToolbarFlagsCapable> const capableViewController =
+            (id<VLCLibraryDynamicToolbarFlagsCapable>)self.librarySegmentViewController;
+        flags = capableViewController.toolbarDisplayFlags;
+    } else {
+        flags = segment.toolbarDisplayFlags;
+    }
+    [self.toolbarDelegate applyVisiblityFlags:flags];
+}
+
 - (void)setViewForSelectedSegment
 {
     const VLCLibrarySegmentType segmentType = self.librarySegmentType;
@@ -244,11 +267,11 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)applySegmentView:(VLCLibrarySegment *)segment
 {
-    [self.toolbarDelegate applyVisiblityFlags:segment.toolbarDisplayFlags];
     self.librarySearchField.placeholderString = segment.searchFieldPlaceholder;
     if (![self.librarySegmentViewController isKindOfClass:segment.libraryViewControllerClass]) {
         _librarySegmentViewController = [segment newLibraryViewController];
     }
+    [self applyToolbarDisplayFlagsForSegment:segment];
     [segment presentLibraryViewUsingController:self.librarySegmentViewController];
     [self invalidateRestorableState];
 }

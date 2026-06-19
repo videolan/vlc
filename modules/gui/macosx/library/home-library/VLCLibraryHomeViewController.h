@@ -23,6 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
+#import "library/VLCLibraryDynamicToolbarFlagsCapable.h"
 
 @class VLCLibraryWindow;
 @class VLCLibraryHomeViewStackViewController;
@@ -33,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Controller for the home library views
 
-@interface VLCLibraryHomeViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
+@interface VLCLibraryHomeViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<VLCLibraryDynamicToolbarFlagsCapable>
 
 @property (readonly, weak) NSView *homeLibraryView;
 @property (readonly, weak) NSScrollView *homeLibraryStackViewScrollView;
