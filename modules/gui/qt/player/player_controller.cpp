@@ -1874,7 +1874,7 @@ void PlayerController::updateTime(vlc_tick_t system_now, bool forceUpdate)
 
         for (int i = 0; i < lyrics.size(); ++i)
         {
-            if (lyrics[i].time().toVLCTick() > currentTime)
+            if ((lyrics[i].time().toVLCTick() - 1) > currentTime)
                 break;
             currentIndex = i;
         }
