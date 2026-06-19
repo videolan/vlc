@@ -36,6 +36,7 @@ libvlccore_deps = [
 ]
 
 vlccore_cargs = [ '-DMODULE_STRING="core"', '-DHAVE_DYNAMIC_PLUGINS' ]
+vlccore_cargs += [ '-DCONFIGURE_LINE="@0@"'.format(meson.build_options().replace('\'"\'"\'', '\\\'').replace('"','\'')) ]
 libvlccore_link_args = []
 
 if host_system == 'darwin'

@@ -21,9 +21,6 @@
 /* Define to 1 if SSSE3 inline assembly is available. */
 #mesondefine CAN_COMPILE_SSSE3
 
-/* The ./configure command line */
-#mesondefine CONFIGURE_LINE
-
 /* Copyright string */
 #mesondefine COPYRIGHT_MESSAGE
 
