@@ -178,6 +178,12 @@
 
 - (void)presentHomeView
 {
+    // If the search field has text from a previous session, present search overlay
+    NSString * const searchText = self.libraryWindow.librarySearchField.stringValue;
+    if (searchText.length > 0) {
+        [self showSearchOverlayForQuery:searchText];
+        return;
+    }
     [self updatePresentedView];
 }
 
