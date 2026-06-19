@@ -604,7 +604,7 @@ package: install
 ifneq ($(notdir $(PREFIX)),$(HOST))
 	(cd tmp && mv $(notdir $(PREFIX)) $(HOST))
 endif
-	(cd tmp && tar c $(HOST)/) | bzip2 -c > ../vlc-contrib-$(HOST)-$(DATE).tar.bz2
+	tar -cjf ../vlc-contrib-$(HOST)-$(DATE).tar.bz2 -C tmp $(HOST)/
 
 list:
 	@echo All packages:
