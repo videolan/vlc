@@ -126,7 +126,29 @@
     if (_pendingProviderCount == 0) {
         _searching = NO;
     }
-    [self scheduleRebuildFlattenedRows];
+    [self scheduleRebuildVisibleIndices];
+    if (self.viewMode != VLCLibraryGridViewModeSegment) {
+        [self scheduleRebuildFlattenedRows];
+    }
+}
+
+- (void)scheduleRebuildVisibleIndices
+{
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(self->_rebuildQueue, ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        NSArray<NSNumber *> * const newVisibleIndices = [strongSelf visibleProviderIndices];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (strongSelf == nil) {
+                return;
+            }
+            strongSelf->_visibleProviderIndices = newVisibleIndices;
+            [strongSelf scheduleViewReload];
+        });
+    });
 }
 
 - (void)scheduleRebuildFlattenedRows
@@ -137,7 +159,6 @@
         if (strongSelf == nil) {
             return;
         }
-
         NSArray<NSNumber *> * const newVisibleIndices = [strongSelf visibleProviderIndices];
         NSArray<VLCLibrarySearchFlattenedRow *> * const newFlattenedRows =
             [strongSelf flattenedRowsForVisibleIndices:newVisibleIndices];
@@ -183,7 +204,11 @@
 - (void)reloadData
 {
     [self updateVisibleProviderIndices];
-    [self rebuildFlattenedRows];
+    if (self.viewMode != VLCLibraryGridViewModeSegment) {
+        [self rebuildFlattenedRows];
+    } else {
+        _flattenedRows = @[];
+    }
     [_cachedProviderParentItems removeAllObjects];
 
     if (self.tableView.dataSource == self) {
@@ -245,6 +270,19 @@
         [provider clearSearch];
     }
     [self reloadData];
+}
+
+- (void)setViewMode:(VLCLibraryViewModeSegment)viewMode
+{
+    if (_viewMode == viewMode) {
+        return;
+    }
+    _viewMode = viewMode;
+    if (viewMode == VLCLibraryGridViewModeSegment) {
+        [self scheduleViewReload];
+    } else {
+        [self scheduleRebuildFlattenedRows];
+    }
 }
 
 #pragma mark - Data management

@@ -229,6 +229,8 @@
 
     self.dataSource.collectionView = self.collectionView;
     self.dataSource.tableView = self.tableView;
+    self.dataSource.viewMode =
+        VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
     self.collectionView.dataSource = self.dataSource;
     self.tableView.dataSource = self.dataSource;
     self.tableView.delegate = self.tableViewDelegate;
@@ -289,9 +291,7 @@
         return;
     }
 
-    const VLCLibraryViewModeSegment viewMode =
-        VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
-    const BOOL gridMode = (viewMode == VLCLibraryGridViewModeSegment);
+    const BOOL gridMode = (self.dataSource.viewMode == VLCLibraryGridViewModeSegment);
 
     const BOOL hasSearchText = query.length > 0;
     const BOOL hasResults = hasSearchText && [self hasAnyResults];

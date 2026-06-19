@@ -24,6 +24,7 @@
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibrarySectionedTableViewDataSource.h"
+#import "library/VLCLibraryWindow.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, weak) NSCollectionView *collectionView;
 @property (readwrite, weak) NSTableView *tableView;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment viewMode;
 @property (readonly) BOOL searching;
 
 - (void)searchForString:(NSString *)string;
