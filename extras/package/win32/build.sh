@@ -185,6 +185,8 @@ FORCED_TOOLS=""
 # Force libtool build when compiling with clang
 if [ "$COMPILING_WITH_CLANG" -gt 0 ] && [ ! -d "libtool" ]; then
     FORCED_TOOLS="$FORCED_TOOLS libtool"
+elif [ -n "$WITH_LTO" ] && [ ! -d "libtool" ]; then
+    FORCED_TOOLS="$FORCED_TOOLS libtool"
 fi
 # bootstrap only if needed in interactive mode
 if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
