@@ -61,6 +61,7 @@
 @property (readwrite, nullable) NSView *presentationContainer;
 @property (readwrite, copy, nullable) NSString *currentQuery;
 @property (readwrite) NSView *backgroundView;
+@property (readwrite, nullable) NSTimer *searchDebounceTimer;
 
 @end
 
@@ -274,6 +275,8 @@
     [self.collectionViewScrollView removeFromSuperview];
     [self.tableViewScrollView removeFromSuperview];
     [self.statusLabel removeFromSuperview];
+    [self.searchDebounceTimer invalidate];
+    self.searchDebounceTimer = nil;
     self.presentationContainer = nil;
 }
 
@@ -285,25 +288,9 @@
         return;
     }
 
-    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    const BOOL emptyLibrary =
-        libraryModel.numberOfAudioMedia == 0 && libraryModel.numberOfVideoMedia == 0;
-
-    if (emptyLibrary) {
-        self.collectionViewScrollView.hidden = YES;
-        self.tableViewScrollView.hidden = YES;
-        self.statusLabel.hidden = NO;
-        self.statusLabel.stringValue = _NS("Your library is empty.\nAdd media to start searching.");
-        return;
-    }
-
-    const BOOL gridMode = (self.dataSource.viewMode == VLCLibraryGridViewModeSegment);
-
     const BOOL hasSearchText = query.length > 0;
     const BOOL hasResults = hasSearchText && [self hasAnyResults];
 
-    self.collectionViewScrollView.hidden = !(hasResults && gridMode);
-    self.tableViewScrollView.hidden = !(hasResults && !gridMode);
     self.statusLabel.hidden = hasResults;
     if (!self.statusLabel.hidden) {
         self.statusLabel.stringValue = hasSearchText
@@ -335,12 +322,30 @@
     }
 
     self.currentQuery = searchString;
-    [self.dataSource searchForString:searchString];
     [self updatePresentationForQuery:searchString];
+
+    [self.searchDebounceTimer invalidate];
+    self.searchDebounceTimer = [NSTimer scheduledTimerWithTimeInterval:0.15
+                                                               target:self
+                                                             selector:@selector(performPendingSearch)
+                                                             userInfo:nil
+                                                              repeats:NO];
+}
+
+- (void)performPendingSearch
+{
+    self.searchDebounceTimer = nil;
+    if (self.currentQuery.length == 0) {
+        return;
+    }
+    [self.dataSource searchForString:self.currentQuery];
+    [self updatePresentationForQuery:self.currentQuery];
 }
 
 - (void)clearSearch
 {
+    [self.searchDebounceTimer invalidate];
+    self.searchDebounceTimer = nil;
     self.currentQuery = nil;
     [self.dataSource clearSearch];
     [self updatePresentationForQuery:@""];
