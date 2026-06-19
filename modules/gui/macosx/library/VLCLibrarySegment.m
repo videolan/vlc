@@ -168,6 +168,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.homeLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags =
+            VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar;
     }
     return self;
 }
@@ -925,51 +927,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 @end
 
-
-// MARK: - Search library view segment
-
-@interface VLCLibrarySearchSegment : VLCLibrarySegment
-@end
-
-@implementation VLCLibrarySearchSegment
-
-- (instancetype)init
-{
-    self = [super initWithSegmentType:VLCLibrarySearchSegmentType];
-    if (self) {
-        self.internalDisplayString = _NS("Search");
-        self.internalSearchFieldPlaceholder = _NS("Search the library");
-        if (@available(macOS 11.0, *)) {
-            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"magnifyingglass"
-                                                  accessibilityDescription:@"Search icon"];
-        } else {
-            self.internalDisplayImage = [NSImage imageNamed:@"NSActionTemplate"];
-            self.internalDisplayImage.template = YES;
-        }
-        self.internalMediaLibraryRequired = YES;
-        self.internalLibraryViewControllerClass = VLCLibrarySearchViewController.class;
-        self.internalLibraryViewControllerCreator = ^{
-            return [[VLCLibrarySearchViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
-        };
-        self.internalLibraryViewPresenter = ^(VLCLibraryAbstractSegmentViewController * const controller) {
-            [(VLCLibrarySearchViewController *)controller presentSearchView];
-        };
-        self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
-            VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode = viewMode;
-        };
-        self.internalGetViewModePreference = ^{
-            return VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
-        };
-        self.internalToolbarDisplayFlags =
-            VLCLibraryWindowToolbarDisplayFlagSortOrderButton |
-            VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton;
-    }
-    return self;
-}
-
-@end
-
-
 // MARK: - VLCLibrarySegment
 
 @implementation VLCLibrarySegment
@@ -981,7 +938,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     if (VLCMain.sharedInstance.libraryController.shouldUseMediaLibrary) {
         [segments addObjectsFromArray:@[
             [[VLCLibraryHomeSegment alloc] init],
-            [[VLCLibrarySearchSegment alloc] init],
             [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Library")],
             [[VLCLibraryFavoritesSegment alloc] init],
             [[VLCLibraryVideoSegment alloc] init],
@@ -1035,8 +991,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return [[VLCLibraryBrowseSegment alloc] init];
         case VLCLibraryStreamsSegmentType:
             return [[VLCLibraryStreamsSegment alloc] init];
-        case VLCLibrarySearchSegmentType:
-            return [[VLCLibrarySearchSegment alloc] init];
         default:
             return nil;
     }
