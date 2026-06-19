@@ -82,6 +82,7 @@ FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml,
 @implementation VLCLibrarySearchProvider
 {
     VLCLibrarySearchProviderFetchBlock _fetchBlock;
+    NSUInteger _searchGeneration;
 }
 
 - (instancetype)initWithDisplayTitle:(NSString *)displayTitle
@@ -163,10 +164,15 @@ FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml,
         return;
     }
 
+    const NSUInteger generation = ++self->_searchGeneration;
+
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t params = { .psz_pattern = string.UTF8String };
         NSArray<id<VLCMediaLibraryItemProtocol>> * const results = self->_fetchBlock(&params);
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (generation != self->_searchGeneration) {
+                return;
+            }
             self->_results = results;
             [NSNotificationCenter.defaultCenter postNotificationName:VLCLibrarySearchProviderResultsUpdated
                                                               object:self];
