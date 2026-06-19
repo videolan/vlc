@@ -1,0 +1,38 @@
+From 98399f0b0ad7a848b198ce77d84b042d5aed4192 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 19 Jun 2026 11:51:11 +0200
+Subject: [PATCH] libtool.m4: respect the provided LTCFLAGS/LTCC during
+ configure
+
+Otherwise calling "LTCFLAGS=-Dtoto LTCC=gcc configure" doesn't use these values.
+It always hardcoded to use CC/CFLAGS.
+---
+ m4/libtool.m4 | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index 8bc4bfde..cabe58a8 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -931,8 +931,6 @@ dnl AC_DEFUN([AC_LIBTOOL_RC], [])
+ m4_defun([_LT_TAG_COMPILER],
+ [AC_REQUIRE([AC_PROG_CC])dnl
+ 
+-_LT_DECL([LTCC], [CC], [1], [A C compiler])dnl
+-_LT_DECL([LTCFLAGS], [CFLAGS], [1], [LTCC compiler flags])dnl
+ _LT_TAGDECL([CC], [compiler], [1], [A language specific compiler])dnl
+ _LT_TAGDECL([with_gcc], [GCC], [0], [Is the compiler the GNU compiler?])dnl
+ 
+@@ -942,6 +940,9 @@ LTCC=${LTCC-"$CC"}
+ # If no C compiler flags were specified, use CFLAGS.
+ LTCFLAGS=${LTCFLAGS-"$CFLAGS"}
+ 
++_LT_DECL([LTCC], [LTCC], [1], [A C compiler])dnl
++_LT_DECL([LTCFLAGS], [LTCFLAGS], [1], [LTCC compiler flags])dnl
++
+ # Allow CC to be a program name with arguments.
+ compiler=$CC
+ ])# _LT_TAG_COMPILER
+-- 
+2.52.0.windows.1
+
