@@ -84,6 +84,8 @@
     NSArray<VLCLibrarySearchFlattenedRow *> *_flattenedRows;
     NSMutableDictionary<NSString *, VLCMediaLibraryDummyItem *> *_cachedProviderParentItems;
     NSUInteger _pendingProviderCount;
+    BOOL _reloadScheduled;
+    dispatch_queue_t _rebuildQueue;
 }
 @end
 
@@ -97,6 +99,7 @@
         _visibleProviderIndices = @[];
         _flattenedRows = @[];
         _cachedProviderParentItems = [NSMutableDictionary dictionary];
+        _rebuildQueue = dispatch_queue_create("searchDataSourceQueue", DISPATCH_QUEUE_SERIAL);
         [self connect];
     }
     return self;
@@ -123,7 +126,104 @@
     if (_pendingProviderCount == 0) {
         _searching = NO;
     }
-    [self reloadData];
+    [self scheduleRebuildFlattenedRows];
+}
+
+- (void)scheduleRebuildFlattenedRows
+{
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(self->_rebuildQueue, ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+
+        NSArray<NSNumber *> * const newVisibleIndices = [strongSelf visibleProviderIndices];
+        NSArray<VLCLibrarySearchFlattenedRow *> * const newFlattenedRows =
+            [strongSelf flattenedRowsForVisibleIndices:newVisibleIndices];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (strongSelf == nil) {
+                return;
+            }
+            strongSelf->_visibleProviderIndices = newVisibleIndices;
+            strongSelf->_flattenedRows = newFlattenedRows;
+            [strongSelf->_cachedProviderParentItems removeAllObjects];
+            [strongSelf scheduleViewReload];
+        });
+    });
+}
+
+- (NSArray<NSNumber *> *)visibleProviderIndices
+{
+    NSMutableArray<NSNumber *> * const visible = [NSMutableArray array];
+    for (NSUInteger i = 0; i < _providers.count; i++) {
+        if (_providers[i].results.count > 0) {
+            [visible addObject:@(i)];
+        }
+    }
+    return [visible copy];
+}
+
+- (NSArray<VLCLibrarySearchFlattenedRow *> *)flattenedRowsForVisibleIndices:(NSArray<NSNumber *> *)visibleIndices
+{
+    NSMutableArray<VLCLibrarySearchFlattenedRow *> * const rows = [NSMutableArray array];
+    for (NSNumber * const indexNumber in visibleIndices) {
+        const NSUInteger providerIndex = indexNumber.unsignedIntegerValue;
+        VLCLibrarySearchProvider * const provider = _providers[providerIndex];
+        const NSUInteger resultCount = provider.results.count;
+        [rows addObject:[VLCLibrarySearchFlattenedRow headerForProvider:providerIndex]];
+        for (NSUInteger i = 0; i < resultCount; i++) {
+            [rows addObject:[VLCLibrarySearchFlattenedRow itemAtIndex:i forProvider:providerIndex]];
+        }
+    }
+    return [rows copy];
+}
+
+- (void)reloadData
+{
+    [self updateVisibleProviderIndices];
+    [self rebuildFlattenedRows];
+    [_cachedProviderParentItems removeAllObjects];
+
+    if (self.tableView.dataSource == self) {
+        [self.tableView reloadData];
+    }
+    if (self.collectionView.dataSource == self) {
+        [self.collectionView reloadData];
+    }
+}
+
+// Coalesce view reloads. The expensive part of a refresh is the actual
+// NSCollectionView / NSTableView reload, so we always defer that to the next
+// run-loop iteration.
+- (void)scheduleViewReload
+{
+    if (_reloadScheduled) {
+        return;
+    }
+    _reloadScheduled = YES;
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        strongSelf->_reloadScheduled = NO;
+        // Only reload views that are actually visible. The search view toggles
+        // the hidden state of the scroll views (not the collection/table views
+        // themselves), so we walk up to the enclosing scroll view to check.
+        if (strongSelf.tableView.dataSource == strongSelf &&
+            strongSelf.tableView.enclosingScrollView != nil &&
+            !strongSelf.tableView.enclosingScrollView.hidden) {
+            [strongSelf.tableView reloadData];
+        }
+        if (strongSelf.collectionView.dataSource == strongSelf &&
+            strongSelf.collectionView.enclosingScrollView != nil &&
+            !strongSelf.collectionView.enclosingScrollView.hidden) {
+            [strongSelf.collectionView reloadData];
+        }
+    });
 }
 
 #pragma mark - Search
@@ -176,20 +276,6 @@
     }
 
     _flattenedRows = [rows copy];
-}
-
-- (void)reloadData
-{
-    [self updateVisibleProviderIndices];
-    [self rebuildFlattenedRows];
-    [_cachedProviderParentItems removeAllObjects];
-
-    if (self.tableView.dataSource == self) {
-        [self.tableView reloadData];
-    }
-    if (self.collectionView.dataSource == self) {
-        [self.collectionView reloadData];
-    }
 }
 
 - (VLCLibrarySearchProvider *)providerForVisibleSection:(NSInteger)visibleSection
