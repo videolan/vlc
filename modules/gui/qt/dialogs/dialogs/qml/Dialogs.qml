@@ -198,7 +198,7 @@ Item {
 
                 Widgets.IconLabel {
                     text: VLCIcons.info
-                    color: errorMsgTheme.fg.negative
+                    color: errorMsgTheme.fg.primary
                     Layout.leftMargin: VLCStyle.margin_xxsmall
                 }
 
@@ -215,7 +215,7 @@ Item {
                     wrapMode: Text.WrapAnywhere
                     font.pixelSize: VLCStyle.fontSize_normal
                     font.bold: true
-                    color: errorMsgTheme.fg.negative
+                    color: errorMsgTheme.fg.primary
                 }
 
                 Widgets.TextToolButton {
@@ -240,7 +240,7 @@ Item {
                     description: qsTr("Dismiss")
                     Layout.rightMargin: VLCStyle.margin_xxsmall
 
-                    color: closeBtn.colorContext.fg.negative
+                    color: closeBtn.colorContext.fg.primary
                     backgroundColor: closeBtn.colorContext.bg.negative
 
                     onClicked: {
