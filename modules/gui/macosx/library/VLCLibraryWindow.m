@@ -374,6 +374,10 @@ static int ShowController(vlc_object_t * __unused p_this,
                                                            userInfo:nil
                                                             repeats:NO];
     
+    if (self.librarySegmentType == VLCLibraryHomeSegmentType) {
+        return;
+    }
+
     // Trigger completions
     NSText * const fieldEditor = self.librarySearchField.currentEditor;
     if (fieldEditor) {
@@ -383,6 +387,10 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)updateFilterString
 {
+    if (self.librarySegmentType == VLCLibraryHomeSegmentType) {
+        return;
+    }
+
     [VLCMain.sharedInstance.libraryController filterByString:_librarySearchField.stringValue];
 }
 
