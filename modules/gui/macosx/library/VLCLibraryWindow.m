@@ -55,6 +55,7 @@
 #import "library/VLCLibraryWindowToolbarDelegate.h"
 
 #import "library/VLCLibraryDynamicToolbarFlagsCapable.h"
+#import "library/VLCLibraryDynamicViewModeCapable.h"
 
 #import "library/groups-library/VLCLibraryGroupsViewController.h"
 
@@ -232,9 +233,29 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)updateGridVsListViewModeSegmentedControl
 {
-    _currentSelectedViewModeSegment =
-        [VLCLibrarySegment segmentWithSegmentType:self.librarySegmentType].viewMode;
+    _currentSelectedViewModeSegment = [self currentViewMode];
     _gridVsListSegmentedControl.selectedSegment = _currentSelectedViewModeSegment;
+}
+
+- (NSInteger)currentViewMode
+{
+    if ([self.librarySegmentViewController conformsToProtocol:@protocol(VLCLibraryDynamicViewModeCapable)]) {
+        id<VLCLibraryDynamicViewModeCapable> const capableViewController =
+            (id<VLCLibraryDynamicViewModeCapable>)self.librarySegmentViewController;
+        return capableViewController.viewMode;
+    }
+    return [VLCLibrarySegment segmentWithSegmentType:self.librarySegmentType].viewMode;
+}
+
+- (void)setCurrentViewMode:(NSInteger)viewMode
+{
+    if ([self.librarySegmentViewController conformsToProtocol:@protocol(VLCLibraryDynamicViewModeCapable)]) {
+        id<VLCLibraryDynamicViewModeCapable> const capableViewController =
+            (id<VLCLibraryDynamicViewModeCapable>)self.librarySegmentViewController;
+        capableViewController.viewMode = (VLCLibraryViewModeSegment)viewMode;
+    } else {
+        [VLCLibrarySegment segmentWithSegmentType:self.librarySegmentType].viewMode = viewMode;
+    }
 }
 
 - (void)updateToolbarDisplayFlags
@@ -294,7 +315,7 @@ static int ShowController(vlc_object_t * __unused p_this,
     }
 
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
-    [VLCLibrarySegment segmentWithSegmentType:self.librarySegmentType].viewMode = _currentSelectedViewModeSegment;
+    [self setCurrentViewMode:_currentSelectedViewModeSegment];
     [self setViewForSelectedSegment];
 }
 

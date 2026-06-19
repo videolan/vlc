@@ -162,14 +162,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalLibraryViewPresenter = ^(VLCLibraryAbstractSegmentViewController * const controller) {
             [(VLCLibraryHomeViewController *)controller presentHomeView];
         };
-        self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
-            VLCLibraryWindowPersistentPreferences.sharedInstance.homeLibraryViewMode = viewMode;
-        };
-        self.internalGetViewModePreference = ^{
-            return VLCLibraryWindowPersistentPreferences.sharedInstance.homeLibraryViewMode;
-        };
-        self.internalToolbarDisplayFlags =
-            VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar;
     }
     return self;
 }

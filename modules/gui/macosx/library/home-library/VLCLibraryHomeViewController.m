@@ -321,4 +321,24 @@
     return VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar;
 }
 
+#pragma mark - VLCLibraryDynamicViewModeCapable
+
+- (VLCLibraryViewModeSegment)viewMode
+{
+    VLCLibraryWindowPersistentPreferences * const prefs =
+        VLCLibraryWindowPersistentPreferences.sharedInstance;
+    return self.isShowingSearchOverlay ? prefs.searchLibraryViewMode : prefs.homeLibraryViewMode;
+}
+
+- (void)setViewMode:(VLCLibraryViewModeSegment)viewMode
+{
+    VLCLibraryWindowPersistentPreferences * const prefs =
+        VLCLibraryWindowPersistentPreferences.sharedInstance;
+    if (self.isShowingSearchOverlay) {
+        prefs.searchLibraryViewMode = viewMode;
+    } else {
+        prefs.homeLibraryViewMode = viewMode;
+    }
+}
+
 @end
