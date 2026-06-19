@@ -28,6 +28,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCLibrarySearchDataSourceDidReloadNotification;
+
 @interface VLCLibrarySearchDataSource : NSObject <VLCLibraryCollectionViewDataSource, VLCLibrarySectionedTableViewDataSource>
 
 @property (readwrite, weak) NSCollectionView *collectionView;

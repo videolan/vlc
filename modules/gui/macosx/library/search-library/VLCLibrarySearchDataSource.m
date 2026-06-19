@@ -24,6 +24,8 @@
 
 #import "VLCLibrarySearchProvider.h"
 
+NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibrarySearchDataSourceDidReloadNotification";
+
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
@@ -148,6 +150,7 @@
             }
             strongSelf->_visibleProviderIndices = newVisibleIndices;
             [strongSelf.collectionView reloadData];
+            [strongSelf postDidReloadNotification];
         });
     });
 }
@@ -172,8 +175,15 @@
             strongSelf->_flattenedRows = newFlattenedRows;
             [strongSelf->_cachedProviderParentItems removeAllObjects];
             [strongSelf.tableView reloadData];
+            [strongSelf postDidReloadNotification];
         });
     });
+}
+
+- (void)postDidReloadNotification
+{
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibrarySearchDataSourceDidReloadNotification
+                                                      object:self];
 }
 
 - (NSArray<NSNumber *> *)visibleProviderIndices

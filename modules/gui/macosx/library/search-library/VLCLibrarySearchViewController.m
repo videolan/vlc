@@ -79,8 +79,23 @@
         [self setupCollectionView];
         [self setupTableView];
         [self setupPlaceholderView];
+
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(dataSourceDidReload:)
+                                                   name:VLCLibrarySearchDataSourceDidReloadNotification
+                                                 object:self.dataSource];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)dataSourceDidReload:(NSNotification *)notification
+{
+    [self updatePresentationForQuery:self.currentQuery ?: @""];
 }
 
 #pragma mark - Setup
@@ -252,11 +267,11 @@
     if (self.dataSource.viewMode != viewMode || self.presentationContainer != container) {
         if (viewMode == VLCLibraryGridViewModeSegment) {
             [self.tableViewScrollView removeFromSuperview];
-            [container addSubview:self.collectionViewScrollView];
+            [container addSubview:self.collectionViewScrollView positioned:NSWindowBelow relativeTo:self.statusLabel];
             [self.collectionViewScrollView applyConstraintsToFillSuperview];
         } else if (viewMode == VLCLibraryListViewModeSegment) {
             [self.collectionViewScrollView removeFromSuperview];
-            [container addSubview:self.tableViewScrollView];
+            [container addSubview:self.tableViewScrollView positioned:NSWindowBelow relativeTo:self.statusLabel];
             [self.tableViewScrollView applyConstraintsToFillSuperview];
         }
         self.dataSource.viewMode = viewMode;
@@ -339,7 +354,6 @@
         return;
     }
     [self.dataSource searchForString:self.currentQuery];
-    [self updatePresentationForQuery:self.currentQuery];
 }
 
 - (void)clearSearch
