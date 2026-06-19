@@ -39,6 +39,9 @@ T.Control {
 
     property int textStyle: Text.Outline
 
+    // `hideControls` being `false` does not necessarily mean that the buttons are shown:
+    property bool hideControls: MainCtx.usingTouch // By default controls are hidden with touch
+
     Accessible.role: Accessible.Graphic
     Accessible.focusable: false
     Accessible.name: qsTr("video content")
@@ -60,8 +63,21 @@ T.Control {
         TapHandler {
             gesturePolicy: TapHandler.WithinBounds
 
-            onDoubleTapped: MainCtx.playerView = true
-            onTapped: MainPlaylistController.togglePlayPause()
+            onDoubleTapped: (eventPoint, button) => {
+                // Docs are lying, there is no `deviceType`: QTBUG-135104
+                if (eventPoint.device.type !== PointerDevice.TouchScreen)
+                    MainCtx.playerView = true
+            }
+
+            onTapped: (eventPoint, button) => {
+                // Docs are lying, there is no `deviceType`: QTBUG-135104
+                if (eventPoint.device.type === PointerDevice.TouchScreen) {
+                    // Breaking the initial binding is intentional here:
+                    root.hideControls = !root.hideControls
+                } else {
+                    MainPlaylistController.togglePlayPause()
+                }
+            }
         }
 
         DragHandler {
@@ -111,10 +127,11 @@ T.Control {
     }
 
     contentItem: Item {
-        visible: hoverHandler.hovered ||
+        visible: !root.hideControls &&
+                 (hoverHandler.hovered ||
                  playButton.hovered ||
                  closeButton.hovered ||
-                 fullscreenButton.hovered
+                 fullscreenButton.hovered)
 
         // Raise the content item so that the handlers of the control do
         // not handle events that are to be handled by the handlers/items
