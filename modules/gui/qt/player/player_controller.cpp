@@ -1407,10 +1407,10 @@ void PlayerController::jumpBwd()
     vlc_player_JumpTime( d->m_player, vlc_tick_from_sec( -i_interval ) );
 }
 
-void PlayerController::jumpToTime(VLCTime i_time)
+void PlayerController::jumpTime(VLCTime i_time)
 {
     Q_D(PlayerController);
-    msg_Dbg( d->p_intf, "jumpToTime");
+    msg_Dbg( d->p_intf, "jumpTime");
     vlc_player_locker lock{ d->m_player };
     if( !d->isCurrentItemSynced() )
         return;
