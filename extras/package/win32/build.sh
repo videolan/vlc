@@ -659,7 +659,7 @@ else
     fi
 
     info "Configuring VLC"
-    ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS
+    ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS LTCFLAGS=-O0
 
     info "Compiling"
     make -j$JOBS ${COMPILEFLAGS}
