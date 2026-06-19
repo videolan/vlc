@@ -476,7 +476,14 @@ FocusScope {
                                 implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                                                          implicitContentHeight + topPadding + bottomPadding)
 
-                                contentItem: LyricsFlickable { id: lyricsFlickable }
+                                contentItem: LyricsFlickable {
+                                    id: lyricsFlickable
+
+                                    onPlayerPositionChangeRequested: (time) => {
+                                        Player.setTime(time)
+                                        lyricsFlickable.lyricsSyncToPlayback = true
+                                    }
+                                }
                             }
                             anchors.left: parent.left
                             anchors.right: parent.right
