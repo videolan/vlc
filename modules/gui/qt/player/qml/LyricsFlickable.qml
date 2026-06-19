@@ -45,6 +45,9 @@ Flickable {
     boundsBehavior: Flickable.StopAtBounds
     clip: !fadingEdge.implicitClipping && (height < implicitHeight)
 
+    // TODO: `vlcTime` type can not be used due to Qt 6.2:
+    signal playerPositionChangeRequested(var time)
+
     function snapToCurrentLyric() {
         const idx = Player.currentLyricIndex
         if (idx < 0)
