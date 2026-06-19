@@ -106,6 +106,7 @@ Flickable {
                 id: lyricDelegate
 
                 required property int index
+                // TODO: `timedText` type can not be used due to Qt 6.2:
                 required property var modelData
 
                 readonly property bool isCurrent: index === Player.currentLyricIndex
