@@ -71,7 +71,7 @@
     self = [super initWithLibraryWindow:libraryWindow];
     if (self) {
         _dataSource = [[VLCLibrarySearchDataSource alloc] init];
-        [self setupSearchField];
+        [self setupBackgroundView];
         [self setupStatusLabel];
         [self setupCollectionView];
         [self setupTableView];
@@ -82,14 +82,12 @@
 
 #pragma mark - Setup
 
-- (void)setupSearchField
+- (void)setupBackgroundView
 {
-    _searchField = [[NSSearchField alloc] init];
-    self.searchField.translatesAutoresizingMaskIntoConstraints = NO;
-    self.searchField.placeholderString = _NS("Search the library");
-    self.searchField.delegate = self;
-    self.searchField.sendsSearchStringImmediately = NO;
-    self.searchField.sendsWholeSearchString = NO;
+    _backgroundView = [[NSView alloc] init];
+    self.backgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.backgroundView.wantsLayer = YES;
+    self.backgroundView.layer.backgroundColor = NSColor.windowBackgroundColor.CGColor;
 }
 
 - (void)setupStatusLabel
@@ -223,6 +221,7 @@
     }
 
     if (self.presentationContainer != nil) {
+        [self.backgroundView removeFromSuperview];
         [self.collectionViewScrollView removeFromSuperview];
         [self.tableViewScrollView removeFromSuperview];
         [self.statusLabel removeFromSuperview];
@@ -235,10 +234,12 @@
     self.tableView.delegate = self.tableViewDelegate;
 
     self.presentationContainer = container;
+    [container addSubview:self.backgroundView];
     [container addSubview:self.collectionViewScrollView];
     [container addSubview:self.tableViewScrollView];
     [container addSubview:self.statusLabel];
 
+    [self.backgroundView applyConstraintsToFillSuperview];
     [self.collectionViewScrollView applyConstraintsToFillSuperview];
     [self.tableViewScrollView applyConstraintsToFillSuperview];
 
@@ -261,6 +262,7 @@
     if (self.presentationContainer == nil) {
         return;
     }
+    [self.backgroundView removeFromSuperview];
     [self.collectionViewScrollView removeFromSuperview];
     [self.tableViewScrollView removeFromSuperview];
     [self.statusLabel removeFromSuperview];
