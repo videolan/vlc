@@ -1230,7 +1230,7 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
 }
 
 static void dvbsub_render_pdata( decoder_t *, dvbsub_region_t *, int, int,
-                                 uint8_t *, int );
+                                 const uint8_t *, int );
 static void dvbsub_pdata2bpp( bs_t *, uint8_t *, int, int * );
 static void dvbsub_pdata4bpp( bs_t *, uint8_t *, int, int * );
 static void dvbsub_pdata8bpp( bs_t *, uint8_t *, int, int * );
@@ -1281,7 +1281,7 @@ static void decode_object( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length 
     if( i_coding_method == 0x00 )
     {
         int i_topfield, i_bottomfield;
-        uint8_t *p_topfield, *p_bottomfield;
+        const uint8_t *p_topfield, *p_bottomfield;
 
         i_topfield    = bs_read( s, 16 );
         i_bottomfield = bs_read( s, 16 );
@@ -1332,7 +1332,7 @@ static void decode_object( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length 
     {
         /* DVB subtitling as characters */
         int i_number_of_codes = bs_read( s, 8 );
-        uint8_t* p_start = s->p_start + bs_pos( s ) / 8;
+        const uint8_t* p_start = s->p_start + bs_pos( s ) / 8;
 
         /* Sanity check */
         if( ( i_segment_length < ( i_number_of_codes*2 + 4 ) ) ||
@@ -1377,7 +1377,7 @@ static void decode_object( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length 
 
 static void dvbsub_render_pdata( decoder_t *p_dec, dvbsub_region_t *p_region,
                                  int i_x, int i_y,
-                                 uint8_t *p_field, int i_field )
+                                 const uint8_t *p_field, int i_field )
 {
     uint8_t *p_pixbuf;
     int i_offset = 0;
