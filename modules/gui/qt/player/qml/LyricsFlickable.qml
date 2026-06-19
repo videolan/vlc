@@ -144,6 +144,12 @@ Flickable {
                     enabled: lyricsFlickable.animationsEnabled
                     OpacityAnimator { duration: VLCStyle.duration_long }
                 }
+
+                TapHandler {
+                    onTapped: {
+                        lyricsFlickable.playerPositionChangeRequested(lyricDelegate.modelData.time)
+                    }
+                }
             }
         }
     }
