@@ -176,6 +176,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryDataSource.h \
 	gui/macosx/library/VLCLibraryDataTypes.h \
 	gui/macosx/library/VLCLibraryDataTypes.m \
+	gui/macosx/library/VLCLibraryDynamicToolbarFlagsCapable.h \
 	gui/macosx/library/VLCLibraryNameCache.h \
 	gui/macosx/library/VLCLibraryNameCache.m \
 	gui/macosx/library/VLCLibraryGroupHeaderDelegate.h \
