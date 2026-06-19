@@ -71,6 +71,8 @@
     self = [super initWithLibraryWindow:libraryWindow];
     if (self) {
         _dataSource = [[VLCLibrarySearchDataSource alloc] init];
+        self.dataSource.viewMode = VLCLibrarySmallestSentinelViewModeSegment;
+
         [self setupBackgroundView];
         [self setupStatusLabel];
         [self setupCollectionView];
@@ -152,6 +154,9 @@
 
     _collectionViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.collectionView
                                                                   contentInsets:VLCLibraryUIUnits.libraryViewScrollViewContentInsets];
+    
+    self.dataSource.collectionView = self.collectionView;
+    self.collectionView.dataSource = self.dataSource;
 }
 
 - (void)setupTableView
@@ -177,6 +182,10 @@
 
     _tableViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.tableView
                                                              contentInsets:VLCLibraryUIUnits.libraryViewScrollViewContentInsets];
+
+    self.tableView.dataSource = self.dataSource;
+    self.tableView.delegate = self.tableViewDelegate;
+    self.dataSource.tableView = self.tableView;
 }
 
 - (void)setupPlaceholderView
@@ -216,47 +225,44 @@
 - (void)presentInContainer:(NSView *)container
 {
     NSParameterAssert(container);
-    if (self.presentationContainer == container) {
+    const VLCLibraryViewModeSegment viewMode =
+        VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
+    if (self.presentationContainer == container && self.dataSource.viewMode == viewMode) {
         return;
     }
 
-    if (self.presentationContainer != nil) {
+    if (self.presentationContainer != container) {
         [self.backgroundView removeFromSuperview];
         [self.collectionViewScrollView removeFromSuperview];
         [self.tableViewScrollView removeFromSuperview];
         [self.statusLabel removeFromSuperview];
+
+        [container addSubview:self.backgroundView];
+        [self.backgroundView applyConstraintsToFillSuperview];
+
+        [container addSubview:self.statusLabel];
+        [NSLayoutConstraint activateConstraints:@[
+            [self.statusLabel.centerXAnchor constraintEqualToAnchor:container.centerXAnchor],
+            [self.statusLabel.centerYAnchor constraintEqualToAnchor:container.centerYAnchor],
+        ]];
+        self.statusLabel.hidden = YES;
     }
 
-    self.dataSource.collectionView = self.collectionView;
-    self.dataSource.tableView = self.tableView;
-    self.dataSource.viewMode =
-        VLCLibraryWindowPersistentPreferences.sharedInstance.searchLibraryViewMode;
-    self.collectionView.dataSource = self.dataSource;
-    self.tableView.dataSource = self.dataSource;
-    self.tableView.delegate = self.tableViewDelegate;
+    if (self.dataSource.viewMode != viewMode || self.presentationContainer != container) {
+        if (viewMode == VLCLibraryGridViewModeSegment) {
+            [self.tableViewScrollView removeFromSuperview];
+            [container addSubview:self.collectionViewScrollView];
+            [self.collectionViewScrollView applyConstraintsToFillSuperview];
+        } else if (viewMode == VLCLibraryListViewModeSegment) {
+            [self.collectionViewScrollView removeFromSuperview];
+            [container addSubview:self.tableViewScrollView];
+            [self.tableViewScrollView applyConstraintsToFillSuperview];
+        }
+        self.dataSource.viewMode = viewMode;
+        [self updatePresentationForQuery:self.currentQuery ?: @""];
+    }
 
     self.presentationContainer = container;
-    [container addSubview:self.backgroundView];
-    [container addSubview:self.collectionViewScrollView];
-    [container addSubview:self.tableViewScrollView];
-    [container addSubview:self.statusLabel];
-
-    [self.backgroundView applyConstraintsToFillSuperview];
-    [self.collectionViewScrollView applyConstraintsToFillSuperview];
-    [self.tableViewScrollView applyConstraintsToFillSuperview];
-
-    [NSLayoutConstraint activateConstraints:@[
-        [self.statusLabel.centerXAnchor constraintEqualToAnchor:container.centerXAnchor],
-        [self.statusLabel.centerYAnchor constraintEqualToAnchor:container.centerYAnchor],
-    ]];
-
-    // Cover the container immediately so the home view (or whatever is below) is
-    // not visible. The caller is expected to follow up with `searchForString:` or
-    // `updatePresentationForQuery:` to refine the visibility (results vs. status
-    // label text) based on the current query and data source state.
-    self.collectionViewScrollView.hidden = YES;
-    self.tableViewScrollView.hidden = YES;
-    self.statusLabel.hidden = YES;
 }
 
 - (void)dismissFromContainer
@@ -296,14 +302,9 @@
     const BOOL hasSearchText = query.length > 0;
     const BOOL hasResults = hasSearchText && [self hasAnyResults];
 
-    // Show results as soon as any provider has reported matches, even if more are
-    // still on the way. The status label is shown whenever there are no results to
-    // display, with the wording depending on whether the user has typed anything.
-    const BOOL showResults = hasResults;
-
-    self.collectionViewScrollView.hidden = !(showResults && gridMode);
-    self.tableViewScrollView.hidden = !(showResults && !gridMode);
-    self.statusLabel.hidden = showResults;
+    self.collectionViewScrollView.hidden = !(hasResults && gridMode);
+    self.tableViewScrollView.hidden = !(hasResults && !gridMode);
+    self.statusLabel.hidden = hasResults;
     if (!self.statusLabel.hidden) {
         self.statusLabel.stringValue = hasSearchText
             ? _NS("No results")

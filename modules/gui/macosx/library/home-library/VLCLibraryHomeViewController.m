@@ -169,6 +169,8 @@
 {
     if (VLCMain.sharedInstance.libraryController.libraryModel.numberOfVideoMedia == 0) { // empty library
         [self presentPlaceholderHomeLibraryView];
+    } else if (self.isShowingSearchOverlay) {
+        [self presentSearchOverlay];
     } else {
         [self presentHomeLibraryView];
     }
@@ -191,6 +193,13 @@
     [self.libraryWindow displayLibraryView:self.homeLibraryView];
     self.homeLibraryStackViewScrollView.hidden = NO;
     [self.stackViewController reloadData];
+}
+
+- (void)presentSearchOverlay
+{
+    [self.searchViewController presentInContainer:self.libraryTargetView];
+    self.isShowingSearchOverlay = YES;
+    [self.libraryWindow updateToolbarDisplayFlags];
 }
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
@@ -246,14 +255,10 @@
 - (void)showSearchOverlayForQuery:(NSString *)query
 {
     NSParameterAssert(query && query.length > 0);
-
-    VLCLibrarySearchViewController * const searchVC = self.searchViewController;
     if (!self.isShowingSearchOverlay) {
-        [searchVC presentInContainer:self.libraryTargetView];
-        self.isShowingSearchOverlay = YES;
-        [self.libraryWindow updateToolbarDisplayFlags];
+        [self presentSearchOverlay];
     }
-    [searchVC searchForString:query];
+    [self.searchViewController searchForString:query];
 }
 
 - (void)hideSearchOverlay

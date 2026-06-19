@@ -35,6 +35,7 @@
 
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibraryWindow.h"
 
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
@@ -84,7 +85,6 @@
     NSArray<VLCLibrarySearchFlattenedRow *> *_flattenedRows;
     NSMutableDictionary<NSString *, VLCMediaLibraryDummyItem *> *_cachedProviderParentItems;
     NSUInteger _pendingProviderCount;
-    BOOL _reloadScheduled;
     dispatch_queue_t _rebuildQueue;
 }
 @end
@@ -126,8 +126,9 @@
     if (_pendingProviderCount == 0) {
         _searching = NO;
     }
-    [self scheduleRebuildVisibleIndices];
-    if (self.viewMode != VLCLibraryGridViewModeSegment) {
+    if (self.viewMode == VLCLibraryGridViewModeSegment) {
+        [self scheduleRebuildVisibleIndices];
+    } else {
         [self scheduleRebuildFlattenedRows];
     }
 }
@@ -146,7 +147,7 @@
                 return;
             }
             strongSelf->_visibleProviderIndices = newVisibleIndices;
-            [strongSelf scheduleViewReload];
+            [strongSelf.collectionView reloadData];
         });
     });
 }
@@ -170,7 +171,7 @@
             strongSelf->_visibleProviderIndices = newVisibleIndices;
             strongSelf->_flattenedRows = newFlattenedRows;
             [strongSelf->_cachedProviderParentItems removeAllObjects];
-            [strongSelf scheduleViewReload];
+            [strongSelf.tableView reloadData];
         });
     });
 }
@@ -203,52 +204,12 @@
 
 - (void)reloadData
 {
-    [self updateVisibleProviderIndices];
-    if (self.viewMode != VLCLibraryGridViewModeSegment) {
-        [self rebuildFlattenedRows];
-    } else {
-        _flattenedRows = @[];
-    }
     [_cachedProviderParentItems removeAllObjects];
-
-    if (self.tableView.dataSource == self) {
-        [self.tableView reloadData];
+    if (self.viewMode != VLCLibraryGridViewModeSegment) {
+        [self scheduleRebuildFlattenedRows];
+    } else {
+        [self scheduleRebuildVisibleIndices];
     }
-    if (self.collectionView.dataSource == self) {
-        [self.collectionView reloadData];
-    }
-}
-
-// Coalesce view reloads. The expensive part of a refresh is the actual
-// NSCollectionView / NSTableView reload, so we always defer that to the next
-// run-loop iteration.
-- (void)scheduleViewReload
-{
-    if (_reloadScheduled) {
-        return;
-    }
-    _reloadScheduled = YES;
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (strongSelf == nil) {
-            return;
-        }
-        strongSelf->_reloadScheduled = NO;
-        // Only reload views that are actually visible. The search view toggles
-        // the hidden state of the scroll views (not the collection/table views
-        // themselves), so we walk up to the enclosing scroll view to check.
-        if (strongSelf.tableView.dataSource == strongSelf &&
-            strongSelf.tableView.enclosingScrollView != nil &&
-            !strongSelf.tableView.enclosingScrollView.hidden) {
-            [strongSelf.tableView reloadData];
-        }
-        if (strongSelf.collectionView.dataSource == strongSelf &&
-            strongSelf.collectionView.enclosingScrollView != nil &&
-            !strongSelf.collectionView.enclosingScrollView.hidden) {
-            [strongSelf.collectionView reloadData];
-        }
-    });
 }
 
 #pragma mark - Search
@@ -279,42 +240,13 @@
     }
     _viewMode = viewMode;
     if (viewMode == VLCLibraryGridViewModeSegment) {
-        [self scheduleViewReload];
+        [self scheduleRebuildVisibleIndices];
     } else {
         [self scheduleRebuildFlattenedRows];
     }
 }
 
 #pragma mark - Data management
-
-- (void)updateVisibleProviderIndices
-{
-    NSMutableArray<NSNumber *> * const visible = [NSMutableArray array];
-    for (NSUInteger i = 0; i < _providers.count; i++) {
-        if (_providers[i].results.count > 0) {
-            [visible addObject:@(i)];
-        }
-    }
-    _visibleProviderIndices = [visible copy];
-}
-
-- (void)rebuildFlattenedRows
-{
-    NSMutableArray<VLCLibrarySearchFlattenedRow *> * const rows = [NSMutableArray array];
-
-    for (NSNumber * const indexNumber in _visibleProviderIndices) {
-        const NSUInteger providerIndex = indexNumber.unsignedIntegerValue;
-        VLCLibrarySearchProvider * const provider = _providers[providerIndex];
-        const NSUInteger resultCount = provider.results.count;
-
-        [rows addObject:[VLCLibrarySearchFlattenedRow headerForProvider:providerIndex]];
-        for (NSUInteger i = 0; i < resultCount; i++) {
-            [rows addObject:[VLCLibrarySearchFlattenedRow itemAtIndex:i forProvider:providerIndex]];
-        }
-    }
-
-    _flattenedRows = [rows copy];
-}
 
 - (VLCLibrarySearchProvider *)providerForVisibleSection:(NSInteger)visibleSection
 {
