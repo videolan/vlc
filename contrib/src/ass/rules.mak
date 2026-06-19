@@ -16,6 +16,7 @@ WITH_HARFBUZZ = 0
 else
 ifdef HAVE_DARWIN_OS
 WITH_FONTCONFIG = 0
+WITH_CORETEXT = 1
 else
 ifdef HAVE_WINSTORE
 WITH_FONTCONFIG = 0
@@ -49,6 +50,10 @@ endif
 
 ifeq ($(WITH_DWRITE), 1)
 ASS_CONF += --enable-directwrite
+endif
+
+ifeq ($(WITH_CORETEXT), 1)
+ASS_CONF += --enable-coretext
 endif
 
 ifeq ($(WITH_ASS_ASM), 0)
