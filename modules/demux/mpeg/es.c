@@ -1598,6 +1598,71 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
             }
         }
     }
+    else if( i_tag == VLC_FOURCC('U', 'S', 'L', 'T') )
+    {
+        /* USLT frame: encoding(1) + language(3) + content descriptor + lyrics/text */
+        if( i_payload < 4 )
+            return VLC_SUCCESS;
+
+        const uint8_t i_encoding = p_payload[0];
+        char psz_language[4];
+        memcpy( psz_language, p_payload + 1, 3 );
+        psz_language[3] = '\0';
+
+        const uint8_t *p = p_payload + 4;
+        size_t i_remaining = i_payload - 4;
+
+        bool b_utf16 = (i_encoding == 0x01 || i_encoding == 0x02);
+
+        if( b_utf16 )
+        {
+            while( i_remaining >= 2 && (p[0] != 0 || p[1] != 0) )
+            {
+                p += 2;
+                i_remaining -= 2;
+            }
+            if( i_remaining < 2 )
+                return VLC_SUCCESS;
+            p += 2;
+            i_remaining -= 2;
+        }
+        else
+        {
+            while( i_remaining > 0 && *p != 0 )
+            {
+                p++;
+                i_remaining--;
+            }
+            if( i_remaining == 0 )
+                return VLC_SUCCESS;
+            p++;
+            i_remaining--;
+        }
+
+        char *psz_allocated = NULL;
+        const char *psz_text = ID3TextConv( p, i_remaining, i_encoding, &psz_allocated );
+        if( psz_text && *psz_text )
+        {
+            if( p_sys->p_meta == NULL )
+                p_sys->p_meta = vlc_meta_New();
+            if( p_sys->p_meta != NULL )
+            {
+                char psz_key[32];
+                snprintf( psz_key, sizeof(psz_key), "Lyrics:%s", psz_language );
+                vlc_meta_SetExtra( p_sys->p_meta, psz_key, psz_text );
+
+                /* Provide a synthetic sylt-data entry at t=0 so the Qt lyrics
+                 * panel can display USLT text using the same timed-lyrics path. */
+                char *psz_sylt;
+                if( asprintf( &psz_sylt, "0\x1F%s\x1E", psz_text ) >= 0 )
+                {
+                    vlc_meta_SetExtra( p_sys->p_meta, "sylt-data", psz_sylt );
+                    free( psz_sylt );
+                }
+            }
+        }
+        free( psz_allocated );
+    }
 
     return VLC_SUCCESS;
 }
