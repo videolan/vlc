@@ -987,6 +987,9 @@ void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang, int i_code_ext )
             && dvd_spu_code_ext[i_code_ext] )
             tk->fmt.psz_description =
                 strdup( vlc_gettext( dvd_spu_code_ext[i_code_ext] ) );
+
+        if( i_code_ext == DVD_SUBP_CODE_EXT_FORCED )
+            tk->fmt.subs.b_forced = true;
     }
 
     tk->es = es_out_Add( p_demux->out, &tk->fmt );
