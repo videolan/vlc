@@ -1380,10 +1380,10 @@ static const char *const mouse_wheel_texts[] = {
     N_("Select the hotkey to make a long forward jump.")
 #define FRAME_NEXT_KEY_TEXT N_("Next frame")
 #define FRAME_NEXT_KEY_LONGTEXT \
-    N_("Select the hotkey to got to the next video frame.")
+    N_("Select the hotkey to go to the next video frame.")
 #define FRAME_PREVIOUS_KEY_TEXT N_("Previous frame")
 #define FRAME_PREVIOUS_KEY_LONGTEXT \
-    N_("Select the hotkey to got to the previous video frame.")
+    N_("Select the hotkey to go to the previous video frame.")
 
 #define JIEXTRASHORT_TEXT N_("Very short jump length")
 #define JIEXTRASHORT_LONGTEXT N_("Very short jump length, in seconds.")
