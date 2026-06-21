@@ -233,6 +233,12 @@ void CompositorDirectComposition::setup()
 
     m_dcompDevice->Commit();
 
+    {
+        QMutexLocker lock(&m_setupStateLock);
+        m_setupState = SetupState::Success;
+        m_setupStateCond.notify_all();
+    }
+
     if (!m_mainCtx->hasAcrylicSurface())
     {
         if (var_InheritBool(m_intf, "qt-backdrop-blur"))
@@ -247,12 +253,6 @@ void CompositorDirectComposition::setup()
                     msg_Warn(m_intf, "%s", what);
             }
         }
-    }
-
-    {
-        QMutexLocker lock(&m_setupStateLock);
-        m_setupState = SetupState::Success;
-        m_setupStateCond.notify_all();
     }
 }
 
