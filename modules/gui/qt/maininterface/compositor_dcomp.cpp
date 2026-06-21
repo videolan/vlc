@@ -231,13 +231,13 @@ void CompositorDirectComposition::setup()
     res = m_rootVisual->AddVisual(m_uiVisual, FALSE, NULL);
     assert(res == S_OK);
 
-    m_dcompDevice->Commit();
-
     {
         QMutexLocker lock(&m_setupStateLock);
         m_setupState = SetupState::Success;
         m_setupStateCond.notify_all();
     }
+
+    m_dcompDevice->Commit();
 
     if (!m_mainCtx->hasAcrylicSurface())
     {
