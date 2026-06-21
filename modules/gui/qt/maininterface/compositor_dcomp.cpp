@@ -243,15 +243,20 @@ void CompositorDirectComposition::setup()
     {
         if (var_InheritBool(m_intf, "qt-backdrop-blur"))
         {
-            try
-            {
-                m_acrylicSurface = std::make_unique<CompositorDCompositionAcrylicSurface>(m_intf, this, m_mainCtx, m_dcompDevice);
-            }
-            catch (const std::exception& exception)
-            {
-                if (const auto what = exception.what())
-                    msg_Warn(m_intf, "%s", what);
-            }
+            QMetaObject::invokeMethod(this, [this]() {
+                if (Q_UNLIKELY(!m_dcompDevice || !interfaceMainWindow()))
+                    return;
+
+                try
+                {
+                    m_acrylicSurface = std::make_unique<CompositorDCompositionAcrylicSurface>(m_intf, this, m_mainCtx, m_dcompDevice);
+                }
+                catch (const std::exception& exception)
+                {
+                    if (const auto what = exception.what())
+                        msg_Warn(m_intf, "%s", what);
+                }
+            }, Qt::QueuedConnection);
         }
     }
 }
