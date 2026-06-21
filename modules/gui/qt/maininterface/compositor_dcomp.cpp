@@ -119,27 +119,6 @@ bool CompositorDirectComposition::init()
             return false;
     }
 
-    std::unique_ptr<std::remove_pointer_t<HMODULE>, BOOL WINAPI (*)(HMODULE)>
-        dcomplib(::LoadLibraryEx(TEXT("dcomp.dll"), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32), ::FreeLibrary);
-
-    typedef HRESULT (__stdcall *DCompositionCreateDeviceFuncPtr)(
-        _In_opt_ IDXGIDevice *dxgiDevice,
-        _In_ REFIID iid,
-        _Outptr_ void **dcompositionDevice);
-    DCompositionCreateDeviceFuncPtr func = nullptr;
-    if (dcomplib)
-    {
-        func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
-            GetProcAddress(dcomplib.get(), "DCompositionCreateDevice"));
-    }
-
-    Microsoft::WRL::ComPtr<IDCompositionDevice> device;
-    if (!func || FAILED(func(nullptr, IID_PPV_ARGS(&device))))
-    {
-        msg_Warn(m_intf, "Can not create DCompositionDevice. CompositorDirectComposition will not work.");
-        return false;
-    }
-
     QString sceneGraphBackend = qEnvironmentVariable("QT_QUICK_BACKEND");
     if (!sceneGraphBackend.isEmpty() /* if empty, RHI is used */ &&
         sceneGraphBackend != QLatin1String("rhi"))
@@ -174,6 +153,27 @@ bool CompositorDirectComposition::init()
     if (Q_UNLIKELY(qEnvironmentVariableIntValue("QT_D3D_NO_FLIP")))
     {
         // Qt does not use Direct Composition with the legacy swapchain model.
+        return false;
+    }
+
+    std::unique_ptr<std::remove_pointer_t<HMODULE>, BOOL WINAPI (*)(HMODULE)>
+        dcomplib(::LoadLibraryEx(TEXT("dcomp.dll"), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32), ::FreeLibrary);
+
+    typedef HRESULT (__stdcall *DCompositionCreateDeviceFuncPtr)(
+        _In_opt_ IDXGIDevice *dxgiDevice,
+        _In_ REFIID iid,
+        _Outptr_ void **dcompositionDevice);
+    DCompositionCreateDeviceFuncPtr func = nullptr;
+    if (dcomplib)
+    {
+        func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
+            GetProcAddress(dcomplib.get(), "DCompositionCreateDevice"));
+    }
+
+    Microsoft::WRL::ComPtr<IDCompositionDevice> device;
+    if (!func || FAILED(func(nullptr, IID_PPV_ARGS(&device))))
+    {
+        msg_Warn(m_intf, "Can not create DCompositionDevice. CompositorDirectComposition will not work.");
         return false;
     }
 
