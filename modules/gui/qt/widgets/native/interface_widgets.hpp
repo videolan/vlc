@@ -62,6 +62,10 @@ public slots:
     void askForUpdate();
     void setArtFromFile();
     void clear();
+
+signals:
+    void editing();
+    void artSelected( const QString& );
 };
 
 #endif

@@ -2180,6 +2180,27 @@ void PlayerController::setArt( input_item_t *p_item, QString fileUrl )
     }
 }
 
+void PlayerController::refreshMediaMeta( input_item_t *p_item )
+{
+    if (p_item == nullptr)
+        return;
+
+    Q_D(PlayerController);
+
+    const bool isCurrentItem = [d, p_item]() {
+        vlc_player_locker lock{ d->m_player };
+        return p_item == vlc_player_GetCurrentMedia( d->m_player );
+    }();
+
+    if (!isCurrentItem)
+        return;
+
+    d->UpdateName( p_item );
+    d->UpdateArt( p_item );
+    d->UpdateMeta( p_item );
+    d->UpdateInfo( p_item );
+}
+
 bool PlayerController::associateSubtitleFile(const QString &uri)
 {
     return AddAssociatedMedia(SPU_ES, uri, true, true, true) == VLC_SUCCESS;

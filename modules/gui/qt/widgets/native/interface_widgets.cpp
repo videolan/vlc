@@ -77,7 +77,10 @@ CoverArtLabel::~CoverArtLabel()
 void CoverArtLabel::setItem( const SharedInputItem& _p_item )
 {
     if( _p_item == p_item )
+    {
+        showArtUpdate();
         return;
+    }
 
     p_item = _p_item;
 
@@ -138,7 +141,9 @@ void CoverArtLabel::setArtFromFile()
     if( fileUrl.isEmpty() )
         return;
 
-    THEMIM->setArt( p_item.get(), fileUrl.toString() );
+    showArtUpdate( fileUrl.toLocalFile() );
+    emit artSelected( fileUrl.toString() );
+    emit editing();
 }
 
 void CoverArtLabel::clear()

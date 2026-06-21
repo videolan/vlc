@@ -302,6 +302,7 @@ public:
 
     void requestArtUpdate( input_item_t *p_item );
     void setArt( input_item_t *p_item, QString fileUrl );
+    void refreshMediaMeta( input_item_t *p_item );
     static const QString decodeArtURL( input_item_t *p_item );
     void updatePosition();
     void updateTime(vlc_tick_t system_now, bool forceTimer);

@@ -28,6 +28,7 @@
 
 #include "qt.hpp"
 #include "info_panels.hpp"
+#include "player/player_controller.hpp"
 #include "widgets/native/interface_widgets.hpp"
 #include "info_widgets.hpp"
 #include "dialogs/fingerprint/fingerprintdialog.hpp"
@@ -143,6 +144,10 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* ART_URL */
     art_cover = new CoverArtLabel( this, p_intf );
     metaLayout->addWidget( art_cover, line, 7, 6, 3, Qt::AlignCenter );
+    connect( art_cover, &CoverArtLabel::editing, this, &MetaPanel::enterEditMode );
+    connect( art_cover, &CoverArtLabel::artSelected, this, [this]( const QString& url ) {
+        currentURL = url;
+    } );
 
     ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
 
@@ -172,9 +177,6 @@ MetaPanel::MetaPanel( QWidget *parent,
     connect( seqtot_text, &QLineEdit::textEdited, this, &MetaPanel::enterEditMode );
 
     connect( date_text, &QLineEdit::textEdited, this, &MetaPanel::enterEditMode );
-//    connect( THEMIM, QOverload<input_item_t *>::of(&PlayerController::artChanged),
-//             this, &MetaPanel::enterEditMode );
-
     /* We are not yet in Edit Mode */
     b_inEditMode = false;
 }
@@ -251,6 +253,9 @@ void MetaPanel::update( const SharedInputItem& p_item )
 #undef UPDATE_META
 
     art_cover->setItem( p_item );
+    char *psz_art = input_item_GetArtURL( inputItem );
+    currentURL = qfu( psz_art ? psz_art : "" );
+    free( psz_art );
 }
 
 /**
@@ -278,6 +283,8 @@ bool MetaPanel::saveMeta()
     input_item_SetCopyright( input, qtu( copyright_text->text() ) );
     input_item_SetPublisher( input, qtu( publisher_text->text() ) );
     input_item_SetDescription( input, qtu( description_text->toPlainText() ) );
+    if( !currentURL.isEmpty() )
+        input_item_SetArtURL( input, qtu( currentURL ) );
 
     /* Reset the status of the mode. No need to emit any signal because parent
        is the only caller */
@@ -287,6 +294,10 @@ bool MetaPanel::saveMeta()
         QMessageBox::warning( this, qtr("Metadata"), qtr("Failed to save metadata") );
         return false;
     }
+    art_cover->setItem( p_input );
+    /* Refresh the player controller caches for the currently playing item so
+     * the Qt UI sees the new artwork and metadata without reopening. */
+    THEMIM->refreshMediaMeta( input );
     return true;
 }
 
@@ -328,6 +339,7 @@ void MetaPanel::clear()
     publisher_text->clear();
     encodedby_text->clear();
     art_cover->clear();
+    currentURL.clear();
     fingerprintButton->setEnabled( false );
 
     setEditMode( false );
