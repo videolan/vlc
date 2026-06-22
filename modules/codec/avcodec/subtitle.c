@@ -34,6 +34,7 @@
 
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
+#include <libavutil/opt.h>
 
 #include "avcodec.h"
 
@@ -65,6 +66,11 @@ int InitSubtitleDec(vlc_object_t *obj)
     /* */
     switch (codec->id) {
     case AV_CODEC_ID_HDMV_PGS_SUBTITLE:
+        /* a track marked forced shows only its forced captions */
+        if (dec->fmt_in->subs.b_forced) {
+            av_opt_set_int(context->priv_data, "forced_subs_only", 1, 0);
+        }
+        break;
     case AV_CODEC_ID_XSUB:
     case AV_CODEC_ID_DVB_SUBTITLE:
         break;
