@@ -48,6 +48,7 @@
 #include <vlc_input.h>
 #include <vlc_charset.h>
 #include "disc_helper.h"
+#include "dvd_description.h"
 
 
 /*****************************************************************************
@@ -860,7 +861,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
 
                 if( !tk->b_configured )
                 {
-                    DvdReadESNew( p_demux, i_id, 0 );
+                    DvdReadESNew( p_demux, i_id, 0, 0 );
                 }
                 if( tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
@@ -914,7 +915,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
 /*****************************************************************************
  * ESNew: register a new elementary stream
  *****************************************************************************/
-void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang )
+void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang, int i_code_ext )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     ps_track_t  *tk = &p_sys->tk[ps_id_to_tk(i_id)];
@@ -966,6 +967,11 @@ void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang )
 #endif
 
         if( psz_language[0] ) tk->fmt.psz_language = strdup( psz_language );
+
+        if( (size_t) i_code_ext < ARRAY_SIZE(dvd_audio_code_ext)
+            && dvd_audio_code_ext[i_code_ext] )
+            tk->fmt.psz_description =
+                strdup( vlc_gettext( dvd_audio_code_ext[i_code_ext] ) );
     }
     else if( tk->fmt.i_cat == SPU_ES )
     {
@@ -976,6 +982,11 @@ void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang )
         memcpy( tk->fmt.subs.spu.palette, p_sys->clut, sizeof( p_sys->clut ) );
 
         if( psz_language[0] ) tk->fmt.psz_language = strdup( psz_language );
+
+        if( (size_t) i_code_ext < ARRAY_SIZE(dvd_spu_code_ext)
+            && dvd_spu_code_ext[i_code_ext] )
+            tk->fmt.psz_description =
+                strdup( vlc_gettext( dvd_spu_code_ext[i_code_ext] ) );
     }
 
     tk->es = es_out_Add( p_demux->out, &tk->fmt );

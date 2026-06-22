@@ -190,7 +190,7 @@ int OpenAudio( vlc_object_t * );
 uint32_t   DvdVRGetProgramSectorSpan( const demux_sys_t *, const vobu_map_t * );
 #endif
 
-void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang );
+void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang, int i_code_ext );
 void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data );
 
 extern const dvdread_ops_t DvdReadVideoOps;

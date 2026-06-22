@@ -678,7 +678,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         /* TODO: re-add angles */
 
 
-        DvdReadESNew( p_demux, 0xe0, 0 ); /* Video, FIXME ? */
+        DvdReadESNew( p_demux, 0xe0, 0, 0 ); /* Video, FIXME ? */
         const video_attr_t *p_attr = &p_vts->vtsi_mat->vts_video_attr;
         int i_video_height = p_attr->video_format != 0 ? 576 : 480;
         int i_video_width;
@@ -752,7 +752,9 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                 }
 
                 DvdReadESNew( p_demux, i_id, p_sys->p_vts_file->vtsi_mat->
-                       vts_audio_attr[i - 1].lang_code );
+                       vts_audio_attr[i - 1].lang_code,
+                       p_sys->p_vts_file->vtsi_mat->
+                       vts_audio_attr[i - 1].code_extension );
             }
         }
 
@@ -798,7 +800,9 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                 i_id = (0x20 + i_position) | PS_PACKET_ID_MASK_VOB;
 
                 DvdReadESNew( p_demux, i_id, p_sys->p_vts_file->vtsi_mat->
-                       vts_subp_attr[i - 1].lang_code );
+                       vts_subp_attr[i - 1].lang_code,
+                       p_sys->p_vts_file->vtsi_mat->
+                       vts_subp_attr[i - 1].code_extension );
             }
         }
 
