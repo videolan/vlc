@@ -1697,6 +1697,7 @@ static void ESNew( demux_t *p_demux, int i_id )
         }
     }
 
+    assert( tk->fmt.psz_language == NULL );
     if( i_lang != 0xffff )
     {
         tk->fmt.psz_language = malloc( 3 );

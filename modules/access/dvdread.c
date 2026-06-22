@@ -936,6 +936,7 @@ void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang )
     }
 
     /* Add a new ES */
+    assert( tk->fmt.psz_language == NULL );
     if( tk->fmt.i_cat == VIDEO_ES )
     {
         tk->fmt.video.i_sar_num = p_sys->i_sar_num;
