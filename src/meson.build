@@ -26,6 +26,13 @@ fourcc = custom_target('fourcc_tables.h',
                         command: [fourcc_gen])
 
 
+meson_build_config = custom_target('build_config.c',
+    command: [find_program('../buildsystem/gen-build-config.py'),
+              meson.build_options().replace('\'"\'"\'', '\\\'')],
+    capture: true,
+    output: 'build_config.c',
+)
+
 #
 # libvlccore dependencies
 #
@@ -36,7 +43,6 @@ libvlccore_deps = [
 ]
 
 vlccore_cargs = [ '-DMODULE_STRING="core"', '-DHAVE_DYNAMIC_PLUGINS' ]
-vlccore_cargs += [ '-DCONFIGURE_LINE="@0@"'.format(meson.build_options().replace('\'"\'"\'', '\\\'').replace('"','\'')) ]
 libvlccore_link_args = []
 
 if host_system == 'darwin'
@@ -297,6 +303,8 @@ libvlccore_sources_base = files(
     'misc/rcu.c',
     'misc/tracer.c',
 )
+
+libvlccore_sources_base += meson_build_config
 
 libvlccore_sout_sources = [
     'stream_output/sap.c',

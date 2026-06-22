@@ -44,6 +44,11 @@
 #include "rcu.h"
 #include "../libvlc.h"
 
+#ifndef CONFIGURE_LINE
+// generated C file
+extern const char CONFIGURE_LINE[];
+#endif
+
 #ifdef _WIN32
 static const char msg_type[4][9] = { "", " error", " warning", " debug" };
 
