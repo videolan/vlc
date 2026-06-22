@@ -279,7 +279,7 @@ endif
 EXTRA_LTLIBRARIES += libvcd_plugin.la
 access_PLUGINS += $(LTLIBvcd)
 
-libdvdnav_plugin_la_SOURCES = access/disc_helper.h access/dvdnav.c demux/mpeg/ps.h demux/mpeg/pes.h
+libdvdnav_plugin_la_SOURCES = access/disc_helper.h access/dvd_description.h access/dvdnav.c demux/mpeg/ps.h demux/mpeg/pes.h
 libdvdnav_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVDNAV_CFLAGS)
 libdvdnav_plugin_la_LIBADD = $(DVDNAV_LIBS)
 libdvdnav_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(access_RPATH)

@@ -65,6 +65,7 @@ dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
 #include "../demux/timestamps_filter.h"
 
 #include "disc_helper.h"
+#include "dvd_description.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -1675,12 +1676,34 @@ static void ESNew( demux_t *p_demux, int i_id )
             {
                 b_select = true;
             }
+
+            /* Audio track description from code_extension */
+            audio_attr_t audio_attr;
+            if( dvdnav_get_audio_attr( p_sys->dvdnav, i_audio, &audio_attr )
+                == DVDNAV_STATUS_OK )
+            {
+                    if( audio_attr.code_extension < ARRAY_SIZE(dvd_audio_code_ext)
+                    && dvd_audio_code_ext[audio_attr.code_extension] )
+                    tk->fmt.psz_description =
+                        strdup( vlc_gettext( dvd_audio_code_ext[audio_attr.code_extension] ) );
+            }
         }
     }
     else if( tk->fmt.i_cat == SPU_ES )
     {
         int32_t i_title, i_part;
         i_lang = dvdnav_spu_stream_to_lang( p_sys->dvdnav, i_id&0x1f );
+
+        /* Subtitle track description from code_extension */
+        subp_attr_t subp_attr;
+        if( dvdnav_get_spu_attr( p_sys->dvdnav, i_id&0x1f, &subp_attr )
+            == DVDNAV_STATUS_OK )
+        {
+            if( subp_attr.code_extension < ARRAY_SIZE(dvd_spu_code_ext)
+                && dvd_spu_code_ext[subp_attr.code_extension] )
+                tk->fmt.psz_description =
+                    strdup( vlc_gettext( dvd_spu_code_ext[subp_attr.code_extension] ) );
+        }
 
         /* Palette */
         tk->fmt.subs.spu.b_palette = true;
