@@ -81,6 +81,10 @@ dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
 
 #define LANGUAGE_DEFAULT ("en")
 
+/* dvdnav_get_active_spu_stream sets this bit when subtitles are hidden
+   and only forced captions should show */
+#define DVDNAV_SPU_HIDDEN 0x80
+
 static int  AccessDemuxOpen ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -1721,6 +1725,8 @@ static void ESNew( demux_t *p_demux, int i_id )
             (i_active_spu & 0x1f) == (i_id&0x1f) )
         {
             b_select = true;
+            if( i_active_spu & DVDNAV_SPU_HIDDEN )
+                tk->fmt.subs.b_forced = true;
         }
     }
 
