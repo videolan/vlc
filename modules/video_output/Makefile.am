@@ -113,7 +113,7 @@ endif
 
 libvout_ios_plugin_la_SOURCES = video_output/opengl/display.c $(OPENGL_VOUT_COMMONSOURCES)
 libvout_ios_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS) -DUSE_OPENGL_ES2
-libvout_ios_plugin_la_LIBADD = libvlc_opengles.la
+libvout_ios_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
 
 libuiview_window_plugin_la_SOURCES = video_output/apple/VLCVideoUIView.m
 libuiview_window_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
