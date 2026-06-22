@@ -49,16 +49,6 @@
 #include <vlc_charset.h>
 #include "disc_helper.h"
 
-extern const dvdread_ops_t DvdReadVideoOps;
-extern void DvdReadHandleDSI( demux_t *, uint8_t * );
-void DvdReadESNew( demux_t *, int, int );
-
-#ifdef DVDREAD_HAS_DVDVIDEORECORDING
-extern const dvdread_ops_t DvdVRReadOps;
-#endif
-#ifdef DVDREAD_HAS_DVDAUDIO
-extern const dvdread_ops_t DvdAudioReadOps;
-#endif
 
 /*****************************************************************************
  * Module descriptor

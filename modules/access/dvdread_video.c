@@ -30,9 +30,6 @@
 #include <limits.h>
 #include <vlc_arrays.h>
 
-extern void DvdReadESNew( demux_t *, int, int );
-void DvdReadHandleDSI( demux_t *, uint8_t * );
-
 static vlc_tick_t dvdtime_to_time( const dvd_time_t *dtime )
 {
 /* Macro to convert Binary Coded Decimal to Decimal */
