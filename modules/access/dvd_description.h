@@ -18,6 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <dvdread/version.h>
+
 /**
  * DVD audio track code_extension values as defined in the DVD-Video spec.
  * Maps audio_attr_t.code_extension to translatable description strings.
@@ -29,6 +31,11 @@ static const char *const dvd_audio_code_ext[] = {
     /* 3 */ N_("Director's comments"),
     /* 4 */ N_("Alternate director's comments"),
 };
+
+/* older libdvdread does not have this enum yet */
+#if DVDREAD_VERSION < DVDREAD_VERSION_CODE(7, 1, 0)
+# define DVD_SUBP_CODE_EXT_FORCED 9
+#endif
 
 /**
  * DVD subtitle track code_extension values as defined in the DVD-Video spec.

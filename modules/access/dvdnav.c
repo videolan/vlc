@@ -1703,6 +1703,9 @@ static void ESNew( demux_t *p_demux, int i_id )
                 && dvd_spu_code_ext[subp_attr.code_extension] )
                 tk->fmt.psz_description =
                     strdup( vlc_gettext( dvd_spu_code_ext[subp_attr.code_extension] ) );
+
+            if( subp_attr.code_extension == DVD_SUBP_CODE_EXT_FORCED )
+                tk->fmt.subs.b_forced = true;
         }
 
         /* Palette */
