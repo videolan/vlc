@@ -339,6 +339,8 @@ error:
     {
         free( p_sig->specific.v4.hashed_data );
         free( p_sig->specific.v4.unhashed_data );
+        p_sig->specific.v4.hashed_data = NULL;
+        p_sig->specific.v4.unhashed_data = NULL;
     }
 
     return VLC_EGENERIC;
@@ -714,6 +716,8 @@ error:
     {
         free( p_key->sig.specific.v4.hashed_data );
         free( p_key->sig.specific.v4.unhashed_data );
+        p_key->sig.specific.v4.hashed_data = NULL;
+        p_key->sig.specific.v4.unhashed_data = NULL;
     }
     free( p_key->psz_username );
     free( p_key_unarmored );
