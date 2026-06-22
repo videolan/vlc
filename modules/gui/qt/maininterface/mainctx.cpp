@@ -1101,15 +1101,20 @@ void MainCtx::setAttachedToolTip(QObject *toolTip)
     // Check if the attached tooltip is actually the
     // one that is set
 #ifndef NDEBUG
-    QQmlComponent component(engine);
-    component.setData(QByteArrayLiteral("import QtQuick; import QtQuick.Controls; Item { }"), {});
-    QObject* const obj = component.create();
-    assert(obj);
-    // Consider disabling setting of custom attached
-    // tooltip if the following assertion fails:
-    if (QQmlProperty::read(obj, QStringLiteral("ToolTip.toolTip"), qmlContext(obj)).value<QObject*>() != toolTip)
-        qmlWarning(obj) << "Could not set self as custom ToolTip!";
-    obj->deleteLater();
+    QMetaObject::invokeMethod(toolTip, [toolTip]() {
+        const auto engine = qmlEngine(toolTip);
+        if (Q_UNLIKELY(!engine)) // Very unlikely, if not impossible
+            return;
+        QQmlComponent component(engine);
+        component.setData(QByteArrayLiteral("import QtQuick; import QtQuick.Controls; Item { }"), {});
+        QObject* const obj = component.create();
+        assert(obj);
+        // Consider disabling setting of custom attached
+        // tooltip if the following assertion fails:
+        if (QQmlProperty::read(obj, QStringLiteral("ToolTip.toolTip"), qmlContext(obj)).value<QObject*>() != toolTip)
+            qmlWarning(obj) << "Could not set self as custom ToolTip!";
+        obj->deleteLater();
+    }, Qt::QueuedConnection);
 #endif
 }
 
