@@ -25,6 +25,7 @@ MIN_MESON=0.60.0
 MIN_NASM=2.15
 MIN_PROTOC=3.4.0
 MIN_NINJA=1.13.0
+MIN_ZSTD=1.2.0
 
 export LC_ALL=
 FOUND=
@@ -191,7 +192,7 @@ check help2man
 check meson $MIN_MESON
 check_ninja $MIN_NINJA
 check gettext
-check zstd
+check zstd $MIN_ZSTD
 
 DEPS_ONLY="help2man"
 
