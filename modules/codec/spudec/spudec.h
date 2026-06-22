@@ -26,6 +26,7 @@ typedef struct
 {
     bool b_packetizer;
     bool b_disabletrans;
+    bool b_forcedonly;
 
     vlc_tick_t i_pts;
     unsigned int i_spu_size;

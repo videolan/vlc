@@ -47,6 +47,7 @@ typedef struct
     vlc_tick_t i_stop;
     bool b_ephemer;
     bool b_subtitle;
+    bool b_forced;
 } spu_properties_t;
 
 typedef struct
@@ -390,6 +391,7 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
     spu_properties.i_start = VLC_TICK_INVALID;
     spu_properties.i_stop = VLC_TICK_INVALID;
     spu_properties.b_subtitle = true;
+    spu_properties.b_forced = false;
 
     for( i_index = 4 + p_sys->i_rle_size; i_index < p_sys->i_spu_size ; )
     {
@@ -434,6 +436,7 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
              * works around non displayable (offset by few ms)
              * spu menu over still frame in SPU_Select */
             spu_properties.b_subtitle = false;
+            spu_properties.b_forced = true;
             i_index += 1;
             break;
 
@@ -569,7 +572,7 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
             i_index += 1;
 
             if( Validate( p_dec, i_index, i_cur_seq, i_next_seq,
-                          &spu_data, &spu_properties ) == VLC_SUCCESS )
+                          &spu_data, &spu_properties ) == VLC_SUCCESS && (!p_sys->b_forcedonly || spu_properties.b_forced))
                 OutputPicture( p_dec, &spu_data, &spu_properties, pf_queue );
 
             break;
