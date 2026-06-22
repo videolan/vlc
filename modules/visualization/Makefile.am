@@ -21,7 +21,9 @@ if HAVE_OSX
 libglspectrum_plugin_la_CPPFLAGS += -DGL_SILENCE_DEPRECATION
 endif
 if HAVE_GL
+if !HAVE_OSX
 visu_PLUGINS += libglspectrum_plugin.la
+endif
 endif
 
 libgoom_plugin_la_SOURCES = visualization/goom.c

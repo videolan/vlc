@@ -150,35 +150,9 @@ video_filter_PLUGINS += libci_filters_plugin.la
 endif
 
 libopengl_filter_plugin_la_SOURCES = video_filter/opengl.c
-
-if HAVE_WIN32
-libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
-if HAVE_GL
-video_filter_PLUGINS += libopengl_filter_plugin.la
-endif
-endif
-
-if HAVE_LINUX
-if HAVE_ANDROID
-libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
-libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
-video_filter_PLUGINS += libopengl_filter_plugin.la
-else
-libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
-if HAVE_GL
-video_filter_PLUGINS += libopengl_filter_plugin.la
-endif
-endif
-endif
-
-if HAVE_IOS_OR_TVOS
-libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
-libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
-video_filter_PLUGINS += libopengl_filter_plugin.la
-endif
-
-if HAVE_OSX
-libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
+libopengl_filter_plugin_la_LIBADD = $(GL_PLUGIN_LIBADD)
+libopengl_filter_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_PLUGIN_CFLAGS)
+if HAVE_GL_OR_GLES2
 video_filter_PLUGINS += libopengl_filter_plugin.la
 endif
 
@@ -208,28 +182,10 @@ libdeinterlace_plugin_la_LIBADD = libdeinterlace_common.la
 video_filter_PLUGINS += libdeinterlace_plugin.la
 
 libglblend_plugin_la_SOURCES = video_filter/deinterlace/glblend.c
-libglblend_plugin_la_CFLAGS = $(AM_CFLAGS)
-if HAVE_GL
-libglblend_plugin_la_LIBADD = libvlc_opengl.la
+libglblend_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_PLUGIN_CFLAGS)
+libglblend_plugin_la_LIBADD = $(GL_PLUGIN_LIBADD)
+if HAVE_GL_OR_GLES2
 video_filter_PLUGINS += libglblend_plugin.la
-endif
-
-if HAVE_OSX
-video_filter_PLUGINS += libglblend_plugin.la
-libglblend_plugin_la_LIBADD = libvlc_opengl.la
-endif
-if HAVE_IOS_OR_TVOS
-video_filter_PLUGINS += libglblend_plugin.la
-libglblend_plugin_la_LIBADD = libvlc_opengles.la
-libglblend_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
-endif
-
-if !HAVE_GL
-if HAVE_GLES2
-libglblend_plugin_la_LIBADD = libvlc_opengles.la
-libglblend_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
-video_filter_PLUGINS += libglblend_plugin.la
-endif
 endif
 
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.cpp
@@ -276,26 +232,8 @@ video_filter_PLUGINS += $(LTLIBopencv_example)
 EXTRA_LTLIBRARIES += libopencv_example_plugin.la
 
 libgladjust_plugin_la_SOURCES = video_filter/gladjust.c
-libgladjust_plugin_la_CFLAGS = $(AM_CFLAGS)
-if HAVE_GL
-libgladjust_plugin_la_LIBADD = libvlc_opengl.la
-video_filter_LTLIBRARIES += libgladjust_plugin.la
-endif
-if HAVE_DARWIN
-if !HAVE_WATCHOS
-if !HAVE_XROS
-if HAVE_OSX
-libgladjust_plugin_la_LIBADD = libvlc_opengl.la
-else
-libgladjust_plugin_la_LIBADD = libvlc_opengles.la
-libgladjust_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
-endif
-video_filter_LTLIBRARIES += libgladjust_plugin.la
-endif
-endif
-endif
-if HAVE_ANDROID
-libgladjust_plugin_la_LIBADD = libvlc_opengles.la
-libgladjust_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+libgladjust_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_PLUGIN_CFLAGS)
+libgladjust_plugin_la_LIBADD = $(GL_PLUGIN_LIBADD)
+if HAVE_GL_OR_GLES2
 video_filter_LTLIBRARIES += libgladjust_plugin.la
 endif

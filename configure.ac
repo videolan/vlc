@@ -3521,10 +3521,31 @@ PKG_CHECK_MODULES([GL], [gl], [
   AC_MSG_CHECKING([for OpenGL])
   AC_MSG_RESULT([${have_gl}])
 ])
-AM_CONDITIONAL([HAVE_GL], [test "${have_gl}" = "yes"])
 
 dnl OpenGL ES 2: depends on EGL 1.1
-PKG_HAVE_WITH_MODULES([GLES2], [glesv2], [enable GLES2 support (default auto)])
+have_gles2="no"
+PKG_WITH_MODULES([GLES2], [glesv2],
+  [have_gles2="yes"], [have_gles2="no"],
+  [enable GLES2 support (default auto)])
+
+dnl On Apple platforms OpenGL/OpenGL ES are provided as system frameworks
+dnl without pkg-config files, so the choice between desktop GL and GLES2 is
+dnl fully determined by the platform.
+AS_IF([test "${HAVE_OSX}" = "1"], [
+  have_gl="yes"
+  GL_LIBS="-Wl,-framework,OpenGL"
+  GL_CFLAGS="-DGL_SILENCE_DEPRECATION"
+])
+AS_IF([test "${HAVE_IOS_OR_TVOS}" = "1"], [
+  have_gles2="yes"
+  GLES2_LIBS="-Wl,-framework,OpenGLES"
+  GLES2_CFLAGS="-DGL_SILENCE_DEPRECATION"
+])
+
+AM_CONDITIONAL([HAVE_GL],    [test "${have_gl}" = "yes"])
+AM_CONDITIONAL([HAVE_GLES2], [test "${have_gles2}" = "yes"])
+AM_CONDITIONAL([HAVE_GL_OR_GLES2],
+  [test "${have_gl}" = "yes" -o "${have_gles2}" = "yes"])
 
 dnl
 dnl Vulkan
