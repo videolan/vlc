@@ -22,6 +22,7 @@
 
 #import "VLCLibraryTableCellView.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
@@ -151,7 +152,7 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 
     self.singlePrimaryTitleTextField.hidden = NO;
     self.singlePrimaryTitleTextField.stringValue = sectionString;
-    self.representedImageView.image = [NSImage imageNamed: @"noart.png"];
+    self.representedImageView.image = NSImage.VLCNoArtImage;
 
     _representedVideoLibrarySection = section;
 }

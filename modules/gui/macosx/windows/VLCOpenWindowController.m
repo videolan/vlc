@@ -762,7 +762,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     } else {
         msg_Warn(getIntf(), "unknown disk type, no idea what to display");
 
-        [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+        [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed:NSImageNameApplicationIcon]];
     }
 }
 
@@ -875,7 +875,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
             msg_Dbg(getIntf(), "no optical media found");
             [self->_discSelectorPopup setHidden: YES];
             [self setMRL:@""];
-            [self showOpticalMediaView: self->_discNoDiscView withIcon: [NSImage imageNamed: @"NSApplicationIcon"]];
+            [self showOpticalMediaView: self->_discNoDiscView withIcon: [NSImage imageNamed: NSImageNameApplicationIcon]];
         }
     });
 }

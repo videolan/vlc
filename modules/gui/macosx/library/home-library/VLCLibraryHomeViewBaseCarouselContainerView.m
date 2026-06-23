@@ -108,7 +108,7 @@
 
     const CGFloat buttonSize = VLCLibraryUIUnits.largeSpacing;
 
-    NSImage * const leftImage = [NSImage imageNamed:@"NSGoLeftTemplate"];
+    NSImage * const leftImage = [NSImage imageNamed:NSImageNameGoLeftTemplate];
     _leftButton = [[NSButton alloc] initWithFrame:NSZeroRect];
     self.leftButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.leftButton.image = leftImage;
@@ -122,7 +122,7 @@
         [self.leftButton.heightAnchor constraintEqualToConstant:buttonSize],
     ]];
 
-    NSImage * const rightImage = [NSImage imageNamed:@"NSGoRightTemplate"];
+    NSImage * const rightImage = [NSImage imageNamed:NSImageNameGoRightTemplate];
     _rightButton = [[NSButton alloc] initWithFrame:NSZeroRect];
     self.rightButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.rightButton.image = rightImage;

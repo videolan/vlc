@@ -633,7 +633,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"list.triangle"
                                                   accessibilityDescription:@"Playlists icon"];
         } else {
-            self.internalDisplayImage = [NSImage imageNamed:@"NSListViewTemplate"];
+            self.internalDisplayImage = [NSImage imageNamed:NSImageNameListViewTemplate];
             self.internalDisplayImage.template = YES;
         }
         self.internalMediaLibraryRequired = YES;
@@ -682,7 +682,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"play.rectangle"
                                                   accessibilityDescription:@"Group icon"];
         } else {
-            self.internalDisplayImage = [NSImage imageNamed:@"NSTouchBarTagIcon"];
+            self.internalDisplayImage = [NSImage imageNamed:NSImageNameTouchBarTagIconTemplate];
             self.internalDisplayImage.template = YES;
         }
         self.internalMediaLibraryRequired = YES;
@@ -722,7 +722,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"rectangle.3.group"
                                                   accessibilityDescription:@"Groups icon"];
         } else {
-            self.internalDisplayImage = [NSImage imageNamed:@"NSTouchBarTagIcon"];
+            self.internalDisplayImage = [NSImage imageNamed:NSImageNameTouchBarTagIconTemplate];
             self.internalDisplayImage.template = YES;
         }
         self.internalMediaLibraryRequired = YES;
@@ -784,7 +784,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
                 [NSImage imageWithSystemSymbolName:@"folder"
                           accessibilityDescription:@"Bookmarked location icon"];
         } else {
-            self.internalDisplayImage = [NSImage imageNamed:@"NSFolder"];
+            self.internalDisplayImage = [NSImage imageNamed:NSImageNameFolder];
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryGroupsViewController.class;
@@ -823,7 +823,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"folder"
                                                   accessibilityDescription:@"Browse icon"];
         } else {
-            self.internalDisplayImage = [NSImage imageNamed:@"NSFolder"];
+            self.internalDisplayImage = [NSImage imageNamed:NSImageNameFolder];
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryMediaSourceViewController.class;
@@ -896,7 +896,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
                 [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
                           accessibilityDescription:@"Streams icon"];
         } else {
-            self.internalDisplayImage = [NSImage imageNamed:@"NSActionTemplate"];
+            self.internalDisplayImage = [NSImage imageNamed:NSImageNameActionTemplate];
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryMediaSourceViewController.class;

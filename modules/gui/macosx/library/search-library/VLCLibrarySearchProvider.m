@@ -150,7 +150,7 @@ FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml,
         [[VLCLibrarySearchProvider alloc]
             initWithDisplayTitle:_NS("Playlists")
                     displayImage:[self imageWithSymbolName:@"list.triangle"
-                                             fallbackImage:[NSImage imageNamed:@"NSListViewTemplate"]]
+                                             fallbackImage:[NSImage imageNamed:NSImageNameListViewTemplate]]
                       fetchBlock:^(const vlc_ml_query_params_t *params) {
                           return fetchPlaylists(params);
                       }],
