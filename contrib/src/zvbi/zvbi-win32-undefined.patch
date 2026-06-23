@@ -1,5 +1,87 @@
---- zvbi/src/io.h.orig	2022-04-27 13:12:22.154124296 +0300
-+++ zvbi/src/io.h	2022-04-27 13:12:54.706349113 +0300
+From 67c4251e92f07a468ec1aaf2d97edfa7a11b8300 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Thu, 21 Apr 2022 13:57:02 +0200
+Subject: [PATCH 08/11] patch to avoid implicit declarations of functions on
+ Windows
+
+Since Clang 15 (which still is under development, so this may
+still change before it's released) [1], implicit function
+declarations are a hard error by default, when building code
+in C99 mode (or newer).
+
+[1] https://github.com/llvm/llvm-project/commit/7d644e1215b376ec5e915df9ea2eeb56e2d94626
+
+The upstream zvbi code doesn't seem to have any support for
+building for Windows at all, therefore not trying to upstream it.
+
+On Windows, the <io.h> header is needed for getting declarations
+of functions like open/read/write/close. The zvbi project has a
+header of its own, named io.h, and it resides on a path added with
+-I, so any includes of <io.h> ends up including this header instead
+of the system header. Therefore, add an #include_next <io.h> which
+should bring in the system header and its declarations too.
+
+Adjust ifdefs to ifdef out larger bits of the code that contained
+calls to functions that simply don't exist on Windows, like
+ioctl, munmap etc. Previously, the zvbi library has been built with
+implicit declarations of those functions, and the static library has
+had undefined references to them. As long as those object files
+from the static library haven't been included in the link, this issue
+has been unnoticed so far.
+
+For the function ffs(), which also was undefined on Windows,
+provide a _BitScanForward based reimplementation. This also resides
+in a file that doesn't end up included in the end, but for this
+case it's just as easy to provide a working implementation as it
+would be to ifdef it out.
+---
+ src/io.c         |  5 ++---
+ src/io.h         |  6 ++++++
+ src/page_table.c | 11 +++++++++++
+ src/pdc.c        |  2 ++
+ 4 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/src/io.c b/src/io.c
+index 2f72981..c023e95 100644
+--- a/src/io.c
++++ b/src/io.c
+@@ -556,7 +556,6 @@ vbi_capture_io_select		(int			fd,
+ 		return ret;
+ 	}
+ }
+-#endif
+ /* Helper functions to log the communication between the library and drivers.
+    FIXME remove fp arg, call user log function instead (0.3). */
+ 
+@@ -777,7 +776,6 @@ device_ioctl			(FILE *			fp,
+ 	return err;
+ }
+ 
+-#ifndef _WIN32
+ /**
+  * @internal
+  * Drop-in for mmap(). Logs the request on fp if not NULL.
+@@ -827,7 +825,7 @@ device_mmap			(FILE *			fp,
+ 
+ 	return r;
+ }
+-#endif
++
+ /**
+  * @internal
+  * Drop-in for munmap(). Logs the request on fp if not NULL.
+@@ -860,6 +858,7 @@ device_munmap			(FILE *			fp,
+ 
+ 	return r;
+ }
++#endif
+ 
+ /*
+ Local variables:
+diff --git a/src/io.h b/src/io.h
+index 77d138b..a5b7f70 100644
+--- a/src/io.h
++++ b/src/io.h
 @@ -28,6 +28,12 @@
  #include "decoder.h"
  #include "bit_slicer.h"
@@ -13,43 +95,10 @@
  /* Public */
  
  #include <sys/time.h> /* struct timeval */
---- zvbi/src/io.c.orig	2022-04-21 14:52:30.294105422 +0300
-+++ zvbi/src/io.c	2022-04-21 14:39:26.424663785 +0300
-@@ -556,7 +556,6 @@
- 		return ret;
- 	}
- }
--#endif
- /* Helper functions to log the communication between the library and drivers.
-    FIXME remove fp arg, call user log function instead (0.3). */
- 
-@@ -777,7 +776,6 @@
- 	return err;
- }
- 
--#ifndef _WIN32
- /**
-  * @internal
-  * Drop-in for mmap(). Logs the request on fp if not NULL.
-@@ -827,7 +825,7 @@
- 
- 	return r;
- }
--#endif
-+
- /**
-  * @internal
-  * Drop-in for munmap(). Logs the request on fp if not NULL.
-@@ -860,6 +858,7 @@
- 
- 	return r;
- }
-+#endif
- 
- /*
- Local variables:
---- zvbi/src/page_table.c.orig	2022-04-21 14:52:22.018047995 +0300
-+++ zvbi/src/page_table.c	2022-04-21 14:48:38.224494983 +0300
+diff --git a/src/page_table.c b/src/page_table.c
+index 29caf86..0adf745 100644
+--- a/src/page_table.c
++++ b/src/page_table.c
 @@ -35,6 +35,17 @@
  #include "misc.h"
  #include "page_table.h"
@@ -68,8 +117,10 @@
  /**
   * addtogroup PageTable Teletext Page Number Table
   * ingroup LowDec
---- zvbi/src/pdc.c.orig	2022-04-21 14:52:12.297980549 +0300
-+++ zvbi/src/pdc.c	2022-04-21 14:51:40.529760109 +0300
+diff --git a/src/pdc.c b/src/pdc.c
+index 73b2855..b1e0b22 100644
+--- a/src/pdc.c
++++ b/src/pdc.c
 @@ -35,6 +35,7 @@
  #include "pdc.h"
  #include "conv.h"
@@ -78,7 +129,7 @@
  /**
   * @addtogroup ProgramID VPS/PDC Program ID
   * @ingroup LowDec
-@@ -1460,6 +1461,7 @@
+@@ -1460,6 +1461,7 @@ vbi_pil_validity_window		(time_t *		begin,
  		}
  	}
  }
@@ -86,3 +137,6 @@
  
  /*
  Local variables:
+-- 
+2.52.0.windows.1
+

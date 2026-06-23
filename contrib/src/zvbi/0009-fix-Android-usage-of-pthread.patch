@@ -1,0 +1,27 @@
+From 4ebcdd3003fbc3a9d9c53ba80328c08832ad0269 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 10 Apr 2024 15:37:48 +0200
+Subject: [PATCH 09/11] fix Android usage of pthread
+
+- pthread_create is not detected properly with the NDK26.
+- pthread_cancel is called but it's not supported by Android, it's probably dead code that is removed during linking
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 3cf3857..29d6fd8 100644
+--- a/configure.in
++++ b/configure.in
+@@ -167,7 +167,7 @@ dnl
+ dnl Check how to link pthreads functions.
+ dnl (-lpthread on Linux, -pthread on FreeBSD).
+ dnl
+-AC_CHECK_LIB(pthread, pthread_create,,[
++AC_SEARCH_LIBS([pthread_create], [pthread pthreads],,[
+   AC_TRY_LINK(, pthread_create();,,[
+     LDFLAGS="$LDFLAGS -pthread"
+     AC_TRY_LINK(, pthread_create();,,[
+-- 
+2.52.0.windows.1
+

@@ -16,22 +16,23 @@ $(TARBALLS)/zvbi-$(ZVBI_VERSION).tar.bz2:
 zvbi: zvbi-$(ZVBI_VERSION).tar.bz2 .sum-zvbi
 	$(UNPACK)
 	$(APPLY) $(SRC)/zvbi/zvbi-ssize_max.patch
-	$(APPLY) $(SRC)/zvbi/zvbi-ioctl.patch
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-static-linking.patch
 ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/zvbi/0001-fix-langinfo-usage.patch
 	$(APPLY) $(SRC)/zvbi/zvbi-win32.patch
 	$(APPLY) $(SRC)/zvbi/zvbi-win32-undefined.patch
 endif
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-clang-support.patch
 	$(APPLY) $(SRC)/zvbi/zvbi-va_copy.patch
 ifdef HAVE_ANDROID
+	$(APPLY) $(SRC)/zvbi/0001-fix-langinfo-usage.patch
 	$(APPLY) $(SRC)/zvbi/zvbi-android.patch
 endif
 	# hardcode -liconv instead of the full path
 	$(APPLY) $(SRC)/zvbi/0001-configure-hardcode-liconv-instead-of-the-full-path.patch
 	$(APPLY) $(SRC)/zvbi/0001-disable-strncpy-hack.patch
 	# check for pthread_create in pthreads as well
-	sed -i.orig "s/AC_CHECK_LIB(pthread, pthread_create,,/AC_SEARCH_LIBS([pthread_create], [pthread pthreads],,/" $(UNPACK_DIR)/configure.in
+	$(APPLY) $(SRC)/zvbi/0009-fix-Android-usage-of-pthread.patch
 	$(MOVE)
 
 DEPS_zvbi = png $(DEPS_png) iconv $(DEPS_iconv)

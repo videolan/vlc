@@ -1,7 +1,7 @@
-From 9d3e264119fdcbe0598fe637d18c66ebf0731cfc Mon Sep 17 00:00:00 2001
+From 0b41b9c0447fcfc7675f6cba5c98dbde24c65d0b Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 16 Apr 2024 07:59:13 +0200
-Subject: [PATCH] configure: hardcode -liconv instead of the full path
+Subject: [PATCH 10/11] configure: hardcode -liconv instead of the full path
 
 It disturbs libtool when adding a .a as a file to link with.
 
@@ -11,7 +11,7 @@ png and libz are already hardcoded.
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/configure.in b/configure.in
-index 25e6aa7..62fd0c9 100644
+index 29d6fd8..11ae97d 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -236,7 +236,9 @@ AM_ICONV_LINK
@@ -26,5 +26,5 @@ index 25e6aa7..62fd0c9 100644
  dnl
  dnl Check for png library.
 -- 
-2.37.3.windows.1
+2.52.0.windows.1
 
