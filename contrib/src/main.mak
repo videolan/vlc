@@ -352,7 +352,7 @@ PIC := -fPIC
 endif
 
 HOSTTOOLS := \
-	CC="$(CC)" CXX="$(CXX)" OBJC="$(OBJC)" LD="$(LD)" \
+	CC="$(CC)" CXX="$(CXX)" OBJC="$(OBJC)" OBJCXX="$(OBJCXX)" LD="$(LD)" \
 	AR="$(AR)" CCAS="$(CCAS)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
 	PKG_CONFIG="$(PKG_CONFIG)"
 
