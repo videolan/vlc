@@ -23,10 +23,10 @@ SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz .sum-SDL_image
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-DEPS_SDL_image = jpeg $(DEPS_jpeg) tiff $(DEPS_tiff) \
+DEPS_SDL_image = jpeg $(DEPS_jpeg) \
 	sdl $(DEPS_sdl)
 
 .SDL_image: SDL_image
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-tif --disable-sdltest --disable-png
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-tif --disable-sdltest --disable-png
 	$(MAKE) -C $< install
 	touch $@
