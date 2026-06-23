@@ -1,7 +1,7 @@
 # mad
 
-MAD_VERSION := 0.15.1b
-MAD_URL := $(CONTRIB_VIDEOLAN)/mad/libmad-$(MAD_VERSION).tar.gz
+MAD_VERSION := 0.16.4
+MAD_URL := https://codeberg.org/tenacityteam/libmad/archive/$(MAD_VERSION).tar.gz
 
 ifdef GPL
 PKGS += mad
@@ -10,44 +10,32 @@ ifeq ($(call need_pkg,"mad"),)
 PKGS_FOUND += mad
 endif
 
+MAD_CONF := -DEXAMPLE=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 ifdef HAVE_WIN32
 ifeq ($(ARCH),arm)
-MAD_CONF += --disable-aso
+MAD_CONF += -DASO:BOOL=OFF
 endif
 endif
 
 $(TARBALLS)/libmad-$(MAD_VERSION).tar.gz:
 	$(call download,$(MAD_URL))
 
-LIBMAD_VARS :=
-ifdef HAVE_IOS
-LIBMAD_VARS += CCAS="$(AS)"
-endif
-
 .sum-mad: libmad-$(MAD_VERSION).tar.gz
 
+libmad: UNPACK_DIR=libmad
 libmad: libmad-$(MAD_VERSION).tar.gz .sum-mad
 	$(UNPACK)
-ifdef HAVE_DARWIN_OS
-	sed -e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
-		-e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' \
-		-i.orig $(UNPACK_DIR)/configure
-endif
 ifdef HAVE_IOS
 	$(APPLY) $(SRC)/mad/mad-ios-asm.patch
 endif
-	$(APPLY) $(SRC)/mad/mad-noopt.patch
-	$(APPLY) $(SRC)/mad/Provide-Thumb-2-alternative-code-for-MAD_F_MLN.diff
-	$(APPLY) $(SRC)/mad/mad-mips-h-constraint-removal.patch
-	$(APPLY) $(SRC)/mad/mad-foreign.patch
-	$(APPLY) $(SRC)/mad/check-bitstream-length.patch
-	$(MOVE)
+	# old patch seem to solve buffer overflow a different way
+	# $(APPLY) $(SRC)/mad/check-bitstream-length.patch
+	# get a tarball with a folder name $(MOVE)
 
-.mad: libmad
+.mad: libmad toolchain.cmake
 	$(REQUIRE_GPL)
-	$(RECONF)
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(LIBMAD_VARS) $(MAD_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+	$(CMAKECLEAN)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(MAD_CONF)
+	+$(CMAKEBUILD)
+	$(CMAKEINSTALL)
 	touch $@
