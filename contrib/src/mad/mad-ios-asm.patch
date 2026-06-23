@@ -1,6 +1,16 @@
-diff -ru libmad/imdct_l_arm.S libmad-fixed/imdct_l_arm.S
---- libmad/imdct_l_arm.S	2001-03-25 22:03:34.000000000 +0200
-+++ libmad-fixed/imdct_l_arm.S	2012-08-06 18:16:49.000000000 +0200
+From 91ace89a505bc2070af2d585cfadaa9f97d99a8e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Felix=20Paul=20K=C3=BChne?= <fkuehne@videolan.org>
+Date: Mon, 6 Aug 2012 18:18:51 +0200
+Subject: [PATCH 1/2] fixed compilation for iOS
+
+---
+ imdct_l_arm.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/imdct_l_arm.S b/imdct_l_arm.S
+index 92d67e1..35f1d55 100644
+--- a/imdct_l_arm.S
++++ b/imdct_l_arm.S
 @@ -202,7 +202,7 @@
  
  
@@ -10,12 +20,6 @@ diff -ru libmad/imdct_l_arm.S libmad-fixed/imdct_l_arm.S
  
      .global III_imdct_l
      .global _III_imdct_l
-@@ -468,7 +468,7 @@
- 
-     @----
- 
--    add     r2, pc, #(imdct36_long_karray-.-8)  @ r2 = base address of Knn array (PIC safe ?)
-+    adr     r2, imdct36_long_karray
- 
- 
- loop:
+-- 
+2.52.0.windows.1
+
