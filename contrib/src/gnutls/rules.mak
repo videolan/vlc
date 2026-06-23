@@ -1,7 +1,7 @@
 # GnuTLS
 
 GNUTLS_MAJVERSION := 3.8
-GNUTLS_VERSION := $(GNUTLS_MAJVERSION).10
+GNUTLS_VERSION := $(GNUTLS_MAJVERSION).13
 GNUTLS_URL := $(GNUGPG)/gnutls/v$(GNUTLS_MAJVERSION)/gnutls-$(GNUTLS_VERSION).tar.xz
 
 # nettle/gmp can't be used with the LGPLv2 license
@@ -47,6 +47,8 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 
 	$(call pkg_static,"lib/gnutls.pc.in")
 
+	# backport build fix for some Apple targets
+	$(APPLY) $(SRC)/gnutls/0001-Fix-CRAU_MAYBE_UNUSED-definition-for-old-compilers.patch
 	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
 	$(APPLY) $(SRC)/gnutls/0001-Use-CreateFile2-in-UWP-builds.patch
 
