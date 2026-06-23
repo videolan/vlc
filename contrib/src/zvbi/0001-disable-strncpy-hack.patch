@@ -1,7 +1,7 @@
-From 7bd5d32dd7f281d43837b2bc8605a4e5eb4dd9bc Mon Sep 17 00:00:00 2001
+From 3e686d7a143cd616b1827fa446b95670cabf0abb Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Wed, 3 Jun 2026 07:38:36 +0200
-Subject: [PATCH] disable strncpy hack
+Subject: [PATCH 11/11] disable strncpy hack
 
 strncpy() is never called in the code but the define may interfere with system headers.
 ---
@@ -9,10 +9,10 @@ strncpy() is never called in the code but the define may interfere with system h
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/misc.h b/src/misc.h
-index ff8e96a..3e4c0b4 100644
+index f7b0094..0e888ee 100644
 --- a/src/misc.h
 +++ b/src/misc.h
-@@ -432,8 +432,10 @@ _vbi_time_max			(void)
+@@ -421,8 +421,10 @@ _vbi_time_max			(void)
  #ifndef HAVE_STRLCPY
  #  define strlcpy _vbi_strlcpy
  #endif

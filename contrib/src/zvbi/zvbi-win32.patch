@@ -1,33 +1,21 @@
-diff -ruN zvbi/src/conv.c zvbi.new/src/conv.c
---- zvbi/src/conv.c	2008-02-26 15:39:23.000000000 +0100
-+++ zvbi.new/src/conv.c	2008-09-11 21:05:18.000000000 +0200
-@@ -26,7 +26,9 @@
- #endif
- 
- #include <errno.h>
-+#ifndef _WIN32
- #include <langinfo.h>
-+#endif
- 
- #include "misc.h"
- #include "conv.h"
-@@ -1234,9 +1236,12 @@
- 	const char *dst_format;
- 
- 	dst_format = bind_textdomain_codeset (vbi_intl_domainname, NULL);
--
-+#ifdef _WIN32
-+#warning this is wrong
-+#else
- 	if (NULL == dst_format)
- 		dst_format = nl_langinfo (CODESET);
-+#endif
- 
- 	return dst_format; /* may be NULL */
- }
-diff -ruN zvbi/src/export.c zvbi.new/src/export.c
---- zvbi/src/export.c	2008-02-19 01:35:15.000000000 +0100
-+++ zvbi.new/src/export.c	2008-09-11 20:38:55.000000000 +0200
+From 5348d2626d8ffb9d86ca5ded12d8842e7e772f1a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
+Date: Tue, 5 Jul 2011 10:45:15 +0200
+Subject: [PATCH 02/11] fix win32 build
+
+---
+ src/export.c    | 20 ++++++++++++++++++++
+ src/io.c        | 11 ++++++++---
+ src/packet.c    |  2 ++
+ src/proxy-msg.c |  2 ++
+ src/proxy-msg.h |  2 ++
+ src/vbi.c       |  2 ++
+ 6 files changed, 36 insertions(+), 3 deletions(-)
+
+diff --git a/src/export.c b/src/export.c
+index 69d6c90..848a869 100644
+--- a/src/export.c
++++ b/src/export.c
 @@ -40,6 +40,26 @@
  #include "conv.h"
  #include "vbi.h" /* asprintf */
@@ -55,60 +43,10 @@ diff -ruN zvbi/src/export.c zvbi.new/src/export.c
  extern const char _zvbi_intl_domainname[];
  
  /**
-diff -ruN zvbi/src/packet.c zvbi.new/src/packet.c
---- zvbi/src/packet.c	2008-02-20 18:04:33.000000000 +0100
-+++ zvbi.new/src/packet.c	2008-09-11 21:00:35.000000000 +0200
-@@ -32,7 +32,9 @@
- #include <fcntl.h>
- #include <time.h>
- #include <errno.h>
-+#ifndef _WIN32
- #include <sys/ioctl.h>
-+#endif
- 
- #include "misc.h"
- #include "hamm.h"
-diff -ruN zvbi/src/proxy-msg.c zvbi.new/src/proxy-msg.c
---- zvbi/src/proxy-msg.c	2008-02-19 01:35:21.000000000 +0100
-+++ zvbi.new/src/proxy-msg.c	2008-09-11 21:00:07.000000000 +0200
-@@ -129,7 +129,9 @@
- #include <netinet/tcp.h>
- #include <arpa/inet.h>
- #include <netdb.h>
-+#ifndef _WIN32
- #include <syslog.h>
-+#endif
- #include <assert.h>
- #include <sys/ioctl.h>
- #include <sys/mman.h>
-diff -ruN zvbi/src/proxy-msg.h zvbi.new/src/proxy-msg.h
---- zvbi/src/proxy-msg.h	2008-02-19 01:35:21.000000000 +0100
-+++ zvbi.new/src/proxy-msg.h	2008-09-11 20:59:40.000000000 +0200
-@@ -68,7 +68,9 @@
- #ifndef PROXY_MSG_H
- #define PROXY_MSG_H
- 
-+#ifndef _WIN32
- #include <sys/syslog.h>
-+#endif
- 
- /* Public */
- 
-diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
---- zvbi/src/vbi.c	2008-03-05 14:33:04.000000000 +0100
-+++ zvbi.new/src/vbi.c	2008-09-11 20:57:55.000000000 +0200
-@@ -39,7 +39,9 @@
- #include <fcntl.h>
- #include <time.h>
- #include <errno.h>
-+#ifndef _WIN32
- #include <sys/ioctl.h>
-+#endif
- #include <sys/time.h>
- #include <pthread.h>
- 
---- zvbi/src/io.c	2008-02-19 01:35:20.000000000 +0100
-+++ zvbi2/src/io.c	2008-09-11 21:18:59.000000000 +0200
+diff --git a/src/io.c b/src/io.c
+index 184a4e5..2f72981 100644
+--- a/src/io.c
++++ b/src/io.c
 @@ -28,8 +28,10 @@
  
  #include <fcntl.h>		/* open() */
@@ -120,7 +58,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  #include <sys/time.h>		/* struct timeval */
  #include <sys/types.h>
  #include <errno.h>
-@@ -514,7 +516,7 @@
+@@ -514,7 +516,7 @@ vbi_capture_io_update_timeout	(struct timeval *	timeout,
  	}
  }
  
@@ -129,7 +67,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  /**
   * @internal
   *
-@@ -554,7 +556,7 @@
+@@ -554,7 +556,7 @@ vbi_capture_io_select		(int			fd,
  		return ret;
  	}
  }
@@ -138,7 +76,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  /* Helper functions to log the communication between the library and drivers.
     FIXME remove fp arg, call user log function instead (0.3). */
  
-@@ -668,7 +670,9 @@
+@@ -668,7 +670,9 @@ device_open			(FILE *			fp,
  				 "EXCL", O_EXCL,
  				 "TRUNC", O_TRUNC,
  				 "APPEND", O_APPEND,
@@ -148,7 +86,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  				 0);
  		fprintf (fp, ", 0%o)", mode);
  
-@@ -773,6 +777,7 @@
+@@ -773,6 +777,7 @@ device_ioctl			(FILE *			fp,
  	return err;
  }
  
@@ -156,7 +94,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  /**
   * @internal
   * Drop-in for mmap(). Logs the request on fp if not NULL.
-@@ -822,7 +827,7 @@
+@@ -822,7 +827,7 @@ device_mmap			(FILE *			fp,
  
  	return r;
  }
@@ -165,3 +103,62 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  /**
   * @internal
   * Drop-in for munmap(). Logs the request on fp if not NULL.
+diff --git a/src/packet.c b/src/packet.c
+index 322a028..0b6563b 100644
+--- a/src/packet.c
++++ b/src/packet.c
+@@ -32,7 +32,9 @@
+ #include <fcntl.h>
+ #include <time.h>
+ #include <errno.h>
++#ifndef _WIN32
+ #include <sys/ioctl.h>
++#endif
+ 
+ #include "misc.h"
+ #include "hamm.h"
+diff --git a/src/proxy-msg.c b/src/proxy-msg.c
+index 47bbde5..12230bf 100644
+--- a/src/proxy-msg.c
++++ b/src/proxy-msg.c
+@@ -129,7 +129,9 @@
+ #include <netinet/tcp.h>
+ #include <arpa/inet.h>
+ #include <netdb.h>
++#ifndef _WIN32
+ #include <syslog.h>
++#endif
+ #include <assert.h>
+ #include <sys/ioctl.h>
+ #include <sys/mman.h>
+diff --git a/src/proxy-msg.h b/src/proxy-msg.h
+index d254f26..42970f7 100644
+--- a/src/proxy-msg.h
++++ b/src/proxy-msg.h
+@@ -68,7 +68,9 @@
+ #ifndef PROXY_MSG_H
+ #define PROXY_MSG_H
+ 
++#ifndef _WIN32
+ #include <sys/syslog.h>
++#endif
+ 
+ /* Public */
+ 
+diff --git a/src/vbi.c b/src/vbi.c
+index 62a323d..b1a0d55 100644
+--- a/src/vbi.c
++++ b/src/vbi.c
+@@ -39,7 +39,9 @@
+ #include <fcntl.h>
+ #include <time.h>
+ #include <errno.h>
++#ifndef _WIN32
+ #include <sys/ioctl.h>
++#endif
+ #include <sys/time.h>
+ #include <pthread.h>
+ 
+-- 
+2.52.0.windows.1
+

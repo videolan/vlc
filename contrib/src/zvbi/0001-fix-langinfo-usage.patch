@@ -1,0 +1,41 @@
+From 696286f86825b2aee391f28667dedde200059f74 Mon Sep 17 00:00:00 2001
+From: Jean-Baptiste Kempf <jb@videolan.org>
+Date: Wed, 10 Dec 2014 22:13:13 +0100
+Subject: [PATCH 01/11] fix langinfo usage
+
+---
+ src/conv.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/conv.c b/src/conv.c
+index 780950c..1db79e1 100644
+--- a/src/conv.c
++++ b/src/conv.c
+@@ -26,7 +26,9 @@
+ #endif
+ 
+ #include <errno.h>
+-#include <langinfo.h>
++#ifdef HAVE_LANGINFO_H
++# include <langinfo.h>
++#endif
+ 
+ #include "misc.h"
+ #include "conv.h"
+@@ -1234,9 +1236,12 @@ vbi_locale_codeset		(void)
+ 	const char *dst_format;
+ 
+ 	dst_format = bind_textdomain_codeset (vbi_intl_domainname, NULL);
+-
++#ifdef HAVE_LANGINFO_H
+ 	if (NULL == dst_format)
+ 		dst_format = nl_langinfo (CODESET);
++#else
++        dst_format = "UTF-8";
++#endif
+ 
+ 	return dst_format; /* may be NULL */
+ }
+-- 
+2.52.0.windows.1
+

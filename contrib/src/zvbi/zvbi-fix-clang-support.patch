@@ -1,6 +1,17 @@
-diff -ru zvbi/src/misc.h zvbi-fixed/src/misc.h
---- zvbi/src/misc.h	2013-07-02 04:32:31.000000000 +0200
-+++ zvbi-fixed/src/misc.h	2013-08-08 21:37:22.000000000 +0200
+From f9319cb4e8abc1749ea77ea1eb4eb86295bf1cc7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Felix=20K=C3=BChne?= <fkuehne@videolan.org>
+Date: Thu, 8 Aug 2013 21:41:55 +0200
+Subject: [PATCH 04/11] fix compilation with clang
+
+Simplified version of initial patch
+---
+ src/misc.h | 13 -------------
+ 1 file changed, 13 deletions(-)
+
+diff --git a/src/misc.h b/src/misc.h
+index ff8e96a..d0e965e 100644
+--- a/src/misc.h
++++ b/src/misc.h
 @@ -52,17 +52,6 @@
  #  define unlikely(expr) __builtin_expect(expr, 0)
  #endif
@@ -19,7 +30,7 @@ diff -ru zvbi/src/misc.h zvbi-fixed/src/misc.h
  /* &x == PARENT (&x.tm_min, struct tm, tm_min),
     safer than &x == (struct tm *) &x.tm_min. A NULL _ptr is safe and
     will return NULL, not -offsetof(_member). */
-@@ -156,8 +145,6 @@
+@@ -156,8 +145,6 @@ do {									\
  
  #define likely(expr) (expr)
  #define unlikely(expr) (expr)
@@ -28,3 +39,6 @@ diff -ru zvbi/src/misc.h zvbi-fixed/src/misc.h
  
  static char *
  PARENT_HELPER (char *p, unsigned int offset)
+-- 
+2.52.0.windows.1
+
