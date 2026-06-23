@@ -40,9 +40,7 @@
 #include "gl_common.h"
 #include "gl_util.h"
 
-struct vlc_gl_sampler_priv {
-    struct vlc_gl_sampler sampler;
-
+struct sampler_priv {
     struct vlc_gl_t *gl;
     struct vlc_gl_api api;
     const opengl_vtable_t *vt; /* for convenience, same as &api.vt */
@@ -79,17 +77,17 @@ struct vlc_gl_sampler_priv {
     struct vlc_gl_extension_vt extension_vt;
 };
 
-static inline struct vlc_gl_sampler_priv *
+static inline struct sampler_priv *
 PRIV(struct vlc_gl_sampler *sampler)
 {
-    return container_of(sampler, struct vlc_gl_sampler_priv, sampler);
+    return sampler->sys;
 }
 
 static int
 sampler_update(struct vlc_gl_sampler *sampler,
                const struct vlc_gl_picture *picture)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     priv->pic = *picture;
 
     return VLC_SUCCESS;
@@ -98,7 +96,7 @@ sampler_update(struct vlc_gl_sampler *sampler,
 static void
 sampler_select_plane(struct vlc_gl_sampler *sampler, unsigned plane)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     priv->plane = plane;
 }
 
@@ -106,7 +104,7 @@ static void
 sampler_close(struct vlc_gl_sampler *sampler)
 {
 #ifdef HAVE_LIBPLACEBO_GL
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     FREENULL(priv->uloc.pl_vars);
     FREENULL(priv->uloc.pl_descs);
     pl_shader_free(&priv->pl_sh);
@@ -116,11 +114,7 @@ sampler_close(struct vlc_gl_sampler *sampler)
     pl_opengl_destroy(&priv->pl_opengl);
     pl_log_destroy(&priv->pl_log);
 #endif
-
-    free(sampler->shader.precision);
-    free(sampler->shader.extensions);
-    free(sampler->shader.body);
-    free(sampler->shader.version);
+    free(sampler->sys);
 }
 
 static const float MATRIX_COLOR_RANGE_LIMITED[4*3] = {
@@ -218,7 +212,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler,
                       const vlc_chroma_description_t *desc,
                       video_color_space_t yuv_space)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
 
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
@@ -301,7 +295,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler,
 static void
 sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
 
     const opengl_vtable_t *vt = priv->vt;
 
@@ -353,7 +347,7 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 static void
 sampler_base_load(struct vlc_gl_sampler *sampler)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
 
     const opengl_vtable_t *vt = priv->vt;
     struct vlc_gl_picture *pic = &priv->pic;
@@ -450,7 +444,7 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
 static void
 sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     const opengl_vtable_t *vt = priv->vt;
 
     priv->uloc.Textures[0] = vt->GetUniformLocation(program, "Textures[0]");
@@ -460,7 +454,7 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 static void
 sampler_xyz12_load(struct vlc_gl_sampler *sampler)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     const opengl_vtable_t *vt = priv->vt;
     struct vlc_gl_picture *pic = &priv->pic;
 
@@ -589,7 +583,7 @@ static void
 GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
          const char **glsl_sampler, const char **texture)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
 
     bool has_texture_func =
         (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 130) ||
@@ -623,7 +617,7 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
 static int
 InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     const bool is_yuv = vlc_fourcc_IsYUV(sampler->fmt_in.i_chroma);
 
     const char *image_external = priv->glsl_version >= 300
@@ -659,7 +653,7 @@ InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
 static void
 sampler_planes_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
 
     const opengl_vtable_t *vt = priv->vt;
 
@@ -676,7 +670,7 @@ sampler_planes_fetch_locations(struct vlc_gl_sampler *sampler, uint32_t program)
 static void
 sampler_planes_load(struct vlc_gl_sampler *sampler)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     unsigned plane = priv->plane;
 
     const opengl_vtable_t *vt = priv->vt;
@@ -757,7 +751,7 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
 static struct pl_custom_lut *LoadCustomLUT(struct vlc_gl_sampler *sampler,
                                            const char *filepath)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     if (!filepath || !filepath[0])
         return NULL;
 
@@ -795,7 +789,7 @@ error:
 static int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    struct sampler_priv *priv = PRIV(sampler);
     const video_format_t *fmt = &sampler->fmt_in;
 
     GLenum tex_target = sampler->tex_target;
@@ -1098,35 +1092,214 @@ static pl_voidfunc_t PlaceboGetProcAddr(void *opaque, const char *name)
 }
 #endif
 
+static int
+Open(struct vlc_gl_sampler *sampler,
+     bool expose_planes)
+{
+    struct sampler_priv *priv = calloc(1, sizeof(*priv));
+    if (!priv)
+        return VLC_ENOMEM;
+
+    sampler->sys = priv;
+
+    priv->gl = sampler->gl;
+
+    int ret = vlc_gl_api_Init(&priv->api, sampler->gl);
+    if (ret != VLC_SUCCESS)
+    {
+        free(priv);
+        return ret;
+    }
+    priv->vt = &priv->api.vt;
+
+    vlc_gl_LoadExtensionFunctions(sampler->gl, &priv->extension_vt);
+
+    memcpy(priv->pic.mtx, MATRIX2x3_IDENTITY, sizeof(MATRIX2x3_IDENTITY));
+    priv->pic.mtx_has_changed = true;
+
+    sampler->pic_to_tex_matrix = priv->pic.mtx;
+
+    sampler->shader.extensions = NULL;
+    sampler->shader.body = NULL;
+
+    switch (sampler->formats[0])
+    {
+        case GL_RED_INTEGER:
+        case GL_RG_INTEGER:
+            priv->unsigned_sampler = true;
+            break;
+        default:
+            priv->unsigned_sampler = false;
+            break;
+    }
+
+    const struct vlc_gl_api *api = &priv->api;
+    int glsl_version;
+    if (api->is_gles) {
+        if (asprintf(&sampler->shader.precision,
+            "precision highp float;\n"
+            "precision highp sampler2D;\n"
+            "%s%s",
+            api->supports_sampler3D ? "precision highp sampler3D;\n" : "",
+            priv->unsigned_sampler ? "precision highp usampler2D;\n" : "" ) <= 0 )
+        {
+            free(priv);
+            return VLC_ENOMEM;
+        }
+
+        if (api->glsl_version >= 300) {
+            sampler->shader.version = strdup("#version 300 es\n");
+            glsl_version = 300;
+        } else {
+            sampler->shader.version = strdup("#version 100\n");
+            glsl_version = 100;
+        }
+        if (!sampler->shader.version)
+        {
+            free(sampler->shader.precision);
+            sampler->shader.precision = NULL;
+            free(priv);
+            return VLC_ENOMEM;
+        }
+    } else {
+        sampler->shader.precision = strdup("// no precision\n");
+        if (!sampler->shader.precision)
+        {
+            free(priv);
+            return VLC_ENOMEM;
+        }
+        /* GLSL version 420+ breaks backwards compatibility with pre-GLSL 130
+         * syntax, which we use in our vertex/fragment shaders. */
+        glsl_version = __MIN(api->glsl_version, 410);
+        if (asprintf(&sampler->shader.version, "#version %d\n", glsl_version) < 0)
+        {
+            free(sampler->shader.precision);
+            sampler->shader.precision = NULL;
+            free(priv);
+            return VLC_ENOMEM;
+        }
+    }
+    priv->glsl_version = glsl_version;
+
+#ifdef HAVE_LIBPLACEBO_GL
+    priv->uloc.pl_vars = NULL;
+    priv->uloc.pl_descs = NULL;
+    priv->pl_sh_res = NULL;
+    priv->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(sampler->gl));
+
+    const struct pl_opengl_params gl_params =
+    {
+        /* Libplacebo won't control whether the context is current or not.
+         * This is the default but we also want to ensure that the struct is
+         * properly initialized even if PL_API_VER < 215. */
+        .make_current = NULL,
+        .release_current = NULL,
+
+#if PL_API_VER >= 215
+        .get_proc_addr_ex = PlaceboGetProcAddr,
+        .proc_ctx = sampler->gl,
+#endif
+    };
+
+    const opengl_vtable_t *vt = priv->vt;
+
+    /* Workaround libplacebo changing the current framebuffer when running
+     * with OpenGL. */
+    GLint out_fb;
+    vt->GetIntegerv(GL_FRAMEBUFFER_BINDING, &out_fb);
+
+    priv->pl_opengl = pl_opengl_create(priv->pl_log, &gl_params);
+    if (!priv->pl_opengl)
+    {
+        msg_Dbg(sampler->gl, "opengl sampler: could not initialize libplacebo");
+        pl_log_destroy(&priv->pl_log);
+        free(sampler->shader.precision);
+        sampler->shader.precision = NULL;
+        free(sampler->shader.version);
+        sampler->shader.version = NULL;
+        free(priv);
+        return VLC_EGENERIC;
+    }
+
+    vt->BindFramebuffer(GL_FRAMEBUFFER, out_fb);
+
+    priv->pl_sh = pl_shader_alloc(priv->pl_log, &(struct pl_shader_params) {
+        .gpu = priv->pl_opengl->gpu,
+        .glsl = {
+            .version = glsl_version,
+            .gles = sampler->gl->api_type == VLC_OPENGL_ES2,
+        },
+    });
+#endif
+
+    ret = opengl_fragment_shader_init(sampler, expose_planes);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Dbg(sampler->gl, "opengl sampler: could not initialize shaders");
+        free(sampler->shader.precision);
+        sampler->shader.precision = NULL;
+        free(sampler->shader.version);
+        sampler->shader.version = NULL;
+        free(priv);
+        return ret;
+    }
+
+    return VLC_SUCCESS;
+}
+
+#ifdef VLC_GL_SAMPLER_MODULE
+#include <vlc_plugin.h>
+
+vlc_module_begin()
+    set_shortname("glsampler")
+    set_description("OpenGL built-in sampler")
+    set_callback_opengl_sampler(Open)
+    set_capability("opengl sampler", 1)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+#ifdef HAVE_LIBPLACEBO_GL
+    set_section(N_("Colorspace conversion"), NULL)
+    add_placebo_color_map_opts("gl")
+    add_integer("target-prim", PL_COLOR_PRIM_UNKNOWN,
+                N_("Target primaries"), N_("Override the target color primaries"))
+            change_integer_list(prim_values, prim_text)
+    add_integer("target-trc", PL_COLOR_TRC_UNKNOWN,
+                N_("Target transfer"), N_("Override the target transfer function"))
+            change_integer_list(trc_values, trc_text)
+    set_section(N_("Dithering"), NULL)
+    add_integer("dither-algo", -1,
+                N_("Dithering algorithm"), N_("Algorithm for dithering"))
+            change_integer_list(dither_values, dither_text)
+    add_integer_with_range("dither-depth", 0, 0, 16,
+                           N_("Dither depth"), N_("Override the dither depth"))
+    add_loadfile("gl-lut-file", NULL,
+                 N_("Custom LUT"), N_("Path to a custom .cube LUT file"))
+#endif
+vlc_module_end()
+#endif
+
+#ifndef VLC_GL_SAMPLER_MODULE
+#include <vlc_modules.h>
+
+static int
+ActivateSampler(void *func, bool forced, va_list args)
+{
+    (void) forced;
+    vlc_gl_sampler_open_fn *activate = func;
+    struct vlc_gl_sampler *sampler = va_arg(args, struct vlc_gl_sampler *);
+    bool expose_planes = va_arg(args, int); /* bool promoted to int in va_args */
+
+    return activate(sampler, expose_planes);
+}
+
 struct vlc_gl_sampler *
 vlc_gl_sampler_New(struct vlc_gl_t *gl,
                    const struct vlc_gl_format *glfmt, bool expose_planes)
 {
-    struct vlc_gl_sampler_priv *priv = vlc_object_create(gl, sizeof(*priv));
-    if (!priv)
+    struct vlc_gl_sampler *sampler = vlc_object_create(gl, sizeof(*sampler));
+    if (!sampler)
         return NULL;
 
-    struct vlc_gl_sampler *sampler = &priv->sampler;
     sampler->gl = gl;
-    sampler->module = NULL;
-
-    vlc_gl_LoadExtensionFunctions(gl, &priv->extension_vt);
-
-    priv->gl = gl;
-
-    int ret = vlc_gl_api_Init(&priv->api, gl);
-    if (ret != VLC_SUCCESS)
-    {
-        free(priv);
-        return NULL;
-    }
-    priv->vt = &priv->api.vt;
-
-    struct vlc_gl_picture *pic = &priv->pic;
-    memcpy(pic->mtx, MATRIX2x3_IDENTITY, sizeof(MATRIX2x3_IDENTITY));
-    priv->pic.mtx_has_changed = true;
-
-    sampler->pic_to_tex_matrix = pic->mtx;
 
     /* Formats with palette are not supported. This also allows to copy
      * video_format_t without possibility of failure. */
@@ -1144,110 +1317,32 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl,
         sampler->formats[i] = glfmt->formats[i];
     }
 
+    sampler->pic_to_tex_matrix = NULL;
+    sampler->shader.version = NULL;
+    sampler->shader.precision = NULL;
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
+    sampler->ops = NULL;
+    sampler->sys = NULL;
 
-    switch (sampler->formats[0])
+    struct vlc_logger *logger = vlc_object_logger(sampler);
+    char *sampler_name = var_InheritString(gl, "gl-sampler");
+    sampler->module = vlc_module_load(logger, "opengl sampler", sampler_name,
+                                      true, ActivateSampler, sampler,
+                                      (int)expose_planes);
+    free(sampler_name);
+    if (!sampler->module)
     {
-        case GL_RED_INTEGER:
-        case GL_RG_INTEGER:
-            priv->unsigned_sampler = true;
-            break;
-        default:
-            priv->unsigned_sampler = false;
-            break;
-    }
-
-    int glsl_version;
-    if (priv->api.is_gles) {
-
-        if (asprintf(&sampler->shader.precision,
-            "precision highp float;\n"
-            "precision highp sampler2D;\n"
-            "%s%s",
-            priv->api.supports_sampler3D ? "precision highp sampler3D;\n" : "",
-            priv->unsigned_sampler ? "precision highp usampler2D;\n" : "" ) <= 0 )
-            goto error;
-
-        if (priv->api.glsl_version >= 300) {
-            sampler->shader.version = strdup("#version 300 es\n");
-            glsl_version = 300;
-        } else {
-            sampler->shader.version = strdup("#version 100\n");
-            glsl_version = 100;
+        int ret = Open(sampler, expose_planes);
+        if (ret != VLC_SUCCESS)
+        {
+            msg_Err(gl, "Could not load OpenGL sampler module or built-in");
+            vlc_object_delete(sampler);
+            return NULL;
         }
-        if (!sampler->shader.version)
-            goto error;
-    } else {
-        sampler->shader.precision = strdup("// no precision\n");
-        if (!sampler->shader.precision)
-            goto error;
-        /* GLSL version 420+ breaks backwards compatibility with pre-GLSL 130
-         * syntax, which we use in our vertex/fragment shaders. */
-        glsl_version = __MIN(priv->api.glsl_version, 410);
-        if (asprintf(&sampler->shader.version, "#version %d\n", glsl_version) < 0)
-            goto error;
-    }
-    priv->glsl_version = glsl_version;
-
-#ifdef HAVE_LIBPLACEBO_GL
-    priv->uloc.pl_vars = NULL;
-    priv->uloc.pl_descs = NULL;
-    priv->pl_sh_res = NULL;
-    priv->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(gl));
-
-    const struct pl_opengl_params gl_params =
-    {
-        /* Libplacebo won't control whether the context is current or not.
-         * This is the default but we also want to ensure that the struct is
-         * properly initialized even if PL_API_VER < 215. */
-        .make_current = NULL,
-        .release_current = NULL,
-
-#if PL_API_VER >= 215
-        .get_proc_addr_ex = PlaceboGetProcAddr,
-        .proc_ctx = gl,
-#endif
-    };
-
-    const opengl_vtable_t *vt = priv->vt;
-
-    /* Workaround libplacebo changing the current framebuffer when running
-     * with OpenGL. */
-    GLint out_fb;
-    vt->GetIntegerv(GL_FRAMEBUFFER_BINDING, &out_fb);
-
-    priv->pl_opengl = pl_opengl_create(priv->pl_log, &gl_params);
-    if (!priv->pl_opengl)
-    {
-        msg_Dbg(gl, "opengl sampler: could not initialize libplacebo");
-        vlc_gl_sampler_Delete(sampler);
-        return NULL;
-    }
-
-    vt->BindFramebuffer(GL_FRAMEBUFFER, out_fb);
-
-    priv->pl_sh = pl_shader_alloc(priv->pl_log, &(struct pl_shader_params) {
-        .gpu = priv->pl_opengl->gpu,
-        .glsl = {
-            .version = glsl_version,
-            .gles = gl->api_type == VLC_OPENGL_ES2,
-        },
-    });
-#endif
-
-    ret = opengl_fragment_shader_init(sampler, expose_planes);
-    if (ret != VLC_SUCCESS)
-    {
-        msg_Dbg(gl, "opengl sampler: could not initialize shaders");
-        goto error;
     }
 
     return sampler;
-
-error:
-    vlc_gl_sampler_Delete(sampler);
-    return NULL;
 }
 
 void
@@ -1256,5 +1351,14 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
     if (sampler->ops && sampler->ops->close)
         sampler->ops->close(sampler);
 
+    if (sampler->module)
+        module_unneed(sampler, sampler->module);
+
+    free(sampler->shader.precision);
+    free(sampler->shader.extensions);
+    free(sampler->shader.body);
+    free(sampler->shader.version);
+
     vlc_object_delete(sampler);
 }
+#endif

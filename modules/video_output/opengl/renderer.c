@@ -818,7 +818,6 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     int ret = vlc_gl_api_Init(&renderer->api, filter->gl);
     if (ret != VLC_SUCCESS)
     {
-        vlc_gl_sampler_Delete(sampler);
         free(renderer);
         return VLC_EGENERIC;
     }

@@ -71,6 +71,18 @@ GL_PLUGIN_CFLAGS = $(GLES2_CFLAGS) -DUSE_OPENGL_ES2=1
 endif
 endif
 
+# glsampler_builtin
+libglsampler_builtin_plugin_la_SOURCES = video_output/opengl/sampler.c
+libglsampler_builtin_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBPLACEBO_CFLAGS) -DVLC_GL_SAMPLER_MODULE
+libglsampler_builtin_plugin_la_LIBADD = $(GL_PLUGIN_LIBADD)
+libglsampler_builtin_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_PLUGIN_CFLAGS)
+if HAVE_LIBPLACEBO_GL
+libglsampler_builtin_plugin_la_LIBADD += $(LIBPLACEBO_LIBS)
+endif
+if HAVE_GL_OR_GLES2
+vout_PLUGINS += libglsampler_builtin_plugin.la
+endif
+
 libglinterop_sw_plugin_la_SOURCES = video_output/opengl/interop_sw.c
 libglinterop_sw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(GL_PLUGIN_CFLAGS)
 libglinterop_sw_plugin_la_LIBADD = $(GL_PLUGIN_LIBADD)

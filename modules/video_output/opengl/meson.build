@@ -120,6 +120,24 @@ vlc_modules += {
     'enabled' : gl_vout_dep.found(),
 }
 
+# glsampler_builtin (GLSL core shaders for texture sampling)
+glsampler_builtin_cargs = ['-DVLC_GL_SAMPLER_MODULE']
+glsampler_builtin_deps = [gl_plugin_dep, m_lib]
+glsampler_builtin_link = []
+if libplacebo_dep.found()
+    glsampler_builtin_cargs += '-DHAVE_LIBPLACEBO_GL'
+    glsampler_builtin_deps += libplacebo_dep
+    glsampler_builtin_link += libplacebo_utils
+endif
+vlc_modules += {
+    'name' : 'glsampler_builtin',
+    'sources' : files('sampler.c'),
+    'dependencies' : glsampler_builtin_deps,
+    'link_with' : glsampler_builtin_link,
+    'c_args' : glsampler_builtin_cargs,
+    'enabled' : gl_vout_dep.found(),
+}
+
 # interop_sw
 vlc_modules += {
     'name' : 'glinterop_sw',
