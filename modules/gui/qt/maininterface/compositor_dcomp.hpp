@@ -75,12 +75,13 @@ protected:
     bool canDoCombinedSurfaceUpdates() const override { return true; };
     void commitSurface() override;
 
+private:
+    [[nodiscard]] bool setup();
+    void cleanup();
+
 private slots:
     void onSurfacePositionChanged(const QPointF& position) override;
     void onSurfaceSizeChanged(const QSizeF& size) override;
-
-    void setup();
-    void cleanup();
 
 protected:
     int windowEnable(const vlc_window_cfg_t *) override;

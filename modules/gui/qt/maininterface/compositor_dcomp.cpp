@@ -180,8 +180,21 @@ bool CompositorDirectComposition::init()
     return true;
 }
 
-void CompositorDirectComposition::setup()
+bool CompositorDirectComposition::setup()
 {
+    // WARNING: This lock is released explicitly as soon as we are ready to signal readiness:
+    QMutexLocker lock(&m_setupStateLock);
+
+    switch (m_setupState)
+    {
+    /* [[unlikely]] */ case SetupState::Fail:
+        return false;
+    /* [[unlikely]] */ case SetupState::Success:
+        return true; // Already called
+    /* [[likely]] */ default:
+        break;
+    }
+
     //Setup shouldn't be called once we are shutting down
     assert(m_mainCtx);
     assert(m_quickView);
@@ -231,11 +244,9 @@ void CompositorDirectComposition::setup()
     res = m_rootVisual->AddVisual(m_uiVisual, FALSE, NULL);
     assert(res == S_OK);
 
-    {
-        QMutexLocker lock(&m_setupStateLock);
-        m_setupState = SetupState::Success;
-        m_setupStateCond.notify_all();
-    }
+    m_setupState = SetupState::Success;
+    m_setupStateCond.notify_all();
+    lock.unlock();
 
     m_dcompDevice->Commit();
 
@@ -259,6 +270,8 @@ void CompositorDirectComposition::setup()
             }, Qt::QueuedConnection);
         }
     }
+
+    return true;
 }
 
 void CompositorDirectComposition::cleanup()
@@ -302,7 +315,14 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx, std::funct
     connect(quickViewPtr,
             &QQuickWindow::frameSwapped, // At this stage, we can be sure that QRhi and QRhiSwapChain are valid.
             this,
-            &CompositorDirectComposition::setup,
+            [this]() {
+                if (!setup())
+                {
+                    // Similar to `QQuickWindow::sceneGraphError()` handling:
+                    if (m_mainCtx)
+                        m_mainCtx->askToQuit();
+                }
+            },
             Qt::SingleShotConnection);
 
     {
@@ -410,7 +430,7 @@ void CompositorDirectComposition::unloadGUI()
         QMutexLocker lock(&m_setupStateLock);
         if (m_quickView) {
             disconnect(m_quickView.get(), &QQuickWindow::frameSwapped,
-                       this, &CompositorDirectComposition::setup);
+                       this, nullptr);
         }
         m_setupState = SetupState::Fail;
         m_setupStateCond.notify_all();
