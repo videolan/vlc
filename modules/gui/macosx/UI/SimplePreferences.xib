@@ -1982,7 +1982,7 @@ Gw
                             <font key="font" metaFont="system"/>
                             <string key="title">Press new keys for
 %s</string>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
