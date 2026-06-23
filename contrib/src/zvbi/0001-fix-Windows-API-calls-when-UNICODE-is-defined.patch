@@ -1,0 +1,30 @@
+From 41265f3f61b02733be254236eb6fd7fd2222891a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 23 Jun 2026 13:47:33 +0200
+Subject: [PATCH] fix Windows API calls when UNICODE is defined
+
+The parameter passed is always "TZ".
+---
+ src/pdc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/pdc.c b/src/pdc.c
+index 31eb1c6..684b1c3 100644
+--- a/src/pdc.c
++++ b/src/pdc.c
+@@ -43,10 +43,10 @@ static int setenv(const char *name, const char *value, int overwrite) {
+ 			return 0;
+ 		}
+ 	}
+-	return SetEnvironmentVariable(name, value) ? 0 : -1;
++	return SetEnvironmentVariableA(name, value) ? 0 : -1;
+ }
+ static int unsetenv(const char *name) {
+-	return SetEnvironmentVariable(name, NULL) ? 0 : -1;
++	return SetEnvironmentVariableA(name, NULL) ? 0 : -1;
+ }
+ #endif
+ 
+-- 
+2.52.0.windows.1
+
