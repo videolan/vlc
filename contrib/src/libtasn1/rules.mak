@@ -1,6 +1,6 @@
 # libtasn1
 
-LIBTASN1_VERSION := 4.19.0
+LIBTASN1_VERSION := 4.21.0
 LIBTASN1_URL := $(GNU)/libtasn1/libtasn1-$(LIBTASN1_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"libtasn1 >= 4.3"),)
