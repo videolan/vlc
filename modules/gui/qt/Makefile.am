@@ -1455,15 +1455,17 @@ QSB_PARAMS_VERBOSE__0 = $(QSB_PARAMS_VERBOSE_0)
 
 EXTRA_DIST += shaders/Common.glsl
 
-%.frag.qsb: %.frag shaders/Common.glsl
-	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $<
+$(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb) $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb): shaders/Common.glsl
 
-%.vert.qsb: %.vert shaders/Common.glsl
-	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $<
+$(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb):
+	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $(srcdir)/$(@:.qsb=)
+
+$(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb):
+	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $(srcdir)/$(@:.qsb=)
 
 shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb) $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb)
-	$(AM_V_GEN) cp -f $(filter %.qrc, $^) $(builddir)/shaders/shaders.qrc || true
-	$(AM_V_GEN) $(RCC) $(RCC_EXTRA_PARAMS) --name shaders -o $@ $(builddir)/shaders/$(notdir $(filter %.qrc, $^))
+	$(AM_V_GEN) cp -f $< $(builddir)/shaders/shaders.qrc || true
+	$(AM_V_GEN) $(RCC) $(RCC_EXTRA_PARAMS) --name shaders -o $@ $(builddir)/shaders/shaders.qrc
 
 libqt_plugin_la_SOURCES += shaders/shaders.qrc $(libqt_plugin_la_SHADER)
 CLEANFILES += shaders/shaders.qrc
@@ -1484,6 +1486,22 @@ EXTRA_DIST += $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_S
 
 nodist_libqt_plugin_la_SOURCES += assets.cpp  shaders/shaders.cpp
 endif
+
+# Emit shader source dependencies so that the built shaders are properly
+# registered with the sources as prerequisites
+shaders/shaders.deps: Makefile
+	$(AM_V_at)$(MKDIR_P) $(@D)
+	$(AM_V_GEN){ \
+	  for s in $(libqt_plugin_la_SHADER_FRAG) $(libqt_plugin_la_SHADER_VERT); do \
+	    echo "$$s.qsb: $(srcdir)/$$s"; \
+	  done; \
+	} > $@.tmp && \
+	if cmp -s $@.tmp $@; then rm -f $@.tmp; else mv $@.tmp $@; fi
+
+BUILT_SOURCES += shaders/shaders.deps
+CLEANFILES    += shaders/shaders.deps
+
+-include shaders/shaders.deps
 
 if ENABLE_VLM
 nodist_libqt_plugin_la_SOURCES += dialogs/vlm/vlm.moc.cpp
