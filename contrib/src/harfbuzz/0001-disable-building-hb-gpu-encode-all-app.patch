@@ -1,0 +1,36 @@
+From 983404897a284c82911dfcc7f0e861b17171bf0b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 25 Jun 2026 07:55:36 +0200
+Subject: [PATCH] disable building hb-gpu-encode-all app
+
+It fails to link with -lm on xrOS (missing SDK path?) because of libpng.
+---
+ util/meson.build | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/util/meson.build b/util/meson.build
+index baed2693b..b7238c331 100644
+--- a/util/meson.build
++++ b/util/meson.build
+@@ -238,11 +238,11 @@ if not get_option('gpu').disabled()
+     )
+   endif
+ 
+-  hb_gpu_encode_all = executable('hb-gpu-encode-all',
+-    'hb-gpu-encode-all.cc',
+-    cpp_args: cpp_args,
+-    include_directories: [incconfig, incsrc],
+-    link_with: [libharfbuzz, libharfbuzz_gpu],
+-    install: false,
+-  )
++  # hb_gpu_encode_all = executable('hb-gpu-encode-all',
++  #   'hb-gpu-encode-all.cc',
++  #   cpp_args: cpp_args,
++  #   include_directories: [incconfig, incsrc],
++  #   link_with: [libharfbuzz, libharfbuzz_gpu],
++  #   install: false,
++  # )
+ endif
+-- 
+2.52.0.windows.1
+
