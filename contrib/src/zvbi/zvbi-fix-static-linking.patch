@@ -1,17 +1,17 @@
-From e7acd46058c1e0dfab2ff8bd7e2b773890a5923b Mon Sep 17 00:00:00 2001
+From 897fae0fb25385f9d65888bdf8191cb207bd87b7 Mon Sep 17 00:00:00 2001
 From: Pavlov Konstantin <thresh@videolan.org>
 Date: Wed, 2 Nov 2016 10:36:47 +0100
-Subject: [PATCH 06/11] fixed linking with static libpng
+Subject: [PATCH 5/9] fixed linking with static libpng
 
 ---
- configure.in | 2 +-
+ configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.in b/configure.in
-index 25e6aa7..3cf3857 100644
---- a/configure.in
-+++ b/configure.in
-@@ -244,7 +244,7 @@ dnl (PNG page export)
+diff --git a/configure.ac b/configure.ac
+index 0288c88..4b2c000 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -317,7 +317,7 @@ dnl (PNG page export)
  dnl
  HAVE_PNG="yes"
  AC_CHECK_LIB(png, png_destroy_write_struct,

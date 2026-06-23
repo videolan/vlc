@@ -1,20 +1,20 @@
-From 0b41b9c0447fcfc7675f6cba5c98dbde24c65d0b Mon Sep 17 00:00:00 2001
+From 861d3b149b29724c20829a794491393c7247825e Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 16 Apr 2024 07:59:13 +0200
-Subject: [PATCH 10/11] configure: hardcode -liconv instead of the full path
+Subject: [PATCH 8/9] configure: hardcode -liconv instead of the full path
 
 It disturbs libtool when adding a .a as a file to link with.
 
 png and libz are already hardcoded.
 ---
- configure.in | 4 +++-
+ configure.ac | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/configure.in b/configure.in
-index 29d6fd8..11ae97d 100644
---- a/configure.in
-+++ b/configure.in
-@@ -236,7 +236,9 @@ AM_ICONV_LINK
+diff --git a/configure.ac b/configure.ac
+index 9889d12..6655a75 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -309,7 +309,9 @@ AM_ICONV_LINK
  if test "x$am_cv_func_iconv" != xyes; then
    AC_MSG_ERROR([iconv() not found])
  fi

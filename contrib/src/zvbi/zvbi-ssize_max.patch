@@ -1,40 +1,19 @@
-From 5d18a8c862b71fbd7d8a512ce9de9d64698f26a1 Mon Sep 17 00:00:00 2001
+From 50f787d82340f4c89ee388b1c182b5fe549ee8d4 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
 Date: Sun, 6 Nov 2011 10:34:52 +0100
-Subject: [PATCH 03/11] fix zvbi compilation on Win32
+Subject: [PATCH 2/8] fix zvbi compilation on Win32
 
 Linear memory extents over SSIZE_MAX are undefined, so there is no
 point in protecting against them.
 ---
- contrib/ntsc-cc.c | 4 ++--
- src/export.c      | 9 +--------
- 2 files changed, 3 insertions(+), 10 deletions(-)
+ src/export.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/contrib/ntsc-cc.c b/contrib/ntsc-cc.c
-index 066ef07..c3aff57 100644
---- a/contrib/ntsc-cc.c
-+++ b/contrib/ntsc-cc.c
-@@ -32,7 +32,6 @@
- #include <fcntl.h>
- #include <errno.h>
- #include <locale.h>
--#include <sys/ioctl.h>
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <sys/time.h>
-@@ -45,6 +44,7 @@
- #include "src/libzvbi.h"
- 
- #ifdef ENABLE_V4L2
-+#  include <sys/ioctl.h>
- #  include <asm/types.h>
- #  include "src/videodev2k.h"
- #endif
 diff --git a/src/export.c b/src/export.c
-index 848a869..5c10568 100644
+index 82fe9cf..f5f111f 100644
 --- a/src/export.c
 +++ b/src/export.c
-@@ -1076,8 +1076,6 @@ write_fd			(vbi_export *		e,
+@@ -1080,8 +1080,6 @@ write_fd			(vbi_export *		e,
  		size_t count;
  
  		count = src_size;
@@ -43,7 +22,7 @@ index 848a869..5c10568 100644
  
  		for (retry = 10;; --retry) {
  			actual = write (e->_handle.fd, src, count);
-@@ -1634,12 +1632,7 @@ vbi_export_mem			(vbi_export *		e,
+@@ -1638,12 +1636,7 @@ vbi_export_mem			(vbi_export *		e,
  			free (e->buffer.data);
  		}
  
