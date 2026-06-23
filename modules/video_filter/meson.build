@@ -59,8 +59,7 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'gladjust',
     'sources' : files('gladjust.c'),
-    'dependencies' : [gl_common_dep, opengl_filter_dep],
-    'c_args' : opengl_filter_cargs,
+    'dependencies' : [gl_plugin_dep],
     'enabled' : opengl_filter_dep.found(),
 }
 
@@ -75,9 +74,9 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'pl_scale',
     'sources' : files('../video_output/opengl/pl_scale.c'),
-    'dependencies' : [gl_common_dep, gl_vout_dep, libplacebo_dep],
+    'dependencies' : [gl_plugin_dep, libplacebo_dep],
     'link_with' : [libplacebo_utils],
-    'enabled' : libplacebo_dep.found() and gl_vout_dep.found(),
+    'enabled' : libplacebo_dep.found() and gl_plugin_dep.found(),
 }
 
 # egl_pbuffer_filter

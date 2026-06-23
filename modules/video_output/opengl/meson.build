@@ -70,6 +70,27 @@ elif opengles2_dep.found() or have_ios or have_tvos or host_system == 'android'
     )
 endif
 
+# Plugins that adapt to either backend link and compile against
+# gl_plugin_dep. They are registered depending on whether gl_plugin_dep
+# is disabled or not.
+# These are GL filters/interops that run inside the current context and
+# call GL through the provider's function table, so they need only the
+# common library, not the GL/GLES2 link libraries.
+gl_plugin_dep = disabler()
+if opengl_dep.found() and not (have_ios or have_tvos or host_system == 'android')
+    gl_plugin_dep = declare_dependency(
+        link_with: libvlc_opengl,
+        compile_args: opengl_headers_c_args,
+        dependencies: [opengl_dep.partial_dependency(compile_args: true, includes: true)],
+    )
+elif opengles2_dep.found() or have_ios or have_tvos or host_system == 'android'
+    gl_plugin_dep = declare_dependency(
+        link_with: libvlc_opengles,
+        compile_args: opengl_headers_c_args + ['-DUSE_OPENGL_ES2'],
+        dependencies: [opengles2_dep.partial_dependency(compile_args: true, includes: true)],
+    )
+endif
+
 # gles2 vout display module
 vlc_modules += {
     'name' : 'gles2',
@@ -87,7 +108,7 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'glfilter_draw',
     'sources' : files('filter_draw.c'),
-    'dependencies' : [gl_common_dep, gl_vout_dep, m_lib],
+    'dependencies' : [gl_plugin_dep, m_lib],
     'enabled' : gl_vout_dep.found(),
 }
 
@@ -95,7 +116,7 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'glfilter_mock',
     'sources' : files('filter_mock.c'),
-    'dependencies' : [gl_common_dep, gl_vout_dep, m_lib],
+    'dependencies' : [gl_plugin_dep, m_lib],
     'enabled' : gl_vout_dep.found(),
 }
 
