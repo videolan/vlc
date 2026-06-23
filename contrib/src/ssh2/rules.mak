@@ -33,7 +33,7 @@ endif
 
 DEPS_ssh2 = gcrypt $(DEPS_gcrypt)
 
-SSH2_CONF := --disable-examples-build --with-libgcrypt --without-openssl --without-mbedtls
+SSH2_CONF := --disable-examples-build --with-libgcrypt --without-openssl --without-mbedtls $(BROKEN_GCC_CFLAGS)
 
 .ssh2: ssh2
 	$(RECONF)
