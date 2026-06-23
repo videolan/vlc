@@ -106,6 +106,7 @@ VLC_HOST_CC="$(xcrun --find clang)"
 VLC_HOST_CPP="$(xcrun --find clang) -E"
 VLC_HOST_CXX="$(xcrun --find clang++)"
 VLC_HOST_OBJC="$(xcrun --find clang)"
+VLC_HOST_OBJCXX="$(xcrun --find clang++)"
 VLC_HOST_LD="$(xcrun --find ld)"
 VLC_HOST_AR="$(xcrun --find ar)"
 VLC_HOST_STRIP="$(xcrun --find strip)"
@@ -393,6 +394,7 @@ hostenv()
     CPP="${VLC_HOST_CPP}" \
     CXX="${VLC_HOST_CXX}" \
     OBJC="${VLC_HOST_OBJC}" \
+    OBJCXX="${VLC_HOST_OBJCXX}" \
     LD="${VLC_HOST_LD}" \
     AR="${VLC_HOST_AR}" \
     STRIP="${VLC_HOST_STRIP}" \
@@ -447,6 +449,7 @@ write_config_mak()
     printf '%s := %s\n' "CPP" "${VLC_HOST_CPP}" >&3
     printf '%s := %s\n' "CXX" "${VLC_HOST_CXX}" >&3
     printf '%s := %s\n' "OBJC" "${VLC_HOST_OBJC}" >&3
+    printf '%s := %s\n' "OBJCXX" "${VLC_HOST_OBJCXX}" >&3
     printf '%s := %s\n' "LD" "${VLC_HOST_LD}" >&3
     printf '%s := %s\n' "AR" "${VLC_HOST_AR}" >&3
     printf '%s := %s\n' "STRIP" "${VLC_HOST_STRIP}" >&3
