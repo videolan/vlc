@@ -991,7 +991,30 @@ libqt_plugin_la_RES += \
 	pixmaps/win7/play.svg
 endif
 
-#QML modules
+# QML modules
+#
+# Each QML module has a small section below. To add a new module "foo", append
+# a section following this template:
+#
+#   libqml_module_foo_a_Module     = VLC.Foo
+#   libqml_module_foo_a_ModulePath = VLC/Foo
+#   libqml_module_foo_a_CXXFLAGS   = $(libqt_plugin_la_CXXFLAGS)
+#   libqml_module_foo_a_CPPFLAGS   = $(libqt_plugin_la_CPPFLAGS)
+#   libqml_module_foo_a_SOURCES    = $(QML_MODULE_foo_SRC)
+#   libqml_module_foo_a_QML 			 = foo/qml/Bar.qml # ...
+#   libqml_module_foo_a_Singleton_QML  = foo/qml/SingletonBar.qml # only when there are Singletons
+#   nodist_libqml_module_foo_a_SOURCES = foo/qmlassets.cpp $(QML_MODULE_foo_NODIST_EXTRA)
+#   QML_MODULE_LIBS += libqml_module_foo.a
+#
+# When exposing singletons, list those QML files in the proper variable so that
+# they are declared as singletons in the generated qmldir.
+#
+# Then:
+#   1. Add "foo" to libqt_plugin_la_QML_MODULES.
+#   2. Add the QML file lists to libqt_plugin_la_ALL_QML.
+#   3. Add a QML_MODULE_foo_SRC / QML_MODULE_foo_NODIST_EXTRA pair to the
+#      "if HAVE_QMLCACHEGEN" block below.
+#
 noinst_LIBRARIES =
 QML_MODULE_LIBS =
 
