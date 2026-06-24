@@ -511,6 +511,9 @@ raspbian-arm:
         ./extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x
         # At least compile every targets
         make check TESTS=
+    after_script:
+      - export PATH="${CI_PROJECT_DIR}/extras/tools/build/bin:$PATH"
+      - !reference [.ccache-common-apple, after_script]
 
 macos-x86_64:
     extends: .macos-common
@@ -565,6 +568,9 @@ nightly-macos-arm64:
           EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --package-contribs"
         fi
         ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH $EXTRA_BUILD_FLAGS $EXTRA_TARGET_FLAGS
+    after_script:
+      - export PATH="${CI_PROJECT_DIR}/extras/tools/build/bin:$PATH"
+      - !reference [default, after_script]
 
 ios-arm64:
     extends: .apple-os-common
