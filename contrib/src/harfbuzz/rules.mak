@@ -16,7 +16,7 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(UNPACK)
 	$(MOVE)
 
-DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
+DEPS_harfbuzz = freetype2 $(DEPS_freetype2) png $(DEPS_png)
 
 HARFBUZZ_CONF := -Dfreetype=enabled \
 	-Dglib=disabled \
