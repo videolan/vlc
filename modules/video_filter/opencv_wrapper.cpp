@@ -454,7 +454,7 @@ static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
                 picture_CopyPixels( p_outpic, p_outpic_tmp );
                 CopyInfoAndRelease( p_outpic, p_outpic_tmp );
             }
-        } else if( p_sys->i_internal_chroma == CINPUT ) {
+        } else if( p_sys->p_proc_image && p_sys->i_internal_chroma == CINPUT ) {
             picture_CopyPixels( p_outpic, p_sys->p_proc_image );
             picture_CopyProperties( p_outpic, p_sys->p_proc_image );
         }
