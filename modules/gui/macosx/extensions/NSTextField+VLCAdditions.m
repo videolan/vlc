@@ -26,20 +26,9 @@
 
 + (instancetype)defaultLabelWithString:(NSString *)stringValue
 {
-    if (@available(macOS 10.12, *)) {
-        NSTextField * const textField = [NSTextField wrappingLabelWithString:stringValue];
-        textField.translatesAutoresizingMaskIntoConstraints = NO;
-        textField.selectable = NO;
-        return textField;
-    }
-    NSTextField * const textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+    NSTextField * const textField = [NSTextField wrappingLabelWithString:stringValue];
     textField.translatesAutoresizingMaskIntoConstraints = NO;
-    textField.stringValue = stringValue;
-    textField.editable = NO;
     textField.selectable = NO;
-    textField.bordered = NO;
-    textField.drawsBackground = NO;
-    textField.lineBreakMode = NSLineBreakByWordWrapping;
     return textField;
 }
 

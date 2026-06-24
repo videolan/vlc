@@ -110,11 +110,7 @@
 
 + (NSColor *)VLCSubtleBorderColor
 {
-    if (@available(macOS 10.13, *)) {
-        return [NSColor colorNamed:@"VLCSubtleBorderColor"];
-    }
-
-    return NSColor.VLCLightSubtleBorderColor;
+    return [NSColor colorNamed:@"VLCSubtleBorderColor"];
 }
 
 @end

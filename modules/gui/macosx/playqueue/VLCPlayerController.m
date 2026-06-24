@@ -697,10 +697,8 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    if (@available(macOS 10.12.2, *)) {
-        _remoteControlService = [[VLCRemoteControlService alloc] init];
-        [_remoteControlService subscribeToRemoteCommands];
-    }
+    _remoteControlService = [[VLCRemoteControlService alloc] init];
+    [_remoteControlService subscribeToRemoteCommands];
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
         if (@available(macOS 10.15, *)) {
@@ -725,9 +723,7 @@ static int BossCallback(vlc_object_t *p_this,
     var_DelCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
 
     [self onPlaybackHasTruelyEnded:nil];
-    if (@available(macOS 10.12.2, *)) {
-        [_remoteControlService unsubscribeFromRemoteCommands];
-    }
+    [_remoteControlService unsubscribeFromRemoteCommands];
     if (_currentTitleList) {
         vlc_player_title_list_Release(_currentTitleList);
     }
