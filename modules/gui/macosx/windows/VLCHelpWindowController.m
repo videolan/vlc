@@ -45,10 +45,8 @@
 - (void)windowDidLoad
 {
     self.window.title = _NS("VLC media player Help");
-    if (@available(macOS 10.12, *)) {
-        self.window.tabbingMode = NSWindowTabbingModeDisallowed;
-    }
-    
+    self.window.tabbingMode = NSWindowTabbingModeDisallowed;
+
     _helpWebView = [[WKWebView alloc] initWithFrame:self.window.contentView.bounds];
     self.helpWebView.navigationDelegate = self;
     self.helpWebView.translatesAutoresizingMaskIntoConstraints = NO;

@@ -185,18 +185,14 @@
         // Attach pull-down menu
         [self.statusItem setMenu:_vlcStatusBarIconMenu];
 
-        if (@available(macOS 10.12, *)) {
-            [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];
-            [self.statusItem setAutosaveName:@"statusBarItem"];
-            [self.statusItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isVisible))
-                                 options:NSKeyValueObservingOptionNew context:NULL];
-        }
+        [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];
+        [self.statusItem setAutosaveName:@"statusBarItem"];
+        [self.statusItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isVisible))
+                             options:NSKeyValueObservingOptionNew context:NULL];
     }
 
-    if (@available(macOS 10.12, *)) {
-        // Sync VLC setting with status bar visibility setting (10.12 runtime only)
-        [self.statusItem setVisible:YES];
-    }
+    // Sync VLC setting with status bar visibility setting
+    [self.statusItem setVisible:YES];
 }
 
 - (void)disableStatusItem
@@ -204,13 +200,7 @@
     if (!self.statusItem)
         return;
 
-    // Lets keep alive the object in Sierra, and destroy it in older OS versions
-    if (@available(macOS 10.12, *)) {
-        self.statusItem.visible = NO;
-    } else {
-        [[NSStatusBar systemStatusBar] removeStatusItem:self.statusItem];
-        self.statusItem = nil;
-    }
+    self.statusItem.visible = NO;
 }
 
 - (void)dealloc
