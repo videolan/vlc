@@ -1,7 +1,7 @@
 # fontconfig
 
-FONTCONFIG_VERSION := 2.14.2
-FONTCONFIG_URL := https://www.freedesktop.org/software/fontconfig/release/fontconfig-$(FONTCONFIG_VERSION).tar.gz
+FONTCONFIG_VERSION := 2.18.1
+FONTCONFIG_URL := https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/$(FONTCONFIG_VERSION)/fontconfig-$(FONTCONFIG_VERSION).tar.xz
 
 ifndef HAVE_WIN32
 PKGS += fontconfig
@@ -10,18 +10,14 @@ ifeq ($(call need_pkg,"fontconfig >= 2.11"),)
 PKGS_FOUND += fontconfig
 endif
 
-$(TARBALLS)/fontconfig-$(FONTCONFIG_VERSION).tar.gz:
+$(TARBALLS)/fontconfig-$(FONTCONFIG_VERSION).tar.xz:
 	$(call download_pkg,$(FONTCONFIG_URL),fontconfig)
 
-.sum-fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz
+.sum-fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.xz
 
-fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz .sum-fontconfig
+fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.xz .sum-fontconfig
 	$(UNPACK)
 	$(call update_autoconfig,.)
-	$(RM) $(UNPACK_DIR)/src/fcobjshash.gperf
-	# include the generated fcobjshash.h, not the one from src/
-	sed -i.orig -e 's,"fcobjshash.h",<fcobjshash.h>,' $(UNPACK_DIR)/src/fcobjs.c
-	$(APPLY) $(SRC)/fontconfig/0001-detect-mkostemp-with-stdlib.h.patch
 	$(call pkg_static, "fontconfig.pc.in")
 	$(MOVE)
 
@@ -57,8 +53,10 @@ endif
 
 DEPS_fontconfig = freetype2 $(DEPS_freetype2) libxml2 $(DEPS_libxml2)
 
+# assume va_copy works as the test fails when cross compiling
+FONTCONFIG_CONF += ac_cv_va_copy=.C99
+
 .fontconfig: fontconfig
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(FONTCONFIG_CONF)
 	+$(MAKEBUILD)
