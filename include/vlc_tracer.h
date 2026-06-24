@@ -242,6 +242,30 @@ static inline struct vlc_tracer_entry VLC_TRACE(const char *key, const char *val
 
 #define VLC_TRACE_TICK_NS(key, tick) VLC_TRACE((key), NS_FROM_VLC_TICK((tick)))
 
+#ifdef __cplusplus
+#undef vlc_tracer_TraceWithTs
+#undef vlc_tracer_Trace
+
+template<typename... Entries>
+static inline void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer,
+                                          vlc_tick_t ts,
+                                          struct vlc_tracer_entry first,
+                                          Entries... rest)
+{
+    const struct vlc_tracer_entry arr[] = { first, rest... };
+    const struct vlc_tracer_trace trace = { arr };
+    vlc_tracer_TraceWithTs(tracer, ts, &trace);
+}
+
+template<typename... Entries>
+static inline void vlc_tracer_Trace(struct vlc_tracer *tracer,
+                                    struct vlc_tracer_entry first,
+                                    Entries... rest)
+{
+    vlc_tracer_TraceWithTs(tracer, vlc_tick_now(), first, rest...);
+}
+#endif
+
 /**
  * @}
  *
