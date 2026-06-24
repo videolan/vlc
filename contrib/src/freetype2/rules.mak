@@ -4,8 +4,14 @@ FREETYPE2_VERSION := 2.13.1
 FREETYPE2_URL := $(SF)/freetype/freetype2/$(FREETYPE2_VERSION)/freetype-$(FREETYPE2_VERSION).tar.xz
 
 PKGS += freetype2
-ifeq ($(call need_pkg,"freetype2"),)
+ifeq ($(BUILD_WITH_FONTCONFIG), 1)
+ifeq ($(call need_pkg,"freetype2 >= 21.0.15"),)
 PKGS_FOUND += freetype2
+endif
+else # without fontconfig
+ifeq ($(call need_pkg,"freetype2 >= 20.0.14"),)
+PKGS_FOUND += freetype2
+endif
 endif
 
 $(TARBALLS)/freetype-$(FREETYPE2_VERSION).tar.xz:
