@@ -244,16 +244,7 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
 
 - (NSTextField *)buildLabelWithFont:(NSFont *)font textColor:(NSColor *)color alignment:(NSTextAlignment)alignment
 {
-    NSTextField *label;
-    if (@available(macOS 10.12, *)) {
-        label = [NSTextField labelWithString:@""];
-    } else {
-        label = [[NSTextField alloc] initWithFrame:NSZeroRect];
-        label.editable = NO;
-        label.bezeled = NO;
-        label.drawsBackground = NO;
-        label.selectable = NO;
-    }
+    NSTextField *label = [NSTextField labelWithString:@""];
     label.font = font;
     label.textColor = color;
     label.alignment = alignment;
@@ -264,15 +255,7 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
 
 - (NSButton *)buildActionButtonWithTitle:(NSString *)title action:(SEL)selector
 {
-    NSButton *button;
-    if (@available(macOS 10.12, *)) {
-        button = [NSButton buttonWithTitle:title target:self action:selector];
-    } else {
-        button = [[NSButton alloc] initWithFrame:NSZeroRect];
-        button.title = title;
-        button.target = self;
-        button.action = selector;
-    }
+    NSButton *button = [NSButton buttonWithTitle:title target:self action:selector];
     button.bezelStyle = NSBezelStyleRounded;
     button.translatesAutoresizingMaskIntoConstraints = NO;
     if (@available(macOS 10.14, *))

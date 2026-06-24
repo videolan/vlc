@@ -80,9 +80,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         self.secondaryDetailTextButton.contentTintColor = NSColor.secondaryLabelColor;
     }
 
-    if(@available(macOS 10.12.2, *)) {
-        self.playButton.bezelColor = NSColor.VLCAccentColor;
-    }
+    self.playButton.bezelColor = NSColor.VLCAccentColor;
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self

@@ -81,9 +81,7 @@
 
     self.targetView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    if (@available(macOS 10.13, *)) {
-        self.viewSelector.segmentDistribution = NSSegmentDistributionFillEqually;
-    }
+    self.viewSelector.segmentDistribution = NSSegmentDistributionFillEqually;
 
     [self setupViewSelectorSegments];
     [self updateViewSelectorState];

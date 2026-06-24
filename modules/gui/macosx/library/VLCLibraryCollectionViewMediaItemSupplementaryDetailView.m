@@ -68,9 +68,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         _mediaItemSecondaryDetailButton.contentTintColor = NSColor.secondaryLabelColor;
     }
 
-    if(@available(macOS 10.12.2, *)) {
-        _playMediaItemButton.bezelColor = NSColor.VLCAccentColor;
-    }
+    _playMediaItemButton.bezelColor = NSColor.VLCAccentColor;
 }
 
 - (NSString *)formattedYearAndDurationAndTypeString

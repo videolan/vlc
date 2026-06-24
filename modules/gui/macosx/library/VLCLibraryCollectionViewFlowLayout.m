@@ -311,11 +311,9 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         NSCollectionViewLayoutAttributes * const attributes = layoutAttributesArray[i].copy;
         NSString * const elementKind = attributes.representedElementKind;
 
-        if (@available(macOS 10.12, *)) {
-            if (([elementKind isEqualToString:NSCollectionElementKindSectionHeader] && self.sectionHeadersPinToVisibleBounds) ||
-                ([elementKind isEqualToString:NSCollectionElementKindSectionFooter] && self.sectionFootersPinToVisibleBounds)) {
-                continue;
-            }
+        if (([elementKind isEqualToString:NSCollectionElementKindSectionHeader] && self.sectionHeadersPinToVisibleBounds) ||
+            ([elementKind isEqualToString:NSCollectionElementKindSectionFooter] && self.sectionFootersPinToVisibleBounds)) {
+            continue;
         }
 
         [attributes setFrame:[self frameForDisplacedAttributes:attributes]];

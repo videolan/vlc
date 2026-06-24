@@ -229,9 +229,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     audioLibraryGridModeListSelectionCollectionViewLayout.headerReferenceSize =
         NSMakeSize(self.audioCollectionViewScrollView.documentView.frame.size.width, VLCLibraryHeaderViewHeight);
 
-    if (@available(macOS 10.12, *)) {
-        audioLibraryGridModeListSelectionCollectionViewLayout.sectionHeadersPinToVisibleBounds = YES;
-    }
+    audioLibraryGridModeListSelectionCollectionViewLayout.sectionHeadersPinToVisibleBounds = YES;
 
     [VLCLibraryAudioDataSource setupCollectionView:_audioLibraryGridModeSplitViewListSelectionCollectionView];
     [VLCLibraryAudioGroupDataSource setupCollectionView:_audioLibraryGridModeSplitViewListSelectionCollectionView];
