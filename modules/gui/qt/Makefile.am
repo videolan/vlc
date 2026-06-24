@@ -1010,7 +1010,6 @@ libqml_module_dialogs_a_QML = \
 	dialogs/toolbar/qml/ToolbarEditorButtonList.qml
 
 $(libqml_module_dialogs_a_QML:.qml=.cpp) : $(builddir)/dialogs/res.qrc
-$(libqml_module_dialogs_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/dialogs/res.qrc
 nodist_libqml_module_dialogs_a_SOURCES = dialogs/qmlassets.cpp
 
 libqml_module_maininterface_a_Module = VLC.MainInterface
@@ -1030,7 +1029,6 @@ endif
 
 nodist_libqml_module_maininterface_a_SOURCES = maininterface/qmlassets.cpp
 $(libqml_module_maininterface_a_QML:.qml=.cpp) : $(builddir)/maininterface/res.qrc
-$(libqml_module_maininterface_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/maininterface/res.qrc
 
 libqml_module_medialibrary_a_Module = VLC.MediaLibrary
 libqml_module_medialibrary_a_ModulePath = VLC/MediaLibrary
@@ -1079,7 +1077,6 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/ScanProgressBar.qml
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary/qmlassets.cpp
 $(libqml_module_medialibrary_a_QML:.qml=.cpp) : $(builddir)/medialibrary/res.qrc
-$(libqml_module_medialibrary_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/medialibrary/res.qrc
 
 libqml_module_menus_a_Module = VLC.Menus
 libqml_module_menus_a_ModulePath = VLC/Menus
@@ -1091,7 +1088,6 @@ libqml_module_menus_a_QML = \
 	menus/qml/ShortcutExt.qml
 nodist_libqml_module_menus_a_SOURCES = menus/qmlassets.cpp
 $(libqml_module_menus_a_QML:.qml=.cpp) : $(builddir)/menus/res.qrc
-$(libqml_module_menus_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/menus/res.qrc
 
 libqml_module_network_a_Module = VLC.Network
 libqml_module_network_a_ModulePath = VLC/Network
@@ -1114,7 +1110,6 @@ libqml_module_network_a_QML = \
 	network/qml/ServicesSources.qml
 nodist_libqml_module_network_a_SOURCES = network/qmlassets.cpp
 $(libqml_module_network_a_QML:.qml=.cpp) : $(builddir)/network/res.qrc
-$(libqml_module_network_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/network/res.qrc
 
 libqml_module_player_a_Module = VLC.Player
 libqml_module_player_a_ModulePath = VLC/Player
@@ -1149,7 +1144,6 @@ libqml_module_player_a_Singleton_QML = \
 
 nodist_libqml_module_player_a_SOURCES = player/qmlassets.cpp
 $(libqml_module_player_a_QML:.qml=.cpp) $(libqml_module_player_a_Singleton_QML:.qml=.cpp) : $(builddir)/player/res.qrc
-$(libqml_module_player_a_QML:.qml=.cpp) $(libqml_module_player_a_Singleton_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/player/res.qrc
 
 libqml_module_playercontrols_a_Module = VLC.PlayerControls
 libqml_module_playercontrols_a_ModulePath = VLC/PlayerControls
@@ -1202,7 +1196,6 @@ libqml_module_playercontrols_a_QML = \
 	player/qml/controlbarcontrols/Fallback.qml
 nodist_libqml_module_playercontrols_a_SOURCES = playercontrols/qmlassets.cpp
 $(libqml_module_playercontrols_a_QML:.qml=.cpp) : $(builddir)/playercontrols/res.qrc
-$(libqml_module_playercontrols_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/playercontrols/res.qrc
 
 libqml_module_playlist_a_Module = VLC.Playlist
 libqml_module_playlist_a_ModulePath = VLC/Playlist
@@ -1215,7 +1208,6 @@ libqml_module_playlist_a_QML = \
 	playlist/qml/PlaylistDetachedWindow.qml
 nodist_libqml_module_playlist_a_SOURCES = playlist/qmlassets.cpp
 $(libqml_module_playlist_a_QML:.qml=.cpp) : $(builddir)/playlist/res.qrc
-$(libqml_module_playlist_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/playlist/res.qrc
 
 libqml_module_style_a_Module = VLC.Style
 libqml_module_style_a_ModulePath = VLC/Style
@@ -1228,7 +1220,6 @@ libqml_module_style_a_Singleton_QML = \
 	style/VLCStyle.qml
 nodist_libqml_module_style_a_SOURCES = style/qmlassets.cpp
 $(libqml_module_style_a_QML:.qml=.cpp) $(libqml_module_style_a_Singleton_QML:.qml=.cpp) : $(builddir)/style/res.qrc
-$(libqml_module_style_a_QML:.qml=.cpp) $(libqml_module_style_a_Singleton_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/style/res.qrc
 
 libqml_module_util_a_Module = VLC.Util
 libqml_module_util_a_ModulePath = VLC/Util
@@ -1249,7 +1240,6 @@ libqml_module_util_a_Singleton_QML = \
 	util/qml/Helpers.qml
 nodist_libqml_module_util_a_SOURCES = util/qmlassets.cpp
 $(libqml_module_util_a_QML:.qml=.cpp) $(libqml_module_util_a_Singleton_QML:.qml=.cpp) : $(builddir)/util/res.qrc
-$(libqml_module_util_a_QML:.qml=.cpp) $(libqml_module_util_a_Singleton_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/util/res.qrc
 
 libqml_module_widgets_a_Module = VLC.Widgets
 libqml_module_widgets_a_ModulePath = VLC/Widgets
@@ -1345,7 +1335,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/ProgressBarExt.qml
 nodist_libqml_module_widgets_a_SOURCES = widgets/qmlassets.cpp
 $(libqml_module_widgets_a_QML:.qml=.cpp) : $(builddir)/widgets/res.qrc
-$(libqml_module_widgets_a_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/widgets/res.qrc
 
 libqt_plugin_la_QML_MODULES = \
 	dialogs \
@@ -1577,14 +1566,18 @@ if HAVE_QT67
 QML_CACHEGEN_EXTRA_ARGS=--validate-basic-blocks
 endif
 
+# Each .qml/.js/.mjs is compiled with its module's res.qrc as prerequisite. The
+# per-module qrc isn't derivable from the target path, so pick it out of $^.
+qml_resource = for f in $^; do case $$f in *.qrc) echo --resource=$$f;; esac; done
+
 .qml.cpp:
-	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) $(QML_CACHEGEN_ARGS) -o $@ $<
+	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) `$(qml_resource)` -o $@ $<
 
 .js.cpp:
-	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) $(QML_CACHEGEN_ARGS) -o $@ $<
+	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) `$(qml_resource)` -o $@ $<
 
 .mjs.cpp:
-	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) $(QML_CACHEGEN_ARGS) -o $@ $<
+	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) `$(qml_resource)` -o $@ $<
 
 #we need to pass the resource path and as it appears in the qrc, this is easier to generate it externally
 %/qmlcachegen.rsp: $(builddir)/%/res.qrc
