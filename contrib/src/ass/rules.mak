@@ -1,6 +1,6 @@
 # ASS
-ASS_VERSION := 0.17.4
-ASS_URL := $(GITHUB)/libass/libass/releases/download/$(ASS_VERSION)/libass-$(ASS_VERSION).tar.gz
+ASS_VERSION := 0.17.5
+ASS_URL := $(GITHUB)/libass/libass/releases/download/$(ASS_VERSION)/libass-$(ASS_VERSION).tar.xz
 
 PKGS += ass
 ifeq ($(call need_pkg,"libass"),)
@@ -28,12 +28,12 @@ endif
 endif
 endif
 
-$(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
+$(TARBALLS)/libass-$(ASS_VERSION).tar.xz:
 	$(call download_pkg,$(ASS_URL),ass)
 
-.sum-ass: libass-$(ASS_VERSION).tar.gz
+.sum-ass: libass-$(ASS_VERSION).tar.xz
 
-libass: libass-$(ASS_VERSION).tar.gz .sum-ass
+libass: libass-$(ASS_VERSION).tar.xz .sum-ass
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
 	$(call pkg_static,"libass.pc.in")
