@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.8.7
+LIBARCHIVE_VERSION := 3.8.8
 LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.xz
 
 PKGS += libarchive
@@ -11,7 +11,6 @@ DEPS_libarchive = zlib $(DEPS_zlib)
 
 LIBARCHIVE_CONF := \
 		-DENABLE_CPIO=OFF -DENABLE_TAR=OFF -DENABLE_CAT=OFF \
-		-DENABLE_NETTLE=OFF \
 		-DENABLE_LIBXML2=OFF -DENABLE_LZMA=OFF -DENABLE_ICONV=OFF -DENABLE_EXPAT=OFF \
 		-DENABLE_TEST=OFF -DENABLE_WERROR=OFF
 
@@ -20,10 +19,6 @@ LIBARCHIVE_CONF +=-DENABLE_CNG=ON
 
 # bsdunzip doesn't build on macos, android and emscripten and it's disabled on Windows
 LIBARCHIVE_CONF +=-DENABLE_UNZIP=OFF
-
-ifdef HAVE_WIN32
-LIBARCHIVE_CONF += -DENABLE_OPENSSL=OFF
-endif
 
 ifdef HAVE_MACOSX
 # these functions are detected as present but there are not until macOS 10.10
@@ -40,6 +35,8 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.xz:
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.xz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-zstd-use-GetNativeSystemInfo-to-get-the-number-of-th.patch
+	# Do not use WINAPI_PARTITION_SYSTEM, It's not handled properly by the mingw64 macro
+	sed -i.orig 's, | WINAPI_PARTITION_SYSTEM,,' $(UNPACK_DIR)/libarchive/archive_write_disk_windows.c
 	# don't use CreateHardLinkW on old UWP
 	$(APPLY) $(SRC)/libarchive/0001-Disable-CreateHardLinkW-usage-on-old-UWP-targets.patch
 	$(APPLY) $(SRC)/libarchive/0003-Use-VirtualAllocFromApp-for-old-UWP-targets.patch

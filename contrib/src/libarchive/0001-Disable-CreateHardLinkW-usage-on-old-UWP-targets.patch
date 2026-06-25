@@ -1,25 +1,34 @@
-From 02acac67f21aa16d5f7223703c5aef5596ee2389 Mon Sep 17 00:00:00 2001
+From 338f388576f6ddadc9abe68bcb7841cf62c2abaa Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 3 Apr 2026 13:31:37 +0200
-Subject: [PATCH] Disable CreateHardLinkW usage on old UWP targets
+Subject: [PATCH 1/3] Disable CreateHardLinkW usage on old UWP targets
 
 ---
- libarchive/archive_write_disk_windows.c | 2 ++
- 1 file changed, 2 insertions(+)
+ libarchive/archive_write_disk_windows.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/libarchive/archive_write_disk_windows.c b/libarchive/archive_write_disk_windows.c
-index c9f10a8a..61931a29 100644
+index a6abd223..4a910b9f 100644
 --- a/libarchive/archive_write_disk_windows.c
 +++ b/libarchive/archive_write_disk_windows.c
-@@ -606,6 +606,8 @@ la_CreateHardLinkW(wchar_t *linkname, wchar_t *target)
- 		set = 1;
- 		f = la_GetFunctionKernel32("CreateHardLinkW");
+@@ -584,6 +584,9 @@ static int
+ la_CreateHardLinkW(wchar_t *linkname, wchar_t *target)
+ {
+ 	BOOL ret;
++#if defined(WINAPI_FAMILY_PARTITION) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && NTDDI_VERSION < NTDDI_WIN10_19H1
++	ret = FALSE;
++#else
+ 	ret = CreateHardLinkW(linkname, target, NULL);
+ 	if (!ret) {
+ 		/* Under windows 2000, it is necessary to remove
+@@ -605,6 +608,7 @@ la_CreateHardLinkW(wchar_t *linkname, wchar_t *target)
+ #undef IS_UNC
+ 		ret = CreateHardLinkW(linkname, target, NULL);
  	}
-+#elif defined(WINAPI_FAMILY_PARTITION) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && NTDDI_VERSION < NTDDI_WIN10_19H1
-+	f = NULL;
- #else
- 	f = CreateHardLinkW;
- #endif
++#endif
+ 	return (ret);
+ }
+ 
 -- 
 2.52.0.windows.1
 
