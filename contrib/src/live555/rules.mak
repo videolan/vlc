@@ -48,31 +48,32 @@ LIVE_TARGET := solaris-32bit
 endif
 endif
 
+live555: UNPACK_DIR=live
 live555: $(LIVE555_FILE) .sum-live555
-	rm -Rf live && $(UNPACK)
+	rm -rf $(UNPACK_DIR)
+	$(UNPACK)
 
 	# Change permissions to patch and sed the source
-	chmod -R u+w live
+	chmod -R u+w $(UNPACK_DIR)
 	# Remove hardcoded cc, c++, ar variables
-	cd live && sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -e 's%LIBRARY_LINK =.*ar%LIBRARY_LINK = $(AR)%' -i.orig config.$(LIVE_TARGET)
+	sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -e 's%LIBRARY_LINK =.*ar%LIBRARY_LINK = $(AR)%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
 	# Replace libtool -s by ar cr for macOS only
-	cd live && sed -i.orig -e s/"libtool -s -o"/"ar cr"/g config.macosx*
+	sed -i.orig -e s/"libtool -s -o"/"ar cr"/g $(UNPACK_DIR)/config.macosx*
 	# Add Extra LDFLAGS for macOS
-	cd live && sed -i.orig -e 's%$(CXX)%$(CXX)\ $(EXTRA_LDFLAGS)%' config.macosx*
+	sed -i.orig -e 's%$(CXX)%$(CXX)\ $(EXTRA_LDFLAGS)%' $(UNPACK_DIR)/config.macosx*
 	# Add CXXFLAGS for macOS (force libc++)
-	cd live && sed -i.orig -e 's%^\(CPLUSPLUS_FLAGS.*\)$$%\1 '"$(CXXFLAGS)%" config.macosx*
+	sed -i.orig -e 's%^\(CPLUSPLUS_FLAGS.*\)$$%\1 '"$(CXXFLAGS)%" $(UNPACK_DIR)/config.macosx*
 	# Add the Extra_CFLAGS to all config files
-	cd live && sed -i.orig \
-		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" config.*
+	sed -i.orig \
+		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" $(UNPACK_DIR)/config.*
 	# We want 64bits offsets and PIC on Linux
-	cd live && sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
+	sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig $(UNPACK_DIR)/config.linux
 	# Disable Locale for Solaris
-	cd live && sed -e 's%-DSOLARIS%-DSOLARIS -DXLOCALE_NOT_USED%' -i.orig config.solaris-*bit
+	sed -e 's%-DSOLARIS%-DSOLARIS -DXLOCALE_NOT_USED%' -i.orig $(UNPACK_DIR)/config.solaris-*bit
 ifdef HAVE_ANDROID
 	# Disable locale on Android too
-	cd live && sed -e 's%-DPIC%-DPIC -DNO_SSTREAM=1 -DLOCALE_NOT_USED -I$(ANDROID_NDK)/platforms/android-$(ANDROID_API)/arch-$(PLATFORM_SHORT_ARCH)/usr/include%' -i.orig config.linux
+	sed -e 's%-DPIC%-DPIC -DNO_SSTREAM=1 -DLOCALE_NOT_USED -I$(ANDROID_NDK)/platforms/android-$(ANDROID_API)/arch-$(PLATFORM_SHORT_ARCH)/usr/include%' -i.orig $(UNPACK_DIR)/config.linux
 endif
-	mv live live.$(LIVE555_VERSION)
 	# Patch for MSG_NOSIGNAL
 	$(APPLY) $(SRC)/live555/live555-nosignal.patch
 	# Add a pkg-config file
@@ -87,8 +88,8 @@ endif
 	$(APPLY) $(SRC)/live555/android-no-ifaddrs.patch
 	# Don't use unavailable off64_t functions
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
-	cd $(UNPACK_DIR) && sed -i.orig "s,LIBRARY_LINK =.*,LIBRARY_LINK = $(AR) cr ,g" config.macosx*
-	mv live.$(LIVE555_VERSION) $@ && touch $@
+	sed -i.orig "s,LIBRARY_LINK =.*,LIBRARY_LINK = $(AR) cr ,g" $(UNPACK_DIR)/config.macosx*
+	$(MOVE)
 
 LIVE555_SUBDIRS=groupsock liveMedia UsageEnvironment BasicUsageEnvironment
 
