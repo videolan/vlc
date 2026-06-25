@@ -4406,6 +4406,10 @@ AS_IF([test "${enable_qt}" != "no"], [
       AS_IF([test "${QMLCACHEGEN}" = "no"], [
           AC_MSG_WARN([qmlcachegen not found])
       ])
+      AC_PATH_PROGS(QMLTYPEREGISTRAR, [qmltyperegistrar], no, ["${QT_QML_LIBEXEC_DIRECTORY}"])
+      AS_IF([test "${QMLTYPEREGISTRAR}" = "no"], [
+          AC_MSG_WARN([qmltyperegistrar not found])
+      ])
 
       AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE6} and conf ${with_qtconf}])
 
@@ -4569,6 +4573,7 @@ AC_ARG_ENABLE([qt-qml-cache],
   AS_HELP_STRING([--disable-qt-qml-cache],
     [disable qml cache generation and basic error checking]))
 AM_CONDITIONAL([HAVE_QMLCACHEGEN], [test "${enable_qt_qml_cache}" != "no" && test "$QMLCACHEGEN" != "no"])
+AM_CONDITIONAL([HAVE_QMLTYPEREGISTRAR], [test "$QMLTYPEREGISTRAR" != "no"])
 
 AC_ARG_ENABLE([qt-qml-debug],
   AS_HELP_STRING([--enable-qt-qml-debug], [enable qml debugger]))
