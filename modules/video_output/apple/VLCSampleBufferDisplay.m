@@ -736,6 +736,8 @@ shouldInheritContentsScale:(CGFloat)newScale
     }
 
     VLCSampleBufferDisplay *sys = self;
+    vout_display_t *vd = _vd;
+    vout_display_place_t place = *_vd->place;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (sys.displayView)
             return;
@@ -745,12 +747,12 @@ shouldInheritContentsScale:(CGFloat)newScale
         VLCView *window = sys.window;
 
         displayView =
-            [[VLCSampleBufferDisplayView alloc] initWithVoutDisplay:sys.vd];
+            [[VLCSampleBufferDisplayView alloc] initWithVoutDisplay:vd];
         spuView = [VLCSampleBufferSubpictureView new];
         [window addSubview:displayView];
         [window addSubview:spuView];
 
-        displayView.frame = [sys frameForPlace:sys.vd->place];
+        displayView.frame = [sys frameForPlace:&place];
         [spuView setFrame:[window bounds]];
 
         sys.displayView = displayView;
