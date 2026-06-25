@@ -393,11 +393,18 @@ moc_verbose_ = $(moc_verbose__$(AM_DEFAULT_VERBOSITY))
 moc_verbose_0 = @echo "  MOC     " $@;
 moc_verbose__0 = $(moc_verbose_0)
 
+MOC_EXTRA_ARGS =
+if HAVE_QMLTYPEREGISTRAR
+if HAVE_QMLCACHEGEN
+MOC_EXTRA_ARGS += --output-json
+endif
+endif
+
 .hpp.moc.cpp:
-	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
+	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $< $(MOC_EXTRA_ARGS)
 
 .cpp.moc:
-	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
+	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $< $(MOC_EXTRA_ARGS)
 
 # These MOC files depend on the configure settings:
 dialogs/dialogs_provider.moc.cpp dialogs/vlm/vlm.moc.cpp: $(top_builddir)/config.h
@@ -544,6 +551,12 @@ nodist_libqt_plugin_la_SOURCES = \
 	widgets/native/backdropblenditem.moc.cpp \
 	widgets/native/roundedcornermask.moc.cpp \
 	widgets/native/fadingedgemask.moc.cpp
+
+if HAVE_QMLTYPEREGISTRAR
+if HAVE_QMLCACHEGEN
+CLEANFILES += $(nodist_libqt_plugin_la_SOURCES:.moc.cpp=.moc.cpp.json)
+endif
+endif
 
 nodist_libqt_plugin_la_SOURCES += \
 	dialogs/extended/ui_equalizer.h \
@@ -1578,13 +1591,20 @@ endif
 # text functions.
 QML_RULES_DEPS = $(libqt_plugin_la_QML_MODULES:=/qml.deps)
 
+QML_QMLTYPES_DEP =
+if HAVE_QMLTYPEREGISTRAR
+if HAVE_QMLCACHEGEN
+QML_QMLTYPES_DEP = $(@D)/plugins.qmltypes
+endif
+endif
+
 # Since every QML modules is built into a given directory, we can use $(@D)
 # to get the module name.
 $(QML_RULES_DEPS): Makefile
 	$(AM_V_at)$(MKDIR_P) $(@D)
 	$(AM_V_at){ \
 	  echo '$(@D)/qmldir.qrc: $(@D)/qmldir'; \
-	  echo '$(@D)/res.qrc $(@D)/qmldir: $(@D)/qml_modules.stamp'; \
+	  echo '$(@D)/res.qrc $(@D)/qmldir: $(@D)/qml_modules.stamp $(QML_QMLTYPES_DEP)'; \
 	  echo '$(@D)/qmlcachegen.rsp: $$(builddir)/$(@D)/res.qrc'; \
 	  echo '$(@D)/qmlcache_loader.cpp: $(@D)/qmlcachegen.rsp'; \
 	  echo '$(@D)/qmlassets.cpp: $$(builddir)/$(@D)/qmldir.qrc $$(builddir)/$(@D)/res.qrc'; \
@@ -1630,7 +1650,64 @@ $(QML_MODULE_QMLDIR):
 	--prefix qt/qml \
 	--module $(libqml_module_$(@D)_a_Module) \
 	--sources $(libqml_module_$(@D)_a_QML) \
-	--singletons $(libqml_module_$(@D)_a_Singleton_QML)
+	--singletons $(libqml_module_$(@D)_a_Singleton_QML) \
+	--typeinfo=plugins.qmltypes
+
+QT_METATYPES = $(libqt_plugin_la_QML_MODULES:=/metatypes.moc.json)
+$(QT_METATYPES): $(nodist_libqt_plugin_la_SOURCES)
+	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/collectmetatypejson.py \
+	-o $@ \
+	--moc $(MOC) \
+	--metatypejsondir="$(@D)/"
+
+# FIXME: It does not seem qmake is able to query the path for metatypes
+QT_METATYPES_DIR = $(QT_ARCHDATA_DIRECTORY)/metatypes
+
+if HAVE_QMLTYPEREGISTRAR
+if HAVE_QMLCACHEGEN
+
+qmltyperegistrar_verbose = $(qmltyperegistrar_verbose_$(V))
+qmltyperegistrar_verbose_ = $(qmltyperegistrar_verbose__$(AM_DEFAULT_VERBOSITY))
+qmltyperegistrar_verbose_0 = @echo "  TYPEREG " $@;
+qmltyperegistrar_verbose__0 = $(qmltyperegistrar_verbose_0)
+
+QMLTYPEREGISTRAR_EXTRA_ARGS = --follow-foreign-versioning
+
+# We provide the built-in Qt metatypes, and other modules of VLC.
+# Note that we currently do not make use of `qmltyperegistrations.cpp`
+
+QML_TYPES = $(libqt_plugin_la_QML_MODULES:=/plugins.qmltypes)
+$(QML_TYPES): $(QT_METATYPES)
+	$(qmltyperegistrar_verbose) \
+	found=; \
+	for f in $(QT_METATYPES_DIR)/*.json; do \
+	    [ -f "$$f" ] && found=1 && break; \
+	done; \
+	if [ -z "$$found" ]; then \
+	    echo "error: no Qt metatypes (*.json) found in '$(QT_METATYPES_DIR)', check QT_METATYPES_DIR" >&2; \
+	    exit 1; \
+	fi; \
+	foreign=; \
+	for f in $^ $(QT_METATYPES_DIR)/*.json; do \
+	    [ -f "$$f" ] || continue; \
+	    foreign="$${foreign:+$$foreign,}$$f"; \
+	done; \
+	$(QMLTYPEREGISTRAR) \
+	    --import-name=$(libqml_module_$(@D)_a_Module) \
+	    --major-version=1 --minor-version=0 \
+	    --private-includes $(QMLTYPEREGISTRAR_EXTRA_ARGS) \
+	    -o $(@D)/qmltyperegistrations.cpp \
+	    --generate-qmltypes=$@ $(@D)/metatypes.moc.json \
+	    --foreign-types="$$foreign"
+
+CLEANFILES += $(QML_TYPES) $(libqt_plugin_la_QML_MODULES:=/qmltyperegistrations.cpp) $(libqt_plugin_la_QML_MODULES:=/metatypes.moc.json)
+
+if ENABLE_QT
+BUILT_SOURCES += $(QML_TYPES)
+endif
+
+endif # HAVE_QMLCACHEGEN
+endif # HAVE_QMLTYPEREGISTRAR
 
 $(QML_MODULE_QMLDIR_QRC):
 	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqrc.py -o $@ \
@@ -1768,7 +1845,7 @@ nodist_base_model_test_SOURCES = tests/test_base_model.moc \
         util/locallistcacheloader.moc.cpp
 
 BUILT_SOURCES += tests/test_base_model.moc
-CLEANFILES += tests/test_base_model.moc
+CLEANFILES += tests/test_base_model.moc tests/test_base_model.moc.json
 base_model_test_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
 base_model_test_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
 base_model_test_LDADD = $(QT_QTEST_COMMON_ldadd)
@@ -1807,7 +1884,7 @@ nodist_test_ml_model_SOURCES = \
 	playlist/playlist_item.moc.cpp
 
 BUILT_SOURCES += tests/test_ml_model.moc
-CLEANFILES += tests/test_ml_model.moc
+CLEANFILES += tests/test_ml_model.moc tests/test_ml_model.moc.json
 test_ml_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
 test_ml_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
 test_ml_model_LDADD = $(QT_QTEST_COMMON_ldadd)
@@ -1827,7 +1904,7 @@ nodist_test_renderer_manager_model_SOURCES = \
     util/renderer_manager.moc.cpp
 
 BUILT_SOURCES += tests/test_renderer_manager_model.moc
-CLEANFILES += tests/test_renderer_manager_model.moc
+CLEANFILES += tests/test_renderer_manager_model.moc tests/test_renderer_manager_model.moc.json
 test_renderer_manager_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
 test_renderer_manager_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
 test_renderer_manager_model_LDADD = $(QT_QTEST_COMMON_ldadd)
@@ -1846,7 +1923,7 @@ nodist_test_thread_runner_SOURCES = \
     medialibrary/mlthreadpool.moc.cpp
 
 BUILT_SOURCES += tests/test_thread_runner.moc
-CLEANFILES += tests/test_thread_runner.moc
+CLEANFILES += tests/test_thread_runner.moc tests/test_thread_runner.moc.json
 test_thread_runner_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
 test_thread_runner_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
 test_thread_runner_LDADD = $(QT_QTEST_COMMON_ldadd)
@@ -1866,7 +1943,7 @@ nodist_test_vlc_dialog_model_SOURCES = \
 	dialogs/dialogs/dialogmodel.moc.cpp
 
 BUILT_SOURCES += tests/test_vlc_dialog_model.moc
-CLEANFILES += tests/test_vlc_dialog_model.moc
+CLEANFILES += tests/test_vlc_dialog_model.moc tests/test_vlc_dialog_model.moc.json
 test_vlc_dialog_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
 test_vlc_dialog_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
 test_vlc_dialog_model_LDADD = $(QT_QTEST_COMMON_ldadd)
@@ -1887,7 +1964,7 @@ nodist_test_qt_csd_button_model_SOURCES = \
 	tests/test_qt_csd_button_model.moc \
 	util/csdbuttonmodel.moc.cpp
 BUILT_SOURCES += tests/test_qt_csd_button_model.moc
-CLEANFILES += tests/test_qt_csd_button_model.moc
+CLEANFILES += tests/test_qt_csd_button_model.moc tests/test_qt_csd_button_model.moc.json
 test_qt_csd_button_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
 test_qt_csd_button_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
 test_qt_csd_button_model_LDADD = $(QT_QTEST_COMMON_ldadd)
@@ -1905,7 +1982,7 @@ nodist_test_qt_navigation_model_SOURCES = \
 	maininterface/navigationmodel.moc.cpp
 
 BUILT_SOURCES += tests/test_navigation_model.moc
-CLEANFILES += tests/test_navigation_model.moc
+CLEANFILES += tests/test_navigation_model.moc tests/test_navigation_model.moc.json
 test_qt_navigation_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
 test_qt_navigation_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
 test_qt_navigation_model_LDADD = $(QT_QTEST_COMMON_ldadd)
@@ -1921,7 +1998,7 @@ QML_LOG_COMPILER = $(builddir)/qml_test -input
 if HAVE_QT_QUICK_TEST
 qml_test_SOURCES = tests/qml_test.cpp tests/qml_test.hpp
 nodist_qml_test_SOURCES = tests/qml_test.moc.cpp
-CLEANFILES += $(nodist_qml_test_SOURCES)
+CLEANFILES += $(nodist_qml_test_SOURCES) $(nodist_qml_test_SOURCES:.moc.cpp=.moc.cpp.json)
 qml_test_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS)
 qml_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt) ${QT_QUICK_TEST_CFLAGS} -DQUICK_TEST_SOURCE_DIR="\"${srcdir}/tests\"" -I"${builddir}/tests"
 qml_test_LDADD = $(QT_INDIRECT_LIBS) ${QT_QUICK_TEST_LIBS} $(QT_LIBS) $(LIBS_qt) libqml_module_util.a
