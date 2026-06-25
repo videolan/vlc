@@ -1,8 +1,24 @@
 # live555
 
-LIVE555_VERSION := 2022.07.14
+LIVE555_VERSION := 2026.06.24
 LIVE555_FILE := live.$(LIVE555_VERSION).tar.gz
 LIVEDOTCOM_URL := $(CONTRIB_VIDEOLAN)/live555/$(LIVE555_FILE)
+
+ifdef HAVE_GCC
+# older GCC doesn't support -std=c++20 required for std::atomic_flag
+ifeq ($(call gcc_at_least, 10), true)
+HAVE_LIVE555_CPP20=1
+endif
+else
+ifdef HAVE_CLANG
+# older CLANG doesn't support -std=c++20 required for std::atomic_flag
+ifeq ($(call clang_at_least, 10), true)
+HAVE_LIVE555_CPP20=1
+endif
+else
+HAVE_LIVE555_CPP20=1
+endif
+endif
 
 ifdef BUILD_NETWORK
 ifdef GNUV3
@@ -58,8 +74,8 @@ live555: $(LIVE555_FILE) .sum-live555
 	# Remove hardcoded cc, c++, ar variables
 	sed -e 's%C_COMPILER%#C_COMPILER%' -e 's%CPLUSPLUS_COMPILER%#CPLUSPLUS_COMPILER%' -e 's%LIBRARY_LINK%#LIBRARY_LINK%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
 	# Remove hardcoded --std=c+20 on un supported compilers
-ifeq ($(call gcc_at_most, 9), true)
-	sed -e 's%std=c++20%std=c++2a%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
+ifndef HAVE_LIVE555_CPP20
+	sed -e 's%std=c++20%std=c++2a -DNO_STD_LIB=1%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
 endif
 	# Add the Extra_CFLAGS to all config files
 	sed -i.orig \
@@ -72,14 +88,10 @@ ifdef HAVE_ANDROID
 	# Disable locale on Android too
 	sed -e 's%-DPIC%-DPIC -DNO_SSTREAM=1 -DLOCALE_NOT_USED -I$(ANDROID_NDK)/platforms/android-$(ANDROID_API)/arch-$(PLATFORM_SHORT_ARCH)/usr/include%' -i.orig $(UNPACK_DIR)/config.linux
 endif
-	# Patch for MSG_NOSIGNAL
-	$(APPLY) $(SRC)/live555/live555-nosignal.patch
 	# Add a pkg-config file
 	$(APPLY) $(SRC)/live555/add-pkgconfig-file.patch
 	# Expose Server:
 	$(APPLY) $(SRC)/live555/expose_server_string.patch
-	# Fix creating static libs on mingw
-	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
 	# FormatMessageA is available on all Windows versions, even WinRT
 	$(APPLY) $(SRC)/live555/live555-formatmessage.patch
 	# ifaddrs.h is supported since API level 24
