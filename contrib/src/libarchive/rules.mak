@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.8.7
+LIBARCHIVE_VERSION := 3.8.8
 LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.xz
 
 PKGS += libarchive
@@ -15,19 +15,11 @@ endif
 
 LIBARCHIVE_CONF := \
 		-DENABLE_CPIO=OFF -DENABLE_TAR=OFF -DENABLE_CAT=OFF \
-		-DENABLE_NETTLE=OFF \
 		-DENABLE_LIBXML2=OFF -DENABLE_LZMA=OFF -DENABLE_ICONV=OFF -DENABLE_EXPAT=OFF \
 		-DENABLE_TEST=OFF -DENABLE_WERROR=OFF
 
-# CNG enables bcrypt on Windows and useless otherwise, it's OK we build for Win7+
-LIBARCHIVE_CONF +=-DENABLE_CNG=ON
-
 # bsdunzip doesn't build on macos, android and emscripten and it's disabled on Windows
 LIBARCHIVE_CONF +=-DENABLE_UNZIP=OFF
-
-ifdef HAVE_WIN32
-LIBARCHIVE_CONF += -DENABLE_OPENSSL=OFF
-endif
 
 $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.xz:
 	$(call download_pkg,$(LIBARCHIVE_URL),libarchive)
@@ -37,6 +29,8 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.xz:
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.xz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-zstd-use-GetNativeSystemInfo-to-get-the-number-of-th.patch
+	# Do not use WINAPI_PARTITION_SYSTEM, It's not handled properly by the mingw64 macro
+	sed -i.orig 's, | WINAPI_PARTITION_SYSTEM,,' $(UNPACK_DIR)/libarchive/archive_write_disk_windows.c
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
