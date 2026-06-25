@@ -3,9 +3,11 @@ from pathlib import Path
 import sys
 import argparse
 
-def genQmldir(out, files, singletons, module, prefix, version):
+def genQmldir(out, files, singletons, module, prefix, version, typeinfo):
     out.write(f"module {module}\n")
     out.write(f"prefer :{prefix}/\n")
+    if typeinfo:
+        out.write(f"typeinfo {typeinfo}\n")
     for f in files:
         basename = Path(f).stem
         filename = os.path.basename(f)
@@ -27,14 +29,20 @@ if __name__ == "__main__":
     parser.add_argument("--module", required=True, help="module name")
     parser.add_argument("--singletons", action='append', default=[], nargs='*', metavar=("CLASS"), help="mark CLASS as a singleton")
     parser.add_argument("--sources", action='append', default=[], nargs='*', metavar=("CLASS"), help="mark CLASS as a singleton")
+    parser.add_argument("--typeinfo", help="qmltypes type info")
 
     args = parser.parse_args()
     prefix = os.path.join("/", args.prefix, *args.module.split("."))
     singletons = [os.path.join(args.srcdir, s) for s in args.singletons[0]]
     files = [os.path.join(args.srcdir, relpath) for relpath in args.sources[0]]
 
+    if args.typeinfo:
+        typeinfo = args.typeinfo
+    else:
+        typeinfo = False
+
     #ensure outdir exists
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
 
     with open(args.output, "w+") as fd:
-        genQmldir(fd, files, singletons, args.module, prefix,  args.version)
+        genQmldir(fd, files, singletons, args.module, prefix, args.version, typeinfo)
