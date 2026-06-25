@@ -563,18 +563,15 @@ static void DeletePipController( pip_controller_t * pipcontroller );
 #pragma mark -
 
 @interface VLCSampleBufferDisplayView: VLCView <CALayerDelegate>
-@property (nonatomic, readonly) vout_display_t *vd;
-- (instancetype)initWithVoutDisplay:(vout_display_t *)vd;
 - (AVSampleBufferDisplayLayer *)displayLayer;
 @end
 
 @implementation VLCSampleBufferDisplayView
 
-- (instancetype)initWithVoutDisplay:(vout_display_t *)vd {
+- (instancetype)init {
     self = [super init];
     if (!self)
         return nil;
-    _vd = vd;
 #if TARGET_OS_OSX
     self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     self.wantsLayer = YES;
@@ -736,7 +733,6 @@ shouldInheritContentsScale:(CGFloat)newScale
     }
 
     VLCSampleBufferDisplay *sys = self;
-    vout_display_t *vd = _vd;
     vout_display_place_t place = *_vd->place;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (sys.displayView)
@@ -746,8 +742,7 @@ shouldInheritContentsScale:(CGFloat)newScale
         VLCSampleBufferSubpictureView *spuView;
         VLCView *window = sys.window;
 
-        displayView =
-            [[VLCSampleBufferDisplayView alloc] initWithVoutDisplay:vd];
+        displayView = [[VLCSampleBufferDisplayView alloc] init];
         spuView = [VLCSampleBufferSubpictureView new];
         [window addSubview:displayView];
         [window addSubview:spuView];
