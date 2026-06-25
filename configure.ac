@@ -4392,6 +4392,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     -query QT_HOST_LIBEXECS 2>/dev/null)"
       QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
       QT_SHADERTOOLS_BIN_DIRECTORY=${QT_BIN_DIRECTORY}
+      QT_ARCHDATA_DIRECTORY="$(${QT_PATHS} -query QT_INSTALL_ARCHDATA 2>/dev/null )"
 
       dnl check native in contribs and keep the full path if found there
       AC_PATH_PROGS(MOC, [moc], moc, ["${QT_LIBEXEC_DIRECTORY}"])
@@ -4582,7 +4583,7 @@ AM_CONDITIONAL(QT_QML_DEBUG, [test "${enable_qt_qml_debug}" = "yes"])
 AS_IF([test "${enable_qt}" != "no"], [
   ALIASES="${ALIASES} qvlc"
 ])
-AC_SUBST([QT_INDIRECT_LIBS])
+AC_SUBST([QT_ARCHDATA_DIRECTORY])
 AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
 AM_CONDITIONAL([HAVE_QT_GTK], [test "${have_qt_gtk}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_QTEST], [test "${have_qt_qtest}" = "yes"])
