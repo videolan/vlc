@@ -39,9 +39,7 @@ endif
 
 ifdef HAVE_MACOSX
 FONTCONFIG_CONF += \
-	--with-cache-dir=~/Library/Caches/fontconfig \
-	--with-default-fonts=/System/Library/Fonts \
-	--with-add-fonts=/Library/Fonts,~/Library/Fonts
+	--with-cache-dir=~/Library/Caches/fontconfig
 endif
 
 ifdef HAVE_ANDROID
