@@ -17,6 +17,8 @@ glew: glew-$(GLEW_VERSION).tgz .sum-glew
 	$(APPLY) $(SRC)/glew/0002-Link-with-opengl32-on-Windows.patch
 	$(APPLY) $(SRC)/glew/0003-Link-directly-with-glu32-on-Windows.patch
 	$(APPLY) $(SRC)/glew/0004-Allow-disabling-the-CMAKE_DEBUG_POSTFIX.patch
+	$(APPLY) $(SRC)/glew/0005-Do-not-force-compiler-flag.patch
+	$(APPLY) $(SRC)/glew/0006-Do-not-compile-the-shared-library-with-DBUILD_SHARED.patch
 	$(MOVE)
 
 GLEW_CONF := -DBUILD_UTILS=OFF

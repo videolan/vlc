@@ -1,0 +1,38 @@
+From 168f2f76d55b828918355aa35fda853766347735 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Fri, 26 Jun 2026 06:46:01 +0200
+Subject: [PATCH 5/6] Do not force compiler flag
+
+- We do want stack protection if it's forced.
+- We don't need to disable standard libraries.
+- Use built-in if you want.
+---
+ build/cmake/CMakeLists.txt | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/build/cmake/CMakeLists.txt b/build/cmake/CMakeLists.txt
+index bd9fc9e..087aaf6 100644
+--- a/build/cmake/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -133,12 +133,12 @@ if (MSVC)
+   target_link_libraries (glew LINK_PRIVATE libvcruntime.lib)
+   target_link_libraries (glew LINK_PRIVATE msvcrt.lib )
+   string(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+-elseif (WIN32 AND ((CMAKE_C_COMPILER_ID MATCHES "GNU") OR (CMAKE_C_COMPILER_ID MATCHES "Clang")))
+-  # remove stdlib dependency on windows with GCC and Clang (for similar reasons
+-  # as to MSVC - to allow it to be used with any Windows compiler)
+-  target_compile_options (glew PRIVATE -fno-builtin -fno-stack-protector)
+-  target_compile_options (glew_s PRIVATE -fno-builtin -fno-stack-protector)
+-  target_link_libraries (glew LINK_PRIVATE -nostdlib)
++# elseif (WIN32 AND ((CMAKE_C_COMPILER_ID MATCHES "GNU") OR (CMAKE_C_COMPILER_ID MATCHES "Clang")))
++#   # remove stdlib dependency on windows with GCC and Clang (for similar reasons
++#   # as to MSVC - to allow it to be used with any Windows compiler)
++#   target_compile_options (glew PRIVATE -fno-builtin -fno-stack-protector)
++#   target_compile_options (glew_s PRIVATE -fno-builtin -fno-stack-protector)
++#   target_link_libraries (glew LINK_PRIVATE -nostdlib)
+ endif ()
+ 
+ if (BUILD_FRAMEWORK)
+-- 
+2.39.5 (Apple Git-154)
+
