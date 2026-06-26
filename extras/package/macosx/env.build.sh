@@ -116,6 +116,9 @@ vlcSetSymbolEnvironment() {
     # - Added symbols in macOS 10.13 / iOS 11 / watchOS 4 / tvOS 11
     # - Added symbol in macOS 10.14 / iOS 12 / tvOS 9
     # - Added symbols in macOS 10.15 / iOS 13 / tvOS 13
+    #
+    # ac_cv_prog_cc_c23: autoconf 2.73 adds -std=gnu23 to CC but not OBJC
+    #                    breaking libtool's ObjC tag inference.
     "${cmd}" "$@" \
     ac_cv_lib_network_connect=no \
     \
@@ -129,6 +132,8 @@ vlcSetSymbolEnvironment() {
     ac_cv_func_readlinkat=no \
     ac_cv_func_linkat=no \
     ac_cv_func_unlinkat=no \
+    \
+    ac_cv_prog_cc_c23=no \
     \
     ac_cv_func_basename_r=no \
     ac_cv_func_clock_getres=no \
