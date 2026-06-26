@@ -81,17 +81,21 @@ endif
 	$(APPLY) $(SRC)/live555/android-no-ifaddrs.patch
 	# Don't use unavailable off64_t functions
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
+	# disable code built/installed in unused folder
+	sed -e 's,all: $$(,all: #,' -e 's,install: $$,install: #,' -e 's,install ,#install ,' -i.orig $(UNPACK_DIR)/testProgs/Makefile.tail
+	sed -e 's,all: $$(,all: #,' -e 's,install: $$,install: #,' -e 's,install ,#install ,' -i.orig $(UNPACK_DIR)/mediaServer/Makefile.tail
+	sed -e 's,all: $$(,all: #,' -e 's,install: $$,install: #,' -e 's,install ,#install ,' -i.orig $(UNPACK_DIR)/proxyServer/Makefile.tail
+	sed -e 's,all: $$(,all: #,' -e 's,install: $$,install: #,' -e 's,install ,#install ,' -i.orig $(UNPACK_DIR)/hlsProxy/Makefile.tail
 	$(MOVE)
-
-LIVE555_SUBDIRS=groupsock liveMedia UsageEnvironment BasicUsageEnvironment
 
 LIVE555_ENV := $(HOSTVARS) C_COMPILER=$(CC) CPLUSPLUS_COMPILER=$(CXX) LIBRARY_LINK="$(AR) cr " \
 	PREFIX=$(PREFIX) DESTDIR= LIBDIR=$(PREFIX)/lib
 
+.live555: BUILD_DIR=$<
 .live555: live555
 	$(REQUIRE_GNUV3)
 	cd $< && ./genMakefiles $(LIVE_TARGET)
-	cd $< && for subdir in $(LIVE555_SUBDIRS); do $(MAKE) $(LIVE555_ENV) -C $$subdir; done
-	cd $< && for subdir in $(LIVE555_SUBDIRS); do $(MAKE) $(LIVE555_ENV) -C $$subdir install; done
-	$(MAKE) $(LIVE555_ENV) -C $< install_shared_libraries
+	+$(MAKEBUILD) $(LIVE555_ENV)
+	+$(MAKEBUILD) $(LIVE555_ENV) install
+	+$(MAKEBUILD) $(LIVE555_ENV) install_shared_libraries
 	touch $@
