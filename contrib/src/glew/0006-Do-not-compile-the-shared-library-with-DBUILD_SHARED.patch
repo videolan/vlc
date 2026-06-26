@@ -1,0 +1,68 @@
+From 94f25bbf055dff046cb865ed73f156ac68ff7c0d Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Fri, 26 Jun 2026 06:47:57 +0200
+Subject: [PATCH 6/6] Do not compile the shared library with
+ -DBUILD_SHARED_LIBS=OFF
+
+---
+ build/cmake/CMakeLists.txt | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/build/cmake/CMakeLists.txt b/build/cmake/CMakeLists.txt
+index 087aaf6..024e4b6 100644
+--- a/build/cmake/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -111,10 +111,12 @@ if (WIN32)
+   list (APPEND GLEW_SRC_FILES ${GLEW_DIR}/build/glew.rc)
+ endif ()
+ 
++if(BUILD_SHARED_LIBS)
+ add_library (glew SHARED ${GLEW_PUBLIC_HEADERS_FILES} ${GLEW_SRC_FILES})
+ set_target_properties (glew PROPERTIES COMPILE_DEFINITIONS "GLEW_BUILD" OUTPUT_NAME "${GLEW_LIB_NAME}" PREFIX "${DLL_PREFIX}"
+                                        VERSION ${GLEW_VERSION}
+                                        SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR})
++endif()
+ add_library (glew_s STATIC ${GLEW_PUBLIC_HEADERS_FILES} ${GLEW_SRC_FILES})
+ set_target_properties (glew_s PROPERTIES COMPILE_DEFINITIONS "GLEW_STATIC" OUTPUT_NAME "${GLEW_LIB_NAME}" PREFIX lib)
+ 
+@@ -141,7 +143,7 @@ if (MSVC)
+ #   target_link_libraries (glew LINK_PRIVATE -nostdlib)
+ endif ()
+ 
+-if (BUILD_FRAMEWORK)
++if (BUILD_FRAMEWORK AND BUILD_SHARED_LIBS)
+   set_target_properties(glew PROPERTIES
+     FRAMEWORK TRUE
+     FRAMEWORK_VERSION ${GLEW_VERSION}
+@@ -154,14 +156,11 @@ if (BUILD_FRAMEWORK)
+   )
+ endif()
+ 
++if(BUILD_SHARED_LIBS)
+ target_link_libraries (glew LINK_PUBLIC ${GLEW_LIBRARIES})
++endif()
+ target_link_libraries (glew_s ${GLEW_LIBRARIES})
+ 
+-target_compile_definitions(glew_s INTERFACE "GLEW_STATIC")
+-foreach(t glew glew_s)
+-  target_include_directories(${t} PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+-endforeach()
+-
+ set(targets_to_install "")
+ if(BUILD_SHARED_LIBS)
+   list(APPEND targets_to_install glew)
+@@ -169,6 +168,11 @@ else ()
+   list(APPEND targets_to_install glew_s)
+ endif()
+ 
++target_compile_definitions(glew_s INTERFACE "GLEW_STATIC")
++foreach(t ${targets_to_install})
++  target_include_directories(${t} PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
++endforeach()
++
+ install ( TARGETS ${targets_to_install}
+           EXPORT glew-targets
+           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+-- 
+2.52.0.windows.1
+
