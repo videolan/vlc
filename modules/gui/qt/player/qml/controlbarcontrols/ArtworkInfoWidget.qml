@@ -17,8 +17,8 @@
  *****************************************************************************/
 
 import QtQuick
+import QtQuick.Templates as T
 import QtQuick.Window
-import QtQuick.Controls
 import QtQuick.Layouts
 
 
@@ -29,7 +29,7 @@ import VLC.Playlist
 import VLC.Player
 import VLC.Util
 
-AbstractButton {
+T.AbstractButton {
     id: root
 
     // Properties
@@ -38,6 +38,10 @@ AbstractButton {
 
     Layout.minimumWidth: height
 
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    // implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+    //                          implicitContentHeight + topPadding + bottomPadding)
     implicitHeight: 0
 
     property bool _keyPressed: false
@@ -175,10 +179,10 @@ AbstractButton {
             Accessible.role: Accessible.Graphic
             Accessible.name: qsTr("Cover")
 
-            ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
+            T.ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
                              && (root.hovered || root.visualFocus)
-            ToolTip.delay: VLCStyle.delayToolTipAppear
-            ToolTip.text: qsTr("%1\n%2\n%3").arg(titleLabel.text)
+            T.ToolTip.delay: VLCStyle.delayToolTipAppear
+            T.ToolTip.text: qsTr("%1\n%2\n%3").arg(titleLabel.text)
                                                 .arg(artistLabel.text)
                                                 .arg(progressIndicator.text)
 

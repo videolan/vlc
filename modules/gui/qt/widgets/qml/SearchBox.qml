@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
 
@@ -104,11 +103,11 @@ FocusScope {
             implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                                      implicitContentHeight + topPadding + bottomPadding)
 
-            closePolicy: Popup.NoAutoClose
+            closePolicy: T.Popup.NoAutoClose
 
             Binding on closePolicy {
                 when: textField.text.length === 0
-                value: Popup.CloseOnPressOutside
+                value: T.Popup.CloseOnPressOutside
             }
 
             height: 0

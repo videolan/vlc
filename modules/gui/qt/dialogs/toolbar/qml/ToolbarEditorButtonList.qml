@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQml.Models
 import QtQuick.Layouts
 
@@ -31,7 +31,7 @@ GridView {
 
     clip: true
 
-    ScrollBar.vertical: Widgets.ScrollBarExt { }
+    T.ScrollBar.vertical: Widgets.ScrollBarExt { }
     model: PlayerControlbarControls.controlList.length
 
     currentIndex: -1

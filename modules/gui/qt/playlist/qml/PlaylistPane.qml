@@ -17,7 +17,6 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Window
-import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
 import QtQml.Models
@@ -266,7 +265,7 @@ T.Pane {
 
             Layout.fillHeight: false
             Layout.leftMargin: VLCStyle.margin_normal
-            Layout.rightMargin: Math.max(listView.ScrollBar.vertical.width, VLCStyle.margin_normal)
+            Layout.rightMargin: Math.max(listView.T.ScrollBar.vertical.width, VLCStyle.margin_normal)
 
             spacing: VLCStyle.margin_large
 
@@ -502,7 +501,7 @@ T.Pane {
                 id: delegate
 
                 width: listView.contentWidth
-                rightPadding: Math.max(listView.ScrollBar.vertical.width, VLCStyle.margin_normal)
+                rightPadding: Math.max(listView.T.ScrollBar.vertical.width, VLCStyle.margin_normal)
 
                 contextMenu: root.contextMenu
 

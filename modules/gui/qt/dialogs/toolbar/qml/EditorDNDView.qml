@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQml.Models
 
 
@@ -41,7 +41,7 @@ ListView {
 
     property bool extraWidthAvailable: true
 
-    ScrollBar.horizontal: Widgets.ScrollBarExt {
+    T.ScrollBar.horizontal: Widgets.ScrollBarExt {
         id: scrollBar
     }
 

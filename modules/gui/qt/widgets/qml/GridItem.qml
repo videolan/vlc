@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
 import QtQml.Models
@@ -378,9 +377,9 @@ T.ItemDelegate {
             Layout.alignment: root.textAlignHCenter ? Qt.AlignCenter : Qt.AlignLeft
             Layout.topMargin: root.subtitleTopMargin
 
-            ToolTip.delay: VLCStyle.delayToolTipAppear
-            ToolTip.text: subtitleTxt.text
-            ToolTip.visible: subtitleTxtMouseHandler.hovered
+            T.ToolTip.delay: VLCStyle.delayToolTipAppear
+            T.ToolTip.text: subtitleTxt.text
+            T.ToolTip.visible: subtitleTxtMouseHandler.hovered
 
             HoverHandler {
                 id: subtitleTxtMouseHandler

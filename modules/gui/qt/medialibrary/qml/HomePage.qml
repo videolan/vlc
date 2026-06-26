@@ -19,7 +19,6 @@
  ******************************************************************************/
 import QtQuick
 import QtQuick.Window
-import QtQuick.Controls
 import QtQuick.Templates as T
 
 import VLC.MediaLibrary
@@ -98,7 +97,7 @@ Widgets.PageExt {
 
         property bool _hasMedias: true
 
-        ScrollBar.vertical: Widgets.ScrollBarExt {}
+        T.ScrollBar.vertical: Widgets.ScrollBarExt {}
 
         // This behavior allows to have similar "smooth" animation
         // that Qt views have with `highlightFollowsCurrentItem`.

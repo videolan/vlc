@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Templates as T
 
 import VLC.Style
@@ -67,8 +66,8 @@ QtObject {
             interval: 100
         }
 
-        readonly property T.ScrollBar _scrollBar: (root.view) ? ((root.orientation === Qt.Vertical) ? root.view.ScrollBar.vertical
-                                                                                                  : root.view.ScrollBar.horizontal)
+        readonly property T.ScrollBar _scrollBar: (root.view) ? ((root.orientation === Qt.Vertical) ? root.view.T.ScrollBar.vertical
+                                                                                                    : root.view.T.ScrollBar.horizontal)
                                                             : null
 
         readonly property int direction: {

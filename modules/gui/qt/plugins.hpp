@@ -44,7 +44,9 @@
     Q_IMPORT_PLUGIN(QSvgPlugin)
     Q_IMPORT_PLUGIN(QJpegPlugin)
     Q_IMPORT_QML_PLUGIN(QtQuick2Plugin)
-    Q_IMPORT_QML_PLUGIN(QtQuickControls2Plugin)
+    // Since we choose the style (basic) at build time,
+    // importing the base plugin is not necessary:
+    // Q_IMPORT_QML_PLUGIN(QtQuickControls2Plugin)
     Q_IMPORT_QML_PLUGIN(QtQuickControls2BasicStylePlugin)
     Q_IMPORT_QML_PLUGIN(QtQuickControls2BasicStyleImplPlugin)
     Q_IMPORT_QML_PLUGIN(QtQuickControls2ImplPlugin)

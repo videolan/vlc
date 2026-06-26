@@ -908,10 +908,6 @@ static void *Thread( void *obj )
     QApplication::setAttribute( Qt::AA_DontCheckOpenGLContextThreadAffinity );
     QQuickWindow::setDefaultAlphaBuffer(true);
 
-#if defined(QT_STATIC) || defined(__APPLE__)
-    QQuickStyle::setStyle(QLatin1String("Basic"));
-#endif
-
     /* Start the QApplication here */
     QApplication app( argc, argv );
     app.setProperty("initialStyle", app.style()->name());

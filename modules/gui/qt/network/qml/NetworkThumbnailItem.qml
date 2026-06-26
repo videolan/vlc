@@ -17,7 +17,6 @@
  *****************************************************************************/
 
 import QtQuick
-import QtQuick.Controls
 import QtQml.Models
 
 import VLC.Widgets as Widgets

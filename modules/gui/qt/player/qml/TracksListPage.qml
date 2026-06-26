@@ -17,7 +17,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
 import QtQml.Models
@@ -107,12 +106,16 @@ RowLayout {
         }
     }
 
-    component TrackColumn: Container {
+    component TrackColumn: T.Container {
         // wrap the contentItem i.e Column into Container
         // so that we can get focusReason, also Container
         // is a FocusScope
         id: tracksListContainer
 
+        implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                                implicitContentWidth + leftPadding + rightPadding)
+        implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                                 implicitContentHeight + topPadding + bottomPadding)
 
         required property string title
         required property var tracksModel

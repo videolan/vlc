@@ -17,7 +17,6 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Window
-import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQml.Models
 import QtQml
@@ -129,7 +128,7 @@ Widgets.PageExt {
         anchors.leftMargin: root.leftPadding
         anchors.rightMargin: root.rightPadding
 
-        ScrollBar.vertical: Widgets.ScrollBarExt { }
+        T.ScrollBar.vertical: Widgets.ScrollBarExt { }
 
         flickableDirection: Flickable.AutoFlickIfNeeded
         boundsBehavior: Flickable.StopAtBounds

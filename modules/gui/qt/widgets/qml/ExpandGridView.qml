@@ -17,8 +17,8 @@
  *****************************************************************************/
 
 import QtQuick
+import QtQuick.Templates as T
 import QtQuick.Window
-import QtQuick.Controls
 
 import QtQml.Models
 
@@ -806,7 +806,7 @@ FocusScope {
         pixelAligned: (MainCtx.qtVersion() >= MainCtx.qtVersionCheck(6, 2, 5)) // QTBUG-103996
                       && (Screen.pixelDensity >= VLCStyle.highPixelDensityThreshold) // no need for sub-pixel alignment with high pixel density
 
-        ScrollBar.vertical: ScrollBarExt {
+        T.ScrollBar.vertical: ScrollBarExt {
             id: flickableScrollBar
         }
 

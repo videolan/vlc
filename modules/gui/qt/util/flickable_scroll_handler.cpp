@@ -66,8 +66,8 @@ void FlickableScrollHandler::componentComplete()
     m_propertyHeight = QQmlProperty(m_target, "height", qCtx);
     m_propertyWidth = QQmlProperty(m_target, "width", qCtx);
 
-    m_scrollBarV.scrollBar = QQmlProperty(m_target, "ScrollBar.vertical", qCtx);
-    m_scrollBarH.scrollBar = QQmlProperty(m_target, "ScrollBar.horizontal", qCtx);
+    m_scrollBarV.scrollBar = QQmlProperty(m_target, "T.ScrollBar.vertical", qCtx);
+    m_scrollBarH.scrollBar = QQmlProperty(m_target, "T.ScrollBar.horizontal", qCtx);
 
     adjustScrollBarV();
     adjustScrollBarH();

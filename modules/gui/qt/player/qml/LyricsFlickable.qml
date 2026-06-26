@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 import VLC.Player
 import VLC.Widgets as Widgets
 import VLC.Style
@@ -40,7 +40,7 @@ Flickable {
 
     interactive: height < implicitHeight
 
-    ScrollBar.vertical: Widgets.ScrollBarExt {}
+    T.ScrollBar.vertical: Widgets.ScrollBarExt {}
 
     boundsBehavior: Flickable.StopAtBounds
     clip: !fadingEdge.implicitClipping && (height < implicitHeight)

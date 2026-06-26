@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQuick.Window
 import QtQuick.Layouts
 
@@ -79,13 +79,13 @@ ListView {
     keyNavigationEnabled: false
     keyNavigationWraps: false
 
-    ScrollBar.vertical: {
+    T.ScrollBar.vertical: {
         // By default vertical scroll bar is only used when the orientation is vertical.
         if (root.defaultScrollBar && (root.orientation === ListView.Vertical))
             return root.defaultScrollBar.createObject() // rely on JS/QML engine's garbage collection
         return null
     }
-    ScrollBar.horizontal: {
+    T.ScrollBar.horizontal: {
         // By default horizontal scroll bar is only used when the orientation is horizontal.
         if (root.defaultScrollBar && (root.orientation === ListView.Horizontal))
             return root.defaultScrollBar.createObject() // rely on JS/QML engine's garbage collection

@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Templates as T
 
@@ -338,7 +337,7 @@ Item {
                 color: loginContentTheme.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
-            CheckBox {
+            Widgets.CheckBoxExt {
                 id: savePassword
 
                 Navigation.upItem: password
@@ -446,7 +445,7 @@ Item {
                 wrapMode: Text.WordWrap
             }
 
-            ProgressBar {
+            Widgets.ProgressBarExt {
                 Layout.fillWidth:true
 
                 from: 0.0

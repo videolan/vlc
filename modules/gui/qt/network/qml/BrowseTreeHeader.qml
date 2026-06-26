@@ -19,7 +19,6 @@
 
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import QtQuick.Templates as T
 
 
@@ -105,7 +104,7 @@ T.Pane {
                   ? qsTr("Remove from medialibrary")
                   : qsTr("Add to medialibrary")
 
-            display: VLCStyle.isScreenSmall ?  AbstractButton.IconOnly  : AbstractButton.TextBesideIcon
+            display: VLCStyle.isScreenSmall ?  T.AbstractButton.IconOnly  : T.AbstractButton.TextBesideIcon
 
             visible: root.providerModel.canBeIndexed ?? false
 

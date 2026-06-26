@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Basic
 import QtQuick.Templates as T
 import QtQuick.Layouts
 
@@ -34,7 +34,7 @@ Dialog {
     modal: true
 
 
-    anchors.centerIn: Overlay.overlay
+    anchors.centerIn: T.Overlay.overlay
 
     padding: VLCStyle.margin_normal
     margins: VLCStyle.margin_large
@@ -52,7 +52,7 @@ Dialog {
         colorSet: ColorContext.Window
     }
 
-    Overlay.modal: Item {
+    T.Overlay.modal: Item {
         Rectangle {
             anchors.fill: blur
 

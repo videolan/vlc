@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls as T
+import QtQuick.Templates as T
 import QtQml.Models
 
 import VLC.Style

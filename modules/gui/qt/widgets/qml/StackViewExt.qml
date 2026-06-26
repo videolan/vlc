@@ -16,14 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 
 import VLC.Style
 
 /*
  * Custom StackView with brief transitions and helper to load view from the history
  */
-StackView {
+T.StackView {
     id: root
 
     // Functions

@@ -16,8 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
-
+import QtQuick.Controls.Basic
 
 import VLC.Style
 

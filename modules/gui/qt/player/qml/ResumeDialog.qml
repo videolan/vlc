@@ -18,7 +18,6 @@
 
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import QtQuick.Templates as T
 
 
@@ -104,7 +103,7 @@ FocusScope {
     }
 
     //FIXME use the right xxxLabel class
-    Label {
+    T.Label {
         id: label
 
         anchors.topMargin: VLCStyle.margin_small

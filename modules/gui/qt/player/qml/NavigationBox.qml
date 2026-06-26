@@ -17,7 +17,7 @@
  *****************************************************************************/
 
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQuick.Layouts
 
 
@@ -27,8 +27,13 @@ import VLC.Widgets as Widgets
 import VLC.Player
 import VLC.Util
 
-Control {
+T.Control {
     id: navigationBox
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
 
     Accessible.name: qsTr("DVD navigation")
     AccessibleCompat.id: "navigationBox"

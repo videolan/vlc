@@ -24,7 +24,6 @@ import QtQml.Models
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Templates
-import QtQuick.Controls
 import QtQuick.Window
 
 import VLC.MainInterface
