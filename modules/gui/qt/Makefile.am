@@ -1459,6 +1459,19 @@ libqt_plugin_la_QML_MODULES = \
 	util \
 	widgets
 
+# qmlcachegen must be provided every other module within each module because of dependency:
+QML_CACHEGEN_EXTRA_ARGS = -i $(builddir)/dialogs/qmldir \
+	-i $(builddir)/maininterface/qmldir \
+	-i $(builddir)/medialibrary/qmldir \
+	-i $(builddir)/menus/qmldir \
+	-i $(builddir)/network/qmldir \
+	-i $(builddir)/player/qmldir \
+	-i $(builddir)/playercontrols/qmldir \
+	-i $(builddir)/playlist/qmldir \
+	-i $(builddir)/style/qmldir \
+	-i $(builddir)/util/qmldir \
+	-i $(builddir)/widgets/qmldir
+
 libqt_plugin_la_ALL_QML = \
 	$(libqml_module_dialogs_a_QML) \
 	$(libqml_module_maininterface_a_QML) \
@@ -1610,6 +1623,11 @@ $(QML_RULES_DEPS): Makefile
 	  echo '$(@D)/qmlassets.cpp: $$(builddir)/$(@D)/qmldir.qrc $$(builddir)/$(@D)/res.qrc'; \
 	  echo '$(@D)/qmlassets.cpp: $$(libqml_module_$(@D)_a_QML) $$(libqml_module_$(@D)_a_Singleton_QML)'; \
 	  echo '$$(libqml_module_$(@D)_a_QML:.qml=.cpp) $$(libqml_module_$(@D)_a_Singleton_QML:.qml=.cpp): $$(builddir)/$(@D)/res.qrc'; \
+	  qmldirs=; \
+	  for s in $(libqt_plugin_la_QML_MODULES); do \
+	    qmldirs="$$qmldirs \$$(builddir)/$$s/qmldir"; \
+	  done; \
+	  echo '$$(libqml_module_$(@D)_a_QML:.qml=.cpp) $$(libqml_module_$(@D)_a_Singleton_QML:.qml=.cpp):'"$$qmldirs"; \
 	} > $@.tmp && mv $@.tmp $@
 
 BUILT_SOURCES += $(QML_RULES_DEPS)
@@ -1644,7 +1662,16 @@ $(QML_MODULE_RES_QRC):
 	--prefix qt/qml/$(libqml_module_$(@D)_a_ModulePath) \
 	--sources $(libqml_module_$(@D)_a_QML) $(libqml_module_$(@D)_a_Singleton_QML)
 
+# We symlink the QML files to the qmldir directory, because our modules may depend on
+# each other, and `qmlcachegen` should access them. In the future, when we eliminate
+# cyclic dependency, instead of this we can provide the compiled files to each module.
 $(QML_MODULE_QMLDIR):
+	$(AM_V_at) for f in $(libqml_module_$(@D)_a_QML); do \
+		$(LN_S) -f $(abs_srcdir)/$$f $(@D)/; \
+	done
+	$(AM_V_at) for f in $(libqml_module_$(@D)_a_Singleton_QML); do \
+		$(LN_S) -f $(abs_srcdir)/$$f $(@D)/; \
+	done
 	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqmldir.py \
 	-o $@ \
 	--prefix qt/qml \
@@ -1652,6 +1679,20 @@ $(QML_MODULE_QMLDIR):
 	--sources $(libqml_module_$(@D)_a_QML) \
 	--singletons $(libqml_module_$(@D)_a_Singleton_QML) \
 	--typeinfo=plugins.qmltypes
+
+# Akin to QML_RULES_DEPS:
+QML_SYMLINK_FILE_DEPS = $(libqt_plugin_la_QML_MODULES:=/qmlsymlinkfiles.deps)
+$(QML_SYMLINK_FILE_DEPS): Makefile
+	$(AM_V_at)$(MKDIR_P) $(@D)
+	$(AM_V_at){ \
+	  for f in $(libqml_module_$(@D)_a_QML) $(libqml_module_$(@D)_a_Singleton_QML); do \
+	    echo "CLEANFILES += $(@D)/$$(basename $$f)"; \
+	  done; \
+	} > $@.tmp && mv $@.tmp $@
+
+BUILT_SOURCES += $(QML_SYMLINK_FILE_DEPS)
+
+-include $(QML_SYMLINK_FILE_DEPS)
 
 # qmldir must remain because `qmlcachegen` needs it:
 .PRECIOUS: $(libqt_plugin_la_QML_MODULES:=/qmldir)
@@ -1728,7 +1769,7 @@ cachegen_verbose_0 = @echo " CACHEGEN " $@;
 cachegen_verbose__0 = $(cachegen_verbose_0)
 
 # We need to use --bare because we need to support cross compilation:
-QML_CACHEGEN_EXTRA_ARGS = --bare -I $(QT_QML_DIRECTORY)
+QML_CACHEGEN_EXTRA_ARGS += --bare -I $(QT_QML_DIRECTORY)
 
 QML_CACHEGEN_EXTRA_ARGS += --validate-basic-blocks
 
