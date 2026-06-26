@@ -57,7 +57,7 @@ T.Container {
             for (let i = 0; i < repeater.count; i++) {
                 const item = repeater.itemAt(i);
 
-                if (item.visible && item.enabled) {
+                if (root._isNavigable(item)) {
                     Helpers.transferFocus(item, Qt.TabFocusReason);
 
                     return;
@@ -69,7 +69,7 @@ T.Container {
             for (let i = repeater.count - 1; i >= 0; i--) {
                 const item = repeater.itemAt(i);
 
-                if (item.visible && item.enabled) {
+                if (root._isNavigable(item)) {
                     Helpers.transferFocus(item, Qt.BacktabFocusReason);
 
                     return;
@@ -83,7 +83,7 @@ T.Container {
             for (let i = 0 ; i < repeater.count; i++) {
                 const item = repeater.itemAt(i);
 
-                if (item.visible && item.enabled) {
+                if (root._isNavigable(item)) {
                     // NOTE: We already have a focused item, so we keep it this way.
                     if (item.activeFocus)
                         return;
@@ -106,12 +106,16 @@ T.Container {
 
     // Functions
 
+    function _isNavigable(item) {
+        return item.visible && item.enabled && item.Navigation.navigable
+    }
+
     function _applyFocus() {
         if (indexFocus < 0 || indexFocus >= count) return false;
 
         const item = repeater.itemAt(indexFocus);
 
-        if (item.visible && item.enabled) {
+        if (root._isNavigable(item)) {
             Helpers.transferFocus(item, focusReason);
 
             return true;
@@ -154,7 +158,7 @@ T.Container {
                         i--;
                     } while (i >= 0
                              &&
-                             (!repeater.itemAt(i).enabled || !repeater.itemAt(i).visible));
+                             !root._isNavigable(repeater.itemAt(i)));
 
                     if (i == -1)
                         root.Navigation.defaultNavigationUp();
@@ -169,7 +173,7 @@ T.Container {
                         i++;
                     } while (i < repeater.count
                              &&
-                             (!repeater.itemAt(i).enabled || !repeater.itemAt(i).visible));
+                             !root._isNavigable(repeater.itemAt(i)));
 
                     if (i == repeater.count)
                         root.Navigation.defaultNavigationDown();
