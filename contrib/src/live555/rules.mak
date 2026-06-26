@@ -55,13 +55,7 @@ live555: $(LIVE555_FILE) .sum-live555
 	# Change permissions to patch and sed the source
 	chmod -R u+w $(UNPACK_DIR)
 	# Remove hardcoded cc, c++, ar variables
-	sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -e 's%LIBRARY_LINK =.*ar%LIBRARY_LINK = $(AR)%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
-	# Replace libtool -s by ar cr for macOS only
-	sed -i.orig -e s/"libtool -s -o"/"ar cr"/g $(UNPACK_DIR)/config.macosx*
-	# Add Extra LDFLAGS for macOS
-	sed -i.orig -e 's%$(CXX)%$(CXX)\ $(EXTRA_LDFLAGS)%' $(UNPACK_DIR)/config.macosx*
-	# Add CXXFLAGS for macOS (force libc++)
-	sed -i.orig -e 's%^\(CPLUSPLUS_FLAGS.*\)$$%\1 '"$(CXXFLAGS)%" $(UNPACK_DIR)/config.macosx*
+	sed -e 's%C_COMPILER%#C_COMPILER%' -e 's%CPLUSPLUS_COMPILER%#CPLUSPLUS_COMPILER%' -e 's%LIBRARY_LINK%#LIBRARY_LINK%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
 	# Add the Extra_CFLAGS to all config files
 	sed -i.orig \
 		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" $(UNPACK_DIR)/config.*
@@ -87,20 +81,17 @@ endif
 	$(APPLY) $(SRC)/live555/android-no-ifaddrs.patch
 	# Don't use unavailable off64_t functions
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
-	sed -i.orig "s,LIBRARY_LINK =.*,LIBRARY_LINK = $(AR) cr ,g" $(UNPACK_DIR)/config.macosx*
 	$(MOVE)
 
 LIVE555_SUBDIRS=groupsock liveMedia UsageEnvironment BasicUsageEnvironment
 
+LIVE555_ENV := $(HOSTVARS) C_COMPILER=$(CC) CPLUSPLUS_COMPILER=$(CXX) LIBRARY_LINK="$(AR) cr " \
+	PREFIX=$(PREFIX) DESTDIR= LIBDIR=$(PREFIX)/lib
+
 .live555: live555
 	$(REQUIRE_GNUV3)
-	cd $< && for subdir in $(LIVE555_SUBDIRS); do \
-		echo "PREFIX = $(PREFIX)" >> $$subdir/Makefile.head && \
-		echo "LIBDIR = $(PREFIX)/lib" >> $$subdir/Makefile.head ; done
-	cd $< && echo "LIBDIR = $(PREFIX)/lib" >> Makefile.head && \
-		echo "PREFIX = $(PREFIX)" >> Makefile.head
 	cd $< && ./genMakefiles $(LIVE_TARGET)
-	cd $< && for subdir in $(LIVE555_SUBDIRS); do $(MAKE) $(HOSTVARS) -C $$subdir; done
-	cd $< && for subdir in $(LIVE555_SUBDIRS); do $(MAKE) $(HOSTVARS) -C $$subdir install; done
-	$(MAKE) -C $< install_shared_libraries
+	cd $< && for subdir in $(LIVE555_SUBDIRS); do $(MAKE) $(LIVE555_ENV) -C $$subdir; done
+	cd $< && for subdir in $(LIVE555_SUBDIRS); do $(MAKE) $(LIVE555_ENV) -C $$subdir install; done
+	$(MAKE) $(LIVE555_ENV) -C $< install_shared_libraries
 	touch $@
