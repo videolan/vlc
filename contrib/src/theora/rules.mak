@@ -2,7 +2,8 @@
 
 THEORA_VERSION := 1.2.0
 THEORA_URL := $(XIPH)/theora/libtheora-$(THEORA_VERSION).tar.xz
-THEORA_GITURL := https://gitlab.xiph.org/xiph/theora.git
+# THEORA_GITURL := https://gitlab.xiph.org/xiph/theora.git
+THEORA_GITURL := https://github.com/xiph/theora.git
 THEORA_GITBRANCH := main
 THEORA_GITVERSION := fb92ede9ba5162d0b8134cd1ff57751df6f3dbe6
 
