@@ -1,0 +1,277 @@
+From 5f147713802f92454ac7c9cb2a673cb95a54ab84 Mon Sep 17 00:00:00 2001
+From: thor <thor@35dc7657-300d-0410-a2e5-dc2837fedb53>
+Date: Fri, 26 Jun 2026 20:59:56 +0000
+Subject: [PATCH 2/2] ports/cmake: Fix building ARM assembly for Windows for
+ mingw targets
+
+This code was attempted to be fixed to support building for
+Windows on ARM with MSVC before - by adding ifdefs for _M_ARM.
+
+The MSVC compilers predefine _M_ARM when targeting ARM - but
+mingw compilers don't define this (they predefine __arm__
+instead).
+
+However, within ARM specific files, we don't specifically need
+to check for an _M_ARM at all - we can just check for _WIN32
+which is predefined by all compilers targeting Windows.
+
+Secondly, add "#ifdef __ELF__" around ".fpu neon" instead of
+"#ifndef __APPLE__"; the .fpu directive can only be assembled on
+ELF targets.
+
+Thirdly, use a separate codepath for Windows in the
+synth*_neon_accurate.S files. Windows on ARM is Thumb only, and in
+Thumb mode, not all instructions are allowed. In this case, we can't
+align the stack pointer with one single instruction, but need to
+use a scratch register inbetween.
+
+This fixes building for Windows on ARM in mingw environments,
+such as with llvm-mingw toolchains.
+
+
+
+git-svn-id: svn://scm.orgis.org/mpg123/trunk@5580 35dc7657-300d-0410-a2e5-dc2837fedb53
+---
+ src/libmpg123/check_neon.S                 |  4 ++--
+ src/libmpg123/dct36_neon.S                 |  4 ++--
+ src/libmpg123/dct64_neon_float.S           |  4 ++--
+ src/libmpg123/getcpuflags_arm.c            |  6 +++---
+ src/libmpg123/synth_neon_accurate.S        | 10 +++++++++-
+ src/libmpg123/synth_neon_float.S           |  4 ++--
+ src/libmpg123/synth_neon_s32.S             |  4 ++--
+ src/libmpg123/synth_stereo_neon.S          |  4 ++--
+ src/libmpg123/synth_stereo_neon_accurate.S | 10 +++++++++-
+ src/libmpg123/synth_stereo_neon_float.S    |  4 ++--
+ src/libmpg123/synth_stereo_neon_s32.S      |  4 ++--
+ 12 files changed, 38 insertions(+), 21 deletions(-)
+
+diff --git a/src/libmpg123/check_neon.S b/src/libmpg123/check_neon.S
+index 87f5f226..6ba6171a 100644
+--- a/src/libmpg123/check_neon.S
++++ b/src/libmpg123/check_neon.S
+@@ -10,10 +10,10 @@
+ #include "mangle.h"
+ 
+ #ifndef __aarch64__
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ #endif
+diff --git a/src/libmpg123/dct36_neon.S b/src/libmpg123/dct36_neon.S
+index b1ea973f..e45ffbde 100644
+--- a/src/libmpg123/dct36_neon.S
++++ b/src/libmpg123/dct36_neon.S
+@@ -9,10 +9,10 @@
+ 
+ #include "mangle.h"
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 	
+diff --git a/src/libmpg123/dct64_neon_float.S b/src/libmpg123/dct64_neon_float.S
+index 9ee8a259..b6660e2a 100644
+--- a/src/libmpg123/dct64_neon_float.S
++++ b/src/libmpg123/dct64_neon_float.S
+@@ -8,10 +8,10 @@
+ 
+ #include "mangle.h"
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff --git a/src/libmpg123/getcpuflags_arm.c b/src/libmpg123/getcpuflags_arm.c
+index 8d0249a1..d5c9c1e6 100644
+--- a/src/libmpg123/getcpuflags_arm.c
++++ b/src/libmpg123/getcpuflags_arm.c
+@@ -19,7 +19,7 @@
+ 
+ extern void INT123_check_neon(void);
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ static sigjmp_buf jmpbuf;
+ #else
+ static jmp_buf jmpbuf;
+@@ -27,7 +27,7 @@ static jmp_buf jmpbuf;
+ 
+ static void mpg123_arm_catch_sigill(int sig)
+ {
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	siglongjmp(jmpbuf, 1);
+ #else
+ 	longjmp(jmpbuf, 1);
+@@ -36,7 +36,7 @@ static void mpg123_arm_catch_sigill(int sig)
+ 
+ unsigned int INT123_getcpuflags(struct cpuflags* cf)
+ {
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	struct sigaction act, act_old;
+ 	act.sa_handler = mpg123_arm_catch_sigill;
+ 	act.sa_flags = SA_RESTART;
+diff --git a/src/libmpg123/synth_neon_accurate.S b/src/libmpg123/synth_neon_accurate.S
+index df60685e..fbc4c5f7 100644
+--- a/src/libmpg123/synth_neon_accurate.S
++++ b/src/libmpg123/synth_neon_accurate.S
+@@ -17,8 +17,10 @@
+ 	return value: number of clipped samples (0)
+ */
+ 
++#ifndef _WIN32
+ 	.code 32
+-#ifndef __APPLE__
++#endif
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+@@ -32,7 +34,13 @@ ASM_NAME(INT123_synth_1to1_neon_accurate_asm):
+ 	vpush		{q4-q7}
+ 	mov			r6, sp
+ 	sub			sp, sp, #16
++#ifdef _WIN32
++	mov			r12, sp
++	bic			r12, r12, #0xff
++	mov			sp, r12
++#else
+ 	bic			sp, #0xff
++#endif
+ 	
+ 	add			WINDOW, WINDOW, #64
+ 	sub			WINDOW, WINDOW, r3, lsl #2
+diff --git a/src/libmpg123/synth_neon_float.S b/src/libmpg123/synth_neon_float.S
+index 99a5d21f..d8c018b5 100644
+--- a/src/libmpg123/synth_neon_float.S
++++ b/src/libmpg123/synth_neon_float.S
+@@ -17,10 +17,10 @@
+ 	return value: number of clipped samples (0)
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff --git a/src/libmpg123/synth_neon_s32.S b/src/libmpg123/synth_neon_s32.S
+index 334a1375..665f47bc 100644
+--- a/src/libmpg123/synth_neon_s32.S
++++ b/src/libmpg123/synth_neon_s32.S
+@@ -17,10 +17,10 @@
+ 	return value: number of clipped samples (0)
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff --git a/src/libmpg123/synth_stereo_neon.S b/src/libmpg123/synth_stereo_neon.S
+index 5abc8b74..791c766b 100644
+--- a/src/libmpg123/synth_stereo_neon.S
++++ b/src/libmpg123/synth_stereo_neon.S
+@@ -18,10 +18,10 @@
+ 	return value: number of clipped samples
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff --git a/src/libmpg123/synth_stereo_neon_accurate.S b/src/libmpg123/synth_stereo_neon_accurate.S
+index 3107a74b..5bdc1427 100644
+--- a/src/libmpg123/synth_stereo_neon_accurate.S
++++ b/src/libmpg123/synth_stereo_neon_accurate.S
+@@ -18,8 +18,10 @@
+ 	return value: number of clipped samples
+ */
+ 
++#ifndef _WIN32
+ 	.code 32
+-#ifndef __APPLE__
++#endif
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+@@ -34,7 +36,13 @@ ASM_NAME(INT123_synth_1to1_s_neon_accurate_asm):
+ 	ldr			r4, [sp, #84]
+ 	mov			r7, sp
+ 	sub			sp, sp, #16
++#ifdef _WIN32
++	mov			r12, sp
++	bic			r12, r12, #0xff
++	mov			sp, r12
++#else
+ 	bic			sp, #0xff
++#endif
+ 	
+ 	add			WINDOW, WINDOW, #64
+ 	sub			WINDOW, WINDOW, r4, lsl #2
+diff --git a/src/libmpg123/synth_stereo_neon_float.S b/src/libmpg123/synth_stereo_neon_float.S
+index e626f2e1..0a5b5c54 100644
+--- a/src/libmpg123/synth_stereo_neon_float.S
++++ b/src/libmpg123/synth_stereo_neon_float.S
+@@ -18,10 +18,10 @@
+ 	return value: number of clipped samples (0)
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+diff --git a/src/libmpg123/synth_stereo_neon_s32.S b/src/libmpg123/synth_stereo_neon_s32.S
+index 505e76bd..66f7b942 100644
+--- a/src/libmpg123/synth_stereo_neon_s32.S
++++ b/src/libmpg123/synth_stereo_neon_s32.S
+@@ -18,10 +18,10 @@
+ 	return value: number of clipped samples
+ */
+ 
+-#ifndef _M_ARM
++#ifndef _WIN32
+ 	.code 32
+ #endif
+-#ifndef __APPLE__
++#ifdef __ELF__
+ 	.fpu neon
+ #endif
+ 
+-- 
+2.43.0
+

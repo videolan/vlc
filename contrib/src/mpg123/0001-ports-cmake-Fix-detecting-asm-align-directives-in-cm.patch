@@ -1,0 +1,75 @@
+From 1c35a3eb9d0dd8bc93472aa15946d08b047adb6c Mon Sep 17 00:00:00 2001
+From: thor <thor@35dc7657-300d-0410-a2e5-dc2837fedb53>
+Date: Fri, 26 Jun 2026 20:33:00 +0000
+Subject: [PATCH 1/2] ports/cmake: Fix detecting asm align directives in cmake
+ on Windows
+
+(https://github.com/madebr/mpg123/pull/25 by mstorsjo)
+
+The mpg123 build system attempts to detect which kind of alignment
+directives the target assembler has.
+
+The autoconf build system attempts detecting this through assembling
+these directives as a .s file, containing only the directive.
+However the cmake build system checks for the same through a
+.c file, with the assembler directives stuck within main() { .. }.
+
+This causes Clang to fail assembling that for Windows ARM/AArch64
+targets, with errors like these:
+
+    fatal error: error in backend: Failed to evaluate function length in SEH unwind info
+
+On Windows on ARM/AArch64, we can't do variable length constructs
+like .align within a function, as it breaks the SEH unwind info
+generation.
+
+These failed tests cause CMake to incorrectly conclude that
+".balign" isn't available, and that ".align" isn't using powers
+of two.
+
+This leads to the assembly attempting to do ".align 16", which
+is interpreted as aligning the sections to 2^16 bytes. In a
+release build of Clang, this gets built successfully, even if it
+might be invalid - but in a Clang build with asserts enabled, it
+fails asserts like this:
+
+    unsupported section alignment
+    UNREACHABLE executed at ../lib/MC/WinCOFFObjectWriter.cpp:322!
+
+(Ideally this wouldn't be an assert but a proper error at some
+level though.)
+
+By placing the __asm__() directive outside of main(), we can
+still test the features of the assembler through a .c file in
+cmake. (CMake has no corresponding "check_asm_source_compiles"
+unfortunately.)
+
+This fixes building for Windows on AArch64 with Clang.
+
+
+
+git-svn-id: svn://scm.orgis.org/mpg123/trunk@5579 35dc7657-300d-0410-a2e5-dc2837fedb53
+---
+ ports/cmake/src/CMakeLists.txt | 4 ++--
+ 3 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/ports/cmake/src/CMakeLists.txt b/ports/cmake/src/CMakeLists.txt
+index f6a77b97..23b2ff57 100644
+--- a/ports/cmake/src/CMakeLists.txt
++++ b/ports/cmake/src/CMakeLists.txt
+@@ -98,10 +98,10 @@ search_libs(socket SOCKET_LIB socket)
+ test_big_endian(WORDS_BIGENDIAN)
+ 
+ check_c_source_compiles(
+-    "int main() { __asm__(\".balign 4\"); return 0; }"
++    "__asm__(\".balign 4\"); int main() { return 0; }"
+     ASMALIGN_BALIGN)
+ check_c_source_compiles(
+-    "int main() { __asm__(\".align 3\"); return 0; }"
++    "__asm__(\".align 3\"); int main() { return 0; }"
+     ASMALIGN_EXP)
+ if(NOT ASMALIGN_EXP)
+     set(ASMALIGN_BYTE ON)
+-- 
+2.43.0
+
