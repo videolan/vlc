@@ -18,9 +18,9 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
 	$(call pkg_static,"libmpg123.pc.in")
 	$(call pkg_static,"libsyn123.pc.in")
-	# fix llvm-mingw ARM build
-	$(APPLY) $(SRC)/mpg123/getcpuflags_arm.c.patch
-	$(APPLY) $(SRC)/mpg123/win_arm_asm.patch
+	# fix llvm-mingw ARM/AArch64 build
+	$(APPLY) $(SRC)/mpg123/0001-ports-cmake-Fix-detecting-asm-align-directives-in-cm.patch
+	$(APPLY) $(SRC)/mpg123/0002-ports-cmake-Fix-building-ARM-assembly-for-Windows-fo.patch
 	$(MOVE)
 
 .mpg123: mpg123 toolchain.cmake
