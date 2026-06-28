@@ -3,109 +3,228 @@ Changes between 3.0.x and 4.0.0-dev:
 
 Platform support changes:
  * 4.0.x requires:
-     - Windows 7/2008 R2 or later (with KB2533623 installed)
-     - macOS 10.13 or later
-     - iOS 9 or later
-     - Android 4.1.x or later (API-16)
+     - Windows 7/2008 R2 or later (with KB2533623 installed) - XP, Vista dropped
+     - macOS 10.13 or later                                  - 10.7-10.12 dropped
+     - iOS 9 or later                                        - iOS7-8 dropped
+     - Android 6 or later (API-23)                       - 4.0.x and 5.0.x dropped
      - GCC 8.0 or Clang 8 (or equivalent)
      - MetalToolchain XCode component for macOS
  * Windows on ARM is now supported
  * Universal Windows is only supported for Windows 10 (not Windows 8 anymore)
+ * RISC-V support, including RISC-V Vector optimizations on platforms that support it
+ * Improve support for all modern OS APIs on Windows, macOS, Linux and Unix
 
 Core:
  * New output clock (internal):
      - The input clock (PCR) or the audio output can drive the output clock
      - By default, the audio output will drive the output clock: no more audio
        resampling or flush when the audio is late or early
- * New medialibrary (vlc_media_library.h)
  * New player (vlc_player.h):
      - Replace the input_thread_t API that is now internal
      - One instance is used to play subsequent medias
      - Allow multiple track selection
      - Fix TOCTOU issues (the player lock is exposed)
+ * New medialibrary (vlc_media_library.h)
  * New mediatree and mediasource (vlc_media_source.h)
      - Browse local network and service discoveries
  * New playlist (vlc_playlist.h)
      - Replace the previous one
      - Flat, new random implementation
      - Can't browse anymore (cf. mediatree)
- * Add support for dual subtitles selection (via the player)
- * Support of HTML help (via the vlc_plugin.h:set_help_html macro)
+ * Add previous-frame stepping and improve next-frame stepping
+ * Add support for dual subtitles selection via the player
+ * Add support for forced subtitle language selection
+ * Allow subtitles to render in black bars (supported by some video output)
+ * Fix MPEG-TS playback with external SubRip (.srt) subtitle files in the new clock
+ * Add low-latency audio support in the core clock and audio output pipeline
+ * Add external preparser support, including out-of-process preparsing and
+   thumbnailing where available
+ * Add HTML-formatted module help via vlc_plugin.h:set_help_html
+ * Add VLC_LIB_PATH, VLC_LIBEXEC_PATH, VLC_USERDATA_PATH and VLC_SNAPSHOTS_DIR
+   path overrides
+ * Improve command-line option diagnostics and obsolete option handling
+ * Improve AB loop, repeat-count, play-and-pause, start-paused and stopping
+   reason handling
 
-Audio output:
- * PipeWire (native) audio output support
- * ALSA: HDMI passthrough support.
-   Use --alsa-passthrough to configure S/PDIF or HDMI passthrough.
- * Remove the DirectSound plugin (API obsolete after Windows 7)
-
-Demuxer:
- * Support for HEIF image and grid image formats
- * Support for Farbfeld images
- * Support for DASH WebM
- * Support for DVBSUB in mkv
- * Support for DAV video files
- * Improved Bluray menus, clips and stream selection
- * Support chapters in mp3 files
- * Support for DMX audio music (MUS) files
- * Removed Musepack demuxer in favor of libavformat+libavcodec
-
-Codecs:
- * Remove schroedinger support for dirac in favor of avcodec
- * Support for experimental AV1 video encoding
- * WebVTT encoder
- * Remove iomx support for Android
- * WebP image decoding
+Codecs (decoders):
+ * Support for VVC decoding
+ * Support for VP8/VP9 with alpha
+ * Support DFPWM, QOA, IMM4, ATRAC audio, AGM, VP4 and Codec 2 decoding
+ * Support for AVS2 decoding with libdavs2
  * Support for SMPTE-TT image profile
  * Support for 16-bit greyscale
- * Support IMM4 decoder
- * Improve 708 decoder
- * Support AGM decoder
- * Support VP4 decoder
+ * Improve CEA-708 decoder
+ * Add libaribcaption decoder/renderer
  * Support OpenAPV decoder (FFmpeg 8 and OpenAPV)
- * Add NVDEC hardware decoder
- * Remove SDL_image support
- * avcodec: support Codec 2 decoding
+ * Native WebP image decoding
+ * Add NVDEC hardware decoder with OpenGL direct rendering, GPU-to-CPU
+   conversion and HEVC 4:4:4 8/10/12/16-bit support
+ * MediaCodec: improve direct rendering, crop handling and colorimetry
+ * MFT: AV1 decoding and D3D11 output support
+ * VAAPI: support more chromas, including 4:2:2/4:4:4 and 12-bit formats,
+   P012 download/upload and DRM modifiers
+ * DXVA/D3D11VA: support HEVC 4:2:2/4:4:4 and alpha output support
+ * VideoToolbox: add visionOS support and improve color property handling
+ * Fix buffer and integer overflows in ambisonic audio, WebVTT subtitles,
+   CEA-708 captions, OggSpots, PNG
+ * Support crop in MediaCodec
+ * Remove legacy libmpeg2, a52 and dca decoder plugins in favor of avcodec
+ * Remove schroedinger support for dirac in favor of avcodec
+ * Remove SDL_image support in favor of avcodec
+ * Remove iomx support for Android (use MediaCodec)
+
+Codecs (encoders):
+ * Support for experimental AV1 video encoding
+ * Support for VideoToolbox video encoding (macOS and friends)
+ * Support for Media Foundation Transform audio/video encoder (Windows)
+ * New WebVTT encoder
+ * New TTML encoder
+ * Add WebP as a snapshot format option
+ * Improve snapshot generation for HDR, high bit-depth, hardware-decoded and
+   rotated video
+
+Demuxer:
+ * Support for HEIF (+grid) and AVIF image formats
+ * Support for Farbfeld images
+ * Support for Genetec G64 and HXVS/HXVT camera recordings
+ * Support for DASH WebM and HLS Ogg streams
+ * Support for TTML in MPEG-TS and Smooth Streaming
+ * Support for VVC in Matroska, MP4, MPEG-TS and adaptive streams
+ * Support for DVBSUB, ProRes, ATRAC, experimental Opus and LZO1X
+   compression in Matroska
+ * Support for APV, Opus, ISO/IEC 23003-5 audio, compact sample size boxes,
+   CEA-708 CDP captions and improved chapter handling in MP4
+ * Improve Blu-ray menus, clips and stream selection
+ * Support Blu-ray playback when opening index.bdmv files directly
+ * Support chapters in mp3 files
+ * Support synchronized lyrics in MPEG audio files
+ * Support for DMX audio music (MUS) files
+ * Support AIFF metadata
+ * Support RE4 CCTV recordings
+ * Improve Ogg Skeleton timing and invalid Skeleton packet handling
+ * Fix AVI SpeedHQ variant detection and AVC1 handling
+ * Fix TiVo demuxer packetization and oversized sequence table handling
+ * Remove Musepack and Real demuxers in favor of libavformat+libavcodec
 
 Access:
+ * Support for the RIST (Reliable Internet Stream Transport) Protocol
+ * Support for the AMT (Automatic Multicast Tunneling) Protocol
+ * Support for AMT over IPv6
+ * Support for the Gopher Protocol
+ * Support for WebDAV browsing
+ * Support for the data URI scheme
+ * Support DVD-Audio and DVD-VR in dvdread
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
- * Added support for the RIST (Reliable Internet Stream Transport) Protocol
- * Added support for the AMT (Automatic Multicast Tunneling) Protocol
- * Added support for the Gopher Protocol
- * Added avaudiocapture module as a replacement for qtsound, which is removed now
+ * Add avaudiocapture module as a replacement for qtsound (macOS)
+ * PipeWire input support on Linux
+ * Add DXGI-based screen capture support on Windows
  * Audio CD data tracks are now correctly detected and skipped
- * Replace Audio CD CDDB lookups in favor of more accurate Musicbrainz
- * Improved CD-TEXT and added Shift-JIS encoding support
- * Support for YoutubeDL (where available).
- * On-the-fly Zstandard (zstd) file decompression (where available).
+ * Replace Audio CD CDDB lookups in favor of more accurate MusicBrainz
+ * Improve CD-TEXT and add Shift-JIS encoding support
+ * Improve DVD seeking and chapter timing support
+ * Add support for forced DVD subtitles
+ * Improve VNC color handling and fix a possible buffer overflow
+ * Improve FTP directory listings, including MLST metadata and LIST fallbacks
+ * Improve HTTP byte-range, cookie forwarding and adaptive/HLS compatibility
+ * Add SFTP public key authentication options and ED25519 host key support
+ * Add RTSP over TLS support
+ * Add SRT listener mode support
+ * Add RTP payload support for H.264, H.265, MPEG-1/2, MPEG-4, Opus,
+   AC-3/E-AC-3, G.726/G.727 ADPCM, PCM and raw video
+ * Improve V4L2 capture with zero-copy buffers, more pixel formats and OpenBSD
+   support
+ * Support RAR 5.0 archives through libarchive
+ * Improve archive stream extraction seeking/error handling and HDS robustness
+ * Remove UDP-Lite support
+ * Remove RealRTSP access plugin
+ * Support YoutubeDL where available
+ * Support on-the-fly Zstandard (zstd) file decompression where available
 
 Access output:
- * Added support for the RIST (Reliable Internet Stream Transport) Protocol
- * Added support for HTTP PUT (HTTP upload)
+ * Support RIST (Reliable Internet Stream Transport) output through libRIST
+ * Support for HTTP PUT (HTTP upload)
+ * Add SRT stream ID, encryption, URL option parsing and connection recovery
+ * Improve LiveHTTP segment duration handling
+ * Fix SHOUTcast dst parameter backward compatibility
 
 Video output:
- * Added X11 RENDER video output plugin
+ * Add Vulkan/libplacebo video output plugin
+ * Add new Apple video output based on AVSampleBufferDisplayLayer
+   with native HDR tone-mapping/color handling, video orientation handling,
+   subpicture rendering/scaling and Picture-in-Picture integration
+   for macOS/iOS/tvOS/visionOS
+ * Add Android AImage/ASurfaceControl video output
+ * Add KMS video output plugin
+ * Add X11 RENDER video output plugin
+ * Add XCB EGL video output module
+ * Add Picture-in-Picture support for macOS and iOS/tvOS libvlc drawables
+ * Improve Direct3D11/OpenGL rendering of HDR, 10/12-bit, alpha, stereo and
+   360-degree video
+ * Support embedded and display ICC profiles for color-managed rendering
+ * Fix washed out black on NVIDIA cards with Direct3D9
+ * Improve subpicture placement
+ * Improve subtitle rendering performance, notably on Android
+ * Add video fitting modes and source projection overrides
+ * Improve FreeType text rendering with ruby, font fallback, RTL, shadow
+   fallback and transparent outline blending
+ * Fix SVG text renderer use-after-free
  * Remove aa plugin
  * Remove evas plugin
  * Remove omxil_vout plugin
- * Remove RealRTSP plugin
- * Remove Real demuxer plugin
- * Fix washed out black on NVIDIA cards with Direct3D9
- * On-Screen-Display is off by default in libvlc
  * Remove deprecated Linux framebuffer plugin
- * Removed VDPAU video output plugin (hardware decoder still present)
-
-Audio filter:
- * Add RNNoise recurrent neural network denoiser
+ * Remove DirectDraw and XVideo output plugins
+ * Remove VDPAU video output plugin (hardware decoder still present)
 
 Video filter:
  * Update yadif
+ * Add RISC-V V and AArch64 SVE deinterlace backends
+ * Add RISC-V V video transform optimizations
+ * Add OpenGL adjust and dithering filters
+ * Add SAM3 segmentation filter
+ * Add AMD FRC and VQ enhancer filters
+ * Add libplacebo scaling and OpenGL filter pipeline support
+ * Improve D3D11/DXVA2 deinterlacing and fix D3D11 adjust filter leaks
+ * Add crop filter without picture copy
  * Remove remote OSD plugin
- * New crop filter without picture copy
+
+Audio output:
+ * Add native PipeWire output with passthrough and ambisonics channel support
+ * Add Android AAudio output with low-latency mode
+ * Add Android AudioTrack E-AC3 passthrough on API 23 and audio session IDs
+ * Add AVSampleBuffer audio output for Apple platforms (macOS/iOS/tvOS/watchOS/visionOS)
+   with finer A/V sync, better AirPlay pause/seek/stop behavior, spatial audio support
+ * Add KAI audio output support
+ * WASAPI: exclusive mode and 24-bit output support
+ * MMDevice: add default-device selection and passthrough control
+ * Fix MMDevice crash when all devices are removed during playback and deadlocks
+ * ALSA: HDMI passthrough support.
+   Use --alsa-passthrough to configure S/PDIF or HDMI passthrough.
+ * CoreAudio/AUHAL: improve latency reporting, channel reordering and mute
+   handling
+ * Fix CoreAudio stack overflow when mapping output layouts
+ * Fix iOS AudioUnit deadlock on interruption
+ * Remove the DirectSound plugin (API obsolete after Windows 7)
+ * Remove the Tizen audio output plugin
+
+Audio filter:
+ * Add RNNoise recurrent neural network denoiser
+ * Add noise gate, dynamic range expander and peak limiter filters
+ * Add stereo pan and center channel upmixing filters
+ * Add EBU R 128 audio meter plugin
+ * Add RISC-V V volume acceleration
+ * Improve scaletempo pitch changes by using the preferred resampler
+ * Fix high-frequency band type in the parametric equalizer
+ * Fix chorus/flanger heap corruption when changing delay parameters
+ * Remove the bandlimited audio resampler
 
 Stream output:
  * New SDI output with improved audio and ancillary support.
    Candidate for deprecation of decklink vout/aout modules.
- * Support for DLNA/UPNP renderers
+ * Add HLS output with playlist generation, HTTP segment sharing, WebVTT
+   subtitles, HEVC, I-frame segmentation and fragmented MP4 segments
+ * Support DLNA/UPnP renderers
+ * Improve Chromecast stream detection, music metadata and playback handoff
+ * Add stream output tracing helper
  * The "udp" access output module has been removed.
    Please use the UDP stream output instead, e.g.:
      Old: '#std{access=udp,mux=ts,dst=239.255.1.2:1234,sap}'
@@ -113,16 +232,138 @@ Stream output:
 
 Muxers:
  * MP4 files are no longer faststart by default
+ * Add WebVTT muxer
+ * Improve MP4 muxing of TTML subtitles and track ordering
+ * Improve MPEG-TS scrambling signalling and use libdvbcsa
+
+Packetizers:
+ * Support 32-bit FLAC samples
+ * Fix DTS packetizer busy loops
+ * Improve A/52 recovery after desynchronization
+ * Harden H.264, HEVC, MPEG-4 Audio, FLAC and AV1 packetizers
 
 Service discovery:
- * Support Renderer discovery with avahi
+ * Add renderer discovery with Avahi
+ * Add Online Radio Browser discovery
+ * Add PipeWire and Windows volumes discovery modules
+ * Discover WebDAV servers through Zeroconf
+ * Fix Podcast, SAP, UDisks, Bonjour and UPnP discovery misc issues
+
+Interfaces:
+ * Add new Qt interface based on QML, with medialibrary, simpler player,
+   classic mode and podcast support
+ * Add redesigned macOS interface
+ * Add UPnP server support with browsing, media fetching, thumbnails,
+   subtitles and Microsoft device compatibility
+ * Skins2: add macOS backend support
+ * Add Picture-in-Picture support on macOS
+ * Qt: support Wayland
+ * Qt: improve playlist creation/editing, drag-and-drop, dark/high-contrast
+   themes and keyboard/touchscreen navigation
+ * Fix D-Bus/MPRIS TrackList signals and track id handling
+ * Fix CLI control socket disconnect behavior
+
+Lua:
+ * Add medialibrary API support, including history, bookmarks, playlists,
+   tracks, metadata, video folders and genre thumbnails
+ * Add renderer discovery support
+ * Add generated documentation for Lua extension APIs
+ * Support HTTPS in the Lua HTTP interface when --http-cert is set
+ * Fix stack overflow risk in Lua extension handling
+
+Build system:
+ * Add Meson build system support alongside autotools, including modules,
+   contribs, tests and platform packaging
 
 macOS:
  * Remove Growl notification support
- * Improved AppleScript API with support for playback modes, recording, rate
+ * Improve AppleScript API with support for playback modes, recording and rate
+ * Add synchronized lyrics display with clickable lyrics seeking
+ * Add DVD-Audio support in the open dialog and play queue
+ * Improve library playlist editing and media source browsing
+ * Add connect-to-server dialog and arbitrary MRL browsing in media sources
+ * Improve macOS packaging and codesigning, including Sparkle 2.8.1
+ * Add UIKit power inhibition support
 
 appleOS:
- * Improved proxy configuration handling
+ * Improve proxy configuration handling
+ * Add unified Apple build scripts, Xcode generation, prebuilt contrib support
+   and xrOS, visionOS and watchOS packaging support
+
+Windows:
+ * Improve Windows packaging with ARM64 package names, long path support,
+   Control Flow Guard, Link Time Optimization, debug symbols and vlc-preparser
+   in NSIS/MSI installers
+ * Remove ActiveX/NPAPI webplugin files from default Windows installers
+
+Visualization:
+ * Update projectM visualization support for libprojectM v4 and Windows
+
+Misc:
+ * Add JSON and Telegraf trace logger modules
+ * Improve medialibrary support for playlists, history, bookmarks, favorites,
+   public/private folders, embedded thumbnails and movie items
+ * Improve artwork caching for embedded attachments and artwork save failures
+ * Improve metadata parsing of ID3, RIFF INFO, FLAC pictures and stream reads
+ * Update TagLib support to TagLib 2.x
+ * Use HTTPS for update and key responses
+ * Fix KWallet, Secret Service and Keychain credential lookup edge cases
+ * Improve TLS defaults in GnuTLS and SecureTransport compatibility
+ * Fix MusicBrainz, AcoustID, Audioscrobbler and thumbnailer crashes and leaks
+ * Fix D-Bus power inhibition support
+ * Update Snap packaging to core22/snapcraft 8 and improve SRT, Vulkan,
+   Chromecast, UDisks2 and desktop integration support
+ * Update translations
+
+Contribs:
+ * Update FFmpeg to 8.1.2 and libarchive to 3.8.8, with security fixes
+ * Update Qt to 6.8.3, TagLib to 2.1, librist to 0.2.18, libplacebo to
+   5.264.1, projectM to 4.1.6 and Sparkle to 2.8.1
+ * Update bundled libraries including AOM 3.14.1, dav1d 1.5.3, GnuTLS 3.8.13,
+   HarfBuzz 14.2.1, libxml2 2.15.3, mpg123 1.33.6 and Opus 1.6.1
+ * Update DVD support libraries to libdvdcss 1.5.0, libdvdread 7.0.1 and
+   libdvdnav 7.0.0
+ * Add bundled OpenAPV, OpenCV4, SAM3, GGML, libdvbcsa, RNNoise, libebur128,
+   librist, libsmb2, Vulkan and Rust/cargo-c contribs
+ * Remove unused or obsolete contribs including libmpeg2, a52, dca, SDL,
+   SDL_image, schroedinger, CDDB and Growl
+
+Documentation:
+ * Add libVLC 3-to-4 migration documentation
+ * Add libVLC samples for the player, parser, media discoverer, renderer
+   discoverer, D3D9/D3D11/OpenGL/SDL callbacks, Qt, AppKit and Win32
+ * Add Rust plugin, Win32 build/debugging and executor documentation
+
+LibVLCcore:
+ * Plugin ABI was bumped and internal plugin APIs now use vlc_tick_t, the new
+   player/playlist/mediatree APIs and callback structures more consistently
+ * Add internal APIs for chroma probing, ancillary data, process spawning,
+   tracing and C++ helpers
+
+LibVLC:
+ * On-Screen-Display is off by default in libvlc
+ * libvlc_time_t now uses microseconds instead of milliseconds
+ * Add libvlc_picture and libvlc_picture_list APIs, including RGBA and WebP
+   support
+ * Rework media parsing and thumbnailing around the new libvlc_parser API
+ * Add media track list APIs, refcounted media tracks, multiple track
+   selection and selected-track reporting
+ * Add media-player timer/watch APIs, record API, program API, next-media API,
+   jump-time API and explicit AB loop API
+ * Add video fit mode, projection mode, stereo mode, SPU text scale, teletext
+   transparency and deinterlace getter/setter APIs
+ * Rework video output callbacks into a unified API for OpenGL, D3D9 and D3D11,
+   with frame metadata, plane selection, host resize/mouse input reporting and
+   Android Native Window callbacks
+ * Add metadata extras, media statistics, media stopping reason and media
+   attachments events
+ * Switch many LibVLC constructors and callback setters to callback structures
+ * Rename media and renderer discoverer release functions to destroy functions,
+   and rename retain/hold-style APIs consistently
+ * Remove the VLM API, libvlc_event_manager_t, deprecated media/list/player
+   events, deprecated track APIs, deprecated service-discovery/log/audio/video
+   stubs, AGL support and libvlc_wait()
+ * Remove libvlc_media_player_set_abloop() in favor of explicit AB loop APIs
 
 
 Changes between 3.0.23 and 3.0.24-beta1:
