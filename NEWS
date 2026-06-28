@@ -286,6 +286,9 @@ Interface:
 Demuxers:
  * Fix potential security issue (OOB Write) on MMS:// by checking user size bounds
 
+Contribs:
+ * Update dav1d to 1.3.0
+
 
 Changes between 3.0.18 and 3.0.19:
 ----------------------------------
@@ -362,6 +365,10 @@ macOS:
 Misc:
  * Fix rendering and performance issue with older GPUs
 
+Security:
+ * Fix possible buffer overflow in VNC
+ * Fix division by zero in MP4 demuxing
+
 Contribs:
  * Update aom
 
@@ -372,6 +379,7 @@ Changes between 3.0.18-rc and 3.0.18-rc2:
 Codec/Demux:
  * Add support for Y16 chroma
  * Fix build of gme plugin
+ * Fix overflows in 24-bit raw audio decoder
 
 Lua:
  * Fix script for vocaroo
@@ -446,8 +454,14 @@ Demux:
 Changes between 3.0.17 and 3.0.17.2:
 ------------------------------------
 
+Video Output:
+ * VAAPI: add support for DRM modifiers
+
 Interface:
  * Qt: Fix right click support on video
+
+Contribs:
+ * Update FLAC to 1.3.4
 
 Misc:
  * Update YouTube script
@@ -477,6 +491,7 @@ Decoders/Packetizers:
  * Fix crashes with VP9 streams
  * Fix styling issues with subs tx3g (mp4) tracks
  * Fix playback of live AV1 streams
+ * GStreamer decoder: add AV1 and more video codec mappings
 
 Audio Output:
  * iOS/tvOS: add support for spatial audio
@@ -488,6 +503,7 @@ Video Output:
 
 Demux:
  * Major overhaul of the adaptive streaming stack
+ * HLS: add support for Ogg streams, packed MP3 and AC-3
  * Support for DAV video files
  * Add WebP image mapping
  * Fix missing audio start of Opus audio in MKV/WebM
@@ -501,9 +517,11 @@ Interface:
  * Add safe area handling on macOS
  * Qt: improve preferences search
  * Qt: fix --no-mouse-events option
+ * Qt: add shuffle playlist action
 
 Misc:
  * Update YouTube script
+ * RTP output: add support for E-AC-3
  * Fix Icecast directory parsing which could lead to missing entries
  * Improve UPnP compatibility with some servers
 
@@ -524,6 +542,7 @@ Misc:
  * Update libnfs to 5.0.1
  * Update libarchive to 3.6.0
  * Update AOM encoder to 3.1.1
+ * Update ncurses to 6.3
 
 
 Changes between 3.0.15 and 3.0.16:
@@ -534,9 +553,16 @@ Video Output:
 
 Access:
  * Fix RTSP server timeout handling
+ * Mark FTP and SOCKS password options as password fields
 
 Interfaces:
  * macOS: Add touchbar support
+
+Stream Output:
+ * Fix --sout-transcode-sfilter option
+
+Contribs:
+ * Update mpg123 to 1.28.0
 
 Misc
  * Multiple settings improvements
@@ -547,6 +573,7 @@ Changes between 3.0.14 and 3.0.15:
 
 Core:
  * Add Opus & Alac wave format mappings
+ * Add legacy Hebrew ISO-639 code for old DVDs
 
 Access:
  * Fix opening DVD folders with non-ascii characters
@@ -562,6 +589,16 @@ Video Output:
 Text renderer:
  * Improve freetype fonts outlining
 
+Audio Output:
+ * Fix sndio crash when adjusting volume while stopped
+
+macOS:
+ * Fix crash on exit related to PXSourceList
+
+Contribs:
+ * Update dav1d to 0.9.0
+ * Update freetype to 2.10.4 and harfbuzz to 2.6.8
+
 Misc:
  * Fix GnuTLS support for Windows XP
 
@@ -573,6 +610,12 @@ Core:
  * Fix double loading of slave input
  * Fix an issue causing the auto-updater not to launch the new version
    installer
+
+Video Output:
+ * Update built-in shaders to BT.709-2 coefficients
+
+Misc:
+ * Fix build with libsmb2 3.0.0
 
 
 Changes between 3.0.12.1 and 3.0.13:
