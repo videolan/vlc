@@ -275,6 +275,7 @@
     [self.searchViewController clearSearch];
     [self.searchViewController dismissFromContainer];
     self.isShowingSearchOverlay = NO;
+    [VLCMain.sharedInstance.libraryController filterByString:@""];
     [self.libraryWindow updateToolbarDisplayFlags];
 
     // Re-present the home content (or placeholder) in the target view.
