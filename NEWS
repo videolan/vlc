@@ -6,16 +6,57 @@ Codecs:
  * Support OpenAPV decoder (FFmpeg 8 and OpenAPV)
  * Support Atrac3/Atrac9 decoding
  * Remove schroedinger support for dirac in favor of avcodec
+ * Fix Speex leaks and packetization issues
+ * Fix WebVTT CSS parsing and error handling
+ * Fix FLAC and HEVC packetizer edge cases
 
 Demuxers:
- * misc. MKV logs and crash fixes
+ * Add support for CEA-708 closed captions in MP4
+ * Expose ID3v2 metadata in MPEG demuxer
+ * Improve subtitle language detection from filenames and SSA/ASS metadata
+ * Fix several MKV crashes, leaks, hangs and malformed file handling issues
+ * Fix AVI hang with zero-sized strd chunks
+ * Fix MP4, MPEG-TS, Ogg, RealAudio and subtitle demuxing edge cases
+
+Access:
+ * Switch RIST input and output to librist, with main and simple profile support
+ * Add SRT listener mode support
+ * Add SFTP public key authentication options and ED25519 hostkey support
+ * Update SMB2 share enumeration
+
+Service Discovery:
+ * Include Chromecast model in mDNS renderer names
+ * Fix IPv6 addresses in Bonjour service URLs
+
+Video Output:
+ * Fix Direct3D11 adjust filter and texture leaks
+ * Fix MediaCodec crop validation
 
 Windows:
  * Support NV12 DirectShow capture
+ * Improve UWP build and runtime compatibility
+ * Fix mmdevice crashes, leaks and deadlocks
+ * Generate debug symbols by default for Windows packages
+
+Interface:
+ * Qt: Fix default open dialog location
+ * Qt: Fix effects window geometry saving
+ * Qt: Improve hotkeys dialog strings
+
+Stream Output:
+ * Disable HEVC for original Chromecast devices
+
+Security:
+ * Fix multiple OOB, integer overflow, double-free and use-after-free issues
+   across demuxers, packetizers and codecs
+ * Fix MKV OOM vulnerability when parsing oversized child elements
+ * Harden EBML/Matroska parsing of unknown and infinite-size elements
 
 Misc:
+ * Add Flatpak build support
  * Fix Audio EQ filter High Frequency parameter
- * add SFTP ED25519 hostkey support
+ * Fix artwork preparser crash when artwork title is null
+ * Fix LibVLC media list player race
 
 Lua:
  * Remove broken youtube.lua plugin
@@ -33,6 +74,7 @@ Contrib:
  * Update jpeg to v9f
  * Update libtasn1 to 4.19.0
  * Update libxml2 to 2.15.1
+ * Update libebml to 1.4.5
  * Update matroska to 1.7.1
  * Update nfs to 6.0.2
  * Update openjpeg to 2.5.4
@@ -40,10 +82,13 @@ Contrib:
  * Update protobuf to 3.4.1
  * Update opus to 1.6.1
  * Update shout to 2.4.6
+ * Update SDL to 3.4.10
+ * Update SDL_image to 3.4.4
  * Update upnp to 1.14.20
  * Update vorbis to 1.3.7
  * Update x265 to 4.1
  * Update zlib to 1.3.2
+ * Add librist 0.2.16
 
 Changes between 3.0.22 and 3.0.23:
 ----------------------------------
