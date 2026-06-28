@@ -235,6 +235,7 @@ Decoders:
 Input:
  * Add support for HTTP content range handling according to RFC 9110
  * Fix some HLS Adaptive Streaming not working in audio-only mode
+ * Fix short HTTP byte-range responses
 
 Video Output:
  * Super Resolution scaling with AMD GPUs
@@ -242,6 +243,7 @@ Video Output:
    the display
  * Improve subtitles rendering on Apple platforms of notably Asian languages
    by correcting font fallback lookups
+ * Fix D3D11 scaler deadlocks and output size changes
 
 Video Filter:
  * New AMD VQ Enhancer filter
@@ -253,19 +255,23 @@ Audio Output:
 
 Services Discovery:
  * Fix exposed UPnP directory URL schemes to be compliant with RFC 3986
+ * Restrict UPnP exposed URLs to HTTP(S)
 
 Contrib:
  * Update FFmpeg to 4.4.4
+ * Update amf to 1.4.33
  * Update dav1d to 1.4.2
  * Update libvpx to 1.14.1
 
 libVLC:
  * the HWND passed to libvlc_media_player_set_hwnd must have the WS_CLIPCHILDREN
    style set.
+ * Fix API compatibility when using libVLC from MSVC
  * Fix crashes when using caopengllayer
 
 Misc:
  * Fix various warnings, leaks and potential crashes
+ * Fix WinVLC crashdump path handling
  * Fix security integer overflow in MMS module
 
 
