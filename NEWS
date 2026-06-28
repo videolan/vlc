@@ -147,9 +147,11 @@ Demuxers:
  * Fix playback of very short ASF files (duration less than 1s)
  * Multiple fixes in MPEG-TS
  * Fix crashes in multiple demuxers (reported by rub.de, oss-fuzz and others)
+   Including fixes for malformed WAV, VOC, MMS, ASF and AVI files and HDS stream
 
 Input:
  * Fix SFTP seeking for large files on 32-bit OS
+ * Do not fetch network metadata when disabled by the user
 
 Interface:
  * Qt: Add option to use dark palette
@@ -164,6 +166,7 @@ Service Discovery:
 Video Output:
  * Use a better stretch mode in wingdi
  * Fetch missing device information when running in UWP
+ * Fix AMF filters crash on non-AMD GPUs
 
 Video Filter:
  * Add AMD GPU Frame Rate Doubler (Direct3D11)
@@ -178,7 +181,7 @@ Contrib:
  * Update gcrypt to 1.10.1
  * Update glew to 2.1.0
  * Update gmp to 6.3.0
- * Udpate gnutls to 3.8.10
+ * Update gnutls to 3.8.10
  * Update harfbuzz to 11.5.0
  * Update iconv to 1.17
  * Update libarchive to 3.8.0 including support for RAR 5.0
@@ -195,13 +198,15 @@ Contrib:
  * Update taglib to 1.13.1
  * Update zlib to 1.3.1
  * and more 3rd party updates
- * libmpeg2, libdca and liba52 are no longer build by default
+ * libmpeg2, libdca and liba52 are no longer built by default
  * build ragel inside harfbuzz if necessary
 
 Misc:
  * gnutls: remove manual DH prime bits setting
  * Avoid very large fonts in portrait mode
  * Update of most translations
+ * Fix AppStream metadata file name
+ * Fix libVLC vout table leak
 
 Many thanks to the Sovereign Tech Agency (https://www.sovereign.tech/), and
 especially their Sovereign Tech Fund program, for helping VLC sustainability and safety.
@@ -216,9 +221,11 @@ Security:
  * Use-after Free in SVG decoder
  * Crash in Subtitles core, in jpeg2 inside TS
  * Multiple crashes and OOB in CEA-708 subtitles
+ * MMS boundary and integer overflow issues
  * OOB read on Oggspot, MP4
  * Multiple leaks in MKV, ASF/WMV, CAF and PS demuxers, Ogg, Theora, Vorbis,
    WebVTT and SVCD decoders
+ * Fix CVE-2014-5461 in bundled Lua
  * Busy loop in WebVTT
   (The list above is not exhaustive)
 
