@@ -44,14 +44,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.22\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2025-12-08 07:33+0100\n"
+"POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Wallon Wallon, 2025\n"
 "Language-Team: French (https://app.transifex.com/yaron/teams/16553/fr/)\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
 "1000000 == 0 ? 1 : 2;\n"
 
@@ -680,7 +680,7 @@ msgid "The maximum number of filters (%u) was reached."
 msgstr "Le nombre maximum de filtres (%u) a été atteint."
 
 #: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:936
-#: src/libvlc-module.c:540 modules/demux/adaptive/adaptive.cpp:124
+#: src/libvlc-module.c:540 modules/demux/adaptive/adaptive.cpp:126
 #: modules/gui/macosx/VLCMainMenu.m:243
 #: modules/gui/macosx/VLCSidebarDataSource.m:211
 #: modules/video_filter/postproc.c:235
@@ -1834,7 +1834,7 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:957
 #: modules/audio_output/kai.c:106 modules/codec/subsdec.c:167
-#: modules/codec/x264.c:434 modules/demux/adaptive/adaptive.cpp:122
+#: modules/codec/x264.c:434 modules/demux/adaptive/adaptive.cpp:124
 #: modules/demux/mpeg/ts.c:132 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:69
 #: modules/gui/qt/components/sout/profile_selector.cpp:590
@@ -2617,9 +2617,9 @@ msgstr ""
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
 #: modules/access/dshow/dshow.cpp:99 modules/access/dshow/dshow.cpp:119
 #: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
-#: modules/audio_output/directsound.c:1048 modules/audio_output/mmdevice.c:1316
-#: modules/audio_output/mmdevice.c:1445 modules/audio_output/winstore.c:594
-#: modules/codec/avcodec/avcodec.c:50 modules/demux/adaptive/adaptive.cpp:106
+#: modules/audio_output/directsound.c:1048 modules/audio_output/mmdevice.c:1343
+#: modules/audio_output/mmdevice.c:1480 modules/audio_output/winstore.c:600
+#: modules/codec/avcodec/avcodec.c:50 modules/demux/adaptive/adaptive.cpp:108
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:322
 #: modules/gui/macosx/VLCMainMenu.m:602
@@ -3134,7 +3134,7 @@ msgstr "Périphérique DVD"
 msgid "VCD device"
 msgstr "Périphérique VCD"
 
-#: src/libvlc-module.c:764 modules/access/cdda.c:984
+#: src/libvlc-module.c:764 modules/access/cdda.c:985
 msgid "Audio CD device"
 msgstr "Périphérique CD audio"
 
@@ -3154,7 +3154,7 @@ msgstr ""
 "Spécifie le périphérique VCD (ou fichier) à utiliser par défaut. Ne pas "
 "oublier les deux-points après la lettre du disque (par ex. D:)"
 
-#: src/libvlc-module.c:774 modules/access/cdda.c:987
+#: src/libvlc-module.c:774 modules/access/cdda.c:988
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
@@ -3170,7 +3170,7 @@ msgstr "Ceci est le périphérique DVD à utiliser par défaut."
 msgid "This is the default VCD device to use."
 msgstr "Ceci est le périphérique VCD à utiliser par défaut."
 
-#: src/libvlc-module.c:785 modules/access/cdda.c:992
+#: src/libvlc-module.c:785 modules/access/cdda.c:993
 msgid "This is the default Audio CD device to use."
 msgstr "Ceci est le lecteur de CD audio à utiliser par défaut."
 
@@ -4144,7 +4144,7 @@ msgstr "Ralentir un peu"
 #: modules/gui/macosx/VLCMainMenu.m:396 modules/gui/macosx/VLCMainMenu.m:499
 #: modules/gui/macosx/VLCMainMenu.m:507
 #: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/dialogs/sout.cpp:91 modules/notify/notify.c:335
+#: modules/gui/qt/dialogs/sout.cpp:89 modules/notify/notify.c:335
 #: modules/gui/qt/ui/streampanel.h:179
 msgid "Next"
 msgstr "Suivant"
@@ -4951,7 +4951,7 @@ msgid "Subpictures"
 msgstr "Incrustations"
 
 #: src/libvlc-module.c:1683 modules/codec/subsdec.c:182
-#: modules/demux/subtitle.c:71 modules/demux/xiph_metadata.h:49
+#: modules/demux/subtitle.c:72 modules/demux/xiph_metadata.h:49
 #: modules/demux/xiph_metadata.h:62
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:158
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:178
@@ -5283,7 +5283,7 @@ msgstr "Média temps"
 msgid "Media View"
 msgstr "Média voir"
 
-#: src/misc/actions.c:100 modules/gui/qt/components/controller.cpp:577
+#: src/misc/actions.c:100 modules/gui/qt/components/controller.cpp:574
 msgid "Menu"
 msgstr "Menu"
 
@@ -5408,7 +5408,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Échec d’ouverture de « %s » en écriture"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2878
+#: modules/demux/avi/avi.c:2888
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -5436,8 +5436,8 @@ msgstr "Échec d’ouverture de « %s » en écriture"
 #: modules/gui/qt/components/open_panels.cpp:1361
 #: modules/gui/qt/components/preferences_widgets.cpp:1420
 #: modules/gui/qt/components/sout/profile_selector.cpp:452
-#: modules/gui/qt/dialogs/sout.cpp:90
-#: modules/stream_out/chromecast/cast.cpp:1197
+#: modules/gui/qt/dialogs/sout.cpp:88
+#: modules/stream_out/chromecast/cast.cpp:1212
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -6479,45 +6479,45 @@ msgstr "Menu principal"
 msgid "First Play"
 msgstr "Premier lu"
 
-#: modules/access/cdda.c:716
+#: modules/access/cdda.c:717
 #, c-format
 msgid "Audio CD - Track %02i"
 msgstr "CD audio - Piste %02i"
 
-#: modules/access/cdda.c:1003 modules/gui/macosx/VLCOpenWindowController.m:169
+#: modules/access/cdda.c:1004 modules/gui/macosx/VLCOpenWindowController.m:169
 #: modules/gui/qt/ui/open_disk.h:297
 msgid "Audio CD"
 msgstr "CD audio"
 
-#: modules/access/cdda.c:1004
+#: modules/access/cdda.c:1005
 msgid "Audio CD input"
 msgstr "Entrée CD audio"
 
-#: modules/access/cdda.c:1013
+#: modules/access/cdda.c:1014
 msgid "[cdda:][device][@[track]]"
 msgstr "[cdda://][périphérique-ou-fichier][@[numéro de piste]]"
 
-#: modules/access/cdda.c:1022
+#: modules/access/cdda.c:1023
 msgid "Musicbrainz Server"
 msgstr "Serveur Musicbrainz"
 
-#: modules/access/cdda.c:1023
+#: modules/access/cdda.c:1024
 msgid "Address of the musicbrainz server to use."
 msgstr "Adresse du serveur musicBrainz à utiliser."
 
-#: modules/access/cdda.c:1025
+#: modules/access/cdda.c:1026
 msgid "CDDB Server"
 msgstr "Serveur CDDB"
 
-#: modules/access/cdda.c:1026
+#: modules/access/cdda.c:1027
 msgid "Address of the CDDB server to use."
 msgstr "Adresse du serveur CDDB à utiliser."
 
-#: modules/access/cdda.c:1027
+#: modules/access/cdda.c:1028
 msgid "CDDB port"
 msgstr "Port CDDB"
 
-#: modules/access/cdda.c:1028
+#: modules/access/cdda.c:1029
 msgid "CDDB Server port to use."
 msgstr "Port du serveur CDDB à utiliser."
 
@@ -6553,11 +6553,11 @@ msgstr "Fichier KDM"
 msgid "Path to Key Delivery Message XML file"
 msgstr "Chemin du fichier XML « Key Delivery Message »"
 
-#: modules/access/dcp/dcp.cpp:77
+#: modules/access/dcp/dcp.cpp:78
 msgid "DCP"
 msgstr "DCP"
 
-#: modules/access/dcp/dcp.cpp:79
+#: modules/access/dcp/dcp.cpp:80
 msgid "Digital Cinema Package module"
 msgstr "Module « Digital Cinema Package »"
 
@@ -6689,7 +6689,7 @@ msgstr "Entrée Blackmagic DeckLink SDI"
 msgid "10 bits"
 msgstr "10 bits"
 
-#: modules/access/decklink.cpp:358 modules/demux/ty.c:783
+#: modules/access/decklink.cpp:358 modules/demux/ty.c:784
 msgid "Closed captions 1"
 msgstr "Sous-titrage malentendants 1"
 
@@ -7609,7 +7609,7 @@ msgstr "Lecture de fichiers"
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:301 modules/gui/qt/dialogs/plugins.cpp:1428
-#: modules/gui/qt/dialogs/sout.cpp:67 modules/gui/qt/dialogs/sout.cpp:119
+#: modules/gui/qt/dialogs/sout.cpp:67 modules/gui/qt/dialogs/sout.cpp:114
 #: share/lua/http/dialogs/create_stream.html:204
 #: share/lua/http/dialogs/stream_config_window.html:36
 #: share/lua/http/dialogs/stream_window.html:95
@@ -8289,80 +8289,52 @@ msgstr "RDP"
 msgid "RDP Remote Desktop"
 msgstr "Bureau à distance RDP"
 
-#: modules/access/rist.c:65
+#: modules/access/rist.c:44
 msgid "Range"
 msgstr "Gamme"
 
-#: modules/access/rist.c:65
+#: modules/access/rist.c:44
 msgid "Bitmask"
 msgstr "Masque de bits"
 
-#: modules/access/rist.c:1127 modules/access_output/rist.c:849
+#: modules/access/rist.c:313
+#, fuzzy
+msgid "Virtual Destination Port Filter"
+msgstr "Fichier de destination :"
+
+#: modules/access/rist.c:315
+msgid ""
+"Destination port to be used inside the reduced-mode of the main profile to "
+"filter incoming data. Use zero to allow all."
+msgstr ""
+
+#: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
 msgstr "RIST"
 
-#: modules/access/rist.c:1128
+#: modules/access/rist.c:322
 msgid "RIST input"
 msgstr "Entrée de RIST"
 
-#: modules/access/rist.c:1133
-msgid "RIST maximum packet size (bytes)"
-msgstr "Taille maximale des paquets RIST (octets)"
-
-#: modules/access/rist.c:1135
+#: modules/access/rist.c:327
 msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "Gigue maximale du démux/décodeur RIST (5ms par défaut)"
 
-#: modules/access/rist.c:1136
+#: modules/access/rist.c:328
+#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
-"chain. The lower the value, the more CPU cycles the algorithm will consume"
+"chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
 "Ceci contrôle la gigue maximale qui sera transmise à la chaîne de démux/"
 "décodage. Plus la valeur est faible, plus l’algorithme consomme de cycles "
 "CPU."
 
-#: modules/access/rist.c:1138
-msgid "RIST latency (ms)"
-msgstr "Latence RIST (ms)"
-
-#: modules/access/rist.c:1139
-msgid "RIST nack retry interval (ms)"
-msgstr "Intervalle de réessai RIST (ms)"
-
-#: modules/access/rist.c:1141
-msgid "RIST reorder buffer (ms)"
-msgstr "Délai de réorganisation du tampon RIST (ms)"
-
-#: modules/access/rist.c:1143
-msgid "RIST maximum retry count"
-msgstr "Nombre maximal de tentatives RIST"
-
-#: modules/access/rist.c:1145
+#: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
 msgstr ""
 "RIST nack type, 0 = intervalle, 1 = bitmask. La valeur par défaut est "
 "intervalle"
-
-#: modules/access/rist.c:1147
-msgid "Disable NACK output packets"
-msgstr "Désactiver les paquets de sortie NACK"
-
-#: modules/access/rist.c:1148
-msgid "Use this to disable packet recovery"
-msgstr "Utilisez ceci pour désactiver la récupération de paquets"
-
-#: modules/access/rist.c:1149
-msgid "Do not check for a valid rtcp message from the encoder"
-msgstr "Ne pas vérifier la validité du message rtcp de l’encodeur"
-
-#: modules/access/rist.c:1150
-msgid ""
-"Send nack messages even when we have not confirmed that the encoder is on "
-"our local network."
-msgstr ""
-"Envoyer des messages nack même si nous n’avons pas confirmé que l’encodeur "
-"se trouve sur notre réseau local"
 
 #: modules/access/rtp/rtp.c:44
 msgid "RTCP (local) port"
@@ -8651,15 +8623,27 @@ msgstr "Port SFTP"
 msgid "SFTP port number to use on the server"
 msgstr "Port SFTP à utiliser sur le serveur"
 
-#: modules/access/sftp.c:64
+#: modules/access/sftp.c:61
+#, fuzzy
+msgid "Private key file"
+msgstr "Fichier de clés AES"
+
+#: modules/access/sftp.c:62
+msgid ""
+"Private-key file used for SSH public key authentication. Public-key file is "
+"assumed to be in the same directory with '.pub' appended. If unset, standard "
+"key paths will be attempted (e.g. '~/.ssh/id_rsa')."
+msgstr ""
+
+#: modules/access/sftp.c:68
 msgid "SFTP input"
 msgstr "Entrée SFTP"
 
-#: modules/access/sftp.c:411
+#: modules/access/sftp.c:463
 msgid "SFTP authentication"
 msgstr "Authentification SFTP"
 
-#: modules/access/sftp.c:412
+#: modules/access/sftp.c:464
 #, c-format
 msgid "Please enter a valid login and password for the sftp connexion to %s"
 msgstr ""
@@ -8774,41 +8758,30 @@ msgstr ""
 "Merci de saisir un nom d’utilisateur (idéalement un nom de domaine utilisant "
 "le format DOMAINE;utilisateur) et un mot de passe."
 
-#: modules/access/srt.c:428 modules/access_output/srt.c:457
+#: modules/access/srt.c:548 modules/access_output/srt.c:457
 msgid "SRT"
 msgstr "SRT"
 
-#: modules/access/srt.c:429
+#: modules/access/srt.c:549
 msgid "SRT input"
 msgstr "Entrée SRT"
 
-#: modules/access/srt.c:435 modules/access_output/srt.c:464
+#: modules/access/srt.c:555 modules/access_output/srt.c:464
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
 msgstr "Envoyer le vote après un délai en millisecondes (-1 = infini)"
 
-#: modules/access/srt.c:438 modules/access_output/srt.c:466
+#: modules/access/srt.c:558 modules/access_output/srt.c:466
 msgid "SRT latency (ms)"
 msgstr "Latence SRT (ms)"
 
-#: modules/access/srt.c:440 modules/access_output/srt.c:468
+#: modules/access/srt.c:560 modules/access_output/srt.c:468
 msgid "Password for stream encryption"
 msgstr "Mot de passe de chiffrement du flux"
 
-#: modules/access/srt.c:446 modules/access_output/srt.c:480
-msgid " SRT Stream ID"
+#: modules/access/srt.c:566
+#, fuzzy
+msgid "SRT Stream ID"
 msgstr " Identifiant du flux SRT"
-
-#: modules/access/srt_common.c:26
-msgid "16 bytes"
-msgstr "16 octets"
-
-#: modules/access/srt_common.c:27
-msgid "24 bytes"
-msgstr "24 octets"
-
-#: modules/access/srt_common.c:27
-msgid "32 bytes"
-msgstr "32 octets"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9194,7 +9167,7 @@ msgid "Vivid"
 msgstr "Vif"
 
 #: modules/access/v4l2/v4l2.c:169 modules/audio_output/auhal.c:43
-#: modules/audio_output/directsound.c:69 modules/audio_output/mmdevice.c:1489
+#: modules/audio_output/directsound.c:69 modules/audio_output/mmdevice.c:1524
 #: modules/audio_output/waveout.c:145
 msgid "Audio volume"
 msgstr "Volume audio"
@@ -9261,7 +9234,7 @@ msgstr ""
 #: modules/control/hotkeys.c:395
 #: modules/gui/macosx/VLCAddonsWindowController.m:100
 #: modules/gui/qt/dialogs/convert.cpp:164
-#: modules/gui/qt/dialogs/plugins.cpp:382
+#: modules/gui/qt/dialogs/plugins.cpp:381
 #: modules/gui/qt/dialogs/preferences.cpp:79
 msgid "All"
 msgstr "Tous"
@@ -9448,19 +9421,19 @@ msgstr "VNC"
 msgid "VNC client access"
 msgstr "Accès client VNC"
 
-#: modules/access/wasapi.c:485
+#: modules/access/wasapi.c:489
 msgid "Loopback mode"
 msgstr "Mode bouclage"
 
-#: modules/access/wasapi.c:486
+#: modules/access/wasapi.c:490
 msgid "Record an audio rendering endpoint."
 msgstr "Enregistre un point de rendu audio."
 
-#: modules/access/wasapi.c:489
+#: modules/access/wasapi.c:493
 msgid "WASAPI"
 msgstr "WASAPI"
 
-#: modules/access/wasapi.c:490
+#: modules/access/wasapi.c:494
 msgid "Windows Audio Session API input"
 msgstr "Entrée Windows Audio Session API"
 
@@ -9671,70 +9644,58 @@ msgstr "Sortie flux HTTP Live"
 msgid "LiveHTTP"
 msgstr "LiveHTTP"
 
-#: modules/access_output/rist.c:824
-msgid "RIST data output caching size (ms)"
-msgstr "Taille du cache de sortie des données RIST (ms)"
+#: modules/access_output/rist.c:268
+msgid "Virtual Source Port"
+msgstr ""
 
-#: modules/access_output/rist.c:826
+#: modules/access_output/rist.c:270
+msgid "Source port to be used inside the reduced-mode of the main profile"
+msgstr ""
+
+#: modules/access_output/rist.c:272
+#, fuzzy
+msgid "Virtual Destination Port"
+msgstr "Destination du flux"
+
+#: modules/access_output/rist.c:274
+msgid "Destination port to be used inside the reduced-mode of the main profile"
+msgstr ""
+
+#: modules/access_output/rist.c:281
+#, fuzzy
+msgid "Multipeer mode"
+msgstr "Multiplexeur"
+
+#: modules/access_output/rist.c:283
 msgid ""
-"Having this cache will guarantee that the packets going out are delivered at "
-"a spacing determined by the chain timestamps thus ensuring a near jitter "
-"free output. Be aware that this setting will also add to the overall latency "
-"of the stream."
+"This allows you to select between duplicate or load balanced modes when "
+"sending data to multiple peers (several network paths)"
 msgstr ""
-"L’utilisation de ce cache garantit que les paquets qui sortent sont délivrés "
-"à un espacement déterminé par les horodatages de la chaîne, assurant ainsi "
-"une sortie presque sans gigue. Sachez que ce paramètre augmente également la "
-"latence globale du flux."
 
-#: modules/access_output/rist.c:831
-msgid "RIST retry-buffer queue size (ms)"
-msgstr "Taille de la file d’attente du tampon de réessai RIST (ms)"
+#: modules/access_output/rist.c:287
+#, fuzzy
+msgid "Duplicate"
+msgstr "Application"
 
-#: modules/access_output/rist.c:833
-msgid ""
-"This must match the buffer size (latency) configured on the server side. If "
-"you are not sure, leave the default of 0 which will set it the maximum value "
-"and will use about 100MB of RAM"
-msgstr ""
-"Cette valeur doit correspondre à la taille du tampon (latence) configurée du "
-"côté du serveur. Si vous n’êtes pas sûr, laissez la valeur par défaut de 0, "
-"qui correspond à la valeur maximale et utilise environ 100 Mo de RAM."
+#: modules/access_output/rist.c:287
+#, fuzzy
+msgid "Load balanced"
+msgstr "Balance des rouges"
 
-#: modules/access_output/rist.c:837
-msgid "SSRC used in RTP output (default is random, i.e. 0)"
-msgstr ""
-"SSRC utilisé dans la sortie RTP (la valeur par défaut est aléatoire, c.-à-d. "
-"0)"
-
-#: modules/access_output/rist.c:839
-msgid ""
-"Use this setting to specify a known SSRC for the RTP header. This is only "
-"useful if your receiver acts on it. When using VLC as receiver, it is not."
-msgstr ""
-"Utilisez ce paramètre pour spécifier un SSRC connu pour l’en-tête RTP. Ceci "
-"n’est utile que si votre récepteur agit sur lui. Lorsque vous utilisez VLC "
-"comme récepteur, ce n’est pas le cas."
-
-#: modules/access_output/rist.c:842 modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:386
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "Nom"
-
-#: modules/access_output/rist.c:844
-msgid ""
-"This Stream name will be sent to the receiver using the rist RTCP channel"
-msgstr ""
-"Ce nom de flux sera envoyé au récepteur en utilisant le canal RTCP RIST."
-
-#: modules/access_output/rist.c:850
+#: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Flux de sortie RIST"
 
-#: modules/access_output/rist.c:855
-msgid "RIST target packet size (bytes)"
+#: modules/access_output/rist.c:299
+#, fuzzy
+msgid "RIST target payload size (bytes)"
 msgstr "Taille du paquet cible RIST (octets)"
+
+#: modules/access_output/shout.c:64
+#: modules/gui/qt/components/sout/sout_widgets.cpp:438
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "Nom"
 
 #: modules/access_output/shout.c:65
 msgid "Name to give to this stream/channel on the shoutcast/icecast server."
@@ -9831,6 +9792,10 @@ msgstr "Taille maximale de la charge utile SRT (octets)"
 #: modules/access_output/srt.c:475
 msgid "SRT maximum bandwidth ceiling (bytes)"
 msgstr "Plafond maximal de bande passante SRT (octets)"
+
+#: modules/access_output/srt.c:480
+msgid " SRT Stream ID"
+msgstr " Identifiant du flux SRT"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10085,30 +10050,30 @@ msgstr "Canaux audio"
 msgid "Audio filter for simple channel mixing"
 msgstr "Mixeur de canaux simple"
 
-#: modules/audio_filter/channel_mixer/spatialaudio.cpp:50
+#: modules/audio_filter/channel_mixer/spatialaudio.cpp:67
 msgid "HRTF file for the binauralization"
 msgstr "Fichier HRTF pour la binauralization"
 
-#: modules/audio_filter/channel_mixer/spatialaudio.cpp:51
+#: modules/audio_filter/channel_mixer/spatialaudio.cpp:68
 msgid "Custom HRTF (Head-related transfer function) file in the SOFA format."
 msgstr ""
 "Fichier HRTF (Head-related transfer function) personnalisé au format SOFA."
 
-#: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
+#: modules/audio_filter/channel_mixer/spatialaudio.cpp:71
 msgid "Headphones mode (binaural)"
 msgstr "Mode casque (binaural)"
 
-#: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
+#: modules/audio_filter/channel_mixer/spatialaudio.cpp:72
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
 msgstr ""
 "Si la sortie est en stéréo, créer la spatialisation sonore avec le décodeur "
 "binaural."
 
-#: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
+#: modules/audio_filter/channel_mixer/spatialaudio.cpp:82
 msgid "Ambisonics renderer and binauralizer"
 msgstr "Rendu Ambisonics et binauralizer"
 
-#: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
+#: modules/audio_filter/channel_mixer/spatialaudio.cpp:94
 msgid "Binauralizer"
 msgstr "Binauralizer"
 
@@ -10863,11 +10828,11 @@ msgstr ""
 "Le périphérique audio sélectionné est utilisé en exclusivité par un autre "
 "programme."
 
-#: modules/audio_output/directsound.c:62 modules/audio_output/mmdevice.c:1486
+#: modules/audio_output/directsound.c:62 modules/audio_output/mmdevice.c:1521
 msgid "Output device"
 msgstr "Périphérique de sortie"
 
-#: modules/audio_output/directsound.c:63 modules/audio_output/mmdevice.c:1487
+#: modules/audio_output/directsound.c:63 modules/audio_output/mmdevice.c:1522
 msgid "Select your audio output device"
 msgstr "Sélectionner le périphérique audio en sortie"
 
@@ -10884,7 +10849,7 @@ msgstr ""
 "permet pas le mixage vers plus complexe (c.-à-d. pas de conversion du type "
 "Stéréo -> 5.1) !"
 
-#: modules/audio_output/directsound.c:70 modules/audio_output/mmdevice.c:1490
+#: modules/audio_output/directsound.c:70 modules/audio_output/mmdevice.c:1525
 msgid "Audio volume in hundredths of decibels (dB)."
 msgstr "Volume audio en centièmes de décibels (dB)."
 
@@ -10989,11 +10954,11 @@ msgstr ""
 msgid "K Audio Interface audio output"
 msgstr "Sortie audio « K Audio Interface »"
 
-#: modules/audio_output/mmdevice.c:1472 modules/gui/qt/ui/sprefs_audio.h:417
+#: modules/audio_output/mmdevice.c:1507 modules/gui/qt/ui/sprefs_audio.h:417
 msgid "HDMI/SPDIF audio passthrough"
 msgstr "Audio HDMI/SPDIF « Passthrough »"
 
-#: modules/audio_output/mmdevice.c:1474
+#: modules/audio_output/mmdevice.c:1509
 msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
@@ -11001,27 +10966,27 @@ msgstr ""
 "Modifier cette valeur si des problèmes avec les codecs HD surviennent en "
 "utilisant un récepteur HDMI."
 
-#: modules/audio_output/mmdevice.c:1481
+#: modules/audio_output/mmdevice.c:1516
 msgid "Disabled"
 msgstr "Désactivée"
 
-#: modules/audio_output/mmdevice.c:1482
+#: modules/audio_output/mmdevice.c:1517
 msgid "Enabled (AC3/DTS only)"
 msgstr "Activé (AC3/DTS seulement)"
 
-#: modules/audio_output/mmdevice.c:1483
+#: modules/audio_output/mmdevice.c:1518
 msgid "Enabled"
 msgstr "Activée"
 
-#: modules/audio_output/mmdevice.c:1494
+#: modules/audio_output/mmdevice.c:1529
 msgid "Windows Multimedia Device output"
 msgstr "Sortie périphérique Windows Multimédia"
 
-#: modules/audio_output/mmdevice.c:1500
+#: modules/audio_output/mmdevice.c:1535
 msgid "Output back-end"
 msgstr "Back-end de sortie"
 
-#: modules/audio_output/mmdevice.c:1500
+#: modules/audio_output/mmdevice.c:1535
 msgid "Audio output back-end interface."
 msgstr "Interface audio de sortie"
 
@@ -11049,7 +11014,7 @@ msgstr "Gain logiciel"
 msgid "This linear gain will be applied in software."
 msgstr "Les filtres de gain linéaire seront appliqués par le logiciel."
 
-#: modules/audio_output/wasapi.c:652
+#: modules/audio_output/wasapi.c:682
 msgid "Windows Audio Session API output"
 msgstr "Sortie de l’API Windows Audio Session"
 
@@ -11167,8 +11132,8 @@ msgstr "Utiliser le rendu de texte par défaut dans les sous-titres."
 msgid "ARIB subtitles decoder"
 msgstr "Décodeur de sous-titres ARIB"
 
-#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1089
-#: modules/demux/mpeg/ts_psi.c:1096
+#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1092
+#: modules/demux/mpeg/ts_psi.c:1099
 msgid "ARIB subtitles"
 msgstr "Sous-titres ARIB"
 
@@ -11217,7 +11182,6 @@ msgstr "Decodage"
 
 #: modules/codec/avcodec/avcodec.c:152 modules/codec/jpeg.c:119
 #: modules/codec/omxil/omxil.c:171 modules/codec/png.c:99
-#: modules/codec/schroedinger.c:370
 msgid "Encoding"
 msgstr "Encodage"
 
@@ -11771,11 +11735,11 @@ msgstr "Empaqueteur vidéo Daala"
 msgid "Daala video encoder"
 msgstr "Encodeur vidéo Daala"
 
-#: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
+#: modules/codec/daala.c:143
 msgid "Chroma format"
 msgstr "Format de chrominance"
 
-#: modules/codec/daala.c:144 modules/codec/schroedinger.c:55
+#: modules/codec/daala.c:144
 msgid ""
 "Picking chroma format will force a conversion of the video into that format"
 msgstr ""
@@ -11900,8 +11864,8 @@ msgstr "Position Y d’encodage des sous-titres"
 msgid "DVB subtitles decoder"
 msgstr "Décodeur de sous-titres DVB"
 
-#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:772
-#: modules/demux/mpeg/ts_psi.c:821
+#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:775
+#: modules/demux/mpeg/ts_psi.c:824
 msgid "DVB subtitles"
 msgstr "Sous-titres DVB"
 
@@ -11913,11 +11877,11 @@ msgstr "Encodeur de sous-titres DVB"
 msgid "Dummy encoder"
 msgstr "Encodeur factice"
 
-#: modules/codec/faad.c:54
+#: modules/codec/faad.c:59
 msgid "AAC audio decoder (using libfaad2)"
 msgstr "Décodeur audio AAC (utilisant libfaad2)"
 
-#: modules/codec/faad.c:448
+#: modules/codec/faad.c:453
 msgid "AAC extension"
 msgstr "Extension AAC"
 
@@ -12049,11 +12013,11 @@ msgstr "Synthétiseur MIDI FluidSynth"
 msgid "FluidSynth"
 msgstr "FluidSynth"
 
-#: modules/codec/fluidsynth.c:153
+#: modules/codec/fluidsynth.c:160
 msgid "MIDI synthesis not set up"
 msgstr "Synthèse MIDI non configurée"
 
-#: modules/codec/fluidsynth.c:154
+#: modules/codec/fluidsynth.c:161
 msgid ""
 "A sound font file (.SF2) is required for MIDI synthesis.\n"
 "Please install a sound font and configure it from the VLC preferences "
@@ -12718,388 +12682,6 @@ msgstr "Pseudo-empaqueteur vidéo brute"
 msgid "Raw video encoder for RTP"
 msgstr "Encodeur vidéo brut pour RTP"
 
-#: modules/codec/schroedinger.c:60
-msgid "4:2:0"
-msgstr "4:2:0"
-
-#: modules/codec/schroedinger.c:60
-msgid "4:2:2"
-msgstr "4:2:2"
-
-#: modules/codec/schroedinger.c:60
-msgid "4:4:4"
-msgstr "4:4:4"
-
-#: modules/codec/schroedinger.c:63
-msgid "Rate control method"
-msgstr "Méthode de contrôle du débit"
-
-#: modules/codec/schroedinger.c:64
-msgid "Method used to encode the video sequence"
-msgstr "Méthode à utiliser pour encoder la séquence vidéo"
-
-#: modules/codec/schroedinger.c:77
-msgid "Constant noise threshold mode"
-msgstr "Forcer un encodage à seuil de bruit constant"
-
-#: modules/codec/schroedinger.c:78
-msgid "Constant bitrate mode (CBR)"
-msgstr "Forcer un encodage à débit constant (CBR)"
-
-#: modules/codec/schroedinger.c:79
-msgid "Low Delay mode"
-msgstr "Forcer un encodage en mode faible retard"
-
-#: modules/codec/schroedinger.c:80
-msgid "Lossless mode"
-msgstr "Forcer un encodage sans perte"
-
-#: modules/codec/schroedinger.c:81
-msgid "Constant lambda mode"
-msgstr "Constante mode lambda"
-
-#: modules/codec/schroedinger.c:82
-msgid "Constant error mode"
-msgstr "Forcer un encodage en mode d’erreur constante"
-
-#: modules/codec/schroedinger.c:83
-msgid "Constant quality mode"
-msgstr "Forcer un encodage à facteur de qualité constant"
-
-#: modules/codec/schroedinger.c:87
-msgid "GOP structure"
-msgstr "Structure GOP"
-
-#: modules/codec/schroedinger.c:88
-msgid "GOP structure used to encode the video sequence"
-msgstr "Structure GOP utilisée pour encoder la séquence vidéo"
-
-#: modules/codec/schroedinger.c:100
-msgid ""
-"No fixed gop structure. A picture can be intra or inter and refer to "
-"previous or future pictures."
-msgstr ""
-"Pas de structure de GOP fixée. Une image peut être intra ou inter et se "
-"référer aux images précédentes ou futures."
-
-#: modules/codec/schroedinger.c:101
-msgid "I-frame only sequence"
-msgstr "Séquence images-I uniquement"
-
-#: modules/codec/schroedinger.c:102 modules/codec/schroedinger.c:103
-msgid "Inter pictures refere to previous pictures only"
-msgstr "Interimages vers les images précédentes seulement"
-
-#: modules/codec/schroedinger.c:104 modules/codec/schroedinger.c:105
-msgid "Inter pictures can refer to previous or future pictures"
-msgstr "Interimages possible vers les précédentes et futures images"
-
-#: modules/codec/schroedinger.c:109
-msgid "Constant quality factor"
-msgstr "Facteur de qualité constant"
-
-#: modules/codec/schroedinger.c:110
-msgid "Quality factor to use in constant quality mode"
-msgstr "Facteur de qualité à utiliser en mode qualité constante"
-
-#: modules/codec/schroedinger.c:113
-msgid "Noise Threshold"
-msgstr "Seuil de bruit"
-
-#: modules/codec/schroedinger.c:114
-msgid "Noise threshold to use in constant noise threshold mode"
-msgstr "Seuil de bruit à utiliser en mode seul de bruit constant"
-
-#: modules/codec/schroedinger.c:117
-msgid "CBR bitrate (kbps)"
-msgstr "Encodage à débit constant (kbit/s)"
-
-#: modules/codec/schroedinger.c:118
-msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-msgstr "Valeur cible en kbit/s pour l’encodage à débit constant"
-
-#: modules/codec/schroedinger.c:121
-msgid "Maximum bitrate (kbps)"
-msgstr "Débit maximum (kbit/s)"
-
-#: modules/codec/schroedinger.c:122
-msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-msgstr "Débit maximum en kbit/s pour l’encodage à débit constant"
-
-#: modules/codec/schroedinger.c:125
-msgid "Minimum bitrate (kbps)"
-msgstr "Débit minimum (kbit/s)"
-
-#: modules/codec/schroedinger.c:126
-msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-msgstr "Débit minimum en kbit/s pour l’encodage à débit constant"
-
-#: modules/codec/schroedinger.c:129
-msgid "GOP length"
-msgstr "Longueur GOP"
-
-#: modules/codec/schroedinger.c:130
-msgid ""
-"Number of pictures between successive sequence headers i.e. length of the "
-"group of pictures"
-msgstr ""
-"Nombre d’images entre en-têtes successifs de séquence, c.-à-d. la longueur "
-"du groupe d’images"
-
-#: modules/codec/schroedinger.c:134
-msgid "Prefilter"
-msgstr "Préfiltre"
-
-#: modules/codec/schroedinger.c:135
-msgid "Enable adaptive prefiltering"
-msgstr "Utilisation d’un préfiltre adaptatif"
-
-#: modules/codec/schroedinger.c:147
-msgid "No pre-filtering"
-msgstr "Pas de préfiltre"
-
-#: modules/codec/schroedinger.c:148
-msgid "Centre Weighted Median"
-msgstr "Moyenne pondérée au centre"
-
-#: modules/codec/schroedinger.c:149
-msgid "Gaussian Low Pass Filter"
-msgstr "Filtre passe-bas gaussien"
-
-#: modules/codec/schroedinger.c:150
-msgid "Add Noise"
-msgstr "Bruit"
-
-#: modules/codec/schroedinger.c:151
-msgid "Gaussian Adaptive Low Pass Filter"
-msgstr "Filtre adaptatif passe-bas gaussien"
-
-#: modules/codec/schroedinger.c:152
-msgid "Low Pass Filter"
-msgstr "Filtre passe-bas"
-
-#: modules/codec/schroedinger.c:156
-msgid "Amount of prefiltering"
-msgstr "Importance du préfiltrage"
-
-#: modules/codec/schroedinger.c:157
-msgid "Higher value implies more prefiltering"
-msgstr "Une valeur plus élevée implique plus de préfiltrage"
-
-#: modules/codec/schroedinger.c:160
-msgid "Picture coding mode"
-msgstr "Réglage de mode d’image"
-
-#: modules/codec/schroedinger.c:161
-msgid ""
-"Field coding is where interlaced fields are coded separately as opposed to a "
-"pseudo-progressive frame"
-msgstr ""
-"Le codage par trame consiste à encoder séparément les trames entrelacées au "
-"contraire d’une image pseudo-progressive"
-
-#: modules/codec/schroedinger.c:166
-msgid "auto - let encoder decide based upon input (Best)"
-msgstr "auto - laisser l’encodeur décider suivant l’entrée (Recommandé)"
-
-#: modules/codec/schroedinger.c:167
-msgid "force coding frame as single picture"
-msgstr "forcer l’encodage d’une trame en image unique"
-
-#: modules/codec/schroedinger.c:168
-msgid "force coding frame as separate interlaced fields"
-msgstr "forcer l’encodage d’une trame en champs entrelacés séparés"
-
-#: modules/codec/schroedinger.c:173
-msgid "Size of motion compensation blocks"
-msgstr "Taille des blocs de compensation de mouvement"
-
-#: modules/codec/schroedinger.c:182 modules/codec/schroedinger.c:199
-#: modules/codec/schroedinger.c:297 modules/codec/schroedinger.c:338
-msgid "automatic - let encoder decide based upon input (Best)"
-msgstr "automatique - laisser l’encodeur décider suivant l’entrée (Recommandé)"
-
-#: modules/codec/schroedinger.c:183
-msgid "small - use small motion compensation blocks"
-msgstr "petit - Utilise des petits blocs de compensation de mouvement"
-
-#: modules/codec/schroedinger.c:184
-msgid "medium - use medium motion compensation blocks"
-msgstr "moyen - Utilise des blocs moyens de compensation de mouvement"
-
-#: modules/codec/schroedinger.c:185
-msgid "large - use large motion compensation blocks"
-msgstr "petit - Utilise des blocs larges de compensation de mouvement"
-
-#: modules/codec/schroedinger.c:190
-msgid "Overlap of motion compensation blocks"
-msgstr "Recouvrement des blocs de compensation de mouvement"
-
-#: modules/codec/schroedinger.c:200
-msgid "none - Motion compensation blocks do not overlap"
-msgstr "aucun - Les blocs de compensation de mouvement ne se recouvrent pas"
-
-#: modules/codec/schroedinger.c:201
-msgid "partial - Motion compensation blocks only partially overlap"
-msgstr ""
-"partiel - Les blocs de compensation de mouvement se recouvrent partiellement"
-
-#: modules/codec/schroedinger.c:202
-msgid "full - Motion compensation blocks fully overlap"
-msgstr ""
-"complet - Les blocs de compensation de mouvement se recouvrent complètement"
-
-#: modules/codec/schroedinger.c:207
-msgid "Motion Vector precision"
-msgstr "Précision du vecteur de mouvement"
-
-#: modules/codec/schroedinger.c:208
-msgid "Motion Vector precision in pels"
-msgstr "Précision du vecteur de mouvement en pixels."
-
-#: modules/codec/schroedinger.c:214
-msgid "Three component motion estimation"
-msgstr "Estimation de mouvement à trois composantes"
-
-#: modules/codec/schroedinger.c:215
-msgid "Use chroma as part of the motion estimation process"
-msgstr "Chrominance utilisée dans l’estimation de mouvement"
-
-#: modules/codec/schroedinger.c:218
-msgid "Intra picture DWT filter"
-msgstr "Filtres DWT intra image"
-
-#: modules/codec/schroedinger.c:221
-msgid "Inter picture DWT filter"
-msgstr "Filtres DWT inter image"
-
-#: modules/codec/schroedinger.c:244
-msgid "Number of DWT iterations"
-msgstr "Nombre d’itérations DWT"
-
-#: modules/codec/schroedinger.c:245
-msgid "Also known as DWT levels"
-msgstr "Autre nom : niveaux DWT (discrete wavelet transform)"
-
-#: modules/codec/schroedinger.c:250
-msgid "Enable multiple quantizers"
-msgstr "Autoriser des quantificateurs multiples"
-
-#: modules/codec/schroedinger.c:251
-msgid "Enable multiple quantizers per subband (one per codeblock)"
-msgstr "Activer plusieurs quantificateurs par sous-bande (un par bloc de code)"
-
-#: modules/codec/schroedinger.c:255
-msgid "Disable arithmetic coding"
-msgstr "Désactiver le codage arithmétique"
-
-#: modules/codec/schroedinger.c:256
-msgid "Use variable length codes instead, useful for very high bitrates"
-msgstr ""
-"Utiliser plutôt des codes à longueur variable, utile aux très haut débits"
-
-#: modules/codec/schroedinger.c:261
-msgid "perceptual weighting method"
-msgstr "Méthode de pondération perceptive"
-
-#: modules/codec/schroedinger.c:272
-msgid "perceptual distance"
-msgstr "Différence de perception"
-
-#: modules/codec/schroedinger.c:273
-msgid "perceptual distance to calculate perceptual weight"
-msgstr "distance perceptuelle pour calculer la pondération perceptuelle"
-
-#: modules/codec/schroedinger.c:277
-msgid "Horizontal slices per frame"
-msgstr "Sections horizontales par trame"
-
-#: modules/codec/schroedinger.c:278
-msgid "Number of horizontal slices per frame in low delay mode"
-msgstr "Nombre de tranches horizontales par image en mode de délai court"
-
-#: modules/codec/schroedinger.c:282
-msgid "Vertical slices per frame"
-msgstr "Sections verticales  par trame"
-
-#: modules/codec/schroedinger.c:283
-msgid "Number of vertical slices per frame in low delay mode"
-msgstr "Nombre de tranches verticales par image en mode de délai court"
-
-#: modules/codec/schroedinger.c:287
-msgid "Size of code blocks in each subband"
-msgstr "Taille des blocs de code dans chaque sous-bande"
-
-#: modules/codec/schroedinger.c:298
-msgid "small - use small code blocks"
-msgstr "petit - Utilise des petits blocs de code"
-
-#: modules/codec/schroedinger.c:299
-msgid "medium - use medium sized code blocks"
-msgstr "moyen - Utilise des blocs de code moyens"
-
-#: modules/codec/schroedinger.c:300
-msgid "large - use large code blocks"
-msgstr "petit - Utilise des blocs de codes larges"
-
-#: modules/codec/schroedinger.c:301
-msgid "full - One code block per subband"
-msgstr "complet - Un bloc de code par sous-bande"
-
-#: modules/codec/schroedinger.c:306
-msgid "Enable hierarchical Motion Estimation"
-msgstr "Activer les algorithmes d’estimation de mouvement hiérarchique."
-
-#: modules/codec/schroedinger.c:310
-msgid "Number of levels of downsampling"
-msgstr "Nombre de niveaux de sous-échantillonnage"
-
-#: modules/codec/schroedinger.c:311
-msgid "Number of levels of downsampling in hierarchical motion estimation mode"
-msgstr ""
-"Nombre de niveaux de sous-échantillonnage en mode d’estimation de mouvement "
-"hiérarchique"
-
-#: modules/codec/schroedinger.c:315
-msgid "Enable Global Motion Estimation"
-msgstr "Activer les algorithmes d’estimation de mouvement global"
-
-#: modules/codec/schroedinger.c:319
-msgid "Enable Phase Correlation Estimation"
-msgstr "Activer les algorithmes d’estimation de corrélation de phase"
-
-#: modules/codec/schroedinger.c:323
-msgid "Enable Scene Change Detection"
-msgstr "Activer la détection de changement de scène"
-
-#: modules/codec/schroedinger.c:327
-msgid "Force Profile"
-msgstr "Profil"
-
-#: modules/codec/schroedinger.c:339
-msgid "VC2 Low Delay Profile"
-msgstr "Profil VC2 bas délai"
-
-#: modules/codec/schroedinger.c:340
-msgid "VC2 Simple Profile"
-msgstr "Profil simple VC2"
-
-#: modules/codec/schroedinger.c:341
-msgid "VC2 Main Profile"
-msgstr "Profil principal VC2"
-
-#: modules/codec/schroedinger.c:342
-msgid "Main Profile"
-msgstr "Profil principal"
-
-#: modules/codec/schroedinger.c:363
-msgid "Dirac video decoder using libschroedinger"
-msgstr "Décodeur vidéo Dirac (utilisant libschroedinger)"
-
-#: modules/codec/schroedinger.c:371
-msgid "Dirac video encoder using libschroedinger"
-msgstr "Encodeur vidéo Dirac utilisant la bibliothèque libschroedinger"
-
 #: modules/codec/scte18.c:41
 msgid "SCTE-18 decoder"
 msgstr "Décodeur SCTE-18"
@@ -13136,7 +12718,7 @@ msgstr "Encodeur audio MP3 « fixed point »"
 msgid "S/PDIF pass-through decoder"
 msgstr "Décodeur S/PDIF pass-through"
 
-#: modules/codec/speex.c:59 modules/codec/speex.c:910
+#: modules/codec/speex.c:59 modules/codec/speex.c:1009
 #: modules/gui/macosx/VLCOpenWindowController.m:195
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
 #: modules/gui/qt/ui/sprefs_video.h:325 modules/gui/qt/ui/video_effects.h:1282
@@ -13464,6 +13046,7 @@ msgstr "Décodeur de sous-titres texte"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
+#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -14784,15 +14367,15 @@ msgstr "Interface de contrôle D-Bus"
 #: modules/gui/macosx/VLCMainWindow.m:581
 #: modules/gui/macosx/VLCMainWindow.m:587
 #: modules/gui/macosx/VLCMainWindow.m:1030
-#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
-#: modules/gui/qt/dialogs/help.cpp:100 modules/gui/qt/main_interface.cpp:1302
-#: modules/gui/qt/main_interface.cpp:1306
-#: modules/gui/qt/main_interface.cpp:1343
-#: modules/gui/qt/main_interface.cpp:1345
-#: modules/gui/qt/main_interface.cpp:1453
-#: modules/gui/qt/main_interface.cpp:1470
-#: modules/gui/qt/main_interface.cpp:1478
-#: modules/gui/qt/main_interface.cpp:1501 modules/lua/libs/httpd.c:80
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1028
+#: modules/gui/qt/dialogs/help.cpp:100 modules/gui/qt/main_interface.cpp:1287
+#: modules/gui/qt/main_interface.cpp:1291
+#: modules/gui/qt/main_interface.cpp:1328
+#: modules/gui/qt/main_interface.cpp:1330
+#: modules/gui/qt/main_interface.cpp:1438
+#: modules/gui/qt/main_interface.cpp:1455
+#: modules/gui/qt/main_interface.cpp:1463
+#: modules/gui/qt/main_interface.cpp:1486 modules/lua/libs/httpd.c:80
 #: modules/notify/osx_notifications.m:302
 #: modules/video_output/wayland/shell.c:348
 #: modules/video_output/wayland/xdg-shell.c:291
@@ -15456,26 +15039,26 @@ msgstr[0] "La liste de lecture n’a que %u élément"
 msgstr[1] "La liste de lecture n’a que %u éléments"
 msgstr[2] "La liste de lecture n’a que %u éléments"
 
-#: modules/control/oldrc.c:1739 modules/gui/ncurses.c:808
+#: modules/control/oldrc.c:1739 modules/gui/ncurses.c:810
 msgid "+-[Incoming]"
 msgstr "+-[Entrée]"
 
-#: modules/control/oldrc.c:1740 modules/gui/ncurses.c:810
+#: modules/control/oldrc.c:1740 modules/gui/ncurses.c:812
 #, c-format
 msgid "| input bytes read : %8.0f KiB"
 msgstr "| octets lus en entrée   : %8.0f Kio"
 
-#: modules/control/oldrc.c:1742 modules/gui/ncurses.c:812
+#: modules/control/oldrc.c:1742 modules/gui/ncurses.c:814
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
 msgstr "| débit d’entrée             : %6.0f kbit/s"
 
-#: modules/control/oldrc.c:1744 modules/gui/ncurses.c:814
+#: modules/control/oldrc.c:1744 modules/gui/ncurses.c:816
 #, c-format
 msgid "| demux bytes read : %8.0f KiB"
 msgstr "| octets lus en demux  : %8.0f Kio"
 
-#: modules/control/oldrc.c:1746 modules/gui/ncurses.c:816
+#: modules/control/oldrc.c:1746 modules/gui/ncurses.c:818
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
 msgstr "| débit de demux         : %6.0f kbit/s"
@@ -15490,40 +15073,40 @@ msgstr "| demux corrompu      : %5<PRIi64>"
 msgid "| discontinuities  :    %5<PRIi64>"
 msgstr "| discontinuités            : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1754 modules/gui/ncurses.c:822
+#: modules/control/oldrc.c:1754 modules/gui/ncurses.c:824
 msgid "+-[Video Decoding]"
 msgstr "+-[Décodage vidéo]"
 
-#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:824
+#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:826
 #, c-format
 msgid "| video decoded    :    %5<PRIi64>"
 msgstr "| vidéo décodée        : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1757 modules/gui/ncurses.c:826
+#: modules/control/oldrc.c:1757 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
 msgstr "| trames affichées     : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1759 modules/gui/ncurses.c:828
+#: modules/control/oldrc.c:1759 modules/gui/ncurses.c:830
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
 msgstr "| trames perdues       : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1763 modules/gui/ncurses.c:834
+#: modules/control/oldrc.c:1763 modules/gui/ncurses.c:836
 msgid "+-[Audio Decoding]"
 msgstr "+-[Décodage audio]"
 
-#: modules/control/oldrc.c:1764 modules/gui/ncurses.c:836
+#: modules/control/oldrc.c:1764 modules/gui/ncurses.c:838
 #, c-format
 msgid "| audio decoded    :    %5<PRIi64>"
 msgstr "| audio décodé       : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1766 modules/gui/ncurses.c:838
+#: modules/control/oldrc.c:1766 modules/gui/ncurses.c:840
 #, c-format
 msgid "| buffers played   :    %5<PRIi64>"
 msgstr "| buffers joués        : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1768 modules/gui/ncurses.c:840
+#: modules/control/oldrc.c:1768 modules/gui/ncurses.c:842
 #, c-format
 msgid "| buffers lost     :    %5<PRIi64>"
 msgstr "| buffers perdus     : %5<PRIi64>"
@@ -15536,88 +15119,88 @@ msgstr "WinMsg"
 msgid "Windows messages interface"
 msgstr "Interface de messages Windows"
 
-#: modules/demux/adaptive/adaptive.cpp:69
+#: modules/demux/adaptive/adaptive.cpp:71
 msgid "Maximum device width"
 msgstr "Largeur maximale du périphérique"
 
-#: modules/demux/adaptive/adaptive.cpp:70
+#: modules/demux/adaptive/adaptive.cpp:72
 msgid "Maximum device height"
 msgstr "Hauteur maximale du périphérique"
 
-#: modules/demux/adaptive/adaptive.cpp:72
+#: modules/demux/adaptive/adaptive.cpp:74
 msgid "Fixed Bandwidth in KiB/s"
 msgstr "Bande passante fixe en Kio/s"
 
-#: modules/demux/adaptive/adaptive.cpp:73
+#: modules/demux/adaptive/adaptive.cpp:75
 msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Bande passante préférée pour les flux non adaptatifs"
 
-#: modules/demux/adaptive/adaptive.cpp:75
+#: modules/demux/adaptive/adaptive.cpp:77
 msgid "Live Playback delay (ms)"
 msgstr "Délai de lecture en direct (ms)"
 
-#: modules/demux/adaptive/adaptive.cpp:76
+#: modules/demux/adaptive/adaptive.cpp:78
 msgid "Tradeoff between stability and real time"
 msgstr "Compromis entre la stabilité et le temps réel"
 
-#: modules/demux/adaptive/adaptive.cpp:78
+#: modules/demux/adaptive/adaptive.cpp:80
 msgid "Max buffering (ms)"
 msgstr "Mise en mémoire tampon max (ms)"
 
-#: modules/demux/adaptive/adaptive.cpp:80
+#: modules/demux/adaptive/adaptive.cpp:82
 msgid "Adaptive Logic"
 msgstr "Logique adaptative"
 
-#: modules/demux/adaptive/adaptive.cpp:82
+#: modules/demux/adaptive/adaptive.cpp:84
 msgid "Use regular HTTP modules"
 msgstr "Utiliser les modules HTTP standard"
 
-#: modules/demux/adaptive/adaptive.cpp:83
+#: modules/demux/adaptive/adaptive.cpp:85
 msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr "Connexion avec l’accès HTTP plutôt que le code HTTP spécifique."
 
-#: modules/demux/adaptive/adaptive.cpp:85
+#: modules/demux/adaptive/adaptive.cpp:87
 #: modules/gui/qt/components/simple_preferences.cpp:713
 msgid "Low latency"
 msgstr "Latence faible"
 
-#: modules/demux/adaptive/adaptive.cpp:86
+#: modules/demux/adaptive/adaptive.cpp:88
 msgid "Overrides low latency parameters"
 msgstr "Remplace les paramètres de faible latence"
 
-#: modules/demux/adaptive/adaptive.cpp:107
+#: modules/demux/adaptive/adaptive.cpp:109
 msgid "Predictive"
 msgstr "Prédictive"
 
-#: modules/demux/adaptive/adaptive.cpp:108
+#: modules/demux/adaptive/adaptive.cpp:110
 msgid "Near Optimal"
 msgstr "Quasi-optimale"
 
-#: modules/demux/adaptive/adaptive.cpp:109
+#: modules/demux/adaptive/adaptive.cpp:111
 msgid "Bandwidth Adaptive"
 msgstr "Bande passante adaptative"
 
-#: modules/demux/adaptive/adaptive.cpp:110
+#: modules/demux/adaptive/adaptive.cpp:112
 msgid "Fixed Bandwidth"
 msgstr "Bande passante fixe"
 
-#: modules/demux/adaptive/adaptive.cpp:111
+#: modules/demux/adaptive/adaptive.cpp:113
 msgid "Lowest Bandwidth/Quality"
 msgstr "Bande passante min. / Basse qualité"
 
-#: modules/demux/adaptive/adaptive.cpp:112
+#: modules/demux/adaptive/adaptive.cpp:114
 msgid "Highest Bandwidth/Quality"
 msgstr "Bande passante max. / Haute qualité"
 
-#: modules/demux/adaptive/adaptive.cpp:123
+#: modules/demux/adaptive/adaptive.cpp:125
 msgid "Force"
 msgstr "Forcer"
 
-#: modules/demux/adaptive/adaptive.cpp:127
+#: modules/demux/adaptive/adaptive.cpp:129
 msgid "Adaptive"
 msgstr "Débit adaptatif"
 
-#: modules/demux/adaptive/adaptive.cpp:128
+#: modules/demux/adaptive/adaptive.cpp:130
 msgid "Unified adaptive streaming for DASH/HLS"
 msgstr "Diffusion adaptative unifiée pour DASH et HLS"
 
@@ -15713,7 +15296,7 @@ msgstr "Réparer si nécessaire"
 msgid "AVI demuxer"
 msgstr "Démultiplexeur AVI"
 
-#: modules/demux/avi/avi.c:910 modules/demux/mp4/mp4.c:4374
+#: modules/demux/avi/avi.c:920 modules/demux/mp4/mp4.c:4382
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15729,27 +15312,27 @@ msgstr ""
 "Cette étape peut prendre un moment sur un gros fichier.\n"
 "Que voulez-vous faire ?"
 
-#: modules/demux/avi/avi.c:918
+#: modules/demux/avi/avi.c:928
 msgid "Do not play"
 msgstr "Ne pas lire"
 
-#: modules/demux/avi/avi.c:919
+#: modules/demux/avi/avi.c:929
 msgid "Build index then play"
 msgstr "Construire l’index puis lancer la lecture"
 
-#: modules/demux/avi/avi.c:920
+#: modules/demux/avi/avi.c:930
 msgid "Play as is"
 msgstr "Lire tel quel"
 
-#: modules/demux/avi/avi.c:921 modules/demux/mp4/mp4.c:4385
+#: modules/demux/avi/avi.c:931 modules/demux/mp4/mp4.c:4393
 msgid "Broken or missing Index"
 msgstr "Index endommagé ou absent"
 
-#: modules/demux/avi/avi.c:2879
+#: modules/demux/avi/avi.c:2889
 msgid "Broken or missing AVI Index"
 msgstr "Index AVI endommagé ou absent"
 
-#: modules/demux/avi/avi.c:2880
+#: modules/demux/avi/avi.c:2890
 msgid "Fixing AVI Index..."
 msgstr "Réparation de l’index AVI…"
 
@@ -15869,7 +15452,7 @@ msgstr "Image"
 
 #: modules/demux/mjpeg.c:46 modules/demux/mpeg/es.c:53
 #: modules/demux/mpeg/h26x.c:46 modules/demux/rawvid.c:43
-#: modules/demux/subtitle.c:77 modules/demux/vc1.c:43
+#: modules/demux/subtitle.c:78 modules/demux/vc1.c:43
 #: modules/gui/macosx/VLCOpenWindowController.m:208
 msgid "Frames per Second"
 msgstr "Images par seconde"
@@ -16189,11 +15772,11 @@ msgstr "Démultiplexeur de flux MP4"
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4382
+#: modules/demux/mp4/mp4.c:4390
 msgid "Do not seek"
 msgstr "Ne pas chercher"
 
-#: modules/demux/mp4/mp4.c:4383
+#: modules/demux/mp4/mp4.c:4391
 msgid "Build index"
 msgstr "Construire l’index"
 
@@ -16362,56 +15945,56 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr "Démultiplexeur MPEG-TS"
 
-#: modules/demux/mpeg/ts_psi.c:422
+#: modules/demux/mpeg/ts_psi.c:425
 msgid "Main audio"
 msgstr "Audio principal"
 
-#: modules/demux/mpeg/ts_psi.c:423
+#: modules/demux/mpeg/ts_psi.c:426
 msgid "Audio description for the visually impaired"
 msgstr "Audiodescription pour déficients visuels"
 
-#: modules/demux/mpeg/ts_psi.c:424
+#: modules/demux/mpeg/ts_psi.c:427
 msgid "Clean audio for the hearing impaired"
 msgstr "Audio nettoyé pour malentendants"
 
-#: modules/demux/mpeg/ts_psi.c:425
+#: modules/demux/mpeg/ts_psi.c:428
 msgid "Spoken subtitles for the visually impaired"
 msgstr "Sous-titres parlés pour déficients visuels"
 
-#: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
+#: modules/demux/mpeg/ts_psi.c:610 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
 msgid "Teletext"
 msgstr "Télétexte"
 
-#: modules/demux/mpeg/ts_psi.c:608
+#: modules/demux/mpeg/ts_psi.c:611
 msgid "Teletext subtitles"
 msgstr "Sous-titres télétexte"
 
-#: modules/demux/mpeg/ts_psi.c:609
+#: modules/demux/mpeg/ts_psi.c:612
 msgid "Teletext: additional information"
 msgstr "Télétexte : informations supplémentaires"
 
-#: modules/demux/mpeg/ts_psi.c:610
+#: modules/demux/mpeg/ts_psi.c:613
 msgid "Teletext: program schedule"
 msgstr "Télétexte : programmes"
 
-#: modules/demux/mpeg/ts_psi.c:611
+#: modules/demux/mpeg/ts_psi.c:614
 msgid "Teletext subtitles: hearing impaired"
 msgstr "Sous-titres Télétexte pour malentendants"
 
-#: modules/demux/mpeg/ts_psi.c:828
+#: modules/demux/mpeg/ts_psi.c:831
 msgid "DVB subtitles: hearing impaired"
 msgstr "Sous-titres DVB pour malentendants"
 
-#: modules/demux/mpeg/ts_psi.c:1337
+#: modules/demux/mpeg/ts_psi.c:1340
 msgid "clean effects"
 msgstr "Nettoyer les effets"
 
-#: modules/demux/mpeg/ts_psi.c:1338
+#: modules/demux/mpeg/ts_psi.c:1341
 msgid "hearing impaired"
 msgstr "Malentendants"
 
-#: modules/demux/mpeg/ts_psi.c:1339
+#: modules/demux/mpeg/ts_psi.c:1342
 msgid "visual impaired commentary"
 msgstr "Commentaire pour les malvoyants"
 
@@ -16674,7 +16257,7 @@ msgstr "Démultiplexeur Real"
 msgid "C64 sid demuxer"
 msgstr "Démultiplexeur C64 sid"
 
-#: modules/demux/smf.c:725
+#: modules/demux/smf.c:727
 msgid "SMF demuxer"
 msgstr "Démultiplexeur SMF"
 
@@ -16682,13 +16265,13 @@ msgstr "Démultiplexeur SMF"
 msgid "EBU STL subtitles parser"
 msgstr "Lecteur de sous-titres EBU STL"
 
-#: modules/demux/subtitle.c:53
+#: modules/demux/subtitle.c:54
 msgid "Apply a delay to all subtitles (in 1/10s, eg 100 means 10s)."
 msgstr ""
 "Ajouter un retard à tous les sous-titres (en dixièmes de seconde, 100 = 10 "
 "s)."
 
-#: modules/demux/subtitle.c:55
+#: modules/demux/subtitle.c:56
 msgid ""
 "Override the normal frames per second settings. This will only work with "
 "MicroDVD and SubRIP (SRT) subtitles."
@@ -16696,7 +16279,7 @@ msgstr ""
 "Remplacer le nombre d’images par seconde. Ne fonctionne qu’avec les sous-"
 "titres MicroDVD et SubRIP (SRT)."
 
-#: modules/demux/subtitle.c:58
+#: modules/demux/subtitle.c:59
 msgid ""
 "Force the subtitles format. Selecting \"auto\" means autodetection and "
 "should always work."
@@ -16704,23 +16287,23 @@ msgstr ""
 "Forcer le format des sous-titres. Utiliser « auto » signifie détection "
 "automatique et devrait toujours fonctionner."
 
-#: modules/demux/subtitle.c:60
+#: modules/demux/subtitle.c:61
 msgid "Override the default track description."
 msgstr "Surcharger la description par défaut de la piste."
 
-#: modules/demux/subtitle.c:72
+#: modules/demux/subtitle.c:73
 msgid "Text subtitle parser"
 msgstr "Lecteur de sous-titres texte"
 
-#: modules/demux/subtitle.c:80 modules/spu/subsdelay.c:275
+#: modules/demux/subtitle.c:81 modules/spu/subsdelay.c:275
 msgid "Subtitle delay"
 msgstr "Retard des sous-titres"
 
-#: modules/demux/subtitle.c:82
+#: modules/demux/subtitle.c:83
 msgid "Subtitle format"
 msgstr "Format des sous-titres"
 
-#: modules/demux/subtitle.c:85
+#: modules/demux/subtitle.c:86
 msgid "Subtitle description"
 msgstr "Description des sous-titres"
 
@@ -16736,15 +16319,15 @@ msgstr "TY"
 msgid "TY Stream audio/video demux"
 msgstr "Démultiplexeur audio/vidéo de flux TY"
 
-#: modules/demux/ty.c:784
+#: modules/demux/ty.c:785
 msgid "Closed captions 2"
 msgstr "Sous-titrage malentendants 2"
 
-#: modules/demux/ty.c:785
+#: modules/demux/ty.c:786
 msgid "Closed captions 3"
 msgstr "Sous-titrage malentendants 3"
 
-#: modules/demux/ty.c:786
+#: modules/demux/ty.c:787
 msgid "Closed captions 4"
 msgstr "Sous-titrage malentendants 4"
 
@@ -16870,26 +16453,26 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
-#: modules/gui/qt/dialogs/plugins.cpp:388
+#: modules/gui/qt/dialogs/plugins.cpp:387
 #: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "Analyseurs de listes de lecture"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:107
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
-#: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/dialogs/plugins.cpp:391
 #: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "Découverte de services"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:109
-#: modules/gui/qt/dialogs/plugins.cpp:396
+#: modules/gui/qt/dialogs/plugins.cpp:395
 #: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr "Interfaces"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:111
-#: modules/gui/qt/dialogs/plugins.cpp:399
+#: modules/gui/qt/dialogs/plugins.cpp:398
 #: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr "Récupérateurs d’illustrations et métadonnées"
@@ -16897,7 +16480,7 @@ msgstr "Récupérateurs d’illustrations et métadonnées"
 #: modules/gui/macosx/VLCAddonsWindowController.m:113
 #: modules/gui/macosx/VLCAddonsWindowController.m:361
 #: modules/gui/macosx/VLCMainMenu.m:343 modules/gui/macosx/VLCMainMenu.m:344
-#: modules/gui/qt/dialogs/plugins.cpp:402
+#: modules/gui/qt/dialogs/plugins.cpp:401
 #: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "Extensions"
@@ -16907,7 +16490,7 @@ msgid "Show Installed Only"
 msgstr "Afficher seulement ceux installés"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:118
-#: modules/gui/qt/dialogs/plugins.cpp:430
+#: modules/gui/qt/dialogs/plugins.cpp:429
 msgid "Find more addons online"
 msgstr "Trouver plus d’extensions en ligne"
 
@@ -16939,7 +16522,7 @@ msgid "Uninstall"
 msgstr "Désinstaller"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
-#: modules/gui/qt/dialogs/plugins.cpp:384
+#: modules/gui/qt/dialogs/plugins.cpp:383
 #: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:535
 msgid "Skins"
@@ -17139,7 +16722,7 @@ msgstr "Temps"
 #: modules/gui/macosx/VLCSimplePrefsController.m:295
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1360
-#: modules/stream_out/chromecast/cast.cpp:1197
+#: modules/stream_out/chromecast/cast.cpp:1212
 msgid "OK"
 msgstr "Ok"
 
@@ -17281,7 +16864,7 @@ msgstr "Enregistrer le fichier"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:149
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:392
 #: modules/gui/macosx/VLCOutput.m:65 modules/gui/macosx/VLCOutput.m:194
-#: modules/gui/macosx/VLCOutput.m:313 modules/gui/qt/dialogs/sout.cpp:92
+#: modules/gui/macosx/VLCOutput.m:313 modules/gui/qt/dialogs/sout.cpp:90
 msgid "Stream"
 msgstr "Diffuser"
 
@@ -17357,10 +16940,10 @@ msgstr "Annonce des flux"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:186
 #: modules/gui/macosx/VLCOpenWindowController.m:197
 #: modules/gui/macosx/VLCOutput.m:68
-#: modules/gui/qt/components/sout/sout_widgets.cpp:242
-#: modules/gui/qt/components/sout/sout_widgets.cpp:329
-#: modules/gui/qt/components/sout/sout_widgets.cpp:371
-#: modules/gui/qt/components/sout/sout_widgets.cpp:426
+#: modules/gui/qt/components/sout/sout_widgets.cpp:294
+#: modules/gui/qt/components/sout/sout_widgets.cpp:381
+#: modules/gui/qt/components/sout/sout_widgets.cpp:423
+#: modules/gui/qt/components/sout/sout_widgets.cpp:478
 msgid "Address"
 msgstr "Adresse"
 
@@ -17372,11 +16955,11 @@ msgstr "TTL"
 #: modules/gui/macosx/VLCOpenWindowController.m:185
 #: modules/gui/macosx/VLCOpenWindowController.m:187
 #: modules/gui/macosx/VLCOutput.m:69
-#: modules/gui/qt/components/sout/sout_widgets.cpp:188
-#: modules/gui/qt/components/sout/sout_widgets.cpp:243
-#: modules/gui/qt/components/sout/sout_widgets.cpp:284
-#: modules/gui/qt/components/sout/sout_widgets.cpp:330
-#: modules/gui/qt/components/sout/sout_widgets.cpp:427 modules/lua/vlc.c:67
+#: modules/gui/qt/components/sout/sout_widgets.cpp:240
+#: modules/gui/qt/components/sout/sout_widgets.cpp:295
+#: modules/gui/qt/components/sout/sout_widgets.cpp:336
+#: modules/gui/qt/components/sout/sout_widgets.cpp:382
+#: modules/gui/qt/components/sout/sout_widgets.cpp:479 modules/lua/vlc.c:67
 #: modules/stream_out/rtp.c:114
 #: share/lua/http/dialogs/stream_config_window.html:32
 #: share/lua/http/dialogs/stream_window.html:91
@@ -18482,7 +18065,7 @@ msgstr "INTERNET"
 #: modules/gui/macosx/VLCSimplePrefsController.m:241
 #: modules/gui/qt/components/simple_preferences.cpp:248
 #: modules/gui/qt/components/simple_preferences.cpp:738
-#: modules/gui/qt/dialogs/plugins.cpp:382
+#: modules/gui/qt/dialogs/plugins.cpp:381
 msgid "Interface Settings"
 msgstr "Paramètres de l’interface"
 
@@ -18500,7 +18083,7 @@ msgstr "Paramètres vidéo"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:247
 #: modules/gui/qt/components/simple_preferences.cpp:254
-#: modules/gui/qt/components/simple_preferences.cpp:894
+#: modules/gui/qt/components/simple_preferences.cpp:901
 msgid "Subtitle & On Screen Display Settings"
 msgstr "Paramètres de sous-titres et d’incrustation vidéo"
 
@@ -18969,7 +18552,7 @@ msgid "Subtitle duration factor:"
 msgstr "Facteur de durée des sous-titres :"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:68
-#: modules/gui/qt/components/extended_panels.cpp:1590
+#: modules/gui/qt/components/extended_panels.cpp:1588
 msgid ""
 "Extend subtitle duration by this value.\n"
 "Set 0 to disable."
@@ -18978,7 +18561,7 @@ msgstr ""
 "Mettre 0 pour inhiber."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:72
-#: modules/gui/qt/components/extended_panels.cpp:1595
+#: modules/gui/qt/components/extended_panels.cpp:1593
 msgid ""
 "Multiply subtitle duration by this value.\n"
 "Set 0 to disable."
@@ -18987,7 +18570,7 @@ msgstr ""
 "Mettre à 0 pour inhiber"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:76
-#: modules/gui/qt/components/extended_panels.cpp:1600
+#: modules/gui/qt/components/extended_panels.cpp:1598
 msgid ""
 "Recalculate subtitle duration according\n"
 "to their content and this value.\n"
@@ -19578,296 +19161,296 @@ msgstr ""
 msgid "Ncurses interface"
 msgstr "Interface « ncurses »"
 
-#: modules/gui/ncurses.c:771
+#: modules/gui/ncurses.c:773
 #, c-format
 msgid "  [%s]"
 msgstr "  [%s]"
 
-#: modules/gui/ncurses.c:775
+#: modules/gui/ncurses.c:777
 #, c-format
 msgid "      %s: %s"
 msgstr "      %s : %s"
 
-#: modules/gui/ncurses.c:859
+#: modules/gui/ncurses.c:861
 msgid "[Display]"
 msgstr "[Affichage]"
 
-#: modules/gui/ncurses.c:861
+#: modules/gui/ncurses.c:863
 msgid " h,H                    Show/Hide help box"
 msgstr " h,H Afficher/Masquer l’aide"
 
-#: modules/gui/ncurses.c:862
+#: modules/gui/ncurses.c:864
 msgid " i                      Show/Hide info box"
 msgstr "i Afficher/Masquer les informations"
 
-#: modules/gui/ncurses.c:863
+#: modules/gui/ncurses.c:865
 msgid " M                      Show/Hide metadata box"
 msgstr " M                      Afficher/Masquer les métadonnéees"
 
-#: modules/gui/ncurses.c:864
+#: modules/gui/ncurses.c:866
 msgid " L                      Show/Hide messages box"
 msgstr "L Afficher/Masquer les messages"
 
-#: modules/gui/ncurses.c:865
+#: modules/gui/ncurses.c:867
 msgid " P                      Show/Hide playlist box"
 msgstr "P Afficher/Masquer la liste de lecture"
 
-#: modules/gui/ncurses.c:866
+#: modules/gui/ncurses.c:868
 msgid " B                      Show/Hide filebrowser"
 msgstr "B Afficher/Masquer le navigateur de fichiers"
 
-#: modules/gui/ncurses.c:867
+#: modules/gui/ncurses.c:869
 msgid " x                      Show/Hide objects box"
 msgstr "x Afficher/Masquer les objets"
 
-#: modules/gui/ncurses.c:868
+#: modules/gui/ncurses.c:870
 msgid " S                      Show/Hide statistics box"
 msgstr "P Afficher/Masquer les statistiques"
 
-#: modules/gui/ncurses.c:869
+#: modules/gui/ncurses.c:871
 msgid " Esc                    Close Add/Search entry"
 msgstr "     [Echap]     Fermer le dialogue Ajouter/Chercher"
 
-#: modules/gui/ncurses.c:870
+#: modules/gui/ncurses.c:872
 msgid " Ctrl-l                 Refresh the screen"
 msgstr "     Ctrl+l      Actualiser l’écran"
 
-#: modules/gui/ncurses.c:874
+#: modules/gui/ncurses.c:876
 msgid "[Global]"
 msgstr "[Global]"
 
-#: modules/gui/ncurses.c:876
+#: modules/gui/ncurses.c:878
 msgid " q, Q, Esc              Quit"
 msgstr "     q, Q, Échap Quitter"
 
-#: modules/gui/ncurses.c:877
+#: modules/gui/ncurses.c:879
 msgid " s                      Stop"
 msgstr "     s           Arrêter"
 
-#: modules/gui/ncurses.c:878
+#: modules/gui/ncurses.c:880
 msgid " <space>                Pause/Play"
 msgstr "     [Espace]    Suspendre/Lire"
 
-#: modules/gui/ncurses.c:879
+#: modules/gui/ncurses.c:881
 msgid " f                      Toggle Fullscreen"
 msgstr "     f           Commuter le plein écran"
 
-#: modules/gui/ncurses.c:880
+#: modules/gui/ncurses.c:882
 msgid " c                      Cycle through audio tracks"
 msgstr " c                      Passer aux pistes audio suivantes"
 
-#: modules/gui/ncurses.c:881
+#: modules/gui/ncurses.c:883
 msgid " v                      Cycle through subtitles tracks"
 msgstr " v                      Passer aux sous-titrages suivants"
 
-#: modules/gui/ncurses.c:882
+#: modules/gui/ncurses.c:884
 msgid " b                      Cycle through video tracks"
 msgstr " b                      Passer aux pistes vidéo suivantes"
 
-#: modules/gui/ncurses.c:883
+#: modules/gui/ncurses.c:885
 msgid " n, p                   Next/Previous playlist item"
 msgstr "     n, p        Suivant/Précédent"
 
-#: modules/gui/ncurses.c:884
+#: modules/gui/ncurses.c:886
 msgid " [, ]                   Next/Previous title"
 msgstr "     [, ]        Titre Suivant/Précédent"
 
-#: modules/gui/ncurses.c:885
+#: modules/gui/ncurses.c:887
 msgid " <, >                   Next/Previous chapter"
 msgstr "     <, >        Chapitre Suivant/Précédent"
 
 #. xgettext: You can use ← and → characters
-#: modules/gui/ncurses.c:887
+#: modules/gui/ncurses.c:889
 #, c-format
 msgid " <left>,<right>         Seek -/+ 1%%"
 msgstr "     ←, →        Sauter -/+1%%"
 
-#: modules/gui/ncurses.c:888
+#: modules/gui/ncurses.c:890
 msgid " a, z                   Volume Up/Down"
 msgstr "     a,z         Augmenter/réduire le volume"
 
-#: modules/gui/ncurses.c:889
+#: modules/gui/ncurses.c:891
 msgid " m                      Mute"
 msgstr "     m           Muet"
 
 #. xgettext: You can use ↑ and ↓ characters
-#: modules/gui/ncurses.c:891
+#: modules/gui/ncurses.c:893
 msgid " <up>,<down>            Navigate through the box line by line"
 msgstr "     ↑,↓         Naviguer ligne par ligne"
 
 #. xgettext: You can use ⇞ and ⇟ characters
-#: modules/gui/ncurses.c:893
+#: modules/gui/ncurses.c:895
 msgid " <pageup>,<pagedown>    Navigate through the box page by page"
 msgstr "     ⇞,⇟         Naviguer page par page"
 
 #. xgettext: You can use ↖ and ↘ characters
-#: modules/gui/ncurses.c:895
+#: modules/gui/ncurses.c:897
 msgid " <start>,<end>          Navigate to start/end of box"
 msgstr "     ↖,↘         Aller au début/à la fin de la boîte de dialogue"
 
-#: modules/gui/ncurses.c:899
+#: modules/gui/ncurses.c:901
 msgid "[Playlist]"
 msgstr "[Liste de lecture]"
 
-#: modules/gui/ncurses.c:901
+#: modules/gui/ncurses.c:903
 msgid " r                      Toggle Random playing"
 msgstr "     r           Commuter la lecture aléatoire"
 
-#: modules/gui/ncurses.c:902
+#: modules/gui/ncurses.c:904
 msgid " l                      Toggle Loop Playlist"
 msgstr "     l           Commuter le rebouclage de liste"
 
-#: modules/gui/ncurses.c:903
+#: modules/gui/ncurses.c:905
 msgid " R                      Toggle Repeat item"
 msgstr "     R           Commuter la répétition d’élément"
 
-#: modules/gui/ncurses.c:904
+#: modules/gui/ncurses.c:906
 msgid " o                      Order Playlist by title"
 msgstr "     o           Trier la liste de lecture par titre"
 
-#: modules/gui/ncurses.c:905
+#: modules/gui/ncurses.c:907
 msgid " O                      Reverse order Playlist by title"
 msgstr "     O           Trier la liste de lecture par titre (inversé)"
 
-#: modules/gui/ncurses.c:906
+#: modules/gui/ncurses.c:908
 msgid " g                      Go to the current playing item"
 msgstr "     g           Aller à l’élément en cours de lecture"
 
-#: modules/gui/ncurses.c:907
+#: modules/gui/ncurses.c:909
 msgid " /                      Look for an item"
 msgstr "     /           Rechercher"
 
-#: modules/gui/ncurses.c:908
+#: modules/gui/ncurses.c:910
 msgid " ;                      Look for the next item"
 msgstr "     ;           Rechercher le prochain"
 
-#: modules/gui/ncurses.c:909
+#: modules/gui/ncurses.c:911
 msgid " A                      Add an entry"
 msgstr "     A           Ajouter"
 
 #. xgettext: You can use ⌫ character to translate <backspace>
-#: modules/gui/ncurses.c:911
+#: modules/gui/ncurses.c:913
 msgid " D, <backspace>, <del>  Delete an entry"
 msgstr "     D, [←], [Suppr] Effacer"
 
-#: modules/gui/ncurses.c:912
+#: modules/gui/ncurses.c:914
 msgid " e                      Eject (if stopped)"
 msgstr "     e           Éjecter (si stoppé)"
 
-#: modules/gui/ncurses.c:916
+#: modules/gui/ncurses.c:918
 msgid "[Filebrowser]"
 msgstr "[Navigateur de fichiers]"
 
-#: modules/gui/ncurses.c:918
+#: modules/gui/ncurses.c:920
 msgid " <enter>                Add the selected file to the playlist"
 msgstr ""
 "     [Entrée]           Ajouter le fichier sélectionné à la liste de lecture"
 
-#: modules/gui/ncurses.c:919
+#: modules/gui/ncurses.c:921
 msgid " <space>                Add the selected directory to the playlist"
 msgstr ""
 "     [Espace]           Ajouter le dossier sélectionné à la liste de lecture"
 
-#: modules/gui/ncurses.c:920
+#: modules/gui/ncurses.c:922
 msgid " .                      Show/Hide hidden files"
 msgstr ". Afficher/Masquer les fichiers cachés"
 
-#: modules/gui/ncurses.c:924
+#: modules/gui/ncurses.c:926
 msgid "[Player]"
 msgstr "[Lecteur]"
 
 #. xgettext: You can use ↑ and ↓ characters
-#: modules/gui/ncurses.c:927
+#: modules/gui/ncurses.c:929
 #, c-format
 msgid " <up>,<down>            Seek +/-5%%"
 msgstr "     ↑,[↓       Sauter +/-5%%"
 
-#: modules/gui/ncurses.c:1046
+#: modules/gui/ncurses.c:1048
 msgid "[Repeat]"
 msgstr "[Répétition] "
 
-#: modules/gui/ncurses.c:1047
+#: modules/gui/ncurses.c:1049
 msgid "[Random]"
 msgstr "[Aléatoire] "
 
-#: modules/gui/ncurses.c:1048
+#: modules/gui/ncurses.c:1050
 msgid "[Loop]"
 msgstr "[Boucler]"
 
-#: modules/gui/ncurses.c:1057
+#: modules/gui/ncurses.c:1059
 #, c-format
 msgid " Source   : %s"
 msgstr " Source   : %s"
 
-#: modules/gui/ncurses.c:1090
+#: modules/gui/ncurses.c:1092
 #, c-format
 msgid " Position : %s/%s"
 msgstr " Position : %s/%s"
 
-#: modules/gui/ncurses.c:1095
+#: modules/gui/ncurses.c:1097
 msgid " Volume   : Mute"
 msgstr " Volume   : muet"
 
-#: modules/gui/ncurses.c:1096
+#: modules/gui/ncurses.c:1098
 #, c-format
 msgid " Volume   : %3ld%%"
 msgstr " Volume   : %3ld%%"
 
-#: modules/gui/ncurses.c:1096
+#: modules/gui/ncurses.c:1098
 msgid " Volume   : ----"
 msgstr " Volume   : ----"
 
-#: modules/gui/ncurses.c:1102
+#: modules/gui/ncurses.c:1104
 #, c-format
 msgid " Title    : %<PRId64>/%d"
 msgstr " Titre      : %<PRId64>/%d"
 
-#: modules/gui/ncurses.c:1108
+#: modules/gui/ncurses.c:1110
 #, c-format
 msgid " Chapter  : %<PRId64>/%d"
 msgstr " Chapitre : %<PRId64>/%d"
 
-#: modules/gui/ncurses.c:1113
+#: modules/gui/ncurses.c:1115
 msgid " Source: <no current item>"
 msgstr "Source : <pas d’élément>"
 
-#: modules/gui/ncurses.c:1115
+#: modules/gui/ncurses.c:1117
 msgid " [ h for help ]"
 msgstr " [ h pour l’aide ]"
 
-#: modules/gui/ncurses.c:1136
+#: modules/gui/ncurses.c:1138
 #, c-format
 msgid "Open: %s"
 msgstr "Ouvrir : %s"
 
-#: modules/gui/ncurses.c:1138
+#: modules/gui/ncurses.c:1140
 #, c-format
 msgid "Find: %s"
 msgstr "Chercher : %s"
 
-#: modules/gui/qt/components/controller.cpp:352
+#: modules/gui/qt/components/controller.cpp:347
 msgid "Shift+L"
 msgstr "Maj+L"
 
-#: modules/gui/qt/components/controller.cpp:457
+#: modules/gui/qt/components/controller.cpp:451
 msgid "Click to toggle between loop all, loop one and no loop"
 msgstr ""
 "Cliquer pour commuter entre tout reboucler, reboucler un média et pas de "
 "boucle"
 
-#: modules/gui/qt/components/controller.cpp:558
+#: modules/gui/qt/components/controller.cpp:555
 msgid "Previous Chapter/Title"
 msgstr "Chapitre/Titre précédent"
 
-#: modules/gui/qt/components/controller.cpp:564
+#: modules/gui/qt/components/controller.cpp:561
 msgid "Next Chapter/Title"
 msgstr "Chapitre/Titre suivant"
 
-#: modules/gui/qt/components/controller.cpp:613
+#: modules/gui/qt/components/controller.cpp:605
 msgid "Teletext Activation"
 msgstr "Activation du télétexte"
 
-#: modules/gui/qt/components/controller.cpp:629
+#: modules/gui/qt/components/controller.cpp:619
 msgid "Toggle Transparency"
 msgstr "Commuter la transparence"
 
@@ -20029,7 +19612,7 @@ msgstr "Arrêter la boucle A->B"
 msgid "Aspect Ratio"
 msgstr "Rapport de cadre"
 
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+#: modules/gui/qt/components/epg/EPGWidget.cpp:66
 msgid "No EPG Data Available"
 msgstr "Aucune donnée de guide TV disponible"
 
@@ -20189,7 +19772,7 @@ msgstr "(Avancé)"
 msgid "(Delayed)"
 msgstr "(Retardé)"
 
-#: modules/gui/qt/components/extended_panels.cpp:1507
+#: modules/gui/qt/components/extended_panels.cpp:1505
 msgid "Force update of this dialog's values"
 msgstr "Forcer la mise à jour des valeurs de la fenêtre"
 
@@ -20288,7 +19871,7 @@ msgstr "Dernières 60 s"
 msgid "Overall"
 msgstr "En tout"
 
-#: modules/gui/qt/components/interface_widgets.cpp:683
+#: modules/gui/qt/components/interface_widgets.cpp:658
 msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
@@ -20296,45 +19879,45 @@ msgstr ""
 "Vitesse de lecture actuelle : %1\n"
 "Cliquez pour ajuster"
 
-#: modules/gui/qt/components/interface_widgets.cpp:756
+#: modules/gui/qt/components/interface_widgets.cpp:730
 msgid "Revert to normal play speed"
 msgstr "Retourner à la vitesse de lecture normale"
 
-#: modules/gui/qt/components/interface_widgets.cpp:863
+#: modules/gui/qt/components/interface_widgets.cpp:827
 msgid "Download cover art"
 msgstr "Télécharger la pochette"
 
-#: modules/gui/qt/components/interface_widgets.cpp:867
+#: modules/gui/qt/components/interface_widgets.cpp:831
 msgid "Add cover art from file"
 msgstr "Ajouter la pochette depuis un fichier"
 
-#: modules/gui/qt/components/interface_widgets.cpp:933
+#: modules/gui/qt/components/interface_widgets.cpp:897
 msgid "Choose Cover Art"
 msgstr "Choisir la pochette"
 
-#: modules/gui/qt/components/interface_widgets.cpp:934
+#: modules/gui/qt/components/interface_widgets.cpp:898
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
 msgstr "Fichiers image (*.gif *.jpg *.jpeg *.png)"
 
-#: modules/gui/qt/components/interface_widgets.cpp:961
+#: modules/gui/qt/components/interface_widgets.cpp:925
 #: modules/gui/qt/dialogs/toolbar.cpp:573
 msgid "Elapsed time"
 msgstr "Durée écoulée"
 
-#: modules/gui/qt/components/interface_widgets.cpp:965
+#: modules/gui/qt/components/interface_widgets.cpp:929
 #: modules/gui/qt/dialogs/toolbar.cpp:577
 msgid "Total/Remaining time"
 msgstr "Temps total/restant"
 
-#: modules/gui/qt/components/interface_widgets.cpp:967
+#: modules/gui/qt/components/interface_widgets.cpp:931
 msgid "Click to toggle between total and remaining time"
 msgstr "Cliquer pour commuter entre temps total et temps restant"
 
-#: modules/gui/qt/components/interface_widgets.cpp:973
+#: modules/gui/qt/components/interface_widgets.cpp:937
 msgid "Click to toggle between elapsed and remaining time"
 msgstr "Cliquer pour commuter entre temps écoulé et temps restant"
 
-#: modules/gui/qt/components/interface_widgets.cpp:975
+#: modules/gui/qt/components/interface_widgets.cpp:939
 msgid "Double click to jump to a chosen time position"
 msgstr "Double-cliquer pour avancer à un moment choisi"
 
@@ -20537,19 +20120,19 @@ msgstr ""
 "La liste de lecture est vide.\n"
 "Déposer un fichier ici ou sélectionner une source depuis la gauche."
 
-#: modules/gui/qt/components/playlist/standardpanel.hpp:143
+#: modules/gui/qt/components/playlist/standardpanel.hpp:144
 msgid "Icons"
 msgstr "Icônes"
 
-#: modules/gui/qt/components/playlist/standardpanel.hpp:144
+#: modules/gui/qt/components/playlist/standardpanel.hpp:145
 msgid "Detailed List"
 msgstr "Liste détaillée"
 
-#: modules/gui/qt/components/playlist/standardpanel.hpp:145
+#: modules/gui/qt/components/playlist/standardpanel.hpp:146
 msgid "List"
 msgstr "Liste"
 
-#: modules/gui/qt/components/playlist/standardpanel.hpp:146
+#: modules/gui/qt/components/playlist/standardpanel.hpp:147
 msgid "PictureFlow"
 msgstr "Affichage « PictureFlow »"
 
@@ -20586,7 +20169,6 @@ msgid "Application level hotkey"
 msgstr "Raccourci de niveau application"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1148
-#: modules/gui/qt/components/preferences_widgets.cpp:1405
 msgid "Global"
 msgstr "Global"
 
@@ -20603,33 +20185,41 @@ msgstr ""
 "Double-cliquer pour changer.\n"
 "Touche Suppr pour supprimer."
 
+#: modules/gui/qt/components/preferences_widgets.cpp:1405
+#, fuzzy
+msgid "Global Hotkey change"
+msgstr "Changement de raccourci clavier"
+
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Changement de raccourci clavier"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-msgid "Press the new key or combination for "
+#, fuzzy
+msgid "Press the new key or combination for <b>%1</b>"
 msgstr "Appuyer sur la nouvelle touche ou combinaison pour "
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Affecter"
 
-#: modules/gui/qt/components/preferences_widgets.cpp:1454
-msgid "Warning: this key or combination is already assigned to "
+#: modules/gui/qt/components/preferences_widgets.cpp:1455
+#, fuzzy
+msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
 msgstr "Attention : la combinaison est déjà assignée à "
 
-#: modules/gui/qt/components/preferences_widgets.cpp:1466
+#: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Attention : <b>%1</b> est un raccourci déjà existant"
 
-#: modules/gui/qt/components/preferences_widgets.cpp:1489
-msgid "Key or combination: "
+#: modules/gui/qt/components/preferences_widgets.cpp:1490
+#, fuzzy
+msgid "Key or combination: <b>%1</b>"
 msgstr "Touche ou combinaison : "
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
-msgid "Key: "
-msgstr "Touche : "
+msgid "Key: <b>%1</b>"
+msgstr ""
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20637,7 +20227,7 @@ msgid "Input & Codecs Settings"
 msgstr "Paramètres d’entrée et de codecs"
 
 #: modules/gui/qt/components/simple_preferences.cpp:258
-#: modules/gui/qt/components/simple_preferences.cpp:938
+#: modules/gui/qt/components/simple_preferences.cpp:945
 msgid "Configure Hotkeys"
 msgstr "Configurer les raccourcis claviers"
 
@@ -20683,30 +20273,30 @@ msgstr "le site Web des habillages VLC"
 msgid "System's default"
 msgstr "Valeur par défaut du système"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1344
+#: modules/gui/qt/components/simple_preferences.cpp:1351
 msgid "File associations"
 msgstr "Association de fichiers"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1353
+#: modules/gui/qt/components/simple_preferences.cpp:1360
 #: modules/gui/qt/dialogs_provider.hpp:42
 msgid "Audio Files"
 msgstr "Fichiers audio"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1354
+#: modules/gui/qt/components/simple_preferences.cpp:1361
 #: modules/gui/qt/dialogs_provider.hpp:41
 msgid "Video Files"
 msgstr "Fichiers vidéo"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1355
+#: modules/gui/qt/components/simple_preferences.cpp:1362
 #: modules/gui/qt/dialogs_provider.hpp:43
 msgid "Playlist Files"
 msgstr "Fichiers de liste de lecture"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1420
+#: modules/gui/qt/components/simple_preferences.cpp:1427
 msgid "&Apply"
 msgstr "&Appliquer"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1421
+#: modules/gui/qt/components/simple_preferences.cpp:1428
 #: modules/gui/qt/dialogs/convert.cpp:137
 #: modules/gui/qt/dialogs/gototime.cpp:48 modules/gui/qt/dialogs/open.cpp:109
 #: modules/gui/qt/dialogs/openurl.cpp:59
@@ -20795,46 +20385,67 @@ msgid ""
 msgstr ""
 "Conteneurs (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:185
+#: modules/gui/qt/components/sout/sout_widgets.cpp:184
+#, fuzzy
+msgid "This module outputs the stream using the RIST protocol (TR06)."
+msgstr ""
+"Ce module transmet le flux transcodé vers le réseau via le protocole MMS."
+
+#: modules/gui/qt/components/sout/sout_widgets.cpp:186
+#, fuzzy
+msgid "Destination Address"
+msgstr "Préfixe de destination"
+
+#: modules/gui/qt/components/sout/sout_widgets.cpp:191
+#, fuzzy
+msgid "Destination Port"
+msgstr "Destination"
+
+#: modules/gui/qt/components/sout/sout_widgets.cpp:201
+#, fuzzy
+msgid "Stream Name"
+msgstr "Nom"
+
+#: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
 msgstr "Diffuser par le réseau via HTTP."
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:187
-#: modules/gui/qt/components/sout/sout_widgets.cpp:283
+#: modules/gui/qt/components/sout/sout_widgets.cpp:239
+#: modules/gui/qt/components/sout/sout_widgets.cpp:335
 msgid "Path"
 msgstr "Chemin d’accès"
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:239
+#: modules/gui/qt/components/sout/sout_widgets.cpp:291
 msgid ""
 "This module outputs the transcoded stream to a network via the mms protocol."
 msgstr ""
 "Ce module transmet le flux transcodé vers le réseau via le protocole MMS."
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:281
+#: modules/gui/qt/components/sout/sout_widgets.cpp:333
 msgid "This module outputs the transcoded stream to a network via RTSP."
 msgstr "Ce module transmet le flux transcodé vers le réseau via RTSP."
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:327
+#: modules/gui/qt/components/sout/sout_widgets.cpp:379
 msgid "This module outputs the transcoded stream to a network via UDP."
 msgstr "Ce module transmet le flux transcodé vers le réseau via UDP."
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:369
+#: modules/gui/qt/components/sout/sout_widgets.cpp:421
 msgid "This module outputs the transcoded stream to a network via RTP."
 msgstr "Ce module transmet le flux transcodé vers le réseau via RTP."
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:376
+#: modules/gui/qt/components/sout/sout_widgets.cpp:428
 msgid "Base port"
 msgstr "Port de base"
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:424
+#: modules/gui/qt/components/sout/sout_widgets.cpp:476
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "Ce module écrit le flux transcodé vers un serveur Icecast."
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:443
+#: modules/gui/qt/components/sout/sout_widgets.cpp:495
 msgid "Mount Point"
 msgstr "Point de montage"
 
-#: modules/gui/qt/components/sout/sout_widgets.cpp:444
+#: modules/gui/qt/components/sout/sout_widgets.cpp:496
 msgid "Login:pass"
 msgstr "Utilisateur:mot de passe"
 
@@ -21234,11 +20845,11 @@ msgstr "&Chercher :"
 msgid "More information..."
 msgstr "Plus d’informations…"
 
-#: modules/gui/qt/dialogs/plugins.cpp:266
+#: modules/gui/qt/dialogs/plugins.cpp:265
 msgid "Reload extensions"
 msgstr "Recharger les extensions"
 
-#: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/dialogs/plugins.cpp:384
 msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
@@ -21246,7 +20857,7 @@ msgstr ""
 "Les habillages personnalisent l’apparence du lecteur. Il est possible de les "
 "activer dans les préférences."
 
-#: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/dialogs/plugins.cpp:388
 msgid ""
 "Playlist parsers add new capabilities to read internet streams or extract "
 "meta data."
@@ -21254,7 +20865,7 @@ msgstr ""
 "L’analyseur de liste de lecteur ajoute de nouvelles fonctionnalités pour "
 "lire les flux internet ou extraire des métadonnées."
 
-#: modules/gui/qt/dialogs/plugins.cpp:393
+#: modules/gui/qt/dialogs/plugins.cpp:392
 msgid ""
 "Service discoveries adds new sources to your playlist such as web radios, "
 "video websites, ..."
@@ -21262,20 +20873,20 @@ msgstr ""
 "Le service de découverte ajoute des nouvelles sources à votre liste de "
 "lecture tels que les radios internet, les sites de vidéos,..."
 
-#: modules/gui/qt/dialogs/plugins.cpp:400
+#: modules/gui/qt/dialogs/plugins.cpp:399
 msgid "Retrieves extra info and art for playlist items"
 msgstr ""
 "Récupérer des informations supplémentaires et les images pour les éléments "
 "de la liste de lecture"
 
-#: modules/gui/qt/dialogs/plugins.cpp:403
+#: modules/gui/qt/dialogs/plugins.cpp:402
 msgid ""
 "Extensions brings various enhancements. Check descriptions for more details"
 msgstr ""
 "Les extensions apportent plusieurs améliorations. Vérifier les descriptions "
 "pour plus de détails."
 
-#: modules/gui/qt/dialogs/plugins.cpp:424
+#: modules/gui/qt/dialogs/plugins.cpp:423
 msgid "Only installed"
 msgstr "Installés seulement"
 
@@ -21407,7 +21018,7 @@ msgstr ""
 "Ceci est généré automatiquement en cas de changement des paramètres\n"
 "ci-dessus, mais est modifiable manuellement."
 
-#: modules/gui/qt/dialogs/sout.cpp:89
+#: modules/gui/qt/dialogs/sout.cpp:87
 msgid "Back"
 msgstr "Retour"
 
@@ -21657,19 +21268,19 @@ msgstr "Vide"
 msgid "Deactivate"
 msgstr "Désactiver"
 
-#: modules/gui/qt/main_interface.cpp:378
+#: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
 msgstr "Voulez-vous redémarrer la lecture là où elle s’était arrêtée ?"
 
-#: modules/gui/qt/main_interface.cpp:384
+#: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
 msgstr "&Reprendre"
 
-#: modules/gui/qt/main_interface.cpp:1454
+#: modules/gui/qt/main_interface.cpp:1439
 msgid "Control menu for the player"
 msgstr "Menu de contrôle pour le lecteur"
 
-#: modules/gui/qt/main_interface.cpp:1498
+#: modules/gui/qt/main_interface.cpp:1483
 msgid "Paused"
 msgstr "En Pause"
 
@@ -22424,15 +22035,15 @@ msgstr "Gamma (0-10)"
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Fixe le gamma de l’image, entre 0,01 et 10. 1 par défaut."
 
-#: modules/hw/d3d11/d3d11_filters.c:681
+#: modules/hw/d3d11/d3d11_filters.c:683
 msgid "AMD VQ Enhancer"
 msgstr "Optimiseur AMD VQ"
 
-#: modules/hw/d3d11/d3d11_filters.c:687
+#: modules/hw/d3d11/d3d11_filters.c:689
 msgid "AMD Frame Rate Doubler"
 msgstr "Doublage de la fréquence d’images AMD"
 
-#: modules/hw/d3d11/d3d11_filters.c:690
+#: modules/hw/d3d11/d3d11_filters.c:692
 msgid "Show indicator"
 msgstr "Afficher l’indicateur"
 
@@ -23867,27 +23478,27 @@ msgstr ""
 msgid "Accept certificate temporarily"
 msgstr "Accepter le certificat temporairement"
 
-#: modules/misc/stats.c:214 modules/stream_out/stats.c:51
+#: modules/misc/stats.c:221 modules/stream_out/stats.c:51
 msgid "Stats"
 msgstr "Statistiques"
 
-#: modules/misc/stats.c:216
+#: modules/misc/stats.c:223
 msgid "Stats encoder function"
 msgstr "Statistiques fonction encoder"
 
-#: modules/misc/stats.c:222 modules/misc/stats.c:228 modules/misc/stats.c:234
+#: modules/misc/stats.c:229 modules/misc/stats.c:235 modules/misc/stats.c:241
 msgid "Stats decoder"
 msgstr "Statistiques décodeur"
 
-#: modules/misc/stats.c:223 modules/misc/stats.c:229 modules/misc/stats.c:235
+#: modules/misc/stats.c:230 modules/misc/stats.c:236 modules/misc/stats.c:242
 msgid "Stats decoder function"
 msgstr "Statistiques fonction décodeur"
 
-#: modules/misc/stats.c:240
+#: modules/misc/stats.c:247
 msgid "Stats demux"
 msgstr "Statistiques démultiplexeur"
 
-#: modules/misc/stats.c:241
+#: modules/misc/stats.c:248
 msgid "Stats demux function"
 msgstr "Statistiques fonction démultiplexeur"
 
@@ -24312,7 +23923,7 @@ msgstr "Empaqueteur audio A/52"
 msgid "avparser packetizer"
 msgstr "Empaqueteur avparser"
 
-#: modules/packetizer/av1.c:585
+#: modules/packetizer/av1.c:586
 msgid "AV1 video packetizer"
 msgstr "Empaqueteur vidéo AV1"
 
@@ -24395,7 +24006,7 @@ msgstr "Découverte par Avahi Renderer"
 
 #: modules/services_discovery/bonjour.m:45
 #: modules/services_discovery/bonjour.m:63
-#: modules/services_discovery/bonjour.m:455
+#: modules/services_discovery/bonjour.m:461
 msgid "Bonjour Network Discovery"
 msgstr "Découverte réseau Bonjour"
 
@@ -24427,7 +24038,7 @@ msgstr "Mes images"
 
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
-#: modules/services_discovery/microdns.c:646
+#: modules/services_discovery/microdns.c:656
 msgid "mDNS Network Discovery"
 msgstr "Découverte réseau mDNS"
 
@@ -25418,31 +25029,31 @@ msgstr "Flux HTTP dynamique"
 msgid "Zlib decompression filter"
 msgstr "Filtre de décompression zlib"
 
-#: modules/stream_filter/prefetch.c:532
+#: modules/stream_filter/prefetch.c:530
 msgid "Stream prefetch filter"
 msgstr "Filtre de préchargement de flux"
 
-#: modules/stream_filter/prefetch.c:535
+#: modules/stream_filter/prefetch.c:533
 msgid "Buffer size"
 msgstr "Taille du tampon"
 
-#: modules/stream_filter/prefetch.c:536
+#: modules/stream_filter/prefetch.c:534
 msgid "Prefetch buffer size (KiB)"
 msgstr "Taille du tampon de préchargement (Kio)"
 
-#: modules/stream_filter/prefetch.c:538
+#: modules/stream_filter/prefetch.c:536
 msgid "Read size"
 msgstr "Taille lue"
 
-#: modules/stream_filter/prefetch.c:539
+#: modules/stream_filter/prefetch.c:537
 msgid "Prefetch background read size (bytes)"
 msgstr "Taille de lecture du préchargement (octets)"
 
-#: modules/stream_filter/prefetch.c:541
+#: modules/stream_filter/prefetch.c:539
 msgid "Seek threshold"
 msgstr "Seuil de déplacement"
 
-#: modules/stream_filter/prefetch.c:542
+#: modules/stream_filter/prefetch.c:540
 msgid "Prefetch forward seek threshold (bytes)"
 msgstr "Seuil de préchargement en recherche avant (octets)"
 
@@ -25595,7 +25206,7 @@ msgstr ""
 "Port HTTP du serveur local utilisé pour diffuser le média vers le Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:192
-#: modules/stream_out/chromecast/cast.cpp:1198
+#: modules/stream_out/chromecast/cast.cpp:1213
 msgid "Performance warning"
 msgstr "Alerte de performance"
 
@@ -25656,11 +25267,11 @@ msgstr "Chromecast"
 msgid "Chromecast stream output"
 msgstr "Flux de sortie Chromecast"
 
-#: modules/stream_out/chromecast/cast.cpp:1197
+#: modules/stream_out/chromecast/cast.cpp:1212
 msgid "Ok, Don't warn me again"
 msgstr "OK, ne plus m’avertir"
 
-#: modules/stream_out/chromecast/cast.cpp:1199
+#: modules/stream_out/chromecast/cast.cpp:1214
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
@@ -28485,7 +28096,7 @@ msgstr "Sortie vidéo « DirectX (DirectDraw) »"
 msgid "Wallpaper"
 msgstr "Papier peint"
 
-#: modules/video_output/win32/glwin32.c:52
+#: modules/video_output/win32/glwin32.c:53
 msgid "OpenGL video output for Windows"
 msgstr "Sortie vidéo « OpenGL » pour Windows"
 
@@ -28493,11 +28104,11 @@ msgstr "Sortie vidéo « OpenGL » pour Windows"
 msgid "Windows GDI video output"
 msgstr "Sortie vidéo « Windows GDI »"
 
-#: modules/video_output/win32/wgl.c:42
+#: modules/video_output/win32/wgl.c:43
 msgid "GPU affinity"
 msgstr "Affinité GPU"
 
-#: modules/video_output/win32/wgl.c:46
+#: modules/video_output/win32/wgl.c:47
 msgid "WGL extension for OpenGL"
 msgstr "Extension WGL pour OpenGL"
 
@@ -30391,3 +30002,386 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Liste du gestionnaire de médias"
+
+#~ msgid "RIST maximum packet size (bytes)"
+#~ msgstr "Taille maximale des paquets RIST (octets)"
+
+#~ msgid "RIST latency (ms)"
+#~ msgstr "Latence RIST (ms)"
+
+#~ msgid "RIST nack retry interval (ms)"
+#~ msgstr "Intervalle de réessai RIST (ms)"
+
+#~ msgid "RIST reorder buffer (ms)"
+#~ msgstr "Délai de réorganisation du tampon RIST (ms)"
+
+#~ msgid "RIST maximum retry count"
+#~ msgstr "Nombre maximal de tentatives RIST"
+
+#~ msgid "Disable NACK output packets"
+#~ msgstr "Désactiver les paquets de sortie NACK"
+
+#~ msgid "Use this to disable packet recovery"
+#~ msgstr "Utilisez ceci pour désactiver la récupération de paquets"
+
+#~ msgid "Do not check for a valid rtcp message from the encoder"
+#~ msgstr "Ne pas vérifier la validité du message rtcp de l’encodeur"
+
+#~ msgid ""
+#~ "Send nack messages even when we have not confirmed that the encoder is on "
+#~ "our local network."
+#~ msgstr ""
+#~ "Envoyer des messages nack même si nous n’avons pas confirmé que "
+#~ "l’encodeur se trouve sur notre réseau local"
+
+#~ msgid "16 bytes"
+#~ msgstr "16 octets"
+
+#~ msgid "24 bytes"
+#~ msgstr "24 octets"
+
+#~ msgid "32 bytes"
+#~ msgstr "32 octets"
+
+#~ msgid "RIST data output caching size (ms)"
+#~ msgstr "Taille du cache de sortie des données RIST (ms)"
+
+#~ msgid ""
+#~ "Having this cache will guarantee that the packets going out are delivered "
+#~ "at a spacing determined by the chain timestamps thus ensuring a near "
+#~ "jitter free output. Be aware that this setting will also add to the "
+#~ "overall latency of the stream."
+#~ msgstr ""
+#~ "L’utilisation de ce cache garantit que les paquets qui sortent sont "
+#~ "délivrés à un espacement déterminé par les horodatages de la chaîne, "
+#~ "assurant ainsi une sortie presque sans gigue. Sachez que ce paramètre "
+#~ "augmente également la latence globale du flux."
+
+#~ msgid "RIST retry-buffer queue size (ms)"
+#~ msgstr "Taille de la file d’attente du tampon de réessai RIST (ms)"
+
+#~ msgid ""
+#~ "This must match the buffer size (latency) configured on the server side. "
+#~ "If you are not sure, leave the default of 0 which will set it the maximum "
+#~ "value and will use about 100MB of RAM"
+#~ msgstr ""
+#~ "Cette valeur doit correspondre à la taille du tampon (latence) configurée "
+#~ "du côté du serveur. Si vous n’êtes pas sûr, laissez la valeur par défaut "
+#~ "de 0, qui correspond à la valeur maximale et utilise environ 100 Mo de "
+#~ "RAM."
+
+#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
+#~ msgstr ""
+#~ "SSRC utilisé dans la sortie RTP (la valeur par défaut est aléatoire, c.-à-"
+#~ "d. 0)"
+
+#~ msgid ""
+#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
+#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
+#~ msgstr ""
+#~ "Utilisez ce paramètre pour spécifier un SSRC connu pour l’en-tête RTP. "
+#~ "Ceci n’est utile que si votre récepteur agit sur lui. Lorsque vous "
+#~ "utilisez VLC comme récepteur, ce n’est pas le cas."
+
+#~ msgid ""
+#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
+#~ msgstr ""
+#~ "Ce nom de flux sera envoyé au récepteur en utilisant le canal RTCP RIST."
+
+#~ msgid "4:2:0"
+#~ msgstr "4:2:0"
+
+#~ msgid "4:2:2"
+#~ msgstr "4:2:2"
+
+#~ msgid "4:4:4"
+#~ msgstr "4:4:4"
+
+#~ msgid "Rate control method"
+#~ msgstr "Méthode de contrôle du débit"
+
+#~ msgid "Method used to encode the video sequence"
+#~ msgstr "Méthode à utiliser pour encoder la séquence vidéo"
+
+#~ msgid "Constant noise threshold mode"
+#~ msgstr "Forcer un encodage à seuil de bruit constant"
+
+#~ msgid "Constant bitrate mode (CBR)"
+#~ msgstr "Forcer un encodage à débit constant (CBR)"
+
+#~ msgid "Low Delay mode"
+#~ msgstr "Forcer un encodage en mode faible retard"
+
+#~ msgid "Lossless mode"
+#~ msgstr "Forcer un encodage sans perte"
+
+#~ msgid "Constant lambda mode"
+#~ msgstr "Constante mode lambda"
+
+#~ msgid "Constant error mode"
+#~ msgstr "Forcer un encodage en mode d’erreur constante"
+
+#~ msgid "Constant quality mode"
+#~ msgstr "Forcer un encodage à facteur de qualité constant"
+
+#~ msgid "GOP structure"
+#~ msgstr "Structure GOP"
+
+#~ msgid "GOP structure used to encode the video sequence"
+#~ msgstr "Structure GOP utilisée pour encoder la séquence vidéo"
+
+#~ msgid ""
+#~ "No fixed gop structure. A picture can be intra or inter and refer to "
+#~ "previous or future pictures."
+#~ msgstr ""
+#~ "Pas de structure de GOP fixée. Une image peut être intra ou inter et se "
+#~ "référer aux images précédentes ou futures."
+
+#~ msgid "I-frame only sequence"
+#~ msgstr "Séquence images-I uniquement"
+
+#~ msgid "Inter pictures refere to previous pictures only"
+#~ msgstr "Interimages vers les images précédentes seulement"
+
+#~ msgid "Inter pictures can refer to previous or future pictures"
+#~ msgstr "Interimages possible vers les précédentes et futures images"
+
+#~ msgid "Constant quality factor"
+#~ msgstr "Facteur de qualité constant"
+
+#~ msgid "Quality factor to use in constant quality mode"
+#~ msgstr "Facteur de qualité à utiliser en mode qualité constante"
+
+#~ msgid "Noise Threshold"
+#~ msgstr "Seuil de bruit"
+
+#~ msgid "Noise threshold to use in constant noise threshold mode"
+#~ msgstr "Seuil de bruit à utiliser en mode seul de bruit constant"
+
+#~ msgid "CBR bitrate (kbps)"
+#~ msgstr "Encodage à débit constant (kbit/s)"
+
+#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
+#~ msgstr "Valeur cible en kbit/s pour l’encodage à débit constant"
+
+#~ msgid "Maximum bitrate (kbps)"
+#~ msgstr "Débit maximum (kbit/s)"
+
+#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
+#~ msgstr "Débit maximum en kbit/s pour l’encodage à débit constant"
+
+#~ msgid "Minimum bitrate (kbps)"
+#~ msgstr "Débit minimum (kbit/s)"
+
+#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
+#~ msgstr "Débit minimum en kbit/s pour l’encodage à débit constant"
+
+#~ msgid "GOP length"
+#~ msgstr "Longueur GOP"
+
+#~ msgid ""
+#~ "Number of pictures between successive sequence headers i.e. length of the "
+#~ "group of pictures"
+#~ msgstr ""
+#~ "Nombre d’images entre en-têtes successifs de séquence, c.-à-d. la "
+#~ "longueur du groupe d’images"
+
+#~ msgid "Prefilter"
+#~ msgstr "Préfiltre"
+
+#~ msgid "Enable adaptive prefiltering"
+#~ msgstr "Utilisation d’un préfiltre adaptatif"
+
+#~ msgid "No pre-filtering"
+#~ msgstr "Pas de préfiltre"
+
+#~ msgid "Centre Weighted Median"
+#~ msgstr "Moyenne pondérée au centre"
+
+#~ msgid "Gaussian Low Pass Filter"
+#~ msgstr "Filtre passe-bas gaussien"
+
+#~ msgid "Add Noise"
+#~ msgstr "Bruit"
+
+#~ msgid "Gaussian Adaptive Low Pass Filter"
+#~ msgstr "Filtre adaptatif passe-bas gaussien"
+
+#~ msgid "Low Pass Filter"
+#~ msgstr "Filtre passe-bas"
+
+#~ msgid "Amount of prefiltering"
+#~ msgstr "Importance du préfiltrage"
+
+#~ msgid "Higher value implies more prefiltering"
+#~ msgstr "Une valeur plus élevée implique plus de préfiltrage"
+
+#~ msgid "Picture coding mode"
+#~ msgstr "Réglage de mode d’image"
+
+#~ msgid ""
+#~ "Field coding is where interlaced fields are coded separately as opposed "
+#~ "to a pseudo-progressive frame"
+#~ msgstr ""
+#~ "Le codage par trame consiste à encoder séparément les trames entrelacées "
+#~ "au contraire d’une image pseudo-progressive"
+
+#~ msgid "auto - let encoder decide based upon input (Best)"
+#~ msgstr "auto - laisser l’encodeur décider suivant l’entrée (Recommandé)"
+
+#~ msgid "force coding frame as single picture"
+#~ msgstr "forcer l’encodage d’une trame en image unique"
+
+#~ msgid "force coding frame as separate interlaced fields"
+#~ msgstr "forcer l’encodage d’une trame en champs entrelacés séparés"
+
+#~ msgid "Size of motion compensation blocks"
+#~ msgstr "Taille des blocs de compensation de mouvement"
+
+#~ msgid "automatic - let encoder decide based upon input (Best)"
+#~ msgstr ""
+#~ "automatique - laisser l’encodeur décider suivant l’entrée (Recommandé)"
+
+#~ msgid "small - use small motion compensation blocks"
+#~ msgstr "petit - Utilise des petits blocs de compensation de mouvement"
+
+#~ msgid "medium - use medium motion compensation blocks"
+#~ msgstr "moyen - Utilise des blocs moyens de compensation de mouvement"
+
+#~ msgid "large - use large motion compensation blocks"
+#~ msgstr "petit - Utilise des blocs larges de compensation de mouvement"
+
+#~ msgid "Overlap of motion compensation blocks"
+#~ msgstr "Recouvrement des blocs de compensation de mouvement"
+
+#~ msgid "none - Motion compensation blocks do not overlap"
+#~ msgstr "aucun - Les blocs de compensation de mouvement ne se recouvrent pas"
+
+#~ msgid "partial - Motion compensation blocks only partially overlap"
+#~ msgstr ""
+#~ "partiel - Les blocs de compensation de mouvement se recouvrent "
+#~ "partiellement"
+
+#~ msgid "full - Motion compensation blocks fully overlap"
+#~ msgstr ""
+#~ "complet - Les blocs de compensation de mouvement se recouvrent "
+#~ "complètement"
+
+#~ msgid "Motion Vector precision"
+#~ msgstr "Précision du vecteur de mouvement"
+
+#~ msgid "Motion Vector precision in pels"
+#~ msgstr "Précision du vecteur de mouvement en pixels."
+
+#~ msgid "Three component motion estimation"
+#~ msgstr "Estimation de mouvement à trois composantes"
+
+#~ msgid "Use chroma as part of the motion estimation process"
+#~ msgstr "Chrominance utilisée dans l’estimation de mouvement"
+
+#~ msgid "Intra picture DWT filter"
+#~ msgstr "Filtres DWT intra image"
+
+#~ msgid "Inter picture DWT filter"
+#~ msgstr "Filtres DWT inter image"
+
+#~ msgid "Number of DWT iterations"
+#~ msgstr "Nombre d’itérations DWT"
+
+#~ msgid "Also known as DWT levels"
+#~ msgstr "Autre nom : niveaux DWT (discrete wavelet transform)"
+
+#~ msgid "Enable multiple quantizers"
+#~ msgstr "Autoriser des quantificateurs multiples"
+
+#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
+#~ msgstr ""
+#~ "Activer plusieurs quantificateurs par sous-bande (un par bloc de code)"
+
+#~ msgid "Disable arithmetic coding"
+#~ msgstr "Désactiver le codage arithmétique"
+
+#~ msgid "Use variable length codes instead, useful for very high bitrates"
+#~ msgstr ""
+#~ "Utiliser plutôt des codes à longueur variable, utile aux très haut débits"
+
+#~ msgid "perceptual weighting method"
+#~ msgstr "Méthode de pondération perceptive"
+
+#~ msgid "perceptual distance"
+#~ msgstr "Différence de perception"
+
+#~ msgid "perceptual distance to calculate perceptual weight"
+#~ msgstr "distance perceptuelle pour calculer la pondération perceptuelle"
+
+#~ msgid "Horizontal slices per frame"
+#~ msgstr "Sections horizontales par trame"
+
+#~ msgid "Number of horizontal slices per frame in low delay mode"
+#~ msgstr "Nombre de tranches horizontales par image en mode de délai court"
+
+#~ msgid "Vertical slices per frame"
+#~ msgstr "Sections verticales  par trame"
+
+#~ msgid "Number of vertical slices per frame in low delay mode"
+#~ msgstr "Nombre de tranches verticales par image en mode de délai court"
+
+#~ msgid "Size of code blocks in each subband"
+#~ msgstr "Taille des blocs de code dans chaque sous-bande"
+
+#~ msgid "small - use small code blocks"
+#~ msgstr "petit - Utilise des petits blocs de code"
+
+#~ msgid "medium - use medium sized code blocks"
+#~ msgstr "moyen - Utilise des blocs de code moyens"
+
+#~ msgid "large - use large code blocks"
+#~ msgstr "petit - Utilise des blocs de codes larges"
+
+#~ msgid "full - One code block per subband"
+#~ msgstr "complet - Un bloc de code par sous-bande"
+
+#~ msgid "Enable hierarchical Motion Estimation"
+#~ msgstr "Activer les algorithmes d’estimation de mouvement hiérarchique."
+
+#~ msgid "Number of levels of downsampling"
+#~ msgstr "Nombre de niveaux de sous-échantillonnage"
+
+#~ msgid ""
+#~ "Number of levels of downsampling in hierarchical motion estimation mode"
+#~ msgstr ""
+#~ "Nombre de niveaux de sous-échantillonnage en mode d’estimation de "
+#~ "mouvement hiérarchique"
+
+#~ msgid "Enable Global Motion Estimation"
+#~ msgstr "Activer les algorithmes d’estimation de mouvement global"
+
+#~ msgid "Enable Phase Correlation Estimation"
+#~ msgstr "Activer les algorithmes d’estimation de corrélation de phase"
+
+#~ msgid "Enable Scene Change Detection"
+#~ msgstr "Activer la détection de changement de scène"
+
+#~ msgid "Force Profile"
+#~ msgstr "Profil"
+
+#~ msgid "VC2 Low Delay Profile"
+#~ msgstr "Profil VC2 bas délai"
+
+#~ msgid "VC2 Simple Profile"
+#~ msgstr "Profil simple VC2"
+
+#~ msgid "VC2 Main Profile"
+#~ msgstr "Profil principal VC2"
+
+#~ msgid "Main Profile"
+#~ msgstr "Profil principal"
+
+#~ msgid "Dirac video decoder using libschroedinger"
+#~ msgstr "Décodeur vidéo Dirac (utilisant libschroedinger)"
+
+#~ msgid "Dirac video encoder using libschroedinger"
+#~ msgstr "Encodeur vidéo Dirac utilisant la bibliothèque libschroedinger"
+
+#~ msgid "Key: "
+#~ msgstr "Touche : "
