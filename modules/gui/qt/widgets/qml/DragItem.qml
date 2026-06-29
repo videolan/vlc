@@ -136,8 +136,6 @@ Item {
     // Implementation
     //---------------------------------------------------------------------------------------------
 
-    parent: T.Overlay.overlay
-
     visible: false
 
     Drag.dragType: Drag.None
