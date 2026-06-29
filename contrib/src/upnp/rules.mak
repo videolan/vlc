@@ -1,5 +1,5 @@
 # UPNP
-UPNP_VERSION := 1.14.20
+UPNP_VERSION := 1.14.31
 UPNP_URL := $(GITHUB)/pupnp/pupnp/archive/refs/tags/release-$(UPNP_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
@@ -43,8 +43,6 @@ ifdef HAVE_IOS
 	$(APPLY) $(SRC)/upnp/fix-reuseaddr-option.patch
 endif
 	$(APPLY) $(SRC)/upnp/0001-Don-t-assume-strndup-to-be-missing-on-Windows.patch
-	$(APPLY) $(SRC)/upnp/0006-uri.c-Dominik-Blain-s-fix-for-vulnerability.patch
-	$(APPLY) $(SRC)/upnp/0007-cmake-add-missing-file-in-Windows-compilation.patch
 	$(MOVE)
 
 .upnp: upnp toolchain.cmake
