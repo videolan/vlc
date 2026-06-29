@@ -1,13 +1,15 @@
 # sqlite
 
-SQLITE_VERSION := 3460100
-SQLITE_URL := https://www.sqlite.org/2024/sqlite-autoconf-$(SQLITE_VERSION).tar.gz
+SQLITE_VERSION := 3530300
+SQLITE_URL := https://www.sqlite.org/2026/sqlite-autoconf-$(SQLITE_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"sqlite3 >= 3.33.0"),)
 PKGS_FOUND += sqlite
 endif
 
-SQLITE_CONF = --disable-readline
+SQLITE_CONF = --prefix="$(PREFIX)" --build="$(BUILD)" --host="$(HOST)" \
+	--disable-shared --disable-rpath \
+	--disable-readline
 
 ifdef HAVE_WINSTORE
 SQLITE_CONF += CFLAGS="$(CFLAGS) -DSQLITE_OS_WINRT=1"
@@ -20,13 +22,12 @@ $(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
 
 sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 	$(UNPACK)
-	$(call update_autoconfig,.)
 	$(call pkg_static, "sqlite3.pc.in")
 	$(MOVE)
 
 .sqlite: sqlite
 	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(SQLITE_CONF)
+	$(MAKECONFDIR)/configure $(SQLITE_CONF)
 	+$(MAKEBUILD) bin_PROGRAMS=
 	+$(MAKEBUILD) bin_PROGRAMS= install
 	touch $@
