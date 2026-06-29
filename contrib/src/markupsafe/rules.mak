@@ -1,4 +1,4 @@
-MARKUPSAFE_VERSION := 2.1.1
+MARKUPSAFE_VERSION := 2.1.5
 MARKUPSAFE_URL := $(GITHUB)/pallets/markupsafe/archive/refs/tags/$(MARKUPSAFE_VERSION).tar.gz
 
 $(TARBALLS)/markupsafe-$(MARKUPSAFE_VERSION).tar.gz:
