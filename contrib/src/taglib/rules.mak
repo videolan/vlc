@@ -1,6 +1,6 @@
 # TagLib
 
-TAGLIB_VERSION := 2.1
+TAGLIB_VERSION := 2.3
 TAGLIB_URL := $(GITHUB)/taglib/taglib/releases/download/v$(TAGLIB_VERSION)/taglib-$(TAGLIB_VERSION).tar.gz
 
 UTFCPP_VERSION := 3.2.5
@@ -24,7 +24,6 @@ $(TARBALLS)/utfcpp-$(UTFCPP_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(UNPACK)
-	$(APPLY) $(SRC)/taglib/0001-Fix-std-ostream-not-defined-on-Android-NDK-29.0.1403.patch
 	$(MOVE)
 
 taglib/3rdparty/utfcpp: utfcpp-$(UTFCPP_VERSION).tar.gz .sum-utfcpp taglib
