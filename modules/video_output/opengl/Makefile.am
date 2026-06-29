@@ -178,6 +178,7 @@ endif
 libopengl_win_offscreen_plugin_la_SOURCES = video_filter/opengl_win_offscreen.c
 if HAVE_WIN32
 if HAVE_GL
+libopengl_win_offscreen_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS) $(GL_CFLAGS)
 libopengl_win_offscreen_plugin_la_LIBADD = libvlc_opengl.la $(GL_LIBS) -lgdi32
 vout_PLUGINS += libopengl_win_offscreen_plugin.la
 endif

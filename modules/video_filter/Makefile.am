@@ -151,7 +151,7 @@ endif
 
 libopengl_filter_plugin_la_SOURCES = video_filter/opengl.c
 libopengl_filter_plugin_la_LIBADD = $(GL_PLUGIN_LIBADD)
-libopengl_filter_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_PLUGIN_CFLAGS)
+libopengl_filter_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_PLUGIN_CFLAGS) $(OPENGL_COMMONCFLAGS)
 if HAVE_GL_OR_GLES2
 video_filter_PLUGINS += libopengl_filter_plugin.la
 endif
