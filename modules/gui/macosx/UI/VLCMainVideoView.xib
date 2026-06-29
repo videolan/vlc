@@ -98,17 +98,16 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx">
                                 <rect key="frame" x="0.0" y="0.0" width="749" height="132"/>
                                 <subviews>
-                                    <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f4v-2z-dQ1" customClass="VLCTimeField">
+                                    <button wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f4v-2z-dQ1" customClass="VLCTimeField">
                                         <rect key="frame" x="652" y="20" width="79" height="14"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="75" id="8Zz-X6-yY1"/>
                                         </constraints>
-                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" placeholderString="0:00" id="FlV-4J-8Jc">
+                                        <buttonCell key="cell" type="push" title="0:00" bezelStyle="regularSquare" imagePosition="overlaps" alignment="right" controlSize="small" borderStyle="border" inset="2" id="FlV-4J-8Jc">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
+                                        </buttonCell>
+                                    </button>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="San-L7-ZvB">
                                         <rect key="frame" x="20" y="59" width="167" height="53"/>
                                         <subviews>
@@ -330,17 +329,16 @@
                                             <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
                                     </stackView>
-                                    <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3ri-8b-8mw" customClass="VLCTimeField">
+                                    <button wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3ri-8b-8mw" customClass="VLCTimeField">
                                         <rect key="frame" x="18" y="20" width="79" height="14"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="75" id="S9v-aM-nfL"/>
                                         </constraints>
-                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" placeholderString="0:00" usesSingleLineMode="YES" id="0ya-Dd-ecT">
+                                        <buttonCell key="cell" type="push" title="0:00" bezelStyle="regularSquare" imagePosition="overlaps" alignment="left" controlSize="small" borderStyle="border" inset="2" id="0ya-Dd-ecT">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
+                                        </buttonCell>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="f4v-2z-dQ1" firstAttribute="trailing" secondItem="qNZ-Fh-W8i" secondAttribute="trailing" id="0DA-7x-5iR"/>

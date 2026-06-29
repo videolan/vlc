@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCTimeField.m: NSTextField subclass for playback time fields
+ * VLCTimeField.m: NSButton subclass for playback time fields
  *****************************************************************************
  * Copyright (C) 2003-2017 VLC authors and VideoLAN
  *
@@ -7,6 +7,7 @@
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *          Marvin Scholz <epirat07 at gmail dot com>
  *          Claudio Cambra <developer at claudiocambra dot com>
+ *          Serhii Bykov <esphynox@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +36,8 @@ NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaini
 {
     NSString *_cachedTime;
     NSString *_remainingTime;
+    NSFont *_titleFont;
+    NSColor *_titleColor;
 }
 @end
 
@@ -44,6 +47,51 @@ NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaini
 {
     NSDictionary * const appDefaults = @{VLCTimeFieldDisplayTimeAsRemaining : @NO};
     [NSUserDefaults.standardUserDefaults registerDefaults:appDefaults];
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (void)setup
+{
+    NSDictionary<NSAttributedStringKey, id> * const initialAttributes =
+        self.attributedTitle.length > 0 ? [self.attributedTitle attributesAtIndex:0 effectiveRange:nil] : nil;
+    _titleFont = initialAttributes[NSFontAttributeName] ?: self.cell.font;
+    _titleColor = initialAttributes[NSForegroundColorAttributeName] ?: NSColor.labelColor;
+
+    self.bordered = NO;
+    [self setButtonType:NSButtonTypeMomentaryChange];
+    self.bezelStyle = NSBezelStyleRegularSquare;
+    self.focusRingType = NSFocusRingTypeNone;
+    self.imagePosition = NSNoImage;
+    self.cell.lineBreakMode = NSLineBreakByClipping;
+    self.title = @"";
+    [self updateDisplayedTitle];
+}
+
+- (BOOL)acceptsFirstMouse:(NSEvent *)event
+{
+    return YES;
+}
+
+- (BOOL)mouseDownCanMoveWindow
+{
+    return NO;
 }
 
 - (void)setPreferencesIdentifier:(NSString *)preferencesIdentifier
@@ -62,19 +110,27 @@ NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaini
                                               forKey:self.preferencesIdentifier];
     }
 
-    [self updateTimeValue];
+    [self updateDisplayedTitle];
 }
 
-- (void)mouseDown:(NSEvent *)ourEvent
+- (NSTextAlignment)alignment
 {
-    if (ourEvent.clickCount > 1) {
+    return self.cell.alignment;
+}
+
+- (void)setAlignment:(NSTextAlignment)alignment
+{
+    self.cell.alignment = alignment;
+    [self updateDisplayedTitle];
+}
+
+- (void)mouseDown:(NSEvent *)event
+{
+    if (event.clickCount > 1) {
         [VLCMain.sharedInstance.mainMenu goToSpecificTime:nil];
     } else {
         self.isTimeRemaining = !self.isTimeRemaining;
     }
-
-    [self updateTimeValue];
-    [self.nextResponder mouseDown:ourEvent];
 }
 
 - (void)setTime:(NSString *)time withRemainingTime:(NSString *)remainingTime
@@ -82,28 +138,26 @@ NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaini
     _cachedTime = time;
     _remainingTime = remainingTime;
 
-    [self updateTimeValue];
+    [self updateDisplayedTitle];
 }
 
-- (void)updateTimeValue
+- (void)updateDisplayedTitle
 {
-    if (!_cachedTime || !_remainingTime) {
-        return;
-    }
+    NSString * const title =
+        self.timeRemaining ? (_remainingTime ?: @"") : (_cachedTime ?: @"");
 
-    if (self.timeRemaining) {
-        self.stringValue = _remainingTime;
-    } else {
-        self.stringValue = _cachedTime;
-    }
-}
+    NSMutableParagraphStyle * const paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.alignment = self.alignment;
+    paragraphStyle.lineBreakMode = NSLineBreakByClipping;
 
-- (void)setStringValue:(NSString *)stringValue
-{
-    [super setStringValue:stringValue];
+    NSDictionary<NSAttributedStringKey, id> * const attributes = @{
+        NSFontAttributeName : _titleFont ?: [NSFont systemFontOfSize:NSFont.smallSystemFontSize],
+        NSForegroundColorAttributeName : _titleColor ?: NSColor.labelColor,
+        NSParagraphStyleAttributeName : paragraphStyle
+    };
 
-    _cachedTime = nil;
-    _remainingTime = nil;
+    self.attributedTitle = [[NSAttributedString alloc] initWithString:title
+                                                           attributes:attributes];
 }
 
 - (BOOL)timeRemaining

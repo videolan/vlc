@@ -152,17 +152,16 @@
                                                     <real value="3.4028234663852886e+38"/>
                                                 </customSpacing>
                                             </stackView>
-                                            <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zOB-QJ-TUy" customClass="VLCTimeField">
+                                            <button wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zOB-QJ-TUy" customClass="VLCTimeField">
                                                 <rect key="frame" x="42" y="3" width="44" height="11"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="40" id="Rox-Cf-MSz"/>
                                                 </constraints>
-                                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="00:00" id="q8L-S3-Ylc">
+                                                <buttonCell key="cell" type="push" title="00:00" bezelStyle="regularSquare" imagePosition="overlaps" alignment="right" borderStyle="border" inset="2" id="q8L-S3-Ylc">
                                                     <font key="font" metaFont="miniSystem"/>
                                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                </textFieldCell>
-                                            </textField>
+                                                </buttonCell>
+                                            </button>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="SM6-nx-NKD" customClass="VLCTrackingView">
                                                 <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
                                                 <subviews>
@@ -228,17 +227,16 @@
                                                     <action selector="timeSliderAction:" target="Uzf-Tf-H8x" id="eDh-39-Ej1"/>
                                                 </connections>
                                             </slider>
-                                            <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
+                                            <button wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
                                                 <rect key="frame" x="326" y="3" width="52" height="11"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="48" id="mAg-xF-yHo"/>
                                                 </constraints>
-                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="left" title="-00:00" id="adD-oG-KsD">
+                                                <buttonCell key="cell" type="push" title="-00:00" bezelStyle="regularSquare" imagePosition="overlaps" alignment="left" borderStyle="border" inset="2" id="adD-oG-KsD">
                                                     <font key="font" metaFont="miniSystem"/>
                                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                </textFieldCell>
-                                            </textField>
+                                                </buttonCell>
+                                            </button>
                                         </subviews>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="oGd-mG-cFw" secondAttribute="trailing" id="25y-hg-Obr"/>

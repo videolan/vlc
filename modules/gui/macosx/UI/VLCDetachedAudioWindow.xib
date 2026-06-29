@@ -151,7 +151,7 @@
                                                     <action selector="timeSliderAction:" target="3" id="46"/>
                                                 </connections>
                                             </slider>
-                                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
+                                            <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
                                                 <rect key="frame" x="446" y="34" width="46" height="13"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="42" id="EvZ-Sy-m25"/>
@@ -160,12 +160,11 @@
                                                 <shadow key="shadow" blurRadius="1">
                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </shadow>
-                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="center" title="00:00" id="16">
+                                                <buttonCell key="cell" type="push" title="00:00" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" inset="2" id="16">
                                                     <font key="font" metaFont="systemBold" size="10"/>
                                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                </textFieldCell>
-                                            </textField>
+                                                </buttonCell>
+                                            </button>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xR4-jH-evo">
                                                 <rect key="frame" x="373" y="10" width="117" height="32"/>
                                                 <subviews>

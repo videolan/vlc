@@ -37,28 +37,26 @@
                 <rect key="frame" x="0.0" y="0.0" width="483" height="84"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nJc-M4-sMF" customClass="VLCTimeField">
+                    <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nJc-M4-sMF" customClass="VLCTimeField">
                         <rect key="frame" x="18" y="61" width="79" height="14"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="75" id="IGO-bJ-xu2"/>
                         </constraints>
-                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="0:00" id="ebb-BZ-1l4">
+                        <buttonCell key="cell" type="push" title="0:00" bezelStyle="regularSquare" imagePosition="overlaps" alignment="left" controlSize="small" borderStyle="border" inset="2" id="ebb-BZ-1l4">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="T3x-es-c7v" customClass="VLCTimeField">
+                        </buttonCell>
+                    </button>
+                    <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="T3x-es-c7v" customClass="VLCTimeField">
                         <rect key="frame" x="386" y="61" width="79" height="14"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="75" id="m9r-7l-uQt"/>
                         </constraints>
-                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" placeholderString="∞" id="PYh-Xz-irE">
+                        <buttonCell key="cell" type="push" title="∞" bezelStyle="regularSquare" imagePosition="overlaps" alignment="right" controlSize="small" borderStyle="border" inset="2" id="PYh-Xz-irE">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
+                        </buttonCell>
+                    </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Vd8-0f-Usz">
                         <rect key="frame" x="98" y="61" width="287" height="14"/>
                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" placeholderString="Nothing Playing" usesSingleLineMode="YES" id="uA0-hc-yIU">

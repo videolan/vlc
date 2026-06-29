@@ -221,17 +221,16 @@
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="r0b-Xe-LxM">
                                                 <rect key="frame" x="268" y="12" width="468" height="14"/>
                                                 <subviews>
-                                                    <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="6Bn-cR-4m1" customClass="VLCTimeField">
+                                                    <button wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="6Bn-cR-4m1" customClass="VLCTimeField">
                                                         <rect key="frame" x="-2" y="0.0" width="79" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="75" id="bmu-4m-sw8"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" placeholderString="0:00" id="nPG-7X-HEG">
+                                                        <buttonCell key="cell" type="push" title="0:00" bezelStyle="regularSquare" imagePosition="overlaps" alignment="right" controlSize="small" borderStyle="border" inset="2" id="nPG-7X-HEG">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
+                                                        </buttonCell>
+                                                    </button>
                                                     <slider verticalHuggingPriority="1000" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="YQG-rd-w0w" customClass="VLCPlaybackProgressSlider">
                                                         <rect key="frame" x="83" y="0.0" width="302" height="14"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="hmW-vO-cJs" customClass="VLCPlaybackProgressSliderCell"/>
@@ -239,17 +238,16 @@
                                                             <action selector="timeSliderAction:" target="3" id="G20-RN-DbG"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="3SA-Ee-NRs" customClass="VLCTimeField">
+                                                    <button wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="3SA-Ee-NRs" customClass="VLCTimeField">
                                                         <rect key="frame" x="391" y="0.0" width="79" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="75" id="gtl-d1-bUT"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" placeholderString="0:00" usesSingleLineMode="YES" id="8WT-Uq-1VQ">
+                                                        <buttonCell key="cell" type="push" title="0:00" bezelStyle="regularSquare" imagePosition="overlaps" alignment="left" controlSize="small" borderStyle="border" inset="2" id="8WT-Uq-1VQ">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
+                                                        </buttonCell>
+                                                    </button>
                                                 </subviews>
                                                 <visibilityPriorities>
                                                     <integer value="1000"/>
