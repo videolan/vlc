@@ -1,4 +1,4 @@
-VULKAN_LOADER_VERSION := 1.3.275
+VULKAN_LOADER_VERSION := 1.4.355
 VULKAN_LOADER_URL := $(GITHUB)/KhronosGroup/Vulkan-Loader/archive/v$(VULKAN_LOADER_VERSION).tar.gz
 
 DEPS_vulkan-loader = vulkan-headers $(DEPS_vulkan-headers)
