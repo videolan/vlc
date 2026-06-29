@@ -1,4 +1,4 @@
-JINJA_VERSION := 3.1.2
+JINJA_VERSION := 3.1.6
 JINJA_URL := $(GITHUB)/pallets/jinja/archive/refs/tags/$(JINJA_VERSION).tar.gz
 
 DEPS_jinja = markupsafe $(DEPS_markupsafe)
