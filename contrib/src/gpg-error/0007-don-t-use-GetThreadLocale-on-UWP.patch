@@ -1,29 +1,27 @@
-From bed81fbf76b81b6468a8e04cd07155f8358773ab Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:19:07 +0200
-Subject: [PATCH 07/14] don't use GetThreadLocale on UWP
+Subject: [PATCH] don't use GetThreadLocale on UWP
 
 ---
  src/w32-gettext.c | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/src/w32-gettext.c b/src/w32-gettext.c
-index bf085cd..3186458 100644
+index 8dd4a85..cf95b7d 100644
 --- a/src/w32-gettext.c
 +++ b/src/w32-gettext.c
-@@ -648,8 +648,12 @@ my_nl_locale_name (const char *categoryname)
+@@ -650,9 +650,13 @@
        if (retval != NULL && retval[0] != '\0')
          return retval;
  
 +#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
 +      lcid = LOCALE_CUSTOM_DEFAULT;
 +#else
-       /* Use native Win32 API locale ID.  */
-       lcid = GetThreadLocale ();
+       /* Use native Win32 API language ID or use GetThreadLocale on XP  */
+       lcid = get_thread_ui_language? get_thread_ui_language ()
+                                    : GetThreadLocale ();
 +#endif
+ 
        /* Strip off the sorting rules, keep only the language part.  */
        langid = LANGIDFROMLCID (lcid);
-     }
--- 
-2.45.1.windows.1
-
