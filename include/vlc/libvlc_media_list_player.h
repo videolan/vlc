@@ -77,9 +77,9 @@ LIBVLC_API libvlc_media_list_player_t *
 
 /**
  * Release a media_list_player after use
- * Decrement the reference count of a media player object. If the
+ * Decrement the reference count of a media list player object. If the
  * reference count is 0, then libvlc_media_list_player_release() will
- * release the media player object. If the media player object
+ * release the media list player object. If the media list player object
  * has been released, then it should not be used again.
  *
  * \param p_mlp media list player instance

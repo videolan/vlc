@@ -192,7 +192,7 @@ libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
                                 void *cbs_opaque );
 
 /**
- * Release a renderer discoverer object
+ * Destroy a renderer discoverer object
  *
  * \version LibVLC 4.0.0 or later
  *

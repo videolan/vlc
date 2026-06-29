@@ -506,7 +506,7 @@ struct libvlc_media_player_cbs
 
 
     /**
-     * Callback protootype that notify when the player added new attachments to
+     * Callback prototype that notify when the player added new attachments to
      * the current media.
      *
      * \note It can be called several times for one playback. The array
@@ -556,7 +556,7 @@ struct libvlc_media_player_cbs
      * available since version 0
      *
      * \param opaque opaque pointer set by libvlc_media_player_new()
-     * \param new_volume volume in the range [0;2.f]
+     * \param volume volume in the range [0;2.f]
      */
     void (*on_audio_volume_changed)( void *opaque, float volume );
 
@@ -711,7 +711,7 @@ LIBVLC_API bool libvlc_media_player_is_playing(libvlc_media_player_t *p_mi);
  * Play
  *
  * \param p_mi the Media Player
- * \return 0 if playback started (and was already started), or -1 on error.
+ * \return 0 if playback started (or was already started), or -1 on error.
  */
 LIBVLC_API int libvlc_media_player_play ( libvlc_media_player_t *p_mi );
 
@@ -2070,7 +2070,7 @@ LIBVLC_API libvlc_media_track_t *
 libvlc_media_player_get_selected_track( libvlc_media_player_t *p_mi,
                                         libvlc_track_type_t type );
 
-/*
+/**
  * Get a track from a track id
  *
  * \version LibVLC 4.0.0 and later.

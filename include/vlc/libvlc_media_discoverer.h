@@ -133,7 +133,7 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst,
  * Start media discovery.
  *
  * To stop it, call libvlc_media_discoverer_stop() or
- * libvlc_media_discoverer_list_release() directly.
+ * libvlc_media_discoverer_destroy() directly.
  *
  * \see libvlc_media_discoverer_stop
  *
@@ -156,8 +156,8 @@ LIBVLC_API void
 libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis );
 
 /**
- * Release media discover object. If the reference count reaches 0, then
- * the object will be released.
+ * Destroy a media discoverer object. If the discovery is running, it will be
+ * stopped first.
  *
  * \param p_mdis media service discover object
  * \version LibVLC 4.0.0 or later

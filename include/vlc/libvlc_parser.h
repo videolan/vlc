@@ -332,7 +332,7 @@ struct libvlc_thumbnailer_request_t
          */
         libvlc_thumbnailer_seek_value_t value;
 
-        /** precise or fast mode (libvlc_thumbnailer_seek_fast by default) */
+        /** precise or fast mode (libvlc_media_thumbnail_seek_precise by default) */
         libvlc_thumbnailer_seek_speed_t speed;
     } seek;
 
