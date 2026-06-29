@@ -24,6 +24,7 @@
 
 #include "../xml_wrapper.hpp"
 
+#include <cstdint>
 #include <optional>
 #include <string>
 
