@@ -4327,7 +4327,7 @@ AS_IF([test "${enable_qt}" != "no"], [
     QT_PATHS="${QMAKE6} -qtconf ${with_qtconf}"
   ])
 
-  QT_MINIMUM_VERSION=6.2
+  QT_MINIMUM_VERSION=6.8
   AC_MSG_CHECKING([Qt is at least ${QT_MINIMUM_VERSION}])
   QT_VERSION_CORE="$(${QT_PATHS}          -query QT_VERSION 2>/dev/null)"
   QT_MINIMUM_MAJ=$(echo ${QT_MINIMUM_VERSION} | cut -d "." -f -1)

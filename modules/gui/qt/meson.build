@@ -12,8 +12,7 @@ qt_cppargs = []
 qt_link_args = [gc_sections_linkargs]
 
 qt6_dep = dependency('qt6',
-    # Note that Qt < 6.2.5 does not provide pc files!
-    version: '>=6.2',
+    version: '>=6.8',
     modules: [
         'Core', 'Gui', 'Widgets', 'Qml',
         'Quick', 'QuickControls2'
