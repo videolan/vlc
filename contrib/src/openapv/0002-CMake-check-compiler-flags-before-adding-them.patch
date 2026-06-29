@@ -1,0 +1,130 @@
+From 33243bab9848c6a06d12696bc34a0254d52a4db2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 14 Jan 2026 13:41:39 +0100
+Subject: [PATCH] CMake: check compiler flags before adding them
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ CMakeLists.txt        | 22 +++++++++++++++++++---
+ src/CMakeLists.txt    | 34 ++++++++++++++++++++++++++++++----
+ src/avx/oapv_tq_avx.c |  5 +++++
+ 3 files changed, 54 insertions(+), 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4df8794..a6bcf2e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -102,6 +102,8 @@ endif()
+ # Compilation flags
+ ########################################
+ 
++include(CheckCCompilerFlag)
++
+ # Set compiler flags and options.
+ if(MSVC)
+   message("Not supported yet!")
+@@ -122,8 +124,22 @@ elseif(UNIX OR MINGW)
+         set(OPT_DBG "-DNDEBUG") # disable assert
+     endif()
+ 
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPT_DBG} -${OPT_LV} -fomit-frame-pointer -pthread -std=c99")
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused-function")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPT_DBG} -${OPT_LV}")
++    check_c_compiler_flag("-fomit-frame-pointer" HAS_FLAG_OMIT_FRAME_POINTER)
++    if(HAS_FLAG_OMIT_FRAME_POINTER)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fomit-frame-pointer")
++    endif()
++    check_c_compiler_flag("-Wall" HAS_FLAG_WARNING_ALL)
++    if(HAS_FLAG_WARNING_ALL)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
++    endif()
++    check_c_compiler_flag("-Wno-unused-function" HAS_FLAG_NO_UNUSED_FUNCTION)
++    if(HAS_FLAG_NO_UNUSED_FUNCTION)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-function")
++    endif()
++    if(NOT WIN32)
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
++    endif()
+     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lm")
+ 
+     if(ENABLE_COVERAGE)
+@@ -143,6 +159,8 @@ endif()
+ ########################################
+ 
+ set(CMAKE_C_STANDARD 99)
++set(CMAKE_C_STANDARD_REQUIRED ON)
++set(CMAKE_C_EXTENSIONS OFF)
+ cmake_policy(SET CMP0048 NEW)
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+ 
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 708e898..8a143f8 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -14,6 +14,11 @@ file(GLOB LIB_AVX_INC "../src/avx/oapv_*.h" )
+ include(GenerateExportHeader)
+ include_directories("${CMAKE_BINARY_DIR}/include")
+ 
++include(CheckCCompilerFlag)
++check_c_compiler_flag("-flax-vector-conversions" HAS_ARM_VECTOR_CONVERSION)
++check_c_compiler_flag("-msse4.1" HAS_SSE41)
++check_c_compiler_flag("-mavx2" HAS_AVX2)
++
+ 
+ message("SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
+ 
+@@ -107,10 +112,34 @@ if(MSVC)
+   endif()
+ elseif(UNIX OR MINGW)
+   if (ARM)
+-    set_property(SOURCE ${NEON} APPEND PROPERTY COMPILE_FLAGS "-flax-vector-conversions")
+-elseif (X86 OR UNIVERSAL)
+-    set_property(SOURCE ${SSE} APPEND PROPERTY COMPILE_FLAGS "-msse4.1")
+-    set_property(SOURCE ${AVX} APPEND PROPERTY COMPILE_FLAGS " -mavx2")
++    if(HAS_ARM_VECTOR_CONVERSION)
++      set_property(SOURCE ${NEON} APPEND PROPERTY COMPILE_FLAGS "-flax-vector-conversions")
++    endif()
++  elseif (X86 OR UNIVERSAL)
++    if(HAS_SSE41)
++      set_property(SOURCE ${SSE} APPEND PROPERTY COMPILE_FLAGS "-msse4.1")
++    endif()
++    if(HAS_AVX2)
++      set_property(SOURCE ${AVX} APPEND PROPERTY COMPILE_FLAGS "-mavx2")
++      include(CheckCSourceCompiles)
++      include(CMakePushCheckState)
++
++      cmake_push_check_state(RESET)
++      set(CMAKE_REQUIRED_FLAGS "-mavx2")
++      check_c_source_compiles("
++      #include <immintrin.h>
++      int main(void)
++      {
++        __m128i a, b;
++        _mm256_setr_m128i(a, b);
++        return 0;
++      }
++      " HAVE_MM256_SETR)
++      cmake_pop_check_state()
++      if(HAVE_MM256_SETR)
++        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHAVE_MM256_SETR")
++      endif()
++    endif()
+   endif()
+ 
+   if(OAPV_BUILD_SHARED_LIB)
+diff --git a/src/avx/oapv_tq_avx.c b/src/avx/oapv_tq_avx.c
+index c3fdd50..3d0afb0 100644
+--- a/src/avx/oapv_tq_avx.c
++++ b/src/avx/oapv_tq_avx.c
+@@ -32,6 +32,11 @@
+ #include "oapv_def.h"
+ #include "oapv_tq_avx.h"
+ 
++#ifndef HAVE_MM256_SETR
++#define _mm256_set_m128i(v0, v1)  _mm256_insertf128_si256(_mm256_castsi128_si256(v1), (v0), 1)
++#define _mm256_setr_m128i(v0, v1) _mm256_set_m128i((v1), (v0))
++#endif
++
+ #if X86_SSE
+ #ifndef _mm256_set_m128i
+ #define _mm256_set_m128i(/* __m128i */ hi, /* __m128i */ lo) \
