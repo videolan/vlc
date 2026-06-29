@@ -1,6 +1,6 @@
 # SAMPLERATE
-SAMPLERATE_VERSION := 0.1.9
-SAMPLERATE_URL := $(GITHUB)/libsndfile/libsamplerate/releases/download/$(SAMPLERATE_VERSION)/libsamplerate-$(SAMPLERATE_VERSION).tar.gz
+SAMPLERATE_VERSION := 0.2.2
+SAMPLERATE_URL := $(GITHUB)/libsndfile/libsamplerate/releases/download/$(SAMPLERATE_VERSION)/libsamplerate-$(SAMPLERATE_VERSION).tar.xz
 
 ifdef GPL
 PKGS += samplerate
@@ -9,21 +9,21 @@ ifeq ($(call need_pkg,"samplerate"),)
 PKGS_FOUND += samplerate
 endif
 
-$(TARBALLS)/libsamplerate-$(SAMPLERATE_VERSION).tar.gz:
+$(TARBALLS)/libsamplerate-$(SAMPLERATE_VERSION).tar.xz:
 	$(call download_pkg,$(SAMPLERATE_URL),samplerate)
 
-.sum-samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz
+.sum-samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.xz
 
-samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
+samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.xz .sum-samplerate
 	$(UNPACK)
-	$(call update_autoconfig,Cfg)
+	$(call update_autoconfig,build-aux)
 	$(MOVE)
 
 .samplerate: samplerate
 	$(REQUIRE_GPL)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	+$(MAKEBUILD) -C src
-	+$(MAKEBUILD) -C src install
+	+$(MAKEBUILD)
+	+$(MAKEBUILD) install
 	+$(MAKEBUILD) install-data
 	touch $@
