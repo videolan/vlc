@@ -381,8 +381,7 @@ libqt_plugin_la_SOURCES = \
 	widgets/native/qvlcframe.cpp \
 	widgets/native/qvlcframe.hpp \
 	widgets/native/searchlineedit.cpp widgets/native/searchlineedit.hpp \
-	widgets/native/viewblockingrectangle.cpp widgets/native/viewblockingrectangle.hpp \
-	widgets/native/doubleclickignoringitem.hpp
+	widgets/native/viewblockingrectangle.cpp widgets/native/viewblockingrectangle.hpp
 
 # Meta-object compilation
 
@@ -684,7 +683,6 @@ nodist_libqt_wayland_plugin_la_SOURCES = \
 	maininterface/xdg-shell-client-protocol.h \
 	maininterface/xdg-shell-protocol.c
 
-if HAVE_QT65
 libqt_wayland_plugin_la_CFLAGS += -DQT_HAS_WAYLAND_FRACTIONAL_SCALING
 nodist_libqt_wayland_plugin_la_SOURCES += \
 	maininterface/viewporter-client-protocol.h \
@@ -698,7 +696,6 @@ maininterface/viewporter-protocol.c: \
 		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml \
 		maininterface/viewporter-client-protocol.h
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
-endif
 
 BUILT_SOURCES += $(nodist_libqt_wayland_plugin_la_SOURCES)
 
@@ -1638,9 +1635,7 @@ cachegen_verbose_ = $(cachegen_verbose__$(AM_DEFAULT_VERBOSITY))
 cachegen_verbose_0 = @echo " CACHEGEN " $@;
 cachegen_verbose__0 = $(cachegen_verbose_0)
 
-if HAVE_QT67
 QML_CACHEGEN_EXTRA_ARGS=--validate-basic-blocks
-endif
 
 # Each .qml/.js/.mjs is compiled with its module's res.qrc as prerequisite. The
 # per-module qrc isn't derivable from the target path, so pick it out of $^.

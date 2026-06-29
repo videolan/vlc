@@ -89,64 +89,48 @@ T.Control {
         root.anchors.horizontalCenter = undefined
     }
 
-    DoubleClickIgnoringItem {
-        anchors.fill: parent
+    TapHandler {
+        dragThreshold: dragHandler.dragThreshold
 
-        TapHandler {
-            gesturePolicy: TapHandler.WithinBounds
-
-            onDoubleTapped: (eventPoint, button) => {
-                // Docs are lying, there is no `deviceType`: QTBUG-135104
-                if (eventPoint.device.type !== PointerDevice.TouchScreen)
-                    MainCtx.playerView = true
-            }
-
-            onTapped: (eventPoint, button) => {
-                // Docs are lying, there is no `deviceType`: QTBUG-135104
-                if (eventPoint.device.type === PointerDevice.TouchScreen) {
-                    // Breaking the initial binding is intentional here:
-                    root.hideControls = !root.hideControls
-                } else {
-                    MainPlaylistController.togglePlayPause()
-                }
-            }
+        onDoubleTapped: (eventPoint, button) => {
+            // Docs are lying, there is no `deviceType`: QTBUG-135104
+            if (eventPoint.device.type !== PointerDevice.TouchScreen)
+                MainCtx.playerView = true
         }
 
-        DragHandler {
-            id: dragHandler
-
-            target: root
-
-            cursorShape: Qt.DragMoveCursor
-
-            dragThreshold: 0
-
-            grabPermissions: PointerHandler.CanTakeOverFromAnything
-
-            xAxis.minimum: root.dragXMin
-            xAxis.maximum: root.dragXMax
-            yAxis.minimum: root.dragYMin
-            yAxis.maximum: root.dragYMax
-        }
-
-        HoverHandler {
-            id: hoverHandler
-
-            grabPermissions: PointerHandler.CanTakeOverFromAnything
-            cursorShape: Qt.ArrowCursor
-
-            Component.onCompleted: {
-                if (typeof blocking === 'boolean')
-                    blocking = true // Qt 6.3 feature
+        onTapped: (eventPoint, button) => {
+            // Docs are lying, there is no `deviceType`: QTBUG-135104
+            if (eventPoint.device.type === PointerDevice.TouchScreen) {
+                // Breaking the initial binding is intentional here:
+                root.hideControls = !root.hideControls
+            } else {
+                MainPlaylistController.togglePlayPause()
             }
         }
+    }
+
+    DragHandler {
+        id: dragHandler
+
+        target: root
+
+        cursorShape: Qt.DragMoveCursor
+
+        dragThreshold: 0
+
+        grabPermissions: PointerHandler.CanTakeOverFromAnything
+
+        xAxis.minimum: root.dragXMin
+        xAxis.maximum: root.dragXMax
+        yAxis.minimum: root.dragYMin
+        yAxis.maximum: root.dragYMax
     }
 
     background: VideoSurface {
         id: videoSurface
         videoSurfaceProvider: MainCtx.videoSurfaceProvider
 
-        color: (hoverHandler.hovered ||
+        color: (hovered ||
                 playButton?.hovered ||
                 closeButton?.hovered ||
                 fullscreenButton?.hovered) ? "#10000000" : "transparent"
@@ -160,16 +144,10 @@ T.Control {
 
     contentItem: Item {
         visible: !root.hideControls &&
-                 (hoverHandler.hovered ||
+                 (videoSurface.hovered ||
                  playButton.hovered ||
                  closeButton.hovered ||
                  fullscreenButton.hovered)
-
-        // Raise the content item so that the handlers of the control do
-        // not handle events that are to be handled by the handlers/items
-        // of the content item. Raising the content item should be fine
-        // because content item is supposed to be the foreground item.
-        z: 1
 
         Widgets.IconButton {
             id: playButton

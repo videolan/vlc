@@ -22,8 +22,6 @@ TapHandler {
 
     acceptedDevices: PointerDevice.TouchScreen
 
-    grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
     property bool pendingContextMenu: false
 
     // - Delegate must have property `index`

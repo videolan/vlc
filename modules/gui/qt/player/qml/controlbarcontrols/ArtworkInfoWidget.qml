@@ -92,6 +92,9 @@ T.AbstractButton {
     // Events
 
     onClicked: {
+        if (dragHandler.active)
+            return
+
         MainCtx.playerView = !MainCtx.playerView
     }
 
@@ -120,29 +123,16 @@ T.AbstractButton {
         indexes: [0]
     }
 
-    // TODO: Qt bug 6.2: QTBUG-103604
-    Item {
-        anchors.fill: parent
+    DragHandler {
+        id: dragHandler
 
-        TapHandler {
-            gesturePolicy: TapHandler.ReleaseWithinBounds // TODO: Qt 6.2 bug: Use TapHandler.DragThreshold
+        target: null
 
-            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
-            onTapped: root.clicked()
-        }
-
-        DragHandler {
-            target: null
-
-            grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
-
-            onActiveChanged: {
-                if (active) {
-                    dragItem.Drag.active = true
-                } else {
-                    dragItem.Drag.drop()
-                }
+        onActiveChanged: {
+            if (active) {
+                dragItem.Drag.active = true
+            } else {
+                dragItem.Drag.drop()
             }
         }
     }
@@ -219,7 +209,7 @@ T.AbstractButton {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumWidth: 0.1 // FIXME: Qt layout bug
+            Layout.minimumWidth: 0.0
 
             spacing: 0
 

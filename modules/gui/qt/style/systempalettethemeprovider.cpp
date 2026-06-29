@@ -148,13 +148,11 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
             accent = QColor( sys->m_isDark ? "#FF8800" : "#FF610A" );
             accentPressed = QColor( sys->m_isDark ? "#e67a30" : "#e65609" );
         }
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
         else if (!strcmp(accentColor, "system"))
         {
             accent = palette.color(QPalette::Normal, QPalette::Accent);
             accentPressed = accent.lighter(150);
         }
-#endif
         else
         {
             accent = QColor(accentColor);

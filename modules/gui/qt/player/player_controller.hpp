@@ -595,13 +595,11 @@ public slots:
         if (!m_property.write(hrt))
             return false;
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
         // Item would like re-polishing after value change.
         // We should have this because `afterAnimating()` is
         // signalled after the items are polished. This may
         // not be necessary, but it is better to have it:
         m_item->ensurePolished();
-#endif
 
         return true;
     }

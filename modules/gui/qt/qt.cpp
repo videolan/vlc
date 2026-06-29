@@ -60,21 +60,12 @@ extern "C" char **environ;
 #include <QList>
 #include <QTranslator>
 
-#if __has_include(<rhi/qrhi.h>) // Qt 6.6
-#define RHI_HEADER_AVAILABLE
+
 #include <rhi/qrhi.h>
-#elif __has_include(<QtGui/private/qrhi_p.h>) && \
-      QT_VERSION >= QT_VERSION_CHECK(6, 4, 0) // `QRhi::probe()` is available since Qt 6.4
-#define RHI_HEADER_AVAILABLE
-#include <QtGui/private/qrhi_p.h>
-#include <QtGui/private/qrhigles2_p.h> // for `QRhiGles2InitParams`
-#endif
-#ifdef RHI_HEADER_AVAILABLE
 #include <QOffscreenSurface>
 #include <QThreadPool>
 #include <QThread>
 #include "util/asynctask.hpp"
-#endif
 
 #ifdef _WIN32
 #include <QOperatingSystemVersion>
@@ -294,7 +285,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define PIP_MODE_LONGTEXT N_( "Picture-in-picture mode allows playing video contained in a smaller area so that the interface remains usable." )
 
 #define ACCENT_COLOR_TEXT N_( "Accent color" )
-#define ACCENT_COLOR_LONGTEXT N_( "Adjusts the accent color, special values are 'default' and 'system' (requires Qt 6.6) ." )
+#define ACCENT_COLOR_LONGTEXT N_( "Adjusts the accent color, special values are 'default' and 'system'." )
 
 static const int initial_prefs_view_list[] = { 0, 1, 2 };
 static const char *const initial_prefs_view_list_texts[] =
@@ -1044,7 +1035,6 @@ static void *Thread( void *obj )
         }
     };
 
-#ifdef RHI_HEADER_AVAILABLE
     // NOTE: Qt Quick does not have a cross-API RHI fallback procedure (as of Qt 6.7.1).
     //       We have to manually pick a graphics api here, since the default graphics
     //       api (Direct3D 11.2) may not be supported.
@@ -1253,24 +1243,6 @@ static void *Thread( void *obj )
             p_intf->mainSettings->sync();
         }
     }
-#else
-    if (qEnvironmentVariable("QT_QUICK_BACKEND", QStringLiteral("rhi")) == QLatin1String("rhi"))
-    {
-        if (QQuickWindow::graphicsApi() == QSGRendererInterface::OpenGL)
-        {
-            // At least set the default format without RHI probing if RHI headers are not available:
-            if (std::optional<QSurfaceFormat> format = createCompatibleOpenGLFormat())
-            {
-                QSurfaceFormat::setDefaultFormat(*format);
-            }
-            else
-            {
-                qCritical() << "Falling back to software mode...";
-                QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
-            }
-        }
-    }
-#endif
 
     app.setApplicationDisplayName( qtr("VLC media player") );
     app.setApplicationVersion( QString::fromUtf8(VERSION_MESSAGE) );

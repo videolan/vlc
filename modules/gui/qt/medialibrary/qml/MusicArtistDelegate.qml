@@ -86,59 +86,48 @@ T.ItemDelegate {
         enabled: root.enabled
     }
 
-    // TODO: Qt bug 6.2: QTBUG-103604
-    DoubleClickIgnoringItem {
-        anchors.fill: parent
+    TapHandler {
+        // We need this for extra information such as modifiers
+        Component.onCompleted: {
+            canceled.connect(initialAction) // DragHandler stole the event
+        }
 
-        TapHandler {
-            gesturePolicy: TapHandler.ReleaseWithinBounds // TODO: Qt 6.2 bug: Use TapHandler.DragThreshold
+        onSingleTapped: (eventPoint, button) => {
+            initialAction()
 
-            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
-            // We need this for extra information such as modifiers
-            Component.onCompleted: {
-                canceled.connect(initialAction) // DragHandler stole the event
-            }
-
-            onSingleTapped: (eventPoint, button) => {
-                initialAction()
-
-                if (!(root.selected && button === Qt.RightButton)) {
-                    view.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
-                    view.currentIndex = root.index
-                }
-            }
-
-            onDoubleTapped: (eventPoint, button) => {
-                if (button !== Qt.RightButton)
-                    MediaLib.addAndPlay(model.id);
-            }
-
-            function initialAction() {
-                root.forceActiveFocus(Qt.MouseFocusReason)
+            if (!(root.selected && button === Qt.RightButton)) {
+                view.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
+                view.currentIndex = root.index
             }
         }
 
-        DragHandler {
-            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
+        onDoubleTapped: (eventPoint, button) => {
+            if (button !== Qt.RightButton)
+                MediaLib.addAndPlay(model.id);
+        }
 
-            target: null
+        function initialAction() {
+            root.forceActiveFocus(Qt.MouseFocusReason)
+        }
+    }
 
-            grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
+    DragHandler {
+        acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
 
-            onActiveChanged: {
-                const target = root.dragTarget
-                if (target) {
-                    if (active) {
-                        if (!selected) {
-                            view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
-                            view.currentIndex = root.index
-                        }
+        target: null
 
-                        target.Drag.active = true
-                    } else {
-                        target.Drag.drop()
+        onActiveChanged: {
+            const target = root.dragTarget
+            if (target) {
+                if (active) {
+                    if (!selected) {
+                        view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
+                        view.currentIndex = root.index
                     }
+
+                    target.Drag.active = true
+                } else {
+                    target.Drag.drop()
                 }
             }
         }

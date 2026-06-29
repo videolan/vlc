@@ -289,7 +289,7 @@ T.Pane {
 
             property bool revealed: false
 
-            height: revealed ? Math.min(implicitHeight, VLCStyle.dp(256, VLCStyle.scale)) : 0.1 // We want 0.0, but Qt 6.2.4 is bugged
+            height: revealed ? Math.min(implicitHeight, VLCStyle.dp(256, VLCStyle.scale)) : 0.0
 
             boundsBehavior: Flickable.StopAtBounds
 

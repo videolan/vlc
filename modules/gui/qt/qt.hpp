@@ -37,11 +37,7 @@
 #include <qconfig.h>
 
 #ifdef QT_STATIC
-#if __has_include(<QtVersionChecks>)
 #include <QtVersionChecks> // Available since Qt 6.8
-#else
-#include <QtGlobal>
-#endif
 
 static_assert(QT_VERSION >= QT_VERSION_CHECK(6, 8, 3), "With static Qt, the Qt version must be greater than or equal to what we provide in the contribs.");
 #endif
@@ -138,11 +134,7 @@ public:
 /* For marking translatable static strings (like `_()`) */
 #define qtr( ... ) qfut( __VA_ARGS__ )
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
 #define QtCheckboxChanged  QCheckBox::checkStateChanged
-#else
-#define QtCheckboxChanged  QCheckBox::stateChanged
-#endif
 
 #define BUTTONACT( b, a ) connect( b, &QAbstractButton::clicked, this, a )
 

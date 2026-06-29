@@ -70,9 +70,6 @@ public:
     void setWindowStateExt(Qt::WindowState);
 
     void setPseudoVisible(bool visible);
-
-protected:
-    void focusOutEvent(QFocusEvent *) override;
 };
 
 

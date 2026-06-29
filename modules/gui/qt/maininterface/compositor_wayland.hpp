@@ -25,7 +25,7 @@
 #include <memory>
 #include "compositor.hpp"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)) && defined(QT_GUI_PRIVATE)
+#ifdef QT_GUI_PRIVATE
 #define QT_WAYLAND_HAS_CUSTOM_MARGIN_SUPPORT
 #endif
 

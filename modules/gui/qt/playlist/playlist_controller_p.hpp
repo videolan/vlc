@@ -42,14 +42,10 @@ public:
     inline void callAsync(Fun&& fun)
     {
         Q_Q(PlaylistController);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
         // NOTE: Starting with Qt 6.7.0, lambda expression here without a return value
         //       causes compilation issues with some compilers.
         // TODO: Find out if a more recent Qt version does not behave that way.
         QMetaObject::invokeMethod(q, [fun = std::forward<Fun>(fun)]() -> std::monostate { fun(); return std::monostate{}; }, Qt::QueuedConnection);
-#else
-        QMetaObject::invokeMethod(q, std::forward<Fun>(fun), Qt::QueuedConnection, nullptr);
-#endif
     }
 
     //playlist

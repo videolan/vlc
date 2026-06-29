@@ -36,14 +36,6 @@
 
 #include "qt.hpp"
 
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 4, 0)
-#define QCOMPARE_LT(a, b) QVERIFY((a) < (b))
-#define QCOMPARE_GT(a, b) QVERIFY((a) > (b))
-#define QCOMPARE_LE(a, b) QVERIFY((a) <= (b))
-#define QCOMPARE_GE(a, b) QVERIFY((a) >= (b))
-#endif
-
 /**
  * This class allows to instanciate a libvlc instance with stubbed modules
  * the modules instance can be reteived and manipulated using their pointer

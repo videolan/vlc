@@ -198,9 +198,6 @@ FocusScope {
                     property string _oldSortCriteria
 
                     function adjustAlbumSections() {
-                        if (!artistBanner) // context is lost, Qt 6.2 bug
-                            return
-
                         if (!(root._currentView instanceof Widgets.TableViewExt))
                             return
 

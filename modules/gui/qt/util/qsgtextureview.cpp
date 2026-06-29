@@ -20,6 +20,7 @@
 #include <QThread>
 #include <QCoreApplication>
 
+#include <rhi/qrhi.h>
 
 QSGTextureView::QSGTextureView(QSGTexture *texture)
 {
@@ -236,10 +237,8 @@ bool QSGTextureView::resetState()
         //         this may cause the texture to be not rendered (OpenGL case). As a workaround, we must disable
         //         mipmap filtering here.
 
-        // Testing `QRhiTexture::flags()` with `QRhiTexture::MipMapped` would make more sense, as that is expected to
-        // actually reflect if the underlying native texture actually has mip maps. But this should be okay also as
-        // RHI stuff are still semi-public as of Qt 6.9, and private before Qt 6.6 (we are supporting Qt 6.2).
-        if (m_texture->hasMipmaps())
+        const auto rhiTexture = m_texture->rhiTexture();
+        if (rhiTexture ? rhiTexture->flags().testFlag(QRhiTexture::MipMapped) : m_texture->hasMipmaps())
         {
             if (const auto newMipmapFiltering = m_texture->mipmapFiltering(); mipmapFiltering() != newMipmapFiltering)
             {

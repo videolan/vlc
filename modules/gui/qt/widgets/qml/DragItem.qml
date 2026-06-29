@@ -191,7 +191,7 @@ Item {
         _covers = covers
 
         if (mimeData.length > 0) {
-            Drag.mimeData = MainCtx.urlListToMimeData(mimeData)
+            Drag.mimeData = {"text/uri-list": mimeData}
         }
     }
 

@@ -178,85 +178,74 @@ T.ItemDelegate {
         hovered: root.hovered
     }
 
-    // TODO: Qt bug 6.2: QTBUG-103604
-    DoubleClickIgnoringItem {
-        anchors.fill: parent
+    DragHandler {
+        id: dragHandler
 
-        DragHandler {
-            id: dragHandler
+        acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
 
-            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
+        target: null
 
-            target: null
-
-            grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
-
-            onActiveChanged: {
-                if (dragItem) {
-                    if (active && !selected) {
-                        root.itemClicked(root._modifiersOnLastPress, true)
-                    }
-
-                    if (active)
-                        dragItem.Drag.active = true
-                    else
-                        dragItem.Drag.drop()
+        onActiveChanged: {
+            if (dragItem) {
+                if (active && !selected) {
+                    root.itemClicked(root._modifiersOnLastPress, true)
                 }
-            }
-        }
 
-        TapHandler {
-            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
-
-            acceptedButtons: Qt.RightButton | Qt.LeftButton
-
-            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
-            gesturePolicy: TapHandler.ReleaseWithinBounds // TODO: Qt 6.2 bug: Use TapHandler.DragThreshold
-
-            onSingleTapped: (eventPoint, button) => {
-                initialAction()
-
-                // FIXME: The signals are messed up in this item.
-                //        Right click does not fire itemClicked?
-                if (button === Qt.RightButton)
-                    contextMenuButtonClicked(picture, eventPoint.globalPosition);
+                if (active)
+                    dragItem.Drag.active = true
                 else
-                    root.itemClicked(point.modifiers, true);
-            }
-
-            onDoubleTapped: (eventPoint, button) => {
-                if (button === Qt.LeftButton)
-                    root.itemDoubleClicked(point.modifiers)
-            }
-
-            Component.onCompleted: {
-                canceled.connect(initialAction)
-            }
-
-            function initialAction() {
-                _modifiersOnLastPress = point.modifiers
-
-                root.forceActiveFocus(Qt.MouseFocusReason)
+                    dragItem.Drag.drop()
             }
         }
+    }
 
-        DelegateTouchTapHandler {
-            delegate: root
+    TapHandler {
+        acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
 
-            onSingleTapped: (eventPoint, button) => {
-                // initial action is handled in `DelegateTouchTapHandler`
-                root.itemClicked(Qt.NoModifier, false)
-                root.itemDoubleClicked(Qt.NoModifier)
-            }
+        acceptedButtons: Qt.RightButton | Qt.LeftButton
 
-            onDoubleTapped: (eventPoint, button) => {
-                root.playClicked()
-            }
+        onSingleTapped: (eventPoint, button) => {
+            initialAction()
 
-            onContextMenuRequested: (index, globalPoint) => {
-                root.contextMenuButtonClicked(picture ?? null, globalPoint)
-            }
+            // FIXME: The signals are messed up in this item.
+            //        Right click does not fire itemClicked?
+            if (button === Qt.RightButton)
+                contextMenuButtonClicked(picture, eventPoint.globalPosition);
+            else
+                root.itemClicked(point.modifiers, true);
+        }
+
+        onDoubleTapped: (eventPoint, button) => {
+            if (button === Qt.LeftButton)
+                root.itemDoubleClicked(point.modifiers)
+        }
+
+        Component.onCompleted: {
+            canceled.connect(initialAction)
+        }
+
+        function initialAction() {
+            _modifiersOnLastPress = point.modifiers
+
+            root.forceActiveFocus(Qt.MouseFocusReason)
+        }
+    }
+
+    DelegateTouchTapHandler {
+        delegate: root
+
+        onSingleTapped: (eventPoint, button) => {
+            // initial action is handled in `DelegateTouchTapHandler`
+            root.itemClicked(Qt.NoModifier, false)
+            root.itemDoubleClicked(Qt.NoModifier)
+        }
+
+        onDoubleTapped: (eventPoint, button) => {
+            root.playClicked()
+        }
+
+        onContextMenuRequested: (index, globalPoint) => {
+            root.contextMenuButtonClicked(picture ?? null, globalPoint)
         }
     }
 
@@ -276,13 +265,6 @@ T.ItemDelegate {
 
     contentItem: ColumnLayout {
         id: layout
-
-        // Raise the content item so that the handlers of the control
-        // do not handle events that are to be handled by the handlers
-        // of the content item. Raising the content item should be
-        // fine because content item is supposed to be the foreground
-        // item.
-        z: 1
 
         spacing: 0
 

@@ -312,9 +312,6 @@ Item {
         wrapMode: (root.mode === DualKawaseBlur.Mode.TwoPass) ? root.visualWrapMode : ShaderEffectSource.ClampToEdge
 
         function scheduleChainedUpdate() {
-            if (!ds1layer) // context is lost, Qt bug (reproduced with 6.2)
-                return
-
             // Common for both four and two pass mode:
             ds1layer.parent = root
             ds1layer.scheduleUpdate()
@@ -363,9 +360,6 @@ Item {
         property bool inhibitParent: false
 
         function scheduleChainedUpdate() {
-            if (!ds2layer) // context is lost, Qt bug (reproduced with 6.2)
-                return
-
             if (root._window) {
                 root._window.afterAnimating.disconnect(ds2layer, ds2layer.scheduleChainedUpdate)
             }
@@ -417,9 +411,6 @@ Item {
         property bool inhibitParent: false
 
         function scheduleChainedUpdate() {
-            if (!ds3layer) // context is lost, Qt bug (reproduced with 6.2)
-                return
-
             if (root._window) {
                 root._window.afterAnimating.disconnect(ds3layer, ds3layer.scheduleChainedUpdate)
             }
@@ -467,9 +458,6 @@ Item {
         property bool inhibitParent: false
 
         function scheduleChainedUpdate() {
-            if (!us0layer) // context is lost, Qt bug (reproduced with 6.2)
-                return
-
             if (root._window) {
                 root._window.afterAnimating.disconnect(us0layer, us0layer.scheduleChainedUpdate)
             }
@@ -551,9 +539,6 @@ Item {
         wrapMode: (root.mode !== DualKawaseBlur.Mode.TwoPass) ? root.visualWrapMode : ShaderEffectSource.ClampToEdge
 
         function scheduleChainedUpdate() {
-            if (!us1layer) // context is lost, Qt bug (reproduced with 6.2)
-                return
-
             if (root._window) {
                 root._window.afterAnimating.disconnect(us1layer, us1layer.scheduleChainedUpdate)
             }
@@ -572,9 +557,6 @@ Item {
         }
 
         function releaseResourcesOfIntermediateLayers() {
-            if (!ds1layer || !ds2layer) // context is lost, Qt bug (reproduced with 6.2)
-                return
-
             if (root._window) {
                 root._window.afterAnimating.disconnect(us1layer, us1layer.releaseResourcesOfIntermediateLayers)
                 root._window = null

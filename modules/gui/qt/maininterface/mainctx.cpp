@@ -75,9 +75,7 @@
 
 #include <QOperatingSystemVersion>
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
 #include <QStyleHints>
-#endif
 
 #ifdef _WIN32
 #include <QFileInfo>
@@ -162,7 +160,6 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     settings = getSettings();
     m_colorScheme = new ColorSchemeModel(this);
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
     connect(m_colorScheme, &ColorSchemeModel::currentChanged, qGuiApp, [colorScheme = m_colorScheme]() {
         QStyleHints *const styleHints = qGuiApp->styleHints();
         if (unlikely(!styleHints))
@@ -185,7 +182,6 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 
         styleHints->setColorScheme(scheme);
     });
-#endif
 
     m_sort = new SortCtx(this);
     m_search = new SearchCtx(this);
@@ -789,60 +785,6 @@ void MainCtx::setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider
                 this, &MainCtx::hasEmbededVideoChanged,
                 Qt::QueuedConnection);
     emit hasEmbededVideoChanged(m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideoEmbed());
-}
-
-QJSValue MainCtx::urlListToMimeData(const QJSValue &array) {
-    // NOTE: Due to a Qt regression since 17318c4
-    //       (Nov 11, 2022), it is not possible to
-    //       use RFC-2483 compliant string here.
-    //       This regression was later corrected by
-    //       c25f53b (Jul 31, 2024).
-    // NOTE: Qt starts supporting string list since
-    //       17318c4, so starting from 6.5.0 a string
-    //       list can be used which is not affected
-    //       by the said issue. For Qt versions below
-    //       6.5.0, use byte array which is used as is
-    //       by Qt.
-    assert(array.property("length").toInt() > 0);
-
-    QJSEngine* const engine = qjsEngine(this);
-    assert(engine);
-
-    QJSValue data;
-#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
-    QString string;
-    for (int i = 0; i < array.property(QStringLiteral("length")).toInt(); ++i)
-    {
-        QString decodedUrl;
-        const QJSValue element = array.property(i);
-        if (element.isUrl())
-            // QJSValue does not have `toUrl()`
-            decodedUrl = QJSManagedValue(element, engine).toUrl().toString(QUrl::FullyEncoded);
-        else if (element.isString())
-            // If the element is string, we assume it is already encoded
-            decodedUrl = element.toString();
-        else if (element.isVariant())
-        {
-            const QVariant variant = element.toVariant();
-            if (variant.typeId() == QMetaType::QUrl)
-                decodedUrl = variant.toUrl().toString(QUrl::FullyEncoded);
-            else if (variant.typeId() == QMetaType::QString)
-                decodedUrl = variant.toString();
-            else
-                Q_UNREACHABLE();
-        }
-        else
-            Q_UNREACHABLE(); // Assertion failure in debug builds
-        string += decodedUrl + QStringLiteral("\r\n");
-    }
-    string.chop(2);
-    data = engine->toScriptValue(string);
-#else
-    data = array;
-#endif
-    QJSValue ret = engine->newObject();
-    ret.setProperty(QStringLiteral("text/uri-list"), data);
-    return ret;
 }
 
 VideoSurfaceProvider* MainCtx::getVideoSurfaceProvider() const

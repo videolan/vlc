@@ -59,7 +59,7 @@ T.Control {
     required property string artist
     required property string album
     required property string title
-    required property var duration // TODO: Qt 6.2 can not use value type vlcTick
+    required property vlcDuration duration
     required property bool preparsed
 
     // Optional
@@ -308,104 +308,93 @@ T.Control {
         }
     }
 
-    // TODO: Qt bug 6.2: QTBUG-103604
-    DoubleClickIgnoringItem {
-        anchors.fill: parent
+    TapHandler {
+        acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
 
-        TapHandler {
-            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onSingleTapped: (eventPoint, button) => {
+            initialAction()
 
-            gesturePolicy: TapHandler.ReleaseWithinBounds // TODO: Qt 6.2 bug: Use TapHandler.DragThreshold
-
-            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
-            onSingleTapped: (eventPoint, button) => {
-                initialAction()
-
-                if (!(delegate.selected && button === Qt.RightButton)) {
-                    view.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
-                    view.currentIndex = index
-                }
-
-                if (contextMenu && button === Qt.RightButton)
-                    contextMenu.popup(delegate.mappedIndex(), eventPoint.globalPosition)
+            if (!(delegate.selected && button === Qt.RightButton)) {
+                view.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
+                view.currentIndex = index
             }
 
-            onDoubleTapped: (eventPoint, button) => {
-                if (button !== Qt.RightButton) {
-                    MainPlaylistController.goTo(delegate.mappedIndex(), true)
-                }
-            }
+            if (contextMenu && button === Qt.RightButton)
+                contextMenu.popup(delegate.mappedIndex(), eventPoint.globalPosition)
+        }
 
-            Component.onCompleted: {
-                canceled.connect(initialAction)
-            }
-
-            function initialAction() {
-                delegate.forceActiveFocus(Qt.MouseFocusReason)
+        onDoubleTapped: (eventPoint, button) => {
+            if (button !== Qt.RightButton) {
+                MainPlaylistController.goTo(delegate.mappedIndex(), true)
             }
         }
 
-        DragHandler {
-            id: dragHandler
+        Component.onCompleted: {
+            canceled.connect(initialAction)
+        }
 
-            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
+        function initialAction() {
+            delegate.forceActiveFocus(Qt.MouseFocusReason)
+        }
+    }
 
-            target: null
+    DragHandler {
+        id: dragHandler
 
-            grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
+        acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
 
-            onActiveChanged: {
-                if (dragItem) {
-                    if (active) {
-                        if (!selected) {
-                            /* the dragged item is not in the selection, replace the selection */
-                            view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
-                        }
+        target: null
 
-                        let items
-
-                        const selectedIndexes = view.selectionModel.selectedIndexesFlat
-                        if (view.model instanceof AbstractProxyModel) {
-                            items = []
-                            for (let i = 0; i < selectedIndexes.length; ++i) {
-                                const mappedIndex = view.model.mapToSource(view.model.index(selectedIndexes[i], 0))
-                                items.push(mappedIndex.row)
-                            }
-                        } else {
-                            items = selectedIndexes
-                        }
-
-                        if (items.length <= 0)
-                            return
-
-                        dragItem.indexes = items
-                        dragItem.indexesFlat = true
-                        dragItem.Drag.active = true
-                    } else {
-                        dragItem.Drag.drop()
+        onActiveChanged: {
+            if (dragItem) {
+                if (active) {
+                    if (!selected) {
+                        /* the dragged item is not in the selection, replace the selection */
+                        view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
                     }
+
+                    let items
+
+                    const selectedIndexes = view.selectionModel.selectedIndexesFlat
+                    if (view.model instanceof AbstractProxyModel) {
+                        items = []
+                        for (let i = 0; i < selectedIndexes.length; ++i) {
+                            const mappedIndex = view.model.mapToSource(view.model.index(selectedIndexes[i], 0))
+                            items.push(mappedIndex.row)
+                        }
+                    } else {
+                        items = selectedIndexes
+                    }
+
+                    if (items.length <= 0)
+                        return
+
+                    dragItem.indexes = items
+                    dragItem.indexesFlat = true
+                    dragItem.Drag.active = true
+                } else {
+                    dragItem.Drag.drop()
                 }
             }
         }
+    }
 
-        DelegateTouchTapHandler {
-            delegate: delegate
+    DelegateTouchTapHandler {
+        delegate: delegate
 
-            onSingleTapped: (eventPoint, button) => {
-                // initial action is handled in `DelegateTouchTapHandler`
-                MainPlaylistController.goTo(delegate.index, true)
-            }
+        onSingleTapped: (eventPoint, button) => {
+            // initial action is handled in `DelegateTouchTapHandler`
+            MainPlaylistController.goTo(delegate.index, true)
+        }
 
-            onDoubleTapped: (eventPoint, button) => {
-                MainCtx.requestShowPlayerView()
-            }
+        onDoubleTapped: (eventPoint, button) => {
+            MainCtx.requestShowPlayerView()
+        }
 
-            onContextMenuRequested: (index, globalPoint) => {
-                delegate.contextMenu.popup(delegate.mappedIndex(), globalPoint)
-            }
+        onContextMenuRequested: (index, globalPoint) => {
+            delegate.contextMenu.popup(delegate.mappedIndex(), globalPoint)
         }
     }
 

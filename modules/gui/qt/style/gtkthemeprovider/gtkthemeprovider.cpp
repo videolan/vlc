@@ -205,14 +205,12 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         {
             qcAccent = QColor( isDark ? "#FF8800" : "#FF610A" );
         }
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
         else if (!strcmp(accentColor, "system"))
         {
             assert(qApp);
             const auto palette = qApp->palette();
             qcAccent = palette.color(QPalette::Normal, QPalette::Accent);
         }
-#endif
         else
         {
             qcAccent = QColor(accentColor);

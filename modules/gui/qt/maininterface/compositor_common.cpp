@@ -169,21 +169,6 @@ void CompositorOffscreenWindow::setPseudoVisible(bool)
 {
 }
 
-void CompositorOffscreenWindow::focusOutEvent(QFocusEvent *ev)
-{
-    // QTBUG-125309
-    // Although on Qt 6.5 it appears that the focus item
-    // is restored, it is not the case with Qt 6.2.
-#if QT_VERSION < QT_VERSION_CHECK(6, 5, 3)
-    QPointer<QQuickItem> focusItem = activeFocusItem();
-    QQuickWindow::focusOutEvent(ev);
-    if (focusItem)
-        focusItem->forceActiveFocus();
-#else
-    QQuickWindow::focusOutEvent(ev);
-#endif
-}
-
 #endif
 
 

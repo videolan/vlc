@@ -42,10 +42,8 @@ DialogErrorModel::~DialogErrorModel()
 {
     vlc_dialog_provider_set_error_callback(m_intf, nullptr, nullptr);
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     assert(qGuiApp);
     qGuiApp->setBadgeNumber(0);
-#endif
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -130,7 +128,6 @@ void DialogErrorModel::pushError(const DialogError & error)
         repeatedNotificationCount = 1;
     }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     assert(qGuiApp);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 13, 0)
@@ -141,7 +138,6 @@ void DialogErrorModel::pushError(const DialogError & error)
 #endif
 
     qGuiApp->setBadgeNumber(badgeNumber);
-#endif
 
     emit countChanged();
 }
@@ -168,13 +164,12 @@ int DialogErrorModel::repeatedMessageCount() const
 void DialogErrorModel::resetRepeatedMessageCount()
 {
    repeatedNotificationCount = 0;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-    // Errors are dismissed, or error dialog is opened.
-    assert(qGuiApp);
-    qGuiApp->setBadgeNumber(0);
+
+   // Errors are dismissed, or error dialog is opened.
+   assert(qGuiApp);
+   qGuiApp->setBadgeNumber(0);
 #if QT_VERSION < QT_VERSION_CHECK(6, 13, 0)
-    qGuiApp->setProperty("badgeNumber", 0);
-#endif
+   qGuiApp->setProperty("badgeNumber", 0);
 #endif
 }
 

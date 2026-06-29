@@ -144,23 +144,9 @@ Item {
         required property color colorStop0
         required property color colorStop1
 
-        // FIXME: Qt 6.2 switching orientation within `Gradient` is problematic
-        gradient: (root.orientation === Qt.Horizontal) ? horizontalGradient
-                                                       : verticalGradient
-
-        Gradient {
-            id: horizontalGradient
-
-            orientation: Gradient.Horizontal
-
-            GradientStop { position: 0.0; color: fadingEdgeRectangle.colorStop0; }
-            GradientStop { position: 1.0; color: fadingEdgeRectangle.colorStop1; }
-        }
-
-        Gradient {
-            id: verticalGradient
-
-            orientation: Gradient.Vertical
+        gradient: Gradient {
+            orientation: (root.orientation === Qt.Horizontal) ? Gradient.Horizontal
+                                                              : Gradient.Vertical
 
             GradientStop { position: 0.0; color: fadingEdgeRectangle.colorStop0; }
             GradientStop { position: 1.0; color: fadingEdgeRectangle.colorStop1; }

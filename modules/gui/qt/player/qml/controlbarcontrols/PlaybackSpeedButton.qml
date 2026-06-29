@@ -78,8 +78,7 @@ PopupIconToolButton {
         }
     }
 
-    // TODO: Qt bug 6.2: QTBUG-103604
-    DoubleClickIgnoringItem {
+    Item {
         anchors.fill: parent
 
         z: -1

@@ -20,13 +20,7 @@
 #include <QSGTextureProvider>
 #include <QQmlInfo>
 
-#if __has_include(<rhi/qrhi.h>) // RHI is semi-public since Qt 6.6
-#define RHI_HEADER_AVAILABLE
 #include <rhi/qrhi.h>
-#elif __has_include(<QtGui/private/qrhi_p.h>)
-#define RHI_HEADER_AVAILABLE
-#include <QtGui/private/qrhi_p.h>
-#endif
 
 TextureProviderObserver::TextureProviderObserver(QObject *parent)
     : QObject{parent}
@@ -249,7 +243,6 @@ void TextureProviderObserver::updateProperties()
                         return size;
                     };
 
-#ifdef RHI_HEADER_AVAILABLE
                     const QRhiTexture* const rhiTexture = texture->rhiTexture();
                     if (Q_LIKELY(rhiTexture))
                     {
@@ -268,9 +261,6 @@ void TextureProviderObserver::updateProperties()
                     {
                         nativeTextureSize = legacyUpdateNativeTextureSize();
                     }
-#else
-                    nativeTextureSize = legacyUpdateNativeTextureSize();
-#endif
                 }
             }
 

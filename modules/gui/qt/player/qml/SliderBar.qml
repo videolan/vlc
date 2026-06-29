@@ -268,8 +268,7 @@ T.ProgressBar {
                 }
             }
 
-            onCentroidChanged: {
-                // FIXME: Qt 6.5 use xAxis.onActiveValueChanged in the DragHandler
+            xAxis.onActiveValueChanged: {
                 if (filterEvents) {
                     Qt.callLater(dragHandler.moveControl)
                 } else {

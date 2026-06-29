@@ -313,7 +313,6 @@ void SystemPalette::componentComplete()
         {
             // Use default
         }
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
         else if (!strcmp(accentColor, "system"))
         {
             assert(qApp);
@@ -322,7 +321,6 @@ void SystemPalette::componentComplete()
             orange500 = palette.color(QPalette::Normal, QPalette::Accent);
             orange800 = orange500.lighter(150);
         }
-#endif
         else
         {
             orange500 = QColor(accentColor);

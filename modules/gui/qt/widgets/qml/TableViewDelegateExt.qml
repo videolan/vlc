@@ -125,87 +125,74 @@ T.Control {
         hovered: delegate.hovered
     }
 
-    // TODO: Qt bug 6.2: QTBUG-103604
-    DoubleClickIgnoringItem {
-        anchors.fill: parent
+    DragHandler {
+        id: dragHandler
 
-        z: -1
+        acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
 
-        DragHandler {
-            id: dragHandler
+        target: null
 
-            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
-
-            target: null
-
-            grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
-
-            onActiveChanged: {
-                if (dragItem) {
-                    if (active) {
-                        if (!selected) {
-                            delegate.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
-                        }
-
-                        dragItem.Drag.active = true
-                    } else {
-                        dragItem.Drag.drop()
+        onActiveChanged: {
+            if (dragItem) {
+                if (active) {
+                    if (!selected) {
+                        delegate.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
                     }
+
+                    dragItem.Drag.active = true
+                } else {
+                    dragItem.Drag.drop()
                 }
             }
         }
+    }
 
-        TapHandler {
-            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
+    TapHandler {
+        acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
 
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-            gesturePolicy: TapHandler.ReleaseWithinBounds // TODO: Qt 6.2 bug: Use TapHandler.DragThreshold
+        onSingleTapped: (eventPoint, button) => {
+            initialAction()
 
-            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
-            onSingleTapped: (eventPoint, button) => {
-                initialAction()
-
-                if (!(delegate.selected && button === Qt.RightButton)) {
-                    const view = delegate.ListView.view
-                    delegate.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
-                    view.currentIndex = index
-                }
-
-                if (button === Qt.RightButton)
-                    delegate.rightClick(delegate, delegate.rowModel, eventPoint.globalPosition)
+            if (!(delegate.selected && button === Qt.RightButton)) {
+                const view = delegate.ListView.view
+                delegate.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
+                view.currentIndex = index
             }
 
-            onDoubleTapped: (point, button) => {
-                if (button === Qt.LeftButton)
-                    delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
-            }
-
-            Component.onCompleted: {
-                canceled.connect(initialAction)
-            }
-
-            function initialAction() {
-                delegate.forceActiveFocus(Qt.MouseFocusReason)
-            }
+            if (button === Qt.RightButton)
+                delegate.rightClick(delegate, delegate.rowModel, eventPoint.globalPosition)
         }
 
-        DelegateTouchTapHandler {
-            delegate: delegate
-
-            onSingleTapped: (eventPoint, button) => {
-                // initial action is handled in `DelegateTouchTapHandler`
+        onDoubleTapped: (point, button) => {
+            if (button === Qt.LeftButton)
                 delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
-            }
+        }
 
-            onDoubleTapped: (eventPoint, button) => {
-                MainCtx.requestShowPlayerView()
-            }
+        Component.onCompleted: {
+            canceled.connect(initialAction)
+        }
 
-            onContextMenuRequested: (index, globalPoint) => {
-                delegate.rightClick(delegate, delegate.rowModel, globalPoint)
-            }
+        function initialAction() {
+            delegate.forceActiveFocus(Qt.MouseFocusReason)
+        }
+    }
+
+    DelegateTouchTapHandler {
+        delegate: delegate
+
+        onSingleTapped: (eventPoint, button) => {
+            // initial action is handled in `DelegateTouchTapHandler`
+            delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
+        }
+
+        onDoubleTapped: (eventPoint, button) => {
+            MainCtx.requestShowPlayerView()
+        }
+
+        onContextMenuRequested: (index, globalPoint) => {
+            delegate.rightClick(delegate, delegate.rowModel, globalPoint)
         }
     }
 
@@ -314,20 +301,7 @@ T.Control {
                                     === delegate._contextMenuRequestID
                                 && delegate.contextMenu.visible)
 
-                // NOTE: QTBUG-100543
-                // Hover handling in controls is blocking in Qt 6.2, meaning if this
-                // control handles the hover, delegate itself won't have its `hovered`
-                // set. Since this control is visible when delegate is hovered, there
-                // becomes an infinite loop of visibility when this control is hovered.
-
-                // 1) When delegate is hovered, delegate's hovered property becomes set.
-                // 2) This control becomes visible.
-                // 3) When this control is hovered, delegate's hovered property becomes unset.
-                // 4) This control becomes invisible. Delegate's hovered property becomes set.
-                // * Infinite loop *
-
-                // Disable hovering in this control to prevent twitching due to infinite loop:
-                hoverEnabled: MainCtx.qtQuickControlRejectsHoverEvents()
+                hoverEnabled: true
 
                 onClicked: {
                     if (!delegate.selected)
