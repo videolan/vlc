@@ -1,6 +1,6 @@
 # LIBBLURAY
 
-BLURAY_VERSION := 1.4.0
+BLURAY_VERSION := 1.4.1
 BLURAY_URL := $(VIDEOLAN)/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.xz
 
 ifdef BUILD_DISCS
@@ -34,7 +34,6 @@ $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.xz:
 
 bluray: libbluray-$(BLURAY_VERSION).tar.xz .sum-bluray
 	$(UNPACK)
-	$(APPLY) $(SRC)/bluray/0001-Link-with-gdi32-when-using-freetype-in-Windows.patch
 	$(MOVE)
 
 .bluray: bluray crossfile.meson
