@@ -1289,8 +1289,8 @@ libqml_module_style_a_CXXFLAGS = $(libqt_plugin_la_CXXFLAGS)
 libqml_module_style_a_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS)
 libqml_module_style_a_QML =
 libqml_module_style_a_Singleton_QML = \
-	style/AcrylicController.qml \
-	style/VLCStyle.qml
+	style/qml/AcrylicController.qml \
+	style/qml/VLCStyle.qml
 libqml_module_style_a_SOURCES = $(QML_MODULE_style_SRC)
 nodist_libqml_module_style_a_SOURCES = style/qmlassets.cpp $(QML_MODULE_style_NODIST_EXTRA)
 QML_MODULE_LIBS += libqml_module_style.a

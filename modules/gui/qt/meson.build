@@ -838,8 +838,8 @@ qml_modules += {
     'target' : 'style',
     'outdir' : 'VLC/Style',
     'singletons': files(
-        'style/AcrylicController.qml',
-        'style/VLCStyle.qml',
+        'style/qml/AcrylicController.qml',
+        'style/qml/VLCStyle.qml',
     ),
 }
 
