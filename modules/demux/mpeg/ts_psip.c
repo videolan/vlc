@@ -356,6 +356,8 @@ static vlc_epg_event_t * ATSC_CreateVLCEPGEvent( demux_t *p_demux, ts_psip_conte
             {
                 const uint8_t *p_data = p_dr->p_data;
                 size_t i_data = p_dr->i_length;
+                if( i_data < 4 )
+                    continue;
                 uint8_t i_ratings_count = p_dr->p_data[0] & 0x3F;
                 p_data++; i_data--;
                 for( ; i_ratings_count && i_data > 3; i_ratings_count-- )
