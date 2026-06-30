@@ -96,40 +96,7 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
                  p_sys->i_title_start_block, p_sys->i_title_end_block,
                  p_sys->i_title_blocks );
 
-        if( p_sys->i_chapters > 0 )
-        {
-            input_title_t *p_title = p_sys->titles[i_title];
-            if( p_title->seekpoint && p_sys->i_title_blocks > 0 )
-            {
-                const vlc_tick_t title_length = FROM_SCALE_NZ(
-                    p_sys->p_title_table->length_pts );
-                const uint32_t first_sector =
-                    p_sys->p_title_table->atsi_track_pointer_rows[0].start_sector;
-
-                p_title->i_length = title_length;
-
-                const int max_sp = __MIN( p_title->i_seekpoint,
-                                            p_sys->i_chapters );
-                /* offset relative to title start */
-                for( int sj = 0; sj < max_sp; sj++ )
-                {
-                    const uint32_t sj_sector =
-                        p_sys->p_title_table->atsi_track_pointer_rows[sj].start_sector;
-                    const uint32_t offset = sj_sector > first_sector
-                        ? sj_sector - first_sector : 0;
-                    if( title_length > 0 &&
-                        offset > UINT64_MAX / (uint64_t)title_length )
-                    {
-                        msg_Err( p_demux, "chapter offset multiply overflow" );
-                        return VLC_EGENERIC;
-                    }
-                    /* widen for the multiply, product fits uint64_t */
-                    p_title->seekpoint[sj]->i_time_offset =
-                        (vlc_tick_t)( (uint64_t)offset * title_length /
-                                      p_sys->i_title_blocks );
-                }
-            }
-        }
+        /* seekpoints are set in DemuxTitles not here */
 
         /* The structure of DVD-A discs seems to be the following
          * each ATS IFO-> is a GROUP -> Contains multiple titles, Span across one or more AOBs -> each title contains multiple tracks or "Trackpoints",
@@ -321,7 +288,7 @@ static void DvdAudioReadDemuxTitles( demux_t *p_demux, int *pi_angle )
 
     for( int i = 0; i < i_titles; i++ )
     {
-        const int32_t i_chapters =
+        uint8_t i_chapters =
             p_sys->p_vmg_file->info_table_second_sector->tracks_info[i].nr_chapters_in_title;
         msg_Dbg( p_demux, "title %d has %d chapters", i, i_chapters );
 
@@ -329,8 +296,7 @@ static void DvdAudioReadDemuxTitles( demux_t *p_demux, int *pi_angle )
         if( unlikely( !t ) )
             return;
 
-        const atsi_track_timestamp_t *p_track_ts = NULL;
-        uint8_t i_track_ts = 0;
+        const atsi_title_record_t *p_title_rec = NULL;
         const track_info_t * const p_track_info =
             &p_sys->p_vmg_file->info_table_second_sector->tracks_info[i];
         t->i_length = FROM_SCALE_NZ( p_track_info->len_audio_zone_pts );
@@ -341,10 +307,22 @@ static void DvdAudioReadDemuxTitles( demux_t *p_demux, int *pi_angle )
          && p_track_info->title_property > 0
          && p_track_info->title_property <= p_ats_ifo->atsi_title_table->nr_titles )
         {
-            const atsi_title_record_t * const p_title_rec =
+            p_title_rec =
                 &p_ats_ifo->atsi_title_table->atsi_title_row_tables[p_track_info->title_property - 1];
-            p_track_ts = p_title_rec->atsi_track_timestamp_rows;
-            i_track_ts = p_title_rec->nr_tracks;
+            i_chapters = p_title_rec->nr_pointer_records;
+            t->i_length = FROM_SCALE_NZ( p_title_rec->length_pts );
+        }
+
+        const atsi_track_pointer_t *rows =
+            p_title_rec ? p_title_rec->atsi_track_pointer_rows : NULL;
+        uint32_t first_sector = 0, blocks = 0;
+        if( rows != NULL && p_title_rec->nr_pointer_records > 0 )
+        {
+            first_sector = rows[0].start_sector;
+            const uint32_t end_sector =
+                rows[p_title_rec->nr_pointer_records - 1].end_sector;
+            if( end_sector >= first_sector )
+                blocks = end_sector - first_sector + 1;
         }
 
         for( int j = 0; j < __MAX( i_chapters, 1 ); j++ )
@@ -352,8 +330,11 @@ static void DvdAudioReadDemuxTitles( demux_t *p_demux, int *pi_angle )
             s = vlc_seekpoint_New();
             if( unlikely( !s ) )
                 goto fail;
-            if( p_track_ts != NULL && j < i_track_ts )
-                s->i_time_offset = FROM_SCALE_NZ( (uint64_t)p_track_ts[j].first_pts_of_track );
+            if( blocks > 0 && j < p_title_rec->nr_pointer_records )
+            {
+                const uint32_t offset = rows[j].start_sector - first_sector;
+                s->i_time_offset = offset * t->i_length / blocks;
+            }
             TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
         }
 
