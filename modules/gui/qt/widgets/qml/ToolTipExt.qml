@@ -74,6 +74,7 @@ T.ToolTip {
     contentItem: Text {
         text: control.text
         font: control.font
+        wrapMode: Text.WordWrap
 
         color: theme.fg.primary
     }
