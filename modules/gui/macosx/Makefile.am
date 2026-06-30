@@ -164,6 +164,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryCollectionViewDelegate.m \
 	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.h \
 	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.m \
+	gui/macosx/library/VLCLibraryCollectionViewItem.h \
+	gui/macosx/library/VLCLibraryCollectionViewItem.m \
 	gui/macosx/library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h \
 	gui/macosx/library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.m \
 	gui/macosx/library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h \
@@ -320,6 +322,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/media-source/VLCMediaSource.m \
 	gui/macosx/library/media-source/VLCMediaSourceBaseDataSource.h \
 	gui/macosx/library/media-source/VLCMediaSourceBaseDataSource.m \
+	gui/macosx/library/media-source/VLCMediaSourceCollectionViewItem.h \
+	gui/macosx/library/media-source/VLCMediaSourceCollectionViewItem.m \
 	gui/macosx/library/media-source/VLCMediaSourceDataSource.h \
 	gui/macosx/library/media-source/VLCMediaSourceDataSource.m \
 	gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.h \
