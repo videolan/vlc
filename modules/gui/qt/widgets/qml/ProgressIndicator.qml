@@ -38,6 +38,7 @@ Control {
 
     background: Rectangle {
         border.color: theme.border
+        border.pixelAligned: (radius < Number.EPSILON)
         radius: VLCStyle.dp(6, VLCStyle.scale)
         color: theme.bg.primary
         opacity: 0.8

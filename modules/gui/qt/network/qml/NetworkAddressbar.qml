@@ -81,6 +81,7 @@ T.Control {
     background: Rectangle {
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         border.color: theme.border
+        border.pixelAligned: (radius < Number.EPSILON)
         color: theme.bg.primary
     }
 

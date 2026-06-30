@@ -41,6 +41,7 @@ Rectangle {
     color: "transparent"
 
     border.width: VLCStyle.focus_border
+    border.pixelAligned: (radius < Number.EPSILON)
 
     //---------------------------------------------------------------------------------------------
     // Animations

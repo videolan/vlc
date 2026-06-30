@@ -154,6 +154,7 @@ Item {
 
             border.width: 1
             border.color: theme.accent
+            border.pixelAligned: (radius < Number.EPSILON)
 
             color: (historyDragHandler.accumulatedDelta >= historyDragHandler.threshold) ? theme.accent
                                                                                          : theme.bg.primary

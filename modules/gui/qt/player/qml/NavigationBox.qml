@@ -134,6 +134,7 @@ Control {
         radius: VLCStyle.navBoxButton_radius
         border.color: theme.bg.secondary
         border.width: VLCStyle.border
+        border.pixelAligned: (radius < Number.EPSILON)
 
         MouseArea {
             id: mouseArea

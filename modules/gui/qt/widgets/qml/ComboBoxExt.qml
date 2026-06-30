@@ -123,6 +123,7 @@ T.ComboBox {
         background: Rectangle {
             color: control.bgColor
             border.color: control.borderColor
+            border.pixelAligned: (radius < Number.EPSILON)
             radius: 2
         }
     }

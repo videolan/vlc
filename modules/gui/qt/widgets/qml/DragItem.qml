@@ -454,6 +454,7 @@ Item {
         color: fsmLoadingFailed.active ? theme.bg.negative : theme.bg.primary
         border.color: theme.border
         border.width: VLCStyle.dp(1, VLCStyle.scale)
+        border.pixelAligned: (radius < Number.EPSILON)
         radius: VLCStyle.dp(6, VLCStyle.scale)
 
         Widgets.RoundedRectangleShadow {
@@ -584,6 +585,7 @@ Item {
         color: theme.bg.secondary
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         border.color: theme.border
+        border.pixelAligned: (radius < Number.EPSILON)
 
         Widgets.MenuLabel {
             anchors.fill: parent

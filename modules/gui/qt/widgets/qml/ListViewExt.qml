@@ -242,6 +242,7 @@ ListView {
 
                 border.width: VLCStyle.dp(2)
                 border.color: theme.accent
+                border.pixelAligned: (radius < Number.EPSILON)
 
                 color: "transparent"
 

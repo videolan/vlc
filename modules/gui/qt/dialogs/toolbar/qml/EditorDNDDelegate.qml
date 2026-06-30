@@ -143,6 +143,7 @@ T.Control {
 
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         border.color: theme.border
+        border.pixelAligned: (radius < Number.EPSILON)
     }
 
     contentItem: Item {

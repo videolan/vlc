@@ -52,6 +52,7 @@ ToolTipExt {
         border.color: pointingTooltip.colorContext.border
         color: pointingTooltip.colorContext.bg.primary
         radius: pointingTooltip.radius
+        border.pixelAligned: (radius < Number.EPSILON)
 
         readonly property real arrowHeight: arrow.implicitHeight + border.width
 
@@ -84,6 +85,7 @@ ToolTipExt {
 
                 color: pointingTooltip.colorContext.bg.primary
                 border.color: pointingTooltip.colorContext.border
+                border.pixelAligned: (radius < Number.EPSILON)
             }
         }
     }

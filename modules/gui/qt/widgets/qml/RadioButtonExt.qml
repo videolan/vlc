@@ -63,6 +63,7 @@ T.RadioButton {
         color: control.down ? Qt.lighter(theme.accent) : theme.bg.primary
         border.width: control.visualFocus ? VLCStyle.dp(2, VLCStyle.scale) : VLCStyle.dp(1, VLCStyle.scale)
         border.color: control.visualFocus ? theme.accent : theme.fg.primary
+        border.pixelAligned: (radius < Number.EPSILON)
 
         Rectangle {
             x: (parent.width - width) / 2

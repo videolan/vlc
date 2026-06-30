@@ -171,6 +171,7 @@ T.Switch {
 
         border.color: root.colorBorder
         border.width: VLCStyle.border
+        border.pixelAligned: (radius < Number.EPSILON)
 
         MouseArea {
             id: handle

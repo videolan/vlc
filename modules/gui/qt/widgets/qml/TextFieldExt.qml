@@ -51,6 +51,7 @@ TextField {
         border.width: control.enabled ? VLCStyle.dp(2, VLCStyle.scale) : 0
         color: theme.bg.primary
         border.color: theme.border
+        border.pixelAligned: (radius < Number.EPSILON)
         radius: control.radius
     }
 

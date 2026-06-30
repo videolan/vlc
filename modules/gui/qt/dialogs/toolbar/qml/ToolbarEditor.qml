@@ -195,6 +195,7 @@ Item {
 
                                 border.color: theme.border
                                 border.width: VLCStyle.border
+                                border.pixelAligned: (radius < Number.EPSILON)
 
                                 property alias count: dndView.count
 
@@ -260,6 +261,7 @@ Item {
             color: buttonList.colorContext.bg.primary
             border.color: theme.border
             border.width: VLCStyle.border
+            border.pixelAligned: (radius < Number.EPSILON)
 
             ColumnLayout {
                 anchors.fill: parent

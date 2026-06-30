@@ -106,6 +106,7 @@ GridView {
 
         border.color: theme.border
         border.width: VLCStyle.dp(2, VLCStyle.scale)
+        border.pixelAligned: (radius < Number.EPSILON)
 
         Text {
             anchors.centerIn: parent
@@ -190,6 +191,7 @@ GridView {
             border.width: VLCStyle.dp(1, VLCStyle.scale)
             border.color: containsMouse && !buttonDragItem.Drag.active ? colorContext.border
                                                                        : "transparent"
+            border.pixelAligned: (radius < Number.EPSILON)
 
             ColumnLayout {
                 anchors.fill: parent

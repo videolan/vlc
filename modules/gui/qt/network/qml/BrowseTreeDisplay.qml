@@ -346,6 +346,7 @@ MainViewLoader {
             background: Rectangle {
                 // NOTE: This is necessary because MainViewLoader may position this indicator over the shown header when height is small.
                 border.color: emptyLabel.colorContext.border
+                border.pixelAligned: (radius < Number.EPSILON)
                 radius: VLCStyle.dp(6, VLCStyle.scale)
                 color: emptyLabel.colorContext.bg.primary
                 opacity: 0.8

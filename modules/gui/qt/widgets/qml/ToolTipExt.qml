@@ -81,6 +81,7 @@ T.ToolTip {
 
     background: Rectangle {
         border.color: theme.border
+        border.pixelAligned: (radius < Number.EPSILON)
         color: theme.bg.primary
         radius: control.radius
     }
