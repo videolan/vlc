@@ -42,7 +42,6 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"

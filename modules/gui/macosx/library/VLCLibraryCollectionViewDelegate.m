@@ -24,8 +24,9 @@
 
 #import "VLCLibraryCollectionViewDataSource.h"
 #import "VLCLibraryCollectionViewFlowLayout.h"
-#import "VLCLibraryCollectionViewItem.h"
 #import "VLCLibraryDataTypes.h"
+
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 @implementation VLCLibraryCollectionViewDelegate
 
@@ -34,7 +35,7 @@
     self = [super init];
     if (self) {
         _dynamicItemSizing = YES;
-        _staticItemSize = VLCLibraryCollectionViewItem.defaultSize;
+        _staticItemSize = VLCMediaItemCollectionViewItem.defaultSize;
         _itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioDefaultItem;
     }
     return self;

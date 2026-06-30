@@ -26,30 +26,35 @@
 #import "extensions/NSScrollView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
+
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryHeaderView.h"
+#import "library/VLCLibraryHeaderCell.h"
+#import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"
-#import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
-#import "library/VLCLibraryTableView.h"
+
 #import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
 #import "library/favorites-library/VLCLibraryFavoritesTableViewDelegate.h"
+
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
-#import "library/VLCLibraryHeaderView.h"
-#import "library/VLCLibraryHeaderCell.h"
+
 #import "main/VLCMain.h"
+
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 @interface VLCLibraryFavoritesViewController ()
 {
@@ -168,8 +173,8 @@
     collectionView.allowsEmptySelection = YES;
     collectionView.allowsMultipleSelection = YES;
     
-    [collectionView registerClass:VLCLibraryCollectionViewItem.class
-            forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [collectionView registerClass:VLCMediaItemCollectionViewItem.class
+            forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
     
     [collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader

@@ -33,7 +33,6 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
-#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
@@ -56,6 +55,7 @@
 #import "playqueue/VLCPlayQueueModel.h"
 
 #import "views/VLCImageView.h"
+#import "views/VLCMediaItemCollectionViewItem.h"
 #import "views/VLCSubScrollView.h"
 
 NSString * const VLCLibrarySongsTableViewSongPlayingColumnIdentifier = @"VLCLibrarySongsTableViewSongPlayingColumnIdentifier";
@@ -447,7 +447,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 {
     NSAssert(collectionView != nil, @"Collection view must not be nil");
 
-    [collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [collectionView registerClass:[VLCMediaItemCollectionViewItem class]
+            forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
 
     NSNib * const albumSupplementaryDetailView =
         [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemListSupplementaryDetailView" bundle:nil];
@@ -879,7 +880,9 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    VLCMediaItemCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier
+                                  forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> actualItem = self.displayedCollection[indexPath.item];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:actualItem parentType:_currentParentType];
 

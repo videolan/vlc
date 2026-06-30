@@ -21,16 +21,14 @@
  *****************************************************************************/
 
 #import "VLCMediaSourceBaseDataSource.h"
-#include <AppKit/AppKit.h>
-#import "extensions/NSImage+VLCAdditions.h"
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSourceProvider.h"
 #import "VLCMediaSource.h"
 #import "VLCMediaSourceDeviceCollectionViewItem.h"
-#import "VLCMediaSourceCollectionViewItem.h"
 #import "VLCMediaSourceDataSource.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTableCellView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
@@ -47,6 +45,7 @@
 #import "main/VLCMain.h"
 
 #import "views/VLCImageView.h"
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseDataSourceNodeChanged";
 
@@ -133,8 +132,10 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 {
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
-    [self.collectionView registerClass:[VLCMediaSourceDeviceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier];
-    [self.collectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
+    [self.collectionView registerClass:[VLCMediaSourceDeviceCollectionViewItem class]
+                 forItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier];
+    [self.collectionView registerClass:[VLCMediaItemCollectionViewItem class]
+                 forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
     [self.collectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
                forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];

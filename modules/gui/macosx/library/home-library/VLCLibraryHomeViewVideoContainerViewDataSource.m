@@ -26,7 +26,6 @@
 
 #import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
@@ -42,6 +41,8 @@
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "main/VLCMain.h"
+
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification";
 
@@ -267,8 +268,8 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     self.collectionView.dataSource = self;
     self.carouselView.dataSource = self;
 
-    [self.collectionView registerClass:[VLCLibraryCollectionViewItem class]
-             forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [self.collectionView registerClass:[VLCMediaItemCollectionViewItem class]
+                 forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
 
     [self.collectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
         forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
@@ -298,7 +299,9 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    VLCMediaItemCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier
+                                  forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.groupDescriptor.group];
 

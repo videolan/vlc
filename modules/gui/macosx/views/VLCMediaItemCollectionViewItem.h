@@ -1,9 +1,10 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItem.h: MacOS X interface module
+ * VLCMediaItemCollectionViewItem.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2026 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ *          Claudio Cambra <developer@claudiocambra.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +27,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
 @class VLCLinearProgressIndicator;
-@class VLCLibraryRepresentedItem;
-@protocol VLCMediaLibraryItemProtocol;
+@protocol VLCMediaItemRepresentable;
 
-extern NSString *VLCLibraryCellIdentifier;
+extern NSString *VLCMediaItemCollectionViewItemIdentifier;
 
-@interface VLCLibraryCollectionViewItem : NSCollectionViewItem
+extern const CGFloat VLCMediaItemCollectionViewItemMinimalDisplayedProgress;
+extern const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress;
+
+@interface VLCMediaItemCollectionViewItem : NSCollectionViewItem
 
 // NOTE: These will need to be changed after changes to XIB
 @property (class, readonly) const NSSize defaultSize;
@@ -55,7 +58,7 @@ extern NSString *VLCLibraryCellIdentifier;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingSecondaryTextToLeadingUnplayedIndicatorConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingSecondaryTextToTrailingSuperviewConstraint;
 
-@property (readwrite, retain, nonatomic) VLCLibraryRepresentedItem *representedItem;
+@property (readwrite, strong, nonatomic, nullable) id<VLCMediaItemRepresentable> representedItem;
 
 @end
 

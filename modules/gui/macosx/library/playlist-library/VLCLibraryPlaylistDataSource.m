@@ -25,7 +25,6 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
@@ -35,6 +34,8 @@
 #import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
+
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     VLCLibraryDataSourceCacheUpdateAction,
@@ -278,8 +279,8 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)setupCollectionView:(NSCollectionView *)collectionView
 {
-    [collectionView registerClass:VLCLibraryCollectionViewItem.class
-            forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [collectionView registerClass:VLCMediaItemCollectionViewItem.class
+            forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
     [collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                    withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
@@ -311,8 +312,9 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier
-                                                                              forIndexPath:indexPath];
+    VLCMediaItemCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier
+                                  forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> libraryItem = self.playlists[indexPath.item];
     // NOTE: Unknown parent type represented items default to playing the represented item only.
     // We want this behaviour as it feels unnatural to handle any parent types for playlists

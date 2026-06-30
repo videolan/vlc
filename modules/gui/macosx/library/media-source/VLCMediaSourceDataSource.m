@@ -29,7 +29,6 @@
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSourceBaseDataSource.h"
-#import "VLCMediaSourceCollectionViewItem.h"
 #import "VLCMediaSource.h"
 
 #import "extensions/NSString+Helpers.h"
@@ -48,6 +47,7 @@
 #import "playqueue/VLCPlayQueueController.h"
 
 #import "views/VLCImageView.h"
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourceNodeChanged";
 NSString * const VLCMediaSourceDataSourceLoadingStarted = @"VLCMediaSourceDataSourceLoadingStarted";
@@ -240,7 +240,9 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaSourceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceCellIdentifier forIndexPath:indexPath];
+    VLCMediaItemCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier
+                                  forIndexPath:indexPath];
 
     VLCInputNode *rootNode = _nodeToDisplay;
     NSArray *nodeChildren = rootNode.children;
@@ -251,7 +253,7 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
     VLCInputNode *childNode = nodeChildren[indexPath.item];
     VLCInputItem *childRootInput = childNode.inputItem;
 
-    viewItem.representedInputItem = childRootInput;
+    viewItem.representedItem = childRootInput;
 
     return viewItem;
 }

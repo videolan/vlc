@@ -6,7 +6,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryCollectionViewItem">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCMediaItemCollectionViewItem">
             <connections>
                 <outlet property="addToPlayQueueButton" destination="Ubz-8I-W2F" id="k0q-b1-PZi"/>
                 <outlet property="annotationTextField" destination="tm2-NW-WsZ" id="Miy-RS-Rol"/>

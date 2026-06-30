@@ -32,11 +32,10 @@
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
-#import "views/VLCLoadingOverlayView.h"
-
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionView.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCInputNodePathControl.h"
 #import "library/VLCLibrarySegment.h"
@@ -44,6 +43,9 @@
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
+
+#import "views/VLCLoadingOverlayView.h"
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 @interface VLCLibraryMediaSourceViewController ()
 {
@@ -152,7 +154,7 @@
 
     VLCLibraryCollectionViewFlowLayout * const mediaSourceCollectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
     self.collectionView.collectionViewLayout = mediaSourceCollectionViewLayout;
-    mediaSourceCollectionViewLayout.itemSize = VLCLibraryCollectionViewItem.defaultSize;
+    mediaSourceCollectionViewLayout.itemSize = VLCMediaItemCollectionViewItem.defaultSize;
 }
 
 - (void)setupMediaSourceLibraryViews

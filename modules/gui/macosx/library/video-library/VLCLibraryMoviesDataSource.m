@@ -24,7 +24,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
-#import "library/VLCLibraryCollectionViewItem.h"
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 NSString * const VLCLibraryMoviesDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryMoviesDataSourceDisplayedCollectionChangedNotification";
 
@@ -73,7 +73,7 @@ NSString * const VLCLibraryMoviesDataSourceDisplayedCollectionChangedNotificatio
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem * const item = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    VLCMediaItemCollectionViewItem * const item = [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> movie = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:movie parentType:self.currentParentType];
     item.representedItem = representedItem;

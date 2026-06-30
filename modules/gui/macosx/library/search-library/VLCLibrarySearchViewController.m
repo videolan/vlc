@@ -34,23 +34,23 @@
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
-
-#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibrarySectionedTableViewDelegate.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
-
-#import "library/VLCLibrarySectionedTableViewDelegate.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
+#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
+
 #import "main/VLCMain.h"
+
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 @interface VLCLibrarySearchViewController ()
 
@@ -134,11 +134,11 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioDefaultItem;
-    self.collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultSize;
+    self.collectionViewDelegate.staticItemSize = VLCMediaItemCollectionViewItem.defaultSize;
     self.collectionView.delegate = self.collectionViewDelegate;
 
-    [self.collectionView registerClass:VLCLibraryCollectionViewItem.class
-                 forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [self.collectionView registerClass:VLCMediaItemCollectionViewItem.class
+                 forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
 
     [self.collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
             forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader

@@ -28,7 +28,6 @@
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
@@ -54,6 +53,8 @@
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"
+
+#import "views/VLCMediaItemCollectionViewItem.h"
 
 @interface VLCLibraryVideoViewController ()
 {
@@ -191,11 +192,11 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
-    _collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
+    _collectionViewDelegate.staticItemSize = VLCMediaItemCollectionViewItem.defaultVideoItemSize;
     collectionView.delegate = _collectionViewDelegate;
 
-    [collectionView registerClass:VLCLibraryCollectionViewItem.class
-            forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [collectionView registerClass:VLCMediaItemCollectionViewItem.class
+            forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
 
     [collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
