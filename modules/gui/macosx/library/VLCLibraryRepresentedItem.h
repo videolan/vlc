@@ -23,13 +23,14 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCMediaItemRepresentable.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMediaLibraryMediaItem;
 @protocol VLCMediaLibraryItemProtocol;
 
-@interface VLCLibraryRepresentedItem : NSObject
+@interface VLCLibraryRepresentedItem : NSObject<VLCMediaItemRepresentable>
 
 @property (readonly) id<VLCMediaLibraryItemProtocol> item;
 // Parent media array is lazy loaded
