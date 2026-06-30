@@ -167,6 +167,8 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
         /* current block relative to start of title*/
         p_sys->i_cur_block=p_sys->p_title_table->atsi_track_pointer_rows[i_track].start_sector;
 
+        DvdReadResetCellTs( p_sys );
+
         if( p_sys->cur_chapter != i_track)
         {
             p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
