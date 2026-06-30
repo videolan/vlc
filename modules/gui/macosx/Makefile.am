@@ -146,6 +146,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCInputNodePathControl.m \
 	gui/macosx/library/VLCInputNodePathControlItem.h \
 	gui/macosx/library/VLCInputNodePathControlItem.m \
+	gui/macosx/library/VLCMediaItemRepresentable.h \
 	gui/macosx/library/VLCLibraryAbstractGroupingDataSource.h \
 	gui/macosx/library/VLCLibraryAbstractGroupingDataSource.m \
 	gui/macosx/library/VLCLibraryAbstractMediaLibrarySegmentViewController.h \
