@@ -353,6 +353,8 @@ static int DvdVRReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
              ci < p_sys->i_cur_cell; ci++ )
         {
             uint16_t s = p_sys->ud_pgcit->m_c_gi[ci].m_vobi_srpn;
+            if( s == 0 || s > p_sys->pgc_gi->nr_of_programs )
+                return VLC_EGENERIC;
             p_sys->i_title_offset += p_sys->pgc_gi->pgi[s - 1].map.nr_of_vobu_info;
         }
         /* add within-program vobu offset for position accuracy */
