@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 395 437" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="odd-stripes" serif:id="odd stripes" transform="matrix(0.842965,0,0,0.87926,31.357751,58.025765)">
+        <path d="M106.648,198.753L124.17,142.401L124.149,142.39C125.612,137.586 127.177,132.475 128.844,127.055C138.315,131.47 161.859,140.415 197.17,140.415C234.573,140.415 256.657,130.972 265.574,126.09C266.964,130.567 268.473,135.433 270.19,140.983L270.075,141.081L287.867,198.711C266.922,219.503 231.537,223.643 197.32,223.643C163.245,223.643 124.542,216.957 106.648,198.753ZM153.146,49.22L164.82,11.679C167.912,4.019 178.877,0.189 197.715,0.189C216.553,0.189 227.358,4.019 230.13,11.679L241.689,49.125C212.836,56.298 178.026,55.654 153.146,49.22Z" style="fill:rgb(255,120,0);"/>
+    </g>
+</svg>
