@@ -297,7 +297,7 @@ QtObject {
     readonly property int duration_humanMoment: 2000
 
     //timing before showing up a tooltip
-    readonly property int delayToolTipAppear: 700
+    readonly property int delayToolTipAppear: (Application?.styleHints?.toolTipWakeUpDelay ?? 700)
 
     //timing for the progressbar/scanbar bouncing animation, explicitly very long
     readonly property int durationSliderBouncing: 2000
