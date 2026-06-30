@@ -74,6 +74,13 @@ static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
         /* Title position inside the selected ats, i_title is the overall title number */
         p_sys->i_ttn = p_vmg->info_table_second_sector->tracks_info[i_title].title_property;
 
+        if( p_vts->atsi_title_table == NULL || p_sys->i_ttn == 0
+         || p_sys->i_ttn > p_vts->atsi_title_table->nr_titles )
+        {
+            msg_Err( p_demux, "invalid ats title %d", i_title );
+            return VLC_EGENERIC;
+        }
+
         const atsi_title_record_t *atsi_title_table=
             p_sys->p_title_table = &p_vts->atsi_title_table->atsi_title_row_tables[p_sys->i_ttn-1];
 
