@@ -126,6 +126,10 @@ Widgets.PageLoader {
 
                 ctx: MainCtx
                 sd_source: NetworkDeviceModel.CAT_INTERNET
+
+                searchPattern: MainCtx.search.pattern
+                sortOrder: MainCtx.sort.order
+                sortCriteria: MainCtx.sort.criteria
             }
 
             NetworkDeviceContextMenu {
@@ -168,6 +172,10 @@ Widgets.PageLoader {
             model: NetworkMediaModel {
                 id: mediaModel
                 ctx: MainCtx
+
+                searchPattern: MainCtx.search.pattern
+                sortOrder: MainCtx.sort.order
+                sortCriteria: MainCtx.sort.criteria
             }
 
             contextMenu: NetworkMediaContextMenu {
