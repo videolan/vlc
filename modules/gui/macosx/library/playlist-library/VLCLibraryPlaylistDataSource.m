@@ -25,6 +25,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
@@ -34,8 +35,6 @@
 #import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
-
-#import "views/VLCMediaItemCollectionViewItem.h"
 
 typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     VLCLibraryDataSourceCacheUpdateAction,
@@ -279,8 +278,8 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)setupCollectionView:(NSCollectionView *)collectionView
 {
-    [collectionView registerClass:VLCMediaItemCollectionViewItem.class
-            forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
+    [collectionView registerClass:VLCLibraryCollectionViewItem.class
+            forItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier];
     [collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                    withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
@@ -312,8 +311,8 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaItemCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier
                                   forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> libraryItem = self.playlists[indexPath.item];
     // NOTE: Unknown parent type represented items default to playing the represented item only.

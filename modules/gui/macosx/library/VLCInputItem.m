@@ -28,9 +28,6 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryImageCache.h"
-
-#import "playqueue/VLCPlayQueueController.h"
 
 #import <vlc_url.h>
 #import <vlc_preparser.h>
@@ -572,47 +569,6 @@ static const struct input_item_parser_cbs_t parserCallbacks =
         [options addObject:option];
     }
     return options.copy;
-}
-
-#pragma mark - VLCMediaItemRepresentable
-
-- (NSString *)displayTitle
-{
-    return self.name;
-}
-
-- (nullable NSString *)annotation
-{
-    switch (self.inputType) {
-        case ITEM_TYPE_STREAM:
-            return _NS("Stream");
-        case ITEM_TYPE_PLAYLIST:
-            return _NS("Playlist");
-        case ITEM_TYPE_DISC:
-            return _NS("Disk");
-        default:
-            return nil;
-    }
-}
-
-- (void)requestThumbnailWithSize:(NSSize)size
-                      completion:(void (^)(NSImage * _Nullable))completionHandler
-{
-    [VLCLibraryImageCache thumbnailForInputItem:self withCompletion:completionHandler];
-}
-
-- (void)play
-{
-    [VLCMain.sharedInstance.playQueueController addInputItem:self.vlcInputItem
-                                                  atPosition:-1
-                                               startPlayback:YES];
-}
-
-- (void)queue
-{
-    [VLCMain.sharedInstance.playQueueController addInputItem:self.vlcInputItem
-                                                  atPosition:-1
-                                               startPlayback:NO];
 }
 
 @end

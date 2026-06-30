@@ -27,7 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
 @class VLCLinearProgressIndicator;
-@protocol VLCMediaItemRepresentable;
 
 extern NSString *VLCMediaItemCollectionViewItemIdentifier;
 
@@ -57,8 +56,6 @@ extern const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *imageViewAspectRatioConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingSecondaryTextToLeadingUnplayedIndicatorConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingSecondaryTextToTrailingSuperviewConstraint;
-
-@property (readwrite, strong, nonatomic, nullable) id<VLCMediaItemRepresentable> representedItem;
 
 @end
 

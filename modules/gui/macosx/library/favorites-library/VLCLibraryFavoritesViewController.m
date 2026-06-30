@@ -30,6 +30,7 @@
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
@@ -53,8 +54,6 @@
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "main/VLCMain.h"
-
-#import "views/VLCMediaItemCollectionViewItem.h"
 
 @interface VLCLibraryFavoritesViewController ()
 {
@@ -173,8 +172,8 @@
     collectionView.allowsEmptySelection = YES;
     collectionView.allowsMultipleSelection = YES;
     
-    [collectionView registerClass:VLCMediaItemCollectionViewItem.class
-            forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
+    [collectionView registerClass:VLCLibraryCollectionViewItem.class
+            forItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier];
     
     [collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader

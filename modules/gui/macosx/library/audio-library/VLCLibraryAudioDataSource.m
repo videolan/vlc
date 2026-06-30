@@ -28,6 +28,7 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryCarouselViewItemView.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryController.h"
@@ -55,7 +56,6 @@
 #import "playqueue/VLCPlayQueueModel.h"
 
 #import "views/VLCImageView.h"
-#import "views/VLCMediaItemCollectionViewItem.h"
 #import "views/VLCSubScrollView.h"
 
 NSString * const VLCLibrarySongsTableViewSongPlayingColumnIdentifier = @"VLCLibrarySongsTableViewSongPlayingColumnIdentifier";
@@ -447,8 +447,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 {
     NSAssert(collectionView != nil, @"Collection view must not be nil");
 
-    [collectionView registerClass:[VLCMediaItemCollectionViewItem class]
-            forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
+    [collectionView registerClass:VLCLibraryCollectionViewItem.class
+            forItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier];
 
     NSNib * const albumSupplementaryDetailView =
         [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemListSupplementaryDetailView" bundle:nil];
@@ -880,8 +880,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaItemCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier
                                   forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> actualItem = self.displayedCollection[indexPath.item];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:actualItem parentType:_currentParentType];

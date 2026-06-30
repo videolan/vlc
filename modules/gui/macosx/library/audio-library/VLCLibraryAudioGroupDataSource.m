@@ -26,18 +26,18 @@
 
 #import "main/VLCMain.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
+#import "library/VLCLibraryHeaderView.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
-#import "library/VLCLibraryHeaderView.h"
 
-#import "views/VLCMediaItemCollectionViewItem.h"
 #import "views/VLCSubScrollView.h"
 
 #import "library/VLCLibrarySegment.h"
@@ -388,9 +388,9 @@
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaItemCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier
-                                  forIndexPath:indexPath];
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier
+                                       forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:_currentParentType];
     viewItem.representedItem = representedItem;

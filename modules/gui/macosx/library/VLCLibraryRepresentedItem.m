@@ -26,7 +26,6 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 
 #import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
@@ -324,32 +323,6 @@
 - (void)moveToTrash
 {
     [self.item moveToTrash];
-}
-
-#pragma mark - VLCMediaItemRepresentable
-
-- (NSString *)displayTitle
-{
-    return self.item.displayString;
-}
-
-- (nullable NSString *)annotation
-{
-    if (![self.item isKindOfClass:VLCMediaLibraryMediaItem.class]) {
-        return nil;
-    }
-    VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)self.item;
-    if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO ||
-        mediaItem.mediaType == VLC_ML_MEDIA_TYPE_UNKNOWN) {
-        return mediaItem.firstVideoTrack.resolutionLabel;
-    }
-    return nil;
-}
-
-- (void)requestThumbnailWithSize:(NSSize)size
-                      completion:(void (^)(NSImage * _Nullable))completionHandler
-{
-    [VLCLibraryImageCache thumbnailForLibraryItem:self.item withCompletion:completionHandler];
 }
 
 @end

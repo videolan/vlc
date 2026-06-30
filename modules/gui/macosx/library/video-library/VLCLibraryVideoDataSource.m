@@ -23,6 +23,7 @@
 #import "VLCLibraryVideoDataSource.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
@@ -38,8 +39,6 @@
 #import "extensions/NSIndexSet+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
-
-#import "views/VLCMediaItemCollectionViewItem.h"
 
 NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification";
 
@@ -564,8 +563,8 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaItemCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier forIndexPath:indexPath];
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier forIndexPath:indexPath];
     const VLCMediaLibraryParentGroupType parentType = [self rowToVideoGroup:indexPath.section];
     const id<VLCMediaLibraryItemProtocol> item =
         [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];

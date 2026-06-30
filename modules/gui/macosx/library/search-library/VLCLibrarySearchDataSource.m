@@ -25,6 +25,7 @@
 #import "VLCLibrarySearchProvider.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryDetailView.h"
@@ -37,8 +38,6 @@
 
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
-
-#import "views/VLCMediaItemCollectionViewItem.h"
 
 NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibrarySearchDataSourceDidReloadNotification";
 
@@ -425,8 +424,8 @@ NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibraryS
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaItemCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier forIndexPath:indexPath];
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> item =
         [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
     VLCLibrarySearchProvider * const provider = [self providerForVisibleSection:indexPath.section];

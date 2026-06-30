@@ -29,6 +29,7 @@
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
@@ -46,8 +47,6 @@
 #import "library/groups-library/VLCLibraryGroupsDataSource.h"
 
 #import "main/VLCMain.h"
-
-#import "views/VLCMediaItemCollectionViewItem.h"
 
 @interface VLCLibraryGroupsViewController ()
 {
@@ -96,15 +95,15 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
-    self.collectionViewDelegate.staticItemSize = VLCMediaItemCollectionViewItem.defaultVideoItemSize;
+    self.collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
     self.collectionView.delegate = self.collectionViewDelegate;
 
     self.collectionView.selectable = YES;
     self.collectionView.allowsEmptySelection = YES;
     self.collectionView.allowsMultipleSelection = YES;
 
-    [self.collectionView registerClass:VLCMediaItemCollectionViewItem.class
-                 forItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier];
+    [self.collectionView registerClass:VLCLibraryCollectionViewItem.class
+                 forItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier];
 
     [self.collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
             forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader

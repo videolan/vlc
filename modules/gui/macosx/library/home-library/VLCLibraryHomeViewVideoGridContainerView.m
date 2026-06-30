@@ -27,6 +27,7 @@
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryUIUnits.h"
@@ -35,7 +36,6 @@
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
-#import "views/VLCMediaItemCollectionViewItem.h"
 #import "views/VLCSubScrollView.h"
 
 @implementation VLCLibraryHomeViewVideoGridContainerView
@@ -92,7 +92,7 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
-    _collectionViewDelegate.staticItemSize = VLCMediaItemCollectionViewItem.defaultVideoItemSize;
+    _collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
     _collectionView.delegate = _collectionViewDelegate;
 }
 

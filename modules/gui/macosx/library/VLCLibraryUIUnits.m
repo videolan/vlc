@@ -25,12 +25,12 @@
 #import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
 
 #import "views/VLCBottomBarView.h"
-#import "views/VLCMediaItemCollectionViewItem.h"
 
 #import "windows/controlsbar/VLCControlsBarCommon.h"
 
@@ -201,9 +201,9 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
     const CGFloat itemWidth = MAX(rowOfItemsWidth / numItemsInRow, 1);
     const CGFloat itemHeight = itemsAspectRatio == VLCLibraryCollectionViewItemAspectRatioDefaultItem 
-        ? itemWidth + VLCMediaItemCollectionViewItem.bottomTextViewsHeight
-        : (itemWidth * [VLCMediaItemCollectionViewItem videoHeightAspectRatioMultiplier]) 
-            + VLCMediaItemCollectionViewItem.bottomTextViewsHeight;
+        ? itemWidth + VLCLibraryCollectionViewItem.bottomTextViewsHeight
+        : (itemWidth * [VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier]) 
+            + VLCLibraryCollectionViewItem.bottomTextViewsHeight;
 
     return NSMakeSize(itemWidth, itemHeight);
 }

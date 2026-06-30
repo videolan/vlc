@@ -23,6 +23,7 @@
 #import "VLCLibraryFavoritesDataSource.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
@@ -34,7 +35,6 @@
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "views/VLCImageView.h"
-#import "views/VLCMediaItemCollectionViewItem.h"
 
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
@@ -465,8 +465,8 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaItemCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCMediaItemCollectionViewItemIdentifier
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier
                                   forIndexPath:indexPath];
     
     const VLCLibraryFavoritesSection section = [self sectionForVisibleIndex:indexPath.section];
