@@ -23,6 +23,7 @@
 #import <Foundation/Foundation.h>
 
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCMediaItemRepresentable.h"
 
 #import <vlc_common.h>
 #import <vlc_input_item.h>
@@ -39,7 +40,7 @@ extern NSString *VLCInputItemPreparsingTimeOut;
 extern NSString *VLCInputItemPreparsingSucceeded;
 extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 
-@interface VLCInputItem : NSObject<VLCLocallyManipulableItemProtocol>
+@interface VLCInputItem : NSObject<VLCMediaItemRepresentable>
 
 + (nullable instancetype)inputItemFromURL:(NSURL *)url;
 - (nullable instancetype)initWithInputItem:(struct input_item_t *)p_inputItem;
