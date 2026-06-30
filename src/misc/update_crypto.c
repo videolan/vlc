@@ -956,7 +956,7 @@ public_key_t *download_key( vlc_object_t *p_this,
         return NULL;
     }
 
-    uint8_t *p_buf = (uint8_t*)malloc( i_size );
+    uint8_t *p_buf = (uint8_t*)malloc( i_size + 1 );
     if( !p_buf )
     {
         vlc_stream_Delete( p_stream );
@@ -972,6 +972,8 @@ public_key_t *download_key( vlc_object_t *p_this,
         free( p_buf );
         return NULL;
     }
+
+    p_buf[i_size] = '\0';
 
     public_key_t *p_pkey = (public_key_t*) malloc( sizeof( public_key_t ) );
     if( !p_pkey )
@@ -1024,7 +1026,7 @@ int download_signature( vlc_object_t *p_this, signature_packet_t *p_sig,
     }
 
     msg_Dbg( p_this, "Downloading signature (%"PRIu64" bytes)", i_size );
-    uint8_t *p_buf = (uint8_t*)malloc( i_size );
+    uint8_t *p_buf = (uint8_t*)malloc( i_size + 1 );
     if( !p_buf )
     {
         vlc_stream_Delete( p_stream );
@@ -1042,6 +1044,8 @@ int download_signature( vlc_object_t *p_this, signature_packet_t *p_sig,
         free( p_buf );
         return VLC_EGENERIC;
     }
+
+    p_buf[i_size] = '\0';
 
     if( (uint8_t)*p_buf < 0x80 ) /* ASCII */
     {
