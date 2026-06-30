@@ -112,9 +112,49 @@
     return [NSImage imageNamed:@"generic"];
 }
 
++ (NSImage *)VLCPlayTemplateImage
+{
+    return [NSImage imageNamed:@"VLCPlayTemplate"];
+}
+
++ (NSImage *)VLCPauseTemplateImage
+{
+    return [NSImage imageNamed:@"VLCPauseTemplate"];
+}
+
++ (NSImage *)VLCBackwardTemplateImage
+{
+    return [NSImage imageNamed:@"VLCBackwardTemplate"];
+}
+
++ (NSImage *)VLCForwardTemplateImage
+{
+    return [NSImage imageNamed:@"VLCForwardTemplate"];
+}
+
++ (NSImage *)VLCFullscreenOffTemplateImage
+{
+    return [NSImage imageNamed:@"VLCFullscreenOffTemplate"];
+}
+
++ (NSImage *)VLCVolumeOnTemplateImage
+{
+    return [NSImage imageNamed:@"VLCVolumeOnTemplate"];
+}
+
 + (NSImage *)VLCVolumeOffTemplateImage
 {
     return [NSImage imageNamed:@"VLCVolumeOffTemplate"];
+}
+
++ (NSImage *)VLCStopImage
+{
+    return [NSImage imageNamed:@"stop"];
+}
+
++ (NSImage *)VLCStopPressedImage
+{
+    return [NSImage imageNamed:@"stop-pressed"];
 }
 
 + (NSImage *)VLCShuffleOffImage

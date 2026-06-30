@@ -301,11 +301,6 @@ NSString *toNSStr(const char *str) {
     return str != NULL ? [NSString stringWithUTF8String:str] : @"";
 }
 
-NSImage *imageFromRes(NSString *name)
-{
-    return [NSImage imageNamed:name];
-}
-
 bool fixIntfSettings(void)
 {
     NSMutableString * o_workString;

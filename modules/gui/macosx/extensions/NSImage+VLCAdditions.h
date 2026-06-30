@@ -52,7 +52,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) NSImage *VLCGenericImage;
 
 // Playback control images
+@property (class, readonly) NSImage *VLCPlayTemplateImage;
+@property (class, readonly) NSImage *VLCPauseTemplateImage;
+@property (class, readonly) NSImage *VLCBackwardTemplateImage;
+@property (class, readonly) NSImage *VLCForwardTemplateImage;
+@property (class, readonly) NSImage *VLCFullscreenOffTemplateImage;
+@property (class, readonly) NSImage *VLCVolumeOnTemplateImage;
 @property (class, readonly) NSImage *VLCVolumeOffTemplateImage;
+@property (class, readonly) NSImage *VLCStopImage;
+@property (class, readonly) NSImage *VLCStopPressedImage;
 @property (class, readonly) NSImage *VLCShuffleOffImage;
 @property (class, readonly) NSImage *VLCShuffleOnImage;
 @property (class, readonly) NSImage *VLCRepeatAllImage;

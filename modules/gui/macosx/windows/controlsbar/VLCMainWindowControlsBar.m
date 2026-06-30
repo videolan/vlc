@@ -115,9 +115,9 @@
     } else {
         _alwaysMuteImage = NSImage.VLCVolumeOffTemplateImage;
 
-        [self.stopButton setImage: imageFromRes(@"stop")];
-        [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
-        [self.volumeUpButton setImage: imageFromRes(@"VLCVolumeOnTemplate")];
+        [self.stopButton setImage:NSImage.VLCStopImage];
+        [self.stopButton setAlternateImage:NSImage.VLCStopPressedImage];
+        [self.volumeUpButton setImage:NSImage.VLCVolumeOnTemplateImage];
     }
 
     [self updateMuteVolumeButtonImage];

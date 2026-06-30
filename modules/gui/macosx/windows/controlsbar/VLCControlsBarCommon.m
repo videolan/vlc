@@ -193,15 +193,15 @@
             }
         }
     } else {
-        _playImage = imageFromRes(@"VLCPlayTemplate");
-        _pressedPlayImage = imageFromRes(@"VLCPlayTemplate");
-        _pauseImage = imageFromRes(@"VLCPauseTemplate");
-        _pressedPauseImage = imageFromRes(@"VLCPauseTemplate");
-        _backwardImage = imageFromRes(@"VLCBackwardTemplate");
-        _forwardImage = imageFromRes(@"VLCForwardTemplate");
-        _fullscreenImage = imageFromRes(@"VLCFullscreenOffTemplate");
-        _mutedVolumeImage = imageFromRes(@"VLCVolumeOffTemplate");
-        _unmutedVolumeImage = imageFromRes(@"VLCVolumeOnTemplate");
+        _playImage = NSImage.VLCPlayTemplateImage;
+        _pressedPlayImage = NSImage.VLCPlayTemplateImage;
+        _pauseImage = NSImage.VLCPauseTemplateImage;
+        _pressedPauseImage = NSImage.VLCPauseTemplateImage;
+        _backwardImage = NSImage.VLCBackwardTemplateImage;
+        _forwardImage = NSImage.VLCForwardTemplateImage;
+        _fullscreenImage = NSImage.VLCFullscreenOffTemplateImage;
+        _mutedVolumeImage = NSImage.VLCVolumeOffTemplateImage;
+        _unmutedVolumeImage = NSImage.VLCVolumeOnTemplateImage;
     }
 
     self.backwardButton.image = _backwardImage;

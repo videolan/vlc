@@ -72,11 +72,6 @@ unsigned int CocoaKeyToVLC(unichar i_key);
  */
 bool fixIntfSettings(void);
 
-/**
- * Gets an image resource
- */
-NSImage *imageFromRes(NSString *name);
-
 @interface NSString (Helpers)
 
 /**
