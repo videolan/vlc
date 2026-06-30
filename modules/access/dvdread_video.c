@@ -584,47 +584,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
             p_sys->i_cur_cell = p_pgc->program_map[pgn - 1] - 1;
         DvdReadFindCell( p_demux );
 
-        /* walk ptts accumulating per-cell durations to set each seekpoint's i_time_offset */
-        if( p_sys->i_chapters > 0 )
-        {
-            input_title_t *p_title = p_sys->titles[i_title];
-            if( p_title->seekpoint )
-            {
-                const int max_sp = __MIN( p_title->i_seekpoint,
-                                            p_sys->i_chapters );
-                const int max_ptt = p_vts->vts_ptt_srpt->title[p_sys->i_ttn - 1].nr_of_ptts;
-                const pgc_t *p_pgc_seek = p_sys->p_cur_pgc;
-                int cell = p_sys->i_title_start_cell;
-                vlc_tick_t t = 0;
-                for( int sj = 0; sj < max_sp && sj < max_ptt; sj++ )
-                {
-                    const uint16_t sj_pgc_id =
-                        p_vts->vts_ptt_srpt->title[p_sys->i_ttn - 1]
-                                             .ptt[sj].pgcn;
-                    const uint16_t sj_pgn =
-                        p_vts->vts_ptt_srpt->title[p_sys->i_ttn - 1]
-                                             .ptt[sj].pgn;
-
-                    /* cells are pgc-local, stop on pgc mismatch */
-                    if( sj_pgc_id != pgc_id || sj_pgn == 0 )
-                        break;
-                    if( sj_pgn > p_pgc_seek->nr_of_programs )
-                        break;
-
-                    const int chapter_cell =
-                        p_pgc_seek->program_map[sj_pgn - 1] - 1;
-                    while( cell < chapter_cell &&
-                           cell <= p_sys->i_title_end_cell )
-                    {
-                        t += dvdtime_to_time( &p_pgc_seek->cell_playback[cell]
-                                                  .playback_time );
-                        cell++;
-                    }
-                    p_title->seekpoint[sj]->i_time_offset = t;
-                }
-                p_title->i_length = DvdReadTitleLength( p_sys );
-            }
-        }
+        /* seekpoints are set in DemuxTitles not here */
 
         DvdReadResetCellTs( p_sys );
         p_sys->i_next_vobu = p_sys->i_cur_block =
@@ -860,6 +820,61 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
     return VLC_SUCCESS;
 }
 
+/* the player copies seekpoints only once at open */
+static void DvdReadFillTitleTimes( const ifo_handle_t *p_vts, int i_ttn,
+                                   input_title_t *t )
+{
+    if( p_vts->vts_ptt_srpt == NULL || p_vts->vts_pgcit == NULL
+     || i_ttn <= 0 || i_ttn > p_vts->vts_ptt_srpt->nr_of_srpts )
+        return;
+
+    const ttu_t *ptt = &p_vts->vts_ptt_srpt->title[i_ttn - 1];
+    if( ptt->ptt == NULL || ptt->nr_of_ptts == 0 )
+        return;
+
+    const uint16_t pgc_id = ptt->ptt[0].pgcn;
+    if( pgc_id == 0 || pgc_id > p_vts->vts_pgcit->nr_of_pgci_srp )
+        return;
+
+    const pgc_t *p_pgc = p_vts->vts_pgcit->pgci_srp[pgc_id - 1].pgc;
+    if( p_pgc == NULL || p_pgc->cell_playback == NULL
+     || p_pgc->program_map == NULL )
+        return;
+
+    const uint16_t pgn = ptt->ptt[0].pgn;
+    if( pgn == 0 || pgn > p_pgc->nr_of_programs )
+        return;
+
+    const int start_cell = p_pgc->program_map[pgn - 1] - 1;
+    const int end_cell = p_pgc->nr_of_cells - 1;
+    if( start_cell < 0 || start_cell > end_cell )
+        return;
+
+    vlc_tick_t length = 0;
+    for( int ci = start_cell; ci <= end_cell; ci++ )
+        length += dvdtime_to_time( &p_pgc->cell_playback[ci].playback_time );
+    t->i_length = length;
+
+    const int max_sp = __MIN( t->i_seekpoint, ptt->nr_of_ptts );
+    int cell = start_cell;
+    vlc_tick_t offset = 0;
+    for( int sj = 0; sj < max_sp; sj++ )
+    {
+        const uint16_t sj_pgn = ptt->ptt[sj].pgn;
+        /* stop if the chapter is in another pgc */
+        if( ptt->ptt[sj].pgcn != pgc_id || sj_pgn == 0
+         || sj_pgn > p_pgc->nr_of_programs )
+            break;
+        const int chapter_cell = p_pgc->program_map[sj_pgn - 1] - 1;
+        while( cell < chapter_cell && cell <= end_cell )
+        {
+            offset += dvdtime_to_time( &p_pgc->cell_playback[cell].playback_time );
+            cell++;
+        }
+        t->seekpoint[sj]->i_time_offset = offset;
+    }
+}
+
 /*****************************************************************************
  * DemuxTitles: get the titles/chapters or group/tracks structure
  *****************************************************************************/
@@ -894,6 +909,15 @@ static void DvdReadDemuxTitles( demux_t *p_demux, int *pi_angle )
             }
             TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
         }
+
+        const title_info_t *p_tinfo = &p_sys->p_vmg_file->tt_srpt->title[i];
+        ifo_handle_t *p_vts = ifoOpen( p_sys->p_dvdread, p_tinfo->title_set_nr );
+        if( p_vts != NULL )
+        {
+            DvdReadFillTitleTimes( p_vts, p_tinfo->vts_ttn, t );
+            ifoClose( p_vts );
+        }
+
         TAB_APPEND( p_sys->i_titles, p_sys->titles, t );
     }
 }
