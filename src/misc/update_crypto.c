@@ -590,6 +590,9 @@ out:
 int verify_signature( signature_packet_t *sign, public_key_packet_t *p_key,
                       uint8_t *p_hash )
 {
+    if( sign->public_key_algo != p_key->algo )
+        return VLC_EGENERIC;
+
     if (sign->public_key_algo == GCRY_PK_DSA)
         return verify_signature_dsa(sign, p_key, p_hash);
     else if (sign->public_key_algo == GCRY_PK_RSA)
