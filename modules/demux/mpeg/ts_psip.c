@@ -338,6 +338,9 @@ static vlc_epg_event_t * ATSC_CreateVLCEPGEvent( demux_t *p_demux, ts_psip_conte
 #ifndef ATSC_DEBUG_EIT
     VLC_UNUSED(p_demux);
 #endif
+    if( !p_basectx->p_stt || !p_basectx->p_a65 )
+        return NULL;
+
     char *psz_title = atsc_a65_Decode_multiple_string( p_basectx->p_a65,
                                                        p_evt->i_title, p_evt->i_title_length );
     char *psz_shortdesc_text = NULL;
@@ -543,10 +546,16 @@ static void ATSC_ETT_Callback( void *p_pid, dvbpsi_atsc_ett_t *p_ett )
     demux_t *p_demux = (demux_t *) p_ett_pid->u.p_psip->p_ctx->p_handle->p_sys;
     demux_sys_t *p_sys = p_demux->p_sys;
     ts_pid_t *p_base_pid = GetPID(p_sys, ATSC_BASE_PID);
+    if( unlikely(p_base_pid->type != TYPE_PSIP ) )
+    {
+        dvbpsi_atsc_DeleteETT( p_ett );
+        return;
+    }
+
     ts_psip_t *p_basepsip = p_base_pid->u.p_psip;
     ts_psip_context_t *p_basectx = p_basepsip->p_ctx;
 
-    if( p_ett->i_etm_id & 0x02 ) /* Event ETT */
+    if( (p_ett->i_etm_id & 0x02) && p_basectx->p_vct && p_basectx->p_mgt ) /* Event ETT */
     {
         ts_psip_context_t *p_ctx = p_ett_pid->u.p_psip->p_ctx;
         uint16_t i_vchannel_id, i_event_id;
