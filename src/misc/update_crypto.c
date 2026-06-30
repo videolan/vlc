@@ -54,7 +54,7 @@
 #define packet_header_len( c ) ( ( c & 0x03 ) + 1 ) /* number of bytes in a packet header */
 
 
-static inline uint32_t scalar_number( const uint8_t *p, int header_len )
+static inline uint32_t scalar_number( const uint8_t *p, size_t header_len )
 {
     assert( header_len == 1 || header_len == 2 || header_len == 4 );
 
@@ -648,15 +648,15 @@ int parse_public_key( const uint8_t *p_key_data, size_t i_key_len,
 
         int i_type = packet_type( *pos );
 
-        int i_header_len = packet_header_len( *pos++ );
-        if( pos + i_header_len > max_pos ||
+        size_t i_header_len = packet_header_len( *pos++ );
+        if( i_header_len > (size_t)( max_pos - pos ) ||
             ( i_header_len != 1 && i_header_len != 2 && i_header_len != 4 ) )
             goto error;
 
         size_t i_packet_len = scalar_number( pos, i_header_len );
         pos += i_header_len;
 
-        if( pos + i_packet_len > max_pos )
+        if( i_packet_len > (size_t)( max_pos - pos ) )
             goto error;
 
         switch( i_type )
