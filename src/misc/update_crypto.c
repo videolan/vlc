@@ -246,15 +246,16 @@ static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
         }
         else if( *p < 255 )
         {
-            if( p + 2 > max_pos )
+            if( 2 > (size_t)( max_pos - p ) )
                 return 0;
             i_subpacket_len = (*p++ - 192) << 8;
             i_subpacket_len += *p++ + 192;
         }
         else
         {
-            if( ++p + 4 > max_pos )
+            if( 5 > (size_t)( max_pos - p ) )
                 return 0;
+            p++;
             i_subpacket_len = U32_AT(p);
             p += 4;
         }
