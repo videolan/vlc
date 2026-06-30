@@ -812,7 +812,7 @@ static void ATSC_STT_Callback( void *p_cb_basepid, dvbpsi_atsc_stt_t* p_stt )
         {
             msg_Err( p_demux, "Can't attach MGT decoder to pid %d", ATSC_BASE_PID );
             ATSC_Detach_Dvbpsi_Decoders( p_handle );
-            dvbpsi_atsc_DeleteSTT( p_ctx->p_stt );
+            dvbpsi_atsc_DeleteSTT( p_stt );
             p_stt = NULL;
         }
     }
