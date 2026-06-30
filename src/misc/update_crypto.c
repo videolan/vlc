@@ -235,14 +235,12 @@ static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
 
     for( ;; )
     {
-        if( p > max_pos )
+        if( p >= max_pos )
             return 0;
 
         size_t i_subpacket_len;
         if( *p < 192 )
         {
-            if( p + 1 > max_pos )
-                return 0;
             i_subpacket_len = *p++;
         }
         else if( *p < 255 )
@@ -261,9 +259,13 @@ static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
             p += 4;
         }
 
+        if( i_subpacket_len == 0 ||
+            i_subpacket_len > (size_t)( max_pos - p ) )
+            return 0;
+
         if( *p == ISSUER_SUBPACKET )
         {
-            if( p + 9 > max_pos )
+            if( i_subpacket_len < 9 )
                 return 0;
 
             memcpy( &p_sig->issuer_longid, p+1, 8 );
