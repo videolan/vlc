@@ -77,7 +77,7 @@ parts:
       export PATH=$PWD/extras/tools/build/bin:${PATH}
       export LD_LIBRARY_PATH=$(pwd)/src/.libs/:$(pwd)/lib/.libs/:${LD_LIBRARY_PATH}
       export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
-      export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/snap/vlc-contrib-${CRAFT_ARCH_TRIPLET_BUILD_FOR}-${VLC_CONTRIB_SHA}.tar.bz2"
+      export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/snap/vlc-contrib-${CRAFT_ARCH_TRIPLET_BUILD_FOR}-${VLC_CONTRIB_SHA}.tar.zst"
       if ! extras/ci/check-url.sh "$VLC_PREBUILT_CONTRIBS_URL"; then unset VLC_PREBUILT_CONTRIBS_URL; fi
       cd contrib && mkdir linux && cd linux
       ../bootstrap \
@@ -94,7 +94,7 @@ parts:
           #export prebuilt for CI jobs
           if [ -f "$CRAFT_PROJECT_DIR/snap-save-prebuilt" ]; then
               make package
-              mv ../vlc-contrib-*.tar.bz2 $CRAFT_PROJECT_DIR/contrib || true
+              mv ../vlc-contrib-*.tar.zst $CRAFT_PROJECT_DIR/contrib || true
           fi
       fi
       cd ../..
