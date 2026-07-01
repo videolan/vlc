@@ -6,11 +6,11 @@ default:
     before_script:
         - set -x
         - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
-        - export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc-3.0/${CI_JOB_NAME##nightly-}/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2"
+        - export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc-3.0/${CI_JOB_NAME##nightly-}/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.zst"
         - if ! extras/ci/check-url.sh "$VLC_PREBUILT_CONTRIBS_URL"; then unset VLC_PREBUILT_CONTRIBS_URL; fi
     after_script:
         - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
-        - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
+        - mv contrib/vlc-contrib-*.tar.zst contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.zst 2>/dev/null || true
     interruptible: true
 
 variables:
@@ -91,7 +91,7 @@ variables:
         - schedules
     artifacts:
         paths:
-            - contrib/vlc-contrib-${TRIPLET}-*.tar.bz2
+            - contrib/vlc-contrib-${TRIPLET}-*.tar.zst
 
 # Common rules for jobs using docker
 .docker-template:

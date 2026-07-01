@@ -576,12 +576,12 @@ distclean: clean
 	$(RM) config.mak
 	unlink Makefile
 
-PREBUILT_URL=http://download.videolan.org/pub/videolan/contrib/$(HOST)/vlc-contrib-$(HOST)-latest.tar.bz2
+PREBUILT_URL=http://download.videolan.org/pub/videolan/contrib/$(HOST)/vlc-contrib-$(HOST)-latest.tar.zst
 
-vlc-contrib-$(HOST)-latest.tar.bz2:
+vlc-contrib-$(HOST)-latest.tar.zst:
 	$(call download,$(PREBUILT_URL))
 
-prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
+prebuilt: vlc-contrib-$(HOST)-latest.tar.zst
 	$(RM) -r $(PREFIX)
 	-$(UNPACK)
 	mv $(HOST) $(PREFIX)
@@ -604,7 +604,7 @@ package: install
 ifneq ($(notdir $(PREFIX)),$(HOST))
 	(cd tmp && mv $(notdir $(PREFIX)) $(HOST))
 endif
-	tar -cjf ../vlc-contrib-$(HOST)-$(DATE).tar.bz2 -C tmp $(HOST)/
+	tar -c -C tmp $(HOST)/ | zstd --quiet --force --threads=0 -12 -o ../vlc-contrib-$(HOST)-$(DATE).tar.zst
 
 list:
 	@echo All packages:
