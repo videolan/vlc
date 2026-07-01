@@ -69,7 +69,7 @@ endif
 # Force cpu detection
 ifdef HAVE_ANDROID
 ifeq ($(ARCH),arm)
-AOM_CONF += -DAOM_TARGET_CPU=armv7
+AOM_CONF += -DAOM_TARGET_CPU=armv7 -DENABLE_NEON=OFF
 endif
 ifeq ($(ARCH),aarch64)
 AOM_CONF += -DAOM_TARGET_CPU=arm64
