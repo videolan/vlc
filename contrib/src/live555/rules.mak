@@ -34,7 +34,7 @@ LIVE_TARGET := mingw
 LIVE_EXTRA_CFLAGS += -DNO_GETIFADDRS=1
 endif
 ifdef HAVE_DARWIN_OS
-LIVE_TARGET := macosx-bigsur
+LIVE_TARGET := macosx-catalina
 endif
 ifdef HAVE_BSD
 LIVE_TARGET := freebsd
