@@ -23,6 +23,7 @@ Access:
  * Add SRT listener mode support
  * Add SFTP public key authentication options and ED25519 hostkey support
  * Update SMB2 share enumeration
+ * Don't ship RealRTSP plugin (build disabled for all configurations)
 
 Service Discovery:
  * Include Chromecast model in mDNS renderer names
