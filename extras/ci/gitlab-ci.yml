@@ -21,7 +21,7 @@ variables:
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20251223015425
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
     VLC_DEBIAN_QT6_IMAGE: registry.videolan.org/vlc-debian-unstable:20260121072258
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20260611083443
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20260701183656
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20260611225331
     VLC_FLATPAK_IMAGE: registry.videolan.org/vlc-flatpak:20260516184439
 
