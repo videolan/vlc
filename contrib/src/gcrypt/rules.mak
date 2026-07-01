@@ -22,6 +22,13 @@ gcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 
 	# don't use getpid in UWP as it's not actually available
 	$(APPLY) $(SRC)/gcrypt/gcrypt-uwp-getpid.patch
+
+ifdef HAVE_ANDROID
+	# disable ARM code that doesn't compile on Android
+	sed -i.orig -e 's, sha1-armv7-neon.lo,,' -e 's, sha1-armv8-aarch32-ce.lo,,' $(UNPACK_DIR)/configure.ac
+	sed -i.orig -e 's,#ifdef USE_NEON,#if 0 //def USE_NEON,g' $(UNPACK_DIR)/cipher/sha1.c
+endif
+
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error $(DEPS_gpg-error)
@@ -59,7 +66,7 @@ endif
 ifeq ($(ANDROID_ABI), x86_64)
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
 endif
-ifeq ($(ARCH),aarch64)
+ifeq ($(ARCH),$(filter $(ARCH), arm aarch64))
 GCRYPT_CONF += --disable-arm-crypto-support
 endif
 endif
