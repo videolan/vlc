@@ -111,6 +111,39 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 500;
 }
 
++ (const CGFloat)mediaItemCollectionViewItemFooterTextHeight
+{
+    return VLCLibraryUIUnits.smallSpacing +
+           16 +
+           VLCLibraryUIUnits.smallSpacing +
+           16 +
+           VLCLibraryUIUnits.smallSpacing;
+}
+
++ (const CGFloat)defaultMediaItemCollectionViewItemWidth
+{
+    return 214;
+}
+
++ (const NSSize)defaultMediaItemCollectionViewItemSize
+{
+    const CGFloat width = VLCLibraryUIUnits.defaultMediaItemCollectionViewItemWidth;
+    return CGSizeMake(width, width + VLCLibraryUIUnits.mediaItemCollectionViewItemFooterTextHeight);
+}
+
++ (const NSSize)defaultVideoItemCollectionViewItemSize
+{
+    const CGFloat width = VLCLibraryUIUnits.defaultMediaItemCollectionViewItemWidth;
+    const CGFloat imageViewHeight = width * VLCLibraryUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier;
+    return CGSizeMake(width, imageViewHeight + VLCLibraryUIUnits.mediaItemCollectionViewItemFooterTextHeight);
+}
+
++ (const CGFloat)videoItemCollectionViewImageViewAspectRatioMultiplier
+{
+    return 10. / 16.;
+}
+
+
 + (const CGFloat)dynamicCollectionViewItemMinimumWidth
 {
     return 150;
@@ -201,9 +234,9 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
     const CGFloat itemWidth = MAX(rowOfItemsWidth / numItemsInRow, 1);
     const CGFloat itemHeight = itemsAspectRatio == VLCLibraryCollectionViewItemAspectRatioDefaultItem 
-        ? itemWidth + VLCLibraryCollectionViewItem.bottomTextViewsHeight
-        : (itemWidth * [VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier]) 
-            + VLCLibraryCollectionViewItem.bottomTextViewsHeight;
+        ? itemWidth + VLCLibraryUIUnits.mediaItemCollectionViewItemFooterTextHeight
+        : (itemWidth * VLCLibraryUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier) 
+            + VLCLibraryUIUnits.mediaItemCollectionViewItemFooterTextHeight;
 
     return NSMakeSize(itemWidth, itemHeight);
 }

@@ -64,6 +64,13 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const CGFloat largeDetailSupplementaryViewCollectionViewWidth;
 @property (class, readonly) const CGFloat largeDetailSupplementaryViewCollectionViewHeight;
 
+// NOTE: These will need to be changed after changes to the VLCMediaItemCollectionViewItem XIB
+@property (class, readonly) const CGFloat mediaItemCollectionViewItemFooterTextHeight;
+@property (class, readonly) const CGFloat videoItemCollectionViewImageViewAspectRatioMultiplier;
+@property (class, readonly) const CGFloat defaultMediaItemCollectionViewItemWidth;
+@property (class, readonly) const NSSize defaultMediaItemCollectionViewItemSize;
+@property (class, readonly) const NSSize defaultVideoItemCollectionViewItemSize;
+
 @property (class, readonly) const CGFloat dynamicCollectionViewItemMinimumWidth;
 @property (class, readonly) const CGFloat dynamicCollectionViewItemMaximumWidth;
 @property (class, readonly) const CGFloat collectionViewItemMinimumWidth;

@@ -133,7 +133,7 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioDefaultItem;
-    self.collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultSize;
+    self.collectionViewDelegate.staticItemSize = VLCLibraryUIUnits.defaultMediaItemCollectionViewItemSize;
     self.collectionView.delegate = self.collectionViewDelegate;
 
     [self.collectionView registerClass:VLCLibraryCollectionViewItem.class

@@ -95,7 +95,7 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
-    self.collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
+    self.collectionViewDelegate.staticItemSize = VLCLibraryUIUnits.defaultVideoItemCollectionViewItemSize;
     self.collectionView.delegate = self.collectionViewDelegate;
 
     self.collectionView.selectable = YES;

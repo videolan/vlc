@@ -35,13 +35,6 @@ extern const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress;
 
 @interface VLCMediaItemCollectionViewItem : NSCollectionViewItem
 
-// NOTE: These will need to be changed after changes to XIB
-@property (class, readonly) const NSSize defaultSize;
-@property (class, readonly) const NSSize defaultVideoItemSize;
-@property (class, readonly) const CGFloat defaultWidth;
-@property (class, readonly) const CGFloat bottomTextViewsHeight;
-@property (class, readonly) const CGFloat videoHeightAspectRatioMultiplier;
-
 @property (readwrite, assign) BOOL deselectWhenClickedIfSelected;
 
 @property (readwrite, weak) IBOutlet NSTextField *mediaTitleTextField;

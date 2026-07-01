@@ -57,38 +57,6 @@ const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress = 0.95;
     return self;
 }
 
-+ (const NSSize)defaultSize
-{
-    const CGFloat width = VLCMediaItemCollectionViewItem.defaultWidth;
-    return CGSizeMake(width, width + self.bottomTextViewsHeight);
-}
-
-+ (const NSSize)defaultVideoItemSize
-{
-    const CGFloat width = VLCMediaItemCollectionViewItem.defaultWidth;
-    const CGFloat imageViewHeight = width * VLCMediaItemCollectionViewItem.videoHeightAspectRatioMultiplier;
-    return CGSizeMake(width, imageViewHeight + self.bottomTextViewsHeight);
-}
-
-+ (const CGFloat)defaultWidth
-{
-    return 214.;
-}
-
-+ (const CGFloat)bottomTextViewsHeight
-{
-    return VLCLibraryUIUnits.smallSpacing +
-           16 +
-           VLCLibraryUIUnits.smallSpacing +
-           16 +
-           VLCLibraryUIUnits.smallSpacing;
-}
-
-+ (const CGFloat)videoHeightAspectRatioMultiplier
-{
-    return 10. / 16.;
-}
-
 - (void)awakeFromNib
 {
     if (@available(macOS 26.0, *)) {

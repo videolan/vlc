@@ -78,7 +78,7 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
                                                                         relatedBy:NSLayoutRelationEqual
                                                                         toItem:self.mediaImageView
                                                                         attribute:NSLayoutAttributeWidth
-                                                                       multiplier:[VLCMediaItemCollectionViewItem videoHeightAspectRatioMultiplier]
+                                                                       multiplier:VLCLibraryUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier
                                                                         constant:1];
     _videoImageViewAspectRatioConstraint.priority = NSLayoutPriorityRequired;
     _videoImageViewAspectRatioConstraint.active = NO;

@@ -154,7 +154,7 @@
 
     VLCLibraryCollectionViewFlowLayout * const mediaSourceCollectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
     self.collectionView.collectionViewLayout = mediaSourceCollectionViewLayout;
-    mediaSourceCollectionViewLayout.itemSize = VLCMediaItemCollectionViewItem.defaultSize;
+    mediaSourceCollectionViewLayout.itemSize = VLCLibraryUIUnits.defaultVideoItemCollectionViewItemSize;
 }
 
 - (void)setupMediaSourceLibraryViews
