@@ -56,6 +56,10 @@ live555: $(LIVE555_FILE) .sum-live555
 	chmod -R u+w $(UNPACK_DIR)
 	# Remove hardcoded cc, c++, ar variables
 	sed -e 's%C_COMPILER%#C_COMPILER%' -e 's%CPLUSPLUS_COMPILER%#CPLUSPLUS_COMPILER%' -e 's%LIBRARY_LINK%#LIBRARY_LINK%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
+	# Remove hardcoded --std=c+20 on un supported compilers
+ifeq ($(call gcc_at_most, 9), true)
+	sed -e 's%std=c++20%std=c++2a%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
+endif
 	# Add the Extra_CFLAGS to all config files
 	sed -i.orig \
 		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" $(UNPACK_DIR)/config.*
