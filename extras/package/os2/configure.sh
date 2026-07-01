@@ -10,7 +10,6 @@ OPTIONS="
       --enable-sftp
       --enable-vcd
       --enable-libcddb
-      --enable-realrtsp
       --enable-dvbpsi
       --enable-ogg
       --enable-mad
