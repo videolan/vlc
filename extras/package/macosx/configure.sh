@@ -14,7 +14,6 @@ OPTIONS="
         --enable-shout
         --enable-ncurses
         --enable-twolame
-        --enable-realrtsp
         --enable-libass
         --enable-macosx-avfoundation
         --disable-skins2
