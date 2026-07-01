@@ -543,6 +543,27 @@ struct libvlc_media_player_cbs
     void (*on_next_frame_status)( void *opaque, int status );
 
     /**
+     * Callback prototype that notify when the previous frame, following a call
+     * to `libvlc_media_player_previous_frame()`, is about to be displayed.
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \see libvlc_media_player_previous_frame()
+     *
+     * \note This callback is sent just before the frame is sent to the video
+     * output, use libvlc_media_player_watch_time() if you need to know exactly
+     * when the frame is displayed.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param status 0 in case of success, -EAGAIN on first call (paused),
+     * -EBUSY in case of video error, -ENOTSUP if can't pause,
+     * -EINVAL in case of invalid state, -ERANGE if the player could not seek
+     * back
+     */
+    void (*on_prev_frame_status)( void *opaque, int status );
+
+    /**
      * Callback prototype that notify when a new player vout is added or removed
      *
      * \note Optional (can be NULL),
@@ -2029,6 +2050,21 @@ LIBVLC_API bool libvlc_media_player_program_scrambled( libvlc_media_player_t *p_
  * \version LibVLC 1.1.1 or later
  */
 LIBVLC_API void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi );
+
+/**
+ * Pause and display the previous video frame.
+ *
+ * \note Works only on streams that support pause, seek, and pace control. If
+ * playing, the player will be paused first.
+ *
+ * \note The user should listen to the
+ * libvlc_media_player_cbs.on_prev_frame_status callback, to be notified when
+ * the previous frame is displayed.
+ *
+ * \param p_mi the media player
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API void libvlc_media_player_previous_frame( libvlc_media_player_t *p_mi );
 
 /**
  * Navigate through DVD Menu
