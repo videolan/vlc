@@ -355,8 +355,6 @@ nightly-debian:
 
 .flatpak-common:
     extends: .docker-template
-    variables:
-        FLATPAK_BRANCH: 3.0.x
     script:
         - flatpak-builder-lint --exceptions --exceptions-repo stable manifest extras/package/flatpak/org.videolan.VLC.yaml
         - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -377,15 +375,16 @@ nightly-debian:
             - repo-${HOST_ARCH}
             - org.videolan.VLC_${HOST_ARCH}.flatpak
 
-flatpak-x86_64:
+nightly-flatpak-x86_64:
     extends: .flatpak-common
+    only:
+        - schedules
     image:
         name: $VLC_FLATPAK_IMAGE
         entrypoint: [""]
     variables:
+        FLATPAK_BRANCH: 3.0-nightly
         HOST_ARCH: x86_64
-        # TODO remove this after we finish the test phase, not really needed outside of releases
-        BUNDLE_SOURCES: 1
     tags:
         - dind-amd64
 
@@ -410,13 +409,15 @@ release-flatpak-x86_64:
 flatpak-repo:
     stage: repo
     extends: .docker-template
-    # TODO only trigger this on tagging after we finish the test phase
-    #only:
-    #    - tags
+    only:
+        - tags
     image:
         name: $VLC_FLATPAK_IMAGE
         entrypoint: [""]
     script:
+        - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        # Install published version of VLC from Flathub to be able to generate deltas
+        - flatpak install --user -y flathub org.videolan.VLC//stable
         - ostree init --repo=repo --mode archive-z2
         - for ref in $(ostree --repo=repo-x86_64 refs); do
             flatpak build-commit-from --no-update-summary --disable-fsync --src-repo=repo-x86_64 repo "$ref";
@@ -428,7 +429,7 @@ flatpak-repo:
         paths:
             - repo.tar.gz
     dependencies:
-      - flatpak-x86_64
+      - release-flatpak-x86_64
 
 #
 # macOS
