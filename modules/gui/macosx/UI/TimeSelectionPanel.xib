@@ -11,9 +11,12 @@
                 <outlet property="cancelButton" destination="C7h-06-Udn" id="vms-H9-Fs6"/>
                 <outlet property="goToLabel" destination="bB6-Le-Ilg" id="Psy-fF-eTf"/>
                 <outlet property="hoursLabel" destination="nrO-yt-AnE" id="twB-pr-AtL"/>
+                <outlet property="hoursValueField" destination="KFt-K5-ogc" id="0sD-O9-3lm"/>
                 <outlet property="minsLabel" destination="jTf-bH-u7w" id="e6b-gc-MHz"/>
+                <outlet property="minsValueField" destination="Smg-Kh-Pjv" id="SzV-8C-Zwx"/>
                 <outlet property="okButton" destination="zrN-B3-Ede" id="TzS-HN-YE3"/>
                 <outlet property="secsLabel" destination="oMI-0n-rej" id="Heh-nH-7Dv"/>
+                <outlet property="secsValueField" destination="ovY-qj-fWV" id="nRq-T4-9hF"/>
                 <outlet property="window" destination="Fqe-af-Tt9" id="u4H-rX-p0W"/>
             </connections>
         </customObject>

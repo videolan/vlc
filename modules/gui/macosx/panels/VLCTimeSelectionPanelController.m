@@ -23,9 +23,10 @@
 
 #import "extensions/NSString+Helpers.h"
 
-@interface VLCTimeSelectionPanelController()
+@interface VLCTimeSelectionPanelController ()
 {
     TimeSelectionCompletionHandler _completionHandler;
+    id _keyMonitor;
 }
 @end
 
@@ -43,12 +44,12 @@
 
 - (void)windowDidLoad
 {
-    [_cancelButton setTitle: _NS("Cancel")];
-    [_okButton setTitle: _NS("OK")];
-    [_secsLabel setStringValue: _NS("ss")];
-    [_minsLabel setStringValue: _NS("mm")];
-    [_hoursLabel setStringValue: _NS("hh")];
-    [_goToLabel setStringValue: _NS("Jump to Time")];
+    [_cancelButton setTitle:_NS("Cancel")];
+    [_okButton setTitle:_NS("OK")];
+    [_secsLabel setStringValue:_NS("ss")];
+    [_minsLabel setStringValue:_NS("mm")];
+    [_hoursLabel setStringValue:_NS("hh")];
+    [_goToLabel setStringValue:_NS("Jump to Time")];
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification
@@ -56,40 +57,43 @@
     [self setPosition:[self getTimeInSecs]];
 }
 
-- (void)setMaxTime:(int)secsMax
+- (void)setMaxTime:(NSInteger)secsMax
 {
+    [self setTimeMax:secsMax];
+
     [self setHoursMax:(int)secsMax / 3600];
 
     if (secsMax >= 3600) {
         [self setMinsMax:59];
         [self setSecsMax:59];
-    }
-    else if (secsMax >= 60) {
+    } else if (secsMax >= 60) {
         [self setMinsMax:(int)secsMax / 60];
         [self setSecsMax:59];
-    }
-    else {
+    } else {
         [self setSecsMax:secsMax];
         [self setMinsMax:0];
     }
 }
 
-- (void)setPosition:(int)secsPos
+- (void)setPosition:(NSInteger)secsPos
 {
-    int minsPos = secsPos / 60;
+    const NSInteger maxTime = [self timeMax];
+
+    secsPos = MAX(MIN(secsPos, maxTime), 0);
+
+    NSInteger minsPos = secsPos / 60;
     secsPos = secsPos % 60;
-    int hoursPos = minsPos / 60;
+    const NSInteger hoursPos = minsPos / 60;
     minsPos = minsPos % 60;
 
-    [self setJumpSecsValue: secsPos];
-    [self setJumpMinsValue: minsPos];
-    [self setJumpHoursValue: hoursPos];
+    [self setJumpSecsValue:secsPos];
+    [self setJumpMinsValue:minsPos];
+    [self setJumpHoursValue:hoursPos];
 }
 
-- (int)getTimeInSecs
+- (NSInteger)getTimeInSecs
 {
-    // calculate resulting time in secs:
-    int timeInSec = self.jumpSecsValue;
+    NSInteger timeInSec = self.jumpSecsValue;
     timeInSec += self.jumpMinsValue * 60;
     timeInSec += self.jumpHoursValue * 3600;
     return timeInSec;
@@ -98,17 +102,75 @@
 - (IBAction)buttonPressed:(id)sender
 {
     [self.window orderOut:sender];
-    [NSApp endSheet: self.window];
+    [NSApp endSheet:self.window];
     int64_t timeInSec = [self getTimeInSecs];
 
     if (_completionHandler)
-        _completionHandler(sender == _okButton ? NSModalResponseOK : NSModalResponseCancel, timeInSec);
+        _completionHandler(sender == _okButton ? NSModalResponseOK : NSModalResponseCancel,
+                           timeInSec);
 }
 
-- (void)runModalForWindow:(NSWindow *)window completionHandler:(TimeSelectionCompletionHandler)handler
+- (void)runModalForWindow:(NSWindow *)window
+        completionHandler:(TimeSelectionCompletionHandler)handler
 {
+    __weak typeof(self) weakSelf = self;
+
+    _keyMonitor =
+        [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyDown
+                                              handler:^NSEvent *(NSEvent *event) {
+                                                  return [weakSelf handleKeyEvent:event];
+                                              }];
+
     _completionHandler = handler;
-    [window beginSheet:self.window completionHandler:nil];
+
+    [window beginSheet:self.window
+        completionHandler:^(NSModalResponse returnCode) {
+        if (self->_keyMonitor) {
+            [NSEvent removeMonitor:self->_keyMonitor];
+            }
+        }];
+}
+
+- (NSEvent *)handleKeyEvent:(NSEvent *)event
+{
+    NSString *const chars = event.characters;
+
+    unichar key = [chars characterAtIndex:0];
+
+    if (key != NSUpArrowFunctionKey && key != NSDownArrowFunctionKey) {
+        return event;
+    }
+
+    id responder = self.window.firstResponder;
+
+    if (![responder isKindOfClass:[NSTextView class]]) {
+        return event;
+    }
+
+    const NSInteger timeDifference = [self getTimeDifference:[responder delegate]];
+
+    if (!timeDifference) {
+        return event;
+    }
+
+    if (key == NSUpArrowFunctionKey) {
+        [self setPosition:[self getTimeInSecs] + timeDifference];
+    } else if (key == NSDownArrowFunctionKey) {
+        [self setPosition:[self getTimeInSecs] - timeDifference];
+    }
+    return nil;
+}
+
+- (NSInteger)getTimeDifference:(NSTextField *)textField
+{
+    if (textField == self.hoursValueField) {
+        return 3600;
+    } else if (textField == self.minsValueField) {
+        return 60;
+    } else if (textField == self.secsValueField) {
+        return 1;
+    }
+    return 0;
 }
 
 @end
