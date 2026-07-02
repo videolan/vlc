@@ -22,22 +22,24 @@
         <window title="GoTo Specific Time" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="Fqe-af-Tt9" userLabel="GoToTime">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="429" y="553" width="265" height="110"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
-            <view key="contentView" id="NrR-3A-NOR">
-                <rect key="frame" x="0.0" y="0.0" width="265" height="110"/>
+            <rect key="contentRect" x="429" y="553" width="280" height="110"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1470" height="923"/>
+            <value key="minSize" type="size" width="280" height="110"/>
+            <value key="minFullScreenContentSize" type="size" width="280" height="110"/>
+            <view key="contentView" misplaced="YES" id="NrR-3A-NOR">
+                <rect key="frame" x="0.0" y="0.0" width="280" height="110"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bB6-Le-Ilg" userLabel="Testlabel">
-                        <rect key="frame" x="56" y="87" width="153" height="17"/>
+                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bB6-Le-Ilg" userLabel="Testlabel">
+                        <rect key="frame" x="64" y="91" width="153" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Go to specific position" id="vXn-nw-Nrc">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ovY-qj-fWV" userLabel="Secs Text Field">
-                        <rect key="frame" x="176" y="50" width="33" height="19"/>
+                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ovY-qj-fWV" userLabel="Secs Text Field">
+                        <rect key="frame" x="188" y="51" width="33" height="22"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0" drawsBackground="YES" id="qZx-Li-5O2">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -53,8 +55,8 @@
                             <outlet property="nextKeyView" destination="KFt-K5-ogc" id="Wnf-MK-lCP"/>
                         </connections>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Smg-Kh-Pjv" userLabel="Mins Text Field">
-                        <rect key="frame" x="94" y="50" width="33" height="19"/>
+                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Smg-Kh-Pjv" userLabel="Mins Text Field">
+                        <rect key="frame" x="100" y="51" width="33" height="22"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0" drawsBackground="YES" id="2wj-p0-8uH">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -70,8 +72,8 @@
                             <outlet property="nextKeyView" destination="ovY-qj-fWV" id="CkK-ug-uuR"/>
                         </connections>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KFt-K5-ogc" userLabel="Hours Text Field">
-                        <rect key="frame" x="20" y="50" width="33" height="19"/>
+                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KFt-K5-ogc" userLabel="Hours Text Field">
+                        <rect key="frame" x="20" y="51" width="33" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="33" id="xwZ-sK-Qq8"/>
                         </constraints>
@@ -91,7 +93,7 @@
                         </connections>
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zsp-zD-QHr" userLabel="Secs Stepper">
-                        <rect key="frame" x="209" y="48" width="15" height="22"/>
+                        <rect key="frame" x="223" y="51" width="17" height="22"/>
                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="30000" id="8Ok-J5-Vfx"/>
                         <connections>
                             <binding destination="-2" name="value" keyPath="self.jumpSecsValue" previousBinding="G0w-1a-j9i" id="Dbd-qx-86s"/>
@@ -99,7 +101,7 @@
                         </connections>
                     </stepper>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xMh-Kx-bRX">
-                        <rect key="frame" x="127" y="48" width="15" height="22"/>
+                        <rect key="frame" x="135" y="51" width="17" height="22"/>
                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="30000" id="WNB-18-kN2"/>
                         <connections>
                             <binding destination="-2" name="value" keyPath="self.jumpMinsValue" previousBinding="s1m-Vn-LGE" id="S3p-kD-BS5"/>
@@ -107,7 +109,7 @@
                         </connections>
                     </stepper>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Un1-2R-ijf">
-                        <rect key="frame" x="53" y="48" width="15" height="22"/>
+                        <rect key="frame" x="55" y="51" width="17" height="22"/>
                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="30000" id="c5h-G9-LlU"/>
                         <connections>
                             <binding destination="-2" name="maxValue" keyPath="self.hoursMax" id="ubF-Xt-qiY"/>
@@ -122,16 +124,16 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jTf-bH-u7w">
-                        <rect key="frame" x="141" y="53" width="25" height="16"/>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jTf-bH-u7w">
+                        <rect key="frame" x="153" y="55" width="25" height="15"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="mm" id="8HU-gm-EEa">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nrO-yt-AnE">
-                        <rect key="frame" x="66" y="53" width="19" height="16"/>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nrO-yt-AnE">
+                        <rect key="frame" x="72" y="55" width="19" height="15"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="hh" id="24d-8K-jxZ">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -139,7 +141,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zrN-B3-Ede">
-                        <rect key="frame" x="208" y="15" width="42" height="27"/>
+                        <rect key="frame" x="224" y="21" width="36" height="20"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="icy-jS-WFH">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -152,7 +154,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C7h-06-Udn">
-                        <rect key="frame" x="148" y="15" width="62" height="27"/>
+                        <rect key="frame" x="160" y="21" width="56" height="20"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" inset="2" id="fXt-nh-exA">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
