@@ -1045,6 +1045,9 @@ endif
 #   3. Add a QML_MODULE_foo_SRC / QML_MODULE_foo_NODIST_EXTRA pair to the
 #      "if HAVE_QMLCACHEGEN" block below.
 #
+# The import path for QML modules is located in `qmlimportdir`, which can
+# be used to configure `qmlls`. If you use Qt Creator, you may create
+# `.qmlls.ini` file with `importPaths` entry pointing to `qmlimportdir`.
 noinst_LIBRARIES =
 QML_MODULE_LIBS =
 
@@ -1679,14 +1682,26 @@ $(QML_MODULE_QMLDIR):
 	--sources $(libqml_module_$(@D)_a_QML) \
 	--singletons $(libqml_module_$(@D)_a_Singleton_QML) \
 	--typeinfo=plugins.qmltypes
+	$(AM_V_at) $(MKDIR_P) qmlimportdir/$(libqml_module_$(@D)_a_ModulePath)
+	$(AM_V_at) $(LN_S) -f $(abs_builddir)/$@ qmlimportdir/$(libqml_module_$(@D)_a_ModulePath)
+	$(AM_V_at) for f in $(libqml_module_$(@D)_a_QML); do \
+		$(LN_S) -f $(abs_srcdir)/$$f qmlimportdir/$(libqml_module_$(@D)_a_ModulePath); \
+	done
+	$(AM_V_at) for f in $(libqml_module_$(@D)_a_Singleton_QML); do \
+		$(LN_S) -f $(abs_srcdir)/$$f qmlimportdir/$(libqml_module_$(@D)_a_ModulePath); \
+	done
 
 # Akin to QML_RULES_DEPS:
 QML_SYMLINK_FILE_DEPS = $(libqt_plugin_la_QML_MODULES:=/qmlsymlinkfiles.deps)
 $(QML_SYMLINK_FILE_DEPS): Makefile
 	$(AM_V_at)$(MKDIR_P) $(@D)
 	$(AM_V_at){ \
+	  for f in $(libqml_module_$(@D)_a_ModulePath); do \
+	    echo "CLEANFILES += qmlimportdir/$$f/qmldir qmlimportdir/$$f/plugins.qmltypes"; \
+	  done; \
 	  for f in $(libqml_module_$(@D)_a_QML) $(libqml_module_$(@D)_a_Singleton_QML); do \
 	    echo "CLEANFILES += $(@D)/$$(basename $$f)"; \
+	    echo "CLEANFILES += qmlimportdir/$(libqml_module_$(@D)_a_ModulePath)/$$(basename $$f)"; \
 	  done; \
 	} > $@.tmp && mv $@.tmp $@
 
@@ -1743,6 +1758,8 @@ $(QML_TYPES): $(QT_METATYPES)
 	    -o $(@D)/qmltyperegistrations.cpp \
 	    --generate-qmltypes=$@ $(@D)/metatypes.moc.json \
 	    --foreign-types="$$foreign"
+	$(AM_V_at) $(MKDIR_P) qmlimportdir/$(libqml_module_$(@D)_a_ModulePath)
+	$(AM_V_at) $(LN_S) -f $(abs_builddir)/$@ qmlimportdir/$(libqml_module_$(@D)_a_ModulePath)
 
 CLEANFILES += $(QML_TYPES) $(libqt_plugin_la_QML_MODULES:=/qmltyperegistrations.cpp) $(libqt_plugin_la_QML_MODULES:=/metatypes.moc.json)
 
