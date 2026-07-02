@@ -2397,9 +2397,23 @@ static bool Control( input_thread_t *p_input,
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
             ResetFramePrevious( p_input );
             priv->next_frame_need_data = false;
-            demux_Control( priv->master->p_demux,
-                           DEMUX_SET_SEEKPOINT, i_seekpoint );
+            if( demux_Control( priv->master->p_demux,
+                               DEMUX_SET_SEEKPOINT, i_seekpoint ) )
+                break;
+
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
+
+            input_title_t *p_title = priv->master->title[i_title];
+            vlc_tick_t i_length = p_title->i_length;
+            vlc_tick_t i_time = p_title->seekpoint[i_seekpoint]->i_time_offset;
+            if( i_time >= 0 && i_length > 0 )
+            {
+                input_SendEventTimes( p_input, (double)i_time / i_length,
+                                      i_time, priv->master->i_normal_time,
+                                      i_length, false );
+                b_force_update = true;
+            }
+
             if( priv->i_slave > 0 )
                 SlaveSeek( p_input );
             break;
