@@ -1463,17 +1463,7 @@ libqt_plugin_la_QML_MODULES = \
 	widgets
 
 # qmlcachegen must be provided every other module within each module because of dependency:
-QML_CACHEGEN_EXTRA_ARGS = -i $(builddir)/dialogs/qmldir \
-	-i $(builddir)/maininterface/qmldir \
-	-i $(builddir)/medialibrary/qmldir \
-	-i $(builddir)/menus/qmldir \
-	-i $(builddir)/network/qmldir \
-	-i $(builddir)/player/qmldir \
-	-i $(builddir)/playercontrols/qmldir \
-	-i $(builddir)/playlist/qmldir \
-	-i $(builddir)/style/qmldir \
-	-i $(builddir)/util/qmldir \
-	-i $(builddir)/widgets/qmldir
+QML_CACHEGEN_EXTRA_ARGS = -I $(builddir)/qmlimportdir
 
 libqt_plugin_la_ALL_QML = \
 	$(libqml_module_dialogs_a_QML) \
