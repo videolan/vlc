@@ -1,0 +1,37 @@
+From fb77acff9ba6bb01d53940da34fb10f20b156a23 Mon Sep 17 00:00:00 2001
+From: Pascal Terjan <pterjan@mageia.org>
+Date: Sun, 12 Apr 2026 19:06:08 +0000
+Subject: [PATCH] Prevent undefined behaviour in overflow check
+
+Fixes #86
+---
+ caca/canvas.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/caca/canvas.c b/caca/canvas.c
+index 7beff5b8..62b72b72 100644
+--- a/caca/canvas.c
++++ b/caca/canvas.c
+@@ -26,6 +26,7 @@
+ #   if defined(HAVE_UNISTD_H)
+ #       include <unistd.h>
+ #   endif
++#   include <limits.h>
+ #endif
+ 
+ #include "caca.h"
+@@ -368,12 +369,12 @@ int caca_resize(caca_canvas_t *cv, int width, int height)
+     int x, y, f, old_width, old_height, old_size;
+ 
+     /* Check for overflow */
+-    int new_size = width * height;
+-    if (new_size < 0 || (width > 0 && new_size / width != height))
++    if (width != 0 && height > INT_MAX / width)
+     {
+         seterrno(EOVERFLOW);
+         return -1;
+     }
++    int new_size = width * height;
+ 
+     old_width = cv->width;
+     old_height = cv->height;
