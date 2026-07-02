@@ -80,7 +80,7 @@
         {"key":"chevron_up", "path": "./icons/ic_fluent_chevron_up.svg"},
         {"key":"chevron_down", "path": "./icons/ic_fluent_chevron_down.svg"},
         {"key":"tv", "path": "./icons/ic_fluent_tv.svg"},
-        {"key":"tvtelx", "path": "./icons/tvtelx.svg"},
+        {"key":"tvtelx", "path": "./icons/ic_tvtelx.svg"},
         {"key":"transparency", "path": "./icons/transparency.svg"},
         {"key":"circle", "path": "./icons/circle.svg"},
         {"key":"visualization", "path": "./icons/visualization.svg"},

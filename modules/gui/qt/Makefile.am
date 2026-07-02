@@ -879,7 +879,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/ic_fluent_chevron_up.svg \
 	pixmaps/icons/ic_fluent_chevron_down.svg \
 	pixmaps/icons/ic_fluent_tv.svg \
-	pixmaps/icons/tvtelx.svg \
+	pixmaps/icons/ic_tvtelx.svg \
 	pixmaps/icons/visualization.svg \
 	pixmaps/icons/volume_high.svg \
 	pixmaps/icons/volume_low.svg \
