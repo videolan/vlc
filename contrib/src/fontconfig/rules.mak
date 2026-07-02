@@ -3,7 +3,7 @@
 FONTCONFIG_VERSION := 2.18.1
 FONTCONFIG_URL := https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/$(FONTCONFIG_VERSION)/fontconfig-$(FONTCONFIG_VERSION).tar.xz
 
-ifndef HAVE_WIN32
+ifneq ($(BUILD_WITH_FONTCONFIG), 0)
 PKGS += fontconfig
 endif
 ifeq ($(call need_pkg,"fontconfig >= 2.11"),)
