@@ -11,26 +11,6 @@ ifneq ($(filter aarch64 i386 x86_64, $(ARCH)),)
 WITH_ASS_ASM = 1
 endif
 
-ifdef HAVE_ANDROID
-WITH_FONTCONFIG = 1
-else
-ifdef HAVE_DARWIN_OS
-WITH_FONTCONFIG = 0
-WITH_CORETEXT = 1
-else
-ifdef HAVE_WIN32
-WITH_FONTCONFIG = 0
-WITH_DWRITE = 1
-else
-ifdef HAVE_EMSCRIPTEN
-WITH_FONTCONFIG = 0
-else
-WITH_FONTCONFIG = 1
-endif
-endif
-endif
-endif
-
 $(TARBALLS)/libass-$(ASS_VERSION).tar.xz:
 	$(call download_pkg,$(ASS_URL),ass)
 
@@ -43,18 +23,18 @@ libass: libass-$(ASS_VERSION).tar.xz .sum-ass
 DEPS_ass = freetype2 $(DEPS_freetype2) fribidi $(DEPS_fribidi) iconv $(DEPS_iconv) harfbuzz $(DEPS_harfbuzz)
 
 ASS_CONF = -Dauto_features=disabled
-ifneq ($(WITH_FONTCONFIG), 0)
+ifneq ($(BUILD_WITH_FONTCONFIG), 0)
 DEPS_ass += fontconfig $(DEPS_fontconfig)
 ASS_CONF += -Dfontconfig=enabled
 else
 ASS_CONF += -Drequire-system-font-provider=false
 endif
 
-ifeq ($(WITH_DWRITE), 1)
+ifdef HAVE_WIN32
 ASS_CONF += -Ddirectwrite=enabled
 endif
 
-ifeq ($(WITH_CORETEXT), 1)
+ifdef HAVE_DARWIN_OS
 ASS_CONF += -Dcoretext=enabled
 endif
 
