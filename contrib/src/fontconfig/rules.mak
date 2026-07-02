@@ -23,11 +23,6 @@ fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.xz .sum-fontconfig
 
 FONTCONFIG_CONF := --enable-libxml2 --disable-docs --disable-cache-build
 
-# FreeType flags
-ifneq ($(findstring freetype2,$(PKGS)),)
-FONTCONFIG_CONF += --with-freetype-config="$(PREFIX)/bin/freetype-config"
-endif
-
 ifdef HAVE_CROSS_COMPILE
 FONTCONFIG_CONF += --with-arch=$(ARCH)
 endif
