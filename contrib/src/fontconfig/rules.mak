@@ -21,12 +21,7 @@ fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.xz .sum-fontconfig
 	$(call pkg_static, "fontconfig.pc.in")
 	$(MOVE)
 
-FONTCONFIG_CONF := --enable-libxml2 --disable-docs
-FONTCONFIG_INSTALL :=
-ifdef HAVE_MACOSX
-# fc-cache crashes on macOS
-FONTCONFIG_INSTALL += RUN_FC_CACHE_TEST=false
-endif
+FONTCONFIG_CONF := --enable-libxml2 --disable-docs --disable-cache-build
 
 # FreeType flags
 ifneq ($(findstring freetype2,$(PKGS)),)
@@ -58,5 +53,5 @@ FONTCONFIG_CONF += ac_cv_va_copy=.C99
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(FONTCONFIG_CONF)
 	+$(MAKEBUILD)
-	+$(MAKEBUILD) $(FONTCONFIG_INSTALL) install
+	+$(MAKEBUILD) install
 	touch $@
