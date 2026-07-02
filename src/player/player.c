@@ -942,12 +942,37 @@ vlc_player_GetSelectedChapterIdx(vlc_player_t *player)
     return input->chapter_selected;
 }
 
+static vlc_tick_t
+vlc_player_ChapterTime(struct vlc_player_input *input, size_t index)
+{
+    if (!input->titles)
+        return -1;
+    const struct vlc_player_title *title =
+        &input->titles->array[input->title_selected];
+    if (index >= title->chapter_count)
+        return -1;
+    return title->chapters[index].time;
+}
+
+/* move the timer right away so the seek bar does not wait for new data */
+static void
+vlc_player_UpdateChapterSeekState(struct vlc_player_input *input, size_t index)
+{
+    vlc_tick_t time = vlc_player_ChapterTime(input, index);
+    if (time < 0)
+        return;
+    if (time < VLC_TICK_0)
+        time = VLC_TICK_0;
+    vlc_player_UpdateTimerSeekState(input->player, time, -1);
+}
+
 void
 vlc_player_SelectChapterIdx(vlc_player_t *player, size_t index)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return;
+    vlc_player_UpdateChapterSeekState(input, index);
     int ret = input_ControlPushHelper(input->thread, INPUT_CONTROL_SET_SEEKPOINT,
                                       &(vlc_value_t){ .i_int = index });
     if (ret == VLC_SUCCESS)
@@ -960,6 +985,7 @@ vlc_player_SelectNextChapter(vlc_player_t *player)
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return;
+    vlc_player_UpdateChapterSeekState(input, input->chapter_selected + 1);
     int ret = input_ControlPush(input->thread, INPUT_CONTROL_SET_SEEKPOINT_NEXT,
                                 NULL);
     if (ret == VLC_SUCCESS)
@@ -972,6 +998,14 @@ vlc_player_SelectPrevChapter(vlc_player_t *player)
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return;
+    size_t index = input->chapter_selected;
+    vlc_tick_t time = vlc_player_ChapterTime(input, index);
+    /* same rule as the input thread */
+    if (time >= 0 && vlc_player_input_GetTime(input, true, vlc_tick_now())
+                     >= time + VLC_TICK_FROM_SEC(3))
+        vlc_player_UpdateChapterSeekState(input, index);
+    else if (index > 0)
+        vlc_player_UpdateChapterSeekState(input, index - 1);
     int ret = input_ControlPush(input->thread, INPUT_CONTROL_SET_SEEKPOINT_PREV,
                                 NULL);
     if (ret == VLC_SUCCESS)
