@@ -20,6 +20,7 @@
 .deps
 .libs
 .dirstamp
+.qmlls.ini
 ABOUT-NLS
 aclocal.m4
 Cargo.lock
