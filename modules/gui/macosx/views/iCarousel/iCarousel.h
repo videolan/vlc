@@ -40,9 +40,7 @@
 #import <Availability.h>
 #undef weak_delegate
 #undef __weak_delegate
-#if __has_feature(objc_arc) && __has_feature(objc_arc_weak) && \
-(!(defined __MAC_OS_X_VERSION_MIN_REQUIRED) || \
-__MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_8)
+#if __has_feature(objc_arc) && __has_feature(objc_arc_weak)
 #define weak_delegate weak
 #else
 #define weak_delegate unsafe_unretained
