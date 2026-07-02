@@ -127,6 +127,8 @@ QVariant DialogsProvider::getTextDialog(QWidget *parent,
 
 void DialogsProvider::quit()
 {
+    if (b_isDying)
+        return;
     b_isDying = true;
     assert(qApp);
     qApp->setProperty("isDying", true);
