@@ -159,7 +159,7 @@ tar: tar-$(TAR_VERSION).tar.bz2
 	$(UNPACK)
 	$(MOVE)
 
-.buildtar: .xz tar
+.buildtar: tar .xz
 	cd $<; ./configure --prefix=$(PREFIX)
 	+$(MAKE) -C $<
 	+$(MAKE) -C $< install
