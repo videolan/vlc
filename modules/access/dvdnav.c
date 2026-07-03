@@ -135,6 +135,12 @@ typedef struct
     bool        b_wait_empty;
     vlc_tick_t  i_wait_start;
     bool        b_es_drained;
+    /* still show navigation */
+    bool        b_still_show;
+    int         i_show_title; /* title known to hold a still show */
+    bool        b_show_done; /* user stepped past the last slide */
+    int         i_step_part; /* part a step is jumping to */
+    vlc_tick_t  i_cell_length;
 
     struct
     {
@@ -205,8 +211,11 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 static int ControlInternal( demux_t *, int, ... );
 
 static void StillTimer( void * );
+static bool StillActive( demux_sys_t * );
 static void StillReset( demux_sys_t * );
+static void StillEnd( demux_sys_t * );
 static bool StillSkipIfNoButtons( demux_t * );
+static bool StillStep( demux_t *, int );
 
 /* some transitions never report an empty es out and would spin forever */
 static bool WaitEmptyTimeout( demux_sys_t *p_sys )
@@ -402,6 +411,10 @@ static int CommonOpen( vlc_object_t *p_this,
     if( i_angle <= 0 ) i_angle = 1;
 
     p_sys->still.b_enabled = false;
+    p_sys->b_still_show = false;
+    p_sys->i_show_title = -1;
+    p_sys->b_show_done = false;
+    p_sys->i_step_part = 0;
     p_sys->i_wait_start = VLC_TICK_INVALID;
     vlc_mutex_init( &p_sys->still.lock );
     vlc_mutex_init( &p_sys->event_lock );
@@ -850,7 +863,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            if( StillSkipIfNoButtons( p_demux ) )
+            if( StillStep( p_demux, 1 ) || StillSkipIfNoButtons( p_demux ) )
                 break;
             if( pci == NULL )
                 return VLC_EGENERIC;
@@ -885,7 +898,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            if( dvdnav_left_button_select( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
+            if( StillStep( p_demux, -1 ) )
+                break;
+            if( pci == NULL ||
+                dvdnav_left_button_select( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
                 return VLC_EGENERIC;
             break;
         }
@@ -894,7 +910,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            if( dvdnav_right_button_select( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
+            if( StillStep( p_demux, 1 ) )
+                break;
+            if( pci == NULL ||
+                dvdnav_right_button_select( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
                 return VLC_EGENERIC;
             break;
         }
@@ -1026,6 +1045,15 @@ static int Demux( demux_t *p_demux )
             msg_Dbg( p_demux, "     - buttons=%d",
                      pci ? pci->hli.hl_gi.btn_ns : -1 );
             p_sys->still.b_infinite = event->length == 0xff;
+            /* a title cell ending on an endless still with nothing to
+               press only happens in still shows */
+            if( p_sys->still.b_infinite && p_sys->cur_title > 0 &&
+                ( pci == NULL || pci->hli.hl_gi.btn_ns == 0 ) )
+            {
+                p_sys->b_still_show = true;
+                p_sys->i_show_title = p_sys->cur_title;
+                p_sys->b_show_done = false;
+            }
             p_sys->still.b_enabled = true;
 
             if( event->length != 0xff && p_sys->still.b_created )
@@ -1115,6 +1143,10 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - vtsN=%d", event->new_vtsN );
         msg_Dbg( p_demux, "     - domain=%d", event->new_domain );
 
+        p_sys->b_still_show = false;
+        p_sys->b_show_done = false;
+        p_sys->i_step_part = 0;
+
         for( int i = 0; i < PS_TK_COUNT; i++ )
         {
             ps_track_t *tk = &p_sys->tk[i];
@@ -1189,8 +1221,9 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - cell_start=%"PRId64, event->cell_start );
         msg_Dbg( p_demux, "     - pg_start=%"PRId64, event->pg_start );
 
-        /* Store the length in time of the current PGC */
+        /* Store the length in time of the current PGC and cell */
         p_sys->i_pgc_length = FROM_SCALE_NZ(event->pgc_length);
+        p_sys->i_cell_length = FROM_SCALE_NZ(event->cell_length);
         p_sys->i_vobu_index = 0;
         p_sys->i_vobu_flush = 0;
         p_sys->cell_ts.dvd = VLC_TICK_INVALID;
@@ -1213,9 +1246,20 @@ static int Demux( demux_t *p_demux )
                     i_nav_part <= p_sys->title[i_nav_title]->i_seekpoint )
                     p_sys->cur_seekpoint = i_nav_part - 1;
                 else p_sys->cur_seekpoint = 0;
+                /* a title that held an endless still once is a still
+                   show for the whole session so stepping works from its
+                   first cell on any revisit until the user runs past
+                   its last slide */
+                if( p_sys->cur_title == p_sys->i_show_title &&
+                    !p_sys->b_show_done )
+                    p_sys->b_still_show = true;
+                p_sys->i_step_part = 0;
             }
             else if( i_nav_title == 0 ) /* in menus, i_part == menu id */
             {
+                p_sys->b_still_show = false;
+                p_sys->b_show_done = false;
+                p_sys->i_step_part = 0;
                 if( MenuIDToSeekpoint( i_nav_part, &p_sys->cur_seekpoint ) )
                     p_sys->cur_seekpoint = 0; /* non standard menu number, can't map back */
                 else
@@ -1838,6 +1882,14 @@ static void StillTimer( void *p_data )
     vlc_mutex_unlock( &p_sys->still.lock );
 }
 
+static bool StillActive( demux_sys_t *p_sys )
+{
+    vlc_mutex_lock( &p_sys->still.lock );
+    bool b_active = p_sys->still.b_enabled;
+    vlc_mutex_unlock( &p_sys->still.lock );
+    return b_active;
+}
+
 /* forget the still without dvdnav_still_skip since a jump cancels it
    anyway and a pending skip would eat the next still */
 static void StillReset( demux_sys_t *p_sys )
@@ -1848,6 +1900,23 @@ static void StillReset( demux_sys_t *p_sys )
     /* stop waiting for the last picture the jump replaces it */
     p_sys->b_wait_empty = false;
     p_sys->i_wait_start = VLC_TICK_INVALID;
+    vlc_mutex_unlock( &p_sys->still.lock );
+}
+
+/* end the still and let playback continue */
+static void StillEnd( demux_sys_t *p_sys )
+{
+    vlc_mutex_lock( &p_sys->still.lock );
+    if( p_sys->still.b_enabled )
+    {
+        vlc_timer_disarm( p_sys->still.timer );
+        p_sys->still.b_enabled = false;
+        dvdnav_still_skip( p_sys->dvdnav );
+        /* read what the disc does next right away instead of finishing
+           the wait for the picture the user is leaving */
+        p_sys->b_wait_empty = false;
+        p_sys->i_wait_start = VLC_TICK_INVALID;
+    }
     vlc_mutex_unlock( &p_sys->still.lock );
 }
 
@@ -1874,6 +1943,66 @@ static bool StillSkipIfNoButtons( demux_t *p_demux )
     }
     vlc_mutex_unlock( &p_sys->still.lock );
     return b_skip;
+}
+
+/* step between the stills of a still show even when pressed in the short
+   data window between two of them where no still is active yet */
+static bool StillStep( demux_t *p_demux, int i_dir )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+    /* once a title is known to hold a show its parts stay steppable
+       even while the show flag is down past the last slide */
+    if( p_sys->cur_title <= 0 || p_sys->cur_title != p_sys->i_show_title )
+        return false;
+    if( pci != NULL && pci->hli.hl_gi.btn_ns > 0 )
+        return false; /* menu buttons take priority */
+
+    /* the 1 based part on display */
+    int i_shown = p_sys->cur_seekpoint + 1;
+
+    if( i_dir > 0 && StillActive( p_sys ) )
+    {
+        /* ending the still lets the disc reach the next slide on its
+           own without the rebuffering a jump would cost */
+        msg_Dbg( p_demux, "still show: step forward" );
+        StillEnd( p_sys );
+        p_sys->i_step_part = i_shown + 1;
+        return true;
+    }
+
+    /* step from the jump already in flight so quick presses add up */
+    int i_base = p_sys->i_step_part > 0 ? p_sys->i_step_part : i_shown;
+    /* going back never lands on the start of what is already showing */
+    if( i_dir < 0 && i_base > i_shown )
+        i_base = i_shown;
+    int i_part = i_base + ( i_dir > 0 ? 1 : -1 );
+    if( i_part < 1 )
+        i_part = 1;
+
+    bool b_in_still = StillActive( p_sys );
+    StillReset( p_sys );
+    msg_Dbg( p_demux, "still show: step to part %d", i_part );
+    if( dvdnav_part_play( p_sys->dvdnav, p_sys->cur_title, i_part )
+            != DVDNAV_STATUS_OK )
+    {
+        /* no part to step to swallow the press so it cannot turn into
+           a seek and with nothing frozen the show ends here until a
+           still proves it again */
+        if( !b_in_still )
+        {
+            p_sys->b_still_show = false;
+            p_sys->b_show_done = true;
+            p_sys->i_step_part = 0;
+        }
+    }
+    else
+    {
+        p_sys->b_show_done = false;
+        p_sys->i_step_part = i_part;
+    }
+    return true;
 }
 
 static void EventMouse( const vlc_mouse_t *newmouse, void *p_data )
