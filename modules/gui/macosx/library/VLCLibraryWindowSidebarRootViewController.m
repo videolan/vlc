@@ -66,9 +66,7 @@
     [self setupPlayQueueTitle];
     [self setupCounterLabel];
 
-    _topInternalConstraint =
-        [self.viewSelector.topAnchor constraintEqualToAnchor:self.view.topAnchor
-                                                    constant:VLCLibraryUIUnits.libraryWindowContentSafeTopInset + VLCLibraryUIUnits.smallSpacing];
+    self.topInternalConstraint.constant = [self topConstraintConstant];
 
     self.mainVideoModeEnabled = NO;
 
@@ -252,10 +250,24 @@
     [self updateTopConstraints];
 }
 
+- (CGFloat)topConstraintConstant
+{
+    CGFloat constant = VLCLibraryUIUnits.smallSpacing;
+    if (@available(macOS 11.0, *)) {
+        // Safe area layout guide already accounts for titlebar height
+        if (!self.mainVideoModeEnabled) {
+            constant += VLCLibraryUIUnits.libraryWindowContentSafeTopInset;
+        }
+    } else if (!self.mainVideoModeEnabled && self.libraryWindow.styleMask & NSWindowStyleMaskFullSizeContentView) {
+        // Compensate for full content view window's titlebar height, prevent top being cut off
+        constant += self.libraryWindow.titlebarHeight;
+    }
+    return constant;
+}
+
 - (void)updateTopConstraints
 {
-    const CGFloat internalTopConstraintConstant =
-        VLCLibraryUIUnits.libraryWindowContentSafeTopInset + VLCLibraryUIUnits.smallSpacing;
+    const CGFloat internalTopConstraintConstant = [self topConstraintConstant];
     self.topInternalConstraint.constant = internalTopConstraintConstant;
     self.playQueueHeaderTopConstraint.constant = internalTopConstraintConstant;
 }
