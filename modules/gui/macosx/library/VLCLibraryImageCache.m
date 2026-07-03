@@ -275,59 +275,55 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         ![libraryItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
 
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-            NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = libraryItem.mediaItems;
-            const NSUInteger expectedCount = mediaItems.count;
-            if (expectedCount == 0) {
+            NSArray<VLCMediaLibraryMediaItem *> * const allMediaItems = libraryItem.mediaItems;
+            const NSUInteger loadCount =
+                MIN((NSUInteger)kVLCCompositeImageDefaultCompositedGridItemCount, allMediaItems.count);
+
+            if (loadCount == 0) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     completionHandler(cache->_noArtImage);
                 });
                 return;
             }
 
+            NSArray<VLCMediaLibraryMediaItem *> * const mediaItems =
+                [allMediaItems subarrayWithRange:NSMakeRange(0, loadCount)];
+
             NSMutableArray<NSImage *> * const itemImages =
-                [NSMutableArray arrayWithCapacity:expectedCount];
-            __block NSUInteger completedCount = 0;
+                [NSMutableArray arrayWithCapacity:loadCount];
+            dispatch_group_t const group = dispatch_group_create();
 
             for (VLCMediaLibraryMediaItem * const item in mediaItems) {
-                [cache imageForLibraryItem:item withCompletion:^(NSImage * const thumbnail) {
-                    BOOL isLast = NO;
-                    @synchronized (itemImages) {
-                        NSImage * const mutableRef = (NSImage *)thumbnail;
-                        if (mutableRef && ![mutableRef isEqual:cache->_noArtImage]) {
-                            [itemImages addObject:mutableRef];
-                        }
-                        completedCount++;
-                        if (completedCount == expectedCount) {
-                            isLast = YES;
+                dispatch_group_enter(group);
+                [cache imageForLibraryItem:item withCompletion:^(const NSImage * thumbnail) {
+                    NSImage * const mutableRef = (NSImage *)thumbnail;
+                    if (mutableRef && ![mutableRef isEqual:cache->_noArtImage]) {
+                        @synchronized (itemImages) {
+                            if (![itemImages containsObject:mutableRef]) {
+                                [itemImages addObject:mutableRef];
+                            }
                         }
                     }
-                    if (!isLast) {
-                        return;
-                    }
-
-                    NSArray<NSImage *> * const uniqueImages =
-                        [NSOrderedSet orderedSetWithArray:itemImages].array;
-
-                    if (uniqueImages.count == 0) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            completionHandler(cache->_noArtImage);
-                        });
-                        return;
-                    }
-
-                    const NSSize size = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
-                    NSArray<NSValue *> * const frames =
-                        [NSImage framesForCompositeImageSquareGridWithImages:uniqueImages
-                                                                        size:size
-                                                               gridItemCount:kVLCCompositeImageDefaultCompositedGridItemCount];
-                    NSImage * const compositeImage =
-                        [NSImage compositeImageWithImages:uniqueImages frames:frames size:size];
-
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        completionHandler(compositeImage);
-                    });
+                    dispatch_group_leave(group);
                 }];
             }
+
+            dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+                if (itemImages.count == 0) {
+                    completionHandler(cache->_noArtImage);
+                    return;
+                }
+
+                const NSSize size = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
+                NSArray<NSValue *> * const frames =
+                    [NSImage framesForCompositeImageSquareGridWithImages:itemImages
+                                                                    size:size
+                                                           gridItemCount:kVLCCompositeImageDefaultCompositedGridItemCount];
+                NSImage * const compositeImage =
+                    [NSImage compositeImageWithImages:itemImages frames:frames size:size];
+
+                completionHandler(compositeImage);
+            });
         });
     } else {
         [cache imageForLibraryItem:libraryItem withCompletion:completionHandler];
