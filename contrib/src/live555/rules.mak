@@ -12,7 +12,7 @@ endif
 else
 ifdef HAVE_CLANG
 # older CLANG doesn't support -std=c++20 required for std::atomic_flag
-ifeq ($(call clang_at_least, 10), true)
+ifeq ($(call clang_at_least, 12), true)
 HAVE_LIVE555_CPP20=1
 endif
 else
