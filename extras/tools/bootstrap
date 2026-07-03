@@ -131,13 +131,45 @@ fi
 }
 
 check_tar() {
-if ! tar PcJ /dev/null >/dev/null 2>&1 && ! tar PcJf /dev/null /dev/null 2>&1
+if ! { check_tar_xz && check_tar_zstd ; }
 then
-    echo "tar doesn't support xz (J option)"
     NEEDED="$NEEDED tar"
 else
     FOUND="$FOUND tar"
 fi
+}
+
+check_tar_xz() {
+if ! tar PcJ /dev/null >/dev/null 2>&1 && ! tar PcJf /dev/null /dev/null 2>&1
+then
+    echo "tar doesn't support xz (J option)"
+    return 1
+fi
+return 0
+}
+
+check_tar_zstd() {
+output="$(tar Pc --zstd /dev/null 2>&1 >/dev/null)"
+ret="$?"
+case "$output" in
+    *"unrecognized option"*|*"not supported"*)
+        echo "tar doesn't support zstd"
+        return 1
+        ;;
+    *"not found"*|*"Can't launch external program"*)
+        echo "tar is new enough but zstd not installed"
+        NEEDED="$NEEDED zstd"
+        return 0
+        ;;
+    *)
+        if [ "$ret" -gt 0 ]; then
+            echo "tar has some unspecific error with zstd"
+            return 1
+        else
+            return 0
+        fi
+        ;;
+esac
 }
 
 check_sed() {
