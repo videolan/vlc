@@ -76,9 +76,9 @@ live555: $(LIVE555_FILE) .sum-live555
 ifndef HAVE_LIVE555_CPP20
 	sed -e 's%-std=c++20% -DNO_STD_LIB=1%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
 endif
-	# Add the Extra_CFLAGS to all config files
+	# Add the Extra_CFLAGS to the config files
 	sed -i.orig \
-		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" $(UNPACK_DIR)/config.*
+		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" $(UNPACK_DIR)/config.$(LIVE_TARGET)
 	# We want 64bits offsets and PIC on Linux
 	sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig $(UNPACK_DIR)/config.linux
 	# Disable Locale for Solaris
