@@ -368,7 +368,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
 {
-    [self doesNotRecognizeSelector:_cmd];
+    for (VLCMediaLibraryMediaItem * const item in self.mediaItems) {
+        mediaItemBlock(item);
+    }
 }
 
 - (NSArray<NSString *> *)labels
@@ -708,13 +710,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.genres.firstObject;
 }
 
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
-{
-    for(VLCMediaLibraryMediaItem* mediaItem in self.mediaItems) {
-        mediaItemBlock(mediaItem);
-    }
-}
-
 - (int)setFavorite:(BOOL)favorite
 {
     const int res = setFavoriteForLibraryItem(vlc_ml_album_set_favorite, self.libraryID, favorite);
@@ -922,13 +917,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.groupMediaItems;
 }
 
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
-{
-    for (VLCMediaLibraryMediaItem * const item in self.mediaItems) {
-        [item iterateMediaItemsWithBlock:mediaItemBlock];
-    }
-}
-
 @end
 
 @interface VLCMediaLibraryPlaylist ()
@@ -1128,17 +1116,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     NSURL * const URL = [NSURL URLWithString:_MRL];
     if (URL) {
         [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[URL]];
-    }
-}
-
-- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
-{
-    if (self.mediaItems == nil) {
-        [self fetchMediaItems];
-    }
-
-    for(VLCMediaLibraryMediaItem * const item in self.mediaItems) {
-        mediaItemBlock(item);
     }
 }
 
@@ -1872,13 +1849,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.episodes;
 }
 
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
-{
-    for (VLCMediaLibraryMediaItem * const item in self.mediaItems) {
-        mediaItemBlock(item);
-    }
-}
-
 @end
 
 @implementation VLCMediaLibraryMovie
@@ -1912,13 +1882,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 - (VLCMediaLibraryMediaItem *)firstMediaItem
 {
     return self.mediaItems.firstObject;
-}
-
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
-{
-    for (VLCMediaLibraryMediaItem *item in self.mediaItems) {
-        mediaItemBlock(item);
-    }
 }
 
 @end
