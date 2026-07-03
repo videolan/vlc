@@ -118,6 +118,9 @@ vlc_module_end ()
 
 #define BLOCK_FLAG_CELL_DISCONTINUITY (BLOCK_FLAG_PRIVATE_SHIFT << 1)
 
+/* how long to wait for the output to empty before moving on anyway */
+#define WAIT_EMPTY_TIMEOUT VLC_TICK_FROM_SEC(2)
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -130,6 +133,7 @@ typedef struct
     bool        b_reset_pcr;
     bool        b_readahead;
     bool        b_wait_empty;
+    vlc_tick_t  i_wait_start;
 
     struct
     {
@@ -202,6 +206,14 @@ static int ControlInternal( demux_t *, int, ... );
 static void StillTimer( void * );
 static void StillReset( demux_sys_t * );
 static bool StillSkipIfNoButtons( demux_t * );
+
+/* some transitions never report an empty es out and would spin forever */
+static bool WaitEmptyTimeout( demux_sys_t *p_sys )
+{
+    if( p_sys->i_wait_start == VLC_TICK_INVALID )
+        p_sys->i_wait_start = vlc_tick_now();
+    return vlc_tick_now() - p_sys->i_wait_start > WAIT_EMPTY_TIMEOUT;
+}
 
 static void EventMouse( const vlc_mouse_t *mouse, void *p_data );
 
@@ -375,6 +387,7 @@ static int CommonOpen( vlc_object_t *p_this,
     if( i_angle <= 0 ) i_angle = 1;
 
     p_sys->still.b_enabled = false;
+    p_sys->i_wait_start = VLC_TICK_INVALID;
     vlc_mutex_init( &p_sys->still.lock );
     vlc_mutex_init( &p_sys->event_lock );
     if( !vlc_timer_create( &p_sys->still.timer, StillTimer, p_sys ) )
@@ -925,11 +938,14 @@ static int Demux( demux_t *p_demux )
     {
         bool b_empty;
         es_out_Control( p_sys->p_tf_out, ES_OUT_IS_EMPTY, &b_empty );
-        if( !b_empty )
+        if( !b_empty && !WaitEmptyTimeout( p_sys ) )
         {
             vlc_tick_sleep( VLC_TICK_FROM_MS(40) );
             return VLC_DEMUXER_SUCCESS;
         }
+        if( !b_empty )
+            msg_Warn( p_demux, "es_out not drained, resuming demux" );
+        p_sys->i_wait_start = VLC_TICK_INVALID;
         p_sys->b_wait_empty = false;
         /* Don't call RESET_PCR directly as we night need to handle NAV events */
         p_sys->b_reset_pcr = true;
@@ -1009,6 +1025,10 @@ static int Demux( demux_t *p_demux )
 
         if( b_still_init )
             DemuxForceStill( p_demux );
+        else
+            /* the wait above may have given up so pace the repeats of
+               this event instead of spinning on them */
+            vlc_tick_sleep( VLC_TICK_FROM_MS(40) );
         break;
     }
 
@@ -1262,8 +1282,9 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_HOP_CHANNEL" );
         p_sys->i_vobu_index = 0;
         p_sys->i_vobu_flush = 0;
-        /* the hop ended any still */
+        /* the hop ended any still and any pending drain wait */
         StillReset( p_sys );
+        p_sys->i_wait_start = VLC_TICK_INVALID;
         es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
         break;
 
@@ -1274,12 +1295,15 @@ static int Demux( demux_t *p_demux )
         int ret = es_out_Control( p_sys->p_tf_out, ES_OUT_DRAIN );
         if( ret == VLC_SUCCESS )
             es_out_Control( p_sys->p_tf_out, ES_OUT_IS_EMPTY, &b_empty );
-        if( !b_empty )
+        if( !b_empty && !WaitEmptyTimeout( p_sys ) )
         {
             vlc_tick_sleep( VLC_TICK_FROM_MS(40) );
         }
         else
         {
+            if( !b_empty )
+                msg_Warn( p_demux, "es_out not drained, skipping wait" );
+            p_sys->i_wait_start = VLC_TICK_INVALID;
             dvdnav_wait_skip( p_sys->dvdnav );
             p_sys->b_reset_pcr = true;
         }
@@ -1808,6 +1832,7 @@ static void StillReset( demux_sys_t *p_sys )
     p_sys->still.b_enabled = false;
     /* stop waiting for the last picture the jump replaces it */
     p_sys->b_wait_empty = false;
+    p_sys->i_wait_start = VLC_TICK_INVALID;
     vlc_mutex_unlock( &p_sys->still.lock );
 }
 
@@ -1830,6 +1855,7 @@ static bool StillSkipIfNoButtons( demux_t *p_demux )
         /* read what the disc does next right away instead of finishing
            the wait for the picture the user is leaving */
         p_sys->b_wait_empty = false;
+        p_sys->i_wait_start = VLC_TICK_INVALID;
     }
     vlc_mutex_unlock( &p_sys->still.lock );
     return b_skip;
