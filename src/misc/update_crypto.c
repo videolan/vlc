@@ -925,6 +925,16 @@ uint8_t *hash_from_public_key( public_key_t *p_pkey )
     return p_hash;
 }
 
+/* Return true if the OS can handle recent https certs (>= Windows 7) */
+bool update_use_https(void)
+{
+    HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+    bool isWin7OrGreater = false;
+    if (likely(hKernel32 != NULL))
+        isWin7OrGreater = GetProcAddress(hKernel32, "GetLogicalProcessorInformationEx") != NULL;
+
+    return isWin7OrGreater;
+}
 
 /*
  * download a public key (the last one) from videolan server, and parse it
@@ -933,7 +943,8 @@ public_key_t *download_key( vlc_object_t *p_this,
                     const uint8_t *p_longid, const uint8_t *p_signature_issuer )
 {
     char *psz_url;
-    if( asprintf( &psz_url, "http://download.videolan.org/pub/keys/%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X.asc",
+    if( asprintf( &psz_url, "http%s://download.videolan.org/pub/keys/%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X.asc",
+                    update_use_https() ? "s" : "",
                     p_longid[0], p_longid[1], p_longid[2], p_longid[3],
                     p_longid[4], p_longid[5], p_longid[6], p_longid[7] ) == -1 )
         return NULL;

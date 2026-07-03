@@ -217,3 +217,5 @@ hash_from_file(
  */
 uint8_t *
 hash_from_public_key( public_key_t *p_pkey );
+
+bool update_use_https(void);
