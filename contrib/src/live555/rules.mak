@@ -82,16 +82,16 @@ endif
 	$(APPLY) $(SRC)/live555/add-pkgconfig-file.patch
 	# Expose Server:
 	$(APPLY) $(SRC)/live555/expose_server_string.patch
+	# Fix creating static libs on mingw
+	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
         # Disable Multicast interface lookup option
 	$(APPLY) $(SRC)/live555/DISABLE_LOOPBACK_IP_ADDRESS_CHECK.patch
 ifdef HAVE_ANDROID
-	# Always access in_addr.s_addr field
+	# Fix in_addr.s_addr field access
 	$(APPLY) $(SRC)/live555/in_addr-s_addr-field.patch
 	# Don't use unavailable off64_t functions
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
 endif
-	# Fix creating static libs on mingw
-	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
 
 	mv live.$(LIVE555_VERSION) $@ && touch $@
 
