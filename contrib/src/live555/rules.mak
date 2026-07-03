@@ -97,6 +97,8 @@ endif
 	$(APPLY) $(SRC)/live555/android-no-ifaddrs.patch
 	# Don't use unavailable off64_t functions
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
+	# fix Win32 time_tm constructor to build on older compilers
+	sed -e 's,= tm{},= tm\(\),' -i.orig $(UNPACK_DIR)/liveMedia/RTSPCommon.cpp
 	# disable code built/installed in unused folder
 	sed -e 's,all: $$(,all: #,' -e 's,install: $$,install: #,' -e 's,install ,#install ,' -i.orig $(UNPACK_DIR)/testProgs/Makefile.tail
 	sed -e 's,all: $$(,all: #,' -e 's,install: $$,install: #,' -e 's,install ,#install ,' -i.orig $(UNPACK_DIR)/mediaServer/Makefile.tail
