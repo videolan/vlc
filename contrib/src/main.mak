@@ -155,7 +155,7 @@ clang_major_is = $(shell echo false)
 gcc_at_least = $(shell echo false)
 gcc_at_most  = $(shell echo false)
 gcc_major_is = $(shell echo false)
-ifneq ($(findstring clang, $(shell $(CC) --version 2>/dev/null)),)
+ifneq ($(findstring clang, $(shell $(CC) --version 2>/dev/null | grep -qi clang && echo "clang")),)
 HAVE_CLANG := 1
 CLANG_VERSION := $(shell $(CC) --version | head -1 | grep -o '[0-9]\+\.' | head -1 | cut -d '.' -f 1)
 clang_at_least = $(shell [ $(CLANG_VERSION) -ge $(1) ] && echo true)
