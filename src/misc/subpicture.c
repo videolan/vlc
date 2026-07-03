@@ -210,6 +210,9 @@ void subpicture_Update( subpicture_t *p_subpicture,
 
     video_format_Copy( &p_private->src, p_fmt_src );
     video_format_Copy( &p_private->dst, p_fmt_dst );
+
+    p_private->display_width = display_width;
+    p_private->display_height = display_height;
 }
 
 typedef struct subpicture_region_private_t
