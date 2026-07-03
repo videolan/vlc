@@ -98,6 +98,8 @@ endif
 	$(APPLY) $(SRC)/live555/android-no-ifaddrs.patch
 	# Don't use unavailable off64_t functions
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
+	# add IPv4 inet_pton()/inet_ntop() helper on older Windows
+	$(APPLY) $(SRC)/live555/live555-vista-inet.patch
 	# fix Win32 time_tm constructor to build on older compilers
 	sed -e 's,= tm{},= tm\(\),' -i.orig $(UNPACK_DIR)/liveMedia/RTSPCommon.cpp
 	# disable code built/installed in unused folder
