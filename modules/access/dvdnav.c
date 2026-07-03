@@ -134,6 +134,7 @@ typedef struct
     bool        b_readahead;
     bool        b_wait_empty;
     vlc_tick_t  i_wait_start;
+    bool        b_es_drained;
 
     struct
     {
@@ -213,6 +214,20 @@ static bool WaitEmptyTimeout( demux_sys_t *p_sys )
     if( p_sys->i_wait_start == VLC_TICK_INVALID )
         p_sys->i_wait_start = vlc_tick_now();
     return vlc_tick_now() - p_sys->i_wait_start > WAIT_EMPTY_TIMEOUT;
+}
+
+/* a second drain before new data would restart it and never complete */
+static int EsOutDrainOnce( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( p_sys->b_es_drained )
+        return VLC_SUCCESS;
+
+    int ret = es_out_Control( p_sys->p_tf_out, ES_OUT_DRAIN );
+    if( ret == VLC_SUCCESS )
+        p_sys->b_es_drained = true;
+    return ret;
 }
 
 static void EventMouse( const vlc_mouse_t *mouse, void *p_data );
@@ -1292,8 +1307,7 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_WAIT" );
 
         bool b_empty = true;
-        int ret = es_out_Control( p_sys->p_tf_out, ES_OUT_DRAIN );
-        if( ret == VLC_SUCCESS )
+        if( EsOutDrainOnce( p_demux ) == VLC_SUCCESS )
             es_out_Control( p_sys->p_tf_out, ES_OUT_IS_EMPTY, &b_empty );
         if( !b_empty && !WaitEmptyTimeout( p_sys ) )
         {
@@ -1549,6 +1563,8 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int32_t len )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    p_sys->b_es_drained = false;
+
     while( len > 0 )
     {
         int i_size = ps_pkt_size( p, len );
@@ -1671,8 +1687,7 @@ static void DemuxForceStill( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int ret = es_out_Control( p_sys->p_tf_out, ES_OUT_DRAIN );
-    if (ret == VLC_SUCCESS)
+    if( EsOutDrainOnce( p_demux ) == VLC_SUCCESS )
         p_sys->b_wait_empty = true;
 }
 
