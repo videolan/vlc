@@ -3350,19 +3350,19 @@ struct vlc_player_cbs
     void (*on_next_frame_status)(vlc_player_t *player, int status, void *data);
 
     /**
-    * Called when the previous frame, following a call to
-    * `vlc_player_PreviousVideoFrame()`, is displayed.
-    *
-    * @see vlc_player_PreviousVideoFrame()
-    *
-    * @param player locked player instance
-    * @param status 0 in case of success,
-    * -EAGAIN on first call (paused) or on first frame,
-    * -EBUSY in case of video error,
-    * -ENOTSUP if can't pause/seek/pace,
-    * -EINVAL in case of invalid state,
-    * -ERANGE if the player could not seek back
-    */
+     * Called when the previous frame, following a call to
+     * `vlc_player_PreviousVideoFrame()`, is about to displayed.
+     *
+     * @see vlc_player_PreviousVideoFrame()
+     *
+     * @param player locked player instance
+     * @param status 0 in case of success,
+     * -EAGAIN on first call (paused) or on first frame,
+     * -EBUSY in case of video error,
+     * -ENOTSUP if can't pause/seek/pace,
+     * -EINVAL in case of invalid state,
+     * -ERANGE if the player could not seek back
+     */
     void (*on_prev_frame_status)(vlc_player_t *player, int status, void *data);
 };
 
