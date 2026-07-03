@@ -135,6 +135,7 @@ typedef struct
     {
         bool         b_created;
         bool         b_enabled;
+        bool         b_infinite;
         vlc_mutex_t  lock;
         vlc_timer_t  timer;
     } still;
@@ -199,6 +200,7 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 static int ControlInternal( demux_t *, int, ... );
 
 static void StillTimer( void * );
+static bool StillSkipIfNoButtons( demux_t * );
 
 static void EventMouse( const vlc_mouse_t *mouse, void *p_data );
 
@@ -694,7 +696,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_PAUSE_STATE:
+        {
+            bool b_pause = (bool)va_arg( args, int );
+            /* play on a still means continue like on a hardware player
+               refusing the pause keeps the next program playing */
+            if( StillSkipIfNoButtons( p_demux ) && b_pause )
+                return VLC_EGENERIC;
             return VLC_SUCCESS;
+        }
 
         case DEMUX_GET_TITLE_INFO:
             ppp_title = va_arg( args, input_title_t*** );
@@ -805,6 +814,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_NAV_ACTIVATE:
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+            if( StillSkipIfNoButtons( p_demux ) )
+                break;
+            if( pci == NULL )
+                return VLC_EGENERIC;
 
             if( dvdnav_button_activate( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
                 return VLC_EGENERIC;
@@ -973,6 +987,10 @@ static int Demux( demux_t *p_demux )
         {
             msg_Dbg( p_demux, "DVDNAV_STILL_FRAME" );
             msg_Dbg( p_demux, "     - length=0x%x", event->length );
+            pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+            msg_Dbg( p_demux, "     - buttons=%d",
+                     pci ? pci->hli.hl_gi.btn_ns : -1 );
+            p_sys->still.b_infinite = event->length == 0xff;
             p_sys->still.b_enabled = true;
 
             if( event->length != 0xff && p_sys->still.b_created )
@@ -1773,6 +1791,30 @@ static void StillTimer( void *p_data )
         dvdnav_still_skip( p_sys->dvdnav );
     }
     vlc_mutex_unlock( &p_sys->still.lock );
+}
+
+/* some discs end a clip on an endless still with nothing to activate
+   expecting the user to press play to continue */
+static bool StillSkipIfNoButtons( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+    vlc_mutex_lock( &p_sys->still.lock );
+    bool b_skip = p_sys->still.b_enabled && p_sys->still.b_infinite &&
+                  ( pci == NULL || pci->hli.hl_gi.btn_ns == 0 );
+    if( b_skip )
+    {
+        msg_Dbg( p_demux, "skipping button-less still" );
+        vlc_timer_disarm( p_sys->still.timer );
+        p_sys->still.b_enabled = false;
+        dvdnav_still_skip( p_sys->dvdnav );
+        /* read what the disc does next right away instead of finishing
+           the wait for the picture the user is leaving */
+        p_sys->b_wait_empty = false;
+    }
+    vlc_mutex_unlock( &p_sys->still.lock );
+    return b_skip;
 }
 
 static void EventMouse( const vlc_mouse_t *newmouse, void *p_data )
