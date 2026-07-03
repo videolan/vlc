@@ -6,6 +6,11 @@ if host_system == 'darwin'
     opengl_headers_c_args += ['-DGL_SILENCE_DEPRECATION']
 endif
 
+opengl32_lib = cc.find_library('opengl32', required: false)
+if have_win_desktop and opengl32_lib.found() and not missing_win_glew
+    opengl_headers_c_args += contrib_inc_args
+endif
+
 gl_common_dep = declare_dependency(
     sources: files(
         'filter.c',
@@ -147,7 +152,6 @@ vlc_modules += {
 }
 
 # interop_dxva2
-opengl32_lib = cc.find_library('opengl32', required: false)
 dxva2_dep = cc.find_library('dxva2', required: false)
 vlc_modules += {
     'name' : 'glinterop_dxva2',
