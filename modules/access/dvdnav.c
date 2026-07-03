@@ -200,6 +200,7 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 static int ControlInternal( demux_t *, int, ... );
 
 static void StillTimer( void * );
+static void StillReset( demux_sys_t * );
 static bool StillSkipIfNoButtons( demux_t * );
 
 static void EventMouse( const vlc_mouse_t *mouse, void *p_data );
@@ -641,6 +642,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             case DEMUX_SET_POSITION:
             {
                 const double f = va_arg( args, double );
+                StillReset( p_sys );
                 if( p_sys->i_pgc_length > 0 &&
                     dvdnav_jump_to_sector_by_time( p_sys->dvdnav,
                         TO_SCALE_NZ((vlc_tick_t)( f * p_sys->i_pgc_length )),
@@ -679,6 +681,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_TIME:
         {
             vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+            StillReset( p_sys );
             if( dvdnav_jump_to_sector_by_time( p_sys->dvdnav,
                                                TO_SCALE_NZ(i_time),
                                                SEEK_SET ) == DVDNAV_STATUS_OK )
@@ -739,7 +742,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( i != 0 )
             {
-                dvdnav_still_skip( p_sys->dvdnav );
+                StillReset( p_sys );
                 if( dvdnav_title_play( p_sys->dvdnav, i ) != DVDNAV_STATUS_OK )
                 {
                     msg_Warn( p_demux, "cannot set title/chapter" );
@@ -765,11 +768,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     dvdnav_menu_call(p_sys->dvdnav, menuid) != DVDNAV_STATUS_OK )
                     return VLC_EGENERIC;
             }
-            else if( dvdnav_part_play( p_sys->dvdnav, p_sys->cur_title,
-                                       i + 1 ) != DVDNAV_STATUS_OK )
+            else
             {
-                msg_Warn( p_demux, "cannot set title/chapter" );
-                return VLC_EGENERIC;
+                StillReset( p_sys );
+                if( dvdnav_part_play( p_sys->dvdnav, p_sys->cur_title,
+                                      i + 1 ) != DVDNAV_STATUS_OK )
+                {
+                    msg_Warn( p_demux, "cannot set title/chapter" );
+                    return VLC_EGENERIC;
+                }
             }
             p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_seekpoint = i;
@@ -955,10 +962,7 @@ static int Demux( demux_t *p_demux )
     switch( i_event )
     {
     case DVDNAV_BLOCK_OK:   /* mpeg block */
-        vlc_mutex_lock( &p_sys->still.lock );
-        vlc_timer_disarm( p_sys->still.timer );
-        p_sys->still.b_enabled = false;
-        vlc_mutex_unlock( &p_sys->still.lock );
+        StillReset( p_sys );
         if( p_sys->b_reset_pcr )
         {
             es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
@@ -1258,6 +1262,8 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_HOP_CHANNEL" );
         p_sys->i_vobu_index = 0;
         p_sys->i_vobu_flush = 0;
+        /* the hop ended any still */
+        StillReset( p_sys );
         es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
         break;
 
@@ -1790,6 +1796,18 @@ static void StillTimer( void *p_data )
         p_sys->still.b_enabled = false;
         dvdnav_still_skip( p_sys->dvdnav );
     }
+    vlc_mutex_unlock( &p_sys->still.lock );
+}
+
+/* forget the still without dvdnav_still_skip since a jump cancels it
+   anyway and a pending skip would eat the next still */
+static void StillReset( demux_sys_t *p_sys )
+{
+    vlc_mutex_lock( &p_sys->still.lock );
+    vlc_timer_disarm( p_sys->still.timer );
+    p_sys->still.b_enabled = false;
+    /* stop waiting for the last picture the jump replaces it */
+    p_sys->b_wait_empty = false;
     vlc_mutex_unlock( &p_sys->still.lock );
 }
 
