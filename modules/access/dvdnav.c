@@ -677,12 +677,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             switch( i_query )
             {
             case DEMUX_GET_POSITION:
-                *va_arg( args, double* ) = (double)pos / (double)len;
+            {
+                double f;
+                if( p_sys->b_still_show )
+                    f = 1.0;
+                else
+                    f = (double)pos / (double)len;
+                *va_arg( args, double* ) = f;
                 return VLC_SUCCESS;
+            }
 
             case DEMUX_SET_POSITION:
             {
                 const double f = va_arg( args, double );
+                /* the bar of a still show is not a timeline there is
+                   nowhere to scrub to */
+                if( p_sys->b_still_show )
+                    return VLC_SUCCESS;
                 StillReset( p_sys );
                 if( p_sys->i_pgc_length > 0 &&
                     dvdnav_jump_to_sector_by_time( p_sys->dvdnav,
@@ -700,6 +711,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             case DEMUX_GET_LENGTH:
+            {
+                if( p_sys->b_still_show && p_sys->i_cell_length > 0 )
+                {
+                    *va_arg( args, vlc_tick_t * ) = p_sys->i_cell_length;
+                    return VLC_SUCCESS;
+                }
                 if( p_sys->i_pgc_length > 0 )
                 {
                     *va_arg( args, vlc_tick_t * ) = p_sys->i_pgc_length;
@@ -707,10 +724,20 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 break;
             }
+            }
             return VLC_EGENERIC;
         }
 
         case DEMUX_GET_TIME:
+        {
+            /* the bar stays full through a still show a full unmoving
+               bar is the only thing the interface cannot keep animating
+               on its own */
+            if( p_sys->b_still_show && p_sys->i_cell_length > 0 )
+            {
+                *va_arg( args, vlc_tick_t * ) = p_sys->i_cell_length;
+                return VLC_SUCCESS;
+            }
             if( p_sys->i_pgc_length > 0 )
             {
                 *va_arg( args, vlc_tick_t * ) =
@@ -718,10 +745,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             break;
+        }
 
         case DEMUX_SET_TIME:
         {
             vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+            if( p_sys->b_still_show )
+                return VLC_SUCCESS;
             StillReset( p_sys );
             if( dvdnav_jump_to_sector_by_time( p_sys->dvdnav,
                                                TO_SCALE_NZ(i_time),
