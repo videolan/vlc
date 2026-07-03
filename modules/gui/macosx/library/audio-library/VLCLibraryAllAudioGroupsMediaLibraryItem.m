@@ -66,10 +66,29 @@
 
 - (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
 {
-    // Iterate by album
+    [self enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item, BOOL * const stop) {
+        mediaItemBlock(item);
+    }];
+}
+
+- (void)enumerateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull, BOOL * _Nonnull))mediaItemBlock
+{
     NSArray<id<VLCMediaLibraryItemProtocol>> * const childItems = self.albums;
-    for(id<VLCMediaLibraryItemProtocol> childItem in childItems) {
-        [childItem iterateMediaItemsWithBlock:mediaItemBlock];
+    __block BOOL shouldStop = NO;
+    for (id<VLCMediaLibraryItemProtocol> const childItem in childItems) {
+        if (shouldStop) {
+            break;
+        }
+        [childItem enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item, BOOL * const stop) {
+            if (shouldStop) {
+                *stop = YES;
+                return;
+            }
+            mediaItemBlock(item, stop);
+            if (*stop) {
+                shouldStop = YES;
+            }
+        }];
     }
 }
 

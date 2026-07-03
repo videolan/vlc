@@ -144,6 +144,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 - (int)setFavorite:(BOOL)favorite;
 - (int)toggleFavorite;
 
+- (void)enumerateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem *item, BOOL *stop))mediaItemBlock;
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
 @end
