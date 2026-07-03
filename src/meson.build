@@ -28,6 +28,7 @@ fourcc = custom_target('fourcc_tables.h',
 
 meson_build_config = custom_target('build_config.c',
     command: [find_program('../buildsystem/gen-build-config.py'),
+              '--',
               meson.build_options().replace('\'"\'"\'', '\\\'')],
     capture: true,
     output: 'build_config.c',
