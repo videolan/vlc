@@ -36,6 +36,7 @@
 #include <vlc_avcodec.h>
 
 #include "avcodec.h"
+#include "../../demux/xiph.h"
 
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
@@ -98,6 +99,20 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
             i_size = __MIN( p_dec->fmt_in->i_extra - i_offset, 36 );
             if( i_size < 36 )
                 i_size = 0;
+        }
+        else if( p_dec->fmt_in->i_codec == VLC_CODEC_OPUS &&
+                 i_size > 21 && !memcmp( &p_src[2], "OpusHead", 8 ) )
+        {
+            /* see opus.c decoder */
+            size_t hdr_size[XIPH_MAX_HEADER_COUNT];
+            const void *hdr[XIPH_MAX_HEADER_COUNT];
+            size_t i_count;
+            if( !xiph_SplitHeaders( hdr_size, hdr, &i_count,
+                                    i_size, p_src ) && i_count >= 1 )
+            {
+                i_offset = (const uint8_t *)hdr[0] - p_src;
+                i_size = hdr_size[0];
+            }
         }
 
         if( i_size > 0 )
