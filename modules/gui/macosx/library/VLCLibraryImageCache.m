@@ -275,33 +275,41 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         ![libraryItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
 
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-            NSArray<VLCMediaLibraryMediaItem *> * const allMediaItems = libraryItem.mediaItems;
-            const NSUInteger loadCount =
-                MIN((NSUInteger)kVLCCompositeImageDefaultCompositedGridItemCount, allMediaItems.count);
+            NSMutableSet<NSString *> * const seenMRLs = NSMutableSet.set;
+            NSMutableArray<VLCMediaLibraryMediaItem *> * const uniqueItems =
+                [NSMutableArray arrayWithCapacity:kVLCCompositeImageDefaultCompositedGridItemCount];
 
-            if (loadCount == 0) {
+            [libraryItem enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item, BOOL * const stop) {
+                if (uniqueItems.count == (NSUInteger)kVLCCompositeImageDefaultCompositedGridItemCount) {
+                    *stop = YES;
+                    return;
+                }
+                NSString * const mrl = item.smallArtworkMRL;
+                if (mrl == nil || [seenMRLs containsObject:mrl]) {
+                    return;
+                }
+                [seenMRLs addObject:mrl];
+                [uniqueItems addObject:item];
+            }];
+
+            if (uniqueItems.count == 0) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     completionHandler(cache->_noArtImage);
                 });
                 return;
             }
 
-            NSArray<VLCMediaLibraryMediaItem *> * const mediaItems =
-                [allMediaItems subarrayWithRange:NSMakeRange(0, loadCount)];
-
             NSMutableArray<NSImage *> * const itemImages =
-                [NSMutableArray arrayWithCapacity:loadCount];
+                [NSMutableArray arrayWithCapacity:uniqueItems.count];
             dispatch_group_t const group = dispatch_group_create();
 
-            for (VLCMediaLibraryMediaItem * const item in mediaItems) {
+            for (VLCMediaLibraryMediaItem * const item in uniqueItems) {
                 dispatch_group_enter(group);
                 [cache imageForLibraryItem:item withCompletion:^(const NSImage * thumbnail) {
                     NSImage * const mutableRef = (NSImage *)thumbnail;
                     if (mutableRef && ![mutableRef isEqual:cache->_noArtImage]) {
                         @synchronized (itemImages) {
-                            if (![itemImages containsObject:mutableRef]) {
-                                [itemImages addObject:mutableRef];
-                            }
+                            [itemImages addObject:mutableRef];
                         }
                     }
                     dispatch_group_leave(group);
