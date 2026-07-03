@@ -1,0 +1,33 @@
+--- live555/groupsock/NetAddress.cpp.orig	2026-06-25 00:45:17.000000000 +0200
++++ live555/groupsock/NetAddress.cpp	2026-07-03 15:07:01.647505300 +0200
+@@ -165,6 +165,30 @@ Boolean operator==(struct sockaddr_stora
+   }
+ }
+ 
++#if defined(_WIN32) && _WIN32_WINNT < 0x0600
++#ifndef AI_ADDRCONFIG
++# define AI_ADDRCONFIG   0x0400
++#endif
++static inline int inet_pton(int af, const char *src, u_int8_t *b)
++{
++  if (af != AF_INET) {
++    return 0;
++  }
++  return sscanf (src, "%hhu.%hhu.%hhu.%hhu",
++                 b + 0, b + 1, b + 2, b + 3) == 4;
++}
++
++static inline void inet_ntop(int af, const void *src, char *dst, int len)
++{
++  if (af != AF_INET) {
++    return;
++  }
++  const unsigned char *b = static_cast<const unsigned char *>(src);
++  _snprintf(dst, len, "%hhu.%hhu.%hhu.%hhu",
++            b[0], b[1], b[2], b[3]);
++}
++#endif
++
+ 
+ ////////// NetAddressList //////////
+ 
