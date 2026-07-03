@@ -772,8 +772,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_PAUSE_STATE:
         {
             bool b_pause = (bool)va_arg( args, int );
-            /* play on a still means continue like on a hardware player
-               refusing the pause keeps the next program playing */
+            /* nothing in a still show is worth pausing space means next
+               slide whether something moves or not */
+            if( b_pause && p_sys->b_still_show && StillStep( p_demux, 1 ) )
+                return VLC_EGENERIC;
+            /* play on a clip end still means continue like on a hardware
+               player refusing the pause keeps the next program playing */
             if( StillSkipIfNoButtons( p_demux ) && b_pause )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
