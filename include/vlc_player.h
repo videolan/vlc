@@ -3338,9 +3338,13 @@ struct vlc_player_cbs
 
     /**
      * Called when the next frame, following a call to
-     * `vlc_player_NextVideoFrame()`, is displayed.
+     * `vlc_player_NextVideoFrame()`, is about to be displayed.
      *
      * @see vlc_player_NextVideoFrame()
+     *
+     * @note This event is sent just before the frame is sent to the video
+     * output, use vlc_player_AddTimer() if you need to know exactly when the
+     * frame is displayed.
      *
      * @param player locked player instance
      * @param status 0 in case of success, -EAGAIN on first call (paused),
@@ -3354,6 +3358,10 @@ struct vlc_player_cbs
      * `vlc_player_PreviousVideoFrame()`, is about to displayed.
      *
      * @see vlc_player_PreviousVideoFrame()
+     *
+     * @note This event is sent just before the frame is sent to the video
+     * output, use vlc_player_AddTimer() if you need to know exactly when the
+     * frame is displayed.
      *
      * @param player locked player instance
      * @param status 0 in case of success,
