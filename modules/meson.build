@@ -369,6 +369,9 @@ subdir('visualization')
 # lua module
 subdir('lua')
 
+#x86 modules
+subdir('isa/x86')
+
 # muxer modules
 if get_option('stream_outputs')
     subdir('mux')

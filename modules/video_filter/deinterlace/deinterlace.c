@@ -559,18 +559,12 @@ notsupp:
         p_sys->pf_merge = MergeAltivec;
     else
 #endif
-#if defined(CAN_COMPILE_SSE2)
-    if( vlc_CPU_SSE2() )
-    {
-        p_sys->pf_merge = pixel_size == 1 ? Merge8BitSSE2 : Merge16BitSSE2;
-        p_sys->pf_end_merge = EndSSE;
-    }
-    else
-#endif
     {
         vlc_CPU_functions_init_once("deinterlace functions", &funcs);
         p_sys->pf_merge = funcs.merges[stdc_trailing_zeros(pixel_size)];
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(CAN_COMPILE_SSE2) && (defined(__i386__) || defined(__x86_64__))
+        p_sys->pf_end_merge = vlc_CPU_SSE2() ? EndSSE : NULL;
+#elif defined(__i386__) || defined(__x86_64__)
         p_sys->pf_end_merge = NULL;
 #endif
     }
