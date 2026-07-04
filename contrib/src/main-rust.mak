@@ -134,10 +134,8 @@ download_vendor = \
 .%-vendor: $(SRC)/%-vendor/SHA512SUMS
 	$(RM) -R $(patsubst .%,%,$@)
 	-$(call checksum,$(SHA512SUM),SHA512,.) \
-		$(foreach f,$(filter %.tar.bz2,$^), && tar $(TAR_VERBOSE)xjfo $(f) && \
-		  mv $(patsubst %.tar.bz2,%,$(notdir $(f))) $(patsubst .%,%,$@)) \
-		$(foreach f,$(filter %.tar.zst,$^), && tar $(TAR_VERBOSE)xfo $(f) && \
-		  mv $(patsubst %.tar.zst,%,$(notdir $(f))) $(patsubst .%,%,$@))
+		$(foreach f,$(filter %.tar.bz2 %.tar.zst,$^), && tar $(TAR_VERBOSE)xfo $(f) && \
+		  mv $(patsubst %.tar,%,$(basename $(notdir $(f)))) $(patsubst .%,%,$@))
 	touch $@
 
 cargo_vendor_setup = \
