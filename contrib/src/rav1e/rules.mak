@@ -25,12 +25,12 @@ DEPS_rav1e = vendor-rav1e $(DEPS_vendor-rav1e) cargo-c $(DEPS_cargo-c)
 
 # vendor-rav1e
 
-$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e
-	$(call download_vendor,rav1e-$(RAV1E_VERSION)-vendor.tar.bz2,rav1e,rav1e-$(RAV1E_VERSION).tar.gz)
+$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.zst: .sum-rav1e
+	$(call download_vendor,rav1e-$(RAV1E_VERSION)-vendor.tar.zst,rav1e,rav1e-$(RAV1E_VERSION).tar.gz)
 
-.sum-vendor-rav1e: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2
+.sum-vendor-rav1e: rav1e-$(RAV1E_VERSION)-vendor.tar.zst
 
-rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 .sum-vendor-rav1e
+rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.zst .sum-vendor-rav1e
 	$(UNPACK)
 	$(MOVE)
 
