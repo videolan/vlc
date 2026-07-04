@@ -220,7 +220,7 @@
                                                     <constraint firstItem="5o7-Z0-dqS" firstAttribute="leading" secondItem="SM6-nx-NKD" secondAttribute="leading" id="vGw-cB-VLb"/>
                                                 </constraints>
                                             </customView>
-                                            <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" ambiguous="YES" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCPlaybackProgressSlider">
+                                            <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" horizontalCompressionResistancePriority="200" verticalCompressionResistancePriority="751" ambiguous="YES" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCPlaybackProgressSlider">
                                                 <rect key="frame" x="88" y="0.0" width="236" height="16"/>
                                                 <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="YMg-uo-8nX" customClass="VLCPlaybackProgressSliderCell"/>
                                                 <connections>
@@ -256,7 +256,7 @@
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="SM6-nx-NKD" secondAttribute="trailing" constant="4" id="wML-fX-wuF"/>
                                         </constraints>
                                     </customView>
-                                    <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
+                                    <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
                                         <rect key="frame" x="612" y="5" width="188" height="40"/>
                                         <subviews>
                                             <button horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Bt8-jQ-hUr">
@@ -272,13 +272,13 @@
                                                     <action selector="toggleFavorite:" target="Uzf-Tf-H8x" id="5n0-gl-qS6"/>
                                                 </connections>
                                             </button>
-                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="i42-vp-ih7">
+                                            <customView horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="i42-vp-ih7">
                                                 <rect key="frame" x="21" y="0.0" width="146" height="40"/>
                                                 <subviews>
-                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="noz-yJ-oH4" customClass="VLCVolumeSlider">
+                                                    <slider verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="noz-yJ-oH4" customClass="VLCVolumeSlider">
                                                         <rect key="frame" x="8" y="14" width="122" height="12"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="48" id="EM2-Hh-lqK"/>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="24" id="EM2-Hh-lqK"/>
                                                         </constraints>
                                                         <sliderCell key="cell" controlSize="mini" continuous="YES" alignment="left" maxValue="512" doubleValue="251.95348837209303" tickMarkPosition="above" sliderType="linear" id="IIu-VN-bEm" customClass="VLCVolumeSliderCell"/>
                                                         <connections>
@@ -357,7 +357,7 @@
                                     <constraint firstAttribute="bottom" secondItem="Ktr-qT-1fr" secondAttribute="bottom" constant="5" id="9pB-9C-2xy"/>
                                     <constraint firstAttribute="trailing" secondItem="S1K-Lp-DVO" secondAttribute="trailing" constant="10" id="BUG-PH-qrw"/>
                                     <constraint firstAttribute="bottom" secondItem="YAj-e7-KCU" secondAttribute="bottom" constant="5" id="Gqk-sg-bBK"/>
-                                    <constraint firstItem="S1K-Lp-DVO" firstAttribute="width" secondItem="YAj-e7-KCU" secondAttribute="width" id="NxM-eQ-3UW"/>
+                                    <constraint firstItem="S1K-Lp-DVO" firstAttribute="width" secondItem="YAj-e7-KCU" secondAttribute="width" priority="250" id="NxM-eQ-3UW"/>
                                     <constraint firstItem="Ktr-qT-1fr" firstAttribute="trailing" secondItem="S1K-Lp-DVO" secondAttribute="leading" constant="-16" id="hN9-7W-Mx1"/>
                                     <constraint firstAttribute="bottom" secondItem="S1K-Lp-DVO" secondAttribute="bottom" constant="5" id="qCf-Co-yI1"/>
                                     <constraint firstItem="YAj-e7-KCU" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="5" id="sIM-7y-JNq"/>
