@@ -47,6 +47,11 @@
 @property (readwrite, strong) IBOutlet NSButton *jumpBackwardButton;
 @property (readwrite, strong) IBOutlet NSButton *jumpForwardButton;
 
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *jumpBackwardButtonWidthConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *jumpForwardButtonWidthConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *jumpBackwardButtonSpacingConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *jumpForwardButtonSpacingConstraint;
+
 @property (readwrite, strong) IBOutlet VLCPlaybackProgressSlider *timeSlider;
 @property (readwrite, strong) IBOutlet VLCVolumeSlider *volumeSlider;
 @property (readwrite, strong) IBOutlet NSButton *muteVolumeButton;

@@ -85,6 +85,7 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const CGFloat controlsFadeAnimationDuration;
 
 @property (class, readonly) const CGFloat libraryWindowControlsBarHeight;
+@property (class, readonly) const CGFloat libraryWindowControlsBarNarrowWidthThreshold;
 
 @property (class, readonly) const CGFloat librarySplitViewSelectionViewDefaultWidth;
 @property (class, readonly) const CGFloat librarySplitViewMainViewMinimumWidth;

@@ -32,6 +32,7 @@
 #import "playqueue/VLCPlayQueueModel.h"
 #import "playqueue/VLCPlayerController.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCDragDropView.h"
@@ -67,6 +68,12 @@
 
     VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
+
+    BOOL _jumpButtonsHidden;
+    CGFloat _jumpBackwardButtonOriginalWidth;
+    CGFloat _jumpForwardButtonOriginalWidth;
+    CGFloat _jumpBackwardButtonOriginalSpacing;
+    CGFloat _jumpForwardButtonOriginalSpacing;
 }
 @end
 
@@ -262,11 +269,51 @@
 
     // Update verything post-init
     [self update];
+
+    _jumpBackwardButtonOriginalWidth = self.jumpBackwardButtonWidthConstraint.constant;
+    _jumpForwardButtonOriginalWidth = self.jumpForwardButtonWidthConstraint.constant;
+    _jumpBackwardButtonOriginalSpacing = self.jumpBackwardButtonSpacingConstraint.constant;
+    _jumpForwardButtonOriginalSpacing = self.jumpForwardButtonSpacingConstraint.constant;
+
+    self.dropView.postsFrameChangedNotifications = YES;
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(dropViewFrameChanged:)
+                                               name:NSViewFrameDidChangeNotification
+                                             object:self.dropView];
+    [self updateJumpButtonVisibilityForWidth:self.dropView.frame.size.width];
 }
 
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)dropViewFrameChanged:(NSNotification *)notification
+{
+    [self updateJumpButtonVisibilityForWidth:self.dropView.frame.size.width];
+}
+
+- (void)updateJumpButtonVisibilityForWidth:(CGFloat)width
+{
+    const CGFloat narrowThreshold = VLCLibraryUIUnits.libraryWindowControlsBarNarrowWidthThreshold;
+
+    if (!_jumpButtonsHidden && width < narrowThreshold) {
+        _jumpButtonsHidden = YES;
+        self.jumpBackwardButton.hidden = YES;
+        self.jumpForwardButton.hidden = YES;
+        self.jumpBackwardButtonWidthConstraint.constant = 0;
+        self.jumpForwardButtonWidthConstraint.constant = 0;
+        self.jumpBackwardButtonSpacingConstraint.constant = 0;
+        self.jumpForwardButtonSpacingConstraint.constant = 0;
+    } else if (_jumpButtonsHidden && width >= narrowThreshold) {
+        _jumpButtonsHidden = NO;
+        self.jumpBackwardButton.hidden = NO;
+        self.jumpForwardButton.hidden = NO;
+        self.jumpBackwardButtonWidthConstraint.constant = _jumpBackwardButtonOriginalWidth;
+        self.jumpForwardButtonWidthConstraint.constant = _jumpForwardButtonOriginalWidth;
+        self.jumpBackwardButtonSpacingConstraint.constant = _jumpBackwardButtonOriginalSpacing;
+        self.jumpForwardButtonSpacingConstraint.constant = _jumpForwardButtonOriginalSpacing;
+    }
 }
 
 - (CGFloat)height

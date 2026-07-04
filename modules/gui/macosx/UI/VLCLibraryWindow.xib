@@ -607,7 +607,11 @@
                 <outlet property="forwardButton" destination="dPD-MZ-5oT" id="btH-v5-s7F"/>
                 <outlet property="fullscreenButton" destination="dwM-Uz-pAw" id="gXA-WS-Gig"/>
                 <outlet property="jumpBackwardButton" destination="72A-6S-lpR" id="YRk-DB-K28"/>
+                <outlet property="jumpBackwardButtonSpacingConstraint" destination="wzB-TW-knV" id="jbs-sp-c"/>
+                <outlet property="jumpBackwardButtonWidthConstraint" destination="q77-Gr-cho" id="jbw-w-c"/>
                 <outlet property="jumpForwardButton" destination="pAd-ve-EeL" id="iBO-a8-WA6"/>
+                <outlet property="jumpForwardButtonSpacingConstraint" destination="S8H-lo-eeW" id="jfs-sp-c"/>
+                <outlet property="jumpForwardButtonWidthConstraint" destination="ASs-Ko-yKD" id="jfw-w-c"/>
                 <outlet property="muteVolumeButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
                 <outlet property="openMainVideoViewButtonOverlay" destination="CzG-0S-Kke" id="6BY-BQ-72f"/>
                 <outlet property="playButton" destination="WgO-zh-k4s" id="0yC-Yh-H4V"/>
