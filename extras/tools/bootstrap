@@ -86,12 +86,25 @@ fi
 }
 
 check_tar() {
-if ! { check_tar_xz && check_tar_zstd ; }
+if ! { check_tar_autocompress && check_tar_xz && check_tar_zstd ; }
 then
     NEEDED="$NEEDED tar"
 else
     FOUND="$FOUND tar"
 fi
+}
+
+check_tar_autocompress() {
+tmp="check_tar"
+ret=0
+echo "Hello Cone" > "$tmp"
+if ! ( tar -caf "$tmp.tar.gz" "$tmp" && tar xfo "$tmp.tar.gz" )
+then
+    echo "tar can't auto-detect compression"
+    ret=1
+fi
+rm -f "$tmp" "$tmp.tar.gz" 2>/dev/null
+return "$ret"
 }
 
 check_tar_xz() {
