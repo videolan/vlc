@@ -35,26 +35,26 @@ extern NSString * const VLCUseClassicVideoPlayerLayoutKey;
 
 @interface VLCMainVideoViewController : NSViewController
 
-@property (readwrite, strong) IBOutlet NSView *voutContainingView;
+@property (readwrite, weak) IBOutlet NSView *voutContainingView;
 
-@property (readwrite, strong) IBOutlet VLCVoutView *voutView;
-@property (readwrite, strong) IBOutlet NSBox *mainControlsView;
-@property (readwrite, strong) IBOutlet VLCMainVideoViewOverlayView *overlayView;
-@property (readwrite, strong) IBOutlet NSView *bottomBarView;
-@property (readwrite, strong) IBOutlet NSStackView *centralControlsStackView;
+@property (readwrite, weak) IBOutlet VLCVoutView *voutView;
+@property (readwrite, weak) IBOutlet NSBox *mainControlsView;
+@property (readwrite, weak) IBOutlet VLCMainVideoViewOverlayView *overlayView;
+@property (readwrite, weak) IBOutlet NSView *bottomBarView;
+@property (readwrite, weak) IBOutlet NSStackView *centralControlsStackView;
 @property (readwrite, strong) IBOutlet VLCMainVideoViewControlsBar *controlsBar;
-@property (readwrite, strong) IBOutlet NSButton *returnButton;
-@property (readwrite, strong) IBOutlet NSButton *playQueueButton;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *returnButtonTopConstraint;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *returnButtonLeadingConstraint;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *playQueueButtonTopConstraint;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *playQueueButtonTrailingConstraint;
+@property (readwrite, weak) IBOutlet NSButton *returnButton;
+@property (readwrite, weak) IBOutlet NSButton *playQueueButton;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *returnButtonTopConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *returnButtonLeadingConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *playQueueButtonTopConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *playQueueButtonTrailingConstraint;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
-@property (readwrite, strong) IBOutlet NSVisualEffectView *fakeTitleBar;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
-@property (readwrite, strong) IBOutlet NSProgressIndicator *loadingIndicator;
-@property (readwrite, strong) IBOutlet NSImageView *floatOnTopIndicatorImageView;
-@property (readwrite, strong) IBOutlet NSView *classicViewBottomBarContainerView;
+@property (readwrite, weak) IBOutlet NSVisualEffectView *fakeTitleBar;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
+@property (readwrite, weak) IBOutlet NSProgressIndicator *loadingIndicator;
+@property (readwrite, weak) IBOutlet NSImageView *floatOnTopIndicatorImageView;
+@property (readwrite, weak) IBOutlet NSView *classicViewBottomBarContainerView;
 
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *playButtonSizeConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *prevButtonSizeConstraint;

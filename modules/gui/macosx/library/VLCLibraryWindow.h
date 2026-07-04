@@ -111,9 +111,9 @@ extern NSString * const VLCLibraryWindowEmbeddedVideoPlaybackActiveKey;
 @property (readwrite, weak) IBOutlet VLCLibraryWindowToolbarDelegate *toolbarDelegate;
 
 @property (nonatomic, readwrite, strong) IBOutlet NSView *emptyLibraryView;
-@property (nonatomic, readwrite, strong) IBOutlet NSImageView *placeholderImageView;
-@property (nonatomic, readwrite, strong) IBOutlet NSTextField *placeholderLabel;
-@property (nonatomic, readwrite, strong) IBOutlet VLCCustomEmptyLibraryBrowseButton *placeholderGoToBrowseButton;
+@property (nonatomic, readwrite, weak) IBOutlet NSImageView *placeholderImageView;
+@property (nonatomic, readwrite, weak) IBOutlet NSTextField *placeholderLabel;
+@property (nonatomic, readwrite, weak) IBOutlet VLCCustomEmptyLibraryBrowseButton *placeholderGoToBrowseButton;
 
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 @property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewConstraints;

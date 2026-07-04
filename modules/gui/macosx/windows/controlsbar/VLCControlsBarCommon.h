@@ -39,37 +39,37 @@
 
 @interface VLCControlsBarCommon : NSObject
 
-@property (readwrite, strong) IBOutlet VLCDragDropView *dropView;
+@property (readwrite, weak) IBOutlet VLCDragDropView *dropView;
 
-@property (readwrite, strong) IBOutlet NSButton *playButton;
-@property (readwrite, strong) IBOutlet NSButton *backwardButton;
-@property (readwrite, strong) IBOutlet NSButton *forwardButton;
-@property (readwrite, strong) IBOutlet NSButton *jumpBackwardButton;
-@property (readwrite, strong) IBOutlet NSButton *jumpForwardButton;
+@property (readwrite, weak) IBOutlet NSButton *playButton;
+@property (readwrite, weak) IBOutlet NSButton *backwardButton;
+@property (readwrite, weak) IBOutlet NSButton *forwardButton;
+@property (readwrite, weak) IBOutlet NSButton *jumpBackwardButton;
+@property (readwrite, weak) IBOutlet NSButton *jumpForwardButton;
 
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *jumpBackwardButtonWidthConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *jumpForwardButtonWidthConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *jumpBackwardButtonSpacingConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *jumpForwardButtonSpacingConstraint;
 
-@property (readwrite, strong) IBOutlet VLCPlaybackProgressSlider *timeSlider;
-@property (readwrite, strong) IBOutlet VLCVolumeSlider *volumeSlider;
-@property (readwrite, strong) IBOutlet NSButton *muteVolumeButton;
+@property (readwrite, weak) IBOutlet VLCPlaybackProgressSlider *timeSlider;
+@property (readwrite, weak) IBOutlet VLCVolumeSlider *volumeSlider;
+@property (readwrite, weak) IBOutlet NSButton *muteVolumeButton;
 
-@property (readwrite, strong) IBOutlet VLCImageView *artworkImageView;
-@property (readwrite, strong) IBOutlet NSButton *artworkButton;
-@property (readwrite, strong) IBOutlet NSTextField *playingItemDisplayField;
-@property (readwrite, strong) IBOutlet NSTextField *detailLabel;
-@property (readwrite, strong) IBOutlet VLCTimeField *timeField;
-@property (readwrite, strong) IBOutlet VLCTimeField *trailingTimeField;
+@property (readwrite, weak) IBOutlet VLCImageView *artworkImageView;
+@property (readwrite, weak) IBOutlet NSButton *artworkButton;
+@property (readwrite, weak) IBOutlet NSTextField *playingItemDisplayField;
+@property (readwrite, weak) IBOutlet NSTextField *detailLabel;
+@property (readwrite, weak) IBOutlet VLCTimeField *timeField;
+@property (readwrite, weak) IBOutlet VLCTimeField *trailingTimeField;
 
-@property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *fullscreenButtonWidthConstraint;
+@property (readwrite, weak) IBOutlet NSButton *fullscreenButton;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *fullscreenButtonWidthConstraint;
 
-@property (readwrite, strong) IBOutlet NSButton *pipButton;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *pipButtonWidthConstraint;
+@property (readwrite, weak) IBOutlet NSButton *pipButton;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *pipButtonWidthConstraint;
 
-@property (readwrite, strong) IBOutlet VLCBottomBarView *bottomBarView;
+@property (readwrite, weak) IBOutlet VLCBottomBarView *bottomBarView;
 
 @property (readonly) BOOL nativeFullscreenMode;
 

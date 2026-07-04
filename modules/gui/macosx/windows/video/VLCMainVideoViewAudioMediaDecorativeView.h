@@ -26,10 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMainVideoViewAudioMediaDecorativeView : NSView
 
-@property (readwrite, strong) IBOutlet NSImageView *foregroundCoverArtView;
-@property (readwrite, strong) IBOutlet NSImageView *backgroundCoverArtView;
-@property (readwrite, strong) IBOutlet NSVisualEffectView *backgroundVisualEffectView;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *foregroundViewTopConstraint;
+@property (readwrite, weak) IBOutlet NSImageView *foregroundCoverArtView;
+@property (readwrite, weak) IBOutlet NSImageView *backgroundCoverArtView;
+@property (readwrite, weak) IBOutlet NSVisualEffectView *backgroundVisualEffectView;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *foregroundViewTopConstraint;
 
 @property (readwrite, weak) IBOutlet NSScrollView *lyricsScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *lyricsTableView;

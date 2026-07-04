@@ -208,23 +208,23 @@
 
 /* vout menu */
 @property (readwrite, strong) IBOutlet NSMenu *voutMenu;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuplay;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenustop;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuRecord;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuprev;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenunext;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuvolup;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuvoldown;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenumute;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuAudiotrack;
-@property (readwrite, strong) IBOutlet NSMenu *voutMenuAudiotrackMenu;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuVideotrack;
-@property (readwrite, strong) IBOutlet NSMenu *voutMenuVideotrackMenu;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuOpenSubtitleFile;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuSubtitlestrack;
-@property (readwrite, strong) IBOutlet NSMenu *voutMenuSubtitlestrackMenu;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenufullscreen;
-@property (readwrite, strong) IBOutlet NSMenuItem *voutMenusnapshot;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuplay;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenustop;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuRecord;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuprev;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenunext;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuvolup;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuvoldown;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenumute;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuAudiotrack;
+@property (readwrite, weak) IBOutlet NSMenu *voutMenuAudiotrackMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuVideotrack;
+@property (readwrite, weak) IBOutlet NSMenu *voutMenuVideotrackMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuOpenSubtitleFile;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuSubtitlestrack;
+@property (readwrite, weak) IBOutlet NSMenu *voutMenuSubtitlestrackMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenufullscreen;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenusnapshot;
 
 @property (readwrite, strong) IBOutlet NSView *playlistSaveAccessoryView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *playlistSaveAccessoryPopup;

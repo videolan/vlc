@@ -35,11 +35,11 @@ typedef void(^CompletionBlock)(enum ResumeResult);
 
 @interface VLCResumeDialogController : NSWindowController
 
-@property (readwrite, strong) IBOutlet NSTextField *titleLabel;
-@property (readwrite, strong) IBOutlet NSTextField *descriptionLabel;
-@property (readwrite, strong) IBOutlet NSButton *restartButton;
-@property (readwrite, strong) IBOutlet NSButton *resumeButton;
-@property (readwrite, strong) IBOutlet NSButton *alwaysResumeCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *titleLabel;
+@property (readwrite, weak) IBOutlet NSTextField *descriptionLabel;
+@property (readwrite, weak) IBOutlet NSButton *restartButton;
+@property (readwrite, weak) IBOutlet NSButton *resumeButton;
+@property (readwrite, weak) IBOutlet NSButton *alwaysResumeCheckbox;
 
 - (IBAction)buttonClicked:(id)sender;
 - (IBAction)resumeSettingChanged:(id)sender;
