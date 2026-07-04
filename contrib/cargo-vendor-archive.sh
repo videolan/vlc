@@ -32,13 +32,13 @@ eval ${CARGO} vendor --locked
 
 # Archive all dependencies
 name=$(basename "$PWD")-vendor
-tar -jcf "../../${name}.tar.bz2" vendor --transform "s,vendor,${name},"
+tar -c vendor --transform "s,vendor,${name}," | zstd --quiet --force --threads=0 -12 -o "../../${name}.tar.zst"
 cd ../..
 rm -rf "${TMP_DIR}"
 
 echo ""
-echo "Please upload this package '${name}.tar.bz2' to our VideoLAN FTP,"
+echo "Please upload this package '${name}.tar.zst' to our VideoLAN FTP,"
 echo ""
 echo "and write the following checksum into the contrib/src/<project>/cargo-vendor-SHA512SUMS:"
 echo ""
-sha512sum "${name}.tar.bz2"
+sha512sum "${name}.tar.zst"
