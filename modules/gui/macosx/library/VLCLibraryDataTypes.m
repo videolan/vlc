@@ -1010,7 +1010,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.libraryID = p_playlist->i_id;
         self.smallArtworkMRL = toNSStr(p_playlist->psz_artwork_mrl);
         self.displayString = toNSStr(p_playlist->psz_name);
-        self.primaryDetailString = [NSString stringWithFormat:@"%u items", p_playlist->i_nb_media];
+        const unsigned int numberOfMedia = p_playlist->i_nb_media;
+        self.primaryDetailString = numberOfMedia == 0 ? _NS("No item") : _NPS("%u item", "%u items", numberOfMedia);
         self.durationString = [NSString stringWithTime:p_playlist->i_duration / VLCMediaLibraryMediaItemDurationDenominator];
 
         _MRL = toNSStr(p_playlist->psz_mrl);
