@@ -114,7 +114,7 @@ download_vendor = \
                tar xzfo $(TARBALLS)/$(3) -C vendor-$(2)-build --strip-components=1 && \
                cd vendor-$(2)-build && \
                $(CARGO_NATIVE) vendor --locked $(patsubst %.tar,%,$(basename $(notdir $(1)))) && \
-               tar -jcf $(1) $(patsubst %.tar,%,$(basename $(notdir $(1)))) && \
+               tar -c $(patsubst %.tar,%,$(basename $(notdir $(1)))) | zstd --quiet --force --threads=0 -12 -o $(1) && \
                cd .. && \
                install vendor-$(2)-build/$(1) "$(TARBALLS)" && \
                $(RM) -R vendor-$(2)-build && \
