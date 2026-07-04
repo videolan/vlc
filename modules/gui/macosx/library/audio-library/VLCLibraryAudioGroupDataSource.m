@@ -40,8 +40,6 @@
 
 #import "views/VLCSubScrollView.h"
 
-#import "library/VLCLibrarySegment.h"
-
 @interface VLCLibraryAudioGroupDataSource ()
 {
     id<VLCMediaLibraryAudioGroupProtocol> _representedAudioGroup;
@@ -289,21 +287,14 @@
         if (self.representedAudioGroup == nil || self.currentParentType == VLCMediaLibraryParentGroupTypeUnknown) {
             albums = libraryModel.listOfAlbums;
         } else if (self.representedAudioGroup.albums.count == 0) {
-            const VLCLibrarySegmentType currentType = VLCMain.sharedInstance.libraryWindow.librarySegmentType;
-            enum vlc_ml_parent_type realParentType = VLC_ML_PARENT_UNKNOWN;
-            switch (currentType) {
-                case VLCLibraryMusicSegmentType:
-                case VLCLibraryArtistsMusicSubSegmentType:
-                    realParentType = VLC_ML_PARENT_ARTIST;
-                    break;
-                case VLCLibraryGenresMusicSubSegmentType:
-                    realParentType = VLC_ML_PARENT_GENRE;
-                    break;
-                default:
-                    realParentType = VLC_ML_PARENT_UNKNOWN;
-                    break;
+            const VLCMediaLibraryParentGroupType parentType = self.currentParentType;
+            if (parentType == VLCMediaLibraryParentGroupTypeArtist ||
+                parentType == VLCMediaLibraryParentGroupTypeGenre) {
+                albums = [libraryModel listAlbumsOfParentType:(enum vlc_ml_parent_type)parentType
+                                                        forID:self.representedAudioGroup.libraryID];
+            } else {
+                albums = libraryModel.listOfAlbums;
             }
-           albums = [libraryModel listAlbumsOfParentType:realParentType forID:self.representedAudioGroup.libraryID];
         } else {
             albums = self.representedAudioGroup.albums;
         }
