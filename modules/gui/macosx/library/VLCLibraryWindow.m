@@ -75,7 +75,6 @@
 #import "media-source/VLCLibraryMediaSourceViewNavigationStack.h"
 
 #import "views/VLCBottomBarView.h"
-#import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCImageView.h"
 #import "views/VLCLoadingOverlayView.h"

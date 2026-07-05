@@ -449,8 +449,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCBasicView.m \
 	gui/macosx/views/VLCBottomBarView.h \
 	gui/macosx/views/VLCBottomBarView.m \
-	gui/macosx/views/VLCCustomWindowButton.h \
-	gui/macosx/views/VLCCustomWindowButton.m \
 	gui/macosx/views/VLCDefaultValueSlider.h \
 	gui/macosx/views/VLCDefaultValueSlider.m \
 	gui/macosx/views/VLCDefaultValueSliderCell.h \
