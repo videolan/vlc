@@ -1304,7 +1304,10 @@ static void EsOutDecodersStopBuffering(es_out_sys_t *p_sys, bool b_forced)
     /* */
     const vlc_tick_t i_current_date = EsOutIsPaused(p_sys) ? p_sys->i_pause_date : vlc_tick_now();
 
-    const vlc_tick_t update = i_current_date - i_buffering_duration;
+    /* The preroll is stream time, unlike the pts_delay margin: convert it to
+     * system time with the current rate. */
+    const vlc_tick_t update = i_current_date - i_buffering_duration
+        - (vlc_tick_t)(i_preroll_duration * (1.0 / p_sys->rate - 1.0));
 
     /* The call order of these 3 input_clock_t/vlc_clock_main_t functions is
      * important:
