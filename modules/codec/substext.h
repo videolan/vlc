@@ -61,6 +61,7 @@ typedef struct
 {
     /* a min of one region */
     substext_updater_region_t region;
+    uint64_t scaling_modes_flags; /* see #29965 */
 
     /* styling */
     text_style_t *p_default_style; /* decoder (full or partial) defaults */
@@ -100,6 +101,17 @@ static inline void SubpictureUpdaterSysRegionAdd(substext_updater_region_t *p_pr
     *pp_next = p_new;
 }
 
+static uint64_t GetScalingModesAsFlags(const substext_updater_region_t *r)
+{
+    uint64_t in_window_flags = 0;
+    for (int i=0; i<63 && r; i++)
+    {
+        in_window_flags |= (!r->b_in_window) << i;
+        r = r->p_next;
+    }
+    return in_window_flags;
+}
+
 static void SubpictureTextUpdate(subpicture_t *subpic,
                                  const struct vlc_spu_updater_configuration *cfg)
 {
@@ -122,12 +134,16 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         prev_render_fmt.i_sar_num = prev_render_fmt.i_sar_den = 1;
     }
 
+    uint64_t scaling_modes_flags = GetScalingModesAsFlags(p_updtregion);
+
     if (render_fmt.i_visible_width == prev_render_fmt.i_visible_width &&
         render_fmt.i_visible_height == prev_render_fmt.i_visible_height &&
         video_format_IsSimilar(cfg->previous.video_dst, fmt_dst) &&
+        sys->scaling_modes_flags == scaling_modes_flags &&
         (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > cfg->pts))
         return;
 
+    sys->scaling_modes_flags = scaling_modes_flags;
 
     if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE) &&
         p_updtregion->b_absolute && !vlc_spu_regions_is_empty(&subpic->regions) &&
