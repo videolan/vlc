@@ -573,10 +573,10 @@ static void DeletePipController( pip_controller_t * pipcontroller );
     if (!self)
         return nil;
 #if TARGET_OS_OSX
-    self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    self.autoresizingMask = NSViewNotSizable;
     self.wantsLayer = YES;
 #else
-    self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.autoresizingMask = UIViewAutoresizingNone;
 #endif
     return self;
 }
