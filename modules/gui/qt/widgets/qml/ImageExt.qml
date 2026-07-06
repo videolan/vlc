@@ -260,16 +260,6 @@ Item {
                 ret.height = root.height
             }
 
-            /// <debug>
-            // Debug only, we use our calculation for reliability regardless of the source:
-            if (source === image) {
-               if (image.paintedWidth !== ret.width || source.paintedHeight !== ret.height) {
-                   console.debug(root, "painted sizes of the default texture provider and the calculation differ: (%1, %2), (%3, %4)"
-                                       .arg(image.paintedWidth).arg(image.paintedHeight).arg(ret.width).arg(ret.height))
-               }
-            }
-            /// </debug>
-
             return ret
         }
 
