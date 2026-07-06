@@ -49,8 +49,6 @@ else
 VPX_CROSS :=
 endif
 
-VPX_LDFLAGS := $(LDFLAGS)
-
 ifeq ($(ARCH),arm)
 VPX_ARCH := armv7
 else ifeq ($(ARCH),i386)
@@ -168,7 +166,7 @@ VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
 .vpx: libvpx
 	rm -rf $(PREFIX)/include/vpx
 	$(MAKEBUILDDIR)
-	cd $(BUILD_DIR) && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) $(BUILD_SRC)/configure $(VPX_CONF)
+	cd $(BUILD_DIR) && CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) $(BUILD_SRC)/configure $(VPX_CONF)
 	+CONFIG_DEBUG=1 $(MAKEBUILD)
 	$(call pkg_static,"$(BUILD_DIRUNPACK)/vpx.pc")
 	+CONFIG_DEBUG=1 $(MAKEBUILD) install
