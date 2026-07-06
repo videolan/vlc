@@ -160,20 +160,11 @@ endif
 # Always enable debug symbols, we strip in the final executables if needed
 VPX_CONF += --enable-debug
 
-ifdef HAVE_ANDROID
-# Starting NDK19, standalone toolchains are deprecated and gcc is not shipped.
-# The presence of gcc can be used to detect if we are using an old standalone
-# toolchain. Unfortunately, libvpx buildsystem only work with standalone
-# toolchains, therefore pass the HOSTVARS directly to bypass any detection.
-ifneq ($(shell $(VPX_CROSS)gcc -v >/dev/null 2>&1 || echo FAIL),)
 VPX_HOSTVARS = $(HOSTVARS)
 
 ifeq ($(filter $(ARCH),i386 x86_64),)
 # use CCAS for platforms not using nasm/yasm
 VPX_HOSTVARS += AS="$(CCAS)"
-endif
-
-endif
 endif
 
 VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
