@@ -218,6 +218,9 @@ set_deployment_target()
         VLC_DEPLOYMENT_TARGET_LDFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}"
     else
         VLC_DEPLOYMENT_TARGET_CFLAG="--target=${VLC_HOST_ARCH}-apple-xros${VLC_DEPLOYMENT_TARGET}"
+        if [ -n "$VLC_HOST_PLATFORM_SIMULATOR" ]; then
+            VLC_DEPLOYMENT_TARGET_CFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}-simulator"
+        fi
         VLC_DEPLOYMENT_TARGET_LDFLAG=""
     fi
 }
