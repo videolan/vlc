@@ -388,7 +388,7 @@ set_host_envvars()
     export OBJCXXFLAGS="$clike_flags"
 
     # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
-    export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH ${bitcode_flag}"
+    export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH ${bitcode_flag}"
 }
 
 hostenv()
@@ -431,7 +431,7 @@ write_config_mak()
     local vlc_objcxxflags="$clike_flags"
 
     # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
-    local vlc_ldflags="\$(VLC_DEPLOYMENT_TARGET_LDFLAG) \$(VLC_DEPLOYMENT_TARGET_CFLAG) -arch $VLC_HOST_ARCH"
+    local vlc_ldflags="\$(VLC_DEPLOYMENT_TARGET_LDFLAG) \$(VLC_DEPLOYMENT_TARGET_CFLAG) -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
 
     echo "Creating makefile..."
     test -e config.mak && unlink config.mak
