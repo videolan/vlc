@@ -379,6 +379,7 @@ nightly-flatpak-x86_64:
     extends: .flatpak-common
     only:
         - schedules
+    except:
     image:
         name: $VLC_FLATPAK_IMAGE
         entrypoint: [""]
