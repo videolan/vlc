@@ -5,6 +5,9 @@
 
 all: install
 
+NULL  :=
+SPACE := $(NULL) #
+
 SRC := $(TOPSRC)/src
 SRC_BUILT := $(TOPSRC_BUILT)/src
 TARBALLS := $(TOPSRC)/tarballs
@@ -546,6 +549,19 @@ endif
 ifdef MSYS_BUILD
 CMAKE = PKG_CONFIG_LIBDIR="$(PKG_CONFIG_PATH)" $(CMAKE)
 CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
+endif
+ifdef HAVE_DARWIN_OS
+# Ignore 3rd party packager paths in CMakes find_*
+# functions, to avoid finding non-system deps
+CMAKE_IGNORE_PREFIX_PATHS := /sw /opt/local
+HOMEBREW_PREFIX := $(shell brew --prefix 2>/dev/null)
+ifneq ($(strip $(HOMEBREW_PREFIX)),)
+CMAKE_IGNORE_PREFIX_PATHS += $(HOMEBREW_PREFIX)
+endif
+CMAKE_IGNORE_PATHS := \
+	$(addsuffix /lib,$(CMAKE_IGNORE_PREFIX_PATHS)) \
+	$(addsuffix /include,$(CMAKE_IGNORE_PREFIX_PATHS))
+CMAKE += -DCMAKE_IGNORE_PATH="$(subst $(SPACE),;,$(strip $(CMAKE_IGNORE_PATHS)))"
 endif
 
 MESONFLAGS = $(BUILD_DIR) $< --default-library static --prefix "$(PREFIX)" \
