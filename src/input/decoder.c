@@ -507,14 +507,14 @@ static void Decoder_ChangeOutputDelay( vlc_input_decoder_t *p_owner, vlc_tick_t 
 
 static void Decoder_UpdateOutState(vlc_input_decoder_t *owner)
 {
-    if (owner->paused)
-        Decoder_ChangeOutputPause(owner, owner->paused, owner->pause_date);
+    if (owner->output_paused)
+        Decoder_ChangeOutputPause(owner, owner->output_paused, owner->pause_date);
 
-    if (owner->rate != 1.f)
-        Decoder_ChangeOutputRate(owner, owner->rate);
+    if (owner->output_rate != 1.f)
+        Decoder_ChangeOutputRate(owner, owner->output_rate);
 
-    if (owner->delay != 0)
-        Decoder_ChangeOutputDelay(owner, owner->delay);
+    if (owner->output_delay != 0)
+        Decoder_ChangeOutputDelay(owner, owner->output_delay);
 }
 
 /**
