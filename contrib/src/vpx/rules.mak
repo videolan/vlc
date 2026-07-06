@@ -139,9 +139,6 @@ ifeq ($(ARCH),arm)
 VPX_CONF += --disable-runtime-cpu-detect
 endif
 VPX_CONF += --enable-vp8-decoder
-ifeq ($(ARCH),aarch64)
-VPX_LDFLAGS += -arch arm64
-endif
 endif
 ifdef HAVE_DARWIN_OS
 ifeq ($(ARCH),$(filter $(ARCH), arm aarch64))
