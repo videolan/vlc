@@ -812,11 +812,12 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         vlc_fifo_Lock(p_owner->p_fifo);
         p_owner->video.started = true;
 
-        Decoder_UpdateOutState( p_owner );
-
         if (vout_state == INPUT_RESOURCE_VOUT_STARTED)
+        {
+            Decoder_UpdateOutState( p_owner );
             decoder_Notify(p_owner, on_vout_started, p_vout,
                            p_owner->video.vout_order);
+        }
         vlc_fifo_Unlock(p_owner->p_fifo);
         return 0;
     }
