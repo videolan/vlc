@@ -1391,6 +1391,8 @@
 	<string>VLC</string>
 	<key>CFBundleIconFile</key>
 	<string>VLC.icns</string>
+	<key>CFBundleIconName</key>
+	<string>VLC</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.videolan.vlc</string>
 	<key>CFBundleInfoDictionaryVersion</key>
