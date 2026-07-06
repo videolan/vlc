@@ -189,6 +189,61 @@ VLC_API void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src );
 VLC_API void picture_Copy( picture_t *p_dst, const picture_t *p_src );
 
 /**
+ * Copy the visible pixels of a plane.
+ *
+ * Unlike plane_CopyPixels(), which copies whole (padded) i_lines, this copies
+ * only i_visible_lines / i_visible_pitch. Use it when the source p_pixels has
+ * been advanced to a sub-region (a crop or tile origin), where copying the
+ * padding lines would read past the source plane.
+ */
+static inline void plane_CopyVisiblePixels( plane_t *p_dst, const plane_t *p_src )
+{
+    const unsigned i_width  = __MIN( p_dst->i_visible_pitch,
+                                     p_src->i_visible_pitch );
+    const unsigned i_height = __MIN( p_dst->i_visible_lines,
+                                     p_src->i_visible_lines );
+
+    /* The 2x visible pitch check does two things:
+       1) Makes field plane_t's work correctly (see the deinterlacer module)
+       2) Moves less data if the pitch and visible pitch differ much.
+    */
+    if( p_src->i_pitch == p_dst->i_pitch  &&
+        p_src->i_pitch < 2*p_src->i_visible_pitch )
+    {
+        memcpy( p_dst->p_pixels, p_src->p_pixels,
+                p_src->i_pitch * i_height );
+    }
+    else
+    {
+        uint8_t *p_in  = p_src->p_pixels;
+        uint8_t *p_out = p_dst->p_pixels;
+
+        for( unsigned i_line = i_height; i_line--; )
+        {
+            memcpy( p_out, p_in, i_width );
+            p_in  += p_src->i_pitch;
+            p_out += p_dst->i_pitch;
+        }
+    }
+}
+
+/**
+ * Copy the visible pixels and the context of a picture.
+ *
+ * Like picture_CopyPixels() but restricted to the visible pixels (see
+ * plane_CopyVisiblePixels()). Dynamic properties are not copied; use
+ * picture_CopyProperties() for those.
+ */
+static inline void picture_CopyVisiblePixels( picture_t *p_dst, const picture_t *p_src )
+{
+    for( int i = 0; i < p_src->i_planes; i++ )
+        plane_CopyVisiblePixels( &p_dst->p[i], &p_src->p[i] );
+
+    if( p_src->context != NULL )
+        p_dst->context = p_src->context->copy( p_src->context );
+}
+
+/**
  * Perform a shallow picture copy
  *
  * This function makes a shallow copy of an existing picture. The same planes
