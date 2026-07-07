@@ -85,9 +85,13 @@ test_pause(struct ctx *ctx)
 
     wait_state(ctx, VLC_PLAYER_STATE_PAUSED);
 
-    /* Ensure all timers are paused */
-    wait_timer_report(player, &video_timer, REPORT_TIMER_PAUSED);
-    wait_timer_report(player, &timer, REPORT_TIMER_PAUSED);
+    /* Ensure all timers are paused, on the second pause (and not on a stale
+     * report from the first one) */
+    struct report_timer video_paused =
+        wait_timer_report(player, &video_timer, REPORT_TIMER_PAUSED);
+    struct report_timer regular_paused =
+        wait_timer_report(player, &timer, REPORT_TIMER_PAUSED);
+    assert(video_paused.paused_date == regular_paused.paused_date);
 
     /* Ensure we stay paused */
     vlc_tick_sleep(VLC_TICK_FROM_MS(100));
