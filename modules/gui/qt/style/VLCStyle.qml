@@ -330,13 +330,13 @@ QtObject {
     readonly property real scrollBarInteractingSize: MainCtx.dp(8, scale)
     readonly property real scrollBarNonInteractingSize: MainCtx.dp(2, scale)
 
-    function dp(size, scale) {
-        if (scale === undefined)
+    function dp(size: real, scale: real) : real {
+        if (!scale)
             return MainCtx.dp(size, MainCtx.intfScaleFactor)
         return MainCtx.dp(size, scale)
     }
 
-    function colWidth(nb) {
+    function colWidth(nb: int) : real {
       return nb * VLCStyle.column_width + ( nb - 1 ) * VLCStyle.column_spacing;
     }
 

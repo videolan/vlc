@@ -22,15 +22,15 @@ import QtQuick
 
 QtObject {
 
-    function clamp(num, min, max) {
+    function clamp(num : real, min : real, max : real) : real {
       return num <= min ? min : num >= max ? max : num;
     }
 
-    function isValidInstanceOf(object, type) {
+    function isValidInstanceOf(object: var, type: var) : bool {
         return (!!object && (object instanceof type))
     }
 
-    function transferFocus(item, reason) {
+    function transferFocus(item: Item, reason: int) {
         if (item.activeFocus && item.focusReason === reason)
             return
 
@@ -41,7 +41,7 @@ QtObject {
     }
 
     // NOTE: This allows us to force another 'reason' even when the item has activeFocus.
-    function enforceFocus(item, reason) {
+    function enforceFocus(item: Item, reason: int) {
         if (item.activeFocus && item.focusReason === reason)
             return
 
@@ -53,34 +53,34 @@ QtObject {
             item.focusReason = reason // Control's focus reason sometimes is not adjusted with `forceActiveFocus()`, Qt bug?
     }
 
-    function pointInRadius(x, y, radius) {
+    function pointInRadius(x: real, y: real, radius: real) : bool {
          return (x * x + y * y < radius * radius)
     }
 
     // checks if point `pos` lies in rect `rect`
-    function contains(rect, pos) {
+    function contains(rect : rect, pos : point) : bool {
         return (clamp(pos.x, rect.x, rect.x + rect.width) === pos.x)
                 && (clamp(pos.y, rect.y, rect.y + rect.height) === pos.y)
     }
 
-    function isInteger(data) {
+    function isInteger(data : var) : bool {
         return (typeof data === 'number' && (data % 1) === 0)
     }
 
-    function compareFloat(a, b) {
+    function compareFloat(a: real, b: real) : bool {
         return (Math.abs(a - b) < Number.EPSILON)
     }
 
-    function alignUp(a, b : int) {
+    function alignUp(a : real, b : int) : int {
         return Math.ceil(a / b) * b
     }
 
-    function alignDown(a, b : int) {
+    function alignDown(a : real, b : int) : int {
         return Math.floor(a / b) * b
     }
 
     // Currently only supports .25, .5, .75
-    function denominatorForFloat(number) : int {
+    function denominatorForFloat(number : real) : int {
         const fraction = number % 1
 
         if (fraction === 0)
@@ -97,7 +97,7 @@ QtObject {
         }
     }
 
-    function isSortedIntegerArrayConsecutive(array) {
+    function isSortedIntegerArrayConsecutive(array : var) : bool {
         for (let i = 1; i < array.length; ++i) {
             if ((array[i] - array[i - 1]) !== 1)
                 return false
@@ -106,7 +106,7 @@ QtObject {
         return true
     }
 
-    function itemsMovable(sortedItemIndexes, targetIndex) {
+    function itemsMovable(sortedItemIndexes : var, targetIndex : int) : bool {
         return !isSortedIntegerArrayConsecutive(sortedItemIndexes) ||
                 (targetIndex > (sortedItemIndexes[sortedItemIndexes.length - 1] + 1) ||
                  targetIndex < sortedItemIndexes[0])
@@ -121,7 +121,11 @@ QtObject {
      * @param type:real bottomMargin
      * @return type:real appropriate contentY for flickable
      */
-    function flickablePositionContaining(flickable, y, height, topMargin, bottomMargin) {
+    function flickablePositionContaining(flickable : Flickable,
+                                         y : real,
+                                         height : real,
+                                         topMargin : real,
+                                         bottomMargin : real) : real {
         const itemTopY = flickable.originY + y
         const itemBottomY = itemTopY + height
 
@@ -142,7 +146,7 @@ QtObject {
         return getFlickableBoundedContentY(flickable, newContentY)
     }
 
-    function isArray(obj) {
+    function isArray(obj : var) : bool {
         return (obj?.length !== undefined) ?? false
     }
 
