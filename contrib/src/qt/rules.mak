@@ -14,6 +14,8 @@ ifeq ($(call need_pkg,"Qt5Core Qt5Gui Qt5Widgets"),)
 PKGS_FOUND += qt
 endif
 
+DEPS_qt = zlib $(DEPS_zlib)
+
 $(TARBALLS)/qt-$(QT_VERSION).tar.xz:
 	$(call download_pkg,$(QT_URL),qt)
 
@@ -71,10 +73,10 @@ endif
 QT_PLATFORM := -xplatform $(QT_SPEC) -device-option CROSS_COMPILE=$(HOST)-
 endif
 
-QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
+QT_CONFIG := -static -opensource -confirm-license -no-pkg-config -system-zlib \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -no-dbus \
 	-no-qml-debug -no-audio-backend -no-sql-odbc -no-pch \
-	-no-compile-examples -nomake examples
+	-no-compile-examples -nomake examples -I $(PREFIX)/include
 ifdef HAVE_WIN32
 QT_CONFIG += -no-xcb
 endif

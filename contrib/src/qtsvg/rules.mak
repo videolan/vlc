@@ -23,6 +23,8 @@ qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(UNPACK)
 	$(APPLY) $(SRC)/qtsvg/0001-Force-the-usage-of-QtZlib-header.patch
 	$(APPLY) $(SRC)/qtsvg/0001-QSvgFont-Initialize-used-member-remove-unused.patch
+	# use up to date system zlib
+	sed -i -e 's,<QtZlib/,<,' $(UNPACK_DIR)/src/svg/qsvgtinydocument.cpp
 	$(MOVE)
 
 .qtsvg: qtsvg
