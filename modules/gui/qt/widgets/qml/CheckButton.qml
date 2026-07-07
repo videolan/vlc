@@ -157,7 +157,7 @@ T.Switch {
 
     background: AnimatedBackground {
         enabled: theme.initialized
-        border.color: root.visualFocus ? theme.visualFocus : "transparent"
+        border.color: root.visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
     }
 
     indicator: Rectangle {

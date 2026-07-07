@@ -50,7 +50,7 @@ T.ItemDelegate {
     background: Widgets.AnimatedBackground {
         enabled: theme.initialized
         color: control.checked ? theme.bg.highlight : theme.bg.primary
-        border.color: visualFocus ? theme.visualFocus : "transparent"
+        border.color: visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
     }
 
     contentItem: Item { // don't use a row, it will move text when control is unchecked

@@ -70,7 +70,7 @@ T.ToolButton {
     background: AnimatedBackground {
         enabled: theme.initialized
         color: theme.bg.primary
-        border.color: visualFocus ? theme.visualFocus : "transparent"
+        border.color: visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
         radius: control.radius
     }
 }

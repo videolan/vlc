@@ -272,7 +272,7 @@ T.ItemDelegate {
 
         //don't show the backgroud unless selected
         color: root.selected ?  theme.bg.highlight : theme.bg.primary
-        border.color: visualFocus ? theme.visualFocus : "transparent"
+        border.color: visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
     }
 
     contentItem: ColumnLayout {

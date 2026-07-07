@@ -40,7 +40,7 @@ Control {
 
     background: Widgets.AnimatedBackground {
         enabled: theme.initialized
-        border.color: visualFocus ? theme.visualFocus : "transparent"
+        border.color: visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
     }
 
     contentItem: Widgets.MenuLabel {

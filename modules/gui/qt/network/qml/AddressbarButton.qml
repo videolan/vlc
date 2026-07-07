@@ -64,7 +64,7 @@ T.Button {
     background: Widgets.AnimatedBackground {
         enabled: theme.initialized
         color: button.backgroundColor
-        border.color: visualFocus ? theme.visualFocus : "transparent"
+        border.color: visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
     }
 
     contentItem: contentLoader.item

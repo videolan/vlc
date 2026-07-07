@@ -182,7 +182,7 @@ Widgets.PageExt {
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
-            fadingEdge.backgroundColor: artistListBackground.usingAcrylic ? "transparent"
+            fadingEdge.backgroundColor: artistListBackground.usingAcrylic ? Qt.alpha(artistListBackground.alternativeColor, 0.0)
                                                                           : artistListBackground.alternativeColor
 
             fadingEdge.enableBeginningFade: root.enableBeginningFade

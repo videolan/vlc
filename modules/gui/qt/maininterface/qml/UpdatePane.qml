@@ -326,7 +326,7 @@ T.Pane {
                 anchors.fill: parent
 
                 backgroundColor: (root.background?.visible && root.background.color.a >= 1.0) ? root.background.color
-                                                                                              : "transparent"
+                                                                                              : Qt.alpha(root.background.color, 0.0)
 
                 sourceItem: descriptionFlickable.contentItem
 

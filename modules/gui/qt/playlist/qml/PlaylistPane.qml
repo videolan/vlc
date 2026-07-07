@@ -221,7 +221,7 @@ T.Pane {
             model: root.model
 
             fadingEdge.backgroundColor: (root.background && (root.background.color.a >= 1.0)) ? root.background.color
-                                                                                             : "transparent"
+                                                                                              : Qt.alpha(root.background.color, 0.0)
 
             isDropAcceptableFunc: function(drop, index) {
                 if (drop.source === dragItem)

@@ -73,7 +73,7 @@ T.ToolButton {
         enabled: theme.initialized
 
         color: theme.bg.primary
-        border.color: control.visualFocus ? theme.visualFocus : "transparent"
+        border.color: control.visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
     }
 
     contentItem: Image {
