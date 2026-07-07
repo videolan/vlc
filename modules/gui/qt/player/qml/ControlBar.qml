@@ -140,6 +140,15 @@ T.Pane {
                 font: timeTextMetrics.font
                 horizontalAlignment: Text.AlignHCenter
 
+                // TODO: Do not use `Binding` when minimum Qt is 6.12:
+                Binding {
+                    target: mediaTime
+                    property: "mutabilityGroup"
+                    when: (mediaTime.mutabilityGroup !== undefined)
+                    value: (Player.playingState === Player.PLAYING_STATE_PLAYING) ? Item.ModerateMutabilityGroup
+                                                                                  : Item.StaticMutabilityGroup
+                }
+
                 anchors.left: (parent === pseudoRow) ? parent.left : undefined
                 anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
             },
@@ -148,7 +157,9 @@ T.Pane {
 
                 Layout.preferredWidth: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? timeTextMetrics.width : -1
 
-                text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
+                readonly property bool showRemainingTime: (MainCtx.showRemainingTime && Player.remainingTime.valid())
+
+                text: showRemainingTime
                       ? "-" + Player.remainingTime.formatHMS()
                       : Player.length.formatHMS()
                 color: mediaTime.color
@@ -156,6 +167,16 @@ T.Pane {
                 horizontalAlignment: Text.AlignHCenter
 
                 visible: root.showRemainingTime
+
+                // TODO: Do not use `Binding` when minimum Qt is 6.12:
+                Binding {
+                    target: mediaRemainingTime
+                    property: "mutabilityGroup"
+                    when: (mediaRemainingTime.mutabilityGroup !== undefined)
+                    value: ((Player.playingState === Player.PLAYING_STATE_PLAYING) &&
+                            mediaRemainingTime.showRemainingTime) ? Item.ModerateMutabilityGroup
+                                                                  : Item.StaticMutabilityGroup
+                }
 
                 anchors.right: (parent === pseudoRow) ? parent.right : undefined
                 anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
