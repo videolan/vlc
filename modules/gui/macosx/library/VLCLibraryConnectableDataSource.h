@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryMoviesDataSource.h: MacOS X interface module
+ * VLCLibraryConnectableDataSource.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2025 VLC authors and VideoLAN
+ * Copyright (C) 2026 VLC authors and VideoLAN
  *
- * Authors: Claudio Cambra <developer@claudiocambra.com>
+ * Authors: Serhii Bykov <esphynox@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,22 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "library/VLCLibraryDataSource.h"
 
-#import "library/VLCLibraryConnectableDataSource.h"
-#import "library/VLCLibraryCollectionViewDataSource.h"
-#import "library/VLCLibraryTableViewDataSource.h"
+@protocol VLCLibraryConnectableDataSource <VLCLibraryDataSource>
 
-NS_ASSUME_NONNULL_BEGIN
-
-@class VLCLibraryModel;
-
-@interface VLCLibraryMoviesDataSource : NSObject <VLCLibraryConnectableDataSource, VLCLibraryCollectionViewDataSource, VLCLibraryTableViewDataSource>
-
-@property (readwrite, weak) VLCLibraryModel *libraryModel;
-@property (readwrite, weak) NSCollectionView *collectionView;
-@property (readwrite, weak) NSTableView *tableView;
+- (void)connect;
+- (void)disconnect;
 
 @end
-
-NS_ASSUME_NONNULL_END

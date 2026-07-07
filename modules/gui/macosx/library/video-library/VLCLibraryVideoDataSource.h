@@ -22,6 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryConnectableDataSource.h"
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibrarySectionedTableViewDataSource.h"
 
@@ -29,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryVideoDataSource : NSObject <VLCLibrarySectionedTableViewDataSource, VLCLibraryCollectionViewDataSource>
+@interface VLCLibraryVideoDataSource : NSObject <VLCLibraryConnectableDataSource, VLCLibrarySectionedTableViewDataSource, VLCLibraryCollectionViewDataSource>
 
 extern NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification;
 

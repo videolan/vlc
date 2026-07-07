@@ -570,6 +570,7 @@
 		53F89E392E2CFB1A008080C1 /* VLCLibraryFavoritesTableViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryFavoritesTableViewDelegate.m; sourceTree = "<group>"; };
 		5A96470D7C0135C694B0E467 /* NSScrollView+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSScrollView+VLCAdditions.h"; sourceTree = "<group>"; };
 		5C059439EDD68213AF6FD18C /* VLCLibrarySearchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySearchViewController.h; sourceTree = "<group>"; };
+		5925B4942FFCFB14007C1A85 /* VLCLibraryConnectableDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryConnectableDataSource.h; sourceTree = "<group>"; };
 		5CCED71014C0D4A90057F8D1 /* VLCExtensionsDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCExtensionsDialogProvider.h; sourceTree = "<group>"; };
 		5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCExtensionsDialogProvider.m; sourceTree = "<group>"; };
 		5CCED71214C0D4A90057F8D1 /* VLCExtensionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCExtensionsManager.h; sourceTree = "<group>"; };
@@ -1503,6 +1504,7 @@
 				7DFBDCA62269E77400B700A5 /* VLCLibraryController.h */,
 				7DFBDCA72269E77500B700A5 /* VLCLibraryController.m */,
 				532CBCFD2C8E025F00899413 /* VLCLibraryDataSource.h */,
+				5925B4942FFCFB14007C1A85 /* VLCLibraryConnectableDataSource.h */,
 				7DFBDCB2226CD00900B700A5 /* VLCLibraryDataTypes.h */,
 				7DFBDCB3226CD00900B700A5 /* VLCLibraryDataTypes.m */,
 				362CDBED2B707C5FC4D54571 /* VLCLibraryDynamicToolbarFlagsCapable.h */,

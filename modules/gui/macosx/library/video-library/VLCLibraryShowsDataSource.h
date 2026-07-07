@@ -22,13 +22,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryConnectableDataSource.h"
 #import "library/VLCLibraryAbstractGroupingDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryShowsDataSource : VLCLibraryAbstractGroupingDataSource
+@interface VLCLibraryShowsDataSource : VLCLibraryAbstractGroupingDataSource <VLCLibraryConnectableDataSource>
 
 @property (readwrite, weak) VLCLibraryModel *libraryModel;
 
