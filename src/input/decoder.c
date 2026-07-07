@@ -225,7 +225,7 @@ struct vlc_input_decoder_t
 #define PREROLL_FORCED VLC_TICK_MAX
 
     /* Pause & Rate */
-    vlc_tick_t pause_date;
+    vlc_tick_t pause_date, output_pause_date;
     vlc_tick_t delay, output_delay;
     float rate, output_rate;
     int frames_countdown;
@@ -2011,9 +2011,16 @@ static void *DecoderThread( void *p_data )
             continue;
         }
 
-        if( p_owner->paused != p_owner->output_paused )
+        /* Also compare the request dates: a pause and a resume requested in
+         * quick succession can cancel each other out, but each request must
+         * still be acknowledged via decoder_Notify() */
+        if( p_owner->paused != p_owner->output_paused
+         || p_owner->pause_date != p_owner->output_pause_date )
         {   /* Update playing/paused status of the output */
-            Decoder_ChangeOutputPause( p_owner, p_owner->paused, p_owner->pause_date );
+            if( p_owner->paused != p_owner->output_paused )
+                Decoder_ChangeOutputPause( p_owner, p_owner->paused,
+                                           p_owner->pause_date );
+            p_owner->output_pause_date = p_owner->pause_date;
             decoder_Notify(p_owner, on_output_paused, p_owner->paused,
                            p_owner->pause_date);
             if (unlikely(p_owner->paused && p_owner->cat == VIDEO_ES
@@ -2182,7 +2189,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     p_owner->output_delay = p_owner->delay = 0;
     p_owner->output_rate = p_owner->rate = 1.f;
     p_owner->output_paused = p_owner->paused = false;
-    p_owner->pause_date = VLC_TICK_INVALID;
+    p_owner->output_pause_date = p_owner->pause_date = VLC_TICK_INVALID;
     p_owner->frames_countdown = 0;
 
     p_owner->b_waiting = false;
