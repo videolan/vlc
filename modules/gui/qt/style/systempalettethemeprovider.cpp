@@ -254,7 +254,11 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
 
         QColor hightlightPressed = sys->m_isDark ? hightlight.lighter(120) : hightlight.darker(110);
 
-        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_NORMAL, Qt::transparent);
+        const QColor transparentHighlight = [hightlight]() mutable {
+            hightlight.setAlpha(0);
+            return hightlight;
+        }();
+        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_NORMAL, transparentHighlight);
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_HOVERED, hightlight);
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_FOCUSED, hightlight);
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_PRESSED, hightlightPressed);
@@ -354,9 +358,13 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setQtColorSetFg(obj, CS, VQTC_NAME_PRIMARY, QPalette::Text);
         setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_SECONDARY, VQTC_STATE_NORMAL, secondaryTextBase);
 
-        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_NORMAL, Qt::transparent);
         QColor itemBgHover = hightlight;
         itemBgHover.setAlphaF(0.1);
+        const QColor transparentBgHover = [itemBgHover]() mutable {
+            itemBgHover.setAlpha(0.0);
+            return itemBgHover;
+        }();
+        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_NORMAL, transparentBgHover);
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_FOCUSED, itemBgHover);
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_HOVERED, itemBgHover);
 
