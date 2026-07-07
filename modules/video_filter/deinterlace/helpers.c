@@ -293,7 +293,6 @@ void ComposeFrame( filter_t *p_filter,
                     p_in_top    += p_inpic_top->p[i_plane].i_pitch;
                     p_in_bottom += p_inpic_bottom->p[i_plane].i_pitch;
                 }
-                EndMerge();
             }
         }
     }

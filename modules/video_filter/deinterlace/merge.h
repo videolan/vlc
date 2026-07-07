@@ -64,13 +64,7 @@ struct deinterlace_functions {
  * Macros
  *****************************************************************************/
 
-/* Convenient Merge() and EndMerge() macros to pick the most appropriate
-   merge implementation automatically.
-
-   Note that you'll need to include vlc_filter.h and deinterlace.h
-   to use these.
-
- * Note that the Open() call of the deinterlace filter automatically selects
+/* Note that the Open() call of the deinterlace filter automatically selects
  * the most appropriate merge routine based on the CPU capabilities.
  * You can call the most appropriate version automatically, from a function
  * in the deinterlace filter, by using the Merge() macro.
@@ -87,17 +81,6 @@ struct deinterlace_functions {
  *
  */
 #define Merge p_sys->pf_merge
-
-/*
- * EndMerge() macro, which must be called after the merge is
- * finished, if the Merge() macro was used to perform the merge.
- */
-#if defined(__i386__) || defined(__x86_64__)
-# define EndMerge() \
-    if(p_sys->pf_end_merge) (p_sys->pf_end_merge)()
-#else
-# define EndMerge() (void)0
-#endif
 
 /*****************************************************************************
  * Merge routines
@@ -139,23 +122,6 @@ void Merge16BitGeneric( void *_p_dest, const void *_p_s1, const void *_p_s2,
  * @param i_bytes Number of bytes to merge
  */
 void MergeAltivec ( void *, const void *, const void *, size_t );
-#endif
-
-/*****************************************************************************
- * EndMerge routines
- *****************************************************************************/
-
-#if defined(CAN_COMPILE_SSE2)
-/**
- * SSE merge finalization routine.
- *
- * Should be called after an SSE merge is finished.
- * This exits SSE mode (by executing the "sfence" instruction).
- *
- * The EndMerge() macro detects whether this is needed, and calls if it is,
- * so just use that.
- */
-void EndSSE( void );
 #endif
 
 #endif

@@ -131,14 +131,3 @@ void MergeAltivec( void *_p_dest, const void *_p_s1,
         *p_dest++ = ( *p_s1++ + *p_s2++ + 1) >> 1;
 }
 #endif
-
-/*****************************************************************************
- * EndMerge routines
- *****************************************************************************/
-
-#if defined(CAN_COMPILE_SSE2)
-void EndSSE( void )
-{
-    __asm__ __volatile__( "sfence" ::: "memory" );
-}
-#endif

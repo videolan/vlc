@@ -562,11 +562,6 @@ notsupp:
     {
         vlc_CPU_functions_init_once("deinterlace functions", &funcs);
         p_sys->pf_merge = funcs.merges[stdc_trailing_zeros(pixel_size)];
-#if defined(CAN_COMPILE_SSE2) && (defined(__i386__) || defined(__x86_64__))
-        p_sys->pf_end_merge = vlc_CPU_SSE2() ? EndSSE : NULL;
-#elif defined(__i386__) || defined(__x86_64__)
-        p_sys->pf_end_merge = NULL;
-#endif
     }
 
     /* */

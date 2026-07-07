@@ -180,7 +180,6 @@ int RenderLinear( filter_t *p_filter,
             memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
         }
     }
-    EndMerge();
     return VLC_SUCCESS;
 }
 
@@ -215,7 +214,6 @@ int RenderMean( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
             p_in += 2 * p_pic->p[i_plane].i_pitch;
         }
     }
-    EndMerge();
     return VLC_SUCCESS;
 }
 
@@ -254,6 +252,5 @@ int RenderBlend( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
             p_in  += p_pic->p[i_plane].i_pitch;
         }
     }
-    EndMerge();
     return VLC_SUCCESS;
 }

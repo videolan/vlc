@@ -70,10 +70,6 @@ typedef struct
 
     /** Merge routine: C, SSE, ALTIVEC, NEON, ... */
     void (*pf_merge) ( void *, const void *, const void *, size_t );
-#if defined (__i386__) || defined (__x86_64__)
-    /** Merge finalization routine for SSE */
-    void (*pf_end_merge) ( void );
-#endif
 
     struct deinterlace_ctx   context;
 
