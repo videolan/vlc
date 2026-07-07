@@ -44,6 +44,7 @@
 #include "avformat.h"
 #include "../xiph.h"
 #include "../vobsub.h"
+#include "../av1_unpack.h"
 
 #include <libavformat/avformat.h>
 #include <libavutil/display.h>
@@ -908,6 +909,17 @@ static int Demux( demux_t *p_demux )
 
     if( pkt.flags & AV_PKT_FLAG_KEY )
         p_frame->i_flags |= BLOCK_FLAG_TYPE_I;
+
+    if( p_stream->codecpar->codec_id == AV_CODEC_ID_AV1 )
+    {
+        /* Prepare the packet like the mkv/mp4 demuxers do. */
+        p_frame = AV1_Unpack_Sample( p_frame );
+        if( unlikely( p_frame == NULL ) )
+        {
+            av_packet_unref( &pkt );
+            return VLC_DEMUXER_EOF;
+        }
+    }
 
     /* Used to avoid timestamps overflow */
     if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
