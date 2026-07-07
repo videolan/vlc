@@ -299,7 +299,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             vlc_player_SignalAtoBLoop(player);
             vlc_player_UpdateTimerEvent(player, NULL,
                                         VLC_PLAYER_TIMER_EVENT_PLAYING,
-                                        input->pause_date);
+                                        state_date);
             /* fall through */
         case VLC_PLAYER_STATE_STARTED:
             if (player->started &&
