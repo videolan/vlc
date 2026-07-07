@@ -1,0 +1,32 @@
+From cecbdf4d638cace945a99cbe923565d0767921c9 Mon Sep 17 00:00:00 2001
+From: Urs Fleisch <ufleisch@users.sourceforge.net>
+Date: Sun, 5 Nov 2023 14:40:18 +0100
+Subject: [PATCH] Fix crash with invalid WAV files (#1163) (#1164)
+
+With specially crafted WAV files having the "id3 " chunk as the
+only valid chunk, when trying to write the tags, the existing
+"id3 " chunk is removed, and then vector::front() is called on
+the now empty chunks vector.
+Now it is checked if the vector is empty to avoid the crash.
+---
+ taglib/riff/rifffile.cpp     |   3 +++
+ 3 files changed, 21 insertions(+)
+ create mode 100644 tests/data/invalid-chunk.wav
+
+diff --git a/taglib/riff/rifffile.cpp b/taglib/riff/rifffile.cpp
+index 005551f4..f615e6c7 100644
+--- a/taglib/riff/rifffile.cpp
++++ b/taglib/riff/rifffile.cpp
+@@ -361,6 +361,9 @@ void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
+ 
+ void RIFF::File::updateGlobalSize()
+ {
++  if(d->chunks.empty())
++    return;
++
+   const Chunk first = d->chunks.front();
+   const Chunk last  = d->chunks.back();
+   d->size = last.offset + last.size + last.padding - first.offset + 12;
+-- 
+2.52.0.windows.1
+
