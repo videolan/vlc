@@ -635,12 +635,12 @@ static void ActivateSets(decoder_t *p_dec,
                                           &sizes[2], &sizes[3],
                                           &sizes[4], &sizes[5] ) )
         {
-            p_dec->fmt_out.video.i_x_offset = sizes[0];
-            p_dec->fmt_out.video.i_y_offset = sizes[1];
             p_dec->fmt_out.video.i_width = sizes[2];
             p_dec->fmt_out.video.i_height = sizes[3];
             if(p_dec->fmt_in->video.i_visible_width == 0)
             {
+                p_dec->fmt_out.video.i_x_offset = sizes[0];
+                p_dec->fmt_out.video.i_y_offset = sizes[1];
                 p_dec->fmt_out.video.i_visible_width = sizes[4];
                 p_dec->fmt_out.video.i_visible_height = sizes[5];
             }
