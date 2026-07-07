@@ -1,6 +1,20 @@
---- qt/src/widgets/util/qsystemtrayicon_win.cpp.old
-+++ qt/src/widgets/util/qsystemtrayicon_win.cpp
-@@ -258,6 +258,10 @@ bool QSystemTrayIconSys::showMessage(con
+From ee4ae8b0134b1c2eb6433fe15c380695f9da7a38 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Fri, 21 Jul 2017 17:34:48 +0200
+Subject: [PATCH] Disable systray notification sounds
+
+Fix #18530
+
+Change-Id: I97c25deb360ea4cd9d95ed464d154eece3333925
+---
+ src/widgets/util/qsystemtrayicon_win.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/widgets/util/qsystemtrayicon_win.cpp b/src/widgets/util/qsystemtrayicon_win.cpp
+index 221d040599b..dc2b00ef862 100644
+--- a/src/widgets/util/qsystemtrayicon_win.cpp
++++ b/src/widgets/util/qsystemtrayicon_win.cpp
+@@ -258,6 +258,10 @@ bool QSystemTrayIconSys::showMessage(const QString &title, const QString &messag
      }
      if (QSysInfo::windowsVersion() >= QSysInfo::WV_VISTA)
          tnd.dwInfoFlags |= NIIF_LARGE_ICON;
@@ -11,3 +25,6 @@
      tnd.cbSize = notifyIconSize;
      tnd.hWnd = m_hwnd;
      tnd.uTimeout = uSecs;
+-- 
+2.52.0.windows.1
+
