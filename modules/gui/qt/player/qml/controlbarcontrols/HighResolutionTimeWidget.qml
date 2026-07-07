@@ -94,6 +94,15 @@ Control {
                                                                                                    : null
                 playerController: Player
             }
+
+            // TODO: Do not use `Binding` when minimum Qt is 6.12:
+            Binding {
+                target: label
+                property: "mutabilityGroup"
+                when: label.mutabilityGroup !== undefined
+                value: (Player.playingState === Player.PLAYING_STATE_PLAYING) ? Item.DynamicMutabilityGroup
+                                                                              : Item.StaticMutabilityGroup
+            }
         }
 
         TextMetrics {
