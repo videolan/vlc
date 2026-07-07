@@ -372,6 +372,17 @@ T.ProgressBar {
                         width: sliderRect.width * control.visualPosition - parent.x - control._seekPointsDistance
                         visible: parent._currentChapter === 0
                         color: theme.fg.primary
+
+                        // We use dynamic mutability group because time interpolation
+                        // may induce rapid change:
+                        // TODO: Do not use `Binding` when minimum Qt is 6.12:
+                        Binding {
+                            target: progressRepRect
+                            property: "mutabilityGroup"
+                            when: (progressRepRect.mutabilityGroup !== undefined)
+                            value: (Player.playingState === Player.PLAYING_STATE_PLAYING) ? Item.DynamicMutabilityGroup
+                                                                                          : Item.StaticMutabilityGroup
+                        }
                     }
                 }
 
@@ -424,6 +435,17 @@ T.ProgressBar {
             color: theme.fg.primary
             height: control.barHeight
             radius: control._seekPointsRadius
+
+            // We use dynamic mutability group because time interpolation
+            // may induce rapid change:
+            // TODO: Do not use `Binding` when minimum Qt is 6.12:
+            Binding {
+                target: progressRect
+                property: "mutabilityGroup"
+                when: (progressRect.mutabilityGroup !== undefined)
+                value: (Player.playingState === Player.PLAYING_STATE_PLAYING) ? Item.DynamicMutabilityGroup
+                                                                              : Item.StaticMutabilityGroup
+            }
         }
 
         Rectangle {
@@ -439,6 +461,15 @@ T.ProgressBar {
             opacity: 0.4
             color: theme.fg.neutral //FIXME buffer color ?
             radius: control.barHeight
+
+            // TODO: Do not use `Binding` when minimum Qt is 6.12:
+            Binding {
+                target: bufferRect
+                property: "mutabilityGroup"
+                when: bufferRect.mutabilityGroup !== undefined
+                value: bufferRect.buffering ? Item.DynamicMutabilityGroup
+                                            : Item.StaticMutabilityGroup
+            }
 
             Timer {
                 id: bufferingTimer
@@ -547,6 +578,17 @@ T.ProgressBar {
         implicitHeight: sliderHandle._size
         radius: VLCStyle.margin_small
         color: theme.fg.primary
+
+        // We use dynamic mutability group because time interpolation
+        // may induce rapid change:
+        // TODO: Do not use `Binding` when minimum Qt is 6.12:
+        Binding {
+            target: sliderHandle
+            property: "mutabilityGroup"
+            when: (sliderHandle.mutabilityGroup !== undefined)
+            value: (Player.playingState === Player.PLAYING_STATE_PLAYING) ? Item.DynamicMutabilityGroup
+                                                                          : Item.StaticMutabilityGroup
+        }
 
         transitions: [
             Transition {
