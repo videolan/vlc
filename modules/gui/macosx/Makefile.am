@@ -102,8 +102,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSAnimationContext+VLCAdditions.m \
 	gui/macosx/extensions/NSArray+VLCAdditions.h \
 	gui/macosx/extensions/NSArray+VLCAdditions.m \
-	gui/macosx/extensions/NSGradient+VLCAdditions.h \
-	gui/macosx/extensions/NSGradient+VLCAdditions.m \
 	gui/macosx/extensions/NSColor+VLCAdditions.h \
 	gui/macosx/extensions/NSColor+VLCAdditions.m \
 	gui/macosx/extensions/NSFont+VLCAdditions.h \

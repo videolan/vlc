@@ -24,7 +24,6 @@
 
 #import <CoreVideo/CoreVideo.h>
 
-#import "extensions/NSGradient+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 
 #import "library/VLCLibraryUIUnits.h"

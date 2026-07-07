@@ -26,7 +26,6 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
-#import "extensions/NSGradient+VLCAdditions.h"
 
 @implementation VLCBottomBarView
 
