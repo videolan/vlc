@@ -18,9 +18,9 @@ $(TARBALLS)/qtsvg-$(QTSVG_VERSION).tar.xz:
 
 .sum-qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz
 
+qtsvg: UNPACK_DIR=qtsvg-opensource-src-$(QTSVG_VERSION)
 qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(UNPACK)
-	mv qtsvg-opensource-src-$(QTSVG_VERSION) qtsvg-$(QTSVG_VERSION)
 	$(APPLY) $(SRC)/qtsvg/0001-Force-the-usage-of-QtZlib-header.patch
 	$(MOVE)
 
