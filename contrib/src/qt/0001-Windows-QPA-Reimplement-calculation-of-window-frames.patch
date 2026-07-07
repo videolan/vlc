@@ -1,7 +1,7 @@
-From 81ead1ff68711fed609cb47b33b3906c14ed95d5 Mon Sep 17 00:00:00 2001
+From 7b7c6312500a9e326ff94df5b016422e5b04e9f8 Mon Sep 17 00:00:00 2001
 From: Friedemann Kleint <Friedemann.Kleint@qt.io>
 Date: Mon, 14 Nov 2016 16:08:51 +0100
-Subject: [PATCH 1/2] Windows QPA: Reimplement calculation of window frames
+Subject: [PATCH 01/31] Windows QPA: Reimplement calculation of window frames
 
 Instead of relying on AdjustWindowRectEx() and dirty-handling,
 capture the rectangles before and after the processing of
@@ -16,14 +16,14 @@ Change-Id: If8364a5440a6324ea5d470bf5b74e68942285abe
 Reviewed-by: Tim Jenssen <tim.jenssen@qt.io>
 Reviewed-by: Oliver Wolff <oliver.wolff@qt.io>
 ---
- src/plugins/platforms/windows/qwindowscontext.cpp | 66 +++++++++++++++++++++--
- src/plugins/platforms/windows/qwindowscontext.h   |  4 +-
- src/plugins/platforms/windows/qwindowswindow.cpp  | 30 ++++-------
- src/plugins/platforms/windows/qwindowswindow.h    |  2 +-
+ .../platforms/windows/qwindowscontext.cpp     | 66 +++++++++++++++++--
+ .../platforms/windows/qwindowscontext.h       |  4 +-
+ .../platforms/windows/qwindowswindow.cpp      | 30 +++------
+ .../platforms/windows/qwindowswindow.h        |  2 +-
  4 files changed, 74 insertions(+), 28 deletions(-)
 
 diff --git a/src/plugins/platforms/windows/qwindowscontext.cpp b/src/plugins/platforms/windows/qwindowscontext.cpp
-index b611843..9058993 100644
+index b6118431d32..90589934469 100644
 --- a/src/plugins/platforms/windows/qwindowscontext.cpp
 +++ b/src/plugins/platforms/windows/qwindowscontext.cpp
 @@ -453,6 +453,11 @@ void QWindowsContext::setWindowCreationContext(const QSharedPointer<QWindowCreat
@@ -142,7 +142,7 @@ index b611843..9058993 100644
  }
  
 diff --git a/src/plugins/platforms/windows/qwindowscontext.h b/src/plugins/platforms/windows/qwindowscontext.h
-index 14baec9..dcac77c 100644
+index 14baec96d85..dcac77c2ff3 100644
 --- a/src/plugins/platforms/windows/qwindowscontext.h
 +++ b/src/plugins/platforms/windows/qwindowscontext.h
 @@ -210,12 +210,14 @@ public:
@@ -162,10 +162,10 @@ index 14baec9..dcac77c 100644
      void setTabletAbsoluteRange(int a);
      void setProcessDpiAwareness(QtWindows::ProcessDpiAwareness dpiAwareness);
 diff --git a/src/plugins/platforms/windows/qwindowswindow.cpp b/src/plugins/platforms/windows/qwindowswindow.cpp
-index b38d7c2..11ba9c1 100644
+index c2238639431..bd8149acf9c 100644
 --- a/src/plugins/platforms/windows/qwindowswindow.cpp
 +++ b/src/plugins/platforms/windows/qwindowswindow.cpp
-@@ -1630,7 +1630,6 @@ QWindowsWindowData QWindowsWindow::setWindowFlags_sys(Qt::WindowFlags wt,
+@@ -1644,7 +1644,6 @@ QWindowsWindowData QWindowsWindow::setWindowFlags_sys(Qt::WindowFlags wt,
      QWindowsWindowData result = m_data;
      result.flags = creationData.flags;
      result.embedded = creationData.embedded;
@@ -173,7 +173,7 @@ index b38d7c2..11ba9c1 100644
      return result;
  }
  
-@@ -1638,7 +1637,6 @@ void QWindowsWindow::handleWindowStateChange(Qt::WindowState state)
+@@ -1652,7 +1651,6 @@ void QWindowsWindow::handleWindowStateChange(Qt::WindowState state)
  {
      qCDebug(lcQpaWindows) << __FUNCTION__ << this << window()
                   << "\n    from " << m_windowState << " to " << state;
@@ -181,7 +181,7 @@ index b38d7c2..11ba9c1 100644
      m_windowState = state;
      QWindowSystemInterface::handleWindowStateChanged(window(), state);
      switch (state) {
-@@ -1715,8 +1713,6 @@ void QWindowsWindow::setWindowState_sys(Qt::WindowState newState)
+@@ -1729,8 +1727,6 @@ void QWindowsWindow::setWindowState_sys(Qt::WindowState newState)
  
      const bool visible = isVisible();
  
@@ -190,7 +190,7 @@ index b38d7c2..11ba9c1 100644
      if ((oldState == Qt::WindowFullScreen) != (newState == Qt::WindowFullScreen)) {
  #ifdef Q_OS_WINCE
          HWND handle = FindWindow(L"HHTaskBar", L"");
-@@ -1826,7 +1822,6 @@ void QWindowsWindow::setStyle(unsigned s) const
+@@ -1840,7 +1836,6 @@ void QWindowsWindow::setStyle(unsigned s) const
  {
      qCDebug(lcQpaWindows) << __FUNCTION__ << this << window() << debugWinStyle(s);
      setFlag(WithinSetStyle);
@@ -198,7 +198,7 @@ index b38d7c2..11ba9c1 100644
      SetWindowLongPtr(m_data.hwnd, GWL_STYLE, s);
      clearFlag(WithinSetStyle);
  }
-@@ -1835,7 +1830,6 @@ void QWindowsWindow::setExStyle(unsigned s) const
+@@ -1849,7 +1844,6 @@ void QWindowsWindow::setExStyle(unsigned s) const
  {
      qCDebug(lcQpaWindows).nospace() << __FUNCTION__ << ' ' << this << ' ' << window()
          << " 0x" << QByteArray::number(s, 16);
@@ -206,7 +206,7 @@ index b38d7c2..11ba9c1 100644
      SetWindowLongPtr(m_data.hwnd, GWL_EXSTYLE, s);
  }
  
-@@ -1909,22 +1903,17 @@ bool QWindowsWindow::handleGeometryChanging(MSG *message) const
+@@ -1923,22 +1917,17 @@ bool QWindowsWindow::handleGeometryChanging(MSG *message) const
      return QWindowsWindow::handleGeometryChangingMessage(message, window(), margins);
  }
  
@@ -238,7 +238,7 @@ index b38d7c2..11ba9c1 100644
  }
  
  void QWindowsWindow::setOpacity(qreal level)
-@@ -2322,7 +2311,6 @@ void QWindowsWindow::setCustomMargins(const QMargins &newCustomMargins)
+@@ -2336,7 +2325,6 @@ void QWindowsWindow::setCustomMargins(const QMargins &newCustomMargins)
          const QPoint topLeft = currentFrameGeometry.topLeft();
          QRect newFrame = currentFrameGeometry.marginsRemoved(oldCustomMargins) + m_data.customMargins;
          newFrame.moveTo(topLeft);
@@ -247,7 +247,7 @@ index b38d7c2..11ba9c1 100644
              << currentFrameGeometry << "->" << newFrame;
          SetWindowPos(m_data.hwnd, 0, newFrame.x(), newFrame.y(), newFrame.width(), newFrame.height(), SWP_NOZORDER | SWP_FRAMECHANGED);
 diff --git a/src/plugins/platforms/windows/qwindowswindow.h b/src/plugins/platforms/windows/qwindowswindow.h
-index 6fffa1e..0e150a8 100644
+index 6fffa1e6e9e..0e150a835e1 100644
 --- a/src/plugins/platforms/windows/qwindowswindow.h
 +++ b/src/plugins/platforms/windows/qwindowswindow.h
 @@ -119,7 +119,6 @@ public:
@@ -267,5 +267,5 @@ index 6fffa1e..0e150a8 100644
      void setOpacity(qreal level) Q_DECL_OVERRIDE;
      void setMask(const QRegion &region) Q_DECL_OVERRIDE;
 -- 
-2.9.0.windows.1
+2.52.0.windows.1
 

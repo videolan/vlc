@@ -1,7 +1,7 @@
-From 8f39b5247c4f7766553131688f5d5b7193327336 Mon Sep 17 00:00:00 2001
+From 503a612ee020024c87d4f5a8307ad3d85be59c32 Mon Sep 17 00:00:00 2001
 From: Friedemann Kleint <Friedemann.Kleint@qt.io>
 Date: Mon, 7 Nov 2016 14:22:37 +0100
-Subject: [PATCH 2/2] Windows QPA: Use new EnableNonClientDpiScaling() for
+Subject: [PATCH 02/31] Windows QPA: Use new EnableNonClientDpiScaling() for
  Windows decoration
 
 Use newly introduced EnableNonClientDpiScaling() function to fix
@@ -12,13 +12,13 @@ Task-number: QTBUG-53255
 Change-Id: Ic6e2f2a92f790259107d2a0837b96177cf3adb5f
 Reviewed-by: Tim Jenssen <tim.jenssen@qt.io>
 ---
- src/plugins/platforms/windows/qtwindowsglobal.h   |  3 ++
- src/plugins/platforms/windows/qwindowscontext.cpp | 35 ++++++++++++++++++++++-
- src/plugins/platforms/windows/qwindowscontext.h   |  7 +++++
+ .../platforms/windows/qtwindowsglobal.h       |  3 ++
+ .../platforms/windows/qwindowscontext.cpp     | 35 ++++++++++++++++++-
+ .../platforms/windows/qwindowscontext.h       |  7 ++++
  3 files changed, 44 insertions(+), 1 deletion(-)
 
 diff --git a/src/plugins/platforms/windows/qtwindowsglobal.h b/src/plugins/platforms/windows/qtwindowsglobal.h
-index 63c083d..e7e010d 100644
+index 63c083d2331..e7e010dee6b 100644
 --- a/src/plugins/platforms/windows/qtwindowsglobal.h
 +++ b/src/plugins/platforms/windows/qtwindowsglobal.h
 @@ -87,6 +87,7 @@ enum WindowsEventType // Simplify event types
@@ -39,7 +39,7 @@ index 63c083d..e7e010d 100644
          return QtWindows::CalculateSize;
  #ifndef Q_OS_WINCE
 diff --git a/src/plugins/platforms/windows/qwindowscontext.cpp b/src/plugins/platforms/windows/qwindowscontext.cpp
-index 9058993..ab0b3da 100644
+index 90589934469..ab0b3da0b83 100644
 --- a/src/plugins/platforms/windows/qwindowscontext.cpp
 +++ b/src/plugins/platforms/windows/qwindowscontext.cpp
 @@ -140,6 +140,28 @@ static inline QWindowsSessionManager *platformSessionManager() {
@@ -106,7 +106,7 @@ index 9058993..ab0b3da 100644
              return QWindowsGeometryHint::handleCalculateSize(d->m_creationContext->customMargins, msg, result);
          case QtWindows::GeometryChangingEvent:
 diff --git a/src/plugins/platforms/windows/qwindowscontext.h b/src/plugins/platforms/windows/qwindowscontext.h
-index dcac77c..156ede5 100644
+index dcac77c2ff3..156ede5d08d 100644
 --- a/src/plugins/platforms/windows/qwindowscontext.h
 +++ b/src/plugins/platforms/windows/qwindowscontext.h
 @@ -96,6 +96,9 @@ struct QWindowsUser32DLL
@@ -131,5 +131,5 @@ index dcac77c..156ede5 100644
  
  struct QWindowsShell32DLL
 -- 
-2.9.0.windows.1
+2.52.0.windows.1
 

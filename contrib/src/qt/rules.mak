@@ -22,8 +22,8 @@ $(TARBALLS)/qt-$(QT_VERSION).tar.xz:
 qt: UNPACK_DIR=qtbase-opensource-src-$(QT_VERSION)
 qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(UNPACK)
-	$(APPLY) $(SRC)/qt/0001-Windows-QPA-Reimplement-calculation-of-window-frames_56.patch
-	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Use-new-EnableNonClientDpiScaling-for-Wi_56.patch
+	$(APPLY) $(SRC)/qt/0001-Windows-QPA-Reimplement-calculation-of-window-frames.patch
+	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Use-new-EnableNonClientDpiScaling-for-Wi.patch
 	$(APPLY) $(SRC)/qt/0003-QPA-prefer-lower-value-when-rounding-fractional-scaling.patch
 	$(APPLY) $(SRC)/qt/0004-qmake-don-t-limit-command-line-length-when-not-actua.patch
 	$(APPLY) $(SRC)/qt/0005-harfbuzz-Fix-building-for-win64-with-clang.patch

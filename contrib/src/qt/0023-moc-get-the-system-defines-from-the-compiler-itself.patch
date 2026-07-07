@@ -1,7 +1,7 @@
-From 89074d0a7e4a038edef8aa0d05609ac33e83d32b Mon Sep 17 00:00:00 2001
+From eafc9dab7d4bb6a7e62438139d220cd1283b9ee8 Mon Sep 17 00:00:00 2001
 From: Thiago Macieira <thiago.macieira@intel.com>
 Date: Fri, 21 Aug 2015 17:08:19 -0700
-Subject: [PATCH 23/23] moc: get the system #defines from the compiler itself
+Subject: [PATCH 23/31] moc: get the system #defines from the compiler itself
 
 In order for moc to properly parse #ifdefs and family, we've had
 QMAKE_COMPILER_DEFINES as a list of pre-defined macros from the
@@ -27,8 +27,6 @@ Backport-Of: 36d524e6a3b64a8c35805c1b868d6d67ccae765c (v5.8.0)
  src/tools/moc/main.cpp                     | 17 ++++++-
  src/tools/moc/preprocessor.cpp             | 58 ++++++++++++----------
  src/tools/moc/preprocessor.h               |  1 +
- tests/auto/tools/moc/subdir/extradefines.h |  1 +
- tests/auto/tools/moc/tst_moc.cpp           | 42 ++++++++++++++++
  7 files changed, 155 insertions(+), 30 deletions(-)
  create mode 100644 tests/auto/tools/moc/subdir/extradefines.h
 
@@ -287,73 +285,6 @@ index 9c81f86f9c4..d876caf7297 100644
      Symbols preprocessed(const QByteArray &filename, QFile *device);
  
      void parseDefineArguments(Macro *m);
-diff --git a/tests/auto/tools/moc/subdir/extradefines.h b/tests/auto/tools/moc/subdir/extradefines.h
-new file mode 100644
-index 00000000000..e7888ce80de
---- /dev/null
-+++ b/tests/auto/tools/moc/subdir/extradefines.h
-@@ -0,0 +1 @@
-+#define FOO     1
-diff --git a/tests/auto/tools/moc/tst_moc.cpp b/tests/auto/tools/moc/tst_moc.cpp
-index d00a86a9e5a..e2c87e923a4 100644
---- a/tests/auto/tools/moc/tst_moc.cpp
-+++ b/tests/auto/tools/moc/tst_moc.cpp
-@@ -587,6 +587,8 @@ private slots:
-     void frameworkSearchPath();
-     void cstyleEnums();
-     void defineMacroViaCmdline();
-+    void defineMacroViaForcedInclude();
-+    void defineMacroViaForcedIncludeRelative();
-     void specifyMetaTagsFromCmdline();
-     void invokable();
-     void singleFunctionKeywordSignalAndSlot();
-@@ -1264,6 +1266,46 @@ void tst_Moc::defineMacroViaCmdline()
- #endif
- }
- 
-+void tst_Moc::defineMacroViaForcedInclude()
-+{
-+#if defined(Q_OS_LINUX) && defined(Q_CC_GNU) && !defined(QT_NO_PROCESS)
-+    QProcess proc;
-+
-+    QStringList args;
-+    args << "--include" << m_sourceDirectory + QLatin1String("/subdir/extradefines.h");
-+    args << m_sourceDirectory + QStringLiteral("/macro-on-cmdline.h");
-+
-+    proc.start(m_moc, args);
-+    QVERIFY(proc.waitForFinished());
-+    QCOMPARE(proc.exitCode(), 0);
-+    QCOMPARE(proc.readAllStandardError(), QByteArray());
-+    QByteArray mocOut = proc.readAllStandardOutput();
-+    QVERIFY(!mocOut.isEmpty());
-+#else
-+    QSKIP("Only tested on linux/gcc");
-+#endif
-+}
-+
-+void tst_Moc::defineMacroViaForcedIncludeRelative()
-+{
-+#if defined(Q_OS_LINUX) && defined(Q_CC_GNU) && !defined(QT_NO_PROCESS)
-+    QProcess proc;
-+
-+    QStringList args;
-+    args << "--include" << QStringLiteral("extradefines.h") << "-I" + m_sourceDirectory + "/subdir";
-+    args << m_sourceDirectory + QStringLiteral("/macro-on-cmdline.h");
-+
-+    proc.start(m_moc, args);
-+    QVERIFY(proc.waitForFinished());
-+    QCOMPARE(proc.exitCode(), 0);
-+    QCOMPARE(proc.readAllStandardError(), QByteArray());
-+    QByteArray mocOut = proc.readAllStandardOutput();
-+    QVERIFY(!mocOut.isEmpty());
-+#else
-+    QSKIP("Only tested on linux/gcc");
-+#endif
-+}
-+
- // tst_Moc::specifyMetaTagsFromCmdline()
- // plugin_metadata.h contains a plugin which we register here. Since we're not building this
- // application as a plugin, we need top copy some of the initializer code found in qplugin.h:
 -- 
-2.43.0
+2.52.0.windows.1
 
