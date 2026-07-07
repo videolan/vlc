@@ -22,6 +22,7 @@ qtsvg: UNPACK_DIR=qtsvg-opensource-src-$(QTSVG_VERSION)
 qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(UNPACK)
 	$(APPLY) $(SRC)/qtsvg/0001-Force-the-usage-of-QtZlib-header.patch
+	$(APPLY) $(SRC)/qtsvg/0001-QSvgFont-Initialize-used-member-remove-unused.patch
 	$(MOVE)
 
 .qtsvg: qtsvg
