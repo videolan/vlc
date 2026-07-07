@@ -196,10 +196,9 @@ struct vlc_player_timer_source
     struct vlc_player_timer_point point;
     bool seeking;
 
-    /* Set once a pause has been reported to this source's listener.
-     * The input might signal paused clock and then output
-     * would signal it. This flag filters this case here. */
-    bool pause_reported;
+    /* Date of the last reported pause, to report a pause signaled by both
+     * the input and the output only once */
+    vlc_tick_t reported_pause_date;
 
     union
     {
@@ -243,6 +242,9 @@ struct vlc_player_timer
         UPDATE_STATE_RESUMING,
     } update_state;
     vlc_tick_t pause_date;
+    /* Date of the last input PLAYING event, to detect ES PAUSED events
+     * delivered after their pause was resumed */
+    vlc_tick_t last_resume_date;
     bool stopping;
 
     struct vlc_player_timer_source sources[VLC_PLAYER_TIMER_TYPE_COUNT];

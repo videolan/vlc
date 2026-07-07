@@ -42,6 +42,7 @@ vlc_player_ResetTimer(vlc_player_t *player)
     player->timer.seek_position = -1;
     player->timer.update_state = UPDATE_STATE_RESUMED;
     player->timer.pause_date = VLC_TICK_INVALID;
+    player->timer.last_resume_date = VLC_TICK_INVALID;
     player->timer.stopping = false;
 
     vlc_mutex_unlock(&player->timer.lock);
@@ -262,8 +263,17 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
 
         case VLC_PLAYER_TIMER_EVENT_PAUSED:
             assert(system_date != VLC_TICK_INVALID);
-            player->timer.update_state = UPDATE_STATE_PAUSED;
-            player->timer.pause_date = system_date;
+
+            /* An ES PAUSED event can be delivered after its pause was
+             * resumed. It is still reported: per-ES events are delivered
+             * in order, but it should not touch player timer state. */
+            if (es_source == NULL
+             || player->timer.last_resume_date == VLC_TICK_INVALID
+             || system_date >= player->timer.last_resume_date)
+            {
+                player->timer.update_state = UPDATE_STATE_PAUSED;
+                player->timer.pause_date = system_date;
+            }
 
             for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
             {
@@ -271,11 +281,11 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
                 if (source->es != es_source)
                     continue;
 
-                /* The input might signal paused clock and then output
-                 * would signal it. This flag filters this case here. */
-                if (source->pause_reported)
+                /* The input and the output signal the same pause with the
+                 * same date */
+                if (source->reported_pause_date == system_date)
                     continue;
-                source->pause_reported = true;
+                source->reported_pause_date = system_date;
                 vlc_player_SendTimerPause(player, source, system_date,
                                           i == VLC_PLAYER_TIMER_TYPE_SMPTE);
             }
@@ -284,9 +294,9 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
 
         case VLC_PLAYER_TIMER_EVENT_PLAYING:
             assert(!player->timer.stopping);
+            if (system_date != VLC_TICK_INVALID)
+                player->timer.last_resume_date = system_date;
             player->timer.update_state = UPDATE_STATE_RESUMING;
-            for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
-                player->timer.sources[i].pause_reported = false;
             break;
 
         case VLC_PLAYER_TIMER_EVENT_STOPPING:
@@ -763,7 +773,7 @@ vlc_player_InitTimer(vlc_player_t *player)
         player->timer.sources[i].point.system_date = VLC_TICK_INVALID;
         player->timer.sources[i].es = NULL;
         player->timer.sources[i].seeking = false;
-        player->timer.sources[i].pause_reported = false;
+        player->timer.sources[i].reported_pause_date = VLC_TICK_INVALID;
     }
     vlc_player_ResetTimer(player);
 }
