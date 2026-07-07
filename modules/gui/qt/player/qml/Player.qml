@@ -758,6 +758,15 @@ FocusScope {
                             wrapMode: Text.WordWrap
                             color: centerTheme.fg.primary
 
+                            // TODO: Do not use `Binding` when minimum Qt is 6.12:
+                            Binding {
+                                target: lyricsLabel
+                                property: "mutabilityGroup"
+                                when: (lyricsLabel.mutabilityGroup !== undefined)
+                                value: (Player.playingState === Player.PLAYING_STATE_PLAYING) ? Item.ModerateMutabilityGroup
+                                                                                              : Item.StaticMutabilityGroup
+                            }
+
                             TextMetrics {
                                 id: lyricsLabelTextMetrics
                                 font: lyricsLabel.font
