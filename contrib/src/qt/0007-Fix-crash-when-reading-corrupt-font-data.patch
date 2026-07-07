@@ -1,0 +1,140 @@
+From 0dc898e11825d7e5d8ad49be41235bb2675b6fda Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4_qt@ycbcr.xyz>
+Date: Wed, 8 Jul 2026 07:23:56 +0200
+Subject: [PATCH 7/7] Fix crash when reading corrupt font data When loading the
+ font data, we had some unprotected reads. To harden this, we check everything
+ against the length of the font data before reading.
+
+[ChangeLog][QtGui][Windows] Fixed a possible crash that could happen
+when loading corrupted font data.
+
+Fixes: QTBUG-116773
+Pick-to: 5.15 6.2 6.5 6.6 6.6.0
+Change-Id: I156df3b8833c9ed785fcc690821a7a74d9a51126
+Reviewed-by: Lars Knoll <lars@knoll.priv.no>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+---
+ .../windows/qwindowsfontdatabase.cpp          | 67 ++++++++++++++-----
+ 1 file changed, 51 insertions(+), 16 deletions(-)
+
+diff --git a/src/plugins/platforms/windows/qwindowsfontdatabase.cpp b/src/plugins/platforms/windows/qwindowsfontdatabase.cpp
+index 4be215ec8af..2442d647b1f 100644
+--- a/src/plugins/platforms/windows/qwindowsfontdatabase.cpp
++++ b/src/plugins/platforms/windows/qwindowsfontdatabase.cpp
+@@ -1295,36 +1295,70 @@ QT_WARNING_POP
+     return fontEngine;
+ }
+ 
+-static QList<quint32> getTrueTypeFontOffsets(const uchar *fontData)
++static QList<quint32> getTrueTypeFontOffsets(const uchar *fontData, const uchar *fileEndSentinel)
+ {
+     QList<quint32> offsets;
+-    const quint32 headerTag = *reinterpret_cast<const quint32 *>(fontData);
++    if (fileEndSentinel - fontData < 12) {
++        qCWarning(lcQpaFonts) << "Corrupted font data detected";
++        return offsets;
++    }
++
++    const quint32 headerTag = qFromUnaligned<quint32>(fontData);
+     if (headerTag != MAKE_TAG('t', 't', 'c', 'f')) {
+         if (headerTag != MAKE_TAG(0, 1, 0, 0)
+             && headerTag != MAKE_TAG('O', 'T', 'T', 'O')
+             && headerTag != MAKE_TAG('t', 'r', 'u', 'e')
+-            && headerTag != MAKE_TAG('t', 'y', 'p', '1'))
++            && headerTag != MAKE_TAG('t', 'y', 'p', '1')) {
+             return offsets;
++        }
+         offsets << 0;
+         return offsets;
+     }
++
++    const quint32 maximumNumFonts = 0xffff;
+     const quint32 numFonts = qFromBigEndian<quint32>(fontData + 8);
+-    for (uint i = 0; i < numFonts; ++i) {
+-        offsets << qFromBigEndian<quint32>(fontData + 12 + i * 4);
++    if (numFonts > maximumNumFonts) {
++        qCWarning(lcQpaFonts) << "Font collection of" << numFonts << "fonts is too large. Aborting.";
++        return offsets;
++    }
++
++    if (quintptr(fileEndSentinel - fontData) > 12 + (numFonts - 1) * 4) {
++        for (quint32 i = 0; i < numFonts; ++i)
++            offsets << qFromBigEndian<quint32>(fontData + 12 + i * 4);
++    } else {
++        qCWarning(lcQpaFonts) << "Corrupted font data detected";
+     }
++
+     return offsets;
+ }
+ 
+-static void getFontTable(const uchar *fileBegin, const uchar *data, quint32 tag, const uchar **table, quint32 *length)
++static void getFontTable(const uchar *fileBegin, const uchar *fileEndSentinel, const uchar *data, quint32 tag, const uchar **table, quint32 *length)
+ {
+-    const quint16 numTables = qFromBigEndian<quint16>(data + 4);
+-    for (uint i = 0; i < numTables; ++i) {
+-        const quint32 offset = 12 + 16 * i;
+-        if (*reinterpret_cast<const quint32 *>(data + offset) == tag) {
+-            *table = fileBegin + qFromBigEndian<quint32>(data + offset + 8);
+-            *length = qFromBigEndian<quint32>(data + offset + 12);
+-            return;
++    if (fileEndSentinel - data >= 6) {
++        const quint16 numTables = qFromBigEndian<quint16>(data + 4);
++        if (fileEndSentinel - data >= 28 + 16 * (numTables - 1)) {
++            for (quint32 i = 0; i < numTables; ++i) {
++                const quint32 offset = 12 + 16 * i;
++                if (qFromUnaligned<quint32>(data + offset) == tag) {
++                    const quint32 tableOffset = qFromBigEndian<quint32>(data + offset + 8);
++                    if (quintptr(fileEndSentinel - fileBegin) <= tableOffset) {
++                        qCWarning(lcQpaFonts) << "Corrupted font data detected";
++                        break;
++                    }
++                    *table = fileBegin + tableOffset;
++                    *length = qFromBigEndian<quint32>(data + offset + 12);
++                    if (quintptr(fileEndSentinel - *table) < *length) {
++                        qCWarning(lcQpaFonts) << "Corrupted font data detected";
++                        break;
++                    }
++                    return;
++                }
++            }
++        } else {
++            qCWarning(lcQpaFonts) << "Corrupted font data detected";
+         }
++    } else {
++        qCWarning(lcQpaFonts) << "Corrupted font data detected";
+     }
+     *table = 0;
+     *length = 0;
+@@ -1336,8 +1370,9 @@ static void getFamiliesAndSignatures(const QByteArray &fontData,
+                                      QVector<FONTSIGNATURE> *signatures)
+ {
+     const uchar *data = reinterpret_cast<const uchar *>(fontData.constData());
++    const uchar *dataEndSentinel = data + fontData.size();
+ 
+-    QList<quint32> offsets = getTrueTypeFontOffsets(data);
++    QList<quint32> offsets = getTrueTypeFontOffsets(data, dataEndSentinel);
+     if (offsets.isEmpty())
+         return;
+ 
+@@ -1345,7 +1380,7 @@ static void getFamiliesAndSignatures(const QByteArray &fontData,
+         const uchar *font = data + offsets.at(i);
+         const uchar *table;
+         quint32 length;
+-        getFontTable(data, font, MAKE_TAG('n', 'a', 'm', 'e'), &table, &length);
++        getFontTable(data, dataEndSentinel, font, MAKE_TAG('n', 'a', 'm', 'e'), &table, &length);
+         if (!table)
+             continue;
+         QString name = getEnglishName(table, length);
+@@ -1356,7 +1391,7 @@ static void getFamiliesAndSignatures(const QByteArray &fontData,
+ 
+         if (signatures) {
+             FONTSIGNATURE signature;
+-            getFontTable(data, font, MAKE_TAG('O', 'S', '/', '2'), &table, &length);
++            getFontTable(data, dataEndSentinel, font, MAKE_TAG('O', 'S', '/', '2'), &table, &length);
+             if (table && length >= 86) {
+                 // Offsets taken from OS/2 table in the TrueType spec
+                 signature.fsUsb[0] = qFromBigEndian<quint32>(table + 42);
+-- 
+2.52.0.windows.1
+

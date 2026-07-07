@@ -1,0 +1,87 @@
+From 67abc7e21b351f07c186988ff93476db0a600349 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 24 Jan 2023 14:29:27 +0100
+Subject: [PATCH 6/7] ODBC SQL driver: deal with different sizes of SQLTCHAR
+ correctly
+
+Neither the UTF-32, nor the UTF-8 recoding of a UTF-16 string is
+necessarily of the same length as the input. The UTF-32 version may
+be shorter, if surrogate pairs were encountered. The UTF-8 version
+will be longer whenever the string contains non-US-ASCII characters.
+
+Split toSQLTCHAR() into three functions, templated on sizeof(SQLTCHAR),
+and use QVLA's range-append instead of manual memcpy()s.
+
+This patch specifically doesn't use constexpr-if, as that's not
+available until C++17, which Qt 5 doesn't require.
+
+Change-Id: I0bfcb66eb321598908ef00ac34c888fdbccf9316
+Reviewed-by: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 66767eea46bea0f19f8ae5ad6ebc641d86867701)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/sql/drivers/odbc/qsql_odbc.cpp | 44 ++++++++++++++++++++----------
+ 1 file changed, 30 insertions(+), 14 deletions(-)
+
+diff --git a/src/sql/drivers/odbc/qsql_odbc.cpp b/src/sql/drivers/odbc/qsql_odbc.cpp
+index 8a3919267f2..2f4a35f12ef 100644
+--- a/src/sql/drivers/odbc/qsql_odbc.cpp
++++ b/src/sql/drivers/odbc/qsql_odbc.cpp
+@@ -83,23 +83,39 @@ inline static QString fromSQLTCHAR(const QVarLengthArray<SQLTCHAR>& input, int s
+     return result;
+ }
+ 
++template <size_t SizeOfChar = sizeof(SQLTCHAR)>
++void toSQLTCHARImpl(QVarLengthArray<SQLTCHAR> &result, const QString &input); // primary template undefined
++
++template <typename Container>
++void do_append(QVarLengthArray<SQLTCHAR> &result, const Container &c)
++{
++    result.append(reinterpret_cast<const SQLTCHAR *>(c.data()), c.size());
++}
++
++template <>
++void toSQLTCHARImpl<1>(QVarLengthArray<SQLTCHAR> &result, const QString &input)
++{
++    const auto u8 = input.toUtf8();
++    do_append(result, u8);
++}
++
++template <>
++void toSQLTCHARImpl<2>(QVarLengthArray<SQLTCHAR> &result, const QString &input)
++{
++    do_append(result, input);
++}
++
++template <>
++void toSQLTCHARImpl<4>(QVarLengthArray<SQLTCHAR> &result, const QString &input)
++{
++    const auto u32 = input.toUcs4();
++    do_append(result, u32);
++}
++
+ inline static QVarLengthArray<SQLTCHAR> toSQLTCHAR(const QString &input)
+ {
+     QVarLengthArray<SQLTCHAR> result;
+-    result.resize(input.size());
+-    switch(sizeof(SQLTCHAR)) {
+-        case 1:
+-            memcpy(result.data(), input.toUtf8().data(), input.size());
+-            break;
+-        case 2:
+-            memcpy(result.data(), input.unicode(), input.size() * 2);
+-            break;
+-        case 4:
+-            memcpy(result.data(), input.toUcs4().data(), input.size() * 4);
+-            break;
+-        default:
+-            qCritical("sizeof(SQLTCHAR) is %d. Don't know how to handle this.", int(sizeof(SQLTCHAR)));
+-    }
++    toSQLTCHARImpl(result, input);
+     result.append(0); // make sure it's null terminated, doesn't matter if it already is, it does if it isn't.
+     return result;
+ }
+-- 
+2.52.0.windows.1
+

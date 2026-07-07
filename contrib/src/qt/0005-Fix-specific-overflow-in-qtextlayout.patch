@@ -1,0 +1,102 @@
+From deaddcaac1d3966119b0569a4a7a4d1d43db0eb6 Mon Sep 17 00:00:00 2001
+From: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Date: Fri, 5 May 2023 09:51:32 +0200
+Subject: [PATCH 5/7] Fix specific overflow in qtextlayout
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adds qAddOverflow and qMulOverflow definitions to QFixed
+
+edit: Use __builtin_add_overflow() directly as add_overflow() doesn't support
+signed values in Qt 5.6.
+
+Fixes: QTBUG-113337
+Change-Id: I13579306defceaccdc0fbb1ec0e9b77c6f8d1af9
+Reviewed-by: Eirik Aavitsland <eirik.aavitsland@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 7b7a01c266b507636eab51a36328c7c72d82d93c)
+Reviewed-by: Michael Brüning <michael.bruning@qt.io>
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+---
+ src/gui/painting/qfixed_p.h               | 16 ++++++++++++++++
+ src/gui/text/qtextlayout.cpp              |  9 ++++++---
+ src/plugins/platforms/windows/windows.pri |  2 +-
+ 3 files changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/src/gui/painting/qfixed_p.h b/src/gui/painting/qfixed_p.h
+index c29dacae3da..5d70fe0b618 100644
+--- a/src/gui/painting/qfixed_p.h
++++ b/src/gui/painting/qfixed_p.h
+@@ -45,10 +45,18 @@
+ // We mean it.
+ //
+ 
++// clang-format off
++
+ #include "QtCore/qdebug.h"
+ #include "QtCore/qpoint.h"
++#if defined(Q_OS_WIN)
++#include <qt_windows.h> // to suppress min, max macros.
++#endif
++#include <QtCore/private/qnumeric_p.h>
+ #include "QtCore/qsize.h"
+ 
++// clang-format on
++
+ QT_BEGIN_NAMESPACE
+ 
+ struct QFixed {
+@@ -175,6 +183,14 @@ Q_DECL_CONSTEXPR inline bool operator<(int i, const QFixed &f) { return i * 64 <
+ Q_DECL_CONSTEXPR inline bool operator>(const QFixed &f, int i) { return f.value() > i * 64; }
+ Q_DECL_CONSTEXPR inline bool operator>(int i, const QFixed &f) { return i * 64 > f.value(); }
+ 
++inline bool qAddOverflow(QFixed v1, QFixed v2, QFixed *r)
++{
++    int val;
++    bool result = __builtin_add_overflow(v1.value(), v2.value(), &val);
++    r->setValue(val);
++    return result;
++}
++
+ #ifndef QT_NO_DEBUG_STREAM
+ inline QDebug &operator<<(QDebug &dbg, const QFixed &f)
+ { return dbg << f.toReal(); }
+diff --git a/src/gui/text/qtextlayout.cpp b/src/gui/text/qtextlayout.cpp
+index ac2895aeb30..8d0b78f4655 100644
+--- a/src/gui/text/qtextlayout.cpp
++++ b/src/gui/text/qtextlayout.cpp
+@@ -2034,11 +2034,14 @@ found:
+         eng->maxWidth = qMax(eng->maxWidth, line.textWidth);
+     } else {
+         eng->minWidth = qMax(eng->minWidth, lbh.minw);
+-        eng->maxWidth += line.textWidth;
++        if (qAddOverflow(eng->maxWidth, line.textWidth, &eng->maxWidth))
++            eng->maxWidth = QFIXED_MAX;
+     }
+ 
+-    if (line.textWidth > 0 && item < eng->layoutData->items.size())
+-        eng->maxWidth += lbh.spaceData.textWidth;
++    if (line.textWidth > 0 && item < eng->layoutData->items.size()) {
++        if (qAddOverflow(eng->maxWidth, lbh.spaceData.textWidth, &eng->maxWidth))
++            eng->maxWidth = QFIXED_MAX;
++    }
+     if (eng->option.flags() & QTextOption::IncludeTrailingSpaces)
+         line.textWidth += lbh.spaceData.textWidth;
+     if (lbh.spaceData.length) {
+diff --git a/src/plugins/platforms/windows/windows.pri b/src/plugins/platforms/windows/windows.pri
+index aee69273389..5681ca7d736 100644
+--- a/src/plugins/platforms/windows/windows.pri
++++ b/src/plugins/platforms/windows/windows.pri
+@@ -10,7 +10,7 @@ mingw: LIBS *= -luuid
+ !wince: LIBS *= -ladvapi32
+ wince: DEFINES *= QT_LIBINFIX=L"\"\\\"$${QT_LIBINFIX}\\\"\""
+ 
+-DEFINES *= QT_NO_CAST_FROM_ASCII
++DEFINES *= QT_NO_CAST_FROM_ASCII NOMINMAX
+ 
+ contains(QT_CONFIG, directwrite) {
+     SOURCES += $$PWD/qwindowsfontenginedirectwrite.cpp
+-- 
+2.52.0.windows.1
+

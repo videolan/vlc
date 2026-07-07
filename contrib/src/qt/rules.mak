@@ -46,6 +46,13 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0022-Don-t-error-out-on-preprocessor-concatenation-of-two.patch
 	$(APPLY) $(SRC)/qt/0023-moc-get-the-system-defines-from-the-compiler-itself.patch
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
+	$(APPLY) $(SRC)/qt/0001-qDecodeDataUrl-fix-precondition-violation-in-call-to.patch
+	$(APPLY) $(SRC)/qt/0002-QFileSystemEngine-Win-Use-GetTempPath2-when-availabl.patch
+	$(APPLY) $(SRC)/qt/0003-QXmlStreamReader-change-fastScanName-to-take-a-Value.patch
+	$(APPLY) $(SRC)/qt/0004-QXmlStreamReader-make-fastScanName-indicate-parsing-.patch
+	$(APPLY) $(SRC)/qt/0005-Fix-specific-overflow-in-qtextlayout.patch
+	$(APPLY) $(SRC)/qt/0006-ODBC-SQL-driver-deal-with-different-sizes-of-SQLTCHA.patch
+	$(APPLY) $(SRC)/qt/0007-Fix-crash-when-reading-corrupt-font-data.patch
 	# fix forcing the WINVER/_WIN32_WINNT version without NTDDI_VERSION
 	sed -i.orig -e "s/DEFINES += WINVER/DEFINES += NTDDI_VERSION=0x06000000 WINVER/" "$(UNPACK_DIR)/src/network/kernel/kernel.pri"
 	# TOUCHINPUT is properly defined in mingw since v4

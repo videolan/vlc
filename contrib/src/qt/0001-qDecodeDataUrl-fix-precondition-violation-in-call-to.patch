@@ -1,0 +1,82 @@
+From 84790959cbc50d36c9eec5dfd7b24ea572aa9809 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Fri, 25 Apr 2025 13:58:25 +0200
+Subject: [PATCH 1/7] qDecodeDataUrl(): fix precondition violation in call to
+ QByteArrayView::at()
+
+It is a precondition violation to call QByteArrayView::at() with
+size() as argument. The code used that, though, as an implicit
+end-of-string check, assuming == ' ' and == '=' would both fail for
+null bytes. Besides, QByteArrays (but most certainly QByteArrayViews)
+need not be null-terminated, so this could read even past size().
+
+To fix, use higher-level API (startsWith()), consuming parsed tokens
+along the way.
+
+Add a test that would crash in debug mode before the fix.
+
+Amends the start of the public history.
+
+Conflict resolution for 6.5:
+* Since the `data` variable is a QByteArray, use QBAV(data, size)
+  c-tor to construct `copy`;
+* Use sliced() instead of slice(), because the latter is only
+  available from 6.8.
+
+Conflict resolution for 5.15:
+* Use QLatin1String instead of QByteArrayView, because the latter
+  is not available in Qt 5.15. The `data` byte array might have
+  non-Latin1 characters, but that should not really matter for
+  this algorithm.
+* Use startsWith(QLatin1String) overload, because there's no
+  overload taking a char, and going via QChar will result in
+  comparing to QStringView, which should be a more expensive code
+  path.
+* Use mid(1) insteal of slice(1) or sliced(1), because both of
+  the latter do not exist in Qt 5.15.
+
+[ChangeLog][QtCore] Fixed a bug in the handling of data: URLs that
+could lead to a crash if Qt was built with assertions enabled. This
+affects QNetworkManager and links in QTextDocument.
+
+Pick-to: 5.15
+Change-Id: I4331c88051dfbb0a18fe7da4f50858c707785d09
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+(cherry picked from commit 4d839093b480d30eef8a89c0f864ee3f340adaa1)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+(cherry picked from commit 21cd27b3b9973f43df152a1dd9dadbbf905c6a73)
+(cherry picked from commit e56bf8d2953d760dfce1817be5f4782aa6fa9958)
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit c2a90cfcd65c257e1ddd4a6ba5d11046ab5236c3)
+
+Change-Id: I9cf807c3cb399c694f323e24143f40531d5a98e7
+edit: QLatin1String::startsWith() doesn't exist in Qt 5.6, use QByteArray instead.
+---
+ src/corelib/io/qdataurl.cpp | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/src/corelib/io/qdataurl.cpp b/src/corelib/io/qdataurl.cpp
+index 09f570be5a7..b1cb2ca2cee 100644
+--- a/src/corelib/io/qdataurl.cpp
++++ b/src/corelib/io/qdataurl.cpp
+@@ -70,10 +70,11 @@ Q_CORE_EXPORT bool qDecodeDataUrl(const QUrl &uri, QString &mimeType, QByteArray
+         }
+ 
+         if (data.toLower().startsWith("charset")) {
+-            int i = 7;      // strlen("charset")
+-            while (data.at(i) == ' ')
+-                ++i;
+-            if (data.at(i) == '=')
++            int prefixSize = 7; // strlen("charset")
++            QByteArray copy(data.constData() + prefixSize, data.size() - prefixSize);
++            while (copy.startsWith(QByteArray(" ")))
++                copy = copy.mid(1);
++            if (copy.startsWith(QByteArray("=")))
+                 data.prepend("text/plain;");
+         }
+ 
+-- 
+2.52.0.windows.1
+

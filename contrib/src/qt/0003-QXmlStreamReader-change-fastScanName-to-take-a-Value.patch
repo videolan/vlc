@@ -1,0 +1,118 @@
+From 466a167eeeef163ba251ce9c5793d8bc4edd0a95 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Wed, 12 Apr 2023 13:10:26 +0200
+Subject: [PATCH 3/7] QXmlStreamReader: change fastScanName() to take a Value*
+
+For easier debugging, e.g. to print out value.len and value.prefix.
+
+Manual conflict resolutions:
+ - qsizetype -> int
+ - qxmlstream.g generated code lands in qxmlstream_p.h, not in
+   qxmlstreamparser_p.h.
+
+Change-Id: Ib0eed38772f899502962f578775d34ea2744fdde
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit 1a423ce4372d18a779f3c0d746d5283d9a425839)
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+---
+ src/corelib/xml/qxmlstream.cpp | 16 ++++++++--------
+ src/corelib/xml/qxmlstream.g   |  5 +++--
+ src/corelib/xml/qxmlstream_p.h |  5 +++--
+ 3 files changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/src/corelib/xml/qxmlstream.cpp b/src/corelib/xml/qxmlstream.cpp
+index 6ad06eaed6a..af2885fc609 100644
+--- a/src/corelib/xml/qxmlstream.cpp
++++ b/src/corelib/xml/qxmlstream.cpp
+@@ -1283,7 +1283,7 @@ inline int QXmlStreamReaderPrivate::fastScanContentCharList()
+     return n;
+ }
+ 
+-inline int QXmlStreamReaderPrivate::fastScanName(int *prefix)
++inline int QXmlStreamReaderPrivate::fastScanName(Value *val)
+ {
+     int n = 0;
+     uint c;
+@@ -1315,16 +1315,16 @@ inline int QXmlStreamReaderPrivate::fastScanName(int *prefix)
+         case '+':
+         case '*':
+             putChar(c);
+-            if (prefix && *prefix == n+1) {
+-                *prefix = 0;
++            if (val && val->prefix == n + 1) {
++                val->prefix = 0;
+                 putChar(':');
+                 --n;
+             }
+             return n;
+         case ':':
+-            if (prefix) {
+-                if (*prefix == 0) {
+-                    *prefix = n+2;
++            if (val) {
++                if (val->prefix == 0) {
++                    val->prefix = n + 2;
+                 } else { // only one colon allowed according to the namespace spec.
+                     putChar(c);
+                     return n;
+@@ -1340,8 +1340,8 @@ inline int QXmlStreamReaderPrivate::fastScanName(int *prefix)
+         }
+     }
+ 
+-    if (prefix)
+-        *prefix = 0;
++    if (val)
++        val->prefix = 0;
+     int pos = textBuffer.size() - n;
+     putString(textBuffer, pos);
+     textBuffer.resize(pos);
+diff --git a/src/corelib/xml/qxmlstream.g b/src/corelib/xml/qxmlstream.g
+index d6a06d1d7f6..5b9c2ba86ed 100644
+--- a/src/corelib/xml/qxmlstream.g
++++ b/src/corelib/xml/qxmlstream.g
+@@ -484,7 +484,7 @@ public:
+     int fastScanLiteralContent();
+     int fastScanSpace();
+     int fastScanContentCharList();
+-    int fastScanName(int *prefix = 0);
++    int fastScanName(Value *val = 0);
+     inline int fastScanNMTOKEN();
+ 
+ 
+@@ -1776,7 +1776,8 @@ space_opt ::= space;
+ qname ::= LETTER;
+ /.
+         case $rule_number: {
+-            sym(1).len += fastScanName(&sym(1).prefix);
++            Value &val = sym(1);
++            val.len += fastScanName(&val);
+             if (atEnd) {
+                 resume($rule_number);
+                 return false;
+diff --git a/src/corelib/xml/qxmlstream_p.h b/src/corelib/xml/qxmlstream_p.h
+index d22a697e5db..33c150706a8 100644
+--- a/src/corelib/xml/qxmlstream_p.h
++++ b/src/corelib/xml/qxmlstream_p.h
+@@ -979,7 +979,7 @@ public:
+     int fastScanLiteralContent();
+     int fastScanSpace();
+     int fastScanContentCharList();
+-    int fastScanName(int *prefix = 0);
++    int fastScanName(Value *val = 0);
+     inline int fastScanNMTOKEN();
+ 
+ 
+@@ -1910,7 +1910,8 @@ bool QXmlStreamReaderPrivate::parse()
+         break;
+ 
+         case 262: {
+-            sym(1).len += fastScanName(&sym(1).prefix);
++            Value &val = sym(1);
++            val.len += fastScanName(&val);
+             if (atEnd) {
+                 resume(262);
+                 return false;
+-- 
+2.52.0.windows.1
+
