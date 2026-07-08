@@ -290,6 +290,19 @@ error:
     return NULL;
 }
 
+/* Whether an EXT-X-MEDIA rendition of the given category exists. */
+static bool HasMediaRendition(const sout_stream_sys_t *sys,
+                              enum es_format_category_e cat)
+{
+    const hls_playlist_t *playlist;
+    vlc_list_foreach_const (playlist, &sys->media_playlists, node)
+    {
+        if (MediaGetTrack(playlist)->input->fmt.i_cat == cat)
+            return true;
+    }
+    return false;
+}
+
 static int GenerateMainManifest(const sout_stream_sys_t *sys,
                                 struct hls_storage **storage_out)
 {
@@ -384,9 +397,12 @@ static int GenerateMainManifest(const sout_stream_sys_t *sys,
             MANIFEST_ADD_ATTRIBUTE("CODECS=\"%s\"", codecs);
             free(codecs);
 
-            MANIFEST_ADD_ATTRIBUTE("VIDEO=\"%s\"", GROUP_IDS[VIDEO_ES]);
-            MANIFEST_ADD_ATTRIBUTE("AUDIO=\"%s\"", GROUP_IDS[AUDIO_ES]);
-            MANIFEST_ADD_ATTRIBUTE("SUBTITLES=\"%s\"", GROUP_IDS[SPU_ES]);
+            if (HasMediaRendition(sys, VIDEO_ES))
+                MANIFEST_ADD_ATTRIBUTE("VIDEO=\"%s\"", GROUP_IDS[VIDEO_ES]);
+            if (HasMediaRendition(sys, AUDIO_ES))
+                MANIFEST_ADD_ATTRIBUTE("AUDIO=\"%s\"", GROUP_IDS[AUDIO_ES]);
+            if (HasMediaRendition(sys, SPU_ES))
+                MANIFEST_ADD_ATTRIBUTE("SUBTITLES=\"%s\"", GROUP_IDS[SPU_ES]);
         MANIFEST_END_TAG
 
         if (vlc_memstream_printf(&out, "%s\n", playlist->url) < 0)
