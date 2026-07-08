@@ -376,6 +376,14 @@ bool UpdateModel::explicitCheck() const
     return d->m_explicitCheck;
 }
 
+void UpdateModel::resetExplicitCheck()
+{
+    Q_D(UpdateModel);
+    if (!d->m_explicitCheck)
+        return;
+    d->m_explicitCheck = false;
+    emit explicitCheckChanged();
+}
 
 /*****************************************************************************
  * UpdateDialog

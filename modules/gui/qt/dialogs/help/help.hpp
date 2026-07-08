@@ -95,7 +95,7 @@ public:
     Q_PROPERTY(QString description READ getDescription NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(QString url READ getUrl NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(double progress READ getProgress NOTIFY progressChanged FINAL) // TODO
-    Q_PROPERTY(bool explicitCheck READ explicitCheck NOTIFY explicitCheckChanged FINAL)
+    Q_PROPERTY(bool explicitCheck READ explicitCheck RESET resetExplicitCheck NOTIFY explicitCheckChanged FINAL)
 
 public:
     explicit UpdateModel(qt_intf_t * p_intf);
@@ -117,6 +117,7 @@ public:
     QString getUrl() const;
     double getProgress() const;
     bool explicitCheck() const;
+    void resetExplicitCheck();
 
 signals:
     void updateStatusChanged();
