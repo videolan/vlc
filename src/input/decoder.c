@@ -141,6 +141,7 @@ struct decoder_audio
     /* If aout is valid, then astream is valid too */
     audio_output_t *aout;
     vlc_aout_stream *stream;
+    bool drained;
 };
 
 struct decoder_spu
@@ -701,6 +702,7 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
         vlc_fifo_Lock(p_owner->p_fifo);
         p_owner->audio.aout = p_aout;
         p_owner->audio.stream = p_astream;
+        p_owner->audio.drained = false;
 
         DecoderUpdateFormatLocked( p_owner );
         aout_FormatPrepare( &p_owner->fmt.audio );
@@ -2086,12 +2088,14 @@ static void *DecoderThread( void *p_data )
             switch (p_owner->cat)
             {
                 case AUDIO_ES:
-                    if( p_owner->audio.stream != NULL )
+                    if( p_owner->audio.stream != NULL
+                     && !p_owner->audio.drained )
                     {
                         /* Draining: the decoder is drained and all decoded
                          * buffers are queued to the output at this point.
                          * Now drain the output. */
                         vlc_aout_stream_Drain( p_owner->audio.stream );
+                        p_owner->audio.drained = true;
                     }
                     break;
                 case VIDEO_ES:
@@ -2261,6 +2265,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
         case AUDIO_ES:
             p_owner->audio.aout = NULL;
             p_owner->audio.stream = NULL;
+            p_owner->audio.drained = false;
             p_dec->cbs = &dec_audio_cbs;
             break;
         case SPU_ES:
@@ -2790,6 +2795,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
     }
     else if( cat == AUDIO_ES )
     {
+        p_owner->audio.drained = false;
         if( p_owner->audio.stream )
             vlc_aout_stream_Flush( p_owner->audio.stream );
     }
