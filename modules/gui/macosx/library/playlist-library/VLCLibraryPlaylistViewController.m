@@ -172,6 +172,10 @@
     self.masterTableView.allowsEmptySelection = NO;
     self.detailTableView.headerView = self.detailTableHeaderView;
     self.detailTableView.allowsMultipleSelection = YES;
+    [self.detailTableView registerForDraggedTypes:@[
+        VLCMediaLibraryMediaItemPasteboardType,
+        VLCMediaLibraryMediaItemUTI
+    ]];
 
     detailColumn.headerCell = [VLCLibraryHeaderCell new];
 

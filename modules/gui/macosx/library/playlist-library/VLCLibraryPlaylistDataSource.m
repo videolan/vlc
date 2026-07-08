@@ -22,6 +22,7 @@
 
 #import "VLCLibraryPlaylistDataSource.h"
 
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -254,6 +255,12 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     }
 
     return nil;
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
 }
 
 - (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
