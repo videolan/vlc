@@ -30,6 +30,10 @@
 
 #include "upnp.hpp"
 
+#ifdef UPNP_HAVE_TOOLS
+#include <upnp/upnptools.h>
+#endif
+
 #include <vlc_access.h>
 #include <vlc_plugin.h>
 #include <vlc_interrupt.h>

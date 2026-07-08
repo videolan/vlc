@@ -32,7 +32,6 @@
 #include <string>
 
 #include <upnp/upnp.h>
-#include <upnp/upnptools.h>
 
 #include <vlc_common.h>
 #include <vlc_url.h>
