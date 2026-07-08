@@ -120,6 +120,10 @@ bool ts_arib_inject_png_palette( const uint8_t *p_in, size_t i_in, uint8_t **pp_
 {
     const uint8_t *p_data = p_in;
     const uint8_t *p_idat = NULL;
+
+    if( i_in < 16+11 )
+        return false;
+
     size_t i_data = i_in - 8;
     p_data += 8;
     i_data -= 8;
