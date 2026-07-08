@@ -3434,6 +3434,7 @@ bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, vlc_tick_t i_t
 
     /* Then Lookup its index */
     unsigned const char *p_fwdbyte = p_stream->p_skel->p_index;
+    unsigned const char *p_end = p_fwdbyte + p_stream->p_skel->i_index_size;
     struct
     {
         int64_t i_pos;
@@ -3442,15 +3443,13 @@ bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, vlc_tick_t i_t
 
     uint64_t i_keypoints_found = 0;
 
-    while( p_fwdbyte < p_fwdbyte + p_stream->p_skel->i_index_size
+    while( p_fwdbyte < p_end
            && i_keypoints_found < p_stream->p_skel->i_index )
     {
         uint64_t i_val;
-        p_fwdbyte = Read7BitsVariableLE( p_fwdbyte,
-                        p_fwdbyte + p_stream->p_skel->i_index_size, &i_val );
+        p_fwdbyte = Read7BitsVariableLE( p_fwdbyte, p_end, &i_val );
         current.i_pos += i_val;
-        p_fwdbyte = Read7BitsVariableLE( p_fwdbyte,
-                        p_fwdbyte + p_stream->p_skel->i_index_size, &i_val );
+        p_fwdbyte = Read7BitsVariableLE( p_fwdbyte, p_end, &i_val );
         current.i_time += i_val * p_stream->p_skel->i_indexstampden;
         if ( current.i_pos < 0 || current.i_time < 0 ) break;
 
