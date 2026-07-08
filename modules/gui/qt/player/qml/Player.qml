@@ -379,7 +379,10 @@ FocusScope {
                     mode: Widgets.DualKawaseBlur.Mode.SixPass
                     radius: 2
 
-                    live: false
+                    // We disable live when everything settles through `liveTimer`,
+                    // which is important to release intermediate layers with static
+                    // source:
+                    live: true
 
                     //destination aspect ratio
                     readonly property real dar: parent.width / parent.height
@@ -428,6 +431,9 @@ FocusScope {
                         // really bad idea. So instead, we turn on live and after some time passes turn it off again.
                         widthChanged.connect(liveTimer, liveTimer.transientTurnOnLive)
                         heightChanged.connect(liveTimer, liveTimer.transientTurnOnLive)
+
+                        // In case texture provider observer never signals texture change:
+                        liveTimer.transientTurnOnLive()
                     }
 
                     Timer {
