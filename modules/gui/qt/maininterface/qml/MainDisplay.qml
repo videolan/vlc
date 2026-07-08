@@ -798,8 +798,10 @@ FocusScope {
         }
 
         onActiveChanged: {
-            if (updateModelIsAvailable && !active)
+            if (updateModelIsAvailable && !active) {
                 UpdateModel.resetStatus()
+                UpdateModel.explicitCheck = undefined // Resets the property
+            }
         }
 
         clip: (height < implicitHeight)
