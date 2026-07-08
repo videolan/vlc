@@ -525,6 +525,11 @@ void UpdateDialog::updateUI( )
     case UpdateModel::Unchecked:
         // do nothing
         break;
+    case UpdateModel::Downloading:
+        // NOTE: It is not planned to implement this in the legacy dialog.
+        //       The new update pane already respects it, we are only
+        //       waiting for the core to provide this information.
+        break;
     }
 }
 
