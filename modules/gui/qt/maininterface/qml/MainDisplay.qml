@@ -767,6 +767,8 @@ FocusScope {
 
         focus: !!item
 
+        property int _updateStatusOnDismissal: -1
+
         readonly property bool shouldShow: {
             if (!updateModelIsAvailable)
                 return false
@@ -774,6 +776,9 @@ FocusScope {
             if (UpdateModel.explicitCheck) {
                 return (UpdateModel.updateStatus !== UpdateModel.Unchecked)
             } else {
+                if (UpdateModel.updateStatus === _updateStatusOnDismissal)
+                    return false // already dismissed with the same status
+            
                 switch (UpdateModel.updateStatus) {
                     case UpdateModel.Unchecked:
                     case UpdateModel.Checking:
@@ -789,6 +794,10 @@ FocusScope {
         property alias toggleAnimation: heightBehavior.enabled
 
         function dismiss() {
+            // This could be also be an assertion:
+            if (updateModelIsAvailable)
+                _updateStatusOnDismissal = UpdateModel.updateStatus
+
             height = 0.0
         }
 
@@ -799,7 +808,6 @@ FocusScope {
 
         onActiveChanged: {
             if (updateModelIsAvailable && !active) {
-                UpdateModel.resetStatus()
                 UpdateModel.explicitCheck = undefined // Resets the property
             }
         }
