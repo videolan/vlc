@@ -67,6 +67,10 @@ vlc_process_Terminate(struct vlc_process *process, bool kill_process);
  * a platform-specific implementation is used due to limitations with poll on
  * non-socket handles.
  *
+ * @warning At most one thread may call this function on a given @p process at
+ *          a time. Reading from one thread while another one writes is
+ *          supported, but two concurrent readers are not.
+ *
  * @param [in]  process     Pointer to the vlc_process instance.
  * @param [out] buf         Buffer where the read data will be stored.
  * @param [in]  size        Maximum number of bytes to read.
@@ -89,6 +93,10 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
  * On POSIX systems, this uses poll to wait for writability. On Windows,
  * a platform-specific implementation is used due to limitations with poll on
  * non-socket handles.
+ *
+ * @warning At most one thread may call this function on a given @p process at
+ *          a time. Writing from one thread while another one reads is
+ *          supported, but two concurrent writers are not.
  *
  * @param [in]  process     Pointer to the vlc_process instance.
  * @param [in]  buf         Buffer containing the data to write.

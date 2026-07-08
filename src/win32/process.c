@@ -80,7 +80,8 @@ struct vlc_process {
     int fd_in;
     int fd_out;
 
-    HANDLE hEvent;
+    HANDLE hEventRead;
+    HANDLE hEventWrite;
 };
 
 struct vlc_process*
@@ -105,7 +106,20 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv)
 
     process->fd_in = -1;
     process->fd_out = -1;
-    process->hEvent = INVALID_HANDLE_VALUE;
+    process->hEventRead = NULL;
+    process->hEventWrite = NULL;
+
+    process->hEventRead = CreateEvent(NULL, TRUE, FALSE, NULL);
+    if (process->hEventRead == NULL) {
+        ret = VLC_ENOMEM;
+        goto end;
+    }
+
+    process->hEventWrite = CreateEvent(NULL, TRUE, FALSE, NULL);
+    if (process->hEventWrite == NULL) {
+        ret = VLC_ENOMEM;
+        goto end;
+    }
 
     ret = vlc_pipe(fds);
     if (ret != 0) {
@@ -120,12 +134,6 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv)
     }
     extfd_in = fds[0];
     process->fd_out = fds[1];
-
-    process->hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    if (process->hEvent == INVALID_HANDLE_VALUE) {
-        errno = EINVAL;
-        goto end;
-    }
 
     int stderr_fd = -1;
     intptr_t h_err = _get_osfhandle(STDERR_FILENO);
@@ -170,8 +178,11 @@ end:
         if (process->fd_out != -1) {
             vlc_close(process->fd_out);
         }
-        if (process->hEvent != INVALID_HANDLE_VALUE) {
-            CloseHandle(process->hEvent);
+        if (process->hEventRead != NULL) {
+            CloseHandle(process->hEventRead);
+        }
+        if (process->hEventWrite != NULL) {
+            CloseHandle(process->hEventWrite);
         }
         free(process);
         return NULL;
@@ -194,7 +205,8 @@ vlc_process_Terminate(struct vlc_process *process, bool kill_process)
 
     vlc_close(process->fd_in);
     vlc_close(process->fd_out);
-    CloseHandle(process->hEvent);
+    CloseHandle(process->hEventRead);
+    CloseHandle(process->hEventWrite);
 
     int status = vlc_waitpid(process->pid);
     process->pid = 0;
@@ -218,15 +230,18 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
 
     DWORD bytes = 0;
     OVERLAPPED overlapped = {0};
-    overlapped.hEvent = process->hEvent;
+    overlapped.hEvent = process->hEventRead;
 
-    BOOL ret = FALSE;
-    ret = ReadFile(hFd, buf, size, &bytes, &overlapped);
+    /* The event is reused across calls, drop any leftover completion. */
+    ResetEvent(process->hEventRead);
 
-    int err = VLC_SUCCESS;
-
-    if (ret) {
-        return bytes;
+    int err;
+    if (ReadFile(hFd, buf, size, NULL, &overlapped)) {
+        if (GetOverlappedResult(hFd, &overlapped, &bytes, FALSE)) {
+            err = VLC_SUCCESS;
+        } else {
+            err = EINVAL;
+        }
     } else {
         DWORD error = GetLastError();
         if (error == ERROR_IO_PENDING) {
@@ -236,6 +251,7 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
             err = EINVAL;
         }
     }
+
     if (err == VLC_SUCCESS) {
         return bytes;
     }
@@ -259,15 +275,18 @@ vlc_process_fd_Write(struct vlc_process *process, const uint8_t *buf, size_t siz
 
     DWORD bytes = 0;
     OVERLAPPED overlapped = {0};
-    overlapped.hEvent = process->hEvent;
+    overlapped.hEvent = process->hEventWrite;
 
-    BOOL ret = FALSE;
-    ret = WriteFile(hFd, buf, size, &bytes, &overlapped);
+    /* The event is reused across calls, drop any leftover completion. */
+    ResetEvent(process->hEventWrite);
 
-    int err = VLC_SUCCESS;
-
-    if (ret) {
-        return bytes;
+    int err;
+    if (WriteFile(hFd, buf, size, NULL, &overlapped)) {
+        if (GetOverlappedResult(hFd, &overlapped, &bytes, FALSE)) {
+            err = VLC_SUCCESS;
+        } else {
+            err = EINVAL;
+        }
     } else {
         DWORD error = GetLastError();
         if (error == ERROR_IO_PENDING) {
@@ -277,6 +296,7 @@ vlc_process_fd_Write(struct vlc_process *process, const uint8_t *buf, size_t siz
             err = EINVAL;
         }
     }
+
     if (err == VLC_SUCCESS) {
         return bytes;
     }
