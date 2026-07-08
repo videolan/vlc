@@ -345,6 +345,10 @@ static int GenerateMainManifest(const sout_stream_sys_t *sys,
         [SPU_ES] = "subtitles",
     };
 
+    /* At most one rendition per group may be DEFAULT (RFC 8216 4.3.4.1). */
+    bool audio_default_set = false;
+    bool spu_default_set = false;
+
     const hls_playlist_t *playlist;
     vlc_list_foreach_const (playlist, &sys->media_playlists, node)
     {
@@ -359,6 +363,25 @@ static int GenerateMainManifest(const sout_stream_sys_t *sys,
 
             const char *group_id = GROUP_IDS[fmt->i_cat];
             MANIFEST_ADD_ATTRIBUTE("GROUP-ID=\"%s\"", group_id);
+
+            if (fmt->i_cat == AUDIO_ES)
+            {
+                if (!audio_default_set)
+                {
+                    MANIFEST_ADD_ATTRIBUTE("DEFAULT=%s", "YES");
+                    audio_default_set = true;
+                }
+                MANIFEST_ADD_ATTRIBUTE("AUTOSELECT=%s", "YES");
+            }
+            else if (fmt->i_cat == SPU_ES)
+            {
+                if (!spu_default_set)
+                {
+                    MANIFEST_ADD_ATTRIBUTE("DEFAULT=%s", "YES");
+                    spu_default_set = true;
+                }
+                MANIFEST_ADD_ATTRIBUTE("AUTOSELECT=%s", "YES");
+            }
 
             const iso639_lang_t *lang =
                 (fmt->psz_language != NULL)
