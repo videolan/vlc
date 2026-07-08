@@ -34,7 +34,6 @@
 #include <upnp/upnp.h>
 
 #include <vlc_common.h>
-#include <vlc_url.h>
 
 #if UPNP_VERSION < 10800
 typedef void* UpnpEventPtr;
