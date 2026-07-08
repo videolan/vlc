@@ -1,0 +1,31 @@
+From fe55edb953c63047fbe02439a4b32315c949d236 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 8 Jul 2026 08:55:58 +0200
+Subject: [PATCH] Do not use missing OnLinkPrefixLength when compiling for XP
+
+(doesn't) work as before e86c7ff18a67eea89649d8981993d3060ea37263.
+gIF_IPV4_NETMASK will not be usable in that case.
+---
+ upnp/src/api/upnpapi.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/upnp/src/api/upnpapi.c b/upnp/src/api/upnpapi.c
+index d13340cf..066b1ead 100644
+--- a/upnp/src/api/upnpapi.c
++++ b/upnp/src/api/upnpapi.c
+@@ -3810,10 +3810,12 @@ int UpnpGetIfInfo(const char *IfName)
+ 					&((struct sockaddr_in *)ip_addr)
+ 						->sin_addr,
+ 					sizeof(v4_addr));
++#if (_WIN32_WINNT >= 0x0600)
+ 				mask = htonl(
+ 					ULONG_MAX
+ 					<< (32 - uni_addr->OnLinkPrefixLength));
+ 				memcpy(&v4_netmask, &mask, sizeof(v4_netmask));
++#endif
+ 				valid_addr_found = 1;
+ 				break;
+ 			case AF_INET6:
+-- 
+2.52.0.windows.1
+
