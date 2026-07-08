@@ -171,6 +171,7 @@
     self.masterTableView.headerView = nil;
     self.masterTableView.allowsEmptySelection = NO;
     self.detailTableView.headerView = self.detailTableHeaderView;
+    self.detailTableView.allowsMultipleSelection = YES;
 
     detailColumn.headerCell = [VLCLibraryHeaderCell new];
 
