@@ -40,7 +40,7 @@ static inline int hls_playlist_type_FromString(const char *str,
     {
         if (!strcmp(str, HLS_PLAYLIST_TYPE_STRINGS[i]))
         {
-            *out = i;
+            *out = (enum hls_playlist_type)i;
             return VLC_SUCCESS;
         }
     }
