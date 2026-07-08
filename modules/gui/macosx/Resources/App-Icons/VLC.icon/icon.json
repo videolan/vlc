@@ -1,8 +1,5 @@
 {
   "color-space-for-untagged-svg-colors" : "display-p3",
-  "features" : [
-    "refractivity"
-  ],
   "fill-specializations" : [
     {
       "value" : {
@@ -128,7 +125,7 @@
       },
       "refractivity" : {
         "depth" : 0.5,
-        "enabled" : true,
+        "enabled" : false,
         "strength" : 0
       },
       "shadow" : {
@@ -279,7 +276,7 @@
       },
       "refractivity" : {
         "depth" : 0.5,
-        "enabled" : true,
+        "enabled" : false,
         "strength" : 0
       },
       "shadow" : {
@@ -380,7 +377,7 @@
       },
       "refractivity" : {
         "depth" : 0.5,
-        "enabled" : true,
+        "enabled" : false,
         "strength" : 0
       },
       "shadow" : {
