@@ -546,7 +546,7 @@ FocusScope {
 
     function rightClickOnItem(index) {
         if (!selectionModel.isSelected(index)) {
-            leftClickOnItem(Qt.NoModifier, index)
+            leftClickOnItem(Qt.NoModifier, index, true)
         }
     }
 
