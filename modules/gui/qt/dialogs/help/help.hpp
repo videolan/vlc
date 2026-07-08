@@ -136,6 +136,8 @@ public:
     UpdateDialog( qt_intf_t * );
     virtual ~UpdateDialog();
 
+    bool event(QEvent *event) override;
+
 private:
     Ui::updateWidget ui;
     UpdateModel* m_model = nullptr;

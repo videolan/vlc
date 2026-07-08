@@ -428,6 +428,28 @@ UpdateDialog::~UpdateDialog()
     saveWidgetPosition( "Update" );
 }
 
+bool UpdateDialog::event(QEvent* event)
+{
+    assert(event);
+
+    if (Q_LIKELY(m_model))
+    {
+        switch(event->type())
+        {
+        case QEvent::Hide:
+        case QEvent::Show:
+        case QEvent::Close:
+        case QEvent::Destroy:
+            m_model->resetExplicitCheck();
+            break;
+        default:
+            break;
+        }
+    }
+
+    return QVLCFrame::event(event);
+}
+
 /* Check for updates */
 void UpdateDialog::checkOrDownload()
 {
