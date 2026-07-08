@@ -501,7 +501,7 @@ nightly-macos-arm64:
         name: $VLC_ANDROID_IMAGE
     script: |
         git clone https://code.videolan.org/videolan/libvlcjni.git
-        (cd libvlcjni && git checkout a2c4ae9ee0f576f0796518ad953c7f4411b9dcf5)
+        (cd libvlcjni && git checkout cfe024f6cf9d188f6057d1c8c30d317cb4ba4b1f)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             /bin/sh ./libvlcjni/buildsystem/compile-libvlc.sh --no-jni -a $ANDROID_ARCH --with-prebuilt-contribs
         else
