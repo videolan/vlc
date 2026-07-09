@@ -86,13 +86,16 @@
 #import "views/VLCNoResultsLabel.h"
 #import "views/VLCPlaybackEndViewController.h"
 #import "views/VLCRoundedCornerTextField.h"
-#import "views/VLCSnowEffectView.h"
 #import "views/VLCTrackingView.h"
 #import "views/VLCUIUnits.h"
 
 #import "windows/VLCDetachedAudioWindow.h"
 #import "windows/VLCOpenInputMetadata.h"
 #import "windows/VLCOpenWindowController.h"
+
+#ifdef ENABLE_MACOSX_UI_SHADERS
+# import "views/VLCSnowEffectView.h"
+#endif
 
 #import "windows/controlsbar/VLCMainWindowControlsBar.h"
 
@@ -333,6 +336,7 @@ static int ShowController(vlc_object_t * __unused p_this,
         [view.rightAnchor constraintEqualToAnchor:self.libraryTargetView.rightAnchor]
     ]];
 
+#ifdef ENABLE_MACOSX_UI_SHADERS
     if (VLCMain.sharedInstance.metalLibrary && ((VLCApplication *)NSApplication.sharedApplication).winterHolidaysTheming) {
         VLCSnowEffectView * const snowView =
             [[VLCSnowEffectView alloc] initWithFrame:self.contentView.bounds];
@@ -340,6 +344,7 @@ static int ShowController(vlc_object_t * __unused p_this,
         snowView.translatesAutoresizingMaskIntoConstraints = NO;
         [snowView applyConstraintsToFillSuperview];
     }
+#endif
 }
 
 - (void)displayLibraryPlaceholderViewWithImage:(NSImage *)image
@@ -365,7 +370,7 @@ static int ShowController(vlc_object_t * __unused p_this,
         _noResultsLabel = [[VLCNoResultsLabel alloc] init];
         _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
     }
-    
+
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         self.libraryTargetView.subviews = @[self.noResultsLabel, self.loadingOverlayView];
     } else {
@@ -415,7 +420,7 @@ static int ShowController(vlc_object_t * __unused p_this,
                                                            selector:@selector(updateFilterString)
                                                            userInfo:nil
                                                             repeats:NO];
-    
+
     if (self.librarySegmentType == VLCLibraryHomeSegmentType) {
         return;
     }
@@ -531,7 +536,7 @@ static int ShowController(vlc_object_t * __unused p_this,
     VLCPlayerController * const playerController = self.playerController;
     const BOOL videoTrackDisabled =
         !playerController.videoTracksEnabled || !playerController.selectedVideoTrack.selected;
-        
+
     if (videoTrackDisabled || !var_InheritBool(getIntf(), "embedded-video"))
         return;
 
@@ -781,20 +786,20 @@ static int ShowController(vlc_object_t * __unused p_this,
     // Get the partial word being completed
     NSString * const currentText = textView.string;
     NSString * const partialWord = [currentText substringWithRange:charRange];
-    
+
     if (partialWord.length == 0) {
         return @[];
     }
-    
+
     // Get cached titles from library model
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     if (!libraryModel) {
         return @[];
     }
-    
+
     NSArray<NSString *> * const allTitles = libraryModel.listOfMediaTitles;
     NSMutableArray<NSString *> * const matchingTitles = [NSMutableArray arrayWithCapacity:VLCLibrarySearchMaxMatchingTitles];
-    
+
     // Filter titles that match the partial word
     for (NSString * const title in allTitles) {
         if (![title.lowercaseString hasPrefix:partialWord.lowercaseString]) {
@@ -805,7 +810,7 @@ static int ShowController(vlc_object_t * __unused p_this,
             break;
         }
     }
-    
+
     *index = -1;
     return matchingTitles;
 }

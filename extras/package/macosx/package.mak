@@ -31,8 +31,10 @@ VLC.app: macos-install
 	cp -R "$(top_builddir)/modules/gui/macosx/UI/." $@/Contents/Resources/Base.lproj/
 	## Copy Asset catalog
 	cp "$(top_builddir)/modules/gui/macosx/Resources/Assets.car" $@/Contents/Resources/Assets.car
+if ENABLE_MACOSX_UI_SHADERS
 	## Copy Shaders metal library
 	cp "$(top_builddir)/modules/gui/macosx/Resources/Shaders.metallib" $@/Contents/Resources/Shaders.metallib
+endif
 	## Copy Info.plist and convert to binary
 	cp -R "$(top_builddir)/share/macosx/Info.plist" $@/Contents/
 	xcrun plutil -convert binary1 $@/Contents/Info.plist

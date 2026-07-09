@@ -498,8 +498,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCScrollingClipView.m \
 	gui/macosx/views/VLCSettingTextField.h \
 	gui/macosx/views/VLCSettingTextField.m \
-	gui/macosx/views/VLCSnowEffectView.h \
-	gui/macosx/views/VLCSnowEffectView.m \
 	gui/macosx/views/VLCSpacingConstraint.h \
 	gui/macosx/views/VLCSpacingConstraint.m \
 	gui/macosx/views/VLCStackView.h \
@@ -577,6 +575,11 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/windows/video/VLCWindow.h \
 	gui/macosx/windows/video/VLCWindow.m
 
+if ENABLE_MACOSX_UI_SHADERS
+libmacosx_plugin_la_SOURCES += \
+	gui/macosx/views/VLCSnowEffectView.h \
+	gui/macosx/views/VLCSnowEffectView.m
+endif
 
 # User interface compilation
 

@@ -327,6 +327,7 @@ static VLCMain *sharedInstance = nil;
 {
     // Only Metal shader in use at the moment is for holiday theming, so only load during this time.
     // Change this if you are going to add new shaders!
+#ifdef ENABLE_MACOSX_UI_SHADERS
     if (((VLCApplication *)NSApplication.sharedApplication).winterHolidaysTheming) {
         _metalDevice = MTLCreateSystemDefaultDevice();
         NSString * const libraryPath =
@@ -341,6 +342,7 @@ static VLCMain *sharedInstance = nil;
             NSLog(@"Error: Could not find Shaders.metallib in the bundle.");
         }
     }
+#endif
 
     _clickerManager = [[VLCClickerManager alloc] init];
 
