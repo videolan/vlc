@@ -236,9 +236,16 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
         break;
     case ADPCM_DK3:
+        /* 16 bytes block (2 channels) preamble outputs 1 sample */
+        /* 3 ADPCM nibbles decodes to 4 16-bit PCM samples. Only stereo */
         i_channels = 2;
-        if( p_sys->i_block >= 16 )
-            p_sys->i_samplesperblock = ( 4 * ( p_sys->i_block - 16 ) + 2 )/ 3;
+        if( p_sys->i_block > 16 )
+        {
+            size_t i_payload = p_sys->i_block - 16;
+            p_sys->i_samplesperblock = 4 * ( i_payload / 3 );
+            if( i_payload % 3 == 2 )
+                p_sys->i_samplesperblock += 2;
+        }
         break;
     case ADPCM_EA:
         if( p_sys->i_block >= i_channels )
@@ -718,9 +725,12 @@ static void DecodeAdpcmDk3( decoder_t *p_dec, int16_t *p_sample,
     GetByte( sum.i_step_index );
     GetByte( diff.i_step_index );
 
+    CLAMP( sum.i_step_index, 0, 88 );
+    CLAMP( diff.i_step_index, 0, 88 );
+
     i_diff_value = diff.i_predictor;
     /* we process 6 nibbles at once */
-    while( p_buffer + 1 <= p_end )
+    while( p_buffer + 1 < p_end )
     {
         /* first 3 nibbles */
         AdpcmImaWavExpandNibble( &sum,
