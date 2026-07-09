@@ -96,8 +96,15 @@ T.Pane {
             // FIXME: use VLCStyle
             implicitWidth: VLCStyle.dp(100, VLCStyle.scale)
 
-            topInset: MainCtx.usingTouch ? VLCStyle.touchHandlerMargin : 0.0 /* implicitTopInset */
-            bottomInset: MainCtx.usingTouch ? VLCStyle.touchHandlerMargin : 0.0 /* implicitTopInset */
+            // WARNING: Directly setting the insets break handle and background positioning.
+            Binding on topInset {
+                when: MainCtx.usingTouch
+                value: VLCStyle.touchHandlerMargin
+            }
+            Binding on bottomInset {
+                when: MainCtx.usingTouch
+                value: VLCStyle.touchHandlerMargin
+            }
 
             Layout.fillHeight: true
             Layout.margins: VLCStyle.margin_xsmall
