@@ -62,8 +62,10 @@ if BUILD_SKINS
 	mkdir -p $@/Contents/Resources/share/skins2
 	cp -r "$(macos_destdir)$(pkgdatadir)/skins2" $@/Contents/Resources/share/
 endif
+if HAVE_NLS
 	## Copy translations
 	-cp -a "$(macos_destdir)$(datadir)/locale" $@/Contents/Resources/share/
+endif
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 	## Copy libs
 	cp -a "$(macos_destdir)$(libdir)"/libvlc*.dylib $@/Contents/Frameworks/

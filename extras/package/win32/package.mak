@@ -78,7 +78,9 @@ if ENABLE_PDB
 		for plugin in $$(find "$$plugindir" -type f \( -not -name '*.la' -and -not -name '*.a' \)); do cp modules/.libs/$$(basename "$$plugin" | sed s/dll/pdb/) "$$plugin_destdir"; done; \
 	done
 endif
+if HAVE_NLS
 	-cp -r $(prefix)/share/locale $(win32_destdir)
+endif
 
 # BD-J JAR
 	-cp $(CONTRIB_DIR)/share/java/*.jar $(win32_destdir)/plugins/access/

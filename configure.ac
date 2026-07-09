@@ -734,6 +734,8 @@ dnl
 AM_GNU_GETTEXT_VERSION([0.21])
 AM_GNU_GETTEXT([external], [need-formatstring-macros])
 
+AM_CONDITIONAL([HAVE_NLS], [test "$USE_NLS" = "yes"])
+
 dnl
 dnl Iconv stuff
 dnl

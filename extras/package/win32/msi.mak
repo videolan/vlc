@@ -23,7 +23,9 @@ endif
 
 heat: package-win-strip
 	$(HEAT) --dir $(VLCDIR)/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(MSIBUILDDIR)/Plugins.fragment.wxs
+if HAVE_NLS
 	$(HEAT) --dir $(VLCDIR)/locale -cg CompLocaleGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(MSIBUILDDIR)/Locale.fragment.wxs
+endif
 if BUILD_LUA
 	$(HEAT) --dir $(VLCDIR)/lua -cg CompLuaGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(MSIBUILDDIR)/Lua.fragment.wxs
 endif
