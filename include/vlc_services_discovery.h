@@ -175,6 +175,9 @@ static inline void services_discovery_AddItem(services_discovery_t *sd,
  * @note This callback does not take ownership of the input item; it might
  * however (and most probably will) add one of more references to the item.
  *
+ * @note Each input item must be reported at most once: do not pass the same
+ * item to this function again, even under a different parent.
+ *
  * The caller is responsible for releasing its own reference(s) eventually.
  * Keeping a reference is necessary to call services_discovery_RemoveItem() or
  * to alter the item later. However, if the caller will never remove nor alter
