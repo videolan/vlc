@@ -211,7 +211,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( p_sys->codec )
     {
     case ADPCM_IMA_QT:
-        p_sys->i_samplesperblock = 64;
+        if( p_sys->i_block >= 34 * i_channels )
+            p_sys->i_samplesperblock = (p_sys->i_block / (34 * i_channels) ) * 64;
         break;
     case ADPCM_IMA_WAV:
         if( p_sys->i_block >= 4 * i_channels )
@@ -617,35 +618,38 @@ static void DecodeAdpcmImaWav( decoder_t *p_dec, int16_t *p_sample,
 static void DecodeAdpcmImaQT( decoder_t *p_dec, int16_t *p_sample,
                               uint8_t *p_buffer )
 {
+    decoder_sys_t *p_sys  = p_dec->p_sys;
     adpcm_ima_wav_channel_t channel[2];
     int                     i_nibbles;
     int                     i_ch;
-    int                     i_step;
+    int                     i_chans = p_dec->fmt_out.audio.i_channels;
 
-    i_step = p_dec->fmt_out.audio.i_channels;
-
-    for( i_ch = 0; i_ch < p_dec->fmt_out.audio.i_channels; i_ch++ )
+    for( unsigned i=0; i<p_sys->i_block/(34 * i_chans); i++)
     {
-        /* load preamble */
-        channel[i_ch].i_predictor  = (int16_t)((( ( p_buffer[0] << 1 )|(  p_buffer[1] >> 7 ) ))<<7);
-        channel[i_ch].i_step_index = p_buffer[1]&0x7f;
-
-        CLAMP( channel[i_ch].i_step_index, 0, 88 );
-        p_buffer += 2;
-
-        for( i_nibbles = 0; i_nibbles < 64; i_nibbles +=2 )
+        for( i_ch = 0; i_ch < p_dec->fmt_out.audio.i_channels; i_ch++ )
         {
-            *p_sample = AdpcmImaWavExpandNibble( &channel[i_ch], (*p_buffer)&0x0f);
-            p_sample += i_step;
+            int16_t *p_out = &p_sample[i_ch];
 
-            *p_sample = AdpcmImaWavExpandNibble( &channel[i_ch], (*p_buffer >> 4)&0x0f);
-            p_sample += i_step;
+            /* load preamble */
+            channel[i_ch].i_predictor  = (int16_t)((( ( p_buffer[0] << 1 )|(  p_buffer[1] >> 7 ) ))<<7);
+            channel[i_ch].i_step_index = p_buffer[1]&0x7f;
 
-            p_buffer++;
+            CLAMP( channel[i_ch].i_step_index, 0, 88 );
+            p_buffer += 2;
+
+            for( i_nibbles = 0; i_nibbles < 64; i_nibbles +=2 )
+            {
+                *p_out = AdpcmImaWavExpandNibble( &channel[i_ch], (*p_buffer)&0x0f);
+                p_out += i_chans;
+
+                *p_out = AdpcmImaWavExpandNibble( &channel[i_ch], (*p_buffer >> 4)&0x0f);
+                p_out += i_chans;
+
+                p_buffer++;
+            }
         }
 
-        /* Next channel */
-        p_sample += 1 - 64 * i_step;
+        p_sample += 64 * i_chans;
     }
 }
 
