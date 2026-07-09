@@ -23,6 +23,7 @@
 #import "VLCLibraryHeroView.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
@@ -49,10 +50,13 @@
 {
     self.largeImageView.contentGravity = VLCImageViewContentGravityResizeAspectFill;
     self.playButton.bezelColor = NSColor.VLCAccentColor;
+    self.playButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
     if (@available(macOS 10.14, *)) {
         self.playButton.contentTintColor = NSColor.VLCAccentColor;
     }
+    self.titleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
     self.titleTextField.maximumNumberOfLines = 3;
+    self.detailTextField.font = NSFont.VLCLibrarySubsectionSubheaderFont;
     self.detailTextField.maximumNumberOfLines = 1;
     [self connectItemUpdaters];
 }
