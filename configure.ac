@@ -1530,21 +1530,26 @@ AC_ARG_ENABLE([optimizations],
 dnl Check for various optimization flags
 AS_IF([test "${enable_optimizations}" != "no"], [
 
-  dnl -O3 only in production builds
   AS_IF([test "${enable_debug}" = "no"], [
-    VLC_SAVE_FLAGS
-    CFLAGS="${CFLAGS} -O3"
-    CXXFLAGS="${CXXFLAGS} -O3"
-    OBJCFLAGS="${OBJCFLAGS} -O3"
-    AC_CACHE_CHECK([if $CC accepts -O3],  [ac_cv_c_o3], [
-      AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-        ac_cv_c_o3=yes
-      ], [
-        ac_cv_c_o3=no
-      ])
-    ])
-    AS_IF([test "${ac_cv_c_o3}" = "no"], [VLC_RESTORE_FLAGS])
+    dnl -O3 only in production builds
+    OPTIMIZATION_LEVEL="-O3"
+  ], [
+    dnl -Og is used if --enable-debug is set, but --disable-optimizations is not
+    OPTIMIZATION_LEVEL="-Og"
   ])
+
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} ${OPTIMIZATION_LEVEL}"
+  CXXFLAGS="${CXXFLAGS} ${OPTIMIZATION_LEVEL}"
+  OBJCFLAGS="${OBJCFLAGS} ${OPTIMIZATION_LEVEL}"
+  AC_CACHE_CHECK([if $CC accepts ${OPTIMIZATION_LEVEL}],  [ac_cv_c_O], [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+      ac_cv_c_O=yes
+    ], [
+      ac_cv_c_O=no
+    ])
+  ])
+  AS_IF([test "${ac_cv_c_O}" = "no"], [VLC_RESTORE_FLAGS])
 
   dnl Check for fast maths
   AX_APPEND_COMPILE_FLAGS([-fno-math-errno -funsafe-math-optimizations -fno-rounding-math -fno-signaling-nans -fcx-limited-range], [CFLAGS])
