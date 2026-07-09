@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Templates as T
 
@@ -95,6 +96,14 @@ T.Pane {
                             return qsTr("Checking for updates...")
                         default:
                             return qsTr("N/A")
+                    }
+                }
+
+                onTextChanged: {
+                    if (visible) {
+                        const window = Window.window
+                        if (window)
+                            window.alert(0)
                     }
                 }
 
