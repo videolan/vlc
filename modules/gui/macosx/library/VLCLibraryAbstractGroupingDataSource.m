@@ -23,6 +23,7 @@
 #import "VLCLibraryAbstractGroupingDataSource.h"
 
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -175,7 +176,11 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                                          withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
                                            forIndexPath:indexPath];
         const id<VLCMediaLibraryItemProtocol> item = self.backingArray[indexPath.section];
-        sectionHeadingView.stringValue = item.displayString;
+        NSString *displayString = item.displayString;
+        if (displayString.length == 0) {
+            displayString = _NS("Unknown");
+        }
+        sectionHeadingView.stringValue = displayString;
         return sectionHeadingView;
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
