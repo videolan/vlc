@@ -413,6 +413,9 @@ void input_item_Release( input_item_t *p_item )
     if( !vlc_atomic_rc_dec( &owner->rc ) )
         return;
 
+    if( p_item->libvlc_owner_release != NULL )
+        p_item->libvlc_owner_release( p_item->libvlc_owner );
+
     free( p_item->psz_name );
     free( p_item->psz_uri );
     free( p_item->p_stats );

@@ -132,6 +132,10 @@ struct input_item_t
 
     void        *libvlc_owner;       /**< LibVLC private data, can only be set
                                           before events are registered. */
+    void       (*libvlc_owner_release)(void *libvlc_owner);
+                                     /**< Called when the input item is
+                                          destroyed to release libvlc_owner,
+                                          same restrictions as libvlc_owner. */
 };
 
 #define INPUT_ITEM_URI_NOP "vlc://nop" /* dummy URI for node/directory items */
