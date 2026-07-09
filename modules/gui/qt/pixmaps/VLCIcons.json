@@ -7,7 +7,7 @@
     "glyphs" : [
         {"key":"active_indicator", "path": "./icons/active_indicator.svg"},
         {"key":"add", "path": "./icons/add.svg"},
-        {"key":"album_cover", "path": "./icons/album_cover.svg"},
+        {"key":"album_cover", "path": "./icons/ic_album_cover.svg"},
         {"key":"aspect_ratio", "path": "./icons/ic_aspect_ratio.svg"},
         {"key":"atob", "path": "./icons/atob.svg"},
         {"key":"audiosub", "path": "./icons/ic_audiosub.svg"},

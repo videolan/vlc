@@ -802,7 +802,7 @@ libqt_plugin_la_RES = \
 	pixmaps/addons/addon_score.svg \
 	pixmaps/icons/active_indicator.svg \
 	pixmaps/icons/add.svg \
-	pixmaps/icons/album_cover.svg \
+	pixmaps/icons/ic_album_cover.svg \
 	pixmaps/icons/ic_aspect_ratio.svg \
 	pixmaps/icons/atob.svg \
 	pixmaps/icons/ic_audiosub.svg \
