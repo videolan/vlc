@@ -248,7 +248,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
         break;
     case ADPCM_EA:
-        if( p_sys->i_block >= i_channels )
+        if( p_sys->i_block > i_channels )
         {
             p_sys->i_samplesperblock =
                 2 * (p_sys->i_block - i_channels) / i_channels;
@@ -808,7 +808,7 @@ static void DecodeAdpcmEA( decoder_t *p_dec, int16_t *p_sample,
         d[c] = (input & 0xf) + 8;
     }
 
-    for (p_buffer += chans; p_buffer < p_end; p_buffer += chans)
+    for (p_buffer += chans; p_buffer + chans <= p_end; p_buffer += chans)
     {
         union { uint32_t u; int32_t i; } spl;
 
