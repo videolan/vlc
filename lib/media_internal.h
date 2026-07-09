@@ -40,10 +40,12 @@ typedef enum libvlc_media_parsed_status_t
     libvlc_media_parsed_status_done,
 } libvlc_media_parsed_status_t;
 
+/* A media is a wrapper of its input item and shares its reference count:
+ * libvlc_media_retain()/libvlc_media_release() forward to the input item and
+ * the media is destroyed with it (input_item_t.libvlc_owner_release). */
 struct libvlc_media_t
 {
     input_item_t      *p_input_item;
-    vlc_atomic_rc_t    rc;
 
     VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t*) p_subitems; /* A media descriptor can have Sub items. This is the only dependency we really have on media_list */
     void *p_user_data;

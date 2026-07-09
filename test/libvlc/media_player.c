@@ -134,6 +134,82 @@ static void test_media_player_set_media(const char** argv, int argc)
     mp_event_ctx_destroy(&ctx);
 }
 
+struct switch_media_ctx
+{
+    vlc_sem_t playing_sem;
+    vlc_sem_t media_changed_sem;
+};
+
+static void switch_media_on_state_changed(void *opaque, libvlc_state_t state)
+{
+    struct switch_media_ctx *ctx = opaque;
+    if (state == libvlc_Playing)
+        vlc_sem_post(&ctx->playing_sem);
+}
+
+static void switch_media_on_media_changed(void *opaque, libvlc_media_t *media)
+{
+    struct switch_media_ctx *ctx = opaque;
+    assert(media != NULL);
+    vlc_sem_post(&ctx->media_changed_sem);
+}
+
+static const struct libvlc_media_player_cbs switch_media_cbs = {
+    .version = 0,
+    .on_state_changed = switch_media_on_state_changed,
+    .on_media_changed = switch_media_on_media_changed,
+};
+
+static void test_media_player_switch_media(const char** argv, int argc)
+{
+    /* The track gives the es_out an info category, deleted during the input
+     * teardown: this sends media meta events referencing the draining media
+     * after the player switched to the next one. */
+    const char *file1 = "mock://audio_track_count=1;length=100000000";
+    const char *file2 = test_default_sample;
+
+    test_log ("Testing media switch while playing\n");
+
+    libvlc_instance_t *vlc = libvlc_new (argc, argv);
+    assert (vlc != NULL);
+
+    struct switch_media_ctx ctx;
+    vlc_sem_init(&ctx.playing_sem, 0);
+    vlc_sem_init(&ctx.media_changed_sem, 0);
+
+    libvlc_media_player_t *mp =
+        libvlc_media_player_new (vlc, &switch_media_cbs, &ctx);
+    assert (mp != NULL);
+
+    libvlc_media_t *md = libvlc_media_new_location(file1);
+    assert (md != NULL);
+    libvlc_media_player_set_media (mp, md);
+    vlc_sem_wait(&ctx.media_changed_sem);
+    /* The application drops its last reference: the media must stay valid as
+     * long as the player (and its draining input) can reference it */
+    libvlc_media_release (md);
+
+    libvlc_media_player_play (mp);
+    test_log ("Waiting for playing\n");
+    vlc_sem_wait(&ctx.playing_sem);
+
+    /* Switch to another media while playing: the first media input drains
+     * asynchronously and still sends events referencing the first media */
+    md = libvlc_media_new_location(file2);
+    assert (md != NULL);
+    libvlc_media_player_set_media (mp, md);
+    libvlc_media_release (md);
+
+    /* The media change is notified once the first input is destroyed: all the
+     * teardown events referencing the first media have been sent by then */
+    test_log ("Waiting for the media change\n");
+    vlc_sem_wait(&ctx.media_changed_sem);
+
+    libvlc_media_player_stop_async (mp);
+    libvlc_media_player_release (mp);
+    libvlc_release (vlc);
+}
+
 static void test_media_player_play_stop(const char** argv, int argc)
 {
     libvlc_instance_t *vlc;
@@ -680,6 +756,7 @@ int main (void)
     test_init();
 
     test_media_player_set_media (test_defaults_args, test_defaults_nargs);
+    test_media_player_switch_media (test_defaults_args, test_defaults_nargs);
     test_media_player_play_stop (test_defaults_args, test_defaults_nargs);
     test_media_player_pause_stop (test_defaults_args, test_defaults_nargs);
     test_media_player_tracks (test_defaults_args, test_defaults_nargs);

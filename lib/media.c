@@ -217,6 +217,16 @@ void libvlc_media_add_subtree(libvlc_media_t *p_md, const input_item_node_t *nod
     input_item_add_subnode( p_md, node );
 }
 
+static void media_destroy( void *libvlc_owner )
+{
+    libvlc_media_t *p_md = libvlc_owner;
+
+    if( p_md->p_subitems )
+        libvlc_media_list_release( p_md->p_subitems );
+
+    free( p_md );
+}
+
 /**
  * \internal
  * Create a new media descriptor object from an input_item (Private)
@@ -232,6 +242,9 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
         libvlc_printerr( "No input item given" );
         return NULL;
     }
+
+    /* The item is wrapped by a single media for its whole lifetime */
+    assert( p_input_item->libvlc_owner == NULL );
 
     p_md = calloc( 1, sizeof(libvlc_media_t) );
     if( !p_md )
@@ -250,9 +263,9 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
     p_md->p_subitems->p_internal_md = p_md;
 
     p_md->p_input_item      = p_input_item;
-    vlc_atomic_rc_init(&p_md->rc);
 
     p_md->p_input_item->libvlc_owner = p_md;
+    p_md->p_input_item->libvlc_owner_release = media_destroy;
     atomic_init(&p_md->parsed_status, libvlc_media_parsed_status_none);
     p_md->req = NULL;
 
@@ -368,22 +381,16 @@ void libvlc_media_release( libvlc_media_t *p_md )
     if (!p_md)
         return;
 
-    if( !vlc_atomic_rc_dec(&p_md->rc) )
-        return;
-
-    if( p_md->p_subitems )
-        libvlc_media_list_release( p_md->p_subitems );
-
+    /* The media shares the reference count of its input item and is
+     * destroyed with it, see media_destroy() */
     input_item_Release( p_md->p_input_item );
-
-    free( p_md );
 }
 
 // Retain a media descriptor object
 libvlc_media_t *libvlc_media_retain( libvlc_media_t *p_md )
 {
     assert (p_md);
-    vlc_atomic_rc_inc( &p_md->rc );
+    input_item_Hold( p_md->p_input_item );
     return p_md;
 }
 
