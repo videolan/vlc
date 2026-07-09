@@ -230,6 +230,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
         break;
     case ADPCM_MS:
+        /* 7 bytes block/channel preamble outputs 2 samples */
         if( p_sys->i_block >= 7 * i_channels )
         {
             p_sys->i_samplesperblock =
@@ -237,6 +238,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
         break;
     case ADPCM_DK4:
+        /* 4 bytes block/channel preamble outputs 1 sample */
         if( p_sys->i_block >= 4 * i_channels )
         {
             p_sys->i_samplesperblock =
