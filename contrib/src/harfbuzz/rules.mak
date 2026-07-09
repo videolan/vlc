@@ -15,6 +15,7 @@ $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.xz:
 harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(UNPACK)
 	$(APPLY) $(SRC)/harfbuzz/0001-disable-building-hb-gpu-encode-all-app.patch
+	$(APPLY) $(SRC)/harfbuzz/0001-Ignore-Wunused-template.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2) png $(DEPS_png)
