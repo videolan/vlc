@@ -531,6 +531,14 @@ void UpdateDialog::updateUI( )
         //       waiting for the core to provide this information.
         break;
     }
+
+    if (isVisible())
+    {
+        if (const auto w = windowHandle())
+        {
+            w->alert(0);
+        }
+    }
 }
 
 #endif
