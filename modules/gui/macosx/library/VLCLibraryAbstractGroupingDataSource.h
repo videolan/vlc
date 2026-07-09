@@ -39,6 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) NSTableView *detailTableView;
 @property (readwrite, weak, nullable) id<VLCLibraryGroupHeaderDelegate> headerDelegate;
 
+// Required!
+@property (readonly, nullable) NSString *dataSourceTypeDisplayString;
+
 - (void)reloadData;
 
 @end

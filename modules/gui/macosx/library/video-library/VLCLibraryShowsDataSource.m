@@ -22,6 +22,8 @@
 
 #import "VLCLibraryShowsDataSource.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
 
@@ -120,6 +122,11 @@
 
     [self.masterTableView removeRowsAtIndexes:[NSIndexSet indexSetWithIndex:rowIndex]
                                 withAnimation:NSTableViewAnimationEffectFade];
+}
+
+- (NSString *)dataSourceTypeDisplayString
+{
+    return _NS("Show");
 }
 
 @end

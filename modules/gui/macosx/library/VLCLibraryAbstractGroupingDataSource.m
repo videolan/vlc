@@ -178,7 +178,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         const id<VLCMediaLibraryItemProtocol> item = self.backingArray[indexPath.section];
         NSString *displayString = item.displayString;
         if (displayString.length == 0) {
-            displayString = _NS("Unknown");
+            displayString = [NSString stringWithFormat:@"%@ %@", _NS("Unknown"), self.dataSourceTypeDisplayString];
         }
         sectionHeadingView.stringValue = displayString;
         return sectionHeadingView;
