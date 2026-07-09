@@ -98,6 +98,8 @@ enum es_out_query_e
     /* Set global meta data (The vlc_meta_t is not modified nor released) */
     ES_OUT_SET_META, /* arg1=const vlc_meta_t * */
 
+    /* Post a node of sub items. Every input item in the node must be newly
+     * created */
     ES_OUT_POST_SUBNODE, /* arg1=input_item_node_t *, res=can fail */
 
     ES_OUT_VOUT_SET_MOUSE_EVENT, /* arg1= es_out_id_t* (video es),
