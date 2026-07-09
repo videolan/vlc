@@ -12,7 +12,7 @@
             <rect key="frame" x="0.0" y="0.0" width="1071" height="322"/>
             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
             <subviews>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
+                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
                     <rect key="frame" x="10" y="10" width="1051" height="282"/>
                     <subviews>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCe-dY-YMM">
@@ -54,7 +54,7 @@
                                 </subviews>
                                 <nil key="backgroundColor"/>
                             </clipView>
-                            <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="10"/>
+                            <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="8"/>
                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ZBY-pE-E7T">
                                 <rect key="frame" x="-100" y="-100" width="701" height="15"/>
                                 <autoresizingMask key="autoresizingMask"/>
@@ -76,10 +76,10 @@
                 </stackView>
             </subviews>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="bw7-QB-Ssc" secondAttribute="trailing" constant="10" id="8QK-wS-vnX"/>
-                <constraint firstItem="bw7-QB-Ssc" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="10" id="L0r-A5-7Xq"/>
-                <constraint firstAttribute="bottom" secondItem="bw7-QB-Ssc" secondAttribute="bottom" constant="10" id="eS3-iK-oGV"/>
-                <constraint firstItem="bw7-QB-Ssc" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="30" id="oWk-8b-f1e"/>
+                <constraint firstAttribute="trailing" secondItem="bw7-QB-Ssc" secondAttribute="trailing" constant="8" id="8QK-wS-vnX"/>
+                <constraint firstItem="bw7-QB-Ssc" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="8" id="L0r-A5-7Xq"/>
+                <constraint firstAttribute="bottom" secondItem="bw7-QB-Ssc" secondAttribute="bottom" constant="8" id="eS3-iK-oGV"/>
+                <constraint firstItem="bw7-QB-Ssc" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="28" id="oWk-8b-f1e"/>
             </constraints>
             <connections>
                 <outlet property="audioGroupAlbumsTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>

@@ -79,18 +79,18 @@ Gw
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="7" secondAttribute="bottom" constant="22" id="2eI-2U-i85"/>
-                    <constraint firstItem="4" firstAttribute="top" secondItem="3" secondAttribute="top" constant="20" id="4Oc-x8-seM"/>
+                    <constraint firstItem="4" firstAttribute="top" secondItem="3" secondAttribute="top" constant="16" id="4Oc-x8-seM"/>
                     <constraint firstItem="7" firstAttribute="leading" secondItem="8" secondAttribute="trailing" constant="12" id="564-S6-DGN"/>
-                    <constraint firstItem="4" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="20" id="6PC-8r-exg"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4" secondAttribute="trailing" constant="20" id="Egm-qq-QKp"/>
+                    <constraint firstItem="4" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="16" id="6PC-8r-exg"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4" secondAttribute="trailing" constant="16" id="Egm-qq-QKp"/>
                     <constraint firstItem="7" firstAttribute="centerY" secondItem="8" secondAttribute="centerY" id="LiA-Xw-4Og"/>
                     <constraint firstItem="5" firstAttribute="leading" secondItem="4" secondAttribute="leading" id="UX0-7z-iJf"/>
                     <constraint firstItem="7" firstAttribute="trailing" secondItem="6" secondAttribute="trailing" id="VI5-Rn-1Fo"/>
-                    <constraint firstAttribute="trailing" secondItem="6" secondAttribute="trailing" constant="20" id="XeS-rh-GeW"/>
-                    <constraint firstItem="6" firstAttribute="top" secondItem="5" secondAttribute="bottom" constant="10" id="Y3E-qC-fAJ"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="5" secondAttribute="trailing" constant="20" id="cOA-LJ-PmC"/>
+                    <constraint firstAttribute="trailing" secondItem="6" secondAttribute="trailing" constant="16" id="XeS-rh-GeW"/>
+                    <constraint firstItem="6" firstAttribute="top" secondItem="5" secondAttribute="bottom" constant="8" id="Y3E-qC-fAJ"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="5" secondAttribute="trailing" constant="16" id="cOA-LJ-PmC"/>
                     <constraint firstItem="5" firstAttribute="top" secondItem="4" secondAttribute="bottom" constant="8" id="srk-nM-3iQ"/>
-                    <constraint firstItem="7" firstAttribute="top" secondItem="6" secondAttribute="bottom" constant="25" id="u2w-Ou-uGC"/>
+                    <constraint firstItem="7" firstAttribute="top" secondItem="6" secondAttribute="bottom" constant="24" id="u2w-Ou-uGC"/>
                     <constraint firstItem="6" firstAttribute="leading" secondItem="5" secondAttribute="leading" id="zwT-Vi-paI"/>
                 </constraints>
             </view>

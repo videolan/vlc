@@ -26,7 +26,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U3j-Zx-fFf">
+                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U3j-Zx-fFf">
                     <rect key="frame" x="20" y="20" width="793" height="86"/>
                     <subviews>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kFW-i6-3hg">
@@ -84,14 +84,14 @@
             <constraints>
                 <constraint firstAttribute="width" secondItem="LPV-K6-7AE" secondAttribute="height" multiplier="21:9" id="2HS-zo-d22"/>
                 <constraint firstItem="qdP-As-qZ0" firstAttribute="top" secondItem="LPV-K6-7AE" secondAttribute="top" id="9aA-Ma-Vvy"/>
-                <constraint firstItem="U3j-Zx-fFf" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" constant="20" symbolic="YES" id="A9P-6v-TYB"/>
-                <constraint firstAttribute="bottom" secondItem="U3j-Zx-fFf" secondAttribute="bottom" constant="20" id="GKS-hS-EhI"/>
-                <constraint firstAttribute="trailing" secondItem="U3j-Zx-fFf" secondAttribute="trailing" constant="20" id="Nzn-Md-2Xx"/>
-                <constraint firstItem="GoN-QI-mru" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" constant="20" id="UTF-IS-5xp"/>
-                <constraint firstItem="U3j-Zx-fFf" firstAttribute="top" relation="greaterThanOrEqual" secondItem="GoN-QI-mru" secondAttribute="bottom" constant="20" id="ZCB-XT-8xc"/>
+                <constraint firstItem="U3j-Zx-fFf" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" constant="16" symbolic="YES" id="A9P-6v-TYB"/>
+                <constraint firstAttribute="bottom" secondItem="U3j-Zx-fFf" secondAttribute="bottom" constant="16" id="GKS-hS-EhI"/>
+                <constraint firstAttribute="trailing" secondItem="U3j-Zx-fFf" secondAttribute="trailing" constant="16" id="Nzn-Md-2Xx"/>
+                <constraint firstItem="GoN-QI-mru" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" constant="16" id="UTF-IS-5xp"/>
+                <constraint firstItem="U3j-Zx-fFf" firstAttribute="top" relation="greaterThanOrEqual" secondItem="GoN-QI-mru" secondAttribute="bottom" constant="16" id="ZCB-XT-8xc"/>
                 <constraint firstAttribute="bottom" secondItem="qdP-As-qZ0" secondAttribute="bottom" id="lyx-Ea-nZ1"/>
                 <constraint firstItem="qdP-As-qZ0" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" id="p3I-zN-Dxs"/>
-                <constraint firstItem="GoN-QI-mru" firstAttribute="top" secondItem="LPV-K6-7AE" secondAttribute="top" constant="20" id="xOv-2n-nx5"/>
+                <constraint firstItem="GoN-QI-mru" firstAttribute="top" secondItem="LPV-K6-7AE" secondAttribute="top" constant="16" id="xOv-2n-nx5"/>
                 <constraint firstAttribute="trailing" secondItem="qdP-As-qZ0" secondAttribute="trailing" id="yrR-6i-uoU"/>
             </constraints>
             <connections>

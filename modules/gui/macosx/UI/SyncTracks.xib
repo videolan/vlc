@@ -92,7 +92,7 @@
                                 <constraint firstItem="6" firstAttribute="leading" secondItem="cSz-hU-mVM" secondAttribute="leading" constant="17" id="aVd-9P-n8Q"/>
                                 <constraint firstItem="8" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6" secondAttribute="trailing" constant="17" id="k8E-KO-bnf"/>
                                 <constraint firstItem="10" firstAttribute="leading" secondItem="8" secondAttribute="trailing" constant="8" id="s7s-bB-pDz"/>
-                                <constraint firstItem="6" firstAttribute="top" secondItem="cSz-hU-mVM" secondAttribute="top" constant="15" id="sA0-Xk-phD"/>
+                                <constraint firstItem="6" firstAttribute="top" secondItem="cSz-hU-mVM" secondAttribute="top" constant="12" id="sA0-Xk-phD"/>
                                 <constraint firstItem="10" firstAttribute="centerY" secondItem="cSz-hU-mVM" secondAttribute="centerY" id="vZl-MW-Ozf"/>
                                 <constraint firstItem="8" firstAttribute="centerY" secondItem="10" secondAttribute="centerY" id="zRC-FF-830"/>
                                 <constraint firstAttribute="trailing" secondItem="10" secondAttribute="trailing" constant="16" id="zeF-Id-Fsw"/>
@@ -259,7 +259,7 @@
                     <constraint firstItem="37" firstAttribute="top" secondItem="5" secondAttribute="bottom" constant="6" id="Qhx-v0-7P9"/>
                     <constraint firstItem="16" firstAttribute="top" secondItem="37" secondAttribute="bottom" id="SxF-ds-YwU"/>
                     <constraint firstItem="5" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="16" id="YNv-ok-Htz"/>
-                    <constraint firstAttribute="trailing" secondItem="5" secondAttribute="trailing" constant="15" id="ZiS-qT-7za"/>
+                    <constraint firstAttribute="trailing" secondItem="5" secondAttribute="trailing" constant="12" id="ZiS-qT-7za"/>
                     <constraint firstItem="20" firstAttribute="width" secondItem="8" secondAttribute="width" id="koU-gc-dHa"/>
                     <constraint firstItem="37" firstAttribute="leading" secondItem="16" secondAttribute="leading" constant="7" id="oNa-nU-jcF"/>
                     <constraint firstItem="16" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="16" id="tDL-yc-wDo"/>

@@ -308,20 +308,20 @@ IA
                                     <constraint firstItem="gAc-zn-uSr" firstAttribute="top" secondItem="ESj-Mw-X94" secondAttribute="top" constant="12" id="18d-J7-NTf"/>
                                     <constraint firstItem="Pfg-HK-E4H" firstAttribute="top" secondItem="hRN-Hm-oJ6" secondAttribute="bottom" constant="8" id="24q-jK-9J7"/>
                                     <constraint firstItem="YjO-49-ed6" firstAttribute="leading" secondItem="hRN-Hm-oJ6" secondAttribute="trailing" constant="8" id="2Tf-Pg-VfZ"/>
-                                    <constraint firstAttribute="trailing" secondItem="Pfg-HK-E4H" secondAttribute="trailing" constant="20" id="3Aw-EY-Jgz"/>
-                                    <constraint firstItem="Pfg-HK-E4H" firstAttribute="leading" secondItem="ESj-Mw-X94" secondAttribute="leading" constant="20" id="70O-DF-o0V"/>
+                                    <constraint firstAttribute="trailing" secondItem="Pfg-HK-E4H" secondAttribute="trailing" constant="16" id="3Aw-EY-Jgz"/>
+                                    <constraint firstItem="Pfg-HK-E4H" firstAttribute="leading" secondItem="ESj-Mw-X94" secondAttribute="leading" constant="16" id="70O-DF-o0V"/>
                                     <constraint firstItem="hRN-Hm-oJ6" firstAttribute="top" secondItem="yQr-Pj-2OQ" secondAttribute="bottom" constant="1" id="DuB-hS-nqq"/>
                                     <constraint firstAttribute="bottom" secondItem="Pfg-HK-E4H" secondAttribute="bottom" constant="8" id="Qib-Os-QkT"/>
-                                    <constraint firstItem="yQr-Pj-2OQ" firstAttribute="leading" secondItem="ESj-Mw-X94" secondAttribute="leading" constant="20" id="TSY-7b-Iud"/>
+                                    <constraint firstItem="yQr-Pj-2OQ" firstAttribute="leading" secondItem="ESj-Mw-X94" secondAttribute="leading" constant="16" id="TSY-7b-Iud"/>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="90" id="ZBi-FO-86D"/>
                                     <constraint firstItem="YjO-49-ed6" firstAttribute="top" secondItem="gAc-zn-uSr" secondAttribute="bottom" constant="1" id="ZEg-Kz-hvV"/>
                                     <constraint firstItem="gAc-zn-uSr" firstAttribute="leading" secondItem="yQr-Pj-2OQ" secondAttribute="trailing" constant="8" id="ZdG-le-RDN"/>
                                     <constraint firstItem="yQr-Pj-2OQ" firstAttribute="top" secondItem="ESj-Mw-X94" secondAttribute="top" constant="12" id="jFW-Cm-1og"/>
-                                    <constraint firstItem="hRN-Hm-oJ6" firstAttribute="leading" secondItem="ESj-Mw-X94" secondAttribute="leading" constant="20" id="lSl-p0-QFt"/>
+                                    <constraint firstItem="hRN-Hm-oJ6" firstAttribute="leading" secondItem="ESj-Mw-X94" secondAttribute="leading" constant="16" id="lSl-p0-QFt"/>
                                     <constraint firstAttribute="height" relation="lessThanOrEqual" constant="200" id="ldX-ic-gvG"/>
-                                    <constraint firstAttribute="trailing" secondItem="YjO-49-ed6" secondAttribute="trailing" constant="20" id="qHC-VC-lrB"/>
+                                    <constraint firstAttribute="trailing" secondItem="YjO-49-ed6" secondAttribute="trailing" constant="16" id="qHC-VC-lrB"/>
                                     <constraint firstItem="YjO-49-ed6" firstAttribute="leading" secondItem="hRN-Hm-oJ6" secondAttribute="trailing" constant="8" id="u6b-x9-u0Q"/>
-                                    <constraint firstAttribute="trailing" secondItem="gAc-zn-uSr" secondAttribute="trailing" constant="20" id="xhv-EZ-pdm"/>
+                                    <constraint firstAttribute="trailing" secondItem="gAc-zn-uSr" secondAttribute="trailing" constant="16" id="xhv-EZ-pdm"/>
                                 </constraints>
                             </customView>
                         </subviews>

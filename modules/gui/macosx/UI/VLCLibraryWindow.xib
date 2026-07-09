@@ -191,11 +191,11 @@
                                                                         </button>
                                                                     </subviews>
                                                                     <constraints>
-                                                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="f5c-zt-tHy" secondAttribute="bottom" constant="5" id="SbH-TQ-eXI"/>
+                                                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="f5c-zt-tHy" secondAttribute="bottom" constant="4" id="SbH-TQ-eXI"/>
                                                                         <constraint firstItem="f5c-zt-tHy" firstAttribute="centerY" secondItem="xiz-t0-wHG" secondAttribute="centerY" id="cD9-w6-RdD"/>
-                                                                        <constraint firstItem="f5c-zt-tHy" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xiz-t0-wHG" secondAttribute="top" constant="5" id="inr-OT-TWe"/>
-                                                                        <constraint firstItem="f5c-zt-tHy" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="xiz-t0-wHG" secondAttribute="leading" constant="5" id="sPR-Go-Z1e"/>
-                                                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="f5c-zt-tHy" secondAttribute="trailing" constant="5" id="tls-Px-be5"/>
+                                                                        <constraint firstItem="f5c-zt-tHy" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xiz-t0-wHG" secondAttribute="top" constant="4" id="inr-OT-TWe"/>
+                                                                        <constraint firstItem="f5c-zt-tHy" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="xiz-t0-wHG" secondAttribute="leading" constant="4" id="sPR-Go-Z1e"/>
+                                                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="f5c-zt-tHy" secondAttribute="trailing" constant="4" id="tls-Px-be5"/>
                                                                         <constraint firstItem="f5c-zt-tHy" firstAttribute="centerX" secondItem="xiz-t0-wHG" secondAttribute="centerX" id="uA7-o6-9kY"/>
                                                                     </constraints>
                                                                 </view>
@@ -256,7 +256,7 @@
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="SM6-nx-NKD" secondAttribute="trailing" constant="4" id="wML-fX-wuF"/>
                                         </constraints>
                                     </customView>
-                                    <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
+                                    <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
                                         <rect key="frame" x="612" y="5" width="188" height="40"/>
                                         <subviews>
                                             <button horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Bt8-jQ-hUr">
@@ -353,17 +353,17 @@
                                     </stackView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="S1K-Lp-DVO" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="5" id="6BO-R7-IvY"/>
+                                    <constraint firstItem="S1K-Lp-DVO" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="4" id="6BO-R7-IvY"/>
                                     <constraint firstItem="Ktr-qT-1fr" firstAttribute="leading" secondItem="YAj-e7-KCU" secondAttribute="trailing" constant="16" id="9P6-Y4-CxW"/>
-                                    <constraint firstAttribute="bottom" secondItem="Ktr-qT-1fr" secondAttribute="bottom" constant="5" id="9pB-9C-2xy"/>
-                                    <constraint firstAttribute="trailing" secondItem="S1K-Lp-DVO" secondAttribute="trailing" constant="10" id="BUG-PH-qrw"/>
-                                    <constraint firstAttribute="bottom" secondItem="YAj-e7-KCU" secondAttribute="bottom" constant="5" id="Gqk-sg-bBK"/>
+                                    <constraint firstAttribute="bottom" secondItem="Ktr-qT-1fr" secondAttribute="bottom" constant="4" id="9pB-9C-2xy"/>
+                                    <constraint firstAttribute="trailing" secondItem="S1K-Lp-DVO" secondAttribute="trailing" constant="8" id="BUG-PH-qrw"/>
+                                    <constraint firstAttribute="bottom" secondItem="YAj-e7-KCU" secondAttribute="bottom" constant="4" id="Gqk-sg-bBK"/>
                                     <constraint firstItem="S1K-Lp-DVO" firstAttribute="width" secondItem="YAj-e7-KCU" secondAttribute="width" priority="100" id="NxM-eQ-3UW"/>
                                     <constraint firstItem="Ktr-qT-1fr" firstAttribute="trailing" secondItem="S1K-Lp-DVO" secondAttribute="leading" constant="-16" id="hN9-7W-Mx1"/>
-                                    <constraint firstAttribute="bottom" secondItem="S1K-Lp-DVO" secondAttribute="bottom" constant="5" id="qCf-Co-yI1"/>
-                                    <constraint firstItem="YAj-e7-KCU" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="5" id="sIM-7y-JNq"/>
-                                    <constraint firstItem="Ktr-qT-1fr" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="5" id="t0h-f6-FGO"/>
-                                    <constraint firstItem="YAj-e7-KCU" firstAttribute="leading" secondItem="MQH-bI-Zdh" secondAttribute="leading" constant="10" id="tkj-nh-Tfb"/>
+                                    <constraint firstAttribute="bottom" secondItem="S1K-Lp-DVO" secondAttribute="bottom" constant="4" id="qCf-Co-yI1"/>
+                                    <constraint firstItem="YAj-e7-KCU" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="4" id="sIM-7y-JNq"/>
+                                    <constraint firstItem="Ktr-qT-1fr" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="4" id="t0h-f6-FGO"/>
+                                    <constraint firstItem="YAj-e7-KCU" firstAttribute="leading" secondItem="MQH-bI-Zdh" secondAttribute="leading" constant="8" id="tkj-nh-Tfb"/>
                                 </constraints>
                             </customView>
                         </subviews>
@@ -371,9 +371,9 @@
                             <constraint firstAttribute="bottom" secondItem="D5i-Pe-TAl" secondAttribute="bottom" constant="1" id="1LS-Zu-gsR"/>
                             <constraint firstAttribute="bottom" secondItem="MQH-bI-Zdh" secondAttribute="bottom" id="Uo1-sD-OXk"/>
                             <constraint firstItem="D5i-Pe-TAl" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" constant="1" id="WKP-Ke-OrH"/>
-                            <constraint firstItem="MQH-bI-Zdh" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" constant="5" id="YVB-nY-sHE"/>
+                            <constraint firstItem="MQH-bI-Zdh" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" constant="4" id="YVB-nY-sHE"/>
                             <constraint firstItem="D5i-Pe-TAl" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" constant="1" id="ZD9-R0-yq0"/>
-                            <constraint firstAttribute="trailing" secondItem="MQH-bI-Zdh" secondAttribute="trailing" constant="5" id="aBH-H2-ykp"/>
+                            <constraint firstAttribute="trailing" secondItem="MQH-bI-Zdh" secondAttribute="trailing" constant="4" id="aBH-H2-ykp"/>
                             <constraint firstItem="MQH-bI-Zdh" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" id="kba-GQ-94a"/>
                             <constraint firstAttribute="trailing" secondItem="D5i-Pe-TAl" secondAttribute="trailing" constant="1" id="lo1-R4-xx4"/>
                         </constraints>
@@ -384,7 +384,7 @@
                     <constraint firstItem="u8g-jy-S4e" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" id="j4i-Gt-xCB"/>
                     <constraint firstAttribute="trailing" secondItem="u8g-jy-S4e" secondAttribute="trailing" id="lEc-Vr-8M9"/>
                     <constraint firstItem="u8g-jy-S4e" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="s58-Wr-5SV"/>
-                    <constraint firstAttribute="bottom" secondItem="vUy-jt-gjY" secondAttribute="bottom" constant="20" id="vMr-VQ-r4P"/>
+                    <constraint firstAttribute="bottom" secondItem="vUy-jt-gjY" secondAttribute="bottom" constant="16" id="vMr-VQ-r4P"/>
                 </constraints>
             </view>
             <toolbar key="toolbar" implicitIdentifier="CAE4F278-DC20-4A58-B07E-1580E7B14C87" autosavesConfiguration="NO" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconOnly" sizeMode="regular" id="pr3-TD-J2z">
@@ -688,7 +688,7 @@
                             <collectionView selectable="YES" allowsMultipleSelection="YES" id="neh-e5-MUa" customClass="VLCLibraryCollectionView">
                                 <rect key="frame" x="0.0" y="0.0" width="875" height="158"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="0sw-3B-cXl">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="8" minimumLineSpacing="8" id="0sw-3B-cXl">
                                     <size key="itemSize" width="50" height="50"/>
                                 </collectionViewFlowLayout>
                                 <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -982,7 +982,7 @@
                             <collectionView selectable="YES" allowsMultipleSelection="YES" id="r7v-GI-W1U" customClass="VLCLibraryCollectionView">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="411"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="v0C-1b-7Ss">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="8" minimumLineSpacing="8" id="v0C-1b-7Ss">
                                     <size key="itemSize" width="210" height="150"/>
                                 </collectionViewFlowLayout>
                                 <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1020,15 +1020,15 @@
                         </pathControl>
                     </subviews>
                     <constraints>
-                        <constraint firstAttribute="bottom" secondItem="Rjk-Q6-FYy" secondAttribute="bottom" constant="10" id="3Mz-ox-bKx"/>
+                        <constraint firstAttribute="bottom" secondItem="Rjk-Q6-FYy" secondAttribute="bottom" constant="8" id="3Mz-ox-bKx"/>
                         <constraint firstItem="jfA-Vr-sQc" firstAttribute="centerY" secondItem="Rjk-Q6-FYy" secondAttribute="centerY" id="8oA-Mf-ETE"/>
-                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="jfA-Vr-sQc" secondAttribute="bottom" constant="10" id="9QR-39-n17"/>
+                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="jfA-Vr-sQc" secondAttribute="bottom" constant="8" id="9QR-39-n17"/>
                         <constraint firstAttribute="height" constant="40" id="9YN-h6-4ls"/>
-                        <constraint firstItem="jfA-Vr-sQc" firstAttribute="leading" secondItem="LIN-LZ-lhm" secondAttribute="leading" constant="10" id="HIi-nl-quS"/>
-                        <constraint firstItem="jfA-Vr-sQc" firstAttribute="top" relation="greaterThanOrEqual" secondItem="LIN-LZ-lhm" secondAttribute="top" constant="10" id="Yux-Fa-4q2"/>
-                        <constraint firstItem="Rjk-Q6-FYy" firstAttribute="leading" secondItem="jfA-Vr-sQc" secondAttribute="trailing" constant="10" id="afa-is-HaB"/>
-                        <constraint firstItem="Rjk-Q6-FYy" firstAttribute="top" secondItem="LIN-LZ-lhm" secondAttribute="top" constant="10" id="dMk-ci-d2B"/>
-                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Rjk-Q6-FYy" secondAttribute="trailing" constant="10" id="iDS-9I-EBt"/>
+                        <constraint firstItem="jfA-Vr-sQc" firstAttribute="leading" secondItem="LIN-LZ-lhm" secondAttribute="leading" constant="8" id="HIi-nl-quS"/>
+                        <constraint firstItem="jfA-Vr-sQc" firstAttribute="top" relation="greaterThanOrEqual" secondItem="LIN-LZ-lhm" secondAttribute="top" constant="8" id="Yux-Fa-4q2"/>
+                        <constraint firstItem="Rjk-Q6-FYy" firstAttribute="leading" secondItem="jfA-Vr-sQc" secondAttribute="trailing" constant="8" id="afa-is-HaB"/>
+                        <constraint firstItem="Rjk-Q6-FYy" firstAttribute="top" secondItem="LIN-LZ-lhm" secondAttribute="top" constant="8" id="dMk-ci-d2B"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Rjk-Q6-FYy" secondAttribute="trailing" constant="8" id="iDS-9I-EBt"/>
                     </constraints>
                 </visualEffectView>
             </subviews>
@@ -1123,7 +1123,7 @@
                                     <collectionView selectable="YES" allowsMultipleSelection="YES" id="ZGR-PZ-7h5" customClass="VLCLibraryCollectionView">
                                         <rect key="frame" x="0.0" y="0.0" width="415" height="390"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                        <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="od3-Iu-ch8">
+                                        <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="8" minimumLineSpacing="8" id="od3-Iu-ch8">
                                             <size key="itemSize" width="50" height="50"/>
                                         </collectionViewFlowLayout>
                                         <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1280,7 +1280,7 @@
                             <collectionView selectable="YES" allowsMultipleSelection="YES" id="QAt-jP-zE7" customClass="VLCLibraryCollectionView">
                                 <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="oKT-Ic-UdV">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="8" minimumLineSpacing="8" id="oKT-Ic-UdV">
                                     <size key="itemSize" width="50" height="50"/>
                                 </collectionViewFlowLayout>
                                 <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>

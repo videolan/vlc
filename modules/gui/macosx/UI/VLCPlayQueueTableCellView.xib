@@ -12,7 +12,7 @@
             <rect key="frame" x="0.0" y="0.0" width="398" height="58"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0Ge-7z-bq6">
+                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0Ge-7z-bq6">
                     <rect key="frame" x="97" y="1" width="245" height="56"/>
                     <subviews>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ohB-P0-nCv">
@@ -87,18 +87,18 @@
             </subviews>
             <constraints>
                 <constraint firstItem="Mk2-5A-q4g" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="7oz-36-KPx"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="10" id="8hv-Qt-uAI"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="8" id="8hv-Qt-uAI"/>
                 <constraint firstItem="0Ge-7z-bq6" firstAttribute="centerY" secondItem="3Ha-ZH-fa9" secondAttribute="centerY" id="DpI-8u-rFu"/>
                 <constraint firstItem="0Ge-7z-bq6" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="EXo-Wn-Jh5"/>
-                <constraint firstItem="97z-d7-S3D" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="5" id="FbP-R4-bAA"/>
+                <constraint firstItem="97z-d7-S3D" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="FbP-R4-bAA"/>
                 <constraint firstItem="Mk2-5A-q4g" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="leading" id="S9m-bB-HBd"/>
-                <constraint firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="trailing" constant="10" id="SVJ-UL-O5m"/>
-                <constraint firstAttribute="bottom" secondItem="97z-d7-S3D" secondAttribute="bottom" constant="5" id="XfR-Fd-n6o"/>
-                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="5" id="aVd-Ld-lUH"/>
-                <constraint firstItem="0Ge-7z-bq6" firstAttribute="leading" secondItem="97z-d7-S3D" secondAttribute="trailing" constant="10" id="adC-9f-And"/>
+                <constraint firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="trailing" constant="8" id="SVJ-UL-O5m"/>
+                <constraint firstAttribute="bottom" secondItem="97z-d7-S3D" secondAttribute="bottom" constant="4" id="XfR-Fd-n6o"/>
+                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="4" id="aVd-Ld-lUH"/>
+                <constraint firstItem="0Ge-7z-bq6" firstAttribute="leading" secondItem="97z-d7-S3D" secondAttribute="trailing" constant="8" id="adC-9f-And"/>
                 <constraint firstItem="97z-d7-S3D" firstAttribute="trailing" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" id="bzC-Km-KOo"/>
-                <constraint firstItem="0Ge-7z-bq6" firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="leading" constant="-10" id="dSC-Pq-ml2"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="5" id="iPZ-zR-jTv"/>
+                <constraint firstItem="0Ge-7z-bq6" firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="leading" constant="-8" id="dSC-Pq-ml2"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="iPZ-zR-jTv"/>
             </constraints>
             <connections>
                 <outlet property="artistTextField" destination="TPv-k2-6XS" id="jJV-4C-USY"/>

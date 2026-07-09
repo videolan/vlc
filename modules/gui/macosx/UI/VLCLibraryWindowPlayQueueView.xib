@@ -185,10 +185,10 @@
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="bottom" secondItem="hc5-GJ-yJe" secondAttribute="bottom" id="0Wh-UN-tLi"/>
-                        <constraint firstItem="hc5-GJ-yJe" firstAttribute="leading" secondItem="ftr-ct-999" secondAttribute="leading" constant="20" symbolic="YES" id="Saj-PQ-UQL"/>
+                        <constraint firstItem="hc5-GJ-yJe" firstAttribute="leading" secondItem="ftr-ct-999" secondAttribute="leading" constant="16" symbolic="YES" id="Saj-PQ-UQL"/>
                         <constraint firstAttribute="height" constant="50" id="ftr-h-001"/>
-                        <constraint firstItem="ew3-Pn-diG" firstAttribute="leading" secondItem="ftr-ct-999" secondAttribute="leading" constant="20" id="ftr-l-001"/>
-                        <constraint firstAttribute="trailing" secondItem="ew3-Pn-diG" secondAttribute="trailing" constant="20" id="ftr-t-001"/>
+                        <constraint firstItem="ew3-Pn-diG" firstAttribute="leading" secondItem="ftr-ct-999" secondAttribute="leading" constant="16" id="ftr-l-001"/>
+                        <constraint firstAttribute="trailing" secondItem="ew3-Pn-diG" secondAttribute="trailing" constant="16" id="ftr-t-001"/>
                         <constraint firstItem="ew3-Pn-diG" firstAttribute="top" secondItem="ftr-ct-999" secondAttribute="top" id="ftr-top-001"/>
                         <constraint firstAttribute="trailing" secondItem="hc5-GJ-yJe" secondAttribute="trailing" id="nNk-FA-MRz"/>
                         <constraint firstItem="hc5-GJ-yJe" firstAttribute="top" secondItem="ftr-ct-999" secondAttribute="top" id="pJc-3i-ul8"/>
@@ -228,7 +228,7 @@
                         <constraint firstItem="qv6-Mn-ifA" firstAttribute="centerY" secondItem="grx-kk-1X1" secondAttribute="centerY" id="AO4-Hd-L52"/>
                         <constraint firstItem="aUB-Ld-N2o" firstAttribute="centerX" secondItem="qv6-Mn-ifA" secondAttribute="centerX" id="DKc-9E-HYo"/>
                         <constraint firstItem="aUB-Ld-N2o" firstAttribute="width" secondItem="qv6-Mn-ifA" secondAttribute="width" multiplier="1.2" id="Jkb-0O-auX"/>
-                        <constraint firstItem="ghp-DI-YmZ" firstAttribute="top" secondItem="aUB-Ld-N2o" secondAttribute="bottom" constant="10" id="XFC-9r-Q8L"/>
+                        <constraint firstItem="ghp-DI-YmZ" firstAttribute="top" secondItem="aUB-Ld-N2o" secondAttribute="bottom" constant="8" id="XFC-9r-Q8L"/>
                         <constraint firstItem="aUB-Ld-N2o" firstAttribute="height" secondItem="qv6-Mn-ifA" secondAttribute="height" multiplier="1.2" id="eJ2-wz-BJL"/>
                         <constraint firstItem="ghp-DI-YmZ" firstAttribute="centerX" secondItem="qv6-Mn-ifA" secondAttribute="centerX" id="gL5-uR-Smy"/>
                         <constraint firstItem="aUB-Ld-N2o" firstAttribute="centerY" secondItem="qv6-Mn-ifA" secondAttribute="centerY" id="yfU-xa-zSE"/>
@@ -240,10 +240,10 @@
                 <constraint firstItem="ik5-L4-VLw" firstAttribute="top" secondItem="NJR-gf-yTs" secondAttribute="top" id="1za-9j-6sD"/>
                 <constraint firstAttribute="trailing" secondItem="grx-kk-1X1" secondAttribute="trailing" id="4CB-HB-Om0"/>
                 <constraint firstItem="grx-kk-1X1" firstAttribute="top" secondItem="ik5-L4-VLw" secondAttribute="bottom" id="AoR-Q7-XYJ"/>
-                <constraint firstItem="ik5-L4-VLw" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" constant="20" id="CW2-KK-Z5t"/>
+                <constraint firstItem="ik5-L4-VLw" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" constant="16" id="CW2-KK-Z5t"/>
                 <constraint firstItem="EIb-Is-vco" firstAttribute="top" secondItem="ik5-L4-VLw" secondAttribute="bottom" id="Cyw-MK-W8n"/>
                 <constraint firstAttribute="trailing" secondItem="EIb-Is-vco" secondAttribute="trailing" id="UAJ-gH-fWy"/>
-                <constraint firstAttribute="trailing" secondItem="ik5-L4-VLw" secondAttribute="trailing" constant="20" id="ef5-v1-Rm6"/>
+                <constraint firstAttribute="trailing" secondItem="ik5-L4-VLw" secondAttribute="trailing" constant="16" id="ef5-v1-Rm6"/>
                 <constraint firstAttribute="bottom" secondItem="ftr-ct-999" secondAttribute="bottom" id="ftr-bot-999"/>
                 <constraint firstItem="ftr-ct-999" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" id="ftr-lead-999"/>
                 <constraint firstAttribute="trailing" secondItem="ftr-ct-999" secondAttribute="trailing" id="ftr-trail-999"/>

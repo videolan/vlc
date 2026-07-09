@@ -66,19 +66,19 @@
                             </progressIndicator>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="2258" secondAttribute="bottom" constant="10" id="FaY-hq-qr1"/>
-                            <constraint firstItem="2256" firstAttribute="top" secondItem="FtB-z3-gSh" secondAttribute="top" constant="10" id="Hoe-j8-9a3"/>
-                            <constraint firstItem="2257" firstAttribute="leading" secondItem="2256" secondAttribute="trailing" constant="5" id="Kcg-D1-gaL"/>
-                            <constraint firstItem="2257" firstAttribute="top" secondItem="FtB-z3-gSh" secondAttribute="top" constant="10" id="LxE-Q8-gUz"/>
-                            <constraint firstAttribute="bottom" secondItem="d97-0g-MPE" secondAttribute="bottom" constant="10" id="QwV-el-tJ7"/>
-                            <constraint firstItem="d97-0g-MPE" firstAttribute="top" secondItem="FtB-z3-gSh" secondAttribute="top" constant="10" id="RZ2-3B-lrf"/>
-                            <constraint firstAttribute="bottom" secondItem="2256" secondAttribute="bottom" constant="10" id="UD7-Co-ctx"/>
-                            <constraint firstAttribute="trailing" secondItem="d97-0g-MPE" secondAttribute="trailing" constant="10" id="gWB-OK-EUY"/>
-                            <constraint firstAttribute="bottom" secondItem="2257" secondAttribute="bottom" constant="10" id="ld4-Qs-QKq"/>
-                            <constraint firstItem="2258" firstAttribute="leading" secondItem="2257" secondAttribute="trailing" constant="5" id="ocS-aj-xnD"/>
+                            <constraint firstAttribute="bottom" secondItem="2258" secondAttribute="bottom" constant="8" id="FaY-hq-qr1"/>
+                            <constraint firstItem="2256" firstAttribute="top" secondItem="FtB-z3-gSh" secondAttribute="top" constant="8" id="Hoe-j8-9a3"/>
+                            <constraint firstItem="2257" firstAttribute="leading" secondItem="2256" secondAttribute="trailing" constant="4" id="Kcg-D1-gaL"/>
+                            <constraint firstItem="2257" firstAttribute="top" secondItem="FtB-z3-gSh" secondAttribute="top" constant="8" id="LxE-Q8-gUz"/>
+                            <constraint firstAttribute="bottom" secondItem="d97-0g-MPE" secondAttribute="bottom" constant="8" id="QwV-el-tJ7"/>
+                            <constraint firstItem="d97-0g-MPE" firstAttribute="top" secondItem="FtB-z3-gSh" secondAttribute="top" constant="8" id="RZ2-3B-lrf"/>
+                            <constraint firstAttribute="bottom" secondItem="2256" secondAttribute="bottom" constant="8" id="UD7-Co-ctx"/>
+                            <constraint firstAttribute="trailing" secondItem="d97-0g-MPE" secondAttribute="trailing" constant="8" id="gWB-OK-EUY"/>
+                            <constraint firstAttribute="bottom" secondItem="2257" secondAttribute="bottom" constant="8" id="ld4-Qs-QKq"/>
+                            <constraint firstItem="2258" firstAttribute="leading" secondItem="2257" secondAttribute="trailing" constant="4" id="ocS-aj-xnD"/>
                             <constraint firstAttribute="height" constant="40" id="ohq-yT-YZR"/>
-                            <constraint firstItem="2258" firstAttribute="top" secondItem="FtB-z3-gSh" secondAttribute="top" constant="10" id="wNK-tJ-Ti3"/>
-                            <constraint firstItem="2256" firstAttribute="leading" secondItem="FtB-z3-gSh" secondAttribute="leading" constant="10" id="ypi-IG-Txn"/>
+                            <constraint firstItem="2258" firstAttribute="top" secondItem="FtB-z3-gSh" secondAttribute="top" constant="8" id="wNK-tJ-Ti3"/>
+                            <constraint firstItem="2256" firstAttribute="leading" secondItem="FtB-z3-gSh" secondAttribute="leading" constant="8" id="ypi-IG-Txn"/>
                         </constraints>
                     </visualEffectView>
                 </subviews>

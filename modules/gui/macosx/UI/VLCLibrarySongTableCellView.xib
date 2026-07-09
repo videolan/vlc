@@ -57,10 +57,10 @@
                 </textField>
             </subviews>
             <constraints>
-                <constraint firstItem="ohB-P0-nCv" firstAttribute="trailing" secondItem="XNL-fH-9bU" secondAttribute="leading" constant="-20" id="8Vs-Dy-2RI"/>
-                <constraint firstItem="Wzl-zu-AHr" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="10" id="E8L-qx-YEb"/>
+                <constraint firstItem="ohB-P0-nCv" firstAttribute="trailing" secondItem="XNL-fH-9bU" secondAttribute="leading" constant="-16" id="8Vs-Dy-2RI"/>
+                <constraint firstItem="Wzl-zu-AHr" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="8" id="E8L-qx-YEb"/>
                 <constraint firstItem="ffE-px-l0g" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="EMs-It-nUH"/>
-                <constraint firstItem="XNL-fH-9bU" firstAttribute="trailing" secondItem="ffE-px-l0g" secondAttribute="trailing" constant="-10" id="Ea2-S4-L6B"/>
+                <constraint firstItem="XNL-fH-9bU" firstAttribute="trailing" secondItem="ffE-px-l0g" secondAttribute="trailing" constant="-8" id="Ea2-S4-L6B"/>
                 <constraint firstAttribute="bottom" secondItem="ffE-px-l0g" secondAttribute="bottom" id="I7D-8N-oA1"/>
                 <constraint firstItem="ohB-P0-nCv" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="JWS-cd-lGO"/>
                 <constraint firstItem="ffE-px-l0g" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="M01-2i-CLZ"/>
@@ -68,7 +68,7 @@
                 <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="bhc-Wp-rhJ"/>
                 <constraint firstItem="XNL-fH-9bU" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="deD-eW-OHk"/>
                 <constraint firstItem="ohB-P0-nCv" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="52" id="fC0-Qy-VzP"/>
-                <constraint firstItem="NFZ-x0-t5c" firstAttribute="leading" secondItem="ffE-px-l0g" secondAttribute="leading" constant="10" id="laI-Bm-0fz"/>
+                <constraint firstItem="NFZ-x0-t5c" firstAttribute="leading" secondItem="ffE-px-l0g" secondAttribute="leading" constant="8" id="laI-Bm-0fz"/>
                 <constraint firstAttribute="trailing" secondItem="ffE-px-l0g" secondAttribute="trailing" id="m4c-HB-V5e"/>
                 <constraint firstItem="Wzl-zu-AHr" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="rwm-3K-L1o"/>
             </constraints>

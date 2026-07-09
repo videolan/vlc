@@ -21,7 +21,7 @@
                         <constraint firstAttribute="width" secondItem="Ydb-7n-5Cd" secondAttribute="height" multiplier="1:1" id="4aB-rs-m22"/>
                     </constraints>
                 </customView>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2yt-Ph-v3B">
+                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2yt-Ph-v3B">
                     <rect key="frame" x="76" y="7" width="312" height="58"/>
                     <subviews>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
@@ -87,18 +87,18 @@
             <constraints>
                 <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerX" secondItem="Ydb-7n-5Cd" secondAttribute="centerX" id="0Eb-LH-6nF"/>
                 <constraint firstItem="9U4-xB-uBz" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" id="2hg-4x-fvu"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="5" id="8hv-Qt-uAI"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="4" id="8hv-Qt-uAI"/>
                 <constraint firstItem="9U4-xB-uBz" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="BrT-ZR-zAc"/>
                 <constraint firstItem="ffE-px-l0g" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="EMs-It-nUH"/>
                 <constraint firstAttribute="bottom" secondItem="ffE-px-l0g" secondAttribute="bottom" id="I7D-8N-oA1"/>
                 <constraint firstItem="ffE-px-l0g" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="M01-2i-CLZ"/>
                 <constraint firstItem="2yt-Ph-v3B" firstAttribute="centerY" secondItem="ffE-px-l0g" secondAttribute="centerY" id="Xsk-fe-nEI"/>
-                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="5" id="aVd-Ld-lUH"/>
+                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="4" id="aVd-Ld-lUH"/>
                 <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="dRw-WH-Y00"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="5" id="iPZ-zR-jTv"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="iPZ-zR-jTv"/>
                 <constraint firstAttribute="trailing" secondItem="ffE-px-l0g" secondAttribute="trailing" id="m4c-HB-V5e"/>
-                <constraint firstItem="2yt-Ph-v3B" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="10" id="svv-3z-IWh"/>
-                <constraint firstAttribute="trailing" secondItem="2yt-Ph-v3B" secondAttribute="trailing" constant="10" id="uti-Wq-BEz"/>
+                <constraint firstItem="2yt-Ph-v3B" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="8" id="svv-3z-IWh"/>
+                <constraint firstAttribute="trailing" secondItem="2yt-Ph-v3B" secondAttribute="trailing" constant="8" id="uti-Wq-BEz"/>
             </constraints>
             <connections>
                 <outlet property="playInstantlyButton" destination="NFZ-x0-t5c" id="suD-1u-UrY"/>

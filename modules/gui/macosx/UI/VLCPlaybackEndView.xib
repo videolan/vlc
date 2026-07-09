@@ -76,20 +76,20 @@
             <constraints>
                 <constraint firstItem="C5J-Xc-NJc" firstAttribute="centerX" secondItem="NcL-Nn-hUb" secondAttribute="centerX" id="6R0-qc-UGn"/>
                 <constraint firstItem="huG-UY-8W9" firstAttribute="leading" secondItem="jN5-TU-5uH" secondAttribute="leading" id="8qx-OA-DDQ"/>
-                <constraint firstItem="jN5-TU-5uH" firstAttribute="top" secondItem="NcL-Nn-hUb" secondAttribute="top" constant="20" id="Bae-6M-XVS"/>
+                <constraint firstItem="jN5-TU-5uH" firstAttribute="top" secondItem="NcL-Nn-hUb" secondAttribute="top" constant="16" id="Bae-6M-XVS"/>
                 <constraint firstItem="jN5-TU-5uH" firstAttribute="centerX" secondItem="NcL-Nn-hUb" secondAttribute="centerX" id="M51-kv-EP2"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="huG-UY-8W9" secondAttribute="trailing" constant="20" id="MbH-DN-TXI"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="huG-UY-8W9" secondAttribute="trailing" constant="16" id="MbH-DN-TXI"/>
                 <constraint firstItem="huG-UY-8W9" firstAttribute="trailing" secondItem="jN5-TU-5uH" secondAttribute="trailing" id="Q7l-NQ-MIx"/>
-                <constraint firstItem="jN5-TU-5uH" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NcL-Nn-hUb" secondAttribute="leading" constant="20" id="SWK-YP-EHJ"/>
+                <constraint firstItem="jN5-TU-5uH" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NcL-Nn-hUb" secondAttribute="leading" constant="16" id="SWK-YP-EHJ"/>
                 <constraint firstItem="C5J-Xc-NJc" firstAttribute="trailing" secondItem="jN5-TU-5uH" secondAttribute="trailing" id="UgU-D1-V5D"/>
-                <constraint firstItem="C5J-Xc-NJc" firstAttribute="top" secondItem="jN5-TU-5uH" secondAttribute="bottom" constant="10" id="VgY-k7-miC"/>
-                <constraint firstItem="huG-UY-8W9" firstAttribute="top" secondItem="C5J-Xc-NJc" secondAttribute="bottom" constant="20" id="Wk4-Fh-M3Z"/>
-                <constraint firstItem="huG-UY-8W9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NcL-Nn-hUb" secondAttribute="leading" constant="20" id="X0f-L9-A1Y"/>
+                <constraint firstItem="C5J-Xc-NJc" firstAttribute="top" secondItem="jN5-TU-5uH" secondAttribute="bottom" constant="8" id="VgY-k7-miC"/>
+                <constraint firstItem="huG-UY-8W9" firstAttribute="top" secondItem="C5J-Xc-NJc" secondAttribute="bottom" constant="16" id="Wk4-Fh-M3Z"/>
+                <constraint firstItem="huG-UY-8W9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NcL-Nn-hUb" secondAttribute="leading" constant="16" id="X0f-L9-A1Y"/>
                 <constraint firstItem="C5J-Xc-NJc" firstAttribute="leading" secondItem="jN5-TU-5uH" secondAttribute="leading" id="Y4B-nN-ley"/>
                 <constraint firstItem="huG-UY-8W9" firstAttribute="centerX" secondItem="NcL-Nn-hUb" secondAttribute="centerX" id="mVr-Ig-tg3"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jN5-TU-5uH" secondAttribute="trailing" constant="20" id="nWw-9e-tGN"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jN5-TU-5uH" secondAttribute="trailing" constant="16" id="nWw-9e-tGN"/>
                 <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="149" id="owb-PL-E4y"/>
-                <constraint firstAttribute="bottom" secondItem="huG-UY-8W9" secondAttribute="bottom" constant="20" id="paw-6c-QHp"/>
+                <constraint firstAttribute="bottom" secondItem="huG-UY-8W9" secondAttribute="bottom" constant="16" id="paw-6c-QHp"/>
             </constraints>
             <point key="canvasLocation" x="286" y="184.5"/>
         </visualEffectView>

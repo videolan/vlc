@@ -13,10 +13,10 @@
             <rect key="frame" x="0.0" y="0.0" width="1071" height="312"/>
             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
             <subviews>
-                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FWp-yd-2Pm">
+                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FWp-yd-2Pm">
                     <rect key="frame" x="10" y="0.0" width="1051" height="282"/>
                     <subviews>
-                        <stackView distribution="equalCentering" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TOx-1e-6D9">
+                        <stackView distribution="equalCentering" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TOx-1e-6D9">
                             <rect key="frame" x="0.0" y="10" width="237" height="272"/>
                             <subviews>
                                 <imageView translatesAutoresizingMaskIntoConstraints="NO" id="xZd-Hk-h2M" customClass="VLCImageView">
@@ -26,7 +26,7 @@
                                     </constraints>
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="no-art" id="6X6-Og-u8A"/>
                                 </imageView>
-                                <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Nc-Mb-wDa">
+                                <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Nc-Mb-wDa">
                                     <rect key="frame" x="0.0" y="0.0" width="237" height="28"/>
                                     <subviews>
                                         <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ntd-VT-2KS">
@@ -78,7 +78,7 @@
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
                             <rect key="frame" x="257" y="0.0" width="794" height="282"/>
                             <subviews>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="nCe-dY-YMM">
@@ -126,11 +126,11 @@
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="leading" secondItem="o9Q-0s-xRU" secondAttribute="trailing" constant="5" id="5IX-1t-Psn"/>
-                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="leading" constant="-5" id="88t-Jp-57R"/>
+                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="leading" secondItem="o9Q-0s-xRU" secondAttribute="trailing" constant="4" id="5IX-1t-Psn"/>
+                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="leading" constant="-4" id="88t-Jp-57R"/>
                                         <constraint firstItem="o9Q-0s-xRU" firstAttribute="top" secondItem="SvO-zd-2zo" secondAttribute="top" id="QuO-Ev-i98"/>
                                         <constraint firstItem="QuO-3G-BMT" firstAttribute="centerY" secondItem="SvO-zd-2zo" secondAttribute="centerY" id="TX6-cF-dnh"/>
-                                        <constraint firstAttribute="trailing" secondItem="QuO-3G-BMT" secondAttribute="trailing" constant="15" id="Wfo-47-OGd"/>
+                                        <constraint firstAttribute="trailing" secondItem="QuO-3G-BMT" secondAttribute="trailing" constant="12" id="Wfo-47-OGd"/>
                                         <constraint firstItem="jNq-xn-yIp" firstAttribute="top" secondItem="SvO-zd-2zo" secondAttribute="top" id="eBH-UW-wtK"/>
                                         <constraint firstAttribute="bottom" secondItem="o9Q-0s-xRU" secondAttribute="bottom" id="lvh-r5-QzT"/>
                                         <constraint firstAttribute="bottom" secondItem="jNq-xn-yIp" secondAttribute="bottom" id="msf-KD-aoJ"/>
@@ -178,7 +178,7 @@
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="Hpe-5w-QJh"/>
                                     </constraints>
-                                    <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="10"/>
+                                    <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="8"/>
                                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ZBY-pE-E7T">
                                         <rect key="frame" x="-100" y="-100" width="701" height="15"/>
                                         <autoresizingMask key="autoresizingMask"/>
@@ -206,7 +206,7 @@
                     </subviews>
                     <constraints>
                         <constraint firstItem="TOx-1e-6D9" firstAttribute="top" secondItem="FWp-yd-2Pm" secondAttribute="top" id="7hM-jR-3N3"/>
-                        <constraint firstAttribute="bottom" secondItem="TOx-1e-6D9" secondAttribute="bottom" constant="10" id="bdR-rj-nKk"/>
+                        <constraint firstAttribute="bottom" secondItem="TOx-1e-6D9" secondAttribute="bottom" constant="8" id="bdR-rj-nKk"/>
                         <constraint firstAttribute="bottom" secondItem="bw7-QB-Ssc" secondAttribute="bottom" id="elF-5e-5LQ"/>
                         <constraint firstAttribute="trailing" secondItem="bw7-QB-Ssc" secondAttribute="trailing" id="uvg-NE-l4m"/>
                         <constraint firstItem="TOx-1e-6D9" firstAttribute="leading" secondItem="FWp-yd-2Pm" secondAttribute="leading" id="vAN-Ww-VKA"/>
@@ -223,10 +223,10 @@
                 </stackView>
             </subviews>
             <constraints>
-                <constraint firstItem="FWp-yd-2Pm" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="10" id="D62-3E-aDO"/>
-                <constraint firstItem="FWp-yd-2Pm" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="30" id="Mr1-w0-CQK"/>
+                <constraint firstItem="FWp-yd-2Pm" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="8" id="D62-3E-aDO"/>
+                <constraint firstItem="FWp-yd-2Pm" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="28" id="Mr1-w0-CQK"/>
                 <constraint firstAttribute="bottom" secondItem="FWp-yd-2Pm" secondAttribute="bottom" id="bUH-jE-TQQ"/>
-                <constraint firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" constant="10" id="cPm-6m-umY"/>
+                <constraint firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" constant="8" id="cPm-6m-umY"/>
             </constraints>
             <connections>
                 <outlet property="artworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>

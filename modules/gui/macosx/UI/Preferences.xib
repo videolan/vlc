@@ -165,13 +165,13 @@ Gw
                     <constraint firstItem="1538" firstAttribute="top" secondItem="2257" secondAttribute="bottom" constant="7" id="Ivl-m2-fvE"/>
                     <constraint firstItem="2257" firstAttribute="leading" secondItem="1538" secondAttribute="leading" id="NPf-MA-q4f"/>
                     <constraint firstItem="1543" firstAttribute="centerY" secondItem="1541" secondAttribute="centerY" id="Vpv-Zr-yLP"/>
-                    <constraint firstItem="3642" firstAttribute="top" secondItem="1538" secondAttribute="bottom" constant="20" id="WJB-3D-P2K"/>
+                    <constraint firstItem="3642" firstAttribute="top" secondItem="1538" secondAttribute="bottom" constant="16" id="WJB-3D-P2K"/>
                     <constraint firstItem="1543" firstAttribute="leading" secondItem="1542" secondAttribute="trailing" constant="12" id="WUZ-Ec-Dy6"/>
-                    <constraint firstAttribute="trailing" secondItem="1538" secondAttribute="trailing" constant="20" id="YaP-lr-3wR"/>
-                    <constraint firstItem="1538" firstAttribute="leading" secondItem="1531" secondAttribute="leading" constant="20" id="jlx-ru-nhU"/>
+                    <constraint firstAttribute="trailing" secondItem="1538" secondAttribute="trailing" constant="16" id="YaP-lr-3wR"/>
+                    <constraint firstItem="1538" firstAttribute="leading" secondItem="1531" secondAttribute="leading" constant="16" id="jlx-ru-nhU"/>
                     <constraint firstItem="3642" firstAttribute="centerY" secondItem="1542" secondAttribute="centerY" id="kqW-3o-Aq8"/>
-                    <constraint firstItem="3642" firstAttribute="leading" secondItem="1531" secondAttribute="leading" constant="20" id="qWn-GY-q1c"/>
-                    <constraint firstAttribute="trailing" secondItem="1541" secondAttribute="trailing" constant="20" id="vud-1E-bef"/>
+                    <constraint firstItem="3642" firstAttribute="leading" secondItem="1531" secondAttribute="leading" constant="16" id="qWn-GY-q1c"/>
+                    <constraint firstAttribute="trailing" secondItem="1541" secondAttribute="trailing" constant="16" id="vud-1E-bef"/>
                 </constraints>
             </view>
         </window>

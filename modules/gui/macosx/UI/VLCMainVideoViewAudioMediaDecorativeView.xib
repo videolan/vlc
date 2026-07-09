@@ -100,12 +100,12 @@
             </subviews>
             <constraints>
                 <constraint firstItem="40P-sL-Mzq" firstAttribute="centerX" secondItem="WRu-Ic-lQK" secondAttribute="centerX" id="4Ib-c0-egD"/>
-                <constraint firstItem="40P-sL-Mzq" firstAttribute="bottom" relation="lessThanOrEqual" secondItem="D1e-fS-bwO" secondAttribute="bottom" constant="-20" id="DHs-x0-cB0"/>
+                <constraint firstItem="40P-sL-Mzq" firstAttribute="bottom" relation="lessThanOrEqual" secondItem="D1e-fS-bwO" secondAttribute="bottom" constant="-16" id="DHs-x0-cB0"/>
                 <constraint firstAttribute="trailing" secondItem="D1e-fS-bwO" secondAttribute="trailing" id="J68-x2-cY5"/>
                 <constraint firstItem="D1e-fS-bwO" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="KBI-Gr-tTT"/>
                 <constraint firstItem="40P-sL-Mzq" firstAttribute="width" relation="lessThanOrEqual" secondItem="D1e-fS-bwO" secondAttribute="width" multiplier="0.4" id="Kuw-Nx-ZmH"/>
                 <constraint firstAttribute="bottom" secondItem="cDv-dn-65H" secondAttribute="bottom" id="Sv1-Hf-eCe"/>
-                <constraint firstItem="40P-sL-Mzq" firstAttribute="top" relation="greaterThanOrEqual" secondItem="D1e-fS-bwO" secondAttribute="top" constant="20" id="TVt-Xt-aoo"/>
+                <constraint firstItem="40P-sL-Mzq" firstAttribute="top" relation="greaterThanOrEqual" secondItem="D1e-fS-bwO" secondAttribute="top" constant="16" id="TVt-Xt-aoo"/>
                 <constraint firstItem="cDv-dn-65H" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="bZL-GN-AAt"/>
                 <constraint firstItem="cDv-dn-65H" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="dvc-kq-jk8"/>
                 <constraint firstItem="D1e-fS-bwO" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="eDP-U6-Qt6"/>
