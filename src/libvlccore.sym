@@ -203,6 +203,7 @@ input_item_DelInfo
 input_item_GetDuration
 input_item_GetInfo
 input_item_GetInfoLocked
+input_item_GetLibvlcOwner
 input_item_GetMeta
 input_item_GetMetaLocked
 input_item_GetName
@@ -225,6 +226,7 @@ input_item_node_Create
 input_item_node_Delete
 input_item_ReplaceInfos
 input_item_SetDuration
+input_item_SetLibvlcOwner
 input_item_SetMeta
 input_item_SetName
 input_item_SetURI

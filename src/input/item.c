@@ -406,6 +406,24 @@ input_item_t *input_item_Hold( input_item_t *p_item )
     return p_item;
 }
 
+void *
+input_item_GetLibvlcOwner(input_item_t *item)
+{
+    input_item_owner_t *owner = item_owner(item);
+
+    return owner->libvlc_owner;
+}
+
+void
+input_item_SetLibvlcOwner(input_item_t *item, void *libvlc_owner,
+                          void (*release)(void *))
+{
+    input_item_owner_t *owner = item_owner(item);
+
+    owner->libvlc_owner = libvlc_owner;
+    owner->libvlc_owner_release = release;
+}
+
 void input_item_Release( input_item_t *p_item )
 {
     input_item_owner_t *owner = item_owner(p_item);
@@ -413,8 +431,8 @@ void input_item_Release( input_item_t *p_item )
     if( !vlc_atomic_rc_dec( &owner->rc ) )
         return;
 
-    if( p_item->libvlc_owner_release != NULL )
-        p_item->libvlc_owner_release( p_item->libvlc_owner );
+    if( owner->libvlc_owner_release != NULL )
+        owner->libvlc_owner_release( owner->libvlc_owner );
 
     free( p_item->psz_name );
     free( p_item->psz_uri );
@@ -982,6 +1000,8 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
         return NULL;
 
     vlc_atomic_rc_init( &owner->rc );
+    owner->libvlc_owner = NULL;
+    owner->libvlc_owner_release = NULL;
 
     input_item_t *p_input = &owner->item;
 

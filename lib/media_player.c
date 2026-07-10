@@ -85,7 +85,7 @@ on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
     libvlc_media_t *libmedia;
     if (new_media != NULL)
     {
-        libmedia = new_media->libvlc_owner;
+        libmedia = input_item_GetLibvlcOwner(new_media);
         assert(libmedia != NULL);
     }
     else
@@ -111,7 +111,7 @@ on_stopping_current_media(vlc_player_t *player, input_item_t *item,
     if (mp->cbs == NULL || mp->cbs->on_media_stopping == NULL)
         return;
 
-    libvlc_media_t *media = item->libvlc_owner;
+    libvlc_media_t *media = input_item_GetLibvlcOwner(item);
     assert(media != NULL);
 
     static_assert((int) VLC_PLAYER_MEDIA_STOPPING_ERROR == libvlc_stopping_reason_error &&
@@ -410,7 +410,7 @@ static void on_media_meta_changed(vlc_player_t *player,
     libvlc_media_player_t *mp = data;
 
     assert(media != NULL);
-    libvlc_media_t *libmedia = media->libvlc_owner;
+    libvlc_media_t *libmedia = input_item_GetLibvlcOwner(media);
     assert(libmedia != NULL);
 
     libvlc_media_parsed_status_t expected = libvlc_media_parsed_status_none;
@@ -432,7 +432,7 @@ on_media_subitems_changed(vlc_player_t *player, input_item_t *media,
     libvlc_media_player_t *mp = data;
 
     assert(media != NULL);
-    libvlc_media_t *libmedia = media->libvlc_owner;
+    libvlc_media_t *libmedia = input_item_GetLibvlcOwner(media);
     assert(libmedia != NULL);
 
     libvlc_media_add_subtree(libmedia, new_subitems);
@@ -448,11 +448,12 @@ on_media_attachments_added(vlc_player_t *player, input_item_t *item,
     (void) player;
 
     libvlc_media_player_t *mp = data;
-    assert(item == NULL || item->libvlc_owner != NULL);
+    assert(item == NULL || input_item_GetLibvlcOwner(item) != NULL);
 
     if (mp->cbs != NULL && mp->cbs->on_media_attachments_added != NULL)
     {
-        libvlc_media_t *p_md = item != NULL ? item->libvlc_owner : NULL;
+        libvlc_media_t *p_md = item != NULL
+                             ? input_item_GetLibvlcOwner(item) : NULL;
         libvlc_picture_list_t *list =
             libvlc_picture_list_from_attachments(array, count);
         if (list == NULL)
@@ -987,7 +988,7 @@ libvlc_media_player_get_media( libvlc_media_player_t *p_mi )
     input_item_t *item = vlc_player_GetCurrentMedia(p_mi->player);
     libvlc_media_t *p_m;
     if (item != NULL)
-        p_m = input_item_Hold(item)->libvlc_owner;
+        p_m = input_item_GetLibvlcOwner(input_item_Hold(item));
     else
         p_m = NULL;
 
@@ -1014,7 +1015,7 @@ libvlc_media_player_get_next_media( libvlc_media_player_t *p_mi )
     input_item_t *item = vlc_player_GetNextMedia(p_mi->player);
     libvlc_media_t *p_m;
     if (item != NULL)
-        p_m = input_item_Hold(item)->libvlc_owner;
+        p_m = input_item_GetLibvlcOwner(input_item_Hold(item));
     else
         p_m = NULL;
 

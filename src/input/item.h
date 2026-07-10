@@ -28,10 +28,23 @@
 
 void input_item_UpdateTracksInfo( input_item_t *item, const es_format_t *fmt,
                                   const char *es_id, bool stable );
+/**
+ * Set the libvlc owner (libvlc_media_t *) with a release callback
+ *
+ * Can only be set after the item is just created.
+ */
+VLC_API void input_item_SetLibvlcOwner(input_item_t *, void *,
+                                       void (*release)(void *));
+/**
+ * Get the libvlc owner (libvlc_media_t *)
+ */
+VLC_API void *input_item_GetLibvlcOwner(input_item_t *);
 
 typedef struct input_item_owner
 {
     input_item_t item;
+    void *libvlc_owner;
+    void (*libvlc_owner_release)(void *libvlc_owner);
     vlc_atomic_rc_t rc;
 } input_item_owner_t;
 

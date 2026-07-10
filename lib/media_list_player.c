@@ -326,7 +326,8 @@ internal_player_media_changed(vlc_player_t *player, input_item_t *new_media,
 
     /* Update the internal current path from the new media */
     libvlc_media_list_path_t path =
-        libvlc_media_list_path_of_item(p_mlp->p_mlist, new_media->libvlc_owner);
+        libvlc_media_list_path_of_item(p_mlp->p_mlist,
+                                      input_item_GetLibvlcOwner(new_media));
     if (p_mlp->current_playing_item_path != path)
     {
         free(p_mlp->current_playing_item_path);

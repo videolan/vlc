@@ -244,7 +244,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
     }
 
     /* The item is wrapped by a single media for its whole lifetime */
-    assert( p_input_item->libvlc_owner == NULL );
+    assert( input_item_GetLibvlcOwner( p_input_item ) == NULL );
 
     p_md = calloc( 1, sizeof(libvlc_media_t) );
     if( !p_md )
@@ -264,8 +264,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
 
     p_md->p_input_item      = p_input_item;
 
-    p_md->p_input_item->libvlc_owner = p_md;
-    p_md->p_input_item->libvlc_owner_release = media_destroy;
+    input_item_SetLibvlcOwner( p_md->p_input_item, p_md, media_destroy );
     atomic_init(&p_md->parsed_status, libvlc_media_parsed_status_none);
     p_md->req = NULL;
 

@@ -67,7 +67,8 @@ static void services_discovery_item_added( services_discovery_t *sd,
     if (p_md == NULL)
         return;
 
-    libvlc_media_t *parent_media = parent != NULL ? parent->libvlc_owner : NULL;
+    libvlc_media_t *parent_media = parent != NULL
+                                 ? input_item_GetLibvlcOwner( parent ) : NULL;
 
     libvlc_media_list_lock( p_mlist );
     libvlc_media_list_internal_add_media( p_mlist, p_md );
@@ -95,7 +96,7 @@ static void services_discovery_item_removed( services_discovery_t *sd,
     {
         p_md = libvlc_media_list_item_at_index( p_mdis->p_mlist, i );
         assert(p_md != NULL);
-        if( p_md == p_item->libvlc_owner )
+        if( p_md == input_item_GetLibvlcOwner( p_item ) )
         {
             libvlc_media_list_internal_remove_index( p_mdis->p_mlist, i );
             libvlc_media_list_unlock( p_mdis->p_mlist );

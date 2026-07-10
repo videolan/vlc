@@ -42,7 +42,7 @@ typedef enum libvlc_media_parsed_status_t
 
 /* A media is a wrapper of its input item and shares its reference count:
  * libvlc_media_retain()/libvlc_media_release() forward to the input item and
- * the media is destroyed with it (input_item_t.libvlc_owner_release). */
+ * the media is destroyed with it through input_item_SetLibvlcOwner(). */
 struct libvlc_media_t
 {
     input_item_t      *p_input_item;

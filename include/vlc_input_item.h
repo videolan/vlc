@@ -129,13 +129,6 @@ struct input_item_t
     enum input_item_type_e i_type;   /**< Type (file, disc, ... see input_item_type_e) */
     bool        b_net;               /**< Net: always true for TYPE_STREAM, it
                                           depends for others types */
-
-    void        *libvlc_owner;       /**< LibVLC private data, can only be set
-                                          before events are registered. */
-    void       (*libvlc_owner_release)(void *libvlc_owner);
-                                     /**< Called when the input item is
-                                          destroyed to release libvlc_owner,
-                                          same restrictions as libvlc_owner. */
 };
 
 #define INPUT_ITEM_URI_NOP "vlc://nop" /* dummy URI for node/directory items */

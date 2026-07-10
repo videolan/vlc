@@ -115,6 +115,11 @@ struct libvlc_instance_t
  * Other internal functions
  ***************************************************************************/
 
+/* Not synchronized: set the LibVLC owner before publishing the item. */
+VLC_API void *input_item_GetLibvlcOwner(input_item_t *);
+VLC_API void input_item_SetLibvlcOwner(input_item_t *, void *,
+                                       void (*release)(void *));
+
 /* Thread context */
 void libvlc_threads_init (void);
 void libvlc_threads_deinit (void);
