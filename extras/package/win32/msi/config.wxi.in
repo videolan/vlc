@@ -14,6 +14,12 @@
     <?define Version = "$(var.VerMajor).$(var.VerMinor).$(var.VerPatch)" ?>
     <?define VersionLong = "$(var.Version).$(var.VerExtra)" ?>
 
+    <?if "@HAVE_NLS_TRUE@" = "" ?>
+        <?define HaveLocale = "yes" ?>
+    <?else ?>
+        <?define HaveLocale = "no" ?>
+    <?endif ?>
+
     <?define SourceDir = "." ?>
 
     <?define Platform= "@WINDOWS_ARCH@" ?>
