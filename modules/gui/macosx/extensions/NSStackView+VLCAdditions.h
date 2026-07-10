@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCSpacingConstraint.h: MacOS X interface module
+ * NSStackView+VLCAdditions.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2026 VLC authors and VideoLAN
  *
@@ -20,14 +20,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "library/VLCLibraryUIUnits.h"
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-IB_DESIGNABLE
-@interface VLCSpacingConstraint : NSLayoutConstraint
+@interface NSStackView (VLCAdditions)
 
 @property (nonatomic) IBInspectable NSInteger spacingToken;
+@property (nonatomic) IBInspectable NSInteger edgeInsetsToken;
 
 @end
 

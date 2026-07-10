@@ -29,6 +29,13 @@ typedef NS_ENUM(NSUInteger, VLCLibraryCollectionViewItemAspectRatio) {
     VLCLibraryCollectionViewItemAspectRatioVideoItem,
 };
 
+typedef NS_ENUM(NSInteger, VLCSpacingToken) {
+    VLCSpacingTokenNone = 0,
+    VLCSpacingTokenSmall = 1,   // smallSpacing (4pt)
+    VLCSpacingTokenMedium = 2,  // mediumSpacing (8pt)
+    VLCSpacingTokenLarge = 3    // largeSpacing (16pt)
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;

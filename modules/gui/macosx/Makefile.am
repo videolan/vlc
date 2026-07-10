@@ -118,6 +118,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSScreen+VLCAdditions.m \
 	gui/macosx/extensions/NSScrollView+VLCAdditions.h \
 	gui/macosx/extensions/NSScrollView+VLCAdditions.m \
+	gui/macosx/extensions/NSStackView+VLCAdditions.h \
+	gui/macosx/extensions/NSStackView+VLCAdditions.m \
 	gui/macosx/extensions/NSString+Helpers.h \
 	gui/macosx/extensions/NSString+Helpers.m \
 	gui/macosx/extensions/NSView+VLCAdditions.h \
