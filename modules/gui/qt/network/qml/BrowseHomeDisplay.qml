@@ -206,6 +206,8 @@ Widgets.PageExt {
 
                 text: qsTr("Folders")
 
+                topPadding: 0
+
                 anchors.left: parent.left
                 anchors.right: parent.right
             }
