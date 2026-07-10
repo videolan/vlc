@@ -151,6 +151,11 @@
                                         <rect key="frame" x="220" y="5" width="376" height="40"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                        <integer value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                                 <rect key="frame" x="130" y="24" width="153" height="16"/>
                                                 <subviews>
                                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d0e-29-yNq" userLabel="Song Name">
@@ -335,6 +340,11 @@
                                         </constraints>
                                     </customView>
                                     <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                <integer value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                         <rect key="frame" x="612" y="5" width="188" height="40"/>
                                         <subviews>
                                             <button horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Bt8-jQ-hUr">

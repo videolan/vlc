@@ -166,6 +166,11 @@
                                                 </buttonCell>
                                             </button>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xR4-jH-evo">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                        <integer value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                                 <rect key="frame" x="373" y="10" width="117" height="32"/>
                                                 <subviews>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tJC-hA-c4P" customClass="VLCImageButton">

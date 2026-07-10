@@ -109,6 +109,11 @@
                                         </buttonCell>
                                     </button>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="San-L7-ZvB">
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                <integer value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                         <rect key="frame" x="20" y="59" width="167" height="53"/>
                                         <subviews>
                                             <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="lEW-MN-FFU">
@@ -152,9 +157,19 @@
                                         </connections>
                                     </slider>
                                     <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="8" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sJu-ZK-5QH">
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                <integer value="2"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                         <rect key="frame" x="207" y="59" width="522" height="28"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y8F-hr-iaW">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                        <integer value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                                 <rect key="frame" x="0.0" y="0.0" width="399" height="28"/>
                                                 <subviews>
                                                     <button wantsLayer="YES" horizontalHuggingPriority="500" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GHq-pt-nIe" customClass="VLCImageButton">
@@ -281,6 +296,11 @@
                                                 </customSpacing>
                                             </stackView>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zyp-45-IgR">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                        <integer value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                                 <rect key="frame" x="409" y="0.0" width="113" height="28"/>
                                                 <subviews>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="afi-4d-rQk" customClass="VLCImageButton">
@@ -421,6 +441,11 @@
                                 </shadow>
                             </customView>
                             <stackView wantsLayer="YES" distribution="fill" orientation="horizontal" alignment="centerY" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CvV-yX-Nbh">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                        <integer value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <rect key="frame" x="207" y="208" width="336" height="64"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="AXA-01-AU8" customClass="VLCImageButton">

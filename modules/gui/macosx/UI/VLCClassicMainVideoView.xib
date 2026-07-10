@@ -261,6 +261,11 @@
                                                 </customSpacing>
                                             </stackView>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RxE-YR-tOE">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                        <integer value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                                 <rect key="frame" x="741" y="5" width="128" height="28"/>
                                                 <subviews>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="x8O-Jz-KS8" customClass="VLCImageButton">
@@ -296,6 +301,11 @@
                                                 </customSpacing>
                                             </stackView>
                                             <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UCW-iN-Dk1">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                        <integer value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                                 <rect key="frame" x="874" y="5" width="148" height="28"/>
                                                 <subviews>
                                                     <button wantsLayer="YES" horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Lyr-Ics-Btn" customClass="VLCImageButton">
