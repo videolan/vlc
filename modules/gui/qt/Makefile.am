@@ -869,7 +869,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/ic_fluent_stop.svg \
 	pixmaps/icons/stream.svg \
 	pixmaps/icons/sync.svg \
-	pixmaps/icons/time.svg \
+	pixmaps/icons/ic_fluent_clock.svg \
 	pixmaps/icons/ic_fluent_globe.svg \
 	pixmaps/icons/topbar_filter.svg \
 	pixmaps/icons/ic_fluent_music_note_2.svg \

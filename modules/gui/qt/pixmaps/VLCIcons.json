@@ -71,7 +71,7 @@
         {"key":"space", "path": "./icons/space.svg"},
         {"key":"stop", "path": "./icons/ic_fluent_stop.svg"},
         {"key":"stream", "path": "./icons/stream.svg"},
-        {"key":"time", "path": "./icons/time.svg"},
+        {"key":"time", "path": "./icons/ic_fluent_clock.svg"},
         {"key":"topbar_discover", "path": "./icons/ic_fluent_globe.svg"},
         {"key":"topbar_music", "path": "./icons/ic_fluent_music_note_2.svg"},
         {"key":"topbar_network", "path": "./icons/ic_fluent_wifi_1.svg"},
