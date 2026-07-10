@@ -1,5 +1,5 @@
 /*****************************************************************************
- * NSStackView+VLCAdditions.h: MacOS X interface module
+ * VLCStackView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2026 VLC authors and VideoLAN
  *
@@ -21,10 +21,12 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "library/VLCLibraryUIUnits.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSStackView (VLCAdditions)
+IB_DESIGNABLE
+@interface VLCStackView : NSStackView
 
 @property (nonatomic) IBInspectable NSInteger spacingToken;
 @property (nonatomic) IBInspectable NSInteger edgeInsetsToken;

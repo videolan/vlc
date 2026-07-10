@@ -118,8 +118,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSScreen+VLCAdditions.m \
 	gui/macosx/extensions/NSScrollView+VLCAdditions.h \
 	gui/macosx/extensions/NSScrollView+VLCAdditions.m \
-	gui/macosx/extensions/NSStackView+VLCAdditions.h \
-	gui/macosx/extensions/NSStackView+VLCAdditions.m \
 	gui/macosx/extensions/NSString+Helpers.h \
 	gui/macosx/extensions/NSString+Helpers.m \
 	gui/macosx/extensions/NSView+VLCAdditions.h \
@@ -487,6 +485,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCSnowEffectView.m \
 	gui/macosx/views/VLCSpacingConstraint.h \
 	gui/macosx/views/VLCSpacingConstraint.m \
+	gui/macosx/views/VLCStackView.h \
+	gui/macosx/views/VLCStackView.m \
 	gui/macosx/views/VLCStatusNotifierView.h \
 	gui/macosx/views/VLCStatusNotifierView.m \
 	gui/macosx/views/VLCSubScrollView.h \

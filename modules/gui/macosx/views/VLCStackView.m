@@ -1,5 +1,5 @@
 /*****************************************************************************
- * NSStackView+VLCAdditions.m: MacOS X interface module
+ * VLCStackView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2026 VLC authors and VideoLAN
  *
@@ -20,29 +20,37 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "NSStackView+VLCAdditions.h"
+#import "VLCStackView.h"
 
-#import "library/VLCLibraryUIUnits.h"
+@implementation VLCStackView
 
-@implementation NSStackView (VLCAdditions)
-
-- (NSInteger)spacingToken
+- (void)awakeFromNib
 {
-    CGFloat spacing = self.spacing;
-    if (spacing == VLCLibraryUIUnits.smallSpacing) {
-        return VLCSpacingTokenSmall;
-    } else if (spacing == VLCLibraryUIUnits.mediumSpacing) {
-        return VLCSpacingTokenMedium;
-    } else if (spacing == VLCLibraryUIUnits.largeSpacing) {
-        return VLCSpacingTokenLarge;
-    }
-    return VLCSpacingTokenNone;
+    [super awakeFromNib];
+    [self applySpacingToken];
+    [self applyEdgeInsetsToken];
 }
 
 - (void)setSpacingToken:(NSInteger)spacingToken
 {
+    _spacingToken = spacingToken;
+    [self applySpacingToken];
+}
+
+- (void)setEdgeInsetsToken:(NSInteger)edgeInsetsToken
+{
+    _edgeInsetsToken = edgeInsetsToken;
+    [self applyEdgeInsetsToken];
+}
+
+- (void)applySpacingToken
+{
+    if (_spacingToken == VLCSpacingTokenNone) {
+        return;
+    }
+    
     CGFloat spacingValue = 0;
-    switch (spacingToken) {
+    switch (_spacingToken) {
         case VLCSpacingTokenSmall:
             spacingValue = VLCLibraryUIUnits.smallSpacing;
             break;
@@ -58,26 +66,14 @@
     self.spacing = spacingValue;
 }
 
-- (NSInteger)edgeInsetsToken
+- (void)applyEdgeInsetsToken
 {
-    NSEdgeInsets insets = self.edgeInsets;
-    if (insets.top == insets.bottom && insets.left == insets.right && insets.top == insets.left) {
-        CGFloat insetVal = insets.top;
-        if (insetVal == VLCLibraryUIUnits.smallSpacing) {
-            return VLCSpacingTokenSmall;
-        } else if (insetVal == VLCLibraryUIUnits.mediumSpacing) {
-            return VLCSpacingTokenMedium;
-        } else if (insetVal == VLCLibraryUIUnits.largeSpacing) {
-            return VLCSpacingTokenLarge;
-        }
+    if (_edgeInsetsToken == VLCSpacingTokenNone) {
+        return;
     }
-    return VLCSpacingTokenNone;
-}
-
-- (void)setEdgeInsetsToken:(NSInteger)edgeInsetsToken
-{
+    
     CGFloat spacingValue = 0;
-    switch (edgeInsetsToken) {
+    switch (_edgeInsetsToken) {
         case VLCSpacingTokenSmall:
             spacingValue = VLCLibraryUIUnits.smallSpacing;
             break;
