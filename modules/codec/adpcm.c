@@ -215,9 +215,17 @@ static int OpenDecoder( vlc_object_t *p_this )
             p_sys->i_samplesperblock = (p_sys->i_block / (34 * i_channels) ) * 64;
         break;
     case ADPCM_IMA_WAV:
-        if( p_sys->i_block >= 4 * i_channels )
+        /* 4 bytes block/channel preamble */
+        /* samples: 4 bytes aligned nibble per channel. 2 samples per byte */
+        if( i_channels == 2 && p_sys->i_block >= ((4+4) * 2) )
         {
-            p_sys->i_samplesperblock = 2 * ( p_sys->i_block - 4 * i_channels )
+            size_t padding = p_sys->i_block % 8;
+            p_sys->i_samplesperblock = 2 * ( p_sys->i_block - 4 * i_channels - padding )
+                                     / i_channels;
+        }
+        else if( i_channels == 1 && p_sys->i_block > 4 )
+        {
+            p_sys->i_samplesperblock = 2 * ( p_sys->i_block - 4 )
                                      / i_channels;
         }
         break;
@@ -579,7 +587,7 @@ static void DecodeAdpcmImaWav( decoder_t *p_dec, int16_t *p_sample,
     if( b_stereo )
     {
         for( i_nibbles = 2 * (p_sys->i_block - 8);
-             i_nibbles > 0;
+             i_nibbles > 15;
              i_nibbles -= 16 )
         {
             int i;
