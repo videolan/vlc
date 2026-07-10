@@ -3,8 +3,6 @@
 SQLITE_VERSION := 3460100
 SQLITE_URL := https://www.sqlite.org/2024/sqlite-autoconf-$(SQLITE_VERSION).tar.gz
 
-PKGS += sqlite
-
 ifeq ($(call need_pkg,"sqlite3 >= 3.33.0"),)
 PKGS_FOUND += sqlite
 endif
