@@ -304,7 +304,9 @@
                 <ComponentGroupRef Id='CompLocaleGroup' />
             <?endif ?>
             <ComponentGroupRef Id='CompLuaGroup' />
-            <!--<ComponentGroupRef Id='CompSkinsGroup' />-->
+            <?if "$(var.HaveSkins)" = "yes" ?>
+                <ComponentGroupRef Id='CompSkinsGroup' />
+            <?endif ?>
 
             <Feature Id='FILEASSOCIATION' Title='File associations' Level='1' AllowAdvertise="no">
                 <Feature Id='VIDEOFILEASSOCIATION' Title='Video' Level='1' AllowAdvertise="no">

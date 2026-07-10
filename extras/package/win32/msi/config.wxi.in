@@ -19,6 +19,11 @@
     <?else ?>
         <?define HaveLocale = "no" ?>
     <?endif ?>
+    <?if "@BUILD_SKINS_TRUE@" = "" ?>
+        <?define HaveSkins = "yes" ?>
+    <?else ?>
+        <?define HaveSkins = "no" ?>
+    <?endif ?>
 
     <?define SourceDir = "." ?>
 
