@@ -48,8 +48,6 @@ struct libvlc_media_player_t
     vlc_cond_t wait;
 
     struct libvlc_instance_t * p_libvlc_instance; /* Parent instance */
-    libvlc_media_t * p_md; /* current media descriptor */
-    libvlc_media_t * p_next_md;
 
     struct {
         vlc_player_timer_id *id;

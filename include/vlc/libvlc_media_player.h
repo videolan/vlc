@@ -701,10 +701,10 @@ LIBVLC_API void libvlc_media_player_set_media( libvlc_media_player_t *p_mi,
 /**
  * Get the media used by the media_player.
  *
- * \warning Calling this function just after libvlc_media_player_set_media()
- * will return the media that was just set, but this media might not be
- * currently used internally by the player. To detect such case, the user
- * should listen to the libvlc_media_player_cbs.on_media_changed callback.
+ * \note The returned media is the one currently used by the player. After
+ * calling libvlc_media_player_set_media() while a media is playing, the
+ * previous media is still returned until the switch is notified by the
+ * libvlc_media_player_cbs.on_media_changed callback.
  *
  * \param p_mi the Media Player
  * \return the media associated with p_mi, or NULL if no
@@ -3616,7 +3616,7 @@ typedef struct libvlc_media_player_time_point_t
  * struct defining callbacks for libvlc_media_player_watch_time()
  */
 struct libvlc_media_player_watch_time_cbs {
-    /** 
+    /**
      * Version of struct libvlc_media_player_watch_time_cbs
      */
     uint32_t version;

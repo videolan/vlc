@@ -160,8 +160,6 @@ int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned ignored,
                            unsigned *restrict px, unsigned *restrict py )
 {
     (void) ignored;
-    if (p_mi->p_md == NULL)
-        return -1;
 
     int ret = -1;
     libvlc_media_track_t *track =
