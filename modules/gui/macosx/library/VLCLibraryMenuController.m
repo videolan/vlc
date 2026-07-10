@@ -55,6 +55,7 @@
 
     NSMenuItem *_deleteItem;
     NSMenuItem *_removeFromPlaylistItem;
+    NSMenuItem *_informationItem;
 
     VLCLibraryAddToPlaylistMenuController *_addToPlaylistMenuController;
     NSMenuItem *_addToPlaylistItem;
@@ -95,8 +96,8 @@
     NSMenuItem *markUnseenItem = [[NSMenuItem alloc] initWithTitle:_NS("Mark as Unseen") action:@selector(markUnseen:) keyEquivalent:@""];
     markUnseenItem.target = self;
 
-    NSMenuItem *informationItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformation:) keyEquivalent:@""];
-    informationItem.target = self;
+    _informationItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformation:) keyEquivalent:@""];
+    _informationItem.target = self;
 
     NSMenuItem * const bookmarkItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Bookmark")
                                                                  action:@selector(toggleBookmark:)
@@ -132,7 +133,7 @@
     [revealItem vlc_setActionImageWithSystemSymbolName:@"folder"];
     [_deleteItem vlc_setActionImageWithSystemSymbolName:@"trash"];
     [markUnseenItem vlc_setActionImageWithSystemSymbolName:@"eye.slash"];
-    [informationItem vlc_setActionImageWithSystemSymbolName:@"info.circle"];
+    [_informationItem vlc_setActionImageWithSystemSymbolName:@"info.circle"];
     [addItem vlc_setActionImageWithSystemSymbolName:@"folder.badge.plus"];
 
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
@@ -147,7 +148,7 @@
         _removeFromPlaylistItem,
         _deleteItem,
         markUnseenItem,
-        informationItem,
+        _informationItem,
         [NSMenuItem separatorItem],
         addItem
     ]];
@@ -159,7 +160,7 @@
     [_mediaItemRequiringMenuItems addObject:self.favoriteItem];
     [_mediaItemRequiringMenuItems addObject:revealItem];
     [_mediaItemRequiringMenuItems addObject:_deleteItem];
-    [_mediaItemRequiringMenuItems addObject:informationItem];
+    [_mediaItemRequiringMenuItems addObject:_informationItem];
 
     _recentsMediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_recentsMediaItemRequiringMenuItems addObject:markUnseenItem];
@@ -183,6 +184,17 @@
     for (NSMenuItem * const menuItem in menuItems) {
         menuItem.hidden = hidden;
     }
+}
+
+- (BOOL)representedItemHasInformationTarget:(VLCLibraryRepresentedItem * const)representedItem
+{
+    id<VLCMediaLibraryItemProtocol> const item = representedItem.item;
+
+    if ([item isKindOfClass:VLCMediaLibraryPlaylist.class]) {
+        return ((VLCMediaLibraryPlaylist *)item).numberOfMedia > 0;
+    }
+
+    return item.mediaItems.count > 0;
 }
 
 - (void)updateMenuItems
@@ -284,7 +296,7 @@
 
         [self menuItems:_localInputItemRequiringMenuItems setHidden:anyStream];
         [self menuItems:_folderInputItemRequiringMenuItems setHidden:!bookmarkable];
-   }
+    }
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
@@ -293,7 +305,22 @@
     if (menuItem.action == @selector(addMedia:)) {
         return YES;
     }
-    return self.representedItems.count > 0 || self.representedInputItems.count > 0;
+
+    if (self.representedItems.count == 0 && self.representedInputItems.count == 0) {
+        return NO;
+    }
+
+    if (menuItem == _informationItem) {
+        for (VLCLibraryRepresentedItem * const item in self.representedItems) {
+            if ([self representedItemHasInformationTarget:item]) {
+                return YES;
+            }
+        }
+
+        return NO;
+    }
+
+    return YES;
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
