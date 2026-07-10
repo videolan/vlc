@@ -20,11 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "views/VLCStackView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryHomeViewActionsView : NSStackView
+@interface VLCLibraryHomeViewActionsView : VLCStackView
 
 @property (readwrite, weak) IBOutlet NSButton *openFileButton;
 @property (readwrite, weak) IBOutlet NSButton *openDiscButton;
