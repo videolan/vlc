@@ -843,6 +843,18 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     vlc_tick_t play_date = VLC_TICK_INVALID;
     vlc_tick_t system_now;
 
+    if (stream->sync.request_delay != stream->sync.delay)
+    {
+        stream->sync.delay = stream->sync.request_delay;
+        vlc_clock_Lock(stream->sync.clock);
+        vlc_tick_t delta = vlc_clock_SetDelay(stream->sync.clock, stream->sync.delay);
+        vlc_clock_Unlock(stream->sync.clock);
+        if (stream->filters)
+            aout_FiltersSetClockDelay(stream->filters, stream->sync.delay);
+        if (delta > 0)
+            stream_Silence(stream, delta, block->i_pts);
+    }
+
     if (stream->filters && (block->i_flags & BLOCK_FLAG_CORE_PRIVATE_FILTERED) == 0)
     {
         system_now = vlc_tick_now();
@@ -873,19 +885,6 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     /* Software volume */
     if (stream->volume != NULL)
         aout_volume_Amplify(stream->volume, block);
-
-    /* Update delay */
-    if (stream->sync.request_delay != stream->sync.delay)
-    {
-        stream->sync.delay = stream->sync.request_delay;
-        vlc_clock_Lock(stream->sync.clock);
-        vlc_tick_t delta = vlc_clock_SetDelay(stream->sync.clock, stream->sync.delay);
-        vlc_clock_Unlock(stream->sync.clock);
-        if (stream->filters)
-            aout_FiltersSetClockDelay(stream->filters, stream->sync.delay);
-        if (delta > 0)
-            stream_Silence(stream, delta, block->i_pts);
-    }
 
     /* Convert the pts if not previously done by filters */
     if (play_date == VLC_TICK_INVALID)
