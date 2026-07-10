@@ -91,8 +91,7 @@ Widgets.PageExt {
         boundsBehavior: Flickable.StopAtBounds
 
         // FIXME: make the media rows positioners consider the flickable margins when adjusting flickable `contentY`.
-        topMargin: VLCStyle.layoutTitle_top_padding
-        bottomMargin: topMargin
+        bottomMargin: VLCStyle.margin_large
 
         pixelAligned: (MainCtx.qtVersion() >= MainCtx.qtVersionCheck(6, 2, 5)) // QTBUG-103996
                       && (Screen.pixelDensity >= VLCStyle.highPixelDensityThreshold) // no need for sub-pixel alignment with high pixel density
