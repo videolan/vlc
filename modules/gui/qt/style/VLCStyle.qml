@@ -212,6 +212,8 @@ QtObject {
 
     readonly property int artistGridCover_radius: MainCtx.dp(90, scale)
 
+    readonly property real mainView_topLeftRadius: MainCtx.dp(8, scale)
+
     //GridItem
     readonly property int gridItemTitle_topMargin: margin_xsmall + margin_xxxsmall
     readonly property int gridItemTitle_height: fontHeight_normal
