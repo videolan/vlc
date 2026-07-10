@@ -39,12 +39,36 @@
             <constraints>
                 <constraint firstItem="mtn-R7-eBE" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="0DF-IW-9CH"/>
                 <constraint firstAttribute="bottom" secondItem="mtn-R7-eBE" secondAttribute="bottom" id="0It-tZ-dXV"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xML-YA-Xws" secondAttribute="trailing" constant="4" id="Onj-RC-BsN"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xML-YA-Xws" secondAttribute="trailing" constant="4" id="Onj-RC-BsN" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
                 <constraint firstAttribute="trailing" secondItem="mtn-R7-eBE" secondAttribute="trailing" id="P9h-wK-iQQ"/>
                 <constraint firstItem="xML-YA-Xws" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" id="POz-OG-DXB"/>
-                <constraint firstItem="mtn-R7-eBE" firstAttribute="top" secondItem="xML-YA-Xws" secondAttribute="bottom" constant="4" id="XVQ-AX-Soz"/>
-                <constraint firstItem="xML-YA-Xws" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="4" id="utW-fX-ack"/>
-                <constraint firstItem="xML-YA-Xws" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="4" id="wLu-wg-aAu"/>
+                <constraint firstItem="mtn-R7-eBE" firstAttribute="top" secondItem="xML-YA-Xws" secondAttribute="bottom" constant="4" id="XVQ-AX-Soz" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstItem="xML-YA-Xws" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="4" id="utW-fX-ack" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstItem="xML-YA-Xws" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="4" id="wLu-wg-aAu" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
             </constraints>
             <point key="canvasLocation" x="132" y="-72"/>
         </customView>

@@ -87,18 +87,66 @@
             </subviews>
             <constraints>
                 <constraint firstItem="Mk2-5A-q4g" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="7oz-36-KPx"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="8" id="8hv-Qt-uAI"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="8" id="8hv-Qt-uAI" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
                 <constraint firstItem="0Ge-7z-bq6" firstAttribute="centerY" secondItem="3Ha-ZH-fa9" secondAttribute="centerY" id="DpI-8u-rFu"/>
                 <constraint firstItem="0Ge-7z-bq6" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="EXo-Wn-Jh5"/>
-                <constraint firstItem="97z-d7-S3D" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="FbP-R4-bAA"/>
+                <constraint firstItem="97z-d7-S3D" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="FbP-R4-bAA" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
                 <constraint firstItem="Mk2-5A-q4g" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="leading" id="S9m-bB-HBd"/>
-                <constraint firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="trailing" constant="8" id="SVJ-UL-O5m"/>
-                <constraint firstAttribute="bottom" secondItem="97z-d7-S3D" secondAttribute="bottom" constant="4" id="XfR-Fd-n6o"/>
-                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="4" id="aVd-Ld-lUH"/>
-                <constraint firstItem="0Ge-7z-bq6" firstAttribute="leading" secondItem="97z-d7-S3D" secondAttribute="trailing" constant="8" id="adC-9f-And"/>
+                <constraint firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="trailing" constant="8" id="SVJ-UL-O5m" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstAttribute="bottom" secondItem="97z-d7-S3D" secondAttribute="bottom" constant="4" id="XfR-Fd-n6o" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="4" id="aVd-Ld-lUH" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstItem="0Ge-7z-bq6" firstAttribute="leading" secondItem="97z-d7-S3D" secondAttribute="trailing" constant="8" id="adC-9f-And" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
                 <constraint firstItem="97z-d7-S3D" firstAttribute="trailing" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" id="bzC-Km-KOo"/>
-                <constraint firstItem="0Ge-7z-bq6" firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="leading" constant="-8" id="dSC-Pq-ml2"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="iPZ-zR-jTv"/>
+                <constraint firstItem="0Ge-7z-bq6" firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="leading" constant="-8" id="dSC-Pq-ml2" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="iPZ-zR-jTv" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
             </constraints>
             <connections>
                 <outlet property="artistTextField" destination="TPv-k2-6XS" id="jJV-4C-USY"/>

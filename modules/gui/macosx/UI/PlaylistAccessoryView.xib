@@ -47,7 +47,13 @@
                     </subviews>
                     <constraints>
                         <constraint firstItem="2" firstAttribute="top" secondItem="1" secondAttribute="top" constant="11" id="3a2-5d-kdq"/>
-                        <constraint firstItem="3" firstAttribute="leading" secondItem="2" secondAttribute="trailing" constant="8" id="5s2-Ut-CYG"/>
+                        <constraint firstItem="3" firstAttribute="leading" secondItem="2" secondAttribute="trailing" constant="8" id="5s2-Ut-CYG" customClass="VLCSpacingConstraint">
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                    <integer value="2"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                        </constraint>
                         <constraint firstItem="2" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="13" id="Fe1-XU-wIa"/>
                         <constraint firstItem="3" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="OTX-0S-cmU"/>
                         <constraint firstAttribute="bottom" secondItem="2" secondAttribute="bottom" constant="11" id="PMa-7j-M4R"/>

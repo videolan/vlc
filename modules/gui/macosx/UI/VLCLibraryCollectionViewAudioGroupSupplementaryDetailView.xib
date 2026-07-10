@@ -76,9 +76,27 @@
                 </stackView>
             </subviews>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="bw7-QB-Ssc" secondAttribute="trailing" constant="8" id="8QK-wS-vnX"/>
-                <constraint firstItem="bw7-QB-Ssc" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="8" id="L0r-A5-7Xq"/>
-                <constraint firstAttribute="bottom" secondItem="bw7-QB-Ssc" secondAttribute="bottom" constant="8" id="eS3-iK-oGV"/>
+                <constraint firstAttribute="trailing" secondItem="bw7-QB-Ssc" secondAttribute="trailing" constant="8" id="8QK-wS-vnX" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstItem="bw7-QB-Ssc" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="8" id="L0r-A5-7Xq" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstAttribute="bottom" secondItem="bw7-QB-Ssc" secondAttribute="bottom" constant="8" id="eS3-iK-oGV" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
                 <constraint firstItem="bw7-QB-Ssc" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="28" id="oWk-8b-f1e"/>
             </constraints>
             <connections>

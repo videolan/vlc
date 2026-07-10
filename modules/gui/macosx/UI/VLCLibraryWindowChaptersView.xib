@@ -118,8 +118,20 @@
                 </scrollView>
             </subviews>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="zf4-pf-0V2" secondAttribute="trailing" constant="16" id="0Sl-8y-RFJ"/>
-                <constraint firstItem="zf4-pf-0V2" firstAttribute="leading" secondItem="SIR-0h-28I" secondAttribute="leading" constant="16" id="Ekv-lb-XRR"/>
+                <constraint firstAttribute="trailing" secondItem="zf4-pf-0V2" secondAttribute="trailing" constant="16" id="0Sl-8y-RFJ" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="3"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
+                <constraint firstItem="zf4-pf-0V2" firstAttribute="leading" secondItem="SIR-0h-28I" secondAttribute="leading" constant="16" id="Ekv-lb-XRR" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="3"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
                 <constraint firstItem="4vZ-4x-fwW" firstAttribute="top" secondItem="zf4-pf-0V2" secondAttribute="bottom" id="Q2S-Bl-E4g"/>
                 <constraint firstAttribute="trailing" secondItem="4vZ-4x-fwW" secondAttribute="trailing" id="Vo4-sT-MAu"/>
                 <constraint firstAttribute="bottom" secondItem="4vZ-4x-fwW" secondAttribute="bottom" id="aRK-vR-wkV"/>

@@ -126,8 +126,20 @@
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="leading" secondItem="o9Q-0s-xRU" secondAttribute="trailing" constant="4" id="5IX-1t-Psn"/>
-                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="leading" constant="-4" id="88t-Jp-57R"/>
+                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="leading" secondItem="o9Q-0s-xRU" secondAttribute="trailing" constant="4" id="5IX-1t-Psn" customClass="VLCSpacingConstraint">
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                    <integer value="1"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </constraint>
+                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="leading" constant="-4" id="88t-Jp-57R" customClass="VLCSpacingConstraint">
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                                    <integer value="1"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </constraint>
                                         <constraint firstItem="o9Q-0s-xRU" firstAttribute="top" secondItem="SvO-zd-2zo" secondAttribute="top" id="QuO-Ev-i98"/>
                                         <constraint firstItem="QuO-3G-BMT" firstAttribute="centerY" secondItem="SvO-zd-2zo" secondAttribute="centerY" id="TX6-cF-dnh"/>
                                         <constraint firstAttribute="trailing" secondItem="QuO-3G-BMT" secondAttribute="trailing" constant="12" id="Wfo-47-OGd"/>
@@ -206,7 +218,13 @@
                     </subviews>
                     <constraints>
                         <constraint firstItem="TOx-1e-6D9" firstAttribute="top" secondItem="FWp-yd-2Pm" secondAttribute="top" id="7hM-jR-3N3"/>
-                        <constraint firstAttribute="bottom" secondItem="TOx-1e-6D9" secondAttribute="bottom" constant="8" id="bdR-rj-nKk"/>
+                        <constraint firstAttribute="bottom" secondItem="TOx-1e-6D9" secondAttribute="bottom" constant="8" id="bdR-rj-nKk" customClass="VLCSpacingConstraint">
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                    <integer value="2"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                        </constraint>
                         <constraint firstAttribute="bottom" secondItem="bw7-QB-Ssc" secondAttribute="bottom" id="elF-5e-5LQ"/>
                         <constraint firstAttribute="trailing" secondItem="bw7-QB-Ssc" secondAttribute="trailing" id="uvg-NE-l4m"/>
                         <constraint firstItem="TOx-1e-6D9" firstAttribute="leading" secondItem="FWp-yd-2Pm" secondAttribute="leading" id="vAN-Ww-VKA"/>
@@ -223,10 +241,22 @@
                 </stackView>
             </subviews>
             <constraints>
-                <constraint firstItem="FWp-yd-2Pm" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="8" id="D62-3E-aDO"/>
+                <constraint firstItem="FWp-yd-2Pm" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="8" id="D62-3E-aDO" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
                 <constraint firstItem="FWp-yd-2Pm" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="28" id="Mr1-w0-CQK"/>
                 <constraint firstAttribute="bottom" secondItem="FWp-yd-2Pm" secondAttribute="bottom" id="bUH-jE-TQQ"/>
-                <constraint firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" constant="8" id="cPm-6m-umY"/>
+                <constraint firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" constant="8" id="cPm-6m-umY" customClass="VLCSpacingConstraint">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                            <integer value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </constraint>
             </constraints>
             <connections>
                 <outlet property="artworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>

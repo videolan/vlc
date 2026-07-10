@@ -91,8 +91,20 @@
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="7" secondAttribute="trailing" id="4nW-Xc-sPX"/>
                     <constraint firstItem="7" firstAttribute="top" secondItem="6" secondAttribute="top" id="6AH-w4-raW"/>
-                    <constraint firstItem="11" firstAttribute="top" secondItem="7" secondAttribute="bottom" constant="8" symbolic="YES" id="ZYg-92-5Hf"/>
-                    <constraint firstItem="11" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="16" id="bE6-8W-prE"/>
+                    <constraint firstItem="11" firstAttribute="top" secondItem="7" secondAttribute="bottom" constant="8" symbolic="YES" id="ZYg-92-5Hf" customClass="VLCSpacingConstraint">
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                <integer value="2"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </constraint>
+                    <constraint firstItem="11" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="16" id="bE6-8W-prE" customClass="VLCSpacingConstraint">
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
+                                <integer value="3"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </constraint>
                     <constraint firstAttribute="bottom" secondItem="11" secondAttribute="bottom" constant="12" id="jpE-a7-krs"/>
                     <constraint firstItem="7" firstAttribute="leading" secondItem="6" secondAttribute="leading" id="n7H-w5-oZh"/>
                 </constraints>
