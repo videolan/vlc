@@ -226,7 +226,7 @@ if [ -n "$BUILD_UCRT" ]; then
     fi
 
     if [ -n "$WINSTORE" ]; then
-        CONTRIBFLAGS="$CONTRIBFLAGS --disable-disc --disable-srt --disable-sdl --disable-SDL_image"
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-disc --disable-srt"
         # FIXME enable discs ?
         # modplug uses GlobalAlloc/Free and lstrcpyA/wsprintfA/lstrcpynA
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-modplug"
