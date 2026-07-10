@@ -43,22 +43,22 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
 + (const CGFloat)largeSpacing
 {
-    return 20;
+    return 16;
 }
 
 + (const CGFloat)mediumSpacing
 {
-    return 10;
+    return 8;
 }
 
 + (const CGFloat)smallSpacing
 {
-    return 5;
+    return 4;
 }
 
 + (const CGFloat)cornerRadius
 {
-    return 5.;
+    return 4.;
 }
 
 + (const CGFloat)borderThickness
