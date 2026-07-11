@@ -3,7 +3,7 @@
  *****************************************************************************
  * This header provides portable high precision time management functions,
  * which should be the only ones used in other segments of the program, since
- * functions like gettimeofday() and ftime() are not always supported.
+ * functions like clock_gettime() and ftime() are not always supported.
  * Most functions are declared as inline or as macros since they are only
  * interfaces to system calls and have to be called frequently.
  *****************************************************************************

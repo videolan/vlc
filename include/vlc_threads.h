@@ -786,7 +786,7 @@ VLC_API unsigned long vlc_thread_id(void) VLC_USED;
  *
  * \warning The origin date (time value "zero") is not specified. It is
  * typically the time the kernel started, but this is platform-dependent.
- * If you need wall clock time, use gettimeofday() instead.
+ * If you need wall clock time, use the standard timespec_get() instead.
  *
  * \return a timestamp in microseconds.
  */
