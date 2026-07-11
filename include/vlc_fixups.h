@@ -137,14 +137,6 @@ typedef unsigned short mode_t;
 # include <time.h> /* time_t */
 #endif
 
-#ifndef HAVE_GETTIMEOFDAY
-#ifdef _WIN32
-#include <winsock2.h>
-#else
-#include <sys/time.h>
-#endif
-#endif
-
 #ifndef HAVE_LLDIV
 typedef struct
 {
@@ -341,11 +333,6 @@ int timespec_get(struct timespec *, int);
 #endif
 
 /* sys/time.h */
-#ifndef HAVE_GETTIMEOFDAY
-struct timezone;
-int gettimeofday(struct timeval *, struct timezone *);
-#endif
-
 #if defined(WIN32) && !defined(WINSTORECOMPAT) && defined(HAVE_GETPID)
 #include <winapifamily.h>
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)

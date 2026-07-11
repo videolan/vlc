@@ -176,9 +176,6 @@
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #mesondefine HAVE_GETTEXT
 
-/* Define to 1 if you have the `gettimeofday' function. */
-#mesondefine HAVE_GETTIMEOFDAY
-
 /* Define to 1 if you have the <GL/wglew.h> header file. */
 #mesondefine HAVE_GL_WGLEW_H
 

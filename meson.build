@@ -733,8 +733,6 @@ libcompat_functions = [
     ['asprintf',         '#include <stdio.h>'],
     ['vasprintf',        '#include <stdio.h>'],
 
-    ['gettimeofday',     '#include <sys/time.h>'],
-
     ['clock_gettime',    '#include <time.h>'],
     ['clock_nanosleep',  '#include <time.h>'],
     ['clock_getres',     '#include <time.h>'],
