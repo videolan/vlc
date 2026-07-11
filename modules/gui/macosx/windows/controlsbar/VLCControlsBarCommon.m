@@ -278,12 +278,12 @@
     _jumpBackwardButtonOriginalSpacing = self.jumpBackwardButtonSpacingConstraint.constant;
     _jumpForwardButtonOriginalSpacing = self.jumpForwardButtonSpacingConstraint.constant;
 
-    self.dropView.postsFrameChangedNotifications = YES;
+    self.bottomBarView.postsFrameChangedNotifications = YES;
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(dropViewFrameChanged:)
+                                           selector:@selector(bottomBarViewFrameChanged:)
                                                name:NSViewFrameDidChangeNotification
-                                             object:self.dropView];
-    [self updateJumpButtonVisibilityForWidth:self.dropView.frame.size.width];
+                                             object:self.bottomBarView];
+    [self updateJumpButtonVisibilityForWidth:self.bottomBarView.frame.size.width];
 }
 
 - (void)dealloc
@@ -291,9 +291,9 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (void)dropViewFrameChanged:(NSNotification *)notification
+- (void)bottomBarViewFrameChanged:(NSNotification *)notification
 {
-    [self updateJumpButtonVisibilityForWidth:self.dropView.frame.size.width];
+    [self updateJumpButtonVisibilityForWidth:self.bottomBarView.frame.size.width];
 }
 
 - (void)updateJumpButtonVisibilityForWidth:(CGFloat)width

@@ -33,6 +33,7 @@
         <customObject id="3" userLabel="Main Video View Controls Bar" customClass="VLCMainVideoViewControlsBar">
             <connections>
                 <outlet property="backwardButton" destination="GVj-Mw-yGh" id="r8R-h9-hIN"/>
+                <outlet property="bottomBarView" destination="qsP-dd-T9O" id="WqX-SW-mpv"/>
                 <outlet property="floatOnTopButton" destination="UlM-pV-GAH" id="Psy-2Z-suK"/>
                 <outlet property="forwardButton" destination="Udx-ZV-vdD" id="ILc-3U-3Lg"/>
                 <outlet property="fullscreenButton" destination="Dka-oG-Ar0" id="nqz-qB-etE"/>
