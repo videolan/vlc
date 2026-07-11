@@ -38,7 +38,11 @@
                 <outlet property="forwardButton" destination="Udx-ZV-vdD" id="ILc-3U-3Lg"/>
                 <outlet property="fullscreenButton" destination="Dka-oG-Ar0" id="nqz-qB-etE"/>
                 <outlet property="jumpBackwardButton" destination="Y6X-Qj-wAU" id="ZDb-ZR-IDF"/>
+                <outlet property="jumpBackwardButtonSpacingConstraint" destination="LnZ-my-zBM" id="jbs-sp-c"/>
+                <outlet property="jumpBackwardButtonWidthConstraint" destination="O5b-gT-vco" id="jbw-w-c"/>
                 <outlet property="jumpForwardButton" destination="omu-it-6Lt" id="gtC-uD-Mnu"/>
+                <outlet property="jumpForwardButtonSpacingConstraint" destination="dmg-RC-IOH" id="jfs-sp-c"/>
+                <outlet property="jumpForwardButtonWidthConstraint" destination="14N-xJ-2Kx" id="jfw-w-c"/>
                 <outlet property="lyricsButton" destination="Lyr-Ics-Btn" id="Lyr-Ics-Out"/>
                 <outlet property="muteVolumeButton" destination="x8O-Jz-KS8" id="lIH-Am-21m"/>
                 <outlet property="pipButton" destination="ha3-L8-lMU" id="nqJ-hd-8M1"/>
@@ -148,6 +152,9 @@
                                             </box>
                                             <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Y6X-Qj-wAU" customClass="VLCImageButton">
                                                 <rect key="frame" x="5" y="5" width="48" height="28"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="48" id="O5b-gT-vco"/>
+                                                </constraints>
                                                 <shadow key="shadow" blurRadius="20">
                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </shadow>
@@ -207,6 +214,9 @@
                                             </button>
                                             <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="omu-it-6Lt" customClass="VLCImageButton">
                                                 <rect key="frame" x="215" y="5" width="48" height="28"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="48" id="14N-xJ-2Kx"/>
+                                                </constraints>
                                                 <shadow key="shadow" blurRadius="20">
                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </shadow>
@@ -365,7 +375,6 @@
                                             </stackView>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="omu-it-6Lt" firstAttribute="width" secondItem="Udx-ZV-vdD" secondAttribute="width" id="14N-xJ-2Kx"/>
                                             <constraint firstAttribute="bottom" secondItem="Y6X-Qj-wAU" secondAttribute="bottom" constant="4" id="16E-Ua-ogn" customClass="VLCSpacingConstraint">
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
@@ -392,14 +401,7 @@
                                             </constraint>
                                             <constraint firstItem="GVj-Mw-yGh" firstAttribute="centerY" secondItem="qsP-dd-T9O" secondAttribute="centerY" id="Ftz-rq-HO8"/>
                                             <constraint firstItem="omu-it-6Lt" firstAttribute="centerY" secondItem="qsP-dd-T9O" secondAttribute="centerY" id="H4i-40-eS4"/>
-                                            <constraint firstItem="Y6X-Qj-wAU" firstAttribute="leading" secondItem="qsP-dd-T9O" secondAttribute="leading" constant="4" id="LnZ-my-zBM" customClass="VLCSpacingConstraint">
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                                                        <integer value="1"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
-                                            </constraint>
-                                            <constraint firstItem="Y6X-Qj-wAU" firstAttribute="width" secondItem="GVj-Mw-yGh" secondAttribute="width" id="O5b-gT-vco"/>
+                                            <constraint firstItem="Y6X-Qj-wAU" firstAttribute="leading" secondItem="qsP-dd-T9O" secondAttribute="leading" constant="5" id="LnZ-my-zBM"/>
                                             <constraint firstItem="GVj-Mw-yGh" firstAttribute="height" secondItem="etJ-bh-XaL" secondAttribute="height" id="OZ1-nq-sPB"/>
                                             <constraint firstItem="Udx-ZV-vdD" firstAttribute="leading" secondItem="etJ-bh-XaL" secondAttribute="trailing" constant="4" id="P9A-Tb-eJJ" customClass="VLCSpacingConstraint">
                                                 <userDefinedRuntimeAttributes>

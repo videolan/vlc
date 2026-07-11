@@ -332,7 +332,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
 + (const CGFloat)libraryWindowControlsBarNarrowWidthThreshold
 {
-    return 600.;
+    return 768.;
 }
 
 + (const CGFloat)libraryWindowNavSidebarMinWidth
