@@ -1,5 +1,5 @@
 /*****************************************************************************
- * asprintf.c: GNU asprintf() replacement
+ * asprintf.c: POSIX asprintf() replacement
  *****************************************************************************
  * Copyright © 1998-2009 VLC authors and VideoLAN
  *

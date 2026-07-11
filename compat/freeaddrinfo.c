@@ -1,5 +1,5 @@
 /*****************************************************************************
- * freeaddrinfo.c: freeaddrinfo() replacement functions
+ * freeaddrinfo.c: POSIX/IETF freeaddrinfo() replacement functions
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * Copyright (C) 2002-2007 Rémi Denis-Courmont

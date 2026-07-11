@@ -1,5 +1,5 @@
 /*****************************************************************************
- * gai_strerror.c: gai_strerror() replacement function
+ * gai_strerror.c: POSIX/IETF gai_strerror() replacement function
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * Copyright (C) 2002-2007 Rémi Denis-Courmont

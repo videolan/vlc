@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vasprintf.c: GNU vasprintf() replacement
+ * vasprintf.c: POSIX vasprintf() replacement
  *****************************************************************************
  * Copyright © 1998-2009 VLC authors and VideoLAN
  *
