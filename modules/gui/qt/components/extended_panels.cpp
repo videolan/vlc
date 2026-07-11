@@ -141,7 +141,7 @@ static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, Q
 
 #define SETUP_VFILTER( widget ) \
     setup_vfilter( p_intf, #widget, ui.widget##Enable ); \
-    connect( ui.widget##Enable, &std::remove_pointer_t<decltype(ui.widget##Enable)>::clicked, this, &ExtVideo::updateFilters );
+    connect( ui.widget##Enable, &std::remove_pointer<decltype(ui.widget##Enable)>::type::clicked, this, &ExtVideo::updateFilters );
 
 #define SETUP_VFILTER_OPTION( widget, signal ) \
     initComboBoxItems( ui.widget ); \

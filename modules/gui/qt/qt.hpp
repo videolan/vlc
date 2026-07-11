@@ -138,7 +138,7 @@ template<typename... Args> struct QOverload {
 };
 #endif
 
-#define BUTTONACT( b, a ) connect( b, &QPushButton::clicked, this, QOverload<>::of(&std::remove_pointer_t<decltype(this)>::a) )
+#define BUTTONACT( b, a ) connect( b, &QPushButton::clicked, this, QOverload<>::of(&std::remove_pointer<decltype(this)>::type::a) )
 
 #define BUTTON_SET( button, text, tooltip )  \
     button->setText( text );                 \

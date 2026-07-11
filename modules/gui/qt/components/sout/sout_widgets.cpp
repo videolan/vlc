@@ -101,8 +101,8 @@ void SoutInputBox::setMRL( const QString& mrl )
     }
 }
 
-#define CT( x ) connect( x, &QLineEdit::textChanged, this, &std::remove_pointer_t<decltype(this)>::mrlUpdated );
-#define CS( x ) connect( x, QOverload<int>::of(&QSpinBox::valueChanged), this, &std::remove_pointer_t<decltype(this)>::mrlUpdated );
+#define CT( x ) connect( x, &QLineEdit::textChanged, this, &std::remove_pointer<decltype(this)>::type::mrlUpdated );
+#define CS( x ) connect( x, QOverload<int>::of(&QSpinBox::valueChanged), this, &std::remove_pointer<decltype(this)>::type::mrlUpdated );
 
 VirtualDestBox::VirtualDestBox( QWidget *_parent ) : QWidget( _parent )
 {
