@@ -34,7 +34,6 @@
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
-#import "library/VLCLibraryUIUnits.h"
 
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
@@ -42,6 +41,8 @@
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "main/VLCMain.h"
+
+#import "views/VLCUIUnits.h"
 
 NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification";
 
@@ -401,8 +402,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     if (carouselItemView == nil) {
         const NSRect itemFrame = NSMakeRect(0,
                                             0,
-                                            VLCLibraryUIUnits.carouselViewVideoItemViewWidth,
-                                            VLCLibraryUIUnits.carouselViewItemViewHeight);
+                                            VLCUIUnits.carouselViewVideoItemViewWidth,
+                                            VLCUIUnits.carouselViewItemViewHeight);
         carouselItemView = [VLCLibraryCarouselViewItemView fromNibWithOwner:self];
         carouselItemView.frame = itemFrame;
     }

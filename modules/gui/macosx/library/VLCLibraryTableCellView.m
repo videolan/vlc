@@ -33,7 +33,6 @@
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
-#import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 

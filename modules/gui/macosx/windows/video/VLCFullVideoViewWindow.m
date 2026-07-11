@@ -26,12 +26,12 @@
 
 #import "extensions/NSAnimationContext+VLCAdditions.h"
 
-#import "library/VLCLibraryUIUnits.h"
-
 #import "main/VLCMain.h"
 
-#import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCFullVideoViewWindow ()
 {
@@ -93,7 +93,7 @@
         return;
     }
 
-    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
                                                               changes:^(NSAnimationContext * const _Nonnull context){
         self->_isFadingIn = YES;
         [titlebarView.animator setAlphaValue:1.0f];
@@ -119,7 +119,7 @@
 
     NSView *titlebarView = [self standardWindowButton:NSWindowCloseButton].superview;
 
-    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
                                                               changes:^(NSAnimationContext * const _Nonnull context) {
         [titlebarView.animator setAlphaValue:0.0f];
     } completionHandler:nil];

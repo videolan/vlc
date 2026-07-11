@@ -26,19 +26,22 @@
 
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+
+#import "library/VLCInputItem.h"
+
 #import "main/VLCMain.h"
+
+#import "playqueue/VLCPlayerController.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayQueueItem.h"
 #import "playqueue/VLCPlayQueueModel.h"
-#import "playqueue/VLCPlayerController.h"
-#import "library/VLCInputItem.h"
-#import "library/VLCLibraryUIUnits.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCImageView.h"
 #import "views/VLCPlaybackProgressSlider.h"
 #import "views/VLCTimeField.h"
+#import "views/VLCUIUnits.h"
 #import "views/VLCVolumeSlider.h"
 
 /*****************************************************************************
@@ -295,7 +298,7 @@
 
 - (void)updateJumpButtonVisibilityForWidth:(CGFloat)width
 {
-    const CGFloat narrowThreshold = VLCLibraryUIUnits.libraryWindowControlsBarNarrowWidthThreshold;
+    const CGFloat narrowThreshold = VLCUIUnits.libraryWindowControlsBarNarrowWidthThreshold;
 
     if (!_jumpButtonsHidden && width < narrowThreshold) {
         _jumpButtonsHidden = YES;

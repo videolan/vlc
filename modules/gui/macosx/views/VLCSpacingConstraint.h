@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "library/VLCLibraryUIUnits.h"
+#import "views/VLCUIUnits.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -28,20 +28,20 @@
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
-#import "main/VLCMain.h"
-
-#import "library/VLCLibraryUIUnits.h"
-#import "library/VLCLibraryWindow.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowPlayQueueSidebarViewController.h"
 #import "library/VLCLibraryWindowSidebarChildViewController.h"
 #import "library/VLCLibraryWindowTitlesSidebarViewController.h"
 
+#import "main/VLCMain.h"
+
 #import "playqueue/VLCPlayerController.h"
 #import "playqueue/VLCPlayQueueController.h"
 
-#include "views/VLCRoundedCornerTextField.h"
+#import "views/VLCRoundedCornerTextField.h"
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibraryWindowSidebarRootViewController ()
 
@@ -106,13 +106,13 @@
 
     _playQueueHeaderTopConstraint = 
         [self.playQueueHeaderLabel.topAnchor constraintEqualToAnchor:self.view.topAnchor
-                                                            constant:VLCLibraryUIUnits.libraryWindowContentSafeTopInset + VLCLibraryUIUnits.smallSpacing];
+                                                            constant:VLCUIUnits.libraryWindowContentSafeTopInset + VLCUIUnits.smallSpacing];
     [NSLayoutConstraint activateConstraints:@[
         self.playQueueHeaderTopConstraint,
         [self.playQueueHeaderLabel.bottomAnchor constraintEqualToAnchor:self.targetView.topAnchor
-                                                               constant:-VLCLibraryUIUnits.smallSpacing],
+                                                               constant:-VLCUIUnits.smallSpacing],
         [self.playQueueHeaderLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor
-                                                                constant:VLCLibraryUIUnits.largeSpacing] 
+                                                                constant:VLCUIUnits.largeSpacing] 
     ]];
 }
 
@@ -153,12 +153,12 @@
         [self.counterLabel.centerYAnchor constraintEqualToAnchor:self.playQueueHeaderLabel.centerYAnchor];
     _counterLabelInChildViewConstraint =
         [self.counterLabel.topAnchor constraintEqualToAnchor:self.targetView.topAnchor
-                                                    constant:VLCLibraryUIUnits.smallSpacing];
+                                                    constant:VLCUIUnits.smallSpacing];
     
     [NSLayoutConstraint activateConstraints:@[
         self.counterLabelInHeaderConstraint,
         [self.counterLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor
-                                                         constant:-VLCLibraryUIUnits.largeSpacing]
+                                                         constant:-VLCUIUnits.largeSpacing]
     ]];
 }
 
@@ -252,11 +252,11 @@
 
 - (CGFloat)topConstraintConstant
 {
-    CGFloat constant = VLCLibraryUIUnits.smallSpacing;
+    CGFloat constant = VLCUIUnits.smallSpacing;
     if (@available(macOS 11.0, *)) {
         // Safe area layout guide already accounts for titlebar height
         if (!self.mainVideoModeEnabled) {
-            constant += VLCLibraryUIUnits.libraryWindowContentSafeTopInset;
+            constant += VLCUIUnits.libraryWindowContentSafeTopInset;
         }
     } else if (!self.mainVideoModeEnabled && self.libraryWindow.styleMask & NSWindowStyleMaskFullSizeContentView) {
         // Compensate for full content view window's titlebar height, prevent top being cut off

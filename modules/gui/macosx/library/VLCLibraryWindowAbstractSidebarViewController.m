@@ -25,8 +25,9 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+
+#import "views/VLCUIUnits.h"
 
 @implementation VLCLibraryWindowAbstractSidebarViewController
 

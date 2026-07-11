@@ -23,7 +23,8 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryDataSource.h"
-#import "library/VLCLibraryUIUnits.h"
+
+#import "views/VLCUIUnits.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

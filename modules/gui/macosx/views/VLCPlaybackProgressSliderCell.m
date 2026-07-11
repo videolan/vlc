@@ -26,13 +26,13 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 
-#import "library/VLCLibraryUIUnits.h"
-
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 
 #import "playqueue/VLCPlayerController.h"
 #import "playqueue/VLCPlayQueueController.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCPlaybackProgressSliderCell ()
 {
@@ -212,7 +212,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
                          inCellFrame:(const NSRect)cellFrame
                            withColor:(NSColor * const)color
 {
-    const CGFloat tickThickness = VLCLibraryUIUnits.sliderTickThickness;
+    const CGFloat tickThickness = VLCUIUnits.sliderTickThickness;
     const CGSize cellSize = cellFrame.size;
     NSRect tickFrame;
 

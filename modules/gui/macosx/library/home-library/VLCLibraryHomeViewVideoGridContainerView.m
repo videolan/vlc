@@ -30,13 +30,13 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryUIUnits.h"
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "views/VLCSubScrollView.h"
+#import "views/VLCUIUnits.h"
 
 @implementation VLCLibraryHomeViewVideoGridContainerView
 
@@ -92,7 +92,7 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
-    _collectionViewDelegate.staticItemSize = VLCLibraryUIUnits.defaultVideoItemCollectionViewItemSize;
+    _collectionViewDelegate.staticItemSize = VLCUIUnits.defaultVideoItemCollectionViewItemSize;
     _collectionView.delegate = _collectionViewDelegate;
 }
 
@@ -193,7 +193,7 @@
     }
 
     if (_groupDescriptor.isHorizontalBarCollectionView) {
-        const CGFloat viewHeight = itemHeight + insetsHeight + VLCLibraryUIUnits.smallSpacing;
+        const CGFloat viewHeight = itemHeight + insetsHeight + VLCUIUnits.smallSpacing;
         return NSMakeSize(width, viewHeight);
     }
 

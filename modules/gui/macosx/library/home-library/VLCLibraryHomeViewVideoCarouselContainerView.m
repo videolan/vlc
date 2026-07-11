@@ -25,11 +25,12 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
-#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryCarouselViewItemView.h"
-#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryDataTypes.h"
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+
+#import "views/VLCUIUnits.h"
 
 #include "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 

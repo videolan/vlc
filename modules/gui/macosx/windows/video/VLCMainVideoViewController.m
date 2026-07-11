@@ -23,24 +23,28 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import <vlc_common.h>
+
 #import "extensions/NSAnimationContext+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowSidebarRootViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "main/VLCMain.h"
 
-#import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+
+#import "private/PIPSPI.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCPlaybackEndViewController.h"
+#import "views/VLCUIUnits.h"
 
 #import "windows/controlsbar/VLCMainVideoViewControlsBar.h"
 
@@ -48,10 +52,6 @@
 #import "windows/video/VLCMainVideoViewOverlayView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCVideoWindowCommon.h"
-
-#import <vlc_common.h>
-
-#import "private/PIPSPI.h"
 
 NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerLayoutKey";
 
@@ -250,8 +250,8 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
 - (void)updateLyricsInsets
 {
-    const CGFloat topInset = self.fakeTitleBar.frame.size.height + VLCLibraryUIUnits.largeSpacing;
-    const CGFloat bottomInset = self.bottomBarView.frame.size.height + VLCLibraryUIUnits.largeSpacing;
+    const CGFloat topInset = self.fakeTitleBar.frame.size.height + VLCUIUnits.largeSpacing;
+    const CGFloat bottomInset = self.bottomBarView.frame.size.height + VLCUIUnits.largeSpacing;
 
     NSScrollView * const scrollView = self.audioDecorativeView.lyricsScrollView;
     scrollView.automaticallyAdjustsContentInsets = NO;
@@ -308,21 +308,21 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         [self setAutohideControls:NO];
         self.centerButtonStackInViewConstraint.active = NO;
         self.bottomButtonStackViewConstraint.active = YES;
-        self.prevButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
-        self.playButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
-        self.nextButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
-        self.jumpBackwardButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
-        self.jumpForwardButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
+        self.prevButtonSizeConstraint.constant = VLCUIUnits.smallPlaybackControlButtonSize;
+        self.playButtonSizeConstraint.constant = VLCUIUnits.smallPlaybackControlButtonSize;
+        self.nextButtonSizeConstraint.constant = VLCUIUnits.smallPlaybackControlButtonSize;
+        self.jumpBackwardButtonSizeConstraint.constant = VLCUIUnits.smallPlaybackControlButtonSize;
+        self.jumpForwardButtonSizeConstraint.constant = VLCUIUnits.smallPlaybackControlButtonSize;
         [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
     } else {
         [self setAutohideControls:!self.classic];
         self.bottomButtonStackViewConstraint.active = NO;
         self.centerButtonStackInViewConstraint.active = YES;
-        self.prevButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
-        self.playButtonSizeConstraint.constant = VLCLibraryUIUnits.largePlaybackControlButtonSize;
-        self.nextButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
-        self.jumpBackwardButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
-        self.jumpForwardButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
+        self.prevButtonSizeConstraint.constant = VLCUIUnits.mediumPlaybackControlButtonSize;
+        self.playButtonSizeConstraint.constant = VLCUIUnits.largePlaybackControlButtonSize;
+        self.nextButtonSizeConstraint.constant = VLCUIUnits.mediumPlaybackControlButtonSize;
+        self.jumpBackwardButtonSizeConstraint.constant = VLCUIUnits.mediumPlaybackControlButtonSize;
+        self.jumpForwardButtonSizeConstraint.constant = VLCUIUnits.mediumPlaybackControlButtonSize;
     }
 }
 
@@ -338,8 +338,8 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
     NSView * const foregroundCoverArtView = self.audioDecorativeView.foregroundCoverArtView;
     [NSLayoutConstraint activateConstraints:@[
-        [self.centralControlsStackView.topAnchor constraintGreaterThanOrEqualToAnchor:foregroundCoverArtView.bottomAnchor constant:VLCLibraryUIUnits.largeSpacing],
-        [self.fakeTitleBar.bottomAnchor constraintLessThanOrEqualToAnchor:foregroundCoverArtView.topAnchor constant:-VLCLibraryUIUnits.largeSpacing]
+        [self.centralControlsStackView.topAnchor constraintGreaterThanOrEqualToAnchor:foregroundCoverArtView.bottomAnchor constant:VLCUIUnits.largeSpacing],
+        [self.fakeTitleBar.bottomAnchor constraintLessThanOrEqualToAnchor:foregroundCoverArtView.topAnchor constant:-VLCUIUnits.largeSpacing]
     ]];
 }
 
@@ -462,7 +462,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
         self.videoViewBottomToViewConstraint.active = YES;
     }
 
-    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
                                                               changes:^(NSAnimationContext * const _Nonnull context) {
         [self->_mainControlsView.animator setAlphaValue:0.0f];
         [self->_floatOnTopIndicatorImageView.animator setAlphaValue:0.0f];
@@ -510,7 +510,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     }
 
 
-    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
                                                               changes:^(NSAnimationContext * const _Nonnull context) {
         self->_isFadingIn = YES;
         [self->_mainControlsView.animator setAlphaValue:1.0f];
@@ -576,7 +576,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     const BOOL placeInFakeToolbar = viewWindow.titlebarAppearsTransparent &&
                                     !windowFullscreen;
 
-    const CGFloat buttonTopSpace = placeInFakeToolbar ? 0 : VLCLibraryUIUnits.largeSpacing;
+    const CGFloat buttonTopSpace = placeInFakeToolbar ? 0 : VLCUIUnits.largeSpacing;
 
     _fakeTitleBarHeightConstraint.constant = windowFullscreen ? 0 : windowTitlebarHeight;
 
@@ -625,8 +625,8 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     const CGFloat realButtonSpace = (windowTitlebarHeight - _playQueueButton.cell.cellSize.height) / 2;
     const NSRect windowButtonBox = [self windowButtonsRect];
 
-    _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + VLCLibraryUIUnits.mediumSpacing + realButtonSpace : VLCLibraryUIUnits.largeSpacing;
-    _playQueueButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: VLCLibraryUIUnits.largeSpacing;
+    _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + VLCUIUnits.mediumSpacing + realButtonSpace : VLCUIUnits.largeSpacing;
+    _playQueueButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: VLCUIUnits.largeSpacing;
 
     _overlayView.drawGradientForTopControls = !placeInFakeToolbar;
     [_overlayView setNeedsDisplay:YES];

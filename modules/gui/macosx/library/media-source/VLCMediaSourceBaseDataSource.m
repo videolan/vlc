@@ -23,29 +23,30 @@
 #import "VLCMediaSourceBaseDataSource.h"
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
-#import "VLCMediaSourceProvider.h"
 #import "VLCMediaSource.h"
-#import "VLCMediaSourceDeviceCollectionViewItem.h"
 #import "VLCMediaSourceDataSource.h"
+#import "VLCMediaSourceDeviceCollectionViewItem.h"
+#import "VLCMediaSourceProvider.h"
 
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTableCellView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
-#import "library/VLCLibraryWindow.h"
+#import "library/VLCInputItem.h"
 #import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
-#import "library/VLCInputItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryTableCellView.h"
-#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
+
 #import "library/media-source/VLCMediaSourceCollectionViewItem.h"
 
 #import "main/VLCMain.h"
 
 #import "views/VLCImageView.h"
+#import "views/VLCUIUnits.h"
 
 NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseDataSourceNodeChanged";
 
@@ -406,9 +407,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
 {
     VLCLibraryCollectionViewFlowLayout * const collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
     NSAssert(collectionViewLayout, @"This should be a flow layout and thus a valid pointer");
-    return [VLCLibraryUIUnits adjustedCollectionViewItemSizeForCollectionView:collectionView
-                                                                   withLayout:collectionViewFlowLayout
-                                                         withItemsAspectRatio:VLCLibraryCollectionViewItemAspectRatioDefaultItem];
+    return [VLCUIUnits adjustedCollectionViewItemSizeForCollectionView:collectionView
+                                                            withLayout:collectionViewFlowLayout
+                                                  withItemsAspectRatio:VLCLibraryCollectionViewItemAspectRatioDefaultItem];
 }
 
 #pragma mark - table view data source and delegation
@@ -626,16 +627,16 @@ referenceSizeForHeaderInSection:(NSInteger)section
     const CGFloat pathControlContainerViewHeight = _pathControlContainerView.frame.size.height;
     const CGFloat scrollViewsTopSpace = visible ? pathControlContainerViewHeight : 0;
 
-    NSEdgeInsets scrollViewInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    NSEdgeInsets scrollViewInsets = VLCUIUnits.libraryViewScrollViewContentInsets;
     scrollViewInsets.top += scrollViewsTopSpace;
-    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    const NSEdgeInsets scrollerInsets = VLCUIUnits.libraryViewScrollViewScrollerInsets;
 
     _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _collectionViewScrollView.contentInsets = scrollViewInsets;
     _collectionViewScrollView.scrollerInsets = scrollerInsets;
 
     _tableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _tableViewScrollView.contentInsets = NSEdgeInsetsMake(scrollViewsTopSpace + VLCLibraryUIUnits.libraryWindowContentSafeTopInset, 0, scrollViewInsets.bottom, 0);
+    _tableViewScrollView.contentInsets = NSEdgeInsetsMake(scrollViewsTopSpace + VLCUIUnits.libraryWindowContentSafeTopInset, 0, scrollViewInsets.bottom, 0);
     _tableViewScrollView.scrollerInsets = NSEdgeInsetsMake(0, 0, -scrollViewInsets.bottom, 0);
 }
 

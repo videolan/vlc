@@ -31,29 +31,30 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
-#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryHeaderView.h"
 #import "library/VLCLibraryHeaderCell.h"
+#import "library/VLCLibraryHeaderView.h"
 #import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
-
-#import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
-#import "library/favorites-library/VLCLibraryFavoritesTableViewDelegate.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
+#import "library/favorites-library/VLCLibraryFavoritesDataSource.h"
+#import "library/favorites-library/VLCLibraryFavoritesTableViewDelegate.h"
+
 #import "main/VLCMain.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibraryFavoritesViewController ()
 {
@@ -140,8 +141,8 @@
     self.favoritesLibraryGroupsTableView.headerView = nil;
     self.favoritesLibraryGroupsTableView.allowsEmptySelection = NO;
     
-    self.favoritesLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
-    self.favoritesLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.favoritesLibraryGroupsTableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
+    self.favoritesLibraryGroupSelectionTableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
 
     self.favoritesLibraryGroupsTableView.allowsMultipleSelection = YES;
     self.favoritesLibraryGroupSelectionTableView.allowsMultipleSelection = YES;
@@ -155,8 +156,8 @@
 
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     
-    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
-    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+    const CGFloat collectionItemSpacing = VLCUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCUIUnits.collectionViewSectionInsets;
     _collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
     _collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     _collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;

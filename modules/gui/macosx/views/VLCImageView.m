@@ -26,7 +26,8 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
-#import "library/VLCLibraryUIUnits.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCImageView()
 {
@@ -79,8 +80,8 @@
 - (void)updateLayerImageCornerCropping
 {
     if (self.cropsImagesToRoundedCorners) {
-        self.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
-        self.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
+        self.layer.cornerRadius = VLCUIUnits.cornerRadius;
+        self.layer.borderWidth = VLCUIUnits.borderThickness;
     } else {
         self.layer.cornerRadius = 0.;
         self.layer.borderWidth = 0.;

@@ -35,7 +35,6 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryTableCellView.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
@@ -45,15 +44,17 @@
 
 #import "library/playlist-library/VLCLibraryPlaylistViewController.h"
 
+#import "library/video-library/VLCLibraryMoviesDataSource.h"
 #import "library/video-library/VLCLibraryShowsDataSource.h"
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
-#import "library/video-library/VLCLibraryMoviesDataSource.h"
 
 #import "main/VLCMain.h"
 
-#import "windows/video/VLCVoutView.h"
+#import "views/VLCUIUnits.h"
+
 #import "windows/video/VLCMainVideoViewController.h"
+#import "windows/video/VLCVoutView.h"
 
 @interface VLCLibraryVideoViewController ()
 {
@@ -179,8 +180,8 @@
 {
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
 
-    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
-    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+    const CGFloat collectionItemSpacing = VLCUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCUIUnits.collectionViewSectionInsets;
     _collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
     _collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     _collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
@@ -191,7 +192,7 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
-    _collectionViewDelegate.staticItemSize = VLCLibraryUIUnits.defaultVideoItemCollectionViewItemSize;
+    _collectionViewDelegate.staticItemSize = VLCUIUnits.defaultVideoItemCollectionViewItemSize;
     collectionView.delegate = _collectionViewDelegate;
 
     [collectionView registerClass:VLCLibraryCollectionViewItem.class
@@ -233,10 +234,10 @@
 
 - (void)setupVideoLibraryViews
 {
-    _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.videoLibraryTableViewRowHeight;
+    _videoLibraryGroupSelectionTableView.rowHeight = VLCUIUnits.videoLibraryTableViewRowHeight;
 
-    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    const NSEdgeInsets defaultInsets = VLCUIUnits.libraryViewScrollViewContentInsets;
+    const NSEdgeInsets scrollerInsets = VLCUIUnits.libraryViewScrollViewScrollerInsets;
 
     _videoLibraryCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _videoLibraryCollectionViewScrollView.contentInsets = defaultInsets;

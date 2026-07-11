@@ -23,11 +23,11 @@
 #import "VLCLibrarySectionedTableViewDelegate.h"
 
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryHeaderView.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibrarySectionedTableViewDataSource.h"
-#import "library/VLCLibraryUIUnits.h"
 
-#import "library/VLCLibraryHeaderView.h"
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibrarySectionedHeaderRowView : NSTableRowView
 @end
@@ -38,7 +38,7 @@
 {
     self = [super init];
     if (self) {
-        _rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+        _rowHeight = VLCUIUnits.mediumTableViewRowHeight;
     }
     return self;
 }

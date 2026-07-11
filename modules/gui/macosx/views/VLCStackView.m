@@ -22,6 +22,8 @@
 
 #import "VLCStackView.h"
 
+#import "views/VLCUIUnits.h"
+
 @implementation VLCStackView
 
 - (void)awakeFromNib
@@ -52,13 +54,13 @@
     CGFloat spacingValue = 0;
     switch (_spacingToken) {
         case VLCSpacingTokenSmall:
-            spacingValue = VLCLibraryUIUnits.smallSpacing;
+            spacingValue = VLCUIUnits.smallSpacing;
             break;
         case VLCSpacingTokenMedium:
-            spacingValue = VLCLibraryUIUnits.mediumSpacing;
+            spacingValue = VLCUIUnits.mediumSpacing;
             break;
         case VLCSpacingTokenLarge:
-            spacingValue = VLCLibraryUIUnits.largeSpacing;
+            spacingValue = VLCUIUnits.largeSpacing;
             break;
         default:
             return;
@@ -75,13 +77,13 @@
     CGFloat spacingValue = 0;
     switch (_edgeInsetsToken) {
         case VLCSpacingTokenSmall:
-            spacingValue = VLCLibraryUIUnits.smallSpacing;
+            spacingValue = VLCUIUnits.smallSpacing;
             break;
         case VLCSpacingTokenMedium:
-            spacingValue = VLCLibraryUIUnits.mediumSpacing;
+            spacingValue = VLCUIUnits.mediumSpacing;
             break;
         case VLCSpacingTokenLarge:
-            spacingValue = VLCLibraryUIUnits.largeSpacing;
+            spacingValue = VLCUIUnits.largeSpacing;
             break;
         default:
             return;

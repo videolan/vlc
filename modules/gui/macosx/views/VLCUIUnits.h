@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryUIUnits.h: MacOS X interface module
+ * VLCUIUnits.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -48,7 +48,7 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 
 @end
 
-@interface VLCLibraryUIUnits : NSObject
+@interface VLCUIUnits : NSObject
 
 // Note that these values are not necessarily linked to the layout defined in the .xib files.
 // If the spacing in the layout is changed you will want to change these values too.

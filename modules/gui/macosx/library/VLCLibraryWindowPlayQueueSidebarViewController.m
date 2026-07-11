@@ -28,17 +28,22 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
-#import "library/VLCLibraryUIUnits.h"
+
 #import "library/VLCLibraryWindow.h"
+
 #import "main/VLCMain.h"
+
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayQueueDataSource.h"
 #import "playqueue/VLCPlayQueueSortingMenuController.h"
+
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
+#import "views/VLCUIUnits.h"
+
 #import "windows/VLCOpenWindowController.h"
-#import "extensions/NSView+VLCAdditions.h"
 
 @implementation VLCLibraryWindowPlayQueueSidebarViewController
 {
@@ -70,7 +75,7 @@
 
     self.tableView.dataSource = self.dataSource;
     self.tableView.delegate = self.dataSource;
-    self.tableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.tableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
     [self.tableView reloadData];
 
     self.openMediaButton.title = _NS("Open media...");
@@ -95,10 +100,10 @@
     }
     [self.dragDropImageBackgroundBox.topAnchor
         constraintGreaterThanOrEqualToAnchor:self.dragDropView.topAnchor
-                                    constant:VLCLibraryUIUnits.smallSpacing].active = YES;
+                                    constant:VLCUIUnits.smallSpacing].active = YES;
     [self.dragDropView.bottomAnchor
         constraintGreaterThanOrEqualToAnchor:self.openMediaButton.bottomAnchor
-                                    constant:VLCLibraryUIUnits.smallSpacing].active = YES;
+                                    constant:VLCUIUnits.smallSpacing].active = YES;
 
     self.shuffleButton.toolTip = _NS("Shuffle");
     self.repeatButton.toolTip = _NS("Repeat");
@@ -123,7 +128,7 @@
 
 - (void)setupScrollViewGradientMask
 {
-    const CGFloat gradientHeight = VLCLibraryUIUnits.mediumSpacing;
+    const CGFloat gradientHeight = VLCUIUnits.mediumSpacing;
 
     _scrollViewGradientMask = [CAGradientLayer layer];
     _scrollViewGradientMask.colors = @[
@@ -171,22 +176,22 @@
         [glassFooterView applyConstraintsToFillSuperview];
 
         self.buttonStack.edgeInsets = NSEdgeInsetsMake(
-            VLCLibraryUIUnits.mediumSpacing,
-            VLCLibraryUIUnits.largeSpacing,
-            VLCLibraryUIUnits.mediumSpacing,
-            VLCLibraryUIUnits.largeSpacing
+            VLCUIUnits.mediumSpacing,
+            VLCUIUnits.largeSpacing,
+            VLCUIUnits.mediumSpacing,
+            VLCUIUnits.largeSpacing
         );
 
         self.scrollViewDefaultBottomConstraint.active = NO;
         self.footerContainerViewDefaultBottomConstraint.active = NO;
-        self.footerContainerViewLeadingConstraint.constant = VLCLibraryUIUnits.largeSpacing;
-        self.footerContainerViewTrailingConstraint.constant = VLCLibraryUIUnits.largeSpacing;
+        self.footerContainerViewLeadingConstraint.constant = VLCUIUnits.largeSpacing;
+        self.footerContainerViewTrailingConstraint.constant = VLCUIUnits.largeSpacing;
 
         NSLayoutConstraint * const footerBottomConstraint =
             [self.buttonStack.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor
-                                                          constant:-VLCLibraryUIUnits.largeSpacing];
+                                                          constant:-VLCUIUnits.largeSpacing];
 
-        const CGFloat footerTopLine = footerHeight + -footerBottomConstraint.constant + VLCLibraryUIUnits.smallSpacing;
+        const CGFloat footerTopLine = footerHeight + -footerBottomConstraint.constant + VLCUIUnits.smallSpacing;
 
         [NSLayoutConstraint activateConstraints:@[
             [self.scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
@@ -219,10 +224,10 @@
         [self.buttonStack applyConstraintsToFillSuperview];
 
         self.buttonStack.edgeInsets = NSEdgeInsetsMake(
-            VLCLibraryUIUnits.mediumSpacing,
-            VLCLibraryUIUnits.largeSpacing,
-            VLCLibraryUIUnits.mediumSpacing,
-            VLCLibraryUIUnits.largeSpacing
+            VLCUIUnits.mediumSpacing,
+            VLCUIUnits.largeSpacing,
+            VLCUIUnits.mediumSpacing,
+            VLCUIUnits.largeSpacing
         );
 
         self.scrollViewDefaultBottomConstraint.active = NO;

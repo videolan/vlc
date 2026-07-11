@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryUIUnits.m: MacOS X interface module
+ * VLCUIUnits.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryUIUnits.h"
+#import "VLCUIUnits.h"
 
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -39,7 +39,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 @implementation VLCCollectionViewItemSizing
 @end
 
-@implementation VLCLibraryUIUnits
+@implementation VLCUIUnits
 
 + (const CGFloat)largeSpacing
 {
@@ -113,11 +113,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
 + (const CGFloat)mediaItemCollectionViewItemFooterTextHeight
 {
-    return VLCLibraryUIUnits.smallSpacing +
+    return VLCUIUnits.smallSpacing +
            16 +
-           VLCLibraryUIUnits.smallSpacing +
+           VLCUIUnits.smallSpacing +
            16 +
-           VLCLibraryUIUnits.smallSpacing;
+           VLCUIUnits.smallSpacing;
 }
 
 + (const CGFloat)defaultMediaItemCollectionViewItemWidth
@@ -127,15 +127,15 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
 + (const NSSize)defaultMediaItemCollectionViewItemSize
 {
-    const CGFloat width = VLCLibraryUIUnits.defaultMediaItemCollectionViewItemWidth;
-    return CGSizeMake(width, width + VLCLibraryUIUnits.mediaItemCollectionViewItemFooterTextHeight);
+    const CGFloat width = VLCUIUnits.defaultMediaItemCollectionViewItemWidth;
+    return CGSizeMake(width, width + VLCUIUnits.mediaItemCollectionViewItemFooterTextHeight);
 }
 
 + (const NSSize)defaultVideoItemCollectionViewItemSize
 {
-    const CGFloat width = VLCLibraryUIUnits.defaultMediaItemCollectionViewItemWidth;
-    const CGFloat imageViewHeight = width * VLCLibraryUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier;
-    return CGSizeMake(width, imageViewHeight + VLCLibraryUIUnits.mediaItemCollectionViewItemFooterTextHeight);
+    const CGFloat width = VLCUIUnits.defaultMediaItemCollectionViewItemWidth;
+    const CGFloat imageViewHeight = width * VLCUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier;
+    return CGSizeMake(width, imageViewHeight + VLCUIUnits.mediaItemCollectionViewItemFooterTextHeight);
 }
 
 + (const CGFloat)videoItemCollectionViewImageViewAspectRatioMultiplier
@@ -193,9 +193,9 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     const CGFloat availableWidth =
         collectionView.bounds.size.width - (sectionInsets.left + sectionInsets.right);
     const float maxPossibleNumItemsInRow =
-        floor(availableWidth / (VLCLibraryUIUnits.dynamicCollectionViewItemMinimumWidth + interItemSpacing));
+        floor(availableWidth / (VLCUIUnits.dynamicCollectionViewItemMinimumWidth + interItemSpacing));
     const float minPossibleNumItemsInRow =
-        MIN(ceil(availableWidth / (VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth + interItemSpacing)), maxPossibleNumItemsInRow);
+        MIN(ceil(availableWidth / (VLCUIUnits.dynamicCollectionViewItemMaximumWidth + interItemSpacing)), maxPossibleNumItemsInRow);
 
     const NSInteger adjustment =
         [NSUserDefaults.standardUserDefaults integerForKey:VLCLibraryCollectionViewItemAdjustmentKey];
@@ -203,7 +203,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
         round((minPossibleNumItemsInRow + maxPossibleNumItemsInRow) / 2.0);
 
     const int unclampedNumItemsInRow = midPossibleNumItemsInRow + adjustment;
-    const uint numItemsInRow = MAX(unclampedNumItemsInRow, VLCLibraryUIUnits.collectionViewMinItemsInRow);
+    const uint numItemsInRow = MAX(unclampedNumItemsInRow, VLCUIUnits.collectionViewMinItemsInRow);
     const NSSize itemSize = [self itemSizeForCollectionView:collectionView
                                                  withLayout:collectionViewLayout
                                        withItemsAspectRatio:itemsAspectRatio
@@ -234,9 +234,9 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
     const CGFloat itemWidth = MAX(rowOfItemsWidth / numItemsInRow, 1);
     const CGFloat itemHeight = itemsAspectRatio == VLCLibraryCollectionViewItemAspectRatioDefaultItem 
-        ? itemWidth + VLCLibraryUIUnits.mediaItemCollectionViewItemFooterTextHeight
-        : (itemWidth * VLCLibraryUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier) 
-            + VLCLibraryUIUnits.mediaItemCollectionViewItemFooterTextHeight;
+        ? itemWidth + VLCUIUnits.mediaItemCollectionViewItemFooterTextHeight
+        : (itemWidth * VLCUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier) 
+            + VLCUIUnits.mediaItemCollectionViewItemFooterTextHeight;
 
     return NSMakeSize(itemWidth, itemHeight);
 }
@@ -267,14 +267,14 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
 + (const NSEdgeInsets)libraryViewScrollViewContentInsets
 {
-    const CGFloat toolbarHeight = VLCLibraryUIUnits.libraryWindowContentSafeTopInset;
-    const CGFloat controlsBarHeight = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
-    const CGFloat controlsBarPadding = VLCLibraryUIUnits.largeSpacing * 2; // Additional padding for floating controls bar
+    const CGFloat toolbarHeight = VLCUIUnits.libraryWindowContentSafeTopInset;
+    const CGFloat controlsBarHeight = VLCUIUnits.libraryWindowControlsBarHeight;
+    const CGFloat controlsBarPadding = VLCUIUnits.largeSpacing * 2; // Additional padding for floating controls bar
 
-    return NSEdgeInsetsMake(VLCLibraryUIUnits.mediumSpacing + toolbarHeight,
-                            VLCLibraryUIUnits.mediumSpacing,
+    return NSEdgeInsetsMake(VLCUIUnits.mediumSpacing + toolbarHeight,
+                            VLCUIUnits.mediumSpacing,
                             controlsBarHeight + controlsBarPadding,
-                            VLCLibraryUIUnits.mediumSpacing);
+                            VLCUIUnits.mediumSpacing);
 }
 
 + (const NSEdgeInsets)libraryViewScrollViewDetailListContentInsets
@@ -283,7 +283,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     static dispatch_once_t dispatchOnceToken;
     dispatch_once(&dispatchOnceToken, ^{
         contentInsets = [self libraryViewScrollViewContentInsets];
-        contentInsets.top -= VLCLibraryUIUnits.largeSpacing;
+        contentInsets.top -= VLCUIUnits.largeSpacing;
     });
     return contentInsets;
 }
@@ -294,14 +294,14 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     static dispatch_once_t dispatchOnceToken;
     dispatch_once(&dispatchOnceToken, ^{
         contentInsets = [self libraryViewScrollViewContentInsets];
-        contentInsets.top += VLCLibraryUIUnits.mediumSpacing;
+        contentInsets.top += VLCUIUnits.mediumSpacing;
     });
     return contentInsets;
 }
 
 + (const NSEdgeInsets)libraryViewScrollViewScrollerInsets
 {
-    const CGFloat toolbarHeight = VLCLibraryUIUnits.libraryWindowContentSafeTopInset;
+    const CGFloat toolbarHeight = VLCUIUnits.libraryWindowContentSafeTopInset;
 
     const NSEdgeInsets contentInsets = [self libraryViewScrollViewContentInsets];
     return NSEdgeInsetsMake(-contentInsets.top + toolbarHeight,

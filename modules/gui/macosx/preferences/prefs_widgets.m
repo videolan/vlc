@@ -37,11 +37,14 @@
 #include <vlc_plugin.h>
 #include <vlc_actions.h>
 
-#import "library/VLCLibraryUIUnits.h"
-#import "main/VLCMain.h"
+#import "preferences/prefs_widgets.h"
+
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTextField+VLCAdditions.h"
-#import "preferences/prefs_widgets.h"
+
+#import "main/VLCMain.h"
+
+#import "views/VLCUIUnits.h"
 
 NSString * const VLCPrefsWidgetModuleDragType = @"VLC media player module";
 
@@ -732,8 +735,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_textfieldString, *o_textfieldTooltip;
@@ -812,8 +815,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_textfieldTooltip;
@@ -916,8 +919,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_itemTooltip, *o_textfieldString;
@@ -1006,8 +1009,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_popupTooltip;
@@ -1142,8 +1145,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
@@ -1234,8 +1237,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_textfieldTooltip;
@@ -1327,8 +1330,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
@@ -1442,8 +1445,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
@@ -1536,8 +1539,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
@@ -1648,8 +1651,8 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
@@ -1796,8 +1799,8 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     } /* FOR i_module_index */
     module_list_free(p_list);
 
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     // First, initialize and draw the table view to get its height
     // width is increased a little to fix horizontal auto-sizing
@@ -2017,8 +2020,8 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
+    const NSUInteger leftMargin = VLCUIUnits.largeSpacing;
+    const NSUInteger rightMargin = VLCUIUnits.largeSpacing;
 
     NSRect mainFrame = [parentView frame];
     NSString *labelString;

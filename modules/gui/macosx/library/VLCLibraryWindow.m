@@ -22,31 +22,30 @@
 
 #import "VLCLibraryWindow.h"
 
+#import <vlc_common.h>
+#import <vlc_configuration.h>
+#import <vlc_media_library.h>
+#import <vlc_url.h>
+
 #import "VLCLibraryDataTypes.h"
 
 #import "extensions/NSAnimationContext+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
-#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
-#import "main/VLCApplication.h"
-#import "main/VLCMain.h"
-#import "menus/VLCMainMenu.h"
-
-#import "playqueue/VLCPlayerController.h"
-#import "playqueue/VLCPlayQueueController.h"
-
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
-#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDynamicToolbarFlagsCapable.h"
+#import "library/VLCLibraryDynamicViewModeCapable.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySortingMenuController.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
@@ -54,25 +53,30 @@
 #import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibraryWindowToolbarDelegate.h"
 
-#import "library/VLCLibraryDynamicToolbarFlagsCapable.h"
-#import "library/VLCLibraryDynamicViewModeCapable.h"
+#import "library/audio-library/VLCLibraryAlbumTableCellView.h"
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "library/groups-library/VLCLibraryGroupsViewController.h"
 
 #import "library/home-library/VLCLibraryHomeViewController.h"
 
+#import "library/playlist-library/VLCLibraryPlaylistViewController.h"
+
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
-#import "library/audio-library/VLCLibraryAlbumTableCellView.h"
-#import "library/audio-library/VLCLibraryAudioViewController.h"
-#import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "main/VLCApplication.h"
+#import "main/VLCMain.h"
 
-#import "library/playlist-library/VLCLibraryPlaylistViewController.h"
-
-#import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCLibraryMediaSourceViewController.h"
 #import "media-source/VLCLibraryMediaSourceViewNavigationStack.h"
+#import "media-source/VLCMediaSourceBaseDataSource.h"
+
+#import "menus/VLCMainMenu.h"
+
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCDragDropView.h"
@@ -83,21 +87,17 @@
 #import "views/VLCRoundedCornerTextField.h"
 #import "views/VLCSnowEffectView.h"
 #import "views/VLCTrackingView.h"
+#import "views/VLCUIUnits.h"
+
+#import "windows/VLCDetachedAudioWindow.h"
+#import "windows/VLCOpenInputMetadata.h"
+#import "windows/VLCOpenWindowController.h"
 
 #import "windows/controlsbar/VLCMainWindowControlsBar.h"
 
-#import "windows/video/VLCVoutView.h"
-#import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCMainVideoViewController.h"
-
-#import "windows/VLCDetachedAudioWindow.h"
-#import "windows/VLCOpenWindowController.h"
-#import "windows/VLCOpenInputMetadata.h"
-
-#import <vlc_common.h>
-#import <vlc_configuration.h>
-#import <vlc_media_library.h>
-#import <vlc_url.h>
+#import "windows/video/VLCVideoOutputProvider.h"
+#import "windows/video/VLCVoutView.h"
 
 const NSUInteger VLCLibrarySearchMaxMatchingTitles = 5;
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
@@ -551,7 +551,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)hideControlsBar
 {
-     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
                                                                changes:^(NSAnimationContext * const context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
         self.controlsBar.bottomBarView.animator.alphaValue = 0;
@@ -570,7 +570,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 {
     self.controlsBar.bottomBarView.hidden = NO;
 
-    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration
+    [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
                                                               changes:^(NSAnimationContext * const context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
         self.controlsBar.bottomBarView.animator.alphaValue = 1;

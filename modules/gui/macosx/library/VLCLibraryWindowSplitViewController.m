@@ -22,7 +22,6 @@
 
 #import "VLCLibraryWindowSplitViewController.h"
 
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 #import "library/VLCLibraryWindowSidebarRootViewController.h"
@@ -30,8 +29,10 @@
 #import "main/VLCMain.h"
 
 #import "views/VLCBottomBarView.h"
+#import "views/VLCUIUnits.h"
 
 #import "windows/controlsbar/VLCMainWindowControlsBar.h"
+
 #import "windows/video/VLCMainVideoViewController.h"
 
 @interface VLCLibraryWindowSplitViewController ()
@@ -72,12 +73,12 @@
     }
 
     _navSidebarItem.preferredThicknessFraction = 0.2;
-    _navSidebarItem.minimumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMinWidth;
-    _navSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMaxWidth;
+    _navSidebarItem.minimumThickness = VLCUIUnits.libraryWindowNavSidebarMinWidth;
+    _navSidebarItem.maximumThickness = VLCUIUnits.libraryWindowNavSidebarMaxWidth;
 
     self.multifunctionSidebarItem.preferredThicknessFraction = 0.2;
     self.multifunctionSidebarItem.maximumThickness =
-        VLCLibraryUIUnits.libraryWindowPlayQueueSidebarMaxWidth;
+        VLCUIUnits.libraryWindowPlayQueueSidebarMaxWidth;
     self.multifunctionSidebarItem.canCollapse = YES;
     self.multifunctionSidebarItem.collapseBehavior =
         NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
@@ -89,9 +90,9 @@
     bottomBarView.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
         [bottomBarView.leadingAnchor constraintEqualToAnchor:self.libraryTargetViewController.view.leadingAnchor
-                                                    constant:VLCLibraryUIUnits.largeSpacing * 2],
+                                                    constant:VLCUIUnits.largeSpacing * 2],
         [bottomBarView.trailingAnchor constraintEqualToAnchor:self.libraryTargetViewController.view.trailingAnchor
-                                                     constant:-(VLCLibraryUIUnits.largeSpacing * 2)],
+                                                     constant:-(VLCUIUnits.largeSpacing * 2)],
     ]];
 }
 

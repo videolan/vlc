@@ -22,7 +22,7 @@
 
 #import "VLCLibraryVideoTableViewDelegate.h"
 
-#import "library/VLCLibraryUIUnits.h"
+#import "views/VLCUIUnits.h"
 
 @implementation VLCLibraryVideoTableViewDelegate
 
@@ -31,7 +31,7 @@
     self = [super init];
     if (self) {
         self.cellViewIdentifier = @"VLCVideoLibraryTableViewCellIdentifier";
-        self.rowHeight = VLCLibraryUIUnits.videoLibraryTableViewRowHeight;
+        self.rowHeight = VLCUIUnits.videoLibraryTableViewRowHeight;
     }
     return self;
 }

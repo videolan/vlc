@@ -22,8 +22,8 @@
 
 #import "VLCLibraryCollectionViewSupplementaryDetailView.h"
 
-#import "library/VLCLibraryUIUnits.h"
 #import "views/VLCSubScrollView.h"
+#import "views/VLCUIUnits.h"
 
 static const CGFloat kArrowHeight = 20.;
 static const CGFloat kArrowWidth = 50.;
@@ -146,15 +146,15 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     _layoutScrollDirection = layoutScrollDirection;
 
     if (_layoutScrollDirection == NSCollectionViewScrollDirectionVertical && [self validConstraintProps]) {
-        _contentViewTopConstraint.constant = kArrowHeight + [VLCLibraryUIUnits mediumSpacing];
-        _contentViewBottomConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
-        _contentViewLeftConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
-        _contentViewRightConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
+        _contentViewTopConstraint.constant = kArrowHeight + [VLCUIUnits mediumSpacing];
+        _contentViewBottomConstraint.constant = [VLCUIUnits mediumSpacing];
+        _contentViewLeftConstraint.constant = [VLCUIUnits mediumSpacing];
+        _contentViewRightConstraint.constant = [VLCUIUnits mediumSpacing];
     } else if (_layoutScrollDirection == NSCollectionViewScrollDirectionHorizontal  && [self validConstraintProps]) {
-        _contentViewTopConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
-        _contentViewBottomConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
-        _contentViewLeftConstraint.constant = kArrowHeight + [VLCLibraryUIUnits mediumSpacing];
-        _contentViewRightConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
+        _contentViewTopConstraint.constant = [VLCUIUnits mediumSpacing];
+        _contentViewBottomConstraint.constant = [VLCUIUnits mediumSpacing];
+        _contentViewLeftConstraint.constant = kArrowHeight + [VLCUIUnits mediumSpacing];
+        _contentViewRightConstraint.constant = [VLCUIUnits mediumSpacing];
     }
 
     self.needsDisplay = YES;

@@ -22,23 +22,22 @@
 
 #import "VLCLibraryAudioDataSource.h"
 
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
-
-#import "main/VLCMain.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryCarouselViewItemView.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
-#import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryTableCellView.h"
-#import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
-#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
-#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
@@ -47,8 +46,7 @@
 
 #import "library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.h"
 
-#import "extensions/NSString+Helpers.h"
-#import "extensions/NSPasteboardItem+VLCAdditions.h"
+#import "main/VLCMain.h"
 
 #import "playqueue/VLCPlayerController.h"
 #import "playqueue/VLCPlayQueueController.h"
@@ -57,6 +55,7 @@
 
 #import "views/VLCImageView.h"
 #import "views/VLCSubScrollView.h"
+#import "views/VLCUIUnits.h"
 
 NSString * const VLCLibrarySongsTableViewSongPlayingColumnIdentifier = @"VLCLibrarySongsTableViewSongPlayingColumnIdentifier";
 NSString * const VLCLibrarySongsTableViewTitleColumnIdentifier = @"VLCLibrarySongsTableViewTitleColumnIdentifier";
@@ -969,8 +968,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     if (carouselItemView == nil) {
         const NSRect itemFrame = NSMakeRect(0,
                                             0,
-                                            VLCLibraryUIUnits.carouselViewItemViewHeight,
-                                            VLCLibraryUIUnits.carouselViewItemViewHeight);
+                                            VLCUIUnits.carouselViewItemViewHeight,
+                                            VLCUIUnits.carouselViewItemViewHeight);
         carouselItemView = [VLCLibraryCarouselViewItemView fromNibWithOwner:self];
         carouselItemView.frame = itemFrame;
     }

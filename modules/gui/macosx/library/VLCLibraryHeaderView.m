@@ -22,13 +22,14 @@
 
 #import "VLCLibraryHeaderView.h"
 
-#import "library/VLCLibraryRepresentedItem.h"
-#import "library/VLCLibraryUIUnits.h"
-
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
+
+#import "library/VLCLibraryRepresentedItem.h"
+
+#import "views/VLCUIUnits.h"
 
 const CGFloat VLCLibraryHeaderViewHeight = 66.f;
 NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
@@ -53,11 +54,11 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
 
 + (CGFloat)internalPaddingHeight
 {
-    const CGFloat topInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing;
+    const CGFloat topInset = VLCUIUnits.largeSpacing + VLCUIUnits.mediumSpacing;
     CGFloat bottomInset = 0.f;
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
     if (@available(macOS 26.0, *)) {
-        bottomInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
+        bottomInset = VLCUIUnits.largeSpacing + VLCUIUnits.mediumSpacing + VLCUIUnits.smallSpacing;
     }
 #endif
     return topInset + bottomInset;
@@ -108,7 +109,7 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
 - (void)commonInit
 {
     NSView *contentHostView = self;
-    self.backgroundTopInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing;
+    self.backgroundTopInset = VLCUIUnits.largeSpacing + VLCUIUnits.mediumSpacing;
     self.backgroundBottomInset = 0.f;
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
@@ -120,7 +121,7 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
         glassView.contentView = glassContentView;
         self.backgroundView = glassView;
         contentHostView = glassContentView;
-        self.backgroundBottomInset = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing + VLCLibraryUIUnits.smallSpacing;
+        self.backgroundBottomInset = VLCUIUnits.largeSpacing + VLCUIUnits.mediumSpacing + VLCUIUnits.smallSpacing;
     } else
 #endif
     if (@available(macOS 10.14, *)) {
@@ -155,7 +156,7 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
     labelsStack.translatesAutoresizingMaskIntoConstraints = NO;
     labelsStack.orientation = NSUserInterfaceLayoutOrientationVertical;
     labelsStack.alignment = NSLayoutAttributeLeading;
-    labelsStack.spacing = VLCLibraryUIUnits.smallSpacing;
+    labelsStack.spacing = VLCUIUnits.smallSpacing;
     [labelsStack setContentHuggingPriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
     [labelsStack setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
     self.labelsStackView = labelsStack;
@@ -164,7 +165,7 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
     buttonsStack.translatesAutoresizingMaskIntoConstraints = NO;
     buttonsStack.orientation = NSUserInterfaceLayoutOrientationHorizontal;
     buttonsStack.alignment = NSLayoutAttributeCenterY;
-    buttonsStack.spacing = VLCLibraryUIUnits.smallSpacing;
+    buttonsStack.spacing = VLCUIUnits.smallSpacing;
     [buttonsStack setContentHuggingPriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
     [buttonsStack setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
     self.buttonsStackView = buttonsStack;
@@ -172,14 +173,14 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
     [contentHostView addSubview:labelsStack];
     [contentHostView addSubview:buttonsStack];
 
-    const CGFloat horizontalContentInset = VLCLibraryUIUnits.mediumSpacing;
+    const CGFloat horizontalContentInset = VLCUIUnits.mediumSpacing;
 
     [NSLayoutConstraint activateConstraints:@[
         [labelsStack.leadingAnchor constraintEqualToAnchor:contentHostView.leadingAnchor constant:horizontalContentInset],
         [labelsStack.centerYAnchor constraintEqualToAnchor:contentHostView.centerYAnchor],
         [contentHostView.trailingAnchor constraintEqualToAnchor:buttonsStack.trailingAnchor constant:horizontalContentInset],
         [buttonsStack.centerYAnchor constraintEqualToAnchor:contentHostView.centerYAnchor],
-        [buttonsStack.leadingAnchor constraintGreaterThanOrEqualToAnchor:labelsStack.trailingAnchor constant:VLCLibraryUIUnits.largeSpacing],
+        [buttonsStack.leadingAnchor constraintGreaterThanOrEqualToAnchor:labelsStack.trailingAnchor constant:VLCUIUnits.largeSpacing],
     ]];
     [self updateBackgroundConstraints];
 
@@ -190,8 +191,8 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
     if (@available(macOS 26.0, *)) {
     } else {
         self.backgroundView.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
-        self.backgroundView.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
-        self.backgroundView.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
+        self.backgroundView.layer.borderWidth = VLCUIUnits.borderThickness;
+        self.backgroundView.layer.cornerRadius = VLCUIUnits.cornerRadius;
         self.backgroundView.layer.masksToBounds = YES;
 
         if (@available(macOS 10.14, *)) {

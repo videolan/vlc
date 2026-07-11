@@ -32,20 +32,20 @@
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
+#import "library/VLCInputNodePathControl.h"
+#import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
-#import "library/VLCInputNodePathControl.h"
 #import "library/VLCLibrarySegment.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
 
 #import "views/VLCLoadingOverlayView.h"
 #import "views/VLCMediaItemCollectionViewItem.h"
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibraryMediaSourceViewController ()
 {
@@ -154,15 +154,15 @@
 
     VLCLibraryCollectionViewFlowLayout * const mediaSourceCollectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
     self.collectionView.collectionViewLayout = mediaSourceCollectionViewLayout;
-    mediaSourceCollectionViewLayout.itemSize = VLCLibraryUIUnits.defaultVideoItemCollectionViewItemSize;
+    mediaSourceCollectionViewLayout.itemSize = VLCUIUnits.defaultVideoItemCollectionViewItemSize;
 }
 
 - (void)setupMediaSourceLibraryViews
 {
-    _mediaSourceTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    _mediaSourceTableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
 
-    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    const NSEdgeInsets defaultInsets = VLCUIUnits.libraryViewScrollViewContentInsets;
+    const NSEdgeInsets scrollerInsets = VLCUIUnits.libraryViewScrollViewScrollerInsets;
 
     _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _collectionViewScrollView.contentInsets = defaultInsets;
@@ -202,13 +202,13 @@
         [self.mediaSourceView addSubview:self.pathControlGlassEffectView];
 
         NSLayoutYAxisAnchor *topAnchor = self.mediaSourceView.topAnchor;
-        const CGFloat topConstant = VLCLibraryUIUnits.libraryWindowContentSafeTopInset;
+        const CGFloat topConstant = VLCUIUnits.libraryWindowContentSafeTopInset;
 
         _pathControlViewTopConstraintToSuperview =
             [self.pathControlGlassEffectView.topAnchor constraintEqualToAnchor:topAnchor constant:topConstant];
         [NSLayoutConstraint activateConstraints:@[
-            [self.pathControlGlassEffectView.leadingAnchor constraintEqualToAnchor:self.mediaSourceView.leadingAnchor constant:VLCLibraryUIUnits.smallSpacing],
-            [self.pathControlGlassEffectView.trailingAnchor constraintEqualToAnchor:self.mediaSourceView.trailingAnchor constant:-VLCLibraryUIUnits.smallSpacing],
+            [self.pathControlGlassEffectView.leadingAnchor constraintEqualToAnchor:self.mediaSourceView.leadingAnchor constant:VLCUIUnits.smallSpacing],
+            [self.pathControlGlassEffectView.trailingAnchor constraintEqualToAnchor:self.mediaSourceView.trailingAnchor constant:-VLCUIUnits.smallSpacing],
         ]];
         NSView * const pathControlContainer = [[NSView alloc] init];
         pathControlContainer.translatesAutoresizingMaskIntoConstraints = NO;
@@ -216,21 +216,21 @@
         [pathControlContainer addSubview:homeButton];
         [pathControlContainer addSubview:pathControl];
         [NSLayoutConstraint activateConstraints:@[
-            [homeButton.leadingAnchor constraintEqualToAnchor:pathControlContainer.leadingAnchor constant:VLCLibraryUIUnits.smallSpacing],
+            [homeButton.leadingAnchor constraintEqualToAnchor:pathControlContainer.leadingAnchor constant:VLCUIUnits.smallSpacing],
             [homeButton.centerYAnchor constraintEqualToAnchor:pathControlContainer.centerYAnchor],
-            [homeButton.topAnchor constraintGreaterThanOrEqualToAnchor:pathControlContainer.topAnchor constant:VLCLibraryUIUnits.smallSpacing],
-            [homeButton.bottomAnchor constraintLessThanOrEqualToAnchor:pathControlContainer.bottomAnchor constant:-VLCLibraryUIUnits.smallSpacing],
-            [pathControl.leadingAnchor constraintEqualToAnchor:homeButton.trailingAnchor constant:VLCLibraryUIUnits.smallSpacing],
-            [pathControl.trailingAnchor constraintEqualToAnchor:pathControlContainer.trailingAnchor constant:-VLCLibraryUIUnits.smallSpacing],
+            [homeButton.topAnchor constraintGreaterThanOrEqualToAnchor:pathControlContainer.topAnchor constant:VLCUIUnits.smallSpacing],
+            [homeButton.bottomAnchor constraintLessThanOrEqualToAnchor:pathControlContainer.bottomAnchor constant:-VLCUIUnits.smallSpacing],
+            [pathControl.leadingAnchor constraintEqualToAnchor:homeButton.trailingAnchor constant:VLCUIUnits.smallSpacing],
+            [pathControl.trailingAnchor constraintEqualToAnchor:pathControlContainer.trailingAnchor constant:-VLCUIUnits.smallSpacing],
             [pathControl.centerYAnchor constraintEqualToAnchor:pathControlContainer.centerYAnchor],
-            [pathControl.topAnchor constraintGreaterThanOrEqualToAnchor:pathControlContainer.topAnchor constant:VLCLibraryUIUnits.smallSpacing],
-            [pathControl.bottomAnchor constraintLessThanOrEqualToAnchor:pathControlContainer.bottomAnchor constant:-VLCLibraryUIUnits.smallSpacing],
+            [pathControl.topAnchor constraintGreaterThanOrEqualToAnchor:pathControlContainer.topAnchor constant:VLCUIUnits.smallSpacing],
+            [pathControl.bottomAnchor constraintLessThanOrEqualToAnchor:pathControlContainer.bottomAnchor constant:-VLCUIUnits.smallSpacing],
         ]];
         self.pathControlGlassEffectView.contentView = pathControlContainer;
 #endif
     } else {
         NSLayoutYAxisAnchor *topAnchor = self.mediaSourceView.topAnchor;
-        const CGFloat topConstant = VLCLibraryUIUnits.libraryWindowContentSafeTopInset;
+        const CGFloat topConstant = VLCUIUnits.libraryWindowContentSafeTopInset;
 
         _pathControlViewTopConstraintToSuperview =
             [self.pathControlVisualEffectView.topAnchor constraintEqualToAnchor:topAnchor constant:topConstant];

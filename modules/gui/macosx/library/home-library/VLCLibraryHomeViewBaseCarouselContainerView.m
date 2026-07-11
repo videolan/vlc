@@ -26,9 +26,10 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTextField+VLCAdditions.h"
 
-#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryCarouselViewItemView.h"
-#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryDataTypes.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibraryHomeViewBaseCarouselContainerView ()
 {
@@ -106,7 +107,7 @@
         [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
     ]];
 
-    const CGFloat buttonSize = VLCLibraryUIUnits.largeSpacing;
+    const CGFloat buttonSize = VLCUIUnits.largeSpacing;
 
     NSImage * const leftImage = [NSImage imageNamed:NSImageNameGoLeftTemplate];
     _leftButton = [[NSButton alloc] initWithFrame:NSZeroRect];
@@ -152,7 +153,7 @@
     }
 #endif
 
-    _itemHeight = VLCLibraryUIUnits.carouselViewItemViewHeight;
+    _itemHeight = VLCUIUnits.carouselViewItemViewHeight;
 
     [self updateCarouselViewHeight];
     [self updateCarouselOffset];
@@ -172,7 +173,7 @@
 - (void)updateCarouselViewHeight
 {
     const CGFloat viewHeight = self.titleView.frame.size.height +
-                               VLCLibraryUIUnits.largeSpacing * 2 +
+                               VLCUIUnits.largeSpacing * 2 +
                                _itemHeight;
 
     if (self.heightConstraint == nil) {
@@ -268,7 +269,7 @@
         // the constant VLC-wide spacing relative to the width of the carousel's
         // itemWidth.
         const CGFloat itemWidth = carousel.itemWidth;
-        const CGFloat bothSidesSpacing = VLCLibraryUIUnits.mediumSpacing * 2;
+        const CGFloat bothSidesSpacing = VLCUIUnits.mediumSpacing * 2;
         const CGFloat desiredWidthWithSpacing = itemWidth + bothSidesSpacing;
         const CGFloat desiredMultiple = desiredWidthWithSpacing / itemWidth;
         return desiredMultiple;

@@ -25,13 +25,14 @@
 #import "extensions/NSAnimationContext+VLCAdditions.h"
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
-#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
-#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
+
+#import "views/VLCUIUnits.h"
 
 #pragma mark - Private data
 static const NSUInteger kAnimationSteps = 32;
@@ -87,8 +88,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
 + (instancetype)standardLayout
 {
-    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
-    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+    const CGFloat collectionItemSpacing = VLCUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCUIUnits.collectionViewSectionInsets;
 
     VLCLibraryCollectionViewFlowLayout * const collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
@@ -102,10 +103,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 {
     self = [super init];
     if (self) {
-        _mediumHeightAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight];
-        _largeHeightAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight];
-        _mediumWidthAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewWidth];
-        _largeWidthAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewWidth];
+        _mediumHeightAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCUIUnits.mediumDetailSupplementaryViewCollectionViewHeight];
+        _largeHeightAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCUIUnits.largeDetailSupplementaryViewCollectionViewHeight];
+        _mediumWidthAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCUIUnits.mediumDetailSupplementaryViewCollectionViewWidth];
+        _largeWidthAnimationSteps = [self generateAnimationStepsForExpandedViewDimension:VLCUIUnits.largeDetailSupplementaryViewCollectionViewWidth];
         
         _animationType = VLCExpandAnimationTypeVerticalMedium;
         _prevProvidedAnimationStep = 0;
@@ -161,14 +162,14 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 {
     switch(_animationType) {
         case VLCExpandAnimationTypeHorizontalMedium:
-            return VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewWidth;
+            return VLCUIUnits.mediumDetailSupplementaryViewCollectionViewWidth;
         case VLCExpandAnimationTypeHorizontalLarge:
-            return VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewWidth;
+            return VLCUIUnits.largeDetailSupplementaryViewCollectionViewWidth;
         case VLCExpandAnimationTypeVerticalLarge:
-            return VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight;
+            return VLCUIUnits.largeDetailSupplementaryViewCollectionViewHeight;
         case VLCExpandAnimationTypeVerticalMedium:
         default:
-            return VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight;
+            return VLCUIUnits.mediumDetailSupplementaryViewCollectionViewHeight;
     }
 }
 
@@ -193,7 +194,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         [self animateDetailViewWithAnimation:VLCDetailViewAnimationTypeExpand];
 
         NSRect frame = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath].frame;
-        frame.size.height += [self finalExpandedHeight] + VLCLibraryUIUnits.largeSpacing;
+        frame.size.height += [self finalExpandedHeight] + VLCUIUnits.largeSpacing;
 
         [NSAnimationContext runAnimationRespectingPreferencesWithChanges:^(NSAnimationContext * const __unused context) {
             [self.collectionView.animator scrollRectToVisible:frame];
@@ -363,7 +364,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         if (self.scrollDirection == NSCollectionViewScrollDirectionVertical) {
             const float selectedItemFrameMaxY = _selectedIndexPath == nil ? 0 : NSMaxY(selectedItemFrame);
             detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame) + self.minimumInteritemSpacing,
-                                                    selectedItemFrameMaxY + VLCLibraryUIUnits.mediumSpacing,
+                                                    selectedItemFrameMaxY + VLCUIUnits.mediumSpacing,
                                                     self.collectionViewContentSize.width - (self.minimumInteritemSpacing * 2),
                                                     [self currentAnimationStep]);
 
@@ -420,13 +421,13 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         if (self.scrollDirection == NSCollectionViewScrollDirectionVertical &&
             NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
 
-            attributesFrame.origin.y += [self currentAnimationStep] + VLCLibraryUIUnits.mediumSpacing;
+            attributesFrame.origin.y += [self currentAnimationStep] + VLCUIUnits.mediumSpacing;
 
         } else if (self.scrollDirection == NSCollectionViewScrollDirectionHorizontal &&
                    NSMinX(attributesFrame) > (NSMaxX(selectedItemFrame))) {
 
-            attributesFrame.origin.y += [self currentAnimationStep] + VLCLibraryUIUnits.mediumSpacing;
-            attributesFrame.origin.x += [self currentAnimationStep] + VLCLibraryUIUnits.mediumSpacing;
+            attributesFrame.origin.y += [self currentAnimationStep] + VLCUIUnits.mediumSpacing;
+            attributesFrame.origin.x += [self currentAnimationStep] + VLCUIUnits.mediumSpacing;
         }
     }
 

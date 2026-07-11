@@ -40,13 +40,14 @@
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/groups-library/VLCLibraryGroupsDataSource.h"
 
 #import "main/VLCMain.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibraryGroupsViewController ()
 {
@@ -81,8 +82,8 @@
 
     _collectionViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.collectionView];
 
-    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
-    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+    const CGFloat collectionItemSpacing = VLCUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCUIUnits.collectionViewSectionInsets;
 
     VLCLibraryCollectionViewFlowLayout * const collectionViewLayout =
         [[VLCLibraryCollectionViewFlowLayout alloc] init];
@@ -95,7 +96,7 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
-    self.collectionViewDelegate.staticItemSize = VLCLibraryUIUnits.defaultVideoItemCollectionViewItemSize;
+    self.collectionViewDelegate.staticItemSize = VLCUIUnits.defaultVideoItemCollectionViewItemSize;
     self.collectionView.delegate = self.collectionViewDelegate;
 
     self.collectionView.selectable = YES;
@@ -173,8 +174,8 @@
 
     selectedGroupColumn.headerCell = [VLCLibraryHeaderCell new];
 
-    self.groupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
-    self.selectedGroupTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.groupsTableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
+    self.selectedGroupTableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
     self.selectedGroupTableView.allowsMultipleSelection = YES;
 
     self.groupsTableView.delegate = self.tableViewDelegate;

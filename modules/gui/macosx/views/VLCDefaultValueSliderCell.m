@@ -30,8 +30,9 @@
 
 #import "VLCDefaultValueSliderCell.h"
 
-#import "library/VLCLibraryUIUnits.h"
 #import "main/CompatibilityFixes.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCDefaultValueSliderCell (){
     BOOL _isRTL;
@@ -161,7 +162,7 @@
     if (_drawTickMarkForDefault && _defaultValue != DBL_MAX) {
 
         // Calculate rect for default tick mark
-        const CGFloat tickThickness = VLCLibraryUIUnits.sliderTickThickness;
+        const CGFloat tickThickness = VLCUIUnits.sliderTickThickness;
 
         NSRect tickFrame = [self knobRectFlipped:_isFlipped
                                         forValue:_defaultValue];

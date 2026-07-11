@@ -31,25 +31,25 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryHeaderCell.h"
+#import "library/VLCLibraryHeaderView.h"
 #import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "library/playlist-library/VLCLibraryPlaylistDataSource.h"
-#import "library/VLCLibraryHeaderCell.h"
-#import "library/VLCLibraryHeaderView.h"
 
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
 #import "main/VLCMain.h"
 
+#import "views/VLCUIUnits.h"
 
 #import "windows/video/VLCMainVideoViewController.h"
 
@@ -175,8 +175,8 @@
 
     detailColumn.headerCell = [VLCLibraryHeaderCell new];
 
-    self.masterTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
-    self.detailTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.masterTableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
+    self.detailTableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
 
     self.masterTableView.delegate = self.tableViewDelegate;
     self.detailTableView.delegate = self.tableViewDelegate;

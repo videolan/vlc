@@ -43,13 +43,14 @@
 #import "library/VLCLibrarySectionedTableViewDelegate.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "main/VLCMain.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibrarySearchViewController ()
 
@@ -118,8 +119,8 @@
 - (void)setupCollectionView
 {
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
-    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
-    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+    const CGFloat collectionItemSpacing = VLCUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCUIUnits.collectionViewSectionInsets;
     self.collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
     self.collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     self.collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
@@ -133,7 +134,7 @@
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioDefaultItem;
-    self.collectionViewDelegate.staticItemSize = VLCLibraryUIUnits.defaultMediaItemCollectionViewItemSize;
+    self.collectionViewDelegate.staticItemSize = VLCUIUnits.defaultMediaItemCollectionViewItemSize;
     self.collectionView.delegate = self.collectionViewDelegate;
 
     [self.collectionView registerClass:VLCLibraryCollectionViewItem.class
@@ -168,7 +169,7 @@
                      withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind];
 
     _collectionViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.collectionView
-                                                                  contentInsets:VLCLibraryUIUnits.libraryViewScrollViewContentInsets];
+                                                                  contentInsets:VLCUIUnits.libraryViewScrollViewContentInsets];
     
     self.dataSource.collectionView = self.collectionView;
     self.collectionView.dataSource = self.dataSource;
@@ -178,7 +179,7 @@
 {
     _tableView = [[VLCLibraryTableView alloc] init];
     self.tableView.headerView = nil;
-    self.tableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.tableView.rowHeight = VLCUIUnits.mediumTableViewRowHeight;
     self.tableView.allowsMultipleSelection = YES;
     self.tableView.floatsGroupRows = NO;
 
@@ -196,7 +197,7 @@
     self.tableView.delegate = self.tableViewDelegate;
 
     _tableViewScrollView = [NSScrollView libraryScrollViewWithDocumentView:self.tableView
-                                                             contentInsets:VLCLibraryUIUnits.libraryViewScrollViewContentInsets];
+                                                             contentInsets:VLCUIUnits.libraryViewScrollViewContentInsets];
 
     self.tableView.dataSource = self.dataSource;
     self.tableView.delegate = self.tableViewDelegate;

@@ -22,10 +22,11 @@
 
 #import "VLCLibraryTwoPaneSplitViewDelegate.h"
 
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
+
+#import "views/VLCUIUnits.h"
 
 NSString * const VLCLibrarySplitViewDetailViewWidthKey = @"VLCLibrarySplitViewDetailViewWidth";
 
@@ -41,7 +42,7 @@ NSString * const VLCLibrarySplitViewDetailViewWidthKey = @"VLCLibrarySplitViewDe
         NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
         CGFloat width = [defaults floatForKey:VLCLibrarySplitViewDetailViewWidthKey];
         if (width <= 0) {
-            width = VLCLibraryUIUnits.librarySplitViewSelectionViewDefaultWidth;
+            width = VLCUIUnits.librarySplitViewSelectionViewDefaultWidth;
         }
         [splitView setPosition:width ofDividerAtIndex:0];
     });
@@ -57,7 +58,7 @@ constrainMaxCoordinate:(CGFloat)proposedMinimumPosition
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
     const CGFloat libraryWindowWidth = libraryWindow.frame.size.width;
-    return libraryWindowWidth - VLCLibraryUIUnits.librarySplitViewMainViewMinimumWidth;
+    return libraryWindowWidth - VLCUIUnits.librarySplitViewMainViewMinimumWidth;
 }
 
 - (void)splitViewDidResizeSubviews:(NSNotification *)notification

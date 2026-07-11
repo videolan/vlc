@@ -28,8 +28,8 @@
 #include <unistd.h>
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
-#import "VLCMediaSourceBaseDataSource.h"
 #import "VLCMediaSource.h"
+#import "VLCMediaSourceBaseDataSource.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTableCellView+VLCAdditions.h"
@@ -39,8 +39,8 @@
 #import "library/VLCInputNodePathControlItem.h"
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryTableCellView.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+
 #import "library/media-source/VLCMediaSourceCollectionViewItem.h"
 
 #import "main/VLCMain.h"
@@ -48,6 +48,7 @@
 #import "playqueue/VLCPlayQueueController.h"
 
 #import "views/VLCImageView.h"
+#import "views/VLCUIUnits.h"
 
 NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourceNodeChanged";
 NSString * const VLCMediaSourceDataSourceLoadingStarted = @"VLCMediaSourceDataSourceLoadingStarted";
@@ -280,9 +281,9 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
 {
     VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
     NSAssert(collectionViewLayout, @"This should be a flow layout and thus a valid pointer");
-    return [VLCLibraryUIUnits adjustedCollectionViewItemSizeForCollectionView:collectionView
-                                                                   withLayout:collectionViewFlowLayout
-                                                         withItemsAspectRatio:VLCLibraryCollectionViewItemAspectRatioDefaultItem];
+    return [VLCUIUnits adjustedCollectionViewItemSizeForCollectionView:collectionView
+                                                            withLayout:collectionViewFlowLayout
+                                                  withItemsAspectRatio:VLCLibraryCollectionViewItemAspectRatioDefaultItem];
 }
 
 #pragma mark - table view data source and delegation

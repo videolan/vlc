@@ -22,15 +22,14 @@
 
 #import "VLCLibraryHomeViewStackViewController.h"
 
+#import "extensions/NSView+VLCAdditions.h"
+
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
-#import "extensions/NSView+VLCAdditions.h"
-
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryHeroView.h"
 #import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryUIUnits.h"
 
 #import "library/home-library/VLCLibraryHomeViewActionsView.h"
 #import "library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h"
@@ -45,6 +44,7 @@
 #import "main/VLCMain.h"
 
 #import "views/VLCSubScrollView.h"
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibraryHomeViewStackViewController()
 {
@@ -299,7 +299,7 @@
     }
 
     _collectionsStackView = collectionsStackView;
-    _collectionsStackView.spacing = VLCLibraryUIUnits.largeSpacing;
+    _collectionsStackView.spacing = VLCUIUnits.largeSpacing;
     _collectionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
     _collectionsStackView.alignment = NSLayoutAttributeLeading;
     _collectionsStackView.distribution = NSStackViewDistributionFill;

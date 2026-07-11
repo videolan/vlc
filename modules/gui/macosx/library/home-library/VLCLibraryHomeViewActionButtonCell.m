@@ -24,7 +24,8 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
-#import "library/VLCLibraryUIUnits.h"
+
+#import "views/VLCUIUnits.h"
 
 @interface VLCLibraryHomeViewActionButtonCell ()
 
@@ -70,7 +71,7 @@
         return _cachedTitleHeight;
     }
     const NSSize titleSize = [self.title sizeWithAttributes:attributes];
-    _cachedTitleHeight = titleSize.height + VLCLibraryUIUnits.smallSpacing;
+    _cachedTitleHeight = titleSize.height + VLCUIUnits.smallSpacing;
     return _cachedTitleHeight;
 }
 
@@ -107,7 +108,7 @@
 
     const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
     const CGFloat imageAvailableVerticalSpace =
-        cellHeight - titleHeight - VLCLibraryUIUnits.largeSpacing * 2;
+        cellHeight - titleHeight - VLCUIUnits.largeSpacing * 2;
     CGFloat imageWidth, imageHeight;
 
     // Try to scale focusing on width first, if this yields a height that is too large, switch
@@ -136,9 +137,9 @@
 
     NSDictionary<NSAttributedStringKey, id> * const titleAttributes = [self titleAttributes];
     const CGFloat titleHeight = [self titleHeightWithAttributes:titleAttributes];
-    const NSRect titleRect = CGRectMake(cellMinX + VLCLibraryUIUnits.smallSpacing,
+    const NSRect titleRect = CGRectMake(cellMinX + VLCUIUnits.smallSpacing,
                                       cellMaxY - titleHeight,
-                                      cellWidth - VLCLibraryUIUnits.smallSpacing * 2,
+                                      cellWidth - VLCUIUnits.smallSpacing * 2,
                                       titleHeight);
     [self.title drawInRect:titleRect withAttributes:titleAttributes];
     return titleRect;
@@ -151,9 +152,9 @@
 
     NSBezierPath * const separatorPath =
         [NSBezierPath bezierPathWithRoundedRect:frame
-                                        xRadius:VLCLibraryUIUnits.cornerRadius
-                                        yRadius:VLCLibraryUIUnits.cornerRadius];
-    separatorPath.lineWidth = VLCLibraryUIUnits.borderThickness;
+                                        xRadius:VLCUIUnits.cornerRadius
+                                        yRadius:VLCUIUnits.cornerRadius];
+    separatorPath.lineWidth = VLCUIUnits.borderThickness;
     [separatorPath stroke];
     [separatorPath fill];
 }

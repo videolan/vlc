@@ -216,8 +216,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryTableCellViewProtocol.h \
 	gui/macosx/library/VLCLibraryTwoPaneSplitViewDelegate.h \
 	gui/macosx/library/VLCLibraryTwoPaneSplitViewDelegate.m \
-	gui/macosx/library/VLCLibraryUIUnits.h \
-	gui/macosx/library/VLCLibraryUIUnits.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/library/VLCLibraryWindowController.h \
@@ -497,6 +495,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCTimeFormatter.m \
 	gui/macosx/views/VLCTrackingView.h \
 	gui/macosx/views/VLCTrackingView.m \
+	gui/macosx/views/VLCUIUnits.h \
+	gui/macosx/views/VLCUIUnits.m \
 	gui/macosx/views/VLCVolumeSlider.h \
 	gui/macosx/views/VLCVolumeSlider.m \
 	gui/macosx/views/VLCVolumeSliderCell.h \

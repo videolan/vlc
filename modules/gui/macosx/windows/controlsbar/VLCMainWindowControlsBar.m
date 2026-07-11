@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #import "VLCMainWindowControlsBar.h"
+
 #import "VLCControlsBarCommon.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
@@ -30,19 +31,19 @@
 #import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
-#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
 
+#import "playqueue/VLCPlayerController.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayQueueItem.h"
 #import "playqueue/VLCPlayQueueModel.h"
-#import "playqueue/VLCPlayerController.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCTimeField.h"
 #import "views/VLCTrackingView.h"
+#import "views/VLCUIUnits.h"
 #import "views/VLCVolumeSlider.h"
 
 /*****************************************************************************
@@ -79,9 +80,9 @@
 #endif
     } else {
         self.visualEffectView.wantsLayer = YES;
-        self.visualEffectView.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
+        self.visualEffectView.layer.cornerRadius = VLCUIUnits.cornerRadius;
         self.visualEffectView.layer.masksToBounds = YES;
-        self.visualEffectView.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
+        self.visualEffectView.layer.borderWidth = VLCUIUnits.borderThickness;
         self.visualEffectView.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
     }
 

@@ -21,7 +21,6 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "library/VLCLibraryUIUnits.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -22,7 +22,7 @@
 
 #import "NSScrollView+VLCAdditions.h"
 
-#import "library/VLCLibraryUIUnits.h"
+#import "views/VLCUIUnits.h"
 
 @implementation NSScrollView (VLCAdditions)
 
@@ -35,7 +35,7 @@
     scrollView.borderType = NSNoBorder;
     scrollView.automaticallyAdjustsContentInsets = NO;
     scrollView.contentInsets = contentInsets;
-    scrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    scrollView.scrollerInsets = VLCUIUnits.libraryViewScrollViewScrollerInsets;
     scrollView.documentView = documentView;
     return scrollView;
 }
@@ -43,13 +43,13 @@
 + (instancetype)libraryScrollViewWithDocumentView:(NSView *)documentView
 {
     return [self libraryScrollViewWithDocumentView:documentView
-                                     contentInsets:VLCLibraryUIUnits.libraryViewScrollViewContentInsets];
+                                     contentInsets:VLCUIUnits.libraryViewScrollViewContentInsets];
 }
 
 + (instancetype)libraryDetailScrollViewWithDocumentView:(NSView *)documentView
 {
     return [self libraryScrollViewWithDocumentView:documentView
-                                     contentInsets:VLCLibraryUIUnits.libraryViewScrollViewDetailListContentInsets];
+                                     contentInsets:VLCUIUnits.libraryViewScrollViewDetailListContentInsets];
 }
 
 @end

@@ -22,15 +22,19 @@
 
 #import "VLCPlaybackEndViewController.h"
 
-#import "main/VLCMain.h"
 #import "extensions/NSArray+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryUIUnits.h"
+
+#import "main/VLCMain.h"
+
 #import "playqueue/VLCPlayQueueController.h"
+
+#import "views/VLCUIUnits.h"
 
 #include <vlc_interface.h>
 
@@ -59,9 +63,9 @@ NSString * const VLCPlaybackEndViewReturnToLibraryNotificationName = @"VLCPlayba
 {
     [super viewDidLoad];
     self.view.wantsLayer = YES;
-    self.view.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
+    self.view.layer.cornerRadius = VLCUIUnits.cornerRadius;
     self.view.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
-    self.view.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
+    self.view.layer.borderWidth = VLCUIUnits.borderThickness;
     self.largeTitleLabel.stringValue = _NS("Reached the end of the play queue");
     self.returnToLibraryButton.stringValue = _NS("Return to library");
     self.returnToLibraryButton.target = self;
