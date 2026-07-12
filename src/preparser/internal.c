@@ -657,17 +657,26 @@ preparser_Push( void *opaque, input_item_t *item,
 
     struct vlc_preparser_req_owner *req_owner = preparser_req_get_owner(req);
 
+    PreparserRequestRetain(req);
+
     if (preparser->parser != NULL)
     {
         PreparserAddTask(preparser, req);
 
         vlc_executor_Submit(preparser->parser, &req_owner->runnable);
 
-        return PreparserRequestRetain(req);
+        return req;
     }
 
     int ret = Fetch(req);
-    return ret == VLC_SUCCESS ? PreparserRequestRetain(req) : NULL;
+    if (ret != VLC_SUCCESS)
+    {
+        /* Never submitted: drop the caller and the task references */
+        vlc_preparser_req_Release(req);
+        vlc_preparser_req_Release(req);
+        return NULL;
+    }
+    return req;
 }
 
 static vlc_preparser_req *
@@ -696,9 +705,10 @@ preparser_GenerateThumbnail( void *opaque, input_item_t *item,
 
     struct vlc_preparser_req_owner *req_owner = preparser_req_get_owner(req);
 
+    PreparserRequestRetain(req);
     vlc_executor_Submit(preparser->thumbnailer, &req_owner->runnable);
 
-    return PreparserRequestRetain(req);
+    return req;
 }
 
 static int
@@ -843,9 +853,10 @@ preparser_GenerateThumbnailToFiles( void *opaque, input_item_t *item,
 
     PreparserAddTask(preparser, req);
 
+    PreparserRequestRetain(req);
     vlc_executor_Submit(preparser->thumbnailer, &req_owner->runnable);
 
-    return PreparserRequestRetain(req);
+    return req;
 }
 
 static size_t preparser_Cancel( void *opaque, vlc_preparser_req *req )
