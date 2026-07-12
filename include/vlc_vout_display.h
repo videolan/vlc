@@ -295,7 +295,7 @@ struct vlc_display_operations
      *
      * \param display the display to change projection for
      * \param projection the new projection mode considered for the source
-     * \return VLC_SUCCESS on succes, another value if changing projection failed
+     * \return VLC_SUCCESS on success, another value if changing projection failed
      */
     int (*change_source_projection)(vout_display_t *display,
                                     video_projection_mode_t projection);
