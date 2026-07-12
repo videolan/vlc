@@ -116,6 +116,9 @@ variables:
         if [ "${CI_COMMIT_BRANCH}" = "3.0.x" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c"
         fi
+        if [ -n "${STRICT_COMPILER}" ]; then
+            export CONFIGFLAGS="CFLAGS=-std=gnu11 CXXFLAGS=-std=gnu++11"
+        fi
         extras/package/win32/build.sh -a $HOST_ARCH $EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
 
 win32:
@@ -136,6 +139,7 @@ win64-arm-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64-arm
+        STRICT_COMPILER: yes
 
 uwp64-libvlc-llvm:
     extends: .win-common
@@ -314,6 +318,9 @@ debian:
         cd ../../
 
         # Build VLC
+        export CFLAGS="$CFLAGS -std=gnu11"
+        export CXXFLAGS="$CXXFLAGS -std=gnu++11"
+
         ./bootstrap
         ./configure
         make -j$NCPU
