@@ -48,6 +48,12 @@ NSString *VLCMediaSourceCollectionViewItemIdentifier = @"VLCMediaSourceCollectio
 
 @implementation VLCMediaSourceCollectionViewItem
 
+- (instancetype)initWithNibName:(NSNibName)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:@"VLCMediaItemCollectionViewItem" bundle:nibBundleOrNil];
+    return self;
+}
+
 - (void)setRepresentedItem:(VLCInputItem *)representedItem
 {
     if (_representedItem == representedItem) {
@@ -93,6 +99,14 @@ NSString *VLCMediaSourceCollectionViewItemIdentifier = @"VLCMediaSourceCollectio
         }
         strongSelf.mediaImageView.image = thumbnail;
     }];
+
+    NSArray<NSString *> *tags = inputItem.finderTags;
+    if (tags.count > 0) {
+        self.secondaryInfoTextField.stringValue = [tags componentsJoinedByString:@", "];
+        self.secondaryInfoTextField.hidden = NO;
+    } else {
+        self.secondaryInfoTextField.hidden = YES;
+    }
 }
 
 #pragma mark - actions
