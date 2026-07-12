@@ -30,7 +30,7 @@
 #ifdef DVDREAD_HAS_DVDAUDIO
 typedef struct demux_sys_t demux_sys_t;
 
-/* function different enough to warrant a seperate implementation*/
+/* function different enough to warrant a separate implementation*/
 static int DvdAudioReadSetArea( demux_t *p_demux, int i_title, int i_track,
                          int i_angle )
 {
