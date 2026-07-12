@@ -317,6 +317,8 @@ libvlc_parser_queue(libvlc_parser_t *parser,
     if (task == NULL)
         return NULL;
 
+    libvlc_parser_task_retain(task);
+
     task->preparser_req = vlc_preparser_Push(parser->preparser,
                                              item,
                                              type_options,
@@ -329,7 +331,7 @@ libvlc_parser_queue(libvlc_parser_t *parser,
         return NULL;
     }
 
-    return libvlc_parser_task_retain(task);
+    return task;
 }
 
 libvlc_parser_task *
@@ -380,6 +382,8 @@ libvlc_parser_queue_thumbnailing(libvlc_parser_t *parser,
     thumb_arg.seek.speed = req->seek.speed == libvlc_media_thumbnail_seek_fast
                          ? VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
 
+    libvlc_parser_task_retain(task);
+
     task->preparser_req = vlc_preparser_GenerateThumbnail(parser->preparser, item, &thumb_arg,
                                                           &thumbnailer_callbacks, task);
 
@@ -389,7 +393,7 @@ libvlc_parser_queue_thumbnailing(libvlc_parser_t *parser,
         return NULL;
     }
 
-    return libvlc_parser_task_retain(task);
+    return task;
 }
 
 size_t libvlc_parser_cancel_request(libvlc_parser_t *parser,
