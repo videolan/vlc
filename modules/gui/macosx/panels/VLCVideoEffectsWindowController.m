@@ -44,6 +44,50 @@ NSString *VLCVideoEffectsSelectedProfileKey = @"VideoEffectSelectedProfile";
 NSString *VLCVideoEffectsProfilesKey = @"VideoEffectProfiles";
 NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
+static const NSUInteger VLCVideoEffectsProfileVersion = 3;
+static const NSUInteger VLCVideoEffectsProfileCountV1 = 32;
+static const NSUInteger VLCVideoEffectsProfileCountV2 = 33;
+static const NSUInteger VLCVideoEffectsProfileCountV3 = 34;
+
+typedef NS_ENUM(NSUInteger, VLCVideoEffectsProfileField) {
+    VLCVideoEffectsProfileFieldVideoFilter = 0,
+    VLCVideoEffectsProfileFieldSubSource = 1,
+    VLCVideoEffectsProfileFieldVideoSplitter = 2,
+    VLCVideoEffectsProfileFieldHueDeprecated = 3,
+    VLCVideoEffectsProfileFieldContrast = 4,
+    VLCVideoEffectsProfileFieldBrightness = 5,
+    VLCVideoEffectsProfileFieldSaturation = 6,
+    VLCVideoEffectsProfileFieldGamma = 7,
+    VLCVideoEffectsProfileFieldSharpenSigma = 8,
+    VLCVideoEffectsProfileFieldGradfunRadius = 9,
+    VLCVideoEffectsProfileFieldGrainVariance = 10,
+    VLCVideoEffectsProfileFieldTransformType = 11,
+    VLCVideoEffectsProfileFieldPuzzleRows = 12,
+    VLCVideoEffectsProfileFieldPuzzleCols = 13,
+    VLCVideoEffectsProfileFieldColorthresColor = 14,
+    VLCVideoEffectsProfileFieldColorthresSaturationThres = 15,
+    VLCVideoEffectsProfileFieldColorthresSimilarityThres = 16,
+    VLCVideoEffectsProfileFieldSepiaIntensity = 17,
+    VLCVideoEffectsProfileFieldGradientMode = 18,
+    VLCVideoEffectsProfileFieldGradientCartoon = 19,
+    VLCVideoEffectsProfileFieldGradientColor = 20,
+    VLCVideoEffectsProfileFieldExtractComponent = 21,
+    VLCVideoEffectsProfileFieldPosterizeLevel = 22,
+    VLCVideoEffectsProfileFieldBlurFactor = 23,
+    VLCVideoEffectsProfileFieldMarqMarquee = 24,
+    VLCVideoEffectsProfileFieldMarqPosition = 25,
+    VLCVideoEffectsProfileFieldLogoFile = 26,
+    VLCVideoEffectsProfileFieldLogoPosition = 27,
+    VLCVideoEffectsProfileFieldLogoOpacity = 28,
+    VLCVideoEffectsProfileFieldCloneCount = 29,
+    VLCVideoEffectsProfileFieldWallRows = 30,
+    VLCVideoEffectsProfileFieldWallCols = 31,
+    VLCVideoEffectsProfileFieldBrightnessThreshold = 32,
+    VLCVideoEffectsProfileFieldHue = 33,
+};
+
+static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3;0;-180.000000";
+
 #pragma mark -
 #pragma mark Initialization
 
@@ -74,7 +118,9 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
 + (NSString *)defaultProfileString
 {
-    return @";;;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3;0;-180.000000";
+    NSAssert([[VLCVideoEffectsDefaultProfileString componentsSeparatedByString:@";"] count] == VLCVideoEffectsProfileCountV3,
+             @"Default video effects profile does not match schema version %lu", (unsigned long)VLCVideoEffectsProfileVersion);
+    return VLCVideoEffectsDefaultProfileString;
 }
 
 - (id)init
@@ -122,14 +168,14 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
     NSArray *items = [profileString componentsSeparatedByString:@";"];
 
-    // version 1 of profile string has 32 entries
-    if ([items count] < 32) {
+    // version 1 of profile string has VLCVideoEffectsProfileCountV1 entries
+    if ([items count] < VLCVideoEffectsProfileCountV1) {
         msg_Err(p_intf, "Error in parsing profile string");
         return;
     }
 
     /* filter handling */
-    NSString *tempString = B64DecNSStr([items firstObject]);
+    NSString *tempString = B64DecNSStr([items objectAtIndex:VLCVideoEffectsProfileFieldVideoFilter]);
     VLCPlayerController *playerController = VLCMain.sharedInstance.playQueueController.playerController;
     vout_thread_t *vout = [playerController mainVideoOutputThread];
 
@@ -137,12 +183,12 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     if (vout)
         var_SetString(vout, "video-filter", [tempString UTF8String]);
 
-    tempString = B64DecNSStr([items objectAtIndex:1]);
+    tempString = B64DecNSStr([items objectAtIndex:VLCVideoEffectsProfileFieldSubSource]);
     /* enable another round of new filters */
     if (vout)
         var_SetString(vout, "sub-source", [tempString UTF8String]);
 
-    tempString = B64DecNSStr([items objectAtIndex:2]);
+    tempString = B64DecNSStr([items objectAtIndex:VLCVideoEffectsProfileFieldVideoSplitter]);
     /* enable another round of new filters */
     char *psz_current_splitter = vout ? var_GetString(vout, "video-splitter") : NULL;
     bool b_filter_changed = psz_current_splitter && ![tempString isEqualToString:toNSStr(psz_current_splitter)];
@@ -153,45 +199,45 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     vout_Release(vout);
 
     /* try to set filter values on-the-fly and store them appropriately */
-    // index 3 is deprecated
-    [VLCVideoFilterHelper setVideoFilterProperty: "contrast" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:4])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "brightness" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:5])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "saturation" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:6])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "gamma" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:7])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "sharpen-sigma" forFilter: "sharpen" withValue: getWidgetFloatValue([items objectAtIndex:8])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "gradfun-radius" forFilter: "gradfun" withValue: getWidgetIntValue([items objectAtIndex:9])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "grain-variance" forFilter: "grain" withValue: getWidgetFloatValue([items objectAtIndex:10])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "transform-type" forFilter: "transform" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:11]) UTF8String] }];
-    [VLCVideoFilterHelper setVideoFilterProperty: "puzzle-rows" forFilter: "puzzle" withValue: getWidgetIntValue([items objectAtIndex:12])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "puzzle-cols" forFilter: "puzzle" withValue: getWidgetIntValue([items objectAtIndex:13])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "colorthres-color" forFilter: "colorthres" withValue: getWidgetIntValue([items objectAtIndex:14])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "colorthres-saturationthres" forFilter: "colorthres" withValue: getWidgetIntValue([items objectAtIndex:15])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "colorthres-similaritythres" forFilter: "colorthres" withValue: getWidgetIntValue([items objectAtIndex:16])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "sepia-intensity" forFilter: "sepia" withValue: getWidgetIntValue([items objectAtIndex:17])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "gradient-mode" forFilter: "gradient" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:18]) UTF8String] }];
-    [VLCVideoFilterHelper setVideoFilterProperty: "gradient-cartoon" forFilter: "gradient" withValue: (vlc_value_t){ .b_bool = [[items objectAtIndex:19] intValue] }];
-    [VLCVideoFilterHelper setVideoFilterProperty: "gradient-color" forFilter: "gradient" withValue: (vlc_value_t){ .b_bool = [[items objectAtIndex:20] intValue] }];
-    [VLCVideoFilterHelper setVideoFilterProperty: "extract-component" forFilter: "extract" withValue: getWidgetIntValue([items objectAtIndex:21])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "posterize-level" forFilter: "posterize" withValue: getWidgetIntValue([items objectAtIndex:22])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "blur-factor" forFilter: "motionblur" withValue: getWidgetIntValue([items objectAtIndex:23])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "marq-marquee" forFilter: "marq" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:24]) UTF8String] }];
-    [VLCVideoFilterHelper setVideoFilterProperty: "marq-position" forFilter: "marq" withValue: getWidgetIntValue([items objectAtIndex:25])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "logo-file" forFilter: "logo" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:26]) UTF8String] }];
-    [VLCVideoFilterHelper setVideoFilterProperty: "logo-position" forFilter: "logo" withValue: getWidgetIntValue([items objectAtIndex:27])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "logo-opacity" forFilter: "logo" withValue: getWidgetIntValue([items objectAtIndex:28])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "clone-count" forFilter: "clone" withValue: getWidgetIntValue([items objectAtIndex:29])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "wall-rows" forFilter: "wall" withValue: getWidgetIntValue([items objectAtIndex:30])];
-    [VLCVideoFilterHelper setVideoFilterProperty: "wall-cols" forFilter: "wall" withValue: getWidgetIntValue([items objectAtIndex:31])];
+    // index VLCVideoEffectsProfileFieldHueDeprecated is deprecated
+    [VLCVideoFilterHelper setVideoFilterProperty: "contrast" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:VLCVideoEffectsProfileFieldContrast])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "brightness" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:VLCVideoEffectsProfileFieldBrightness])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "saturation" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:VLCVideoEffectsProfileFieldSaturation])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "gamma" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:VLCVideoEffectsProfileFieldGamma])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "sharpen-sigma" forFilter: "sharpen" withValue: getWidgetFloatValue([items objectAtIndex:VLCVideoEffectsProfileFieldSharpenSigma])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "gradfun-radius" forFilter: "gradfun" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldGradfunRadius])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "grain-variance" forFilter: "grain" withValue: getWidgetFloatValue([items objectAtIndex:VLCVideoEffectsProfileFieldGrainVariance])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "transform-type" forFilter: "transform" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:VLCVideoEffectsProfileFieldTransformType]) UTF8String] }];
+    [VLCVideoFilterHelper setVideoFilterProperty: "puzzle-rows" forFilter: "puzzle" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldPuzzleRows])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "puzzle-cols" forFilter: "puzzle" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldPuzzleCols])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "colorthres-color" forFilter: "colorthres" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldColorthresColor])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "colorthres-saturationthres" forFilter: "colorthres" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldColorthresSaturationThres])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "colorthres-similaritythres" forFilter: "colorthres" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldColorthresSimilarityThres])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "sepia-intensity" forFilter: "sepia" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldSepiaIntensity])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "gradient-mode" forFilter: "gradient" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:VLCVideoEffectsProfileFieldGradientMode]) UTF8String] }];
+    [VLCVideoFilterHelper setVideoFilterProperty: "gradient-cartoon" forFilter: "gradient" withValue: (vlc_value_t){ .b_bool = [[items objectAtIndex:VLCVideoEffectsProfileFieldGradientCartoon] intValue] }];
+    [VLCVideoFilterHelper setVideoFilterProperty: "gradient-color" forFilter: "gradient" withValue: (vlc_value_t){ .b_bool = [[items objectAtIndex:VLCVideoEffectsProfileFieldGradientColor] intValue] }];
+    [VLCVideoFilterHelper setVideoFilterProperty: "extract-component" forFilter: "extract" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldExtractComponent])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "posterize-level" forFilter: "posterize" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldPosterizeLevel])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "blur-factor" forFilter: "motionblur" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldBlurFactor])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "marq-marquee" forFilter: "marq" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:VLCVideoEffectsProfileFieldMarqMarquee]) UTF8String] }];
+    [VLCVideoFilterHelper setVideoFilterProperty: "marq-position" forFilter: "marq" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldMarqPosition])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "logo-file" forFilter: "logo" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:VLCVideoEffectsProfileFieldLogoFile]) UTF8String] }];
+    [VLCVideoFilterHelper setVideoFilterProperty: "logo-position" forFilter: "logo" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldLogoPosition])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "logo-opacity" forFilter: "logo" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldLogoOpacity])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "clone-count" forFilter: "clone" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldCloneCount])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "wall-rows" forFilter: "wall" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldWallRows])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "wall-cols" forFilter: "wall" withValue: getWidgetIntValue([items objectAtIndex:VLCVideoEffectsProfileFieldWallCols])];
 
-    if ([items count] >= 33) { // version >=2 of profile string
-        /* "brightness-threshold" at 32 */
+    if ([items count] >= VLCVideoEffectsProfileCountV2) { // version >=2 of profile string
+        /* "brightness-threshold" at VLCVideoEffectsProfileFieldBrightnessThreshold */
     }
 
     vlc_value_t hueValue;
-    if ([items count] >= 34) { // version >=3 of profile string
-        hueValue.f_float = [[items objectAtIndex:33] floatValue];
+    if ([items count] >= VLCVideoEffectsProfileCountV3) { // version >=3 of profile string
+        hueValue.f_float = [[items objectAtIndex:VLCVideoEffectsProfileFieldHue] floatValue];
     } else {
-        hueValue.f_float = [[items objectAtIndex:3] intValue]; // deprecated since 3.0.0
+        hueValue.f_float = [[items objectAtIndex:VLCVideoEffectsProfileFieldHueDeprecated] intValue]; // deprecated since 3.0.0
         // convert to new scale ([0,360] --> [-180,180])
         hueValue.f_float -= 180;
     }
@@ -704,9 +750,9 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
                      var_InheritInteger(vout, "wall-rows"),
                      var_InheritInteger(vout, "wall-cols"),
                      // version 2 of profile string:
-                     0LL /* "brightness-threshold" */, // index: 32
+                     0LL /* "brightness-threshold" */, // index: VLCVideoEffectsProfileFieldBrightnessThreshold
                      // version 3 of profile string: (vlc-3.0.0)
-                     var_InheritFloat(vout, "hue") // index: 33
+                     var_InheritFloat(vout, "hue") // index: VLCVideoEffectsProfileFieldHue
             ];
     vout_Release(vout);
     return string;
