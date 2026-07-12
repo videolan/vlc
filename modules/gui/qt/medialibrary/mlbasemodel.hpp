@@ -81,7 +81,7 @@ public:
 
     /**
      * @brief getIndexFromId allow getting the row of an item from its id,
-     *        if the item is not in cache, data will be retreived until it is
+     *        if the item is not in cache, data will be retrieved until it is
      *        satisfied
      * @param id of the item
      * @return a JS Promise with the row index

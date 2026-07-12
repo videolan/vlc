@@ -289,7 +289,7 @@ public:
             return false;
 
         //we need to advertise before doing the operations
-        //  - first retreive the flatten range to be added/removed
+        //  - first retrieve the flatten range to be added/removed
         //  - then perform the operation
         if (!expanded)
         {

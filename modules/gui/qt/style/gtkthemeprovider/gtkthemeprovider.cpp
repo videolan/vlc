@@ -224,7 +224,7 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
     }
 
 
-    //IDK how to retreive the shadow color from GTK, using a black like in our theme is good enough
+    //IDK how to retrieve the shadow color from GTK, using a black like in our theme is good enough
     GdkRGBA shadow;
     shadow.red = shadow.green = shadow.blue = 0.f;
     shadow.alpha = 0.22;

@@ -59,7 +59,7 @@ protected:
  *
  * ItemType will be copied locally so it must be easilly copyable (sharedptr or primitive types)
  *
- * model must implement ModelSource interface to retreive data, and data revision
+ * model must implement ModelSource interface to retrieve data, and data revision
  *
  * data is sorted and filtered on the UI thread
  */
