@@ -78,6 +78,7 @@ extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 @property (readonly) BOOL isStream;
 @property (readonly, nullable) NSArray<NSString *> *options;
 @property (readonly) NSArray<NSString *> *extraMetaNames;
+@property (readonly, nullable) NSArray<NSString *> *finderTags;
 
 - (nullable NSString *)extraMetaForKey:(NSString *)key;
 

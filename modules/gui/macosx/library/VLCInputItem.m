@@ -571,6 +571,21 @@ static const struct input_item_parser_cbs_t parserCallbacks =
     return options.copy;
 }
 
+- (nullable NSArray<NSString *> *)finderTags
+{
+    NSString * const mrl = self.MRL;
+    if (![mrl hasPrefix:@"file://"]) {
+        return nil;
+    }
+    NSURL * const url = [NSURL URLWithString:mrl];
+    if (!url) {
+        return nil;
+    }
+    NSArray<NSString *> *tags = nil;
+    [url getResourceValue:&tags forKey:NSURLTagNamesKey error:nil];
+    return tags;
+}
+
 @end
 
 
