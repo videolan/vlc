@@ -401,6 +401,22 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
                 break;
         }
         cellView.textField.stringValue = typeName;
+    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableTagsColumn"]) {
+        static NSString * const basicCellViewIdentifier = @"BasicTableCellViewIdentifier";
+        NSTableCellView *cellView = [tableView makeViewWithIdentifier:basicCellViewIdentifier
+                                                                owner:self];
+        if (cellView == nil) {
+            cellView = [NSTableCellView tableCellViewWithIdentifier:basicCellViewIdentifier
+                                                      showingString:@""];
+        }
+
+        NSArray<NSString *> * const tags = inputNode.inputItem.finderTags;
+        if (tags.count > 0) {
+            cellView.textField.stringValue = [tags componentsJoinedByString:@", "];
+        } else {
+            cellView.textField.stringValue = @"";
+        }
+        return cellView;
     }
     return cellView;
 }
