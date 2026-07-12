@@ -49,8 +49,8 @@ Item {
     ShortcutExt{ sequence:"F11"; onActivated: MainCtx.toggleInterfaceFullScreen() }
     ShortcutExt{ sequence:"Ctrl+H"; onActivated: MainCtx.minimalView = !MainCtx.minimalView; }
 
-    ShortcutExt{ sequences: [StandardKey.ZoomIn]; onActivated: MainCtx.incrementIntfUserScaleFactor(true) }
-    ShortcutExt{ sequences: [StandardKey.ZoomOut]; onActivated: MainCtx.incrementIntfUserScaleFactor(false) }
+    ShortcutExt{ sequences: [StandardKey.ZoomIn, "Ctrl+="]; onActivated: MainCtx.incrementIntfUserScaleFactor(true) }
+    ShortcutExt{ sequences: [StandardKey.ZoomOut, "Ctrl+Shift+-"]; onActivated: MainCtx.incrementIntfUserScaleFactor(false) }
 
     Loader {
         active: MainCtx.mediaLibraryAvailable
