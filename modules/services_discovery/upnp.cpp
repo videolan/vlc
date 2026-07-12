@@ -1072,14 +1072,14 @@ bool MediaServer::addItem( IXML_Element* itemElement )
     IXML_NodeList* p_resource_list = ixmlDocument_getElementsByTagName( (IXML_Document*) itemElement, "res" );
     if ( !p_resource_list)
         return false;
-    int list_lenght = ixmlNodeList_length( p_resource_list );
-    if (list_lenght <= 0 ) {
+    int list_length = ixmlNodeList_length( p_resource_list );
+    if (list_length <= 0 ) {
         ixmlNodeList_free( p_resource_list );
         return false;
     }
     input_item_t *p_item = NULL;
 
-    for (int index = 0; index < list_lenght; index++)
+    for (int index = 0; index < list_length; index++)
     {
         IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, index );
         const char* rez_type = ixmlElement_getAttribute( p_resource, "protocolInfo" );
