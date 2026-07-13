@@ -39,8 +39,8 @@ Widgets.PageLoader {
         name: "favorites",
         component: favoritesComponent
     }, {
-        name: "newMedia",
-        component: newMediaComponent
+        name: "newVideo",
+        component: newVideoComponent
     }]
 
     property int displayMarginBeginning: 0
@@ -138,24 +138,34 @@ Widgets.PageLoader {
     }
 
     Component {
-        id: newMediaComponent
+        id: newVideoComponent
 
         Widgets.PageExt {
-            id: newMediaPage
+            id: newVideoPage
 
-            title: qsTr("New Medias")
+            title: qsTr("New Videos")
 
-            MediaView {
-                focus: true
+            VideoAll {
+                id: newVideo
 
                 anchors.fill: parent
 
-                model: MLMediaModel {
+                focus: true
+
+                model: MLVideoModel {
                     ml: MediaLib
 
-                    sortCriteria: newMediaPage.sort.criteria || "insertion"
-                    sortOrder: newMediaPage.sort.order
-                    searchPattern: newMediaPage.search.pattern
+                    sortCriteria: newVideoPage.sort.criteria || "insertion"
+                    sortOrder: newVideoPage.sort.order
+                    searchPattern: newVideoPage.search.pattern
+                }
+
+                sectionProperty: model.sortCriteria === "title" ? "title_first_symbol" : ""
+
+                contextMenu: MLContextMenu {
+                    model: newVideo.model
+
+                    showPlayAsAudioAction: true
                 }
 
                 displayMarginBeginning: root.displayMarginBeginning

@@ -68,8 +68,8 @@ Widgets.PageExt {
             continueWatchingRow.setCurrentItemFocus(reason)
         else if (favoritesRow.focus)
             favoritesRow.setCurrentItemFocus(reason)
-        else if (newMediaRow.focus)
-            newMediaRow.setCurrentItemFocus(reason)
+        else if (newVideoRow.focus)
+            newVideoRow.setCurrentItemFocus(reason)
         else
             coneNButtons.forceActiveFocus(reason)
     }
@@ -135,7 +135,7 @@ Widgets.PageExt {
             }
 
             MainCtx.setTimeout(() => {
-                flickable._hasMedias = Qt.binding(() => { return continueWatchingRow.visible || favoritesRow.visible || newMediaRow.visible } )
+                flickable._hasMedias = Qt.binding(() => { return continueWatchingRow.visible || favoritesRow.visible || newVideoRow.visible } )
             }, 50, [], flickable)
         }
 
@@ -159,7 +159,7 @@ Widgets.PageExt {
             anchors.centerIn: flickable._hasMedias ? undefined : parent
             anchors.top: flickable._hasMedias ? parent.top : undefined
             anchors.left: flickable._hasMedias ? parent.left : undefined
-            anchors.leftMargin: flickable._hasMedias ? newMediaRow.contentLeftMargin : 0
+            anchors.leftMargin: flickable._hasMedias ? newVideoRow.contentLeftMargin : 0
 
             Navigation.parentItem: root
             Navigation.upItem: root.header
@@ -337,18 +337,18 @@ Widgets.PageExt {
             }
 
             Widgets.ViewHeader {
-                text: qsTr("New Medias")
-                visible: newMediaRow.visible
-                view: newMediaRow
-                seeAllButton.visible: newMediaRow.model.maximumCount > newMediaRow.model.count
+                text: qsTr("New Videos")
+                visible: newVideoRow.visible
+                view: newVideoRow
+                seeAllButton.visible: newVideoRow.model.maximumCount > newVideoRow.model.count
 
                 onSeeAllButtonClicked: function (reason) {
-                    root.seeAllButtonClicked("newMedia", reason)
+                    root.seeAllButtonClicked("newVideo", reason)
                 }
             }
 
-            MediaView {
-                id: newMediaRow
+            VideoAll {
+                id: newVideoRow
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -357,10 +357,10 @@ Widgets.PageExt {
 
                 visible: model.count !== 0
 
-                listHeaderPositioning: ListView.InlineHeader
+                headerPositioning: ListView.InlineHeader
                 enableBeginningFade: false
                 enableEndFade: false
-                listSectionProperty: ""
+                sectionProperty: ""
 
                 interactive: false
 
@@ -376,7 +376,7 @@ Widgets.PageExt {
 
                 Navigation.parentItem: mediaRows
 
-                model: MLMediaModel {
+                model: MLVideoModel {
                     ml: MediaLib
 
                     sortCriteria: root.sort.criteria || "insertion"
@@ -384,7 +384,13 @@ Widgets.PageExt {
                     searchPattern: root.search.pattern
 
                     // FIXME: Make limit 0 load no items, instead of loading all items.
-                    limit: MainCtx.gridView ? Math.max(newMediaRow.currentItem?.nbItemPerRow ?? null, 1) : 5
+                    limit: MainCtx.gridView ? Math.max(newVideoRow.currentItem?.nbItemPerRow ?? null, 1) : 5
+                }
+
+                contextMenu: MLContextMenu {
+                    model: newVideoRow.model
+
+                    showPlayAsAudioAction: true
                 }
 
                 onActiveFocusChanged: {
