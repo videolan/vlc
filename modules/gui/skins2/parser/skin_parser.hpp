@@ -43,7 +43,7 @@ public:
     };
 
     SkinParser( intf_thread_t *pIntf, const std::string &rFileName,
-                const std::string &rPath, BuilderData *pData = NULL );
+                const std::string &rPath, BuilderData *pData = NULL, unsigned = 0 );
     virtual ~SkinParser();
 
     const BuilderData &getData() const { return *m_pData; }
@@ -75,6 +75,8 @@ private:
     int m_curLayer;
     /// Set of used id
     std::set<std::string> m_idSet;
+    /// recursive depth control
+    unsigned m_instanceCount;
 
     /// Callbacks
     virtual void handleBeginElement( const std::string &rName,
