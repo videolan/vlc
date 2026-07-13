@@ -41,6 +41,9 @@ Widgets.PageLoader {
     }, {
         name: "newVideo",
         component: newVideoComponent
+    }, {
+        name: "newMusic",
+        component: newMusicComponent
     }]
 
     property int displayMarginBeginning: 0
@@ -166,6 +169,36 @@ Widgets.PageLoader {
                     model: newVideo.model
 
                     showPlayAsAudioAction: true
+                }
+
+                displayMarginBeginning: root.displayMarginBeginning
+                displayMarginEnd: root.displayMarginEnd
+
+                enableBeginningFade: root.enableBeginningFade
+                enableEndFade: root.enableEndFade
+            }
+        }
+    }
+
+    Component {
+        id: newMusicComponent
+
+        Widgets.PageExt {
+            id: newMusicPage
+
+            title: qsTr("New Music")
+
+            MediaView {
+                focus: true
+
+                anchors.fill: parent
+
+                model: MLAudioModel {
+                    ml: MediaLib
+
+                    sortCriteria: newMusicPage.sort.criteria || "insertion"
+                    sortOrder: newMusicPage.sort.order
+                    searchPattern: newMusicPage.search.pattern
                 }
 
                 displayMarginBeginning: root.displayMarginBeginning
