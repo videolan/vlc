@@ -14,204 +14,204 @@ class VLCIcons : public QObject {
     QML_SINGLETON
 
     Q_PROPERTY(QString fontFamily MEMBER fontFamily CONSTANT FINAL)
-    Q_PROPERTY(QString active_indicator MEMBER active_indicator CONSTANT FINAL)
-    Q_PROPERTY(QString add MEMBER add CONSTANT FINAL)
-    Q_PROPERTY(QString album_cover MEMBER album_cover CONSTANT FINAL)
-    Q_PROPERTY(QString aspect_ratio MEMBER aspect_ratio CONSTANT FINAL)
-    Q_PROPERTY(QString atob MEMBER atob CONSTANT FINAL)
-    Q_PROPERTY(QString audiosub MEMBER audiosub CONSTANT FINAL)
-    Q_PROPERTY(QString back MEMBER back CONSTANT FINAL)
-    Q_PROPERTY(QString breadcrumb_sep MEMBER breadcrumb_sep CONSTANT FINAL)
-    Q_PROPERTY(QString breadcrumb_prev MEMBER breadcrumb_prev CONSTANT FINAL)
-    Q_PROPERTY(QString bookmark MEMBER bookmark CONSTANT FINAL)
-    Q_PROPERTY(QString check MEMBER check CONSTANT FINAL)
-    Q_PROPERTY(QString clear MEMBER clear CONSTANT FINAL)
-    Q_PROPERTY(QString close MEMBER close CONSTANT FINAL)
-    Q_PROPERTY(QString defullscreen MEMBER defullscreen CONSTANT FINAL)
-    Q_PROPERTY(QString del MEMBER del CONSTANT FINAL)
-    Q_PROPERTY(QString dropzone MEMBER dropzone CONSTANT FINAL)
-    Q_PROPERTY(QString dvd_menu MEMBER dvd_menu CONSTANT FINAL)
-    Q_PROPERTY(QString dvd_next MEMBER dvd_next CONSTANT FINAL)
-    Q_PROPERTY(QString dvd_prev MEMBER dvd_prev CONSTANT FINAL)
-    Q_PROPERTY(QString effect_filter MEMBER effect_filter CONSTANT FINAL)
-    Q_PROPERTY(QString eject MEMBER eject CONSTANT FINAL)
-    Q_PROPERTY(QString ellipsis MEMBER ellipsis CONSTANT FINAL)
-    Q_PROPERTY(QString enqueue MEMBER enqueue CONSTANT FINAL)
-    Q_PROPERTY(QString expand_inverted MEMBER expand_inverted CONSTANT FINAL)
-    Q_PROPERTY(QString expand MEMBER expand CONSTANT FINAL)
-    Q_PROPERTY(QString faster MEMBER faster CONSTANT FINAL)
-    Q_PROPERTY(QString next_frame MEMBER next_frame CONSTANT FINAL)
-    Q_PROPERTY(QString previous_frame MEMBER previous_frame CONSTANT FINAL)
-    Q_PROPERTY(QString fullscreen MEMBER fullscreen CONSTANT FINAL)
-    Q_PROPERTY(QString grid MEMBER grid CONSTANT FINAL)
-    Q_PROPERTY(QString history MEMBER history CONSTANT FINAL)
-    Q_PROPERTY(QString home MEMBER home CONSTANT FINAL)
-    Q_PROPERTY(QString info MEMBER info CONSTANT FINAL)
-    Q_PROPERTY(QString list MEMBER list CONSTANT FINAL)
-    Q_PROPERTY(QString more MEMBER more CONSTANT FINAL)
-    Q_PROPERTY(QString next MEMBER next CONSTANT FINAL)
-    Q_PROPERTY(QString ok MEMBER ok CONSTANT FINAL)
-    Q_PROPERTY(QString pause_filled MEMBER pause_filled CONSTANT FINAL)
-    Q_PROPERTY(QString play_filled MEMBER play_filled CONSTANT FINAL)
-    Q_PROPERTY(QString play MEMBER play CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_arrow_move MEMBER ic_fluent_arrow_move CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_chevron_down_24 MEMBER ic_fluent_chevron_down_24 CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_chevron_left_24 MEMBER ic_fluent_chevron_left_24 CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_chevron_right_24 MEMBER ic_fluent_chevron_right_24 CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_chevron_up_24 MEMBER ic_fluent_chevron_up_24 CONSTANT FINAL)
-    Q_PROPERTY(QString panel_left MEMBER panel_left CONSTANT FINAL)
-    Q_PROPERTY(QString play_reverse MEMBER play_reverse CONSTANT FINAL)
-    Q_PROPERTY(QString playlist MEMBER playlist CONSTANT FINAL)
-    Q_PROPERTY(QString playlist_clear MEMBER playlist_clear CONSTANT FINAL)
-    Q_PROPERTY(QString previous MEMBER previous CONSTANT FINAL)
-    Q_PROPERTY(QString profile_new MEMBER profile_new CONSTANT FINAL)
-    Q_PROPERTY(QString record MEMBER record CONSTANT FINAL)
-    Q_PROPERTY(QString remove MEMBER remove CONSTANT FINAL)
-    Q_PROPERTY(QString renderer MEMBER renderer CONSTANT FINAL)
-    Q_PROPERTY(QString repeat_all MEMBER repeat_all CONSTANT FINAL)
-    Q_PROPERTY(QString repeat_one MEMBER repeat_one CONSTANT FINAL)
-    Q_PROPERTY(QString search MEMBER search CONSTANT FINAL)
-    Q_PROPERTY(QString settings MEMBER settings CONSTANT FINAL)
-    Q_PROPERTY(QString shuffle MEMBER shuffle CONSTANT FINAL)
-    Q_PROPERTY(QString skip_back MEMBER skip_back CONSTANT FINAL)
-    Q_PROPERTY(QString skip_for MEMBER skip_for CONSTANT FINAL)
-    Q_PROPERTY(QString slower MEMBER slower CONSTANT FINAL)
-    Q_PROPERTY(QString snapshot MEMBER snapshot CONSTANT FINAL)
-    Q_PROPERTY(QString space MEMBER space CONSTANT FINAL)
-    Q_PROPERTY(QString stop MEMBER stop CONSTANT FINAL)
-    Q_PROPERTY(QString stream MEMBER stream CONSTANT FINAL)
-    Q_PROPERTY(QString time MEMBER time CONSTANT FINAL)
-    Q_PROPERTY(QString topbar_discover MEMBER topbar_discover CONSTANT FINAL)
-    Q_PROPERTY(QString topbar_music MEMBER topbar_music CONSTANT FINAL)
-    Q_PROPERTY(QString topbar_network MEMBER topbar_network CONSTANT FINAL)
-    Q_PROPERTY(QString topbar_sort MEMBER topbar_sort CONSTANT FINAL)
-    Q_PROPERTY(QString topbar_video MEMBER topbar_video CONSTANT FINAL)
-    Q_PROPERTY(QString chevron_up MEMBER chevron_up CONSTANT FINAL)
-    Q_PROPERTY(QString chevron_down MEMBER chevron_down CONSTANT FINAL)
-    Q_PROPERTY(QString tv MEMBER tv CONSTANT FINAL)
-    Q_PROPERTY(QString tvtelx MEMBER tvtelx CONSTANT FINAL)
-    Q_PROPERTY(QString transparency MEMBER transparency CONSTANT FINAL)
-    Q_PROPERTY(QString circle MEMBER circle CONSTANT FINAL)
-    Q_PROPERTY(QString visualization MEMBER visualization CONSTANT FINAL)
-    Q_PROPERTY(QString volume_high MEMBER volume_high CONSTANT FINAL)
-    Q_PROPERTY(QString volume_low MEMBER volume_low CONSTANT FINAL)
-    Q_PROPERTY(QString volume_medium MEMBER volume_medium CONSTANT FINAL)
-    Q_PROPERTY(QString volume_muted MEMBER volume_muted CONSTANT FINAL)
-    Q_PROPERTY(QString volume_zero MEMBER volume_zero CONSTANT FINAL)
-    Q_PROPERTY(QString window_close MEMBER window_close CONSTANT FINAL)
-    Q_PROPERTY(QString window_maximize MEMBER window_maximize CONSTANT FINAL)
-    Q_PROPERTY(QString window_minimize MEMBER window_minimize CONSTANT FINAL)
-    Q_PROPERTY(QString window_restore MEMBER window_restore CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_document_add_24_regular MEMBER ic_fluent_document_add_24_regular CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_document_copy_24_regular MEMBER ic_fluent_document_copy_24_regular CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_arrow_download_24_regular MEMBER ic_fluent_arrow_download_24_regular CONSTANT FINAL)
-    Q_PROPERTY(QString ic_fluent_arrow_sync_24_regular MEMBER ic_fluent_arrow_sync_24_regular CONSTANT FINAL)
-    Q_PROPERTY(QString medialibrary_add MEMBER medialibrary_add CONSTANT FINAL)
-    Q_PROPERTY(QString medialibrary_remove MEMBER medialibrary_remove CONSTANT FINAL)
+    Q_PROPERTY(QChar active_indicator MEMBER active_indicator CONSTANT FINAL)
+    Q_PROPERTY(QChar add MEMBER add CONSTANT FINAL)
+    Q_PROPERTY(QChar album_cover MEMBER album_cover CONSTANT FINAL)
+    Q_PROPERTY(QChar aspect_ratio MEMBER aspect_ratio CONSTANT FINAL)
+    Q_PROPERTY(QChar atob MEMBER atob CONSTANT FINAL)
+    Q_PROPERTY(QChar audiosub MEMBER audiosub CONSTANT FINAL)
+    Q_PROPERTY(QChar back MEMBER back CONSTANT FINAL)
+    Q_PROPERTY(QChar breadcrumb_sep MEMBER breadcrumb_sep CONSTANT FINAL)
+    Q_PROPERTY(QChar breadcrumb_prev MEMBER breadcrumb_prev CONSTANT FINAL)
+    Q_PROPERTY(QChar bookmark MEMBER bookmark CONSTANT FINAL)
+    Q_PROPERTY(QChar check MEMBER check CONSTANT FINAL)
+    Q_PROPERTY(QChar clear MEMBER clear CONSTANT FINAL)
+    Q_PROPERTY(QChar close MEMBER close CONSTANT FINAL)
+    Q_PROPERTY(QChar defullscreen MEMBER defullscreen CONSTANT FINAL)
+    Q_PROPERTY(QChar del MEMBER del CONSTANT FINAL)
+    Q_PROPERTY(QChar dropzone MEMBER dropzone CONSTANT FINAL)
+    Q_PROPERTY(QChar dvd_menu MEMBER dvd_menu CONSTANT FINAL)
+    Q_PROPERTY(QChar dvd_next MEMBER dvd_next CONSTANT FINAL)
+    Q_PROPERTY(QChar dvd_prev MEMBER dvd_prev CONSTANT FINAL)
+    Q_PROPERTY(QChar effect_filter MEMBER effect_filter CONSTANT FINAL)
+    Q_PROPERTY(QChar eject MEMBER eject CONSTANT FINAL)
+    Q_PROPERTY(QChar ellipsis MEMBER ellipsis CONSTANT FINAL)
+    Q_PROPERTY(QChar enqueue MEMBER enqueue CONSTANT FINAL)
+    Q_PROPERTY(QChar expand_inverted MEMBER expand_inverted CONSTANT FINAL)
+    Q_PROPERTY(QChar expand MEMBER expand CONSTANT FINAL)
+    Q_PROPERTY(QChar faster MEMBER faster CONSTANT FINAL)
+    Q_PROPERTY(QChar next_frame MEMBER next_frame CONSTANT FINAL)
+    Q_PROPERTY(QChar previous_frame MEMBER previous_frame CONSTANT FINAL)
+    Q_PROPERTY(QChar fullscreen MEMBER fullscreen CONSTANT FINAL)
+    Q_PROPERTY(QChar grid MEMBER grid CONSTANT FINAL)
+    Q_PROPERTY(QChar history MEMBER history CONSTANT FINAL)
+    Q_PROPERTY(QChar home MEMBER home CONSTANT FINAL)
+    Q_PROPERTY(QChar info MEMBER info CONSTANT FINAL)
+    Q_PROPERTY(QChar list MEMBER list CONSTANT FINAL)
+    Q_PROPERTY(QChar more MEMBER more CONSTANT FINAL)
+    Q_PROPERTY(QChar next MEMBER next CONSTANT FINAL)
+    Q_PROPERTY(QChar ok MEMBER ok CONSTANT FINAL)
+    Q_PROPERTY(QChar pause_filled MEMBER pause_filled CONSTANT FINAL)
+    Q_PROPERTY(QChar play_filled MEMBER play_filled CONSTANT FINAL)
+    Q_PROPERTY(QChar play MEMBER play CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_arrow_move MEMBER ic_fluent_arrow_move CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_chevron_down_24 MEMBER ic_fluent_chevron_down_24 CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_chevron_left_24 MEMBER ic_fluent_chevron_left_24 CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_chevron_right_24 MEMBER ic_fluent_chevron_right_24 CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_chevron_up_24 MEMBER ic_fluent_chevron_up_24 CONSTANT FINAL)
+    Q_PROPERTY(QChar panel_left MEMBER panel_left CONSTANT FINAL)
+    Q_PROPERTY(QChar play_reverse MEMBER play_reverse CONSTANT FINAL)
+    Q_PROPERTY(QChar playlist MEMBER playlist CONSTANT FINAL)
+    Q_PROPERTY(QChar playlist_clear MEMBER playlist_clear CONSTANT FINAL)
+    Q_PROPERTY(QChar previous MEMBER previous CONSTANT FINAL)
+    Q_PROPERTY(QChar profile_new MEMBER profile_new CONSTANT FINAL)
+    Q_PROPERTY(QChar record MEMBER record CONSTANT FINAL)
+    Q_PROPERTY(QChar remove MEMBER remove CONSTANT FINAL)
+    Q_PROPERTY(QChar renderer MEMBER renderer CONSTANT FINAL)
+    Q_PROPERTY(QChar repeat_all MEMBER repeat_all CONSTANT FINAL)
+    Q_PROPERTY(QChar repeat_one MEMBER repeat_one CONSTANT FINAL)
+    Q_PROPERTY(QChar search MEMBER search CONSTANT FINAL)
+    Q_PROPERTY(QChar settings MEMBER settings CONSTANT FINAL)
+    Q_PROPERTY(QChar shuffle MEMBER shuffle CONSTANT FINAL)
+    Q_PROPERTY(QChar skip_back MEMBER skip_back CONSTANT FINAL)
+    Q_PROPERTY(QChar skip_for MEMBER skip_for CONSTANT FINAL)
+    Q_PROPERTY(QChar slower MEMBER slower CONSTANT FINAL)
+    Q_PROPERTY(QChar snapshot MEMBER snapshot CONSTANT FINAL)
+    Q_PROPERTY(QChar space MEMBER space CONSTANT FINAL)
+    Q_PROPERTY(QChar stop MEMBER stop CONSTANT FINAL)
+    Q_PROPERTY(QChar stream MEMBER stream CONSTANT FINAL)
+    Q_PROPERTY(QChar time MEMBER time CONSTANT FINAL)
+    Q_PROPERTY(QChar topbar_discover MEMBER topbar_discover CONSTANT FINAL)
+    Q_PROPERTY(QChar topbar_music MEMBER topbar_music CONSTANT FINAL)
+    Q_PROPERTY(QChar topbar_network MEMBER topbar_network CONSTANT FINAL)
+    Q_PROPERTY(QChar topbar_sort MEMBER topbar_sort CONSTANT FINAL)
+    Q_PROPERTY(QChar topbar_video MEMBER topbar_video CONSTANT FINAL)
+    Q_PROPERTY(QChar chevron_up MEMBER chevron_up CONSTANT FINAL)
+    Q_PROPERTY(QChar chevron_down MEMBER chevron_down CONSTANT FINAL)
+    Q_PROPERTY(QChar tv MEMBER tv CONSTANT FINAL)
+    Q_PROPERTY(QChar tvtelx MEMBER tvtelx CONSTANT FINAL)
+    Q_PROPERTY(QChar transparency MEMBER transparency CONSTANT FINAL)
+    Q_PROPERTY(QChar circle MEMBER circle CONSTANT FINAL)
+    Q_PROPERTY(QChar visualization MEMBER visualization CONSTANT FINAL)
+    Q_PROPERTY(QChar volume_high MEMBER volume_high CONSTANT FINAL)
+    Q_PROPERTY(QChar volume_low MEMBER volume_low CONSTANT FINAL)
+    Q_PROPERTY(QChar volume_medium MEMBER volume_medium CONSTANT FINAL)
+    Q_PROPERTY(QChar volume_muted MEMBER volume_muted CONSTANT FINAL)
+    Q_PROPERTY(QChar volume_zero MEMBER volume_zero CONSTANT FINAL)
+    Q_PROPERTY(QChar window_close MEMBER window_close CONSTANT FINAL)
+    Q_PROPERTY(QChar window_maximize MEMBER window_maximize CONSTANT FINAL)
+    Q_PROPERTY(QChar window_minimize MEMBER window_minimize CONSTANT FINAL)
+    Q_PROPERTY(QChar window_restore MEMBER window_restore CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_document_add_24_regular MEMBER ic_fluent_document_add_24_regular CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_document_copy_24_regular MEMBER ic_fluent_document_copy_24_regular CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_arrow_download_24_regular MEMBER ic_fluent_arrow_download_24_regular CONSTANT FINAL)
+    Q_PROPERTY(QChar ic_fluent_arrow_sync_24_regular MEMBER ic_fluent_arrow_sync_24_regular CONSTANT FINAL)
+    Q_PROPERTY(QChar medialibrary_add MEMBER medialibrary_add CONSTANT FINAL)
+    Q_PROPERTY(QChar medialibrary_remove MEMBER medialibrary_remove CONSTANT FINAL)
 
 
 public:
     VLCIcons(QObject* parent = nullptr);
 
 public:
-    static const inline QString fontFamily{ "VLCIcons" };
+    static const inline QString fontFamily{ QStringLiteral("VLCIcons") };
 
     // Icons
 public:
-    static const inline QString active_indicator{ "\ue000" };
-    static const inline QString add{ "\ue001" };
-    static const inline QString album_cover{ "\ue002" };
-    static const inline QString aspect_ratio{ "\ue003" };
-    static const inline QString atob{ "\ue004" };
-    static const inline QString audiosub{ "\ue005" };
-    static const inline QString back{ "\ue006" };
-    static const inline QString breadcrumb_sep{ "\ue007" };
-    static const inline QString breadcrumb_prev{ "\ue008" };
-    static const inline QString bookmark{ "\ue009" };
-    static const inline QString check{ "\ue00a" };
-    static const inline QString clear{ "\ue00b" };
-    static const inline QString close{ "\ue00c" };
-    static const inline QString defullscreen{ "\ue00d" };
-    static const inline QString del{ "\ue00e" };
-    static const inline QString dropzone{ "\ue00f" };
-    static const inline QString dvd_menu{ "\ue010" };
-    static const inline QString dvd_next{ "\ue011" };
-    static const inline QString dvd_prev{ "\ue012" };
-    static const inline QString effect_filter{ "\ue013" };
-    static const inline QString eject{ "\ue014" };
-    static const inline QString ellipsis{ "\ue015" };
-    static const inline QString enqueue{ "\ue016" };
-    static const inline QString expand_inverted{ "\ue017" };
-    static const inline QString expand{ "\ue018" };
-    static const inline QString faster{ "\ue019" };
-    static const inline QString next_frame{ "\ue01a" };
-    static const inline QString previous_frame{ "\ue01b" };
-    static const inline QString fullscreen{ "\ue01c" };
-    static const inline QString grid{ "\ue01d" };
-    static const inline QString history{ "\ue01e" };
-    static const inline QString home{ "\ue01f" };
-    static const inline QString info{ "\ue020" };
-    static const inline QString list{ "\ue021" };
-    static const inline QString more{ "\ue022" };
-    static const inline QString next{ "\ue023" };
-    static const inline QString ok{ "\ue024" };
-    static const inline QString pause_filled{ "\ue025" };
-    static const inline QString play_filled{ "\ue026" };
-    static const inline QString play{ "\ue027" };
-    static const inline QString ic_fluent_arrow_move{ "\ue028" };
-    static const inline QString ic_fluent_chevron_down_24{ "\ue029" };
-    static const inline QString ic_fluent_chevron_left_24{ "\ue02a" };
-    static const inline QString ic_fluent_chevron_right_24{ "\ue02b" };
-    static const inline QString ic_fluent_chevron_up_24{ "\ue02c" };
-    static const inline QString panel_left{ "\ue02d" };
-    static const inline QString play_reverse{ "\ue02e" };
-    static const inline QString playlist{ "\ue02f" };
-    static const inline QString playlist_clear{ "\ue030" };
-    static const inline QString previous{ "\ue031" };
-    static const inline QString profile_new{ "\ue032" };
-    static const inline QString record{ "\ue033" };
-    static const inline QString remove{ "\ue034" };
-    static const inline QString renderer{ "\ue035" };
-    static const inline QString repeat_all{ "\ue036" };
-    static const inline QString repeat_one{ "\ue037" };
-    static const inline QString search{ "\ue038" };
-    static const inline QString settings{ "\ue039" };
-    static const inline QString shuffle{ "\ue03a" };
-    static const inline QString skip_back{ "\ue03b" };
-    static const inline QString skip_for{ "\ue03c" };
-    static const inline QString slower{ "\ue03d" };
-    static const inline QString snapshot{ "\ue03e" };
-    static const inline QString space{ "\ue03f" };
-    static const inline QString stop{ "\ue040" };
-    static const inline QString stream{ "\ue041" };
-    static const inline QString time{ "\ue042" };
-    static const inline QString topbar_discover{ "\ue043" };
-    static const inline QString topbar_music{ "\ue044" };
-    static const inline QString topbar_network{ "\ue045" };
-    static const inline QString topbar_sort{ "\ue046" };
-    static const inline QString topbar_video{ "\ue047" };
-    static const inline QString chevron_up{ "\ue048" };
-    static const inline QString chevron_down{ "\ue049" };
-    static const inline QString tv{ "\ue04a" };
-    static const inline QString tvtelx{ "\ue04b" };
-    static const inline QString transparency{ "\ue04c" };
-    static const inline QString circle{ "\ue04d" };
-    static const inline QString visualization{ "\ue04e" };
-    static const inline QString volume_high{ "\ue04f" };
-    static const inline QString volume_low{ "\ue050" };
-    static const inline QString volume_medium{ "\ue051" };
-    static const inline QString volume_muted{ "\ue052" };
-    static const inline QString volume_zero{ "\ue053" };
-    static const inline QString window_close{ "\ue054" };
-    static const inline QString window_maximize{ "\ue055" };
-    static const inline QString window_minimize{ "\ue056" };
-    static const inline QString window_restore{ "\ue057" };
-    static const inline QString ic_fluent_document_add_24_regular{ "\ue058" };
-    static const inline QString ic_fluent_document_copy_24_regular{ "\ue059" };
-    static const inline QString ic_fluent_arrow_download_24_regular{ "\ue05a" };
-    static const inline QString ic_fluent_arrow_sync_24_regular{ "\ue05b" };
-    static const inline QString medialibrary_add{ "\ue05c" };
-    static const inline QString medialibrary_remove{ "\ue05d" };
+    static constexpr inline QChar active_indicator{ u'\ue000' };
+    static constexpr inline QChar add{ u'\ue001' };
+    static constexpr inline QChar album_cover{ u'\ue002' };
+    static constexpr inline QChar aspect_ratio{ u'\ue003' };
+    static constexpr inline QChar atob{ u'\ue004' };
+    static constexpr inline QChar audiosub{ u'\ue005' };
+    static constexpr inline QChar back{ u'\ue006' };
+    static constexpr inline QChar breadcrumb_sep{ u'\ue007' };
+    static constexpr inline QChar breadcrumb_prev{ u'\ue008' };
+    static constexpr inline QChar bookmark{ u'\ue009' };
+    static constexpr inline QChar check{ u'\ue00a' };
+    static constexpr inline QChar clear{ u'\ue00b' };
+    static constexpr inline QChar close{ u'\ue00c' };
+    static constexpr inline QChar defullscreen{ u'\ue00d' };
+    static constexpr inline QChar del{ u'\ue00e' };
+    static constexpr inline QChar dropzone{ u'\ue00f' };
+    static constexpr inline QChar dvd_menu{ u'\ue010' };
+    static constexpr inline QChar dvd_next{ u'\ue011' };
+    static constexpr inline QChar dvd_prev{ u'\ue012' };
+    static constexpr inline QChar effect_filter{ u'\ue013' };
+    static constexpr inline QChar eject{ u'\ue014' };
+    static constexpr inline QChar ellipsis{ u'\ue015' };
+    static constexpr inline QChar enqueue{ u'\ue016' };
+    static constexpr inline QChar expand_inverted{ u'\ue017' };
+    static constexpr inline QChar expand{ u'\ue018' };
+    static constexpr inline QChar faster{ u'\ue019' };
+    static constexpr inline QChar next_frame{ u'\ue01a' };
+    static constexpr inline QChar previous_frame{ u'\ue01b' };
+    static constexpr inline QChar fullscreen{ u'\ue01c' };
+    static constexpr inline QChar grid{ u'\ue01d' };
+    static constexpr inline QChar history{ u'\ue01e' };
+    static constexpr inline QChar home{ u'\ue01f' };
+    static constexpr inline QChar info{ u'\ue020' };
+    static constexpr inline QChar list{ u'\ue021' };
+    static constexpr inline QChar more{ u'\ue022' };
+    static constexpr inline QChar next{ u'\ue023' };
+    static constexpr inline QChar ok{ u'\ue024' };
+    static constexpr inline QChar pause_filled{ u'\ue025' };
+    static constexpr inline QChar play_filled{ u'\ue026' };
+    static constexpr inline QChar play{ u'\ue027' };
+    static constexpr inline QChar ic_fluent_arrow_move{ u'\ue028' };
+    static constexpr inline QChar ic_fluent_chevron_down_24{ u'\ue029' };
+    static constexpr inline QChar ic_fluent_chevron_left_24{ u'\ue02a' };
+    static constexpr inline QChar ic_fluent_chevron_right_24{ u'\ue02b' };
+    static constexpr inline QChar ic_fluent_chevron_up_24{ u'\ue02c' };
+    static constexpr inline QChar panel_left{ u'\ue02d' };
+    static constexpr inline QChar play_reverse{ u'\ue02e' };
+    static constexpr inline QChar playlist{ u'\ue02f' };
+    static constexpr inline QChar playlist_clear{ u'\ue030' };
+    static constexpr inline QChar previous{ u'\ue031' };
+    static constexpr inline QChar profile_new{ u'\ue032' };
+    static constexpr inline QChar record{ u'\ue033' };
+    static constexpr inline QChar remove{ u'\ue034' };
+    static constexpr inline QChar renderer{ u'\ue035' };
+    static constexpr inline QChar repeat_all{ u'\ue036' };
+    static constexpr inline QChar repeat_one{ u'\ue037' };
+    static constexpr inline QChar search{ u'\ue038' };
+    static constexpr inline QChar settings{ u'\ue039' };
+    static constexpr inline QChar shuffle{ u'\ue03a' };
+    static constexpr inline QChar skip_back{ u'\ue03b' };
+    static constexpr inline QChar skip_for{ u'\ue03c' };
+    static constexpr inline QChar slower{ u'\ue03d' };
+    static constexpr inline QChar snapshot{ u'\ue03e' };
+    static constexpr inline QChar space{ u'\ue03f' };
+    static constexpr inline QChar stop{ u'\ue040' };
+    static constexpr inline QChar stream{ u'\ue041' };
+    static constexpr inline QChar time{ u'\ue042' };
+    static constexpr inline QChar topbar_discover{ u'\ue043' };
+    static constexpr inline QChar topbar_music{ u'\ue044' };
+    static constexpr inline QChar topbar_network{ u'\ue045' };
+    static constexpr inline QChar topbar_sort{ u'\ue046' };
+    static constexpr inline QChar topbar_video{ u'\ue047' };
+    static constexpr inline QChar chevron_up{ u'\ue048' };
+    static constexpr inline QChar chevron_down{ u'\ue049' };
+    static constexpr inline QChar tv{ u'\ue04a' };
+    static constexpr inline QChar tvtelx{ u'\ue04b' };
+    static constexpr inline QChar transparency{ u'\ue04c' };
+    static constexpr inline QChar circle{ u'\ue04d' };
+    static constexpr inline QChar visualization{ u'\ue04e' };
+    static constexpr inline QChar volume_high{ u'\ue04f' };
+    static constexpr inline QChar volume_low{ u'\ue050' };
+    static constexpr inline QChar volume_medium{ u'\ue051' };
+    static constexpr inline QChar volume_muted{ u'\ue052' };
+    static constexpr inline QChar volume_zero{ u'\ue053' };
+    static constexpr inline QChar window_close{ u'\ue054' };
+    static constexpr inline QChar window_maximize{ u'\ue055' };
+    static constexpr inline QChar window_minimize{ u'\ue056' };
+    static constexpr inline QChar window_restore{ u'\ue057' };
+    static constexpr inline QChar ic_fluent_document_add_24_regular{ u'\ue058' };
+    static constexpr inline QChar ic_fluent_document_copy_24_regular{ u'\ue059' };
+    static constexpr inline QChar ic_fluent_arrow_download_24_regular{ u'\ue05a' };
+    static constexpr inline QChar ic_fluent_arrow_sync_24_regular{ u'\ue05b' };
+    static constexpr inline QChar medialibrary_add{ u'\ue05c' };
+    static constexpr inline QChar medialibrary_remove{ u'\ue05d' };
 
 };
 
