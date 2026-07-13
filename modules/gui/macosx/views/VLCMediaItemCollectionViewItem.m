@@ -49,8 +49,9 @@ const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress = 0.95;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         if (nibNameOrNil == nil) {
-            NSBundle * const bundle = [NSBundle bundleForClass:self.class];
-            [bundle loadNibNamed:@"VLCMediaItemCollectionViewItem" owner:self topLevelObjects:nil];
+            [NSBundle.mainBundle loadNibNamed:@"VLCMediaItemCollectionViewItem"
+                                        owner:self
+                              topLevelObjects:nil];
         }
     }
     return self;
