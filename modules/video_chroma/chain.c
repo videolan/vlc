@@ -359,6 +359,7 @@ CheckFilterChroma( filter_t *p_filter, vlc_fourcc_t chroma, const char *name )
     fmt.i_codec = fmt.video.i_chroma = chroma;
     test->fmt_in = fmt;
     test->fmt_out = fmt;
+    test->psz_name = name;
 
     test->p_module = vlc_filter_LoadModule( test, "video filter", name, true );
     bool success = test->p_module != NULL;
