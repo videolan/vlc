@@ -44,6 +44,10 @@ Item {
             return root.scrolling ? Text.ElideNone : Text.ElideRight
         })
 
+        if (label.mutabilityGroup !== undefined)
+            label.mutabilityGroup = Qt.binding(function() { return (root.label === label && root.scrolling) ? Item.DynamicMutabilityGroup
+                                                                                                            : Item.AutoMutabilityGroup })
+
         label.Accessible.ignored = true
     }
 
