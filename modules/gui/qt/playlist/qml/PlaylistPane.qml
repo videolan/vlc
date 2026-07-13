@@ -271,6 +271,8 @@ T.Pane {
                 id: proxyModelComponent
 
                 QtSortFilterProxyModel {
+                    filterRole: PlaylistListModel.FilterRole
+
                     sourceModel: root.model
 
                     filterCaseSensitivity: toolbar.searchBox.caseSensitiveButtonToggled ? Qt.CaseSensitive
