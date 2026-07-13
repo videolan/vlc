@@ -760,37 +760,35 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
     block_t *p_newblock = NULL;
 
     assert(p_block->i_buffer <= SSIZE_MAX);
-    /* always need at least 10 bytes (atom size+header+1pair)*/
+
     if (p_block->i_buffer < 8)
         goto out;
 
     if(!memcmp(&p_block->p_buffer[4], "ccdp", 4))
         return MP4_CDP_Convert(p_block);
 
-    uint_fast32_t cdat_size = GetDWBE(p_block->p_buffer) - 8;
-    if (cdat_size > p_block->i_buffer)
+    uint_fast32_t atomsize = GetDWBE(p_block->p_buffer);
+    if (atomsize < 8 || atomsize > p_block->i_buffer ||
+        memcmp(&p_block->p_buffer[4], "cdat", 4))
         goto out;
 
     const uint8_t *cdat = p_block->p_buffer + 8;
-    if (memcmp(cdat - 4, "cdat", 4) != 0)
-        goto out;
+    uint_fast32_t cdat_size = (atomsize - 8) & ~1;
 
-    p_block->p_buffer += cdat_size;
-    p_block->i_buffer -= cdat_size;
-    cdat_size &= ~1;
+    p_block->p_buffer += atomsize;
+    p_block->i_buffer -= atomsize;
 
     /* cdt2 is optional */
     uint_fast32_t cdt2_size = 0;
     const uint8_t *cdt2 = NULL;
 
     if (p_block->i_buffer >= 8) {
-        size_t size = GetDWBE(p_block->p_buffer) - 8;
+        atomsize = GetDWBE(p_block->p_buffer);
 
-        if (size <= p_block->i_buffer) {
+        if (atomsize > 8 && atomsize <= p_block->i_buffer &&
+            !memcmp(&p_block->p_buffer[4], "cdt2", 4)) {
             cdt2 = p_block->p_buffer + 8;
-
-            if (memcmp(cdt2 - 4, "cdt2", 4) == 0)
-                cdt2_size = size & ~1;
+            cdt2_size = (atomsize - 8) & ~1;
         }
     }
 
@@ -800,14 +798,14 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
 
     uint8_t *out = p_newblock->p_buffer;
 
-    while (cdat_size > 0) {
+    while (cdat_size >= 2) {
          *(out++) = CC_PKT_BYTE0(0); /* cc1 == field 0 */
          *(out++) = *(cdat++);
          *(out++) = *(cdat++);
          cdat_size -= 2;
     }
 
-    while (cdt2_size > 0) {
+    while (cdt2_size >= 2) {
          *(out++) = CC_PKT_BYTE0(1); /* cc2 == field 1 */
          *(out++) = *(cdt2++);
          *(out++) = *(cdt2++);
