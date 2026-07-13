@@ -286,6 +286,7 @@ QHash<int, QByteArray>
 PlaylistListModel::roleNames() const
 {
     return {
+        { FilterRole, QByteArrayLiteral("filter") },
         { PreparsedRole, QByteArrayLiteral("preparsed") },
         { TitleRole, QByteArrayLiteral("title") },
         { DurationRole, QByteArrayLiteral("duration") },
@@ -484,6 +485,12 @@ PlaylistListModel::data(const QModelIndex &index, int role) const
 
     switch (role)
     {
+    case FilterRole:
+        return QVariant::fromValue<QString>(data(index, TitleRole).toString() +
+                                            QStringLiteral("\n") +
+                                            data(index, ArtistRole).toString() +
+                                            QStringLiteral("\n") +
+                                            data(index, AlbumRole).toString());
     case TitleRole:
         return d->m_items[row].getTitle();
     case IsCurrentRole:

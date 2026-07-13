@@ -45,7 +45,8 @@ public:
     enum Roles
     {
         TitleRole = Qt::DisplayRole,
-        DurationRole = Qt::UserRole,
+        FilterRole = Qt::UserRole,
+        DurationRole,
         IsCurrentRole,
         ArtistRole,
         AlbumRole,
