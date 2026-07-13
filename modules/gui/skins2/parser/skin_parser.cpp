@@ -27,9 +27,9 @@
 #include <math.h>
 
 SkinParser::SkinParser( intf_thread_t *pIntf, const std::string &rFileName,
-                        const std::string &rPath, BuilderData *pData ):
+                        const std::string &rPath, BuilderData *pData, unsigned instance ):
     XMLParser( pIntf, rFileName ), m_path( rPath ), m_pData( pData ),
-    m_ownData( pData == NULL ), m_xOffset( 0 ), m_yOffset( 0 )
+    m_ownData( pData == NULL ), m_xOffset( 0 ), m_yOffset( 0 ), m_instanceCount( instance )
 {
     // Make sure the data is allocated
     if( m_pData == NULL )
@@ -71,12 +71,17 @@ void SkinParser::handleBeginElement( const std::string &rName, AttrList_t &attr 
 
     if( rName == "Include" )
     {
+        if( m_instanceCount >= 4 )
+        {
+            m_errors = true;
+            return;
+        }
         RequireAttr( attr, rName, "file" );
 
         OSFactory *pFactory = OSFactory::instance( getIntf() );
         std::string fullPath = m_path + pFactory->getDirSeparator() + attr["file"];
         msg_Dbg( getIntf(), "opening included XML file: %s", fullPath.c_str() );
-        SkinParser subParser( getIntf(), fullPath.c_str(), m_path, m_pData );
+        SkinParser subParser( getIntf(), fullPath.c_str(), m_path, m_pData, m_instanceCount + 1 );
         subParser.parse();
     }
 
