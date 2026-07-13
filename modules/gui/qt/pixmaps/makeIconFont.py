@@ -79,7 +79,7 @@ public:
     VLCIcons(QObject* parent = nullptr);
 
 public:
-    static const inline QString fontFamily{{ "{font_name}" }};
+    static const inline QString fontFamily{{ QStringLiteral("{font_name}") }};
 
     // Icons
 public:
