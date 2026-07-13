@@ -390,6 +390,22 @@ static void Close(vlc_object_t *p_this)
     free(p_sys);
 }
 
+static void SetMetaFromField(input_item_t *item, csv_parser *parser, int index, vlc_meta_type_t type)
+{
+    if (index < 0 || strlen(parser->fields[index]) == 0)
+        return;
+
+    input_item_SetMeta(item, type, parser->fields[index]);
+}
+
+static void SetMetaExtraFromField(input_item_t *item, csv_parser *parser, int index, const char *name)
+{
+    if (index < 0 || strlen(parser->fields[index]) == 0)
+        return;
+
+    input_item_SetMetaExtra(item, name, parser->fields[index]);
+}
+
 static int ReadDirectory(stream_t *p_access, input_item_node_t *p_node)
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -423,6 +439,11 @@ static int ReadDirectory(stream_t *p_access, input_item_node_t *p_node)
     int name_index = csv_parser_get_field_index(parser, "name");
     int url_index = csv_parser_get_field_index(parser, "url");
     int favicon_index = csv_parser_get_field_index(parser, "favicon");
+    int homepage_index = csv_parser_get_field_index(parser, "homepage");
+    int tags_index = csv_parser_get_field_index(parser, "tags");
+    int language_index = csv_parser_get_field_index(parser, "language");
+    int codec_index = csv_parser_get_field_index(parser, "codec");
+    int bitrate_index = csv_parser_get_field_index(parser, "bitrate");
     if (name_index < 0 || url_index < 0)
     {
         msg_Err(p_access, "Missing required fields in station data");
@@ -445,16 +466,22 @@ static int ReadDirectory(stream_t *p_access, input_item_node_t *p_node)
             continue;
         }
 
-        input_item_t *station_item = input_item_New(parser->fields[url_index], parser->fields[name_index]);
+        input_item_t *station_item = input_item_NewStream(parser->fields[url_index],
+                                                         parser->fields[name_index],
+                                                         INPUT_DURATION_INDEFINITE);
         if (!station_item)
         {
             continue;
         }
 
-        if (favicon_index >= 0 && strlen(parser->fields[favicon_index]) > 0)
-        {
-            input_item_SetMeta(station_item, vlc_meta_ArtworkURL, parser->fields[favicon_index]);
-        }
+        SetMetaFromField(station_item, parser, favicon_index, vlc_meta_ArtworkURL);
+        SetMetaFromField(station_item, parser, homepage_index, vlc_meta_URL);
+        SetMetaFromField(station_item, parser, tags_index, vlc_meta_Genre);
+        SetMetaFromField(station_item, parser, language_index, vlc_meta_Language);
+
+        SetMetaExtraFromField(station_item, parser, codec_index, "Codec");
+        SetMetaExtraFromField(station_item, parser, bitrate_index, "Bitrate (kb/s)");
+
         input_item_node_AppendItem(p_node, station_item);
         input_item_Release(station_item);
     }
