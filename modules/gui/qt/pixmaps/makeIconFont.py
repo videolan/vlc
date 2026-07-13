@@ -50,11 +50,11 @@ def renderHpp(*, qml_prefix, font_name, glyphs, **kwargs):
 
     @iterlist
     def _qproperties(glyph):
-        return f"""    Q_PROPERTY(QString {glyph["key"]} MEMBER {glyph["key"]} CONSTANT FINAL)"""
+        return f"""    Q_PROPERTY(QChar {glyph["key"]} MEMBER {glyph["key"]} CONSTANT FINAL)"""
 
     @iterlist
     def _members(glyph):
-        return f"""    static const inline QString {glyph["key"]}{{ "{glyph["charcode"]}" }};"""
+        return f"""    static constexpr inline QChar {glyph["key"]}{{ u'{glyph["charcode"]}' }};"""
 
     return f"""
 /**
