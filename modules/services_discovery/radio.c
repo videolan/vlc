@@ -406,7 +406,7 @@ static int ReadDirectory(stream_t *p_access, input_item_node_t *p_node)
     }
 
     char *stations_endpoint;
-    if (asprintf(&stations_endpoint, "%scsv/stations/bycountrycodeexact/%s?hidebroken=true&order=random",
+    if (asprintf(&stations_endpoint, "%scsv/stations/bycountrycodeexact/%s?hidebroken=true&order=votes&reverse=true",
                  p_sys->base_url, p_access->psz_location) < 0)
     {
         return VLC_ENOMEM;
