@@ -113,6 +113,20 @@ T.Pane {
                 fadingEdge.backgroundColor:  (root.background && (root.background.color.a >= 1.0)) ? root.background.color
                                                                                                    : "transparent"
 
+                component DelegateAnimation : NumberAnimation {
+                    easing.type: Easing.InOutSine
+                    duration: VLCStyle.duration_long
+                }
+
+                reuseItems: false // Not relevant here, we disable it because of QTBUG-131106 when transition is involved.
+
+                // As the docs note, `ListView` transitions do not seem to handle height animation. For that reason,
+                // we animate the height directly in the delegate (Qt's recommended workaround). Because of this, we
+                // do not need to have `addDisplaced` transition here, but we can have `removeDisplaced` here:
+                removeDisplaced: Transition {
+                    DelegateAnimation { property: "y" }
+                }
+
                 onCurrentIndexChanged: {
                     const rowIndex = navigationModel.index(currentIndex, 0)
 
@@ -121,13 +135,23 @@ T.Pane {
                         navigationModel.setData(rowIndex, true, NavigationModel.EXPANDED)
                 }
 
+                property bool readyForAnimations: false
+
+                onModelChanged: {
+                    if (!listView.readyForAnimations)
+                        Qt.callLater(() => { listView.readyForAnimations = true })
+                }
+
                 Navigation.parentItem: root
                 Navigation.downItem: preferenceButton
 
                 delegate: SideNavigationDelegate {
+                    id: delegate
 
                     width: ListView.view.contentWidth
-                    height: VLCStyle.buttonHeightNavigationPane
+                    height: preferredHeight
+
+                    property real preferredHeight: VLCStyle.buttonHeightNavigationPane
 
                     leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
                     rightPadding: root.safeAreaRightMargin
@@ -145,6 +169,32 @@ T.Pane {
                         itemClicked(model.uri)
                         listView.currentIndex = index
                         listView.forceActiveFocus(focusReason)
+                    }
+
+                    Behavior on height {
+                        id: heightBehavior
+
+                        enabled: false
+
+                        DelegateAnimation {
+                            onRunningChanged: {
+                                if (running) {
+                                    delegate.clip = true
+                                } else {
+                                    delegate.clip = false
+                                }
+                            }
+                        }
+                    }
+
+                    ListView.onAdd: {
+                        if (listView.readyForAnimations) {
+                            heightBehavior.enabled = false
+                            delegate.height = 0.0
+                            heightBehavior.enabled = true
+                            delegate.height = Qt.binding(() => delegate.preferredHeight)
+                            heightBehavior.enabled = false
+                        }
                     }
                 }
             }
