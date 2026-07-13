@@ -113,6 +113,8 @@ Widgets.PageLoader {
         id: sourceRootComponent
 
         BrowseTreeDisplay {
+            id: sourceRootPage
+
             property alias source_name: deviceModel.source_name
 
             model: deviceModel
@@ -132,9 +134,9 @@ Widgets.PageLoader {
                 ctx: MainCtx
                 sd_source: NetworkDeviceModel.CAT_INTERNET
 
-                searchPattern: MainCtx.search.pattern
-                sortOrder: MainCtx.sort.order
-                sortCriteria: MainCtx.sort.criteria
+                searchPattern: sourceRootPage.search.pattern
+                sortOrder: sourceRootPage.sort.order
+                sortCriteria: sourceRootPage.sort.criteria
             }
 
             NetworkDeviceContextMenu {
@@ -150,6 +152,8 @@ Widgets.PageLoader {
         id: sourceBrowseComponent
 
         BrowseTreeDisplay {
+            id: sourceBrowsePage
+
             property alias tree: mediaModel.tree
             property string source_name
 
@@ -166,9 +170,9 @@ Widgets.PageLoader {
                 id: mediaModel
                 ctx: MainCtx
 
-                searchPattern: MainCtx.search.pattern
-                sortOrder: MainCtx.sort.order
-                sortCriteria: MainCtx.sort.criteria
+                searchPattern: sourceBrowsePage.search.pattern
+                sortOrder: sourceBrowsePage.sort.order
+                sortCriteria: sourceBrowsePage.sort.criteria
             }
 
             headerPath:  {
