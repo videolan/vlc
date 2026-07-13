@@ -42,17 +42,17 @@ QString NetworkBaseModel::artworkFallbackForType(const ItemType type) const
 {
     switch (type) {
     case TYPE_DISC:
-        return "qrc:///sd/disc.svg";
+        return QStringLiteral("qrc:///sd/disc.svg");
     case TYPE_CARD:
-        return "qrc:///sd/capture-card.svg";
+        return QStringLiteral("qrc:///sd/capture-card.svg");
     case TYPE_STREAM:
-        return "qrc:///sd/stream.svg";
+        return QStringLiteral("qrc:///sd/stream.svg");
     case TYPE_PLAYLIST:
-        return "qrc:///sd/playlist.svg";
+        return QStringLiteral("qrc:///sd/playlist.svg");
     case TYPE_FILE:
-        return "qrc:///sd/file.svg";
+        return QStringLiteral("qrc:///sd/file.svg");
     default:
-        return "qrc:///sd/directory.svg";
+        return QStringLiteral("qrc:///sd/directory.svg");
     }
 }
 
