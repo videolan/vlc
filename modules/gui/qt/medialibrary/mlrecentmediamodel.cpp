@@ -44,7 +44,7 @@ QHash<int, QByteArray> MLRecentMediaModel::roleNames() const
     QHash<int, QByteArray> hash = MLMediaModel::roleNames();
 
     hash.insert({
-        { RECENT_MEDIA_URL, "url" },
+        { RECENT_MEDIA_URL, QByteArrayLiteral("url") },
     });
 
     return hash;

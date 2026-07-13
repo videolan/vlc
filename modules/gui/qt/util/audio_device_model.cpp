@@ -149,7 +149,7 @@ void AudioDeviceModel::updateCurrent(QString current)
 QHash<int, QByteArray> AudioDeviceModel::roleNames() const
 {
     return QHash<int, QByteArray>{
-        {Qt::DisplayRole, "display"},
-        {Qt::CheckStateRole, "checked"}
+        {Qt::DisplayRole, QByteArrayLiteral("display")},
+        {Qt::CheckStateRole, QByteArrayLiteral("checked")}
     };
 }

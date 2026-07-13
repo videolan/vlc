@@ -152,7 +152,7 @@ void TrackListModel::clear()
 QHash<int, QByteArray> TrackListModel::roleNames() const
 {
     QHash<int, QByteArray> roleNames = this->QAbstractListModel::roleNames();
-    roleNames[Qt::CheckStateRole] = "checked";
+    roleNames[Qt::CheckStateRole] = QByteArrayLiteral("checked");
     return roleNames;
 }
 
@@ -290,7 +290,7 @@ void TitleListModel::resetTitles(vlc_player_title_list *newTitleList)
 QHash<int, QByteArray> TitleListModel::roleNames() const
 {
     QHash<int, QByteArray> roleNames = this->QAbstractListModel::roleNames();
-    roleNames[Qt::CheckStateRole] = "checked";
+    roleNames[Qt::CheckStateRole] = QByteArrayLiteral("checked");
     return roleNames;
 }
 
@@ -358,11 +358,11 @@ bool ChapterListModel::setData(const QModelIndex &index, const QVariant &value, 
 QHash<int, QByteArray> ChapterListModel::roleNames() const
 {
     return QHash<int, QByteArray>{
-        {Qt::DisplayRole, "display"},
-        {Qt::CheckStateRole, "checked"},
-        {ChapterListRoles::TimeRole, "time"},
-        {ChapterListRoles::StartPositionRole, "startPosition"},
-        {ChapterListRoles::EndPositionRole, "endPosition"}
+        {Qt::DisplayRole, QByteArrayLiteral("display")},
+        {Qt::CheckStateRole, QByteArrayLiteral("checked")},
+        {ChapterListRoles::TimeRole, QByteArrayLiteral("time")},
+        {ChapterListRoles::StartPositionRole, QByteArrayLiteral("startPosition")},
+        {ChapterListRoles::EndPositionRole, QByteArrayLiteral("endPosition")}
     };
 }
 
@@ -583,7 +583,7 @@ void ProgramListModel::clear()
 QHash<int, QByteArray> ProgramListModel::roleNames() const
 {
     QHash<int, QByteArray> roleNames = this->QAbstractListModel::roleNames();
-    roleNames[Qt::CheckStateRole] = "checked";
+    roleNames[Qt::CheckStateRole] = QByteArrayLiteral("checked");
     return roleNames;
 }
 

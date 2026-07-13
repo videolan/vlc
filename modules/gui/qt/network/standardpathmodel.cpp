@@ -220,8 +220,8 @@ StandardPathModel::StandardPathModel(QObject * parent)
 QHash<int, QByteArray> StandardPathModel::roleNames() const /* override */
 {
     auto roles = NetworkBaseModel::roleNames();
-    roles[PATH_SOURCE] = "source";
-    roles[PATH_TREE] = "tree";
+    roles[PATH_SOURCE] = QByteArrayLiteral("source");
+    roles[PATH_TREE] = QByteArrayLiteral("tree");
     return roles;
 }
 

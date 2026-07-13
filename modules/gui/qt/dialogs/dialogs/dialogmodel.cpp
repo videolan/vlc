@@ -83,8 +83,8 @@ QHash<int, QByteArray> DialogErrorModel::roleNames() const /* override */
 {
     return
     {
-        { DialogErrorModel::DIALOG_TITLE, "title" },
-        { DialogErrorModel::DIALOG_TEXT,  "text"  }
+        { DialogErrorModel::DIALOG_TITLE, QByteArrayLiteral("title") },
+        { DialogErrorModel::DIALOG_TEXT,  QByteArrayLiteral("text")  }
     };
 }
 

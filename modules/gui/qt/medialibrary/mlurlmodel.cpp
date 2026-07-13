@@ -50,10 +50,10 @@ QVariant MLUrlModel::itemRoleData(const MLItem *item, int role) const
 QHash<int, QByteArray> MLUrlModel::roleNames() const
 {
     return {
-        { URL_ID, "id" },
-        { URL_URL, "url" },
-        { URL_LAST_PLAYED_DATE, "last_played_date" },
-        { URL_IS_DELETABLE, "isDeletable" },
+        { URL_ID, QByteArrayLiteral("id") },
+        { URL_URL, QByteArrayLiteral("url") },
+        { URL_LAST_PLAYED_DATE, QByteArrayLiteral("last_played_date") },
+        { URL_IS_DELETABLE, QByteArrayLiteral("isDeletable") },
     };
 }
 

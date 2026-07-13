@@ -294,20 +294,20 @@ QHash<int, QByteArray> MLPlaylistModel::roleNames() const /* override */
 {
     return
     {
-        { MEDIA_ID,                 "id"                 },
-        { MEDIA_IS_NEW,             "isNew"              },
-        { MEDIA_TITLE,              "title"              },
-        { MEDIA_THUMBNAIL,          "thumbnail"          },
-        { MEDIA_DURATION,           "duration"           },
-        { MEDIA_PROGRESS,           "progress"           },
-        { MEDIA_PLAYCOUNT,          "playcount"          },
-        { MEDIA_RESOLUTION,         "resolution_name"    },
-        { MEDIA_CHANNEL,            "channel"            },
-        { MEDIA_MRL,                "mrl"                },
-        { MEDIA_DISPLAY_MRL,        "display_mrl"        },
-        { MEDIA_AUDIO_TRACK,        "audioDesc"          },
-        { MEDIA_VIDEO_TRACK,        "videoDesc"          },
-        { MEDIA_TITLE_FIRST_SYMBOL, "title_first_symbol" }
+        { MEDIA_ID,                 QByteArrayLiteral("id")                 },
+        { MEDIA_IS_NEW,             QByteArrayLiteral("isNew")              },
+        { MEDIA_TITLE,              QByteArrayLiteral("title")              },
+        { MEDIA_THUMBNAIL,          QByteArrayLiteral("thumbnail")          },
+        { MEDIA_DURATION,           QByteArrayLiteral("duration")           },
+        { MEDIA_PROGRESS,           QByteArrayLiteral("progress")           },
+        { MEDIA_PLAYCOUNT,          QByteArrayLiteral("playcount")          },
+        { MEDIA_RESOLUTION,         QByteArrayLiteral("resolution_name")    },
+        { MEDIA_CHANNEL,            QByteArrayLiteral("channel")            },
+        { MEDIA_MRL,                QByteArrayLiteral("mrl")                },
+        { MEDIA_DISPLAY_MRL,        QByteArrayLiteral("display_mrl")        },
+        { MEDIA_AUDIO_TRACK,        QByteArrayLiteral("audioDesc")          },
+        { MEDIA_VIDEO_TRACK,        QByteArrayLiteral("videoDesc")          },
+        { MEDIA_TITLE_FIRST_SYMBOL, QByteArrayLiteral("title_first_symbol") }
     };
 }
 
@@ -370,10 +370,10 @@ QVariant MLPlaylistModel::itemRoleData(const MLItem *item, int role) const /* ov
 vlc_ml_sorting_criteria_t MLPlaylistModel::nameToCriteria(QByteArray name) const /* override */
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        {"id",             VLC_ML_SORTING_DEFAULT},
-        {"title",          VLC_ML_SORTING_ALPHA},
-        {"duration",       VLC_ML_SORTING_DURATION},
-        {"playcount",      VLC_ML_SORTING_PLAYCOUNT},
+        {QByteArrayLiteral("id"),             VLC_ML_SORTING_DEFAULT},
+        {QByteArrayLiteral("title"),          VLC_ML_SORTING_ALPHA},
+        {QByteArrayLiteral("duration"),       VLC_ML_SORTING_DURATION},
+        {QByteArrayLiteral("playcount"),      VLC_ML_SORTING_PLAYCOUNT},
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 

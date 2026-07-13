@@ -29,28 +29,28 @@ MLAlbumModel::MLAlbumModel(QObject *parent)
 QHash<int, QByteArray> MLAlbumModel::roleNames() const
 {
     return {
-        {ALBUM_ID,"id"},
-        {ALBUM_TITLE, "title"},
-        {ALBUM_RELEASE_YEAR, "release_year"},
-        {ALBUM_SHORT_SUMMARY, "shortsummary"},
-        {ALBUM_COVER, "cover"},
-        {ALBUM_MAIN_ARTIST, "main_artist"},
-        {ALBUM_NB_TRACKS, "nb_tracks"},
-        {ALBUM_DURATION, "duration"},
-        {ALBUM_TITLE_FIRST_SYMBOL, "title_first_symbol"},
-        {ALBUM_MAIN_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"}
+        {ALBUM_ID, QByteArrayLiteral("id")},
+        {ALBUM_TITLE, QByteArrayLiteral("title")},
+        {ALBUM_RELEASE_YEAR, QByteArrayLiteral("release_year")},
+        {ALBUM_SHORT_SUMMARY, QByteArrayLiteral("shortsummary")},
+        {ALBUM_COVER, QByteArrayLiteral("cover")},
+        {ALBUM_MAIN_ARTIST, QByteArrayLiteral("main_artist")},
+        {ALBUM_NB_TRACKS, QByteArrayLiteral("nb_tracks")},
+        {ALBUM_DURATION, QByteArrayLiteral("duration")},
+        {ALBUM_TITLE_FIRST_SYMBOL, QByteArrayLiteral("title_first_symbol")},
+        {ALBUM_MAIN_ARTIST_FIRST_SYMBOL, QByteArrayLiteral("main_artist_first_symbol")}
     };
 }
 
 vlc_ml_sorting_criteria_t MLAlbumModel::nameToCriteria(QByteArray name) const
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        {"id", VLC_ML_SORTING_DEFAULT},
-        {"title", VLC_ML_SORTING_ALPHA},
-        {"release_year", VLC_ML_SORTING_RELEASEDATE},
-        {"main_artist", VLC_ML_SORTING_ARTIST},
+        {QByteArrayLiteral("id"), VLC_ML_SORTING_DEFAULT},
+        {QByteArrayLiteral("title"), VLC_ML_SORTING_ALPHA},
+        {QByteArrayLiteral("release_year"), VLC_ML_SORTING_RELEASEDATE},
+        {QByteArrayLiteral("main_artist"), VLC_ML_SORTING_ARTIST},
         // {"nb_tracks"},
-        {"duration", VLC_ML_SORTING_DURATION},
+        {QByteArrayLiteral("duration"), VLC_ML_SORTING_DURATION},
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 

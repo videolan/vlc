@@ -286,14 +286,14 @@ QHash<int, QByteArray>
 PlaylistListModel::roleNames() const
 {
     return {
-        { PreparsedRole, "preparsed" },
-        { TitleRole, "title" },
-        { DurationRole, "duration" },
-        { IsCurrentRole, "isCurrent" },
-        { ArtistRole , "artist" },
-        { AlbumRole  , "album" },
-        { ArtworkRole, "artwork" },
-        { UrlRole, "url" }
+        { PreparsedRole, QByteArrayLiteral("preparsed") },
+        { TitleRole, QByteArrayLiteral("title") },
+        { DurationRole, QByteArrayLiteral("duration") },
+        { IsCurrentRole, QByteArrayLiteral("isCurrent") },
+        { ArtistRole , QByteArrayLiteral("artist") },
+        { AlbumRole  , QByteArrayLiteral("album") },
+        { ArtworkRole, QByteArrayLiteral("artwork") },
+        { UrlRole, QByteArrayLiteral("url") }
     };
 }
 

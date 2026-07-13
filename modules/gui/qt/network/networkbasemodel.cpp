@@ -59,11 +59,11 @@ QString NetworkBaseModel::artworkFallbackForType(const ItemType type) const
 QHash<int, QByteArray> NetworkBaseModel::roleNames() const
 {
     return {
-        { NETWORK_BASE_NAME, "name" },
-        { NETWORK_BASE_MRL, "mrl" },
-        { NETWORK_BASE_TYPE, "type" },
-        { NETWORK_BASE_PROTOCOL, "protocol" },
-        { NETWORK_BASE_ARTWORK, "artwork" },
-        { NETWORK_BASE_ARTWORK_FALLBACK, "artworkFallback" },
+        { NETWORK_BASE_NAME, QByteArrayLiteral("name") },
+        { NETWORK_BASE_MRL, QByteArrayLiteral("mrl") },
+        { NETWORK_BASE_TYPE, QByteArrayLiteral("type") },
+        { NETWORK_BASE_PROTOCOL, QByteArrayLiteral("protocol") },
+        { NETWORK_BASE_ARTWORK, QByteArrayLiteral("artwork") },
+        { NETWORK_BASE_ARTWORK_FALLBACK, QByteArrayLiteral("artworkFallback") },
     };
 }

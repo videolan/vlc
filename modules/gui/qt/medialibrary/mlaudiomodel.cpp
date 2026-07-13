@@ -60,15 +60,15 @@ QHash<int, QByteArray> MLAudioModel::roleNames() const
     QHash<int, QByteArray> hash = MLMediaModel::roleNames();
 
     hash.insert({
-        {AUDIO_COVER, "cover"}, // TODO: remove (a similar roleName already "small_cover")
-        {AUDIO_TRACK_NUMBER, "track_number"},
-        {AUDIO_DISC_NUMBER, "disc_number"},
-        {AUDIO_ARTIST, "main_artist"},
-        {AUDIO_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"},
-        {AUDIO_ALBUM, "album_title"},
-        {AUDIO_ALBUM_FIRST_SYMBOL, "album_title_first_symbol"},
-        {AUDIO_ALBUM_ID, "album_id"},
-        {AUDIO_ALBUM_ID_SERIALIZED, "album_id_serialized"},
+        {AUDIO_COVER, QByteArrayLiteral("cover")}, // TODO: remove (a similar roleName already "small_cover")
+        {AUDIO_TRACK_NUMBER, QByteArrayLiteral("track_number")},
+        {AUDIO_DISC_NUMBER, QByteArrayLiteral("disc_number")},
+        {AUDIO_ARTIST, QByteArrayLiteral("main_artist")},
+        {AUDIO_ARTIST_FIRST_SYMBOL, QByteArrayLiteral("main_artist_first_symbol")},
+        {AUDIO_ALBUM, QByteArrayLiteral("album_title")},
+        {AUDIO_ALBUM_FIRST_SYMBOL, QByteArrayLiteral("album_title_first_symbol")},
+        {AUDIO_ALBUM_ID, QByteArrayLiteral("album_id")},
+        {AUDIO_ALBUM_ID_SERIALIZED, QByteArrayLiteral("album_id_serialized")},
     });
 
     return hash;
@@ -77,13 +77,13 @@ QHash<int, QByteArray> MLAudioModel::roleNames() const
 vlc_ml_sorting_criteria_t MLAudioModel::nameToCriteria(QByteArray name) const
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        {"id", VLC_ML_SORTING_DEFAULT},
-        {"title", VLC_ML_SORTING_ALPHA},
-        {"album_title", VLC_ML_SORTING_ALBUM},
-        {"track_number", VLC_ML_SORTING_TRACKNUMBER},
-        {"release_year", VLC_ML_SORTING_RELEASEDATE},
-        {"main_artist", VLC_ML_SORTING_ARTIST},
-        {"duration", VLC_ML_SORTING_DURATION},
+        {QByteArrayLiteral("id"), VLC_ML_SORTING_DEFAULT},
+        {QByteArrayLiteral("title"), VLC_ML_SORTING_ALPHA},
+        {QByteArrayLiteral("album_title"), VLC_ML_SORTING_ALBUM},
+        {QByteArrayLiteral("track_number"), VLC_ML_SORTING_TRACKNUMBER},
+        {QByteArrayLiteral("release_year"), VLC_ML_SORTING_RELEASEDATE},
+        {QByteArrayLiteral("main_artist"), VLC_ML_SORTING_ARTIST},
+        {QByteArrayLiteral("duration"), VLC_ML_SORTING_DURATION},
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 

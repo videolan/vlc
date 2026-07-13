@@ -84,14 +84,14 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
     QHash<int, QByteArray> hash = MLMediaModel::roleNames();
 
     hash.insert({
-        {VIDEO_THUMBNAIL, "thumbnail"}, // TODO: remove (a similar roleName already "small_cover")
-        {VIDEO_IS_NEW, "isNew"},
-        {VIDEO_RESOLUTION, "resolution_name"},
-        {VIDEO_CHANNEL, "channel"},
-        {VIDEO_DISPLAY_MRL, "display_mrl"},
-        {VIDEO_VIDEO_TRACK, "videoDesc"},
-        {VIDEO_AUDIO_TRACK, "audioDesc"},
-        {VIDEO_SUBTITLE_TRACK, "subtitleDesc"},
+        {VIDEO_THUMBNAIL, QByteArrayLiteral("thumbnail")}, // TODO: remove (a similar roleName already "small_cover")
+        {VIDEO_IS_NEW, QByteArrayLiteral("isNew")},
+        {VIDEO_RESOLUTION, QByteArrayLiteral("resolution_name")},
+        {VIDEO_CHANNEL, QByteArrayLiteral("channel")},
+        {VIDEO_DISPLAY_MRL, QByteArrayLiteral("display_mrl")},
+        {VIDEO_VIDEO_TRACK, QByteArrayLiteral("videoDesc")},
+        {VIDEO_AUDIO_TRACK, QByteArrayLiteral("audioDesc")},
+        {VIDEO_SUBTITLE_TRACK, QByteArrayLiteral("subtitleDesc")},
     });
 
     return hash;
@@ -100,9 +100,9 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
 vlc_ml_sorting_criteria_t MLVideoModel::nameToCriteria(QByteArray name) const
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        {"title", VLC_ML_SORTING_ALPHA},
-        {"duration", VLC_ML_SORTING_DURATION},
-        {"playcount", VLC_ML_SORTING_PLAYCOUNT},
+        {QByteArrayLiteral("title"), VLC_ML_SORTING_ALPHA},
+        {QByteArrayLiteral("duration"), VLC_ML_SORTING_DURATION},
+        {QByteArrayLiteral("playcount"), VLC_ML_SORTING_PLAYCOUNT},
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 

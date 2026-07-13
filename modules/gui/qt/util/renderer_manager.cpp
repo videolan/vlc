@@ -318,12 +318,12 @@ bool RendererManager::setData(const QModelIndex &index, const QVariant &value, i
 QHash<int,QByteArray> RendererManager::roleNames() const
 {
     return {
-        { NAME, "name" },
-        { TYPE, "type" },
-        { DEMUX_FILTER, "demuxFilter" },
-        { SOUT, "sour" },
-        { ICON_URI, "iconUri" },
-        { FLAGS, "flags" },
+        { NAME, QByteArrayLiteral("name") },
+        { TYPE, QByteArrayLiteral("type") },
+        { DEMUX_FILTER, QByteArrayLiteral("demuxFilter") },
+        { SOUT, QByteArrayLiteral("sour") },
+        { ICON_URI, QByteArrayLiteral("iconUri") },
+        { FLAGS, QByteArrayLiteral("flags") },
     };
 }
 

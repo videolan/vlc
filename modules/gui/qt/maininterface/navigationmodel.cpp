@@ -387,12 +387,12 @@ NavigationModel::~NavigationModel()
 QHash<int,QByteArray> NavigationModel::roleNames() const
 {
     return {
-        {TITLE, "title" },
-        {URI, "uri" },
-        {DEPTH, "depth" },
-        {ICON, "icon"},
-        {EXPANDABLE, "expandable" },
-        {EXPANDED, "expanded" },
+        {TITLE, QByteArrayLiteral("title") },
+        {URI, QByteArrayLiteral("uri") },
+        {DEPTH, QByteArrayLiteral("depth") },
+        {ICON, QByteArrayLiteral("icon") },
+        {EXPANDABLE, QByteArrayLiteral("expandable") },
+        {EXPANDED, QByteArrayLiteral("expanded") },
     };
 }
 

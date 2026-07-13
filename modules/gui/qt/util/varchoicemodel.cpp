@@ -48,7 +48,7 @@ Qt::ItemFlags VLCVarChoiceModel::flags(const QModelIndex &) const
 QHash<int, QByteArray> VLCVarChoiceModel::roleNames() const
 {
     QHash<int, QByteArray> roleNames = this->QAbstractListModel::roleNames();
-    roleNames[Qt::CheckStateRole] = "checked";
+    roleNames[Qt::CheckStateRole] = QByteArrayLiteral("checked");
     return roleNames;
 }
 

@@ -594,15 +594,15 @@ QHash<int, QByteArray> NetworkMediaModel::roleNames() const
 {
     auto roles = NetworkBaseModel::roleNames();
 
-    roles[NETWORK_INDEXED] = "indexed";
-    roles[NETWORK_CANINDEX] = "can_index";
-    roles[NETWORK_TREE] = "tree";
-    roles[NETWORK_FILE_SIZE] = "fileSizeRaw64";
-    roles[NETWORK_FILE_MODIFIED] = "fileModified";
-    roles[NETWORK_MEDIA] = "media";
-    roles[NETWORK_MEDIA_PROGRESS] = "progress";
-    roles[NETWORK_MEDIA_DURATION] = "duration";
-    roles[URL] = "url";
+    roles[NETWORK_INDEXED] = QByteArrayLiteral("indexed");
+    roles[NETWORK_CANINDEX] = QByteArrayLiteral("can_index");
+    roles[NETWORK_TREE] = QByteArrayLiteral("tree");
+    roles[NETWORK_FILE_SIZE] = QByteArrayLiteral("fileSizeRaw64");
+    roles[NETWORK_FILE_MODIFIED] = QByteArrayLiteral("fileModified");
+    roles[NETWORK_MEDIA] = QByteArrayLiteral("media");
+    roles[NETWORK_MEDIA_PROGRESS] = QByteArrayLiteral("progress");
+    roles[NETWORK_MEDIA_DURATION] = QByteArrayLiteral("duration");
+    roles[URL] = QByteArrayLiteral("url");
 
     return roles;
 }

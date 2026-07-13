@@ -590,10 +590,10 @@ QHash<int, QByteArray> ControlbarProfileModel::roleNames() const
 {
     return {
         {
-            Qt::DisplayRole, "name"
+            Qt::DisplayRole, QByteArrayLiteral("name")
         },
         {
-            MODEL_ROLE, "model"
+            MODEL_ROLE, QByteArrayLiteral("model")
         }
     };
 }

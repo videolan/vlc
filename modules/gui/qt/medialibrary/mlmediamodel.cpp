@@ -109,29 +109,29 @@ void MLMediaModel::deleteFileFromSource(const QModelIndex &index)
 vlc_ml_sorting_criteria_t MLMediaModel::nameToCriteria(QByteArray name) const
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        {"title", VLC_ML_SORTING_ALPHA},
-        {"duration", VLC_ML_SORTING_DURATION},
-        {"insertion", VLC_ML_SORTING_INSERTIONDATE},
+        {QByteArrayLiteral("title"), VLC_ML_SORTING_ALPHA},
+        {QByteArrayLiteral("duration"), VLC_ML_SORTING_DURATION},
+        {QByteArrayLiteral("insertion"), VLC_ML_SORTING_INSERTIONDATE},
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
 QHash<int, QByteArray> MLMediaModel::roleNames() const
 {
     return {
-        {MEDIA_ID, "id"},
-        {MEDIA_TITLE, "title"},
-        {MEDIA_TITLE_FIRST_SYMBOL, "title_first_symbol"},
-        {MEDIA_FILENAME, "fileName"},
-        {MEDIA_SMALL_COVER, "small_cover"},
-        {MEDIA_DURATION, "duration"},
-        {MEDIA_MRL, "mrl"},
-        {MEDIA_IS_VIDEO, "isVideo"},
-        {MEDIA_IS_FAVORITE, "isFavorite"},
-        {MEDIA_IS_LOCAL, "isLocal"},
-        {MEDIA_PROGRESS, "progress"},
-        {MEDIA_PLAYCOUNT, "playcount"},
-        {MEDIA_LAST_PLAYED_DATE, "last_played_date"},
-        {MEDIA_IS_DELETABLE_FILE, "isDeletableFile"},
+        {MEDIA_ID, QByteArrayLiteral("id")},
+        {MEDIA_TITLE, QByteArrayLiteral("title")},
+        {MEDIA_TITLE_FIRST_SYMBOL, QByteArrayLiteral("title_first_symbol")},
+        {MEDIA_FILENAME, QByteArrayLiteral("fileName")},
+        {MEDIA_SMALL_COVER, QByteArrayLiteral("small_cover")},
+        {MEDIA_DURATION, QByteArrayLiteral("duration")},
+        {MEDIA_MRL, QByteArrayLiteral("mrl")},
+        {MEDIA_IS_VIDEO, QByteArrayLiteral("isVideo")},
+        {MEDIA_IS_FAVORITE, QByteArrayLiteral("isFavorite")},
+        {MEDIA_IS_LOCAL, QByteArrayLiteral("isLocal")},
+        {MEDIA_PROGRESS, QByteArrayLiteral("progress")},
+        {MEDIA_PLAYCOUNT, QByteArrayLiteral("playcount")},
+        {MEDIA_LAST_PLAYED_DATE, QByteArrayLiteral("last_played_date")},
+        {MEDIA_IS_DELETABLE_FILE, QByteArrayLiteral("isDeletableFile")},
     };
 }
 

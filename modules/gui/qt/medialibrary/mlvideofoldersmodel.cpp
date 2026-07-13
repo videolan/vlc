@@ -51,13 +51,13 @@ static const int MLVIDEOFOLDERSMODEL_COVER_HEIGHT = 162 * 3;
 QHash<int, QByteArray> MLVideoFoldersModel::roleNames() const /* override */
 {
     return {
-        { FOLDER_ID, "id" },
-        { FOLDER_TITLE, "title" },
-        { FOLDER_TITLE_FIRST_SYMBOL, "title_first_symbol" },
-        { FOLDER_THUMBNAIL, "thumbnail" },
-        { FOLDER_DURATION, "duration" },
-        { FOLDER_COUNT, "count" },
-        { FOLDER_NB_VIDEOS, "nb_videos" },
+        { FOLDER_ID, QByteArrayLiteral("id") },
+        { FOLDER_TITLE, QByteArrayLiteral("title") },
+        { FOLDER_TITLE_FIRST_SYMBOL, QByteArrayLiteral("title_first_symbol") },
+        { FOLDER_THUMBNAIL, QByteArrayLiteral("thumbnail") },
+        { FOLDER_DURATION, QByteArrayLiteral("duration") },
+        { FOLDER_COUNT, QByteArrayLiteral("count") },
+        { FOLDER_NB_VIDEOS, QByteArrayLiteral("nb_videos") },
     };
 }
 
@@ -101,8 +101,8 @@ QVariant MLVideoFoldersModel::itemRoleData(const MLItem * item, const int role) 
 vlc_ml_sorting_criteria_t MLVideoFoldersModel::nameToCriteria(QByteArray name) const /* override */
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        { "title",    VLC_ML_SORTING_ALPHA    },
-        { "duration", VLC_ML_SORTING_DURATION },
+        { QByteArrayLiteral("title"),    VLC_ML_SORTING_ALPHA    },
+        { QByteArrayLiteral("duration"), VLC_ML_SORTING_DURATION },
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 

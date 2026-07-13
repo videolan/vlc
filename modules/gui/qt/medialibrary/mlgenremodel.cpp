@@ -69,13 +69,13 @@ QVariant MLGenreModel::itemRoleData(const MLItem *item, const int role) const
 QHash<int, QByteArray> MLGenreModel::roleNames() const
 {
     return {
-        { GENRE_ID, "id" },
-        { GENRE_NAME, "name" },
-        { GENRE_NB_TRACKS, "nb_tracks" },
-        { GENRE_ARTISTS, "artists" },
-        { GENRE_TRACKS, "tracks" },
-        { GENRE_ALBUMS, "albums" },
-        { GENRE_COVER, "cover" }
+        { GENRE_ID, QByteArrayLiteral("id") },
+        { GENRE_NAME, QByteArrayLiteral("name") },
+        { GENRE_NB_TRACKS, QByteArrayLiteral("nb_tracks") },
+        { GENRE_ARTISTS, QByteArrayLiteral("artists") },
+        { GENRE_TRACKS, QByteArrayLiteral("tracks") },
+        { GENRE_ALBUMS, QByteArrayLiteral("albums") },
+        { GENRE_COVER, QByteArrayLiteral("cover") }
     };
 }
 
@@ -120,7 +120,7 @@ void MLGenreModel::onVlcMlEvent(const MLEvent &event)
 vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        {"name", VLC_ML_SORTING_ALPHA},
+        {QByteArrayLiteral("name"), VLC_ML_SORTING_ALPHA},
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 

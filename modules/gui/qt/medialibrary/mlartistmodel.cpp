@@ -50,20 +50,20 @@ QVariant MLArtistModel::itemRoleData(const MLItem *item, const int role) const
 QHash<int, QByteArray> MLArtistModel::roleNames() const
 {
     return {
-        { ARTIST_ID, "id" },
-        { ARTIST_NAME, "name" },
-        { ARTIST_SHORT_BIO, "short_bio" },
-        { ARTIST_COVER, "cover" },
-        { ARTIST_NB_ALBUMS, "nb_albums" },
-        { ARTIST_NB_TRACKS, "nb_tracks" }
+        { ARTIST_ID, QByteArrayLiteral("id") },
+        { ARTIST_NAME, QByteArrayLiteral("name") },
+        { ARTIST_SHORT_BIO, QByteArrayLiteral("short_bio") },
+        { ARTIST_COVER, QByteArrayLiteral("cover") },
+        { ARTIST_NB_ALBUMS, QByteArrayLiteral("nb_albums") },
+        { ARTIST_NB_TRACKS, QByteArrayLiteral("nb_tracks") }
     };
 }
 
 vlc_ml_sorting_criteria_t MLArtistModel::nameToCriteria(QByteArray name) const
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        {"name", VLC_ML_SORTING_ALPHA},
-        {"nb_tracks", VLC_ML_SORTING_TRACKNUMBER},
+        {QByteArrayLiteral("name"), VLC_ML_SORTING_ALPHA},
+        {QByteArrayLiteral("nb_tracks"), VLC_ML_SORTING_TRACKNUMBER},
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 

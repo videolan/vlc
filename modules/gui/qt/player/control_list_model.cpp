@@ -79,7 +79,7 @@ QHash<int, QByteArray> ControlListModel::roleNames() const
 {
     return {
         {
-            ID_ROLE, "id"
+            ID_ROLE, QByteArrayLiteral("id")
         }
     };
 }

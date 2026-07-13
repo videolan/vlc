@@ -437,8 +437,8 @@ QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
 QHash<int, QByteArray> NetworkDeviceModel::roleNames() const
 {
     QHash<int, QByteArray> roles = NetworkBaseModel::roleNames();
-    roles[NETWORK_SOURCE] = "source";
-    roles[NETWORK_TREE] = "tree";
+    roles[NETWORK_SOURCE] = QByteArrayLiteral("source");
+    roles[NETWORK_TREE] = QByteArrayLiteral("tree");
     return roles;
 }
 

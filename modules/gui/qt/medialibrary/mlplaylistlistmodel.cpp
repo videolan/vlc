@@ -268,14 +268,14 @@ QHash<int, QByteArray> MLPlaylistListModel::roleNames() const /* override */
 {
     return
     {
-        { PLAYLIST_ID,        "id"        },
-        { PLAYLIST_NAME,      "name"      },
-        { PLAYLIST_THUMBNAIL, "thumbnail" },
-        { PLAYLIST_DURATION,  "duration"  },
-        { PLAYLIST_COUNT,     "count"     },
-        { PLAYLIST_NB_AUDIO,  "nb_audio"  },
-        { PLAYLIST_NB_VIDEO,  "nb_video"  },
-        { PLAYLIST_NB_UNKNOWN,"nb_unknown"}
+        { PLAYLIST_ID,        QByteArrayLiteral("id")         },
+        { PLAYLIST_NAME,      QByteArrayLiteral("name")       },
+        { PLAYLIST_THUMBNAIL, QByteArrayLiteral("thumbnail")  },
+        { PLAYLIST_DURATION,  QByteArrayLiteral("duration")   },
+        { PLAYLIST_COUNT,     QByteArrayLiteral("count")      },
+        { PLAYLIST_NB_AUDIO,  QByteArrayLiteral("nb_audio")   },
+        { PLAYLIST_NB_VIDEO,  QByteArrayLiteral("nb_video")   },
+        { PLAYLIST_NB_UNKNOWN,QByteArrayLiteral("nb_unknown") }
     };
 }
 

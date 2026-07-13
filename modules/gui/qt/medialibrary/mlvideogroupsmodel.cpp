@@ -60,11 +60,11 @@ QHash<int, QByteArray> MLVideoGroupsModel::roleNames() const /* override */
 
     const QHash<int, QByteArray> groupRoles =
     {
-        {GROUP_IS_VIDEO, "isVideo"},
-        {GROUP_TITLE_FIRST_SYMBOL, "group_title_first_symbol"},
-        {GROUP_DATE, "date"},
-        {GROUP_COUNT, "count"},
-        {GROUP_NB_VIDEOS, "nb_videos"},
+        {GROUP_IS_VIDEO, QByteArrayLiteral("isVideo")},
+        {GROUP_TITLE_FIRST_SYMBOL, QByteArrayLiteral("group_title_first_symbol")},
+        {GROUP_DATE, QByteArrayLiteral("date")},
+        {GROUP_COUNT, QByteArrayLiteral("count")},
+        {GROUP_NB_VIDEOS, QByteArrayLiteral("nb_videos")},
     };
 
     hash.insert(groupRoles);
@@ -145,9 +145,9 @@ QVariant MLVideoGroupsModel::itemRoleData(const MLItem * item, const int role) c
 vlc_ml_sorting_criteria_t MLVideoGroupsModel::nameToCriteria(QByteArray name) const /* override */
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
-        { "title",    VLC_ML_SORTING_ALPHA         },
-        { "duration", VLC_ML_SORTING_DURATION      },
-        { "date",     VLC_ML_SORTING_INSERTIONDATE },
+        { QByteArrayLiteral("title"),    VLC_ML_SORTING_ALPHA         },
+        { QByteArrayLiteral("duration"), VLC_ML_SORTING_DURATION      },
+        { QByteArrayLiteral("date"),     VLC_ML_SORTING_INSERTIONDATE },
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 

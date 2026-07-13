@@ -147,10 +147,10 @@ bool MLBookmarkModel::setData(const QModelIndex &index, const QVariant &value, i
 
 QHash<int, QByteArray> MLBookmarkModel::roleNames() const{
     return QHash<int, QByteArray>{
-        {BookmarkRoles::NameRole, "name"},
-        {BookmarkRoles::TimeRole, "time"},
-        {BookmarkRoles::PositionRole, "position"},
-        {BookmarkRoles::DescriptionRole, "description"}
+        {BookmarkRoles::NameRole, QByteArrayLiteral("name")},
+        {BookmarkRoles::TimeRole, QByteArrayLiteral("time")},
+        {BookmarkRoles::PositionRole, QByteArrayLiteral("position")},
+        {BookmarkRoles::DescriptionRole, QByteArrayLiteral("description")}
     };
 }
 

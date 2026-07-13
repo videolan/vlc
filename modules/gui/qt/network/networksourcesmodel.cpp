@@ -220,10 +220,10 @@ QVariant NetworkSourcesModel::data( const QModelIndex& index, int role ) const
 QHash<int, QByteArray> NetworkSourcesModel::roleNames() const
 {
     return {
-        { SOURCE_NAME, "name" },
-        { SOURCE_LONGNAME, "long_name" },
-        { SOURCE_TYPE, "type" },
-        { SOURCE_ARTWORK, "artwork" }
+        { SOURCE_NAME, QByteArrayLiteral("name") },
+        { SOURCE_LONGNAME, QByteArrayLiteral("long_name") },
+        { SOURCE_TYPE, QByteArrayLiteral("type") },
+        { SOURCE_ARTWORK, QByteArrayLiteral("artwork") }
     };
 }
 
