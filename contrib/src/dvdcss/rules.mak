@@ -1,5 +1,5 @@
 # DVDCSS
-DVDCSS_VERSION := 1.5.0
+DVDCSS_VERSION := 1.6.0
 DVDCSS_URL := $(VIDEOLAN_GIT)/videolan/libdvdcss/-/archive/$(DVDCSS_VERSION)/libdvdcss-$(DVDCSS_VERSION).tar.bz2
 LIBDVDCSS_GITURL:=$(VIDEOLAN_GIT)/videolan/libdvdcss.git
 LIBDVDCSS_BRANCH:=master
