@@ -166,6 +166,14 @@ typedef enum input_event_type_e
     INPUT_EVENT_FRAME_PREVIOUS_STATUS,
 } input_event_type_e;
 
+/**
+ * Mouse Pause Policy
+ */
+enum vlc_mouse_pause_policy {
+    VLC_MOUSE_PAUSE_DISABLED,
+    VLC_MOUSE_IMMEDIATE_PAUSE_ON_RELEASED
+};
+
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
 #define VLC_INPUT_CAPABILITIES_PAUSEABLE (1<<1)
 #define VLC_INPUT_CAPABILITIES_CHANGE_RATE (1<<2)

@@ -363,6 +363,9 @@ static void test_playback(void)
     var_Create(root, "captions", VLC_VAR_INTEGER);
     var_SetInteger(root, "captions", 608);
 
+    var_Create(root, "mouse-pause-policy", VLC_VAR_STRING);
+    var_SetString(root, "mouse-pause-policy", "auto");
+
     input_item_t *item = input_item_NewStream("mock://", "mock", 0);
 
     input_thread_private_t *priv = vlc_object_create(root, sizeof(*priv));
@@ -472,6 +475,9 @@ static void test_multiple_programs(void)
 
     var_Create(root, "captions", VLC_VAR_INTEGER);
     var_SetInteger(root, "captions", 608);
+
+    var_Create(root, "mouse-pause-policy", VLC_VAR_STRING);
+    var_SetString(root, "mouse-pause-policy", "auto");
 
     input_item_t *item = input_item_NewStream("mock://", "mock", 0);
 

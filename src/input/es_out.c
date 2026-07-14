@@ -242,6 +242,8 @@ typedef struct
 
     unsigned    cc_decoder;
 
+    enum vlc_mouse_pause_policy mouse_pause_policy;
+
     struct vlc_input_es_out out;
 } es_out_sys_t;
 
@@ -343,6 +345,45 @@ default_val:
     for( int fetes_i=0; fetes_i<2; fetes_i++ ) \
         vlc_list_foreach( pos, (!fetes_i ? &p_sys->es : &p_sys->es_slaves), node )
 
+struct mouse_pause_policy_mapping
+{
+    char key[sizeof("pause-on-released")];
+    enum vlc_mouse_pause_policy val;
+};
+
+static int mouse_pause_policy_cmp(const void *key, const void *val)
+{
+    const struct mouse_pause_policy_mapping *entry = val;
+    return strcmp( key, entry->key );
+}
+
+static enum vlc_mouse_pause_policy
+mouse_pause_policy_inherit(input_thread_t *obj)
+{
+    static const struct mouse_pause_policy_mapping mouse_pause_policy_list[] =
+    {
+        { "auto", VLC_MOUSE_IMMEDIATE_PAUSE_ON_RELEASED},
+        { "disabled", VLC_MOUSE_PAUSE_DISABLED},
+        { "pause-on-released", VLC_MOUSE_IMMEDIATE_PAUSE_ON_RELEASED},
+    };
+
+    char *policy_str = var_InheritString(obj, "mouse-pause-policy");
+    if (policy_str == NULL)
+        goto default_val;
+
+    const struct mouse_pause_policy_mapping *entry =
+        bsearch(policy_str, mouse_pause_policy_list, ARRAY_SIZE(mouse_pause_policy_list),
+                sizeof (*mouse_pause_policy_list), mouse_pause_policy_cmp);
+    free(policy_str);
+    if (entry == NULL)
+        goto default_val;
+
+    return entry->val;
+
+default_val:
+    return VLC_MOUSE_IMMEDIATE_PAUSE_ON_RELEASED;
+}
+
 static void MouseEventCb(const vlc_mouse_t *newmouse, void *userdata)
 {
     es_out_id_t *id = userdata;
@@ -350,6 +391,13 @@ static void MouseEventCb(const vlc_mouse_t *newmouse, void *userdata)
     es_out_sys_t *p_sys = PRIV(&out->out);
 
     if(!p_sys->p_input)
+        return;
+
+    enum vlc_mouse_pause_policy policy = p_sys->mouse_pause_policy;
+
+    //TODO: More behaviors to be implemented.
+
+    if (policy == VLC_MOUSE_PAUSE_DISABLED)
         return;
 
     if(!newmouse)
@@ -4400,6 +4448,7 @@ input_EsOutNew(input_thread_t *p_input, input_source_t *main_source, float rate,
                     "sub-track-id", "sub-track", "sub-language", "sub" );
 
     p_sys->cc_decoder = var_InheritInteger( p_input, "captions" );
+    p_sys->mouse_pause_policy = mouse_pause_policy_inherit(p_sys->p_input);
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
     p_sys->i_audio_delay = p_sys->i_spu_delay = p_sys->i_video_delay = 0;
