@@ -106,6 +106,7 @@ enum
     BOX_SEARCH,
     BOX_OPEN,
     BOX_BROWSE,
+    BOX_FSEARCH,
     BOX_META,
     BOX_STATS
 };
@@ -119,6 +120,7 @@ static const char box_title[][19] = {
     [BOX_SEARCH]    = " Playlist ",
     [BOX_OPEN]      = " Playlist ",
     [BOX_BROWSE]    = " Browse ",
+    [BOX_FSEARCH]   = " Browse ",
     [BOX_META]      = " Meta-information ",
     [BOX_STATS]     = " Stats ",
 };
@@ -185,6 +187,7 @@ struct intf_sys_t
 
     /* Search Box context */
     char            search_chain[20];
+    char            fsearch_chain[255];
 
     /* Open Box Context */
     char            open_chain[50];
@@ -371,19 +374,23 @@ playlist_on_items_updated(vlc_playlist_t *playlist,
     ((intf_sys_t *)userdata)->need_update = true;
 }
 
+/****************************************************************************
+ * Search
+ ****************************************************************************/
+
 /* Playlist suxx */
-static int SubSearchPlaylist(intf_sys_t *sys, char *searchstring,
-                             int i_start, int i_stop)
+static int SubSearchIn(intf_sys_t *sys, char *searchstring,
+                             int i_start, int i_stop, const char * (*getter)(intf_sys_t *, int))
 {
     for (int i = i_start + 1; i < i_stop; i++)
-        if (strcasestr(sys->pl_item_names.data[i], searchstring))
+        if (strcasestr(getter(sys, i), searchstring))
             return i;
     return -1;
 }
 
-static void SearchPlaylist(intf_sys_t *sys)
+static void SearchIn(intf_sys_t *sys, const char * (*getter)(intf_sys_t *, int), size_t size, char search_chain[])
 {
-    char *str = sys->search_chain;
+    char *str = search_chain;
     int i_first = sys->box_idx;
     if (i_first < 0)
         i_first = 0;
@@ -391,14 +398,38 @@ static void SearchPlaylist(intf_sys_t *sys)
     if (!str || !*str)
         return;
 
-    int i_item = SubSearchPlaylist(sys, str, i_first + 1,
-                                   sys->pl_item_names.size);
+    int i_item = SubSearchIn(sys, str, i_first + 1, size, getter);
     if (i_item < 0)
-        i_item = SubSearchPlaylist(sys, str, 0, i_first);
+        i_item = SubSearchIn(sys, str, 0, i_first, getter);
 
-    if (i_item > 0) {
+    if (i_item >= 0) {
         sys->box_idx = i_item;
         CheckIdx(sys);
+    }
+}
+
+static const char * FileSearchGetter(intf_sys_t * sys, int index)
+{
+    return sys->dir_entries[index]->path;
+}
+
+static const char * PlaylistSearchGetter(intf_sys_t * sys, int index)
+{
+    return sys->pl_item_names.data[index];
+}
+
+static void Search(intf_sys_t *sys)
+{
+    switch (sys->box_type)
+    {
+        case BOX_BROWSE:
+        case BOX_FSEARCH:
+            SearchIn(sys, FileSearchGetter, sys->n_dir_entries, sys->fsearch_chain);
+            break;
+        case BOX_PLAYLIST:
+        case BOX_SEARCH:
+            SearchIn(sys, PlaylistSearchGetter, sys->pl_item_names.size, sys->search_chain);
+            break;
     }
 }
 
@@ -1222,6 +1253,8 @@ static void FillTextBox(intf_sys_t *sys)
     DrawEmptyLine(7, 1, width);
     if (sys->box_type == BOX_OPEN)
         mvnprintw(7, 1, width, _("Open: %s"), sys->open_chain);
+    else if (sys->box_type == BOX_FSEARCH)
+        mvnprintw(7, 1, width, _("Find: %s"), sys->fsearch_chain);
     else
         mvnprintw(7, 1, width, _("Find: %s"), sys->search_chain);
 }
@@ -1235,6 +1268,7 @@ static void FillBox(intf_thread_t *intf)
         [BOX_META]      = DrawMeta,
         [BOX_STATS]     = DrawStats,
         [BOX_BROWSE]    = DrawBrowse,
+        [BOX_FSEARCH]   = DrawBrowse,
         [BOX_PLAYLIST]  = DrawPlaylist,
         [BOX_SEARCH]    = DrawPlaylist,
         [BOX_OPEN]      = DrawPlaylist,
@@ -1243,7 +1277,7 @@ static void FillBox(intf_thread_t *intf)
 
     sys->box_lines_total = draw[sys->box_type](intf);
 
-    if (sys->box_type == BOX_SEARCH || sys->box_type == BOX_OPEN)
+    if (sys->box_type == BOX_SEARCH || sys->box_type == BOX_OPEN || sys->box_type == BOX_FSEARCH)
         FillTextBox(sys);
 }
 
@@ -1435,7 +1469,7 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
         return true;
 
     case ';':
-        SearchPlaylist(sys);
+        Search(sys);
         return true;
 
     case 'g':
@@ -1489,6 +1523,10 @@ static bool HandleBrowseKey(intf_thread_t *intf, int key)
         ReadDir(intf);
         return true;
 
+    case ';':
+        Search(sys);
+        return true;
+
     case KEY_ENTER:
     case '\r':
     case '\n':
@@ -1528,12 +1566,16 @@ static void OpenSelection(intf_thread_t *intf)
 
 static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
 {
+#define SEARCH_SIZE (search ? sizeof sys->search_chain \
+                              : fsearch ? sizeof sys->fsearch_chain \
+                              : sizeof sys->open_chain)
     intf_sys_t *sys = intf->p_sys;
     bool search = box == BOX_SEARCH;
-    char *str = search ? sys->search_chain: sys->open_chain;
+    bool fsearch = box == BOX_FSEARCH;
+    char *str = search ? sys->search_chain: fsearch ? sys->fsearch_chain: sys->open_chain;
     size_t len = strlen(str);
 
-    assert(box == BOX_SEARCH || box == BOX_OPEN);
+    assert(box == BOX_SEARCH || box == BOX_OPEN || box == BOX_FSEARCH);
 
     switch(key)
     {
@@ -1543,12 +1585,12 @@ static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
     case KEY_ENTER:
     case '\r':
     case '\n':
-        if (search)
-            SearchPlaylist(sys);
+        if (search || fsearch)
+            Search(sys);
         else
             OpenSelection(intf);
 
-        sys->box_type = BOX_PLAYLIST;
+        sys->box_type = sys->previous_box_type;
         return;
 
     case 0x1b: /* ESC */
@@ -1570,21 +1612,27 @@ static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
             sys->box_type = BOX_PLAYLIST;
         return;
 
+    case 'w' & 037: // expanded from CTRL('w')
+        for (int i = 0; (unsigned long)i < SEARCH_SIZE; i++)
+        {
+            str[i] = 0;
+        }
+        break;
+
     case KEY_BACKSPACE:
     case 0x7f:
         RemoveLastUTF8Entity(str, len);
         break;
 
     default:
-        if (len + 1 < (search ? sizeof sys->search_chain
-                              : sizeof sys->open_chain)) {
+        if (len + 1 < SEARCH_SIZE) {
             str[len + 0] = key;
             str[len + 1] = '\0';
         }
     }
 
-    if (search)
-        SearchPlaylist(sys);
+    if (search || fsearch)
+        Search(sys);
 }
 
 static void HandleCommonKey(intf_thread_t *intf, vlc_player_t *player, int key)
@@ -1615,9 +1663,12 @@ static void HandleCommonKey(intf_thread_t *intf, vlc_player_t *player, int key)
     case 'B': BoxSwitch(sys, BOX_BROWSE);     return;
     case 'S': BoxSwitch(sys, BOX_STATS);      return;
 
-    case '/': /* Search */
+    case '/': /* Search playlist or in file browser */
         sys->plidx_follow = false;
-        BoxSwitch(sys, BOX_SEARCH);
+        if (sys->box_type == BOX_BROWSE)
+            BoxSwitch(sys, BOX_FSEARCH);
+        else
+            BoxSwitch(sys, BOX_SEARCH);
         return;
 
     case 'A': /* Open */
@@ -1768,7 +1819,7 @@ static void HandleKey(intf_thread_t *intf)
     if (key == -1)
         return;
 
-    if (box == BOX_SEARCH || box == BOX_OPEN) {
+    if (box == BOX_SEARCH || box == BOX_OPEN || box == BOX_FSEARCH) {
         HandleEditBoxKey(intf, key, sys->box_type);
         return;
     }
