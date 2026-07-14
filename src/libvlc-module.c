@@ -540,6 +540,17 @@ static const char *const fit_descriptions[] = {
 #define MOUSE_EVENTS_LONGTEXT N_( \
     "This enables handling of mouse clicks on the video." )
 
+#define MOUSE_PAUSE_POLICY_TEXT N_("Mouse Pause Policy")
+#define MOUSE_PAUSE_POLICY_LONGTEXT N_(\
+    "This controls how pause on mouse click is handled")
+
+static const char *const ppsz_mouse_pause_policy_values[] = {
+    "auto", "disabled", "pause-on-released"
+};
+
+static const char *const ppsz_mouse_pause_policy_descriptions[] =
+   { N_("Auto"), N_("Disabled"), N_("Toggle pause immediately on mouse released") };
+
 /*****************************************************************************
  * Input
  ****************************************************************************/
@@ -1681,6 +1692,9 @@ vlc_module_begin ()
               KEYBOARD_EVENTS_LONGTEXT )
     add_bool( "mouse-events", true, MOUSE_EVENTS_TEXT,
               MOUSE_EVENTS_LONGTEXT )
+    add_string( "mouse-pause-policy", ppsz_mouse_pause_policy_values[0], MOUSE_PAUSE_POLICY_TEXT,
+              MOUSE_PAUSE_POLICY_LONGTEXT);
+        change_string_list(ppsz_mouse_pause_policy_values, ppsz_mouse_pause_policy_descriptions)
     add_bool( "video-on-top", false, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT )
     add_bool( "video-wallpaper", false, WALLPAPER_TEXT,
