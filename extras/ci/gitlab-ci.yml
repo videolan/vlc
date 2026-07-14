@@ -135,6 +135,8 @@ variables:
 .base-template:
     stage: build
     rules:
+        - if: '$CI_MERGE_REQUEST_DRAFT == "true"'
+          when: manual
         - if: $CI_MERGE_REQUEST_IID
         - if: '$CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_PATH == "videolan/vlc"'
     artifacts:
