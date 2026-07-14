@@ -293,6 +293,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "drawable-nsobject", VLC_VAR_ADDRESS );
 #endif
 
+    var_Create( p_libvlc, "mouse-pause-policy", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+
     /*
      * Get input filenames given as commandline arguments.
      * We assume that the remaining parameters are filenames
