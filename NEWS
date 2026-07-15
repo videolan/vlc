@@ -33,6 +33,7 @@ Service Discovery:
 Video Output:
  * Fix Direct3D11 adjust filter and texture leaks
  * Fix MediaCodec crop validation
+ * Super Resolution scaling with Moore Threads GPUs
 
 Windows:
  * Support NV12 DirectShow capture
