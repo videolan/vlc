@@ -758,6 +758,14 @@ do \
              p_sys->i_max_bit_rate,
              p_sys->i_header_size );
 
+    if( p_sys->i_packet_length == 0 || p_sys->i_header_size == 0 )
+    {
+        msg_Err( p_access, "invalid values detected" );
+        var_buffer_free( &buffer );
+        MMSClose( p_access );
+        return VLC_EGENERIC;
+    }
+
     /* *** send command 15 *** */
 
     var_buffer_reinitwrite( &buffer, 0 );
