@@ -124,6 +124,10 @@ vlc_player_input_SeekByPos(struct vlc_player_input *input, double position,
     vlc_player_t *player = input->player;
     vlc_player_assert_seek_params(speed, whence);
 
+    /* Assert before we modify position internally, this only check that user
+     * positions are correct. */
+    assert(position >= 0 && position <=1);
+
     if (whence != VLC_PLAYER_WHENCE_ABSOLUTE)
         position += vlc_player_input_GetPos(input, true, vlc_tick_now());
 
