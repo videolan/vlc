@@ -118,6 +118,9 @@ vlcSetSymbolEnvironment() {
     #
     # ac_cv_prog_cc_c23: autoconf 2.73 adds -std=gnu23 to CC but not OBJC
     #                    breaking libtool's ObjC tag inference.
+    #
+    # ac_cv_func_dup3 / ac_cv_func_pipe2: undeclared in Apple SDK headers but
+    #   falsely link-detectable since iOS simulator SDK 26.4.
     "${cmd}" "$@" \
     \
     ac_cv_prog_cc_c23=no \
@@ -137,6 +140,9 @@ vlcSetSymbolEnvironment() {
     ac_cv_func_open_memstream=no \
     ac_cv_func_futimens=no \
     ac_cv_func_utimensat=no \
+    \
+    ac_cv_func_dup3=no \
+    ac_cv_func_pipe2=no \
     \
     ac_cv_func_thread_get_register_pointer_values=no \
     \
