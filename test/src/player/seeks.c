@@ -45,7 +45,7 @@ test_seeks(struct ctx *ctx)
         assert_position(ctx, &VEC_LAST(vec));
     }
 
-    vlc_player_SetPosition(player, 2.0f);
+    vlc_player_SetPosition(player, 1.0f);
 
     test_prestop(ctx);
 
