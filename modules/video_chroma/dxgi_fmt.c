@@ -155,6 +155,7 @@ const char *DxgiVendorStr(unsigned int gpu_vendor)
         { GPU_MANUFACTURER_S3,       "S3 Graphics" },
         { GPU_MANUFACTURER_QUALCOMM, "Qualcomm"    },
         { GPU_MANUFACTURER_MICROSOFT, "Microsoft"  },
+        { GPU_MANUFACTURER_MTGPU,    "Moore Threads" },
         { 0,                         "Unknown" }
     };
 
