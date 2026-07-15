@@ -414,6 +414,8 @@ debian-meson:
         entrypoint: [""]
     script:
         - git config --global --add safe.directory ${CI_PROJECT_DIR}/.git
+        # snapcraft need to have an up to date apt cache to be able to download its dependencies
+        - apt update
         - extras/package/snap/build.sh -p
     allow_failure: true
     variables: *variables-snap
