@@ -114,7 +114,7 @@
                             <binding destination="-2" name="value" keyPath="self.jumpHoursValue" previousBinding="ubF-Xt-qiY" id="fTw-EH-qRY"/>
                         </connections>
                     </stepper>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="oMI-0n-rej">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="oMI-0n-rej">
                         <rect key="frame" x="222" y="53" width="25" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="ss" id="74c-xI-3AS">
                             <font key="font" metaFont="cellTitle"/>
