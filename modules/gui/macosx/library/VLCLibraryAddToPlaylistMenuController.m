@@ -22,6 +22,7 @@
 
 #import "VLCLibraryAddToPlaylistMenuController.h"
 
+#import "extensions/NSMenuItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryController.h"
@@ -46,6 +47,16 @@
         _addToPlaylistMenu.delegate = self;
     }
     return self;
+}
+
+- (NSMenuItem *)createAddToPlaylistMenuItem
+{
+    NSMenuItem * const item = [[NSMenuItem alloc] initWithTitle:_NS("Add to Playlist")
+                                                        action:nil
+                                                 keyEquivalent:@""];
+    [item setSubmenu:self.addToPlaylistMenu];
+    [item vlc_setActionImageWithSystemSymbolName:@"text.badge.plus"];
+    return item;
 }
 
 #pragma mark - Helpers

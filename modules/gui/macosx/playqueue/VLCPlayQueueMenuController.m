@@ -89,10 +89,7 @@
     _informationMenuItem.target = self;
 
     _addToPlaylistMenuController = [[VLCLibraryAddToPlaylistMenuController alloc] init];
-    _addToPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add to Playlist")
-                                                        action:nil
-                                                 keyEquivalent:@""];
-    [_addToPlaylistMenuItem setSubmenu:_addToPlaylistMenuController.addToPlaylistMenu];
+    _addToPlaylistMenuItem = [_addToPlaylistMenuController createAddToPlaylistMenuItem];
 
     _addFilesToPlayQueueMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add File...") action:@selector(addFilesToPlayQueue:) keyEquivalent:@""];
     _addFilesToPlayQueueMenuItem.target = self;
@@ -111,7 +108,6 @@
     [_removeMenuItem vlc_setActionImageWithSystemSymbolName:@"minus.circle"];
     [_revealInFinderMenuItem vlc_setActionImageWithSystemSymbolName:@"folder"];
     [_informationMenuItem vlc_setActionImageWithSystemSymbolName:@"info.circle"];
-    [_addToPlaylistMenuItem vlc_setActionImageWithSystemSymbolName:@"text.badge.plus"];
     [_addFilesToPlayQueueMenuItem vlc_setActionImageWithSystemSymbolName:@"plus.circle"];
     [_clearPlayQueueMenuItem vlc_setActionImageWithSystemSymbolName:@"xmark.circle"];
     [_createPlaylistMenuItem vlc_setActionImageWithSystemSymbolName:@"music.note.list"];

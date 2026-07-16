@@ -113,10 +113,7 @@
     self.favoriteItem.target = self;
 
     _addToPlaylistMenuController = [[VLCLibraryAddToPlaylistMenuController alloc] init];
-    _addToPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Add to Playlist")
-                                                    action:nil
-                                             keyEquivalent:@""];
-    [_addToPlaylistItem setSubmenu:_addToPlaylistMenuController.addToPlaylistMenu];
+    _addToPlaylistItem = [_addToPlaylistMenuController createAddToPlaylistMenuItem];
 
     _removeFromPlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Remove from Playlist")
                                                          action:@selector(removeFromPlaylist:)
@@ -125,7 +122,6 @@
 
     [playItem vlc_setActionImageWithSystemSymbolName:@"play.fill"];
     [appendItem vlc_setActionImageWithSystemSymbolName:@"text.line.last.and.arrowtriangle.forward"];
-    [_addToPlaylistItem vlc_setActionImageWithSystemSymbolName:@"text.badge.plus"];
     [_removeFromPlaylistItem vlc_setActionImageWithSystemSymbolName:@"minus.circle"];
     [self.favoriteItem vlc_setActionImageWithSystemSymbolName:@"heart"];
     [bookmarkItem vlc_setActionImageWithSystemSymbolName:@"bookmark"];

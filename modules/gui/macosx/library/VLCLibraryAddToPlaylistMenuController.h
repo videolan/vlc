@@ -34,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nullable) NSArray<VLCLibraryRepresentedItem *> *representedItems;
 @property (copy, nullable) NSArray<VLCMediaLibraryMediaItem *> *representedMediaItems;
 
+- (NSMenuItem *)createAddToPlaylistMenuItem;
+
 @end
 
 NS_ASSUME_NONNULL_END
