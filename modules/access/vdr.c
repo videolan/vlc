@@ -325,6 +325,8 @@ static int Control( stream_t *p_access, int i_query, va_list args )
 
         case STREAM_SET_SEEKPOINT:
             i = va_arg( args, int );
+            if( i < 0 || !p_sys->p_marks || i >= p_sys->p_marks->i_seekpoint )
+                return VLC_EGENERIC;
             return Seek( p_access, p_sys->offsets[i] );
 
         case STREAM_GET_META:
