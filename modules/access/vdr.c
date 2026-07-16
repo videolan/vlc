@@ -62,6 +62,7 @@ See http://www.vdr-wiki.de/ and http://www.tvdr.de/ for more information.
 #include <vlc_charset.h>
 #include <vlc_dialog.h>
 #include <vlc_configuration.h>
+#include <vlc_memstream.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -659,7 +660,6 @@ static void ImportMeta( stream_t *p_access )
 
     char *line = NULL;
     size_t line_len;
-    char *psz_title = NULL, *psz_smalltext = NULL, *psz_date = NULL;
 
     while( ReadLine( &line, &line_len, infofile ) )
     {
@@ -693,8 +693,6 @@ static void ImportMeta( stream_t *p_access )
                 /* TODO: locale */
                 strftime( str, sizeof(str), "%Y-%m-%d %H:%M", &tm );
                 vlc_meta_AddExtra( p_meta, "Date", str );
-                free( psz_date );
-                psz_date = strdup( str );
 
                 /* display in minutes */
                 i_length = ( i_length + 59 ) / 60;
@@ -705,15 +703,11 @@ static void ImportMeta( stream_t *p_access )
 
         else if( tag == 'T' )
         {
-            free( psz_title );
-            psz_title = strdup( text );
             vlc_meta_AddExtra( p_meta, "Title", text );
         }
 
         else if( tag == 'S' )
         {
-            free( psz_smalltext );
-            psz_smalltext = strdup( text );
             vlc_meta_AddExtra( p_meta, "Info", text );
         }
 
@@ -748,35 +742,30 @@ static void ImportMeta( stream_t *p_access )
     }
 
     /* create a meaningful title */
-    int i_len = 10 +
-        ( psz_title ? strlen( psz_title ) : 0 ) +
-        ( psz_smalltext ? strlen( psz_smalltext ) : 0 ) +
-        ( psz_date ? strlen( psz_date ) : 0 );
-    char *psz_display = malloc( i_len );
-
-    if( psz_display )
+    struct vlc_memstream memstream;
+    if( vlc_memstream_open( &memstream ) == 0 )
     {
-        *psz_display = '\0';
-        if( psz_title )
-            strcat( psz_display, psz_title );
-        if( psz_title && psz_smalltext )
-            strcat( psz_display, " - " );
-        if( psz_smalltext )
-            strcat( psz_display, psz_smalltext );
-        if( ( psz_title || psz_smalltext ) && psz_date )
-        {
-            strcat( psz_display, " (" );
-            strcat( psz_display, psz_date );
-            strcat( psz_display, ")" );
-        }
-        if( *psz_display )
-            vlc_meta_SetTitle( p_meta, psz_display );
-    }
+        const char *psz_title = vlc_meta_GetExtra( p_meta, "Title" );
+        const char *psz_smalltext = vlc_meta_GetExtra( p_meta, "Info" );
+        const char *psz_date = vlc_meta_GetExtra( p_meta, "Date" );
 
-    free( psz_display );
-    free( psz_title );
-    free( psz_smalltext );
-    free( psz_date );
+        if( psz_title )
+        {
+            vlc_memstream_puts( &memstream, psz_title );
+            if( psz_smalltext )
+                vlc_memstream_puts( &memstream, " - " );
+        }
+        if( psz_smalltext )
+            vlc_memstream_puts( &memstream, psz_smalltext );
+        if( ( psz_title || psz_smalltext ) && psz_date )
+            vlc_memstream_printf( &memstream, " (%s)", psz_date );
+        if( vlc_memstream_close( &memstream ) == 0 )
+        {
+            if( memstream.length )
+                vlc_meta_SetTitle( p_meta, memstream.ptr );
+            free( memstream.ptr );
+        }
+    }
 
     fclose( infofile );
 }
