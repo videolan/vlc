@@ -52,7 +52,8 @@ uint16_t  var_buffer_get16( var_buffer_t *p_buf );
 uint32_t  var_buffer_get32( var_buffer_t *p_buf );
 uint64_t  var_buffer_get64( var_buffer_t *p_buf );
 int       var_buffer_getmemory ( var_buffer_t *p_buf, void *p_mem, int64_t i_mem );
-int       var_buffer_readempty( var_buffer_t *p_buf );
+int       var_buffer_readempty( const var_buffer_t *p_buf );
 void      var_buffer_getguid( var_buffer_t *p_buf, vlc_guid_t *p_guid );
+int       var_buffer_remain( const var_buffer_t *p_buf );
 
 #endif
