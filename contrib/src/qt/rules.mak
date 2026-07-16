@@ -55,6 +55,10 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0005-Fix-specific-overflow-in-qtextlayout.patch
 	$(APPLY) $(SRC)/qt/0006-ODBC-SQL-driver-deal-with-different-sizes-of-SQLTCHA.patch
 	$(APPLY) $(SRC)/qt/0007-Fix-crash-when-reading-corrupt-font-data.patch
+ifdef ENABLE_PDB
+	# for -gcodeview when PDB is enabled
+	sed -i.orig -e "s/ -g/ -g -gcodeview/g" "$(UNPACK_DIR)/mkspecs/win32-clang-g++/qmake.conf"
+endif
 	# fix forcing the WINVER/_WIN32_WINNT version without NTDDI_VERSION
 	sed -i.orig -e "s/DEFINES += WINVER/DEFINES += NTDDI_VERSION=0x06000000 WINVER/" "$(UNPACK_DIR)/src/network/kernel/kernel.pri"
 	# TOUCHINPUT is properly defined in mingw since v4
