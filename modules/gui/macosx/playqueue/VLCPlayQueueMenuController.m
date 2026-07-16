@@ -54,6 +54,7 @@
 
 @property (readwrite, atomic) NSArray<NSMenuItem *> *items;
 @property (readwrite, atomic) NSArray<NSMenuItem *> *multipleSelectionItems;
+@property (readwrite, atomic) NSArray<NSMenuItem *> *backgroundItems;
 
 @end
 
@@ -113,13 +114,18 @@
         NSMenuItem.separatorItem,
         _addFilesToPlayQueueMenuItem,
         _clearPlayQueueMenuItem,
-        _createPlaylistMenuItem,
         _sortMenuItem
     ];
 
     self.multipleSelectionItems = @[
         _removeMenuItem,
         NSMenuItem.separatorItem,
+        _addFilesToPlayQueueMenuItem,
+        _clearPlayQueueMenuItem,
+        _sortMenuItem
+    ];
+
+    self.backgroundItems = @[
         _addFilesToPlayQueueMenuItem,
         _clearPlayQueueMenuItem,
         _createPlaylistMenuItem,
@@ -145,6 +151,16 @@
                                name:NSTableViewSelectionDidChangeNotification
                              object:self.playQueueTableView];
 
+}
+
+- (void)prepareForRowContextMenu:(BOOL)rowContextMenu
+{
+    if (rowContextMenu) {
+        const BOOL multipleSelection = self.playQueueTableView.selectedRowIndexes.count > 1;
+        self.playQueueMenu.itemArray = multipleSelection ? self.multipleSelectionItems : self.items;
+    } else {
+        self.playQueueMenu.itemArray = self.backgroundItems;
+    }
 }
 
 - (void)play:(id)sender
@@ -218,23 +234,7 @@
 
 - (void)createPlaylistFromQueue:(id)sender
 {
-    NSIndexSet * const selectedIndexes = self.playQueueTableView.selectedRowIndexes;
-    
-    NSArray<VLCPlayQueueItem *> *items = nil;
-    if (selectedIndexes.count > 0) {
-        NSMutableArray<VLCPlayQueueItem *> * const selectedItems = [NSMutableArray arrayWithCapacity:selectedIndexes.count];
-        [selectedIndexes enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const __unused stop) {
-            VLCPlayQueueItem * const item = [_playQueueController.playQueueModel playQueueItemAtIndex:idx];
-            if (item) {
-                [selectedItems addObject:item];
-            }
-        }];
-        items = selectedItems.copy;
-    } else {
-        items = _playQueueController.playQueueModel.playQueueItems;
-    }
-    
-    [VLCMain.sharedInstance.libraryController showCreatePlaylistDialogForPlayQueueItems:items];
+    [VLCMain.sharedInstance.libraryController showCreatePlaylistDialogForPlayQueueItems:_playQueueController.playQueueModel.playQueueItems];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem

@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak, nonatomic) NSTableView *playQueueTableView;
 @property (readonly) NSMenu *playQueueMenu;
 
+- (void)prepareForRowContextMenu:(BOOL)rowContextMenu;
+
 @end
 
 NS_ASSUME_NONNULL_END
