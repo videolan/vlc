@@ -81,7 +81,7 @@ ifdef HAVE_WIN32
 QT_CONFIG += -no-xcb
 endif
 
-QT_CONFIG += -release
+QT_CONFIG += -release -force-debug-info
 
 .qt: qt
 	cd $< && ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
