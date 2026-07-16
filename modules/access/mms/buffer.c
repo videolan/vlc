@@ -208,7 +208,7 @@ int var_buffer_getmemory ( var_buffer_t *p_buf, void *p_mem, int64_t i_mem )
     return( i_copy );
 }
 
-int var_buffer_readempty( var_buffer_t *p_buf )
+int var_buffer_readempty( const var_buffer_t *p_buf )
 {
     return( ( p_buf->i_data >= p_buf->i_size ) ? 1 : 0 );
 }
@@ -221,4 +221,11 @@ void var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid )
 
     for( int i = 0; i < 8; i++ )
         p_guid->Data4[i] = var_buffer_get8( p_buf );
+}
+
+int var_buffer_remain( const var_buffer_t *p_buf )
+{
+    if( var_buffer_readempty( p_buf ) )
+        return 0;
+    return p_buf->i_size - p_buf->i_data;
 }
