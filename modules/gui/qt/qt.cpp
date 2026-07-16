@@ -63,10 +63,10 @@ extern "C" char **environ;
 #include <QOperatingSystemVersion>
 #include <QThreadPool>
 #include "util/asynctask.hpp"
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
 #include <rhi/qrhi.h>
 #include <QOffscreenSurface>
-#endif
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #endif
 
 #include "qt.hpp"
@@ -981,11 +981,23 @@ static void *Thread( void *obj )
 
         // TODO: Investigate if we should use D3D12. Currently it is not the default by
         //       Qt (as of Qt 6.8), and is not as battle tested as the default D3D11.
+#ifndef NDEBUG
+        const bool d3d11SdkLayersAvailable = []() {
+            std::unique_ptr<std::remove_pointer_t<HMODULE>, BOOL WINAPI (*)(HMODULE)>
+                d3d11sdklayerslib(::LoadLibraryEx(TEXT("d3d11_1sdklayers.dll"), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32), ::FreeLibrary);
+
+            if (d3d11sdklayerslib)
+                return true;
+            else
+                return false;
+        }();
+#endif
 
         {
             QRhiD3D11InitParams params;
 #ifndef NDEBUG
-            params.enableDebugLayer = true;
+            if (d3d11SdkLayersAvailable)
+                params.enableDebugLayer = true;
 #endif
             if (QRhi::probe(QRhi::D3D11, &params))
             {
@@ -1019,7 +1031,8 @@ static void *Thread( void *obj )
             // as what `::probe()` does, at least for DirectX:
             QRhiD3D11InitParams params;
 #ifndef NDEBUG
-            params.enableDebugLayer = true;
+            if (d3d11SdkLayersAvailable)
+                params.enableDebugLayer = true;
 #endif
             QRhi *rhi = QRhi::create(QRhi::D3D11, &params, QRhi::PreferSoftwareRenderer);
             if (rhi)
