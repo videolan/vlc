@@ -993,16 +993,20 @@ static void *Thread( void *obj )
             }
         }
 
-        {
+        std::optional<QPair<QSGRendererInterface::GraphicsApi, bool>> retGlProbe;
+        QMetaObject::invokeMethod(qApp, [&retGlProbe]() {
+            // Due to offscreen surface involvement, this has to be done in the
+            // gui thread only:
             QRhiGles2InitParams params;
             params.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
             if (QRhi::probe(QRhi::OpenGLES2, &params))
             {
-                delete params.fallbackSurface;
-                return {QSGRendererInterface::OpenGL, false};
+                retGlProbe = {QSGRendererInterface::OpenGL, false};
             }
             delete params.fallbackSurface;
-        }
+        }, Qt::BlockingQueuedConnection);
+        if (retGlProbe)
+            return *retGlProbe;
 
         // TODO: Investigate if using Vulkan makes sense on Windows.
         // TODO: Investigate if it makes sense to try D3D12 when probing D3D11 failed.
