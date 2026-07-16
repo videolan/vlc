@@ -345,7 +345,7 @@ skip_uninstall32_cleanup:
   WriteRegStr HKCR Applications\vlc.exe\shell\Open "" "$(ContextMenuEntry_PlayWith)"
   WriteRegStr HKCR Applications\vlc.exe\shell\Open\command "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   !insertmacro MacroAllExtensions RegisterExtensionMacro
-  !insertmacro MacroSkinExtensions RegisterSkinExtensionMacro
+@BUILD_SKINS_TRUE@   !insertmacro MacroSkinExtensions RegisterSkinExtensionMacro
 
   ; Add VLC to "App Paths" to run VLC from ShellExecute/ShellExecuteEx/run dialog without giving a full path
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\vlc.exe" "" "$INSTDIR\vlc.exe"
