@@ -25,12 +25,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryRepresentedItem;
+@class VLCMediaLibraryMediaItem;
 
 @interface VLCLibraryAddToPlaylistMenuController : NSObject
 
 @property (readonly) NSMenu *addToPlaylistMenu;
 
 @property (copy, nullable) NSArray<VLCLibraryRepresentedItem *> *representedItems;
+@property (copy, nullable) NSArray<VLCMediaLibraryMediaItem *> *representedMediaItems;
 
 @end
 

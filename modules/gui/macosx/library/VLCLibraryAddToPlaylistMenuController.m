@@ -77,6 +77,10 @@
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)selectedMediaItems
 {
+    if (self.representedMediaItems.count > 0) {
+        return self.representedMediaItems;
+    }
+
     NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems =
         [NSMutableArray arrayWithCapacity:self.representedItems.count];
     for (VLCLibraryRepresentedItem * const representedItem in self.representedItems) {

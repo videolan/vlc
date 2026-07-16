@@ -27,7 +27,9 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSMenu+VLCAdditions.h"
 #import "extensions/NSMenuItem+VLCAdditions.h"
+#import "library/VLCLibraryAddToPlaylistMenuController.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayQueueModel.h"
@@ -40,12 +42,14 @@
 {
     VLCPlayQueueController *_playQueueController;
     VLCPlayQueueSortingMenuController *_playQueueSortingMenuController;
+    VLCLibraryAddToPlaylistMenuController *_addToPlaylistMenuController;
     VLCInformationWindowController *_informationWindowController;
 
     NSMenuItem *_playMenuItem;
     NSMenuItem *_removeMenuItem;
     NSMenuItem *_informationMenuItem;
     NSMenuItem *_revealInFinderMenuItem;
+    NSMenuItem *_addToPlaylistMenuItem;
     NSMenuItem *_addFilesToPlayQueueMenuItem;
     NSMenuItem *_clearPlayQueueMenuItem;
     NSMenuItem *_sortMenuItem;
@@ -84,6 +88,12 @@
     _informationMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformationPanel:) keyEquivalent:@""];
     _informationMenuItem.target = self;
 
+    _addToPlaylistMenuController = [[VLCLibraryAddToPlaylistMenuController alloc] init];
+    _addToPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add to Playlist")
+                                                        action:nil
+                                                 keyEquivalent:@""];
+    [_addToPlaylistMenuItem setSubmenu:_addToPlaylistMenuController.addToPlaylistMenu];
+
     _addFilesToPlayQueueMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add File...") action:@selector(addFilesToPlayQueue:) keyEquivalent:@""];
     _addFilesToPlayQueueMenuItem.target = self;
 
@@ -101,6 +111,7 @@
     [_removeMenuItem vlc_setActionImageWithSystemSymbolName:@"minus.circle"];
     [_revealInFinderMenuItem vlc_setActionImageWithSystemSymbolName:@"folder"];
     [_informationMenuItem vlc_setActionImageWithSystemSymbolName:@"info.circle"];
+    [_addToPlaylistMenuItem vlc_setActionImageWithSystemSymbolName:@"text.badge.plus"];
     [_addFilesToPlayQueueMenuItem vlc_setActionImageWithSystemSymbolName:@"plus.circle"];
     [_clearPlayQueueMenuItem vlc_setActionImageWithSystemSymbolName:@"xmark.circle"];
     [_createPlaylistMenuItem vlc_setActionImageWithSystemSymbolName:@"music.note.list"];
@@ -111,6 +122,7 @@
         _removeMenuItem,
         _revealInFinderMenuItem,
         _informationMenuItem,
+        _addToPlaylistMenuItem,
         NSMenuItem.separatorItem,
         _addFilesToPlayQueueMenuItem,
         _clearPlayQueueMenuItem,
@@ -119,6 +131,7 @@
 
     self.multipleSelectionItems = @[
         _removeMenuItem,
+        _addToPlaylistMenuItem,
         NSMenuItem.separatorItem,
         _addFilesToPlayQueueMenuItem,
         _clearPlayQueueMenuItem,
@@ -153,12 +166,39 @@
 
 }
 
+- (NSArray<VLCMediaLibraryMediaItem *> *)selectedMediaLibraryItems
+{
+    NSIndexSet * const selectedIndexes = self.playQueueTableView.selectedRowIndexes;
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems =
+        [NSMutableArray arrayWithCapacity:selectedIndexes.count];
+
+    [selectedIndexes enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const __unused stop) {
+        VLCPlayQueueItem * const item =
+            [self->_playQueueController.playQueueModel playQueueItemAtIndex:idx];
+        VLCMediaLibraryMediaItem * const mediaLibraryItem = item.mediaLibraryItem;
+        if (mediaLibraryItem != nil) {
+            [mediaItems addObject:mediaLibraryItem];
+        }
+    }];
+
+    return mediaItems.copy;
+}
+
+- (void)updateAddToPlaylistMenuItem
+{
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = [self selectedMediaLibraryItems];
+    _addToPlaylistMenuController.representedMediaItems = mediaItems;
+    _addToPlaylistMenuItem.enabled = mediaItems.count > 0;
+}
+
 - (void)prepareForRowContextMenu:(BOOL)rowContextMenu
 {
     if (rowContextMenu) {
+        [self updateAddToPlaylistMenuItem];
         const BOOL multipleSelection = self.playQueueTableView.selectedRowIndexes.count > 1;
         self.playQueueMenu.itemArray = multipleSelection ? self.multipleSelectionItems : self.items;
     } else {
+        _addToPlaylistMenuController.representedMediaItems = nil;
         self.playQueueMenu.itemArray = self.backgroundItems;
     }
 }
@@ -248,6 +288,9 @@
     } else if (menuItem == _createPlaylistMenuItem) {
         return (self.playQueueTableView.numberOfRows > 0);
 
+    } else if (menuItem == _addToPlaylistMenuItem) {
+        return _addToPlaylistMenuController.representedMediaItems.count > 0;
+
     } else if (menuItem == _removeMenuItem ||
                menuItem == _playMenuItem ||
                menuItem == _informationMenuItem) {
@@ -273,6 +316,7 @@
     } else {
         self.playQueueMenu.itemArray = self.items;
     }
+    [self updateAddToPlaylistMenuItem];
 }
 
 @end
