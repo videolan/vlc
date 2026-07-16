@@ -57,6 +57,8 @@ void  asf_HeaderParse ( asf_header_t *hdr,
     }
 
     var_buffer_initread( &buffer, p_header, i_header );
+    if( var_buffer_remain( &buffer ) < 30 )
+        return;
     var_buffer_getguid( &buffer, &guid );
 
     if( !guidcmp( &guid, &asf_object_header_guid ) )
@@ -67,11 +69,19 @@ void  asf_HeaderParse ( asf_header_t *hdr,
 
     for( ;; )
     {
+        if( var_buffer_remain( &buffer ) < 24 )
+            return;
+
         var_buffer_getguid( &buffer, &guid );
         i_size = var_buffer_get64( &buffer );
+        if( i_size < 24 || var_buffer_remain( &buffer ) < i_size - 24 )
+            return;
 
         if( guidcmp( &guid, &asf_object_file_properties_guid ) )
         {
+            const int object_size = 24 + 16 + 8 + 8 + 8 + 8+8+8+4 + 4;
+            if( i_size < object_size )
+                return;
             var_buffer_getmemory( &buffer, NULL, 16 );
             hdr->i_file_size            = var_buffer_get64( &buffer );
             var_buffer_getmemory( &buffer, NULL, 8 );
@@ -79,18 +89,22 @@ void  asf_HeaderParse ( asf_header_t *hdr,
             var_buffer_getmemory( &buffer, NULL, 8+8+8+4);
             hdr->i_min_data_packet_size = var_buffer_get32( &buffer );
 
-            var_buffer_getmemory( &buffer, NULL, i_size - 24 - 16 - 8 - 8 - 8 - 8-8-8-4 - 4);
+            var_buffer_getmemory( &buffer, NULL, i_size - object_size );
         }
         else if( guidcmp( &guid, &asf_object_header_extension_guid ) )
         {
+            if( i_size < 46 )
+                return;
             /* Enter it */
             var_buffer_getmemory( &buffer, NULL, 46 - 24 );
         }
         else if( guidcmp( &guid, &asf_object_extended_stream_properties_guid ) )
         {
+            if( i_size < 88 )
+                return;
             /* Grrrrrr */
-            int16_t i_count1, i_count2;
-            int i_subsize;
+            uint16_t i_count1, i_count2;
+            uint64_t i_subsize;
 
             var_buffer_getmemory( &buffer, NULL, 84 - 24 );
 
@@ -98,12 +112,17 @@ void  asf_HeaderParse ( asf_header_t *hdr,
             i_count2 = var_buffer_get16( &buffer );
 
             i_subsize = 88;
+
             for( int i = 0; i < i_count1; i++ )
             {
-                int i_len;
+                uint64_t i_len;
 
+                if( i_size - i_subsize < 2 + 2 )
+                    return;
                 var_buffer_get16( &buffer );
                 i_len = var_buffer_get16( &buffer );
+                if( i_size - i_subsize < 2 + 2 + i_len )
+                    return;
                 var_buffer_getmemory( &buffer, NULL, i_len );
 
                 i_subsize += 4 + i_len;
@@ -111,12 +130,17 @@ void  asf_HeaderParse ( asf_header_t *hdr,
 
             for( int i = 0; i < i_count2; i++ )
             {
-                int i_len;
+                if( i_size - i_subsize < 16 + 2 + 4 )
+                    return;
+
+                uint64_t i_len;
                 var_buffer_getmemory( &buffer, NULL, 16 + 2 );
                 i_len = var_buffer_get32( &buffer );
+                if( i_size - i_subsize < i_len + 16 + 2 + 4 )
+                    return;
                 var_buffer_getmemory( &buffer, NULL, i_len );
 
-                i_subsize += 16 + 6 + i_len;
+                i_subsize += 16 + 2 + 4 + i_len;
             }
 
             if( i_size - i_subsize <= 24 )
@@ -128,6 +152,10 @@ void  asf_HeaderParse ( asf_header_t *hdr,
         }
         else if( guidcmp( &guid, &asf_object_stream_properties_guid ) )
         {
+            const int object_size = 24 + 32 + 16 + 1;
+            if( i_size < object_size )
+                return;
+
             int     i_stream_id;
             vlc_guid_t  stream_type;
 
@@ -135,7 +163,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
             var_buffer_getmemory( &buffer, NULL, 32 );
 
             i_stream_id = var_buffer_get8( &buffer ) & 0x7f;
-            var_buffer_getmemory( &buffer, NULL, i_size - 24 - 32 - 16 - 1);
+            var_buffer_getmemory( &buffer, NULL, i_size - object_size );
 
             if( guidcmp( &stream_type, &asf_object_stream_type_video ) )
             {
@@ -152,12 +180,15 @@ void  asf_HeaderParse ( asf_header_t *hdr,
         }
         else if ( guidcmp( &guid, &asf_object_stream_bitrate_properties ) )
         {
+            if( i_size < 24 + 2 + 6 )
+                return;
+
             int     i_count;
             uint8_t i_stream_id;
 
             i_count = var_buffer_get16( &buffer );
             i_size -= 2;
-            while( i_count > 0 )
+            while( i_count > 0 && i_size >= (24 + 6) )
             {
                 i_stream_id = var_buffer_get16( &buffer )&0x7f;
                 hdr->stream[i_stream_id].i_bitrate =  var_buffer_get32( &buffer );
