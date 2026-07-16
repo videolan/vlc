@@ -317,7 +317,7 @@ skip_uninstall32_cleanup:
 
   ; Subfolders
   !insertmacro InstallFolder plugins
-  !insertmacro InstallFolderOptional locale
+@HAVE_NLS_TRUE@ !insertmacro InstallFolderOptional locale
   !insertmacro InstallFolder hrtfs
 @BUILD_SKINS_TRUE@   !insertmacro InstallFolder skins
 @BUILD_LUA_TRUE@     !insertmacro InstallFolder lua

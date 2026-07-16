@@ -12,6 +12,7 @@ nsi_conf.set('HAVE_WIN64_FALSE', have_win64 ? '#' : '')
 nsi_conf.set('HAVE_ARM64_TRUE',  host_machine.cpu_family() == 'aarch64' or host_machine.cpu() == 'arm64' ? '' : '#')
 nsi_conf.set('HAVE_ARM64_FALSE', host_machine.cpu_family() == 'aarch64' or host_machine.cpu() == 'arm64' ? '#' : '')
 nsi_conf.set('PROGRAMFILES', have_win64 ? 'PROGRAMFILES64' : 'PROGRAMFILES')
+nsi_conf.set('HAVE_NLS_TRUE', nsi_conf.get('ENABLE_NLS', 0) == 1 ? '' : '#')
 
 nsProcess_cargs = ['-D_UNICODE=1', '-DUNICODE=1']
 if not have_win64
