@@ -31,6 +31,7 @@ endif
 	# old patch seem to solve buffer overflow a different way
 	# $(APPLY) $(SRC)/mad/check-bitstream-length.patch
 	# get a tarball with a folder name $(MOVE)
+	touch $@
 
 .mad: libmad toolchain.cmake
 	$(REQUIRE_GPL)
