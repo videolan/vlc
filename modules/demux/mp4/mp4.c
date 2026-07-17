@@ -39,6 +39,7 @@
 #include <vlc_replay_gain.h>
 #include <assert.h>
 #include <limits.h>
+#include <stdckdint.h>
 #include <math.h>
 #include "meta.h"
 #include "attachments.h"
@@ -1532,15 +1533,24 @@ static block_t * MP4_RTPHintToFrame( demux_t *p_demux, block_t *p_block, uint32_
         }
 
         /* slice doesn't fit in buffer */
-        if( sample_cons.sampleoffset + sample_cons.length > p_block->i_buffer)
+        size_t slice_size;
+        if( ckd_add( &slice_size, sample_cons.sampleoffset, sample_cons.length ) ||
+            slice_size > p_block->i_buffer )
         {
             msg_Err(p_demux, "Sample buffer is smaller than sample" );
             goto error;
         }
 
+        size_t realloc_size;
+        if( ckd_add( &realloc_size, i_payload, sample_cons.length ) ||
+            ckd_add( &realloc_size, realloc_size, 4 ) )
+        {
+            goto error;
+        }
+
         block_t *p_realloc = ( p_newblock ) ?
-                             block_Realloc( p_newblock, 0, i_payload + sample_cons.length + 4 ):
-                             block_Alloc( i_payload + sample_cons.length + 4 );
+                             block_Realloc( p_newblock, 0, realloc_size ):
+                             block_Alloc( realloc_size );
         if( !p_realloc )
             goto error;
 
