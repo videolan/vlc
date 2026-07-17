@@ -107,6 +107,11 @@
     return [NSImage imageNamed:@"placeholder-group2"];
 }
 
++ (NSImage *)VLCPlaceholderMusicImage
+{
+    return [NSImage imageNamed:@"placeholder-music"];
+}
+
 + (NSImage *)VLCGenericImage
 {
     return [NSImage imageNamed:@"generic"];

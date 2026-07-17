@@ -49,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) NSImage *VLCNoArtImage;
 @property (class, readonly) NSImage *VLCPlaceholderVideoImage;
 @property (class, readonly) NSImage *VLCPlaceholderGroupImage;
+@property (class, readonly) NSImage *VLCPlaceholderMusicImage;
 @property (class, readonly) NSImage *VLCGenericImage;
 
 // Playback control images

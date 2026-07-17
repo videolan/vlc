@@ -22,6 +22,7 @@
 
 #import "VLCLibraryAudioViewController.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -64,7 +65,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 
     NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
-    NSArray<NSString *> *_placeholderImageNames;
+    NSArray<NSImage *> *_placeholderImages;
     NSArray<NSString *> *_placeholderLabelStrings;
 
     VLCLibraryCollectionViewDelegate *_audioLibraryCollectionViewDelegate;
@@ -256,7 +257,12 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                       constant:149.f],
     ];
 
-    _placeholderImageNames = @[@"placeholder-group2", @"placeholder-music", @"placeholder-music", @"placeholder-music"];
+    _placeholderImages = @[
+        NSImage.VLCPlaceholderGroupImage,
+        NSImage.VLCPlaceholderMusicImage,
+        NSImage.VLCPlaceholderMusicImage,
+        NSImage.VLCPlaceholderMusicImage,
+    ];
     _placeholderLabelStrings = @[
         _NS("Your music artists will appear here.\nGo to the Browse section to add artists you love."),
         _NS("Your music albums will appear here.\nGo to the Browse section to add albums you love."),
@@ -327,7 +333,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     NSAssert(selectedLibrarySegment != VLCAudioLibraryRecentsSegment &&
              selectedLibrarySegment != VLCAudioLibraryUnknownSegment,
              @"Received invalid audio library segment from audio data source!");
-    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:_placeholderImageNames[selectedLibrarySegment]]
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:_placeholderImages[selectedLibrarySegment]
                                               usingConstraints:self.placeholderImageViewSizeConstraints
                                              displayingMessage:_placeholderLabelStrings[selectedLibrarySegment]];
 }
