@@ -699,7 +699,7 @@ do \
         MMSClose( p_access );
         return VLC_EGENERIC;
     }
-    if( p_sys->i_command != 0x06 )
+    if( p_sys->i_command != 0x06 ) // MID: 0x00040006
     {
         msg_Err( p_access,
                  "unknown answer (0x%x instead of 0x06)",
@@ -709,7 +709,7 @@ do \
         return( -1 );
     }
 
-    if( p_sys->i_cmd < MMS_CMD_HEADERSIZE + 64 )
+    if( p_sys->i_cmd < MMS_CMD_HEADERSIZE + 64 ) // 2.2.4.7 LinkMacToViewerReportOpenFile
     {
         var_buffer_free( &buffer );
         MMSClose( p_access );
@@ -735,17 +735,17 @@ do \
     }
 
     p_sys->i_flags_broadcast =
-        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 12 );
+        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 12 ); // fileAttributes
     p_sys->i_media_length =
-        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 24 );
+        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 24 ); // fileDuration
     p_sys->i_packet_length =
-        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 44 );
+        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 44 ); // filePacketSize
     p_sys->i_packet_count =
-        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 48 );
+        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 48 ); // filePacketCount
     p_sys->i_max_bit_rate =
-        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 56 );
+        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 56 ); // fileBitRate
     p_sys->i_header_size =
-        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 60 );
+        GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 60 ); // fileHeaderSize
 
     msg_Dbg( p_access,
              "answer 0x06 flags:0x%8.8"PRIx32" media_length:%"PRIu32"s "
