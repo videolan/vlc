@@ -114,12 +114,12 @@ static int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, M
 {
     p_track->fmt.i_original_fourcc = p_sample->i_type;
 
-    if( !p_track->p_sdp )
+    const MP4_Box_t *p_sdp = p_track->p_sdp;
+    if( !p_sdp || !BOXDATA(p_sdp)->psz_text )
     {
         msg_Err(p_demux, "Required 'sdp '-box not found");
         return 0;
     }
-    MP4_Box_t *p_sdp = p_track->p_sdp;
     char *strtok_state;
     char * pch = strtok_r(BOXDATA(p_sdp)->psz_text, " =\n", &strtok_state); /* media entry */
     if( pch && pch[0] != 'm' )
