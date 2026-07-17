@@ -1549,7 +1549,7 @@ static block_t * MP4_RTPHintToFrame( demux_t *p_demux, block_t *p_block, uint32_
         }
 
         block_t *p_realloc = ( p_newblock ) ?
-                             block_Realloc( p_newblock, 0, realloc_size ):
+                             block_TryRealloc( p_newblock, 0, realloc_size ):
                              block_Alloc( realloc_size );
         if( !p_realloc )
             goto error;
