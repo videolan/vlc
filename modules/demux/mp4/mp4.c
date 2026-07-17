@@ -1561,7 +1561,7 @@ static block_t * MP4_RTPHintToFrame( demux_t *p_demux, block_t *p_block, uint32_
         uint8_t i_type = (*p_src) & ((1<<5)-1);
 
         const uint8_t synccode[4] = { 0, 0, 0, 1 };
-        if( memcmp( p_src, synccode, 4 ) )
+        if( sample_cons.length < 4 || memcmp( p_src, synccode, 4 ) )
         {
             if( i_type == 7 || i_type == 8 )
                 *p_dst++=0;
