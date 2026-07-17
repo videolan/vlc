@@ -3925,7 +3925,7 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
                 return;
             }
 
-            memcpy( sdp_media_type, BOXDATA(p_sdp)->psz_text, 7 );
+            strncpy( sdp_media_type, BOXDATA(p_sdp)->psz_text, 7 );
             if( !strcmp(sdp_media_type, "m=audio") )
             {
                 msg_Dbg( p_demux, "Found audio Rtp: %s", sdp_media_type );
