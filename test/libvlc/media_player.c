@@ -413,12 +413,16 @@ static void test_media_player_tracks(const char** argv, int argc)
         {
             case EVENT_TYPE_TRACK_LIST:
             {
-                assert(ev->track_list.action == libvlc_list_action_added);
+                assert(ev->track_list.action == libvlc_list_action_added
+                    || ev->track_list.action == libvlc_list_action_updated);
                 libvlc_track_type_t type = ev->track_list.type;
                 struct track *track =
                     get_track_from_id(alltracks[type], ev->track_list.id);
                 assert(track);
-                track->added = true;
+                if (ev->track_list.action == libvlc_list_action_updated)
+                    assert(track->added);
+                else
+                    track->added = true;
                 break;
             }
             case EVENT_TYPE_TRACK_SELECTION:
@@ -518,6 +522,13 @@ static void test_media_player_tracks(const char** argv, int argc)
     while (!tracks_check_all_events(alltracks, false))
     {
         struct mp_event *ev = mp_event_ctx_wait_event(&ctx);
+        if (ev->type == EVENT_TYPE_TRACK_LIST)
+        {
+            /* It is possible to receive an update between added and selected */
+            assert(ev->track_list.action == libvlc_list_action_updated);
+            mp_event_delete(ev);
+            continue;
+        }
         assert(ev->type == EVENT_TYPE_TRACK_SELECTION);
 
         libvlc_track_type_t type = ev->track_selection.type;
