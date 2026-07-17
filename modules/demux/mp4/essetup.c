@@ -150,7 +150,7 @@ static int SetupRTPReceptionHintTrack( demux_t *p_demux, const mp4_track_t *p_tr
     p_fmt->i_original_fourcc = i_sample_type;
 
     const MP4_Box_t *p_sdp = MP4_BoxGet( p_track->p_track, "udta/hnti/sdp " );
-    if( !p_sdp )
+    if( !p_sdp || !BOXDATA(p_sdp)->psz_text )
     {
         msg_Err(p_demux, "Required 'sdp '-box not found");
         return 0;

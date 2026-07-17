@@ -3918,7 +3918,8 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
             MP4_Box_t *p_sdp;
 
             /* parse the sdp message to find out whether the RTP stream contained audio or video */
-            if( !( p_sdp  = MP4_BoxGet( p_box_trak, "udta/hnti/sdp " ) ) )
+            if( !( p_sdp  = MP4_BoxGet( p_box_trak, "udta/hnti/sdp " ) ) ||
+                !BOXDATA(p_sdp)->psz_text )
             {
                 msg_Warn( p_demux, "Didn't find sdp box to determine stream type" );
                 return;
