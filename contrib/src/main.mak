@@ -468,7 +468,7 @@ checksum = \
 	(cd $(TARBALLS) && $(1) /dev/stdin) < \
 		"$(SRC)/$(patsubst $(3)%,%,$@)/$(2)SUMS"
 CHECK_SHA512 = $(call checksum,$(SHA512SUM),SHA512,.sum-)
-UNPACK = $(RM) -R $@ \
+UNPACK = $(RM) -R $@ $(UNPACK_DIR) \
 	$(foreach f,$(filter %.tar.gz %.tgz %.tar.bz2 %.tar.xz %.tar.zst,$^), && tar $(TAR_VERBOSE)xfo $(f)) \
 	$(foreach f,$(filter %.zip,$^), && unzip $(ZIP_QUIET) $(f) $(UNZIP_PARAMS))
 UNPACK_DIR = $(patsubst %.tar,%,$(basename $(notdir $<)))
