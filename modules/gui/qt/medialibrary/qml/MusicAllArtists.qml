@@ -143,7 +143,6 @@ MainViewLoader {
                 title: model.name || qsTr("Unknown artist")
                 subtitle: qsTr("%1 song", "%1 songs", model.nb_tracks).arg(model.nb_tracks)
                 titleTopMargin: artistGrid.titleTopMargin
-                playIconSize: VLCStyle.play_cover_small
                 textAlignHCenter: true
                 dragItem: artistsDragItem
 
