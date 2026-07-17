@@ -43,7 +43,7 @@ ifeq ($(V),1)
 TAR_VERBOSE := v
 endif
 
-UNPACK = $(RM) -R $@ \
+UNPACK = $(RM) -R $@ $(UNPACK_DIR) \
     $(foreach f,$(filter %.tar.gz %.tgz %.tar.bz2 %.tar.xz %.tar.zst,$^), && tar $(TAR_VERBOSE)xfo $(f)) \
     $(foreach f,$(filter %.zip,$^), && unzip $(f))
 
