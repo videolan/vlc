@@ -23,6 +23,7 @@
 #import "VLCVolumeSlider.h"
 
 #import "extensions/NSView+VLCAdditions.h"
+#import "main/CompatibilityFixes.h"
 #import "views/VLCVolumeSliderCell.h"
 
 @implementation VLCVolumeSlider
@@ -37,6 +38,7 @@
 
         if (@available(macOS 10.14, *)) {
             [self viewDidChangeEffectiveAppearance];
+            self.clipsToBounds = YES;
         } else {
             [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
         }

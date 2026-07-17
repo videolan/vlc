@@ -48,6 +48,16 @@ enum {
 
 #endif
 
+#ifndef MAC_OS_VERSION_14_0
+
+@interface NSView (VLCCompatibility)
+
+@property BOOL clipsToBounds;
+
+@end
+
+#endif
+
 NS_ASSUME_NONNULL_END
 
 #define OSX_BIGSUR_AND_HIGHER (NSAppKitVersionNumber >= 2022.00)
