@@ -1520,6 +1520,9 @@ static block_t * MP4_RTPHintToFrame( demux_t *p_demux, block_t *p_block, uint32_
         /* skip packet constructor */
         p_slice += CONSTRUCTORSIZE;
 
+        if( sample_cons.length == 0 )
+            continue;
+
         /* check that is RTPsampleconstructor, referencing itself and no weird audio stuff */
         if( sample_cons.type != 2||sample_cons.trackrefindex != -1
             ||sample_cons.samplesperblock != 1||sample_cons.bytesperblock != 1 )
