@@ -27,6 +27,7 @@
 @class VLCInputItem;
 @class VLCLibraryModel;
 @class VLCMediaLibraryMediaItem;
+@class VLCMediaLibraryPlaylist;
 @class VLCPlayQueueItem;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -53,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showCreatePlaylistDialogForPlayQueue;
 - (void)showCreatePlaylistDialogForPlayQueueItems:(NSArray<VLCPlayQueueItem *> *)items;
 - (void)showCreatePlaylistDialogForMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems;
+- (void)showRenamePlaylistDialogForPlaylist:(VLCMediaLibraryPlaylist *)playlist;
 
 /**
  * Sort the entire library representation based on:

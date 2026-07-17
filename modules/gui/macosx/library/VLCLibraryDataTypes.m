@@ -1187,6 +1187,29 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return res;
 }
 
+- (BOOL)renameTo:(NSString *)name
+{
+    if (_readOnly || name.length == 0) {
+        return NO;
+    }
+
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (p_mediaLibrary == NULL) {
+        return NO;
+    }
+
+    const int result =
+        vlc_ml_playlist_rename(p_mediaLibrary, self.libraryID, name.UTF8String);
+    if (result != VLC_SUCCESS) {
+        msg_Err(getIntf(), "Failed to rename playlist %s (ID %lld) to %s",
+                self.displayString.UTF8String, self.libraryID, name.UTF8String);
+        return NO;
+    }
+
+    self.displayString = name;
+    return YES;
+}
+
 - (BOOL)appendMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
     if (_readOnly || mediaItems.count == 0) {

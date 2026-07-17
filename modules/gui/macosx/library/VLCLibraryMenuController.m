@@ -56,6 +56,7 @@
     NSMenuItem *_deleteItem;
     NSMenuItem *_removeFromPlaylistItem;
     NSMenuItem *_informationItem;
+    NSMenuItem *_renamePlaylistItem;
 
     VLCLibraryAddToPlaylistMenuController *_addToPlaylistMenuController;
     NSMenuItem *_addToPlaylistItem;
@@ -120,9 +121,15 @@
                                                   keyEquivalent:@""];
     _removeFromPlaylistItem.target = self;
 
+    _renamePlaylistItem = [[NSMenuItem alloc] initWithTitle:_NS("Rename playlist")
+                                                     action:@selector(renamePlaylist:)
+                                              keyEquivalent:@""];
+    _renamePlaylistItem.target = self;
+
     [playItem vlc_setActionImageWithSystemSymbolName:@"play.fill"];
     [appendItem vlc_setActionImageWithSystemSymbolName:@"text.line.last.and.arrowtriangle.forward"];
     [_removeFromPlaylistItem vlc_setActionImageWithSystemSymbolName:@"minus.circle"];
+    [_renamePlaylistItem vlc_setActionImageWithSystemSymbolName:@"pencil"];
     [self.favoriteItem vlc_setActionImageWithSystemSymbolName:@"heart"];
     [bookmarkItem vlc_setActionImageWithSystemSymbolName:@"bookmark"];
     [addToLibraryItem vlc_setActionImageWithSystemSymbolName:@"plus.rectangle.on.folder"];
@@ -137,6 +144,7 @@
         playItem,
         appendItem,
         _addToPlaylistItem,
+        _renamePlaylistItem,
         self.favoriteItem,
         bookmarkItem,
         addToLibraryItem,
@@ -199,6 +207,7 @@
     NSArray<VLCMediaLibraryMediaItem *> * const recents = libraryModel.listOfRecentMedia;
 
     _removeFromPlaylistItem.hidden = YES;
+    _renamePlaylistItem.hidden = YES;
 
     /* no represented items (right-click on empty space) - media actions are disabled */
     if (self.representedItems.count == 0 && self.representedInputItems.count == 0) {
@@ -227,6 +236,12 @@
             }
         }
         _removeFromPlaylistItem.hidden = !allInPlaylist;
+        if (self.representedItems.count == 1 &&
+            [self.representedItems.firstObject.item isKindOfClass:VLCMediaLibraryPlaylist.class]) {
+            VLCMediaLibraryPlaylist * const playlist =
+                (VLCMediaLibraryPlaylist *)self.representedItems.firstObject.item;
+            _renamePlaylistItem.hidden = playlist.readOnly;
+        }
 
         BOOL anyNonRecent = NO;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
@@ -393,6 +408,21 @@
     }
 
     [playlist removeMediaItemsAtPositions:positions];
+}
+
+- (void)renamePlaylist:(id)sender
+{
+    if (self.representedItems.count != 1) {
+        return;
+    }
+
+    id<VLCMediaLibraryItemProtocol> const item = self.representedItems.firstObject.item;
+    if (![item isKindOfClass:VLCMediaLibraryPlaylist.class]) {
+        return;
+    }
+
+    VLCMediaLibraryPlaylist * const playlist = (VLCMediaLibraryPlaylist *)item;
+    [VLCMain.sharedInstance.libraryController showRenamePlaylistDialogForPlaylist:playlist];
 }
 
 - (void)addMedia:(id)sender

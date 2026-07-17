@@ -289,27 +289,69 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
     }
 }
 
+- (void)showRenamePlaylistDialogForPlaylist:(VLCMediaLibraryPlaylist *)playlist
+{
+    if (playlist == nil || playlist.readOnly) {
+        return;
+    }
+
+    NSString * const playlistName = [self runRenamePlaylistDialogForPlaylist:playlist];
+    if (!playlistName) {
+        return;
+    }
+
+    [playlist renameTo:playlistName];
+}
+
 - (nullable NSString *)runCreatePlaylistDialog
 {
+    return [self runPlaylistNameDialogWithTitle:_NS("Create New Playlist")
+                                informativeText:_NS("Enter a name for the new playlist:")
+                             primaryButtonTitle:_NS("Create")
+                                    initialName:nil
+                             requireNameChange:NO];
+}
+
+- (nullable NSString *)runRenamePlaylistDialogForPlaylist:(VLCMediaLibraryPlaylist *)playlist
+{
+    return [self runPlaylistNameDialogWithTitle:_NS("Rename playlist")
+                                informativeText:_NS("Please enter the new playlist name:")
+                             primaryButtonTitle:_NS("Rename")
+                                    initialName:playlist.displayString
+                             requireNameChange:YES];
+}
+
+- (nullable NSString *)runPlaylistNameDialogWithTitle:(NSString *)title
+                                      informativeText:(NSString *)informativeText
+                                   primaryButtonTitle:(NSString *)primaryButtonTitle
+                                          initialName:(nullable NSString *)initialName
+                                   requireNameChange:(BOOL)requireNameChange
+{
     NSAlert * const alert = [[NSAlert alloc] init];
-    alert.messageText = _NS("Create New Playlist");
-    alert.informativeText = _NS("Enter a name for the new playlist:");
-    NSButton * const createButton = [alert addButtonWithTitle:_NS("Create")];
-    createButton.enabled = NO;
+    alert.messageText = title;
+    alert.informativeText = informativeText;
+    NSButton * const primaryButton = [alert addButtonWithTitle:primaryButtonTitle];
+    primaryButton.enabled = NO;
     [alert addButtonWithTitle:_NS("Cancel")];
 
     NSTextField * const input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 300, 24)];
+    input.stringValue = initialName ?: @"";
     input.placeholderString = _NS("Playlist Name");
     alert.accessoryView = input;
     alert.window.initialFirstResponder = input;
 
     NSCharacterSet * const whitespace = NSCharacterSet.whitespaceAndNewlineCharacterSet;
+    NSString * const currentName =
+        [(initialName ?: @"") stringByTrimmingCharactersInSet:whitespace];
     id observer = [NSNotificationCenter.defaultCenter
         addObserverForName:NSControlTextDidChangeNotification
                    object:input
                     queue:NSOperationQueue.mainQueue
-               usingBlock:^(NSNotification *note) {
-        createButton.enabled = [input.stringValue stringByTrimmingCharactersInSet:whitespace].length > 0;
+               usingBlock:^(NSNotification * __unused note) {
+        NSString * const newName =
+            [input.stringValue stringByTrimmingCharactersInSet:whitespace];
+        primaryButton.enabled = newName.length > 0 &&
+            (!requireNameChange || ![newName isEqualToString:currentName]);
     }];
 
     const NSModalResponse response = [alert runModal];
@@ -320,7 +362,10 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
     }
 
     NSString * const name = [input.stringValue stringByTrimmingCharactersInSet:whitespace];
-    return name.length > 0 ? name : nil;
+    if (name.length == 0 || (requireNameChange && [name isEqualToString:currentName])) {
+        return nil;
+    }
+    return name;
 }
 
 - (BOOL)createPlaylistWithName:(NSString *)playlistName fromPlayQueueItems:(NSArray<VLCPlayQueueItem *> *)items
