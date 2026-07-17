@@ -1608,6 +1608,7 @@ static block_t * MP4_RTPHint_Convert( demux_t *p_demux, block_t *p_block, vlc_fo
         if( i_packets == 1 && i_skip < p_block->i_buffer )
         {
             p_block->p_buffer += i_skip;
+            p_block->i_buffer -= i_skip;
             p_converted = p_block;
         }
         else
