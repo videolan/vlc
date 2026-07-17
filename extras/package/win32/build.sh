@@ -156,8 +156,6 @@ cd extras/tools
 export VLC_TOOLS="$PWD/build"
 
 export PATH="$PWD/build/bin":"$PATH"
-# Force patched meson as newer versions don't add -lpthread properly in libplacebo.pc
-FORCED_TOOLS="meson"
 # Force libtool build when compiling with clang
 if [ "$COMPILING_WITH_CLANG" -gt 0 ] && [ ! -d "libtool" ]; then
     FORCED_TOOLS="$FORCED_TOOLS libtool"
