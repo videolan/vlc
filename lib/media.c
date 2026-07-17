@@ -424,14 +424,14 @@ char *libvlc_media_get_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta )
     {
         psz_meta = input_item_GetNowPlayingFb( p_md->p_input_item );
     }
+    else if( e_meta == libvlc_meta_Title )
+    {
+        psz_meta = input_item_GetTitleFbName( p_md->p_input_item );
+    }
     else
     {
         psz_meta = input_item_GetMeta( p_md->p_input_item,
                                              libvlc_to_vlc_meta[e_meta] );
-        /* Should be integrated in core */
-        if( psz_meta == NULL && e_meta == libvlc_meta_Title
-         && p_md->p_input_item->psz_name != NULL )
-            psz_meta = strdup( p_md->p_input_item->psz_name );
     }
     return psz_meta;
 }
