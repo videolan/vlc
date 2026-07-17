@@ -138,9 +138,6 @@ if ! printf "#ifdef __clang__\n#error CLANG\n#endif" | $CC -E - 1>/dev/null 2>/d
     if ! printf "#if __clang_major__ >= 14\n#error CLANG\n#endif" | $CC -E - 1>/dev/null 2>/dev/null; then
         COMPILING_WITH_CLANG14=1
     fi
-    if ! printf "#if __clang_major__ >= 16\n#error CLANG\n#endif" | $CC -E - 1>/dev/null 2>/dev/null; then
-        COMPILING_WITH_CLANG16=1
-    fi
     COMPILING_WITH_CLANG=1
 else
     COMPILING_WITH_CLANG=0
@@ -366,11 +363,6 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     if [ "${COMPILING_WITH_CLANG14}" = "1" ]; then
         VLC_CXXFLAGS="$VLC_CXXFLAGS --end-no-unused-arguments"
         VLC_LDFLAGS="$VLC_LDFLAGS --end-no-unused-arguments"
-    fi
-    if [ "${COMPILING_WITH_CLANG16}" = "1" ]; then
-        VLC_CFLAGS="$VLC_CFLAGS -mguard=cf"
-        VLC_CXXFLAGS="$VLC_CXXFLAGS -mguard=cf"
-        VLC_LDFLAGS="$VLC_LDFLAGS -mguard=cf"
     fi
 fi
 
