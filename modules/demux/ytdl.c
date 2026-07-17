@@ -133,13 +133,21 @@ static int CompareFormats(const struct json_object *f_a,
     double h_b = json_get_num(f_b, "height");
     double abr_b = json_get_num(f_b, "abr");
 
-    /* Prefer non-mute formats */
-    if (!isnan(abr_a) != !isnan(abr_b))
-        return isnan(abr_a) ? -1 : +1;
+    /* Prefer non-mute formats. Treat unknown as a non-mute format */
+    const char *acodec_a = json_get_str(f_a, "acodec");
+    const char *acodec_b = json_get_str(f_b, "acodec");
+    bool has_audio_a = acodec_a == NULL || strcmp(acodec_a, "none") != 0;
+    bool has_audio_b = acodec_b == NULL || strcmp(acodec_b, "none") != 0;
+    if (has_audio_a != has_audio_b)
+        return has_audio_a ? +1 : -1;
 
-    /* Prefer non-blind formats */
-    if (!isnan(h_a) != !isnan(h_b))
-        return isnan(h_a) ? -1 : +1;
+    /* Prefer non-blind formats. Treat unknown as a non-blind format */
+    const char *vcodec_a = json_get_str(f_a, "vcodec");
+    const char *vcodec_b = json_get_str(f_b, "vcodec");
+    bool has_video_a = vcodec_a == NULL || strcmp(vcodec_a, "none") != 0;
+    bool has_video_b = vcodec_b == NULL || strcmp(vcodec_b, "none") != 0;
+    if (has_video_a != has_video_b)
+        return has_video_a ? +1 : -1;
 
     if (islessequal(h_a, pref_height)) {
         if (!islessequal(h_b, pref_height))
