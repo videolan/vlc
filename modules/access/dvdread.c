@@ -161,7 +161,7 @@ int OpenCommonDvdread( vlc_object_t *p_this , dvd_type_t type,
     dvd_logger_cb cbs = { .pf_log = DvdReadLog };
 #endif
     dvd_reader_t *p_dvdread;
-#ifdef DVDREAD_HAS_DVDAUDIO
+#if defined(DVDREAD_HAS_DVDAUDIO) && DVDREAD_VERSION >= DVDREAD_VERSION_CODE(6, 1, 0)
     switch (type) {
         case DVD_A:
             p_dvdread = DVDOpenAudio( p_demux, &cbs, psz_path );
