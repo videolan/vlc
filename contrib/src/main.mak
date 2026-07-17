@@ -403,7 +403,7 @@ checksum = \
 	(cd $(TARBALLS) && $(1) /dev/stdin) < \
 		"$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS"
 CHECK_SHA512 = $(call checksum,$(SHA512SUM),SHA512)
-UNPACK = $(RM) -R $@ \
+UNPACK = $(RM) -R $@ $(UNPACK_DIR) \
 	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar $(TAR_VERBOSE)xzfo $(f)) \
 	$(foreach f,$(filter %.tar.bz2,$^), && tar $(TAR_VERBOSE)xjfo $(f)) \
 	$(foreach f,$(filter %.tar.xz,$^), && tar $(TAR_VERBOSE)xJfo $(f)) \
