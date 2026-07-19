@@ -1,6 +1,6 @@
 # fluid
 
-FLUID_VERSION := 2.3.0
+FLUID_VERSION := 2.5.6
 FLUID_URL := $(GITHUB)/FluidSynth/fluidsynth/archive/refs/tags/v$(FLUID_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"glib-2.0 gthread-2.0"),)
