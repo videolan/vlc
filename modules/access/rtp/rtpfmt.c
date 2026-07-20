@@ -236,7 +236,9 @@ int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *session,
 
     /* Parse the a=rtpmap and extract a=fmtp lines */
     for (const struct vlc_sdp_attr *a = media->attrs; a != NULL; a = a->next) {
-        if (strcmp(a->name, "rtpmap") == 0) {
+        if (a->value == NULL)
+            continue;
+        else if (strcmp(a->name, "rtpmap") == 0) {
             unsigned char number, channels;
             char name[16];
             unsigned int frequency;
