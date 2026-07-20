@@ -71,13 +71,15 @@ Dialog {
 
             visible: MainCtx.backdropBlurRequested() && blur.available
 
+            mode: Widgets.DualKawaseBlur.Mode.SixPass
+
             source: ShaderEffectSource {
                 sourceItem: blur.visible ? control.rootWindow : null
                 live: true
                 hideSource: true
             }
 
-            radius: 3
+            radius: 2
         }
     }
 
