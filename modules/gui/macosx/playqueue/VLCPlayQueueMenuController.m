@@ -187,9 +187,9 @@
     _addToPlaylistMenuItem.enabled = mediaItems.count > 0;
 }
 
-- (void)prepareForRowContextMenu:(BOOL)rowContextMenu
+- (void)prepareForContextMenuTarget:(VLCPlayQueueContextMenuTarget)target
 {
-    if (rowContextMenu) {
+    if (target == VLCPlayQueueContextMenuTargetRow) {
         [self updateAddToPlaylistMenuItem];
         const BOOL multipleSelection = self.playQueueTableView.selectedRowIndexes.count > 1;
         self.playQueueMenu.itemArray = multipleSelection ? self.multipleSelectionItems : self.items;

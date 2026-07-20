@@ -26,12 +26,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, VLCPlayQueueContextMenuTarget) {
+    VLCPlayQueueContextMenuTargetRow,
+    VLCPlayQueueContextMenuTargetBackground,
+};
+
 @interface VLCPlayQueueMenuController : NSObject
 
 @property (readwrite, weak, nonatomic) NSTableView *playQueueTableView;
 @property (readonly) NSMenu *playQueueMenu;
 
-- (void)prepareForRowContextMenu:(BOOL)rowContextMenu;
+- (void)prepareForContextMenuTarget:(VLCPlayQueueContextMenuTarget)target;
 
 @end
 
