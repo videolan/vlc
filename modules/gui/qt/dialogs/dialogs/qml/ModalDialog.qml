@@ -85,6 +85,17 @@ Dialog {
 
     background: Rectangle {
         color: theme.bg.primary
+
+        Widgets.RoundedRectangleShadow {
+            yOffset: VLCStyle.dp(4, VLCStyle.scale)
+            blurRadius: VLCStyle.dp(3, VLCStyle.scale)
+
+            visible: (parent.color.a > 0.0)
+
+            opacity: 0.2
+
+            color: "black"
+        }
     }
 
     //FIXME use the right xxxLabel class
