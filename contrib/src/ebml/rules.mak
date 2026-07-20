@@ -1,6 +1,6 @@
 # ebml
 
-EBML_VERSION := 1.4.5
+EBML_VERSION := 1.4.6
 EBML_URL := https://dl.matroska.org/downloads/libebml/libebml-$(EBML_VERSION).tar.xz
 
 ifeq ($(call need_pkg,"libebml >= 1.3.8"),)
@@ -14,20 +14,11 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.xz:
 
 ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
-	$(APPLY) $(SRC)/ebml/0001-IOCallback-avoid-reading-more-than-2-32-at-once.patch
-	$(APPLY) $(SRC)/ebml/0001-EbmlString-ReadFully-use-automatic-memory-management.patch
-	$(APPLY) $(SRC)/ebml/0002-EbmlUnicodeString-use-std-string-when-reading-instea.patch
-	$(APPLY) $(SRC)/ebml/0001-EbmlMaster-fix-leak-when-reading-upper-level-element.patch
-	$(APPLY) $(SRC)/ebml/0002-EbmlMaster-exit-reading-loop-if-upper-element-found-.patch
-	$(APPLY) $(SRC)/ebml/0001-EbmlHead-do-not-allow-to-have-an-infinite-unknown-si.patch
-	$(APPLY) $(SRC)/ebml/0001-include-iterator-for-std-back_inserter.patch
-	$(APPLY) $(SRC)/ebml/0002-include-new-for-std-nothrow.patch
-	$(APPLY) $(SRC)/ebml/0001-EbmlMaster-fix-leak-on-upper-element-found-inside-th.patch
 	$(MOVE)
 
 .ebml: ebml toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE) -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+	$(HOSTVARS_CMAKE) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
