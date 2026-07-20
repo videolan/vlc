@@ -250,6 +250,17 @@ Item {
                     }
                 }
             }
+
+            Widgets.RoundedRectangleShadow {
+                yOffset: VLCStyle.dp(4, VLCStyle.scale)
+                blurRadius: VLCStyle.dp(3, VLCStyle.scale)
+
+                opacity: 0.2
+
+                visible: (color.a > 0.0)
+
+                color: Qt.darker(parent.color)
+            }
         }
 
         state: "hidden"
