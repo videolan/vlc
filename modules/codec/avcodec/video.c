@@ -916,7 +916,7 @@ int InitVideoHwDec( vlc_object_t *obj )
         return VLC_ENOMEM;
 
     const AVCodec *p_codec;
-    AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec );
+    AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec, true );
     if( unlikely(p_context == NULL) )
     {
         free(p_sys);
@@ -974,7 +974,7 @@ int InitVideoDec( vlc_object_t *obj )
 {
     decoder_t *p_dec = (decoder_t *)obj;
     const AVCodec *p_codec;
-    AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec );
+    AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec, false );
     if( p_context == NULL )
         return VLC_EGENERIC;
 

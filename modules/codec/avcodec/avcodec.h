@@ -47,7 +47,7 @@ int InitSubtitleDec( vlc_object_t * );
 void EndSubtitleDec( vlc_object_t * );
 
 /* Initialize decoder */
-AVCodecContext *ffmpeg_AllocContext( decoder_t *, const AVCodec ** );
+AVCodecContext *ffmpeg_AllocContext( decoder_t *, const AVCodec **, bool );
 int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
 
 /*****************************************************************************

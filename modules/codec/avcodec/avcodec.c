@@ -221,8 +221,26 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
+static const AVCodec *FindHwCapableDecoder(enum AVCodecID codec_id)
+{
+    void *iter = NULL;
+
+    const AVCodec *codec = av_codec_iterate(&iter);
+    while (codec != NULL)
+    {
+        if (codec->id == codec_id && av_codec_is_decoder(codec))
+        {
+            if (avcodec_get_hw_config(codec, 0) != NULL)
+                return codec;
+        }
+        codec = av_codec_iterate(&iter);
+    }
+    return NULL;
+}
+
 AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
-                                     const AVCodec **restrict codecp )
+                                     const AVCodec **restrict codecp,
+                                     bool b_require_hw_codec)
 {
     enum AVCodecID i_codec_id;
     const char *psz_namecodec;
@@ -253,7 +271,9 @@ AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
         }
         free( psz_decoder );
     }
-    if( !p_codec )
+    if( !p_codec && b_require_hw_codec )
+        p_codec = FindHwCapableDecoder( i_codec_id );
+    else if ( !p_codec )
         p_codec = avcodec_find_decoder( i_codec_id );
     if( !p_codec )
     {

@@ -243,7 +243,7 @@ int InitAudioDec( vlc_object_t *obj )
 {
     decoder_t *p_dec = (decoder_t *)obj;
     const AVCodec *codec;
-    AVCodecContext *avctx = ffmpeg_AllocContext( p_dec, &codec );
+    AVCodecContext *avctx = ffmpeg_AllocContext( p_dec, &codec, false );
     if( avctx == NULL )
         return VLC_EGENERIC;
 

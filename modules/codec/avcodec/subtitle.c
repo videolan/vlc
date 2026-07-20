@@ -57,7 +57,7 @@ int InitSubtitleDec(vlc_object_t *obj)
 {
     decoder_t *dec = (decoder_t *)obj;
     const AVCodec *codec;
-    AVCodecContext *context = ffmpeg_AllocContext(dec, &codec);
+    AVCodecContext *context = ffmpeg_AllocContext(dec, &codec, false);
     if (context == NULL)
         return VLC_EGENERIC;
 
