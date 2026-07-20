@@ -14,6 +14,7 @@ $(TARBALLS)/libaom-$(AOM_VERSION).tar.gz:
 
 aom: libaom-$(AOM_VERSION).tar.gz .sum-aom
 	$(UNPACK)
+	$(APPLY) $(SRC)/aom/0001-Do-not-force-_WIN32_WINNT.patch
 	$(MOVE)
 
 DEPS_aom =
