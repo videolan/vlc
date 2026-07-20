@@ -44,10 +44,11 @@ NSString *VLCVideoEffectsSelectedProfileKey = @"VideoEffectSelectedProfile";
 NSString *VLCVideoEffectsProfilesKey = @"VideoEffectProfiles";
 NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
-static const NSUInteger VLCVideoEffectsProfileVersion = 3;
+static const NSUInteger VLCVideoEffectsProfileVersion = 4;
 static const NSUInteger VLCVideoEffectsProfileCountV1 = 32;
 static const NSUInteger VLCVideoEffectsProfileCountV2 = 33;
 static const NSUInteger VLCVideoEffectsProfileCountV3 = 34;
+static const NSUInteger VLCVideoEffectsProfileCountV4 = 38;
 
 typedef NS_ENUM(NSUInteger, VLCVideoEffectsProfileField) {
     VLCVideoEffectsProfileFieldVideoFilter = 0,
@@ -84,9 +85,13 @@ typedef NS_ENUM(NSUInteger, VLCVideoEffectsProfileField) {
     VLCVideoEffectsProfileFieldWallCols = 31,
     VLCVideoEffectsProfileFieldBrightnessThreshold = 32,
     VLCVideoEffectsProfileFieldHue = 33,
+    VLCVideoEffectsProfileFieldCropTop = 34,
+    VLCVideoEffectsProfileFieldCropBottom = 35,
+    VLCVideoEffectsProfileFieldCropLeft = 36,
+    VLCVideoEffectsProfileFieldCropRight = 37,
 };
 
-static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3;0;-180.000000";
+static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3;0;-180.000000;0;0;0;0";
 
 #pragma mark -
 #pragma mark Initialization
@@ -118,7 +123,7 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
 
 + (NSString *)defaultProfileString
 {
-    NSAssert([[VLCVideoEffectsDefaultProfileString componentsSeparatedByString:@";"] count] == VLCVideoEffectsProfileCountV3,
+    NSAssert([[VLCVideoEffectsDefaultProfileString componentsSeparatedByString:@";"] count] == VLCVideoEffectsProfileCountV4,
              @"Default video effects profile does not match schema version %lu", (unsigned long)VLCVideoEffectsProfileVersion);
     return VLCVideoEffectsDefaultProfileString;
 }
@@ -196,7 +201,6 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
 
     if (b_filter_changed)
         var_SetString(vout, "video-splitter", [tempString UTF8String]);
-    vout_Release(vout);
 
     /* try to set filter values on-the-fly and store them appropriately */
     // index VLCVideoEffectsProfileFieldHueDeprecated is deprecated
@@ -242,6 +246,16 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
         hueValue.f_float -= 180;
     }
     [VLCVideoFilterHelper setVideoFilterProperty: "hue" forFilter: "adjust" withValue: hueValue];
+
+    if ([items count] >= VLCVideoEffectsProfileCountV4 && vout) { // version >=4 of profile string
+        var_SetInteger(vout, "crop-top", [[items objectAtIndex:VLCVideoEffectsProfileFieldCropTop] intValue]);
+        var_SetInteger(vout, "crop-bottom", [[items objectAtIndex:VLCVideoEffectsProfileFieldCropBottom] intValue]);
+        var_SetInteger(vout, "crop-left", [[items objectAtIndex:VLCVideoEffectsProfileFieldCropLeft] intValue]);
+        var_SetInteger(vout, "crop-right", [[items objectAtIndex:VLCVideoEffectsProfileFieldCropRight] intValue]);
+    }
+
+    if (vout)
+        vout_Release(vout);
 }
 
 - (void)windowDidLoad
@@ -543,6 +557,10 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
     if (!vout)
         return;
     BOOL b_state;
+    int cropLeft = 0;
+    int cropTop = 0;
+    int cropRight = 0;
+    int cropBottom = 0;
 
     /* do we have any filter enabled? if yes, show it. */
     char * psz_vfilters;
@@ -610,6 +628,11 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
         [_wallCheckbox setState: NSOffState];
     }
 
+    cropLeft = var_GetInteger(vout, "crop-left");
+    cropTop = var_GetInteger(vout, "crop-top");
+    cropRight = var_GetInteger(vout, "crop-right");
+    cropBottom = var_GetInteger(vout, "crop-bottom");
+
     vout_Release(vout);
 
     /* fetch and show the various values */
@@ -635,10 +658,10 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
     [self setWidgetValue: _grainSlider forOption: "grain-variance" enabled: [_grainCheckbox state]];
     [_grainLabel setEnabled: [_grainCheckbox state]];
 
-    [self setCropLeftValue: 0];
-    [self setCropTopValue: 0];
-    [self setCropRightValue: 0];
-    [self setCropBottomValue: 0];
+    [self setCropLeftValue: cropLeft];
+    [self setCropTopValue: cropTop];
+    [self setCropRightValue: cropRight];
+    [self setCropBottomValue: cropBottom];
     [_cropSyncTopBottomCheckbox setState: NSOffState];
     [_cropSyncLeftRightCheckbox setState: NSOffState];
 
@@ -716,7 +739,7 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
     vout_thread_t *vout = [playerController mainVideoOutputThread];
     if (!vout)
         return nil;
-    NSString *string = [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli;%lli;%f",
+    NSString *string = [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli;%lli;%f;%lli;%lli;%lli;%lli",
                      B64EncAndFree(var_InheritString(vout, "video-filter")),
                      B64EncAndFree(var_InheritString(vout, "sub-source")),
                      B64EncAndFree(var_InheritString(vout, "video-splitter")),
@@ -752,7 +775,12 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
                      // version 2 of profile string:
                      0LL /* "brightness-threshold" */, // index: VLCVideoEffectsProfileFieldBrightnessThreshold
                      // version 3 of profile string: (vlc-3.0.0)
-                     var_InheritFloat(vout, "hue") // index: VLCVideoEffectsProfileFieldHue
+                     var_InheritFloat(vout, "hue"), // index: VLCVideoEffectsProfileFieldHue
+                     // version 4 of profile string:
+                     var_GetInteger(vout, "crop-top"), // index: VLCVideoEffectsProfileFieldCropTop
+                     var_GetInteger(vout, "crop-bottom"), // index: VLCVideoEffectsProfileFieldCropBottom
+                     var_GetInteger(vout, "crop-left"), // index: VLCVideoEffectsProfileFieldCropLeft
+                     var_GetInteger(vout, "crop-right") // index: VLCVideoEffectsProfileFieldCropRight
             ];
     vout_Release(vout);
     return string;
