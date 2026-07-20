@@ -1049,6 +1049,7 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
         if (block)
         {
             assert (block->i_pts != VLC_TICK_INVALID);
+            stream->timing.played_samples += block->i_nb_samples;
             aout->play(aout, block, vlc_tick_now());
         }
     }
