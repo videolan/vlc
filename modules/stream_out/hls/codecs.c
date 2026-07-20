@@ -157,6 +157,14 @@ static int FormatMP4A(struct vlc_memstream *ms, const es_format_t *fmt)
     return (written < 0) ? VLC_ENOMEM : VLC_SUCCESS;
 }
 
+static int FormatOpus(struct vlc_memstream *ms, bool legacy)
+{
+    // Legacy lower-cased "opus" is required by
+    // some receivers (e.g. Chromecast default receiver or old browsers).
+    const int written = vlc_memstream_puts(ms, legacy ? "opus" : "Opus");
+    return (written <= 0) ? VLC_ENOMEM : VLC_SUCCESS;
+}
+
 static int FormatFLAC(struct vlc_memstream *ms, bool legacy)
 {
     // Legacy lower-cased "flac" is required by some receivers (e.g. Chromecast
@@ -182,6 +190,8 @@ int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt,
             return FormatHEVC(ms, fmt);
         case VLC_CODEC_MP4A:
             return FormatMP4A(ms, fmt);
+        case VLC_CODEC_OPUS:
+            return FormatOpus(ms, legacy_codecs);
         case VLC_CODEC_FLAC:
             return FormatFLAC(ms, legacy_codecs);
         case VLC_CODEC_TEXT:
@@ -195,6 +205,7 @@ int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt,
 bool hls_codec_IsSupported(const es_format_t *fmt)
 {
     return fmt->i_codec == VLC_CODEC_H264 || fmt->i_codec == VLC_CODEC_HEVC ||
-           fmt->i_codec == VLC_CODEC_MP4A || fmt->i_codec == VLC_CODEC_FLAC ||
-           fmt->i_codec == VLC_CODEC_TEXT || fmt->i_codec == VLC_CODEC_WEBVTT;
+           fmt->i_codec == VLC_CODEC_MP4A || fmt->i_codec == VLC_CODEC_OPUS ||
+           fmt->i_codec == VLC_CODEC_FLAC || fmt->i_codec == VLC_CODEC_TEXT ||
+           fmt->i_codec == VLC_CODEC_WEBVTT;
 }
