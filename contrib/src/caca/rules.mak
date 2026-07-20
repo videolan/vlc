@@ -70,6 +70,6 @@ CACA_CONF += \
 .caca: caca
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(CACA_CONF)
-	+$(MAKEBUILD) -C $<
-	+$(MAKEBUILD) -C $< install
+	+$(MAKEBUILD) -C $< noinst_PROGRAMS= bin_PROGRAMS=
+	+$(MAKEBUILD) -C $< noinst_PROGRAMS= bin_PROGRAMS= install
 	touch $@
