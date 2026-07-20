@@ -1,0 +1,30 @@
+From 40d944066622f2e7dc07e475caba38efbef311a1 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolan.org>
+Date: Mon, 20 Jul 2026 10:36:22 +0200
+Subject: [PATCH] Do not force _WIN32_WINNT
+
+Either it's set in the environment or the user wants to use the toolchain default.
+If a minimum version is required it should be checked there, not in the code when
+we force this value.
+
+Change-Id: I47400eadc5c2e0dcee874e932a99e6c987ddf5c9
+---
+ cmake/aom_configure.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/aom_configure.cmake b/cmake/aom_configure.cmake
+index d5cd4db55b..39d77a4aae 100644
+--- a/cmake/aom_configure.cmake
++++ b/cmake/aom_configure.cmake
+@@ -244,7 +244,7 @@ endif()
+ if(AOM_TARGET_SYSTEM STREQUAL "Windows")
+   # The default _WIN32_WINNT value in MinGW is 0x0502 (Windows XP with SP2). Set
+   # it to 0x0601 (Windows 7).
+-  add_compiler_flag_if_supported("-D_WIN32_WINNT=0x0601")
++  # add_compiler_flag_if_supported("-D_WIN32_WINNT=0x0601")
+   # Quiet warnings related to fopen, printf, etc.
+   add_compiler_flag_if_supported("-D_CRT_SECURE_NO_WARNINGS")
+ endif()
+-- 
+2.52.0.windows.1
+
