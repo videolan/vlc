@@ -173,6 +173,13 @@ static int FormatFLAC(struct vlc_memstream *ms, bool legacy)
     return (written <= 0) ? VLC_ENOMEM : VLC_SUCCESS;
 }
 
+static int FormatAC3(struct vlc_memstream *ms, const es_format_t *fmt)
+{
+    const int written = vlc_memstream_puts(
+        ms, (fmt->i_codec == VLC_CODEC_EAC3) ? "ec-3" : "ac-3");
+    return (written <= 0) ? VLC_ENOMEM : VLC_SUCCESS;
+}
+
 static int FormatWebVTT(struct vlc_memstream *ms)
 {
     const int written = vlc_memstream_puts(ms, "wvtt");
@@ -194,6 +201,9 @@ int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt,
             return FormatOpus(ms, legacy_codecs);
         case VLC_CODEC_FLAC:
             return FormatFLAC(ms, legacy_codecs);
+        case VLC_CODEC_A52:
+        case VLC_CODEC_EAC3:
+            return FormatAC3(ms, fmt);
         case VLC_CODEC_TEXT:
         case VLC_CODEC_WEBVTT:
             return FormatWebVTT(ms);
@@ -206,6 +216,7 @@ bool hls_codec_IsSupported(const es_format_t *fmt)
 {
     return fmt->i_codec == VLC_CODEC_H264 || fmt->i_codec == VLC_CODEC_HEVC ||
            fmt->i_codec == VLC_CODEC_MP4A || fmt->i_codec == VLC_CODEC_OPUS ||
-           fmt->i_codec == VLC_CODEC_FLAC || fmt->i_codec == VLC_CODEC_TEXT ||
+           fmt->i_codec == VLC_CODEC_FLAC || fmt->i_codec == VLC_CODEC_A52 ||
+           fmt->i_codec == VLC_CODEC_EAC3 || fmt->i_codec == VLC_CODEC_TEXT ||
            fmt->i_codec == VLC_CODEC_WEBVTT;
 }
