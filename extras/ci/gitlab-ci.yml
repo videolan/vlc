@@ -325,13 +325,6 @@ debian:
     variables:
         <<: *variables-debian
 
-nightly-debian:
-    extends: debian
-    rules:
-        - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    after_script:
-    artifacts:
-
 #
 # Linux Meson build
 #
