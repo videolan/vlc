@@ -24,6 +24,7 @@
 
 #include <windows.h>
 #include <assert.h>
+#include <errno.h>
 #include <fcntl.h>
 
 #include <vlc_common.h>
@@ -99,7 +100,7 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
     assert(fdv != NULL);
     assert(argv != NULL);
 
-    int ret = -1;
+    int ret = EINVAL;
     int nulfd = -1;
     HANDLE nul_handle = INVALID_HANDLE_VALUE;
     PROCESS_INFORMATION pi = {0};
@@ -116,16 +117,18 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
     wchar_t *application_name = NULL;
     wchar_t *wide_path = ToWide(path);
     if (unlikely(wide_path == NULL))
-        return ret;
+        return ENOMEM;
     wchar_t *cmdline = NULL;
 
     if (fdv[0] == -1 || fdv[1] == -1) {
         nulfd = _open("\\\\.\\NUL", O_RDWR);
-        if (unlikely(nulfd == -1))
+        if (unlikely(nulfd == -1)) {
+            ret = errno;
             goto error;
 
         nul_handle = dup_handle_from_fd(nulfd);
-        if (unlikely(nul_handle == INVALID_HANDLE_VALUE))
+        if (unlikely(nul_handle == INVALID_HANDLE_VALUE)) {
+            ret = EBADF;
             goto error;
 
         if (fdv[0] == -1)
@@ -156,8 +159,10 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
         siEx.StartupInfo.hStdError
     };
     siEx.lpAttributeList = allow_hstd_inherit(handles);
-    if (unlikely(!siEx.lpAttributeList))
+    if (unlikely(!siEx.lpAttributeList)) {
+        ret = ENOMEM;
         goto error;
+    }
 
     if (search) {
         wchar_t short_path[MAX_PATH];
@@ -165,20 +170,28 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
             goto error;
 
         DWORD path_size = SearchPathW(NULL, wide_path, NULL, ARRAY_SIZE(short_path), short_path, NULL);
-        if (path_size == 0)
+        if (path_size == 0) {
+            ret = ENOENT;
             goto error;
+        }
         if (path_size <= ARRAY_SIZE(short_path)) {
             application_name = _wcsdup(short_path);
-            if (unlikely(!application_name))
+            if (unlikely(!application_name)) {
+                ret = ENOMEM;
                 goto error;
+            }
         } else {
             application_name = malloc(path_size * sizeof(*application_name));
-            if (unlikely(!application_name))
+            if (unlikely(!application_name)) {
+                ret = ENOMEM;
                 goto error;
+            }
 
             DWORD full_path_size = SearchPathW(NULL, wide_path, NULL, path_size, application_name, NULL);
-            if (unlikely(path_size < full_path_size))
+            if (unlikely(path_size < full_path_size)) {
+                ret = ENOENT;
                 goto error;
+            }
         }
     } else {
         application_name = wide_path;
@@ -186,24 +199,45 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
 
     if (likely(argv[0])) {
         struct vlc_memstream cmdline_s;
-        if (unlikely(vlc_memstream_open(&cmdline_s) != 0))
+        if (unlikely(vlc_memstream_open(&cmdline_s) != 0)) {
+            ret = ENOMEM;
             goto error;
+        }
         vlc_memstream_printf(&cmdline_s, "%s", argv[0]);
         for (int argc = 1; argv[argc]; ++argc)
             vlc_memstream_printf(&cmdline_s, " %s", argv[argc]);
-        if (vlc_memstream_close(&cmdline_s) != 0)
+        if (vlc_memstream_close(&cmdline_s) != 0) {
+            ret = ENOMEM;
             goto error;
+        }
         cmdline = ToWide(cmdline_s.ptr);
         free(cmdline_s.ptr);
-        if (unlikely(cmdline == NULL))
+        if (unlikely(cmdline == NULL)) {
+            ret = ENOMEM;
             goto error;
+        }
     }
 
     BOOL bSuccess = CreateProcessW(application_name, cmdline, NULL,
                                    NULL, TRUE, EXTENDED_STARTUPINFO_PRESENT,
                                    NULL, NULL, &siEx.StartupInfo, &pi);
-    if (!bSuccess)
-        goto error;
+    if (!bSuccess) {
+        switch (GetLastError()) {
+            case ERROR_FILE_NOT_FOUND:
+            case ERROR_PATH_NOT_FOUND:
+                ret = ENOENT;
+                goto error;
+            case ERROR_ACCESS_DENIED:
+                ret = EACCES;
+                goto error;
+            case ERROR_BAD_EXE_FORMAT:
+                ret = ENOEXEC;
+                goto error;
+            default:
+                ret = EINVAL;
+                goto error;
+        }
+    }
 
     pid_t id = GetProcessId(pi.hProcess);
     if (unlikely(!id))
