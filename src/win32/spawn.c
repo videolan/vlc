@@ -219,7 +219,8 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
     }
 
     BOOL bSuccess = CreateProcessW(application_name, cmdline, NULL,
-                                   NULL, TRUE, EXTENDED_STARTUPINFO_PRESENT,
+                                   NULL, TRUE,
+                                   EXTENDED_STARTUPINFO_PRESENT | CREATE_NO_WINDOW,
                                    NULL, NULL, &siEx.StartupInfo, &pi);
     if (!bSuccess) {
         switch (GetLastError()) {
