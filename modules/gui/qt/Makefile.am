@@ -865,7 +865,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/ic_fluent_skip_back_10.svg \
 	pixmaps/icons/ic_fluent_skip_forward_10.svg \
 	pixmaps/icons/ic_fluent_camera.svg \
-	pixmaps/icons/space.svg \
+	pixmaps/icons/ic_fluent_spacebar.svg \
 	pixmaps/icons/ic_fluent_stop.svg \
 	pixmaps/icons/stream.svg \
 	pixmaps/icons/sync.svg \

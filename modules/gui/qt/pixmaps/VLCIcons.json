@@ -68,7 +68,7 @@
         {"key":"skip_for", "path": "./icons/ic_fluent_skip_forward_10.svg"},
         {"key":"slower", "path": "./icons/ic_fluent_rewind.svg"},
         {"key":"snapshot", "path": "./icons/ic_fluent_camera.svg"},
-        {"key":"space", "path": "./icons/space.svg"},
+        {"key":"space", "path": "./icons/ic_fluent_spacebar.svg"},
         {"key":"stop", "path": "./icons/ic_fluent_stop.svg"},
         {"key":"stream", "path": "./icons/stream.svg"},
         {"key":"time", "path": "./icons/ic_fluent_clock.svg"},
