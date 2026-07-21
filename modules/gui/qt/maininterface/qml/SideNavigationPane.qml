@@ -157,6 +157,9 @@ T.Pane {
                     leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
                     rightPadding: root.safeAreaRightMargin
 
+                    leftInset: root.safeAreaLeftMargin + implicitLeftInset
+                    rightInset: root.safeAreaRightMargin + implicitRightInset
+
                     iconTxt: model.icon
                     text: model.title
 
@@ -227,6 +230,9 @@ T.Pane {
 
                 leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
                 rightPadding: root.safeAreaRightMargin
+
+                leftInset: root.safeAreaLeftMargin + implicitLeftInset
+                rightInset: root.safeAreaRightMargin + implicitRightInset
 
                 iconTxt: VLCIcons.settings
                 text: qsTr("Preferences")

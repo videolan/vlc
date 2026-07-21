@@ -46,11 +46,17 @@ T.ItemDelegate {
 
     padding: VLCStyle.margin_xxsmall
 
-    leftInset: VLCStyle.margin_xxsmall
-    rightInset: VLCStyle.margin_xxsmall
+    leftInset: implicitLeftInset
+    rightInset: implicitRightInset
 
-    topInset: VLCStyle.margin_xxxsmall
-    bottomInset: VLCStyle.margin_xxxsmall
+    topInset: implicitTopInset
+    bottomInset: implicitBottomInset
+
+    property real implicitLeftInset: VLCStyle.margin_xxsmall
+    property real implicitRightInset: VLCStyle.margin_xxsmall
+
+    property real implicitTopInset: VLCStyle.margin_xxxsmall
+    property real implicitBottomInset: VLCStyle.margin_xxxsmall
 
     // Accessible
 
