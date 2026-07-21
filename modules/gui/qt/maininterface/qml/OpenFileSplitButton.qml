@@ -19,6 +19,7 @@ import QtQuick
 
 import VLC.Widgets as Widgets
 import VLC.Dialogs
+import VLC.Util
 
 Widgets.SplitButton {
     id: root
@@ -33,6 +34,8 @@ Widgets.SplitButton {
         qsTr("Open Capture Device"),
         qsTr("Open Location from clipboard"),
     ]
+
+    AccessibleCompat.id: "openFileButton"
 
     onClicked: DialogsProvider.simpleOpenDialog()
 
