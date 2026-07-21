@@ -328,6 +328,9 @@ debian:
         # Run tests
         VLC_TEST_TIMEOUT=60 sh -x ./test/make_check_wrapper.sh -j4
         if [ "${CI_JOB_NAME:0:8}" = "nightly-" ]; then
+            # dvdread from the system fails to link when forcing CFLAGS
+            unset CFLAGS
+            unset CXXFLAGS
             export XZ_OPT="-T 0"
             make -j$NCPU distcheck
         fi
