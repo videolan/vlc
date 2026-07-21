@@ -1356,6 +1356,7 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/SearchBox.qml \
 	widgets/qml/SliderExt.qml \
 	widgets/qml/SortControl.qml \
+	widgets/qml/SplitButton.qml \
 	widgets/qml/SpinBoxExt.qml \
 	widgets/qml/StackViewExt.qml \
 	widgets/qml/PageLoader.qml \

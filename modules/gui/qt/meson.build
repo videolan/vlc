@@ -910,6 +910,7 @@ qml_modules += {
         'widgets/qml/NavigableRow.qml',
         'widgets/qml/PlayCover.qml',
         'widgets/qml/RoundButtonExt.qml',
+        'widgets/qml/SplitButton.qml',
         'widgets/qml/ScaledImage.qml',
         'widgets/qml/TextAutoScroller.qml',
         'widgets/qml/SearchBox.qml',
