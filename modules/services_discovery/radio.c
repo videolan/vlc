@@ -36,6 +36,7 @@
 #define DEFAULT_BASE_URL "https://all.api.radio-browser.info/" // Default Base URL for the Radio Browser API
 #define MRL_PREFIX "radio://"
 #define CSV_MAX_FIELDS 100
+#define STATIONS_PAGE_SIZE 1000
 
 typedef struct
 {
@@ -421,71 +422,89 @@ static int ReadDirectory(stream_t *p_access, input_item_node_t *p_node)
         return VLC_EGENERIC;
     }
 
-    char *stations_endpoint;
-    if (asprintf(&stations_endpoint, "%scsv/stations/bycountrycodeexact/%s?hidebroken=true&order=votes&reverse=true",
-                 p_sys->base_url, p_access->psz_location) < 0)
+    size_t offset = 0;
+    for (;;)
     {
-        return VLC_ENOMEM;
-    }
+        char *stations_endpoint;
+        if (asprintf(&stations_endpoint,
+                     "%scsv/stations/bycountrycodeexact/%s?hidebroken=true&order=votes&reverse=true&limit=%zu&offset=%zu",
+                     p_sys->base_url, p_access->psz_location,
+                     (size_t)STATIONS_PAGE_SIZE, offset) < 0)
+        {
+            return VLC_ENOMEM;
+        }
 
-    csv_parser *parser = csv_parser_init(p_access, stations_endpoint, CSV_MAX_FIELDS);
-    free(stations_endpoint);
+        csv_parser *parser = csv_parser_init(p_access, stations_endpoint, CSV_MAX_FIELDS);
+        free(stations_endpoint);
 
-    if (!parser)
-    {
-        return VLC_EGENERIC;
-    }
+        if (!parser)
+        {
+            return offset == 0 ? VLC_EGENERIC : VLC_SUCCESS;
+        }
 
-    int name_index = csv_parser_get_field_index(parser, "name");
-    int url_index = csv_parser_get_field_index(parser, "url");
-    int favicon_index = csv_parser_get_field_index(parser, "favicon");
-    int homepage_index = csv_parser_get_field_index(parser, "homepage");
-    int tags_index = csv_parser_get_field_index(parser, "tags");
-    int language_index = csv_parser_get_field_index(parser, "language");
-    int codec_index = csv_parser_get_field_index(parser, "codec");
-    int bitrate_index = csv_parser_get_field_index(parser, "bitrate");
-    if (name_index < 0 || url_index < 0)
-    {
-        msg_Err(p_access, "Missing required fields in station data");
+        int name_index = csv_parser_get_field_index(parser, "name");
+        int url_index = csv_parser_get_field_index(parser, "url");
+        int favicon_index = csv_parser_get_field_index(parser, "favicon");
+        int homepage_index = csv_parser_get_field_index(parser, "homepage");
+        int tags_index = csv_parser_get_field_index(parser, "tags");
+        int language_index = csv_parser_get_field_index(parser, "language");
+        int codec_index = csv_parser_get_field_index(parser, "codec");
+        int bitrate_index = csv_parser_get_field_index(parser, "bitrate");
+        if (name_index < 0 || url_index < 0)
+        {
+            msg_Err(p_access, "Missing required fields in station data");
+            csv_parser_free(parser);
+            return offset == 0 ? VLC_EGENERIC : VLC_SUCCESS;
+        }
+
+        size_t rows = 0;
+        bool killed = false;
+        int ret;
+        while ((ret = csv_parser_read_line(parser)))
+        {
+            if (vlc_killed())
+            {
+                killed = true;
+                break;
+            }
+            rows++;
+            if (ret < 0)
+            {
+                continue;
+            }
+
+            if (strlen(parser->fields[name_index]) == 0 || strlen(parser->fields[url_index]) == 0)
+            {
+                continue;
+            }
+
+            input_item_t *station_item = input_item_NewStream(parser->fields[url_index],
+                                                             parser->fields[name_index],
+                                                             INPUT_DURATION_INDEFINITE);
+            if (!station_item)
+            {
+                continue;
+            }
+
+            SetMetaFromField(station_item, parser, favicon_index, vlc_meta_ArtworkURL);
+            SetMetaFromField(station_item, parser, homepage_index, vlc_meta_URL);
+            SetMetaFromField(station_item, parser, tags_index, vlc_meta_Genre);
+            SetMetaFromField(station_item, parser, language_index, vlc_meta_Language);
+
+            SetMetaExtraFromField(station_item, parser, codec_index, "Codec");
+            SetMetaExtraFromField(station_item, parser, bitrate_index, "Bitrate (kb/s)");
+
+            input_item_node_AppendItem(p_node, station_item);
+            input_item_Release(station_item);
+        }
         csv_parser_free(parser);
-        return VLC_EGENERIC;
-    }
 
-    int ret;
-    while ((ret = csv_parser_read_line(parser)))
-    {
-        if(vlc_killed())
+        if (killed || rows < STATIONS_PAGE_SIZE)
+        {
             break;
-        if (ret < 0)
-        {
-            continue;
         }
-
-        if (strlen(parser->fields[name_index]) == 0 || strlen(parser->fields[url_index]) == 0)
-        {
-            continue;
-        }
-
-        input_item_t *station_item = input_item_NewStream(parser->fields[url_index],
-                                                         parser->fields[name_index],
-                                                         INPUT_DURATION_INDEFINITE);
-        if (!station_item)
-        {
-            continue;
-        }
-
-        SetMetaFromField(station_item, parser, favicon_index, vlc_meta_ArtworkURL);
-        SetMetaFromField(station_item, parser, homepage_index, vlc_meta_URL);
-        SetMetaFromField(station_item, parser, tags_index, vlc_meta_Genre);
-        SetMetaFromField(station_item, parser, language_index, vlc_meta_Language);
-
-        SetMetaExtraFromField(station_item, parser, codec_index, "Codec");
-        SetMetaExtraFromField(station_item, parser, bitrate_index, "Bitrate (kb/s)");
-
-        input_item_node_AppendItem(p_node, station_item);
-        input_item_Release(station_item);
+        offset += rows;
     }
-    csv_parser_free(parser);
     return VLC_SUCCESS;
 }
 
