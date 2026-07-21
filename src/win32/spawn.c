@@ -120,38 +120,47 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
         return ENOMEM;
     wchar_t *cmdline = NULL;
 
-    if (fdv[0] == -1 || fdv[1] == -1) {
+    HANDLE hstd[3] = { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE,
+                       INVALID_HANDLE_VALUE };
+    bool need_nul = false;
+
+    for (int i = 0; i < 3; i++) {
+        if (fdv[i] == -1) {
+            need_nul = true;
+            continue;
+        }
+
+        hstd[i] = dup_handle_from_fd(fdv[i]);
+        if (hstd[i] == INVALID_HANDLE_VALUE) {
+            if (fdv[i] < 0 || fdv[i] > 2) {
+                ret = EBADF;
+                goto error;
+            }
+            need_nul = true;
+        }
+    }
+
+    if (need_nul) {
         nulfd = _open("\\\\.\\NUL", O_RDWR);
         if (unlikely(nulfd == -1)) {
             ret = errno;
             goto error;
+        }
 
         nul_handle = dup_handle_from_fd(nulfd);
         if (unlikely(nul_handle == INVALID_HANDLE_VALUE)) {
             ret = EBADF;
             goto error;
+        }
 
-        if (fdv[0] == -1)
-            siEx.StartupInfo.hStdInput = nul_handle;
-        if (fdv[1] == -1)
-            siEx.StartupInfo.hStdOutput = nul_handle;
+        for (int i = 0; i < 3; i++)
+            if (hstd[i] == INVALID_HANDLE_VALUE)
+                hstd[i] = nul_handle;
     }
 
-    if (fdv[0] != -1) {
-        siEx.StartupInfo.hStdInput = dup_handle_from_fd(fdv[0]);
-        if (unlikely(siEx.StartupInfo.hStdInput == INVALID_HANDLE_VALUE))
-            goto error;
-    }
-    if (fdv[1] != -1) {
-        siEx.StartupInfo.hStdOutput = dup_handle_from_fd(fdv[1]);
-        if (unlikely(siEx.StartupInfo.hStdOutput == INVALID_HANDLE_VALUE))
-            goto error;
-    }
-    if (fdv[2] != -1) {
-        siEx.StartupInfo.hStdError = dup_handle_from_fd(fdv[2]);
-        if (unlikely(siEx.StartupInfo.hStdError == INVALID_HANDLE_VALUE))
-            goto error;
-    }
+    siEx.StartupInfo.hStdInput  = hstd[0];
+    siEx.StartupInfo.hStdOutput = hstd[1];
+    siEx.StartupInfo.hStdError  = hstd[2];
 
     HANDLE handles[3] = {
         siEx.StartupInfo.hStdInput,
@@ -256,12 +265,9 @@ error:
     if (nul_handle != INVALID_HANDLE_VALUE)
         CloseHandle(nul_handle);
 
-    if (fdv[0] != -1 && siEx.StartupInfo.hStdInput != INVALID_HANDLE_VALUE)
-        CloseHandle(siEx.StartupInfo.hStdInput);
-    if (fdv[1] != -1 && siEx.StartupInfo.hStdOutput != INVALID_HANDLE_VALUE)
-        CloseHandle(siEx.StartupInfo.hStdOutput);
-    if (siEx.StartupInfo.hStdError != INVALID_HANDLE_VALUE)
-        CloseHandle(siEx.StartupInfo.hStdError);
+    for (int i = 0; i < 3; i++)
+        if (hstd[i] != INVALID_HANDLE_VALUE && hstd[i] != nul_handle)
+            CloseHandle(hstd[i]);
 
     if (siEx.lpAttributeList) {
         DeleteProcThreadAttributeList(siEx.lpAttributeList);
