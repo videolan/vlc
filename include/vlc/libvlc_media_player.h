@@ -1829,7 +1829,7 @@ LIBVLC_API double libvlc_media_player_get_position( libvlc_media_player_t *p_mi 
  *
  * \param p_mi the Media Player
  * \param b_fast prefer fast seeking or precise seeking
- * \param f_pos the position
+ * \param f_pos the position in the range [0;1]
  * \return 0 on success, -1 on error
  */
 LIBVLC_API int libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
