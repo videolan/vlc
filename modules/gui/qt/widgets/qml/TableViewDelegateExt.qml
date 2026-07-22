@@ -342,6 +342,7 @@ T.Control {
         id: dropAreaLayout
         anchors.fill: parent
 
+        index: delegate.index
         view: delegate.ListView.view
     }
 }

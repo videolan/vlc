@@ -128,6 +128,8 @@ ListView {
     component VerticalDropAreaLayout : ColumnLayout {
         spacing: 0
 
+        required property int index
+
         property alias higherDropArea: higherDropArea
         property alias lowerDropArea: lowerDropArea
 
