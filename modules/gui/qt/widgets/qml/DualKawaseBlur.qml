@@ -236,17 +236,6 @@ Item {
         required property Item source
         readonly property int radius: root.radius
 
-        // TODO: We could use `textureSize()` and get rid of this, but we
-        //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
-        //       though the shader is written in GLSL 4.40:
-        property size sourceTextureSize
-
-        Binding on sourceTextureSize {
-            when: root.live
-            value: textureProviderObserver.nativeTextureSize
-            restoreMode: Binding.RestoreNone // No need to restore
-        }
-
         property rect subRect // may not be necessary, but still needed to prevent warning
 
         property alias tpObserver: textureProviderObserver
@@ -319,10 +308,6 @@ Item {
             if (!ds1layer) // context is lost, Qt bug (reproduced with 6.2)
                 return
 
-            ds1.sourceTextureSize = ds1.tpObserver.nativeTextureSize
-            if (ds1.ensurePolished)
-                ds1.ensurePolished()
-
             // Common for both four and two pass mode:
             ds1layer.parent = root
             ds1layer.scheduleUpdate()
@@ -384,10 +369,6 @@ Item {
                 return
             }
 
-            ds2.sourceTextureSize = ds2.tpObserver.nativeTextureSize
-            if (ds2.ensurePolished)
-                ds2.ensurePolished()
-
             ds2layer.inhibitParent = false
             ds2layer.scheduleUpdate()
 
@@ -442,10 +423,6 @@ Item {
                 return
             }
 
-            ds3.sourceTextureSize = ds3.tpObserver.nativeTextureSize
-            if (ds3.ensurePolished)
-                ds3.ensurePolished()
-
             ds3layer.inhibitParent = false
             ds3layer.scheduleUpdate()
 
@@ -495,10 +472,6 @@ Item {
                 root._window = null
                 return
             }
-
-            us0.sourceTextureSize = us0.tpObserver.nativeTextureSize
-            if (us0.ensurePolished)
-                us0.ensurePolished()
 
             us0layer.inhibitParent = false
             us0layer.scheduleUpdate()
@@ -581,10 +554,6 @@ Item {
                 return
             }
 
-            us1.sourceTextureSize = us1.tpObserver.nativeTextureSize
-            if (us1.ensurePolished)
-                us1.ensurePolished()
-
             us1layer.scheduleUpdate()
 
             if (root._window) {
@@ -608,8 +577,6 @@ Item {
             // not in the scene anymore:
             if (root.live)
                 return
-
-            us2.sourceTextureSize = us2.tpObserver.nativeTextureSize
 
             // Last layer is updated, now it is time to release the intermediate buffers:
             console.debug(root, ": releasing intermediate layers, expect the video memory consumption to drop.")
