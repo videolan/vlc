@@ -126,6 +126,8 @@ ListView {
     }
 
     component VerticalDropAreaLayout : ColumnLayout {
+        id: verticalDropAreaLayout
+
         spacing: 0
 
         required property int index
@@ -165,6 +167,13 @@ ListView {
             }
         }
 
+        function mappedIndex() {
+            if (view?.model instanceof QtAbstractProxyModel)
+                return view.model.mapToSource(view.model.index(index, 0)).row
+            else
+                return index
+        }
+
         // NOTE: Nested inline components are not supported in QML as of Qt 6.8
 
         DropArea {
@@ -179,7 +188,7 @@ ListView {
                     return
                 }
 
-                if (isDropAcceptable && !isDropAcceptable(drag, index)) {
+                if (isDropAcceptable && !isDropAcceptable(drag, verticalDropAreaLayout.mappedIndex())) {
                     drag.accepted = false
                     return
                 }
@@ -187,7 +196,7 @@ ListView {
 
             onDropped: (drop) => {
                 console.assert(acceptDrop)
-                commonDrop(index, drop)
+                commonDrop(verticalDropAreaLayout.mappedIndex(), drop)
             }
         }
 
@@ -203,7 +212,7 @@ ListView {
                     return
                 }
 
-                if (isDropAcceptable && !isDropAcceptable(drag, index + 1)) {
+                if (isDropAcceptable && !isDropAcceptable(drag, verticalDropAreaLayout.mappedIndex() + 1)) {
                     drag.accepted = false
                     return
                 }
@@ -211,7 +220,7 @@ ListView {
 
             onDropped: (drop) => {
                 console.assert(acceptDrop)
-                commonDrop(index + 1, drop)
+                commonDrop(verticalDropAreaLayout.mappedIndex() + 1, drop)
             }
         }
     }
