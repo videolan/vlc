@@ -90,6 +90,14 @@ Widgets.PageLoader {
                     sortCriteria: continueWatchingPage.sort.criteria
                     sortOrder: continueWatchingPage.sort.order
                     searchPattern: continueWatchingPage.search.pattern
+
+                    readonly property bool needToNavigateBack: !loading && count === 0
+                                                               && continueWatchingPage.search.pattern === ""
+
+                    onNeedToNavigateBackChanged: {
+                        if (needToNavigateBack)
+                            History.previous(Qt.BacktabFocusReason)
+                    }
                 }
 
                 sectionProperty: model.sortCriteria === "title" ? "title_first_symbol" : ""
