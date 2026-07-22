@@ -28,6 +28,7 @@
 #include "playlist/playlist_model.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "util/colorizedsvgicon.hpp"
+#include "maininterface/navigationmodel.hpp"
 
 // Qt includes
 #include <QPainter>
@@ -1244,4 +1245,123 @@ void PlaylistContextMenu::popup(int selectedIndex, QPoint pos )
     }
 
     m_menu->popup(pos);
+}
+
+NavigationBarContextMenu::NavigationBarContextMenu(QObject *parent)
+    : BasicMenuContainer(parent)
+{
+
+}
+
+void NavigationBarContextMenu::popup(int index, const QPoint& pos, bool setFirstActionAsActive)
+{
+    assert(m_ctx);
+    assert(m_model);
+
+    QMenu *menu = newMenu();
+    assert(menu);
+
+    const auto modelIndex = m_model->index(index, 0);
+    assert(modelIndex.isValid());
+
+    const auto children = m_model->data(modelIndex, NavigationModel::CHILDREN).value<QList<NavigationModelItem>>();
+
+    if (children.count() <= 0)
+    {
+        emit pageRequested(m_model->data(modelIndex, NavigationModel::URI).toStringList());
+        return;
+    }
+
+    populateMenuForChildren(menu, children, setFirstActionAsActive);
+
+    menu->popup(pos);
+}
+
+void NavigationBarContextMenu::popup(const QPoint &pos, bool setFirstActionAsActive)
+{
+    assert(m_ctx);
+    assert(m_model);
+
+    QMenu *menu = newMenu();
+    assert(menu);
+
+    bool activeActionSet = !setFirstActionAsActive;
+    bool menuAdded = false;
+
+    for (int i = 0; i < m_model->rowCount(); ++i)
+    {
+        const auto modelIndex = m_model->index(i, 0);
+        assert(modelIndex.isValid());
+
+        const auto menuTitle = m_model->data(modelIndex, NavigationModel::TITLE).toString();
+        const auto menuUri = m_model->data(modelIndex, NavigationModel::URI).toStringList();
+        const auto menuIcon = m_model->data(modelIndex, NavigationModel::ICON_SVG).toString();
+        const auto menuExpandable = m_model->data(modelIndex, NavigationModel::EXPANDABLE).toBool();
+        const auto menuChildren = m_model->data(modelIndex, NavigationModel::CHILDREN).value<QList<NavigationModelItem>>();
+        const auto menuDepth = m_model->data(modelIndex, NavigationModel::DEPTH).toInt();
+
+        // We currently do not care about deeper levels:
+        if (menuDepth != 0)
+            continue;
+
+        if (menuExpandable && menuChildren.size() > 0)
+        {
+            const auto subMenu = menu->addMenu(menuTitle);
+
+            if (menuIcon.length() > 0)
+                subMenu->setIcon(ColorizedSvgIcon::colorizedIconForWidget(menuIcon, subMenu));
+
+            populateMenuForChildren(subMenu, menuChildren, setFirstActionAsActive);
+
+            menuAdded = true;
+        }
+        else
+        {
+            const auto action = menu->addAction(menuTitle, [this, menuUri]() {
+                emit pageRequested(menuUri);
+            });
+
+            if (menuIcon.length() > 0)
+                action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(menuIcon, qobject_cast<QWidget*>(menu)));
+
+            if (!activeActionSet && !menuAdded)
+            {
+                menu->setActiveAction(action);
+                activeActionSet = true;
+            }
+        }
+    }
+
+    menu->popup(pos);
+}
+
+void NavigationBarContextMenu::populateMenuForChildren(QMenu *menu, const QList<NavigationModelItem> &children, bool setFirstActionAsActive)
+{
+    assert(m_ctx);
+    assert(m_model);
+    assert(menu);
+
+    bool activeActionSet = !setFirstActionAsActive;
+
+    for (const auto& child : children)
+    {
+        const auto childTitle = child.name();
+        assert(childTitle.length() > 0);
+        const auto childUri = child.uri();
+        assert(childUri.length() > 0);
+        const auto childIcon = child.icon_svg();
+
+        const auto action = menu->addAction(childTitle, [this, uri = childUri]() {
+            emit pageRequested(uri);
+        });
+
+        if (childIcon.length() > 0)
+            action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(childIcon, qobject_cast<QWidget*>(menu)));
+
+        if (!activeActionSet)
+        {
+            menu->setActiveAction(action);
+            activeActionSet = true;
+        }
+    }
 }

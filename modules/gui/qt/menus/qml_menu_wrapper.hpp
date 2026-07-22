@@ -483,6 +483,28 @@ private:
     std::unique_ptr<QMenu> m_menu;
 };
 
+class NavigationBarContextMenu : public BasicMenuContainer
+{
+    Q_OBJECT
+
+    SIMPLE_MENU_PROPERTY(QAbstractItemModel*, model, nullptr)
+
+    QML_ELEMENT
+
+public:
+    explicit NavigationBarContextMenu(QObject *parent = nullptr);
+
+public slots:
+    void popup(int index, const QPoint& pos, bool setFirstActionAsActive = false);
+    void popup(const QPoint& pos, bool setFirstActionAsActive = false);
+
+signals:
+    void pageRequested(const QStringList& uri);
+
+private:
+    void populateMenuForChildren(QMenu *menu, const QList<class NavigationModelItem>& children, bool setFirstActionAsActive = false);
+};
+
 #undef SIMPLE_MENU_PROPERTY
 
 #endif // QMLMENUWRAPPER_HPP
