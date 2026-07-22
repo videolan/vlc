@@ -33,7 +33,7 @@
 #include <vlc_interrupt.h>
 #include <ctype.h>
 
-#define DEFAULT_BASE_URL "https://all.api.radio-browser.info/" // Default Base URL for the Radio Browser API
+#define DEFAULT_BASE_URL "https://radio.videolan.org/"
 #define MRL_PREFIX "radio://"
 #define CSV_MAX_FIELDS 100
 #define STATIONS_PAGE_SIZE 1000
@@ -345,7 +345,7 @@ static void *Run(void *data)
         }
 
         char flag[256];
-        snprintf(flag, sizeof(flag), "https://flagsapi.com/%s/flat/64.png", parser->fields[iso_3166_1_index]);
+        snprintf(flag, sizeof(flag), "https://flags.videolan.org/%s/flat/64.png", parser->fields[iso_3166_1_index]);
         input_item_SetMeta(country_node, vlc_meta_ArtworkURL, flag);
 
         services_discovery_AddItem(p_sd, country_node);
