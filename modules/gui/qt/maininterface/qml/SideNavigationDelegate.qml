@@ -156,6 +156,8 @@ T.ItemDelegate {
 
             elide: Text.ElideRight
 
+            visible: control.showText
+
             font.pixelSize: VLCStyle.fontSize_normal
 
             font.weight: control.checked ? Font.DemiBold : Font.Normal
