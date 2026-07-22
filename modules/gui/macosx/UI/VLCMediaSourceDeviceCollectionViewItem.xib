@@ -19,8 +19,8 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jJ3-BQ-y8F">
-                    <rect key="frame" x="-2" y="0.0" width="37" height="16"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" title="Label" usesSingleLineMode="YES" id="Utm-F6-CKx">
+                    <rect key="frame" x="-2" y="0.0" width="218" height="16"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="truncatingTail" title="Label" usesSingleLineMode="YES" id="Utm-F6-CKx">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -45,6 +45,7 @@
                 <constraint firstAttribute="trailing" secondItem="rko-Nc-j4c" secondAttribute="trailing" id="QHi-3o-Z4u"/>
                 <constraint firstItem="rko-Nc-j4c" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="Va8-hk-LhR"/>
                 <constraint firstItem="jJ3-BQ-y8F" firstAttribute="leading" secondItem="rko-Nc-j4c" secondAttribute="leading" id="rFY-qw-fsf"/>
+                <constraint firstItem="jJ3-BQ-y8F" firstAttribute="trailing" secondItem="rko-Nc-j4c" secondAttribute="trailing" id="sAI-o0-Vaz"/>
                 <constraint firstAttribute="bottom" secondItem="jJ3-BQ-y8F" secondAttribute="bottom" id="tms-ub-oAu"/>
             </constraints>
             <point key="canvasLocation" x="-211" y="66.5"/>
