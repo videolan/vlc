@@ -247,15 +247,15 @@ Item {
             restoreMode: Binding.RestoreNone // No need to restore
         }
 
-        property rect normalRect // may not be necessary, but still needed to prevent warning
+        property rect subRect // may not be necessary, but still needed to prevent warning
 
         property alias tpObserver: textureProviderObserver
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
         // Maybe we should have vertex shader unconditionally, and calculate the half pixel there instead of fragment shader?
-        vertexShader: (normalRect.width > 0.0 && normalRect.height > 0.0) ? "qrc:///shaders/SubTexture.vert.qsb"
-                                                                          : ""
+        vertexShader: (subRect.width > 0.0 && subRect.height > 0.0) ? "qrc:///shaders/SubTexture.vert.qsb"
+                                                                    : ""
 
         supportsAtlasTextures: true
 
@@ -298,15 +298,11 @@ Item {
 
         source: root.source
 
-        // TODO: Instead of normalizing here, we could use GLSL 1.30's `textureSize()`
-        //       and normalize in the vertex shader, but we can not because we are
-        //       targeting GLSL 1.20/ESSL 1.0, even though the shader is written in
-        //       GLSL 4.40.
-        normalRect: (root.sourceRect.width > 0.0 && root.sourceRect.height > 0.0) ? Qt.rect(root.sourceRect.x * root.eDPR / sourceTextureSize.width,
-                                                                                            root.sourceRect.y * root.eDPR / sourceTextureSize.height,
-                                                                                            root.sourceRect.width * root.eDPR / sourceTextureSize.width,
-                                                                                            root.sourceRect.height * root.eDPR / sourceTextureSize.height)
-                                                                                  : Qt.rect(0.0, 0.0, 0.0, 0.0)
+        subRect: (root.sourceRect.width > 0.0 && root.sourceRect.height > 0.0) ? Qt.rect(root.sourceRect.x * root.eDPR,
+                                                                                         root.sourceRect.y * root.eDPR,
+                                                                                         root.sourceRect.width * root.eDPR,
+                                                                                         root.sourceRect.height * root.eDPR)
+                                                                               : Qt.rect(0.0, 0.0, 0.0, 0.0)
     }
 
     DefaultShaderEffectSource {
@@ -688,10 +684,10 @@ Item {
 
         // NOTE: Vertex shader is set in `DefaultShaderEffect` when `normalRect` is valid.
 
-        normalRect: useSubTexture ? Qt.rect((root._localVisualRect.x - root._localViewportRect.x) * root.eDPR / sourceTextureSize.width,
-                                            (root._localVisualRect.y - root._localViewportRect.y) * root.eDPR / sourceTextureSize.height,
-                                            root._localVisualRect.width * root.eDPR / sourceTextureSize.width,
-                                            root._localVisualRect.height * root.eDPR / sourceTextureSize.height)
+        subRect: useSubTexture ? Qt.rect((root._localVisualRect.x - root._localViewportRect.x) * root.eDPR,
+                                         (root._localVisualRect.y - root._localViewportRect.y) * root.eDPR,
+                                         root._localVisualRect.width * root.eDPR,
+                                         root._localVisualRect.height * root.eDPR)
                                   : Qt.rect(0,0,0,0)
     }
 }

@@ -25,12 +25,14 @@ layout(std140, binding = 0) uniform buf {
     mat4 qt_Matrix;
     float qt_Opacity;
 
-    vec4 normalRect;
+    vec4 subRect;
 };
 
+layout(binding = 1) uniform sampler2D source;
+
 void main() {
-    // TODO: With GLSL 1.30, we can use `textureSize()` and normalize the coordinate here,
-    //       rather than asking an already normalized rectangle.
-    qt_TexCoord0 = normalRect.xy + normalRect.zw * qt_MultiTexCoord0;
+    vec2 size = textureSize(source, 0);
+
+    qt_TexCoord0 = vec2(subRect.x / size.x, subRect.y / size.y) + vec2(subRect.z / size.x, subRect.w / size.y) * qt_MultiTexCoord0;
     gl_Position = qt_Matrix * qt_Vertex;
 }

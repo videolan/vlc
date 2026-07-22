@@ -34,7 +34,7 @@ layout(std140, binding = 0) uniform qt_buf {
     mat4 qt_Matrix;
     float qt_Opacity;
 
-    vec4 normalRect; // unused, but Qt needs it as it used in first-pass vertex shader for sub-texturing (Qt bug?)
+    vec4 subRect; // unused, but Qt needs it as it used in first-pass vertex shader for sub-texturing (Qt bug?)
     vec2 sourceTextureSize;
     int radius;
 
