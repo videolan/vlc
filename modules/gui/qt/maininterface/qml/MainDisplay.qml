@@ -519,11 +519,14 @@ FocusScope {
         }
 
         Rectangle {
+            id: smallScreenOverlay
+
             // overlay for smallscreens
             z: 2
 
             anchors.fill: parent
-            visible: VLCStyle.isScreenSmall && (playlistLoader.shown || (pannelVisiblity.showNavigation && sidebar.visible))
+
+            visible: VLCStyle.isScreenSmall && playlistLoader.shown
             color: "black"
             opacity: 0.4
 
@@ -549,9 +552,13 @@ FocusScope {
                 left: parent.left
             }
 
-            width: 0
+            width: VLCStyle.isScreenReallySmall ? 0.0 : collapsedWidth
 
-            visible: false
+            property real collapsedWidth: VLCStyle.icon_normal + VLCStyle.margin_small + VLCStyle.margin_xsmall + VLCStyle.applicationHorizontalMargin
+
+            delegateShowText: (state === "expanded")
+
+            visible: (width > 0.0)
 
             height: parent.height - g_mainDisplay.displayMargin
 
@@ -559,14 +566,44 @@ FocusScope {
 
             topPadding: 0
             leftPadding: 0
-            rightPadding: sidebarResizeHandle.visualBorder.width
+            rightPadding: sidebarResizeHandle.visible ? sidebarResizeHandle.visualBorder.width : 0.0
             bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.margin_small
 
             safeAreaLeftMargin: VLCStyle.applicationHorizontalMargin
 
             useAcrylic: !VLCStyle.isScreenSmall
 
+            NavigationBarContextMenu {
+                id: navigationBarContextMenu
+
+                ctx: MainCtx
+
+                model: sidebar.model
+
+                onPageRequested: (uri) => {
+                    if (stackView.isDefaulLoadedForPath([...uri]) ||
+                        History.exactMatch(History.viewPath, uri)) {
+                        stackView.positionContentAtBeginning()
+                        return
+                    }
+
+                    History.push(uri)
+                }
+            }
+
             onItemClicked: (modelUri, item) => {
+                console.assert(modelUri)
+
+                console.assert(item)
+                if ((sidebar.state !== 'expanded') && item.model.expandable) {
+                    // TODO: Investigate opening the menu on hover, if
+                    //       we switch to `Popup.Item` type of menus.
+                    const mappedPos = mapToGlobal(item.x + item.width, item.y)
+                    navigationBarContextMenu.popup(item.index, mappedPos, !item.hovered)
+
+                    return
+                }
+
                 if (stackView.isDefaulLoadedForPath([...modelUri]) ||
                     !!modelUri.length && History.exactMatch(History.viewPath, modelUri)) {
                     stackView.positionContentAtBeginning()
@@ -600,7 +637,6 @@ FocusScope {
                 PropertyChanges {
                     target: sidebar
                     width: sidebar.implicitWidth
-                    visible: true
                 }
             }
 
@@ -611,14 +647,10 @@ FocusScope {
                 from: ""; to: "expanded";
                 reversible: true
 
-                SequentialAnimation {
-                    PropertyAction { property: "visible" }
-
-                    NumberAnimation {
-                        property: "width"
-                        duration: VLCStyle.duration_short
-                        easing.type: Easing.InOutSine
-                    }
+                NumberAnimation {
+                    property: "width"
+                    duration: VLCStyle.duration_short
+                    easing.type: Easing.InOutSine
                 }
             }
 
@@ -631,6 +663,7 @@ FocusScope {
                 panelObject: MainCtx.navigationPanel
                 atRight: true
 
+                resizeHandle.visible: (sidebar.state === "expanded")
                 visualBorder.visible: !topLeftCornerBackground.visible
 
                 minimumWidth: sidebar.minimumWidth
@@ -782,7 +815,7 @@ FocusScope {
             } else {
                 if (UpdateModel.updateStatus === _updateStatusOnDismissal)
                     return false // already dismissed with the same status
-            
+
                 switch (UpdateModel.updateStatus) {
                     case UpdateModel.Unchecked:
                     case UpdateModel.Checking:
@@ -834,7 +867,7 @@ FocusScope {
         Navigation.downItem: miniPlayer
         Navigation.navigable: (active && height > 0.0)
 
-        onLoaded: {            
+        onLoaded: {
             item.background.visible = Qt.binding(function() { return !stackViewParent.layer.enabled })
 
             item.leftPadding = Qt.binding(function() { return VLCStyle.margin_large + VLCStyle.applicationHorizontalMargin })
@@ -1045,6 +1078,7 @@ FocusScope {
         property alias atRight: resizeHandle.atRight
 
         property alias visualBorder: visualBorder
+        property alias resizeHandle: resizeHandle
 
         property alias minimumWidth: resizeHandle.minimumWidth
         property alias maximumWidth: resizeHandle.maximumWidth
