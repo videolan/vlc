@@ -702,7 +702,8 @@ vlc_player_GetPosition(vlc_player_t *player);
  * a starting position.
  *
  * @param player locked player instance
- * @param position position in the range [0.f;1.f]
+ * @param position position in the range [0;1] (VLC_PLAYER_WHENCE_ABSOLUTE)
+ * or [-1;1] (VLC_PLAYER_WHENCE_RELATIVE)
  * @param speed precise of fast
  * @param whence absolute or relative
  */
