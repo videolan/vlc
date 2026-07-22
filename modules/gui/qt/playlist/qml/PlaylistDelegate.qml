@@ -109,11 +109,18 @@ T.Control {
 
     Keys.onMenuPressed: {
         if (contextMenu) {
-            contextMenu.popup(index, delegate.mapToGlobal(0, delegate.height))
+            contextMenu.popup(delegate.mappedIndex(), delegate.mapToGlobal(0, delegate.height))
         }
     }
 
     // Functions
+
+    function mappedIndex() {
+        if (delegate.view?.model instanceof QtAbstractProxyModel)
+            return delegate.view.model.mapToSource(delegate.view.model.index(delegate.index, 0))?.row
+        else
+            return delegate.index
+    }
 
     // Childs
 
@@ -324,12 +331,13 @@ T.Control {
                 }
 
                 if (contextMenu && button === Qt.RightButton)
-                    contextMenu.popup(index, eventPoint.globalPosition)
+                    contextMenu.popup(delegate.mappedIndex(), eventPoint.globalPosition)
             }
 
             onDoubleTapped: (eventPoint, button) => {
-                if (button !== Qt.RightButton)
-                    MainPlaylistController.goTo(index, true)
+                if (button !== Qt.RightButton) {
+                    MainPlaylistController.goTo(delegate.mappedIndex(), true)
+                }
             }
 
             Component.onCompleted: {
@@ -358,7 +366,23 @@ T.Control {
                             view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
                         }
 
-                        dragItem.indexes = view.selectionModel.selectedIndexesFlat
+                        let items
+
+                        const selectedIndexes = view.selectionModel.selectedIndexesFlat
+                        if (view.model instanceof QtAbstractProxyModel) {
+                            items = []
+                            for (let i = 0; i < selectedIndexes.length; ++i) {
+                                const mappedIndex = view.model.mapToSource(view.model.index(selectedIndexes[i], 0))
+                                items.push(mappedIndex.row)
+                            }
+                        } else {
+                            items = selectedIndexes
+                        }
+
+                        if (items.length <= 0)
+                            return
+
+                        dragItem.indexes = items
                         dragItem.indexesFlat = true
                         dragItem.Drag.active = true
                     } else {
@@ -381,7 +405,7 @@ T.Control {
             }
 
             onContextMenuRequested: (index, globalPoint) => {
-                delegate.contextMenu.popup(index, globalPoint)
+                delegate.contextMenu.popup(delegate.mappedIndex(), globalPoint)
             }
         }
     }
