@@ -100,7 +100,8 @@ static char *BuildChildUrl(access_sys_t *sys, const char *href)
     return abs;
 }
 
-static bool IsSelfHref(const access_sys_t *sys, const char *href)
+static bool IsSelfHref(const access_sys_t *sys, const char *href,
+                       bool is_collection)
 {
     vlc_url_t u;
     if (vlc_UrlParse(&u, href) != 0 || u.psz_path == NULL)
@@ -112,7 +113,12 @@ static bool IsSelfHref(const access_sys_t *sys, const char *href)
     /* Compare the href path against our request path (without any query). */
     size_t hlen = strlen(u.psz_path);
     size_t slen = strcspn(sys->path, "?");
+
+    if (is_collection && hlen == slen + 1 && u.psz_path[slen] == '/')
+        u.psz_path[--hlen] = '\0';
+
     bool match = hlen == slen && memcmp(u.psz_path, sys->path, hlen) == 0;
+
     vlc_UrlClean(&u);
     return match;
 }
@@ -442,7 +448,8 @@ static int ParseMultistatus(stream_t *access, stream_t *body,
             {
                 /* memset on successful push transfers href/name ownership
                  * to the vector; ResetEntry frees them otherwise. */
-                if (cur.href != NULL && IsSelfHref(sys, cur.href))
+                if (cur.href != NULL
+                 && IsSelfHref(sys, cur.href, cur.is_collection))
                 {
                     if (self_is_collection_out != NULL)
                         *self_is_collection_out = cur.is_collection;
