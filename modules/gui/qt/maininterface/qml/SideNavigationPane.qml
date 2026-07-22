@@ -40,6 +40,8 @@ T.Pane {
 
     property bool useAcrylic: false
 
+    property bool delegateShowText: true
+
     readonly property int minimumWidth: VLCStyle.expandNavigationPaneWidth + safeAreaLeftMargin + safeAreaRightMargin
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
@@ -170,6 +172,8 @@ T.Pane {
                     iconTxt: model.icon
                     text: model.title
 
+                    showText: root.delegateShowText
+
                     Binding on highlighted {
                         when: !!model.uri && History.match(History.viewPath, model.uri)
                         value: true
@@ -245,6 +249,8 @@ T.Pane {
                 text: qsTr("Preferences")
 
                 checked: DialogsProvider.prefsDialogVisible
+
+                showText: root.delegateShowText
 
                 onClicked: DialogsProvider.prefsDialog()
 
