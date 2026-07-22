@@ -30,7 +30,7 @@ import VLC.Util
 T.Pane {
     id: root
 
-    signal itemClicked(uri : var)
+    signal itemClicked(uri : var, item : Item)
 
     //safe area margins for delegate content,
     //so the background of the delegates fills the available space
@@ -177,7 +177,7 @@ T.Pane {
                     checked: !model.expanded && highlighted
 
                     onClicked: {
-                        itemClicked(model.uri)
+                        itemClicked(model.uri, this)
                         listView.currentIndex = index
                         listView.forceActiveFocus(focusReason)
                     }
