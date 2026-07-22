@@ -33,7 +33,7 @@ shader_files = files(shader_sources)
 qt_bin_directory = qt6_dep.get_variable(pkgconfig: 'bindir', configtool: 'QT_HOST_BINS')
 qsb = find_program('qsb', dirs: qt_bin_directory, required: true)
 
-qsb_params = ['--glsl=100 es,120,150', '--batchable', '-O']
+qsb_params = ['--glsl=300 es,130,150', '--batchable', '-O']
 if host_system == 'windows'
     qsb_params += ['--hlsl=50', '-c']
 elif host_system == 'darwin'

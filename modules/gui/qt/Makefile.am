@@ -1485,7 +1485,7 @@ BUILT_SOURCES += \
     $(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb) \
     $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb)
 
-QSB_PARAMS = --glsl="100 es,120,150" --batchable -O
+QSB_PARAMS = --glsl="300 es,130,150" --batchable -O
 if HAVE_WIN32
 QSB_PARAMS += --hlsl=50 -c
 endif
