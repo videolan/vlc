@@ -223,12 +223,6 @@ Item {
         // batch rendering in `ShaderEffect`.
         readonly property bool shouldCrop: (root.fillMode === Image.PreserveAspectCrop)
 
-        // Native texture size (atlas size if texture is in the atlas):
-        // TODO: We could use `textureSize()` and get rid of this, but we
-        //       can not because we are targeting GLSL 1.20/ESSL 1.0, even
-        //       though the shader is written in GLSL 4.40.
-        readonly property size sourceTextureSize: tpObserver.nativeTextureSize
-
         // WARNING: Do not put this into the uniform block of the shader,
         //          since it depends on the implicit size, it would break
         //          batch rendering. This is a concern for delegates.
