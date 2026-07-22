@@ -423,7 +423,8 @@ QHash<int,QByteArray> NavigationModel::roleNames() const
         {TITLE, QByteArrayLiteral("title") },
         {URI, QByteArrayLiteral("uri") },
         {DEPTH, QByteArrayLiteral("depth") },
-        {ICON, QByteArrayLiteral("icon") },
+        // TODO: Use "icon" instead, when minimum Qt increases:
+        {ICON, QByteArrayLiteral("icon_alias") },
         {ICON_SVG, QByteArrayLiteral("icon_svg")},
         {EXPANDABLE, QByteArrayLiteral("expandable") },
         {EXPANDED, QByteArrayLiteral("expanded") },

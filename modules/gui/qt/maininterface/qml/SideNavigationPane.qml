@@ -171,24 +171,31 @@ T.Pane {
                     leftInset: root.safeAreaLeftMargin + implicitLeftInset
                     rightInset: root.safeAreaRightMargin + implicitRightInset
 
-                    iconTxt: model.icon
-                    text: model.title
+                    iconTxt: icon_alias
+                    text: title
 
                     showText: root.delegateShowText
 
-                    required property var model
+                    required property string title
+                    required property var uri
+                    required property int depth
+                    // TODO: Qt 6.2 has property `icon` marked final, so we can't override it:
+                    required property string icon_alias
+                    required property bool expandable
+                    required property bool expanded
+
                     required property int index
 
                     visible: showText || (iconTxt.length > 0)
 
                     Binding on highlighted {
-                        when: !!model.uri && History.match(History.viewPath, model.uri)
+                        when: !!uri && History.match(History.viewPath, uri)
                         value: true
                     }
-                    checked: (!showText || !model.expanded) && highlighted
+                    checked: (!showText || !expanded) && highlighted
 
                     onClicked: {
-                        itemClicked(model.uri, this)
+                        itemClicked(uri, this)
                         listView.currentIndex = index
                         listView.forceActiveFocus(focusReason)
                     }

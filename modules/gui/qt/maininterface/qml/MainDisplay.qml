@@ -601,7 +601,7 @@ FocusScope {
                 console.assert(modelUri)
 
                 console.assert(item)
-                if ((sidebar.state !== 'expanded') && item.model.expandable) {
+                if ((sidebar.state !== 'expanded') && item.expandable) {
                     // TODO: Investigate opening the menu on hover, if
                     //       we switch to `Popup.Item` type of menus.
                     const mappedPos = mapToGlobal(item.x + item.width, item.y)
