@@ -306,7 +306,12 @@ ListView {
                 onDropped: function(drop) {
                     console.assert(!!root.acceptDropFunc)
                     dropOperationOngoing = true
-                    root.acceptDropFunc(root.model.count, drop)
+                    let targetIndex
+                    if (root.model instanceof QtAbstractProxyModel)
+                        targetIndex = (root.model.mapToSource(root.model.index(root.count - 1, 0))?.row ?? 0) + 1
+                    else
+                        targetIndex = root.count
+                    root.acceptDropFunc(targetIndex, drop)
                         .then(() => { dropOperationOngoing = false })
                 }
             }
