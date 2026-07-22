@@ -89,7 +89,7 @@ T.Pane {
         }
 
         onRequestInputItems: (indexes, data, resolve, reject) => {
-            resolve(root.model.getItemsForIndexes(root.selectionModel.selectedIndexesFlat))
+            resolve(root.model.getItemsForIndexes((indexes?.length > 0) ? indexes : root.selectionModel.selectedIndexesFlat))
         }
     }
 
