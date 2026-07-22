@@ -529,6 +529,8 @@ static int Open(vlc_object_t *obj)
     if (sys->manager == NULL)
         goto clean;
 
+    sys->url.psz_protocol = sys->secure ? (char *)"https" : (char *)"http";
+
     vlc_credential crd;
     vlc_credential_init(&crd, &sys->url);
 
@@ -582,6 +584,8 @@ static int Open(vlc_object_t *obj)
         goto clean;
     }
 
+    vlc_credential_store(&crd, obj);
+
     /* Follow Location on redirects. */
     if (status == 301 || status == 302 || status == 303
      || status == 307 || status == 308)
@@ -621,7 +625,6 @@ static int Open(vlc_object_t *obj)
         goto clean;
     }
 
-    vlc_credential_store(&crd, obj);
     vlc_credential_clean(&crd);
 
     bool self_is_collection = false;
