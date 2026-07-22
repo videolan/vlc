@@ -178,7 +178,7 @@ T.Pane {
                         when: !!model.uri && History.match(History.viewPath, model.uri)
                         value: true
                     }
-                    checked: !model.expanded && highlighted
+                    checked: (!showText || !model.expanded) && highlighted
 
                     onClicked: {
                         itemClicked(model.uri, this)
