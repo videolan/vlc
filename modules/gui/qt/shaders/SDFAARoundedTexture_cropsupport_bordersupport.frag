@@ -62,7 +62,6 @@ layout(std140, binding = 0) uniform buf {
 #endif
 #ifdef CROP_SUPPORT
     int shouldCrop; // WARNING: intentionally not a boolean
-    vec2 sourceTextureSize; // TODO: Ditch targeting GLSL 1.20/ESSL 1.0, and use `textureSize()` instead.
 #endif
 #ifdef BACKGROUND_SUPPORT
     vec4 backgroundColor;
@@ -129,7 +128,8 @@ void main()
     {
         vec2 texCoord;
 
-        vec2 denormalSubTextureSize = vec2(sourceTextureSize.x * qt_SubRect_source.z, sourceTextureSize.y * qt_SubRect_source.w);
+        vec2 texSize = textureSize(source, 0);
+        vec2 denormalSubTextureSize = vec2(texSize.x * qt_SubRect_source.z, texSize.y * qt_SubRect_source.w);
 
         float implicitRatio = denormalSubTextureSize.x / denormalSubTextureSize.y;
         float ratio = size.x / size.y;
