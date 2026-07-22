@@ -174,6 +174,9 @@ T.Pane {
 
                     showText: root.delegateShowText
 
+                    required property var model
+                    required property int index
+
                     Binding on highlighted {
                         when: !!model.uri && History.match(History.viewPath, model.uri)
                         value: true
