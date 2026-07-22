@@ -250,6 +250,7 @@ void MainUI::registerQMLTypes()
 #endif
 
         qmlRegisterTypesAndRevisions<NavigationModel>( uri, versionMajor);
+        qmlRegisterTypesAndRevisions<NavigationBarContextMenu>( uri, versionMajor );
 
         // Foreign types:
         qmlRegisterTypesAndRevisions<vlc::QAbstractProxyModelForeign>(uri, versionMajor);
