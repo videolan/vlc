@@ -109,6 +109,13 @@ T.Pane {
 
                 model: navigationModel
 
+                Binding {
+                    target: listView.T.ScrollBar.vertical
+                    property: "policy"
+                    when: listView.T.ScrollBar.vertical?.size > (1.0 - Number.EPSILON)
+                    value: T.ScrollBar.AlwaysOff
+                }
+
                 colorContext.colorSet: ColorContext.Window
 
                 fadingEdge.backgroundColor:  (root.background && (root.background.color.a >= 1.0)) ? root.background.color
