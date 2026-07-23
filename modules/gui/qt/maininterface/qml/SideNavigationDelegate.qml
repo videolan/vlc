@@ -91,6 +91,8 @@ T.ItemDelegate {
             }
             implicitHeight: parent.height * 3 / 4
             visible: control.checked
+
+            radius: control.radius / 2
         }
     }
 
