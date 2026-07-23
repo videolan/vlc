@@ -89,7 +89,7 @@ T.ItemDelegate {
                 leftMargin: VLCStyle.margin_xxxsmall
                 verticalCenter: parent.verticalCenter
             }
-            implicitHeight: parent.height * 3 / 4
+            implicitHeight: parent.height / 2
             visible: control.checked
 
             radius: control.radius / 2
