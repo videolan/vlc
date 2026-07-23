@@ -78,6 +78,18 @@ T.ToolTip {
         wrapMode: Text.WordWrap
 
         color: theme.fg.primary
+
+        Component.onCompleted: {
+            if (MainCtx.createWindowWithoutRedirectionSurface) { // Win32
+                Window.windowChanged.connect(this, () => {
+                    if (Window.window && (Window.window !== MainCtx.intfMainWindow)) { // Only relevant when `popupType` is `Popup.Window`
+                        const ret = MainCtx.createWindowWithoutRedirectionSurface(Window.window)
+                        if (!ret)
+                            console.debug("MainCtx::createWindowWithoutRedirectionSurface(): returned false for window", this)
+                    }
+                })
+            }
+        }
     }
 
     background: Rectangle {
