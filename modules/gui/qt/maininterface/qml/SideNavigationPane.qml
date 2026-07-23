@@ -163,7 +163,7 @@ T.Pane {
                     width: ListView.view.contentWidth
                     height: preferredHeight
 
-                    property real preferredHeight: visible ? VLCStyle.buttonHeightNavigationPane : 0.0
+                    property real preferredHeight: shouldShow ? VLCStyle.buttonHeightNavigationPane : 0.0
 
                     leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
                     rightPadding: root.safeAreaRightMargin
@@ -186,7 +186,14 @@ T.Pane {
 
                     required property int index
 
-                    visible: showText || (iconTxt.length > 0)
+                    visible: (height > 0.0)
+
+                    property bool shouldShow: showText || (iconTxt.length > 0)
+
+                    onShouldShowChanged: {
+                        if (listView.readyForAnimations)
+                            heightBehavior.enabled = true // At this point, it can keep being enabled for good.
+                    }
 
                     Binding on highlighted {
                         when: !!uri && History.match(History.viewPath, uri)
