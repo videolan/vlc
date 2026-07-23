@@ -40,6 +40,8 @@ ListSelectionModel::ListSelectionModel(QAbstractItemModel *model, QObject *paren
             connect(model, &QAbstractItemModel::layoutChanged, this, &ListSelectionModel::invalidateCache);
             connect(model, &QAbstractItemModel::modelReset, this, &ListSelectionModel::invalidateCache);
         }
+
+        invalidateCache();
     });
 
     connect(this, &QItemSelectionModel::selectionChanged, this, &ListSelectionModel::invalidateCache);
