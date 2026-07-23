@@ -1390,12 +1390,12 @@ AC_ARG_ENABLE([extra_checks],
                     [Turn some warnings into compilation error (default disabled)]),,
                     [enable_extra_checks="no"])
 AS_IF([test "${enable_extra_checks}" = "yes"], [
-    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=incompatible-pointer-types -Werror=restrict -Werror=int-conversion -Werror=implicit-int -Werror=return-mismatch -Werror=declaration-missing-parameter-type -Werror=excess-initializers -Werror=unterminated-string-initialization], [CFLAGS])
+    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=incompatible-pointer-types -Werror=restrict -Werror=int-conversion -Werror=implicit-int -Werror=return-mismatch -Werror=declaration-missing-parameter-type -Werror=excess-initializers -Werror=unterminated-string-initialization -Werror=gnu-pointer-arith], [CFLAGS])
     AC_LANG_PUSH(C++)
-    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=excess-initializers -Werror=unterminated-string-initialization], [CXXFLAGS])
+    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=excess-initializers -Werror=unterminated-string-initialization -Werror=gnu-pointer-arith], [CXXFLAGS])
     AC_LANG_POP(C++)
     AC_LANG_PUSH([Objective C])
-    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=excess-initializers -Werror=incompatible-pointer-types -Werror=int-conversion -Werror=implicit-int -Wextra -Werror=unterminated-string-initialization], [OBJCFLAGS])
+    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=excess-initializers -Werror=incompatible-pointer-types -Werror=int-conversion -Werror=implicit-int -Wextra -Werror=unterminated-string-initialization -Werror=gnu-pointer-arith], [OBJCFLAGS])
     AC_LANG_POP([Objective C])
 ])
 

@@ -541,12 +541,14 @@ if get_option('extra_checks')
         '-Werror=declaration-missing-parameter-type',
         '-Werror=excess-initializers',
         '-Werror=unterminated-string-initialization',
+        '-Werror=gnu-pointer-arith',
     ]), language: ['c'])
     add_project_arguments(cpp.get_supported_arguments([
         '-Werror=missing-field-initializers',
         '-Werror=format',
         '-Werror=excess-initializers',
         '-Werror=unterminated-string-initialization',
+        '-Werror=gnu-pointer-arith',
     ]), language: ['cpp', 'objcpp'])
 endif
 
