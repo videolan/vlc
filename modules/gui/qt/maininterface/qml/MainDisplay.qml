@@ -946,8 +946,8 @@ FocusScope {
             visible: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
             enabled: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
 
-            dragXMin: 0
-            dragXMax: g_mainDisplay.width - playerPip.width
+            dragXMin: VLCStyle.applicationHorizontalMargin
+            dragXMax: g_mainDisplay.width - playerPip.width - VLCStyle.applicationHorizontalMargin
             dragYMin: localTopbar.y + localTopbar.height
             dragYMax: loaderUpdatePane.y - playerPip.height
 
