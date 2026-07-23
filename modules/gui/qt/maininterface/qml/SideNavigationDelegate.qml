@@ -35,6 +35,8 @@ T.ItemDelegate {
 
     property bool showText: true
 
+    property real radius: VLCStyle.button_radius
+
     // Settings
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
@@ -78,6 +80,8 @@ T.ItemDelegate {
         enabled: theme.initialized
         color: theme.bg.primary
         border.color: visualFocus ? theme.visualFocus : "transparent"
+
+        radius: control.radius
 
         Widgets.CurrentIndicator {
             anchors {
