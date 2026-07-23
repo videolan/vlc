@@ -1408,7 +1408,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                                                    p_stream->i_headers + p_oggpacket->bytes );
             if( p_stream->p_headers )
             {
-                memcpy( &p_stream->p_headers[p_stream->i_headers], p_oggpacket->packet, p_oggpacket->bytes );
+                memcpy( (uint8_t*)p_stream->p_headers + p_stream->i_headers, p_oggpacket->packet, p_oggpacket->bytes );
                 p_stream->i_headers += p_oggpacket->bytes;
             }
             else
