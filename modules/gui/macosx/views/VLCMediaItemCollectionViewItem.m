@@ -23,6 +23,7 @@
 
 #import "VLCMediaItemCollectionViewItem.h"
 
+#import "extensions/NSAppearance+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
@@ -109,12 +110,7 @@ const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)updateColoredAppearance:(NSAppearance *)appearance
 {
     NSParameterAssert(appearance);
-    BOOL isDark = NO;
-    if (@available(macOS 10.14, *)) {
-        isDark = 
-            [appearance.name isEqualToString:NSAppearanceNameDarkAqua] ||
-            [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
-    }
+    const BOOL isDark = appearance.shouldShowDarkAppearance;
 
     self.mediaTitleTextField.textColor = isDark 
         ? NSColor.VLClibraryDarkTitleColor

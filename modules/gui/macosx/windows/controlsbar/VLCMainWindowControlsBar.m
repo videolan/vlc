@@ -25,6 +25,7 @@
 
 #import "VLCControlsBarCommon.h"
 
+#import "extensions/NSAppearance+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
@@ -148,8 +149,7 @@
         return;
     } else if (@available(macOS 10.14, *)) {
         NSAppearance * const appearance = change[NSKeyValueChangeNewKey];
-        const BOOL isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || 
-                            [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+        const BOOL isDark = appearance.shouldShowDarkAppearance;
         self.visualEffectView.layer.borderColor = isDark ?
             NSColor.VLCDarkSubtleBorderColor.CGColor : NSColor.VLCLightSubtleBorderColor.CGColor;
     }

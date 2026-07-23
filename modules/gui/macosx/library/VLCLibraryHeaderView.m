@@ -22,6 +22,7 @@
 
 #import "VLCLibraryHeaderView.h"
 
+#import "extensions/NSAppearance+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
@@ -235,8 +236,7 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
     } else if ([keyPath isEqualToString:@"effectiveAppearance"]) {
         if (@available(macOS 10.14, *))  {
             NSAppearance * const appearance = change[NSKeyValueChangeNewKey];
-            const BOOL isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] ||
-                                [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+            const BOOL isDark = appearance.shouldShowDarkAppearance;
             self.backgroundView.layer.borderColor = isDark ?
                 NSColor.VLCDarkSubtleBorderColor.CGColor : NSColor.VLCLightSubtleBorderColor.CGColor;
         }

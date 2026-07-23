@@ -24,6 +24,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 
+#import "extensions/NSAppearance+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
@@ -263,11 +264,7 @@
 {
     [super updateColorsBasedOnAppearance:appearance];
 
-    BOOL isDark = NO;
-    if (@available(macOS 10.14, *)) {
-        isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || 
-                 [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
-    }
+    const BOOL isDark = appearance.shouldShowDarkAppearance;
 
     // If we try to pull the view's effectiveAppearance we are going to get the previous 
     // appearance's name despite responding to the effectiveAppearance change (???) so it is a
