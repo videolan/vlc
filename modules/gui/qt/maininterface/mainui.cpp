@@ -87,6 +87,9 @@
 
 #include "videosurface.hpp"
 #include "mainctx.hpp"
+#ifdef _WIN32
+#include "mainctx_win32.hpp"
+#endif
 #include "mainctx_submodels.hpp"
 
 #include <QScreen>
@@ -227,6 +230,10 @@ void MainUI::registerQMLTypes()
 
         // @uri VLC.MainInterface
         qmlRegisterSingletonInstance<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", m_mainCtx);
+#ifdef _WIN32
+        assert(dynamic_cast<MainCtxWin32*>(m_mainCtx));
+        qmlRegisterAnonymousType<MainCtxWin32>(uri, versionMajor);
+#endif
         qmlRegisterTypesAndRevisions<SearchCtx>(uri, versionMajor);
         qmlRegisterTypesAndRevisions<SortCtx>(uri, versionMajor);
         qmlRegisterUncreatableType<UINotifier>(uri, versionMajor, versionMinor, "UINotifier", "");
