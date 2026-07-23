@@ -40,6 +40,8 @@
 
 #include <QWindow>
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <dwmapi.h>
 
 #define WM_APPCOMMAND 0x0319
@@ -838,6 +840,52 @@ void MainCtxWin32::reloadPrefs()
 bool MainCtxWin32::getDisableVolumeKeys() const
 {
     return m_disableVolumeKeys;
+}
+
+bool MainCtxWin32::createWindowWithoutRedirectionSurfaceImpl(QWindow *window)
+{
+    assert(window);
+
+    if (window->handle()) // Unlike `::winId()`, `::handle()` does not implicitly call `::create()`
+    {
+        const auto extendedStyle = GetWindowLong(reinterpret_cast<HWND>(window->winId()), GWL_EXSTYLE);
+        const bool alreadyHasNoRedirectionBitmap = (extendedStyle & 0x00200000L /* WS_EX_NOREDIRECTIONBITMAP */);
+
+        assert(alreadyHasNoRedirectionBitmap); // You can not call this function on an already created window.
+        return alreadyHasNoRedirectionBitmap;
+    }
+
+    // Express the desire to use WS_EX_NOREDIRECTIONBITMAP, it has the following advantages:
+    // - Increased performance due to not having to copy buffers (within GPU, or inter GPU-CPU unlike WS_EX_LAYERED).
+    // - Win32 window background brush is invalidated, so window does not flash white when opened.
+    // - No more resize artifact until the opaque scene covers the new area when the window is resized.
+    // - Make it possible to use the Windows 11 22H2 native acrylic backdrop effect, because the white background does not remain as an artifact.
+    //   When the window has a frame (currently it is the case for both SSD and CSD), clear color does not clear that background, which means
+    //   that the window should not be exposed (transparent UI). Currently there is either the acrylic simulation visual in the background which is
+    //   completely opaque or the video visual or the UI visual does not get transparent, so we don't suffer from this issue. With `WS_EX_NOREDIRECTIONBITMAP`,
+    //   the background does not paint a rectangle with `WNDCLASSEX::hbrBackground`, even if `WS_EX_LAYERED` is not used, so we are fine. The scene graph
+    //   does not have anything in the window to clear, so clear color can be transparent which means that the UI can be transparent and expose the window
+    //   for the window to provide the (native) backdrop acrylic effect.
+
+    const char* const envDisableRedirectionSurface = "QT_QPA_DISABLE_REDIRECTION_SURFACE";
+    const bool redirectionSurfaceIsExplicitlyWanted = !qEnvironmentVariableIsEmpty(envDisableRedirectionSurface) && !qEnvironmentVariableIntValue(envDisableRedirectionSurface);
+
+    if (!redirectionSurfaceIsExplicitlyWanted)
+    {
+        qputenv(envDisableRedirectionSurface, "1");
+    }
+    else
+    {
+        qDebug() << "MainCtxWin32::createWindowWithoutRedirectionSurfaceImpl():"
+                 << "redirection surface is explicitly wanted through" << envDisableRedirectionSurface;
+        return false;
+    }
+
+    window->create();
+
+    qunsetenv(envDisableRedirectionSurface); // NOTE: We need to disable it, otherwise regular QWidget windows would have issues
+
+    return true;
 }
 
 // InterfaceWindowHandlerWin32

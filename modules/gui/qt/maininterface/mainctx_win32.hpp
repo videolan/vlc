@@ -25,6 +25,7 @@
 #define MAIN_INTERFACE_WIN32_HPP
 
 #include "maininterface/mainctx.hpp"
+#include "maininterface/compositor.hpp"
 #include "player/player_controller.hpp"
 #include "interface_window_handler.hpp"
 #include <QAbstractNativeEventFilter>
@@ -90,6 +91,19 @@ public:
 
     Q_INVOKABLE bool platformHandlesShadowsWithCSD() const override { return (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows8); };
     Q_INVOKABLE bool platformHandlesResizeWithCSD() const override { return (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows8); };
+
+    static bool createWindowWithoutRedirectionSurfaceImpl(QWindow* window);
+
+    Q_INVOKABLE bool createWindowWithoutRedirectionSurface(QWindow* window)
+    {
+        // Only applicable with Direct Composition:
+        assert(p_intf);
+        assert(p_intf->p_compositor);
+        if (p_intf->p_compositor->type() != vlc::Compositor::DirectCompositionCompositor)
+            return false;
+
+        return createWindowWithoutRedirectionSurfaceImpl(window);
+    }
 
 public slots:
     void reloadPrefs() override;
