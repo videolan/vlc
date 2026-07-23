@@ -34,6 +34,10 @@ import VLC.Dialogs
 MainViewLoader {
     id: root
 
+    Accessible.role: Accessible.List
+    Accessible.name: qsTr("Playlist media list")
+    AccessibleCompat.id: "playlistMediaList"
+
     //---------------------------------------------------------------------------------------------
     // Properties
     //---------------------------------------------------------------------------------------------

@@ -199,6 +199,8 @@ Widgets.PageExt {
             VideoAll {
                 id: continueWatchingRow
 
+                AccessibleCompat.id: "continueWatching"
+
                 anchors.left: parent.left
                 anchors.right: parent.right
 
@@ -277,6 +279,8 @@ Widgets.PageExt {
             MediaView {
                 id: favoritesRow
 
+                AccessibleCompat.id: "favourites"
+
                 anchors.left: parent.left
                 anchors.right: parent.right
 
@@ -350,6 +354,8 @@ Widgets.PageExt {
 
             VideoAll {
                 id: newVideoRow
+
+                AccessibleCompat.id: "newVideo"
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -428,6 +434,8 @@ Widgets.PageExt {
 
             MediaView {
                 id: newMusicRow
+
+                AccessibleCompat.id: "newMusic"
 
                 anchors.left: parent.left
                 anchors.right: parent.right

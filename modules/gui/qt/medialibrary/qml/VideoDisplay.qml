@@ -26,6 +26,7 @@ import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 Widgets.PageLoader {
     id: root
@@ -57,6 +58,7 @@ Widgets.PageLoader {
 
     Accessible.role: Accessible.Client
     Accessible.name: qsTr("Video view")
+    AccessibleCompat.id: "videoDisplay"
 
     onCurrentItemChanged: {
         if (currentItem) {

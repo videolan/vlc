@@ -24,6 +24,7 @@ import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 
 Widgets.PageLoader {
@@ -31,6 +32,7 @@ Widgets.PageLoader {
 
     Accessible.role: Accessible.Client
     Accessible.name: qsTr("Music view")
+    AccessibleCompat.id: "musicDisplay"
 
     pageModel: [{
             displayText: qsTr("Artists"),

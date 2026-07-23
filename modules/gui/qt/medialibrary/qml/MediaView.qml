@@ -32,6 +32,10 @@ import VLC.Style
 MainViewLoader {
     id: root
 
+    Accessible.role: Accessible.Pane
+    Accessible.name: qsTr("Media view")
+    AccessibleCompat.id: "mediaView"
+
     property int listHeaderPositioning: ListView.OverlayHeader // ListView.InlineHeader, when as a row
 
     // Currently only respected by the list view:

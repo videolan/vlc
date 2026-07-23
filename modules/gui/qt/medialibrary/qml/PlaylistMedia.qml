@@ -30,6 +30,9 @@ import VLC.Style
 Widgets.TableViewExt {
     id: root
 
+    Accessible.name: qsTr("Playlist media")
+    AccessibleCompat.id: "playlistMedia"
+
     //---------------------------------------------------------------------------------------------
     // Properties
     //---------------------------------------------------------------------------------------------

@@ -28,6 +28,8 @@ import VLC.Style
 ListViewExt {
     id: root
 
+    Accessible.role: Accessible.Table
+
     selectionModel: ListSelectionModel {
         model: root.model
     }

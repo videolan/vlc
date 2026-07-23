@@ -39,6 +39,7 @@ FocusScope {
 
     Accessible.role: Accessible.Pane
     Accessible.name: qsTr("Artist banner")
+    AccessibleCompat.id: "artistTopBanner"
 
     function setCurrentItemFocus(reason) {
         playActionBtn.forceActiveFocus(reason);
@@ -234,6 +235,9 @@ FocusScope {
 
                 Widgets.ActionButtonPrimary {
                     id: playActionBtn
+
+                    AccessibleCompat.id: "artistPlayButton"
+
                     iconTxt: VLCIcons.play
                     text: qsTr("Play all")
                     focus: true
@@ -248,6 +252,9 @@ FocusScope {
 
                 Widgets.ActionButtonOverlay {
                     id: enqueueActionBtn
+
+                    AccessibleCompat.id: "artistEnqueueButton"
+
                     iconTxt: VLCIcons.enqueue
                     text: qsTr("Enqueue all")
                     onClicked: MediaLib.addToPlaylist( artist.id )

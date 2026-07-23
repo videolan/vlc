@@ -137,6 +137,8 @@ FocusScope {
                         Widgets.ActionButtonPrimary {
                             id: playActionBtn
 
+                            AccessibleCompat.id: "videoInfoPlayButton"
+
                             iconTxt: VLCIcons.play
                             text: qsTr("Play")
                             onClicked: MediaLib.addAndPlay( model.id )
@@ -144,6 +146,8 @@ FocusScope {
 
                         Widgets.ButtonExt {
                             id: enqueueActionBtn
+
+                            AccessibleCompat.id: "videoInfoEnqueueButton"
 
                             iconTxt: VLCIcons.enqueue
                             text: qsTr("Enqueue")
@@ -176,6 +180,8 @@ FocusScope {
 
                     Widgets.IconToolButton {
                         id: closeButton
+
+                        AccessibleCompat.id: "videoInfoCloseButton"
 
                         text: VLCIcons.close
 
@@ -230,6 +236,8 @@ FocusScope {
 
                 Widgets.ButtonExt {
                     id: showMoreButton
+
+                    AccessibleCompat.id: "videoInfoShowMoreButton"
 
                     text: root._showMoreInfo ? qsTr("View Less") : qsTr("View More")
                     iconTxt: VLCIcons.expand

@@ -54,6 +54,7 @@ Widgets.PageLoader {
 
     Accessible.role: Accessible.Client
     Accessible.name: qsTr("Home View")
+    AccessibleCompat.id: "homeDisplay"
 
 
     Component {
