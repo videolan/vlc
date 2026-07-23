@@ -279,9 +279,29 @@ T.Pane {
             fadingEdge.backgroundColor: (root.background && (root.background.color.a >= 1.0)) ? root.background.color
                                                                                               : Qt.alpha(root.background.color, 0.0)
 
+            function mappedSelectedIndexes() : var {
+                let mappedSelectedIndexes
+
+                if (!listView.selectionModel)
+                    return [] // unlikely
+
+                const selectedIndexes = listView.selectionModel.selectedIndexesFlat
+                if (listView.proxyModel && listView.model === listView.proxyModel) {
+                    mappedSelectedIndexes = []
+                    for (let i = 0; i < selectedIndexes.length; ++i) {
+                        const mappedIndex = listView.model.mapToSource(listView.model.index(selectedIndexes[i], 0))
+                        mappedSelectedIndexes.push(mappedIndex.row)
+                    }
+                } else {
+                    mappedSelectedIndexes = selectedIndexes
+                }
+
+                return mappedSelectedIndexes
+            }
+
             isDropAcceptableFunc: function(drop, index) {
                 if (drop.source === dragItem)
-                    return Helpers.itemsMovable(selectionModel.sortedSelectedIndexesFlat, index)
+                    return Helpers.itemsMovable(listView.mappedSelectedIndexes(), index)
                 else if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem))
                     return true
                 else if (drop.hasUrls)
@@ -295,7 +315,7 @@ T.Pane {
 
                 // NOTE: Move implementation.
                 if (dragItem === item) {
-                    root.model.moveItemsPre(root.selectionModel.sortedSelectedIndexesFlat, index);
+                    root.model.moveItemsPre(listView.mappedSelectedIndexes(), index);
                     listView.forceActiveFocus();
                 // NOTE: Dropping medialibrary content into the queue.
                 } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
