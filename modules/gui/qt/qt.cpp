@@ -854,7 +854,6 @@ static void *Thread( void *obj )
 #endif
     Q_INIT_RESOURCE( shaders );
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     // NOTE:  Qt declarative 6.8.0 initializes scenegraph_shaders,
     //        but not scenegraph_curve_shaders. Curve shaders
     //        are used in particular cases even when curve
@@ -862,12 +861,8 @@ static void *Thread( void *obj )
     //        observed with underlined text on Windows which lead
     //        access violation in the scene graph thread.
     Q_INIT_RESOURCE( scenegraph_curve_shaders );
-#endif
 
     Q_INIT_RESOURCE( qmake_QtQml );
-#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
-    Q_INIT_RESOURCE( qmake_QtQml_Base );
-#endif
     Q_INIT_RESOURCE( qmake_QtQml_Models );
     Q_INIT_RESOURCE( qmake_QtQml_WorkerScript );
     Q_INIT_RESOURCE( qmake_QtQuick );
@@ -879,13 +874,8 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( qmake_QtQuick_Layouts );
     Q_INIT_RESOURCE( qmake_QtQuick_Templates );
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     Q_INIT_RESOURCE( QuickControls2Basic_raw_qml_0 );
     Q_INIT_RESOURCE( qtquickcontrols2basicstyle );
-#else
-    Q_INIT_RESOURCE( qtquickcontrols2basicstyleplugin_raw_qml_0 );
-    Q_INIT_RESOURCE( qtquickcontrols2basicstyleplugin );
-#endif
 
     // Q_INIT_RESOURCE( qtquickshapes_shaders );
 #endif
@@ -1053,7 +1043,7 @@ static void *Thread( void *obj )
     static constexpr QLatin1String graphicsApiRhiSoftwareKey {"graphics-api-rhi-software"};
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") &&
         qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND") &&
-        (QT_VERSION < QT_VERSION_CHECK(6, 4, 0) || !uint(qEnvironmentVariableIntValue("QSG_RHI_PREFER_SOFTWARE_RENDERER"))))
+        !uint(qEnvironmentVariableIntValue("QSG_RHI_PREFER_SOFTWARE_RENDERER")))
     {
         const auto enableRhiSoftwareRenderer = []() {
             // We could use `QQuickGraphicsConfiguration::setPreferSoftwareDevice()`, but this

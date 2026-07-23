@@ -36,6 +36,16 @@
 
 #include <qconfig.h>
 
+#ifdef QT_STATIC
+#if __has_include(<QtVersionChecks>)
+#include <QtVersionChecks> // Available since Qt 6.8
+#else
+#include <QtGlobal>
+#endif
+
+static_assert(QT_VERSION >= QT_VERSION_CHECK(6, 8, 3), "With static Qt, the Qt version must be greater than or equal to what we provide in the contribs.");
+#endif
+
 #include <QString>
 
 enum {

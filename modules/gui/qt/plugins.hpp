@@ -54,16 +54,9 @@
     Q_IMPORT_QML_PLUGIN(QtQmlModelsPlugin)
     Q_IMPORT_QML_PLUGIN(QtQmlPlugin)
     Q_IMPORT_QML_PLUGIN(QtQmlWorkerScriptPlugin)
-#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
-    Q_IMPORT_QML_PLUGIN(QtQmlMetaPlugin)
-#endif
 
 #ifdef _WIN32
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     Q_IMPORT_PLUGIN(QModernWindowsStylePlugin)
-#else
-    Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin)
-#endif
     Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
     // Q_IMPORT_PLUGIN(QWindowsDirect2DIntegrationPlugin)
 #elif defined(Q_OS_MACOS)

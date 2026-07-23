@@ -8,13 +8,7 @@ CONFIG -= debug_and_release
 CONFIG += no_include_pwd
 
 win32 {
-QTPLUGIN += qwindows
-
-versionAtLeast(QT_VERSION, 6.7.0) {
-QTPLUGIN += qmodernwindowsstyle
-} else {
-QTPLUGIN += qwindowsvistastyle
-}
+QTPLUGIN += qwindows qmodernwindowsstyle
 }
 
 linux {
