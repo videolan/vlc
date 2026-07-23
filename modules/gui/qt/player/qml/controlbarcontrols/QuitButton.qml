@@ -21,11 +21,15 @@ import QtQuick
 import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 
 Widgets.IconToolButton {
     id: quitBtn
+
     text: VLCIcons.clear
     onClicked: MainCtx.close()
     description: qsTr("Quit")
+
+    AccessibleCompat.id: "quitButton"
 }

@@ -75,6 +75,9 @@ T.Pane {
                     return VLCIcons.volume_high
             }
             description: qsTr("Mute")
+
+            AccessibleCompat.id: "muteButton"
+
             onClicked: Player.muted = !Player.muted
 
             Accessible.onIncreaseAction: {
@@ -139,6 +142,7 @@ T.Pane {
             }
 
             Accessible.name: qsTr("Volume")
+            AccessibleCompat.id: "volumeSlider"
 
             Keys.onPressed: (event) => {
                 if (KeyHelper.matchOk(event)) {

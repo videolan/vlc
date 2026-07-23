@@ -26,6 +26,7 @@ import VLC.MainInterface
 import VLC.Style
 import VLC.Player
 import VLC.Widgets
+import VLC.Util
 
 PopupIconToolButton {
     id: root
@@ -37,6 +38,8 @@ PopupIconToolButton {
     text: VLCIcons.tvtelx
 
     description: qsTr("Teletext")
+
+    AccessibleCompat.id: "teletextButton"
 
     popup.contentItem: TeletextWidget {
         colorContext.palette: root.colorContext.palette

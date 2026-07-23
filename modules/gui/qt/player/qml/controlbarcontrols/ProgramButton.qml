@@ -24,6 +24,7 @@ import VLC.MainInterface
 import VLC.Player
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 Widgets.IconToolButton {
     id: root
@@ -33,6 +34,8 @@ Widgets.IconToolButton {
     text: VLCIcons.tv
 
     description: qsTr("Programs")
+
+    AccessibleCompat.id: "programButton"
 
     // NOTE: We want to pop the menu above the button.
     onClicked: menu.popup(this.mapToGlobal(0, 0), true)

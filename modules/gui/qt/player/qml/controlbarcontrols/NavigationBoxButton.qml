@@ -22,12 +22,15 @@ import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Player
 import VLC.Style
+import VLC.Util
 
 
 Widgets.IconToolButton {
     visible: Player.isInteractive
     text: VLCIcons.ic_fluent_arrow_move
     description: qsTr("Navigation Buttons")
+
+    AccessibleCompat.id: "navigationBoxButton"
 
     onClicked: MainCtx.navBoxToggled()
 }

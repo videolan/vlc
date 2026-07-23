@@ -21,6 +21,7 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Dialogs
+import VLC.Util
 
 Widgets.IconToolButton {
     id: extdSettingsBtn
@@ -28,6 +29,8 @@ Widgets.IconToolButton {
     text: VLCIcons.effect_filter
 
     description: qsTr("Extended settings")
+
+    AccessibleCompat.id: "extendedSettingsButton"
 
     onClicked: DialogsProvider.extendedDialog()
 }

@@ -22,12 +22,16 @@ import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
 import VLC.Playlist
+import VLC.Util
 
 
 Widgets.IconToolButton {
     id: stopBtn
+
     enabled: Player.isStarted
     text: VLCIcons.stop
     onClicked: MainPlaylistController.stop()
     description: qsTr("Stop")
+
+    AccessibleCompat.id: "stopButton"
 }

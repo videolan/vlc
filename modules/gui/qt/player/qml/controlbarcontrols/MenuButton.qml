@@ -22,6 +22,7 @@ import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Menus
+import VLC.Util
 
 Widgets.IconToolButton {
     id: menuBtn
@@ -30,6 +31,9 @@ Widgets.IconToolButton {
 
     text: VLCIcons.ellipsis
     description: qsTr("Menu")
+
+    AccessibleCompat.id: "menuButton"
+
     checked: contextMenu.shown
 
     onClicked: contextMenu.popup(this.mapToGlobal(0, 0))

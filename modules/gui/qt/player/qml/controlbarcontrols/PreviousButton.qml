@@ -21,11 +21,15 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Playlist
+import VLC.Util
 
 Widgets.IconToolButton {
     id: prevBtn
+
     text: VLCIcons.previous
     enabled: MainPlaylistController.hasPrev
     onClicked: MainPlaylistController.prev()
     description: qsTr("Previous")
+
+    AccessibleCompat.id: "previousButton"
 }

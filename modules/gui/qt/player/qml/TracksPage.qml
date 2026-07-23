@@ -25,6 +25,7 @@ import QtQuick.Layouts
 import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
+import VLC.Util
 
 RowLayout {
     id: root
@@ -63,6 +64,8 @@ RowLayout {
 
         Widgets.IconTrackButton {
             id: button
+
+            AccessibleCompat.id: "tracksBackButton"
 
             anchors.horizontalCenter: parent.horizontalCenter
 

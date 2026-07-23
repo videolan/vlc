@@ -21,6 +21,7 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 Widgets.IconToolButton {
     id: fasterBtn
@@ -30,4 +31,6 @@ Widgets.IconToolButton {
     text: VLCIcons.faster
     onClicked: Player.faster()
     description: qsTr("Faster")
+
+    AccessibleCompat.id: "fasterButton"
 }

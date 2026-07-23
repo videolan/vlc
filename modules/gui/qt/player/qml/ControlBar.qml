@@ -27,6 +27,7 @@ import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Player
+import VLC.Util
 
 T.Pane {
     id: root
@@ -67,6 +68,7 @@ T.Pane {
     Navigation.cancelAction: function() { History.previous(Qt.BacktabFocusReason) }
 
     Accessible.name: qsTr("Player controls")
+    AccessibleCompat.id: "playerControlBar"
 
     function showChapterMarks() {
         if (contentItem.trackPositionSlider)
@@ -217,6 +219,11 @@ T.Pane {
                 id: trackPositionSlider
 
                 barHeight: root.sliderHeight
+
+                Accessible.role: Accessible.Slider
+                Accessible.name: qsTr("Progress")
+                AccessibleCompat.id: "progressSlider"
+
                 Layout.fillWidth: true
                 enabled: Player.playingState === Player.PLAYING_STATE_PLAYING || Player.playingState === Player.PLAYING_STATE_PAUSED
 

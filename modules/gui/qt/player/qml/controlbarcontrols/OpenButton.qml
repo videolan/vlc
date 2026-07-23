@@ -21,10 +21,14 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Dialogs
+import VLC.Util
 
 Widgets.IconToolButton {
     id: openMediaBtn
+
     text: VLCIcons.eject
     onClicked: DialogsProvider.openDialog()
     description: qsTr("Open media")
+
+    AccessibleCompat.id: "openMediaButton"
 }

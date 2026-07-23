@@ -20,11 +20,16 @@ import QtQuick
 import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 
 Widgets.IconToolButton {
     id: backBtn
+
     text: VLCIcons.back
     description: qsTr("Back")
+
+    AccessibleCompat.id: "backButton"
+
     onClicked: History.previous()
 }

@@ -22,9 +22,13 @@ import VLC.MainInterface
 import VLC.Player
 import VLC.PlayerControls
 import VLC.Style
+import VLC.Util
 
 ControlBar {
     id: root
+
+    Accessible.name: qsTr("Mini player")
+    AccessibleCompat.id: "miniplayerControlBar"
 
     visible: (-anchors.bottomMargin < height) || (state === "inViewport")
 

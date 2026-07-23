@@ -21,6 +21,7 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 Widgets.IconToolButton {
     id: stepBackBtn
@@ -30,4 +31,6 @@ Widgets.IconToolButton {
     text: VLCIcons.skip_back
     onClicked: Player.jumpBwd()
     description: qsTr("Step back")
+
+    AccessibleCompat.id: "skipBackButton"
 }

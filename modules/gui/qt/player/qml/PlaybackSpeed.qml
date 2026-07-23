@@ -145,6 +145,8 @@ ColumnLayout {
 
         text: qsTr("Playback Speed")
 
+        AccessibleCompat.id: "playbackSpeedLabel"
+
         color: theme.fg.primary
     }
 
@@ -201,6 +203,9 @@ ColumnLayout {
         }
 
         toolTipFollowsMouse: true
+
+        Accessible.name: qsTr("Playback speed")
+        AccessibleCompat.id: "playbackSpeedSlider"
 
         Navigation.parentItem: root
 

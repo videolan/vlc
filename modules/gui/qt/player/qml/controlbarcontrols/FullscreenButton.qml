@@ -21,11 +21,15 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 Widgets.IconToolButton {
     id: fullScreenBtn
+
     enabled: Player.hasVideoOutput
     text: Player.fullscreen ? VLCIcons.defullscreen :VLCIcons.fullscreen
     onClicked: Player.fullscreen = !Player.fullscreen
     description: qsTr("fullscreen")
+
+    AccessibleCompat.id: "fullscreenButton"
 }

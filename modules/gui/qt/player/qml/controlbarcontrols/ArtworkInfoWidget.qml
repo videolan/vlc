@@ -55,6 +55,8 @@ AbstractButton {
 
     text: qsTr("Open player")
 
+    AccessibleCompat.id: "artworkInfoWidget"
+
     padding: VLCStyle.focus_border
 
     Accessible.onPressAction: root.clicked()

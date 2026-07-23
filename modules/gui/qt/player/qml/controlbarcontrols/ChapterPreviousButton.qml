@@ -21,11 +21,15 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 Widgets.IconToolButton {
     id: chapterPreviousBtn
+
     text: VLCIcons.dvd_prev
     onClicked: Player.chapterPrev()
     enabled: Player.hasChapters
     description: qsTr("Previous chapter")
+    
+    AccessibleCompat.id: "chapterPreviousButton"
 }

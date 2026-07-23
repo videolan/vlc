@@ -67,6 +67,7 @@ FocusScope {
 
     Accessible.role: Accessible.Client
     Accessible.name: qsTr("Player")
+    AccessibleCompat.id: "playerView"
 
     // Events
 
@@ -807,6 +808,8 @@ FocusScope {
                                 font.pixelSize: VLCStyle.icon_audioPlayerButton
                                 onClicked: Player.jumpBwd()
                                 description: qsTr("Step back")
+
+                                AccessibleCompat.id: "audioStepBackButton"
                             }
 
                             Widgets.IconToolButton {
@@ -814,6 +817,8 @@ FocusScope {
                                 font.pixelSize: VLCStyle.icon_audioPlayerButton
                                 onClicked: Player.toggleVisualization()
                                 description: qsTr("Visualization")
+
+                                AccessibleCompat.id: "audioVisualizationButton"
                             }
 
                             Widgets.IconToolButton {
@@ -825,6 +830,7 @@ FocusScope {
 
                                 Accessible.role: Accessible.Button
                                 Accessible.name: qsTr("Toggle lyrics view")
+                                AccessibleCompat.id: "audioLyricsButton"
                             }
 
                             Widgets.IconToolButton{
@@ -832,6 +838,8 @@ FocusScope {
                                 font.pixelSize: VLCStyle.icon_audioPlayerButton
                                 onClicked: Player.jumpFwd()
                                 description: qsTr("Step forward")
+
+                                AccessibleCompat.id: "audioStepForwardButton"
                             }
                         }
 
@@ -873,6 +881,7 @@ FocusScope {
 
                             Accessible.role: Accessible.CheckBox
                             Accessible.name: qsTr("Sync lyrics to playback position")
+                            AccessibleCompat.id: "syncToPlaybackCheckBox"
 
                             Navigation.parentItem: rootPlayer
                             Navigation.upItem: audioControls

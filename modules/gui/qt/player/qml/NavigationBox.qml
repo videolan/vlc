@@ -25,9 +25,13 @@ import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Player
+import VLC.Util
 
 Control {
     id: navigationBox
+
+    Accessible.name: qsTr("DVD navigation")
+    AccessibleCompat.id: "navigationBox"
 
     padding: VLCStyle.focus_border
 
@@ -70,6 +74,10 @@ Control {
             Layout.row: 0
             iconTxt: VLCIcons.window_close
             iconSize: VLCStyle.icon_normal
+
+            Accessible.name: qsTr("Close navigation")
+            AccessibleCompat.id: "navCloseButton"
+
             onClicked: {
                 navigationBox.toggleVisibility()
             }
@@ -82,6 +90,10 @@ Control {
             Layout.row: 0
             iconTxt: VLCIcons.ic_fluent_chevron_up_24
             iconSize: VLCStyle.icon_large
+
+            Accessible.name: qsTr("Navigate up")
+            AccessibleCompat.id: "navUpButton"
+
             onClicked: Player.navigateUp()
         }
 
@@ -92,6 +104,10 @@ Control {
             Layout.row: 1
             iconTxt: VLCIcons.ic_fluent_chevron_left_24
             iconSize: VLCStyle.icon_large
+
+            Accessible.name: qsTr("Navigate left")
+            AccessibleCompat.id: "navLeftButton"
+
             onClicked: Player.navigateLeft()
         }
 
@@ -103,6 +119,10 @@ Control {
             iconTxt: VLCIcons.ok
             font.pixelSize: VLCStyle.fontSize_large
             iconSize: VLCStyle.icon_normal
+
+            Accessible.name: qsTr("Select")
+            AccessibleCompat.id: "navOkButton"
+
             onClicked: Player.navigateActivate()
         }
 
@@ -113,6 +133,10 @@ Control {
             Layout.row: 1
             iconTxt: VLCIcons.ic_fluent_chevron_right_24
             iconSize: VLCStyle.icon_large
+
+            Accessible.name: qsTr("Navigate right")
+            AccessibleCompat.id: "navRightButton"
+
             onClicked: Player.navigateRight()
         }
 
@@ -123,6 +147,10 @@ Control {
             Layout.row: 2
             iconTxt: VLCIcons.ic_fluent_chevron_down_24
             iconSize: VLCStyle.icon_large
+
+            Accessible.name: qsTr("Navigate down")
+            AccessibleCompat.id: "navDownButton"
+
             onClicked: Player.navigateDown()
         }
     }

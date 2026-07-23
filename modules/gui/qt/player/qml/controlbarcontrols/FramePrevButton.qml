@@ -21,6 +21,7 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Player
 import VLC.Style
+import VLC.Util
 
 
 Widgets.IconToolButton {
@@ -31,4 +32,6 @@ Widgets.IconToolButton {
     text: VLCIcons.previous_frame
     onClicked: Player.framePrev()
     description: qsTr("Previous frame")
+
+    AccessibleCompat.id: "previousFrameButton"
 }

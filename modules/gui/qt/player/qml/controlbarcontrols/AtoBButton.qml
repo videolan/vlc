@@ -35,6 +35,8 @@ Widgets.ImageToolButton {
 
     description: text
 
+    AccessibleCompat.id: "atoBButton"
+
     //imageSource: "qrc:///icons/atob.svg"
     imageSource: {
         switch(Player.ABloopState) {

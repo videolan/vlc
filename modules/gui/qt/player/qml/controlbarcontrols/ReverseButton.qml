@@ -24,12 +24,15 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Player
 import VLC.Style
+import VLC.Util
 
 Widgets.IconToolButton {
     enabled: Player.rewindable
 
     text: VLCIcons.play_reverse
     description: qsTr("Reverse")
+
+    AccessibleCompat.id: "reverseButton"
 
     onClicked: Player.reverse()
 }

@@ -28,6 +28,7 @@ import VLC.Style
 import VLC.PlayerControls
 import VLC.Widgets as Widgets
 import VLC.Menus as Menus
+import VLC.Util
 
 FocusScope{
     id: root
@@ -77,8 +78,9 @@ FocusScope{
 
     // Settings
 
-    Accessible.name: qsTr("Player topbar")
     Accessible.role: Accessible.ToolBar
+    Accessible.name: qsTr("Player topbar")
+    AccessibleCompat.id: "playerTopBar"
 
     // Events
 
@@ -276,6 +278,9 @@ FocusScope{
                 font.pixelSize: VLCStyle.icon_banner
                 text: VLCIcons.back
                 description: qsTr("Back")
+
+                AccessibleCompat.id: "topBarBackButton"
+
                 focus: true
 
                 Navigation.parentItem: root
@@ -439,6 +444,9 @@ FocusScope{
 
             text: VLCIcons.more
             description: qsTr("Menu")
+
+            AccessibleCompat.id: "topBarMenuButton"
+
             checked: contextMenu.shown
 
             Navigation.parentItem: root
@@ -475,6 +483,9 @@ FocusScope{
             font.pixelSize: VLCStyle.icon_banner
             text: VLCIcons.playlist
             description: qsTr("Playlist")
+
+            AccessibleCompat.id: "topBarPlayqueueButton"
+
             focus: root.showToolbar
 
             width: VLCStyle.bannerButton_width
@@ -484,7 +495,9 @@ FocusScope{
             Navigation.leftItem: menuSelector.visible ? menuSelector : backBtn
 
             onClicked: togglePlaylistVisibility()
+
             Accessible.onToggleAction:togglePlaylistVisibility()
+
             onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
         }
     }

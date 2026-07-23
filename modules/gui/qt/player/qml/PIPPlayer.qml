@@ -147,6 +147,9 @@ T.Control {
             font.pixelSize: VLCStyle.icon_large
 
             description: qsTr("play/pause")
+
+            AccessibleCompat.id: "pipPlayButton"
+
             text: (Player.playingState !== Player.PLAYING_STATE_PAUSED
                    && Player.playingState !== Player.PLAYING_STATE_STOPPED)
                   ? VLCIcons.pause_filled
@@ -169,6 +172,9 @@ T.Control {
 
             font.pixelSize: VLCStyle.icon_PIP
             description: qsTr("close video")
+
+            AccessibleCompat.id: "pipCloseButton"
+
             text: VLCIcons.close
 
             textStyle: root.textStyle
@@ -189,6 +195,9 @@ T.Control {
             font.pixelSize: VLCStyle.icon_PIP
 
             description: qsTr("maximize player")
+
+            AccessibleCompat.id: "pipFullscreenButton"
+
             text: VLCIcons.fullscreen
 
             textStyle: root.textStyle

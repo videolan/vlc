@@ -22,6 +22,7 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 Widgets.IconToolButton {
     id: root
@@ -47,6 +48,8 @@ Widgets.IconToolButton {
     enabled: menuLoader.status === Loader.Ready
 
     description: qsTr("Languages and tracks")
+
+    AccessibleCompat.id: "langButton"
 
     // Events
 

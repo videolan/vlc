@@ -35,6 +35,8 @@ PopupIconToolButton {
 
     description: qsTr("change playback speed")
 
+    AccessibleCompat.id: "playbackSpeedButton"
+
     popup.contentItem: PlaybackSpeed {
         colorContext.palette: root.colorContext.palette
 

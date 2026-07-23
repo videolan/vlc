@@ -20,6 +20,7 @@ import QtQuick
 import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 
 Widgets.IconToolButton {
@@ -30,4 +31,6 @@ Widgets.IconToolButton {
     }
 
     description: qsTr("Switch Player")
+
+    AccessibleCompat.id: "playerSwitchButton"
 }

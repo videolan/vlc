@@ -24,6 +24,7 @@ import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 Widgets.IconToolButton {
     id: root
@@ -32,6 +33,8 @@ Widgets.IconToolButton {
 
     text: VLCIcons.renderer
     description: qsTr("Renderer")
+
+    AccessibleCompat.id: "rendererButton"
 
     // NOTE: We want to pop the menu above the button.
     onClicked: menu.popup(this.mapToGlobal(0, 0), true)

@@ -21,11 +21,15 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Playlist
+import VLC.Util
 
 Widgets.IconToolButton {
     id: nextBtn
+
     text: VLCIcons.next
     enabled: MainPlaylistController.hasNext
     onClicked: MainPlaylistController.next()
     description: qsTr("Next")
+
+    AccessibleCompat.id: "nextButton"
 }

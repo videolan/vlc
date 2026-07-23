@@ -26,6 +26,7 @@ import VLC.MainInterface
 import VLC.Player
 import VLC.Style
 import VLC.Widgets as Widgets
+import VLC.Util
 
 FocusScope {
     id: resumePanel
@@ -126,6 +127,9 @@ FocusScope {
         anchors.leftMargin: VLCStyle.margin_xsmall
 
         text: qsTr("Continue")
+
+        AccessibleCompat.id: "resumeContinueButton"
+
         font.bold: true
         color: theme.fg.primary
         focus: true
@@ -147,6 +151,9 @@ FocusScope {
         anchors.left: continueBtn.right
 
         text: qsTr("Dismiss")
+
+        AccessibleCompat.id: "resumeDismissButton"
+
         font.bold: true
         color: theme.fg.primary
         onClicked: hideResumePanel()

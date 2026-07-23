@@ -22,6 +22,7 @@ import QtQuick.Templates as T
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 Widgets.IconToolButton {
     id: control
@@ -31,6 +32,8 @@ Widgets.IconToolButton {
     color: "#FFFF0000" //red means recording
     text: VLCIcons.record
     description: qsTr("record")
+
+    AccessibleCompat.id: "recordButton"
 
     onClicked: Player.toggleRecord()
 

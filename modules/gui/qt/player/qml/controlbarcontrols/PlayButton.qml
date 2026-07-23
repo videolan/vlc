@@ -61,6 +61,7 @@ T.Control {
 
     Accessible.role: Accessible.Button
     Accessible.name: qsTr("Play/Pause")
+    AccessibleCompat.id: "playButton"
     Accessible.checkable: true
     Accessible.checked: Player.playingState !== Player.PLAYING_STATE_PAUSED
                         && Player.playingState !== Player.PLAYING_STATE_STOPPED

@@ -23,6 +23,7 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 
 Widgets.IconToolButton {
@@ -31,6 +32,8 @@ Widgets.IconToolButton {
 
     text: VLCIcons.dvd_menu
     description: qsTr("Menu")
+
+    AccessibleCompat.id: "dvdMenuButton"
 
     onClicked: Player.sectionMenu()
 }
