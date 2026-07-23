@@ -44,6 +44,12 @@ T.ItemDelegate {
 
     padding: VLCStyle.margin_xxsmall
 
+    leftInset: VLCStyle.margin_xxsmall
+    rightInset: VLCStyle.margin_xxsmall
+
+    topInset: VLCStyle.margin_xxxsmall
+    bottomInset: VLCStyle.margin_xxxsmall
+
     // Accessible
 
     Accessible.onPressAction: control.clicked()
