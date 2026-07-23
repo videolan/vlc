@@ -133,6 +133,8 @@ FocusScope {
             Widgets.ActionButtonPrimary {
                 id: fileButton
 
+                AccessibleCompat.id: "openFileButton"
+
                 focus: true
 
                 text: qsTr("Open File")
@@ -154,6 +156,8 @@ FocusScope {
 
             Widgets.ActionButtonPrimary {
                 id: discButton
+
+                AccessibleCompat.id: "discButton"
 
                 text: qsTr("Open Disc")
 

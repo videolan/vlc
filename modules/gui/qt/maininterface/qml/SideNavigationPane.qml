@@ -25,6 +25,7 @@ import VLC.Widgets as Widgets
 
 import VLC.MainInterface
 import VLC.Dialogs
+import VLC.Util
 
 T.Pane {
     id: root
@@ -218,6 +219,8 @@ T.Pane {
 
             SideNavigationDelegate {
                 id: preferenceButton
+
+                AccessibleCompat.id: "preferencesButton"
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: VLCStyle.buttonHeightNavigationPane

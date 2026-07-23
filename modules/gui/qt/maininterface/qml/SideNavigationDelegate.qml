@@ -55,6 +55,21 @@ T.ItemDelegate {
     // Accessible
 
     Accessible.onPressAction: control.clicked()
+    AccessibleCompat.id: {
+        if (model.depth !== 0 || !model.uri || model.uri.length === 0) return "";
+        const navBarIds = {
+            "home": "homeNavBar",
+            "video": "videoNavBar",
+            "music": "musicNavBar",
+            "network": "browseNavBar",
+            "discover": "discoverNavBar"
+        }
+        const id = navBarIds[model.uri[0]]
+        if (id !== undefined)
+            return id
+        else
+            return ""
+    }
 
     // Tooltip
 

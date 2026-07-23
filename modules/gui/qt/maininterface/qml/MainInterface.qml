@@ -42,6 +42,10 @@ import VLC.PlayerControls
 Item {
     id: root
 
+    Accessible.role: Accessible.Client
+    Accessible.name: qsTr("Main interface")
+    AccessibleCompat.id: "mainInterface"
+
     property bool _extendedFrameVisible: MainCtx.windowSuportExtendedFrame
                                       && MainCtx.clientSideDecoration
                                       && (MainCtx.intfMainWindow.visibility === Window.Windowed)

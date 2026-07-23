@@ -34,6 +34,9 @@ import VLC.Util
 T.ToolBar {
     id: root
 
+    Accessible.name: qsTr("Menu")
+    AccessibleCompat.id: "menuTopbar"
+
     // For now, used for d&d functionality
     // Not strictly necessary to set
     property PlaylistPane plListView: null

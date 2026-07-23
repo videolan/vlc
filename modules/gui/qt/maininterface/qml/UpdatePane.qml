@@ -108,6 +108,8 @@ T.Pane {
             Widgets.ActionButtonOverlay {
                 id: revealDetailsButton
 
+                AccessibleCompat.id: "updateDetailsButton"
+
                 iconTxt: VLCIcons.chevron_up
                 iconRotation: descriptionFlickable.revealed ? 180 : 0
 

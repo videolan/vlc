@@ -31,6 +31,10 @@ import VLC.Dialogs
 FocusScope {
     id: g_mainDisplay
 
+    Accessible.role: Accessible.Pane
+    Accessible.name: qsTr("Main display")
+    AccessibleCompat.id: "mainDisplay"
+
     // Properties
 
     property bool hasMiniPlayer: miniPlayer.visible

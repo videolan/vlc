@@ -34,6 +34,9 @@ import VLC.Util
 T.ToolBar {
     id: root
 
+    Accessible.name: qsTr("Local top bar")
+    AccessibleCompat.id: "localTopbar"
+
     property bool useAcrylic: true
 
     // For now, used for d&d functionality
@@ -105,6 +108,8 @@ T.ToolBar {
                     text: VLCIcons.panel_left
                     description: qsTr("Show navigation menu")
 
+                    AccessibleCompat.id: "sidebarToggleButton"
+
                     font.pixelSize: VLCStyle.icon_banner
                     height: VLCStyle.bannerButton_height
                     width: VLCStyle.bannerButton_width
@@ -121,6 +126,8 @@ T.ToolBar {
                     font.pixelSize: VLCStyle.icon_banner
                     text: VLCIcons.back
                     description: qsTr("Previous")
+
+                    AccessibleCompat.id: "historyBackButton"
 
                     height: VLCStyle.bannerButton_height
                     width: VLCStyle.bannerButton_width
@@ -181,6 +188,9 @@ T.ToolBar {
                     font.pixelSize: VLCStyle.icon_banner
                     text: VLCIcons.playlist
                     description: qsTr("Playlist")
+
+                    AccessibleCompat.id: "playqueueToggle"
+
                     width: VLCStyle.bannerButton_width
                     height: VLCStyle.bannerButton_height
                     //highlighted: MainCtx.playlistVisible
