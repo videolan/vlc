@@ -67,6 +67,14 @@ Window {
         show()
     }
 
+    Component.onCompleted: {
+        if (MainCtx.createWindowWithoutRedirectionSurface) { // Win32
+            const ret = MainCtx.createWindowWithoutRedirectionSurface(this)
+            if (!ret)
+                console.debug("MainCtx::createWindowWithoutRedirectionSurface(): returned false for window", this)
+        }
+    }
+
     ColumnLayout {
         id: layout
         anchors.fill: parent
