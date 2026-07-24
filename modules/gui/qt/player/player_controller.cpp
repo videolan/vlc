@@ -203,6 +203,9 @@ void PlayerControllerPrivate::UpdateMeta( input_item_t *p_item )
              * Later meta refreshes may not carry sylt-data again, so keep the
              * cached buffer until the current media changes. */
             const char *psz_sylt_data = vlc_meta_GetExtra( p_item->p_meta, "sylt-data" );
+            if (!psz_sylt_data)
+                psz_sylt_data = vlc_meta_GetExtra( p_item->p_meta, "uslt-data" );
+
             if (psz_sylt_data != NULL)
             {
                 QByteArray newRaw( psz_sylt_data );
