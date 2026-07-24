@@ -30,6 +30,7 @@
 #include "preferences_widgets.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "maininterface/mainctx.hpp"
+#include "util/accessible_compat_attached.hpp"
 #include "util/color_scheme_model.hpp"
 #include "util/proxycolumnmodel.hpp"
 #include "medialibrary/mlrecentmediamodel.hpp"
@@ -1028,6 +1029,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             if ( vlc_ml_instance_get( p_intf ) != NULL )
             {
+                AccessibleCompatAttached::setId( ui.mlGroupBox, "ml-groupbox" );
                 auto foldersModel = new MLFoldersModel( this );
                 foldersModel->setCtx( p_intf->p_mi );
                 ui.entryPoints->setMLFoldersModel( foldersModel );
