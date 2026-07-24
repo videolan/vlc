@@ -95,7 +95,7 @@ public:
     Q_PROPERTY(QString description READ getDescription NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(QString url READ getUrl NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(double progress READ getProgress NOTIFY progressChanged FINAL) // TODO
-    Q_PROPERTY(bool explicitCheck READ explicitCheck RESET resetExplicitCheck NOTIFY explicitCheckChanged FINAL)
+    Q_PROPERTY(bool explicitCheck READ explicitCheck WRITE _setExplicitCheck RESET resetExplicitCheck NOTIFY explicitCheckChanged FINAL)
 
 public:
     explicit UpdateModel(qt_intf_t * p_intf);
@@ -125,6 +125,14 @@ signals:
     void explicitCheckChanged();
 
 private:
+    void _setExplicitCheck(bool) const
+    {
+        // This method is added as a workaround for QML engine bug
+        // where the property can't be reset, if it does not have
+        // WRITE method. Do not use it.
+        assert(false);
+    }
+
     Q_DECLARE_PRIVATE(UpdateModel)
     QScopedPointer<UpdateModelPrivate> d_ptr;
 };
