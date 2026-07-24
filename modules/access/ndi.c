@@ -43,8 +43,51 @@ typedef struct {
     es_out_id_t *p_video_es;
     es_out_id_t *p_audio_es;
     vlc_tick_t i_pcr;
-    int i_audio_bps;
+    vlc_tick_t i_last_video_pts;
+    vlc_tick_t i_last_audio_pts;
+    uint64_t i_video_timecode_base;
+    uint64_t i_audio_timecode_base;
+    uint32_t i_audio_bps;
 } demux_sys_t;
+
+static void update_pcr( demux_sys_t *p_sys, demux_t *p_demux )
+{
+    vlc_tick_t i_min;
+
+    if( p_sys->i_last_video_pts == VLC_TICK_MIN )
+        i_min = p_sys->i_last_audio_pts;
+    else if( p_sys->i_last_audio_pts == VLC_TICK_MIN )
+        i_min = p_sys->i_last_video_pts;
+    else
+        i_min = __MIN( p_sys->i_last_video_pts, p_sys->i_last_audio_pts );
+
+    if( i_min > p_sys->i_pcr )
+    {
+        p_sys->i_pcr = i_min;
+        es_out_SetPCR( p_demux->out, i_min );
+    }
+}
+
+static vlc_tick_t timecode_to_pts( uint64_t *p_base, uint64_t i_timecode )
+{
+    if ( unlikely( *p_base == UINT64_MAX ) )
+        *p_base = i_timecode;
+    return VLC_TICK_0 + (vlc_tick_t)( i_timecode - *p_base ) / 10;
+}
+
+static uint32_t get_physical_channels( unsigned channels )
+{
+    switch ( channels )
+    {
+        case 1:  return AOUT_CHAN_CENTER;
+        case 2:  return AOUT_CHANS_STEREO;
+        case 4:  return AOUT_CHANS_4_0;
+        case 5:  return AOUT_CHANS_5_0;
+        case 6:  return AOUT_CHANS_5_1;
+        case 8:  return AOUT_CHANS_7_1;
+        default: return AOUT_CHANS_STEREO;
+    }
+}
 
 /*****************************************************************************/
 
@@ -95,12 +138,13 @@ static int data_callback( noidea_packet_t *noidea_packet, void *user_data )
 
             video->data = NULL;
             p_video_frame->i_buffer = video->size;
-            p_video_frame->i_pts = VLC_TICK_FROM_MSFTIME( video->timecode );
-            if ( p_video_frame->i_pts > p_sys->i_pcr )
-            {
-                p_sys->i_pcr = p_video_frame->i_pts;
-                es_out_SetPCR( p_demux->out, p_sys->i_pcr );
-            }
+            p_video_frame->i_pts = timecode_to_pts( &p_sys->i_video_timecode_base, video->timecode );
+            p_video_frame->i_dts = p_video_frame->i_pts;
+            if ( video->fps_num != 0 )
+                p_video_frame->i_length = vlc_tick_from_frac( video->fps_den, video->fps_num );
+
+            p_sys->i_last_video_pts = p_video_frame->i_pts;
+            update_pcr( p_sys, p_demux );
 
             es_out_Send( p_demux->out, p_sys->p_video_es, p_video_frame );
             break;
@@ -109,8 +153,13 @@ static int data_callback( noidea_packet_t *noidea_packet, void *user_data )
         case NDI_DATA_AUDIO:
         {
             noidea_packet_audio_t *audio = (noidea_packet_audio_t *) noidea_packet->packet;
+            if ( audio->sample_rate == 0 )
+            {
+                msg_Warn( p_demux, "Audio packet with zero sample rate, skipping" );
+                return 0;
+            }
+
             block_t *p_audio_frame = NULL;
-            
             if ( p_sys->p_audio_es == NULL )
             {
                 es_format_t audio_format;
@@ -137,6 +186,7 @@ static int data_callback( noidea_packet_t *noidea_packet, void *user_data )
                 audio_format.audio.i_rate = audio->sample_rate;
                 audio_format.audio.i_channels = audio->num_channels;
                 audio_format.audio.i_bitspersample = p_sys->i_audio_bps * 8;
+                audio_format.audio.i_physical_channels = get_physical_channels( audio->num_channels );
 
                 p_sys->p_audio_es = es_out_Add( p_demux->out, &audio_format );
                 if ( p_sys->p_audio_es == NULL )
@@ -161,12 +211,21 @@ static int data_callback( noidea_packet_t *noidea_packet, void *user_data )
                 }
             }
             p_audio_frame->i_buffer = buffer_size;
-            p_audio_frame->i_pts = VLC_TICK_FROM_MSFTIME( audio->timecode );
-            if ( p_audio_frame->i_pts > p_sys->i_pcr )
+            p_audio_frame->i_nb_samples = audio->num_samples;
+            p_audio_frame->i_length = vlc_tick_from_samples( audio->num_samples, audio->sample_rate );
+
+            if ( p_sys->i_audio_bps == sizeof( float ) )
             {
-                p_sys->i_pcr = p_audio_frame->i_pts;
-                es_out_SetPCR( p_demux->out, p_sys->i_pcr );
+                float *p = (float *) p_audio_frame->p_buffer;
+                for ( uint32_t i = 0; i < audio->num_samples * audio->num_channels; i++ )
+                    p[i] *= 10.0f;
             }
+
+            p_audio_frame->i_pts = timecode_to_pts( &p_sys->i_audio_timecode_base, audio->timecode );
+            p_audio_frame->i_dts = p_audio_frame->i_pts;
+
+            p_sys->i_last_audio_pts = p_audio_frame->i_pts;
+            update_pcr( p_sys, p_demux );
 
             es_out_Send( p_demux->out, p_sys->p_audio_es, p_audio_frame );
             break;
@@ -217,7 +276,7 @@ static int Demux( demux_t *p_demux )
     {
         if ( errno != EAGAIN )
         {
-            msg_Err( p_demux, "Failed to capture NDI data" );
+            msg_Err( p_demux, "Failed to capture NDI data: %s", vlc_strerror_c(errno) );
             break;
         }
 
@@ -236,6 +295,8 @@ static int Demux( demux_t *p_demux )
 
 static int Control( demux_t *p_demux, int query, va_list args )
 {
+    demux_sys_t *p_sys = (demux_sys_t *) p_demux->p_sys;
+
     switch ( query )
     {
         case DEMUX_CAN_PAUSE:
@@ -251,6 +312,13 @@ static int Control( demux_t *p_demux, int query, va_list args )
         case DEMUX_GET_TIME:
         case DEMUX_SET_TIME:
             return VLC_EGENERIC;
+
+        case DEMUX_GET_NORMAL_TIME:
+        {
+            vlc_tick_t *pi_time = va_arg( args, vlc_tick_t * );
+            *pi_time = p_sys->i_pcr;
+            break;
+        }
 
         case DEMUX_GET_PTS_DELAY:
             *va_arg( args, vlc_tick_t * ) =
@@ -347,12 +415,16 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_video_es = NULL;
     p_sys->p_audio_es = NULL;
-    p_sys->i_pcr = VLC_TICK_MIN;
+    p_sys->i_pcr = VLC_TICK_0;
+    p_sys->i_last_video_pts = VLC_TICK_MIN;
+    p_sys->i_last_audio_pts = VLC_TICK_MIN;
+    p_sys->i_video_timecode_base = UINT64_MAX;
+    p_sys->i_audio_timecode_base = UINT64_MAX;
     p_sys->noidea_ctx = noidea_ctx;
     p_demux->p_sys = p_sys;
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    
+
     vlc_UrlClean( &url );
     return VLC_SUCCESS;
 
