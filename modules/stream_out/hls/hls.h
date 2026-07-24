@@ -57,6 +57,7 @@ struct hls_config
     unsigned int max_segments;
     bool pace;
     vlc_tick_t segment_length;
+    vlc_tick_t max_segment_length;
     size_t max_memory;
     enum hls_playlist_type preferred_type;
 };
