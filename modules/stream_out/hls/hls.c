@@ -472,7 +472,7 @@ GeneratePlaylistManifest(const hls_playlist_t *playlist,
     // First version adding CMAF fragments support.
     MANIFEST_ADD_TAG("#EXT-X-VERSION:7");
 
-    const bool will_destroy_segments = playlist->config->max_segments == 0;
+    const bool will_destroy_segments = playlist->config->max_segments != 0;
     if (playlist->ended)
         MANIFEST_ADD_TAG("#EXT-X-PLAYLIST-TYPE:VOD");
     else if (!will_destroy_segments)
