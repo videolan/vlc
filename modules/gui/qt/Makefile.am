@@ -305,6 +305,7 @@ libqt_plugin_la_SOURCES = \
 	playlist/playlist_model.hpp \
 	playlist/playlist_model_p.hpp \
 	util/asynctask.hpp \
+	util/accessible_compat_attached.cpp util/accessible_compat_attached.hpp \
 	util/audio_device_model.cpp  \
 	util/audio_device_model.hpp \
 	util/workerthreadset.hpp util/workerthreadset.cpp \
@@ -498,6 +499,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	playlist/playlist_item.moc.cpp \
 	playlist/playlist_model.moc.cpp \
 	util/asynctask.moc.cpp \
+	util/accessible_compat_attached.moc.cpp \
 	util/audio_device_model.moc.cpp \
 	util/workerthreadset.moc.cpp \
 	util/base_model.moc.cpp \
