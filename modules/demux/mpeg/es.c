@@ -1651,12 +1651,12 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
                 snprintf( psz_key, sizeof(psz_key), "Lyrics:%s", psz_language );
                 vlc_meta_SetExtra( p_sys->p_meta, psz_key, psz_text );
 
-                /* Provide a synthetic sylt-data entry at t=0 so the Qt lyrics
+                /* Provide a synthetic uslt-data entry at t=0 so the Qt lyrics
                  * panel can display USLT text using the same timed-lyrics path. */
                 char *psz_sylt;
                 if( asprintf( &psz_sylt, "0\x1F%s\x1E", psz_text ) >= 0 )
                 {
-                    vlc_meta_SetExtra( p_sys->p_meta, "sylt-data", psz_sylt );
+                    vlc_meta_SetExtra( p_sys->p_meta, "uslt-data", psz_sylt );
                     free( psz_sylt );
                 }
             }
