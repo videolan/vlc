@@ -126,15 +126,15 @@ public:
         // Akin to `QQuickToolTipAttached`:
         if (visible)
         {
-            setPos(m_pos);
-            setText(m_text);
-
             if (!m_parentProperty)
                 m_parentProperty = QQmlProperty(m_instance, QStringLiteral("parent"));
 
             assert(m_parentProperty->isWritable());
 
             m_parentProperty->write(QVariant::fromValue(qobject_cast<QQuickItem*>(parent())));
+
+            setPos(m_pos);
+            setText(m_text);
 
             m_visibleProperty->write(true);
         }
