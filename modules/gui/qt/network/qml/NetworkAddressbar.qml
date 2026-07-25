@@ -25,6 +25,7 @@ import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Network
 import VLC.Menus
+import VLC.Util
 
 T.Control {
     id: control
@@ -93,6 +94,8 @@ T.Control {
         AddressbarButton {
             id: homeButton
 
+            AccessibleCompat.id: "addressBarHome"
+
             text: VLCIcons.home
             font.pixelSize: VLCStyle.icon_addressBar
 
@@ -115,6 +118,8 @@ T.Control {
 
         AddressbarButton {
             id: menuButton
+
+            AccessibleCompat.id: "addressBarMenu"
 
             visible: !!control._menuModel && control._menuModel.length > 0
             text: VLCIcons.breadcrumb_prev

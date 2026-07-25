@@ -95,6 +95,8 @@ T.Pane {
         Widgets.ButtonExt {
             id: medialibraryBtn
 
+            AccessibleCompat.id: "browseIndexButton"
+
             focus: true
 
             iconTxt: root.providerModel.indexed ? VLCIcons.medialibrary_remove : VLCIcons.medialibrary_add

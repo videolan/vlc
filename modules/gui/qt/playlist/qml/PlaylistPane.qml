@@ -59,7 +59,9 @@ T.Pane {
 
     verticalPadding: VLCStyle.margin_normal
 
+    Accessible.role: Accessible.Pane
     Accessible.name: qsTr("Play Queue")
+    AccessibleCompat.id: "playqueuePane"
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme

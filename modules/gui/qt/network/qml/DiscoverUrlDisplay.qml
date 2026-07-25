@@ -55,6 +55,8 @@ Widgets.PageExt {
             FocusScope {
                 id: searchFieldContainer
 
+                AccessibleCompat.id: "networkUrlSearchField"
+
                 width: parent.width
                 height: searchField.height + VLCStyle.margin_normal * 2
                 focus: true

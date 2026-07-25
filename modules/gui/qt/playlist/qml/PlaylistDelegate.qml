@@ -32,6 +32,8 @@ import VLC.Util
 T.Control {
     id: delegate
 
+    Accessible.name: title
+
     // Properties
 
     property Flickable view: ListView.view

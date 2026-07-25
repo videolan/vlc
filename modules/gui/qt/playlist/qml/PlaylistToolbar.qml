@@ -23,6 +23,7 @@ import QtQuick.Layouts
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Playlist
+import VLC.Util
 
 RowLayout {
     id: rowLayout
@@ -48,7 +49,11 @@ RowLayout {
             anchors.centerIn: parent
 
             font.pixelSize: VLCStyle.icon_playlist
+
             description: qsTr("Loop")
+
+            AccessibleCompat.id: "playqueueLoop"
+
             text: (MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT)
                       ? VLCIcons.repeat_one
                       : VLCIcons.repeat_all
@@ -72,7 +77,11 @@ RowLayout {
 
             checked: MainPlaylistController.random
             font.pixelSize: VLCStyle.icon_playlist
+
             description: qsTr("Shuffle")
+
+            AccessibleCompat.id: "playqueueShuffle"
+
             text: VLCIcons.shuffle
             onClicked: MainPlaylistController.toggleRandom()
         }
@@ -91,6 +100,10 @@ RowLayout {
             anchors.centerIn: parent
 
             font.pixelSize: VLCStyle.icon_playlist
+
+            description : qsTr("Sort")
+
+            AccessibleCompat.id: "playqueueSort"
 
             enabled: MainPlaylistController.count > 1
 
@@ -140,7 +153,11 @@ RowLayout {
 
             font.pixelSize: VLCStyle.icon_playlist
             enabled: !MainPlaylistController.empty
+
             description: qsTr("Clear play queue")
+
+            AccessibleCompat.id: "playqueueClearPlayqueue"
+
             text: VLCIcons.playlist_clear
             onClicked: MainPlaylistController.clear()
         }
