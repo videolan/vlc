@@ -37,6 +37,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg);
 static void CloseInstance(vlc_placebo_t *pl);
 static int MakeCurrent(vlc_placebo_t *pl);
 static void ReleaseCurrent(vlc_placebo_t *pl);
+static void Resize(vlc_placebo_t *pl, unsigned width, unsigned height);
 static void SwapBuffers(void *);
 
 #define GL_TEXT N_("OpenGL extension")
@@ -86,6 +87,7 @@ static const struct vlc_placebo_operations instance_opts =
     .close = CloseInstance,
     .make_current = MakeCurrent,
     .release_current = ReleaseCurrent,
+    .resize = Resize,
 };
 
 #if PL_API_VER >= 215
@@ -179,6 +181,12 @@ static void ReleaseCurrent(vlc_placebo_t *pl)
 {
     vlc_placebo_system_t *sys = pl->sys;
     vlc_gl_ReleaseCurrent(sys->gl);
+}
+
+static void Resize(vlc_placebo_t *pl, unsigned width, unsigned height)
+{
+    vlc_placebo_system_t *sys = pl->sys;
+    vlc_gl_Resize(sys->gl, width, height);
 }
 
 static void SwapBuffers(void *opaque)

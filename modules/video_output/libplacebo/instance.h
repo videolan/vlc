@@ -36,6 +36,8 @@ struct vlc_placebo_operations
     // For acquiring/releasing the context on the current thread. (Optional)
     int (*make_current)(struct vlc_placebo_t *);
     void (*release_current)(struct vlc_placebo_t *);
+
+    void (*resize)(struct vlc_placebo_t *, unsigned width, unsigned height);
 };
 
 typedef struct vlc_placebo_system_t vlc_placebo_system_t;
@@ -63,5 +65,7 @@ void vlc_placebo_Release(vlc_placebo_t *);
 // Needed around every `pl_gpu` / `pl_swapchain` operation
 int vlc_placebo_MakeCurrent(vlc_placebo_t *);
 void vlc_placebo_ReleaseCurrent(vlc_placebo_t *);
+
+void vlc_placebo_Resize(vlc_placebo_t *, unsigned width, unsigned height);
 
 #endif // VLC_LIBPLACEBO_INSTANCE_H

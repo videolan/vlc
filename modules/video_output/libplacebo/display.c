@@ -533,6 +533,7 @@ static int SetDisplaySize(vout_display_t *vd, unsigned width_, unsigned height_)
     if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
         return VLC_SUCCESS; // ignore errors
 
+    vlc_placebo_Resize(sys->pl, width_, height_);
     pl_swapchain_resize(sys->pl->swapchain, &width, &height);
     vlc_placebo_ReleaseCurrent(sys->pl);
 

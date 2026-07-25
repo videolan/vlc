@@ -147,3 +147,9 @@ void vlc_placebo_ReleaseCurrent(vlc_placebo_t *pl)
     if (pl->ops->release_current)
         pl->ops->release_current(pl);
 }
+
+void vlc_placebo_Resize(vlc_placebo_t *pl, unsigned width, unsigned height)
+{
+    if (pl->ops->resize)
+        pl->ops->resize(pl, width, height);
+}
