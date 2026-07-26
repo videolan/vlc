@@ -62,10 +62,8 @@ EXTRA_DIST += \
 	extras/tools/automake-clang.patch \
 	extras/tools/automake-disable-documentation.patch \
 	extras/tools/libtool-2.4.7-bitcode.patch \
-	extras/tools/libtool-2.5.4-clang-libs.patch \
 	extras/tools/libtool-2.4.7-lpthread.patch \
-	extras/tools/libtool-2.5.4-embed-bitcode.patch \
-	extras/tools/libtool-2.5.4-unarchive-old-libraries.patch \
+	extras/tools/libtool-2.6.2-embed-bitcode.patch \
 	extras/tools/libtool-2.5.4-ltmain.in-reference-MAGIC_EXE-in-the-main.patch \
 	extras/tools/libtool-2.5.4-libtool.m4-respect-the-provided-LTCFLAGS-LTCC-during.patch \
 	extras/tools/ninja-1.11.1-replace-pipes-quote-with-shlex-quote.patch \
