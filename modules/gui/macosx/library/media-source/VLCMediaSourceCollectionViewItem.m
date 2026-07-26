@@ -54,6 +54,12 @@ NSString *VLCMediaSourceCollectionViewItemIdentifier = @"VLCMediaSourceCollectio
     return self;
 }
 
+- (void)prepareForReuse
+{
+    [super prepareForReuse];
+    _representedItem = nil;
+}
+
 - (void)setRepresentedItem:(VLCInputItem *)representedItem
 {
     if (_representedItem == representedItem) {
