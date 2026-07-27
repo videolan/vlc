@@ -104,7 +104,6 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, size_t index, BaseRepresen
             chunk->discontinuitySequenceNumber = getDiscontinuitySequenceNumber();
             if(!prepareChunk(res, chunk, rep))
             {
-                res->getConnManager()->recycleSource(source);
                 delete chunk;
                 return nullptr;
             }
