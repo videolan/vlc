@@ -36,6 +36,9 @@ static const char *const HLS_PLAYLIST_TYPE_STRINGS[] = {
 static inline int hls_playlist_type_FromString(const char *str,
                                                enum hls_playlist_type *out)
 {
+    if (str == NULL)
+        return -ENOENT;
+
     for (unsigned i = 0; i < ARRAY_SIZE(HLS_PLAYLIST_TYPE_STRINGS); ++i)
     {
         if (!strcmp(str, HLS_PLAYLIST_TYPE_STRINGS[i]))
