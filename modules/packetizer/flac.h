@@ -58,7 +58,7 @@ static inline void FLAC_ParseStreamInfo( const uint8_t *p_buf,
     stream_info->max_framesize = GetDWBE( &p_buf[6] ) & 0x00FFFFFF;
 
     stream_info->sample_rate = GetDWBE( &p_buf[10] ) >> 12;
-    stream_info->channels = (p_buf[12] & 0x0F >> 1) + 1;
+    stream_info->channels = ((p_buf[12] >> 1) & 0x07) + 1;
     stream_info->bits_per_sample = (((p_buf[12] & 0x01) << 4) | p_buf[13] >> 4) + 1;
 
     stream_info->total_samples = GetQWBE(&p_buf[4+6]) & ((INT64_C(1)<<36)-1);
