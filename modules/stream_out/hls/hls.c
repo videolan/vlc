@@ -619,6 +619,11 @@ static hls_block_chain_t ExtractAVSegment(enum hls_playlist_type type,
         muxed_output->begin = cut.last->p_next;
         cut.last->p_next = NULL;
         muxed_output->length -= segment.length;
+        if (muxed_output->begin == NULL)
+        {
+            muxed_output->end = &muxed_output->begin;
+            muxed_output->last_header = NULL;
+        }
     }
     else
     {
