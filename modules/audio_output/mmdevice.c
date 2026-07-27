@@ -756,7 +756,10 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
     wchar_t *previous = atomic_exchange(&sys->device_name, selected_device_name);
     free(previous);
     if (unlikely(selected_device_name == NULL && new_string))
+    {
+        sys->device_status = DEVICE_ACQUISITION_FAILED;
         return -1;
+    }
 
     return DeviceRequestLocked(aout);
 }
