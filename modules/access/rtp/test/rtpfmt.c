@@ -93,7 +93,12 @@ int main(void)
         "m=naughty 5010 RTP/AVP 64 64 foobar 128 255\r\n"
         "a=rtpmap:64 invalid/0/0\r\n"
         "m=evil 5010 RTP/AVP 42 128 255\r\n"
-        "a=rtpmap:128 overflow/90000\r\n";
+        "a=rtpmap:128 overflow/90000\r\n"
+        "m=undead 5012 RTP/AVP 96\r\n"
+        "a=rtpmap\r\n"
+        "a=fmtp\r\n"
+        "a=recvonly\r\n"
+        "a=rtpmap:96 t140/1000\r\n";
 
     int val;
 
@@ -129,6 +134,13 @@ int main(void)
     assert(media != NULL);
     EXPECT_PTS();
     vlc_rtp_add_media_types(NULL, NULL, media, &owner);
+
+    /* undead: attributes without a value must be skipped, not dereferenced */
+    media = media->next;
+    assert(media != NULL);
+    EXPECT_PTS(96);
+    val = vlc_rtp_add_media_types(NULL, NULL, media, &owner);
+    assert(val == 0);
 
     media = media->next;
     EXPECT_PTS();
