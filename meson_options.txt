@@ -133,6 +133,11 @@ option('css_engine',
     value : 'auto',
     description : 'CSS selector engine for WebVTT')
 
+option('adaptive',
+    type : 'feature',
+    value : 'auto',
+    description : 'Adaptive streaming (DASH/HLS/Smooth) demux module')
+
 # Dependency options
 option('chromecast',
     type : 'feature',

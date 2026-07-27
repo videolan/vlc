@@ -514,6 +514,8 @@ if HAVE_GCRYPT
 libvlc_adaptive_la_CXXFLAGS += $(GCRYPT_CFLAGS)
 libvlc_adaptive_la_LIBADD += $(GCRYPT_LIBS)
 endif
+
+if ENABLE_ADAPTIVE
 noinst_LTLIBRARIES += libvlc_adaptive.la
 
 libadaptive_plugin_la_SOURCES = demux/adaptive/adaptive.cpp
@@ -539,6 +541,7 @@ adaptive_test_SOURCES = \
 adaptive_test_LDADD = libvlc_adaptive.la
 check_PROGRAMS += adaptive_test
 TESTS += adaptive_test
+endif
 
 libytdl_plugin_la_SOURCES = demux/ytdl.c
 libytdl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DEXEEXT=\"$(EXEEXT)\"

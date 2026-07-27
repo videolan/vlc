@@ -2251,6 +2251,14 @@ dnl
 EXTEND_HELP_STRING([Input plugins:])
 
 dnl
+dnl  Adaptive streaming demux (DASH/HLS/Smooth)
+dnl
+AC_ARG_ENABLE([adaptive],
+  AS_HELP_STRING([--disable-adaptive],
+    [disable the adaptive streaming demux (DASH/HLS/Smooth) (default enabled)]))
+AM_CONDITIONAL([ENABLE_ADAPTIVE], [test "${enable_adaptive}" != "no"])
+
+dnl
 dnl  libarchive access module
 dnl
 PKG_ENABLE_MODULES_VLC([ARCHIVE], [archive], [libarchive >= 3.1.0], (libarchive support), [auto])

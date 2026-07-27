@@ -471,6 +471,7 @@ endif
 
 vlc_modules += {
     'name' : 'adaptive',
+    'enabled' : get_option('adaptive').allowed(),
     'sources' : files(
         # DASH specific sources
         'dash/mpd/AdaptationSet.cpp',
