@@ -645,6 +645,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
             p_dec->fmt_out.audio.i_channels = channel_count;
 
             aout_FormatPrepare(&p_dec->fmt_out.audio);
+            p_sys->b_extract = false;
             return;
         }
 
