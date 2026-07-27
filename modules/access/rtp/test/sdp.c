@@ -121,6 +121,35 @@ int main(void)
 
     vlc_sdp_free(sdp);
 
+    /* Connection address starting with '/': the first sscanf() conversion
+     * fails, so the truncation offset must default to zero. */
+    static const char slashaddr[] =
+        "v=0\r\n"
+        "o=- 0 0 x y z\r\n"
+        "s=\r\n"
+        "c=IN IP4 /127\r\n"
+        "t=0 0\r\n"
+        "m=text 5004 RTP/AVP 96\r\n"
+        "c=IN IP6 /2\r\n";
+
+    test_sdp_valid(slashaddr);
+
+    sdp = vlc_sdp_parse(slashaddr, strlen(slashaddr));
+    assert(sdp != NULL);
+    c = sdp->conn;
+    assert(c != NULL);
+    assert(c->family == 4);
+    assert(!strcmp(c->addr, ""));
+    assert(c->ttl == 255);
+    assert(c->addr_count == 1);
+    assert(sdp->media != NULL);
+    c = vlc_sdp_media_conn(sdp->media);
+    assert(c != NULL);
+    assert(c->family == 6);
+    assert(!strcmp(c->addr, ""));
+    assert(c->addr_count == 1);
+    vlc_sdp_free(sdp);
+
     char smallest[] =
         "v=0\n"
         "o=- 0 0 x y z\n"
