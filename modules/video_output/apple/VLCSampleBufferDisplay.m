@@ -755,8 +755,54 @@ shouldInheritContentsScale:(CGFloat)newScale
         @synchronized(sys.displayLayer) {
             sys.displayLayer = displayView.displayLayer;
         }
+        [sys observeDisplayLayerFailures];
         [sys preparePictureInPicture];
     });
+}
+
+- (void)observeDisplayLayerFailures {
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+
+#if !TARGET_OS_OSX
+    [notificationCenter addObserver:self
+                           selector:@selector(applicationDidBecomeActive:)
+                               name:UIApplicationDidBecomeActiveNotification
+                             object:nil];
+#endif
+
+    if (@available(iOS 14.0, tvOS 14.0, macOS 11.0, *)) {
+        [notificationCenter addObserver:self
+                               selector:@selector(displayLayerRequiresFlushDidChange:)
+                                   name:AVSampleBufferDisplayLayerRequiresFlushToResumeDecodingDidChangeNotification
+                                 object:self.displayLayer];
+    }
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    [self flushToResumeDecoding];
+}
+
+- (void)displayLayerRequiresFlushDidChange:(NSNotification *)notification {
+    [self flushToResumeDecoding];
+}
+
+- (void)flushToResumeDecoding {
+    AVSampleBufferDisplayLayer * const displayLayer = self.displayLayer;
+    @synchronized(displayLayer) {
+        if (displayLayer.status != AVQueuedSampleBufferRenderingStatusFailed)
+            return;
+
+        /* only a failure caused by revoked decoder resources is recoverable */
+        if (@available(iOS 14.0, tvOS 14.0, macOS 11.0, *)) {
+            if (!displayLayer.requiresFlushToResumeDecoding) {
+                msg_Err(_vd, "display layer failed permanently: %s",
+                        displayLayer.error.localizedDescription.UTF8String);
+                return;
+            }
+        }
+
+        [displayLayer flush];
+    }
 }
 
 - (void)placeVideo:(vout_display_place_t)newPlace {
@@ -764,6 +810,8 @@ shouldInheritContentsScale:(CGFloat)newScale
 }
 
 - (void)close {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
     VLCSampleBufferDisplay *sys = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         [sys.displayView removeFromSuperview];
@@ -828,6 +876,8 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
 
     @synchronized(sys.displayLayer) {
         if (sys.displayLayer == nil)
+            return;
+        if (sys.displayLayer.status == AVQueuedSampleBufferRenderingStatusFailed)
             return;
     }
 
