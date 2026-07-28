@@ -81,6 +81,7 @@ extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 @property (readonly, nullable) NSArray<NSString *> *finderTags;
 
 - (nullable NSString *)extraMetaForKey:(NSString *)key;
+- (nullable NSString *)radioCountryCodeForFlagArtwork;
 
 - (void)parseInputItem;
 - (void)cancelParsing;

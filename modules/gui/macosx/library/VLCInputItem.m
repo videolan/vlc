@@ -429,6 +429,17 @@ static const struct input_item_parser_cbs_t parserCallbacks =
     }
 }
 
+- (nullable NSString *)radioCountryCodeForFlagArtwork
+{
+    NSURL * const url = [NSURL URLWithString:self.MRL];
+    if (![url.scheme isEqualToString:@"radio"]) {
+        return nil;
+    }
+
+    NSString * const countryCode = url.host.uppercaseString;
+    return flagEmojiStringForCountryCode(countryCode) ? countryCode : nil;
+}
+
 - (void)parseInputItem
 {
     const struct input_item_parser_cfg cfg = {

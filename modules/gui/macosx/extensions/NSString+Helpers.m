@@ -49,6 +49,34 @@ NSString *const kVLCMediaVideoTSFolder = @"VIDEO_TS";
 NSString *const kVLCMediaBDMVFolder = @"BDMV";
 NSString *const kVLCMediaUnknown = @"Unknown";
 
+NSString * flagEmojiStringForCountryCode(NSString *countryCode)
+{
+    NSString * const uppercaseCode = countryCode.uppercaseString;
+    if (uppercaseCode.length != 2) {
+        return nil;
+    }
+
+    NSMutableString * const emoji = [NSMutableString stringWithCapacity:2];
+    for (NSUInteger i = 0; i < uppercaseCode.length; i++) {
+        const unichar character = [uppercaseCode characterAtIndex:i];
+        if (character < 'A' || character > 'Z') {
+            return nil;
+        }
+
+        uint32_t const scalar = 0x1F1E6 + (character - 'A');
+        NSString * const regionalIndicator =
+            [[NSString alloc] initWithBytes:&scalar
+                                     length:sizeof(scalar)
+                                   encoding:NSUTF32LittleEndianStringEncoding];
+        if (regionalIndicator == nil) {
+            return nil;
+        }
+        [emoji appendString:regionalIndicator];
+    }
+
+    return emoji;
+}
+
 @implementation NSString (Helpers)
 
 + (instancetype)stringWithDuration:(vlc_tick_t)duration

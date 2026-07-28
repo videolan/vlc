@@ -22,8 +22,64 @@
 
 #import "NSImage+VLCAdditions.h"
 
+#import "NSString+Helpers.h"
+
 #import <QuickLook/QuickLook.h>
 #import <QuickLookThumbnailing/QuickLookThumbnailing.h>
+
+static NSImage *ImageFromEmoji(NSString *emoji, NSSize size)
+{
+    const NSInteger pixelsWide = MAX((NSInteger)ceil(size.width), 1);
+    const NSInteger pixelsHigh = MAX((NSInteger)ceil(size.height), 1);
+    NSBitmapImageRep * const bitmapImageRep =
+        [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL
+                                               pixelsWide:pixelsWide
+                                               pixelsHigh:pixelsHigh
+                                            bitsPerSample:8
+                                          samplesPerPixel:4
+                                                 hasAlpha:YES
+                                                 isPlanar:NO
+                                           colorSpaceName:NSCalibratedRGBColorSpace
+                                              bytesPerRow:0
+                                             bitsPerPixel:0];
+    if (!bitmapImageRep) {
+        return nil;
+    }
+    bitmapImageRep.size = size;
+
+    NSGraphicsContext * const context =
+        [NSGraphicsContext graphicsContextWithBitmapImageRep:bitmapImageRep];
+    if (!context) {
+        return nil;
+    }
+
+    NSGraphicsContext * const previousContext = NSGraphicsContext.currentContext;
+    NSGraphicsContext.currentContext = context;
+    [context saveGraphicsState];
+    [NSColor.whiteColor setFill];
+    NSRectFill(NSMakeRect(0., 0., size.width, size.height));
+
+    const CGFloat initialFontSize = MIN(size.width, size.height);
+    NSDictionary *attributes = @{ NSFontAttributeName : [NSFont systemFontOfSize:initialFontSize] };
+    NSSize emojiSize = [emoji sizeWithAttributes:attributes];
+    if (emojiSize.width > size.width || emojiSize.height > size.height) {
+        const CGFloat scale = MIN(size.width / emojiSize.width, size.height / emojiSize.height);
+        const CGFloat fontSize = floor(initialFontSize * scale);
+        attributes = @{ NSFontAttributeName : [NSFont systemFontOfSize:MAX(fontSize, 1.)] };
+        emojiSize = [emoji sizeWithAttributes:attributes];
+    }
+
+    const NSPoint point = NSMakePoint((size.width - emojiSize.width) / 2.,
+                                     (size.height - emojiSize.height) / 2.);
+    [emoji drawAtPoint:point withAttributes:attributes];
+    [context flushGraphics];
+    [context restoreGraphicsState];
+    NSGraphicsContext.currentContext = previousContext;
+
+    NSImage * const image = [[NSImage alloc] initWithSize:size];
+    [image addRepresentation:bitmapImageRep];
+    return image;
+}
 
 @implementation NSImage(VLCAdditions)
 
@@ -187,8 +243,24 @@
     return [NSImage imageNamed:@"repeatOff"];
 }
 
-+ (void)quickLookPreviewForLocalPath:(NSString *)path 
-                            withSize:(NSSize)size 
++ (nullable NSImage *)flagImageForCountryCode:(NSString *)countryCode
+                                         size:(NSSize)size
+{
+    if (size.width <= 0 || size.height <= 0) {
+        return nil;
+    }
+
+    NSString * const uppercaseCountryCode = countryCode.uppercaseString;
+    NSString * const emoji = flagEmojiStringForCountryCode(uppercaseCountryCode);
+    if (emoji == nil) {
+        return nil;
+    }
+
+    return ImageFromEmoji(emoji, size);
+}
+
++ (void)quickLookPreviewForLocalPath:(NSString *)path
+                            withSize:(NSSize)size
                    completionHandler:(void (^)(NSImage *))completionHandler
 {
     NSURL * const pathUrl = [NSURL fileURLWithPath:path];

@@ -82,6 +82,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<NSValue *> *)framesForCompositeImageSquareGridWithImages:(NSArray<NSImage *> * const)images
                                                                size:(const NSSize)size
                                                       gridItemCount:(const NSUInteger)gridItemCount;
++ (nullable NSImage *)flagImageForCountryCode:(NSString *)countryCode
+                                         size:(NSSize)size;
 
 - (instancetype)imageTintedWithColor:(NSColor *)color;
 

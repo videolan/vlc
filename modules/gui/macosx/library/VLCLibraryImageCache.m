@@ -42,7 +42,6 @@ uint32_t kVLCDesiredThumbnailHeight = 512;
 float kVLCDefaultThumbnailPosition = .15;
 const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
 
-
 @interface VLCLibraryImageCache()
 {
     NSCache *_imageCache;
@@ -214,6 +213,32 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     [VLCLibraryImageCache.sharedImageCache imageForInputItem:inputItem withCompletion:completionHandler];
 }
 
+- (void)imageForCountryCode:(NSString *)countryCode
+             withCompletion:(void(^)(const NSImage * _Nullable))completionHandler
+{
+    NSString * const normalizedCountryCode = countryCode.uppercaseString;
+    NSString * const cacheKey = [@"flag://" stringByAppendingString:normalizedCountryCode];
+    NSImage * const cachedImage = [_imageCache objectForKey:cacheKey];
+    if (cachedImage) {
+        completionHandler(cachedImage);
+        return;
+    }
+
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        const NSSize imageSize =
+            NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
+        NSImage * const image = [NSImage flagImageForCountryCode:normalizedCountryCode
+                                                           size:imageSize];
+        if (image) {
+            const NSUInteger cost = [VLCLibraryImageCache costForImage:image];
+            [self->_imageCache setObject:image forKey:cacheKey cost:cost];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(image);
+        });
+    });
+}
+
 - (void)imageForInputItem:(VLCInputItem *)inputItem 
            withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
@@ -225,8 +250,8 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     [self generateImageForInputItem:inputItem withCompletion:completionHandler];
 }
 
-- (void)generateImageForInputItem:(VLCInputItem *)inputItem
-                   withCompletion:(void(^)(const NSImage *))completionHandler
+- (void)generateArtworkForInputItem:(VLCInputItem *)inputItem
+                     withCompletion:(void(^)(const NSImage *))completionHandler
 {
     NSURL * const artworkURL = inputItem.artworkURL;
     const NSSize imageSize = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
@@ -257,6 +282,25 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
             });
         }];
     });
+}
+
+- (void)generateImageForInputItem:(VLCInputItem *)inputItem
+                   withCompletion:(void(^)(const NSImage *))completionHandler
+{
+    NSString * const radioCountryCode = inputItem.radioCountryCodeForFlagArtwork;
+    if (!radioCountryCode) {
+        [self generateArtworkForInputItem:inputItem withCompletion:completionHandler];
+        return;
+    }
+
+    [self imageForCountryCode:radioCountryCode
+               withCompletion:^(const NSImage * const flagImage) {
+        if (flagImage) {
+            completionHandler(flagImage);
+            return;
+        }
+        [self generateArtworkForInputItem:inputItem withCompletion:completionHandler];
+    }];
 }
 
 + (void)thumbnailForPlayQueueItem:(VLCPlayQueueItem *)playQueueItem

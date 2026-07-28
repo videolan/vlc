@@ -37,6 +37,7 @@
 #import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
@@ -298,8 +299,6 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 
         const enum input_item_type_e inputType = childRootInput.inputType;
         const BOOL isStream = childRootInput.isStream;
-        
-        NSURL * const artworkURL = childRootInput.artworkURL;
 
         NSImage *placeholder;
         if (mediaSource.category == SD_CAT_LAN) {
@@ -326,8 +325,15 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
             }
         }
         NSAssert(placeholder != nil, @"Placeholder image should not be nil");
-        
-        if (artworkURL) {
+
+        NSURL * const artworkURL = childRootInput.artworkURL;
+        if (childRootInput.radioCountryCodeForFlagArtwork) {
+            viewItem.mediaImageView.image = placeholder;
+            [VLCLibraryImageCache thumbnailForInputItem:childRootInput
+                                         withCompletion:^(const NSImage * const thumbnail) {
+                viewItem.mediaImageView.image = (NSImage *)thumbnail;
+            }];
+        } else if (artworkURL) {
             [viewItem.mediaImageView setImageURL:artworkURL placeholderImage:placeholder];
         } else {
             viewItem.mediaImageView.image = placeholder;
@@ -435,7 +441,13 @@ referenceSizeForHeaderInSection:(NSInteger)section
             VLCInputItem * const currentNodeInput = _lanDeviceSnapshot[row].inputNode.inputItem;
             NSURL * const artworkURL = currentNodeInput.artworkURL;
             NSImage * const placeholder = NSImage.VLCDefaultAppIconImage;
-            if (artworkURL) {
+            if (currentNodeInput.radioCountryCodeForFlagArtwork) {
+                cellView.representedImageView.image = placeholder;
+                [VLCLibraryImageCache thumbnailForInputItem:currentNodeInput
+                                             withCompletion:^(const NSImage * const thumbnail) {
+                    cellView.representedImageView.image = (NSImage *)thumbnail;
+                }];
+            } else if (artworkURL) {
                 [cellView.representedImageView setImageURL:artworkURL placeholderImage:placeholder];
             } else {
                 cellView.representedImageView.image = placeholder;

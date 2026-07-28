@@ -201,6 +201,11 @@ NSString * getVolumeTypeFromMountPath(NSString *mountPath);
 NSString * getBSDNodeFromMountPath(NSString *mountPath);
 
 /**
+ * Converts an ISO 3166-1 alpha-2 country code to its flag emoji.
+ */
+NSString * flagEmojiStringForCountryCode(NSString *countryCode);
+
+/**
  * Converts VLC key string to a prettified version, for hotkey settings.
  * The returned string adapts similar how its done within the cocoa framework when setting this
  * key to menu items.
