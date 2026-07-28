@@ -25,6 +25,8 @@
 #include <vlc_text_style.h>
 #include <vlc_subpicture.h>
 
+#include <stdint.h>
+
 typedef struct substext_updater_region_t substext_updater_region_t;
 
 enum substext_updater_region_flags_e
@@ -106,7 +108,7 @@ static uint64_t GetScalingModesAsFlags(const substext_updater_region_t *r)
     uint64_t in_window_flags = 0;
     for (int i=0; i<63 && r; i++)
     {
-        in_window_flags |= (!r->b_in_window) << i;
+        in_window_flags |= (r->b_in_window ? UINT64_C(0) : UINT64_C(1)) << i;
         r = r->p_next;
     }
     return in_window_flags;
