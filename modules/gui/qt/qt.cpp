@@ -59,12 +59,24 @@ extern "C" char **environ;
 #include <QQmlError>
 #include <QList>
 #include <QTranslator>
-#ifdef _WIN32
-#include <QOperatingSystemVersion>
+
+#if __has_include(<rhi/qrhi.h>) // Qt 6.6
+#define RHI_HEADER_AVAILABLE
+#include <rhi/qrhi.h>
+#elif __has_include(<QtGui/private/qrhi_p.h>) && \
+      QT_VERSION >= QT_VERSION_CHECK(6, 4, 0) // `QRhi::probe()` is available since Qt 6.4
+#define RHI_HEADER_AVAILABLE
+#include <QtGui/private/qrhi_p.h>
+#include <QtGui/private/qrhigles2_p.h> // for `QRhiGles2InitParams`
+#endif
+#ifdef RHI_HEADER_AVAILABLE
+#include <QOffscreenSurface>
 #include <QThreadPool>
 #include "util/asynctask.hpp"
-#include <rhi/qrhi.h>
-#include <QOffscreenSurface>
+#endif
+
+#ifdef _WIN32
+#include <QOperatingSystemVersion>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -109,6 +121,7 @@ extern "C" char **environ;
 #include <vlc_messages.h>
 
 #include <QQuickWindow>
+#include <QOpenGLContext> // Available in Qt GUI, no need for Qt OpenGL module
 
 #ifndef X_DISPLAY_MISSING
 # include <vlc_xlib.h>
@@ -962,13 +975,47 @@ static void *Thread( void *obj )
 #endif
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
 
-#if defined(_WIN32)
+    // It is guaranteed that the returned format is supported, if a format is returned.
+    static const auto createCompatibleOpenGLFormat = []() -> std::optional<QSurfaceFormat> {
+        QOpenGLContext defaultCtx;
+        // This is really unnecessary to check, since Qt should not be using unavailable contexts, but nevertheless.
+        if (Q_UNLIKELY(!defaultCtx.create()))
+            return std::nullopt;
+
+        const QSurfaceFormat format = defaultCtx.format();
+
+        if (format.majorVersion() >= 3) // We need OpenGL (ES) 3.0 since our shaders use `textureSize()`.
+            return format;
+
+        QSurfaceFormat compatibleFormat = format;
+        compatibleFormat.setMajorVersion(3);
+        compatibleFormat.setMinorVersion(0);
+
+        // OpenGL ES does not have core/compatibility profiles:
+        if (compatibleFormat.renderableType() == QSurfaceFormat::OpenGL)
+            compatibleFormat.setProfile(QSurfaceFormat::CoreProfile);
+
+        QOpenGLContext ctx;
+        ctx.setFormat(compatibleFormat);
+
+        if (!ctx.create() || ctx.format().majorVersion() < 3)
+        {
+            qCritical() << "OpenGL (ES) 3.0 context creation failed.";
+            return std::nullopt;
+        }
+        else
+        {
+            return compatibleFormat;
+        }
+    };
+
+#ifdef RHI_HEADER_AVAILABLE
     // NOTE: Qt Quick does not have a cross-API RHI fallback procedure (as of Qt 6.7.1).
     //       We have to manually pick a graphics api here, since the default graphics
     //       api (Direct3D 11.2) may not be supported.
     static const auto probeRhi = []() -> QPair<QSGRendererInterface::GraphicsApi,
                                                bool /* software through rhi, such as d3d warp */> {
-
+#if defined(_WIN32)
         // TODO: Investigate if we should use D3D12. Currently it is not the default by
         //       Qt (as of Qt 6.8), and is not as battle tested as the default D3D11.
 #ifndef NDEBUG
@@ -994,16 +1041,25 @@ static void *Thread( void *obj )
                 return {QSGRendererInterface::Direct3D11, false};
             }
         }
+#endif
 
         std::optional<QPair<QSGRendererInterface::GraphicsApi, bool>> retGlProbe;
         QMetaObject::invokeMethod(qApp, [&retGlProbe]() {
             // Due to offscreen surface involvement, this has to be done in the
             // gui thread only:
             QRhiGles2InitParams params;
+
+            const std::optional<QSurfaceFormat> format = createCompatibleOpenGLFormat();
+            if (format)
+                params.format = *format;
+            else
+                return;
+
             params.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
             if (QRhi::probe(QRhi::OpenGLES2, &params))
             {
                 retGlProbe = {QSGRendererInterface::OpenGL, false};
+                QSurfaceFormat::setDefaultFormat(*format);
             }
             delete params.fallbackSurface;
         }, Qt::BlockingQueuedConnection);
@@ -1013,6 +1069,7 @@ static void *Thread( void *obj )
         // TODO: Investigate if using Vulkan makes sense on Windows.
         // TODO: Investigate if it makes sense to try D3D12 when probing D3D11 failed.
 
+#if defined(_WIN32)
         {
             // D3D11 Warp:
 
@@ -1031,6 +1088,7 @@ static void *Thread( void *obj )
                 return {QSGRendererInterface::Direct3D11, true};
             }
         }
+#endif
 
         // Qt's own software renderer, it can not display shader effects and is very
         // primitive. Used as last resort:
@@ -1119,6 +1177,23 @@ static void *Thread( void *obj )
             QQuickWindow::setGraphicsApi(graphicsApi);
             p_intf->mainSettings->setValue(graphicsApiKey, static_cast<int>(graphicsApi));
             p_intf->mainSettings->sync();
+        }
+    }
+#else
+    if (qEnvironmentVariable("QT_QUICK_BACKEND", QStringLiteral("rhi")) == QLatin1String("rhi"))
+    {
+        if (QQuickWindow::graphicsApi() == QSGRendererInterface::OpenGL)
+        {
+            // At least set the default format without RHI probing if RHI headers are not available:
+            if (std::optional<QSurfaceFormat> format = createCompatibleOpenGLFormat())
+            {
+                QSurfaceFormat::setDefaultFormat(*format);
+            }
+            else
+            {
+                qCritical() << "Falling back to software mode...";
+                QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+            }
         }
     }
 #endif
