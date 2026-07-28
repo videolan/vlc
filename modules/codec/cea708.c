@@ -747,8 +747,10 @@ static void CEA708_Window_Scroll( cea708_window_t *p_w )
             for( int i=p_w->i_firstrow; i <= p_w->i_lastrow; i++ )
                 p_w->rows[i-1] = p_w->rows[i];
             p_w->rows[p_w->i_lastrow] = NULL;
-            p_w->i_firstrow--;
-            p_w->i_lastrow--;
+            if( p_w->i_firstrow != 0 )
+                p_w->i_firstrow--;
+            if( p_w->i_lastrow != 0 )
+                p_w->i_lastrow--;
             break;
     }
 }
