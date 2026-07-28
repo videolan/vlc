@@ -114,6 +114,18 @@ static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
                  proposedRow:(NSInteger)row
        proposedDropOperation:(NSTableViewDropOperation)dropOperation
 {
+    // Make drops at the end of the table go to the end.
+    if (row == -1) {
+        row = tableView.numberOfRows;
+        dropOperation = NSTableViewDropAbove;
+        [tableView setDropRow:row dropOperation:dropOperation];
+    }
+
+    // We don't ever want to drop onto a row, only between rows.
+    if (dropOperation == NSTableViewDropOn) {
+        [tableView setDropRow:row + 1 dropOperation:NSTableViewDropAbove];
+    }
+
     return NSDragOperationCopy;
 }
 
