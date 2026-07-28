@@ -106,7 +106,7 @@ static inline void SubpictureUpdaterSysRegionAdd(substext_updater_region_t *p_pr
 static uint64_t GetScalingModesAsFlags(const substext_updater_region_t *r)
 {
     uint64_t in_window_flags = 0;
-    for (int i=0; i<63 && r; i++)
+    for (int i=0; i<64 && r; i++)
     {
         in_window_flags |= (r->b_in_window ? UINT64_C(0) : UINT64_C(1)) << i;
         r = r->p_next;
