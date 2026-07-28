@@ -35,6 +35,18 @@ ControlBar {
     state: Player.isStarted ? "inViewport"
                             : "outViewport"
 
+    Binding on state {
+        id: stateBinding
+        when: false
+        delayed: true
+        value: Player.isStarted ? "inViewport"
+                                : "outViewport"
+    }
+
+    Component.onCompleted: {
+        Qt.callLater(() => { stateBinding.when = true })
+    }
+
     textPosition: (MainCtx.pinVideoControls) ? ControlBar.TimeTextPosition.LeftRightSlider
                                              : ControlBar.TimeTextPosition.Hide
 
