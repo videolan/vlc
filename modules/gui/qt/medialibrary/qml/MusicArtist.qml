@@ -19,7 +19,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Window
-import QtQml.Models
 import QtQuick.Layouts
 
 import VLC.MediaLibrary
@@ -454,7 +453,6 @@ FocusScope {
         let initialIndex = root.initialIndex
         if (initialIndex >= albumModel.count)
             initialIndex = 0
-        albumSelectionModel.select(initialIndex, ItemSelectionModel.ClearAndSelect)
         const albumsListView = MainCtx.gridView ? _currentView : _currentView?.preferredHeaderItem?.albumsListView
         if (albumsListView) {
             albumsListView.currentIndex = initialIndex
