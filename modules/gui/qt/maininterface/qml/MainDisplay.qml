@@ -946,6 +946,17 @@ FocusScope {
             visible: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
             enabled: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
 
+            Binding on visible {
+                id: visibleBinding
+                when: false
+                delayed: true
+                value: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
+            }
+
+            Component.onCompleted: {
+                Qt.callLater(() => { visibleBinding.when = true })
+            }
+
             dragXMin: VLCStyle.applicationHorizontalMargin
             dragXMax: g_mainDisplay.width - playerPip.width - VLCStyle.applicationHorizontalMargin
             dragYMin: localTopbar.y + localTopbar.height
