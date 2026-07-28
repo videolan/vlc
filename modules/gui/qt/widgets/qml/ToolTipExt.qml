@@ -18,6 +18,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
+import QtQuick.Window
 
 import VLC.MainInterface
 import VLC.Style
@@ -77,8 +78,7 @@ T.ToolTip {
 
         text: control.text
         font: control.font
-        wrapMode: Text.WordWrap
-
+        wrapMode: textMetrics.width > maxContentWidth ? Text.WordWrap : Text.NoWrap
         color: theme.fg.primary
 
         property QtWindow _lastWindowForNoRedirectionSurface
@@ -94,6 +94,25 @@ T.ToolTip {
                         }
                     }
                 })
+            }
+        }
+
+        readonly property real maxContentWidth: (control.popupType === 1 /* Popup.Window */)
+            ? Screen.desktopAvailableWidth
+            : Window.width
+
+        TextMetrics {
+            id: textMetrics
+
+            font: contentText.font
+            text: {
+                const lines = contentText.text.split("\n")
+                let longestLine = ""
+                for (let i in lines) {
+                    if (lines[i].length > longestLine.length)
+                        longestLine = lines[i]
+                }
+                return longestLine
             }
         }
     }
