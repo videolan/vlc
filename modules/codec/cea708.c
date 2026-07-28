@@ -81,16 +81,16 @@ static void CEA708_DTVCC_Demux_ServiceBlocks( cea708_demux_t *h, vlc_tick_t i_st
         uint8_t i_sid = p_data[0] >> 5;
         const uint8_t i_block_size = p_data[0] & 0x1F;
 
-        if( i_block_size == 0 || i_block_size > i_data - 1 )
-        {
-            return;
-        }
-        else if( i_sid == 0x07 )
+        if( i_sid == 0x07 )
         {
             i_sid = p_data[1] & 0x3F;
             if( i_sid < 0x07 )
                 return;
             p_data += 1; i_data -= 1;
+        }
+        if( i_block_size == 0 || i_block_size > i_data - 1 )
+        {
+            return;
         }
         p_data += 1; i_data -= 1;
 
