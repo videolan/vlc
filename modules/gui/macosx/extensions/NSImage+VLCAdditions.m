@@ -280,7 +280,7 @@
 {
     return [NSImage imageWithSize:size
                           flipped:NO
-                   drawingHandler:^BOOL(const NSRect dstRect) {
+                   drawingHandler:^BOOL(const NSRect __unused dstRect) {
 
         NSUInteger counter = 0;
         for (NSValue * const rectValue in frames) {

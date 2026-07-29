@@ -278,7 +278,7 @@
         return;
 
     _loadingOverlayView.alphaValue = 1.0;
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * __unused context) {
         _loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
         [_loadingOverlayView removeFromSuperview];

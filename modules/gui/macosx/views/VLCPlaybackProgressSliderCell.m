@@ -55,9 +55,9 @@
 
 static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
                                     const CVTimeStamp *inNow,
-                                    const CVTimeStamp *inOutputTime,
-                                    CVOptionFlags flagsIn,
-                                    CVOptionFlags *flagsOut,
+                                    const CVTimeStamp *__unused inOutputTime,
+                                    CVOptionFlags __unused flagsIn,
+                                    CVOptionFlags *__unused flagsOut,
                                     void *displayLinkContext)
 {
     const CVTimeStamp inNowCopy = *inNow;

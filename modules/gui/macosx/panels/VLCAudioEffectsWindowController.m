@@ -641,7 +641,7 @@ static inline void enableTextField(NSTextField *const __unsafe_unretained textFi
 
 #pragma mark -
 #pragma mark Equalizer
-static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
+static bool GetEqualizerStatus(intf_thread_t *__unused p_custom_intf,
                                VLCPlayerController *playerController,
                                char *psz_name)
 {

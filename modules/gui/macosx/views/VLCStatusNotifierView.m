@@ -98,7 +98,7 @@ NSString * const VLCMessageTimeoutTimerUserInfoMessageKey = @"VLCMessageTimeoutT
         [NSNotificationCenter.defaultCenter postNotificationName:VLCStatusNotifierViewActivated object:self];
     }
     NSString *finalMessage = message;
-    const NSInteger matchingIndex = [self.messages indexOfObjectPassingTest:^BOOL(NSString * const string, NSUInteger, BOOL *){
+    const NSInteger matchingIndex = [self.messages indexOfObjectPassingTest:^BOOL(NSString * const string, NSUInteger __unused idx, BOOL * __unused stop){
         return [string hasPrefix:message];
     }];
     if (matchingIndex != NSNotFound) {
@@ -115,7 +115,7 @@ NSString * const VLCMessageTimeoutTimerUserInfoMessageKey = @"VLCMessageTimeoutT
         return;
     }
 
-    const NSInteger matchingIndex = [self.messages indexOfObjectPassingTest:^BOOL(NSString * const string, NSUInteger, BOOL *){
+    const NSInteger matchingIndex = [self.messages indexOfObjectPassingTest:^BOOL(NSString * const string, NSUInteger __unused idx, BOOL * __unused stop){
         return [string hasPrefix:message];
     }];
     if (matchingIndex != NSNotFound) {

@@ -42,7 +42,7 @@
 
 - (NSInteger)indexOfMediaLibraryItem:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem
 {
-    return [self indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> item, const NSUInteger idx, BOOL * const stop) {
+    return [self indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> item, const NSUInteger __unused idx, BOOL * const __unused stop) {
         NSParameterAssert([item conformsToProtocol:@protocol(VLCMediaLibraryItemProtocol)]);
         return item.libraryID == mediaLibraryItem.libraryID;
     }];

@@ -432,7 +432,7 @@ static AppleRemote* sharedInstance=nil;
 /*  Callback method for the device queue
 Will be called for any event of any type (cookie) to which we subscribe
 */
-static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, void* sender) {
+static void QueueCallbackFunction(void* target,  IOReturn result, void* __unused refcon, void* __unused sender) {
     AppleRemote* remote = (__bridge AppleRemote*)target;
 
     IOHIDEventStruct event;

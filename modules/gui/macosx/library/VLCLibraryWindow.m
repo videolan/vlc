@@ -571,7 +571,7 @@ static int ShowController(vlc_object_t * __unused p_this,
     self.controlsBar.bottomBarView.hidden = NO;
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
-                                                              changes:^(NSAnimationContext * const context) {
+                                                              changes:^(NSAnimationContext * const __unused context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
         self.controlsBar.bottomBarView.animator.alphaValue = 1;
     } completionHandler:nil];
@@ -712,7 +712,7 @@ static int ShowController(vlc_object_t * __unused p_this,
     [self.loadingOverlayView applyConstraintsToFillSuperview];
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.5
-                                                              changes:^(NSAnimationContext * const context) {
+                                                              changes:^(NSAnimationContext * const __unused context) {
         self.loadingOverlayView.animator.alphaValue = 1.0;
     } completionHandler:nil];
 
@@ -732,7 +732,7 @@ static int ShowController(vlc_object_t * __unused p_this,
     self.loadingOverlayView.alphaValue = 1.0;
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:1.0
-                                                              changes:^(NSAnimationContext * const context) {
+                                                              changes:^(NSAnimationContext * const __unused context) {
         self.loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
         NSMutableArray * const mutableSubviews = self.libraryTargetView.subviews.mutableCopy;

@@ -94,7 +94,7 @@
     }
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
-                                                              changes:^(NSAnimationContext * const _Nonnull context){
+                                                              changes:^(NSAnimationContext * const _Nonnull __unused context){
         self->_isFadingIn = YES;
         [titlebarView.animator setAlphaValue:1.0f];
     } completionHandler:^{
@@ -120,7 +120,7 @@
     NSView *titlebarView = [self standardWindowButton:NSWindowCloseButton].superview;
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
-                                                              changes:^(NSAnimationContext * const _Nonnull context) {
+                                                              changes:^(NSAnimationContext * const _Nonnull __unused context) {
         [titlebarView.animator setAlphaValue:0.0f];
     } completionHandler:nil];
 }

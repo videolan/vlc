@@ -463,7 +463,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
     }
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
-                                                              changes:^(NSAnimationContext * const _Nonnull context) {
+                                                              changes:^(NSAnimationContext * const _Nonnull __unused context) {
         [self->_mainControlsView.animator setAlphaValue:0.0f];
         [self->_floatOnTopIndicatorImageView.animator setAlphaValue:0.0f];
     } completionHandler:nil];
@@ -511,7 +511,7 @@ NSString * const VLCUseClassicVideoPlayerLayoutKey = @"VLCUseClassicVideoPlayerL
 
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:VLCUIUnits.controlsFadeAnimationDuration
-                                                              changes:^(NSAnimationContext * const _Nonnull context) {
+                                                              changes:^(NSAnimationContext * const _Nonnull __unused context) {
         self->_isFadingIn = YES;
         [self->_mainControlsView.animator setAlphaValue:1.0f];
         [self->_floatOnTopIndicatorImageView.animator setAlphaValue:1.0f];

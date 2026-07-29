@@ -235,7 +235,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     NSRect screenFrame = [screen frame];
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.5 * duration
-                                                              changes:^(NSAnimationContext *context) {
+                                                              changes:^(NSAnimationContext *__unused context) {
         [[window animator] setFrame:screenFrame display:YES];
     } completionHandler:nil];
 }
@@ -246,7 +246,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     [[window animator] setFrame:_frameBeforeLionFullscreen display:YES animate:YES];
 
     [NSAnimationContext runAnimationRespectingPreferencesWithDuration:0.5 * duration
-                                                              changes:^(NSAnimationContext *context) {
+                                                              changes:^(NSAnimationContext *__unused context) {
         [[window animator] setFrame:self->_frameBeforeLionFullscreen display:YES animate:YES];
     } completionHandler:nil];
 }

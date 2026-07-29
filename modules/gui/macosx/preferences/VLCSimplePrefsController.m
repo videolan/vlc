@@ -915,7 +915,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     }];
 }
 
-static inline void save_int_list(intf_thread_t * p_intf, id object, const char * name)
+static inline void save_int_list(intf_thread_t * __unused p_intf, id object, const char * name)
 {
     NSNumber *p_valueobject = (NSNumber *)[[object selectedItem] representedObject];
     if (p_valueobject) {
@@ -924,7 +924,7 @@ static inline void save_int_list(intf_thread_t * p_intf, id object, const char *
     }
 }
 
-static inline void save_string_list(intf_thread_t * p_intf, id object, const char * name)
+static inline void save_string_list(intf_thread_t * __unused p_intf, id object, const char * name)
 {
     NSString *p_stringobject = (NSString *)[[object selectedItem] representedObject];
     if (p_stringobject) {
