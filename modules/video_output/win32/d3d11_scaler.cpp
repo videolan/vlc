@@ -634,6 +634,15 @@ done_super:
 void D3D11_UpscalerDestroy(d3d11_scaler *scaleProc)
 {
     ReleaseSRVs(scaleProc);
+
+    // D3D11_UpscalerUpdate() AddRefs the context stored in picsys.
+    // Release the final retained reference when destroying the scaler.
+    if (scaleProc->picsys.context)
+    {
+        scaleProc->picsys.context->Release();
+        scaleProc->picsys.context = nullptr;
+    }
+
 #ifdef HAVE_AMF_SCALER
     if (scaleProc->amfInput != nullptr)
     {
