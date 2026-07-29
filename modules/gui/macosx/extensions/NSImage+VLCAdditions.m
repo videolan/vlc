@@ -310,7 +310,7 @@
         [image lockFocus];
         [color set];
         const NSRect imageRect = {NSZeroPoint, image.size};
-        NSRectFillUsingOperation(imageRect, NSCompositeSourceIn);
+        NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
         [image unlockFocus];
     }
 
