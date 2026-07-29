@@ -633,6 +633,8 @@ if [ -n "$BUILD_MESON" ]; then
         rm -rf ${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH-$VLC_GIT_TAG-debug.7z
         cd ${BUILD_PATH}/$SHORTARCH-meson && \
             7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$SHORTARCH-$VLC_GIT_TAG-debug.7z vlc-$SHORTARCH
+    elif [ "$INSTALLER" = "r" ]; then
+        meson dist -C ${BUILD_PATH}/$SHORTARCH-meson -j$JOBS --no-tests
     fi
 else
     info "Bootstrapping"
