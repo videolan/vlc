@@ -429,7 +429,7 @@ static inline void enableTextField(NSTextField *const __unsafe_unretained textFi
     NSString *newProfile = [self generateProfileString];
 
     NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:VLCAudioEffectsProfilesKey]];
-    if (currentProfileIndex >= [workArray count])
+    if (currentProfileIndex < 0 || (NSUInteger)currentProfileIndex >= workArray.count)
         return;
 
     [workArray replaceObjectAtIndex:currentProfileIndex withObject:newProfile];
@@ -785,7 +785,7 @@ static bool GetEqualizerStatus(intf_thread_t *__unused p_custom_intf,
     NSString *preset = [[[NSUserDefaults standardUserDefaults] objectForKey:VLCAudioEffectsEqualizerValuesKey] objectAtIndex:presetID];
     NSArray *values = [preset componentsSeparatedByString:@" "];
     NSUInteger count = [values count];
-    for (int x = 0; x < count; x++)
+    for (NSUInteger x = 0; x < count; x++)
         [self setValue:[[values objectAtIndex:x] floatValue] forSlider:x];
 }
 

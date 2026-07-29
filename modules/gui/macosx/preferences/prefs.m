@@ -450,7 +450,7 @@ enum VLCTreeBranchType {
 - (VLCTreeBranchItem *)childRepresentingCategory:(enum vlc_config_cat)category
 {
     NSUInteger childrenCount = [[self children] count];
-    for (int i = 0; i < childrenCount; i++) {
+    for (NSUInteger i = 0; i < childrenCount; i++) {
         VLCTreeBranchItem * item = [[self children] objectAtIndex:i];
         if ([item branchType] == CategoryBranch && [item category] == category)
             return item;

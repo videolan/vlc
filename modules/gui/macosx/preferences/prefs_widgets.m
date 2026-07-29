@@ -1722,7 +1722,7 @@ my_width, tooltip, init_value)                                              \
     size_t count;
     p_list = module_list_get(&count);
     for (i_module_index = 0; i_module_index < count; i_module_index++) {
-        int i;
+        unsigned int i;
         p_parser = p_list[i_module_index];
 
         if (module_is_main(p_parser))

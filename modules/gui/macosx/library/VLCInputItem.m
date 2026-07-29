@@ -565,7 +565,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 {
     const int i_options = _vlcInputItem->i_options;
     NSMutableArray * const options = [NSMutableArray arrayWithCapacity:i_options];
-    for (NSUInteger i = 0; i < i_options; ++i) {
+    for (int i = 0; i < i_options; ++i) {
         const char * const psz_option = _vlcInputItem->ppsz_options[i];
         NSString * const option = NSTR(psz_option);
         [options addObject:option];

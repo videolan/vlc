@@ -803,7 +803,7 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:VLCVideoEffectsProfilesKey]];
-    if (currentProfileIndex >= [workArray count])
+    if (currentProfileIndex < 0 || (NSUInteger)currentProfileIndex >= workArray.count)
         return;
 
     [workArray replaceObjectAtIndex:currentProfileIndex withObject:newProfile];

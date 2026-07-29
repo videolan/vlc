@@ -167,7 +167,7 @@ static void addonChangedCallback( addons_manager_t *manager,
 - (IBAction)installSelection:(id)sender
 {
     NSInteger selectedRow = [_addonsTable selectedRow];
-    if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
+    if (selectedRow < 0 || (NSUInteger)selectedRow >= _displayedAddons.count)
         return;
 
     VLCAddonListItem *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
@@ -179,7 +179,7 @@ static void addonChangedCallback( addons_manager_t *manager,
 - (IBAction)uninstallSelection:(id)sender
 {
     NSInteger selectedRow = [_addonsTable selectedRow];
-    if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
+    if (selectedRow < 0 || (NSUInteger)selectedRow >= _displayedAddons.count)
         return;
 
     VLCAddonListItem *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
@@ -210,7 +210,7 @@ static void addonChangedCallback( addons_manager_t *manager,
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
     NSInteger selectedRow = [_addonsTable selectedRow];
-    if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0) {
+    if (selectedRow < 0 || (NSUInteger)selectedRow >= _displayedAddons.count) {
         [_name setStringValue:@""];
         [_author setStringValue:@""];
         [_version setStringValue:@""];
@@ -276,7 +276,7 @@ static void addonChangedCallback( addons_manager_t *manager,
     NSMutableArray *filteredItems = [[NSMutableArray alloc] initWithCapacity:_addons.count];
     for (VLCAddonListItem *currentItem in _addons) {
         if (type != -1) {
-            if ([currentItem type] == type) {
+            if ((int)[currentItem type] == type) {
                 if (installedOnly) {
                     if ([currentItem isInstalled])
                         [filteredItems addObject:currentItem];

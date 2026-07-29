@@ -622,7 +622,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     const char *pref = NULL;
     NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
     pref = [[defaults objectForKey:@"language"] UTF8String];
-    for (int x = 0; x < ARRAY_SIZE(language_map); x++) {
+    for (size_t x = 0; x < ARRAY_SIZE(language_map); x++) {
         [_intf_languagePopup addItemWithTitle:toNSStr(language_map[x].name)];
         if (pref) {
             if (!strcmp(language_map[x].iso, pref))
@@ -943,7 +943,7 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
         [defaults removeObjectForKey:@"NSForceRightToLeftWritingDirection"];
         [defaults removeObjectForKey:@"AppleTextDirection"];
     } else {
-        for(int i = 0; i < ARRAY_SIZE(language_map); i++) {
+        for(size_t i = 0; i < ARRAY_SIZE(language_map); i++) {
             if (!strcmp(language_map[i].iso, [isoCode UTF8String])) {
                 [defaults setBool:language_map[i].isRightToLeft forKey:@"NSForceRightToLeftWritingDirection"];
                 [defaults setBool:language_map[i].isRightToLeft forKey:@"AppleTextDirection"];

@@ -411,7 +411,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     }
 
     const NSInteger selectedRow = self.masterTableView.selectedRow;
-    if (selectedRow < 0 || selectedRow >= self.playlists.count) {
+    if (selectedRow < 0 || (NSUInteger)selectedRow >= self.playlists.count) {
         return nil;
     }
 
@@ -440,7 +440,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     }
 
     const NSInteger selectedRow = masterTableView.selectedRow;
-    if (selectedRow < 0 || selectedRow >= self.playlists.count) {
+    if (selectedRow < 0 || (NSUInteger)selectedRow >= self.playlists.count) {
         [self.headerDelegate updateHeaderForTableView:detailTableView
                                   withRepresentedItem:nil
                                         fallbackTitle:_NS("Playlists")
