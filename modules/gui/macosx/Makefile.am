@@ -352,6 +352,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/main/CompatibilityFixes.m \
 	gui/macosx/main/VLCApplication.h \
 	gui/macosx/main/VLCApplication.m \
+	gui/macosx/main/VLCMain+Sparkle.h \
+	gui/macosx/main/VLCMain+Sparkle.m \
 	gui/macosx/main/VLCMain+OldPrefs.h \
 	gui/macosx/main/VLCMain+OldPrefs.m \
 	gui/macosx/main/VLCMain.h \

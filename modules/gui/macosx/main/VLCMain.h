@@ -101,4 +101,6 @@ extern NSString * const kVLCPreferencesVersion;
 @property (readonly) SPUStandardUpdaterController *sparkleUpdaterController;
 #endif
 
+- (int)processIsTranslated;
+
 @end

@@ -89,9 +89,7 @@
 #import "windows/video/VLCMainVideoViewController.h"
 
 #ifdef HAVE_SPARKLE
-#import <Sparkle/Sparkle.h>                 /* we're the update delegate */
-NSString *const kIntel64UpdateURLString = @"https://update.videolan.org/vlc/sparkle/vlc-intel64.xml";
-NSString *const kARM64UpdateURLString = @"https://update.videolan.org/vlc/sparkle/vlc-arm64.xml";
+#import "main/VLCMain+Sparkle.h"
 #endif
 
 NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotification";
@@ -102,11 +100,7 @@ NSString * const kVLCPreferencesVersion = @"VLCPreferencesVersion";
 #pragma mark Private extension
 
 @interface VLCMain ()
-#ifdef HAVE_SPARKLE
-<SPUUpdaterDelegate, NSApplicationDelegate>
-#else
 <NSApplicationDelegate>
-#endif
 {
     intf_thread_t *_p_intf;
     BOOL _launched;
@@ -134,6 +128,9 @@ NSString * const kVLCPreferencesVersion = @"VLCPreferencesVersion";
 }
 + (void)killInstance;
 - (void)applicationWillTerminate:(NSNotification *)notification;
+#ifdef HAVE_SPARKLE
+@property (readwrite) SPUStandardUpdaterController *sparkleUpdaterController;
+#endif
 
 @end
 
@@ -326,9 +323,7 @@ static VLCMain *sharedInstance = nil;
     _clickerManager = [[VLCClickerManager alloc] init];
 
 #ifdef HAVE_SPARKLE
-    _sparkleUpdaterController = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:YES 
-                                                                              updaterDelegate:self
-                                                                           userDriverDelegate:nil];
+    [self setupSparkle];
 #endif
 
     [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:_mainmenu topLevelObjects:nil];
@@ -409,66 +404,6 @@ static VLCMain *sharedInstance = nil;
     /* write cached user defaults to disk */
     CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
-
-#pragma mark -
-#pragma mark Sparkle delegate
-
-#ifdef HAVE_SPARKLE
-/* received directly before the update gets installed, so let's shut down a bit */
-- (void)updater:(SPUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
-{
-    [NSApp activateIgnoringOtherApps:YES];
-    [_playQueueController stopPlayback];
-}
-
-/* don't be enthusiastic about an update if we currently play a video */
-- (BOOL)updater:(SPUUpdater *)updater mayPerformUpdateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error
-{
-    if ([_playQueueController.playerController activeVideoPlayback]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:@"org.videolan.vlc.Sparkle"
-                                          code:1
-                                      userInfo:@{NSLocalizedDescriptionKey: _NS("VLC is currently playing video.")}];
-        }
-        return NO;
-    }
-
-    return YES;
-}
-
-/* use the correct feed depending on the hardware architecture */
-- (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)updater
-{
-#ifdef __x86_64__
-    if (OSX_BIGSUR_AND_HIGHER) {
-        if ([self processIsTranslated] > 0) {
-            msg_Dbg(getIntf(), "Process is translated. On update, VLC will install the native ARM-64 binary.");
-            return kARM64UpdateURLString;
-        }
-    }
-    return kIntel64UpdateURLString;
-#elif __arm64__
-    return kARM64UpdateURLString;
-#else
-    #error unsupported architecture
-#endif
-}
-
-- (void)updaterDidNotFindUpdate:(SPUUpdater *)updater error:(NSError *)error
-{
-    msg_Dbg(getIntf(), "No update found");
-}
-
-- (void)updater:(SPUUpdater *)updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
-{
-    msg_Warn(getIntf(), "Failed to download update with error %li", error.code);
-}
-
-- (void)updater:(SPUUpdater *)updater didAbortWithError:(NSError *)error
-{
-    msg_Err(getIntf(), "Updater aborted with error %li", error.code);
-}
-#endif
 
 #pragma mark -
 #pragma mark File opening over dock icon
