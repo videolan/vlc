@@ -63,8 +63,6 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 @implementation AppleRemote
 
-#pragma public interface
-
 - (id)init
 {
     self = [super init];
