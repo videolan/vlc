@@ -1941,7 +1941,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
 }
 
 - (BOOL)tableView:(NSTableView*)table acceptDrop:(id <NSDraggingInfo>)info
-              row:(NSInteger)dropRow dropOperation:(NSTableViewDropOperation)op;
+              row:(NSInteger)dropRow dropOperation:(NSTableViewDropOperation)op
 {
     NSPasteboard    *pb = [info draggingPasteboard];
     BOOL accepted = NO;

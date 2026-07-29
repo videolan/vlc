@@ -279,7 +279,7 @@ static void updateProgressCallback(void *p_data,
                    type:(vlc_dialog_question_type)questionType
              cancelText:(NSString *)cancelText
             action1Text:(NSString *)action1Text
-            action2Text:(NSString *)action2Text;
+            action2Text:(NSString *)action2Text
 {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:title];
