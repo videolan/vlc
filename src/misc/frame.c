@@ -522,7 +522,7 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
         vlc_testcancel();
         i += len;
     }
-    if (unlikely(!SetFilePointerEx(handle, srcPointer, NULL, FILE_BEGIN)))
+    if (frame != NULL && unlikely(!SetFilePointerEx(handle, srcPointer, NULL, FILE_BEGIN)))
     {
         vlc_frame_Release (frame);
         frame = NULL;
