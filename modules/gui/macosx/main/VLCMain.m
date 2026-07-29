@@ -103,7 +103,7 @@ NSString * const kVLCPreferencesVersion = @"VLCPreferencesVersion";
 
 @interface VLCMain ()
 #ifdef HAVE_SPARKLE
-<SUUpdaterDelegate, NSApplicationDelegate>
+<SPUUpdaterDelegate, NSApplicationDelegate>
 #else
 <NSApplicationDelegate>
 #endif
@@ -126,6 +126,9 @@ NSString * const kVLCPreferencesVersion = @"VLCPreferencesVersion";
     VLCConvertAndSaveWindowController *_convertAndSaveWindow;
     VLCClickerManager *_clickerManager;
     VLCDetachedAudioWindow *_detachedAudioWindow;
+#ifdef HAVE_SPARKLE
+    SPUStandardUpdaterController *_sparkleUpdaterController;
+#endif
 
     bool _interfaceIsTerminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -322,11 +325,13 @@ static VLCMain *sharedInstance = nil;
 
     _clickerManager = [[VLCClickerManager alloc] init];
 
-    [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:_mainmenu topLevelObjects:nil];
-
 #ifdef HAVE_SPARKLE
-    [[SUUpdater sharedUpdater] setDelegate:self];
+    _sparkleUpdaterController = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:YES 
+                                                                              updaterDelegate:self
+                                                                           userDriverDelegate:nil];
 #endif
+
+    [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:_mainmenu topLevelObjects:nil];
 
     NSImage *appIconImage = [VLCApplication.sharedApplication vlcAppIconImage];
     [VLCApplication.sharedApplication
@@ -410,23 +415,29 @@ static VLCMain *sharedInstance = nil;
 
 #ifdef HAVE_SPARKLE
 /* received directly before the update gets installed, so let's shut down a bit */
-- (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
+- (void)updater:(SPUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
 {
     [NSApp activateIgnoringOtherApps:YES];
     [_playQueueController stopPlayback];
 }
 
 /* don't be enthusiastic about an update if we currently play a video */
-- (BOOL)updaterMayCheckForUpdates:(SUUpdater *)bundle
+- (BOOL)updater:(SPUUpdater *)updater mayPerformUpdateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error
 {
-    if ([_playQueueController.playerController activeVideoPlayback])
+    if ([_playQueueController.playerController activeVideoPlayback]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:@"org.videolan.vlc.Sparkle"
+                                          code:1
+                                      userInfo:@{NSLocalizedDescriptionKey: _NS("VLC is currently playing video.")}];
+        }
         return NO;
+    }
 
     return YES;
 }
 
 /* use the correct feed depending on the hardware architecture */
-- (nullable NSString *)feedURLStringForUpdater:(SUUpdater *)updater
+- (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)updater
 {
 #ifdef __x86_64__
     if (OSX_BIGSUR_AND_HIGHER) {
@@ -443,17 +454,17 @@ static VLCMain *sharedInstance = nil;
 #endif
 }
 
-- (void)updaterDidNotFindUpdate:(SUUpdater *)updater
+- (void)updaterDidNotFindUpdate:(SPUUpdater *)updater error:(NSError *)error
 {
     msg_Dbg(getIntf(), "No update found");
 }
 
-- (void)updater:(SUUpdater *)updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
+- (void)updater:(SPUUpdater *)updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
 {
     msg_Warn(getIntf(), "Failed to download update with error %li", error.code);
 }
 
-- (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error
+- (void)updater:(SPUUpdater *)updater didAbortWithError:(NSError *)error
 {
     msg_Err(getIntf(), "Updater aborted with error %li", error.code);
 }

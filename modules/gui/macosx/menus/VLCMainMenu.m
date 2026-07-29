@@ -145,7 +145,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 #ifdef HAVE_SPARKLE
     [_checkForUpdate setAction:@selector(checkForUpdates:)];
-    [_checkForUpdate setTarget:[SUUpdater sharedUpdater]];
+    [_checkForUpdate setTarget:VLCMain.sharedInstance.sparkleUpdaterController];
 #else
     [_checkForUpdate setEnabled:NO];
 #endif

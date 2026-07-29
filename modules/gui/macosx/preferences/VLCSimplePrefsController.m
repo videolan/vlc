@@ -199,7 +199,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 
 #ifdef HAVE_SPARKLE
     [_intf_updateCheckbox bind:@"value"
-                   toObject:[SUUpdater sharedUpdater]
+                   toObject:VLCMain.sharedInstance.sparkleUpdaterController.updater
                 withKeyPath:@"automaticallyChecksForUpdates"
                     options:nil];
 #else
@@ -654,8 +654,9 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 
 
 #ifdef HAVE_SPARKLE
-    if ([[SUUpdater sharedUpdater] lastUpdateCheckDate] != NULL)
-        [_intf_last_updateLabel setStringValue: [NSString stringWithFormat: _NS("Last check on: %@"), [[[SUUpdater sharedUpdater] lastUpdateCheckDate] descriptionWithLocale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]]]];
+    NSDate * const lastUpdateCheckDate = VLCMain.sharedInstance.sparkleUpdaterController.updater.lastUpdateCheckDate;
+    if (lastUpdateCheckDate != NULL)
+        [_intf_last_updateLabel setStringValue: [NSString stringWithFormat: _NS("Last check on: %@"), [lastUpdateCheckDate descriptionWithLocale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]]]];
     else
         [_intf_last_updateLabel setStringValue: _NS("No check was performed yet.")];
 #endif
