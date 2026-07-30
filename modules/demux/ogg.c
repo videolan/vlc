@@ -3217,7 +3217,7 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
         }
 
         char debug_string[32] = {0};
-        strncpy(debug_string, &p_oggpacket->packet[42], __MIN(value_size, 31));
+        strncpy(debug_string, (const char*)&p_oggpacket->packet[42], __MIN(value_size, 31));
         msg_Dbg( p_demux, "AnxData packet info: %"PRId64" / %"PRId64", %d, ``%s''",
                  granule_rate_numerator, granule_rate_denominator,
                  p_stream->i_secondary_header_packets, debug_string );
