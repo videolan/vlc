@@ -1,12 +1,15 @@
-skins2_enabled = get_option('skins2') \
+skins2_option = get_option('skins2') \
     .disable_auto_if(host_system != 'windows' and host_system != 'darwin' and not x11_dep.found()) \
-    .require(freetype_dep.found(), error_message: 'Freetype is not available') \
-    .allowed()
+    .require(freetype_dep.found(), error_message: 'Freetype is not available')
+
+skins2_allowed = skins2_option.allowed()
+skins2_enabled = skins2_option.enabled()
+skins2_feasible = true
 
 skins2_flags = []
 skins2_deps = [ freetype_dep, m_lib ]
 
-if skins2_enabled
+if skins2_allowed
     fribidi_dep = dependency('fribidi', required: get_option('fribidi'))
     if fribidi_dep.found()
         skins2_deps += [ fribidi_dep ]
@@ -124,7 +127,7 @@ skins2_sources += files(
     'win32/win32_tooltip.cpp',
     'win32/win32_window.cpp',
 )
-elif x11_dep.found() and skins2_enabled
+elif x11_dep.found() and skins2_allowed
 skins2_flags += [ '-DX11_SKINS' ]
 skins2_sources += files(
     'x11/x11_display.cpp',
@@ -139,12 +142,12 @@ skins2_sources += files(
 )
 skins2_deps += [
     x11_dep,
-    dependency('xpm', required: true),
-    dependency('xinerama', required: true),
-    dependency('xcursor', required: true),
-    dependency('xext', required: true),
+    dependency('xpm', required: skins2_enabled),
+    dependency('xinerama', required: skins2_enabled),
+    dependency('xcursor', required: skins2_enabled),
+    dependency('xext', required: skins2_enabled),
 ]
-elif host_system == 'darwin' and skins2_enabled
+elif host_system == 'darwin' and skins2_allowed
 skins2_flags += [ '-DMACOSX_SKINS' ]
 skins2_sources += files(
     'macosx/macosx_dragdrop.mm',
@@ -161,6 +164,14 @@ skins2_deps += [
 ]
 endif
 
+foreach iter_skins2_dep : skins2_deps
+    if not iter_skins2_dep.found()
+        skins2_feasible = false
+        message('Skins2 interface disabled due to missing dependencies.')
+        break
+    endif
+endforeach
+
 vlc_modules += {
     'name' : 'skins2',
     'sources' : [ skins2_sources ],
@@ -168,10 +179,10 @@ vlc_modules += {
     'c_args' : skins2_flags,
     'cpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
     'objcpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
-    'enabled': skins2_enabled,
+    'enabled': skins2_feasible,
 }
 
-if host_system == 'darwin' and skins2_enabled
+if host_system == 'darwin' and skins2_feasible
     vlc_modules += {
         'name' : 'macosx_dialogs',
         'sources' : files('macosx/macosx_dialogs.m'),
