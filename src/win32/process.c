@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <io.h>
 #include <assert.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
 #include <vlc_process.h>
@@ -127,11 +128,15 @@ struct vlc_process {
     /* Pid of the linked process */
     pid_t pid;
 
+    HANDLE hProcess;
+
     int fd_in;
     int fd_out;
 
     HANDLE hEventRead;
     HANDLE hEventWrite;
+
+    atomic_bool killed;
 };
 
 struct vlc_process*
@@ -156,8 +161,10 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv)
 
     process->fd_in = -1;
     process->fd_out = -1;
+    process->hProcess = NULL;
     process->hEventRead = NULL;
     process->hEventWrite = NULL;
+    atomic_init(&process->killed, false);
 
     process->hEventRead = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (process->hEventRead == NULL) {
@@ -210,6 +217,8 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv)
         goto end;
     }
 
+    process->hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, process->pid);
+
 end:
 
     free(args);
@@ -240,17 +249,34 @@ end:
     return process;
 }
 
+void
+vlc_process_Kill(struct vlc_process *process)
+{
+    assert(process != NULL);
+
+    if (process->hProcess != NULL) {
+        TerminateProcess(process->hProcess, 15);
+    }
+
+    atomic_store(&process->killed, true);
+
+    intptr_t h_in = _get_osfhandle(process->fd_in);
+    if (h_in != -1 && h_in != -2) {
+        CancelIoEx((HANDLE)h_in, NULL);
+    }
+    intptr_t h_out = _get_osfhandle(process->fd_out);
+    if (h_out != -1 && h_out != -2) {
+        CancelIoEx((HANDLE)h_out, NULL);
+    }
+}
+
 int
 vlc_process_Terminate(struct vlc_process *process, bool kill_process)
 {
     assert(process != NULL);
 
     if (kill_process) {
-        HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, process->pid);
-        if (hProcess) {
-            TerminateProcess(hProcess, 15);
-            CloseHandle(hProcess);
-        }
+        vlc_process_Kill(process);
     }
 
     vlc_close(process->fd_in);
@@ -259,6 +285,9 @@ vlc_process_Terminate(struct vlc_process *process, bool kill_process)
     CloseHandle(process->hEventWrite);
 
     int status = vlc_waitpid(process->pid);
+    if (process->hProcess != NULL) {
+        CloseHandle(process->hProcess);
+    }
     process->pid = 0;
     free(process);
     return status;
@@ -270,6 +299,11 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
 {
     assert(process != NULL);
     assert(buf != NULL);
+
+    /* The channel is shut down, report end-of-stream like POSIX does. */
+    if (atomic_load(&process->killed)) {
+        return 0;
+    }
 
     intptr_t h = _get_osfhandle(process->fd_in);
     if (h == -1) {
@@ -296,6 +330,9 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
     } else {
         DWORD error = GetLastError();
         if (error == ERROR_IO_PENDING) {
+            if (atomic_load(&process->killed)) {
+                CancelIoEx(hFd, &overlapped);
+            }
             err = vlc_process_WindowsPoll(hFd, &overlapped, &bytes,
                                           (DWORD)size, true, timeout_ms);
         } else {
@@ -305,6 +342,9 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
 
     if (err == VLC_SUCCESS) {
         return bytes;
+    }
+    if (atomic_load(&process->killed)) {
+        return 0;
     }
     errno = err;
     return -1;
@@ -316,6 +356,11 @@ vlc_process_fd_Write(struct vlc_process *process, const uint8_t *buf, size_t siz
 {
     assert(process != NULL);
     assert(buf != NULL);
+
+    if (atomic_load(&process->killed)) {
+        errno = EPIPE;
+        return -1;
+    }
 
     intptr_t h = _get_osfhandle(process->fd_out);
     if (h == -1) {
@@ -342,6 +387,9 @@ vlc_process_fd_Write(struct vlc_process *process, const uint8_t *buf, size_t siz
     } else {
         DWORD error = GetLastError();
         if (error == ERROR_IO_PENDING) {
+            if (atomic_load(&process->killed)) {
+                CancelIoEx(hFd, &overlapped);
+            }
             err = vlc_process_WindowsPoll(hFd, &overlapped, &bytes,
                                           (DWORD)size, false, timeout_ms);
         } else {
@@ -352,6 +400,6 @@ vlc_process_fd_Write(struct vlc_process *process, const uint8_t *buf, size_t siz
     if (err == VLC_SUCCESS) {
         return bytes;
     }
-    errno = err;
+    errno = atomic_load(&process->killed) ? EPIPE : err;
     return -1;
 }

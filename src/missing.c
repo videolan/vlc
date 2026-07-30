@@ -190,6 +190,13 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv)
     return NULL;
 }
 
+void
+vlc_process_Kill(struct vlc_process *process)
+{
+    VLC_UNUSED(process);
+    vlc_assert_unreachable();
+}
+
 int
 vlc_process_Terminate(struct vlc_process *process, bool kill_process)
 {

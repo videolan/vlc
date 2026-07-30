@@ -120,13 +120,22 @@ end:
     return process;
 }
 
+VLC_API void
+vlc_process_Kill(struct vlc_process *process)
+{
+    assert(process != NULL);
+
+    kill(process->pid, SIGTERM);
+    shutdown(process->fd, SHUT_RDWR);
+}
+
 VLC_API int
 vlc_process_Terminate(struct vlc_process *process, bool kill_process)
 {
     assert(process != NULL);
 
     if (kill_process) {
-        kill(process->pid, SIGTERM);
+        vlc_process_Kill(process);
     }
 
     shutdown(process->fd, SHUT_RDWR);

@@ -41,6 +41,23 @@ VLC_API struct vlc_process *
 vlc_process_Spawn(const char *path, int argc, const char *const *argv);
 
 /**
+ * Kill a process and abort its I/O.
+ *
+ * Sends a termination signal to the process and shuts down the communication
+ * channel, so that any in-flight or subsequent I/O on @p process completes
+ * promptly instead of blocking: vlc_process_fd_Read() reports end-of-stream
+ * and vlc_process_fd_Write() fails with EPIPE.
+ *
+ * This does not free @p process: vlc_process_Terminate() must still be called
+ * for that. It can be called multiple times.
+ *
+ * @param [in]  process     Pointer to the vlc_process instance. Must not be
+ *                          NULL.
+ */
+VLC_API void
+vlc_process_Kill(struct vlc_process *process);
+
+/**
  * Stop a vlc_process and wait for its termination.
  *
  * Closes its file descriptors, and waits for it to exit. Optionally sends a
@@ -50,7 +67,8 @@ vlc_process_Spawn(const char *path, int argc, const char *const *argv);
  *          vlc_process_fd_Write() on the same @p process. It closes the
  *          underlying pipe/socket and frees @p process, so the caller must
  *          ensure that any thread performing I/O has returned first to avoid a
- *          use-after-free.
+ *          use-after-free. Use vlc_process_Kill() to unblock such a thread,
+ *          then join it before calling this.
  *
  * @param [in]  process        Pointer to the vlc_process instance. Must not
  *                             be NULL.
