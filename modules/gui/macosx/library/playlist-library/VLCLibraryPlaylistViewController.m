@@ -80,6 +80,10 @@
                                    name:VLCLibraryModelPlaylistAdded
                                  object:nil];
         [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelAllCachesDropped
+                                 object:nil];
+        [notificationCenter addObserver:self
                                selector:@selector(libraryModelPlaylistDeleted:)
                                    name:VLCLibraryModelPlaylistDeleted
                                  object:nil];
@@ -285,6 +289,7 @@
 {
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    [self.dataSource reloadData];
     if ([libraryModel numberOfPlaylistsOfType:playlistType] > 0) {
         [self presentPlaylistLibraryView];
     } else if (self.dataSource.libraryModel.filterString.length > 0) {
@@ -310,9 +315,16 @@
     VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     const size_t numberOfPlaylists = [model numberOfPlaylistsOfType:playlistType];
+    const BOOL isPlaylistSegmentActive =
+        self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegmentType ||
+        self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType ||
+        self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType;
+    const BOOL shouldRefreshForFilterChange =
+        [notification.name isEqualToString:VLCLibraryModelAllCachesDropped];
 
-    if (self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegmentType &&
-        ((numberOfPlaylists == 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:self.libraryWindow.emptyLibraryView]) ||
+    if (isPlaylistSegmentActive &&
+        (shouldRefreshForFilterChange ||
+         (numberOfPlaylists == 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:self.libraryWindow.emptyLibraryView]) ||
          (numberOfPlaylists > 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
         !self.libraryWindow.embeddedVideoPlaybackActive) {
 
