@@ -42,9 +42,10 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     VLCLibraryDataSourceCacheDeleteAction,
 };
 
-@interface VLCLibraryPlaylistDataSource ()
-
-@property (readwrite, atomic) NSMutableArray<VLCMediaLibraryPlaylist *> *playlists;
+@interface VLCLibraryPlaylistDataSource () {
+    dispatch_queue_t _playlistQueue;
+    NSArray<VLCMediaLibraryPlaylist *> *_playlists;
+}
 
 @end
 
@@ -63,9 +64,26 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)setup
 {
+    _playlistQueue = dispatch_queue_create("org.videolan.vlc.libraryplaylistdatasource.queue", DISPATCH_QUEUE_CONCURRENT);
     _libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     [self connect];
     [self reloadData];
+}
+
+- (NSArray<VLCMediaLibraryPlaylist *> *)playlists
+{
+    __block NSArray<VLCMediaLibraryPlaylist *> *playlists;
+    dispatch_sync(_playlistQueue, ^{
+        playlists = self->_playlists;
+    });
+    return playlists;
+}
+
+- (void)setPlaylists:(NSArray<VLCMediaLibraryPlaylist *> *)playlists
+{
+    dispatch_barrier_async(_playlistQueue, ^{
+        self->_playlists = [playlists copy];
+    });
 }
 
 - (void)connect
@@ -100,7 +118,9 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 {
     NSParameterAssert(notification);
     VLCMediaLibraryPlaylist * const playlist = (VLCMediaLibraryPlaylist *)notification.object;
-    [self cacheAction:VLCLibraryDataSourceCacheUpdateAction onPlaylist:playlist];
+    [self applyCacheAction:VLCLibraryDataSourceCacheUpdateAction
+            withPlaylistID:playlist.libraryID
+                  playlist:playlist];
 }
 
 - (void)playlistDeleted:(NSNotification *)notification
@@ -109,18 +129,16 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     NSParameterAssert((NSNumber *)notification.object != nil);
 
     const int64_t playlistId = [(NSNumber *)notification.object longLongValue];
-    const NSUInteger playlistIdx = [self indexForPlaylistWithId:playlistId];
-    if (playlistIdx == NSNotFound) {
-        return;
-    }
-
-    VLCMediaLibraryPlaylist * const playlist = self.playlists[playlistIdx];
-    [self cacheAction:VLCLibraryDataSourceCacheDeleteAction onPlaylist:playlist];
+    [self applyCacheAction:VLCLibraryDataSourceCacheDeleteAction
+            withPlaylistID:playlistId
+                  playlist:nil];
 }
 
 - (void)reloadData
 {
-    self.playlists = [[self.libraryModel listOfPlaylistsOfType:self.playlistType] mutableCopy];
+    NSArray<VLCMediaLibraryPlaylist *> * const listOfPlaylists =
+        [self.libraryModel listOfPlaylistsOfType:self.playlistType];
+    self.playlists = listOfPlaylists ?: @[];
     [self reloadViews];
     [self updateHeaderInTableView:self.detailTableView forMasterSelection:self.masterTableView];
 }
@@ -184,35 +202,41 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     }
 }
 
-- (NSUInteger)indexForPlaylistWithId:(const int64_t)itemId
+- (void)applyCacheAction:(VLCLibraryDataSourceCacheAction)action
+          withPlaylistID:(const int64_t)playlistID
+                playlist:(VLCMediaLibraryPlaylist * _Nullable const)playlist
 {
-    return [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist *playlist, const NSUInteger __unused idx, BOOL * const __unused stop) {
-        NSAssert(playlist != nil, @"Cache list should not contain nil playlists");
-        return playlist.libraryID == itemId;
-    }];
-}
+    dispatch_barrier_async(_playlistQueue, ^{
+        NSMutableArray *mutablePlaylists = [self->_playlists mutableCopy];
+        if (mutablePlaylists == nil) {
+            return;
+        }
 
-- (void)cacheAction:(VLCLibraryDataSourceCacheAction)action
-         onPlaylist:(VLCMediaLibraryPlaylist * const)playlist
-{
-    NSParameterAssert(playlist != nil);
+        const NSUInteger idx =
+            [mutablePlaylists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist *item, 
+                                                             const NSUInteger __unused index,
+                                                             BOOL * const __unused stop) {
+            return item.libraryID == playlistID;
+        }];
 
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const NSUInteger idx = [self indexForPlaylistWithId:playlist.libraryID];
         if (idx == NSNotFound) {
             return;
         }
 
         switch (action) {
             case VLCLibraryDataSourceCacheUpdateAction:
-                [self.playlists replaceObjectAtIndex:idx withObject:playlist];
+                NSAssert(playlist != nil, @"Playlist must not be nil for update action");
+                if (playlist != nil) {
+                    [mutablePlaylists replaceObjectAtIndex:idx withObject:playlist];
+                }
                 break;
             case VLCLibraryDataSourceCacheDeleteAction:
-                [self.playlists removeObjectAtIndex:idx];
+                [mutablePlaylists removeObjectAtIndex:idx];
                 break;
             default:
                 NSAssert(false, @"Invalid playlist cache action");
         }
+        self->_playlists = [mutablePlaylists copy];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self reloadViewsAtIndex:idx dueToCacheAction:action];
