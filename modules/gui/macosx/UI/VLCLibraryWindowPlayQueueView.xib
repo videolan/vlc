@@ -11,7 +11,6 @@
                 <outlet property="bottomButtonsSeparator" destination="ew3-Pn-diG" id="N5L-cw-953"/>
                 <outlet property="buttonStack" destination="hc5-GJ-yJe" id="cvF-K1-cq5"/>
                 <outlet property="clearButton" destination="aKS-lw-hfk" id="30D-7g-SnA"/>
-                <outlet property="dragDropImageBackgroundBox" destination="aUB-Ld-N2o" id="9xc-5h-uRF"/>
                 <outlet property="dragDropView" destination="grx-kk-1X1" id="b1W-Zw-a7Z"/>
                 <outlet property="footerContainerView" destination="ftr-ct-999" id="ftr-o1-999"/>
                 <outlet property="footerContainerViewDefaultBottomConstraint" destination="ftr-bot-999" id="y58-xy-3xa"/>
@@ -215,14 +214,6 @@
                 <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="grx-kk-1X1" customClass="VLCDragDropView">
                     <rect key="frame" x="0.0" y="50" width="510" height="210"/>
                     <subviews>
-                        <box boxType="custom" borderType="line" borderWidth="0.0" cornerRadius="10" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="aUB-Ld-N2o">
-                            <rect key="frame" x="188" y="38" width="134" height="134"/>
-                            <view key="contentView" id="9Ay-rU-2bA">
-                                <rect key="frame" x="0.0" y="0.0" width="134" height="134"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            </view>
-                            <color key="borderColor" name="separatorColor" catalog="System" colorSpace="catalog"/>
-                        </box>
                         <imageView translatesAutoresizingMaskIntoConstraints="NO" id="qv6-Mn-ifA" customClass="VLCDropDisabledImageView">
                             <rect key="frame" x="199" y="49" width="112" height="112"/>
                             <constraints>
@@ -244,18 +235,14 @@
                     </subviews>
                     <constraints>
                         <constraint firstItem="qv6-Mn-ifA" firstAttribute="centerY" secondItem="grx-kk-1X1" secondAttribute="centerY" id="AO4-Hd-L52"/>
-                        <constraint firstItem="aUB-Ld-N2o" firstAttribute="centerX" secondItem="qv6-Mn-ifA" secondAttribute="centerX" id="DKc-9E-HYo"/>
-                        <constraint firstItem="aUB-Ld-N2o" firstAttribute="width" secondItem="qv6-Mn-ifA" secondAttribute="width" multiplier="1.2" id="Jkb-0O-auX"/>
-                        <constraint firstItem="ghp-DI-YmZ" firstAttribute="top" secondItem="aUB-Ld-N2o" secondAttribute="bottom" constant="8" id="XFC-9r-Q8L" customClass="VLCSpacingConstraint">
+                        <constraint firstItem="ghp-DI-YmZ" firstAttribute="top" secondItem="qv6-Mn-ifA" secondAttribute="bottom" constant="8" id="XFC-9r-Q8L" customClass="VLCSpacingConstraint">
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
                                     <integer value="2"/>
                                 </userDefinedRuntimeAttribute>
                             </userDefinedRuntimeAttributes>
                         </constraint>
-                        <constraint firstItem="aUB-Ld-N2o" firstAttribute="height" secondItem="qv6-Mn-ifA" secondAttribute="height" multiplier="1.2" id="eJ2-wz-BJL"/>
                         <constraint firstItem="ghp-DI-YmZ" firstAttribute="centerX" secondItem="qv6-Mn-ifA" secondAttribute="centerX" id="gL5-uR-Smy"/>
-                        <constraint firstItem="aUB-Ld-N2o" firstAttribute="centerY" secondItem="qv6-Mn-ifA" secondAttribute="centerY" id="yfU-xa-zSE"/>
                         <constraint firstItem="qv6-Mn-ifA" firstAttribute="centerX" secondItem="grx-kk-1X1" secondAttribute="centerX" id="z8g-fU-cRw"/>
                     </constraints>
                 </customView>

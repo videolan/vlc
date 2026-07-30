@@ -7,7 +7,12 @@ actool_verbose__0 = $(actool_verbose_0)
 # so that it is properly rebuilt when its content changes.
 ASSET_CATALOG_DEPS = \
 	gui/macosx/Resources/Assets.xcassets/Contents.json \
-	gui/macosx/Resources/Assets.xcassets/VLCAccentColor.colorset/Contents.json
+	gui/macosx/Resources/Assets.xcassets/VLCAccentColor.colorset/Contents.json \
+	gui/macosx/Resources/Assets.xcassets/dropzone.imageset/Contents.json \
+	gui/macosx/Resources/Assets.xcassets/dropzone.imageset/dropzone-dark.png \
+	gui/macosx/Resources/Assets.xcassets/dropzone.imageset/dropzone-dark@2x.png \
+	gui/macosx/Resources/Assets.xcassets/dropzone.imageset/dropzone.png \
+	gui/macosx/Resources/Assets.xcassets/dropzone.imageset/dropzone@2x.png
 
 gui/macosx/Resources/Assets.car: gui/macosx/Resources/Assets.xcassets $(ASSET_CATALOG_DEPS)
 	$(AM_V_at)$(MKDIR_P) "gui/macosx/Resources"
@@ -703,9 +708,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow/backward-6btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/backward-6btns.png \
 	gui/macosx/Resources/mainwindow/backward-6btns@2x.png \
-	gui/macosx/Resources/mainwindow/dropzone-background.png \
-	gui/macosx/Resources/mainwindow/dropzone.png \
-	gui/macosx/Resources/mainwindow/dropzone@2x.png \
 	gui/macosx/Resources/mainwindow/effects-double-buttons-pressed.png \
 	gui/macosx/Resources/mainwindow/effects-double-buttons-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/effects-double-buttons.png \

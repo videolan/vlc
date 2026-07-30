@@ -80,7 +80,6 @@
     [self.tableView reloadData];
 
     self.openMediaButton.title = _NS("Open media...");
-    self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
 
     // Allow the drop zone image to shrink when the sidebar is contracted
     for (NSView * const subview in self.dragDropView.subviews) {
@@ -99,9 +98,6 @@
             break;
         }
     }
-    [self.dragDropImageBackgroundBox.topAnchor
-        constraintGreaterThanOrEqualToAnchor:self.dragDropView.topAnchor
-                                    constant:VLCUIUnits.smallSpacing].active = YES;
     [self.dragDropView.bottomAnchor
         constraintGreaterThanOrEqualToAnchor:self.openMediaButton.bottomAnchor
                                     constant:VLCUIUnits.smallSpacing].active = YES;
@@ -271,10 +267,8 @@
     // better idea to pull from the general system theme preference, which is always up-to-date
     if (isDark) {
         self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
-        self.dragDropImageBackgroundBox.hidden = NO;
     } else {
         self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
-        self.dragDropImageBackgroundBox.hidden = YES;
     }
 }
 
