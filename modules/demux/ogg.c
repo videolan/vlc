@@ -2832,7 +2832,10 @@ static bool Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
     if ( p_stream->f_rate == 0 ) return false;
     oggpack_adv( &opb, 32 ); /* mode */
     oggpack_adv( &opb, 32 ); /* mode_bitstream_version */
-    p_stream->fmt.audio.i_channels = oggpack_read( &opb, 32 );
+    uint32_t channels = oggpack_read( &opb, 32 );
+    if (channels > UINT8_MAX)
+        return false;
+    p_stream->fmt.audio.i_channels = channels;
     fill_channels_info(&p_stream->fmt.audio);
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
     p_stream->special.speex.i_framesize =
