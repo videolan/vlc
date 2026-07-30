@@ -295,6 +295,8 @@ MainViewLoader {
             MLTableColumns {
                 id: tableColumns
 
+                criteriaCover: "coverNonBlur" 
+
                 showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)
 
                 titleCover_height: VLCStyle.listAlbumCover_height

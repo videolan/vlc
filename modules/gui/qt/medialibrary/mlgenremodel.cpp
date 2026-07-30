@@ -60,7 +60,9 @@ QVariant MLGenreModel::itemRoleData(const MLItem *item, const int role) const
     case GENRE_NB_TRACKS:
         return QVariant::fromValue( ml_genre->getNbTracks() );
     case GENRE_COVER:
-        return getCover(ml_genre);
+        return getCover(ml_genre, MLGENREMODEL_COVER_BLUR);
+    case GENRE_COVER_NONBLUR:
+        return getCover(ml_genre, 0);
     default :
         return QVariant();
     }
@@ -75,7 +77,8 @@ QHash<int, QByteArray> MLGenreModel::roleNames() const
         { GENRE_ARTISTS, QByteArrayLiteral("artists") },
         { GENRE_TRACKS, QByteArrayLiteral("tracks") },
         { GENRE_ALBUMS, QByteArrayLiteral("albums") },
-        { GENRE_COVER, QByteArrayLiteral("cover") }
+        { GENRE_COVER, QByteArrayLiteral("cover") },
+        { GENRE_COVER_NONBLUR, QByteArrayLiteral("coverNonBlur") }
     };
 }
 
@@ -124,14 +127,14 @@ vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
-QString MLGenreModel::getCover(const MLGenre * genre) const
+QString MLGenreModel::getCover(const MLGenre * genre, int blur) const
 {
     return MLCustomCover::url(genre->getId()
                             , QSize(MLGENREMODEL_COVER_WIDTH, MLGENREMODEL_COVER_HEIGHT)
                             , m_coverDefault
                             , MLGENREMODEL_COVER_COUNTX
                             , MLGENREMODEL_COVER_COUNTY
-                            , MLGENREMODEL_COVER_BLUR
+                            , blur
                             , true);
 }
 

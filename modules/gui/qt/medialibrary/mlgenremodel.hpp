@@ -43,7 +43,8 @@ public:
         GENRE_ARTISTS,
         GENRE_TRACKS,
         GENRE_ALBUMS,
-        GENRE_COVER
+        GENRE_COVER,
+        GENRE_COVER_NONBLUR
     };
 
 public:
@@ -67,7 +68,7 @@ private:
     void onVlcMlEvent(const MLEvent &event) override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 
-    QString getCover(const MLGenre* genre) const;
+    QString getCover(const MLGenre* genre, int blur) const;
 
     QString m_coverDefault;
 
