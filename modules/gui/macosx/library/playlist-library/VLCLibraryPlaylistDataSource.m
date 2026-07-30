@@ -109,17 +109,13 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     NSParameterAssert((NSNumber *)notification.object != nil);
 
     const int64_t playlistId = [(NSNumber *)notification.object longLongValue];
-    const NSInteger playlistIdx =
-        [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist * const playlist,
-                                                       const NSUInteger __unused idx,
-                                                       BOOL * const __unused stop) {
-            return playlist.libraryID == playlistId;
-        }];
-    VLCMediaLibraryPlaylist * const playlist = self.playlists[playlistIdx];
-
-    if (playlist != nil) {
-        [self cacheAction:VLCLibraryDataSourceCacheDeleteAction onPlaylist:playlist];
+    const NSUInteger playlistIdx = [self indexForPlaylistWithId:playlistId];
+    if (playlistIdx == NSNotFound) {
+        return;
     }
+
+    VLCMediaLibraryPlaylist * const playlist = self.playlists[playlistIdx];
+    [self cacheAction:VLCLibraryDataSourceCacheDeleteAction onPlaylist:playlist];
 }
 
 - (void)reloadData
