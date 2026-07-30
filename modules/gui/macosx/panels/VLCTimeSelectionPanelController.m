@@ -134,6 +134,16 @@
 - (NSEvent *)handleKeyEvent:(NSEvent *)event
 {
     NSString *const chars = event.characters;
+    if (chars.length == 0) {
+        return event;
+    }
+
+    if ([chars isEqualToString:@":"]) {
+        if ([self moveToNextField]) {
+            return nil;
+        }
+        return event;
+    }
 
     unichar key = [chars characterAtIndex:0];
 
@@ -171,6 +181,30 @@
         return 1;
     }
     return 0;
+}
+
+- (BOOL)moveToNextField
+{
+    NSWindow *window = self.window;
+    id responder = window.firstResponder;
+
+    if (![responder isKindOfClass:[NSTextView class]]) {
+        return NO;
+    }
+
+    NSTextView *textView = responder;
+    id delegate = textView.delegate;
+
+    if (delegate == self.hoursValueField) {
+        [window makeFirstResponder:self.minsValueField];
+        return YES;
+    } else if (delegate == self.minsValueField) {
+        [window makeFirstResponder:self.secsValueField];
+        return YES;
+    } else if (delegate == self.secsValueField) {
+        return YES;
+    }
+    return NO;
 }
 
 @end
