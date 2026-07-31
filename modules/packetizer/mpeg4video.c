@@ -79,7 +79,6 @@ typedef struct
     unsigned int i_flags;
 
     int         i_fps_num;
-    int         i_fps_den;
 
     bool  b_frame;
 
@@ -440,7 +439,7 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
     {
         unsigned i_time_increment_bits = vlc_log2( p_sys->i_fps_num - 1 ) + 1;
 
-        p_sys->i_fps_den = bs_read( &s, i_time_increment_bits );
+        bs_skip( &s, i_time_increment_bits ); /* i_fps_den */
     }
     if( i_shape == 0 )
     {
