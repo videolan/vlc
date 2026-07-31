@@ -251,6 +251,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                         input_item_AddInfo( p_current_input,
                             _( "Podcast Info" ), _( "Podcast Summary" ),
                             "%s", node );
+                        input_item_SetDescription( p_current_input, node );
                     }
                 }
                 else
