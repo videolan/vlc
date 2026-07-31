@@ -1091,14 +1091,14 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
       ((double) ((seek_pos % CHUNK_SIZE) / (double) (CHUNK_SIZE)) * p_sys->i_num_recs);
     msg_Dbg(p_demux, "Seeked to file pos %"PRIu64, seek_pos);
     msg_Dbg(p_demux, " (chunk %d, record %d)",
-             p_sys->i_cur_chunk - 1, p_sys->i_cur_rec);
+             p_sys->i_cur_chunk ? p_sys->i_cur_chunk - 1 : 0, p_sys->i_cur_rec);
 
     /* seek to the start of this record's data.
      * to do that, we have to skip past all prior records */
     l_skip_amt = 0;
     for ( int i=0; i<p_sys->i_cur_rec; i++)
         l_skip_amt += p_sys->rec_hdrs[i].l_rec_size;
-    if( vlc_stream_Seek(p_demux->s, ((p_sys->i_cur_chunk-1) * CHUNK_SIZE) +
+    if( vlc_stream_Seek(p_demux->s, ((p_sys->i_cur_chunk ? p_sys->i_cur_chunk - 1 : 0) * CHUNK_SIZE) +
                         (p_sys->i_num_recs * REC_SIZE) + l_skip_amt + 4) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
