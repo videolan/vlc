@@ -456,7 +456,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialAudioCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedAudioMedia; } fromQueue:_mediaItemCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedAudioMedia)
+                                 fromQueue:_mediaItemCacheModificationQueue].count;
 }
 
 - (vlc_ml_query_params_t)queryParams
@@ -467,11 +468,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return queryParams;
 }
 
-- (NSArray *)readCachedArrayFromBlock:(NSArray * (^)(void))getBlock fromQueue:(dispatch_queue_t)queue
+- (NSArray *)readCachedArrayFromGetter:(SEL)getterSelector
+                             fromQueue:(dispatch_queue_t)queue
 {
     __block NSArray *result;
     dispatch_sync(queue, ^{
-        result = getBlock();
+        const IMP cacheGetterImp = [self methodForSelector:getterSelector];
+        NSArray * (*cacheGetterFunction)(id, SEL) = (void *)cacheGetterImp;
+        result = cacheGetterFunction(self, getterSelector);
     });
     return result;
 }
@@ -500,7 +504,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfAudioMedia];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedAudioMedia; } fromQueue:_mediaItemCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedAudioMedia)
+                                 fromQueue:_mediaItemCacheModificationQueue];
 }
 
 - (size_t)numberOfArtists
@@ -510,7 +515,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialArtistCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedArtists; } fromQueue:_artistCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedArtists)
+                                 fromQueue:_artistCacheModificationQueue].count;
 }
 
 - (void)resetCachedListOfArtists
@@ -547,7 +553,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfArtists];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedArtists; } fromQueue:_artistCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedArtists)
+                                  fromQueue:_artistCacheModificationQueue];
 }
 
 - (size_t)numberOfAlbums
@@ -557,7 +564,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialAlbumCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedAlbums; } fromQueue:_albumCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedAlbums)
+                                  fromQueue:_albumCacheModificationQueue].count;
 }
 
 - (void)resetCachedListOfAlbums
@@ -591,7 +599,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfAlbums];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedAlbums; } fromQueue:_albumCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedAlbums)
+                                  fromQueue:_albumCacheModificationQueue];
 }
 
 - (size_t)numberOfGenres
@@ -601,7 +610,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialGenreCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedGenres; } fromQueue:_genreCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedGenres)
+                                 fromQueue:_genreCacheModificationQueue].count;
 }
 
 - (void)resetCachedListOfGenres
@@ -635,7 +645,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfGenres];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedGenres; } fromQueue:_genreCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedGenres)
+                                 fromQueue:_genreCacheModificationQueue];
 }
 
 - (size_t)numberOfVideoMedia
@@ -646,7 +657,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialVideoCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedVideoMedia; } fromQueue:_mediaItemCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedVideoMedia)
+                                 fromQueue:_mediaItemCacheModificationQueue].count;
 }
 
 - (void)resetCachedListOfVideoMedia
@@ -679,7 +691,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfVideoMedia];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedVideoMedia; } fromQueue:_mediaItemCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedVideoMedia)
+                                 fromQueue:_mediaItemCacheModificationQueue];
 }
 
 - (void)resetCachedListOfMediaTitles
@@ -717,7 +730,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfMediaTitles];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedMediaTitles; } fromQueue:_mediaTitlesCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedMediaTitles)
+                                 fromQueue:_mediaTitlesCacheModificationQueue];
 }
 
 - (void)getListOfRecentMediaOfType:(vlc_ml_media_type_t)type
@@ -761,7 +775,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialRecentsCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedRecentMedia; } fromQueue:_mediaItemCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedRecentMedia)
+                                 fromQueue:_mediaItemCacheModificationQueue].count;
 }
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfRecentMedia
@@ -770,7 +785,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfRecentMedia];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedRecentMedia; } fromQueue:_mediaItemCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedRecentMedia)
+                                 fromQueue:_mediaItemCacheModificationQueue];
 }
 
 - (void)resetCachedListOfRecentAudioMedia
@@ -790,7 +806,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialRecentAudioCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedRecentAudioMedia; } fromQueue:_mediaItemCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedRecentAudioMedia)
+                                 fromQueue:_mediaItemCacheModificationQueue].count;
 }
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfRecentAudioMedia
@@ -799,7 +816,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfRecentAudioMedia];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedRecentAudioMedia; } fromQueue:_mediaItemCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedRecentAudioMedia)
+                                 fromQueue:_mediaItemCacheModificationQueue];
 }
 
 - (void)resetCachedListOfShows
@@ -861,7 +879,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialShowCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedListOfShows; } fromQueue:_mediaItemCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedListOfShows)
+                                 fromQueue:_mediaItemCacheModificationQueue].count;
 }
 
 - (size_t)numberOfMovies
@@ -871,7 +890,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialMovieCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedListOfMovies; } fromQueue:_mediaItemCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedListOfMovies)
+                                 fromQueue:_mediaItemCacheModificationQueue].count;
 }
 
 - (NSArray<VLCMediaLibraryShow *> *)listOfShows
@@ -880,7 +900,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfShows];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedListOfShows; } fromQueue:_mediaItemCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedListOfShows)
+                                 fromQueue:_mediaItemCacheModificationQueue];
 }
 
 - (NSArray<VLCMediaLibraryMovie *> *)listOfMovies
@@ -889,7 +910,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfMovies];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedListOfMovies; } fromQueue:_mediaItemCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedListOfMovies)
+                                 fromQueue:_mediaItemCacheModificationQueue];
 }
 
 - (size_t)numberOfGroups
@@ -899,7 +921,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialGroupCount;
     }
-    return [self readCachedArrayFromBlock:^{ return self.cachedListOfGroups; } fromQueue:_groupCacheModificationQueue].count;
+    return [self readCachedArrayFromGetter:@selector(cachedListOfGroups)
+                                 fromQueue:_groupCacheModificationQueue].count;
 }
 
 - (NSArray<VLCMediaLibraryGroup *> *)listOfGroups
@@ -908,7 +931,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfGroups];
     }
     
-    return [self readCachedArrayFromBlock:^{ return self.cachedListOfGroups; } fromQueue:_groupCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedListOfGroups)
+                                 fromQueue:_groupCacheModificationQueue];
 }
 
 - (void)resetCachedListOfGroups
@@ -1034,7 +1058,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfMonitoredFolders];
     }
 
-    return [self readCachedArrayFromBlock:^{ return self.cachedListOfMonitoredFolders; } fromQueue:_mediaItemCacheModificationQueue];
+    return [self readCachedArrayFromGetter:@selector(cachedListOfMonitoredFolders)
+                                 fromQueue:_mediaItemCacheModificationQueue];
 }
 
 - (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(const enum vlc_ml_parent_type)parentType forID:(int64_t)ID
