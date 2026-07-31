@@ -99,7 +99,7 @@ static block_t *ParseMPEGBlock( decoder_t *, block_t * );
 static int ParseVOL( decoder_t *, es_format_t *, uint8_t *, int );
 static int ParseVO( decoder_t *, block_t * );
 static int ParseVOP( decoder_t *, block_t * );
-static int vlc_log2( unsigned int );
+static unsigned vlc_log2( unsigned int );
 
 #define VIDEO_OBJECT_MASK                       0x01f
 #define VIDEO_OBJECT_LAYER_MASK                 0x00f
@@ -438,9 +438,7 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
 
     if( bs_read1( &s ) )
     {
-        int i_time_increment_bits = vlc_log2( p_sys->i_fps_num - 1 ) + 1;
-
-        if( i_time_increment_bits < 1 ) i_time_increment_bits = 1;
+        unsigned i_time_increment_bits = vlc_log2( p_sys->i_fps_num - 1 ) + 1;
 
         p_sys->i_fps_den = bs_read( &s, i_time_increment_bits );
     }
@@ -503,7 +501,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int64_t i_time_increment, i_time_ref;
-    int i_modulo_time_base = 0, i_time_increment_bits;
+    int i_modulo_time_base = 0;
     bs_t s;
 
     if( p_sys->i_fps_num == 0 )
@@ -532,8 +530,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
     if( !bs_read1( &s ) ) return VLC_EGENERIC; /* Marker */
 
     /* VOP time increment */
-    i_time_increment_bits = vlc_log2(p_sys->i_fps_num - 1) + 1;
-    if( i_time_increment_bits < 1 ) i_time_increment_bits = 1;
+    unsigned i_time_increment_bits = vlc_log2(p_sys->i_fps_num - 1) + 1;
     i_time_increment = bs_read( &s, i_time_increment_bits );
 
     /* Interpolate PTS/DTS */
@@ -614,10 +611,10 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
 }
 
 /* look at libavutil av_log2 ;) */
-static int vlc_log2( unsigned int v )
+static unsigned vlc_log2( unsigned int v )
 {
-    int n = 0;
-    static const int vlc_log2_table[16] =
+    unsigned n = 0;
+    static const unsigned vlc_log2_table[16] =
     {
         0,0,1,1,2,2,2,2, 3,3,3,3,3,3,3,3
     };
