@@ -506,6 +506,9 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
     int i_modulo_time_base = 0, i_time_increment_bits;
     bs_t s;
 
+    if( p_sys->i_fps_num == 0 )
+        return VLC_EGENERIC;
+
     bs_init( &s, &p_vop->p_buffer[4], p_vop->i_buffer - 4 );
 
     switch( bs_read( &s, 2 ) )
@@ -548,7 +551,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
     }
 
     int64_t i_time_diff = (i_time_ref + i_time_increment) - (p_sys->i_last_time + p_sys->i_last_timeincr);
-    if( p_sys->i_fps_num && i_modulo_time_base == 0 && i_time_diff < 0 && -i_time_diff > p_sys->i_fps_num )
+    if( i_modulo_time_base == 0 && i_time_diff < 0 && -i_time_diff > p_sys->i_fps_num )
     {
         msg_Warn(p_dec, "missing modulo_time_base update");
         i_modulo_time_base += -i_time_diff / p_sys->i_fps_num;
@@ -565,7 +568,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
         p_dec->fmt_in->video.i_frame_rate_base,
         p_dec->fmt_in->video.i_frame_rate);
     }
-    else if( p_sys->i_fps_num )
+    else
     {
         i_time_diff = (i_time_ref + i_time_increment) - (p_sys->i_last_time + p_sys->i_last_timeincr);
         p_sys->i_interpolated_pts += vlc_tick_from_samples( i_time_diff, p_sys->i_fps_num );
