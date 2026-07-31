@@ -282,6 +282,12 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
+    if ( p_sys->i_ssnd_pos == -1 )
+    {
+        msg_Err( p_demux, "Missing SSND chunk" );
+        goto error;
+    }
+
     if( pi_channels_in != NULL )
     {
         p_sys->i_chans_to_reorder =
