@@ -506,7 +506,6 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
-    int64_t i64;
 
     /*msg_Info(p_demux, "control cmd %d", i_query);*/
     switch( i_query )
@@ -517,10 +516,10 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
 
     case DEMUX_GET_POSITION:
         /* arg is 0.0 - 1.0 percent of overall file position */
-        if( ( i64 = p_sys->i_stream_size ) > 0 )
+        if( p_sys->i_stream_size != 0 )
         {
             pf = va_arg( args, double* );
-            *pf = ((double)1.0) * vlc_stream_Tell( p_demux->s ) / (double) i64;
+            *pf = ((double)1.0) * vlc_stream_Tell( p_demux->s ) / (double) p_sys->i_stream_size;
             return VLC_SUCCESS;
         }
         return VLC_EGENERIC;
@@ -529,7 +528,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         /* arg is 0.0 - 1.0 percent of overall file position */
         f = va_arg( args, double );
         /* msg_Dbg(p_demux, "Control - set position to %2.3f", f); */
-        if ((i64 = p_sys->i_stream_size) > 0)
+        if (p_sys->i_stream_size != 0)
             return ty_stream_seek_pct(p_demux, f);
         return VLC_EGENERIC;
     case DEMUX_GET_TIME:
