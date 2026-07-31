@@ -67,7 +67,7 @@ typedef struct
 
     int64_t     i_ssnd_pos;
     uint32_t    i_ssnd_size;
-    int         i_ssnd_offset;
+    uint32_t    i_ssnd_offset;
     int         i_ssnd_blocksize;
 
     /* real data start */
@@ -237,7 +237,7 @@ static int Open( vlc_object_t *p_this )
             p_sys->i_ssnd_offset = GetDWBE( &p_peek[8] );
             p_sys->i_ssnd_blocksize = GetDWBE( &p_peek[12] );
 
-            msg_Dbg( p_demux, "SSND: (offset=%d blocksize=%d)",
+            msg_Dbg( p_demux, "SSND: (offset=%" PRIu32 " blocksize=%d)",
                      p_sys->i_ssnd_offset, p_sys->i_ssnd_blocksize );
         }
         else if( !memcmp( p_peek, "CHAN", 4 ) && i_chunk_size > 8 + 12 )
