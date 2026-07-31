@@ -502,7 +502,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
     decoder_sys_t *p_sys = p_dec->p_sys;
     int64_t i_time_ref;
     uint32_t i_time_increment;
-    int i_modulo_time_base = 0;
+    uint64_t i_modulo_time_base = 0;
     bs_t s;
 
     if( p_sys->i_fps_num == 0 )
