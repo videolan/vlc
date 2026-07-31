@@ -418,6 +418,8 @@ static vlc_tick_t strTimeToMTime( const char *psz )
         return vlc_tick_from_sec( ( h*60 + m )*60 + s );
     case 2:
         return vlc_tick_from_sec( h*60 + m );
+    case 1:
+        return vlc_tick_from_sec( h );
     default:
         return INPUT_DURATION_UNSET;
     }
