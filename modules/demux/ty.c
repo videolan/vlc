@@ -1060,18 +1060,16 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint64_t seek_pos = p_sys->i_stream_size * seek_pct;
     uint64_t l_skip_amt;
-    unsigned i_cur_part;
 
     /* if we're not seekable, there's nothing to do */
     if (!p_sys->b_seekable)
         return VLC_EGENERIC;
 
     /* figure out which part & chunk we want & go there */
-    i_cur_part = seek_pos / TIVO_PART_LENGTH;
     p_sys->i_cur_chunk = seek_pos / CHUNK_SIZE;
 
     /* try to read the part header (master chunk) if it's there */
-    if (vlc_stream_Seek( p_demux->s, i_cur_part * TIVO_PART_LENGTH ) ||
+    if (vlc_stream_Seek( p_demux->s, (seek_pos / TIVO_PART_LENGTH) * TIVO_PART_LENGTH ) ||
         parse_master(p_demux) != VLC_SUCCESS)
     {
         /* can't seek stream */
