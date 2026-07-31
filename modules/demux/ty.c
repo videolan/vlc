@@ -1593,7 +1593,7 @@ static int ty_stream_seek_time(demux_t *p_demux, uint64_t l_seek_time)
             p_sys->i_stuff_cnt = 0;
             get_chunk_header(p_demux);
             // check ty PTS for the SEQ entry in this chunk
-            if (p_sys->i_seq_rec < 0 || p_sys->i_seq_rec > p_sys->i_num_recs) {
+            if (p_sys->i_seq_rec < 0 || p_sys->i_seq_rec >= p_sys->i_num_recs) {
                 msg_Err(p_demux, "no SEQ hdr in chunk; table had one.");
                 /* Seek to beginning of original chunk & reload it */
                 if(vlc_stream_Seek(p_demux->s, (l_cur_pos / CHUNK_SIZE) * CHUNK_SIZE) != VLC_SUCCESS)
