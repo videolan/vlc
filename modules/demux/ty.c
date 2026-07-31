@@ -229,7 +229,7 @@ typedef struct
 
   xds_t       xds;
 
-  int             i_cur_chunk;
+  uint64_t        i_cur_chunk;
   int             i_stuff_cnt;
   size_t          i_stream_size;      /* size of input stream (if known) */
   //uint64_t        l_program_len;      /* length of this stream in msec */
@@ -1090,7 +1090,7 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
     p_sys->i_cur_rec = (int)
       ((double) ((seek_pos % CHUNK_SIZE) / (double) (CHUNK_SIZE)) * p_sys->i_num_recs);
     msg_Dbg(p_demux, "Seeked to file pos %"PRIu64, seek_pos);
-    msg_Dbg(p_demux, " (chunk %d, record %d)",
+    msg_Dbg(p_demux, " (chunk %" PRIu64 ", record %d)",
              p_sys->i_cur_chunk ? p_sys->i_cur_chunk - 1 : 0, p_sys->i_cur_rec);
 
     /* seek to the start of this record's data.
@@ -1904,7 +1904,7 @@ static int get_chunk_header(demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_payload_size;             /* sum of all records' sizes */
 
-    msg_Dbg(p_demux, "parsing ty chunk #%d", p_sys->i_cur_chunk );
+    msg_Dbg(p_demux, "parsing ty chunk #%" PRIu64, p_sys->i_cur_chunk );
 
     /* if we have left-over filler space from the last chunk, get that */
     if (p_sys->i_stuff_cnt > 0) {
