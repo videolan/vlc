@@ -81,7 +81,7 @@ T.Pane {
                     switch (UpdateModel.updateStatus) {
                         case UpdateModel.NeedUpdate:
                             const extra = UpdateModel.extra
-                            return qsTr("A new version of VLC is available: <font color=\"%1\">%2.%3.%4%5</font>").arg(theme.fg.neutral)
+                            return qsTr("A new version of VLC is available: <font color=\"%1\">%2.%3.%4%5</font>").arg(theme.fg.positive)
                                                                                                                   .arg(UpdateModel.major)
                                                                                                                   .arg(UpdateModel.minor)
                                                                                                                   .arg(UpdateModel.revision)
