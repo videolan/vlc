@@ -50,6 +50,7 @@
 #import "views/VLCUIUnits.h"
 
 NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseDataSourceNodeChanged";
+NSString * const VLCMediaSourceTableTagsColumnIdentifier = @"VLCMediaSourceTableTagsColumn";
 
 @interface VLCLANDeviceRecord : NSObject
 @property (readonly) VLCMediaSource *mediaSource;
@@ -156,7 +157,15 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
     [self.tableView registerNib:tableCellViewNib forIdentifier:VLCLibraryTableCellViewIdentifier];
 
+    [self updateTableColumnVisibility];
     [self reloadViews];
+}
+
+- (void)updateTableColumnVisibility
+{
+    NSTableColumn * const tagsColumn =
+        [self.tableView tableColumnWithIdentifier:VLCMediaSourceTableTagsColumnIdentifier];
+    tagsColumn.hidden = self.mediaSourceMode == VLCMediaSourceModeInternet;
 }
 
 - (void)reloadViews
@@ -240,6 +249,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
         return;
     }
     _mediaSourceMode = mediaSourceMode;
+    [self updateTableColumnVisibility];
     [self loadMediaSources];
     [self returnHome];
 }
