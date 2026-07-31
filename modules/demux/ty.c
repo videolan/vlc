@@ -231,7 +231,7 @@ typedef struct
 
   uint64_t        i_cur_chunk;
   int             i_stuff_cnt;
-  size_t          i_stream_size;      /* size of input stream (if known) */
+  uint64_t        i_stream_size;      /* size of input stream (if known) */
   //uint64_t        l_program_len;      /* length of this stream in msec */
   bool      b_seekable;         /* is this stream seekable? */
   bool      b_have_master;      /* are master chunks present? */
