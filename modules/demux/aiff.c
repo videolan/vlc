@@ -34,6 +34,7 @@
 #include <vlc_aout.h>
 #include <vlc_meta.h>
 #include <limits.h>
+#include <stdint.h>
 
 #include "mp4/coreaudio.h"
 
@@ -66,8 +67,8 @@ typedef struct
     unsigned int i_rate;
 
     /* real data start */
-    int64_t     i_ssnd_start;
-    int64_t     i_ssnd_end;
+    uint64_t    i_ssnd_start;
+    uint64_t    i_ssnd_end;
 
     unsigned    i_ssnd_fsize;
 
@@ -192,7 +193,7 @@ static int Open( vlc_object_t *p_this )
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
 
     const uint32_t *pi_channels_in = NULL;
-    int64_t  i_ssnd_pos = -1;
+    uint64_t i_ssnd_pos = UINT64_C(-1);
     uint32_t i_ssnd_size = 0;
     uint32_t i_ssnd_offset = 0;
 
@@ -281,7 +282,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if ( i_ssnd_pos == -1 )
+    if ( i_ssnd_pos == UINT64_C(-1) )
     {
         msg_Err( p_demux, "Missing SSND chunk" );
         goto error;
@@ -352,7 +353,7 @@ static int Demux( demux_t *p_demux )
     block_t     *p_block;
     size_t      i_read;
 
-    if( p_sys->i_ssnd_end > 0 && i_tell >= (uint64_t)p_sys->i_ssnd_end )
+    if( p_sys->i_ssnd_end != 0 && i_tell >= p_sys->i_ssnd_end )
     {
         /* EOF */
         return VLC_DEMUXER_EOF;
@@ -363,7 +364,7 @@ static int Demux( demux_t *p_demux )
 
     /* we will read 100ms at once */
     i_read = p_sys->i_ssnd_fsize * ( p_sys->i_rate / 10 );
-    if( p_sys->i_ssnd_end > 0 && (uint64_t)p_sys->i_ssnd_end > i_tell && p_sys->i_ssnd_end - i_tell < i_read )
+    if( p_sys->i_ssnd_end != 0 && p_sys->i_ssnd_end > i_tell && p_sys->i_ssnd_end - i_tell < i_read )
     {
         i_read = p_sys->i_ssnd_end - i_tell;
     }
@@ -415,13 +416,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_POSITION:
         {
-            int64_t i_start = p_sys->i_ssnd_start;
-            int64_t i_end   = p_sys->i_ssnd_end > 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
+            uint64_t i_start = p_sys->i_ssnd_start;
+            uint64_t i_end   = p_sys->i_ssnd_end != 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
             uint64_t i_tell  = vlc_stream_Tell( p_demux->s );
 
             pf = va_arg( args, double * );
 
-            if( i_start < i_end && i_start <= (int64_t)i_tell )
+            if( i_start < i_end && i_start <= i_tell )
             {
                 *pf = (double)(i_tell - i_start)/(double)(i_end - i_start);
                 return VLC_SUCCESS;
@@ -431,8 +432,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
         {
-            int64_t i_start = p_sys->i_ssnd_start;
-            int64_t i_end  = p_sys->i_ssnd_end > 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
+            uint64_t i_start = p_sys->i_ssnd_start;
+            uint64_t i_end  = p_sys->i_ssnd_end != 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
 
             f = va_arg( args, double );
 
@@ -457,7 +458,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
         {
-            int64_t i_end  = p_sys->i_ssnd_end > 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
+            uint64_t i_end  = p_sys->i_ssnd_end != 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
 
             if( p_sys->i_ssnd_start < i_end )
             {
