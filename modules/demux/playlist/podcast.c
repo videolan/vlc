@@ -1,7 +1,7 @@
 /*****************************************************************************
  * podcast.c : podcast playlist imports
  *****************************************************************************
- * Copyright (C) 2005-2009 VLC authors and VideoLAN
+ * Copyright (C) 2005-2026 VLC authors and VideoLAN
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
@@ -114,6 +114,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     char *psz_item_keywords = NULL;
     char *psz_item_subtitle = NULL;
     char *psz_item_summary = NULL;
+    char *psz_item_art_url = NULL;
     char *psz_art_url = NULL;
     const char *node;
     int i_type;
@@ -176,6 +177,16 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                         else
                             msg_Dbg( p_demux,"unhandled attribute %s in <%s>",
                                      attr, node );
+                    }
+                    else if( !strcmp( node, "itunes:image" ) &&
+                             !strcmp( attr, "href" ) && *value )
+                    {
+                        char **p = b_item ? &psz_item_art_url : &psz_art_url;
+
+                        free( *p );
+                        *p = strdup( value );
+                        if( *p != NULL )
+                            vlc_xml_decode( *p );
                     }
                     else
                         msg_Dbg( p_demux,"unhandled attribute %s in <%s>",
@@ -246,8 +257,13 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 {
                     if( !strcmp( psz_elname, "url" ) && *node )
                     {
-                        free( psz_art_url );
-                        psz_art_url = strdup( node );
+                        // fallback if no itunes artwork
+                        if( psz_art_url == NULL )
+                        {
+                            psz_art_url = strdup( node );
+                            if( psz_art_url != NULL )
+                                vlc_xml_decode( psz_art_url );
+                        }
                     }
                     else
                         msg_Dbg( p_demux, "unhandled text in element <%s>",
@@ -280,8 +296,9 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                         FREENULL( psz_item_keywords );
                         FREENULL( psz_item_subtitle );
                         FREENULL( psz_item_summary );
-                        FREENULL( psz_art_url );
+                        FREENULL( psz_item_art_url );
                         FREENULL( psz_elname );
+                        b_item = false;
                         continue;
                     }
 
@@ -293,7 +310,10 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                     FREENULL( psz_item_name );
 
                     if( p_input == NULL )
+                    {
+                        FREENULL( psz_item_art_url );
                         break; /* FIXME: meta data memory leaks? */
+                    }
 
                     /* Set the duration if available */
                     if( psz_item_duration )
@@ -322,12 +342,12 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 #undef ADD_INFO
 #undef ADD_INFO_META
 
-                    /* Add the global art url to this item, if any */
-                    if( psz_art_url )
-                    {
-                        vlc_xml_decode( psz_art_url );
+                    /* Add the item art url if any, and the channel one otherwise */
+                    if( psz_item_art_url != NULL )
+                        input_item_SetArtURL( p_input, psz_item_art_url );
+                    else if( psz_art_url != NULL )
                         input_item_SetArtURL( p_input, psz_art_url );
-                    }
+                    FREENULL( psz_item_art_url );
 
                     if( psz_item_size )
                     {
@@ -356,6 +376,10 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
         msg_Warn( p_demux, "error while parsing data" );
     }
 
+    if( psz_art_url != NULL )
+        input_item_SetArtURL( p_current_input, psz_art_url );
+
+    free( psz_item_art_url );
     free( psz_art_url );
     free( psz_elname );
     xml_ReaderDelete( p_xml_reader );
@@ -374,6 +398,7 @@ error:
     free( psz_item_keywords );
     free( psz_item_subtitle );
     free( psz_item_summary );
+    free( psz_item_art_url );
     free( psz_art_url );
     free( psz_elname );
 
