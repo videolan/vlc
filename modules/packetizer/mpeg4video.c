@@ -71,8 +71,8 @@ typedef struct
     vlc_tick_t i_interpolated_pts;
     vlc_tick_t i_interpolated_dts;
     vlc_tick_t i_last_ref_pts;
-    int64_t i_last_time_ref;
-    int64_t i_time_ref;
+    uint64_t i_last_time_ref;
+    uint64_t i_time_ref;
     int64_t i_last_time;
     uint32_t i_last_timeincr;
 
@@ -499,7 +499,7 @@ static int ParseVO( decoder_t *p_dec, block_t *p_vo )
 static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int64_t i_time_ref;
+    uint64_t i_time_ref;
     uint32_t i_time_increment;
     uint64_t i_modulo_time_base = 0;
     bs_t s;
