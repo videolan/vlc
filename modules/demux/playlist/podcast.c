@@ -239,12 +239,20 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     else if( !strcmp( psz_elname, name ) ) \
         input_item_AddInfo( p_current_input, _("Podcast Info"), \
                             info, "%s", node );
-                    ADD_GINFO( _("Podcast Link"), "link" )
-                    ADD_GINFO( _("Podcast Copyright"), "copyright" )
+#define ADD_GINFO_META( info, name, meta ) \
+    else if( !strcmp( psz_elname, name ) ) { \
+        input_item_AddInfo( p_current_input, _("Podcast Info"), \
+                            info, "%s", node ); \
+        input_item_SetMeta( p_current_input, (meta), node ); }
+                    ADD_GINFO_META( _("Podcast Link"), "link", vlc_meta_URL )
+                    ADD_GINFO_META( _("Podcast Copyright"), "copyright", vlc_meta_Copyright )
+                    ADD_GINFO_META( _("Podcast Language"), "language", vlc_meta_Language )
+                    ADD_GINFO_META( _("Podcast Author"), "itunes:author", vlc_meta_Artist )
                     ADD_GINFO( _("Podcast Category"), "itunes:category" )
                     ADD_GINFO( _("Podcast Keywords"), "itunes:keywords" )
                     ADD_GINFO( _("Podcast Subtitle"), "itunes:subtitle" )
 #undef ADD_GINFO
+#undef ADD_GINFO_META
                     else if( !strcmp( psz_elname, "itunes:summary" ) ||
                              !strcmp( psz_elname, "description" ) )
                     { /* <description> isn't standard iTunes podcast stuff */
