@@ -66,7 +66,7 @@ typedef struct
     es_out_id_t *es;
 
     int64_t     i_ssnd_pos;
-    int64_t     i_ssnd_size;
+    uint32_t    i_ssnd_size;
     int         i_ssnd_offset;
     int         i_ssnd_blocksize;
 
@@ -313,7 +313,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    if( p_sys->i_ssnd_size <= 0 )
+    if( p_sys->i_ssnd_size == 0 )
     {
         /* unknown */
         p_sys->i_ssnd_end = 0;
