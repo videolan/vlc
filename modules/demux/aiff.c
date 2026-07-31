@@ -74,7 +74,7 @@ typedef struct
     int64_t     i_ssnd_start;
     int64_t     i_ssnd_end;
 
-    int         i_ssnd_fsize;
+    unsigned    i_ssnd_fsize;
 
     vlc_tick_t  i_time;
 
@@ -307,7 +307,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_ssnd_fsize = p_sys->fmt.audio.i_channels *
                           ((p_sys->fmt.audio.i_bitspersample + 7) / 8);
 
-    if( p_sys->i_ssnd_fsize <= 0 || p_sys->fmt.audio.i_rate == 0 )
+    if( p_sys->i_ssnd_fsize == 0 || p_sys->fmt.audio.i_rate == 0 )
     {
         msg_Err( p_demux, "invalid audio parameters" );
         goto error;
@@ -351,7 +351,7 @@ static int Demux( demux_t *p_demux )
     uint64_t    i_tell = vlc_stream_Tell( p_demux->s );
 
     block_t     *p_block;
-    int         i_read;
+    size_t      i_read;
 
     if( p_sys->i_ssnd_end > 0 && i_tell >= (uint64_t)p_sys->i_ssnd_end )
     {
@@ -439,8 +439,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( i_start < i_end )
             {
-                int     i_frame = (f * ( i_end - i_start )) / p_sys->i_ssnd_fsize;
-                int64_t i_new   = i_start + i_frame * p_sys->i_ssnd_fsize;
+                unsigned i_frame = (f * ( i_end - i_start )) / p_sys->i_ssnd_fsize;
+                uint64_t i_new   = i_start + i_frame * p_sys->i_ssnd_fsize;
 
                 if( vlc_stream_Seek( p_demux->s, i_new ) )
                 {
