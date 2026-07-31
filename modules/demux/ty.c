@@ -1058,7 +1058,7 @@ static bool DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bloc
 static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t seek_pos = p_sys->i_stream_size * seek_pct;
+    const uint64_t seek_pos = p_sys->i_stream_size * seek_pct;
     uint64_t l_skip_amt;
     unsigned i_cur_part;
 
@@ -1091,7 +1091,7 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
     /* seek within the chunk to get roughly to where we want */
     p_sys->i_cur_rec = (int)
       ((double) ((seek_pos % CHUNK_SIZE) / (double) (CHUNK_SIZE)) * p_sys->i_num_recs);
-    msg_Dbg(p_demux, "Seeked to file pos %"PRId64, seek_pos);
+    msg_Dbg(p_demux, "Seeked to file pos %"PRIu64, seek_pos);
     msg_Dbg(p_demux, " (chunk %d, record %d)",
              p_sys->i_cur_chunk - 1, p_sys->i_cur_rec);
 
