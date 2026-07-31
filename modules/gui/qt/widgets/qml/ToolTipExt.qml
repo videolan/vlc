@@ -73,19 +73,25 @@ T.ToolTip {
     }
 
     contentItem: Text {
+        id: contentText
+
         text: control.text
         font: control.font
         wrapMode: Text.WordWrap
 
         color: theme.fg.primary
 
+        property QtWindow _lastWindowForNoRedirectionSurface
+
         Component.onCompleted: {
             if (MainCtx.createWindowWithoutRedirectionSurface) { // Win32
                 Window.windowChanged.connect(this, () => {
                     if (Window.window && (Window.window !== MainCtx.intfMainWindow)) { // Only relevant when `popupType` is `Popup.Window`
-                        const ret = MainCtx.createWindowWithoutRedirectionSurface(Window.window)
-                        if (!ret)
-                            console.debug("MainCtx::createWindowWithoutRedirectionSurface(): returned false for window", this)
+                        if (Window.window !== contentText._lastWindowForNoRedirectionSurface) {
+                            const ret = MainCtx.createWindowWithoutRedirectionSurface(Window.window)
+                            console.debug("MainCtx::createWindowWithoutRedirectionSurface(): returned %1 for window %2.".arg(ret).arg(Window.window))
+                            contentText._lastWindowForNoRedirectionSurface = Window.window
+                        }
                     }
                 })
             }
