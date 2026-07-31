@@ -78,7 +78,7 @@ typedef struct
 
     unsigned int i_flags;
 
-    unsigned     i_fps_num;
+    uint16_t    i_fps_num;
 
     bool  b_frame;
 
