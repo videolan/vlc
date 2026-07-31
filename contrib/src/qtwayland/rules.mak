@@ -12,7 +12,7 @@ endif
 DEPS_qtwayland = qtdeclarative $(DEPS_qtdeclarative)
 
 $(TARBALLS)/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz:
-	$(call download,$(QTWAYLAND_URL))
+	$(call download_pkg,$(QTWAYLAND_URL),qtwayland)
 
 .sum-qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 

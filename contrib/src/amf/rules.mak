@@ -18,7 +18,7 @@ endif
 endif
 
 $(TARBALLS)/AMF-$(AMF_VERSION).tar.gz:
-	$(call download,$(AMF_URL))
+	$(call download_pkg,$(AMF_URL),amf)
 
 .sum-amf: AMF-$(AMF_VERSION).tar.gz
 

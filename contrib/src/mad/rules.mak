@@ -18,7 +18,7 @@ endif
 endif
 
 $(TARBALLS)/libmad-$(MAD_VERSION).tar.gz:
-	$(call download,$(MAD_URL))
+	$(call download_pkg,$(MAD_URL),mad)
 
 .sum-mad: libmad-$(MAD_VERSION).tar.gz
 
