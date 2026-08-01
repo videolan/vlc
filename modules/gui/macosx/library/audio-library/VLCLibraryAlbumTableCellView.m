@@ -91,11 +91,19 @@ static const CGFloat VLCLibraryInternalMediaItemIntercellSpacing = 2.;
 {
     static CGFloat albumNameHeight;
     static CGFloat artistNameHeight;
+    static CGFloat artworkAndSecondaryLabelsHeight;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         VLCLibraryAlbumTableCellView *prototype = [VLCLibraryAlbumTableCellView fromNibWithOwner:NSNull.null];
-        albumNameHeight = prototype.albumNameTextField.intrinsicContentSize.height;
-        artistNameHeight = prototype.artistNameTextButton.intrinsicContentSize.height;
+        albumNameHeight = prototype.albumNameTextField.frame.size.height;
+        artistNameHeight = prototype.artistNameTextButton.frame.size.height;
+        artworkAndSecondaryLabelsHeight = VLCUIUnits.largeSpacing +
+                                          prototype.representedImageView.frame.size.height +
+                                          VLCUIUnits.mediumSpacing +
+                                          prototype.summaryTextField.frame.size.height +
+                                          VLCUIUnits.smallSpacing +
+                                          prototype.yearTextField.frame.size.height +
+                                          VLCUIUnits.largeSpacing;
     });
 
     const NSUInteger numberOfTracks = album.numberOfTracks;
@@ -109,7 +117,8 @@ static const CGFloat VLCLibraryInternalMediaItemIntercellSpacing = 2.;
                                             tracksHeight +
                                             VLCUIUnits.largeSpacing;
 
-    return MAX(titleAndTableViewHeight, VLCLibraryAlbumTableCellViewDefaultHeight);
+    return MAX(MAX(titleAndTableViewHeight, artworkAndSecondaryLabelsHeight),
+               VLCLibraryAlbumTableCellViewDefaultHeight);
 }
 
 - (CGFloat)height
