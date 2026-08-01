@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString *VLCMediaSourceChildrenReset;
 extern NSString *VLCMediaSourceChildrenAdded;
 extern NSString *VLCMediaSourceChildrenRemoved;
+extern NSString *VLCMediaSourcePreparsingStarted;
 extern NSString *VLCMediaSourcePreparsingEnded;
 
 @interface VLCMediaSource : NSObject
