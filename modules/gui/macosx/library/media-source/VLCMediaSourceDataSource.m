@@ -60,6 +60,7 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
 }
 
 @property (readwrite) dispatch_source_t observedPathDispatchSource;
+@property (readwrite) BOOL preparseOngoing;
 
 @end
 
@@ -84,7 +85,11 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
                                    name:VLCMediaSourceChildrenRemoved
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(mediaSourceChildrenChanged:)
+                               selector:@selector(preparseStateChanged:)
+                                   name:VLCMediaSourcePreparsingStarted
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(preparseStateChanged:)
                                    name:VLCMediaSourcePreparsingEnded
                                  object:nil];
     }
@@ -94,6 +99,11 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)preparseStateChanged:(NSNotification *)notification
+{
+    self.preparseOngoing = notification.name != VLCMediaSourcePreparsingEnded;
 }
 
 - (void)mediaSourceChildrenChanged:(NSNotification *)notification
@@ -177,7 +187,7 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
     }
 
     [self reloadData];
-    if (!self.hasDisplayedItems) {
+    if (self.preparseOngoing) {
         [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceDataSourceLoadingStarted
                                                           object:self];
     } else {
