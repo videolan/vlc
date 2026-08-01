@@ -43,16 +43,6 @@
     return [NSColor.VLCAccentColor colorWithAlphaComponent:0.8];
 }
 
-+ (NSColor *)VLClibraryLightTitleColor
-{
-    return [NSColor colorWithRed:0.15 green:0.16 blue:0.17 alpha:1.];
-}
-
-+ (NSColor *)VLClibraryDarkTitleColor
-{
-    return [NSColor colorWithRed:0.85 green:0.84 blue:0.83 alpha:1.];
-}
-
 + (NSColor *)VLClibrarySubtitleColor
 {
     return [NSColor colorWithRed:0.52 green:0.57 blue:0.61 alpha:1.];

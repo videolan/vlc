@@ -23,7 +23,6 @@
 
 #import "VLCMediaItemCollectionViewItem.h"
 
-#import "extensions/NSAppearance+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
@@ -95,26 +94,7 @@ const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress = 0.95;
     self.annotationTextField.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor;
     self.highlightBox.borderColor = NSColor.VLCAccentColor;
     self.unplayedIndicatorTextField.textColor = NSColor.VLCAccentColor;
-
-    [self updateColoredAppearance:self.view.effectiveAppearance];
     [self prepareForReuse];
-}
-
-#pragma mark - dynamic appearance
-
-- (void)viewDidChangeEffectiveAppearance
-{
-    [self updateColoredAppearance:self.view.effectiveAppearance];
-}
-
-- (void)updateColoredAppearance:(NSAppearance *)appearance
-{
-    NSParameterAssert(appearance);
-    const BOOL isDark = appearance.shouldShowDarkAppearance;
-
-    self.mediaTitleTextField.textColor = isDark 
-        ? NSColor.VLClibraryDarkTitleColor
-        : NSColor.VLClibraryLightTitleColor;
 }
 
 #pragma mark - view representation

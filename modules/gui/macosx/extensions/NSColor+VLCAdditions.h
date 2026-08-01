@@ -28,8 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (class, readonly) NSColor *VLCAccentColor;
 @property (class, readonly) NSColor *VLCSubtlerAccentColor;
-@property (class, readonly) NSColor *VLClibraryLightTitleColor;
-@property (class, readonly) NSColor *VLClibraryDarkTitleColor;
 @property (class, readonly) NSColor *VLClibrarySubtitleColor;
 @property (class, readonly) NSColor *VLClibraryAnnotationColor;
 @property (class, readonly) NSColor *VLClibraryAnnotationBackgroundColor;
