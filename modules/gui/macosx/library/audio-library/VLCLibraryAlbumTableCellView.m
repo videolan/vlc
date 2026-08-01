@@ -50,6 +50,7 @@ NSString * const VLCLibraryAlbumTableCellTableViewIdentifier = @"VLCLibraryAlbum
 NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibraryAlbumTableCellTableViewColumnIdentifier";
 
 const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
+static const CGFloat VLCLibraryInternalMediaItemIntercellSpacing = 2.;
 
 @interface VLCNonScrollableScrollView : NSScrollView
 @end
@@ -71,6 +72,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     VLCLibraryAlbumTracksTableViewDelegate *_tracksTableViewDelegate;
     VLCLibraryTableView *_tracksTableView;
     NSScrollView *_tracksScrollView;
+    NSLayoutConstraint *_tracksScrollViewHeightConstraint;
     NSTableColumn *_column;
 }
 
@@ -97,14 +99,13 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     });
 
     const NSUInteger numberOfTracks = album.numberOfTracks;
-    const CGFloat intercellSpacing = numberOfTracks > 1 ? (numberOfTracks - 1) * 1. : 0;
-    const CGFloat tracksHeight = numberOfTracks * VLCLibraryInternalMediaItemRowHeight + intercellSpacing + VLCUIUnits.mediumSpacing;
+    const CGFloat tracksHeight = numberOfTracks * (VLCLibraryInternalMediaItemRowHeight + VLCLibraryInternalMediaItemIntercellSpacing);
 
     const CGFloat titleAndTableViewHeight = VLCUIUnits.largeSpacing +
                                             albumNameHeight +
                                             VLCUIUnits.smallSpacing +
                                             artistNameHeight +
-                                            VLCUIUnits.smallSpacing +
+                                            VLCUIUnits.mediumSpacing +
                                             tracksHeight +
                                             VLCUIUnits.largeSpacing;
 
@@ -133,7 +134,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
                                             _albumNameTextField.frame.size.height +
                                             VLCUIUnits.smallSpacing +
                                             _artistNameTextButton.frame.size.height +
-                                            VLCUIUnits.smallSpacing +
+                                            VLCUIUnits.mediumSpacing +
                                             [self expectedTableViewHeight] +
                                             VLCUIUnits.largeSpacing;
 
@@ -163,8 +164,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     }
 
     const NSUInteger numberOfTracks = album.numberOfTracks;
-    const CGFloat intercellSpacing = numberOfTracks > 1 ? (numberOfTracks - 1) * _tracksTableView.intercellSpacing.height : 0;
-    return numberOfTracks * VLCLibraryInternalMediaItemRowHeight + intercellSpacing + VLCUIUnits.mediumSpacing;
+    return numberOfTracks * (VLCLibraryInternalMediaItemRowHeight + _tracksTableView.intercellSpacing.height);
 }
 
 - (void)awakeFromNib
@@ -230,6 +230,10 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
         _tracksTableView.style = NSTableViewStyleFullWidth;
     }
     _tracksTableView.gridStyleMask = NSTableViewSolidHorizontalGridLineMask;
+    _tracksTableView.intercellSpacing = NSMakeSize(_tracksTableView.intercellSpacing.width,
+                                                   VLCLibraryInternalMediaItemIntercellSpacing);
+    _tracksTableView.rowSizeStyle = NSTableViewRowSizeStyleCustom;
+    _tracksTableView.usesAutomaticRowHeights = NO;
     _tracksTableView.rowHeight = VLCLibraryInternalMediaItemRowHeight;
     _tracksTableView.backgroundColor = [NSColor clearColor];
 
@@ -255,6 +259,8 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksScrollView, _representedImageView, _albumNameTextField, _artistNameTextButton);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalVisualConstraints options:0 metrics:0 views:dict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalVisualContraints options:0 metrics:0 views:dict]];
+    _tracksScrollViewHeightConstraint = [_tracksScrollView.heightAnchor constraintEqualToConstant:0.];
+    _tracksScrollViewHeightConstraint.active = YES;
 
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
@@ -282,7 +288,13 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     }
 
     _tracksDataSource.representedItem = nil;
+    _tracksScrollViewHeightConstraint.constant = 0.;
     [_tracksTableView reloadData];
+}
+
+- (void)updateTracksScrollViewHeight
+{
+    _tracksScrollViewHeightConstraint.constant = MAX(0., [self expectedTableViewHeight]);
 }
 
 - (void)handleAlbumUpdated:(NSNotification *)notification
@@ -386,6 +398,8 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
         self.genreNameTextButton.contentTintColor = secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
     }
 
+    [self updateTracksScrollViewHeight];
+
     __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
         if (!weakSelf || weakSelf.representedItem.item != album) {
@@ -399,6 +413,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
         if (strongSelf) {
             [strongSelf->_tracksTableView reloadData];
+            [strongSelf updateTracksScrollViewHeight];
         }
     }];
 }
