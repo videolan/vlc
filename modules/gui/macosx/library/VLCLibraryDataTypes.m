@@ -162,9 +162,13 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 
     VLCMediaLibraryGenre * const secondGenre = [genres objectAtIndex:1];
+    if (genreCount == 2) {
+        return [NSString stringWithFormat:_NS("%@ and %@"), firstGenre.name, secondGenre.name];
+    }
+
     return [NSString stringWithFormat:_NS("%@, %@, and %lli other genres"),
-                     firstGenre.displayString,
-                     secondGenre.displayString,
+                     firstGenre.name,
+                     secondGenre.name,
                      genreCount - 2];
 }
 
