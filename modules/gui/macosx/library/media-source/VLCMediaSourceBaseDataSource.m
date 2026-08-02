@@ -24,6 +24,7 @@
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSource.h"
+#import "VLCLocalMediaSource.h"
 #import "VLCMediaSourceDataSource.h"
 #import "VLCMediaSourceDeviceCollectionViewItem.h"
 #import "VLCMediaSourceProvider.h"
@@ -767,8 +768,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)browseFolderByMrl:(NSString *)mrl
 {
     vlc_preparser_t *p_preparser = getNetworkPreparser();
-    VLCMediaSource * const mediaSource =
-        [[VLCMediaSource alloc] initWithFolderMrl:mrl andPreparser:p_preparser];
+    NSURL * const folderURL = [NSURL URLWithString:mrl];
+    VLCMediaSource * const mediaSource = folderURL.isFileURL
+        ? [[VLCLocalMediaSource alloc] initWithFolderMrl:mrl andPreparser:p_preparser]
+        : [[VLCMediaSource alloc] initWithFolderMrl:mrl andPreparser:p_preparser];
     if (mediaSource == nil) {
         NSLog(@"Could not create valid media source for mrl: %@", mrl);
         return;
