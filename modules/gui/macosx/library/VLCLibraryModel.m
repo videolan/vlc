@@ -1221,12 +1221,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             // Create mutable copies for modification
             NSMutableArray<VLCMediaLibraryMediaItem *> * const recentsMutable = cachedRecents.mutableCopy;
             NSMutableArray<VLCMediaLibraryMediaItem *> * const videoMutable = cachedVideos.mutableCopy;
-            NSMutableArray<VLCMediaLibraryShow *> * const showsMutable = cachedShows.mutableCopy;
+            NSMutableArray<VLCMediaLibraryShow *> * const showsMutable =
+                showIndex == NSNotFound ? nil : cachedShows.mutableCopy;
 
             action(videoMutable, videoIndex, recentsMutable, recentsIndex, showsMutable, showIndex, episodeIndex);
             self.cachedVideoMedia = videoMutable.copy;
             self.cachedRecentMedia = recentsMutable.copy;
-            self.cachedListOfShows = showsMutable.copy;
+            if (showsMutable)
+                self.cachedListOfShows = showsMutable.copy;
             return;
         }
 
