@@ -143,6 +143,7 @@ NSString * const kVLCPreferencesVersion = @"VLCPreferencesVersion";
 
 static intf_thread_t *p_interface_thread;
 static vlc_preparser_t *p_network_preparser;
+static vlc_preparser_t *p_thumbnailer;
 vlc_sem_t g_wait_quit;
 
 intf_thread_t *getIntf()
@@ -153,6 +154,11 @@ intf_thread_t *getIntf()
 vlc_preparser_t *getNetworkPreparser()
 {
     return p_network_preparser;
+}
+
+vlc_preparser_t *getThumbnailer()
+{
+    return p_thumbnailer;
 }
 
 int OpenIntf (vlc_object_t *p_this)
@@ -176,6 +182,17 @@ int OpenIntf (vlc_object_t *p_this)
                 retcode = VLC_ENOMEM;
                 dispatch_semaphore_signal(sem);
                 return;
+            }
+
+            const struct vlc_preparser_cfg thumbnailer_cfg = {
+                .types = VLC_PREPARSER_TYPE_THUMBNAIL,
+                .max_thumbnailer_threads = 1,
+                .timeout = VLC_TICK_FROM_SEC(3),
+                .external_process = false,
+            };
+            p_thumbnailer = vlc_preparser_New(p_this, &thumbnailer_cfg);
+            if (p_thumbnailer == NULL) {
+                msg_Warn(p_intf, "Could not initialize the thumbnailer");
             }
             msg_Dbg(p_intf, "Starting macosx interface");
 
@@ -212,6 +229,11 @@ void CloseIntf (vlc_object_t *p_this)
         @autoreleasepool {
             msg_Dbg(p_this, "Closing macosx interface");
             [VLCMain.sharedInstance applicationWillTerminate:nil];
+            if (p_thumbnailer != NULL) {
+                vlc_preparser_Cancel(p_thumbnailer, NULL);
+                vlc_preparser_Delete(p_thumbnailer);
+                p_thumbnailer = NULL;
+            }
             [VLCMain killInstance];
         }
         vlc_preparser_Delete(p_network_preparser);

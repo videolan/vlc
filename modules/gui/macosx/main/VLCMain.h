@@ -41,6 +41,7 @@ typedef struct vlc_preparser_t vlc_preparser_t;
 
 intf_thread_t *getIntf(void);
 vlc_preparser_t *getNetworkPreparser();
+vlc_preparser_t *getThumbnailer();
 
 extern NSString *VLCConfigurationChangedNotification;
 extern NSString * const kVLCPreferencesVersion;
