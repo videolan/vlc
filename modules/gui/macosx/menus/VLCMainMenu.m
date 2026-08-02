@@ -156,6 +156,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     /* configure playback / controls menu */
     self.fileMenu.delegate = self;
     self.controlsMenu.delegate = self;
+    self.audioMenu.delegate = self;
     self.videoMenu.delegate = self;
     self.subtitlesMenu.delegate = self;
     [_rendererNoneItem setState:NSOnState];
@@ -300,6 +301,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_voutMenusnapshot matchKeyEquivalentsOfMenuItem:_snapshot];
 
     [self updateVideoSubmenuEnablement];
+    [self updateAudioSubmenuEnablement];
     [self updateRecentMenuEnablement];
 }
 
@@ -719,6 +721,21 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         vout_Release(p_vout);
 }
 
+- (void)updateAudioSubmenuEnablement
+{
+    audio_output_t * const p_aout = _playerController.mainAudioOutput;
+    const BOOL enabled = p_aout != NULL &&
+                         _playerController.currentMedia != nil &&
+                         _playerController.playerState != VLC_PLAYER_STATE_STOPPED;
+
+    _audiotrack.enabled = enabled && _playerController.audioTracks.count > 0;
+    _channels.enabled = enabled;
+    _visual.enabled = enabled;
+
+    if (p_aout != NULL)
+        aout_Release(p_aout);
+}
+
 - (void)updateRecentMenuEnablement
 {
     _open_recent.enabled = NSDocumentController.sharedDocumentController.recentDocumentURLs.count > 0;
@@ -736,6 +753,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     }
 
     [self updateVideoSubmenuEnablement];
+    [self updateAudioSubmenuEnablement];
 }
 
 - (void)rebuildAoutMenu
@@ -1082,6 +1100,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     [self updateSubtitlesMenu:notification];
     [self updateVideoSubmenuEnablement];
+    [self updateAudioSubmenuEnablement];
 }
 
 - (void)rebuildTracksMenu:(NSMenu *)menu
@@ -1659,6 +1678,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)playbackStateChanged:(NSNotification *)aNotification
 {
     [self updateVideoSubmenuEnablement];
+    [self updateAudioSubmenuEnablement];
 
     switch (_playerController.playerState) {
         case VLC_PLAYER_STATE_PLAYING:
@@ -2016,6 +2036,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     if (menu == self.fileMenu) {
         [self updateRecentMenuEnablement];
+    }
+
+    if (menu == self.audioMenu) {
+        [self updateAudioSubmenuEnablement];
     }
 
     if (menu == self.videoMenu) {
