@@ -89,6 +89,7 @@ static void recentStreamsLibraryCallback(void *p_data, const vlc_ml_event_t *p_e
 - (void)rebuild
 {
     [_submenu removeAllItems];
+    _hasEntries = NO;
 
     if (_mediaLibrary == NULL) {
         return;
@@ -124,6 +125,8 @@ static void recentStreamsLibraryCallback(void *p_data, const vlc_ml_event_t *p_e
 
         vlc_ml_media_list_release(list);
     }
+
+    _hasEntries = hasEntries;
 
     NSMenuItem *clearItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear Menu")
                                                        action:@selector(clearRecentStreams:)

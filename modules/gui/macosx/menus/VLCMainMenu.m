@@ -154,6 +154,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [self setupKeyboardShortcuts];
 
     /* configure playback / controls menu */
+    self.fileMenu.delegate = self;
     self.controlsMenu.delegate = self;
     self.videoMenu.delegate = self;
     self.subtitlesMenu.delegate = self;
@@ -298,6 +299,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_voutMenusnapshot matchKeyEquivalentsOfMenuItem:_snapshot];
 
     [self updateVideoSubmenuEnablement];
+    [self updateRecentMenuEnablement];
 }
 
 - (void)setupMenu:(NSMenu *)menu withIntList:(char *)psz_name andSelector:(SEL)selector
@@ -714,6 +716,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     if (p_vout != NULL)
         vout_Release(p_vout);
+}
+
+- (void)updateRecentMenuEnablement
+{
+    _open_recent.enabled = NSDocumentController.sharedDocumentController.recentDocumentURLs.count > 0;
+    _recent_streams.enabled = _recentStreamsMenuController.hasEntries;
 }
 
 - (void)mediaItemChanged:(NSNotification *)notification
@@ -2003,6 +2011,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)menuWillOpen:(NSMenu *)menu
 {
     [_rendererMenuController startRendererDiscoveries];
+
+    if (menu == self.fileMenu) {
+        [self updateRecentMenuEnablement];
+    }
 
     if (menu == self.videoMenu) {
         [self updateVideoSubmenuEnablement];

@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCRecentStreamsMenuController : NSObject
 
+@property (readonly) BOOL hasEntries;
+
 - (instancetype)initWithSubmenu:(NSMenu *)submenu;
 
 @end
