@@ -44,6 +44,12 @@
 
 @implementation VLCRendererMenuController
 
+- (void)setRendererMenuItem:(NSMenuItem *)rendererMenuItem
+{
+    _rendererMenuItem = rendererMenuItem;
+    [self updateRendererMenuItemEnablement];
+}
+
 - (instancetype)init
 {
     self = [super init];
@@ -100,6 +106,7 @@
     NSMutableArray * const mutableRenderers = _rendererItems.mutableCopy;
     [mutableRenderers addObject:item];
     _rendererItems = mutableRenderers.copy;
+    [self updateRendererMenuItemEnablement];
 
     // Check if the item is already selected
     if (_selectedItem.representedObject != nil) {
@@ -138,6 +145,7 @@
     NSMutableArray * const mutableRenderers = _rendererItems.mutableCopy;
     [mutableRenderers removeObject:item];
     _rendererItems = mutableRenderers.copy;
+    [self updateRendererMenuItemEnablement];
 
     const NSInteger index = [_rendererMenu indexOfItemWithRepresentedObject:item];
     if (index >= 0) {
@@ -163,6 +171,11 @@
     for (VLCRendererDiscovery *dc in _rendererDiscoveries) {
         [dc stopDiscovery];
     }
+}
+
+- (void)updateRendererMenuItemEnablement
+{
+    _rendererMenuItem.enabled = _rendererItems.count > 0;
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {

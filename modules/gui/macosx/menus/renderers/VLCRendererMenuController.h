@@ -28,11 +28,13 @@
 @interface VLCRendererMenuController : NSObject <VLCRendererDiscoveryDelegate>
 
 @property (readwrite, weak) NSMenu *rendererMenu;
+@property (readwrite, weak) NSMenuItem *rendererMenuItem;
 @property (readwrite, weak) NSMenuItem *rendererNoneItem;
 @property (readonly, strong) NSArray<VLCRendererItem *> *rendererItems;
 
 - (void)startRendererDiscoveries;
 - (void)stopRendererDiscoveries;
+- (void)updateRendererMenuItemEnablement;
 - (void)selectRenderer:(NSMenuItem *)sender;
 
 @end

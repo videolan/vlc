@@ -162,6 +162,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
+    _rendererMenuController.rendererMenuItem = _rendererMenuItem;
     _playQueueSortingController = [[VLCPlayQueueSortingMenuController alloc] init];
     _sortPlayQueue.submenu = _playQueueSortingController.playQueueSortingMenu;
     _recentStreamsMenuController =
@@ -2011,6 +2012,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)menuWillOpen:(NSMenu *)menu
 {
     [_rendererMenuController startRendererDiscoveries];
+    [_rendererMenuController updateRendererMenuItemEnablement];
 
     if (menu == self.fileMenu) {
         [self updateRecentMenuEnablement];
