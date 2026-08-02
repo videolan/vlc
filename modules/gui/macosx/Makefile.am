@@ -322,6 +322,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/media-source/VLCLibraryMediaSourceViewController.m \
 	gui/macosx/library/media-source/VLCMediaSource.h \
 	gui/macosx/library/media-source/VLCMediaSource.m \
+	gui/macosx/library/media-source/VLCLocalMediaSourceNodeObservation.h \
+	gui/macosx/library/media-source/VLCLocalMediaSourceNodeObservation.m \
 	gui/macosx/library/media-source/VLCMediaSourceNodeObservation.h \
 	gui/macosx/library/media-source/VLCMediaSourceBaseDataSource.h \
 	gui/macosx/library/media-source/VLCMediaSourceBaseDataSource.m \
