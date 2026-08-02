@@ -22,11 +22,6 @@
 
 #import "VLCMediaSourceDataSource.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSource.h"
 #import "VLCMediaSourceBaseDataSource.h"
@@ -61,6 +56,7 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
 
 @property (readwrite) dispatch_source_t observedPathDispatchSource;
 @property (readwrite) BOOL preparseOngoing;
+@property (readwrite, strong, nullable, nonatomic) id<VLCMediaSourceNodeObservation> nodeObservation;
 
 @end
 
@@ -98,6 +94,7 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
 
 - (void)dealloc
 {
+    [self.nodeObservation cancel];
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
@@ -121,70 +118,30 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
     });
 }
 
-- (dispatch_source_t)observeLocalUrl:(NSURL *)url
-                      forVnodeEvents:(dispatch_source_vnode_flags_t)eventsFlags
-                    withEventHandler:(dispatch_block_t)eventHandlerBlock
-{
-    const uintptr_t descriptor = open(url.path.UTF8String, O_EVTONLY);
-    if (descriptor == (uintptr_t)-1) {
-        return nil;
-    }
-    struct stat fileStat;
-    const int statResult = fstat(descriptor, &fileStat);
-    if (statResult == -1) {
-        NSLog(@"Failed to stat file %@: %s", url.path, strerror(errno));
-        return nil;
-    }
-
-    const dispatch_queue_t globalQueue =
-        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    const dispatch_source_t fileDispatchSource =
-        dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, descriptor, eventsFlags, globalQueue);
-    dispatch_source_set_event_handler(fileDispatchSource, eventHandlerBlock);
-    dispatch_source_set_cancel_handler(fileDispatchSource, ^{
-        close(descriptor);
-    });
-    dispatch_resume(fileDispatchSource);
-    return fileDispatchSource;
-}
-
 - (void)setNodeToDisplay:(nonnull VLCInputNode*)nodeToDisplay
 {
     NSAssert(nodeToDisplay, @"Nil node to display, will not set");
     _nodeToDisplay = nodeToDisplay;
 
     NSParameterAssert(self.parentBaseDataSource);
-    if (self.parentBaseDataSource.mediaSourceMode == VLCMediaSourceModeLAN) {
-        NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
+    [self.nodeObservation cancel];
 
-        if (nodeUrl.isFileURL) {
-            if (self.observedPathDispatchSource) {
-                dispatch_source_cancel(self.observedPathDispatchSource);
-                self.observedPathDispatchSource = nil;
-            }
-
-            const __weak typeof(self) weakSelf = self;
-            self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
-                                                    forVnodeEvents:DISPATCH_VNODE_WRITE |
-                                                                   DISPATCH_VNODE_DELETE |
-                                                                   DISPATCH_VNODE_RENAME
-                                                withEventHandler:^{
-                const uintptr_t eventFlags =
-                    dispatch_source_get_data(weakSelf.observedPathDispatchSource);
-                if (eventFlags & DISPATCH_VNODE_DELETE || eventFlags & DISPATCH_VNODE_RENAME) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [weakSelf.parentBaseDataSource homeButtonAction:weakSelf];
-                    });
-                } else {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:nodeToDisplay
-                                                                                  withUrl:nodeUrl];
-                        [weakSelf reloadData];
-                    });
-                }
-            }];
+    const __weak typeof(self) weakSelf = self;
+    self.nodeObservation = [self.displayedMediaSource observeInputNode:nodeToDisplay
+                                                              onChange:^(VLCMediaSourceNodeChange change) {
+        const typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
         }
-    }
+        switch (change) {
+            case VLCMediaSourceNodeChangeChildrenUpdated:
+                [strongSelf reloadData];
+                break;
+            case VLCMediaSourceNodeChangeInvalidated:
+                [strongSelf.parentBaseDataSource homeButtonAction:strongSelf];
+                break;
+        }
+    }];
 
     [self reloadData];
     if (self.preparseOngoing) {
@@ -341,10 +298,8 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
         if (inputNode.numberOfChildren == 0) {
             cellView.textField.stringValue = NSTR("Loading…");
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-                NSURL * const inputNodeUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
                 NSError * const error =
-                    [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
-                                                                          withUrl:inputNodeUrl];
+                    [self.displayedMediaSource preparseInputNodeWithinTree:inputNode];
                 if (error) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         cellView.textField.stringValue = NSTR("Unavailable");
