@@ -826,6 +826,16 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)updateSubtitlesMenu:(NSNotification *)notification
 {
     const BOOL enabled = [self validateUserInterfaceItem:self.openSubtitleFile];
+    const BOOL hasSubtitleTracks = _playerController.subtitleTracks.count > 0;
+
+    self.subtitleSize.enabled = enabled;
+    self.subtitle_track.enabled = enabled && hasSubtitleTracks;
+    self.subtitle_textcolor.enabled = enabled;
+    self.subtitle_outlinethickness.enabled = enabled;
+    self.subtitle_bgopacity.enabled = enabled;
+    self.subtitle_bgcolor.enabled = enabled;
+    self.teletext.enabled = enabled && _playerController.teletextMenuAvailable;
+
     self.subtitleSizeSlider.enabled = enabled;
 
     const unsigned int scaleFactor = _playerController.subtitleTextScalingFactor;
@@ -2019,6 +2029,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         }
 
         if (menu == _subtitlesMenu) {
+            [self updateSubtitlesMenu:nil];
             _subtitle_bgopacity_view_offset_constraint.constant = menuItemOffset;
             _subtitleSizeViewOffsetConstraint.constant = menuItemOffset;
         }
