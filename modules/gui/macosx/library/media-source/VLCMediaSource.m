@@ -339,6 +339,12 @@ static const char *const remoteBrowseDescription = "Remote Browse";
     return nil;
 }
 
+- (nullable id<VLCMediaSourceNodeObservation>)observeInputNode:(VLCInputNode *const __unused)inputNode
+                                                      onChange:(void (^const __unused)(VLCMediaSourceNodeChange change))changeHandler
+{
+    return nil;
+}
+
 - (void)clearChildNodesForNode:(nonnull input_item_node_t*)inputNode
 {
     NSAssert(inputNode != NULL, @"Could not clear child nodes for input node as node is null");
@@ -633,6 +639,5 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         
     });
 }
-
 
 @end
