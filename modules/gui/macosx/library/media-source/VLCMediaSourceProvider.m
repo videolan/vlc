@@ -23,6 +23,7 @@
 #import "VLCMediaSourceProvider.h"
 
 #import "VLCMediaSource.h"
+#import "VLCLocalMediaSource.h"
 
 #import "main/VLCMain.h"
 
@@ -78,8 +79,8 @@ static inline void getMediaSourcesForCategory(NSMutableArray <VLCMediaSource *> 
     NSMutableArray<VLCMediaSource *> * const mutableArray = [[NSMutableArray alloc] initWithCapacity:32]; // A sane default
 
     // "My Folders" and "My Machine" entries are a bit of a custom implementation so it gets treated differently
-    VLCMediaSource * const myFoldersMediaSource = [[VLCMediaSource alloc] initMyFoldersMediaSourceWithPreparser:p_preparser];
-    VLCMediaSource * const localDevicesMediaSource = [[VLCMediaSource alloc] initForLocalDevices:p_preparser];
+    VLCMediaSource * const myFoldersMediaSource = [[VLCLocalMediaSource alloc] initMyFoldersMediaSourceWithPreparser:p_preparser];
+    VLCMediaSource * const localDevicesMediaSource = [[VLCLocalMediaSource alloc] initForLocalDevices:p_preparser];
     [mutableArray addObject:myFoldersMediaSource];
     [mutableArray addObject:localDevicesMediaSource];
 
