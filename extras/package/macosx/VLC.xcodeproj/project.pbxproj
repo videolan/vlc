@@ -276,6 +276,7 @@
 		7DFBDCB7226CDFD600B700A5 /* VLCImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCB6226CDFD600B700A5 /* VLCImageView.m */; };
 		7DFBDCBB226CED6300B700A5 /* VLCMediaSourceProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCBA226CED6300B700A5 /* VLCMediaSourceProvider.m */; };
 		7DFBDCBE226CED7200B700A5 /* VLCMediaSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCBD226CED7200B700A5 /* VLCMediaSource.m */; };
+		7DFBDCDF226CED7200B700A5 /* VLCLocalMediaSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCDE226CED7200B700A5 /* VLCLocalMediaSource.m */; };
 		7DFBDCE2226CED7200B700A5 /* VLCLocalMediaSourceNodeObservation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCE1226CED7200B700A5 /* VLCLocalMediaSourceNodeObservation.m */; };
 		7DFBDCC1226DC16200B700A5 /* VLCInputItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCC0226DC16200B700A5 /* VLCInputItem.m */; };
 		7DFBDCC4226E445500B700A5 /* VLCMediaSourceBaseDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCC3226E445500B700A5 /* VLCMediaSourceBaseDataSource.m */; };
@@ -949,6 +950,8 @@
 		7DFBDCBA226CED6300B700A5 /* VLCMediaSourceProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMediaSourceProvider.m; sourceTree = "<group>"; };
 		7DFBDCBC226CED7200B700A5 /* VLCMediaSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMediaSource.h; sourceTree = "<group>"; };
 		7DFBDCBD226CED7200B700A5 /* VLCMediaSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMediaSource.m; sourceTree = "<group>"; };
+		7DFBDCDD226CED7200B700A5 /* VLCLocalMediaSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLocalMediaSource.h; sourceTree = "<group>"; };
+		7DFBDCDE226CED7200B700A5 /* VLCLocalMediaSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLocalMediaSource.m; sourceTree = "<group>"; };
 		7DFBDCE0226CED7200B700A5 /* VLCLocalMediaSourceNodeObservation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLocalMediaSourceNodeObservation.h; sourceTree = "<group>"; };
 		7DFBDCE1226CED7200B700A5 /* VLCLocalMediaSourceNodeObservation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLocalMediaSourceNodeObservation.m; sourceTree = "<group>"; };
 		7DFBDCDA226CED7200B700A5 /* VLCMediaSourceNodeObservation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMediaSourceNodeObservation.h; sourceTree = "<group>"; };
@@ -2128,6 +2131,8 @@
 				539668862D37B483005CD9D4 /* VLCLibraryMediaSourceViewNavigationState.m */,
 				7DFBDCBC226CED7200B700A5 /* VLCMediaSource.h */,
 				7DFBDCBD226CED7200B700A5 /* VLCMediaSource.m */,
+				7DFBDCDD226CED7200B700A5 /* VLCLocalMediaSource.h */,
+				7DFBDCDE226CED7200B700A5 /* VLCLocalMediaSource.m */,
 				7DFBDCE0226CED7200B700A5 /* VLCLocalMediaSourceNodeObservation.h */,
 				7DFBDCE1226CED7200B700A5 /* VLCLocalMediaSourceNodeObservation.m */,
 				7DFBDCDA226CED7200B700A5 /* VLCMediaSourceNodeObservation.h */,
@@ -2408,6 +2413,7 @@
 				5352B37329DF29BF0011CE03 /* VLCMainVideoViewControlsBar.m in Sources */,
 				7D445D812202524000263D34 /* VLCPlayQueueController.m in Sources */,
 				7DFBDCBE226CED7200B700A5 /* VLCMediaSource.m in Sources */,
+				7DFBDCDF226CED7200B700A5 /* VLCLocalMediaSource.m in Sources */,
 				7DFBDCE2226CED7200B700A5 /* VLCLocalMediaSourceNodeObservation.m in Sources */,
 				536283F2291146BC00640C15 /* VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.m in Sources */,
 				5341F1542C9865F8003BDF0A /* VLCLibraryWindowSidebarRootViewController.m in Sources */,
