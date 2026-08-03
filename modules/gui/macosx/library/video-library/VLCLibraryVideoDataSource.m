@@ -398,7 +398,7 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
 - (BOOL)recentItemsPresent
 {
-    return self.libraryModel.numberOfRecentMedia > 0;
+    return _recentsArray.count > 0;
 }
 
 - (NSUInteger)rowToVideoGroupAdjustment

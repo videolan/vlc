@@ -739,7 +739,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                     withCompletion:(void (^)(NSArray *recentMediaArray))completionHandler
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParameters = { .i_nbResults = countLimit };
+        vlc_ml_query_params_t queryParameters = vlc_ml_query_params_create();
+        queryParameters.i_nbResults = countLimit;
+        queryParameters.psz_pattern = self->_filterString.length > 0 ? self->_filterString.UTF8String : NULL;
         // we don't set the sorting criteria here as they are not applicable to history
         vlc_ml_media_list_t *p_media_list = NULL;
         if (type == VLC_ML_MEDIA_TYPE_VIDEO)
@@ -758,6 +760,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     });
 }
 
+- (size_t)countOfRecentVideoMediaWithCountLimit:(size_t)countLimit
+{
+    vlc_ml_query_params_t queryParameters = vlc_ml_query_params_create();
+    queryParameters.i_nbResults = countLimit;
+    queryParameters.psz_pattern = self->_filterString.length > 0 ? self->_filterString.UTF8String : NULL;
+    return vlc_ml_count_video_history(self->_p_mediaLibrary, &queryParameters);
+}
+
 - (void)resetCachedListOfRecentMedia
 {
     [self getListOfRecentMediaOfType:VLC_ML_MEDIA_TYPE_VIDEO
@@ -772,7 +782,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedRecentMedia) {
         [self resetCachedListOfRecentMedia];
-        // Return initial count here, otherwise it will return 0 on the first time
+        // Return the filtered count immediately during search, otherwise keep the startup fast path.
+        if (_filterString.length > 0) {
+            return [self countOfRecentVideoMediaWithCountLimit:_recentMediaLimit];
+        }
         return _initialRecentsCount;
     }
     return [self readCachedArrayFromGetter:@selector(cachedRecentMedia)
