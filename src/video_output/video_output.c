@@ -2355,6 +2355,15 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
         }
         sys->window_enabled = true;
     }
+    else
+    {
+        /* The window is kept enabled when the vout is recycled between two
+         * inputs, so vlc_window_Enable() and the inhibition it sets up are
+         * skipped here. The inhibition may have been disabled by a pause
+         * from the previous input, and the pause state will not be
+         * signalled again for the new one. */
+        vlc_window_SetInhibition(sys->display_cfg.window, true);
+    }
     return 0;
 }
 
