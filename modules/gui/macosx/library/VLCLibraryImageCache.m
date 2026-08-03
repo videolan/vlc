@@ -293,7 +293,9 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
             return;
         }
 
-        if (inputItem.inputType == ITEM_TYPE_FILE && !inputItem.isStream) {
+        if (inputItem.inputType == ITEM_TYPE_FILE &&
+            !inputItem.isStream &&
+            input_item_Playable(inputItem.path.UTF8String)) {
             [self generateVLCThumbnailForInputItem:inputItem
                                           cacheKey:inputItem.MRL
                                         completion:^(NSImage * const thumbnail) {
