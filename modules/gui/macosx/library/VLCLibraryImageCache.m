@@ -78,6 +78,17 @@ static void vlcThumbnailerToFilesOnEnded(vlc_preparser_req *req,
     vlc_preparser_req_Release(req);
 }
 
+static NSString *thumbnailHashForString(NSString *string)
+{
+    NSData * const data = [string dataUsingEncoding:NSUTF8StringEncoding];
+    char hash[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+    vlc_hash_md5_t md5;
+    vlc_hash_md5_Init(&md5);
+    vlc_hash_md5_Update(&md5, data.bytes, data.length);
+    vlc_hash_FinishHex(&md5, hash);
+    return [NSString stringWithUTF8String:hash];
+}
+
 @implementation VLCLibraryImageCache
 
 + (NSImage *)downsampledImageFromURL:(NSURL *)url maxPixelSize:(uint32_t)maxPixelSize
@@ -173,39 +184,74 @@ static void vlcThumbnailerToFilesOnEnded(vlc_preparser_req *req,
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (nullable NSString *)thumbnailPathForCacheKey:(NSString *)cacheKey
+- (nullable NSString *)thumbnailPathForInputItem:(VLCInputItem *)inputItem
+                                        cacheKey:(NSString *)cacheKey
 {
-    if (_thumbnailCacheDirectory == nil || cacheKey.length == 0) {
+    if (_thumbnailCacheDirectory == nil || inputItem.path.length == 0 || cacheKey.length == 0) {
         return nil;
     }
 
-    NSString * const identifier = [NSString stringWithFormat:@"%@-%ux%u",
+    NSString * const sourceKey = inputItem.path;
+    NSString * const sourceHash = thumbnailHashForString(sourceKey);
+    NSDictionary * const sourceAttributes =
+        [NSFileManager.defaultManager attributesOfItemAtPath:inputItem.path error:NULL];
+    NSDate * const modificationDate = sourceAttributes[NSFileModificationDate];
+    NSNumber * const sourceSize = sourceAttributes[NSFileSize];
+    NSString * const identifier = [NSString stringWithFormat:@"%@-%@-%llu-%.6f-%ux%u-%.6f",
+                                   sourceKey,
                                    cacheKey,
+                                   sourceSize.unsignedLongLongValue,
+                                   modificationDate.timeIntervalSince1970,
                                    kVLCDesiredThumbnailWidth,
-                                   kVLCDesiredThumbnailHeight];
-    NSData * const identifierData = [identifier dataUsingEncoding:NSUTF8StringEncoding];
-    char hash[VLC_HASH_MD5_DIGEST_HEX_SIZE];
-    vlc_hash_md5_t md5;
-    vlc_hash_md5_Init(&md5);
-    vlc_hash_md5_Update(&md5, identifierData.bytes, identifierData.length);
-    vlc_hash_FinishHex(&md5, hash);
+                                   kVLCDesiredThumbnailHeight,
+                                   kVLCDefaultThumbnailPosition];
+    NSString * const thumbnailHash = thumbnailHashForString(identifier);
 
     return [_thumbnailCacheDirectory stringByAppendingPathComponent:
-            [NSString stringWithFormat:@"%s.jpg", hash]];
+            [NSString stringWithFormat:@"%@-%@.jpg", sourceHash, thumbnailHash]];
 }
 
-- (nullable NSImage *)thumbnailFromCacheForKey:(NSString *)cacheKey
+- (nullable NSImage *)thumbnailFromCacheForInputItem:(VLCInputItem *)inputItem
+                                            cacheKey:(NSString *)cacheKey
 {
-    NSString * const thumbnailPath = [self thumbnailPathForCacheKey:cacheKey];
+    NSString * const thumbnailPath = [self thumbnailPathForInputItem:inputItem
+                                                            cacheKey:cacheKey];
     if (thumbnailPath == nil) {
         return nil;
     }
 
+    [self removeStaleThumbnailFilesForInputItem:inputItem
+                                       cacheKey:cacheKey
+                                    keepingPath:thumbnailPath];
     NSImage * const image = [[NSImage alloc] initWithContentsOfFile:thumbnailPath];
     if (image == nil && [NSFileManager.defaultManager fileExistsAtPath:thumbnailPath]) {
         [NSFileManager.defaultManager removeItemAtPath:thumbnailPath error:NULL];
     }
     return image;
+}
+
+- (void)removeStaleThumbnailFilesForInputItem:(VLCInputItem *)inputItem
+                                     cacheKey:(NSString *)cacheKey
+                                  keepingPath:(NSString *)keepingPath
+{
+    if (_thumbnailCacheDirectory == nil || inputItem.path.length == 0 || cacheKey.length == 0) {
+        return;
+    }
+
+    NSString * const sourceKey = inputItem.path;
+    NSString * const sourcePrefix = [thumbnailHashForString(sourceKey) stringByAppendingString:@"-"];
+    NSArray<NSString *> * const cachedFiles =
+        [NSFileManager.defaultManager contentsOfDirectoryAtPath:_thumbnailCacheDirectory error:NULL];
+    for (NSString * const cachedFile in cachedFiles) {
+        if (![cachedFile hasPrefix:sourcePrefix] || ![cachedFile.pathExtension isEqualToString:@"jpg"]) {
+            continue;
+        }
+
+        NSString * const cachedPath = [_thumbnailCacheDirectory stringByAppendingPathComponent:cachedFile];
+        if (![cachedPath isEqualToString:keepingPath]) {
+            [NSFileManager.defaultManager removeItemAtPath:cachedPath error:NULL];
+        }
+    }
 }
 
 + (instancetype)sharedImageCache
@@ -357,7 +403,9 @@ static void vlcThumbnailerToFilesOnEnded(vlc_preparser_req *req,
         if (inputItem.inputType == ITEM_TYPE_FILE &&
             !inputItem.isStream &&
             input_item_Playable(inputItem.path.UTF8String)) {
-            NSImage * const cachedThumbnail = [self thumbnailFromCacheForKey:memoryCacheKey];
+            NSImage * const cachedThumbnail =
+                [self thumbnailFromCacheForInputItem:inputItem
+                                            cacheKey:memoryCacheKey];
             if (cachedThumbnail != nil) {
                 const NSUInteger cost = [VLCLibraryImageCache costForImage:cachedThumbnail];
                 [self->_imageCache setObject:cachedThumbnail forKey:memoryCacheKey cost:cost];
@@ -391,6 +439,13 @@ static void vlcThumbnailerToFilesOnEnded(vlc_preparser_req *req,
                     });
                 }];
             }];
+            return;
+        }
+
+        if (inputItem.inputType != ITEM_TYPE_FILE || inputItem.isStream) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(self->_noArtImage);
+            });
             return;
         }
 
@@ -442,7 +497,8 @@ static void vlcThumbnailerToFilesOnEnded(vlc_preparser_req *req,
         request = [[VLCThumbnailRequest alloc] init];
         request.imageCache = self;
         request.cacheKey = cacheKey;
-        request.thumbnailPath = [self thumbnailPathForCacheKey:cacheKey];
+        request.thumbnailPath = [self thumbnailPathForInputItem:inputItem
+                                                       cacheKey:cacheKey];
         request.completionHandlers = [NSMutableArray arrayWithObject:[completion copy]];
         _pendingThumbnailRequests[cacheKey] = request;
     }
@@ -525,7 +581,7 @@ static void vlcThumbnailerToFilesOnEnded(vlc_preparser_req *req,
 }
 
 + (void)thumbnailForPlayQueueItem:(VLCPlayQueueItem *)playQueueItem
-                  withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
+                   withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
     return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playQueueItem.inputItem
                                                      withCompletion:completionHandler];
