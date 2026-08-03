@@ -1,17 +1,17 @@
-From 1def00f0b864977a7477219c5a8277fcc0e8b9a3 Mon Sep 17 00:00:00 2001
+From 1ea7ae5d446590548a74e82c92674baf3de87c1c Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:17:08 +0200
-Subject: [PATCH 04/14] use WCHAR API for temporary windows folder
+Subject: [PATCH 04/16] use WCHAR API for temporary windows folder
 
 ---
  src/estream.c | 16 ++++++++--------
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/src/estream.c b/src/estream.c
-index 7e1d55c..6062001 100644
+index d2cdc12..d5965e5 100644
 --- a/src/estream.c
 +++ b/src/estream.c
-@@ -5115,27 +5115,27 @@ tmpfd (void)
+@@ -5134,27 +5134,27 @@ tmpfd (void)
  {
  #ifdef HAVE_W32_SYSTEM
    int attempts, n;
@@ -45,7 +45,7 @@ index 7e1d55c..6062001 100644
    *p++ = '\\';
    name = p;
    for (attempts=0; attempts < 10; attempts++)
-@@ -5147,8 +5147,8 @@ tmpfd (void)
+@@ -5166,8 +5166,8 @@ tmpfd (void)
            *p++ = tohex (((value >> 28) & 0x0f));
            value <<= 4;
          }
@@ -57,5 +57,5 @@ index 7e1d55c..6062001 100644
                           0,
                           NULL,
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 

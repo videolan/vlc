@@ -1,7 +1,7 @@
-From e2df6855f455bf3731d407e00da7d6a39827b0ea Mon Sep 17 00:00:00 2001
+From 70cc95fa9c5573f991899e96099bb288f14bbd1f Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:19:44 +0200
-Subject: [PATCH 08/14] don't use GetUserNameW on Windows 10+
+Subject: [PATCH 08/16] don't use GetUserNameW on Windows 10+
 
 It's not available in UWP
 ---
@@ -48,5 +48,5 @@ index b6d6a55..2830452 100644
  
  #else /* !HAVE_W32_SYSTEM */
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 

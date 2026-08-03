@@ -1,7 +1,7 @@
-From aa9ec7d915bb43cb35e685f384142eb347ccea9b Mon Sep 17 00:00:00 2001
+From 642c53393bf204c98b991fe247513212600dfb2b Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 24 Oct 2025 08:28:33 +0200
-Subject: [PATCH 13/14] configure: allow building Windows with
+Subject: [PATCH 13/16] configure: allow building Windows with
  --disable-threads
 
 ---
@@ -9,12 +9,12 @@ Subject: [PATCH 13/14] configure: allow building Windows with
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index c327835..4ed37e1 100644
+index 1f2fe0d..c2b9a36 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -154,9 +154,9 @@ esac
- AC_SUBST(EXTRA_LIBS_FOR_BUILD)
- 
+@@ -142,9 +142,9 @@ case "${host}" in
+        ;;
+ esac
  
 -if test "$have_w32_system" != yes; then
 +dnl if test "$have_w32_system" != yes; then
@@ -24,7 +24,7 @@ index c327835..4ed37e1 100644
  
  # We build libgpg-error with large file support so that we have a 64
  # bit off_t.  Our external interface uses the gpgrt_off_t which is
-@@ -634,7 +634,7 @@ if test "$have_w32_system" = yes; then
+@@ -624,7 +624,7 @@ if test "$have_w32_system" = yes; then
      if test "$have_w64_system" = yes; then
        AC_DEFINE(HAVE_W64_SYSTEM,1,[Defined if we run on 64 bit W32 API system])
      fi
@@ -34,5 +34,5 @@ index c327835..4ed37e1 100644
  if test x"$gl_use_threads" = xno; then
    lock_obj_h_generated=yes
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 
