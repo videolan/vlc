@@ -106,6 +106,14 @@ static const struct input_item_parser_cbs_t parserCallbacks =
         input_item_node_Delete(_subTree);
 }
 
+- (NSString *)stringMetadata:(char *(*)(input_item_t *))getter
+{
+    char *value = getter(_vlcInputItem);
+    NSString *result = toNSStr(value);
+    FREENULL(value);
+    return result;
+}
+
 - (NSString *)name
 {
     return toNSStr(_vlcInputItem->psz_name);
@@ -134,10 +142,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)artist
 {
-    char *psz_artist = input_item_GetArtist(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_artist);
-    FREENULL(psz_artist);
-    return returnValue;
+    return [self stringMetadata:input_item_GetArtist];
 }
 - (void)setArtist:(NSString *)artist
 {
@@ -146,10 +151,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)album
 {
-    char *psz_album = input_item_GetAlbum(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_album);
-    FREENULL(psz_album);
-    return returnValue;
+    return [self stringMetadata:input_item_GetAlbum];
 }
 - (void)setAlbum:(NSString *)albumName
 {
@@ -158,10 +160,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)trackNumber
 {
-    char *psz_trackNumber = input_item_GetTrackNumber(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_trackNumber);
-    FREENULL(psz_trackNumber);
-    return returnValue;
+    return [self stringMetadata:input_item_GetTrackNumber];
 }
 - (void)setTrackNumber:(NSString *)trackNumber
 {
@@ -170,10 +169,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)genre
 {
-    char *psz_genre = input_item_GetGenre(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_genre);
-    FREENULL(psz_genre);
-    return returnValue;
+    return [self stringMetadata:input_item_GetGenre];
 }
 - (void)setGenre:(NSString *)genre
 {
@@ -182,10 +178,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)copyright
 {
-    char *psz_copyright = input_item_GetCopyright(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_copyright);
-    FREENULL(psz_copyright);
-    return returnValue;
+    return [self stringMetadata:input_item_GetCopyright];
 }
 - (void)setCopyright:(NSString *)copyright
 {
@@ -194,10 +187,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)publisher
 {
-    char *psz_publisher = input_item_GetPublisher(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_publisher);
-    FREENULL(psz_publisher);
-    return returnValue;
+    return [self stringMetadata:input_item_GetPublisher];
 }
 - (void)setPublisher:(NSString *)publisher
 {
@@ -206,18 +196,12 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)nowPlaying
 {
-    char *psz_nowPlaying = input_item_GetNowPlaying(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_nowPlaying);
-    FREENULL(psz_nowPlaying);
-    return returnValue;
+    return [self stringMetadata:input_item_GetNowPlaying];
 }
 
 - (NSString *)language
 {
-    char *psz_language = input_item_GetLanguage(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_language);
-    FREENULL(psz_language);
-    return returnValue;
+    return [self stringMetadata:input_item_GetLanguage];
 }
 - (void)setLanguage:(NSString *)language
 {
@@ -226,10 +210,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)date
 {
-    char *psz_date = input_item_GetDate(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_date);
-    FREENULL(psz_date);
-    return returnValue;
+    return [self stringMetadata:input_item_GetDate];
 }
 - (void)setDate:(NSString *)date
 {
@@ -238,10 +219,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)contentDescription
 {
-    char *psz_description = input_item_GetDescription(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_description);
-    FREENULL(psz_description);
-    return returnValue;
+    return [self stringMetadata:input_item_GetDescription];
 }
 - (void)setContentDescription:(NSString *)contentDescription
 {
@@ -250,34 +228,22 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)encodedBy
 {
-    char *psz_encodedBy = input_item_GetEncodedBy(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_encodedBy);
-    FREENULL(psz_encodedBy);
-    return returnValue;
+    return [self stringMetadata:input_item_GetEncodedBy];
 }
 
 - (NSString *)trackID
 {
-    char *psz_trackID = input_item_GetTrackID(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_trackID);
-    FREENULL(psz_trackID);
-    return returnValue;
+    return [self stringMetadata:input_item_GetTrackID];
 }
 
 - (NSString *)trackTotal
 {
-    char *psz_trackTotal = input_item_GetTrackTotal(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_trackTotal);
-    FREENULL(psz_trackTotal);
-    return returnValue;
+    return [self stringMetadata:input_item_GetTrackTotal];
 }
 
 - (NSString *)director
 {
-    char *psz_director = input_item_GetDirector(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_director);
-    FREENULL(psz_director);
-    return returnValue;
+    return [self stringMetadata:input_item_GetDirector];
 }
 - (void)setDirector:(NSString *)director
 {
@@ -286,26 +252,17 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)season
 {
-    char *psz_season = input_item_GetSeason(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_season);
-    FREENULL(psz_season);
-    return returnValue;
+    return [self stringMetadata:input_item_GetSeason];
 }
 
 - (NSString *)episode
 {
-    char *psz_episode = input_item_GetEpisode(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_episode);
-    FREENULL(psz_episode);
-    return returnValue;
+    return [self stringMetadata:input_item_GetEpisode];
 }
 
 - (NSString *)showName
 {
-    char *psz_showName = input_item_GetShowName(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_showName);
-    FREENULL(psz_showName);
-    return returnValue;
+    return [self stringMetadata:input_item_GetShowName];
 }
 - (void)setShowName:(NSString *)showName
 {
@@ -314,10 +271,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)actors
 {
-    char *psz_actors = input_item_GetActors(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_actors);
-    FREENULL(psz_actors);
-    return returnValue;
+    return [self stringMetadata:input_item_GetActors];
 }
 - (void)setActors:(NSString *)actors
 {
@@ -326,18 +280,12 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)discNumber
 {
-    char *psz_discNumber = input_item_GetDiscNumber(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_discNumber);
-    FREENULL(psz_discNumber);
-    return returnValue;
+    return [self stringMetadata:input_item_GetDiscNumber];
 }
 
 - (NSString *)totalNumberOfDiscs
 {
-    char *psz_totalDiscNumber = input_item_GetDiscTotal(_vlcInputItem);
-    NSString *returnValue = toNSStr(psz_totalDiscNumber);
-    FREENULL(psz_totalDiscNumber);
-    return returnValue;
+    return [self stringMetadata:input_item_GetDiscTotal];
 }
 
 - (NSString *)MRL
