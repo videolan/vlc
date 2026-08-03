@@ -75,7 +75,7 @@ Contrib:
  * Update faad to 2.11.2
  * Update flac to 1.4.2
  * Update FFmpeg to 8.1.2
- * Update gcrypt to 1.12.0
+ * Update gcrypt to 1.12.2
  * Update glew to 2.3.1
  * Update gme to 0.6.5
  * Update gnutls to 3.8.13
@@ -106,8 +106,8 @@ Contrib:
  * Update vorbis to 1.3.7
  * Update x265 to 4.1
  * Update zlib to 1.3.2
- * Add librist 0.2.16
  * Update zvbi to 0.2.44
+ * Add librist 0.2.20
  * Switch mfx Library to Intel's vpl 2.13.0
 
 Changes between 3.0.22 and 3.0.23:
