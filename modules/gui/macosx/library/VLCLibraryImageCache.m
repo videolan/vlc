@@ -43,6 +43,7 @@
 NSUInteger kVLCMaximumLibraryImageCacheSize = 500;
 /* 256 MB cost limit based on estimated pixel data size per image */
 static const NSUInteger kVLCLibraryImageCacheCostLimit = 256 * 1024 * 1024;
+static const NSTimeInterval kVLCThumbnailCacheMaximumAge = 30 * 24 * 60 * 60;
 uint32_t kVLCDesiredThumbnailWidth = 512;
 uint32_t kVLCDesiredThumbnailHeight = 512;
 float kVLCDefaultThumbnailPosition = .15;
@@ -156,6 +157,9 @@ static NSString *thumbnailHashForString(NSString *string)
                                                          attributes:@{NSFilePosixPermissions: @0700}
                                                               error:&error]) {
                 _thumbnailCacheDirectory = [thumbnailCacheDirectory copy];
+                dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+                    [self pruneStoredThumbnailCache];
+                });
             } else {
                 NSLog(@"Failed to create thumbnail cache directory %@: %@",
                       thumbnailCacheDirectory, error);
@@ -182,6 +186,36 @@ static NSString *thumbnailHashForString(NSString *string)
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)pruneStoredThumbnailCache
+{
+    if (_thumbnailCacheDirectory == nil) {
+        return;
+    }
+
+    @synchronized (self) {
+        NSArray<NSString *> * const cachedFiles =
+            [NSFileManager.defaultManager contentsOfDirectoryAtPath:_thumbnailCacheDirectory
+                                                              error:NULL];
+        NSDate * const now = NSDate.date;
+
+        for (NSString * const cachedFile in cachedFiles) {
+            if (![cachedFile.pathExtension isEqualToString:@"jpg"]) {
+                continue;
+            }
+
+            NSString * const cachedPath =
+                [_thumbnailCacheDirectory stringByAppendingPathComponent:cachedFile];
+            NSDictionary * const attributes =
+                [NSFileManager.defaultManager attributesOfItemAtPath:cachedPath error:NULL];
+            NSDate * const modificationDate = attributes[NSFileModificationDate];
+            if (modificationDate != nil &&
+                [now timeIntervalSinceDate:modificationDate] > kVLCThumbnailCacheMaximumAge) {
+                [NSFileManager.defaultManager removeItemAtPath:cachedPath error:NULL];
+            }
+        }
+    }
 }
 
 - (nullable NSString *)thumbnailPathForInputItem:(VLCInputItem *)inputItem
