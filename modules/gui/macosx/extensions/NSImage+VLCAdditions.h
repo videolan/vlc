@@ -24,6 +24,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+struct picture_t;
+struct vlc_object_t;
+
 @interface NSImage (VLCAdditions)
 
 // App images
@@ -76,6 +79,9 @@ NS_ASSUME_NONNULL_BEGIN
                   completionHandler:(void (^)(NSImage * _Nullable))completionHandler;
 + (instancetype)quickLookPreviewForLocalPath:(NSString*)path withSize:(NSSize)size;
 + (instancetype)quickLookPreviewForLocalURL:(NSURL*)url withSize:(NSSize)size;
++ (nullable NSImage *)imageFromVLCPicture:(struct picture_t *)picture
+                                vlcObject:(struct vlc_object_t *)object
+                                     size:(NSSize)size;
 + (instancetype)compositeImageWithImages:(NSArray<NSImage *> * const)images
                                   frames:(NSArray<NSValue *> * const)frames
                                     size:(const NSSize)size;

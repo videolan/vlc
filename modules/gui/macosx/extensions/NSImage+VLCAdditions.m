@@ -26,6 +26,8 @@
 
 #import <QuickLook/QuickLook.h>
 #import <QuickLookThumbnailing/QuickLookThumbnailing.h>
+#import <vlc_block.h>
+#import <vlc_picture.h>
 
 static NSImage *ImageFromEmoji(NSString *emoji, NSSize size)
 {
@@ -343,6 +345,61 @@ static NSImage *ImageFromEmoji(NSString *emoji, NSSize size)
     NSImage *image = [[NSImage alloc] initWithSize:[bitmapImageRep size]];
     [image addRepresentation:bitmapImageRep];
     CFRelease(qlThumbnailRef);
+    return image;
+}
+
++ (NSImage *)imageFromVLCPicture:(picture_t *)picture
+                       vlcObject:(vlc_object_t *)object
+                            size:(NSSize)size
+{
+    if (picture == NULL || object == NULL) {
+        return nil;
+    }
+
+    block_t *block = NULL;
+    video_format_t format;
+    const int exportStatus = picture_Export(object,
+                                            &block,
+                                            &format,
+                                            picture,
+                                            VLC_CODEC_ARGB,
+                                            (int)size.width,
+                                            (int)size.height,
+                                            true);
+    if (exportStatus != VLC_SUCCESS || block == NULL) {
+        return nil;
+    }
+
+    const NSUInteger bytesPerRow = (NSUInteger)format.i_width * 4;
+    const NSUInteger expectedSize = bytesPerRow * (NSUInteger)format.i_height;
+    if (block->i_buffer < expectedSize) {
+        block_Release(block);
+        return nil;
+    }
+
+    NSBitmapImageRep * const bitmap = [[NSBitmapImageRep alloc]
+        initWithBitmapDataPlanes:NULL
+                      pixelsWide:format.i_width
+                      pixelsHigh:format.i_height
+                   bitsPerSample:8
+                 samplesPerPixel:4
+                        hasAlpha:YES
+                        isPlanar:NO
+                  colorSpaceName:NSDeviceRGBColorSpace
+                    bitmapFormat:NSBitmapFormatThirtyTwoBitLittleEndian
+                     bytesPerRow:bytesPerRow
+                    bitsPerPixel:32];
+    if (bitmap == nil) {
+        block_Release(block);
+        return nil;
+    }
+
+    memcpy(bitmap.bitmapData, block->p_buffer, expectedSize);
+    block_Release(block);
+
+    NSImage * const image = [[NSImage alloc]
+        initWithSize:NSMakeSize(format.i_width, format.i_height)];
+    [image addRepresentation:bitmap];
     return image;
 }
 
