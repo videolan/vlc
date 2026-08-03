@@ -339,6 +339,14 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_video_output_inhibit',
+    'sources' : files('video_output/inhibit.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : ['demux_mock']
+}
+
+vlc_tests += {
     'name' : 'test_src_video_output_opengl',
     'sources' : files('video_output/opengl.c'),
     'suite' : ['src', 'test_src'],
