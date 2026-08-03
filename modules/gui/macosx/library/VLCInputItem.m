@@ -530,8 +530,8 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
         NSImage * const workspaceImage = [NSWorkspace.sharedWorkspace iconForFile:path];
         if (workspaceImage) {
-            image.size = size;
-            completionHandler(image);
+            workspaceImage.size = size;
+            completionHandler(workspaceImage);
             return;
         }
 
