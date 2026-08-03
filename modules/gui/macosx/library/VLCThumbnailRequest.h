@@ -32,6 +32,7 @@ typedef void (^VLCThumbnailCompletion)(NSImage * _Nullable image);
 
 @property (nonatomic, weak, nullable) VLCLibraryImageCache *imageCache;
 @property (nonatomic, copy) NSString *cacheKey;
+@property (nonatomic, copy, nullable) NSString *thumbnailPath;
 @property (nonatomic, strong) NSMutableArray<VLCThumbnailCompletion> *completionHandlers;
 
 @end

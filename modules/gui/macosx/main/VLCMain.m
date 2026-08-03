@@ -185,7 +185,7 @@ int OpenIntf (vlc_object_t *p_this)
             }
 
             const struct vlc_preparser_cfg thumbnailer_cfg = {
-                .types = VLC_PREPARSER_TYPE_THUMBNAIL,
+                .types = VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES,
                 .max_thumbnailer_threads = 1,
                 .timeout = VLC_TICK_FROM_SEC(3),
                 .external_process = false,

@@ -35,8 +35,10 @@
 
 #import <ImageIO/ImageIO.h>
 
+#import <vlc_configuration.h>
+#import <vlc_hash.h>
 #import <vlc_preparser.h>
-#import <vlc_picture.h>
+#import <vlc_strings.h>
 
 NSUInteger kVLCMaximumLibraryImageCacheSize = 500;
 /* 256 MB cost limit based on estimated pixel data size per image */
@@ -51,23 +53,28 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     NSCache *_imageCache;
     NSImage *_noArtImage;
     vlc_medialibrary_t *_p_libraryInstance;
+    NSString *_thumbnailCacheDirectory;
     NSMutableDictionary<NSString *, VLCThumbnailRequest *> *_pendingThumbnailRequests;
 }
 
-- (void)generateVLCThumbnailForInputItem:(VLCInputItem *)inputItem
-                                cacheKey:(NSString *)cacheKey
-                              completion:(VLCThumbnailCompletion)completion;
 - (void)thumbnailRequest:(VLCThumbnailRequest *)request
      didFinishWithStatus:(int)status
-               thumbnail:(picture_t *)thumbnail;
+                 results:(const bool *)results
+             resultCount:(size_t)resultCount;
 
 @end
 
-static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
-                                  picture_t *thumbnail, void *data)
+static void vlcThumbnailerToFilesOnEnded(vlc_preparser_req *req,
+                                         int status,
+                                         const bool *results,
+                                         size_t resultCount,
+                                         void *data)
 {
     VLCThumbnailRequest * const request = (__bridge VLCThumbnailRequest *)data;
-    [request.imageCache thumbnailRequest:request didFinishWithStatus:status thumbnail:thumbnail];
+    [request.imageCache thumbnailRequest:request
+                     didFinishWithStatus:status
+                                 results:results
+                             resultCount:resultCount];
     vlc_preparser_req_Release(req);
 }
 
@@ -126,6 +133,24 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
         _noArtImage = NSImage.VLCNoArtImage;
         _pendingThumbnailRequests = NSMutableDictionary.dictionary;
 
+        char * const cacheDirectory = config_GetUserDir(VLC_CACHE_DIR);
+        if (cacheDirectory != NULL) {
+            NSString * const thumbnailCacheDirectory =
+                [NSString stringWithFormat:@"%s/macosx-thumbnails", cacheDirectory];
+            free(cacheDirectory);
+
+            NSError *error = nil;
+            if ([NSFileManager.defaultManager createDirectoryAtPath:thumbnailCacheDirectory
+                                        withIntermediateDirectories:YES
+                                                         attributes:@{NSFilePosixPermissions: @0700}
+                                                              error:&error]) {
+                _thumbnailCacheDirectory = [thumbnailCacheDirectory copy];
+            } else {
+                NSLog(@"Failed to create thumbnail cache directory %@: %@",
+                      thumbnailCacheDirectory, error);
+            }
+        }
+
         NSNotificationCenter * const notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
                                selector:@selector(mediaItemThumbnailGenerated:)
@@ -146,6 +171,41 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (nullable NSString *)thumbnailPathForCacheKey:(NSString *)cacheKey
+{
+    if (_thumbnailCacheDirectory == nil || cacheKey.length == 0) {
+        return nil;
+    }
+
+    NSString * const identifier = [NSString stringWithFormat:@"%@-%ux%u",
+                                   cacheKey,
+                                   kVLCDesiredThumbnailWidth,
+                                   kVLCDesiredThumbnailHeight];
+    NSData * const identifierData = [identifier dataUsingEncoding:NSUTF8StringEncoding];
+    char hash[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+    vlc_hash_md5_t md5;
+    vlc_hash_md5_Init(&md5);
+    vlc_hash_md5_Update(&md5, identifierData.bytes, identifierData.length);
+    vlc_hash_FinishHex(&md5, hash);
+
+    return [_thumbnailCacheDirectory stringByAppendingPathComponent:
+            [NSString stringWithFormat:@"%s.jpg", hash]];
+}
+
+- (nullable NSImage *)thumbnailFromCacheForKey:(NSString *)cacheKey
+{
+    NSString * const thumbnailPath = [self thumbnailPathForCacheKey:cacheKey];
+    if (thumbnailPath == nil) {
+        return nil;
+    }
+
+    NSImage * const image = [[NSImage alloc] initWithContentsOfFile:thumbnailPath];
+    if (image == nil && [NSFileManager.defaultManager fileExistsAtPath:thumbnailPath]) {
+        [NSFileManager.defaultManager removeItemAtPath:thumbnailPath error:NULL];
+    }
+    return image;
 }
 
 + (instancetype)sharedImageCache
@@ -195,7 +255,7 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
             NSImage * const image =
                 [VLCLibraryImageCache downsampledImageFromURL:artworkURL
-                                                maxPixelSize:kVLCDesiredThumbnailWidth];
+                                                 maxPixelSize:kVLCDesiredThumbnailWidth];
             if (image) {
                 const NSUInteger cost = [VLCLibraryImageCache costForImage:image];
                 [self->_imageCache setObject:image forKey:artworkMRL cost:cost];
@@ -280,9 +340,10 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
     NSString * const memoryCacheKey = inputItem.MRL;
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-        NSImage * const image = artworkURL ?
-            [VLCLibraryImageCache downsampledImageFromURL:artworkURL
-                                            maxPixelSize:kVLCDesiredThumbnailWidth] : nil;
+        NSImage * const image = artworkURL
+            ? [VLCLibraryImageCache downsampledImageFromURL:artworkURL
+                                               maxPixelSize:kVLCDesiredThumbnailWidth]
+            : nil;
 
         if (image) {
             const NSUInteger cost = [VLCLibraryImageCache costForImage:image];
@@ -296,6 +357,16 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
         if (inputItem.inputType == ITEM_TYPE_FILE &&
             !inputItem.isStream &&
             input_item_Playable(inputItem.path.UTF8String)) {
+            NSImage * const cachedThumbnail = [self thumbnailFromCacheForKey:memoryCacheKey];
+            if (cachedThumbnail != nil) {
+                const NSUInteger cost = [VLCLibraryImageCache costForImage:cachedThumbnail];
+                [self->_imageCache setObject:cachedThumbnail forKey:memoryCacheKey cost:cost];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionHandler(cachedThumbnail);
+                });
+                return;
+            }
+
             [self generateVLCThumbnailForInputItem:inputItem
                                           cacheKey:inputItem.MRL
                                         completion:^(NSImage * const thumbnail) {
@@ -371,13 +442,17 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
         request = [[VLCThumbnailRequest alloc] init];
         request.imageCache = self;
         request.cacheKey = cacheKey;
+        request.thumbnailPath = [self thumbnailPathForCacheKey:cacheKey];
         request.completionHandlers = [NSMutableArray arrayWithObject:[completion copy]];
         _pendingThumbnailRequests[cacheKey] = request;
     }
 
     vlc_preparser_t * const thumbnailer = getThumbnailer();
-    if (thumbnailer == NULL) {
-        [self thumbnailRequest:request didFinishWithStatus:VLC_EGENERIC thumbnail:NULL];
+    if (thumbnailer == NULL || request.thumbnailPath == nil) {
+        [self thumbnailRequest:request
+           didFinishWithStatus:VLC_EGENERIC
+                       results:NULL
+                   resultCount:0];
         return;
     }
 
@@ -389,24 +464,38 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
         },
         .hw_dec = false,
     };
-    static const struct vlc_thumbnailer_cbs callbacks = {
-        .on_ended = vlcThumbnailerOnEnded,
+    const struct vlc_thumbnailer_output output = {
+        .format = VLC_THUMBNAILER_FORMAT_JPEG,
+        .width = kVLCDesiredThumbnailWidth,
+        .height = kVLCDesiredThumbnailHeight,
+        .crop = true,
+        .file_path = request.thumbnailPath.fileSystemRepresentation,
+        .creat_mode = 0600,
+    };
+    static const struct vlc_thumbnailer_to_files_cbs callbacks = {
+        .on_ended = vlcThumbnailerToFilesOnEnded,
     };
 
-    vlc_preparser_req * const requestHandle = vlc_preparser_GenerateThumbnail(
+    vlc_preparser_req * const requestHandle = vlc_preparser_GenerateThumbnailToFiles(
         thumbnailer,
         inputItem.vlcInputItem,
         &thumbnailerArgument,
+        &output,
+        1,
         &callbacks,
         (__bridge void *)request);
     if (requestHandle == NULL) {
-        [self thumbnailRequest:request didFinishWithStatus:VLC_EGENERIC thumbnail:NULL];
+        [self thumbnailRequest:request
+           didFinishWithStatus:VLC_EGENERIC
+                       results:NULL
+                   resultCount:0];
     }
 }
 
 - (void)thumbnailRequest:(VLCThumbnailRequest *)request
      didFinishWithStatus:(int)status
-               thumbnail:(picture_t *)thumbnail
+                 results:(const bool *)results
+             resultCount:(size_t)resultCount
 {
     NSArray<VLCThumbnailCompletion> *completionHandlers;
     @synchronized (self) {
@@ -421,12 +510,14 @@ static void vlcThumbnailerOnEnded(vlc_preparser_req *req, int status,
         return;
     }
 
-    NSImage * const image = status == VLC_SUCCESS
-        ? [NSImage imageFromVLCPicture:thumbnail
-                             vlcObject:VLC_OBJECT(getIntf())
-                                  size:NSMakeSize(kVLCDesiredThumbnailWidth,
-                                                  kVLCDesiredThumbnailHeight)]
-        : nil;
+    NSImage *image = nil;
+    if (status == VLC_SUCCESS && resultCount == 1 && results != NULL && results[0]) {
+        image = [[NSImage alloc] initWithContentsOfFile:request.thumbnailPath];
+    }
+
+    if (image == nil && request.thumbnailPath != nil) {
+        [NSFileManager.defaultManager removeItemAtPath:request.thumbnailPath error:NULL];
+    }
 
     for (VLCThumbnailCompletion completion in completionHandlers) {
         completion(image);
