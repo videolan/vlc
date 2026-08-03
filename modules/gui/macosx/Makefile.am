@@ -192,6 +192,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryHeroView.m \
 	gui/macosx/library/VLCLibraryImageCache.h \
 	gui/macosx/library/VLCLibraryImageCache.m \
+	gui/macosx/library/VLCThumbnailRequest.h \
+	gui/macosx/library/VLCThumbnailRequest.m \
 	gui/macosx/library/VLCLibraryItemInternalMediaItemsDataSource.h \
 	gui/macosx/library/VLCLibraryItemInternalMediaItemsDataSource.m \
 	gui/macosx/library/VLCLibraryItemPresentingCapable.h \

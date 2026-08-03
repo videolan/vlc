@@ -240,6 +240,7 @@
 		7D903EAD2243928800917358 /* libvlc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D903EAC2243928800917358 /* libvlc.dylib */; };
 		7D903EB6224394BE00917358 /* specific.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB5224394BE00917358 /* specific.c */; };
 		7D92AF2123DDCA8D00D81EA3 /* VLCLibraryImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D92AF2023DDCA8D00D81EA3 /* VLCLibraryImageCache.m */; };
+		7D92AF2223DDCA8D00D81EA3 /* VLCThumbnailRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D92AF2423DDCA8D00D81EA3 /* VLCThumbnailRequest.m */; };
 		7D93D8FC2316C2DC001C0063 /* VLCCustomCropArWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D93D8FB2316C2DC001C0063 /* VLCCustomCropArWindowController.m */; };
 		7DB40D2A20CBCEB500F63173 /* VLCMainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */; };
 		7DB40D2D20CBCEC200F63173 /* VLCStatusBarIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */; };
@@ -882,6 +883,8 @@
 		7D903EB5224394BE00917358 /* specific.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
 		7D92AF1F23DDCA8D00D81EA3 /* VLCLibraryImageCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryImageCache.h; sourceTree = "<group>"; };
 		7D92AF2023DDCA8D00D81EA3 /* VLCLibraryImageCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryImageCache.m; sourceTree = "<group>"; };
+		7D92AF2323DDCA8D00D81EA3 /* VLCThumbnailRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCThumbnailRequest.h; sourceTree = "<group>"; };
+		7D92AF2423DDCA8D00D81EA3 /* VLCThumbnailRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCThumbnailRequest.m; sourceTree = "<group>"; };
 		7D93D8F92316C142001C0063 /* VLCCustomCropARPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCCustomCropARPanel.xib; sourceTree = "<group>"; };
 		7D93D8FA2316C2DC001C0063 /* VLCCustomCropArWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCCustomCropArWindowController.h; sourceTree = "<group>"; };
 		7D93D8FB2316C2DC001C0063 /* VLCCustomCropArWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCCustomCropArWindowController.m; sourceTree = "<group>"; };
@@ -1513,6 +1516,8 @@
 				53B40FD62AA878E400C814E4 /* VLCLibraryHeroView.m */,
 				7D92AF1F23DDCA8D00D81EA3 /* VLCLibraryImageCache.h */,
 				7D92AF2023DDCA8D00D81EA3 /* VLCLibraryImageCache.m */,
+				7D92AF2323DDCA8D00D81EA3 /* VLCThumbnailRequest.h */,
+				7D92AF2423DDCA8D00D81EA3 /* VLCThumbnailRequest.m */,
 				536283DC291146BC00640C15 /* VLCLibraryItemInternalMediaItemsDataSource.h */,
 				536283DF291146BC00640C15 /* VLCLibraryItemInternalMediaItemsDataSource.m */,
 				5360E99F2C5BE01F0046BA8B /* VLCLibraryMasterDetailViewTableViewDataSource.h */,
@@ -2497,6 +2502,7 @@
 				1C3113941E508C6900D4DD76 /* VLCAddonsWindowController.m in Sources */,
 				53CBE30B2C159A4D006BF2E3 /* VLCNoResultsLabel.m in Sources */,
 				7D92AF2123DDCA8D00D81EA3 /* VLCLibraryImageCache.m in Sources */,
+				7D92AF2223DDCA8D00D81EA3 /* VLCThumbnailRequest.m in Sources */,
 				7D2E0EDE20CD206F0033A221 /* VLCVideoWindowCommon.m in Sources */,
 				1C3113961E508C6900D4DD76 /* applescript.m in Sources */,
 				5325C57D29302E6800B2B63A /* VLCLibraryAudioViewController.m in Sources */,
