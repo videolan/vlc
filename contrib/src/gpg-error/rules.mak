@@ -38,6 +38,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 	sed -i.orig -e 's/ExpandEnvironmentStrings /ExpandEnvironmentStringsA /g' $(UNPACK_DIR)/src/w32-reg.c
 	sed -i.orig -e 's/SetEnvironmentVariable /SetEnvironmentVariableA /g' $(UNPACK_DIR)/src/sysutils.c
 	sed -i.orig -e 's/GetEnvironmentVariable /GetEnvironmentVariableA /g' $(UNPACK_DIR)/src/sysutils.c
+	sed -i.orig -e 's/GetModuleHandle /GetModuleHandleA /g' $(UNPACK_DIR)/src/w32-gettext.c
 
 	$(MOVE)
 
