@@ -1,7 +1,7 @@
-From 749be993cfc7a9994f4e0733182fc6dbb88bd655 Mon Sep 17 00:00:00 2001
+From 29d71e76eed00840acbae83cd82c765876720e2b Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 6 Nov 2025 13:31:25 +0100
-Subject: [PATCH 14/14] core: disable locking API with --disable-threads
+Subject: [PATCH 14/16] core: disable locking API with --disable-threads
 
 The _gpgrt_lock_t structure used in the specialized lock API's are not
 matching the structure set by gen-lock-obj.sh with --disable-threads.
@@ -17,7 +17,7 @@ In particular LOCK_ABI_VERSION is not set.
  6 files changed, 23 insertions(+)
 
 diff --git a/src/gen-lock-obj.sh b/src/gen-lock-obj.sh
-index 6e78c5f..ae867ba 100755
+index a8d9352..fb906ff 100755
 --- a/src/gen-lock-obj.sh
 +++ b/src/gen-lock-obj.sh
 @@ -59,6 +59,8 @@ typedef struct
@@ -30,7 +30,7 @@ index 6e78c5f..ae867ba 100755
  else
  AWK_VERSION_OUTPUT=$($AWK 'BEGIN { print PROCINFO["version"] }')
 diff --git a/src/gpgrt-int.h b/src/gpgrt-int.h
-index 8d2a936..f859a5b 100644
+index b8533dc..00c0c75 100644
 --- a/src/gpgrt-int.h
 +++ b/src/gpgrt-int.h
 @@ -137,12 +137,21 @@ void _gpgrt_post_syscall (void);
@@ -128,5 +128,5 @@ index c389635..69599f2 100644
 +
 +#endif /* !GPGRT_LOCK_NOT_SUPPORTED */
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 

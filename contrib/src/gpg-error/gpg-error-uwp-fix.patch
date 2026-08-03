@@ -1,7 +1,7 @@
-From d246bd0c4eba45b78f18786898ec4f8d6af86c72 Mon Sep 17 00:00:00 2001
+From a7e0e6d5c4b405a1d9103bb255e6d5cc6a126fb5 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 15 May 2023 08:20:15 +0200
-Subject: [PATCH 03/15] fix UWP build
+Subject: [PATCH 03/16] fix UWP build
 
 ---
  src/init.c     | 11 ++++++++++-
@@ -9,7 +9,7 @@ Subject: [PATCH 03/15] fix UWP build
  2 files changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/src/init.c b/src/init.c
-index 7f970d9..321da10 100644
+index 5a218ac..12e92e6 100644
 --- a/src/init.c
 +++ b/src/init.c
 @@ -81,8 +81,9 @@ static void *(*custom_realloc)(void *a, size_t n);
@@ -34,7 +34,7 @@ index 7f970d9..321da10 100644
  }
  #endif
  
-@@ -589,7 +594,11 @@ _gpgrt_windows_feature (int k)
+@@ -590,7 +595,11 @@ _gpgrt_windows_feature (int k)
    switch (k)
      {
      case GPGRT_WINDOWS_PROC_ATTRIBUTE:
@@ -47,10 +47,10 @@ index 7f970d9..321da10 100644
      case GPGRT_WINDOWS_UNDER_WINE:
        return windows_features.semihosted_by_wine;
 diff --git a/src/mkheader.c b/src/mkheader.c
-index 7c772e6..779e0ab 100644
+index 09727d5..71432fd 100644
 --- a/src/mkheader.c
 +++ b/src/mkheader.c
-@@ -623,7 +623,7 @@ write_special (const char *fname, int lnr, const char *tag)
+@@ -606,7 +606,7 @@ write_special (const char *fname, int lnr, const char *tag)
      }
    else if (!strcmp (tag, "include:os-add"))
      {

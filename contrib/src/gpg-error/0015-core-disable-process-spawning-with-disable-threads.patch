@@ -1,7 +1,7 @@
-From 10922c66bd0b717114c6b3080e0737b7676afd86 Mon Sep 17 00:00:00 2001
+From 8c21110007d4d0589f2962f19b1a66aae48f1404 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 6 Nov 2025 14:52:04 +0100
-Subject: [PATCH 15/15] core: disable process spawning with --disable-threads
+Subject: [PATCH 15/16] core: disable process spawning with --disable-threads
 
 ---
  src/spawn-posix.c | 4 ++++
@@ -10,7 +10,7 @@ Subject: [PATCH 15/15] core: disable process spawning with --disable-threads
  3 files changed, 10 insertions(+)
 
 diff --git a/src/spawn-posix.c b/src/spawn-posix.c
-index 8cdd032..0791b8a 100644
+index 55f6379..195c2c6 100644
 --- a/src/spawn-posix.c
 +++ b/src/spawn-posix.c
 @@ -58,6 +58,8 @@
@@ -22,14 +22,14 @@ index 8cdd032..0791b8a 100644
  /* Definition for the gpgrt_spawn_actions_t.  Note that there is a
   * different one for Windows.  */
  struct gpgrt_spawn_actions {
-@@ -1066,3 +1068,5 @@ _gpgrt_process_wait_list (gpgrt_process_t *process_list, int count, int hang)
+@@ -1068,3 +1070,5 @@ _gpgrt_process_wait_list (gpgrt_process_t *process_list, int count, int hang)
  
    return ec;
  }
 +
 +#endif /* !GPGRT_LOCK_NOT_SUPPORTED */
 diff --git a/src/spawn-w32.c b/src/spawn-w32.c
-index cb15dd0..3a3b648 100644
+index 70f5833..3f76f68 100644
 --- a/src/spawn-w32.c
 +++ b/src/spawn-w32.c
 @@ -49,6 +49,8 @@
@@ -41,14 +41,14 @@ index cb15dd0..3a3b648 100644
  /* Define to 1 do enable debugging.  */
  #define DEBUG_W32_SPAWN 0
  
-@@ -1218,3 +1220,5 @@ _gpgrt_process_wait_list (gpgrt_process_t *process_list, int count, int hang)
+@@ -1235,3 +1237,5 @@ _gpgrt_process_wait_list (gpgrt_process_t *process_list, int count, int hang)
  
    return ec;
  }
 +
 +#endif /* !GPGRT_LOCK_NOT_SUPPORTED */
 diff --git a/src/visibility.c b/src/visibility.c
-index 54c4e2a..4a97b6d 100644
+index 5574f33..b3d810b 100644
 --- a/src/visibility.c
 +++ b/src/visibility.c
 @@ -1133,6 +1133,7 @@ gpgrt_close_all_fds (int from, int *keep_fds)
@@ -68,5 +68,5 @@ index 54c4e2a..4a97b6d 100644
  
  int
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 

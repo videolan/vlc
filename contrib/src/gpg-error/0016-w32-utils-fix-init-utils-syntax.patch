@@ -1,14 +1,14 @@
-From 3b2ea0e318c6ddcb7801b3be951ffa04cd6de33d Mon Sep 17 00:00:00 2001
+From 177f99434c4501bd153059071dc03eda362f1b28 Mon Sep 17 00:00:00 2001
 From: Jean-Baptiste Kempf <jb@videolan.org>
-Date: Mon, 29 Jun 2026 11:48:00 +0000
-Subject: [PATCH] w32-utils: fix init utils syntax
+Date: Mon, 29 Jun 2026 11:48:00 +0200
+Subject: [PATCH 16/16] w32-utils: fix init utils syntax
 
 ---
- src/w32-utils.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ src/w32-utils.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/src/w32-utils.c b/src/w32-utils.c
-index d8f4896..afb8cca 100644
+index 5cf4fbd..afb8cca 100644
 --- a/src/w32-utils.c
 +++ b/src/w32-utils.c
 @@ -68,7 +68,11 @@ w32_shgetfolderpath (HWND a, int b, HANDLE c, DWORD d)
@@ -23,13 +23,6 @@ index d8f4896..afb8cca 100644
        if (!handle)
          {
            _gpgrt_w32_set_errno (-1);
-@@ -159,6 +163,6 @@ w32_utils_init (void)
- void
- _gpgrt_w32__init_utils (void)
- {
--  w32_utils_init ().
-+  w32_utils_init ();
- }
- #endif
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
+

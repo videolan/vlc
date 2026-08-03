@@ -1,5 +1,5 @@
 # GPGERROR
-GPGERROR_VERSION := 1.57
+GPGERROR_VERSION := 1.61
 GPGERROR_URL := $(GNUGPG)/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.bz2
 
 $(TARBALLS)/libgpg-error-$(GPGERROR_VERSION).tar.bz2:

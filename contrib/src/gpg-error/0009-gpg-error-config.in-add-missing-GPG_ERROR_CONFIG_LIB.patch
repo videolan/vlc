@@ -1,7 +1,7 @@
-From 8ceb454e05af8be392dc18309f1800a4945398a5 Mon Sep 17 00:00:00 2001
+From 08801e4e4cd5b5e114d60b39640c56f8249c2305 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 23 Oct 2025 12:20:16 +0200
-Subject: [PATCH 09/14] gpg-error-config.in: add missing
+Subject: [PATCH 09/16] gpg-error-config.in: add missing
  GPG_ERROR_CONFIG_LIBS_PRIVATE
 
 Otherwise the confirmity check fails
@@ -23,5 +23,5 @@ index 3b45928..e50a9d2 100644
                  output="$output @GPG_ERROR_CONFIG_MT_LIBS@"
              fi
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 

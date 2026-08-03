@@ -1,7 +1,7 @@
-From 2b5fff174b5b9ebaff32e653f3accea0ac782acb Mon Sep 17 00:00:00 2001
+From 81efaac078270d106ada3dba6268f9d662af4fdd Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 23 May 2023 14:31:16 +0200
-Subject: [PATCH 05/14] use CreateFile2 in Win8 as CreateFileW is forbidden in
+Subject: [PATCH 05/16] use CreateFile2 in Win8 as CreateFileW is forbidden in
  UWP
 
 ---
@@ -11,10 +11,10 @@ Subject: [PATCH 05/14] use CreateFile2 in Win8 as CreateFileW is forbidden in
  3 files changed, 47 insertions(+)
 
 diff --git a/src/estream.c b/src/estream.c
-index 6062001..f7ab037 100644
+index d5965e5..f148d43 100644
 --- a/src/estream.c
 +++ b/src/estream.c
-@@ -2058,6 +2058,17 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
+@@ -2059,6 +2059,17 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
    else
      creation_distribution |= OPEN_EXISTING;
  
@@ -32,7 +32,7 @@ index 6062001..f7ab037 100644
    hd = CreateFileW (wpath,
                      desired_access,
                      share_mode,
-@@ -2065,6 +2076,7 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
+@@ -2066,6 +2077,7 @@ func_file_create_w32 (void **cookie, HANDLE *rethd, const char *path,
                      creation_distribution,
                      flags_and_attrs,
                      NULL); /* template file  */
@@ -40,7 +40,7 @@ index 6062001..f7ab037 100644
    if (hd == INVALID_HANDLE_VALUE)
      {
        _set_errno (map_w32_to_errno (GetLastError ()));
-@@ -5148,6 +5160,17 @@ tmpfd (void)
+@@ -5167,6 +5179,17 @@ tmpfd (void)
            value <<= 4;
          }
        wcscpy (p, L".tmp");
@@ -58,7 +58,7 @@ index 6062001..f7ab037 100644
        file = CreateFileW (buffer,
                           GENERIC_READ | GENERIC_WRITE,
                           0,
-@@ -5155,6 +5178,7 @@ tmpfd (void)
+@@ -5174,6 +5197,7 @@ tmpfd (void)
                           CREATE_NEW,
                           FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
                           NULL);
@@ -67,7 +67,7 @@ index 6062001..f7ab037 100644
          {
            int fd = _open_osfhandle ((intptr_t)file, 0);
 diff --git a/src/spawn-w32.c b/src/spawn-w32.c
-index ecc9437..cb15dd0 100644
+index f21991a..70f5833 100644
 --- a/src/spawn-w32.c
 +++ b/src/spawn-w32.c
 @@ -224,10 +224,23 @@ w32_open_null (int for_write, int enable_null_device)
@@ -95,10 +95,10 @@ index ecc9437..cb15dd0 100644
          _gpgrt_log_debug ("can't open 'nul': ec=%d\n", (int)GetLastError ());
        return hfile;
 diff --git a/src/w32-gettext.c b/src/w32-gettext.c
-index 5b15a77..42aa01c 100644
+index 980d905..129b730 100644
 --- a/src/w32-gettext.c
 +++ b/src/w32-gettext.c
-@@ -1216,8 +1216,18 @@ load_domain (const char *filename)
+@@ -1227,8 +1227,18 @@ load_domain (const char *filename)
      if (!wfilename)
        fh = INVALID_HANDLE_VALUE;
      else
@@ -118,5 +118,5 @@ index 5b15a77..42aa01c 100644
    }
    if (fh == INVALID_HANDLE_VALUE)
 -- 
-2.45.1.windows.1
+2.52.0.windows.1
 
