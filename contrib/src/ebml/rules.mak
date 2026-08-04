@@ -7,6 +7,8 @@ ifeq ($(call need_pkg,"libebml >= 1.3.8"),)
 PKGS_FOUND += ebml
 endif
 
+DEPS_ebml := utfcpp $(DEPS_utfcpp)
+
 $(TARBALLS)/libebml-$(EBML_VERSION).tar.xz:
 	$(call download_pkg,$(EBML_URL),ebml)
 
