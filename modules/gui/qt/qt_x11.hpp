@@ -32,11 +32,20 @@ static inline bool vlcQtIsX11()
 {
     return qApp->nativeInterface<QNativeInterface::QX11Application>() != nullptr;
 }
+static inline Display *vlcQtX11Display()
+{
+    auto *x11App = qApp->nativeInterface<QNativeInterface::QX11Application>();
+    return x11App ? x11App->display() : nullptr;
+}
 #else
 #include <QX11Info>
 static inline bool vlcQtIsX11()
 {
     return QX11Info::isPlatformX11();
+}
+static inline Display *vlcQtX11Display()
+{
+    return QX11Info::display();
 }
 #endif
 

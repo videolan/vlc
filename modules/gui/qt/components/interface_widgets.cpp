@@ -54,7 +54,7 @@ static inline int qrand() {
 
 #if defined (QT_HAS_X11)
 # include <X11/Xlib.h>
-# include <QX11Info>
+# include "qt_x11.hpp"
 # if defined(QT_HAS_XCB)
 #  include <xcb/xproto.h>
 # endif
@@ -103,8 +103,8 @@ void VideoWidget::sync( void )
      * This protects other threads using distinct connections from getting
      * the video widget window in an inconsistent states. */
 #ifdef QT_HAS_X11
-    if( QX11Info::isPlatformX11() )
-        XSync( QX11Info::display(), False );
+    if( vlcQtIsX11() )
+        XSync( vlcQtX11Display(), False );
 #endif
 }
 
@@ -171,9 +171,9 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
 QSize VideoWidget::physicalSize() const
 {
 #ifdef QT_HAS_X11
-    if ( QX11Info::isPlatformX11() )
+    if ( vlcQtIsX11() )
     {
-        Display *p_x_display = QX11Info::display();
+        Display *p_x_display = vlcQtX11Display();
         Window x_window = stable->winId();
         XWindowAttributes x_attributes;
 
