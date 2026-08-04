@@ -81,7 +81,8 @@ const char *vlc_meta_TypeToString(vlc_meta_type_t meta_type)
         [vlc_meta_Actors]      = N_("Actors"),
         [vlc_meta_AlbumArtist] = N_("Album Artist"),
         [vlc_meta_DiscNumber]  = N_("Disc number"),
-        [vlc_meta_DiscTotal]   = N_("Total disc number")
+        [vlc_meta_DiscTotal]   = N_("Total disc number"),
+        [vlc_meta_Compilation] = N_("Compilation"),
     };
 
     assert(meta_type < ARRAY_SIZE(posix_names));

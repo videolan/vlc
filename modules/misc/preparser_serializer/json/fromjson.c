@@ -920,6 +920,7 @@ static void fromJSON_meta(struct serdes_sys *sys,
     meta_from_object(obj, meta, Actors, err);
     meta_from_object(obj, meta, DiscNumber, err);
     meta_from_object(obj, meta, DiscTotal, err);
+    meta_from_object(obj, meta, Compilation, err);
 
 #undef meta_from_object
 

@@ -798,6 +798,7 @@ static void toJSON_meta(struct serdes_sys *sys, const vlc_meta_t *meta,
     stringify_meta(sys, meta, Actors);
     stringify_meta(sys, meta, DiscNumber);
     stringify_meta(sys, meta, DiscTotal);
+    stringify_meta(sys, meta, Compilation);
 
 #undef stringify_meta
 
