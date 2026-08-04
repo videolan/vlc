@@ -31,6 +31,7 @@ static struct
     const char *psz;
 } const ID3_tag_to_metatype[] = {
     { VLC_FOURCC('T', 'A', 'L', 'B'), vlc_meta_Album,       NULL },
+    { VLC_FOURCC('T', 'C', 'M', 'P'), vlc_meta_Compilation, NULL },
     { VLC_FOURCC('T', 'D', 'R', 'C'), vlc_meta_Date,        NULL },
     { VLC_FOURCC('T', 'E', 'N', 'C'), vlc_meta_extra,       "Encoder" },
     { VLC_FOURCC('T', 'I', 'T', '2'), vlc_meta_Title,       NULL },
