@@ -367,7 +367,7 @@ static void Abort( void *obj )
 
 #if defined (QT_HAS_X11)
 # include <vlc_xlib.h>
-# include <QX11Info>
+# include "qt_x11.hpp"
 
 static void *ThreadXCB( void *data )
 {
@@ -800,7 +800,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 #ifdef QT_HAS_X11
     Window xid;
 
-    if (QX11Info::isPlatformX11())
+    if (vlcQtIsX11())
     {
         sys->dpy = XOpenDisplay(NULL);
         if (unlikely(sys->dpy == NULL))
@@ -821,7 +821,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     if (!sys->mi->getVideo(p_wnd, cfg->width, cfg->height, cfg->is_fullscreen))
     {
 #ifdef QT_HAS_X11
-        if (QX11Info::isPlatformX11())
+        if (vlcQtIsX11())
             XCloseDisplay(sys->dpy);
 #endif
         delete sys;
@@ -829,7 +829,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     }
 
 #ifdef QT_HAS_X11
-    if (QX11Info::isPlatformX11())
+    if (vlcQtIsX11())
     {
         QMutexLocker locker2(&sys->lock);
 
@@ -849,7 +849,7 @@ void WindowResized(vout_window_t *wnd, const QSize& size)
 #ifdef QT_HAS_X11
     vout_window_qt_t *sys = (vout_window_qt_t *)wnd->sys;
 
-    if (QX11Info::isPlatformX11())
+    if (vlcQtIsX11())
     {
         XResizeWindow(sys->dpy, wnd->handle.xid, size.width(), size.height());
         XSync(sys->dpy, True);
@@ -878,7 +878,7 @@ void WindowOrphaned(vout_window_t *wnd)
 
     msg_Warn(wnd, "orphaned video window");
 #if defined (QT_HAS_X11)
-    if (QX11Info::isPlatformX11())
+    if (vlcQtIsX11())
     {   /* In the unlikely event that WindowOpen() has not yet reparented the
          * window, WindowOpen() will skip reparenting. Then this call will be
          * a no-op.
@@ -914,7 +914,7 @@ static void WindowClose( vout_window_t *p_wnd )
         msg_Warn (p_wnd, "video already released");
 
 #if defined (QT_HAS_X11)
-    if (QX11Info::isPlatformX11())
+    if (vlcQtIsX11())
         XCloseDisplay(sys->dpy);
 #endif
     delete sys;

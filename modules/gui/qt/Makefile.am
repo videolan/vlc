@@ -41,7 +41,7 @@ libqt_plugin_la_CPPFLAGS += -DQT_GUI_PRIVATE $(QT_GUI_PRIVATE_CFLAGS)
 endif
 
 libqt_plugin_la_SOURCES = \
-	gui/qt/qt.cpp gui/qt/qt.hpp \
+	gui/qt/qt.cpp gui/qt/qt.hpp gui/qt/qt_x11.hpp \
 	gui/qt/menus.cpp gui/qt/menus.hpp \
 	gui/qt/main_interface.cpp gui/qt/main_interface.hpp \
 	gui/qt/dialogs_provider.cpp gui/qt/dialogs_provider.hpp \
