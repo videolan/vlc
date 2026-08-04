@@ -169,6 +169,7 @@ uwparm64-libvlc-llvm:
         - for ext in 7z;             do mv ${VLCARCH}/vlc-*-debug.${ext} nightlies/$(basename ${VLCARCH}/vlc-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
         - for ext in exe msi 7z zip; do mv ${VLCARCH}/vlc-*.${ext}       nightlies/$(basename ${VLCARCH}/vlc-*.${ext}       | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+    interruptible: false
     artifacts:
         paths:
             - nightlies/*
@@ -358,6 +359,7 @@ nightly-debian:
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
+    interruptible: false
     artifacts:
 
 .flatpak-common:
@@ -389,6 +391,7 @@ nightly-flatpak-x86_64:
     image:
         name: $VLC_FLATPAK_IMAGE
         entrypoint: [""]
+    interruptible: false
     variables:
         FLATPAK_BRANCH: 3.0-nightly
         HOST_ARCH: x86_64
@@ -481,6 +484,7 @@ macos-arm64:
         - mkdir nightlies
         - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.dmg/")
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+    interruptible: false
     artifacts:
         paths:
             - nightlies/*
