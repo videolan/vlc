@@ -5247,6 +5247,7 @@ static const struct
     { ATOM_atID,    MP4_ReadBox_Metadata,    ATOM_ilst }, /* iTunes */
     { ATOM_cnID,    MP4_ReadBox_Metadata,    ATOM_ilst }, /* iTunes */
     { ATOM_covr,    MP4_ReadBoxContainer,    ATOM_ilst },
+    { ATOM_cpil,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_desc,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_disk,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_flvr,    MP4_ReadBox_Metadata,    ATOM_ilst },

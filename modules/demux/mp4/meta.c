@@ -470,6 +470,16 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_box, void *pri
         }
         break;
     }
+    case ATOM_cpil:
+    {
+        if ( BOXDATA(p_data)->i_blob >= 1 &&
+             BOXDATA(p_data)->e_wellknowntype == DATA_WKT_BE_SIGNED )
+        {
+            vlc_meta_SetCompilation( p_meta,
+                                     *BOXDATA(p_data)->p_blob ? "1" : "0" );
+        }
+        break;
+    }
     case ATOM_disk:
     {
         if ( BOXDATA(p_data)->i_blob >= 6 &&

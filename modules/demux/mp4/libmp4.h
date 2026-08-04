@@ -395,6 +395,7 @@ typedef int64_t stime_t;
 #define ATOM_0xa9xyz VLC_FOURCC( 0xa9, 'x', 'y', 'z' )
 #define ATOM_aART VLC_FOURCC( 'a', 'A', 'R', 'T' )
 #define ATOM_chpl VLC_FOURCC( 'c', 'h', 'p', 'l' )
+#define ATOM_cpil VLC_FOURCC( 'c', 'p', 'i', 'l' )
 #define ATOM_HMMT VLC_FOURCC( 'H', 'M', 'M', 'T' )
 #define ATOM_desc VLC_FOURCC( 'd', 'e', 's', 'c' )
 #define ATOM_disk VLC_FOURCC( 'd', 'i', 's', 'k' )
