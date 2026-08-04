@@ -3924,6 +3924,7 @@ AC_ARG_ENABLE(qt, [
   ])
 ])
 have_qt5_x11="no"
+qt6_configured="no"
 AS_IF([test "${enable_qt}" != "no"], [
   PKG_CHECK_MODULES([QT], [Qt5Core >= 5.5.0 Qt5Widgets Qt5Gui Qt5Svg], [
       PKG_CHECK_MODULES([QT5_X11], [Qt5X11Extras], [
@@ -3940,6 +3941,7 @@ AS_IF([test "${enable_qt}" != "no"], [
     ], [
       dnl use any qmake that is available, including from contrib tools
       AC_PATH_PROGS(QMAKE6, [qmake6 qmake], qmake6, ["${CONTRIB_DIR}/../bin:$PATH"])
+      QT_QMAKE_MAJOR="$(${QMAKE6} -query QT_VERSION 2>/dev/null | cut -d. -f1)"
 
       AC_ARG_WITH([qtconf],
         AS_HELP_STRING([--with-qtconf=PATH], [location of Qt6 qt.conf file (auto)])
@@ -4030,6 +4032,8 @@ AS_IF([test "${enable_qt}" != "no"], [
           AC_MSG_RESULT([no])
         ])
         rm -f ${ac_pwd}/modules/gui/qt/qmake-private-gui
+
+        AS_IF([test "${QT_QMAKE_MAJOR}" = "6"], [qt6_configured="yes"])
       ],[
         AS_IF([test -n "${enable_qt}"],[
           AC_MSG_ERROR([${QT_PKG_ERRORS}.])
