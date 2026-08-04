@@ -36,7 +36,7 @@ ifdef HAVE_ANDROID
 FONTCONFIG_CONF += \
 	--with-cache-dir=~/.cache/fontconfig \
 	--with-default-fonts=/system/fonts \
-	--with-add-fonts=/product/fonts,/data/fonts
+	--with-add-fonts=/product/fonts
 endif
 
 DEPS_fontconfig = freetype2 $(DEPS_freetype2) libxml2 $(DEPS_libxml2)
