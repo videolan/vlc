@@ -4050,6 +4050,18 @@ AS_IF([test "${enable_qt}" != "no"], [
 ])
 AC_SUBST(QT_VERSION)
 AM_CONDITIONAL(ENABLE_QT, [test "$enable_qt" != "no"])
+dnl HAVE_QT_X11 enables the helper code that abstracts Qt5 v Qt6 access to X11
+have_qt_x11="no"
+AS_IF([test "${enable_qt}" != "no"], [
+  AS_IF([test "${qt6_configured}" = "yes"], [
+    AS_IF([test "${no_x}" != "yes"], [
+      have_qt_x11="yes"
+    ])
+  ], [
+    have_qt_x11="${have_qt5_x11}"
+  ])
+])
+AM_CONDITIONAL([HAVE_QT_X11], [test "${have_qt_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_QT5_X11], [test "${have_qt5_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_GUI_PRIVATE], [test "${have_qt_gui_private}" = "yes"])
 
