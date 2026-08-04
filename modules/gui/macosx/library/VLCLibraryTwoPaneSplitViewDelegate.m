@@ -49,6 +49,17 @@ NSString * const VLCLibrarySplitViewDetailViewWidthKey = @"VLCLibrarySplitViewDe
 }
 
 - (CGFloat)splitView:(NSSplitView *)splitView
+constrainMinCoordinate:(CGFloat)proposedMinimumPosition
+         ofSubviewAt:(NSInteger)dividerIndex
+{
+    if (dividerIndex != 0) {
+        return proposedMinimumPosition;
+    }
+
+    return VLCUIUnits.librarySplitViewSelectionViewMinimumWidth;
+}
+
+- (CGFloat)splitView:(NSSplitView *)splitView
 constrainMaxCoordinate:(CGFloat)proposedMinimumPosition
          ofSubviewAt:(NSInteger)dividerIndex
 {
