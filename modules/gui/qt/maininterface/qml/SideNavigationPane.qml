@@ -42,6 +42,8 @@ T.Pane {
 
     property bool delegateShowText: true
 
+    property alias model: navigationModel
+
     readonly property int minimumWidth: VLCStyle.expandNavigationPaneWidth + safeAreaLeftMargin + safeAreaRightMargin
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
