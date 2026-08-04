@@ -48,6 +48,6 @@ FONTCONFIG_CONF += ac_cv_va_copy=.C99
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(FONTCONFIG_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+	+$(MAKEBUILD) noinst_PROGRAMS= bin_PROGRAMS= check_PROGRAMS=
+	+$(MAKEBUILD) noinst_PROGRAMS= bin_PROGRAMS= check_PROGRAMS= install
 	touch $@
