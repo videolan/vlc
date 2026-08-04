@@ -256,6 +256,7 @@ QtObject {
     readonly property int mediumWidth: MainCtx.dp(1000, scale)
 
     readonly property bool isScreenSmall: appWidth <= smallWidth
+    readonly property bool isScreenReallySmall: appWidth <= MainCtx.dp(380, scale)
 
     //global application margin "safe area"
     readonly property int applicationHorizontalMargin: MainCtx.safeArea * appWidth / 100
