@@ -128,7 +128,7 @@ vlc_process_fd_Read(struct vlc_process *process, uint8_t *buf, size_t size,
  * @param [in]  timeout_ms  Timeout in milliseconds to wait for the pipe to be
  *                          writable.
  *
- * @return      The number of bytes read on success,
+ * @return      The number of bytes written on success,
  *              -1 on error, and errno is set to indicate the error.
  */
 VLC_API ssize_t
