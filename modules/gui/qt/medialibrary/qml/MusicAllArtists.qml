@@ -155,8 +155,8 @@ MainViewLoader {
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
 
-                selectedShadow.anchors.margins: VLCStyle.dp(1) // outside border
-                unselectedShadow.anchors.margins: VLCStyle.dp(1) // outside border
+                selectedShadow.anchors.margins: VLCStyle.dp(1, VLCStyle.scale) // outside border
+                unselectedShadow.anchors.margins: VLCStyle.dp(1, VLCStyle.scale) // outside border
             }
         }
     }

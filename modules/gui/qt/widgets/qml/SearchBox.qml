@@ -185,8 +185,8 @@ FocusScope {
 
                 implicitWidth: VLCStyle.widthSearchInput
 
-                padding: VLCStyle.dp(6)
-                leftPadding: padding + VLCStyle.dp(4)
+                padding: VLCStyle.dp(6, VLCStyle.scale)
+                leftPadding: padding + VLCStyle.dp(4, VLCStyle.scale)
                 rightPadding: leftPadding + (insideRow.visible ? insideRow.width : 0.0)
 
                 radius: clearButton.radius

@@ -258,7 +258,7 @@ ListView {
                 anchors.fill: parent
                 anchors.margins: VLCStyle.margin_small
 
-                border.width: VLCStyle.dp(2)
+                border.width: VLCStyle.dp(2, VLCStyle.scale)
                 border.color: theme.accent
                 border.pixelAligned: (radius < Number.EPSILON)
 
@@ -831,7 +831,7 @@ ListView {
             }
         }
 
-        implicitHeight: VLCStyle.dp(1)
+        implicitHeight: VLCStyle.dp(1, VLCStyle.scale)
 
         visible: !!parent
         color: theme.accent

@@ -39,7 +39,7 @@ QtObject {
 
     property int orientation: (view && view.orientation !== undefined) ? view.orientation
                                                                        : Qt.Vertical
-    property real margin: VLCStyle.dp(20)
+    property real margin: VLCStyle.dp(20, VLCStyle.scale)
 
     readonly property bool scrolling: animation.running // for convenience
     property alias scrollingDirection: animation.direction
@@ -60,7 +60,7 @@ QtObject {
         reversingMode: SmoothedAnimation.Immediate
         easing.type: Easing.OutQuad
 
-        velocity: VLCStyle.dp(200)
+        velocity: VLCStyle.dp(200, VLCStyle.scale)
         maximumEasingTime: 1000
 
         readonly property Timer _timer: Timer {

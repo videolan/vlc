@@ -656,14 +656,14 @@ FocusScope {
 
                                 Widgets.RoundedRectangleShadow {
                                     color: Qt.rgba(0, 0, 0, .18)
-                                    yOffset: VLCStyle.dp(24)
-                                    blurRadius: VLCStyle.dp(54)
+                                    yOffset: VLCStyle.dp(24, VLCStyle.scale)
+                                    blurRadius: VLCStyle.dp(54, VLCStyle.scale)
                                 }
 
                                 Widgets.RoundedRectangleShadow {
                                     color: Qt.rgba(0, 0, 0, .22)
-                                    yOffset: VLCStyle.dp(5)
-                                    blurRadius: VLCStyle.dp(14)
+                                    yOffset: VLCStyle.dp(5, VLCStyle.scale)
+                                    blurRadius: VLCStyle.dp(14, VLCStyle.scale)
                                 }
                             }
                         }

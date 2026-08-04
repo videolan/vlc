@@ -208,7 +208,7 @@ Widgets.TableViewExt {
         anchors.left : parent.left
         anchors.right: parent.right
 
-        height: VLCStyle.dp(1)
+        height: VLCStyle.dp(1, VLCStyle.scale)
 
         visible: root._item !== null
 

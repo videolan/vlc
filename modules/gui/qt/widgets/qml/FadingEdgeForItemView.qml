@@ -59,7 +59,7 @@ FadingEdge {
 
 
     readonly property bool _fadeRectEnoughSize: (orientation === Qt.Vertical ? itemView.height
-                                                                             : itemView.width) > (fadeSize * 2 + VLCStyle.dp(25))
+                                                                             : itemView.width) > (fadeSize * 2 + VLCStyle.dp(25, VLCStyle.scale))
 
     readonly property rect _currentItemMappedRect: itemView.currentItem ? Qt.rect(itemView.currentItem.x - sourceX,
                                                                                   itemView.currentItem.y - sourceY,

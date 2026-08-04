@@ -37,8 +37,8 @@ QtObject{
 
     // NOTE: The total text height of title and subtitle
     //       1dp is added to each, to correctly represent the actual height
-    readonly property int textHeight: (titleHeight ? titleHeight + titleTopMargin + VLCStyle.dp(1): 0) +
-                                      (subtitleHeight ? subtitleHeight + subtitleTopMargin + VLCStyle.dp(1) : 0)
+    readonly property int textHeight: (titleHeight ? titleHeight + titleTopMargin + VLCStyle.dp(1, VLCStyle.scale): 0) +
+                                      (subtitleHeight ? subtitleHeight + subtitleTopMargin + VLCStyle.dp(1, VLCStyle.scale) : 0)
 
     property int horizontalSpacing: nbItemPerRow === 2 ? VLCStyle.margin_large + VLCStyle.margin_xxxsmall
                                                        : (nbItemPerRow === 3 ? VLCStyle.margin_large + VLCStyle.margin_xxsmall

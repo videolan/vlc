@@ -271,8 +271,8 @@ T.Control {
                 visible: opacity > 0
                 opacity: 0
 
-                blurRadius: VLCStyle.dp(9)
-                yOffset: VLCStyle.dp(4)
+                blurRadius: VLCStyle.dp(9, VLCStyle.scale)
+                yOffset: VLCStyle.dp(4, VLCStyle.scale)
 
                 color: theme.accent.alpha(0.29)
             }
@@ -284,7 +284,7 @@ T.Control {
 
                 anchors.fill: parent
                 anchors.margins: _diminished ? (parent.width / 2)
-                                             : VLCStyle.dp(2)
+                                             : VLCStyle.dp(2, VLCStyle.scale)
 
                 radius: width / 2
 

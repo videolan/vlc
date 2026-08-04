@@ -34,7 +34,7 @@ ToolTipExt {
     implicitHeight: (implicitContentHeight + topPadding + bottomPadding)
 
     x: _x
-    y: _pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5))
+    y: _pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5, VLCStyle.scale))
 
     readonly property real _x: _pos.x - (width / 2)
     property point pos

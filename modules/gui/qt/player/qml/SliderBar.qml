@@ -146,7 +146,7 @@ T.ProgressBar {
                 "pressControl": {
                     action: (position, forcePrecise) => {
                         control.forceActiveFocus()
-                        fsm._seekToPosition(position, VLCStyle.dp(4) / control.width, forcePrecise)
+                        fsm._seekToPosition(position, VLCStyle.dp(4, VLCStyle.scale) / control.width, forcePrecise)
                     },
                     target: fsmHeld
                 }
@@ -159,7 +159,7 @@ T.ProgressBar {
             transitions: ({
                 "moveControl": {
                     action: (position, forcePrecise) => {
-                        fsm._seekToPosition(position, VLCStyle.dp(2) / control.width, forcePrecise)
+                        fsm._seekToPosition(position, VLCStyle.dp(2, VLCStyle.scale) / control.width, forcePrecise)
                     }
                 },
                 "releaseControl": {
