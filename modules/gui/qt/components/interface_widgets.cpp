@@ -55,7 +55,7 @@ static inline int qrand() {
 #if defined (QT5_HAS_X11)
 # include <X11/Xlib.h>
 # include <QX11Info>
-# if defined(QT5_HAS_XCB)
+# if defined(QT_HAS_XCB)
 #  include <xcb/xproto.h>
 # endif
 #endif
@@ -252,7 +252,7 @@ bool VideoWidget::nativeEventFilter(const QByteArray &eventType, void *message, 
 #endif
 {
 #if defined(QT5_HAS_X11)
-# if defined(QT5_HAS_XCB)
+# if defined(QT_HAS_XCB)
     if ( eventType == "xcb_generic_event_t" )
     {
         const xcb_generic_event_t* xev = static_cast<const xcb_generic_event_t*>( message );
