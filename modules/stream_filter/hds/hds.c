@@ -1144,6 +1144,12 @@ static void* live_thread( void* p )
         else
         {
             int64_t size = stream_Size( download_stream );
+            if( size == 0 )
+            {
+                msg_Err( s, "Unknown stream size for %s", abst_url );
+            }
+            else
+            {
             uint8_t* data = malloc( size );
             int read = vlc_stream_Read( download_stream, data,
                                     size );
@@ -1163,6 +1169,7 @@ static void* live_thread( void* p )
             }
 
             free( data );
+            }
 
             vlc_stream_Delete( download_stream );
         }
