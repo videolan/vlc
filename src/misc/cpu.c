@@ -144,9 +144,10 @@ out:
     return i_capabilities;
 }
 
+static atomic_uint cpu_flags = -1U;
+
 unsigned vlc_CPU(void)
 {
-    static atomic_uint cpu_flags = -1U;
     unsigned flags = atomic_load_explicit(&cpu_flags, memory_order_relaxed);
 
     if (unlikely(flags == -1U)) {
@@ -155,6 +156,11 @@ unsigned vlc_CPU(void)
     }
 
     return flags;
+}
+
+void vlc_CPU_set(unsigned mask)
+{
+    atomic_store_explicit(&cpu_flags, vlc_CPU_raw() & mask, memory_order_relaxed);
 }
 
 void vlc_CPU_dump (vlc_object_t *obj)

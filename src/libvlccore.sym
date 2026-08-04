@@ -597,6 +597,7 @@ vlc_control_cancel
 vlc_GetCPUCount
 vlc_CPU
 vlc_CPU_functions_init
+vlc_CPU_set
 vlc_filenamecmp
 vlc_fourcc_GetCodec
 vlc_fourcc_GetCodecAudio

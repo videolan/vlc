@@ -34,6 +34,24 @@
 VLC_API unsigned vlc_CPU(void);
 
 /**
+ * Masks CPU capability flags.
+ *
+ * This overrides the cached CPU capability flags with the intersection of
+ * the actually-detected CPU capabilities and the supplied mask. Bits cannot be
+ * added, only cleared: masking never reports a capability that hardware
+ * doesn't actually have.
+ *
+ * This is intended for testing purposes only (e.g. checkasm), to force
+ * code paths for lesser CPU capabilities to be exercised.
+ *
+ * \warning This function is not thread-safe with respect to vlc_CPU(): it
+ * must be called before any thread makes its first call to vlc_CPU(),
+ * otherwise the lazy initialisation in vlc_CPU() may race with and
+ * overwrite the masked value.
+ */
+VLC_API void vlc_CPU_set(unsigned mask);
+
+/**
  * Computes CPU capability flags.
  *
  * Do not call this function directly.
