@@ -449,6 +449,7 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
     SET( "LANGUAGE", Language );
     SET( "PUBLISHER", Publisher );
     SET( "MUSICBRAINZ_TRACKID", TrackID );
+    SET( "COMPILATION", Compilation );
 
     SET_EXTRA( "MUSICBRAINZ_ALBUMID", VLC_META_EXTRA_MB_ALBUMID );
 
@@ -509,6 +510,10 @@ static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
 
 #undef SET
 #undef SET_EXTRA
+
+    if( tag->attributeListMap().contains("WM/IsCompilation") )
+        vlc_meta_SetCompilation( p_meta,
+            tag->attributeListMap()["WM/IsCompilation"].front().toBool() ? "1" : "0" );
 
     // List the pictures
     list = tag->attributeListMap()["WM/Picture"];
@@ -767,6 +772,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
     SET( "TLAN", Language );
     SET( "TPUB", Publisher );
     SET( "TPE2", AlbumArtist );
+    SET( "TCMP", Compilation );
     SET_EXTRA( "USLT", "Lyrics" );
 
 #undef SET_EXTRA
@@ -826,6 +832,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     SET( "MUSICBRAINZ_TRACKID", TrackID );
     SET( "ALBUMARTIST", AlbumArtist );
     SET( "DISCNUMBER", DiscNumber );
+    SET( "COMPILATION", Compilation );
 
     SET_EXTRA( "MUSICBRAINZ_ALBUMID", VLC_META_EXTRA_MB_ALBUMID );
 #undef SET
@@ -884,6 +891,9 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
 
 #undef SET
 #undef SET_EXTRA
+
+    if( tag->contains("cpil") )
+        vlc_meta_SetCompilation( p_meta, tag->item("cpil").toBool() ? "1" : "0" );
 
     if( tag->contains("covr") )
     {
