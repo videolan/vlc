@@ -809,13 +809,12 @@ static uint8_t* download_chunk( stream_t *s,
     free( fragment_url );
 
     int64_t size = stream_Size( download_stream );
-    chunk->data_len = (uint32_t) size;
-
     if( size > MAX_REQUEST_SIZE )
     {
         msg_Err(s, "Strangely-large chunk of %"PRIi64" Bytes", size );
         return NULL;
     }
+    chunk->data_len = (uint32_t) size;
 
     uint8_t* data = malloc( size );
     if( ! data )
