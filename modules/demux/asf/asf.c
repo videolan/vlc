@@ -1395,6 +1395,7 @@ static int DemuxInit( demux_t *p_demux )
             else set_meta( "WM/AlbumArtist",  vlc_meta_AlbumArtist )
             else set_meta( "WM/Publisher",    vlc_meta_Publisher )
             else set_meta( "WM/PartOfSet",    vlc_meta_DiscNumber )
+            else set_meta( "WM/IsCompilation", vlc_meta_Compilation )
             else if( p_ecd->ppsz_value[i] != NULL && p_ecd->ppsz_name[i] &&
                     *p_ecd->ppsz_value[i] != '\0' && /* no empty value */
                     *p_ecd->ppsz_value[i] != '{'  && /* no guid value */
