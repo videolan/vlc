@@ -83,6 +83,7 @@ check_PROGRAMS = \
 	test_modules_codec_cea708_aspect_ratio \
 	test_modules_codec_cea708_integration \
 	test_modules_keystore \
+	test_modules_demux_json \
 	test_modules_demux_libmp4 \
 	test_modules_demux_timestamps \
 	test_modules_demux_timestamps_filter \
@@ -355,6 +356,9 @@ test_modules_keystore_SOURCES = modules/keystore/test.c
 test_modules_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_tls_SOURCES = modules/misc/tls.c
 test_modules_tls_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_demux_json_SOURCES = modules/demux/json.c \
+				../modules/demux/json/json.h
+test_modules_demux_json_LDADD = $(LIBVLCCORE) ../modules/libvlc_json.la
 test_modules_demux_libmp4_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM) $(LIBZ)
 test_modules_demux_libmp4_SOURCES = modules/demux/libmp4.c \
 				../modules/demux/mp4/libmp4.c \

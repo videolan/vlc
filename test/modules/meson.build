@@ -84,6 +84,13 @@ vlc_tests += {
 endif
 
 vlc_tests += {
+    'name' : 'test_modules_demux_json',
+    'sources' : files('demux/json.c'),
+    'suite' : ['modules', 'test_modules'],
+    'link_with' : [vlc_json_lib, libvlccore],
+}
+
+vlc_tests += {
     'name' : 'test_modules_demux_libmp4',
     'sources' : files(
         'demux/libmp4.c',
