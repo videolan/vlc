@@ -52,7 +52,7 @@ static inline int qrand() {
 }
 #endif
 
-#if defined (QT5_HAS_X11)
+#if defined (QT_HAS_X11)
 # include <X11/Xlib.h>
 # include <QX11Info>
 # if defined(QT_HAS_XCB)
@@ -102,7 +102,7 @@ void VideoWidget::sync( void )
     /* Make sure the X server has processed all requests.
      * This protects other threads using distinct connections from getting
      * the video widget window in an inconsistent states. */
-#ifdef QT5_HAS_X11
+#ifdef QT_HAS_X11
     if( QX11Info::isPlatformX11() )
         XSync( QX11Info::display(), False );
 #endif
@@ -136,7 +136,7 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
        management */
     /* This is currently disabled on X11 as it does not seem to improve
      * performance, but causes the video widget to be transparent... */
-#if !defined (QT5_HAS_X11)
+#if !defined (QT_HAS_X11)
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
 #else
     stable->setMouseTracking( true );
@@ -170,7 +170,7 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
 
 QSize VideoWidget::physicalSize() const
 {
-#ifdef QT5_HAS_X11
+#ifdef QT_HAS_X11
     if ( QX11Info::isPlatformX11() )
     {
         Display *p_x_display = QX11Info::display();
@@ -251,7 +251,7 @@ bool VideoWidget::nativeEventFilter(const QByteArray &eventType, void *message, 
 bool VideoWidget::nativeEventFilter(const QByteArray &eventType, void *message, long *)
 #endif
 {
-#if defined(QT5_HAS_X11)
+#if defined(QT_HAS_X11)
 # if defined(QT_HAS_XCB)
     if ( eventType == "xcb_generic_event_t" )
     {

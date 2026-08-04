@@ -365,7 +365,7 @@ static void Abort( void *obj )
 }
 #endif
 
-#if defined (QT5_HAS_X11)
+#if defined (QT_HAS_X11)
 # include <vlc_xlib.h>
 # include <QX11Info>
 
@@ -453,7 +453,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     void *(*thread)(void *) = Thread;
 
-#ifdef QT5_HAS_X11
+#ifdef QT_HAS_X11
     if( HasX11( p_this ) )
         thread = ThreadXCB;
     else
@@ -756,7 +756,7 @@ static int WindowControl( vout_window_t *, int i_query, va_list );
 
 typedef struct {
     MainInterface *mi;
-#ifdef QT5_HAS_X11
+#ifdef QT_HAS_X11
     Display *dpy;
 #endif
     QMutex lock;
@@ -797,7 +797,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     p_wnd->sys = (vout_window_sys_t *)sys;
     msg_Dbg( p_wnd, "requesting video window..." );
 
-#ifdef QT5_HAS_X11
+#ifdef QT_HAS_X11
     Window xid;
 
     if (QX11Info::isPlatformX11())
@@ -820,7 +820,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 
     if (!sys->mi->getVideo(p_wnd, cfg->width, cfg->height, cfg->is_fullscreen))
     {
-#ifdef QT5_HAS_X11
+#ifdef QT_HAS_X11
         if (QX11Info::isPlatformX11())
             XCloseDisplay(sys->dpy);
 #endif
@@ -828,7 +828,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     }
 
-#ifdef QT5_HAS_X11
+#ifdef QT_HAS_X11
     if (QX11Info::isPlatformX11())
     {
         QMutexLocker locker2(&sys->lock);
@@ -846,7 +846,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 
 void WindowResized(vout_window_t *wnd, const QSize& size)
 {
-#ifdef QT5_HAS_X11
+#ifdef QT_HAS_X11
     vout_window_qt_t *sys = (vout_window_qt_t *)wnd->sys;
 
     if (QX11Info::isPlatformX11())
@@ -877,7 +877,7 @@ void WindowOrphaned(vout_window_t *wnd)
     QMutexLocker locker(&sys->lock);
 
     msg_Warn(wnd, "orphaned video window");
-#if defined (QT5_HAS_X11)
+#if defined (QT_HAS_X11)
     if (QX11Info::isPlatformX11())
     {   /* In the unlikely event that WindowOpen() has not yet reparented the
          * window, WindowOpen() will skip reparenting. Then this call will be
@@ -913,7 +913,7 @@ static void WindowClose( vout_window_t *p_wnd )
     else
         msg_Warn (p_wnd, "video already released");
 
-#if defined (QT5_HAS_X11)
+#if defined (QT_HAS_X11)
     if (QX11Info::isPlatformX11())
         XCloseDisplay(sys->dpy);
 #endif

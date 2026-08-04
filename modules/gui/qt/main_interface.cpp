@@ -68,7 +68,7 @@
 # include <QStatusBar>
 #endif
 
-#if ! HAS_QT510 && defined(QT5_HAS_X11)
+#if ! HAS_QT510 && defined(QT_HAS_X11)
 # include <QX11Info>
 # include <X11/Xlib.h>
 #endif
@@ -1351,7 +1351,7 @@ void MainInterface::toggleUpdateSystrayMenuWhenVisible()
 
 void MainInterface::resizeWindow(int w, int h)
 {
-#if ! HAS_QT510 && defined(QT5_HAS_X11)
+#if ! HAS_QT510 && defined(QT_HAS_X11)
     if( QX11Info::isPlatformX11() )
     {
 #if HAS_QT56
