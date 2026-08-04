@@ -33,5 +33,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(NETTLE_CONF)
-	+$(MAKEBUILD) install
+	+$(MAKEBUILD) SUBDIRS=
+	+$(MAKEBUILD) SUBDIRS= install
 	touch $@
