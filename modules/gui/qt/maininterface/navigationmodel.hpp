@@ -38,6 +38,7 @@ public:
         URI,
         DEPTH,
         ICON,
+        ICON_SVG,
         EXPANDABLE,
         EXPANDED,
     };
