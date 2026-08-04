@@ -1155,25 +1155,25 @@ static void* live_thread( void* p )
             }
             else
             {
-            uint8_t* data = malloc( size );
-            int read = vlc_stream_Read( download_stream, data,
-                                    size );
-            if( read < size )
-            {
-                msg_Err( s, "Requested %"PRIi64" bytes, "  \
-                         "but only got %d", size, read );
+                uint8_t* data = malloc( size );
+                int read = vlc_stream_Read( download_stream, data,
+                                        size );
+                if( read < size )
+                {
+                    msg_Err( s, "Requested %"PRIi64" bytes, "  \
+                             "but only got %d", size, read );
 
-            }
-            else
-            {
-                vlc_mutex_lock( & hds_stream->abst_lock );
-                parse_BootstrapData( VLC_OBJECT(s), hds_stream,
-                                     data, data + read );
-                vlc_mutex_unlock( & hds_stream->abst_lock );
-                maintain_live_chunks( s, hds_stream );
-            }
+                }
+                else
+                {
+                    vlc_mutex_lock( & hds_stream->abst_lock );
+                    parse_BootstrapData( VLC_OBJECT(s), hds_stream,
+                                         data, data + read );
+                    vlc_mutex_unlock( & hds_stream->abst_lock );
+                    maintain_live_chunks( s, hds_stream );
+                }
 
-            free( data );
+                free( data );
             }
 
             vlc_stream_Delete( download_stream );
