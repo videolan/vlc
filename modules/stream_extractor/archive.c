@@ -173,7 +173,7 @@ static la_int64_t libarchive_seek_cb( libarchive_t* p_arc, void* p_obj,
 
     }
 
-    if( whence_pos < 0 || vlc_stream_Seek( p_source, whence_pos + offset ) )
+    if( whence_pos < -offset || vlc_stream_Seek( p_source, whence_pos + offset ) )
         return ARCHIVE_FATAL;
 
     return vlc_stream_Tell( p_source );
