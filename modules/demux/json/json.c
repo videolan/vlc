@@ -75,10 +75,13 @@ char *json_unescape(const char *in, size_t inlen)
         uint16_t c = *(in2++);
 
         if (c == '\\') {
-            switch (*(in2++)) {
+            uint16_t esc = *(in2++);
+
+            switch (esc) {
                 case '"':
                 case '\\':
                 case '/':
+                    c = esc;
                     break;
                 case 'b':
                     c = '\b';
