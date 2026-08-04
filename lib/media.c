@@ -72,7 +72,8 @@ static const vlc_meta_type_t libvlc_to_vlc_meta[] =
     [libvlc_meta_Actors]       = vlc_meta_Actors,
     [libvlc_meta_AlbumArtist]  = vlc_meta_AlbumArtist,
     [libvlc_meta_DiscNumber]   = vlc_meta_DiscNumber,
-    [libvlc_meta_DiscTotal]    = vlc_meta_DiscTotal
+    [libvlc_meta_DiscTotal]    = vlc_meta_DiscTotal,
+    [libvlc_meta_Compilation]  = vlc_meta_Compilation,
 };
 
 static_assert(

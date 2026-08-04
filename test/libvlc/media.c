@@ -100,7 +100,7 @@ static void print_media(libvlc_media_t *media)
         test_log("\tmedia doesn't have any tracks\n");
 
     for (enum libvlc_meta_t i = libvlc_meta_Title;
-         i <= libvlc_meta_DiscTotal; ++i)
+         i <= libvlc_meta_Compilation; ++i)
     {
         char *psz_meta = libvlc_media_get_meta(media, i);
         if (psz_meta != NULL)
