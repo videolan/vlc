@@ -896,12 +896,18 @@ preparser_pool_Delete(struct preparser_process_pool *pool)
     /* "closing" is now true, this will wake up threads */
     vlc_cond_broadcast(&pool->queue_wait);
 
+    struct preparser_process_thread *thread = NULL;
+    vlc_list_foreach(thread, &pool->threads, node) {
+        if (thread->process != NULL) {
+            vlc_process_Kill(thread->process);
+        }
+    }
+
     vlc_mutex_unlock(&pool->lock);
 
     /* The threads list may not be written at this point, so it is safe to read
      * it without mutex locked (the mutex must be released to join the
      * threads). */
-    struct preparser_process_thread *thread = NULL;
     vlc_list_foreach(thread, &pool->threads, node) {
         vlc_join(thread->thread, NULL);
         if (thread->process != NULL) {
