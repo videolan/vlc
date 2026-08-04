@@ -23,6 +23,40 @@
 #include <QQmlEngine>
 #include <QAbstractListModel>
 
+class NavigationModelItem
+{
+    Q_GADGET
+
+    Q_PROPERTY(QString name READ name CONSTANT FINAL)
+    Q_PROPERTY(QString icon READ icon CONSTANT FINAL)
+    Q_PROPERTY(QString icon_svg READ icon_svg CONSTANT FINAL)
+    Q_PROPERTY(QStringList uri READ uri CONSTANT FINAL)
+
+    QML_VALUE_TYPE(navigationModelItem)
+
+public:
+    NavigationModelItem() = default;
+
+    NavigationModelItem(const QString& name,
+                        const QString& icon,
+                        const QString& icon_svg,
+                        const QStringList& uri)
+        : m_name(name)
+        , m_icon(icon)
+        , m_icon_svg(icon_svg)
+        , m_uri(uri)
+    { }
+
+    QString name() const { return m_name; }
+    QString icon() const { return m_icon; }
+    QString icon_svg() const { return m_icon_svg; }
+    QStringList uri() const { return m_uri; }
+
+private:
+    QString m_name, m_icon, m_icon_svg;
+    QStringList m_uri;
+};
+
 class NavigationModelPrivate;
 class NavigationModel : public QAbstractListModel, public QQmlParserStatus
 {
@@ -41,6 +75,7 @@ public:
         ICON_SVG,
         EXPANDABLE,
         EXPANDED,
+        CHILDREN
     };
     Q_ENUM(Roles)
 

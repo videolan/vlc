@@ -229,6 +229,14 @@ struct ModelEntry
             return *it + (getIndex(it + 1, end));
     }
 
+    const ModelEntry* getModelEntry(const PathIterator& it, const PathIterator& end) const
+    {
+        if (it == end)
+            return this;
+        else
+            return &children[*it];
+    }
+
     template<typename OutIterator>
     void getUri(
         PathIterator it, const PathIterator& end,
@@ -321,6 +329,14 @@ public:
             //itemIndex doesn't change
             auto itemIndex = q->index(newExpandedIndex);
             q->dataChanged(itemIndex, itemIndex, {NavigationModel::EXPANDED});
+
+            // TODO: Use more specific range:
+            for (int i = 0; i < q->rowCount(); ++i)
+            {
+                const auto modelIndex = q->index(i, 0);
+                q->dataChanged(modelIndex, modelIndex, {NavigationModel::CHILDREN});
+            }
+
             return true;
         }
         else
@@ -369,6 +385,13 @@ public:
             auto itemIndex = q->index(itemIndexRow);
 
             q->dataChanged(itemIndex, itemIndex, {NavigationModel::EXPANDED});
+
+            // TODO: Use more specific range:
+            for (int i = 0; i < q->rowCount(); ++i)
+            {
+                const auto modelIndex = q->index(i, 0);
+                q->dataChanged(modelIndex, modelIndex, {NavigationModel::CHILDREN});
+            }
         }
 
         return true;
@@ -404,6 +427,7 @@ QHash<int,QByteArray> NavigationModel::roleNames() const
         {ICON_SVG, QByteArrayLiteral("icon_svg")},
         {EXPANDABLE, QByteArrayLiteral("expandable") },
         {EXPANDED, QByteArrayLiteral("expanded") },
+        {CHILDREN, QByteArrayLiteral("children") }
     };
 }
 
@@ -441,6 +465,28 @@ QVariant NavigationModel::data(const QModelIndex &index, int role) const
         return d->m_model.isExpandable(path.cbegin(), path.cend());
     case EXPANDED:
         return d->m_model.isExpanded(path.cbegin(), path.cend());
+    case CHILDREN:
+    {
+        const ModelEntry* modelEntry = d->m_model.getModelEntry(path.cbegin(), path.cend());
+        assert(modelEntry);
+
+        const auto& children = modelEntry->children;
+
+        QList<NavigationModelItem> list;
+        list.reserve(children.size());
+        for (const auto& child : children)
+        {
+            QStringList outlist;
+            d->m_model.getUri(path.cbegin(), path.cend(), std::back_inserter(outlist));
+            //don't advertise our root note
+            outlist.pop_front();
+            outlist.push_back(child.urinode);
+
+            list.emplace_back(child.name, child.icon, child.icon_svg, outlist);
+        }
+
+        return QVariant::fromValue(list);
+    }
     default:
         break;
     }
