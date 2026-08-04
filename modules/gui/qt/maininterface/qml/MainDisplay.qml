@@ -530,7 +530,11 @@ FocusScope {
             // overlay for smallscreens
             z: 2
 
-            anchors.fill: parent
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            height: parent.height - g_mainDisplay.displayMargin
 
             visible: VLCStyle.isScreenSmall && (playlistLoader.shown || (sidebar.visible && (sidebar.state === "expanded")))
             color: "black"
