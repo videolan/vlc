@@ -212,6 +212,7 @@ uwp32-libvlc-llvm:
         - for ext in 7z;  do mv ${VLCARCH}/vlc-*-dev-*-debug.${ext} nightlies/$(basename ${VLCARCH}/vlc-*-dev-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/") || echo "vlc-*debug.${ext} not found!"; done
         - for ext in exe msi 7z zip; do mv ${VLCARCH}/vlc-*-dev-*.${ext} nightlies/$(basename ${VLCARCH}/vlc-*-dev-*.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/") || echo "vlc-*.${ext} not found!"; done
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+    interruptible: false
     artifacts:
         paths:
             - nightlies/*
@@ -433,6 +434,7 @@ nightly-snap:
         - mv vlc_*.snap nightlies/
         - snapcraft upload --release edge nightlies/vlc_*.snap
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+    interruptible: false
     artifacts:
         paths:
            - nightlies/*
@@ -533,6 +535,7 @@ macos-arm64:
         - mv vlc-*.dmg nightlies/$(basename vlc-*.dmg | sed "s/\.dmg/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.dmg/")
         - mv vlc-*.tar.gz nightlies/$(basename vlc-*.tar.gz | sed "s/\.tar\.gz/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.tar\.gz/")
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+    interruptible: false
     artifacts:
         paths:
             - nightlies/*
@@ -698,3 +701,4 @@ nightly-docs:
         publish: public
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    interruptible: false
