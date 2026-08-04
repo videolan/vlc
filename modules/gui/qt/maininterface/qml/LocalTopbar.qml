@@ -51,6 +51,8 @@ T.ToolBar {
     property alias navigationVisible: navigationVisibilty.checked
     property alias playqueueVisible: playlistBtn.checked
 
+    property alias navigationButton: navigationVisibilty
+
     signal toggleNavigationVisibility()
     signal togglePlayqueueVisibility()
 
