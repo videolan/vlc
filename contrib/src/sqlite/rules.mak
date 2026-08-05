@@ -11,6 +11,9 @@ SQLITE_CONF = --prefix="$(PREFIX)" --build="$(BUILD)" --host="$(HOST)" \
 	--disable-shared --disable-rpath \
 	--disable-readline
 
+# force build FTS3 used by the medialibrary, otherwise it may crash
+SQLITE_CONF += --enable-fts3
+
 $(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
 ifdef HAVE_WINSTORE
 	$(error "sqlite no longer supported in UWP")
