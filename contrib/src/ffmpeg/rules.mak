@@ -1,16 +1,16 @@
 # FFmpeg
 
-FFMPEG_HASH=ec47a3b95f88fc3f820b900038ac439e4eb3fede
+# FFMPEG_HASH=ec47a3b95f88fc3f820b900038ac439e4eb3fede
 FFMPEG_MAJVERSION := 9.0
 FFMPEG_REVISION := 0
 # FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
 FFMPEG_VERSION := $(FFMPEG_MAJVERSION)
-FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
+# FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
-FFMPEG_GITURL := https://code.ffmpeg.org/FFmpeg/FFmpeg.git
+# FFMPEG_GITURL := https://code.ffmpeg.org/FFmpeg/FFmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 
-FFMPEG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(FFMPEG_HASH))))
+# FFMPEG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(FFMPEG_HASH))))
 
 # bsf=vp9_superframe is needed to mux VP9 inside webm/mkv
 FFMPEGCONF = --prefix="$(PREFIX)" --enable-static --disable-shared \
@@ -222,8 +222,8 @@ endif
 
 FFMPEGCONF += --nm="$(NM)" --ar="$(AR)" --ranlib="$(RANLIB)"
 
-$(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
-	$(call download_git,$(FFMPEG_GITURL),$(FFMPEG_BRANCH),$(FFMPEG_HASH))
+# $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
+# 	$(call download_git,$(FFMPEG_GITURL),$(FFMPEG_BRANCH),$(FFMPEG_HASH))
 
 # .sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz
 # 	$(call check_githash,$(FFMPEG_HASH))
