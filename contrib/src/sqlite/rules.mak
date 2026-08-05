@@ -1,6 +1,6 @@
 # sqlite
 
-SQLITE_VERSION := 3530300
+SQLITE_VERSION := 3530400
 SQLITE_URL := https://www.sqlite.org/2026/sqlite-autoconf-$(SQLITE_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"sqlite3 >= 3.33.0"),)
