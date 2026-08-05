@@ -857,6 +857,9 @@ FocusScope {
             if (UpdateModel.explicitCheck) {
                 return (UpdateModel.updateStatus !== UpdateModel.Unchecked)
             } else {
+                if (sidebar.loaderUpdateButton.active && !sidebar.loaderUpdateButton.suppressed)
+                    return false
+
                 if (UpdateModel.updateStatus === UpdateModel.updateStatusOnAcknowledgment)
                     return false // already dismissed with the same status
 
