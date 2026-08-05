@@ -251,7 +251,7 @@ AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
          i_codec_id == AV_CODEC_ID_RAWVIDEO )
          return NULL;
 
-    msg_Dbg( p_dec, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
+    msg_Dbg( p_dec, "using %s", LIBAVCODEC_IDENT );
 
     /* Initialization must be done before avcodec_find_decoder() */
     vlc_init_avcodec(VLC_OBJECT(p_dec));

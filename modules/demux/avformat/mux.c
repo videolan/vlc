@@ -98,7 +98,7 @@ int avformat_OpenMux( vlc_object_t *p_this )
     bool dummy = !strcmp( p_mux->p_access->psz_access, "dummy");
 
 
-    msg_Dbg( p_mux, "using %s %s", AVPROVIDER(LIBAVFORMAT), LIBAVFORMAT_IDENT );
+    msg_Dbg( p_mux, "using %s", LIBAVFORMAT_IDENT );
 
     vlc_init_avformat(p_this);
 

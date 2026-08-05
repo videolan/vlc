@@ -331,7 +331,7 @@ int InitVideoEnc( vlc_object_t *p_this )
 
     const struct vlc_encoder_operations *encoder_ops;
 
-    msg_Dbg( p_this, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
+    msg_Dbg( p_this, "using %s", LIBAVCODEC_IDENT );
 
     /* Initialization must be done before avcodec_find_encoder() */
     vlc_init_avcodec(p_this);

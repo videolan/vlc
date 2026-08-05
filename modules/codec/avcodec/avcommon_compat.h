@@ -24,8 +24,6 @@
 #ifndef AVCOMMON_COMPAT_H
 #define AVCOMMON_COMPAT_H 1
 
-#define AVPROVIDER(lib) ((lib##_VERSION_MICRO < 100) ? "libav" : "ffmpeg")
-
 #include <libavcodec/avcodec.h>
 
 /* LIBAVCODEC_VERSION_CHECK checks for the right version of FFmpeg
