@@ -145,6 +145,10 @@
     }
 
     VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
+    if (bookmark == nil) {
+        return;
+    }
+
     vlc_tick_t bookmarkTime = VLC_TICK_FROM_MS(bookmark.bookmarkTime);
 
     VLCPlayerController * const playerController = VLCMain.sharedInstance.playQueueController.playerController;
@@ -159,6 +163,10 @@
     }
 
     VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
+    if (bookmark == nil) {
+        return;
+    }
+
     [_tableViewDataSource removeBookmark:bookmark];
 }
 

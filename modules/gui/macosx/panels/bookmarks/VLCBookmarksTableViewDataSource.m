@@ -179,10 +179,13 @@ static void bookmarksLibraryCallback(void *p_data, const vlc_ml_event_t *p_event
     return _bookmarks.count;
 }
 
-- (VLCBookmark *)bookmarkForRow:(NSInteger)row
+- (nullable VLCBookmark *)bookmarkForRow:(NSInteger)row
 {
-    NSParameterAssert(row >= 0 || (NSUInteger)row < _bookmarks.count);
-    return [_bookmarks objectAtIndex:row];
+    if (row < 0 || (NSUInteger)row >= _bookmarks.count) {
+        return nil;
+    }
+
+    return _bookmarks[(NSUInteger)row];
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
@@ -192,7 +195,9 @@ static void bookmarksLibraryCallback(void *p_data, const vlc_ml_event_t *p_event
     }
 
     VLCBookmark * const bookmark = [self bookmarkForRow:row];
-    NSAssert(bookmark != nil, @"Should be a valid bookmark");
+    if (bookmark == nil) {
+        return @"";
+    }
 
     NSString * const identifier = [tableColumn identifier];
 
@@ -213,6 +218,10 @@ static void bookmarksLibraryCallback(void *p_data, const vlc_ml_event_t *p_event
               row:(NSInteger)row
 {
     VLCBookmark * const bookmark = [self bookmarkForRow:row];
+    if (bookmark == nil) {
+        return;
+    }
+
     VLCBookmark * const originalBookmark = [bookmark copy];
 
     NSString * const columnIdentifier = tableColumn.identifier;

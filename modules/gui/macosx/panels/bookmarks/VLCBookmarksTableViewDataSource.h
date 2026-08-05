@@ -47,7 +47,7 @@ extern NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier;
 - (void)clearBookmarks;
 
 - (void)updateBookmarks;
-- (VLCBookmark *)bookmarkForRow:(NSInteger)row;
+- (nullable VLCBookmark *)bookmarkForRow:(NSInteger)row;
 
 @end
 
