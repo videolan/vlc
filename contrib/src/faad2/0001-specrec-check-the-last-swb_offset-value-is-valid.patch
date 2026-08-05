@@ -1,0 +1,28 @@
+From 44e0e0abc77d2fccf97de9cbb3740bc6bb56ba36 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 6 Aug 2026 08:01:23 +0200
+Subject: [PATCH] specrec: check the last swb_offset value is valid
+
+It comes from hDecoder->frameLength and must be at least equal or greater to the
+value before it.
+---
+ libfaad/specrec.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/libfaad/specrec.c b/libfaad/specrec.c
+index 9b1da2f..d53b4e0 100644
+--- a/libfaad/specrec.c
++++ b/libfaad/specrec.c
+@@ -372,6 +372,9 @@ uint8_t window_grouping_info(NeAACDecStruct *hDecoder, ic_stream *ics)
+ #ifdef LD_DEC
+         }
+ #endif
++        if (ics->num_swb > 0 && ics->swb_offset[ics->num_swb] < ics->swb_offset[ics->num_swb-1]) {
++            return 32;
++        }
+         return 0;
+     case EIGHT_SHORT_SEQUENCE:
+         ics->num_windows = 8;
+-- 
+2.52.0.windows.1
+

@@ -20,6 +20,7 @@ faad2: faad2-$(FAAD2_VERSION).tar.gz .sum-faad2
 ifndef HAVE_FPU
 	$(APPLY) $(SRC)/faad2/faad2-fixed.patch
 endif
+	$(APPLY) $(SRC)/faad2/0001-specrec-check-the-last-swb_offset-value-is-valid.patch
 	$(call pkg_static,"libfaad/faad2.pc.in")
 	$(MOVE)
 
