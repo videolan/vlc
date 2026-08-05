@@ -1224,7 +1224,9 @@ UpdateModel* MainCtx::getUpdateModel() const
                     const auto target = p_intf->p_compositor->quickWindow()->contentItem();
                     QMetaObject::invokeMethod(target, [target]() {
                         const auto updatePaneLoader = target->findChild<QQuickItem*>(QStringLiteral("updatePaneLoader"));
-                        if (!updatePaneLoader || (updatePaneLoader->property("status").toInt() != 1 /* Loader.Ready */))
+                        const auto updateButtonLoader = target->findChild<QQuickItem*>(QStringLiteral("updateButtonLoader"));
+                        if ((!updatePaneLoader || (updatePaneLoader->property("status").toInt() != 1 /* Loader.Ready */)) &&
+                            (!updateButtonLoader || (updateButtonLoader->property("status").toInt() != 1 /* Loader.Ready */)))
                         {
                             qDebug("No acknowledgement from the modern update loader, falling back to the old update dialog.");
                             THEDP->updateDialog(DialogsProvider::Show);
