@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) CGFloat         originalValue;
 @property (nonatomic) NSTrackingArea *trackingArea;
 
+- (void)commitCurrentValue;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -72,8 +72,13 @@
     [super mouseUp:event];
 
     if (self.isHovering) {
-        self.originalValue = self.doubleValue;
+        [self commitCurrentValue];
     }
+}
+
+- (void)commitCurrentValue
+{
+    self.originalValue = self.doubleValue;
 }
 
 - (void)setDoubleValue:(double)doubleValue
