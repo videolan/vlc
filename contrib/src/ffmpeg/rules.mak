@@ -17,6 +17,8 @@ FFMPEGCONF = --prefix="$(PREFIX)" --enable-static --disable-shared \
 	--extra-ldflags="$(LDFLAGS)" \
 	--cc="$(CC)" \
 	--host-cc="$(BUILDCC)" \
+	--host-cflags="$(BUILDCFLAGS)" \
+	--host-cppflags="$(BUILDCPPFLAGS)" \
 	--pkg-config="$(PKG_CONFIG)" \
 	--disable-doc \
 	--disable-encoder=vorbis \
