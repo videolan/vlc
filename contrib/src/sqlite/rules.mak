@@ -11,16 +11,18 @@ SQLITE_CONF = --prefix="$(PREFIX)" --build="$(BUILD)" --host="$(HOST)" \
 	--disable-shared --disable-rpath \
 	--disable-readline
 
-ifdef HAVE_WINSTORE
-SQLITE_CONF += CFLAGS="$(CFLAGS) -DSQLITE_OS_WINRT=1"
-endif
-
 $(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
+ifdef HAVE_WINSTORE
+	$(error "sqlite no longer supported in UWP")
+endif
 	$(call download_pkg,$(SQLITE_URL),sqlite)
 
 .sum-sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz
 
 sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
+ifdef HAVE_WINSTORE
+	$(error "sqlite no longer supported in UWP")
+endif
 	$(UNPACK)
 	$(call pkg_static, "sqlite3.pc.in")
 	$(MOVE)
