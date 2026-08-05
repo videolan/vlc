@@ -60,6 +60,8 @@ T.Pane {
         colorSet: ColorContext.Window
     }
 
+    property alias loaderUpdateButton: loaderUpdateButton
+
     Accessible.name: qsTr("Sidebar")
 
     NavigationModel {
@@ -157,7 +159,7 @@ T.Pane {
                 }
 
                 Navigation.parentItem: root
-                Navigation.downItem: preferenceButton
+                Navigation.downItem: loaderUpdateButton
 
                 delegate: SideNavigationDelegate {
                     id: delegate
@@ -261,6 +263,227 @@ T.Pane {
                 }
             }
 
+            Loader {
+                id: loaderUpdateButton
+
+                // WARNING: Object name is used from C++ side to acknowledge the modern update pane is loaded,
+                //          if C++ side does not get this acknowledgement, the old update dialog is shown as
+                //          fallback.
+                objectName: "updateButtonLoader"
+
+                visible: active
+
+                Layout.fillWidth: true
+
+                readonly property bool updateModelIsAvailable: (typeof UpdateModel !== 'undefined')
+
+                opacity: 0.0
+
+                Behavior on opacity {
+                    OpacityAnimator {
+                        duration: VLCStyle.duration_short
+                    }
+                }
+
+                active: updateModelIsAvailable && (shouldShow || opacity > 0.0)
+
+                readonly property bool shouldShow: {
+                    if (!updateModelIsAvailable)
+                        return false
+
+                    if (DialogsProvider.updateDialogVisible)
+                        return false
+                        
+                    if (UpdateModel.explicitCheck) {
+                        return false // This button is only meant for non-explicit update checks (unlike update pane).
+                    } else {
+                        if (UpdateModel.updateStatus === UpdateModel.updateStatusOnAcknowledgment)
+                            return false // already dismissed with the same status
+
+                        switch (UpdateModel.updateStatus) {
+                            case UpdateModel.NeedUpdate:
+                            case UpdateModel.CheckFailed:
+                                return true
+                            default:
+                                return false
+                        }
+                    }
+                }
+
+                onShouldShowChanged: {
+                    if (shouldShow) {
+                        opacity = 1.0
+                        suppressed = false
+                    }
+                }
+
+                property bool suppressed: false
+
+                function dismiss(suppress /* : bool */ = false) {
+                    // This could be also be an assertion:
+                    if (updateModelIsAvailable) {
+                        if (!suppress)
+                            UpdateModel.updateStatusOnAcknowledgment = UpdateModel.updateStatus
+                    }
+
+                    if (suppress)
+                        suppressed = true
+
+                    opacity = 0.0
+                }
+
+                Navigation.parentItem: root
+                Navigation.upItem: listView
+                Navigation.downItem: preferenceButton
+
+                sourceComponent: Widgets.ButtonExt {
+                    id: updateButton
+
+                    focus: true
+
+                    radius: VLCStyle.button_radius
+
+                    verticalPadding: VLCStyle.margin_xxsmall
+
+                    leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
+                    rightPadding: root.safeAreaRightMargin + VLCStyle.margin_xsmall
+
+                    leftInset: root.safeAreaLeftMargin + VLCStyle.margin_xxsmall
+                    rightInset: root.safeAreaRightMargin + VLCStyle.margin_xxsmall
+
+                    topInset: VLCStyle.margin_xxxsmall
+                    bottomInset: VLCStyle.margin_xxxsmall
+
+                    topPadding: VLCStyle.margin_xxsmall
+                    bottomPadding: VLCStyle.margin_xxsmall
+
+                    spacing: VLCStyle.margin_xsmall
+
+                    showText: root.delegateShowText
+
+                    iconSize: VLCStyle.icon_banner
+
+                    font.pixelSize: VLCStyle.fontSize_normal
+
+                    text: {
+                        switch (UpdateModel.updateStatus) {
+                        case UpdateModel.NeedUpdate:
+                            return qsTr("Update found!")
+                        case UpdateModel.CheckFailed:
+                            return qsTr("Update error!")
+                        default:
+                            return qsTr("N/A")
+                        }
+                    }
+
+                    Navigation.parentItem: loaderUpdateButton
+
+                    Keys.onCancelPressed: {
+                        loaderUpdateButton.dismiss()
+                    }
+
+                    Keys.onEscapePressed: {
+                        loaderUpdateButton.dismiss()
+                    }
+
+                    onClicked: {
+                        loaderUpdateButton.dismiss(true)
+                    }
+
+                    background: Widgets.AnimatedBackground {
+                        enabled: updateButton.colorContext.initialized
+
+                        color: {
+                            switch (UpdateModel.updateStatus) {
+                            case UpdateModel.NeedUpdate:
+                                return updateButton.colorContext.bg.positive
+                            case UpdateModel.CheckFailed:
+                                return updateButton.colorContext.bg.negative
+                            default:
+                                return updateButton.colorContext.bg.neutral
+                            }
+                        }
+
+                        border.color: updateButton.visualFocus ? updateButton.colorFocus
+                                                               : (updateButton.colorContext.border.a > 0.0 ? updateButton.colorContext.border
+                                                                                                           : color)
+
+                        radius: updateButton.radius
+
+                        opacity: 0.8
+                    }
+
+                    contentItem: RowLayout {
+                        spacing: updateButton.spacing
+
+                        property alias label: contentText
+
+                        Widgets.IconLabel {
+                            Layout.fillHeight: true
+
+                            font.pixelSize: updateButton.iconSize
+
+                            text: VLCIcons.ic_fluent_arrow_sync_24_regular
+
+                            color: updateButton.colorContext.fg.primary
+                        }
+
+                        Widgets.LabelExt {
+                            id: contentText
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            font: updateButton.font
+
+                            visible: updateButton.showText
+
+                            elide: Text.ElideRight
+
+                            verticalAlignment: Text.AlignVCenter
+
+                            text: updateButton.text
+
+                            color: updateButton.colorContext.fg.primary
+
+                            Accessible.ignored: true
+                        }
+
+                        Widgets.IconToolButton {
+                            id: closeButton
+
+                            Layout.fillHeight: true
+                            Layout.maximumHeight: width
+
+                            implicitHeight: contentText.implicitHeight
+
+                            description: qsTr("Dismiss the update button")
+                            text: VLCIcons.close
+
+                            visible: contentText.visible
+
+                            // We handle escape key press in `updateButton`:
+                            activeFocusOnTab: false
+
+                            onClicked: {
+                                loaderUpdateButton.dismiss()
+                            }
+
+                            // This blocks propagating hover to the root button (updateButton):
+                            HoverHandler {
+                                id: hoverHandler
+
+                                Component.onCompleted: {
+                                    // TODO: Directly set with Qt 6.3
+                                    if (hoverHandler.blocking !== undefined)
+                                        hoverHandler.blocking = true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             SideNavigationDelegate {
                 id: preferenceButton
 
@@ -288,7 +511,7 @@ T.Pane {
                 focusPolicy: Qt.StrongFocus
 
                 Navigation.parentItem: root
-                Navigation.upItem: listView
+                Navigation.upItem: loaderUpdateButton
 
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: (e) => Navigation.defaultKeyAction(e)
