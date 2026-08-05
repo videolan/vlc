@@ -1,10 +1,10 @@
 # FFmpeg
 
 FFMPEG_HASH=ec47a3b95f88fc3f820b900038ac439e4eb3fede
-FFMPEG_MAJVERSION := 8.1
-FFMPEG_REVISION := 2
-FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
-# FFMPEG_VERSION := $(FFMPEG_MAJVERSION)
+FFMPEG_MAJVERSION := 9.0
+FFMPEG_REVISION := 0
+# FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
+FFMPEG_VERSION := $(FFMPEG_MAJVERSION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
 FFMPEG_GITURL := https://code.ffmpeg.org/FFmpeg/FFmpeg.git
@@ -244,6 +244,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
 	$(APPLY) $(SRC)/ffmpeg/0011-avcodec-videotoolboxenc-disable-calls-on-unsupported.patch
 	$(APPLY) $(SRC)/ffmpeg/avcodec-fix-compilation-visionos.patch
+	$(APPLY) $(SRC)/ffmpeg/0009-swscale-x86-use-HOSTCPPFLAGS-instead-of-CPPFLAGS-for.patch
 	$(MOVE)
 
 .ffmpeg: ffmpeg

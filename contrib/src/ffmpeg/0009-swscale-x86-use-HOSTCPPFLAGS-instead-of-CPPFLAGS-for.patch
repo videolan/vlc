@@ -1,0 +1,25 @@
+From 03abaac3e22c2e766e9b0bdd11e3150e8dd4dc04 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 5 Aug 2026 11:45:10 +0200
+Subject: [PATCH 9/9] swscale/x86: use HOSTCPPFLAGS instead of CPPFLAGS for
+ native code
+
+Similar to 976e18fdef8bcd0602b6b94bb157a82a3eb9a1a6.
+---
+ libswscale/x86/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libswscale/x86/Makefile b/libswscale/x86/Makefile
+index 0f7a3dbf2d..4467fd877d 100644
+--- a/libswscale/x86/Makefile
++++ b/libswscale/x86/Makefile
+@@ -32,5 +32,5 @@ $(SUBDIR)x86/ops_int.o: $(SUBDIR)x86/uops_macros.gen.asm
+ $(SUBDIR)x86/ops_float.o: $(SUBDIR)x86/uops_macros.gen.asm
+ $(SUBDIR)x86/uops_macros.gen.asm: $(SRC_PATH)/libswscale/x86/uops_macros.asm.h \
+                                   $(SRC_PATH)/libswscale/uops_macros.h
+-	$(HOSTCC) $(HOSTCC_E) $(CPPFLAGS) $<
++	$(HOSTCC) $(HOSTCC_E) $(HOSTCPPFLAGS) $<
+ endif
+-- 
+2.52.0.windows.1
+
