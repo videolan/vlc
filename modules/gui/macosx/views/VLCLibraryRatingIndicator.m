@@ -67,15 +67,6 @@
     }
 }
 
-- (void)mouseUp:(NSEvent *)event
-{
-    [super mouseUp:event];
-
-    if (self.isHovering) {
-        [self commitCurrentValue];
-    }
-}
-
 - (void)commitCurrentValue
 {
     self.originalValue = self.doubleValue;

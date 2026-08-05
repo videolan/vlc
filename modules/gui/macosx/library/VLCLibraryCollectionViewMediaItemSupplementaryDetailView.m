@@ -39,6 +39,7 @@
 #import "library/VLCLibraryWindow.h"
 
 #import "views/VLCImageView.h"
+#import "views/VLCLibraryRatingIndicator.h"
 
 NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind = @"VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier";
@@ -254,14 +255,14 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 - (IBAction)ratingAction:(id)sender
 {
-    NSLevelIndicator * const control = (NSLevelIndicator *)sender;
-    if (control == nil) {
-        return;
-    }
-
+    NSParameterAssert([sender isKindOfClass:VLCLibraryRatingIndicator.class]);
+    VLCLibraryRatingIndicator * const control = sender;
     const double proportion = 100 / control.maxValue;
     const double rating = control.doubleValue * proportion;
     ((VLCMediaLibraryMediaItem *)self.representedItem.item).rating = (int)rating;
+
+    // NSLevelIndicatorCell handles mouse-up during tracking, so the view's mouseUp: is not called.
+    [control commitCurrentValue];
 }
 
 - (IBAction)openPathAction:(id)sender
