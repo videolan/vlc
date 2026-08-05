@@ -120,7 +120,7 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
         if( i_size > 0 )
         {
             p_context->extradata =
-                av_malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
+                av_malloc( i_size + AV_INPUT_BUFFER_PADDING_SIZE );
             if( p_context->extradata )
             {
                 uint8_t *p_dst = p_context->extradata;
@@ -128,7 +128,7 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
                 p_context->extradata_size = i_size;
 
                 memcpy( &p_dst[0],            &p_src[i_offset], i_size );
-                memset( &p_dst[i_size], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+                memset( &p_dst[i_size], 0, AV_INPUT_BUFFER_PADDING_SIZE );
             }
         }
     }
@@ -373,11 +373,11 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         if( (p_block->i_flags & BLOCK_FLAG_PRIVATE_REALLOCATED) == 0 )
         {
-            *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+            *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + AV_INPUT_BUFFER_PADDING_SIZE );
             if( !p_block )
                 goto end;
-            p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
-            memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+            p_block->i_buffer -= AV_INPUT_BUFFER_PADDING_SIZE;
+            memset( &p_block->p_buffer[p_block->i_buffer], 0, AV_INPUT_BUFFER_PADDING_SIZE );
 
             p_block->i_flags |= BLOCK_FLAG_PRIVATE_REALLOCATED;
         }

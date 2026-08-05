@@ -203,11 +203,11 @@ static subpicture_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
     *block_ptr =
     block      = block_Realloc(block,
                                0,
-                               block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE);
+                               block->i_buffer + AV_INPUT_BUFFER_PADDING_SIZE);
     if (!block)
         return NULL;
-    block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
-    memset(&block->p_buffer[block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE);
+    block->i_buffer -= AV_INPUT_BUFFER_PADDING_SIZE;
+    memset(&block->p_buffer[block->i_buffer], 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
     if( sys->p_codec->id == AV_CODEC_ID_DVB_SUBTITLE && block->i_buffer > 3 )
     {

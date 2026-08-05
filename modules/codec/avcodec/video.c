@@ -1431,13 +1431,13 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_block && p_block->i_buffer > 0 )
     {
         p_block = block_Realloc( p_block, 0,
-                            p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+                            p_block->i_buffer + AV_INPUT_BUFFER_PADDING_SIZE );
         if( !p_block )
             return VLCDEC_ECRITICAL;
-        p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
+        p_block->i_buffer -= AV_INPUT_BUFFER_PADDING_SIZE;
         *pp_block = p_block;
         memset( p_block->p_buffer + p_block->i_buffer, 0,
-                FF_INPUT_BUFFER_PADDING_SIZE );
+                AV_INPUT_BUFFER_PADDING_SIZE );
     }
 
     bool b_drain = ( pp_block == NULL );
@@ -1810,7 +1810,7 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
         p_sys->p_context->extradata_size = i_size + 12;
         p = p_sys->p_context->extradata =
             av_malloc( p_sys->p_context->extradata_size +
-                       FF_INPUT_BUFFER_PADDING_SIZE );
+                       AV_INPUT_BUFFER_PADDING_SIZE );
         if( !p )
             return;
 
@@ -1847,13 +1847,13 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
     {
         p_sys->p_context->extradata_size = i_size;
         p_sys->p_context->extradata =
-            av_malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
+            av_malloc( i_size + AV_INPUT_BUFFER_PADDING_SIZE );
         if( p_sys->p_context->extradata )
         {
             memcpy( p_sys->p_context->extradata,
                     p_dec->fmt_in->p_extra, i_size );
             memset( p_sys->p_context->extradata + i_size,
-                    0, FF_INPUT_BUFFER_PADDING_SIZE );
+                    0, AV_INPUT_BUFFER_PADDING_SIZE );
         }
     }
 }
