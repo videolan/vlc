@@ -473,7 +473,7 @@ static int ShowController(vlc_object_t * __unused p_this,
         return;
     }
 
-    if (self.videoViewController.view.isHidden) {
+    if (!self.embeddedVideoPlaybackActive) {
         [self showControlsBar];
     }
 }
