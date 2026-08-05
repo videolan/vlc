@@ -74,6 +74,10 @@
 # define FF_API_AVIO_WRITE_NONCONST (LIBAVFORMAT_VERSION_MAJOR < 61)
 #endif
 
+#ifndef FF_API_V408_CODECID // removed in ffmpeg 9
+# define FF_API_V408_CODECID (LIBAVCODEC_VERSION_MAJOR < 63)
+#endif
+
 # include <libavutil/avutil.h>
 
 /* LIBAVUTIL_VERSION_CHECK checks for the right version of FFmpeg

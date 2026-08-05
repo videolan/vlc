@@ -237,7 +237,9 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     { VLC_CODEC_BMVVIDEO, AV_CODEC_ID_BMV_VIDEO },
     { VLC_CODEC_VBLE, AV_CODEC_ID_VBLE },
     { VLC_CODEC_DXTORY, AV_CODEC_ID_DXTORY },
+#if FF_API_V408_CODECID
     { VLC_CODEC_V410, AV_CODEC_ID_V410 },
+#endif
     /* AV_CODEC_ID_XWD */
     { VLC_CODEC_CDXL, AV_CODEC_ID_CDXL },
     /* AV_CODEC_ID_XBM */
@@ -293,8 +295,10 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     /* ffmpeg only: AV_CODEC_ID_AVUI */
     /* ffmpeg only: AV_CODEC_ID_TARGA_Y216 */
 
+#if FF_API_V408_CODECID
     { VLC_CODEC_V308, AV_CODEC_ID_V308 },
     { VLC_CODEC_V408, AV_CODEC_ID_V408 },
+#endif
     { VLC_CODEC_YUV4, AV_CODEC_ID_YUV4 },
 
     /* ffmpeg only: AV_CODEC_ID_SANM */
