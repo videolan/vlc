@@ -75,6 +75,7 @@ Contrib:
  * Update faad to 2.11.2
  * Update flac to 1.4.2
  * Update FFmpeg to 8.1.2
+ * Update freetype to 2.14.3
  * Update gcrypt to 1.12.2
  * Update glew to 2.3.1
  * Update gme to 0.6.5
