@@ -287,6 +287,8 @@ MainViewLoader {
             //-------------------------------------------------------------------------------------
             // Settings
 
+            focus: true
+
             basePictureWidth: isMusic ? VLCStyle.gridCover_music_width : VLCStyle.gridCover_video_width
             basePictureHeight: isMusic ? VLCStyle.gridCover_music_height : VLCStyle.gridCover_video_height
 

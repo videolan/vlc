@@ -148,6 +148,8 @@ MainViewLoader {
 
             // Settings
 
+            focus: true
+
             model: root.model
 
             selectionModel: root.selectionModel

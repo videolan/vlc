@@ -104,6 +104,8 @@ MainViewLoader {
             basePictureWidth: VLCStyle.gridCover_music_width
             basePictureHeight: VLCStyle.gridCover_music_height
 
+            focus: true
+
             activeFocusOnTab:true
 
             headerDelegate: root.header
