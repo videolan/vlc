@@ -380,7 +380,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     VLCLibrarySegment * const segment = [VLCLibrarySegment segmentForLibraryItem:libraryItem];
-    [self applySegmentView:segment];
+    [self.splitViewController.navSidebarViewController selectSegment:segment.segmentType];
     if ([self.librarySegmentViewController conformsToProtocol:@protocol(VLCLibraryItemPresentingCapable)]) {
         [(VLCLibraryAbstractSegmentViewController<VLCLibraryItemPresentingCapable> *)self.librarySegmentViewController presentLibraryItem:libraryItem];
     }
