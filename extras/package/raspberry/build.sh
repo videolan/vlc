@@ -74,6 +74,7 @@ case $ARCH in
     arm)
         SHORTARCH="linuxarm"
         EABI="gnueabihf"
+        ARCHFLAGS="-mfpu=neon"
         ;;
     *)
         usage
@@ -115,9 +116,9 @@ CONTRIBFLAGS="$CONTRIBFLAGS --disable-x265 --disable-xcb --disable-libaribcaptio
 ${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET $CONTRIBFLAGS
 
 # use the system headers for the OS and firmware
-export CFLAGS="$CFLAGS -g -mfpu=neon -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
-export CXXFLAGS="$CXXFLAGS -g -mfpu=neon -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
-export CPPFLAGS="$CPPFLAGS -g -mfpu=neon -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
+export CFLAGS="$CFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
+export CXXFLAGS="$CXXFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
+export CPPFLAGS="$CPPFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
 export LDFLAGS="$LDFLAGS -L/usr/$TRIPLET/lib -L/opt/vc/lib"
 
 # Rebuild the contribs or use the prebuilt ones
