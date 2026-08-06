@@ -1,0 +1,50 @@
+From 6680b11bbf4516c5718d14eaf3468f4d91cbdefd Tue Aug 04 11:45:11 2026
+From: jaypitts23 <jayalanpitts@gmail.com>
+Date: Tue, 04 Aug 2026 11:45:11 +0000
+Subject: [PATCH] win32: stop rpc_read_from_socket() when the transport is
+ replaced mid-read
+
+---
+ lib/socket.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+--- a/lib/socket.c	2026-07-26 13:31:24.953045209 +0000
++++ b/lib/socket.c	2026-07-26 13:31:57.107691689 +0000
+@@ -555,6 +555,16 @@
+ 	ssize_t count;
+         int pos;
+         uint32_t inbuf_size;
++        /* A reply callback (e.g. the portmap GETPORT handler) can disconnect
++         * the socket we are reading on and open a new connection while we are
++         * still inside this read loop. If the loop then iterates and calls
++         * recv() on the freshly created, not-yet-connected socket, Windows
++         * returns WSAENOTCONN (not mapped to EAGAIN), which is treated as a
++         * fatal read error and aborts the mount. Snapshot the transport and,
++         * once a PDU callback has replaced it, stop reading and let the next
++         * mainloop iteration service the new socket. */
++        int saved_fd = rpc->fd;
++        int saved_is_connected = rpc->is_connected;
+ 
+ 	assert(rpc->magic == RPC_CONTEXT_MAGIC);
+         if (rpc->socket_disabled) {
+@@ -841,6 +851,17 @@
+                                                       "Closing socket");
+                                         return -1;
+                                 }
++                                /* The PDU callback replaced the transport
++                                 * (fd changed and/or is_connected dropped to
++                                 * 0); stop reading the now-stale connection.
++                                 * Checking is_connected too avoids missing the
++                                 * case where Windows recycles the fd number. */
++                                if (rpc->fd != saved_fd ||
++                                    rpc->is_connected != saved_is_connected) {
++                                        rpc->inpos = 0;
++                                        rpc->state = READ_RM;
++                                        return 0;
++                                }
+ #ifdef HAVE_LIBKRB5
+                                 /*
+                                  * Since we don't do zero-copy reads for
+
+--
+2.39.2
