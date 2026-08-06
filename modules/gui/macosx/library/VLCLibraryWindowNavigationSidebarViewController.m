@@ -337,8 +337,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
     }
 
-    const NSInteger segmentIndex = [self.outlineView rowForItem:targetNode];
     [self expandParentsOfNode:targetNode];
+    const NSInteger segmentIndex = [self.outlineView rowForItem:targetNode];
     [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentIndex]
                   byExtendingSelection:NO];
 }
