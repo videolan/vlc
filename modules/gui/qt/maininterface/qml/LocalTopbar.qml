@@ -184,72 +184,16 @@ T.ToolBar {
                 Navigation.parentItem: root
                 Navigation.leftItem: navigationButtons
 
-                Widgets.IconToolButton {
+                PlaylistPane.PlaylistToggleButton {
                     id: playlistBtn
 
-                    font.pixelSize: VLCStyle.icon_banner
-                    text: VLCIcons.playlist
-                    description: qsTr("Playlist")
-
-                    AccessibleCompat.id: "playqueueToggle"
-
-                    width: VLCStyle.bannerButton_width
-                    height: VLCStyle.bannerButton_height
-                    //highlighted: MainCtx.playlistVisible
+                    plListView: root.plListView
 
                     Navigation.parentItem: playqueueButtonsTop
                     Navigation.rightItem: menuBtn
                     Navigation.leftItem: historyBack
 
                     onClicked:  root.togglePlayqueueVisibility()
-
-                    DropArea {
-                        anchors.fill: parent
-
-                        onContainsDragChanged: {
-                            if (containsDrag) {
-                                _timer.restart()
-
-                                if (plListView)
-                                    MainCtx.setCursor(Qt.DragCopyCursor)
-                            } else {
-                                _timer.stop()
-
-                                if (plListView)
-                                    MainCtx.restoreCursor()
-                            }
-                        }
-
-                        onEntered: (drag) => {
-                            if (root.plListView) {
-                                console.assert(root.plListView.isDropAcceptableFunc)
-                                console.assert(root.plListView.model)
-                                if (root.plListView.isDropAcceptableFunc(drag, root.plListView.model.count)) {
-                                    drag.accept()
-                                } else {
-                                    drag.accepted = false
-                                }
-                            } else {
-                                drag.accepted = false
-                            }
-                        }
-
-                        onDropped: (drop) => {
-                            if (root.plListView) {
-                                console.assert(plListView.acceptDropFunc)
-                                root.plListView.acceptDropFunc(root.plListView.model.count, drop)
-                            }
-                        }
-
-                        Timer {
-                            id: _timer
-                            interval: VLCStyle.duration_humanMoment
-
-                            onTriggered: {
-                                MainCtx.playqueuePanel.visible = true
-                            }
-                        }
-                    }
                 }
 
                 Widgets.IconToolButton {
