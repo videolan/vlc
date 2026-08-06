@@ -97,22 +97,6 @@ MainViewLoader {
         indexesFlat: !!selectionModel.selectedIndexesFlat
     }
 
-    /*
-     *define the initial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because selectionModel.
-     * selectedGroup update itself after this event
-     */
-    onActiveFocusChanged: {
-        if (activeFocus && genreModel.count > 0 && !selectionModel.hasSelection) {
-            let initialIndex = 0
-            if (currentIndex !== -1)
-                initialIndex = currentIndex
-
-            selectionModel.select(genreModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-            currentItem.currentIndex = initialIndex
-        }
-    }
-
     MLContextMenu {
         id: contextMenu
 

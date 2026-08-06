@@ -54,18 +54,6 @@ Widgets.ExpandGridItemView {
         return true
     }
 
-    // Events
-
-    // NOTE: Define the initial position and selection. This is done on activeFocus rather
-    //       than Component.onCompleted because selectionModel.selectedGroup update itself
-    //       after this event.
-    onActiveFocusChanged: {
-        if (!activeFocus || model.count === 0 || selectionModel.hasSelection)
-            return;
-
-        resetFocus() // restores initialIndex
-    }
-
     // Connections
 
     Connections {
