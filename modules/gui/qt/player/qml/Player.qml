@@ -1117,10 +1117,13 @@ FocusScope {
                     // NOTE: We increase the padding accordingly to avoid overlapping the TopBar.
                     return topBar.reservedHeight
             }
+            bottomPadding: 0
 
             background: Rectangle {
                 color: windowTheme.bg.primary.alpha(0.8)
             }
+
+            view.fadingEdge.pixelAlignedForDPR: !controlBar.visible
 
             Navigation.parentItem: rootPlayer
             Navigation.upItem: topBar

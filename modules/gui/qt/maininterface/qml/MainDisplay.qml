@@ -757,10 +757,12 @@ FocusScope {
 
                 leftPadding: playqueueResizeHandle.visualBorder.width
                 rightPadding: VLCStyle.applicationHorizontalMargin
-                bottomPadding: VLCStyle.margin_normal + Math.max(VLCStyle.applicationVerticalMargin - g_mainDisplay.displayMargin, 0)
+                bottomPadding: Math.max(VLCStyle.applicationVerticalMargin - g_mainDisplay.displayMargin, 0)
                 topPadding: VLCStyle.layoutTitle_top_padding
 
                 useAcrylic: !VLCStyle.isScreenSmall
+
+                view.fadingEdge.pixelAlignedForDPR: !miniPlayer.visible
 
                 Navigation.parentItem: g_mainDisplay
                 Navigation.upItem: localTopbar

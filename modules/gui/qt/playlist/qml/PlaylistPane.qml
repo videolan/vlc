@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
@@ -115,22 +116,115 @@ T.Pane {
     contentItem: ColumnLayout {
         spacing: VLCStyle.margin_xxsmall
 
-        Layout.minimumWidth: noContentInfoColumn.implicitWidth
+        Layout.minimumWidth: Math.min(Math.max(noContentInfoColumn.implicitWidth,
+                                               titleRowLayout.implicitWidth ),
+                                      /* Minimum width should not be too large, we rely on elision otherwise: */
+                                      Window.width / 3) + (headerColumn.Layout.leftMargin + headerColumn.Layout.rightMargin)
 
         readonly property ListView listView: listView
 
         Column {
+            id: headerColumn
+
             Layout.fillHeight: false
             Layout.fillWidth: true
             Layout.leftMargin: VLCStyle.margin_normal
+            Layout.rightMargin: VLCStyle.margin_normal
 
             spacing: VLCStyle.margin_xxxsmall
 
-            Widgets.SubtitleLabel {
-                text: qsTr("Play Queue")
-                color: theme.fg.primary
-                font.weight: Font.Bold
-                font.pixelSize: VLCStyle.dp(24, VLCStyle.scale)
+            RowLayout {
+                id: titleRowLayout
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                spacing: VLCStyle.margin_normal
+
+                Widgets.SubtitleLabel {
+                    id: titleLabel
+
+                    Layout.fillWidth: true
+
+                    text: qsTr("Play Queue")
+                    color: theme.fg.primary
+                    font.weight: Font.Bold
+                    font.pixelSize: VLCStyle.dp(24, VLCStyle.scale)
+                }
+
+                Widgets.SortControl {
+                    id: sort
+
+                    font.pixelSize: VLCStyle.icon_banner
+
+                    description : qsTr("Sort")
+
+                    AccessibleCompat.id: "playqueueSort"
+
+                    enabled: MainPlaylistController.count > 1
+
+                    checked: MainPlaylistController.sortKey !== PlaylistController.SORT_KEY_NONE
+
+                    popupAbove: false
+
+                    model: MainPlaylistController.sortKeyTitleList
+
+                    onSortSelected: key => {
+                        MainPlaylistController.sortKey = key
+                    }
+
+                    onSortOrderSelected: type => {
+                        if (type === Qt.AscendingOrder)
+                            MainPlaylistController.sortOrder = PlaylistController.SORT_ORDER_ASC
+                        else if (type === Qt.DescendingOrder)
+                            MainPlaylistController.sortOrder = PlaylistController.SORT_ORDER_DESC
+
+                        MainPlaylistController.sort()
+                    }
+
+                    sortOrder: {
+                        if (MainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_ASC) {
+                            Qt.AscendingOrder
+                        }
+                        else if (MainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_DESC) {
+                            Qt.DescendingOrder
+                        }
+                    }
+
+                    sortKey: MainPlaylistController.sortKey
+
+                    Navigation.parentItem: root
+                    Navigation.rightItem: searchBox
+                    Navigation.downItem: listView
+                }
+
+                Widgets.SearchBox {
+                    id: searchBox
+
+                    enabled: MainPlaylistController.count > 1
+
+                    toggleButton.font.pixelSize: VLCStyle.icon_banner
+
+                    popBelow: true
+
+                    displayRegexToggleButton: true
+                    displayCaseSensitiveToggleButton: true
+
+                    popup.width: Math.max(popup.implicitWidth, root.contentItem?.width * 0.6)
+                    popup.topPadding: VLCStyle.margin_xxsmall
+
+                    Navigation.parentItem: root
+                    Navigation.leftItem: sort
+                    Navigation.downItem: listView
+
+                    Connections {
+                        target: contextMenu
+
+                        function onDiscardedFilteredOutItems() {
+                            searchBox.retract()
+                        }
+                    }
+                }
             }
 
             Widgets.CaptionLabel {
@@ -248,9 +342,9 @@ T.Pane {
             model: proxyModel ?? root.model
 
             onWidthChanged: {
-                if (toolbar.searchBox.expanded) {
-                    if (width < toolbar.searchBox.textField.width)
-                        toolbar.searchBox.retract()
+                if (searchBox.expanded) {
+                    if (width < searchBox.textField.width)
+                        searchBox.retract()
                 }
             }
 
@@ -263,10 +357,10 @@ T.Pane {
                     proxyModel = proxyModelComponent.createObject(listView)
                 }
 
-                if (toolbar.searchBox.regexButtonToggled)
-                    proxyModel.setFilterRegularExpression(toolbar.searchBox.searchPattern)
+                if (searchBox.regexButtonToggled)
+                    proxyModel.setFilterRegularExpression(searchBox.searchPattern)
                 else
-                    proxyModel.setFilterFixedString(toolbar.searchBox.searchPattern)
+                    proxyModel.setFilterFixedString(searchBox.searchPattern)
             }
 
             Component {
@@ -277,8 +371,8 @@ T.Pane {
 
                     sourceModel: root.model
 
-                    filterCaseSensitivity: toolbar.searchBox.caseSensitiveButtonToggled ? Qt.CaseSensitive
-                                                                                        : Qt.CaseInsensitive
+                    filterCaseSensitivity: searchBox.caseSensitiveButtonToggled ? Qt.CaseSensitive
+                                                                                : Qt.CaseInsensitive
                 }
             }
 
@@ -386,8 +480,8 @@ T.Pane {
                     }
                 })
 
-                toolbar.searchBox.searchPatternChanged.connect(listView, listView.adjustFiltering)
-                toolbar.searchBox.regexButtonToggledChanged.connect(listView, listView.adjustFiltering)
+                searchBox.searchPatternChanged.connect(listView, listView.adjustFiltering)
+                searchBox.regexButtonToggledChanged.connect(listView, listView.adjustFiltering)
             }
 
             Connections {
@@ -446,6 +540,7 @@ T.Pane {
             }
 
             Navigation.parentItem: root
+            Navigation.upItem: sort
 
             onActionAtIndex: (index) => {
                 if (index < 0)
@@ -515,27 +610,6 @@ T.Pane {
                     color: label.color
 
                     font.pixelSize: VLCStyle.fontSize_large
-                }
-            }
-        }
-
-        PlaylistToolbar {
-            id: toolbar
-
-            Layout.preferredHeight: VLCStyle.heightBar_normal
-            Layout.fillHeight: false
-            Layout.fillWidth: true
-            Layout.leftMargin: VLCStyle.margin_normal
-            Layout.rightMargin: VLCStyle.margin_normal
-
-            searchBox.displayRegexToggleButton: true
-            searchBox.displayCaseSensitiveToggleButton: true
-
-            Connections {
-                target: contextMenu
-
-                function onDiscardedFilteredOutItems() {
-                    toolbar.searchBox.retract()
                 }
             }
         }
