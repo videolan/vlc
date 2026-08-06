@@ -52,6 +52,8 @@ T.Pane {
     property alias isDropAcceptableFunc: listView.isDropAcceptableFunc
     property alias acceptDropFunc: listView.acceptDropFunc
 
+    property alias view: listView
+
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
