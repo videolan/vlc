@@ -523,7 +523,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParams = [self queryParams];
-        vlc_ml_artist_list_t * const p_artist_list = vlc_ml_list_artists(self->_p_mediaLibrary, &queryParams, NO);
+        vlc_ml_artist_list_t * const p_artist_list = vlc_ml_list_artists(self->_p_mediaLibrary, &queryParams, YES);
         const size_t numberOfArtists = p_artist_list->i_nb_items;
         NSMutableArray * const mutableArtistArray = [[NSMutableArray alloc] initWithCapacity:numberOfArtists];
         NSMutableDictionary * const mutableArtistDict = [NSMutableDictionary dictionaryWithCapacity:numberOfArtists];
