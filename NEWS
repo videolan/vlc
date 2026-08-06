@@ -67,10 +67,10 @@ Lua:
 Contrib:
  * Update libarchive to 3.8.8
  * Update libass to 0.17.5
- * Update chromaprint to 1.6.0
  * Update aom to 3.14.1
- * Update amf to 1.5.0
+ * Update amf to 1.5.2
  * Update asdcp to 2_13_2
+ * Update chromaprint to 1.6.0
  * Update dav1d to 1.5.4
  * Update faad to 2.11.2
  * Update flac to 1.4.2
@@ -80,11 +80,13 @@ Contrib:
  * Update glew to 2.3.1
  * Update gme to 0.6.5
  * Update gnutls to 3.8.13
- * Update gpg-error to 1.56
+ * Update gpg-error to 1.61
  * Update harfbuzz to 14.2.1
  * Update jpeg to v9f
+ * Update libbluray to 1.4.1
  * Update libebml to 1.4.6
  * Update libmad to 0.16.14
+ * Update libmicrodns to 0.2.0
  * Update libtasn1 to 4.21.0
  * Update libxml2 to 2.15.3
  * Update matroska to 1.7.2
