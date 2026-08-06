@@ -562,6 +562,24 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     _displayedCollectionUpdating = YES;
 
     dispatch_async(dispatch_get_main_queue(), ^{
+        NSTableView * const gridModeListTableView = self.gridModeListTableView;
+        const NSInteger selectedGridModeRow = gridModeListTableView != nil
+            ? gridModeListTableView.selectedRow
+            : -1;
+        const id<VLCMediaLibraryItemProtocol> selectedGridModeItem =
+            selectedGridModeRow >= 0 && (NSUInteger)selectedGridModeRow < self.displayedCollection.count
+                ? self.displayedCollection[selectedGridModeRow]
+                : nil;
+
+        NSTableView * const collectionSelectionTableView = self.collectionSelectionTableView;
+        const NSInteger selectedListModeRow = collectionSelectionTableView != nil
+            ? collectionSelectionTableView.selectedRow
+            : -1;
+        const id<VLCMediaLibraryItemProtocol> selectedListModeItem =
+            selectedListModeRow >= 0 && (NSUInteger)selectedListModeRow < self.displayedCollection.count
+                ? self.displayedCollection[selectedListModeRow]
+                : nil;
+
         self.displayedCollection = [[self collectionToDisplay] mutableCopy];
 
         if (self.displayAllArtistsGenresTableEntry) {
@@ -595,6 +613,22 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
             NSAssert(self.carouselView == nil || self.carouselView.dataSource == (id)self, @"Cannot reload a carousel view with a different data source");
             [self.carouselView reloadData];
         }];
+
+        if (selectedGridModeItem != nil) {
+            const NSUInteger selectedGridModeItemIndex =
+                [self indexForMediaLibraryItemWithId:selectedGridModeItem.libraryID];
+            if (selectedGridModeItemIndex != NSNotFound) {
+                [self tableView:gridModeListTableView selectRowIndices:[NSIndexSet indexSetWithIndex:selectedGridModeItemIndex]];
+            }
+        }
+
+        if (selectedListModeItem != nil) {
+            const NSUInteger selectedListModeItemIndex =
+                [self indexForMediaLibraryItemWithId:selectedListModeItem.libraryID];
+            if (selectedListModeItemIndex != NSNotFound) {
+                [self tableView:collectionSelectionTableView selectRowIndices:[NSIndexSet indexSetWithIndex:selectedListModeItemIndex]];
+            }
+        }
 
         [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification object:self];
     });
