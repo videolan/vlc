@@ -820,7 +820,6 @@ qml_modules += {
     'sources': files(
         'playlist/qml/PlaylistDelegate.qml',
         'playlist/qml/PlaylistPane.qml',
-        'playlist/qml/PlaylistToolbar.qml',
         'playlist/qml/PlaylistDetachedWindow.qml',
     ),
 }

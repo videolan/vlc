@@ -1257,7 +1257,6 @@ libqml_module_playlist_a_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS)
 libqml_module_playlist_a_QML = \
 	playlist/qml/PlaylistDelegate.qml \
 	playlist/qml/PlaylistPane.qml \
-	playlist/qml/PlaylistToolbar.qml \
 	playlist/qml/PlaylistDetachedWindow.qml
 libqml_module_playlist_a_Singleton_QML =
 libqml_module_playlist_a_SOURCES = $(QML_MODULE_playlist_SRC)
