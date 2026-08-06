@@ -592,6 +592,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                   fallbackDetail:(NSString *)fallbackDetail
 {
     if (tableView != self.audioCollectionSelectionTableView &&
+        tableView != self.audioLibraryGridModeSplitViewListTableView &&
         tableView != self.audioGroupSelectionTableView &&
         ![self.audioGroupDataSource.tableViews containsObject:tableView])
         return;
