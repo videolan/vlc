@@ -156,7 +156,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
 + (const CGFloat)collectionViewItemMinimumWidth
 {
-    return 40;
+    return VLCUIUnits.dynamicCollectionViewItemMinimumWidth;
 }
 
 + (const unsigned short)collectionViewMinItemsInRow
