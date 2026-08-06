@@ -21,6 +21,7 @@ ifndef HAVE_FPU
 	$(APPLY) $(SRC)/faad2/faad2-fixed.patch
 endif
 	$(APPLY) $(SRC)/faad2/0001-specrec-check-the-last-swb_offset-value-is-valid.patch
+	$(APPLY) $(SRC)/faad2/0001-decoder-return-early-when-the-object-type-can-t-be-s.patch
 	$(call pkg_static,"libfaad/faad2.pc.in")
 	$(MOVE)
 
