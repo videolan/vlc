@@ -544,4 +544,72 @@ T.Pane {
     Keys.priority: Keys.AfterItem
     Keys.forwardTo: listView
     Keys.onPressed: (event) => root.Navigation.defaultKeyAction(event)
+
+    component PlaylistToggleButton : Widgets.IconToolButton {
+        id: playlistBtn
+
+        focus: true
+
+        font.pixelSize: VLCStyle.icon_banner
+        text: VLCIcons.playlist
+        description: qsTr("Play queue")
+
+        AccessibleCompat.id: "playqueueToggle"
+
+        width: VLCStyle.bannerButton_width
+        height: VLCStyle.bannerButton_height
+        //highlighted: MainCtx.playlistVisible
+
+        property Item plListView
+
+        DropArea {
+            anchors.fill: parent
+
+            onContainsDragChanged: {
+                if (containsDrag) {
+                    _timer.restart()
+
+                    if (playlistBtn.plListView)
+                        MainCtx.setCursor(Qt.DragCopyCursor)
+                } else {
+                    _timer.stop()
+
+                    if (playlistBtn.plListView)
+                        MainCtx.restoreCursor()
+                }
+            }
+
+            onEntered: (drag) => {
+                const plListView = playlistBtn.plListView
+                if (plListView) {
+                    console.assert(plListView.isDropAcceptableFunc)
+                    console.assert(plListView.model)
+                    if (plListView.isDropAcceptableFunc(drag, plListView.model.count)) {
+                        drag.accept()
+                    } else {
+                        drag.accepted = false
+                    }
+                } else {
+                    drag.accepted = false
+                }
+            }
+
+            onDropped: (drop) => {
+                const plListView = playlistBtn.plListView
+                if (plListView) {
+                    console.assert(plListView.acceptDropFunc)
+                    plListView.acceptDropFunc(plListView.model.count, drop)
+                }
+            }
+
+            Timer {
+                id: _timer
+                interval: VLCStyle.duration_humanMoment
+
+                onTriggered: {
+                    MainCtx.playqueuePanel.visible = true
+                }
+            }
+        }
+    }
 }
