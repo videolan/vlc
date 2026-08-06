@@ -963,6 +963,15 @@ FocusScope {
         showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
         playlistVisible: playlistVisibility.isPlaylistVisible
 
+        plListView: {
+            if (playlistpopup.active)
+                return playlistpopup.item
+            else if (playlistWindowLoader?.status === Loader.Ready)
+                return playlistWindowLoader.item.playlistView
+            else
+                return null
+        }
+
         Navigation.parentItem: rootPlayer
         Navigation.downItem: {
             if (playlistVisibility.isPlaylistVisible)

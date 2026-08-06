@@ -38,6 +38,10 @@ FocusScope{
 
     required property int textWidth
 
+    // For now, used for d&d functionality
+    // Not strictly necessary to set
+    property Item plListView
+
     property int reservedHeight: 0
 
     property int topMargin: 0
@@ -492,6 +496,8 @@ FocusScope{
             width: VLCStyle.bannerButton_width
             height: VLCStyle.bannerButton_height
 
+            plListView: root.plListView
+            
             Navigation.parentItem: root
             Navigation.leftItem: menuSelector.visible ? menuSelector : backBtn
 
