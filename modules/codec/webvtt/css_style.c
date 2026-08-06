@@ -166,7 +166,7 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
     }
     else if( !strcasecmp( p_decl->psz_property, "font-family" ) )
     {
-        vlc_css_term_t *term;
+        const vlc_css_term_t *term;
         if( term0.type >= TYPE_STRING )
         {
             size_t i_total = 1 + (p_decl->expr->i_count - 1) * 2;
