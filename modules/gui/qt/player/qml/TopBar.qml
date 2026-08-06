@@ -26,6 +26,7 @@ import QtQuick.Window
 import VLC.MainInterface
 import VLC.Style
 import VLC.PlayerControls
+import VLC.Playlist
 import VLC.Widgets as Widgets
 import VLC.Menus as Menus
 import VLC.Util
@@ -475,7 +476,7 @@ FocusScope{
             }
         }
 
-        Widgets.IconToolButton {
+        PlaylistPane.PlaylistToggleButton {
             id: playlistButton
 
             anchors.verticalCenter: parent.verticalCenter
