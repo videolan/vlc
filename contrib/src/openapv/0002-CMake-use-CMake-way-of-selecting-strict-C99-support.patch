@@ -1,0 +1,35 @@
+From 5c955393404ea1c64ea81abdf5dd3207a216e566 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 14 Jan 2026 13:41:39 +0100
+Subject: [PATCH 2/5] CMake: use CMake way of selecting strict C99 support
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f040c92..edd71d0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -122,7 +122,7 @@ elseif(UNIX OR MINGW)
+         set(OPT_DBG "-DNDEBUG") # disable assert
+     endif()
+ 
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPT_DBG} -${OPT_LV} -fomit-frame-pointer -pthread -std=c99")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPT_DBG} -${OPT_LV} -fomit-frame-pointer -pthread")
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused-function")
+     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lm")
+ 
+@@ -143,6 +143,8 @@ message ("linker Flags: " ${CMAKE_EXE_LINKER_FLAGS})
+ ########################################
+ 
+ set(CMAKE_C_STANDARD 99)
++set(CMAKE_C_STANDARD_REQUIRED ON)
++set(CMAKE_C_EXTENSIONS OFF)
+ cmake_policy(SET CMP0048 NEW)
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+ 
+-- 
+2.52.0.windows.1
+
