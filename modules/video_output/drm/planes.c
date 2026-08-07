@@ -4,6 +4,7 @@
  */
 /*****************************************************************************
  * Copyright © 2022 Rémi Denis-Courmont
+ * Copyright © 2026 Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -163,6 +164,9 @@ static ssize_t vlc_drm_get_planes(int fd, uint32_t **restrict listp)
             *listp = planes;
             return res.count_planes;
         }
+
+        /* Re-allocate the correct number of plane this time. */
+        count = res.count_planes;
         free(planes);
     }
 }
