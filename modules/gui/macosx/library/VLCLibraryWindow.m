@@ -77,6 +77,7 @@
 
 #import "playqueue/VLCPlayerController.h"
 #import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueModel.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCDragDropView.h"
@@ -577,6 +578,13 @@ static int ShowController(vlc_object_t * __unused p_this,
     } completionHandler:nil];
 }
 
+- (BOOL)shouldShowControlsBarForPlaybackContext
+{
+    VLCPlayerController * const playerController = self.playQueueController.playerController;
+    return playerController.playerState != VLC_PLAYER_STATE_STOPPED &&
+           self.playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
+}
+
 - (void)presentExternalWindows
 {
     VLCVideoOutputProvider * const voutProvider = VLCMain.sharedInstance.voutProvider;
@@ -673,7 +681,11 @@ static int ShowController(vlc_object_t * __unused p_this,
     self.alphaValue = 1.0;
     [self disableVideoTitleBarMode];
     [self setViewForSelectedSegment];
-    [self showControlsBarImmediately];
+    if ([self shouldShowControlsBarForPlaybackContext]) {
+        [self showControlsBarImmediately];
+    } else {
+        [self hideControlsBarImmediately];
+    }
     [self updateArtworkButtonEnabledState];
 
     if (!self.playQueueController.playerController.currentMediaIsAudioOnly) {
