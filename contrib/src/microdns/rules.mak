@@ -19,6 +19,7 @@ $(TARBALLS)/microdns-$(LIBMICRODNS_VERSION).tar.xz:
 
 microdns: microdns-$(LIBMICRODNS_VERSION).tar.xz .sum-microdns
 	$(UNPACK)
+	$(APPLY) $(SRC)/microdns/0001-mdns-support-XP-Vista-differences-at-runtime.patch
 	$(MOVE)
 
 .microdns: microdns crossfile.meson
