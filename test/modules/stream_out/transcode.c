@@ -103,6 +103,12 @@ static int DecoderDecode(decoder_t *dec, vlc_frame_t *frame)
 static void CloseDecoder(vlc_object_t *obj)
 {
     decoder_t *dec = (decoder_t*)obj;
+
+    /* An owner that cleans fmt_in before unloading would set the category
+     * to UNKNOWN_ES, but it must only be cleaned after this callback. */
+    assert(dec->fmt_in->i_cat == VIDEO_ES);
+    assert(dec->fmt_in->i_codec != 0);
+
     struct vlc_video_context *vctx = dec->p_sys;
     if (vctx)
         vlc_video_context_Release(vctx);
