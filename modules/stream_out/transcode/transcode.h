@@ -179,8 +179,10 @@ static inline void dec_Delete( decoder_t *p_dec )
         return;
 
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
+
+    decoder_Clean(p_dec);
     es_format_Clean( &p_owner->fmt_in );
-    decoder_Destroy( p_dec );
+    vlc_object_delete(p_dec);
 }
 
 static inline void es_format_SetMeta( es_format_t *p_dst, const es_format_t *p_src )
