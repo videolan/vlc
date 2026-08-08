@@ -26,8 +26,8 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U3j-Zx-fFf" customClass="VLCStackView">
-                    <rect key="frame" x="20" y="16" width="797" height="88"/>
+                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U3j-Zx-fFf" customClass="VLCStackView">
+                    <rect key="frame" x="16" y="16" width="181" height="88"/>
                     <subviews>
                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kFW-i6-3hg">
                             <rect key="frame" x="-2" y="60" width="103" height="28"/>
@@ -51,8 +51,8 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="5zZ-VM-Lb9">
-                            <rect key="frame" x="0.0" y="0.0" width="797" height="32"/>
+                        <button horizontalHuggingPriority="249" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="5zZ-VM-Lb9">
+                            <rect key="frame" x="0.0" y="0.0" width="181" height="32"/>
                             <buttonCell key="cell" type="bevel" title=" Resume playing" bezelStyle="regularSquare" image="play.circle.fill" catalog="system" imagePosition="leading" alignment="left" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="639-6i-zsD">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="systemSemibold" size="17"/>
@@ -89,21 +89,7 @@
             <constraints>
                 <constraint firstAttribute="width" secondItem="LPV-K6-7AE" secondAttribute="height" multiplier="21:9" id="2HS-zo-d22"/>
                 <constraint firstItem="qdP-As-qZ0" firstAttribute="top" secondItem="LPV-K6-7AE" secondAttribute="top" id="9aA-Ma-Vvy"/>
-                <constraint firstItem="U3j-Zx-fFf" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" constant="16" symbolic="YES" id="A9P-6v-TYB" customClass="VLCSpacingConstraint">
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                            <integer key="value" value="0"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
-                </constraint>
                 <constraint firstAttribute="bottom" secondItem="U3j-Zx-fFf" secondAttribute="bottom" constant="16" id="GKS-hS-EhI" customClass="VLCSpacingConstraint">
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                            <integer key="value" value="0"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
-                </constraint>
-                <constraint firstAttribute="trailing" secondItem="U3j-Zx-fFf" secondAttribute="trailing" constant="16" id="Nzn-Md-2Xx" customClass="VLCSpacingConstraint">
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
                             <integer key="value" value="0"/>
@@ -126,6 +112,8 @@
                 </constraint>
                 <constraint firstAttribute="bottom" secondItem="qdP-As-qZ0" secondAttribute="bottom" id="lyx-Ea-nZ1"/>
                 <constraint firstItem="qdP-As-qZ0" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" id="p3I-zN-Dxs"/>
+                <constraint firstAttribute="trailing" secondItem="U3j-Zx-fFf" secondAttribute="trailing" constant="16" id="s7T-NB-rHT"/>
+                <constraint firstItem="U3j-Zx-fFf" firstAttribute="leading" secondItem="GoN-QI-mru" secondAttribute="leading" id="v4k-5f-psi"/>
                 <constraint firstItem="GoN-QI-mru" firstAttribute="top" secondItem="LPV-K6-7AE" secondAttribute="top" constant="16" id="xOv-2n-nx5" customClass="VLCSpacingConstraint">
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
