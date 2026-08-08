@@ -114,6 +114,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     char *psz_item_keywords = NULL;
     char *psz_item_subtitle = NULL;
     char *psz_item_summary = NULL;
+    char *psz_item_content = NULL;
     char *psz_item_art_url = NULL;
     char *psz_art_url = NULL;
     const char *node;
@@ -214,6 +215,8 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                              !strcmp( psz_elname, "description" ) )
                         /* <description> isn't standard iTunes podcast stuff */
                         p = &psz_item_summary;
+                    else if( !strcmp( psz_elname, "content:encoded" ) )
+                        p = &psz_item_content;
                     else if( !strcmp( psz_elname, "pubDate" ) )
                         p = &psz_item_date;
                     else if( !strcmp( psz_elname, "itunes:category" ) )
@@ -305,6 +308,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                         FREENULL( psz_item_keywords );
                         FREENULL( psz_item_subtitle );
                         FREENULL( psz_item_summary );
+                        FREENULL( psz_item_content );
                         FREENULL( psz_item_art_url );
                         FREENULL( psz_elname );
                         b_item = false;
@@ -350,6 +354,16 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                     ADD_INFO( _("Podcast Type"), psz_item_type );
 #undef ADD_INFO
 #undef ADD_INFO_META
+
+                    if( psz_item_content )
+                    {
+                        input_item_AddInfo( p_input, _( "Podcast Info" ),
+                                            _( "Show Notes" ), "%s",
+                                            psz_item_content );
+                        input_item_SetMetaExtra( p_input, "content:encoded",
+                                                 psz_item_content );
+                        FREENULL( psz_item_content );
+                    }
 
                     /* Add the item art url if any, and the channel one otherwise */
                     if( psz_item_art_url != NULL )
@@ -407,6 +421,7 @@ error:
     free( psz_item_keywords );
     free( psz_item_subtitle );
     free( psz_item_summary );
+    free( psz_item_content );
     free( psz_item_art_url );
     free( psz_art_url );
     free( psz_elname );
