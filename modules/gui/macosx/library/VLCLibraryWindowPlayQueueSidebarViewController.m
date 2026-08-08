@@ -73,6 +73,7 @@
     self.dataSource.counterTextField = self.counterLabel;
     [self.dataSource prepareForUse];
     self.playQueueController.playQueueDataSource = self.dataSource;
+    [self.dataSource playQueueUpdated];
 
     self.tableView.dataSource = self.dataSource;
     self.tableView.delegate = self.dataSource;
