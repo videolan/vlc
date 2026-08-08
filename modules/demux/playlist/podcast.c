@@ -115,6 +115,8 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     char *psz_item_subtitle = NULL;
     char *psz_item_summary = NULL;
     char *psz_item_content = NULL;
+    char *psz_item_season = NULL;
+    char *psz_item_episode = NULL;
     char *psz_item_art_url = NULL;
     char *psz_art_url = NULL;
     const char *node;
@@ -227,6 +229,10 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                         p = &psz_item_keywords;
                     else if( !strcmp( psz_elname, "itunes:subtitle" ) )
                         p = &psz_item_subtitle;
+                    else if( !strcmp( psz_elname, "itunes:season" ) )
+                        p = &psz_item_season;
+                    else if( !strcmp( psz_elname, "itunes:episode" ) )
+                        p = &psz_item_episode;
                     else
                         break;
 
@@ -309,6 +315,8 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                         FREENULL( psz_item_subtitle );
                         FREENULL( psz_item_summary );
                         FREENULL( psz_item_content );
+                        FREENULL( psz_item_season );
+                        FREENULL( psz_item_episode );
                         FREENULL( psz_item_art_url );
                         FREENULL( psz_elname );
                         b_item = false;
@@ -351,6 +359,8 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                     ADD_INFO( _("Podcast Keywords"), psz_item_keywords );
                     ADD_INFO( _("Podcast Subtitle"), psz_item_subtitle );
                     ADD_INFO_META( _("Podcast Summary"), psz_item_summary, vlc_meta_Description );
+                    ADD_INFO_META( _("Podcast Season"), psz_item_season, vlc_meta_Season );
+                    ADD_INFO_META( _("Podcast Episode"), psz_item_episode, vlc_meta_Episode );
                     ADD_INFO( _("Podcast Type"), psz_item_type );
 #undef ADD_INFO
 #undef ADD_INFO_META
@@ -422,6 +432,8 @@ error:
     free( psz_item_subtitle );
     free( psz_item_summary );
     free( psz_item_content );
+    free( psz_item_season );
+    free( psz_item_episode );
     free( psz_item_art_url );
     free( psz_art_url );
     free( psz_elname );
