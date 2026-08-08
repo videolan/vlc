@@ -109,6 +109,17 @@ bool fixIntfSettings(void);
 + (instancetype)stringWithTimeFromTicks:(vlc_tick_t)time;
 
 /**
+ Creates an NSString with the given time in milliseconds
+
+ This method allocates and initializes an NSString with the given
+ time formatted as displayable time, returning an undefined time
+ placeholder for non-positive values.
+
+ \param time   Time in milliseconds
+ */
++ (instancetype)stringWithTimeFromMilliseconds:(int64_t)time;
+
+/**
  Returns a time in seconds from strings formatted with colons (aka ##, ##:##, ##:##:##)
 
  \param aString the string to parse

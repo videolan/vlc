@@ -103,6 +103,15 @@ NSString * flagEmojiStringForCountryCode(NSString *countryCode)
             vlc_tick_to_str(psz_time, time)];
 }
 
++ (instancetype)stringWithTimeFromMilliseconds:(int64_t)time
+{
+    if (time <= 0) {
+        return @"--:--";
+    }
+
+    return [NSString stringWithTimeFromTicks:VLC_TICK_FROM_MS(time)];
+}
+
 + (instancetype)stringWithTime:(long long int)time
 {
     if (time > 0) {

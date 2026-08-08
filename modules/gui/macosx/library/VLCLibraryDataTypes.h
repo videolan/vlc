@@ -34,8 +34,6 @@ extern NSString * const VLCMediaLibraryMediaItemUTI;
 @class VLCMediaLibraryGenre;
 @class VLCInputItem;
 
-extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
-
 vlc_medialibrary_t * _Nullable getMediaLibrary(void);
 
 typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {

@@ -42,7 +42,6 @@ const CGFloat VLCMediaLibrary1080pWidth = 1920.;
 const CGFloat VLCMediaLibrary1080pHeight = 1080.;
 const CGFloat VLCMediaLibrary540pWidth = 960.;
 const CGFloat VLCMediaLibrary540pHeight = 540.;
-const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
 
 NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryID";
 
@@ -708,7 +707,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)durationString
 {
-    return [NSString stringWithTime:_duration / VLCMediaLibraryMediaItemDurationDenominator];
+    return [NSString stringWithTimeFromMilliseconds:_duration];
 }
 
 - (NSArray<VLCMediaLibraryArtist *> *)artists
@@ -960,7 +959,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)durationString
 {
-    return [NSString stringWithTime:_duration / VLCMediaLibraryMediaItemDurationDenominator];
+    return [NSString stringWithTimeFromMilliseconds:_duration];
 }
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
@@ -1016,7 +1015,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.displayString = toNSStr(p_playlist->psz_name);
         const unsigned int numberOfMedia = p_playlist->i_nb_media;
         self.primaryDetailString = numberOfMedia == 0 ? _NS("No item") : _NPS("%u item", "%u items", numberOfMedia);
-        self.durationString = [NSString stringWithTime:p_playlist->i_duration / VLCMediaLibraryMediaItemDurationDenominator];
+        self.durationString = [NSString stringWithTimeFromMilliseconds:p_playlist->i_duration];
 
         _MRL = toNSStr(p_playlist->psz_mrl);
 
@@ -1571,7 +1570,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)durationString
 {
-    return [NSString stringWithTime:_duration / VLCMediaLibraryMediaItemDurationDenominator];
+    return [NSString stringWithTimeFromMilliseconds:_duration];
 
 }
 
@@ -1959,7 +1958,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.displayString = p_media->psz_title ? toNSStr(p_media->psz_title) : @"";
         self.primaryDetailString = self.displayString;
         self.secondaryDetailString = @"";
-        self.durationString = [NSString stringWithTime:p_media->i_duration / VLCMediaLibraryMediaItemDurationDenominator];
+        self.durationString = [NSString stringWithTimeFromMilliseconds:p_media->i_duration];
 
         // Movie-specific
         _summary = toNSStr(p_media->movie.psz_summary);
