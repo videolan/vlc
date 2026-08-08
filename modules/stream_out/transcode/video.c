@@ -573,11 +573,14 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     if( id->encoder == NULL )
         return VLC_SUCCESS;
 
+    /* drained blocks must be appended after already output (pending)
+     * blocks. */
+    block_t *drained = NULL;
     vlc_fifo_Lock( id->output_fifo );
     if( unlikely( !id->b_error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
     {
         msg_Dbg( p_stream, "Draining thread and waiting for that");
-        if( transcode_encoder_drain( id->encoder, out ) == VLC_SUCCESS )
+        if (transcode_encoder_drain(id->encoder, &drained) == VLC_SUCCESS)
             msg_Dbg( p_stream, "Draining done");
         else
             msg_Warn( p_stream, "Draining failed");
@@ -587,8 +590,13 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     {
         vlc_frame_t *pendings = vlc_fifo_DequeueAllUnlocked( id->output_fifo );
         block_ChainAppend(out, pendings);
+        block_ChainAppend(out, drained);
+        drained = NULL;
     }
     vlc_fifo_Unlock( id->output_fifo );
+
+    if (drained != NULL)
+        block_ChainRelease(drained);
 
     if( b_eos )
         tag_last_block_with_flag( out, BLOCK_FLAG_END_OF_SEQUENCE );
