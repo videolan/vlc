@@ -53,13 +53,6 @@ typedef NS_ENUM(NSUInteger, VLCExpandAnimationType) {
     VLCExpandAnimationTypeHorizontalLarge,
 };
 
-static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
-                                            const CVTimeStamp *inNow,
-                                            const CVTimeStamp *inOutputTime,
-                                            CVOptionFlags flagsIn,
-                                            CVOptionFlags *flagsOut,
-                                            void *displayLinkContext);
-
 #pragma mark - VLCLibraryCollectionViewFlowLayout
 @interface VLCLibraryCollectionViewFlowLayout ()
 {
@@ -75,6 +68,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
     BOOL _invalidateAll;
     CGFloat _previousWidth;
+    NSUInteger _displayLinkGeneration;
 }
 
 @property (nonatomic, readwrite) BOOL detailViewIsAnimating;
@@ -85,6 +79,11 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 @end
 
 @implementation VLCLibraryCollectionViewFlowLayout
+
+- (void)dealloc
+{
+    [self releaseDisplayLink];
+}
 
 + (instancetype)standardLayout
 {
@@ -461,8 +460,59 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         return;
     }
 
-    CVDisplayLinkSetOutputCallback(_displayLinkRef, detailViewAnimationCallback, (__bridge void *)self);
-    CVDisplayLinkStart(_displayLinkRef);
+    const NSUInteger displayLinkGeneration = ++_displayLinkGeneration;
+    CVDisplayLinkRef const expectedDisplayLink = _displayLinkRef;
+    __weak VLCLibraryCollectionViewFlowLayout * const weakSelf = self;
+    const CVReturn handlerResult = CVDisplayLinkSetOutputHandler(_displayLinkRef, ^CVReturn(
+        CVDisplayLinkRef displayLink __unused,
+        const CVTimeStamp *inNow __unused,
+        const CVTimeStamp *inOutputTime __unused,
+        CVOptionFlags flagsIn __unused,
+        CVOptionFlags *flagsOut __unused) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            VLCLibraryCollectionViewFlowLayout * const strongSelf = weakSelf;
+            if (strongSelf == nil || strongSelf->_displayLinkGeneration != displayLinkGeneration ||
+                strongSelf->_displayLinkRef != expectedDisplayLink) {
+                return;
+            }
+            [strongSelf advanceDetailViewAnimation];
+        });
+        return kCVReturnSuccess;
+    });
+
+    if (handlerResult != kCVReturnSuccess || CVDisplayLinkStart(_displayLinkRef) != kCVReturnSuccess) {
+        [self releaseDisplayLink];
+        _detailViewIsAnimating = NO;
+    }
+}
+
+- (void)advanceDetailViewAnimation
+{
+    BOOL animationFinished = NO;
+
+    if (self.detailViewIsAnimating) {
+        if (self.animationIsCollapse) {
+            --self.animationIndex;
+            animationFinished = (self.animationIndex == kWrapAroundValue);
+        } else {
+            ++self.animationIndex;
+            animationFinished = (self.animationIndex == kAnimationSteps);
+        }
+    }
+
+    if (self.detailViewIsAnimating == NO || animationFinished) {
+        self.detailViewIsAnimating = NO;
+        [self releaseDisplayLink];
+
+        if (self.animationIsCollapse) {
+            self.selectedIndexPath = nil;
+            self.animationIndex = 0;
+        } else {
+            self.animationIndex = kAnimationSteps - 1;
+        }
+    }
+
+    [self invalidateLayout];
 }
 
 - (void)releaseDisplayLink
@@ -471,54 +521,12 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         return;
     }
 
-    CVDisplayLinkStop(_displayLinkRef);
-    CVDisplayLinkRelease(_displayLinkRef);
-
+    CVDisplayLinkRef const displayLink = _displayLinkRef;
     _displayLinkRef = NULL;
+    ++_displayLinkGeneration;
+
+    CVDisplayLinkStop(displayLink);
+    CVDisplayLinkRelease(displayLink);
 }
 
 @end
-
-static CVReturn detailViewAnimationCallback(
-                                            CVDisplayLinkRef displayLink __unused,
-                                            const CVTimeStamp *inNow __unused,
-                                            const CVTimeStamp *inOutputTime __unused,
-                                            CVOptionFlags flagsIn __unused,
-                                            CVOptionFlags *flagsOut __unused,
-                                            void *displayLinkContext)
-{
-    if (displayLinkContext == nil) {
-        return kCVReturnError;
-    }
-
-    VLCLibraryCollectionViewFlowLayout *bridgedSelf = (__bridge VLCLibraryCollectionViewFlowLayout *)displayLinkContext;
-    BOOL animationFinished = NO;
-
-    if(bridgedSelf.detailViewIsAnimating) {
-        if (bridgedSelf.animationIsCollapse) {
-            --bridgedSelf.animationIndex;
-            animationFinished = (bridgedSelf.animationIndex == kWrapAroundValue);
-        } else {
-            ++bridgedSelf.animationIndex;
-            animationFinished = (bridgedSelf.animationIndex == kAnimationSteps);
-        }
-    }
-
-    if (bridgedSelf.detailViewIsAnimating == NO || animationFinished) {
-        bridgedSelf.detailViewIsAnimating = NO;
-        [bridgedSelf releaseDisplayLink];
-
-        if (bridgedSelf.animationIsCollapse) {
-            bridgedSelf.selectedIndexPath = nil;
-            bridgedSelf.animationIndex = 0;
-        } else {
-            bridgedSelf.animationIndex = kAnimationSteps - 1;
-        }
-    }
-
-    dispatch_async(dispatch_get_main_queue(), ^(void){
-        [bridgedSelf invalidateLayout];
-    });
-
-    return kCVReturnSuccess;
-}
