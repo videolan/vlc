@@ -652,12 +652,14 @@ void CloseDecoder(vlc_object_t *o)
     decoder_t *dec = container_of(o, decoder_t, obj);
     vpx_alpha *p_sys = dec->p_sys;
 
+    decoder_Clean(&p_sys->opaque->dec);
     es_format_Clean(&p_sys->opaque->fmt_out);
     es_format_Clean(&p_sys->opaque->fmt_in);
-    decoder_Destroy(&p_sys->opaque->dec);
+    vlc_object_delete(&p_sys->opaque->dec);
+    decoder_Clean(&p_sys->alpha->dec);
     es_format_Clean(&p_sys->alpha->fmt_out);
     es_format_Clean(&p_sys->alpha->fmt_in);
-    decoder_Destroy(&p_sys->alpha->dec);
+    vlc_object_delete(&p_sys->alpha->dec);
 
     if (p_sys->pool)
         picture_pool_Release(p_sys->pool);
