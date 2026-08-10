@@ -758,8 +758,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
             _lanDeviceSnapshot = [self snapshotByUpdatingSource:source];
         }
     }
-
-    [self reloadData];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadData];
+    });
 }
 
 - (void)reloadData
