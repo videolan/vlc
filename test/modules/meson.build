@@ -11,7 +11,8 @@ vlc_tests += {
     'sources' : files('lua/playlist_parser.c'),
     'suite' : ['modules', 'test_modules'],
     'link_with' : [libvlc, libvlccore],
-    'module_depends' : ['lua'] 
+    'module_depends' : ['lua'],
+    'enabled' : lua_dep.found() and get_option('lua').enabled(),
 }
 
 if not (host_system == 'windows') # missing mkdtemp()

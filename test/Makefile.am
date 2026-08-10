@@ -71,7 +71,6 @@ check_PROGRAMS = \
 	test_src_video_output_opengl \
 	test_src_video_output_spu \
 	test_modules_lua_extension \
-	test_modules_lua_playlist_parser \
 	test_modules_misc_medialibrary \
 	test_modules_packetizer_helpers \
 	test_modules_packetizer_hxxx \
@@ -112,6 +111,10 @@ endif
 
 if HAVE_DARWIN
 check_PROGRAMS += test_src_misc_image_cvpx
+endif
+
+if BUILD_LUA
+check_PROGRAMS += test_modules_lua_playlist_parser
 endif
 
 
