@@ -142,9 +142,9 @@ static void ReleaseDecoder( decoder_t *p_dec )
         vlc_decoder_device_Release( p_owner->dec_dev );
         p_owner->dec_dev = NULL;
     }
+    decoder_Clean( p_dec );
     es_format_Clean( &p_owner->fmt_in );
     es_format_Clean( &p_owner->fmt_out );
-    decoder_Clean( p_dec );
     if ( p_owner->filters != NULL )
         filter_chain_Delete( p_owner->filters );
     if ( p_owner->vctx != NULL )
