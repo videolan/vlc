@@ -195,8 +195,8 @@ nightly-win64-arm-llvm:
 .release-win-common:
     # We don't use any of the .win-common template so just use .docker-template
     extends: .docker-template
-    only:
-      - tags
+    rules:
+        - if: '$CI_COMMIT_TAG'
     tags:
         - release
         - amd64
@@ -229,8 +229,8 @@ nightly-win64-arm-llvm:
 
 release-debian:
     extends: .docker-template
-    only:
-      - tags
+    rules:
+        - if: '$CI_COMMIT_TAG'
     tags:
         - release
         - amd64
@@ -395,8 +395,8 @@ nightly-flatpak-x86_64:
 
 .release-flatpak:
     extends: .flatpak-common
-    only:
-        - tags
+    rules:
+        - if: '$CI_COMMIT_TAG'
     variables:
         FLATPAK_BRANCH: stable
 
@@ -414,8 +414,8 @@ release-flatpak-x86_64:
 flatpak-repo:
     stage: repo
     extends: .docker-template
-    only:
-        - tags
+    rules:
+        - if: '$CI_COMMIT_TAG'
     image:
         name: $VLC_FLATPAK_IMAGE
         entrypoint: [""]
