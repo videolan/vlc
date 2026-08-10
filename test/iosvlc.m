@@ -199,12 +199,11 @@ int main(int argc, char * argv[]) {
 /* Glue interface code, define drawable-nsobject for display module */
 static int Open(vlc_object_t *obj)
 {
-    AppDelegate *d = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    if( d == nil )
-        return VLC_EGENERIC;
+    __block AppDelegate *d;
 
     dispatch_sync(dispatch_get_main_queue(), ^{
-        if (d->subview != nil)
+        d = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        if (d == nil || d->subview != nil)
             return;
 
 #if !TARGET_OS_VISION
@@ -227,6 +226,9 @@ static int Open(vlc_object_t *obj)
         [d->window addGestureRecognizer:d->_pinchRecognizer];
 #endif
     } );
+
+    if (d == nil)
+        return VLC_EGENERIC;
 
     assert(d->subview != nil);
     var_SetAddress(vlc_object_instance(obj), "drawable-nsobject",
