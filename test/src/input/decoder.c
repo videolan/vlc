@@ -107,8 +107,8 @@ static int decoder_load(decoder_t *decoder, bool is_packetizer,
     decoder_LoadModule(decoder, is_packetizer, false);
     if (!decoder->p_module)
     {
-        es_format_Clean( &owner->fmt_in );
         decoder_Clean( decoder );
+        es_format_Clean( &owner->fmt_in );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -117,8 +117,9 @@ static int decoder_load(decoder_t *decoder, bool is_packetizer,
 static void decoder_destroy_clean(decoder_t *decoder)
 {
     struct decoder_owner *owner = dec_get_owner(decoder);
+    decoder_Clean(decoder);
     es_format_Clean(&owner->fmt_in);
-    decoder_Destroy(decoder);
+    vlc_object_delete(decoder);
 }
 
 void test_decoder_destroy(decoder_t *decoder)
@@ -227,8 +228,8 @@ int test_decoder_process(decoder_t *decoder, block_t *p_block)
             decoder->pf_decode(decoder, NULL);
 
             /* Reload decoder */
-            es_format_Clean( &owner->fmt_in );
             decoder_Clean(decoder);
+            es_format_Clean( &owner->fmt_in );
             if (decoder_load(decoder, false, &packetizer->fmt_out) != VLC_SUCCESS)
             {
                 if (p_block != NULL)
