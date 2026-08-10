@@ -414,16 +414,14 @@ VLC_API int decoder_LoadModule(decoder_t *dec, bool packetizer,
                                 bool use_varoption);
 
 /**
- * Destroy a decoder and reset the structure.
- *
- * To be used by decoder owners.
- */
-VLC_API void decoder_Destroy( decoder_t *p_dec );
-
-/**
  * Unload a decoder module and reset the input/output formats.
  *
  * To be used by decoder owners.
+ *
+ * \note
+ * The module can read the format given to decoder_Init() until it is
+ * unloaded, so the owner must call this function before cleaning that
+ * format, and delete the decoder object afterwards.
  */
 VLC_API void decoder_Clean( decoder_t *p_dec );
 

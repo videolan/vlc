@@ -107,15 +107,6 @@ void decoder_Clean( decoder_t *p_dec )
     }
 }
 
-void decoder_Destroy( decoder_t *p_dec )
-{
-    if (p_dec != NULL)
-    {
-        decoder_Clean( p_dec );
-        vlc_object_delete(p_dec);
-    }
-}
-
 int decoder_UpdateVideoFormat( decoder_t *dec )
 {
     return decoder_UpdateVideoOutput( dec, NULL );

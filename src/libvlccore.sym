@@ -95,7 +95,6 @@ decoder_NewPicture
 decoder_Init
 decoder_LoadModule
 decoder_Clean
-decoder_Destroy
 decoder_NewAudioBuffer
 decoder_UpdateVideoFormat
 decoder_UpdateVideoOutput
