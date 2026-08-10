@@ -647,32 +647,31 @@ android-x86_64:
 # Webassembly
 #
 
-.wasm32-emscripten-common :
+wasm32-emscripten-build :
     extends: .base-template
     variables: *variables-emscripten-wasm32
+    parallel:
+        matrix:
+            - BUILD_TYPE: Static
+            - BUILD_TYPE: Shared
+              LIBMODE: "--enable-shared"
     image:
         name: $VLC_WASM_EMSCRIPTEN
     script:
         - source $EMSCRIPTEN_SDK/emsdk_env.sh
         - |
-            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --enable-extra-checks"
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --enable-extra-checks $LIBMODE"
             if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
                 echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
                 EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --with-prebuilt-contribs"
             fi
             if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
-                EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --gen-contrib-archive"
-            fi
-            if [[ $CI_JOB_NAME == *"shared"* ]]; then
-                EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --enable-shared"
+                if [ "${BUILD_TYPE}" = "Static" ]; then
+                    # only one variant of the matrix should produce the prebuilt tarball
+                    EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --gen-contrib-archive"
+                fi
             fi
             ./extras/package/wasm-emscripten/build.sh $EXTRA_BUILD_FLAGS
-
-wasm32-emscripten-build :
-    extends: .wasm32-emscripten-common
-
-wasm32-emscripten-build-shared :
-    extends: .wasm32-emscripten-common
 
 #
 # VLC Documentation
