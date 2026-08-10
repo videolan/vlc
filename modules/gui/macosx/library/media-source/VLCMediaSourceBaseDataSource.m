@@ -719,25 +719,33 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)mediaSourceChildrenReset:(NSNotification *)aNotification
 {
     msg_Dbg(getIntf(), "Reset nodes: %s", [[aNotification.object description] UTF8String]);
-    [self reloadDataForNotification:aNotification];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadDataForNotification:aNotification];
+    });
 }
 
 - (void)mediaSourceChildrenAdded:(NSNotification *)aNotification
 {
     msg_Dbg(getIntf(), "Received new nodes: %s", [[aNotification.object description] UTF8String]);
-    [self reloadDataForNotification:aNotification];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadDataForNotification:aNotification];
+    });
 }
 
 - (void)mediaSourceChildrenRemoved:(NSNotification *)aNotification
 {
     msg_Dbg(getIntf(), "Removed nodes: %s", [[aNotification.object description] UTF8String]);
-    [self reloadDataForNotification:aNotification];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadDataForNotification:aNotification];
+    });
 }
 
 - (void)mediaSourcePreparingEnded:(NSNotification *)aNotification
 {
     msg_Dbg(getIntf(), "Preparsing ended: %s", [[aNotification.object description] UTF8String]);
-    [self reloadDataForNotification:aNotification];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadDataForNotification:aNotification];
+    });
 }
 
 - (void)reloadDataForNotification:(NSNotification *)aNotification
@@ -750,6 +758,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
             _lanDeviceSnapshot = [self snapshotByUpdatingSource:source];
         }
     }
+
     [self reloadData];
 }
 
