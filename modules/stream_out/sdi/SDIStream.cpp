@@ -487,8 +487,6 @@ vlc_decoder_device * VideoDecodedStream::VideoDecCallback_get_device(decoder_t *
 
 void VideoDecodedStream::ReleaseDecoder()
 {
-    AbstractDecodedStream::ReleaseDecoder();
-
     struct decoder_owner *p_owner;
     p_owner = container_of(p_decoder, struct decoder_owner, dec);
     if (p_owner->dec_dev)
@@ -496,6 +494,8 @@ void VideoDecodedStream::ReleaseDecoder()
         vlc_decoder_device_Release(p_owner->dec_dev);
         p_owner->dec_dev = NULL;
     }
+
+    AbstractDecodedStream::ReleaseDecoder();
 }
 
 int VideoDecodedStream::VideoDecCallback_update_format(decoder_t *p_dec,
