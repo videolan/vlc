@@ -229,6 +229,16 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_modules_stream_out_sdi',
+    'sources' : files(
+        'stream_out/sdi.cpp',
+        '../../modules/stream_out/sdi/SDIStream.cpp',
+        '../../modules/stream_out/sdi/SDIStream.hpp'),
+    'suite' : ['modules', 'test_modules'],
+    'link_with' : [libvlc, libvlccore]
+}
+
+vlc_tests += {
     'name' : 'test_modules_stream_out_pcr_sync',
     'sources' : files(
         'stream_out/pcr_sync.c',
