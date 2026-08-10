@@ -280,11 +280,7 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
 
     if(vlc_clone(&thread, decoderThreadCallback, this))
     {
-        es_format_Clean(&p_owner->decoder_out);
-        es_format_Clean(&p_owner->last_fmt_update);
-        es_format_Clean(&p_owner->fmt_in);
-        decoder_Destroy( p_decoder );
-        p_decoder = NULL;
+        ReleaseDecoder();
         return false;
     }
 
@@ -410,10 +406,11 @@ void AbstractDecodedStream::ReleaseDecoder()
 {
     struct decoder_owner *p_owner;
     p_owner = container_of(p_decoder, struct decoder_owner, dec);
+    decoder_Clean(p_decoder);
     es_format_Clean(&p_owner->decoder_out);
     es_format_Clean(&p_owner->last_fmt_update);
     es_format_Clean(&p_owner->fmt_in);
-    decoder_Destroy( p_decoder );
+    vlc_object_delete(p_decoder);
     p_decoder = NULL;
 }
 
