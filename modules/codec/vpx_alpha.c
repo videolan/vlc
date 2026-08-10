@@ -565,6 +565,14 @@ static void Flush( decoder_t *dec )
     vlc_mutex_unlock(&p_sys->lock);
 }
 
+static void DestroyDecoder(struct vp_decoder *vpdec)
+{
+    decoder_Clean(&vpdec->dec);
+    es_format_Clean(&vpdec->fmt_out);
+    es_format_Clean(&vpdec->fmt_in);
+    vlc_object_delete(&vpdec->dec);
+}
+
 int OpenDecoder(vlc_object_t *o)
 {
     decoder_t *dec = container_of(o, decoder_t, obj);
@@ -628,16 +636,16 @@ int OpenDecoder(vlc_object_t *o)
     decoder_LoadModule(&p_sys->opaque->dec, false, true);
     if (p_sys->opaque->dec.p_module == NULL)
     {
-        decoder_Destroy(&p_sys->alpha->dec);
-        decoder_Destroy(&p_sys->opaque->dec);
+        DestroyDecoder(p_sys->alpha);
+        DestroyDecoder(p_sys->opaque);
         return VLC_EGENERIC;
     }
     p_sys->alpha->dec.cbs = &dec_cbs;
     decoder_LoadModule(&p_sys->alpha->dec, false, true);
     if (p_sys->alpha->dec.p_module == NULL)
     {
-        decoder_Destroy(&p_sys->alpha->dec);
-        decoder_Destroy(&p_sys->opaque->dec);
+        DestroyDecoder(p_sys->alpha);
+        DestroyDecoder(p_sys->opaque);
         return VLC_EGENERIC;
     }
 
@@ -652,14 +660,8 @@ void CloseDecoder(vlc_object_t *o)
     decoder_t *dec = container_of(o, decoder_t, obj);
     vpx_alpha *p_sys = dec->p_sys;
 
-    decoder_Clean(&p_sys->opaque->dec);
-    es_format_Clean(&p_sys->opaque->fmt_out);
-    es_format_Clean(&p_sys->opaque->fmt_in);
-    vlc_object_delete(&p_sys->opaque->dec);
-    decoder_Clean(&p_sys->alpha->dec);
-    es_format_Clean(&p_sys->alpha->fmt_out);
-    es_format_Clean(&p_sys->alpha->fmt_in);
-    vlc_object_delete(&p_sys->alpha->dec);
+    DestroyDecoder(p_sys->opaque);
+    DestroyDecoder(p_sys->alpha);
 
     if (p_sys->pool)
         picture_pool_Release(p_sys->pool);
