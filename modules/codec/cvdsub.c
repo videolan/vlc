@@ -65,7 +65,7 @@ static int Decode( decoder_t *, block_t * );
 static block_t *Packetize  ( decoder_t *, block_t ** );
 static block_t *Reassemble ( decoder_t *, block_t * );
 static void ParseMetaInfo  ( decoder_t *, block_t * );
-static void ParseHeader    ( decoder_t *, block_t * );
+static int  ParseHeader    ( decoder_t *, block_t * );
 static subpicture_t *DecodePacket( decoder_t *, block_t * );
 static void RenderImage( decoder_t *, block_t *, picture_t * );
 
@@ -246,7 +246,15 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
     p_block->i_buffer -= SPU_HEADER_LEN;
 
     /* First packet in the subtitle block */
-    if( p_sys->i_state == SUBTITLE_BLOCK_EMPTY ) ParseHeader( p_dec, p_block );
+    if( p_sys->i_state == SUBTITLE_BLOCK_EMPTY )
+    {
+        if( ParseHeader( p_dec, p_block ) != VLC_SUCCESS )
+        {
+            msg_Warn( p_dec, "Missing header data");
+            block_Release( p_block );
+            return NULL;
+        }
+    }
 
     block_ChainAppend( &p_sys->p_spu, p_block );
     p_sys->p_spu = block_ChainGather( p_sys->p_spu );
@@ -263,7 +271,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
                       p_spu->i_buffer, p_sys->i_spu_size );
         }
 
-        msg_Dbg( p_dec, "subtitle packet complete, size=%zuu", p_spu->i_buffer);
+        msg_Dbg( p_dec, "subtitle packet complete, size=%zu", p_spu->i_buffer);
 
         ParseMetaInfo( p_dec, p_spu );
 
@@ -306,10 +314,12 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
   this, so it may be untested.
 */
 
-static void ParseHeader( decoder_t *p_dec, block_t *p_block )
+static int ParseHeader( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *p = p_block->p_buffer;
+    if (p_block->i_buffer < 4)
+        return VLC_EINVAL; // not enough data
 
     p_sys->i_spu_size = (p[0] << 8) + p[1] + 4; p += 2;
 
@@ -325,6 +335,7 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
     msg_Dbg( p_dec, "total size: %zu  metadata size: %zu",
              p_sys->i_spu_size, p_sys->metadata_length );
 #endif
+    return VLC_SUCCESS;
 }
 
 /*
