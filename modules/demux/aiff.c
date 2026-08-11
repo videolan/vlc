@@ -352,7 +352,7 @@ static int Demux( demux_t *p_demux )
 
     /* we will read 100ms at once */
     i_read = p_sys->i_ssnd_fsize * ( p_sys->fmt.audio.i_rate / 10 );
-    if( p_sys->i_ssnd_end > 0 && p_sys->i_ssnd_end - i_tell < i_read )
+    if( p_sys->i_ssnd_end > 0 && p_sys->i_ssnd_end > i_tell && p_sys->i_ssnd_end - i_tell < i_read )
     {
         i_read = p_sys->i_ssnd_end - i_tell;
     }
