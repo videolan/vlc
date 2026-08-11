@@ -1861,11 +1861,11 @@
                 </imageView>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="V2G-WY-Ewc" userLabel="Browse Button" customClass="VLCCustomEmptyLibraryBrowseButton">
                     <rect key="frame" x="298" y="141" width="99" height="28"/>
-                    <buttonCell key="cell" type="recessed" title="Browse" bezelStyle="recessed" imagePosition="left" alignment="center" borderStyle="border" inset="2" id="l2n-Ul-S0e">
+                    <buttonCell key="cell" type="push" title="Browse" bezelStyle="rounded" imagePosition="left" alignment="center" borderStyle="border" inset="2" id="l2n-Ul-S0e">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                         <font key="font" metaFont="cellTitle"/>
                     </buttonCell>
-                    <color key="contentTintColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                    <color key="bezelColor" name="VLCAccentColor"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="28" id="8dg-gG-ccj"/>
                         <constraint firstAttribute="width" constant="99" id="ELs-Kb-L3e"/>
