@@ -307,7 +307,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_ssnd_fsize = p_sys->fmt.audio.i_channels *
                           ((p_sys->fmt.audio.i_bitspersample + 7) / 8);
 
-    if( p_sys->i_ssnd_fsize <= 0 || p_sys->fmt.audio.i_rate == 0 || p_sys->i_ssnd_pos < 12 )
+    if( p_sys->i_ssnd_fsize <= 0 || p_sys->fmt.audio.i_rate == 0 )
     {
         msg_Err( p_demux, "invalid audio parameters" );
         goto error;
