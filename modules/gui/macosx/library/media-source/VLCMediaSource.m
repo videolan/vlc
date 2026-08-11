@@ -339,7 +339,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         VLCMediaSourcePreparseInputItemKey: inputNode.inputItem
     };
     dispatch_async(dispatch_get_main_queue(), ^{
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingStarted
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingStarted
                                                           object:self
                                                         userInfo:preparseUserInfo];
     });
@@ -350,8 +350,22 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         return [self generateChildNodesForDirectoryNode:inputNode withUrl:dirUrl];
     }
 
-    vlc_media_tree_Preparse(_p_mediaSource->tree, _p_preparser,
-                            inputNode.inputItem.vlcInputItem);
+    vlc_preparser_req * const request =
+        vlc_media_tree_Preparse(_p_mediaSource->tree,
+                                _p_preparser,
+                                inputNode.inputItem.vlcInputItem);
+    if (request == NULL) {
+        NSDictionary * const failedPreparseUserInfo = @{
+            VLCMediaSourcePreparseInputItemKey: inputNode.inputItem,
+            VLCMediaSourcePreparseStatusKey: @(VLC_ENOMEM)
+        };
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
+                                                              object:self
+                                                            userInfo:failedPreparseUserInfo];
+        });
+        return [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+    }
     return nil;
 }
 
@@ -491,7 +505,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
                 VLCMediaSourcePreparseStatusKey: @(VLC_EGENERIC)
             };
             dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
+                [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
                                                                   object:self
                                                                 userInfo:userInfo];
             });
@@ -552,7 +566,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
             VLCMediaSourcePreparseStatusKey: @(VLC_SUCCESS)
         };
         dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
                                                               object:self
                                                             userInfo:userInfo];
         });
