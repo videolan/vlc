@@ -410,7 +410,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             pf = va_arg( args, double * );
 
-            if( i_start < i_end )
+            if( i_start < i_end && i_start <= i_tell )
             {
                 *pf = (double)(i_tell - i_start)/(double)(i_end - i_start);
                 return VLC_SUCCESS;
