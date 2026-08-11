@@ -40,6 +40,8 @@ NSString *VLCMediaSourceChildrenAdded = @"VLCMediaSourceChildrenAdded";
 NSString *VLCMediaSourceChildrenRemoved = @"VLCMediaSourceChildrenRemoved";
 NSString *VLCMediaSourcePreparsingStarted = @"VLCMediaSourcePreparsingStarted";
 NSString *VLCMediaSourcePreparsingEnded = @"VLCMediaSourcePreparsingEnded";
+NSString * const VLCMediaSourcePreparseInputItemKey = @"VLCMediaSourcePreparseInputItemKey";
+NSString * const VLCMediaSourcePreparseStatusKey = @"VLCMediaSourcePreparseStatusKey";
 
 static void cb_children_reset(vlc_media_tree_t * __unused p_tree,
                               input_item_node_t * __unused p_node,
@@ -79,14 +81,22 @@ static void cb_children_removed(vlc_media_tree_t * __unused p_tree,
 }
 
 static void cb_preparse_ended(vlc_media_tree_t * __unused p_tree,
-                              input_item_node_t * __unused p_node,
-                              int __unused status,
+                              input_item_node_t *p_node,
+                              int status,
                               void *p_data)
 {
+    VLCMediaSource * const mediaSource = (__bridge VLCMediaSource *)p_data;
+    VLCInputItem * const inputItem = p_node->p_item == NULL
+        ? nil
+        : [[VLCInputItem alloc] initWithInputItem:p_node->p_item];
+    NSDictionary * const userInfo = inputItem == nil
+        ? @{ VLCMediaSourcePreparseStatusKey: @(status) }
+        : @{ VLCMediaSourcePreparseInputItemKey: inputItem,
+             VLCMediaSourcePreparseStatusKey: @(status) };
     dispatch_async(dispatch_get_main_queue(), ^{
-        VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
         [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
-                                                            object:mediaSource];
+                                                          object:mediaSource
+                                                        userInfo:userInfo];
     });
 }
 
@@ -325,8 +335,14 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         return nil;
     }
 
+    NSDictionary * const preparseUserInfo = @{
+        VLCMediaSourcePreparseInputItemKey: inputNode.inputItem
+    };
+    dispatch_async(dispatch_get_main_queue(), ^{
     [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingStarted
-                                                      object:self];
+                                                          object:self
+                                                        userInfo:preparseUserInfo];
+    });
 
     if (inputNode.inputItem.inputType == ITEM_TYPE_DIRECTORY &&
         [inputNode.inputItem.MRL hasPrefix:@"file://"]) {
@@ -470,8 +486,15 @@ static const char *const remoteBrowseDescription = "Remote Browse";
             if (self.didFinishGeneratingChildNodesForNodeHandler) {
                 self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
             }
+            NSDictionary * const userInfo = @{
+                VLCMediaSourcePreparseInputItemKey: directoryInputNode.inputItem,
+                VLCMediaSourcePreparseStatusKey: @(VLC_EGENERIC)
+            };
+            dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
-                                                              object:self];
+                                                                  object:self
+                                                                userInfo:userInfo];
+            });
             return error;
         }
 
@@ -524,8 +547,15 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         if (self.didFinishGeneratingChildNodesForNodeHandler) {
             self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
         }
+        NSDictionary * const userInfo = @{
+            VLCMediaSourcePreparseInputItemKey: directoryInputNode.inputItem,
+            VLCMediaSourcePreparseStatusKey: @(VLC_SUCCESS)
+        };
+        dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
-                                                          object:self];
+                                                              object:self
+                                                            userInfo:userInfo];
+        });
     }
 
     return nil;
