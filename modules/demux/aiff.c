@@ -223,9 +223,9 @@ static int Open( vlc_object_t *p_this )
             p_sys->fmt.audio.i_bitspersample = GetWBE( &p_peek[14] );
             p_sys->fmt.audio.i_rate     = GetF80BE( &p_peek[16] );
 
-            msg_Dbg( p_demux, "COMM: channels=%" PRIu16 " samples_frames=%d bits=%d rate=%d",
-                     channels, GetDWBE( &p_peek[10] ), GetWBE( &p_peek[14] ),
-                     GetF80BE( &p_peek[16] ) );
+            msg_Dbg( p_demux, "COMM: channels=%" PRIu16 " samples_frames=%d bits=%u rate=%u",
+                     channels, GetDWBE( &p_peek[10] ), fmt.audio.i_bitspersample,
+                     fmt.audio.i_rate );
         }
         else if( !memcmp( p_peek, "SSND", 4 ) )
         {
