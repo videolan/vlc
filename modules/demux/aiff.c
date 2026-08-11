@@ -348,12 +348,12 @@ error:
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t     i_tell = vlc_stream_Tell( p_demux->s );
+    uint64_t    i_tell = vlc_stream_Tell( p_demux->s );
 
     block_t     *p_block;
     int         i_read;
 
-    if( p_sys->i_ssnd_end > 0 && i_tell >= p_sys->i_ssnd_end )
+    if( p_sys->i_ssnd_end > 0 && i_tell >= (uint64_t)p_sys->i_ssnd_end )
     {
         /* EOF */
         return VLC_DEMUXER_EOF;
@@ -364,7 +364,7 @@ static int Demux( demux_t *p_demux )
 
     /* we will read 100ms at once */
     i_read = p_sys->i_ssnd_fsize * ( p_sys->fmt.audio.i_rate / 10 );
-    if( p_sys->i_ssnd_end > 0 && p_sys->i_ssnd_end > i_tell && p_sys->i_ssnd_end - i_tell < i_read )
+    if( p_sys->i_ssnd_end > 0 && (uint64_t)p_sys->i_ssnd_end > i_tell && p_sys->i_ssnd_end - i_tell < i_read )
     {
         i_read = p_sys->i_ssnd_end - i_tell;
     }
@@ -418,11 +418,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             int64_t i_start = p_sys->i_ssnd_start;
             int64_t i_end   = p_sys->i_ssnd_end > 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
-            int64_t i_tell  = vlc_stream_Tell( p_demux->s );
+            uint64_t i_tell  = vlc_stream_Tell( p_demux->s );
 
             pf = va_arg( args, double * );
 
-            if( i_start < i_end && i_start <= i_tell )
+            if( i_start < i_end && i_start <= (int64_t)i_tell )
             {
                 *pf = (double)(i_tell - i_start)/(double)(i_end - i_start);
                 return VLC_SUCCESS;
