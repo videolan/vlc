@@ -485,6 +485,18 @@ foreach module : vlc_modules
         kwargs: kwargs,
         shortname: shortname,
     )
+    if is_disabler(vlc_plugin)
+        # Report the plugin as disabled, or every target listing it in
+        # 'depends' would silently turn into a disabler too, without
+        # any diagnostic.
+        warning('Plugin \'@0@\' will be disabled, one of its dependencies is a disabler'
+            .format(module['name']))
+        vlc_plugins_manifest += {
+            module['name']: module + { 'enabled': false }
+        }
+        continue
+    endif
+
     vlc_plugins_targets += {
         module['name']: vlc_plugin
     }
