@@ -213,12 +213,18 @@ static int Open( vlc_object_t *p_this )
             if( vlc_stream_Peek( p_demux->s, &p_peek, 18+8 ) < 18+8 )
                 goto error;
 
-            p_sys->fmt.audio.i_channels = GetWBE( &p_peek[8] );
+            uint16_t channels = GetWBE( &p_peek[8] );
+            if (channels > 32)
+            {
+                msg_Err( p_demux, "Unsupported number of channels %" PRIu16, channels );
+                goto error;
+            }
+            p_sys->fmt.audio.i_channels = channels;
             p_sys->fmt.audio.i_bitspersample = GetWBE( &p_peek[14] );
             p_sys->fmt.audio.i_rate     = GetF80BE( &p_peek[16] );
 
-            msg_Dbg( p_demux, "COMM: channels=%d samples_frames=%d bits=%d rate=%d",
-                     GetWBE( &p_peek[8] ), GetDWBE( &p_peek[10] ), GetWBE( &p_peek[14] ),
+            msg_Dbg( p_demux, "COMM: channels=%" PRIu16 " samples_frames=%d bits=%d rate=%d",
+                     channels, GetDWBE( &p_peek[10] ), GetWBE( &p_peek[14] ),
                      GetF80BE( &p_peek[16] ) );
         }
         else if( !memcmp( p_peek, "SSND", 4 ) )
