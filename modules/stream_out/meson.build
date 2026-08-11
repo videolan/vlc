@@ -144,6 +144,11 @@ vlc_modules += {
 }
 
 # RTP
+rtp_sout_deps = [socket_libs]
+if srtp_dep.found()
+    rtp_sout_deps += srtp_dep
+endif
+
 vlc_modules += {
     'name' : 'stream_out_rtp',
     'sources' : files(
@@ -153,7 +158,7 @@ vlc_modules += {
         'rtcp.c',
         'rtsp.c',
     ),
-    'dependencies' : [socket_libs, srtp_dep],
+    'dependencies' : rtp_sout_deps,
     'shortname' : 's_o_rtp',
 }
 
