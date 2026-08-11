@@ -54,6 +54,15 @@
 
 - (void)controlTextDidChange:(NSNotification *)notification
 {
+    NSTextField *sender = notification.object;
+    NSString *stringValue = sender.stringValue;
+
+    if ([stringValue containsString:@":"]) {
+        [self applyColonSeparatedDimensions:stringValue startingAtField:sender];
+        [self setPosition:[self getTimeInSecs]];
+        return;
+    }
+
     [self setPosition:[self getTimeInSecs]];
 }
 
@@ -205,6 +214,36 @@
         return YES;
     }
     return NO;
+}
+
+- (void)applyColonSeparatedDimensions:(NSString *)text startingAtField:(NSTextField *)field
+{
+    NSArray<NSString *> *parts = [text componentsSeparatedByString:@":"];
+
+    NSInteger startingField = 0;
+    NSInteger timeDifference = [self getTimeDifference:field];
+
+    if (timeDifference == 3600) {
+        startingField = 0;
+    } else if (timeDifference == 60) {
+        startingField = 1;
+    } else if (timeDifference == 1) {
+        startingField = 2;
+    } else {
+        return;
+    }
+
+    NSInteger count = MIN(parts.count, 3 - startingField);
+
+    NSInteger newPosition = 0;
+    for (NSInteger i = 0; i < count; i++) {
+        NSString *part = [parts[i]
+            stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        newPosition += timeDifference * part.integerValue;
+        timeDifference /= 60;
+    }
+
+    [self setPosition:newPosition];
 }
 
 @end
