@@ -152,14 +152,15 @@ NSString * const VLCMessageTimeoutTimerUserInfoMessageKey = @"VLCMessageTimeoutT
         [self displayFinishLoad];
         [self presentTransientMessage:self.discoveryFailedMessage];
         [self removeMessage:self.discoveringMediaMessage];
-    } else if ([notificationName containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notificationName]) {
+    } else if ([notificationName hasSuffix:VLCLongNotificationNameStartSuffix] &&
+               ![self.longNotifications containsObject:notificationName]) {
         if (self.longNotifications.count == 0) {
             [self addMessage:self.loadingLibraryItemsMessage];
             [self removeMessage:self.libraryItemsLoadedMessage];
             [self displayStartLoad];
         }
         [self.longNotifications addObject:notificationName];
-    } else if ([notificationName containsString:VLCLongNotificationNameFinishSuffix]) {
+    } else if ([notificationName hasSuffix:VLCLongNotificationNameFinishSuffix]) {
         NSString * const loadingNotification =
             [notificationName stringByReplacingOccurrencesOfString:VLCLongNotificationNameFinishSuffix withString:VLCLongNotificationNameStartSuffix];
         [self.longNotifications removeObject:loadingNotification];
