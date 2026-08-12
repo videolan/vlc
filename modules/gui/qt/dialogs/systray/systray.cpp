@@ -73,14 +73,14 @@ VLCSystray::~VLCSystray()
  */
 void VLCSystray::toggleUpdateMenu()
 {
-    m_ctx->toggleWindowVisibility();
+    m_ctx->toggleWindowVisibility(true);
     update();
 }
 
 /* First Item of the systray menu */
 void VLCSystray::showUpdateMenu()
 {
-    m_ctx->setInterfaceVisibible(true);
+    m_ctx->setInterfaceVisibible(true, true);
     update();
 }
 

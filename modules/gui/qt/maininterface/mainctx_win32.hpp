@@ -121,7 +121,7 @@ class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler, public QAbstr
 public:
     explicit InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent = nullptr);
     virtual ~InterfaceWindowHandlerWin32();
-    void toggleWindowVisibility() override;
+    void toggleWindowVisibility(bool requestActivate = false) override;
 
     bool eventFilter(QObject*, QEvent* event) override;
 

@@ -40,8 +40,8 @@ protected slots:
     virtual void setFullScreen( bool fs );
     virtual void setInterfaceFullScreen( bool fs );
     virtual void setInterfaceAlwaysOnTop( bool on_top );
-    virtual void toggleWindowVisibility();
-    virtual void setInterfaceVisible(bool);
+    virtual void toggleWindowVisibility(bool requestActivate = false);
+    virtual void setInterfaceVisible(bool, bool requestActivate = false);
     virtual void setInterfaceHiden();
     virtual void setInterfaceShown();
     virtual void setInterfaceMinimized();

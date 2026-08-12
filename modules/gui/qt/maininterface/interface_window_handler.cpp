@@ -344,18 +344,20 @@ void InterfaceWindowHandler::onVideoEmbedChanged(bool embed)
 }
 
 
-void InterfaceWindowHandler::toggleWindowVisibility()
+void InterfaceWindowHandler::toggleWindowVisibility(bool _requestActivate)
 {
     switch ( m_window->visibility() )
     {
     case QWindow::Hidden:
         /* If hidden, show it */
         setInterfaceShown();
-        requestActivate();
+        if (_requestActivate)
+            requestActivate();
         break;
     case QWindow::Minimized:
         setInterfaceNormal();
-        requestActivate();
+        if (_requestActivate)
+            requestActivate();
         break;
     default:
         setInterfaceHiden();
@@ -364,7 +366,7 @@ void InterfaceWindowHandler::toggleWindowVisibility()
 }
 
 
-void InterfaceWindowHandler::setInterfaceVisible(bool visible)
+void InterfaceWindowHandler::setInterfaceVisible(bool visible, bool _requestActivate)
 {
     if (visible)
     {
@@ -372,14 +374,17 @@ void InterfaceWindowHandler::setInterfaceVisible(bool visible)
         {
         case QWindow::Hidden:
             setInterfaceShown();
+            if (_requestActivate)
+                requestActivate();
             break;
         case QWindow::Minimized:
             setInterfaceNormal();
+            if (_requestActivate)
+                requestActivate();
             break;
         default:
             break;
         }
-        requestActivate();
     }
     else
     {

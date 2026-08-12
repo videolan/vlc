@@ -915,7 +915,7 @@ InterfaceWindowHandlerWin32::~InterfaceWindowHandlerWin32()
     QApplication::instance()->removeNativeEventFilter(this);
 }
 
-void InterfaceWindowHandlerWin32::toggleWindowVisibility()
+void InterfaceWindowHandlerWin32::toggleWindowVisibility(bool _requestActivate)
 {
 
     switch ( m_window->visibility() )
@@ -923,11 +923,13 @@ void InterfaceWindowHandlerWin32::toggleWindowVisibility()
     case QWindow::Hidden:
         /* If hidden, show it */
         setInterfaceShown();
-        requestActivate();
+        if (_requestActivate)
+            requestActivate();
         break;
     case QWindow::Minimized:
         setInterfaceMinimized();
-        requestActivate();
+        if (_requestActivate)
+            requestActivate();
         break;
     default:
         {
@@ -949,7 +951,7 @@ void InterfaceWindowHandlerWin32::toggleWindowVisibility()
             }
             if( !hwnd || !GetWindowInfo( hwnd, &wi ) || (wi.dwExStyle&WS_EX_TOPMOST) )
                 setInterfaceHiden();
-            else
+            else if (_requestActivate)
                 requestActivate();
         }
         break;

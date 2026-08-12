@@ -554,9 +554,9 @@ protected slots:
 
 signals:
     void fullscreenInterfaceToggled( bool );
-    void setInterfaceVisibible(bool );
+    void setInterfaceVisibible(bool, bool requestActivate = false);
     void setInterfaceFullScreen( bool );
-    void toggleWindowVisibility();
+    void toggleWindowVisibility(bool requestActivate = false);
     void askToQuit();
     void askShow();
     void askBoss();
